@@ -1,180 +1,165 @@
-Return-Path: <kvm+bounces-29261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC77A9A5F05
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 10:46:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB959A5E7D
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 10:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BE91C240BE
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:46:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0E01C20DCA
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2C81E2618;
-	Mon, 21 Oct 2024 08:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8907D1E1C18;
+	Mon, 21 Oct 2024 08:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="H+r0j0dl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qnV1ClMl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AB51C36;
-	Mon, 21 Oct 2024 08:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B931E1A32;
+	Mon, 21 Oct 2024 08:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729500370; cv=none; b=bbPrHc7GFDKJSfTzqYhOPlB+BXlMluTbtRcnmx6UNXoQTiHld0+SmoM7nuQiDGGYCFpb+tGix+U5t4XDH1d2ZACVPbBIaHm2rmHXi4qhoopbFuRyu3q8qsjWClrTlC3D4rBN3C22fcJmWQAqaBs/RJWBeiR5KTdPbsjQzfn2lsI=
+	t=1729498917; cv=none; b=ey+i40JoMSF1PjJ3YoI+gFYTO1yqUPnUyuI/CcBGY9Ai724sg5IY9d9fnSQFADv1+Z3S1ndFv0BvZzY7MY3kPYZEEwkEYpRXieaN9TAsD7THe1brIiT0Hkg5kfbADoFPcYd4GTxicgYqg/0g01x9VzbgHzJSPWR7EOvqCrENJho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729500370; c=relaxed/simple;
-	bh=fJXjH5qlfC6ASDlZU2YZEnFhYawwdHJBoYR3WOBcS30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pCfp0qEpuZPyLjKWvMy7tvbMpZ0oCoDyM6yFnKFY1JIGsLAPrhy2MwLfHQdrlPZwbxIRngwaaEg9SL8IA8jqI8Nwz6DYOlucruMwvGnU+By7J7msmeN6roG1X1NBZGVWtZdOO7WDqikghDxsOMyz2aC+uM+Kgd+uC76jmnAxS6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=H+r0j0dl; arc=none smtp.client-ip=80.12.242.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 2nWit5w2oIGzd2nWitpn3w; Mon, 21 Oct 2024 10:12:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1729498354;
-	bh=b74pKJMrbi0EjSGOws8bCaw1p7JE0thrw1ZwFQ6pL1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=H+r0j0dlHG4EKgzxFMUkKsG0q8pg0iKdICETVBVlDYM4vUPoYmBSun26Yq6zYs0w2
-	 hJJ9JBJljmEjks5Kgck6/lPlN36DpOAb0x8llN3+x+k085av3NhGRRjyg1WEKQnsnB
-	 AT56vYHIHdtKFXDyIOnd3VaH1bTZqR8pwD4m92m83h+A8n5MlWHGZ6dHINU7MXNOnj
-	 OcvTmGJXQPFZEybml5JwseYK1jndJ1iXYTNeFhH6CQzXNKU6wtjmD7135nU1TdBVMz
-	 pvjChI0pGFkk+0aEKF4qHhenW+g8lMpikzKzw6m7X6B0nAK0I/yAmPsRWMd4bLdJCd
-	 dbEAfkYmELjEg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Mon, 21 Oct 2024 10:12:34 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <396e511f-e5cc-4850-bf72-0a2111f7683c@wanadoo.fr>
-Date: Mon, 21 Oct 2024 10:12:32 +0200
+	s=arc-20240116; t=1729498917; c=relaxed/simple;
+	bh=Q3dBwhKYtosBRIhpoY2C5AnPotARGVEjMtl3n73RKsg=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=PqCsWdMc9md+LsAJ2VSxb1N9+o+q+9bfECfQLFlD+0qlLUZL4QHCPmMSimq9NF+TdzHTjOZsXvLS21ggC2Wb4/mb5qH092YR29HAobKjiniA+SQZDR3iwe8xQypetL0jkYLbm//7ZWarlPHh7+Hn2XVBikaM9aHVq8Rhyxvm+Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qnV1ClMl; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49L2KiPQ027225;
+	Mon, 21 Oct 2024 08:21:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=jFNaAR
+	88v7fVUsVqZ/Iv6kpsqeif58Qvy1y/HcetyAE=; b=qnV1ClMlaAg3B7oxMyxd/l
+	bNkuYnnndoSVQuHPfI+AwbnH5p5ocDYuF7yw664zffs4zVtaIxDKgsQ0co6QxVfZ
+	ZSLAxnxT9EDE7XsirzS6a9LxZLnI/fI1/rBeVC1zD4haPs4OZunvOugBQA+rCYds
+	gptOrgzSFRbDBFlrdl1LNmpyRQk3TzNJMiNbADGrUfsoWFeZZVDpPfrwNQle9zdL
+	4YR1hzG2ClaNO2IGDi1i5bijnwOEDYephrKXTK41+15PxfDOjbh//lZFR/NGc1tu
+	1YsnISmVPSmRCTsUH1AajNJiifvDaGzE/9xMZiP1cE7wN7dCJM2FtHuUXQLSzwZQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42c5fcfgk5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 08:21:53 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49L8LqtA027440;
+	Mon, 21 Oct 2024 08:21:52 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42c5fcfgk3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 08:21:52 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49L5hoSn018605;
+	Mon, 21 Oct 2024 08:21:52 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42csaj50ap-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 08:21:52 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49L8LmjA56361416
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Oct 2024 08:21:48 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A091520040;
+	Mon, 21 Oct 2024 08:21:48 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7D93E20049;
+	Mon, 21 Oct 2024 08:21:48 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.29.79])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 21 Oct 2024 08:21:48 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 03/13] x86/sev: Add Secure TSC support for SNP guests
-To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
- thomas.lendacky@amd.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
-Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20241021055156.2342564-1-nikunj@amd.com>
- <20241021055156.2342564-4-nikunj@amd.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241021055156.2342564-4-nikunj@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <606b3c63-f4e1-449a-b3de-6fbb5e8211d7@linux.ibm.com>
+References: <20241016180320.686132-1-nsg@linux.ibm.com> <20241016180320.686132-5-nsg@linux.ibm.com> <e649996c-559f-425e-833f-ca83bad59372@linux.ibm.com> <172924897145.324297.7466880604426455626@t14-nrb.local> <606b3c63-f4e1-449a-b3de-6fbb5e8211d7@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 4/6] s390x: Add library functions for exiting from snippet
+From: Nico Boehr <nrb@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Date: Mon, 21 Oct 2024 10:21:47 +0200
+Message-ID: <172949890741.324297.5665746219783039207@t14-nrb.local>
+User-Agent: alot/0.10
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sXkELXFjUvSAgroKWsdU490FfLnwIf9h
+X-Proofpoint-GUID: GAhBPISrGDB8LJyml8LUpXNFvRs797pd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 clxscore=1011 mlxlogscore=852 phishscore=0
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410210056
 
-Le 21/10/2024 à 07:51, Nikunj A Dadhania a écrit :
-> Add support for Secure TSC in SNP-enabled guests. Secure TSC allows guests
-> to securely use RDTSC/RDTSCP instructions, ensuring that the parameters
-> used cannot be altered by the hypervisor once the guest is launched.
-> 
-> Secure TSC-enabled guests need to query TSC information from the AMD
-> Security Processor. This communication channel is encrypted between the AMD
-> Security Processor and the guest, with the hypervisor acting merely as a
-> conduit to deliver the guest messages to the AMD Security Processor. Each
-> message is protected with AEAD (AES-256 GCM). Use a minimal AES GCM library
-> to encrypt and decrypt SNP guest messages for communication with the PSP.
-> 
-> Use mem_encrypt_init() to fetch SNP TSC information from the AMD Security
-> Processor and initialize snp_tsc_scale and snp_tsc_offset. During secondary
-> CPU initialization, set the VMSA fields GUEST_TSC_SCALE (offset 2F0h) and
-> GUEST_TSC_OFFSET (offset 2F8h) with snp_tsc_scale and snp_tsc_offset,
-> respectively.
-> 
-> Add confidential compute platform attribute CC_ATTR_GUEST_SNP_SECURE_TSC
-> that can be used by the guest to query whether the Secure TSC feature is
-> active.
-> 
-> Since handle_guest_request() is common routine used by both the SEV guest
-> driver and Secure TSC code, move it to the SEV header file.
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Tested-by: Peter Gonda <pgonda@google.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
+Quoting Janosch Frank (2024-10-18 14:53:34)
+> On 10/18/24 12:56 PM, Nico Boehr wrote:
+> > Quoting Janosch Frank (2024-10-18 10:02:37)
+> > [...]
+> >>> +static inline uint64_t snippet_get_force_exit_value(struct vm *vm)
+> >>> +{
+> >>> +     struct kvm_s390_sie_block *sblk =3D vm->sblk;
+> >>> +
+> >>> +     assert(snippet_is_force_exit_value(vm));
+> >>> +
+> >>> +     return vm->save_area.guest.grs[sblk_ip_as_diag(sblk).r_1];
+> >>> +}
+> >>
+> >> The cpu address parameter for 9C is 16 bit.
+> >> While we could make it 64 bit for snippets I don't see a reason to do
+> >> so. The 16 bits are enough to indicate something to the host which can
+> >> then go and fetch memory for more data.
+> >=20
+> > Mh, how exactly would you "fetch memory"? That requires knowledge on wh=
+ere
+> > things are in guest memory which can be painful to figure out from the
+> > host.
+> >=20
+> > I've found it useful to be able to pass a pointer from guest to host. M=
+aybe
+> > a diag500 is the better option? gr2 contains the cookie which is a 64-b=
+it
+> > value - see Linux' Documentation/virt/kvm/s390/s390-diag.rst.
+> >=20
+> > P.S. Did I miss the part in the docs where the 16-bit restriction of 9c=
+ is
+> > documented or is it missing?
+>=20
+> For ASM snippets addresses 0x2000 to 0x4000 are a free area.
+> For C snippets that area is the stack.
+> The 16 bits should be good enough to point into that area.
 
-..
+Actually, it's currently just enough to point into the stack (snippet stack
+is 64K)... also requires additional fiddling in the host to figure out the
+complete address. Probably also in the guest, if you do it r15-relative
+(can't think of a different solution right now).
 
-> +static int __init snp_get_tsc_info(void)
-> +{
-> +	static u8 buf[SNP_TSC_INFO_RESP_SZ + AUTHTAG_LEN];
-> +	struct snp_guest_request_ioctl rio;
-> +	struct snp_tsc_info_resp tsc_resp;
-> +	struct snp_tsc_info_req *tsc_req;
-> +	struct snp_msg_desc *mdesc;
-> +	struct snp_guest_req req;
-> +	int rc;
-> +
-> +	/*
-> +	 * The intermediate response buffer is used while decrypting the
-> +	 * response payload. Make sure that it has enough space to cover the
-> +	 * authtag.
-> +	 */
-> +	BUILD_BUG_ON(sizeof(buf) < (sizeof(tsc_resp) + AUTHTAG_LEN));
-> +
-> +	mdesc = snp_msg_alloc();
-> +	if (IS_ERR_OR_NULL(mdesc))
-> +		return -ENOMEM;
-> +
-> +	rc = snp_msg_init(mdesc, snp_vmpl);
-> +	if (rc)
-> +		return rc;
-> +
-> +	tsc_req = kzalloc(sizeof(struct snp_tsc_info_req), GFP_KERNEL);
-> +	if (!tsc_req)
-> +		return -ENOMEM;
-> +
-> +	memset(&req, 0, sizeof(req));
-> +	memset(&rio, 0, sizeof(rio));
-> +	memset(buf, 0, sizeof(buf));
-> +
-> +	req.msg_version = MSG_HDR_VER;
-> +	req.msg_type = SNP_MSG_TSC_INFO_REQ;
-> +	req.vmpck_id = snp_vmpl;
-> +	req.req_buf = tsc_req;
-> +	req.req_sz = sizeof(*tsc_req);
-> +	req.resp_buf = buf;
-> +	req.resp_sz = sizeof(tsc_resp) + AUTHTAG_LEN;
-> +	req.exit_code = SVM_VMGEXIT_GUEST_REQUEST;
-> +
-> +	rc = snp_send_guest_request(mdesc, &req, &rio);
-> +	if (rc)
-> +		goto err_req;
-> +
-> +	memcpy(&tsc_resp, buf, sizeof(tsc_resp));
-> +	pr_debug("%s: response status %x scale %llx offset %llx factor %x\n",
-> +		 __func__, tsc_resp.status, tsc_resp.tsc_scale, tsc_resp.tsc_offset,
-> +		 tsc_resp.tsc_factor);
-> +
-> +	if (tsc_resp.status == 0) {
-> +		snp_tsc_scale = tsc_resp.tsc_scale;
-> +		snp_tsc_offset = tsc_resp.tsc_offset;
-> +	} else {
-> +		pr_err("Failed to get TSC info, response status %x\n", tsc_resp.status);
-> +		rc = -EIO;
-> +	}
-> +
-> +err_req:
-> +	/* The response buffer contains the sensitive data, explicitly clear it. */
-> +	memzero_explicit(buf, sizeof(buf));
-> +	memzero_explicit(&tsc_resp, sizeof(tsc_resp));
-> +	memzero_explicit(&req, sizeof(req));
+> If the snippet requires a lot of memory then you can use constant=20
+> addresses which are way over the snippet binary or just store a 64 bit=20
+> address in a "free" lowcore location.
 
-req does not seem to hold sensitive data.
-Is it needed, or maybe should it be tsc_req?
+Would you prefer any of those over the diag500 solution?
 
-> +
-> +	return rc;
-> +}
+> As you mentioned we also have diag500 which has the drawback of=20
+> requiring to specify a couple more registers but that's not a huge=20
+> hassle.=20
 
-...
-
-CJ
+Since Nina contributed this nice wrapper function, going diag500 seems to
+be the best thing to do.
 
