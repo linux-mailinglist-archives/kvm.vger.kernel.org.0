@@ -1,236 +1,291 @@
-Return-Path: <kvm+bounces-29251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BABBE9A5A77
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:36:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A8D9A5AEE
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB8A71C21126
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 06:36:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A3B9B2172D
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 06:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A154199EAF;
-	Mon, 21 Oct 2024 06:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C521DF96D;
+	Mon, 21 Oct 2024 06:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZfPWd22Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6yyz7ZQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFE1194A49
-	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 06:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729492559; cv=fail; b=lJqs9X++IcXFc/kW1+ofNPGPmtUsPDo+QoCdhNEtsV0OjqJPhAF4mAiHuUq1jjd6xNKvbWcDMydRthN8+y1lpTi4CTTpD8Hf0N4mbyVJgmjQtk4kvkMTooUuVY2BVjHYJ+KhSGYJFS3CPa7GMlL+k+6fe5sUOi4FO9M2ypLj5to=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729492559; c=relaxed/simple;
-	bh=xtkC4GD5NSqSOyFPnYVlsSz8m10THyxzdz/DDqtE+v0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ANaENFdbXy1zXawcTwodMSxnMBmHmPlZmhbgokn//dpPe+o2dK4bt8LpU/nRPKJIEOtSFLackUueydiMpicLhMm319WWmWtyaYbnV9oz90n+oiKzdEJTA7nt7UK37oNRPILcq+SUXvcBOwF+fzh/1o0pZunq9JwkL460NbJBMuM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZfPWd22Z; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729492557; x=1761028557;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xtkC4GD5NSqSOyFPnYVlsSz8m10THyxzdz/DDqtE+v0=;
-  b=ZfPWd22Z703mOC06Mks4rFM4Oddxot6tupPHzIt09SyO4b1nSFHmFLd+
-   pDgFP5aW77uxO2wB+0FxtVsyiA9F3i5XV2eWqt6GZmW1TwW7WRyXPFIrH
-   Q7HS9QCf43JUTjqVustP65xQlo3DIovdZ6EegSR8tmELhcVHQj4PlobW4
-   zaERBn4x0iUgMoh2PnxMfZ1X2elh0nJyb9DiX1zBdMHLsGNSAuMD1YoeZ
-   E1vXXbmeIKwIwroD79hmcoi23MIgs0lEwEFVRfqrBvidpNXnjt5ZdjPyj
-   7PKEz/Rfw3syGLhXJWlRO9vgrKta8ht7RRlIv1YF7bNIVyw9g8nDNgATI
-   w==;
-X-CSE-ConnectionGUID: 1FnydUiYSJ6jWmp9SnBDxg==
-X-CSE-MsgGUID: nKNVHe1nTViOBaKZrqbPoA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28838992"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="28838992"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2024 23:35:56 -0700
-X-CSE-ConnectionGUID: TBjdNqHMSki3LeOqh0DtiA==
-X-CSE-MsgGUID: dejeqCawSQyZnrywPEzL6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,220,1725346800"; 
-   d="scan'208";a="102740745"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2024 23:35:55 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sun, 20 Oct 2024 23:35:55 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sun, 20 Oct 2024 23:35:55 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sun, 20 Oct 2024 23:35:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wqrLDsOwZZGx/lGhbcSOA6BjYWrXceQkwPLTC/dK3diZTYG8l0LzPdR898NTXZUbLWnOUTZfY9KXwejmDbB4OuNoII+s0os31nHaTFBX+7A8wFg1OXpqJZ4odg1a1alJSIEjM/YdejUlI2x2hMM0e65z7WoZHHY2MmD/3rbp6NGzqbuoLMB70viwT8lFwCteEycNJfJNnWNlE4E5wuk3JE/ERIGrk36N3GHQB7oeQ6FwsfkRruisSXCvsBQz8z29lOB4lc1MbMvIdsgqj3xxSe5GirvySxkxl8ZF87HYqUhFDeZO7wnRbJxYpA2fbqrgFshiJCPVwroSrDeZvjCrbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hQwS0oDwOA5IiHXik3K394S7cy+AxUXFRKNOyEMK2Vc=;
- b=XVCL+9IZbOiIa4qjEZceOWOw1ANGTMLS7JfK66Ih3CN1uhg8vUh+7GWoFBwCjl61Tee0FKNKWDAPpg0rTP1WKhU5L7S9Sou5/A53jkuuE/gd1u72OVwX6P9DpYyUAs+3w2+cmF41+kWex7Vt/YOl5VACtKOjLqU41UM/vaCdDpVOmp84X79Z62N61DT13Qhb4MROWBUkvvwhl1gb55mv7RwiC8eZzhraffetvRfAe2PdedvadfChg8dspps+GkP1JjK3x87Ik48B0VRSB3kyMoTOSL6RMZv370yWso+Lek/Hyz5D7ZeQHINNNjSz8BbEy3BBF1nfouP1k4gvWiL2DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by DM4PR11MB7255.namprd11.prod.outlook.com (2603:10b6:8:10d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Mon, 21 Oct
- 2024 06:35:53 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8069.024; Mon, 21 Oct 2024
- 06:35:52 +0000
-Message-ID: <fd9dbe4c-bac1-419d-9af1-adfa33408a9b@intel.com>
-Date: Mon, 21 Oct 2024 14:40:27 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 9/9] iommu: Make set_dev_pasid op support domain
- replacement
-To: Baolu Lu <baolu.lu@linux.intel.com>, <joro@8bytes.org>, <jgg@nvidia.com>,
-	<kevin.tian@intel.com>, <will@kernel.org>
-CC: <alex.williamson@redhat.com>, <eric.auger@redhat.com>,
-	<nicolinc@nvidia.com>, <kvm@vger.kernel.org>, <chao.p.peng@linux.intel.com>,
-	<iommu@lists.linux.dev>, <zhenzhong.duan@intel.com>, <vasant.hegde@amd.com>
-References: <20241018055402.23277-1-yi.l.liu@intel.com>
- <20241018055402.23277-10-yi.l.liu@intel.com>
- <17513727-c2db-4aea-a60a-d9bb8b8ac71c@linux.intel.com>
-Content-Language: en-US
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <17513727-c2db-4aea-a60a-d9bb8b8ac71c@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: KL1P15301CA0054.APCP153.PROD.OUTLOOK.COM
- (2603:1096:820:3d::8) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271BE1D220E
+	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 06:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729493277; cv=none; b=cLTO0RRa69OohVy0tSUkSSg6LkZaDCLNs3q4KCVECMcKzYl2CFEtWNKyhH0+KD84nUdoQ9SdHiOqAj7oO1RSqFr1KbkRpMGdmy4tg9ktGkywujFBLaUNaUySKNXFGzVK6vik1mNCmmENeUSt8QYRC8IWqsk4JLh/I1HuAVdtRVI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729493277; c=relaxed/simple;
+	bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=X6P+QYHeUQL0vS2YcVsvbYL79H0PbLueski8yWVjSySOY7rzi9mHi2bFoQ2RvvyFDC7/nVeLdSR0MH0q3vh8J8o+IlAFpVINjpIo/5qZvxwyIP0Lc/qL72yxJQMSVMR1aorOfS73t01bTOL+3ma2mJHwVc0SufCjZlKRm/NNDcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H6yyz7ZQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729493274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
+	b=H6yyz7ZQHfOJWxDQybm0UBGe0/oNi9DhJrT6zT7tpjtTexTcwOt0JzQY8Amy4NLVvnVbjA
+	Xi2DatgmBicfvR3VXskiKwJhoV3hy3sOnt5UHDm3IIVCiL+6grEtWOk5WBE54nubgIXcXi
+	QBWW19Wvy8uPGrR8ZoWXTz7SD4722Ao=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-407-eH9aREfOP_6QEtw3dAaOpw-1; Mon, 21 Oct 2024 02:47:50 -0400
+X-MC-Unique: eH9aREfOP_6QEtw3dAaOpw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4316300bb15so20468255e9.2
+        for <kvm@vger.kernel.org>; Sun, 20 Oct 2024 23:47:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729493269; x=1730098069;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
+        b=j7kCN9x9hDavQBUEHitt1AIcfkfdWAAi0uQ14adJf6DePpy7TDDTNLRpkJ0Fm+eeBj
+         GM4lz9ikhuUxY71jIjJXBOKIH4TQwf+QFzwWdSWGYPqP1mfpE/U9NA4302CD8g6lbEk8
+         xCwRNvTXjnDpl23d5iTAze4SJdavouK8pj8wa+ryrgmsoSkpPOqfxUXRukDXg1cWS8lV
+         v8hMyUChZ1F45Xqqw/lArS3vUKvXi2jHEV3RQbODjc9bt4xsFqgR/+qdklJyHjALAaya
+         Orewrhd7GSpPyqoHXR/c4kL2vN4SpBTL4oIv8OLL1HFxVYGpHyqxpF4r7cm6AP5U6Egq
+         Xnaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1v732wsCUI6FLcZkzT5U3pv2p5a65aguJP9sKazWRhQMNKZ/0T7v8iavl9F4F1EB0KYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywY3cEJW2kX3xztOFZZNRrTvJr0HUyNcN8HAG2q35bZbw0Hl7R
+	1pyK2tCSbwLkN2XqINnlYTyN//uYSGhSYLtgR5qHarR26HdEA+ES0QRh3WhLaUZPMJimIu8egdM
+	t3dR/iHEV4lEZd1RGOUQ99Ktk81Vc+c9LbfzzguzTTE14eh+S6A==
+X-Received: by 2002:a05:600c:3591:b0:431:4c14:abf4 with SMTP id 5b1f17b1804b1-4316163a1b2mr84025655e9.14.1729493269429;
+        Sun, 20 Oct 2024 23:47:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVZgn1S+/IbVUHVqZogTbkz5rvgpgAowACslYYkYZ99T9pAyCEi5NExPZQP+nHcWcbmjh9Bw==
+X-Received: by 2002:a05:600c:3591:b0:431:4c14:abf4 with SMTP id 5b1f17b1804b1-4316163a1b2mr84025225e9.14.1729493268971;
+        Sun, 20 Oct 2024 23:47:48 -0700 (PDT)
+Received: from eisenberg.fritz.box (200116b82d449800aee93296d73e68da.dip.versatel-1u1.de. [2001:16b8:2d44:9800:aee9:3296:d73e:68da])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f570f89sm45821675e9.7.2024.10.20.23.47.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Oct 2024 23:47:48 -0700 (PDT)
+Message-ID: <1f90d885f0e8dc2e8d9b2b7e88700b4cdb19d84c.camel@redhat.com>
+Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, Niklas
+ Cassel <cassel@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj
+ Natikar <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
+ <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>,  Mario Limonciello
+ <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>,  Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>,  Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>,  Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
+ <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>, Ankit Agrawal
+ <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette Chatre
+ <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-input@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Mon, 21 Oct 2024 08:47:46 +0200
+In-Reply-To: <20241018234537.GA770692@bhelgaas>
+References: <20241018234537.GA770692@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|DM4PR11MB7255:EE_
-X-MS-Office365-Filtering-Correlation-Id: 296a9515-3260-4cdb-b142-08dcf19a9c15
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Q2MybXhiVXVBRGd2akVoQnJuZHVMdWhGaWo0a1RlM2M0WCtNNXJteGt0a2o5?=
- =?utf-8?B?R3grWkU3K2o3c3lhRFY2c080MWFnSE94aWphczVyU0Z2VUN5eE5YUTVqdURo?=
- =?utf-8?B?ZGNsL1k0MDBDWnJXY3cxbURiWHprUWtCT2w0VHB5aWtQWHZrWkg0aGFTSlMy?=
- =?utf-8?B?aGFDNDhKbHlXczQ0V2lGV0c1NCtTazQ0TDdER3ZFZW1GUGtjemtwSW40V0pL?=
- =?utf-8?B?ZlNHMktjUUdhQjJJUFNUaHRlbWROSHFBTFJ5RkQyczdDeU80UTNTRWtDWnI5?=
- =?utf-8?B?Ny8vMStId1NnU05Hd2Fkclk0Myt5MzVUQnRaRFFxUHN4Z3ZNdjNwSFRSbEpR?=
- =?utf-8?B?L09OZHlsWUVaQkJCc0VqR1pGRFQrT1p6bEtkeHlVNDdhdGttVHlqcSs2cG5M?=
- =?utf-8?B?ZEhSZjYyU2pDaStrQ1RCVFN2UGFqbExjSWlZSHJNRmxCaUNud0ZaWmtkVWdI?=
- =?utf-8?B?RjJuS1V3Mkg3TkJpSGx3bjUreVR0bmZBMUNSSUhHeEhhQUc0UVBOeFc1eVBs?=
- =?utf-8?B?bXNweHY4OThFdDVNdStNdTZudVl0NkRSSlFTdmRhWXFJMEJEZmRRMCtuMzNy?=
- =?utf-8?B?TUVCNzlOU0krSHlPL1N1UUZqeExsMmdMbG9jUW1OVndKQUJlRldUenUyMXBt?=
- =?utf-8?B?bGVPQW1sQnQyTE9wNGpHK1lqOHNRaHRNZCthNTVLZVdiUkZHUGlzbFU5b1pD?=
- =?utf-8?B?STdqZTZMUWdtTU1Bc0kyeHlnQ0p6SWdIVitOclYxaXUrcXRVV2xYSEd1WDEv?=
- =?utf-8?B?SlNiRmZJRGFmQW51VGZaZEI1RHlqTlBZalllN0FjNkpZZUUweksrT2lXeFhp?=
- =?utf-8?B?enRsWnlzUElmV3o5TU9zS05NOGV6UXB2MytpN1cwWUkvRnZPeWFLeXJYSGZH?=
- =?utf-8?B?dWIxbndvWEZQWVpYelAvZkx4VFpjQ0txVEsvcE91OExGSTVtMStwVEMra1dj?=
- =?utf-8?B?TEZWNTF2WUZOTHovWk5VMjZKK2xPeXc0eUx5aGZuT2tycUR5bFN6WHN2LzZR?=
- =?utf-8?B?S1AyRFk5eUY3S3dmWjJWeEtkem5GTDNkb2xjSjRDZFBPVzhwMEl2TUIyZFQw?=
- =?utf-8?B?eGdwck5raW1GMm5LRnlIbUVGTGltV3dCUHU5czJ3N3hPdmMwMy9KcGV2R1lT?=
- =?utf-8?B?ZTBzWVlXQTZJRk5SVHVuYU5KZGp1SWR0NXB2cVU2LzdQeFRiTFNuVFhDSURF?=
- =?utf-8?B?cy91U2tER21BZ09PaGhYL1hZTjJ2ZVdYTlpwUW5YK3hzeU9vY2dQNldwMVBM?=
- =?utf-8?B?eEYxZ056cTljYXNnL25Hd3VGOGVMSVpmWGtEQ080Z1FQRnVySldvblR1VTdQ?=
- =?utf-8?B?MWthWlZxZ2VmTjBnYk1BUlBZSW41bWFnVVBTSE5xTEF2ZG5UaTNiblRJZ3VJ?=
- =?utf-8?B?dUFveTF4WUh1V3pGd25YdXJVdm9vSlRDQ29LM082WDlONUVTSGtCMGdyd0pt?=
- =?utf-8?B?NUg0bWhJMFFIU09BSkdrMThmdjU3NVUrYTlQRDVCN0NMYktHOGM5d1NyU2JX?=
- =?utf-8?B?UVVqS3k1cVVPK0E1bE1xZDI2Uk1rcXYyVEhjOCsrZ3JQMGNZd0wwZ1kxSER0?=
- =?utf-8?B?QUk4aFUyV2p2N2VvaEtwVXlGN2s5YjRTVElyRU9semptdlZkNnRiUHBLWnpF?=
- =?utf-8?B?TlFpSDR0cEkrWVo4eWJlMkxwN2g5WFlqTWRKbyt3SjFESjROdDZ0L1loMEp4?=
- =?utf-8?B?RURkK1c4QTVkZmZRdXdRb1VRRDBoQXgxVWFkcmRaT3NIaDhIT2lxY2dVVTcy?=
- =?utf-8?Q?SHPUHcvhfHrMQk/aZwkD8LSUG19yLUZ0LYW4Se+?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlFOMGVYRUl6T2NnSnpXaFRoMFBMS2RnV21ObXcyMG9EQmpXTHZRWGZybERx?=
- =?utf-8?B?bmk5UUE5OEFWVHY3Zmp4bGt5aitraWZ6V2QydzRNTUpOMVFZMzdvRGRUakNZ?=
- =?utf-8?B?dm1YVzJVSHlvSitwMHJMZUFjY0EyeVdWb1lMckc3RDRreTVxU1RPcE1kbFBS?=
- =?utf-8?B?VEhIbFRDbTNUYjVERHZmMGxZOWlScExIeGZHenNERHBhQkVFa0RmQ0E1SEFY?=
- =?utf-8?B?cjJOWkxLU21FWGM3dGpyVnRlcVpnZWg3S3oza3RCamtHN0NmeFp4UUZCMXNS?=
- =?utf-8?B?Tm5vS3Y3RHp4NjVUd0VBYmdYL0k0YUM2UlQrKzFkdXV0cGhpMCs0SVU0RDA0?=
- =?utf-8?B?dzI3Vk4yRHg5SUs2aHUxR21yRzVxajlUT0FzckRZbkNOOHNSY3FMaUpHdGN6?=
- =?utf-8?B?ZUFMNDdXbG9HVUJVN1dwNW9kRnliVEw5Y29lZ01iRkR5V2gvQkU5RlBpRmwr?=
- =?utf-8?B?MHh4MkljR1BYODZaZng4QmR3QllEYzFTdDYwZUJncDFuSzRMNkR3Q2E5RmxS?=
- =?utf-8?B?THFQdjdBL0dzemZDZXU1NlpSZVN6RVpDcjVreEl0UmlhTTJ6clhmdDFmWENV?=
- =?utf-8?B?clRkTVMweFkvUzZCTnp5UlpJMlk2cGY3aTVZSEMramhKQ2xDWGRXQ1BtdVY4?=
- =?utf-8?B?MXpOcXNKbWNsdGtKeTNERUg4ZEkwejVERmNjeXNDUGdXTHNoWlZtd1QvR2Nu?=
- =?utf-8?B?RzczK2pPaFhVUTB5eVRYekFUSTl4Y3FlTzdlUEZQbmZuSkxuZjE3Z1NLRmo1?=
- =?utf-8?B?emdoN2pjSGh5cTRlb0ZrdGtwc1dlZGlPMDZLcXJaLzlmb0wySjN2M0xkdHNk?=
- =?utf-8?B?T1U2WVhzeVlYZTYxcCtEMWVVMmFOeUtOeWxKYVRzdGpxN3pUTWpWTnNhcTZr?=
- =?utf-8?B?ZkJpamZFbDJRQTBTZi9GUDNiY0h6bXUyTUlRZWxRZmVvRTlCUmd5VktMR1lP?=
- =?utf-8?B?V1FQQ2dWUU5waENNRVZyUzRLeHB5cU1jUFZmQWVVMnkweVEwYmh0WmkzZDlL?=
- =?utf-8?B?WDF6SDcwL3M2RG1Bb1BQdlRrZUJ4allZSVVzQnQzZVk3WHhkSEw0d0hvOGpz?=
- =?utf-8?B?Q2Y5SzFZRDNlOElyN2F2ZGhmWWJ1dnZ5bDVlaWh2US9aUlZtODNQZnpYNXds?=
- =?utf-8?B?c0Y3a0syNjJmSWY4MDFQa1FKQjExeU51ajNxemsxYklBbHFyZkt6VDVHRXpK?=
- =?utf-8?B?SU1lVTR6YnFYMUhFOW1QYnk4ZjdyNzFIUkFvY2RuVHErZmpPR05xdW9ieC82?=
- =?utf-8?B?UE5qZDVVVFl1ZnZydXpsY1c1Mk1ucS9jMzZPYmFGb3N3WXB0OTNiSDA4b0xl?=
- =?utf-8?B?a0RnUjZGS1J2N3RCR1UvMng2YXVRR0d6WFpJeEpmSyt1Wkd4N3RLY0VNeE1O?=
- =?utf-8?B?R2NSZUJUNHFnL29uVlZOaXErcTJyNk9jSFZUZnZXV1l0dkdEL2FaTHp2clFq?=
- =?utf-8?B?TGR5SXlNZndkRFR3RklSTzh0WW9VamUrVGhINzhGK252Q0NqYXZCaWY5cm9B?=
- =?utf-8?B?Q3JLaERJd1NMcDVyZkdJbitCSzc1TENmSVloL3RmM0lpbFZINGJvMU15clVE?=
- =?utf-8?B?Yzg3K1Iwb2ZtY3RCclp1bVh2ZEF4RS83bmlpdmZoa3k0UVdnUUZHRTJwYlpK?=
- =?utf-8?B?TDZWRHVXQjhkZitoeHliVE9lUGR0ZEFQV0p5YWhXSXdaQjVJUzIzUHJicWkz?=
- =?utf-8?B?dndadDBwcGdZK3NGMmREeEFWUWZJaVNaRFFMQ0tRanlTQXhVSVMrZkFIUnl0?=
- =?utf-8?B?SWtNVis4SjJEWGxhVE80d0s0QzFNaEFLMEFsc3RsMFRwYnRBM2ViRHJSK1Vq?=
- =?utf-8?B?eVMwR05xSWk0SUtuUUZDdVJDQzVsdytpQVVOYWdOQUtESEVWdENzaktJNlVT?=
- =?utf-8?B?THBXUzhHSytleHpGVXJvMU5pdkwvRG9sdnE1d0F2Q2NWejNGNGFveWE1NTBJ?=
- =?utf-8?B?Wng4ZmFuQmtQTGhkUDh4Z3FWR3lLTjhFaVF1UUhjc1N1YVI3eDh5VmNZQ3Jj?=
- =?utf-8?B?QW9NNFBZSUpFNkUwR2Y2dllUMjRHU0V6ZmFNdjZDd3hWS3dvcE05U01nM2Rr?=
- =?utf-8?B?bThVYTBwMUF6UDZzUHAzTGI4UlhscUg4T1U0MmFROVZpK3hJSFpKZWdVUlJ1?=
- =?utf-8?Q?aIvWfFjS6DlSr6+z93jaGBagD?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 296a9515-3260-4cdb-b142-08dcf19a9c15
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 06:35:52.8660
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0KQCxSlSHVVfZNuWqZAfSWlVENrdPITtM20GUk3gbWMwfhgt9nJWwgErkTdb+Tf0V5YFoT8TTPnyi4TFUFskcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7255
-X-OriginatorOrg: intel.com
 
-On 2024/10/21 14:27, Baolu Lu wrote:
-> On 2024/10/18 13:54, Yi Liu wrote:
->> The iommu core is going to support domain replacement for pasid, it needs
->> to make the set_dev_pasid op support replacing domain and keep the old
->> domain config in the failure case.
->>
->> AMD iommu driver does not support domain replacement for pasid yet, so it
->> would fail the set_dev_pasid op to keep the old config if the input @old
->> is non-NULL.
->>
->> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
->> Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
->> Reviewed-by: Kevin Tian<kevin.tian@intel.com>
->> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
->> ---
->>   drivers/iommu/amd/pasid.c | 3 +++
->>   include/linux/iommu.h     | 3 ++-
->>   2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> I would suggest merging this patch with patch 1/9.
+On Fri, 2024-10-18 at 18:45 -0500, Bjorn Helgaas wrote:
+> On Wed, Oct 16, 2024 at 10:53:16AM +0200, Philipp Stanner wrote:
+> > On Wed, 2024-10-16 at 10:43 +0200, Heiner Kallweit wrote:
+> > > On 16.10.2024 08:57, Philipp Stanner wrote:
+> > > > On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
+> > > > > On Tue, 15 Oct 2024 20:51:23 +0200
+> > > > > Philipp Stanner <pstanner@redhat.com> wrote:
+> > > > >=20
+> > > > > > pci_intx() and its managed counterpart pcim_intx() only
+> > > > > > exist
+> > > > > > for
+> > > > > > older
+> > > > > > drivers which have not been ported yet for various reasons.
+> > > > > > Future
+> > > > > > drivers should preferably use pci_alloc_irq_vectors().
+> > > > > >=20
+> > > > > > Mark pci_intx() and pcim_intx() as deprecated and encourage
+> > > > > > usage
+> > > > > > of
+> > > > > > pci_alloc_irq_vectors() in its place.
+> > > > >=20
+> > > > > I don't really understand this.=C2=A0 As we've discussed
+> > > > > previously
+> > > > > pci_alloc_irq_vectors() is, unsurprisingly, for allocating
+> > > > > PCI
+> > > > > IRQ
+> > > > > vectors while pci_intx() is for manipulating the INTx disable
+> > > > > bit
+> > > > > on
+> > > > > PCI devices.=C2=A0 The latter is a generic mechanism for
+> > > > > preventing
+> > > > > PCI
+> > > > > devices from generating INTx, regardless of whether there's a
+> > > > > vector
+> > > > > allocated for it.=C2=A0 How does the former replace the latter an=
+d
+> > > > > why
+> > > > > do
+> > > > > we
+> > > > > feel the need to deprecate the latter?
+> > > > >=20
+> > > > > It feels like this fits some narrow narrative and makes all
+> > > > > users
+> > > > > of
+> > > > > these now deprecated functions second class citizens.=C2=A0 Why?=
+=C2=A0
+> > > > > At
+> > > > > it's
+> > > > > root these are simply providing mask and set or mask and
+> > > > > clear
+> > > > > register
+> > > > > bit operations.=C2=A0 Thanks,
+> > > >=20
+> > > > I got the feeling from the RFC discussion that that was
+> > > > basically
+> > > > the
+> > > > consensus: people should use pci_alloc_irq_vectors(). Or did I
+> > > > misunderstand Andy and Heiner?
+> > > >=20
+> > > I think there are two different use cases for pci_intx().
+> > > At first there are several drivers where the direct usage of
+> > > pci_intx()
+> > > can be eliminated by switching to the pci_alloc_irq_vectors()
+> > > API.
+> > >=20
+> > > And then there's usage of pci_intx() in
+> > > drivers/vfio/pci/vfio_pci_intrs.c
+> > > drivers/xen/xen-pciback/conf_space_header.c
+> > > There we have to keep the (AFAICS unmanaged) pci_intx() calls.
+> >=20
+> > There is also the usage within PCI itself, in MSI. Patch =E2=84=968 tou=
+ches
+> > that.
+> >=20
+> > It's why I think this series should land before anyone should port
+> > direct pci_intx() users to the irq vectors function, because the
+> > latter
+> > also uses pci_intx() and its own devres, which sounds explosive to
+> > me.
+> >=20
+> > > > I'm perfectly happy with dropping this patch and continue
+> > > > offering
+> > > > pci{m}_intx() to users, since after removing that hybrid
+> > > > hazzard I
+> > > > don't see any harm in them anymore.
+>=20
+> So is the bottom line that we should drop *this* patch and apply the
+> rest of the series?
 
-If merging it with patch 01, none of the drivers is ready for the new
-definition. With the current order, the new definition are claimed after
-all the drivers are ready. So it seems more reasonable. Also good from
-bisect p.o.v. is it?:)
+Yes Sir, that's the idea
 
--- 
 Regards,
-Yi Liu
+P.
+
+>=20
+> > > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > > > > > ---
+> > > > > > =C2=A0drivers/pci/devres.c | 5 ++++-
+> > > > > > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 5 ++++-
+> > > > > > =C2=A02 files changed, 8 insertions(+), 2 deletions(-)
+> > > > > >=20
+> > > > > > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+> > > > > > index 6f8f712fe34e..4c76fc063104 100644
+> > > > > > --- a/drivers/pci/devres.c
+> > > > > > +++ b/drivers/pci/devres.c
+> > > > > > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
+> > > > > > *get_or_create_intx_devres(struct device *dev)
+> > > > > > =C2=A0}
+> > > > > > =C2=A0
+> > > > > > =C2=A0/**
+> > > > > > - * pcim_intx - managed pci_intx()
+> > > > > > + * pcim_intx - managed pci_intx() (DEPRECATED)
+> > > > > > =C2=A0 * @pdev: the PCI device to operate on
+> > > > > > =C2=A0 * @enable: boolean: whether to enable or disable PCI INT=
+x
+> > > > > > =C2=A0 *
+> > > > > > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
+> > > > > > *get_or_create_intx_devres(struct device *dev)
+> > > > > > =C2=A0 *
+> > > > > > =C2=A0 * Enable/disable PCI INTx for device @pdev.
+> > > > > > =C2=A0 * Restore the original state on driver detach.
+> > > > > > + *
+> > > > > > + * This function is DEPRECATED. Do not use it in new code.
+> > > > > > + * Use pci_alloc_irq_vectors() instead (there is no
+> > > > > > managed
+> > > > > > version, currently).
+> > > > > > =C2=A0 */
+> > > > > > =C2=A0int pcim_intx(struct pci_dev *pdev, int enable)
+> > > > > > =C2=A0{
+> > > > > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > > > > > index 7ce1d0e3a1d5..dc69e23b8982 100644
+> > > > > > --- a/drivers/pci/pci.c
+> > > > > > +++ b/drivers/pci/pci.c
+> > > > > > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct
+> > > > > > pci_dev
+> > > > > > *dev)
+> > > > > > =C2=A0}
+> > > > > > =C2=A0
+> > > > > > =C2=A0/**
+> > > > > > - * pci_intx - enables/disables PCI INTx for device dev
+> > > > > > + * pci_intx - enables/disables PCI INTx for device dev
+> > > > > > (DEPRECATED)
+> > > > > > =C2=A0 * @pdev: the PCI device to operate on
+> > > > > > =C2=A0 * @enable: boolean: whether to enable or disable PCI INT=
+x
+> > > > > > =C2=A0 *
+> > > > > > =C2=A0 * Enables/disables PCI INTx for device @pdev
+> > > > > > + *
+> > > > > > + * This function is DEPRECATED. Do not use it in new code.
+> > > > > > + * Use pci_alloc_irq_vectors() instead.
+> > > > > > =C2=A0 */
+> > > > > > =C2=A0void pci_intx(struct pci_dev *pdev, int enable)
+> > > > > > =C2=A0{
+> > > > >=20
+> > > >=20
+> > > >=20
+> > >=20
+> >=20
+>=20
+
 
