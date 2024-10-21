@@ -1,228 +1,115 @@
-Return-Path: <kvm+bounces-29300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B2039A70DE
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 19:17:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD07C9A71FF
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 20:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BDB61C21557
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 17:17:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2670EB246A6
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 18:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE021EB9F3;
-	Mon, 21 Oct 2024 17:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6BBB1FCF47;
+	Mon, 21 Oct 2024 18:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzgAR9r8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kvy2TT4n"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8CA47A73
-	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 17:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95561FAC2A
+	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 18:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729531057; cv=none; b=DQPxv8gVvXYpvCEF9fT7XmxAvTFyydOYsjruI7oFKceiP5XyZZ2z9sdsgjHpHwiGFO5Ykgc5vI6JMKnXawVu4zXlhtXym09VXwnw2gSLQwRp3OBb2fN9xsL12AHcBIjfbnLATQgzoeY+X00LHoqo9M7Wq1SH30Nr9BnjThBrLMA=
+	t=1729534134; cv=none; b=enSYQiXjEnLNJpE94K0oW1W+qlAOFVUcRTpyp9k2HED7FJPOrPDAz/8ObM+uJIbdhjyNRSU+oQhaXEYZrvxG20dK7EFHxmPuevfwbdmIfT3iRhRK5v/QrKmx49obkafqS6k9pd+q54NnI7nxsnWN8FFRtnZZIJw53nA8ttXBeTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729531057; c=relaxed/simple;
-	bh=Pssf58C9KYMaZ1C3qQd3lMGGHwG0fgPM4SOvOt42Fx4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EzrYosjhrVukDrTevvmmfPQC0s80hCbS4Q8YeejzioiJcC675VR50hhnSMxX4OKX5h6Eb5lXD+eMblPuA91bpodIBDJ2eHEAciG4FQovWtYat4IN1crSKovAv3BZ3FIdKJB3HXUxOSshlNCJ3MbCMCBBMMA8cfYDW4PncDDP//o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzgAR9r8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729531054;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nhOC5GPQkpePVojMReRZl5Tz4DJriOb7GbQOy4xKCGk=;
-	b=gzgAR9r8ePLiTsObE5BBWEckCjI6xxguSyRj8mdOGC/0ACX5PWVQPSEImGR3aa1KJ3m8GC
-	Nqkp+0w3rPLc6DBQ8LhZBgMNXKNYmMrI3XLG4HfsLN9eElRzOfUBn1/dWKPCzRuSKOB8t1
-	4xmY5BNvM1iqCEq/22Bgw1IGOhWYoHM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-58-XrErIfc8NsWeZ0_SMJMbZw-1; Mon,
- 21 Oct 2024 13:17:31 -0400
-X-MC-Unique: XrErIfc8NsWeZ0_SMJMbZw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 195C61954232;
-	Mon, 21 Oct 2024 17:17:30 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 67EAC1955F4B;
-	Mon, 21 Oct 2024 17:17:29 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.12-rc5
-Date: Mon, 21 Oct 2024 13:17:28 -0400
-Message-ID: <20241021171728.274997-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1729534134; c=relaxed/simple;
+	bh=lGAahFUJB47Jv0GHevlLPsXzZ4O8VtjPyAFbuGdCp8E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pBXG5WN1NDeNsLQf5mQzRT4j64boIZShNptNoVT3v1klobYBHYXdQWW66R+TVyY9PP7CjNTKQDx/rDckHOxT0aFhkthPsfzQUYR72TbQcVCbSR/mlv+OqhBd3w+Uxvhpb8coLj+7QWz53uDpNX1ypF+6Qy7FnpNUauT2EXeR8rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kvy2TT4n; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2e2a6f9438eso6058303a91.3
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 11:08:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729534131; x=1730138931; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
+        b=Kvy2TT4nFNRE4v6qOhuvlFoeLee0AdD4xf9oblSyYyxEb8GhQukzYNy1Ol8V+YhjMD
+         C3NGaSmYp8oth+na2vGGhm3ih9Koiclz5KYzTxNy5pcVr9ARX+mnJ7B613cFBUpFK71x
+         iWfh/ohEyQ3Xp1/YPlK/EY1B9iYSmr4Yc2fpQbUSrFtQAag2BJB0DTanRLhydyrkVu9O
+         GSS75Wqwr+13Ik7si/pFv+bQ9H6zv6VW5TQn/3oPp/u1JWFq2rLcxcl9vwwiK6DdqnGd
+         IvqPdPaVrspj8hHudi68Q1kFLiJtYZwvkWAsKsGoodfBahhHBnpIyInghyeovWvoyWBg
+         r/Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729534131; x=1730138931;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
+        b=Yq09NvsxE1xV3Az1bv2OOOOita9JPfs1qL2RUK15aG8OEm6Uz35w+rBdDwYInzH8VW
+         dBwjYHS8PTe1ZQRb4x1roaJMpg+z6UMdyRdXNstpwA7jGVYUpAT/k5Qo8hEF8gDFRce+
+         wYxWDG3pLTQcHAWf5kCEYm0JgZ22hpRkVIrAl0pUluoTR4WTVFBFXOGjkUlzgZwRdOOo
+         RXbL41vnEOX6YgT0PbN3mtYyOdUl3xfnjk/Wf0RjkVd1m8pHnzon8jGCZNmkE9oT/o/W
+         f/cSm0sjCszD+VDz9DkZ0bkpp0VV+8bIQzeZ4hlLc1CZR+F6MirvwR730SZt/3ZITHMJ
+         xR/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWYL34SD3Wo1ABAAmQ5HQtGFzQ74rcq4AznjHva/R1dUlUb+G1+MzEPC/psC5rAaYB7pOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOYK53VllVsfNaAYtvK/+GZTU6nnoB3jFYFsJIHK47ePxeG6e6
+	Jvj/YkDcMflz0PP7zEY5mrKKGjiXN7q3an2wMxkyU46pljb0tXY2/biNF2Fguejkm4tG1m4A2il
+	znQ==
+X-Google-Smtp-Source: AGHT+IHz/sqxbIaZMzAhwQE+KHAQ50pc4vGOx7OQ/MlEMfrpYKQ16K4ySzEgLcCV5+myw9EmSbX31Z6uvf4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e147:b0:2d8:a9c2:2f3a with SMTP id
+ 98e67ed59e1d1-2e5616d8f42mr22750a91.3.1729534130899; Mon, 21 Oct 2024
+ 11:08:50 -0700 (PDT)
+Date: Mon, 21 Oct 2024 11:08:49 -0700
+In-Reply-To: <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Mime-Version: 1.0
+References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-20-seanjc@google.com>
+ <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
+Message-ID: <ZxaYsfc0m6UHmi10@google.com>
+Subject: Re: [PATCH v13 19/85] KVM: Introduce kvm_follow_pfn() to eventually
+ replace "gfn_to_pfn" APIs
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
+	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Linus,
+On Mon, Oct 21, 2024, Yan Zhao wrote:
+> On Thu, Oct 10, 2024 at 11:23:21AM -0700, Sean Christopherson wrote:
+> > --- a/virt/kvm/pfncache.c
+> > +++ b/virt/kvm/pfncache.c
+> > @@ -159,6 +159,12 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+> >  	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
+> >  	void *new_khva = NULL;
+> >  	unsigned long mmu_seq;
+> > +	struct kvm_follow_pfn kfp = {
+> > +		.slot = gpc->memslot,
+> > +		.gfn = gpa_to_gfn(gpc->gpa),
+> > +		.flags = FOLL_WRITE,
+> > +		.hva = gpc->uhva,
+> > +	};
+> Is .map_writable uninitialized?
 
-The following changes since commit c8d430db8eec7d4fd13a6bea27b7086a54eda6da:
-
-  Merge tag 'kvmarm-fixes-6.12-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-10-06 03:59:22 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to e9001a382fa2c256229adc68d55212028b01d515:
-
-  Merge tag 'kvmarm-fixes-6.12-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-10-20 12:10:59 -0400)
-
-After seeing your release commentary yesterday, well, this is not
-going to make rc5 smaller.  The short description is that there is
-mostly Arm stuff here (due to me sitting on submaintainer pull requests
-for perhaps too long) and a bit of everything for x86 (host, guest,
-selftests, docs).
-
-Paolo
-
-----------------------------------------------------------------
-ARM64:
-
-* Fix the guest view of the ID registers, making the relevant fields
-  writable from userspace (affecting ID_AA64DFR0_EL1 and ID_AA64PFR1_EL1)
-
-* Correcly expose S1PIE to guests, fixing a regression introduced
-  in 6.12-rc1 with the S1POE support
-
-* Fix the recycling of stage-2 shadow MMUs by tracking the context
-  (are we allowed to block or not) as well as the recycling state
-
-* Address a couple of issues with the vgic when userspace misconfigures
-  the emulation, resulting in various splats. Headaches courtesy
-  of our Syzkaller friends
-
-* Stop wasting space in the HYP idmap, as we are dangerously close
-  to the 4kB limit, and this has already exploded in -next
-
-* Fix another race in vgic_init()
-
-* Fix a UBSAN error when faking the cache topology with MTE
-  enabled
-
-RISCV:
-
-* RISCV: KVM: use raw_spinlock for critical section in imsic
-
-x86:
-
-* A bandaid for lack of XCR0 setup in selftests, which causes trouble
-  if the compiler is configured to have x86-64-v3 (with AVX) as the
-  default ISA.  Proper XCR0 setup will come in the next merge window.
-
-* Fix an issue where KVM would not ignore low bits of the nested CR3
-  and potentially leak up to 31 bytes out of the guest memory's bounds
-
-* Fix case in which an out-of-date cached value for the segments could
-  by returned by KVM_GET_SREGS.
-
-* More cleanups for KVM_X86_QUIRK_SLOT_ZAP_ALL
-
-* Override MTRR state for KVM confidential guests, making it WB by
-  default as is already the case for Hyper-V guests.
-
-Generic:
-
-* Remove a couple of unused functions
-
-----------------------------------------------------------------
-Cyan Yang (1):
-      RISCV: KVM: use raw_spinlock for critical section in imsic
-
-Dr. David Alan Gilbert (2):
-      KVM: Remove unused kvm_vcpu_gfn_to_pfn
-      KVM: Remove unused kvm_vcpu_gfn_to_pfn_atomic
-
-Ilkka Koskinen (1):
-      KVM: arm64: Fix shift-out-of-bounds bug
-
-Kirill A. Shutemov (1):
-      x86/kvm: Override default caching mode for SEV-SNP and TDX
-
-Marc Zyngier (3):
-      Merge branch kvm-arm64/idregs-6.12 into kvmarm/fixes
-      KVM: arm64: Don't eagerly teardown the vgic on init error
-      KVM: arm64: Shave a few bytes from the EL2 idmap code
-
-Mark Brown (1):
-      KVM: arm64: Expose S1PIE to guests
-
-Maxim Levitsky (1):
-      KVM: VMX: reset the segment cache after segment init in vmx_vcpu_reset()
-
-Oliver Upton (7):
-      KVM: arm64: Unregister redistributor for failed vCPU creation
-      KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
-      KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
-      KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-      KVM: arm64: nv: Clarify safety of allowing TLBI unmaps to reschedule
-      KVM: arm64: vgic: Don't check for vgic_ready() when setting NR_IRQS
-      KVM: arm64: Ensure vgic_ready() is ordered against MMIO registration
-
-Paolo Bonzini (2):
-      Merge tag 'kvmarm-fixes-6.12-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvmarm-fixes-6.12-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-
-Sean Christopherson (5):
-      KVM: x86/mmu: Zap only SPs that shadow gPTEs when deleting memslot
-      KVM: x86/mmu: Add lockdep assert to enforce safe usage of kvm_unmap_gfn_range()
-      KVM: x86: Clean up documentation for KVM_X86_QUIRK_SLOT_ZAP_ALL
-      KVM: nSVM: Ignore nCR3[4:0] when loading PDPTEs from memory
-      KVM: selftests: Fix out-of-bounds reads in CPUID test's array lookups
-
-Shameer Kolothum (1):
-      KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-
-Shaoqin Huang (4):
-      KVM: arm64: Disable fields that KVM doesn't know how to handle in ID_AA64PFR1_EL1
-      KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to the guest
-      KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
-      KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-
-Vitaly Kuznetsov (1):
-      KVM: selftests: x86: Avoid using SSE/AVX instructions
-
- Documentation/virt/kvm/api.rst                    | 16 ++---
- Documentation/virt/kvm/locking.rst                |  2 +-
- arch/arm64/include/asm/kvm_asm.h                  |  1 +
- arch/arm64/include/asm/kvm_host.h                 |  7 +++
- arch/arm64/include/asm/kvm_mmu.h                  |  3 +-
- arch/arm64/include/asm/kvm_nested.h               |  4 +-
- arch/arm64/kernel/asm-offsets.c                   |  1 +
- arch/arm64/kvm/arm.c                              |  5 ++
- arch/arm64/kvm/hyp/nvhe/hyp-init.S                | 52 ++++++++-------
- arch/arm64/kvm/hypercalls.c                       | 12 ++--
- arch/arm64/kvm/mmu.c                              | 15 ++---
- arch/arm64/kvm/nested.c                           | 53 +++++++++++++---
- arch/arm64/kvm/sys_regs.c                         | 77 ++++++++++++++++++++---
- arch/arm64/kvm/vgic/vgic-init.c                   | 41 ++++++++++--
- arch/arm64/kvm/vgic/vgic-kvm-device.c             |  7 ++-
- arch/riscv/kvm/aia_imsic.c                        |  8 +--
- arch/x86/kernel/kvm.c                             |  4 ++
- arch/x86/kvm/mmu/mmu.c                            | 27 +++++---
- arch/x86/kvm/svm/nested.c                         |  6 +-
- arch/x86/kvm/vmx/vmx.c                            |  6 +-
- include/linux/kvm_host.h                          |  2 -
- tools/testing/selftests/kvm/Makefile              |  1 +
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 16 ++++-
- tools/testing/selftests/kvm/x86_64/cpuid_test.c   |  2 +-
- virt/kvm/kvm_main.c                               | 12 ----
- 25 files changed, 277 insertions(+), 103 deletions(-)
-
+Nope, per C99, "subobjects without explicit initializers are initialized to zero",
+i.e. map_writable is initialized to "false".
 
