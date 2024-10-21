@@ -1,136 +1,161 @@
-Return-Path: <kvm+bounces-29304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4B589A7262
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 20:32:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 483669A72C3
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 20:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40D38B21C00
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 18:32:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087282832E3
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 18:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7D11FAC29;
-	Mon, 21 Oct 2024 18:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49981FBC87;
+	Mon, 21 Oct 2024 18:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsmBuPJs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kdASUYjA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CD3A41;
-	Mon, 21 Oct 2024 18:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464E41946CF
+	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 18:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729535538; cv=none; b=kOCIbLbfQc+dAF7ShLDzOy1NN1e4yFg2pML6smnFNbnx2USw4iWTIx9ju66mjzaSX7AWlkwE/0Qctmrst9Tohly3uxBFBviqUZJ3PRvdoDiDcMvJCAVFZ5ICj04hhoK7c3Vv7pIXZqVv/mHm1vy/lR0Bw+euu72A1HqEKC2oW4I=
+	t=1729537072; cv=none; b=gC5u8yys/e4VpcGN1PRs/Qj+YOSHkyv9r8CHYKY7OWdGgkOusx/Ha4C2gBKWni62D5s50+E9D8RuRnrkBiA/0IIGerP+hhKk9uRiitMo/Xz49d+3NgIACsQWYePoYMglkI6gQKPxhoB4sTUl5bwlvy6qdwZXiqp4bI0UVSU5syI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729535538; c=relaxed/simple;
-	bh=pyzBm0CHxtwGCiTGX+R2MXyhePBYI6qHIcFJ4NEy704=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ly2p4FwhVksJj+Tmk9a/V920n8r+S32j1BERxXMhY47fNxGvOiU8FIdOPsYFfRXzvZAgVnR93Pthcd3iMqWGmVg6v/zRyiaqJFanC4X/AkXpKAg0jFmd2++lfkftZQ0me02nq6glceBoubSq0uxTNbLmUoHPMHqeFrZcb7sFeJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsmBuPJs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 205D5C4CEC3;
-	Mon, 21 Oct 2024 18:32:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729535537;
-	bh=pyzBm0CHxtwGCiTGX+R2MXyhePBYI6qHIcFJ4NEy704=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YsmBuPJs5KQTszv56fUCa4qm/bfQeZggdOhOj6FpPImCqi9uTwz0HDGmeR5I2XDZO
-	 0f4Uu3SlSN8HTCF+1wwH1tIDneP+Vo1ZjIuUqhexULDUMXQBSCIPD7C/MlMJfhWi4P
-	 pwO13Gs7FcmsKn7A5+5czaAnt9yJbMFLd7MGa/qlbfNg2j4I6JnclcZEGDhLMMpm7O
-	 RLMQ0C7Wf02lIskF6eA1yHNXMo6XvUvnxbxYTxtBtUwv/II/LI0+8GDh70BCFZcABx
-	 jaQeCifmfo/MTtgi/moFcicb8+TpbbpQoVmG3jUHSZLIzCSrO2OtOWwNeYCtuylh1l
-	 rh0el/PK2tOmg==
-Date: Mon, 21 Oct 2024 19:32:13 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH] KVM: selftests: x86: Avoid using SSE/AVX instructions
-Message-ID: <9a160e3d-501b-4759-9067-17cd822617ec@sirena.org.uk>
-References: <20240920154422.2890096-1-vkuznets@redhat.com>
+	s=arc-20240116; t=1729537072; c=relaxed/simple;
+	bh=eiuskN0Rqd2YRzqsihlK78NQBES1kITJct33unB+ED8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Lp40YpWjW8FlU/fnsXjrRKkjuf+/+hCzzjpZFqyXfzHX7t5jqxSeCm+/aWAxj5Qezh3F3Nl0BiMySq6+cAmQ+Q1CEDo0uTLTZA4irvKVq0HlDDdB0PUY5kMlB6YW/mLe78pSN/jdFrQ7fqXDTFndUpVreGkp7FY9gRLAQ/zMCt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kdASUYjA; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7ea6efcd658so4087251a12.3
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 11:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729537065; x=1730141865; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TRc3VGGNkUkUR9ifA4nNeX0hRZiSdlXeerhUJQ+tYBo=;
+        b=kdASUYjA4uGl+/Lzlu6BXwHfIsB7i/tBFO9IhxUbGjGXjQF59ek6/CHFTCctjDPUuZ
+         1MsqOVNsd6s+GVMiWC66957Em1xb2DBYSrU8isQeABQyn83ei/fsD2aLt0a479A84cPB
+         V6LQXUawucewAehTnjFLXliSYnhKBk8UAXPQ+AitbwdoQtePAUTyUeq4WLFcVDe63oDV
+         NJ1lP/wPdprXRQIJOX+XcdgC/XnymfjsG04Nsel3StCJTWt/TqYrXpcJScgrgmUXp0Nw
+         t/bsnz9EcP/v4StUu/at1ueGJTkWoxc7LMRy61IvJpEUERO1Ijr8RyeSn6hTAIbErve4
+         namA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729537065; x=1730141865;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TRc3VGGNkUkUR9ifA4nNeX0hRZiSdlXeerhUJQ+tYBo=;
+        b=FoWRvY80OOVUbJTaYuBCRuunZrBpj8WEH88Rywm9k/omE5I7PtYzmW/tytEYtmi7H0
+         Z63GhjiwSL7vctciwYhvdKouhzQjz7swS90AYpzT0Yp2izlrHiR1Ey+AUNpPU6dqacPL
+         go07o3z66KG4QGI7Cod4bquu0hpZPXcYby2aQcyo0MYQWtf564O02YUSYfVUwqBmh2vv
+         1PW0bG3U3MCiO2lO7p2hh4BJooV+IbAwLqEqtQc+tzhXBbMiSqcIoViZE/wzDpYcb9W8
+         SoZz1dmR18IEwkEK7MOA6HYGSw1RpTD2Z2eaUXdlxHwUgg/z2V663OaEAKf4pyO+Vd3X
+         H+jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZSafc/HTWUPytTqA5ftrz1N8/pPPCE6jwkWe0nIo/cfBd6LssIGVQhL6RR6pJfpLC8Us=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyp1Db2e+eDaUtwfqNTV5RQCr1Nls0NvqWuvte0ZOBkz4HTqeZ
+	gb4ij5XqgUkAKAGRhHWm/+YSUwg6oe45tToYkhTDtp7LbBzSPgLyD410AJ8QOuR0Kg8GeMaFH0K
+	zRQ==
+X-Google-Smtp-Source: AGHT+IHRYlBrX6M+NH4TUGVEqm9BFtB7q+VVhXD5EoRBvSsXa42IiMZxJc+hXyxs+ZPnB8HLQQfXC/cdu0E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:3858:0:b0:7e9:f93c:22b9 with SMTP id
+ 41be03b00d2f7-7eacc895cf2mr12508a12.10.1729537064143; Mon, 21 Oct 2024
+ 11:57:44 -0700 (PDT)
+Date: Mon, 21 Oct 2024 11:57:42 -0700
+In-Reply-To: <ZxYrYe/WN8XoB+fI@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nKMoXBYbWb2e++RT"
-Content-Disposition: inline
-In-Reply-To: <20240920154422.2890096-1-vkuznets@redhat.com>
-X-Cookie: Thufir's a Harkonnen now.
-
-
---nKMoXBYbWb2e++RT
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-52-seanjc@google.com>
+ <ZxYrYe/WN8XoB+fI@yzhao56-desk.sh.intel.com>
+Message-ID: <ZxakJr_jWkU-Y54e@google.com>
+Subject: Re: [PATCH v13 51/85] KVM: VMX: Use __kvm_faultin_page() to get APIC
+ access page/pfn
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
+	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 20, 2024 at 05:44:22PM +0200, Vitaly Kuznetsov wrote:
+On Mon, Oct 21, 2024, Yan Zhao wrote:
+> On Thu, Oct 10, 2024 at 11:23:53AM -0700, Sean Christopherson wrote:
+> > Use __kvm_faultin_page() get the APIC access page so that KVM can
+> > precisely release the refcounted page, i.e. to remove yet another user
+> > of kvm_pfn_to_refcounted_page().  While the path isn't handling a guest
+> > page fault, the semantics are effectively the same; KVM just happens to
+> > be mapping the pfn into a VMCS field instead of a secondary MMU.
+> >=20
+> > Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
 
-> Some distros switched gcc to '-march=3Dx86-64-v3' by default and while it=
-'s
-> hard to find a CPU which doesn't support it today, many KVM selftests fail
-> with
+...
 
-This patch, which is queued in -next as 9a400068a1586bc4 targeted as a
-fix, breaks the build on non-x86 architectures:
+> > @@ -6838,10 +6840,13 @@ void vmx_set_apic_access_page_addr(struct kvm_v=
+cpu *vcpu)
+> >  		vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(pfn));
+> > =20
+> >  	/*
+> > -	 * Do not pin apic access page in memory, the MMU notifier
+> > -	 * will call us again if it is migrated or swapped out.
+> > +	 * Do not pin the APIC access page in memory so that it can be freely
+> > +	 * migrated, the MMU notifier will call us again if it is migrated or
+> > +	 * swapped out.  KVM backs the memslot with anonymous memory, the pfn
+> > +	 * should always point at a refcounted page (if the pfn is valid).
+> >  	 */
+> > -	kvm_release_pfn_clean(pfn);
+> > +	if (!WARN_ON_ONCE(!refcounted_page))
+> > +		kvm_release_page_clean(refcounted_page);
+> Why it's not
+> if (!WARN_ON_ONCE(!refcounted_page)) {
+> 	if (writable)
+> 		kvm_release_page_dirty(refcounted_page)
+> 	else
+> 		kvm_release_page_clean(refcounted_page)
+> }
+>=20
+> or simply not pass "writable" to __kvm_faultin_pfn() as we know the slot =
+is
+> not read-only and then set dirty ?
 
-aarch64-linux-gnu-gcc -D_GNU_SOURCE=3D  -Wall -Wstrict-prototypes -Wuniniti=
-alized=20
--O2 -g -std=3Dgnu99 -Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFI=
-G_64BIT
- -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset -fno-builtin-s=
-trnlen -fno-stack-protector -fno-PIE -I/build/stage/linux/tools/testing/sel=
-ftests/../../../tools/include -I/build/stage/linux/tools/testing/selftests/=
-=2E./../../tools/arch/arm64/include -I/build/stage/linux/tools/testing/self=
-tests/../../../usr/include/ -Iinclude -Iaarch64 -Iinclude/aarch64 -I ../rse=
-q -I..  -march=3Dx86-64-v2 -isystem /build/stage/build-work/usr/include -I/=
-build/stage/linux/tools/testing/selftests/../../../tools/arch/arm64/include=
-/generated/   -c aarch64/aarch32_id_regs.c -o /build/stage/build-work/kself=
-test/kvm/aarch64/aarch32_id_regs.o
-cc1: error: unknown value =E2=80=98x86-64-v2=E2=80=99 for =E2=80=98-march=
-=E2=80=99
+__kvm_faultin_pfn() requires a non-NULL @writable.  The intent is to help e=
+nsure
+the caller is actually checking whether a readable vs. writable mapping was
+acquired.  For cases that explicitly pass FOLL_WRITE, it's awkward, but tho=
+se
+should be few and far between.
 
-This is because:
+> if (!WARN_ON_ONCE(!refcounted_page))
+> 	kvm_release_page_dirty(refcounted_page)
 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
-ts/kvm/Makefile
-> index 48d32c5aa3eb..3f1b24ed7245 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -238,6 +238,7 @@ CFLAGS +=3D -Wall -Wstrict-prototypes -Wuninitialized=
- -O2 -g -std=3Dgnu99 \
->  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
->  	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-> +	-march=3Dx86-64-v2 \
->  	$(KHDR_INCLUDES)
->  ifeq ($(ARCH),s390)
->  	CFLAGS +=3D -march=3Dz10
-
-unconditionally sets an architecture specific flag which is obviously
-not going to work on anything except x86.  This should be set under an
-architecture check like the similar S/390 flag that can be seen in the
-context for the diff.
-
---nKMoXBYbWb2e++RT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcWniwACgkQJNaLcl1U
-h9BYogf/eDE5fDBfcReAjReqJDkasaQLJfWc+Ak+v4uCbqw9mBLCPyaYWfEW0snN
-cK13zFzB6Fr0KQa5+cGcdaCPIqSwc2YWX83ljaS8Q8x9PemPIU4K+sIH9NY/E9hE
-gd6oGL2wSZIhe7kpL7D2U6yrx+ItFfg77kxMgc9MABuYPNN5QS0SRvs9UUVBkDYm
-pZ3zZqI+9Z1FJMWUb4W9b5YRMjlKUDNz4pKvR6zTf8/935BAKV39ReatYrXjcFbW
-xfVrnUDw9LjXza1P+mw0GL8572WgGrydF1sY32HYVAhL6Pxkx2dNE68i19sRDj1x
-ZB0f0DIwsZU8XuD88KV44cZdoTphzA==
-=/jnL
------END PGP SIGNATURE-----
-
---nKMoXBYbWb2e++RT--
+Ya, this is probably more correct?  Though I would strongly prefer to make =
+any
+change in behavior on top of this series.  The use of kvm_release_page_clea=
+n()
+was added by commit 878940b33d76 ("KVM: VMX: Retry APIC-access page reload =
+if
+invalidation is in-progress"), and I suspect the only reason it added the
+kvm_set_page_accessed() call is because there was no "unused" variant.  I.e=
+. there
+was no concious decision to set Accessed but not Dirty.
 
