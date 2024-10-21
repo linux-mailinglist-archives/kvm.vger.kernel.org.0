@@ -1,65 +1,82 @@
-Return-Path: <kvm+bounces-29247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09B29A5A4E
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:28:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF4E79A5A72
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 08:34:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A2528183B
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 06:27:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1074AB2154F
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 06:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33CD1D04B9;
-	Mon, 21 Oct 2024 06:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BCA1D07BD;
+	Mon, 21 Oct 2024 06:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nc2xdKSX"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ARnhkOK5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D32194AEC
-	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 06:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DECA194C6C;
+	Mon, 21 Oct 2024 06:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729492063; cv=none; b=kcq0E56aSSztGMLhPwgJ2fJoso3L+Mt5KHDXNrQ8vkoEc606hLFdzKF9toKsc7qsYZ5O+2kiYslJ32ghwFo3PKwkbIyLaEpI5m72B1lpWDk+gBZBFGUQuaWW2It1h583JbH0xOGLWtg3mr0yRLyqmM/l59b8Eix0Fa80i6GSxo4=
+	t=1729492446; cv=none; b=t5+Q8phWfxZ5ezGudR2dG5bsB+M4/vOj3ahUkPnE9jr3xV9xzjAdk+ZJNPHJrgwHIJgIeY33Jr+YJ7MUlKAfulwE2tNOnP1RfzrUEMdU20zEgWNp/fJrXhXiubYiof+aBsmcwkJ93VJYq143nVKoX/IekpaAl4dwx8PxOrOnMlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729492063; c=relaxed/simple;
-	bh=KqQV1jBJ1R+LBKBk0CySepX7kupWCVvNeVB8OkPWJI4=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LSaSOdv6CxBhvtBuYTUrkbxaoP8wK/uiKaVLERhwHgr1ESw+86sQCHKDnCflv/OuMEfZmdSj37PQP6V4Hg/1hvThx1pZ5TrO9IFHAADkbkco7v9tK8mjBHf5jeR/QubKmHa8YE+zPOhBDwwQQ2htdQYcHtHv8DqU1jcuWn1JWCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nc2xdKSX; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729492061; x=1761028061;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KqQV1jBJ1R+LBKBk0CySepX7kupWCVvNeVB8OkPWJI4=;
-  b=Nc2xdKSXu0jiNZEFtkEWKmSMa9Xw3AkqlArbG9VKiuEpMZXchUMF79Iy
-   p2FTHwxFb3vGagZF3CklR+v3mivwGJzwNgrLOi8CWDjNslAdijdaR25xS
-   a14ISAMwDESILt6GqkVsnFMnduNuInsbv/1el4q4eiYb7xy2bZtnvhcWC
-   RmA/1R4HlE98xh13MGBvY1i5t5Aa+DxxbnoK5Jzi6n++WjK7fD3Zzus2X
-   68WNvIxBde5d+IKU7ccQa5DD5a6ue0301sGIZwyj8dtRmXCrg/EcLh5Sf
-   6+HR2CsxdF3shZxlxBemou0YzcS9xk0Mg8OmSn7TDpsk13a1WgEwrdN8x
-   A==;
-X-CSE-ConnectionGUID: P9Y17LYuQwup4D1ixw7oAQ==
-X-CSE-MsgGUID: bio1J6MtSvauJQjYeYB+DQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40084565"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40084565"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2024 23:27:40 -0700
-X-CSE-ConnectionGUID: 3x7FizEYT7qxA1+28A7rqA==
-X-CSE-MsgGUID: 4fDg2/ShTvm6UccG3oNyXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,220,1725346800"; 
-   d="scan'208";a="79363857"
-Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2024 23:27:36 -0700
-Message-ID: <17513727-c2db-4aea-a60a-d9bb8b8ac71c@linux.intel.com>
-Date: Mon, 21 Oct 2024 14:27:32 +0800
+	s=arc-20240116; t=1729492446; c=relaxed/simple;
+	bh=d+Vn5Dqu0W7NzPHX/GrXXUEhW3wXOthQtBtO6LLwieE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AOl/krtWkGWX6nJC91l5W/C+9BTiXokGdaV/wGcODwiw0Kd4iiOYVDt+CdT6eY+e/jeAvUcBJdNSd0xhDXiJdW9wRLcDOyWX6gnp//Jbjz2rF5kchj8Hbd8Uc1iUX3p4G7zlZ9jJcVdfsyPN/XiZPoGWBXhmY0qEJj8Mo//nl/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ARnhkOK5; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49L2KHwX002179;
+	Mon, 21 Oct 2024 06:33:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=QKaq4B
+	5URAFGBy0bwe2UmpkraYPJ2j4a6Afx8H1P0X8=; b=ARnhkOK5gLJCohv7zvJln5
+	KtBlrpHd5u3tMrI0NxOHaHponCeVVkq+d2/uugPxNBEydz/TQr3zG9tDX2Uc2Ldm
+	Q3SLMBz2vLtKHpPzDUoZJk2vmkake10+YLeA440DsVzkph5gTILQBs1+QW66G5nh
+	61xO4c1/475UDzmjFOPtsMXO1+jhnceejSNmVOSmPW+hKQaHajFPtE70X8KuXsD+
+	ZkNHcK6Lfud1hzWf1ew+WhQomIZ1FRHRHwZBdHjXyDPh4KEx765d4/6/P9/iERA/
+	ExBU+gCvB0BeXPWtkCxtPssI6rLKitct5U36/KNdHRmt+8CIhiKmw87KnzTBzj1A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42c5gcfeq5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 06:33:53 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49L6Xqjk000729;
+	Mon, 21 Oct 2024 06:33:53 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42c5gcfeq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 06:33:52 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49L5O8fs029401;
+	Mon, 21 Oct 2024 06:33:51 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42crkjvmyr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 06:33:51 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49L6XliM49938792
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Oct 2024 06:33:47 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B96F2004B;
+	Mon, 21 Oct 2024 06:33:47 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2FB6A20040;
+	Mon, 21 Oct 2024 06:33:46 +0000 (GMT)
+Received: from [9.179.24.137] (unknown [9.179.24.137])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 21 Oct 2024 06:33:46 +0000 (GMT)
+Message-ID: <fbee219a-cc88-414b-8f5f-2cb3b4c9f470@linux.ibm.com>
+Date: Mon, 21 Oct 2024 08:33:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,42 +84,80 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
- eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
- chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com
-Subject: Re: [PATCH v3 9/9] iommu: Make set_dev_pasid op support domain
- replacement
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com, will@kernel.org
-References: <20241018055402.23277-1-yi.l.liu@intel.com>
- <20241018055402.23277-10-yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 5/7] virtio-mem: s390 support
+To: Heiko Carstens <hca@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
+References: <20241014144622.876731-1-david@redhat.com>
+ <20241014144622.876731-6-david@redhat.com>
+ <20241014184824.10447-F-hca@linux.ibm.com>
+ <ebce486f-71a0-4196-b52a-a61d0403e384@redhat.com>
+ <20241015083750.7641-D-hca@linux.ibm.com>
 Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241018055402.23277-10-yi.l.liu@intel.com>
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20241015083750.7641-D-hca@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: MZ1yrbyezdS4zll8wFGufHjjP4N0smer
+X-Proofpoint-ORIG-GUID: 37ZgR9RiC9b_Gof1v4vav0KFZsJWLwy9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=853 clxscore=1011 suspectscore=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 spamscore=0 phishscore=0 adultscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410210043
 
-On 2024/10/18 13:54, Yi Liu wrote:
-> The iommu core is going to support domain replacement for pasid, it needs
-> to make the set_dev_pasid op support replacing domain and keep the old
-> domain config in the failure case.
+
+
+Am 15.10.24 um 10:37 schrieb Heiko Carstens:
+> On Mon, Oct 14, 2024 at 09:16:45PM +0200, David Hildenbrand wrote:
+>> On 14.10.24 20:48, Heiko Carstens wrote:
+>>> On Mon, Oct 14, 2024 at 04:46:17PM +0200, David Hildenbrand wrote:
+>>>> to dump. Based on this, support for dumping virtio-mem memory can be
+>>> Hm.. who will add this support? This looks like a showstopper to me.
+>>
+>> The cover letter is clearer on that: "One remaining work item is kdump
+>> support for virtio-mem memory. This will be sent out separately once initial
+>> support landed."
+>>
+>> I had a prototype, but need to spend some time to clean it up -- or find
+>> someone to hand it over to clean it up.
+>>
+>> I have to chose wisely what I work on nowadays, and cannot spend that time
+>> if the basic support won't get ACKed.
+>>
+>>> Who is supposed to debug crash dumps where memory parts are missing?
+>>
+>> For many production use cases it certainly needs to exist.
+>>
+>> But note that virtio-mem can be used with ZONE_MOVABLE, in which case mostly
+>> only user data (e.g., pagecache,anon) ends up on hotplugged memory, that
+>> would get excluded from makedumpfile in the default configs either way.
+>>
+>> It's not uncommon to let kdump support be added later (e.g., AMD SNP
+>> variants).
 > 
-> AMD iommu driver does not support domain replacement for pasid yet, so it
-> would fail the set_dev_pasid op to keep the old config if the input @old
-> is non-NULL.
-> 
-> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
-> Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
-> Reviewed-by: Kevin Tian<kevin.tian@intel.com>
-> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
-> ---
->   drivers/iommu/amd/pasid.c | 3 +++
->   include/linux/iommu.h     | 3 ++-
->   2 files changed, 5 insertions(+), 1 deletion(-)
+> I'll leave it up to kvm folks to decide if we need kdump support from
+> the beginning or if we are good with the current implementation.
 
-I would suggest merging this patch with patch 1/9.
-
-Thanks,
-baolu
+If David confirms that he has a plan for this, I am fine with a staged approach
+for upstream.
 
