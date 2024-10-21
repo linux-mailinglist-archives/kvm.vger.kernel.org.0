@@ -1,493 +1,360 @@
-Return-Path: <kvm+bounces-29288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF82F9A69BF
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 15:10:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DEC49A6A25
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 15:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 615981F2283C
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 13:10:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DF41C22B34
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 13:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1261F470B;
-	Mon, 21 Oct 2024 13:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6B01F707B;
+	Mon, 21 Oct 2024 13:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rhp8Jh7F"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kHEw1CR9";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kHEw1CR9"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2068.outbound.protection.outlook.com [40.107.223.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2D61E884B;
-	Mon, 21 Oct 2024 13:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729516236; cv=fail; b=MZ9a7Uw1RqfPteY4zqV9Kbezzpt4te718ESTZOmnmtrKpHMOCKhA7ll5mJbCnE3AGsvL7rrPOGpkstcFePToD/RCbAYqJQUigDHyI6UNhVW9SXoAxQQxKQdEuVN4qNRjKbWbab7QoOhXyzS/J+MbfKn2HEVlzBbMAROl1F2t02o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729516236; c=relaxed/simple;
-	bh=hFm96K1v6DSodVEp4GYjrWC+rWULUgY3RXCnuvc6jcY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QE+PvKBKWZcQ50FNnpa8isVF+IR1nmWPVaQLqQ40ERMmFkR39vjO29f4p5BgUz2Hesmh/d7+shM+HX/4CUSiZieRtl3rCiHrcR2SAOgIyNHoD1J4wrjGluMyYkkTC3RnN45GTOIll0oBbp+eLSGBwohfpHxSnSyfnqKqEnA1rV8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rhp8Jh7F; arc=fail smtp.client-ip=40.107.223.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VgeuC81MWK2B6C5WsGLAEdqtCu+xaGUGOBvBcZCAUssjO/AUKYLrOR+fFb5CMTq6Qb4Fvu9ETqUq8JpCSQ5WbFmkLUs73uhoAsHPCUiE1uUTrReHL6gJrZmOZGDORAUJcMxLyXNTxBu1CqeSdSfQJoctI0HgPjtLwlqMU+0uwUz229aqpVhtcBCKyLQhAy050v1XmKabXhIrc8WJRzJyhQFmJly4Gxn5V26NDX2ImndE34eU15R5doJiMFct8dzPZVGZlxbmUN0XopfV5a5I+fq43dRNlJTNEjeAwPQBoeZ/7JUhxN4nvydBPRZMU+3gBjOZ+f9742AujEAyDPWvdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EiXa87in7rBAzv3uV1soGHG3lo9SBjmZjDPtG6yWv2k=;
- b=nx4gWZh3N04dYWzjohkT1qPweIhSW+inMNyEVjHw/PzKLyBBkkbKx1TNibDHPlhUa3k6tzGpynLUgFu++jtQ6HXK4URZKBp0iOq3Yi8WncHc/oEakjuLGvMc+NT5mW6U5yoqZ3FMCSoEG3q6W8CsigwvUi4BTtX18jmlRW32CQ1xMrSB2adWnwT3bmH/jSjD9UGl9iOHJ06GAxNUQgqwDXNhbu6j0lZgVGzWqH1vVwD8l0oPSKwykXy6frAf0YWRxkdgNq4bw2iYzeDSu8XTpNOv2e1KutW8H590n6j4pdHvwMsjDyqLV9CpQhaQnP7JqvcqEfT8fdtkO4jpSqXdPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EiXa87in7rBAzv3uV1soGHG3lo9SBjmZjDPtG6yWv2k=;
- b=rhp8Jh7FgJSEncWa2SRpCubXnQJGkq1uRDfJDk9f3OnzwjVeAjqg/OarVWrqhxGFEnKpUaxIR1CTjI2gklZVWnSILYMD4sx5AiYe2HDT9LE1/Daua9j+oL70ehYBcASJeEEVlXpKCp9qlw4roUroc6SGDwyxjgzpN3Yx71mD50w=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by CH2PR12MB4264.namprd12.prod.outlook.com (2603:10b6:610:a4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.29; Mon, 21 Oct
- 2024 13:10:29 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8069.027; Mon, 21 Oct 2024
- 13:10:29 +0000
-Message-ID: <896cc83c-6323-88fe-6cbd-f723246d4032@amd.com>
-Date: Mon, 21 Oct 2024 14:10:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC 00/13] vfio: introduce vfio-cxl to support CXL type-2
- accelerator passthrough
-Content-Language: en-US
-To: Zhi Wang <zhiw@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Jason Gunthorpe <jgg@nvidia.com>,
- "alison.schofield@intel.com" <alison.schofield@intel.com>,
- "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
- "dave.jiang@intel.com" <dave.jiang@intel.com>,
- "dave@stgolabs.net" <dave@stgolabs.net>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "ira.weiny@intel.com" <ira.weiny@intel.com>,
- "vishal.l.verma@intel.com" <vishal.l.verma@intel.com>,
- Andy Currid <ACurrid@nvidia.com>, Neo Jia <cjia@nvidia.com>,
- Surath Mitra <smitra@nvidia.com>, Ankit Agrawal <ankita@nvidia.com>,
- Aniket Agashe <aniketa@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
- "zhiwang@kernel.org" <zhiwang@kernel.org>
-References: <20240920223446.1908673-1-zhiw@nvidia.com>
- <c4c660b7-3220-4cf8-9430-a3dd7e623cef@nvidia.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <c4c660b7-3220-4cf8-9430-a3dd7e623cef@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0051.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ac::13) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6401E1C3B
+	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 13:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729517180; cv=none; b=MFma+h9mlXPYjkBfkEg+OFNEnsaZYLpWPD5hOIZKaSTpAWr5Bubkflfnr19fbeckX+oPdsc2ff54NMcSotMdc+fqQsTzTuQhOtcIoGuRPXk/jchqzOWbpgcTRmfhjc+J0uSasbZWcRyEe6LSnryKZFhw+h361thYlqS2pRwh4Iw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729517180; c=relaxed/simple;
+	bh=bmrTrU+oNV2VwqIexnTsbMIh/NkVHyw1Jk2+N8eai8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b5VXH2N6ITkpx+RAmzHvAYt0MVgwrDIXVSnVi3odnfbWw8UDQJkqkNZDy6Rq+/BMT0bgJ/T3cwlDwp9Crh4zA5Xa3HIn9F6LRUh+4KKrptAQBTRxM1xjyS+ibatW8ex1y2asVZTDDpz7ydxFIgzUNg56/+0HCyiFnm0lNL5dmlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=kHEw1CR9; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=kHEw1CR9; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 677EF21C5E;
+	Mon, 21 Oct 2024 13:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1729517176; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bmrTrU+oNV2VwqIexnTsbMIh/NkVHyw1Jk2+N8eai8A=;
+	b=kHEw1CR9ysNf0IyKKqDzK7ujCS/9Q8rfkVTk3Itq2d7kugDleVqchPazWu9kkWR6lASqwq
+	HP51ImSwN2fIdzLba1w/qpu15h4LoMRUuwJzC6RzBfhClZOS+B3O9Kwht7+5Y+0dcXnFkp
+	Q1PJUA7W/oql9dzApDXub2ch2Or4uds=
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=kHEw1CR9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1729517176; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bmrTrU+oNV2VwqIexnTsbMIh/NkVHyw1Jk2+N8eai8A=;
+	b=kHEw1CR9ysNf0IyKKqDzK7ujCS/9Q8rfkVTk3Itq2d7kugDleVqchPazWu9kkWR6lASqwq
+	HP51ImSwN2fIdzLba1w/qpu15h4LoMRUuwJzC6RzBfhClZOS+B3O9Kwht7+5Y+0dcXnFkp
+	Q1PJUA7W/oql9dzApDXub2ch2Or4uds=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1AC5F136DC;
+	Mon, 21 Oct 2024 13:26:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3HUTBXhWFmcyQQAAD6G6ig
+	(envelope-from <jgross@suse.com>); Mon, 21 Oct 2024 13:26:16 +0000
+Message-ID: <e6461e14-ca65-4322-a818-88b66b58c5c1@suse.com>
+Date: Mon, 21 Oct 2024 15:26:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CH2PR12MB4264:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f1df523-9520-4e12-5a77-08dcf1d1bc1b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bGRJejlQMmowNEFvRldSanE1dkxCTzQ2R3dNZUZHTlAvcTFodVZBQkdNemEw?=
- =?utf-8?B?UXZCQndKb01yR2dtZWpseHAxSmxXWE93UHlUK25saWZPRjgwUDhqRnZWM1RK?=
- =?utf-8?B?cURIMnVKRElGZWJrbDNjMnNLZmhkdFdYL2FHNi84K2ZtODdlK3JzU0dQalpl?=
- =?utf-8?B?YmEwbGxZS1lkMnhkTkIyeVJIeUZXK2NzbUNjZWNvMklsb00yUXNRc0U1Mi9t?=
- =?utf-8?B?SHlEQ2NTN29ETkRLejdReEtVSk9kei9SZXNFMktndmtzc2dkZm9TbFZRSTdi?=
- =?utf-8?B?MzVIam10ZGJNb29idU9PbmdtN1FhTHhwZUMyYWVsQWFKNDFheml4TmFob3dO?=
- =?utf-8?B?L1FWYXRxeVRRMyt0Ui8ya21Tcm91Mm5lRFJGVEZ5d0pvcTEyY054T3I5MDV0?=
- =?utf-8?B?SDBoT3crcnZxekxZRjA5U0lmeU5rM3NYTFJ3YXd0bitnaTNNMlZoVytyTFVC?=
- =?utf-8?B?ZXlsNnpOOXdoNkttL2J5OHMzd2liNVlWYW1nNEViT3grNS9qc1llQ2Q2YmFY?=
- =?utf-8?B?bTFHamsvMG5Ba2p1VFF0Z0gvbnF6ZFlHeTdxRkY0VUNYY2VDVFh1MHk4V0xh?=
- =?utf-8?B?SE9PZE5QNDdkd0xlVFNyZUJrcWN0akhEZHowZDNybnhhVkNCM3BnYVdiVjZq?=
- =?utf-8?B?UjNRaktER3hqMzg1cWVicHovRk4wdzR3bThMdDFGbHhSbXR2QVBDZVZTTWJ6?=
- =?utf-8?B?VThvaFZFeEZNdmxNOG1ZdkRhaEV1NHVKb01tSTJFZEtkT1dOMTE1bldLVDQ3?=
- =?utf-8?B?ZXdTeFJ5QUg4WmdNNmNoVW1odHlDdHZjRVNISWtQR3VZZUdLbzE0TVkwc01Q?=
- =?utf-8?B?RlJLQlNnc0tkQndZT2JORzB6bXB5eElRaVE2OVk5bHM0c2pFelVqcFNCNHI4?=
- =?utf-8?B?YlZKR1NoSktKMGh2RGxuQmZpU3ZrOXFrZkd4L21NNnVXZWtPWWszRk5JZzFo?=
- =?utf-8?B?RmJTdUNPejc5RlVJRDNhNEJVUDN4c3dBaHdBdmVIYlFkVHZyZHJPdG85ZUp0?=
- =?utf-8?B?Qm1QV1kvcE1UMktaS1JKcktKV3JYY0hTU3h5MTIrVVF6cHkzc2JvUzc2M2dV?=
- =?utf-8?B?NmJDQTdJeDZMS2tBSis2REdBVkJnbDJzTmFzN3BvMFpUN21xNnk0OWVta0pY?=
- =?utf-8?B?U09zTDM0YXllRGxuSkVQcWdxUFEvYVBzY1pSZFd1MnhwQUpBVWREL09lUUdz?=
- =?utf-8?B?L3pieU1jaVFQcDByNkh0L2YwbjkySkJFVVROYmhXa1FXS2FBZGxmM25SU1li?=
- =?utf-8?B?K0ppSTB5UkJjbEJYN3o3T2pWZHhpOGFIVDJpWDNSRXNGUjFtM0U4L2dZOWxP?=
- =?utf-8?B?dGk2SmdOS0FHYkN1dFM5YUxoSmpvcm1obEJaWXQwWW9kNmZpek1yL3dudDF3?=
- =?utf-8?B?UkhCaSs1V0Y4R3NFRitKNzZodWhncUZMYUZkOVBhbzZuaHNuOUVaeXRuOGNQ?=
- =?utf-8?B?RFFTUDg0ejI0YlhQUEh2YVREWFZiNWc4SWRlQ1UyV0dzZ3RUZnJLVlQ1SmRh?=
- =?utf-8?B?Qk5oNXZtSXBpSWF6Z1NjTkgyN0txcVB6a0J6bDAwL2xNLzJXSFRQU3UyYk9K?=
- =?utf-8?B?elZaTXVLYy9LRS81ei9ETGNrb0xFekh0alpXVDZZUngwOTlZV1RSR1hiaVFy?=
- =?utf-8?B?SElHOTJDRnJJbi9RWi9YQmJZTUUwTjY5UURsTGppYlVITXhlR1JxT3lxbDhx?=
- =?utf-8?B?TE9rdEludVRhenlhTTdRTHY5T2YrUnp3S1pNV3FxR2FtQ0JUeFZ1Q3ZnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dWRGWll2Q3dCbE4xUVVZUGlSQWNSWUVHMkhmMFFUaGxSNU5FMVVDNGRGNnUw?=
- =?utf-8?B?SmZoWUUwN05BamYvTVdkdm5DV1VaWnFoRzdaVXRmSGl5ZWl3bnEvdU1Kdzlt?=
- =?utf-8?B?UHd4RmloS2QxTmR1RTBkQ3RzVkxTaXdwNTR0Z2ozWk9RMStBSTdKamY5R0g0?=
- =?utf-8?B?UE9NaUQwRnlWRHBkdE0vWFVpaWpMSkxBQ2hyY3JQa0NJMHpwenRYTCt3cC82?=
- =?utf-8?B?OW50OGlPSzYxN0xjeDNpd3EvWDBSbnd6T08zOXRLTG82bkUwcldyd0VVajY0?=
- =?utf-8?B?bmFJTUxaMkd6TzZibm1QdkRqTE12YWtsbFAzUjBUd1kyMzhOYk5lVXdsWTc3?=
- =?utf-8?B?dXZ0S1p5VEFHbnZaTE94YnA4aVNSWi81emluMHJOaDdTQk5rOEozbUh0enJt?=
- =?utf-8?B?bnZxUy95eFRUOURNNnpObGJCUDd4SGMwQVFFNC92eTBtQ2JSU01MUWlIdmN5?=
- =?utf-8?B?eWdSMVUxTXNXQW1ZWDJWUGZLcnJab0lDOXlLTk0zdGdtTTBzUVVTNVNzTnJ3?=
- =?utf-8?B?OG5lS3BGa29raWt5UkxtZjJwNlVSUjNtUjdTVDFvVXAxMEx2MnVwSlh4U2NY?=
- =?utf-8?B?UjAyQTFZUXJyc2U4Q1JFNEZOekhJdklzdkw2SXQ5UHVLeEFvemttYUpDSzJu?=
- =?utf-8?B?ZFBoNER6Q0ZJSEZET3B1WXk0WU9PeEErcUFvOXNJM2ZkL2FFT3JWdkhyM2lM?=
- =?utf-8?B?MExwNHFVenVQc2gwV05qNDRDZ20xMzhmaDFFTWd3Vk5pcWY5K1d5QVVvNnNN?=
- =?utf-8?B?SUJwWWdvb0U0OFFPK3Q0S0E0TXBxUUtSNjRjdDZRRkpJbzdHNCt1a2FVVldx?=
- =?utf-8?B?Q1YzK2p2d0ZOaTJROFkzVzRzRVBDem5tc1NaTUlDNnhBMXMvSjFtYTR2ZU9V?=
- =?utf-8?B?VFZoY0hWRTd4K29WSTJXYkJoa1BCc3RxcHhDV29SbWRwUWZudWhENndSZFVL?=
- =?utf-8?B?NlFZMUh5RzBocDM2akdYNU9Daml5eXFkQ0UrWXplQUJlUGFob0ZLMW5GNUtu?=
- =?utf-8?B?bXFaOWtjeU8rKzA4cGczUytMeEpyTlZNalc1Mlpra0t1dkYyRGJNbDVTOGxv?=
- =?utf-8?B?dzlQMHpqQi85MmIzaVg5d0llU0llUVVXSzhNVUZjYlliSGRkZXQyTnJHYlF0?=
- =?utf-8?B?aEpKSTBIUG9vRGFXaUwxMUYzRklXQnhOWjBGZnUxbDFFNHlQSTV3cVRHdnZ0?=
- =?utf-8?B?SEVCenJXZU5lWEY0NUQ3U3hFM3hSelJwZEVpNFRRNWNKY3dCZFZmTG1lb0sx?=
- =?utf-8?B?ZUdJTnZpN0U0a2FDRWp3M1RQWjVIUlZReG9ZUS9aVDdrTS8xcXM3OU1FNENx?=
- =?utf-8?B?NENYbGFGbDVHWFNlUU14WnM4SFljMnRDekZBcXEwWnlVdENYL28wbFBxZ3lu?=
- =?utf-8?B?S0c4Zis2elNBSnkyeUVTNG00RUxRNm45MWJoUk9BOWdkOVNiQWIwc09hYU1T?=
- =?utf-8?B?eWYzcEJ3b1pIZHpWYm9BQ1N4QUpMeVQybzkxUEswMVo3MElGVTZxTUhNaUI4?=
- =?utf-8?B?a0k0T1QwRjVvQUp3eXRmWEd4Y2xVT0JmRXh1NHFqUU4zWGZMcndUNjJQQW5w?=
- =?utf-8?B?QlFpbjZWcEkwVmpXeEgydlFYTndXZUdURFgwVzBiWExoQ09GY1h0d29ROUk0?=
- =?utf-8?B?T2l4OUsrbklJVnNGOHJ6ODJkLytaaGRXekhlb2hYUHg0NCtRa2M4YXN4RVpj?=
- =?utf-8?B?WnVLVWZ4aitHU1l6UEIxa3QzdXlZMDVzT2NFUUdXVjlTUlRqWStGN3luOEF4?=
- =?utf-8?B?V2JmMk8vbWVVejhlUW15SFlHalJKVUl3WGVtTms5V09kNEVZZGpsQUdjVnVo?=
- =?utf-8?B?anVhdkVNTG5iY2s0YllYeEhXcy9mcGhudWY0Vmw1RWlRbGRDblJ0akpYRE45?=
- =?utf-8?B?ekhSTm1kbEZpZUxCeU0zd1EwK1IxVXd6RUtiUVpjd2RDckNYSFc0cWhqK0dj?=
- =?utf-8?B?aGIxTEk3VDJyNXhlODlndnVnelpQN2dtZlhIWlVzQ0lyU1pRNHVNWEhDM3hD?=
- =?utf-8?B?VWtDSk4xcGxhYUdWNGx0RUZralJvMVpjVTA1Mzd2eGRGRmkwNFNhVzluenRv?=
- =?utf-8?B?YUJGVkYxODlWWmt2M2ZPRkg1ZmQ5SURZV3FBV3dLTmdDSkJEdjFSRjFuUXQr?=
- =?utf-8?Q?i278k+DsmRkesnrcCeA/WBoLT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f1df523-9520-4e12-5a77-08dcf1d1bc1b
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 13:10:28.8248
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: olBiyO9hvE9M0JXTs+jvF8LUOAL4h0X6hovleG37N8GbqazaztE2wHaFEX1RuhCbzV/u/XywOOKT2napHw1sEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4264
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
+ terminal
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>,
+ Claudio Fontana <cfontana@suse.de>
+References: <20240807172334.1006-1-cfontana@suse.de>
+Content-Language: en-US
+From: Juergen Gross <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20240807172334.1006-1-cfontana@suse.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------WAJpAm6VtTfBMpjT7mtFWEcV"
+X-Rspamd-Queue-Id: 677EF21C5E
+X-Spam-Score: -5.40
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-5.40 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	NEURAL_HAM_SHORT(-0.19)[-0.971];
+	MIME_UNKNOWN(0.10)[application/pgp-keys];
+	MIME_BASE64_TEXT(0.10)[];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	HAS_ATTACHMENT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:dkim,suse.com:mid,suse.com:email,suse.de:email]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Hi Zhi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------WAJpAm6VtTfBMpjT7mtFWEcV
+Content-Type: multipart/mixed; boundary="------------abCZza9bJa7ktEtEkDR4G9Aq";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>,
+ Claudio Fontana <cfontana@suse.de>
+Message-ID: <e6461e14-ca65-4322-a818-88b66b58c5c1@suse.com>
+Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
+ terminal
+References: <20240807172334.1006-1-cfontana@suse.de>
+In-Reply-To: <20240807172334.1006-1-cfontana@suse.de>
 
+--------------abCZza9bJa7ktEtEkDR4G9Aq
+Content-Type: multipart/mixed; boundary="------------dEuYg109tgzS5FGIQhht8Vu3"
 
-Some comments below.
+--------------dEuYg109tgzS5FGIQhht8Vu3
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
+QW55IHJlYXNvbiBub3QgdG8gY29tbWl0IHRoaXMgcGF0Y2g/IEl0IGhhcyBnb3QgYSBSZXZp
+ZXdlZC1ieTogdGFnIGZyb20NClN0ZWZhbiBtb3JlIHRoYW4gMiBtb250aHMgYWdvLi4uDQoN
+Ck9uIDA3LjA4LjI0IDE5OjIzLCBDbGF1ZGlvIEZvbnRhbmEgd3JvdGU6DQo+IEZvciB0aGUg
+LWwgYW5kIC1MIG9wdGlvbnMgKGxvZ2dpbmcgbW9kZSksIHJlcGxhY2UgdGhlIHVzZSBvZiB0
+aGUNCj4gS2V5Ym9hcmRJbnRlcnJ1cHQgZXhjZXB0aW9uIHRvIGdyYWNlZnVsbHkgdGVybWlu
+YXRlIGluIGZhdm9yDQo+IG9mIGhhbmRsaW5nIHRoZSBTSUdJTlQgYW5kIFNJR1RFUk0gc2ln
+bmFscy4NCj4gDQo+IFRoaXMgYWxsb3dzIHRoZSBwcm9ncmFtIHRvIGJlIHJ1biBmcm9tIHNj
+cmlwdHMgYW5kIHN0aWxsIGJlDQo+IHNpZ25hbGVkIHRvIGdyYWNlZnVsbHkgdGVybWluYXRl
+IHdpdGhvdXQgYW4gaW50ZXJhY3RpdmUgdGVybWluYWwuDQo+IA0KPiBCZWZvcmUgdGhpcyBj
+aGFuZ2UsIHNvbWV0aGluZyBsaWtlIHRoaXMgc2NyaXB0Og0KPiANCj4ga3ZtX3N0YXQgLXAg
+ODU4OTYgLWQgLXQgLXMgMSAtYyAtTCBrdm1fc3RhdF84NTg5Ni5jc3YgJg0KPiBzbGVlcCAx
+MA0KPiBwa2lsbCAtVEVSTSAtUCAkJA0KPiANCj4gd291bGQgeWllbGQgYW4gZW1wdHkgbG9n
+Og0KPiAtcnctci0tci0tIDEgcm9vdCByb290ICAgICAwIEF1ZyAgNyAxNjoxNyBrdm1fc3Rh
+dF84NTg5Ni5jc3YNCj4gDQo+IGFmdGVyIHRoaXMgY29tbWl0Og0KPiAtcnctci0tci0tIDEg
+cm9vdCByb290IDEzNDY2IEF1ZyAgNyAxNjo1NyBrdm1fc3RhdF84NTg5Ni5jc3YNCj4gDQo+
+IFNpZ25lZC1vZmYtYnk6IENsYXVkaW8gRm9udGFuYSA8Y2ZvbnRhbmFAc3VzZS5kZT4NCj4g
+Q2M6IERhcmlvIEZhZ2dpb2xpIDxkZmFnZ2lvbGlAc3VzZS5jb20+DQo+IENjOiBGYWJpYW5v
+IFJvc2FzIDxmYXJvc2FzQHN1c2UuZGU+DQo+IC0tLQ0KPiAgIHRvb2xzL2t2bS9rdm1fc3Rh
+dC9rdm1fc3RhdCAgICAgfCA2NCArKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0N
+Cj4gICB0b29scy9rdm0va3ZtX3N0YXQva3ZtX3N0YXQudHh0IHwgMTIgKysrKysrKw0KPiAg
+IDIgZmlsZXMgY2hhbmdlZCwgNDQgaW5zZXJ0aW9ucygrKSwgMzIgZGVsZXRpb25zKC0pDQo+
+IA0KPiBkaWZmIC0tZ2l0IGEvdG9vbHMva3ZtL2t2bV9zdGF0L2t2bV9zdGF0IGIvdG9vbHMv
+a3ZtL2t2bV9zdGF0L2t2bV9zdGF0DQo+IGluZGV4IDE1YmYwMGU3OWUzZi4uMmNmMmRhM2Vk
+MDAyIDEwMDc1NQ0KPiAtLS0gYS90b29scy9rdm0va3ZtX3N0YXQva3ZtX3N0YXQNCj4gKysr
+IGIvdG9vbHMva3ZtL2t2bV9zdGF0L2t2bV9zdGF0DQo+IEBAIC0yOTcsOCArMjk3LDYgQEAg
+SU9DVExfTlVNQkVSUyA9IHsNCj4gICAgICAgJ1JFU0VUJzogICAgICAgMHgwMDAwMjQwMywN
+Cj4gICB9DQo+ICAgDQo+IC1zaWduYWxfcmVjZWl2ZWQgPSBGYWxzZQ0KPiAtDQo+ICAgRU5D
+T0RJTkcgPSBsb2NhbGUuZ2V0cHJlZmVycmVkZW5jb2RpbmcoRmFsc2UpDQo+ICAgVFJBQ0Vf
+RklMVEVSID0gcmUuY29tcGlsZShyJ15bXlwoXSokJykNCj4gICANCj4gQEAgLTE1OTgsNyAr
+MTU5NiwxOSBAQCBjbGFzcyBDU1ZGb3JtYXQob2JqZWN0KToNCj4gICANCj4gICBkZWYgbG9n
+KHN0YXRzLCBvcHRzLCBmcm10LCBrZXlzKToNCj4gICAgICAgIiIiUHJpbnRzIHN0YXRpc3Rp
+Y3MgYXMgcmVpdGVyYXRpbmcga2V5IGJsb2NrLCBtdWx0aXBsZSB2YWx1ZSBibG9ja3MuIiIi
+DQo+IC0gICAgZ2xvYmFsIHNpZ25hbF9yZWNlaXZlZA0KPiArICAgIHNpZ25hbF9yZWNlaXZl
+ZCA9IGRlZmF1bHRkaWN0KGJvb2wpDQo+ICsNCj4gKyAgICBkZWYgaGFuZGxlX3NpZ25hbChz
+aWcsIGZyYW1lKToNCj4gKyAgICAgICAgbm9ubG9jYWwgc2lnbmFsX3JlY2VpdmVkDQo+ICsg
+ICAgICAgIHNpZ25hbF9yZWNlaXZlZFtzaWddID0gVHJ1ZQ0KPiArICAgICAgICByZXR1cm4N
+Cj4gKw0KPiArDQo+ICsgICAgc2lnbmFsLnNpZ25hbChzaWduYWwuU0lHSU5ULCBoYW5kbGVf
+c2lnbmFsKQ0KPiArICAgIHNpZ25hbC5zaWduYWwoc2lnbmFsLlNJR1RFUk0sIGhhbmRsZV9z
+aWduYWwpDQo+ICsgICAgaWYgb3B0cy5sb2dfdG9fZmlsZToNCj4gKyAgICAgICAgc2lnbmFs
+LnNpZ25hbChzaWduYWwuU0lHSFVQLCBoYW5kbGVfc2lnbmFsKQ0KPiArDQo+ICAgICAgIGxp
+bmUgPSAwDQo+ICAgICAgIGJhbm5lcl9yZXBlYXQgPSAyMA0KPiAgICAgICBmID0gTm9uZQ0K
+PiBAQCAtMTYyNCwzOSArMTYzNCwzMSBAQCBkZWYgbG9nKHN0YXRzLCBvcHRzLCBmcm10LCBr
+ZXlzKToNCj4gICAgICAgZG9fYmFubmVyKG9wdHMpDQo+ICAgICAgIGJhbm5lcl9wcmludGVk
+ID0gVHJ1ZQ0KPiAgICAgICB3aGlsZSBUcnVlOg0KPiAtICAgICAgICB0cnk6DQo+IC0gICAg
+ICAgICAgICB0aW1lLnNsZWVwKG9wdHMuc2V0X2RlbGF5KQ0KPiAtICAgICAgICAgICAgaWYg
+c2lnbmFsX3JlY2VpdmVkOg0KPiAtICAgICAgICAgICAgICAgIGJhbm5lcl9wcmludGVkID0g
+VHJ1ZQ0KPiAtICAgICAgICAgICAgICAgIGxpbmUgPSAwDQo+IC0gICAgICAgICAgICAgICAg
+Zi5jbG9zZSgpDQo+IC0gICAgICAgICAgICAgICAgZG9fYmFubmVyKG9wdHMpDQo+IC0gICAg
+ICAgICAgICAgICAgc2lnbmFsX3JlY2VpdmVkID0gRmFsc2UNCj4gLSAgICAgICAgICAgIGlm
+IChsaW5lICUgYmFubmVyX3JlcGVhdCA9PSAwIGFuZCBub3QgYmFubmVyX3ByaW50ZWQgYW5k
+DQo+IC0gICAgICAgICAgICAgICAgbm90IChvcHRzLmxvZ190b19maWxlIGFuZCBpc2luc3Rh
+bmNlKGZybXQsIENTVkZvcm1hdCkpKToNCj4gLSAgICAgICAgICAgICAgICBkb19iYW5uZXIo
+b3B0cykNCj4gLSAgICAgICAgICAgICAgICBiYW5uZXJfcHJpbnRlZCA9IFRydWUNCj4gLSAg
+ICAgICAgICAgIHZhbHVlcyA9IHN0YXRzLmdldCgpDQo+IC0gICAgICAgICAgICBpZiAobm90
+IG9wdHMuc2tpcF96ZXJvX3JlY29yZHMgb3INCj4gLSAgICAgICAgICAgICAgICBhbnkodmFs
+dWVzW2tdLmRlbHRhICE9IDAgZm9yIGsgaW4ga2V5cykpOg0KPiAtICAgICAgICAgICAgICAg
+IGRvX3N0YXRsaW5lKG9wdHMsIHZhbHVlcykNCj4gLSAgICAgICAgICAgICAgICBsaW5lICs9
+IDENCj4gLSAgICAgICAgICAgICAgICBiYW5uZXJfcHJpbnRlZCA9IEZhbHNlDQo+IC0gICAg
+ICAgIGV4Y2VwdCBLZXlib2FyZEludGVycnVwdDoNCj4gKyAgICAgICAgdGltZS5zbGVlcChv
+cHRzLnNldF9kZWxheSkNCj4gKyAgICAgICAgIyBEbyBub3QgdXNlIHRoZSBLZXlib2FyZElu
+dGVycnVwdCBleGNlcHRpb24sIGJlY2F1c2Ugd2UgbWF5IGJlIHJ1bm5pbmcgd2l0aG91dCBh
+IHRlcm1pbmFsDQo+ICsgICAgICAgIGlmIChzaWduYWxfcmVjZWl2ZWRbc2lnbmFsLlNJR0lO
+VF0gb3Igc2lnbmFsX3JlY2VpdmVkW3NpZ25hbC5TSUdURVJNXSk6DQo+ICAgICAgICAgICAg
+ICAgYnJlYWsNCj4gKyAgICAgICAgaWYgc2lnbmFsX3JlY2VpdmVkW3NpZ25hbC5TSUdIVVBd
+Og0KPiArICAgICAgICAgICAgYmFubmVyX3ByaW50ZWQgPSBUcnVlDQo+ICsgICAgICAgICAg
+ICBsaW5lID0gMA0KPiArICAgICAgICAgICAgZi5jbG9zZSgpDQo+ICsgICAgICAgICAgICBk
+b19iYW5uZXIob3B0cykNCj4gKyAgICAgICAgICAgIHNpZ25hbF9yZWNlaXZlZFtzaWduYWwu
+U0lHSFVQXSA9IEZhbHNlDQo+ICsgICAgICAgIGlmIChsaW5lICUgYmFubmVyX3JlcGVhdCA9
+PSAwIGFuZCBub3QgYmFubmVyX3ByaW50ZWQgYW5kDQo+ICsgICAgICAgICAgICBub3QgKG9w
+dHMubG9nX3RvX2ZpbGUgYW5kIGlzaW5zdGFuY2UoZnJtdCwgQ1NWRm9ybWF0KSkpOg0KPiAr
+ICAgICAgICAgICAgZG9fYmFubmVyKG9wdHMpDQo+ICsgICAgICAgICAgICBiYW5uZXJfcHJp
+bnRlZCA9IFRydWUNCj4gKyAgICAgICAgdmFsdWVzID0gc3RhdHMuZ2V0KCkNCj4gKyAgICAg
+ICAgaWYgKG5vdCBvcHRzLnNraXBfemVyb19yZWNvcmRzIG9yDQo+ICsgICAgICAgICAgICBh
+bnkodmFsdWVzW2tdLmRlbHRhICE9IDAgZm9yIGsgaW4ga2V5cykpOg0KPiArICAgICAgICAg
+ICAgZG9fc3RhdGxpbmUob3B0cywgdmFsdWVzKQ0KPiArICAgICAgICAgICAgbGluZSArPSAx
+DQo+ICsgICAgICAgICAgICBiYW5uZXJfcHJpbnRlZCA9IEZhbHNlDQo+ICAgDQo+ICAgICAg
+IGlmIG9wdHMubG9nX3RvX2ZpbGU6DQo+ICAgICAgICAgICBmLmNsb3NlKCkNCj4gICANCj4g
+ICANCj4gLWRlZiBoYW5kbGVfc2lnbmFsKHNpZywgZnJhbWUpOg0KPiAtICAgIGdsb2JhbCBz
+aWduYWxfcmVjZWl2ZWQNCj4gLQ0KPiAtICAgIHNpZ25hbF9yZWNlaXZlZCA9IFRydWUNCj4g
+LQ0KPiAtICAgIHJldHVybg0KPiAtDQo+IC0NCj4gICBkZWYgaXNfZGVsYXlfdmFsaWQoZGVs
+YXkpOg0KPiAgICAgICAiIiJWZXJpZnkgZGVsYXkgaXMgaW4gdmFsaWQgdmFsdWUgcmFuZ2Uu
+IiIiDQo+ICAgICAgIG1zZyA9IE5vbmUNCj4gQEAgLTE4NjksOCArMTg3MSw2IEBAIGRlZiBt
+YWluKCk6DQo+ICAgICAgICAgICBzeXMuZXhpdCgwKQ0KPiAgIA0KPiAgICAgICBpZiBvcHRp
+b25zLmxvZyBvciBvcHRpb25zLmxvZ190b19maWxlOg0KPiAtICAgICAgICBpZiBvcHRpb25z
+LmxvZ190b19maWxlOg0KPiAtICAgICAgICAgICAgc2lnbmFsLnNpZ25hbChzaWduYWwuU0lH
+SFVQLCBoYW5kbGVfc2lnbmFsKQ0KPiAgICAgICAgICAga2V5cyA9IHNvcnRlZChzdGF0cy5n
+ZXQoKS5rZXlzKCkpDQo+ICAgICAgICAgICBpZiBvcHRpb25zLmNzdjoNCj4gICAgICAgICAg
+ICAgICBmcm10ID0gQ1NWRm9ybWF0KGtleXMpDQo+IGRpZmYgLS1naXQgYS90b29scy9rdm0v
+a3ZtX3N0YXQva3ZtX3N0YXQudHh0IGIvdG9vbHMva3ZtL2t2bV9zdGF0L2t2bV9zdGF0LnR4
+dA0KPiBpbmRleCAzYTlmMjAzN2JkMjMuLjRhOTlhMTExYTkzYyAxMDA2NDQNCj4gLS0tIGEv
+dG9vbHMva3ZtL2t2bV9zdGF0L2t2bV9zdGF0LnR4dA0KPiArKysgYi90b29scy9rdm0va3Zt
+X3N0YXQva3ZtX3N0YXQudHh0DQo+IEBAIC0xMTUsNiArMTE1LDE4IEBAIE9QVElPTlMNCj4g
+ICAtLXNraXAtemVyby1yZWNvcmRzOjoNCj4gICAgICAgICAgIG9taXQgcmVjb3JkcyB3aXRo
+IGFsbCB6ZXJvcyBpbiBsb2dnaW5nIG1vZGUNCj4gICANCj4gKw0KPiArU0lHTkFMUw0KPiAr
+LS0tLS0tLQ0KPiArd2hlbiBrdm1fc3RhdCBpcyBydW5uaW5nIGluIGxvZ2dpbmcgbW9kZSAo
+ZWl0aGVyIHdpdGggLWwgb3Igd2l0aCAtTCksDQo+ICtpdCBoYW5kbGVzIHRoZSBmb2xsb3dp
+bmcgc2lnbmFsczoNCj4gKw0KPiArU0lHSFVQIC0gY2xvc2VzIGFuZCByZW9wZW5zIHRoZSBs
+b2cgZmlsZSAoLUwgb25seSksIHRoZW4gY29udGludWVzLg0KPiArDQo+ICtTSUdJTlQgLSBj
+bG9zZXMgdGhlIGxvZyBmaWxlIGFuZCB0ZXJtaW5hdGVzLg0KPiArU0lHVEVSTSAtIGNsb3Nl
+cyB0aGUgbG9nIGZpbGUgYW5kIHRlcm1pbmF0ZXMuDQo+ICsNCj4gKw0KPiAgIFNFRSBBTFNP
+DQo+ICAgLS0tLS0tLS0NCj4gICAncGVyZicoMSksICd0cmFjZS1jbWQnKDEpDQoNCg==
+--------------dEuYg109tgzS5FGIQhht8Vu3
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-On 10/21/24 11:49, Zhi Wang wrote:
-> On 21/09/2024 1.34, Zhi Wang wrote:
->
-> Hi folks:
->
-> Thanks so much for the comments and discussions in the mail and
-> collaboration meeting. Here are the update of the major opens raised and
-> conclusion/next steps:
->
-> 1) It is not necessary to support the multiple virtual HDM decoders for
-> CXL type-2 device. (Jonathan)
->
-> Was asking SW folks around about the requirement of multiple HDM
-> decoders in a CXL type-2 device driver. It seems one is enough, which is
-> reasonable, because the CXL region created by the type-2 device driver
-> is mostly kept for its own private use.
->
-> 2) Pre-created vs post-created CXL region for the guest.
-> (Dan/Kevin/Alejandro)
->
-> There has been a discussion about when to create CXL region for the guest.
->
-> Option a: The pCXL region is pre-created before VM boots. When a guest
-> creates the CXL region via its virtual HDM decoder, QEMU maps the pCXL
-> region to the virtual CXL region configured by the guest. Changes and
-> re-configuration of the pCXL region is not expected.
->
-> Option b: The pCXL region will be (re)created when a guest creates the
-> CXL region via its virtual HDM decoder. QEMU traps the HDM decoder
-> commits, triggers the pCXL region creation, maps the pCXL to the virtual
-> CXL region.
->
-> Alejandro (option b):
-> - Will write a doc to elaborate the problem of CXL.cache and why option
-> b should be chosen.
->
-> Kevin (option b):
-> - CXL region is a SW concept, it should be controlled by the guest SW.
->
-> Dan (option a):
-> - Error handling when creating the pCXL region at runtime. E.g.
-> Available HPA in the FWMS in the host is running out when creating the
-> pCXL region
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjri
+oyspZKOBycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2
+kaV2KL9650I1SJvedYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i
+1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/B
+BLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xqG7/377qptDmrk42GlSK
+N4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR3Jvc3Mg
+PGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsE
+FgIDAQIeAQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4F
+UGNQH2lvWAUy+dnyThpwdtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3Tye
+vpB0CA3dbBQp0OW0fgCetToGIQrg0MbD1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u
++6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbvoPHZ8SlM4KWm8rG+lIkGurq
+qu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v5QL+qHI3EIP
+tyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVy
+Z2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJ
+CAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4
+RF7HoZhPVPogNVbC4YA6lW7DrWf0teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz7
+8X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC/nuAFVGy+67q2DH8As3KPu0344T
+BDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0LhITTd9jLzdDad1pQ
+SToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLmXBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkM
+nQfvUewRz80hSnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMB
+AgAjBQJTjHDXAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/
+Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJnFOXgMLdBQgBlVPO3/D9R8LtF9DBAFPN
+hlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1jnDkfJZr6jrbjgyoZHi
+w/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0N51N5Jf
+VRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwP
+OoE+lotufe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK
+/1xMI3/+8jbO0tsn1tqSEUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1
+c2UuZGU+wsB5BBMBAgAjBQJTjHDrAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgEC
+F4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3g3OZUEBmDHVVbqMtzwlmNC4
+k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5dM7wRqzgJpJ
+wK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu
+5D+jLRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzB
+TNh30FVKK1EvmV2xAKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37Io
+N1EblHI//x/e2AaIHpzK5h88NEawQsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6
+AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpWnHIs98ndPUDpnoxWQugJ6MpMncr
+0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZRwgnBC5mVM6JjQ5x
+Dk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNVbVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mm
+we0icXKLkpEdIXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0I
+v3OOImwTEe4co3c1mwARAQABwsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMv
+Q/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEwTbe8YFsw2V/Buv6Z4Mysln3nQK5ZadD
+534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1vJzQ1fOU8lYFpZXTXIH
+b+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8VGiwXvT
+yJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqc
+suylWsviuGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5B
+jR/i1DG86lem3iBDXzXsZDn8R3/CwO0EGAEIACAWIQSFEmdy6PYElKXQl/ew3p3W
+KL8TLwUCWt3w0AIbAgCBCRCw3p3WKL8TL3YgBBkWCAAdFiEEUy2wekH2OPMeOLge
+gFxhu0/YY74FAlrd8NAACgkQgFxhu0/YY75NiwD/fQf/RXpyv9ZX4n8UJrKDq422
+bcwkujisT6jix2mOOwYBAKiip9+mAD6W5NPXdhk1XraECcIspcf2ff5kCAlG0DIN
+aTUH/RIwNWzXDG58yQoLdD/UPcFgi8GWtNUp0Fhc/GeBxGipXYnvuWxwS+Qs1Qay
+7/Nbal/v4/eZZaWs8wl2VtrHTS96/IF6q2o0qMey0dq2AxnZbQIULiEndgR625EF
+RFg+IbO4ldSkB3trsF2ypYLij4ZObm2casLIP7iB8NKmQ5PndL8Y07TtiQ+Sb/wn
+g4GgV+BJoKdDWLPCAlCMilwbZ88Ijb+HF/aipc9hsqvW/hnXC2GajJSAY3Qs9Mib
+4Hm91jzbAjmp7243pQ4bJMfYHemFFBRaoLC7ayqQjcsttN2ufINlqLFPZPR/i3IX
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-I think there is nothing option b can not do including any error 
-handling. Available HPA can change, but this is not different to this 
-being handled for host devices trying to get an HPA range concurrently.
+--------------dEuYg109tgzS5FGIQhht8Vu3--
 
+--------------abCZza9bJa7ktEtEkDR4G9Aq--
 
-> - CXL.cache might need extra handling which cannot be done at runtime.
-> (Need to check Alejandro's doc)
->
-> Next step:
->
-> - Will check with Alejandro and start from his doc about CXL.cache concerns.
+--------------WAJpAm6VtTfBMpjT7mtFWEcV
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Working on it. Hopefully a first draft next week.
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmcWVncFAwAAAAAACgkQsN6d1ii/Ey+5
+2gf/XLbxeOmOtfD+Yw0f3q595NXElGNGUSCg9np4cFZSUhgDgmHJuNvxjTjoCPL1MSTJQJzo3Y80
+HLx/pTjHxkPQ2sG017k57Y4fp2sAHCqKGgWImzDN69y18tubqE1rc8+Ljlkcv1TW88CCRHxOv6To
+SweF5BwTF4QnLp1Lc7FDEZpa8fvE9/o1KjqowQIg8z403W2uuUkMlEzV/MO8ok3mnJ+Iz7sPjdWO
+oQc5YPYlASvlf1iHNsSifqmPMI0nQhzacagQrqVHgWk/9tDoYN8jOkes5lbMl01gGPswIRemmDYZ
+nDvDmV7Z89VgilZM4DrXSEY35NLdnL1BIDWyKMhAPA==
+=u2OV
+-----END PGP SIGNATURE-----
 
-
-> 3) Is this exclusively a type2 extension or how do you envision type1/3
-> devices with vfio? (Alex)
->
-> For type-3 device passthrough, due to its nature of memory expander, CXL
-> folks have decided to use either virtio-mem or another stub driver in
-> QEMU to manage/map the memory to the guest.
->
-> For type-1 device, I am not aware of any type-1 device in the market.
-> Dan commented in the CXL discord group:
->
-> "my understanding is that some of the CXL FPGA kits offer Type-1 flows,
-> but those are for custom solutions not open-market. I am aware of some
-> private deployments of such hardware, but nothing with an upstream driver."
->
-> My take is that we don't need to consider support type-1 device
-> passthrough so far.
-
-
-I can not see a difference between Type1 and Type2 regarding CXL.cache 
-support. Once we have a solution for Type2, that should be fine for Type1.
-
-Thanks,
-
-Alejandro
-
-
->
-> Z.
->
->> Hi folks:
->>
->> As promised in the LPC, here are all you need (patches, repos, guiding
->> video, kernel config) to build a environment to test the vfio-cxl-core.
->>
->> Thanks so much for the discussions! Enjoy and see you in the next one.
->>
->> Background
->> ==========
->>
->> Compute Express Link (CXL) is an open standard interconnect built upon
->> industrial PCI layers to enhance the performance and efficiency of data
->> centers by enabling high-speed, low-latency communication between CPUs
->> and various types of devices such as accelerators, memory.
->>
->> It supports three key protocols: CXL.io as the control protocol, CXL.cache
->> as the cache-coherent host-device data transfer protocol, and CXL.mem as
->> memory expansion protocol. CXL Type 2 devices leverage the three protocols
->> to seamlessly integrate with host CPUs, providing a unified and efficient
->> interface for high-speed data transfer and memory sharing. This integration
->> is crucial for heterogeneous computing environments where accelerators,
->> such as GPUs, and other specialized processors, are used to handle
->> intensive workloads.
->>
->> Goal
->> ====
->>
->> Although CXL is built upon the PCI layers, passing a CXL type-2 device can
->> be different than PCI devices according to CXL specification[1]:
->>
->> - CXL type-2 device initialization. CXL type-2 device requires an
->> additional initialization sequence besides the PCI device initialization.
->> CXL type-2 device initialization can be pretty complicated due to its
->> hierarchy of register interfaces. Thus, a standard CXL type-2 driver
->> initialization sequence provided by the kernel CXL core is used.
->>
->> - Create a CXL region and map it to the VM. A mapping between HPA and DPA
->> (Device PA) needs to be created to access the device memory directly. HDM
->> decoders in the CXL topology need to be configured level by level to
->> manage the mapping. After the region is created, it needs to be mapped to
->> GPA in the virtual HDM decoders configured by the VM.
->>
->> - CXL reset. The CXL device reset is different from the PCI device reset.
->> A CXL reset sequence is introduced by the CXL spec.
->>
->> - Emulating CXL DVSECs. CXL spec defines a set of DVSECs registers in the
->> configuration for device enumeration and device control. (E.g. if a device
->> is capable of CXL.mem CXL.cache, enable/disable capability) They are owned
->> by the kernel CXL core, and the VM can not modify them.
->>
->> - Emulate CXL MMIO registers. CXL spec defines a set of CXL MMIO registers
->> that can sit in a PCI BAR. The location of register groups sit in the PCI
->> BAR is indicated by the register locator in the CXL DVSECs. They are also
->> owned by the kernel CXL core. Some of them need to be emulated.
->>
->> Design
->> ======
->>
->> To achieve the purpose above, the vfio-cxl-core is introduced to host the
->> common routines that variant driver requires for device passthrough.
->> Similar with the vfio-pci-core, the vfio-cxl-core provides common
->> routines of vfio_device_ops for the variant driver to hook and perform the
->> CXL routines behind it.
->>
->> Besides, several extra APIs are introduced for the variant driver to
->> provide the necessary information the kernel CXL core to initialize
->> the CXL device. E.g., Device DPA.
->>
->> CXL is built upon the PCI layers but with differences. Thus, the
->> vfio-pci-core is aimed to be re-used as much as possible with the
->> awareness of operating on a CXL device.
->>
->> A new VFIO device region is introduced to expose the CXL region to the
->> userspace. A new CXL VFIO device cap has also been introduced to convey
->> the necessary CXL device information to the userspace.
->>
->> Patches
->> =======
->>
->> The patches are based on the cxl-type2 support RFCv2 patchset[2]. Will
->> rebase them to V3 once the cxl-type2 support v3 patch review is done.
->>
->> PATCH 1-3: Expose the necessary routines required by vfio-cxl.
->>
->> PATCH 4: Introduce the preludes of vfio-cxl, including CXL device
->> initialization, CXL region creation.
->>
->> PATCH 5: Expose the CXL region to the userspace.
->>
->> PATCH 6-7: Prepare to emulate the HDM decoder registers.
->>
->> PATCH 8: Emulate the HDM decoder registers.
->>
->> PATCH 9: Tweak vfio-cxl to be aware of working on a CXL device.
->>
->> PATCH 10: Tell vfio-pci-core to emulate CXL DVSECs.
->>
->> PATCH 11: Expose the CXL device information that userspace needs.
->>
->> PATCH 12: An example variant driver to demonstrate the usage of
->> vfio-cxl-core from the perspective of the VFIO variant driver.
->>
->> PATCH 13: A workaround needs suggestions.
->>
->> Test
->> ====
->>
->> To test the patches and hack around, a virtual passthrough with nested
->> virtualization approach is used.
->>
->> The host QEMU emulates a CXL type-2 accel device based on Ira's patches
->> with the changes to emulate HDM decoders.
->>
->> While running the vfio-cxl in the L1 guest, an example VFIO variant
->> driver is used to attach with the QEMU CXL access device.
->>
->> The L2 guest can be booted via the QEMU with the vfio-cxl support in the
->> VFIOStub.
->>
->> In the L2 guest, a dummy CXL device driver is provided to attach to the
->> virtual pass-thru device.
->>
->> The dummy CXL type-2 device driver can successfully be loaded with the
->> kernel cxl core type2 support, create CXL region by requesting the CXL
->> core to allocate HPA and DPA and configure the HDM decoders.
->>
->> To make sure everyone can test the patches, the kernel config of L1 and
->> L2 are provided in the repos, the required kernel command params and
->> qemu command line can be found from the demostration video.[5]
->>
->> Repos
->> =====
->>
->> QEMU host: https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-host
->> L1 Kernel: https://github.com/zhiwang-nvidia/linux/tree/zhi/vfio-cxl-l1-kernel-rfc
->> L1 QEMU: https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-l1-rfc
->> L2 Kernel: https://github.com/zhiwang-nvidia/linux/tree/zhi/vfio-cxl-l2
->>
->> [1] https://computeexpresslink.org/cxl-specification/
->> [2] https://lore.kernel.org/netdev/20240715172835.24757-1-alejandro.lucero-palau@amd.com/T/
->> [3] https://patchew.org/QEMU/20230517-rfc-type2-dev-v1-0-6eb2e470981b@intel.com/
->> [4] https://youtu.be/zlk_ecX9bxs?si=hc8P58AdhGXff3Q7
->>
->> Feedback expected
->> =================
->>
->> - Archtiecture level between vfio-pci-core and vfio-cxl-core.
->> - Variant driver requirements from more hardware vendors.
->> - vfio-cxl-core UABI to QEMU.
->>
->> Moving foward
->> =============
->>
->> - Rebase the patches on top of Alejandro's PATCH v3.
->> - Get Ira's type-2 emulated device patch into upstream as CXL folks and RH
->>     folks both came to talk and expect this. I had a chat with Ira and he
->>     expected me to take it over. Will start a discussion in the CXL discord
->>     group for the desgin of V1.
->> - Sparse map in vfio-cxl-core.
->>
->> Known issues
->> ============
->>
->> - Teardown path. Missing teardown paths have been implements in Alejandor's
->>     PATCH v3. It should be solved after the rebase.
->>
->> - Powerdown L1 guest instead of reboot it. The QEMU reset handler is missing
->>     in the Ira's patch. When rebooting L1, many CXL registers are not reset.
->>     This will be addressed in the formal review of emulated CXL type-2 device
->>     support.
->>
->> Zhi Wang (13):
->>     cxl: allow a type-2 device not to have memory device registers
->>     cxl: introduce cxl_get_hdm_info()
->>     cxl: introduce cxl_find_comp_reglock_offset()
->>     vfio: introduce vfio-cxl core preludes
->>     vfio/cxl: expose CXL region to the usersapce via a new VFIO device
->>       region
->>     vfio/pci: expose vfio_pci_rw()
->>     vfio/cxl: introduce vfio_cxl_core_{read, write}()
->>     vfio/cxl: emulate HDM decoder registers
->>     vfio/pci: introduce CXL device awareness
->>     vfio/pci: emulate CXL DVSEC registers in the configuration space
->>     vfio/cxl: introduce VFIO CXL device cap
->>     vfio/cxl: VFIO variant driver for QEMU CXL accel device
->>     vfio/cxl: workaround: don't take resource region when cxl is enabled.
->>
->>    drivers/cxl/core/pci.c              |  28 ++
->>    drivers/cxl/core/regs.c             |  22 +
->>    drivers/cxl/cxl.h                   |   1 +
->>    drivers/cxl/cxlpci.h                |   3 +
->>    drivers/cxl/pci.c                   |  14 +-
->>    drivers/vfio/pci/Kconfig            |   6 +
->>    drivers/vfio/pci/Makefile           |   5 +
->>    drivers/vfio/pci/cxl-accel/Kconfig  |   6 +
->>    drivers/vfio/pci/cxl-accel/Makefile |   3 +
->>    drivers/vfio/pci/cxl-accel/main.c   | 116 +++++
->>    drivers/vfio/pci/vfio_cxl_core.c    | 647 ++++++++++++++++++++++++++++
->>    drivers/vfio/pci/vfio_pci_config.c  |  10 +
->>    drivers/vfio/pci/vfio_pci_core.c    |  79 +++-
->>    drivers/vfio/pci/vfio_pci_rdwr.c    |   8 +-
->>    include/linux/cxl_accel_mem.h       |   3 +
->>    include/linux/cxl_accel_pci.h       |   6 +
->>    include/linux/vfio_pci_core.h       |  53 +++
->>    include/uapi/linux/vfio.h           |  14 +
->>    18 files changed, 992 insertions(+), 32 deletions(-)
->>    create mode 100644 drivers/vfio/pci/cxl-accel/Kconfig
->>    create mode 100644 drivers/vfio/pci/cxl-accel/Makefile
->>    create mode 100644 drivers/vfio/pci/cxl-accel/main.c
->>    create mode 100644 drivers/vfio/pci/vfio_cxl_core.c
->>
+--------------WAJpAm6VtTfBMpjT7mtFWEcV--
 
