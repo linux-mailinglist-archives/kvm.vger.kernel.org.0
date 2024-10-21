@@ -1,74 +1,54 @@
-Return-Path: <kvm+bounces-29298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECCE9A6F1A
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 18:12:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E07F99A7088
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 19:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BAADB23239
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 16:12:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55F98B21F3E
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 17:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B161C1D432A;
-	Mon, 21 Oct 2024 16:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DF61EE032;
+	Mon, 21 Oct 2024 17:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tVYAqz5H"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="IojEY9yP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0271412D1FA
-	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 16:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8698E5FEE4;
+	Mon, 21 Oct 2024 17:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729527145; cv=none; b=aaB8fXCwgCux3nSjNSPDvoFoPCLdCSzoLffpJt12eThZWI+MQBUU42Drt0R4TYwrBRs9Wz/SxA9pJlHgb0p+nhuvZF5reObGYkLecsMRbTjYTfKCxiKUeO/yo26jAoYJTT+iKdydOs9Ibbfv4x8nAAIJC2FYzlMaIlRkQikRwmQ=
+	t=1729530296; cv=none; b=uu608NQEMb8WBhmD2EnQPUUv0hpJ0QMotOrlAz6kCZ9G1wQr0YZt9NCV5LCzsOsG8lDhNTvxbCMJ3AqW7uDbUYp/ZreL7CAyGLFYmP6m7i2RzFcL+lNVHMnIX0EFYZhqFn3tBLAgrBW9RKj2zvRyqrFqrh2PvcpR5TOEyclb9Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729527145; c=relaxed/simple;
-	bh=4tyI9HMcw+oed3UoyTiS3Y+lP3POZ+ihsONfL3iJWRs=;
+	s=arc-20240116; t=1729530296; c=relaxed/simple;
+	bh=hBTGbfQZFDWOdYOpyxXdFrU+IVT0wQ/omllxk2C0VVY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YSSrfO8Ss1v0DskFnqahAfroQesHKKEPHhGANhNvxEvF8Vwx7vVbXLwYqlwnKFW3KRuBaPPWNlatiCqnInPUFE0Pw6RIi+gGtFVK1CIcZdKlsWySATvBzTNMnFr9360nn2Z5iUdlbmkqAVEE0idNpTgkTWoGSSu0IQ5bDyktrsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tVYAqz5H; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e2b549799eso3388446a91.3
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 09:12:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729527143; x=1730131943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4tyI9HMcw+oed3UoyTiS3Y+lP3POZ+ihsONfL3iJWRs=;
-        b=tVYAqz5Hsmmp8U4fNq6fzbR/gkywkhoTICVHSXgDeBhZixGFSsEgj2m2j0jHHpQQJz
-         o7JBGP4qKYf9ODyq/krNBVXnW95mexYO5jQyj6OhzhD9zh1BnRDfbWgPF1ZWKsg1O1Gd
-         BIRGoYmkwzSq0unaQD0/riXiKvfEpOmOAFl63UCaJ/rBBS3bjkIuXa0MsBZldGOOKTJ3
-         ZMLivBNU4tFyQX0eQI2uap7gX/J4NhLg7nZNFQ0E0llJqx6Ge7Xpvwg2CB36Rn0QtG7P
-         oMeRid7+W6sjdcF9VZPcZeAcq2CHTm/dSeXTOpmOSkKt7YDwE3Eff8fKp0Xxe8OaR5Wh
-         kixg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729527143; x=1730131943;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4tyI9HMcw+oed3UoyTiS3Y+lP3POZ+ihsONfL3iJWRs=;
-        b=ST3huxrvbr6hCsPNhDx5/dGNIcTBZV5ODwv5PJTWnKocdjEwt8o/ocmxuwxQhTE17p
-         CdgZxapsNt+6O9RhOGeyvzpKmWiIkMT+0lAU2hsHzZS9KkbxHuNlcd3D2cy6ENpAhbgR
-         QMZl86DyFdLMPcpkjBTBDbal0s+YmLX7gmVHY5LD4v6Rcm4JXNmaFJUzIE99jJOp5UO9
-         +4hUapGLmmN+5SGy0eg0l7boPl1i1KWAVbpvF1tmdWU0BXW+XM/Cxr6PxHyDD8OolThn
-         e7CTzQGD+nPAoIEvlCxWjSsW1RTmQPfBXU87L4EiWPOXQp1EabN+UMMZ/jH/a3aBZXS9
-         WW7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWu27nOUt321WBMEyzhR1Fg2gdLHG91N2nxAkILiwNHrSaa+HIz2HZvklYeWnN3TjTZ6cg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaNe2Bd7YDDCQj/lbr1P5VlNdMUgbXquC6XdYXmLLI1qapDqI8
-	cwWA4ZHi6xN+lePw7eEeTSUPpSQzVC/WM6wF4G2+rsmmZOsa9rfj87T4EO2gFl4=
-X-Google-Smtp-Source: AGHT+IEJ79rcO7UvywEBODvgpNUBrZrniDJFce4wT3Aa2wPLvxVw7ShFnIcwMRwswCfdTaS4rxYemg==
-X-Received: by 2002:a17:90a:f30f:b0:2e2:bfb0:c06 with SMTP id 98e67ed59e1d1-2e5616e893fmr13956844a91.12.1729527143007;
-        Mon, 21 Oct 2024 09:12:23 -0700 (PDT)
-Received: from [192.168.1.67] (216-180-64-156.dyn.novuscom.net. [216.180.64.156])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e5ad388effsm4015553a91.34.2024.10.21.09.12.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 09:12:22 -0700 (PDT)
-Message-ID: <58f35342-76a1-4de2-901e-0e138232af57@linaro.org>
-Date: Mon, 21 Oct 2024 09:12:21 -0700
+	 In-Reply-To:Content-Type; b=ReKWnKT115wokSaflG0HfwbIvIdrQi6ASZBj1+zADAVXXzi2iHf2LOfEV2/ryQ1q+1hleArg7wMzwogcIhM1nFPbEnztKDgzHILUTmvac3jyLPVG8pu3B1Qm0slJU4CW+dEldYPGAdu5EHBHLYQIXAqOjjIlJp4tlmXDjAR4nSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=IojEY9yP; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49LH3kE1333540
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 21 Oct 2024 10:03:46 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49LH3kE1333540
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024101701; t=1729530227;
+	bh=rVmfHPDoL04d5hOGwgvAovxLxNBguOSAHrx+Ta+oj7I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IojEY9yP9vnnMsrOHmfKTGz9nyNft8luv58SOtRKOVQPzYJUY1JzvHKUbqHbJkPIC
+	 q13JeCWa5j8sXB9w2Uy29pAiT9vRTAG06p0xtoUcwyJ/qcTNPcLX/S9x3vDbvh5zVm
+	 pykrtZiTaNghiZ6QwlwJAZ33yjIbk7xcIV/G3J0+ngRa6pOqJjhlkmIhpEYeVaeOkH
+	 xZEQdTdQtXETrQHvhTxf83L/O8pYVJ8IBwDJjBo5kB5epoEpz1bumAhg2mGhvrFj3l
+	 9yV2idBMO0E8ZODFqda9oZKdKDfcZVkWzXtG93rdQMWjqfwCguuiwDwBpRt3GO80M2
+	 PFxmxaBzgVXmQ==
+Message-ID: <10aa42de-a448-40d4-a874-514c9deb56a3@zytor.com>
+Date: Mon, 21 Oct 2024 10:03:45 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,29 +56,118 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/3] build qemu with gcc and tsan
+Subject: Re: [PATCH v3 03/27] KVM: VMX: Add support for the secondary VM exit
+ controls
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
+References: <20241001050110.3643764-1-xin@zytor.com>
+ <20241001050110.3643764-4-xin@zytor.com> <ZxYQvmc9Ke+PYGkQ@intel.com>
 Content-Language: en-US
-To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-s390x@nongnu.org, Beraldo Leal <bleal@redhat.com>
-References: <20240910174013.1433331-1-pierrick.bouvier@linaro.org>
- <87wmj0ypwe.fsf@draig.linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <87wmj0ypwe.fsf@draig.linaro.org>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <ZxYQvmc9Ke+PYGkQ@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 
-T24gOS8yNS8yNCAwMzo0MywgQWxleCBCZW5uw6llIHdyb3RlOg0KPiBBbGV4IEJlbm7DqWUg
-PGFsZXguYmVubmVlQGxpbmFyby5vcmc+IHdyaXRlczoNCj4gDQo+IFF1ZXVlZCB0byB0ZXN0
-aW5nL25leHQsIHRoYW5rcy4NCj4gDQoNCkdlbnRsZSBwaW5nLiBJIGNhbid0IHNlZSB0aGlz
-IHNlcmllcyBvbiB0ZXN0aW5nL25leHQuIFdhcyBpdCBsb3N0IG9uIHRoZSANCndheT8NCg0K
-VGhhbmtzLA0KUGllcnJpY2sNCg==
+On 10/21/2024 1:28 AM, Chao Gao wrote:
+>> +	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_triplets); i++) {
+>> +		u32 n_ctrl = vmcs_entry_exit_triplets[i].entry_control;
+>> +		u32 x_ctrl = vmcs_entry_exit_triplets[i].exit_control;
+>> +		u64 x_ctrl_2 = vmcs_entry_exit_triplets[i].exit_2nd_control;
+>> +		bool has_n = n_ctrl && ((_vmentry_control & n_ctrl) == n_ctrl);
+>> +		bool has_x = x_ctrl && ((_vmexit_control & x_ctrl) == x_ctrl);
+>> +		bool has_x_2 = x_ctrl_2 && ((_secondary_vmexit_control & x_ctrl_2) == x_ctrl_2);
+>> +
+>> +		if (x_ctrl_2) {
+>> +			/* Only activate secondary VM exit control bit should be set */
+>> +			if ((_vmexit_control & x_ctrl) == VM_EXIT_ACTIVATE_SECONDARY_CONTROLS) {
+>> +				if (has_n == has_x_2)
+>> +					continue;
+>> +			} else {
+>> +				/* The feature should not be supported in any control */
+>> +				if (!has_n && !has_x && !has_x_2)
+>> +					continue;
+>> +			}
+>> +		} else if (has_n == has_x) {
+>> 			continue;
+>> +		}
+>>
+>> -		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
+>> -			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
+>> +		pr_warn_once("Inconsistent VM-Entry/VM-Exit triplet, entry = %x, exit = %x, secondary_exit = %llx\n",
+>> +			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl,
+>> +			     _secondary_vmexit_control & x_ctrl_2);
+>>
+>> 		if (error_on_inconsistent_vmcs_config)
+>> 			return -EIO;
+>>
+>> 		_vmentry_control &= ~n_ctrl;
+>> 		_vmexit_control &= ~x_ctrl;
+> 
+> w/ patch 4, VM_EXIT_ACTIVATE_SECONDARY_CONTROLS is cleared if FRED fails in the
+> consistent check. this means, all features in the secondary vm-exit controls
+> are removed. it is overkill.
+
+Good catch!
+
+> 
+> I prefer to maintain a separate table for the secondary VM-exit controls:
+> 
+>   	struct {
+>   		u32 entry_control;
+>   		u64 exit2_control;
+> 	} const vmcs_entry_exit2_pairs[] = {
+> 		{ VM_ENTRY_LOAD_IA32_FRED, SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+> 					   SECONDARY_VM_EXIT_LOAD_IA32_FRED},
+> 	};
+> 
+> 	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit2_pairs); i++) {
+> 	...
+> 	}
+
+Hmm, I prefer one table, as it's more straight forward.
+
+> 
+>> +		_secondary_vmexit_control &= ~x_ctrl_2;
+>> 	}
+>>
+>> 	rdmsrl(MSR_IA32_VMX_BASIC, basic_msr);
+
 
