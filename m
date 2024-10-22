@@ -1,193 +1,139 @@
-Return-Path: <kvm+bounces-29349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391889A9E6C
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E7C9A9E8E
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCF0A1F23638
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 09:24:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ACCA1F227B7
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 09:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715BB1991CC;
-	Tue, 22 Oct 2024 09:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A32F198A2C;
+	Tue, 22 Oct 2024 09:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HyR1jLnQ"
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="fH2SpGPp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CCF19882B
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 09:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B495B12D75C;
+	Tue, 22 Oct 2024 09:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729589018; cv=none; b=f3l7/RvmvYp093m7+XjMdJt3KOhM7kkjsq8uyHNWAZVeQTfkRiiTQpceU580MQDb/MYjfEtkr/Csll8wswl4/SHt0OyHS5GNK+yLHpO3G6c2YWhKMDjr+qfNClAxwklBvpZha9vj3qLQIL/npolP7zYH3nm3BlR9bNU1VHjnDHE=
+	t=1729589590; cv=none; b=paA1ucSVky89sfyjpV+421/Ev2cfDruw0r+fbPht0BxnZmaJ0uIqpJYB1FOMGHDTO4xjyJYq2YkNiqbMoL7Oeo/3cZimsapnAMuaUYt/wDtI+w3a/3kV1x0hRrdPGs7L0pBW/d9/hScXWIJJzueBpTwp+I9bWai1kAE0IqSnOTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729589018; c=relaxed/simple;
-	bh=ZDt+qPw7wsKcrlPrUutVtr9aTxJWu9f+fNl+xeHpl9k=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tyt2DDfQnqnJDDie6HdOle35BPtMnhCJo9aNWOP6fE4OUWouycgHyabw/dp2jKl1hBzdYjh54HcnFXDJny0gEzCm0VAzkssE96B27kYovjBAzFOfOTu9Wm694xjqswpv/2sC8+Gxjzk/2MnSfpMbQ/i9uFl/8lOp35YkbKaIMzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HyR1jLnQ; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729589015; x=1761125015;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZDt+qPw7wsKcrlPrUutVtr9aTxJWu9f+fNl+xeHpl9k=;
-  b=HyR1jLnQvrlOXNC5MVlSKDI5akp5Mony7ssdjeg8CPFb2Pcy2xoqkr5b
-   cGgxx2EUXQC5/Z85vU9ZXqAZDUi+6eDCZ4jOCljYpzXsIuw9wDKDxPjH5
-   WDu7JB31GmIFcX2Zb5o9VPu2S25O3IxWtxf/tOvV+P3e7KMOSZ2iTaeaN
-   HLRwSVdh02Vv30RULgxzPO2q/mywu4lHMk5vHUAvNyZaZoJJD/wTR9Ase
-   0O1zFkhTbdwjFx2cXmf07BWIIgeobQu5g2qrLPBvaSi0viCc9PGG7Tfba
-   k5BsQU6qbmMFwr1kDwKxwGzJFPlpxs2Me/vke3xzn6bWuURVBncPG/7Id
-   w==;
-X-CSE-ConnectionGUID: q1B8L54vQ5OKVpdfwIpDiA==
-X-CSE-MsgGUID: 57AmqcXGQpqvDv+v9/ssfA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="39695603"
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="39695603"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 02:23:35 -0700
-X-CSE-ConnectionGUID: cFC3aHDLR9+RN0CGI82V9Q==
-X-CSE-MsgGUID: faHbF45wRp25wCfWq1Xjtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="110623539"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.124.240.228]) ([10.124.240.228])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 02:23:31 -0700
-Message-ID: <9d726285-730a-400d-8d45-f494b2c62205@linux.intel.com>
-Date: Tue, 22 Oct 2024 17:23:29 +0800
+	s=arc-20240116; t=1729589590; c=relaxed/simple;
+	bh=mtBUN9O6XwNgU6hepxjh0Fx8PkgjIAjfIprd/U9o5+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rymxx0Gx4cnqFDvekCXhCLaSKejzb39+ZiTb39pg+V123+hxchhVuTilp1APqVIYmRwTH7ofLBm/X1OIRAl2MaUxgsJk00Nm8ISjPKAvpHmR5vi4GS9ITsWjtn0JmeAKEjCEpKQizL0+XMIPhpAdS9/mg1mtnTal7vjMCJbzH6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=fH2SpGPp reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 422B440E01A5;
+	Tue, 22 Oct 2024 09:32:59 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ANcwB4Fk7Jbm; Tue, 22 Oct 2024 09:32:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1729589572; bh=SH+rPM7WUYQemldaYJuuNTQyZ/vEN4oDTFLL1xY0pXo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fH2SpGPpQ3Z0ynfqyrm5xcO2/+LM65BHRTAFGA7zo+dkpb4s5C0KdtWaW2vCpcUS/
+	 4Nubi1BdnZFPVQPQbH3RhzoBto7/PGtNy5BqQICRgJC94MMeHj6Tbfjwbh3C602tdA
+	 HnzL7+Ld10SgfpAlGAxJyEnaMNJydwH+gASMR8Fmb3tW1N4mbHVzt2RFboPsb3MnVp
+	 HVSexQrc9QfI36iDT/Y5pbi9KAhHGBPxkH0QS7Op2jYhJ0IZH7I1mVwam55pQqSVXL
+	 F93KyiQhLo/Puja2TYb4X3ciekfPdpKkFR1q8PS1p0xFb9IYGR93iAjjqifv22tt2K
+	 4v7WGy8fADbdnPKjA+iQfFVceCse1q3GJFOFHv9z6PB1qEC8inOy2FazDmrgmcgSRC
+	 0CTV9/UjY05IhNO3W9omvr9wZnhiFL08i81vHX6gatpvuvR20RKpKRuUqlix2A5x2Y
+	 AEGTV8NXZ2DCdYUswUC42BBWMmrh+u2pnn2jDLBNkFL6t1v7l8Qte9/zfw0Ev2rgkF
+	 3sx0tYTld+c01gcrK73OWnk5xtJ8LgmgW1J1fjcsB1T4eVNMCzo4ScP7zGY2coClwD
+	 4b+UxMGLZIu7bw94hwbC5La1UdyZaX5YBQrAPdxYhXewv3ZeBR7dNqUH6NsEJvK2cS
+	 SIzzoieOXvPSkASp0Ton2S+0=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 986C440E015F;
+	Tue, 22 Oct 2024 09:32:42 +0000 (UTC)
+Date: Tue, 22 Oct 2024 11:32:36 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org,
+	nikunj@amd.com, thomas.lendacky@amd.com, vkuznets@redhat.com,
+	babu.moger@amd.com
+Subject: Re: [PATCH v4 1/4] x86/cpufeatures: Add CPUID feature bit for Idle
+ HLT intercept
+Message-ID: <20241022093236.GAZxdxNCTki88ttFmy@fat_crate.local>
+References: <20241022054810.23369-1-manali.shukla@amd.com>
+ <20241022054810.23369-2-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
- eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
- chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com
-Subject: Re: [PATCH v3 3/9] iommu/vt-d: Let intel_pasid_tear_down_entry()
- return pasid entry
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com, will@kernel.org
-References: <20241018055402.23277-1-yi.l.liu@intel.com>
- <20241018055402.23277-4-yi.l.liu@intel.com>
- <e5cd1de4-37f7-4d55-aa28-f37d49d46ac6@linux.intel.com>
- <521b4f3e-1979-46f5-bfad-87951db2b6ed@intel.com>
- <ce78d006-53d8-4194-ae9d-249ab38c1d6d@linux.intel.com>
- <bab356e9-de34-41bb-9942-de639ee7d3de@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <bab356e9-de34-41bb-9942-de639ee7d3de@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241022054810.23369-2-manali.shukla@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/10/21 15:24, Yi Liu wrote:
-> On 2024/10/21 14:59, Baolu Lu wrote:
->> On 2024/10/21 14:35, Yi Liu wrote:
->>> On 2024/10/21 14:13, Baolu Lu wrote:
->>>> On 2024/10/18 13:53, Yi Liu wrote:
->>>>> intel_pasid_tear_down_entry() finds the pasid entry and tears it down.
->>>>> There are paths that need to get the pasid entry, tear it down and
->>>>> re-configure it. Letting intel_pasid_tear_down_entry() return the 
->>>>> pasid
->>>>> entry can avoid duplicate codes to get the pasid entry. No functional
->>>>> change is intended.
->>>>>
->>>>> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
->>>>> ---
->>>>>   drivers/iommu/intel/pasid.c | 11 ++++++++---
->>>>>   drivers/iommu/intel/pasid.h |  5 +++--
->>>>>   2 files changed, 11 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
->>>>> index 2898e7af2cf4..336f9425214c 100644
->>>>> --- a/drivers/iommu/intel/pasid.c
->>>>> +++ b/drivers/iommu/intel/pasid.c
->>>>> @@ -239,9 +239,12 @@ devtlb_invalidation_with_pasid(struct 
->>>>> intel_iommu *iommu,
->>>>>   /*
->>>>>    * Caller can request to drain PRQ in this helper if it hasn't 
->>>>> done so,
->>>>>    * e.g. in a path which doesn't follow remove_dev_pasid().
->>>>> + * Return the pasid entry pointer if the entry is found or NULL if no
->>>>> + * entry found.
->>>>>    */
->>>>> -void intel_pasid_tear_down_entry(struct intel_iommu *iommu, struct 
->>>>> device *dev,
->>>>> -                 u32 pasid, u32 flags)
->>>>> +struct pasid_entry *
->>>>> +intel_pasid_tear_down_entry(struct intel_iommu *iommu, struct 
->>>>> device *dev,
->>>>> +                u32 pasid, u32 flags)
->>>>>   {
->>>>>       struct pasid_entry *pte;
->>>>>       u16 did, pgtt;
->>>>> @@ -250,7 +253,7 @@ void intel_pasid_tear_down_entry(struct 
->>>>> intel_iommu *iommu, struct device *dev,
->>>>>       pte = intel_pasid_get_entry(dev, pasid);
->>>>>       if (WARN_ON(!pte) || !pasid_pte_is_present(pte)) {
->>>>>           spin_unlock(&iommu->lock);
->>>>> -        return;
->>>>> +        goto out;
->>>>
->>>> The pasid table entry is protected by iommu->lock. It's  not reasonable
->>>> to return the pte pointer which is beyond the lock protected range.
->>>
->>> Per my understanding, the iommu->lock protects the content of the entry,
->>> so the modifications to the entry need to hold it. While, it looks not
->>> necessary to protect the pasid entry pointer itself. The pasid table 
->>> should
->>> exist during device probe and release. is it?
->>
->> The pattern of the code that modifies a pasid table entry is,
->>
->>      spin_lock(&iommu->lock);
->>      pte = intel_pasid_get_entry(dev, pasid);
->>      ... modify the pasid table entry ...
->>      spin_unlock(&iommu->lock);
->>
->> Returning the pte pointer to the caller introduces a potential race
->> condition. If the caller subsequently modifies the pte without re-
->> acquiring the spin lock, there's a risk of data corruption or
->> inconsistencies.
-> 
-> it appears that we are on the same page about if pte pointer needs to be
-> protected or not. And I agree the modifications to the pte should be
-> protected by iommu->lock. If so, will documenting that the caller must hold
-> iommu->lock if is tries to modify the content of pte work? Also, it might
-> be helpful to add lockdep to make sure all the modifications of pte entry
-> are under protection.
+On Tue, Oct 22, 2024 at 05:48:07AM +0000, Manali Shukla wrote:
+> From: Manali Shukla <Manali.Shukla@amd.com>
+>=20
+> The Idle HLT Intercept feature allows for the HLT instruction
+> execution by a vCPU to be intercepted by the hypervisor only if there
+> are no pending events (V_INTR and V_NMI) for the vCPU. When the vCPU
+> is expected to service the pending events (V_INTR and V_NMI), the Idle
+> HLT intercept won=E2=80=99t trigger. The feature allows the hypervisor =
+to
+> determine if the vCPU is idle and reduces wasteful VMEXITs.
+>=20
+> In addition to the aforementioned use case, the Idle HLT intercept
+> feature is also used for enlightened guests who aim to securely manage
+> events without the hypervisor=E2=80=99s awareness. If a HLT occurs whil=
+e
+> a virtual event is pending and the hypervisor is unaware of this
+> pending event (as could be the case with enlightened guests), the
+> absence of the Idle HLT intercept feature could result in a vCPU being
+> suspended indefinitely.
+>=20
+> Presence of Idle HLT intercept feature for guests is indicated via CPUI=
+D
+> function 0x8000000A_EDX[30].
+>=20
+> Signed-off-by: Manali Shukla <Manali.Shukla@amd.com>
+> Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/=
+cpufeatures.h
+> index dd4682857c12..7461a49e1045 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -382,6 +382,7 @@
+>  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual S=
+PEC_CTRL */
+>  #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
+>  #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* SVME addr check */
+> +#define X86_FEATURE_IDLE_HLT		(15*32+30) /* "" IDLE HLT intercept */
 
-People will soon forget about this lock and may modify the returned pte
-pointer without locking, introducing a race condition silently.
+Whoever commits this, you can remove the "" in the comment now as they're=
+ not
+needed anymore.
 
-> Or any suggestion from you given a path that needs to get pte first, check
-> if it exists and then call intel_pasid_tear_down_entry(). For example the
-> intel_pasid_setup_first_level() [1], in my series, I need to call the
-> unlock iommu->lock and call intel_pasid_tear_down_entry() and then lock
-> iommu->lock and do more modifications on the pasid entry. It would invoke
-> the intel_pasid_get_entry() twice if no change to
-> intel_pasid_tear_down_entry().
+Thx.
 
-There is no need to check the present of a pte entry before calling into
-intel_pasid_tear_down_entry(). The helper will return directly if the
-pte is not present:
+--=20
+Regards/Gruss,
+    Boris.
 
-         spin_lock(&iommu->lock);
-         pte = intel_pasid_get_entry(dev, pasid);
-         if (WARN_ON(!pte) || !pasid_pte_is_present(pte)) {
-                 spin_unlock(&iommu->lock);
-                 return;
-         }
-
-Does it work for you?
-
-Thanks,
-baolu
+https://people.kernel.org/tglx/notes-about-netiquette
 
