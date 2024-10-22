@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-29362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A009AA08E
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD129AA08F
 	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9631A1C21F3A
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:56:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17AE71C21EA4
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00DD19B5A5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12B419C57D;
 	Tue, 22 Oct 2024 10:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TD6CnZVG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FqBZ+GWQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C801993AF
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5170F19ABD5
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729594583; cv=none; b=sSzbscSaxYYzjH0ogjFDl2/+6Lbd8NoThHCyUkQKkEgjMO3pyl0JkZbrGdvEgZLxocbXdjXJ6cah+kzkKtDBmPw72m7FOXv6EajlUjCfZzkck5RbYhqF5XrdxPP74eCpktfGIpafteY/w2ZTEFMDGM8Ol3URL4bRw62LFYzCJWA=
+	t=1729594583; cv=none; b=lscoHLfb0EIUohv1COj62plOlXLyz3OSSMSMeZ/S2SwNVfVlT5cgz4rgiPtIuPeHyu3qeGE2XDv90B2qK/jPp8/LWT9KFwOFUhREz6B+YUzQ95yOAhjj7slLqa8f29d1QwEP/xQ8R7WXerZT872ZENkfgxz0xsZHcw3pbC3hNmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729594583; c=relaxed/simple;
-	bh=3ocp18cipe28Y1G4M2yx66dkQYTqfF/PEb1KxGFg+rU=;
+	bh=aS2l+vmDfLF2uLItNIzgkZDSryR40qUXakZxJbkgV9Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X7y/naC5kONFsQNhlJ1GW5N+dG65MNgThANWJazashwMkiaQ5GeeATub9SQXTHRSlogm/L49+lHJNlGLewdfzpMVsoQawu+ucFoCaAFkBHLqZQuno9IhbQT5QvvpN9HpRnOYNo/BtHxx0qz5RWN2wf/ba5Y1Q1Ilqm3XpAUkkW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TD6CnZVG; arc=none smtp.client-ip=209.85.167.53
+	 MIME-Version:Content-Type; b=Wj+3eRbk+Bc7y1VSKpXLDSxNyRykwz3DN+ZvZnDNcPk4QEDYPEdAX1CBxvnTGUxvqyJff4xin6gl2Y4O8jUuH463JJrHxwm5gra1dZoJV07XvUg7T4jWES47fMQ6wCRMvHj4+mtcOGvH7GrY/O9AapnFij3mauYKGlsEvKaNT8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FqBZ+GWQ; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-539f84907caso6173422e87.3
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:20 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c99be0a4bbso7348791a12.2
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729594579; x=1730199379; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1729594580; x=1730199380; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FXjwiUjPDmRUKmjejukivCx1FVXlutJ/frWtXF30WgI=;
-        b=TD6CnZVGnEbUutRk7CHgsMOhkfnxV21JSxucRhiJLlh8JMtTWVUSKN9aFhaNHNnVa+
-         D0QRmmcYFvBP0UX66cto108U246jr4+NKR/ZztBZqxt8UhFniZdihU2fRKqBvWiYdSAW
-         NfiU81JMosnRSK/TLCZQJaLUa6SzotF9Cra6UIN4UbDjm4RDF5SdfXcT59KfgCtknlzS
-         K+EESU55I8YbVfHPLFKy+zRJoZt3iNk5dnLzzWAgIug+9uNlP5xXxic4oLU/t0AvbCsx
-         ux/5eq57XTUnh9wIwYddjF4LXUxQo1B1wbIXB9JcIcalkGHW4ISQZpjbUi/zvUTLSIOH
-         jz9w==
+        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
+        b=FqBZ+GWQvug7iZSPtu+eRwtit9ZFbQ6GAnVhkiAzvmI1cbOZ84YttoaDwashOVNkyc
+         B6g2eGIrs4yvOeIS52d9sDxsSbZgrv4shKSl3OyrF8Vy6Hha/SXCRhdY/0Yt8pZl9UQn
+         aF8YaQNJptbgCy52iMJPkbA0HQKMb0ny9VPMjZKGhVzIhFElfORMua2bi7VrxD+0f/cU
+         HUGFDaRW+uEQcVktWRSHDc5mfNHE1LeR0PLVCoUTV9CM5KFOgHde4QaMITguWcxky/sE
+         sDVcW2cu/XoJNwn5T6MZCkWsqHPnv5q5uGXtVBQhAETMzN58YAWxfQPWRFvFqWNnYcDT
+         Z3Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729594579; x=1730199379;
+        d=1e100.net; s=20230601; t=1729594580; x=1730199380;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FXjwiUjPDmRUKmjejukivCx1FVXlutJ/frWtXF30WgI=;
-        b=Ggw91UbI6led7sRmAHOWkH195KzzRUOxZPYXsXmGp6XWZztG16I8GSVVlZHZt4q0QO
-         JuIoinF/fYpT8dnViYZvEccSb/whs21pHEJnk75twBCbSGIjvau5+SyQ5XDi417Gzyfn
-         7s8mFDsVKsAfg+ya0PxxgCCubCqTXy/Wi7bvHKBeKWrufXI8xbZBsWKoQ1pd3sBHvvpr
-         HvmR75rO0PhzptFGsQLlg0CXSdYN1YJfO85vQWpqTPdx+wN8VojPGPBWb5/drDgKCGqz
-         O31W8vrSc6zGBUdy4gW9z4DXiy4l9iHKttjo4tcAA/+C6X2a0jwyxFh9s0YEalQb3ytx
-         keKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgpsnIxe8lbBq2BMKB/0tFe+8ahR4VM00z2r4D0sIiymdS04z1AOrjTmL6qt8E87ur5VA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxHRxSpvwr9Bpda7VjQXVJA+RTRYZw/WVuoNElV2wSxrIMOH3v
-	y+dpN5x7jeIOSlWMmr8w/T+VH87d0VTDfyHH4aiwAZuJLIotSxJbH6dHVnsNpHs=
-X-Google-Smtp-Source: AGHT+IFnyQzZQ7bHbDbOpYPXpjtSnilsQDL7HRDM+s0y4d6oS+Xo96+ra1aRtC+YDcuLeBLbm75Uyw==
-X-Received: by 2002:a05:6512:108f:b0:536:9ef0:d829 with SMTP id 2adb3069b0e04-53a1544afc8mr7923850e87.44.1729594579206;
+        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
+        b=pz4znYn5MjWjbfgFCug0iFXgLpAIvWH6IQeDmomzo/mrYRQ3hHW5f2MMfKiqVTudr0
+         uEsgq7LJn4n+Mxs8yNv36avZ9pEcIHA2i0905Ec7HDyk/WKpj5RyBYqF4Ea5dmm2jAKD
+         DdTdRYOCQWbSRIlFWRcc4K3dQNafitZ+p37AzpNkxwz5fv5dFCeZtLenuAnjzUJneiHQ
+         AmUaXHw8SsjBe6BRWRM2rYGr0fTzV4fxOxoaqRc5JoVjBnPxIXjko5XOMfVDrahBVVIr
+         zW2Y8uIrlRKudP3Zi0mHbtGZpwsOmr7cf3ixcqUbBbwhQ/LXJHs0yPyAd3bkjf7tiLZ2
+         005Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXnt3SIuz14iUf2/JiGc6V4QnZFN3ULNtWK+GZgoMsefK1M+h0bpLxxlf6b6WSEX5qMVTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxviJwlVjhqTtYffLL2+2iCdGFxBJJkiBUcg3NOw89V6OniITLy
+	V2vZyDlCre78yZRtLtzI83inY8mmegj6WytKWkQhzjhM4vdLxXoO9xjOZKb9Xds=
+X-Google-Smtp-Source: AGHT+IEWTHq0nZKsD5+vd+nTSltz6qRpJ8m1ZUA3e2J9fRXNb4Q6Dz/tYps28BHQ7v9MYQ4wj/pQ1w==
+X-Received: by 2002:a05:6402:1d49:b0:5c9:57bd:e9d with SMTP id 4fb4d7f45d1cf-5cb782f9e3fmr2351410a12.19.1729594579617;
         Tue, 22 Oct 2024 03:56:19 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb675eb1bdsm2947453a12.10.2024.10.22.03.56.15
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66c7262bsm2981150a12.82.2024.10.22.03.56.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 22 Oct 2024 03:56:15 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id BF0265F8A6;
+	by draig.lan (Postfix) with ESMTP id D35445F8CC;
 	Tue, 22 Oct 2024 11:56:14 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -98,11 +98,10 @@ Cc: Beraldo Leal <bleal@redhat.com>,
 	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: [PATCH v2 01/20] tests/docker: Fix microblaze atomics
-Date: Tue, 22 Oct 2024 11:55:55 +0100
-Message-Id: <20241022105614.839199-2-alex.bennee@linaro.org>
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 02/20] tests/docker: add NOFETCH env variable for testing
+Date: Tue, 22 Oct 2024 11:55:56 +0100
+Message-Id: <20241022105614.839199-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241022105614.839199-1-alex.bennee@linaro.org>
 References: <20241022105614.839199-1-alex.bennee@linaro.org>
@@ -115,73 +114,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Ilya Leoshkevich <iii@linux.ibm.com>
+Testing non-auto built docker containers (i.e. custom built compilers)
+is a bit fiddly as you couldn't continue a build with a previously
+locally built container. While you can play games with REGISTRY its
+simpler to allow a NOFETCH that will go through the cached build
+process when you run the tests.
 
-GCC produces invalid code for microblaze atomics.
-
-The fix is unfortunately not upstream, so fetch it from an external
-location and apply it locally.
-
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
-Message-Id: <20240919152308.10440-1-iii@linux.ibm.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .../debian-microblaze-cross.d/build-toolchain.sh          | 8 ++++++++
- tests/docker/dockerfiles/debian-toolchain.docker          | 7 +++++++
- 2 files changed, 15 insertions(+)
+ tests/docker/Makefile.include | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh b/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-index 23ec0aa9a7..c5cd0aa931 100755
---- a/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-+++ b/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-@@ -10,6 +10,8 @@ TOOLCHAIN_INSTALL=/usr/local
- TOOLCHAIN_BIN=${TOOLCHAIN_INSTALL}/bin
- CROSS_SYSROOT=${TOOLCHAIN_INSTALL}/$TARGET/sys-root
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 681feae744..fead7d3abe 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -92,10 +92,10 @@ endif
+ docker-image-alpine: NOUSER=1
  
-+GCC_PATCH0_URL=https://raw.githubusercontent.com/Xilinx/meta-xilinx/refs/tags/xlnx-rel-v2024.1/meta-microblaze/recipes-devtools/gcc/gcc-12/0009-Patch-microblaze-Fix-atomic-boolean-return-value.patch
-+
- export PATH=${TOOLCHAIN_BIN}:$PATH
- 
- #
-@@ -31,6 +33,12 @@ mv gcc-11.2.0 src-gcc
- mv musl-1.2.2 src-musl
- mv linux-5.10.70 src-linux
- 
-+#
-+# Patch gcc
-+#
-+
-+wget -O - ${GCC_PATCH0_URL} | patch -d src-gcc -p1
-+
- mkdir -p bld-hdr bld-binu bld-gcc bld-musl
- mkdir -p ${CROSS_SYSROOT}/usr/include
- 
-diff --git a/tests/docker/dockerfiles/debian-toolchain.docker b/tests/docker/dockerfiles/debian-toolchain.docker
-index 687a97fec4..ab4ce29533 100644
---- a/tests/docker/dockerfiles/debian-toolchain.docker
-+++ b/tests/docker/dockerfiles/debian-toolchain.docker
-@@ -10,6 +10,8 @@ FROM docker.io/library/debian:11-slim
- # ??? The build-dep isn't working, missing a number of
- # minimal build dependiencies, e.g. libmpc.
- 
-+RUN sed 's/^deb /deb-src /' </etc/apt/sources.list >/etc/apt/sources.list.d/deb-src.list
-+
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-@@ -33,6 +35,11 @@ RUN cd /root && ./build-toolchain.sh
- # and the build trees by restoring the original image,
- # then copying the built toolchain from stage 0.
- FROM docker.io/library/debian:11-slim
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        libmpc3
- COPY --from=0 /usr/local /usr/local
- # As a final step configure the user (if env is defined)
- ARG USER
+ debian-toolchain-run = \
+-	$(if $(NOCACHE), 						\
++	$(if $(NOCACHE)$(NOFETCH),					\
+ 		$(call quiet-command,					\
+ 			$(DOCKER_SCRIPT) build -t qemu/$1 -f $< 	\
+-			$(if $V,,--quiet) --no-cache 			\
++			$(if $V,,--quiet) $(if $(NOCACHE),--no-cache)	\
+ 			--registry $(DOCKER_REGISTRY) --extra-files	\
+ 			$(DOCKER_FILES_DIR)/$1.d/build-toolchain.sh,	\
+ 			"BUILD", $1),				        \
+@@ -177,6 +177,7 @@ docker:
+ 	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
+ 	@echo '    NOUSER=1             Define to disable adding current user to containers passwd.'
+ 	@echo '    NOCACHE=1            Ignore cache when build images.'
++	@echo '    NOFETCH=1            Do not fetch from the registry.'
+ 	@echo '    EXECUTABLE=<path>    Include executable in image.'
+ 	@echo '    EXTRA_FILES="<path> [... <path>]"'
+ 	@echo '                         Include extra files in image.'
 -- 
 2.39.5
 
