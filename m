@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-29365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4E59AA092
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:57:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541129AA09D
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67011283A82
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:57:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816611C218ED
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8FD19C540;
-	Tue, 22 Oct 2024 10:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D731319D891;
+	Tue, 22 Oct 2024 10:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ciMtWl7V"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XvlrOaEQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B0819C579
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AA919C543
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729594585; cv=none; b=QX4DpNrKohe3H6LRgSY5hSHpduZBpmrUC1G+ddSNLGO1rNVDXrzIdYJy6lX3dZ56BLkE2ovAmnL3H1/eqVaS81uL/QflTwv8kVlux4TH2bUkmc7lZ6/VqOUegsAUf3z6FkabsX9ONE7472k3F8lZDGQ3zXT2FkZtkoZuGZe1svQ=
+	t=1729594594; cv=none; b=aeb/sp9LbIriYi0fVFx2A0SjmC+o7189HDgliOT9NMagjoGxlOc1mz5/QSd9SoYUQaD803JTRB5BxD8PqiNXUuRyWfKl+nkyVqf7pg8oD0CtKUFVKIf9+eFcNw5qzneT0lVq40sNFNS9Q7/UeW+wg8V2i66svb4y8C0PfVwi04M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729594585; c=relaxed/simple;
-	bh=mp3Y+13HJt4aLaIDoWu1rAuu6usjzMXR6e+YoqULWZU=;
+	s=arc-20240116; t=1729594594; c=relaxed/simple;
+	bh=W9oqkuoqnG3CzN1HaJ//sVwJsa3g5RCIP1k2aZEBCW4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jo9GFTtnim64d9t5mxTGaoPvF9yzIXWyF6k1X2wvNuh+/AHegbX+uV5R2k+ZmDkFBnz6/kT81LVVHPh34tyTwd2+uW0fIo+6yY7inB0ZJQDeHlWY1GiRLkKr8tkohMH7rtS83AZPFeNFTFJZQXb/zGmwc7ediSwpcZXsQE/1HPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ciMtWl7V; arc=none smtp.client-ip=209.85.208.48
+	 MIME-Version:Content-Type; b=HlT3Cb3LoutRfNvKaHg0VpydM6evbvLZrHA5kunvzbRUAE65KrEVocLIwOP+gCU0PZ5Ne6WqZltmJdRuIFHVUxnrgaAe0Joz02jp0NMZeeOCvxC3t8pn0n2wBMdCH5CPUkafsDyhrpsE+MCZ63WmBbq1yrecSq5r9McWoi28Kq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XvlrOaEQ; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c94861ee25so2818020a12.0
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:23 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c935d99dc5so5891147a12.1
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729594582; x=1730199382; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1729594591; x=1730199391; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/thHQrDD74xWhDO5ZvpNfmAfgwRl7ohsH8B1mB/WTo0=;
-        b=ciMtWl7VOYEF32hagQEPQSWhbEF/72/waY54GT7SBVm0sGRgTrDp34wtWQrh1abXCc
-         hX6fEAveHsQ9r7tZpnjnyuecEZrF6Ye6Cv053gYEXgMeemuPAa8UpC18PfAIYzU8lNoK
-         znxNN9T6szDB7ftjNcbXHHXbkynIhl21osz14QxVpbudbAzvuZ2sMZi+tkaS2dbtHFJ3
-         YjwocC5ZuMFVa2CPiqkHp/7kp5Jd1vFp76GKfHVcniLSKdZfMNu10KPyiJeZw8jgv8uU
-         W0vzSkwFNS8rCdjy+m2NA4z5SmXHGl1BdB+KTQ6fzFhD/Pl2Pjq7hmHBbMBY2wdWRA2h
-         eNQQ==
+        bh=p2jXJE3FbWlzhHC2JLNXh46hRwsq96dE8ivUr/Ry4PY=;
+        b=XvlrOaEQ8J7uevmXj4FZNv6rc2aos36jBCMn4C7Bet0ZoWrBtA2TrT7ugVO+aIT4VF
+         mNqWkDsP0yk4SyEKkqacmtTUu03OvwerOpSZ2OVHxfKDw/5fu58vdNlWHDUf56+4BcTT
+         FvXKQvEXeYDbkMfKlMln92zAB4/Vjr6Jq38aG7JL1MPsYDYlbSMkDXtr7ABFoc/6Edjy
+         +t97l+jf1kfEnbS652rdyibwQX+vcW3G3L79SpaDYthBCbGFy6YWC0z/GQWINadtKMWC
+         KXot3i6b2UySZ7bw6pZlOeFmKy7uCtnyx2AtyQIuExj5Vgskr/9aT7GtLZW4e8KaHOw/
+         uQ7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729594582; x=1730199382;
+        d=1e100.net; s=20230601; t=1729594591; x=1730199391;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/thHQrDD74xWhDO5ZvpNfmAfgwRl7ohsH8B1mB/WTo0=;
-        b=NmvIdZB/xOot71kxkmj2DFzEdrJMBuiUuiVtDPe/HmTm16dFI+hQwj7BLJ0w+FEoLI
-         FFDDtsOl4z6cog3WB0YsyHGNjD3mB+rBwkmfW5z/tK1QF8BCCqhZdgvAYcWtQVBcOCVs
-         VtQC0lBt5RwaU514aBhJJPjfFV3ESWC+3glsi0hKF4Wp0o49Weyv6DzFRxqoWRW3wWQE
-         /OyaDdXvzrLKVhFFWhkpBRVrlgDIwpE7jQaASAdmYaZxuM6Ew4mUmXDDFWoILwey8gAu
-         03XMT7iHEJgf3ZCxKRrt32IDZ8k4GI2E94SPZeKbQOSD/14FBjZUJlwvelIChJzFVDXn
-         9ZQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWRI40aCeoeCH4rHaS99kt8jHirzHTnsL/1rx8NciuTfT1d7Or/7gpSxrng5LdhlZiucBY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzofb3Z8rEqk3IVvyffOMZfSEvRPpUn06EdyjuCzfEns2d9pq+s
-	3VWSgKW6XDhZVyOUmdsjrym/cH9gy/ird9j+c8Yy4QeZG5NHpz5CwZAmvPP8IE4=
-X-Google-Smtp-Source: AGHT+IFBxLhqkcFc083FyPJREjZC/bdX6TenkPZv3cJUb/crfFR4k5TS849WsfGhqyrMbpgpzkF9Rg==
-X-Received: by 2002:a05:6402:909:b0:5c9:21aa:b145 with SMTP id 4fb4d7f45d1cf-5ca0af87099mr17318763a12.36.1729594582079;
-        Tue, 22 Oct 2024 03:56:22 -0700 (PDT)
+        bh=p2jXJE3FbWlzhHC2JLNXh46hRwsq96dE8ivUr/Ry4PY=;
+        b=qsuQa3uKb2K9fHN20hnX9YVH5kWObZiuHoZIo2ltYLcofPOOlQqRmruzCC7KKeQKpd
+         MsAjz5aNjK3sG57w3Egzi7O7msW3XX2Nb5WCbrjnJzFpYpVAnBMfd2TG18UfH8Kx8iqh
+         slDWORXZQBOffuI45/QoH/ZoBTRFB03Ao8XSwjmqRvlqE32rDmZWuDa7V8R2+GxTw2kn
+         JXd9helDkL32J9lLQBx2JOwrCxa/BlpFq46EDxS8oA0qxNK5PUhRq1FsL+ZpEPW5iNTw
+         s1kxkFN/L0xEwHQi+UcJ8+O1shVyJ393/TCXLh/LyYNA1hEP8FXGl7LkMCSA7933umdA
+         tXTg==
+X-Forwarded-Encrypted: i=1; AJvYcCWe/3x9IVBSMjvDYem9LnGkMfvnhZu8+9/sUB27lXpAcHwXZpmgAvLRH0Pc9HQCubk2QTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcO8HsCK5mNIW44jqh7CQCP29rlRcdGJ8YF3QXd+gegpNnL8Bo
+	X3tb2dgGh3Z7q4uKvMR+2kiXQNvvqWs6VkuQKSnsm8DuPp4oTp39JDtzC1+dViQ=
+X-Google-Smtp-Source: AGHT+IGUejPeSVv+t0DCi7SW64a6BptBW33UQRq4rjvBjk+8TQgWaYTlBD5pezBspgvI4FXlscux/w==
+X-Received: by 2002:a17:907:7da5:b0:a99:4aa7:4d6f with SMTP id a640c23a62f3a-a9a6995d6f8mr1533790966b.12.1729594590554;
+        Tue, 22 Oct 2024 03:56:30 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66c72581sm3010588a12.86.2024.10.22.03.56.17
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912edc33sm321455366b.58.2024.10.22.03.56.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 03:56:19 -0700 (PDT)
+        Tue, 22 Oct 2024 03:56:28 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 86BD95F9EC;
+	by draig.lan (Postfix) with ESMTP id 99FE35FA0B;
 	Tue, 22 Oct 2024 11:56:15 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -99,9 +99,9 @@ Cc: Beraldo Leal <bleal@redhat.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 10/20] gitlab: make check-[dco|patch] a little more verbose
-Date: Tue, 22 Oct 2024 11:56:04 +0100
-Message-Id: <20241022105614.839199-11-alex.bennee@linaro.org>
+Subject: [PATCH v2 11/20] MAINTAINERS: mention my gdbstub/next tree
+Date: Tue, 22 Oct 2024 11:56:05 +0100
+Message-Id: <20241022105614.839199-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241022105614.839199-1-alex.bennee@linaro.org>
 References: <20241022105614.839199-1-alex.bennee@linaro.org>
@@ -114,59 +114,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When git fails the rather terse backtrace only indicates it failed
-without some useful context. Add some to make the log a little more
-useful.
+Make it easy for people to see what is already queued.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .gitlab-ci.d/check-dco.py   | 9 +++++----
- .gitlab-ci.d/check-patch.py | 9 +++++----
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/.gitlab-ci.d/check-dco.py b/.gitlab-ci.d/check-dco.py
-index 632c8bcce8..d29c580d63 100755
---- a/.gitlab-ci.d/check-dco.py
-+++ b/.gitlab-ci.d/check-dco.py
-@@ -19,10 +19,11 @@
- reponame = os.path.basename(cwd)
- repourl = "https://gitlab.com/%s/%s.git" % (namespace, reponame)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b84787ae1b..81396c9f15 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2978,6 +2978,7 @@ F: gdb-xml/
+ F: tests/tcg/multiarch/gdbstub/*
+ F: scripts/feature_to_c.py
+ F: scripts/probe-gdb-support.py
++T: git https://gitlab.com/stsquad/qemu gdbstub/next
  
--subprocess.check_call(["git", "remote", "add", "check-dco", repourl])
--subprocess.check_call(["git", "fetch", "check-dco", "master"],
--                      stdout=subprocess.DEVNULL,
--                      stderr=subprocess.DEVNULL)
-+print(f"adding upstream git repo @ {repourl}")
-+subprocess.run(["git", "remote", "add", "check-dco", repourl],
-+               check=True, capture_output=True)
-+subprocess.run(["git", "fetch", "check-dco", "master"],
-+               check=True, capture_output=True)
- 
- ancestor = subprocess.check_output(["git", "merge-base",
-                                     "check-dco/master", "HEAD"],
-diff --git a/.gitlab-ci.d/check-patch.py b/.gitlab-ci.d/check-patch.py
-index 39e2b403c9..94afdce555 100755
---- a/.gitlab-ci.d/check-patch.py
-+++ b/.gitlab-ci.d/check-patch.py
-@@ -19,13 +19,14 @@
- reponame = os.path.basename(cwd)
- repourl = "https://gitlab.com/%s/%s.git" % (namespace, reponame)
- 
-+print(f"adding upstream git repo @ {repourl}")
- # GitLab CI environment does not give us any direct info about the
- # base for the user's branch. We thus need to figure out a common
- # ancestor between the user's branch and current git master.
--subprocess.check_call(["git", "remote", "add", "check-patch", repourl])
--subprocess.check_call(["git", "fetch", "check-patch", "master"],
--                      stdout=subprocess.DEVNULL,
--                      stderr=subprocess.DEVNULL)
-+subprocess.run(["git", "remote", "add", "check-patch", repourl],
-+               check=True, capture_output=True)
-+subprocess.run(["git", "fetch", "check-patch", "master"],
-+               check=True, capture_output=True)
- 
- ancestor = subprocess.check_output(["git", "merge-base",
-                                     "check-patch/master", "HEAD"],
+ Memory API
+ M: Paolo Bonzini <pbonzini@redhat.com>
 -- 
 2.39.5
 
