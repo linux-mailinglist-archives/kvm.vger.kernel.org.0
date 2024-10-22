@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-29383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C31D9AA0D6
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:09:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC829AA10A
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D48FB20ED4
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E8781F241BF
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A948A19AA56;
-	Tue, 22 Oct 2024 11:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887AF19ABAB;
+	Tue, 22 Oct 2024 11:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MlvE+j6p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c45cVjEn"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7211199E9A
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 11:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9042140E38
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 11:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729595333; cv=none; b=QucGJcgd31RFf6IGBXR5zJfhBER7q9r/+GIerDGTxvjaGQDGaeV92NbXC6VF4xWlj+iDmnh/WRWNfk3SgDxztHodtSy9o8vLpeb/TEE/n1yq6sLFZeSPJHIRlkFFluC8L9i5ojh1dBU2v2cXaLgZGcDQcJ/1Q0sXZifF1iOKMVY=
+	t=1729596036; cv=none; b=RjknPiz3stSmgTX+lEFrZyrAx+3PAXR1e4YmDuCC157OgvGhCbJ+Ofq10zZl5Z8ocm0xhu6ziVmvlOmJsWam/yqrUfyvBt9igOWZXNmkAovGFWPGmfvzuCE726G8GlkPiYvtFDFPRl2a/jsw4DaKIpvRAssJsAet/qjEG5gmGjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729595333; c=relaxed/simple;
-	bh=S2OXb9iLr9+ePPs27CwjyVlbud0H61ZDht9bvviCkZQ=;
+	s=arc-20240116; t=1729596036; c=relaxed/simple;
+	bh=Eql3GPhG7pn9XedigbrWxLj6rD+UGl7jGSS/wZOiwFs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KwB6y7jVtnNHIWjQ1fDBKzRu/rhhdWJJrbUwEvF6ok8EOOCEWHyzMXIuhw8bpBkWd3ZXkqRD9+EQE7+R4+/n6G2qmZ+uY+bEDQiaTDZIyEL/Hfrxk3bPwYyOWIFptUgFjOUq64zRaQgaACUvIwHrdtsdC74plLMDn14Xu4YpiII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MlvE+j6p; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Y/1QIsLnxCC1osNZY9D54vWhqyF5K2cIY8m5ZqwyrDNIpa5Oij0zesBL0wWIKNdc526gVij6T2my9zNIjqkBpP5rHWzFtKhZRTeMZmyvYnE+yollciS/Ld92GV6W/L2sHpuwtosYcz8oG/v2sHSC8J36JtZ8zaNbO82JYp/6La8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c45cVjEn; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729595330;
+	s=mimecast20190719; t=1729596033;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5C+wUpQXfGIPLQ3UhbqP2JZa2mcjb3ugeggIlo4yB6s=;
-	b=MlvE+j6pMFLyt7pk4TGF12U+P0zOJRl4/WpFH8Y2CQ1O2TvxArUFzSl8ANnBx0HQYABV3w
-	UbJIfDozKdVrLMMs8mm7mMZAZ/Tqm8E2YEYiy8A0wmSEezbOruel4ecnw4Z8Xu3JEJfsjn
-	TcNGcGhheMemgpjwuwky2kkQs8tN81U=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Xz5kCx0hdHDiVOVGdcwX+bMGEGNqJ5i23xoa8m0d6bk=;
+	b=c45cVjEnOk0vMty6ZCeG5gbT+hm5VNjX/bMVWFajmMvRz6iFY0eREZxwMl9czhQrkLoC/k
+	C9HIdYz66at4q0ZRpdeKH/ag/u8W1J8hHlxfxv0x4yYRBsU9Bo9n6TBIgDcH+wmdk2eZL7
+	aHQ3XPg8eLAaQIRj+K7FDhC5QKf2elY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-282-x7LCCIJNPJWeFIAPii1b_Q-1; Tue, 22 Oct 2024 07:08:49 -0400
-X-MC-Unique: x7LCCIJNPJWeFIAPii1b_Q-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6cbf039dccfso24413186d6.0
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 04:08:49 -0700 (PDT)
+ us-mta-410-7R2CvXY4MkeMeCoBkVz9sw-1; Tue, 22 Oct 2024 07:20:32 -0400
+X-MC-Unique: 7R2CvXY4MkeMeCoBkVz9sw-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b14073eabdso289052585a.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 04:20:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729595329; x=1730200129;
+        d=1e100.net; s=20230601; t=1729596032; x=1730200832;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5C+wUpQXfGIPLQ3UhbqP2JZa2mcjb3ugeggIlo4yB6s=;
-        b=woJBiXyvOgXS9jKRpUg2F+2Hl/JokhsmGE4iwI6iQcXT3XBYN7z3jckgBK/sUY9rR0
-         pRF83XzOSPrufmZsup5shnDtagM7J6tKv2qkJ01TBVgFOv0kxDNpXS5pqpNhBo5m7zmy
-         VxKsFZh42WCW20FZ1VGUCfiCh5L890pAC6Mvz5SssbmZYBrBOw0Wcslfv3xlvsaruBg5
-         OvoDY2UNe3ooagmflMNY2VNcnJHlGyaXiLI1BNaDOyTKXRX773zAiCJJzs/QR0QSPmh5
-         40lFY1Ws9aw/BSlV4zL+EAXJecGhpucDpqZkG/PO3UAQPlFMV9C0FcSgN1ROHqHMeBl5
-         29mw==
-X-Forwarded-Encrypted: i=1; AJvYcCV216dvlznOmWCRvIGKPhzJBvWNSdQJQ80JsHrhTlPxMD46NNEv6bTE0tTA7b/JnhL6hqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTuSoKCoWZmq7BMLakj61vGuxjaI21775v9CTTcb6mN19AaJag
-	+vES+JsKMflnM9i5Do4ph97XEGY1KFZzjhIUJ42g4nhNa7hJrDf5ioOJgGyK88AY9WvZrk0p2K5
-	yOJCSX38DsdIE0PyIUZE0fVDNsAxMKOryCS5sAGOKUx9rgXRr6w==
-X-Received: by 2002:a05:6214:4498:b0:6cb:e997:6717 with SMTP id 6a1803df08f44-6cde15db124mr224440026d6.38.1729595328959;
-        Tue, 22 Oct 2024 04:08:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IED7QF3zGlxZaTXUtx2trHCarebfg8cjpAIyA3gT5NN0qP0hppOSbAgne1dtnDmqXx/jth79A==
-X-Received: by 2002:a05:6214:4498:b0:6cb:e997:6717 with SMTP id 6a1803df08f44-6cde15db124mr224439766d6.38.1729595328710;
-        Tue, 22 Oct 2024 04:08:48 -0700 (PDT)
+        bh=Xz5kCx0hdHDiVOVGdcwX+bMGEGNqJ5i23xoa8m0d6bk=;
+        b=xSPmHwjGAb3nuOpkhR+TlBfvqXB6wHilGCzk3HEONTyKpVELnqnfUR+jauvV5x9lPh
+         CFwA8sljGYNZDMM3botf8UGIzHGM0UBsmDMlpdN+dCzYFbDMRYSP7I0/EQD9BnrSsbVk
+         KNr2kzGg/hcYvjhq855jFgYoYkQ7F3JVlQQPxxj7dbgDQi71/9yKnbneWIWM0cvI+rJd
+         1gUhmadbTb2xhIO1+M8nf4DiDbwedbzZ/41746g49yoc3g8kYDBkeK6pGa/Tp5apNqJE
+         fn7TXuwWGGxgTBRiWVJ30fRE7VSXG2QWFtZ4dgfCYjIeBylZz8zVPZqghfkc5YQreP8F
+         aTSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtwryrEjE/UN32kQGuBRlxsEq5Tfn4XYTY5zETpzfw4Kyh66Fp7noKC+FG2gROC7P/i34=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6kzdqGmEN73MDWQBSB67iO8fBc2bMsQG+BfGLgSN7Ca77fpUm
+	DesSHA3RNcwqe0rznQmWKld8Czfx5XpjPFDUl74kkO5nT6iK96k6JKSTIc7Wz4Q1x6P17mfaWpn
+	YRA8eneXyVEI26fIu9UTDQU8B9pxYIaa3PuOA7My4McZqO4mhPg==
+X-Received: by 2002:a05:6214:4804:b0:6cb:ec6a:7d52 with SMTP id 6a1803df08f44-6cde155e583mr240452616d6.31.1729596031921;
+        Tue, 22 Oct 2024 04:20:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHdtRaO1cUB9QQRRvXlyi2zL21bB2SzvGt5DpWszz3ijpXYgod5rFSMuy0o2EHe66sCNJldOg==
+X-Received: by 2002:a05:6214:4804:b0:6cb:ec6a:7d52 with SMTP id 6a1803df08f44-6cde155e583mr240452236d6.31.1729596031563;
+        Tue, 22 Oct 2024 04:20:31 -0700 (PDT)
 Received: from [192.168.0.7] (ip-109-40-241-30.web.vodafone.de. [109.40.241.30])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce00999d08sm27654656d6.83.2024.10.22.04.08.41
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce00999d08sm27733446d6.83.2024.10.22.04.20.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 04:08:48 -0700 (PDT)
-Message-ID: <71858315-3814-43c3-817f-bdd9414e7a28@redhat.com>
-Date: Tue, 22 Oct 2024 13:08:39 +0200
+        Tue, 22 Oct 2024 04:20:30 -0700 (PDT)
+Message-ID: <9661bb1c-701e-4472-94b6-92b7bc3c3550@redhat.com>
+Date: Tue, 22 Oct 2024 13:20:21 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/20] gitlab: make check-[dco|patch] a little more
- verbose
+Subject: Re: [PATCH v2 03/20] MAINTAINERS: mention my testing/next tree
 To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Beraldo Leal <bleal@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
@@ -106,7 +105,7 @@ Cc: Beraldo Leal <bleal@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
  Pierrick Bouvier <pierrick.bouvier@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>
 References: <20241022105614.839199-1-alex.bennee@linaro.org>
- <20241022105614.839199-11-alex.bennee@linaro.org>
+ <20241022105614.839199-4-alex.bennee@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -151,20 +150,18 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20241022105614.839199-11-alex.bennee@linaro.org>
+In-Reply-To: <20241022105614.839199-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 22/10/2024 12.56, Alex Bennée wrote:
-> When git fails the rather terse backtrace only indicates it failed
-> without some useful context. Add some to make the log a little more
-> useful.
+On 22/10/2024 12.55, Alex Bennée wrote:
+> I put it under my name as there may be other maintainer testing trees
+> as well.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->   .gitlab-ci.d/check-dco.py   | 9 +++++----
->   .gitlab-ci.d/check-patch.py | 9 +++++----
->   2 files changed, 10 insertions(+), 8 deletions(-)
+>   MAINTAINERS | 1 +
+>   1 file changed, 1 insertion(+)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
