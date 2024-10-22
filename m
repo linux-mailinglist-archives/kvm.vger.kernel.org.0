@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-29421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519089AB3B6
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C949AB3C5
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F874B2332F
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:19:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60509B24229
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570ED1BB6B3;
-	Tue, 22 Oct 2024 16:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0BE1BBBEA;
+	Tue, 22 Oct 2024 16:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aufXaGle"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DxdcD2ag"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A845B1A01D4;
-	Tue, 22 Oct 2024 16:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C8F1A76D1;
+	Tue, 22 Oct 2024 16:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729613981; cv=none; b=NzUk3wOHz5cQWbwX5qPj1WZZvYO8uPBb9eOxGepICpUuohhw8TqL5i1Xaxzunpg6VaVicBkXQjIOo4+vyCOUFfYX7Jfzz1R9NCasNWssYnsfJJwuhbxEp6fibMK0eUHaHXOwp64zZXtnJz4yjWGNquJLzTJfctOzRrpP2nxme9U=
+	t=1729614118; cv=none; b=ijvpm8viKruyYfW0yZ9+NiFY6OBMhKdnNnNpPCrD2sQAlsS8+poFqfxKgY26jYUstSAnRay3CFtaeR92gazIEIQGReLLtCGqHzmxf+w+kD/K0JZDGpQZ1znD18tfVjW1p346PSMsUpsh+cXNbb6FVZUkrJLkbvboOocyXQxvxss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729613981; c=relaxed/simple;
-	bh=CvtlmF5cGuskit8xkyZlrI9xYyWWabA80n3pfNjhWIA=;
+	s=arc-20240116; t=1729614118; c=relaxed/simple;
+	bh=g0X8esJl5OXSo6yVG0u/hl1XuyhY3af4PbbgX2UZJcQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HX3NUyFt75ABQ5Pe2gXLkPC9r2B1uPFkMDrX6WtOpbreTi0Zh3g11P/ur7TIn0NsTeqZM+xuVH9e2Lb9gcEUBB5oID75kjVAVqXjjkO0RJLg3PEW/ge9sIPpn+Kl+ujgY1uZPKNlc3Qyoy/1PB6TgdmdD3PyGRWmwkATXDb1LcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aufXaGle; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=WrPneXoGXbUe/ENdr25QP/E9f/stiFk48NLN+kdubZkhNAoS4994kMGIltt+s0P4bukE8zrVvZcu8zOC3Sj5FUI/9E1L1LkEsaWEWO4UGwwA5jfgKjlPKELvyB67Elq7UwsYMTkPJ4wcfR0cp4rm/wvng1nHH/Q3S/Lq9w85VJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DxdcD2ag; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.205] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGIxG9810664
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGLTuM811311
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 22 Oct 2024 09:18:59 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGIxG9810664
+	Tue, 22 Oct 2024 09:21:30 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGLTuM811311
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1729613941;
-	bh=PQ8WaWZqpwDl5XAjh+/ICxJ0hVGMTIG/hPE2VcIrRR4=;
+	s=2024101701; t=1729614091;
+	bh=mMa/nEHi+IJsuIgB+ctUr20GZTFdfugp1CDxj/jJrYg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aufXaGleldv5CuuuLA14O6G8zFsj5e/T3cycGGhrhsKGI+8Miqh6wWMSzFO4Sv4jm
-	 bu3ps+MLOiJTc2SUNbNQhg3aqm4xzwTJbjhSZzY3yWxWAXApEJvNzjCDcWVBCXdixY
-	 1tFSPTaEdXeV/+F+Z4LquYTQLeN0oGeTGf/1so4Xw3UBYJjzEZuM+0cNmcpUKdmyEA
-	 SUkxvc/yvoZHyuZOmXDZtqUWsUkYy7vZKMNbyCaj3J6vmvUKIdWQCIJIOOjOjjCl6u
-	 aBgxsHaAFcI/Nw+QvbAL/kuTjmZIinau3cGL3OUatlCsXjRqoutffpuPxT7WnwZg+/
-	 QKjh9kz4q1m4Q==
-Message-ID: <3bc22633-4f79-4930-8357-11e5074014ed@zytor.com>
-Date: Tue, 22 Oct 2024 09:18:58 -0700
+	b=DxdcD2agaLTNr8riwzxdG21klgd9KXakweVzSJ08kiapCzxErhZksXuvILgoUMX+8
+	 y6QIrTQcxV/1I/A2kG9ZZltAhW2IBe5f1PnQ5EAACWsCq4O4E6pgMS8z+a5ZwlDvz9
+	 sfw6LPIc/3xPjcckhYC7VzdbIRzP7ZTOM+SiQ5cRzzWaHWoBTBrwyk5UP+3UGCHc2b
+	 aCDju3JNJidMA9/XPFcCv+xZDHr1VCS67tNUy9Wi8PO+qFNo8K/TS5EfXtZio7QIgl
+	 pzkXFJz5k1Zhw5oqGm0RFlk4EDqMw1IivQuL+sci54lz/Oo6Fuhw4tn1WhsfacTAY7
+	 s27WZSr7BEFig==
+Message-ID: <332870de-888a-4ebc-9ca5-d4980f79b8be@zytor.com>
+Date: Tue, 22 Oct 2024 09:21:28 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,7 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/27] KVM: VMX: Initialize VMCS FRED fields
+Subject: Re: [PATCH v3 05/27] KVM: VMX: Disable FRED if FRED consistency
+ checks fail
 To: Chao Gao <chao.gao@intel.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
@@ -64,7 +65,7 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
 References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-8-xin@zytor.com> <ZxdrM9IV7iX02Of0@intel.com>
+ <20241001050110.3643764-6-xin@zytor.com> <ZxdmxC92KmMQVYNU@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -101,28 +102,54 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <ZxdrM9IV7iX02Of0@intel.com>
+In-Reply-To: <ZxdmxC92KmMQVYNU@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/22/2024 2:06 AM, Chao Gao wrote:
->> @@ -1503,6 +1503,18 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
->> 				    (unsigned long)(cpu_entry_stack(cpu) + 1));
->> 		}
+On 10/22/2024 1:48 AM, Chao Gao wrote:
+> On Mon, Sep 30, 2024 at 10:00:48PM -0700, Xin Li (Intel) wrote:
+>> From: Xin Li <xin3.li@intel.com>
 >>
->> +		/* Per-CPU FRED MSRs */
->> +		if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
->> +#ifdef CONFIG_X86_64
->> +			vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(DB));
->> +			vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(NMI));
->> +			vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(DF));
->> +#endif
->> +			vmcs_write64(HOST_IA32_FRED_SSP1, 0);
->> +			vmcs_write64(HOST_IA32_FRED_SSP2, 0);
->> +			vmcs_write64(HOST_IA32_FRED_SSP3, 0);
+>> Do not virtualize FRED if FRED consistency checks fail.
+>>
+>> Either on broken hardware, or when run KVM on top of another hypervisor
+>> before the underlying hypervisor implements nested FRED correctly.
+>>
+>> Suggested-by: Chao Gao <chao.gao@intel.com>
+>> Signed-off-by: Xin Li <xin3.li@intel.com>
+>> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+>> Tested-by: Shan Kang <shan.kang@intel.com>
 > 
-> Given SSP[1-3] are constant for now, how about asserting that host SSP[1-3] are
-> all zeros when KVM is loaded and moving their writes to vmx_set_constant_host_state()?
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> 
+> one nit below,
+> 
+>> ---
+>> arch/x86/kvm/vmx/capabilities.h | 7 +++++++
+>> arch/x86/kvm/vmx/vmx.c          | 3 +++
+>> 2 files changed, 10 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+>> index e8f3ad0f79ee..2962a3bb9747 100644
+>> --- a/arch/x86/kvm/vmx/capabilities.h
+>> +++ b/arch/x86/kvm/vmx/capabilities.h
+>> @@ -400,6 +400,13 @@ static inline bool vmx_pebs_supported(void)
+>> 	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
+>> }
+>>
+>> +static inline bool cpu_has_vmx_fred(void)
+>> +{
+>> +	/* No need to check FRED VM exit controls. */
+> 
+> how about:
+> 
+> 	/*
+> 	 * setup_vmcs_config() guarantees FRED VM-entry/exit controls are
+> 	 * either all set or none. So, no need to check FRED VM-exit controls.
+> 	 */
+> 
+> It is better to call out the reason.
+> 
 
-I like the idea :)
+make sense!
 
