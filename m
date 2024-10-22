@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-29422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C949AB3C5
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:22:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92BB9AB412
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60509B24229
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:22:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C3A81F23A3D
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0BE1BBBEA;
-	Tue, 22 Oct 2024 16:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD86E1BD020;
+	Tue, 22 Oct 2024 16:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DxdcD2ag"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DqEUv5sS"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C8F1A76D1;
-	Tue, 22 Oct 2024 16:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1C649652;
+	Tue, 22 Oct 2024 16:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729614118; cv=none; b=ijvpm8viKruyYfW0yZ9+NiFY6OBMhKdnNnNpPCrD2sQAlsS8+poFqfxKgY26jYUstSAnRay3CFtaeR92gazIEIQGReLLtCGqHzmxf+w+kD/K0JZDGpQZ1znD18tfVjW1p346PSMsUpsh+cXNbb6FVZUkrJLkbvboOocyXQxvxss=
+	t=1729614681; cv=none; b=VHAsmAfGB7KRHIGLzOpSbYeqopLHdXGfhMYI+5q+D/rwsBdT9BbRy6KU7C2YSjVjtpZDQzhTCxnB2Q0GzMcEH+JTuXQY9y/ZuZN6XWnbCO/piui48mX0/CO5UpStSxo3NKFS2QWkSWPsjwj6Gd46qjYdBpdgiwKh1y3cSHHi1fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729614118; c=relaxed/simple;
-	bh=g0X8esJl5OXSo6yVG0u/hl1XuyhY3af4PbbgX2UZJcQ=;
+	s=arc-20240116; t=1729614681; c=relaxed/simple;
+	bh=VJwj7MA066z9kHAFfL/2sU7sqKINqbMoM+lr7owpILc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WrPneXoGXbUe/ENdr25QP/E9f/stiFk48NLN+kdubZkhNAoS4994kMGIltt+s0P4bukE8zrVvZcu8zOC3Sj5FUI/9E1L1LkEsaWEWO4UGwwA5jfgKjlPKELvyB67Elq7UwsYMTkPJ4wcfR0cp4rm/wvng1nHH/Q3S/Lq9w85VJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DxdcD2ag; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=KR6M/zlYjrkSxii4LSroXNZU+qJ7uYB9mqzC9QWEwAoOpUkEkETM054RcUgAoZzhS1mY3LEConxqWBabqjtPR7pGfXViURX6GPsJ49JG9+f5DTezPbp53MAZf0TvO7JVNKvpjff6jZUyZf6B7jbsoAMD768Y7+MoNZ+r/RHO/yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DqEUv5sS; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.205] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGLTuM811311
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGUlQm814998
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 22 Oct 2024 09:21:30 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGLTuM811311
+	Tue, 22 Oct 2024 09:30:48 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGUlQm814998
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1729614091;
-	bh=mMa/nEHi+IJsuIgB+ctUr20GZTFdfugp1CDxj/jJrYg=;
+	s=2024101701; t=1729614651;
+	bh=CXELoJvoHyovP8cYyonhwjwqYSsgW6npVYhZM7l3PFA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DxdcD2agaLTNr8riwzxdG21klgd9KXakweVzSJ08kiapCzxErhZksXuvILgoUMX+8
-	 y6QIrTQcxV/1I/A2kG9ZZltAhW2IBe5f1PnQ5EAACWsCq4O4E6pgMS8z+a5ZwlDvz9
-	 sfw6LPIc/3xPjcckhYC7VzdbIRzP7ZTOM+SiQ5cRzzWaHWoBTBrwyk5UP+3UGCHc2b
-	 aCDju3JNJidMA9/XPFcCv+xZDHr1VCS67tNUy9Wi8PO+qFNo8K/TS5EfXtZio7QIgl
-	 pzkXFJz5k1Zhw5oqGm0RFlk4EDqMw1IivQuL+sci54lz/Oo6Fuhw4tn1WhsfacTAY7
-	 s27WZSr7BEFig==
-Message-ID: <332870de-888a-4ebc-9ca5-d4980f79b8be@zytor.com>
-Date: Tue, 22 Oct 2024 09:21:28 -0700
+	b=DqEUv5sS1M10ZxZfbA22WXJBks/LmSjbytQxrGg1FbV69rKiZmCBXiJJGUu7YyDtV
+	 tw8dtZPgjFvKnHtUmycexjbzpH4bs7f59uYLUa0u9yJkTudRHRGQOqmp8GzUR+IXQG
+	 Kxc+ui5uSfKfG/rAxhHIBdbn5bbjVy87nnMlLlcbPwZTDcdnUK4Q2Bm7qvr2ccwrDP
+	 6dR38i5joF9W1TVwEk4PsWJUf68jk536cntE+NKXF9o1mEMtbqZq6gKHOTUjS4SO0+
+	 VyjhK02qkdJnPV9cDsXBk5cAl5sfcSx/agGpWGv6AD+SEgi587LD/nHTsNIxYTCbnN
+	 kjBBiwkdAflog==
+Message-ID: <5582cf56-0b22-4603-b8e2-6b652c09b4fa@zytor.com>
+Date: Tue, 22 Oct 2024 09:30:47 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/27] KVM: VMX: Disable FRED if FRED consistency
- checks fail
+Subject: Re: [PATCH v3 03/27] KVM: VMX: Add support for the secondary VM exit
+ controls
 To: Chao Gao <chao.gao@intel.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
@@ -65,7 +65,8 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
 References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-6-xin@zytor.com> <ZxdmxC92KmMQVYNU@intel.com>
+ <20241001050110.3643764-4-xin@zytor.com> <ZxYQvmc9Ke+PYGkQ@intel.com>
+ <10aa42de-a448-40d4-a874-514c9deb56a3@zytor.com> <ZxcSPpuBHO8Y1jfG@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -102,54 +103,49 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <ZxdmxC92KmMQVYNU@intel.com>
+In-Reply-To: <ZxcSPpuBHO8Y1jfG@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/22/2024 1:48 AM, Chao Gao wrote:
-> On Mon, Sep 30, 2024 at 10:00:48PM -0700, Xin Li (Intel) wrote:
->> From: Xin Li <xin3.li@intel.com>
+>>>> 		_vmentry_control &= ~n_ctrl;
+>>>> 		_vmexit_control &= ~x_ctrl;
+>>>
+>>> w/ patch 4, VM_EXIT_ACTIVATE_SECONDARY_CONTROLS is cleared if FRED fails in the
+>>> consistent check. this means, all features in the secondary vm-exit controls
+>>> are removed. it is overkill.
 >>
->> Do not virtualize FRED if FRED consistency checks fail.
+>> Good catch!
 >>
->> Either on broken hardware, or when run KVM on top of another hypervisor
->> before the underlying hypervisor implements nested FRED correctly.
+>>>
+>>> I prefer to maintain a separate table for the secondary VM-exit controls:
+>>>
+>>>    	struct {
+>>>    		u32 entry_control;
+>>>    		u64 exit2_control;
+>>> 	} const vmcs_entry_exit2_pairs[] = {
+>>> 		{ VM_ENTRY_LOAD_IA32_FRED, SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+>>> 					   SECONDARY_VM_EXIT_LOAD_IA32_FRED},
+>>> 	};
+>>>
+>>> 	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit2_pairs); i++) {
+>>> 	...
+>>> 	}
 >>
->> Suggested-by: Chao Gao <chao.gao@intel.com>
->> Signed-off-by: Xin Li <xin3.li@intel.com>
->> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
->> Tested-by: Shan Kang <shan.kang@intel.com>
+>> Hmm, I prefer one table, as it's more straight forward.
 > 
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> 
-> one nit below,
-> 
->> ---
->> arch/x86/kvm/vmx/capabilities.h | 7 +++++++
->> arch/x86/kvm/vmx/vmx.c          | 3 +++
->> 2 files changed, 10 insertions(+)
->>
->> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
->> index e8f3ad0f79ee..2962a3bb9747 100644
->> --- a/arch/x86/kvm/vmx/capabilities.h
->> +++ b/arch/x86/kvm/vmx/capabilities.h
->> @@ -400,6 +400,13 @@ static inline bool vmx_pebs_supported(void)
->> 	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
->> }
->>
->> +static inline bool cpu_has_vmx_fred(void)
->> +{
->> +	/* No need to check FRED VM exit controls. */
-> 
-> how about:
-> 
-> 	/*
-> 	 * setup_vmcs_config() guarantees FRED VM-entry/exit controls are
-> 	 * either all set or none. So, no need to check FRED VM-exit controls.
-> 	 */
-> 
-> It is better to call out the reason.
-> 
+> One table is fine if we can fix the issue and improve readability. The three
+> nested if() statements hurts readability.
 
-make sense!
+You're right!  Let's try to make it clearer.
+
+> I just thought using two tables would eliminate the need for any if() statements.
+>
+
+One more thing, IIUC, Sean prefers to keep
+VM_EXIT_ACTIVATE_SECONDARY_CONTROLS set if it's allowed to be set and
+even bits in the 2nd VM exit controls are all 0.  I may be able to make
+it simpler.
+
+
+
 
