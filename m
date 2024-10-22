@@ -1,148 +1,105 @@
-Return-Path: <kvm+bounces-29380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 553499AA0C9
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:05:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35719AA0D1
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14B711F243A7
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655E32849FC
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00532199FAB;
-	Tue, 22 Oct 2024 11:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYlihbR0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764DA19AD8D;
+	Tue, 22 Oct 2024 11:06:56 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C61219925F
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 11:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEA518BBA9;
+	Tue, 22 Oct 2024 11:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729595111; cv=none; b=T5J4AWk76ZXt3f6uka2rJtSHu/g+liReVmKh1zGqUTCNADDJekvidKV7uJ4nvjkWXEQtUS49nt/CkEVInIlrWWmWbMbK9Q9+PQlhwOWGAgKjE66JuTD0zP3nyWyP88CkEBub1wfTJrZdfTP1jMr6XXk5He6usfUDFhfwK59e8TI=
+	t=1729595216; cv=none; b=pF/iH4blcxs5ndKJTF2sv7r088cepVIB3WH+x8YziILGE1AbJjES+ngSm6swi5PNi+oE2EDraI6U96Wdeg4jjHBXBqiz+eXRt9HUIkrvRleSzw1eH0y//hlxM+Wt2jlWhBc/yW9zEiJDWt9bt85blpzgefKtVTZxXTTLjB1GzQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729595111; c=relaxed/simple;
-	bh=Fk/mCQtoxbzwnQ7HscGSO6R2b1ACPtPhtvoAC3F+esU=;
+	s=arc-20240116; t=1729595216; c=relaxed/simple;
+	bh=v7P5/7qk7UApYxhUS6nF0cmNQ91ZhvIbcS2flDvVIFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EqJ0gl1llXv6+pQAmV7/3YKeWLk+hnjNNVZSfBXuF1gfucT8sBR351yo9xELtrdp87iarGwnwP4f5R0TaLWEIO6nbOFtuL/YoG3TRVOX/AnBN7r1tIV2and8Pl970pKJeaupLXNXI4HwHbtkXGpx+2/2aJ0r9JKLKSkiXqfoemg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HYlihbR0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729595108;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XgXOm/egpp5fSRjhAcPNhDSab7aMEhiEVg5mXUt45Zk=;
-	b=HYlihbR0FYBKi09+HxIrZjR83Jx5NcXpxJKhSEoR/W/lK6KusPHlG/z5H16rXE52Tc1Ttz
-	SzXRHjKKPNpZXnyZp9Kwkq6H5mDouDxMDCqTd/xSp2E3wHE0GCmpPfIyZZSjqLHxpzb4si
-	yi64bLUGy33gPQl6T5G5po98BJ8waFg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-572-1-6-f52TMw-jaPvV2hz7hg-1; Tue,
- 22 Oct 2024 07:05:06 -0400
-X-MC-Unique: 1-6-f52TMw-jaPvV2hz7hg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 223351955D92;
-	Tue, 22 Oct 2024 11:05:03 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.59])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D63419560AE;
-	Tue, 22 Oct 2024 11:04:53 +0000 (UTC)
-Date: Tue, 22 Oct 2024 12:04:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Beraldo Leal <bleal@redhat.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Yanan Wang <wangyanan55@huawei.com>, Thomas Huth <thuth@redhat.com>,
-	John Snow <jsnow@redhat.com>,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	qemu-arm@nongnu.org, Eduardo Habkost <eduardo@habkost.net>,
-	devel@lists.libvirt.org, Cleber Rosa <crosa@redhat.com>,
-	kvm@vger.kernel.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Alexandre Iooss <erdnaxe@crans.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Riku Voipio <riku.voipio@iki.fi>, Zhao Liu <zhao1.liu@intel.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 10/20] gitlab: make check-[dco|patch] a little more
- verbose
-Message-ID: <ZxeG0rMSORBKjAVX@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241022105614.839199-1-alex.bennee@linaro.org>
- <20241022105614.839199-11-alex.bennee@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W1j4F/NH6AGBSJDoXoHYqLMaM9y40kUEmpDzju/1cyP3rvnqGhzac4A+5gIwbwdeFmDayKflwOdQcD62eHzInUBFY8/B5jGN5yTFbthcnjuUpJE5XYX18kc1nYhs1FOztC8iTMmnZerzi7wdcagzG2XT9QmADpo3/w5XarxDF+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B4C3C4CEC3;
+	Tue, 22 Oct 2024 11:06:51 +0000 (UTC)
+Date: Tue, 22 Oct 2024 12:06:49 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Sami Mujawar <sami.mujawar@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [PATCH v7 10/11] virt: arm-cca-guest: TSM_REPORT support for
+ realms
+Message-ID: <ZxeHSdpxocFA-SrO@arm.com>
+References: <20241017131434.40935-1-steven.price@arm.com>
+ <20241017131434.40935-11-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241022105614.839199-11-alex.bennee@linaro.org>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <20241017131434.40935-11-steven.price@arm.com>
 
-On Tue, Oct 22, 2024 at 11:56:04AM +0100, Alex Bennée wrote:
-> When git fails the rather terse backtrace only indicates it failed
-> without some useful context. Add some to make the log a little more
-> useful.
+On Thu, Oct 17, 2024 at 02:14:33PM +0100, Steven Price wrote:
+> From: Sami Mujawar <sami.mujawar@arm.com>
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Introduce an arm-cca-guest driver that registers with
+> the configfs-tsm module to provide user interfaces for
+> retrieving an attestation token.
+> 
+> When a new report is requested the arm-cca-guest driver
+> invokes the appropriate RSI interfaces to query an
+> attestation token.
+> 
+> The steps to retrieve an attestation token are as follows:
+>   1. Mount the configfs filesystem if not already mounted
+>      mount -t configfs none /sys/kernel/config
+>   2. Generate an attestation token
+>      report=/sys/kernel/config/tsm/report/report0
+>      mkdir $report
+>      dd if=/dev/urandom bs=64 count=1 > $report/inblob
+>      hexdump -C $report/outblob
+>      rmdir $report
+> 
+> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  .gitlab-ci.d/check-dco.py   | 9 +++++----
->  .gitlab-ci.d/check-patch.py | 9 +++++----
->  2 files changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/.gitlab-ci.d/check-dco.py b/.gitlab-ci.d/check-dco.py
-> index 632c8bcce8..d29c580d63 100755
-> --- a/.gitlab-ci.d/check-dco.py
-> +++ b/.gitlab-ci.d/check-dco.py
-> @@ -19,10 +19,11 @@
->  reponame = os.path.basename(cwd)
->  repourl = "https://gitlab.com/%s/%s.git" % (namespace, reponame)
->  
-> -subprocess.check_call(["git", "remote", "add", "check-dco", repourl])
-> -subprocess.check_call(["git", "fetch", "check-dco", "master"],
-> -                      stdout=subprocess.DEVNULL,
-> -                      stderr=subprocess.DEVNULL)
-> +print(f"adding upstream git repo @ {repourl}")
-> +subprocess.run(["git", "remote", "add", "check-dco", repourl],
-> +               check=True, capture_output=True)
-> +subprocess.run(["git", "fetch", "check-dco", "master"],
-> +               check=True, capture_output=True)
+> Changes since v6:
+>  * Avoid get_cpu() and instead make the init attestation call using
+>    smp_call_function_single(). Improve comments to explain the logic.
+>  * Minor code reorgnisation and comment cleanup following Gavin's review
+>    (thanks!)
 
-This is effectively no change - 'capture_output'  means stderr/out
-are captured into a buffer which subprocess.run returns, but you're
-not using the return value so the captured output is invisible.
+Gavin, since most changes in v7 are based on your feedback, do you have
+any more comments on this patch? I plan to push this series into -next
+fairly soon.
 
-If we want to see errors, then just remove the stderr/stdout
-args from the check_call function, so they're no longer sent
-to /dev/null
+Thanks.
 
-
-With regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Catalin
 
