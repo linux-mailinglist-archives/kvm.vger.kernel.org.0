@@ -1,253 +1,122 @@
-Return-Path: <kvm+bounces-29430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29431-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 836679AB6DD
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 21:33:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF679AB72F
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 21:53:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FC952842DD
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 19:33:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64F141F2476B
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 19:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2465D1CCB50;
-	Tue, 22 Oct 2024 19:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8BF1CBE98;
+	Tue, 22 Oct 2024 19:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SW6jM7Ol"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kvgVpv4Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5BF19EED0;
-	Tue, 22 Oct 2024 19:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C6814A08E
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 19:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729625482; cv=none; b=tBKHg1gT0xsmcyHNpDOW8bEioNXyAdrO3JCRaXeDG9JYx6WG3HVM6/OrXCqAdFjKvZgWmMYHkPGdUFU/IZOyNsAgVUXWkClSCyxnb05j1m1SyB4XrzwDRkv995DOf8c0/BFMcqpDMf76ygdXGnPtBG8w7CjVHBiUgEmCTCEiGaQ=
+	t=1729626779; cv=none; b=oNeBfsh00tTh4gdItnREQWJ1AvEUNpB3xQ+u/S30Ot5FcvTLH72Rp04zwx75dlkHxVyGeklEj8EvlFT9gPI106XzSdWgqRl6HgHg1KjG5csjd7TIe3o7d3MBoe8r5SQ8u0yCwDxeNNNOLCadX7/ROhyPx24qX01OouFTIUReme4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729625482; c=relaxed/simple;
-	bh=1dT2jJaCjhu9+xr53oY4OlmfMB8jPqfWipDC5gxKAtI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dd7jebuJqUPfHKLKSLjicsMd/VvH5htluJ+4cjLtjkbgIiI4w5H76RD7Sl5wPgVBLY3HaHGHSC8Du6MGcSukbYcjCcLyWWu7sQYAYo0vBHpKa91vqyFzilCFqCSeqr7aiwT4De20ePoVaQ9FHEEiKDvE+F0InI5GpQKQFydF7yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SW6jM7Ol; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729625481; x=1761161481;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1dT2jJaCjhu9+xr53oY4OlmfMB8jPqfWipDC5gxKAtI=;
-  b=SW6jM7Ol0cbPyX5pleBFFI8MVeodSXVb2Cx6JY9msG1LHuUfAn+sFjQv
-   RDah+32KJb88grEphEIZY+AiZeOAJXvN2NALpcNA/cSdZt+Enb8in6bHu
-   oxkqs3pwNhqT+7EGl1wahcF0phYaUlSu7U8LLQ63Zy0MN8aXHdhTKE5ge
-   9uRQct+DTngtdLLHtgP26esp8mO8kK2LwoohfcCalEFcbyg7ZBT1RsVkw
-   SlHfKhY9f3H/uQsiiclnwelXzKqk/LdAu1JAYCTysWSXyFCTqogIAONHx
-   WEGoew7isWA+hhayZdhLVSwvfUu7tWcsbfgtUan0QlElT5DD6LmSnQ1cb
-   w==;
-X-CSE-ConnectionGUID: i8qiTTMWRaOSpQuR8WaKlA==
-X-CSE-MsgGUID: mbyOPUQsSHOPt9LGeBxZyQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40307870"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40307870"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 12:31:18 -0700
-X-CSE-ConnectionGUID: gJ2/MQknTLC8VZHvb2HBYg==
-X-CSE-MsgGUID: AvRxGY7XQAqoUWQ6JunKCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="80148851"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.81])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 12:31:07 -0700
-Message-ID: <2a8e6f2c-4284-4218-9b91-af6a4d65e982@intel.com>
-Date: Tue, 22 Oct 2024 22:31:02 +0300
+	s=arc-20240116; t=1729626779; c=relaxed/simple;
+	bh=900jALxWYVLS8Z+BChGV7e1343M0eNmQQ/AjG1m8sVI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BmqNbpctTnf8cefYCxA2iwZdA3rAU0y/rojg9LFPlnSVZxzuH/2ghr/DCpzVL7pIulLZHhyDrJYSttT/DK0nP+uGC2/3QSE9bqD48VuIyvpNSgvdBtHiKIotyUcm+DO3jRY0tGFC7oT3ycWkcD+pZ5eL98XyAn4+jAQdDGnf7Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kvgVpv4Q; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e292dbfd834so9132526276.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 12:52:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729626776; x=1730231576; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P+SI51bEi1jKFAwZYIZIZnZEYLQDC0ghYZ/VkhDOKRw=;
+        b=kvgVpv4Q1LpCe1Tv/iDrc/0DEkCJjWZg7CJTnSvMMMTzl7sirwPFXoZ9U6WrT5nkGM
+         3cwQijCaZqSwdLd11FMFSksqkwgEjh05jIoAiZsQG1JEPfagurmEHaU2K/UABYwL4/N/
+         f/z/7dyIcVl6htI0RKbqj4ZFAQr0NEXAVliu7E7BuD8gqXt+Gg2/Qo2UakVPlLd/hU9y
+         W4AXMBQ5xRJw3Csl0G+7OfrvOOQnMB5ZeRcWzsMOFncn9my7wNiHIXoXCBihScfxpUUB
+         mXLLOZicMT+N7eQKmc5H/nAn/T3uNDQgtVlo8lgR8LmA9FMS23c/B3xb6/4CloqfPGph
+         c9zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729626776; x=1730231576;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P+SI51bEi1jKFAwZYIZIZnZEYLQDC0ghYZ/VkhDOKRw=;
+        b=EfRIomO+wl1b7DtG8sOorBjfQ1SO+/EoFQozRWlqL4wC8PF/3vLvWAiTMOa8r+Oq/B
+         4jWxx+w/mQTrvg8zQYYigXJDJVtUG1CxqKAjruhm4o20JaXDAhwaa9Xg2uxkUctXwT6i
+         azhzdrsCL42E9547I7OfFWtKyYclGXx1nkgArEX8ri60xZ2iwxYV6BPSzs5K6CXjO+ew
+         YnMUs/o6yk/w5301SeJ3JYzfSDSZ/0cdcbGr2mnOcrOdOPJvTm2sCLjst6DpM0r+jW9f
+         4e8bYR5yhKRrS2kQXgoCjH+evSRBzZHIq8Ktk3pup2y1MYQThYY6PpY3Ytl7gJSedG2s
+         F/oQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUSCjNsjF1MlDNgb6cVt1cEgy9caAebZpOtseIYaPxivdRAztP/040AXv94GD9O7btFJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG4ypTUuBTwBH5o2FejI2BKo68j+FN8D5OKbYQB4HIhuB3Ohf1
+	0N+JkAZvvYaS8qWgnSvtYJmLMPwuaJ2N4BVBPqLDwEKTKds0doioa2khIxCpw0ED5ao7OkPgQoQ
+	nxg==
+X-Google-Smtp-Source: AGHT+IEwPnDeQbkgHiRpbdb78i0IZVB0bvSwR5nuQygXUzqVgLEvYnoLPehcPVfIe+hCt8gRKA6p7HNV+TE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1818:b0:e2e:3131:337f with SMTP id
+ 3f1490d57ef6-e2e3a624ed7mr37276.4.1729626776174; Tue, 22 Oct 2024 12:52:56
+ -0700 (PDT)
+Date: Tue, 22 Oct 2024 12:52:54 -0700
+In-Reply-To: <ZxfZ_VSeOo2Vnmmg@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V13 03/14] KVM: x86: Fix Intel PT Host/Guest mode when
- host tracing also
-To: Sean Christopherson <seanjc@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
- Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Heiko Carstens <hca@linux.ibm.com>, Thomas Richter <tmricht@linux.ibm.com>,
- Hendrik Brueckner <brueckner@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach
- <mike.leach@linaro.org>, James Clark <james.clark@arm.com>,
- coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- Yicong Yang <yangyicong@hisilicon.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>, Will Deacon
- <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
- Ian Rogers <irogers@google.com>, Andi Kleen <ak@linux.intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- H Peter Anvin <hpa@zytor.com>, Kan Liang <kan.liang@linux.intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, mizhang@google.com,
- kvm@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20241014105124.24473-1-adrian.hunter@intel.com>
- <20241014105124.24473-4-adrian.hunter@intel.com>
- <Zw1iCMNSI4Lc0mSG@google.com>
- <b29e8ba4-5893-4ca0-b2cc-55d95f2fc968@intel.com>
- <ZxfTOQzcXTBEiXMG@google.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <ZxfTOQzcXTBEiXMG@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241021173455.2691973-1-roman.gushchin@linux.dev>
+ <Zxa60Ftbh8eN1MG5@casper.infradead.org> <ZxcKjwhMKmnHTX8Q@google.com>
+ <ZxcgR46zpW8uVKrt@casper.infradead.org> <ZxcrJHtIGckMo9Ni@google.com>
+ <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
+ <ZxfHNo1dUVcOLJYK@google.com> <ZxfZ_VSeOo2Vnmmg@casper.infradead.org>
+Message-ID: <ZxgCllkf_vka3sM-@google.com>
+Subject: Re: [PATCH v2] mm: page_alloc: move mlocked flag clearance into free_pages_prepare()
+From: Sean Christopherson <seanjc@google.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Yosry Ahmed <yosryahmed@google.com>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Hugh Dickins <hughd@google.com>, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 22/10/24 19:30, Sean Christopherson wrote:
-> On Tue, Oct 22, 2024, Adrian Hunter wrote:
->> On 14/10/24 21:25, Sean Christopherson wrote:
->>>> Fixes: 2ef444f1600b ("KVM: x86: Add Intel PT context switch for each vcpu")
->>>> Cc: stable@vger.kernel.org
->>>
->>> This is way, way too big for stable@.  Given that host/guest mode is disabled by
->>> default and that no one has complained about this, I think it's safe to say that
->>> unless we can provide a minimal patch, fixing this in LTS kernels isn't a priority.
->>>
->>> Alternatively, I'm tempted to simply drop support for host/guest mode.  It clearly
->>> hasn't been well tested, and given the lack of bug reports, likely doesn't have
->>> many, if any, users.  And I'm guessing the overhead needed to context switch all
->>> the RTIT MSRs makes tracing in the guest relatively useless.
->>
->> As a control flow trace, it is not affected by context switch overhead.
+On Tue, Oct 22, 2024, Matthew Wilcox wrote:
+> On Tue, Oct 22, 2024 at 08:39:34AM -0700, Sean Christopherson wrote:
+> > > Trying to or maybe set VM_SPECIAL in kvm_vcpu_mmap()? I am not
+> > > sure tbh, but this doesn't seem right.
+> > 
+> > Agreed.  VM_DONTEXPAND is the only VM_SPECIAL flag that is remotely appropriate,
+> > but setting VM_DONTEXPAND could theoretically break userspace, and other than
+> > preventing mlock(), there is no reason why the VMA can't be expanded.  I doubt
+> > any userspace VMM is actually remapping and expanding a vCPU mapping, but trying
+> > to fudge around this outside of core mm/ feels kludgy and has the potential to
+> > turn into a game of whack-a-mole.
 > 
-> Out of curiosity, how much is Intel PT used purely for control flow tracing, i.e.
-> without caring _at all_ about perceived execution time?
+> Actually, VM_PFNMAP is probably ideal.  We're not really mapping pages
+> here (I mean, they are pages, but they're not filesystem pages or
+> anonymous pages ... there's no rmap to them).  We're mapping blobs of
+> memory whose refcount is controlled by the vma that maps them.  We don't
+> particularly want to be able to splice() this memory, or do RDMA to it.
+> We probably do want gdb to be able to read it (... yes?)
 
-It can be used to try to understand how code went wrong.
+More than likely, yes.  And we probably want the pages to show up in core dumps,
+and be gup()-able.  I think that's the underlying problem with KVM's pages.  In
+many cases, we want them to show up as vm_normal_page() pages.  But for a few
+things, e.g. mlock(), it's nonsensical because they aren't entirely normal, just
+mostly normal.
 
-But timestamps would still indicate what was happening on different VCPUs
-at about the same time.
-
+> which might be a complication with a PFNMAP VMA.
 > 
->> Intel PT timestamps are also not affected by that.
-> 
-> Timestamps are affected because the guest will see inexplicable jumps in time.
-
-Tracing a task on the host sees jumps in time for scheduler
-context switches anyway.
-
-> Those gaps are unavoidable to some degree, but context switching on every entry
-> and exit is 
-> 
->> This patch reduces the MSR switching.
-> 
-> To be clear, I'm not objecting to any of the ideas in this patch, I'm "objecting"
-> to trying to put band-aids on KVM's existing implementation, which is clearly
-> buggy and, like far too many PMU-ish features in KVM, was probably developed
-> without any thought as to how it would affect use cases beyond the host admin
-> and the VM owner being a single person.  And I'm also objecting, vehemently, to
-> sending anything of this magnitude and complexity to LTS kernels.
-
-That's your call for sure.
-
-> 
->>> /me fiddles around
->>>
->>> LOL, yeah, this needs to be burned with fire.  It's wildly broken.  So for stable@,
->>
->> It doesn't seem wildly broken.  Just the VMM passing invalid CPUID
->> and KVM not validating it.
-> 
-> Heh, I agree with "just", but unfortunately "just ... not validating" a large
-> swath of userspace inputs is pretty widly broken.  More importantly, it's not
-> easy to fix.  E.g. KVM could require the inputs to exactly match hardware, but
-> that creates an ABI that I'm not entirely sure is desirable in the long term.
-
-Although the CPUID ABI does not really change.  KVM does not support
-emulating Intel PT, so accepting CPUID that the hardware cannot support
-seems like a bit of a lie.  Aren't there other features that KVM does not
-support if the hardware support is not there?
-
-To some degree, a testing and debugging feature does not have to be
-available in 100% of cases because it can still be useful when it is
-available.
-
-> 
->>> I'll post a patch to hide the module param if CONFIG_BROKEN=n (and will omit
->>> stable@ for the previous patch).
->>>
->>> Going forward, if someone actually cares about virtualizing PT enough to want to
->>> fix KVM's mess, then they can put in the effort to fix all the bugs, write all
->>> the tests, and in general clean up the implementation to meet KVM's current
->>> standards.  E.g. KVM usage of intel_pt_validate_cap() instead of KVM's guest CPUID
->>> and capabilities infrastructure needs to go.
->>
->> The problem below seems to be caused by not validating against the *host*
->> CPUID.  KVM's CPUID information seems to be invalid.
-> 
-> Yes.
-> 
->>> My vote is to queue the current code for removal, and revisit support after the
->>> mediated PMU has landed.  Because I don't see any point in supporting Intel PT
->>> without a mediated PMU, as host/guest mode really only makes sense if the entire
->>> PMU is being handed over to the guest.
->>
->> Why?
-> 
-> To simplify the implementation, and because I don't see how virtualizing Intel PT
-> without also enabling the mediated PMU makes any sense.
-> 
-> Conceptually, KVM's PT implementation is very, very similar to the mediated PMU.
-> They both effectively give the guest control of hardware when the vCPU starts
-> running, and take back control when the vCPU stops running.
-> 
-> If KVM allows Intel PT without the mediated PMU, then KVM and perf have to support
-> two separate implementations for the same model.  If virtualizing Intel PT is
-> allowed if and only if the mediated PMU is enabled, then .handle_intel_pt_intr()
-> goes away.  And on the flip side, it becomes super obvious that host usage of
-> Intel PT needs to be mutually exclusive with the mediated PMU.
-
-And forgo being able to trace mediated passthough with Intel PT ;-)
-
-> 
->> Intel PT PMU is programmed separately from the x86 PMU.
-> 
-> Except for the minor detail that Intel PT generates PMIs, and that PEBS can log
-> to PT buffers.  Oh, and giving the guest control of the PMU means host usage of
-> Intel PT will break the host *and* guest.  The host won't get PMIs, while the
-> guest will see spurious PMIs.
-
-Yes the PMI is in conflict if it is not also a VM-Exit
-
-Note that Intel PT does have a snapshot mode that doesn't use a PMI.
-Trace data continuously overwrites the ring buffer until the user asks
-for a snapshot.
-
-> 
-> So I don't see any reason to try to separate the two.
-
-OK
-
-> 
->>> [ 1458.686107] ------------[ cut here ]------------
->>> [ 1458.690766] Invalid MSR 588, please adapt vmx_possible_passthrough_msrs[]
->>
->> VMM is trying to set a non-existent MSR.  Looks like it has
->> decided there are more PT address filter MSRs that are architecturally
->> possible.
->>
->> I had no idea QEMU was so broken.  
-> 
-> It's not QEMU that's broken, it's KVM that's broken.  
-> 
->> I always just use -cpu host.
-> 
-> Yes, and that's exactly the problem.  The only people that have ever touched this
-> likely only ever use `-cpu host`, and so KVM's flaws have gone unnoticed.
-> 
->> What were you setting?
-> 
-> I tweaked your selftest to feed KVM garbage.
+> We've given a lot of flexibility to device drivers about how they
+> implement mmap() and I think that's now getting in the way of some
+> important improvements.  I want to see a simpler way of providing the
+> same functionality, and I'm not quite there yet.
 
 
