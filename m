@@ -1,126 +1,122 @@
-Return-Path: <kvm+bounces-29425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515C59AB490
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76A369AB495
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 19:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 809D01C2308D
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B46F1C231D0
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 17:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5DD1BD007;
-	Tue, 22 Oct 2024 16:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D341BC065;
+	Tue, 22 Oct 2024 17:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A8W+Kt2x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ceIZXixH"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BB81BC9F5;
-	Tue, 22 Oct 2024 16:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D8B1E4A4
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 17:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729616389; cv=none; b=LMx19gcrCHWDNsuvIF4hJ8E7oQJQPm8GfvEOFNYcTLstqCwLacG9Qshh1L5TQRA44eZJKShCo9KPqgCSCvpdDsd0OC0O1D/1LIWrDt6wruD8tFw1Rs4d7hICw0I/b+4zVyH2A/5gzvM0QDSLZyKQaouJkWUKYZXAzIcVpoZgOXg=
+	t=1729616471; cv=none; b=OX6DqMBQKgZ+TZk1S45RCFr84+kestfAF0wHH0+5bqnLOBqJCAc9hqp2R5jJ/pWJlohLIPpjLwwfXxq7vagI8zgD4uG2Arbf/h6k1vMkdXYRCA+kT1dVyhZuXSv91YnVat3+uePt+8zFPuOcNlZgYsFCMpiGi+j46JQdhCSBYYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729616389; c=relaxed/simple;
-	bh=VwKa+WbiBqrWRWS5cjfvU15kXhvt5HsDR7HGZdhNcA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uQNfQ5yEhPvhagd86qgUbJoJypdzYAlbX1FK1nZcc4RgLPWTuUPRrUfig45ynrEuJPhXx8e14klRjWXpXgZKX3C3OiYSPyL2EpKiSQyj+/7Snp8/3ohoy6fsguePiOweZnfymha+chhBM0j0AklBAoF8sBc9O4Hh1r0UjsQIPZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A8W+Kt2x; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M3403l0++IC5vLibquK9W7dEl1jgdPyJMeNaJ8pe8Uc=; b=A8W+Kt2xkOU0oftggZLkqP2b7l
-	7LLOyP22CczZYEpkuT60nFiydOm4HBeusR+5hwVnnBNvlXOoJgb29xJ6XIQ3VaBRbQLwa6+TZEe8o
-	o0oMCLPO1LpwlF6aGur6JlQ9DbRi2zMpa23n3SgxchjVzp9329qt1JA2l66KLQMfjIf46RJXJu/+N
-	EsUo9bCl1ICOHlH9CkZMGNDSTSZPJ3yPXql/W8pgVxTSmVLAXBTx3FkIruD1ltX2JPcs13CkVvzel
-	0xlsMWn75NcsG9vpRTMij6SPA1Zw2Ng+4YDJDEO0RBReAM2Y0w/B2gJ4NJ/b42jA0Zlt7hSdEqRur
-	W4FLD3FQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t3IEP-00000001pLb-1W8R;
-	Tue, 22 Oct 2024 16:59:41 +0000
-Date: Tue, 22 Oct 2024 17:59:41 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosryahmed@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] mm: page_alloc: move mlocked flag clearance into
- free_pages_prepare()
-Message-ID: <ZxfZ_VSeOo2Vnmmg@casper.infradead.org>
-References: <20241021173455.2691973-1-roman.gushchin@linux.dev>
- <Zxa60Ftbh8eN1MG5@casper.infradead.org>
- <ZxcKjwhMKmnHTX8Q@google.com>
- <ZxcgR46zpW8uVKrt@casper.infradead.org>
- <ZxcrJHtIGckMo9Ni@google.com>
- <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
- <ZxfHNo1dUVcOLJYK@google.com>
+	s=arc-20240116; t=1729616471; c=relaxed/simple;
+	bh=ifN6cqjsbcmVpO5CYfsnF/3RQKUBqSnhMcykdzi5jb4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JMReaxDPDcviZ7Wr13n3eoD+jlR2eowJXAg+DHtLWmpmQ5Nq6b9lirEG9XZVf4FoY+FGvRKy5EWthr4cggD8k4zzuV7/0llPa8uSLKufU9DShvECwL2L0Zxw1psCLY6Yek3SMOOzhTM71r8XMJ8Lxonxu2skw3MWu38d4BRaOXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ceIZXixH; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e6d31b3bdso6815280b3a.2
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729616469; x=1730221269; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jz6HPAUfPJFv2cSc6XtRrNpTzfpz4jKdakYIVYEvHsQ=;
+        b=ceIZXixHrUxi8vI2mg7nuMSmPm9EK4NbX9bdd3yPhNRAE/VY3ZoNnnqv/XKSdUE100
+         piaD/JVaUe5vE1Q60+kDOc0q8ljpOcP9silpkjlZeEy7M0Xc/wQr1xd8ywk3Xgh3XtZP
+         qT1QhbCYVXdSy2EekVNLsJ0td6pXFXNBvJcXMis+2eIdBvS+E3F0AJxiPENYL1++QdF/
+         CZR864Eg0SXPuv62OMkkyV8+9hZWxnoB+fTcwgaA1Ie/mtTaW/tTWaO9h4MjsYOf1mi0
+         VJn9v4aXR+B2agDDNu4zgKI2qhz9aARMzeH2HCNuw04/vEYmWI/VR0wLYtrBYzc8NPlL
+         4WPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729616469; x=1730221269;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jz6HPAUfPJFv2cSc6XtRrNpTzfpz4jKdakYIVYEvHsQ=;
+        b=c5BlaaK3j+W4b8WdRAxMkF7qh0CesyCkHaj2rhbzkd2IKMeWujMWOfOAo7ZU/lWRfV
+         agoR1dHh9KbXsVD4OpSp5WqseRogelTx9u45aH7hJP9JJ5/kTZTBTQ8E8lnHehLqQRJ1
+         vkw5emk4ZTma501JC0SmEBstKWoyXJAJUtRxO/2v8HXEVVO8xqxyNIz/2sTD4mym+SS/
+         /1wXXNHaGu9h+XczvSP3DBt0HQajmqllh5jTuNNzwlKxfyFZwyXG1d37NWK1kQai+iEh
+         MFSGLyuoLT3fP81KDYLcExR58Tyuiu6K56UK3ut0jHL3wv8ps2HdJvn6oxZPtCISB29Y
+         SZ2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXxCMuTDOlIFo1n78s1caWdWZwMoq37RxlJd3yo4ZIF9nHZVE+/WJfN8SG54zlKe/oa6BM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv8QYz9jdj6Pd34PbCGyKK3b7SNLOCj2gQxYD4z5BjaYoA82M6
+	qU3wRqSq9W3A/2xupToIyc/RC9p2Jd2xqSFdRZxiPiSEHe0oBr+1ZCh+wdxaXkr/NXE4eue0VSc
+	mRg==
+X-Google-Smtp-Source: AGHT+IHnyZ3xuVY7Clm+eBIYyW7Mrfkpkys2oJltNzld9dORGFnn5Yu6KuNOVHJzto/+35IL38mQWUk0W7o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a62:b403:0:b0:71e:4ad1:b133 with SMTP id
+ d2e1a72fcca58-71ea32daff6mr27874b3a.4.1729616468773; Tue, 22 Oct 2024
+ 10:01:08 -0700 (PDT)
+Date: Tue, 22 Oct 2024 10:01:07 -0700
+In-Reply-To: <20241022100812.4955-1-jgross@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZxfHNo1dUVcOLJYK@google.com>
+Mime-Version: 1.0
+References: <20241022100812.4955-1-jgross@suse.com>
+Message-ID: <ZxfaU9cCS6556AKg@google.com>
+Subject: Re: [PATCH] kvm/x86: simplify kvm_mmu_do_page_fault() a little bit
+From: Sean Christopherson <seanjc@google.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Oct 22, 2024 at 08:39:34AM -0700, Sean Christopherson wrote:
-> On Tue, Oct 22, 2024, Yosry Ahmed wrote:
-> > Even if we don't want mlock() to err in this case, shouldn't we just do
-> > nothing?
+On Tue, Oct 22, 2024, Juergen Gross wrote:
+> Testing whether to call kvm_tdp_page_fault() or
+> vcpu->arch.mmu->page_fault() doesn't make sense, as kvm_tdp_page_fault()
+> is selected only if vcpu->arch.mmu->page_fault == kvm_tdp_page_fault.
+
+It does when retpolines are enabled and significantly inflate the cost of the
+indirect call.  This is a hot path in various scenarios, but KVM can't use
+static_call() to avoid the retpoline due to mmu->page_fault being a property of
+the current vCPU.  Only kvm_tdp_page_fault() is special cased because all other
+mmu->page_fault targets are slow-ish and/or we don't care terribly about their
+performance.
+
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+>  arch/x86/kvm/mmu/mmu_internal.h | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 > 
-> Ideally, yes.
-
-Agreed.  There's no sense in having this count against the NR_MLOCK
-stats, for example.
-
-> > I see a lot of checks at the beginning of mlock_fixup() to check
-> > whether we should operate on the vma, perhaps we should also check for
-> > these KVM vmas?
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index c98827840e07..6eae54aa1160 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -322,10 +322,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
+>  	}
+>  
+> -	if (IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) && fault.is_tdp)
+> -		r = kvm_tdp_page_fault(vcpu, &fault);
+> -	else
+> -		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
+> +	r = vcpu->arch.mmu->page_fault(vcpu, &fault);
+>  
+>  	/*
+>  	 * Not sure what's happening, but punt to userspace and hope that
+> -- 
+> 2.43.0
 > 
-> Definitely not.  KVM may be doing something unexpected, but the VMA certainly
-> isn't unique enough to warrant mm/ needing dedicated handling.
-> 
-> Focusing on KVM is likely a waste of time.  There are probably other subsystems
-> and/or drivers that .mmap() kernel allocated memory in the same way.  Odds are
-> good KVM is just the messenger, because syzkaller knows how to beat on KVM.  And
-> even if there aren't any other existing cases, nothing would prevent them from
-> coming along in the future.
-
-They all need to be fixed.  How to do that is not an answer I have at
-this point.  Ideally we can fix them without changing them all immediately
-(but they will all need to be fixed eventually because pages will no
-longer have a refcount and so get_page() will need to go away ...)
-
-> > Trying to or maybe set VM_SPECIAL in kvm_vcpu_mmap()? I am not
-> > sure tbh, but this doesn't seem right.
-> 
-> Agreed.  VM_DONTEXPAND is the only VM_SPECIAL flag that is remotely appropriate,
-> but setting VM_DONTEXPAND could theoretically break userspace, and other than
-> preventing mlock(), there is no reason why the VMA can't be expanded.  I doubt
-> any userspace VMM is actually remapping and expanding a vCPU mapping, but trying
-> to fudge around this outside of core mm/ feels kludgy and has the potential to
-> turn into a game of whack-a-mole.
-
-Actually, VM_PFNMAP is probably ideal.  We're not really mapping pages
-here (I mean, they are pages, but they're not filesystem pages or
-anonymous pages ... there's no rmap to them).  We're mapping blobs of
-memory whose refcount is controlled by the vma that maps them.  We don't
-particularly want to be able to splice() this memory, or do RDMA to it.
-We probably do want gdb to be able to read it (... yes?) which might be
-a complication with a PFNMAP VMA.
-
-We've given a lot of flexibility to device drivers about how they
-implement mmap() and I think that's now getting in the way of some
-important improvements.  I want to see a simpler way of providing the
-same functionality, and I'm not quite there yet.
 
