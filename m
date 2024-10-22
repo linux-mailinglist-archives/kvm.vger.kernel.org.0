@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-29407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B529AA345
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 15:36:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F929AA346
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 15:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 531B9B225FA
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:36:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6809284240
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 13:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F4719E999;
-	Tue, 22 Oct 2024 13:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7462E19E833;
+	Tue, 22 Oct 2024 13:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="elCuVRaH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kkiiCEjD"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A137019DFA2
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 13:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9CF19CC3E
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 13:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729604179; cv=none; b=uELgqyzGBfFzmkJ9bg1Cb3/KG0oQBuox5nviSiF/QpX2yywsCkFxt/7faZcBekx1FVU7US64PckYXXo2QuJaJLnMe4uBAswsyWA3Gw6F+f5zWoh77pEV2DJCjnUrLMZ94eUiQcNBIok34sHCDBm9NO3omt3SXeVkrNGyFvWn7A4=
+	t=1729604184; cv=none; b=fxpkG1qoZmrr/SwyNuYsdLC4/UvgnK/soP2R5NdvG6jX0ZXQKM3M9GxTGdd0WOzuaBOWiP73OsIOLQDZJa7x+/2ND95eG+J1BkP85CQLRCSKBhRmLvmeI6fXBEtbDJi4A1CY37f3Fn0f7atKHY3w5C7a+hERfvHvuAEldCyIh9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729604179; c=relaxed/simple;
-	bh=CXEnu+acIaMUIG1n6iHnGCDN/IL7pMz2PY+de6Mno7g=;
+	s=arc-20240116; t=1729604184; c=relaxed/simple;
+	bh=UxShiMoLv5ztumoy5EWz7J8OcY/aVPzZnSshl0fwQyY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gfbojkslhEETbdxTlZwLB2IEGxxCm8nAySDJDhDWLl233YNxPuenMgEziE4ZPLOoOToHYqo159AjRDfK1YH4k9xmFR27cu8IhD1LoBWuprHMfli0Q8SELPs9EkUnWRr1a2O9EH9EoDhCB23iukmNDkaaePscR3vCWBTNUGDiYUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=elCuVRaH; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=WA5rWlVQlYp8tf183R9S3MIsjn5FQ4sVbT3t0Kv7tOrjJPDB9h6++DdN13R1TZEGnc/p6NsIk62qwsaU2htBFLwkZg2p0jr956uNoQvks/zlzna9bqKo4PjtiI8MTYZZTaGbm1B2pfT8y0iQ3HTaPBU+zFolqXLGa+wa/AxfrnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kkiiCEjD; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729604176; x=1761140176;
+  t=1729604182; x=1761140182;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CXEnu+acIaMUIG1n6iHnGCDN/IL7pMz2PY+de6Mno7g=;
-  b=elCuVRaHGDRdNrlKWd6ZYRcjVHewsBYAGEnzmiGgD/WnAMzI+gy/mEBG
-   l4/TR007+coy/+CEpG+uNuKNRMx/7OcjbJ9PFpB9ePctC15Ix25T3DBcl
-   KwJORc+dakgfHG3Ao+STB9Sq13jaiS3ZkZid6oLqX4iqZvU+2vjoOL3gT
-   lcZhCAm4KThbvg6xjfat6YtyWu2pOQQ0J56ntvDeX74gB9hj2I4UHyzPQ
-   tdhi5qncDgXdHnXZYRSLf1Dl39NaO8wGk+PdIMtLRcBFc99EJVf6NC6BO
-   Vhy7hjIqdb2O85o9bVJa/NgeA6UeT+g4K/UB/tuSSixtygHcNDoqdUWgD
-   g==;
-X-CSE-ConnectionGUID: kBim8GQqQKarLm9xI7hriw==
-X-CSE-MsgGUID: B68LB6YMQUyGM+7/GuWpTQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="46603637"
+  bh=UxShiMoLv5ztumoy5EWz7J8OcY/aVPzZnSshl0fwQyY=;
+  b=kkiiCEjDv4Rx45dj09V6nMuRTI3xizcxOuyseOwwi7AV9C3UyLg1I6I8
+   DthVxOD4FLtYKXCU3nQWe6nEVw/PeCxpbKv6SEn1HIFlnfNl+6aShgWSe
+   pUl+l3srIA2Z2KEWMDGDFj6ccA44VNy+yplqQMzZZdn/Rxbn66rfV2xph
+   bsy4JCS7yrWONoxhwlxcskzYoEeVPB8AydTHeIwvpe2hGAfArhC567TQg
+   NzK5hTxcgzAbkKlATH3IXfaFBiagbzrgtDCw/gXGmcmuM85KSsbY7/hVd
+   HPuSGuC6c/GMDKaUjMi4LcT6S6TffzLQHJJC5GWm8OLwoGnhiM05d+SEt
+   w==;
+X-CSE-ConnectionGUID: LRnt3cRRRCaY4iw2xWN0xg==
+X-CSE-MsgGUID: 9qtiM8ooRVSKl2ZqFijZ3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="46603668"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="46603637"
+   d="scan'208";a="46603668"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 06:36:16 -0700
-X-CSE-ConnectionGUID: oNl6Bm++SPm6iZAJ/n88cA==
-X-CSE-MsgGUID: g2AJMVwtSWCxNJn9BzLwHw==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 06:36:22 -0700
+X-CSE-ConnectionGUID: nugYYcSVQbC7Rdl5GFbc9g==
+X-CSE-MsgGUID: LnksyR5YTVerAb/ci842ow==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="79782271"
+   d="scan'208";a="79782308"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orviesa009.jf.intel.com with ESMTP; 22 Oct 2024 06:36:10 -0700
+  by orviesa009.jf.intel.com with ESMTP; 22 Oct 2024 06:36:17 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -84,9 +84,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>
-Subject: [PATCH v4 2/9] hw/core: Make CPU topology enumeration arch-agnostic
-Date: Tue, 22 Oct 2024 21:51:44 +0800
-Message-Id: <20241022135151.2052198-3-zhao1.liu@intel.com>
+Subject: [PATCH v4 3/9] qapi/qom: Define cache enumeration and properties for machine
+Date: Tue, 22 Oct 2024 21:51:45 +0800
+Message-Id: <20241022135151.2052198-4-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241022135151.2052198-1-zhao1.liu@intel.com>
 References: <20241022135151.2052198-1-zhao1.liu@intel.com>
@@ -98,684 +98,294 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Cache topology needs to be defined based on CPU topology levels. Thus,
-define CPU topology enumeration in qapi/machine.json to make it generic
-for all architectures.
+The x86 and ARM need to allow user to configure cache properties
+(current only topology):
+ * For x86, the default cache topology model (of max/host CPU) does not
+   always match the Host's real physical cache topology. Performance can
+   increase when the configured virtual topology is closer to the
+   physical topology than a default topology would be.
+ * For ARM, QEMU can't get the cache topology information from the CPU
+   registers, then user configuration is necessary. Additionally, the
+   cache information is also needed for MPAM emulation (for TCG) to
+   build the right PPTT.
 
-To match the general topology naming style, rename CPU_TOPO_LEVEL_* to
-CPU_TOPOLOGY_LEVEL_*, and rename SMT and package levels to thread and
-socket.
+Define smp-cache related enumeration and properties in QAPI, so that
+user could configure cache properties for SMP system through -machine in
+the subsequent patch.
 
-Also, enumerate additional topology levels for non-i386 arches, and add
-a CPU_TOPOLOGY_LEVEL_DEFAULT to help future smp-cache object to work
-with compatibility requirement of arch-specific cache topology models.
+Cache enumeration (CacheLevelAndType) is implemented as the combination
+of cache level (level 1/2/3) and cache type (data/instruction/unified).
 
+Currently, separated L1 cache (L1 data cache and L1 instruction cache)
+with unified higher-level cache (e.g., unified L2 and L3 caches), is the
+most common cache architectures.
+
+Therefore, enumerate the L1 D-cache, L1 I-cache, L2 cache and L3 cache
+with smp-cache object to add the basic cache topology support. Other
+kinds of caches (e.g., L1 unified or L2/L3 separated caches) can be
+added directly into CacheLevelAndType if necessary.
+
+Cache properties (SmpCacheProperties) currently only contains cache
+topology information, and other cache properties can be added in it
+if necessary.
+
+Note, define cache topology based on CPU topology level with two
+reasons:
+
+ 1. In practice, a cache will always be bound to the CPU container
+    (either private in the CPU container or shared among multiple
+    containers), and CPU container is often expressed in terms of CPU
+    topology level.
+ 2. The x86's cache-related CPUIDs encode cache topology based on APIC
+    ID's CPU topology layout. And the ACPI PPTT table that ARM/RISCV
+    relies on also requires CPU containers to help indicate the private
+    shared hierarchy of the cache. Therefore, for SMP systems, it is
+    natural to use the CPU topology hierarchy directly in QEMU to define
+    the cache topology.
+
+With smp-cache QAPI support, add smp cache topology for machine by
+parsing the smp-cache object list.
+
+Also add the helper to access/update cache topology level of machine.
+
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 ---
-Changes since Patch v3:
- * Dropped "invalid" level to avoid an unsettable option. (Daniel)
+Suggested by credit:
+ * Referred to Daniel's suggestion to introduce cache object list.
 ---
- hw/i386/x86-common.c       |   4 +-
- include/hw/i386/topology.h |  23 ++----
- qapi/machine-common.json   |  44 +++++++++++-
- target/i386/cpu.c          | 144 ++++++++++++++++++-------------------
- target/i386/cpu.h          |   4 +-
- 5 files changed, 123 insertions(+), 96 deletions(-)
+Changes since Patch v3:
+ * Dropped "invalid" level check since now we don't enumerate it in
+   QAPI. (Daniel)
+ * Added a helper to update MachineState.smp_cache (
+   machine_set_cache_topo_level).
+---
+ hw/core/machine-smp.c    | 37 +++++++++++++++++++++++++++++
+ hw/core/machine.c        | 44 +++++++++++++++++++++++++++++++++++
+ include/hw/boards.h      | 12 ++++++++++
+ qapi/machine-common.json | 50 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 143 insertions(+)
 
-diff --git a/hw/i386/x86-common.c b/hw/i386/x86-common.c
-index b86c38212eab..bc360a9ea44b 100644
---- a/hw/i386/x86-common.c
-+++ b/hw/i386/x86-common.c
-@@ -273,12 +273,12 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
- 
-     if (ms->smp.modules > 1) {
-         env->nr_modules = ms->smp.modules;
--        set_bit(CPU_TOPO_LEVEL_MODULE, env->avail_cpu_topo);
-+        set_bit(CPU_TOPOLOGY_LEVEL_MODULE, env->avail_cpu_topo);
+diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+index 5d8d7edcbd3f..c6d90cd6d413 100644
+--- a/hw/core/machine-smp.c
++++ b/hw/core/machine-smp.c
+@@ -261,6 +261,31 @@ void machine_parse_smp_config(MachineState *ms,
      }
- 
-     if (ms->smp.dies > 1) {
-         env->nr_dies = ms->smp.dies;
--        set_bit(CPU_TOPO_LEVEL_DIE, env->avail_cpu_topo);
-+        set_bit(CPU_TOPOLOGY_LEVEL_DIE, env->avail_cpu_topo);
-     }
- 
-     /*
-diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-index 48b43edc5a90..b2c8bf2de158 100644
---- a/include/hw/i386/topology.h
-+++ b/include/hw/i386/topology.h
-@@ -39,7 +39,7 @@
-  *  CPUID Fn8000_0008_ECX[ApicIdCoreIdSize[3:0]] is set to apicid_core_width().
-  */
- 
--
-+#include "qapi/qapi-types-machine-common.h"
- #include "qemu/bitops.h"
- 
- /*
-@@ -62,22 +62,7 @@ typedef struct X86CPUTopoInfo {
-     unsigned threads_per_core;
- } X86CPUTopoInfo;
- 
--#define CPU_TOPO_LEVEL_INVALID CPU_TOPO_LEVEL_MAX
--
--/*
-- * CPUTopoLevel is the general i386 topology hierarchical representation,
-- * ordered by increasing hierarchical relationship.
-- * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
-- * or AMD (CPUID[0x80000026]).
-- */
--enum CPUTopoLevel {
--    CPU_TOPO_LEVEL_SMT,
--    CPU_TOPO_LEVEL_CORE,
--    CPU_TOPO_LEVEL_MODULE,
--    CPU_TOPO_LEVEL_DIE,
--    CPU_TOPO_LEVEL_PACKAGE,
--    CPU_TOPO_LEVEL_MAX,
--};
-+#define CPU_TOPOLOGY_LEVEL_INVALID CPU_TOPOLOGY_LEVEL__MAX
- 
- /* Return the bit width needed for 'count' IDs */
- static unsigned apicid_bitwidth_for_count(unsigned count)
-@@ -213,8 +198,8 @@ static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
-  */
- static inline bool x86_has_extended_topo(unsigned long *topo_bitmap)
- {
--    return test_bit(CPU_TOPO_LEVEL_MODULE, topo_bitmap) ||
--           test_bit(CPU_TOPO_LEVEL_DIE, topo_bitmap);
-+    return test_bit(CPU_TOPOLOGY_LEVEL_MODULE, topo_bitmap) ||
-+           test_bit(CPU_TOPOLOGY_LEVEL_DIE, topo_bitmap);
  }
  
- #endif /* HW_I386_TOPOLOGY_H */
++bool machine_parse_smp_cache(MachineState *ms,
++                             const SmpCachePropertiesList *caches,
++                             Error **errp)
++{
++    const SmpCachePropertiesList *node;
++    DECLARE_BITMAP(caches_bitmap, CACHE_LEVEL_AND_TYPE__MAX);
++
++    for (node = caches; node; node = node->next) {
++        /* Prohibit users from repeating settings. */
++        if (test_bit(node->value->cache, caches_bitmap)) {
++            error_setg(errp,
++                       "Invalid cache properties: %s. "
++                       "The cache properties are duplicated",
++                       CacheLevelAndType_str(node->value->cache));
++            return false;
++        }
++
++        machine_set_cache_topo_level(ms, node->value->cache,
++                                     node->value->topology);
++        set_bit(node->value->cache, caches_bitmap);
++    }
++
++    return true;
++}
++
+ unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
+ {
+     return ms->smp.cores * ms->smp.modules * ms->smp.clusters * ms->smp.dies;
+@@ -270,3 +295,15 @@ unsigned int machine_topo_get_threads_per_socket(const MachineState *ms)
+ {
+     return ms->smp.threads * machine_topo_get_cores_per_socket(ms);
+ }
++
++CpuTopologyLevel machine_get_cache_topo_level(const MachineState *ms,
++                                              CacheLevelAndType cache)
++{
++    return ms->smp_cache.props[cache].topology;
++}
++
++void machine_set_cache_topo_level(MachineState *ms, CacheLevelAndType cache,
++                                  CpuTopologyLevel level)
++{
++    ms->smp_cache.props[cache].topology = level;
++}
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index adaba17ebac1..518beb9f883a 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -932,6 +932,40 @@ static void machine_set_smp(Object *obj, Visitor *v, const char *name,
+     machine_parse_smp_config(ms, config, errp);
+ }
+ 
++static void machine_get_smp_cache(Object *obj, Visitor *v, const char *name,
++                                  void *opaque, Error **errp)
++{
++    MachineState *ms = MACHINE(obj);
++    SmpCache *cache = &ms->smp_cache;
++    SmpCachePropertiesList *head = NULL;
++    SmpCachePropertiesList **tail = &head;
++
++    for (int i = 0; i < CACHE_LEVEL_AND_TYPE__MAX; i++) {
++        SmpCacheProperties *node = g_new(SmpCacheProperties, 1);
++
++        node->cache = cache->props[i].cache;
++        node->topology = cache->props[i].topology;
++        QAPI_LIST_APPEND(tail, node);
++    }
++
++    visit_type_SmpCachePropertiesList(v, name, &head, errp);
++    qapi_free_SmpCachePropertiesList(head);
++}
++
++static void machine_set_smp_cache(Object *obj, Visitor *v, const char *name,
++                                  void *opaque, Error **errp)
++{
++    MachineState *ms = MACHINE(obj);
++    SmpCachePropertiesList *caches;
++
++    if (!visit_type_SmpCachePropertiesList(v, name, &caches, errp)) {
++        return;
++    }
++
++    machine_parse_smp_cache(ms, caches, errp);
++    qapi_free_SmpCachePropertiesList(caches);
++}
++
+ static void machine_get_boot(Object *obj, Visitor *v, const char *name,
+                             void *opaque, Error **errp)
+ {
+@@ -1057,6 +1091,11 @@ static void machine_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "smp",
+         "CPU topology");
+ 
++    object_class_property_add(oc, "smp-cache", "SmpCachePropertiesWrapper",
++        machine_get_smp_cache, machine_set_smp_cache, NULL, NULL);
++    object_class_property_set_description(oc, "smp-cache",
++        "Cache properties list for SMP machine");
++
+     object_class_property_add(oc, "phandle-start", "int",
+         machine_get_phandle_start, machine_set_phandle_start,
+         NULL, NULL);
+@@ -1195,6 +1234,11 @@ static void machine_initfn(Object *obj)
+     ms->smp.cores = 1;
+     ms->smp.threads = 1;
+ 
++    for (int i = 0; i < CACHE_LEVEL_AND_TYPE__MAX; i++) {
++        ms->smp_cache.props[i].cache = (CacheLevelAndType)i;
++        ms->smp_cache.props[i].topology = CPU_TOPOLOGY_LEVEL_DEFAULT;
++    }
++
+     machine_copy_boot_config(ms, &(BootConfiguration){ 0 });
+ }
+ 
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 5966069baab3..f7591d54a3d3 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -44,8 +44,15 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                                Error **errp);
+ void machine_parse_smp_config(MachineState *ms,
+                               const SMPConfiguration *config, Error **errp);
++bool machine_parse_smp_cache(MachineState *ms,
++                             const SmpCachePropertiesList *caches,
++                             Error **errp);
+ unsigned int machine_topo_get_cores_per_socket(const MachineState *ms);
+ unsigned int machine_topo_get_threads_per_socket(const MachineState *ms);
++CpuTopologyLevel machine_get_cache_topo_level(const MachineState *ms,
++                                              CacheLevelAndType cache);
++void machine_set_cache_topo_level(MachineState *ms, CacheLevelAndType cache,
++                                  CpuTopologyLevel level);
+ void machine_memory_devices_init(MachineState *ms, hwaddr base, uint64_t size);
+ 
+ /**
+@@ -369,6 +376,10 @@ typedef struct CpuTopology {
+     unsigned int max_cpus;
+ } CpuTopology;
+ 
++typedef struct SmpCache {
++    SmpCacheProperties props[CACHE_LEVEL_AND_TYPE__MAX];
++} SmpCache;
++
+ /**
+  * MachineState:
+  */
+@@ -419,6 +430,7 @@ struct MachineState {
+     AccelState *accelerator;
+     CPUArchIdList *possible_cpus;
+     CpuTopology smp;
++    SmpCache smp_cache;
+     struct NVDIMMState *nvdimms_state;
+     struct NumaState *numa_state;
+ };
 diff --git a/qapi/machine-common.json b/qapi/machine-common.json
-index b64e4895cfd7..1a5687fb99fc 100644
+index 1a5687fb99fc..298e51f373a3 100644
 --- a/qapi/machine-common.json
 +++ b/qapi/machine-common.json
-@@ -5,7 +5,7 @@
- # See the COPYING file in the top-level directory.
- 
- ##
--# = Machines S390 data types
-+# = Common machine types
- ##
- 
- ##
-@@ -18,3 +18,45 @@
- ##
- { 'enum': 'S390CpuEntitlement',
-   'data': [ 'auto', 'low', 'medium', 'high' ] }
+@@ -60,3 +60,53 @@
+ { 'enum': 'CpuTopologyLevel',
+   'data': [ 'thread', 'core', 'module', 'cluster', 'die',
+             'socket', 'book', 'drawer', 'default' ] }
 +
 +##
-+# @CpuTopologyLevel:
++# @CacheLevelAndType:
 +#
-+# An enumeration of CPU topology levels.
++# Caches a system may have.  The enumeration value here is the
++# combination of cache level and cache type.
 +#
-+# @thread: thread level, which would also be called SMT level or
-+#     logical processor level.  The @threads option in
-+#     SMPConfiguration is used to configure the topology of this
-+#     level.
++# @l1d: L1 data cache.
 +#
-+# @core: core level.  The @cores option in SMPConfiguration is used
-+#     to configure the topology of this level.
++# @l1i: L1 instruction cache.
 +#
-+# @module: module level.  The @modules option in SMPConfiguration is
-+#     used to configure the topology of this level.
++# @l2: L2 (unified) cache.
 +#
-+# @cluster: cluster level.  The @clusters option in SMPConfiguration
-+#     is used to configure the topology of this level.
-+#
-+# @die: die level.  The @dies option in SMPConfiguration is used to
-+#     configure the topology of this level.
-+#
-+# @socket: socket level, which would also be called package level.
-+#     The @sockets option in SMPConfiguration is used to configure
-+#     the topology of this level.
-+#
-+# @book: book level.  The @books option in SMPConfiguration is used
-+#     to configure the topology of this level.
-+#
-+# @drawer: drawer level.  The @drawers option in SMPConfiguration is
-+#     used to configure the topology of this level.
-+#
-+# @default: default level.  Some architectures will have default
-+#     topology settings (e.g., cache topology), and this special
-+#     level means following the architecture-specific settings.
++# @l3: L3 (unified) cache
 +#
 +# Since: 9.2
 +##
-+{ 'enum': 'CpuTopologyLevel',
-+  'data': [ 'thread', 'core', 'module', 'cluster', 'die',
-+            'socket', 'book', 'drawer', 'default' ] }
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 638de9c29c4c..f1cbcaf9f4ad 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -235,23 +235,23 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
-                        0 /* Invalid value */)
- 
- static uint32_t max_thread_ids_for_cache(X86CPUTopoInfo *topo_info,
--                                         enum CPUTopoLevel share_level)
-+                                         enum CpuTopologyLevel share_level)
- {
-     uint32_t num_ids = 0;
- 
-     switch (share_level) {
--    case CPU_TOPO_LEVEL_CORE:
-+    case CPU_TOPOLOGY_LEVEL_CORE:
-         num_ids = 1 << apicid_core_offset(topo_info);
-         break;
--    case CPU_TOPO_LEVEL_DIE:
-+    case CPU_TOPOLOGY_LEVEL_DIE:
-         num_ids = 1 << apicid_die_offset(topo_info);
-         break;
--    case CPU_TOPO_LEVEL_PACKAGE:
-+    case CPU_TOPOLOGY_LEVEL_SOCKET:
-         num_ids = 1 << apicid_pkg_offset(topo_info);
-         break;
-     default:
-         /*
--         * Currently there is no use case for SMT and MODULE, so use
-+         * Currently there is no use case for THREAD and MODULE, so use
-          * assert directly to facilitate debugging.
-          */
-         g_assert_not_reached();
-@@ -300,19 +300,19 @@ static void encode_cache_cpuid4(CPUCacheInfo *cache,
- }
- 
- static uint32_t num_threads_by_topo_level(X86CPUTopoInfo *topo_info,
--                                          enum CPUTopoLevel topo_level)
-+                                          enum CpuTopologyLevel topo_level)
- {
-     switch (topo_level) {
--    case CPU_TOPO_LEVEL_SMT:
-+    case CPU_TOPOLOGY_LEVEL_THREAD:
-         return 1;
--    case CPU_TOPO_LEVEL_CORE:
-+    case CPU_TOPOLOGY_LEVEL_CORE:
-         return topo_info->threads_per_core;
--    case CPU_TOPO_LEVEL_MODULE:
-+    case CPU_TOPOLOGY_LEVEL_MODULE:
-         return topo_info->threads_per_core * topo_info->cores_per_module;
--    case CPU_TOPO_LEVEL_DIE:
-+    case CPU_TOPOLOGY_LEVEL_DIE:
-         return topo_info->threads_per_core * topo_info->cores_per_module *
-                topo_info->modules_per_die;
--    case CPU_TOPO_LEVEL_PACKAGE:
-+    case CPU_TOPOLOGY_LEVEL_SOCKET:
-         return topo_info->threads_per_core * topo_info->cores_per_module *
-                topo_info->modules_per_die * topo_info->dies_per_pkg;
-     default:
-@@ -322,18 +322,18 @@ static uint32_t num_threads_by_topo_level(X86CPUTopoInfo *topo_info,
- }
- 
- static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
--                                            enum CPUTopoLevel topo_level)
-+                                            enum CpuTopologyLevel topo_level)
- {
-     switch (topo_level) {
--    case CPU_TOPO_LEVEL_SMT:
-+    case CPU_TOPOLOGY_LEVEL_THREAD:
-         return 0;
--    case CPU_TOPO_LEVEL_CORE:
-+    case CPU_TOPOLOGY_LEVEL_CORE:
-         return apicid_core_offset(topo_info);
--    case CPU_TOPO_LEVEL_MODULE:
-+    case CPU_TOPOLOGY_LEVEL_MODULE:
-         return apicid_module_offset(topo_info);
--    case CPU_TOPO_LEVEL_DIE:
-+    case CPU_TOPOLOGY_LEVEL_DIE:
-         return apicid_die_offset(topo_info);
--    case CPU_TOPO_LEVEL_PACKAGE:
-+    case CPU_TOPOLOGY_LEVEL_SOCKET:
-         return apicid_pkg_offset(topo_info);
-     default:
-         g_assert_not_reached();
-@@ -341,18 +341,18 @@ static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
-     return 0;
- }
- 
--static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
-+static uint32_t cpuid1f_topo_type(enum CpuTopologyLevel topo_level)
- {
-     switch (topo_level) {
--    case CPU_TOPO_LEVEL_INVALID:
-+    case CPU_TOPOLOGY_LEVEL_INVALID:
-         return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
--    case CPU_TOPO_LEVEL_SMT:
-+    case CPU_TOPOLOGY_LEVEL_THREAD:
-         return CPUID_1F_ECX_TOPO_LEVEL_SMT;
--    case CPU_TOPO_LEVEL_CORE:
-+    case CPU_TOPOLOGY_LEVEL_CORE:
-         return CPUID_1F_ECX_TOPO_LEVEL_CORE;
--    case CPU_TOPO_LEVEL_MODULE:
-+    case CPU_TOPOLOGY_LEVEL_MODULE:
-         return CPUID_1F_ECX_TOPO_LEVEL_MODULE;
--    case CPU_TOPO_LEVEL_DIE:
-+    case CPU_TOPOLOGY_LEVEL_DIE:
-         return CPUID_1F_ECX_TOPO_LEVEL_DIE;
-     default:
-         /* Other types are not supported in QEMU. */
-@@ -370,17 +370,17 @@ static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
-     unsigned long level, base_level, next_level;
-     uint32_t num_threads_next_level, offset_next_level;
- 
--    assert(count <= CPU_TOPO_LEVEL_PACKAGE);
-+    assert(count <= CPU_TOPOLOGY_LEVEL_SOCKET);
- 
-     /*
-      * Find the No.(count + 1) topology level in avail_cpu_topo bitmap.
--     * The search starts from bit 0 (CPU_TOPO_LEVEL_SMT).
-+     * The search starts from bit 0 (CPU_TOPOLOGY_LEVEL_THREAD).
-      */
--    level = CPU_TOPO_LEVEL_SMT;
-+    level = CPU_TOPOLOGY_LEVEL_THREAD;
-     base_level = level;
-     for (int i = 0; i <= count; i++) {
-         level = find_next_bit(env->avail_cpu_topo,
--                              CPU_TOPO_LEVEL_PACKAGE,
-+                              CPU_TOPOLOGY_LEVEL_SOCKET,
-                               base_level);
- 
-         /*
-@@ -388,20 +388,20 @@ static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
-          * and it just encodes the invalid level (all fields are 0)
-          * into the last subleaf of 0x1f.
-          */
--        if (level == CPU_TOPO_LEVEL_PACKAGE) {
--            level = CPU_TOPO_LEVEL_INVALID;
-+        if (level == CPU_TOPOLOGY_LEVEL_SOCKET) {
-+            level = CPU_TOPOLOGY_LEVEL_INVALID;
-             break;
-         }
-         /* Search the next level. */
-         base_level = level + 1;
-     }
- 
--    if (level == CPU_TOPO_LEVEL_INVALID) {
-+    if (level == CPU_TOPOLOGY_LEVEL_INVALID) {
-         num_threads_next_level = 0;
-         offset_next_level = 0;
-     } else {
-         next_level = find_next_bit(env->avail_cpu_topo,
--                                   CPU_TOPO_LEVEL_PACKAGE,
-+                                   CPU_TOPOLOGY_LEVEL_SOCKET,
-                                    level + 1);
-         num_threads_next_level = num_threads_by_topo_level(topo_info,
-                                                            next_level);
-@@ -577,7 +577,7 @@ static CPUCacheInfo legacy_l1d_cache = {
-     .sets = 64,
-     .partitions = 1,
-     .no_invd_sharing = true,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
-@@ -592,7 +592,7 @@ static CPUCacheInfo legacy_l1d_cache_amd = {
-     .partitions = 1,
-     .lines_per_tag = 1,
-     .no_invd_sharing = true,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /* L1 instruction cache: */
-@@ -606,7 +606,7 @@ static CPUCacheInfo legacy_l1i_cache = {
-     .sets = 64,
-     .partitions = 1,
-     .no_invd_sharing = true,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
-@@ -621,7 +621,7 @@ static CPUCacheInfo legacy_l1i_cache_amd = {
-     .partitions = 1,
-     .lines_per_tag = 1,
-     .no_invd_sharing = true,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /* Level 2 unified cache: */
-@@ -635,7 +635,7 @@ static CPUCacheInfo legacy_l2_cache = {
-     .sets = 4096,
-     .partitions = 1,
-     .no_invd_sharing = true,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /*FIXME: CPUID leaf 2 descriptor is inconsistent with CPUID leaf 4 */
-@@ -645,7 +645,7 @@ static CPUCacheInfo legacy_l2_cache_cpuid2 = {
-     .size = 2 * MiB,
-     .line_size = 64,
-     .associativity = 8,
--    .share_level = CPU_TOPO_LEVEL_INVALID,
-+    .share_level = CPU_TOPOLOGY_LEVEL_INVALID,
- };
- 
- 
-@@ -659,7 +659,7 @@ static CPUCacheInfo legacy_l2_cache_amd = {
-     .associativity = 16,
-     .sets = 512,
-     .partitions = 1,
--    .share_level = CPU_TOPO_LEVEL_CORE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_CORE,
- };
- 
- /* Level 3 unified cache: */
-@@ -675,7 +675,7 @@ static CPUCacheInfo legacy_l3_cache = {
-     .self_init = true,
-     .inclusive = true,
-     .complex_indexing = true,
--    .share_level = CPU_TOPO_LEVEL_DIE,
-+    .share_level = CPU_TOPOLOGY_LEVEL_DIE,
- };
- 
- /* TLB definitions: */
-@@ -2026,7 +2026,7 @@ static const CPUCaches epyc_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2039,7 +2039,7 @@ static const CPUCaches epyc_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2050,7 +2050,7 @@ static const CPUCaches epyc_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2064,7 +2064,7 @@ static const CPUCaches epyc_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = true,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2080,7 +2080,7 @@ static CPUCaches epyc_v4_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2093,7 +2093,7 @@ static CPUCaches epyc_v4_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2104,7 +2104,7 @@ static CPUCaches epyc_v4_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2118,7 +2118,7 @@ static CPUCaches epyc_v4_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = false,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2134,7 +2134,7 @@ static const CPUCaches epyc_rome_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2147,7 +2147,7 @@ static const CPUCaches epyc_rome_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2158,7 +2158,7 @@ static const CPUCaches epyc_rome_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2172,7 +2172,7 @@ static const CPUCaches epyc_rome_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = true,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2188,7 +2188,7 @@ static const CPUCaches epyc_rome_v3_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2201,7 +2201,7 @@ static const CPUCaches epyc_rome_v3_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2212,7 +2212,7 @@ static const CPUCaches epyc_rome_v3_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2226,7 +2226,7 @@ static const CPUCaches epyc_rome_v3_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = false,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2242,7 +2242,7 @@ static const CPUCaches epyc_milan_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2255,7 +2255,7 @@ static const CPUCaches epyc_milan_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2266,7 +2266,7 @@ static const CPUCaches epyc_milan_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2280,7 +2280,7 @@ static const CPUCaches epyc_milan_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = true,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2296,7 +2296,7 @@ static const CPUCaches epyc_milan_v2_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2309,7 +2309,7 @@ static const CPUCaches epyc_milan_v2_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2320,7 +2320,7 @@ static const CPUCaches epyc_milan_v2_cache_info = {
-         .partitions = 1,
-         .sets = 1024,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2334,7 +2334,7 @@ static const CPUCaches epyc_milan_v2_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = false,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -2350,7 +2350,7 @@ static const CPUCaches epyc_genoa_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l1i_cache = &(CPUCacheInfo) {
-         .type = INSTRUCTION_CACHE,
-@@ -2363,7 +2363,7 @@ static const CPUCaches epyc_genoa_cache_info = {
-         .lines_per_tag = 1,
-         .self_init = 1,
-         .no_invd_sharing = true,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2374,7 +2374,7 @@ static const CPUCaches epyc_genoa_cache_info = {
-         .partitions = 1,
-         .sets = 2048,
-         .lines_per_tag = 1,
--        .share_level = CPU_TOPO_LEVEL_CORE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
-     },
-     .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-@@ -2388,7 +2388,7 @@ static const CPUCaches epyc_genoa_cache_info = {
-         .self_init = true,
-         .inclusive = true,
-         .complex_indexing = false,
--        .share_level = CPU_TOPO_LEVEL_DIE,
-+        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
-     },
- };
- 
-@@ -6512,7 +6512,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
- 
-                     /* Share the cache at package level. */
-                     *eax |= max_thread_ids_for_cache(&topo_info,
--                                CPU_TOPO_LEVEL_PACKAGE) << 14;
-+                                CPU_TOPOLOGY_LEVEL_SOCKET) << 14;
-                 }
-             }
-         } else if (cpu->vendor_cpuid_only && IS_AMD_CPU(env)) {
-@@ -7998,10 +7998,10 @@ static void x86_cpu_init_default_topo(X86CPU *cpu)
-     env->nr_modules = 1;
-     env->nr_dies = 1;
- 
--    /* SMT, core and package levels are set by default. */
--    set_bit(CPU_TOPO_LEVEL_SMT, env->avail_cpu_topo);
--    set_bit(CPU_TOPO_LEVEL_CORE, env->avail_cpu_topo);
--    set_bit(CPU_TOPO_LEVEL_PACKAGE, env->avail_cpu_topo);
-+    /* thread, core and socket levels are set by default. */
-+    set_bit(CPU_TOPOLOGY_LEVEL_THREAD, env->avail_cpu_topo);
-+    set_bit(CPU_TOPOLOGY_LEVEL_CORE, env->avail_cpu_topo);
-+    set_bit(CPU_TOPOLOGY_LEVEL_SOCKET, env->avail_cpu_topo);
- }
- 
- static void x86_cpu_initfn(Object *obj)
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 74886d1580f4..abb75019ca61 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1666,7 +1666,7 @@ typedef struct CPUCacheInfo {
-      * Used to encode CPUID[4].EAX[bits 25:14] or
-      * CPUID[0x8000001D].EAX[bits 25:14].
-      */
--    enum CPUTopoLevel share_level;
-+    CpuTopologyLevel share_level;
- } CPUCacheInfo;
- 
- 
-@@ -1999,7 +1999,7 @@ typedef struct CPUArchState {
-     unsigned nr_modules;
- 
-     /* Bitmap of available CPU topology levels for this CPU. */
--    DECLARE_BITMAP(avail_cpu_topo, CPU_TOPO_LEVEL_MAX);
-+    DECLARE_BITMAP(avail_cpu_topo, CPU_TOPOLOGY_LEVEL__MAX);
- } CPUX86State;
- 
- struct kvm_msrs;
++{ 'enum': 'CacheLevelAndType',
++  'data': [ 'l1d', 'l1i', 'l2', 'l3' ] }
++
++##
++# @SmpCacheProperties:
++#
++# Cache information for SMP system.
++#
++# @cache: Cache name, which is the combination of cache level
++#     and cache type.
++#
++# @topology: Cache topology level.  It accepts the CPU topology
++#     enumeration as the parameter, i.e., CPUs in the same
++#     topology container share the same cache.
++#
++# Since: 9.2
++##
++{ 'struct': 'SmpCacheProperties',
++  'data': {
++  'cache': 'CacheLevelAndType',
++  'topology': 'CpuTopologyLevel' } }
++
++##
++# @SmpCachePropertiesWrapper:
++#
++# List wrapper of SmpCacheProperties.
++#
++# @caches: the list of SmpCacheProperties.
++#
++# Since 9.2
++##
++{ 'struct': 'SmpCachePropertiesWrapper',
++  'data': { 'caches': ['SmpCacheProperties'] } }
 -- 
 2.34.1
 
