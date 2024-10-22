@@ -1,197 +1,128 @@
-Return-Path: <kvm+bounces-29420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637049AB24A
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 17:39:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519089AB3B6
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 144862835DA
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 15:39:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F874B2332F
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF5D1A3056;
-	Tue, 22 Oct 2024 15:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570ED1BB6B3;
+	Tue, 22 Oct 2024 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vrsey+98"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aufXaGle"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D781A00D2
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 15:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A845B1A01D4;
+	Tue, 22 Oct 2024 16:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729611578; cv=none; b=sbPUu/zKyS4wR+LCiGhiULtMwdh9sv2PfsNEpZEId67mHy0DmG3FNEeOZTPL1uEq4cb9LFkJiigPOwq/5tzvGPMC6lQWLUdkvBm5RV3qAWGHwQp6xD3SSZZhabrsH7iJw4vRnEHLVhwytl9oCLrDrByNQwCQOJ9j+JPfykIkMmM=
+	t=1729613981; cv=none; b=NzUk3wOHz5cQWbwX5qPj1WZZvYO8uPBb9eOxGepICpUuohhw8TqL5i1Xaxzunpg6VaVicBkXQjIOo4+vyCOUFfYX7Jfzz1R9NCasNWssYnsfJJwuhbxEp6fibMK0eUHaHXOwp64zZXtnJz4yjWGNquJLzTJfctOzRrpP2nxme9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729611578; c=relaxed/simple;
-	bh=wcNc2MA1GyKb0CNLmVy6i3fGKYzMQ9ZDso8LkvyEZCM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PZuBNVDBxkLJ2uHIp1pgQ85XjH3sNn7+creuhjH3YsRHaplyEnS4B/LbVNT1vmnGVfOvUHwHBX1gu+ZX6YVtvGz76jqiWSruY7MHdcMjUhb2utYqRNTmZRMbM5klw9S2co/prN+JF2JVJ+kFx2chhqYHgmReFwG22MReYCup9y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vrsey+98; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7ea6efcd658so5024203a12.3
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 08:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729611576; x=1730216376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h3y119MD9wmKtbCuck0m1HoKm8DFO9OxY9WfoV49VvA=;
-        b=vrsey+98Ttl7/DSnaCzGWGBzRJcc7/IbYdggxin5OnANf/Mw3pxfY4CVR27t9adP8q
-         fhX4X9LypDodT9b45UYBfUBHNjekV+5G0ezgCjEhf6ZfalC5aay0BfTC0uFmyHaFo2Hn
-         iBO1ed5siuuFzMXnCBcifaoY8pYLpnlsVf3iSd6OlEHVAzw6Waf6y3XhFcBUkQwtES1m
-         zyYM1trLoWDb4w93OPuXAWrtIHXTicmzaXViQka97kumovx8FzYbKOAgu2JW8OQkjIFq
-         2vrPtyi9mvfGTrT1Wby2y/9+A3XRdG0edj7okiEOeQKWwwFKZK1YK1SULR/6TQofpBKN
-         58Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729611576; x=1730216376;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=h3y119MD9wmKtbCuck0m1HoKm8DFO9OxY9WfoV49VvA=;
-        b=JQZr/bVLo6ZP8Yrqp4SdSrvQRdm90V+5H7mkRqKRSbfKIG0pvvjKiB5h+5/WcHGFnC
-         lzoK+EnIjNmV6rW8U06+6JYhz0JmfT1cDH3o1Djs35Japt0S3tEdPQMjFaI7e02MYvqG
-         5AQGGbVOQuY8HP2moWZfP62aI493jz82szkpbQWopQcfoRLQnns6OCxxDwVhDwOOZyB3
-         7Qnukr3TzHwgTcGsn3uptgJdNH4gtUEX/TLWQMrRiOBoX/rJCXXJ8iJ/YujhgClu51L2
-         JCDrqNuDvBEdtn7dOfMYUKP/OiKZewFeF9ikcwmiWu2emAhW+mbkW6oYQawO5lNZsdGQ
-         ZarQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvu16u8Wc/IB1DCBk33uj+MX2hczj/6LNTS1c1RsCjs6WBG+vrkg+OBXucBcaepla0IWg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgDr8WUv2b/s2mfOOjlnw0gfSfcR9DxnSXPwpXPPlSDyvA7wvC
-	NQ8sdX7fuCfBf4JnV2SvmELU6zddZ6oW8dA8f9Rbu3N+gCN5Fxb4mTp2WTjt2pV0ACVSnXJ8S6Z
-	vzA==
-X-Google-Smtp-Source: AGHT+IGC9vYjja2RJe4yfi4oSZXSGryKcMpLP6CLXouCF0l5UeX3c76IyljH5E7eZYNj8rn5Bmx44Cfiq2k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:f545:0:b0:7ea:67a0:9651 with SMTP id
- 41be03b00d2f7-7eacc6e6631mr17501a12.3.1729611576172; Tue, 22 Oct 2024
- 08:39:36 -0700 (PDT)
-Date: Tue, 22 Oct 2024 08:39:34 -0700
-In-Reply-To: <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
+	s=arc-20240116; t=1729613981; c=relaxed/simple;
+	bh=CvtlmF5cGuskit8xkyZlrI9xYyWWabA80n3pfNjhWIA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HX3NUyFt75ABQ5Pe2gXLkPC9r2B1uPFkMDrX6WtOpbreTi0Zh3g11P/ur7TIn0NsTeqZM+xuVH9e2Lb9gcEUBB5oID75kjVAVqXjjkO0RJLg3PEW/ge9sIPpn+Kl+ujgY1uZPKNlc3Qyoy/1PB6TgdmdD3PyGRWmwkATXDb1LcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aufXaGle; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGIxG9810664
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 22 Oct 2024 09:18:59 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGIxG9810664
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024101701; t=1729613941;
+	bh=PQ8WaWZqpwDl5XAjh+/ICxJ0hVGMTIG/hPE2VcIrRR4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aufXaGleldv5CuuuLA14O6G8zFsj5e/T3cycGGhrhsKGI+8Miqh6wWMSzFO4Sv4jm
+	 bu3ps+MLOiJTc2SUNbNQhg3aqm4xzwTJbjhSZzY3yWxWAXApEJvNzjCDcWVBCXdixY
+	 1tFSPTaEdXeV/+F+Z4LquYTQLeN0oGeTGf/1so4Xw3UBYJjzEZuM+0cNmcpUKdmyEA
+	 SUkxvc/yvoZHyuZOmXDZtqUWsUkYy7vZKMNbyCaj3J6vmvUKIdWQCIJIOOjOjjCl6u
+	 aBgxsHaAFcI/Nw+QvbAL/kuTjmZIinau3cGL3OUatlCsXjRqoutffpuPxT7WnwZg+/
+	 QKjh9kz4q1m4Q==
+Message-ID: <3bc22633-4f79-4930-8357-11e5074014ed@zytor.com>
+Date: Tue, 22 Oct 2024 09:18:58 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241021173455.2691973-1-roman.gushchin@linux.dev>
- <Zxa60Ftbh8eN1MG5@casper.infradead.org> <ZxcKjwhMKmnHTX8Q@google.com>
- <ZxcgR46zpW8uVKrt@casper.infradead.org> <ZxcrJHtIGckMo9Ni@google.com> <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
-Message-ID: <ZxfHNo1dUVcOLJYK@google.com>
-Subject: Re: [PATCH v2] mm: page_alloc: move mlocked flag clearance into free_pages_prepare()
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Roman Gushchin <roman.gushchin@linux.dev>, Matthew Wilcox <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Hugh Dickins <hughd@google.com>, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 07/27] KVM: VMX: Initialize VMCS FRED fields
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
+References: <20241001050110.3643764-1-xin@zytor.com>
+ <20241001050110.3643764-8-xin@zytor.com> <ZxdrM9IV7iX02Of0@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <ZxdrM9IV7iX02Of0@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 22, 2024, Yosry Ahmed wrote:
-> On Mon, Oct 21, 2024 at 9:33=E2=80=AFPM Roman Gushchin <roman.gushchin@li=
-nux.dev> wrote:
-> >
-> > On Tue, Oct 22, 2024 at 04:47:19AM +0100, Matthew Wilcox wrote:
-> > > On Tue, Oct 22, 2024 at 02:14:39AM +0000, Roman Gushchin wrote:
-> > > > On Mon, Oct 21, 2024 at 09:34:24PM +0100, Matthew Wilcox wrote:
-> > > > > On Mon, Oct 21, 2024 at 05:34:55PM +0000, Roman Gushchin wrote:
-> > > > > > Fix it by moving the mlocked flag clearance down to
-> > > > > > free_page_prepare().
-> > > > >
-> > > > > Urgh, I don't like this new reference to folio in free_pages_prep=
-are().
-> > > > > It feels like a layering violation.  I'll think about where else =
-we
-> > > > > could put this.
-> > > >
-> > > > I agree, but it feels like it needs quite some work to do it in a n=
-icer way,
-> > > > no way it can be backported to older kernels. As for this fix, I do=
-n't
-> > > > have better ideas...
-> > >
-> > > Well, what is KVM doing that causes this page to get mapped to usersp=
-ace?
-> > > Don't tell me to look at the reproducer as it is 403 Forbidden.  All =
-I
-> > > can tell is that it's freed with vfree().
-> > >
-> > > Is it from kvm_dirty_ring_get_page()?  That looks like the obvious th=
-ing,
-> > > but I'd hate to spend a lot of time on it and then discover I was loo=
-king
-> > > at the wrong thing.
-> >
-> > One of the pages is vcpu->run, others belong to kvm->coalesced_mmio_rin=
-g.
->=20
-> Looking at kvm_vcpu_fault(), it seems like we after mmap'ing the fd
-> returned by KVM_CREATE_VCPU we can access one of the following:
-> - vcpu->run
-> - vcpu->arch.pio_data
-> - vcpu->kvm->coalesced_mmio_ring
-> - a page returned by kvm_dirty_ring_get_page()
->=20
-> It doesn't seem like any of these are reclaimable,
+On 10/22/2024 2:06 AM, Chao Gao wrote:
+>> @@ -1503,6 +1503,18 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+>> 				    (unsigned long)(cpu_entry_stack(cpu) + 1));
+>> 		}
+>>
+>> +		/* Per-CPU FRED MSRs */
+>> +		if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
+>> +#ifdef CONFIG_X86_64
+>> +			vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(DB));
+>> +			vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(NMI));
+>> +			vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(DF));
+>> +#endif
+>> +			vmcs_write64(HOST_IA32_FRED_SSP1, 0);
+>> +			vmcs_write64(HOST_IA32_FRED_SSP2, 0);
+>> +			vmcs_write64(HOST_IA32_FRED_SSP3, 0);
+> 
+> Given SSP[1-3] are constant for now, how about asserting that host SSP[1-3] are
+> all zeros when KVM is loaded and moving their writes to vmx_set_constant_host_state()?
 
-Correct, these are all kernel allocated pages that KVM exposes to userspace=
- to
-facilitate bidirectional sharing of large chunks of data.
-
-> why is mlock()'ing them supported to begin with?
-
-Because no one realized it would be problematic, and KVM would have had to =
-go out
-of its way to prevent mlock().
-
-> Even if we don't want mlock() to err in this case, shouldn't we just do
-> nothing?
-
-Ideally, yes.
-
-> I see a lot of checks at the beginning of mlock_fixup() to check
-> whether we should operate on the vma, perhaps we should also check for
-> these KVM vmas?
-
-Definitely not.  KVM may be doing something unexpected, but the VMA certain=
-ly
-isn't unique enough to warrant mm/ needing dedicated handling.
-
-Focusing on KVM is likely a waste of time.  There are probably other subsys=
-tems
-and/or drivers that .mmap() kernel allocated memory in the same way.  Odds =
-are
-good KVM is just the messenger, because syzkaller knows how to beat on KVM.=
-  And
-even if there aren't any other existing cases, nothing would prevent them f=
-rom
-coming along in the future.
-
-> Trying to or maybe set VM_SPECIAL in kvm_vcpu_mmap()? I am not
-> sure tbh, but this doesn't seem right.
-
-Agreed.  VM_DONTEXPAND is the only VM_SPECIAL flag that is remotely appropr=
-iate,
-but setting VM_DONTEXPAND could theoretically break userspace, and other th=
-an
-preventing mlock(), there is no reason why the VMA can't be expanded.  I do=
-ubt
-any userspace VMM is actually remapping and expanding a vCPU mapping, but t=
-rying
-to fudge around this outside of core mm/ feels kludgy and has the potential=
- to
-turn into a game of whack-a-mole.
-
-> FWIW, I think moving the mlock clearing from __page_cache_release ()
-> to free_pages_prepare() (or another common function in the page
-> freeing path) may be the right thing to do in its own right. I am just
-> wondering why we are not questioning the mlock() on the KVM vCPU
-> mapping to begin with.
->=20
-> Is there a use case for this that I am missing?
-
-Not that I know of, I suspect mlock() is allowed simply because it's allowe=
-d by
-default.
+I like the idea :)
 
