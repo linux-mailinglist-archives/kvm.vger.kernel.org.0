@@ -1,121 +1,129 @@
-Return-Path: <kvm+bounces-29353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1589A9EF2
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 11:46:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7619A9F7C
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:02:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F6222833D1
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 09:46:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46DBAB214AF
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F19199229;
-	Tue, 22 Oct 2024 09:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CTZqzY+8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9811119993A;
+	Tue, 22 Oct 2024 10:01:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFA7194125;
-	Tue, 22 Oct 2024 09:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA3D196C7B;
+	Tue, 22 Oct 2024 10:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729590349; cv=none; b=GLp6zTMR6esL8dRn8nKt7s1qN9Vl0FYo3BbNOvRFgLzbAIUP2PuwFxRcMw6NrwP/tuKaSzrHquEvv2Qj+n0OXMXqxfYAcpO+K7OF2Xf1zjP0/+ViTVwYfjqNlc0cXIQ2pf69MTOj/SDNEaP2ovZJOhkWOYuTcDapQYuC6EGOz5Y=
+	t=1729591318; cv=none; b=nvi+lO9BK4K3Z2HyK6OIdEPoCmg06Nhjk7dwsgjEDFluupRpU6INaTfi3EYh5S34CNMhZL9BEwkYbL7vET9uLMagNcSEeyFIjxXOSUyj5e+5EOUrDcllAHxjZ1ODk+sE9PmPd0FjIPKSIjG0c8wAzcykimUwU6HRNgdoWMD9kVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729590349; c=relaxed/simple;
-	bh=/EM5Wlnzp5qyIo+gkuTwuN/TfFFLXBMYaQ36Rg6KXbw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dPCr09Mh1YvRq7GmREXAv5ybsgVL5/TJIGYDTeHh11vHi58g3j68RTMZlbcj1TK0uYKmxUCdhItQNxformhGmzpeAvV99lc8xrFBMjpfTMORnn/9OJV6v3XxKLkWjGTUO7kfG8nMSg/1L3cuT4J7zbOd2atsOjdCi3Y7wUuC5DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CTZqzY+8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21EFCC4CEE8;
-	Tue, 22 Oct 2024 09:45:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729590349;
-	bh=/EM5Wlnzp5qyIo+gkuTwuN/TfFFLXBMYaQ36Rg6KXbw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CTZqzY+8JHzK1mlUk7ymZpOglyOzo3/3W7eCay3Woe50NBiaTV18cAfVNxbSNAQ5r
-	 wdE4cJPJ+nOC6/QvnDXE5/AhZ93s0qajjeclZJpSG4uZBMRVmFeZjeIUSwvLKGq2tu
-	 Z/V8gaa449+HZZf7EB4PhWUZwMOmZ0YBwbm6hfM0j4eREbE1FkczszbATjc98lDL3Y
-	 t8zhuXM8o73kanz1TiagjbtskmuTJOAWNDYIMG4eh7jkgS5exowywh3NYMstBFnwzh
-	 BGW9RkOMRlAFyVKoV2wVOhDzORNys+0loK1RqQGi+CSNUdA/QpTcCu06etkvo9y7pG
-	 a5b+RjAQHrNLw==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c903f5bd0eso1894807a12.3;
-        Tue, 22 Oct 2024 02:45:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUmhPZO1xrOU6zcZ8G+Nzb67EKkKAp207AGhugJeAD5OCQXfqgK9Op7gGNJ0TWyTnozr94NYnB+qnTWKaqB@vger.kernel.org, AJvYcCX/PodsKg2oUpT5NbkFrmc8jY3pYybQsYth2PEEvV4n12R9hTj6y+R51bRgId7055aMlxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/JSYWnaWasxr/nMpw89P6J/KjA0WEQe1ZpHCjpbbvuNbceqWu
-	k6ysrgDvTX/loWcFd3ZkRrGbxFhxyfM9lDOdst5HwnksEpxTpnEzmW9DuFRrPhNK+YEqGTt3NCp
-	OUNS2i8HOAhZubTlypY3YeUcUXsg=
-X-Google-Smtp-Source: AGHT+IGV+67ot6l201z6JTI0YHqTnxyfX0J6auFooUvHxusqUOfc7MNkh7L9q1Bt+vbb4ZHLs8A/xAHMIvaz8U6SOy4=
-X-Received: by 2002:a17:907:96a1:b0:a9a:67a8:4c0b with SMTP id
- a640c23a62f3a-a9aad3dc7d3mr188856866b.60.1729590347646; Tue, 22 Oct 2024
- 02:45:47 -0700 (PDT)
+	s=arc-20240116; t=1729591318; c=relaxed/simple;
+	bh=aMHdY6O6EDnpUnBTDu6QR/VsigEjeyLZRSt0+vfKLKs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=A8QN8QChgtTuy4whUCHNKIWGg7yZDEj12UFymN9b2HKv5hlQNWFh6lbGeas6ImMctkM483sDNeLSjJ8Pc0uF6hRgbN9fcFvMdYDmeIiU3cVumdCtqBy564AY5ht9R1/GTMgf/Bzt7lwhDxDUu++NhwIgZYXFWUIOL58PNxKAUVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxeeEReBdn+t4EAA--.11279S3;
+	Tue, 22 Oct 2024 18:01:53 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMBx_uAPeBdnmlkHAA--.43333S3;
+	Tue, 22 Oct 2024 18:01:52 +0800 (CST)
+Subject: Re: [PATCH v8 3/3] irqchip/loongson-eiointc: Add extioi virt
+ extension support
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ x86@kernel.org, Song Gao <gaosong@loongson.cn>
+References: <20240830093229.4088354-1-maobibo@loongson.cn>
+ <20240830093229.4088354-4-maobibo@loongson.cn>
+ <CAAhV-H4W4LwL3U2HT+-r+6nH5ZSBBbPYL2wdZJqQF7WNkhOgMw@mail.gmail.com>
+ <878qv6y631.ffs@tglx> <2fb27579-5a4d-8bcc-db08-8942960dc07e@loongson.cn>
+ <CAAhV-H52kC_-ehzxmT5ye+XVNm5Lm=psSfAv6xqnQpkOHTMFdA@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <10de3f46-3f68-d2e6-4b18-fd098b6fec9d@loongson.cn>
+Date: Tue, 22 Oct 2024 18:01:29 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830093229.4088354-1-maobibo@loongson.cn> <20240830093229.4088354-4-maobibo@loongson.cn>
- <CAAhV-H4W4LwL3U2HT+-r+6nH5ZSBBbPYL2wdZJqQF7WNkhOgMw@mail.gmail.com>
- <878qv6y631.ffs@tglx> <2fb27579-5a4d-8bcc-db08-8942960dc07e@loongson.cn>
-In-Reply-To: <2fb27579-5a4d-8bcc-db08-8942960dc07e@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 22 Oct 2024 17:45:34 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H52kC_-ehzxmT5ye+XVNm5Lm=psSfAv6xqnQpkOHTMFdA@mail.gmail.com>
-Message-ID: <CAAhV-H52kC_-ehzxmT5ye+XVNm5Lm=psSfAv6xqnQpkOHTMFdA@mail.gmail.com>
-Subject: Re: [PATCH v8 3/3] irqchip/loongson-eiointc: Add extioi virt
- extension support
-To: maobibo <maobibo@loongson.cn>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, x86@kernel.org, 
-	Song Gao <gaosong@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAhV-H52kC_-ehzxmT5ye+XVNm5Lm=psSfAv6xqnQpkOHTMFdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBx_uAPeBdnmlkHAA--.43333S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Zw4ftry8CFWUJw1UGryrKrX_yoW8GrWxpa
+	ySkFn8tF4kJrWayan7t3Z5XF4YvrnxJFsFg3Z5Jr18A3sIvF1Fqr4xJFWUCFZ3W34rGa4j
+	vry0ga47XFyUWrXCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE
+	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E
+	14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+	CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
+	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsG
+	vfC2KfnxnUUI43ZEXa7IU8yrW7UUUUU==
 
-On Tue, Oct 22, 2024 at 5:17=E2=80=AFPM maobibo <maobibo@loongson.cn> wrote=
-:
->
-> Hi Huacai/Thomas,
->
-> Sorry for the ping message :(
->
-> Can this patch be applied int next RC version?
-Queued for the next release.
 
-Huacai
+Got it, thanks.
 
->
-> Regards
-> Bibo Mao
->
-> On 2024/10/2 =E4=B8=8B=E5=8D=889:42, Thomas Gleixner wrote:
-> > On Wed, Sep 11 2024 at 17:11, Huacai Chen wrote:
-> >> Hi, Thomas,
-> >>
-> >> On Fri, Aug 30, 2024 at 5:32=E2=80=AFPM Bibo Mao <maobibo@loongson.cn>=
- wrote:
-> >>>
-> >>> Interrupts can be routed to maximal four virtual CPUs with one HW
-> >>> EIOINTC interrupt controller model, since interrupt routing is encode=
-d with
-> >>> CPU bitmap and EIOINTC node combined method. Here add the EIOINTC vir=
-t
-> >>> extension support so that interrupts can be routed to 256 vCPUs on
-> >>> hypervisor mode. CPU bitmap is replaced with normal encoding and EIOI=
-NTC
-> >>> node type is removed, so there are 8 bits for cpu selection, at most =
-256
-> >>> vCPUs are supported for interrupt routing.
-> >> This patch is OK for me now, but seems it depends on the first two,
-> >> and the first two will get upstream via loongarch-kvm tree. So is that
-> >> possible to also apply this one to loongarch-kvm with your Acked-by?
-> >
-> > Go ahead.
-> >
-> > Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-> >
->
+Regards
+Bibo Mao
+
+On 2024/10/22 下午5:45, Huacai Chen wrote:
+> On Tue, Oct 22, 2024 at 5:17 PM maobibo <maobibo@loongson.cn> wrote:
+>>
+>> Hi Huacai/Thomas,
+>>
+>> Sorry for the ping message :(
+>>
+>> Can this patch be applied int next RC version?
+> Queued for the next release.
+> 
+> Huacai
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>
+>> On 2024/10/2 下午9:42, Thomas Gleixner wrote:
+>>> On Wed, Sep 11 2024 at 17:11, Huacai Chen wrote:
+>>>> Hi, Thomas,
+>>>>
+>>>> On Fri, Aug 30, 2024 at 5:32 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>>
+>>>>> Interrupts can be routed to maximal four virtual CPUs with one HW
+>>>>> EIOINTC interrupt controller model, since interrupt routing is encoded with
+>>>>> CPU bitmap and EIOINTC node combined method. Here add the EIOINTC virt
+>>>>> extension support so that interrupts can be routed to 256 vCPUs on
+>>>>> hypervisor mode. CPU bitmap is replaced with normal encoding and EIOINTC
+>>>>> node type is removed, so there are 8 bits for cpu selection, at most 256
+>>>>> vCPUs are supported for interrupt routing.
+>>>> This patch is OK for me now, but seems it depends on the first two,
+>>>> and the first two will get upstream via loongarch-kvm tree. So is that
+>>>> possible to also apply this one to loongarch-kvm with your Acked-by?
+>>>
+>>> Go ahead.
+>>>
+>>> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+>>>
+>>
+
 
