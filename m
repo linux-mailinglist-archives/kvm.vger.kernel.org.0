@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-29369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EBA9AA096
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:57:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA5E9AA090
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1A8228399B
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:57:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF9C8B238B7
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892CA19AD93;
-	Tue, 22 Oct 2024 10:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCDD19CC17;
+	Tue, 22 Oct 2024 10:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SRCPG0kJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s+TNplj+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CB919B3EE
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819319B3EE
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729594591; cv=none; b=NjrJeOSWi2VLX5DdcauE549Aq2IT3giM4Jr6vuamvhMN7+/ZfRv+bvE2PzRUS2vz/i8IdqengfeCnhuUtANaBr3haG/f31HkkOrr2tWRXHsZCqpIz4D1esXK2XXJlRrs0cq8o9oKOOIIY9oVTMyth642r31AxkjMRl7uBfV2lrg=
+	t=1729594583; cv=none; b=XDTYUBn2GRwKc6y3WynBjTzW7cat3AqZun5noj/ADj3RgH5lxXeC+khgvnIbHajrNYmxK7SDDT+p7ckCVVabwqka290zbKtkPeiwWmueS3Hkq8xbyqG45cf/p8lJguA0/NNmBsIIAb9mB+3gR7pgoG9Mbdmbl9rJ+bboJW6JPhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729594591; c=relaxed/simple;
-	bh=rPqdeMZHjsIWZRK4nVVQap0ga9cDd7eG9O38cGJ5E8o=;
+	s=arc-20240116; t=1729594583; c=relaxed/simple;
+	bh=HJ7Z/tpHGMdXyiozbqSlWM/DfmvRMwN6gEUJ22MTOs8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iDxPEczEnqPfSr/+Xx5VnggtlLmdJXv/LBMR/jRRtcxfPCWw+6+Sc8xveN4+Ma8JE28Y44zJ1LFinMo8c3ZpC07zjwvaimU6CQe15i6TPPC3aJTF3bfsk4WahzDHzc+NVvBe5wt+34PQ5k7Hu1BejtCap72I5PMHFZkON/t1aK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SRCPG0kJ; arc=none smtp.client-ip=209.85.208.43
+	 MIME-Version:Content-Type; b=B+xQqyKbdFzxgfWW5JVqMPjGOYndTkcuX501N/8kh+MQyidWI1bS8olATSKC2cPf54BHnBvo0InowVCKAV+Ha55DrXLz90GK6h4eMZIFYABhP+JKUdkiKOSBeDLlNyCse44gQBZ7+2264XUSZionjYavDPYnnnY9ZVPtsgrT/g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=s+TNplj+; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c99be0a4bbso7348970a12.2
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:29 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d473c4bb6so4950508f8f.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729594588; x=1730199388; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1729594580; x=1730199380; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iZZo1oPZPqzjBeoixQ7wpptFRyTvJhgIff9wczeHXgQ=;
-        b=SRCPG0kJ5yUPdkxvlfaBwiQqmM4qKllaw7vxOk7aRpWVt6wrofsfteFuSd9bYpvit7
-         AESaeJY5p2tYoTpcfzXWUPhdr/LHgU3B7vV6A0TrORwSEbbSzpkn/dzVPnN5O7+cSqOu
-         gHUaeTilGc/VaNgKkPJz3wboK+oG51P4W5T8HdhHKX4PAgDtLx1C39x3nSQ9tXrnO0dZ
-         fLQ76e7P63pulEz9Mgoa6ZGd6eF5TfQeNT2mhz7MeAbsIQwt0zH2XpH22+98tMBV9m4l
-         VhyInp5BM1iA+73qgvQBX1W6ZP8eR3KBE2eC+z6NEKwUbJUFMIOrTzqAL41kv9Qc11Ew
-         ZFxA==
+        bh=COTB8IX9EL+KvqwMSRlZ5WoxH3jy7uQtMVM8wKCP4/g=;
+        b=s+TNplj+nPZhX2f/hF1Vu2ZfiCUfiNwRyOaBatBrIvzKtwt8uieJ59Iy8ohHaMI956
+         qBczgqg2MX04KtKpsYt5msKZw8ZRxxW6gJW9g33t9XkHc9sWLjVIQ/2tUXsuOW5/1ekr
+         zjOPVdwDUyIrF90ZoCyyB/TZvlQsyq4mMXbXArUfVCAP2fNAa1jqZvxJAUfXfiTwu5YT
+         /Bqixm8l2qJgNqO3IT1eGww0+Zj2bG2JSQj9LuvUj/AROAxRlc895RICtOhHgSQ7f1UK
+         uHfoN5e1b+i8g0DqO/xgVPUhQX4ImMF9AKfFRqKZetKoqoAK8H5KdNIkb8pSLzWg38tV
+         CVKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729594588; x=1730199388;
+        d=1e100.net; s=20230601; t=1729594580; x=1730199380;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iZZo1oPZPqzjBeoixQ7wpptFRyTvJhgIff9wczeHXgQ=;
-        b=dn13UmfwzceV15omYz6P5cz67tVE39i6ezEeay/uqU0CBUSyE89fEauewmN0Z6aXzu
-         E1/5tUxuObTubYPfkxw+XbRoUP4CJM6p3cJbylIDMhH6cNxDPZiW+CigEyPQAHUZeton
-         2GUp2SlFMFZcTh18QXkc2g+nQeJkhRQXc7ML8snQeJ8S8h0Jy22+wZMYQpDicC6FfzgT
-         NMG4Chd9x7WowMHYLnZ80Cr/LV51E7UQ80teMlwrL9jt22dW5juUtgB6VonuYqsb5puU
-         xO24fRdlLzy0R56+E2r56ePBjXj2I9IphGiYXzWyGZacwuj2PXoBmq4dnnsYvnxrv8sP
-         4YPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ1fe7ZHEKhrjiDIINB4wNUrg+78T5TbAkHiO2RGgEIrTi2JNRI6cyw6VXaOuZMjHyIA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg0cQWyzYJtDvF6jbt2QCFb7ntSsdLAelR//I/Ft+nPXc6YSsp
-	wS+lbG4CFl3vfr4fdB6de93jFTPLFXwXuYB7oj38q2rk2lN2VTGzeJ2VZjv9pM8=
-X-Google-Smtp-Source: AGHT+IFRsXwXWWZ+1iUXj/NDdR1zmIgl8xhujNIEkYhFmxY8XSoNScTyD+Rf8wUGR1kAm8G1SujWGA==
-X-Received: by 2002:a05:6402:3514:b0:5cb:7594:9ece with SMTP id 4fb4d7f45d1cf-5cb782e16e2mr2678552a12.17.1729594588142;
-        Tue, 22 Oct 2024 03:56:28 -0700 (PDT)
+        bh=COTB8IX9EL+KvqwMSRlZ5WoxH3jy7uQtMVM8wKCP4/g=;
+        b=PN/FxLMggK4p5eQLBCn6Njh9D7OnRa+Ruv7kkL3BMPyZBsYcRVwYeyVtZ1x6jVuW8u
+         JB4l+HSH0nw0K4ffpbDIFeLDwZfk8vhJSksWiKPOjqZaxYezYj1kmHdUc9c2WsCJDDEl
+         pTvt3V8ND5wcIWP3Ff3YZ2tFd+Ruewci6BH9MLQoKJIvwl8iNi1B5kDJyKXZHfxX46u1
+         kRuoZjLd07o6fa+Kzqss4LmMkbllcpgDmkhaSyXpkrQC5kq0M/OZqQu40Lnta9IBWyUn
+         P1fTefNPbzqE+TNVVQlvny3MOeBR7nbBC3Mu8vLa6pZL9m+slCxSRBsUuwmNvUaEYloR
+         W8BA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+/HrOvisC2uudM7MDLZqlnbvsoz1DmvX9FWrsYUq+hII/DOmB2hYJQWP2L3CV9pQPYBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUHG4NGJL+BOEMtIbDJTkfl1qwDjwak8q0YeVA2Bs/6AJHVrSH
+	UYMwgygFcjhX/fDBaV+Q5GUXyLYndf4tsFkku5+YLX6jdOBIA9WNcuaj+lJBNyQ=
+X-Google-Smtp-Source: AGHT+IF8gTYNUNEInBLeGzU/PWN6iK1a20tMenTDraAJtih3b9OaMANLgGCpLzqKTnRdNaK+s8hEig==
+X-Received: by 2002:a5d:424c:0:b0:37d:51b7:5e08 with SMTP id ffacd0b85a97d-37ea21d8fbdmr11273338f8f.18.1729594580178;
+        Tue, 22 Oct 2024 03:56:20 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66a657bcsm3124198a12.23.2024.10.22.03.56.17
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91307874sm323980966b.94.2024.10.22.03.56.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 22 Oct 2024 03:56:19 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 1AA775F925;
+	by draig.lan (Postfix) with ESMTP id 2F1E35F92E;
 	Tue, 22 Oct 2024 11:56:15 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -99,9 +99,9 @@ Cc: Beraldo Leal <bleal@redhat.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 05/20] docs/devel: update tsan build documentation
-Date: Tue, 22 Oct 2024 11:55:59 +0100
-Message-Id: <20241022105614.839199-6-alex.bennee@linaro.org>
+Subject: [PATCH v2 06/20] scripts/ci: remove architecture checks for build-environment updates
+Date: Tue, 22 Oct 2024 11:56:00 +0100
+Message-Id: <20241022105614.839199-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241022105614.839199-1-alex.bennee@linaro.org>
 References: <20241022105614.839199-1-alex.bennee@linaro.org>
@@ -114,66 +114,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+We were missing s390x here. There isn't much point testing for the
+architecture here as we will fail anyway if the appropriate package
+list is missing.
 
-Mention it's now possible to build with gcc, instead of clang, and
-explain how to build a sanitized glib version.
-
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20240910174013.1433331-4-pierrick.bouvier@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- docs/devel/testing/main.rst | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ scripts/ci/setup/ubuntu/build-environment.yml | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/docs/devel/testing/main.rst b/docs/devel/testing/main.rst
-index 09725e8ea9..91f4dc61fb 100644
---- a/docs/devel/testing/main.rst
-+++ b/docs/devel/testing/main.rst
-@@ -628,20 +628,38 @@ Building and Testing with TSan
- It is possible to build and test with TSan, with a few additional steps.
- These steps are normally done automatically in the docker.
+diff --git a/scripts/ci/setup/ubuntu/build-environment.yml b/scripts/ci/setup/ubuntu/build-environment.yml
+index edf1900b3e..56b51609e3 100644
+--- a/scripts/ci/setup/ubuntu/build-environment.yml
++++ b/scripts/ci/setup/ubuntu/build-environment.yml
+@@ -39,7 +39,6 @@
+       when:
+         - ansible_facts['distribution'] == 'Ubuntu'
+         - ansible_facts['distribution_version'] == '22.04'
+-        - ansible_facts['architecture'] == 'aarch64' or ansible_facts['architecture'] == 'x86_64'
  
--There is a one time patch needed in clang-9 or clang-10 at this time:
-+TSan is supported for clang and gcc.
-+One particularity of sanitizers is that all the code, including shared objects
-+dependencies, should be built with it.
-+In the case of TSan, any synchronization primitive from glib (GMutex for
-+instance) will not be recognized, and will lead to false positives.
-+
-+To build a tsan version of glib:
+     - name: Install packages for QEMU on Ubuntu 22.04
+       package:
+@@ -47,7 +46,6 @@
+       when:
+         - ansible_facts['distribution'] == 'Ubuntu'
+         - ansible_facts['distribution_version'] == '22.04'
+-        - ansible_facts['architecture'] == 'aarch64' or ansible_facts['architecture'] == 'x86_64'
  
- .. code::
- 
--  sed -i 's/^const/static const/g' \
--      /usr/lib/llvm-10/lib/clang/10.0.0/include/sanitizer/tsan_interface.h
-+   $ git clone --depth=1 --branch=2.81.0 https://github.com/GNOME/glib.git
-+   $ cd glib
-+   $ CFLAGS="-O2 -g -fsanitize=thread" meson build
-+   $ ninja -C build
- 
- To configure the build for TSan:
- 
- .. code::
- 
--  ../configure --enable-tsan --cc=clang-10 --cxx=clang++-10 \
-+  ../configure --enable-tsan \
-                --disable-werror --extra-cflags="-O0"
- 
-+When executing qemu, don't forget to point to tsan glib:
-+
-+.. code::
-+
-+   $ glib_dir=/path/to/glib
-+   $ export LD_LIBRARY_PATH=$glib_dir/build/gio:$glib_dir/build/glib:$glib_dir/build/gmodule:$glib_dir/build/gobject:$glib_dir/build/gthread
-+   # check correct version is used
-+   $ ldd build/qemu-x86_64 | grep glib
-+   $ qemu-system-x86_64 ...
-+
- The runtime behavior of TSAN is controlled by the TSAN_OPTIONS environment
- variable.
- 
+     - name: Install armhf cross-compile packages to build QEMU on AArch64 Ubuntu 22.04
+       package:
 -- 
 2.39.5
 
