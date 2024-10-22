@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-29363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29359-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCD129AA08F
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:56:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA719AA08B
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 12:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17AE71C21EA4
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:56:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C434283A1D
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 10:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12B419C57D;
-	Tue, 22 Oct 2024 10:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEC719ADBF;
+	Tue, 22 Oct 2024 10:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FqBZ+GWQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wWF5RZsi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5170F19ABD5
-	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312DE199246
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 10:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729594583; cv=none; b=lscoHLfb0EIUohv1COj62plOlXLyz3OSSMSMeZ/S2SwNVfVlT5cgz4rgiPtIuPeHyu3qeGE2XDv90B2qK/jPp8/LWT9KFwOFUhREz6B+YUzQ95yOAhjj7slLqa8f29d1QwEP/xQ8R7WXerZT872ZENkfgxz0xsZHcw3pbC3hNmg=
+	t=1729594581; cv=none; b=n326xcVNs+HTKxAsW5rr6NxZK20oMCJ7tiECmipqT+gyioX9fOHt5tTkBgsbNwHbLVGJneNoNvRSw1y6ZJ6P0TIgrDpwxWUJ178fFmyj++1Z7eto2Ah0G397VydsJKFn9wRRSja+9SURArER0pz3Y/UtJKvMp6b5sz+Cky+sga8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729594583; c=relaxed/simple;
-	bh=aS2l+vmDfLF2uLItNIzgkZDSryR40qUXakZxJbkgV9Y=;
+	s=arc-20240116; t=1729594581; c=relaxed/simple;
+	bh=abAMXQAwQ2MoPuA+FlXwtgJwTb8SfN7qI0SuliOBmuM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wj+3eRbk+Bc7y1VSKpXLDSxNyRykwz3DN+ZvZnDNcPk4QEDYPEdAX1CBxvnTGUxvqyJff4xin6gl2Y4O8jUuH463JJrHxwm5gra1dZoJV07XvUg7T4jWES47fMQ6wCRMvHj4+mtcOGvH7GrY/O9AapnFij3mauYKGlsEvKaNT8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FqBZ+GWQ; arc=none smtp.client-ip=209.85.208.48
+	 MIME-Version:Content-Type; b=Oyk305LBalFXAspvhLyS/ambt3tcwcjoD1ZnizR3pD4rnXaCxgjlmMTOPhvMvONc72kuotm34oFTMXqo9R70KMcGCWWpvLeCTbyAUwxcPO7sKrO4y6ebMSZvpdthEy96a47pvReMqsRURfszaLhA6K1unDl5WZa2ZMyRP0o4BvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wWF5RZsi; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c99be0a4bbso7348791a12.2
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:21 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d4ac91d97so5282404f8f.2
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 03:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729594580; x=1730199380; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1729594577; x=1730199377; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
-        b=FqBZ+GWQvug7iZSPtu+eRwtit9ZFbQ6GAnVhkiAzvmI1cbOZ84YttoaDwashOVNkyc
-         B6g2eGIrs4yvOeIS52d9sDxsSbZgrv4shKSl3OyrF8Vy6Hha/SXCRhdY/0Yt8pZl9UQn
-         aF8YaQNJptbgCy52iMJPkbA0HQKMb0ny9VPMjZKGhVzIhFElfORMua2bi7VrxD+0f/cU
-         HUGFDaRW+uEQcVktWRSHDc5mfNHE1LeR0PLVCoUTV9CM5KFOgHde4QaMITguWcxky/sE
-         sDVcW2cu/XoJNwn5T6MZCkWsqHPnv5q5uGXtVBQhAETMzN58YAWxfQPWRFvFqWNnYcDT
-         Z3Rg==
+        bh=VedVTeltUD2hOjhTzgZcTRLZkzOYBwLXkPWLhE+aU3A=;
+        b=wWF5RZsiCwbBWwIlZgwQUw1EHOuNScuw3v9sDQOfuaSW5eMzPixOo/TiV7PmsUHg1a
+         y7DQdSirlOi1kAGptBEKgIKv/2QUQeMZdXt8QrhmfUszizNnScd52ejMOg/2cI3ojN/e
+         eu2kDRdyrgoPOLmrZW8b/zZz+jH07zSjOJe/hJS4odBP1TEUkoq/LTmWozJYe5X8NR7c
+         yEtvrk+OV0hHC4257gZJGLez18eYpZr2w0rkf6tAJvYVxdUWvAL23OnYns64wthHfPf6
+         NJPs+UxRI77b+ZKokZKdLpUfvPDhAQm3gdn2G+CVSeKHgawiGIQc8LvclKD0Eo10DIWW
+         bR0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729594580; x=1730199380;
+        d=1e100.net; s=20230601; t=1729594577; x=1730199377;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
-        b=pz4znYn5MjWjbfgFCug0iFXgLpAIvWH6IQeDmomzo/mrYRQ3hHW5f2MMfKiqVTudr0
-         uEsgq7LJn4n+Mxs8yNv36avZ9pEcIHA2i0905Ec7HDyk/WKpj5RyBYqF4Ea5dmm2jAKD
-         DdTdRYOCQWbSRIlFWRcc4K3dQNafitZ+p37AzpNkxwz5fv5dFCeZtLenuAnjzUJneiHQ
-         AmUaXHw8SsjBe6BRWRM2rYGr0fTzV4fxOxoaqRc5JoVjBnPxIXjko5XOMfVDrahBVVIr
-         zW2Y8uIrlRKudP3Zi0mHbtGZpwsOmr7cf3ixcqUbBbwhQ/LXJHs0yPyAd3bkjf7tiLZ2
-         005Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXnt3SIuz14iUf2/JiGc6V4QnZFN3ULNtWK+GZgoMsefK1M+h0bpLxxlf6b6WSEX5qMVTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxviJwlVjhqTtYffLL2+2iCdGFxBJJkiBUcg3NOw89V6OniITLy
-	V2vZyDlCre78yZRtLtzI83inY8mmegj6WytKWkQhzjhM4vdLxXoO9xjOZKb9Xds=
-X-Google-Smtp-Source: AGHT+IEWTHq0nZKsD5+vd+nTSltz6qRpJ8m1ZUA3e2J9fRXNb4Q6Dz/tYps28BHQ7v9MYQ4wj/pQ1w==
-X-Received: by 2002:a05:6402:1d49:b0:5c9:57bd:e9d with SMTP id 4fb4d7f45d1cf-5cb782f9e3fmr2351410a12.19.1729594579617;
-        Tue, 22 Oct 2024 03:56:19 -0700 (PDT)
+        bh=VedVTeltUD2hOjhTzgZcTRLZkzOYBwLXkPWLhE+aU3A=;
+        b=Xar12vyE9Xl4NesIyUBiXFmA/nXamCsCz8Hd4uVbc1hPpWG4AKzB0DRf9vFMbqoPbJ
+         jhnpmXUBildrXr8M0Sy1wjHJI2Ym4E0U0slscGty+3V4FjbCwXO3Wwa0veWh8IHzoDxt
+         6jTDG+26eVhtNiczMaIOUhUTRzwACx4Z9fQ+e/rztlmhHvDkrnHaetaCle2dqdlN/Sm5
+         4VlpWyO0bKwfBpoVVhe6kiiSmRzJdj0Jg/iHYfnf72OXoqaDR6UfCNlO2K/jjKe3Yj4O
+         xCOmMMI3FqsAHfQvMfEY2q+/351keTmKevfkMaUrlWTSq2jj+mERpyO80P220IrMdYJY
+         gPBw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+63gqmORZr2Qx4ImgZ9tWvTSW6GwClfAvccNfVrUhM52v/RmwotqIAZ7vPv33TnDcIC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YximVftY8uUR0qf+e/JK/4Or+RaFvQaK6wVKDuUcT3PAnvFv51j
+	B+o4/nihikzBD2xRYLSe6OMey+tG0Y0owFZb4pR3a3zK8Z1iuLXb3fplV5UjrIU=
+X-Google-Smtp-Source: AGHT+IEkxGTtQDWx75WFvqG2eOnkN/ttLbD0g2OlndDgZrl3BuDo9P5GA68WBIt5JhY19RGUOaJdnw==
+X-Received: by 2002:a5d:424c:0:b0:37d:51b7:5e08 with SMTP id ffacd0b85a97d-37ea21d8fbdmr11273254f8f.18.1729594576819;
+        Tue, 22 Oct 2024 03:56:16 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66c7262bsm2981150a12.82.2024.10.22.03.56.15
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91572abdsm326459266b.171.2024.10.22.03.56.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 22 Oct 2024 03:56:15 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id D35445F8CC;
+	by draig.lan (Postfix) with ESMTP id E69C95F8D7;
 	Tue, 22 Oct 2024 11:56:14 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -99,9 +99,9 @@ Cc: Beraldo Leal <bleal@redhat.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 02/20] tests/docker: add NOFETCH env variable for testing
-Date: Tue, 22 Oct 2024 11:55:56 +0100
-Message-Id: <20241022105614.839199-3-alex.bennee@linaro.org>
+Subject: [PATCH v2 03/20] MAINTAINERS: mention my testing/next tree
+Date: Tue, 22 Oct 2024 11:55:57 +0100
+Message-Id: <20241022105614.839199-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241022105614.839199-1-alex.bennee@linaro.org>
 References: <20241022105614.839199-1-alex.bennee@linaro.org>
@@ -114,42 +114,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Testing non-auto built docker containers (i.e. custom built compilers)
-is a bit fiddly as you couldn't continue a build with a previously
-locally built container. While you can play games with REGISTRY its
-simpler to allow a NOFETCH that will go through the cached build
-process when you run the tests.
+I put it under my name as there may be other maintainer testing trees
+as well.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 681feae744..fead7d3abe 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -92,10 +92,10 @@ endif
- docker-image-alpine: NOUSER=1
- 
- debian-toolchain-run = \
--	$(if $(NOCACHE), 						\
-+	$(if $(NOCACHE)$(NOFETCH),					\
- 		$(call quiet-command,					\
- 			$(DOCKER_SCRIPT) build -t qemu/$1 -f $< 	\
--			$(if $V,,--quiet) --no-cache 			\
-+			$(if $V,,--quiet) $(if $(NOCACHE),--no-cache)	\
- 			--registry $(DOCKER_REGISTRY) --extra-files	\
- 			$(DOCKER_FILES_DIR)/$1.d/build-toolchain.sh,	\
- 			"BUILD", $1),				        \
-@@ -177,6 +177,7 @@ docker:
- 	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
- 	@echo '    NOUSER=1             Define to disable adding current user to containers passwd.'
- 	@echo '    NOCACHE=1            Ignore cache when build images.'
-+	@echo '    NOFETCH=1            Do not fetch from the registry.'
- 	@echo '    EXECUTABLE=<path>    Include executable in image.'
- 	@echo '    EXTRA_FILES="<path> [... <path>]"'
- 	@echo '                         Include extra files in image.'
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c21d6a2f9e..b84787ae1b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4074,6 +4074,7 @@ Build and test automation
+ -------------------------
+ Build and test automation, general continuous integration
+ M: Alex Bennée <alex.bennee@linaro.org>
++T: git https://gitlab.com/stsquad/qemu testing/next
+ M: Philippe Mathieu-Daudé <philmd@linaro.org>
+ M: Thomas Huth <thuth@redhat.com>
+ R: Wainer dos Santos Moschetta <wainersm@redhat.com>
 -- 
 2.39.5
 
