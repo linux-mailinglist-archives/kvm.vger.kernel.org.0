@@ -1,151 +1,208 @@
-Return-Path: <kvm+bounces-29424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92BB9AB412
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:31:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC749AB407
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 18:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C3A81F23A3D
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:31:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F1541C22C31
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 16:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD86E1BD020;
-	Tue, 22 Oct 2024 16:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E181BBBFD;
+	Tue, 22 Oct 2024 16:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DqEUv5sS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fqGLSzzr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1C649652;
-	Tue, 22 Oct 2024 16:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87154FB5
+	for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 16:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729614681; cv=none; b=VHAsmAfGB7KRHIGLzOpSbYeqopLHdXGfhMYI+5q+D/rwsBdT9BbRy6KU7C2YSjVjtpZDQzhTCxnB2Q0GzMcEH+JTuXQY9y/ZuZN6XWnbCO/piui48mX0/CO5UpStSxo3NKFS2QWkSWPsjwj6Gd46qjYdBpdgiwKh1y3cSHHi1fs=
+	t=1729614654; cv=none; b=lZWipZqQLZoYkZv5vnCCpdy97TI3gxTyzP/uEIOAuPz+epIpzDjkDP/GzquIR8ZJtgM990DJpj11DSbKBUVHnGsh4zX1oGuPPNGgJQKfDq2DPEpEdCi0a1dXuqp0rTosRt0T+rKSC575EwNtI3uYvicyFYCt1VVc8+AB6vanQFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729614681; c=relaxed/simple;
-	bh=VJwj7MA066z9kHAFfL/2sU7sqKINqbMoM+lr7owpILc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KR6M/zlYjrkSxii4LSroXNZU+qJ7uYB9mqzC9QWEwAoOpUkEkETM054RcUgAoZzhS1mY3LEConxqWBabqjtPR7pGfXViURX6GPsJ49JG9+f5DTezPbp53MAZf0TvO7JVNKvpjff6jZUyZf6B7jbsoAMD768Y7+MoNZ+r/RHO/yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DqEUv5sS; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.205] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49MGUlQm814998
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 22 Oct 2024 09:30:48 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49MGUlQm814998
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1729614651;
-	bh=CXELoJvoHyovP8cYyonhwjwqYSsgW6npVYhZM7l3PFA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DqEUv5sS1M10ZxZfbA22WXJBks/LmSjbytQxrGg1FbV69rKiZmCBXiJJGUu7YyDtV
-	 tw8dtZPgjFvKnHtUmycexjbzpH4bs7f59uYLUa0u9yJkTudRHRGQOqmp8GzUR+IXQG
-	 Kxc+ui5uSfKfG/rAxhHIBdbn5bbjVy87nnMlLlcbPwZTDcdnUK4Q2Bm7qvr2ccwrDP
-	 6dR38i5joF9W1TVwEk4PsWJUf68jk536cntE+NKXF9o1mEMtbqZq6gKHOTUjS4SO0+
-	 VyjhK02qkdJnPV9cDsXBk5cAl5sfcSx/agGpWGv6AD+SEgi587LD/nHTsNIxYTCbnN
-	 kjBBiwkdAflog==
-Message-ID: <5582cf56-0b22-4603-b8e2-6b652c09b4fa@zytor.com>
-Date: Tue, 22 Oct 2024 09:30:47 -0700
+	s=arc-20240116; t=1729614654; c=relaxed/simple;
+	bh=QOPxs8wUWKMAIDl2V9pd953dr2fdLJZqCSgzDiAXVz4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=q5ZzSe0W83k52FXcDtLAomGjX9HmieNRtABJgAPjs5QZuu45CfEmYB1xfyLRcOAp1M/3gVXYyTPjCbgPHnY9Ddlcrxxkjw0jdTO6BpsgbOchIazOveyRI3TdvFn5AcwrKX/TRT8/yoHy8p7GE2uLNeMuHGchSgmZgGq6t3anADY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fqGLSzzr; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2605ce4276so10414291276.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2024 09:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729614651; x=1730219451; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9kRp9X9Evgeqhd6nWrjVapRhaCIHseB9bHGDukDgzlg=;
+        b=fqGLSzzriuboJZlYznc2xAYIPnlzhSZqNeiZRtE0IPWHc5a9Txq//hAEjkI7dTa/4/
+         hcuG/Omms7ZVw6Bc3gcioQ5fQt6AxxNt5t3m68aDkSAZt3RLmnHlU71iFgtNTf1zDbLG
+         Pt2X7GA2wALJsXSyDpmxhSzJZDYP5YizdwpJF1wAoOtseBT53WX2aCbVEDs/l/RlN6Kp
+         Bw2bAM7sJ+butLU4k5orLMEkkRd5KK8SKxw7w37zDary+0tIL423qNRs5/4cBnJNjI9R
+         UdaprmPlzdGBgHf6B5jNTlYfdvvgPKLGhvPUkufNwrw6lDQdrhojhb/15LBywTPcuiw3
+         EbfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729614651; x=1730219451;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9kRp9X9Evgeqhd6nWrjVapRhaCIHseB9bHGDukDgzlg=;
+        b=sCtp9Rhmowh6DkYaJ4En8GjGsRt0CNAJaYqTWRwpHvAbaqub+rtDI4NqnWZxhj/y50
+         PGvS7GYJ7/V66a2xqtJDo3sTQsh8FhnSUQlCRTamI1Yue/L0Z09o1NN9J+MVTNMep5x8
+         YjneB51CaPky4KthGfxLQjQxoO2+MHbSOlj0j4B2V/YlPlqnQKhauLuZZigoGMl7wWOZ
+         Taj9XXD3+l+WFRSSvxh138KNfi/R270uzMYbR0XLt3QHcS5/6+USyHyrvxoVbMz59+XS
+         vB6DvlZXlLGOzNS8bxFFHF7zZaVB4yuHY4elv1UaizjcR0yJ8pJMwbjp+sbEDD55e64w
+         RtAA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4ft8Hwm1QyzZ236T+QTrfpenXX5o77aTA8uV8zarKMpwkaYbgZAyKZohFOTwltimH0/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLSJ545iPA/uL9ETnaHMh0Iutn1egScx3pd3stwhjst6rukgTq
+	kTouo6EE2mb2E3MBU5dSr7vZSlJTH57aX29iYNUyUkwyjT96fNOg+0bayfyHUuAvOrmx6lDZjeF
+	KEA==
+X-Google-Smtp-Source: AGHT+IFhidXoMwHV1i3xjXEppuei+o0CgKpCcKTpOo27zytz1Beo5NbI8wae2gvpTFRD+0KpTD3bdky90Rg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a5b:c10:0:b0:e20:2502:be14 with SMTP id
+ 3f1490d57ef6-e2bb168d0f5mr9106276.7.1729614650729; Tue, 22 Oct 2024 09:30:50
+ -0700 (PDT)
+Date: Tue, 22 Oct 2024 09:30:49 -0700
+In-Reply-To: <b29e8ba4-5893-4ca0-b2cc-55d95f2fc968@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/27] KVM: VMX: Add support for the secondary VM exit
- controls
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
-References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-4-xin@zytor.com> <ZxYQvmc9Ke+PYGkQ@intel.com>
- <10aa42de-a448-40d4-a874-514c9deb56a3@zytor.com> <ZxcSPpuBHO8Y1jfG@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <ZxcSPpuBHO8Y1jfG@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241014105124.24473-1-adrian.hunter@intel.com>
+ <20241014105124.24473-4-adrian.hunter@intel.com> <Zw1iCMNSI4Lc0mSG@google.com>
+ <b29e8ba4-5893-4ca0-b2cc-55d95f2fc968@intel.com>
+Message-ID: <ZxfTOQzcXTBEiXMG@google.com>
+Subject: Re: [PATCH V13 03/14] KVM: x86: Fix Intel PT Host/Guest mode when
+ host tracing also
+From: Sean Christopherson <seanjc@google.com>
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Thomas Richter <tmricht@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
+	James Clark <james.clark@arm.com>, coresight@lists.linaro.org, 
+	linux-arm-kernel@lists.infradead.org, Yicong Yang <yangyicong@hisilicon.com>, 
+	Jonathan Cameron <jonathan.cameron@huawei.com>, Will Deacon <will@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Andi Kleen <ak@linux.intel.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, H Peter Anvin <hpa@zytor.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, mizhang@google.com, 
+	kvm@vger.kernel.org, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
->>>> 		_vmentry_control &= ~n_ctrl;
->>>> 		_vmexit_control &= ~x_ctrl;
->>>
->>> w/ patch 4, VM_EXIT_ACTIVATE_SECONDARY_CONTROLS is cleared if FRED fails in the
->>> consistent check. this means, all features in the secondary vm-exit controls
->>> are removed. it is overkill.
->>
->> Good catch!
->>
->>>
->>> I prefer to maintain a separate table for the secondary VM-exit controls:
->>>
->>>    	struct {
->>>    		u32 entry_control;
->>>    		u64 exit2_control;
->>> 	} const vmcs_entry_exit2_pairs[] = {
->>> 		{ VM_ENTRY_LOAD_IA32_FRED, SECONDARY_VM_EXIT_SAVE_IA32_FRED |
->>> 					   SECONDARY_VM_EXIT_LOAD_IA32_FRED},
->>> 	};
->>>
->>> 	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit2_pairs); i++) {
->>> 	...
->>> 	}
->>
->> Hmm, I prefer one table, as it's more straight forward.
+On Tue, Oct 22, 2024, Adrian Hunter wrote:
+> On 14/10/24 21:25, Sean Christopherson wrote:
+> >> Fixes: 2ef444f1600b ("KVM: x86: Add Intel PT context switch for each vcpu")
+> >> Cc: stable@vger.kernel.org
+> > 
+> > This is way, way too big for stable@.  Given that host/guest mode is disabled by
+> > default and that no one has complained about this, I think it's safe to say that
+> > unless we can provide a minimal patch, fixing this in LTS kernels isn't a priority.
+> > 
+> > Alternatively, I'm tempted to simply drop support for host/guest mode.  It clearly
+> > hasn't been well tested, and given the lack of bug reports, likely doesn't have
+> > many, if any, users.  And I'm guessing the overhead needed to context switch all
+> > the RTIT MSRs makes tracing in the guest relatively useless.
 > 
-> One table is fine if we can fix the issue and improve readability. The three
-> nested if() statements hurts readability.
+> As a control flow trace, it is not affected by context switch overhead.
 
-You're right!  Let's try to make it clearer.
+Out of curiosity, how much is Intel PT used purely for control flow tracing, i.e.
+without caring _at all_ about perceived execution time?
 
-> I just thought using two tables would eliminate the need for any if() statements.
->
+> Intel PT timestamps are also not affected by that.
 
-One more thing, IIUC, Sean prefers to keep
-VM_EXIT_ACTIVATE_SECONDARY_CONTROLS set if it's allowed to be set and
-even bits in the 2nd VM exit controls are all 0.  I may be able to make
-it simpler.
+Timestamps are affected because the guest will see inexplicable jumps in time.
+Those gaps are unavoidable to some degree, but context switching on every entry
+and exit is 
 
+> This patch reduces the MSR switching.
 
+To be clear, I'm not objecting to any of the ideas in this patch, I'm "objecting"
+to trying to put band-aids on KVM's existing implementation, which is clearly
+buggy and, like far too many PMU-ish features in KVM, was probably developed
+without any thought as to how it would affect use cases beyond the host admin
+and the VM owner being a single person.  And I'm also objecting, vehemently, to
+sending anything of this magnitude and complexity to LTS kernels.
 
+> > /me fiddles around
+> > 
+> > LOL, yeah, this needs to be burned with fire.  It's wildly broken.  So for stable@,
+> 
+> It doesn't seem wildly broken.  Just the VMM passing invalid CPUID
+> and KVM not validating it.
+
+Heh, I agree with "just", but unfortunately "just ... not validating" a large
+swath of userspace inputs is pretty widly broken.  More importantly, it's not
+easy to fix.  E.g. KVM could require the inputs to exactly match hardware, but
+that creates an ABI that I'm not entirely sure is desirable in the long term.
+
+> > I'll post a patch to hide the module param if CONFIG_BROKEN=n (and will omit
+> > stable@ for the previous patch).
+> > 
+> > Going forward, if someone actually cares about virtualizing PT enough to want to
+> > fix KVM's mess, then they can put in the effort to fix all the bugs, write all
+> > the tests, and in general clean up the implementation to meet KVM's current
+> > standards.  E.g. KVM usage of intel_pt_validate_cap() instead of KVM's guest CPUID
+> > and capabilities infrastructure needs to go.
+> 
+> The problem below seems to be caused by not validating against the *host*
+> CPUID.  KVM's CPUID information seems to be invalid.
+
+Yes.
+
+> > My vote is to queue the current code for removal, and revisit support after the
+> > mediated PMU has landed.  Because I don't see any point in supporting Intel PT
+> > without a mediated PMU, as host/guest mode really only makes sense if the entire
+> > PMU is being handed over to the guest.
+> 
+> Why?
+
+To simplify the implementation, and because I don't see how virtualizing Intel PT
+without also enabling the mediated PMU makes any sense.
+
+Conceptually, KVM's PT implementation is very, very similar to the mediated PMU.
+They both effectively give the guest control of hardware when the vCPU starts
+running, and take back control when the vCPU stops running.
+
+If KVM allows Intel PT without the mediated PMU, then KVM and perf have to support
+two separate implementations for the same model.  If virtualizing Intel PT is
+allowed if and only if the mediated PMU is enabled, then .handle_intel_pt_intr()
+goes away.  And on the flip side, it becomes super obvious that host usage of
+Intel PT needs to be mutually exclusive with the mediated PMU.
+
+> Intel PT PMU is programmed separately from the x86 PMU.
+
+Except for the minor detail that Intel PT generates PMIs, and that PEBS can log
+to PT buffers.  Oh, and giving the guest control of the PMU means host usage of
+Intel PT will break the host *and* guest.  The host won't get PMIs, while the
+guest will see spurious PMIs.
+
+So I don't see any reason to try to separate the two.
+
+> > [ 1458.686107] ------------[ cut here ]------------
+> > [ 1458.690766] Invalid MSR 588, please adapt vmx_possible_passthrough_msrs[]
+> 
+> VMM is trying to set a non-existent MSR.  Looks like it has
+> decided there are more PT address filter MSRs that are architecturally
+> possible.
+> 
+> I had no idea QEMU was so broken.  
+
+It's not QEMU that's broken, it's KVM that's broken.  
+
+> I always just use -cpu host.
+
+Yes, and that's exactly the problem.  The only people that have ever touched this
+likely only ever use `-cpu host`, and so KVM's flaws have gone unnoticed.
+
+> What were you setting?
+
+I tweaked your selftest to feed KVM garbage.
 
