@@ -1,318 +1,141 @@
-Return-Path: <kvm+bounces-29477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E229AC8A4
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 13:10:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC749AC8B7
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 13:17:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7702826E0
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 11:10:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB132839B3
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 11:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6D41A0726;
-	Wed, 23 Oct 2024 11:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3F61AA7BA;
+	Wed, 23 Oct 2024 11:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jZyRWf5S"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KIYk3zFK"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2052.outbound.protection.outlook.com [40.107.92.52])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A796154439
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 11:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729681838; cv=fail; b=Hg9FLz6CzZXqgqlLttNz4PGYkJBFRW+6cTTHXduLrc4mnRKt52sBcECIikHEK/pB+uLvKx4DTtzNugjMDRbggikLLQfpMI35srKZ5crBw+J+50uhVPIa8HEwiiszWrAZc+AoEoGe8kjcy6Oivpd+glxdZmQUPYNU9jcFubIEQAE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729681838; c=relaxed/simple;
-	bh=LuY9+lfwTGUocQms4ldus818N6My+w66RJdngqTCd9w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XqbLBcYEXV0uyh7zxGhV6yGwcqZVCZlhQgDZa+E6NPSZcQuEn8RIJ8eb5Ms3xTLVB0cTPf+7Qo6rmIhbnmrQ9vEnFk/e73N/6I/eTm6jMhlcXLBV+Uu27GjPPVe7OkRLPrLaPD9F3Qe8Db5AYdEyBa45nJDDNHWUh+KChDC3x8Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jZyRWf5S; arc=fail smtp.client-ip=40.107.92.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JH0RaYVgi+J7125NOzxbxnO1JspPvPAXgIg2lVlUzxRNRug5GIEgv/KJ8Keo7XiiAcDUhJdkR1BO5ah+UN4XI3u7H9M3Uvvg44epWmpfvQpEJC3EyIIxeT2BlEJl2gIMeeN4ld1krvnh4w+Eb0K5QZDnAf4qq5jiseEh/oTJf9pRUc7IouLjryIjFjEIlNzLutoX+j9kaz4QaZad9NPcNfzgmfUSrUaZhMALt9o/5R2joGcflJma+3Tq7uZIifRyv3JpZDcEVsPqfQPG03AOBAyETA9L9SChxAZm0l/toiZHJtmwpe7cZE7I/WpQNu0YWNkmmLeKnQiKOer0gnAqRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ib1ZXuREW8hf0L2hNIsjp0CxXIgfdsCYaTvAIlrYS8I=;
- b=wMc5xr4Or8iDYZbIEncD/ERV0wCvExSizv/TNVjy7RKo6r1oewt6ERJVZ4etHx/11fasZZGm0MozkGqsQ49lVNMmIHvRhHVon+ond18UqyCGhuq33KgA+CpKnz7HC2XqqB4BC6bfyRAo53u9IV13Qz8v5gHqdijGM3kwrk865AY+DANEIAGZO0R1oJ2/PbPwRvwHNh8ymX0ODNIxn/+PzGgSHkJHSzCNN3Sn2jtBBhrCWX7k1FbJ549oQououiN7HjYy9lV4iEQ1LnF+kPahvcG11s/V13JuIU4P6kTT2CEEDMQLMD2Ab+I0oG66zA1HQqdsxDeIugY1EB139mf18Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ib1ZXuREW8hf0L2hNIsjp0CxXIgfdsCYaTvAIlrYS8I=;
- b=jZyRWf5S72usxAA4zRHOTzrvJZAzRIysKBnfoJgMZM1rJAVITPDgatEkeqR9tnPab3GtPoOEKRabQsBZzYJp8CgT9cSrmSw94xGxz69sHY91ts4RMMY9eIhHlyMjEmAmcrJnTT1THc/7+FM++Y5f6evZ+XB4yHVocvcwTYyczr4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- PH7PR12MB7137.namprd12.prod.outlook.com (2603:10b6:510:1ed::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Wed, 23 Oct
- 2024 11:10:32 +0000
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5%4]) with mapi id 15.20.8069.027; Wed, 23 Oct 2024
- 11:10:32 +0000
-Message-ID: <e937b08c-4648-4f92-8ef6-16c52ecd19fa@amd.com>
-Date: Wed, 23 Oct 2024 16:40:22 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] iommu: Add a wrapper for remove_dev_pasid
-To: Yi Liu <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-Cc: joro@8bytes.org, kevin.tian@intel.com, baolu.lu@linux.intel.com,
- will@kernel.org, alex.williamson@redhat.com, eric.auger@redhat.com,
- nicolinc@nvidia.com, kvm@vger.kernel.org, chao.p.peng@linux.intel.com,
- iommu@lists.linux.dev, zhenzhong.duan@intel.com
-References: <20241018055824.24880-1-yi.l.liu@intel.com>
- <20241018055824.24880-2-yi.l.liu@intel.com>
- <20241018143924.GH3559746@nvidia.com>
- <9434c0d2-6575-4990-aeab-e4f6bfe4de45@intel.com>
- <20241021123354.GR3559746@nvidia.com>
- <91141a3f-5086-434d-b2f8-10d7ae1ee13c@intel.com>
-Content-Language: en-US
-From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <91141a3f-5086-434d-b2f8-10d7ae1ee13c@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN1PEPF000067F1.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c04::2d) To DS7PR12MB6048.namprd12.prod.outlook.com
- (2603:10b6:8:9f::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893831A0B1A;
+	Wed, 23 Oct 2024 11:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729682263; cv=none; b=UWIBbn3+4K4p0qz4V78kM5OR6l185eFIUyrt9qJj8PBk5wt6nHrX3GrqB8eOCqZrRInH51SXFI4dRKKPhu2TQcCiaLynw1OaENCmqGyNkX3YlrrNZw96BvtwCAQDKRWKKVvf4DHb6t/q72Ufz7baltfrnZRJcdsYjY4gFzXwPkY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729682263; c=relaxed/simple;
+	bh=eCBwA2uVeaP+2Ms9EufdOjG1uAd6/PDeJZo0k69Rz0I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=oysC20SoybLI5bIObfwjuwtcn7+HO49ggZqZ+Ft7tmQ19b/okfEOiG/IjQkrt7lQtjtjVGL4Papq0b5OguGMKZUOSzuqqJ+simBqQwu2Sg2gd9TnNCOeVWgfjOhbUCJEhGmM+iE8BYwts+c0jRR7r1nkr1BjN/jyyYgXEW3iMvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KIYk3zFK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49N0N2WV027060;
+	Wed, 23 Oct 2024 11:17:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ZE6D+HYETUE/ynzDtMdhfiXsH2K1dY
+	hl0JDp52VsIME=; b=KIYk3zFKjt5NfqmqLpfkxYcX8Bh7E5ZOBX6MngDiUHPE7i
+	za35AfTYZSqkN3qn84cGmanG6XJibAGMbIuZeE/0leRww3WfTrn9uja63UVmQyvD
+	Dt3CgfWVW/IGXx4PzjP2G32bTqT68OB2pAvEJ3HubS7qc+d0yJmNEQYa/MB7WBfJ
+	0OMsqSw9z6ZHAtCf8qUQhMdxawGtGtIL8edswVaZJYZN32wTfJOeT0YS694mWCkP
+	QmMwUvvHS9V6eE5MPzUVbxG5due9OOfbRZ9SE4N1MHXPSXmSmlt5GkG79410yxEn
+	1N9eXrQLZ6QyzC5Y5EFuO4LnUY48ytK/9LzZyYgw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emafjq2p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 11:17:31 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49NBF8co023247;
+	Wed, 23 Oct 2024 11:17:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emafjq2g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 11:17:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49N7XXlk014287;
+	Wed, 23 Oct 2024 11:17:29 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42emhfjjfk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 11:17:29 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49NBHPJO41615756
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 11:17:25 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 74C2D2004B;
+	Wed, 23 Oct 2024 11:17:25 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5A65520049;
+	Wed, 23 Oct 2024 11:17:25 +0000 (GMT)
+Received: from localhost (unknown [9.155.200.179])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 23 Oct 2024 11:17:25 +0000 (GMT)
+From: Alexander Egorenkov <egorenar@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: agordeev@linux.ibm.com, akpm@linux-foundation.org,
+        borntraeger@linux.ibm.com, cohuck@redhat.com, corbet@lwn.net,
+        eperezma@redhat.com, frankja@linux.ibm.com, gor@linux.ibm.com,
+        hca@linux.ibm.com, imbrenda@linux.ibm.com, jasowang@redhat.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, mcasquer@redhat.com, mst@redhat.com,
+        svens@linux.ibm.com, thuth@redhat.com, virtualization@lists.linux.dev,
+        xuanzhuo@linux.alibaba.com, zaslonko@linux.ibm.com
+Subject: Re: [PATCH v2 1/7] s390/kdump: implement is_kdump_kernel()
+In-Reply-To: <64db4a88-4f2d-4d1d-8f7c-37c797d15529@redhat.com>
+References: <87ed4g5fwk.fsf@li-0ccc18cc-2c67-11b2-a85c-a193851e4c5d.ibm.com>
+ <76f4ed45-5a40-4ac4-af24-a40effe7725c@redhat.com>
+ <87sespfwtt.fsf@li-0ccc18cc-2c67-11b2-a85c-a193851e4c5d.ibm.com>
+ <64db4a88-4f2d-4d1d-8f7c-37c797d15529@redhat.com>
+Date: Wed, 23 Oct 2024 13:17:25 +0200
+Message-ID: <87wmhzt6ey.fsf@li-0ccc18cc-2c67-11b2-a85c-a193851e4c5d.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|PH7PR12MB7137:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44586438-b587-49c7-eefe-08dcf3534f38
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UGY5ZURWWU5uVVN6Yk15cVdCUnBlNWdRMTAvUnpZSXYySitZeWhtYjFJK2tj?=
- =?utf-8?B?S3lvZGZjc3B2eEMwODB6OUpQVU40czJTRVFwTUhSNUIrd3NOYk5Qb1EvTDZr?=
- =?utf-8?B?WUE0QkxIemltVnVzWEVGK2xGaGVSWmt1OEZCeVE5Z3JpMzV4ZnhIY0NkVGw4?=
- =?utf-8?B?T0VIanVRODI2L3BwMGVHcDFkM1lxb1RwTkNiZWlEVDNrcUZ4UlJCZkpFTFQ5?=
- =?utf-8?B?WXFrQU1VSnNPakFGenBIa1I5a1dZb3JVRVVjK2xJSzhFSGxQYldpdTJUcGc1?=
- =?utf-8?B?OWRQaVNWdE9kNyszTWNSSlpJNGhRb09PbHo1R2ZGd1BSVDNxenNzN295Y0pj?=
- =?utf-8?B?Sm1TZmkxaFd6dmRGb0hUTEZQR3luN2wwTUNMK2hQa3cyUUMrMENud3k3UnF1?=
- =?utf-8?B?L1p2RXEzeFljcmpaZUhEeGM4NXNvbW5TU3RBUkhVSTFRZWprNUpDNGtSZXhI?=
- =?utf-8?B?cmluZVJMWHRNOGRnaGI3V1JNb0VFcFVsYWc0TkNRcFIxUjFuZkVCalYzVk9o?=
- =?utf-8?B?b3l4eTA5NjVrMWhkWEFHajM5Zm8wL0xjQ2JmdGpTaEpZc3Y3U1lUODlna3lN?=
- =?utf-8?B?b2JZRUE1OWVRV3Z4dWpzUHlyS1p0UEM4WEpnOWVkK2VmZzhoT092cDBIVlhH?=
- =?utf-8?B?RlFXTnlROC82ZExpTEJvSUlSUFFQTU1NUzZrT0N6VGUyZG0xQXY2Z29SWHZi?=
- =?utf-8?B?cUtBYjJOQ3ZrZGNUWkdTTVFpZklLZ1Z2UEJwcFdoY0ZrZTNmakNHZS9pQ0ow?=
- =?utf-8?B?M2o5YXlWb0kwM0YvajFDbUhEQ2Z6VFNrU2FKS2ZsK2RLcjVYV0tDR2cvOEQ2?=
- =?utf-8?B?andFNzYrK2V5U0NVWkh3eDRQbkk4bmxSdlk4aWgza1JSZlFLZEgvTHk3dGhm?=
- =?utf-8?B?MDhqOXJZaWNRSHlaSlF4TGNsSkpzTGFJK1RDUFZ1enZLZ0tuNCtsaDN6SkVo?=
- =?utf-8?B?OUlpZzNWQTg0SVgwcXp5Q2RMNWk0a1kyVUhNcjcxS1preXJGMUlHcjlTYU5R?=
- =?utf-8?B?c1drVElTaFV1b0JoVEQweEJ2aVR5d0NqT3pQL1NrZUJ1QTU1Tmh3L2xMZkxx?=
- =?utf-8?B?ZUZsRyt4V3c3bUVhbFk5UnpDVEFDMzNPMHlqRWV5SmtwTnlOWTRwcEJCRkRI?=
- =?utf-8?B?OHhxUTY4K1JobmFPOEZSYkNDQld1NFRJMEJqYVcrWnRIZ0doK3ViN29iTldk?=
- =?utf-8?B?UEg4b0piU3FHYmpvcEZuNTRzVUtMTWk3bHMvNDBXN0E0dXVlMUNmc0R6c3Fh?=
- =?utf-8?B?Sk8rS2xMRm5UU3NhWUQ2TWFXMG9VekhLdTNwWUtyS2ZCaXZJRDAzNmVjYUlm?=
- =?utf-8?B?aTZOTU40KzNucmluYWY4ayt5a1kzcnBzdWdoRnMraHh0TnJvRlFTWDF0eXpU?=
- =?utf-8?B?bFlnaFRKMUZaUHNValg3bkxHSFQ2dXBPYW9XQWRyVzU2Y0RJRTR6K0JRMW96?=
- =?utf-8?B?ZTY5YVZvTWhZRi9hTmRsQ1BQaE95UEl6S041L3ZXZGNxQkpwRUQyWndPUVB2?=
- =?utf-8?B?bURiSFFFNDhGWVZJVXkvWFM1NjIwUWFXdEQ5bHhlZ1hyU3N5QnNPZmRidzVt?=
- =?utf-8?B?U2NTS1l4Qk1yZFJ2elhTM1J5citiV2ppNWQzRnV3aHp0VERkNUx3SHRHb1RV?=
- =?utf-8?B?U3paT0VST3R5QXFmVUdRSlM4RWRDL1ljNzd5ZU1OVmMvRWlZYzEzSU1ua3BU?=
- =?utf-8?B?NjhDdEtROEJVT2djVmZXNTArOS9tN05kN2FLeWlGTlZ3MU9pM0ZSL2xmaU44?=
- =?utf-8?Q?mwZlaVlnnIHTEenu1w=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bmRrcncxdHd6d0ZkTkRIcnR6V3Y1Q0h3b28vT1ZLUndFaWxBWkVHQTZ0d1gr?=
- =?utf-8?B?dnU2QnkrSU94RHYyVm0rZ2l4UWtMRWw1QStPQThENnhNK0VXOHU0SzY1aXlL?=
- =?utf-8?B?UFJqNG5XWi9PTThERkFnRE9VTXdOTmxTUW5EaTIzV3VLMkM4S05ZTW1SZ3Zz?=
- =?utf-8?B?UDV6aXlNREZNOCtvbEplVE5rTjNjQkxORU9ubWJXdjV3cW1LbkR6VWg5OVlq?=
- =?utf-8?B?OSsyM1BMYWQvcE5tZnRsd1ZuanlLME9TSjJ2OENkQy81cUJ6QVZjaFpoanhF?=
- =?utf-8?B?NEJ5YXdFN01qRGdqWU1kQlZBcVZ4RDJ0czBhRjBDaGUzUUt6akdGOU9iUWsv?=
- =?utf-8?B?TzUraiswc3F3K3Q1cFkzTDhLMFZiQW93TjJYbkpxWEppVTJxd2s5OVpNbFZ5?=
- =?utf-8?B?RXphekRyT285cVpSZjVZUDdZTlkybklqYXM5YWllS3ZxNS9HS0xlc3dCVTUw?=
- =?utf-8?B?UDRFWGVTQjF4VXdxYTI2SDFab2t5bzNuVHYyaHM5NWFxcUdxNi81TUphVUNI?=
- =?utf-8?B?NWFkRFdIMHA2QXdMM3NqMUFubHFWT1N1VVprQlIrSno0a2FVcG9BVmRuQk1j?=
- =?utf-8?B?ZGh3bHJ4WnFYanNuamlyUDNCQmhMNFUzYXhaTTN5NXpqamd2TzhHeDgySUhP?=
- =?utf-8?B?R1pkRVRtUGdWZ0N2NUpZNDFpalU3eGtxTkZ0cTZ3TnRmNnUzOS96bFlKRVZL?=
- =?utf-8?B?RE00bTM0WHlWYjNEejlwaHVHOTh2RjgrWkpyZ0VxSmh0UWp6WEVVdUhJRGlJ?=
- =?utf-8?B?QWx2V1JhSVQ3eStrVDdVRUFublFUU251T1NuSjRiQS9Pc0NjS0lhb1pDSlo0?=
- =?utf-8?B?WGtnMnAzQWh6Z0drNEl0aEFjUk5SeUJYZDVkRUVJWUJRUlczN0FTbUtsNUN3?=
- =?utf-8?B?dDFoaVJTRnFqZHlEMVNJZXdnRzV0b2owSlJnVE9wU1BVT21HSEVFakxMMDJ5?=
- =?utf-8?B?WGV2cWFhTnYxOEhyTGVIN282UEdZT2szaXhJaVNCYUZlQlJ5Sld3VnVnUG1o?=
- =?utf-8?B?VzR6ZTdOOTl1S2ZxY21NaVV4TWZ6bitsZDNndUxRcWk0YS9mM2xBc3oxWWs2?=
- =?utf-8?B?NFRTRGZIWlUyVVZaamNEaEM1cVRjUTRIS3VJcmtCQ3gzSEZFZGdGZHRuN1Y1?=
- =?utf-8?B?ZkNVM1p2QU5OSUl0azhQdG1FNFFTYzJnTExrR0xoUlcyYnRvNlNZejJoL21R?=
- =?utf-8?B?cm5FU0hkV3VVTStTNGRoUjh0c0IvSGtBZlFzMlNaeGF2bHFpTjlsdEwwSzNr?=
- =?utf-8?B?WHNaeC9iVFJFeTA5aHJSUktiMW9hcEx3cDBXS29qK0RocWs1OUkxZ2o5OVdB?=
- =?utf-8?B?OUUwSWRXdHV0clB0UTMxdmRDKzg5UE9STGw1TlF3RmkwalFZODgvMFlreW4w?=
- =?utf-8?B?OU5nSkxKbnZUTzJsaklUR1BmS0xTOEZOV2JVdloxWUh4cTN2SzU0Qmx1MjFh?=
- =?utf-8?B?N25kd2ZyMS9qdE15R3VybCs2WFE3SDA1YzRqTEZzNU9XekdiSTk3NEZYbVZH?=
- =?utf-8?B?TS9INW1hc2FtbDNpTGdsS3U4QjZnRXMvWVBxV2dldEY2RWFCYSttZUVINWtp?=
- =?utf-8?B?aEFDZkxLb3Nkbkd1cDZNbFI5eFg4TjJGWUNwaW5HOEI2eGlCNzZST0J2QmtL?=
- =?utf-8?B?RmlOZE1ONzgwUXZrN3J5VXcvYWIwVS82dnVoUnUyQmhEU21HSVNlejl6TWpL?=
- =?utf-8?B?V05VbVowRzl3cWtPeUU3VzFXZlZxMTFDVys2QldUSmVOUDg4RHFtYk9GazRh?=
- =?utf-8?B?WDFzQ2JXdkM2QURyZVZKdnFNTUtnYU1ibHZjbjFvdXF1M3RrM1dsRzUzVUNK?=
- =?utf-8?B?QUErRVovMFV5Q3BES2dvNWloTXFCbE1rQXFZeXVrTGVra2l0aUwrZTh3cTBE?=
- =?utf-8?B?WUNNQk5PanR6SmZjQlEvOENORmFjZzdpcTZGdW12MUVJdkQ0YzkrZHdqYVMy?=
- =?utf-8?B?ZzFleEtPQVI4N1ZhSG1EUUFBQjVvYzVyZ0VSY294Z1J3WU15TVREV3VyT1RG?=
- =?utf-8?B?aHZyN0NrTXF5cDFtMW5za29Xb05lbjB5dU93Ky9pRjBIRlYzb2wzcGw1bmxB?=
- =?utf-8?B?MXY2cm1vZks3cFF3cHhnZmg0cHo5R1Z6MWg4T2ljbnltQTloSDlQZVpJd1BP?=
- =?utf-8?Q?++Iqse02hUGY3URaVFiAfxPJU?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44586438-b587-49c7-eefe-08dcf3534f38
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 11:10:32.0295
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jT8Ju4GzBLwaNmvgL1HCP2BEQZzvYhzDwEBg1gjZlqCfXV4PskJXBbZIZgImq/mm9XfhXE4NS5xHysAcnUKLiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7137
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: CKYpV1nV98NDEQcpmjz79r4Re2RRu4UK
+X-Proofpoint-GUID: nlELFtrFhiav0kiOq_i2qsR30bXf8Zr-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxscore=0 mlxlogscore=804 adultscore=0 lowpriorityscore=0 malwarescore=0
+ spamscore=0 phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410230065
 
-Hi Yi,
+Hi David,
+
+David Hildenbrand <david@redhat.com> writes:
 
 
-On 10/22/2024 6:21 PM, Yi Liu wrote:
-> On 2024/10/21 20:33, Jason Gunthorpe wrote:
->> On Mon, Oct 21, 2024 at 05:35:38PM +0800, Yi Liu wrote:
->>> On 2024/10/18 22:39, Jason Gunthorpe wrote:
->>>> On Thu, Oct 17, 2024 at 10:58:22PM -0700, Yi Liu wrote:
->>>>> The iommu drivers are on the way to drop the remove_dev_pasid op by
->>>>> extending the blocked_domain to support PASID. However, this cannot be
->>>>> done in one shot. So far, the Intel iommu and the ARM SMMUv3 driver have
->>>>> supported it, while the AMD iommu driver has not yet. During this
->>>>> transition, the IOMMU core needs to support both ways to destroy the
->>>>> attachment of device/PASID and domain.
->>>>
->>>> Let's just fix AMD?
->>>
->>> cool.
->>
->> You could probably do better on this and fixup
->> amd_iommu_remove_dev_pasid() to have the right signature directly,
->> like the other drivers did
-> 
-> It might make sense to move the amd_iommu_remove_dev_pasid() to the
-> drivers/iommu/amd/iommu.c and make it to be the blocked_domain_set_dev_pasid().
+> Staring at the powerpc implementation:
+>
+> /*
+>   * Return true only when kexec based kernel dump capturing method is used.
+>   * This ensures all restritions applied for kdump case are not automatically
+>   * applied for fadump case.
+>   */
+> bool is_kdump_kernel(void)
+> {
+> 	return !is_fadump_active() && elfcorehdr_addr != ELFCORE_ADDR_MAX;
+> }
+> EXPORT_SYMBOL_GPL(is_kdump_kernel);
 
-I wanted to keep all PASID code in pasid.c. I'd say for now lets keep it in
-pasid.c only.
+Thanks for the pointer.
 
-> 
-> 
-> diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
-> index b11b014fa82d..55ac1ad10fb3 100644
-> --- a/drivers/iommu/amd/amd_iommu.h
-> +++ b/drivers/iommu/amd/amd_iommu.h
-> @@ -54,8 +54,8 @@ void amd_iommu_domain_free(struct iommu_domain *dom);
->  int iommu_sva_set_dev_pasid(struct iommu_domain *domain,
->                  struct device *dev, ioasid_t pasid,
->                  struct iommu_domain *old);
-> -void amd_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
-> -                struct iommu_domain *domain);
-> +void remove_pdom_dev_pasid(struct protection_domain *pdom,
-> +               struct device *dev, ioasid_t pasid);
-> 
->  /* SVA/PASID */
->  bool amd_iommu_pasid_supported(void);
-> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> index 8364cd6fa47d..f807c4956a75 100644
-> --- a/drivers/iommu/amd/iommu.c
-> +++ b/drivers/iommu/amd/iommu.c
-> @@ -2437,6 +2437,30 @@ static int blocked_domain_attach_device(struct
-> iommu_domain *domain,
->      return 0;
->  }
-> 
+I would say power's version is semantically equivalent to what i have in
+mind for s390 :) If a dump kernel is running, but not a stand-alone
+one (apart from sa kdump), then it's a kdump kernel. 
 
-May be we should add comment here or at least explain it in patch description.
-Otherwise it may create confusion. Something like below
-
-
-Remove PASID from old domain and device GCR3 table. No need to attach PASID to
-blocked domain as clearing PASID from GCR3 table will make sure all DMAs for
-that PASID is blocked.
-
-
-
-
-
-> +static int blocked_domain_set_dev_pasid(struct iommu_domain *domain,
-> +                    struct device *dev, ioasid_t pasid,
-> +                    struct iommu_domain *old)
-> +{
-> +    struct protection_domain *pdom = to_pdomain(old);
-> +    unsigned long flags;
-> +
-> +    if (old->type != IOMMU_DOMAIN_SVA)
-> +        return -EINVAL;
-> +
-> +    if (!is_pasid_valid(dev_iommu_priv_get(dev), pasid))
-> +        return 0;
-> +
-> +    pdom = to_pdomain(domain);
-
-This is redundant as you already set pdom to old domain.
-
-> +
-> +    spin_lock_irqsave(&pdom->lock, flags);
-> +
-> +    /* Remove PASID from dev_data_list */
-> +    remove_pdom_dev_pasid(pdom, dev, pasid);
-> +
-> +    spin_unlock_irqrestore(&pdom->lock, flags);
-> +    return 0;
-> +}
-> +
->  static struct iommu_domain blocked_domain = {
->      .type = IOMMU_DOMAIN_BLOCKED,
->      .ops = &(const struct iommu_domain_ops) {
-> diff --git a/drivers/iommu/amd/pasid.c b/drivers/iommu/amd/pasid.c
-> index 8c73a30c2800..c43c7286c872 100644
-> --- a/drivers/iommu/amd/pasid.c
-> +++ b/drivers/iommu/amd/pasid.c
-> @@ -39,8 +39,8 @@ static void remove_dev_pasid(struct pdom_dev_data *pdom_dev_data)
->  }
-> 
->  /* Clear PASID from device GCR3 table and remove pdom_dev_data from list */
-> -static void remove_pdom_dev_pasid(struct protection_domain *pdom,
-> -                  struct device *dev, ioasid_t pasid)
-> +void remove_pdom_dev_pasid(struct protection_domain *pdom,
-> +               struct device *dev, ioasid_t pasid)
->  {
->      struct pdom_dev_data *pdom_dev_data;
->      struct iommu_dev_data *dev_data = dev_iommu_priv_get(dev);
-> @@ -145,25 +145,6 @@ int iommu_sva_set_dev_pasid(struct iommu_domain *domain,
->      return ret;
->  }
-> 
-> -void amd_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
-> -                struct iommu_domain *domain)
-> -{
-> -    struct protection_domain *sva_pdom;
-> -    unsigned long flags;
-> -
-> -    if (!is_pasid_valid(dev_iommu_priv_get(dev), pasid))
-> -        return;
-> -
-> -    sva_pdom = to_pdomain(domain);
-> -
-> -    spin_lock_irqsave(&sva_pdom->lock, flags);
-> -
-> -    /* Remove PASID from dev_data_list */
-> -    remove_pdom_dev_pasid(sva_pdom, dev, pasid);
-> -
-> -    spin_unlock_irqrestore(&sva_pdom->lock, flags);
-> -}
-> -
->  static void iommu_sva_domain_free(struct iommu_domain *domain)
->  {
->      struct protection_domain *sva_pdom = to_pdomain(domain);
-> 
-> 
+Regards
+Alex
 
