@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-29464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 566D19AC031
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 09:28:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F6E9AC040
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 09:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 124D92815C0
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 07:28:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61E43B235A7
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 07:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8121547D5;
-	Wed, 23 Oct 2024 07:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2EA153BF8;
+	Wed, 23 Oct 2024 07:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/7KjDeC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITZaz2qr"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBBF1547E4
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 07:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194F2148FE8
+	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 07:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729668532; cv=none; b=FpuAwEERlXxIrUS99cyRfvRwY3IR+9Z5kI3MfyomXMsIHDHju6jtTOZDIOaIaQQ9bwT2qL0b4dS03cBicNFWOtUkfs4XxwbJgK2ImD4y7MM6oCTH9fFxarKQG3LoX629wNptcEGspIIAbNUy4IOoiSzdX7xfYNUbmrbjGpHZbdc=
+	t=1729668659; cv=none; b=mPqAf3kpMo9hD3ZezaZINKF8QmmKYpjgNc1WWRZAV42qhgZGnahnwp5MMClTs5xLzHVRdOFNGWkYUyWNfr0GeA7ZD/eSo+Ga/i1pvCUrTGYXy7f0bWlPN23+eyDySL9F6XcoTgjxVYLKTBt+Nvu23JN9QLcPk+vMyFVxAbQobeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729668532; c=relaxed/simple;
-	bh=tQy7Z/wXQN4bQ5hmaRyeOHr78J2Jpa8mKsqNYYeOX6w=;
+	s=arc-20240116; t=1729668659; c=relaxed/simple;
+	bh=S18A9/uegNQLch0nFe6lcikOk1MT+xNgksoyQj207/Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LkiTtGt2WLhcYsXaooBrx8O9KpvvBqw2dSLSEQhujE2QYbizT9ip3ErVNY22Xb8zsZ0llISiRtKGO8eAczVlf0jASTbwtfd6M/70oMM8h9kWHmHtBXh7heN5MmPtCkxaSnbUf4K94rlJQVi447rqYz0cNCISw+1c1LiLSKMdCic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/7KjDeC; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=MKtzBb4WuTMF70YAu/ibyROQOEx+Kp3zUQ8YGnlPHIPQZVsl+bYuAPcuzAJwwvse/e3hitOcNFedj2HDVRr6KzX4HbGZ8+8myzcQdrPUE7T+ZD7PTyuJJ3ZuFWZ1qm8mejeJUq1Qc12cB+ir4DmzzG/Poc5K+Tp8qNsK0vmxBtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITZaz2qr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729668528;
+	s=mimecast20190719; t=1729668656;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=n3bFd8/vbccyYuQYQ2+btECDTQp1eTA3rb9KvkPx0Ts=;
-	b=W/7KjDeCOwZjSdSohkjoDY8Te22Jy3cAoo8MGZHQ06FuP8nu1YbciT0efMZAKH4qsCxNcq
-	7ei4bCKEnXKXxp+35oqayXp72/d9FPvnSBb4iKhYIFalf1I5KB2W8x6naA8R+NHTEvFnOY
-	qXOg69UvG+Yd1G2q1asrGU5HefryZf8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nLAbOW5noKWYdqiOCxdBnOzCCEaEY6Bx0acXsqpyM84=;
+	b=ITZaz2qrZ71Jy2iShgEesjVr/boxexA2jFzktfjU4yMtEA/LO6agxlA44eRfr+1yX1xBmV
+	LWYvxTAHy1ipXdOwO7BsV3JmTA3KJjHrmXduMhajg09q4dZ3/HrRjPE6wO25lDcX0+XMPB
+	pRebKtOjrSJp4tYfKSn53F646Sr90DM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-Bci_mFFIOXiaWSRaKcZs-Q-1; Wed, 23 Oct 2024 03:28:47 -0400
-X-MC-Unique: Bci_mFFIOXiaWSRaKcZs-Q-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315b7b0c16so47655625e9.1
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 00:28:47 -0700 (PDT)
+ us-mta-335-bx9Tyoi3MCmlysoH1VNRSw-1; Wed, 23 Oct 2024 03:30:53 -0400
+X-MC-Unique: bx9Tyoi3MCmlysoH1VNRSw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5a3afa84so3411185f8f.3
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 00:30:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729668526; x=1730273326;
+        d=1e100.net; s=20230601; t=1729668652; x=1730273452;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=n3bFd8/vbccyYuQYQ2+btECDTQp1eTA3rb9KvkPx0Ts=;
-        b=YvCn/ZMcSrBLfNVWeZ2AA5to9d0b/+8OsAlCrJdEwB4KIHMKmz8IAsyeLlL7gTF9f2
-         vReDyIZRCb1o66fQDIS6753iAWR4h1u6bK6mYNQokOdc5I/smbcq7rFEYvEjYHH/N+Hx
-         b01K1NV++jce1mskHV/xt9Fm1M4z3xtThir1jO2WDyHDNXVwamGMeec9d1uASLfym52B
-         feiQw/Zot6/XPoYBwFEdQUyYkAB8FopWuzeXtJFK6X5Er0w44XOqUSVzYcmr7lExVs4T
-         kxx8GmmhV/+AuX0sCCjxhbnypXgWJdKu8IbKSofOC86erP+mEDP970NPaP48wLPanX7n
-         G6lg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8Op3c4WIkJVsq+ucr4HoBGRsqNXQs7AXjaBVdK9WLcDxynDam4Di34fnYa1HB9ZA9hVI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWOYMfwXBdso53c79/ZqBF5kWj1viQAv5AMre8DR7OUd6q7wqC
-	t/20zTtBV3Yn+soYTwkEgw1YqLWk9OQkBJ4S9y5hc9HrmcXfo2Q8XF5XlKCZLwBeCBP2qvpXfUW
-	iHjwmQnatruhbvO479ShrI0JczYm/FMCp9r9+k5KRLJh9pSBzGg==
-X-Received: by 2002:a05:600c:4fc6:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-431841b6110mr9953585e9.35.1729668525963;
-        Wed, 23 Oct 2024 00:28:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFSQp7KFRiSfNAAWWy/79lbw+H+eUimxk+XUNKNGd4tlk0i5h/4iB14tXJZmIuKHVr5wY98NA==
-X-Received: by 2002:a05:600c:4fc6:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-431841b6110mr9953385e9.35.1729668525405;
-        Wed, 23 Oct 2024 00:28:45 -0700 (PDT)
+        bh=nLAbOW5noKWYdqiOCxdBnOzCCEaEY6Bx0acXsqpyM84=;
+        b=UqQ7Drs/+s//AAnzskgblxE8LIy98xPrU6hTs8cQS9h/71+a11KybcTzGvSlJoJJ57
+         4rsUwJw0t1kfV5opANSxZDiEa6rum/9ku60ruC/XYRxa7hkuo2OysACMd3mCBW39lZNj
+         HhVAOtTYO7wyQ1EYDgQYoS7JOTF8y/rV/jtPUd3E6CwGKeHx9pXlBX4FkBKEeHlAC3gb
+         Nt6FI5TKyZpCL6poK5fsgUFkpb4hx669KrElhxuzyblC0V0MxwHTs+sP6BIs5nqLdAx6
+         tEt98BeftP2WIrS1tR0yFFpIqIlChMjTxnbTRO3qoy74xx7kd5KKrqkIwtE2tASJ0p7Z
+         qpAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUltHql8WB72JBHjTmiM38Ma6uz7yHvOFpinecMbg7tve7CyZht7qBtFS41xRZWEa82DXs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSjAovzM332pifscm0KmFjv/+DavHBqGQ8UN6Kwg55l2fz9eWf
+	4e5oi88eErMgDCz79U1M6bnboLm6homSRK49Gc2Gs2ebj5kFjtKLXfMfoQx8tJ37oLaHndorwdp
+	XkzkpB68tyiVCxkr41y3Z2QWb24wi6lLya3YqUkPHjbtYoDtwcw==
+X-Received: by 2002:adf:fc89:0:b0:37e:f1ed:67e8 with SMTP id ffacd0b85a97d-37efcf1febemr910537f8f.35.1729668652070;
+        Wed, 23 Oct 2024 00:30:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IElQufGspeuo8s52Js73KdBiTAVmxS+0bm1ueIZyZW3Xk3w29r46GilaYuIg/XFCvKU6PmSYA==
+X-Received: by 2002:adf:fc89:0:b0:37e:f1ed:67e8 with SMTP id ffacd0b85a97d-37efcf1febemr910514f8f.35.1729668651465;
+        Wed, 23 Oct 2024 00:30:51 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c70c:cd00:c139:924e:3595:3b5? (p200300cbc70ccd00c139924e359503b5.dip0.t-ipconnect.de. [2003:cb:c70c:cd00:c139:924e:3595:3b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186c3a7a1sm8161615e9.32.2024.10.23.00.28.44
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186c15684sm8218015e9.39.2024.10.23.00.30.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 00:28:45 -0700 (PDT)
-Message-ID: <a0fda9e7-d55b-455b-aeaa-27162b6cdc65@redhat.com>
-Date: Wed, 23 Oct 2024 09:28:43 +0200
+        Wed, 23 Oct 2024 00:30:50 -0700 (PDT)
+Message-ID: <0cda6b34-d62c-49c7-b30c-33f171985817@redhat.com>
+Date: Wed, 23 Oct 2024 09:30:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/4] accel/kvm: Keep track of the HWPoisonPage
- page_size
+Subject: Re: [PATCH v1 3/4] system/physmem: Largepage punch hole before reset
+ of memory pages
 To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
  peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
  philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
@@ -92,7 +92,7 @@ To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
 Cc: joao.m.martins@oracle.com
 References: <ZwalK7Dq_cf-EA_0@x1n>
  <20241022213503.1189954-1-william.roche@oracle.com>
- <20241022213503.1189954-3-william.roche@oracle.com>
+ <20241022213503.1189954-4-william.roche@oracle.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -140,65 +140,52 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241022213503.1189954-3-william.roche@oracle.com>
+In-Reply-To: <20241022213503.1189954-4-william.roche@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 22.10.24 23:35, “William Roche wrote:
 > From: William Roche <william.roche@oracle.com>
 > 
-> Add the page size information to the hwpoison_page_list elements.
-> As the kernel doesn't always report the actual poisoned page size,
-> we adjust this size from the backend real page size.
-> We take into account the recorded page size to adjust the size
-> and location of the memory hole.
+> When the VM reboots, a memory reset is performed calling
+> qemu_ram_remap() on all hwpoisoned pages.
+> While we take into account the recorded page sizes to repair the
+> memory locations, a large page also needs to punch a hole in the
+> backend file to regenerate a usable memory, cleaning the HW
+> poisoned section. This is mandatory for hugetlbfs case for example.
 > 
 > Signed-off-by: William Roche <william.roche@oracle.com>
 > ---
->   accel/kvm/kvm-all.c       | 14 ++++++++++----
->   include/exec/cpu-common.h |  1 +
->   include/sysemu/kvm.h      |  3 ++-
->   include/sysemu/kvm_int.h  |  3 ++-
->   system/physmem.c          | 20 ++++++++++++++++++++
->   target/arm/kvm.c          |  8 ++++++--
->   target/i386/kvm/kvm.c     |  8 ++++++--
->   7 files changed, 47 insertions(+), 10 deletions(-)
+>   system/physmem.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 2adc4d9c24..40117eefa7 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1266,6 +1266,7 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
->    */
->   typedef struct HWPoisonPage {
->       ram_addr_t ram_addr;
-> +    size_t     page_size;
->       QLIST_ENTRY(HWPoisonPage) list;
->   } HWPoisonPage;
->   
-> @@ -1278,15 +1279,18 @@ static void kvm_unpoison_all(void *param)
->   
->       QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->           QLIST_REMOVE(page, list);
-> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
-> +        qemu_ram_remap(page->ram_addr, page->page_size);
+> diff --git a/system/physmem.c b/system/physmem.c
+> index 3757428336..3f6024a92d 100644
+> --- a/system/physmem.c
+> +++ b/system/physmem.c
+> @@ -2211,6 +2211,14 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
+>                   prot = PROT_READ;
+>                   prot |= block->flags & RAM_READONLY ? 0 : PROT_WRITE;
+>                   if (block->fd >= 0) {
+> +                    if (length > TARGET_PAGE_SIZE && fallocate(block->fd,
+> +                        FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+> +                        offset + block->fd_offset, length) != 0) {
+> +                        error_report("Could not recreate the file hole for "
+> +                                     "addr: " RAM_ADDR_FMT "@" RAM_ADDR_FMT "",
+> +                                     length, addr);
+> +                        exit(1);
+> +                    }
+>                       area = mmap(vaddr, length, prot, flags, block->fd,
+>                                   offset + block->fd_offset);
+>                   } else {
 
-Can't we just use the page size from the RAMBlock in qemu_ram_remap? 
-There we lookup the RAMBlock, and all pages in a RAMBlock have the same 
-size.
+Ah! Just what I commented to patch #3; we should be using 
+ram_discard_range(). It might be better to avoid the mmap() completely 
+if ram_discard_range() worked.
 
-I'll note that qemu_ram_remap() is rather stupid and optimized only for 
-private memory (not shmem etc).
-
-mmap(MAP_FIXED|MAP_SHARED, fd) will give you the same poisoned page from 
-the pagecache; you'd have to punch a hole instead.
-
-It might be better to use ram_block_discard_range() in the long run. 
-Memory preallocation + page pinning is tricky, but we could simply bail 
-out in these cases (preallocation failing, ram discard being disabled).
-
-qemu_ram_remap() might be problematic with page pinning (vfio) as is in 
-any way :(
+And as raised, there is the problem with memory preallocation (where we 
+should fail if it doesn't work) and ram discards being disabled because 
+something relies on long-term page pinning ...
 
 -- 
 Cheers,
