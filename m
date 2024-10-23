@@ -1,146 +1,126 @@
-Return-Path: <kvm+bounces-29518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA93E9ACC2B
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 16:23:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4FD9ACD63
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 16:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90BB41C20C49
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 14:23:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A474280E20
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 14:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41DB1BC9EB;
-	Wed, 23 Oct 2024 14:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89AF1B6556;
+	Wed, 23 Oct 2024 14:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PcZodF8s"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="QUtgjPP4";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="QUtgjPP4"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7698F1AA787
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 14:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E5421830E;
+	Wed, 23 Oct 2024 14:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729693401; cv=none; b=siVoYpFz9ZsTU1dafLGNi350MpLX79tPr9PnwfirhauM8nD7PSTG+QCxNB2n7LCnEnout1mOx6Z39YEZwLYmDLf+4Hd49p7/AY6PXFTRj5ExoqDdZa6VtR9+Tbyk+3HlqRxNpWfAoVRvZtxXB1aAEBUhUgORaMMpKcDMOY3QN0s=
+	t=1729694007; cv=none; b=MtDy4H+YgpuRHwQW1wbaCGYKmImkD3qjnpczxE6TmnlZjO4BoQKz1fCiyfYLzFTWroyirs7+5qTl0txYvtbEXdDK3O03qAHaq+BewKhnSPZIWAEk0B89GaXyFWAY4AKCA++6kRgHZJfGgezgFyZQRhpAa96v6tbsf8CRv7NuxCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729693401; c=relaxed/simple;
-	bh=BUVzywpRpzr14CpLVd/duDK9VHh+MmrSGYph3Sfix4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VNehC24+ilk+8YsddvFXEAmC9O+RLbckRcDbVmDYyZVbQvG8JJ/aQsuEf7Jci8hek1iBrkiGCCW1DRpJvUow7AWrd7ZPGFYs4qZOJ4ZhVF8Ed0pBWkTtd2a9Ks5xAEA8aTRR/41h90BLVRlF/As6tC9XUkIE0MJtKp0HCFqjzNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PcZodF8s; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 23 Oct 2024 16:23:10 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729693395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6D6+2LA53RFDe6sHdCHip511F5V3mLNeWhEGIZIvwok=;
-	b=PcZodF8shkw7wU5unEOCjDqxu4TRsordgOyKkt8E5oau+GNbeq9K/gIC4IGSdcHl2Msz6o
-	DQace9/VZAXvlqJCgohgqMvKhxQBpVH38Ve0bK/uo3gTBe8p+6Gp94b6rE3loXOskO79Ik
-	5n0SpXtjrQ3zbGWXZNqOUGZwxSHHtnE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: James Raphael Tiovalen <jamestiotio@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu
-Subject: Re: [kvm-unit-tests PATCH v5 0/5] riscv: sbi: Add support to test
- HSM extension
-Message-ID: <20241023-13ecdc4f251cd2d070c9ee5e@orel>
-References: <20240921100824.151761-1-jamestiotio@gmail.com>
+	s=arc-20240116; t=1729694007; c=relaxed/simple;
+	bh=S7Z+vVe4R+0sfq538t4ASPMCuufGmEe03z1ZjfijqSY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WkFAFwqA69ENlVy8pVUYtrh3xXC/KmU3/xVIaIaBslv/cFmCJDEuiTeVNYKOEaMrRna1zqSQueGawHdr/cgGwAaxZ7ytCkZ2qQW7bsCxKCEbpf5D4SyVGajCLh/G0WgQvJnm8pl9YiXD9qwe4ZHVUA0ug0zUu1eZ1qQQCaZ63S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=QUtgjPP4; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=QUtgjPP4; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1729694004;
+	bh=S7Z+vVe4R+0sfq538t4ASPMCuufGmEe03z1ZjfijqSY=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=QUtgjPP4gL/mKqPoyU7dcPQcu+19EbdaM/Me7wwl14P7Uy8i4mLXeUNL1O5zghzWC
+	 7QSoqF/k0xoZHO/hFunv1Mf/s3rVYcw079SdrrnLz3cqwjxaAtJJ6gaTg2HFxCZzou
+	 n/7CEm7Ox5hD2XpevQFv0XDA4jD+EFD2dYPyfL8U=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 4D90612874E5;
+	Wed, 23 Oct 2024 10:33:24 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id zbiu8HbL15g3; Wed, 23 Oct 2024 10:33:24 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1729694004;
+	bh=S7Z+vVe4R+0sfq538t4ASPMCuufGmEe03z1ZjfijqSY=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=QUtgjPP4gL/mKqPoyU7dcPQcu+19EbdaM/Me7wwl14P7Uy8i4mLXeUNL1O5zghzWC
+	 7QSoqF/k0xoZHO/hFunv1Mf/s3rVYcw079SdrrnLz3cqwjxaAtJJ6gaTg2HFxCZzou
+	 n/7CEm7Ox5hD2XpevQFv0XDA4jD+EFD2dYPyfL8U=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id EF36F1287459;
+	Wed, 23 Oct 2024 10:33:22 -0400 (EDT)
+Message-ID: <526445c102e47fbc1179a76a85661c89581c29e5.camel@HansenPartnership.com>
+Subject: Re: [RFC PATCH 0/5] Extend SEV-SNP SVSM support with a kvm_vcpu per
+ VMPL
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>
+Cc: roy.hopkins@suse.com, ashish.kalra@amd.com, bp@alien8.de, 
+ dave.hansen@linux.intel.com, jroedel@suse.de, kvm@vger.kernel.org, 
+ linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+ michael.roth@amd.com,  mingo@redhat.com, tglx@linutronix.de,
+ thomas.lendacky@amd.com, x86@kernel.org
+Date: Wed, 23 Oct 2024 10:33:21 -0400
+In-Reply-To: <8db215c5-4393-4db1-883c-431fed9dfd59@redhat.com>
+References: <cover.1726506534.git.roy.hopkins@suse.com>
+	 <6028e1a0fad729f28451782754417b0be3aea7ed.camel@HansenPartnership.com>
+	 <ZxawyGnWfo378f3S@google.com>
+	 <8db215c5-4393-4db1-883c-431fed9dfd59@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240921100824.151761-1-jamestiotio@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 21, 2024 at 06:08:18PM +0800, James Raphael Tiovalen wrote:
-> This patch series adds support for testing all 4 functions of the HSM
-> extension as defined in the RISC-V SBI specification. The first 4
-> patches add some helper routines to prepare for the HSM test, while
-> the last patch adds the actual test for the HSM extension.
+On Wed, 2024-10-23 at 13:48 +0200, Paolo Bonzini wrote:
+> On 10/21/24 21:51, Sean Christopherson wrote:
+> > On Fri, Oct 18, 2024, James Bottomley wrote:
+> > > > I've prepared this series as an extension to the RFC patch
+> > > > series: 'SEV-SNP support for running an SVSM' posted by Tom
+> > > > Lendacky [1]. This extends the support for transitioning a vCPU
+> > > > between VM Privilege Levels (VMPLs) by storing the vCPU state
+> > > > for each VMPL in its own `struct kvm_vcpu`. This additionally
+> > > > allows for separate APICs for each VMPL.
+> > > 
+> > > I couldn't attend KVM forum, but I understand based on feedback
+> > > at a session there, Paolo took the lead to provide an
+> > > architecture document for this feature, is that correct?
+> > 
+> > Yep.
+> > 
+> > > Just asking because I haven't noticed anything about this on the
+> > > list.
+> > 
+> > Heh, there's quite a queue of blocked readers (and writers!) at
+> > this point ;-)
+> 
+> Well, at least one person had a writer's block instead.
+> 
+> I had it almost ready but then noticed a few hiccups in the design we
+> came up with, and have been seating on it for a while.  I'm sending
+> it now, finishing the commit messages.
 
-Hi James,
+Thanks for doing that.  For those on linux-coco who don't follow the
+KVM list, the document is here:
 
-Patch1 is now merged and I've applied patch2 to riscv/sbi[1]. I've also
-applied [2] and [3] to riscv/sbi so patches 3 and 4 of this series
-should no longer be necessary. Can you please rebase patch5 on
-riscv/sbi and repost?
+https://lore.kernel.org/kvm/20241023124507.280382-6-pbonzini@redhat.com/
 
-[1] https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
-[2] https://lore.kernel.org/all/20241023131718.117452-4-andrew.jones@linux.dev/
-[3] https://lore.kernel.org/all/20241023132130.118073-6-andrew.jones@linux.dev/
+Regards,
 
-Thanks,
-drew
+James
 
-> 
-> v5:
-> - Addressed all of Andrew's comments.
-> - Added 2 new patches to clear on_cpu_info[cpu].func and to set the
->   cpu_started mask, which are used to perform cleanup after running the
->   HSM tests.
-> - Added some new tests to validate suspension on RV64 with the high
->   bits set for suspend_type.
-> - Picked up the hartid_to_cpu rewrite patch from Andrew's branch.
-> - Moved the variables declared in riscv/sbi.c in patch 2 to group it
->   together with the other HSM test variables declared in patch 5.
-> 
-> v4:
-> - Addressed all of Andrew's comments.
-> - Included the 2 patches from Andrew's branch that refactored some
->   functions.
-> - Added timers to all of the waiting activities in the HSM tests.
-> 
-> v3:
-> - Addressed all of Andrew's comments.
-> - Split the report_prefix_pop patch into its own series.
-> - Added a new environment variable to specify the maximum number of
->   CPUs supported by the SBI implementation.
-> 
-> v2:
-> - Addressed all of Andrew's comments.
-> - Added a new patch to add helper routines to clear multiple prefixes.
-> - Reworked the approach to test the HSM extension by using cpumask and
->   on-cpus.
-> 
-> Andrew Jones (1):
->   riscv: Rewrite hartid_to_cpu in assembly
-> 
-> James Raphael Tiovalen (4):
->   riscv: sbi: Provide entry point for HSM tests
->   lib/on-cpus: Add helper method to clear the function from on_cpu_info
->   riscv: Add helper method to set cpu started mask
->   riscv: sbi: Add tests for HSM extension
-> 
->  riscv/Makefile          |   3 +-
->  lib/riscv/asm/smp.h     |   2 +
->  lib/on-cpus.h           |   1 +
->  lib/on-cpus.c           |  11 +
->  lib/riscv/asm-offsets.c |   5 +
->  lib/riscv/setup.c       |  10 -
->  lib/riscv/smp.c         |   8 +
->  riscv/sbi-tests.h       |  10 +
->  riscv/cstart.S          |  24 ++
->  riscv/sbi-asm.S         |  71 +++++
->  riscv/sbi.c             | 651 ++++++++++++++++++++++++++++++++++++++++
->  11 files changed, 785 insertions(+), 11 deletions(-)
->  create mode 100644 riscv/sbi-tests.h
->  create mode 100644 riscv/sbi-asm.S
-> 
-> --
-> 2.43.0
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+
 
