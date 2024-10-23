@@ -1,47 +1,65 @@
-Return-Path: <kvm+bounces-29455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954789ABAB7
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:51:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6530C9ABAD6
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 03:10:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48E952850DE
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 00:51:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE40AB221D8
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 01:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5492233A;
-	Wed, 23 Oct 2024 00:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7026E200CB;
+	Wed, 23 Oct 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Ptq/Asv6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGCBtc9z"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C2E1C6A3;
-	Wed, 23 Oct 2024 00:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A60912B73
+	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 01:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729644668; cv=none; b=sImg5hSQ9ZGCzSDmmiK6WLThYWdW9r7Ktf5I6sQ8PYYZ8mvzsqO4RsMIyV3CdB0nAice+r5ffCfuj/6KNJQ4/r54NvO4ZvqTVAqTyrJ79ypxEV3RnKG4/60UUMaCT5gb8R/lLd25W+yncH0so9eVp1Vxxwun9J5lUTE6GFZPYvI=
+	t=1729645836; cv=none; b=E0gt+dnhW5ufJLdD3Qn3Ck7a0fMsGxO16n588nQaeAiCrmLDPrxgyS43mFBXzdAUQjssvy7h7v/vPjZ6vnStOAZZpRXaaWOxyR3GwPC8PbCBKjefZjKIKz3qtu0wMFMO+4CpGFrzldKxma80D6/wU6n6ycbjaEbeO6qA6uMX3c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729644668; c=relaxed/simple;
-	bh=2CicPGy2glP1mUqm5CAPj05xgBoGuI0XdTJxJxXKrDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M8mfOGrSL+Cyp0D+wTbJLEL2Z8k1WE35Gar1ofxumN6D8VA8EP6Bs2xK1TJedCWyfuoQ8i8KdbZVAm4ubIfwjoOW649jL8Pmbkp+mGjMA0ll/QwZwDYm837+N83YGFoa58fyl+3X/En34BFVLHGp3Q3u72bBtGWgBH4unkbvrDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Ptq/Asv6; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id E31B820FC5F2;
-	Tue, 22 Oct 2024 17:51:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E31B820FC5F2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729644666;
-	bh=zjZeWP3Fn8idOep3PQVo7QwCf4WCY+6296943aRWrJo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ptq/Asv6NOd+j2FY/cwnF8Hu8cTmgTkCKNGmUO8vaWOmDGr2W5C3tiAUiJjUCJHpp
-	 D3lFoU5kHF/38OOU7fNrQytJFQx60+KYnIi8VDrVVrWD1Sh/M95SHve4tCkxvaOjyU
-	 8mjWFYlVmGMrtAatziaIPXazv+vB8cutE+AlXvbQ=
-Message-ID: <725bac7d-5758-44fd-82cc-29fb85d8c53f@linux.microsoft.com>
-Date: Tue, 22 Oct 2024 17:51:05 -0700
+	s=arc-20240116; t=1729645836; c=relaxed/simple;
+	bh=ag84I7dGOv3bQ8TTSJOqJgpoxA5sD+5ecTqpuh9qc9o=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=M4muk5swAXlRDIlqp2NNLjBUa95haAERjpH0tUj6jf4VekqMEB97hs3/5xmOdUOme8FJ85gz8FHqONjmy7e0SY8gzNcRGIkVrXiH6/ppDUhetFLdRqhSFhcseC8VdwwBJP2yi+RUGr5XbH8O4IEZm+8OHi9fMZxpfnR3NQmMvTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oGCBtc9z; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729645835; x=1761181835;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ag84I7dGOv3bQ8TTSJOqJgpoxA5sD+5ecTqpuh9qc9o=;
+  b=oGCBtc9zUK56wyvzMHmf7Wp0VQcZBfXmTuoVNqUmd4bHq8p3DjQtHtDU
+   O7x5LRJsVlDQh7Jzn87PkSetHv0s8YSbfbZLr42JFRAtPMMm75bCJJTdH
+   nga5aDETW0UWbF8SvWZhn0y912Jpvtlf6HXqlFcP85Q7MP1jiwTuFvOkT
+   fWyBoZQ6hqrqp+NgzOs7Z0ndqCkVQhdyQtt1Xz8km0q/g4DMTSy2dB4BC
+   VkxqGxN4sWAXXdrWokpEebVcq/uixE254xy1aA6Jzy3Wzg+MP9Wn856xA
+   CjLNwLgav0f3+iUrVk/TJimcCGZ2sgoMdxuigWxzbnLKNUUq/bJC5KCxt
+   g==;
+X-CSE-ConnectionGUID: 8mRJ0JQBTDKpUaOAYtRR6Q==
+X-CSE-MsgGUID: MMbQPi5oSYCOJ9w2K1yfEw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="29315815"
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="29315815"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 18:10:34 -0700
+X-CSE-ConnectionGUID: 1xc3ISuBSSmAX80S+HSpUw==
+X-CSE-MsgGUID: oMRX30oNSQiEnH1nM22xgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="79615839"
+Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 18:10:31 -0700
+Message-ID: <ae7e0ce3-8e8a-4c8c-8107-8074692dd12a@linux.intel.com>
+Date: Wed, 23 Oct 2024 09:10:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -49,170 +67,103 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] Add new headers for Hyper-V Dom0
-To: Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
- "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
+Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
+ eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+ chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
+ zhenzhong.duan@intel.com, vasant.hegde@amd.com
+Subject: Re: [PATCH v3 3/9] iommu/vt-d: Let intel_pasid_tear_down_entry()
+ return pasid entry
+To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
+ kevin.tian@intel.com, will@kernel.org
+References: <20241018055402.23277-1-yi.l.liu@intel.com>
+ <20241018055402.23277-4-yi.l.liu@intel.com>
+ <e5cd1de4-37f7-4d55-aa28-f37d49d46ac6@linux.intel.com>
+ <521b4f3e-1979-46f5-bfad-87951db2b6ed@intel.com>
+ <ce78d006-53d8-4194-ae9d-249ab38c1d6d@linux.intel.com>
+ <bab356e9-de34-41bb-9942-de639ee7d3de@intel.com>
+ <9d726285-730a-400d-8d45-f494b2c62205@linux.intel.com>
+ <fe88f071-0d06-4838-9ce6-a5bcccf10163@intel.com>
+ <965fe7e8-9a23-48a7-a84d-819f0c330cde@linux.intel.com>
+ <2f83a298-8212-4d7b-8fa8-b03c939e054b@intel.com>
 Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <2f83a298-8212-4d7b-8fa8-b03c939e054b@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 10/10/2024 11:21 AM, Michael Kelley wrote:
-> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday, October 3, 2024 12:51 PM
->>>> An intermediary header "hv_defs.h" is introduced to conditionally
->> include either hyperv-tlfs.h or hvhdk.h. This is required because
->> several headers which today include hyperv-tlfs.h, are shared
->> between Hyper-V and KVM code (e.g. mshyperv.h).
-> 
-> Have you considered user space code that uses
-> include/linux/hyperv.h? Which of the two schemes will it use? That code
-> needs to compile correctly on x86 and ARM64 after your changes.
-> User space code includes the separate DPDK project, and some of the
-> tools in the kernel tree under tools/hv. Anything that uses the
-> uio_hv_generic.c driver falls into this category.
-> 
-Unless I misunderstand something, the uapi code isn't affected at all
-by this patch set. e.g. the code in tools/hv uses include/uapi/linux/hyperv.h,
-which doesn't include any other Hyper-V headers.
-
-I'm not aware of how the DPDK project uses the Hyper-V definitions, but if it
-is getting headers from uapi it should also be unaffected.
-
-> I think there's also user space code that is built for vDSO that might pull
-> in the .h files you are modifying. There are in-progress patches dealing
-> with vDSO include files, such as [1]. My general comment on vDSO
-> is to be careful in making #include file changes that it uses, but I'm
-> not knowledgeable enough on how vDSO is built to give specific
-> guidance. :-(
-> 
-Hmm, interesting, looks like it does get used by userspace. The tsc page
-is mapped into userspace in vdso.vma.c, and read in vdso/gettimeofday.h.
-
-That is unexpected for me, since these things aren't in uapi. However I don't
-anticipate a problem. The definitions used haven't changed, just the headers
-they are included from.
-
-Thanks
-Nuno
-
-> Michael
-> 
-> [1] https://lore.kernel.org/lkml/20241010135146.181175-1-vincenzo.frascino@arm.com/
-> 
+On 2024/10/22 21:25, Yi Liu wrote:
+>>>>> Or any suggestion from you given a path that needs to get pte 
+>>>>> first, check
+>>>>> if it exists and then call intel_pasid_tear_down_entry(). For 
+>>>>> example the
+>>>>> intel_pasid_setup_first_level() [1], in my series, I need to call the
+>>>>> unlock iommu->lock and call intel_pasid_tear_down_entry() and then 
+>>>>> lock
+>>>>> iommu->lock and do more modifications on the pasid entry. It would 
+>>>>> invoke
+>>>>> the intel_pasid_get_entry() twice if no change to
+>>>>> intel_pasid_tear_down_entry().
+>>>>
+>>>> There is no need to check the present of a pte entry before calling 
+>>>> into
+>>>> intel_pasid_tear_down_entry(). The helper will return directly if the
+>>>> pte is not present:
+>>>>
+>>>>          spin_lock(&iommu->lock);
+>>>>          pte = intel_pasid_get_entry(dev, pasid);
+>>>>          if (WARN_ON(!pte) || !pasid_pte_is_present(pte)) {
+>>>>                  spin_unlock(&iommu->lock);
+>>>>                  return;
+>>>>          }
+>>>>
+>>>> Does it work for you?
+>>>
+>>> This is not I'm talking about. My intention is to avoid duplicated
+>>> intel_pasid_get_entry() call when calling 
+>>> intel_pasid_tear_down_entry() in
+>>> intel_pasid_setup_first_level(). Both the two functions call the
+>>> intel_pasid_get_entry() to get pte pointer. So I think it might be 
+>>> good to
+>>> save one of them.
 >>
->> Summary:
->> Patch 1-2: Cleanup patches
->> Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
->> Patch 4: Add hv_defs.h and use it in mshyperv.h, svm.h,
->>          hyperv_timer.h
->> Patch 5: Switch to the new headers, only in Hyper-V code
->>
->> Nuno Das Neves (5):
->>   hyperv: Move hv_connection_id to hyperv-tlfs.h
->>   hyperv: Remove unnecessary #includes
->>   hyperv: Add new Hyper-V headers
->>   hyperv: Add hv_defs.h to conditionally include hyperv-tlfs.h or
->>     hvhdk.h
->>   hyperv: Use hvhdk.h instead of hyperv-tlfs.h in Hyper-V code
->>
->>  arch/arm64/hyperv/hv_core.c              |    3 +-
->>  arch/arm64/hyperv/mshyperv.c             |    1 +
->>  arch/arm64/include/asm/mshyperv.h        |    2 +-
->>  arch/x86/entry/vdso/vma.c                |    1 +
->>  arch/x86/hyperv/hv_apic.c                |    2 +-
->>  arch/x86/hyperv/hv_init.c                |    3 +-
->>  arch/x86/hyperv/hv_proc.c                |    4 +-
->>  arch/x86/hyperv/hv_spinlock.c            |    1 +
->>  arch/x86/hyperv/hv_vtl.c                 |    1 +
->>  arch/x86/hyperv/irqdomain.c              |    1 +
->>  arch/x86/hyperv/ivm.c                    |    2 +-
->>  arch/x86/hyperv/mmu.c                    |    2 +-
->>  arch/x86/hyperv/nested.c                 |    2 +-
->>  arch/x86/include/asm/kvm_host.h          |    1 -
->>  arch/x86/include/asm/mshyperv.h          |    3 +-
->>  arch/x86/include/asm/svm.h               |    2 +-
->>  arch/x86/include/asm/vdso/gettimeofday.h |    1 +
->>  arch/x86/kernel/cpu/mshyperv.c           |    2 +-
->>  arch/x86/kernel/cpu/mtrr/generic.c       |    1 +
->>  arch/x86/kvm/vmx/vmx_onhyperv.h          |    1 -
->>  arch/x86/mm/pat/set_memory.c             |    2 -
->>  drivers/clocksource/hyperv_timer.c       |    2 +-
->>  drivers/hv/channel.c                     |    1 +
->>  drivers/hv/channel_mgmt.c                |    1 +
->>  drivers/hv/connection.c                  |    1 +
->>  drivers/hv/hv.c                          |    1 +
->>  drivers/hv/hv_balloon.c                  |    5 +-
->>  drivers/hv/hv_common.c                   |    2 +-
->>  drivers/hv/hv_kvp.c                      |    1 -
->>  drivers/hv/hv_snapshot.c                 |    1 -
->>  drivers/hv/hv_util.c                     |    1 +
->>  drivers/hv/hyperv_vmbus.h                |    1 -
->>  drivers/hv/ring_buffer.c                 |    1 +
->>  drivers/hv/vmbus_drv.c                   |    1 +
->>  drivers/iommu/hyperv-iommu.c             |    1 +
->>  drivers/net/hyperv/netvsc.c              |    1 +
->>  drivers/pci/controller/pci-hyperv.c      |    1 +
->>  include/asm-generic/hyperv-tlfs.h        |    9 +
->>  include/asm-generic/mshyperv.h           |    2 +-
->>  include/clocksource/hyperv_timer.h       |    2 +-
->>  include/hyperv/hv_defs.h                 |   29 +
->>  include/hyperv/hvgdk.h                   |   66 ++
->>  include/hyperv/hvgdk_ext.h               |   46 +
->>  include/hyperv/hvgdk_mini.h              | 1212 ++++++++++++++++++++++
->>  include/hyperv/hvhdk.h                   |  733 +++++++++++++
->>  include/hyperv/hvhdk_mini.h              |  310 ++++++
->>  include/linux/hyperv.h                   |   12 +-
->>  net/vmw_vsock/hyperv_transport.c         |    1 -
->>  48 files changed, 2442 insertions(+), 40 deletions(-)
->>  create mode 100644 include/hyperv/hv_defs.h
->>  create mode 100644 include/hyperv/hvgdk.h
->>  create mode 100644 include/hyperv/hvgdk_ext.h
->>  create mode 100644 include/hyperv/hvgdk_mini.h
->>  create mode 100644 include/hyperv/hvhdk.h
->>  create mode 100644 include/hyperv/hvhdk_mini.h
->>
->> --
->> 2.34.1
->>
+>> Then, perhaps you can add a pasid_entry_tear_down() helper which asserts
+>> iommu->lock and call it in both intel_pasid_tear_down_entry() and
+>> intel_pasid_setup_first_level()?
 > 
+> hmmm. I still have a doubt. Only part of the intel_pasid_tear_down_entry()
+> holds the iommu->lock. I'm afraid it's uneasy to split the
+> intel_pasid_tear_down_entry() without letting the cache flush code under
+> the iommu->lock. But it seems unnecessary to do cache flush under the
+> iommu->lock. What about your thought? or am I getting you correctly?
+> Also, I suppose this split allows the caller of the new
+ > pasid_entry_tear_down() helper to pass in the pte pointer. is it?
 
+Okay, so you want to implement a "replace" on a PASID. I think there are
+two ways to achieve this. First, we can transition the PASID to the
+blocking state and then replace it with a new translation. Second, we
+can implement a native replacement by directly modifying the present
+PASID entry.
+
+For the first solution, we could do something like this:
+
+	/* blocking the translation on the PASID */
+	intel_pasid_tear_down_entry(dev, pasid);
+	... ...
+	/* setup the new domain on the PASID */
+	ret = intel_pasid_setup_first_level(domain, dev, pasid);
+	if (ret)
+		intel_pasid_setup_first_level(old_domain, dev, pasid);
+
+For the second solution, we need to implement a new helper function,
+intel_pasid_replace_first_level(), and use it like this:
+
+	ret = intel_pasid_replace_first_level(domain, dev, pasid);
+
+The PASID entry remains unchanged if an error occurs.
+
+I don't see a need of refactoring current PASID tear_down and setup
+helpers.
+
+Thanks,
+baolu
 
