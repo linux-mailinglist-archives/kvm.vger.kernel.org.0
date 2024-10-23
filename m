@@ -1,144 +1,147 @@
-Return-Path: <kvm+bounces-29457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFEA9ABB4E
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 04:04:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8A59ABC20
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 05:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A011F24672
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:04:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A7E1F238FD
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 03:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74D44E1CA;
-	Wed, 23 Oct 2024 02:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C7E1369BC;
+	Wed, 23 Oct 2024 03:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eXIZhoc9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EiVFtzfz"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE63928DD0;
-	Wed, 23 Oct 2024 02:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DFF84A2F;
+	Wed, 23 Oct 2024 03:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729649057; cv=none; b=NFrb3+zfOi1rd6nXai5nAY9jbGDIC4/NNLJSEDdFaWwoRBxTz4Q8F7eYvh2yit3+5vOAbGOryERzgTAPN5T5uq5X4sQJ3PgYH7UlgLI3m+HqdDOLOpQyXeuckzN6mbqKxKUve0wgNfVx+TJ4i7OIfLgLXs4EzBD2v8p+wIpRYec=
+	t=1729653963; cv=none; b=QV+7i/dcfv8R3SKPfEJEDi8hAIACHhDWnIYZ/gRZhcO3BFVpnGtdPxz6lnzviUkTZu3QYhlOJguWvnJ8Wl4dmcXHahGDOvksj1MwfKKd3V11GH6lArN4Br4Aar3iP4mZEazde163LR2OmNasKUVeAwgkoZsmIUfP638cWs+wGMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729649057; c=relaxed/simple;
-	bh=R4GGG33lUKGQnK9hCXXz7w12TC6kQJDQkpXGRbWbwpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bJDuQMFtIxB2r7ms6WOQXMOv6YgyltmemAqGpdwfhehuSQmEOlT9tZrKuVFQtufvzrvxlkshGibEW3gbrVH8XQuOuSMEpiOKM+vSyPDvDupT7tcyUw3mVmH5qHJ+Eya3RhHlhqXftGm19OaeQ38wL2gMlM5uUp1du2z5+c06eyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eXIZhoc9; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 23 Oct 2024 02:04:07 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729649053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WTDEQxtL/e15npVRRblX1oHt3rcZenqRAA28VnZ+D7Q=;
-	b=eXIZhoc9TWuSBnwsavc9/J5Z7v7U1C5BMrOQyHH3rqg/Ek6KpEz+5L98tc+uhzAH3yAWew
-	6Hl+Zj+c9bioi5qtX17tmHvMgtXbdotK3zuBFfXmw4HIMxi5xd/NcYahSK69rhSlxjEn0Q
-	IMghs7iVcnFSvyFfoopgoQaGPL0eoVc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosryahmed@google.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] mm: page_alloc: move mlocked flag clearance into
- free_pages_prepare()
-Message-ID: <ZxhZl3Qi2sRIWRIb@google.com>
-References: <20241021173455.2691973-1-roman.gushchin@linux.dev>
- <Zxa60Ftbh8eN1MG5@casper.infradead.org>
- <ZxcKjwhMKmnHTX8Q@google.com>
- <ZxcgR46zpW8uVKrt@casper.infradead.org>
- <ZxcrJHtIGckMo9Ni@google.com>
- <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
- <ZxfHNo1dUVcOLJYK@google.com>
+	s=arc-20240116; t=1729653963; c=relaxed/simple;
+	bh=UawuPvVNweLt+f+x3Fgtz3lImYTI7h9j5JT2/8MpuPY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ttc/lmmjO05gA/gsnmKLC490FYOXqjepO4o4UH6UXWMeAyXmAqkVcfIKdNruSG4lnSgKMPfWJarSvoFuDo/bZmSO+4MT99+UzhErwcbtqCe3l08/MhHj5j9xIxUaA7DIo2JgK7kbzxkH+edzNB7vx0W67WGvpl8kfASCATTtQ30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EiVFtzfz; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729653962; x=1761189962;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UawuPvVNweLt+f+x3Fgtz3lImYTI7h9j5JT2/8MpuPY=;
+  b=EiVFtzfzh/IuqzdLwl8lHJdwt8hEO1Zshv/tJseU5piY4AZlTTCHX9/p
+   WffxName5w61GcEbUXQv+iTMrTgXI1LmEUen5P9OBzGRNq7Fk1UBWsAFh
+   fGyzMMLo8H1VkTLJ1/kUH8AyLL4MYvXxg8rH1fZzpQC6PKLDQ4ELuQcax
+   WWOTBk5XNRvEsjXoj2G04GV1/CKXuR85LL7HvIbpyVGw9mQhxEhMSzKY+
+   hThT33yLZxkIr/UoCffoUSFo5/h2KHKtdeVLx75cIoqDK+qw6dwO9cGWD
+   HrhrZ1OYtAVbP6ZYEPSsx0VLVZmnH0AnbOIFV83RD/5GvdNjHeB5zGxJM
+   Q==;
+X-CSE-ConnectionGUID: l4M+jAc2RF2ZjqdMFMJ4dA==
+X-CSE-MsgGUID: mXf3CmRRQ8iIa3w3IWGqTQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="28667927"
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="28667927"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 20:26:01 -0700
+X-CSE-ConnectionGUID: +w79cpkpQXyKxS0RZnURrw==
+X-CSE-MsgGUID: q4RXTF7YQtGpAcwsikNzwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="117535126"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.172]) ([10.124.227.172])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 20:25:57 -0700
+Message-ID: <c0596432-a20c-4cb7-8eb4-f8f23a1ec24b@intel.com>
+Date: Wed, 23 Oct 2024 11:25:54 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZxfHNo1dUVcOLJYK@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 04/13] x86/sev: Change TSC MSR behavior for Secure TSC
+ enabled guests
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ thomas.lendacky@amd.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20241021055156.2342564-1-nikunj@amd.com>
+ <20241021055156.2342564-5-nikunj@amd.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20241021055156.2342564-5-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 22, 2024 at 08:39:34AM -0700, Sean Christopherson wrote:
-> On Tue, Oct 22, 2024, Yosry Ahmed wrote:
-> > On Mon, Oct 21, 2024 at 9:33 PM Roman Gushchin <roman.gushchin@linux.dev> wrote:
-> > >
-> > > On Tue, Oct 22, 2024 at 04:47:19AM +0100, Matthew Wilcox wrote:
-> > > > On Tue, Oct 22, 2024 at 02:14:39AM +0000, Roman Gushchin wrote:
-> > > > > On Mon, Oct 21, 2024 at 09:34:24PM +0100, Matthew Wilcox wrote:
-> > > > > > On Mon, Oct 21, 2024 at 05:34:55PM +0000, Roman Gushchin wrote:
-> > > > > > > Fix it by moving the mlocked flag clearance down to
-> > > > > > > free_page_prepare().
-> > > > > >
-> > > > > > Urgh, I don't like this new reference to folio in free_pages_prepare().
-> > > > > > It feels like a layering violation.  I'll think about where else we
-> > > > > > could put this.
-> > > > >
-> > > > > I agree, but it feels like it needs quite some work to do it in a nicer way,
-> > > > > no way it can be backported to older kernels. As for this fix, I don't
-> > > > > have better ideas...
-> > > >
-> > > > Well, what is KVM doing that causes this page to get mapped to userspace?
-> > > > Don't tell me to look at the reproducer as it is 403 Forbidden.  All I
-> > > > can tell is that it's freed with vfree().
-> > > >
-> > > > Is it from kvm_dirty_ring_get_page()?  That looks like the obvious thing,
-> > > > but I'd hate to spend a lot of time on it and then discover I was looking
-> > > > at the wrong thing.
-> > >
-> > > One of the pages is vcpu->run, others belong to kvm->coalesced_mmio_ring.
-> > 
-> > Looking at kvm_vcpu_fault(), it seems like we after mmap'ing the fd
-> > returned by KVM_CREATE_VCPU we can access one of the following:
-> > - vcpu->run
-> > - vcpu->arch.pio_data
-> > - vcpu->kvm->coalesced_mmio_ring
-> > - a page returned by kvm_dirty_ring_get_page()
-> > 
-> > It doesn't seem like any of these are reclaimable,
+On 10/21/2024 1:51 PM, Nikunj A Dadhania wrote:
+> Secure TSC enabled guests should not write to MSR_IA32_TSC(10H) register as
+> the subsequent TSC value reads are undefined. MSR_IA32_TSC read/write
+> accesses should not exit to the hypervisor for such guests.
 > 
-> Correct, these are all kernel allocated pages that KVM exposes to userspace to
-> facilitate bidirectional sharing of large chunks of data.
+> Accesses to MSR_IA32_TSC needs special handling in the #VC handler for the
+> guests with Secure TSC enabled. Writes to MSR_IA32_TSC should be ignored,
+> and reads of MSR_IA32_TSC should return the result of the RDTSC
+> instruction.
 > 
-> > why is mlock()'ing them supported to begin with?
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Tested-by: Peter Gonda <pgonda@google.com>
+> ---
+>   arch/x86/coco/sev/core.c | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
 > 
-> Because no one realized it would be problematic, and KVM would have had to go out
-> of its way to prevent mlock().
-> 
-> > Even if we don't want mlock() to err in this case, shouldn't we just do
-> > nothing?
-> 
-> Ideally, yes.
-> 
-> > I see a lot of checks at the beginning of mlock_fixup() to check
-> > whether we should operate on the vma, perhaps we should also check for
-> > these KVM vmas?
-> 
-> Definitely not.  KVM may be doing something unexpected, but the VMA certainly
-> isn't unique enough to warrant mm/ needing dedicated handling.
-> 
-> Focusing on KVM is likely a waste of time.  There are probably other subsystems
-> and/or drivers that .mmap() kernel allocated memory in the same way.  Odds are
-> good KVM is just the messenger, because syzkaller knows how to beat on KVM.  And
-> even if there aren't any other existing cases, nothing would prevent them from
-> coming along in the future.
+> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+> index 965209067f03..2ad7773458c0 100644
+> --- a/arch/x86/coco/sev/core.c
+> +++ b/arch/x86/coco/sev/core.c
+> @@ -1308,6 +1308,30 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+>   		return ES_OK;
+>   	}
+>   
+> +	/*
+> +	 * TSC related accesses should not exit to the hypervisor when a
+> +	 * guest is executing with SecureTSC enabled, so special handling
+> +	 * is required for accesses of MSR_IA32_TSC:
+> +	 *
+> +	 * Writes: Writing to MSR_IA32_TSC can cause subsequent reads
+> +	 *         of the TSC to return undefined values, so ignore all
+> +	 *         writes.
+> +	 * Reads:  Reads of MSR_IA32_TSC should return the current TSC
+> +	 *         value, use the value returned by RDTSC.
+> +	 */
 
-Yeah, I also think so.
-It seems that bpf/ringbuf.c contains another example. There are likely more.
+Why doesn't handle it by returning ES_VMM_ERROR when hypervisor 
+intercepts RD/WR of MSR_IA32_TSC? With SECURE_TSC enabled, it seems not 
+need to be intercepted.
 
-So I think we have either to fix it like proposed or on the mlock side.
+I think the reason is that SNP guest relies on interception to do the 
+ignore behavior for WRMSR in #VC handler because the writing leads to 
+undefined result. Then the question is what if the hypervisor doesn't 
+intercept write to MSR_IA32_TSC in the first place?
+
+> +	if (regs->cx == MSR_IA32_TSC && cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC)) {
+> +		u64 tsc;
+> +
+> +		if (exit_info_1)
+> +			return ES_OK;
+> +
+> +		tsc = rdtsc();
+> +		regs->ax = UINT_MAX & tsc;
+> +		regs->dx = UINT_MAX & (tsc >> 32);
+> +
+> +		return ES_OK;
+> +	}
+> +
+>   	ghcb_set_rcx(ghcb, regs->cx);
+>   	if (exit_info_1) {
+>   		ghcb_set_rax(ghcb, regs->ax);
+
 
