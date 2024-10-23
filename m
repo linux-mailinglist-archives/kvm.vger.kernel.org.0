@@ -1,169 +1,144 @@
-Return-Path: <kvm+bounces-29456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6530C9ABAD6
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 03:10:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CFEA9ABB4E
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 04:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE40AB221D8
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 01:10:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A011F24672
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7026E200CB;
-	Wed, 23 Oct 2024 01:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74D44E1CA;
+	Wed, 23 Oct 2024 02:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGCBtc9z"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eXIZhoc9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A60912B73
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 01:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE63928DD0;
+	Wed, 23 Oct 2024 02:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729645836; cv=none; b=E0gt+dnhW5ufJLdD3Qn3Ck7a0fMsGxO16n588nQaeAiCrmLDPrxgyS43mFBXzdAUQjssvy7h7v/vPjZ6vnStOAZZpRXaaWOxyR3GwPC8PbCBKjefZjKIKz3qtu0wMFMO+4CpGFrzldKxma80D6/wU6n6ycbjaEbeO6qA6uMX3c4=
+	t=1729649057; cv=none; b=NFrb3+zfOi1rd6nXai5nAY9jbGDIC4/NNLJSEDdFaWwoRBxTz4Q8F7eYvh2yit3+5vOAbGOryERzgTAPN5T5uq5X4sQJ3PgYH7UlgLI3m+HqdDOLOpQyXeuckzN6mbqKxKUve0wgNfVx+TJ4i7OIfLgLXs4EzBD2v8p+wIpRYec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729645836; c=relaxed/simple;
-	bh=ag84I7dGOv3bQ8TTSJOqJgpoxA5sD+5ecTqpuh9qc9o=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=M4muk5swAXlRDIlqp2NNLjBUa95haAERjpH0tUj6jf4VekqMEB97hs3/5xmOdUOme8FJ85gz8FHqONjmy7e0SY8gzNcRGIkVrXiH6/ppDUhetFLdRqhSFhcseC8VdwwBJP2yi+RUGr5XbH8O4IEZm+8OHi9fMZxpfnR3NQmMvTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oGCBtc9z; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729645835; x=1761181835;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ag84I7dGOv3bQ8TTSJOqJgpoxA5sD+5ecTqpuh9qc9o=;
-  b=oGCBtc9zUK56wyvzMHmf7Wp0VQcZBfXmTuoVNqUmd4bHq8p3DjQtHtDU
-   O7x5LRJsVlDQh7Jzn87PkSetHv0s8YSbfbZLr42JFRAtPMMm75bCJJTdH
-   nga5aDETW0UWbF8SvWZhn0y912Jpvtlf6HXqlFcP85Q7MP1jiwTuFvOkT
-   fWyBoZQ6hqrqp+NgzOs7Z0ndqCkVQhdyQtt1Xz8km0q/g4DMTSy2dB4BC
-   VkxqGxN4sWAXXdrWokpEebVcq/uixE254xy1aA6Jzy3Wzg+MP9Wn856xA
-   CjLNwLgav0f3+iUrVk/TJimcCGZ2sgoMdxuigWxzbnLKNUUq/bJC5KCxt
-   g==;
-X-CSE-ConnectionGUID: 8mRJ0JQBTDKpUaOAYtRR6Q==
-X-CSE-MsgGUID: MMbQPi5oSYCOJ9w2K1yfEw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="29315815"
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="29315815"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 18:10:34 -0700
-X-CSE-ConnectionGUID: 1xc3ISuBSSmAX80S+HSpUw==
-X-CSE-MsgGUID: oMRX30oNSQiEnH1nM22xgA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="79615839"
-Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 18:10:31 -0700
-Message-ID: <ae7e0ce3-8e8a-4c8c-8107-8074692dd12a@linux.intel.com>
-Date: Wed, 23 Oct 2024 09:10:28 +0800
+	s=arc-20240116; t=1729649057; c=relaxed/simple;
+	bh=R4GGG33lUKGQnK9hCXXz7w12TC6kQJDQkpXGRbWbwpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJDuQMFtIxB2r7ms6WOQXMOv6YgyltmemAqGpdwfhehuSQmEOlT9tZrKuVFQtufvzrvxlkshGibEW3gbrVH8XQuOuSMEpiOKM+vSyPDvDupT7tcyUw3mVmH5qHJ+Eya3RhHlhqXftGm19OaeQ38wL2gMlM5uUp1du2z5+c06eyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eXIZhoc9; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 23 Oct 2024 02:04:07 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729649053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WTDEQxtL/e15npVRRblX1oHt3rcZenqRAA28VnZ+D7Q=;
+	b=eXIZhoc9TWuSBnwsavc9/J5Z7v7U1C5BMrOQyHH3rqg/Ek6KpEz+5L98tc+uhzAH3yAWew
+	6Hl+Zj+c9bioi5qtX17tmHvMgtXbdotK3zuBFfXmw4HIMxi5xd/NcYahSK69rhSlxjEn0Q
+	IMghs7iVcnFSvyFfoopgoQaGPL0eoVc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosryahmed@google.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Hugh Dickins <hughd@google.com>,
+	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2] mm: page_alloc: move mlocked flag clearance into
+ free_pages_prepare()
+Message-ID: <ZxhZl3Qi2sRIWRIb@google.com>
+References: <20241021173455.2691973-1-roman.gushchin@linux.dev>
+ <Zxa60Ftbh8eN1MG5@casper.infradead.org>
+ <ZxcKjwhMKmnHTX8Q@google.com>
+ <ZxcgR46zpW8uVKrt@casper.infradead.org>
+ <ZxcrJHtIGckMo9Ni@google.com>
+ <CAJD7tkb2oUre-tgVyW6XgUaNfGQSSKp=QNAfB0iZoTvHcc0n0w@mail.gmail.com>
+ <ZxfHNo1dUVcOLJYK@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
- eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
- chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com
-Subject: Re: [PATCH v3 3/9] iommu/vt-d: Let intel_pasid_tear_down_entry()
- return pasid entry
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com, will@kernel.org
-References: <20241018055402.23277-1-yi.l.liu@intel.com>
- <20241018055402.23277-4-yi.l.liu@intel.com>
- <e5cd1de4-37f7-4d55-aa28-f37d49d46ac6@linux.intel.com>
- <521b4f3e-1979-46f5-bfad-87951db2b6ed@intel.com>
- <ce78d006-53d8-4194-ae9d-249ab38c1d6d@linux.intel.com>
- <bab356e9-de34-41bb-9942-de639ee7d3de@intel.com>
- <9d726285-730a-400d-8d45-f494b2c62205@linux.intel.com>
- <fe88f071-0d06-4838-9ce6-a5bcccf10163@intel.com>
- <965fe7e8-9a23-48a7-a84d-819f0c330cde@linux.intel.com>
- <2f83a298-8212-4d7b-8fa8-b03c939e054b@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <2f83a298-8212-4d7b-8fa8-b03c939e054b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZxfHNo1dUVcOLJYK@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/10/22 21:25, Yi Liu wrote:
->>>>> Or any suggestion from you given a path that needs to get pte 
->>>>> first, check
->>>>> if it exists and then call intel_pasid_tear_down_entry(). For 
->>>>> example the
->>>>> intel_pasid_setup_first_level() [1], in my series, I need to call the
->>>>> unlock iommu->lock and call intel_pasid_tear_down_entry() and then 
->>>>> lock
->>>>> iommu->lock and do more modifications on the pasid entry. It would 
->>>>> invoke
->>>>> the intel_pasid_get_entry() twice if no change to
->>>>> intel_pasid_tear_down_entry().
->>>>
->>>> There is no need to check the present of a pte entry before calling 
->>>> into
->>>> intel_pasid_tear_down_entry(). The helper will return directly if the
->>>> pte is not present:
->>>>
->>>>          spin_lock(&iommu->lock);
->>>>          pte = intel_pasid_get_entry(dev, pasid);
->>>>          if (WARN_ON(!pte) || !pasid_pte_is_present(pte)) {
->>>>                  spin_unlock(&iommu->lock);
->>>>                  return;
->>>>          }
->>>>
->>>> Does it work for you?
->>>
->>> This is not I'm talking about. My intention is to avoid duplicated
->>> intel_pasid_get_entry() call when calling 
->>> intel_pasid_tear_down_entry() in
->>> intel_pasid_setup_first_level(). Both the two functions call the
->>> intel_pasid_get_entry() to get pte pointer. So I think it might be 
->>> good to
->>> save one of them.
->>
->> Then, perhaps you can add a pasid_entry_tear_down() helper which asserts
->> iommu->lock and call it in both intel_pasid_tear_down_entry() and
->> intel_pasid_setup_first_level()?
+On Tue, Oct 22, 2024 at 08:39:34AM -0700, Sean Christopherson wrote:
+> On Tue, Oct 22, 2024, Yosry Ahmed wrote:
+> > On Mon, Oct 21, 2024 at 9:33 PM Roman Gushchin <roman.gushchin@linux.dev> wrote:
+> > >
+> > > On Tue, Oct 22, 2024 at 04:47:19AM +0100, Matthew Wilcox wrote:
+> > > > On Tue, Oct 22, 2024 at 02:14:39AM +0000, Roman Gushchin wrote:
+> > > > > On Mon, Oct 21, 2024 at 09:34:24PM +0100, Matthew Wilcox wrote:
+> > > > > > On Mon, Oct 21, 2024 at 05:34:55PM +0000, Roman Gushchin wrote:
+> > > > > > > Fix it by moving the mlocked flag clearance down to
+> > > > > > > free_page_prepare().
+> > > > > >
+> > > > > > Urgh, I don't like this new reference to folio in free_pages_prepare().
+> > > > > > It feels like a layering violation.  I'll think about where else we
+> > > > > > could put this.
+> > > > >
+> > > > > I agree, but it feels like it needs quite some work to do it in a nicer way,
+> > > > > no way it can be backported to older kernels. As for this fix, I don't
+> > > > > have better ideas...
+> > > >
+> > > > Well, what is KVM doing that causes this page to get mapped to userspace?
+> > > > Don't tell me to look at the reproducer as it is 403 Forbidden.  All I
+> > > > can tell is that it's freed with vfree().
+> > > >
+> > > > Is it from kvm_dirty_ring_get_page()?  That looks like the obvious thing,
+> > > > but I'd hate to spend a lot of time on it and then discover I was looking
+> > > > at the wrong thing.
+> > >
+> > > One of the pages is vcpu->run, others belong to kvm->coalesced_mmio_ring.
+> > 
+> > Looking at kvm_vcpu_fault(), it seems like we after mmap'ing the fd
+> > returned by KVM_CREATE_VCPU we can access one of the following:
+> > - vcpu->run
+> > - vcpu->arch.pio_data
+> > - vcpu->kvm->coalesced_mmio_ring
+> > - a page returned by kvm_dirty_ring_get_page()
+> > 
+> > It doesn't seem like any of these are reclaimable,
 > 
-> hmmm. I still have a doubt. Only part of the intel_pasid_tear_down_entry()
-> holds the iommu->lock. I'm afraid it's uneasy to split the
-> intel_pasid_tear_down_entry() without letting the cache flush code under
-> the iommu->lock. But it seems unnecessary to do cache flush under the
-> iommu->lock. What about your thought? or am I getting you correctly?
-> Also, I suppose this split allows the caller of the new
- > pasid_entry_tear_down() helper to pass in the pte pointer. is it?
+> Correct, these are all kernel allocated pages that KVM exposes to userspace to
+> facilitate bidirectional sharing of large chunks of data.
+> 
+> > why is mlock()'ing them supported to begin with?
+> 
+> Because no one realized it would be problematic, and KVM would have had to go out
+> of its way to prevent mlock().
+> 
+> > Even if we don't want mlock() to err in this case, shouldn't we just do
+> > nothing?
+> 
+> Ideally, yes.
+> 
+> > I see a lot of checks at the beginning of mlock_fixup() to check
+> > whether we should operate on the vma, perhaps we should also check for
+> > these KVM vmas?
+> 
+> Definitely not.  KVM may be doing something unexpected, but the VMA certainly
+> isn't unique enough to warrant mm/ needing dedicated handling.
+> 
+> Focusing on KVM is likely a waste of time.  There are probably other subsystems
+> and/or drivers that .mmap() kernel allocated memory in the same way.  Odds are
+> good KVM is just the messenger, because syzkaller knows how to beat on KVM.  And
+> even if there aren't any other existing cases, nothing would prevent them from
+> coming along in the future.
 
-Okay, so you want to implement a "replace" on a PASID. I think there are
-two ways to achieve this. First, we can transition the PASID to the
-blocking state and then replace it with a new translation. Second, we
-can implement a native replacement by directly modifying the present
-PASID entry.
+Yeah, I also think so.
+It seems that bpf/ringbuf.c contains another example. There are likely more.
 
-For the first solution, we could do something like this:
-
-	/* blocking the translation on the PASID */
-	intel_pasid_tear_down_entry(dev, pasid);
-	... ...
-	/* setup the new domain on the PASID */
-	ret = intel_pasid_setup_first_level(domain, dev, pasid);
-	if (ret)
-		intel_pasid_setup_first_level(old_domain, dev, pasid);
-
-For the second solution, we need to implement a new helper function,
-intel_pasid_replace_first_level(), and use it like this:
-
-	ret = intel_pasid_replace_first_level(domain, dev, pasid);
-
-The PASID entry remains unchanged if an error occurs.
-
-I don't see a need of refactoring current PASID tear_down and setup
-helpers.
-
-Thanks,
-baolu
+So I think we have either to fix it like proposed or on the mlock side.
 
