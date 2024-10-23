@@ -1,162 +1,253 @@
-Return-Path: <kvm+bounces-29452-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29453-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40979ABA54
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:04:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A11A9ABA74
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4D9E1C22C14
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 00:04:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42BDE1C22BFA
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 00:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC9F946F;
-	Wed, 23 Oct 2024 00:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBE5168DA;
+	Wed, 23 Oct 2024 00:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W7B9glwO"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OH+kt1r1"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60016182;
-	Wed, 23 Oct 2024 00:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF30322B
+	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 00:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729641845; cv=none; b=qQH4xvIHowR2uzKybLkLdTpT3tPnF+yZiGxgGw9K52Bqi/9KYoHUX3YIwO2ztVY8iENqFUlPwZ8lfA8pUmt+chTM49VkHBhTLw2kHsR64Ni0DK+oqu/0GNt7Fd/hrK9XaU/aMJ47mZsPNdg6dKY1KPm0f7AKnlDh/1eWT/9pKYw=
+	t=1729642710; cv=none; b=Pf3kL/fn76xyNGgfg5CMqIeujtk7RrQ3a9UnBv04FdfYb9aN7Cl0KfZ+wm0jh/HcYacmfFhe/kLgj9U2GfbWKPGQ093lWXn6iJdb4CFPtNdR7efReqej0hK+Ui3o7ib5OLQno5/FqaeTU+Nsls5f+5Q1AV012oezoHuNF2giulE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729641845; c=relaxed/simple;
-	bh=BS3twbZ5C6CqufKtgBl7yFiz4Th4SXUn3z0s0DmuctI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iPa/f40MGfrflY5XrApMSKJs8UR1rKg4vzZRYgBu/3s0yyohR1Y3fkd4ufYxTPecsC/CnHJ/o5aAqvWkXbX/jjPLBAMsFFoMjUlEyiGAjeAebN9ISRMdEoPAirl8/AGD/Ogz+k5jUDF5X9mFscEpDy9yFmZZnQ3wV3CoHCn/xQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W7B9glwO; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 0604621112FB;
-	Tue, 22 Oct 2024 17:04:02 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0604621112FB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729641843;
-	bh=BSb0pSoDio3rfbTxA/Zn5HqyVgKFFvAwXvG36oPMm5A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=W7B9glwOso1LY6SeJ5JgRjNbXl8nw9FwsuxxkoDI1KlFSFB//2dXCNi0FWwhuCyFE
-	 IOZ6i+ipbig3SDZ2Bz92iF0LOgqTgQxeWjJTR8AQbWPoSVm0ApXkTXAN9h1/uZLuu/
-	 7kzQtW5Iw3AXshGs3dfUWNkGEtI/O2obLyU5wd28=
-Message-ID: <c426d122-4ba3-4193-80d5-a40d7554d324@linux.microsoft.com>
-Date: Tue, 22 Oct 2024 17:04:01 -0700
+	s=arc-20240116; t=1729642710; c=relaxed/simple;
+	bh=SBoBNINTmrmrZ6PS1raunSzBNj06bgQiQWurqk8pEkc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qecxmkPz3Xf4B7SCT/RI2rAoCHSg5tNfBFAXWkWApcy/EaDgLDyxjI9hc0Avz2uk/GARTFNKrHfTDFZvfppGjftsgGlpXZRooqhXk8rtawhW2VUyorIitue2TZ57OLsM5SYjUJbyBzIjo3sihvSdkjxdbY4dRBFjRHqx65bgaR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OH+kt1r1; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49MLoBML006937;
+	Wed, 23 Oct 2024 00:16:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=SBoBNI
+	NTmrmrZ6PS1raunSzBNj06bgQiQWurqk8pEkc=; b=OH+kt1r1ac46DhWewUxJSv
+	VXQziNTkLk4XNNmuSOuq6sX1lhNEDpbRuv7aT3Tr1c//aHBuxdVvkMAut0Wh4Dve
+	xpOHh5ZsQTs8u2mnhVuQvcICbDsiCECTTmAGZQRIw5kTq3bVyc2mW1suRswGD4wF
+	KDhvbJRj0vSedvp/8aEpYJHZ5VKC2QaRJ4wkiYSYOTsfJVAH88OKmXs5DXq9cN4J
+	N/SuTKQWlc29JViCL6WSTibw6DBfmMqq+EWRWcGXKCXliBs7NzjxCSnm0Jyq9WGq
+	z1ezOywt4kb4Jdlp2DevWPWAJgwpqQGHee8IKE8ge5mYpyj8e8QBLOJZDi+Vtdmg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emafrds9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 00:16:54 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49N0GrLj023088;
+	Wed, 23 Oct 2024 00:16:53 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emafrds8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 00:16:53 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49MM8hIG001552;
+	Wed, 23 Oct 2024 00:16:52 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 42emk98cny-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 00:16:52 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49N0GpHJ45285632
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 00:16:51 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0FBD020043;
+	Wed, 23 Oct 2024 00:16:51 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 83BB620040;
+	Wed, 23 Oct 2024 00:16:49 +0000 (GMT)
+Received: from [127.0.0.1] (unknown [9.152.108.100])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 23 Oct 2024 00:16:49 +0000 (GMT)
+Message-ID: <4c383f09bd6bd9b488ad301e5f050b8c9971f3a2.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 07/20] tests/tcg/x86_64: Add cross-modifying code test
+From: Ilya Leoshkevich <iii@linux.ibm.com>
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+        Alex
+ =?ISO-8859-1?Q?Benn=E9e?=
+	 <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org
+Cc: Beraldo Leal <bleal@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Mahmoud Mandour
+ <ma.mandourr@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Yanan Wang
+ <wangyanan55@huawei.com>, Thomas Huth <thuth@redhat.com>,
+        John Snow
+ <jsnow@redhat.com>,
+        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau
+ <marcandre.lureau@redhat.com>,
+        qemu-arm@nongnu.org,
+        "Daniel P."
+ =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
+        Eduardo Habkost
+ <eduardo@habkost.net>, devel@lists.libvirt.org,
+        Cleber Rosa
+ <crosa@redhat.com>, kvm@vger.kernel.org,
+        Philippe
+ =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Alexandre Iooss
+ <erdnaxe@crans.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Richard
+ Henderson <richard.henderson@linaro.org>,
+        Riku Voipio
+ <riku.voipio@iki.fi>, Zhao Liu <zhao1.liu@intel.com>,
+        Marcelo Tosatti
+ <mtosatti@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini
+ <pbonzini@redhat.com>
+Date: Wed, 23 Oct 2024 02:16:49 +0200
+In-Reply-To: <6b18238b-f9c3-4046-964f-de16dc30d26e@linaro.org>
+References: <20241022105614.839199-1-alex.bennee@linaro.org>
+	 <20241022105614.839199-8-alex.bennee@linaro.org>
+	 <6b18238b-f9c3-4046-964f-de16dc30d26e@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: H5mvpg5WpP0LgFN83-PfKKlyGVf_CLmb
+X-Proofpoint-ORIG-GUID: bhM4KN_iLhtvPV9j9L2Gh6SjUqCU3ZM7
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] RE: [PATCH 0/5] Add new headers for Hyper-V Dom0
-To: MUKESH RATHOR <mukeshrathor@microsoft.com>,
- Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
- <haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
- <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410220156
 
-Michael - sorry for the delay, I just got back from vacation.
+On Tue, 2024-10-22 at 13:36 -0700, Pierrick Bouvier wrote:
+> On 10/22/24 03:56, Alex Benn=C3=A9e wrote:
+> > From: Ilya Leoshkevich <iii@linux.ibm.com>
+> >=20
+> > commit f025692c992c ("accel/tcg: Clear PAGE_WRITE before
+> > translation")
+> > fixed cross-modifying code handling, but did not add a test. The
+> > changed code was further improved recently [1], and I was not sure
+> > whether these modifications were safe (spoiler: they were fine).
+> >=20
+> > Add a test to make sure there are no regressions.
+> >=20
+> > [1]
+> > https://lists.gnu.org/archive/html/qemu-devel/2022-09/msg00034.html
+> >=20
+> > Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+> > Message-Id: <20241001150617.9977-1-iii@linux.ibm.com>
+> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > ---
+> > =C2=A0 tests/tcg/x86_64/cross-modifying-code.c | 80
+> > +++++++++++++++++++++++++
+> > =C2=A0 tests/tcg/x86_64/Makefile.target=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0 4 ++
+> > =C2=A0 2 files changed, 84 insertions(+)
+> > =C2=A0 create mode 100644 tests/tcg/x86_64/cross-modifying-code.c
+> >=20
+> > diff --git a/tests/tcg/x86_64/cross-modifying-code.c
+> > b/tests/tcg/x86_64/cross-modifying-code.c
+> > new file mode 100644
+> > index 0000000000..2704df6061
+> > --- /dev/null
+> > +++ b/tests/tcg/x86_64/cross-modifying-code.c
+> > @@ -0,0 +1,80 @@
+> > +/*
+> > + * Test patching code, running in one thread, from another thread.
+> > + *
+> > + * Intel SDM calls this "cross-modifying code" and recommends a
+> > special
+> > + * sequence, which requires both threads to cooperate.
+> > + *
+> > + * Linux kernel uses a different sequence that does not require
+> > cooperation and
+> > + * involves patching the first byte with int3.
+> > + *
+> > + * Finally, there is user-mode software out there that simply uses
+> > atomics, and
+> > + * that seems to be good enough in practice. Test that QEMU has no
+> > problems
+> > + * with this as well.
+> > + */
+> > +
+> > +#include <assert.h>
+> > +#include <pthread.h>
+> > +#include <stdbool.h>
+> > +#include <stdlib.h>
+> > +
+> > +void add1_or_nop(long *x);
+> > +asm(".pushsection .rwx,\"awx\",@progbits\n"
+> > +=C2=A0=C2=A0=C2=A0 ".globl add1_or_nop\n"
+> > +=C2=A0=C2=A0=C2=A0 /* addq $0x1,(%rdi) */
+> > +=C2=A0=C2=A0=C2=A0 "add1_or_nop: .byte 0x48, 0x83, 0x07, 0x01\n"
+> > +=C2=A0=C2=A0=C2=A0 "ret\n"
+> > +=C2=A0=C2=A0=C2=A0 ".popsection\n");
+> > +
+> > +#define THREAD_WAIT 0
+> > +#define THREAD_PATCH 1
+> > +#define THREAD_STOP 2
+> > +
+> > +static void *thread_func(void *arg)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0 int val =3D 0x0026748d; /* nop */
+> > +
+> > +=C2=A0=C2=A0=C2=A0 while (true) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (__atomic_load_n((in=
+t *)arg, __ATOMIC_SEQ_CST)) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case THREAD_WAIT:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case THREAD_PATCH:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val=
+ =3D __atomic_exchange_n((int *)&add1_or_nop, val,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 __ATOMIC_SEQ_CST);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case THREAD_STOP:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+urn NULL;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ass=
+ert(false);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __b=
+uiltin_unreachable();
+>=20
+> Use g_assert_not_reached() instead.
+> checkpatch emits an error for it now.
 
-On 10/10/2024 6:34 PM, MUKESH RATHOR wrote:
-> 
-> 
-> On 10/10/24 11:21, Michael Kelley wrote:
->  > From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: 
-> Thursday, October 3, 2024 12:51 PM
->  >>
->  >> To support Hyper-V Dom0 (aka Linux as root partition), many new
->  >> definitions are required.
->  >>
->  >> The plan going forward is to directly import headers from
->  >> Hyper-V. This is a more maintainable way to import definitions
->  >> rather than via the TLFS doc. This patch series introduces
->  >> new headers (hvhdk.h, hvgdk.h, etc, see patch #3) directly
->  >> derived from Hyper-V code.
->  >>
->  >> This patch series replaces hyperv-tlfs.h with hvhdk.h, but only
->  >> in Microsoft-maintained Hyper-V code where they are needed. This
->  >> leaves the existing hyperv-tlfs.h in use elsewhere - notably for
->  >> Hyper-V enlightenments on KVM guests.
->  >
->  > Could you elaborate on why the bifurcation is necessary? Is it an
->  > interim step until the KVM code can use the new scheme as well?
+Is there an easy way to include glib from testcases?
+It's located using meson, and I can't immediately see how to push the
+respective compiler flags to the test Makefiles - this seems to be
+currently handled by configure writing to $config_target_mak.
 
-It's not strictly necessary. We chose this approach in order to
-minimize any potential impact on KVM and other non-Microsoft-
-maintained code that uses hyperv-tlfs.h. As Mukesh mentioned below,
-eventually it will be better if everyone uses the new headers.
+[...]
 
->  > Also, does "Hyper-V enlightenments on KVM guests" refer to
->  > nested KVM running at L1 on an L0 Hyper-V, and supporting L2 guests?
->  > Or is it the more general KVM support for mimicking Hyper-V for
->  > the purposes of running Windows guests? From these patches, it
->  > looks like your intention is for all KVM support for Hyper-V
->  > functionality to continue to use the existing hyperv-tlfs.h file.
-
-You're correct - "all KVM support for Hyper-V" is really what I meant.
-> 
-> Like it says above, we are creating new dom0 (root/host) support
-> that requires many new defs only available to dom0 and not any
-> guest. Hypervisor makes them publicly available via hv*dk files.
-> 
-> Ideally, someday everybody will use those, I hope we can move in
-> that direction, but I guess one step at a time. For now, KVM can
-> continue to use the tlfs file, and if there is no resistance, we
-> can move them to hv*dk files also as next step and obsolete the
-> single tlfs file.
-> 
-> Since headers are the ultimate source of truth, this will allow
-> better maintenance, better debug/support experience, and a more
-> stable stack. It also enforces non-leaking of data structs from
-> private header files (unfortunately has happened).
-> 
-> Thanks
-> -Mukesh
-> 
-
-Thanks for providing the additional context, Mukesh.
-
-Nuno
 
 
