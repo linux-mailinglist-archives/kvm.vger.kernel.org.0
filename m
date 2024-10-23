@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-29544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F219ACDF5
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 17:04:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9861C9ACDF3
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 17:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4B691F232B8
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 15:04:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C75DE1C23149
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 15:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2692B2071E8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1009D206E61;
 	Wed, 23 Oct 2024 14:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o11ddARJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNqTecft"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BF520408D;
-	Wed, 23 Oct 2024 14:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095651CFEB3;
+	Wed, 23 Oct 2024 14:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695236; cv=none; b=Q5VNiz5oXXdKJnS9Hu7R6zjxEmcHRvL9fNJDs8oKpKVIQSL81HRi4cepxpw8NK5yI0sUH9SJnEiBu9g71zBLO8ctqb6J0cdlknk959iQYWsU5zS4N2FBN6ek59BYLe+tTdpgYwiYwl7WEHUA0pY3b4zHL+Y1KWfSE8eE72tfV4c=
+	t=1729695236; cv=none; b=FVF8/KyoOayEXjhMMq5U1EojKZEfHf5tkS5Z4xp7kuN3swUB9SUch0C5rPQjymxnDtDIqPWuE69xO6NKgjF1CcYUVKEFQDImGLWJeGLdgl1FhMXp3akHyVi8UoFjGu6DJWC5sTlB7f6MeChvDEC1DrqRxO6oIOmvAuA5gomoNeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729695236; c=relaxed/simple;
-	bh=dHJ3KFc8Fd9R8bqsS2a+yer53TbR/Cd03c/AD97edWg=;
+	bh=rAYE/pTG5IPhfJrFpLrgXvimEya8Y322Dd8HVgtMsAY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fwg9BtKIJ56CAyrNw/PWXNmWGChC+wxk6gh0M2IL0Ju/J2bAKOY6g07KJY2gFQAf6mE3NBWO2KWpOthYC6avns7G8P0w4/IqGKi5xQEKBM+RUPWYR2yrSSZed2zmUTxK/+QZqzWFn0losqoksR2BGFzKhoK5sewBPMZ9/r9G7uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o11ddARJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DB0C4CEC6;
+	 MIME-Version; b=XrFrfsr0lA8ViCgqqwh6f6pBlO+7vH3vPn8Z7T+wD4V5FYi9Q6agyoSBuUv1BigjaCByDP9qt95nmLx9UIOXYy4leyvQxWOeDW6KbfBJrByI7M4b2SWa2PDW+Tmbk/PtXztgHjT4lSJf49cRK3AZ0gHVv9I7hCldaz2EheqkMgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNqTecft; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0CACC4CEE7;
 	Wed, 23 Oct 2024 14:53:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1729695235;
-	bh=dHJ3KFc8Fd9R8bqsS2a+yer53TbR/Cd03c/AD97edWg=;
+	bh=rAYE/pTG5IPhfJrFpLrgXvimEya8Y322Dd8HVgtMsAY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o11ddARJDnLBeEjJG+CyPpObqIDDpR0vqcQ4FGr/pdC+izcd9Dpas5K0cL6KayFx3
-	 LyifpRU+qUeju5SN612Akgc5qw4LmSAYw5gE0MNdZuiwB9vZz8hqsEhO1YTPIO2YAY
-	 jLQxcm5lSfsIumrkD3yOnl3Ha5oXaMJotq1LuXhX8wR9bZ8jlCwQgTFk0ZZInFCYNK
-	 uxvp00wI3aY4s8/3XsjLTii0FD7ak7xLPVh9edJq0/vVuXv/8PIfSSR2Spl2yI5nDa
-	 wq3S5QcpFbtgFJ1gX8FDpCQsU4CyqTpjA+KLbMRgjZGgU0nGHKHed13EOGggd+BPJE
-	 Syr7eOkHWnYUg==
+	b=BNqTecftSXpsZ/shgLZyHd7S9tS8oGDDQkr6il5bW0YJy/NHcYTYgJpBBHVw3kHPJ
+	 hwgcG0COiIrS9we8/HiFMBkqQBz9NUkxL2chR3DRG1K3eJLBpb5Wr/1ifWKcIH59xb
+	 sF/9hiC9MBsJIQX3sxMvEq/XgeAcVe5JmhstjVbAvnNlueIi7dM9Zr2fr8n0Xin/Yu
+	 al3j2dvlq4mJ3A/AKMTBbiaUaZDljTWyf9StqKNUdBM4KhBmGfwyNhqs440RXa2xPu
+	 DxFjqlkJkRGZ7ooXvoCmrySViXptd03pH07hfEAap2uj8DZ0jSSqFVrvCE3wco6tGH
+	 BKsADg1q8wqng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3ckE-0068vz-1v;
+	id 1t3ckE-0068vz-7n;
 	Wed, 23 Oct 2024 15:53:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 22/37] KVM: arm64: Add a composite EL2 visibility helper
-Date: Wed, 23 Oct 2024 15:53:30 +0100
-Message-Id: <20241023145345.1613824-23-maz@kernel.org>
+Subject: [PATCH v5 23/37] KVM: arm64: Define helper for EL2 registers with custom visibility
+Date: Wed, 23 Oct 2024 15:53:31 +0100
+Message-Id: <20241023145345.1613824-24-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
 References: <20241023145345.1613824-1-maz@kernel.org>
@@ -75,48 +75,50 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We are starting to have a bunch of visibility helpers checking
-for EL2 + something else, and we are going to add more.
+From: Mark Brown <broonie@kernel.org>
 
-Simplify things somehow by introducing a helper that implement
-extractly that by taking a visibility helper as a parameter,
-and convert the existing ones to that.
+In preparation for adding more visibility filtering for EL2 registers add
+a helper macro like EL2_REG() which allows specification of a custom
+visibility operation.
 
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Link: https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-1-376624fa829c@kernel.org
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c9638541c0994..dfbfae40c53c5 100644
+index dfbfae40c53c5..cfb1e58a31c06 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2296,16 +2296,18 @@ static u64 reset_hcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	return __vcpu_sys_reg(vcpu, r->reg) = val;
+@@ -2164,6 +2164,15 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 	.val = v,				\
  }
  
-+static unsigned int __el2_visibility(const struct kvm_vcpu *vcpu,
-+				     const struct sys_reg_desc *rd,
-+				     unsigned int (*fn)(const struct kvm_vcpu *,
-+							const struct sys_reg_desc *))
-+{
-+	return el2_visibility(vcpu, rd) ?: fn(vcpu, rd);
++#define EL2_REG_FILTERED(name, acc, rst, v, filter) {	\
++	SYS_DESC(SYS_##name),			\
++	.access = acc,				\
++	.reset = rst,				\
++	.reg = name,				\
++	.visibility = filter,			\
++	.val = v,				\
 +}
 +
- static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
- 				       const struct sys_reg_desc *rd)
- {
--	unsigned int r;
--
--	r = el2_visibility(vcpu, rd);
--	if (r)
--		return r;
--
--	return sve_visibility(vcpu, rd);
-+	return __el2_visibility(vcpu, rd, sve_visibility);
- }
+ #define EL2_REG_VNCR(name, rst, v)	EL2_REG(name, bad_vncr_trap, rst, v)
+ #define EL2_REG_REDIR(name, rst, v)	EL2_REG(name, bad_redir_trap, rst, v)
  
- static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+@@ -2854,8 +2863,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG_VNCR(HFGITR_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(HACR_EL2, reset_val, 0),
+ 
+-	{ SYS_DESC(SYS_ZCR_EL2), .access = access_zcr_el2, .reset = reset_val,
+-	  .visibility = sve_el2_visibility, .reg = ZCR_EL2 },
++	EL2_REG_FILTERED(ZCR_EL2, access_zcr_el2, reset_val, 0,
++			 sve_el2_visibility),
+ 
+ 	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+ 
 -- 
 2.39.2
 
