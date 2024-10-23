@@ -1,117 +1,162 @@
-Return-Path: <kvm+bounces-29451-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29452-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F739ABA2B
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 01:46:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40979ABA54
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 02:04:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D70E61C217D4
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2024 23:46:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4D9E1C22C14
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 00:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCDA1CEEBA;
-	Tue, 22 Oct 2024 23:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC9F946F;
+	Wed, 23 Oct 2024 00:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HrBPXvL9"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W7B9glwO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D81126C05;
-	Tue, 22 Oct 2024 23:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60016182;
+	Wed, 23 Oct 2024 00:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729640748; cv=none; b=CY8tZGbVjTQM6B6ocsMqNYTdvp/RkEvT0Un7Y49nyDav8waiKCfRxVuJU6loiw5JT0UwMC9qvqz3J5xsw6KrQe5wvt0hQNktQUbUj+Kr0KfL/mj2LBwgGBYP8MxrYADTxAds2mmbDSPBX6hGcSR31lX8UxYcauJrydPBFy3IORQ=
+	t=1729641845; cv=none; b=qQH4xvIHowR2uzKybLkLdTpT3tPnF+yZiGxgGw9K52Bqi/9KYoHUX3YIwO2ztVY8iENqFUlPwZ8lfA8pUmt+chTM49VkHBhTLw2kHsR64Ni0DK+oqu/0GNt7Fd/hrK9XaU/aMJ47mZsPNdg6dKY1KPm0f7AKnlDh/1eWT/9pKYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729640748; c=relaxed/simple;
-	bh=pDIp6PIXI7LCutYgWUWmchS4MNpPa0JMX6sCG63Zp3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N2UF/uumpEpk3S0fAuuNJQjBWXXPy9p6+Tg19TnKDdYerxGcz62VYqsg7tBaZuyGO4rtj34mulEnxPtaRYxs0HmnjYQWnWxAlcqmASVwNvHwHpEaMaUujTHJ9MCC1SvQmcvTukSE8ONcEL2fkPGFVHfh0bPsvRT9xZU/2HD3V8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HrBPXvL9; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729640747; x=1761176747;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pDIp6PIXI7LCutYgWUWmchS4MNpPa0JMX6sCG63Zp3k=;
-  b=HrBPXvL91RrlDuB3vYw2Dz2a2asOca1G8EX9Vr4TxoAb+NeWrp66rn/B
-   b5RKA3BjTYK1nYm7ajNJHnpv+OOc7dr+EbK+NuxP3OZVThTeJxnnbhMax
-   SwAHZGhgH6VFJ0J/zn/AnBHDdRc34ToOqUZIljuIHvWhj7ZEoAXDfJtk4
-   1yiyC5/vojbHEyQdCIfPZou0s/xTxJplcS7kI5fA3+m5mtXWD5ICafF8x
-   dF3RgaNrEow7fpG5PugJmjcvxZwlj/ZzuK1henSshQbF+rP+JGJup8MJh
-   Xh8u5gbyz1yxSnjWstf6kPuUAX7zh8v3fIzXwTnXs5vi+jHP7GSn5WzVr
-   Q==;
-X-CSE-ConnectionGUID: WWGtQBIdTTmJQuphj3zp4A==
-X-CSE-MsgGUID: 1NTfbLFBToGqrfCUdVuNIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="29316930"
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="29316930"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 16:45:46 -0700
-X-CSE-ConnectionGUID: 55rXk8hyRsK1sIoI0f4Z6Q==
-X-CSE-MsgGUID: I305ftsyQn+MbR3owEo2xQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="80096757"
-Received: from tassilo.jf.intel.com (HELO tassilo) ([10.54.38.190])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 16:45:45 -0700
-Date: Tue, 22 Oct 2024 16:45:44 -0700
-From: Andi Kleen <ak@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Thomas Richter <tmricht@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>,
-	Kan Liang <kan.liang@linux.intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>, mizhang@google.com,
-	kvm@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH V13 03/14] KVM: x86: Fix Intel PT Host/Guest mode when
- host tracing also
-Message-ID: <Zxg5KJKx-mdY4ocC@tassilo>
-References: <20241014105124.24473-1-adrian.hunter@intel.com>
- <20241014105124.24473-4-adrian.hunter@intel.com>
- <Zw1iCMNSI4Lc0mSG@google.com>
- <b29e8ba4-5893-4ca0-b2cc-55d95f2fc968@intel.com>
- <ZxfTOQzcXTBEiXMG@google.com>
+	s=arc-20240116; t=1729641845; c=relaxed/simple;
+	bh=BS3twbZ5C6CqufKtgBl7yFiz4Th4SXUn3z0s0DmuctI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iPa/f40MGfrflY5XrApMSKJs8UR1rKg4vzZRYgBu/3s0yyohR1Y3fkd4ufYxTPecsC/CnHJ/o5aAqvWkXbX/jjPLBAMsFFoMjUlEyiGAjeAebN9ISRMdEoPAirl8/AGD/Ogz+k5jUDF5X9mFscEpDy9yFmZZnQ3wV3CoHCn/xQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W7B9glwO; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 0604621112FB;
+	Tue, 22 Oct 2024 17:04:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0604621112FB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1729641843;
+	bh=BSb0pSoDio3rfbTxA/Zn5HqyVgKFFvAwXvG36oPMm5A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=W7B9glwOso1LY6SeJ5JgRjNbXl8nw9FwsuxxkoDI1KlFSFB//2dXCNi0FWwhuCyFE
+	 IOZ6i+ipbig3SDZ2Bz92iF0LOgqTgQxeWjJTR8AQbWPoSVm0ApXkTXAN9h1/uZLuu/
+	 7kzQtW5Iw3AXshGs3dfUWNkGEtI/O2obLyU5wd28=
+Message-ID: <c426d122-4ba3-4193-80d5-a40d7554d324@linux.microsoft.com>
+Date: Tue, 22 Oct 2024 17:04:01 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZxfTOQzcXTBEiXMG@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] RE: [PATCH 0/5] Add new headers for Hyper-V Dom0
+To: MUKESH RATHOR <mukeshrathor@microsoft.com>,
+ Michael Kelley <mhklinux@outlook.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
+ <haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
+ "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
+ <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
+ "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
+ "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>
+References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Michael - sorry for the delay, I just got back from vacation.
+
+On 10/10/2024 6:34 PM, MUKESH RATHOR wrote:
 > 
-> Out of curiosity, how much is Intel PT used purely for control flow tracing, i.e.
-> without caring _at all_ about perceived execution time?
+> 
+> On 10/10/24 11:21, Michael Kelley wrote:
+>  > From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: 
+> Thursday, October 3, 2024 12:51 PM
+>  >>
+>  >> To support Hyper-V Dom0 (aka Linux as root partition), many new
+>  >> definitions are required.
+>  >>
+>  >> The plan going forward is to directly import headers from
+>  >> Hyper-V. This is a more maintainable way to import definitions
+>  >> rather than via the TLFS doc. This patch series introduces
+>  >> new headers (hvhdk.h, hvgdk.h, etc, see patch #3) directly
+>  >> derived from Hyper-V code.
+>  >>
+>  >> This patch series replaces hyperv-tlfs.h with hvhdk.h, but only
+>  >> in Microsoft-maintained Hyper-V code where they are needed. This
+>  >> leaves the existing hyperv-tlfs.h in use elsewhere - notably for
+>  >> Hyper-V enlightenments on KVM guests.
+>  >
+>  > Could you elaborate on why the bifurcation is necessary? Is it an
+>  > interim step until the KVM code can use the new scheme as well?
 
-It is very common, e.g. one major use of PT is control flow discovery in
-feedback fuzzers.
+It's not strictly necessary. We chose this approach in order to
+minimize any potential impact on KVM and other non-Microsoft-
+maintained code that uses hyperv-tlfs.h. As Mukesh mentioned below,
+eventually it will be better if everyone uses the new headers.
 
--Andi
+>  > Also, does "Hyper-V enlightenments on KVM guests" refer to
+>  > nested KVM running at L1 on an L0 Hyper-V, and supporting L2 guests?
+>  > Or is it the more general KVM support for mimicking Hyper-V for
+>  > the purposes of running Windows guests? From these patches, it
+>  > looks like your intention is for all KVM support for Hyper-V
+>  > functionality to continue to use the existing hyperv-tlfs.h file.
+
+You're correct - "all KVM support for Hyper-V" is really what I meant.
+> 
+> Like it says above, we are creating new dom0 (root/host) support
+> that requires many new defs only available to dom0 and not any
+> guest. Hypervisor makes them publicly available via hv*dk files.
+> 
+> Ideally, someday everybody will use those, I hope we can move in
+> that direction, but I guess one step at a time. For now, KVM can
+> continue to use the tlfs file, and if there is no resistance, we
+> can move them to hv*dk files also as next step and obsolete the
+> single tlfs file.
+> 
+> Since headers are the ultimate source of truth, this will allow
+> better maintenance, better debug/support experience, and a more
+> stable stack. It also enforces non-leaking of data structs from
+> private header files (unfortunately has happened).
+> 
+> Thanks
+> -Mukesh
+> 
+
+Thanks for providing the additional context, Mukesh.
+
+Nuno
+
 
