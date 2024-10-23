@@ -1,78 +1,81 @@
-Return-Path: <kvm+bounces-29561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B540F9ACEB3
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 17:26:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 486DE9ACEB6
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 17:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38A731F210D5
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 15:26:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 737DB1C21E2D
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 15:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24861C3045;
-	Wed, 23 Oct 2024 15:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545B61C82F1;
+	Wed, 23 Oct 2024 15:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rcs0hzTw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UnptddTT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774B61C1746
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 15:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E988B1C232D
+	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 15:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729697203; cv=none; b=uoAv1PFGFnnXjZLsRrM7zC+hIk1jUnViTZMuD1zYPt8ePodP498YOFRCuWB1g3l/g4g1j1A2ruiFXUtS3c10V8L2AtN3kCBWNpr/zfvfEXnZStymtPPDnGLUpWP2cRqdB1FCv2qXvziVlPIklY2q+OvZAPIoAnENVYNyYJLr+pQ=
+	t=1729697205; cv=none; b=myX3dxKIYG6eNWWbRnOknL2hica7ATw4/ayFrzMIktIoEjGSse5YNjKKNht3T24IJ1TbRdSoi1j/qKkkK1Pdhn85VTegMxxbwg+coo66EryH8Tz9bytIINBTYmKJ8MJIfL9MrK719/Cnh8HSlQZFMyZVIlxSIXbkISSamwJNoKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729697203; c=relaxed/simple;
-	bh=hHfBZftXhNOJ3HtBKDzEps5lRrh8yzrWQIEEayw2NdQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZpQbgMqVJBxxzq3FZ4EsZSrF3i/j7KsVLg6D/KnAlXnuExeRlt7Fj5/7L/+sN5X70uzNKQI+LIwW+9KJZhpCXK5TezkWoMNnSHWIBxJdAibByZy/fd91xgoa6CQLhOYAOcfjb6i2izFvbF4BVSCGI6elxr+V7Jc3IqWeZINZ+x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rcs0hzTw; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1729697205; c=relaxed/simple;
+	bh=esQoNZuXsR24jwPl1DfQPAsmfQfBH1AfjOxCgQQxj50=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=I7Xk6w+pSxxoEQOZOJ7wJr3ccpXk2ZQ+yJt0VxHrIJI+3yfDH213WDas4H/bWH7ggRrIwIRSB+xREGwqAwaGl9HRM2ItVNMfa2209sGGmSkTLibat1xpn8LvhNb0/U9g4skW7cE8rqT4Sv48Z6UyXf/ARWEToNzBs8SFk6dBTxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UnptddTT; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e29205f6063so11045014276.1
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 08:26:42 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e3529d80e5so120963547b3.0
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 08:26:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729697201; x=1730302001; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LgyTGB3pqM8nd2tlaCQUWlInWbsb/ECPLI+TMKap3wE=;
-        b=Rcs0hzTwmnwyurDbCMDaG1zK45Qrok/2MqdspTEH6c14pTDapHLfeUwqiWeCqKhE6D
-         ijwNiKDGSAEYCZctaB2CaCEcJKZV5pYlk9ny77YXyi7SzKEhBkG9IApsoPtCf9cR1+vp
-         VkGA9NtTsNgxziexKU0Wxm66Nuy4xvNdrR2Jr1NmYKjUWXXW21/bGrg5mfZ9lTVevmMs
-         bfMhYSkL+nHmD103koZa0n+G0LbJQQSq9dP7VWmlCa6ZtOwpvH8sfcIO8IVmVTztbevz
-         NUKA5XfJDa3ltfhr50dC93sGSYI9k4+K5mFRDIoIp+bGSHEnMHaj2HIENqYZZzxLlzhc
-         jnAQ==
+        d=google.com; s=20230601; t=1729697203; x=1730302003; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
+        b=UnptddTTjSWKqFJpFHyGYMDGmM0jP/sK2gHpXfLQk7V82ed287fPn46FIkFrKgU7KY
+         MMnroaaEM9/iQOZjHXpxquCaux9bLcCGyhEiThtZGCwT3JLkf7B7rmBEzzD1Q1cLYRvi
+         DnkOsJrDo0oTzeVq/dB9btZxFejWLXrhHMDLVtgOCbw6OZD6yVnvHfe7PPUWBGdgCPVh
+         EBstI9G9vgJ83GR5vklGiCH4o/gY+yKao/pgtxyMzw6u+S8lQwaBY2B69aXdlJ+PXZjP
+         kWcFj8OGAb6zsbkBhLqupwZsOCwzcMtlopkkVRUr9Py0o8EfpIIISFPtBopxxHt0YzS1
+         jcIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729697201; x=1730302001;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LgyTGB3pqM8nd2tlaCQUWlInWbsb/ECPLI+TMKap3wE=;
-        b=h/EOMgXJC7WS75pDOTz0b6NhtdnIKeuFmRD6HqQd28LzBt5NXuh7/oePsViXjt5VLQ
-         qrpZyk/uAYI9L6ocGztf8sv0kjXlNidyvvLVjK8me84pfQ8QYf1WPxKj3tC/eQlTGhPe
-         +dYsOgSDavkHyafwJP6CWHrOXNDjrNBoj6vEJTFszLv0FcsXSvV0iJEtHRxv7CQgp54B
-         vHckRCBiiDKh+5jRTo0JEts52NCLRJYa0osYh/cIjtgBJ0gtv7gMtAWx4wEkKhzCgVLm
-         ZA8KKQVHNcVN5rol2lHV61aprpFNOz2U1FaJTn0JGt9emXz05jV9JidJTZ1LRsK7+nQL
-         dBxg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrdUO4MRoDa3QyjMK7pvDedud4d5lrwOaDT6/LXe7jkCPYfKuqAmD0q4jVubiR0hDFoUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqWib1jGaD18zoMpxvingj0AC0vojUhP+GScntS2AZfBwK577b
-	6TyrDtqMzPh7QcE9giuN9hqFZ3iwP4o3QdXnbcweP57eL+BF3PjNOPuVTVjCHbZwvg0Heuh9KEF
-	qFNEQng==
-X-Google-Smtp-Source: AGHT+IGZLylUFfRaeoUChkh5zta51HqScos57+PeLEawa/Zj6Vb0Z2er1q5qfJlHjZXBZG3OR/irola46j3M
+        d=1e100.net; s=20230601; t=1729697203; x=1730302003;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
+        b=rW32sshwo1652rPIrWes7mVdAe6zDe0orCL39g+NVSANj1vY21QzS5818XFqV05fFz
+         2So0e/HqWAEGQQrtfFp5lczhG1iwa8dCN2+iS3Th1xvn5Qz6DWztvDYlzaig7k0AjBy1
+         cJzXRKYOzOYS/o8qLZNlTjCGyCxzElEgqaIY/AfCCyiBNEgITKdxOqsCe0SJE2WSjfWV
+         EZhC41m0nXxkGPQl47ybqZQ0Mfgv2e/8h0Xd97zyCW7TvFUHscOp93efRCkAi+c5Ar2b
+         +zZDXHcyjAiB/NkrCmUtbmwwt0gknydeJ410giM/kRcZZZzssPBNn9hT/CTYaCu/u70U
+         6o+g==
+X-Forwarded-Encrypted: i=1; AJvYcCU5uggxgw0oBqf20p2YSA2vbetJmGMhLFvSkgSL+JmzsQpwUxhZjDpUFVVUyWLmaq4L1Bc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvQE6YJfTqfKVfkxBRfwZ4kC25CZlxDI73cMTiKa1Jd13Lh2v/
+	dmpGU3KmZFsCdbZK2RPwYX5iItBLXSD6sMuPXjPVenljkUR5EG2TKdcg9TorYAGvre6GqLlqBAs
+	DgEwkJw==
+X-Google-Smtp-Source: AGHT+IGyKD6tDsN1UOGbK0zHzy2EM8WTJ3RRqhXskaDYZzY4RpWhowWcPc5+5VKKdGJS9/5Go7f2MraDRssJ
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fac1])
- (user=rananta job=sendgmr) by 2002:a25:b21f:0:b0:e2b:d28f:bf28 with SMTP id
- 3f1490d57ef6-e2e3a5fa7a4mr5506276.2.1729697201237; Wed, 23 Oct 2024 08:26:41
+ (user=rananta job=sendgmr) by 2002:a25:8e87:0:b0:e1d:912e:9350 with SMTP id
+ 3f1490d57ef6-e2e3a6bc055mr2784276.6.1729697202285; Wed, 23 Oct 2024 08:26:42
  -0700 (PDT)
-Date: Wed, 23 Oct 2024 15:26:34 +0000
+Date: Wed, 23 Oct 2024 15:26:35 +0000
+In-Reply-To: <20241023152638.3317648-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20241023152638.3317648-1-rananta@google.com>
 X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
-Message-ID: <20241023152638.3317648-1-rananta@google.com>
-Subject: [kvm-unit-tests PATCH v2 0/4] Fix arm64 clang errors on fpu tests
+Message-ID: <20241023152638.3317648-2-rananta@google.com>
+Subject: [kvm-unit-tests PATCH v2 1/4] arm: Fix clang error in sve_vl()
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Subhasish Ghosh <subhasish.ghosh@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
 	Andrew Jones <andrew.jones@linux.dev>
@@ -81,34 +84,40 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-When compiled with clang for arm64, some build errors were observed
-along the fpu code. Moreover, data aborts were seen while running
-the arm/fpu test due to misconfigured input/output args in the inline
-assembly.
+Fix the following clang error in sve_vl():
 
-The series tries to address these issues.
+In file included from arm/selftest.c:16:
+kvm-unit-tests/lib/asm/processor.h:163:16:
+error: value size does not match register size specified by the
+constraint and modifier [-Werror,-Wasm-operand-widths]
+                     : "=r" (vl));
+                             ^
+kvm-unit-tests/lib/asm/processor.h:162:14:
+note: use constraint modifier "w"
+                     "rdvl %0, #8"
+                           ^~
+                           %w0
+1 error generated.
 
-v2:
- - Fix build errors for newer clang versions that push 'q' registers out
-   of scope under '-mgeneral-regs-only'. (Andrew)
+Fixes: d47d370c8f ("arm: Add test for FPU/SIMD context save/restore")
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ lib/arm64/asm/processor.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v1:
-https://lore.kernel.org/all/20241022004710.1888067-1-rananta@google.com/
-
-- Raghavendra
-
-Raghavendra Rao Ananta (4):
-  arm: Fix clang error in sve_vl()
-  arm: fpu: Convert 'q' registers to 'v' to satisfy clang
-  arm: fpu: Add '.arch_extension fp' to fpu macros
-  arm: fpu: Fix the input/output args for inline asm in fpu.c
-
- arm/fpu.c                 | 52 ++++++++++++++++++++-------------------
- lib/arm64/asm/processor.h |  2 +-
- 2 files changed, 28 insertions(+), 26 deletions(-)
-
-
-base-commit: f246b16099478a916eab37b9bd1eb07c743a67d5
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index b28d41fd..e261e74d 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -159,7 +159,7 @@ static inline int sve_vl(void)
+ 	int vl;
+ 
+ 	asm volatile(".arch_extension sve\n"
+-		     "rdvl %0, #8"
++		     "rdvl %w0, #8"
+ 		     : "=r" (vl));
+ 
+ 	return vl;
 -- 
 2.47.0.105.g07ac214952-goog
 
