@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-29613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66219AE192
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:55:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BB59AE196
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38634B236E5
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:55:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76C61F21540
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DAF1C07DF;
-	Thu, 24 Oct 2024 09:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5811C1758;
+	Thu, 24 Oct 2024 09:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="l4TU/9pV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CmIIy1Ft"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29D31BD028;
-	Thu, 24 Oct 2024 09:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F9C1B6D1A;
+	Thu, 24 Oct 2024 09:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729763701; cv=none; b=kQc+LWsA4xD4Dokw5qryXLdeP491+LwUKPfzJOeDQA1CKT7mRyD/HuioLogHUHXN39RiQDVHiAsVJ5X5rSQKJtuG/qrY4VDT+K5jdRzEEmcT8K0qu2/tKp/p9Yb42qxvOTa/El/Aj72TJxqE+IcowsLtb7qhmGz+gDUD+0m3Y2w=
+	t=1729763718; cv=none; b=hJI6eo5bg+M3v/fMLwQiBDmYnYL/QlIXoAe4gWYbqBK47Bh6tuK4gZTAbVog4gcGjGTUehjLEXj5yxVaxVftXFuBpc/x2endWCsrdL5rmME1TLLq5PSj6ZjCwgoEQgearhuuAscJAif0aSxzSbMgAExa3/F1qKKOdSJPCkX4hJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729763701; c=relaxed/simple;
-	bh=V6a1tnpgTrpi5tfy9KML/vCwRHQQ5hweosaua4JfMzk=;
+	s=arc-20240116; t=1729763718; c=relaxed/simple;
+	bh=O6drzlv3N80zmY7Pe/nx5UWGSkU3ccJmkWXqNPnK4jY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zmr6VPkZaAZNIOsTYOORTx2KQVXJgx8CFYEXNYe2CZ/he8TRxZ7Z+cLELv+mskWnyMrH8c7dDOnZ/rx7KK1Lg+yQj53huujSRi3Z5qOBNiRIRi9N8bAlac48jn5F/fJCtWBfs+9+DSdHPgXNhWD7Sxva0aOCCO2aJGLuoIRQuXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=l4TU/9pV; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=WslQQa28ECeBlZWKeJQJSFUghfld8CnnN8m3xQdkYBYwkkw/iQ/777BpViUtjWoF2z4G1guEBywDNeF4nLsZDH6uw08/wIkUfFzcm75DyBltltBrJj+jQyP1zRlxuU3DzSm+lyz7sh3MUUthE/aOYQvyrO3t4CdCqQbnJviqX/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CmIIy1Ft; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729763699; x=1761299699;
+  t=1729763717; x=1761299717;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=z9vqie+qwxIDDZ4iRqHz/Fa2emMPN1oyvmAoTg4g0iw=;
-  b=l4TU/9pVijIF8PsCFw5jtMhUC/eY/ZMgLsGuC+mEt90dU10jXMFbdkO8
-   EJxCsz2IyzrjJr4H++a0nyvtbOdi3JpEwCfU9rOmdUwJe6K50b8IAjkTo
-   fp9EYTVpULtmiAod+dlSO1DjezA2Kt8AIZq2YIXFoqNZ7T6O5UTWz+Rcm
-   g=;
+  bh=MmRiiZPN8/PxouBRWWyXIjMBR7ptHi0tvj2mQku4mOY=;
+  b=CmIIy1FtgHOYnMZRSdFmk8BPmESvLk6tEd1/m08xTsSeCcErIPcuwrx/
+   Vvj7tUJmYOzY+qmASgJmikCO70uLHi1/w2g0T0loBfomlG5Ekq6jjbiy8
+   +mlmc/FIla0j3qb5TcfrAE9kz7w+cvDu21VoeaJJBv/pk69tAugGwlwHJ
+   Y=;
 X-IronPort-AV: E=Sophos;i="6.11,228,1725321600"; 
-   d="scan'208";a="346285243"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 09:54:59 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:48893]
+   d="scan'208";a="690218938"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 09:55:12 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:45954]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.247:2525] with esmtp (Farcaster)
- id 55ebfe2c-a83b-4838-9e79-7cc1f7f0fb46; Thu, 24 Oct 2024 09:54:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 55ebfe2c-a83b-4838-9e79-7cc1f7f0fb46
-Received: from EX19D003UWC004.ant.amazon.com (10.13.138.150) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ id 9c21d62f-0fbe-4351-baa5-5eb88fe8a31f; Thu, 24 Oct 2024 09:55:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 9c21d62f-0fbe-4351-baa5-5eb88fe8a31f
+Received: from EX19D020UWA002.ant.amazon.com (10.13.138.222) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 24 Oct 2024 09:54:58 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (10.250.64.143) by
- EX19D003UWC004.ant.amazon.com (10.13.138.150) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 24 Oct 2024 09:54:58 +0000
-Received: from email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.149) with Microsoft SMTP
+ Thu, 24 Oct 2024 09:55:10 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D020UWA002.ant.amazon.com (10.13.138.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 24 Oct 2024 09:55:10 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Thu, 24 Oct 2024 09:54:57 +0000
+ 15.2.1258.34 via Frontend Transport; Thu, 24 Oct 2024 09:55:10 +0000
 Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com (Postfix) with ESMTPS id 3F8CB40332;
-	Thu, 24 Oct 2024 09:54:56 +0000 (UTC)
+	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTPS id 8D8D540397;
+	Thu, 24 Oct 2024 09:55:08 +0000 (UTC)
 From: Nikita Kalyazin <kalyazin@amazon.com>
 To: <pbonzini@redhat.com>, <corbet@lwn.net>, <kvm@vger.kernel.org>,
 	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
@@ -71,9 +71,9 @@ CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
 	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
 	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>,
 	<kalyazin@amazon.com>
-Subject: [PATCH 2/4] KVM: add KVM_GUEST_MEMFD_POPULATE ioctl for guest_memfd
-Date: Thu, 24 Oct 2024 09:54:27 +0000
-Message-ID: <20241024095429.54052-3-kalyazin@amazon.com>
+Subject: [PATCH 3/4] KVM: allow KVM_GUEST_MEMFD_POPULATE in another mm
+Date: Thu, 24 Oct 2024 09:54:28 +0000
+Message-ID: <20241024095429.54052-4-kalyazin@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20241024095429.54052-1-kalyazin@amazon.com>
 References: <20241024095429.54052-1-kalyazin@amazon.com>
@@ -86,73 +86,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-The ioctl populates guest_memfd with userspace-provided data.
+Allow calling KVM_GUEST_MEMFD_POPULATE ioctl by the process that does
+not own the KVM context.
+This is to enable guest_memfd population by a non-VMM process that is
+useful for isolation of the memory management logic from the VMM for
+security and performance reasons.
 
 Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 ---
- include/linux/kvm_host.h |  3 +++
- include/uapi/linux/kvm.h |  9 +++++++++
- virt/kvm/guest_memfd.c   |  7 +++++++
- virt/kvm/kvm_main.c      | 10 ++++++++++
- 4 files changed, 29 insertions(+)
+ virt/kvm/kvm_main.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index db567d26f7b9..5b0347783598 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2505,6 +2505,9 @@ typedef int (*kvm_gmem_populate_cb)(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
- 
- long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, long npages,
- 		       kvm_gmem_populate_cb post_populate, void *opaque);
-+
-+int kvm_gmem_guest_memfd_populate(struct kvm *kvm,
-+				struct kvm_guest_memfd_populate *populate);
- #endif
- 
- #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 637efc055145..5d8073de0d96 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1573,4 +1573,13 @@ struct kvm_pre_fault_memory {
- 	__u64 padding[5];
- };
- 
-+struct kvm_guest_memfd_populate {
-+	__u64 gpa;
-+	__u64 size;
-+	void __user *from;
-+	__u64 flags;
-+};
-+
-+#define KVM_GUEST_MEMFD_POPULATE _IOW(KVMIO,  0xd6, struct kvm_guest_memfd_populate)
-+
- #endif /* __LINUX_KVM_H */
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 954312fac462..08630b87f0e3 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -720,4 +720,11 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
- 	return ret && !i ? ret : i;
- }
- EXPORT_SYMBOL_GPL(kvm_gmem_populate);
-+
-+int kvm_gmem_guest_memfd_populate(struct kvm *kvm,
-+				struct kvm_guest_memfd_populate *populate)
-+{
-+	return kvm_gmem_populate(kvm, populate->gpa >> PAGE_SHIFT, populate->from,
-+		populate->size >> PAGE_SHIFT, kvm_gmem_post_populate_generic, NULL);
-+}
- #endif
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 05cbb2548d99..e5bd2c0031bf 100644
+index e5bd2c0031bf..eb626c4bf4d7 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -5383,6 +5383,16 @@ static long kvm_vm_ioctl(struct file *filp,
- 		r = kvm_gmem_create(kvm, &guest_memfd);
- 		break;
- 	}
-+	case KVM_GUEST_MEMFD_POPULATE: {
+@@ -5159,8 +5159,25 @@ static long kvm_vm_ioctl(struct file *filp,
+ 	void __user *argp = (void __user *)arg;
+ 	int r;
+ 
+-	if (kvm->mm != current->mm || kvm->vm_dead)
++	if (kvm->vm_dead)
+ 		return -EIO;
++
++#ifdef CONFIG_KVM_PRIVATE_MEM
++	if (ioctl == KVM_GUEST_MEMFD_POPULATE) {
 +		struct kvm_guest_memfd_populate populate;
 +
 +		r = -EFAULT;
@@ -160,8 +118,30 @@ index 05cbb2548d99..e5bd2c0031bf 100644
 +			goto out;
 +
 +		r = kvm_gmem_guest_memfd_populate(kvm, &populate);
-+		break;
++		goto out;
 +	}
++#endif
++
++	if (kvm->mm != current->mm)
++		return -EIO;
++
+ 	switch (ioctl) {
+ 	case KVM_CREATE_VCPU:
+ 		r = kvm_vm_ioctl_create_vcpu(kvm, arg);
+@@ -5383,16 +5400,6 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_gmem_create(kvm, &guest_memfd);
+ 		break;
+ 	}
+-	case KVM_GUEST_MEMFD_POPULATE: {
+-		struct kvm_guest_memfd_populate populate;
+-
+-		r = -EFAULT;
+-		if (copy_from_user(&populate, argp, sizeof(populate)))
+-			goto out;
+-
+-		r = kvm_gmem_guest_memfd_populate(kvm, &populate);
+-		break;
+-	}
  #endif
  	default:
  		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
