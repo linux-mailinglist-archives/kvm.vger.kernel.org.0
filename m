@@ -1,147 +1,138 @@
-Return-Path: <kvm+bounces-29663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8CC9AEF93
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 20:19:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842D19AF28C
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 21:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218662817B3
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 18:19:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A862C1C2415E
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 19:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6F82003DC;
-	Thu, 24 Oct 2024 18:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05411216A35;
+	Thu, 24 Oct 2024 19:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="AR5miBzy"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="lA5AKoUJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383581FE0EA
-	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 18:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF3C1FC7FE
+	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 19:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729793950; cv=none; b=MB87MXy0ymx0vkP4Bn1cymk/kH4k0FjFYHdaD6NVFlPOce5k2+yshdrg5+dKX3Fc2uF7g4d0VvceCbkBsQk1ayKTU3dPacGM8mxLzMssJNr2/0ZZIZEMVp+7bYPHdKoI260x/OhI812+ME3l02NgbX20bEp12nrppZDQdmdrfwE=
+	t=1729797427; cv=none; b=XvCwNLGfZpKBoyeVpV2kpNKOdGpoUghlhSO90y7LqOxnTkY2WIeJfTjCNK0/cXadMq0J3qYG3KHyTzqmGm3KiH/O2E+wOx6zNj8AJIBwwqQaHfdVwW089vWSt+kM7xUccLSMU/D5Rr0c1bXfqWX8bcdA7tEINrU1GFtcc+heru0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729793950; c=relaxed/simple;
-	bh=CH8vMW1/zpkG7zSqbe9PVXIyeHGTmLRmHDa4jG4zZzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PSSYI4i98DYPBU95U8+uGM7aqvPjB0dWND+h6VkUUy3pHvuGhoypRVYujmup0fD9XxxciSUJx2NclirXzNqDaxTbRj1Fo83F3En+NTmRfbKLzr0MBVqhS6NuiTCEu/PmW66dsBzXP4IZR1Tu2IVda6iVvaEhp918apLQ2VC0xlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=AR5miBzy; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5eb70a779baso662978eaf.1
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 11:19:07 -0700 (PDT)
+	s=arc-20240116; t=1729797427; c=relaxed/simple;
+	bh=r2894LsRaL5cMjTp9c/aiq8WNR9qa3a0tHFbx9n/VDw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LuPI64S6zmo2TMITYMqXTJ1Ynt0LEJtJJwKp+WSjg7P9uZQGYWSmd2TXIEE45yIBuE1AiIo/EHr0JwjTToKuKdxEYi0fV2gIoa57fmN1lwnUFWqNacUcBbr4QSb5pYaOermppzhp++M2NOzkAkblBl7vEEI2zjNnpo2cusNQrIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=lA5AKoUJ; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-83aba237c03so48696039f.3
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 12:17:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1729793947; x=1730398747; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uZBytGE7ZuTkGms+2TTJHzCJ6rcb64F+IbygfHjIlxo=;
-        b=AR5miBzyBcqPKU7U97g1DSTMpT2tSF9yCp3TmS4l3Lh74647R0tL3vjQnIeDq4xqAg
-         6SAajy6iC1I7H3f/MyWxW4J/1grkcBk0vdc0gmJXCZbc7itJA2vo1AVu0842uubt112R
-         eVf69A3PrXED3faIvhP9ftc98PCqMo69dk04HEC2Fjyd2oVnkUtCfYTK5JNa5Z2n9QHU
-         4SLhDDuprpq2biUvyvEE6bUlZa18EMV/yn3bSyPnCw8VFIYtdVi3J1iPwSWl9wHVP+YJ
-         VEStulca4g5hgP6aHMykmDGyzt/baRPKX14zJBHG0GKWHUx5mFENrVIn4iZZAHsaDBGI
-         dSfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729793947; x=1730398747;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1729797423; x=1730402223; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uZBytGE7ZuTkGms+2TTJHzCJ6rcb64F+IbygfHjIlxo=;
-        b=TzQIO1QIzIcuKOuhlasRj2AJyT2+j8SfApcYqSUIf8MnGoeq4IYvad5/8nesi+/z3y
-         aXFv0y9QzpIDUFx730onSencRV8lZHE0XkXKBzCZ/9AWLt0ECmuea353OVQjmNO7ZuOy
-         Rq7arIi8KWzZLDOJkIAKR1kcWYLpD2VNvIrIufO8wsDwDZMDr2qgxZ5UILUin2CL1n5g
-         3ki8PZG98iAlLQxsEjACfh17GgkC5/ifSu1FASE/7hGSi+TSB8bjmBT7GouCjAjblZYA
-         na8S9lweihGv6okJiDD2c3VF4mHtfkYe0osw2TQcIRAMIyp77xgn/YIeB11EkpQJk2J9
-         cGqA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6U2DQkrRpEmNinegSVMJarq1AtxZxJqGDb8hkM02KIBwPzzfdNtE/U/8LwJuOgU7Q1vc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe9yvug7mMiSgga3D+yr4AvE2MfRtYLhW7Q1B0QFY2CFc6qYz/
-	2mbWTsztgKqH7NwUpEbBm3ypiu5wDtgMp1DJ7EShq29yWDNXNJy6vctZCfMkEoE=
-X-Google-Smtp-Source: AGHT+IEjicTJUCagFJHVWThr9j6tOLmSf7uLfErGeRucuprxKLTVc9VjM+4CMkaK7H0akWzhPiSqsQ==
-X-Received: by 2002:a05:6358:60c3:b0:1c3:8215:164c with SMTP id e5c5f4694b2df-1c3d80d4610mr558532255d.1.1729793946767;
-        Thu, 24 Oct 2024 11:19:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3c3fe1csm53700741cf.10.2024.10.24.11.19.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 11:19:04 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t42QJ-000000005sw-3YfU;
-	Thu, 24 Oct 2024 15:19:03 -0300
-Date: Thu, 24 Oct 2024 15:19:03 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Qinyun Tan <qinyuntan@linux.alibaba.com>,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1: vfio: avoid unnecessary pin memory when dma map io
- address space 0/2]
-Message-ID: <20241024181903.GA20281@ziepe.ca>
-References: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
- <20241024110624.63871cfa.alex.williamson@redhat.com>
+        bh=aMVuNP7DptisRZKMAE62XcZxOQ0ITSLxzIbBe9rphWg=;
+        b=lA5AKoUJX5NIwwmgwcPO0LlAnXNw+nDr5zN62GyzVprCGtCgDWXcbL3wbZKSmd/cKV
+         q2tkl2+WVcFz036R8T2JRNiF0UTJJy+n5Mvbe9+HwpJCpIogtQuHGpNUcl17ct5wRC+b
+         q78WEjVrXTskIjfLoqRXO6mn+aGGaQRckOft+v7EXhfs4hO7youWj1ySdz7r0bMyQ1x6
+         3aHrdfL7wgFFuc6ng37zi9seTtXpUdckqOCFGHjDe5kbErGaXluSWILmwojRuMN2z18E
+         N9GcNvBFxFa7W6lczd6JavYcSyxkBkKEK8GzFWAgXzfb4O28HsugSwfaH0XnL74SxTEU
+         LNSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729797423; x=1730402223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aMVuNP7DptisRZKMAE62XcZxOQ0ITSLxzIbBe9rphWg=;
+        b=g7WpvK2rfjcR2JTQezwi5QjyvYUEHlxE+HLMndcM6usDIgnEOpP3azpUmZ8qZrL+C4
+         DzS3hOZ5dJw+0asy6e72y/46X65IaTzZ4fACxZlHfwccc0GBZEkhLnzr3+PEMI0lsLnx
+         uEyiF7JsApa7+1v6n2UpX/Y8ctVR5vOWO6gxxwvAf1pzFQZwmgkF+zevwVOfTKkRODnZ
+         SpuKXlYFG5g8CCqNKJSNXhC9FHroN6+zQrft/U96C0WJubrS+YO2PY6D7yGF13lMIJha
+         0SLX34FOJDG79ivXJqbbPrCk+rPH0HL5qdjk6lHSCIgoGz8jGZMxYnrc02XSj8cZMVgR
+         xBWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwxSc78DwhPFrP/YY3Qn7xxhK329rjNtVjfmCyXLOo0upgrqY1EZgbh6R8pnWqa8aI3R0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8I8PyRCj6kpAat9c/Qb8GCNZDt8tecfcT8y9SSvQxP+F8BrOn
+	EmWAaCXhN5C0yXzu6j3P+VwM0ZT2ZPKd2WIqpPdkOeA/GtXtPd0xjWazCXyUmUn8SiclWXJ6HEE
+	CxDIsCgOs3IGvhgE6lVagE0TUk7MRMTInX1TKCg==
+X-Google-Smtp-Source: AGHT+IFZzEb2zN7h96lApR8DYauv53XlH5oPpoX1QtB4zj0x/HOggQdCeZlKWS+cP9VVlhcXp5Qae/4W4hrCmVnyZps=
+X-Received: by 2002:a05:6e02:1564:b0:3a0:c15f:7577 with SMTP id
+ e9e14a558f8ab-3a4d5945f99mr81465345ab.9.1729797423093; Thu, 24 Oct 2024
+ 12:17:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024110624.63871cfa.alex.williamson@redhat.com>
+References: <20240927-dev-maxh-svukte-rebase-2-v2-0-9afe57c33aee@sifive.com> <20240927-dev-maxh-svukte-rebase-2-v2-3-9afe57c33aee@sifive.com>
+In-Reply-To: <20240927-dev-maxh-svukte-rebase-2-v2-3-9afe57c33aee@sifive.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 25 Oct 2024 00:46:51 +0530
+Message-ID: <CAAhSdy0ncLTAjEE1s-GWL95sscxwQFsKn1rXyA1_VVfk1bQBiw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 3/3] riscv: KVM: Add Svukte extension support for Guest/VM
+To: Max Hsu <max.hsu@sifive.com>
+Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@sifive.com>, 
+	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, Samuel Holland <samuel.holland@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2024 at 11:06:24AM -0600, Alex Williamson wrote:
-> On Thu, 24 Oct 2024 17:34:42 +0800
-> Qinyun Tan <qinyuntan@linux.alibaba.com> wrote:
-> 
-> > When user application call ioctl(VFIO_IOMMU_MAP_DMA) to map a dma address,
-> > the general handler 'vfio_pin_map_dma' attempts to pin the memory and
-> > then create the mapping in the iommu.
-> > 
-> > However, some mappings aren't backed by a struct page, for example an
-> > mmap'd MMIO range for our own or another device. In this scenario, a vma
-> > with flag VM_IO | VM_PFNMAP, the pin operation will fail. Moreover, the
-> > pin operation incurs a large overhead which will result in a longer
-> > startup time for the VM. We don't actually need a pin in this scenario.
-> > 
-> > To address this issue, we introduce a new DMA MAP flag
-> > 'VFIO_DMA_MAP_FLAG_MMIO_DONT_PIN' to skip the 'vfio_pin_pages_remote'
-> > operation in the DMA map process for mmio memory. Additionally, we add
-> > the 'VM_PGOFF_IS_PFN' flag for vfio_pci_mmap address, ensuring that we can
-> > directly obtain the pfn through vma->vm_pgoff.
-> > 
-> > This approach allows us to avoid unnecessary memory pinning operations,
-> > which would otherwise introduce additional overhead during DMA mapping.
-> > 
-> > In my tests, using vfio to pass through an 8-card AMD GPU which with a
-> > large bar size (128GB*8), the time mapping the 192GB*8 bar was reduced
-> > from about 50.79s to 1.57s.
-> 
-> If the vma has a flag to indicate pfnmap, why does the user need to
-> provide a mapping flag to indicate not to pin?  We generally cannot
-> trust such a user directive anyway, nor do we in this series, so it all
-> seems rather redundant.
+On Fri, Sep 27, 2024 at 7:12=E2=80=AFPM Max Hsu <max.hsu@sifive.com> wrote:
+>
+> Add KVM ISA extension ONE_REG interface to allow VMM tools to
+> detect and enable Svukte extension for Guest/VM.
+>
+> Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+> Signed-off-by: Max Hsu <max.hsu@sifive.com>
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h | 1 +
+>  arch/riscv/kvm/vcpu_onereg.c      | 1 +
+>  2 files changed, 2 insertions(+)
+>
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index e97db3296456e19f79ca02e4c4f70ae1b4abb48b..41b466b7ffaec421e8389d3f5=
+b178580091a2c98 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -175,6 +175,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+>         KVM_RISCV_ISA_EXT_ZCF,
+>         KVM_RISCV_ISA_EXT_ZCMOP,
+>         KVM_RISCV_ISA_EXT_ZAWRS,
+> +       KVM_RISCV_ISA_EXT_SVUKTE,
+>         KVM_RISCV_ISA_EXT_MAX,
+>  };
+>
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index b319c4c13c54ce22d2a7552f4c9f256a0c50780e..67237d6e53882a9fcd2cf265a=
+a1704f25cc4a701 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -41,6 +41,7 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
+>         KVM_ISA_EXT_ARR(SVINVAL),
+>         KVM_ISA_EXT_ARR(SVNAPOT),
+>         KVM_ISA_EXT_ARR(SVPBMT),
+> +       KVM_ISA_EXT_ARR(SVUKTE),
+>         KVM_ISA_EXT_ARR(ZACAS),
+>         KVM_ISA_EXT_ARR(ZAWRS),
+>         KVM_ISA_EXT_ARR(ZBA),
 
-The best answer is to map from DMABUF not from VMA and then you get
-perfect aggregation cheaply.
- 
-> What about simply improving the batching of pfnmap ranges rather than
-> imposing any sort of mm or uapi changes?  Or perhaps, since we're now
-> using huge_fault to populate the vma, maybe we can iterate at PMD or
-> PUD granularity rather than PAGE_SIZE?  Seems like we have plenty of
-> optimizations to pursue that could be done transparently to the
-> user.
+The KVM_RISCV_ISA_EXT_SVUKTE should be added to the
+switch-case in kvm_riscv_vcpu_isa_disable_allowed() because
+hypervisor seems to have no way to disable Svukte for the Guest
+when it's available on the Host.
 
-I don't want to add more stuff to support the security broken
-follow_pfn path. It needs to be replaced.
-
-Leon's work to improve the DMA API is soo close so we may be close to
-the end!
-
-There are two versions of the dmabuf patches on the list, it would be
-good to get that in good shape. We could make a full solution,
-including the vfio/iommufd map side while waiting.
-
-Jason
+Regards,
+Anup
 
