@@ -1,138 +1,157 @@
-Return-Path: <kvm+bounces-29664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842D19AF28C
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 21:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BF459AF2CD
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 21:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A862C1C2415E
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 19:22:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DE521C21A37
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 19:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05411216A35;
-	Thu, 24 Oct 2024 19:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005C518BB88;
+	Thu, 24 Oct 2024 19:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="lA5AKoUJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TEmUWDZ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF3C1FC7FE
-	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 19:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D40222B67F;
+	Thu, 24 Oct 2024 19:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729797427; cv=none; b=XvCwNLGfZpKBoyeVpV2kpNKOdGpoUghlhSO90y7LqOxnTkY2WIeJfTjCNK0/cXadMq0J3qYG3KHyTzqmGm3KiH/O2E+wOx6zNj8AJIBwwqQaHfdVwW089vWSt+kM7xUccLSMU/D5Rr0c1bXfqWX8bcdA7tEINrU1GFtcc+heru0=
+	t=1729799155; cv=none; b=qfwNGqWrXWTWTkwgAWiO2rDayvNlVLEAsev44RzQHncNPxUf9VNV6E1tnnq1JrPC3mmXXeCt2iFIKwaxeeMbX1ZbKUsEIh5iF/U4c2w1HhoRWOKSWSWmjInjElz4HYxWj7KcXmTU89edlzR99J+23w35IEtyUIisYJjqZyqx2hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729797427; c=relaxed/simple;
-	bh=r2894LsRaL5cMjTp9c/aiq8WNR9qa3a0tHFbx9n/VDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LuPI64S6zmo2TMITYMqXTJ1Ynt0LEJtJJwKp+WSjg7P9uZQGYWSmd2TXIEE45yIBuE1AiIo/EHr0JwjTToKuKdxEYi0fV2gIoa57fmN1lwnUFWqNacUcBbr4QSb5pYaOermppzhp++M2NOzkAkblBl7vEEI2zjNnpo2cusNQrIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=lA5AKoUJ; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-83aba237c03so48696039f.3
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 12:17:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1729797423; x=1730402223; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aMVuNP7DptisRZKMAE62XcZxOQ0ITSLxzIbBe9rphWg=;
-        b=lA5AKoUJX5NIwwmgwcPO0LlAnXNw+nDr5zN62GyzVprCGtCgDWXcbL3wbZKSmd/cKV
-         q2tkl2+WVcFz036R8T2JRNiF0UTJJy+n5Mvbe9+HwpJCpIogtQuHGpNUcl17ct5wRC+b
-         q78WEjVrXTskIjfLoqRXO6mn+aGGaQRckOft+v7EXhfs4hO7youWj1ySdz7r0bMyQ1x6
-         3aHrdfL7wgFFuc6ng37zi9seTtXpUdckqOCFGHjDe5kbErGaXluSWILmwojRuMN2z18E
-         N9GcNvBFxFa7W6lczd6JavYcSyxkBkKEK8GzFWAgXzfb4O28HsugSwfaH0XnL74SxTEU
-         LNSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729797423; x=1730402223;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aMVuNP7DptisRZKMAE62XcZxOQ0ITSLxzIbBe9rphWg=;
-        b=g7WpvK2rfjcR2JTQezwi5QjyvYUEHlxE+HLMndcM6usDIgnEOpP3azpUmZ8qZrL+C4
-         DzS3hOZ5dJw+0asy6e72y/46X65IaTzZ4fACxZlHfwccc0GBZEkhLnzr3+PEMI0lsLnx
-         uEyiF7JsApa7+1v6n2UpX/Y8ctVR5vOWO6gxxwvAf1pzFQZwmgkF+zevwVOfTKkRODnZ
-         SpuKXlYFG5g8CCqNKJSNXhC9FHroN6+zQrft/U96C0WJubrS+YO2PY6D7yGF13lMIJha
-         0SLX34FOJDG79ivXJqbbPrCk+rPH0HL5qdjk6lHSCIgoGz8jGZMxYnrc02XSj8cZMVgR
-         xBWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwxSc78DwhPFrP/YY3Qn7xxhK329rjNtVjfmCyXLOo0upgrqY1EZgbh6R8pnWqa8aI3R0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8I8PyRCj6kpAat9c/Qb8GCNZDt8tecfcT8y9SSvQxP+F8BrOn
-	EmWAaCXhN5C0yXzu6j3P+VwM0ZT2ZPKd2WIqpPdkOeA/GtXtPd0xjWazCXyUmUn8SiclWXJ6HEE
-	CxDIsCgOs3IGvhgE6lVagE0TUk7MRMTInX1TKCg==
-X-Google-Smtp-Source: AGHT+IFZzEb2zN7h96lApR8DYauv53XlH5oPpoX1QtB4zj0x/HOggQdCeZlKWS+cP9VVlhcXp5Qae/4W4hrCmVnyZps=
-X-Received: by 2002:a05:6e02:1564:b0:3a0:c15f:7577 with SMTP id
- e9e14a558f8ab-3a4d5945f99mr81465345ab.9.1729797423093; Thu, 24 Oct 2024
- 12:17:03 -0700 (PDT)
+	s=arc-20240116; t=1729799155; c=relaxed/simple;
+	bh=bgYitpnN1oSO4rKkV387ujRSJ2DlmrmlLUojI4iSrG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N+ejpKeTXK/fpLXiAsnBZDea9OcOhGv1k7zwW6hHxmZCNA776ehCqSNxkewAATE6CdzCJF/ekIgBEiVR4T6S7U5iL3AF20LH0np2Xy8Bw1bcQDmrCY20Hgu0fCR8Za94oNyHqoLpJPQuMzqVjL2kYmh3flHr2PBYJqvxxRgJ7vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TEmUWDZ8; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729799153; x=1761335153;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bgYitpnN1oSO4rKkV387ujRSJ2DlmrmlLUojI4iSrG4=;
+  b=TEmUWDZ8VScrUaJY6qwRG22v66isEX8VVjaYpUjpaCWZfvoJnp//NGWN
+   luue/GgjpWuIatVT1w4ABvjevW4Oj+wMK8t0O7tvhYgvkkIiHGtAvcc4J
+   l3TmhrEu8gYzlK+o007VA7xWJ/RHUm2CgKMgXNXAFuLsY+Q+bFL/MtK2I
+   gLJovCBuMtH0c/YpfVRzQ/wM/KsOOldb6QGmNs1XiH5fC/oIWgJtX++Bm
+   aBLj5NPQP2eZXb73PXxlsWyLWKk8q4bV7O/jr1SlYSkUt4RUHR24Fmwne
+   4PkTEkte0sWurF0bhAaL8nvoGe7Ui/8G5FT20FRL5ScXQrVcO7RI4tZtk
+   Q==;
+X-CSE-ConnectionGUID: PsOlv0tyRCmom5urIbX+8A==
+X-CSE-MsgGUID: jm+mSbIDSli9EI3a8hr+dQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="52004894"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="52004894"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 12:45:52 -0700
+X-CSE-ConnectionGUID: B+GrMAY6RM+2W6ySmP1ISg==
+X-CSE-MsgGUID: 3bKxS+7gRk2wCUt2hPSMRQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,230,1725346800"; 
+   d="scan'208";a="118161315"
+Received: from soc-cp83kr3.clients.intel.com (HELO [10.24.8.117]) ([10.24.8.117])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 12:45:52 -0700
+Message-ID: <17f0f408-459a-4dc2-bad4-c697f782117c@intel.com>
+Date: Thu, 24 Oct 2024 12:45:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927-dev-maxh-svukte-rebase-2-v2-0-9afe57c33aee@sifive.com> <20240927-dev-maxh-svukte-rebase-2-v2-3-9afe57c33aee@sifive.com>
-In-Reply-To: <20240927-dev-maxh-svukte-rebase-2-v2-3-9afe57c33aee@sifive.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 25 Oct 2024 00:46:51 +0530
-Message-ID: <CAAhSdy0ncLTAjEE1s-GWL95sscxwQFsKn1rXyA1_VVfk1bQBiw@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 3/3] riscv: KVM: Add Svukte extension support for Guest/VM
-To: Max Hsu <max.hsu@sifive.com>
-Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@sifive.com>, 
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Samuel Holland <samuel.holland@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 15/58] perf/x86: Support switch_interrupt interface
+To: Colton Lewis <coltonlewis@google.com>, Mingwei Zhang <mizhang@google.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, xiong.y.zhang@intel.com,
+ dapeng1.mi@linux.intel.com, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ manali.shukla@amd.com, sandipan.das@amd.com, jmattson@google.com,
+ eranian@google.com, irogers@google.com, namhyung@kernel.org,
+ gce-passthrou-pmu-dev@google.com, samantha.alt@intel.com,
+ zhiyuan.lv@intel.com, yanfei.xu@intel.com, like.xu.linux@gmail.com,
+ peterz@infradead.org, rananta@google.com, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <gsnt5xr4eauc.fsf@coltonlewis-kvm.c.googlers.com>
+Content-Language: en-US
+From: "Chen, Zide" <zide.chen@intel.com>
+In-Reply-To: <gsnt5xr4eauc.fsf@coltonlewis-kvm.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 27, 2024 at 7:12=E2=80=AFPM Max Hsu <max.hsu@sifive.com> wrote:
->
-> Add KVM ISA extension ONE_REG interface to allow VMM tools to
-> detect and enable Svukte extension for Guest/VM.
->
-> Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
-> Signed-off-by: Max Hsu <max.hsu@sifive.com>
-> ---
->  arch/riscv/include/uapi/asm/kvm.h | 1 +
->  arch/riscv/kvm/vcpu_onereg.c      | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
-asm/kvm.h
-> index e97db3296456e19f79ca02e4c4f70ae1b4abb48b..41b466b7ffaec421e8389d3f5=
-b178580091a2c98 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -175,6 +175,7 @@ enum KVM_RISCV_ISA_EXT_ID {
->         KVM_RISCV_ISA_EXT_ZCF,
->         KVM_RISCV_ISA_EXT_ZCMOP,
->         KVM_RISCV_ISA_EXT_ZAWRS,
-> +       KVM_RISCV_ISA_EXT_SVUKTE,
->         KVM_RISCV_ISA_EXT_MAX,
->  };
->
-> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-> index b319c4c13c54ce22d2a7552f4c9f256a0c50780e..67237d6e53882a9fcd2cf265a=
-a1704f25cc4a701 100644
-> --- a/arch/riscv/kvm/vcpu_onereg.c
-> +++ b/arch/riscv/kvm/vcpu_onereg.c
-> @@ -41,6 +41,7 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
->         KVM_ISA_EXT_ARR(SVINVAL),
->         KVM_ISA_EXT_ARR(SVNAPOT),
->         KVM_ISA_EXT_ARR(SVPBMT),
-> +       KVM_ISA_EXT_ARR(SVUKTE),
->         KVM_ISA_EXT_ARR(ZACAS),
->         KVM_ISA_EXT_ARR(ZAWRS),
->         KVM_ISA_EXT_ARR(ZBA),
 
-The KVM_RISCV_ISA_EXT_SVUKTE should be added to the
-switch-case in kvm_riscv_vcpu_isa_disable_allowed() because
-hypervisor seems to have no way to disable Svukte for the Guest
-when it's available on the Host.
 
-Regards,
-Anup
+On 9/9/2024 3:11 PM, Colton Lewis wrote:
+> Mingwei Zhang <mizhang@google.com> writes:
+> 
+>> From: Kan Liang <kan.liang@linux.intel.com>
+> 
+>> Implement switch_interrupt interface for x86 PMU, switch PMI to dedicated
+>> KVM_GUEST_PMI_VECTOR at perf guest enter, and switch PMI back to
+>> NMI at perf guest exit.
+> 
+>> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+>> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>   arch/x86/events/core.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+> 
+>> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+>> index 5bf78cd619bf..b17ef8b6c1a6 100644
+>> --- a/arch/x86/events/core.c
+>> +++ b/arch/x86/events/core.c
+>> @@ -2673,6 +2673,15 @@ static bool x86_pmu_filter(struct pmu *pmu, int
+>> cpu)
+>>       return ret;
+>>   }
+> 
+>> +static void x86_pmu_switch_interrupt(bool enter, u32 guest_lvtpc)
+>> +{
+>> +    if (enter)
+>> +        apic_write(APIC_LVTPC, APIC_DM_FIXED | KVM_GUEST_PMI_VECTOR |
+>> +               (guest_lvtpc & APIC_LVT_MASKED));
+>> +    else
+>> +        apic_write(APIC_LVTPC, APIC_DM_NMI);
+>> +}
+>> +
+> 
+> Similar issue I point out in an earlier patch. #define
+> KVM_GUEST_PMI_VECTOR is guarded by CONFIG_KVM but this code is not,
+> which can result in compile errors.
+
+Since KVM_GUEST_PMI_VECTOR and the interrupt handler are owned by KVM,
+how about to simplify it to:
+
+static void x86_pmu_switch_guest_ctx(bool enter, void *data)
+{
+	if (enter)
+		apic_write(APIC_LVTPC, *(u32 *)data);
+        ...
+}
+
+In KVM side:
+perf_guest_enter(whatever_lvtpc_value_it_decides);
+
+
+>>   static struct pmu pmu = {
+>>       .pmu_enable        = x86_pmu_enable,
+>>       .pmu_disable        = x86_pmu_disable,
+>> @@ -2702,6 +2711,8 @@ static struct pmu pmu = {
+>>       .aux_output_match    = x86_pmu_aux_output_match,
+> 
+>>       .filter            = x86_pmu_filter,
+>> +
+>> +    .switch_interrupt    = x86_pmu_switch_interrupt,
+>>   };
+> 
+>>   void arch_perf_update_userpage(struct perf_event *event,
+> 
+
 
