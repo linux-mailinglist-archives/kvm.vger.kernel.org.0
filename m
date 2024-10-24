@@ -1,363 +1,205 @@
-Return-Path: <kvm+bounces-29582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D159AD86A
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 01:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DE89ADA68
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 05:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C82F1F21862
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2024 23:28:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB2911F22B64
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 03:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89B21FF7B1;
-	Wed, 23 Oct 2024 23:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4475016190C;
+	Thu, 24 Oct 2024 03:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aNYpTN4a"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MAEtoByA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EF01E4A4
-	for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 23:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729726075; cv=none; b=UG2Wh1gRCEcoHhJ21mt1Y0dapmSGfz39ivd3WCWL+XLo68k68WUjqD9cAO3HuA5q+y0e1AzWCoj49xt2p5iSCWI+VAMuVxdZrnMqh0Rtn/OC/ENt2Zyo9hnLN0GsrtBHzsuHVVbBilYPN9a9RisZkigk9kYhN7SLeUVt9IlPNGU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729726075; c=relaxed/simple;
-	bh=EG0ONMmq4RVFhRO10BpZvh/oHirmRtJ2HeXZN0x9Qdk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kOIHdu0jBJet8nd8dmthqmG6xVW8XoqBgNB/jyk8wg8X0/o+S6GUAi04m0uwm6lXqDoAq6Rr71j6huGafG/Pf2/3PLUSuvXTldfhSSSjeg9FnNx06HdecU3fhGEAsZjvS5EbsNWWTlIzKb1AA9roy6D8zsCuE12UX7/XKw/mylI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aNYpTN4a; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2a9577037so359325a91.1
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2024 16:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729726072; x=1730330872; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pak5RcdWZ0viVp+nAws2VedxAmJZM+00JUHRChlUMWk=;
-        b=aNYpTN4ansliEX7ZdYim0ukORvdS4EAZLeVxICKJPE7R4U+f9otKdmBiEMdrkFip2R
-         xukgZYXJ2LLjD7i7Yq1wt9CrBeeVqArJEu52fij1lWOV20UDHxJP2J0MOSj9p+kYhA6m
-         Rr0+qA+thyRkuVmSugxyCNwo4m8Epr58wGIyKnoAVa8EFAAMeq2njQvOeu4HSZqpz6zZ
-         U535NEYHuARWKCD+x+jYBLrZsdqvEfddLdMJc1JFiZVXD8EEwJB0MKd1NTOa9sBN3gY0
-         rIpkv5x5/wGlttKXRs6Zizf9JzwEuXm8/pAP4ZbsDVeZB9Pux+qFwKtzYw62uIA/y4E4
-         GK2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729726072; x=1730330872;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pak5RcdWZ0viVp+nAws2VedxAmJZM+00JUHRChlUMWk=;
-        b=DtRDXrcxgOTFIQB6jpKQ5qmVe061I77dOzV2npPPmv4takCWkDoT1QrJeTiwsAb71N
-         1xmbM2BA9vhhTjt821ksDPIcyLZ6+lGitPjixs0CQRP+soroXN/fbaEFZ3d9TodOUjWv
-         AUsB4x0VXgGPDrd84wC+LIZ5JGD3cNZ4yAQenNwhX1GBcUjS1ALep8Ikb9S+9wls1k1U
-         wEmsbHtswJt7CyuPyPUkFa63BTeov+hemVVqbmMkjgVVorz5XK1CzfA87sXugqGErWnX
-         tU+Hz1kVKwfPDqZU7gxPXMZcBPts6SOCcNljV7fkO8L5KcaCU1KF546xaVl/mT50cITP
-         hQmg==
-X-Gm-Message-State: AOJu0YxJx9s/eXtbj3Oz68tieAmxb0DMetM3AUi2hfuEAonuDEtrTzDW
-	T+KjjXUdGOv/4z/n7qEDOtKDA6OyVj3TYmbcIElfREwxdCN8VOTzDzqyP4awZxgYGViyZF2uJ3y
-	CHg==
-X-Google-Smtp-Source: AGHT+IENhEQ51gU24q+D/f8e8zXmVUVvDzHs+KLAWVmSaatkQ+M8OIvwipnznMZeCLARioALmq9zKEQ4wA8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90b:e11:b0:2e2:cf55:5124 with SMTP id
- 98e67ed59e1d1-2e77ecb2a13mr112a91.0.1729726072261; Wed, 23 Oct 2024 16:27:52
- -0700 (PDT)
-Date: Wed, 23 Oct 2024 16:27:50 -0700
-In-Reply-To: <20241023091902.2289764-1-bk@alpico.io>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8C1157A59;
+	Thu, 24 Oct 2024 03:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729740267; cv=fail; b=i+EuSqVI5BBd23tniysz9Xey4A10r0X1H+vfaa5wTTxv6E2oK81/8/nmmUR/gScbfu20FpZOQ2713fyr/ZDxVtswKazmnv5pdEbZXY+VQOVU5daIeWAjBrcnDcw3LOm1giy9eRlo5+AzczTJkZPkbMfhXnuUnApOmUee1h5/kU4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729740267; c=relaxed/simple;
+	bh=ZEAUcMLFWwAnHfSlhv3n4RiEuswj0Bu7zHrwV04v/sk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Eq3XTsEKKhpFJPjZaQ/n8OjiEYl60soy78gIpAHls0AINxu6qew8EFWzXHxc2ZSvvvHIw4gA2XM9gSZkESyly+wvZpC2ydT2Q3LvdkaITJ3F6w5eadP5DymYMTHCDVYT+pYBxgBswXJl51GCJ0WHF4qDQTzsLldGoN9LNgdY65U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MAEtoByA; arc=fail smtp.client-ip=40.107.93.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KPjZQTkpteMKH3eiLdilrNJfveoN/yn56sKSXCxSv5Fh7buX1aWE6sU2SMWumEUVBAh4PmvGOUqQexuYwb+EhzRAOgCpA6Zts73UG7sPydF0yz9K6Bciozvyfi91+GwWwqm6U1o7PHfxkS4XEK4lE3df7xFkzgbVEei6Z99KpbUKMxhJwibr3TQTVADxSxQCeYsqL2rjW5RuBOWnucMhaWxqc/yhbB8DoajNNmgEUAY3doWpC1MeDyg5U9wh13BtehSXJNuYNP+SjaVouCbj4Ut2jd4RBqQvDyZoVLjSCV44loJmvVNxjaDJNzsipyJ48ZCrAsiHXdAk7URH5vGhcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v6n30k5GJQxsuFQ9KFnMYvvtBpIRhRF97eKm37cmVp4=;
+ b=ph9kj9DP1EK6SrGAhLeteQ+BaHv/9aLVvTQc2BZICUivZW4X605DN4H+YPZgQOqKvQNHgIssVEO/b04b9yRBH8IHq86Tt62fy07P5oBChM7j9ZMqcnrhhyX3nY4jPIme6Cy77zmhSMxb3+RrBotD5+cntmA8kf9V168olzdnfS4XtGU6g/8EZEUr3001aE+5v0+sf74PztTNuMSUQ6f/S2M8Uk5/tZ9F3Nw92bF8YwqWWrjlp/34E4dA8GqGamurTsh2n2DUZpNku/8NgV+UhCoaXndfowrnXplE3r+iHt1htC9ayNxfQl2g5r3McLFQfOZKu9dD1AFdaMjs5kPoYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v6n30k5GJQxsuFQ9KFnMYvvtBpIRhRF97eKm37cmVp4=;
+ b=MAEtoByANznZVqa2vRdppMoalzt88XxgXyV5xg9+tiHSnVXJdmMk0saBJYx/uHYniKewyK/6cbjvGqBEHNfPbcqCAmwzfcwzRi6vo47A1DviTmOOlhV3fXTCPnPtavlNMUh5xn0PJF0ev6ffAImNgN5C3sYQrPSu91dGYjtgIVQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ PH7PR12MB8056.namprd12.prod.outlook.com (2603:10b6:510:269::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Thu, 24 Oct
+ 2024 03:24:22 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%3]) with mapi id 15.20.8069.027; Thu, 24 Oct 2024
+ 03:24:22 +0000
+Message-ID: <02e72165-a32b-48da-9eff-199c52cfacf8@amd.com>
+Date: Thu, 24 Oct 2024 08:54:09 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 02/14] x86/apic: Initialize Secure AVIC APIC backing page
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+ David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-3-Neeraj.Upadhyay@amd.com>
+ <20241023163626.GKZxkmCi8ZyyCZlkrX@fat_crate.local>
+Content-Language: en-US
+From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+In-Reply-To: <20241023163626.GKZxkmCi8ZyyCZlkrX@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN0PR01CA0040.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:49::18) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241023091902.2289764-1-bk@alpico.io>
-Message-ID: <ZxmGdhwr9BlhUQ_Y@google.com>
-Subject: Re: [PATCH] KVM: x86: Fast forward the iterator when zapping the TDP MMU
-From: Sean Christopherson <seanjc@google.com>
-To: Bernhard Kauer <bk@alpico.io>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|PH7PR12MB8056:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e696782-7ba8-4624-b01e-08dcf3db5a3a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Mmd6TEZZRlBZTEdWWlZiTFFGRW1XWkRlMjdDYTdSRktOcnJEQ2xWMWlGd3N2?=
+ =?utf-8?B?WnMvSWZHNEFVV0NETHdRNjRMTktobHUvM2V0bzMzUURxbkJ4RkNOY2FDQUlI?=
+ =?utf-8?B?U0Fjb1ZGdFB2N0hDZ2UvYlpSMFlNN1BnbUpRc2pZVGlKMUJGUkdRWEJxbXdL?=
+ =?utf-8?B?cDBGQnVVZ2NNSW41UGJwY3VBZVhzL3IxcndZUGRKYUdrOFlmZ255S20rdjBh?=
+ =?utf-8?B?T01UNzkwWGNxUmFXUElCWEJQLzRZcUNYRGJNRHQ1aGROUWprSmpYdTA4MDVa?=
+ =?utf-8?B?d2RwNTU2T3ZOV1crUUU1dEVPZTAwcmhUUWVxOG8ranhVTFl2bTRsQ1h2ME40?=
+ =?utf-8?B?N3YwVG9ydG55WUEyS0J6WU92Sy9aeEVUd1Bjd3lqczVNYUhhS1pybnpmK295?=
+ =?utf-8?B?d0NVWFJpKzlheDl6TmhmNGY3b1pZVTQyL1lHam5IbFNpQVQvQmZsNWN5NTA4?=
+ =?utf-8?B?R0EyMnNjVmZsK0lVV3pPR1l4WmZBSGRydEllcldQcVhRSnRzcExjajMrVVRz?=
+ =?utf-8?B?NVFGajF6Uy9xbGxqTFI1L09RTm9jQ1h2YW1tanFKdEQxekFjd25EdWpOcjVl?=
+ =?utf-8?B?K3JIWG4xVUNRZGFIZzVTVDlzeFlJcndwdUJMaFJ6NXQxbUYrck1mU296YzhQ?=
+ =?utf-8?B?cHNkbGFtamZjNlU0ZGN6T0dNa3g3YUFtUDNjODNIeEZ3QTFvUkUwbFNZWjlS?=
+ =?utf-8?B?S0R4K0RJeWtJUjJ5eVRTdVJlOUd1NWIxVnQ2cEw1ME9FVWxLQ3RSaWFNMzB4?=
+ =?utf-8?B?N3FtOVFuTVJua1VkZVRyVjlnV1Q5SGhTK0dPQnFFOHdZZnVIR2N6QUEzZEJy?=
+ =?utf-8?B?eHVjdkhXTndFaWlVak5mSlYxYkVEMVFKRmZ6bDJ4Tk1NUm1vakFaRjl6Ry9X?=
+ =?utf-8?B?eE5KbEExeTh5UWQwaUtsdEprWFBsOWlubU16cUZoUWQ5OU5Dc2pPTGJmS1JZ?=
+ =?utf-8?B?OUNxckVUVEZXUFFNVXN2LzZDMXRheTBnU2J6N0VHQnRjdk1IMWY3YnhKTVc3?=
+ =?utf-8?B?TEtnY09aT21rUm1RY3BCZVE5by9kY2ZPUUZ5ZFV0aUJIZzRaMjBLcEVjSFlZ?=
+ =?utf-8?B?cnN2djVadERHNnpyQjE0cDRJWGlUc29nTWpIVXRkNGMwSDNNSVFrZVFnSDlQ?=
+ =?utf-8?B?b0NxVWdtUWpvNmxLdkhTbDlUZ2xxZVlHNHh0LzV4dHk0dlZBTkRrczBXY1Qz?=
+ =?utf-8?B?SVk4ckxmNHBDS3JZWTFVbnFKR3pPVmNkZW1sQ1lFM0NRVFZseFZNMHlSQ21J?=
+ =?utf-8?B?b1k1R0hwSWxKV1Z6aitQRHc0OHVEV0Z2L1h3SnRXaFhLVDVQTnlDcllNYjRL?=
+ =?utf-8?B?QitBTWFVZkdhUDBYZS9zMXJXam9KSHlTMmRuUjd3VGFJMGZGeDNrdkRUc1dn?=
+ =?utf-8?B?aU4vQVVVZXArNlg0cWJ4b1NYekdScHRKQitDUGt6VTNkRkEwdzRZcWhFOWZo?=
+ =?utf-8?B?RkFNRlhtYWhXQkZ5REpuTEhrYXJqWDF1TWsrTWpwcXJVSm9vZEZMemdCdTdk?=
+ =?utf-8?B?MFB1Z0JOQWg0M3A0L1F4aFNlQlBwdWJVekJVYUNDZVZHZ1ozRGZDcFZHelRz?=
+ =?utf-8?B?U0pvc1pEaGVVenJOYXN6dW0ydWlENUVuTmwrMUdCUTFiUEZMR3VoeExGQmhZ?=
+ =?utf-8?B?SDlFQ3owNFJGSVEzb1BYWmJncnVZait1RFN1STRDNjhsSzQyaGE2NXhUR2V4?=
+ =?utf-8?B?V3RoTkk3Wm5GTCt2V1RxbmZGYUtkTGZqTEJRQUYrdHh5Y1lXd29pQlllV3JR?=
+ =?utf-8?Q?QWeB8Vn8gkOAK2aecSDI9iQ2WJ1y6HvNUKX1PtQ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Ymg4MmFiTG9QZEViekh6K1FUaEZZcHZKSExaOHMwRmp6VXFyQ1QzaExJMW9u?=
+ =?utf-8?B?aVVJY2FQNU4yV1pLQlYvRHNpclZKcGpQQ0tDd2t2VTV0TGZIdVJpNitka2FZ?=
+ =?utf-8?B?RHM3Rk85ZDYvcmh5ZG1GYU9MWTdpUUZVd2FHRSttZmw0SXhHV2oxRFFqK1FX?=
+ =?utf-8?B?K0E5a3RKbXFYdHhlSmxsZERyU2g5cVlsZzA1bzZWSWs3Vm5iMzlsQjA3SUJw?=
+ =?utf-8?B?Z0JiNnZ3b01iMWs3SWE5dld2aFgvcjNLK1NoWnVHZ25tTTU3cVZTMWJIamtx?=
+ =?utf-8?B?M3ZqdXZGUk5HNGxQZm0yalhyeXJCWWdlSVdDNWNDNlhLYUpLemM1cUlMZnFH?=
+ =?utf-8?B?eEZ0dFpJMjRUMDBuSnNGaHc2R0FDZTdkM2FiUTR4YnJPeExiVkh3MVBzaGJz?=
+ =?utf-8?B?R0NCTmdqdUlOOWoveUZ4MzYyY2NpQjlKdGdLd0puTGIxa3lUMm9HQ3Ivd1JH?=
+ =?utf-8?B?dnJ1VFpNL09wYjhHRXI3amZNSE9leHRPNS8rNVdKVzJlazlGeVNyREV3TTd4?=
+ =?utf-8?B?ejNGSU9zNlhCWWpQdUlCOVJLbGhOcVF3KzFyT1liVVgrQUFJNU56UzhDcTNq?=
+ =?utf-8?B?U21lVkZFQVNOL2sxM24rUllERkhacEJVYTY3cU41aGMyY09CelFPMVhBdVg0?=
+ =?utf-8?B?ZHhiRGhjSTRVZlkwcWhaZHlGbys4SDcvM0lRWm1OWkp0TmplbFBXSXVDTXE0?=
+ =?utf-8?B?OW1QZlA2QVFPQ0E0QVMzUTE5dm5XdzJiOWlDK29ZOWdaaTdRWkdOMHBzS3cy?=
+ =?utf-8?B?QW5YMG9VbnNJNnhJb2dHUG1DeXc3ZFgvNThpczZoczVHTXZIaW1oSFlWbkpu?=
+ =?utf-8?B?VmZyR3BFNkpqLzVmUTNhSVR5YkpucmtsVkZTdFFnRS96eXNwOTQwYnhoT3hL?=
+ =?utf-8?B?NjhoQ3lJc0F6TFdDdHpYQ3MxaTkvd3NYRU5TYlBLNWNBcDNMT2xOWHZudzNK?=
+ =?utf-8?B?b1FrVGxNcXVSa3NBb0JGZWttNW5pUVdZMk1QTVVTZEJBb3FBV2lPb3BIcnB5?=
+ =?utf-8?B?VlNpRnE3TmViNUl1T2xqcllrd3pyaVdPZGhWRG5TeEVDWTRucFFKMklJWHdm?=
+ =?utf-8?B?c0xOeEVjV1JGWVJubHVpYlh2aTZuMFNmek9QdGw1OFBDSzBoVVBIL0ZLWit1?=
+ =?utf-8?B?eEFuMXZJSW5USHJYRTFxNnZ5Rk1zRy9iUVBad2R1M3lnVEhBS3luUitlSzZt?=
+ =?utf-8?B?MHdHRElmVmxza09pdlR5T0lrSVhidmRHL09iaG5lQ0dNaXRmU1BuN3ZHcXpl?=
+ =?utf-8?B?bHp0RndiYnROVWVCVXdUNVFpa3BTaTVXUE0zNUFvNDdZVXNvK0kzSnZNV0Nn?=
+ =?utf-8?B?czdjSzBFN1NJUzNtSVBtQWREVTFzVFFMVjUxZXREK2tHUU1ncFE4QVB4S0hn?=
+ =?utf-8?B?SHJRYU9hMzI1enc3cUh6STN3bUpqN1F6d3Mwb3VXbVlmTG13cnEvd1NaSDY0?=
+ =?utf-8?B?d2puQXpVOTZ0Mys2MVo2dHAySTlRV2VTdzRySVNZSWdEa0tZQ2tvK1ZuUkxZ?=
+ =?utf-8?B?L1o0eklna2NUdjdMMWlpVys3YURHbmN2RUxtdHRoVE4zbXA5THg2a2RoN3RR?=
+ =?utf-8?B?d3dNZE9mMlFQYmdJQUpyeWtJbG9jRTNLdEpJdEdZb01Jekc1dU9mQ0ZNME8w?=
+ =?utf-8?B?SEVWVXN3NnFDMjcxNWdMWFZLNTEyWlRvTlV5QjliMWtwRjdEQk01dnBFQkZ1?=
+ =?utf-8?B?bmVaejJFaGhhSER6WFprQVloSUw4ZlVWbmtteUdBVFJHeUdjaW1GbGFCL1Y4?=
+ =?utf-8?B?MlBlVjFsdllYeTQwQjQ2Q0xYd0dGMTMwUVpvMitjKzdZaiszVGIrUGFPeWVo?=
+ =?utf-8?B?Q0xYNGd0VFBXeGpVY2FqYW9FNmJMeTNGUHhOam5oSEJGbXc4R3l6N2ZGcDQ1?=
+ =?utf-8?B?YThSeDZhL0RySDBQWjNHSzdOL2FTemZScG0xSGdCSmdJeitjTDlNUldJbGxt?=
+ =?utf-8?B?MytOcjU3VVRHY2xYTFRjcWxHMDhTTTJ6NWlHajRwMVpLTGhkdVVFVExzSlBL?=
+ =?utf-8?B?UUhFU2h0RGZZMlNXMlZtSXl4UzN5WTZnWjYxLzRNR2sycUY2VWl2R2lmbkJi?=
+ =?utf-8?B?TWhjRDNnNHBsV1lOMHY5YkZmRGwweGNnTEdxUlcwZHNQVVVsV1FxQ3VPQ2tE?=
+ =?utf-8?Q?AOmauva/aHsbrYjAcZrCfMwOW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e696782-7ba8-4624-b01e-08dcf3db5a3a
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 03:24:22.1647
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SXrJKDw9KzRpG3D92QaVzCBjuOFLp0NnlJneoAGV9XKdLv8FjjQgdF4U98HlfOknWDhi0cesnjMs4VXvKcvAlQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8056
 
-On Wed, Oct 23, 2024, Bernhard Kauer wrote:
-> Zapping a root means scanning for present entries in a page-table
-> hierarchy. This process is relatively slow since it needs to be
-> preemtible as millions of entries might be processed.
+
+
+On 10/23/2024 10:06 PM, Borislav Petkov wrote:
+> On Fri, Sep 13, 2024 at 05:06:53PM +0530, Neeraj Upadhyay wrote:
+>> @@ -61,8 +65,30 @@ static void x2apic_savic_send_IPI_mask_allbutself(const struct cpumask *mask, in
+>>  	__send_IPI_mask(mask, vector, APIC_DEST_ALLBUT);
+>>  }
+>>  
+>> +static void x2apic_savic_setup(void)
+>> +{
+>> +	void *backing_page;
+>> +	enum es_result ret;
+>> +	unsigned long gpa;
+>> +
+>> +	if (this_cpu_read(savic_setup_done))
 > 
-> Furthermore the root-page is traversed multiple times as zapping
-> is done with increasing page-sizes.
+> I'm sure you can get rid of that silly bool. Like check the apic_backing_page
+> pointer instead and use that pointer to verify whether the per-CPU setup has
+> been done successfully.
 > 
-> Optimizing for the not-present case speeds up the hello microbenchmark
-> by 115 microseconds.
 
-What is the "hello" microbenchmark?  Do we actually care if it's faster?
-
-Are you able to determine exactly what makes iteration slow?  Partly because I'm
-curious, partly because it would be helpful to be able to avoid problematic
-patterns in the future, and partly because maybe there's a more elegant solution.
-
-Regardless of why iteration is slow, I would much prefer to solve this for all
-users of the iterator.  E.g. very lightly tested, and not 100% optimized (though
-should be on par with the below).
-
----
- arch/x86/kvm/mmu/tdp_iter.c | 33 ++++++++++++++++-----------------
- arch/x86/kvm/mmu/tdp_iter.h | 19 +++++++++++++------
- arch/x86/kvm/mmu/tdp_mmu.c  | 26 ++++++++++----------------
- 3 files changed, 39 insertions(+), 39 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-index 04c247bfe318..53aebc044ca6 100644
---- a/arch/x86/kvm/mmu/tdp_iter.c
-+++ b/arch/x86/kvm/mmu/tdp_iter.c
-@@ -37,7 +37,7 @@ void tdp_iter_restart(struct tdp_iter *iter)
-  * rooted at root_pt, starting with the walk to translate next_last_level_gfn.
-  */
- void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
--		    int min_level, gfn_t next_last_level_gfn)
-+		    int min_level, bool only_present, gfn_t next_last_level_gfn)
- {
- 	if (WARN_ON_ONCE(!root || (root->role.level < 1) ||
- 			 (root->role.level > PT64_ROOT_MAX_LEVEL))) {
-@@ -45,6 +45,7 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
- 		return;
- 	}
- 
-+	iter->only_shadow_present = only_present;
- 	iter->next_last_level_gfn = next_last_level_gfn;
- 	iter->root_level = root->role.level;
- 	iter->min_level = min_level;
-@@ -103,26 +104,24 @@ static bool try_step_down(struct tdp_iter *iter)
- /*
-  * Steps to the next entry in the current page table, at the current page table
-  * level. The next entry could point to a page backing guest memory or another
-- * page table, or it could be non-present. Returns true if the iterator was
-- * able to step to the next entry in the page table, false if the iterator was
-- * already at the end of the current page table.
-+ * page table, or it could be non-present. Skips non-present entries if the
-+ * iterator is configured to process only shadow-present entries. Returns true
-+ * if the iterator was able to step to the next entry in the page table, false
-+ * if the iterator was already at the end of the current page table.
-  */
- static bool try_step_side(struct tdp_iter *iter)
- {
--	/*
--	 * Check if the iterator is already at the end of the current page
--	 * table.
--	 */
--	if (SPTE_INDEX(iter->gfn << PAGE_SHIFT, iter->level) ==
--	    (SPTE_ENT_PER_PAGE - 1))
--		return false;
-+	while (SPTE_INDEX(iter->gfn << PAGE_SHIFT, iter->level) < (SPTE_ENT_PER_PAGE - 1)) {
-+		iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
-+		iter->next_last_level_gfn = iter->gfn;
-+		iter->sptep++;
-+		iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep);
- 
--	iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
--	iter->next_last_level_gfn = iter->gfn;
--	iter->sptep++;
--	iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep);
--
--	return true;
-+		if (!iter->only_shadow_present ||
-+		    is_shadow_present_pte(iter->old_spte))
-+			return true;
-+	}
-+	return false;
- }
- 
- /*
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index 2880fd392e0c..11945ff42f50 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -105,6 +105,8 @@ struct tdp_iter {
- 	int as_id;
- 	/* A snapshot of the value at sptep */
- 	u64 old_spte;
-+	/* True if the walk should only visit shadow-present PTEs. */
-+	bool only_shadow_present;
- 	/*
- 	 * Whether the iterator has a valid state. This will be false if the
- 	 * iterator walks off the end of the paging structure.
-@@ -122,18 +124,23 @@ struct tdp_iter {
-  * Iterates over every SPTE mapping the GFN range [start, end) in a
-  * preorder traversal.
-  */
--#define for_each_tdp_pte_min_level(iter, root, min_level, start, end) \
--	for (tdp_iter_start(&iter, root, min_level, start); \
--	     iter.valid && iter.gfn < end;		     \
--	     tdp_iter_next(&iter))
-+#define for_each_tdp_pte_min_level(iter, root, min_level, only_present, start, end)	\
-+	for (tdp_iter_start(&iter, root, min_level, only_present, start);		\
-+	     iter.valid && iter.gfn < end;						\
-+	     tdp_iter_next(&iter))							\
-+		if ((only_present) && !is_shadow_present_pte(iter.old_spte)) {		\
-+		} else
-+
-+#define for_each_shadow_present_tdp_pte(iter, root, min_level, start, end)		\
-+	for_each_tdp_pte_min_level(iter, root, min_level, true, start, end)
- 
- #define for_each_tdp_pte(iter, root, start, end) \
--	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end)
-+	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, false, start, end)
- 
- tdp_ptep_t spte_to_child_pt(u64 pte, int level);
- 
- void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
--		    int min_level, gfn_t next_last_level_gfn);
-+		    int min_level, bool only_present, gfn_t next_last_level_gfn);
- void tdp_iter_next(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
- 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3b996c1fdaab..25a75db83ca3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -752,14 +752,11 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	gfn_t end = tdp_mmu_max_gfn_exclusive();
- 	gfn_t start = 0;
- 
--	for_each_tdp_pte_min_level(iter, root, zap_level, start, end) {
-+	for_each_shadow_present_tdp_pte(iter, root, zap_level, start, end) {
- retry:
- 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
- 			continue;
- 
--		if (!is_shadow_present_pte(iter.old_spte))
--			continue;
--
- 		if (iter.level > zap_level)
- 			continue;
- 
-@@ -856,15 +853,14 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	rcu_read_lock();
- 
--	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
-+	for_each_shadow_present_tdp_pte(iter, root, PG_LEVEL_4K, start, end) {
- 		if (can_yield &&
- 		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
- 			flush = false;
- 			continue;
- 		}
- 
--		if (!is_shadow_present_pte(iter.old_spte) ||
--		    !is_last_spte(iter.old_spte, iter.level))
-+		if (!is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
- 		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
-@@ -1296,7 +1292,7 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	BUG_ON(min_level > KVM_MAX_HUGEPAGE_LEVEL);
- 
--	for_each_tdp_pte_min_level(iter, root, min_level, start, end) {
-+	for_each_shadow_present_tdp_pte(iter, root, min_level, start, end) {
- retry:
- 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
- 			continue;
-@@ -1415,12 +1411,12 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 	 * level above the target level (e.g. splitting a 1GB to 512 2MB pages,
- 	 * and then splitting each of those to 512 4KB pages).
- 	 */
--	for_each_tdp_pte_min_level(iter, root, target_level + 1, start, end) {
-+	for_each_shadow_present_tdp_pte(iter, root, target_level + 1, start, end) {
- retry:
- 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
- 			continue;
- 
--		if (!is_shadow_present_pte(iter.old_spte) || !is_large_pte(iter.old_spte))
-+		if (!is_large_pte(iter.old_spte))
- 			continue;
- 
- 		if (!sp) {
-@@ -1626,13 +1622,12 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
- 
- 	rcu_read_lock();
- 
--	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_2M, start, end) {
-+	for_each_shadow_present_tdp_pte(iter, root, PG_LEVEL_2M, start, end) {
- retry:
- 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
- 			continue;
- 
--		if (iter.level > KVM_MAX_HUGEPAGE_LEVEL ||
--		    !is_shadow_present_pte(iter.old_spte))
-+		if (iter.level > KVM_MAX_HUGEPAGE_LEVEL)
- 			continue;
- 
- 		/*
-@@ -1696,9 +1691,8 @@ static bool write_protect_gfn(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	rcu_read_lock();
- 
--	for_each_tdp_pte_min_level(iter, root, min_level, gfn, gfn + 1) {
--		if (!is_shadow_present_pte(iter.old_spte) ||
--		    !is_last_spte(iter.old_spte, iter.level))
-+	for_each_shadow_present_tdp_pte(iter, root, min_level, gfn, gfn + 1) {
-+		if (!is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
- 		new_spte = iter.old_spte &
-
-base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
--- 
+Ok agree. In this patch version, APIC backing page allocation for all CPUs is done in
+x2apic_savic_probe(). This is done to group the allocation together, so that these
+backing pages are mapped using single 2M NPT and RMP entry.
+I will move the APIC backing page setup to per-CPU setup (x2apic_savic_setup()) and
+use that pointer to do the check.
 
 
-> Signed-off-by: Bernhard Kauer <bk@alpico.io>
-> ---
->  arch/x86/kvm/mmu/tdp_iter.h | 21 +++++++++++++++++++++
->  arch/x86/kvm/mmu/tdp_mmu.c  |  2 +-
->  2 files changed, 22 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> index 2880fd392e0c..7ad28ac2c6b8 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.h
-> +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> @@ -130,6 +130,27 @@ struct tdp_iter {
->  #define for_each_tdp_pte(iter, root, start, end) \
->  	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end)
->  
-> +
-> +/*
-> + * Skip up to count not present entries of the iterator. Returns true
-> + * if the final entry is not present.
-> + */
-> +static inline bool tdp_iter_skip_not_present(struct tdp_iter *iter, int count)
-> +{
-> +	int i;
-> +	int pos;
-> +
-> +	pos = SPTE_INDEX(iter->gfn << PAGE_SHIFT, iter->level);
-> +	count = min(count, SPTE_ENT_PER_PAGE - 1 - pos);
-> +	for (i = 0; i < count && !is_shadow_present_pte(iter->old_spte); i++)
-> +		iter->old_spte = kvm_tdp_mmu_read_spte(iter->sptep + i + 1);
-> +
-> +	iter->gfn += i * KVM_PAGES_PER_HPAGE(iter->level);
-> +	iter->next_last_level_gfn = iter->gfn;
-> +	iter->sptep += i;
-> +	return !is_shadow_present_pte(iter->old_spte);
-> +}
-> +
->  tdp_ptep_t spte_to_child_pt(u64 pte, int level);
->  
->  void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 1951f76db657..404726511f95 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -750,7 +750,7 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
->  			continue;
->  
-> -		if (!is_shadow_present_pte(iter.old_spte))
-> +		if (tdp_iter_skip_not_present(&iter, 32))
->  			continue;
->  
->  		if (iter.level > zap_level)
-> -- 
-> 2.45.2
-> 
+- Neeraj
+
 
