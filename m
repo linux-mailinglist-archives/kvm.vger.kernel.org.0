@@ -1,103 +1,96 @@
-Return-Path: <kvm+bounces-29607-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3155A9AE01D
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:06:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9F69AE0F3
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2881284EE4
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4E581F2338D
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2751B3951;
-	Thu, 24 Oct 2024 09:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6EC1C9EAF;
+	Thu, 24 Oct 2024 09:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Rx+c0tEI"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X12JoyZ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1073B1B3933;
-	Thu, 24 Oct 2024 09:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24231C4A08;
+	Thu, 24 Oct 2024 09:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729760745; cv=none; b=b/B56qZgOlyMtzeP9w1ELzvl5jQfpUON4+mSIwMeQqknTbhvmUQApK0nYhsGKcU/SFpN69phvjPttdPadJrmfgyZQXqOCWYehhgtMvr+cYIeykj5Nwx+wkJd2sp3GoPmGwuzbF3+Ce089xDPNJawvV7ZRoQ59IpGfs9G63JIVEI=
+	t=1729762500; cv=none; b=Fg7SU25uZ7OYsFt3XINYo+txSb4wjy8iCZlV22l2GUCf5xQQkGVLuaaobfOcnSmLpSOEMxF10KRO3YBUPXAkb/1r3XE2qralg4VfCfl2c5ChGbiQwIKqG8SBaj3MzCxsQ5+THg/o419i7euHtv5ibPvXrqG0Whe5z7dEOvGErWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729760745; c=relaxed/simple;
-	bh=iLBl2uqkzw7TXsj+7GQ+KZq3Axo7bQMOS0R0jqOfu60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pw8DyCoV40wELXTX+xmNTBdoazBtoNfWFwUYrsU0aLM7pf3tE8Ept8wzV+EnQb577i3Sjslk0F+ejqBbyHgy1xNAk81Q9SgiTcpd9GfafYnNO8LqU9BXj+DnnUKX4D5lEqvVQCjIFmGKiJdNpUuMgPSN63LLbw+9MCjWVBJxLG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Rx+c0tEI; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=W+xcl40+d2Ufw9544YoSrmVFDCb6kVciErHqMFvT+8c=; b=Rx+c0tEIZxo7coLNsWBdyt0SWq
-	UKGh9Mf9mkwwzY/XdGBBjiIh2maXLa+oLD4E6yxVWQhkpUYHSvrX4BDjgqWcJ9OW+wXcJ4vWJJSqm
-	HBqy4/bBKWYI/EkO9fJ45cQ9kc4lT7UjhsmnXAP7wmXwJcf8HCk4W1xSka3nFy0SGal812vASUJh5
-	hplj0b0Wm+++l2Xzd947aSXrLbR72c7BOS4k+AAIt7nvcTYynSmZRDS7HNQZQ/vMYLMQo3WaMOXwQ
-	VcVGsJ1klkqJqXlVn2nycljCNgmPmobO2/Y+EC6bXbO0RaYR+wmV+TIOjZV/rtLC0qFqyjHnExA/5
-	f2NBrMtg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t3tmp-0000000HOMu-2RXX;
-	Thu, 24 Oct 2024 09:05:43 +0000
-Date: Thu, 24 Oct 2024 02:05:43 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Srujana Challa <schalla@marvell.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"eperezma@redhat.com" <eperezma@redhat.com>,
-	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
- NO-IOMMU mode
-Message-ID: <ZxoN57kleWecXejY@infradead.org>
-References: <20240920140530.775307-1-schalla@marvell.com>
- <Zvu3HktM4imgHpUw@infradead.org>
- <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
- <Zw3mC3Ej7m0KyZVv@infradead.org>
- <20241016134127-mutt-send-email-mst@kernel.org>
- <ZxCrqPPbidzZb6w1@infradead.org>
- <20241019201059-mutt-send-email-mst@kernel.org>
- <ZxieizC7zeS7zyrd@infradead.org>
- <20241023041739-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1729762500; c=relaxed/simple;
+	bh=/Tn+MrrxiautAbVvWw7SQaK8HXpmk/v/zmMnPJm4GwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nMH52bg6MP1gxkjiNYN1CaMgF289Fib0mAfkAU75GZg4xQ27CAct1tb1avMzOB6fuDn/gyCYb95f/9mbJCgF2tTjiwGGY9fkbJeHbRLbolo9LkLxgNE0JxZrZSke6cPAE19aAg1WrvEL/oCpB+lOG02hjwFB2O5tyBujZM73vko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X12JoyZ3; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729762489; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=Sqi0c9JA0XixX3/Pb1Xq3+tg4PT5N19qCIVxnsw0ZkE=;
+	b=X12JoyZ3cJ2GTEFg8/ZzjNa2ML2OvGB4JcOoTSl0JcTQBg/EmEnW2g/xAT69iaDQMWrllZ6IH5y02wzrR6SMFHIqAYuanfThJLNnUs5KVn/DPPmBEWBN6DB6GhK+kNCpsZbcqb2iED0/V+xh5CbmC6K5reU5/OQLkIA/nionKBI=
+Received: from localhost.localdomain(mailfrom:qinyuntan@linux.alibaba.com fp:SMTPD_---0WHoiywV_1729762487 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 24 Oct 2024 17:34:48 +0800
+From: Qinyun Tan <qinyuntan@linux.alibaba.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-mm@kvack.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qinyun Tan <qinyuntan@linux.alibaba.com>
+Subject: [PATCH v1: vfio: avoid unnecessary pin memory when dma map io address space 0/2] 
+Date: Thu, 24 Oct 2024 17:34:42 +0800
+Message-ID: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023041739-mutt-send-email-mst@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 23, 2024 at 04:19:02AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Oct 22, 2024 at 11:58:19PM -0700, Christoph Hellwig wrote:
-> > On Sat, Oct 19, 2024 at 08:16:44PM -0400, Michael S. Tsirkin wrote:
-> > > Because people want to move from some vendor specific solution with vfio
-> > > to a standard vdpa compatible one with vdpa.
-> > 
-> > So now you have a want for new use cases and you turn that into a must
-> > for supporting completely insecure and dangerous crap.
-> 
-> Nope.
-> 
-> kernel is tainted -> unsupported
-> 
-> whoever supports tainted kernels is already in dangerous waters.
+When user application call ioctl(VFIO_IOMMU_MAP_DMA) to map a dma address,
+the general handler 'vfio_pin_map_dma' attempts to pin the memory and
+then create the mapping in the iommu.
 
-That's not a carte blanche for doing whatever crazy stuff you
-want.
+However, some mappings aren't backed by a struct page, for example an
+mmap'd MMIO range for our own or another device. In this scenario, a vma
+with flag VM_IO | VM_PFNMAP, the pin operation will fail. Moreover, the
+pin operation incurs a large overhead which will result in a longer
+startup time for the VM. We don't actually need a pin in this scenario.
 
-And if you don't trust me I'll add Greg who has a very clear opinion
-on IOMMU-bypassing user I/O hooks in the style of the uio driver as
-well I think :)
+To address this issue, we introduce a new DMA MAP flag
+'VFIO_DMA_MAP_FLAG_MMIO_DONT_PIN' to skip the 'vfio_pin_pages_remote'
+operation in the DMA map process for mmio memory. Additionally, we add
+the 'VM_PGOFF_IS_PFN' flag for vfio_pci_mmap address, ensuring that we can
+directly obtain the pfn through vma->vm_pgoff.
+
+This approach allows us to avoid unnecessary memory pinning operations,
+which would otherwise introduce additional overhead during DMA mapping.
+
+In my tests, using vfio to pass through an 8-card AMD GPU which with a
+large bar size (128GB*8), the time mapping the 192GB*8 bar was reduced
+from about 50.79s to 1.57s.
+
+Qinyun Tan (2):
+  mm: introduce vma flag VM_PGOFF_IS_PFN
+  vfio: avoid unnecessary pin memory when dma map io address space
+
+ drivers/vfio/pci/vfio_pci_core.c |  2 +-
+ drivers/vfio/vfio_iommu_type1.c  | 64 +++++++++++++++++++++++++-------
+ include/linux/mm.h               |  6 +++
+ include/uapi/linux/vfio.h        | 11 ++++++
+ 4 files changed, 68 insertions(+), 15 deletions(-)
+
+-- 
+2.43.5
+
 
