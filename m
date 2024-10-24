@@ -1,169 +1,249 @@
-Return-Path: <kvm+bounces-29647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0F49AE86A
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 16:24:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C919AE893
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 16:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9304A28FE97
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 14:24:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED3C31F21E52
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 14:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFB81F4FD4;
-	Thu, 24 Oct 2024 14:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBFA1E379B;
+	Thu, 24 Oct 2024 14:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+PJztDa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhDsXAZo"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062EB1E3766;
-	Thu, 24 Oct 2024 14:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5E31D9A72;
+	Thu, 24 Oct 2024 14:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729779472; cv=none; b=qPw6U5I3L+L1kf92qTwO+t+xm9lDXqAKifbBmbUlGw4cOEwt7+Rsut8GVEHERG8CVq8CswJNeBJq1t1/U9llSuWQcY4ebpTwCZkuUB7lgxo/xuSt29g+cylb32y+O+mB450qrUcfwpnceEnqdd90kb3eq3ox7+rjfrNkFsb65qA=
+	t=1729779713; cv=none; b=KmxywulIqmxP3ZnUS9knDs45Ga5DAPdn3jahmmSv5gsacCuacgpsE8qrkl8YgzYHpa9OV1496nb4/GkF1BbNcHzvck01M+oPqlboLhyPKCbc/elmHUFpEJwuDwqLPHYBfu4TNYj3CVsoHQqsawem9YXPQogWlbcbabpDwNrXWzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729779472; c=relaxed/simple;
-	bh=4uD2k8h2vy1UgxcQ+HHmd+XNAwZMm6TvGvEVPby1hNs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YSnwCd36FHGH7CMW3xrnDW0g2mkUEFktBocht6Jh21g/IXTJNrBeV8qm4P5e6HxIOlWtwtkJEr20fFXqPYbqObmemauwSHRW1IAAPsHqGXyiKkbfAW4DUCloTzNgNg3PoE4/SPRVxmF+MJdhqee3DZCruVznK7/+/TkmCPQ9zg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+PJztDa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D18BAC4CEC7;
-	Thu, 24 Oct 2024 14:17:44 +0000 (UTC)
+	s=arc-20240116; t=1729779713; c=relaxed/simple;
+	bh=BXMt59WXyWTeW0L3olIzXz3JJnmP4KXvS4zdZJDZ19M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qm41kzfpnZKDO/CAzksGg7Bqms935oHFmsWTvGk4hPqoVveNVtenyXZ55dzEx6pqOhee3JVKuwt188plHfxvGTXoz5rO68osaSqgOz3PRb3SbgBsjVcUn1umu6ZqLZoksa1MCIiLzbjp7q1408H0z+QtEj5Y/CkLAqqUAPlIuEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lhDsXAZo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8902BC4CEC7;
+	Thu, 24 Oct 2024 14:21:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729779471;
-	bh=4uD2k8h2vy1UgxcQ+HHmd+XNAwZMm6TvGvEVPby1hNs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Z+PJztDa3DLJi8zczBtunJjYtTgbSB/pWYuOXBfkLIyw6TJiCAQ0WRq/AQHNYvMIO
-	 ypPUss6EbEuI+coFbJNqOQ7DB+SW8zeDyvxK1TRcGHKz3TKoE8rdW6wGUWGYFTZfzL
-	 pqbUZrnT461zBGjqAr82cZ5oVy50OPec5abANxSAzPIpWWUz5lKPIPkuWR2RcW+Ak/
-	 Lc6LA81PZMJ5+ZtTF2j46hgvE/ZCfmDp2TRENpjxGGbiUvUVIlIorJpIWJWxPb7jXl
-	 4P5XKju/mwmLSgkExTYhQYAm8xCA2feq6F05VCgttXD1PUf43IL0rqbydLFMxZfMKo
-	 QUgNloX/6Rwnw==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1729779712;
+	bh=BXMt59WXyWTeW0L3olIzXz3JJnmP4KXvS4zdZJDZ19M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lhDsXAZou3Y/ZnIIooFku7kKBbZD7gYehjeQhRKRKNCx52j1HF37v6RO4SsKfYPzs
+	 TkfoFGmO9VRoBK//Z+bGhkkBI84tIpMhnjkg9hT7CGOmQqhFTPA+OOiwiUlsMG59Yz
+	 3cgDm07JBTJ4ALGemvDLzsQ8HqZ4rOKjdkN2bFTQxl5wXlx74npebfjtfr9a03IDxb
+	 RbUFrY0EKxCeRLVO24Hu1i5vyLXH5B6zT9KC31PNvL0Vy5wTaEZ40ir2r95tYLnRea
+	 RTroGP/E5N+oeY+654GPnl/0oAtM15FCABm6jLXuAotPuEGLN4bpUsTulbMuy99j9R
+	 0Op0Zswwayt+w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t3yik-006TeL-2W;
+	Thu, 24 Oct 2024 15:21:50 +0100
+Date: Thu, 24 Oct 2024 15:21:49 +0100
+Message-ID: <86sesl37k2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 04/43] arm64: RME: Handle Granule Protection Faults
- (GPFs)
-In-Reply-To: <20241004152804.72508-5-steven.price@arm.com>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-5-steven.price@arm.com>
-Date: Thu, 24 Oct 2024 19:47:41 +0530
-Message-ID: <yq5a8qudmvp6.fsf@kernel.org>
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v5 21/37] KVM: arm64: Implement AT S1PIE support
+In-Reply-To: <20241024135925.GB1403933@e124191.cambridge.arm.com>
+References: <20241023145345.1613824-1-maz@kernel.org>
+	<20241023145345.1613824-22-maz@kernel.org>
+	<20241024135925.GB1403933@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Steven Price <steven.price@arm.com> writes:
+On Thu, 24 Oct 2024 14:59:25 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Wed, Oct 23, 2024 at 03:53:29PM +0100, Marc Zyngier wrote:
+> > It doesn't take much effort to implement S1PIE support in AT.
+> > 
+> > It is only a matter of using the AArch64.S1IndirectBasePermissions()
+> > encodings for the permission, ignoring GCS which has no impact on AT,
+> > and enforce FEAT_PAN3 being enabled as this is a requirement of
+> > FEAT_S1PIE.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 117 +++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 116 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index f5bd750288ff5..3d93ed1795603 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -781,6 +781,9 @@ static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> >  	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
+> >  		return false;
+> >  
+> > +	if (s1pie_enabled(vcpu, regime))
+> > +		return true;
+> > +
+> >  	if (regime == TR_EL10)
+> >  		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> >  	else
+> > @@ -862,11 +865,123 @@ static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> >  	}
+> >  }
+> >  
+> > +#define perm_idx(v, r, i)	((vcpu_read_sys_reg((v), (r)) >> ((i) * 4)) & 0xf)
+> > +
+> > +#define set_priv_perms(wr, r, w, x)	\
+> > +	do {				\
+> > +		(wr)->pr = (r);		\
+> > +		(wr)->pw = (w);		\
+> > +		(wr)->px = (x);		\
+> > +	} while (0)
+> > +
+> > +#define set_unpriv_perms(wr, r, w, x)	\
+> > +	do {				\
+> > +		(wr)->ur = (r);		\
+> > +		(wr)->uw = (w);		\
+> > +		(wr)->ux = (x);		\
+> > +	} while (0)
+> > +
+> > +/* Similar to AArch64.S1IndirectBasePermissions(), without GCS  */
+> > +#define set_perms(w, wr, ip)						\
+> > +	do {								\
+> > +		/* R_LLZDZ */						\
+> > +		switch ((ip)) {						\
+> > +		case 0b0000:						\
+> > +			set_ ## w ## _perms((wr), false, false, false);	\
+> > +			break;						\
+> > +		case 0b0001:						\
+> > +			set_ ## w ## _perms((wr), true , false, false);	\
+> > +			break;						\
+> > +		case 0b0010:						\
+> > +			set_ ## w ## _perms((wr), false, false, true );	\
+> > +			break;						\
+> > +		case 0b0011:						\
+> > +			set_ ## w ## _perms((wr), true , false, true );	\
+> > +			break;						\
+> > +		case 0b0100:						\
+> > +			set_ ## w ## _perms((wr), false, false, false);	\
+> > +			break;						\
+> > +		case 0b0101:						\
+> > +			set_ ## w ## _perms((wr), true , true , false);	\
+> > +			break;						\
+> > +		case 0b0110:						\
+> > +			set_ ## w ## _perms((wr), true , true , true );	\
+> > +			break;						\
+> > +		case 0b0111:						\
+> > +			set_ ## w ## _perms((wr), true , true , true );	\
+> > +			break;						\
+> > +		case 0b1000:						\
+> > +			set_ ## w ## _perms((wr), true , false, false);	\
+> > +			break;						\
+> > +		case 0b1001:						\
+> > +			set_ ## w ## _perms((wr), true , false, false);	\
+> > +			break;						\
+> > +		case 0b1010:						\
+> > +			set_ ## w ## _perms((wr), true , false, true );	\
+> > +			break;						\
+> > +		case 0b1011:						\
+> > +			set_ ## w ## _perms((wr), false, false, false);	\
+> > +			break;						\
+> > +		case 0b1100:						\
+> > +			set_ ## w ## _perms((wr), true , true , false);	\
+> > +			break;						\
+> > +		case 0b1101:						\
+> > +			set_ ## w ## _perms((wr), false, false, false);	\
+> > +			break;						\
+> > +		case 0b1110:						\
+> > +			set_ ## w ## _perms((wr), true , true , true );	\
+> > +			break;						\
+> > +		case 0b1111:						\
+> > +			set_ ## w ## _perms((wr), false, false, false);	\
+> > +			break;						\
+> > +		}							\
+> > +	} while (0)
+> > +
+> > +static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
+> > +					    struct s1_walk_info *wi,
+> > +					    struct s1_walk_result *wr)
+> > +{
+> > +	u8 up, pp, idx;
+> > +
+> > +	idx = pte_pi_index(wr->desc);
+> > +
+> > +	switch (wi->regime) {
+> > +	case TR_EL10:
+> > +		pp = perm_idx(vcpu, PIR_EL1, idx);
+> > +		up = perm_idx(vcpu, PIRE0_EL1, idx);
+> > +		break;
+> > +	case TR_EL20:
+> > +		pp = perm_idx(vcpu, PIR_EL2, idx);
+> > +		up = perm_idx(vcpu, PIRE0_EL2, idx);
+> > +		break;
+> > +	case TR_EL2:
+> > +		pp = perm_idx(vcpu, PIR_EL2, idx);
+> > +		up = 0;
+> > +		break;
+> > +	}
+> 
+> There seems to be inconsistent use of
+> 
+> default:
+> 	BUG();
+> 
+> when switching on wi->regime.
 
-> If the host attempts to access granules that have been delegated for use
-> in a realm these accesses will be caught and will trigger a Granule
-> Protection Fault (GPF).
->
-> A fault during a page walk signals a bug in the kernel and is handled by
-> oopsing the kernel. A non-page walk fault could be caused by user space
-> having access to a page which has been delegated to the kernel and will
-> trigger a SIGBUS to allow debugging why user space is trying to access a
-> delegated page.
->
+True. Maybe I should drop them all apart from the one in
+setup_s1_walk().
 
-A non-page walk fault can also be caused by host kernel trying to access a
-page which it had delegated before. It would be nice to dump details
-like FAR in that case. Right now it shows only the below.
+> 
+> > +
+> > +	set_perms(priv, wr, pp);
+> > +
+> > +	if (wi->regime != TR_EL2)
+> > +		set_perms(unpriv, wr, up);
+> > +	else
+> > +		set_unpriv_perms(wr, false, false, false);
+> 
+> When regime == TR_EL2, up == 0, so the if/else should do the same thing? Maybe
+> you've done that intentionally to be more explicit.
 
-[  285.122310] Internal error: Granule Protection Fault not on table walk: 0000000096000068 [#1] PREEMPT SMP               
-[  285.122427] Modules linked in:                                                                                                                                                
-[  285.122512] CPU: 1 UID: 0 PID: 217 Comm: kvm-vcpu-0 Not tainted 6.12.0-rc1-00082-g8461d8333829 #42
-[  285.122656] Hardware name: FVP Base RevC (DT)
-[  285.122733] pstate: 81400009 (Nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-[  285.122871] pc : clear_page+0x18/0x50
-[  285.122975] lr : kvm_gmem_get_pfn+0xbc/0x190
-[  285.123110] sp : ffff800082cef900
-[  285.123182] x29: ffff800082cef910 x28: 0000000090000000 x27: 0000000090000006
-.....
+The reason for doing so was not to give the impression that we were
+actively using the unprivileged indirect permissions for TR_EL2.
 
--aneesh
+But maybe that's be just as clear with a comment.
 
->
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v2:
->  * Include missing "Granule Protection Fault at level -1"
-> ---
->  arch/arm64/mm/fault.c | 31 +++++++++++++++++++++++++------
->  1 file changed, 25 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index 8b281cf308b3..f9d72a936d48 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -804,6 +804,25 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
->  	return 0;
->  }
->  
-> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> +{
-> +	const struct fault_info *inf = esr_to_fault_info(esr);
-> +
-> +	die_kernel_fault(inf->name, far, esr, regs);
-> +	return 0;
-> +}
-> +
-> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> +{
-> +	const struct fault_info *inf = esr_to_fault_info(esr);
-> +
-> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs))
-> +		return 0;
-> +
-> +	arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
-> +	return 0;
-> +}
-> +
->  static const struct fault_info fault_info[] = {
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
-> @@ -840,12 +859,12 @@ static const struct fault_info fault_info[] = {
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
->  	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
-> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
-> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level -1" },
-> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 0" },
-> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 1" },
-> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 2" },
-> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 3" },
-> +	{ do_gpf,		SIGBUS,  SI_KERNEL,	"Granule Protection Fault not on table walk" },
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
->  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
->  	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
-> -- 
-> 2.34.1
+> 
+> Either way:
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
