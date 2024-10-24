@@ -1,54 +1,59 @@
-Return-Path: <kvm+bounces-29609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE9F69AE0F3
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:36:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DDD9AE0ED
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:35:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4E581F2338D
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69691C25F5D
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6EC1C9EAF;
-	Thu, 24 Oct 2024 09:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D351C07FE;
+	Thu, 24 Oct 2024 09:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X12JoyZ3"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wM9sxCdb"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24231C4A08;
-	Thu, 24 Oct 2024 09:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1FE1C07C1;
+	Thu, 24 Oct 2024 09:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729762500; cv=none; b=Fg7SU25uZ7OYsFt3XINYo+txSb4wjy8iCZlV22l2GUCf5xQQkGVLuaaobfOcnSmLpSOEMxF10KRO3YBUPXAkb/1r3XE2qralg4VfCfl2c5ChGbiQwIKqG8SBaj3MzCxsQ5+THg/o419i7euHtv5ibPvXrqG0Whe5z7dEOvGErWQ=
+	t=1729762495; cv=none; b=pHgnEkQLrzmP0iZJEj1BoRViphl77c1Oo8o3zi6bDgXTI9sfsPUPsCstX9YFxUoC3yOl+FxWkrI/ptP/1HNjuVKdwc7N9IvsFoj1R71mPjVXeNRMXGRDqjBHFfxEU2hLok5gK4jSQkdlXiKhq7rvHf6NGZtfEBnxiQWHq7ZIpXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729762500; c=relaxed/simple;
-	bh=/Tn+MrrxiautAbVvWw7SQaK8HXpmk/v/zmMnPJm4GwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nMH52bg6MP1gxkjiNYN1CaMgF289Fib0mAfkAU75GZg4xQ27CAct1tb1avMzOB6fuDn/gyCYb95f/9mbJCgF2tTjiwGGY9fkbJeHbRLbolo9LkLxgNE0JxZrZSke6cPAE19aAg1WrvEL/oCpB+lOG02hjwFB2O5tyBujZM73vko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X12JoyZ3; arc=none smtp.client-ip=115.124.30.119
+	s=arc-20240116; t=1729762495; c=relaxed/simple;
+	bh=+yesL1/Tjzt5TF8Vnp9EeBw/ptoHOo1EBeTHV+wYTQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LB4YSHaEt5rSmeFgN6HZHk+Gw1VR379CaQ/bHHBZYqd23cAopOv8logz2E760tnCr9xaTkXTrR/uA0fQDOwVbxcb0zeRwQlQRpk9IlauChdoP7Sl8Wdcbdn81tppPwKG0fgmvkmGeSGTFrVZD7hH00c9axH0TpGQO7/xLk9uSQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wM9sxCdb; arc=none smtp.client-ip=115.124.30.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1729762489; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=Sqi0c9JA0XixX3/Pb1Xq3+tg4PT5N19qCIVxnsw0ZkE=;
-	b=X12JoyZ3cJ2GTEFg8/ZzjNa2ML2OvGB4JcOoTSl0JcTQBg/EmEnW2g/xAT69iaDQMWrllZ6IH5y02wzrR6SMFHIqAYuanfThJLNnUs5KVn/DPPmBEWBN6DB6GhK+kNCpsZbcqb2iED0/V+xh5CbmC6K5reU5/OQLkIA/nionKBI=
-Received: from localhost.localdomain(mailfrom:qinyuntan@linux.alibaba.com fp:SMTPD_---0WHoiywV_1729762487 cluster:ay36)
+	t=1729762490; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=wMMJARvMklmy7JTnx9koiikH8rF5s7OtNVXr+o/den4=;
+	b=wM9sxCdbJ1sWc7pqU89ZSgKshGkpDU2+qND7ekkjUckOJXZ7lT0c667IdrvhJ4bdN8Ajjs/rINJEWYtxUw1T7PnSHHnwDfTYB8Emj4OFp78OlfBXm7ze6kDbbmilOuZZHvfbwUXFZQPfRp1dbUa7wWHPGW01YXvsqnaaaOCHhRs=
+Received: from localhost.localdomain(mailfrom:qinyuntan@linux.alibaba.com fp:SMTPD_---0WHoiyxC_1729762488 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 24 Oct 2024 17:34:48 +0800
+          Thu, 24 Oct 2024 17:34:49 +0800
 From: Qinyun Tan <qinyuntan@linux.alibaba.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Alex Williamson <alex.williamson@redhat.com>
 Cc: linux-mm@kvack.org,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Qinyun Tan <qinyuntan@linux.alibaba.com>
-Subject: [PATCH v1: vfio: avoid unnecessary pin memory when dma map io address space 0/2] 
-Date: Thu, 24 Oct 2024 17:34:42 +0800
-Message-ID: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
+	Qinyun Tan <qinyuntan@linux.alibaba.com>,
+	Guanghui Feng <guanghuifeng@linux.alibaba.com>,
+	Xunlei Pang <xlpang@linux.alibaba.com>
+Subject: [PATCH v1: vfio: avoid unnecessary pin memory when dma map io address space 1/2]  mm: introduce vma flag VM_PGOFF_IS_PFN
+Date: Thu, 24 Oct 2024 17:34:43 +0800
+Message-ID: <da92b66f3ab0f51292d82ff9267ea1a15ec7e81c.1729760996.git.qinyuntan@linux.alibaba.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
+References: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,39 +62,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When user application call ioctl(VFIO_IOMMU_MAP_DMA) to map a dma address,
-the general handler 'vfio_pin_map_dma' attempts to pin the memory and
-then create the mapping in the iommu.
+Introduce a new vma flag 'VM_PGOFF_IS_PFN', which means
+vma->vm_pgoff == pfn. This allows us to directly obtain pfn
+through vma->vm_pgoff. No Functional Change.
 
-However, some mappings aren't backed by a struct page, for example an
-mmap'd MMIO range for our own or another device. In this scenario, a vma
-with flag VM_IO | VM_PFNMAP, the pin operation will fail. Moreover, the
-pin operation incurs a large overhead which will result in a longer
-startup time for the VM. We don't actually need a pin in this scenario.
+Signed-off-by: Qinyun Tan <qinyuntan@linux.alibaba.com>
+Reviewed-by: Guanghui Feng <guanghuifeng@linux.alibaba.com>
+Reviewed-by: Xunlei Pang <xlpang@linux.alibaba.com>
+---
+ include/linux/mm.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-To address this issue, we introduce a new DMA MAP flag
-'VFIO_DMA_MAP_FLAG_MMIO_DONT_PIN' to skip the 'vfio_pin_pages_remote'
-operation in the DMA map process for mmio memory. Additionally, we add
-the 'VM_PGOFF_IS_PFN' flag for vfio_pci_mmap address, ensuring that we can
-directly obtain the pfn through vma->vm_pgoff.
-
-This approach allows us to avoid unnecessary memory pinning operations,
-which would otherwise introduce additional overhead during DMA mapping.
-
-In my tests, using vfio to pass through an 8-card AMD GPU which with a
-large bar size (128GB*8), the time mapping the 192GB*8 bar was reduced
-from about 50.79s to 1.57s.
-
-Qinyun Tan (2):
-  mm: introduce vma flag VM_PGOFF_IS_PFN
-  vfio: avoid unnecessary pin memory when dma map io address space
-
- drivers/vfio/pci/vfio_pci_core.c |  2 +-
- drivers/vfio/vfio_iommu_type1.c  | 64 +++++++++++++++++++++++++-------
- include/linux/mm.h               |  6 +++
- include/uapi/linux/vfio.h        | 11 ++++++
- 4 files changed, 68 insertions(+), 15 deletions(-)
-
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index ecf63d2b05825..80849b1b9aa92 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -322,6 +322,12 @@ extern unsigned int kobjsize(const void *objp);
+ #define VM_NOHUGEPAGE	0x40000000	/* MADV_NOHUGEPAGE marked this vma */
+ #define VM_MERGEABLE	0x80000000	/* KSM may merge identical pages */
+ 
++#ifdef CONFIG_ARCH_USES_HIGH_VMA_FLAGS	/* vma->vm_pgoff == pfn */
++    #define VM_PGOFF_IS_PFN   BIT(62)
++#else
++    #define VM_PGOFF_IS_PFN   VM_NONE
++#endif
++
+ #ifdef CONFIG_ARCH_USES_HIGH_VMA_FLAGS
+ #define VM_HIGH_ARCH_BIT_0	32	/* bit only usable on 64-bit architectures */
+ #define VM_HIGH_ARCH_BIT_1	33	/* bit only usable on 64-bit architectures */
 -- 
 2.43.5
 
