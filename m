@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-29614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17BB59AE196
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:55:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FE09AE199
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 11:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76C61F21540
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:55:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B14A1F21C17
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 09:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5811C1758;
-	Thu, 24 Oct 2024 09:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120E11C07DF;
+	Thu, 24 Oct 2024 09:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CmIIy1Ft"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Uu5C/MiG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F9C1B6D1A;
-	Thu, 24 Oct 2024 09:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BCC1B3939;
+	Thu, 24 Oct 2024 09:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729763718; cv=none; b=hJI6eo5bg+M3v/fMLwQiBDmYnYL/QlIXoAe4gWYbqBK47Bh6tuK4gZTAbVog4gcGjGTUehjLEXj5yxVaxVftXFuBpc/x2endWCsrdL5rmME1TLLq5PSj6ZjCwgoEQgearhuuAscJAif0aSxzSbMgAExa3/F1qKKOdSJPCkX4hJ0=
+	t=1729763736; cv=none; b=SsCPnsDI01CpKO00vMKHFeT+uJr249TZK1Utq3q4uWkiXSEOQhI2BykeyjpgeQQCP4oiEAyy9DA5W8Zo8Ys0jCxJT+kC0pLvUUT/+WCUs+jdwQDhbz9BYGgjelapCWbX/gjsgxxZYMNiWJAgXYWjP0WKsIYv7EmPmK0TeXId7Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729763718; c=relaxed/simple;
-	bh=O6drzlv3N80zmY7Pe/nx5UWGSkU3ccJmkWXqNPnK4jY=;
+	s=arc-20240116; t=1729763736; c=relaxed/simple;
+	bh=i5vK9aLmsT0GGDyg7WEDIE5qnmQKXG3tKt7ZzyssSAs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WslQQa28ECeBlZWKeJQJSFUghfld8CnnN8m3xQdkYBYwkkw/iQ/777BpViUtjWoF2z4G1guEBywDNeF4nLsZDH6uw08/wIkUfFzcm75DyBltltBrJj+jQyP1zRlxuU3DzSm+lyz7sh3MUUthE/aOYQvyrO3t4CdCqQbnJviqX/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CmIIy1Ft; arc=none smtp.client-ip=52.119.213.156
+	 MIME-Version:Content-Type; b=QXrf06shuDdecr6gwQAOwyeH06LIG8b7FSAWxo2MXLlwGSvUbFEsjgp223YgCXNxwVn0oDu2JR5GjaqoTpnHCE/vL54Jt/FnqaQqPg1wbgIVUgdLOAXywY93ay4dpKTkutfEI6pcSajHUi2r/MS+Dh21s7FsBuE2WNmpEsLSr8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Uu5C/MiG; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729763717; x=1761299717;
+  t=1729763730; x=1761299730;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MmRiiZPN8/PxouBRWWyXIjMBR7ptHi0tvj2mQku4mOY=;
-  b=CmIIy1FtgHOYnMZRSdFmk8BPmESvLk6tEd1/m08xTsSeCcErIPcuwrx/
-   Vvj7tUJmYOzY+qmASgJmikCO70uLHi1/w2g0T0loBfomlG5Ekq6jjbiy8
-   +mlmc/FIla0j3qb5TcfrAE9kz7w+cvDu21VoeaJJBv/pk69tAugGwlwHJ
+  bh=HXXzFn3jpMW6RTAoikwJEYClFQzi+J2nHDJ1RTMwPhs=;
+  b=Uu5C/MiG7gAh/Hd3Jf9tmHGovTdeqSgFAbXWn3jx2xt4k593ZpAaBuHK
+   V9mqvZgBsVI+OoqAbxS7nC47+X9OeBmJtCi8IacT5Qn+TYYDKSDSAgRNX
+   jhTZqp6yCaS9KF2+4+DALSeUhSxYgL6szAEqRrbfDqzZm00dJ/Ixhe4PQ
    Y=;
 X-IronPort-AV: E=Sophos;i="6.11,228,1725321600"; 
-   d="scan'208";a="690218938"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 09:55:12 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:45954]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.247:2525] with esmtp (Farcaster)
- id 9c21d62f-0fbe-4351-baa5-5eb88fe8a31f; Thu, 24 Oct 2024 09:55:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 9c21d62f-0fbe-4351-baa5-5eb88fe8a31f
+   d="scan'208";a="140248274"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 09:55:28 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:19110]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.104:2525] with esmtp (Farcaster)
+ id 79e479ff-e6f5-4772-9796-14113ad03430; Thu, 24 Oct 2024 09:55:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 79e479ff-e6f5-4772-9796-14113ad03430
 Received: from EX19D020UWA002.ant.amazon.com (10.13.138.222) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 24 Oct 2024 09:55:10 +0000
+ Thu, 24 Oct 2024 09:55:24 +0000
 Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
  EX19D020UWA002.ant.amazon.com (10.13.138.222) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 24 Oct 2024 09:55:10 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com
+ Thu, 24 Oct 2024 09:55:23 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-d1311ce8.us-west-2.amazon.com
  (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Thu, 24 Oct 2024 09:55:10 +0000
+ 15.2.1258.34 via Frontend Transport; Thu, 24 Oct 2024 09:55:23 +0000
 Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTPS id 8D8D540397;
-	Thu, 24 Oct 2024 09:55:08 +0000 (UTC)
+	by email-imr-corp-prod-pdx-all-2c-d1311ce8.us-west-2.amazon.com (Postfix) with ESMTPS id BDF2140617;
+	Thu, 24 Oct 2024 09:55:21 +0000 (UTC)
 From: Nikita Kalyazin <kalyazin@amazon.com>
 To: <pbonzini@redhat.com>, <corbet@lwn.net>, <kvm@vger.kernel.org>,
 	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
@@ -71,9 +71,9 @@ CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
 	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
 	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>,
 	<kalyazin@amazon.com>
-Subject: [PATCH 3/4] KVM: allow KVM_GUEST_MEMFD_POPULATE in another mm
-Date: Thu, 24 Oct 2024 09:54:28 +0000
-Message-ID: <20241024095429.54052-4-kalyazin@amazon.com>
+Subject: [PATCH 4/4] KVM: document KVM_GUEST_MEMFD_POPULATE ioctl
+Date: Thu, 24 Oct 2024 09:54:29 +0000
+Message-ID: <20241024095429.54052-5-kalyazin@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20241024095429.54052-1-kalyazin@amazon.com>
 References: <20241024095429.54052-1-kalyazin@amazon.com>
@@ -86,65 +86,46 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-Allow calling KVM_GUEST_MEMFD_POPULATE ioctl by the process that does
-not own the KVM context.
-This is to enable guest_memfd population by a non-VMM process that is
-useful for isolation of the memory management logic from the VMM for
-security and performance reasons.
-
 Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 ---
- virt/kvm/kvm_main.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ Documentation/virt/kvm/api.rst | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e5bd2c0031bf..eb626c4bf4d7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5159,8 +5159,25 @@ static long kvm_vm_ioctl(struct file *filp,
- 	void __user *argp = (void __user *)arg;
- 	int r;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index e32471977d0a..f192dab41bad 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6442,6 +6442,30 @@ the capability to be present.
  
--	if (kvm->mm != current->mm || kvm->vm_dead)
-+	if (kvm->vm_dead)
- 		return -EIO;
+ `flags` must currently be zero.
+ 
++4.144 KVM_GUEST_MEMFD_POPULATE
++----------------------------
 +
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+	if (ioctl == KVM_GUEST_MEMFD_POPULATE) {
-+		struct kvm_guest_memfd_populate populate;
++:Capability: KVM_CAP_GUEST_MEMFD
++:Architectures: none
++:Type: vm ioctl
++:Parameters: struct kvm_guest_memfd_populate(in)
++:Returns: 0 if all requested pages populated, < 0 on error
 +
-+		r = -EFAULT;
-+		if (copy_from_user(&populate, argp, sizeof(populate)))
-+			goto out;
++KVM_GUEST_MEMFD_POPULATE populates guest_memfd with data provided by userspace.
 +
-+		r = kvm_gmem_guest_memfd_populate(kvm, &populate);
-+		goto out;
-+	}
-+#endif
++::
 +
-+	if (kvm->mm != current->mm)
-+		return -EIO;
++  struct kvm_guest_memfd_populate {
++  __u64 gpa;
++  __u64 size;
++  void __user *from;
++  __u64 flags;
++  };
 +
- 	switch (ioctl) {
- 	case KVM_CREATE_VCPU:
- 		r = kvm_vm_ioctl_create_vcpu(kvm, arg);
-@@ -5383,16 +5400,6 @@ static long kvm_vm_ioctl(struct file *filp,
- 		r = kvm_gmem_create(kvm, &guest_memfd);
- 		break;
- 	}
--	case KVM_GUEST_MEMFD_POPULATE: {
--		struct kvm_guest_memfd_populate populate;
--
--		r = -EFAULT;
--		if (copy_from_user(&populate, argp, sizeof(populate)))
--			goto out;
--
--		r = kvm_gmem_guest_memfd_populate(kvm, &populate);
--		break;
--	}
- #endif
- 	default:
- 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
++A gfn can only be populated once.  If a gfn is attempted to get populated
++multiple times without prior calls to fallocate(PUNCH_HOLE), subsequent calls
++will return EEXIST.
++If the `from` pointer is NULL, the pages are cleared.
+ 
+ 5. The kvm_run structure
+ ========================
 -- 
 2.40.1
 
