@@ -1,54 +1,58 @@
-Return-Path: <kvm+bounces-29626-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29627-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2CA9AE4BC
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 14:28:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6C69AE4BD
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 14:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BE3E1C20E2D
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:28:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20D85B214BF
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1C81D5AAC;
-	Thu, 24 Oct 2024 12:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC1A1D5AA7;
+	Thu, 24 Oct 2024 12:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cTg5vrLd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ekd1+zEK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231341D5165
-	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 12:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0275418784C
+	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 12:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729772928; cv=none; b=a/j5p7DVjLGX5KALI4U3E1Md4lOsBD7fYipiliqcIDnvZytBd8+lFc40tEbNYjHz0SEQD5Hra3JaJNHmJPQMXMHW3npncwiYsYLxsOuqOvXrFDycqVtOruGsDTd5KAL4Rc8DToyHs7QdsImE60SQQXnPBKCyjItIDFOsUc/ObDw=
+	t=1729772938; cv=none; b=is3FzPkD0p2nbrfWOoxLm6X3xVKlvTete2mMV3/twQ/kRhj8KEVo25zKOTqKkRTZQM+NpL5C47E5ZNf/cxq6h7lJWd7q+spOGrKDwgUwuYHBL7r7JEAmMzsR5GkpFSGaNT6ehAUVGyG8Xh7R0gJCKLHnpmrd/uMIotp6T6AUQ1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729772928; c=relaxed/simple;
-	bh=fVoG9mOSmW4e3iG2TcU+ssjpJo9J3K0wxWPT5LnY8YI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I8+i7lcStxBChss7YNP6SoNEbe2vpEa4NWc0B8KemvyQdEAM4r50/iJ+Va1YD+YrqtQDzKJhPFjJXHSrvGHd0Gqc/7IbLb2GN85GdS9tjYXPYkGKAMcqHT9PNAA8J6m3M1R0440YHBHc4tkhItZuAF9LPb2p6UOqzAFgsdKGY4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cTg5vrLd; arc=none smtp.client-ip=95.215.58.170
+	s=arc-20240116; t=1729772938; c=relaxed/simple;
+	bh=+3N3tPmq9Enxzcre2jV43GQ8dmZ+Ady39InNYSJ5PNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mCawYtNq1dOJwebsColZa1da26uMVygbIoXY4IFUSoB/6LjU4Rqh4UFgljwL3Q2SqLF87RtJpCu0gGAm4bzKqL3Klkn+jS0SvWdbM7RC7vM5eQI+Toj42ZJE8wdVmXClbdLRH14VZXKhR134ooDV9Dbn5nArHWDfUXQ95gz6olk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ekd1+zEK; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729772922;
+	t=1729772932;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FtV0byj1D4lseB8uYVo+8vFbBCxuFY8V71mq8CNJMoM=;
-	b=cTg5vrLdY8c22a4uUz45tqJIXsKU46NMpvSor68jpaeDv8lq7d+o24GMKgrsX52xVgmXW3
-	n0brfTkAkcMxfN00gZZXW4o7e0npNJBnhHGUyvg2E70q5DgF5f7mo3mdHR5AJDz9a4Tvtu
-	rtJygLD7zsY65SDMxhzhMzq6K4i6N8Q=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vrJKQYsqPwfe+UgIDxmj85EUMOBw0DGpaZVWjzi1Ymg=;
+	b=Ekd1+zEKQDJLHGukcW5X+Va3WoHLQu4VX98H9BK4ukiC1n2JeRaXb3pgtRnrN8Ww0x32lN
+	CHzACX2HJ6KyLui+rATAalHJ8tDcI7NNQXv3L8ODilKsxMpud9VgVOzWvpzxO1FV5RzXki
+	JKeEQ01l7PThEB35FSxRA/ZdKcLaKFA=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: cade.richard@gmail.com,
 	atishp@rivosinc.com,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH 0/2] riscv: sbi: Add IPI tests
-Date: Thu, 24 Oct 2024 14:28:40 +0200
-Message-ID: <20241024122839.71753-4-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 1/2] riscv: Add sbi_send_ipi_broadcast
+Date: Thu, 24 Oct 2024 14:28:41 +0200
+Message-ID: <20241024122839.71753-5-andrew.jones@linux.dev>
+In-Reply-To: <20241024122839.71753-4-andrew.jones@linux.dev>
+References: <20241024122839.71753-4-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,25 +62,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Repost Cade's IPI test patch[1] with all the changes pointed out in the
-last review and more.
+Coming SBI IPI tests will use this, but as it could be useful for
+other tests too, add it to the library.
 
-Based-on: https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ lib/riscv/asm/sbi.h | 1 +
+ lib/riscv/sbi.c     | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-[1] https://lore.kernel.org/all/20240826065106.20281-1-cade.richard@berkeley.edu/
-
-Andrew Jones (1):
-  riscv: Add sbi_send_ipi_broadcast
-
-Cade Richard (1):
-  riscv: sbi: Add IPI extension tests
-
- lib/riscv/asm/sbi.h |   1 +
- lib/riscv/sbi.c     |   7 ++-
- riscv/sbi.c         | 149 +++++++++++++++++++++++++++++++++++++++++++-
- riscv/unittests.cfg |   1 +
- 4 files changed, 155 insertions(+), 3 deletions(-)
-
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index 1319439b7118..102486c00de3 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -87,6 +87,7 @@ struct sbiret sbi_hart_get_status(unsigned long hartid);
+ struct sbiret sbi_send_ipi(unsigned long hart_mask, unsigned long hart_mask_base);
+ struct sbiret sbi_send_ipi_cpu(int cpu);
+ struct sbiret sbi_send_ipi_cpumask(const cpumask_t *mask);
++struct sbiret sbi_send_ipi_broadcast(void);
+ struct sbiret sbi_set_timer(unsigned long stime_value);
+ long sbi_probe(int ext);
+ 
+diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
+index f25bde169490..02dd338c1915 100644
+--- a/lib/riscv/sbi.c
++++ b/lib/riscv/sbi.c
+@@ -62,13 +62,18 @@ struct sbiret sbi_send_ipi_cpu(int cpu)
+ 	return sbi_send_ipi(1UL, cpus[cpu].hartid);
+ }
+ 
++struct sbiret sbi_send_ipi_broadcast(void)
++{
++	return sbi_send_ipi(0, -1UL);
++}
++
+ struct sbiret sbi_send_ipi_cpumask(const cpumask_t *mask)
+ {
+ 	struct sbiret ret;
+ 	cpumask_t tmp;
+ 
+ 	if (cpumask_full(mask))
+-		return sbi_send_ipi(0, -1UL);
++		return sbi_send_ipi_broadcast();
+ 
+ 	cpumask_copy(&tmp, mask);
+ 
 -- 
 2.47.0
 
