@@ -1,51 +1,47 @@
-Return-Path: <kvm+bounces-29620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E84B9AE267
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B49E19AE277
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:25:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA551B216A1
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 10:21:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 578E4B2156E
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 10:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6B21C07DF;
-	Thu, 24 Oct 2024 10:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48D81C07EB;
+	Thu, 24 Oct 2024 10:25:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9953399F
-	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 10:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mediconcil.de (mail.mediconcil.de [91.107.198.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBD9155345
+	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 10:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.107.198.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729765312; cv=none; b=g9i/gw8Bu/jgjABcVGu1/c8GJr4Hc++2kWnVlwpxRCMGdH//BziWMKrf/hgt9VX8oz1Tqe7SwQd8DCFRzEAGPEKmv6D/WCZttSLWUZyjK6emsKUo/jStDIN27j+iY5DmZ5uzpaJhuPA9G3MwXeFqHb87ByDGZOx33R/q9/0QzZw=
+	t=1729765532; cv=none; b=YCH7jMABFhYeUbBVUoBIHI+BaJIdxP+Hd4FDZ7dVPh6yuYE5oCvPK7GgWxZTddU7sXpaF9I8GcYZ1nfs0MGrFn3mAC4Q3pUr7Jx7m1FnPlBeu2VJ3wUiSUZZlzBlInoYJ0ewUCzvx4JKDPCQu/cumpP2xXr3/w25D4gEo96o8VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729765312; c=relaxed/simple;
-	bh=o7V1fEUBye7S5nTTQDp6lzZ3iKL73ESUhBqYHqHHr10=;
+	s=arc-20240116; t=1729765532; c=relaxed/simple;
+	bh=zRX2KORi9cvakJYcLiZ81Ucj8x+qnSJGT517IP0G8+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VmdoefZYV5OSb/UVfZmCslJFSpvmpceWlJ5v/ud2netlSZZ4F5/DtQkIccOdHCxwLe6m+3yI86qLue28GnvVq6FefRNYeOixJJ0mxDr1Lhr8AYAV+s4e++X6/H3+deMQJcu2hGDA/+2JA8dfVZPNtR++KBRxssghIJrT8gd9VTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83B1F339;
-	Thu, 24 Oct 2024 03:22:19 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A91F53F71E;
-	Thu, 24 Oct 2024 03:21:48 -0700 (PDT)
-Date: Thu, 24 Oct 2024 11:21:46 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v5 12/37] KVM: arm64: Sanitise TCR2_EL2
-Message-ID: <20241024102146.GB1382116@e124191.cambridge.arm.com>
-References: <20241023145345.1613824-1-maz@kernel.org>
- <20241023145345.1613824-13-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZeOqPznE8uSYg9LPQBL7kFGwCfw6OjvDgPqHTOX17xqQWHQ8errkIjk48eAR5qrgINlx9C7ZfB9RnBx9VnLB+aTCoPICoLGIHuEDENffXT1NMWTmPVBukY+17iEvSUhhq0vWbYm57aWtx27x+fhVXuQ8kxOPcoeI6QNvNNWA56o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io; spf=none smtp.mailfrom=mias.mediconcil.de; arc=none smtp.client-ip=91.107.198.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mias.mediconcil.de
+Received: from bernie by mediconcil.de with local (Exim 4.96)
+	(envelope-from <bernie@mias.mediconcil.de>)
+	id 1t3v1g-005aD0-0s;
+	Thu, 24 Oct 2024 12:25:08 +0200
+Date: Thu, 24 Oct 2024 12:25:08 +0200
+From: Bernhard Kauer <bk@alpico.io>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Bernhard Kauer <bk@alpico.io>, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fast forward the iterator when zapping the TDP
+ MMU
+Message-ID: <ZxoghG8+7xAHh3bu@mias.mediconcil.de>
+References: <20241023091902.2289764-1-bk@alpico.io>
+ <ZxmGdhwr9BlhUQ_Y@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -54,53 +50,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241023145345.1613824-13-maz@kernel.org>
+In-Reply-To: <ZxmGdhwr9BlhUQ_Y@google.com>
 
-On Wed, Oct 23, 2024 at 03:53:20PM +0100, Marc Zyngier wrote:
-> TCR2_EL2 is a bag of control bits, all of which are only valid if
-> certain features are present, and RES0 otherwise.
+On Wed, Oct 23, 2024 at 04:27:50PM -0700, Sean Christopherson wrote:
+> On Wed, Oct 23, 2024, Bernhard Kauer wrote:
+> > Zapping a root means scanning for present entries in a page-table
+> > hierarchy. This process is relatively slow since it needs to be
+> > preemtible as millions of entries might be processed.
+> > 
+> > Furthermore the root-page is traversed multiple times as zapping
+> > is done with increasing page-sizes.
+> > 
+> > Optimizing for the not-present case speeds up the hello microbenchmark
+> > by 115 microseconds.
 > 
-> Describe these constraints and register them with the masking
-> infrastructure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index b20b3bfb9caec..b4b3ec88399b3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1179,6 +1179,28 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
->  		res0 |= ~(res0 | res1);
->  	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
->  
-> +	/* TCR2_EL2 */
-> +	res0 = TCR2_EL2_RES0;
-> +	res1 = TCR2_EL2_RES1;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, D128, IMP))
-> +		res0 |= (TCR2_EL2_DisCH0 | TCR2_EL2_DisCH1 | TCR2_EL2_D128);
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, MEC, IMP))
-> +		res0 |= TCR2_EL2_AMEC1 | TCR2_EL2_AMEC0;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, HAFT))
-> +		res0 |= TCR2_EL2_HAFT;
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
-> +		res0 |= TCR2_EL2_PTTWI | TCR2_EL2_PnCH;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
-> +		res0 |= TCR2_EL2_AIE;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
-> +		res0 |= TCR2_EL2_POE | TCR2_EL2_E0POE;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-> +		res0 |= TCR2_EL2_PIE;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, VH, IMP))
-> +		res0 |= (TCR2_EL2_E0POE | TCR2_EL2_D128 |
-> +			 TCR2_EL2_AMEC1 | TCR2_EL2_DisCH0 | TCR2_EL2_DisCH1);
-> +	set_sysreg_masks(kvm, TCR2_EL2, res0, res1);
-> +
->  	/* SCTLR_EL1 */
->  	res0 = SCTLR_EL1_RES0;
->  	res1 = SCTLR_EL1_RES1;
+> What is the "hello" microbenchmark?  Do we actually care if it's faster?
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Hello is a tiny kernel that just outputs "Hello world!" over a virtual
+serial port and then shuts the VM down.  It is the minimal test-case that
+reveals performance bottlenecks hard to see in the noise of a big system.
+
+Does it matter?  The case I optimized might be only relevant for
+short-running virtual machines.  However, you found more users of
+the iterator that might benefit from it.
+
+ 
+> Are you able to determine exactly what makes iteration slow? 
+
+I've counted the loop and the number of entries removed:
+
+	[24661.896626] zap root(0, 1) loops 3584 entries 2
+	[24661.896655] zap root(0, 2) loops 2048 entries 3
+	[24661.896709] zap root(0, 3) loops 1024 entries 2
+	[24661.896750] zap root(0, 4) loops 512 entries 1
+	[24661.896812] zap root(1, 1) loops 512 entries 0
+	[24661.896856] zap root(1, 2) loops 512 entries 0
+	[24661.896895] zap root(1, 3) loops 512 entries 0
+	[24661.896938] zap root(1, 4) loops 512 entries 0
+
+
+So for this simple case one needs 9216 iterations to go through 18 pagetables
+with 512 entries each. My patch reduces this to 303 iterations.
+
+
+	[24110.032368] zap root(0, 1) loops 118 entries 2
+	[24110.032374] zap root(0, 2) loops 69 entries 3
+	[24110.032419] zap root(0, 3) loops 35 entries 2
+	[24110.032421] zap root(0, 4) loops 17 entries 1
+	[24110.032434] zap root(1, 1) loops 16 entries 0
+	[24110.032435] zap root(1, 2) loops 16 entries 0
+	[24110.032437] zap root(1, 3) loops 16 entries 0
+	[24110.032438] zap root(1, 4) loops 16 entries 0
+
+
+Given the 115 microseconds one loop iteration is roughly 13 nanoseconds. 
+With the updates to the iterator and the various checks this sounds
+reasonable to me.  Simplifying the inner loop should help here.
+
+
+> partly because maybe there's a more elegant solution.
+
+Scanning can be avoided if one keeps track of the used entries.
+
+ 
+> Regardless of why iteration is slow, I would much prefer to solve this for all
+> users of the iterator.  E.g. very lightly tested, and not 100% optimized (though
+> should be on par with the below).
+
+Makes sense. I tried it out and it is a bit slower. One can optimize
+the while loop in try_side_step() a bit further.
 
