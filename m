@@ -1,245 +1,199 @@
-Return-Path: <kvm+bounces-29622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E449AE2BD
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:37:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC0C9AE2C2
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 12:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89A351F219A3
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 10:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD4562830F3
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 10:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E721C4A1F;
-	Thu, 24 Oct 2024 10:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="f6CtQX3Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76251C4A0D;
+	Thu, 24 Oct 2024 10:38:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CAD1BD4FD
-	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 10:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6751A0BD6
+	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 10:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729766252; cv=none; b=CWMMVZFa5POJOXvW7xX5za2bFJLU7OeTO/1IkE25fU8dEBOB5UKkeM5uRc0kyeXC2JPjqgLUlgAb4jOmywGSKnWZVpTHYrjZmg7+TDri3IXzamyayTVhcEvJSDht4nQ41LeEPQlaxpP9aw3TkFHM06DOfarxXf3qojLinNIZ+58=
+	t=1729766312; cv=none; b=aocZwI8TD1O+XQDxbXZdx1ZbcNkBo7849AQ3T+itu9VAT9L4eLh+jMGcqVayhdnRxALaPrdTpQZgMj8hE6JewH7MFV9gP/QMOHPmifJ27p6yaZwSEcybL1eiAQOO8+ddvC3ls/y9G5A5R2lJ6Z8qH4n0SyeHEPHOiNiAvIVDwQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729766252; c=relaxed/simple;
-	bh=bldPCYPiJpaAa2X0lnjjCRk9wrOiE+UF6MZbPBV2he4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WA98Ly/ZkuqsYpFsJOAzEkcwWIACTYu4b9in3efasXFigOVfkZgazHaUNmkUYwHJ0oGo4TFgTeEksIeLBrc434jyyInMg10lwH6wAlDB7gj8vVRtu9Z9E8QUlcPq5aMln8fwi/s4R8RPL3yA6QZlx1z2L7YNBZHUc5NQ62J8vEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=f6CtQX3Y; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-37d41894a32so540061f8f.1
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 03:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1729766249; x=1730371049; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bldPCYPiJpaAa2X0lnjjCRk9wrOiE+UF6MZbPBV2he4=;
-        b=f6CtQX3YwC9EuQ2qgYlEDYP4K/DNA3QUHoRfUfdeMKQ2uKAY0pjTYVie15hCZw7GcU
-         9gv+vxeEjFBEYtXvZ2ZVp3o7m+JO28+fVVedq/JxFGlmO1WcjaYn4pFR7iv925nTVpZW
-         ONdTx+459ftj6JXQOcR5m2Zz1qFR9DJ+mZfuqk4iW1yhyjh+mlDQYCoXMCgwakfH2o5B
-         irP273wxd9Ki8yw/pLLDAYwOFgMoTg3guM7C/5BKhKHeuQUTDDpiNCxBBI9CH0SnuVgo
-         7EU9fanA0DWNr38wlTAhf9T04RM2CY9NLVDpBWXrY5dERGNdY63MCuIs+B2X/y8zKx7E
-         kgxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729766249; x=1730371049;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bldPCYPiJpaAa2X0lnjjCRk9wrOiE+UF6MZbPBV2he4=;
-        b=U5LwYTzgYTsRENaoZpU0IUNF/wwUu4ic/aNfl8fKhdq86FsM+mV3Ykj6iYRMx833Qz
-         7XaQdK69hiHN5Hb4oIRBgBbaAgaJ9lH9ev5aMQbXG4aqaFuZFZGJmxVUYXa7HLFNlH8U
-         hjNuT3RE9eJ3vcyusajplvCBrm1exk0i6yZGqcItizIFLZA/DyUNSrDkaXPgamuYeEQe
-         sR3QNVysmcGhfBmcFTxX87SR3NIaWQ+sUtUIWqPW7BIKbmjzLgtp9pTsmfhWWvDofYoi
-         8N4wdHQEzAlMHFRSzt5MtUsrkyZ6Ed8CTWrCPoH4R3GRgb9Q2d7Ssq+neHJbEK71xC90
-         eNgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFoJK8/9RFUt4qFZzrVB8SBnjXROGDwgmv39A9X2nY9tPYkLzLSfAdOSjhNsAeNVUgqcQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfFwUEv4yU5pbhbBuzGdz8Pegeq9DIdBpC8uVrmCd1BRQkmHa9
-	Ui0WHAmfB4jgO5HZU1NXdJWQlbr9XOjIjh87s7p89yXhi25nBC3ddSuK18WItUo=
-X-Google-Smtp-Source: AGHT+IFQxXUZRRnIfj/huMeQtkmfP6roIz9bX6PHch4SqeRq8+aVT/bpsAt4tB+QbzuwccWo/I7sHw==
-X-Received: by 2002:a5d:5266:0:b0:37c:f997:5b94 with SMTP id ffacd0b85a97d-3803ac2951emr942090f8f.12.1729766248635;
-        Thu, 24 Oct 2024 03:37:28 -0700 (PDT)
-Received: from ?IPV6:2003:e5:8714:8700:db3b:60ed:e8b9:cd28? (p200300e587148700db3b60ede8b9cd28.dip0.t-ipconnect.de. [2003:e5:8714:8700:db3b:60ed:e8b9:cd28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186bfb2f5sm42252425e9.21.2024.10.24.03.37.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 03:37:28 -0700 (PDT)
-Message-ID: <bdb08cdf-11d1-464c-950e-07d39136a15a@suse.com>
-Date: Thu, 24 Oct 2024 12:37:27 +0200
+	s=arc-20240116; t=1729766312; c=relaxed/simple;
+	bh=8P3PZop4XsKv0OgdyvV2UsAKkiUmHrZxtJjnquzGlMg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qnIczJKa+C8nV0yQ2fCPBAVRRxVJ2ffrXAUZmo0stPAZjT1fR7Ykax0fbg0zEx9ZthGTNjNmoWORGs3nhJlKSNn84nQjFlHuw1N6tJZIv1faAkERkkqejXO6db4YQSmpuKotWMrtyge+Lq23kQFTKpyKcgPBJ5Kbz7OW7TAYtCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2DF4339;
+	Thu, 24 Oct 2024 03:38:58 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5A483F71E;
+	Thu, 24 Oct 2024 03:38:27 -0700 (PDT)
+Date: Thu, 24 Oct 2024 11:38:25 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v5 09/37] KVM: arm64: Extend masking facility to
+ arbitrary registers
+Message-ID: <20241024103825.GC1382116@e124191.cambridge.arm.com>
+References: <20241023145345.1613824-1-maz@kernel.org>
+ <20241023145345.1613824-10-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] kvm/x86: simplify kvm_mmu_do_page_fault() a little bit
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-References: <20241022100812.4955-1-jgross@suse.com>
- <ZxfaU9cCS6556AKg@google.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <ZxfaU9cCS6556AKg@google.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------dyw9h1bi5H0nviXabhJ3ltFX"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023145345.1613824-10-maz@kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------dyw9h1bi5H0nviXabhJ3ltFX
-Content-Type: multipart/mixed; boundary="------------wySzuRItW6TIPKtEVQa4uu3W";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <bdb08cdf-11d1-464c-950e-07d39136a15a@suse.com>
-Subject: Re: [PATCH] kvm/x86: simplify kvm_mmu_do_page_fault() a little bit
-References: <20241022100812.4955-1-jgross@suse.com>
- <ZxfaU9cCS6556AKg@google.com>
-In-Reply-To: <ZxfaU9cCS6556AKg@google.com>
+On Wed, Oct 23, 2024 at 03:53:17PM +0100, Marc Zyngier wrote:
+> We currently only use the masking (RES0/RES1) facility for VNCR
+> registers, as they are memory-based and thus easy to sanitise.
+> 
+> But we could apply the same thing to other registers if we:
+> 
+> - split the sanitisation from __VNCR_START__
+> - apply the sanitisation when reading from a HW register
+> 
+> This involves a new "marker" in the vcpu_sysreg enum, which
+> defines the point at which the sanitisation applies (the VNCR
+> registers being of course after this marker).
+> 
+> Whle we are at it, rename kvm_vcpu_sanitise_vncr_reg() to
+> kvm_vcpu_apply_reg_masks(), which is vaguely more explicit,
+> and harden set_sysreg_masks() against setting masks for
+> random registers...
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++------
+>  arch/arm64/kvm/nested.c           | 12 ++++++++----
+>  arch/arm64/kvm/sys_regs.c         |  3 +++
+>  3 files changed, 24 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1adf68971bb17..7f409dfc5cd4a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -367,7 +367,7 @@ struct kvm_arch {
+>  
+>  	u64 ctr_el0;
+>  
+> -	/* Masks for VNCR-baked sysregs */
+> +	/* Masks for VNCR-backed and general EL2 sysregs */
+>  	struct kvm_sysreg_masks	*sysreg_masks;
+>  
+>  	/*
+> @@ -401,6 +401,9 @@ struct kvm_vcpu_fault_info {
+>  	r = __VNCR_START__ + ((VNCR_ ## r) / 8),	\
+>  	__after_##r = __MAX__(__before_##r - 1, r)
+>  
+> +#define MARKER(m)				\
+> +	m, __after_##m = m - 1
+> +
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+> @@ -487,7 +490,11 @@ enum vcpu_sysreg {
+>  	CNTHV_CTL_EL2,
+>  	CNTHV_CVAL_EL2,
+>  
+> -	__VNCR_START__,	/* Any VNCR-capable reg goes after this point */
+> +	/* Anything from this can be RES0/RES1 sanitised */
+> +	MARKER(__SANITISED_REG_START__),
+> +
+> +	/* Any VNCR-capable reg goes after this point */
+> +	MARKER(__VNCR_START__),
+>  
+>  	VNCR(SCTLR_EL1),/* System Control Register */
+>  	VNCR(ACTLR_EL1),/* Auxiliary Control Register */
+> @@ -547,7 +554,7 @@ struct kvm_sysreg_masks {
+>  	struct {
+>  		u64	res0;
+>  		u64	res1;
+> -	} mask[NR_SYS_REGS - __VNCR_START__];
+> +	} mask[NR_SYS_REGS - __SANITISED_REG_START__];
+>  };
+>  
+>  struct kvm_cpu_context {
+> @@ -995,13 +1002,13 @@ static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+>  
+>  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+>  
+> -u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
+> +u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
+>  #define __vcpu_sys_reg(v,r)						\
+>  	(*({								\
+>  		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
+>  		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
+> -		if (vcpu_has_nv((v)) && (r) >= __VNCR_START__)		\
+> -			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
+> +		if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__)	\
+> +			*__r = kvm_vcpu_apply_reg_masks((v), (r), *__r);\
+>  		__r;							\
+>  	}))
+>  
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index f9e30dd34c7a1..b20b3bfb9caec 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -908,15 +908,15 @@ static void limit_nv_id_regs(struct kvm *kvm)
+>  	kvm_set_vm_id_reg(kvm, SYS_ID_AA64DFR0_EL1, val);
+>  }
+>  
+> -u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
+> +u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *vcpu,
+> +			     enum vcpu_sysreg sr, u64 v)
+>  {
+> -	u64 v = ctxt_sys_reg(&vcpu->arch.ctxt, sr);
+>  	struct kvm_sysreg_masks *masks;
+>  
+>  	masks = vcpu->kvm->arch.sysreg_masks;
+>  
+>  	if (masks) {
+> -		sr -= __VNCR_START__;
+> +		sr -= __SANITISED_REG_START__;
+>  
+>  		v &= ~masks->mask[sr].res0;
+>  		v |= masks->mask[sr].res1;
+> @@ -927,7 +927,11 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
+>  
+>  static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
+>  {
+> -	int i = sr - __VNCR_START__;
+> +	int i = sr - __SANITISED_REG_START__;
+> +
+> +	BUILD_BUG_ON(!__builtin_constant_p(sr));
+> +	BUILD_BUG_ON(sr < __SANITISED_REG_START__);
+> +	BUILD_BUG_ON(sr >= NR_SYS_REGS);
+>  
+>  	kvm->arch.sysreg_masks->mask[i].res0 = res0;
+>  	kvm->arch.sysreg_masks->mask[i].res1 = res1;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 932d2fb7a52a0..d9c20563cae93 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -189,6 +189,9 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  
+>  		/* Get the current version of the EL1 counterpart. */
+>  		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
+> +		if (reg >= __SANITISED_REG_START__)
+> +			val = kvm_vcpu_apply_reg_masks(vcpu, reg, val);
+> +
+>  		return val;
+>  	}
+>  
 
---------------wySzuRItW6TIPKtEVQa4uu3W
-Content-Type: multipart/mixed; boundary="------------imQuVRZiVyxrOVSSgPLoJpv8"
-
---------------imQuVRZiVyxrOVSSgPLoJpv8
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-
-T24gMjIuMTAuMjQgMTk6MDEsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6DQo+IE9uIFR1
-ZSwgT2N0IDIyLCAyMDI0LCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPj4gVGVzdGluZyB3aGV0
-aGVyIHRvIGNhbGwga3ZtX3RkcF9wYWdlX2ZhdWx0KCkgb3INCj4+IHZjcHUtPmFyY2gubW11
-LT5wYWdlX2ZhdWx0KCkgZG9lc24ndCBtYWtlIHNlbnNlLCBhcyBrdm1fdGRwX3BhZ2VfZmF1
-bHQoKQ0KPj4gaXMgc2VsZWN0ZWQgb25seSBpZiB2Y3B1LT5hcmNoLm1tdS0+cGFnZV9mYXVs
-dCA9PSBrdm1fdGRwX3BhZ2VfZmF1bHQuDQo+IA0KPiBJdCBkb2VzIHdoZW4gcmV0cG9saW5l
-cyBhcmUgZW5hYmxlZCBhbmQgc2lnbmlmaWNhbnRseSBpbmZsYXRlIHRoZSBjb3N0IG9mIHRo
-ZQ0KPiBpbmRpcmVjdCBjYWxsLiAgVGhpcyBpcyBhIGhvdCBwYXRoIGluIHZhcmlvdXMgc2Nl
-bmFyaW9zLCBidXQgS1ZNIGNhbid0IHVzZQ0KPiBzdGF0aWNfY2FsbCgpIHRvIGF2b2lkIHRo
-ZSByZXRwb2xpbmUgZHVlIHRvIG1tdS0+cGFnZV9mYXVsdCBiZWluZyBhIHByb3BlcnR5IG9m
-DQo+IHRoZSBjdXJyZW50IHZDUFUuICBPbmx5IGt2bV90ZHBfcGFnZV9mYXVsdCgpIGlzIHNw
-ZWNpYWwgY2FzZWQgYmVjYXVzZSBhbGwgb3RoZXINCj4gbW11LT5wYWdlX2ZhdWx0IHRhcmdl
-dHMgYXJlIHNsb3ctaXNoIGFuZC9vciB3ZSBkb24ndCBjYXJlIHRlcnJpYmx5IGFib3V0IHRo
-ZWlyDQo+IHBlcmZvcm1hbmNlLg0KDQpGYWlyIGVub3VnaC4gOi0pDQoNCkknbGwgbW9kaWZ5
-IHRoZSBwYXRjaCB0byBhZGQgYSBjb21tZW50IGluIHRoaXMgcmVnYXJkIGluIG9yZGVyIHRv
-IGF2b2lkDQpzaW1pbGFyIHNpbXBsaWZpY2F0aW9uIGF0dGVtcHRzIGluIHRoZSBmdXR1cmUu
-DQoNCg0KSnVlcmdlbg0K
---------------imQuVRZiVyxrOVSSgPLoJpv8
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
-
---------------imQuVRZiVyxrOVSSgPLoJpv8--
-
---------------wySzuRItW6TIPKtEVQa4uu3W--
-
---------------dyw9h1bi5H0nviXabhJ3ltFX
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmcaI2cFAwAAAAAACgkQsN6d1ii/Ey84
-Kwf/e9NYpFsJGTjB0NgUfPWxP5oBktb4P1kwteNWjtyEHHYyW1b6zlskHIJxGhLfkHnF4AjeCRy8
-iJ+2etdbqcjPZiGNpDcvAPoTqJ4J5tVMMB3JhDtGXY69CeA2NqyDms5yE41uutSN8F8P5RFaINu1
-gjHt+lns/ynuG/CYYihv0asQ4zAOX6fY8ld/Eih3bt6kfu4gS8EFH5I8P+cKeIrvkoCTsFsViix8
-JnJ9LyTeofAWKV83vpXfEP1r1Cy+65c7PzJ2BDebCKag61YCwzVTq30D/OfdTQcfIPBJqqR/Gqe0
-Ej9WZZxZ2rMEHYXp6JWbCPuAonexPHPN/6I9+rIqNg==
-=iXMj
------END PGP SIGNATURE-----
-
---------------dyw9h1bi5H0nviXabhJ3ltFX--
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
