@@ -1,132 +1,112 @@
-Return-Path: <kvm+bounces-29658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA4F9AEB2C
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 17:56:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785DD9AEB66
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 18:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FF3F1C23261
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 15:56:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232451F21E3D
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 16:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F241F668C;
-	Thu, 24 Oct 2024 15:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dV1S5ICZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBF51F76A9;
+	Thu, 24 Oct 2024 16:06:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B591E0B6F;
-	Thu, 24 Oct 2024 15:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFCA158A31;
+	Thu, 24 Oct 2024 16:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729785389; cv=none; b=i/EhmooQJZHH4zzAGTtTp6iKX5vKzQugoQY5kMt0xO8lfAIsf4GQZA8QtlF+vIXJCINy0JBSvewClHKNjRkc2zucqocAyGJuArpsNEKvF2jeGYuIfk0eGUOWZItqks1Y9m7K5ZkVS0LmI6oWr70QQcaGYVgdv+3opOUPfl5vSR0=
+	t=1729785989; cv=none; b=oWYxqqJuh0MHZl7Oci1XnExQ0y+L5w334g8fVe1pH00NLD/WIU4F3qxS8N8nX/Cv52QR/S5VeCUSxf8oADZMgN5VSzOGnb9ADn+kaINnijGY0Ix/7N8x0ArGxTAOjDJxDaZa6ARBa8m0fAXh9qNEQsHNtms+2Xgo81x+X3A07hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729785389; c=relaxed/simple;
-	bh=IK4bOpKqQ8ZfRYl0RKc3CNMgpunjWfUIWn5lauJpMuI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=bgF+fzfnjYurc8XSI3xLjFWHF425pmGCybla32GKHBXJF3reBB2eUFCli7GzTHbwxpTiahRFHCnuGq2rZmaxlf8YqutVFORSIGhKPA1T+MbZuiAM51+hiuCfZ7gughogYisYi3LazZGn+ith5olQngc2KQ61y53qLjwBgOijqjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dV1S5ICZ; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=dEyOjfWbUxIAyxFc/S0iV8ZJySQkSomEtN2A/QMyFoo=; b=dV1S5ICZvgKROwZdemu1KjNcnX
-	H3PJ1kv870MmHX+cSLKhiO93gvmgpf4iUgPsDWjuXUGE4eLZ+7r9bTGIFOm2yLb5LaKMQGqLh94D0
-	8dhi6cIqeIo+wH6DLEdXQWs/W4/6mn5UAssAb4e+xJOAdyFIB2BqB21YhOcVMaM8UpsU+1Hktjq7Y
-	rs0gdSvdtv+kmvv7Nxg2Pe23YWhAuFy+WkEleVxn7m/9ogbMWEbailZXgQ3yK4MUIP5bR6V/WPdBG
-	6lz9VwVetW/w/vnbm5htiSBLov2HkYsYj/WjIFdhCNc16J7vGKufUwWD+gpgdM938TFmM0NsbzzW/
-	bGhLnwTw==;
-Received: from [31.94.24.214] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t40C6-00000008iBu-12hz;
-	Thu, 24 Oct 2024 15:56:14 +0000
-Date: Thu, 24 Oct 2024 17:56:09 +0200
-From: David Woodhouse <dwmw2@infradead.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: Miguel Luis <miguel.luis@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
- Len Brown <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>,
- David Woodhouse <dwmw@amazon.co.uk>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- Francesco Lavra <francescolavra.fl@gmail.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v6_6/6=5D_arm64=3A_Use_SYSTEM=5FOF?=
- =?US-ASCII?Q?F2_PSCI_call_to_power_off_for_hibernate?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <ZxprcWDe2AXuLhD_@linux.dev>
-References: <20241019172459.2241939-1-dwmw2@infradead.org> <20241019172459.2241939-7-dwmw2@infradead.org> <23C91005-7304-4312-A5E0-F5E6C05B3209@oracle.com> <ECD0CA58-2C3B-48F3-AF12-95E37CB0FC48@infradead.org> <ZxprcWDe2AXuLhD_@linux.dev>
-Message-ID: <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org>
+	s=arc-20240116; t=1729785989; c=relaxed/simple;
+	bh=kaZBkio4UH/+/ON9NRJBBr0xVx14/nXK7f1ZHT8Lb74=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sESfTsxf62FPczjK0omJbIqODuH6wV8mAi5hHrvyJHqaxhQNZDQn8RpP2cqialTs34YUgrW0ffom8O70HyMMN4BfzF+9Wm5imqxvIlz7BJFcZJkaEAIPbQMnpHD5bfLna2quc1WGiWd6HmGWwgppJQOcyGtYPwsVlwyvVfFchbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XZ9js1JzXz6K9K7;
+	Fri, 25 Oct 2024 00:05:21 +0800 (CST)
+Received: from frapeml100007.china.huawei.com (unknown [7.182.85.133])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6B1191404F5;
+	Fri, 25 Oct 2024 00:06:22 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml100007.china.huawei.com (7.182.85.133) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 18:06:22 +0200
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Thu, 24 Oct 2024 18:06:22 +0200
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linuxarm@openeuler.org"
+	<linuxarm@openeuler.org>
+Subject: RE: [PATCH v10 0/4] debugfs to hisilicon migration driver
+Thread-Topic: [PATCH v10 0/4] debugfs to hisilicon migration driver
+Thread-Index: AQHbH2oB0l11SSHpU0u1ubTVKcydHLKV7z/ggAAC9oCAACrmAA==
+Date: Thu, 24 Oct 2024 16:06:22 +0000
+Message-ID: <5d0a9221a3b84ea88d2f77197f913091@huawei.com>
+References: <20241016012308.14108-1-liulongfang@huawei.com>
+ <3ede2cf97ffd4dd6948aa06084a09d2d@huawei.com>
+ <20241024152749.GB6956@nvidia.com>
+In-Reply-To: <20241024152749.GB6956@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On 24 October 2024 17:44:49 CEST, Oliver Upton <oliver=2Eupton@linux=2Edev>=
- wrote:
->Hi,
->
->On Thu, Oct 24, 2024 at 03:48:26PM +0200, David Woodhouse wrote:
->> On 24 October 2024 14:54:41 CEST, Miguel Luis <miguel=2Eluis@oracle=2Ec=
-om> wrote:
->> >Perhaps spec=2E F=2Eb=2E could be accommodated by first invoking SYSTE=
-M_OFF2 with
->> >PSCI_1_3_OFF_TYPE_HIBERNATE_OFF and checking its return value in case =
-of a
->> >fallback to an invocation with 0x0 ?
->
->This already complies with F=2Eb=2E
->
->The PSCI implementation is required to accept either 0 or 1 for
->HIBERNATE_OFF=2E Using 0 seems like a good choice for compatibility since=
- =2E=2E=2E
->
->> I wasn't aware there was any point=2E Are there any hypervisors which a=
-ctually implemented it that way? Amazon Linux and Ubuntu guests already jus=
-t use zero=2E
->>=20
->> We could add it later if such a hypervisor (now in violation of F=2Eb) =
-turns up, I suppose?
->
->IIUC, you're really wanting to 0x0 because there are hypervisors out
->there that violate the final spec and *only* accept this value=2E
->
->That's perfectly fine, but it'd help avoid confusion if the supporting
->comment was a bit more direct:
->
->	/*
->	 * If no hibernate type is specified SYSTEM_OFF2 defaults to
->	 * selecting HIBERNATE_OFF=2E
->	 *
->	 * There are hypervisors in the wild that violate the spec and
->	 * reject calls that explicitly provide a hibernate type=2E For
->	 * compatibility with these nonstandard implementations, pass 0
->	 * as the type=2E
->	 */
->	 if (system_entering_hibernation())
->		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2), 0 , 0, 0);
 
-By the time this makes it into released versions of the guest Linux kernel=
-, that comment won't be true any more=2E
 
+> -----Original Message-----
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, October 24, 2024 4:28 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: liulongfang <liulongfang@huawei.com>; alex.williamson@redhat.com;
+> Jonathan Cameron <jonathan.cameron@huawei.com>;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linuxarm@openeuler.org
+> Subject: Re: [PATCH v10 0/4] debugfs to hisilicon migration driver
+>=20
+> On Thu, Oct 24, 2024 at 01:18:55PM +0000, Shameerali Kolothum Thodi
+> wrote:
+> > > Add a debugfs function to the hisilicon migration driver in VFIO to
+> > > provide intermediate state values and data during device migration.
+> > >
+> > > When the execution of live migration fails, the user can view the
+> > > status and data during the migration process separately from the
+> > > source and the destination, which is convenient for users to analyze
+> > > and locate problems.
+> >
+> > Could you please take another look at this series as it looks like almo=
+st
+> there.
+>=20
+> Why are we so keen to do this? Nobody else needed a complex debugfs for
+> their live migration?
+
+I don't think it is that complex debugfs.  Longfang has found this very hel=
+pful in
+testing and debug with hardware.=20
+
+And hopefully this can be expanded in future with different hardware revisi=
+ons.
+
+Thanks,
+Shameer
 
