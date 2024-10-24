@@ -1,123 +1,139 @@
-Return-Path: <kvm+bounces-29654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B265F9AEA93
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 17:34:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868AE9AEAB2
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 17:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EA6BB22EEF
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 15:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B57BC1C22995
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2024 15:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025DF1EF946;
-	Thu, 24 Oct 2024 15:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N+d2AuwH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71581F12F2;
+	Thu, 24 Oct 2024 15:36:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294891E8833;
-	Thu, 24 Oct 2024 15:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CE11C728E
+	for <kvm@vger.kernel.org>; Thu, 24 Oct 2024 15:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729784052; cv=none; b=FMM0HHW7zG6lCBLXuBvpZuemJX9d8LaP8QHQ6W96l42MDeN5sxnnjdA/9134kkNlG5CXxopXKNV2uagS///HUbhrwZpa/lot5k+ne2ZiPJsviZGOFuMOWJ7deI/iBHojnenPutGyj6gkEEAIsYUgeAgeVInRpUkF0Y+TrLGo9d0=
+	t=1729784190; cv=none; b=t/oTZYlbwzEWJJbd2NPz4Jvl9SqatlsP8f+DBGeu7u2PLaj/Wlid+J5ZtOcg++EzB04Xfq52q9SOlvf1GkzrqrtxZ5QbzmVE2unGG7UrwF1KySG/NoYe+zc2wAkppx7/h16OoBqKUSsOP9UQxY8ZJyOLMRSjmQF4E41UF0DRAiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729784052; c=relaxed/simple;
-	bh=V0mys8VKe+wh2bASr2FBVzaXHPp9Hknt6GUorObUwnI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qCxWuiCypO27ICHzM0B7Zu8m+6/oem9peyWGncIbhXxG9qFIByE5pUlHORWH6Mdcr0o1gkKrXrvg3wNpI0/shPh/c1lhrcW1dTA8XFkXf7xE9QM+GPROKMFcO6TBwflq8w1hfo4HGZo+YC9XCj4P0ATYnn1yTOZCr6H+yZkAxuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N+d2AuwH; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729784050; x=1761320050;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=V0mys8VKe+wh2bASr2FBVzaXHPp9Hknt6GUorObUwnI=;
-  b=N+d2AuwH1p7Lzq54EXDPntlCO9mEm+kgyJT4ValNcFbpTwRtGKlMAUEz
-   A2WvA4b2gvnWrYC7Z5FTDsCbmsidq54JRk/Vjq46g4tjQhUQD1NwEWjon
-   n2gviIJH9n7NO6elhAv9cb0b66jFgVFKhA+m0npIbtgKliMVb0ZVu6qq5
-   SajWAlg5SlghstfyBUGiDQFb9kmxMSorMpjlzqLUGIAssQa0IsKTbtSAL
-   oRhQEVSeKWK7rMZIkcUsRYlKwzlnRXRpvqgncC0uX7+i4tn+kfl/4gvND
-   aPZEpdrjJ0d0UmmO8uDygh8jNL17bsw8bmy2N+2gmmpqPTk509QIh3+ED
-   g==;
-X-CSE-ConnectionGUID: lsf9YFQ9SOynJH7wBr3EOg==
-X-CSE-MsgGUID: 6tE7FM9nRbChir1z4DJ92g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29583192"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="29583192"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 08:34:09 -0700
-X-CSE-ConnectionGUID: gW42Oo/YQu2zuGBgdWh9Hw==
-X-CSE-MsgGUID: snwWtF/4TK+EHgsFint1IA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
-   d="scan'208";a="81059031"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.172]) ([10.124.227.172])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 08:34:06 -0700
-Message-ID: <b2cdf533-08f0-487b-998f-0d436be923f5@intel.com>
-Date: Thu, 24 Oct 2024 23:34:02 +0800
+	s=arc-20240116; t=1729784190; c=relaxed/simple;
+	bh=yC0V756RRZAsCmqtJnjm53GOiOV+CVBZkn7D76jUupU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NMxXObC9UYvUOO/OfrZXWfU48QZoWFzI61sfE/gtWT4TtMNuTD+y157tznYtJNZ5idlrz7RNL2HB53CMb4gosTksuwc+PpkkerbPGm31AVTOL2OGsYiZmV/pp1EOsKRT3glLwIoEcC+ZoMhzGl7NfK6s2Y4OxmUDINeb39T+1nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1A2E339;
+	Thu, 24 Oct 2024 08:36:56 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D73ED3F528;
+	Thu, 24 Oct 2024 08:36:25 -0700 (PDT)
+Date: Thu, 24 Oct 2024 16:36:23 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v5 34/37] KVM: arm64: Disable hierarchical permissions
+ when POE is enabled
+Message-ID: <20241024153623.GF1403933@e124191.cambridge.arm.com>
+References: <20241023145345.1613824-1-maz@kernel.org>
+ <20241023145345.1613824-35-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 05/13] x86/sev: Prevent RDTSC/RDTSCP interception for
- Secure TSC enabled guests
-To: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
- thomas.lendacky@amd.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
-Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20241021055156.2342564-1-nikunj@amd.com>
- <20241021055156.2342564-6-nikunj@amd.com>
- <aff9bf82-e11e-43d9-8661-aefa328242ad@intel.com>
- <de0b0551-003d-0cc8-9015-9124c25f5d43@amd.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <de0b0551-003d-0cc8-9015-9124c25f5d43@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023145345.1613824-35-maz@kernel.org>
 
-On 10/24/2024 4:44 PM, Nikunj A. Dadhania wrote:
+On Wed, Oct 23, 2024 at 03:53:42PM +0100, Marc Zyngier wrote:
+> The hierarchical permissions must be disabled when POE is enabled
+> in the translation regime used for a given table walk.
 > 
+> We store the two enable bits in the s1_walk_info structure so that
+> they can be retrieved down the line, as they will be useful.
 > 
-> On 10/24/2024 1:26 PM, Xiaoyao Li wrote:
->> On 10/21/2024 1:51 PM, Nikunj A Dadhania wrote:
->>> The hypervisor should not be intercepting RDTSC/RDTSCP when Secure TSC is
->>> enabled. A #VC exception will be generated if the RDTSC/RDTSCP instructions
->>> are being intercepted. If this should occur and Secure TSC is enabled,
->>> terminate guest execution.
->>
->> There is another option to ignore the interception and just return back to
->> guest execution.
-> 
-> That is not correct, RDTSC/RDTSCP should return the timestamp counter value
-> computed using the GUEST_TSC_SCALE and GUEST_TSC_OFFSET part of VMSA.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Ah, I missed this. Yes, if ignore the interception, guest needs to do 
-TSC scale itself with GUEST_TSC_SCALE and GUEST_TSC_OFFSET to get the 
-correct TSC. It's complicating things while making not intercepting 
-RDTSC/RDTSP a hard requirement is much simple.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-I think it's worth adding it as the justification.
-
->> I think it better to add some justification on why make it> fatal and terminate the guest is better than ignoring the interception.
+> ---
+>  arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 > 
-> How about the below updated commit message:
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index ef1643faedeb4..8d1dc6327ec5b 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -24,6 +24,8 @@ struct s1_walk_info {
+>  	unsigned int		txsz;
+>  	int 	     		sl;
+>  	bool	     		hpd;
+> +	bool			e0poe;
+> +	bool			poe;
+>  	bool	     		be;
+>  	bool	     		s2;
+>  };
+> @@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+>  	}
+>  }
+>  
+> +static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+> +{
+> +	u64 val;
+> +
+> +	if (!kvm_has_s1poe(vcpu->kvm)) {
+> +		wi->poe = wi->e0poe = false;
+> +		return;
+> +	}
+> +
+> +	switch (wi->regime) {
+> +	case TR_EL2:
+> +	case TR_EL20:
+> +		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
+> +		wi->poe = val & TCR2_EL2_POE;
+> +		wi->e0poe = (wi->regime == TR_EL20) && (val & TCR2_EL2_E0POE);
+> +		break;
+> +	case TR_EL10:
+> +		if (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) {
+> +			wi->poe = wi->e0poe = false;
+> +			return;
+> +		}
+> +
+> +		val = __vcpu_sys_reg(vcpu, TCR2_EL1);
+> +		wi->poe = val & TCR2_EL1x_POE;
+> +		wi->e0poe = val & TCR2_EL1x_E0POE;
+> +	}
+> +}
+> +
+>  static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+>  			 struct s1_walk_result *wr, u64 va)
+>  {
+> @@ -206,6 +236,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+>  	/* R_JHSVW */
+>  	wi->hpd |= s1pie_enabled(vcpu, wi->regime);
+>  
+> +	/* Do we have POE? */
+> +	compute_s1poe(vcpu, wi);
+> +
+> +	/* R_BVXDG */
+> +	wi->hpd |= (wi->poe || wi->e0poe);
+> +
+>  	/* Someone was silly enough to encode TG0/TG1 differently */
+>  	if (va55) {
+>  		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+> -- 
+> 2.39.2
 > 
-> The hypervisor should not be intercepting RDTSC/RDTSCP when Secure TSC is
-> enabled. A #VC exception will be generated if the RDTSC/RDTSCP instructions
-> are being intercepted. If this should occur and Secure TSC is enabled,
-> terminate guest execution as the guest cannot rely on the TSC value provided
-> by the hypervisor.
-> 
-> Regards
-> Nikunj
-> 
-
 
