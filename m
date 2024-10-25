@@ -1,134 +1,235 @@
-Return-Path: <kvm+bounces-29719-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29720-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631F19B057C
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:17:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D4AD9B05A9
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B08F1F24B8A
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:17:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F14F1F24C45
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A73420D508;
-	Fri, 25 Oct 2024 14:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0BF1FB8AE;
+	Fri, 25 Oct 2024 14:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9r6rA0a"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VFmXHLSi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F16F209F3D
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 14:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE391F7547;
+	Fri, 25 Oct 2024 14:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729865769; cv=none; b=Ry0q8XkcxmfmychI5lHBbXEyeoPlIrM5lT/+s6eHm7F6LZgYALtTKzK/ncQX2B+9/14GgTlPd29wK4IKBMJPXbqbgqcWG9qBFvxPV3W5QkkT4byX1xtPxHR8Q25U2hCt7eZXVHfSQ044pmWO0H3taZ66QI16HPhidysbTjj1D1E=
+	t=1729866172; cv=none; b=VDKvMmCgsNw1vNzTBEvlzntzEh0CcMIQoW8kJwvsZ9E7aWztL4mFMAchGVQ+wcUthvTDPygQcIoW+Kl6HI9bMY84EICtCQoM8Fmhf5tZXG3mW1nOjDBknszpGnkTh3oTKQ4jIVu2qSiPgyCBBHhaKh/aR2MlI6QlHzOdzMQDZ1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729865769; c=relaxed/simple;
-	bh=rYhwBK9SCZ9zfJJywiKfESHUTBEUEMFB3Y18DVCgEr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n2vtixamgVhVIMs2ksq5Ez0AJT/VelwNiK3LVTxYcn2kK5tzxszJ2+gh6C5XS4BgmDZchgfxRmnlp9REv/zXtdO8OrkC4W8oTHoPG438CWg1ZBPDRySi6H6h6F9qoKPdfySQjnEINz/2hy5CEDov3p1NusrUz7do1LmLtsqJBY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C9r6rA0a; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729865766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RqrSCL9SnqQxdMhiUeTqL0vv0HNcmyIpWy8EeAUhBAs=;
-	b=C9r6rA0aoWWpbjb8Ba3OVDYB0V8tBX+mamaKMmGG9SDO87KpbGMXUxNh28nH+RHcTd3ZZQ
-	xPp8HH6K72/NXBIVqtFg9kk3IvXR6k/tqODMQPv0woV0dP4Kxd47fH2FTsjf/ge8sdEKrB
-	qVauuuVoXGvRUZFCO98eeCum4rkHNXU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-QVg6coorOeq0mXJ05YLkIw-1; Fri,
- 25 Oct 2024 10:16:03 -0400
-X-MC-Unique: QVg6coorOeq0mXJ05YLkIw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CF7E1955F3F;
-	Fri, 25 Oct 2024 14:15:58 +0000 (UTC)
-Received: from t14s.redhat.com (unknown [10.22.65.27])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2459119560A2;
-	Fri, 25 Oct 2024 14:15:50 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-s390@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH v3 7/7] s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA
-Date: Fri, 25 Oct 2024 16:14:52 +0200
-Message-ID: <20241025141453.1210600-8-david@redhat.com>
-In-Reply-To: <20241025141453.1210600-1-david@redhat.com>
-References: <20241025141453.1210600-1-david@redhat.com>
+	s=arc-20240116; t=1729866172; c=relaxed/simple;
+	bh=2dl/Xe419sk+LmUjBAuq5rggnFUXEKzvgD0WDXRXpRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mOhkWckiareh5O32Wga3TBi3iZd1fQzT7z2kQlaAyM+oXqPKqbX99U0dd0WGgmEoYfn5T1mT+SexZYh+WZor3/5Gg14vXeWHP15xMBYfDj1tMa7QH21B7uGEBHXch/oCzNG15yCHW3cFllYixjWjEhh5VSjVv4VDcNTNa3NkITs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VFmXHLSi; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49P20eTu016724;
+	Fri, 25 Oct 2024 14:22:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ZeVnIZsZ+W6LZTALEEW0rV0SpWEyEK
+	WMjQtAarasrAs=; b=VFmXHLSi18rIA3bfaHj6q8I5FMWL1CMHjA7Za2xDW8tmdc
+	NImQmyWh2aUPAn6C8Q9ouVGlm9p42bBGsq6jVMzFUe4wxl8QLJIbCMqZbboK4XJE
+	NBE/1tidihamMyGO9raVN9kBAQsyGizUaIPdxfeMYPW7NOLpuICEc73/2Br671N+
+	Q969V41NIiksVvpZ0YUI8leCc++eeMdz6Yg5jdeugLutJApyw3CrjKW3zWXM+Bq9
+	Kl381Uv4kZhm3l25WcQu+Z1ktu0OJP6OFYP8jaWLZbvuxd5OtKQPgqPfZMQkrCY7
+	nMw5fGkfL3E/LenIxuOrNwmKyQDgBkps1wZhB8kA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emajxgtp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 14:22:31 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49PEMUpv029480;
+	Fri, 25 Oct 2024 14:22:30 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emajxgtk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 14:22:30 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49PAbv44008796;
+	Fri, 25 Oct 2024 14:22:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42emkax34j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 14:22:30 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49PEMSYC32440840
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Oct 2024 14:22:28 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 636EB2004B;
+	Fri, 25 Oct 2024 14:22:28 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 790ED20043;
+	Fri, 25 Oct 2024 14:22:26 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.31.149])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 25 Oct 2024 14:22:26 +0000 (GMT)
+Date: Fri, 25 Oct 2024 19:52:23 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: PPC: Book3S HV: Mask off LPCR_MER for a vCPU
+ before running it to avoid spurious interrupts
+Message-ID: <x4sx3g3as4xzhby6gyonh73z54y6z7d5s37yferz3ybbyc6skd@fjwoxrgz6rds>
+References: <20241024173417.95395-1-gautam@linux.ibm.com>
+ <877c9wkf8q.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877c9wkf8q.fsf@mail.lhotse>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: KOMBPlvXuVQ2ggS1xN5NnXnFwyFOY6Iw
+X-Proofpoint-GUID: jdzenZ0xq_9A_mSgMqBUxBZxed7KPAIe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ mlxscore=0 phishscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410250110
 
-virtio-mem uses memory_add_physaddr_to_nid() to determine the NID to use
-for memory it adds.
+On Fri, Oct 25, 2024 at 02:56:05PM +1100, Michael Ellerman wrote:
+> Hi Gautam,
+> 
+> A few comments below ...
+> 
+> Gautam Menghani <gautam@linux.ibm.com> writes:
+> > Mask off the LPCR_MER bit before running a vCPU to ensure that it is not
+> > set if there are no pending interrupts.
+> 
+> I would typically leave this until the end of the change log. ie.
+> describe the bug and how it happens first, then the fix at the end.
+> 
+> But it's not a hard rule, so up to you.
 
-We currently fallback to the dummy implementation in mm/numa.c with
-CONFIG_NUMA, which will end up triggering an undesired pr_info_once():
+Yes agreed, that would make more sense.
 
-	Unknown online node for memory at 0x100000000, assuming node 0
+> 
+> > Running a vCPU with LPCR_MER bit
+>             ^
+>         "an L2 vCPU"
+> 
+> In general if you can qualify L0 vs L1 vs L2 everywhere it would help
+> folks follow the description.
 
-On s390, we map all cpus and memory to node 0, so let's add a simple
-memory_add_physaddr_to_nid() implementation that does exactly that,
-but without complaining.
+yes will add it in v3
+> 
+> > set and no pending interrupts results in L2 vCPU getting an infinite flood
+> > of spurious interrupts. The 'if check' in kvmhv_run_single_vcpu() sets
+> > the LPCR_MER bit if there are pending interrupts.
+> >
+> > The spurious flood problem can be observed in 2 cases:
+> > 1. Crashing the guest while interrupt heavy workload is running
+> >   a. Start a L2 guest and run an interrupt heavy workload (eg: ipistorm)
+> >   b. While the workload is running, crash the guest (make sure kdump
+> >      is configured)
+> >   c. Any one of the vCPUs of the guest will start getting an infinite
+> >      flood of spurious interrupts.
+> >
+> > 2. Running LTP stress tests in multiple guests at the same time
+> >    a. Start 4 L2 guests.
+> >    b. Start running LTP stress tests on all 4 guests at same time.
+> >    c. In some time, any one/more of the vCPUs of any of the guests will
+> >       start getting an infinite flood of spurious interrupts.
+> >
+> > The root cause of both the above issues is the same:
+> > 1. A NMI is sent to a running vCPU that has LPCR_MER bit set.
+> > 2. In the NMI path, all registers are refreshed, i.e, H_GUEST_GET_STATE
+> >    is called for all the registers.
+> > 3. When H_GUEST_GET_STATE is called for lpcr, the vcpu->arch.vcore->lpcr
+> >    of that vCPU at L1 level gets updated with LPCR_MER set to 1, and this
+> >    new value is always used whenever that vCPU runs, regardless of whether
+> >    there was a pending interrupt.
+> > 4. Since LPCR_MER is set, the vCPU in L2 always jumps to the external
+> >    interrupt handler, and this cycle never ends.
+> >
+> > Fix the spurious flood by making sure a vCPU's LPCR_MER is always masked
+> > before running a vCPU.
+> 
+> I think your original sentence at the top of the change log is actually more
+> accurate. ie. it's not that LPCR_MER is always cleared, it's cleared
+> *unless there's a pending interrupt*.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/include/asm/sparsemem.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Yes agreed
+> 
+> > Fixes: ec0f6639fa88 ("KVM: PPC: Book3S HV nestedv2: Ensure LPCR_MER bit is passed to the L0")
+> > Cc: stable@vger.kernel.org # v6.8+
+> > Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+> > ---
+> > V1 -> V2:
+> > 1. Mask off the LPCR_MER in vcpu->arch.vcore->lpcr instead of resetting
+> > it so that we avoid grabbing vcpu->arch.vcore->lock. (Suggested by
+> > Ritesh in an internal review)
+> 
+> Did v1 take the vcore->lock? I don't remember it.
 
-diff --git a/arch/s390/include/asm/sparsemem.h b/arch/s390/include/asm/sparsemem.h
-index ff628c50afac..6377b7ea8a40 100644
---- a/arch/s390/include/asm/sparsemem.h
-+++ b/arch/s390/include/asm/sparsemem.h
-@@ -5,4 +5,12 @@
- #define SECTION_SIZE_BITS	27
- #define MAX_PHYSMEM_BITS	CONFIG_MAX_PHYSMEM_BITS
- 
-+#ifdef CONFIG_NUMA
-+static inline int memory_add_physaddr_to_nid(u64 addr)
-+{
-+	return 0;
-+}
-+#define memory_add_physaddr_to_nid memory_add_physaddr_to_nid
-+#endif /* CONFIG_NUMA */
-+
- #endif /* _ASM_S390_SPARSEMEM_H */
--- 
-2.46.1
+No v1 did not take a lock, but ideally was supposed to take a lock. I
+missed the locking part there.
+> 
+> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> > index 8f7d7e37bc8c..b8701b5dde50 100644
+> > --- a/arch/powerpc/kvm/book3s_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > @@ -5089,9 +5089,19 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+> >  
+> >  	do {
+> >  		accumulate_time(vcpu, &vcpu->arch.guest_entry);
+> > +		/*
+> > +		 * L1's copy of L2's lpcr (vcpu->arch.vcore->lpcr) can get its MER bit
+>                                      ^
+>                                      LPCR
 
+Ack. 
+> > +		 * unexpectedly set - for e.g. during NMI handling when all register
+> > +		 * states are synchronized from L0 to L1. L1 needs to inform L0 about
+> > +		 * MER=1 only when there are pending external interrupts.
+> > +		 * kvmhv_run_single_vcpu() anyway sets MER bit if there are pending
+> > +		 * external interrupts. Hence, mask off MER bit when passing vcore->lpcr
+> > +		 * here as otherwise it may generate spurious interrupts in L2 KVM
+> > +		 * causing an endless loop, which results in L2 guest getting hung.
+> > +		 */
+> >  		if (cpu_has_feature(CPU_FTR_ARCH_300))
+> >  			r = kvmhv_run_single_vcpu(vcpu, ~(u64)0,
+> > -						  vcpu->arch.vcore->lpcr);
+> > +						  vcpu->arch.vcore->lpcr & ~LPCR_MER);
+>  
+> This is much better than v1 which hid the clearing of LPCR_MER in a macro.
+> 
+> But I still wonder if it would be better to clear it in
+> kvmhv_run_single_vcpu() itself.
+> 
+> The logic to set LPCR_MER is already in there, so why not ensure
+> LPCR_MER is cleared as part of that some block?
+> 
+> I realise there's another caller of kvmhv_run_single_vcpu() from the
+> nested code, but that's OK because there's already a nested check in
+> kvmhv_run_single_vcpu(), so you can still isolate this change to just
+> the non-nested case.
+> 
+
+Yes it would be better to mask off LPCR_MER inside
+kvmhv_run_single_vcpu(), will make that change and send v3. 
+
+> cheers
+
+Thanks,
+Gautam
 
