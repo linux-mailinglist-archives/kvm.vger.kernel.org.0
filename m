@@ -1,236 +1,137 @@
-Return-Path: <kvm+bounces-29706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CDD39B020F
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:20:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246E79B03DC
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60B361C2113E
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 12:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61372853EE
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 13:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3129920370E;
-	Fri, 25 Oct 2024 12:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5FD52F76;
+	Fri, 25 Oct 2024 13:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xi8t5k/H"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FED82036E6
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 12:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7D2212164
+	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 13:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729858776; cv=none; b=Y0uemLexeUkVOfFPhUuYg8WF/YgMOVJv9hO071TOXVRY4tDO3O3J0uVR9HzYflMR8rw2CGy51mwwBZKfbuj/z7vJNVoIW9yuq/NZAb/8Hc2wzHLzFY3JCtK3xBhWEkvHPdQGdap0kbpLd8LWgdJufqqfq+gZVegzqjh7tCnIEUw=
+	t=1729862485; cv=none; b=ceQFyG9Ilbny7zDQppe/oRD7ifpO/EGFFbFdcm1zRsXvDtJfaOikhm+hYdavrsrNzQ08wCc9JGfXFIoT/lLoymRfGmKcTiM2pgoTmuUW8SWufUsuqM8Dkty5R/0ZX3we5zyuwENSGwEhGrVWaKHCkZS7cYn65BYcyOfeRmDETuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729858776; c=relaxed/simple;
-	bh=aMBAw5dk/I+yeZfefEAkCNcH79TJ7FgjGU5fWouUI7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFdgWFxk7NV/Fjqu89uPUbXmqIDo/W32SFaJBMx502D42RYcqRffGeFKukIe4FhjilJWSmycFQ3J5D7KUmJbrBDhFm/y+2SwPggzowepllQfp9AEENftWpwtbsJjFiJA9uC67VIYORjWacLT2fQMDXLm3Y7WAg277Lcvr8yYBn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EEBC1339;
-	Fri, 25 Oct 2024 05:20:01 -0700 (PDT)
-Received: from arm.com (unknown [10.32.102.33])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 691633F71E;
-	Fri, 25 Oct 2024 05:19:30 -0700 (PDT)
-Date: Fri, 25 Oct 2024 13:19:26 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev, atishp@rivosinc.com, jamestiotio@gmail.com,
-	eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 1/2] lib/on-cpus: Correct and simplify
- synchronization
-Message-ID: <ZxuMzrEMxE/lnwtK@arm.com>
-References: <20241023131718.117452-4-andrew.jones@linux.dev>
- <20241023131718.117452-5-andrew.jones@linux.dev>
+	s=arc-20240116; t=1729862485; c=relaxed/simple;
+	bh=/32HmL7YwBkjAVKTXfU1mVprjlPb8B1ISFkFhMOu8aM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TP2tj2PWa5lt35iYTSItYlFcc8r9yH0OMMTmaC3Niz1LDyJedWpUBfp+4X5AjRFT/GRVDHJ8zYURFP7ruIsOAZg46BX7Ciok5tM2nb5q7bITadWZXPmL5ha93/UoflptHrjTn9/H4LLKyJgtlBIlxHXV8MmUBzfmJockpOMVx7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xi8t5k/H; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-460969c49f2so260621cf.0
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 06:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729862482; x=1730467282; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7bTA5XEv/pSAM+W1H3oIEVE2GosaAWU3ljRxi1KlB14=;
+        b=Xi8t5k/Hl+VtKA0i5CAqPvqw+2zTRtgIBL0xwgj1wpRmZqmGMAeDYQoQA2FSjRyjhH
+         DaF2DOZ+hLlzFnwP2G1FP772uAiJYzgf0Pw7YGfVBNrSb1H309LF86ECRvKiJWUfncGp
+         e3WK/6QueuHla+qqVyKec8uFidYLc9ULu9LrC5RIJolNFr1XQqU1nmyK6HHvfD/09emp
+         n+OD0cVyzwTb5Q3GS8pyo5OiIH7rQmWnD/aFVaI2N+Y70thYv9JShrii1fyzlSjo4cXZ
+         O3JoF5qdohsNGYp+w9grnYL8Q1tftV89UYUeGyWbXqlnjiIH5++YycSv6OwT7mg90iBS
+         ujeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729862482; x=1730467282;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7bTA5XEv/pSAM+W1H3oIEVE2GosaAWU3ljRxi1KlB14=;
+        b=UKW1zBxlJRSKrHUOIq9qNOtDo6/DYuuRt9upwXNAr9naapDWPrAgefa38Aq5TX4/oc
+         Q0Uqvs3FpNVoO15bl9ripBenKRD63bdwXE68LX0qCQvt8uiBw0JFLHmw7gOyIUvEJP1q
+         mHqeeHarJFbx/AAibGxQEPV81Kk2fY+uIZrpYA/qoHTLP4esHMqz1krWs7wnIGuoO1d0
+         qCPMcGwcZoJjAvzraluLoUSTArTLpQ+kI/wnTvRrZcG3IWLyBytu9cX5qZrM619cWrzK
+         zDYSnf3qfpu0ZXT5ZWr/Ky9h5KzmXPDSuZC0p03JkZHLvl8zWWRI5GXoeeNlmdS/oQUF
+         v88g==
+X-Forwarded-Encrypted: i=1; AJvYcCW4AN4qFqceDaWLg/WQiW6+9JNW1Ut0hApi+mTbNw9jWpVWT1hPo1sPa8V19MBC+HJ5hVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQK7kH4eI8JLZUNckKfed6qKUiuOlj+Ao5swKhbjG8YDhQRSmL
+	hDiTkfMfyV2oWyjz23BiKlFinqvdpWDk+/I7nZ6CRtl9gZ5OZemdJsPkoyGFkoeoj7KhZOCAlmj
+	xlVICfBsxSqK/wzgVSrasn/gXKzqmAWfcnmKY
+X-Google-Smtp-Source: AGHT+IFLcF2W2NrORj/Xb8SC12qeyC5KVAM9B79QtrQcqFpidlzCS6ayGMpyXO+mm8gBR/NQWaXXOnPJfjuALjSAZEE=
+X-Received: by 2002:a05:622a:152:b0:460:4638:78c0 with SMTP id
+ d75a77b69052e-4612eb81fbfmr3022001cf.14.1729862482147; Fri, 25 Oct 2024
+ 06:21:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023131718.117452-5-andrew.jones@linux.dev>
+References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
+ <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com> <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
+In-Reply-To: <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
+From: Brendan Jackman <jackmanb@google.com>
+Date: Fri, 25 Oct 2024 15:21:11 +0200
+Message-ID: <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
+Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr compatible
+To: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Alexandre Chartre <alexandre.chartre@oracle.com>, Liran Alon <liran.alon@oracle.com>, 
+	Jan Setje-Eilers <jan.setjeeilers@oracle.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>, 
+	Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Michal Hocko <mhocko@kernel.org>, Khalid Aziz <khalid.aziz@oracle.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Junaid Shahid <junaids@google.com>, Ofir Weisse <oweisse@google.com>, 
+	Yosry Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>, 
+	KP Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>, 
+	Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Drew,
+Hey Boris,
 
-I've been paging in all the on_cpu* machinery, and it occurred to me that
-we have a chance to simplify the code and to remove a duplicate interface
-by not exposing smp_boot_secondary() to the tests, as the on_cpu* functions
-serve the same purpose. With this change, we can remove the entry argument
-to smp_boot_secondary(), and the assembly for secondary_entry can be made
-simpler by eliminating the branch to the entry function.
+On Fri, 25 Oct 2024 at 13:41, Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Fri, Jul 12, 2024 at 05:00:19PM +0000, Brendan Jackman wrote:
+> > +/*
+> > + * Can be used for functions which themselves are not strictly noinstr, but
+> > + * may be called from noinstr code.
+> > + */
+> > +#define inline_or_noinstr                                            \
+>
+> Hmm, this is confusing. So is it noinstr or is it getting inlined?
 
-Do you think that would be something worth pursuing? I can have a look at
-it.
+We don't care if it's getting inlined, which is kinda the point. This
+annotation means "you may call this function from noinstr code". My
+current understanding is that the normal noinstr annotation means
+"this function fundamentally mustn't be instrumented".
 
-There are exactly two places where smp_boot_secondary() is used: in
-arm/psci.c and arm/gic.c, and from a quick glance it looks to me like those
-can be replaced with one of the on_cpu* functions.
+So with inline_or_noinstr you get:
 
-On Wed, Oct 23, 2024 at 03:17:20PM +0200, Andrew Jones wrote:
-> get/put_on_cpu_info() were trying to provide per-cpu locking for
-> the per-cpu on_cpu info, but they were flawed since they would
-> always set the "lock" since they were treating test_and_set/clear
-> as cmpxchg (which they're not). Just revert to a normal spinlock
+1. "Documentation" that the function itself doesn't have any problem
+with getting traced etc.
+2. Freedom for the compiler to inline or not.
 
-Would you mind expanding on that a bit more?
+> I'd expect you either always inline the small functions - as you do for some
+> aleady - or mark the others noinstr. But not something in between.
+>
+> Why this?
 
-From my understanding of the code, on arm64, this is the call chain that I get
-for get_on_cpu_info(cpu):
+Overall it's pretty likely I'm wrong about the subtlety of noinstr's
+meaning. And the benefits I listed above are pretty minor. I should
+have looked into this as it would have been an opportunity to reduce
+the patch count of this RFC!
 
-  ->get_on_cpu_info(cpu):
-    ->!cpumask_test_and_set(cpu, on_cpu_info_lock)
-      ->!test_and_set_bit(cpu, on_cpu_info_lock->bits):
-         return (old & mask) != 0;
-
-'mask' always has the CPU bit set, which means that get_on_cpu_info() returns
-true if and only if 'old' has the bit clear. I think that prevents a thread
-getting the lock if it's already held, so from that point of view it does
-function as a per target cpu spinlock. Have I misunderstood something?
-
-Regardless of the above, on_cpu_async() is used like this:
-
-on_cpu_async()
-wait_for_synchronization()
-
-so it doesn't make much sense to optimize for performance for the case were
-multiple threads call on_cpu_async() concurrently, as they would need to
-have to wait for synchronization anyway.
-
-So yes, I'm totally in favour for replacing the per-cpu spinlock with a global
-spinlock, even if the only reason is simplifying the code.
-
-> to correct it. Also simplify the break case for on_cpu_async() -
-> we don't care if func is NULL, we only care that the cpu is idle.
-
-That makes sense.
-
-> And, finally, add a missing barrier to on_cpu_async().
-
-Might be worth explaining in the commit message why it was missing. Just in
-case someone is looking at the code and isn't exactly sure why it's there.
-
-> 
-> Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> ---
->  lib/on-cpus.c | 36 +++++++++++-------------------------
->  1 file changed, 11 insertions(+), 25 deletions(-)
-> 
-> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-> index 892149338419..f6072117fa1b 100644
-> --- a/lib/on-cpus.c
-> +++ b/lib/on-cpus.c
-> @@ -9,6 +9,7 @@
->  #include <on-cpus.h>
->  #include <asm/barrier.h>
->  #include <asm/smp.h>
-> +#include <asm/spinlock.h>
->  
->  bool cpu0_calls_idle;
->  
-> @@ -18,18 +19,7 @@ struct on_cpu_info {
->  	cpumask_t waiters;
->  };
->  static struct on_cpu_info on_cpu_info[NR_CPUS];
-> -static cpumask_t on_cpu_info_lock;
-> -
-> -static bool get_on_cpu_info(int cpu)
-> -{
-> -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
-> -}
-> -
-> -static void put_on_cpu_info(int cpu)
-> -{
-> -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
-> -	assert(ret);
-> -}
-> +static struct spinlock lock;
->  
->  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
->  {
-> @@ -81,18 +71,14 @@ void do_idle(void)
->  	if (cpu == 0)
->  		cpu0_calls_idle = true;
->  
-> -	set_cpu_idle(cpu, true);
-> -	smp_send_event();
-> -
->  	for (;;) {
-> +		set_cpu_idle(cpu, true);
-> +		smp_send_event();
-> +
->  		while (cpu_idle(cpu))
->  			smp_wait_for_event();
->  		smp_rmb();
->  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
-> -		on_cpu_info[cpu].func = NULL;
-> -		smp_wmb();
-
-I think the barrier is still needed. The barrier orderered the now removed
-write func = NULL before the write set_cpu_idle(), but it also orderered
-whatever writes func(data) performed before set_cpu_idle(cpu, true). This
-matters for on_cpu(), where I think it's reasonable for the caller to
-expect to observe the writes made by 'func' after on_cpu() returns.
-
-If you agree that this is the correct approach, I think it's worth adding a
-comment explaining it.
-
-> -		set_cpu_idle(cpu, true);
-> -		smp_send_event();
->  	}
->  }
->  
-> @@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
->  
->  	for (;;) {
->  		cpu_wait(cpu);
-> -		if (get_on_cpu_info(cpu)) {
-> -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
-> -				break;
-> -			put_on_cpu_info(cpu);
-> -		}
-> +		spin_lock(&lock);
-> +		if (cpu_idle(cpu))
-> +			break;
-> +		spin_unlock(&lock);
->  	}
->  
->  	on_cpu_info[cpu].func = func;
->  	on_cpu_info[cpu].data = data;
-> +	smp_wmb();
-
-Without this smp_wmb(), it is possible for the target CPU to read an
-outdated on_cpu_info[cpu].data. So adding it is the right thing to do,
-since it orders the writes to on_cpu_info before set_cpu_idle().
-
->  	set_cpu_idle(cpu, false);
-> -	put_on_cpu_info(cpu);
-> +	spin_unlock(&lock);
->  	smp_send_event();
-
-I think a DSB is necessary before all the smp_send_event() calls in this
-file. The DSB ensures that the stores to cpu_idle_mask will be observed by
-the thread that is waiting on the WFE, otherwise it is theoretically
-possible to get a deadlock (in practice this will never happen, because KVM
-will be generating the events that cause WFE to complete):
-
-CPU0: on_cpu_async():		CPU1: do_idle():
-
-load CPU1_idle = true
-//do stuff
-store CPU1_idle=false
-SEV
-				1: WFE
-				   load CPU1_idle=true // old value, allowed
-				   b 1b // deadlock
-
-Also, it looks unusual to have smp_send_event() unpaired from set_cpu_idle().
-Can't really point to anything being wrong about it though.
-
-Thanks,
-Alex
+Maybe I'm also forgetting something more important, perhaps Junaid
+will weigh in...
 
