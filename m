@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-29692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8073A9AFB2C
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 09:35:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443B39AFC02
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 10:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0EF11C22485
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 07:35:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041AA285281
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 08:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409711B393B;
-	Fri, 25 Oct 2024 07:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA67E1CACE8;
+	Fri, 25 Oct 2024 08:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="CGOdiDUZ"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="T1OP+GAJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D37E19B59F;
-	Fri, 25 Oct 2024 07:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CE2155308;
+	Fri, 25 Oct 2024 08:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729841697; cv=none; b=jUYVKSPupBRi7/MyGyaLj4tSY3a3U0FVFKzEqKdaIhLMXai2VOl5nAyBXHKzbYFJF0TfkqxsD5M1TX+vE6jPXYAN85MtprgNw28xS+J6l2vWgrS4xeiv0JlhmaJsqrxegHabh74t6d9vH8iZ7LrucR1KNwFFY+UdIu9jKcfNCeg=
+	t=1729843546; cv=none; b=Vi9dO43ekOnWXZsAiOGpbwCUYNTplVaNbhnx7apVlz/0b/8+y4fsguElFWSq/68PIUth4REZwdS56h179KyrSLlf8uwySLqPWpWGtC+/VCii2RXLW1BjEBNS/q+atFdEUyMoSKjA0wNmzBob1hUCVu6MILeAxVhkvB5rVf5cv0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729841697; c=relaxed/simple;
-	bh=HPJBTKt2s2JeWexm0xhl7kakBBDv3mVKl4YY8KXecAw=;
+	s=arc-20240116; t=1729843546; c=relaxed/simple;
+	bh=ceH4aILP/lHtZaI+C7Y8VtOTtSWcPki1LCmXtifv+/0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dpSsnqyq0mlfdnnIewcnJxymZWPDHobgef3Yau3MwfJcLzwVdjEU7BmL4I4Zk2/VvXSNjWcFUrqDPN0Ky6u4jp+b/VmWcmNwhHqTyi2H63jBpbFXPdQ8DwodjZcbxCxtf1vRBayasDdxEjFLU8EwT/pnN6VgUv9S/gS4saU5kMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=CGOdiDUZ; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=tw9pEGD5VTKyYs0g1+5C2VxrTREVEm8LuQFHXpZbpoXOmQQQ7vnFDB1OuPDL1JwUX2OnnPuspIMc+8Qsi0mraM+M8Kgjvpq5ZdrBu2a+CunTDva2/L4PWBMqpsU8JL9RMekY0X11gCff1HZFa3slE3p9WxOFQHlyTclkABDql10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=T1OP+GAJ; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.205] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49P7YPHm2108861
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49P84HE92121122
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 25 Oct 2024 00:34:25 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49P7YPHm2108861
+	Fri, 25 Oct 2024 01:04:18 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49P84HE92121122
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1729841666;
-	bh=cjcIWk0vTCLF88p/9j8npmpd+ZQ/ryZZQSzE1BRQ/xk=;
+	s=2024101701; t=1729843514;
+	bh=4zHdutFlOl0JkvjKECtk2NMjVvsxd0XSbHb4/Oxo5ns=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CGOdiDUZtrAVWGZ+UD7uvQ7SblFNDAyNg+X3t9KyodNOCLn7fdUXDBZMzgsiCPKKp
-	 FYI5PQk30f99GbBFJalGmSRVv3Ou+04ocpQhefz1dOg5gkJwBxkk46mrHM3c5Kws/e
-	 IKiwBPNwwGNlg6lSojeivOTYaiqBcdBkGw6YrIAcVjB0ws2+ur+5SAlIctJ7J4YTdX
-	 4Z8TMlL2MjvIod5PFMBe3jClwzIA7zcHuru9G1SiE8B4b1f6RAZS0hOxIeAJ0Wu3xP
-	 Yu/JUggtaLKceXlwNxEJkvRiaahj4BYGgglQ6sm/ylNjHTd78ZNpFepWf5gHFTlSrn
-	 m7iPXSMzEok5Q==
-Message-ID: <edcdad12-bbb7-46b9-8914-9bbb36b44597@zytor.com>
-Date: Fri, 25 Oct 2024 00:34:24 -0700
+	b=T1OP+GAJvhLMjzOh/5TIEdqdp9NsnlXhvwuvg2gKsckc0/pkc8oKjxyhMdT6Xao0Q
+	 picKvgtfPLFGRss5J40j6thW5IDrO7LywYungopY0Kj0993ISgJp0WKwFhvfw8NTCn
+	 cMpUyStMlCondNxEFuaDoZZ/A81TV7rHtYq9afjZuUT+Yv06gtsDWTY1nYdoCKpEtP
+	 gGnLbgzcRuPEXqdCUkrk/MJ3jIt2AypPkGrwmwh6yyO67NJN9tPlMHAFPy8X8+g6C9
+	 C5KWYJXgx97TChOaVIftR5ZO6Bv6GoJF4SeXRskSDOUvXDqrcHhzMCKqChAYDbVxn4
+	 k8Pecq0DRX9NQ==
+Message-ID: <5ded5ea5-6a31-47ef-ae12-f32615ada248@zytor.com>
+Date: Fri, 25 Oct 2024 01:04:16 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 21/27] KVM: VMX: Invoke vmx_set_cpu_caps() before
- nested setup
+Subject: Re: [PATCH v3 16/27] KVM: VMX: Virtualize FRED nested exception
+ tracking
 To: Chao Gao <chao.gao@intel.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
@@ -65,7 +65,7 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
 References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-22-xin@zytor.com> <Zxn8BX6vxQKY+YNF@intel.com>
+ <20241001050110.3643764-17-xin@zytor.com> <ZxnoE6ltLawgPHdZ@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -102,23 +102,104 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <Zxn8BX6vxQKY+YNF@intel.com>
+In-Reply-To: <ZxnoE6ltLawgPHdZ@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/24/2024 12:49 AM, Chao Gao wrote:
-> On Mon, Sep 30, 2024 at 10:01:04PM -0700, Xin Li (Intel) wrote:
->> From: Xin Li <xin3.li@intel.com>
->>
->> Set VMX CPU capabilities before initializing nested instead of after,
->> as it needs to check VMX CPU capabilities to setup the VMX basic MSR
->> for nested.
+On 10/23/2024 11:24 PM, Chao Gao wrote:
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index b9b82aaea9a3..3830084b569b 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -736,6 +736,7 @@ struct kvm_queued_exception {
+>> 	u32 error_code;
+>> 	unsigned long payload;
+>> 	bool has_payload;
+>> +	bool nested;
+>> 	u64 event_data;
 > 
-> Which VMX CPU capabilities are needed? after reading patch 25, I still
-> don't get that.
+> how "nested" is migrated in live migration?
 
-Sigh, in v2 I had 'if (kvm_cpu_cap_has(X86_FEATURE_FRED))' in
-nested_vmx_setup_basic(), which is changed to 'if (cpu_has_vmx_fred())'
-in v3.  So the reason for the change is gone.  But I think logically
-the change is still needed; nested setup should be after VMX setup.
+Damn, I forgot it!
+
+Looks we need to add it to kvm_vcpu_ioctl_x86_{get,set}_vcpu_events(),
+but the real question is how to add it to struct kvm_vcpu_events.
+
+> 
+>> };
+> 
+> [..]
+> 
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index d81144bd648f..03f42b218554 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -1910,8 +1910,11 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
+>> 		vmcs_write32(VM_ENTRY_INSTRUCTION_LEN,
+>> 			     vmx->vcpu.arch.event_exit_inst_len);
+>> 		intr_info |= INTR_TYPE_SOFT_EXCEPTION;
+>> -	} else
+>> +	} else {
+>> 		intr_info |= INTR_TYPE_HARD_EXCEPTION;
+>> +		if (ex->nested)
+>> +			intr_info |= INTR_INFO_NESTED_EXCEPTION_MASK;
+> 
+> how about moving the is_fred_enable() check from kvm_multiple_exception() to here? i.e.,
+> 
+> 		if (ex->nested && is_fred_enabled(vcpu))
+> 			intr_info |= INTR_INFO_NESTED_EXCEPTION_MASK;
+> 
+> It is slightly clearer because FRED details don't bleed into kvm_multiple_exception().
+
+But FRED is all about events, including exception/interrupt/trap/...
+
+logically VMX nested exception only works when FRED is enabled, see how 
+it is set at 2 places in kvm_multiple_exception().
+
+> 
+>> +	}
+>>
+>> 	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
+>>
+>> @@ -7290,6 +7293,7 @@ static void __vmx_complete_interrupts(struct kvm_vcpu *vcpu,
+>> 		kvm_requeue_exception(vcpu, vector,
+>> 				      idt_vectoring_info & VECTORING_INFO_DELIVER_CODE_MASK,
+>> 				      error_code,
+>> +				      idt_vectoring_info & VECTORING_INFO_NESTED_EXCEPTION_MASK,
+>> 				      event_data);
+>> 		break;
+>> 	}
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 7a55c1eb5297..8546629166e9 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -874,6 +874,11 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+>> 		vcpu->arch.exception.pending = true;
+>> 		vcpu->arch.exception.injected = false;
+>>
+>> +		vcpu->arch.exception.nested = vcpu->arch.exception.nested ||
+>> +					      (is_fred_enabled(vcpu) &&
+>> +					       (vcpu->arch.nmi_injected ||
+>> +					        vcpu->arch.interrupt.injected));
+>> +
+>> 		vcpu->arch.exception.has_error_code = has_error;
+>> 		vcpu->arch.exception.vector = nr;
+>> 		vcpu->arch.exception.error_code = error_code;
+>> @@ -903,8 +908,13 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+>> 		vcpu->arch.exception.injected = false;
+>> 		vcpu->arch.exception.pending = false;
+>>
+>> +		/* #DF is NOT a nested event, per its definition. */
+>> +		vcpu->arch.exception.nested = false;
+>> +
+>> 		kvm_queue_exception_e(vcpu, DF_VECTOR, 0);
+>> 	} else {
+>> +		vcpu->arch.exception.nested = is_fred_enabled(vcpu);
+>> +
+>> 		/* replace previous exception with a new one in a hope
+>> 		   that instruction re-execution will regenerate lost
+>> 		   exception */
+> 
+
 
