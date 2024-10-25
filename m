@@ -1,59 +1,61 @@
-Return-Path: <kvm+bounces-29712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A059B054F
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:15:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 848FF9B0556
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8C981F24632
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:15:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D16284B57
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CC21FB8A2;
-	Fri, 25 Oct 2024 14:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC27A206503;
+	Fri, 25 Oct 2024 14:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKt78Sor"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ji8SCkuP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0BF1F755D
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 14:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195D81FDFA8
+	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 14:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729865712; cv=none; b=VOv/oIUvcM9wgavYmi5I/bkPE/s9KDaP8cErD/009fEbPHDpqVsAEW0P4UMAu9M0iYHDWQshaI8FBxhYZ5KsCeF6jYDRikGVWks1ZFSmb22lId28L8ZnWPyCpz+iAb2VxaWbbIGkw11Kdmzhvim4FnBk2IUvF9oTfAueB84KjDE=
+	t=1729865723; cv=none; b=pY6O9Vw6EIMvxsbh5HcB2FlVb+ErNjQtSBB+WOWXwm/ePO7Xu0p1w5yFMqsFDtCPu2Fxqwx4HKfkzPLXPY5iX8MBZThnFwL9d6DhvgiArDofBxSOX/Zc+dvJtLSDPSwSNMpojrSgIBUQBo/TqpSiFVhKvcnZ+Rvuzwnsrv4S/do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729865712; c=relaxed/simple;
-	bh=eVjDySFNHYvLkJiFndXO4WwDtQ50lC6XGvV99R9ck9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s18AO0sjXuGylzrngozPs9XgirpYqSTf0SkNdWFQDS6GzMdpWhI3olN+FKJcDNUPLMG6Owar0BcbcPsO7xeKB24khsJe0t6qFmVFztQmLuysnLWKOWwGLwaznw0cZZ67f79KWf3+o/BMc+ilPZ2pLCIQ7T3Hkt4Ss6l18EozfaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JKt78Sor; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1729865723; c=relaxed/simple;
+	bh=I9NMJ19LAZGd8lwkfkrPWKiA82Yio12NcORWUrZNZqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EmVfDYTPzN17gZBFavHtbXvqL4Nmw0CDg1jVAmLbZh0tX8HTAARZfmdk2kN65UkMLH9QVEIH6P/E3P3E9lHNAF8XVXp77V5k4s+HPk5ENGH6hU7fzXRw1lJW+R1NvJH8l2kS9uji5dMZxL3ThQB36NlxwPhNOM+bEdTJuVDqQAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ji8SCkuP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729865709;
+	s=mimecast20190719; t=1729865717;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Ff6XQKworBBc6g+g+GISIC2w5/BR0dZAOdIhNYuIBxY=;
-	b=JKt78SorW3qqUZQeBVC5DJX0WJ30/nGl41b5qyF6giECejaEzmRfZc8b1KjllQ/N4mlqpw
-	R5fGNAMUUtXV5d9s4SMJ1iN7wVphJKg/EPSGYetQJ7Cwv1LyW8OedR/UWsFnlf6ZUWwHWd
-	CUfzN6sx2H6lGL/uJM1pRsP0ABbLcDs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c02jmCltsV6yISoJOqxBYZsRrdNBar2VI+HnnpDo3Tk=;
+	b=Ji8SCkuPQz/v9qfGaUEDfTrnYrE8j0PN1REG3B5XiKBvtsL9WuH2RQ2FIEnzSUTh2egMPH
+	CWwsKRrfE0iYzMW8coJA2M+8I3zF9Hh/iUKyurCfLbFpQMjieRnOgtCj62ikezKWRMytuL
+	22TXNl/E0PwtpbwBjiYmqNtYcHgqWjc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-277-hdlqc4_INZygg1ik9ibmHw-1; Fri,
- 25 Oct 2024 10:15:05 -0400
-X-MC-Unique: hdlqc4_INZygg1ik9ibmHw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-314-tzlcknbTOoqc6cAii0r6cA-1; Fri,
+ 25 Oct 2024 10:15:13 -0400
+X-MC-Unique: tzlcknbTOoqc6cAii0r6cA-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D061719560A6;
-	Fri, 25 Oct 2024 14:15:02 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B750C1955D47;
+	Fri, 25 Oct 2024 14:15:10 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.22.65.27])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B94FE1955F30;
-	Fri, 25 Oct 2024 14:14:54 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 44BD01955F3B;
+	Fri, 25 Oct 2024 14:15:03 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -78,110 +80,69 @@ Cc: linux-mm@kvack.org,
 	Eric Farman <farman@linux.ibm.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH v3 0/7] virtio-mem: s390 support
-Date: Fri, 25 Oct 2024 16:14:45 +0200
-Message-ID: <20241025141453.1210600-1-david@redhat.com>
+Subject: [PATCH v3 1/7] Documentation: s390-diag.rst: make diag500 a generic KVM hypercall
+Date: Fri, 25 Oct 2024 16:14:46 +0200
+Message-ID: <20241025141453.1210600-2-david@redhat.com>
+In-Reply-To: <20241025141453.1210600-1-david@redhat.com>
+References: <20241025141453.1210600-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Let's finally add s390 support for virtio-mem; my last RFC was sent
-4 years ago, and a lot changed in the meantime.
+Let's make it a generic KVM hypercall, allowing other subfunctions to
+be more independent of virtio.
 
-The latest QEMU series is available at [1], which contains some more
-details and a usage example on s390 (last patch).
+While at it, document that unsupported/unimplemented subfunctions result
+in a SPECIFICATION exception.
 
-There is not too much in here: The biggest part is querying a new diag(500)
-STORAGE_LIMIT hypercall to obtain the proper "max_physmem_end".
+This is a preparation for documenting a new hypercall.
 
-The last three patches are not strictly required but certainly nice-to-have.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ Documentation/virt/kvm/s390/s390-diag.rst | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-Note that -- in contrast to standby memory -- virtio-mem memory must be
-configured to be automatically onlined as soon as hotplugged. The easiest
-approach is using the "memhp_default_state=" kernel parameter or by using
-proper udev rules. More details can be found at [2].
-
-I have reviving+upstreaming a systemd service to handle configuring
-that on my todo list, but for some reason I keep getting distracted ...
-
-I tested various things, including:
- * Various memory hotplug/hotunplug combinations
- * Device hotplug/hotunplug
- * /proc/iomem output
- * reboot
- * kexec
- * kdump: make sure we properly enter the "kdump mode" in the virtio-mem
-   driver
-
-kdump support for virtio-mem memory on s390 will be sent out separately.
-
-v2 -> v3
-* "s390/kdump: make is_kdump_kernel() consistently return "true" in kdump
-   environments only"
- -> Sent out separately [3]
-* "s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM memory
-   devices"
- -> No query function for diag500 for now.
- -> Update comment above setup_ident_map_size().
- -> Optimize/rewrite diag500_storage_limit() [Heiko]
- -> Change handling in detect_physmem_online_ranges [Alexander]
- -> Improve documentation.
-* "s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA"
- -> Added after testing on systems with CONFIG_NUMA=y
-
-v1 -> v2:
-* Document the new diag500 subfunction
-* Use "s390" instead of "s390x" consistently
-
-[1] https://lkml.kernel.org/r/20241008105455.2302628-1-david@redhat.com
-[2] https://virtio-mem.gitlab.io/user-guide/user-guide-linux.html
-[3] https://lkml.kernel.org/r/20241023090651.1115507-1-david@redhat.com
-
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Sven Schnelle <svens@linux.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Eugenio Pérez" <eperezma@redhat.com>
-Cc: Eric Farman <farman@linux.ibm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-
-David Hildenbrand (7):
-  Documentation: s390-diag.rst: make diag500 a generic KVM hypercall
-  Documentation: s390-diag.rst: document diag500(STORAGE LIMIT)
-    subfunction
-  s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM
-    memory devices
-  virtio-mem: s390 support
-  lib/Kconfig.debug: default STRICT_DEVMEM to "y" on s390
-  s390/sparsemem: reduce section size to 128 MiB
-  s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA
-
- Documentation/virt/kvm/s390/s390-diag.rst | 35 +++++++++++++----
- arch/s390/boot/physmem_info.c             | 47 ++++++++++++++++++++++-
- arch/s390/boot/startup.c                  |  7 +++-
- arch/s390/include/asm/physmem_info.h      |  3 ++
- arch/s390/include/asm/sparsemem.h         | 10 ++++-
- drivers/virtio/Kconfig                    | 12 +++---
- lib/Kconfig.debug                         |  2 +-
- 7 files changed, 98 insertions(+), 18 deletions(-)
-
-
-base-commit: ae90f6a6170d7a7a1aa4fddf664fbd093e3023bc
+diff --git a/Documentation/virt/kvm/s390/s390-diag.rst b/Documentation/virt/kvm/s390/s390-diag.rst
+index ca85f030eb0b..48a326d41cc0 100644
+--- a/Documentation/virt/kvm/s390/s390-diag.rst
++++ b/Documentation/virt/kvm/s390/s390-diag.rst
+@@ -35,20 +35,24 @@ DIAGNOSE function codes not specific to KVM, please refer to the
+ documentation for the s390 hypervisors defining them.
+ 
+ 
+-DIAGNOSE function code 'X'500' - KVM virtio functions
+------------------------------------------------------
++DIAGNOSE function code 'X'500' - KVM functions
++----------------------------------------------
+ 
+-If the function code specifies 0x500, various virtio-related functions
+-are performed.
++If the function code specifies 0x500, various KVM-specific functions
++are performed, including virtio functions.
+ 
+-General register 1 contains the virtio subfunction code. Supported
+-virtio subfunctions depend on KVM's userspace. Generally, userspace
+-provides either s390-virtio (subcodes 0-2) or virtio-ccw (subcode 3).
++General register 1 contains the subfunction code. Supported subfunctions
++depend on KVM's userspace. Regarding virtio subfunctions, generally
++userspace provides either s390-virtio (subcodes 0-2) or virtio-ccw
++(subcode 3).
+ 
+ Upon completion of the DIAGNOSE instruction, general register 2 contains
+ the function's return code, which is either a return code or a subcode
+ specific value.
+ 
++If the specified subfunction is not supported, a SPECIFICATION exception
++will be triggered.
++
+ Subcode 0 - s390-virtio notification and early console printk
+     Handled by userspace.
+ 
 -- 
 2.46.1
 
