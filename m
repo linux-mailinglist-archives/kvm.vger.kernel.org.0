@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-29703-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29704-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 549C99B0088
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 12:52:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE009B009A
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 12:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13694284703
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 10:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C543285465
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 10:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D51B1F80D9;
-	Fri, 25 Oct 2024 10:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5611F8F08;
+	Fri, 25 Oct 2024 10:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+HwVTYD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9RFf7MX"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEB41EF096
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 10:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CA61F81AF
+	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 10:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729853533; cv=none; b=dAhAZj7QTDC8PVhgQegXKY6mEOtd9KM6Kn0J0SJF+V/bQpAeDVj//oNRBNe6U8RLcIxFr2mYlPmGUZ2Yq41YDtiYbj9+kTjjIfZpAsbRsAt+Ygy2qK6N19ynFGUvixCId0QeWqaPTmrxz5TXf7E1Dgl85Ct7GidldfhsFOhUb+c=
+	t=1729853680; cv=none; b=tcbQ0G4XMN48OiZ2Zl6WqyQrbUz5bB7wLhf+DzuonOhQ0Py7HHD3qEojnFlc36uUICDrHLYxAAxoRC5A4i2ea4xocxsZDBpafjoUO5IpUtSQhSvqx+F0frLBeraqZf01Btb0cuSP/Zl6R1uOiV2Vdz9B5TavXPNC5L3R7SY6YYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729853533; c=relaxed/simple;
-	bh=kp2DJSQcz5F9ITrB7GXc5frB5yJiuuHNUVJHR6XpcF0=;
+	s=arc-20240116; t=1729853680; c=relaxed/simple;
+	bh=avMLLefhq5M2tr0I4Wur4AOze6yAMsZFBYF9tCtbbCE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DJMcXkFEgUlEQZ8+fSZv5JSRFv4T9e6XMbI8whz6FF5qwtHFHTnkWqV3LeaXVJSBNrwVfyxdGimFhOa81iHqn6nN/Pg3kB/8OdVdbaVoyagNAIc89rVCPl5VObGfNZ2x/IzTHpODAzHujPfhTZPj0hO8JG0H1is36eUiFzhlEiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G+HwVTYD; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=aORLgxz7SQ15B2jy62DTVUxLJ2yG4zZv4wkfklTNroa8dj6ykJdej/b1OCBeCFt3xcD7hIQPOimPR+B4THfJLtx4qLajsB/+mKdLJALQ2WMY87piRy+JrnMY/GijJsNuXrCWjHPQodU7Qfowz6zbMk2LISPLSKSntdsnA1XT+9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q9RFf7MX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729853530;
+	s=mimecast20190719; t=1729853677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=e4r2NzZfPv+Z+xS0CZlcU7ZKIzf4wqWDmUdEIeMKIBk=;
-	b=G+HwVTYD3EDgcZCiuq5Dr77QqaXNNeaNQGrG84BC7zlXBDOATRzuFNobwN9fsrL1nEFEM4
-	3AnbxXaiUyg5fTfaNQBM9oVjsFo+tE27iTI79RcaL/1mAi4XurKzYO4EoAnLf5Y3Kr77Bd
-	5w8F/xv36PwFgOXqF4bFQviqbGAtKaE=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=lX6wkw61ogYPGQv+Og/9qyA9gtBeGLjVgM8dxDOIajo=;
+	b=Q9RFf7MXatjJvG+x24BOLiePfgICinkosSBQPAEpyIu84acX4Zkm6Hv1p+AjtZCakH10Nb
+	sXv1deFwFvrg4H34inG75DPOgJRX8daec3Kyg6bsp+MfQul2M0naEjuNeg1SzWqrirekZC
+	OjQ1/fT12SsLcCyOCSUz6T+EW981AD4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-td_AUsnENBWjIg-Gkk1wCw-1; Fri, 25 Oct 2024 06:52:08 -0400
-X-MC-Unique: td_AUsnENBWjIg-Gkk1wCw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2fb45ca974bso13080041fa.2
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 03:52:08 -0700 (PDT)
+ us-mta-76-HPJPgD7BN7-3J7-LxkDF6g-1; Fri, 25 Oct 2024 06:54:35 -0400
+X-MC-Unique: HPJPgD7BN7-3J7-LxkDF6g-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4314f023f55so14497975e9.2
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 03:54:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729853527; x=1730458327;
+        d=1e100.net; s=20230601; t=1729853674; x=1730458474;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=e4r2NzZfPv+Z+xS0CZlcU7ZKIzf4wqWDmUdEIeMKIBk=;
-        b=Z3Hf+RHLnSKLZh8l9JQ7wMt0Mn39+ENoLdksDSlMK+G7q7BcSqLp9tsHMHRnMbyMIc
-         t9HsdU3xv98LpOJY3nv4JCuY4arhOkVPUE35OpTjoPQQAQLOV6y2vbvjtLMDAGr1jKz/
-         Phd4S7569/KCTjf4iJBd1GMIrhcjlXBDmjbDxsQXsWMQ2ZTtDyevylM4dS3VkNzURrTt
-         f91KGnEFGM9PeTAqF1kfFFiT3iYuHpCNraf2poSQjEp7eFvsViFhulVvPN2DWCawFbNe
-         YJgLw4KvEQcVBDhImkpS7uAB3VpZGcRriGDZfwFrirsazaMHMCvj+3rj+TA276YtaZOp
-         yz/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU0SFR8aDUbl9YJBBlkHisgq2OFv+zdMm29RsTrquBBpEwj+X/btPTyO8NMmtO0G6/N8T0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh8/0e6+/U2dC1D3nSqMx7Y4CkW6Z72kXTAsPUDpBUm5iyG6oZ
-	w0JfzzcbgFyd5TEBImA3UNLPVgFlJe2tHKYRT88j1zfrRIROxfqroSEOlVO6MfuTd081zoksRts
-	hAYeKdFjH/JfaphsVXU6o6Ipuao6p7kxhNMaP4PbC24RBRJO0Dw==
-X-Received: by 2002:a2e:741:0:b0:2fb:5014:8eb9 with SMTP id 38308e7fff4ca-2fc9d2f1a2cmr38426811fa.10.1729853527300;
-        Fri, 25 Oct 2024 03:52:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEcmLZmu7afPuuZ9o9QyvzZjgc+xVg74UVePptJdhAFYX1KPdNcPvjRw2LvDcGh5gFxxydkeQ==
-X-Received: by 2002:a2e:741:0:b0:2fb:5014:8eb9 with SMTP id 38308e7fff4ca-2fc9d2f1a2cmr38426451fa.10.1729853526804;
-        Fri, 25 Oct 2024 03:52:06 -0700 (PDT)
+        bh=lX6wkw61ogYPGQv+Og/9qyA9gtBeGLjVgM8dxDOIajo=;
+        b=BFZZzdeUMjp/Y6mtSjddoUTZHcIT3SPyhCefC8OjvZy+E/e/Vd0O9gSxRHFaH7zaWz
+         XFtFrur7olhBizI+gTJ2TdTO3R0xcNHiVhk3ZlfOcbeHtu2i13ZX9P2MBuceD11OoaWC
+         E2YeJ7RHdu5dZgRoPLu46BjQc81m8yyPRuLsis1J+aPwd9uj83CjgVniesqGRZd/PQ8e
+         BlyO6bEyscSSNrGe+NrHBgCzfs1fVy3bUMGE+Gcw8krESmDWLky83ZL04ofXZ86ib2Bx
+         SrvHJAaCH4/ze8QicyTM9kmW/HuKYS5nzDDAfBKTgqpEOEyKBKp3qydFwj95ybQTiy0E
+         49cg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+XSRKF9XNRDVY67OLyYx0Aeznow8uaAKown9i00rotuKMNnMBlRGO1W3Fv1s5rhcjE0c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPKQR3BbMXELbJiOTn46Z7Ro64aIi5E7sPbHxQ1Ctkg/vMWiSG
+	AzwcdOwwTdK+oLDH5bkVCdDPylHdX6r7U35eZdD3OiUgfDoLHBuS/f98Y8kgrjN0trN0wGjJ1Nz
+	cS5fFd925R2vkHzeRPhXQ7aUQO5tmyFvhPzlMXypnGev3AmreEg==
+X-Received: by 2002:a05:600c:1c07:b0:431:93d8:e1a1 with SMTP id 5b1f17b1804b1-43193d8e71dmr10357235e9.27.1729853674525;
+        Fri, 25 Oct 2024 03:54:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7IVOreW4+B4iSirpxWHeAO6cOJxr4GiTaPS55IIWw1AHwJeNbZt687nEp5ciutpoHBueS4Q==
+X-Received: by 2002:a05:600c:1c07:b0:431:93d8:e1a1 with SMTP id 5b1f17b1804b1-43193d8e71dmr10357085e9.27.1729853674128;
+        Fri, 25 Oct 2024 03:54:34 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c70d:d800:499c:485a:c734:f290? (p200300cbc70dd800499c485ac734f290.dip0.t-ipconnect.de. [2003:cb:c70d:d800:499c:485a:c734:f290])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4318b5431ecsm45473185e9.5.2024.10.25.03.52.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4319360c0besm14204715e9.41.2024.10.25.03.54.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2024 03:52:06 -0700 (PDT)
-Message-ID: <e6ca25ae-52dc-40d0-acc6-fd65bd36d00c@redhat.com>
-Date: Fri, 25 Oct 2024 12:52:05 +0200
+        Fri, 25 Oct 2024 03:54:33 -0700 (PDT)
+Message-ID: <8395194d-6c9d-4324-a475-1b856707a729@redhat.com>
+Date: Fri, 25 Oct 2024 12:54:31 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,9 +83,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/7] s390/physmem_info: query diag500(STORAGE LIMIT) to
- support QEMU/KVM memory devices
-To: Heiko Carstens <hca@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH v2 0/7] virtio-mem: s390 support
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
  linux-doc@vger.kernel.org, kvm@vger.kernel.org,
@@ -93,16 +93,13 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
  Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
  Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
  <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
+ Jonathan Corbet <corbet@lwn.net>
 References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-5-david@redhat.com>
- <20241014184339.10447-E-hca@linux.ibm.com>
- <8131b905c61a7baf4bd09ec4a08e1ace84d36754.camel@linux.ibm.com>
- <20241015152008.7641-P-hca@linux.ibm.com>
+ <20241014185659.10447-H-hca@linux.ibm.com>
+ <20241015095735.189a93a9@p-imbrenda.boeblingen.de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -150,37 +147,55 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241015152008.7641-P-hca@linux.ibm.com>
+In-Reply-To: <20241015095735.189a93a9@p-imbrenda.boeblingen.de.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 15.10.24 17:20, Heiko Carstens wrote:
-> On Tue, Oct 15, 2024 at 11:01:44AM -0400, Eric Farman wrote:
->> On Mon, 2024-10-14 at 20:43 +0200, Heiko Carstens wrote:
->>> On Mon, Oct 14, 2024 at 04:46:16PM +0200, David Hildenbrand wrote:
-> ...
->>> +#define DIAG500_SC_STOR_LIMIT 4
-> ...
->> I like the idea of a defined constant here instead of hardcoded, but maybe it should be placed
->> somewhere in include/uapi so that QEMU can pick it up with update-linux-headers.sh and be in sync
->> with the kernel, instead of just an equivalent definition in [1] ?
+On 15.10.24 09:57, Claudio Imbrenda wrote:
+> On Mon, 14 Oct 2024 20:56:59 +0200
+> Heiko Carstens <hca@linux.ibm.com> wrote:
+> 
+>> On Mon, Oct 14, 2024 at 04:46:12PM +0200, David Hildenbrand wrote:
+>>> Let's finally add s390 support for virtio-mem; my last RFC was sent
+>>> 4 years ago, and a lot changed in the meantime.
+>>>
+>>> The latest QEMU series is available at [1], which contains some more
+>>> details and a usage example on s390 (last patch).
+>>>
+>>> There is not too much in here: The biggest part is querying a new diag(500)
+>>> STORAGE_LIMIT hypercall to obtain the proper "max_physmem_end".
+>>>
+>>> The last two patches are not strictly required but certainly nice-to-have.
+>>>
+>>> Note that -- in contrast to standby memory -- virtio-mem memory must be
+>>> configured to be automatically onlined as soon as hotplugged. The easiest
+>>> approach is using the "memhp_default_state=" kernel parameter or by using
+>>> proper udev rules. More details can be found at [2].
+>>>
+>>> I have reviving+upstreaming a systemd service to handle configuring
+>>> that on my todo list, but for some reason I keep getting distracted ...
+>>>
+>>> I tested various things, including:
+>>>   * Various memory hotplug/hotunplug combinations
+>>>   * Device hotplug/hotunplug
+>>>   * /proc/iomem output
+>>>   * reboot
+>>>   * kexec
+>>>   * kdump: make sure we don't hotplug memory
+>>>
+>>> One remaining work item is kdump support for virtio-mem memory. This will
+>>> be sent out separately once initial support landed.
 >>
->> [1] https://lore.kernel.org/qemu-devel/20241008105455.2302628-8-david@redhat.com/
+>> Besides the open kdump question, which I think is quite important, how
+>> is this supposed to go upstream?
+>>
+>> This could go via s390, however in any case this needs reviews and/or
+>> Acks from kvm folks.
 > 
-> It is already a mess; we have already subcode 3 defined:
-> 
-> #define KVM_S390_VIRTIO_CCW_NOTIFY 3
-> 
-> in
-> 
-> arch/s390/include/uapi/asm/virtio-ccw.h
-> 
-> which for some reason is uapi. But it doesn't make sense to put the
-> new subcode 4 there too. So what is the end result?
-> 
-> Another uapi file? I think resolving this would be a project on its own.
+> we're working on it :)
 
-Agreed, thanks all!
+I'll be sending a v3 later today, and a v1 of kdump support (which 
+involves a bunch of changes to fs/proc/vmcore.c and virtio-mem) separately.
 
 -- 
 Cheers,
