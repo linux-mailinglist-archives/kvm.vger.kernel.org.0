@@ -1,196 +1,162 @@
-Return-Path: <kvm+bounces-29734-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29735-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21699B08CB
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 17:46:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9329E9B0996
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 18:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F12A1C219C1
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:46:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D631C23466
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907E315ADAB;
-	Fri, 25 Oct 2024 15:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7594170854;
+	Fri, 25 Oct 2024 16:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="culC0GUY"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995EC1411E0
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 15:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E957080E;
+	Fri, 25 Oct 2024 16:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729871171; cv=none; b=kuAoZs0B6VVpR1pFpD4XxpbVphYrKZvKhE3TwgQaTaCQudCf8jNlXQKcSXjx3sA9bosWuqhqrO3/vdk/oG32irioT5VBWtyRDVpJY194dCrw6BHKY3/NKk/fzYMZrAhikEOz48o2wL6T2iPC+0fBaERMoarHI7f/UBfa+aSHnJY=
+	t=1729872983; cv=none; b=dshX3Q6cXywyvHHyUzBZH/dr8qnmtegY4FwgDRF1+tGRpI4uqjOKwURyCVeO306wbPDic5SXbzBgZPFgYy62vq+O3iHjGwSGPRoXMqGfteeAbqvAN8E9yAufKwl7S/LXYpfDOXAD2h6FGu+mTB71YmfQxZtAly41AC11u8eaxlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729871171; c=relaxed/simple;
-	bh=E0n7nO+3obEoljEtO63VirXpJr5kVqVzmje2qTj39zw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CvqXamwZDC33J+crifZSKzsk3UM5hCFemev1KxmvcyNpIlHptL0AgGB0PuzrEIcfA7CrpuZfY2BSS27hupc9BSo5aHiXONnO9mkpgoLOlH+Fiimk+fQ1I029qFeCam8RIEVIzz7uri0PXD5rO/XZCswlZFSkANsMSbyoDhruxTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97E6C339;
-	Fri, 25 Oct 2024 08:46:36 -0700 (PDT)
-Received: from arm.com (unknown [10.57.25.65])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62C283F73B;
-	Fri, 25 Oct 2024 08:46:01 -0700 (PDT)
-Date: Fri, 25 Oct 2024 16:45:54 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
-	lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-	nrb@linux.ibm.com, npiggin@gmail.com
-Subject: Re: [RFC kvm-unit-tests PATCH] lib/report: Return pass/fail result
- from report
-Message-ID: <Zxu9MkAob0zVCsYQ@arm.com>
-References: <20241023165347.174745-2-andrew.jones@linux.dev>
+	s=arc-20240116; t=1729872983; c=relaxed/simple;
+	bh=jAyEYdh61XeY7Gsp+z+t8Gb7g67E3e88u1Ybd1z+u8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gTuur95wrjEVQsKF4sOsaXyfnbZgSFbg2ZYOD1pSSudYoxffYfLtYUCemjvt24rkWvMJXYXNmHJASHsNxP8wnWPUlHhbkzHTiEXjC65PoubEeJaGGZztuKuCjbkRiaFuHob9Cnpwiw9kOalg5bMMUNIS06CjrGbSJ//8Cq9n5Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=culC0GUY; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729872981; x=1761408981;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jAyEYdh61XeY7Gsp+z+t8Gb7g67E3e88u1Ybd1z+u8M=;
+  b=culC0GUYLyRb8Nq3agJl2TUYKZ6sq9L8qToZ36/hM6K8WqzWI6BOIQxF
+   S5k6wnLonyd7z3686z+IybVxav94DP7cHmJLu9l/fbdTCOshYnT39+yul
+   TKOuTJ+hJONu0ERiwdSDsTHUw95bkHPWfbpoPKNVNXpTMcbFUz7QFbg5H
+   MJ56zLDVzUcS4X0ToAokogjde310xf07cyJY88HfgXAja9hZVasIBwvq7
+   9M+RIIYn7ILCTWgICHRCckJ8KslC4bI+VQkozzwoohVfgtvu9c7yMpP3I
+   E/PMaMTh0IKDPLyfi2v60tM7tAJ9VniToEBIpvmIJr811WYQp4lzIOORp
+   A==;
+X-CSE-ConnectionGUID: CAbqRnVpS8CmDh4I/r8Gcw==
+X-CSE-MsgGUID: Hwgbh5U1S2mRUKmMDUR/fA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="32407167"
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="32407167"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 09:16:21 -0700
+X-CSE-ConnectionGUID: RpympDO8R2uMpCQDRTAaaA==
+X-CSE-MsgGUID: nKB+BOxNT2izVtoTvjHSvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="111764279"
+Received: from soc-cp83kr3.clients.intel.com (HELO [10.24.8.117]) ([10.24.8.117])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 09:16:20 -0700
+Message-ID: <d0d8a945-1623-448a-b08a-8877464a4531@intel.com>
+Date: Fri, 25 Oct 2024 09:16:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023165347.174745-2-andrew.jones@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 43/58] KVM: x86/pmu: Introduce PMU operator for
+ setting counter overflow
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
+ <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-44-mizhang@google.com>
+Content-Language: en-US
+From: "Chen, Zide" <zide.chen@intel.com>
+In-Reply-To: <20240801045907.4010984-44-mizhang@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Drew,
 
-On Wed, Oct 23, 2024 at 06:53:48PM +0200, Andrew Jones wrote:
-> A nice pattern to use in order to try and maintain parsable reports,
-> but also output unexpected values, is
+
+On 7/31/2024 9:58 PM, Mingwei Zhang wrote:
+> Introduce PMU operator for setting counter overflow. When emulating counter
+> increment, multiple counters could overflow at the same time, i.e., during
+> the execution of the same instruction. In passthrough PMU, having an PMU
+> operator provides convenience to update the PMU global status in one shot
+> with details hidden behind the vendor specific implementation.
+
+Since neither Intel nor AMD does implement this API, this patch should
+be dropped.
+
 > 
->     if (!report(value == expected_value, "my test")) {
->         report_info("failure due to unexpected value (received %d, expected %d)",
->                     value, expected_value);
->     }
-
-This looks like a good idea to me, makes the usage of report() similar to
-the kernel pattern of wrapping an if condition around WARN_ON():
-
-	if (WARN_ON(condition)) {
-		do_stuff()
-	}
-
-Plus, current users are not affected by the change so I see no reason not
-to have the choice.
-
-> 
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > ---
->  lib/libcflat.h |  6 +++---
->  lib/report.c   | 28 +++++++++++++++++++++-------
->  2 files changed, 24 insertions(+), 10 deletions(-)
+>  arch/x86/include/asm/kvm-x86-pmu-ops.h | 1 +
+>  arch/x86/kvm/pmu.h                     | 1 +
+>  arch/x86/kvm/vmx/pmu_intel.c           | 5 +++++
+>  3 files changed, 7 insertions(+)
 > 
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index eec34c3f2710..b4110b9ec91b 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -97,11 +97,11 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
->  extern void report_prefix_push(const char *prefix);
->  extern void report_prefix_pop(void);
->  extern void report_prefix_popn(int n);
-> -extern void report(bool pass, const char *msg_fmt, ...)
-> +extern bool report(bool pass, const char *msg_fmt, ...)
->  		__attribute__((format(printf, 2, 3), nonnull(2)));
-> -extern void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
-> +extern bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
->  		__attribute__((format(printf, 3, 4), nonnull(3)));
-> -extern void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
-> +extern bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
->  		__attribute__((format(printf, 3, 4), nonnull(3)));
->  extern void report_abort(const char *msg_fmt, ...)
->  					__attribute__((format(printf, 1, 2)))
-> diff --git a/lib/report.c b/lib/report.c
-> index 0756e64e6f10..43c0102c1b0e 100644
-> --- a/lib/report.c
-> +++ b/lib/report.c
-> @@ -89,7 +89,7 @@ void report_prefix_popn(int n)
->  	spin_unlock(&lock);
+> diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> index 72ca78df8d2b..bd5b118a5ce5 100644
+> --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> @@ -28,6 +28,7 @@ KVM_X86_PMU_OP_OPTIONAL(passthrough_pmu_msrs)
+>  KVM_X86_PMU_OP_OPTIONAL(save_pmu_context)
+>  KVM_X86_PMU_OP_OPTIONAL(restore_pmu_context)
+>  KVM_X86_PMU_OP_OPTIONAL(incr_counter)
+> +KVM_X86_PMU_OP_OPTIONAL(set_overflow)
+>  
+>  #undef KVM_X86_PMU_OP
+>  #undef KVM_X86_PMU_OP_OPTIONAL
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 325f17673a00..78a7f0c5f3ba 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -45,6 +45,7 @@ struct kvm_pmu_ops {
+>  	void (*save_pmu_context)(struct kvm_vcpu *vcpu);
+>  	void (*restore_pmu_context)(struct kvm_vcpu *vcpu);
+>  	bool (*incr_counter)(struct kvm_pmc *pmc);
+> +	void (*set_overflow)(struct kvm_vcpu *vcpu);
+>  
+>  	const u64 EVENTSEL_EVENT;
+>  	const int MAX_NR_GP_COUNTERS;
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 42af2404bdb9..2d46c911f0b7 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -881,6 +881,10 @@ static void intel_restore_guest_pmu_context(struct kvm_vcpu *vcpu)
+>  	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl_hw);
 >  }
 >  
-> -static void va_report(const char *msg_fmt,
-> +static bool va_report(const char *msg_fmt,
->  		bool pass, bool xfail, bool kfail, bool skip, va_list va)
->  {
->  	const char *prefix = skip ? "SKIP"
-> @@ -114,14 +114,20 @@ static void va_report(const char *msg_fmt,
->  		failures++;
->  
->  	spin_unlock(&lock);
+> +static void intel_set_overflow(struct kvm_vcpu *vcpu)
+> +{
+> +}
 > +
-> +	return pass || xfail;
+>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
+>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
+> @@ -897,6 +901,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>  	.save_pmu_context = intel_save_guest_pmu_context,
+>  	.restore_pmu_context = intel_restore_guest_pmu_context,
+>  	.incr_counter = intel_incr_counter,
+> +	.set_overflow = intel_set_overflow,
+>  	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+>  	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
+>  	.MIN_NR_GP_COUNTERS = 1,
 
-va_report() has 4 boolean parameters that the callers set. 'kfail' can be
-ignored, because all it does is control which variable serves as the
-accumulator for the failure.
-
-I was thinking about the 'skip' parameter - report_skip() sets pass = xfail
-= false, skip = true. Does it matter that va_report() returns false for
-report_skip()? I don't think so (report_skip() returns void), just wanting
-to make sure we've considered all the cases.  Sorry if this looks like
-nitpicking.
-
-Other than that, the patch looks good to me.
-
-Thanks,
-Alex
-
->  }
->  
-> -void report(bool pass, const char *msg_fmt, ...)
-> +bool report(bool pass, const char *msg_fmt, ...)
->  {
->  	va_list va;
-> +	bool ret;
-> +
->  	va_start(va, msg_fmt);
-> -	va_report(msg_fmt, pass, false, false, false, va);
-> +	ret = va_report(msg_fmt, pass, false, false, false, va);
->  	va_end(va);
-> +
-> +	return ret;
->  }
->  
->  void report_pass(const char *msg_fmt, ...)
-> @@ -142,24 +148,32 @@ void report_fail(const char *msg_fmt, ...)
->  	va_end(va);
->  }
->  
-> -void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
-> +bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
->  {
-> +	bool ret;
-> +
->  	va_list va;
->  	va_start(va, msg_fmt);
-> -	va_report(msg_fmt, pass, xfail, false, false, va);
-> +	ret = va_report(msg_fmt, pass, xfail, false, false, va);
->  	va_end(va);
-> +
-> +	return ret;
->  }
->  
->  /*
->   * kfail is known failure. If kfail is true then test will succeed
->   * regardless of pass.
->   */
-> -void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
-> +bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
->  {
-> +	bool ret;
-> +
->  	va_list va;
->  	va_start(va, msg_fmt);
-> -	va_report(msg_fmt, pass, false, kfail, false, va);
-> +	ret = va_report(msg_fmt, pass, false, kfail, false, va);
->  	va_end(va);
-> +
-> +	return ret;
->  }
->  
->  void report_skip(const char *msg_fmt, ...)
-> -- 
-> 2.47.0
-> 
-> 
 
