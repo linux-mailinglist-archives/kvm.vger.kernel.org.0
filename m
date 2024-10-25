@@ -1,137 +1,176 @@
-Return-Path: <kvm+bounces-29707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246E79B03DC
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:21:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ADCE9B03F2
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61372853EE
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 13:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4E301F23E2A
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 13:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5FD52F76;
-	Fri, 25 Oct 2024 13:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xi8t5k/H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D951632C0;
+	Fri, 25 Oct 2024 13:24:51 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7D2212164
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 13:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38E7212185;
+	Fri, 25 Oct 2024 13:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729862485; cv=none; b=ceQFyG9Ilbny7zDQppe/oRD7ifpO/EGFFbFdcm1zRsXvDtJfaOikhm+hYdavrsrNzQ08wCc9JGfXFIoT/lLoymRfGmKcTiM2pgoTmuUW8SWufUsuqM8Dkty5R/0ZX3we5zyuwENSGwEhGrVWaKHCkZS7cYn65BYcyOfeRmDETuw=
+	t=1729862690; cv=none; b=cADULzDp45Fsiet7/EPwucpl0SRkcBFO3ahqMJrSiIwKc0wkgqd3pmPckyCNjnYm8g5mtIdxFjdSIwhohttR4/JFUvGHKjAhqd3f8wxepnqfUnZ/d9La47d/pRnQJkGo+etBY4V2tqluKN1HnQ1K+F91oG+W1Hr90/QvKHsLbYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729862485; c=relaxed/simple;
-	bh=/32HmL7YwBkjAVKTXfU1mVprjlPb8B1ISFkFhMOu8aM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TP2tj2PWa5lt35iYTSItYlFcc8r9yH0OMMTmaC3Niz1LDyJedWpUBfp+4X5AjRFT/GRVDHJ8zYURFP7ruIsOAZg46BX7Ciok5tM2nb5q7bITadWZXPmL5ha93/UoflptHrjTn9/H4LLKyJgtlBIlxHXV8MmUBzfmJockpOMVx7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xi8t5k/H; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-460969c49f2so260621cf.0
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 06:21:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729862482; x=1730467282; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7bTA5XEv/pSAM+W1H3oIEVE2GosaAWU3ljRxi1KlB14=;
-        b=Xi8t5k/Hl+VtKA0i5CAqPvqw+2zTRtgIBL0xwgj1wpRmZqmGMAeDYQoQA2FSjRyjhH
-         DaF2DOZ+hLlzFnwP2G1FP772uAiJYzgf0Pw7YGfVBNrSb1H309LF86ECRvKiJWUfncGp
-         e3WK/6QueuHla+qqVyKec8uFidYLc9ULu9LrC5RIJolNFr1XQqU1nmyK6HHvfD/09emp
-         n+OD0cVyzwTb5Q3GS8pyo5OiIH7rQmWnD/aFVaI2N+Y70thYv9JShrii1fyzlSjo4cXZ
-         O3JoF5qdohsNGYp+w9grnYL8Q1tftV89UYUeGyWbXqlnjiIH5++YycSv6OwT7mg90iBS
-         ujeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729862482; x=1730467282;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7bTA5XEv/pSAM+W1H3oIEVE2GosaAWU3ljRxi1KlB14=;
-        b=UKW1zBxlJRSKrHUOIq9qNOtDo6/DYuuRt9upwXNAr9naapDWPrAgefa38Aq5TX4/oc
-         Q0Uqvs3FpNVoO15bl9ripBenKRD63bdwXE68LX0qCQvt8uiBw0JFLHmw7gOyIUvEJP1q
-         mHqeeHarJFbx/AAibGxQEPV81Kk2fY+uIZrpYA/qoHTLP4esHMqz1krWs7wnIGuoO1d0
-         qCPMcGwcZoJjAvzraluLoUSTArTLpQ+kI/wnTvRrZcG3IWLyBytu9cX5qZrM619cWrzK
-         zDYSnf3qfpu0ZXT5ZWr/Ky9h5KzmXPDSuZC0p03JkZHLvl8zWWRI5GXoeeNlmdS/oQUF
-         v88g==
-X-Forwarded-Encrypted: i=1; AJvYcCW4AN4qFqceDaWLg/WQiW6+9JNW1Ut0hApi+mTbNw9jWpVWT1hPo1sPa8V19MBC+HJ5hVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQK7kH4eI8JLZUNckKfed6qKUiuOlj+Ao5swKhbjG8YDhQRSmL
-	hDiTkfMfyV2oWyjz23BiKlFinqvdpWDk+/I7nZ6CRtl9gZ5OZemdJsPkoyGFkoeoj7KhZOCAlmj
-	xlVICfBsxSqK/wzgVSrasn/gXKzqmAWfcnmKY
-X-Google-Smtp-Source: AGHT+IFLcF2W2NrORj/Xb8SC12qeyC5KVAM9B79QtrQcqFpidlzCS6ayGMpyXO+mm8gBR/NQWaXXOnPJfjuALjSAZEE=
-X-Received: by 2002:a05:622a:152:b0:460:4638:78c0 with SMTP id
- d75a77b69052e-4612eb81fbfmr3022001cf.14.1729862482147; Fri, 25 Oct 2024
- 06:21:22 -0700 (PDT)
+	s=arc-20240116; t=1729862690; c=relaxed/simple;
+	bh=wD6jUuBlvN6RbhnBKl+0OEQCxIdsQrDQgvnBlzR2yBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ATYEES3gt8wvuaaacolEX0dx8QU/6VPjM0CI2aC+a8BrdXjHo/QXkYNJKHOLGKJmMTWnbsYINkxTaUnS+fIrRhWMl8ZHU/cDpEoMxTFdEpkpdCeOtP0jtoldX+4utC1gfO5ToM78RsDbc/gU6Lo8COrRSi68BFuoYasiMlu7A18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E512C339;
+	Fri, 25 Oct 2024 06:25:15 -0700 (PDT)
+Received: from [10.1.36.18] (e122027.cambridge.arm.com [10.1.36.18])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C42393F71E;
+	Fri, 25 Oct 2024 06:24:41 -0700 (PDT)
+Message-ID: <bba3e573-989f-432b-82c9-3f5872563e9f@arm.com>
+Date: Fri, 25 Oct 2024 14:24:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com> <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
-In-Reply-To: <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
-From: Brendan Jackman <jackmanb@google.com>
-Date: Fri, 25 Oct 2024 15:21:11 +0200
-Message-ID: <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr compatible
-To: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexandre Chartre <alexandre.chartre@oracle.com>, Liran Alon <liran.alon@oracle.com>, 
-	Jan Setje-Eilers <jan.setjeeilers@oracle.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>, 
-	Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Michal Hocko <mhocko@kernel.org>, Khalid Aziz <khalid.aziz@oracle.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Junaid Shahid <junaids@google.com>, Ofir Weisse <oweisse@google.com>, 
-	Yosry Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>, 
-	KP Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>, 
-	Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 04/43] arm64: RME: Handle Granule Protection Faults
+ (GPFs)
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-5-steven.price@arm.com> <yq5a8qudmvp6.fsf@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <yq5a8qudmvp6.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hey Boris,
+On 24/10/2024 15:17, Aneesh Kumar K.V wrote:
+> Steven Price <steven.price@arm.com> writes:
+> 
+>> If the host attempts to access granules that have been delegated for use
+>> in a realm these accesses will be caught and will trigger a Granule
+>> Protection Fault (GPF).
+>>
+>> A fault during a page walk signals a bug in the kernel and is handled by
+>> oopsing the kernel. A non-page walk fault could be caused by user space
+>> having access to a page which has been delegated to the kernel and will
+>> trigger a SIGBUS to allow debugging why user space is trying to access a
+>> delegated page.
+>>
+> 
+> A non-page walk fault can also be caused by host kernel trying to access a
+> page which it had delegated before. It would be nice to dump details
+> like FAR in that case. Right now it shows only the below.
 
-On Fri, 25 Oct 2024 at 13:41, Borislav Petkov <bp@alien8.de> wrote:
->
-> On Fri, Jul 12, 2024 at 05:00:19PM +0000, Brendan Jackman wrote:
-> > +/*
-> > + * Can be used for functions which themselves are not strictly noinstr, but
-> > + * may be called from noinstr code.
-> > + */
-> > +#define inline_or_noinstr                                            \
->
-> Hmm, this is confusing. So is it noinstr or is it getting inlined?
+While I agree FAR would be handy, this isn't specific to a GPF.
 
-We don't care if it's getting inlined, which is kinda the point. This
-annotation means "you may call this function from noinstr code". My
-current understanding is that the normal noinstr annotation means
-"this function fundamentally mustn't be instrumented".
+arm64_notify_die() takes the FAR, but in the case of a kernel fault
+ignores it and calls die(). I'm not sure if there's a good reason for it
+not calling die_kernel_fault() instead which would print the FAR. Or
+indeed whether the FAR should be passed instead of the ESR (although
+changing that now would probably be confusing).
 
-So with inline_or_noinstr you get:
+This affects e.g. do_sea(), do_mem_abort() and others too. It might be
+worth sending a patch to improve that behaviour, but I think the
+handling for GPFs of using arm64_notify_die() is correct.
 
-1. "Documentation" that the function itself doesn't have any problem
-with getting traced etc.
-2. Freedom for the compiler to inline or not.
+Thanks,
+Steve
 
-> I'd expect you either always inline the small functions - as you do for some
-> aleady - or mark the others noinstr. But not something in between.
->
-> Why this?
+> [  285.122310] Internal error: Granule Protection Fault not on table walk: 0000000096000068 [#1] PREEMPT SMP               
+> [  285.122427] Modules linked in:                                                                                                                                                
+> [  285.122512] CPU: 1 UID: 0 PID: 217 Comm: kvm-vcpu-0 Not tainted 6.12.0-rc1-00082-g8461d8333829 #42
+> [  285.122656] Hardware name: FVP Base RevC (DT)
+> [  285.122733] pstate: 81400009 (Nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> [  285.122871] pc : clear_page+0x18/0x50
+> [  285.122975] lr : kvm_gmem_get_pfn+0xbc/0x190
+> [  285.123110] sp : ffff800082cef900
+> [  285.123182] x29: ffff800082cef910 x28: 0000000090000000 x27: 0000000090000006
+> .....
+> 
+> -aneesh
+> 
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Include missing "Granule Protection Fault at level -1"
+>> ---
+>>  arch/arm64/mm/fault.c | 31 +++++++++++++++++++++++++------
+>>  1 file changed, 25 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>> index 8b281cf308b3..f9d72a936d48 100644
+>> --- a/arch/arm64/mm/fault.c
+>> +++ b/arch/arm64/mm/fault.c
+>> @@ -804,6 +804,25 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>>  	return 0;
+>>  }
+>>  
+>> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	die_kernel_fault(inf->name, far, esr, regs);
+>> +	return 0;
+>> +}
+>> +
+>> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs))
+>> +		return 0;
+>> +
+>> +	arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
+>> +	return 0;
+>> +}
+>> +
+>>  static const struct fault_info fault_info[] = {
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
+>> @@ -840,12 +859,12 @@ static const struct fault_info fault_info[] = {
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
+>>  	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
+>> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
+>> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level -1" },
+>> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 0" },
+>> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 1" },
+>> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 2" },
+>> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 3" },
+>> +	{ do_gpf,		SIGBUS,  SI_KERNEL,	"Granule Protection Fault not on table walk" },
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
+>>  	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
+>>  	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
+>> -- 
+>> 2.34.1
 
-Overall it's pretty likely I'm wrong about the subtlety of noinstr's
-meaning. And the benefits I listed above are pretty minor. I should
-have looked into this as it would have been an opportunity to reduce
-the patch count of this RFC!
-
-Maybe I'm also forgetting something more important, perhaps Junaid
-will weigh in...
 
