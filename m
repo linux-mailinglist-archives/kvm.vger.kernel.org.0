@@ -1,183 +1,134 @@
-Return-Path: <kvm+bounces-29689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB3239AFA37
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 08:43:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747E59AF9AB
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 08:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9B61F23367
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 06:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A46F92834F8
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 06:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637741B0F03;
-	Fri, 25 Oct 2024 06:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719DC1AAE17;
+	Fri, 25 Oct 2024 06:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLsLHJ6b"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="M3Fp92Mp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9923118C018;
-	Fri, 25 Oct 2024 06:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBDE18BC2A;
+	Fri, 25 Oct 2024 06:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729838592; cv=none; b=FUMqKuRoQIfLf6fogz3UhTIesnq0YPHosa2ZpThOTvIoOmFc8KhUKSZfOyRJz5B9DFMnPZXi+iy0T/OZn6aIqa8UzluxTDas0eH02XG3IwMDuuaNBp3aXORYVTCb6wv/JuWSxMKtF7UylK+/64W+GRkWuvQv8XjhpPcTgxFH6r0=
+	t=1729836815; cv=none; b=U+3EA062kKZvP8s4yr8H60fGySs9RLCS+VYu13c/QLMjeeAEDLOry5PrDXyv/9yBP2BRxbpEhiZJrE7m0mCToQOjsH9eVggJvP9N64VmLtGQEni8cnDpqMbqVYQEAMq+uXbSkcZ0WVaES/eYHdXsQNo8JmqS/DzFxDbaLu8vnX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729838592; c=relaxed/simple;
-	bh=tYWW8T550R8QEZd5gfGCnQaBxuLELI8mHkKVHTwpUMU=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=ZNZepCL1400CxijCjK8MzPMQrKjnQsgiU43NN1lrPhEblQLvtldkfeZb7dqFI1YO8E3D+/gG6Uny66nMYnqL2TsN1uCjcXeAV2sReizbowH3D4aXcKCu8vmgfk/DeEZ/vkivsnIhZAyL02uaH+lYNVIXfr4lHjG2+zSoAlHTl34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLsLHJ6b; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ea8d7341e6so1123888a12.3;
-        Thu, 24 Oct 2024 23:43:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729838589; x=1730443389; darn=vger.kernel.org;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=P47I0gdiUlkn3LmA4ci0Px6PUVaCXe2wtW4m1OPAR8s=;
-        b=fLsLHJ6bW8WRrEt31EroqwA80Ok23bqef280bKa5k2tVKRvVQMUM1+BBvfa9dTFRRv
-         jMJlZva4iNaBG5oPPQGQmYhPL92ZQLHCdaXh8aF4DgG2sflO+0mZO/7S20EZlnqtwsPM
-         2gjjDhAjyQ2polYr9i8OSLx8cTz4k0amYz7KnANFMs9ooWcCY6Qdj1hcBpEpDwozUsoh
-         xsej0RI3GSdQnUaaoTSF/HleFALrtWxDfp8wbmWtCs6m55SanQNjt3bZTyRWAuKdF7BH
-         AEWPKaD4pBS77+XC2MCQRAII3VED8qfjoETG8+xOwH/6l0QNxJxiOatLv9Qt6yb8v1AJ
-         mCEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729838589; x=1730443389;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P47I0gdiUlkn3LmA4ci0Px6PUVaCXe2wtW4m1OPAR8s=;
-        b=PBDqNyLZnhwefTxh04/61B7OBWpDw8Yj6hH+v4y0MK7NxdAsXjmxS1CYkkiFPisxpA
-         GUHTrUlFeau++Me15Yhu1p8PtDHsJrlmsZjT9kaqxV0DsK2IX4TxRZ1lg7lw8eRW3CS3
-         mzHGtOjWQk5OUj5etNa8kZ2yd9RyH80KNLQWobu/NUs8f6Jda8kEYwAHLQwB1BMhQl1P
-         c5tvLb9jKu8bzuHM6jhFLrLqp75nNqZbPTkCioOtCeT80TFQ5q0bqpRNartYkKlM+5kz
-         0aajbbH0pXRzF/67WpYNmh3IEtM8MBl0wJMEVZEraqp9zrDPjKDCmVrLyz1Xvmjep4iK
-         G8ow==
-X-Forwarded-Encrypted: i=1; AJvYcCVt+WaAZQKv0BIhwGmEqR2tzJ9EFCUXofI+XRFi/vfxTMRSJjA6T2Am1Ml9wsX+dvEY50g=@vger.kernel.org, AJvYcCWxcDdD7nQAqb4s73DLpjNnvYEzlOH4SollbBrk9n0QI7tSionYyOrh/x30dLgtrGyK8ow0S1uM5IMzd9Lv@vger.kernel.org
-X-Gm-Message-State: AOJu0YzY1Yp9P37858B0I3K0SBsBVM9xIy3vjU+2tPbaeDXcQve6g0Ti
-	GCPiyegCbdCUtEbxmd6XWwWfrkaGVfV6g8hun8t7cxHwRiSJuRliZyMmMw==
-X-Google-Smtp-Source: AGHT+IFxdZwIFKOQNiOIOKlXyUTiHQUYTmMXDxrzgTed1lrPb/WrWs4hS/ZL7SNSfx+CwmEz3d4d5g==
-X-Received: by 2002:a05:6a21:3a82:b0:1d6:5f3d:4ab7 with SMTP id adf61e73a8af0-1d989b3c990mr5577835637.22.1729838588742;
-        Thu, 24 Oct 2024 23:43:08 -0700 (PDT)
-Received: from dw-tp ([171.76.85.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1f18esm446345b3a.146.2024.10.24.23.43.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 23:43:07 -0700 (PDT)
-From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-To: Gautam Menghani <gautam@linux.ibm.com>, mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: PPC: Book3S HV: Mask off LPCR_MER for a vCPU before running it to avoid spurious interrupts
-In-Reply-To: <20241024173417.95395-1-gautam@linux.ibm.com>
-Date: Fri, 25 Oct 2024 11:37:52 +0530
-Message-ID: <871q04oguf.fsf@gmail.com>
-References: <20241024173417.95395-1-gautam@linux.ibm.com>
+	s=arc-20240116; t=1729836815; c=relaxed/simple;
+	bh=6d0jNOYm8+UX1GI3ORK1fHvZg2kELwsSG52v2C5UXhY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=XpJfaPadzMut+GCOSchaAslbucElZQQfTFyK4Ws50Pfkf9ZYp7OdsNL4R/JlieuFubfLq6QKG7IE8+MGwqEUMMAgNyr4XdpeOONPs+o0SX0Nc6JoOWl3Ze+5OCuESQEElU/ALrGq9f9P/k0n+TczsF9v2ga/W6Xa48V6EvbIbiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=M3Fp92Mp; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=Yqhk9X0Hpv5XLgEFxivgetJ23tlmLhIvDHYvaF3/RF0=; b=M3Fp92MpdZcnNiNxDY5LYNlsfQ
+	IkV4ivBXpPQQRb3Ck3yLPwIJm36djIj9TL9qKmD/XDH9tEQtYFPQ5pQ1MBDYjweS5LOEXo45X+W+W
+	XuUcsZlVdUzZxT02yjYXjUP92vURayFIJZyNhHMoDAzZ6PMapzGiqmnRWFEbDEPsXEk/AEAkBDPy/
+	6za1uQZx/Z5J3OQytaJImBEv5X5h7O6XY9Ha1/cI0wSOPo/EHJFlwUuPeKtdO+Z/jhp3n/mSnyi3l
+	VkzFd3rYSufi9c937pkpMPCKAOSGu8PsMbT4Abnk4wjqduo8ISrlISGdJK1tkVdEr86/BQT8CdEvL
+	kbF4CIbA==;
+Received: from [69.6.35.226] (helo=[127.0.0.1])
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t4DZI-00000008qB8-1qL8;
+	Fri, 25 Oct 2024 06:13:06 +0000
+Date: Fri, 25 Oct 2024 08:13:03 +0200
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: Miguel Luis <miguel.luis@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+ Len Brown <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>,
+ David Woodhouse <dwmw@amazon.co.uk>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ Francesco Lavra <francescolavra.fl@gmail.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v6_6/6=5D_arm64=3A_Use_SYSTEM=5FOF?=
+ =?US-ASCII?Q?F2_PSCI_call_to_power_off_for_hibernate?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZxqmsiXV6ZYTANKY@linux.dev>
+References: <20241019172459.2241939-1-dwmw2@infradead.org> <20241019172459.2241939-7-dwmw2@infradead.org> <23C91005-7304-4312-A5E0-F5E6C05B3209@oracle.com> <ECD0CA58-2C3B-48F3-AF12-95E37CB0FC48@infradead.org> <ZxprcWDe2AXuLhD_@linux.dev> <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org> <ZxqmsiXV6ZYTANKY@linux.dev>
+Message-ID: <627769A8-AF84-47A1-B4F9-5F44C75A8058@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-Gautam Menghani <gautam@linux.ibm.com> writes:
-
-> Mask off the LPCR_MER bit before running a vCPU to ensure that it is not
-> set if there are no pending interrupts. Running a vCPU with LPCR_MER bit
-> set and no pending interrupts results in L2 vCPU getting an infinite flood
-> of spurious interrupts. The 'if check' in kvmhv_run_single_vcpu() sets
-> the LPCR_MER bit if there are pending interrupts.
+On 24 October 2024 21:57:38 CEST, Oliver Upton <oliver=2Eupton@linux=2Edev>=
+ wrote:
+>On Thu, Oct 24, 2024 at 05:56:09PM +0200, David Woodhouse wrote:
+>> On 24 October 2024 17:44:49 CEST, Oliver Upton <oliver=2Eupton@linux=2E=
+dev> wrote:
+>> >IIUC, you're really wanting to 0x0 because there are hypervisors out
+>> >there that violate the final spec and *only* accept this value=2E
+>> >
+>> >That's perfectly fine, but it'd help avoid confusion if the supporting
+>> >comment was a bit more direct:
+>> >
+>> >	/*
+>> >	 * If no hibernate type is specified SYSTEM_OFF2 defaults to
+>> >	 * selecting HIBERNATE_OFF=2E
+>> >	 *
+>> >	 * There are hypervisors in the wild that violate the spec and
+>> >	 * reject calls that explicitly provide a hibernate type=2E For
+>> >	 * compatibility with these nonstandard implementations, pass 0
+>> >	 * as the type=2E
+>> >	 */
+>> >	 if (system_entering_hibernation())
+>> >		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2), 0 , 0, 0);
+>>=20
+>> By the time this makes it into released versions of the guest Linux ker=
+nel, that comment won't be true any more=2E
 >
-> The spurious flood problem can be observed in 2 cases:
-> 1. Crashing the guest while interrupt heavy workload is running
->   a. Start a L2 guest and run an interrupt heavy workload (eg: ipistorm)
->   b. While the workload is running, crash the guest (make sure kdump
->      is configured)
->   c. Any one of the vCPUs of the guest will start getting an infinite
->      flood of spurious interrupts.
+>Then does it even matter? What is the problem you're trying to solve
+>with using a particular value for the hibernate type?
 >
-> 2. Running LTP stress tests in multiple guests at the same time
->    a. Start 4 L2 guests.
->    b. Start running LTP stress tests on all 4 guests at same time.
->    c. In some time, any one/more of the vCPUs of any of the guests will
->       start getting an infinite flood of spurious interrupts.
+>Either the goal of this is to make the PSCI client code compatible with
+>your hypervisor today (and any other implementation based on 'F ALP1') or
+>we don't care and go with whatever value we want=2E
 >
-> The root cause of both the above issues is the same:
-> 1. A NMI is sent to a running vCPU that has LPCR_MER bit set.
-> 2. In the NMI path, all registers are refreshed, i.e, H_GUEST_GET_STATE
->    is called for all the registers.
-> 3. When H_GUEST_GET_STATE is called for lpcr, the vcpu->arch.vcore->lpcr
->    of that vCPU at L1 level gets updated with LPCR_MER set to 1, and this
->    new value is always used whenever that vCPU runs, regardless of whether
->    there was a pending interrupt.
-> 4. Since LPCR_MER is set, the vCPU in L2 always jumps to the external
->    interrupt handler, and this cycle never ends.
+>Even if the comment eventually becomes stale, there is a ton of value in
+>documenting the exact implementation decision being made=2E
 >
-> Fix the spurious flood by making sure a vCPU's LPCR_MER is always masked
-> before running a vCPU.
->
-> Fixes: ec0f6639fa88 ("KVM: PPC: Book3S HV nestedv2: Ensure LPCR_MER bit is passed to the L0")
-> Cc: stable@vger.kernel.org # v6.8+
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
-> V1 -> V2:
-> 1. Mask off the LPCR_MER in vcpu->arch.vcore->lpcr instead of resetting
-> it so that we avoid grabbing vcpu->arch.vcore->lock. (Suggested by
-> Ritesh in an internal review)
 
-Thanks Gautam for addressing the review comment. But let me improve the
-changelog a little to make it more accurate for others too.
+Eventually it won't matter and we can go with whatever value we want=2E Bu=
+t yes, the goal is to be compatible with the hypervisor *today* until it ca=
+tches up the changes to the final versions of the spec=2E I didn't spend mu=
+ch time overthinking the comment=2E What was it=2E=2E=2E=2E
 
-Removed the macro which was silently clearing LPCR_MER bit from vcore->lpcr
-and instead just mask it off while sending it to kvmhv_run_single_vcpu().
-Added an inline comment describing the reason to avoid anyone tipping
-it over. - (suggested ...)
+	/*
+	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
+	 * and is supported by hypervisors implementing an earlier version
+	 * of the pSCI v1=2E3 spec=2E
+	 */
 
-
-Yes, that would also mean that no need of taking any vcore lock since we
-are not modifying any of the vcore state variables which came up in the
-internal review discussion.
-Having said that it will be good to document the usage of vcore->lock
-above the struct kvmppc_vcore definition. Because it isn't obvious of
-when all it should be taken and/or what all it protects?
-
->
->  arch/powerpc/kvm/book3s_hv.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 8f7d7e37bc8c..b8701b5dde50 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -5089,9 +5089,19 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
->  
->  	do {
->  		accumulate_time(vcpu, &vcpu->arch.guest_entry);
-> +		/*
-> +		 * L1's copy of L2's lpcr (vcpu->arch.vcore->lpcr) can get its MER bit
-> +		 * unexpectedly set - for e.g. during NMI handling when all register
-> +		 * states are synchronized from L0 to L1. L1 needs to inform L0 about
-> +		 * MER=1 only when there are pending external interrupts.
-> +		 * kvmhv_run_single_vcpu() anyway sets MER bit if there are pending
-> +		 * external interrupts. Hence, mask off MER bit when passing vcore->lpcr
-> +		 * here as otherwise it may generate spurious interrupts in L2 KVM
-> +		 * causing an endless loop, which results in L2 guest getting hung.
-> +		 */
-
-Thanks for describing this inline.
-
->  		if (cpu_has_feature(CPU_FTR_ARCH_300))
->  			r = kvmhv_run_single_vcpu(vcpu, ~(u64)0,
-> -						  vcpu->arch.vcore->lpcr);
-> +						  vcpu->arch.vcore->lpcr & ~LPCR_MER);
-
-While still at it - 
-I too like mpe suggestion to clear the LPCR_MER bit at one place
-itself within kvmhv_run_single_vcpu(). 
-
->  		else
->  			r = kvmppc_run_vcpu(vcpu);
->  
-> -- 
-> 2.47.0
-
--ritesh
+That seems to cover it just fine, I think=2E
 
