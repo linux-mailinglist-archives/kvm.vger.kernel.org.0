@@ -1,191 +1,196 @@
-Return-Path: <kvm+bounces-29732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B8CF9B07CD
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 17:19:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21699B08CB
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 17:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08D09B29220
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:18:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F12A1C219C1
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 15:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7110121F4B9;
-	Fri, 25 Oct 2024 15:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Py6SXWnR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907E315ADAB;
+	Fri, 25 Oct 2024 15:46:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB1E2064E6
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 15:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995EC1411E0
+	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 15:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729869207; cv=none; b=dnwd/b0nG2vu5lFm0yVnSeoOERxdI2z/hndRG2SBrxKjfLPNxnYGzBFxQasCRSFsFxDIXGja4uA8C5w2zwmmWW2lQEwNPjLBHZWlU8lsZTc9IHjjmiLWcI2o8337t5iBEQQpRmdGeK8TiQg4fk05f2DE50T972u9sjm42zMiyEY=
+	t=1729871171; cv=none; b=kuAoZs0B6VVpR1pFpD4XxpbVphYrKZvKhE3TwgQaTaCQudCf8jNlXQKcSXjx3sA9bosWuqhqrO3/vdk/oG32irioT5VBWtyRDVpJY194dCrw6BHKY3/NKk/fzYMZrAhikEOz48o2wL6T2iPC+0fBaERMoarHI7f/UBfa+aSHnJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729869207; c=relaxed/simple;
-	bh=l8Vke+v1qJcY3Kdt2qKC4wrsbTNgJAV880fY1X1hrJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cqFQE4PRmdS3oTAF48hT4X1yqygG0LoMckAe4SUyZ2CucNhXWyjxjHHqKQyXq97D0W02DVB2f9jSYafxX60mPFqq+ZWlpEg0t5GnD034A3qnmBD43akcHgU1G6MJPutcNqDhHWlAUNU0gXoxifQAojgLv6wprciimH5IeEdwt5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Py6SXWnR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729869204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=duV64aDOzPCg70Erai+k0MR4CZFFfLJs/Tny3PQhGqo=;
-	b=Py6SXWnRRaYj5YfdQ32q1Yz4tx1KceUdfrsMSo9rXb1hCRYtJuxPMeU8ELBtJ32Aby/wK/
-	mhlU3WLXKkd5ykcpAKH66baagvhntNHGedC+8wnLT5i+WVsKHJCChIoKylnhv0UHfOpJHn
-	o6afDZvZNqmL17RURTtHktZCkTVDDUw=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-_q3EKHFQNEmGt7K_9EZzAQ-1; Fri,
- 25 Oct 2024 11:13:19 -0400
-X-MC-Unique: _q3EKHFQNEmGt7K_9EZzAQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 750F61956096;
-	Fri, 25 Oct 2024 15:13:17 +0000 (UTC)
-Received: from t14s.redhat.com (unknown [10.22.65.27])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 27021300018D;
-	Fri, 25 Oct 2024 15:13:08 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-s390@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org,
-	David Hildenbrand <david@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Baoquan He <bhe@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>,
-	Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v1 11/11] s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
-Date: Fri, 25 Oct 2024 17:11:33 +0200
-Message-ID: <20241025151134.1275575-12-david@redhat.com>
-In-Reply-To: <20241025151134.1275575-1-david@redhat.com>
-References: <20241025151134.1275575-1-david@redhat.com>
+	s=arc-20240116; t=1729871171; c=relaxed/simple;
+	bh=E0n7nO+3obEoljEtO63VirXpJr5kVqVzmje2qTj39zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CvqXamwZDC33J+crifZSKzsk3UM5hCFemev1KxmvcyNpIlHptL0AgGB0PuzrEIcfA7CrpuZfY2BSS27hupc9BSo5aHiXONnO9mkpgoLOlH+Fiimk+fQ1I029qFeCam8RIEVIzz7uri0PXD5rO/XZCswlZFSkANsMSbyoDhruxTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97E6C339;
+	Fri, 25 Oct 2024 08:46:36 -0700 (PDT)
+Received: from arm.com (unknown [10.57.25.65])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62C283F73B;
+	Fri, 25 Oct 2024 08:46:01 -0700 (PDT)
+Date: Fri, 25 Oct 2024 16:45:54 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
+	lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com, npiggin@gmail.com
+Subject: Re: [RFC kvm-unit-tests PATCH] lib/report: Return pass/fail result
+ from report
+Message-ID: <Zxu9MkAob0zVCsYQ@arm.com>
+References: <20241023165347.174745-2-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023165347.174745-2-andrew.jones@linux.dev>
 
-Let's add support for including virtio-mem device RAM in the crash dump,
-setting NEED_PROC_VMCORE_DEVICE_RAM, and implementing
-elfcorehdr_fill_device_ram_ptload_elf64().
+Hi Drew,
 
-To avoid code duplication, factor out the code to fill a PT_LOAD entry.
+On Wed, Oct 23, 2024 at 06:53:48PM +0200, Andrew Jones wrote:
+> A nice pattern to use in order to try and maintain parsable reports,
+> but also output unexpected values, is
+> 
+>     if (!report(value == expected_value, "my test")) {
+>         report_info("failure due to unexpected value (received %d, expected %d)",
+>                     value, expected_value);
+>     }
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/Kconfig             |  1 +
- arch/s390/kernel/crash_dump.c | 39 ++++++++++++++++++++++++++++-------
- 2 files changed, 32 insertions(+), 8 deletions(-)
+This looks like a good idea to me, makes the usage of report() similar to
+the kernel pattern of wrapping an if condition around WARN_ON():
 
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index d339fe4fdedf..d80450d957a9 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -230,6 +230,7 @@ config S390
- 	select MODULES_USE_ELF_RELA
- 	select NEED_DMA_MAP_STATE	if PCI
- 	select NEED_PER_CPU_EMBED_FIRST_CHUNK
-+	select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
- 	select NEED_SG_DMA_LENGTH	if PCI
- 	select OLD_SIGACTION
- 	select OLD_SIGSUSPEND3
-diff --git a/arch/s390/kernel/crash_dump.c b/arch/s390/kernel/crash_dump.c
-index edae13416196..97b9e71b734d 100644
---- a/arch/s390/kernel/crash_dump.c
-+++ b/arch/s390/kernel/crash_dump.c
-@@ -497,6 +497,19 @@ static int get_mem_chunk_cnt(void)
- 	return cnt;
- }
- 
-+static void fill_ptload(Elf64_Phdr *phdr, unsigned long paddr,
-+		unsigned long vaddr, unsigned long size)
-+{
-+	phdr->p_type = PT_LOAD;
-+	phdr->p_vaddr = vaddr;
-+	phdr->p_offset = paddr;
-+	phdr->p_paddr = paddr;
-+	phdr->p_filesz = size;
-+	phdr->p_memsz = size;
-+	phdr->p_flags = PF_R | PF_W | PF_X;
-+	phdr->p_align = PAGE_SIZE;
-+}
-+
- /*
-  * Initialize ELF loads (new kernel)
-  */
-@@ -509,14 +522,8 @@ static void loads_init(Elf64_Phdr *phdr, bool os_info_has_vm)
- 	if (os_info_has_vm)
- 		old_identity_base = os_info_old_value(OS_INFO_IDENTITY_BASE);
- 	for_each_physmem_range(idx, &oldmem_type, &start, &end) {
--		phdr->p_type = PT_LOAD;
--		phdr->p_vaddr = old_identity_base + start;
--		phdr->p_offset = start;
--		phdr->p_paddr = start;
--		phdr->p_filesz = end - start;
--		phdr->p_memsz = end - start;
--		phdr->p_flags = PF_R | PF_W | PF_X;
--		phdr->p_align = PAGE_SIZE;
-+		fill_ptload(phdr, start, old_identity_base + start,
-+			    end - start);
- 		phdr++;
- 	}
- }
-@@ -526,6 +533,22 @@ static bool os_info_has_vm(void)
- 	return os_info_old_value(OS_INFO_KASLR_OFFSET);
- }
- 
-+#ifdef CONFIG_PROC_VMCORE_DEVICE_RAM
-+/*
-+ * Fill PT_LOAD for a physical memory range owned by a device and detected by
-+ * its device driver.
-+ */
-+void elfcorehdr_fill_device_ram_ptload_elf64(Elf64_Phdr *phdr,
-+		unsigned long long paddr, unsigned long long size)
-+{
-+	unsigned long old_identity_base = 0;
-+
-+	if (os_info_has_vm())
-+		old_identity_base = os_info_old_value(OS_INFO_IDENTITY_BASE);
-+	fill_ptload(phdr, paddr, old_identity_base + paddr, size);
-+}
-+#endif
-+
- /*
-  * Prepare PT_LOAD type program header for kernel image region
-  */
--- 
-2.46.1
+	if (WARN_ON(condition)) {
+		do_stuff()
+	}
 
+Plus, current users are not affected by the change so I see no reason not
+to have the choice.
+
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  lib/libcflat.h |  6 +++---
+>  lib/report.c   | 28 +++++++++++++++++++++-------
+>  2 files changed, 24 insertions(+), 10 deletions(-)
+> 
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index eec34c3f2710..b4110b9ec91b 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -97,11 +97,11 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
+>  extern void report_prefix_push(const char *prefix);
+>  extern void report_prefix_pop(void);
+>  extern void report_prefix_popn(int n);
+> -extern void report(bool pass, const char *msg_fmt, ...)
+> +extern bool report(bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 2, 3), nonnull(2)));
+> -extern void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+> +extern bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 3, 4), nonnull(3)));
+> -extern void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+> +extern bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 3, 4), nonnull(3)));
+>  extern void report_abort(const char *msg_fmt, ...)
+>  					__attribute__((format(printf, 1, 2)))
+> diff --git a/lib/report.c b/lib/report.c
+> index 0756e64e6f10..43c0102c1b0e 100644
+> --- a/lib/report.c
+> +++ b/lib/report.c
+> @@ -89,7 +89,7 @@ void report_prefix_popn(int n)
+>  	spin_unlock(&lock);
+>  }
+>  
+> -static void va_report(const char *msg_fmt,
+> +static bool va_report(const char *msg_fmt,
+>  		bool pass, bool xfail, bool kfail, bool skip, va_list va)
+>  {
+>  	const char *prefix = skip ? "SKIP"
+> @@ -114,14 +114,20 @@ static void va_report(const char *msg_fmt,
+>  		failures++;
+>  
+>  	spin_unlock(&lock);
+> +
+> +	return pass || xfail;
+
+va_report() has 4 boolean parameters that the callers set. 'kfail' can be
+ignored, because all it does is control which variable serves as the
+accumulator for the failure.
+
+I was thinking about the 'skip' parameter - report_skip() sets pass = xfail
+= false, skip = true. Does it matter that va_report() returns false for
+report_skip()? I don't think so (report_skip() returns void), just wanting
+to make sure we've considered all the cases.  Sorry if this looks like
+nitpicking.
+
+Other than that, the patch looks good to me.
+
+Thanks,
+Alex
+
+>  }
+>  
+> -void report(bool pass, const char *msg_fmt, ...)
+> +bool report(bool pass, const char *msg_fmt, ...)
+>  {
+>  	va_list va;
+> +	bool ret;
+> +
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, false, false, false, va);
+> +	ret = va_report(msg_fmt, pass, false, false, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  void report_pass(const char *msg_fmt, ...)
+> @@ -142,24 +148,32 @@ void report_fail(const char *msg_fmt, ...)
+>  	va_end(va);
+>  }
+>  
+> -void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+> +bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>  {
+> +	bool ret;
+> +
+>  	va_list va;
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, xfail, false, false, va);
+> +	ret = va_report(msg_fmt, pass, xfail, false, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  /*
+>   * kfail is known failure. If kfail is true then test will succeed
+>   * regardless of pass.
+>   */
+> -void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+> +bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+>  {
+> +	bool ret;
+> +
+>  	va_list va;
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, false, kfail, false, va);
+> +	ret = va_report(msg_fmt, pass, false, kfail, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  void report_skip(const char *msg_fmt, ...)
+> -- 
+> 2.47.0
+> 
+> 
 
