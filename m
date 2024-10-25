@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-29718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090329B0577
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:17:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631F19B057C
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 16:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DD51F24A72
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:17:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B08F1F24B8A
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2024 14:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5086920D510;
-	Fri, 25 Oct 2024 14:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A73420D508;
+	Fri, 25 Oct 2024 14:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cpy55fY5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9r6rA0a"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2761FB8B0
-	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 14:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F16F209F3D
+	for <kvm@vger.kernel.org>; Fri, 25 Oct 2024 14:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729865760; cv=none; b=KPVrA9bDksDyujDMtztM1ZD7xkxVo2lTuz3aK7JKxZuKNDgHfirgUGPoCY2mEUDZeaiw8j+pqCU9K6+O83b4FVvaW0CNCrpdVKUonb2EE5wpvIQZ5PI2IlpJFoQN9dOiMkMNkWxADoOTjh36+aSrKqUvz9WqQhUhnGmbRb1VP+M=
+	t=1729865769; cv=none; b=Ry0q8XkcxmfmychI5lHBbXEyeoPlIrM5lT/+s6eHm7F6LZgYALtTKzK/ncQX2B+9/14GgTlPd29wK4IKBMJPXbqbgqcWG9qBFvxPV3W5QkkT4byX1xtPxHR8Q25U2hCt7eZXVHfSQ044pmWO0H3taZ66QI16HPhidysbTjj1D1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729865760; c=relaxed/simple;
-	bh=2GXCUlyOi24cr84KtLR76IrFQ4bDh/2Fz1VgOJWs5Ks=;
+	s=arc-20240116; t=1729865769; c=relaxed/simple;
+	bh=rYhwBK9SCZ9zfJJywiKfESHUTBEUEMFB3Y18DVCgEr8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kZE8+4QvPAozb2Z9EsYZ5UiUECNYz84oTuhmcsOrbAVmz27nTNJ4iqGn01LVWVJaSq2FUXv6JdEZZ8GhLt7jGFL5h1+l1K9aNl6Y7wsnRYhaAPKkyMCP/YnHfgnBS7AXUuc7AA3mU3RxjUgjpqlURokHT8tA3Wh2PTPrAsdDb0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cpy55fY5; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=n2vtixamgVhVIMs2ksq5Ez0AJT/VelwNiK3LVTxYcn2kK5tzxszJ2+gh6C5XS4BgmDZchgfxRmnlp9REv/zXtdO8OrkC4W8oTHoPG438CWg1ZBPDRySi6H6h6F9qoKPdfySQjnEINz/2hy5CEDov3p1NusrUz7do1LmLtsqJBY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C9r6rA0a; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729865757;
+	s=mimecast20190719; t=1729865766;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=minQPvjcAw7BmTU59AI15v5UYV4aItz4WqTTQMtatbA=;
-	b=Cpy55fY5LI2w/vkgUGLC2Yg9qDCeAoy6mlb6SiIYbrtEy6pIIAeEsniwQPQnhqmozs2zlB
-	ih4L2iSoMpHR07vKdGw60oxI52JI2yyeRYIiUX6zplGKR/jub0v5ERXm66/jHbQ0L53YHX
-	y16COZyQ1BuMHzA2dfL5Bw/o6uWqoU8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=RqrSCL9SnqQxdMhiUeTqL0vv0HNcmyIpWy8EeAUhBAs=;
+	b=C9r6rA0aoWWpbjb8Ba3OVDYB0V8tBX+mamaKMmGG9SDO87KpbGMXUxNh28nH+RHcTd3ZZQ
+	xPp8HH6K72/NXBIVqtFg9kk3IvXR6k/tqODMQPv0woV0dP4Kxd47fH2FTsjf/ge8sdEKrB
+	qVauuuVoXGvRUZFCO98eeCum4rkHNXU=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-cIntWAoSP6e3AMrL0U5dWA-1; Fri,
- 25 Oct 2024 10:15:54 -0400
-X-MC-Unique: cIntWAoSP6e3AMrL0U5dWA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-QVg6coorOeq0mXJ05YLkIw-1; Fri,
+ 25 Oct 2024 10:16:03 -0400
+X-MC-Unique: QVg6coorOeq0mXJ05YLkIw-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8804419560B5;
-	Fri, 25 Oct 2024 14:15:50 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CF7E1955F3F;
+	Fri, 25 Oct 2024 14:15:58 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.22.65.27])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2754819560A2;
-	Fri, 25 Oct 2024 14:15:42 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2459119560A2;
+	Fri, 25 Oct 2024 14:15:50 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -79,11 +79,10 @@ Cc: linux-mm@kvack.org,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	Eric Farman <farman@linux.ibm.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Mario Casquero <mcasquer@redhat.com>
-Subject: [PATCH v3 6/7] s390/sparsemem: reduce section size to 128 MiB
-Date: Fri, 25 Oct 2024 16:14:51 +0200
-Message-ID: <20241025141453.1210600-7-david@redhat.com>
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH v3 7/7] s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA
+Date: Fri, 25 Oct 2024 16:14:52 +0200
+Message-ID: <20241025141453.1210600-8-david@redhat.com>
 In-Reply-To: <20241025141453.1210600-1-david@redhat.com>
 References: <20241025141453.1210600-1-david@redhat.com>
 Precedence: bulk
@@ -95,53 +94,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Ever since commit 421c175c4d609 ("[S390] Add support for memory hot-add.")
-we've been using a section size of 256 MiB on s390 and 32 MiB on s390.
-Before that, we were using a section size of 32 MiB on both
-architectures.
+virtio-mem uses memory_add_physaddr_to_nid() to determine the NID to use
+for memory it adds.
 
-Now that we have a new mechanism to expose additional memory to a VM --
-virtio-mem -- reduce the section size to 128 MiB to allow for more
-flexibility and reduce the metadata overhead when dealing with hot(un)plug
-granularity smaller than 256 MiB.
+We currently fallback to the dummy implementation in mm/numa.c with
+CONFIG_NUMA, which will end up triggering an undesired pr_info_once():
 
-128 MiB has been used by x86-64 since the very beginning. arm64 with 4k
-base pages switched to 128 MiB as well: it's just big enough on these
-architectures to allows for using a huge page (2 MiB) in the vmemmap in
-sane setups with sizeof(struct page) == 64 bytes and a huge page mapping
-in the direct mapping, while still allowing for small hot(un)plug
-granularity.
+	Unknown online node for memory at 0x100000000, assuming node 0
 
-For s390, we could even switch to a 64 MiB section size, as our huge page
-size is 1 MiB: but the smaller the section size, the more sections we'll
-have to manage especially on bigger machines. Making it consistent with
-x86-64 and arm64 feels like the right thing for now.
+On s390, we map all cpus and memory to node 0, so let's add a simple
+memory_add_physaddr_to_nid() implementation that does exactly that,
+but without complaining.
 
-Note that the smallest memory hot(un)plug granularity is also limited by
-the memory block size, determined by extracting the memory increment
-size from SCLP. Under QEMU/KVM, implementing virtio-mem, we expose 0;
-therefore, we'll end up with a memory block size of 128 MiB with a
-128 MiB section size.
-
-Tested-by: Mario Casquero <mcasquer@redhat.com>
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- arch/s390/include/asm/sparsemem.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/s390/include/asm/sparsemem.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/arch/s390/include/asm/sparsemem.h b/arch/s390/include/asm/sparsemem.h
-index c549893602ea..ff628c50afac 100644
+index ff628c50afac..6377b7ea8a40 100644
 --- a/arch/s390/include/asm/sparsemem.h
 +++ b/arch/s390/include/asm/sparsemem.h
-@@ -2,7 +2,7 @@
- #ifndef _ASM_S390_SPARSEMEM_H
- #define _ASM_S390_SPARSEMEM_H
- 
--#define SECTION_SIZE_BITS	28
-+#define SECTION_SIZE_BITS	27
+@@ -5,4 +5,12 @@
+ #define SECTION_SIZE_BITS	27
  #define MAX_PHYSMEM_BITS	CONFIG_MAX_PHYSMEM_BITS
  
++#ifdef CONFIG_NUMA
++static inline int memory_add_physaddr_to_nid(u64 addr)
++{
++	return 0;
++}
++#define memory_add_physaddr_to_nid memory_add_physaddr_to_nid
++#endif /* CONFIG_NUMA */
++
  #endif /* _ASM_S390_SPARSEMEM_H */
 -- 
 2.46.1
