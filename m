@@ -1,797 +1,227 @@
-Return-Path: <kvm+bounces-29752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA3419B19BC
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 18:18:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A6AA9B1ABA
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 22:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9A3D282292
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 16:18:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DCFD1F21C69
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 20:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044FB1386B4;
-	Sat, 26 Oct 2024 16:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93221187850;
+	Sat, 26 Oct 2024 20:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ds9iOWH2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0EwPZa0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9AD1D278C
-	for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 16:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417C718E37D
+	for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 20:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729959511; cv=none; b=RzOw1R/tLfFgsZlrHlB+vMKrn44gkQBYn25/jykG4tl7QXmfluw6Tx2kca7cff2InHJ3h4495rYBB8MLdcuZiXMTpHm5a9INEqww/wosxdPV4DhVOSuGWMhTemHgzmb0PMiJIVNNCcywNglU++0LwWlc4B+owUspT7jNH5ANyJo=
+	t=1729974368; cv=none; b=gt1tFtk5eP0c5rtAqADaL171wH0Xmz1rNeURt5Sy9eugE+EgySw5u8jtv0e2TlZ15k/G+p9uo4X8dGJn56JqvFmSlYJn9i+QdTSjCBr8NCcSReM0Ztzv7754b2TZobHLG6N0h/u4zStSbzQ/3PVcF9P8ny3Q+iJn6m9XxZTzku0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729959511; c=relaxed/simple;
-	bh=bCTMv4sl/cvJf9tJ7nCOSfZ6a4rooWY+eiMp8UagDCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gW/cJFEsWkoPKaSq9wOSu2mohMnGgJ942n+kemYpnqPB/BgMNd990YgoGBFK0JMisMEykji/l6jAyLNk+z7v3GxYoi9+oTP7hvzzAOltKSWK6nyWvg/WvT8fMTV611T9IW7GN1jB2pGd/pFRT4vtdKk5mVainTFPA53CQuZhDCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ds9iOWH2; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7203c431f93so2393864b3a.1
-        for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 09:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729959506; x=1730564306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T0smmCl2Pl9lYuSwhonRnWZqPkBcB1aJnBGothIWogQ=;
-        b=Ds9iOWH2p/REbaBJ1w6kkBCIBtNGaruS3G/UiPxCtj3jj3IrbUMzWu7qrjWsN9r2ez
-         oqLiW35EAxk9RjUv4xakiCTz5gM/LMgZjzFl9h5YW4WYy+vMONGPCc3d7FZ/rnpOx0j2
-         Ve0eLl8U+zRoTspPReWa2cNT5AxNctIlf6CwMNWdLc3c5etBe9y5BVwLgDGlmmCWdUXX
-         NsgaGxMKDfVjf4nEJGtEedjl1ap+UZsRnNKDSbgNbKU4A3kyFeCUM1ftU5DzFfl2KDEE
-         5w3anPMC7MIC4JHsaqEs5/XcM+ivpQui6tden0b0GqRezDZUvOEjI8Gp58EE7FqTmOQn
-         PcuA==
+	s=arc-20240116; t=1729974368; c=relaxed/simple;
+	bh=tUAUvQ737sodN9yK5aQGONrT7W7Or4tB2oyzGkwlZQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mPJ13yFzWV35643fLd+TYptxS469eQOwYFLh7zxpTDjbg5/ucgjUoaNjHZmehpfqNpftlQOJ4/rvHSXaSFlP5FUyquECVjzxJrcLuzfNhzWq5mXyHGMa0u/+FcCXvdAid2rK1F77y31YUPy8DMkRL9OeoWC25+oc765VdZgZ1Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W0EwPZa0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729974365;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8ILgF2ANT9OZDmDrUe3BvutpFI6Z0i+T3Y7sxTWoDZw=;
+	b=W0EwPZa0PllVW4W0lMoRw4uGuPynigAo4CW8mf1jEafXGaj4L559N2UPyzCSCaWtmfC4Db
+	d/WtXIWckZIqh22w3RMJu5cBwi3hLwEGpqd+lCTjodDoPjbwc3oCTZlyLBchTcmYYRBPzT
+	7oIdCKlWgunPNALnHJAiV5x84/AM5V8=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-103-dHZdroCwM-G5jBzqAix_xA-1; Sat, 26 Oct 2024 16:26:03 -0400
+X-MC-Unique: dHZdroCwM-G5jBzqAix_xA-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e4ece7221so3094464b3a.0
+        for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 13:26:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729959506; x=1730564306;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T0smmCl2Pl9lYuSwhonRnWZqPkBcB1aJnBGothIWogQ=;
-        b=xJZL3sojoPmkuxwCATI9ehS2bnSB5GEtIJWjZEt3UTQZ+Cfnl3wMXmGqeYZYqUBY6a
-         MbzEaxP7iXOKNGmi7t9tvMe/dwKek9YYqFTdzV9h4eUzL6eRBcX9BmAf6WpaXTOgx57F
-         x+pskAdSdIqGzs53cy/iGTnU+WyYKGhjO646U0CWPxD8pMuU7S7ruZOz619/TY7A9TFC
-         bUJpaLzTrMjA11HG1QkBBVm4uibCo2hOPmmlkBjsPr9SVE//lWeamIC+/3wXhROrPNlo
-         lOxfTBN6tPCjEg7I+fyezbD3f8Rj/PojBYxY0XcW8XgdEk5ZhBlfPxHH21Dh9mL97t4r
-         g4KA==
-X-Gm-Message-State: AOJu0YzDqdDPzzNYj4j+tA5OdAeC6rTYP1PPohBxLG2IMpTNX56fu10S
-	VK9GlQBdxxElq6cjHuVhhK5OTc20+DcfHPFyyYEUfUUxidTab4H4htewe5ur
-X-Google-Smtp-Source: AGHT+IF54vghMgTd/7p1j23WzVQMVZLs+gsvV+uemtll42vrtNOCvSF5dH+1jXhArYOssvGbGdz+vg==
-X-Received: by 2002:a05:6a20:9e06:b0:1d9:6e67:de83 with SMTP id adf61e73a8af0-1d9a83b04f4mr4535871637.1.1729959506080;
-        Sat, 26 Oct 2024 09:18:26 -0700 (PDT)
-Received: from JRT-PC.. ([202.166.44.78])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1fe53sm2904317b3a.162.2024.10.26.09.18.24
+        d=1e100.net; s=20230601; t=1729974363; x=1730579163;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ILgF2ANT9OZDmDrUe3BvutpFI6Z0i+T3Y7sxTWoDZw=;
+        b=AhC7XWUZ/3/MyjB94XSzVDpZqk6LFFygFFlRlnjJYuoRep90EG9Py4Gff5JRHotGWL
+         6YcjsAjnGmdjnJSg+m0QbMwhcFNTI0jKq/NFZJNJ2ER6dC3DqWTThGOYiBCNhdclgkM6
+         J1YzD2HhzEvEimtPuAFnHwspdEhg8qUtAF1us+ZsMEr5V5YjccevfZBJ7GjqTeAwH53w
+         758JfjsHLRoxCz71NkWf8gvVW99X4Ig7+kmcP1vz7Svl4pyqT4rlnrv02+NJsp34sPZg
+         RyKKZpPg05jO5cTIFQXYrLI9KXETBzeAzFJ3c1BpmKcw/r+RE+GF1cimj/035qodqe/M
+         4utw==
+X-Forwarded-Encrypted: i=1; AJvYcCW7gDfcDeXc3oNRJeEndNhrrN6W/AsnAvc6woZ4DwaOoUsh5CNOlC2syn6dDbNZQsNoh0U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyENotWW/hlRflcQFHO6xwYvGLX5s2knQ36CQvYkxA95cbWrvWu
+	M+RCqSSlImkwr5rvn5xUVjny3ZQvLtsKn2fxvgfUDTFqhztJqC1y19YWg83dP+cf7CTeuIJ4wsW
+	vaYr1U7fsLMeHQh41d+nvbOmghJH8dsYBDrV/QiSTSzgWomooNA==
+X-Received: by 2002:a05:6a21:394b:b0:1d9:3acf:8bdd with SMTP id adf61e73a8af0-1d9a767bdfamr5925529637.22.1729974362654;
+        Sat, 26 Oct 2024 13:26:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwP/m05oeFk9b8sbVzI0tK+++7zBHiaxMX3MviGhXhL+kZBBndL9iS5Tpoq327xlI5FsMfmw==
+X-Received: by 2002:a05:6a21:394b:b0:1d9:3acf:8bdd with SMTP id adf61e73a8af0-1d9a767bdfamr5925511637.22.1729974362246;
+        Sat, 26 Oct 2024 13:26:02 -0700 (PDT)
+Received: from localhost (ip98-179-76-110.ph.ph.cox.net. [98.179.76.110])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205791dda2sm3081517b3a.42.2024.10.26.13.26.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Oct 2024 09:18:25 -0700 (PDT)
-From: James Raphael Tiovalen <jamestiotio@gmail.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: andrew.jones@linux.dev,
-	atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	James Raphael Tiovalen <jamestiotio@gmail.com>
-Subject: [kvm-unit-tests PATCH v6 1/1] riscv: sbi: Add tests for HSM extension
-Date: Sun, 27 Oct 2024 00:18:13 +0800
-Message-ID: <20241026161813.17189-2-jamestiotio@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241026161813.17189-1-jamestiotio@gmail.com>
-References: <20241026161813.17189-1-jamestiotio@gmail.com>
+        Sat, 26 Oct 2024 13:26:01 -0700 (PDT)
+Date: Sat, 26 Oct 2024 13:26:00 -0700
+From: Jerry Snitselaar <jsnitsel@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>, 
+	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>, 
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, Len Brown <lenb@kernel.org>, 
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
+	Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev, 
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, 
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v3 0/9] Initial support for SMMUv3 nested translation
+Message-ID: <7uv6kandebgqyw64im2kfwmiqahsikpsb6yp2tkd6qol3li3r3@fxsra3soryma>
+References: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
 
-Add some tests for all of the HSM extension functions. These tests
-ensure that the HSM extension functions follow the behavior as described
-in the SBI specification.
+On Wed, Oct 09, 2024 at 01:23:06PM -0300, Jason Gunthorpe wrote:
+> This brings support for the IOMMFD ioctls:
+> 
+>  - IOMMU_GET_HW_INFO
+>  - IOMMU_HWPT_ALLOC_NEST_PARENT
+>  - IOMMU_DOMAIN_NESTED
+>  - ops->enforce_cache_coherency()
+> 
+> This is quite straightforward as the nested STE can just be built in the
+> special NESTED domain op and fed through the generic update machinery.
+> 
+> The design allows the user provided STE fragment to control several
+> aspects of the translation, including putting the STE into a "virtual
+> bypass" or a aborting state. This duplicates functionality available by
+> other means, but it allows trivially preserving the VMID in the STE as we
+> eventually move towards the vIOMMU owning the VMID.
+> 
+> Nesting support requires the system to either support S2FWB or the
+> stronger CANWBS ACPI flag. This is to ensure the VM cannot bypass the
+> cache and view incoherent data, currently VFIO lacks any cache flushing
+> that would make this safe.
+> 
+> Yan has a series to add some of the needed infrastructure for VFIO cache
+> flushing here:
+> 
+>  https://lore.kernel.org/linux-iommu/20240507061802.20184-1-yan.y.zhao@intel.com/
+> 
+> Which may someday allow relaxing this further.
+> 
+> Remove VFIO_TYPE1_NESTING_IOMMU since it was never used and superseded by
+> this.
+> 
+> This is the first series in what will be several to complete nesting
+> support. At least:
+>  - IOMMU_RESV_SW_MSI related fixups
+>     https://lore.kernel.org/linux-iommu/cover.1722644866.git.nicolinc@nvidia.com/
+>  - vIOMMU object support to allow ATS and CD invalidations
+>     https://lore.kernel.org/linux-iommu/cover.1723061377.git.nicolinc@nvidia.com/
+>  - vCMDQ hypervisor support for direct invalidation queue assignment
+>     https://lore.kernel.org/linux-iommu/cover.1712978212.git.nicolinc@nvidia.com/
+>  - KVM pinned VMID using vIOMMU for vBTM
+>     https://lore.kernel.org/linux-iommu/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
+>  - Cross instance S2 sharing
+>  - Virtual Machine Structure using vIOMMU (for vMPAM?)
+>  - Fault forwarding support through IOMMUFD's fault fd for vSVA
+> 
+> The vIOMMU series is essential to allow the invalidations to be processed
+> for the CD as well.
+> 
+> It is enough to allow qemu work to progress.
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/smmuv3_nesting
+> 
+> v3:
+>  - Rebase on v6.12-rc2
+>  - Revise commit messages
+>  - Consolidate CANWB checks into arm_smmu_master_canwbs()
+>  - Add CONFIG_ARM_SMMU_V3_IOMMUFD to compile out iommufd only features
+>    like nesting
+>  - Shift code into arm-smmu-v3-iommufd.c
+>  - Add missed IS_ERR check
+>  - Add S2FWB to arm_smmu_get_ste_used()
+>  - Fixup quirks checks
+>  - Drop ARM_SMMU_FEAT_COHERENCY checks for S2FWB
+>  - Limit S2FWB to S2 Nesting Parent domains "just in case"
+> v2: https://patch.msgid.link/r/0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com
+>  - Revise commit messages
+>  - Guard S2FWB support with ARM_SMMU_FEAT_COHERENCY, since it doesn't make
+>    sense to use S2FWB to enforce coherency on inherently non-coherent hardware.
+>  - Add missing IO_PGTABLE_QUIRK_ARM_S2FWB validation
+>  - Include formal ACPIA commit for IORT built using
+>    generate/linux/gen-patch.sh
+>  - Use FEAT_NESTING to block creating a NESTING_PARENT
+>  - Use an abort STE instead of non-valid if the user requests a non-valid
+>    vSTE
+>  - Consistently use 'nest_parent' for naming variables
+>  - Use the right domain for arm_smmu_remove_master_domain() when it
+>    removes the master
+>  - Join bitfields together
+>  - Drop arm_smmu_cache_invalidate_user patch, invalidation will
+>    exclusively go via viommu
+> v1: https://patch.msgid.link/r/0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com
+> 
+> Jason Gunthorpe (6):
+>   vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+>   iommu/arm-smmu-v3: Report IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
+>   iommu/arm-smmu-v3: Implement IOMMU_HWPT_ALLOC_NEST_PARENT
+>   iommu/arm-smmu-v3: Expose the arm_smmu_attach interface
+>   iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
+>   iommu/arm-smmu-v3: Use S2FWB for NESTED domains
+> 
+> Nicolin Chen (3):
+>   ACPICA: IORT: Update for revision E.f
+>   ACPI/IORT: Support CANWBS memory access flag
+>   iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via struct
+>     arm_smmu_hw_info
+> 
+>  drivers/acpi/arm64/iort.c                     |  13 ++
+>  drivers/iommu/Kconfig                         |   9 +
+>  drivers/iommu/arm/arm-smmu-v3/Makefile        |   1 +
+>  .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 204 ++++++++++++++++++
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 114 ++++++----
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  83 ++++++-
+>  drivers/iommu/arm/arm-smmu/arm-smmu.c         |  16 --
+>  drivers/iommu/io-pgtable-arm.c                |  27 ++-
+>  drivers/iommu/iommu.c                         |  10 -
+>  drivers/iommu/iommufd/vfio_compat.c           |   7 +-
+>  drivers/vfio/vfio_iommu_type1.c               |  12 +-
+>  include/acpi/actbl2.h                         |   3 +-
+>  include/linux/io-pgtable.h                    |   2 +
+>  include/linux/iommu.h                         |   5 +-
+>  include/uapi/linux/iommufd.h                  |  55 +++++
+>  include/uapi/linux/vfio.h                     |   2 +-
+>  16 files changed, 465 insertions(+), 98 deletions(-)
+>  create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> 
+> 
+> base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+> -- 
+> 2.46.2
+> 
 
-Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
----
- riscv/sbi.c | 663 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 663 insertions(+)
-
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 6f2d3e35..b09e2e45 100644
---- a/riscv/sbi.c
-+++ b/riscv/sbi.c
-@@ -21,6 +21,7 @@
- #include <asm/delay.h>
- #include <asm/io.h>
- #include <asm/mmu.h>
-+#include <asm/page.h>
- #include <asm/processor.h>
- #include <asm/sbi.h>
- #include <asm/setup.h>
-@@ -54,6 +55,11 @@ static struct sbiret sbi_dbcn_write_byte(uint8_t byte)
- 	return sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE_BYTE, byte, 0, 0, 0, 0, 0);
- }
- 
-+static struct sbiret sbi_hart_suspend(uint32_t suspend_type, unsigned long resume_addr, unsigned long opaque)
-+{
-+	return sbi_ecall(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, suspend_type, resume_addr, opaque, 0, 0, 0);
-+}
-+
- static struct sbiret sbi_system_suspend(uint32_t sleep_type, unsigned long resume_addr, unsigned long opaque)
- {
- 	return sbi_ecall(SBI_EXT_SUSP, 0, sleep_type, resume_addr, opaque, 0, 0, 0);
-@@ -833,6 +839,662 @@ static void check_susp(void)
- 	report_prefix_pop();
- }
- 
-+unsigned char sbi_hsm_stop_hart[NR_CPUS];
-+unsigned char sbi_hsm_hart_start_checks[NR_CPUS];
-+unsigned char sbi_hsm_non_retentive_hart_suspend_checks[NR_CPUS];
-+cpumask_t sbi_hsm_started_hart_checks;
-+static bool sbi_hsm_invalid_hartid_check;
-+static bool sbi_hsm_timer_fired;
-+extern void sbi_hsm_check_hart_start(void);
-+extern void sbi_hsm_check_non_retentive_suspend(void);
-+
-+static void hsm_timer_irq_handler(struct pt_regs *regs)
-+{
-+	sbi_hsm_timer_fired = true;
-+	timer_stop();
-+}
-+
-+static void hsm_timer_setup(void)
-+{
-+	install_irq_handler(IRQ_S_TIMER, hsm_timer_irq_handler);
-+	local_irq_enable();
-+	timer_irq_enable();
-+}
-+
-+static void hsm_timer_teardown(void)
-+{
-+	timer_irq_disable();
-+	local_irq_disable();
-+	install_irq_handler(IRQ_S_TIMER, NULL);
-+}
-+
-+static void hart_empty_fn(void *data) {}
-+
-+static void hart_execute(void *data)
-+{
-+	struct sbiret ret;
-+	unsigned long hartid = current_thread_info()->hartid;
-+	int me = smp_processor_id();
-+
-+	ret = sbi_hart_start(hartid, virt_to_phys(&hart_empty_fn), 0);
-+
-+	if (ret.error == SBI_ERR_ALREADY_AVAILABLE)
-+		cpumask_set_cpu(me, &sbi_hsm_started_hart_checks);
-+}
-+
-+static void hart_start_invalid_hartid(void *data)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_hart_start(ULONG_MAX, virt_to_phys(&hart_empty_fn), 0);
-+
-+	if (ret.error == SBI_ERR_INVALID_PARAM)
-+		sbi_hsm_invalid_hartid_check = true;
-+}
-+
-+static void hart_stop(void *data)
-+{
-+	unsigned long hartid = current_thread_info()->hartid;
-+	struct sbiret ret = sbi_hart_stop();
-+
-+	report_fail("failed to stop hart %ld (error=%ld)", hartid, ret.error);
-+}
-+
-+static void hart_retentive_suspend(void *data)
-+{
-+	unsigned long hartid = current_thread_info()->hartid;
-+	struct sbiret ret = sbi_hart_suspend(SBI_EXT_HSM_HART_SUSPEND_RETENTIVE, 0, 0);
-+
-+	if (ret.error)
-+		report_fail("failed to retentive suspend hart %ld (error=%ld)", hartid, ret.error);
-+}
-+
-+static void hart_non_retentive_suspend(void *data)
-+{
-+	unsigned long hartid = current_thread_info()->hartid;
-+
-+	/* Set opaque as hartid so that we can check a0 == a1, ensuring that a0 is hartid and a1 is opaque */
-+	struct sbiret ret = sbi_hart_suspend(SBI_EXT_HSM_HART_SUSPEND_NON_RETENTIVE,
-+					     virt_to_phys(&sbi_hsm_check_non_retentive_suspend), hartid);
-+
-+	report_fail("failed to non-retentive suspend hart %ld (error=%ld)", hartid, ret.error);
-+}
-+
-+static void hart_retentive_suspend_with_msb_set(void *data)
-+{
-+	unsigned long hartid = current_thread_info()->hartid;
-+	unsigned long suspend_type = SBI_EXT_HSM_HART_SUSPEND_RETENTIVE | (_AC(1, UL) << (__riscv_xlen - 1));
-+	struct sbiret ret = sbi_ecall(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, suspend_type, 0, 0, 0, 0, 0);
-+
-+	if (ret.error)
-+		report_fail("failed to retentive suspend hart %ld with MSB set (error=%ld)", hartid, ret.error);
-+}
-+
-+static void hart_non_retentive_suspend_with_msb_set(void *data)
-+{
-+	unsigned long hartid = current_thread_info()->hartid;
-+	unsigned long suspend_type = SBI_EXT_HSM_HART_SUSPEND_NON_RETENTIVE | (_AC(1, UL) << (__riscv_xlen - 1));
-+
-+	/* Set opaque as hartid so that we can check a0 == a1, ensuring that a0 is hartid and a1 is opaque */
-+	struct sbiret ret = sbi_ecall(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, suspend_type,
-+				      virt_to_phys(&sbi_hsm_check_non_retentive_suspend), hartid, 0, 0, 0);
-+
-+	report_fail("failed to non-retentive suspend hart %ld with MSB set (error=%ld)", hartid, ret.error);
-+}
-+
-+static bool hart_wait_on_status(unsigned long hartid, enum sbi_ext_hsm_sid status, unsigned long duration)
-+{
-+	struct sbiret ret;
-+
-+	sbi_hsm_timer_fired = false;
-+	timer_start(duration);
-+
-+	ret = sbi_hart_get_status(hartid);
-+
-+	while (!ret.error && ret.value == status && !sbi_hsm_timer_fired) {
-+		cpu_relax();
-+		ret = sbi_hart_get_status(hartid);
-+	}
-+
-+	timer_stop();
-+
-+	if (sbi_hsm_timer_fired)
-+		report_info("timer fired while waiting on status %u for hart %ld", status, hartid);
-+	else if (ret.error)
-+		report_fail("got %ld while waiting on status %u for hart %ld\n", ret.error, status, hartid);
-+
-+	return sbi_hsm_timer_fired || ret.error;
-+}
-+
-+static void check_hsm(void)
-+{
-+	struct sbiret ret;
-+	unsigned long hartid;
-+	cpumask_t secondary_cpus_mask, hsm_start, hsm_stop, hsm_suspend, hsm_resume, hsm_check;
-+	bool ipi_unavailable = false;
-+	bool suspend_with_msb = false, resume_with_msb = false, check_with_msb = false, stop_with_msb = false;
-+	int cpu, me = smp_processor_id();
-+	int max_cpus = getenv("SBI_MAX_CPUS") ? strtol(getenv("SBI_MAX_CPUS"), NULL, 0) : nr_cpus;
-+	unsigned long hsm_timer_duration = getenv("SBI_HSM_TIMER_DURATION")
-+					 ? strtol(getenv("SBI_HSM_TIMER_DURATION"), NULL, 0) : 200000;
-+
-+	max_cpus = MIN(max_cpus, nr_cpus);
-+
-+	report_prefix_push("hsm");
-+
-+	if (!sbi_probe(SBI_EXT_HSM)) {
-+		report_skip("hsm extension not available");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	report_prefix_push("hart_get_status");
-+
-+	hartid = current_thread_info()->hartid;
-+	ret = sbi_hart_get_status(hartid);
-+
-+	if (ret.error) {
-+		report_fail("failed to get status of current hart (error=%ld)", ret.error);
-+		report_prefix_popn(2);
-+		return;
-+	} else if (ret.value != SBI_EXT_HSM_STARTED) {
-+		report_fail("current hart is not started (ret.value=%ld)", ret.value);
-+		report_prefix_popn(2);
-+		return;
-+	}
-+
-+	report_pass("status of current hart is started");
-+
-+	for_each_present_cpu(cpu) {
-+		if (sbi_hart_get_status(cpus[cpu].hartid).error == SBI_ERR_INVALID_PARAM)
-+			set_cpu_present(cpu, false);
-+	}
-+
-+	report(cpumask_weight(&cpu_present_mask) == nr_cpus, "all present harts have valid hartids");
-+
-+	report_prefix_pop();
-+
-+	if (max_cpus < 2) {
-+		report_skip("no other cpus to run the remaining hsm tests on");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	report_prefix_push("hart_stop");
-+
-+	cpumask_copy(&secondary_cpus_mask, &cpu_present_mask);
-+	cpumask_clear_cpu(me, &secondary_cpus_mask);
-+	hsm_timer_setup();
-+
-+	/* Assume that previous tests have not cleaned up and stopped the secondary harts */
-+	on_cpumask_async(&secondary_cpus_mask, hart_stop, NULL);
-+
-+	cpumask_clear(&hsm_stop);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STOP_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STOPPED)
-+			report_info("hart %ld status is not 'stopped' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_stop);
-+	}
-+
-+	report(cpumask_weight(&hsm_stop) == max_cpus - 1, "all secondary harts stopped");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_start");
-+
-+	cpumask_clear(&hsm_start);
-+	cpumask_clear(&hsm_check);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		/* Set opaque as hartid so that we can check a0 == a1, ensuring that a0 is hartid and a1 is opaque */
-+		ret = sbi_hart_start(hartid, virt_to_phys(&sbi_hsm_check_hart_start), hartid);
-+		if (ret.error) {
-+			report_fail("failed to start test hart %ld (error=%ld)", hartid, ret.error);
-+			continue;
-+		}
-+
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STOPPED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_START_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error) {
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+			continue;
-+		} else if (ret.value != SBI_EXT_HSM_STARTED) {
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+			continue;
-+		} else {
-+			cpumask_set_cpu(cpu, &hsm_start);
-+		}
-+
-+		sbi_hsm_timer_fired = false;
-+		timer_start(hsm_timer_duration);
-+
-+		while (!(READ_ONCE(sbi_hsm_hart_start_checks[cpu]) & SBI_HSM_TEST_DONE) && !sbi_hsm_timer_fired)
-+			cpu_relax();
-+
-+		timer_stop();
-+
-+		if (sbi_hsm_timer_fired) {
-+			report_info("hsm timer fired before hart %ld is done with start checks", hartid);
-+			continue;
-+		}
-+
-+		if (!(sbi_hsm_hart_start_checks[cpu] & SBI_HSM_TEST_SATP))
-+			report_info("satp is not zero for test hart %ld", hartid);
-+		else if (!(sbi_hsm_hart_start_checks[cpu] & SBI_HSM_TEST_SIE))
-+			report_info("sstatus.SIE is not zero for test hart %ld", hartid);
-+		else if (!(sbi_hsm_hart_start_checks[cpu] & SBI_HSM_TEST_HARTID_A1))
-+			report_info("either a0 or a1 is not hartid for test hart %ld", hartid);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_check);
-+	}
-+
-+	report(cpumask_weight(&hsm_start) == max_cpus - 1, "all secondary harts started");
-+	report(cpumask_weight(&hsm_check) == max_cpus - 1,
-+	       "all secondary harts have expected register values after hart start");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_stop");
-+
-+	memset(sbi_hsm_stop_hart, 1, sizeof(sbi_hsm_stop_hart));
-+
-+	cpumask_clear(&hsm_stop);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STOP_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STOPPED)
-+			report_info("hart %ld status is not 'stopped' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_stop);
-+	}
-+
-+	report(cpumask_weight(&hsm_stop) == max_cpus - 1, "all secondary harts stopped");
-+
-+	/* Reset the stop flags so that we can reuse them after suspension tests */
-+	memset(sbi_hsm_stop_hart, 0, sizeof(sbi_hsm_stop_hart));
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_start");
-+
-+	/* Select just one secondary cpu to run the invalid hartid test */
-+	on_cpu(cpumask_next(-1, &secondary_cpus_mask), hart_start_invalid_hartid, NULL);
-+
-+	report(sbi_hsm_invalid_hartid_check, "secondary hart refuse to start with invalid hartid");
-+
-+	on_cpumask_async(&secondary_cpus_mask, hart_execute, NULL);
-+
-+	cpumask_clear(&hsm_start);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STOPPED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_START_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STARTED)
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_start);
-+	}
-+
-+	report(cpumask_weight(&hsm_start) == max_cpus - 1, "all secondary harts started");
-+
-+	sbi_hsm_timer_fired = false;
-+	timer_start(hsm_timer_duration);
-+
-+	while (cpumask_weight(&cpu_idle_mask) != max_cpus - 1 && !sbi_hsm_timer_fired)
-+		cpu_relax();
-+
-+	timer_stop();
-+
-+	if (sbi_hsm_timer_fired)
-+		report_info("hsm timer fired before all secondary harts started");
-+
-+	report(cpumask_weight(&cpu_idle_mask) == max_cpus - 1,
-+	       "all secondary harts successfully executed code after start");
-+	report(cpumask_weight(&cpu_online_mask) == max_cpus, "all secondary harts online");
-+	report(cpumask_weight(&sbi_hsm_started_hart_checks) == max_cpus - 1,
-+	       "all secondary harts are already started");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_suspend");
-+
-+	if (!sbi_probe(SBI_EXT_IPI)) {
-+		report_skip("skipping suspension tests since ipi extension is unavailable");
-+		report_prefix_pop();
-+		ipi_unavailable = true;
-+		goto sbi_hsm_hart_stop_tests;
-+	}
-+
-+	on_cpumask_async(&secondary_cpus_mask, hart_retentive_suspend, NULL);
-+
-+	cpumask_clear(&hsm_suspend);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPEND_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_SUSPENDED)
-+			report_info("hart %ld status is not 'suspended' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_suspend);
-+	}
-+
-+	report(cpumask_weight(&hsm_suspend) == max_cpus - 1, "all secondary harts retentive suspended");
-+
-+	/* Ignore the return value since we check the status of each hart anyway */
-+	sbi_send_ipi_cpumask(&secondary_cpus_mask);
-+
-+	cpumask_clear(&hsm_resume);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPENDED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_RESUME_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STARTED)
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_resume);
-+	}
-+
-+	report(cpumask_weight(&hsm_resume) == max_cpus - 1, "all secondary harts retentive resumed");
-+
-+	sbi_hsm_timer_fired = false;
-+	timer_start(hsm_timer_duration);
-+
-+	while (cpumask_weight(&cpu_idle_mask) != max_cpus - 1 && !sbi_hsm_timer_fired)
-+		cpu_relax();
-+
-+	timer_stop();
-+
-+	if (sbi_hsm_timer_fired)
-+		report_info("hsm timer fired before all secondary harts retentive resumed");
-+
-+	report(cpumask_weight(&cpu_idle_mask) == max_cpus - 1,
-+	       "all secondary harts successfully executed code after retentive suspend");
-+	report(cpumask_weight(&cpu_online_mask) == max_cpus,
-+	       "all secondary harts online");
-+
-+	on_cpumask_async(&secondary_cpus_mask, hart_non_retentive_suspend, NULL);
-+
-+	cpumask_clear(&hsm_suspend);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPEND_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_SUSPENDED)
-+			report_info("hart %ld status is not 'suspended' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_suspend);
-+	}
-+
-+	report(cpumask_weight(&hsm_suspend) == max_cpus - 1, "all secondary harts non-retentive suspended");
-+
-+	/* Ignore the return value since we check the status of each hart anyway */
-+	sbi_send_ipi_cpumask(&secondary_cpus_mask);
-+
-+	cpumask_clear(&hsm_resume);
-+	cpumask_clear(&hsm_check);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPENDED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_RESUME_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error) {
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+			continue;
-+		} else if (ret.value != SBI_EXT_HSM_STARTED) {
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+			continue;
-+		} else {
-+			cpumask_set_cpu(cpu, &hsm_resume);
-+		}
-+
-+		sbi_hsm_timer_fired = false;
-+		timer_start(hsm_timer_duration);
-+
-+		while (!((READ_ONCE(sbi_hsm_non_retentive_hart_suspend_checks[cpu])) & SBI_HSM_TEST_DONE)
-+			&& !sbi_hsm_timer_fired)
-+			cpu_relax();
-+
-+		timer_stop();
-+
-+		if (sbi_hsm_timer_fired) {
-+			report_info("hsm timer fired before hart %ld is done with non-retentive resume checks",
-+				    hartid);
-+			continue;
-+		}
-+
-+		if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_SATP))
-+			report_info("satp is not zero for test hart %ld", hartid);
-+		else if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_SIE))
-+			report_info("sstatus.SIE is not zero for test hart %ld", hartid);
-+		else if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_HARTID_A1))
-+			report_info("either a0 or a1 is not hartid for test hart %ld", hartid);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_check);
-+	}
-+
-+	report(cpumask_weight(&hsm_resume) == max_cpus - 1, "all secondary harts non-retentive resumed");
-+	report(cpumask_weight(&hsm_check) == max_cpus - 1,
-+	       "all secondary harts have expected register values after non-retentive resume");
-+
-+	report_prefix_pop();
-+
-+sbi_hsm_hart_stop_tests:
-+	report_prefix_push("hart_stop");
-+
-+	if (ipi_unavailable)
-+		on_cpumask_async(&secondary_cpus_mask, hart_stop, NULL);
-+	else
-+		memset(sbi_hsm_stop_hart, 1, sizeof(sbi_hsm_stop_hart));
-+
-+	cpumask_clear(&hsm_stop);
-+
-+	for_each_cpu(cpu, &secondary_cpus_mask) {
-+		hartid = cpus[cpu].hartid;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration))
-+			continue;
-+		if (hart_wait_on_status(hartid, SBI_EXT_HSM_STOP_PENDING, hsm_timer_duration))
-+			continue;
-+
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STOPPED)
-+			report_info("hart %ld status is not 'stopped' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			cpumask_set_cpu(cpu, &hsm_stop);
-+	}
-+
-+	report(cpumask_weight(&hsm_stop) == max_cpus - 1, "all secondary harts stopped");
-+
-+	if (__riscv_xlen == 32 || ipi_unavailable) {
-+		hsm_timer_teardown();
-+		report_prefix_popn(2);
-+		return;
-+	}
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_suspend");
-+
-+	/* Select just one secondary cpu to run suspension tests with MSB of suspend type being set */
-+	cpu = cpumask_next(-1, &secondary_cpus_mask);
-+	hartid = cpus[cpu].hartid;
-+
-+	/* Boot up the secondary cpu and let it proceed to the idle loop */
-+	on_cpu(cpu, hart_empty_fn, NULL);
-+
-+	on_cpu_async(cpu, hart_retentive_suspend_with_msb_set, NULL);
-+
-+	if (!hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration) &&
-+	    !hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPEND_PENDING, hsm_timer_duration)) {
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_SUSPENDED)
-+			report_info("hart %ld status is not 'suspended' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			suspend_with_msb = true;
-+	}
-+
-+	report(suspend_with_msb, "secondary hart retentive suspended with MSB set");
-+
-+	/* Ignore the return value since we manually validate the status of the hart anyway */
-+	sbi_send_ipi_cpu(cpu);
-+
-+	if (!hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPENDED, hsm_timer_duration) &&
-+	    !hart_wait_on_status(hartid, SBI_EXT_HSM_RESUME_PENDING, hsm_timer_duration)) {
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STARTED)
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			resume_with_msb = true;
-+	}
-+
-+	report(resume_with_msb, "secondary hart retentive resumed with MSB set");
-+
-+	/* Reset these flags so that we can reuse them for the non-retentive suspension test */
-+	suspend_with_msb = false;
-+	resume_with_msb = false;
-+	sbi_hsm_stop_hart[cpu] = 0;
-+	sbi_hsm_non_retentive_hart_suspend_checks[cpu] = 0;
-+
-+	on_cpu_async(cpu, hart_non_retentive_suspend_with_msb_set, NULL);
-+
-+	if (!hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration) &&
-+	    !hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPEND_PENDING, hsm_timer_duration)) {
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_SUSPENDED)
-+			report_info("hart %ld status is not 'suspended' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			suspend_with_msb = true;
-+	}
-+
-+	report(suspend_with_msb, "secondary hart non-retentive suspended with MSB set");
-+
-+	/* Ignore the return value since we manually validate the status of the hart anyway */
-+	sbi_send_ipi_cpu(cpu);
-+
-+	if (!hart_wait_on_status(hartid, SBI_EXT_HSM_SUSPENDED, hsm_timer_duration) &&
-+	    !hart_wait_on_status(hartid, SBI_EXT_HSM_RESUME_PENDING, hsm_timer_duration)) {
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STARTED)
-+			report_info("hart %ld status is not 'started' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			resume_with_msb = true;
-+
-+		sbi_hsm_timer_fired = false;
-+		timer_start(hsm_timer_duration);
-+
-+		while (!((READ_ONCE(sbi_hsm_non_retentive_hart_suspend_checks[cpu])) & SBI_HSM_TEST_DONE)
-+			&& !sbi_hsm_timer_fired)
-+			cpu_relax();
-+
-+		timer_stop();
-+
-+		if (sbi_hsm_timer_fired) {
-+			report_info("hsm timer fired before hart %ld is done with non-retentive resume checks",
-+				    hartid);
-+		} else {
-+			if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_SATP))
-+				report_info("satp is not zero for test hart %ld", hartid);
-+			else if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_SIE))
-+				report_info("sstatus.SIE is not zero for test hart %ld", hartid);
-+			else if (!(sbi_hsm_non_retentive_hart_suspend_checks[cpu] & SBI_HSM_TEST_HARTID_A1))
-+				report_info("either a0 or a1 is not hartid for test hart %ld", hartid);
-+			else
-+				check_with_msb = true;
-+		}
-+	}
-+
-+	report(resume_with_msb, "secondary hart non-retentive resumed with MSB set");
-+	report(check_with_msb,
-+	       "secondary hart has expected register values after non-retentive resume with MSB set");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("hart_stop");
-+
-+	sbi_hsm_stop_hart[cpu] = 1;
-+
-+	if (!hart_wait_on_status(hartid, SBI_EXT_HSM_STARTED, hsm_timer_duration) &&
-+	    !hart_wait_on_status(hartid, SBI_EXT_HSM_STOP_PENDING, hsm_timer_duration)) {
-+		ret = sbi_hart_get_status(hartid);
-+		if (ret.error)
-+			report_info("hart %ld get status failed (error=%ld)", hartid, ret.error);
-+		else if (ret.value != SBI_EXT_HSM_STOPPED)
-+			report_info("hart %ld status is not 'stopped' (ret.value=%ld)", hartid, ret.value);
-+		else
-+			stop_with_msb = true;
-+	}
-+
-+	report(stop_with_msb, "secondary hart stopped after suspension tests with MSB set");
-+
-+	hsm_timer_teardown();
-+	report_prefix_popn(2);
-+}
-+
- int main(int argc, char **argv)
- {
- 	if (argc > 1 && !strcmp(argv[1], "-h")) {
-@@ -844,6 +1506,7 @@ int main(int argc, char **argv)
- 	check_base();
- 	check_time();
- 	check_ipi();
-+	check_hsm();
- 	check_dbcn();
- 	check_susp();
- 
--- 
-2.43.0
+Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
 
 
