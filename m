@@ -1,178 +1,134 @@
-Return-Path: <kvm+bounces-29750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19E39B18CF
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 16:53:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277889B19BB
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 18:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F05DC1C20DED
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 14:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C72801F21E49
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 16:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31F622612;
-	Sat, 26 Oct 2024 14:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2826C1D2F67;
+	Sat, 26 Oct 2024 16:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IDXAYO04"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcArLYEP"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7417D2746C
-	for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 14:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D5F1CBE9E
+	for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 16:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729954396; cv=none; b=MGahjcNGV4g9wqTwJS9Y2fhRmfskE1uO7HULizhwoiP76HGLiqCcSm3mEjx/W1zIP/gGmI0aL5G6uwka+k0VIVOE5hx2+ZdY3bKulYX6DjGm56G3lgcnmHpn9T1EEVH9xUw9/wZkI28WnuGzqVhc9+GypPlLnk7OtcTeDQAw5n4=
+	t=1729959507; cv=none; b=jSMxtPR6PfXVlzR+FsJWThGj/ECcb+FRMsXVepwEtMlEcklwcfegmsIp0LdozploesFs3lw5tpF/WNY5ogH+Arl3N7tFE33b/hoVO3k9J4LI8460J5Cu+gzypy60zMQVuTKdCrifki2TEkSSZ0X8I5pvOOa7HWKyF14RuYvyeBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729954396; c=relaxed/simple;
-	bh=0ZAutvhhGaFlmj1XmFap9brpWl2bniA/D2BddoTQ/jM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jlPbLx2NZBtkoAd6ZGwyEZWq3lSXqViIgRLAQBZ75IDSx39x7x+NjX8AARMMjfe2exhLWoytmcAvnQaixApWaPlqJDm4/apks4AEBjE7BKypVxAUfY9cnhOF3dUTAz0DgiDngqQ3O0xQ0uxVCSeb2bcj44UX+lu8qm9PrwQ+x2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IDXAYO04; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sat, 26 Oct 2024 07:53:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729954390;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f6oEY5I2mn6JavjYEYeWI4XafhLDooXmCGvLmqMJIxw=;
-	b=IDXAYO04odV2PC/0FFjwWPsKKHzqtlkfTZw+5+KuPl8w5Mo++yXHzLsZTEF+ZR0DNjAfqL
-	zSWPUbrqLaREWWiScSQsS5jxMFGdimkChYtRQ3L6M0S4/mZk4JHQiWuyT1ybNlLbsQlnI0
-	vAy0Oz+0NMusUx+JOGzqoh6uH80Rnlw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	stable@vger.kernel.org, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH] KVM: arm64: Mark the VM as dead for failed
- initializations
-Message-ID: <Zx0CT1gdSWVyKLuD@linux.dev>
-References: <20241025221220.2985227-1-rananta@google.com>
- <Zxx_X9-MdmAFzHUO@linux.dev>
- <87ttcztili.wl-maz@kernel.org>
+	s=arc-20240116; t=1729959507; c=relaxed/simple;
+	bh=Li9lg/d4LoObpo0qaotCrvuxuFk+kNls0HsIlEvJO50=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ah/57VZaQqK6vrmad1Fadm2RYlEhv+oFJ19ReKkUla6nsBLCm3zxD6BIB0D8UCRPZuVQwP0ePRWNE0CMilpkPliUWi+1mj9rtEnb3815qrg9UeDCR2F26G/v3p2sKEgWMtEWvlehzYHeTLvFc2Pmunwd4kP7p5sqbk+TlN7I848=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcArLYEP; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71e5130832aso2147104b3a.0
+        for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 09:18:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729959504; x=1730564304; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5JyZ7yiPmyHL4xk6pJ9JiQBHhf05fIYRMraM7jPw8gw=;
+        b=bcArLYEPJ+x/zGAH4lfzqVtkkIX1MvhpfdddSf2upWKudTiqOTT1cAkahyn3I1XJMG
+         FFkdSOEdeI0MzvTn/lNqhBvL91f9iiWsr4KiJdJQd9ej19bFNrvHoBdgbAZ2BO0rMv9e
+         sBinxG48/TsBQpTslcwmntquG9iuryONJhlpBiqG2q8u6iRtX9rlCM7YTtelAu0BMOjO
+         Aiqd7hlZseDAl3NFu84z6ev6tp8a0N6AxABi6kvbKLTRQ1egtxzIW2ZKt9HsS9BHsOD6
+         Q22Yq/QfdmJylGbBuiKX0y/ZFeJFPMZEEjgSoH7gpiMXWB9rGCN3b1PG8C1ZOFk9p32c
+         o5Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729959504; x=1730564304;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5JyZ7yiPmyHL4xk6pJ9JiQBHhf05fIYRMraM7jPw8gw=;
+        b=BzWnqed1Drzice6rvFbQPwRGlNtyL6NvNExzKTqTBfGOrjhuOSCooatVfMsfIEfgMC
+         WWuEG1qQUGXAdmPVIPEbrieICyrHDHnTks4aJtnbdnKlzxRBa27Tn5QfyZQnm34KDN+v
+         PifqljlUcng+a/41tObbDLwYo8ySkGt1jCopCa72pyY/3wYvvz1WNAWCkNbetQWqOLpb
+         fLNadwHnpkWLmoTdXdnTXKcdmJpL+Sl5kGVrYx2z/5PVSotmDOMOkxQC/YlSiKp8CsE+
+         V8/1rjtNhPVy1/OrQg9G0kDuhkIZrRYJaKjbWXxHaDo02OoeZPFJ04ADw0kJ4Ek8PYTu
+         Mhow==
+X-Gm-Message-State: AOJu0Yw6iuY3V9KIXL4LKE4ANismebebxWvg5o0RxqVpw03YwnRhixLF
+	xSk/JIRwUewJjZvQ4GDqPFomkdyUiVeSI9xT1S5E0BTCY8BR1XVXNhhrZzvI
+X-Google-Smtp-Source: AGHT+IFnk4ReoPitP+chgKrxmrGai83F/h9KMccFgK2cqeaFe7mT7GYeGCxehzx1FgOvhA8EjDODtQ==
+X-Received: by 2002:a05:6a00:18a8:b0:71d:f64d:ec60 with SMTP id d2e1a72fcca58-72062f83dedmr5553924b3a.7.1729959503771;
+        Sat, 26 Oct 2024 09:18:23 -0700 (PDT)
+Received: from JRT-PC.. ([202.166.44.78])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1fe53sm2904317b3a.162.2024.10.26.09.18.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Oct 2024 09:18:23 -0700 (PDT)
+From: James Raphael Tiovalen <jamestiotio@gmail.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: andrew.jones@linux.dev,
+	atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	James Raphael Tiovalen <jamestiotio@gmail.com>
+Subject: [kvm-unit-tests PATCH v6 0/1] riscv: sbi: Add support to test HSM extension
+Date: Sun, 27 Oct 2024 00:18:12 +0800
+Message-ID: <20241026161813.17189-1-jamestiotio@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ttcztili.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 26, 2024 at 08:43:21AM +0100, Marc Zyngier wrote:
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bf64fed9820e..c315bc1a4e9a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -74,8 +74,6 @@ enum kvm_mode kvm_get_mode(void);
->  static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
->  #endif
->  
-> -DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> -
->  extern unsigned int __ro_after_init kvm_sve_max_vl;
->  extern unsigned int __ro_after_init kvm_host_sve_max_vl;
->  int __init kvm_arm_init_sve(void);
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 879982b1cc73..1215df590418 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -206,8 +206,7 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
->  
->  static inline bool userspace_irqchip(struct kvm *kvm)
->  {
-> -	return static_branch_unlikely(&userspace_irqchip_in_use) &&
-> -		unlikely(!irqchip_in_kernel(kvm));
-> +	return unlikely(!irqchip_in_kernel(kvm));
->  }
->  
->  static void soft_timer_start(struct hrtimer *hrt, u64 ns)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 48cafb65d6ac..70ff9a20ef3a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -69,7 +69,6 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  static bool vgic_present, kvm_arm_initialised;
->  
->  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
-> -DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
->  bool is_kvm_arm_initialised(void)
->  {
-> @@ -503,9 +502,6 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> -	if (vcpu_has_run_once(vcpu) && unlikely(!irqchip_in_kernel(vcpu->kvm)))
-> -		static_branch_dec(&userspace_irqchip_in_use);
-> -
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
->  	kvm_timer_vcpu_terminate(vcpu);
->  	kvm_pmu_vcpu_destroy(vcpu);
-> @@ -848,14 +844,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> -	if (!irqchip_in_kernel(kvm)) {
-> -		/*
-> -		 * Tell the rest of the code that there are userspace irqchip
-> -		 * VMs in the wild.
-> -		 */
-> -		static_branch_inc(&userspace_irqchip_in_use);
-> -	}
-> -
->  	/*
->  	 * Initialize traps for protected VMs.
->  	 * NOTE: Move to run in EL2 directly, rather than via a hypercall, once
-> @@ -1077,7 +1065,7 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
->  	 * state gets updated in kvm_timer_update_run and
->  	 * kvm_pmu_update_run below).
->  	 */
-> -	if (static_branch_unlikely(&userspace_irqchip_in_use)) {
-> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
->  		if (kvm_timer_should_notify_user(vcpu) ||
->  		    kvm_pmu_should_notify_user(vcpu)) {
->  			*ret = -EINTR;
-> @@ -1199,7 +1187,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  			vcpu->mode = OUTSIDE_GUEST_MODE;
->  			isb(); /* Ensure work in x_flush_hwstate is committed */
->  			kvm_pmu_sync_hwstate(vcpu);
-> -			if (static_branch_unlikely(&userspace_irqchip_in_use))
-> +			if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  				kvm_timer_sync_user(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
->  			local_irq_enable();
-> @@ -1245,7 +1233,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		 * we don't want vtimer interrupts to race with syncing the
->  		 * timer virtual interrupt state.
->  		 */
-> -		if (static_branch_unlikely(&userspace_irqchip_in_use))
-> +		if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  			kvm_timer_sync_user(vcpu);
->  
->  		kvm_arch_vcpu_ctxsync_fp(vcpu);
-> 
-> I think this would fix the problem you're seeing without changing the
-> userspace view of an erroneous configuration. It would also pave the
-> way for the complete removal of the interrupt notification to
-> userspace, which I claim has no user and is just a shit idea.
+This patch series adds support for testing all 4 functions of the HSM
+extension as defined in the RISC-V SBI specification. The only patch in
+version 6 of this series adds the actual test for the HSM extension.
+The changes are based on the riscv/sbi branch.
 
-Yeah, looks like this ought to get it done.
+v6:
+- Rebased on top of the latest commit of the riscv/sbi branch.
+- Removed unnecessary cleanup code in the HSM tests after improvements
+  to the on-cpus API were made by Andrew.
 
-Even with a fix for this particular issue I do wonder if we should
-categorically harden against late initialization failures and un-init
-the vCPU (or bug VM, where necessary) to avoid dealing with half-baked
-vCPUs/VMs across our UAPI surfaces.
+v5:
+- Addressed all of Andrew's comments.
+- Added 2 new patches to clear on_cpu_info[cpu].func and to set the
+  cpu_started mask, which are used to perform cleanup after running the
+  HSM tests.
+- Added some new tests to validate suspension on RV64 with the high
+  bits set for suspend_type.
+- Picked up the hartid_to_cpu rewrite patch from Andrew's branch.
+- Moved the variables declared in riscv/sbi.c in patch 2 to group it
+  together with the other HSM test variables declared in patch 5.
 
-A sane userspace will probably crash when KVM_RUN returns EINVAL anyway.
+v4:
+- Addressed all of Andrew's comments.
+- Included the 2 patches from Andrew's branch that refactored some
+  functions.
+- Added timers to all of the waiting activities in the HSM tests.
 
--- 
-Thanks,
-Oliver
+v3:
+- Addressed all of Andrew's comments.
+- Split the report_prefix_pop patch into its own series.
+- Added a new environment variable to specify the maximum number of
+  CPUs supported by the SBI implementation.
+
+v2:
+- Addressed all of Andrew's comments.
+- Added a new patch to add helper routines to clear multiple prefixes.
+- Reworked the approach to test the HSM extension by using cpumask and
+  on-cpus.
+
+James Raphael Tiovalen (1):
+  riscv: sbi: Add tests for HSM extension
+
+ riscv/sbi.c | 663 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 663 insertions(+)
+
+--
+2.43.0
+
 
