@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-29787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3A79B1E9F
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 15:31:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2084B9B1EA6
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 15:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E95C1C22D68
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 14:31:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D54B9281CB0
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 14:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1631A1DA31D;
-	Sun, 27 Oct 2024 14:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2F61DB350;
+	Sun, 27 Oct 2024 14:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPuXERdP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcGU8E7n"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A68B17D358;
-	Sun, 27 Oct 2024 14:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEC71DA61D;
+	Sun, 27 Oct 2024 14:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730038981; cv=none; b=RnEYmrzz9jNw4QsTGzs6RtIWywl45RgNlgfg0Ew7tfUNM1IHb4oh/qLpX7OLBKKOX1qP72nYHHX5x1NWvPovy7J6I4iGGY2bTsQw8fy8TEdXqm+d+LRIAm64SCvcs4oi4LjhGFAzoSt2ce5TYm2jIPbDfV0w8+fiEUmbngSw+Bw=
+	t=1730038985; cv=none; b=ScuX6eGFa49JR7MZsBy9Gml9TIpRPjzebJA+EiYAeRoyG/VP4rB7aT+FVDJ4HH9XMnM60dscr+h2xLZkJF810hTsWttopY+wmZTEdPuSG4htsFxsQVflfSlmCAyUEBdHsY3NdFxYhdcqHWVUYzQH3Bv7lZstUkmtzzUvaU7rkos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730038981; c=relaxed/simple;
-	bh=9DR3LFJjJhjhbu472Va//Xe8BphJFty4JMYW8TX4X1I=;
+	s=arc-20240116; t=1730038985; c=relaxed/simple;
+	bh=tSv2Q/UIDmsmBR/B+0LlfVehWktc2fzMNx0dgOtrb5I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K0tkOXPWv+A++VNSH1f8v79b/jpSH+ez1Q8BO+BvcTDPrq8NNoycyb+0ejz+XXnlUQo2sM1HvugnT2ahWg1H/xBJt4HhGHPajjTE5T5CX+XmmHq7OgO+/XtDCyXQw84oiCOr3tMb+Lzr5a8mmQUFiP7ZJqz7fg5Mbvxf71aRzUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPuXERdP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BD05C4CEE5;
-	Sun, 27 Oct 2024 14:23:00 +0000 (UTC)
+	 MIME-Version; b=LY41dlfondHJflQD1rd3R0BdhzwTb5sJcfQsnApfRBV6P1wj5pi7g1t3ZtwKSJFTfDWW//i2yxdS+tXqeZnNO2eld53TZUMFcJEDAjjNFQhfTfNyN58N+ZtM0HW7aMLT6E+O4Ya5WhShwRbfY3HIIMWltF/Jlgsujfvuhpl8d3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcGU8E7n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30CB6C4CEC3;
+	Sun, 27 Oct 2024 14:23:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730038981;
-	bh=9DR3LFJjJhjhbu472Va//Xe8BphJFty4JMYW8TX4X1I=;
+	s=k20201202; t=1730038985;
+	bh=tSv2Q/UIDmsmBR/B+0LlfVehWktc2fzMNx0dgOtrb5I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hPuXERdPFKyRKnnAub1JPkt8oeVENyiRQqNq5FYQjoxSMzpqfJc+ZPwdfx3HpJ2ko
-	 ymCeTGgIafCN3eHEOH4LA53Ephvv179t+7iRHX9jMk5+g3q6etTegx4HBpUpGsZJtJ
-	 esLWLUFB4m/qz8vXShOVP9ErGfuP6u+imE23Bd1qqQWqmU3ohI2AWmmjIOz2SdrPeN
-	 ALS21r1jA5TJ6duS26kzeQfH3r1ude1LVXDVyvi+e2har7IMxbiyHVvpQ/SoDTkQ44
-	 QBAhVRb6Cbecg847TMNxQ9odCamJhWK3ZUPTmyBaq1+638ICOVMOp/C6RWcDXPstKE
-	 3UzxbmWuiI4rA==
+	b=fcGU8E7nqAZ/TN3lckAgvc+gp+UfN38AiQA0fW96+skp6qRwatz6+Tp+Y9GZAXoZv
+	 32gYhCzvwkTALLTPnjKbgOaQPHt8sGsNEdt9KJbNhKApAh7jv24SRFA3hGiLfrQYgb
+	 G/Po80vNtP9F8BeE8e4uWTkMLLm5fivWyKQHJxEIt/mCjmNIb97v/FnvfgqfoT4TTh
+	 rz7W2/MVey+NJeDPA+D1i7fdC/b2byuhn0NKXfgpQS+wRQ6AryyTiMSut6bA7FGvnc
+	 bh/vGMOJ+JsUoHC7zVNhazkcjoWtkM0V5Idz20gkDCG7oEUw/cZU4OFtBrphpw8Tfp
+	 o+KYa1jtD4fhg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -69,9 +69,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH 4/7] blk-mq: add scatterlist-less DMA mapping helpers
-Date: Sun, 27 Oct 2024 16:21:57 +0200
-Message-ID: <383557d0fa1aa393dbab4e1daec94b6cced384ab.1730037261.git.leon@kernel.org>
+Subject: [RFC PATCH 5/7] nvme-pci: remove struct nvme_descriptor
+Date: Sun, 27 Oct 2024 16:21:58 +0200
+Message-ID: <31fe216877a270c00bc79cddace3a9f4b3ade50c.1730037261.git.leon@kernel.org>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <cover.1730037261.git.leon@kernel.org>
 References: <cover.1730037261.git.leon@kernel.org>
@@ -85,281 +85,166 @@ Content-Transfer-Encoding: 8bit
 
 From: Christoph Hellwig <hch@lst.de>
 
-Add a new blk_rq_dma_map / blk_rq_dma_unmap pair that does away with
-the wasteful scatterlist structure.  Instead it uses the mapping iterator
-to either add segments to the IOVA for IOMMU operations, or just maps
-them one by one for the direct mapping.  For the IOMMU case instead of
-a scatterlist with an entry for each segment, only a single [dma_addr,len]
-pair needs to be stored for processing a request, and for the direct
-mapping the per-segment allocation shrinks from
-[page,offset,len,dma_addr,dma_len] to just [dma_addr,len].
+There is no real point in having a union of two pointer types here, just
+use a void pointer as we mix and match types between the arms of the
+union between the allocation and freeing side already.
 
-The major downside of this API is that the IOVA collapsing only works
-when the driver sets a virt_boundary that matches the IOMMU granule.
-
-Note that struct blk_dma_vec, struct blk_dma_mapping and blk_rq_dma_unmap
-aren't really block specific, but for they are kept with the only mapping
-routine to keep things simple.
+Also rename the nr_allocations field to nr_descriptors to better describe
+what it does.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- block/blk-merge.c          | 163 +++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq-dma.h |  64 +++++++++++++++
- 2 files changed, 227 insertions(+)
- create mode 100644 include/linux/blk-mq-dma.h
+ drivers/nvme/host/pci.c | 51 ++++++++++++++++++-----------------------
+ 1 file changed, 22 insertions(+), 29 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index b63fd754a5de..77e5a3d208fc 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -7,6 +7,8 @@
- #include <linux/bio.h>
- #include <linux/blkdev.h>
- #include <linux/blk-integrity.h>
-+#include <linux/blk-mq-dma.h>
-+#include <linux/dma-mapping.h>
- #include <linux/scatterlist.h>
- #include <linux/part_stat.h>
- #include <linux/blk-cgroup.h>
-@@ -515,6 +517,167 @@ static bool blk_map_iter_next(struct request *req,
- #define blk_phys_to_page(_paddr) \
- 	(pfn_to_page(__phys_to_pfn(_paddr)))
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 4b9fda0b1d9a..ba077a42cbba 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -43,7 +43,8 @@
+  */
+ #define NVME_MAX_KB_SZ	8192
+ #define NVME_MAX_SEGS	128
+-#define NVME_MAX_NR_ALLOCATIONS	5
++
++#define NVME_MAX_NR_DESCRIPTORS		5
  
-+/*
-+ * The IOVA-based DMA API wants to be able to coalesce at the minimal IOMMU page
-+ * size granularity (which is guaranteed to be <= PAGE_SIZE and usually 4k), so
-+ * we need to ensure our segments are aligned to this as well.
-+ *
-+ * Note that there is no point in using the slightly more complicated IOVA based
-+ * path for single segment mappings.
-+ */
-+static inline bool blk_can_dma_map_iova(struct request *req,
-+		struct device *dma_dev)
-+{
-+	return !((queue_virt_boundary(req->q) + 1) &
-+		dma_get_merge_boundary(dma_dev));
-+}
-+
-+static bool blk_dma_map_bus(struct request *req, struct device *dma_dev,
-+		struct blk_dma_iter *iter, struct phys_vec *vec)
-+{
-+	iter->addr = pci_p2pdma_bus_addr_map(&iter->p2pdma, vec->paddr);
-+	iter->len = vec->len;
-+	return true;
-+}
-+
-+static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
-+		struct blk_dma_iter *iter, struct phys_vec *vec)
-+{
-+	iter->addr = dma_map_page(dma_dev, blk_phys_to_page(vec->paddr),
-+			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
-+	if (dma_mapping_error(dma_dev, iter->addr)) {
-+		iter->status = BLK_STS_RESOURCE;
-+		return false;
-+	}
-+	iter->len = vec->len;
-+	return true;
-+}
-+
-+static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state, struct blk_dma_iter *iter,
-+		struct phys_vec *vec)
-+{
-+	enum dma_data_direction dir = rq_dma_dir(req);
-+	unsigned int mapped = 0;
-+	int error = 0;
-+
-+	iter->addr = state->addr;
-+	iter->len = dma_iova_size(state);
-+
-+	do {
-+		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
-+				vec->len, dir, 0);
-+		if (error)
-+			break;
-+		mapped += vec->len;
-+	} while (blk_map_iter_next(req, &iter->iter, vec));
-+
-+	error = dma_iova_sync(dma_dev, state, 0, mapped, error);
-+	if (error) {
-+		iter->status = errno_to_blk_status(error);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+/**
-+ * blk_rq_dma_map_iter_start - map the first DMA segment for a request
-+ * @req:	request to map
-+ * @dma_dev:	device to map to
-+ * @state:	DMA IOVA state
-+ * @iter:	block layer DMA iterator
-+ *
-+ * Start DMA mapping @req to @dma_dev.  @state and @iter are provided by the
-+ * caller and don't need to be initialized.  @state needs to be stored for use
-+ * at unmap time, @iter is only needed at map time.
-+ *
-+ * Returns %false if there is no segment to map, including due to an error, or
-+ * %true it it did map a segment.
-+ *
-+ * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-+ * the length in @iter.len.  If no segment was mapped the status code is
-+ * returned in @iter.status.
-+ *
-+ * The caller can call blk_rq_dma_map_coalesce() to check if further segments
-+ * need to be mapped after this, or go straight to blk_rq_dma_map_iter_next()
-+ * to try to map the following segments.
-+ */
-+bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state, struct blk_dma_iter *iter)
-+{
-+	unsigned int total_len = blk_rq_payload_bytes(req);
-+	struct phys_vec vec;
-+
-+	iter->iter.bio = req->bio;
-+	iter->iter.iter = req->bio->bi_iter;
-+	memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
-+	iter->status = BLK_STS_OK;
-+
-+	/*
-+	 * Grab the first segment ASAP because we'll need it to check for P2P
-+	 * transfers.
-+	 */
-+	if (!blk_map_iter_next(req, &iter->iter, &vec))
-+		return false;
-+
-+	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && (req->cmd_flags & REQ_P2PDMA)) {
-+		switch (pci_p2pdma_state(&iter->p2pdma, dma_dev,
-+				blk_phys_to_page(vec.paddr))) {
-+		case PCI_P2PDMA_MAP_BUS_ADDR:
-+			return blk_dma_map_bus(req, dma_dev, iter, &vec);
-+		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-+			/*
-+			 * P2P transfers through the host bridge are treated the
-+			 * same as non-P2P transfers below and during unmap.
-+			 */
-+			req->cmd_flags &= ~REQ_P2PDMA;
-+			break;
-+		default:
-+			iter->status = BLK_STS_INVAL;
-+			return false;
-+		}
-+	}
-+
-+	if (blk_can_dma_map_iova(req, dma_dev) &&
-+	    dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
-+		return blk_rq_dma_map_iova(req, dma_dev, state, iter, &vec);
-+	return blk_dma_map_direct(req, dma_dev, iter, &vec);
-+}
-+EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
-+
-+/**
-+ * blk_rq_dma_map_iter_next - map the next DMA segment for a request
-+ * @req:	request to map
-+ * @dma_dev:	device to map to
-+ * @state:	DMA IOVA state
-+ * @iter:	block layer DMA iterator
-+ *
-+ * Iterate to the next mapping after a previous call to
-+ * blk_rq_dma_map_iter_start().  See there for a detailed description of the
-+ * arguments.
-+ *
-+ * Returns %false if there is no segment to map, including due to an error, or
-+ * %true it it did map a segment.
-+ *
-+ * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-+ * the length in @iter.len.  If no segment was mapped the status code is
-+ * returned in @iter.status.
-+ */
-+bool blk_rq_dma_map_iter_next(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state, struct blk_dma_iter *iter)
-+{
-+	struct phys_vec vec;
-+
-+	if (!blk_map_iter_next(req, &iter->iter, &vec))
-+		return false;
-+
-+	if (iter->p2pdma.map == PCI_P2PDMA_MAP_BUS_ADDR)
-+		return blk_dma_map_bus(req, dma_dev, iter, &vec);
-+	return blk_dma_map_direct(req, dma_dev, iter, &vec);
-+}
-+EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_next);
-+
- static inline struct scatterlist *blk_next_sg(struct scatterlist **sg,
- 		struct scatterlist *sglist)
- {
-diff --git a/include/linux/blk-mq-dma.h b/include/linux/blk-mq-dma.h
-new file mode 100644
-index 000000000000..f1dae14e8203
---- /dev/null
-+++ b/include/linux/blk-mq-dma.h
-@@ -0,0 +1,64 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef BLK_MQ_DMA_H
-+#define BLK_MQ_DMA_H
-+
-+#include <linux/blk-mq.h>
-+#include <linux/pci-p2pdma.h>
-+
-+struct blk_dma_iter {
-+	/* Output address range for this iteration */
-+	dma_addr_t			addr;
-+	u32				len;
-+
-+	/* Status code. Only valid when blk_rq_dma_map_iter_* returned false */
-+	blk_status_t			status;
-+
-+	/* Internal to blk_rq_dma_map_iter_* */
-+	struct req_iterator		iter;
-+	struct pci_p2pdma_map_state	p2pdma;
-+};
-+
-+bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state, struct blk_dma_iter *iter);
-+bool blk_rq_dma_map_iter_next(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state, struct blk_dma_iter *iter);
-+
-+/**
-+ * blk_rq_dma_map_coalesce - were all segments coalesced?
-+ * @state: DMA state to check
-+ *
-+ * Returns true if blk_rq_dma_map_iter_start coalesced all segments into a
-+ * single DMA range.
-+ */
-+static inline bool blk_rq_dma_map_coalesce(struct dma_iova_state *state)
-+{
-+	return dma_use_iova(state);
-+}
-+
-+/**
-+ * blk_rq_dma_map_coalesce - try to DMA unmap a request
-+ * @req:	request to unmap
-+ * @dma_dev:	device to unmap from
-+ * @state:	DMA IOVA state
-+ *
-+ * Returns %false if the callers needs to manually unmap every DMA segment
-+ * mapped using @iter or %true if no work is left to be done.
-+ */
-+static inline bool blk_rq_dma_unmap(struct request *req, struct device *dma_dev,
-+		struct dma_iova_state *state)
-+{
-+	if (req->cmd_flags & REQ_P2PDMA)
-+		return true;
-+
-+	if (dma_use_iova(state)) {
-+		dma_iova_destroy(dma_dev, state, rq_dma_dir(req), 0);
-+		return true;
-+	}
-+
-+	if (!dma_need_unmap(dma_dev))
-+		return true;
-+
-+	return false;
-+}
-+
-+#endif /* BLK_MQ_DMA_H */
+ static int use_threaded_interrupts;
+ module_param(use_threaded_interrupts, int, 0444);
+@@ -216,28 +217,20 @@ struct nvme_queue {
+ 	struct completion delete_done;
+ };
+ 
+-union nvme_descriptor {
+-	struct nvme_sgl_desc	*sg_list;
+-	__le64			*prp_list;
+-};
+-
+ /*
+  * The nvme_iod describes the data in an I/O.
+- *
+- * The sg pointer contains the list of PRP/SGL chunk allocations in addition
+- * to the actual struct scatterlist.
+  */
+ struct nvme_iod {
+ 	struct nvme_request req;
+ 	struct nvme_command cmd;
+ 	bool aborted;
+-	s8 nr_allocations;	/* PRP list pool allocations. 0 means small
+-				   pool in use */
++	/* # of PRP/SGL descriptors: (0 for small pool) */
++	s8 nr_descriptors;
+ 	unsigned int dma_len;	/* length of single DMA segment mapping */
+ 	dma_addr_t first_dma;
+ 	dma_addr_t meta_dma;
+ 	struct sg_table sgt;
+-	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
++	void *descriptors[NVME_MAX_NR_DESCRIPTORS];
+ };
+ 
+ static inline unsigned int nvme_dbbuf_size(struct nvme_dev *dev)
+@@ -528,8 +521,8 @@ static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
+ 	dma_addr_t dma_addr = iod->first_dma;
+ 	int i;
+ 
+-	for (i = 0; i < iod->nr_allocations; i++) {
+-		__le64 *prp_list = iod->list[i].prp_list;
++	for (i = 0; i < iod->nr_descriptors; i++) {
++		__le64 *prp_list = iod->descriptors[i];
+ 		dma_addr_t next_dma_addr = le64_to_cpu(prp_list[last_prp]);
+ 
+ 		dma_pool_free(dev->prp_page_pool, prp_list, dma_addr);
+@@ -551,11 +544,11 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 
+ 	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
+ 
+-	if (iod->nr_allocations == 0)
+-		dma_pool_free(dev->prp_small_pool, iod->list[0].sg_list,
++	if (iod->nr_descriptors == 0)
++		dma_pool_free(dev->prp_small_pool, iod->descriptors[0],
+ 			      iod->first_dma);
+-	else if (iod->nr_allocations == 1)
+-		dma_pool_free(dev->prp_page_pool, iod->list[0].sg_list,
++	else if (iod->nr_descriptors == 1)
++		dma_pool_free(dev->prp_page_pool, iod->descriptors[0],
+ 			      iod->first_dma);
+ 	else
+ 		nvme_free_prps(dev, req);
+@@ -613,18 +606,18 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
+ 	nprps = DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE);
+ 	if (nprps <= (256 / 8)) {
+ 		pool = dev->prp_small_pool;
+-		iod->nr_allocations = 0;
++		iod->nr_descriptors = 0;
+ 	} else {
+ 		pool = dev->prp_page_pool;
+-		iod->nr_allocations = 1;
++		iod->nr_descriptors = 1;
+ 	}
+ 
+ 	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
+ 	if (!prp_list) {
+-		iod->nr_allocations = -1;
++		iod->nr_descriptors = -1;
+ 		return BLK_STS_RESOURCE;
+ 	}
+-	iod->list[0].prp_list = prp_list;
++	iod->descriptors[0] = prp_list;
+ 	iod->first_dma = prp_dma;
+ 	i = 0;
+ 	for (;;) {
+@@ -633,7 +626,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
+ 			prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
+ 			if (!prp_list)
+ 				goto free_prps;
+-			iod->list[iod->nr_allocations++].prp_list = prp_list;
++			iod->descriptors[iod->nr_descriptors++] = prp_list;
+ 			prp_list[0] = old_prp_list[i - 1];
+ 			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
+ 			i = 1;
+@@ -703,19 +696,19 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
+ 
+ 	if (entries <= (256 / sizeof(struct nvme_sgl_desc))) {
+ 		pool = dev->prp_small_pool;
+-		iod->nr_allocations = 0;
++		iod->nr_descriptors = 0;
+ 	} else {
+ 		pool = dev->prp_page_pool;
+-		iod->nr_allocations = 1;
++		iod->nr_descriptors = 1;
+ 	}
+ 
+ 	sg_list = dma_pool_alloc(pool, GFP_ATOMIC, &sgl_dma);
+ 	if (!sg_list) {
+-		iod->nr_allocations = -1;
++		iod->nr_descriptors = -1;
+ 		return BLK_STS_RESOURCE;
+ 	}
+ 
+-	iod->list[0].sg_list = sg_list;
++	iod->descriptors[0] = sg_list;
+ 	iod->first_dma = sgl_dma;
+ 
+ 	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
+@@ -841,7 +834,7 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+ 	blk_status_t ret;
+ 
+ 	iod->aborted = false;
+-	iod->nr_allocations = -1;
++	iod->nr_descriptors = -1;
+ 	iod->sgt.nents = 0;
+ 
+ 	ret = nvme_setup_cmd(req->q->queuedata, req);
+@@ -3626,7 +3619,7 @@ static int __init nvme_init(void)
+ 	BUILD_BUG_ON(IRQ_AFFINITY_MAX_SETS < 2);
+ 	BUILD_BUG_ON(NVME_MAX_SEGS > SGES_PER_PAGE);
+ 	BUILD_BUG_ON(sizeof(struct scatterlist) * NVME_MAX_SEGS > PAGE_SIZE);
+-	BUILD_BUG_ON(nvme_pci_npages_prp() > NVME_MAX_NR_ALLOCATIONS);
++	BUILD_BUG_ON(nvme_pci_npages_prp() > NVME_MAX_NR_DESCRIPTORS);
+ 
+ 	return pci_register_driver(&nvme_driver);
+ }
 -- 
 2.46.2
 
