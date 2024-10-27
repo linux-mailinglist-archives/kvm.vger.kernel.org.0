@@ -1,227 +1,246 @@
-Return-Path: <kvm+bounces-29753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6AA9B1ABA
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 22:26:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E97D9B1D11
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 11:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DCFD1F21C69
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2024 20:26:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E205C281AD1
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 10:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93221187850;
-	Sat, 26 Oct 2024 20:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2B813B59B;
+	Sun, 27 Oct 2024 10:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0EwPZa0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PCcXgPKH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417C718E37D
-	for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 20:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729974368; cv=none; b=gt1tFtk5eP0c5rtAqADaL171wH0Xmz1rNeURt5Sy9eugE+EgySw5u8jtv0e2TlZ15k/G+p9uo4X8dGJn56JqvFmSlYJn9i+QdTSjCBr8NCcSReM0Ztzv7754b2TZobHLG6N0h/u4zStSbzQ/3PVcF9P8ny3Q+iJn6m9XxZTzku0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729974368; c=relaxed/simple;
-	bh=tUAUvQ737sodN9yK5aQGONrT7W7Or4tB2oyzGkwlZQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mPJ13yFzWV35643fLd+TYptxS469eQOwYFLh7zxpTDjbg5/ucgjUoaNjHZmehpfqNpftlQOJ4/rvHSXaSFlP5FUyquECVjzxJrcLuzfNhzWq5mXyHGMa0u/+FcCXvdAid2rK1F77y31YUPy8DMkRL9OeoWC25+oc765VdZgZ1Us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W0EwPZa0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729974365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8ILgF2ANT9OZDmDrUe3BvutpFI6Z0i+T3Y7sxTWoDZw=;
-	b=W0EwPZa0PllVW4W0lMoRw4uGuPynigAo4CW8mf1jEafXGaj4L559N2UPyzCSCaWtmfC4Db
-	d/WtXIWckZIqh22w3RMJu5cBwi3hLwEGpqd+lCTjodDoPjbwc3oCTZlyLBchTcmYYRBPzT
-	7oIdCKlWgunPNALnHJAiV5x84/AM5V8=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-dHZdroCwM-G5jBzqAix_xA-1; Sat, 26 Oct 2024 16:26:03 -0400
-X-MC-Unique: dHZdroCwM-G5jBzqAix_xA-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e4ece7221so3094464b3a.0
-        for <kvm@vger.kernel.org>; Sat, 26 Oct 2024 13:26:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729974363; x=1730579163;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ILgF2ANT9OZDmDrUe3BvutpFI6Z0i+T3Y7sxTWoDZw=;
-        b=AhC7XWUZ/3/MyjB94XSzVDpZqk6LFFygFFlRlnjJYuoRep90EG9Py4Gff5JRHotGWL
-         6YcjsAjnGmdjnJSg+m0QbMwhcFNTI0jKq/NFZJNJ2ER6dC3DqWTThGOYiBCNhdclgkM6
-         J1YzD2HhzEvEimtPuAFnHwspdEhg8qUtAF1us+ZsMEr5V5YjccevfZBJ7GjqTeAwH53w
-         758JfjsHLRoxCz71NkWf8gvVW99X4Ig7+kmcP1vz7Svl4pyqT4rlnrv02+NJsp34sPZg
-         RyKKZpPg05jO5cTIFQXYrLI9KXETBzeAzFJ3c1BpmKcw/r+RE+GF1cimj/035qodqe/M
-         4utw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7gDfcDeXc3oNRJeEndNhrrN6W/AsnAvc6woZ4DwaOoUsh5CNOlC2syn6dDbNZQsNoh0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyENotWW/hlRflcQFHO6xwYvGLX5s2knQ36CQvYkxA95cbWrvWu
-	M+RCqSSlImkwr5rvn5xUVjny3ZQvLtsKn2fxvgfUDTFqhztJqC1y19YWg83dP+cf7CTeuIJ4wsW
-	vaYr1U7fsLMeHQh41d+nvbOmghJH8dsYBDrV/QiSTSzgWomooNA==
-X-Received: by 2002:a05:6a21:394b:b0:1d9:3acf:8bdd with SMTP id adf61e73a8af0-1d9a767bdfamr5925529637.22.1729974362654;
-        Sat, 26 Oct 2024 13:26:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwP/m05oeFk9b8sbVzI0tK+++7zBHiaxMX3MviGhXhL+kZBBndL9iS5Tpoq327xlI5FsMfmw==
-X-Received: by 2002:a05:6a21:394b:b0:1d9:3acf:8bdd with SMTP id adf61e73a8af0-1d9a767bdfamr5925511637.22.1729974362246;
-        Sat, 26 Oct 2024 13:26:02 -0700 (PDT)
-Received: from localhost (ip98-179-76-110.ph.ph.cox.net. [98.179.76.110])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205791dda2sm3081517b3a.42.2024.10.26.13.26.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Oct 2024 13:26:01 -0700 (PDT)
-Date: Sat, 26 Oct 2024 13:26:00 -0700
-From: Jerry Snitselaar <jsnitsel@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>, 
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>, 
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, Len Brown <lenb@kernel.org>, 
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
-	Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev, 
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, 
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v3 0/9] Initial support for SMMUv3 nested translation
-Message-ID: <7uv6kandebgqyw64im2kfwmiqahsikpsb6yp2tkd6qol3li3r3@fxsra3soryma>
-References: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F3F29CE8
+	for <kvm@vger.kernel.org>; Sun, 27 Oct 2024 10:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730023720; cv=fail; b=Qcjw2EWzISJs+nQ6cOcxsc7fsUEqOZx97OXZkp/s98Bsmg/kBirnTU34NE9Pnt3tby5pTV+DSoSRDN44Pys/IgkSxP0ulCF3Z9WQaNPTMP5lVetQZ0ki/vBsTps4BYyLOjvoSG+iS5o9pGmUoajCbgjAj7pzpvqg87SJ1lv1avQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730023720; c=relaxed/simple;
+	bh=42KrXyNjAsSguxripYCr4BOT2l9Zkpr09QnRkDrdnFQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uL/J4cBsq55EBLmu3U8ZMQevVlLShWNxxNL/z75dYaSpMiWkf7CAC9RXo7VrjojpdscgSb4zKsmmFe2AiWzoUQbBRNIGD6pY5EJDZXaCOVZ/mUZk2QtLPjqcn4OHMKyWDPWDFN06sLY5DYL4L3zeR5ameEtzQ1+soQe8gy4/Elg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PCcXgPKH; arc=fail smtp.client-ip=40.107.220.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=s7UO58fSFo7vVZZajKYIGiFKMUpfsgKEp/bsetvMFNVDSAu+2XI3AJCT4gIKwrEpfJ7ijqu0ERP4b/BVMv14YlMzGPbtb08PME07FtpU/Dy6MJuscgWcNvfUOk5w6/N3G47brIP1KWG1cGqxsu/DedzK9xXE0RkUUrwkdUYZOB747HrSaFcB8CfShoS9HZ5L2P40rc8fR06tAauFH9Fop/Bfd5VUsoj6qx2GC8T3ude3yDIBn0qllP/2yM2pd8RC+ZzYimGOjGqpuDaDMqBVoIcrh14ENYMscWF9VO9fxKNuSkfMGl7QmqZ7HZNMF6Fl5tlq7t31jd9fNfmSgy2C+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FPjQUWXk6Tra4ix46EvHuWdZcFfmvfQEc7G/zbY7vhI=;
+ b=V0fcZTl38QXZSEubSi1K9mirf93/TGD/wTPFR2e5HOQDgVaBqyWDQmc63y0DKipDqeBX7FS8DZQlgGFIl4yR6XHed0vp8uypmA86JrJG3Vnf3xe9bx/igIjVQVArQUL7ZSSLKGefwt7aCLC/vZvrhU5ciU59vIz60eyseaziC7SicKe2lJgre3BPgMPXYeiH5LPmJRaA+UoaHM+ztwIUdC6Iq05TymJZQ6mPPWuAXFo9u3a/T24sfOZ2UVR3UOSVsMa+eujMHQrdEJ97Gu617Qnk+/idXA69oaOicjG/f1NPaiIjiqL4fpnyYHo5GoH18NpzgIPC9oeSpkQRmcNKzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FPjQUWXk6Tra4ix46EvHuWdZcFfmvfQEc7G/zbY7vhI=;
+ b=PCcXgPKHZVFrlr7yj+8KZtohx1yXLRJ8r/vMHI6SbTqKNfwA3lA/6TYclOjutWsGzUHeGclR8gP2zAx1ZvYKTt0zTeVEKxkreiyJSpg1NMKeB2cV0FytAGZMFBgXfuduaqLekDjTakXTUes+jVURUMqbYV94BmeC8WtUC6707RsUB9JPTVhniyMsApcBNLwKPB/0V23aedLL4STibIquLCxEIu4PdRt10lIwWuTBIX1WK7JIP7MhUuIsfeaXizaQmgrGAFw3HFTxjs4bQS1bKeVs90DdloUFVekF1qnq+m+UVCUfkPUHG94+rbxyrf+LLz6B36ylWaPAgP6jcIkdyw==
+Received: from MW4PR04CA0049.namprd04.prod.outlook.com (2603:10b6:303:6a::24)
+ by SA1PR12MB7102.namprd12.prod.outlook.com (2603:10b6:806:29f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Sun, 27 Oct
+ 2024 10:08:34 +0000
+Received: from BN3PEPF0000B077.namprd04.prod.outlook.com
+ (2603:10b6:303:6a:cafe::dd) by MW4PR04CA0049.outlook.office365.com
+ (2603:10b6:303:6a::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24 via Frontend
+ Transport; Sun, 27 Oct 2024 10:08:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN3PEPF0000B077.mail.protection.outlook.com (10.167.243.122) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.14 via Frontend Transport; Sun, 27 Oct 2024 10:08:33 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 27 Oct
+ 2024 03:08:19 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 27 Oct
+ 2024 03:08:19 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Sun, 27 Oct
+ 2024 03:08:15 -0700
+From: Yishai Hadas <yishaih@nvidia.com>
+To: <alex.williamson@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
+	<jgg@nvidia.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
+	<joao.m.martins@oracle.com>, <leonro@nvidia.com>, <yishaih@nvidia.com>,
+	<maorg@nvidia.com>
+Subject: [PATCH vfio 0/7] Enhances the vfio-virtio driver to support live migration
+Date: Sun, 27 Oct 2024 12:07:44 +0200
+Message-ID: <20241027100751.219214-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B077:EE_|SA1PR12MB7102:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3413feaf-a4c9-45c2-07ea-08dcf66f50d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?VETwP+kmJc6Ptomncv1ipUioTQzUqjPdsWnpBqxgQq0xmP26ph9au5iQTR3D?=
+ =?us-ascii?Q?tKJSAPitiomPtnBiobgUxE9wweQwC7AdOXWGdC6EiZnH8c58tbLX2llwgYI8?=
+ =?us-ascii?Q?JkV7xd2MOGRex4p4QWCSBtANafqYzNnXHBT9e3oNFCrFcDS5gEdJH4830G52?=
+ =?us-ascii?Q?d04yepr45t1zs0LyyZBCjLJ9ScPZ2i84AvffHeFaOPyEXeEHTnmdu75mT1Nq?=
+ =?us-ascii?Q?U2MVcX0lLH0kJWFJoUukVhKhN6Y/gXmpBddfUssGcRuG30PsFFYPqDvxFFeo?=
+ =?us-ascii?Q?u9oy1poonBZYLOa7AokgRNTvkB9vJm3MFGHJ6szYyyavdGZd5WuJxHI7waUb?=
+ =?us-ascii?Q?WuVCT28/pXNQRZ5P63AVW6Bvy+3FdsZv5haSBnAVX2GK4HdIy3wLFYN3KtC/?=
+ =?us-ascii?Q?3WoUZm3SChWkmVwMVccPH5asJqe2FWRygCjbvR4YwMf9Z2UE1Puqs0sU16ol?=
+ =?us-ascii?Q?o0eMJN2VYEngNseM4xMA5XSPbcf795pNzmNr/HDg/lLYcOIn/zCh/mBCbt2j?=
+ =?us-ascii?Q?O2nRClGb8ziP1kOMp8HV9pgx5P5+3T6mpwA2NxiF27dro0MJNF62bNE8VLug?=
+ =?us-ascii?Q?sB6yyiHRKsRf8+dl2rn805uw/C8DNecLT9YEIWolP2a9ZinfWqSxL6TvpLt4?=
+ =?us-ascii?Q?tw8ZZlmRdESM1DlCOaWUTlpfY4Xwu1GXTlNvJhrqm2RtcRUzyZ/laM9R7DGa?=
+ =?us-ascii?Q?Vqc1phGnCsS/Ds4ONndwxV1IACkXtNAiIrW1AGiogOsdIhbM7vl+rzrEmPOs?=
+ =?us-ascii?Q?fE+NTigrJWfcjGUZEM8lCVL3SgI04IQr/LIYcGyhRLHr6dk6HmWoj2m1sgRD?=
+ =?us-ascii?Q?hfOFFiOW4O2g4YTp8zDRwdpG6pRTeQ8Z3g2nSthmNqA1KzXv6Dyds9WyT7vq?=
+ =?us-ascii?Q?rJ9zBubmO9/6+lQUqXjWzP5S8HwO2JjS5AhCEpwr0hUZj+R0dGnZfIhRzyxy?=
+ =?us-ascii?Q?fFvS5XONnpBrym9zCDBsTyVfumuFOZ5C01B7U5MGIYjceMcbh0nau3QdxbuM?=
+ =?us-ascii?Q?ndxFXKYFtQn7DffAziuX3HBiU5mnGcw2tJMsooripV9c4DcyotBHjvJHGUyy?=
+ =?us-ascii?Q?1HzlqgOn3vOq868+LfxKJz11H+nhZ9Npkt8GZUdW9DTXNwiNcdRQ2yB2/mkq?=
+ =?us-ascii?Q?1o0kZKCfgo+/I0TiLXVZhw+m5sUiieMYkKDDB2LwU/y7shvC5+f6i6xfMzD8?=
+ =?us-ascii?Q?06aqYZ1jFLDuCWJopTc6N4y2DueLIdHwodpnHkZeGyE6ycgKsdlqmhC/D/QF?=
+ =?us-ascii?Q?5hOGaYjC7LlRiyUT6eHrfn3TBmIT3I4ALbL69nBmyFfIQjTfOrngfUaCHRT/?=
+ =?us-ascii?Q?Y988w3vhxlxU1l7jyNEVKVTn9yYRPDwgZyjXZxr146BNUlBMogoGAHhqGJjV?=
+ =?us-ascii?Q?7wAGoTazZlmCxo+u5NpqH62CBqd1hAwA/8gk2lD5arXus5mIvg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2024 10:08:33.5808
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3413feaf-a4c9-45c2-07ea-08dcf66f50d7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B077.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7102
 
-On Wed, Oct 09, 2024 at 01:23:06PM -0300, Jason Gunthorpe wrote:
-> This brings support for the IOMMFD ioctls:
-> 
->  - IOMMU_GET_HW_INFO
->  - IOMMU_HWPT_ALLOC_NEST_PARENT
->  - IOMMU_DOMAIN_NESTED
->  - ops->enforce_cache_coherency()
-> 
-> This is quite straightforward as the nested STE can just be built in the
-> special NESTED domain op and fed through the generic update machinery.
-> 
-> The design allows the user provided STE fragment to control several
-> aspects of the translation, including putting the STE into a "virtual
-> bypass" or a aborting state. This duplicates functionality available by
-> other means, but it allows trivially preserving the VMID in the STE as we
-> eventually move towards the vIOMMU owning the VMID.
-> 
-> Nesting support requires the system to either support S2FWB or the
-> stronger CANWBS ACPI flag. This is to ensure the VM cannot bypass the
-> cache and view incoherent data, currently VFIO lacks any cache flushing
-> that would make this safe.
-> 
-> Yan has a series to add some of the needed infrastructure for VFIO cache
-> flushing here:
-> 
->  https://lore.kernel.org/linux-iommu/20240507061802.20184-1-yan.y.zhao@intel.com/
-> 
-> Which may someday allow relaxing this further.
-> 
-> Remove VFIO_TYPE1_NESTING_IOMMU since it was never used and superseded by
-> this.
-> 
-> This is the first series in what will be several to complete nesting
-> support. At least:
->  - IOMMU_RESV_SW_MSI related fixups
->     https://lore.kernel.org/linux-iommu/cover.1722644866.git.nicolinc@nvidia.com/
->  - vIOMMU object support to allow ATS and CD invalidations
->     https://lore.kernel.org/linux-iommu/cover.1723061377.git.nicolinc@nvidia.com/
->  - vCMDQ hypervisor support for direct invalidation queue assignment
->     https://lore.kernel.org/linux-iommu/cover.1712978212.git.nicolinc@nvidia.com/
->  - KVM pinned VMID using vIOMMU for vBTM
->     https://lore.kernel.org/linux-iommu/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
->  - Cross instance S2 sharing
->  - Virtual Machine Structure using vIOMMU (for vMPAM?)
->  - Fault forwarding support through IOMMUFD's fault fd for vSVA
-> 
-> The vIOMMU series is essential to allow the invalidations to be processed
-> for the CD as well.
-> 
-> It is enough to allow qemu work to progress.
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/smmuv3_nesting
-> 
-> v3:
->  - Rebase on v6.12-rc2
->  - Revise commit messages
->  - Consolidate CANWB checks into arm_smmu_master_canwbs()
->  - Add CONFIG_ARM_SMMU_V3_IOMMUFD to compile out iommufd only features
->    like nesting
->  - Shift code into arm-smmu-v3-iommufd.c
->  - Add missed IS_ERR check
->  - Add S2FWB to arm_smmu_get_ste_used()
->  - Fixup quirks checks
->  - Drop ARM_SMMU_FEAT_COHERENCY checks for S2FWB
->  - Limit S2FWB to S2 Nesting Parent domains "just in case"
-> v2: https://patch.msgid.link/r/0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com
->  - Revise commit messages
->  - Guard S2FWB support with ARM_SMMU_FEAT_COHERENCY, since it doesn't make
->    sense to use S2FWB to enforce coherency on inherently non-coherent hardware.
->  - Add missing IO_PGTABLE_QUIRK_ARM_S2FWB validation
->  - Include formal ACPIA commit for IORT built using
->    generate/linux/gen-patch.sh
->  - Use FEAT_NESTING to block creating a NESTING_PARENT
->  - Use an abort STE instead of non-valid if the user requests a non-valid
->    vSTE
->  - Consistently use 'nest_parent' for naming variables
->  - Use the right domain for arm_smmu_remove_master_domain() when it
->    removes the master
->  - Join bitfields together
->  - Drop arm_smmu_cache_invalidate_user patch, invalidation will
->    exclusively go via viommu
-> v1: https://patch.msgid.link/r/0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com
-> 
-> Jason Gunthorpe (6):
->   vfio: Remove VFIO_TYPE1_NESTING_IOMMU
->   iommu/arm-smmu-v3: Report IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
->   iommu/arm-smmu-v3: Implement IOMMU_HWPT_ALLOC_NEST_PARENT
->   iommu/arm-smmu-v3: Expose the arm_smmu_attach interface
->   iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
->   iommu/arm-smmu-v3: Use S2FWB for NESTED domains
-> 
-> Nicolin Chen (3):
->   ACPICA: IORT: Update for revision E.f
->   ACPI/IORT: Support CANWBS memory access flag
->   iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via struct
->     arm_smmu_hw_info
-> 
->  drivers/acpi/arm64/iort.c                     |  13 ++
->  drivers/iommu/Kconfig                         |   9 +
->  drivers/iommu/arm/arm-smmu-v3/Makefile        |   1 +
->  .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 204 ++++++++++++++++++
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 114 ++++++----
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  83 ++++++-
->  drivers/iommu/arm/arm-smmu/arm-smmu.c         |  16 --
->  drivers/iommu/io-pgtable-arm.c                |  27 ++-
->  drivers/iommu/iommu.c                         |  10 -
->  drivers/iommu/iommufd/vfio_compat.c           |   7 +-
->  drivers/vfio/vfio_iommu_type1.c               |  12 +-
->  include/acpi/actbl2.h                         |   3 +-
->  include/linux/io-pgtable.h                    |   2 +
->  include/linux/iommu.h                         |   5 +-
->  include/uapi/linux/iommufd.h                  |  55 +++++
->  include/uapi/linux/vfio.h                     |   2 +-
->  16 files changed, 465 insertions(+), 98 deletions(-)
->  create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
-> 
-> 
-> base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
-> -- 
-> 2.46.2
-> 
+This series enhances the vfio-virtio driver to support live migration
+for virtio-net Virtual Functions (VFs) that are migration-capable.
+ 
+This series follows the Virtio 1.4 specification to implement the
+necessary device parts commands, enabling a device to participate in the
+live migration process.
 
-Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
+The key VFIO features implemented include: VFIO_MIGRATION_STOP_COPY,
+VFIO_MIGRATION_P2P, VFIO_MIGRATION_PRE_COPY.
+ 
+The implementation integrates with the VFIO subsystem via vfio_pci_core
+and incorporates Virtio-specific logic to handle the migration process.
+ 
+Migration functionality follows the definitions in uapi/vfio.h and uses
+the Virtio VF-to-PF admin queue command channel for executing the device
+parts related commands.
+ 
+Patch Overview:
+The first four patches focus on the Virtio layer and address the
+following:
+- Define the layout of the device parts commands required as part of the
+  migration process.
+- Provide APIs to enable upper layers (e.g., VFIO, net) to execute the
+  related device parts commands.
+ 
+The last three patches focus on the VFIO layer:
+- Extend the vfio-virtio driver to support live migration for Virtio-net
+  VFs.
+- Move legacy I/O operations to a separate file, which is compiled only
+  when VIRTIO_PCI_ADMIN_LEGACY is configured, ensuring that live
+  migration depends solely on VIRTIO_PCI.
+ 
+Additional Notes:
+- The kernel protocol between the source and target devices includes a
+  header containing metadata such as record size, tag, and flags.
+  The record size allows the target to read a complete image from the
+  source before passing device part data. This follows the Virtio
+  specification, which mandates that partial device parts are not
+  supplied. The tag and flags serve as placeholders for future extensions
+  to the kernel protocol between the source and target, ensuring backward
+  and forward compatibility.
+ 
+- Both the source and target comply with the Virtio specification by
+  using a device part object with a unique ID during the migration
+  process. As this resource is limited to a maximum of 255, its lifecycle
+  is confined to periods when live migration is active.
+
+- According to the Virtio specification, a device has only two states:
+  RUNNING and STOPPED. Consequently, certain VFIO transitions (e.g.,
+  RUNNING_P2P->STOP, STOP->RUNNING_P2P) are treated as no-ops. When
+  transitioning to RUNNING_P2P, the device state is set to STOP and
+  remains STOPPED until it transitions back from RUNNING_P2P->RUNNING, at
+  which point it resumes its RUNNING state.
+ 
+- Furthermore, the Virtio specification does not support reading partial
+  or incremental device contexts. This means that during the PRE_COPY
+  state, the vfio-virtio driver reads the full device state. This step is
+  beneficial because it allows the device to send some "initial data"
+  before moving to the STOP_COPY state, thus reducing downtime by
+  preparing early. To avoid an infinite number of device calls during
+  PRE_COPY, the vfio-virtio driver limits this flow to a maximum of 128
+  calls. After reaching this limit, the driver will report zero bytes
+  remaining in PRE_COPY, signaling to QEMU to transition to STOP_COPY.
+ 
+- Support for dirty page tracking during migration will be provided via
+  the IOMMUFD framework.
+ 
+- This series has been successfully tested on Virtio-net VF devices.
+
+Yishai
+
+Yishai Hadas (7):
+  virtio_pci: Introduce device parts access commands
+  virtio: Extend the admin command to include the result size
+  virtio: Manage device and driver capabilities via the admin commands
+  virtio-pci: Introduce APIs to execute device parts admin commands
+  vfio/virtio: Add support for the basic live migration functionality
+  vfio/virtio: Add PRE_COPY support for live migration
+  vfio/virtio: Enable live migration once VIRTIO_PCI was configured
+
+ drivers/vfio/pci/virtio/Kconfig     |    4 +-
+ drivers/vfio/pci/virtio/Makefile    |    3 +-
+ drivers/vfio/pci/virtio/common.h    |  127 +++
+ drivers/vfio/pci/virtio/legacy_io.c |  420 +++++++++
+ drivers/vfio/pci/virtio/main.c      |  496 ++--------
+ drivers/vfio/pci/virtio/migrate.c   | 1339 +++++++++++++++++++++++++++
+ drivers/virtio/virtio_pci_common.h  |   19 +-
+ drivers/virtio/virtio_pci_modern.c  |  457 ++++++++-
+ include/linux/virtio.h              |    1 +
+ include/linux/virtio_pci_admin.h    |   11 +
+ include/uapi/linux/virtio_pci.h     |  131 +++
+ 11 files changed, 2593 insertions(+), 415 deletions(-)
+ create mode 100644 drivers/vfio/pci/virtio/common.h
+ create mode 100644 drivers/vfio/pci/virtio/legacy_io.c
+ create mode 100644 drivers/vfio/pci/virtio/migrate.c
+
+-- 
+2.27.0
 
 
