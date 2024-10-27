@@ -1,141 +1,184 @@
-Return-Path: <kvm+bounces-29763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D609B1DF5
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 14:55:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D03AA9B1E02
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 15:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87DF0B20F4D
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 13:55:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 984EB281B4D
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 14:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E028C156F45;
-	Sun, 27 Oct 2024 13:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E63165EFC;
+	Sun, 27 Oct 2024 14:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T9M0HXc6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A585558BC
-	for <kvm@vger.kernel.org>; Sun, 27 Oct 2024 13:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6D9566A;
+	Sun, 27 Oct 2024 14:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730037336; cv=none; b=s9LAPd80lfxiC33gmqx63qp7XlWIX9dK8CKnXCKytINBcaA6mvU6RcriFz1KAZzmfDmG/eHv+jpg4EuFZpj7MnwW1G/C7Oz3iaqoDpxIua9K0RyIP1hMLo0fe40STWdowCE5GtcQwKSQd0AsKSubpZl1zgLABnfcaTKhYUkkFM4=
+	t=1730037987; cv=none; b=kwA5fKcRqzxxpGFFU5kUN9sX91EtYBrnfNc/Tm6Wyg1Jn5mieE136JnXgT6spkVXuzTvZeUUyVIcYS0g0alHuY5KmOCCmVv5qw3xhiJ7FK4fFTGKQE8wpP3SjPKw0trOAbf2gOM1uoiCD0AyhRBQSXXIqCzGHg0lw0aZLZtaVB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730037336; c=relaxed/simple;
-	bh=IagfQGZZSfpCbczPiCtVB7H5zIQnFPYsAAqk0fIFFNc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Pzdi2MtCxOgXMnKa1ZilEO8c2xiCYDlBsAgwdEECU8m+nhA93SwVKhH+IhXrv9d1M+ErVq18zmvRx9D9ph9+KkaD99bMZ6S5tkdzLUJyQRQDn/WpVwMEJWXIMuXB9P4cOiOvM7K2qgf6b3X/o8WLm1GlRW/rUo/exF8gnW8KWGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a4e52b6577so23736925ab.3
-        for <kvm@vger.kernel.org>; Sun, 27 Oct 2024 06:55:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730037333; x=1730642133;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DvpTdNJAHMUYMjV0otN9rJrodmRbe5MNxe8dC8b5a+s=;
-        b=TeifiGhCCXI11Eh2fi4HxFCSLJoZCEt2hPjCnsi6OPmn4X5v2uvJ29xnVr6dPRpWJI
-         EZQ0CVeIevU8lN4nSujz9sEEj4n51ieh94K9QZjDoidmkkYLOnUJjTUtXexhNaamggEf
-         zkBa88KaYaJXP093UENj1SfhwyXKBCopy7OVfIVMGCAeB1RbyFfgHmE2KJfbD1UAUSmE
-         GUw1tEvaG9XRsGtHYGchcMJRf05cbWrPBxjEyNKvn44KQTFz/QcMwQs1UyOkazhi2tF1
-         ZPZZ3PpMeqVc3wNxQ1wW626F1FbKKrIWWK7IFjhiy3T523hfklxI/OHTHkM9F7CJ8TlA
-         xG0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXvl31Dn9Gr3xjVRblrm+u7NLq0kSM5cAgSvqPAd8zBzIpZzktlX3BbYI+ZSYldDwPR2eM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcJYQrx8WUk6hcHvBqEWYVvazynKzdTnGByAxiWudK43Epg0ul
-	jv2CvUn8dz1a3wFAtnxrgrKJrdTHAwov+BH3vPSCuy1S5+1fw19eCUBOhNMc3TxrP2+fYvIj2NO
-	UXOPh3jYhE4XJrYnqNLgVTi61Dd6zxiMMJ2Pb8pACgk5/NTqlbAsVNHg=
-X-Google-Smtp-Source: AGHT+IFgVj5y7UcihmmcffRNSjAUAwJfopX6wPsav4ShCezh1Hg0VzDeEPFvjj/nI9gnNr1RM0lkZYrJahlIKMAz9BYGshq8ciZq
+	s=arc-20240116; t=1730037987; c=relaxed/simple;
+	bh=+w719NZeWpJQATCySgxL+7T4ydNQQFE6MvtDCIXUBKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m9S/awnY49yehIdYtCQa01Gf9LGgRONeQ8yUUp1YLeMwlSzmMBCEONQy6kCHbsuGQ+2b72gwjjeFr2nSeL7iBWb9V2EibjL0AhdpFAALyl4wb4LZMp4G+WndO9GDjIqjZ7JR+m9qIp29ah9mJMwWr4dnZZhNnhHN7LRwi546tm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T9M0HXc6; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730037986; x=1761573986;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+w719NZeWpJQATCySgxL+7T4ydNQQFE6MvtDCIXUBKQ=;
+  b=T9M0HXc6lrLj68rO1BTdTOWZ1cg9iIofxL3Gr8u/kNlkc8HtcvPnZnsA
+   QDTMSXWukIhQGKhRbuG394swDAtKowEIHTGKpZ1rthCLieK5IOmLrdqYu
+   mzo0yaAXinhtGI6LRaKEYyIoAPgqf+U3/5wbcHsaGxNiQF0Dvk7OqfAsK
+   mzYAlM3QqWk/hbMeST9vK41jpKahuzXpE/fowIs52RWDN60h/7gGoql1Q
+   xeb6Qgx4i+8WItZmJy53LJeseuMS/r5QCkj5NjLJAeB244I+I7nhdYpCX
+   cfTXYb8uHHrrbWwgwkPb/+04il1YHHGZM9HXWWCpNOyAMOI0W63HRbcUg
+   w==;
+X-CSE-ConnectionGUID: kUXigcBfRZW5A77hlKN4Cg==
+X-CSE-MsgGUID: 7fxoS/A6RCS0GL/21w96eA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="33557709"
+X-IronPort-AV: E=Sophos;i="6.11,237,1725346800"; 
+   d="scan'208";a="33557709"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 07:06:25 -0700
+X-CSE-ConnectionGUID: n8a56hwLS8+he2G/BxEBOw==
+X-CSE-MsgGUID: tuaZi8akSUKfju80jbQPCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,237,1725346800"; 
+   d="scan'208";a="81323263"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.172]) ([10.124.227.172])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 07:06:21 -0700
+Message-ID: <81e6604b-fa84-4b74-b9e6-2a37e8076fd7@intel.com>
+Date: Sun, 27 Oct 2024 22:06:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1445:b0:3a3:b45b:a8cc with SMTP id
- e9e14a558f8ab-3a4ed2b5cb9mr42286565ab.15.1730037333549; Sun, 27 Oct 2024
- 06:55:33 -0700 (PDT)
-Date: Sun, 27 Oct 2024 06:55:33 -0700
-In-Reply-To: <66f4164d.050a0220.211276.0032.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <671e4655.050a0220.2b8c0f.01d8.GAE@google.com>
-Subject: Re: [syzbot] [bcachefs] WARNING in srcu_check_nmi_safety (2)
-From: syzbot <syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com>
-To: kent.overstreet@linux.dev, kvm@vger.kernel.org, 
-	linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] KVM: kvm-coco-queue: Support protected TSC
+To: Marcelo Tosatti <mtosatti@redhat.com>, "Nikunj A. Dadhania"
+ <nikunj@amd.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
+ pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
+ chao.gao@intel.com, rick.p.edgecombe@intel.com, yan.y.zhao@intel.com,
+ linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+ Tom Lendacky <thomas.lendacky@amd.com>
+References: <cover.1728719037.git.isaku.yamahata@intel.com>
+ <c4df36dc-9924-e166-ec8b-ee48e4f6833e@amd.com> <ZxvGPZDQmqmoT0Sj@tpad>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZxvGPZDQmqmoT0Sj@tpad>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On 10/26/2024 12:24 AM, Marcelo Tosatti wrote:
+> On Mon, Oct 14, 2024 at 08:17:19PM +0530, Nikunj A. Dadhania wrote:
+>> Hi Isaku,
+>>
+>> On 10/12/2024 1:25 PM, Isaku Yamahata wrote:
+>>> This patch series is for the kvm-coco-queue branch.  The change for TDX KVM is
+>>> included at the last.  The test is done by create TDX vCPU and run, get TSC
+>>> offset via vCPU device attributes and compare it with the TDX TSC OFFSET
+>>> metadata.  Because the test requires the TDX KVM and TDX KVM kselftests, don't
+>>> include it in this patch series.
+>>>
+>>>
+>>> Background
+>>> ----------
+>>> X86 confidential computing technology defines protected guest TSC so that the
+>>> VMM can't change the TSC offset/multiplier once vCPU is initialized and the
+>>> guest can trust TSC.  The SEV-SNP defines Secure TSC as optional.  TDX mandates
+>>> it.  The TDX module determines the TSC offset/multiplier.  The VMM has to
+>>> retrieve them.
+>>>
+>>> On the other hand, the x86 KVM common logic tries to guess or adjust the TSC
+>>> offset/multiplier for better guest TSC and TSC interrupt latency at KVM vCPU
+>>> creation (kvm_arch_vcpu_postcreate()), vCPU migration over pCPU
+>>> (kvm_arch_vcpu_load()), vCPU TSC device attributes (kvm_arch_tsc_set_attr()) and
+>>> guest/host writing to TSC or TSC adjust MSR (kvm_set_msr_common()).
+>>>
+>>>
+>>> Problem
+>>> -------
+>>> The current x86 KVM implementation conflicts with protected TSC because the
+>>> VMM can't change the TSC offset/multiplier.  Disable or ignore the KVM
+>>> logic to change/adjust the TSC offset/multiplier somehow.
+>>>
+>>> Because KVM emulates the TSC timer or the TSC deadline timer with the TSC
+>>> offset/multiplier, the TSC timer interrupts are injected to the guest at the
+>>> wrong time if the KVM TSC offset is different from what the TDX module
+>>> determined.
+>>>
+>>> Originally the issue was found by cyclic test of rt-test [1] as the latency in
+>>> TDX case is worse than VMX value + TDX SEAMCALL overhead.  It turned out that
+>>> the KVM TSC offset is different from what the TDX module determines.
+>>
+>> Can you provide what is the exact command line to reproduce this problem ?
+> 
+> Nikunj,
+> 
+> Run cyclictest, on an isolated CPU, in a VM. For the maximum latency
+> metric, rather than 50us, one gets 500us at times.
+> 
+>> Any links to this reported issue ?
+> 
+> This was not posted publically. But its not hard to reproduce.
+> 
+>>> Solution
+>>> --------
+>>> The solution is to keep the KVM TSC offset/multiplier the same as the value of
+>>> the TDX module somehow.  Possible solutions are as follows.
+>>> - Skip the logic
+>>>    Ignore (or don't call related functions) the request to change the TSC
+>>>    offset/multiplier.
+>>>    Pros
+>>>    - Logically clean.  This is similar to the guest_protected case.
+>>>    Cons
+>>>    - Needs to identify the call sites.
+>>>
+>>> - Revert the change at the hooks after TSC adjustment
+>>>    x86 KVM defines the vendor hooks when the TSC offset/multiplier are
+>>>    changed.  The callback can revert the change.
+>>>    Pros
+>>>    - We don't need to care about the logic to change the TSC offset/multiplier.
+>>>    Cons:
+>>>    - Hacky to revert the KVM x86 common code logic.
+>>>
+>>> Choose the first one.  With this patch series, SEV-SNP secure TSC can be
+>>> supported.
+>>
+>> I am not sure how will this help SNP Secure TSC, as the GUEST_TSC_OFFSET and
+>> GUEST_TSC_SCALE are only available to the guest.
+> 
+> Nikunj,
+> 
+> FYI:
+> 
+> SEV-SNP processors (at least the one below) do not seem affected by this problem.
 
-HEAD commit:    850925a8133c Merge tag '9p-for-6.12-rc5' of https://github..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1311ea87980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
-dashboard link: https://syzkaller.appspot.com/bug?extid=314c2cfd4071ad738810
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bf3e5f980000
+Did you apply Secure TSC patches of (guest kernel, KVM and QEMU) 
+manualy? because none of them are merged. Otherwise, I think SNP guest 
+is still using KVM emulated TSC.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-850925a8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c831c931f29c/vmlinux-850925a8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/85f584e52a7f/bzImage-850925a8.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/9ebb84247bd1/mount_5.gz
+> At least this one:
+> 
+> vendor_id	: AuthenticAMD
+> cpu family	: 25
+> model		: 17
+> model name	: AMD EPYC 9124 16-Core Processor
+> 
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-CPU 0 old state 2 new state 1
-WARNING: CPU: 0 PID: 5631 at kernel/rcu/srcutree.c:708 srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
-Modules linked in:
-CPU: 0 UID: 0 PID: 5631 Comm: syz.2.27 Not tainted 6.12.0-rc4-syzkaller-00261-g850925a8133c #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
-Code: 81 c3 c8 01 00 00 48 89 d8 48 c1 e8 03 42 0f b6 04 20 84 c0 75 77 8b 33 48 c7 c7 80 0d 0c 8c 89 ea 44 89 f9 e8 87 81 db ff 90 <0f> 0b 90 90 eb 0c 42 0f b6 04 23 84 c0 75 3d 45 89 3e 48 83 c4 08
-RSP: 0000:ffffc9000d1c7648 EFLAGS: 00010246
-RAX: 84aa6098780aa300 RBX: ffffe8ffffc537c8 RCX: ffff88803ecb8000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000002 R08: ffffffff8155e452 R09: 1ffff11003f8519a
-R10: dffffc0000000000 R11: ffffed1003f8519b R12: dffffc0000000000
-R13: 0000607fe0053600 R14: ffffe8ffffc53620 R15: 0000000000000001
-FS:  00007fe40acde6c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fe409f7e719 CR3: 000000001f99c000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- srcu_read_lock include/linux/srcu.h:248 [inline]
- __kvm_handle_hva_range virt/kvm/kvm_main.c:612 [inline]
- kvm_mmu_notifier_invalidate_range_end+0x90/0x3e0 virt/kvm/kvm_main.c:843
- mn_hlist_invalidate_end mm/mmu_notifier.c:550 [inline]
- __mmu_notifier_invalidate_range_end+0x241/0x410 mm/mmu_notifier.c:569
- mmu_notifier_invalidate_range_end include/linux/mmu_notifier.h:472 [inline]
- wp_page_copy mm/memory.c:3460 [inline]
- do_wp_page+0x265a/0x52d0 mm/memory.c:3745
- handle_pte_fault+0x10e3/0x6800 mm/memory.c:5771
- __handle_mm_fault mm/memory.c:5898 [inline]
- handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6066
- do_user_addr_fault arch/x86/mm/fault.c:1338 [inline]
- handle_page_fault arch/x86/mm/fault.c:1481 [inline]
- exc_page_fault+0x459/0x8c0 arch/x86/mm/fault.c:1539
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0033:0x7fe409e418e0
-Code: 39 4f 08 72 4c 8d 4d ff 85 ed 74 33 66 0f 1f 44 00 00 48 39 f0 72 1b 4d 8b 07 49 89 c1 49 29 f1 47 0f b6 0c 08 45 84 c9 74 08 <45> 88 0c 00 49 8b 47 10 48 83 c0 01 49 89 47 10 83 e9 01 73 d3 41
-RSP: 002b:00007fe40acdd4a0 EFLAGS: 00010202
-RAX: 0000000000147010 RBX: 00007fe40acdd540 RCX: 0000000000000007
-RDX: 00000000000007ff RSI: 0000000000001000 RDI: 00007fe40acdd5e0
-RBP: 0000000000000008 R08: 00007fe400c00000 R09: 0000000000000015
-R10: 0000000020005982 R11: 00000000000058ad R12: 0000000000000c01
-R13: 00007fe40a005ae0 R14: 0000000000000017 R15: 00007fe40acdd5e0
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
