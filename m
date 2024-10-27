@@ -1,164 +1,141 @@
-Return-Path: <kvm+bounces-29762-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29763-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48D59B1D9A
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 13:06:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D609B1DF5
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 14:55:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64305281C5C
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 12:06:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87DF0B20F4D
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2024 13:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B072D154BED;
-	Sun, 27 Oct 2024 12:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jz31HBDS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E028C156F45;
+	Sun, 27 Oct 2024 13:55:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740FE7DA67;
-	Sun, 27 Oct 2024 12:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A585558BC
+	for <kvm@vger.kernel.org>; Sun, 27 Oct 2024 13:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730030804; cv=none; b=VJZIs4PUplWeXoWtivSPWqGJmSm3+1M8ZxILPo6nXkM+C7JsV+tDLBKUtZZaBoqaUWgeMLynM0Cek58ji2XzqK2uemcg8soVMrRTbPKzjpP90WPy1YBo8QqHNTxTFaIbOwchW9SXHPMWjHbapM6c+EZSJQil9u47v2aHi08C/XU=
+	t=1730037336; cv=none; b=s9LAPd80lfxiC33gmqx63qp7XlWIX9dK8CKnXCKytINBcaA6mvU6RcriFz1KAZzmfDmG/eHv+jpg4EuFZpj7MnwW1G/C7Oz3iaqoDpxIua9K0RyIP1hMLo0fe40STWdowCE5GtcQwKSQd0AsKSubpZl1zgLABnfcaTKhYUkkFM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730030804; c=relaxed/simple;
-	bh=iHfvyFI5jiAmSBtDrE4mKuQ2KDG8G0iL340AzkPpyL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=acxUGUHiejH+97RbBi9UlgRLF8lfdyvsfA0OXRpQy56paJoDhz223uoznU1FWhq4y0FkzB/mi6E9r+0JxW7gbjSePpTwhYxc0Y4QKXyj9G5io6+bucXGpTYxqFnt41ZfPP6RZBDqx4BWVIOt35hVSm5u6ioBs/6/P28jr4T3UDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jz31HBDS; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730030802; x=1761566802;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iHfvyFI5jiAmSBtDrE4mKuQ2KDG8G0iL340AzkPpyL8=;
-  b=Jz31HBDSlRLm3dmo6DldqppXEeGNzev/4lqulTjrI8m/IvufQjMmGRbL
-   VzZnIodV9S5+IWtYbOZ+JNARUIZaNb+pVlBY5InnRs7E2Uje11lAOBEvh
-   4BjMDYVrGAtQiCYv/Xi5iYk3ZQahVEwfuUrZl7UK6IQ49FW7q94wTBJlL
-   BKGBzKzYmOkXKvksRb57B1PNBGySIy/b64PLxga+1Tb02hmuXOsPpE/q7
-   NCjltK2GJFrNz14fH42STE1/vIbVtg1yDC5jZX/RLfL9r9zUGfwwVDANI
-   n+3uYPz/gg87sZHZSeKFerNv8Ro22t+/YTrItbqFVQAQtmm4OqnzZRt9S
-   A==;
-X-CSE-ConnectionGUID: fxvnWf0nTvSw9RT9+r8ElQ==
-X-CSE-MsgGUID: 2V56TaUXSVug5yIlyZaLRw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11237"; a="29103280"
-X-IronPort-AV: E=Sophos;i="6.11,237,1725346800"; 
-   d="scan'208";a="29103280"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 05:06:40 -0700
-X-CSE-ConnectionGUID: LneXGWtqSx+D02z9FVwWrw==
-X-CSE-MsgGUID: X6TwckngTi2QKLPhln6agg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,237,1725346800"; 
-   d="scan'208";a="81803930"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.125.240.3]) ([10.125.240.3])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 05:06:35 -0700
-Message-ID: <7295b12c-c780-4457-8895-cc554d5b597a@linux.intel.com>
-Date: Sun, 27 Oct 2024 20:06:32 +0800
+	s=arc-20240116; t=1730037336; c=relaxed/simple;
+	bh=IagfQGZZSfpCbczPiCtVB7H5zIQnFPYsAAqk0fIFFNc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Pzdi2MtCxOgXMnKa1ZilEO8c2xiCYDlBsAgwdEECU8m+nhA93SwVKhH+IhXrv9d1M+ErVq18zmvRx9D9ph9+KkaD99bMZ6S5tkdzLUJyQRQDn/WpVwMEJWXIMuXB9P4cOiOvM7K2qgf6b3X/o8WLm1GlRW/rUo/exF8gnW8KWGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a4e52b6577so23736925ab.3
+        for <kvm@vger.kernel.org>; Sun, 27 Oct 2024 06:55:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730037333; x=1730642133;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DvpTdNJAHMUYMjV0otN9rJrodmRbe5MNxe8dC8b5a+s=;
+        b=TeifiGhCCXI11Eh2fi4HxFCSLJoZCEt2hPjCnsi6OPmn4X5v2uvJ29xnVr6dPRpWJI
+         EZQ0CVeIevU8lN4nSujz9sEEj4n51ieh94K9QZjDoidmkkYLOnUJjTUtXexhNaamggEf
+         zkBa88KaYaJXP093UENj1SfhwyXKBCopy7OVfIVMGCAeB1RbyFfgHmE2KJfbD1UAUSmE
+         GUw1tEvaG9XRsGtHYGchcMJRf05cbWrPBxjEyNKvn44KQTFz/QcMwQs1UyOkazhi2tF1
+         ZPZZ3PpMeqVc3wNxQ1wW626F1FbKKrIWWK7IFjhiy3T523hfklxI/OHTHkM9F7CJ8TlA
+         xG0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXvl31Dn9Gr3xjVRblrm+u7NLq0kSM5cAgSvqPAd8zBzIpZzktlX3BbYI+ZSYldDwPR2eM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcJYQrx8WUk6hcHvBqEWYVvazynKzdTnGByAxiWudK43Epg0ul
+	jv2CvUn8dz1a3wFAtnxrgrKJrdTHAwov+BH3vPSCuy1S5+1fw19eCUBOhNMc3TxrP2+fYvIj2NO
+	UXOPh3jYhE4XJrYnqNLgVTi61Dd6zxiMMJ2Pb8pACgk5/NTqlbAsVNHg=
+X-Google-Smtp-Source: AGHT+IFgVj5y7UcihmmcffRNSjAUAwJfopX6wPsav4ShCezh1Hg0VzDeEPFvjj/nI9gnNr1RM0lkZYrJahlIKMAz9BYGshq8ciZq
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 43/58] KVM: x86/pmu: Introduce PMU operator for
- setting counter overflow
-To: "Chen, Zide" <zide.chen@intel.com>, Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
-Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
- Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-44-mizhang@google.com>
- <d0d8a945-1623-448a-b08a-8877464a4531@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <d0d8a945-1623-448a-b08a-8877464a4531@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1445:b0:3a3:b45b:a8cc with SMTP id
+ e9e14a558f8ab-3a4ed2b5cb9mr42286565ab.15.1730037333549; Sun, 27 Oct 2024
+ 06:55:33 -0700 (PDT)
+Date: Sun, 27 Oct 2024 06:55:33 -0700
+In-Reply-To: <66f4164d.050a0220.211276.0032.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <671e4655.050a0220.2b8c0f.01d8.GAE@google.com>
+Subject: Re: [syzbot] [bcachefs] WARNING in srcu_check_nmi_safety (2)
+From: syzbot <syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com>
+To: kent.overstreet@linux.dev, kvm@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    850925a8133c Merge tag '9p-for-6.12-rc5' of https://github..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1311ea87980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
+dashboard link: https://syzkaller.appspot.com/bug?extid=314c2cfd4071ad738810
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bf3e5f980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-850925a8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c831c931f29c/vmlinux-850925a8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/85f584e52a7f/bzImage-850925a8.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/9ebb84247bd1/mount_5.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+CPU 0 old state 2 new state 1
+WARNING: CPU: 0 PID: 5631 at kernel/rcu/srcutree.c:708 srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
+Modules linked in:
+CPU: 0 UID: 0 PID: 5631 Comm: syz.2.27 Not tainted 6.12.0-rc4-syzkaller-00261-g850925a8133c #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
+Code: 81 c3 c8 01 00 00 48 89 d8 48 c1 e8 03 42 0f b6 04 20 84 c0 75 77 8b 33 48 c7 c7 80 0d 0c 8c 89 ea 44 89 f9 e8 87 81 db ff 90 <0f> 0b 90 90 eb 0c 42 0f b6 04 23 84 c0 75 3d 45 89 3e 48 83 c4 08
+RSP: 0000:ffffc9000d1c7648 EFLAGS: 00010246
+RAX: 84aa6098780aa300 RBX: ffffe8ffffc537c8 RCX: ffff88803ecb8000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000002 R08: ffffffff8155e452 R09: 1ffff11003f8519a
+R10: dffffc0000000000 R11: ffffed1003f8519b R12: dffffc0000000000
+R13: 0000607fe0053600 R14: ffffe8ffffc53620 R15: 0000000000000001
+FS:  00007fe40acde6c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fe409f7e719 CR3: 000000001f99c000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ srcu_read_lock include/linux/srcu.h:248 [inline]
+ __kvm_handle_hva_range virt/kvm/kvm_main.c:612 [inline]
+ kvm_mmu_notifier_invalidate_range_end+0x90/0x3e0 virt/kvm/kvm_main.c:843
+ mn_hlist_invalidate_end mm/mmu_notifier.c:550 [inline]
+ __mmu_notifier_invalidate_range_end+0x241/0x410 mm/mmu_notifier.c:569
+ mmu_notifier_invalidate_range_end include/linux/mmu_notifier.h:472 [inline]
+ wp_page_copy mm/memory.c:3460 [inline]
+ do_wp_page+0x265a/0x52d0 mm/memory.c:3745
+ handle_pte_fault+0x10e3/0x6800 mm/memory.c:5771
+ __handle_mm_fault mm/memory.c:5898 [inline]
+ handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6066
+ do_user_addr_fault arch/x86/mm/fault.c:1338 [inline]
+ handle_page_fault arch/x86/mm/fault.c:1481 [inline]
+ exc_page_fault+0x459/0x8c0 arch/x86/mm/fault.c:1539
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+RIP: 0033:0x7fe409e418e0
+Code: 39 4f 08 72 4c 8d 4d ff 85 ed 74 33 66 0f 1f 44 00 00 48 39 f0 72 1b 4d 8b 07 49 89 c1 49 29 f1 47 0f b6 0c 08 45 84 c9 74 08 <45> 88 0c 00 49 8b 47 10 48 83 c0 01 49 89 47 10 83 e9 01 73 d3 41
+RSP: 002b:00007fe40acdd4a0 EFLAGS: 00010202
+RAX: 0000000000147010 RBX: 00007fe40acdd540 RCX: 0000000000000007
+RDX: 00000000000007ff RSI: 0000000000001000 RDI: 00007fe40acdd5e0
+RBP: 0000000000000008 R08: 00007fe400c00000 R09: 0000000000000015
+R10: 0000000020005982 R11: 00000000000058ad R12: 0000000000000c01
+R13: 00007fe40a005ae0 R14: 0000000000000017 R15: 00007fe40acdd5e0
+ </TASK>
 
 
-On 10/26/2024 12:16 AM, Chen, Zide wrote:
->
-> On 7/31/2024 9:58 PM, Mingwei Zhang wrote:
->> Introduce PMU operator for setting counter overflow. When emulating counter
->> increment, multiple counters could overflow at the same time, i.e., during
->> the execution of the same instruction. In passthrough PMU, having an PMU
->> operator provides convenience to update the PMU global status in one shot
->> with details hidden behind the vendor specific implementation.
-> Since neither Intel nor AMD does implement this API, this patch should
-> be dropped.
-
-oh, yes.
-
-
->
->> Signed-off-by: Mingwei Zhang <mizhang@google.com>
->> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
->> ---
->>  arch/x86/include/asm/kvm-x86-pmu-ops.h | 1 +
->>  arch/x86/kvm/pmu.h                     | 1 +
->>  arch/x86/kvm/vmx/pmu_intel.c           | 5 +++++
->>  3 files changed, 7 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
->> index 72ca78df8d2b..bd5b118a5ce5 100644
->> --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
->> +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
->> @@ -28,6 +28,7 @@ KVM_X86_PMU_OP_OPTIONAL(passthrough_pmu_msrs)
->>  KVM_X86_PMU_OP_OPTIONAL(save_pmu_context)
->>  KVM_X86_PMU_OP_OPTIONAL(restore_pmu_context)
->>  KVM_X86_PMU_OP_OPTIONAL(incr_counter)
->> +KVM_X86_PMU_OP_OPTIONAL(set_overflow)
->>  
->>  #undef KVM_X86_PMU_OP
->>  #undef KVM_X86_PMU_OP_OPTIONAL
->> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
->> index 325f17673a00..78a7f0c5f3ba 100644
->> --- a/arch/x86/kvm/pmu.h
->> +++ b/arch/x86/kvm/pmu.h
->> @@ -45,6 +45,7 @@ struct kvm_pmu_ops {
->>  	void (*save_pmu_context)(struct kvm_vcpu *vcpu);
->>  	void (*restore_pmu_context)(struct kvm_vcpu *vcpu);
->>  	bool (*incr_counter)(struct kvm_pmc *pmc);
->> +	void (*set_overflow)(struct kvm_vcpu *vcpu);
->>  
->>  	const u64 EVENTSEL_EVENT;
->>  	const int MAX_NR_GP_COUNTERS;
->> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->> index 42af2404bdb9..2d46c911f0b7 100644
->> --- a/arch/x86/kvm/vmx/pmu_intel.c
->> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->> @@ -881,6 +881,10 @@ static void intel_restore_guest_pmu_context(struct kvm_vcpu *vcpu)
->>  	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl_hw);
->>  }
->>  
->> +static void intel_set_overflow(struct kvm_vcpu *vcpu)
->> +{
->> +}
->> +
->>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
->>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
->>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
->> @@ -897,6 +901,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
->>  	.save_pmu_context = intel_save_guest_pmu_context,
->>  	.restore_pmu_context = intel_restore_guest_pmu_context,
->>  	.incr_counter = intel_incr_counter,
->> +	.set_overflow = intel_set_overflow,
->>  	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
->>  	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
->>  	.MIN_NR_GP_COUNTERS = 1,
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
