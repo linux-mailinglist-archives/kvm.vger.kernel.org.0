@@ -1,156 +1,128 @@
-Return-Path: <kvm+bounces-29890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46CF9B3982
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:47:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B309B3BF9
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 21:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72C01C21B45
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:47:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68A2C1F22E3F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 20:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48D51DFE2F;
-	Mon, 28 Oct 2024 18:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531F31E04B8;
+	Mon, 28 Oct 2024 20:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flPbUyz1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GZs+indq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023A71DF990
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 18:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4C418E76F
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 20:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730141198; cv=none; b=HBRZxaHN9U10wfaNsuCR6dIMBa01nsMKPTbhg5fH4leK22LQ3tQ+uE6/ReM0CVYG8/tDvFaYAMB8z7vNKG2g9TAW2N39GZYtL/m3M4PX18R3xpAb4FrkAOG1n9qmWKJcygFYODX8L7WKjEZy5uWpt1hRJsh2OZHYmr32KtxnmHw=
+	t=1730147858; cv=none; b=gEPLrg64IDhxk9wt9Vh0i9LUJgN11qPXC6vaPE5FG07cGz12sVYehOBqUQCxC5dbaIVCgvbMq1W1RqUV2HUudWUiXdhs+UDFJTnegKSSlJ8PILCGWEZkUlWQvsWVU+HHSFigAVsbkjZYCX+tVODEuc0KOuT75ESYZnBTY63/wmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730141198; c=relaxed/simple;
-	bh=bt/2IBSyvFyIwK0fQGepi2cNlzRZ6JIqmBsMvd7CXxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JeQFp5cpcU+xNqIPz1DfSLSC0F/ZYR8krTLhjev6Z4Fq5uPTW6iNgco7iIWdXqEWiLE78Cf+z7gjndo30s3ivKRRA+onfWOTMDJmFrhQe+iEJqlm35KmwhtjgxOK7o3459SJE8p1LgaQEqwvXO3sI3wWZ0D9/5xUl+rclFvmwzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=flPbUyz1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730141192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/duWhcOe1aV9qEvaWU4UFnx1HOxvBRZzb+I+M3qyFDE=;
-	b=flPbUyz19dE5MQjFmJ127bz9F5NdLyKyW7MFLr+QVNSYUHYTNtK2yS6/I2OeYR8Xe5FG3g
-	pteypRlWnmDp3MEKWM48P1D6a7cLdKOe63TYAC0qkTU+EYPqBLWb/G8fuvAFG7cQkiIlQu
-	DvXzJlxICWeYMrORRgCJ5B4sPpMnSQ8=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-7pjjNAoyPaGas_wYb4QlXA-1; Mon, 28 Oct 2024 14:46:31 -0400
-X-MC-Unique: 7pjjNAoyPaGas_wYb4QlXA-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-539fdef0040so3613956e87.0
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 11:46:31 -0700 (PDT)
+	s=arc-20240116; t=1730147858; c=relaxed/simple;
+	bh=4tI3tevwWJFEabw0MDqHvv30EkiuHDShjv3zKsQqCHo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M17T19Ype3biwbmIcIZucMjec3hT1l5eidigBRRA9hypMcSKBRGBtkOUyrmPH5wYgwlR1TcGPQvgbh5QxCIabcOtWQmiPlfwQqxPJYBPjq9aEIvZ7bUr/R8nmywzJlV/zJpF3srQofbdoqSaoyhGrOeK9KfIhwYgav8urfvNpX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GZs+indq; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-37d6ff1cbe1so3513231f8f.3
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 13:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730147855; x=1730752655; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=950tvZToDH3Xz3HQmCJhfPPgLkFTybdofF+TRroBG40=;
+        b=GZs+indqNZR4qGc0NGZzAuWE4JciaJmNgZvBhihzXFrJV4EeU8Plrh3pOz6KahXf5Q
+         ANT81VCMZkNISH9x3PGSrxrYfVnUFww66Rlf2vVWjze931avVwSAJzCWO7EiX82daGA0
+         jqD/QaOWqAfZYMPNRPvVXbDKb7AqNiO3e7jPFRFuJavxOEMJC5DhIVG3/d1XjwZCG4fk
+         1sH+pJ1FlBxBBPcczAAoNiKd0zbmaDiLiSLHR/nIXqYSa+RZzzffSeZrmoQgl75xyiD/
+         lzygc2QxKRbk6nDNR4iyA7if40F2VfKGMH1IZ6Fo0yyUEDITEZ04EgNW2jLBY6jE2Ujs
+         goxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730141190; x=1730745990;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/duWhcOe1aV9qEvaWU4UFnx1HOxvBRZzb+I+M3qyFDE=;
-        b=F06sx95TH8Iy8lbyFY6FC/BYPvI9VraWZC5PT7w329RObU3XDUssKBeoIAlxCx/k8J
-         wqnRvc/AV23PO1r/U7PU7i791nEm5vSuKBUMUN6QXSbWVf9oOO4ixzEJ4jaTIDhRHHok
-         F7p1r2F4dQJCERibjgGvywue+fDkiEsNyBF0su3cfL67eYxrQRI691ynLZsqOvfdRlQR
-         7t4P3cNLP/JFGx/zVHyJKyAWVLTXOeKD8o1wlZIJPNh+wOjcmRaA//SOgFS1ycWD2CXJ
-         xmSxzxA7IqeplznIqkfX/44Osu7jikNUtDlv/3URfczBPuRbLyR+migkl62h8UP+zr9D
-         67JA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzwFxDzdGhzKbC1lIcSodpLYnkxGPtlJE77R7dCPHC6N2sEPl/bCYL09RaEHEeTqAxz/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVzUD/89NhD//JGumPN77oCFS5f2THFTNgyMQg8NwG3CsQs8k5
-	EBL296gfsWbUUOwdnQGdvO1H3s3AJNDOR6RyTmnRpgaLvz50h0cMNng9rtoco+Wrf46n4LhyszW
-	oe7e9zDdVbG2SpoKCLoytu0EQhXuRRHzxOnchGbWy6hcz0E0aCw==
-X-Received: by 2002:a05:6512:23a9:b0:536:55cf:3148 with SMTP id 2adb3069b0e04-53b348deb93mr4085165e87.31.1730141189852;
-        Mon, 28 Oct 2024 11:46:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHm1bvLsow39EoR9m9jYNYihrELSE9cjFLCyyUGNfdmqekYxy0V+KX0ic+gAqga1gJS2Gm7wA==
-X-Received: by 2002:a05:6512:23a9:b0:536:55cf:3148 with SMTP id 2adb3069b0e04-53b348deb93mr4085156e87.31.1730141189386;
-        Mon, 28 Oct 2024 11:46:29 -0700 (PDT)
-Received: from [192.168.10.3] ([151.49.226.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4319360d233sm116673085e9.45.2024.10.28.11.46.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Oct 2024 11:46:28 -0700 (PDT)
-Message-ID: <fa32d1e0-7e18-42c4-b5af-82ecece7d0ae@redhat.com>
-Date: Mon, 28 Oct 2024 19:46:27 +0100
+        d=1e100.net; s=20230601; t=1730147855; x=1730752655;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=950tvZToDH3Xz3HQmCJhfPPgLkFTybdofF+TRroBG40=;
+        b=bKTtK4YwNwnQhjG4eNgD1SvGzNq5o3prioHqf9EwMC8rUwFJAPixzpocVs6SBnmOof
+         FCSAIilP5PwqpUvPYBHTWebfDt1LhWwM7ZFZO1o3Z0IZNStfn8o9T5HRWGP0rX3ZleQx
+         SV7CAs9/SSVplTHj55+l/8dTvz/ffDrEnvF/zdzppKJ7eT8o/WJXEjPRfJ+MNen/fCB5
+         VXQAgsLkQ+khgOQmGoyM7Kl0GZJn2IfRPvWVGhIymWGKPiYUspr5XwsAHRd6dSDl2ASS
+         0CkfFHq0pPOHNSQ/FWQVYk97E1PU+xLLaeUBll1KqVkYJZve7G/ECCTKpdZ4Gl1JcENN
+         DHLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXpke9JMNqfpy+VuXD8p4rpnxUU8vi4VBtWBRTC6D5RqLBNuy0CJw3Frunt5LRjcFBaDO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBMfzXv41/pp5UQu6A9k8QdmBoKujXbSxqwf4+eRLSWDfV4uCh
+	chtkp9Up1nHsUtcjhoFLqIP2NLcOd71VbaaS/+1drMQp2RV+6cCosbsvFlVY28s1I6Vlixb3Zij
+	PF0/KripHVDNdNl7gEd/7Zq08Ep+s92qeGv4a
+X-Google-Smtp-Source: AGHT+IFxle8Yr8gOyEf6jQju2CPCM+MD1nHdoAA2boJlnsRNm3EFrW5KeQpfbiUJ8885NxdK4k/tlauPCp5mRUo5twQ=
+X-Received: by 2002:a05:6000:c83:b0:37d:33a3:de14 with SMTP id
+ ffacd0b85a97d-3806110aaafmr7437579f8f.7.1730147854503; Mon, 28 Oct 2024
+ 13:37:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/7] target/i386: Add support for perfmon-v2, RAS bits
- and EPYC-Turin CPU model
-To: Babu Moger <babu.moger@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <cover.1729807947.git.babu.moger@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <cover.1729807947.git.babu.moger@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241004195540.210396-1-vipinsh@google.com> <20241004195540.210396-3-vipinsh@google.com>
+ <ZxrXe_GWTKqQ-ch8@google.com> <CAHVum0ebkzXecZhEVC6DJyztX-aVD7mTmY6J6qgyBHM4sqT=vg@mail.gmail.com>
+In-Reply-To: <CAHVum0ebkzXecZhEVC6DJyztX-aVD7mTmY6J6qgyBHM4sqT=vg@mail.gmail.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 28 Oct 2024 13:37:04 -0700
+Message-ID: <CALzav=e7utP8wT_0t2bnVjyezyde7q86F3BHTsSpR1=qVbexQg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86/mmu: Use MMU shrinker to shrink KVM MMU
+ memory caches
+To: Vipin Sharma <vipinsh@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, zhi.wang.linux@gmail.com, 
+	weijiang.yang@intel.com, mizhang@google.com, liangchen.linux@gmail.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/25/24 00:18, Babu Moger wrote:
-> 
-> This series adds the support for following features in qemu.
-> 1. RAS feature bits (SUCCOR, McaOverflowRecov)
-> 2. perfmon-v2
-> 3. Update EPYC-Genoa to support perfmon-v2 and RAS bits
-> 4. Support for bits related to SRSO (sbpb, ibpb-brtype, srso-user-kernel-no)
-> 5. Added support for feature bits CPUID_Fn80000021_EAX/CPUID_Fn80000021_EBX
->     to address CPUID enforcement requirement in Turin platforms.
-> 6. Add support for EPYC-Turin.
+On Fri, Oct 25, 2024 at 10:37=E2=80=AFAM Vipin Sharma <vipinsh@google.com> =
+wrote:
+>
+> On Thu, Oct 24, 2024 at 4:25=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Fri, Oct 04, 2024, Vipin Sharma wrote:
+> > > +out_mmu_memory_cache_unlock:
+> > > +     mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
+> >
+> > I've been thinking about this patch on and off for the past few weeks, =
+and every
+> > time I come back to it I can't shake the feeling that we came up with a=
+ clever
+> > solution for a problem that doesn't exist.  I can't recall a single com=
+plaint
+> > about KVM consuming an unreasonable amount of memory for page tables.  =
+In fact,
+> > the only time I can think of where the code in question caused problems=
+ was when
+> > I unintentionally inverted the iterator and zapped the newest SPs inste=
+ad of the
+> > oldest SPs.
+> >
+> > So, I'm leaning more and more toward simply removing the shrinker integ=
+ration.
+>
+> One thing we can agree on is that we don't need MMU shrinker in its
+> current form because it is removing pages which are very well being
+> used by VM instead of shrinking its cache.
+>
+> Regarding the current series, the biggest VM in GCE we can have 416
+> vCPUs, considering each thread can have 40 pages in its cache, total
+> cost gonna be around 65 MiB, doesn't seem much to me considering these
+> VMs have memory in TiB. Since caches in VMs are not unbounded, I think
+> it is fine to not have a MMU shrinker as its impact is miniscule in
+> KVM.
 
-Queued the following
-
-- target/i386: Fix minor typo in NO_NESTED_DATA_BP feature bit
-- target/i386: Add PerfMonV2 feature bit
-- target/i386: Expose bits related to SRSO vulnerability
-- target/i386: Expose new feature bits in CPUID 8000_0021_EAX/EBX
-
-I am leaving out the CPU model updates so that they are updated just 
-once instead of twice (especially Turin should have the right CPUID bits 
-for nested SVM).
-
-Paolo
-
+I have no objection to removing the shrinker entirely.
 
