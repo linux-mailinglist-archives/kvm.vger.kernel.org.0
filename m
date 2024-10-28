@@ -1,222 +1,129 @@
-Return-Path: <kvm+bounces-29869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112269B36F4
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 17:44:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AAD9B3721
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 17:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33F4E1C22131
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:44:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7841F22549
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20BCD1DF253;
-	Mon, 28 Oct 2024 16:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294731DEFFE;
+	Mon, 28 Oct 2024 16:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fn7tnK2v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpfpRXM+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A9F1DEFE0
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 16:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D1C185B54
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 16:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730133879; cv=none; b=mKvSxy86EsWovUvwGHedjZFiaf2aTGCzbAuHdeVtbw52wOdCtU3q6SFMpwz4kfpSZMlx+d8dKhqTpvVSA1TvteIstfe94+VRYF9DvaBh49+RkMY30c+cWLdOWouuyPQfBat7eNAY1/gjODbA+ME8SdJ5DF5xYRM1mRGbS4ItrHA=
+	t=1730134451; cv=none; b=o5Y2C9SkGW6c6iUU6sWOtea4JQr65MdjUQmsk/I0oE686sl4XjORct2479uRBq/judt3Hu6RZ3hwytQJt1RMQlKfrKfzSlqpKhTlp6RuYB+f+DVyEbZuMLIrsYRvCVYWdjSR/bWxI5kO1L2/U/bqd+E07NqZqui0F06V89vUsMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730133879; c=relaxed/simple;
-	bh=IRdwHS4vcuPgJBmJX90PCn2d28fWXVAkeeopEpWdAUo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hNEsLTpAZW+xpeBzTG+g6fLMopySogYegxuN7B7e2Bfgu1abbjPlrz+y/KJaRZixT+nH8q/UBaVVDJvFBn66Jkc1S9yKPovFpBSccF8LSeJBbUlG+JZS4dUCvNibS0tL1KyqL78SIWkpm2x235401acg1ZNRQYcZYigt1TPChII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fn7tnK2v; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2971589916so7931155276.3
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 09:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730133876; x=1730738676; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CCL9TFiHYG8TKvqieIfQVOyBSmKupXLL6Zu34z4C9gI=;
-        b=fn7tnK2vGxSx48q3hCKTa8z5YvUmcy/h0ExUXwVFFXXirFHai7xPhpi8KVlWznejlH
-         vbVvEhNi6mxabnYuCKT/2lo8cp4yinekMlI9ofa1dI/ZVJB8db6Wp4NKQ9b+aMfljAGo
-         uX2Ci3nUnUqmVVH5IwUrdgeoZZZdrJYiaqYD3IA3wK9fSjY6PoWL6P6I/XTE8LsHIOSm
-         AC7OjxMYN5TKimEG0ZzdP7VNDveBtYE28LlmgmMSiaL5KB20P6BXaSuYiWX8s8HsSQvQ
-         A66JNZVRA70RKy7CPepczq6UmicaOC1cZ5d1tgwPprzFHEgyoJ5AMkBWZjHamRfiIHdf
-         a+mg==
+	s=arc-20240116; t=1730134451; c=relaxed/simple;
+	bh=045AGb8JuNqOjsQOzN8aZyC+lESpHF0mytQYlaut7Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HOu3MrsnOJM9/MwzsW1epHoODzJrpc3k9kot4h28NHvcJlAGhspkGB/N9yNqfKdHw8qC7VNS2xdZYrvgCNo6wvagHSE0yKimFmAswyxgp72yqbVn2N3YYkuif3Tt01OfqOSqCYjTDTr8NHClI0ru9LcVVU04KExCCG/p0J5WK0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fpfpRXM+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730134448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ccBdl674U7Jv+vtXlnAHZ7z0c85T85M1xUuXFrqnPmQ=;
+	b=fpfpRXM+L3em8RweMRy1xrv0ejMc3qb8qK8bL5ecXSLckx+PNNPVYnH4jDKkWOuLmmpuFf
+	40Slrr/nZSlc7gyif/pTw+csFm22OpPy8aXUwGxt2CMoGXKGEAF3HVFgKV3b2gXlz6jRA1
+	Guhq461V0REjllSI4TqR1iFbONYfJFE=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-SupbjMlcMcundQV5Gpz1Hw-1; Mon, 28 Oct 2024 12:54:07 -0400
+X-MC-Unique: SupbjMlcMcundQV5Gpz1Hw-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a3b8a34c06so7133625ab.3
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 09:54:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730133876; x=1730738676;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CCL9TFiHYG8TKvqieIfQVOyBSmKupXLL6Zu34z4C9gI=;
-        b=i9imI8WDYluOhGEhMqQfGJqYD5muw5qCXaiaJUMd/ISboNeFOd+udMnkigqnUgayLd
-         hQME4ntb8fF9HanFkOeCie6i293goIt+uPrdlsjWgsMAKDdwVA8ZEiWKVbIFkWF+PmTm
-         FSrdyoEe5JuTllbuo7Oy7y8HunZHVt9rksCBs0fHHYAbhghb0C4bPJCLcGbCWU/fDRlG
-         /ufXjROXEncOty3uCzRWYuGICWkRp/4acEDK2oFXrp+iNOyPAoq+kiKfonO0hh6bAptm
-         31DaRNwDxnxcj5b2auQAvB3V4MIA9nCH3Hz6Gb62tTPZHAySSZU/pZGazZIJL2PTqV/8
-         rBzw==
-X-Gm-Message-State: AOJu0Yww3Hxtcb3/E4RcKaqDjnShyUKn+SYBG18OAL3jFpL7o+nO7+6m
-	w0oCcQkMM9MwrWKUU/ViQSj6cjzeTYy1QOoMTDG/7LjNYB22z6H+VsiYwmBbVGXuZLtWnCMRJBZ
-	j7A==
-X-Google-Smtp-Source: AGHT+IE//TNw/PMtjJZRwHZaAUcMdT4Kdw3bcVqrAPb4Rhj9jlzDmo640iVH80uclQXL8iqL0K+/Axb42Kg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:6c57:0:b0:e28:eee0:aaa1 with SMTP id
- 3f1490d57ef6-e3087a55f95mr5386276.4.1730133875860; Mon, 28 Oct 2024 09:44:35
- -0700 (PDT)
-Date: Mon, 28 Oct 2024 09:44:34 -0700
-In-Reply-To: <ZxoghG8+7xAHh3bu@mias.mediconcil.de>
+        d=1e100.net; s=20230601; t=1730134446; x=1730739246;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ccBdl674U7Jv+vtXlnAHZ7z0c85T85M1xUuXFrqnPmQ=;
+        b=uCvU/Ic0lZ5cJDC5GGkQS5sUrK5MEWcX39lV3MHzsRRGA9yg1ljWWYD/lJYrkxrbJ2
+         sQ7ZHXht6uWz1V5qFQQMmpPuy7sSRao7ruO+Fveot+bU4hFam0+7SKD+5FJrvhcnraUw
+         e1WXFOhA33Csw713kAhcp8GrpGKhzNTZoa7iWtBHdaGkg2HuhS7dfOPyhlicoRPF6GHS
+         BA9c9iFnudQbgWX4Hoxo5jdblBNPY5tEeuFB0FWCR/t1Zk5JbjZSxS4Lyg1IJGI4UunB
+         xx9h2hLUX4VWMjb1v+diwYFDrOHSWW6LUCSXWyXS3DPBBd4QEK0ecdDDg8SKxAJgdj5P
+         eQ9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVwZFBAI00kaPNLOT/2C+kAYW9f8fSZ720CutMg7U81YUohoUfCVJascmDRWKuvRLed80g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2x7wGW7kIdLCFHoP9tY/fTKFGVP/EfmbIDdPS7VI5C8S5jvBx
+	WqUymGMW57qe6LzEuDHd8UWtdDmK1YrRP67O7twMOqbbUHKbqFUr1HSXlGIrV0bK5b5BcK/jar5
+	NEHEIkQkWckV5czaNjTn9fYIsLw08NQoht8/3O6qaC0AahaLAPQ==
+X-Received: by 2002:a05:6e02:1caf:b0:3a0:4bd3:6cd with SMTP id e9e14a558f8ab-3a4ed1ba8e2mr23283675ab.0.1730134446400;
+        Mon, 28 Oct 2024 09:54:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGZCi7fJ/OejaB2WuuWKlBM5pd//oi671GvJLr0HBWjjOLQbzaoYpAgGbyvQmX+EVgQIK5/Q==
+X-Received: by 2002:a05:6e02:1caf:b0:3a0:4bd3:6cd with SMTP id e9e14a558f8ab-3a4ed1ba8e2mr23283495ab.0.1730134446003;
+        Mon, 28 Oct 2024 09:54:06 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc72751e90sm1783197173.96.2024.10.28.09.54.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Oct 2024 09:54:05 -0700 (PDT)
+Date: Mon, 28 Oct 2024 10:54:04 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Yishai Hadas <yishaih@nvidia.com>, mst@redhat.com, jasowang@redhat.com,
+ kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ parav@nvidia.com, feliu@nvidia.com, kevin.tian@intel.com,
+ joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 0/7] Enhances the vfio-virtio driver to support
+ live migration
+Message-ID: <20241028105404.4858dcc2.alex.williamson@redhat.com>
+In-Reply-To: <20241028162354.GS6956@nvidia.com>
+References: <20241027100751.219214-1-yishaih@nvidia.com>
+	<20241028101348.37727579.alex.williamson@redhat.com>
+	<20241028162354.GS6956@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241023091902.2289764-1-bk@alpico.io> <ZxmGdhwr9BlhUQ_Y@google.com>
- <ZxoghG8+7xAHh3bu@mias.mediconcil.de>
-Message-ID: <Zx-_cmV8ps7Y2fTe@google.com>
-Subject: Re: [PATCH] KVM: x86: Fast forward the iterator when zapping the TDP MMU
-From: Sean Christopherson <seanjc@google.com>
-To: Bernhard Kauer <bk@alpico.io>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 24, 2024, Bernhard Kauer wrote:
-> On Wed, Oct 23, 2024 at 04:27:50PM -0700, Sean Christopherson wrote:
-> > On Wed, Oct 23, 2024, Bernhard Kauer wrote:
-> > > Zapping a root means scanning for present entries in a page-table
-> > > hierarchy. This process is relatively slow since it needs to be
-> > > preemtible as millions of entries might be processed.
-> > > 
-> > > Furthermore the root-page is traversed multiple times as zapping
-> > > is done with increasing page-sizes.
-> > > 
-> > > Optimizing for the not-present case speeds up the hello microbenchmark
-> > > by 115 microseconds.
-> > 
-> > What is the "hello" microbenchmark?  Do we actually care if it's faster?
-> 
-> Hello is a tiny kernel that just outputs "Hello world!" over a virtual
-> serial port and then shuts the VM down.  It is the minimal test-case that
-> reveals performance bottlenecks hard to see in the noise of a big system.
-> 
-> Does it matter?
+On Mon, 28 Oct 2024 13:23:54 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Yes.  Knowing the behavior and use case helps guide jugdment calls, e.g. for
-balancing complexity and maintenance burden versus performance, and it also helps
-readers understand what types of behaviors/workloads will benefit from the change.
+> On Mon, Oct 28, 2024 at 10:13:48AM -0600, Alex Williamson wrote:
+> 
+> > If the virtio spec doesn't support partial contexts, what makes it
+> > beneficial here?    
+> 
+> It stil lets the receiver 'warm up', like allocating memory and
+> approximately sizing things.
+> 
+> > If it is beneficial, why is it beneficial to send initial data more than
+> > once?    
+> 
+> I guess because it is allowed to change and the benefit is highest
+> when the pre copy data closely matches the final data..
 
-> The case I optimized might be only relevant for short-running virtual
-> machines.  However, you found more users of the iterator that might benefit
-> from it.
->  
-> > Are you able to determine exactly what makes iteration slow? 
-> 
-> I've counted the loop and the number of entries removed:
-> 
-> 	[24661.896626] zap root(0, 1) loops 3584 entries 2
-> 	[24661.896655] zap root(0, 2) loops 2048 entries 3
-> 	[24661.896709] zap root(0, 3) loops 1024 entries 2
-> 	[24661.896750] zap root(0, 4) loops 512 entries 1
-> 	[24661.896812] zap root(1, 1) loops 512 entries 0
-> 	[24661.896856] zap root(1, 2) loops 512 entries 0
-> 	[24661.896895] zap root(1, 3) loops 512 entries 0
-> 	[24661.896938] zap root(1, 4) loops 512 entries 0
-> 
-> 
-> So for this simple case one needs 9216 iterations to go through 18 pagetables
-> with 512 entries each. My patch reduces this to 303 iterations.
-> 
-> 	[24110.032368] zap root(0, 1) loops 118 entries 2
-> 	[24110.032374] zap root(0, 2) loops 69 entries 3
-> 	[24110.032419] zap root(0, 3) loops 35 entries 2
-> 	[24110.032421] zap root(0, 4) loops 17 entries 1
-> 	[24110.032434] zap root(1, 1) loops 16 entries 0
-> 	[24110.032435] zap root(1, 2) loops 16 entries 0
-> 	[24110.032437] zap root(1, 3) loops 16 entries 0
-> 	[24110.032438] zap root(1, 4) loops 16 entries 0
-> 
-> 
-> Given the 115 microseconds one loop iteration is roughly 13 nanoseconds. 
-> With the updates to the iterator and the various checks this sounds
-> reasonable to me.  Simplifying the inner loop should help here.
+It would be useful to see actual data here.  For instance, what is the
+latency advantage to allocating anything in the warm-up and what's the
+probability that allocation is simply refreshed versus starting over?
 
-Yeah, I was essentialy wondering if we could optimize some of the checks at each
-step.  E.g. untested, but I suspect that checking yielded_gfn to ensure forward
-progress if and only if a resched is needed would improve overall throughput by
-short circuiting on the common case (no resched needed), and by making that path
-more predictable (returning false instead of iter->yielded).
+Re-sending the initial data up to some arbitrary cap sounds more like
+we're making a policy decision in the driver to consume more migration
+bandwidth for some unknown latency trade-off at stop-copy.  I wonder if
+that advantage disappears if the pre-copy data is at all stale relative
+to the current device state.  Thanks,
 
----
- arch/x86/kvm/mmu/tdp_mmu.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Alex
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 25a75db83ca3..15be07fcc5f9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -706,31 +706,31 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
- 							  struct tdp_iter *iter,
- 							  bool flush, bool shared)
- {
--	WARN_ON_ONCE(iter->yielded);
-+	KVM_MMU_WARN_ON(iter->yielded);
-+
-+	if (!need_resched() && !rwlock_needbreak(&kvm->mmu_lock))
-+		return false;
- 
- 	/* Ensure forward progress has been made before yielding. */
- 	if (iter->next_last_level_gfn == iter->yielded_gfn)
- 		return false;
- 
--	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
--		if (flush)
--			kvm_flush_remote_tlbs(kvm);
-+	if (flush)
-+		kvm_flush_remote_tlbs(kvm);
- 
--		rcu_read_unlock();
-+	rcu_read_unlock();
- 
--		if (shared)
--			cond_resched_rwlock_read(&kvm->mmu_lock);
--		else
--			cond_resched_rwlock_write(&kvm->mmu_lock);
-+	if (shared)
-+		cond_resched_rwlock_read(&kvm->mmu_lock);
-+	else
-+		cond_resched_rwlock_write(&kvm->mmu_lock);
- 
--		rcu_read_lock();
-+	rcu_read_lock();
- 
--		WARN_ON_ONCE(iter->gfn > iter->next_last_level_gfn);
-+	KVM_MMU_WARN_ON(iter->gfn > iter->next_last_level_gfn);
- 
--		iter->yielded = true;
--	}
--
--	return iter->yielded;
-+	iter->yielded = true;
-+	return true;
- }
- 
- static inline gfn_t tdp_mmu_max_gfn_exclusive(void)
-
-base-commit: 80fef183d5a6283e50a50c2aff20dfb415366305
--- 
-
-> > partly because maybe there's a more elegant solution.
-> 
-> Scanning can be avoided if one keeps track of the used entries.
-
-Yeah, which is partly why I asked about the details of the benchmark.  Tracking
-used entries outside of the page tables themselves adds complexity and likely
-increases the latency of insertion operations.
-
-> > Regardless of why iteration is slow, I would much prefer to solve this for all
-> > users of the iterator.  E.g. very lightly tested, and not 100% optimized (though
-> > should be on par with the below).
-> 
-> Makes sense. I tried it out and it is a bit slower. One can optimize
-> the while loop in try_side_step() a bit further.
 
