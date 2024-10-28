@@ -1,104 +1,154 @@
-Return-Path: <kvm+bounces-29859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2D69B3419
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 15:55:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFECB9B356F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2A80280DF1
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 14:55:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0FB21C21958
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 15:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650C01DE2DC;
-	Mon, 28 Oct 2024 14:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92A51DE88B;
+	Mon, 28 Oct 2024 15:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TSei5zFp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XRUtRG+1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389C11DD0F2
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 14:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D171DDC13
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 15:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730127332; cv=none; b=R+zML/8LB/Gpe3LUQdoHXxB7596OiTqR19kIqYK75aaHoFbO58Tozbd9BcGcTlTxBxwZwKRSvghSKwT2qIecE2nnEgg3AkTd6DCGlnN7meXSRbQG4qnjs6sdWMDxEkZU89a2/m/AfrtarSaNM1GvCGSmhwqWMQTWvQCKUoF2ytE=
+	t=1730130922; cv=none; b=o+oQX0hobCwMbv4UEahTCF/k6DFix8vLCUITLzZVmWdc3zpBXtVH2PircQuO9RSLCnwpgV5Nkhz5Mn4omD/DIFY3C/COeQGGiyVDdY3f4ath79swfVZgRKaaE61/2vfgCShfHEa2BFsU8Yj1pwl/qw5KzjmNvo/8Mao+XnvvDWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730127332; c=relaxed/simple;
-	bh=3I/c1iSHfDGPSB8Vg4G3/uhCl6rDJuP0ZIYONyN2iRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NB7PncxuPT8lPhgDYvQOpTMH9QQ/mlXtS8yc99KucOM9nUnUnzW2z9J7GTjP4uMvPjYC7bUsmb6TzdNNrgxhTTCc0DHRoB2AERlc6fo5UbZIXw2y53BTeFuAZ71SRz45GT7PKhSfGhpQ2Dt+rpjDuwGvIyIh2kU9d/JldbQ/FQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TSei5zFp; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a68480164so611235566b.3
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 07:55:29 -0700 (PDT)
+	s=arc-20240116; t=1730130922; c=relaxed/simple;
+	bh=G7gK7h5l4wdYxW15n43e1nF6+MLyAKmon7XGH8HlZUo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BQCSrrWC9APhDgNauSVnSlPZyQMoAbulLOh7c5X71EqjGFF/15n8loqZQklfDyhGeK6HeGQuFHTK3OfBT6cuPnPkkYOh8Z8QDz+nQxufdQpaCeoJIoDJ67eRXmHL1TaoLMLs3/KhuddYd1o1PUO1RrPNpKYg5cVDpflFW8WrkQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XRUtRG+1; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e59dc7df64so54665967b3.1
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 08:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1730127328; x=1730732128; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8Iun/RjX690GMZEyAyGhf0q0//IXeU/3+RYE93HP2ik=;
-        b=TSei5zFp8sqO8bh52nEw+OLAqgFIDIODhUbpZUcHkY4OlFTYMoXSEf3ikqad3NkoS7
-         JPz+H7vbS2Rc5LDLa41Kz+woNk/PxLuxq6UFnCD50KpnJ1TM9oibDm5lZBRYfsOT2EdP
-         rzveWKRj2F+OuL31Ml3hHKIgNTCsIfrwornlIi76ak5S2jP3ABlPhYE3G5yyIu5y+3Z5
-         RDw+CZKgsDahF04aCo4pa0Jw4QOPqCHRDTSt6U2t4mlJz922gzRHqVQd+cJIhoorl63f
-         2xJ/vG3+Tkff6vJWNLWdzj7of8kIkXkNzntsO9b2L/G+TDbKyJpFFOM6iMz4ehiQHViV
-         wQnA==
+        d=google.com; s=20230601; t=1730130920; x=1730735720; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0C2b1d52yixaqrwrj7hYu48SeL8+Gd/GtggTGgTR4hU=;
+        b=XRUtRG+1pMvbKng2jEphQwktkkF+4v29FUF5cFYEncD6tNo4tiD4zA+2vKIEG8qJv7
+         b+02gD5wR/p4dsd0SN11dLG6B2O0MMofS6B9qn6K8KegVIIhfpEPaPBFb5fPVfXhhVf8
+         FFMF4gM+VCBAqo0FRvdkCVJ0/yd+pWAwPo3nhKuLP8hxsgx42e7QOhSjRq6bY9lTyfKJ
+         9O8Y4EkIDQ7PpAziA/UAeD5P4EePzx9RBH8FKbOThDDBEg5H9MsXbyqdGpB9wKJzV6Wp
+         OoRLe7+eQ7d9SB1vzVWQjqLEg+8kXZm4OJZqh7qYz50rOVN4j6EWsQRbvp3bXKKjKxu8
+         Kffg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730127328; x=1730732128;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Iun/RjX690GMZEyAyGhf0q0//IXeU/3+RYE93HP2ik=;
-        b=Pp7EOQarUqw1iU9380ro1mCOPfaOLjFmTu7ChTH3e1HL50CeHy3cK1+6yNb/t7Ca66
-         KpYcr0APcpHXntSiBzRynNc19ahI4f+OqS9e98+mE1p1xWSXABXUy2EmKy5Fwc1BjVLP
-         Fs+LRwPn5snl3WnIAF4bEwa4/t+1fxLwjs7yOay5UHrUMDXP0//GB7PkXyEkXcRmHen4
-         lU7F98s1qx74MqUy1Saa79PTnd7CTJpjyV78NEHZdi0XPVo2fsAUKU4oOcHoIQGM+1kl
-         pkt6R8GAYguqNEZvCq+r5a0tEVQg25yoR/XQzHAGwzzQFuOF2ncHiBrNP0jQXlzbBzxd
-         9/Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCWoneQTiWCCEVAckFSHbxD6C0Zvq3umBlklhytqo29EpgXnCxBqjEtwgcxS36F/nyAzQXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0mF8Kv3ptgQkYOIRSBtkUG7Xoybg6PARHs0nRNsY9cYM9Sh0B
-	Rl+SBKctHdh3v+8RRbvlGRcAeBjirmq7cq9dRwZriOgNTkw1zwl8ULePFQblKSM=
-X-Google-Smtp-Source: AGHT+IG1u9a2TBkIJGXQu2TDn2MLnBYwYgjbkhmzFVSLRK4+krixIOTdIogv1lXP+QAyAO3JziQlPg==
-X-Received: by 2002:a17:907:72c2:b0:a99:f67c:2314 with SMTP id a640c23a62f3a-a9de5ee34d7mr949087566b.35.1730127328041;
-        Mon, 28 Oct 2024 07:55:28 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:7465:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7465:7285:c2ff:fedd:7e3a])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b1f298bc1sm385999666b.137.2024.10.28.07.55.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Oct 2024 07:55:27 -0700 (PDT)
-Message-ID: <d2185390-5967-4abf-b2f7-13a26bd4443d@suse.com>
-Date: Mon, 28 Oct 2024 16:55:26 +0200
+        d=1e100.net; s=20230601; t=1730130920; x=1730735720;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0C2b1d52yixaqrwrj7hYu48SeL8+Gd/GtggTGgTR4hU=;
+        b=KRfBP5FCwsvDgzoRQiqr6bNJUiYtg20o2lhqhA9eT+y5D5/G7jEu9OVk+RMvUDaxi8
+         qP/9bRk1+IV6NTI4oGwzjXif2oNLCWETEhGQmuQ4ZwWLGgRHUqCzRkdMFobX3HHfAmQk
+         upVGmMSn2QHxKDLFAoA0a6xjkOIKvj1EONQNbcpVfYtoZKOeAEfV5gBWdCV5reSUHTYO
+         egP/9BXCNsQONktGpG7am8wcDE8A5dJfBCxCgnUm0OcEyIAHHWWa2oiIFPfgFaTsWRRU
+         fL8cN9SetQR7a1RiUpBGBIEtw1fmqyRbM6a3SEUvFbSPmNtO7slHYUAcIel7gPQLDxre
+         bXZg==
+X-Gm-Message-State: AOJu0YzcwmXUt9E17+SkK4rdAyxcQi1JTc0xz+kkPj/YvgtePlHycmt2
+	AKTMhN2QE8Dv2F4hBb/4UQOK+Dadw+Ryj0G2ELai6k4nzWV/NtwIqzpxZmg868+rSyrgXtfZwZW
+	Pmg==
+X-Google-Smtp-Source: AGHT+IFW2uWD2JoYRqx//feYgv7dWWPiDC8Ri6H9Jm3Pt4mRWMx4jp0WPopWTpFDgAHwyA7bUNQFLD/xReI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:7301:b0:6dd:bb6e:ec89 with SMTP id
+ 00721157ae682-6ea22d45915mr1767b3.2.1730130919797; Mon, 28 Oct 2024 08:55:19
+ -0700 (PDT)
+Date: Mon, 28 Oct 2024 08:55:18 -0700
+In-Reply-To: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/10] x86/virt/tdx: Switch to use auto-generated
- global metadata reading code
-To: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com,
- kirill.shutemov@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
- peterz@infradead.org, mingo@redhat.com, hpa@zytor.com,
- dan.j.williams@intel.com, seanjc@google.com, pbonzini@redhat.com
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, adrian.hunter@intel.com
-References: <cover.1730118186.git.kai.huang@intel.com>
- <7382397ef94470c8a2b074bbdf507581b1b9db7e.1730118186.git.kai.huang@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <7382397ef94470c8a2b074bbdf507581b1b9db7e.1730118186.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
+Message-ID: <Zx-z5sRKCXAXysqv@google.com>
+Subject: Re: vmx_pmu_caps_test fails on Skylake based CPUS due to read only LBRs
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Oct 18, 2024, Maxim Levitsky wrote:
+> Hi,
+>=20
+> Our CI found another issue, this time with vmx_pmu_caps_test.
+>=20
+> On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to an=
+d
+> TOS), are always read only - even when LBR is disabled - once I disable t=
+he
+> feature in DEBUG_CTL, all LBR msrs reset to 0, and you can't change their
+> value manually.  Freeze LBRS on PMI seems not to affect this behavior.
+>=20
+> I don't know if this is how the hardware is supposed to work (Intel's man=
+ual
+> doesn't mention anything about this), or if it is something platform
+> specific, because this system also was found to have LBRs enabled
+> (IA32_DEBUGCTL.LBR =3D=3D 1) after a fresh boot, as if BIOS left them ena=
+bled - I
+> don't have an idea on why.
+>=20
+> The problem is that vmx_pmu_caps_test writes 0 to LBR_TOS via KVM_SET_MSR=
+S,
+> and KVM actually passes this write to actual hardware msr (this is somewh=
+at
+> wierd),
 
+When the "virtual" LBR event is active in host perf, the LBR MSRs are passe=
+d
+through to the guest, and so KVM needs to propagate the guest values into h=
+ardware.
 
-On 28.10.24 г. 14:41 ч., Kai Huang wrote:
-> Now the caller to read global metadata has been tweaked to be ready to
-> use auto-generated metadata reading code.  Switch to use it.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> and since the MSR is not writable and silently drops writes instead,
+> once the test tries to read it, it gets some random value instead.
 
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+This just showed up in our testing too (delayed backport on our end).  I ha=
+ven't
+(yet) tried debugging our setup, but is there any chance Intel PT is interf=
+ering?
+
+  33.3.1.2 Model Specific Capability Restrictions
+  Some processor generations impose restrictions that prevent use of
+  LBRs/BTS/BTM/LERs when software has enabled tracing with Intel Processor =
+Trace.
+  On these processors, when TraceEn is set, updates of LBR, BTS, BTM, LERs =
+are
+  suspended but the states of the corresponding IA32_DEBUGCTL control field=
+s
+  remained unchanged as if it were still enabled. When TraceEn is cleared, =
+the
+  LBR array is reset, and LBR/BTS/BTM/LERs updates will resume.
+  Further, reads of these registers will return 0, and writes will be dropp=
+ed.
+
+  The list of MSRs whose updates/accesses are restricted follows.
+ =20
+    =E2=80=A2 MSR_LASTBRANCH_x_TO_IP, MSR_LASTBRANCH_x_FROM_IP, MSR_LBR_INF=
+O_x, MSR_LASTBRANCH_TOS
+    =E2=80=A2 MSR_LER_FROM_LIP, MSR_LER_TO_LIP
+    =E2=80=A2 MSR_LBR_SELECT
+ =20
+  For processors with CPUID DisplayFamily_DisplayModel signatures of 06_3DH=
+,
+  06_47H, 06_4EH, 06_4FH, 06_56H, and 06_5EH, the use of Intel PT and LBRs =
+are
+  mutually exclusive.
+
+If Intel PT is NOT responsible, i.e. the behavior really is due to DEBUG_CT=
+L.LBR=3D0,
+then I don't see how KVM can sanely virtualize LBRs.
 
