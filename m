@@ -1,154 +1,139 @@
-Return-Path: <kvm+bounces-29860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFECB9B356F
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:55:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC0C39B359F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 17:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0FB21C21958
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 15:55:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92AB41F22F1A
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92A51DE88B;
-	Mon, 28 Oct 2024 15:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3251DED71;
+	Mon, 28 Oct 2024 16:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XRUtRG+1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pay5G7sV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D171DDC13
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 15:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D6A1DED53
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 16:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730130922; cv=none; b=o+oQX0hobCwMbv4UEahTCF/k6DFix8vLCUITLzZVmWdc3zpBXtVH2PircQuO9RSLCnwpgV5Nkhz5Mn4omD/DIFY3C/COeQGGiyVDdY3f4ath79swfVZgRKaaE61/2vfgCShfHEa2BFsU8Yj1pwl/qw5KzjmNvo/8Mao+XnvvDWk=
+	t=1730131311; cv=none; b=uDzd/ZhrKNTuKg42RwQMOolt4zUWU2QwQywODhLSaZQaHnH2T/CupE9xl5GXiy/mXHtS47GPUuq6JfIkMJEnpypEtsjT9AgtBoMnPj48bcVIL7SDIRldXMMUL9tONqywwVnB3e7l1E/cHP3O2aBReRGsNV+CUCVS9TpYEewv+GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730130922; c=relaxed/simple;
-	bh=G7gK7h5l4wdYxW15n43e1nF6+MLyAKmon7XGH8HlZUo=;
+	s=arc-20240116; t=1730131311; c=relaxed/simple;
+	bh=7PRNa+uQzRKDZOo/peK7GEezP1r6PlJrVhbHzVtCDD8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BQCSrrWC9APhDgNauSVnSlPZyQMoAbulLOh7c5X71EqjGFF/15n8loqZQklfDyhGeK6HeGQuFHTK3OfBT6cuPnPkkYOh8Z8QDz+nQxufdQpaCeoJIoDJ67eRXmHL1TaoLMLs3/KhuddYd1o1PUO1RrPNpKYg5cVDpflFW8WrkQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XRUtRG+1; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=KePTkaAoA4wc9lC5s7WuqQ0TmiAIiuDSo74qgalDf4SSDgf3AdbJ/BLhNUrlMZ9j05ea+lBLLoyMGdjxSbFyKpPrskkbUrYpxqZSSGaPL9B4cJYRnzmJFLK5YfWRuihV47PmYnkP7yOag3YXbxsOytIrOZQ+ujyM+eQhsGSkmi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pay5G7sV; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e59dc7df64so54665967b3.1
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 08:55:20 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e292dbfd834so7348085276.3
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 09:01:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730130920; x=1730735720; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0C2b1d52yixaqrwrj7hYu48SeL8+Gd/GtggTGgTR4hU=;
-        b=XRUtRG+1pMvbKng2jEphQwktkkF+4v29FUF5cFYEncD6tNo4tiD4zA+2vKIEG8qJv7
-         b+02gD5wR/p4dsd0SN11dLG6B2O0MMofS6B9qn6K8KegVIIhfpEPaPBFb5fPVfXhhVf8
-         FFMF4gM+VCBAqo0FRvdkCVJ0/yd+pWAwPo3nhKuLP8hxsgx42e7QOhSjRq6bY9lTyfKJ
-         9O8Y4EkIDQ7PpAziA/UAeD5P4EePzx9RBH8FKbOThDDBEg5H9MsXbyqdGpB9wKJzV6Wp
-         OoRLe7+eQ7d9SB1vzVWQjqLEg+8kXZm4OJZqh7qYz50rOVN4j6EWsQRbvp3bXKKjKxu8
-         Kffg==
+        d=google.com; s=20230601; t=1730131308; x=1730736108; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r02bHDcQ9tRemd8lnxwsawjLvScs8VGZuPjD+oM8q8A=;
+        b=Pay5G7sVGRk7lZ4U2mLLuVB2WbBKDDdMjILAYb8IF7MVO2z4M9mjicrXyQSfpUeIMX
+         lci/LRt6KYF3lM7gAKMIhHAhGk0Wt8oPWsQ3hHuWGL05zg2mFe1NUC9dfYogDfgnMCbG
+         wOA6jtVdenJr8Y0jqFsTGMVSHL9Hgm27GlIwKndyZ3ospRtxwHLb/GSd/l2svu8wJwrz
+         lIoDubslXLQBRZ6RKmQbqkQDX7WI3XVRu55/yC0f1EEvAst9RszwzfFNTK5dmzVFmGvY
+         nREhdojBH1rEUempstGVxgC3//zV6nrJnqsY/9mHK0odwCI6w4WaszljbdaWAt4HeHQc
+         u3QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730130920; x=1730735720;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0C2b1d52yixaqrwrj7hYu48SeL8+Gd/GtggTGgTR4hU=;
-        b=KRfBP5FCwsvDgzoRQiqr6bNJUiYtg20o2lhqhA9eT+y5D5/G7jEu9OVk+RMvUDaxi8
-         qP/9bRk1+IV6NTI4oGwzjXif2oNLCWETEhGQmuQ4ZwWLGgRHUqCzRkdMFobX3HHfAmQk
-         upVGmMSn2QHxKDLFAoA0a6xjkOIKvj1EONQNbcpVfYtoZKOeAEfV5gBWdCV5reSUHTYO
-         egP/9BXCNsQONktGpG7am8wcDE8A5dJfBCxCgnUm0OcEyIAHHWWa2oiIFPfgFaTsWRRU
-         fL8cN9SetQR7a1RiUpBGBIEtw1fmqyRbM6a3SEUvFbSPmNtO7slHYUAcIel7gPQLDxre
-         bXZg==
-X-Gm-Message-State: AOJu0YzcwmXUt9E17+SkK4rdAyxcQi1JTc0xz+kkPj/YvgtePlHycmt2
-	AKTMhN2QE8Dv2F4hBb/4UQOK+Dadw+Ryj0G2ELai6k4nzWV/NtwIqzpxZmg868+rSyrgXtfZwZW
-	Pmg==
-X-Google-Smtp-Source: AGHT+IFW2uWD2JoYRqx//feYgv7dWWPiDC8Ri6H9Jm3Pt4mRWMx4jp0WPopWTpFDgAHwyA7bUNQFLD/xReI=
+        d=1e100.net; s=20230601; t=1730131308; x=1730736108;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r02bHDcQ9tRemd8lnxwsawjLvScs8VGZuPjD+oM8q8A=;
+        b=VH9IZxiarfFRlAwFaEjYPGbtarZ4eMv+wAFjsIk1+SrvL9aoximhCp99O4s1LIJdjG
+         YEa1tue01yESdDn/unBMDItP6iFyVerNM4RzB21Fc+copX+0Sa2alOm5r5IavkygWgbG
+         I8br4u69sv0rRl1pBcnonMO8jJQf7g3LC/aYwystG9QQbCenActNT+ZH4Jdrh2pHAE4N
+         f5g/Rs00KYqzd4hPCudvjulZSCul6Fuy/dRWLlNDHzV84zleD7EhopUgYPldtKueU6iK
+         MCujiCyijhw3fgNcax++odHZaHc3h9Sv8xz8JnWWvIfFXy0utAvZZH3r4vw/egW7mLjz
+         lW/g==
+X-Forwarded-Encrypted: i=1; AJvYcCU3jKCiTesQ93KRzi/T+3Vfd6kAFzMjeBBbltzL4o1OFL8CVCYPvCmVs+/QU4SdHjoqlmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL+75Iv7J+AHU8qvzg2HJbwdJtaISxS3Gv/iFJczgbtQ1GbTgt
+	7mFHQiYPB4r5LeCSypJomul4PqMV/kHnk2w5b0cU8QDM1KMAyroLE1xdsEnnCgA46TIrr48uWne
+	DPg==
+X-Google-Smtp-Source: AGHT+IEKUP2ZAMuHgHcmbZspRBm/ZQWf9eWaTd80Q0jLh5BNLTlzUUdtWo+08mkzloiLxpY8tEw/bnordWw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:7301:b0:6dd:bb6e:ec89 with SMTP id
- 00721157ae682-6ea22d45915mr1767b3.2.1730130919797; Mon, 28 Oct 2024 08:55:19
+ (user=seanjc job=sendgmr) by 2002:a25:7810:0:b0:e2b:d28f:bf28 with SMTP id
+ 3f1490d57ef6-e3087a48962mr44938276.2.1730131308346; Mon, 28 Oct 2024 09:01:48
  -0700 (PDT)
-Date: Mon, 28 Oct 2024 08:55:18 -0700
-In-Reply-To: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
+Date: Mon, 28 Oct 2024 09:01:46 -0700
+In-Reply-To: <c8e184b7acf1e073c0d6cf489031bc7d2b6304b0.1729864615.git.namcao@linutronix.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
-Message-ID: <Zx-z5sRKCXAXysqv@google.com>
-Subject: Re: vmx_pmu_caps_test fails on Skylake based CPUS due to read only LBRs
+References: <cover.1729864615.git.namcao@linutronix.de> <c8e184b7acf1e073c0d6cf489031bc7d2b6304b0.1729864615.git.namcao@linutronix.de>
+Message-ID: <Zx-1ahdKLH3o2MHj@google.com>
+Subject: Re: [PATCH 04/21] KVM: x86/xen: Initialize hrtimer in kvm_xen_init_vcpu()
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Nam Cao <namcao@linutronix.de>
+Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda <ojeda@kernel.org>, Kees Cook <kees@kernel.org>, 
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 18, 2024, Maxim Levitsky wrote:
-> Hi,
->=20
-> Our CI found another issue, this time with vmx_pmu_caps_test.
->=20
-> On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to an=
-d
-> TOS), are always read only - even when LBR is disabled - once I disable t=
-he
-> feature in DEBUG_CTL, all LBR msrs reset to 0, and you can't change their
-> value manually.  Freeze LBRS on PMI seems not to affect this behavior.
->=20
-> I don't know if this is how the hardware is supposed to work (Intel's man=
-ual
-> doesn't mention anything about this), or if it is something platform
-> specific, because this system also was found to have LBRs enabled
-> (IA32_DEBUGCTL.LBR =3D=3D 1) after a fresh boot, as if BIOS left them ena=
-bled - I
-> don't have an idea on why.
->=20
-> The problem is that vmx_pmu_caps_test writes 0 to LBR_TOS via KVM_SET_MSR=
-S,
-> and KVM actually passes this write to actual hardware msr (this is somewh=
-at
-> wierd),
+On Mon, Oct 28, 2024, Nam Cao wrote:
+> The hrtimer is initialized in the KVM_XEN_VCPU_SET_ATTR ioctl. That caused
+> problem in the past, because the hrtimer can be initialized multiple times,
+> which was fixed by commit af735db31285 ("KVM: x86/xen: Initialize Xen timer
+> only once"). This commit avoids initializing the timer multiple times by
+> checking the field 'function' of struct hrtimer to determine if it has
+> already been initialized.
+> 
+> Instead of "abusing" the 'function' field, move the hrtimer initialization
+> into kvm_xen_init_vcpu() so that it will only be initialized once.
+> 
+> Signed-off-by: Nam Cao <namcao@linutronix.de>
+> ---
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> ---
+>  arch/x86/kvm/xen.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 622fe24da910..c386fbe6b58d 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -1070,9 +1070,6 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+>  			break;
+>  		}
+>  
+> -		if (!vcpu->arch.xen.timer.function)
+> -			kvm_xen_init_timer(vcpu);
+> -
+>  		/* Stop the timer (if it's running) before changing the vector */
+>  		kvm_xen_stop_timer(vcpu);
+>  		vcpu->arch.xen.timer_virq = data->u.timer.port;
+> @@ -2235,6 +2232,7 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.xen.poll_evtchn = 0;
+>  
+>  	timer_setup(&vcpu->arch.xen.poll_timer, cancel_evtchn_poll, 0);
+> +	kvm_xen_init_timer(vcpu);
 
-When the "virtual" LBR event is active in host perf, the LBR MSRs are passe=
-d
-through to the guest, and so KVM needs to propagate the guest values into h=
-ardware.
+I vote for opportunistically dropping kvm_xen_init_timer() and open coding its
+contents here.
 
-> and since the MSR is not writable and silently drops writes instead,
-> once the test tries to read it, it gets some random value instead.
+If the intent is for subsystems to grab their relevant patches, I can fixup when
+applying.
 
-This just showed up in our testing too (delayed backport on our end).  I ha=
-ven't
-(yet) tried debugging our setup, but is there any chance Intel PT is interf=
-ering?
-
-  33.3.1.2 Model Specific Capability Restrictions
-  Some processor generations impose restrictions that prevent use of
-  LBRs/BTS/BTM/LERs when software has enabled tracing with Intel Processor =
-Trace.
-  On these processors, when TraceEn is set, updates of LBR, BTS, BTM, LERs =
-are
-  suspended but the states of the corresponding IA32_DEBUGCTL control field=
-s
-  remained unchanged as if it were still enabled. When TraceEn is cleared, =
-the
-  LBR array is reset, and LBR/BTS/BTM/LERs updates will resume.
-  Further, reads of these registers will return 0, and writes will be dropp=
-ed.
-
-  The list of MSRs whose updates/accesses are restricted follows.
- =20
-    =E2=80=A2 MSR_LASTBRANCH_x_TO_IP, MSR_LASTBRANCH_x_FROM_IP, MSR_LBR_INF=
-O_x, MSR_LASTBRANCH_TOS
-    =E2=80=A2 MSR_LER_FROM_LIP, MSR_LER_TO_LIP
-    =E2=80=A2 MSR_LBR_SELECT
- =20
-  For processors with CPUID DisplayFamily_DisplayModel signatures of 06_3DH=
-,
-  06_47H, 06_4EH, 06_4FH, 06_56H, and 06_5EH, the use of Intel PT and LBRs =
-are
-  mutually exclusive.
-
-If Intel PT is NOT responsible, i.e. the behavior really is due to DEBUG_CT=
-L.LBR=3D0,
-then I don't see how KVM can sanely virtualize LBRs.
+>  	kvm_gpc_init(&vcpu->arch.xen.runstate_cache, vcpu->kvm);
+>  	kvm_gpc_init(&vcpu->arch.xen.runstate2_cache, vcpu->kvm);
+> -- 
+> 2.39.5
+> 
 
