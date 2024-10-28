@@ -1,151 +1,111 @@
-Return-Path: <kvm+bounces-29878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BECFF9B38BC
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:07:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5D89B38CA
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 848B4287358
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:07:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4734283C3F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D311DF74D;
-	Mon, 28 Oct 2024 18:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568A61DF97F;
+	Mon, 28 Oct 2024 18:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CLxE4szh"
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="ZgpvCfWo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0197F1DE889
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 18:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FEA155A52;
+	Mon, 28 Oct 2024 18:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730138823; cv=none; b=KzeM9p7YWa4cw8DVXnHJBuEo8ZrNY4i69nniPZnZXuTMTFubyjVdskyfza4bHxPJGhgXhvTfYZTPi9BoZed2rXx4m5XpM5j2bGYbKpkvHdWCx2VpxxgxeY4fxk9fWd3qvLGTRJ+f/Qe4QqQVZTi+d/E4ZuGSGqS3njXwbQgWM5A=
+	t=1730139099; cv=none; b=Zk1/4jQGQiVFQ+4Wtb1CLgJ+dcDrp+grUrYR4XfiuGGyVbeq9quUK4V+3Y2DqGZ6qIjyUeEyBTOiuFlwwtwOhpxqRjWhqp/gNK4rde5L5BLwIpCAlmmBRhJR9gdT8Uy6EG38ZKvllMGVjKqVLyynFFUfOBTgfdwYxgTvW246jAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730138823; c=relaxed/simple;
-	bh=906Xwqc5BLZHTLhmXAaRwWo5+JImUIzliYYeDlqxCT4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=p/jiC5f2DG1cijAIaCDgrgTb2Op0rRw5U8qp6cd0gxsHfzA1Et7kh8IoYuAG7zU1fpgXOdrGJoDw+5YOk3bCMVM9yvjQysW8QxbAJPDJlCxi0zybIbDkOLJYa5ohQ3iLrTtSsZtp97IgbynvJ+doPpI7Nh8HdjlU7xZRDNIy6EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CLxE4szh; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e6241c002so4103060b3a.1
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 11:07:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730138821; x=1730743621; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OSPXfhYXFqsav+wNvpf5kcVIJjv343m6ZpWPKhJ4i1M=;
-        b=CLxE4szhYoLXxWaMp45xVw572QDxCD3LdBzXZEaYmRbyRhCoQVoYHKtZuqGrAAFIbH
-         TUEFfVzXvcyCVemN8oiIgFpc0/6tQiRopSwYnyFpbj01KH90i08OzRCiQXljzVkL0tPY
-         Nf+FUgPy5clE9q/vKmBMgNl5HPzfLKZRKQz8eWrqG9YZQe7hiqVmqZ+h/U5s2iLTPuLD
-         fXQcicHb6GUqYrMWP+tKzHUtBWPtC7n51api8eKkzheu+IGOwSh/YOUMAgr/tkXB5/hb
-         LL12ijvhpgliJ+5vPL3KGoLtWpyjrbpa79steucsYpA0M9+AK1OcMyIlTl4IDcQzAxt+
-         7vWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730138821; x=1730743621;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OSPXfhYXFqsav+wNvpf5kcVIJjv343m6ZpWPKhJ4i1M=;
-        b=dxLSkZwsWzTTm5b5jLclxSPG43U9OaJjQ4C2hD5kLkRfL5o4xw+u/no4A9bcmrWix7
-         qIsyRxcJrshBxVYXsI0plKGirj5KYUTwPOVCjGzcKkIZJhAPxPaAjtCGLyTil4eWIzkW
-         v/TzrZ67lOY7HWfQWhVkuSZtPUTGvCOpGjPXOAxW06ZtCwhFkUcE9G81AAvrf66YRkDH
-         nIM/hFJ+7gpch/PAxYCN1CBVJMMZQ1SweUxykFWQvBglA8/7UcnswyuIdUjArr2bXqWn
-         XtH4QxBcw+2F46NCQZXl8EfS3ygnsfJy0ubWEx+7zQRYcz4KRaJyLyZyclfAG3lq2XUD
-         sgYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW6FztoEXSn3UWQlz97OkHeGDrSELvKrN2hilUdXV5Xll0qlLBozW7mFUnhFku4HApg3j4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuPAGgIcxLQpDKv2kH80Mi7lni3QeMaED50bvESyYCDE4llitQ
-	KS8Jj4Z4tXJvXU0ROBz/DplyfrJodk+yGBZHvEzjS2Cu11t/JHFO0/vhilBIm1pO1tlbn14nvu+
-	0kA==
-X-Google-Smtp-Source: AGHT+IGEphgAMJPO1RrBvORQ8s/TYfMNYCHByxWeAm23fw9VpJx73ZRrDNmOoAg0zAywWzMIM+hx0G5Vf7Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:6f64:b0:720:3b92:da02 with SMTP id
- d2e1a72fcca58-7209257ee6dmr6558b3a.1.1730138821179; Mon, 28 Oct 2024 11:07:01
- -0700 (PDT)
-Date: Mon, 28 Oct 2024 11:06:59 -0700
-In-Reply-To: <Zx_NgJnjsGIrW4uF@arm.com>
+	s=arc-20240116; t=1730139099; c=relaxed/simple;
+	bh=SIxSdBe+RXcsbzx/Ctvx/wGBM6KxLLfq6vguV1usP0o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=gEcXvCLpnrvNfmqCzTlxiBaxDf/RDoueBap//aNvkVAmK2zFwX4G/aWiaI4FYilhJ/L2+7iCe+yFS0BjslikbIgTH135LfdX7HZYKZewObC7+2c2ssdfNsMTKGW/yf3rJjC5Wc9BNRJWHd1I+J0GlPchVK7n+w51QOKL2eJ6GBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=ZgpvCfWo; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=8p+XeF371FBdizlYdFFfI+9cvX4PxDYJkCjxcGvOnbA=; b=ZgpvCfWocWsIQTbiuMoGgvu81j
+	S/fCHcyzInt5f0gPKd+LIK7OJ5mxEaoNwY3if96O+eQaCdejZ8p5V3sgl/v9nalWlDJO5DRXi/kIn
+	wvHhSbq4aAwqMIMsOMusADIniYrFBNpOPovhNcwteIj9k4BUkv8XY28rtPNRm9woscrRzWxlXqEZb
+	x/tnpblDzlq9tceUkjNsArDEQcZsmuRZZSVXzOBFycNxqU3EB7/U9E1zPZg62v7QNAB9eXmVwn9dD
+	fGPW5l7LzLYo6jMaIh+Joy5PZ/qKbf8+LukxoA/IHSVyQYhrFtbPf9diRx5yqeRINUUkSejoMIZIj
+	4p2sRADA==;
+Received: from d104-157-31-28.abhsia.telus.net ([104.157.31.28] helo=[192.168.1.250])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1t5UCo-002ZVS-20;
+	Mon, 28 Oct 2024 12:11:07 -0600
+Message-ID: <31cae8da-74fa-4a45-a88f-ad76572246d4@deltatee.com>
+Date: Mon, 28 Oct 2024 12:10:38 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241028170310.3051da53@canb.auug.org.au> <Zx_NgJnjsGIrW4uF@arm.com>
-Message-ID: <Zx_Sw8XVHeaD4ya6@google.com>
-Subject: Re: linux-next: manual merge of the kvm tree with the arm64 tree
-From: Sean Christopherson <seanjc@google.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
-	KVM <kvm@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Yang Shi <yang@os.amperecomputing.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <cover.1730037276.git.leon@kernel.org>
+ <a4d93ca45f7ad09105a1cf347e6b6d6b6fb7e303.1730037276.git.leon@kernel.org>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <a4d93ca45f7ad09105a1cf347e6b6d6b6fb7e303.1730037276.git.leon@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 104.157.31.28
+X-SA-Exim-Rcpt-To: leon@kernel.org, axboe@kernel.dk, jgg@ziepe.ca, robin.murphy@arm.com, joro@8bytes.org, will@kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, bhelgaas@google.com, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com, alex.williamson@redhat.com, m.szyprowski@samsung.com, jglisse@redhat.com, akpm@linux-foundation.org, corbet@lwn.net, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-rdma@vger.kernel.org, iommu@lists.linux.dev, linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 01/18] PCI/P2PDMA: refactor the p2pdma mapping helpers
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On Mon, Oct 28, 2024, Catalin Marinas wrote:
-> On Mon, Oct 28, 2024 at 05:03:10PM +1100, Stephen Rothwell wrote:
-> > Today's linux-next merge of the kvm tree got a conflict in:
-> > 
-> >   arch/arm64/kvm/guest.c
-> > 
-> > between commit:
-> > 
-> >   25c17c4b55de ("hugetlb: arm64: add mte support")
-> > 
-> > from the arm64 tree and commit:
-> > 
-> >   570d666c11af ("KVM: arm64: Use __gfn_to_page() when copying MTE tags to/from userspace")
-> > 
-> > from the kvm tree.
-> [...]
-> > diff --cc arch/arm64/kvm/guest.c
-> > index e738a353b20e,4cd7ffa76794..000000000000
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@@ -1051,13 -1051,11 +1051,12 @@@ int kvm_vm_ioctl_mte_copy_tags(struct k
-> >   	}
-> >   
-> >   	while (length > 0) {
-> > - 		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
-> > + 		struct page *page = __gfn_to_page(kvm, gfn, write);
-> >   		void *maddr;
-> >   		unsigned long num_tags;
-> > - 		struct page *page;
-> >  +		struct folio *folio;
-> >   
-> > - 		if (is_error_noslot_pfn(pfn)) {
-> > + 		if (!page) {
-> >   			ret = -EFAULT;
-> >   			goto out;
-> >   		}
-> > @@@ -1099,12 -1090,8 +1097,12 @@@
-> >   			/* uaccess failed, don't leave stale tags */
-> >   			if (num_tags != MTE_GRANULES_PER_PAGE)
-> >   				mte_clear_page_tags(maddr);
-> >  -			set_page_mte_tagged(page);
-> >  +			if (folio_test_hugetlb(folio))
-> >  +				folio_set_hugetlb_mte_tagged(folio);
-> >  +			else
-> >  +				set_page_mte_tagged(page);
-> >  +
-> > - 			kvm_release_pfn_dirty(pfn);
-> > + 			kvm_release_page_dirty(page);
-> >   		}
-> >   
-> >   		if (num_tags != MTE_GRANULES_PER_PAGE) {
+
+
+On 2024-10-27 08:21, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
 > 
-> Thanks Stephen. The resolution looks fine
-
-Looks correct to my eyes, too.  Thanks Stephen!
-
-> and I'm happy to leave to Linus to fix it up during the merging window.
+> The current scheme with a single helper to determine the P2P status
+> and map a scatterlist segment force users to always use the map_sg
+> helper to DMA map, which we're trying to get away from because they
+> are very cache inefficient.
 > 
-> To the KVM maintainers, if you prefer a conflict-free linux-next, feel
-> free to pull the arm64 for-next/mte branch with the above commit (and a
-> kselftest). The other way around is not something I'd suggest we do,
-> there are over 80 patches in that kvm series.
+> Refactor the code so that there is a single helper that checks the P2P
+> state for a page, including the result that it is not a P2P page to
+> simplify the callers, and a second one to perform the address translation
+> for a bus mapped P2P transfer that does not depend on the scatterlist
+> structure.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 
-Not feeling lucky today? ;-)
+Looks good to me. Thanks!
+
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
