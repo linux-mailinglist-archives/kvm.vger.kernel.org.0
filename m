@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-29865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C794F9B3685
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 17:32:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF729B36DB
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 17:42:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4941C1F23107
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:32:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD40B1F21A2B
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 16:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D371DED75;
-	Mon, 28 Oct 2024 16:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE371DEFE3;
+	Mon, 28 Oct 2024 16:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cczWJyoY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2Vh8dY6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FB8188701
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 16:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAFF186E27
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 16:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730133150; cv=none; b=rfiU9etsRAo3YMmd0QAh5XTGCrEHEzi1ZELXf6E37jkFq3sl+rkvKXkLArFNl+oC/ScCAlQ5iQ7biA98gVmqkQrwI/gwKZtPWaJxA1jOkroc/z0pY1rXOUGQ2+imhDWGiB6trDyDKPeNomqZXrVlGygW8v7aRr/uCcO+48rrsLw=
+	t=1730133738; cv=none; b=Mi0skVxkajtC1luR69Of7ErhEClgN3AGYD6b+en7vYk6/nqFREutKl31pTY8o5fZygDK8YrfQ1kN9N+vAE+cMnpgRfEEj4NQuunGfjdNx9aOMKd1ck3BFU2fSYJ4ElGF0R1uYqEURpv/AowSOpVlfkVLUauX+3qkSPrBoSoWB8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730133150; c=relaxed/simple;
-	bh=CUqbEHRp/aGU4YbiXZRV3LYL7rE97ohMOM4Ak9tlEng=;
+	s=arc-20240116; t=1730133738; c=relaxed/simple;
+	bh=gtDU3Zk/9KeyeKM9oi//Mw9PoYgZ2wDzl+5iv5WDJ58=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aQCnGUAnxmc9um+790DnX3CLpdfbKCbjaViNPJkFtp/3uO9eMpx9K3LHROvrpqADC0Y0cM0ps0xnbRECDNAooI3fPWNts7yT2vtJG7aPBP98F+imkNEwyqGfUfkbDfg9dM2C04qu9DboY+idoa0hp8HdqX8Z81LiKFRM6npIm9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cczWJyoY; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=T+RYLqmnoh08iQzyxaLoVAekjeB8gAXbXKHjHbBLasXw/e+WLZzTIvaYFjmx2cOqo9pd82Fye1t6TPtng22Bg24k3xOVmlDsgA44+ylS7tkArypddlrISY/eQCFsUCxjLMh8e4Md2+jSNWtFunPFYee/MNVVGu/JJcC+n6y6e/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y2Vh8dY6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730133147;
+	s=mimecast20190719; t=1730133735;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gjggvzGWkBwrrwMfWh3JXGSzHIVlrh/OgLv0sI1bRiQ=;
-	b=cczWJyoYdCSgyf3m1ZzvmwPTpFeQ50iAt1MoMfPDUcAszqi6Y6P0wAGGkOS1seV7KANYj2
-	VmgNuYpyLMjuC3LxMtSfbuQ6m8SzPyOCFjy2K3yI2EX61fine2SBeTRNpJLpCciv4jONMe
-	1guNvNeoUVxWZEOMYajN1ZRAlqUkQQg=
+	bh=T0UAX23+37ZRrHea98bsMhwQ80Lb1MZgJknkx7BqqeA=;
+	b=Y2Vh8dY691G7jmQKyjtRF0hXJ5JBtqX5IfTfkwIef4/eVT12MsR3uCXAnxnPDcZI/ionv9
+	M9xMfXcZtwLvuv8ZN78QQE3s2RzzNukkTT+ArGgKhxiU8+7FBzMX97yJVRp/sQJimX1cp7
+	pVOgiwDSDqUBEpyaY2NxYOoRp4WY6yw=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-338-AALFBt3pPwSv08lXxUlu-A-1; Mon, 28 Oct 2024 12:32:26 -0400
-X-MC-Unique: AALFBt3pPwSv08lXxUlu-A-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4316300bb15so32430715e9.2
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 09:32:26 -0700 (PDT)
+ us-mta-383-OGNcBieINGuCpUkI5dahJg-1; Mon, 28 Oct 2024 12:42:13 -0400
+X-MC-Unique: OGNcBieINGuCpUkI5dahJg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315e8e9b1cso24996175e9.1
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 09:42:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730133145; x=1730737945;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gjggvzGWkBwrrwMfWh3JXGSzHIVlrh/OgLv0sI1bRiQ=;
-        b=bicHvptAHXIM+gpc5GCp2IbC07REoFwMcZbXfzlbZ+AYJZwlZduuQy6DkrEJSShgKH
-         Ajs50BUyYIg8epO+ZljRTkOcfCMJEMdABS3TAtBl4UnKdskVYkzXk+if8T06RYNHQbzJ
-         Chl50JrUGQEa+qZUVBN7624Pj/rLFt2EfiLaXPvpJEDJCrWgumArOmM6QiafZAyZSxh/
-         xeS6pOXG206ULkEiH/hWl2rR/uJ9Z+WMF3z1gwUzLZXGY0s+MTGPhNH44LKPx6rK9wbp
-         ISYPwHyuMeKE+6TlXXMc6f9amTj0Zg610t2qMWZLsPQIh4fGK+GtG1eYOOSICPjX9Rfg
-         QqJg==
-X-Gm-Message-State: AOJu0Yw+U7sAIITaXOP9TsVMOYaCvuCzSwh2dH37YQi3dsKkIk6VDfP2
-	kbuJrBNuHXp9bnPtzX0DxPeYqS6LlnTBGHlB8BczyV/OUSwCmJPuvD+dLYPl0wOqJz+T+Sx0PZU
-	ziahLBRhvn4U9++zXFyj3pyADYljD81qCvNGvxRA1r+eT1UFrGA==
-X-Received: by 2002:a05:600c:46d4:b0:427:ff3b:7a20 with SMTP id 5b1f17b1804b1-4319ad049a8mr63761705e9.27.1730133145159;
-        Mon, 28 Oct 2024 09:32:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvrVzNQ5KvnDWYy7NCoR4A208IKWmafb3FxMi+dq1XB8mVrAuLmie/i7ZtybE4HCP+JfWBJw==
-X-Received: by 2002:a05:600c:46d4:b0:427:ff3b:7a20 with SMTP id 5b1f17b1804b1-4319ad049a8mr63761545e9.27.1730133144747;
-        Mon, 28 Oct 2024 09:32:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730133732; x=1730738532;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T0UAX23+37ZRrHea98bsMhwQ80Lb1MZgJknkx7BqqeA=;
+        b=GSUdCz1fNkYhqg5zNfq8X9UIKu+GZnpQRWDANXFXrjm+FyXBhf+yonsANdsakd9sVe
+         aKyPtYfbc4XJlOE2YKS8mI8BtjHJYzcv6QP92zkUpb3d7eej2YmC2qIYgRrXj/3iNz7b
+         Ziu/42nSsQ7NO5ogvloLZdliuO/2X1eyCV9/8wrYWy7tOzonswgnmtyOI4nFypzrZA7w
+         nzn/ayHsOpTiw8t8ZOgMYkrbJfhep/TP7muSHgHSpJx6GNI8OLyjEj4w+H3ESrf5i29/
+         Af8F5IWFFgs3Ltt/4qZR4DLJzBjYUvNAZP35aqZwctJNj885mWpm0KOL2L6CUffqIoY+
+         eCBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXN2RUOGwL8tliVUMaYr7jOTG/CW71/n3gDeUkPDm5itxR5GyFYmIE6taV237JT0kvVbQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp43z7RTLCSToQ/MidhPDVxpBxNEVSrXZmg4EqEOcBviENkacu
+	nv6Lq/UKueN0yux7YNAymU+MRfsg4TP+/ZG3y8lkORDpnxTh4pFjY83QqY5wQ/zLk4/hQmvEfDj
+	XX7Mvp5a/pPQ1rLES/3BB41jVGsYB9LzoZJ31wEKtHL+xRC42jA==
+X-Received: by 2002:a05:600c:450f:b0:431:7ccd:ff8a with SMTP id 5b1f17b1804b1-431b2f326c8mr2055605e9.14.1730133731985;
+        Mon, 28 Oct 2024 09:42:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGBesCrSu0q4i2SZfeVQIYSHgqs3Pn9F5uTcLGHdCRZm3VZfc0mDe/6YB2p/qzRtKR5IbJeA==
+X-Received: by 2002:a05:600c:450f:b0:431:7ccd:ff8a with SMTP id 5b1f17b1804b1-431b2f326c8mr2055315e9.14.1730133731552;
+        Mon, 28 Oct 2024 09:42:11 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c722:3c00:70fc:90a8:2c65:79b4? (p200300cbc7223c0070fc90a82c6579b4.dip0.t-ipconnect.de. [2003:cb:c722:3c00:70fc:90a8:2c65:79b4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4319360d233sm113285555e9.45.2024.10.28.09.32.23
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43193573551sm115340055e9.6.2024.10.28.09.42.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Oct 2024 09:32:24 -0700 (PDT)
-Message-ID: <be678d47-b8f5-4061-9287-adb6a44ad483@redhat.com>
-Date: Mon, 28 Oct 2024 17:32:23 +0100
+        Mon, 28 Oct 2024 09:42:11 -0700 (PDT)
+Message-ID: <9a49fc5f-bf9e-4e72-bd3e-13975d4913bd@redhat.com>
+Date: Mon, 28 Oct 2024 17:42:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,21 +83,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC RESEND 0/6] hugetlbfs largepage RAS project
-To: William Roche <william.roche@oracle.com>, pbonzini@redhat.com,
- peterx@redhat.com, philmd@linaro.org, marcandre.lureau@redhat.com,
- berrange@redhat.com, thuth@redhat.com, richard.henderson@linaro.org,
- peter.maydell@linaro.org, mtosatti@redhat.com, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org, joao.m.martins@oracle.com
-References: <20240910090747.2741475-1-william.roche@oracle.com>
- <20240910100216.2744078-1-william.roche@oracle.com>
- <ec3337f7-3906-4a1b-b153-e3d5b16685b6@redhat.com>
- <9f9a975e-3a04-4923-b8a5-f1edbed945e6@oracle.com>
- <cf587c8b-3894-4589-bfea-be5db70e81f3@redhat.com>
- <966bf4bf-6928-44a3-b452-d2847d06bb25@oracle.com>
- <0ef808b0-839d-4078-90cb-d3d56c1f4a71@oracle.com>
-Content-Language: en-US
+Subject: Re: [PATCH v1 2/4] accel/kvm: Keep track of the HWPoisonPage
+ page_size
+To: William Roche <william.roche@oracle.com>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
+ philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
+ joao.m.martins@oracle.com
+References: <ZwalK7Dq_cf-EA_0@x1n>
+ <20241022213503.1189954-1-william.roche@oracle.com>
+ <20241022213503.1189954-3-william.roche@oracle.com>
+ <a0fda9e7-d55b-455b-aeaa-27162b6cdc65@redhat.com>
+ <9b17600d-4473-4bb6-841f-00f93d86f720@oracle.com>
 From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -142,46 +142,149 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <0ef808b0-839d-4078-90cb-d3d56c1f4a71@oracle.com>
+In-Reply-To: <9b17600d-4473-4bb6-841f-00f93d86f720@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 19.09.24 18:52, William Roche wrote:
-> Hello David,
+On 26.10.24 01:27, William Roche wrote:
+> On 10/23/24 09:28, David Hildenbrand wrote:
+> 
+>> On 22.10.24 23:35, “William Roche wrote:
+>>> From: William Roche <william.roche@oracle.com>
+>>>
+>>> Add the page size information to the hwpoison_page_list elements.
+>>> As the kernel doesn't always report the actual poisoned page size,
+>>> we adjust this size from the backend real page size.
+>>> We take into account the recorded page size to adjust the size
+>>> and location of the memory hole.
+>>>
+>>> Signed-off-by: William Roche <william.roche@oracle.com>
+>>> ---
+>>>   accel/kvm/kvm-all.c       | 14 ++++++++++----
+>>>   include/exec/cpu-common.h |  1 +
+>>>   include/sysemu/kvm.h      |  3 ++-
+>>>   include/sysemu/kvm_int.h  |  3 ++-
+>>>   system/physmem.c          | 20 ++++++++++++++++++++
+>>>   target/arm/kvm.c          |  8 ++++++--
+>>>   target/i386/kvm/kvm.c     |  8 ++++++--
+>>>   7 files changed, 47 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>>> index 2adc4d9c24..40117eefa7 100644
+>>> --- a/accel/kvm/kvm-all.c
+>>> +++ b/accel/kvm/kvm-all.c
+>>> @@ -1266,6 +1266,7 @@ int kvm_vm_check_extension(KVMState *s, 
+>>> unsigned int extension)
+>>>    */
+>>>   typedef struct HWPoisonPage {
+>>>       ram_addr_t ram_addr;
+>>> +    size_t     page_size;
+>>>       QLIST_ENTRY(HWPoisonPage) list;
+>>>   } HWPoisonPage;
+>>>   @@ -1278,15 +1279,18 @@ static void kvm_unpoison_all(void *param)
+>>>         QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+>>>           QLIST_REMOVE(page, list);
+>>> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+>>> +        qemu_ram_remap(page->ram_addr, page->page_size);
+>>
+>> Can't we just use the page size from the RAMBlock in qemu_ram_remap? 
+>> There we lookup the RAMBlock, and all pages in a RAMBlock have the 
+>> same size.
+> 
+> 
+> Yes, we could use the page size from the RAMBlock in qemu_ram_remap() 
+> that is called when the VM is resetting. I think that knowing the 
+> information about the size of poisoned chunk of memory when the poison 
+> is created is useful to give a trace of what is going on, before seeing 
+> maybe other pages being reported as poisoned. That's the 4th patch goal 
+> to give an information as soon as we get it.
+> It also helps to filter the new errors reported and only create an entry 
+> in the hwpoison_page_list for new large pages.
+> Now we could delay the page size retrieval until we are resetting and 
+> present the information (post mortem). I do think that having the 
+> information earlier is better in this case.
 
-Hi William,
+If it is not required for this patch, then please move the other stuff 
+to patch #4.
 
-sorry for not replying earlier, it somehow fell through the cracks as my 
-inbox got flooded :(
+Here, we really only have to discard a large page, which we can derive 
+from the QEMU RAMBlock page size.
 
 > 
-> I hope my last week email answered your interrogations about:
->       - retrieving the valid data from the lost hugepage
->       - the need of smaller pages to replace a failed large page
->       - the interaction of memory error and VM migration
->       - the non-symmetrical access to a poisoned memory area after a recovery
->         Qemu would be able to continue to access the still valid data
->         location of the formerly poisoned hugepage, but any other entity
->         mapping the large page would not be allowed to use the location.
 > 
-> I understand that this last item _is_ some kind of "inconsistency".
+>>
+>> I'll note that qemu_ram_remap() is rather stupid and optimized only 
+>> for private memory (not shmem etc).
+>>
+>> mmap(MAP_FIXED|MAP_SHARED, fd) will give you the same poisoned page 
+>> from the pagecache; you'd have to punch a hole instead.
+>>
+>> It might be better to use ram_block_discard_range() in the long run. 
+>> Memory preallocation + page pinning is tricky, but we could simply 
+>> bail out in these cases (preallocation failing, ram discard being 
+>> disabled).
+> 
+> 
+> I see that ram_block_discard_range() adds more control before discarding 
+> the RAM region and can also call madvise() in addition to the fallocate 
+> punch hole for standard sized memory pages. Now as the range is supposed 
+> to be recreated, I'm not convinced that these madvise calls are necessary.
 
-That's my biggest concern. Physical memory and its properties are 
-described by the QEMU RAMBlock, which includes page size, 
-shared/private, and sometimes properties (e.g., uffd).
+They are the proper replacement for the mmap(MAP_FIXED) + fallocate.
 
-Adding inconsistent there is really suboptimal :(
+That function handles all cases of properly discarding guest RAM.
 
-> So if I want to make sure that a "shared" memory region (used for vhost-user
-> processes, vfio or ivshmem) is not recovered, how can I identify what
-> region(s)
-> of a guest memory could be used for such a shared location ?
-> Is there a way for qemu to identify the memory locations that have been
-> shared ?
+> 
+> But we can also notice that this function will report the following 
+> warning in all cases of not shared file backends:
+> "ram_block_discard_range: Discarding RAM in private file mappings is 
+> possibly dangerous, because it will modify the underlying file and will 
+> affect other users of the file"
 
-I'll reply to your other cleanups/improvements, but we can detect if we 
-must not discard arbitrary memory (because likely something is relying 
-on long-term pinnings) using ram_block_discard_is_disabled().
+Yes, because it's a clear warning sign that something weird is 
+happening. You might be throwing away data that some other process might 
+be relying on.
+
+How are you making QEMU consume hugetlbs?
+
+We could suppress these warnings, but let's first see how you are able 
+to trigger it.
+
+> Which means that hugetlbfs configurations do see this new cryptic 
+> warning message on reboot if it is impacted by a memory poisoning.
+> So I would prefer to leave the fallocate call in the qemu_ram_remap() 
+> function. Or would you prefer to enhance ram_block_discard_range()code 
+> to avoid the message in a reset situation (when called from qemu_ram_remap)?
+
+Please try reusing the mechanism to discard guest RAM instead of 
+open-coding this. We still have to use mmap(MAP_FIXED) as a backup, but 
+otherwise this function should mostly do+check what you need.
+
+(-warnings we might want to report differently / suppress)
+
+If you want, I can start a quick prototype of what it could look like 
+when using ram_block_discard_range() + ram_block_discard_is_disabled() + 
+fallback to existing mmap(MAP_FIXED).
+
+> 
+> 
+>>
+>> qemu_ram_remap() might be problematic with page pinning (vfio) as is 
+>> in any way :(
+> 
+> I agree. If qemu_ram_remap() fails, Qemu is ended either abort() or 
+> exit(1). Do you say that memory pinning could be detected by 
+> ram_block_discard_range() or maybe mmap call for the impacted region and 
+> make one of them fail ? This would be an additional reason to call 
+> ram_block_discard_range() from qemu_ram_remap().   Is it what you are 
+> suggesting ?
+
+ram_block_discard_is_disabled() might be the right test. If discarding 
+is disabled, then rebooting might create an inconsistency with 
+e.g.,vfio, resulting in the issues we know from memory ballooning where 
+the state vfio sees will be different from the state the guest kernel 
+sees. It's tricky ... and we much rather quit the VM early instead of 
+corrupting data later :/
 
 -- 
 Cheers,
