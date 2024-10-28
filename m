@@ -1,101 +1,120 @@
-Return-Path: <kvm+bounces-29821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29820-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785E49B2746
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 07:47:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311419B26D5
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 07:43:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30BCD1F24864
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:47:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB129282548
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE7D18FDCC;
-	Mon, 28 Oct 2024 06:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4D618E743;
+	Mon, 28 Oct 2024 06:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXfr6iuk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X7Dc4T3q"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AC118A924;
-	Mon, 28 Oct 2024 06:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D8318E37C
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 06:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730097998; cv=none; b=J3ZtHsAZyrH8qGEVw+MaJQv9SHD0kf5mw//1+ssxKo/DvDrFAiZMCX0Wxg88ujEV4HIcDwuoQNtwPi6Rj5yorl8526qHnrQJvlCfpxH2YBDcd/zAAd8dy+1xngecpo/G5lXlok0KIBbaYpOuRq/8pova5ks7UJNcK/rK/i7lppk=
+	t=1730097782; cv=none; b=sqA/WiF+zY5n8W8hQH2TJ51wpNV4w3TDwVEexINWu/qyRYIEyVkwa+oSD7mDH6wUP3BGg4Z9kLCN9UagMTXuRqgTyZY9A5+TCBQZnDIhdO7Uwk4i4mOTDkrKvQj8P15O3KbBW3Mn7lQqlNkpCMlfvQXNwlyCKaXb49urcct14Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730097998; c=relaxed/simple;
-	bh=JxpLCeEPUhJrMkdL0TYudbC/XbTxYSrHktHQOg5tBzY=;
+	s=arc-20240116; t=1730097782; c=relaxed/simple;
+	bh=/ojNyzEvkXc3gjW31rjjvySL+jX2GWb/Xty5DpADLSs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pajR0/ucKNIQXo/E8COdMX0upwc/8LRvqEdlN1DPHe3PvwIBxvHrdcJgyZVhaAbyaEiRtpSxQuiGXN2OTXcnm8WUid/G/JObx3NVF3ToBjf6LZSiAF1IenFBisuWbL8HC9T3pElTmPKXM+2hP0ROzci1+tLjYsooP8wvZLS3KcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXfr6iuk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA05C4CEC3;
-	Mon, 28 Oct 2024 06:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730097998;
-	bh=JxpLCeEPUhJrMkdL0TYudbC/XbTxYSrHktHQOg5tBzY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pXfr6iukpFNitgAKIIVSyCYtDDCh3B1GaWuseUbNm4XLfuvHiPNIEI1RqzgXGCn+r
-	 T8x3ffU9NvEGqhEZOlcisSCjWlq5PsrCdXVG8sEw7pR+jCveH56xttouEjDQJDV8WY
-	 bx5SFdkmU/eJH7Hrzmkv07xrrIzZ4Y8X8n46X7ryPLmoTBBwUTYHLhLxEw9x3XHUY1
-	 Sze57dE6qj3rdN/EwuSVQ8/g13tIxT1HqDmg5aZ6q77NA2Bid5WHDDtaexWJgT2Sgx
-	 tKYkFMMAg8RNVBv4t74ApVds33Nr2L4PoRFdOrDOZnsgk8sPPHU+TQP6pn8GBLAoZx
-	 12xZsB0TjAqdA==
-Date: Mon, 28 Oct 2024 08:46:34 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Srinivasulu Thanneeru <dev.srinivasulu@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 05/18] dma: Provide an interface to allow allocate IOVA
-Message-ID: <20241028064634.GE1615717@unreal>
-References: <cover.1730037276.git.leon@kernel.org>
- <844f3dcf9c341b8178bfbc90909ef13d11dd2193.1730037276.git.leon@kernel.org>
- <CAMtOeKJeVrELCp5JpYTC64KdfKpbnW9a8QrnL6ziCYL48nc=qQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tYaKl/NXK7lpAi+XyTZVbDinhgmzK0Crn2RFWFjnZc2HjISbyE4m60gFl3qhkVjFFlajp/M/1Q1m9Ol+CwMSbnnnEGHxMEX1GKU/5A10Kpvh+Y3Rjnv2WD3l83X37mRNymt9KNGGJy4EOPBYEH7uTV9Vh1owFpZov5V8cQd9z2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X7Dc4T3q; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730097781; x=1761633781;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/ojNyzEvkXc3gjW31rjjvySL+jX2GWb/Xty5DpADLSs=;
+  b=X7Dc4T3qszp17f+GwUh1nXL2DwGEIc11DHDmmDksimXZ8/GRTNCGDOdt
+   eJ4mZYyznribSOVWAlKpacAdYMgeLs9NeYkmwHfuSPe1A7rRqjESCf9WV
+   Tza6HuPmxc1yh5qtBI4ug74eqovu87DNEqbDfxnEbyx+fOSZBNJoQSnZC
+   ktM9WX3edZIt1oJCOvkD8k5bSfYTyIfc/Kizn72/DXklhp5ne2iGqooHw
+   2ijfpspxKmD7EnuT5vA92SiXmtQHGXyQQyoh/Fc2ihHXwLcWsqI4+pMN8
+   WWFZYd+VsBTRTMSfsVUbMGI+dkNXwVRkHipfjWvfeByJoQmaihbwLrqy0
+   A==;
+X-CSE-ConnectionGUID: 1Q0EaZHEQZeomQ7lR0Uzkw==
+X-CSE-MsgGUID: TUyCQ8Q+SS69qa3qLbB1+g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="40303042"
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="40303042"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 23:43:00 -0700
+X-CSE-ConnectionGUID: iH8c8OTIT/ObRXKruBliKw==
+X-CSE-MsgGUID: t2yVzOgIQLm5dVqtEjvFKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="104850200"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa002.fm.intel.com with ESMTP; 27 Oct 2024 23:42:58 -0700
+Date: Mon, 28 Oct 2024 14:59:17 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Babu Moger <babu.moger@amd.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	John Allen <john.allen@amd.com>
+Subject: Re: [PATCH v3 2/7] target/i386: Add RAS feature bits on EPYC CPU
+ models
+Message-ID: <Zx82ReAE9h7bLSNN@intel.com>
+References: <cover.1729807947.git.babu.moger@amd.com>
+ <63d01f172cabd5a7741434fb923ed7e1447776ee.1729807947.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMtOeKJeVrELCp5JpYTC64KdfKpbnW9a8QrnL6ziCYL48nc=qQ@mail.gmail.com>
+In-Reply-To: <63d01f172cabd5a7741434fb923ed7e1447776ee.1729807947.git.babu.moger@amd.com>
 
-On Mon, Oct 28, 2024 at 09:54:49AM +0530, Srinivasulu Thanneeru wrote:
-> On Sun, Oct 27, 2024 at 10:23 PM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > The existing .map_page() callback provides both allocating of IOVA
-> > and linking DMA pages. That combination works great for most of the
-> > callers who use it in control paths, but is less effective in fast
-> > paths where there may be multiple calls to map_page().
+(+John)
+
+Hi Babu,
+
+This patch is fine for me.
+
+However, users recently reported an issue with SUCCOR support on AMD
+hosts: https://gitlab.com/qemu-project/qemu/-/issues/2571.
+
+Could you please double check and clarify that issue on AMD host?
+
+Thanks,
+Zhao
+
+On Thu, Oct 24, 2024 at 05:18:20PM -0500, Babu Moger wrote:
+> Date: Thu, 24 Oct 2024 17:18:20 -0500
+> From: Babu Moger <babu.moger@amd.com>
+> Subject: [PATCH v3 2/7] target/i386: Add RAS feature bits on EPYC CPU models
+> X-Mailer: git-send-email 2.34.1
 > 
-> Can you please share perf stats with this patch in fast path, if available?
+> Add the support for following RAS features bits on AMD guests.
+> 
+> SUCCOR: Software uncorrectable error containment and recovery capability.
+> 	The processor supports software containment of uncorrectable errors
+> 	through context synchronizing data poisoning and deferred error
+> 	interrupts.
+> 
+> McaOverflowRecov: MCA overflow recovery support.
+> 
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+> v3: No changes
+> 
+> v2: Added reviewed by from Zhao.
+> ---
+>  target/i386/cpu.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 
-I don't have this data for HMM and VFIO as they have other benefits from this
-series except performance. For NVMe, I don't have the data yet, but it will
-come https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org/,
-as it is the main performant user of this API.
-
-This is the main reason why NVMe series is marked as RFC yet.
-
-Thanks
 
