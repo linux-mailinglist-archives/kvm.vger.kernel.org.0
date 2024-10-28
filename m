@@ -1,153 +1,152 @@
-Return-Path: <kvm+bounces-29815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29816-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE459B24D1
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 07:03:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D5BE9B252F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 07:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A17F01F219E0
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:03:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B20281FCF
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4933418D627;
-	Mon, 28 Oct 2024 06:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C921E18E35B;
+	Mon, 28 Oct 2024 06:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lokTkadu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDs6atF8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9376152E1C;
-	Mon, 28 Oct 2024 06:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA43D18990E;
+	Mon, 28 Oct 2024 06:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730095397; cv=none; b=D97PC/yX+cMLi/Jp5+nkWFZHgBVfAFP8icJQytnWQi2nBl/p7iIslQZS+8hPqzzs+QLYG6jB5P7dJY8JluKZUQWX2bt67bIsAsvrFkjTGR6K7GxPF3cK0dZVQRj10JlhVTnClB8L3uvvzruuNimf5yJHNWeghn/mfF77g7/ddho=
+	t=1730096578; cv=none; b=CJ4HNP+X17TBcrggTuNY3BYuLTXQNyUVRialrfAp7UN9AN8GEeDCJEN8Y0Hn9fF5CJkS2tnksp7hdomTZ8UqdEpMf9Ym7NRvb5+YsgxEY2nvmuqFiCf9O56vLsoYQNtoPYFtypAuLaCjWeOxCGWnThMjDGy2DnmLIpxC2xxZ6vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730095397; c=relaxed/simple;
-	bh=TI3ksAMTpWD8gOlvvcnQztCLvbbDM0zXwV43Wxs/9vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Mju+VQ07Cb4fhtSCGSKVUJfqc33Aeo3u19vW48ThfaET5VvpHvwu89nplx+03XuU1FlvEdswxRdCdS4mCmVP1lB3FLpZBTvdrYduYCvIG3DpZYyFcc19efxAyFsCwSWVMG1/aGeA6pzXUu+ZXRiC+LokCv6r7ObdGh+W8hCqDis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=lokTkadu; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1730095391;
-	bh=r5CGirt+k28THwHiOtdhQFTAzLSz32aIval60x2/fnI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=lokTkadufk+xTd5oxYvUiO8Ho4ihlP94oIyUJbG+YFsuhWnyQC9LVLRxlp/yXhbfu
-	 rVvlXoMILLVtigCFD0ToiltB3WRnJThJRRtMWT3ed5UVGZ1EaJ2WnTooEofxHn+34d
-	 246BFJwibKxw6ROf+qo5HRswsQjRaquFYcwhidRl3xiW410nyJovA5wyF6lv3mu6R/
-	 lp/ue2NpITH3Mof+2zEQyVgdoWuD2izMkG/7yOWKRE3M5iHKa9Af3O24t0rRTTuTUn
-	 TTc1cY8hcIXyHVDRcx1ANQQ2dXbemXqcAjgh8jSbt/Mi1qDOCbXa6/R43LzXxCd13N
-	 +GENtMtnSDqlw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XcN996fmYz4wcl;
-	Mon, 28 Oct 2024 17:03:09 +1100 (AEDT)
-Date: Mon, 28 Oct 2024 17:03:10 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Sean Christopherson <seanjc@google.com>, Yang
- Shi <yang@os.amperecomputing.com>
-Subject: linux-next: manual merge of the kvm tree with the arm64 tree
-Message-ID: <20241028170310.3051da53@canb.auug.org.au>
+	s=arc-20240116; t=1730096578; c=relaxed/simple;
+	bh=Jk5IbqRh4vCRoUbHWTgVvsfDpi3BO4pWidLR8NsFZ9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SpVNe8Mow7djTOb0sHisJ6bolaMdZ8FgvAbdTFY/Y0+grfLdAPbyOClGUHkPQCycbTOHEO50/dNjpbIyO/TedH/jaHAL1oEUOlHZElYWtkUsGrdtF1avwAm/Abi6Ey4DER5ccA0yilOz+luVoh0AxuW+MVkH152hLqIMMrlyBh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDs6atF8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E16C4CEC3;
+	Mon, 28 Oct 2024 06:22:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730096577;
+	bh=Jk5IbqRh4vCRoUbHWTgVvsfDpi3BO4pWidLR8NsFZ9M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bDs6atF8lGVkOSu8PR/Zeze3PGZeuSNAwBS1wCvfCB64zduIV8EVNQLYrGRITgsOX
+	 m4HZ8igBY57cpFEdhFNUBm8dkFqVcwLIZJNyD3FxqvF/X6ketbJhvrbBPr+u6WZxZ3
+	 w11mQnvuMXHiPD97WTOWcp1gf7Qn8YL4dM5TPF8cGuddYW1HkSqRGukSUz9O+9rzqF
+	 KLngHHPHYjOu7rL222u8QMXoukG9r55bOcTa7Rw2qnhI04sopB/+K6VdPCEVj61xlv
+	 ViLwDGbr7PuiCkXsEHb96dqrPmRCahF5OFg843XZ1f+zK0SivcsINr8cHzq8IxXcnI
+	 li8XZp6ad0yXA==
+Date: Mon, 28 Oct 2024 08:22:52 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 07/18] dma-mapping: Implement link/unlink ranges API
+Message-ID: <20241028062252.GC1615717@unreal>
+References: <cover.1730037276.git.leon@kernel.org>
+ <b434f2f6d3c601649c9b6973a2ec3ec2149bba37.1730037276.git.leon@kernel.org>
+ <6a9366a5-7c5b-449c-b259-8e2492aae2a1@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/SoGIVsEPFh=qBQZQubuD=DY";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a9366a5-7c5b-449c-b259-8e2492aae2a1@linux.intel.com>
 
---Sig_/SoGIVsEPFh=qBQZQubuD=DY
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 28, 2024 at 10:00:25AM +0800, Baolu Lu wrote:
+> On 2024/10/27 22:21, Leon Romanovsky wrote:
+> > +/**
+> > + * dma_iova_sync - Sync IOTLB
+> > + * @dev: DMA device
+> > + * @state: IOVA state
+> > + * @offset: offset into the IOVA state to sync
+> > + * @size: size of the buffer
+> > + * @ret: return value from the last IOVA operation
+> > + *
+> > + * Sync IOTLB for the given IOVA state. This function should be called on
+> > + * the IOVA-contigous range created by one ore more dma_iova_link() calls
+> > + * to sync the IOTLB.
+> > + */
+> > +int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
+> > +		size_t offset, size_t size, int ret)
+> > +{
+> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> > +	struct iova_domain *iovad = &cookie->iovad;
+> > +	dma_addr_t addr = state->addr + offset;
+> > +	size_t iova_start_pad = iova_offset(iovad, addr);
+> > +
+> > +	addr -= iova_start_pad;
+> > +	size = iova_align(iovad, size + iova_start_pad);
+> > +
+> > +	if (!ret)
+> > +		ret = iommu_sync_map(domain, addr, size);
+> > +	if (ret)
+> > +		iommu_unmap(domain, addr, size);
+> 
+> It appears strange that mapping is not done in this helper, but
+> unmapping is added in the failure path. Perhaps I overlooked anything?
 
-Hi all,
+Like iommu_sync_map() is performed on whole continuous range, the iommu_unmap()
+should be done on the same range. So, technically you can unmap only part of
+the range which called to dma_iova_link() and failed, but you will need
+to make sure that iommu_sync_map() is still called for "successful" part of
+iommu_map().
 
-Today's linux-next merge of the kvm tree got a conflict in:
+In that case, you will need to undo everything anyway and it means that
+you will call to iommu_unmap() on the successful part of the range
+anyway.
 
-  arch/arm64/kvm/guest.c
+dma_iova_sync() is single operation for the whole range and
+iommu_unmap() too, so they are bound together.
 
-between commit:
+> To my understanding, it should like below:
+> 
+> 	return iommu_sync_map(domain, addr, size);
+> 
+> In the drivers that make use of this interface should do something like
+> below:
+> 
+> 	ret = dma_iova_sync(...);
+> 	if (ret)
+> 		dma_iova_destroy(...)
 
-  25c17c4b55de ("hugetlb: arm64: add mte support")
+It is actually what is happening in the code, but in less direct way due
+to unwinding of the code.
 
-from the arm64 tree and commit:
+As an simple example, see VFIO patch https://lore.kernel.org/all/0a517ddff099c14fac1ceb0e75f2f50ed183d09c.1730037276.git.leon@kernel.org/
+where failed in dma_iova_sync() will trigger call to unregister_dma_pages() and that will call to dma_iova_destroy().
 
-  570d666c11af ("KVM: arm64: Use __gfn_to_page() when copying MTE tags to/f=
-rom userspace")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/kvm/guest.c
-index e738a353b20e,4cd7ffa76794..000000000000
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@@ -1051,13 -1051,11 +1051,12 @@@ int kvm_vm_ioctl_mte_copy_tags(struct k
-  	}
- =20
-  	while (length > 0) {
-- 		kvm_pfn_t pfn =3D gfn_to_pfn_prot(kvm, gfn, write, NULL);
-+ 		struct page *page =3D __gfn_to_page(kvm, gfn, write);
-  		void *maddr;
-  		unsigned long num_tags;
-- 		struct page *page;
- +		struct folio *folio;
- =20
-- 		if (is_error_noslot_pfn(pfn)) {
-+ 		if (!page) {
-  			ret =3D -EFAULT;
-  			goto out;
-  		}
-@@@ -1099,12 -1090,8 +1097,12 @@@
-  			/* uaccess failed, don't leave stale tags */
-  			if (num_tags !=3D MTE_GRANULES_PER_PAGE)
-  				mte_clear_page_tags(maddr);
- -			set_page_mte_tagged(page);
- +			if (folio_test_hugetlb(folio))
- +				folio_set_hugetlb_mte_tagged(folio);
- +			else
- +				set_page_mte_tagged(page);
- +
-- 			kvm_release_pfn_dirty(pfn);
-+ 			kvm_release_page_dirty(page);
-  		}
- =20
-  		if (num_tags !=3D MTE_GRANULES_PER_PAGE) {
-
---Sig_/SoGIVsEPFh=qBQZQubuD=DY
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcfKR4ACgkQAVBC80lX
-0GyNaAf3fOZRAdtjm1v/S4cgiyVo3XKlUSRVdk0AE6B4/IveFjqZ4G0a26tDUhJO
-BivPci/A4XZypbG7We0hNmgBuEhdBgley3XrhQJWwWMd3ye32zrRKEzUj9WgLhBP
-VVVThYO2MpeV0J6Zm00xl5j3dqjWOFb29OmXpnLhCZqR+m+KIXRhY0UsCpEtfnxD
-BpCE/xncVQEBsz1kCMeYin1FuY0AtyPPX4dNNIA+2cNFLAHxeqUHGHkcQrLRFY+e
-eUXsACHgZU0RTd69MWWDO56GIL7RHn5PNFjeruLjyCn8L47n7jeQM+Dnq/AgvJS6
-rMrKHkF0O+FvpFX5GBsLmZknL5Lh
-=xyTl
------END PGP SIGNATURE-----
-
---Sig_/SoGIVsEPFh=qBQZQubuD=DY--
+> 
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL_GPL(dma_iova_sync);
+> 
+> Thanks,
+> baolu
+> 
 
