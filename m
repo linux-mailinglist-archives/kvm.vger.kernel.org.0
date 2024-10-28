@@ -1,176 +1,185 @@
-Return-Path: <kvm+bounces-29826-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29828-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807319B2A81
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 09:40:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE289B2AEA
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 10:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 856F41C21B54
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 08:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 889C6281F52
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 09:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BFB1922FC;
-	Mon, 28 Oct 2024 08:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322B5192D64;
+	Mon, 28 Oct 2024 09:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WZAwnYMK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VcLW9I7G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AB19049D
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 08:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C9718D620;
+	Mon, 28 Oct 2024 09:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730104808; cv=none; b=E3tevBv4wF75zU427o9CMltmK9KlmzTnacKbd1U+PoKWBxHG2+H1hydrs7/hfPX9mzhmtbYb0a2S41XSG0vLZP7db16gMw/emKhLxR+QnWsCXaqsL6z12CouelWzufksbIfr9KWVB9nNeXhhqn6GwQ7/S0cGxOQ8xIl9vyBqERE=
+	t=1730106287; cv=none; b=aGpor9eBGVzcwBcFGUFbyPseywqqts1zER3vUR6+UwwYYgVgQD1f6xPi/gFuLY5pjgVMIu0lyVS0pZwX63yy6PBHvmUI5uW5Ou9Jw+EJtiZsgUiwXlqaUSdG4zrHg7IQG/TgP0m94Awse4/noINoJxxryhu5AtJ9shCieucOTrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730104808; c=relaxed/simple;
-	bh=giOUIlMYY9g+1lp8uUNbkptN/mLl6W7Jm/JD1/sGYxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tm+XXyLxdej87f9JQ25xaMHyAZ+2A0NRnOAwqxxmJaQkUag6FzdJp0JP+/otKHnY216yXdJX7sO46dg36Hy/J3PRUDkx/841ZKPDT1qK6/O30SjdMHtvu/WAPNPdSqHjzWCju2CvWqhnCLP1Ze2Pg98d8VsxbbmEN41Nae0KsEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WZAwnYMK; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730104805; x=1761640805;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=giOUIlMYY9g+1lp8uUNbkptN/mLl6W7Jm/JD1/sGYxQ=;
-  b=WZAwnYMKBI00UASpBu1LAgVBeXEfKWlVGIAcOnFlL5KbQszcBZJARt3k
-   Zjzg4JoXghAoknahpIK6GbhhZ9H0Bu+2B585Qr+JIG87zejtf3yj8u9hJ
-   rUePUrRCyI+Gnt+ReQxC4OKwUfiwfS9PO9IK1V4nqt5o8A8ECbBsTw173
-   fXeQ4cCIqLjsutbjZSQ9+VBS3J2ecq7zlJwhWI9WDgxTqbbbW9EwxrCAd
-   DZgLlkdT0cLQT7txG9YomMugIk3PcVPf7ig8tdOx+L8GXKUTNOTnN5giQ
-   pno3yQGNrNkHtJmCT1XZ+kbT+iubSj5zAxbygSAWwltIU0muAymwaEtFt
-   A==;
-X-CSE-ConnectionGUID: NVWGC0qFQCWYfxp/cydpHw==
-X-CSE-MsgGUID: wO98m7i5QuOeLRwRGfcRAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29553256"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="29553256"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 01:39:57 -0700
-X-CSE-ConnectionGUID: ePYqHz3ZTLCh3IhLXteREA==
-X-CSE-MsgGUID: wxQqWWDYQZSja73delKz4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="86292516"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa003.jf.intel.com with ESMTP; 28 Oct 2024 01:39:55 -0700
-Date: Mon, 28 Oct 2024 16:56:14 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Babu Moger <babu.moger@amd.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 5/7] target/i386: Expose bits related to SRSO
- vulnerability
-Message-ID: <Zx9Rrtks38sqcn44@intel.com>
-References: <cover.1729807947.git.babu.moger@amd.com>
- <dadbd70c38f4e165418d193918a3747bd715c5f4.1729807947.git.babu.moger@amd.com>
+	s=arc-20240116; t=1730106287; c=relaxed/simple;
+	bh=gyJ9oZUtsIILS43TZ9MbHRIWjlg+PqaBoo0kSPY7GBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nX7or3RZx9bNHZ20tigROdR4ngfQWyDUDSt91aHMfVKy84D0YBurfidqcPk9QwbtiLW9nHtPmItBWg4sKeyniEYmm6l5+8JPRyWX/LVt2SXf6XZ2znlj0+bHdJmlqewTbqIGgqj1tIa7GdAtoB1/bwvsSwo+cnCI9/LIIAUkKZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VcLW9I7G; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49S4nlQ0012398;
+	Mon, 28 Oct 2024 09:04:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=t2Ci5kao+4+ddykeyTAEKEL8LLe1ptoQ/ZFa4/xPr
+	t8=; b=VcLW9I7G0cv4k6lNT7SOX0XTQsVJeu2ZkujBj8xAIl169PAUVAuFNp9wk
+	N0csdA+YZD2BQe9OtFW2YmP9CD3SBFTsjPbsl3Z9bQkComOCgSsTK9gB2YGhv9Aw
+	A5RG1DA0bKZ0V8y+Ceyl0jLsqHJYw0ya4gxkYnhdxro+juIPyi5hLSq/cFvHmfBz
+	SVFR8z+FinR6VY6RbVJQ3X/BajSoENbnFSwIq+ZFK9S6Pd0h0QEWNQwYS0iREUj8
+	pGEU+2bXE3B1oN6g7mP2IWR0vCwirEjxuGV0SdhZhJ2tZUIJ5qjuabXHTPKObaZG
+	TMMBtcnDDLnH5jmxL5/6fDBcxyiDg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42j3x498ht-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 09:04:27 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49S94Q8E021773;
+	Mon, 28 Oct 2024 09:04:26 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42j3x498hn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 09:04:26 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49S7JmlZ028181;
+	Mon, 28 Oct 2024 09:04:25 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42hb4xnkjn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 09:04:25 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49S94LQG53412288
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Oct 2024 09:04:21 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4097F20043;
+	Mon, 28 Oct 2024 09:04:21 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3A4A42004D;
+	Mon, 28 Oct 2024 09:04:19 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com.com (unknown [9.39.18.192])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 28 Oct 2024 09:04:19 +0000 (GMT)
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        naveen@kernel.org, maddy@linux.ibm.com
+Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3] KVM: PPC: Book3S HV: Mask off LPCR_MER for a vCPU before running it to avoid spurious interrupts
+Date: Mon, 28 Oct 2024 14:34:09 +0530
+Message-ID: <20241028090411.34625-1-gautam@linux.ibm.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dadbd70c38f4e165418d193918a3747bd715c5f4.1729807947.git.babu.moger@amd.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BZMeBVHIyD5nBrAPX4cdDejDlkm9YMrJ
+X-Proofpoint-ORIG-GUID: _0AiW0j22I7z42wojGI2WOkXkmCtfxgm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ mlxscore=0 suspectscore=0 clxscore=1015 mlxlogscore=676 malwarescore=0
+ spamscore=0 priorityscore=1501 phishscore=0 bulkscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410280073
 
-Hi Babu
+Running a L2 vCPU (see [1] for terminology) with LPCR_MER bit set and no
+pending interrupts results in that L2 vCPU getting an infinite flood of
+spurious interrupts. The 'if check' in kvmhv_run_single_vcpu() sets the
+LPCR_MER bit if there are pending interrupts.
 
-On Thu, Oct 24, 2024 at 05:18:23PM -0500, Babu Moger wrote:
-> Date: Thu, 24 Oct 2024 17:18:23 -0500
-> From: Babu Moger <babu.moger@amd.com>
-> Subject: [PATCH v3 5/7] target/i386: Expose bits related to SRSO
->  vulnerability
-> X-Mailer: git-send-email 2.34.1
-> 
-> Add following bits related Speculative Return Stack Overflow (SRSO).
-> Guests can make use of these bits if supported.
-> 
-> These bits are reported via CPUID Fn8000_0021_EAX.
-> ===================================================================
-> Bit Feature Description
-> ===================================================================
-> 27  SBPB                Indicates support for the Selective Branch Predictor Barrier.
-> 28  IBPB_BRTYPE         MSR_PRED_CMD[IBPB] flushes all branch type predictions.
-> 29  SRSO_NO             Not vulnerable to SRSO.
-> 30  SRSO_USER_KERNEL_NO Not vulnerable to SRSO at the user-kernel boundary.
-> ===================================================================
-> 
-> Link: https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-return-stack-overflow-whitepaper.pdf
-> Link: https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/57238.zip
+The spurious flood problem can be observed in 2 cases:
+1. Crashing the guest while interrupt heavy workload is running
+  a. Start a L2 guest and run an interrupt heavy workload (eg: ipistorm)
+  b. While the workload is running, crash the guest (make sure kdump
+     is configured)
+  c. Any one of the vCPUs of the guest will start getting an infinite
+     flood of spurious interrupts.
 
-I suggest updating the description of SRSO-related mitigations in the
-"Important CPU features for AMD x86 hosts" section of docs/system/
-cpu-models-x86.rst.inc.
+2. Running LTP stress tests in multiple guests at the same time
+   a. Start 4 L2 guests.
+   b. Start running LTP stress tests on all 4 guests at same time.
+   c. In some time, any one/more of the vCPUs of any of the guests will
+      start getting an infinite flood of spurious interrupts.
 
-If you could also synchronize the CPU model (you added in this series)
-in the "Preferred CPU models for AMD x86 hosts" section, that would be
-even better. :-)
+The root cause of both the above issues is the same:
+1. A NMI is sent to a running vCPU that has LPCR_MER bit set.
+2. In the NMI path, all registers are refreshed, i.e, H_GUEST_GET_STATE
+   is called for all the registers.
+3. When H_GUEST_GET_STATE is called for LPCR, the vcpu->arch.vcore->lpcr
+   of that vCPU at L1 level gets updated with LPCR_MER set to 1, and this
+   new value is always used whenever that vCPU runs, regardless of whether
+   there was a pending interrupt.
+4. Since LPCR_MER is set, the vCPU in L2 always jumps to the external
+   interrupt handler, and this cycle never ends.
 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
-> v3: New patch
-> ---
->  target/i386/cpu.c |  2 +-
->  target/i386/cpu.h | 14 +++++++++++---
->  2 files changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 690efd4085..642e71b636 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1221,7 +1221,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, "sbpb",
-> -            "ibpb-brtype", NULL, NULL, NULL,
-> +            "ibpb-brtype", "srso-no", "srso-user-kernel-no", NULL,
->          },
->          .cpuid = { .eax = 0x80000021, .reg = R_EAX, },
->          .tcg_features = 0,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index e0dea1ba54..792518b62d 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1015,13 +1015,21 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
->  #define CPUID_8000_0008_EBX_AMD_PSFD    (1U << 28)
->  
->  /* Processor ignores nested data breakpoints */
-> -#define CPUID_8000_0021_EAX_NO_NESTED_DATA_BP    (1U << 0)
-> +#define CPUID_8000_0021_EAX_NO_NESTED_DATA_BP            (1U << 0)
->  /* LFENCE is always serializing */
->  #define CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING    (1U << 2)
->  /* Null Selector Clears Base */
-> -#define CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE    (1U << 6)
-> +#define CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE            (1U << 6)
->  /* Automatic IBRS */
-> -#define CPUID_8000_0021_EAX_AUTO_IBRS   (1U << 8)
-> +#define CPUID_8000_0021_EAX_AUTO_IBRS                    (1U << 8)
-> +/* Selective Branch Predictor Barrier */
-> +#define CPUID_8000_0021_EAX_SBPB                         (1U << 27)
-> +/* IBPB includes branch type prediction flushing */
-> +#define CPUID_8000_0021_EAX_IBPB_BRTYPE                  (1U << 28)
-> +/* Not vulnerable to Speculative Return Stack Overflow */
-> +#define CPUID_8000_0021_EAX_SRSO_NO                      (1U << 29)
-> +/* Not vulnerable to SRSO at the user-kernel boundary */
-> +#define CPUID_8000_0021_EAX_SRSO_USER_KERNEL_NO          (1U << 30)
+Fix the spurious flood by masking off the LPCR_MER bit before running a
+L2 vCPU to ensure that it is not set if there are no pending interrupts.
 
-These feature bits defination could be added in patch 7 because only
-patch 7 uses these macros.
+[1] Terminology:
+1. L0 : PAPR hypervisor running in HV mode
+2. L1 : Linux guest (logical partition) running on top of L0
+3. L2 : KVM guest running on top of L1
 
-BTW, which platform supports CPUID_8000_0021_EAX_SRSO_NO? I found that
-even the Turin model added in patch 7 does not support this feature.
+Fixes: ec0f6639fa88 ("KVM: PPC: Book3S HV nestedv2: Ensure LPCR_MER bit is passed to the L0")
+Cc: stable@vger.kernel.org # v6.8+
+Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+---
+v1 -> v2:
+1. Removed the macro which was silently clearing LPCR_MER bit from vcore->lpcr
+and instead just masked it off while sending it to kvmhv_run_single_vcpu().
+Added an inline comment describing the reason to avoid anyone tipping
+it over. (Suggested by Ritesh in an internal review)
 
-Thanks,
-Zhao
+v2 -> v3:
+1. Moved the masking of LPCR_MER from kvmppc_vcpu_run_hv() to
+kvmhv_run_single_vcpu() (Suggested by Michael Ellerman)
 
->  /* Performance Monitoring Version 2 */
->  #define CPUID_8000_0022_EAX_PERFMON_V2  (1U << 0)
-> -- 
-> 2.34.1
-> 
-> 
+ arch/powerpc/kvm/book3s_hv.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 8f7d7e37bc8c..0ed5c5c7a350 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4892,6 +4892,18 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 							   BOOK3S_INTERRUPT_EXTERNAL, 0);
+ 			else
+ 				lpcr |= LPCR_MER;
++		} else {
++			/*
++			 * L1's copy of L2's LPCR (vcpu->arch.vcore->lpcr) can get its MER bit
++			 * unexpectedly set - for e.g. during NMI handling when all register
++			 * states are synchronized from L0 to L1. L1 needs to inform L0 about
++			 * MER=1 only when there are pending external interrupts.
++			 * In the above if check, MER bit is set if there are pending
++			 * external interrupts. Hence, explicity mask off MER bit
++			 * here as otherwise it may generate spurious interrupts in L2 KVM
++			 * causing an endless loop, which results in L2 guest getting hung.
++			 */
++			lpcr &= ~LPCR_MER;
+ 		}
+ 	} else if (vcpu->arch.pending_exceptions ||
+ 		   vcpu->arch.doorbell_request ||
+-- 
+2.47.0
+
 
