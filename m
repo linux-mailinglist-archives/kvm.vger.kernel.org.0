@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-29802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345309B2460
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:37:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CECAE9B2464
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 06:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579081C20446
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 05:37:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36DF2B22C86
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 05:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E4019007F;
-	Mon, 28 Oct 2024 05:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7146D191461;
+	Mon, 28 Oct 2024 05:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vwiEp3wF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MeqBMoC4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2076.outbound.protection.outlook.com [40.107.237.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF7A190059;
-	Mon, 28 Oct 2024 05:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B1218CBF9;
+	Mon, 28 Oct 2024 05:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730093722; cv=fail; b=sIrlXt6dm/ZeWuXAkUcdhySVgfVDWfZaSlB2I62lJATp1gIWP0PRp22igINz6473GI4rTbeLSJXQpLmXt7hc9oIn3f7FqjkWzR4vu9O3m/JvUXRUt8ZqtcRKKz6ktaa2dd1WF4fPcI828rwT6D84rzXqNOa9n3cS6uRV3Coe3FA=
+	t=1730093726; cv=fail; b=h537DjSvvK0im3mxcK1BXKx+TpzeiRREptf4CTfnYnSAoha3srV7F64YXchOby0WC1kTZcmWq0qcjH84xVOn3uWCFG6NMhCeVsXGg113cVhL/E/SLzyd/+63CW6EzW+k72ZpgQalrzIQ0+g4KGSm9yO0fZEnOAqUXWMzvAHQE5M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730093722; c=relaxed/simple;
-	bh=pME00bVnTJogCyHOxeOmNwbWSncjjDziRL7bZH4hGeY=;
+	s=arc-20240116; t=1730093726; c=relaxed/simple;
+	bh=RHBmoHqM5ZGAiGvChT+X2KckG2N4x4w/n0lg6f+cjok=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQRzsHGIQgbXHeRjQJbERbb1TwWiDJdBNMzMXwCXwAOePD2ejZbgnMarMtFd7NuHgEvuqz08sFleft70YL2Etgh+lEgnAQLL2Gzdd2hr8bq6mvY0oxyhpwAvKbrhohoNQ3wgIgJrgeLCa4CMMz6/8O5VR5/V8D662cPqQPPqkIc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vwiEp3wF; arc=fail smtp.client-ip=40.107.94.83
+	 MIME-Version:Content-Type; b=KT0fZDzLvKo5oVroRybl/9o7xEf8XKplCrLVoNwYnCIIdwCIVR4QALF9JktXERPHcjclxv/Y9bYzmXJzLvwHZvCPxZNGgxo5hHO9kKZTgs4MH6btM99fVKB3T1tTUe9Hii7VUf/d56wKeQ91mQ6Qj10XbDW6geGrQ7Ocf2elUmI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MeqBMoC4; arc=fail smtp.client-ip=40.107.237.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PWntWVf9YcvrEgsFtA0/clIGQeIydS4XkCL68a7qnbphNN+O8dTH4YKCMcSNZD8E3synJnRJO3c9cB2goxGNJtmZtF+LSw99UsCW6ejmM4H1lI4TvvSmSDKCv5gPkzf4+8HordAuEeJkxZUy3HZnZ96q6Inmp6Pnww1219dAbgAwegy+IaF0y65v1uKzTX1BOMYHNNYmwdsWF1/ANjiOq7YKe2xUTPukXYKtut4+NheahWGnOqeD0jTeDqQYSg+2woXafWUqirhndHZsj49YbuUfGj63A5EV/dVd2hlyRA6T95uwMbO5+3by2pwScAf6VXLM8c2ozQ7eq/tP/jAScA==
+ b=dIQiBO02q470w3eZL6RgJAWcWEwnO8/TW0PIUstnRISo7lG0fT0RpL3jGCg8QWcTNKI9s6qzxZ2BDMHXZLqrq8g3GAGy7mEvW4XuvSb49m5bQp6TTTsweaTWT/dXv/MKTyerYBWwoiQE9e1j7YFffBIf2pxQ3v4FwYwPlrTNuNi1eyNpJiTMzIEtPr8PAZdwmh8VayfMw78K2uQRdQe11WmMGly3rsB5kuKqvk2kGHPGih+L7iKEMcTOTERSoAM50XOcZ2CZwEkIOPSFtWVhXMYsX3yILiPHC9BqmUfpGGcnieYDGGRfrS1zRDlm/HoWMHjonPXySWy1EUNWw7b86w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cgnZz6sBWYHCJXbdUT93V5kE72/4pEh6Tlp+77STnTw=;
- b=JcyKCZXw2S7/ldqH0H1crTDbvOEwBX3ceFA4iRY0y5SNOvtPC6nrvNYByHcale03zILMo+TsTRbAb0rCqqkgORcn4PMBAyCDK4/xKbPjPri34WEhD5H0p48BmvPHjBgMd0BZTkT6LUDs2fe5JQgmQcO7xRfxOvfk+3T+B2VgOnP2qALDaRAXpGd5cNrSKV3dkoppqRR46BVnVpnIZ+dLEVyt6JbrVW5/7Ipp327pAT1WGQysOfHkCFyOtwSknwymhe3MuT6BE3Tc+t7WyYfa9LRGMpVuTCuglIXLYXUGJmrIhxDuZ3Aq0UPKvdePfZB1DXdPa/1qUuSkwtLArynWjQ==
+ bh=1hDZP03aUpnP3mricDnRDxtyoyn6Nm7/c7XIhDSatWo=;
+ b=ist5SylQmrBpR7ZdLR+fxo0UDMsAjy3fB/+gW7u4J1FAiltnH7N1TjU8te5bwMLcve3pCnuJWmOCYVyp4XqIRZmiXaRDKl5bJ8jggVbHFEsdVho+QuW9pLnMcLmasOXcPlRv9Pn6dDmx0+PSXDYYaXF0UhQAgT8gvh3dfgnwutVzkPVMKPJZiZ57yZ968iEztJZS6CgTnJVkQaz9qkXh1sqyhXoknFkSYvnjmx3kDN/Vf/fyftLfxNgMbikazI2Ll+Lk2XuSCsNHbE/1y5BbIQKXkkZVmnIv0Qdya+5Qu1bjHNs87ffSSgI9Vmt4J2yJmdn0gckBLtcOYTbC56gzkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cgnZz6sBWYHCJXbdUT93V5kE72/4pEh6Tlp+77STnTw=;
- b=vwiEp3wFuKtyo0j1ve5+uhCKWutNcexvxHCM+nH6jgDk7EXn115fxVyX8Wwz1cXPqJExz/OUfglA6dCgOK1ogd4Pvs1uPirbD15BfiAWUGxVhPClh+8ZwUO9qj2I2ePv9sPk2bsy/ML1x3OgnYevNanV/DPqOL61fnVSLnK4cG4=
-Received: from BN9PR03CA0931.namprd03.prod.outlook.com (2603:10b6:408:108::6)
- by DM3PR12MB9413.namprd12.prod.outlook.com (2603:10b6:8:1af::12) with
+ bh=1hDZP03aUpnP3mricDnRDxtyoyn6Nm7/c7XIhDSatWo=;
+ b=MeqBMoC4F9qcDq7IGH4dxqPNUS18tMCPW4h9VJp1KMpn9FIuvFU/kIuZG0q4Az5bDEMF8c3y6+i8qb7t4Hc3YJKtp7tiJawnprONhaYHMhsjIbV3bnjd/4XtjN7nKIH0ZJ0wFBubMCod2nvUBwcc4pNNksRJFDUp5G0av0L5CRI=
+Received: from BN9PR03CA0936.namprd03.prod.outlook.com (2603:10b6:408:108::11)
+ by DM6PR12MB4436.namprd12.prod.outlook.com (2603:10b6:5:2a3::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.21; Mon, 28 Oct
- 2024 05:35:13 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.27; Mon, 28 Oct
+ 2024 05:35:17 +0000
 Received: from BL6PEPF0001AB53.namprd02.prod.outlook.com
- (2603:10b6:408:108:cafe::df) by BN9PR03CA0931.outlook.office365.com
- (2603:10b6:408:108::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.29 via Frontend
- Transport; Mon, 28 Oct 2024 05:35:13 +0000
+ (2603:10b6:408:108:cafe::15) by BN9PR03CA0936.outlook.office365.com
+ (2603:10b6:408:108::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28 via Frontend
+ Transport; Mon, 28 Oct 2024 05:35:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BL6PEPF0001AB53.mail.protection.outlook.com (10.167.241.5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8114.16 via Frontend Transport; Mon, 28 Oct 2024 05:35:12 +0000
+ 15.20.8114.16 via Frontend Transport; Mon, 28 Oct 2024 05:35:16 +0000
 Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 28 Oct
- 2024 00:35:08 -0500
+ 2024 00:35:12 -0500
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
 	<x86@kernel.org>, <kvm@vger.kernel.org>
 CC: <mingo@redhat.com>, <tglx@linutronix.de>, <dave.hansen@linux.intel.com>,
 	<pgonda@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
 	<nikunj@amd.com>
-Subject: [PATCH v14 01/13] x86/sev: Carve out and export SNP guest messaging init routines
-Date: Mon, 28 Oct 2024 11:04:19 +0530
-Message-ID: <20241028053431.3439593-2-nikunj@amd.com>
+Subject: [PATCH v14 02/13] x86/sev: Relocate SNP guest messaging routines to common code
+Date: Mon, 28 Oct 2024 11:04:20 +0530
+Message-ID: <20241028053431.3439593-3-nikunj@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241028053431.3439593-1-nikunj@amd.com>
 References: <20241028053431.3439593-1-nikunj@amd.com>
@@ -94,654 +94,787 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|DM3PR12MB9413:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8a68ac7-47ae-481a-463b-08dcf7124baa
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|DM6PR12MB4436:EE_
+X-MS-Office365-Filtering-Correlation-Id: 511f1e36-f12d-49de-1875-08dcf7124de4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|7416014|376014|82310400026;
+	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8qK8g8/rbq4XTJtYjEHxxghK46/ersWYT7VR1+TmnCfM7coIbrUb7LYyP8U7?=
- =?us-ascii?Q?IsyZy9aDNfajvWX9f1WmoMqzoHcEnwPon4IsRuLJQtYBfFx2BtxmfTXK9Ll2?=
- =?us-ascii?Q?qqQeq8mg2MG0DZamHLCBlSdDvcHhf8XeQ6+Bu0rH1z3cAIDPHAWZKjKBtssj?=
- =?us-ascii?Q?rnrLOMoXdaoovJIx4cZ7Bj3GhiOIaXVOV9nJotJtmgvlJ2/KCnrXyR0NGIF0?=
- =?us-ascii?Q?xl2WYbVDMBcRCRs/LMan5QTD6BGUYsSJrpoOgRjyKIFr07eiurD7OoWYL/0J?=
- =?us-ascii?Q?Axk6G3aZGBBryc7KCzgTJAKwfRn4XoS4noy1MD/gQJPwuV7GiPm/hLst6qws?=
- =?us-ascii?Q?aGnVQ/KNqW2bnNtpaD7kne+aB+0EQ/GX0pitcfYgibMctxx8wjCy6shrA7Za?=
- =?us-ascii?Q?n85j3dO8lZI4OMKoJdM8BSn0P2unZ5vJoOashzvZGRsadWWHtpRf/ort0E+I?=
- =?us-ascii?Q?DotkdwLEZwDhOk/c7np2hd+eLRHcGvTXjmS0YXi8SZlE46RpNXhsQ5gSAyKU?=
- =?us-ascii?Q?mbQKLEmGt8/wsJJ4uw0REINyOzQWFQ/h4SykPMWSaiwLPWLKvGQnZCz0nsF8?=
- =?us-ascii?Q?kYaxiqNxVWiEY0V8PnLVJp0FaFn8UHpVQErMnYJglzJUFmu5rx6SDavi8OIB?=
- =?us-ascii?Q?U1nEXrswzbWkJyW7FPFkD0bJrqHOxqPWuGuhLQ12vwRiB792YdpatKLPuzzj?=
- =?us-ascii?Q?TTjX1nwG0dm5yDEMLYu1ed9QjaBkXz9rcU/BqCweJiRBRlQ2Us0O3YjFZQao?=
- =?us-ascii?Q?cI2ATDk1Ri7th14fAx7nU45D4mhd4kjEFcsbuXsd0FrpmhjqSurUFI/d+k+Q?=
- =?us-ascii?Q?FRUdvwYoPFw3u8a870G/ivccgwgEUW7mJCNBqytv/kZtDWFfTB8cD+qySMsL?=
- =?us-ascii?Q?oAFP97cjkhR6PbnZqTLZl+3UDoaJg3asJ2ZkLEmM9AB/AWErzuD4BymSIJa1?=
- =?us-ascii?Q?sQI75yMU2p6zsvsI5QxxfR/GEK8vo3rYDZ440EQGQOJ6Yn8b+IW0xvuazMbh?=
- =?us-ascii?Q?x2f3PBYzNHyGZIeJtBO0beNVDFDLG80Na8nnYSq3ZPEiOON0yx25XGp7208A?=
- =?us-ascii?Q?L9U5sjRclfrmH6ZxnZX2MNwZPwSzljzpDjMSlXhF+SZusYdAtjdDV8snHFHZ?=
- =?us-ascii?Q?juFBuiOlE9obBXNkbR2Nr070YzooN2e8nzjhA49WILmVtUDVus0bgKs+Ckbq?=
- =?us-ascii?Q?k1yReVqwcQ+/du67anl3FqyCJ3rRl09D2vttT8u721k/2pYOUekAH/ewOty4?=
- =?us-ascii?Q?3OjcpNR6LVLDHE95gmpQ0YBq5X3ky/2Psy4JYxfVG3ARJ9RdniNmg2PSTeSS?=
- =?us-ascii?Q?bi+GcmXLAkImt9Wu4hp0yDJJ9UBXn2JtyXwtR1FEGqZNkcAfo1AC1UebQn72?=
- =?us-ascii?Q?WykZuJU9w5n6dlEe1X4ng2zd/8ALBzRCd4oTVlvtR+xpQIxz1Q=3D=3D?=
+	=?us-ascii?Q?wE3TuORqziv9EFgMsDBt3gQE/eUGLU0nDrzLir9RuHbvkJ7ABOiSW03sRm7z?=
+ =?us-ascii?Q?FtTt5TBeDr5QzNcibeidIn+MrB9IfyXsDYTvEXBNfcReytQ4Bp4ff1XKzSzF?=
+ =?us-ascii?Q?MKn522vIhYEbJQUOeWCuNYvU5AQeHsmhAEyIcP9ZBBK3VWjFaMyq02nqstzk?=
+ =?us-ascii?Q?3pwPcwRecBXBPULwz7kIpnQ3/qj4htElsHh7QntTDDnj648uQ5zz6SPpvgcC?=
+ =?us-ascii?Q?OpihgZowOfrrf73OF0VT5M2nyy9gWumpbZ73DSkJR2S+kJMExrCwAxRQny+l?=
+ =?us-ascii?Q?xW/WKqTyCcF3S3YdKWEFlh5T7wXcWNDNgf//1+r1QZWv2DahWaY/bvbpcOu0?=
+ =?us-ascii?Q?+Z6jCtHoTg84iRd8ObJ8T3pXFBffpm7OokdjX+D6FqrYSx3GJUVueZYlzQ+B?=
+ =?us-ascii?Q?pnSoI2o4piSBAZ2CnHV5KWjq0kkl2raV54J1V5dHe9Wqk8c08ZZyUBeaGUw1?=
+ =?us-ascii?Q?jCxqx8MafKp3n5k0Y8Z/elJyeH/cCRC5k2hF0703DysorI5BmMomTMrinTve?=
+ =?us-ascii?Q?c3w9N64y3ep69APqLPc8pDjuzyDWOD49786l2sZm1ejsK3b1KTQkNhrTMQj3?=
+ =?us-ascii?Q?AioR2eA+kHUs2BMKC2xa4qqjkeL/QinBmOgy1PbAop0WmOWSMNi/UgJSba3j?=
+ =?us-ascii?Q?QWlC+CeUVfxkBfbhW219Z4u/0duhLW2EpwK2VooltqN/2Ly/v1LUTKe+e3g0?=
+ =?us-ascii?Q?SMZadT7B3Ld8iCfHejj0rYtXOpKBfiI2w4nizQDXl/NmOxnpEVmUmgC1LlZa?=
+ =?us-ascii?Q?zEJLH4blal+PffclmJxPTKnlyq1/XNhjhnY9Xcx8cxHQklwfMgZDoGCY6Mn4?=
+ =?us-ascii?Q?i6/SFRqbY0B53ubovZYINprGMlBRRjIiuR2vcbTUVXoIPZ5gdjch5nfA7V+j?=
+ =?us-ascii?Q?lqKfcvGGVPuRx9maczWJiKSrqhh5bucOkOfrGT9O2WHs922hZ475prrBWBtG?=
+ =?us-ascii?Q?kl+fmNeOYDj1qm6VgNfqCzsuvTwPcBhb7XzgjlQxkAVEKoHh44nMeLELB4pq?=
+ =?us-ascii?Q?60VvddkynJWELCs8UQq+VGt/n1Eo6rSwpzzd4KqXJP/2dJCRUa4UdCsmRDhp?=
+ =?us-ascii?Q?+gDO0LwnlUoxof+L+jYdZTb6TX4E639JX0T1l3GWQ4ZBObwxWOJjwWB4RMyy?=
+ =?us-ascii?Q?PEDzdUjql3KT4uZglB4o88Grl3ZDmWOBbOMT3LOFERaaZKbfYu55FkCVRU3F?=
+ =?us-ascii?Q?z/OVZJDiW5SLdKBOqJ0SmyP2NFXeC4gnksSnltmh3RDLLMCiWcvUy67No7GE?=
+ =?us-ascii?Q?MgpgEOUkM6n9hIbbTXuTVCKanVf5IsQnZQF6Rkmzb3x2mSmI8oAHLtW2vjRW?=
+ =?us-ascii?Q?O1JniyZLMXF8vj6zO1TiD+1eRyCJI9f11n6+PZkX1hc0/0ziS1NHCJi21FHL?=
+ =?us-ascii?Q?/Pv6zvxEC8pqeeVQb0iCK7FPCya0HK8PdeJbA7b/98j1oiWgIQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 05:35:12.9283
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 05:35:16.7252
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8a68ac7-47ae-481a-463b-08dcf7124baa
+X-MS-Exchange-CrossTenant-Network-Message-Id: 511f1e36-f12d-49de-1875-08dcf7124de4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL6PEPF0001AB53.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9413
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4436
 
-Currently, the SEV guest driver is the only user of SNP guest messaging.
-All routines for initializing SNP guest messaging are implemented within
-the SEV guest driver. To add Secure TSC guest support, these initialization
-routines need to be available during early boot.
+At present, the SEV guest driver exclusively handles SNP guest messaging.
+All routines for sending guest messages are embedded within the guest
+driver. To support Secure TSC, SEV-SNP guests must communicate with the AMD
+Security Processor during early boot. However, these guest messaging
+functions are not accessible during early boot since they are currently
+part of the guest driver.
 
-Carve out common SNP guest messaging buffer allocations and message
-initialization routines to core/sev.c and export them. These newly added
-APIs set up the SNP message context (snp_msg_desc), which contains all the
-necessary details for sending SNP guest messages.
+Hence, relocate the core SNP guest messaging functions to SEV common code
+and provide an API for sending SNP guest messages.
 
-At present, the SEV guest platform data structure is used to pass the
-secrets page physical address to SEV guest driver. Since the secrets page
-address is locally available to the initialization routine, use the cached
-address. Remove the unused SEV guest platform data structure.
+No functional change, but just an export symbol added for
+sev_send_geust_message() and dropped the export symbol on
+snp_issue_guest_request() and made it static.
 
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/sev.h              |  71 ++++++++-
- arch/x86/coco/sev/core.c                | 133 +++++++++++++++-
- drivers/virt/coco/sev-guest/sev-guest.c | 195 +++---------------------
- 3 files changed, 215 insertions(+), 184 deletions(-)
+ arch/x86/include/asm/sev.h              |  15 +-
+ arch/x86/coco/sev/core.c                | 295 +++++++++++++++++++++++-
+ drivers/virt/coco/sev-guest/sev-guest.c | 292 -----------------------
+ arch/x86/Kconfig                        |   1 +
+ drivers/virt/coco/sev-guest/Kconfig     |   1 -
+ 5 files changed, 301 insertions(+), 303 deletions(-)
 
 diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 2e49c4a9e7fe..63c30f4d44d7 100644
+index 63c30f4d44d7..2c542b9e8dbf 100644
 --- a/arch/x86/include/asm/sev.h
 +++ b/arch/x86/include/asm/sev.h
-@@ -14,6 +14,7 @@
- #include <asm/insn.h>
- #include <asm/sev-common.h>
- #include <asm/coco.h>
-+#include <asm/set_memory.h>
+@@ -125,6 +125,9 @@ struct snp_req_data {
+ #define AAD_LEN			48
+ #define MSG_HDR_VER		1
  
- #define GHCB_PROTOCOL_MIN	1ULL
- #define GHCB_PROTOCOL_MAX	2ULL
-@@ -170,10 +171,6 @@ struct snp_guest_msg {
- 	u8 payload[PAGE_SIZE - sizeof(struct snp_guest_msg_hdr)];
- } __packed;
++#define SNP_REQ_MAX_RETRY_DURATION      (60*HZ)
++#define SNP_REQ_RETRY_DELAY             (2*HZ)
++
+ /* See SNP spec SNP_GUEST_REQUEST section for the structure */
+ enum msg_type {
+ 	SNP_MSG_TYPE_INVALID = 0,
+@@ -427,8 +430,6 @@ void snp_set_wakeup_secondary_cpu(void);
+ bool snp_init(struct boot_params *bp);
+ void __noreturn snp_abort(void);
+ void snp_dmi_setup(void);
+-int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *input,
+-			    struct snp_guest_request_ioctl *rio);
+ int snp_issue_svsm_attest_req(u64 call_id, struct svsm_call *call, struct svsm_attest_call *input);
+ void snp_accept_memory(phys_addr_t start, phys_addr_t end);
+ u64 snp_get_unsupported_features(u64 status);
+@@ -493,6 +494,9 @@ static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc)
+ 	kfree(mdesc->ctx);
+ }
  
--struct sev_guest_platform_data {
--	u64 secrets_gpa;
--};
--
- struct snp_guest_req {
- 	void *req_buf;
- 	size_t req_sz;
-@@ -253,6 +250,7 @@ struct snp_msg_desc {
- 
- 	u32 *os_area_msg_seqno;
- 	u8 *vmpck;
-+	int vmpck_id;
- };
- 
- /*
-@@ -438,6 +436,63 @@ u64 sev_get_status(void);
- void sev_show_status(void);
- void snp_update_svsm_ca(void);
- 
-+static inline void free_shared_pages(void *buf, size_t sz)
-+{
-+	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-+	int ret;
-+
-+	if (!buf)
-+		return;
-+
-+	ret = set_memory_encrypted((unsigned long)buf, npages);
-+	if (ret) {
-+		WARN_ONCE(ret, "failed to restore encryption mask (leak it)\n");
-+		return;
-+	}
-+
-+	__free_pages(virt_to_page(buf), get_order(sz));
-+}
-+
-+static inline void *alloc_shared_pages(size_t sz)
-+{
-+	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-+	struct page *page;
-+	int ret;
-+
-+	page = alloc_pages(GFP_KERNEL_ACCOUNT, get_order(sz));
-+	if (!page)
-+		return NULL;
-+
-+	ret = set_memory_decrypted((unsigned long)page_address(page), npages);
-+	if (ret) {
-+		pr_err("failed to mark page shared, ret=%d\n", ret);
-+		__free_pages(page, get_order(sz));
-+		return NULL;
-+	}
-+
-+	return page_address(page);
-+}
-+
-+static inline bool is_vmpck_empty(struct snp_msg_desc *mdesc)
-+{
-+	static const char zero_key[VMPCK_KEY_LEN] = {0};
-+
-+	if (mdesc->vmpck)
-+		return !memcmp(mdesc->vmpck, zero_key, VMPCK_KEY_LEN);
-+
-+	return true;
-+}
-+
-+int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id);
-+struct snp_msg_desc *snp_msg_alloc(void);
-+
-+static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc)
-+{
-+	mdesc->vmpck = NULL;
-+	mdesc->os_area_msg_seqno = NULL;
-+	kfree(mdesc->ctx);
-+}
++int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
++			   struct snp_guest_request_ioctl *rio);
 +
  #else	/* !CONFIG_AMD_MEM_ENCRYPT */
  
  #define snp_vmpl 0
-@@ -474,6 +529,14 @@ static inline u64 snp_get_unsupported_features(u64 status) { return 0; }
- static inline u64 sev_get_status(void) { return 0; }
- static inline void sev_show_status(void) { }
- static inline void snp_update_svsm_ca(void) { }
-+static inline void free_shared_pages(void *buf, size_t sz) { }
-+static inline void *alloc_shared_pages(size_t sz) { return NULL; }
-+static inline bool is_vmpck_empty(struct snp_msg_desc *mdesc) { return false; }
-+
-+static inline int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id) { return -1; }
-+static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
-+
-+static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc) { }
+@@ -515,11 +519,6 @@ static inline void snp_set_wakeup_secondary_cpu(void) { }
+ static inline bool snp_init(struct boot_params *bp) { return false; }
+ static inline void snp_abort(void) { }
+ static inline void snp_dmi_setup(void) { }
+-static inline int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *input,
+-					  struct snp_guest_request_ioctl *rio)
+-{
+-	return -ENOTTY;
+-}
+ static inline int snp_issue_svsm_attest_req(u64 call_id, struct svsm_call *call, struct svsm_attest_call *input)
+ {
+ 	return -ENOTTY;
+@@ -537,6 +536,8 @@ static inline int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id) { retur
+ static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
+ 
+ static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc) { }
++static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
++					 struct snp_guest_request_ioctl *rio) { return -ENODEV; }
  
  #endif	/* CONFIG_AMD_MEM_ENCRYPT */
  
 diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-index c7b4270d0e18..6ba13ae0b153 100644
+index 6ba13ae0b153..c96b742789c5 100644
 --- a/arch/x86/coco/sev/core.c
 +++ b/arch/x86/coco/sev/core.c
-@@ -25,6 +25,7 @@
- #include <linux/psp-sev.h>
- #include <linux/dmi.h>
- #include <uapi/linux/sev-guest.h>
-+#include <crypto/gcm.h>
- 
- #include <asm/init.h>
- #include <asm/cpu_entry_area.h>
-@@ -95,6 +96,8 @@ static u64 sev_hv_features __ro_after_init;
- /* Secrets page physical address from the CC blob */
- static u64 secrets_pa __ro_after_init;
- 
-+static struct snp_msg_desc *snp_mdesc;
-+
- /* #VC handler runtime per-CPU data */
- struct sev_es_runtime_data {
- 	struct ghcb ghcb_page;
-@@ -2445,15 +2448,9 @@ static struct platform_device sev_guest_device = {
- 
- static int __init snp_init_platform_device(void)
- {
--	struct sev_guest_platform_data data;
--
- 	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
- 		return -ENODEV;
- 
--	data.secrets_gpa = secrets_pa;
--	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
--		return -ENODEV;
--
- 	if (platform_device_register(&sev_guest_device))
- 		return -ENODEV;
- 
-@@ -2532,3 +2529,127 @@ static int __init sev_sysfs_init(void)
+@@ -2376,8 +2376,8 @@ int snp_issue_svsm_attest_req(u64 call_id, struct svsm_call *call,
  }
- arch_initcall(sev_sysfs_init);
- #endif // CONFIG_SYSFS
+ EXPORT_SYMBOL_GPL(snp_issue_svsm_attest_req);
+ 
+-int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *input,
+-			    struct snp_guest_request_ioctl *rio)
++static int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *input,
++				   struct snp_guest_request_ioctl *rio)
+ {
+ 	struct ghcb_state state;
+ 	struct es_em_ctxt ctxt;
+@@ -2439,7 +2439,6 @@ int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *inpu
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(snp_issue_guest_request);
+ 
+ static struct platform_device sev_guest_device = {
+ 	.name		= "sev-guest",
+@@ -2653,3 +2652,293 @@ struct snp_msg_desc *snp_msg_alloc(void)
+ 	return ERR_PTR(-ENOMEM);
+ }
+ EXPORT_SYMBOL_GPL(snp_msg_alloc);
 +
-+static u8 *get_vmpck(int id, struct snp_secrets_page *secrets, u32 **seqno)
++/* Mutex to serialize the shared buffer access and command handling. */
++static DEFINE_MUTEX(snp_cmd_mutex);
++
++/*
++ * If an error is received from the host or AMD Secure Processor (ASP) there
++ * are two options. Either retry the exact same encrypted request or discontinue
++ * using the VMPCK.
++ *
++ * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
++ * encrypt the requests. The IV for this scheme is the sequence number. GCM
++ * cannot tolerate IV reuse.
++ *
++ * The ASP FW v1.51 only increments the sequence numbers on a successful
++ * guest<->ASP back and forth and only accepts messages at its exact sequence
++ * number.
++ *
++ * So if the sequence number were to be reused the encryption scheme is
++ * vulnerable. If the sequence number were incremented for a fresh IV the ASP
++ * will reject the request.
++ */
++static void snp_disable_vmpck(struct snp_msg_desc *mdesc)
 +{
-+	u8 *key = NULL;
-+
-+	switch (id) {
-+	case 0:
-+		*seqno = &secrets->os_area.msg_seqno_0;
-+		key = secrets->vmpck0;
-+		break;
-+	case 1:
-+		*seqno = &secrets->os_area.msg_seqno_1;
-+		key = secrets->vmpck1;
-+		break;
-+	case 2:
-+		*seqno = &secrets->os_area.msg_seqno_2;
-+		key = secrets->vmpck2;
-+		break;
-+	case 3:
-+		*seqno = &secrets->os_area.msg_seqno_3;
-+		key = secrets->vmpck3;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return key;
++	pr_alert("Disabling VMPCK%d communication key to prevent IV reuse.\n",
++		  mdesc->vmpck_id);
++	memzero_explicit(mdesc->vmpck, VMPCK_KEY_LEN);
++	mdesc->vmpck = NULL;
 +}
 +
-+static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
++static inline u64 __snp_get_msg_seqno(struct snp_msg_desc *mdesc)
 +{
-+	struct aesgcm_ctx *ctx;
++	u64 count;
 +
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
-+	if (!ctx)
-+		return NULL;
++	lockdep_assert_held(&snp_cmd_mutex);
 +
-+	if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
-+		pr_err("Crypto context initialization failed\n");
-+		kfree(ctx);
-+		return NULL;
-+	}
++	/* Read the current message sequence counter from secrets pages */
++	count = *mdesc->os_area_msg_seqno;
 +
-+	return ctx;
++	return count + 1;
 +}
 +
-+int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id)
++/* Return a non-zero on success */
++static u64 snp_get_msg_seqno(struct snp_msg_desc *mdesc)
 +{
-+	/* Adjust the default VMPCK key based on the executing VMPL level */
-+	if (vmpck_id == -1)
-+		vmpck_id = snp_vmpl;
++	u64 count = __snp_get_msg_seqno(mdesc);
 +
-+	mdesc->vmpck = get_vmpck(vmpck_id, mdesc->secrets, &mdesc->os_area_msg_seqno);
-+	if (!mdesc->vmpck) {
-+		pr_err("Invalid VMPCK%d communication key\n", vmpck_id);
-+		return -EINVAL;
++	/*
++	 * The message sequence counter for the SNP guest request is a  64-bit
++	 * value but the version 2 of GHCB specification defines a 32-bit storage
++	 * for it. If the counter exceeds the 32-bit value then return zero.
++	 * The caller should check the return value, but if the caller happens to
++	 * not check the value and use it, then the firmware treats zero as an
++	 * invalid number and will fail the  message request.
++	 */
++	if (count >= UINT_MAX) {
++		pr_err("request message sequence counter overflow\n");
++		return 0;
 +	}
 +
-+	/* Verify that VMPCK is not zero. */
-+	if (is_vmpck_empty(mdesc)) {
-+		pr_err("Empty VMPCK%d communication key\n", vmpck_id);
-+		return -EINVAL;
-+	}
++	return count;
++}
 +
-+	mdesc->vmpck_id = vmpck_id;
++static void snp_inc_msg_seqno(struct snp_msg_desc *mdesc)
++{
++	/*
++	 * The counter is also incremented by the PSP, so increment it by 2
++	 * and save in secrets page.
++	 */
++	*mdesc->os_area_msg_seqno += 2;
++}
 +
-+	mdesc->ctx = snp_init_crypto(mdesc->vmpck, VMPCK_KEY_LEN);
-+	if (!mdesc->ctx)
-+		return -ENOMEM;
++static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_req *req)
++{
++	struct snp_guest_msg *resp_msg = &mdesc->secret_response;
++	struct snp_guest_msg *req_msg = &mdesc->secret_request;
++	struct snp_guest_msg_hdr *req_msg_hdr = &req_msg->hdr;
++	struct snp_guest_msg_hdr *resp_msg_hdr = &resp_msg->hdr;
++	struct aesgcm_ctx *ctx = mdesc->ctx;
++	u8 iv[GCM_AES_IV_SIZE] = {};
++
++	pr_debug("response [seqno %lld type %d version %d sz %d]\n",
++		 resp_msg_hdr->msg_seqno, resp_msg_hdr->msg_type, resp_msg_hdr->msg_version,
++		 resp_msg_hdr->msg_sz);
++
++	/* Copy response from shared memory to encrypted memory. */
++	memcpy(resp_msg, mdesc->response, sizeof(*resp_msg));
++
++	/* Verify that the sequence counter is incremented by 1 */
++	if (unlikely(resp_msg_hdr->msg_seqno != (req_msg_hdr->msg_seqno + 1)))
++		return -EBADMSG;
++
++	/* Verify response message type and version number. */
++	if (resp_msg_hdr->msg_type != (req_msg_hdr->msg_type + 1) ||
++	    resp_msg_hdr->msg_version != req_msg_hdr->msg_version)
++		return -EBADMSG;
++
++	/*
++	 * If the message size is greater than our buffer length then return
++	 * an error.
++	 */
++	if (unlikely((resp_msg_hdr->msg_sz + ctx->authsize) > req->resp_sz))
++		return -EBADMSG;
++
++	/* Decrypt the payload */
++	memcpy(iv, &resp_msg_hdr->msg_seqno, min(sizeof(iv), sizeof(resp_msg_hdr->msg_seqno)));
++	if (!aesgcm_decrypt(ctx, req->resp_buf, resp_msg->payload, resp_msg_hdr->msg_sz,
++			    &resp_msg_hdr->algo, AAD_LEN, iv, resp_msg_hdr->authtag))
++		return -EBADMSG;
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(snp_msg_init);
 +
-+struct snp_msg_desc *snp_msg_alloc(void)
++static int enc_payload(struct snp_msg_desc *mdesc, u64 seqno, struct snp_guest_req *req)
 +{
-+	struct snp_msg_desc *mdesc;
++	struct snp_guest_msg *msg = &mdesc->secret_request;
++	struct snp_guest_msg_hdr *hdr = &msg->hdr;
++	struct aesgcm_ctx *ctx = mdesc->ctx;
++	u8 iv[GCM_AES_IV_SIZE] = {};
 +
-+	BUILD_BUG_ON(sizeof(struct snp_guest_msg) > PAGE_SIZE);
++	memset(msg, 0, sizeof(*msg));
 +
-+	if (snp_mdesc)
-+		return snp_mdesc;
++	hdr->algo = SNP_AEAD_AES_256_GCM;
++	hdr->hdr_version = MSG_HDR_VER;
++	hdr->hdr_sz = sizeof(*hdr);
++	hdr->msg_type = req->msg_type;
++	hdr->msg_version = req->msg_version;
++	hdr->msg_seqno = seqno;
++	hdr->msg_vmpck = req->vmpck_id;
++	hdr->msg_sz = req->req_sz;
 +
-+	mdesc = kzalloc(sizeof(struct snp_msg_desc), GFP_KERNEL);
-+	if (!mdesc)
-+		return ERR_PTR(-ENOMEM);
++	/* Verify the sequence number is non-zero */
++	if (!hdr->msg_seqno)
++		return -ENOSR;
 +
-+	mdesc->secrets = (__force struct snp_secrets_page *)ioremap_encrypted(secrets_pa,
-+									      PAGE_SIZE);
-+	if (!mdesc->secrets)
-+		return ERR_PTR(-ENODEV);
++	pr_debug("request [seqno %lld type %d version %d sz %d]\n",
++		 hdr->msg_seqno, hdr->msg_type, hdr->msg_version, hdr->msg_sz);
 +
-+	/* Allocate the shared page used for the request and response message. */
-+	mdesc->request = alloc_shared_pages(sizeof(struct snp_guest_msg));
-+	if (!mdesc->request)
-+		goto e_unmap;
++	if (WARN_ON((req->req_sz + ctx->authsize) > sizeof(msg->payload)))
++		return -EBADMSG;
 +
-+	mdesc->response = alloc_shared_pages(sizeof(struct snp_guest_msg));
-+	if (!mdesc->response)
-+		goto e_free_request;
++	memcpy(iv, &hdr->msg_seqno, min(sizeof(iv), sizeof(hdr->msg_seqno)));
++	aesgcm_encrypt(ctx, msg->payload, req->req_buf, req->req_sz, &hdr->algo,
++		       AAD_LEN, iv, hdr->authtag);
 +
-+	mdesc->certs_data = alloc_shared_pages(SEV_FW_BLOB_MAX_SIZE);
-+	if (!mdesc->certs_data)
-+		goto e_free_response;
-+
-+	/* initial the input address for guest request */
-+	mdesc->input.req_gpa = __pa(mdesc->request);
-+	mdesc->input.resp_gpa = __pa(mdesc->response);
-+	mdesc->input.data_gpa = __pa(mdesc->certs_data);
-+
-+	snp_mdesc = mdesc;
-+
-+	return mdesc;
-+
-+e_free_response:
-+	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
-+e_free_request:
-+	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
-+e_unmap:
-+	iounmap((__force void __iomem *)mdesc->secrets);
-+
-+	return ERR_PTR(-ENOMEM);
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(snp_msg_alloc);
++
++static int __handle_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
++				  struct snp_guest_request_ioctl *rio)
++{
++	unsigned long req_start = jiffies;
++	unsigned int override_npages = 0;
++	u64 override_err = 0;
++	int rc;
++
++retry_request:
++	/*
++	 * Call firmware to process the request. In this function the encrypted
++	 * message enters shared memory with the host. So after this call the
++	 * sequence number must be incremented or the VMPCK must be deleted to
++	 * prevent reuse of the IV.
++	 */
++	rc = snp_issue_guest_request(req, &mdesc->input, rio);
++	switch (rc) {
++	case -ENOSPC:
++		/*
++		 * If the extended guest request fails due to having too
++		 * small of a certificate data buffer, retry the same
++		 * guest request without the extended data request in
++		 * order to increment the sequence number and thus avoid
++		 * IV reuse.
++		 */
++		override_npages = mdesc->input.data_npages;
++		req->exit_code	= SVM_VMGEXIT_GUEST_REQUEST;
++
++		/*
++		 * Override the error to inform callers the given extended
++		 * request buffer size was too small and give the caller the
++		 * required buffer size.
++		 */
++		override_err = SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN);
++
++		/*
++		 * If this call to the firmware succeeds, the sequence number can
++		 * be incremented allowing for continued use of the VMPCK. If
++		 * there is an error reflected in the return value, this value
++		 * is checked further down and the result will be the deletion
++		 * of the VMPCK and the error code being propagated back to the
++		 * user as an ioctl() return code.
++		 */
++		goto retry_request;
++
++	/*
++	 * The host may return SNP_GUEST_VMM_ERR_BUSY if the request has been
++	 * throttled. Retry in the driver to avoid returning and reusing the
++	 * message sequence number on a different message.
++	 */
++	case -EAGAIN:
++		if (jiffies - req_start > SNP_REQ_MAX_RETRY_DURATION) {
++			rc = -ETIMEDOUT;
++			break;
++		}
++		schedule_timeout_killable(SNP_REQ_RETRY_DELAY);
++		goto retry_request;
++	}
++
++	/*
++	 * Increment the message sequence number. There is no harm in doing
++	 * this now because decryption uses the value stored in the response
++	 * structure and any failure will wipe the VMPCK, preventing further
++	 * use anyway.
++	 */
++	snp_inc_msg_seqno(mdesc);
++
++	if (override_err) {
++		rio->exitinfo2 = override_err;
++
++		/*
++		 * If an extended guest request was issued and the supplied certificate
++		 * buffer was not large enough, a standard guest request was issued to
++		 * prevent IV reuse. If the standard request was successful, return -EIO
++		 * back to the caller as would have originally been returned.
++		 */
++		if (!rc && override_err == SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN))
++			rc = -EIO;
++	}
++
++	if (override_npages)
++		mdesc->input.data_npages = override_npages;
++
++	return rc;
++}
++
++int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
++			   struct snp_guest_request_ioctl *rio)
++{
++	u64 seqno;
++	int rc;
++
++	guard(mutex)(&snp_cmd_mutex);
++
++	/* Check if the VMPCK is not empty */
++	if (is_vmpck_empty(mdesc)) {
++		pr_err_ratelimited("VMPCK is disabled\n");
++		return -ENOTTY;
++	}
++
++	/* Get message sequence and verify that its a non-zero */
++	seqno = snp_get_msg_seqno(mdesc);
++	if (!seqno)
++		return -EIO;
++
++	/* Clear shared memory's response for the host to populate. */
++	memset(mdesc->response, 0, sizeof(struct snp_guest_msg));
++
++	/* Encrypt the userspace provided payload in mdesc->secret_request. */
++	rc = enc_payload(mdesc, seqno, req);
++	if (rc)
++		return rc;
++
++	/*
++	 * Write the fully encrypted request to the shared unencrypted
++	 * request page.
++	 */
++	memcpy(mdesc->request, &mdesc->secret_request,
++	       sizeof(mdesc->secret_request));
++
++	rc = __handle_guest_request(mdesc, req, rio);
++	if (rc) {
++		if (rc == -EIO &&
++		    rio->exitinfo2 == SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN))
++			return rc;
++
++		pr_alert("Detected error from ASP request. rc: %d, exitinfo2: 0x%llx\n",
++			 rc, rio->exitinfo2);
++
++		snp_disable_vmpck(mdesc);
++		return rc;
++	}
++
++	rc = verify_and_dec_payload(mdesc, req);
++	if (rc) {
++		pr_alert("Detected unexpected decode failure from ASP. rc: %d\n", rc);
++		snp_disable_vmpck(mdesc);
++		return rc;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(snp_send_guest_request);
 diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index fca5c45ed5cd..862fc74452ac 100644
+index 862fc74452ac..d64efc489686 100644
 --- a/drivers/virt/coco/sev-guest/sev-guest.c
 +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -63,16 +63,6 @@ MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when communicating with the PSP.
- /* Mutex to serialize the shared buffer access and command handling. */
- static DEFINE_MUTEX(snp_cmd_mutex);
+@@ -31,9 +31,6 @@
  
--static bool is_vmpck_empty(struct snp_msg_desc *mdesc)
+ #define DEVICE_NAME	"sev-guest"
+ 
+-#define SNP_REQ_MAX_RETRY_DURATION	(60*HZ)
+-#define SNP_REQ_RETRY_DELAY		(2*HZ)
+-
+ #define SVSM_MAX_RETRIES		3
+ 
+ struct snp_guest_dev {
+@@ -60,76 +57,6 @@ static int vmpck_id = -1;
+ module_param(vmpck_id, int, 0444);
+ MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when communicating with the PSP.");
+ 
+-/* Mutex to serialize the shared buffer access and command handling. */
+-static DEFINE_MUTEX(snp_cmd_mutex);
+-
+-/*
+- * If an error is received from the host or AMD Secure Processor (ASP) there
+- * are two options. Either retry the exact same encrypted request or discontinue
+- * using the VMPCK.
+- *
+- * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
+- * encrypt the requests. The IV for this scheme is the sequence number. GCM
+- * cannot tolerate IV reuse.
+- *
+- * The ASP FW v1.51 only increments the sequence numbers on a successful
+- * guest<->ASP back and forth and only accepts messages at its exact sequence
+- * number.
+- *
+- * So if the sequence number were to be reused the encryption scheme is
+- * vulnerable. If the sequence number were incremented for a fresh IV the ASP
+- * will reject the request.
+- */
+-static void snp_disable_vmpck(struct snp_msg_desc *mdesc)
 -{
--	char zero_key[VMPCK_KEY_LEN] = {0};
--
--	if (mdesc->vmpck)
--		return !memcmp(mdesc->vmpck, zero_key, VMPCK_KEY_LEN);
--
--	return true;
+-	pr_alert("Disabling VMPCK%d communication key to prevent IV reuse.\n",
+-		  mdesc->vmpck_id);
+-	memzero_explicit(mdesc->vmpck, VMPCK_KEY_LEN);
+-	mdesc->vmpck = NULL;
 -}
 -
- /*
-  * If an error is received from the host or AMD Secure Processor (ASP) there
-  * are two options. Either retry the exact same encrypted request or discontinue
-@@ -93,7 +83,7 @@ static bool is_vmpck_empty(struct snp_msg_desc *mdesc)
- static void snp_disable_vmpck(struct snp_msg_desc *mdesc)
+-static inline u64 __snp_get_msg_seqno(struct snp_msg_desc *mdesc)
+-{
+-	u64 count;
+-
+-	lockdep_assert_held(&snp_cmd_mutex);
+-
+-	/* Read the current message sequence counter from secrets pages */
+-	count = *mdesc->os_area_msg_seqno;
+-
+-	return count + 1;
+-}
+-
+-/* Return a non-zero on success */
+-static u64 snp_get_msg_seqno(struct snp_msg_desc *mdesc)
+-{
+-	u64 count = __snp_get_msg_seqno(mdesc);
+-
+-	/*
+-	 * The message sequence counter for the SNP guest request is a  64-bit
+-	 * value but the version 2 of GHCB specification defines a 32-bit storage
+-	 * for it. If the counter exceeds the 32-bit value then return zero.
+-	 * The caller should check the return value, but if the caller happens to
+-	 * not check the value and use it, then the firmware treats zero as an
+-	 * invalid number and will fail the  message request.
+-	 */
+-	if (count >= UINT_MAX) {
+-		pr_err("request message sequence counter overflow\n");
+-		return 0;
+-	}
+-
+-	return count;
+-}
+-
+-static void snp_inc_msg_seqno(struct snp_msg_desc *mdesc)
+-{
+-	/*
+-	 * The counter is also incremented by the PSP, so increment it by 2
+-	 * and save in secrets page.
+-	 */
+-	*mdesc->os_area_msg_seqno += 2;
+-}
+-
+ static inline struct snp_guest_dev *to_snp_dev(struct file *file)
  {
- 	pr_alert("Disabling VMPCK%d communication key to prevent IV reuse.\n",
--		  vmpck_id);
-+		  mdesc->vmpck_id);
- 	memzero_explicit(mdesc->vmpck, VMPCK_KEY_LEN);
- 	mdesc->vmpck = NULL;
- }
-@@ -147,23 +137,6 @@ static inline struct snp_guest_dev *to_snp_dev(struct file *file)
+ 	struct miscdevice *dev = file->private_data;
+@@ -137,225 +64,6 @@ static inline struct snp_guest_dev *to_snp_dev(struct file *file)
  	return container_of(dev, struct snp_guest_dev, misc);
  }
  
--static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
+-static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_req *req)
 -{
--	struct aesgcm_ctx *ctx;
+-	struct snp_guest_msg *resp_msg = &mdesc->secret_response;
+-	struct snp_guest_msg *req_msg = &mdesc->secret_request;
+-	struct snp_guest_msg_hdr *req_msg_hdr = &req_msg->hdr;
+-	struct snp_guest_msg_hdr *resp_msg_hdr = &resp_msg->hdr;
+-	struct aesgcm_ctx *ctx = mdesc->ctx;
+-	u8 iv[GCM_AES_IV_SIZE] = {};
 -
--	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
--	if (!ctx)
--		return NULL;
+-	pr_debug("response [seqno %lld type %d version %d sz %d]\n",
+-		 resp_msg_hdr->msg_seqno, resp_msg_hdr->msg_type, resp_msg_hdr->msg_version,
+-		 resp_msg_hdr->msg_sz);
 -
--	if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
--		pr_err("Crypto context initialization failed\n");
--		kfree(ctx);
--		return NULL;
--	}
+-	/* Copy response from shared memory to encrypted memory. */
+-	memcpy(resp_msg, mdesc->response, sizeof(*resp_msg));
 -
--	return ctx;
+-	/* Verify that the sequence counter is incremented by 1 */
+-	if (unlikely(resp_msg_hdr->msg_seqno != (req_msg_hdr->msg_seqno + 1)))
+-		return -EBADMSG;
+-
+-	/* Verify response message type and version number. */
+-	if (resp_msg_hdr->msg_type != (req_msg_hdr->msg_type + 1) ||
+-	    resp_msg_hdr->msg_version != req_msg_hdr->msg_version)
+-		return -EBADMSG;
+-
+-	/*
+-	 * If the message size is greater than our buffer length then return
+-	 * an error.
+-	 */
+-	if (unlikely((resp_msg_hdr->msg_sz + ctx->authsize) > req->resp_sz))
+-		return -EBADMSG;
+-
+-	/* Decrypt the payload */
+-	memcpy(iv, &resp_msg_hdr->msg_seqno, min(sizeof(iv), sizeof(resp_msg_hdr->msg_seqno)));
+-	if (!aesgcm_decrypt(ctx, req->resp_buf, resp_msg->payload, resp_msg_hdr->msg_sz,
+-			    &resp_msg_hdr->algo, AAD_LEN, iv, resp_msg_hdr->authtag))
+-		return -EBADMSG;
+-
+-	return 0;
 -}
 -
- static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_req *req)
- {
- 	struct snp_guest_msg *resp_msg = &mdesc->secret_response;
-@@ -414,7 +387,7 @@ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_io
- 
- 	req.msg_version = arg->msg_version;
- 	req.msg_type = SNP_MSG_REPORT_REQ;
--	req.vmpck_id = vmpck_id;
-+	req.vmpck_id = mdesc->vmpck_id;
- 	req.req_buf = report_req;
- 	req.req_sz = sizeof(*report_req);
- 	req.resp_buf = report_resp->data;
-@@ -461,7 +434,7 @@ static int get_derived_key(struct snp_guest_dev *snp_dev, struct snp_guest_reque
- 
- 	req.msg_version = arg->msg_version;
- 	req.msg_type = SNP_MSG_KEY_REQ;
--	req.vmpck_id = vmpck_id;
-+	req.vmpck_id = mdesc->vmpck_id;
- 	req.req_buf = derived_key_req;
- 	req.req_sz = sizeof(*derived_key_req);
- 	req.resp_buf = buf;
-@@ -539,7 +512,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 
- 	req.msg_version = arg->msg_version;
- 	req.msg_type = SNP_MSG_REPORT_REQ;
--	req.vmpck_id = vmpck_id;
-+	req.vmpck_id = mdesc->vmpck_id;
- 	req.req_buf = &report_req->data;
- 	req.req_sz = sizeof(report_req->data);
- 	req.resp_buf = report_resp->data;
-@@ -616,76 +589,11 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
- 	return ret;
- }
- 
--static void free_shared_pages(void *buf, size_t sz)
+-static int enc_payload(struct snp_msg_desc *mdesc, u64 seqno, struct snp_guest_req *req)
 -{
--	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
--	int ret;
+-	struct snp_guest_msg *msg = &mdesc->secret_request;
+-	struct snp_guest_msg_hdr *hdr = &msg->hdr;
+-	struct aesgcm_ctx *ctx = mdesc->ctx;
+-	u8 iv[GCM_AES_IV_SIZE] = {};
 -
--	if (!buf)
--		return;
+-	memset(msg, 0, sizeof(*msg));
 -
--	ret = set_memory_encrypted((unsigned long)buf, npages);
--	if (ret) {
--		WARN_ONCE(ret, "failed to restore encryption mask (leak it)\n");
--		return;
--	}
+-	hdr->algo = SNP_AEAD_AES_256_GCM;
+-	hdr->hdr_version = MSG_HDR_VER;
+-	hdr->hdr_sz = sizeof(*hdr);
+-	hdr->msg_type = req->msg_type;
+-	hdr->msg_version = req->msg_version;
+-	hdr->msg_seqno = seqno;
+-	hdr->msg_vmpck = req->vmpck_id;
+-	hdr->msg_sz = req->req_sz;
 -
--	__free_pages(virt_to_page(buf), get_order(sz));
+-	/* Verify the sequence number is non-zero */
+-	if (!hdr->msg_seqno)
+-		return -ENOSR;
+-
+-	pr_debug("request [seqno %lld type %d version %d sz %d]\n",
+-		 hdr->msg_seqno, hdr->msg_type, hdr->msg_version, hdr->msg_sz);
+-
+-	if (WARN_ON((req->req_sz + ctx->authsize) > sizeof(msg->payload)))
+-		return -EBADMSG;
+-
+-	memcpy(iv, &hdr->msg_seqno, min(sizeof(iv), sizeof(hdr->msg_seqno)));
+-	aesgcm_encrypt(ctx, msg->payload, req->req_buf, req->req_sz, &hdr->algo,
+-		       AAD_LEN, iv, hdr->authtag);
+-
+-	return 0;
 -}
 -
--static void *alloc_shared_pages(struct device *dev, size_t sz)
+-static int __handle_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
+-				  struct snp_guest_request_ioctl *rio)
 -{
--	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
--	struct page *page;
--	int ret;
+-	unsigned long req_start = jiffies;
+-	unsigned int override_npages = 0;
+-	u64 override_err = 0;
+-	int rc;
 -
--	page = alloc_pages(GFP_KERNEL_ACCOUNT, get_order(sz));
--	if (!page)
--		return NULL;
+-retry_request:
+-	/*
+-	 * Call firmware to process the request. In this function the encrypted
+-	 * message enters shared memory with the host. So after this call the
+-	 * sequence number must be incremented or the VMPCK must be deleted to
+-	 * prevent reuse of the IV.
+-	 */
+-	rc = snp_issue_guest_request(req, &mdesc->input, rio);
+-	switch (rc) {
+-	case -ENOSPC:
+-		/*
+-		 * If the extended guest request fails due to having too
+-		 * small of a certificate data buffer, retry the same
+-		 * guest request without the extended data request in
+-		 * order to increment the sequence number and thus avoid
+-		 * IV reuse.
+-		 */
+-		override_npages = mdesc->input.data_npages;
+-		req->exit_code	= SVM_VMGEXIT_GUEST_REQUEST;
 -
--	ret = set_memory_decrypted((unsigned long)page_address(page), npages);
--	if (ret) {
--		dev_err(dev, "failed to mark page shared, ret=%d\n", ret);
--		__free_pages(page, get_order(sz));
--		return NULL;
+-		/*
+-		 * Override the error to inform callers the given extended
+-		 * request buffer size was too small and give the caller the
+-		 * required buffer size.
+-		 */
+-		override_err = SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN);
+-
+-		/*
+-		 * If this call to the firmware succeeds, the sequence number can
+-		 * be incremented allowing for continued use of the VMPCK. If
+-		 * there is an error reflected in the return value, this value
+-		 * is checked further down and the result will be the deletion
+-		 * of the VMPCK and the error code being propagated back to the
+-		 * user as an ioctl() return code.
+-		 */
+-		goto retry_request;
+-
+-	/*
+-	 * The host may return SNP_GUEST_VMM_ERR_BUSY if the request has been
+-	 * throttled. Retry in the driver to avoid returning and reusing the
+-	 * message sequence number on a different message.
+-	 */
+-	case -EAGAIN:
+-		if (jiffies - req_start > SNP_REQ_MAX_RETRY_DURATION) {
+-			rc = -ETIMEDOUT;
+-			break;
+-		}
+-		schedule_timeout_killable(SNP_REQ_RETRY_DELAY);
+-		goto retry_request;
 -	}
 -
--	return page_address(page);
+-	/*
+-	 * Increment the message sequence number. There is no harm in doing
+-	 * this now because decryption uses the value stored in the response
+-	 * structure and any failure will wipe the VMPCK, preventing further
+-	 * use anyway.
+-	 */
+-	snp_inc_msg_seqno(mdesc);
+-
+-	if (override_err) {
+-		rio->exitinfo2 = override_err;
+-
+-		/*
+-		 * If an extended guest request was issued and the supplied certificate
+-		 * buffer was not large enough, a standard guest request was issued to
+-		 * prevent IV reuse. If the standard request was successful, return -EIO
+-		 * back to the caller as would have originally been returned.
+-		 */
+-		if (!rc && override_err == SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN))
+-			rc = -EIO;
+-	}
+-
+-	if (override_npages)
+-		mdesc->input.data_npages = override_npages;
+-
+-	return rc;
 -}
 -
- static const struct file_operations snp_guest_fops = {
- 	.owner	= THIS_MODULE,
- 	.unlocked_ioctl = snp_guest_ioctl,
- };
- 
--static u8 *get_vmpck(int id, struct snp_secrets_page *secrets, u32 **seqno)
+-static int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
+-				  struct snp_guest_request_ioctl *rio)
 -{
--	u8 *key = NULL;
+-	u64 seqno;
+-	int rc;
 -
--	switch (id) {
--	case 0:
--		*seqno = &secrets->os_area.msg_seqno_0;
--		key = secrets->vmpck0;
--		break;
--	case 1:
--		*seqno = &secrets->os_area.msg_seqno_1;
--		key = secrets->vmpck1;
--		break;
--	case 2:
--		*seqno = &secrets->os_area.msg_seqno_2;
--		key = secrets->vmpck2;
--		break;
--	case 3:
--		*seqno = &secrets->os_area.msg_seqno_3;
--		key = secrets->vmpck3;
--		break;
--	default:
--		break;
--	}
+-	guard(mutex)(&snp_cmd_mutex);
 -
--	return key;
--}
--
- struct snp_msg_report_resp_hdr {
- 	u32 status;
- 	u32 report_size;
-@@ -979,13 +887,10 @@ static void unregister_sev_tsm(void *data)
- 
- static int __init sev_guest_probe(struct platform_device *pdev)
- {
--	struct sev_guest_platform_data *data;
--	struct snp_secrets_page *secrets;
- 	struct device *dev = &pdev->dev;
- 	struct snp_guest_dev *snp_dev;
- 	struct snp_msg_desc *mdesc;
- 	struct miscdevice *misc;
--	void __iomem *mapping;
- 	int ret;
- 
- 	BUILD_BUG_ON(sizeof(struct snp_guest_msg) > PAGE_SIZE);
-@@ -993,115 +898,57 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
- 		return -ENODEV;
- 
--	if (!dev->platform_data)
--		return -ENODEV;
--
--	data = (struct sev_guest_platform_data *)dev->platform_data;
--	mapping = ioremap_encrypted(data->secrets_gpa, PAGE_SIZE);
--	if (!mapping)
--		return -ENODEV;
--
--	secrets = (__force void *)mapping;
--
--	ret = -ENOMEM;
- 	snp_dev = devm_kzalloc(&pdev->dev, sizeof(struct snp_guest_dev), GFP_KERNEL);
- 	if (!snp_dev)
--		goto e_unmap;
--
--	mdesc = devm_kzalloc(&pdev->dev, sizeof(struct snp_msg_desc), GFP_KERNEL);
--	if (!mdesc)
--		goto e_unmap;
--
--	/* Adjust the default VMPCK key based on the executing VMPL level */
--	if (vmpck_id == -1)
--		vmpck_id = snp_vmpl;
-+		return -ENOMEM;
- 
--	ret = -EINVAL;
--	mdesc->vmpck = get_vmpck(vmpck_id, secrets, &mdesc->os_area_msg_seqno);
--	if (!mdesc->vmpck) {
--		dev_err(dev, "Invalid VMPCK%d communication key\n", vmpck_id);
--		goto e_unmap;
--	}
-+	mdesc = snp_msg_alloc();
-+	if (IS_ERR_OR_NULL(mdesc))
-+		return -ENOMEM;
- 
--	/* Verify that VMPCK is not zero. */
+-	/* Check if the VMPCK is not empty */
 -	if (is_vmpck_empty(mdesc)) {
--		dev_err(dev, "Empty VMPCK%d communication key\n", vmpck_id);
--		goto e_unmap;
+-		pr_err_ratelimited("VMPCK is disabled\n");
+-		return -ENOTTY;
 -	}
-+	ret = snp_msg_init(mdesc, vmpck_id);
-+	if (ret)
-+		return -EIO;
- 
- 	platform_set_drvdata(pdev, snp_dev);
- 	snp_dev->dev = dev;
--	mdesc->secrets = secrets;
 -
--	/* Allocate the shared page used for the request and response message. */
--	mdesc->request = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
--	if (!mdesc->request)
--		goto e_unmap;
+-	/* Get message sequence and verify that its a non-zero */
+-	seqno = snp_get_msg_seqno(mdesc);
+-	if (!seqno)
+-		return -EIO;
 -
--	mdesc->response = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
--	if (!mdesc->response)
--		goto e_free_request;
+-	/* Clear shared memory's response for the host to populate. */
+-	memset(mdesc->response, 0, sizeof(struct snp_guest_msg));
 -
--	mdesc->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
--	if (!mdesc->certs_data)
--		goto e_free_response;
+-	/* Encrypt the userspace provided payload in mdesc->secret_request. */
+-	rc = enc_payload(mdesc, seqno, req);
+-	if (rc)
+-		return rc;
 -
--	ret = -EIO;
--	mdesc->ctx = snp_init_crypto(mdesc->vmpck, VMPCK_KEY_LEN);
--	if (!mdesc->ctx)
--		goto e_free_cert_data;
- 
- 	misc = &snp_dev->misc;
- 	misc->minor = MISC_DYNAMIC_MINOR;
- 	misc->name = DEVICE_NAME;
- 	misc->fops = &snp_guest_fops;
- 
--	/* Initialize the input addresses for guest request */
--	mdesc->input.req_gpa = __pa(mdesc->request);
--	mdesc->input.resp_gpa = __pa(mdesc->response);
--	mdesc->input.data_gpa = __pa(mdesc->certs_data);
+-	/*
+-	 * Write the fully encrypted request to the shared unencrypted
+-	 * request page.
+-	 */
+-	memcpy(mdesc->request, &mdesc->secret_request,
+-	       sizeof(mdesc->secret_request));
 -
- 	/* Set the privlevel_floor attribute based on the vmpck_id */
--	sev_tsm_ops.privlevel_floor = vmpck_id;
-+	sev_tsm_ops.privlevel_floor = mdesc->vmpck_id;
- 
- 	ret = tsm_register(&sev_tsm_ops, snp_dev);
- 	if (ret)
--		goto e_free_cert_data;
-+		goto e_msg_init;
- 
- 	ret = devm_add_action_or_reset(&pdev->dev, unregister_sev_tsm, NULL);
- 	if (ret)
--		goto e_free_cert_data;
-+		goto e_msg_init;
- 
- 	ret =  misc_register(misc);
- 	if (ret)
--		goto e_free_ctx;
-+		goto e_msg_init;
- 
- 	snp_dev->msg_desc = mdesc;
--	dev_info(dev, "Initialized SEV guest driver (using VMPCK%d communication key)\n", vmpck_id);
-+	dev_info(dev, "Initialized SEV guest driver (using VMPCK%d communication key)\n",
-+		 mdesc->vmpck_id);
- 	return 0;
- 
--e_free_ctx:
--	kfree(mdesc->ctx);
--e_free_cert_data:
--	free_shared_pages(mdesc->certs_data, SEV_FW_BLOB_MAX_SIZE);
--e_free_response:
--	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
--e_free_request:
--	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
--e_unmap:
--	iounmap(mapping);
-+e_msg_init:
-+	snp_msg_cleanup(mdesc);
-+
- 	return ret;
- }
- 
- static void __exit sev_guest_remove(struct platform_device *pdev)
- {
- 	struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
--	struct snp_msg_desc *mdesc = snp_dev->msg_desc;
- 
--	free_shared_pages(mdesc->certs_data, SEV_FW_BLOB_MAX_SIZE);
--	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
--	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
--	kfree(mdesc->ctx);
-+	snp_msg_cleanup(snp_dev->msg_desc);
- 	misc_deregister(&snp_dev->misc);
- }
- 
+-	rc = __handle_guest_request(mdesc, req, rio);
+-	if (rc) {
+-		if (rc == -EIO &&
+-		    rio->exitinfo2 == SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN))
+-			return rc;
+-
+-		pr_alert("Detected error from ASP request. rc: %d, exitinfo2: 0x%llx\n",
+-			 rc, rio->exitinfo2);
+-
+-		snp_disable_vmpck(mdesc);
+-		return rc;
+-	}
+-
+-	rc = verify_and_dec_payload(mdesc, req);
+-	if (rc) {
+-		pr_alert("Detected unexpected decode failure from ASP. rc: %d\n", rc);
+-		snp_disable_vmpck(mdesc);
+-		return rc;
+-	}
+-
+-	return 0;
+-}
+-
+ struct snp_req_resp {
+ 	sockptr_t req_data;
+ 	sockptr_t resp_data;
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 2852fcd82cbd..6426b6d469a4 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1556,6 +1556,7 @@ config AMD_MEM_ENCRYPT
+ 	select ARCH_HAS_CC_PLATFORM
+ 	select X86_MEM_ENCRYPT
+ 	select UNACCEPTED_MEMORY
++	select CRYPTO_LIB_AESGCM
+ 	help
+ 	  Say yes to enable support for the encryption of system memory.
+ 	  This requires an AMD processor that supports Secure Memory
+diff --git a/drivers/virt/coco/sev-guest/Kconfig b/drivers/virt/coco/sev-guest/Kconfig
+index 0b772bd921d8..a6405ab6c2c3 100644
+--- a/drivers/virt/coco/sev-guest/Kconfig
++++ b/drivers/virt/coco/sev-guest/Kconfig
+@@ -2,7 +2,6 @@ config SEV_GUEST
+ 	tristate "AMD SEV Guest driver"
+ 	default m
+ 	depends on AMD_MEM_ENCRYPT
+-	select CRYPTO_LIB_AESGCM
+ 	select TSM_REPORTS
+ 	help
+ 	  SEV-SNP firmware provides the guest a mechanism to communicate with
 -- 
 2.34.1
 
