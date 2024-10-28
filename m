@@ -1,115 +1,112 @@
-Return-Path: <kvm+bounces-29881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4384F9B38E4
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:13:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAEA79B38EB
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:17:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B93283691
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:13:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665E51F2214F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0232F1E0094;
-	Mon, 28 Oct 2024 18:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061A21DF757;
+	Mon, 28 Oct 2024 18:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="K19VSXkL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGMDmh07"
 X-Original-To: kvm@vger.kernel.org
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B21A1DF97A;
-	Mon, 28 Oct 2024 18:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35019186616
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 18:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730139171; cv=none; b=VZKbRqFpTCxPqw9s9DRnRvyqb8voqGOYWD/4iv/GForaMkvXpdSK/DbYFTu/rBApk0Is9a64Vmj/sDnPnfzL6PlZRlKbuFIHKc+DHyJUTCPEi1NNb0ZqtrMFdbaMCmD1ZORWyDVMv6XlaoR836nqB/J3a8whX0pB/hNlkmYH5bI=
+	t=1730139473; cv=none; b=YOrWBw9VIoYb65qyZvC4OBzBjBikVzBd8GyLntw5aLAv8NDiJ7W0UC/LG7FONE5Wiu575mWdAlDAh28CRls+zm23WEqCZZnBfnPg0MA70xlRwNHaYti4mkHxmDlM/sbDKDqTGZ6IVkpToSL5K/f92ADOek/CUx5x6aV+ylAT8MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730139171; c=relaxed/simple;
-	bh=5MaPsfR2hKKODgbANuDJ+3vdVd9wsJj23KxRLquFmkc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=Ra6FpbEM9XLjA6K3ULHuTl8jODPqEmw9qDKatyh/BfvcTwbUBUT4DWxknevcxtdnxKwLy80jd59WvHDRDSoemrE9plldeCsxVKBTn9nin0odWhtlSnm7wXCQrVfnyvLTN7gjww0TqvAqkDWPWAgjZmWIra2AXCQyc3tKeSNa+m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=K19VSXkL; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=PVgGO8I+aKJHmvYCR04uOsA3HSUhN0BC0EboYMzK8as=; b=K19VSXkL0jbE9wKlLQwlzKl5Qt
-	dFI8msaT1mELaj5hwKIwDlCJ46EwcaMmEobLfzfEKq+Eq7nTnteRjLb92tlfPf+mQ1jHZs/uau/Zv
-	btPElz6z7lxamWA9dafk7bpsCpOHuPE5ytvXdPKxSvkskCQz9G9p+Cd3hVlToTbBzJvAgoSIlT37A
-	r+ZWM2l+KvYFm7d2b43t3ljFpzoofdPK8h6WvgnWHW7sU/zCs1CIEnQebX78Y3u5+eOJI3mrSnt5j
-	dSSu52KwvY+eSIGe4RXd3JdoU0j37bdCROcQ7YHpM0slV0+MpM5Xaz7qZFasLUl12Cvd6Oj0uBW7u
-	ffpSvEzg==;
-Received: from d104-157-31-28.abhsia.telus.net ([104.157.31.28] helo=[192.168.1.250])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <logang@deltatee.com>)
-	id 1t5UEF-002ZWw-0E;
-	Mon, 28 Oct 2024 12:12:35 -0600
-Message-ID: <30e87c78-1021-4fa4-8aa6-e81245e77379@deltatee.com>
-Date: Mon, 28 Oct 2024 12:12:34 -0600
+	s=arc-20240116; t=1730139473; c=relaxed/simple;
+	bh=BI0TiyriFR9sBLWv0MTNVLSTtiBR6zB5VM599YILyhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VZPZ1Cc0Zfub4Rb1i4sBYTXEhUUVkbTKh+k2E6g5fcC0MEq1GWLU6xz1dK2jTF9mnaUbo+Z/yT4v5yJ2mZlIIZ4TPY0rNJEG7mJOLBKXHfHPo+V8tNfVhQvmUcsY2Kqi9vPVqgX58Bf2Bmxe8FxWZpMyymhTxMLNgzPd+p+Jx5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iGMDmh07; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730139470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ow6yg5EfDFU7n7Pa/d9u/odwnb2QoL21BBF3d5MTEfc=;
+	b=iGMDmh07/fsEobL8nhvhOURoj0PWM5jbZTItYtlYWkjQD1+ZFwmp26sAZnMU3LQJgADlly
+	AdF1h+StAnAlDQnvBFAZamlxI500P4Pql9mHvzqN5/0474kWTkF1phbk7KrroiRBm2n8rf
+	T3YNo6L/EYnJ+f491nWmMDYgusEoX4c=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-196-jS7CPEonM7aw1ggzpOmPRw-1; Mon, 28 Oct 2024 14:17:48 -0400
+X-MC-Unique: jS7CPEonM7aw1ggzpOmPRw-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83ab67710b5so50087939f.3
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 11:17:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730139468; x=1730744268;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ow6yg5EfDFU7n7Pa/d9u/odwnb2QoL21BBF3d5MTEfc=;
+        b=FQCY/yLzfhAQVzaTD+Ny13uFXIUfLLoyS87C0G9TUF+QMAJlSS7MLeyB4CX6At4N2H
+         89dDgHTe8Bb34/3w/OOahk0jnYUGKx3AAfT8UHVuqIViXT+oPw0EFsdi7mFpvrk5c4km
+         eymdI6lMDnJxSR4PPjpA0slDjq+jDCI0inLwK6kx6b7++C1vFDOA4BeAFszOIHQZNeIW
+         eBKYL+19wTSE2ny8YnCHUJghBS88IVL9lIW52bKKCYP0r3DaIaTv+C6Iu03NJTsWVYQ1
+         BaiWsxAWMRFhic0SryJ+J9tPd7+RYUudRSz7bszSoQoSH0SSfTgjKK64IcKm0ZMzUuPe
+         T94A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFqRCxZf8XbvO9ApeSa+5N8d9H0/dZEK0uCSN9lV8aUSomzYMPpvdAZMFB1AOaPGv4NQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyADX1elIplqrysKffTNN3jstzAKU+QKqAZRFhLUYXlm3GHbcs
+	9cfQBvIVJP3/h301DNaK/ScU9l4Q83JJQ2XlwJxzYI2TgqOckdcS7gdLO8PetUkM9jcMnoRuunZ
+	JK2gsziapNfbJTSM0rJW2sQHhV+NIs5V5jegl/1EHNPMncWbtzQ==
+X-Received: by 2002:a05:6e02:1d19:b0:3a2:6cd7:3255 with SMTP id e9e14a558f8ab-3a4ed30c266mr22182685ab.6.1730139467881;
+        Mon, 28 Oct 2024 11:17:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyaCZsOb3OubpwLQK2tvyyyBnC7J+AwIr3XfWRoJc04SSKzCg6MWaZngCwZ2ehfEY79ESAGQ==
+X-Received: by 2002:a05:6e02:1d19:b0:3a2:6cd7:3255 with SMTP id e9e14a558f8ab-3a4ed30c266mr22182605ab.6.1730139467445;
+        Mon, 28 Oct 2024 11:17:47 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc725eb673sm1826022173.16.2024.10.28.11.17.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Oct 2024 11:17:47 -0700 (PDT)
+Date: Mon, 28 Oct 2024 12:17:45 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+ <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+ <parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
+ <joao.m.martins@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH vfio 0/7] Enhances the vfio-virtio driver to support
+ live migration
+Message-ID: <20241028121745.17d4d18c.alex.williamson@redhat.com>
+In-Reply-To: <20241027100751.219214-1-yishaih@nvidia.com>
+References: <20241027100751.219214-1-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <cover.1730037276.git.leon@kernel.org>
- <f7ee023a7497ad3d8a7a31b12f492339d155ac39.1730037276.git.leon@kernel.org>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <f7ee023a7497ad3d8a7a31b12f492339d155ac39.1730037276.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 104.157.31.28
-X-SA-Exim-Rcpt-To: leon@kernel.org, axboe@kernel.dk, jgg@ziepe.ca, robin.murphy@arm.com, joro@8bytes.org, will@kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, bhelgaas@google.com, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com, alex.williamson@redhat.com, m.szyprowski@samsung.com, jglisse@redhat.com, akpm@linux-foundation.org, corbet@lwn.net, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-rdma@vger.kernel.org, iommu@lists.linux.dev, linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH 09/18] docs: core-api: document the IOVA-based API
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
+On Sun, 27 Oct 2024 12:07:44 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-I noticed a couple of typos below:
+> This series enhances the vfio-virtio driver to support live migration
+> for virtio-net Virtual Functions (VFs) that are migration-capable.
 
-On 2024-10-27 08:21, Leon Romanovsky wrote:
+What's the status of making virtio-net VFs in QEMU migration capable?
 
-> +Part Ie - IOVA-based DMA mappings
-> +---------------------------------
-> +
-> +These APIs allow a very efficient mapping when using an IOMMU.  They are an
-> +optional path that requires extra code and are only recommended for drivers
-> +where DMA mapping performance, or the space usage for storing the dma addresses
+There would be some obvious benefits for the vfio migration ecosystem
+if we could validate migration of a functional device (ie. not mtty) in
+an L2 guest with no physical hardware dependencies.  Thanks,
 
-The second 'dma' should be capitalized as it is in other uses.
+Alex
 
-
-> +    int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
-> +		size_t offset, size_t size, int ret);
-> +
-> +Must called to sync the IOMMU page tables for IOVA-range mapped by one or
-> +more calls to ``dma_iova_link()``.
-
-"Must be called" instead of "Must called"
-
-Thanks,
-
-Logan
 
