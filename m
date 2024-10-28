@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-29792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76A119B21FA
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 02:24:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8E89B2226
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 03:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36A35280DF9
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 01:24:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB9131F2194B
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 02:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035A8156243;
-	Mon, 28 Oct 2024 01:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E136017BEAD;
+	Mon, 28 Oct 2024 02:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YIURW7bc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FEAgzFUH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7D26088F;
-	Mon, 28 Oct 2024 01:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086C74C6C;
+	Mon, 28 Oct 2024 02:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730078662; cv=none; b=h2ZNJFj3dseyksea1iLXyaXB4hv7o9idqqZ6GXGNv3ftJhY8pAFW4qmG9D8K5aAKsmfOqrQM+PjMq0mbhnysKpW7q0WnuuIjoaRUmRGhyiLaGGrZF994qL4w+Zhs9YsCGelZUb1nQix+aD6LF438ivb/mtTZUl2/l48Bu39yykI=
+	t=1730080872; cv=none; b=EljFwNStEK1a9jF9olcr8EuC2x6PSr9+hoPH/MEYK6RdkMP1HQKCQr30SLPOpqb3IF29dKlLTq4hEJti2K4P0mDrSBoyQwUXvXxpufu4FWzvUOrmZ+z4RBh6L+TbiW1MyByJxtmKA6CMNJJJxSdq4q69NHuV7TGmW9f1MOTmNCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730078662; c=relaxed/simple;
-	bh=bf/VeYucpNv6ZZcK2fwIQKDea5xGi/UZ5dimPkOuYKQ=;
+	s=arc-20240116; t=1730080872; c=relaxed/simple;
+	bh=O3Ovtbf3MrmDzHqqK2oXEfGTFDsY4Dl/uMRNNzQ0jlU=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=iQPwaeLyE1sB311tpGGd33c3XpCrnDTXsrw9lE89H1xljA2wRnTeCyvBUjJCzYwSgL7PlvreRBk8ah7e9dgkeQuKuyhP51BT/cUMa3jqEpxDlUtD888iQvY0kleCxjRn7+zlY0DobK8TS8lMH1qz24MZ5oBW9jU/VKYsJgfZGUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YIURW7bc; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:Content-Type; b=NHTFbKDZlCpS/mOegY+6MSe+a2RlkVGVBRLp582Z0qGmss3m7YcE7jLCe6AFgXBRIlOOdIW7fSSzSomjASh7HATQ1XNaKPVlPGVXLlzDJiB/56cQ8vwILwAG3usEE7Evq4cy+/7b/+zDq077HqzxTrp2hzkJB3pyApSHJW1z7uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FEAgzFUH; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730078660; x=1761614660;
+  t=1730080870; x=1761616870;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=bf/VeYucpNv6ZZcK2fwIQKDea5xGi/UZ5dimPkOuYKQ=;
-  b=YIURW7bcE23xqiz8YIpgYH8bWnzyD4MyTr76iiXVCrbu5E14ZHjuG/2a
-   oKsUjpudo1KLHbOlvC+d7txqYG0hnXhrfpHFmPlVPFp3k7z6lr8PxdHt6
-   iSalkx1khfPPIpwQyTfkpUrO2vnFdOWozbvL5kn/iiO+ky4wgY0AYqLt8
-   NC/P3OWCPl0MkTqp9rrQhPWQz+M4TbO/IUZKVlpTUazkLmLf48zqB0kRu
-   qTFzw9JQyHiHUPdJzKOKUFEZxutmDzQVLKel1NXujepjvFUTZlHBs/Zbe
-   cyX2o/Q8j5xpqePF0lHaN2k8OcNthLQjLnunFdehGdyQPlz6aKGyjZlub
+  bh=O3Ovtbf3MrmDzHqqK2oXEfGTFDsY4Dl/uMRNNzQ0jlU=;
+  b=FEAgzFUHr3EQeuWhjCD3MszQyI86wPqnDx/ufKLi4m/0yXVv62m/0PdX
+   Qb34JnriCtA7T64jegh2/b/ygqDorvKBw2ODy6ltR+yqCqlfmerDhpNG1
+   DLqJIUQtzk1ueG0x9u1ZglHJWfAjIAgEiQVV7L2ZsCwCXcsn7qmMBN2ib
+   caBi6uRteHLVW07jY7GM7ol+1yuZlXtzwshj0qfK7XQB45iur85AwtdZm
+   QFnHEdXxT5aINA4SqwEKL2oEeueg/ApaXiXrTga0JvE74MDtu34m/QmM5
+   gxaVbagNjoFTDRRaDpL1fsWSi2xAaK40GBg8JHWj7z597sKNXq5ehYJtH
    A==;
-X-CSE-ConnectionGUID: 7DnuyC14RTW9l20zUBYcuA==
-X-CSE-MsgGUID: XozA1EDOShavepJd8ZpKJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40769204"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40769204"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 18:24:17 -0700
-X-CSE-ConnectionGUID: 3XId+CpwRcup4hw+6LoFIA==
-X-CSE-MsgGUID: nYY7ZZ8XT8aQBqUAXsE3Xw==
+X-CSE-ConnectionGUID: GUE7Y+dvRjSSYU6F1TMxbw==
+X-CSE-MsgGUID: NYnuvrPVSNiuuMueSjJUfQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="32530610"
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="32530610"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 19:01:09 -0700
+X-CSE-ConnectionGUID: qpBwISFYS46tXapmQ++WeA==
+X-CSE-MsgGUID: cTaC7appS+WESSNDD4yrMw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
-   d="scan'208";a="86065323"
+   d="scan'208";a="104792722"
 Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.238.0.51]) ([10.238.0.51])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 18:24:10 -0700
-Message-ID: <25c32551-32e2-4a44-b0ae-30ad08e06799@linux.intel.com>
-Date: Mon, 28 Oct 2024 09:24:08 +0800
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 19:00:28 -0700
+Message-ID: <6a9366a5-7c5b-449c-b259-8e2492aae2a1@linux.intel.com>
+Date: Mon, 28 Oct 2024 10:00:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,110 +80,65 @@ Cc: baolu.lu@linux.intel.com, Leon Romanovsky <leonro@nvidia.com>,
  linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
  iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
  linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 05/18] dma: Provide an interface to allow allocate IOVA
+Subject: Re: [PATCH 07/18] dma-mapping: Implement link/unlink ranges API
 To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
  Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
  Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
  Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
 References: <cover.1730037276.git.leon@kernel.org>
- <844f3dcf9c341b8178bfbc90909ef13d11dd2193.1730037276.git.leon@kernel.org>
+ <b434f2f6d3c601649c9b6973a2ec3ec2149bba37.1730037276.git.leon@kernel.org>
 Content-Language: en-US
 From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <844f3dcf9c341b8178bfbc90909ef13d11dd2193.1730037276.git.leon@kernel.org>
+In-Reply-To: <b434f2f6d3c601649c9b6973a2ec3ec2149bba37.1730037276.git.leon@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2024/10/27 22:21, Leon Romanovsky wrote:
-> From: Leon Romanovsky<leonro@nvidia.com>
-> 
-> The existing .map_page() callback provides both allocating of IOVA
-> and linking DMA pages. That combination works great for most of the
-> callers who use it in control paths, but is less effective in fast
-> paths where there may be multiple calls to map_page().
-> 
-> These advanced callers already manage their data in some sort of
-> database and can perform IOVA allocation in advance, leaving range
-> linkage operation to be in fast path.
-> 
-> Provide an interface to allocate/deallocate IOVA and next patch
-> link/unlink DMA ranges to that specific IOVA.
-> 
-> The API is exported from dma-iommu as it is the only implementation
-> supported, the namespace is clearly different from iommu_* functions
-> which are not allowed to be used. This code layout allows us to save
-> function call per API call used in datapath as well as a lot of boilerplate
-> code.
-> 
-> Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
-> ---
->   drivers/iommu/dma-iommu.c   | 79 +++++++++++++++++++++++++++++++++++++
->   include/linux/dma-mapping.h | 15 +++++++
->   2 files changed, 94 insertions(+)
-> 
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index c422e36c0d66..0644152c5aad 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -1745,6 +1745,85 @@ size_t iommu_dma_max_mapping_size(struct device *dev)
->   	return SIZE_MAX;
->   }
->   
-> +static bool iommu_dma_iova_alloc(struct device *dev,
-> +		struct dma_iova_state *state, phys_addr_t phys, size_t size)
+> +/**
+> + * dma_iova_sync - Sync IOTLB
+> + * @dev: DMA device
+> + * @state: IOVA state
+> + * @offset: offset into the IOVA state to sync
+> + * @size: size of the buffer
+> + * @ret: return value from the last IOVA operation
+> + *
+> + * Sync IOTLB for the given IOVA state. This function should be called on
+> + * the IOVA-contigous range created by one ore more dma_iova_link() calls
+> + * to sync the IOTLB.
+> + */
+> +int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
+> +		size_t offset, size_t size, int ret)
 > +{
 > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
 > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
 > +	struct iova_domain *iovad = &cookie->iovad;
-> +	size_t iova_off = iova_offset(iovad, phys);
-> +	dma_addr_t addr;
+> +	dma_addr_t addr = state->addr + offset;
+> +	size_t iova_start_pad = iova_offset(iovad, addr);
 > +
-> +	if (WARN_ON_ONCE(!size))
-> +		return false;
-> +	if (WARN_ON_ONCE(size & DMA_IOVA_USE_SWIOTLB))
-> +		return false;
+> +	addr -= iova_start_pad;
+> +	size = iova_align(iovad, size + iova_start_pad);
 > +
-> +	addr = iommu_dma_alloc_iova(domain,
-> +			iova_align(iovad, size + iova_off),
-> +			dma_get_mask(dev), dev);
-> +	if (!addr)
-> +		return false;
-> +
-> +	state->addr = addr + iova_off;
-> +	state->__size = size;
-> +	return true;
-> +}
-> +
-> +/**
-> + * dma_iova_try_alloc - Try to allocate an IOVA space
-> + * @dev: Device to allocate the IOVA space for
-> + * @state: IOVA state
-> + * @phys: physical address
-I'm curious to know why a physical address is necessary for IOVA space
-allocation. Could you please elaborate?
+> +	if (!ret)
+> +		ret = iommu_sync_map(domain, addr, size);
+> +	if (ret)
+> +		iommu_unmap(domain, addr, size);
 
-> + * @size: IOVA size
-> + *
-> + * Check if @dev supports the IOVA-based DMA API, and if yes allocate IOVA space
-> + * for the given base address and size.
-> + *
-> + * Note: @phys is only used to calculate the IOVA alignment. Callers that always
-> + * do PAGE_SIZE aligned transfers can safely pass 0 here.
-> + *
-> + * Returns %true if the IOVA-based DMA API can be used and IOVA space has been
-> + * allocated, or %false if the regular DMA API should be used.
-> + */
-> +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-> +		phys_addr_t phys, size_t size)
-> +{
-> +	memset(state, 0, sizeof(*state));
-> +	if (!use_dma_iommu(dev))
-> +		return false;
-> +	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
-> +	    iommu_deferred_attach(dev, iommu_get_domain_for_dev(dev)))
-> +		return false;
-> +	return iommu_dma_iova_alloc(dev, state, phys, size);
+It appears strange that mapping is not done in this helper, but
+unmapping is added in the failure path. Perhaps I overlooked anything?
+To my understanding, it should like below:
+
+	return iommu_sync_map(domain, addr, size);
+
+In the drivers that make use of this interface should do something like
+below:
+
+	ret = dma_iova_sync(...);
+	if (ret)
+		dma_iova_destroy(...)
+
+> +	return ret;
 > +}
-> +EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
+> +EXPORT_SYMBOL_GPL(dma_iova_sync);
 
 Thanks,
 baolu
