@@ -1,108 +1,138 @@
-Return-Path: <kvm+bounces-29883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ADEF9B38FE
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5649B3917
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 19:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5F94B2248F
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:20:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7D94B213C3
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 18:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF971DF98B;
-	Mon, 28 Oct 2024 18:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDCE1DFDA1;
+	Mon, 28 Oct 2024 18:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tc5d8MxS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIJp2+P5"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B011DF251
-	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 18:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413461DF73A
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 18:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730139625; cv=none; b=sGvi6vz1PRl8unt1QtBmqSdjeHwmmRa+sa59BP/KvXHeS7y/66Gx90Ed1cJs5/cuybVD4WzW8xaKe8lNO6Kq1ZNd+jrOGTEy6uZPJWMp8RsARG61KwH1ZfZ4jSYiyfpAGPaYDzwIZawNwDoa6F6SXpbCLXXI6PTU5QF5dzMmqJI=
+	t=1730140061; cv=none; b=fujw9EMf6ihXQ8r0QkXA1KdjlOuPgbA23kk56vwuAwiz4QMlv6DRyi3M8ITMltjODR5HKbC31o7BwpHQwGuqiQNz2sVi2l6owkCqt8UhfqQx5QpOyEmwyseFq4NU4BSqwn+UzJYOTRXT5I6h5HizfAmKUxJlDaeyEhgZWmMnBlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730139625; c=relaxed/simple;
-	bh=lH79W0uMbqi4yKZO5aZMPWy4AfJYjDaphUfhMP+ya0k=;
+	s=arc-20240116; t=1730140061; c=relaxed/simple;
+	bh=b1S1kMmCum00nro+Vr3336NHK/tiVehkGpWnxsKKwWw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=p7DJugjdgc2+VYgrdjyCsTJtetPhu08UBGcwqtngaWJ7wQ+nr9ID3KHsj7rAfKI5RO2hs+ec9D4gmAtjlbRz622iZRLcxGeihacxz/drxUHsocSCE8Wwl3qtU4VM3lX8cNNHWPCwOWfkywd3/se/orS3aWPFcKHGhXIokqlccDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tc5d8MxS; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=Tw5TuKLZ8sRPQ1MdHINBJZYbQtGsMXtc324eBb6097HDRDgaoHAtdnAql+K2bhhy5p0vlTyLeJa73+8/q4T/9CGQVOK3bdrNmA3kWwugqQ0wk4lur28IzIA+Osd+nlU2lyIt+1FVpoJt0/+rZC3CqhU0T380iDaYGLAHc7PaekE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIJp2+P5; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e30b8fd4ca1so784335276.3
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 11:20:23 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e307c375d36so5562220276.1
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 11:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730139623; x=1730744423; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730140058; x=1730744858; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nJX4y1SwBFlqpYhxsuhY42rX3MFJuIm/9BwAllYm8WA=;
-        b=Tc5d8MxSoPIPgtRt+NJfUjdH4drZjGt+EMhYgbPW8f/eh2y+BOS5S12GL2TIW2hYxe
-         zJDqJF3ZFPI9kIPKB5u7R3Wf07hTkrm2AusSRkW1IA9Cj/DQX+dcBknwAE1q8oiB0aRw
-         k2HReaYW4eZLP9UYRtwXgKMHhzNHEk+APJxtPimEPqLZv5VMQBLXxNp14M4MP+aSe7HK
-         8X9oY4kino0jWxkrpLAcRjgOaccYDnxjNbuNwRBpsaDWstHXmd8MRoFCSR4weHZj6J1Q
-         4w924rhxpGjUdw+DOLjzqHqgSQr5l4zVqb/9E+iQhtX2GyYgHXAcCaJcpz+HZCY7ZlFU
-         zGoA==
+        bh=cmnbZOU0qjIEimURD21SxRpoBoMeIUpyXKqWoTkNi2A=;
+        b=dIJp2+P5X5PHVU8BE/doOTRgmnSVZxdnbz1OZM8RcfVnZSmOpPc9vMaZ4g6O5fliiK
+         Lsj1+wGw5dgihVYMbItp2+oHmp1s52H/tv38LGlMVo8ZUa6QCh6ptHB/LmlmIJMXtQ7m
+         uZT8ZDG9AX2mKEkY8j+4iHtvuacpJRsTLNaFaqNXYqs5IOdpJhfK2pQllemwf6ccR4DX
+         5qDnDeinhdrME/SEveYh0vszejw9eVoOFVs+7P4J63Xyowwtb+nDihI92dWgErXSxJtU
+         TRGSuWaghojh3XQGhw7Wt6AhIV5ehLclk1k0tZVQQXj7ueqoclII86rEfB61nDweIvfq
+         gMuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730139623; x=1730744423;
+        d=1e100.net; s=20230601; t=1730140058; x=1730744858;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nJX4y1SwBFlqpYhxsuhY42rX3MFJuIm/9BwAllYm8WA=;
-        b=UR/2X//TgceEa1fFcYBKyMWECnMVB6pLHkYg2k+rE33EqwgNa3ZXg6FGQhR7NX6KcZ
-         XISemdvwuxsipbweP01mZj+eSAHHiVqtx7ADwTnHXvyp8oGaoGo3FuEFuJ+s+weFBBGu
-         6fGOWr+TFcUMNGCQ3ANJ6GQmj2ksJWgWCOLvMbxt7XHybW5JzcDVdl9HVksSgme18ZPB
-         E/vfHdFgaXjza2Ouk97xqT4/4Ki0FCB/mrgfvSCI+859c+2De6POZWY8X+x+2vjfZngZ
-         cKrE4MUtz5xR2+9tTfUmbxsqWlDVqqJqtxYbhuHUOqnw/rzyGqR71JPsZCTc5XTN1XuU
-         zpBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWODbSZEwzXKUZpTNmcR6wIYyt1CW97z4rq6uxeS3HGpc4UwWa8pMgprKBLPCEAZL0Jxjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN+/zsL8tQj7b8XgqC/7fmfNVqwMNEGhdz5uwsonYDTZPMfbvU
-	VzWVfTq1Yjsrpdeeu8AH62xzCGPy07IPbZCZosWto9j+G1UchDj4fmOci6JkpcbkWSP2bYvIUeh
-	I2A==
-X-Google-Smtp-Source: AGHT+IFXrnGi8zCOlqbG2xXq8xFgLUpq2KxOh8G6ohInFjQzOCfOhTsZHU2ciqujNv6S3Xkjq8hOwwr3c9g=
+        bh=cmnbZOU0qjIEimURD21SxRpoBoMeIUpyXKqWoTkNi2A=;
+        b=hbUD9AqmNs++ACiH507PN1Ed4JCWZhWmbHeFi3s9uZSwlX1PryoHcL3B0S0uxIW049
+         WYUJFyzSkwDZUnVXAsIDn0fVSN6AIKfCE2tuO1Gcr/FIKdJbPa6ecQ+xJUNctk1o3U08
+         S3HgfFR4zwMHmaQX+DfPtmJe8S7WCwR+DFXQUtSrXfrSNQjB1txa07aM6wwhpg2AkBMT
+         nUe2v1UnJGpBjwc3kA7MKm7lHljfQs4WYHaX+H273H3uIWyUva942xsoKW4aUvcWuxd1
+         UMFxBfpQShYp0ANhrorLMi9UU+wa3kvLmfNm4M/0GQlCT7h2ZyfFDx2NYpg4GN2ZC7YQ
+         ukZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxuB6OH363IzsaYnWYeWGgM9uNJMwxoZsSlfHsLA7JGCaYQcO08kIGU5m3kRylxUnJwyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaRmufp5RYqOYfpRg6Br5bFv/Cy4DONQQExwz5oZLxdUzO/Scn
+	4+3ZxU9B2XZjbFsion9m4VWSPXIm3siA8k8j8aMefNuHAHyNrt5itsiRJ6gwnw/Q5krUVXf219F
+	bdA==
+X-Google-Smtp-Source: AGHT+IFn240YgEA2N2ByflWwnKUPX22a8Bmi+G7kKnmPMa+4cJwROFpduXbMAKP/dP2eb/K6QoAQDQFEUeI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:844e:0:b0:e30:b813:ca60 with SMTP id
- 3f1490d57ef6-e30b813d0a8mr995276.1.1730139623094; Mon, 28 Oct 2024 11:20:23
+ (user=seanjc job=sendgmr) by 2002:a25:b28e:0:b0:e29:6df8:ef58 with SMTP id
+ 3f1490d57ef6-e3087a5bd64mr65240276.4.1730140058246; Mon, 28 Oct 2024 11:27:38
  -0700 (PDT)
-Date: Mon, 28 Oct 2024 11:20:21 -0700
-In-Reply-To: <CAAH4kHZ-9ajaLH8C1N2MKzFuBKjx+BVk9-t24xhyEL3AKEeMQQ@mail.gmail.com>
+Date: Mon, 28 Oct 2024 11:27:36 -0700
+In-Reply-To: <Zx9Ua0dTQXwC9lzS@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240621134041.3170480-1-michael.roth@amd.com>
- <20240621134041.3170480-5-michael.roth@amd.com> <ZnwkMyy1kgu0dFdv@google.com>
- <r3tffokfww4yaytdfunj5kfy2aqqcsxp7sm3ga7wdytgyb3vnz@pfmstnvtuyg2>
- <Zn8YM-s0TRUk-6T-@google.com> <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
- <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com> <CAAH4kHZ-9ajaLH8C1N2MKzFuBKjx+BVk9-t24xhyEL3AKEeMQQ@mail.gmail.com>
-Message-ID: <Zx_V5SHwzDAl8ZQR@google.com>
-Subject: Re: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
+References: <20241001050110.3643764-1-xin@zytor.com> <20241001050110.3643764-26-xin@zytor.com>
+ <Zxn6Vc/2vvJ3VHCb@intel.com> <f9bb0740-21ec-482d-92fb-7fed3fef7d36@zytor.com> <Zx9Ua0dTQXwC9lzS@intel.com>
+Message-ID: <Zx_XmJnMCZjb7VBS@google.com>
+Subject: Re: [PATCH v3 25/27] KVM: nVMX: Add FRED VMCS fields
 From: Sean Christopherson <seanjc@google.com>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	pbonzini@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com, 
-	liam.merwick@oracle.com, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Chao P Peng <chao.p.peng@intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Xin Li <xin@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
+	peterz@infradead.org, andrew.cooper3@citrix.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Sep 13, 2024, Dionna Amalie Glaze wrote:
-> We can extend the ccp driver to, on extended guest request, lock the
-> command buffer, get the REPORTED_TCB, complete the request, unlock the
-> command buffer, and return both the response and the REPORTED_TCB at
-> the time of the request. 
+On Mon, Oct 28, 2024, Chao Gao wrote:
+> On Fri, Oct 25, 2024 at 12:25:45AM -0700, Xin Li wrote:
+> >> > static void nested_vmx_setup_cr_fixed(struct nested_vmx_msrs *msrs)
+> >> > diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> >> > index 2c296b6abb8c..5272f617fcef 100644
+> >> > --- a/arch/x86/kvm/vmx/nested.h
+> >> > +++ b/arch/x86/kvm/vmx/nested.h
+> >> > @@ -251,6 +251,14 @@ static inline bool nested_cpu_has_encls_exit(struct vmcs12 *vmcs12)
+> >> > 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING);
+> >> > }
+> >> > 
+> >> > +static inline bool nested_cpu_has_fred(struct vmcs12 *vmcs12)
+> >> > +{
+> >> > +	return vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_FRED &&
+> >> > +	       vmcs12->vm_exit_controls & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS &&
+> >> > +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_SAVE_IA32_FRED &&
+> >> > +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_LOAD_IA32_FRED;
+> >> 
+> >> Is it a requirement in the SDM that the VMM should enable all FRED controls or
+> >> none? If not, the VMM is allowed to enable only one or two of them. This means
+> >> KVM would need to emulate FRED controls for the L1 VMM as three separate
+> >> features.
+> >
+> >The SDM doesn't say that.  But FRED states are used during and
+> >immediately after VM entry and exit, I don't see a good reason for a VMM
+> >to enable only one or two of the 3 save/load configs.
 
-Holding a lock across an exit to userspace seems wildly unsafe.
+Not KVM's concern.
 
-Can you explain the race that you are trying to close, with the exact "bad" sequence
-of events laid out in chronological order, and an explanation of why the race can't
-be sovled in userspace?  I read through your previous comment[*] (which I assume
-is the race you want to close?), but I couldn't quite piece together exactly what's
-broken.
+> >Say if VM_ENTRY_LOAD_IA32_FRED is not set, it means a VMM needs to
+> >switch to guest FRED states before it does a VM entry, which is
+> >absolutely a big mess.
 
-[*] https://lore.kernel.org/all/CAAH4kHb03Una2kcvyC3W=1ZfANBWF_7a7zsSmWhr_r9g3rCDZw@mail.gmail.com
+Again, not KVM's concern.
+
+> If the VMM doesn't enable FRED, it's fine to load guest FRED states before VM
+> entry, right?
+
+Yep.  Or if L1 is simply broken and elects to manually load FRED state before
+VM-Enter instead of using VM_ENTRY_LOAD_IA32_FRED, then any badness that happens
+is 100% L1's problem to deal with.  KVM's responsiblity is to emulate the
+architectural behavior, what L1 may or may not do is irrelevant.
+
+> The key is to emulate hardware behavior accurately without making assumptions
+> about guests.
+
++1000
+
+> If some combinations of controls cannot be emulated properly, KVM
+> should report internal errors at some point.
 
