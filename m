@@ -1,353 +1,138 @@
-Return-Path: <kvm+bounces-29853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5859B3190
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 14:21:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D669B31B4
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 14:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AAA282CEB
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 13:21:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CF1D1F21E84
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2024 13:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736CE1DDC01;
-	Mon, 28 Oct 2024 13:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F4D1DC046;
+	Mon, 28 Oct 2024 13:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZM9Guy5t"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LJ2vzMym"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D501DD872;
-	Mon, 28 Oct 2024 13:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB2A1DBB2C
+	for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 13:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730121639; cv=none; b=PEzGGIaBVPpZ/5Mf0UALwp3h606MqL8zlbFWgwpV+sylD7K7K1uQmStNNNlMNAK7vglZTo9HMtqLBJxBSi9K5ZcxgAdK6JPTRtX3zlVtkteXZUscI8V5RoECN+awAg76rvkIsKflTITOOqc8zHTOmI024qMIFEZgWGyLwTf5RBo=
+	t=1730122189; cv=none; b=Ancfiz64yT8f+tNcpa8iy9RJ5i028wzsJXxUuJPxpA8nq9djLEjLgrycyU0AvT00C1BLhyj3QX6hBnR/jzxNW5VroGW6ixSI+gO+n12HgtUUYwr2GN/hysU8fw5VoWJ9QYEiznJw88PprTyHL5a1zUFdupHr9Fv57tdHynApcno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730121639; c=relaxed/simple;
-	bh=yjSEcZCTd05Yt7ubS1sHvNhzEiGxhRqRhxD7zM4nrxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BsFAHMujrU+hD+QAXXnYN/kHbZuQJ0ObgI/4WGifpNepkeUNkzgdTDZdtmeFZEdc8pvqhLiUB8LQSCOeEnUibd5cI6W4u6DnCumKBEMpD619sSH0QqcRDP96GkJUHTyaIIo+icQ5JxOkAm9Kt0H9563E10cqaA5cSlXm75Sn50Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZM9Guy5t; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730121637; x=1761657637;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yjSEcZCTd05Yt7ubS1sHvNhzEiGxhRqRhxD7zM4nrxo=;
-  b=ZM9Guy5tFjaQPiRaGzxgHoBF/TEugJu2NRCXwDzrCb1jA/ngrUDm34Nl
-   qgQFlqysrBFFUrnH58eKrkA0Gkxzj/YoTAyqsk3BSyRqbTvrzHqCtBYK2
-   abw+jO2+QKX9/qwB83QBv41YrrrQ/GfpEfmcQxFrcbc1KxCfpIP0D6riq
-   k5NyE9dBk/5/UxZ9xFmYbXX/SCBgkZ6fyCUZCSPX4xWeIXPQebeso+R2P
-   JOskGxD/EppS938x/8094/m/rLlAUpvf1oqz6pRDdfYwUjv2xjtcqg7Ig
-   3aTSJAK7Wn3d+iMZPtD8a51hI04TbZPF0JXygZh33awtsjZLjr3KRsHvc
-   Q==;
-X-CSE-ConnectionGUID: M7T0UVHgTIGx6Can7avk1g==
-X-CSE-MsgGUID: 5xoCxHObT7eC30oVwiQAFg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="29820983"
-X-IronPort-AV: E=Sophos;i="6.11,239,1725346800"; 
-   d="scan'208";a="29820983"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 06:20:37 -0700
-X-CSE-ConnectionGUID: qiJkstXASuSMyxbV2DxLPw==
-X-CSE-MsgGUID: N+xiRrQtRkqOLzEOyl+Mng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,239,1725346800"; 
-   d="scan'208";a="86397267"
-Received: from gargmani-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.222.169])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 06:20:35 -0700
-From: Kai Huang <kai.huang@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com
-Cc: isaku.yamahata@intel.com,
-	reinette.chatre@intel.com,
-	binbin.wu@linux.intel.com,
-	xiaoyao.li@intel.com,
-	yan.y.zhao@intel.com,
-	adrian.hunter@intel.com,
-	tony.lindgren@intel.com,
-	kristen@linux.intel.com,
-	linux-kernel@vger.kernel.org,
-	Kai Huang <kai.huang@intel.com>
-Subject: [PATCH 3/3] KVM: VMX: Initialize TDX during KVM module load
-Date: Tue, 29 Oct 2024 02:20:16 +1300
-Message-ID: <f7394b88a22e52774f23854950d45c1bfeafe42c.1730120881.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <cover.1730120881.git.kai.huang@intel.com>
-References: <cover.1730120881.git.kai.huang@intel.com>
+	s=arc-20240116; t=1730122189; c=relaxed/simple;
+	bh=5oyGvkREqDeHRidY85A/FS5BqBuSvvzmECWkFjPbNjw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K7tetKwZtQlFhVrx6BEH+M6sNu7xRPVvVbn+e/NoW1vpOQrUgXrYx5wZNugVsWiqcRKR5wn96ucIhudFSHa0EXDaAQyHrDxDxynLoMIzOv/EEMJQWPEtn3adM3ycV7QNVL3M6QMS2OerfKv6CuhTvbZbeqaNcc8ZMDAUgYnpZwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LJ2vzMym; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-37d70df0b1aso3593793f8f.3
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 06:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1730122186; x=1730726986; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w6EadJB8V7Y8cpv+mItipPaoLP4/d3PNTxf1GVBJWGY=;
+        b=LJ2vzMymnOGEvza1h1Xs90HPi5qGhobtWJWYjsRe3r2pLdU/uxA1PbTZ15zA7uDcg0
+         0Xk/z4fGCSiy6oij+LcAYPBf8gGgFBg5/JiLT44FTK4BduglJd0ZqNnq8RIldZ6i96ek
+         XUVqRmg2ER/i20MM1bMBWVDG11vw3PjU6Ds4PiTt4RTrNljeXTAsm4Cjrdyp4WfnOzC0
+         7LsgFkDtM7DB/gs3Xk8BznKq2FgbXWeOlfDxzIKCSnI2ZQ9IpVnPzcDaEIBK8aU2a4QR
+         BDYAKpGqb39IhV+YbNbCHRqCdAmIApFTGYhsdHgt4sOUWZ56teoJ/aL24L6EYeD9BY3L
+         ILzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730122186; x=1730726986;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6EadJB8V7Y8cpv+mItipPaoLP4/d3PNTxf1GVBJWGY=;
+        b=wLozQ4OS8/xxoy2DgAADjQBqcrdmjN8zas33WtqDuJqg07AT7NmCkEfSi6y6M0GlSw
+         D5+72ko7XgqHYUXTwyCatTWZPfGnHEWEA5dIZuko02Qva7VekL41CJdIlHLRiNoK3wJY
+         BpTGbw1noLydIVKtLQDYYFJJVuhjo3BaQGqOXkPpbD8hmoS+ejnrm9gsdfavtPbNC7GL
+         +TmMM8Sc1RtpCUBXuK0mGXPlay8YVi0rIZhV2EnP4DinR7omXbiK06spKz+voH38ClMO
+         xDr194+z+N9wXORrGsY6Q/sNkiNYkrHgX9gheIGMEW/PVKOM6JfIDaRQuyCWs/89bfIK
+         DkUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXc7tnCNX8x0Nh1gB5c1rYUEzFtmRHqIOHVQHLHN9wifEaUCvdvCJcE8Nhu2A5CpVX/kwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRTkUPqX/0HK8TlWu7ibZ11WIzTSX44owu1giJ7abceAVqwxIZ
+	/kfW8sF3hRoXIGvhBTzmHmdZNJcDXvrtVJwplXBbiHD+Eb6g/DrRTb7FMHnCX18=
+X-Google-Smtp-Source: AGHT+IEtvTZNKEmWWIFoMubPfm0ya5C1jtARvcC1GXFVdulw5wHQLnMw/8We5rF0Uedjydxv72ay8A==
+X-Received: by 2002:a5d:5f41:0:b0:37d:4f1b:35d with SMTP id ffacd0b85a97d-380611ff128mr6725541f8f.48.1730122185780;
+        Mon, 28 Oct 2024 06:29:45 -0700 (PDT)
+Received: from ?IPV6:2a10:bac0:b000:7465:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7465:7285:c2ff:fedd:7e3a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058bb4724sm9463052f8f.115.2024.10.28.06.29.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Oct 2024 06:29:45 -0700 (PDT)
+Message-ID: <1fb9d072-67a3-4149-b5a3-0ea79f2b0733@suse.com>
+Date: Mon, 28 Oct 2024 15:29:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 04/10] x86/virt/tdx: Use dedicated struct members for
+ PAMT entry sizes
+To: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com,
+ kirill.shutemov@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
+ peterz@infradead.org, mingo@redhat.com, hpa@zytor.com,
+ dan.j.williams@intel.com, seanjc@google.com, pbonzini@redhat.com
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, adrian.hunter@intel.com
+References: <cover.1730118186.git.kai.huang@intel.com>
+ <e1f311a32a1721cb138982d475515e24f18e4edb.1730118186.git.kai.huang@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <e1f311a32a1721cb138982d475515e24f18e4edb.1730118186.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Before KVM can use TDX to create and run TDX guests, TDX needs to be
-initialized from two perspectives: 1) TDX module must be initialized
-properly to a working state; 2) A per-cpu TDX initialization, a.k.a the
-TDH.SYS.LP.INIT SEAMCALL must be done on any logical cpu before it can
-run any other TDX SEAMCALLs.
 
-The TDX host core-kernel provides two functions to do above two
-respectively: tdx_enable() and tdx_cpu_enable().
 
-There are two options in terms of when to initialize TDX: initialize TDX
-at KVM module loading time, or when creating the first TDX guest.
+On 28.10.24 г. 14:41 ч., Kai Huang wrote:
+> Currently, the 'struct tdmr_sys_info_tdmr' which includes TDMR related
+> fields defines the PAMT entry sizes for TDX supported page sizes (4KB,
+> 2MB and 1GB) as an array:
+> 
+> 	struct tdx_sys_info_tdmr {
+> 		...
+> 		u16 pamt_entry_sizes[TDX_PS_NR];
+> 	};
+> 
+> PAMT entry sizes are needed when allocating PAMTs for each TDMR.  Using
+> the array to contain PAMT entry sizes reduces the number of arguments
+> that need to be passed when calling tdmr_set_up_pamt().  It also makes
+> the code pattern like below clearer:
+> 
+> 	for (pgsz = TDX_PS_4K; pgsz < TDX_PS_NR; pgsz++) {
+> 		pamt_size[pgsz] = tdmr_get_pamt_sz(tdmr, pgsz,
+> 					pamt_entry_size[pgsz]);
+> 		tdmr_pamt_size += pamt_size[pgsz];
+> 	}
+> 
+> However, the auto-generated metadata reading code generates a structure
+> member for each field.  The 'global_metadata.json' has a dedicated field
+> for each PAMT entry size, and the new 'struct tdx_sys_info_tdmr' looks
+> like:
+> 
+> 	struct tdx_sys_info_tdmr {
+> 		...
+> 		u16 pamt_4k_entry_size;
+> 		u16 pamt_2m_entry_size;
+> 		u16 pamt_1g_entry_size;
+> 	};
+> 
+> To prepare to use the auto-generated code, make the existing 'struct
+> tdx_sys_info_tdmr' look like the generated one.  But when passing to
+> tdmrs_set_up_pamt_all(), build a local array of PAMT entry sizes from
+> the structure so the code to allocate PAMTs can stay the same.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 
-Choose to initialize TDX during KVM module loading time:
-
-Initializing TDX module is both memory and CPU time consuming: 1) the
-kernel needs to allocate a non-trivial size(~1/256) of system memory
-as metadata used by TDX module to track each TDX-usable memory page's
-status; 2) the TDX module needs to initialize this metadata, one entry
-for each TDX-usable memory page.
-
-Also, the kernel uses alloc_contig_pages() to allocate those metadata
-chunks, because they are large and need to be physically contiguous.
-
-alloc_contig_pages() can fail.  If initializing TDX when creating the
-first TDX guest, then there's chance that KVM won't be able to run any
-TDX guests albeit KVM _declares_ to be able to support TDX.
-
-This isn't good to the user.  On the other hand, initializing TDX at KVM
-module loading time can make sure KVM is providing a consistent view of
-whether KVM can support TDX to the user.
-
-Always only try to initialize TDX after VMX has been initialized.  TDX
-is based on VMX, and if VMX fails to initialize then TDX is likely to be
-broken anyway.  Also, in practice, supporting TDX will require part of
-VMX and common x86 infrastructure in working order, so TDX cannot be
-sololy w/o VMX support.
-
-Specifically, initialize TDX after VMX has been initialized and before
-kvm_init() in vt_init().  Don't fail the whole vt_init() if TDX fails to
-initialize, since in this case KVM can still support normal VMX guests.
-
-Because TDX costs additional memory, don't enable TDX by default.  Add a
-new module parameter 'enable_tdx' to allow the user to opt-in.
-
-Register a new TDX-specific cpuhp callback to run tdx_cpu_enable(), and
-call tdx_enable() after that to ensure tdx_cpu_enable() has been done
-for all online CPUs before making the tdx_enable().  Use a dynamic cpuhp
-state for TDX so that KVM's cpuhp callback to enable VMX on new online
-CPU can happen before tdx_cpu_enable().
-
-Note, the name tdx_init() has already been taken by the early boot code.
-Use tdx_bringup() for initializing TDX (and tdx_cleanup() since KVM
-doesn't actually teardown TDX).  They don't match vt_init()/vt_exit(),
-vmx_init()/vmx_exit() etc but it's not end of the world.
-
-Also, once initialized, the TDX module cannot be disabled and enabled
-again w/o the TDX module runtime update, which isn't supported by the
-kernel.  After TDX is enabled, nothing needs to be done when KVM
-disables hardware virtualization, e.g., when offlining CPU, or during
-suspend/resume.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/Makefile   |   1 +
- arch/x86/kvm/vmx/main.c |   6 +++
- arch/x86/kvm/vmx/tdx.c  | 115 ++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h  |  12 +++++
- 4 files changed, 134 insertions(+)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
- create mode 100644 arch/x86/kvm/vmx/tdx.h
-
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index f9dddb8cb466..fec803aff7ad 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -20,6 +20,7 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
- kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
- 
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o
- 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 433ecbd90905..053294939eb1 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -6,6 +6,7 @@
- #include "nested.h"
- #include "pmu.h"
- #include "posted_intr.h"
-+#include "tdx.h"
- 
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
-@@ -170,6 +171,7 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
- static void vt_exit(void)
- {
- 	kvm_exit();
-+	tdx_cleanup();
- 	vmx_exit();
- }
- module_exit(vt_exit);
-@@ -182,6 +184,9 @@ static int __init vt_init(void)
- 	if (r)
- 		return r;
- 
-+	/* tdx_init() has been taken */
-+	tdx_bringup();
-+
- 	/*
- 	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
- 	 * exposed to userspace!
-@@ -194,6 +199,7 @@ static int __init vt_init(void)
- 	return 0;
- 
- err_kvm_init:
-+	tdx_cleanup();
- 	vmx_exit();
- 	return r;
- }
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..8651599822d5
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,115 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/cpu.h>
-+#include <asm/tdx.h>
-+#include "capabilities.h"
-+#include "tdx.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+static bool enable_tdx __ro_after_init;
-+module_param_named(tdx, enable_tdx, bool, 0444);
-+
-+static enum cpuhp_state tdx_cpuhp_state;
-+
-+static int tdx_online_cpu(unsigned int cpu)
-+{
-+	unsigned long flags;
-+	int r;
-+
-+	/* Sanity check CPU is already in post-VMXON */
-+	WARN_ON_ONCE(!(cr4_read_shadow() & X86_CR4_VMXE));
-+
-+	/* tdx_cpu_enable() must be called with IRQ disabled */
-+	local_irq_save(flags);
-+	r = tdx_cpu_enable();
-+	local_irq_restore(flags);
-+
-+	return r;
-+}
-+
-+static void __do_tdx_cleanup(void)
-+{
-+	/*
-+	 * Once TDX module is initialized, it cannot be disabled and
-+	 * re-initialized again w/o runtime update (which isn't
-+	 * supported by kernel).  In fact the kernel doesn't support
-+	 * disable (shut down) TDX module, so only need to remove the
-+	 * cpuhp state.
-+	 */
-+	WARN_ON_ONCE(!tdx_cpuhp_state);
-+	cpuhp_remove_state_nocalls(tdx_cpuhp_state);
-+	tdx_cpuhp_state = 0;
-+}
-+
-+static int __init __do_tdx_bringup(void)
-+{
-+	int r;
-+
-+	/*
-+	 * TDX-specific cpuhp callback to call tdx_cpu_enable() on all
-+	 * online CPUs before calling tdx_enable(), and on any new
-+	 * going-online CPU to make sure it is ready for TDX guest.
-+	 */
-+	r = cpuhp_setup_state_cpuslocked(CPUHP_AP_ONLINE_DYN,
-+					 "kvm/cpu/tdx:online",
-+					 tdx_online_cpu, NULL);
-+	if (r < 0)
-+		return r;
-+
-+	tdx_cpuhp_state = r;
-+
-+	/* tdx_enable() must be called with cpus_read_lock() */
-+	r = tdx_enable();
-+	if (r)
-+		__do_tdx_cleanup();
-+
-+	return r;
-+}
-+
-+static int __init __tdx_bringup(void)
-+{
-+	int r;
-+
-+	if (!enable_ept) {
-+		pr_err("Cannot enable TDX with EPT disabled.\n");
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * Enabling TDX requires enabling hardware virtualization first,
-+	 * as making SEAMCALLs requires CPU being in post-VMXON state.
-+	 */
-+	r = kvm_enable_virtualization();
-+	if (r)
-+		return r;
-+
-+	cpus_read_lock();
-+	r = __do_tdx_bringup();
-+	cpus_read_unlock();
-+
-+	if (r)
-+		goto tdx_bringup_err;
-+
-+	/*
-+	 * Leave hardware virtualization enabled after TDX is enabled
-+	 * successfully.  TDX CPU hotplug depends on this.
-+	 */
-+	return 0;
-+tdx_bringup_err:
-+	kvm_disable_virtualization();
-+	return r;
-+}
-+
-+void tdx_cleanup(void)
-+{
-+	if (enable_tdx) {
-+		__do_tdx_cleanup();
-+		kvm_disable_virtualization();
-+	}
-+}
-+
-+void __init tdx_bringup(void)
-+{
-+	enable_tdx = enable_tdx && !__tdx_bringup();
-+}
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-new file mode 100644
-index 000000000000..766a6121f670
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -0,0 +1,12 @@
-+#ifndef  __KVM_X86_VMX_TDX_H
-+#define __KVM_X86_VMX_TDX_H
-+
-+#ifdef CONFIG_INTEL_TDX_HOST
-+void tdx_bringup(void);
-+void tdx_cleanup(void);
-+#else
-+static inline void tdx_bringup(void) {}
-+static inline void tdx_cleanup(void) {}
-+#endif
-+
-+#endif
--- 
-2.46.2
-
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 
