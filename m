@@ -1,150 +1,229 @@
-Return-Path: <kvm+bounces-29963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BD3C9B4FC7
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:50:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16CA09B4FF6
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32782846EF
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 16:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB06C283253
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 16:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450991D2F73;
-	Tue, 29 Oct 2024 16:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEE61DA617;
+	Tue, 29 Oct 2024 16:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="akR45IMG"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SwzF4HOj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514CD7DA81;
-	Tue, 29 Oct 2024 16:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84EA1D7989
+	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 16:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730220615; cv=none; b=fOqF6HPjqNrTxS8TSf9qNqIyrMzyZ5mRLssS4xxWAVVdJn0iM5yp0AAA4il/+8VIwq1QGantwnu1g/uScDbj4CkWgINfyChX5FfXNt9zjyZm4KVnOOpwptIq57pbdEjit8Uvu+eppoAKWbftHwZCG6LkUyPg1JJwga2BOuhFlrg=
+	t=1730221154; cv=none; b=Cy0yaOTcrdBjyI9hwF3xbaT/n/aT8XZK3IlkDT/Gp0Ysms3EM+GlldxT0kohvunBbg8buJWDoMTFhZo2FNnFYybJu8hXhubraMMeVJuduUimukgtJle8TVjRpACtP9yiyqe+lVnADIUexYMcM9GQpwIX3qYDEVyhEp07TO3IAOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730220615; c=relaxed/simple;
-	bh=k6cUcZpUt6ToVhnKWvYenHvyQmKi0BhNKUXcYsKzO6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p/xew831ZISRUZ0/+x0sVElxeM8OGoM/ZR0uBaRV2cD2LnFmGF0ju9Xbk7pRENiqidgpOAuC5ONwZVQs2Gu2eps5rrXzcePVo4ZOM2dY6XZhKeYx1vCBbveoEmoZ0FqvayJrLH+fKhSOSESlfHMwiV+xqVmA7kpUHTB3t1bf/dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=akR45IMG; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730220614; x=1761756614;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=k6cUcZpUt6ToVhnKWvYenHvyQmKi0BhNKUXcYsKzO6A=;
-  b=akR45IMGtocEKUGBBS4yWh+txvAGK8F6CRBOSDu/1sWODDq+OhqGIDrs
-   495x/JFquDebrf3TprZje92HRY9r00ayybo/8ZjArkVqrmyJlQbOHE4Ei
-   e2wgvkrAH8UmM1isSi40w94sFjSO05MyzGkFE6iHFfa/i7UmX78F7Uk07
-   G33LJvflTQtFcoJQIoE2FryfnGggvIBFlLc/mzCNpvt7I4DT+7EGo/JOz
-   tdxBs0O8cLw6wo9DBJHgcRKwzTy0LbVka4he5/cx1T6/FXw4Dzw2r+MRV
-   BG7gARNyAAk29gmTba3sCJxLDUojiCxOgjW3Gi2+RT+0EyU1Or4wVQuNe
-   w==;
-X-CSE-ConnectionGUID: Uweodr7iR5SjR/MRcpGLsw==
-X-CSE-MsgGUID: vNg+M9ONRW+8Xv196Kro4A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30014691"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30014691"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 09:50:13 -0700
-X-CSE-ConnectionGUID: Ga5bH4q9Qd2z/rv4IY+qow==
-X-CSE-MsgGUID: PUT9jY7AQsuuEEYTZ7KBDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
-   d="scan'208";a="82088694"
-Received: from ccbilbre-mobl3.amr.corp.intel.com (HELO [10.124.223.38]) ([10.124.223.38])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 09:50:12 -0700
-Message-ID: <caef0899-0e8a-435d-9583-c52bb81d7e8d@intel.com>
-Date: Tue, 29 Oct 2024 09:50:11 -0700
+	s=arc-20240116; t=1730221154; c=relaxed/simple;
+	bh=qve4Uj21cHwTFynHyGZzk+eztrJ1eAD73FPERwjdao8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B2LnIJBv3aAPgffI3JJRYV2jvux9dBbIxPcqKr6C/STBxDKg/Qv9qpuvtOJPQ8cBpAuaBK1YfNe4P3x/V4in2rbBDimSWa5T1rfGp0QXsVWNoiYjUvByOj5K64/hkMiVqAvz+yNWSPo3FDtqyv1ng1O0uaZx8FwKUKU6QKSyTSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SwzF4HOj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TE9riu028493;
+	Tue, 29 Oct 2024 16:59:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=3wNjCE
+	i7HhyX8S1Zr5PH2k90gpq+kLoTJGaD3xBTcN0=; b=SwzF4HOjb1RPd+09qxcQ99
+	+PSVAc3HwP7y6LMMrrVjntm+sXHe8i8J9EGRRXBgct3kAwGVf/VbpksvbTaMp/U+
+	+D71IBJoGvj0UPJUlRqgVN8DG16KiJVlM0dvjz80XcZ/pcnvVlfLM+aH0LWWwTuC
+	Ul+QAcR+oA1qSLP1dvyMMTzqG7i2zvvrXfBQKUjZQfSXv7gp91f/TNqQTRmjeT/o
+	4J/3VWRd8Rtol9Y71DEvEIfAktjx92cFZmQeqwLwDQM6Ih5LX/hHvT1ACxo2aE/s
+	OiVT5iruOdJg4U9A4xkzLg4CHHjiXdmPKC/EZ5kfyqrE/70ovKkVYiWuN4I9iveA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42j3nst0qq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 16:59:07 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49TGx7Mq014190;
+	Tue, 29 Oct 2024 16:59:07 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42j3nst0qm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 16:59:07 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49TF1kdP018376;
+	Tue, 29 Oct 2024 16:59:06 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42hc8k3w1j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 16:59:06 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49TGx2Ct34669052
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Oct 2024 16:59:02 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5403620043;
+	Tue, 29 Oct 2024 16:59:02 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BD4B82004B;
+	Tue, 29 Oct 2024 16:59:01 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.81.218])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue, 29 Oct 2024 16:59:01 +0000 (GMT)
+Date: Tue, 29 Oct 2024 17:58:58 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
+        lvivier@redhat.com, frankja@linux.ibm.com, nrb@linux.ibm.com,
+        npiggin@gmail.com
+Subject: Re: [RFC kvm-unit-tests PATCH] lib/report: Return pass/fail result
+ from report
+Message-ID: <20241029175858.670ffe1c@p-imbrenda>
+In-Reply-To: <20241023165347.174745-2-andrew.jones@linux.dev>
+References: <20241023165347.174745-2-andrew.jones@linux.dev>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 03/13] x86/sev: Add Secure TSC support for SNP guests
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Borislav Petkov <bp@alien8.de>
-Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
- thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
- mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20241028053431.3439593-1-nikunj@amd.com>
- <20241028053431.3439593-4-nikunj@amd.com>
- <3ea9cbf7-aea2-4d30-971e-d2ca5c00fb66@intel.com>
- <56ce5e7b-48c1-73b0-ae4b-05b80f10ccf7@amd.com>
- <3782c833-94a0-4e41-9f40-8505a2681393@intel.com>
- <20241029142757.GHZyDw7TVsXGwlvv5P@fat_crate.local>
- <ef4f1d7a-cd5c-44db-9da0-1309b6aeaf6c@intel.com>
- <20241029150327.GKZyD5P1_tetoNaU_y@fat_crate.local>
- <59084476-e210-4392-b73b-1038a2956e31@intel.com>
-Content-Language: en-US
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <59084476-e210-4392-b73b-1038a2956e31@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tq6lUOPsDvbriUwdfES6o_6Odyq_VWEM
+X-Proofpoint-GUID: 0mZ1PJLDjNjAeTttrkV2GhYs-7QXDcu8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=999 clxscore=1011 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410290128
 
-On 10/29/24 08:14, Xiaoyao Li wrote:
-> On 10/29/2024 11:03 PM, Borislav Petkov wrote:
->> On Tue, Oct 29, 2024 at 10:50:18PM +0800, Xiaoyao Li wrote:
->>> I meant the starter to add SNP guest specific feature initialization
->>> code in
->>> somewhat in proper place.
->>
->> https://lore.kernel.org/r/20241029144948.GIZyD2DBjyg6FBLdo4@fat_crate.local
->>
->> IOW, I don't think we really have a "proper" place yet. 
+On Wed, 23 Oct 2024 18:53:48 +0200
+Andrew Jones <andrew.jones@linux.dev> wrote:
+
+> A nice pattern to use in order to try and maintain parsable reports,
+> but also output unexpected values, is
 > 
-> Then why can't we create one for it?
+>     if (!report(value == expected_value, "my test")) {
+>         report_info("failure due to unexpected value (received %d, expected %d)",
+>                     value, expected_value);
+>     }
 
-The code looks fine to me as-is.  If anyone sees a better way to
-refactor it and stash it elsewhere to make it cleaner and simpler, I'd
-love to see the patch.
+it would be cool if we could somehow do this with just one function
+call or macro, but I can't really think of a reasonable way to do it.
+
+this patch is a good step in that direction, though
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  lib/libcflat.h |  6 +++---
+>  lib/report.c   | 28 +++++++++++++++++++++-------
+>  2 files changed, 24 insertions(+), 10 deletions(-)
+> 
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index eec34c3f2710..b4110b9ec91b 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -97,11 +97,11 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
+>  extern void report_prefix_push(const char *prefix);
+>  extern void report_prefix_pop(void);
+>  extern void report_prefix_popn(int n);
+> -extern void report(bool pass, const char *msg_fmt, ...)
+> +extern bool report(bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 2, 3), nonnull(2)));
+> -extern void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+> +extern bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 3, 4), nonnull(3)));
+> -extern void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+> +extern bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+>  		__attribute__((format(printf, 3, 4), nonnull(3)));
+>  extern void report_abort(const char *msg_fmt, ...)
+>  					__attribute__((format(printf, 1, 2)))
+> diff --git a/lib/report.c b/lib/report.c
+> index 0756e64e6f10..43c0102c1b0e 100644
+> --- a/lib/report.c
+> +++ b/lib/report.c
+> @@ -89,7 +89,7 @@ void report_prefix_popn(int n)
+>  	spin_unlock(&lock);
+>  }
+>  
+> -static void va_report(const char *msg_fmt,
+> +static bool va_report(const char *msg_fmt,
+>  		bool pass, bool xfail, bool kfail, bool skip, va_list va)
+>  {
+>  	const char *prefix = skip ? "SKIP"
+> @@ -114,14 +114,20 @@ static void va_report(const char *msg_fmt,
+>  		failures++;
+>  
+>  	spin_unlock(&lock);
+> +
+> +	return pass || xfail;
+>  }
+>  
+> -void report(bool pass, const char *msg_fmt, ...)
+> +bool report(bool pass, const char *msg_fmt, ...)
+>  {
+>  	va_list va;
+> +	bool ret;
+> +
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, false, false, false, va);
+> +	ret = va_report(msg_fmt, pass, false, false, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  void report_pass(const char *msg_fmt, ...)
+> @@ -142,24 +148,32 @@ void report_fail(const char *msg_fmt, ...)
+>  	va_end(va);
+>  }
+>  
+> -void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+> +bool report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>  {
+> +	bool ret;
+> +
+>  	va_list va;
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, xfail, false, false, va);
+> +	ret = va_report(msg_fmt, pass, xfail, false, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  /*
+>   * kfail is known failure. If kfail is true then test will succeed
+>   * regardless of pass.
+>   */
+> -void report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+> +bool report_kfail(bool kfail, bool pass, const char *msg_fmt, ...)
+>  {
+> +	bool ret;
+> +
+>  	va_list va;
+>  	va_start(va, msg_fmt);
+> -	va_report(msg_fmt, pass, false, kfail, false, va);
+> +	ret = va_report(msg_fmt, pass, false, kfail, false, va);
+>  	va_end(va);
+> +
+> +	return ret;
+>  }
+>  
+>  void report_skip(const char *msg_fmt, ...)
+
 
