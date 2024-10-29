@@ -1,79 +1,54 @@
-Return-Path: <kvm+bounces-29968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D46B9B5119
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 18:39:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0EFC9B511D
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 18:41:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B177D1F2210F
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:39:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64CE51F221A7
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E851DD534;
-	Tue, 29 Oct 2024 17:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0091D356C;
+	Tue, 29 Oct 2024 17:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hUjxJgKv"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="prWlFthl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D314419992D
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 17:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FAE2107;
+	Tue, 29 Oct 2024 17:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730223523; cv=none; b=bUnjfIfU8FubWOaihSB8uLbd1brdt6FhBZLkq3RohHqeMJSSSS1hIdr6pAURncRFIQzbFKgZxcZDyiLlprpSJsfdWIubNf2zyFo8g/557A7/YyH//C6EJdTqlorqgw657/2aElk/xaS0JRgGcsBiMvnmGpS17uMc09cuzubLpWw=
+	t=1730223651; cv=none; b=tX3/AWfhI9f2ElciqjNOpZX+wRLSMVfaDuaQhMFfKmfJYB8wvYcXXl7Tv5PuN1xGPYIrnJN480J6XxhJ55U5AjtAgLXqbMeobLeuiipgdYPS33jikJpmZLkAJtlda0BCy+NjBIUBSRMwKyGeajUhinyCh7NjfQT1OCXb8HkYrYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730223523; c=relaxed/simple;
-	bh=4hBwtnFU0qAi8YGRKbcNCKRHUnrB/+rP1zHxyIDHDIY=;
+	s=arc-20240116; t=1730223651; c=relaxed/simple;
+	bh=nOaHu/IehEL6OQiLLzh5zQdYlqOfd77xgDIYOg4DnAo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ot+5Vm9nCMhIa6S6pgRRzEdLaGSyZgC/PZM9IZkzZueo5wPRuoL98SPxBZ0KJyRSvZvUQa2KvlndZ6akNWjq2wGn1GRBUjojhYrcA+0tkbJBux04KJ4JttGTSxPRJSgaxke9QttOf+4+yljdT6hKyLJ7oAISgmanMMN3Tho2Ntk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hUjxJgKv; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4608dddaa35so29181cf.0
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 10:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730223521; x=1730828321; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4NzyGHFNG2VmMmlShndRLXedmken+2X5Xff0mPyjqlA=;
-        b=hUjxJgKvHxAOY5hISm4fq/HeoWH2gj4mCsB0pkCG5Z7KJ1VTYeEmDkP0zGN2swHyLA
-         7mGJnvUloXhk+Rk8ZLBl4j44+mzOjwQCzCZfY5Sli9sVthBuX/PC771c1Uz/r9Zp5pdW
-         JIITbUX54UK+WpZbNgN4NGs4oXwhq5AknU39ekoVXGvNq9jERaWj/hukhNschvs4KPSc
-         hyaBkLFul987AhIbGiN5J0ZFxr1oV9TlVufDCIEquAQdwdoRNezmz7/uq+azeQsdv74o
-         sDMUiaiN52avjw2RNVRPL3aLuk5ABUN0i9v8csEinYvtPXHDWUx95hGGw0d+EJofR2aK
-         fTvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730223521; x=1730828321;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4NzyGHFNG2VmMmlShndRLXedmken+2X5Xff0mPyjqlA=;
-        b=bCTvAJiDRS0KRoZsPDbHAT0g4vjyb5hcLXkgO9JexcbsJzgu4fv40gXZQpvqzxpPdH
-         dWPNjqHi6IAWpXgSpl00aqAVjs28oWf5JXmDzgANHtz8FXVRpd7AAFTyoPxYqO2r/5uk
-         ldTOh3C9WGljaEYreKi8X4dHPPK0toeGnfBzvP1iY41gJS19c4w/R9SbX0leS7KvjtSl
-         hbg8CMS13ftRswGNC54lFATODCYJbf2wHTVFuiC6fhdLr/HAWloYPPNkm2TYSkP6oS0X
-         3VdhdY1gMOXgQKEDwkIIcF2mzm+l6OxanOzbEflM3AZQfoP1SN/3TpfSE+EJtxJKsyeL
-         fLNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJP6fME/0nszf1WMUmGvZI2ZI8Vk/x3j7KMH77zkcmp/UvpflwilDZDF/j0hUCABUXai4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdtEZxcUzhhasPxZkvzq0HUsyTePql6waZjBmO98oH0dadDYZa
-	dV8PWo7MJgnuDkOdA5Q6+jwnXACMhtAwY5TqC4f51g8/hj4jPrAl52e449xPNw==
-X-Gm-Gg: ASbGncvUgMFE4OE5VyhP8rENJbQu5fzkm/MNvppetZwrifIZJfVA8tqcuhoBM7bnLk5
-	WvXzHHrLHvTJEAA2MmW+YHPdMUdf3S0HRXEGEqiURLKsZHe+fj6cSX1E4lG4Z9+pFtEZkxYAdYX
-	uuexthkHZLy3nsqaN1D7mbuHLSIkbv2z8iTygyHq7qRhKltp4AkJBLfymK2QN5ZJJEApKdbKnrq
-	HrjM5PGQc6XeZRziF1jxTkkC1FoVO1+vR5rNtLcBORA3GxXP1jQxObfkh2aW+NyqL333UlaChFX
-	yovOph1H2z2hW42tCAec
-X-Google-Smtp-Source: AGHT+IH+aatp5vvOT3MLmDgG/8NEz2ktnGYsU3OGGl2E+dYdZKM2fvH7N/zzBC7qLEmuQMllIaaB+w==
-X-Received: by 2002:a05:622a:1a9d:b0:460:f093:f259 with SMTP id d75a77b69052e-46164fcec8fmr4325821cf.22.1730223520365;
-        Tue, 29 Oct 2024 10:38:40 -0700 (PDT)
-Received: from ?IPV6:2600:1700:38d4:55d0:4aae:c9af:39c8:58b? ([2600:1700:38d4:55d0:4aae:c9af:39c8:58b])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ec187389a0sm2417435eaf.42.2024.10.29.10.38.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 10:38:38 -0700 (PDT)
-Message-ID: <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com>
-Date: Tue, 29 Oct 2024 10:38:27 -0700
+	 In-Reply-To:Content-Type; b=uiVu1IeFlnaGi2enyIU/OKZbZzrYravHgANnWMP7wUqRA0g54cZ0jdnTi1zmPSEtKlTMU3gj95mjMHqJWLhqWy2M1OT2GFg0FOWu7pwPzgzvBa4wIgI/kBOVaj+3KyURikYp6iOnY+e8bQM70MDdDOELd311ndls6DFrRro7LS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=prWlFthl; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49THe3A6451693
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 29 Oct 2024 10:40:03 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49THe3A6451693
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024101701; t=1730223604;
+	bh=l0/F6+jn/7mFUkBUVW0dl3LGmpVjN1lVeIa3tibqzhE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=prWlFthlScSlGElGCx1KOSTF9/+bR6IBrIn8zROURZ5GpR4+/Zk6ti2sYv2aB51+q
+	 HHVlYD85bN5u0dbpR9sNp/BA3UPvMJvN3/SHrVSZo8GM6HgdU7V92S5C04ByVEFS4a
+	 BX76o/UpzVfQPaLSFvo5M2l8NnsMtRt7ZhtLnPX2TbZrGJdoqqL+JSp9S1ZVk5r3P2
+	 /L1x8K52qb0lsshahMxfSv1dgjPVZx0/gSSVzd+rDgG/S68izOfhu+FZ+b34obl1mV
+	 dEOG8vkad6Q0JdH7jyNB3jFeZhw745r8bwrYm1G7qOHUjtJZuzqryj6CA4I1lyoEoQ
+	 OFq5kEREnpMcw==
+Message-ID: <538c630c-0de3-4807-9e9f-6af02dd18d0e@zytor.com>
+Date: Tue, 29 Oct 2024 10:40:03 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,81 +56,115 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr
- compatible
-To: Brendan Jackman <jackmanb@google.com>, Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Alexandre Chartre <alexandre.chartre@oracle.com>,
- Liran Alon <liran.alon@oracle.com>,
- Jan Setje-Eilers <jan.setjeeilers@oracle.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>,
- Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>,
- Vlastimil Babka <vbabka@suse.cz>, Michal Hocko <mhocko@kernel.org>,
- Khalid Aziz <khalid.aziz@oracle.com>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>,
- Reiji Watanabe <reijiw@google.com>, Ofir Weisse <oweisse@google.com>,
- Yosry Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>,
- KP Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>,
- Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kvm@vger.kernel.org
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com>
- <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
- <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
+Subject: Re: [PATCH v3 25/27] KVM: nVMX: Add FRED VMCS fields
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
+References: <20241001050110.3643764-1-xin@zytor.com>
+ <20241001050110.3643764-26-xin@zytor.com> <Zxn6Vc/2vvJ3VHCb@intel.com>
+ <f9bb0740-21ec-482d-92fb-7fed3fef7d36@zytor.com> <Zx9Ua0dTQXwC9lzS@intel.com>
+ <Zx_XmJnMCZjb7VBS@google.com>
 Content-Language: en-US
-From: Junaid Shahid <junaids@google.com>
-In-Reply-To: <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <Zx_XmJnMCZjb7VBS@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/25/24 6:21 AM, Brendan Jackman wrote:
-> Hey Boris,
+On 10/28/2024 11:27 AM, Sean Christopherson wrote:
+> On Mon, Oct 28, 2024, Chao Gao wrote:
+>> On Fri, Oct 25, 2024 at 12:25:45AM -0700, Xin Li wrote:
+>>>>> static void nested_vmx_setup_cr_fixed(struct nested_vmx_msrs *msrs)
+>>>>> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+>>>>> index 2c296b6abb8c..5272f617fcef 100644
+>>>>> --- a/arch/x86/kvm/vmx/nested.h
+>>>>> +++ b/arch/x86/kvm/vmx/nested.h
+>>>>> @@ -251,6 +251,14 @@ static inline bool nested_cpu_has_encls_exit(struct vmcs12 *vmcs12)
+>>>>> 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING);
+>>>>> }
+>>>>>
+>>>>> +static inline bool nested_cpu_has_fred(struct vmcs12 *vmcs12)
+>>>>> +{
+>>>>> +	return vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_FRED &&
+>>>>> +	       vmcs12->vm_exit_controls & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS &&
+>>>>> +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_SAVE_IA32_FRED &&
+>>>>> +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_LOAD_IA32_FRED;
+>>>>
+>>>> Is it a requirement in the SDM that the VMM should enable all FRED controls or
+>>>> none? If not, the VMM is allowed to enable only one or two of them. This means
+>>>> KVM would need to emulate FRED controls for the L1 VMM as three separate
+>>>> features.
+>>>
+>>> The SDM doesn't say that.  But FRED states are used during and
+>>> immediately after VM entry and exit, I don't see a good reason for a VMM
+>>> to enable only one or two of the 3 save/load configs.
 > 
-> On Fri, 25 Oct 2024 at 13:41, Borislav Petkov <bp@alien8.de> wrote:
->>
->> On Fri, Jul 12, 2024 at 05:00:19PM +0000, Brendan Jackman wrote:
->>> +/*
->>> + * Can be used for functions which themselves are not strictly noinstr, but
->>> + * may be called from noinstr code.
->>> + */
->>> +#define inline_or_noinstr                                            \
->>
->> Hmm, this is confusing. So is it noinstr or is it getting inlined?
+> Not KVM's concern.
 > 
-> We don't care if it's getting inlined, which is kinda the point. This
-> annotation means "you may call this function from noinstr code". My
-> current understanding is that the normal noinstr annotation means
-> "this function fundamentally mustn't be instrumented".
+>>> Say if VM_ENTRY_LOAD_IA32_FRED is not set, it means a VMM needs to
+>>> switch to guest FRED states before it does a VM entry, which is
+>>> absolutely a big mess.
 > 
-> So with inline_or_noinstr you get:
+> Again, not KVM's concern.
 > 
-> 1. "Documentation" that the function itself doesn't have any problem
-> with getting traced etc.
-> 2. Freedom for the compiler to inline or not.
+>> If the VMM doesn't enable FRED, it's fine to load guest FRED states before VM
+>> entry, right?
 > 
->> I'd expect you either always inline the small functions - as you do for some
->> aleady - or mark the others noinstr. But not something in between.
->>
->> Why this?
-> 
-> Overall it's pretty likely I'm wrong about the subtlety of noinstr's
-> meaning. And the benefits I listed above are pretty minor. I should
-> have looked into this as it would have been an opportunity to reduce
-> the patch count of this RFC!
-> 
-> Maybe I'm also forgetting something more important, perhaps Junaid
-> will weigh in...
+> Yep.  Or if L1 is simply broken and elects to manually load FRED state before
+> VM-Enter instead of using VM_ENTRY_LOAD_IA32_FRED, then any badness that happens
+> is 100% L1's problem to deal with.  KVM's responsiblity is to emulate the
+> architectural behavior, what L1 may or may not do is irrelevant.
 
-Yes, IIRC the idea was that there is no need to prohibit inlining for this class 
-of functions.
+Damn, obviously I COMPLETELY missed this point.
 
+Let me think how should KVM as L0 handle it.
+
+> 
+>> The key is to emulate hardware behavior accurately without making assumptions
+>> about guests.
+> 
+> +1000
+> 
+>> If some combinations of controls cannot be emulated properly, KVM
+>> should report internal errors at some point.
+
+Yeah, only if CANNOT.  Otherwise a broken VMM will behave differently on
+real hardware and KVM, even if it crashes in a way which it never knows
+about, right?
 
