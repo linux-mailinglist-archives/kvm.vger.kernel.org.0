@@ -1,97 +1,104 @@
-Return-Path: <kvm+bounces-29946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0244A9B4BF4
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 334F69B4C10
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:28:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC21528298F
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:18:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE29228496F
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435B206E9E;
-	Tue, 29 Oct 2024 14:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6672071EC;
+	Tue, 29 Oct 2024 14:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npqMchlO"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="AOPK1UCw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F33E1E507;
-	Tue, 29 Oct 2024 14:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628C620696B;
+	Tue, 29 Oct 2024 14:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730211489; cv=none; b=pZrU4JCZ1TgoKsvWmPFVEeWs1k+k8jAs7hTEi5LbvUSsWhZR0BQvQVaElz9evgN3hQpSZFM5/BhgfHzyYv4VWM1G/jg6fiWSZ9S+dBM/2qKR+bSn9pCPojkIUI+trp+2nwxus2QlpwOubenpCCH9E8QrMbJS3zdm5AtOKW7CFg0=
+	t=1730212103; cv=none; b=sPSSdpVzM1txkvvy7ertX/JY8aLSmHXTB8biB8DsF9tccNTZW4o+xPxGLkD0Do3DkXDuOqgKAotX4A95kt9oi/yr1Z/+pCIC7lLjCS6oh2MZWXuaXx9WAiQVvqCL0LuGKH6X78/gjdOr5mDvDiSkqkvx+m2/0bj8RYetDMtUcVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730211489; c=relaxed/simple;
-	bh=McEZtfOP6VjUEou6D0sp3RbKj3XY5E+ZTox3plQDDlw=;
+	s=arc-20240116; t=1730212103; c=relaxed/simple;
+	bh=zQSTQuHfIXDeySIqsjpMXxQJKi9tTYPZ4/OJS6CLMo8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OGBMhmMKgmKNpmce4r3Qn0vryJYO3jRVAL4yDhOHFC9pJLFMURCHjErZmtOsQWtnWd6bMcX4UJhSR7L6+5rLZbgCwB6+ikDMzLz4yhbs6HPhBWxbWrhtereRmtidkl4XVTn5DESPc35UidQRwkxaSEgGr+2bgmnpG1EcdtbigfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npqMchlO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39ACFC4CECD;
-	Tue, 29 Oct 2024 14:18:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730211488;
-	bh=McEZtfOP6VjUEou6D0sp3RbKj3XY5E+ZTox3plQDDlw=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZHmJEenVZdUVnzyC0+X+/AA45X3Y0WTDSJLoyqbL+w2MEYPjGiwXxbykhTjQRn+z0XhRnPetloR/2pDn07ychaIw/BvavrsAyezWahTceELCrF+oMKCip7BB/RtMfz4ZjrIyeYx848ZONcr9Nm1xxmOZbrj9/+oEv1I3wdJ1Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=AOPK1UCw; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2D86B40E0219;
+	Tue, 29 Oct 2024 14:28:19 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id LrVDKlyK2IwV; Tue, 29 Oct 2024 14:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730212095; bh=yizANEBOVFjBZEYttknFswJfr+e4kzXqziGfAwRn6SM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=npqMchlOZfIXy9KzRwaSUcGb/ms2aTIHWUQ4JfHeUuGZMvAglstLEEUurwzfuei2d
-	 1qSdZTkt34eaSjcHboitlPT3HA4EpYuPb+yZ7oEUUiixJKpSyoIwhnaGEx14iDaKuz
-	 XU0tPuFMVt406sGyhOVypLWhJNs7BE5PvJnd3N65XOWOxmZbbjNiyeoYR3yBj6KNgk
-	 X24A+WyU1Gv6tTCepVkJ4vRlvjJsTjoJFG/pk+Md1+uk308yBlMoUnKjO15tzpqOoT
-	 e+NJBXDJ/gXF5PcovPlHo1iKoLkuoSuBE5NgM0v9//i4APxMRfEC7K8hnGzL47qSR8
-	 WE+eN6fUpNGMQ==
-Date: Tue, 29 Oct 2024 14:18:03 +0000
-From: Will Deacon <will@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>,
-	Alexander Potapenko <glider@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 0/6] KVM: Fix bugs in vCPUs xarray usage
-Message-ID: <20241029141802.GA4691@willie-the-truck>
-References: <20241009150455.1057573-1-seanjc@google.com>
+	b=AOPK1UCwnkFenxQpt44QmxIH1vtwwF6zF8mdVeBFh4qtka21vsyKrM+lPq37mSgDX
+	 3M92Lfp2I0a5/AYpKpu5KcysLz6U8E/Ir4Nn2Bpve6qAp2ezX0N5bHuDfWil0+03rt
+	 fahYiNYLz3uyxR6/DqQ6DhFLdWv4/L/JQ4qWvuA0j8kBDIPYu1Ddll00vznfobucDB
+	 YDAj4Jq1qzpT81QWcfdso285LvBYM6ntwGGjDjP0vTBvZhT2xNVCQ8qOSRSsnqVbMJ
+	 YsPNF1dAaM3WmTR0v3G0YZhwUMLtGVzu47QaUXYjyW9oOd13vRriUR3aiCZgrcr2u4
+	 numfSVDjonRPvQcl7fry+SFKwdfar4rwsTbZ4kEoTadMwfUwA1OAO5/R1AK/OXsysA
+	 h/NMOCltcbBO9/lsq4gGxr3hlMdH+wAU3DqIUsYDICnhcDVA35yQCgrDY0Jtoxj73a
+	 Pw2THF6DO84c/RRga1SCLcrbUerlmoHwCE6fVEq1paYJiiHM87EskF+9GDhlWSMK+J
+	 aSLr++g29zRojnmAprJ51OWFr4ZRyOGqOXdG6g/n7EC580s0mGFxYVS+aKKNs+mgep
+	 cxfhG2smpYdzYklTnabb8h1tBKWyPkFb37uB1tMe5WrEwMi4LXB6aTjQJGCO0EbGeE
+	 IYZOg2+NJ37NiXYrnjOXlMjc=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EB72040E01A5;
+	Tue, 29 Oct 2024 14:28:02 +0000 (UTC)
+Date: Tue, 29 Oct 2024 15:27:57 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+	pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+Subject: Re: [PATCH v14 03/13] x86/sev: Add Secure TSC support for SNP guests
+Message-ID: <20241029142757.GHZyDw7TVsXGwlvv5P@fat_crate.local>
+References: <20241028053431.3439593-1-nikunj@amd.com>
+ <20241028053431.3439593-4-nikunj@amd.com>
+ <3ea9cbf7-aea2-4d30-971e-d2ca5c00fb66@intel.com>
+ <56ce5e7b-48c1-73b0-ae4b-05b80f10ccf7@amd.com>
+ <3782c833-94a0-4e41-9f40-8505a2681393@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241009150455.1057573-1-seanjc@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <3782c833-94a0-4e41-9f40-8505a2681393@intel.com>
 
-On Wed, Oct 09, 2024 at 08:04:49AM -0700, Sean Christopherson wrote:
-> This series stems from Will's observation[*] that kvm_vm_ioctl_create_vcpu()'s
-> handling of xa_store() failure when inserting into vcpu_array is technically
-> broken, although in practice it's impossible for xa_store() to fail.
-> 
-> After much back and forth and staring, I realized that commit afb2acb2e3a3
-> ("KVM: Fix vcpu_array[0] races") papered over underlying bugs in
-> kvm_get_vcpu() and kvm_for_each_vcpu().  The core problem is that KVM
-> allowed other tasks to see vCPU0 while online_vcpus==0, and thus trying
-> to gracefully error out of vCPU creation led to use-after-free failures.
-> 
-> So, rather than trying to solve the unsolvable problem for an error path
-> that should be impossible to hit, fix the underlying issue and ensure that
-> vcpu_array[0] is accessed if and only if online_vcpus is non-zero.
-> 
-> Patch 3 fixes a race Michal identified when we were trying to figure out
-> how to handle the xa_store() mess.
-> 
-> Patch 4 reverts afb2acb2e3a3.
-> 
-> Patches 5 and 6 are tangentially related cleanups.
+On Tue, Oct 29, 2024 at 05:19:29PM +0800, Xiaoyao Li wrote:
+> IMHO, it's a bad starter.
 
-Thanks, Sean. For the series:
+What does a "bad starter" mean exactly?
 
-Acked-by: Will Deacon <will@kernel.org>
+> As more and more SNP features will be enabled in the future, a SNP init
+> function like tdx_early_init() would be a good place for all SNP guest
+> stuff.
 
-I sympathise a little with Paolo on patch 4, but at the end of the day
-it's a revert and I think that the code is better for it, even if the
-whole scenario is messy.
+There is already a call to sme_early_init() around that area. It could be
+repurposed for SEV/SNP stuff too...
 
-Will
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
