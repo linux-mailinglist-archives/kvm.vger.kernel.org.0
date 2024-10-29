@@ -1,169 +1,129 @@
-Return-Path: <kvm+bounces-29918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401189B40BA
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 04:03:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 390949B40ED
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 04:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A569BB21A45
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 03:03:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F25E12838CD
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 03:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6C61FCF49;
-	Tue, 29 Oct 2024 03:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0696620101C;
+	Tue, 29 Oct 2024 03:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l5VlXwzk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTHuSNJ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B8B149C4F;
-	Tue, 29 Oct 2024 03:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7CE1FCF49
+	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 03:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730170973; cv=none; b=Yp4oT06r3hpBnfguctUXYxOZ1um6DohYf8mnAzFNfY5u0I+/mnFdnSNtJ4aPIpV0v7SeYJ4cL9i/Ol/adstsZMWQNAiCnnZJrOYUT1OXuWdUjl1Y4mHckuW5gW+nZN6q8GkvvDjL2i/hZwm7AIo4vNW1aH2eeNj4XouFffqzagk=
+	t=1730171650; cv=none; b=njRODY3lixl6s5Lw6xt9js03dUeqpYFTn0WS8YaK+RwX2uUDRaJSkoOga6diXfXbAil8tJT5+TuyK3LDJdC2n1uo1Ob/bPj/Bx58UrLiKvfRBAPwuHfAqzpWehZpKDX+Q/MPAcnboCeNrxLTlCLIWcX5r64IUByjmaLNn3JJ4vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730170973; c=relaxed/simple;
-	bh=YJirQKrSE6yxS55nJowHms/VDNWK13GiMmuZEuD9SnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YwoB6oGv437csV4wNi+NXgaVYeQoYDFDnDcW/syy0u3j3D+iDY4Euzuw0tXs9VeYQeB7S7xOl0f31veJCOUTJXsi4L0xGoHHnIj4dStC7mkm+FpVBpWbgDZZb6rjVR4OiTcCA+8jiay1sfcDvKH/Gu2qPI6dAN9TFOa8jm3gv4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l5VlXwzk; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730170971; x=1761706971;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=YJirQKrSE6yxS55nJowHms/VDNWK13GiMmuZEuD9SnQ=;
-  b=l5VlXwzkBhRatUzpiJnnKg+c0Y/H21PZxvwcFDYMW4IK69Bx9vmrV+nN
-   OXTTpFfncgIuVrVdBBKcZ/e6pc1mHou+Bmyytn0Hyp4Kzc7SlVIR+vj1X
-   YFj010ZQA4ytUSbivBfRxfgrZ9bZePQc3c9WYpXgaegnC5rOTZHVCPkdY
-   JuAz5cIGbhDu7azRsyiglInTfaIuk7YVIcCnVCgGa+BkvoygHn6luDeKC
-   qp1r7VrE/WzN/OwaMnYHIVv9KMerfgavRFXlE/mDAOJL3nHLbONqdSkj+
-   6PYIuCoCYO8UmkbeXQRflIUjn46KHd+NrObQKgGKhu44v8EhiuzyrTK0z
-   w==;
-X-CSE-ConnectionGUID: 5JxL2fBtRFmAJtoRJwK8Rw==
-X-CSE-MsgGUID: wUpqbguxSMm5pOmgWOVwiw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47255576"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="47255576"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 20:02:50 -0700
-X-CSE-ConnectionGUID: wW+3HsnpRHeswz3V7zRU2w==
-X-CSE-MsgGUID: zcvFjNC5Tj+aNRVtubgFPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,240,1725346800"; 
-   d="scan'208";a="81906246"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.172]) ([10.124.227.172])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 20:02:46 -0700
-Message-ID: <b015fb9c-4595-49a9-afde-ef01a45e15d1@intel.com>
-Date: Tue, 29 Oct 2024 11:02:44 +0800
+	s=arc-20240116; t=1730171650; c=relaxed/simple;
+	bh=e3mnB95l0+StkHV8WW0Kyb3JcGNBepgPCH3LG4uxrl0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Um0gNPdxuFo2n8hInK+nGa9hII33I1qjEMATJJgnZDr6cn/ZPB0FsJ48W9KV9fNjZCM6/uRCYBaxqa8GqMBpUZO/QebDw38Mc99WGg6DyI1E11YqNNPJNP+3Qikm2dQkb2MoaZX1Uwz0v62lPYLu5jDXo4n0AqsilMJ9b/oEqRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FTHuSNJ6; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20e6981ca77so53354535ad.2
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 20:14:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730171647; x=1730776447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hY0U2BSY5rjzdYRiUNE/NnDc+Aaii3oMoTVczkWgK4w=;
+        b=FTHuSNJ67zaIA9cG0k+vQwxZIexe1ZNPTSC1HUo51rwacuTIKUQAlAzQu1PGrr5CKB
+         2AdRcoFcJM136+545QgL49uxIfwivO5CVlLc8eluNYHdca9NQKD0iI4jhCe2DedZoSJc
+         brl3sP2C6vhQ4bZWcW7QI7Qk1RZNjUk7gw9CwNUjVZDTgSwZSNvqa7jm5mLQcdk0cGNj
+         jlab/0aA9YcAUNyFpd8wzENuRABg/V00OtPPgZwi+RP6WSEijDiR4wil9FBj7BlKg6f3
+         S2QjDkneRyomWhhM5YUC1Nb7CQkqKnPuG1PKTghH8Pg6ibXGwIwtrB3gKfL0yitTV04K
+         atbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730171647; x=1730776447;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hY0U2BSY5rjzdYRiUNE/NnDc+Aaii3oMoTVczkWgK4w=;
+        b=Jh8dbMpp6UFUcrlBOJivQsEdS6wAMGAdxlRqi1Buonu75TgrA9IAQEzJHuy4zUBvN7
+         Jz3QEjhECt4wFl7k3B+9UVk1gxrFVkp+3XLieyY+iMYgyV3/Luq6Ul4l+sQgus38E/2g
+         K/g6yIQubjpEW78ZZf9gtd05VUdIRYDN/tMoEA0j+zAXjn0fV9YtMlK9bzVykbixmyJh
+         f+3udNnw6vqNxZUtZJxhXz+ENfQjPqRZei4qi2eLIxxtt8DgmGLkn0dzLxTnCjbLrlV0
+         A0c4v1bFSZA6gzgHjq+IBi3zCK98can9sWSDEn2sE0x59GNT2UmBFcEjR3LAI4xlMG9A
+         6Bfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVB3K3fA0ob7O6sFxioH5Rh1eu7YKUym8UJdhAsD0afyKAReVmpMhb1jwsNhQHxrpXLiqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLYNsdqiFm4psBXGwzobS4aTR54vW+P0t4CqkNW2HrjG7lsIzN
+	uydGSdLoHMUSKhbSUtFlUhQFTaLCHNBELIPFf3SjHtP8Ku08FMlK
+X-Google-Smtp-Source: AGHT+IEcaIAHMs9BJckxJcfP/0G9ohWgYCacVX5fo5xhpPCQT8jOd4bxSJfsC481VrVhw4ZvtEhEjA==
+X-Received: by 2002:a17:902:d486:b0:210:e8b5:1363 with SMTP id d9443c01a7336-210e8b5136emr21879435ad.55.1730171647513;
+        Mon, 28 Oct 2024 20:14:07 -0700 (PDT)
+Received: from localhost.localdomain ([14.22.11.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf43476sm57300795ad.24.2024.10.28.20.14.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Oct 2024 20:14:07 -0700 (PDT)
+From: Yong He <zhuangel570@gmail.com>
+X-Google-Original-From: Yong He <alexyonghe@tencent.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com,
+	kvm@vger.kernel.org
+Cc: wanpengli@tencent.com,
+	alexyonghe@tencent.com,
+	junaids@google.com
+Subject: [PATCH 0/2] Introduce configuration for LRU cache of previous CR3s
+Date: Tue, 29 Oct 2024 11:13:58 +0800
+Message-ID: <20241029031400.622854-1-alexyonghe@tencent.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 09/13] tsc: Use the GUEST_TSC_FREQ MSR for discovering
- TSC frequency
-To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
- thomas.lendacky@amd.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
-Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20241028053431.3439593-1-nikunj@amd.com>
- <20241028053431.3439593-10-nikunj@amd.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20241028053431.3439593-10-nikunj@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/28/2024 1:34 PM, Nikunj A Dadhania wrote:
-> Calibrating the TSC frequency using the kvmclock is not correct for
-> SecureTSC enabled guests. Use the platform provided TSC frequency via the
-> GUEST_TSC_FREQ MSR (C001_0134h).
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> ---
->   arch/x86/include/asm/sev.h |  2 ++
->   arch/x86/coco/sev/core.c   | 16 ++++++++++++++++
->   arch/x86/kernel/tsc.c      |  5 +++++
->   3 files changed, 23 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index d27c4e0f9f57..9ee63ddd0d90 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -536,6 +536,7 @@ static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code
->   }
->   
->   void __init snp_secure_tsc_prepare(void);
-> +void __init snp_secure_tsc_init(void);
->   
->   #else	/* !CONFIG_AMD_MEM_ENCRYPT */
->   
-> @@ -584,6 +585,7 @@ static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code
->   				       u32 resp_sz) { return -ENODEV; }
->   
->   static inline void __init snp_secure_tsc_prepare(void) { }
-> +static inline void __init snp_secure_tsc_init(void) { }
->   
->   #endif	/* CONFIG_AMD_MEM_ENCRYPT */
->   
-> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-> index 140759fafe0c..0be9496b8dea 100644
-> --- a/arch/x86/coco/sev/core.c
-> +++ b/arch/x86/coco/sev/core.c
-> @@ -3064,3 +3064,19 @@ void __init snp_secure_tsc_prepare(void)
->   
->   	pr_debug("SecureTSC enabled");
->   }
-> +
-> +static unsigned long securetsc_get_tsc_khz(void)
-> +{
-> +	unsigned long long tsc_freq_mhz;
-> +
-> +	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
-> +	rdmsrl(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
-> +
-> +	return (unsigned long)(tsc_freq_mhz * 1000);
-> +}
-> +
-> +void __init snp_secure_tsc_init(void)
-> +{
-> +	x86_platform.calibrate_cpu = securetsc_get_tsc_khz;
-> +	x86_platform.calibrate_tsc = securetsc_get_tsc_khz;
-> +}
-> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-> index dfe6847fd99e..730cbbd4554e 100644
-> --- a/arch/x86/kernel/tsc.c
-> +++ b/arch/x86/kernel/tsc.c
-> @@ -30,6 +30,7 @@
->   #include <asm/i8259.h>
->   #include <asm/topology.h>
->   #include <asm/uv/uv.h>
-> +#include <asm/sev.h>
->   
->   unsigned int __read_mostly cpu_khz;	/* TSC clocks / usec, not used here */
->   EXPORT_SYMBOL(cpu_khz);
-> @@ -1514,6 +1515,10 @@ void __init tsc_early_init(void)
->   	/* Don't change UV TSC multi-chassis synchronization */
->   	if (is_early_uv_system())
->   		return;
-> +
-> +	if (cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
-> +		snp_secure_tsc_init();
+From: Yong He <alexyonghe@tencent.com>
 
-IMHO, it isn't the good place to call snp_secure_tsc_init() to update 
-the callbacks here.
+When running function loading inside VM without EPT supported,
+we found shadow page table rebuilds are very frequent even
+only 3 process running inside VM, such as kvm_mmu_free_roots
+if invoked frequently.
 
-It's better to be called in some snp init functions.
+PTI is enabled inside our VM, so 3 process will have 6
+valid CR3s, but there are only 3 LRU cache of previous CR3s,
+so this made the cache is always invalid, and the shadow page
+table is frequently rebuilt.
 
->   	if (!determine_cpu_tsc_frequencies(true))
->   		return;
->   	tsc_enable_sched_clock();
+In this patch we enlarge the number of LRU cache, and introduce
+a parameter for it, so that user could enlarge the cache when
+needed.
+
+Here is context switch latency test of lmbench3, run in Ice
+lake server, after enlarge the LRU cache number, the switch
+latency reduced 14%~18%.
+
+process number     2      3      4      5      6      7      8
+LRU cache = 3    4.857  6.802  7.518  7.836  7.770  7.287  7.271
+LRU cache = 11   4.654  5.518  6.292  6.516  6.512  7.135  7.270
+
+Also, the kvm_mmu_free_roots reduced from 7k+ to 60, when running
+the latency test with 4 processes.
+
+Yong He (2):
+  KVM: x86: expand the LRU cache of previous CR3s
+  KVM: x86: introduce cache configurations for previous CR3s
+
+ arch/x86/include/asm/kvm_host.h |  7 +++---
+ arch/x86/kvm/mmu.h              |  1 +
+ arch/x86/kvm/mmu/mmu.c          | 40 +++++++++++++++++++++++----------
+ arch/x86/kvm/vmx/nested.c       |  4 ++--
+ arch/x86/kvm/x86.c              |  2 +-
+ 5 files changed, 36 insertions(+), 18 deletions(-)
+
+-- 
+2.43.5
 
 
