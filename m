@@ -1,179 +1,108 @@
-Return-Path: <kvm+bounces-29949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FBB29B4C36
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:37:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647C99B4C51
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1602B226E6
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:37:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4D3FB235BD
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00CF206E9B;
-	Tue, 29 Oct 2024 14:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F1520720B;
+	Tue, 29 Oct 2024 14:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="CZ2YPwp3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IAi9ysm8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TaeOpziv"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9661361;
-	Tue, 29 Oct 2024 14:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAA62071FC
+	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 14:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730212625; cv=none; b=qZIBaDo5IvkURFbnrv5jACm+iaqz0O7Pieot2zFRoxwjg7ZhrX6S+zDfLY3J5YSaRlGMl3uMkM5eZ7EUsT8YsRhUoM4Glf3KeW1BqHnAWu8LkfZ/YFyxW7nmIkMufrKbxUGgwiiF5Qp0UmpvtEP6nWzeimsFAOWydCkRAk2NdTk=
+	t=1730212837; cv=none; b=M/nTUUgmLoaKR95nAKiUqgKHLQKORR9+37qU+4oaq8zEJflxccVTTQ9XH9GccYDPDCGkd/65tjU4TE/w0mJBgaVtOYfvtrsuRAXyr5h+ELAFMnftW5pdYpYenHacdpmRxtpvZSFuiNmQp4PRdy5id4t7fKMHm/8clzCijjcPrlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730212625; c=relaxed/simple;
-	bh=iOhDX5FV0VLbdeCkY5l1lzKjn8x1HtA48a32wtkAOps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNEm2wIbITPCQzKupnnpqKVpTzkCkTpLgqvf73ohc3ahajdD1N3mII8KWfC6D+wk8tTpZuzwahoKUj2I6+dROgajtMAXA6JspRvlqVZSl5mqkCWVlCMVbf5i9Kb6I0pnYb1axJ3ZzOgd2nxHe0V1Zqc4obEY+qrxHmdLWpGgj3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=CZ2YPwp3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IAi9ysm8; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8A2D211400C5;
-	Tue, 29 Oct 2024 10:37:01 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Tue, 29 Oct 2024 10:37:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1730212621; x=
-	1730299021; bh=uwXaMiHv60LoZZVSxHl13+Rw6h4A35GgnjzQx8o5D7o=; b=C
-	Z2YPwp3oykk6NtIP0YO6NkUXaEtLk+xhaXp9MKfFeRByypJYQslVBLulpFuqSRPL
-	5zu8JwrnXoD69mui7dlOyXA/lpdz8WAmm06oP+EECuZ8EK7fml48zKJEF/0UxB+4
-	B3nta82114vcA/2WoGAJ/69oFkjrK1K/Tcz6fUAmZup9lSAPItasLA24qXmGM/ih
-	unS9UiesZgTWtREQX7dOP8XVq8LqFzeAvhI8nXWDvG6/dAxbqlVRgHwUEJlzr+8k
-	G8QF2xrDxz8JiCDHo5OuD4QCBbse3HtUtS0TEaOHxfBD4QtXguTo40g4lmO6DXMb
-	eqL9cgh4OVgoI2KvUL4UA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730212621; x=1730299021; bh=uwXaMiHv60LoZZVSxHl13+Rw6h4A35Ggnjz
-	Qx8o5D7o=; b=IAi9ysm8RzqMmsjLZK6o/X0vbG4193OTjPVoEeXnm7UUfru5SYV
-	7K31mPjR7ucw3DtuegrRwTFk1VtVVpptQxBDad/bWePMNwHeV8HZforh6Buf2xCT
-	GhOmKidr+HtRp/E8PfrsHrtRYrHR1bi+nwZZ9pgWr4CVcjntwytc7XTbk+JqlwLa
-	4PO72tBjy20mtGsqhn6IXfEJVdF+F4UA8GGpZhSXGM5Gmiv07AwtYFXta2i0zlt4
-	qk4+BcFF3keK9JnblHsdxQx3zQOEBhWqzGHIpzG4oVltFWDaKfQsoMyVRFy/s7RL
-	kIOnokVDx1aD74EQR/C13aM9vV18X7TEu5w==
-X-ME-Sender: <xms:DPMgZ2O7aDuoZ7CZg2lJT-OV1_qz1VW_Ga7hJxFhXMujm1TyR5UExg>
-    <xme:DPMgZ0_XLEVspY9LCWMsR7RPHCDvL3tOWVIwlNh5eDa8sSmaHWlbU51HkN8TooXMY
-    TE1hlHtlmLHjXyEk2s>
-X-ME-Received: <xmr:DPMgZ9T-vLNyBMFesBPcxu6FUXaJadWm0-Gc6S-S24M0nPiXQ97zikokd_7Xa1NO91rumw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdekuddgiedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
-    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
-    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfhhfff
-    veelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhv
-    rdhnrghmvgdpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopehnvggvrhgrjhdruhhprgguhhihrgihsegrmhgurdgtohhmpdhrtghpthhtohep
-    sghpsegrlhhivghnkedruggvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvgh
-    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhi
-    gidruggvpdhrtghpthhtohepmhhinhhgohesrhgvughhrghtrdgtohhmpdhrtghpthhtoh
-    epuggrvhgvrdhhrghnshgvnheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthho
-    pehthhhomhgrshdrlhgvnhgurggtkhihsegrmhgurdgtohhmpdhrtghpthhtohepnhhikh
-    hunhhjsegrmhgurdgtohhmpdhrtghpthhtohepshgrnhhtohhshhdrshhhuhhklhgrsegr
-    mhgurdgtohhm
-X-ME-Proxy: <xmx:DPMgZ2tkvlzNbwN95cuAEIYRDCdpmIXitZ7TNyNO4FOQu0fpvBwb2w>
-    <xmx:DPMgZ-enMCSdHCNXLKltlMNoEs9_8ux-TJFA7fhgba9wQHea0w11Kw>
-    <xmx:DPMgZ62ja7sZD9-vN4W_eIRK9T5q4skH_GSp6slPwVirvIi4WY4bfg>
-    <xmx:DPMgZy-w-91PiKc6AEa7eI4yB_L1ibwHVNUB03n0kcIs13zXbK7WQA>
-    <xmx:DfMgZxVdwuYloCbpul0lq2zf02R3DnajeCEkxEvDmRQDOg3caZGk4nE0>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 29 Oct 2024 10:36:55 -0400 (EDT)
-Date: Tue, 29 Oct 2024 16:36:50 +0200
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com, 
-	Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, 
-	peterz@infradead.org, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [RFC 00/14] AMD: Add Secure AVIC Guest Support
-Message-ID: <mzrkt3qm35tluz3sh3weg7g2xf6xozgmiimenyidubcyofyrng@a63x6gie4vqy>
-References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
- <vo2oavwp2p4gbenistkq2demqtorisv24zjq2jgotuw6i5i7oy@uq5k2wcg3j5z>
- <378fb9dd-dfb9-48aa-9304-18367a60af58@amd.com>
- <ramttkbttoyswpl7fkz25jwsxs4iuoqdogfllp57ltigmgb3vd@txz4azom56ej>
- <20241029094711.GAZyCvH-ZMHskXAwuv@fat_crate.local>
- <708594f6-78d3-4877-9a1e-b37c55ad0d39@amd.com>
- <submtt3ajyq54jyyywf3pb36nto27ojtuchjvhzycrplvfzrke@sieiu6mqa6xi>
- <8015deec-08e7-4908-85e1-d42f55f4bb6b@amd.com>
+	s=arc-20240116; t=1730212837; c=relaxed/simple;
+	bh=oa+ecJWuyWFLH7ZxazuBVoefmJuASR1Rhnv7y8xKspk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=e433KZM72ywrAM13MaLbJpvJq7EBw8ftnIXLlMdsxWViWHkt46Bo+1AzNMCCf8GDrezSfXgCdn1qm6J85oGTWSacQyUUapfdZD3oAV2mlR0Ii2iqHy2pZ6xuJfyTB6xYGbkx7MYlbijIHrVaYKsTNcJQmfwhc56wOTh/AcvwYhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TaeOpziv; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e28fc60660dso8394992276.0
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 07:40:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730212835; x=1730817635; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZURPetRk0pTnbiNEOPR0W3xXFQVbNGIGyW0OrcoXvE=;
+        b=TaeOpziv8p9FryNaMS8++3DWfV1DASRfPGUZAqZ5IN0OlqKRZWA/9hgSpH2gmSMblr
+         l+lT7CZaIZPX041eZl4HnwSRdjV0kplnwEvkueM5zBOY/LoxTiBLIWTSG2q4REK9NXB9
+         2Ik0XKLyLzhyuqTeOyWMln6+p5gtA4RrqCIuFNsDztnZ4hPdBV+iSLxAVTi9E2ICLew3
+         IFkNsqR7iBuKbalXWDpSjTdyfKmR65fDCOBWdnNKoJZbSEzQI4MzNyCG7Lte51If6O3Y
+         Z0crs4GPTLOJ+tKjC0X6HlIaX4EoQj6a0bemDFETxpgqn8esMY8BbhakR8Rpj2lEtV0+
+         xnaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730212835; x=1730817635;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZURPetRk0pTnbiNEOPR0W3xXFQVbNGIGyW0OrcoXvE=;
+        b=fqcHde9+6WRb/RHQOo3Ghc0xP/vdaNlwc3vXa7QOBt439VtYrDtZhFpQ4m5lD4f+7I
+         fz7SXzvCGTWuXn28SHgSFlt0ri3xoJEPPJEWbp38IKT7qZjGMuXkvo+vmjIHSZdNTlHP
+         jnbw2bDSgq3p2EDL6G+RzeGWdHQVoDxJ9lUK3XTJK4GTXebWtbGOi1VucfnQtA+Xz1x8
+         O5qE+lcI3wUOkDX3hI04gejJ3SgNEyp13CsAiZ8h+5+yRcx1K2ahijxunuL8S8wuCR6g
+         YpAzZlE/iWJEtiZosAgEArRnU7gzGlIhBZmF7cDxni5snrkgAUTdwuxJwgkASzAntkwp
+         dD8A==
+X-Forwarded-Encrypted: i=1; AJvYcCW9Kr+I9MYJ+bE+IhScnX2an0BUNQTADlfrgUoVE6oBHmrIR77eYfwAIHaBqFKW7uJYL8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw+JcMElijHxVWU7Mgl/xqb5PooEefnSGQneEeYOHMdyV+FbJK
+	VlBCywXFoYn8fRalq/d+2VtUwBP3gNLCXtSVwQXFrnm13Imr7JZc1MeG/gsnxEfI28Z+eDK3HJb
+	0dA==
+X-Google-Smtp-Source: AGHT+IEEilk2EK1brP6PSC69voETQHBJTwU+IafSMkR926CjbDlA6tCqkF5Kk3FPpRGhJ4ZS56aFxwrYkDM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:aace:0:b0:e28:f35b:c719 with SMTP id
+ 3f1490d57ef6-e3087bd6066mr41479276.6.1730212834790; Tue, 29 Oct 2024 07:40:34
+ -0700 (PDT)
+Date: Tue, 29 Oct 2024 07:40:33 -0700
+In-Reply-To: <20241029031400.622854-2-alexyonghe@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8015deec-08e7-4908-85e1-d42f55f4bb6b@amd.com>
+Mime-Version: 1.0
+References: <20241029031400.622854-1-alexyonghe@tencent.com> <20241029031400.622854-2-alexyonghe@tencent.com>
+Message-ID: <ZyDz4S0dYsRcBrTn@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: expand the LRU cache of previous CR3s
+From: Sean Christopherson <seanjc@google.com>
+To: Yong He <zhuangel570@gmail.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com, junaids@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Oct 29, 2024 at 05:45:23PM +0530, Neeraj Upadhyay wrote:
-> 
-> 
-> On 10/29/2024 5:21 PM, Kirill A. Shutemov wrote:
-> > On Tue, Oct 29, 2024 at 03:54:24PM +0530, Neeraj Upadhyay wrote:
-> >> diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
-> >> index aeda74bf15e6..08156ac4ec6c 100644
-> >> --- a/arch/x86/kernel/apic/apic.c
-> >> +++ b/arch/x86/kernel/apic/apic.c
-> >> @@ -1163,6 +1163,9 @@ void disable_local_APIC(void)
-> >>         if (!apic_accessible())
-> >>                 return;
-> >>
-> >> +       if (apic->teardown)
-> >> +               apic->teardown();
-> >> +
-> >>         apic_soft_disable();
-> >>
-> >>  #ifdef CONFIG_X86_32
-> > 
-> > Hm. I think it will call apic->teardown() for all but the one CPU that
-> > does kexec. I believe we need to disable SAVIC for all CPUs.
-> > 
-> 
-> I see it being called for all CPUs.
-> 
-> For the CPU doing kexec, I see below backtrace, which lands into disable_local_APIC()
-> 
-> disable_local_APIC
-> native_stop_other_cpus
-> native_machine_shutdown
-> machine_shutdown
-> kernel_kexec
-> 
-> For the other CPUs, it is below:
-> 
-> disable_local_APIC
-> stop_this_cpu
-> __sysvec_reboot
-> sysvec_reboot
+KVM: x86/mmu:
 
-Backtraces are backwards, but, yeah, I missed reboot path.
-
-> > Have you tested the case when the target kernel doesn't support SAVIC and
-> > tries to use a new interrupt vector on the boot CPU? I think it will
-> > break.
-> > 
+On Tue, Oct 29, 2024, Yong He wrote:
+> From: Yong He <alexyonghe@tencent.com>
 > 
-> For a VM launched with VMSA feature containing Secure AVIC, the target
-> kernel also is required to support Secure AVIC. Otherwise, guest bootup
-> would fail. I will capture this information in the documentation.
-> So, as far as I understand, SAVIC kernel kexecing into a non-SAVIC kernel
-> is not a valid use case.
+> Expand max number of LRU cache of previous CR3s, so that
+> we could cache more entry when needed, such as KPTI is
 
-Hm. I thought if SAVIC is not enabled by the guest the guest would boot
-without the secure feature, no?
+No "we".  Documentation/process/maintainer-kvm-x86.rst
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+And I would argue this changelog is misleading.  I was expecting that the patch
+would actually change the number of roots that KVM caches, whereas this simply
+increases the capacity.  The changelog should also mention that the whole reason
+for doing so is to allow for a module param.
+
+Something like:
+
+  KVM: x86/mmu: Expand max capacity of per-MMU CR3/PGD caches
+
+  Expand the maximum capacity of the "previous roots" cache in kvm_mmu so
+  that a future patch can make the number of roots configurable via module
+  param, without needing to dynamically allocate the array.
+
+That said, I hope we can avoid this entirely.  More in the next patch.
 
