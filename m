@@ -1,288 +1,112 @@
-Return-Path: <kvm+bounces-29921-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29922-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081759B40EF
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 04:16:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 106739B410C
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 04:33:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C64E1F23272
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 03:16:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9063283716
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 03:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7582022C6;
-	Tue, 29 Oct 2024 03:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1971FBF7E;
+	Tue, 29 Oct 2024 03:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQfXhetx"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pheDC6Bh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BE71FCF73
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 03:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590E54400;
+	Tue, 29 Oct 2024 03:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730171658; cv=none; b=uwdISf6GSbHm4JvNl1gGCwkwFawJdKLOpgH6ku0s0ACH5OY0rZofN2oTwVWQXqL3wFTOTciKnxIxRggjYNcirq/qhUt4JOdp2xgV8JDUSSPqOebuCHz9dPH7+m5k281Gk2cvjF/mJMjylT+zkRueoA7QrAmtGcaofMWAcjE9EiA=
+	t=1730172789; cv=none; b=EvZCR2+ZSjuG8UIZ7z9fbykdfggc/jCHuLYuJG0tPSpwrdGk6TpB//IhHANiYHfCHQaZP7ocvq8rlkEUIk7cHSv7didb2ZQAlQGZwg0wYPHuJr4TEU8LusxXkIyKXjkj2FeXzOSjYvNB0ATISXH6UFRgKMNZblouWa9dIoZ2hwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730171658; c=relaxed/simple;
-	bh=BluNThS9r+K/CgjMy4ZogSIbHQOXp2EC8HKk6XGRa3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dlNslxdkwCMhPRaf5XUD+JOTw2Y1MzQYmgN2Sem2Rom2pueERE5BRiI8ZsSSggxvuEDb/ongf5SXzfrYMdRUZOqzVfaWdWDe27QTSrEPY5V3OVZaijsJschhJpW/onzsYAizA3UBAmf7DnR/rj0dk6dzUWFGwzCfdbGGYsH9cr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQfXhetx; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20cb47387ceso44762465ad.1
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2024 20:14:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730171655; x=1730776455; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rQ7IkF8ldMF5vJTFcSqC1bgJ/63e0IOrqwrvyfvip0g=;
-        b=RQfXhetxrtWSh3eNe5LWhy60a2Q1BLj527YughAhNctjBjj7wLP0gl+skhcwMFt8ny
-         UL64ucg55bU+IWyGnFKFBqKkd1V4hwgEv9HFifA1a7q3qnwyOOZmBjoHI5gwNEmTGaU7
-         xezzHmoKf+V6GCrIgOC9J47yrim7iezxhZSV/Ey/2xSkaFdvr9QCIEBCgvDlHP7aWzPh
-         ZMDEo69hOBd8VtWlubzZGX28OzdIhMmD7Y1P8DfBdSTZsiVC53SJeWbK4Cg/9t+CQEbd
-         ZxIy2K/0GCtROrJ0FRSXdahPXxUDxb9ULvd36fatQf8WlLItuOPDzoX4OgFGj7qUEMJR
-         WapA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730171655; x=1730776455;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rQ7IkF8ldMF5vJTFcSqC1bgJ/63e0IOrqwrvyfvip0g=;
-        b=IFWMHaEkPmSWGEqtHoQKarSMJ6r/NPkJC+EhrYzfZsAbNzdRyBJmKf0dAC41VgudpP
-         r2i5z+4aAam5VacurVaaNVA0ynAdvRsdATpE3cBIFRBiaiw45hqHmoPUCZ376KfSFHKq
-         cV3j++gzEh/ccCoeiyjtP4o2fP+rjxxXBEdnB5U5I2nlC3abnOLdnVXfja+dIM8y8ETC
-         vjn9jGe6osrmBJeBRO4W24tk9kwrFj9CrBkwPZxXOBhgeCgoVlv6kRCPz+3bigcuqBJ7
-         F5Tc9PjAjzrJr4fp+bDYW1T5tPeSRxeqPm4X+YOL9+t03LzmLVBCFzXxoCj/sOo4hXje
-         9F1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVvsHYo85R70RnLy1qiSHeFQj3ZYz0N0kxCC3m82fOOrn8MvTpvhrCrTu9eydbplobfyeI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTKEpUgwpWXQTqNsW35aX19rmLlyvJ9v2O81//KQUpTIvXBbUz
-	jAIAiO7TCuw2Jt6eCv+w64GRfitlEDObV/TfJTnqAmwbd+krQPVV
-X-Google-Smtp-Source: AGHT+IEImm5WxZi1qqQHEuoSrB1CkyaP1OLsLXNba5yq1aSYGuGxBa3h7IkKFnpsoXA0l8xRTKS+OA==
-X-Received: by 2002:a17:902:ecc5:b0:20c:7181:51cb with SMTP id d9443c01a7336-210c6892b62mr146562315ad.18.1730171654725;
-        Mon, 28 Oct 2024 20:14:14 -0700 (PDT)
-Received: from localhost.localdomain ([14.22.11.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf43476sm57300795ad.24.2024.10.28.20.14.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 20:14:14 -0700 (PDT)
-From: Yong He <zhuangel570@gmail.com>
-X-Google-Original-From: Yong He <alexyonghe@tencent.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: wanpengli@tencent.com,
-	alexyonghe@tencent.com,
-	junaids@google.com
-Subject: [PATCH 2/2] KVM: x86: introduce cache configurations for previous CR3s
-Date: Tue, 29 Oct 2024 11:14:00 +0800
-Message-ID: <20241029031400.622854-3-alexyonghe@tencent.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241029031400.622854-1-alexyonghe@tencent.com>
-References: <20241029031400.622854-1-alexyonghe@tencent.com>
+	s=arc-20240116; t=1730172789; c=relaxed/simple;
+	bh=Axfbl2mXtYfhUUvSfNjqd8Cjc2LFTccozln5xrrkvsA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KGzaEenVAoAI1qT5jvG4SrnF+8cFDX+j1jyg+tqlSzMBX2nsYTOkxLg9IvZbJ4YmQt7pvb3I54WgxyWJKA1YsVIajemhVcsQa3MEmUXcjRXSN8TZNK5dJFX3PZRiT2VWuTP88AcyCisAJ9gytA293Cvjm0g2tOAOxEVLiZ5iuj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pheDC6Bh; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730172777; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=I/2DTLm1WNbI9Umt9nEXdjlHaYdgN4nxe2/jWIWHQxM=;
+	b=pheDC6Bh9ms3uzRRwGlVWSMEBYlpdkof185fts27k2qBA+niJrkVgE1eYB2XB9/MrhmfLbTzgwAbodFOV9F+/CtcQndbHZWY8Jh7YC0hT1dd8lqtCAK8DFZBo2C6IMHjDnZD+YVOXHC9ryJkX5n81YKbdq7XUbD1P2KTTVx+bH0=
+Received: from 30.178.65.205(mailfrom:qinyuntan@linux.alibaba.com fp:SMTPD_---0WI8m0P8_1730172769 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 29 Oct 2024 11:32:57 +0800
+Message-ID: <18761ea2-46a7-4c79-a5b7-933e26362559@linux.alibaba.com>
+Date: Tue, 29 Oct 2024 11:32:49 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+From: qinyuntan <qinyuntan@linux.alibaba.com>
+Subject: Re: [PATCH v1: vfio: avoid unnecessary pin memory when dma map io
+ address space 0/2]
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1729760996.git.qinyuntan@linux.alibaba.com>
+ <20241024110624.63871cfa.alex.williamson@redhat.com>
+In-Reply-To: <20241024110624.63871cfa.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Yong He <alexyonghe@tencent.com>
+You are right, it seems I did not get the relevant updates in time. In 
+the patch f9e54c3a2f5b7 ("vfio/pci: implement huge_fault support"), 
+huge_fault was introduced, and maybe we can achieve the same effect by 
+adjusting the function vfio_pci_mmap_huge_fault's order parameter.
+Thanks,
 
-Introduce prev_roots_num param, so that we use more cache of
-previous CR3/root_hpa pairs, which help us to reduce shadow
-page table evict and rebuild overhead.
+Qinyun Tan
 
-Signed-off-by: Yong He <alexyonghe@tencent.com>
----
- arch/x86/kvm/mmu.h        |  1 +
- arch/x86/kvm/mmu/mmu.c    | 40 +++++++++++++++++++++++++++------------
- arch/x86/kvm/vmx/nested.c |  4 ++--
- arch/x86/kvm/x86.c        |  2 +-
- 4 files changed, 32 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 4341e0e28..e5615433a 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -7,6 +7,7 @@
- #include "cpuid.h"
- 
- extern bool __read_mostly enable_mmio_caching;
-+extern uint __read_mostly prev_roots_num;
- 
- #define PT_WRITABLE_SHIFT 1
- #define PT_USER_SHIFT 2
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7813d28b0..2acc24dd2 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -96,6 +96,22 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
- static bool __read_mostly force_flush_and_sync_on_reuse;
- module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
- 
-+static int prev_roots_num_param(const char *val, const struct kernel_param *kp)
-+{
-+	return param_set_uint_minmax(val, kp, KVM_MMU_NUM_PREV_ROOTS, KVM_MMU_NUM_PREV_ROOTS_MAX);
-+}
-+
-+static const struct kernel_param_ops prev_roots_num_ops = {
-+	.set = prev_roots_num_param,
-+	.get = param_get_uint,
-+};
-+
-+uint __read_mostly prev_roots_num = KVM_MMU_NUM_PREV_ROOTS;
-+EXPORT_SYMBOL_GPL(prev_roots_num);
-+module_param_cb(prev_roots_num, &prev_roots_num_ops,
-+		&prev_roots_num, 0644);
-+__MODULE_PARM_TYPE(prev_roots_num, "uint");
-+
- /*
-  * When setting this variable to true it enables Two-Dimensional-Paging
-  * where the hardware walks 2 page tables:
-@@ -3594,12 +3610,12 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
- 		&& VALID_PAGE(mmu->root.hpa);
- 
- 	if (!free_active_root) {
--		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+		for (i = 0; i < prev_roots_num; i++)
- 			if ((roots_to_free & KVM_MMU_ROOT_PREVIOUS(i)) &&
- 			    VALID_PAGE(mmu->prev_roots[i].hpa))
- 				break;
- 
--		if (i == KVM_MMU_NUM_PREV_ROOTS)
-+		if (i == prev_roots_num)
- 			return;
- 	}
- 
-@@ -3608,7 +3624,7 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
- 	else
- 		write_lock(&kvm->mmu_lock);
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+	for (i = 0; i < prev_roots_num; i++)
- 		if (roots_to_free & KVM_MMU_ROOT_PREVIOUS(i))
- 			mmu_free_root_page(kvm, &mmu->prev_roots[i].hpa,
- 					   &invalid_list);
-@@ -3655,7 +3671,7 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
- 	 */
- 	WARN_ON_ONCE(mmu->root_role.guest_mode);
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		root_hpa = mmu->prev_roots[i].hpa;
- 		if (!VALID_PAGE(root_hpa))
- 			continue;
-@@ -4066,7 +4082,7 @@ void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu)
- 	unsigned long roots_to_free = 0;
- 	int i;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+	for (i = 0; i < prev_roots_num; i++)
- 		if (is_unsync_root(vcpu->arch.mmu->prev_roots[i].hpa))
- 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
- 
-@@ -4814,7 +4830,7 @@ static bool cached_root_find_and_keep_current(struct kvm *kvm, struct kvm_mmu *m
- 	if (is_root_usable(&mmu->root, new_pgd, new_role))
- 		return true;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		/*
- 		 * The swaps end up rotating the cache like this:
- 		 *   C   0 1 2 3   (on entry to the function)
-@@ -4845,7 +4861,7 @@ static bool cached_root_find_without_current(struct kvm *kvm, struct kvm_mmu *mm
- {
- 	uint i;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+	for (i = 0; i < prev_roots_num; i++)
- 		if (is_root_usable(&mmu->prev_roots[i], new_pgd, new_role))
- 			goto hit;
- 
-@@ -4854,7 +4870,7 @@ static bool cached_root_find_without_current(struct kvm *kvm, struct kvm_mmu *mm
- hit:
- 	swap(mmu->root, mmu->prev_roots[i]);
- 	/* Bubble up the remaining roots.  */
--	for (; i < KVM_MMU_NUM_PREV_ROOTS - 1; i++)
-+	for (; i < prev_roots_num - 1; i++)
- 		mmu->prev_roots[i] = mmu->prev_roots[i + 1];
- 	mmu->prev_roots[i].hpa = INVALID_PAGE;
- 	return true;
-@@ -5795,7 +5811,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
- 	if (is_obsolete_root(kvm, mmu->root.hpa))
- 		roots_to_free |= KVM_MMU_ROOT_CURRENT;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		if (is_obsolete_root(kvm, mmu->prev_roots[i].hpa))
- 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
- 	}
-@@ -6125,7 +6141,7 @@ void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 	if (roots & KVM_MMU_ROOT_CURRENT)
- 		__kvm_mmu_invalidate_addr(vcpu, mmu, addr, mmu->root.hpa);
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		if (roots & KVM_MMU_ROOT_PREVIOUS(i))
- 			__kvm_mmu_invalidate_addr(vcpu, mmu, addr, mmu->prev_roots[i].hpa);
- 	}
-@@ -6159,7 +6175,7 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
- 	if (pcid == kvm_get_active_pcid(vcpu))
- 		roots |= KVM_MMU_ROOT_CURRENT;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		if (VALID_PAGE(mmu->prev_roots[i].hpa) &&
- 		    pcid == kvm_get_pcid(vcpu, mmu->prev_roots[i].pgd))
- 			roots |= KVM_MMU_ROOT_PREVIOUS(i);
-@@ -6271,7 +6287,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
- 
- 	mmu->root.hpa = INVALID_PAGE;
- 	mmu->root.pgd = 0;
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+	for (i = 0; i < prev_roots_num; i++)
- 		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
- 
- 	/* vcpu->arch.guest_mmu isn't used when !tdp_enabled. */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2392a7ef2..d7e375c34 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -394,7 +394,7 @@ static void nested_ept_invalidate_addr(struct kvm_vcpu *vcpu, gpa_t eptp,
- 
- 	WARN_ON_ONCE(!mmu_is_nested(vcpu));
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+	for (i = 0; i < prev_roots_num; i++) {
- 		cached_root = &vcpu->arch.mmu->prev_roots[i];
- 
- 		if (nested_ept_root_matches(cached_root->hpa, cached_root->pgd,
-@@ -5820,7 +5820,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
- 					    operand.eptp))
- 			roots_to_free |= KVM_MMU_ROOT_CURRENT;
- 
--		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+		for (i = 0; i < prev_roots_num; i++) {
- 			if (nested_ept_root_matches(mmu->prev_roots[i].hpa,
- 						    mmu->prev_roots[i].pgd,
- 						    operand.eptp))
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c983c8e43..047cf66da 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1235,7 +1235,7 @@ static void kvm_invalidate_pcid(struct kvm_vcpu *vcpu, unsigned long pcid)
- 	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE))
- 		return;
- 
--	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+	for (i = 0; i < prev_roots_num; i++)
- 		if (kvm_get_pcid(vcpu, mmu->prev_roots[i].pgd) == pcid)
- 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
- 
--- 
-2.43.5
+On 2024/10/25 01:06, Alex Williamson wrote:
+> On Thu, 24 Oct 2024 17:34:42 +0800
+> Qinyun Tan <qinyuntan@linux.alibaba.com> wrote:
+> 
+>> When user application call ioctl(VFIO_IOMMU_MAP_DMA) to map a dma address,
+>> the general handler 'vfio_pin_map_dma' attempts to pin the memory and
+>> then create the mapping in the iommu.
+>>
+>> However, some mappings aren't backed by a struct page, for example an
+>> mmap'd MMIO range for our own or another device. In this scenario, a vma
+>> with flag VM_IO | VM_PFNMAP, the pin operation will fail. Moreover, the
+>> pin operation incurs a large overhead which will result in a longer
+>> startup time for the VM. We don't actually need a pin in this scenario.
+>>
+>> To address this issue, we introduce a new DMA MAP flag
+>> 'VFIO_DMA_MAP_FLAG_MMIO_DONT_PIN' to skip the 'vfio_pin_pages_remote'
+>> operation in the DMA map process for mmio memory. Additionally, we add
+>> the 'VM_PGOFF_IS_PFN' flag for vfio_pci_mmap address, ensuring that we can
+>> directly obtain the pfn through vma->vm_pgoff.
+>>
+>> This approach allows us to avoid unnecessary memory pinning operations,
+>> which would otherwise introduce additional overhead during DMA mapping.
+>>
+>> In my tests, using vfio to pass through an 8-card AMD GPU which with a
+>> large bar size (128GB*8), the time mapping the 192GB*8 bar was reduced
+>> from about 50.79s to 1.57s.
+> 
+> If the vma has a flag to indicate pfnmap, why does the user need to
+> provide a mapping flag to indicate not to pin?  We generally cannot
+> trust such a user directive anyway, nor do we in this series, so it all
+> seems rather redundant.
+> 
+> What about simply improving the batching of pfnmap ranges rather than
+> imposing any sort of mm or uapi changes?  Or perhaps, since we're now
+> using huge_fault to populate the vma, maybe we can iterate at PMD or
+> PUD granularity rather than PAGE_SIZE?  Seems like we have plenty of
+> optimizations to pursue that could be done transparently to the user.
+> Thanks,
+> 
+> Alex
 
 
