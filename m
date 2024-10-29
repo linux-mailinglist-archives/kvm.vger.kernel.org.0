@@ -1,136 +1,192 @@
-Return-Path: <kvm+bounces-29931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3405E9B44FF
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 09:56:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 208209B456B
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 10:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B779E1F2261C
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 08:56:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70940B20300
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 09:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887EB20408C;
-	Tue, 29 Oct 2024 08:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44EF1E0DB5;
+	Tue, 29 Oct 2024 09:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WyJFokw9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gn6ta54M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2421D7994
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 08:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA48818C33B;
+	Tue, 29 Oct 2024 09:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730192150; cv=none; b=L3+34J+9qqOR0NzR+ZIvcs4F9QJdj1Kxs4dvqwaYwfOTA9bDkSdZlI6ryb/eE/8l2dLA3t9plW0x8eqVb/YEF3GZDWkZA72wkBK9hNXbYUxF5qFOJ4oh62H45+SsSi0XQFRM8TU5rUUgM1es69wbSBor+dYAoN+To/opYSWIur4=
+	t=1730193320; cv=none; b=V8+5jdc0oPBkXjQKEm0Dez44hMGf7m8WdbYJdHsFTqaReEEgOGmcZtZYXJ+o7Pd4UIzzQiZZXmz8CQrD9yISuyGBzEZkXkOq68DO53TeDHBsgBLs+jYKBc/jBngsCNv8gPPKQFFX0412JIORmrSnlsdih20+6/xZvIf3zS7VzPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730192150; c=relaxed/simple;
-	bh=4gFt5SNrfp0SWXU5+NH1gVt41zrxB2+OF6ksw2y669E=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=gC8PAwhaq97tUfI1hP+nHJFh6+3RXrLcmNkg2MFSQzu7e0/R+KCvPglw6rMNz5i26K78uE0USvVIDfjk5rq91lnkVnSZ/Hw/vrh+BokaBxEMgvAbbjspyLPfvQ73SDBUFkQ54YY0b9CO3PKY2kB531X3iOYyHeixezzQUIowW1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=WyJFokw9; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ea8ecacf16so3303572a12.1
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 01:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1730192148; x=1730796948; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xuWnhLJQw+PAY3xEBfJ+QJn2JlieNeFBTgX6ZFMdL84=;
-        b=WyJFokw9U1deMTx9dGui8OG44BfPiimFXzDnt0Z08OGppSUaI2Q+LkO932iw00AVKf
-         btX/W56kQOdabMb9XppMfxLJgYdgdeH7yusmYB6l2dtXT1xaCIISSY4r+m2QBp809V5o
-         wNrD6lTqEw8wKkx/MwAwjCENTxFRDyoMGMqyGeWetKZL17t4vUoE5AjDgCmk4gjfVj1Y
-         mX5iHJgm4ckT/jg6GlHOt6gxw9M+wer5ZQEOKKY7CYb45wCsj7XxUr5y63f6+U66g3z6
-         CTUFGUTWoNEKiKuppzP8J1qDnM4zzOi8xC5vfS5P5eo467V8Je+CHenuTT+ZdKW2WtTX
-         RB0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730192148; x=1730796948;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xuWnhLJQw+PAY3xEBfJ+QJn2JlieNeFBTgX6ZFMdL84=;
-        b=QIs8aFO5FgaoaQx/2OZI4I95JCl0zzFtIbkz7vFc/joGMVG0q3ybE9Gbq+IAsiIse0
-         S8EqGpRFya/59NZeIZ9ef7EtQ1HAOYfSl++hPfRyQU2WlpFf3KH13ukf90sOnb6qTls2
-         yPnUhTWZ/lBPiYbSFAJVXTe6RD5HsE9LKzqMtzz3uxYHQ/CZLa85lfWm6Bf469vKtD75
-         Og1YsTrO97+yCqTQObw/L5gHEWQ0J97OWKxam68BxyvdUtvY9bHB771lDoAcBDQlkjgT
-         426cAtheigHGpYedjBVIf/2sk6OeZdDYEOIbTAfbgWalqrk5RALdRY5sW39XVP2gQ0XB
-         1uOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ2nH3kG4Z3ZHW/Ef2H+jE8QmrOoyJGKUI7H9M7KZ9WpW2eMsF4gGfE8GFFMYzQ/OoblU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu4p5+y8CBylwphkv39zyVnDA0Z5KjcqjopeSS9COoU9T0+czj
-	VaTcLlBAL4vSvMy8XGJSDQgZ4Ph4yKvYD9Y4XODxkf2WFrB9Kt23aEgVJeEl3OA=
-X-Google-Smtp-Source: AGHT+IHf0YC+Ea5Ksx4oBfD4ogAxvHzzwCrdPrdXaYrCaa9GKLqYlspwFnf6XIm9UGsHOjhUqPUyrA==
-X-Received: by 2002:a05:6a21:a24c:b0:1cf:2853:bc6c with SMTP id adf61e73a8af0-1d9a84de0a3mr14026908637.33.1730192148007;
-        Tue, 29 Oct 2024 01:55:48 -0700 (PDT)
-Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057931a06sm7054189b3a.55.2024.10.29.01.55.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 01:55:47 -0700 (PDT)
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: greentime.hu@sifive.com,
-	vincent.chen@sifive.com,
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>
-Subject: [PATCH v2 1/1] RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
-Date: Tue, 29 Oct 2024 16:55:39 +0800
-Message-Id: <20241029085542.30541-1-yongxuan.wang@sifive.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1730193320; c=relaxed/simple;
+	bh=HDYJQCLEBxCmXHa0cy8/U0NzXNhzXlQDLDtz6/M/1R8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h768lRHWtTYUhVIFGMefteK82z8eNqZzCDe0MHHoZCy/s4mlErPSLKRX5A4I8TlcAJch8i+nEELCp07N8k1Zc6LdTcWBPkTSu62mXAbgHbgYPxhwRSnhQyGksIh9CSJOIZeaaDEUV4/vLyiEsMiFHJbgTI5c8A+IBon53tsVhOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gn6ta54M; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730193318; x=1761729318;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HDYJQCLEBxCmXHa0cy8/U0NzXNhzXlQDLDtz6/M/1R8=;
+  b=Gn6ta54MmCy65vs/Zbfuo9EIW1uWFnWzMugGr0U10xvdmvevoV477rbd
+   4i5kOBs+I+/zytZ6TUflIOc11LRwdoIvRz243m+P7q5dpmm7RKiZP+Tfr
+   3EVjGl7KVloLSA3KfR90iC277FIJcsWy2RuMhi0BuIWMEesrjdAD1sLBk
+   XrHV/LMD7tEkzONvbYZPWAzYGEyzmYxfscJ9z3oto27/zfGtGMiP+Rbp7
+   DnHQFQtJuCM3VDSSXBjwZuTGQhGrvJ1nRFUoG0MOLpSDkFTHC2l5LejJm
+   J5tcIv8FblbJY5ZcjPWnKoqICISk2jEPdATTFecZ65wxP3s1VeWtw3AEn
+   A==;
+X-CSE-ConnectionGUID: LW9IBtIOQw2YWUz8aVslGQ==
+X-CSE-MsgGUID: MDb5ilRUR+y2tIMaz93Axg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11239"; a="47299432"
+X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
+   d="scan'208";a="47299432"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 02:15:17 -0700
+X-CSE-ConnectionGUID: UB/d2OifTCuGY/GPVt0epg==
+X-CSE-MsgGUID: Wr7bJn31Ra6sijXxxCA/Eg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
+   d="scan'208";a="119357839"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.172]) ([10.124.227.172])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 02:15:14 -0700
+Message-ID: <ff5d23fa-12c6-47bb-8309-b19d39875827@intel.com>
+Date: Tue, 29 Oct 2024 17:15:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 09/13] tsc: Use the GUEST_TSC_FREQ MSR for discovering
+ TSC frequency
+To: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ thomas.lendacky@amd.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20241028053431.3439593-1-nikunj@amd.com>
+ <20241028053431.3439593-10-nikunj@amd.com>
+ <b015fb9c-4595-49a9-afde-ef01a45e15d1@intel.com>
+ <ebfae76b-1a4d-175a-e0ab-91319164e461@amd.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ebfae76b-1a4d-175a-e0ab-91319164e461@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-In the section "4.7 Precise effects on interrupt-pending bits"
-of the RISC-V AIA specification defines that:
+On 10/29/2024 11:56 AM, Nikunj A. Dadhania wrote:
+> 
+> 
+> On 10/29/2024 8:32 AM, Xiaoyao Li wrote:
+>> On 10/28/2024 1:34 PM, Nikunj A Dadhania wrote:
+>>> Calibrating the TSC frequency using the kvmclock is not correct for
+>>> SecureTSC enabled guests. Use the platform provided TSC frequency via the
+>>> GUEST_TSC_FREQ MSR (C001_0134h).
+>>>
+>>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>>> ---
+>>>    arch/x86/include/asm/sev.h |  2 ++
+>>>    arch/x86/coco/sev/core.c   | 16 ++++++++++++++++
+>>>    arch/x86/kernel/tsc.c      |  5 +++++
+>>>    3 files changed, 23 insertions(+)
+>>>
+>>> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+>>> index d27c4e0f9f57..9ee63ddd0d90 100644
+>>> --- a/arch/x86/include/asm/sev.h
+>>> +++ b/arch/x86/include/asm/sev.h
+>>> @@ -536,6 +536,7 @@ static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code
+>>>    }
+>>>      void __init snp_secure_tsc_prepare(void);
+>>> +void __init snp_secure_tsc_init(void);
+>>>      #else    /* !CONFIG_AMD_MEM_ENCRYPT */
+>>>    @@ -584,6 +585,7 @@ static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code
+>>>                           u32 resp_sz) { return -ENODEV; }
+>>>      static inline void __init snp_secure_tsc_prepare(void) { }
+>>> +static inline void __init snp_secure_tsc_init(void) { }
+>>>      #endif    /* CONFIG_AMD_MEM_ENCRYPT */
+>>>    diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+>>> index 140759fafe0c..0be9496b8dea 100644
+>>> --- a/arch/x86/coco/sev/core.c
+>>> +++ b/arch/x86/coco/sev/core.c
+>>> @@ -3064,3 +3064,19 @@ void __init snp_secure_tsc_prepare(void)
+>>>          pr_debug("SecureTSC enabled");
+>>>    }
+>>> +
+>>> +static unsigned long securetsc_get_tsc_khz(void)
+>>> +{
+>>> +    unsigned long long tsc_freq_mhz;
+>>> +
+>>> +    setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
+>>> +    rdmsrl(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
+>>> +
+>>> +    return (unsigned long)(tsc_freq_mhz * 1000);
+>>> +}
+>>> +
+>>> +void __init snp_secure_tsc_init(void)
+>>> +{
+>>> +    x86_platform.calibrate_cpu = securetsc_get_tsc_khz;
+>>> +    x86_platform.calibrate_tsc = securetsc_get_tsc_khz;
+>>> +}
+>>> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+>>> index dfe6847fd99e..730cbbd4554e 100644
+>>> --- a/arch/x86/kernel/tsc.c
+>>> +++ b/arch/x86/kernel/tsc.c
+>>> @@ -30,6 +30,7 @@
+>>>    #include <asm/i8259.h>
+>>>    #include <asm/topology.h>
+>>>    #include <asm/uv/uv.h>
+>>> +#include <asm/sev.h>
+>>>      unsigned int __read_mostly cpu_khz;    /* TSC clocks / usec, not used here */
+>>>    EXPORT_SYMBOL(cpu_khz);
+>>> @@ -1514,6 +1515,10 @@ void __init tsc_early_init(void)
+>>>        /* Don't change UV TSC multi-chassis synchronization */
+>>>        if (is_early_uv_system())
+>>>            return;
+>>> +
+>>> +    if (cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
+>>> +        snp_secure_tsc_init();
+>>
+>> IMHO, it isn't the good place to call snp_secure_tsc_init() to update the callbacks here.
+>>
+>> It's better to be called in some snp init functions.
+> 
+> As part of setup_arch(), init_hypervisor_platform() gets called and all the PV clocks
+> are registered and initialized as part of init_platform callback. Once the hypervisor
+> platform is initialized, tsc_early_init() is called. SEV SNP guest can be running on
+> any hypervisor, so the call back needs to be updated either in tsc_early_init() or
+> init_hypervisor_platform(), as the change is TSC related, I have updated it here.
 
-"If the source mode is Level1 or Level0 and the interrupt domain
-is configured in MSI delivery mode (domaincfg.DM = 1):
-The pending bit is cleared whenever the rectified input value is
-low, when the interrupt is forwarded by MSI, or by a relevant
-write to an in_clrip register or to clripnum."
+I think it might be due to
 
-Update the aplic_write_pending() to match the spec.
+1. it lacks a central place for SNP related stuff, like tdx_early_init()
+2. even we have some place of 1), the callbacks will be overwrote in 
+init_hypervisor_platform() by specific PV ops.
 
-Fixes: d8dd9f113e16 ("RISC-V: KVM: Fix APLIC setipnum_le/be write emulation")
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
----
-v2;
-- add fixes tag (Anup)
-- follow the suggestion from Anup
----
- arch/riscv/kvm/aia_aplic.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+However, I don't think it's good practice to update it tsc.c. The reason 
+why callback is used is that arch/hypervisor specific code can implement
+and overwrite with it's own implementation in its own file.
 
-diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
-index da6ff1bade0d..f59d1c0c8c43 100644
---- a/arch/riscv/kvm/aia_aplic.c
-+++ b/arch/riscv/kvm/aia_aplic.c
-@@ -143,7 +143,7 @@ static void aplic_write_pending(struct aplic *aplic, u32 irq, bool pending)
- 	if (sm == APLIC_SOURCECFG_SM_LEVEL_HIGH ||
- 	    sm == APLIC_SOURCECFG_SM_LEVEL_LOW) {
- 		if (!pending)
--			goto skip_write_pending;
-+			goto noskip_write_pending;
- 		if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
- 		    sm == APLIC_SOURCECFG_SM_LEVEL_LOW)
- 			goto skip_write_pending;
-@@ -152,6 +152,7 @@ static void aplic_write_pending(struct aplic *aplic, u32 irq, bool pending)
- 			goto skip_write_pending;
- 	}
- 
-+noskip_write_pending:
- 	if (pending)
- 		irqd->state |= APLIC_IRQ_STATE_PENDING;
- 	else
--- 
-2.17.1
+Back to your case, I think a central snp init function would be helpful, 
+and we can introduce a new flag to skip the overwrite of tsc/cpu 
+calibration for hypervisor when the flag is set.
+
+
+>>
+>>>        if (!determine_cpu_tsc_frequencies(true))
+>>>            return;
+>>>        tsc_enable_sched_clock();
+>>
+> 
+> Regards,
+> Nikunj
 
 
