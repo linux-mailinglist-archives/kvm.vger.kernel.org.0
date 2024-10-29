@@ -1,226 +1,212 @@
-Return-Path: <kvm+bounces-29978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CCA99B5319
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 21:11:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E599B53B3
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 21:32:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C0DE1C229AC
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 20:11:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B9B286647
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 20:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3392076B2;
-	Tue, 29 Oct 2024 20:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FB220A5C0;
+	Tue, 29 Oct 2024 20:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ouKrp1Wl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpqeNwRE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EC21940B3
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 20:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E253209F26
+	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 20:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730232672; cv=none; b=R7TMjjWDD0fBnWar/zbfeHPM0nc6+IUWZw1uKd4RWQU0qo6JyRXNuFbTWur/5+x+FgHz6UJ5FS0W+nxHhL7ynN2E5ZCyci9XhAkgHxD/C6cTVWCq7Ybz6Dnv0FZX1DuBLBgac5lcqTPM1FnVQffw13r6pYBLhYhFdUgBbmC/OI4=
+	t=1730233720; cv=none; b=qlxuUtSHV+xBkBe3Rce+hn9P8JLuzNK3oFHEyaCoGLY3GXnhC0YmRlqmdKdVWoIAABSFrFojcAfadRSDL+98aGGbzqSFjsPGosDbxyF486S6AA3diu4RaFapFqSf41lld6U4JooRpIY+5PKCE0EvWDFCQX2+GrgObOMOGXcYz74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730232672; c=relaxed/simple;
-	bh=bfoprkZGjmkHJRVDyqbHwnrqzCLu7TqY0+8j0H9z3NU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bwAVUA4ytt/WYC4+ViCdZJDFaNrX+TCxWutNj27FMWJsDPfsPkw7NC+CYRsbe0SNlF6hR0onv5qhfWVnmGqht87h+x+A5ZY4ReqGoe/y2xHRWAX1RbEQyIzHLWCGzSldoTX6HNN4aFKjSiYPvn8ixb8Uf32cGedWKZt29DuZsi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ouKrp1Wl; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539ebb5a20aso6069842e87.2
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 13:11:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730232668; x=1730837468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mVffrm7ORWtwr/oTU7Spuj4YBIi+VLsXfNiPlPYNk9Q=;
-        b=ouKrp1Wl5Ye05ub16BoAMNU05Qq00hEor9ScWasIvbczlxvhRumOYNkuUzTZiwWYUk
-         NJkAj3uWh1699hfJosx3eA0dVfR15z23W7I6KzD/SN/KMNGFIxgxz1TXrZ5sX7pdDIFN
-         BpEuErwrFrnCbKY99MDQHZTo6wjQL+ehgxt3RGiOJ51D8htreeERE8D/JEw3/AcrimOG
-         ds2ldp6NVczHT2RYVh6Yo+yEtaTD4lwf4tFxmJ2MSfBDB1iGc3dC7+e+T6VJpLMphKvU
-         WSDXQEIyjDvxPVTaEhsH31nDNxDdTm3FyDFohIiGFTkD9cs/TNojwikxMWLufGxzWJQl
-         qo6g==
+	s=arc-20240116; t=1730233720; c=relaxed/simple;
+	bh=a5xIuAZIag/sepN5E+3EBOahr5lBoxT2h56exTpk7kM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AW8F/80xmBmnGSqCtCZzJca3QN8NenIz2sF6PqJamnHjnXVOcFHbmZiIjpOVXBll8Zm75hH4wMkxccE8rdKsz0XzENsphQFx7daGDgKofst1EgOHk27D3CRQ211Ay4sSpZQU1plVtneHsCY/H2zcZVNMXyifBlohai4152JuIh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpqeNwRE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730233715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=851Ps5eN/WBcnZzS5QtOPdUJ2Lt5cNuaFi9PFnOegbw=;
+	b=VpqeNwRE4diElT9k9KYP9MSb9WPYljkhfh1C8C/laV6Kq9Snlps8/ANE8jzwU/5LhqVS6w
+	wfx/axtmEf1ciYbK2Qq+Uwt1LQpSxW4T4EFUgFQgQcFpzNB53Sa1sR2VqA2EBfyYCFImws
+	rjJDaA9Lnmjm/AEqwJyUG/DLERc6BTE=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-272-Af-dW5QPPfChXxVcvC66Zw-1; Tue, 29 Oct 2024 16:28:32 -0400
+X-MC-Unique: Af-dW5QPPfChXxVcvC66Zw-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83ac065de2fso59544239f.0
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 13:28:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730232668; x=1730837468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mVffrm7ORWtwr/oTU7Spuj4YBIi+VLsXfNiPlPYNk9Q=;
-        b=Qk5rDvKHPdvSNoDb9SPXBcZy8111vEfy+3TJO2gPkFUQPxfsU79WKQkCD7Y9oCxxE3
-         wX9burY1Y+x1+60VQztQcoP05G+7c812PtKOS6trEHBaRZO2KErD56HbaCIqhQNxv6vj
-         ahlmoph0Mx9PjYhy7k/MyTd3a+3MVEZ3jJ7U2gLjyXFwA7EX1flGWBWBEzNSq6VLC2Kz
-         wQB3aJV8UPkZqiaG7hllCgWJIBJKPR3oT1KHAWjUJKYJRe8bZYzXQyrs42v1zcN7G9UJ
-         VpvNmkwN0z+A1iYzWONu2JlOgkPx22FlJVOrTaBfapXo5V1RdwyG7vB5Y8WXV2f2lUNS
-         o0yA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKKF+ldNBlMUtFjWXGmymhekZSAMTZ1MkZ0gfUeG3N3sqigvdQlb6kVjMbMhdqnnNFcZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYcBMt3KH2EptF3ajrEpbMt7ugWlRypl7wvcYfYECiDK92+NU3
-	z8ebZBX7HWaeRPh7uXamNu9OXnHpOhy6WT1pk++/q7qowY9lpJSOGtNoSp4zAMQ=
-X-Google-Smtp-Source: AGHT+IEQm7S7HhrAefu6bB3WsI9sjvU1NibhMhK2h3mgqHzs6Ac3q/ixT/MrrVYq2nNiKqsosFqETQ==
-X-Received: by 2002:a05:6512:1285:b0:539:e513:1f66 with SMTP id 2adb3069b0e04-53b3491e086mr6508337e87.37.1730232667785;
-        Tue, 29 Oct 2024 13:11:07 -0700 (PDT)
-Received: from [192.168.156.226] ([91.223.100.133])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53bc0d5f161sm40364e87.213.2024.10.29.13.10.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 13:11:07 -0700 (PDT)
-Message-ID: <31e8dc51-f70f-44eb-a768-61cfa50eed5b@linaro.org>
-Date: Tue, 29 Oct 2024 17:10:52 -0300
+        d=1e100.net; s=20230601; t=1730233710; x=1730838510;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=851Ps5eN/WBcnZzS5QtOPdUJ2Lt5cNuaFi9PFnOegbw=;
+        b=cdOVi2cQbjFHDOS9DEg++6JcX0CboA3R4J8L7NCHDPfnr6xJjOeqXfuQvS6R12U8Pe
+         1WB3yqR6JjldGvWjIm/kjeI9g/a7wFNuG9h3ardqF8a0x9tgO83YnX+7PmAYjGpYBBDw
+         8e9/NZfOT5MjGWUP3WcfnlPSkRaKZNNUgCrOr5Die/LoQ+OrQjpKlmRim0KaM7iWcXTN
+         1U4V2d43yuWUpZnVWrJLuxbJKuBzH2zAnLOM8CCyq5wrWCb1Q/p5JdSF0ZtDUHpp6LqG
+         4s7siIw7WfMIOsGEeNJ0GxChBvmse+ElydHNSjFYgyHWlcCtCBWhKYLV8051goCfvbkP
+         2/7g==
+X-Forwarded-Encrypted: i=1; AJvYcCU7809IU2NRUNlzCHbEJuEP60t1pf2vAWA4Sg57NQ+CVCZu6S7xQvlSWEFQi6Uu6GLYmbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybodFilCXZYr5nSX2bWBUXN1Qmjo6lpWfzhu464G3s/a4XGWwq
+	XapCETNy8/X18g06S+A+3O9A2UBFEvptRZ+3slbXipGdYef80nXMoETSjAWz1HVUnuf6lapDHfa
+	m7pRWxmhVkO64iNP8KHFPZkE1G1V28E5scbZAJmlWadP2k2maqFMgCCqBCQ==
+X-Received: by 2002:a5d:959a:0:b0:83a:acf9:fa03 with SMTP id ca18e2360f4ac-83b1c612559mr299146739f.5.1730233709987;
+        Tue, 29 Oct 2024 13:28:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHKReZAi6oCptitalNpW1MwvdgSb9EBWSdrx7SCMBV57J4vGIb8mYpE47sABKEVBNSy5GseDw==
+X-Received: by 2002:a5d:959a:0:b0:83a:acf9:fa03 with SMTP id ca18e2360f4ac-83b1c612559mr299145339f.5.1730233709552;
+        Tue, 29 Oct 2024 13:28:29 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83b13891df4sm221458139f.46.2024.10.29.13.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 13:28:28 -0700 (PDT)
+Date: Tue, 29 Oct 2024 14:28:26 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com"
+ <jasowang@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "virtualization@lists.linux-foundation.org"
+ <virtualization@lists.linux-foundation.org>, Feng Liu <feliu@nvidia.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>, "joao.m.martins@oracle.com"
+ <joao.m.martins@oracle.com>, Leon Romanovsky <leonro@nvidia.com>, Maor
+ Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH vfio 0/7] Enhances the vfio-virtio driver to support
+ live migration
+Message-ID: <20241029142826.1b148685.alex.williamson@redhat.com>
+In-Reply-To: <CY8PR12MB7195FCA5172D7829B1ABC773DC4A2@CY8PR12MB7195.namprd12.prod.outlook.com>
+References: <20241027100751.219214-1-yishaih@nvidia.com>
+	<20241028101348.37727579.alex.williamson@redhat.com>
+	<20241028162354.GS6956@nvidia.com>
+	<20241028105404.4858dcc2.alex.williamson@redhat.com>
+	<CY8PR12MB7195FCA5172D7829B1ABC773DC4A2@CY8PR12MB7195.namprd12.prod.outlook.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/9] hw/core: Make CPU topology enumeration
- arch-agnostic
-To: Zhao Liu <zhao1.liu@intel.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Sia Jee Heng <jeeheng.sia@starfivetech.com>,
- Alireza Sanaee <alireza.sanaee@huawei.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-riscv@nongnu.org,
- qemu-arm@nongnu.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>
-References: <20241022135151.2052198-1-zhao1.liu@intel.com>
- <20241022135151.2052198-3-zhao1.liu@intel.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20241022135151.2052198-3-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 22/10/24 10:51, Zhao Liu wrote:
-> Cache topology needs to be defined based on CPU topology levels. Thus,
-> define CPU topology enumeration in qapi/machine.json to make it generic
-> for all architectures.
+On Mon, 28 Oct 2024 17:46:57 +0000
+Parav Pandit <parav@nvidia.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Monday, October 28, 2024 10:24 PM
+> > 
+> > On Mon, 28 Oct 2024 13:23:54 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Mon, Oct 28, 2024 at 10:13:48AM -0600, Alex Williamson wrote:
+> > >  
+> > > > If the virtio spec doesn't support partial contexts, what makes it
+> > > > beneficial here?  
+> > >
+> > > It stil lets the receiver 'warm up', like allocating memory and
+> > > approximately sizing things.
+> > >  
+> > > > If it is beneficial, why is it beneficial to send initial data more than
+> > > > once?  
+> > >
+> > > I guess because it is allowed to change and the benefit is highest
+> > > when the pre copy data closely matches the final data..  
+> > 
+> > It would be useful to see actual data here.  For instance, what is the latency
+> > advantage to allocating anything in the warm-up and what's the probability
+> > that allocation is simply refreshed versus starting over?
+> >   
 > 
-> To match the general topology naming style, rename CPU_TOPO_LEVEL_* to
-> CPU_TOPOLOGY_LEVEL_*, and rename SMT and package levels to thread and
-> socket.
+> Allocating everything during the warm-up phase, compared to no
+> allocation, reduced the total VM downtime from 439 ms to 128 ms. This
+> was tested using two PCI VF hardware devices per VM.
+>
+> The benefit comes from the device state staying mostly the same.
 > 
-> Also, enumerate additional topology levels for non-i386 arches, and add
-> a CPU_TOPOLOGY_LEVEL_DEFAULT to help future smp-cache object to work
-> with compatibility requirement of arch-specific cache topology models.
+> We tested with different configurations from 1 to 4 devices per VM,
+> varied with vcpus and memory. Also, more detailed test results are
+> captured in Figure-2 on page 6 at [1].
+
+Those numbers seems to correspond to column 1 of Figure 2 in the
+referenced document, but that's looking only at downtime.  To me that
+chart seems to show a step function where there's ~400ms of downtime
+per device, which suggests we're serializing device resume in the
+stop-copy phase on the target without pre-copy.
+
+Figure 3 appears to look at total VM migration time, where pre-copy
+tends to show marginal improvements in smaller configurations, but up
+to 60% worse overall migration time as the vCPU, device, and VM memory
+size increase.  The paper comes to the conclusion:
+
+	It can be concluded that either of increasing the VM memory or
+	device configuration has equal effect on the VM total migration
+	time, but no effect on the VM downtime due to pre-copy
+	enablement.
+
+Noting specifically "downtime" here ignores that the overall migration
+time actually got worse with pre-copy.
+
+Between columns 10 & 11 the device count is doubled.  With pre-copy
+enabled, the migration time increases by 135% while with pre-copy
+disabled we only only see a 113% increase.  Between columns 11 & 12 the
+VM memory is further doubled.  This results in another 33% increase in
+migration time with pre-copy enabled and only a 3% increase with
+pre-copy disabled.  For the most part this entire figure shows that
+overall migration time with pre-copy enabled is either on par with or
+worse than the same with pre-copy disabled.
+
+We then move on to Tables 1 & 2, which are again back to specifically
+showing timing of operations related to downtime rather than overall
+migration time.  The notable thing here seems to be that we've
+amortized the 300ms per device load time across the pre-copy phase,
+leaving only 11ms per device contributing to downtime.
+
+However, the paper also goes into this tangent:
+
+	Our observations indicate that enabling device-level pre-copy
+	results in more pre-copy operations of the system RAM and
+	device state. This leads to a 50% reduction in memory (RAM)
+	copy time in the device pre-copy method in the micro-benchmark
+	results, saving 100 milliseconds of downtime.
+
+I'd argue that this is an anti-feature.  A less generous interpretation
+is that pre-copy extended the migration time, likely resulting in more
+RAM transfer during pre-copy, potentially to the point that the VM
+undershot its prescribed downtime.  Further analysis should also look
+at the total data transferred for the migration and adherence to the
+configured VM downtime, rather than just the absolute downtime.
+
+At the end of the paper, I think we come to the same conclusion shown
+in Figure 1, where device load seems to be serialized and therefore
+significantly limits scalability.  That could be parallelized, but
+even 300-400ms for loading all devices is still too much contribution to
+downtime.  I'd therefore agree that pre-loading the device during
+pre-copy improves the scaling by an order of magnitude, but it doesn't
+solve the scaling problem.  Also, it should not come with the cost of
+drawing out pre-copy and thus the overall migration time to this
+extent.  The reduction in downtime related to RAM copy time should be
+evidence that the pre-copy behavior here has exceeded its scope and is
+interfering with the balance between pre- and post- copy elsewhere.
+Thanks,
+
+Alex
+
 > 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> ---
-> Changes since Patch v3:
->   * Dropped "invalid" level to avoid an unsettable option. (Daniel)
-> ---
->   hw/i386/x86-common.c       |   4 +-
->   include/hw/i386/topology.h |  23 ++----
->   qapi/machine-common.json   |  44 +++++++++++-
->   target/i386/cpu.c          | 144 ++++++++++++++++++-------------------
->   target/i386/cpu.h          |   4 +-
->   5 files changed, 123 insertions(+), 96 deletions(-)
+> [1] https://netdevconf.info/0x18/docs/netdev-0x18-paper22-talk-paper.pdf
 > 
-> diff --git a/hw/i386/x86-common.c b/hw/i386/x86-common.c
-> index b86c38212eab..bc360a9ea44b 100644
-> --- a/hw/i386/x86-common.c
-> +++ b/hw/i386/x86-common.c
-> @@ -273,12 +273,12 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
->   
->       if (ms->smp.modules > 1) {
->           env->nr_modules = ms->smp.modules;
-> -        set_bit(CPU_TOPO_LEVEL_MODULE, env->avail_cpu_topo);
-> +        set_bit(CPU_TOPOLOGY_LEVEL_MODULE, env->avail_cpu_topo);
->       }
->   
->       if (ms->smp.dies > 1) {
->           env->nr_dies = ms->smp.dies;
-> -        set_bit(CPU_TOPO_LEVEL_DIE, env->avail_cpu_topo);
-> +        set_bit(CPU_TOPOLOGY_LEVEL_DIE, env->avail_cpu_topo);
->       }
->   
->       /*
-> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-> index 48b43edc5a90..b2c8bf2de158 100644
-> --- a/include/hw/i386/topology.h
-> +++ b/include/hw/i386/topology.h
-> @@ -39,7 +39,7 @@
->    *  CPUID Fn8000_0008_ECX[ApicIdCoreIdSize[3:0]] is set to apicid_core_width().
->    */
->   
-> -
-> +#include "qapi/qapi-types-machine-common.h"
->   #include "qemu/bitops.h"
->   
->   /*
-> @@ -62,22 +62,7 @@ typedef struct X86CPUTopoInfo {
->       unsigned threads_per_core;
->   } X86CPUTopoInfo;
->   
-> -#define CPU_TOPO_LEVEL_INVALID CPU_TOPO_LEVEL_MAX
-> -
-> -/*
-> - * CPUTopoLevel is the general i386 topology hierarchical representation,
-> - * ordered by increasing hierarchical relationship.
-> - * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
-> - * or AMD (CPUID[0x80000026]).
-> - */
-> -enum CPUTopoLevel {
-> -    CPU_TOPO_LEVEL_SMT,
-> -    CPU_TOPO_LEVEL_CORE,
-> -    CPU_TOPO_LEVEL_MODULE,
-> -    CPU_TOPO_LEVEL_DIE,
-> -    CPU_TOPO_LEVEL_PACKAGE,
-> -    CPU_TOPO_LEVEL_MAX,
-> -};
-> +#define CPU_TOPOLOGY_LEVEL_INVALID CPU_TOPOLOGY_LEVEL__MAX
-
-
-> @@ -341,18 +341,18 @@ static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
->       return 0;
->   }
->   
-> -static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
-> +static uint32_t cpuid1f_topo_type(enum CpuTopologyLevel topo_level)
->   {
->       switch (topo_level) {
-> -    case CPU_TOPO_LEVEL_INVALID:
-> +    case CPU_TOPOLOGY_LEVEL_INVALID:
-
-Since we use an enum, I'd rather directly use CPU_TOPOLOGY_LEVEL__MAX.
-
-Or maybe in this case ...
-
->           return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
-> -    case CPU_TOPO_LEVEL_SMT:
-> +    case CPU_TOPOLOGY_LEVEL_THREAD:
->           return CPUID_1F_ECX_TOPO_LEVEL_SMT;
-> -    case CPU_TOPO_LEVEL_CORE:
-> +    case CPU_TOPOLOGY_LEVEL_CORE:
->           return CPUID_1F_ECX_TOPO_LEVEL_CORE;
-> -    case CPU_TOPO_LEVEL_MODULE:
-> +    case CPU_TOPOLOGY_LEVEL_MODULE:
->           return CPUID_1F_ECX_TOPO_LEVEL_MODULE;
-> -    case CPU_TOPO_LEVEL_DIE:
-> +    case CPU_TOPOLOGY_LEVEL_DIE:
->           return CPUID_1F_ECX_TOPO_LEVEL_DIE;
->       default:
-            /* Other types are not supported in QEMU. */
-            g_assert_not_reached();
-
-... return CPUID_1F_ECX_TOPO_LEVEL_INVALID as default.
-
-Can be cleaned on top, so:
-
-Acked-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-
 
 
