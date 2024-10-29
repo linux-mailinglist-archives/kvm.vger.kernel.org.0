@@ -1,257 +1,239 @@
-Return-Path: <kvm+bounces-29981-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29982-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F9C9B5625
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 23:59:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 332219B5679
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 00:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D4F283EF8
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 22:59:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87111F23D72
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 23:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B082520ADEF;
-	Tue, 29 Oct 2024 22:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E83920D4F6;
+	Tue, 29 Oct 2024 23:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T462Yrqs"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mCQKQDO9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8634A194AD6
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 22:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A5D20C49B;
+	Tue, 29 Oct 2024 23:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730242794; cv=none; b=r2ZS/MFe38Yf8wRrMEnqVrpSap9ZpOjSpie29kGZ1B/gVXq6empvTni6SA04ouUzHvCBeJudwcAmUKePWkagJV+sEk1Uj4Gj55B1GPK5AutXfRgr64TAN01xghk3Q9E1VwYrY6CXq0XKIr1jPAA9Zyq+bxsLDd2SXWu7lyXRmIU=
+	t=1730243179; cv=none; b=rwaLWGgbnS0gmR56RGQ/vZfTkCG5F0saoX9Yh7rGTwrkBCSvmTb2CbX7c80X0SaQca8UMyCYBK0+MExePcoWEL3sB3kvGJ3io2vhNXRyq2kGCiXECfAttfVgDPwZk00pkfMqP6dNgVqw47Kelh2nV1qBg2UMi3+aWGnVXgFYkx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730242794; c=relaxed/simple;
-	bh=JVi7y45kZBWbS2F7GabGE5yhstU057iLHEOvLaL+Vcw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X6pFq6rFJFLFyPtP5n8QXukmCgbJhENRhxz2M0c/6ZeMW/CpT6yGfVLAh0w9i2ZvuwaPEEWhOB/Acbl5ymhURpwh8Td3Y/j6MkhteJ8aC+49MXtQvDB41SJ81cl0z6wibiToTQQLgfrS1YpqrIE6w5svNyCZmI9eqdWHjqzD3y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T462Yrqs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730242791;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uC80EUK0/uILcge2OXCLIRoiryY17Wl0SjIOpx9KtUU=;
-	b=T462YrqsN6JVHsN5EtJRNF+uN2Qa2+boA9mQ1oYSOh5RRdCj2u9X1eMyl2mQz1azMiRsVn
-	nIpJSqimga0vSfi2b0N4YXg3+m6vgeHw3WKhzeaUYRmIPgwVYh1WHY5B0iebJDVm9iXqya
-	G9zSqdMn2wsimACI6VDiLQCG6F0FRZk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-454zRWztM7-LwO60k3_ekQ-1; Tue, 29 Oct 2024 18:59:50 -0400
-X-MC-Unique: 454zRWztM7-LwO60k3_ekQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4317391101aso41557985e9.2
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 15:59:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730242789; x=1730847589;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uC80EUK0/uILcge2OXCLIRoiryY17Wl0SjIOpx9KtUU=;
-        b=W+OcOB/5p997g2NFQs2OpF9MARIMG/BlWgFaljDa24QpgSZN+jIleL2z4TI+FD+qbn
-         xQerJUF9dfJBBHuSPqbrNmblJEaC7SbAPCoFiJdsyNlo6/ssQyhIWY79gRuUcSqZowgX
-         cnpTF9Eo+1bGDW0WGnbp/N26goFhfXllu+3Dk1YZ55BAFL1AWwpkq96vgx8TTdNDNch1
-         tDyPGAAwGs1l8m0L0NDTfXmilDzZu4ejODb0Kae1wP3j8mM8m3lLTLxXMrg2i6AJuwXq
-         tp3eAmXQ+yUYG/BpgqvOMCHkwNNYEe6iD4LehKTbxRLozFRoB2p5NJh9GHwozTU6EeCY
-         r+tw==
-X-Gm-Message-State: AOJu0YzkLJVj6JGx1M7/KCAh2/bdJ2iLlD2aoznQ81N8xkiPqX40T9s0
-	NGQTtA4GqAMjPOEmESzA5zFys20kC8hHgrKzMvpmHmc3KGW9EC1+K3IMH8gnKd1IQZ8zGZcc0mU
-	1d0QCJLOYZ8s827swRZnlwC4RuxSKYVS5P52k+Y5li4kVf+kXIw==
-X-Received: by 2002:a05:600c:350b:b0:431:44fe:fd9a with SMTP id 5b1f17b1804b1-4319acb8a7cmr112318435e9.19.1730242788893;
-        Tue, 29 Oct 2024 15:59:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsm7OZ7MAFVicUj8pTSI6wQKTrCNicjqISkuPLhqcNhR9WTy+4/jAtAk+Mm6Ppb+5nez3Uvw==
-X-Received: by 2002:a05:600c:350b:b0:431:44fe:fd9a with SMTP id 5b1f17b1804b1-4319acb8a7cmr112318315e9.19.1730242788512;
-        Tue, 29 Oct 2024 15:59:48 -0700 (PDT)
-Received: from [192.168.10.3] ([151.49.226.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd98e823sm2868095e9.38.2024.10.29.15.59.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 15:59:47 -0700 (PDT)
-Message-ID: <1998a069-50a0-46a2-8420-ebdce7725720@redhat.com>
-Date: Tue, 29 Oct 2024 23:59:43 +0100
+	s=arc-20240116; t=1730243179; c=relaxed/simple;
+	bh=9W+AHt/u5MeZwhEMrDWMOoEiPok8YXhk3IbKNloyLig=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SUZIFpMuQe0wlk3cqwPSDcoK9cmmeA4Nj/CYmQ0cOIIf6YGsHykmfLmZaYRpj8GjBu94EVs5P1eZqJJjPNJcemSUd+Rcfj/uQGN1DoIet/b0M2NZATK4rROGhTPw1dCXNEFapxe9VcJiawtae+qB8IIIpjrfzxquP89ts2epwVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mCQKQDO9; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TLjePI025437;
+	Tue, 29 Oct 2024 23:05:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=XvPjFHvm1+HBenMPEFmypiCz
+	DsR7VO/a8uKBoMokM3U=; b=mCQKQDO9bf3KfjOJU9ltheoQ4pi0fn1YYss4JVAT
+	q1v+p9+u9ONpdRk7Qgy5XsZ3UXOhgNR2wlEUyIZJiTATUwupgdqCX8w2AzPTkQHD
+	o7My0k7jrEgNK/E8DCtuwASBBQvKrb0z5dzki/3JQPD86QZg/Jx7q7OyRcpYlhX4
+	kL/qq7w+YWQzddaE2fHnJ3F7FG6kbEWr7MwYfkkeOIYh1k/UFHNc7Hezg+xvrhXG
+	9BAKuIplcwNjNJp/KZs98qV/cW4m01e13kPJS0HhNvYCtdWhMLpAjvVvjd87NFVK
+	tTp/G4ONtnEkJgL68a8jrsECbbgSoCHa4JrFK6nSf6Jnpw==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gsq8hwyc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 23:05:56 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49TN5tQ9001175
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 23:05:55 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 29 Oct 2024 16:05:54 -0700
+Date: Tue, 29 Oct 2024 16:05:54 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: James Gowans <jgowans@amazon.com>
+CC: <linux-kernel@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Viro
+	<viro@zeniv.linux.org.uk>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Anthony
+ Yznaga <anthony.yznaga@oracle.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Andrew
+ Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>,
+        Jason Gunthorpe
+	<jgg@ziepe.ca>, <linux-fsdevel@vger.kernel.org>,
+        Usama Arif
+	<usama.arif@bytedance.com>, <kvm@vger.kernel.org>,
+        Alexander Graf
+	<graf@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
+        Paul Durrant
+	<pdurrant@amazon.co.uk>,
+        Nicolas Saenz Julienne <nsaenz@amazon.es>
+Subject: Re: [PATCH 05/10] guestmemfs: add file mmap callback
+Message-ID: <20241029120232032-0700.eberman@hu-eberman-lv.qualcomm.com>
+References: <20240805093245.889357-1-jgowans@amazon.com>
+ <20240805093245.889357-6-jgowans@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: cgroup2 freezer and kvm_vm_worker_thread()
-To: Tejun Heo <tj@kernel.org>, Luca Boccassi <bluca@debian.org>,
- Roman Gushchin <roman.gushchin@linux.dev>
-Cc: kvm@vger.kernel.org, cgroups@vger.kernel.org,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- linux-kernel@vger.kernel.org
-References: <ZyAnSAw34jwWicJl@slm.duckdns.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZyAnSAw34jwWicJl@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240805093245.889357-6-jgowans@amazon.com>
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: YHT3SO5zWSaOsoLiIh9WLH0BmLD6E99w
+X-Proofpoint-ORIG-GUID: YHT3SO5zWSaOsoLiIh9WLH0BmLD6E99w
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ adultscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1011 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410290175
 
-On 10/29/24 01:07, Tejun Heo wrote:
-> Hello,
+On Mon, Aug 05, 2024 at 11:32:40AM +0200, James Gowans wrote:
+> Make the file data usable to userspace by adding mmap. That's all that
+> QEMU needs for guest RAM, so that's all be bother implementing for now.
 > 
-> Luca is reporting that cgroups which have kvm instances inside never
-> complete freezing. This can be trivially reproduced:
-> 
->    root@test ~# mkdir /sys/fs/cgroup/test
->    root@test ~# echo $fish_pid > /sys/fs/cgroup/test/cgroup.procs
->    root@test ~# qemu-system-x86_64 --nographic -enable-kvm
-> 
-> and in another terminal:
-> 
->    root@test ~# echo 1 > /sys/fs/cgroup/test/cgroup.freeze
->    root@test ~# cat /sys/fs/cgroup/test/cgroup.events
->    populated 1
->    frozen 0
->    root@test ~# for i in (cat /sys/fs/cgroup/test/cgroup.threads); echo $i; cat /proc/$i/stack; end
->    2070
->    [<0>] do_freezer_trap+0x42/0x70
->    [<0>] get_signal+0x4da/0x870
->    [<0>] arch_do_signal_or_restart+0x1a/0x1c0
->    [<0>] syscall_exit_to_user_mode+0x73/0x120
->    [<0>] do_syscall_64+0x87/0x140
->    [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    2159
->    [<0>] do_freezer_trap+0x42/0x70
->    [<0>] get_signal+0x4da/0x870
->    [<0>] arch_do_signal_or_restart+0x1a/0x1c0
->    [<0>] syscall_exit_to_user_mode+0x73/0x120
->    [<0>] do_syscall_64+0x87/0x140
->    [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    2160
->    [<0>] do_freezer_trap+0x42/0x70
->    [<0>] get_signal+0x4da/0x870
->    [<0>] arch_do_signal_or_restart+0x1a/0x1c0
->    [<0>] syscall_exit_to_user_mode+0x73/0x120
->    [<0>] do_syscall_64+0x87/0x140
->    [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    2161
->    [<0>] kvm_nx_huge_page_recovery_worker+0xea/0x680
->    [<0>] kvm_vm_worker_thread+0x8f/0x2b0
->    [<0>] kthread+0xe8/0x110
->    [<0>] ret_from_fork+0x33/0x40
->    [<0>] ret_from_fork_asm+0x1a/0x30
->    2164
->    [<0>] do_freezer_trap+0x42/0x70
->    [<0>] get_signal+0x4da/0x870
->    [<0>] arch_do_signal_or_restart+0x1a/0x1c0
->    [<0>] syscall_exit_to_user_mode+0x73/0x120
->    [<0>] do_syscall_64+0x87/0x140
->    [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> The cgroup freezing happens in the signal delivery path but
-> kvm_vm_worker_thread() thread never call into the signal delivery path while
-> joining non-root cgroups, so they never get frozen. Because the cgroup
-> freezer determines whether a given cgroup is frozen by comparing the number
-> of frozen threads to the total number of threads in the cgroup, the cgroup
-> never becomes frozen and users waiting for the state transition may hang
-> indefinitely.
-> 
-> There are two paths that we can take:
-> 
-> 1. Make kvm_vm_worker_thread() call into signal delivery path.
->     io_wq_worker() is in a similar boat and handles signal delivery and can
->     be frozen and trapped like regular threads.
+> When mmaping the file the VMA is marked as PFNMAP to indicate that there
+> are no struct pages for the memory in this VMA. Remap_pfn_range() is
+> used to actually populate the page tables. All PTEs are pre-faulted into
+> the pgtables at mmap time so that the pgtables are usable when this
+> virtual address range is given to VFIO's MAP_DMA.
 
-For the freezing part, would this be anything more than
+Thanks for sending this out! I'm going through the series with the
+intention to see how it might fit within the existing guest_memfd work
+for pKVM/CoCo/Gunyah.
 
-fdiff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d16ce8174ed6..b7b6a1c1b6a4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -47,6 +47,7 @@
-  #include <linux/kern_levels.h>
-  #include <linux/kstrtox.h>
-  #include <linux/kthread.h>
-+#include <linux/freezer.h>
-  #include <linux/wordpart.h>
-  
-  #include <asm/page.h>
-@@ -7429,22 +7430,27 @@ static long get_nx_huge_page_recovery_timeout(u64 start_time)
-  static int kvm_nx_huge_page_recovery_worker(struct kvm *kvm, uintptr_t data)
-  {
-  	u64 start_time;
--	long remaining_time;
-+	u64 end_time;
-+
-+	set_freezable();
-  
-  	while (true) {
-  		start_time = get_jiffies_64();
--		remaining_time = get_nx_huge_page_recovery_timeout(start_time);
-+		end_time = start_time + get_nx_huge_page_recovery_timeout(start_time);
-  
--		set_current_state(TASK_INTERRUPTIBLE);
--		while (!kthread_should_stop() && remaining_time > 0) {
--			schedule_timeout(remaining_time);
--			remaining_time = get_nx_huge_page_recovery_timeout(start_time);
-+		for (;;) {
-  			set_current_state(TASK_INTERRUPTIBLE);
-+			if (kthread_freezable_should_stop(NULL))
-+				break;
-+			start_time = get_jiffies_64();
-+			if ((s64)(end_time - start_time) <= 0)
-+				break;
-+			schedule_timeout(end_time - start_time);
-  		}
-  
-  		set_current_state(TASK_RUNNING);
-  
--		if (kthread_should_stop())
-+		if (kthread_freezable_should_stop(NULL))
-  			return 0;
-  
-  		kvm_recover_nx_huge_pages(kvm);
+It might've been mentioned in the MM alignment session -- you might be
+interested to join the guest_memfd bi-weekly call to see how we are
+overlapping [1].
 
-(untested beyond compilation).
+[1]: https://lore.kernel.org/kvm/ae794891-fe69-411a-b82e-6963b594a62a@redhat.com/T/
 
-I'm not sure if the KVM worker thread should process signals.  We want it
-to take the CPU time it uses from the guest, but otherwise it's not running
-on behalf of userspace in the way that io_wq_worker() is.
+---
 
-Paolo
+Was the decision to pre-fault everything because it was convenient to do
+or otherwise intentionally different from hugetlb?
 
+> 
+> Signed-off-by: James Gowans <jgowans@amazon.com>
+> ---
+>  fs/guestmemfs/file.c       | 43 +++++++++++++++++++++++++++++++++++++-
+>  fs/guestmemfs/guestmemfs.c |  2 +-
+>  fs/guestmemfs/guestmemfs.h |  3 +++
+>  3 files changed, 46 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/guestmemfs/file.c b/fs/guestmemfs/file.c
+> index 618c93b12196..b1a52abcde65 100644
+> --- a/fs/guestmemfs/file.c
+> +++ b/fs/guestmemfs/file.c
+> @@ -1,6 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  
+>  #include "guestmemfs.h"
+> +#include <linux/mm.h>
+>  
+>  static int truncate(struct inode *inode, loff_t newsize)
+>  {
+> @@ -41,6 +42,46 @@ static int inode_setattr(struct mnt_idmap *idmap, struct dentry *dentry, struct
+>  	return 0;
+>  }
+>  
+> +/*
+> + * To be able to use PFNMAP VMAs for VFIO DMA mapping we need the page tables
+> + * populated with mappings. Pre-fault everything.
+> + */
+> +static int mmap(struct file *filp, struct vm_area_struct *vma)
+> +{
+> +	int rc;
+> +	unsigned long *mappings_block;
+> +	struct guestmemfs_inode *guestmemfs_inode;
+> +
+> +	guestmemfs_inode = guestmemfs_get_persisted_inode(filp->f_inode->i_sb,
+> +			filp->f_inode->i_ino);
+> +
+> +	mappings_block = guestmemfs_inode->mappings;
+> +
+> +	/* Remap-pfn-range will mark the range VM_IO */
+> +	for (unsigned long vma_addr_offset = vma->vm_start;
+> +			vma_addr_offset < vma->vm_end;
+> +			vma_addr_offset += PMD_SIZE) {
+> +		int block, mapped_block;
+> +		unsigned long map_size = min(PMD_SIZE, vma->vm_end - vma_addr_offset);
+> +
+> +		block = (vma_addr_offset - vma->vm_start) / PMD_SIZE;
+> +		mapped_block = *(mappings_block + block);
+> +		/*
+> +		 * It's wrong to use rempa_pfn_range; this will install PTE-level entries.
+> +		 * The whole point of 2 MiB allocs is to improve TLB perf!
+> +		 * We should use something like mm/huge_memory.c#insert_pfn_pmd
+> +		 * but that is currently static.
+> +		 * TODO: figure out the best way to install PMDs.
+> +		 */
+> +		rc = remap_pfn_range(vma,
+> +				vma_addr_offset,
+> +				(guestmemfs_base >> PAGE_SHIFT) + (mapped_block * 512),
+> +				map_size,
+> +				vma->vm_page_prot);
+> +	}
+> +	return 0;
+> +}
+> +
+>  const struct inode_operations guestmemfs_file_inode_operations = {
+>  	.setattr = inode_setattr,
+>  	.getattr = simple_getattr,
+> @@ -48,5 +89,5 @@ const struct inode_operations guestmemfs_file_inode_operations = {
+>  
+>  const struct file_operations guestmemfs_file_fops = {
+>  	.owner = THIS_MODULE,
+> -	.iterate_shared = NULL,
+> +	.mmap = mmap,
+>  };
+> diff --git a/fs/guestmemfs/guestmemfs.c b/fs/guestmemfs/guestmemfs.c
+> index c45c796c497a..38f20ad25286 100644
+> --- a/fs/guestmemfs/guestmemfs.c
+> +++ b/fs/guestmemfs/guestmemfs.c
+> @@ -9,7 +9,7 @@
+>  #include <linux/memblock.h>
+>  #include <linux/statfs.h>
+>  
+> -static phys_addr_t guestmemfs_base, guestmemfs_size;
+> +phys_addr_t guestmemfs_base, guestmemfs_size;
+>  struct guestmemfs_sb *psb;
+>  
+>  static int statfs(struct dentry *root, struct kstatfs *buf)
+> diff --git a/fs/guestmemfs/guestmemfs.h b/fs/guestmemfs/guestmemfs.h
+> index 7ea03ac8ecca..0f2788ce740e 100644
+> --- a/fs/guestmemfs/guestmemfs.h
+> +++ b/fs/guestmemfs/guestmemfs.h
+> @@ -8,6 +8,9 @@
+>  #define GUESTMEMFS_FILENAME_LEN 255
+>  #define GUESTMEMFS_PSB(sb) ((struct guestmemfs_sb *)sb->s_fs_info)
+>  
+> +/* Units of bytes */
+> +extern phys_addr_t guestmemfs_base, guestmemfs_size;
+> +
+>  struct guestmemfs_sb {
+>  	/* Inode number */
+>  	unsigned long next_free_ino;
+> -- 
+> 2.34.1
+> 
+> 
 
