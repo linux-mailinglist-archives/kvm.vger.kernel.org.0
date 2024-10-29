@@ -1,170 +1,219 @@
-Return-Path: <kvm+bounces-29969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EFC9B511D
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 18:41:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A429B5141
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 18:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64CE51F221A7
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:41:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3341C282C34
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0091D356C;
-	Tue, 29 Oct 2024 17:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B461D7985;
+	Tue, 29 Oct 2024 17:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="prWlFthl"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="FZwPXa1a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FAE2107;
-	Tue, 29 Oct 2024 17:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FCA19258A;
+	Tue, 29 Oct 2024 17:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730223651; cv=none; b=tX3/AWfhI9f2ElciqjNOpZX+wRLSMVfaDuaQhMFfKmfJYB8wvYcXXl7Tv5PuN1xGPYIrnJN480J6XxhJ55U5AjtAgLXqbMeobLeuiipgdYPS33jikJpmZLkAJtlda0BCy+NjBIUBSRMwKyGeajUhinyCh7NjfQT1OCXb8HkYrYU=
+	t=1730223865; cv=none; b=LPiS2vhro7Ma6CSl80vPYjkkD2puyY9wXO/a+NasGgdRpsfOQszp5zrKOXf0XHEqBq+3z3hbUWeRdRV03LybdcFaYa7LBt3hlZAe8fOwa3zeGy2kSG3RiL5eF+G8ZVva/L8xEjKTRT2sIa0NN2rFdopXU5Y5v78uRkCt95YTicM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730223651; c=relaxed/simple;
-	bh=nOaHu/IehEL6OQiLLzh5zQdYlqOfd77xgDIYOg4DnAo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uiVu1IeFlnaGi2enyIU/OKZbZzrYravHgANnWMP7wUqRA0g54cZ0jdnTi1zmPSEtKlTMU3gj95mjMHqJWLhqWy2M1OT2GFg0FOWu7pwPzgzvBa4wIgI/kBOVaj+3KyURikYp6iOnY+e8bQM70MDdDOELd311ndls6DFrRro7LS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=prWlFthl; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.205] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 49THe3A6451693
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 29 Oct 2024 10:40:03 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 49THe3A6451693
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1730223604;
-	bh=l0/F6+jn/7mFUkBUVW0dl3LGmpVjN1lVeIa3tibqzhE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=prWlFthlScSlGElGCx1KOSTF9/+bR6IBrIn8zROURZ5GpR4+/Zk6ti2sYv2aB51+q
-	 HHVlYD85bN5u0dbpR9sNp/BA3UPvMJvN3/SHrVSZo8GM6HgdU7V92S5C04ByVEFS4a
-	 BX76o/UpzVfQPaLSFvo5M2l8NnsMtRt7ZhtLnPX2TbZrGJdoqqL+JSp9S1ZVk5r3P2
-	 /L1x8K52qb0lsshahMxfSv1dgjPVZx0/gSSVzd+rDgG/S68izOfhu+FZ+b34obl1mV
-	 dEOG8vkad6Q0JdH7jyNB3jFeZhw745r8bwrYm1G7qOHUjtJZuzqryj6CA4I1lyoEoQ
-	 OFq5kEREnpMcw==
-Message-ID: <538c630c-0de3-4807-9e9f-6af02dd18d0e@zytor.com>
-Date: Tue, 29 Oct 2024 10:40:03 -0700
+	s=arc-20240116; t=1730223865; c=relaxed/simple;
+	bh=J365I8voCVVs7+QqfpUdraeQTQar+BYCR5lc+7HjVw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i5P8Qo0kCl9nld4jdm4l5NiNev/79IIo4FJ+PSQYX7Vlaz8QWPqd+YRMwsclNh906NETRxXzLtH/FG8w4lPCNnzZuI6oIVsqd+kJpF4Pm6qm5EnlEoWRYaa80HETBuYS/h5pcMi5sKFCNXcWxV121RKQlz8uXZNGYa75vtzVgwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=FZwPXa1a; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8AF5240E01A5;
+	Tue, 29 Oct 2024 17:44:19 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id T6BQsndEFnLR; Tue, 29 Oct 2024 17:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730223854; bh=HR0f1lTZwMqBrosIlrc89Nf1wvTIZfC3xRSgXCnUop4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FZwPXa1a39vgGs2cA6eGp6LoC3ion5mxCurIvBCkGss97+yjpzZR2mmOvywkCjyhD
+	 n21aXL3PcQeThpY7js900k8P951/xRbPaUsmyS2ep3F1S/ZYyZg4FkCfccK1ASdJua
+	 95hT13X6sS8zQsrJ52nFexi8gIwtqjepehTC2UhbIcQECphoqDKJIyefkX6p57gGTQ
+	 ccmyyMmT9pgNgn0PlL5WyMPe6mIBMeNY/HmM28LmDEoeFUlWf5oymX7yXa9tnOm/dh
+	 RCpUQq5AtoRSZqTWxPF6e4MJX3PDHr1H7esnLAtzhGSC3bJM90hhBsjL8IwsWLVWXl
+	 5C8IRhDAD4Epf76OwMHlSaGtqkd3HxFFwBdlUkaSs0kewkx1IO2EkgjxUKE5W+EkJI
+	 vEd5FREV2al0J/kXgiLUO85Tnsa9Ap1rUai7VUnXiNdH3bYacE3Fi1zo7cumz5wiah
+	 CQL9rZblE6EbnskJGZjmhWTyxnNqEfESZd23bSs59sYL1+iV+0fQBnWq+2dFMAeh88
+	 H4yz6DrrSS0UYsjc0BaGM2SvsExat9A71lMRubN+7EsNfhIEQfNgyM9EFJcRcpUCMz
+	 vwIg5WwMOVBTrSoWbG1XDylcBKHZhmH8WeMhUnJMZszj9Uo39vnrbtBQndyTJJboAe
+	 sUCMhl28PfbzJbHXrzvas5l4=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AA2F240E0198;
+	Tue, 29 Oct 2024 17:44:03 +0000 (UTC)
+Date: Tue, 29 Oct 2024 18:43:57 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v14 01/13] x86/sev: Carve out and export SNP guest
+ messaging init routines
+Message-ID: <20241029174357.GWZyEe3VwJr3xYHXoT@fat_crate.local>
+References: <20241028053431.3439593-1-nikunj@amd.com>
+ <20241028053431.3439593-2-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 25/27] KVM: nVMX: Add FRED VMCS fields
-To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
-References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-26-xin@zytor.com> <Zxn6Vc/2vvJ3VHCb@intel.com>
- <f9bb0740-21ec-482d-92fb-7fed3fef7d36@zytor.com> <Zx9Ua0dTQXwC9lzS@intel.com>
- <Zx_XmJnMCZjb7VBS@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <Zx_XmJnMCZjb7VBS@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241028053431.3439593-2-nikunj@amd.com>
 
-On 10/28/2024 11:27 AM, Sean Christopherson wrote:
-> On Mon, Oct 28, 2024, Chao Gao wrote:
->> On Fri, Oct 25, 2024 at 12:25:45AM -0700, Xin Li wrote:
->>>>> static void nested_vmx_setup_cr_fixed(struct nested_vmx_msrs *msrs)
->>>>> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
->>>>> index 2c296b6abb8c..5272f617fcef 100644
->>>>> --- a/arch/x86/kvm/vmx/nested.h
->>>>> +++ b/arch/x86/kvm/vmx/nested.h
->>>>> @@ -251,6 +251,14 @@ static inline bool nested_cpu_has_encls_exit(struct vmcs12 *vmcs12)
->>>>> 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING);
->>>>> }
->>>>>
->>>>> +static inline bool nested_cpu_has_fred(struct vmcs12 *vmcs12)
->>>>> +{
->>>>> +	return vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_FRED &&
->>>>> +	       vmcs12->vm_exit_controls & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS &&
->>>>> +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_SAVE_IA32_FRED &&
->>>>> +	       vmcs12->secondary_vm_exit_controls & SECONDARY_VM_EXIT_LOAD_IA32_FRED;
->>>>
->>>> Is it a requirement in the SDM that the VMM should enable all FRED controls or
->>>> none? If not, the VMM is allowed to enable only one or two of them. This means
->>>> KVM would need to emulate FRED controls for the L1 VMM as three separate
->>>> features.
->>>
->>> The SDM doesn't say that.  But FRED states are used during and
->>> immediately after VM entry and exit, I don't see a good reason for a VMM
->>> to enable only one or two of the 3 save/load configs.
+On Mon, Oct 28, 2024 at 11:04:19AM +0530, Nikunj A Dadhania wrote:
+> Currently, the SEV guest driver is the only user of SNP guest messaging.
+> All routines for initializing SNP guest messaging are implemented within
+> the SEV guest driver. To add Secure TSC guest support, these initialization
+> routines need to be available during early boot.
 > 
-> Not KVM's concern.
+> Carve out common SNP guest messaging buffer allocations and message
+> initialization routines to core/sev.c and export them. These newly added
+> APIs set up the SNP message context (snp_msg_desc), which contains all the
+> necessary details for sending SNP guest messages.
 > 
->>> Say if VM_ENTRY_LOAD_IA32_FRED is not set, it means a VMM needs to
->>> switch to guest FRED states before it does a VM entry, which is
->>> absolutely a big mess.
-> 
-> Again, not KVM's concern.
-> 
->> If the VMM doesn't enable FRED, it's fine to load guest FRED states before VM
->> entry, right?
-> 
-> Yep.  Or if L1 is simply broken and elects to manually load FRED state before
-> VM-Enter instead of using VM_ENTRY_LOAD_IA32_FRED, then any badness that happens
-> is 100% L1's problem to deal with.  KVM's responsiblity is to emulate the
-> architectural behavior, what L1 may or may not do is irrelevant.
+> At present, the SEV guest platform data structure is used to pass the
+> secrets page physical address to SEV guest driver. Since the secrets page
+> address is locally available to the initialization routine, use the cached
+> address. Remove the unused SEV guest platform data structure.
 
-Damn, obviously I COMPLETELY missed this point.
+Do not talk about *what* the patch is doing in the commit message - that
+should be obvious from the diff itself. Rather, concentrate on the *why*
+it needs to be done.
 
-Let me think how should KVM as L0 handle it.
+Imagine one fine day you're doing git archeology, you find the place in
+the code about which you want to find out why it was changed the way it 
+is now.
 
-> 
->> The key is to emulate hardware behavior accurately without making assumptions
->> about guests.
-> 
-> +1000
-> 
->> If some combinations of controls cannot be emulated properly, KVM
->> should report internal errors at some point.
+You do git annotate <filename> ... find the line, see the commit id and
+you do:
 
-Yeah, only if CANNOT.  Otherwise a broken VMM will behave differently on
-real hardware and KVM, even if it crashes in a way which it never knows
-about, right?
+git show <commit id>
+
+You read the commit message and there's just gibberish and nothing's
+explaining *why* that change was done. And you start scratching your
+head, trying to figure out why.
+
+See what I mean?
+
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h              |  71 ++++++++-
+>  arch/x86/coco/sev/core.c                | 133 +++++++++++++++-
+>  drivers/virt/coco/sev-guest/sev-guest.c | 195 +++---------------------
+>  3 files changed, 215 insertions(+), 184 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 2e49c4a9e7fe..63c30f4d44d7 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -14,6 +14,7 @@
+>  #include <asm/insn.h>
+>  #include <asm/sev-common.h>
+>  #include <asm/coco.h>
+> +#include <asm/set_memory.h>
+>  
+>  #define GHCB_PROTOCOL_MIN	1ULL
+>  #define GHCB_PROTOCOL_MAX	2ULL
+> @@ -170,10 +171,6 @@ struct snp_guest_msg {
+>  	u8 payload[PAGE_SIZE - sizeof(struct snp_guest_msg_hdr)];
+>  } __packed;
+>  
+> -struct sev_guest_platform_data {
+> -	u64 secrets_gpa;
+> -};
+> -
+>  struct snp_guest_req {
+>  	void *req_buf;
+>  	size_t req_sz;
+> @@ -253,6 +250,7 @@ struct snp_msg_desc {
+>  
+>  	u32 *os_area_msg_seqno;
+>  	u8 *vmpck;
+> +	int vmpck_id;
+>  };
+>  
+>  /*
+> @@ -438,6 +436,63 @@ u64 sev_get_status(void);
+>  void sev_show_status(void);
+>  void snp_update_svsm_ca(void);
+>  
+> +static inline void free_shared_pages(void *buf, size_t sz)
+
+A function with a generic name exported in a header?!
+
+First of all, why is it in a header?
+
+Then, why isn't it called something "sev_" or so...?
+
+Same holds true for all the below.
+
+> +	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!buf)
+> +		return;
+> +
+> +	ret = set_memory_encrypted((unsigned long)buf, npages);
+> +	if (ret) {
+> +		WARN_ONCE(ret, "failed to restore encryption mask (leak it)\n");
+> +		return;
+> +	}
+> +
+> +	__free_pages(virt_to_page(buf), get_order(sz));
+> +}
+
+...
+
+> +static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
+> +{
+> +	struct aesgcm_ctx *ctx;
+> +
+> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
+> +	if (!ctx)
+> +		return NULL;
+> +
+> +	if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
+
+ld: vmlinux.o: in function `snp_init_crypto':
+/home/boris/kernel/2nd/linux/arch/x86/coco/sev/core.c:2700:(.text+0x1fa3): undefined reference to `aesgcm_expandkey'
+make[2]: *** [scripts/Makefile.vmlinux:34: vmlinux] Error 1
+make[1]: *** [/mnt/kernel/kernel/2nd/linux/Makefile:1166: vmlinux] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:224: __sub-make] Error 2
+
+I'll stop here until you fix those.
+
+Btw, tip patches are done against tip/master - not against the branch they get
+queued in.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
