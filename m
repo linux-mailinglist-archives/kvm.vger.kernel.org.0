@@ -1,125 +1,161 @@
-Return-Path: <kvm+bounces-29959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C629B4EB4
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 16:58:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B5B79B4F4A
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 17:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C5AE1F2376B
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1451C21803
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 16:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F8F196D8F;
-	Tue, 29 Oct 2024 15:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6517A199E80;
+	Tue, 29 Oct 2024 16:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="h8WAM8ke"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urbEN6hN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFB91917F9;
-	Tue, 29 Oct 2024 15:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798BA2107;
+	Tue, 29 Oct 2024 16:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730217488; cv=none; b=Z+viNLmM16TCDZO9I+i5cc9IVanHZIPDOQ1QwdlauCm2mcDIn3IPrTzB2UZ9OenaZqMiXciiNBsljnt8H8hRxySQVT9aZvtcFLfybYSUIXKcG2jZ1wdrX/vsO3Mj6Y8m8O+YynNhWFptklvYKcfBIieb/tRyCu53yXeGi2Qxtog=
+	t=1730219254; cv=none; b=U+tIofre2W1tNIXuKNsC2KRSDY6KlpLwl0sPHfEAKu09UjQbSZzTRf2RawY6zvVT9DI1/uzlWy3nQGqUoeRk0OM9Q2ijr91oxGMjdPYwqLupVQaxYaxj9NCxfsAyxlHKzt8JOsmlpS9tcQpNQhqu+RYT50lbNQGv4F2b5OF4B+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730217488; c=relaxed/simple;
-	bh=XR9+om4ScVOdEArtXJ+HMBDzmeQKqanXDaij5mePADg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/tGl3UB2D4+s/ZOBmXcrwwr4N11rOl6UUEBJJ5gHqJ87AvRpxoxJthomoj7WiTjiGTqFc3KDhiNvidEsNn66UTOM1fzj57xDTGevhaMDm/39thVgx2bOvSuDHCTn9dYC6bJ2xx0dWi2Z8L/mHdadQmKVrQvkJ0ts+IxsqNJGWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=h8WAM8ke; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3F60640E0192;
-	Tue, 29 Oct 2024 15:58:03 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ldU0KY-akd8y; Tue, 29 Oct 2024 15:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1730217477; bh=E1Eu7/CBiDK5On1k+8E/px28Z45wOChcdzeICfvDRzE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h8WAM8keOTA41hoTZsaqP2W9fPo3U+SuC88JgXDHD3V1sXgn9xTakKxxcl95U7juT
-	 fXpmYMCp4qvHwHQgCki9OXTKURBxFfCCZzS+DQF7f5A26OAfowweresr6iIBq2BOj+
-	 RaJ3qaUP2BFK5SyUZl2p7niObXa2A+4xwPuvxwnsPF+66E+eEIJSZU0pfQBeDqLABO
-	 7EgvNMCm1/V+fxdd+Kc2Numu4Iob3LJzOAT6OyQJn0EemUZ9nnBokXvmon2kBhLep0
-	 z2tnPetKyt+hEwMXdL9Ne54gvtjDvL1MzdX40UKGSs/w281XTCq7tm6cmhkDA1Rdhb
-	 8yiDJ/a8w6HuW1JreIveP+yIN81AxxaRqNNDKgpky714vMQ0nDGynOu5dJx0xprUO7
-	 uwZl7kUGcfpNPG5BEOfwfQ2iKb6ZhFNbejGnLmEMcA5aOgH6BaO4AfM2vzwFuNnEVl
-	 47eY+qsIFikmdI70RUGzTwFSoCjmdd/WuJtLTXTZBMoquY/D3pd5sFuuVTK9WOBwU1
-	 eA+tOHx0G8e0Dw0SpEjaTM/9/O6tjeZ+7yOAQ+WzebZ1mEFQBcthMoSgF0rbZEUX+1
-	 G5LUj3M/ynVzJ1P5QAbv/YUgReYGviCHiuLnuExD9o6x89E8O+jwZNZj+5wXpLrkQt
-	 qa35yR9r7HmqoKXOKtfq28OU=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0078F40E0198;
-	Tue, 29 Oct 2024 15:57:44 +0000 (UTC)
-Date: Tue, 29 Oct 2024 16:57:39 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
-	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-Subject: Re: [PATCH v14 03/13] x86/sev: Add Secure TSC support for SNP guests
-Message-ID: <20241029155739.GNZyEF88OV1m-tU94h@fat_crate.local>
-References: <20241028053431.3439593-1-nikunj@amd.com>
- <20241028053431.3439593-4-nikunj@amd.com>
- <3ea9cbf7-aea2-4d30-971e-d2ca5c00fb66@intel.com>
- <56ce5e7b-48c1-73b0-ae4b-05b80f10ccf7@amd.com>
- <3782c833-94a0-4e41-9f40-8505a2681393@intel.com>
- <20241029142757.GHZyDw7TVsXGwlvv5P@fat_crate.local>
- <ef4f1d7a-cd5c-44db-9da0-1309b6aeaf6c@intel.com>
- <20241029150327.GKZyD5P1_tetoNaU_y@fat_crate.local>
- <59084476-e210-4392-b73b-1038a2956e31@intel.com>
+	s=arc-20240116; t=1730219254; c=relaxed/simple;
+	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EKjWmTXe04/57oc7MPhHZexABGuMichi6i9tdoXuGlJrZQ+GqEUV4lvd2vD/uz1/Whv89HgB5CG+ubl7yHhIz7LVdwVWEnK/wfHoOYMgUZMUyJjc5kIO77BQ+IeEt7mDmiL6zr/T0dFMUzoBgv0QbJQKlNTnW25XPrriWsF3RDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urbEN6hN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF11EC4CEE4;
+	Tue, 29 Oct 2024 16:27:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730219253;
+	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=urbEN6hNzPqi50TUyCRNw61epjyTQT3YPQmW5yrOe5jO+DwS/+lgpRI2cqFKO9aG6
+	 Tpj1T/xg6ZozpcDEl7bBQMK2X7sOdaEBneyvCIyXryQOP++9U80LeA7l42oOj+pkT8
+	 6cE/IqUz/1R4Ag4cqlzcMruzENyFyNbd7MfJscoCVnAKwYUVB84oKPPa7Ql16tXKUK
+	 z9Y+Bri390dmftkG15PvWU+h0y9tA1SDDv09NpRhzJigMSUi0Lmz8GfSzztArAJAa3
+	 1DhC4k7vUUVWQEbnEA5YIMAoS1pM04G/7l5OlC8meIxRBb4YcnT/VAZUnRNMueaHZ+
+	 GKfjubpSsnUfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t5p47-007z9Y-LO;
+	Tue, 29 Oct 2024 16:27:31 +0000
+Date: Tue, 29 Oct 2024 16:27:31 +0000
+Message-ID: <868qu63mdo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	stable@vger.kernel.org,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+In-Reply-To: <20241028234533.942542-1-rananta@google.com>
+References: <20241028234533.942542-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <59084476-e210-4392-b73b-1038a2956e31@intel.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org, syzkaller@googlegroups.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 29, 2024 at 11:14:29PM +0800, Xiaoyao Li wrote:
-> However, how secure TSC related to memory encryption?
+On Mon, 28 Oct 2024 23:45:33 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Improper use of userspace_irqchip_in_use led to syzbot hitting the
+> following WARN_ON() in kvm_timer_update_irq():
+> 
+> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
+> kvm_timer_update_irq+0x21c/0x394
+> Call trace:
+>   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
+>   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
+>   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
+>   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
+>   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
+>   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
+>   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:907 [inline]
+>   __se_sys_ioctl fs/ioctl.c:893 [inline]
+>   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
+>   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+>   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> 
+> The following sequence led to the scenario:
+>  - Userspace creates a VM and a vCPU.
+>  - The vCPU is initialized with KVM_ARM_VCPU_PMU_V3 during
+>    KVM_ARM_VCPU_INIT.
+>  - Without any other setup, such as vGIC or vPMU, userspace issues
+>    KVM_RUN on the vCPU. Since the vPMU is requested, but not setup,
+>    kvm_arm_pmu_v3_enable() fails in kvm_arch_vcpu_run_pid_change().
+>    As a result, KVM_RUN returns after enabling the timer, but before
+>    incrementing 'userspace_irqchip_in_use':
+>    kvm_arch_vcpu_run_pid_change()
+>        ret = kvm_arm_pmu_v3_enable()
+>            if (!vcpu->arch.pmu.created)
+>                return -EINVAL;
+>        if (ret)
+>            return ret;
+>        [...]
+>        if (!irqchip_in_kernel(kvm))
+>            static_branch_inc(&userspace_irqchip_in_use);
+>  - Userspace ignores the error and issues KVM_ARM_VCPU_INIT again.
+>    Since the timer is already enabled, control moves through the
+>    following flow, ultimately hitting the WARN_ON():
+>    kvm_timer_vcpu_reset()
+>        if (timer->enabled)
+>           kvm_timer_update_irq()
+>               if (!userspace_irqchip())
+>                   ret = kvm_vgic_inject_irq()
+>                       ret = vgic_lazy_init()
+>                           if (unlikely(!vgic_initialized(kvm)))
+>                               if (kvm->arch.vgic.vgic_model !=
+>                                   KVM_DEV_TYPE_ARM_VGIC_V2)
+>                                       return -EBUSY;
+>                   WARN_ON(ret);
+> 
+> Theoretically, since userspace_irqchip_in_use's functionality can be
 
-Are you kidding me?
+nit: this isn't theoretical at all.
 
-Secure TSC is a SNP feature.
+> simply replaced by '!irqchip_in_kernel()', get rid of the static key
+> to avoid the mismanagement, which also helps with the syzbot issue.
 
-I don't think you're getting it so lemme elaborate:
+Did you have a chance to check whether this had any negative impact on
+actual workloads? Since the entry/exit code is a bit of a hot spot,
+I'd like to make sure we're not penalising the common case (I only
+wrote this patch while waiting in an airport, and didn't test it at
+all).
 
-mem_encrypt.c is only *trying* to be somewhat generic but there is stuff like:
+Any such data about it would be very welcome in the commit message.
 
-        if (cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-                snp_fixup_e820_tables();
+Thanks,
 
-for example.
-
-Both TDX and SEV/SNP need to call *something* at different times during boot
-for various reasons.
-
-We could aim for generalizing things by doing per-vendor early init functions,
-which is ok, but hasn't been the main goal so far. So far the goal is to do
-the proper init/setup calls at the right time during boot and not allow the
-code to grow into an unmaintainable mess while doing so.
-
-But both vendors need to do different things at different times during the
-lifetime of the kernel depending on what they need/want to support.
-
-IOW, the memory encryption code is still shaping up...
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
 
