@@ -1,126 +1,121 @@
-Return-Path: <kvm+bounces-29974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75E39B5284
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 20:13:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A159B52BB
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 20:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AEB7B22124
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 19:13:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACBCFB229D0
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 19:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C2D2071FF;
-	Tue, 29 Oct 2024 19:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07AE12076B2;
+	Tue, 29 Oct 2024 19:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LteSbu9X";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tffWXmsp"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="mhEFYSCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08821FBF50;
-	Tue, 29 Oct 2024 19:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4396120720B
+	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 19:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730229183; cv=none; b=Vz4UgvMYbWvFr72RnRsas8UkXGwqXpLWcU75PGjWALCJSDpPJpLAEY9ZjAYuTQ3+3liYYOmeG9ZvB9Vt46yZkIvEwaSnoy1Y2Q2I+lglCed2EpfzThhrlKLHoJHkIxVzgPrMxoJv529nUQhm2td48T7WroUYRFcASr1kb/5eNjc=
+	t=1730230192; cv=none; b=hZdS/lnDHbCwAkVN7zcYTtISDVNGRF+8qE462FXa0zDLJC8Bet+rUVDgFpUGCuvhdm4MQgLWcYlECfCOzBq3GtPXMBdBkBNb6s/tq8gY0rC0BYF03v9QsSHsGViIf9N+vInbjtdOQxVb5EbPCpjS+YWseRy4WVENDG1q9ujFWwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730229183; c=relaxed/simple;
-	bh=kVYtwcfclxpvBW30S2RwWocigUFMTa1azVLZdYZRh5E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cSwnp72HPtGnoBnHWXR4Vyzg4TCvdZ4vpHe/3Wijof36WUdjLu6z7g9B9hgUBpycPcOGmoGsmwtIdNOtwybXX192jdEgJAZTGWaJ9smRIZL9/763UCSqONwIyylFtczcBGI1+bs8Dlzul71DdUGKwvR5mPS54euqLpC3PVNksrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LteSbu9X; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tffWXmsp; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1730229180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nNDoZlvVc72wsuMOc+bkf/3VOAqrrScR8m3Zau9Vv2A=;
-	b=LteSbu9Xs2VfzjzEJkuyON+4kl2xG6qdPp8l31+3semXp8JX+wELAol3bGKIObe2tC8qgZ
-	r/STTisUNB90uUbxwASGC3zhmFIgz4HdCDWJ8xEIQl/+K5mHMFxoNuqo0ZLaEDvZPckodY
-	Z8XS99mlhVFgp7za0qYgZUjaUCtVxgjcsQdOvp0LwCqhMCh6x+fh/yRfHObDJCQoBgQbIP
-	uXtSvLiB/RJ383jc4ZUkzMBjcu8U3JPeBu5y0eUDtDarHfjnSuoL5XAuphDp4DcuYciNqf
-	QyG5YZkWHdLLQBGYL1zxZrv1NWff66znqDKl1X+4MKqkdUQxnQCNZZI9aCo8uA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1730229180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nNDoZlvVc72wsuMOc+bkf/3VOAqrrScR8m3Zau9Vv2A=;
-	b=tffWXmspbsG8CjVmPkNj8bsXifiOXLbwPOM8E71lx8cYAnHl21ExdcKl3ZFuIiOMh3MolO
-	XUK1hXHPM3igiTBg==
-To: Junaid Shahid <junaids@google.com>, Brendan Jackman
- <jackmanb@google.com>, Borislav Petkov <bp@alien8.de>
-Cc: Ingo Molnar <mingo@redhat.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy
- Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Sean
- Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandre Chartre <alexandre.chartre@oracle.com>, Liran Alon
- <liran.alon@oracle.com>, Jan Setje-Eilers <jan.setjeeilers@oracle.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Andrew Morton
- <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>, Lorenzo Stoakes
- <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>, Vlastimil
- Babka <vbabka@suse.cz>, Michal Hocko <mhocko@kernel.org>, Khalid Aziz
- <khalid.aziz@oracle.com>, Juri Lelli <juri.lelli@redhat.com>, Vincent
- Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Valentin
- Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>, Reiji
- Watanabe <reijiw@google.com>, Ofir Weisse <oweisse@google.com>, Yosry
- Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>, KP
- Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>, Matteo
- Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kvm@vger.kernel.org
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr
- compatible
-In-Reply-To: <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com>
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com>
- <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
- <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
- <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com>
-Date: Tue, 29 Oct 2024 20:12:59 +0100
-Message-ID: <878qu6205g.ffs@tglx>
+	s=arc-20240116; t=1730230192; c=relaxed/simple;
+	bh=LN7V5BQeKRXCPiL+YCrWG2j4TvAtcAaEOUEhSygUgns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIz6SL/6edOCMQaIiWnmDMKbU/GucE7CLHXnrxcTuqHU/LBuXfZzJSc4wWzzQXe3R08ievT+xnxQS/mNFKdw6CdL6PQNRt+aCFjgduXYTWQp7e8lTFmvGkCna0adDAPRsOVhNBBuM31Mg7l/lKhhalXtO2AFWWiXAbLg9c3yWUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=mhEFYSCr; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ede6803585so147313a12.0
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 12:29:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1730230189; x=1730834989; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p453f5qLRHQrUMFO6yBtyDQCP3AS0fkH5n591K5O5UY=;
+        b=mhEFYSCr82QFdTX9kitkI0S3dUZZv1eiE6GPRHfDwgu+S/Sc5dqqiRHjnI4k2R3oDI
+         uqQ4xK3YRctbX6QxSITaSwgyp0qWokDZ/mpLxt6dTFB+RLDEBtqZdRLBXDJqOKGQmpxT
+         LB5jYQI6c6E6VUQWhQ0g8HVTz+j04gkgjXthjebkWIkQZbYihntkC6ikzqZU1RiTHdgl
+         ZiMEiNIkIHS2llQMxsxJGGj8XcMY+lQ9tYL1+UeaU17dDvNiyG8+SzIz7LT5cdxGwClP
+         dB9CnBSv82/0xIg5+u/T4gEMLYRyugkzYNLvNDQdgUG85N8QvjIig/d/4hoHppyiZT22
+         ZHig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730230189; x=1730834989;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p453f5qLRHQrUMFO6yBtyDQCP3AS0fkH5n591K5O5UY=;
+        b=hdKHsPD1Yg2vXIrSvtc+b9cOLed8fMuECzQGNCDlrCXAdXdc11/+24jfaisphC7mrG
+         LUbGTDrnLnKxwDfacpTy9PkXfX5J3eHEYhOOqHPW9uqNQU77meb9jIOYrZDVgm6Iek81
+         qEFauicxp/dTwI3ROZq4PQNOmNDlxtgcImKaWJeoA7Hyq+P560Fed6/RNj8wSi7alqF1
+         UgV1m7MTZPUoFW89iAaQN0nBcjyChdGGQCUOkgHGoiz7LYf9Tu9QKzmeB/nKMWu+blF3
+         GW/SgZz30hw0XVJs3yuIiMBJOiZt4rKHWnKJZh1el8Vw1iV0s/rGlSN4fws/2y4dunLc
+         SbUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4aBJ1G/mWBrxjYIxFXzlud8J2X5maM3Fj27KN6ZzbWOizIfSsl3pOjuIEWd09tBylWPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNmE05UUvIyk8vT2VMJrseiS90h1nxeSPCWLw/zxKk6B8ntpOx
+	JbPtAuXKe7viADzT2nARjAdGAcVjS4S6oAYp+xta2/FyDSZlGAC4ffiprE77uPM=
+X-Google-Smtp-Source: AGHT+IFhFlcCcvQjHhliRyZXirlOj5VprFQBCQ8QKlxSPQtXsUC/wqBDa3PY5cBoAFjEcgQ0R7Ad7Q==
+X-Received: by 2002:a05:6a21:181a:b0:1d9:15b2:83e with SMTP id adf61e73a8af0-1d9e1f0b721mr5535203637.7.1730230189067;
+        Tue, 29 Oct 2024 12:29:49 -0700 (PDT)
+Received: from debug.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a3fdf2sm7909099b3a.214.2024.10.29.12.29.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 12:29:48 -0700 (PDT)
+Date: Tue, 29 Oct 2024 12:29:46 -0700
+From: Deepak Gupta <debug@rivosinc.com>
+To: Max Hsu <max.hsu@sifive.com>
+Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	Samuel Holland <samuel.holland@sifive.com>
+Subject: Re: [PATCH RFC 2/3] riscv: Add Svukte extension support
+Message-ID: <ZyE3qjpOXJYPRVlX@debug.ba.rivosinc.com>
+References: <20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com>
+ <20240920-dev-maxh-svukte-rebase-v1-2-7864a88a62bd@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240920-dev-maxh-svukte-rebase-v1-2-7864a88a62bd@sifive.com>
 
-On Tue, Oct 29 2024 at 10:38, Junaid Shahid wrote:
-> On 10/25/24 6:21 AM, Brendan Jackman wrote:
->>> I'd expect you either always inline the small functions - as you do for some
->>> aleady - or mark the others noinstr. But not something in between.
->>>
->>> Why this?
->> 
->> Overall it's pretty likely I'm wrong about the subtlety of noinstr's
->> meaning. And the benefits I listed above are pretty minor. I should
->> have looked into this as it would have been an opportunity to reduce
->> the patch count of this RFC!
->> 
->> Maybe I'm also forgetting something more important, perhaps Junaid
->> will weigh in...
+On Fri, Sep 20, 2024 at 03:39:04PM +0800, Max Hsu wrote:
+>Svukte extension introduce senvcfg.UKTE, hstatus.HUKTE.
 >
-> Yes, IIRC the idea was that there is no need to prohibit inlining for this class 
-> of functions.
+>This patch add CSR bit definition, and detects if Svukte ISA extension
+>is available, cpufeature will set the correspond bit field so the
+>svukte-qualified memory accesses are protected in a manner that is
+>timing-independent of the faulting virtual address.
+>
+>Since hstatus.HU is not enabled by linux, enabling hstatus.HUKTE will
+>not be affective.
+>
+>This patch depends on patch "riscv: Per-thread envcfg CSR support" [1]
+>
+>Link: https://lore.kernel.org/linux-riscv/20240814081126.956287-1-samuel.holland@sifive.com/ [1]
+>
+>Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+>Signed-off-by: Max Hsu <max.hsu@sifive.com>
+>---
+> arch/riscv/include/asm/csr.h   | 2 ++
+> arch/riscv/include/asm/hwcap.h | 1 +
+> arch/riscv/kernel/cpufeature.c | 4 ++++
+> 3 files changed, 7 insertions(+)
 
-I doubt that it works as you want it to work.
+Reviewed-by: Deepak Gupta <debug@rivosinc.com>
 
-+	inline notrace __attribute((__section__(".noinstr.text")))	\
-
-So this explicitely puts the inline into the .noinstr.text section,
-which means when it is used in .text the compiler will generate an out-of
-line function in the .noinstr.text section and insert a call into the
-usage site. That's independent of the size of the inline.
-
-Thanks,
-
-        tglx
 
