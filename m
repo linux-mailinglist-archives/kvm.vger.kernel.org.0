@@ -1,79 +1,57 @@
-Return-Path: <kvm+bounces-29945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29946-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32639B4B22
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:45:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0244A9B4BF4
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 15:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20AF51C22689
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 13:45:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC21528298F
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 14:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A6820650E;
-	Tue, 29 Oct 2024 13:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435B206E9E;
+	Tue, 29 Oct 2024 14:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLP7+qMF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npqMchlO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFB920110B
-	for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 13:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F33E1E507;
+	Tue, 29 Oct 2024 14:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730209530; cv=none; b=l+BICP69nUB+WN20lKhkiJb7pBz8439t5DjFgXryEbiXhD7z1rDOiyxR/Cy3Tu5nc8zaXmCYdkvsROsC3WJMkYI25iCILXge3irYc2a+4l+6ye4x+EVxClG0x7r0Kh86exWU/IlmopsuDlpMz9BKnckhTchmbHwqOXSsciNSVuc=
+	t=1730211489; cv=none; b=pZrU4JCZ1TgoKsvWmPFVEeWs1k+k8jAs7hTEi5LbvUSsWhZR0BQvQVaElz9evgN3hQpSZFM5/BhgfHzyYv4VWM1G/jg6fiWSZ9S+dBM/2qKR+bSn9pCPojkIUI+trp+2nwxus2QlpwOubenpCCH9E8QrMbJS3zdm5AtOKW7CFg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730209530; c=relaxed/simple;
-	bh=rs0GY66OkD5KdorTMLFQxyHUnobGBq77b2NXknl0J4U=;
+	s=arc-20240116; t=1730211489; c=relaxed/simple;
+	bh=McEZtfOP6VjUEou6D0sp3RbKj3XY5E+ZTox3plQDDlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MILmkkGUTtEJp/Dpj74GxDYM5HsxS3YLOEN19Zl0I2q5HJHWbclTtSnUPX3ZDLzg7F+KHteZX05MlNWsg7rUgxJXwx+TS8s42UZe7WqwdgFOpz9bs52H9c6KhmhSegMHdBwsekpDWTdDtzXuk/z2maQIn1jM4zOQfSqJhIa5S6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hLP7+qMF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730209526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mtkDk4obOcGU3ViQFPgP0Y9MdKhVxxTkytXXF2dG21g=;
-	b=hLP7+qMF5zwQdjIILM2w9e0VEnAMtRLXblzx0wzN9ScSeCFsFeEsXDqWczG0J1do9nH3uW
-	BuQF3KTeKVZK82NqmioAglMg4w2+944212A5v4Z3e+qQ2C16f+zwlCJK4BRGkGuX4K24PQ
-	oTa4uAXX3nj5UQ75oPetJcNHwlJsoE0=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-571-H-3KNJE6M9GS_qyNuAZn9A-1; Tue,
- 29 Oct 2024 09:45:20 -0400
-X-MC-Unique: H-3KNJE6M9GS_qyNuAZn9A-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBE661954B1F;
-	Tue, 29 Oct 2024 13:45:18 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.7])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8BE9F19560A3;
-	Tue, 29 Oct 2024 13:45:18 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 9A8F0400DF400; Tue, 29 Oct 2024 10:44:59 -0300 (-03)
-Date: Tue, 29 Oct 2024 10:44:59 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-	pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
-	chao.gao@intel.com, rick.p.edgecombe@intel.com,
-	yan.y.zhao@intel.com, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 0/2] KVM: kvm-coco-queue: Support protected TSC
-Message-ID: <ZyDm25/oSBfuUpqj@tpad>
-References: <cover.1728719037.git.isaku.yamahata@intel.com>
- <c4df36dc-9924-e166-ec8b-ee48e4f6833e@amd.com>
- <ZxvGPZDQmqmoT0Sj@tpad>
- <81e6604b-fa84-4b74-b9e6-2a37e8076fd7@intel.com>
- <Zx+/Dl0F73GUrzI2@tpad>
- <714ab7a2-69fa-b08d-deae-6eb91ecba95b@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OGBMhmMKgmKNpmce4r3Qn0vryJYO3jRVAL4yDhOHFC9pJLFMURCHjErZmtOsQWtnWd6bMcX4UJhSR7L6+5rLZbgCwB6+ikDMzLz4yhbs6HPhBWxbWrhtereRmtidkl4XVTn5DESPc35UidQRwkxaSEgGr+2bgmnpG1EcdtbigfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npqMchlO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39ACFC4CECD;
+	Tue, 29 Oct 2024 14:18:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730211488;
+	bh=McEZtfOP6VjUEou6D0sp3RbKj3XY5E+ZTox3plQDDlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=npqMchlOZfIXy9KzRwaSUcGb/ms2aTIHWUQ4JfHeUuGZMvAglstLEEUurwzfuei2d
+	 1qSdZTkt34eaSjcHboitlPT3HA4EpYuPb+yZ7oEUUiixJKpSyoIwhnaGEx14iDaKuz
+	 XU0tPuFMVt406sGyhOVypLWhJNs7BE5PvJnd3N65XOWOxmZbbjNiyeoYR3yBj6KNgk
+	 X24A+WyU1Gv6tTCepVkJ4vRlvjJsTjoJFG/pk+Md1+uk308yBlMoUnKjO15tzpqOoT
+	 e+NJBXDJ/gXF5PcovPlHo1iKoLkuoSuBE5NgM0v9//i4APxMRfEC7K8hnGzL47qSR8
+	 WE+eN6fUpNGMQ==
+Date: Tue, 29 Oct 2024 14:18:03 +0000
+From: Will Deacon <will@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>,
+	Alexander Potapenko <glider@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 0/6] KVM: Fix bugs in vCPUs xarray usage
+Message-ID: <20241029141802.GA4691@willie-the-truck>
+References: <20241009150455.1057573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,53 +60,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <714ab7a2-69fa-b08d-deae-6eb91ecba95b@amd.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20241009150455.1057573-1-seanjc@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Oct 29, 2024 at 09:34:58AM +0530, Nikunj A. Dadhania wrote:
-> Hello Marcelo
+On Wed, Oct 09, 2024 at 08:04:49AM -0700, Sean Christopherson wrote:
+> This series stems from Will's observation[*] that kvm_vm_ioctl_create_vcpu()'s
+> handling of xa_store() failure when inserting into vcpu_array is technically
+> broken, although in practice it's impossible for xa_store() to fail.
 > 
-> On 10/28/2024 10:12 PM, Marcelo Tosatti wrote:
-> > On Sun, Oct 27, 2024 at 10:06:17PM +0800, Xiaoyao Li wrote:
-> >> On 10/26/2024 12:24 AM, Marcelo Tosatti wrote:
-> >>> On Mon, Oct 14, 2024 at 08:17:19PM +0530, Nikunj A. Dadhania wrote:
-> >>>> Hi Isaku,
-> >>>>
-> >>>> On 10/12/2024 1:25 PM, Isaku Yamahata wrote:
-> >>>>> Choose the first one.  With this patch series, SEV-SNP secure TSC can be
-> >>>>> supported.
-> >>>>
-> >>>> I am not sure how will this help SNP Secure TSC, as the GUEST_TSC_OFFSET and
-> >>>> GUEST_TSC_SCALE are only available to the guest.
-> >>>
-> >>> Nikunj,
-> >>>
-> >>> FYI:
-> >>>
-> >>> SEV-SNP processors (at least the one below) do not seem affected by this problem.
-> >>
-> >> Did you apply Secure TSC patches of (guest kernel, KVM and QEMU) manualy?
-> >> because none of them are merged. 
-> > 
-> > Yes. cyclictest latency, on a system configured with tuned
-> > realtime-virtual-host/realtime-virtual-guest tuned profiles,
-> > goes from 30us to 50us.
+> After much back and forth and staring, I realized that commit afb2acb2e3a3
+> ("KVM: Fix vcpu_array[0] races") papered over underlying bugs in
+> kvm_get_vcpu() and kvm_for_each_vcpu().  The core problem is that KVM
+> allowed other tasks to see vCPU0 while online_vcpus==0, and thus trying
+> to gracefully error out of vCPU creation led to use-after-free failures.
 > 
-> Would you be ok if I include your Tested-by in the next version of my Secure TSC patches?
+> So, rather than trying to solve the unsolvable problem for an error path
+> that should be impossible to hit, fix the underlying issue and ensure that
+> vcpu_array[0] is accessed if and only if online_vcpus is non-zero.
 > 
-> https://lore.kernel.org/lkml/20241028053431.3439593-1-nikunj@amd.com/
+> Patch 3 fixes a race Michal identified when we were trying to figure out
+> how to handle the xa_store() mess.
+> 
+> Patch 4 reverts afb2acb2e3a3.
+> 
+> Patches 5 and 6 are tangentially related cleanups.
 
-Please don't, haven't tested specifically the patches above.
+Thanks, Sean. For the series:
 
-> >> Otherwise, I think SNP guest is still using
-> >> KVM emulated TSC.
-> > 
-> > Not in the case the test was made.
-> > 
-> 
-> Regards,
-> Nikunj
-> 
-> 
+Acked-by: Will Deacon <will@kernel.org>
 
+I sympathise a little with Paolo on patch 4, but at the end of the day
+it's a revert and I think that the code is better for it, even if the
+whole scenario is messy.
+
+Will
 
