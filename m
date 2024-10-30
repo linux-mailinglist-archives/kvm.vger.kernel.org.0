@@ -1,336 +1,214 @@
-Return-Path: <kvm+bounces-30011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF669B607D
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 11:49:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46449B625D
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 12:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1A21F2385C
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 10:49:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9296A282D51
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 11:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955291E47BC;
-	Wed, 30 Oct 2024 10:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1CE1E767D;
+	Wed, 30 Oct 2024 11:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IA1X8aUu"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC801E47A0
-	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 10:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730285344; cv=none; b=r9/jye9g5J630nB22E8GHi/D4AuiBo88oJDu73PNPihHFS/qzSYa9W6UWAKpBVuppTRLvbbfVpJxvjaUB3wr0IgtktSPxA2N5gYymC8bnq2TUrYh2kBWLI0cNdncUT5dwnM/K05bupixWHmPpMapMKzw0dWCZ8Ql4caScO5otbw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730285344; c=relaxed/simple;
-	bh=q75+5AgRyRwtv1YfXhTN4Dc4tQT8VCLpDYXWMg7vrdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGGD83DaAFPwGHSaTgnKN4v1b+t40jnpj415HCvVVQxa5Is3pyHMmAQLDJ4xEK62pRCYqi4PkI8k/cSStI++XwaQHQzbLjOgIPxqSGbTbSe/UHi8HtjDBUYXClOiVxwb52OnwTX1H6Pq8rhK+u3viFhDSEtjyi9+QUgpVN8+MaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46BB5113E;
-	Wed, 30 Oct 2024 03:49:28 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BF4B3F73B;
-	Wed, 30 Oct 2024 03:48:56 -0700 (PDT)
-Date: Wed, 30 Oct 2024 10:48:53 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev, atishp@rivosinc.com, jamestiotio@gmail.com,
-	eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 1/2] lib/on-cpus: Correct and simplify
- synchronization
-Message-ID: <ZyIPFb0e39DZXquU@raptor>
-References: <20241023131718.117452-4-andrew.jones@linux.dev>
- <20241023131718.117452-5-andrew.jones@linux.dev>
- <ZxuMzrEMxE/lnwtK@arm.com>
- <20241029-1d35ce0dbbea4d21b56209dc@orel>
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2069.outbound.protection.outlook.com [40.107.93.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3DF1E6338;
+	Wed, 30 Oct 2024 11:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730289330; cv=fail; b=K2fUTGDQsKchQJJDOfvSLo0WiKYlCiCjHB5r3MfLnGHzqAxanrVg0UdvaoUZooF/EloIWK6U+fU47uVAIfzm4PLRM6XWZUwi4An2Zh7ESk2HxRb3FJB+/GhyQgN0qST4hqQNm4a5/uvTnWze5iNohkBZbPXVwDOfERw0a/zears=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730289330; c=relaxed/simple;
+	bh=x0FbMS0OmVzEydkLOjbV5rM2/FLq2ZDLZJsQ7zr+LN4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ATVARBL8HGuWvOqa8fbyPQ5/Z+zLI3whKDmISArVR9dexzNwcUNXWQ4yNxVNHClAbAy6zIf1cr1tVyQwBp5n/CTTVCk/Ho1lsRfwjPKrkHrqcGQ1uRwhlhtf0DgBwnoc2bQWsGgoxubZWmVnAnz2mFTe4lXS5nXvYrrDkC95JqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IA1X8aUu; arc=fail smtp.client-ip=40.107.93.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Txw6EL2ePnf4ZV1tsxwMQHAK3kp+afx3GWqh550sKxSlDgZaJaL04mptPZyoU29KDVvwpTQB6p1IviWZEyQjZ5cj0q+uN7AG1jtIDsrtBlbd0ehrpLqTrSIQdlv0R+P3bhk/dpFbLh4vdmms819hQ3dZxUq3D4OMyQfHtytyQ2tN365SdLIUYsKIa34mDKq0Nqbm54b9zj8/nh3a7QuReX+EObleIpmRJaMCHAVTg2uboVBw2NB6u5DM+oV3tKMAUUyL9gDv9ShH6Vau+Mu5dR7VstZgkKT/L3oaQ5LrCD6ir5V5LsFySXotiC+258m5pCCgUgGsJofxJYu3faJ8ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V0V2OgtNb9Hu0zgfFh/kmaBeuJdAUucxJx0zOq/TJmw=;
+ b=sDuhSjfeuZiWLGuHSyPSy+krdVUh9OQsngoAG/eX0/oEj95Yj4M3pWx7m5OGQ9UY2lo+NbcQdjHUzrLYgGwIEoGhmuAasR69UZoRpgo9kDK4l1KoP2dkBPVAV3BSLC7SJPh5dnSIn39V+DmU0g78IOzWfRxN7Vuux5sEPOjSmhzmmLg53yfCWGj1VKU/z/QG0ErG5R2AiCzOPl5XSP1xPdRxTt369FMu2JOvKLeATcc4dp88GVfTu+8SAgw7qGIsEdquboniSpiYxkEvmm6WPOtu+MrCShfLkCZe7eA5NQUdLW5k6j3fDh5KVlyM/NpeDcPa5AapoojzmU0bDEGtkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V0V2OgtNb9Hu0zgfFh/kmaBeuJdAUucxJx0zOq/TJmw=;
+ b=IA1X8aUuJUrn/3m1mE/xURfEBC3QgxnZULOzYMT+5yO3u8DNsJIP1KUlfORD5QiS2opNiIfkHl1n0xkm6Yuk5GIY3b4EsMlzaMqcViEAR+2FmAhc3y5JmXjcF+/d5hNRSGiCQK7lp13ysYiqrlg8YuxkV7K8PVLFAAvwM6d+0nw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ MN0PR12MB5786.namprd12.prod.outlook.com (2603:10b6:208:375::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.23; Wed, 30 Oct
+ 2024 11:55:22 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%4]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
+ 11:55:22 +0000
+Message-ID: <16a13edd-0061-019e-f8bf-e816022a40c2@amd.com>
+Date: Wed, 30 Oct 2024 17:25:13 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v14 03/13] x86/sev: Add Secure TSC support for SNP guests
+To: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
+ x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20241028053431.3439593-1-nikunj@amd.com>
+ <20241028053431.3439593-4-nikunj@amd.com>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20241028053431.3439593-4-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PNYP287CA0012.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:23d::17) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029-1d35ce0dbbea4d21b56209dc@orel>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MN0PR12MB5786:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96785cf9-41e7-4e83-e435-08dcf8d9bbb2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VW1qYmtFVlphamNDVUkvd1JZK21TVWhQNUM3cThMWVhDRk9HSkxYZE0rY3pZ?=
+ =?utf-8?B?cUF4SmhRMjE5QVdHSWkrTkdZaWR1YjNXU1MvZDlPMC9JKzhhSmJ2SkFxM3M5?=
+ =?utf-8?B?ZnVQQXhqdUltUTdObC92VkptdUpESHVreDQ0Q21vTk8rZ3ZBMGk0eWNMQU1S?=
+ =?utf-8?B?Nit2ZitRcWlGd01LM0tqREVKMWtZenlaV1hoenQrcDF6Q0JIY0hobVppU2o1?=
+ =?utf-8?B?ZTl2YnRNbGRYUEdLWFg4N2szV0dLdUxNOUxXamFjQlNFWi8xVEpNQkdQRWo5?=
+ =?utf-8?B?WmlLR01Layt5Yk55SldjQTVHUXVHaXF3UlpBUFd6cHZTSldrcmFQT0VDaURJ?=
+ =?utf-8?B?c1JjYWFrY0tpTUFTT0ZFQy9CWWVZbGVGY1A0bkQ2dkt1cGx4WExGazZaQlZq?=
+ =?utf-8?B?YkpWMTRSNUhYb1pHelVXR2xNL3c0L1NCQmxGSE51cG03RHg1dkhuQjVIUk5V?=
+ =?utf-8?B?UndsU3cweXdQeC9MMFdzSlY1ZFhPZ1JCUXphSzFiL082WTVlZTB5bmZkaEF3?=
+ =?utf-8?B?Njd0UGJFMmxkUmFySHZha2xkWHBYclcwT0l3N2dFdTNHcUtqMHJmMytjUEF6?=
+ =?utf-8?B?d1VXU0hGRDVQcEo5ZCtDeHlYSHg2K0Y0Qk5UQ1FteUFwcjRIWDYzaWRmMHNP?=
+ =?utf-8?B?RFA1STRiM3c3YmwvQjN1TGErTGFRSnJacWVNdzhMUEJiY1J4UzlCa0ZBVEZj?=
+ =?utf-8?B?bVM2Ynl1SDMwVXQ3cXU0R3NTTlVnWkZ5T3ZZVEVYczhFNVNuek1DOGhHVmFj?=
+ =?utf-8?B?dUhUMGNuTmQwZDBEY2Nyd00xYkNWeVdtK0RJcVRxakxGR3YwWUIxc054bDh5?=
+ =?utf-8?B?UVQzWVFGMkhMMDY3enV1YnBsaUhnbndIKys1MkxTY3FhakUwTVFvL3l2RE01?=
+ =?utf-8?B?WHZLeEpVR0pONkpVVm9wVjNrbkYvZTF5OEt6QVF4MmRWSHZldDJzbGY4Z3NZ?=
+ =?utf-8?B?WjVrTkszK2trVTVTODcrZGxiZEFVSTlVWm55Vk4rV29iYWVLaTdkc2c4TUNP?=
+ =?utf-8?B?eU1VRVM5Q3BReWpvcDhxcmU2R29wUzNTS2d3VzBvanM1YXpzclQyUUM2SVdU?=
+ =?utf-8?B?akpxdlJJVHNGK3lQYklhYTd3V1ZOOVRucFVOck11R3ZNZzlBUzNoZE1vVG9a?=
+ =?utf-8?B?Vm0rRGdPTy8vdUdjdDlTSjVoTVVMS2lod0hqYkZKZk5jVEI5Vk1GNk1qNU9Z?=
+ =?utf-8?B?WkxmZmZHcWQzS3IzWXZPMVNIRGhxejEzdG80eGVIVjdBYTNGRGhMS2NTVnFn?=
+ =?utf-8?B?TUM2MGttTUJNTkJkUEJ4SWM2djQzQjZtQWNDcitWcGE5UWFzRlZiNnFhQnRW?=
+ =?utf-8?B?WXZTMHBObldZazdkd1V2UXl3YXJOMlFyN1ZkYzFWcVVnSnB3b1FNT3J0Nk94?=
+ =?utf-8?B?NGMydzhhTHh5L0pZVXlNYlJ4MHU1UysxYytaa05kb3p3MWMwYUtqN01ueHhm?=
+ =?utf-8?B?V1I0SEI0Z1pSZWhYemNqVlRXTnF2WmtyZVNRMHFpaFQ3NVhmaFhiVUtuZzF2?=
+ =?utf-8?B?L09VOTh2bkkzSS9ERDJNMHBXcTJLWkVlMUx5VmVxM2xmbUtzVTMzaTZWYm16?=
+ =?utf-8?B?OFdmTXl1Qm9mWW83OTR4dklkbVBVbXhxZno4M2Jka0dPZiswNGFDT082WTdr?=
+ =?utf-8?B?OVBkSGo5WXZaaTRiVTViWEpHMUxkdTc0ZjljK0UzaW50UFA0aC9Td29TUy9S?=
+ =?utf-8?B?ZFFYSVVtWHZuV3lQL3FwSzhNVG1vTWZuemxkMUcrZXFPUjB4eGJVRVhyZUFa?=
+ =?utf-8?Q?Y4NDmYGH8ZKnSrGIf7DoIMGjH3UnUBWu2rRUKJ6?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NkdkYkcxbVFoaVd3dk0rN09JL0hMdldqQnArUnJRbGIzQytwU0p0a3daNlVm?=
+ =?utf-8?B?c00yazlvUjBGZzZ5SFBtOS9tc2tRR2NYWWYzczUzS3N6QitnQUlpcnNYOXB3?=
+ =?utf-8?B?QjhWTUdUN3pxZm95T0ZHTVhXT1J1eHY0R2draTE2T3Q0by8vbEdFbE51WDBC?=
+ =?utf-8?B?UEsxcGxMK1RJMjRUSEpaQlVpRUN2dGhTd3FMbDcraTY1N3dDRTUxWDhKV2ZT?=
+ =?utf-8?B?VXJxOHhRSk1uOFhkaUN5dGFsaVNKdGtPcE94OXUwY0hRTEVpMmlMc3JHdGFZ?=
+ =?utf-8?B?YWxodW9mV2ZHNlBNVEhZWTRGUjZJRm1sT3hMU1VuNExoOVZwNWhzTXVPT2x1?=
+ =?utf-8?B?bjd0c1d2VEVZKzNWNEZEWGV0bHV4L0UrM01DK0YyL1pKWjVBN1pheUVZclhT?=
+ =?utf-8?B?STAxMUpvTHQ4WlF3ZTA5RkdDN05lc05pVUFPeDcreDE3azkyYkQ0a1ZUSWtm?=
+ =?utf-8?B?M1RTZ1lsRWpUMlRlR1RZUnNsV0Vhd3JwNDg0SG9FdE93dlNnVEV2VS9zYzcw?=
+ =?utf-8?B?QXVOS3B5dFVoWVd3R2p6OXppMGlkQVFjdDZEQi82NHcvMnI4WFcwejBIbGhM?=
+ =?utf-8?B?YVpxWVAycnIvdStMNWZWd3lxRHFBQjFyWFpWRlVCOVB3Wk5KNGZFazlqOWw4?=
+ =?utf-8?B?bFp1NURyblcyV2VkYUY4QlMvWHdkaEU5azgzUVJoTm5Wc3RmTzZJOHZhMHRr?=
+ =?utf-8?B?NVA3VTFKS3p5Q2tvckQvQ1RpK1EvcUZ6d0dtMTR5V09jMm9nZUsvdTlWeHlS?=
+ =?utf-8?B?N2NycXVxV3hUNWJCZm5KditCSmJUcm9DZHFYdG1DREV6Z2JGL2ZoV0k0blRw?=
+ =?utf-8?B?RDVrRTIvYmZUY1NwWUUwNTFYZFZhTlVDMExsWlU2VnNkVjU1WFJLVTlsQ2Nr?=
+ =?utf-8?B?MDRXRW5id1I4OGMwWlN4SGNRR2llS1UreG1nSzdUQ2ZFMjV0YUZQemRJeVVi?=
+ =?utf-8?B?dXRjNmhCZm10OWxyZEp4REMvYmtZNUQrdGNseGk3a0F4blNhckV6ZlBhMXAz?=
+ =?utf-8?B?VVU2SUVCbkpvcitWTTB6Nkw2N2hWQTNNOEQwaEN2dzY5My95UWpFbXFGMUtC?=
+ =?utf-8?B?R3JpTVI0dGZIOUYwN1orbktkOHJUNTlwbUFXQ3NnWHZTT3FJVmJla2w4YjJQ?=
+ =?utf-8?B?S0JQellzLzZyODRTUzE0MWxPdlZGa1J5KzNjcTkySnRlK21LOEVSMk80S2c4?=
+ =?utf-8?B?SDhMQ1JmaUhKT3RTS3I3VHpFK0F6SmM1VXZRK0dtV2ZxQ1kwbTBFVC9lSjk2?=
+ =?utf-8?B?YnQyTW1qQnFnWlR0RHBSWVFaVk55a2tobGc4ZmJuZ3hZYUlTZVBiV2MzVnhl?=
+ =?utf-8?B?SVdSQ25ibTJjOGR6cUZvZk5pRHFxNHM3UGp0enJScEx2M1hlam5MU05ZSU1o?=
+ =?utf-8?B?cE1xN0xGUVJ0WW9PVVpaUDc0b0ZrVWdJVXloMTZmS29hQWtPVzNSbFErVEJK?=
+ =?utf-8?B?U0FHUG1IcWYrL2dMSzZ2cjFMNUY2eUZhVk9IVEUxOVNHVE5IVFo5SW1KNmp0?=
+ =?utf-8?B?WVNVMjJnMk5EczdyaTRaNFRpTlpsUE1ZaG1pa202NlJuczc5OWU1RGRSTWZp?=
+ =?utf-8?B?eXpyTFlQQmxiaVI0azBxTVAxREMyTmpieW1FVFBvUDh1SG9wdWUxZWliUWN6?=
+ =?utf-8?B?cjNTUEFhb2lYZFVSdTN2cmlrcG5ZMzN1blRmOW1BSCt1TllYWEJ4b0NoS1Zm?=
+ =?utf-8?B?Qi9GYVNXWk1TMmt4Vzh0ZDdxZ0RqWVVNQUY5QVQ3bXRyeE5jeWNEQmdKVXdK?=
+ =?utf-8?B?TmVNdGxnV3VUdzFqWFZoZHdvTWc4VzhENVpXcEE2bG85VEVMVEcrWHd4dTgy?=
+ =?utf-8?B?LzQ4bkJtOGFGYzNvbHZKaG9ScS90QmNEV2lCdmFhUFZad3lVSW1VVjREdTNI?=
+ =?utf-8?B?eVlhMlI5SUVGdE12aWNWZlZLVEZpZjBVcnlkTXplWXBJR1RFaUxleWZEVXU5?=
+ =?utf-8?B?SGdjRlNsbkQ2dE52N0hMd2k0NUgvZGdrZStpdkFBVHlXWnNtUk5CYkpySkt3?=
+ =?utf-8?B?c0Y5RysrQXRSYm5LSGF5S04zSEZEUHZFaUE5YSsyeXMyYUJvWkFKVlZyNVZM?=
+ =?utf-8?B?QUlTYko2MjJpcm9PVm1TQjNDRjJibnVMVmtkcDZjQ2dIOVNKc2hpcFZhWEdo?=
+ =?utf-8?Q?VY7MwjNQ+fJO0SarKRKaeByHr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96785cf9-41e7-4e83-e435-08dcf8d9bbb2
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 11:55:22.4082
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YK2J8wJl3imJUM1YoJ9rsGoyH5wpSUgCaOLkBqGbbOL7ncbVBBI7v4G32klHsL90F8bKhMEwJKWUJ6rRWJkpBQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5786
 
-Hi Drew,
 
-On Tue, Oct 29, 2024 at 11:56:58AM +0100, Andrew Jones wrote:
-> On Fri, Oct 25, 2024 at 01:19:26PM +0100, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > I've been paging in all the on_cpu* machinery, and it occurred to me that
-> > we have a chance to simplify the code and to remove a duplicate interface
-> > by not exposing smp_boot_secondary() to the tests, as the on_cpu* functions
-> > serve the same purpose. With this change, we can remove the entry argument
-> > to smp_boot_secondary(), and the assembly for secondary_entry can be made
-> > simpler by eliminating the branch to the entry function.
-> 
-> You're right that smp_boot_secondary() doesn't appear to getting use, but
-> a goal for the library code is to be useful and with defaults that will
-> satisfy nearly all unit tests, but to never restrict a unit test to
-> having to use it. Exposing calls like smp_boot_secondary() give unit tests
-> the ability to eliminate as much library code as possible from their paths
-> without having to duplicate the few lines needed to "boot" a secondary.
 
-Yep, that makes sense.
+On 10/28/2024 11:04 AM, Nikunj A Dadhania wrote:
+> @@ -497,6 +516,27 @@ static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc)
+>  int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
+>  			   struct snp_guest_request_ioctl *rio);
+>  
+> +static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code,
+> +				       struct snp_guest_request_ioctl *rio, u8 type,
+> +				       void *req_buf, size_t req_sz, void *resp_buf,
+> +				       u32 resp_sz)
+> +{
+> +	struct snp_guest_req req = {
+> +		.msg_version	= rio->msg_version,
+> +		.msg_type	= type,
+> +		.vmpck_id	= mdesc->vmpck_id,
+> +		.req_buf	= req_buf,
+> +		.req_sz		= req_sz,
+> +		.resp_buf	= resp_buf,
+> +		.resp_sz	= resp_sz,
+> +		.exit_code	= exit_code,
+> +	};
+> +
+> +	return snp_send_guest_request(mdesc, &req, rio);
+> +}
 
-> 
-> > 
-> > Do you think that would be something worth pursuing? I can have a look at
-> > it.
-> > 
-> > There are exactly two places where smp_boot_secondary() is used: in
-> > arm/psci.c and arm/gic.c, and from a quick glance it looks to me like those
-> > can be replaced with one of the on_cpu* functions.
-> > 
-> > On Wed, Oct 23, 2024 at 03:17:20PM +0200, Andrew Jones wrote:
-> > > get/put_on_cpu_info() were trying to provide per-cpu locking for
-> > > the per-cpu on_cpu info, but they were flawed since they would
-> > > always set the "lock" since they were treating test_and_set/clear
-> > > as cmpxchg (which they're not). Just revert to a normal spinlock
-> > 
-> > Would you mind expanding on that a bit more?
-> > 
-> > From my understanding of the code, on arm64, this is the call chain that I get
-> > for get_on_cpu_info(cpu):
-> > 
-> >   ->get_on_cpu_info(cpu):
-> >     ->!cpumask_test_and_set(cpu, on_cpu_info_lock)
-> >       ->!test_and_set_bit(cpu, on_cpu_info_lock->bits):
-> >          return (old & mask) != 0;
-> > 
-> > 'mask' always has the CPU bit set, which means that get_on_cpu_info() returns
-> > true if and only if 'old' has the bit clear. I think that prevents a thread
-> > getting the lock if it's already held, so from that point of view it does
-> > function as a per target cpu spinlock. Have I misunderstood something?
-> 
-> No, you're right, and thanks for reminding me of the thought process I
-> used when I wrote get/put_on_cpu_info() in the first place :-) While
-> trying to simplify things, I just got fed up with staring at it and
-> reasoning about it, so I threw my hands up and went back to a good ol'
-> lock. Now that you've convinced me [again] that the test-and-set isn't
-> flawed, we could keep it, but...
-> 
-> > 
-> > Regardless of the above, on_cpu_async() is used like this:
-> > 
-> > on_cpu_async()
-> > wait_for_synchronization()
-> > 
-> > so it doesn't make much sense to optimize for performance for the case were
-> > multiple threads call on_cpu_async() concurrently, as they would need to
-> > have to wait for synchronization anyway.
-> 
-> ...even though on_cpu_async() has a wait part, it only waits (outside the
-> lock) for the target cpu to be idle. If all targets are idle already, and
-> we have more than one "launcher" cpu, then we could launch tests on all
-> the targets more-or-less simultaneously with percpu locks, but...
+I realized that the above is not required anymore. I will remove in my next version.
 
-Ahah, that's very interesting, hadn't though about it that way.
+> @@ -538,6 +578,12 @@ static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
+>  static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc) { }
+>  static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
+>  					 struct snp_guest_request_ioctl *rio) { return -ENODEV; }
+> +static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code,
+> +				       struct snp_guest_request_ioctl *rio, u8 type,
+> +				       void *req_buf, size_t req_sz, void *resp_buf,
+> +				       u32 resp_sz) { return -ENODEV; }
+> +
 
-Another interesting thing here is that the glanularity for ATOMIC_TESTOP is
-8 * 8 = 64 bits, because LDXR loads from an 8 byte address, which is then
-marked for exclusive access. I think that means that in the end, if you
-have less than 64 CPUs, then the per-cpu spinlock will end looking similar
-to a spinlock.
+Ditto.
 
-> 
-> > 
-> > So yes, I'm totally in favour for replacing the per-cpu spinlock with a global
-> > spinlock, even if the only reason is simplifying the code.
-> 
-> ...simplifying the code is probably the better choice since the critical
-> section is so small that sharing a lock really shouldn't matter much and
-> even some contention test which needs to run simultaneously on several
-> cpus should use looping rather than rely on a simultaneous launch.
-
-Yes, please use a spinlock here.
-
-> 
-> > 
-> > > to correct it. Also simplify the break case for on_cpu_async() -
-> > > we don't care if func is NULL, we only care that the cpu is idle.
-> > 
-> > That makes sense.
-> > 
-> > > And, finally, add a missing barrier to on_cpu_async().
-> > 
-> > Might be worth explaining in the commit message why it was missing. Just in
-> > case someone is looking at the code and isn't exactly sure why it's there.
-> 
-> Sure. I think the reason it's missing is because when 018550041b38 changed
-> from spinlock to put_on_cpu_info(), the release was also moved below the
-> clearing of idle. Prior to that, the spin_unlock() was acting as barrier.
-> With the move of where the release was done a barrier should have been
-> added.
-> 
-> > 
-> > > 
-> > > Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
-> > > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> > > ---
-> > >  lib/on-cpus.c | 36 +++++++++++-------------------------
-> > >  1 file changed, 11 insertions(+), 25 deletions(-)
-> > > 
-> > > diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-> > > index 892149338419..f6072117fa1b 100644
-> > > --- a/lib/on-cpus.c
-> > > +++ b/lib/on-cpus.c
-> > > @@ -9,6 +9,7 @@
-> > >  #include <on-cpus.h>
-> > >  #include <asm/barrier.h>
-> > >  #include <asm/smp.h>
-> > > +#include <asm/spinlock.h>
-> > >  
-> > >  bool cpu0_calls_idle;
-> > >  
-> > > @@ -18,18 +19,7 @@ struct on_cpu_info {
-> > >  	cpumask_t waiters;
-> > >  };
-> > >  static struct on_cpu_info on_cpu_info[NR_CPUS];
-> > > -static cpumask_t on_cpu_info_lock;
-> > > -
-> > > -static bool get_on_cpu_info(int cpu)
-> > > -{
-> > > -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
-> > > -}
-> > > -
-> > > -static void put_on_cpu_info(int cpu)
-> > > -{
-> > > -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
-> > > -	assert(ret);
-> > > -}
-> > > +static struct spinlock lock;
-> > >  
-> > >  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
-> > >  {
-> > > @@ -81,18 +71,14 @@ void do_idle(void)
-> > >  	if (cpu == 0)
-> > >  		cpu0_calls_idle = true;
-> > >  
-> > > -	set_cpu_idle(cpu, true);
-> > > -	smp_send_event();
-> > > -
-> > >  	for (;;) {
-> > > +		set_cpu_idle(cpu, true);
-> > > +		smp_send_event();
-> > > +
-> > >  		while (cpu_idle(cpu))
-> > >  			smp_wait_for_event();
-> > >  		smp_rmb();
-> > >  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
-> > > -		on_cpu_info[cpu].func = NULL;
-> > > -		smp_wmb();
-> > 
-> > I think the barrier is still needed. The barrier orderered the now removed
-> > write func = NULL before the write set_cpu_idle(), but it also orderered
-> > whatever writes func(data) performed before set_cpu_idle(cpu, true). This
-> > matters for on_cpu(), where I think it's reasonable for the caller to
-> > expect to observe the writes made by 'func' after on_cpu() returns.
-> > 
-> > If you agree that this is the correct approach, I think it's worth adding a
-> > comment explaining it.
-> 
-> I think that's reasonable (along with adding smp_rmb()'s to the bottom of
-> on_cpu() and on_cpumask()). So the idea is we have
-
-I don't think adding smp_rmb() to on_cpu() and on_cpumask() is strictly
-necessary, because cpumask_set_cpu()->set_bit() already has a smp_mb().
-
-> 
->  cpu1                                         cpu2
->  ----                                         ----
->  func() /* store something */                 /* wait for cpu1 to be idle */
->  smp_wmb();                                   smp_rmb();
->  set_cpu_idle(smp_processor_id(), true);      /* load what func() stored */
-> 
-
-Just one small thing here, so it's even more precise what is being ordered:
-the smp_rmb() on cpu2 orders the read from cpu_online_mask() before the
-load from what func() stored.
-
-> > 
-> > > -		set_cpu_idle(cpu, true);
-> > > -		smp_send_event();
-> > >  	}
-> > >  }
-> > >  
-> > > @@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
-> > >  
-> > >  	for (;;) {
-> > >  		cpu_wait(cpu);
-> > > -		if (get_on_cpu_info(cpu)) {
-> > > -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
-> > > -				break;
-> > > -			put_on_cpu_info(cpu);
-> > > -		}
-> > > +		spin_lock(&lock);
-> > > +		if (cpu_idle(cpu))
-> > > +			break;
-> > > +		spin_unlock(&lock);
-> > >  	}
-> > >  
-> > >  	on_cpu_info[cpu].func = func;
-> > >  	on_cpu_info[cpu].data = data;
-> > > +	smp_wmb();
-> > 
-> > Without this smp_wmb(), it is possible for the target CPU to read an
-> > outdated on_cpu_info[cpu].data. So adding it is the right thing to do,
-> > since it orders the writes to on_cpu_info before set_cpu_idle().
-> > 
-> > >  	set_cpu_idle(cpu, false);
-> > > -	put_on_cpu_info(cpu);
-> > > +	spin_unlock(&lock);
-> > >  	smp_send_event();
-> > 
-> > I think a DSB is necessary before all the smp_send_event() calls in this
-> > file. The DSB ensures that the stores to cpu_idle_mask will be observed by
-> > the thread that is waiting on the WFE, otherwise it is theoretically
-> > possible to get a deadlock (in practice this will never happen, because KVM
-> > will be generating the events that cause WFE to complete):
-> > 
-> > CPU0: on_cpu_async():		CPU1: do_idle():
-> > 
-> > load CPU1_idle = true
-> > //do stuff
-> > store CPU1_idle=false
-> > SEV
-> > 				1: WFE
-> > 				   load CPU1_idle=true // old value, allowed
-> > 				   b 1b // deadlock
-> 
-> Good catch. Can you send a patch for that? The patch should be for the arm
-> implementations of smp_send_event() (and smp_wait_for_event()?) in
-> lib/arm/asm/smp.h.
-
-Sure, I can do that. Should I wait until this series gets merged?
-
-Also, I don't think smp_wait_for_event() needs a barrier - a wmb() before
-smp_send_event() will make sure that all stores have **completed** before
-smp_send_event() is executed, so on the waiting CPU all the stores will be
-visible.
-
-Using a smp_wmp() (or smp_mb()) will not work, because smp_send_event() is
-not a memory operation, and the smp_* primitives won't order the memory
-accesses against it.
-
-> 
-> > 
-> > Also, it looks unusual to have smp_send_event() unpaired from set_cpu_idle().
-> > Can't really point to anything being wrong about it though.
-> 
-> You mean due to the spin_unlock() separating the set_cpu_idle() and
-> smp_send_event()? We could put the spin_unlock() above the set_cpu_idle()
-> (as it was in 018550041b38, which also removes the need for the wmb), but
-> I think I like it the way it is now better for better readability. I
-> also can't think of why it would matter for them to be unpaired.
-
-Then choose whatever looks best for you :)
-
-Thanks,
-Alex
+Regards
+Nikunj
 
