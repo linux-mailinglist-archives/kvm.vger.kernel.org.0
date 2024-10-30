@@ -1,214 +1,487 @@
-Return-Path: <kvm+bounces-30012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46449B625D
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 12:55:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDB69B625E
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 12:56:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9296A282D51
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 11:55:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FA211F21B77
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 11:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1CE1E767D;
-	Wed, 30 Oct 2024 11:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IA1X8aUu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18C61E7655;
+	Wed, 30 Oct 2024 11:56:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2069.outbound.protection.outlook.com [40.107.93.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3DF1E6338;
-	Wed, 30 Oct 2024 11:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730289330; cv=fail; b=K2fUTGDQsKchQJJDOfvSLo0WiKYlCiCjHB5r3MfLnGHzqAxanrVg0UdvaoUZooF/EloIWK6U+fU47uVAIfzm4PLRM6XWZUwi4An2Zh7ESk2HxRb3FJB+/GhyQgN0qST4hqQNm4a5/uvTnWze5iNohkBZbPXVwDOfERw0a/zears=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730289330; c=relaxed/simple;
-	bh=x0FbMS0OmVzEydkLOjbV5rM2/FLq2ZDLZJsQ7zr+LN4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ATVARBL8HGuWvOqa8fbyPQ5/Z+zLI3whKDmISArVR9dexzNwcUNXWQ4yNxVNHClAbAy6zIf1cr1tVyQwBp5n/CTTVCk/Ho1lsRfwjPKrkHrqcGQ1uRwhlhtf0DgBwnoc2bQWsGgoxubZWmVnAnz2mFTe4lXS5nXvYrrDkC95JqE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IA1X8aUu; arc=fail smtp.client-ip=40.107.93.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Txw6EL2ePnf4ZV1tsxwMQHAK3kp+afx3GWqh550sKxSlDgZaJaL04mptPZyoU29KDVvwpTQB6p1IviWZEyQjZ5cj0q+uN7AG1jtIDsrtBlbd0ehrpLqTrSIQdlv0R+P3bhk/dpFbLh4vdmms819hQ3dZxUq3D4OMyQfHtytyQ2tN365SdLIUYsKIa34mDKq0Nqbm54b9zj8/nh3a7QuReX+EObleIpmRJaMCHAVTg2uboVBw2NB6u5DM+oV3tKMAUUyL9gDv9ShH6Vau+Mu5dR7VstZgkKT/L3oaQ5LrCD6ir5V5LsFySXotiC+258m5pCCgUgGsJofxJYu3faJ8ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V0V2OgtNb9Hu0zgfFh/kmaBeuJdAUucxJx0zOq/TJmw=;
- b=sDuhSjfeuZiWLGuHSyPSy+krdVUh9OQsngoAG/eX0/oEj95Yj4M3pWx7m5OGQ9UY2lo+NbcQdjHUzrLYgGwIEoGhmuAasR69UZoRpgo9kDK4l1KoP2dkBPVAV3BSLC7SJPh5dnSIn39V+DmU0g78IOzWfRxN7Vuux5sEPOjSmhzmmLg53yfCWGj1VKU/z/QG0ErG5R2AiCzOPl5XSP1xPdRxTt369FMu2JOvKLeATcc4dp88GVfTu+8SAgw7qGIsEdquboniSpiYxkEvmm6WPOtu+MrCShfLkCZe7eA5NQUdLW5k6j3fDh5KVlyM/NpeDcPa5AapoojzmU0bDEGtkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V0V2OgtNb9Hu0zgfFh/kmaBeuJdAUucxJx0zOq/TJmw=;
- b=IA1X8aUuJUrn/3m1mE/xURfEBC3QgxnZULOzYMT+5yO3u8DNsJIP1KUlfORD5QiS2opNiIfkHl1n0xkm6Yuk5GIY3b4EsMlzaMqcViEAR+2FmAhc3y5JmXjcF+/d5hNRSGiCQK7lp13ysYiqrlg8YuxkV7K8PVLFAAvwM6d+0nw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- MN0PR12MB5786.namprd12.prod.outlook.com (2603:10b6:208:375::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.23; Wed, 30 Oct
- 2024 11:55:22 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%4]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
- 11:55:22 +0000
-Message-ID: <16a13edd-0061-019e-f8bf-e816022a40c2@amd.com>
-Date: Wed, 30 Oct 2024 17:25:13 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v14 03/13] x86/sev: Add Secure TSC support for SNP guests
-To: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- x86@kernel.org, kvm@vger.kernel.org
-Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20241028053431.3439593-1-nikunj@amd.com>
- <20241028053431.3439593-4-nikunj@amd.com>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20241028053431.3439593-4-nikunj@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PNYP287CA0012.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:23d::17) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204D079D2;
+	Wed, 30 Oct 2024 11:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730289381; cv=none; b=DpVlIrlDSsLeJDbsEflgrfREY/OCOfhzjrdGjZ1OQu47On6u9KuoyeUnri3gKZhoxgS2SjT3WrC/00kNPWxKYOWklhuVm1Jfi5WdbrCMCKO2y2tf4LHXpydX9lAR9PDMdY8Lj2uFfEymQN1xFJjxvH1H/HmfGGo9FqDnruPrpls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730289381; c=relaxed/simple;
+	bh=5z9/T3UXEW6lG4xakIGGEzGXoMGGoluht/KIMPSiWbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WFQ3cXmVRAWwxwrQQHnHlz+fwDfNV5TyFl2LfluYZmxuQ0m1TkeEKD87/igbreoQj00fWD57xoQa7UfQiptGMcmuUdMNkyTpM3kcvE9s6mH/XyK/BiTlCK+uf1qdAS1VSeLjYyW9o8EYnipfQAq92MTEukkbfjQ+gmfsXcsc3Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60DE0C4CEE3;
+	Wed, 30 Oct 2024 11:56:15 +0000 (UTC)
+Date: Wed, 30 Oct 2024 13:56:11 +0200
+From: Zhi Wang <zhiw@nvidia.com>
+To: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>
+Cc: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
+ <alison.schofield@intel.com>, <dan.j.williams@intel.com>,
+ <dave.jiang@intel.com>, <dave@stgolabs.net>, <jonathan.cameron@huawei.com>,
+ <ira.weiny@intel.com>, <vishal.l.verma@intel.com>, <alucerop@amd.com>,
+ <acurrid@nvidia.com>, <cjia@nvidia.com>, <smitra@nvidia.com>,
+ <ankita@nvidia.com>, <aniketa@nvidia.com>, <kwankhede@nvidia.com>,
+ <targupta@nvidia.com>, <zhiwang@kernel.org>
+Subject: Re: [RFC 00/13] vfio: introduce vfio-cxl to support CXL type-2
+ accelerator passthrough
+Message-ID: <20241030135611.0000031f.zhiw@nvidia.com>
+In-Reply-To: <20240920223446.1908673-1-zhiw@nvidia.com>
+References: <20240920223446.1908673-1-zhiw@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MN0PR12MB5786:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96785cf9-41e7-4e83-e435-08dcf8d9bbb2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VW1qYmtFVlphamNDVUkvd1JZK21TVWhQNUM3cThMWVhDRk9HSkxYZE0rY3pZ?=
- =?utf-8?B?cUF4SmhRMjE5QVdHSWkrTkdZaWR1YjNXU1MvZDlPMC9JKzhhSmJ2SkFxM3M5?=
- =?utf-8?B?ZnVQQXhqdUltUTdObC92VkptdUpESHVreDQ0Q21vTk8rZ3ZBMGk0eWNMQU1S?=
- =?utf-8?B?Nit2ZitRcWlGd01LM0tqREVKMWtZenlaV1hoenQrcDF6Q0JIY0hobVppU2o1?=
- =?utf-8?B?ZTl2YnRNbGRYUEdLWFg4N2szV0dLdUxNOUxXamFjQlNFWi8xVEpNQkdQRWo5?=
- =?utf-8?B?WmlLR01Layt5Yk55SldjQTVHUXVHaXF3UlpBUFd6cHZTSldrcmFQT0VDaURJ?=
- =?utf-8?B?c1JjYWFrY0tpTUFTT0ZFQy9CWWVZbGVGY1A0bkQ2dkt1cGx4WExGazZaQlZq?=
- =?utf-8?B?YkpWMTRSNUhYb1pHelVXR2xNL3c0L1NCQmxGSE51cG03RHg1dkhuQjVIUk5V?=
- =?utf-8?B?UndsU3cweXdQeC9MMFdzSlY1ZFhPZ1JCUXphSzFiL082WTVlZTB5bmZkaEF3?=
- =?utf-8?B?Njd0UGJFMmxkUmFySHZha2xkWHBYclcwT0l3N2dFdTNHcUtqMHJmMytjUEF6?=
- =?utf-8?B?d1VXU0hGRDVQcEo5ZCtDeHlYSHg2K0Y0Qk5UQ1FteUFwcjRIWDYzaWRmMHNP?=
- =?utf-8?B?RFA1STRiM3c3YmwvQjN1TGErTGFRSnJacWVNdzhMUEJiY1J4UzlCa0ZBVEZj?=
- =?utf-8?B?bVM2Ynl1SDMwVXQ3cXU0R3NTTlVnWkZ5T3ZZVEVYczhFNVNuek1DOGhHVmFj?=
- =?utf-8?B?dUhUMGNuTmQwZDBEY2Nyd00xYkNWeVdtK0RJcVRxakxGR3YwWUIxc054bDh5?=
- =?utf-8?B?UVQzWVFGMkhMMDY3enV1YnBsaUhnbndIKys1MkxTY3FhakUwTVFvL3l2RE01?=
- =?utf-8?B?WHZLeEpVR0pONkpVVm9wVjNrbkYvZTF5OEt6QVF4MmRWSHZldDJzbGY4Z3NZ?=
- =?utf-8?B?WjVrTkszK2trVTVTODcrZGxiZEFVSTlVWm55Vk4rV29iYWVLaTdkc2c4TUNP?=
- =?utf-8?B?eU1VRVM5Q3BReWpvcDhxcmU2R29wUzNTS2d3VzBvanM1YXpzclQyUUM2SVdU?=
- =?utf-8?B?akpxdlJJVHNGK3lQYklhYTd3V1ZOOVRucFVOck11R3ZNZzlBUzNoZE1vVG9a?=
- =?utf-8?B?Vm0rRGdPTy8vdUdjdDlTSjVoTVVMS2lod0hqYkZKZk5jVEI5Vk1GNk1qNU9Z?=
- =?utf-8?B?WkxmZmZHcWQzS3IzWXZPMVNIRGhxejEzdG80eGVIVjdBYTNGRGhMS2NTVnFn?=
- =?utf-8?B?TUM2MGttTUJNTkJkUEJ4SWM2djQzQjZtQWNDcitWcGE5UWFzRlZiNnFhQnRW?=
- =?utf-8?B?WXZTMHBObldZazdkd1V2UXl3YXJOMlFyN1ZkYzFWcVVnSnB3b1FNT3J0Nk94?=
- =?utf-8?B?NGMydzhhTHh5L0pZVXlNYlJ4MHU1UysxYytaa05kb3p3MWMwYUtqN01ueHhm?=
- =?utf-8?B?V1I0SEI0Z1pSZWhYemNqVlRXTnF2WmtyZVNRMHFpaFQ3NVhmaFhiVUtuZzF2?=
- =?utf-8?B?L09VOTh2bkkzSS9ERDJNMHBXcTJLWkVlMUx5VmVxM2xmbUtzVTMzaTZWYm16?=
- =?utf-8?B?OFdmTXl1Qm9mWW83OTR4dklkbVBVbXhxZno4M2Jka0dPZiswNGFDT082WTdr?=
- =?utf-8?B?OVBkSGo5WXZaaTRiVTViWEpHMUxkdTc0ZjljK0UzaW50UFA0aC9Td29TUy9S?=
- =?utf-8?B?ZFFYSVVtWHZuV3lQL3FwSzhNVG1vTWZuemxkMUcrZXFPUjB4eGJVRVhyZUFa?=
- =?utf-8?Q?Y4NDmYGH8ZKnSrGIf7DoIMGjH3UnUBWu2rRUKJ6?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NkdkYkcxbVFoaVd3dk0rN09JL0hMdldqQnArUnJRbGIzQytwU0p0a3daNlVm?=
- =?utf-8?B?c00yazlvUjBGZzZ5SFBtOS9tc2tRR2NYWWYzczUzS3N6QitnQUlpcnNYOXB3?=
- =?utf-8?B?QjhWTUdUN3pxZm95T0ZHTVhXT1J1eHY0R2draTE2T3Q0by8vbEdFbE51WDBC?=
- =?utf-8?B?UEsxcGxMK1RJMjRUSEpaQlVpRUN2dGhTd3FMbDcraTY1N3dDRTUxWDhKV2ZT?=
- =?utf-8?B?VXJxOHhRSk1uOFhkaUN5dGFsaVNKdGtPcE94OXUwY0hRTEVpMmlMc3JHdGFZ?=
- =?utf-8?B?YWxodW9mV2ZHNlBNVEhZWTRGUjZJRm1sT3hMU1VuNExoOVZwNWhzTXVPT2x1?=
- =?utf-8?B?bjd0c1d2VEVZKzNWNEZEWGV0bHV4L0UrM01DK0YyL1pKWjVBN1pheUVZclhT?=
- =?utf-8?B?STAxMUpvTHQ4WlF3ZTA5RkdDN05lc05pVUFPeDcreDE3azkyYkQ0a1ZUSWtm?=
- =?utf-8?B?M1RTZ1lsRWpUMlRlR1RZUnNsV0Vhd3JwNDg0SG9FdE93dlNnVEV2VS9zYzcw?=
- =?utf-8?B?QXVOS3B5dFVoWVd3R2p6OXppMGlkQVFjdDZEQi82NHcvMnI4WFcwejBIbGhM?=
- =?utf-8?B?YVpxWVAycnIvdStMNWZWd3lxRHFBQjFyWFpWRlVCOVB3Wk5KNGZFazlqOWw4?=
- =?utf-8?B?bFp1NURyblcyV2VkYUY4QlMvWHdkaEU5azgzUVJoTm5Wc3RmTzZJOHZhMHRr?=
- =?utf-8?B?NVA3VTFKS3p5Q2tvckQvQ1RpK1EvcUZ6d0dtMTR5V09jMm9nZUsvdTlWeHlS?=
- =?utf-8?B?N2NycXVxV3hUNWJCZm5KditCSmJUcm9DZHFYdG1DREV6Z2JGL2ZoV0k0blRw?=
- =?utf-8?B?RDVrRTIvYmZUY1NwWUUwNTFYZFZhTlVDMExsWlU2VnNkVjU1WFJLVTlsQ2Nr?=
- =?utf-8?B?MDRXRW5id1I4OGMwWlN4SGNRR2llS1UreG1nSzdUQ2ZFMjV0YUZQemRJeVVi?=
- =?utf-8?B?dXRjNmhCZm10OWxyZEp4REMvYmtZNUQrdGNseGk3a0F4blNhckV6ZlBhMXAz?=
- =?utf-8?B?VVU2SUVCbkpvcitWTTB6Nkw2N2hWQTNNOEQwaEN2dzY5My95UWpFbXFGMUtC?=
- =?utf-8?B?R3JpTVI0dGZIOUYwN1orbktkOHJUNTlwbUFXQ3NnWHZTT3FJVmJla2w4YjJQ?=
- =?utf-8?B?S0JQellzLzZyODRTUzE0MWxPdlZGa1J5KzNjcTkySnRlK21LOEVSMk80S2c4?=
- =?utf-8?B?SDhMQ1JmaUhKT3RTS3I3VHpFK0F6SmM1VXZRK0dtV2ZxQ1kwbTBFVC9lSjk2?=
- =?utf-8?B?YnQyTW1qQnFnWlR0RHBSWVFaVk55a2tobGc4ZmJuZ3hZYUlTZVBiV2MzVnhl?=
- =?utf-8?B?SVdSQ25ibTJjOGR6cUZvZk5pRHFxNHM3UGp0enJScEx2M1hlam5MU05ZSU1o?=
- =?utf-8?B?cE1xN0xGUVJ0WW9PVVpaUDc0b0ZrVWdJVXloMTZmS29hQWtPVzNSbFErVEJK?=
- =?utf-8?B?U0FHUG1IcWYrL2dMSzZ2cjFMNUY2eUZhVk9IVEUxOVNHVE5IVFo5SW1KNmp0?=
- =?utf-8?B?WVNVMjJnMk5EczdyaTRaNFRpTlpsUE1ZaG1pa202NlJuczc5OWU1RGRSTWZp?=
- =?utf-8?B?eXpyTFlQQmxiaVI0azBxTVAxREMyTmpieW1FVFBvUDh1SG9wdWUxZWliUWN6?=
- =?utf-8?B?cjNTUEFhb2lYZFVSdTN2cmlrcG5ZMzN1blRmOW1BSCt1TllYWEJ4b0NoS1Zm?=
- =?utf-8?B?Qi9GYVNXWk1TMmt4Vzh0ZDdxZ0RqWVVNQUY5QVQ3bXRyeE5jeWNEQmdKVXdK?=
- =?utf-8?B?TmVNdGxnV3VUdzFqWFZoZHdvTWc4VzhENVpXcEE2bG85VEVMVEcrWHd4dTgy?=
- =?utf-8?B?LzQ4bkJtOGFGYzNvbHZKaG9ScS90QmNEV2lCdmFhUFZad3lVSW1VVjREdTNI?=
- =?utf-8?B?eVlhMlI5SUVGdE12aWNWZlZLVEZpZjBVcnlkTXplWXBJR1RFaUxleWZEVXU5?=
- =?utf-8?B?SGdjRlNsbkQ2dE52N0hMd2k0NUgvZGdrZStpdkFBVHlXWnNtUk5CYkpySkt3?=
- =?utf-8?B?c0Y5RysrQXRSYm5LSGF5S04zSEZEUHZFaUE5YSsyeXMyYUJvWkFKVlZyNVZM?=
- =?utf-8?B?QUlTYko2MjJpcm9PVm1TQjNDRjJibnVMVmtkcDZjQ2dIOVNKc2hpcFZhWEdo?=
- =?utf-8?Q?VY7MwjNQ+fJO0SarKRKaeByHr?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96785cf9-41e7-4e83-e435-08dcf8d9bbb2
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 11:55:22.4082
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YK2J8wJl3imJUM1YoJ9rsGoyH5wpSUgCaOLkBqGbbOL7ncbVBBI7v4G32klHsL90F8bKhMEwJKWUJ6rRWJkpBQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5786
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+On Fri, 20 Sep 2024 15:34:33 -0700
+Zhi Wang <zhiw@nvidia.com> wrote:
+
+Hi folks:
+
+As what Kevin and Alex pointed out that we need to discuss about the
+virtualization polices for the registers that need to be handled by the
+vfio-cxl core, here are my summary about the virtualization polices for
+configuration space registers.
+
+For CXL MMIO registers, I am leaning towards vfio-cxl core respecting
+the BAR Virtualization ACL Register Block (8.2.6 BAR Virtualization ACL
+Register Block), which shows the register ranges can be safely
+passed to the guest. For registers are not in the Virtualization ACL
+Register Block, or a device doesn't present a BAR Virtualization ACL
+Register Block, we leave the handling the to the variant driver.
+Besides, 
+
+Feel free to comment.
+
+Z.
+
+----
+
+8.1 Configuration Space Registers
+=================================
+
+8.1.3 PCIE DVSEC for CXL Devices
+==================================
+
+- DVS Header 1 (0x4)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+- DVS Header 2 (0x8)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+- DVSEC CXL Capability (0xa)
+
+Overide values from HW:
+
+Bit [5:4] RO - HDM_Count:
+Support only one HDM decoder
+
+Bit [12] RO - TSP Capable:
+Not supported in v1
+
+Other bits are RO, emulated, and inital values are from the HW.
+
+- DVSEC CXL Control (0xc)
+
+Bit [0] RWL - Cache_Enable:
+Emulated as RO if CONFIG_LOCK bit is set, otherwise RW.
+
+Bit [1] RO - IO_Enable:
+Emulated as RO.
+
+Bit [12:2] RWL:
+Emulated as RO when CONFIG_LOCK bit is set, otherwise RW.
+
+Bit [13] Rsvd:
+Emualted as RO
+
+Bit [14] RWL:
+Emulated as RO when CONFIG_LOCK bit is set, otherwise RW.
+
+Bit [15] Rsvd:
+Emulated as RO.
+
+- DVSEC CXL Status (0xe)
+
+Bit [14] RW1CS - Viral_Status:
+Emulate write one clear bit.
+
+Other bits are Rsvd and emulated as RO, inital values are from the HW.
+
+- DVSEC CXL Control 2 (0x10)
+
+Bit [0] RW - Disable caching:
+Disable the caching on HW when VM writes bit 1.
+
+Bit [1] RW - Initiate Cache Write Back and Invalidation:
+Trigger the cache writeback and invalidation via Linux CXL core, update
+cache invalid bit in DVSEC CXL Status 2.
+
+Bit [2] RW - Initiate CXL Reset:
+Trigger the CXL reset via Linux CXL core, update the CXL reset complete
+, CXL reset error in DVSEC CXL Status 2.
+
+Bit [3] RW - CXL Reset Mem Clr Enable:
+As a param when trigger the CXL reset via Linux CXL core.
+
+Bit [4] Desired Volatile HDM State after Hot Reset - RWS/RO
+Write the bit on the HW or via Linux CXL core.
+
+Bit [5] Modified Completion Eanble - RW/RO
+Write the bit on the HW or via Linux CXL core.
+
+Other bits are Rsvd, emulated as RO and inital values are from the HW.
+
+- DVSEC CXL Status 2 (0x12)
+Bit [0] RO - Cache Invalid:
+Updated when emulating DVSEC CXL Control 2.
+
+Bit [1] RO - CXL Reset Complete:
+Updated when emulating DVSEC CXL Control 2.
+
+Bit [1] RO - CXL Reset Error:
+Updated when emulating DVSEC CXL Control 2.
+
+Bit [3] RW1CS/RsvdZ - Volatile HDM Preservation Error:
+Read the bit from the HW.
+
+Bit [14:4] Rsvd:
+Emulated as RO and inital values are from the HW.
+
+Bit [15] RO - Power Management Intalization Complete:
+Read the bit from the HW.
+
+DVSEC CXL Capability2 (0x16)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVSEC CXL Range 1 Size High (0x18)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVSEC CXL Range 1 Size Low (0x1c)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVSEC CXL Range 1 Base High (0x20)
+Emulated as RW
+
+DVSEC CXL Range 1 Base Low (0x24)
+Emulated as RW
+
+DVSEC CXL Range 2 Size High (0x28)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVSEC CXL Range 2 Size Low (0x2c)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVSEC CXL Range 2 Base High (0x30)
+Emulated as RW
+
+DVSEC CXL Range 2 Base Low (0x34)
+Emulated as RW
+
+DVSEC CXL Capability 3 (0x38)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+8.1.4 Non-CXL Function Map DVSEC
+================================
+Not supported
+
+8.1.5 CXL Extensions DVSEC for Ports
+====================================
+For root port/switches, no need to support in type-2 device passthorugh
+
+8.1.6 GPF DVSEC for CXL Port
+============================
+For root port/switches, no need to support in type-2 device passthorugh
+
+8.1.7 GPF DVSEC for CXL Device
+==============================
+
+DVS Header 1 (0x4)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVS Header 2 (0x8)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+GPF Phase 2 Duration (0xa)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+GPF Phase 2 Power (0xc)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+8.1.8 PCIE DVSEC for Flex Bus Port
+==================================
+For root port/switches, no need to support in type-2 device passthorugh
+
+8.1.9 Register Locator DVSEC
+============================
+
+DVS Header 1 (0x4)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+DVS Header 2 (0x8)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+Register Block 1-3 (Varies)
+All bits are RO, emulated as RO and initial values are from the HW.
+
+8.1.10 MLD DVSEC
+================
+Not supported. Mostly this is for type-3 device.
+
+8.1.11 Table Access DOE
+Coupled with QEMU DOE emulation
+
+8.1.12 Memory Device Configuration Space Layout
+Not supported. Mostly this is for type-3 device.
+
+8.1.13 Switch Mailbox CCI Configuration Space Layout
+Not supported. This is for switches.
 
 
+> Hi folks:
+> 
+> As promised in the LPC, here are all you need (patches, repos, guiding
+> video, kernel config) to build a environment to test the
+> vfio-cxl-core.
+> 
+> Thanks so much for the discussions! Enjoy and see you in the next one.
+> 
+> Background
+> ==========
+> 
+> Compute Express Link (CXL) is an open standard interconnect built upon
+> industrial PCI layers to enhance the performance and efficiency of
+> data centers by enabling high-speed, low-latency communication
+> between CPUs and various types of devices such as accelerators,
+> memory.
+> 
+> It supports three key protocols: CXL.io as the control protocol,
+> CXL.cache as the cache-coherent host-device data transfer protocol,
+> and CXL.mem as memory expansion protocol. CXL Type 2 devices leverage
+> the three protocols to seamlessly integrate with host CPUs, providing
+> a unified and efficient interface for high-speed data transfer and
+> memory sharing. This integration is crucial for heterogeneous
+> computing environments where accelerators, such as GPUs, and other
+> specialized processors, are used to handle intensive workloads.
+> 
+> Goal
+> ====
+> 
+> Although CXL is built upon the PCI layers, passing a CXL type-2
+> device can be different than PCI devices according to CXL
+> specification[1]:
+> 
+> - CXL type-2 device initialization. CXL type-2 device requires an
+> additional initialization sequence besides the PCI device
+> initialization. CXL type-2 device initialization can be pretty
+> complicated due to its hierarchy of register interfaces. Thus, a
+> standard CXL type-2 driver initialization sequence provided by the
+> kernel CXL core is used.
+> 
+> - Create a CXL region and map it to the VM. A mapping between HPA and
+> DPA (Device PA) needs to be created to access the device memory
+> directly. HDM decoders in the CXL topology need to be configured
+> level by level to manage the mapping. After the region is created, it
+> needs to be mapped to GPA in the virtual HDM decoders configured by
+> the VM.
+> 
+> - CXL reset. The CXL device reset is different from the PCI device
+> reset. A CXL reset sequence is introduced by the CXL spec.
+> 
+> - Emulating CXL DVSECs. CXL spec defines a set of DVSECs registers in
+> the configuration for device enumeration and device control. (E.g. if
+> a device is capable of CXL.mem CXL.cache, enable/disable capability)
+> They are owned by the kernel CXL core, and the VM can not modify them.
+> 
+> - Emulate CXL MMIO registers. CXL spec defines a set of CXL MMIO
+> registers that can sit in a PCI BAR. The location of register groups
+> sit in the PCI BAR is indicated by the register locator in the CXL
+> DVSECs. They are also owned by the kernel CXL core. Some of them need
+> to be emulated.
+> 
+> Design
+> ======
+> 
+> To achieve the purpose above, the vfio-cxl-core is introduced to host
+> the common routines that variant driver requires for device
+> passthrough. Similar with the vfio-pci-core, the vfio-cxl-core
+> provides common routines of vfio_device_ops for the variant driver to
+> hook and perform the CXL routines behind it.
+> 
+> Besides, several extra APIs are introduced for the variant driver to
+> provide the necessary information the kernel CXL core to initialize
+> the CXL device. E.g., Device DPA.
+> 
+> CXL is built upon the PCI layers but with differences. Thus, the
+> vfio-pci-core is aimed to be re-used as much as possible with the
+> awareness of operating on a CXL device.
+> 
+> A new VFIO device region is introduced to expose the CXL region to the
+> userspace. A new CXL VFIO device cap has also been introduced to
+> convey the necessary CXL device information to the userspace.
+> 
+> Patches
+> =======
+> 
+> The patches are based on the cxl-type2 support RFCv2 patchset[2]. Will
+> rebase them to V3 once the cxl-type2 support v3 patch review is done.
+> 
+> PATCH 1-3: Expose the necessary routines required by vfio-cxl.
+> 
+> PATCH 4: Introduce the preludes of vfio-cxl, including CXL device
+> initialization, CXL region creation.
+> 
+> PATCH 5: Expose the CXL region to the userspace.
+> 
+> PATCH 6-7: Prepare to emulate the HDM decoder registers.
+> 
+> PATCH 8: Emulate the HDM decoder registers.
+> 
+> PATCH 9: Tweak vfio-cxl to be aware of working on a CXL device.
+> 
+> PATCH 10: Tell vfio-pci-core to emulate CXL DVSECs.
+> 
+> PATCH 11: Expose the CXL device information that userspace needs.
+> 
+> PATCH 12: An example variant driver to demonstrate the usage of
+> vfio-cxl-core from the perspective of the VFIO variant driver.
+> 
+> PATCH 13: A workaround needs suggestions.
+> 
+> Test
+> ====
+> 
+> To test the patches and hack around, a virtual passthrough with nested
+> virtualization approach is used.
+> 
+> The host QEMU emulates a CXL type-2 accel device based on Ira's
+> patches with the changes to emulate HDM decoders.
+> 
+> While running the vfio-cxl in the L1 guest, an example VFIO variant
+> driver is used to attach with the QEMU CXL access device.
+> 
+> The L2 guest can be booted via the QEMU with the vfio-cxl support in
+> the VFIOStub.
+> 
+> In the L2 guest, a dummy CXL device driver is provided to attach to
+> the virtual pass-thru device.
+> 
+> The dummy CXL type-2 device driver can successfully be loaded with the
+> kernel cxl core type2 support, create CXL region by requesting the CXL
+> core to allocate HPA and DPA and configure the HDM decoders.
+> 
+> To make sure everyone can test the patches, the kernel config of L1
+> and L2 are provided in the repos, the required kernel command params
+> and qemu command line can be found from the demostration video.[5]
+> 
+> Repos
+> =====
+> 
+> QEMU host:
+> https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-host L1
+> Kernel:
+> https://github.com/zhiwang-nvidia/linux/tree/zhi/vfio-cxl-l1-kernel-rfc
+> L1 QEMU:
+> https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-l1-rfc
+> L2 Kernel:
+> https://github.com/zhiwang-nvidia/linux/tree/zhi/vfio-cxl-l2
+> 
+> [1] https://computeexpresslink.org/cxl-specification/
+> [2]
+> https://lore.kernel.org/netdev/20240715172835.24757-1-alejandro.lucero-palau@amd.com/T/
+> [3]
+> https://patchew.org/QEMU/20230517-rfc-type2-dev-v1-0-6eb2e470981b@intel.com/
+> [4] https://youtu.be/zlk_ecX9bxs?si=hc8P58AdhGXff3Q7
+> 
+> Feedback expected
+> =================
+> 
+> - Archtiecture level between vfio-pci-core and vfio-cxl-core.
+> - Variant driver requirements from more hardware vendors.
+> - vfio-cxl-core UABI to QEMU.
+> 
+> Moving foward
+> =============
+> 
+> - Rebase the patches on top of Alejandro's PATCH v3.
+> - Get Ira's type-2 emulated device patch into upstream as CXL folks
+> and RH folks both came to talk and expect this. I had a chat with Ira
+> and he expected me to take it over. Will start a discussion in the
+> CXL discord group for the desgin of V1.
+> - Sparse map in vfio-cxl-core.
+> 
+> Known issues
+> ============
+> 
+> - Teardown path. Missing teardown paths have been implements in
+> Alejandor's PATCH v3. It should be solved after the rebase.
+> 
+> - Powerdown L1 guest instead of reboot it. The QEMU reset handler is
+> missing in the Ira's patch. When rebooting L1, many CXL registers are
+> not reset. This will be addressed in the formal review of emulated
+> CXL type-2 device support.
+> 
+> Zhi Wang (13):
+>   cxl: allow a type-2 device not to have memory device registers
+>   cxl: introduce cxl_get_hdm_info()
+>   cxl: introduce cxl_find_comp_reglock_offset()
+>   vfio: introduce vfio-cxl core preludes
+>   vfio/cxl: expose CXL region to the usersapce via a new VFIO device
+>     region
+>   vfio/pci: expose vfio_pci_rw()
+>   vfio/cxl: introduce vfio_cxl_core_{read, write}()
+>   vfio/cxl: emulate HDM decoder registers
+>   vfio/pci: introduce CXL device awareness
+>   vfio/pci: emulate CXL DVSEC registers in the configuration space
+>   vfio/cxl: introduce VFIO CXL device cap
+>   vfio/cxl: VFIO variant driver for QEMU CXL accel device
+>   vfio/cxl: workaround: don't take resource region when cxl is
+> enabled.
+> 
+>  drivers/cxl/core/pci.c              |  28 ++
+>  drivers/cxl/core/regs.c             |  22 +
+>  drivers/cxl/cxl.h                   |   1 +
+>  drivers/cxl/cxlpci.h                |   3 +
+>  drivers/cxl/pci.c                   |  14 +-
+>  drivers/vfio/pci/Kconfig            |   6 +
+>  drivers/vfio/pci/Makefile           |   5 +
+>  drivers/vfio/pci/cxl-accel/Kconfig  |   6 +
+>  drivers/vfio/pci/cxl-accel/Makefile |   3 +
+>  drivers/vfio/pci/cxl-accel/main.c   | 116 +++++
+>  drivers/vfio/pci/vfio_cxl_core.c    | 647
+> ++++++++++++++++++++++++++++ drivers/vfio/pci/vfio_pci_config.c  |
+> 10 + drivers/vfio/pci/vfio_pci_core.c    |  79 +++-
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |   8 +-
+>  include/linux/cxl_accel_mem.h       |   3 +
+>  include/linux/cxl_accel_pci.h       |   6 +
+>  include/linux/vfio_pci_core.h       |  53 +++
+>  include/uapi/linux/vfio.h           |  14 +
+>  18 files changed, 992 insertions(+), 32 deletions(-)
+>  create mode 100644 drivers/vfio/pci/cxl-accel/Kconfig
+>  create mode 100644 drivers/vfio/pci/cxl-accel/Makefile
+>  create mode 100644 drivers/vfio/pci/cxl-accel/main.c
+>  create mode 100644 drivers/vfio/pci/vfio_cxl_core.c
+> 
 
-On 10/28/2024 11:04 AM, Nikunj A Dadhania wrote:
-> @@ -497,6 +516,27 @@ static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc)
->  int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
->  			   struct snp_guest_request_ioctl *rio);
->  
-> +static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code,
-> +				       struct snp_guest_request_ioctl *rio, u8 type,
-> +				       void *req_buf, size_t req_sz, void *resp_buf,
-> +				       u32 resp_sz)
-> +{
-> +	struct snp_guest_req req = {
-> +		.msg_version	= rio->msg_version,
-> +		.msg_type	= type,
-> +		.vmpck_id	= mdesc->vmpck_id,
-> +		.req_buf	= req_buf,
-> +		.req_sz		= req_sz,
-> +		.resp_buf	= resp_buf,
-> +		.resp_sz	= resp_sz,
-> +		.exit_code	= exit_code,
-> +	};
-> +
-> +	return snp_send_guest_request(mdesc, &req, rio);
-> +}
-
-I realized that the above is not required anymore. I will remove in my next version.
-
-> @@ -538,6 +578,12 @@ static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
->  static inline void snp_msg_cleanup(struct snp_msg_desc *mdesc) { }
->  static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
->  					 struct snp_guest_request_ioctl *rio) { return -ENODEV; }
-> +static inline int handle_guest_request(struct snp_msg_desc *mdesc, u64 exit_code,
-> +				       struct snp_guest_request_ioctl *rio, u8 type,
-> +				       void *req_buf, size_t req_sz, void *resp_buf,
-> +				       u32 resp_sz) { return -ENODEV; }
-> +
-
-Ditto.
-
-Regards
-Nikunj
 
