@@ -1,90 +1,90 @@
-Return-Path: <kvm+bounces-29987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866A29B59AC
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 02:56:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AC39B59AF
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 02:56:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC3E01F2063E
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 01:56:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BD501C22523
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 01:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174AB1885A4;
-	Wed, 30 Oct 2024 01:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3217191F60;
+	Wed, 30 Oct 2024 01:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BzPfV6sI";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ysXevslw"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jYwD8V4g";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ValOaRkx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4851799F
-	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 01:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DA33398E
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 01:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730253384; cv=fail; b=CzS7/73MAh82XnNsAtohacgHpl/6vF1671Y7+0KQeL2YpoqNbNRGWh7Wz9+oqTzb/zFZdbjYf5+gWllAJmdvX+TA7vMwJiWJ3m5JcYijO9pk/M96YaYmhfeZHxE/lEkJOgJaVEKQhGGBSerc1JUBx/atiW9mLz4sXKEZ4rifB7k=
+	t=1730253404; cv=fail; b=hmTDHrN7L/gTt7b7sBdvktmF3T29d9PYRa8bIyiY3vdrb60jP6eYSMiw4EiwMJKV+jCGV5bg5Ef1DPDRj1zDLIFfnMTmyNPPaMKFY6s+BNxSy57qeDcfVsm7M9tv0jHTu75A1NCl2JuYW35UPvkh3P43zAAeQuL5OPvFDKZkGAE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730253384; c=relaxed/simple;
-	bh=vC05eFKaxrAEcRp880yuF7/7cq2lnKnH4cLKGeLoG00=;
+	s=arc-20240116; t=1730253404; c=relaxed/simple;
+	bh=FDQV8Ft04Pg+8d4pZLsjt7fl+70nhSxgSTK4R8geFLQ=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=apvl6W7PIv1ALAIOD7eTm1lUG7tUNoOnMUyRFC4f10BxwWB3ar0jl5AcuD+JP5dk3wPjLtB6UJStsTb9F/eQLWOLN6MCeHnjDznpBzaSvlyBKSBAN7kQ07q4rOUtjCnB5HNBG3TSfroPHO6yfewuYVrNfElvaPNdQAlfSL5+g78=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=BzPfV6sI; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ysXevslw; arc=fail smtp.client-ip=205.220.165.32
+	 Content-Type:MIME-Version; b=mP1oJoElFuxdj23E1IVdQz43taSHFn3JtgHz8tUW3VpHSm9GXbUMZUqcnQMFswPS+Cdm5iR//qXLIXBG8np0Og0SADWPVcie9ZPGjvQngcE7NaDJRWoN2qNGzcBXe0ZnAjwreWD6GgaNeEaqOUZVXhHHGSwrbYSXJxfjoqSaiW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jYwD8V4g; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ValOaRkx; arc=fail smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49U1hZLi015134;
-	Wed, 30 Oct 2024 01:56:09 GMT
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49U1fdbC027036;
+	Wed, 30 Oct 2024 01:56:35 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=SPTZ+j1EW+qy3TgjVevD42SfOmwpi0QzWUZMXtErEm0=; b=
-	BzPfV6sIQb58d1putlG76yI4JVuCR7smpX44giCtkKNde7i4MClZ5vDJFKoL9LBe
-	1gndhzCUkH2EcTbfaIvtAE88Th/2XeSNNgDstCSVALp0zj4dO+BkWHN6rHFpW3v+
-	pdO+0xJDBaYOCpcVUsrsI7LmnY+FZAgOFcRQRzvrNOWCa72f9umpQ31QiX8XXC6z
-	dJQdCPz6RzDpaS8/UsbS4FHaQaSSasMyRXfVCHJPYNzX+o21GAVOr0CmfK2ED7aE
-	VK0chFf1XHzTn3Emec8oiCyygPaSzbTsLtIakhuCliem7FPBCAGL0zYKYk8KyXIm
-	Xp07xAQHeBmSS+s2jhfTwA==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42grys6xsy-1
+	corp-2023-11-20; bh=9Oy+8HnX348JmAgN4TnH9nz9SqXdn5d4ycr748o4ofY=; b=
+	jYwD8V4gYK+kxxTRIDT/MGQba02oWVK+9jyzya1EycfTYUL20CulluT28RBn54qV
+	Fz6Andt3gjqNxBetgLnv8UWVz3tHavucuCXXRNt1SZuDThvyZT6lzBqTfDP4/cfz
+	2FfN68tYSYOjKuBZ5IwjJQlNoM8hN2rHe4SIyjraJSFcGS/Z/ySAG+I97jAXn0/1
+	jckMEBfQfZqkv/B/PD7W4mBTcH2VcfMkPvnPFOkc/NsJLb0Kf5lT4GUX9wEG5ALn
+	NiXUcTkCjtXFrdzb8RZ2qLAFI9wQsNFf3AvAeVe7kJhLo9VgbHW0U6s/sGQlrIxQ
+	h6EaKuHWOp2+6DuMM04z+A==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42grgweuvg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 30 Oct 2024 01:56:08 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49U1siQR010235;
-	Wed, 30 Oct 2024 01:56:08 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42hn8xpp8t-1
+	Wed, 30 Oct 2024 01:56:34 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49TNAf1A008495;
+	Wed, 30 Oct 2024 01:56:33 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 42hneafy3g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 30 Oct 2024 01:56:07 +0000
+	Wed, 30 Oct 2024 01:56:32 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rB8CbtvPrx8zJ1/kFzKB/A3wAP1PCGLP0jqWOg9mzzE9v0AraRmmcp+hkVa12QHxkDjZdZDL2c/o6o8cp8LZXeD03dZxjgQSf06M6lgu24n3iVFhPTjamzZOO8QKSHRTxQqE24kJdWqfoKQIV+IXsjbhcX+EKi2/JIavgTyYv/upS4mrtx9EmuPvFFf1QY+z+mbzYPhfJoOZ/1nJI/OqzOxDIlKDcCu0ZeB3Sg4l6V+bbSc0mRYaOdXbyb0C1rUCF1yqJ4Zm6ZDpaW+BIc3RUxJVkPPlwh0GDPH9K8HjEKKnkD1kzaq947Ui4272eamJXLA6WWQLwLNaEluo6dpvPA==
+ b=u13gC+Ec9WQCY4USfkLJla4V9L73rpyDKe+N7YyRHLW0lOvNZOUmCvpL5dI9+t3nus0cXqDq+gPDCW3DC+dFudMdrdovBldCd10E9qgLLsA5QSO+6+TsOlgHFHX3sPdQrwdPTAZ+ik0SU7e58E75t+vn7ufcdl8f7Q3N45kvDwnBjXN4qhIgSJudpYEsUzRkVu8Ry2u4yuh+L1gcKWN8Xr/hwcwX73wEb7wnft8GAfaymXpM3vRws7ybyHFzYuFht8l5iexn/08urHwLewDFbKftIoJiPdR5TXiyfqynNiL/WcEsYGt2fvZzk59KNPpxjDyogmv/vX1yuP3qA+cxGA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SPTZ+j1EW+qy3TgjVevD42SfOmwpi0QzWUZMXtErEm0=;
- b=fFMMe5K2kb5Y3fvFC0rrk1LzgwacrsvWMR4m06mK+oar/Pfg6LcJQSPdg6jssjZS9c8H66D0cahCGpZ/uQ9gaEbxIeYlO60ixHxkh2CkOgPzUQq8f6Q+Vo9plUPJ3BnHgFaR3H2iiPWnz10IeVMXAYRrD/WXvgc0f7eEDGuYMzQP/io8tmNBA9F5s33KJ71YKGUs+IKAw90nU6vnbcnz4juZ0Vl7XXoKXHcgsHkqZhpB9ULkSmUoU82U9wQ0Sl8Cip/FXb3u/IN5GGv0DouKRjL3RO8XbjgNDZa20k98ZLvUK8UwlPn3W1ODXQI9SGhCP7TJB5t6T8MDTvSAGskedg==
+ bh=9Oy+8HnX348JmAgN4TnH9nz9SqXdn5d4ycr748o4ofY=;
+ b=NqBhfsTtcjJoDw9GYo5VXnOvVNGtIGz/kKqV3ElFCzoopWhpPdeNwVxM4CLGB0/NogktEjwgdzFTpDwr6CUkQ6BcsNsxpgYSVFVjx82+VeF7G6c5J52qsB5Z8zaf/C4LOsFaSztkTwPVNqqjSaCmms9ltVhDUkcHo9ke0idXS52zfQc8gugLiK8wA774XQETb0L+hdx+7K3695i96sXoZW+3x8QyoJnmopBgvN7h8Z6qSJnOvcd9N30moSuJAug3BIjS/uHVw/5+lpt0mVc+PhiJFf8J39cY0KMClzkPjVXAh22p2M6ydSTqACI86gH4zbvWLug5dySU2Do0ZsG0mA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SPTZ+j1EW+qy3TgjVevD42SfOmwpi0QzWUZMXtErEm0=;
- b=ysXevslwBiWEif91Jkx90kaNKwDDCZiLIdfpFUivlJ6GF4394NSDGumjAZ5+V2BB/PPItRH4JqUvBDDcf9EdKYuuwCAqoUxE2S//XSSqZuM7A5K8rekJkULfyPo2Tng/gi+7aqyLcNe5eo0HsTJlqZ0dx2MrKAq/WXPnuDMnr3I=
+ bh=9Oy+8HnX348JmAgN4TnH9nz9SqXdn5d4ycr748o4ofY=;
+ b=ValOaRkxJmgSL+WTpZZvnwDjx+ay4h4H9aH2nE0qXyfv4uLqpQK1R7kyNUIQNIbVDyXutJJ9kWEzWBvnX4rFrmp+Sab9l8Cz9voTiN5bnAHld/+drqrITu2hgVytZR3clqPdiWDNgkSJggFFyuqbJq5Uygm6E68/FpJzW3dLz5E=
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
  by DS0PR10MB6823.namprd10.prod.outlook.com (2603:10b6:8:11e::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24; Wed, 30 Oct
- 2024 01:56:05 +0000
+ 2024 01:56:30 +0000
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23%4]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
- 01:56:05 +0000
-Message-ID: <ea82558c-eef1-4af6-bb90-5902f04ce06c@oracle.com>
-Date: Wed, 30 Oct 2024 02:56:01 +0100
+ 01:56:30 +0000
+Message-ID: <416a47ff-3324-444b-a2e2-9ea775e61244@oracle.com>
+Date: Wed, 30 Oct 2024 02:56:25 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/4] accel/kvm: Keep track of the HWPoisonPage
- page_size
+Subject: Re: [PATCH v1 3/4] system/physmem: Largepage punch hole before reset
+ of memory pages
 To: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
@@ -92,17 +92,17 @@ Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
         joao.m.martins@oracle.com
 References: <ZwalK7Dq_cf-EA_0@x1n>
  <20241022213503.1189954-1-william.roche@oracle.com>
- <20241022213503.1189954-3-william.roche@oracle.com>
- <a0fda9e7-d55b-455b-aeaa-27162b6cdc65@redhat.com>
- <9b17600d-4473-4bb6-841f-00f93d86f720@oracle.com>
- <9a49fc5f-bf9e-4e72-bd3e-13975d4913bd@redhat.com>
+ <20241022213503.1189954-4-william.roche@oracle.com>
+ <0cda6b34-d62c-49c7-b30c-33f171985817@redhat.com>
+ <e9f8e404-50db-4e0f-a5e1-749acad49325@oracle.com>
+ <6cc00e04-6e38-4970-9d6b-52b56ee20a64@redhat.com>
 Content-Language: en-US, fr
 From: William Roche <william.roche@oracle.com>
-In-Reply-To: <9a49fc5f-bf9e-4e72-bd3e-13975d4913bd@redhat.com>
+In-Reply-To: <6cc00e04-6e38-4970-9d6b-52b56ee20a64@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AS4P195CA0005.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:5e2::14) To CH3PR10MB7329.namprd10.prod.outlook.com
+X-ClientProxiedBy: LO4P123CA0485.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a8::22) To CH3PR10MB7329.namprd10.prod.outlook.com
  (2603:10b6:610:12c::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -112,300 +112,311 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|DS0PR10MB6823:EE_
-X-MS-Office365-Filtering-Correlation-Id: f1e84f91-c187-4cd4-bcd4-08dcf886037c
+X-MS-Office365-Filtering-Correlation-Id: 76c808af-84f9-4451-1f85-08dcf88612ce
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dmlGYkFlRUo5QjdXYWo1dS9FNTIvZnRMVEtGdHpuLzMveDcvWXRDMmh4YjhZ?=
- =?utf-8?B?Q25qdW1TR0UyTjNSRmQ4bjdvM3pHcFZzMzNhdFFaUWViU0ZRVTlERHd0K2pI?=
- =?utf-8?B?NUpkakJOZW5jUnVDWUdsU2hZd1NPSXc3eHlObFJzZm5TNkwvYW51U1NDVHVn?=
- =?utf-8?B?VkFOWWlHeGl1Vnl3cTJiWDhZNEJBbGZWQVFrSTlkMUFtaDVkMFRJZFZFSmo1?=
- =?utf-8?B?TnJGcURwSitCUk9oZDR4U3g1dlprY0tuODRVM08rRExYOGZZQi91dnQ2Y2lw?=
- =?utf-8?B?RzFYbWJFQlZBYXVVSk92YnVYUFQ1d0NzTER5aXVlNVJtU0tFMVM2L2d6SWM1?=
- =?utf-8?B?amt4Q0lRRlhvQmUvbUNkTytzOThBWWZaR2Q0cUY4bXp3M3JnbUhHMHMrUmRB?=
- =?utf-8?B?ZzBFQ2trbnpKdGppQmpLYS9MZ1dOOGpvV3Y2a3l0V2R0OCtyaW0vVjVaQ0RK?=
- =?utf-8?B?bzBYOWxiKzIxREdFYXI2UmVScDdZbWpTWUFNTVhYaGpINThSSXdKOFVRb3lC?=
- =?utf-8?B?OE4wcG9WZjJqa2N5RExpT3pRWWsrWWFpNkJTVGo1cnBWcXlLRmxOWndqZEd3?=
- =?utf-8?B?QzFtZlNpUjZteG9qSUU2R2NtYmdjaHNJZ3I1WWJUMXFMeWhLV2NYRURtcDRh?=
- =?utf-8?B?T1lRR29RNnNaKzF5d0hTT0NCQXlSMnlrTEw0R3ZFZURqZElzUXNQcXdrdHZt?=
- =?utf-8?B?TWJ6emh6TU53NERVRCsyN0lvRm94QXpuRFhrMllqRGNDQ3FhSDIzVWJBZjA2?=
- =?utf-8?B?TGVMZHBFckNZcUk2b1pHZVB0SFhUTk1PYzdmZjJWaTJiUzE4amFXa2FzczBm?=
- =?utf-8?B?V2g4cTh5K3FBVEEwNlBjMHVOaVJoajE0SmtERjZ2enpxbE4rZ1ZkcnBvVlJP?=
- =?utf-8?B?WmIxSElKaGh2RnhJbUVsY3BKdHY2c3Y1NkFoMlhXMHg0ZU9BbFRqVXJqKzVB?=
- =?utf-8?B?TWRMcTNWMVFxc3dwWEVpQ0puRnZjU3BtZnJ2TDhYRUloNmJZOE5ib0ZhWjJj?=
- =?utf-8?B?TW15WEhTcWpVYjJlUktKb253bzhMMkN4L3ROaDAxVGZOQ3JWN000NkhzYUcr?=
- =?utf-8?B?WHh6Wjh4RVVCVi9Vc3NXaFZwY1pJenZhYm5Jd29EK0RZb2xvNGpqNm0xWUpk?=
- =?utf-8?B?b08wRzdTVXBXTDZHRUt5SERjRmIxUFhtdkoyVnNkamV3Z2kzREd0R016K2N6?=
- =?utf-8?B?VGNqWWI2V2hvOXBtWnR3QXBoUThtRkl1Q0ZOenlQeUM3TlJIT2hld1MzZkNE?=
- =?utf-8?B?OVBRUWJzb25tK3UzRVMvYjUyZFZkMFJYZXFsdVdQT1JkaW03RGErYTRhMmJq?=
- =?utf-8?B?OE52cjBhK1BENk1OZG1keCtqMFAvbkNseXNXMStwaVU3dnJkb2xxcXdvaW9F?=
- =?utf-8?B?L3FtRFJxSmwvY1ExWW94WTFsaXhURThyeXJtQzExdzR6VXgwVkpuM3ZPcTJk?=
- =?utf-8?B?L0pMMnpOZDZ2TnprNUZtTTdJcmlFWk90YTlLbFQ2cWZqOUE1Y0dCVHo4bGRr?=
- =?utf-8?B?ZzZrQ2taV20raEx2L3hrbHpaUzBENTRIeVZOK0ZkQzBUaXlTN0NhTDdNTHNw?=
- =?utf-8?B?TFMrcGMyU21BM3hNY2VKcVVhOWs3dTUzTCsyTi9aUVpUOFpya04zajF1NjZL?=
- =?utf-8?B?T0N6dHNkWStQdmVmYTl0STdFQXM3Y3k4RysyRUdhd29KWUhOcGlnTEVLRW1L?=
- =?utf-8?B?TWZ1L1pIS3YrNlRlVG9RdEVaN21Idy9QU0x2TjAwd3p1c2V4eGNsaGhDVTZB?=
- =?utf-8?Q?3oCsp951umNcZG6uERPFXKLGRDrHLaBLZcHNpT9?=
+	=?utf-8?B?NkhleGsrVHNLM2crMmJNZURuTTNrNWFkcUNsY0NUN3I3YnpFUzBFVHlrb2Na?=
+ =?utf-8?B?OTd3SzVudjdXYTNWV2taSDcyaE9vMUpETzRXQm1DZVR6T1g4UEU3czNTRjZR?=
+ =?utf-8?B?bms5YmZTRGRWWC9wc1ZWWllFVXVobjh3MXZuQ0dRdVpQRTc4eHJmRFQxZ2lG?=
+ =?utf-8?B?dC9xdG5uNmRQcmFaVTZYSXkwTXpmTmFiVzdUb1VQVG5kMzV3UVd3RE45Ylc1?=
+ =?utf-8?B?ZzJuWTZiS2E1N2x3WG5Fa0pmbE9jNlRqbHFITWJPalNKcWJNcVl5bkJVaXUw?=
+ =?utf-8?B?Q1ZvRjlWVld4UG9JOVNyckszOENKYUVRT1RZQ1FTamhjU2RRTllOaHlPVXBk?=
+ =?utf-8?B?czFSek0rQ2pGY2d1L0VFOVIyQ0JzMXZIUzk5akFlaWJ1SU1sTGpOQkJ0VjdR?=
+ =?utf-8?B?cTVXVkJDYnlaY3VoWVZrTUxqblg2R3Brb01EcUpLVHREMHd5NkpOL2tKRFhK?=
+ =?utf-8?B?Um12YW9BaDg3bjB0ZnlFa1djUUtlbmUycU5mR09HS0tUbWVoOTFva3kva2JU?=
+ =?utf-8?B?MFBjdlVXdExvUUNCTkdKdk9RYm5jemQrM2VPMXU5UExHWVluMnJnVjhTRCtV?=
+ =?utf-8?B?SmpxUXNjYWc4V2lvUTAvR29SUGRnZ3ViWjZWcHd1VFN4bUFSWWFRVTlGNXRn?=
+ =?utf-8?B?VVdUa2piQ1hSWjI1TERlcTNISnZXQllRbEd4cWVlMGw4M2pHU3ZyK2thcGFU?=
+ =?utf-8?B?c0kvNVZWdFlTSmREakpudjg3MldVNHFzSHA0emZDMmJDNU5vSVNUTzBCR3Zo?=
+ =?utf-8?B?QVlTenphR1lGRVBTRjRYQnNGcWZtWGhmdWozN1NYZjd0Ymk0TG5ObElHWTBo?=
+ =?utf-8?B?TXVRemRYRlZ5c0IvK2ppU1RxK3JwUDAwYkN1TFZXNWFONEN6YldBVEhDNnJM?=
+ =?utf-8?B?c2lmNGRwb2VmTUpreTZ2SmFjNUluYWluUnBKZ285Vm1LbFR0M0dtTzRjVnlw?=
+ =?utf-8?B?RzZpdTFzV0xMT1RaQzZCRFdMbWhybnJIT1RrelVqbEFieVVIZVJmSktXWEhG?=
+ =?utf-8?B?N3VyZTdENld1VHk4Q0d4aUZ6U0NzR1YxY1V1ZExnY1dsOTNCcjFXNHMrNEpZ?=
+ =?utf-8?B?WTBXVmIzb2xqc1hZKzNYZHVGSTlMN1pUalg2enFlanc2aXdkTnZGRXFkRUJt?=
+ =?utf-8?B?Wk5vbGUzZnY2aHVHTlRvdW5XMXJKeHM3ZFVNejNyV1U4T0hraWhKWjhZWVRZ?=
+ =?utf-8?B?bUxad3JacTgyUjVTVWtwb2pPMFMzTVplakEzdkMxVGowLzZkcmptTjhHNlhO?=
+ =?utf-8?B?MG9ITHlHOVBWZ2M2dnV0ekdZcm5WT0M4OVFPYTRRSm8xUWVrNTZHbUNKc09u?=
+ =?utf-8?B?TTh2ZFl6RC9jYVhuZ3BFRWx1dmdnUE5mZzZwRWM1OXBTazFmNW03eXo1dTZT?=
+ =?utf-8?B?eGIrMmJYdW4wdFFRZXNFbXhSZk5panY5V1c4VnJpUHRRdkZZTjBqZUdIWE1Y?=
+ =?utf-8?B?aHpDdHZYWndtN05WR2l0TTVnd0UySng0OE9QS3lOZ0ltQzlzUTcyZm5ONDBC?=
+ =?utf-8?B?ZUdwbUJvZjJGeVM2UE53c08vaHcxMXVqaDRIdytFY1dnY283YkVBSklnRkdJ?=
+ =?utf-8?B?bW90aGJVbjFtb1JmREdpMDlvcWNZdFpOUVlHekZyeTRIRC9EdDJEeDJ3T3ZR?=
+ =?utf-8?B?anVsUFFQdy9JK1g1Zm5nMmdKWVlsTkpaRWRtRmFWMUVjby9HdG1xc1ZPNzl1?=
+ =?utf-8?B?VDhZcFpaaXUybUJEVzJlSHNGdmZlWTkwMWRrZ2NqTld2b0xEOHZmUnNyZ2ZW?=
+ =?utf-8?Q?1hV/AoYOhIUlutZnvmodaXSkCNw8cg9D7s6cWVV?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NmRhT2hMTUZ4eUpsaHlrZHgzWTc1WDMwbWdVVXllS0E2M3oydnRHVTd6MnJ3?=
- =?utf-8?B?d2ZKd3hJVm5ibnVMZm9rVmg2NURzZjlqT1ZkNGJ0MWdFNzhpYjdwdHpJZG9C?=
- =?utf-8?B?bnBKQ3pZRXU3KzNUSWdpTWlld09lVTRGVVgwMVB2eFVhSndmMnc3ekgvVnl2?=
- =?utf-8?B?L2lja3BzVU4rcUZkYTNlcVRHV1hLVlNERE5rdU1OSmhUMktqMWY4MEZLZnVr?=
- =?utf-8?B?Y2tBS1RJNit3VkZBU00vdWYrc0thV3lESFZHMmZCdGhjUWFGeGFRM2VwM3ZP?=
- =?utf-8?B?NzBRTUdsR3dvOTRKSWsvcnk4TVJrODUyZGJlNHE3VHlnSmFsM1V3c2ZPUU0z?=
- =?utf-8?B?cTkwcFNSdUZES0tUSzhnd2RzU3AveS91M29iVk96VmdmQmp1dE8rVGpyN2ty?=
- =?utf-8?B?ellHSHcxbXkrdXl1bVBYOUhZNG9ZeGZObkdsVDF4MVBKVGozRE04a3JBeG8r?=
- =?utf-8?B?Q1RGTFFpVlVpSnR5WDZoS0tkcHVBVTlzMVRzKzlGWUNxK2VlZUxxYUdvaDh1?=
- =?utf-8?B?dXFlSi9ENU9oK0x5RWhrTUE5OVVqQWgvSFErbVg4a1VndUlXanJyRUZnTzho?=
- =?utf-8?B?cUUxdXlieFlWY0Vpa0toSnY3UnlXbER6VHU0cVNVeFovcXlnMDNvdmlUSnFW?=
- =?utf-8?B?bkJSdzhDdUN3N0M1NFpnUzFwSisxNFh6RnlEMGFQMmQ4MGJadnJtZzAwN0tx?=
- =?utf-8?B?MDhEUStQRFZUSnhVeUZETGtOM05Jc2EzODJRaVQ0ZElkd1JHZmozRWVTb3Jl?=
- =?utf-8?B?TmdmcFlhYlVpWHlmNS84RjlONnd4dmxBRy9CWEhEdDBNTEZmK0hhdkRJanAv?=
- =?utf-8?B?SGZzWVZVb1NGY2pRcVZ6aXVHbjhvVXJxcFFvM2Y0K28wOVpnajN5aXo3NVN6?=
- =?utf-8?B?WlNFK0RmNkx2MUN2WHg4amVIcEJPLy9Bd1hSTisyZHBlV2ZsdTVxZjBRSVR3?=
- =?utf-8?B?K044MkxNelpvUWptMWdpM0FFZHJXNUFrcStoQnpQejZ3ME5TYllIZ3liUStR?=
- =?utf-8?B?dlBEVVNFTUIwY0FRNFRCZVJ2d1UxWGZXdWVKSmNuSWF3Mm9pRms3bWZaTTJl?=
- =?utf-8?B?SzY5aVdvWDhweXlPbGlVbDRoQlRDMFh4Qk5kbW1LcFJvWUhLZmFta2RaTmF3?=
- =?utf-8?B?a0EvakZwTWFkaGpKSWdxZ0QzWEhYNGxNM2JiS2t2OU5KeHBKOHg2RDIzZDhB?=
- =?utf-8?B?RTQwbzVaWnpONHU5cEVlSmg1dUNodXpyTTJwVEo0TExGaHRzaVhkaytXaEJJ?=
- =?utf-8?B?Vjd4QjRzbXZFZzJLME5MZENvVkw2UnBLV3VkK25HVkQ1aDJoZUd3TE5ralI2?=
- =?utf-8?B?aktIWnV0YUNWeTMyYWUxRU1wR2hhTFBZdkl5c2h4Mit1K3A3aSttbDAxa0Zh?=
- =?utf-8?B?NU1UVk1WRVBJY0IrdU1FMkplenhWUWlYNUdBbHdRakgyeWJUQVYvS3pWYjAw?=
- =?utf-8?B?R3JHb0J1Y3A4emp0bVhGc3Z3eWVhc1lOMTlJNU9iRm91V0Y3cm9yS1VRQmlj?=
- =?utf-8?B?K1Fld1BGZmcxWVJiSWs0STdjR0NmeFZvU2ZPWVJwZDY1MkszaWZIbEJFVU5F?=
- =?utf-8?B?MFAyWE4vbktnYWpZWDdremFCM0ZKMUV6Q3VkYmd3eUZ5UStNcThobStwK2Fs?=
- =?utf-8?B?aW15blRLTElKdmhVVFBxTHRwSVhROHpMbnhBR0ZVVXBaaHM1bjlwbUNXamcy?=
- =?utf-8?B?bEVzTHhYUDlCRDVTU25NbTZBZmtUSW1aTEszOGI2dGszQWIxNGE1amJSYjhv?=
- =?utf-8?B?a2VaSm53MHFsVGxwTGRRVjkySEp4WlJHd2Z2TVRLZ0RkbGVFUUpTcmFFMkRn?=
- =?utf-8?B?cmdCT0dNekpWbTFSMWRXM1EzcVl1OHhMR2tkZUEzeWsydzVYWTJiNXVFdXd5?=
- =?utf-8?B?SVN2RmE2QUFoemFNS3c0aE9uY04yYzNZdk1La3RpUU4vTWJEYjRtR0cxSHps?=
- =?utf-8?B?Q1hLOWhQRVpYb3JsTFBXM3hnL1kyNzBQd0lqcVdwNjFVTUJOWkR5RDEvZEVZ?=
- =?utf-8?B?dytXSkpiRXRxM21pang5QmQwdzB4dFNYay9KYVhlSE5LU0cxdG1sODJmQXpa?=
- =?utf-8?B?MC9saHlibzQ5T2ZaYzdSZUxDSzJlNnFkRHBnTTR6a0l3QVFPL2F4aDNuZnQ5?=
- =?utf-8?B?Z2pPWWNTZnF5K0g0WWlQbnplSWtrc3lPUVJtYXg1TVZ0TWlDQXdjZUdURXF0?=
- =?utf-8?B?YlE9PQ==?=
+	=?utf-8?B?Q3BQcmxzSFYzZ2Z0UjVvNC9MeVlsMVBBc0R6TG8zVTI2d21DYW5KNW1Dam55?=
+ =?utf-8?B?bittZGRQUER0NHdCMU42T0hNTGttT2xOWkhNTGwyTCtrOXFNOWU5eU1IQUhE?=
+ =?utf-8?B?bHJvbnBrNktKTDA5MHhoVmxwVks4M1kxYWJGcDFpbzBqOGlaM3Zva3RpbU1F?=
+ =?utf-8?B?UnV5VGh2OWttdGMzaVVmMG1ESGpZeHg2c1VLQmg1Qld0MnlCVjAwV3I0NXNL?=
+ =?utf-8?B?bkZ6UmF6MTY4Tm9TOVhMNTNBeW1CU05ROWNwQzFualdHUy9qZFkzdVRwOEJr?=
+ =?utf-8?B?V0puWDN3MWFSOHJKWmkyd0l5SG1iNzNGc0Z6cnY3UktVelk3NGc5dGozeWpr?=
+ =?utf-8?B?UUlNY2VtM3YycW9NcXhta0xMUVdwQWI0Tm9rdnhqQnNWN3FzWWwyVktYVGdh?=
+ =?utf-8?B?TmFiRzRKbDYxS2ZWSWhlS3hGczZnZzM3MXpiVnNmcURyb1R1WHNoMXprL3B6?=
+ =?utf-8?B?NzJkK3hRdVBuSVN0VitoOVIxNndSSkpvblN5eFdXNFptSDBlYXY5bitIbkNZ?=
+ =?utf-8?B?cmlTZ1E3bTlqNjErd3hNQ0doL1Jpc1A1WWlLSGFQZHJ4d3N5WHJrNFJiTzVa?=
+ =?utf-8?B?OHlGdndjekNhb1RkL1ZKdk16ZWFSSU4zNzYxQlZtWDdocTVmSjFVTTRQSW8x?=
+ =?utf-8?B?Y1c2TjRCSHc3SHBzUlNpRDVIOG15bjBpR1VTa0xDbGZmOWdWRENNTk1qTjgy?=
+ =?utf-8?B?RXE5STd6NksvMXI5MUt4b2plTWdISkllYlRxaXJGZ2NkZm9oMHdHci9BRTBM?=
+ =?utf-8?B?eE53RCs3WUx3Q21GNTU4Zmh3Qzc5Y1ZjVE5uVGRlQ1FmTEFFUG1rK2xOOGVo?=
+ =?utf-8?B?UllyOVVSRFdpSG9iNmJkUjhuRVVlNzJaK2hsQWhabE9iL1Bndmw4QkNoRlN6?=
+ =?utf-8?B?S3AybW1Ib3hpNk1zZ1R5VXNCeHVqeVJiWU5KQm9JZmZvNUJkcDhHV2VyZHR3?=
+ =?utf-8?B?SXpuZ1pjdk1iTkpjRmtWWEVET25MeEEwTi9mbWZTUE1hUnVrbW8zcGxSWHJR?=
+ =?utf-8?B?WTlVQnF6NVN5eldWMnZyWnh0WCtDVHFLNzNXMUVwbDd0M21XNVB6bXJBYlEr?=
+ =?utf-8?B?d0Y2WUJOTzQxV0lqRFFXWFcvZnk3Q3gwZER1Y3l6ZEorMzFaWFVtVGxiTmpX?=
+ =?utf-8?B?SzROZ3MwNTllNk9JbFZCYTlIOVFNbTk5M2JEYVZXbFNxcGVqcUhQNHFQbi9s?=
+ =?utf-8?B?ZnE4c0kyWUdWajljUHJ0N0hqUUl2c05GWFhPVDJzSUUvT1N0cW90SHFvVmx6?=
+ =?utf-8?B?VmFJaTVrOFgwR2prNW1mNzdkLzIwNFJKRjREZXJlVTVIeVljRmwwSFYzT1Y5?=
+ =?utf-8?B?STNWdE1wR1pvR2NZUC9mZ1FrTzJZaFN5Y2xMajFSNUdxQlpGeE5ienVrWWhW?=
+ =?utf-8?B?elo4Y1FSaUU3WHVONE1BSmxsbUEyYTFkK2tlNFpDd0UvSFR0cSsvVlVINW1q?=
+ =?utf-8?B?TlNuVXl5SWtoKzFnN0JPc29zK3EzQVUyMUU4dnVvWXJkSWNaNUJtZTlSQUJx?=
+ =?utf-8?B?NkRBRDRYRjc0aFk2YldaOXhLK3VCWGZTVnBCS0RmRGx3ajREWG9KWnRONlR2?=
+ =?utf-8?B?cUkwZEdhRHZ0bFg2V2Q5RzFuQ0Z4ajdiZ3pCb21ZYno4WENyWmFFb0czaGpS?=
+ =?utf-8?B?MkJoc3phYkVpRlRobi9MUmdGWHdiKzcydDBZdDg1UHVBT0xQMjA1bjNkdFor?=
+ =?utf-8?B?Z21WRE9JbHV1N1d2SmhaaEZEVE1xN1d3Sm5YbVVxTWdORWpXd1NubDVYd2p3?=
+ =?utf-8?B?UFF5cXlMRWgwL2d2KzFibnNMSjVrWXAreW54L1ZvbHlOazFhS2FTQldIYjdH?=
+ =?utf-8?B?VXRnS3c1b2NIRFNlNkpLSGxKODdQd28yT1dGNUdjMHozK0M1Vkw0c0UwTnVw?=
+ =?utf-8?B?R0hOV1NjejJYUWw3eGxtdW1WSXNrTGNQd3k2cTN5OU90SW15NzZRYVpvcGJw?=
+ =?utf-8?B?bGNub1h4emY5UzB3dnd5bDdPbHFqT1JpSE1qeUR0RTNrbmZHMzh2UkRQSW5z?=
+ =?utf-8?B?TTczTFlHbkhtZ2V1VlFoekhzbVc2SFp4aVU0Tk9kNzZKU05kaWxucExJeW9o?=
+ =?utf-8?B?TnN4U0M5RU9iOHZYcGhBQWdNdnorcDJvS0dxRGpTQW12YktTdHFhbXJRZ1Bw?=
+ =?utf-8?B?M25tL0p1TGNjSGREb092d1g4aUFiZjZSdXllcGtDSjlUZHpzOFkwTEFyOHYz?=
+ =?utf-8?B?WEE9PQ==?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	F/AXUIWKB9FyxkIUCP/3C3AuehaTmaIM4GrLhR6w91ymyy1No4Dq2oEz+ERhoS5gYAsbS/gNBM0IcNdxKUIoQoTRIyaSzUOA+aDb/xxxABR7VxYC5DEYg1j/XT6xa+jSbxbF353m00rhAPUxemcPejSoYpdNrQLUvtJ+kvpHk3zug2EF1iPvJj6VgVLjVN1oDt0b15fNOtCULkTCSvA677j4P0Mycj1SKLZuaQAjQGMj+kCT1AQG5q72sIcUF5P/agnYBYYnL5Dk6kCrkEHUTXEI/d6rUQNXDRhMbsPWdFwBMSI1i2BPjMyKbo5ldwVMwB/CZpqebvIeUVMQc7x23hzjimOQIMkE0tjVmB54+lgF8eNYUKblKLZxCS8WCwjvRByf4AR0fGkLWvLyGTe5RkulML+O2IyrLkkx3Oi/8NKjXDgVL5U9ZipvDKOZzqG4YaGDtJ+hUR/FOF1qI0uWF2+WQcVqxwxwBbb9MgiqW1raXzyQJqQ4MZ9cDyvBOmvpzJ/9VhVtTI18jl9t51DbWhglfan6fWrrgcpobwPgIikiFWKlMeUHaAgAqmJsZEWF4OvUyRZFjhY95AMPTUAUxY7IQq9pjvt4CRP3zM382hs=
+	SaPwszkbVCh3SD3ESoH0AdY9OR9L3qM6Pb3mFe3jqn5VXZR/AUCL6fAz3Oel0DpTXXjDNfN36cbcxhEmas+cA0ivjeWh4dVSQXogcjxS716PHp/tvASOV+CtZcBxchZLwMPKFxdJhFkogCxSHPnZhzdaokdUb/KmHRYbbmA3T+DH5Ua5dNWBE7WlcO39J1YYIv7nRu4vJPZRvoj7La92RbNQBUmEvnwHKw5SLHXLsRcjh9qV4b3gUgYmIBhUvnAspxbw4tQLGkuFCZqTQJrRcyQFO8TZiXSbg6VxEksO6ZvG7/RcS2KUt6ha6nIyqSMtKGC2x0gDzd/2Y+fo0R6pOPs3TFpN6EFq9Ij5OC2/NBB0nCeC4wOuAGvkr5BfEzVw2jkMwDLlDl4rbU9OX3rSHHQx2ZWKFO1SqrUJDa2Bui23srY5sQhRzYTw9y724oKIDcVJY3Sbu1gSUrsfjuvMOagHLw5n0t/T1jWS/Ppg4GEm01oG1fwzC8CFBgEKdsS/oOVbgnu0ceCE036LxXnSzccWLqGLAwUtTegmmgPESvoDvfxx1LrBqqKxHu28PPwP2oUpHBVJ7m8z8uusp1KpbmiOsIo0hlyZ79gy+43UIgg=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1e84f91-c187-4cd4-bcd4-08dcf886037c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76c808af-84f9-4451-1f85-08dcf88612ce
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 01:56:05.0904
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 01:56:30.6676
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: M5FZL8DRrn4w/S1D3Lu7IZJwQ2YcmMsBIF64QXtFUcqtwqIGhd8sljAIttnDmReWusODMRUAa4dVyzXdFQHBqqx6wVuAWligPnVurUxS19g=
+X-MS-Exchange-CrossTenant-UserPrincipalName: a8ja20XQR2ojQ3mgdD/mYs/YweullnrRDDONNvZIq3M//SYz4Cz9nPESCaoLFRYJbwl2nILouINgQdlU1CZ6JWNRbCPmZuJn37oWbony90Q=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6823
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-29_20,2024-10-29_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 spamscore=0
- phishscore=0 suspectscore=0 malwarescore=0 adultscore=0 bulkscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
  definitions=main-2410300014
-X-Proofpoint-ORIG-GUID: 84JdrWg-4v1isVyJKmWVm27rGqHKS0cj
-X-Proofpoint-GUID: 84JdrWg-4v1isVyJKmWVm27rGqHKS0cj
+X-Proofpoint-ORIG-GUID: hVX0-i8IPGgKBAh2Z2qJbrhPDPz-piK8
+X-Proofpoint-GUID: hVX0-i8IPGgKBAh2Z2qJbrhPDPz-piK8
 
-On 10/28/24 17:42, David Hildenbrand wrote:
+On 10/28/24 18:01, David Hildenbrand wrote:
 > On 26.10.24 01:27, William Roche wrote:
->> On 10/23/24 09:28, David Hildenbrand wrote:
+>> On 10/23/24 09:30, David Hildenbrand wrote:
 >>
 >>> On 22.10.24 23:35, “William Roche wrote:
 >>>> From: William Roche <william.roche@oracle.com>
 >>>>
->>>> Add the page size information to the hwpoison_page_list elements.
->>>> As the kernel doesn't always report the actual poisoned page size,
->>>> we adjust this size from the backend real page size.
->>>> We take into account the recorded page size to adjust the size
->>>> and location of the memory hole.
+>>>> When the VM reboots, a memory reset is performed calling
+>>>> qemu_ram_remap() on all hwpoisoned pages.
+>>>> While we take into account the recorded page sizes to repair the
+>>>> memory locations, a large page also needs to punch a hole in the
+>>>> backend file to regenerate a usable memory, cleaning the HW
+>>>> poisoned section. This is mandatory for hugetlbfs case for example.
 >>>>
 >>>> Signed-off-by: William Roche <william.roche@oracle.com>
 >>>> ---
->>>>   accel/kvm/kvm-all.c       | 14 ++++++++++----
->>>>   include/exec/cpu-common.h |  1 +
->>>>   include/sysemu/kvm.h      |  3 ++-
->>>>   include/sysemu/kvm_int.h  |  3 ++-
->>>>   system/physmem.c          | 20 ++++++++++++++++++++
->>>>   target/arm/kvm.c          |  8 ++++++--
->>>>   target/i386/kvm/kvm.c     |  8 ++++++--
->>>>   7 files changed, 47 insertions(+), 10 deletions(-)
+>>>>    system/physmem.c | 8 ++++++++
+>>>>    1 file changed, 8 insertions(+)
 >>>>
->>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>> index 2adc4d9c24..40117eefa7 100644
->>>> --- a/accel/kvm/kvm-all.c
->>>> +++ b/accel/kvm/kvm-all.c
->>>> @@ -1266,6 +1266,7 @@ int kvm_vm_check_extension(KVMState *s, 
->>>> unsigned int extension)
->>>>    */
->>>>   typedef struct HWPoisonPage {
->>>>       ram_addr_t ram_addr;
->>>> +    size_t     page_size;
->>>>       QLIST_ENTRY(HWPoisonPage) list;
->>>>   } HWPoisonPage;
->>>>   @@ -1278,15 +1279,18 @@ static void kvm_unpoison_all(void *param)
->>>>         QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, 
->>>> next_page) {
->>>>           QLIST_REMOVE(page, list);
->>>> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
->>>> +        qemu_ram_remap(page->ram_addr, page->page_size);
+>>>> diff --git a/system/physmem.c b/system/physmem.c
+>>>> index 3757428336..3f6024a92d 100644
+>>>> --- a/system/physmem.c
+>>>> +++ b/system/physmem.c
+>>>> @@ -2211,6 +2211,14 @@ void qemu_ram_remap(ram_addr_t addr,
+>>>> ram_addr_t length)
+>>>>                    prot = PROT_READ;
+>>>>                    prot |= block->flags & RAM_READONLY ? 0 : 
+>>>> PROT_WRITE;
+>>>>                    if (block->fd >= 0) {
+>>>> +                    if (length > TARGET_PAGE_SIZE &&
+>>>> fallocate(block->fd,
+>>>> +                        FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+>>>> +                        offset + block->fd_offset, length) != 0) {
+>>>> +                        error_report("Could not recreate the file
+>>>> hole for "
+>>>> +                                     "addr: " RAM_ADDR_FMT "@"
+>>>> RAM_ADDR_FMT "",
+>>>> +                                     length, addr);
+>>>> +                        exit(1);
+>>>> +                    }
+>>>>                        area = mmap(vaddr, length, prot, flags, 
+>>>> block->fd,
+>>>>                                    offset + block->fd_offset);
+>>>>                    } else {
 >>>
->>> Can't we just use the page size from the RAMBlock in qemu_ram_remap? 
->>> There we lookup the RAMBlock, and all pages in a RAMBlock have the 
->>> same size.
+>>> Ah! Just what I commented to patch #3; we should be using
+>>> ram_discard_range(). It might be better to avoid the mmap() completely
+>>> if ram_discard_range() worked.
 >>
->>
->> Yes, we could use the page size from the RAMBlock in qemu_ram_remap() 
->> that is called when the VM is resetting. I think that knowing the 
->> information about the size of poisoned chunk of memory when the poison 
->> is created is useful to give a trace of what is going on, before 
->> seeing maybe other pages being reported as poisoned. That's the 4th 
->> patch goal to give an information as soon as we get it.
->> It also helps to filter the new errors reported and only create an 
->> entry in the hwpoison_page_list for new large pages.
->> Now we could delay the page size retrieval until we are resetting and 
->> present the information (post mortem). I do think that having the 
->> information earlier is better in this case.
 > 
-> If it is not required for this patch, then please move the other stuff 
-> to patch #4.
-> 
-> Here, we really only have to discard a large page, which we can derive 
-> from the QEMU RAMBlock page size.
-
-
-Ok, I can remove the first patch that is created to track the kernel 
-provided page size and pass it to the kvm_hwpoison_page_add() function, 
-but we could deal with the page size at the kvm_hwpoison_page_add() 
-function level as we don't rely on the kernel provided info, but just 
-the RAMBlock page size.
-
-I'll send a new version with this modification.
-
-
->>
->>
->>>
->>> I'll note that qemu_ram_remap() is rather stupid and optimized only 
->>> for private memory (not shmem etc).
->>>
->>> mmap(MAP_FIXED|MAP_SHARED, fd) will give you the same poisoned page 
->>> from the pagecache; you'd have to punch a hole instead.
->>>
->>> It might be better to use ram_block_discard_range() in the long run. 
->>> Memory preallocation + page pinning is tricky, but we could simply 
->>> bail out in these cases (preallocation failing, ram discard being 
->>> disabled).
->>
->>
->> I see that ram_block_discard_range() adds more control before 
->> discarding the RAM region and can also call madvise() in addition to 
->> the fallocate punch hole for standard sized memory pages. Now as the 
->> range is supposed to be recreated, I'm not convinced that these 
->> madvise calls are necessary.
-> 
-> They are the proper replacement for the mmap(MAP_FIXED) + fallocate.
-> 
-> That function handles all cases of properly discarding guest RAM.
-
-In the case of hugetlbfs pages, ram_block_discard_range() does the 
-punch-hole fallocate call (and prints out the warning messages).
-The madvise call is only done when (rb->page_size == 
-qemu_real_host_page_size()) which isn't true for hugetlbfs.
-So need_madvise is false and neither QEMU_MADV_REMOVE nor 
-QEMU_MADV_DONTNEED madvise calls is performed.
-
-
+> Hi!
 > 
 >>
->> But we can also notice that this function will report the following 
->> warning in all cases of not shared file backends:
->> "ram_block_discard_range: Discarding RAM in private file mappings is 
->> possibly dangerous, because it will modify the underlying file and 
->> will affect other users of the file"
+>> I think you are referring to ram_block_discard_range() here, as
+>> ram_discard_range() seems to relate to VM migrations, maybe not a VM 
+>> reset.
 > 
-> Yes, because it's a clear warning sign that something weird is 
-> happening. You might be throwing away data that some other process might 
-> be relying on.
+> Please take a look at the users of ram_block_discard_range(), including 
+> virtio-balloon to completely zap guest memory, so we will get fresh 
+> memory on next access. It takes care of process-private and file-backed 
+> (shared) memory.
+
+The calls to madvise should take care of releasing the memory for the 
+mapped area, and it is called for standard page sized memory.
+
+>>
+>> Remapping the page is needed to get rid of the poison. So if we want to
+>> avoid the mmap(), we have to shrink the memory address space -- which
+>> can be a real problem if we imagine a VM with 1G large pages for
+>> example. qemu_ram_remap() is used to regenerate the lost memory and the
+>> mmap() call looks mandatory on the reset phase.
 > 
-> How are you making QEMU consume hugetlbs?
+> Why can't we use ram_block_discard_range() to zap the poisoned page 
+> (unmap from page tables + conditionally drop from the page cache)? Is 
+> there anything important I am missing?
 
-A classical way to consume (not shared) hugetlbfs pages is done with the 
-creation of a file that is opened, mmapped by the Qemu instance but we 
-also delete the file system entry so that if the Qemu instance dies, the 
-resources are released. This file is usually not shared.
+Or maybe _I'm_ missing something important, but what I understand is that:
+    need_madvise = (rb->page_size == qemu_real_host_page_size());
 
+ensures that the madvise call on ram_block_discard_range() is not done 
+in the case off hugepages.
+In this case, we need to call mmap the remap the hugetlbfs large page.
 
-> 
-> We could suppress these warnings, but let's first see how you are able 
-> to trigger it.
+As I said in the previous email, recent kernels start to implement these 
+calls for hugetlbfs, but I'm not sure that changing the mechanism of 
+this ram_block_discard_range() function now is appropriate.
+Do you agree with that ?
 
-The warning is always displayed when such a hugetlbfs VM impacted by a 
-memory error is rebooted.
-I understand the reason why we have this message, but in the case of 
-hugetlbfs classical use this (new) message on reboot is probably too 
-worrying...  But loosing memory is already very worrying ;)
-
-
-> 
->> Which means that hugetlbfs configurations do see this new cryptic 
->> warning message on reboot if it is impacted by a memory poisoning.
->> So I would prefer to leave the fallocate call in the qemu_ram_remap() 
->> function. Or would you prefer to enhance ram_block_discard_range()code 
->> to avoid the message in a reset situation (when called from 
->> qemu_ram_remap)?
-> 
-> Please try reusing the mechanism to discard guest RAM instead of open- 
-> coding this. We still have to use mmap(MAP_FIXED) as a backup, but 
-> otherwise this function should mostly do+check what you need.
-> 
-> (-warnings we might want to report differently / suppress)
-> 
-> If you want, I can start a quick prototype of what it could look like 
-> when using ram_block_discard_range() + ram_block_discard_is_disabled() + 
-> fallback to existing mmap(MAP_FIXED).
-
-I just want to notice that the reason why need_madvise was used was 
-because "DONTNEED fails for hugepages but fallocate works on hugepages 
-and shmem". In fact, MADV_REMOVE support on hugetlbfs only appeared in 
-kernel v4.3 and MADV_DONTNEED support only appeared 5.18
-
-Our Qemu code avoids calling these madvise for hugepages, as we need to 
-have:
-(rb->page_size == qemu_real_host_page_size())
-
-That's a reason why we have to remap the "hole-punched" section of the 
-file when using hugepages.
 
 >>
 >>
 >>>
->>> qemu_ram_remap() might be problematic with page pinning (vfio) as is 
->>> in any way :(
+>>> And as raised, there is the problem with memory preallocation (where
+>>> we should fail if it doesn't work) and ram discards being disabled
+>>> because something relies on long-term page pinning ...
 >>
->> I agree. If qemu_ram_remap() fails, Qemu is ended either abort() or 
->> exit(1). Do you say that memory pinning could be detected by 
->> ram_block_discard_range() or maybe mmap call for the impacted region 
->> and make one of them fail ? This would be an additional reason to call 
->> ram_block_discard_range() from qemu_ram_remap().   Is it what you are 
->> suggesting ?
+>>
+>> Yes. Do you suggest that we add a call to qemu_prealloc_mem() for the
+>> remapped area in case of a backend->prealloc being true ?
 > 
-> ram_block_discard_is_disabled() might be the right test. If discarding 
-> is disabled, then rebooting might create an inconsistency with 
-> e.g.,vfio, resulting in the issues we know from memory ballooning where 
-> the state vfio sees will be different from the state the guest kernel 
-> sees. It's tricky ... and we much rather quit the VM early instead of 
-> corrupting data later :/
+> Yes. Otherwise, with hugetlb, you might run out of hugetlb pages at 
+> runtime and SIGBUS QEMU :(
+> 
+>>
+>> Or as we are running on posix machines for this piece of code (ifndef
+>> _WIN32) maybe we could simply add a MAP_POPULATE flag to the mmap call
+>> done in qemu_ram_remap() in the case where the backend requires a
+>> 'prealloc' ?  Can you confirm if this flag could be used on all systems
+>> running this code ?
+> 
+> Please use qemu_prealloc_mem(). MAP_POPULATE has no guarantees, it's 
+> really weird :/ mmap() might succeed even though MAP_POPULATE didn't 
+> work ... and it's problematic with NUMA policies because we essentially 
+> lose (overwrite) them.
+> 
+> And the whole mmap(MAP_FIXED) is an ugly hack. For example, we wouldn't 
+> reset the memory policy we apply in 
+> host_memory_backend_memory_complete() ... that code really needs a 
+> rewrite to do it properly.
+
+Maybe I can try to call madvise on hugepages too, only in this VM reset 
+situation, and deal with the failure scenario of older kernels not 
+supporting it... Leaving the behavior unchanged for every other 
+locations calling this function.
+
+But I'll need to verify these madvise effect on hugetlbfs on the latest 
+upstream kernel and some older kernels too.
 
 
-Alright. we can verify if ram_block_discard_is_disabled() is true and we 
-exit Qemu in this case with a message instead of trying to recreate the 
-memory area (in the other case).
 
+> 
+> Ideally, we'd do something high-level like
+> 
+> 
+> if (ram_block_discard_is_disabled()) {
+>      /*
+>       * We cannot safely discard RAM,  ... for example we might have
+>       * to remap all guest RAM into vfio after discarding the
+>       * problematic pages ... TODO.
+>       */
+>      exit(0);
+> }
+> 
+> /* Throw away the problematic (poisoned) page. *./
+> if (ram_block_discard_range()) {
+>      /* Conditionally fallback to MAP_FIXED workaround */
+>      ...
+> }
+> 
+> /* If prealloction was requested, we really must re-preallcoate. */
+> if (prealloc && qemu_prealloc_mem()) {
+>      /* Preallocation failed .... */
+>      exit(0);
+> }
+> 
+> As you note the last part is tricky. See bwloe.
+> 
+>>
+>> Unfortunately, I don't know how to get the MEMORY_BACKEND corresponding
+>> to a given memory block. I'm not sure that MEMORY_BACKEND(block->mr) is
+>> a valid way to retrieve the Backend object and its 'prealloc' property
+>> here. Could you please give me a direction here ?
+> 
+> We could add a RAM_PREALLOC flag to hint that this memory has "prealloc" 
+> semantics.
+> 
+> I once had an alternative approach: Similar to ram_block_notify_resize() 
+> we would implement ram_block_notify_remap().
+> 
+> That's where the backend could register and re-apply mmap properties 
+> like NUMA policies (in case we have to fallback to MAP_FIXED) and handle 
+> the preallocation.
+> 
+> So one would implement a ram_block_notify_remap() and maybe indicate if 
+> we had to do MAP_FIXED or if we only discarded the page.
+> 
+> I once had a prototype for that, let me dig ...
+
+That would be great !  Thanks.
+
+> 
+>>
+>> I can send a new version using ram_block_discard_range() as you
+>> suggested to replace the direct call to fallocate(), if you think it
+>> would be better.
+>> Please let me know what other enhancement(s) you'd like to see in this
+>> code change.
+> 
+> Something along the lines above. Please let me know if you see problems 
+> with that approach that I am missing.
+
+
+Let me check the madvise use on hugetlbfs and if it works as expected,
+I'll try to implement a V2 version of the fix proposal integrating a 
+modified ram_block_discard_range() function.
+
+I'll also remove the page size information from the signal handlers
+and only keep it in the kvm_hwpoison_page_add() function.
+
+I'll investigate how to keep track of the 'prealloc' attribute to 
+optionally use when remapping the hugepages (on older kernels).
+And if you find the prototype code you talked about that would 
+definitely help :)
+
+Thanks a lot,
+William.
 
 
