@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-30099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30559B6CB4
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:09:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F7E9B6CB3
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:09:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8277328103E
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:09:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C2A7B20DA1
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0AA2281F5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948FC2281EF;
 	Wed, 30 Oct 2024 19:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dDp2zYFH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZUOxsa5W"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1841D1506;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8BA227366;
 	Wed, 30 Oct 2024 19:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730314878; cv=none; b=LYIKknRITNTOoLttGsggRxSPJjucRWtiEbNnCfvD+DZaACxafA7wviLKfAQmymowPPZu+gmCpL1DgMkQrqmJtNf5FRSMPgvDODvde86nUcyfFZP/Cb0RuXMFddmNkiyPcKxJQx6MXVw+j0x+hOQwON9g5ZBaER9H3yfG3aUZu3g=
+	t=1730314878; cv=none; b=cgtbHhpxQzV0j+DagLDi7dBbXZgO3zTt0rfy4k/Q5b81bfH+fkXLC5RtQEbn+yPKV2jhiedPAKbEUe9xcUsZAFgbr7ICSPfPzFhDyJ3157aZ5hOLNRjxsmry7EmWMbV/5ZZRTt1CjaHzlS0HN2BHbdpE75yl+1IQVtnAsQmvhOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730314878; c=relaxed/simple;
-	bh=BEDue/QNC2+Q1sz4S/Xu8rWd/5NHgqbk6JjIdzhTmPg=;
+	bh=jqkj4Hb7DRvcZMExIzjynTbXnLXSSlyhjX7U93N28yw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XraKe6EntmCxwR547ooRUq1tnEMPqjUhaPCSV6QvMYTc8kDqCN053zJU4NymOtGzac7BYppWCUtJoPWHtrHEdrUaO1nOpentQK0vbalEIcjJagdICPSQA0p7ggpQHJ6K6BCFF4FuMqtEJyIOVEbLTAs1NMD6FzEvdzpueJi7TlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDp2zYFH; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=LOmQop/vURyCRz9m33e0/NoXqexUwu13p+zQQAabal2sSitiK2ApIYufQ5g6cus1+97ov2mtp5UtXnpURUk+2QKngnOByvS5hXt804/mdPLh1/1DST7TGeEvDX/pDJi3xtB8bzOuIQCO2pB5sEeNrPyRqgkozF4UzktyYi9kpyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZUOxsa5W; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1730314876; x=1761850876;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BEDue/QNC2+Q1sz4S/Xu8rWd/5NHgqbk6JjIdzhTmPg=;
-  b=dDp2zYFHkloouEaY8XyWBpdS7QVn1DBHSc+lUHCbwGgepa2pxoRpI8K5
-   SAfqhcz3OzWnMfCvLhdBA1AEV6pb4aIcUmK/XlNYbl6L2oAQZUEAPbUut
-   Ak4zJKtIgg4iP3DGvL9lg7EQUgHsRXQKvewNZx3XqzWF+SdHsSQAc+uOq
-   LXwAGYLq84sOA48o47RsDLU/efV9UxRUYbfPLgzqXHK6A8u7NjVS+N6HR
-   8GhwEs0YQHjyY1a9mW+ifTEG0U6Zjq37c74ulonP86/SrOnkPuNIwpzjv
-   7takc+6oqhw8AmgbF5U/MmtL3f2XEKInNE7jfeBv0eEbM1X9w1k69gnMU
+  bh=jqkj4Hb7DRvcZMExIzjynTbXnLXSSlyhjX7U93N28yw=;
+  b=ZUOxsa5WDgWGJxjzmgnuZfVA2bOoQnArsEWJPyXQw6j7w7rnySSF/hgp
+   AoqpiT54+AS7I8cONG3B53FsP1hIRjXPEOseUTfoM2c48GqdDybFdAmVf
+   QfZYQEW+rFY87yTbWYcOaxWGIGxTBuhvn3gxlDI6lWNTHEX01fHUOzd7n
+   3bduxb9Csse0RbFu2s++N4C5jC85Bb+KvJ2rfM3NF2HxxjSeldcGNrVqH
+   LXg0mQsEt+m8Ss+CfjCbLNh7KRg8t2P66UDfiGrKj4IHDdn9teN/TAb6I
+   ZLoXxHbCEPmPLrfpv3xjFBj9aqEyU8mdwtSALuOyGclFaUrJCb1fNRz6Q
    g==;
-X-CSE-ConnectionGUID: TpiR/5PfRO+XR8PhTPFvDw==
-X-CSE-MsgGUID: gdhpFwUCTH6+olAO1Vt1dQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678829"
+X-CSE-ConnectionGUID: S9Efz8FZTzeEEpy1GkGnGg==
+X-CSE-MsgGUID: L/U978McQRenQq2h2GgD5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678836"
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="17678829"
+   d="scan'208";a="17678836"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:06 -0700
-X-CSE-ConnectionGUID: 3WPS5F1JQFCJxLJDoTKviA==
-X-CSE-MsgGUID: dAb0XkRETi6SyJgRy5F9WQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:07 -0700
+X-CSE-ConnectionGUID: Ww617W06Ty+o0ciM4QW+Dg==
+X-CSE-MsgGUID: 2CCMq2zgS3eRXqqEoDd9Tw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="82499442"
+   d="scan'208";a="82499448"
 Received: from sramkris-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.223.186])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:05 -0700
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:06 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -70,10 +70,11 @@ Cc: rick.p.edgecombe@intel.com,
 	tony.lindgren@linux.intel.com,
 	xiaoyao.li@intel.com,
 	reinette.chatre@intel.com,
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: [PATCH v2 20/25] KVM: TDX: Make pmu_intel.c ignore guest TD case
-Date: Wed, 30 Oct 2024 12:00:33 -0700
-Message-ID: <20241030190039.77971-21-rick.p.edgecombe@intel.com>
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>
+Subject: [PATCH v2 21/25] KVM: TDX: Don't offline the last cpu of one package when there's TDX guest
+Date: Wed, 30 Oct 2024 12:00:34 -0700
+Message-ID: <20241030190039.77971-22-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
 References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
@@ -87,244 +88,129 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX KVM doesn't support PMU yet, it's future work of TDX KVM support as
-another patch series. For now, handle TDX by updating vcpu_to_lbr_desc()
-and vcpu_to_lbr_records() to return NULL.
+Destroying TDX guest requires there's at least one cpu online for each
+package, because reclaiming the TDX KeyID of the guest (as part of the
+teardown process) requires to call some SEAMCALL (on any cpu) on all
+packages.
 
+Do not offline the last cpu of one package when there's any TDX guest
+running, otherwise KVM may not be able to teardown TDX guest resulting
+in leaking of TDX KeyID and other resources like TDX guest control
+structure pages.
+
+Implement the TDX version 'offline_cpu()' to prevent the cpu from going
+offline if it is the last cpu on the package.
+
+Co-developed-by: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
-Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 uAPI breakout v2:
- - Make vcpu_to_lbr_desc() to return NULL (Paolo)
- - Drop unecessary ifdefs around is_td_vcpu() (Tony)
+ - Update description to leave out stale part (Binbin)
+ - Add some local hkid tracking on KVM side, now that the allocator is
+   in arch/x86 code (Kai)
 
 uAPI breakout v1:
- - Fix bisectability issues in headers (Kai)
- - Fix rebase error from v19 (Chao Gao)
- - Make helpers static (Tony Lindgren)
- - Improve whitespace (Tony Lindgren)
+ - Remove nr_configured_keyid, use ida_is_empty() instead (Chao)
+ - Change to use a simpler way to check whether the to-go-offline cpu is
+   the last online cpu on the package. (Chao)
+ - Improve the changelog (Kai)
+ - Improve the patch title to call out "when there's TDX guest".  (Kai)
+ - Significantly reduce the code by using TDX's own CPUHP callback,
+   instead of hooking into KVM's.
+ - Update changelog to reflect the change.
 
 v18:
- - Removed unnecessary change to vmx.c which caused kernel warning.
+ - Added reviewed-by BinBin
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 50 +++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/pmu_intel.h | 28 ++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.h       | 34 +-----------------------
- 3 files changed, 78 insertions(+), 34 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/pmu_intel.h
+ arch/x86/kvm/vmx/tdx.c | 43 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 83382a4d1d66..1cd92b43f463 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -19,6 +19,7 @@
- #include "lapic.h"
- #include "nested.h"
- #include "pmu.h"
-+#include "tdx.h"
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index ac224d79ba1e..17df857ae4c1 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -122,6 +122,8 @@ static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
+  */
+ static DEFINE_MUTEX(tdx_lock);
  
- /*
-  * Perf's "BASE" is wildly misleading, architectural PMUs use bits 31:16 of ECX
-@@ -34,6 +35,22 @@
++static atomic_t nr_configured_hkid;
++
+ /* Maximum number of retries to attempt for SEAMCALLs. */
+ #define TDX_SEAMCALL_RETRIES	10000
  
- #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
- 
-+static struct lbr_desc *vcpu_to_lbr_desc(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return NULL;
-+
-+	return &to_vmx(vcpu)->lbr_desc;
-+}
-+
-+static struct x86_pmu_lbr *vcpu_to_lbr_records(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return NULL;
-+
-+	return &to_vmx(vcpu)->lbr_desc.records;
-+}
-+
- static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+@@ -134,6 +136,7 @@ static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
  {
- 	struct kvm_pmc *pmc;
-@@ -129,6 +146,22 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
- 	return get_gp_pmc(pmu, msr, MSR_IA32_PMC0);
+ 	tdx_guest_keyid_free(kvm_tdx->hkid);
+ 	kvm_tdx->hkid = -1;
++	atomic_dec(&nr_configured_hkid);
  }
  
-+static bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+
-+	return cpuid_model_is_consistent(vcpu);
-+}
-+
-+bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+
-+	return !!vcpu_to_lbr_records(vcpu)->nr;
-+}
-+
- static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
- {
- 	struct x86_pmu_lbr *records = vcpu_to_lbr_records(vcpu);
-@@ -194,6 +227,9 @@ static inline void intel_pmu_release_guest_lbr_event(struct kvm_vcpu *vcpu)
- {
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+ static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
+@@ -612,6 +615,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 		return ret;
+ 	kvm_tdx->hkid = ret;
  
-+	if (!lbr_desc)
-+		return;
++	atomic_inc(&nr_configured_hkid);
 +
- 	if (lbr_desc->event) {
- 		perf_event_release_kernel(lbr_desc->event);
- 		lbr_desc->event = NULL;
-@@ -235,6 +271,9 @@ int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu)
- 					PERF_SAMPLE_BRANCH_USER,
- 	};
+ 	va = __get_free_page(GFP_KERNEL_ACCOUNT);
+ 	if (!va)
+ 		goto free_hkid;
+@@ -913,6 +918,42 @@ static int tdx_online_cpu(unsigned int cpu)
+ 	return r;
+ }
  
-+	if (WARN_ON_ONCE(!lbr_desc))
++static int tdx_offline_cpu(unsigned int cpu)
++{
++	int i;
++
++	/* No TD is running.  Allow any cpu to be offline. */
++	if (!atomic_read(&nr_configured_hkid))
 +		return 0;
 +
- 	if (unlikely(lbr_desc->event)) {
- 		__set_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use);
- 		return 0;
-@@ -466,6 +505,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	u64 perf_capabilities;
- 	u64 counter_rsvd;
- 
-+	if (!lbr_desc)
-+		return;
-+
- 	memset(&lbr_desc->records, 0, sizeof(lbr_desc->records));
- 
- 	/*
-@@ -542,7 +584,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
- 
- 	perf_capabilities = vcpu_get_perf_capabilities(vcpu);
--	if (cpuid_model_is_consistent(vcpu) &&
-+	if (intel_pmu_lbr_is_compatible(vcpu) &&
- 	    (perf_capabilities & PMU_CAP_LBR_FMT))
- 		memcpy(&lbr_desc->records, &vmx_lbr_caps, sizeof(vmx_lbr_caps));
- 	else
-@@ -570,6 +612,9 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
- 
-+	if (!lbr_desc)
-+		return;
-+
- 	for (i = 0; i < KVM_MAX_NR_INTEL_GP_COUNTERS; i++) {
- 		pmu->gp_counters[i].type = KVM_PMC_GP;
- 		pmu->gp_counters[i].vcpu = vcpu;
-@@ -677,6 +722,9 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
- 
-+	if (WARN_ON_ONCE(!lbr_desc))
-+		return;
-+
- 	if (!lbr_desc->event) {
- 		vmx_disable_lbr_msrs_passthrough(vcpu);
- 		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.h b/arch/x86/kvm/vmx/pmu_intel.h
-new file mode 100644
-index 000000000000..5620d0882cdc
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pmu_intel.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_X86_VMX_PMU_INTEL_H
-+#define  __KVM_X86_VMX_PMU_INTEL_H
-+
-+#include <linux/kvm_host.h>
-+
-+bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu);
-+int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
-+
-+struct lbr_desc {
-+	/* Basic info about guest LBR records. */
-+	struct x86_pmu_lbr records;
++	/*
++	 * In order to reclaim TDX HKID, (i.e. when deleting guest TD), need to
++	 * call TDH.PHYMEM.PAGE.WBINVD on all packages to program all memory
++	 * controller with pconfig.  If we have active TDX HKID, refuse to
++	 * offline the last online cpu.
++	 */
++	for_each_online_cpu(i) {
++		/*
++		 * Found another online cpu on the same package.
++		 * Allow to offline.
++		 */
++		if (i != cpu && topology_physical_package_id(i) ==
++				topology_physical_package_id(cpu))
++			return 0;
++	}
 +
 +	/*
-+	 * Emulate LBR feature via passthrough LBR registers when the
-+	 * per-vcpu guest LBR event is scheduled on the current pcpu.
++	 * This is the last cpu of this package.  Don't offline it.
 +	 *
-+	 * The records may be inaccurate if the host reclaims the LBR.
++	 * Because it's hard for human operator to understand the
++	 * reason, warn it.
 +	 */
-+	struct perf_event *event;
++#define MSG_ALLPKG_ONLINE \
++	"TDX requires all packages to have an online CPU. Delete all TDs in order to offline all CPUs of a package.\n"
++	pr_warn_ratelimited(MSG_ALLPKG_ONLINE);
++	return -EBUSY;
++}
 +
-+	/* True if LBRs are marked as not intercepted in the MSR bitmap */
-+	bool msr_passthrough;
-+};
-+
-+extern struct x86_pmu_lbr vmx_lbr_caps;
-+
-+#endif /* __KVM_X86_VMX_PMU_INTEL_H */
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index ad9efe41e691..37a555c6dfbf 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -11,6 +11,7 @@
+ static void __do_tdx_cleanup(void)
+ {
+ 	/*
+@@ -938,7 +979,7 @@ static int __init __do_tdx_bringup(void)
+ 	 */
+ 	r = cpuhp_setup_state_cpuslocked(CPUHP_AP_ONLINE_DYN,
+ 					 "kvm/cpu/tdx:online",
+-					 tdx_online_cpu, NULL);
++					 tdx_online_cpu, tdx_offline_cpu);
+ 	if (r < 0)
+ 		return r;
  
- #include "capabilities.h"
- #include "../kvm_cache_regs.h"
-+#include "pmu_intel.h"
- #include "vmcs.h"
- #include "vmx_ops.h"
- #include "../cpuid.h"
-@@ -90,24 +91,6 @@ union vmx_exit_reason {
- 	u32 full;
- };
- 
--struct lbr_desc {
--	/* Basic info about guest LBR records. */
--	struct x86_pmu_lbr records;
--
--	/*
--	 * Emulate LBR feature via passthrough LBR registers when the
--	 * per-vcpu guest LBR event is scheduled on the current pcpu.
--	 *
--	 * The records may be inaccurate if the host reclaims the LBR.
--	 */
--	struct perf_event *event;
--
--	/* True if LBRs are marked as not intercepted in the MSR bitmap */
--	bool msr_passthrough;
--};
--
--extern struct x86_pmu_lbr vmx_lbr_caps;
--
- /*
-  * The nested_vmx structure is part of vcpu_vmx, and holds information we need
-  * for correct emulation of VMX (i.e., nested VMX) on this vcpu.
-@@ -659,21 +642,6 @@ static __always_inline struct vcpu_vmx *to_vmx(struct kvm_vcpu *vcpu)
- 	return container_of(vcpu, struct vcpu_vmx, vcpu);
- }
- 
--static inline struct lbr_desc *vcpu_to_lbr_desc(struct kvm_vcpu *vcpu)
--{
--	return &to_vmx(vcpu)->lbr_desc;
--}
--
--static inline struct x86_pmu_lbr *vcpu_to_lbr_records(struct kvm_vcpu *vcpu)
--{
--	return &vcpu_to_lbr_desc(vcpu)->records;
--}
--
--static inline bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
--{
--	return !!vcpu_to_lbr_records(vcpu)->nr;
--}
--
- void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
- int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
- void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu);
 -- 
 2.47.0
 
