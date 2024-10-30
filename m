@@ -1,142 +1,147 @@
-Return-Path: <kvm+bounces-30112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0792B9B6EBA
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 22:22:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10B69B6EBD
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 22:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E379B2155B
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 21:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 190FB1C217D0
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 21:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6754821747F;
-	Wed, 30 Oct 2024 21:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4E621745A;
+	Wed, 30 Oct 2024 21:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DN1zi0nr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zQayDFTf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EC521500A
-	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 21:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4351E0489
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 21:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730323316; cv=none; b=FIt/kl83Z308pYRG+uS0sbnYnjqqiXZm5rsfUyTjKjiichEySzYB+MkyGyNsHfzj8ZgMwnLlnvq5qieutVKsjg24WgMY7s+loW95ZOCq3i43248iu0la9ECwtOSryPyVQTHFpA1bxqZ7xcgmA6xhr9oCqu0vFcfhQtoU/7kTrmc=
+	t=1730323368; cv=none; b=JTAsW027iKFIDGmJOTy/rgeSvqho9VDvaHzZmlSVaGHgRMUACD59cdWtW9RLzaEGDOtXSfktPYNenCquElCqGyaPNB77FvGTFA0WS3hwqgErlCGqq5hK7CnQzonCHQ+ZBo6BbNtvEMkppTsvylTl7yblSE8ETpwu+RK7ItilKpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730323316; c=relaxed/simple;
-	bh=MbbCCbjq5JrUGConaTKMydDsYPgTDYUDt9hl0GKh/J0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oJHZ5182rqmDpt4My5LGu9bG59nUqtrWaprvTmPLHn8/ua4qIU3ZC0+oKehxPwb9YmPrjpC2Eqotl9F9uMeYQn3i7KjmmNWKoLaV/zrkGVEYzir1RYAZItH1gn+te8M4fWGD+ZoSxHbjYLbiL7MKp/uj9DdLonuhrd+DiAH4O9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DN1zi0nr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730323313;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fImY0tgPhU7C7Gbsu2PvJitaPu6EoaPbjdriZ08AJg8=;
-	b=DN1zi0nrYcA/nXT0JYO9AjrC2LsbAgi/NqY3cyrUZjAkKG9g0R6L60s2mgz2nKUtVlahot
-	Wc0DM/tfVER6p37m8D4Ar5dlV8U6uI+yB9DENd5r3xyH7ONGZlxzqD4TLfx3Ue3Q1Tpn8+
-	TjxPPOZ7sSDiuIKLKeStIc2HPhaK53g=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-QbEb5wHdMhaBW5-NNpkPiQ-1; Wed, 30 Oct 2024 17:21:52 -0400
-X-MC-Unique: QbEb5wHdMhaBW5-NNpkPiQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6cbceb26182so6813316d6.0
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 14:21:52 -0700 (PDT)
+	s=arc-20240116; t=1730323368; c=relaxed/simple;
+	bh=daCn9Zmrz+ByMSuRpsqlpxCU+Lz/HcHlR2nvMTXULSQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nEtD2AFlbKNaGDLjDWtZKYi9hC4vU4wvNCoP7OL0ssVsNMimB0kNYiyc9NslM0fT/us8G+L/OUgncm3i70TkPbV0wDh5W0DJF29J+XGer8yg6iUzwgvIL6xa4qRUjEcQBc9mymyhrK8yB3P/e9twyYBLqKxrjJiNjDUB/ymw4yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zQayDFTf; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-20c70cc9d27so2568205ad.2
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 14:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730323365; x=1730928165; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uD1I7n518ep0y1/IcygTlaTa6BQftuCZvZqhANK+tG8=;
+        b=zQayDFTfMrGlOb9QhQPScWq/MgWBC2fVbZT05CbQFM83cHw80qBOmNB630Zf/S9PCj
+         C4S6Ltpxxjcx4ybDa261Q3KyQ0nnNNEaMVLdztykEes67XpU+6UtuThKJhKx9kmrfbHp
+         a/AvkkET+0+yGqO/OdezzQxGWazAB3tMU6sY8FX+UtAp5Czn1dKNHkOR7fJFlswaOojA
+         cHr4gYobjoz5ZJMrP6+2U1WiQLgJw3ykp6e6UQJ9y7+aavLj2h5/Cazkwxh5Advmf4NO
+         DEXfq1hQHhicDiY3nlMazEJzao5m3CF/G8P94fMtWguZOQ+gTPgFBO90bBTr8pHoaCmt
+         Y39Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730323311; x=1730928111;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fImY0tgPhU7C7Gbsu2PvJitaPu6EoaPbjdriZ08AJg8=;
-        b=O5Um9ZBY4eFeBshk99HMIRMW8jAELOjVosKIAtr45rHgSfxXYOjrW1ni6c6eSJPC8v
-         Dcec3IzluZGSKhYzqU8uR6t9giVecmHSYbA0yNxAA+JmVSZYHssXqapdScYJLmBHuKN5
-         aS6V4pkC6yqnl6sccqIKrTR8YyKkeCigPhkLXudYyV+2TTvJgPQEiHJbeMm0nsamxOpB
-         196Krpcp4XPk5mB1YN25IIVDvqdlx5aaBDr+7ZmhiUYTMffoOL1eaUAD97LdiDjfRKU1
-         wQKAmpAoNy8PC6vfZadW1l9A+WwtATAkjIR+kQuNLJPUg1JkGbqxcH9JZKTCzW33l0mX
-         QqJw==
-X-Gm-Message-State: AOJu0YzX62YR74sXpEMHTl6LqFVm0/+3LddDe2hw6OWZjz/WVU02QuK6
-	ofJKHvZfmzpjuH2StJD17AIi/ltmt5W4PXGB+dSX1lLFM0cqcdQkB4r6jRYUzvae+gQuN9nNIed
-	JkJxrrMhHkJyGA0975deV7q4Lk1t8ycAmAsa45ezsiJDMuFWP1GAimAh3wq3+DUNnTZQXaQsRZg
-	igN6FTmcDPgZB3toKmdjIWH5JjnQ6Wi8fhgQ==
-X-Received: by 2002:a05:6214:419a:b0:6cd:5ff4:cb1f with SMTP id 6a1803df08f44-6d351a92c11mr11401436d6.3.1730323311383;
-        Wed, 30 Oct 2024 14:21:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEr0fgtvMzz0D10iM8abFx6F7KGhICxqqQgW6cfSToB9LfZyBq1dF7BOnv89yuukqJXIUPsDQ==
-X-Received: by 2002:a05:6214:419a:b0:6cd:5ff4:cb1f with SMTP id 6a1803df08f44-6d351a92c11mr11401186d6.3.1730323311045;
-        Wed, 30 Oct 2024 14:21:51 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d354189baasm486516d6.143.2024.10.30.14.21.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 14:21:50 -0700 (PDT)
-Message-ID: <d59b923ebd369415056c80b99ca4e0f75d60fa84.camel@redhat.com>
-Subject: Re: [PATCH v5 0/3] KVM: x86: tracepoint updates
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, Thomas
- Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Paolo
- Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, Sean
- Christopherson <seanjc@google.com>, "H. Peter Anvin" <hpa@zytor.com>, 
- linux-kernel@vger.kernel.org
-Date: Wed, 30 Oct 2024 17:21:49 -0400
-In-Reply-To: <20240910200350.264245-1-mlevitsk@redhat.com>
-References: <20240910200350.264245-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1730323365; x=1730928165;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uD1I7n518ep0y1/IcygTlaTa6BQftuCZvZqhANK+tG8=;
+        b=BBZWCX8KxB3uPrka6uPONwGghsYaPzt9Xtf3WNN7y4wZYddYPmwDlCPWRPWUTiFbBe
+         DvG7EgDFdGzMDz8abjCTp2EbuB4OZKoq/+xf2VXrSuw4DgZ24K5UhNtNOogs4Z/em7oe
+         AdKq9dyn6gE8vFz9VK42VxOaWxrx22rA5DgQNtxCeEfRDYq2sYOYr0JhODYVDsQotpXt
+         8WIvZYTTKm13RRP6GyoF8TZpNaktn1BYJubQtb5BAJm4ZL1Yi9SANSCc0YGrg6iYdIuX
+         uYjk6jsD09bOR3u9SeU3CM6Wgw0RSVZV/k2/uqbrn/W9E6o2BYUHreczNtv0Si5Y4/Bb
+         P8ug==
+X-Gm-Message-State: AOJu0Yy09haTrrv8vSJ+g+UuIGZWPWFJ23fwEhUgaGCBC94hSOLhW0gU
+	x/t0tdMIuNw5AYpgGzRSFAy9AwQ34ozQIiBe6tuXyHi1vPOv6BNGSDn4vMVL4xHEd/9CkXm25Gs
+	lrQ==
+X-Google-Smtp-Source: AGHT+IG5X+boI+x3N+fKSDre8no68V3qBwE5Al2ZhcBN3LVJgc3XFIT5bb+3v+iN1DK1T2sVKEucIdNQ2hs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d504:b0:20c:9ed7:673d with SMTP id
+ d9443c01a7336-210c6731a2fmr356745ad.0.1730323365350; Wed, 30 Oct 2024
+ 14:22:45 -0700 (PDT)
+Date: Wed, 30 Oct 2024 14:22:43 -0700
+In-Reply-To: <c6594c5f040eedc7e5b3cb001aac1bcfcb6782cd.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240906221824.491834-1-mlevitsk@redhat.com> <c6594c5f040eedc7e5b3cb001aac1bcfcb6782cd.camel@redhat.com>
+Message-ID: <ZyKjo-XpaNjIkMdA@google.com>
+Subject: Re: [PATCH v4 0/4] Relax canonical checks on some arch msrs
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, linux-kernel@vger.kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 2024-09-10 at 16:03 -0400, Maxim Levitsky wrote:
-> This patch series is intended to add some selected information
-> to the kvm tracepoints to make it easier to gather insights about
-> running nested guests.
+On Wed, Oct 30, 2024, Maxim Levitsky wrote:
+> On Fri, 2024-09-06 at 18:18 -0400, Maxim Levitsky wrote:
+> > Recently we came up upon a failure where likely the guest writes
+> > 0xff4547ceb1600000 to MSR_KERNEL_GS_BASE and later on, qemu
+> > sets this value via KVM_PUT_MSRS, and is rejected by the
+> > kernel, likely due to not being canonical in 4 level paging.
+> > 
+> > One of the way to trigger this is to make the guest enter SMM,
+> > which causes paging to be disabled, which SMM bios re-enables
+> > but not the whole 5 level. MSR_KERNEL_GS_BASE on the other
+> > hand continues to contain old value.
+> > 
+> > I did some reverse engineering and to my surprise I found out
+> > that both Intel and AMD indeed ignore CR4.LA57 when doing
+> > canonical checks on this and other msrs and/or other arch
+> > registers (like GDT base) which contain linear addresses.
+> > 
+> > V2: addressed a very good feedback from Chao Gao. Thanks!
+> > 
+> > V3: also fix the nested VMX, and also fix the
+> > MSR_IA32_SYSENTER_EIP / MSR_IA32_SYSENTER_ESP
+> > 
+> > V4:
+> >   - added PT and PEBS msrs
+> >   - corrected emulation of SGDT/SIDT/STR/SLDT instructions
+> >   - corrected canonical checks for TLB invalidation instructions
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > Maxim Levitsky (4):
+> >   KVM: x86: drop x86.h include from cpuid.h
+> >   KVM: x86: implement emul_is_noncanonical_address using
+> >     is_noncanonical_address
+> >   KVM: x86: model canonical checks more precisely
+> >   KVM: nVMX: fix canonical check of vmcs12 HOST_RIP
+> > 
+> >  arch/x86/kvm/cpuid.h         |  1 -
+> >  arch/x86/kvm/emulate.c       | 15 ++++++-----
+> >  arch/x86/kvm/kvm_emulate.h   |  5 ++++
+> >  arch/x86/kvm/mmu.h           |  1 +
+> >  arch/x86/kvm/mmu/mmu.c       |  2 +-
+> >  arch/x86/kvm/vmx/hyperv.c    |  1 +
+> >  arch/x86/kvm/vmx/nested.c    | 35 +++++++++++++++++---------
+> >  arch/x86/kvm/vmx/pmu_intel.c |  2 +-
+> >  arch/x86/kvm/vmx/sgx.c       |  5 ++--
+> >  arch/x86/kvm/vmx/vmx.c       |  4 +--
+> >  arch/x86/kvm/x86.c           | 13 +++++++---
+> >  arch/x86/kvm/x86.h           | 49 ++++++++++++++++++++++++++++++++++--
+> >  12 files changed, 102 insertions(+), 31 deletions(-)
+> > 
+> > -- 
+> > 2.26.3
+> > 
+> > 
 > 
-> This patch series was developed together with a new x86 performance analysis tool
-> that I developed recently (https://gitlab.com/maximlevitsky/kvmon)
-> which aims to be a better kvm_stat, and allows you at glance
-> to see what is happening in a VM, including nesting.
-> 
-> V5: rebased on top of recent changes
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (3):
->   KVM: x86: add more information to the kvm_entry tracepoint
->   KVM: x86: add information about pending requests to kvm_exit
->     tracepoint
->   KVM: x86: add new nested vmexit tracepoints
-> 
->  arch/x86/include/asm/kvm-x86-ops.h |   1 +
->  arch/x86/include/asm/kvm_host.h    |   5 +-
->  arch/x86/kvm/svm/nested.c          |  22 ++++++
->  arch/x86/kvm/svm/svm.c             |  17 +++++
->  arch/x86/kvm/trace.h               | 107 ++++++++++++++++++++++++++---
->  arch/x86/kvm/vmx/main.c            |   1 +
->  arch/x86/kvm/vmx/nested.c          |  27 ++++++++
->  arch/x86/kvm/vmx/vmx.c             |  11 +++
->  arch/x86/kvm/vmx/x86_ops.h         |   4 ++
->  arch/x86/kvm/x86.c                 |   3 +
->  10 files changed, 189 insertions(+), 9 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
+> Hi,
+> A very gentle ping on this patch series.
 
-Hi,
-A very gentle ping on this patch series.
-
-Best regards,
-	Maxim Levitsky
-
+Heh, good timing, I literally (like, 2 seconds ago) applied this (still need to
+test before you'll see a "thank you" email).
 
