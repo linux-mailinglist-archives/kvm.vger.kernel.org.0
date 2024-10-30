@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-30082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F067A9B6C91
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:03:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F279B6C93
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DAA21C2123E
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:03:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF86EB23390
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387F021790F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D3D217919;
 	Wed, 30 Oct 2024 19:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AwVRXfiF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l24PXbhi"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702FA213EE0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9DD2144C9;
 	Wed, 30 Oct 2024 19:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730314862; cv=none; b=DaVW+HpMC6TUU4l1EeY4hkCcM+SH8cQ5hcz1lSBi7QnKWXTqy3QcdAimyjorN0Xkhkx54D6nf0L4wnpp+KTfuse8UzNkwPWd3nQ+dwuYv5czMrSKo4CrDUYIZwIl2au+Ltctuh4tErg10vC1tDyDh1tduvJWoSXSa35CQq5KSTA=
+	t=1730314862; cv=none; b=QgSDU3lVNPZ48o3ywlO6WJIzyo4ODw/mW5ywjbq6vzb/9QKyx3EA2Kuq/reGe2Q6pq48mSxXzhnPTSTIX8y6VB1Iv61V/BZ/rSN5PBa+yKJwo6Fb163jpLFo42xfn8ns+R2Ucc+6JreMQVchCRGbY/RmzOmJxRdYEVisQCRE5y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730314862; c=relaxed/simple;
-	bh=r4DqlT6kr0U8khXg231vkLTSX6v5nFIoCA9SrxE9kFg=;
+	bh=CiSo38Rz8D/47DL/LqhUW7zxwMDCBDtJIrYv9FERmIY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p77VfcHYwQ6VV2ElIeuzP70aWatWARUrZ76IIQu9HijKtr118eLt4PsbC984TENkp80Yc7MPQ4XYlYV+mmA5DDWeGUv7xBN9XCXQr+FDdMYjY7MSaIp0pna3VGdBTvA/NqsWV1Eml3O6ZM66JCd550OlxRMxyVMn248gxQ/Y9ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AwVRXfiF; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=L6bd0Q3y2lg9cmCnkbRrW44zFQPrvEKUWhLFVwEmjYMoiZIQhE/4XNSC+JY9yZb+KJpxo4QgboWGzMzSvLXlApQssXm3+diSLtY8VmDHaWVN1s8KPwb+QwOYMu9JOtmzMtrSWXzgE75mAwTNAOa5fzMyc7uXG7Cg9cMmwvgbgeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l24PXbhi; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730314859; x=1761850859;
+  t=1730314860; x=1761850860;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=r4DqlT6kr0U8khXg231vkLTSX6v5nFIoCA9SrxE9kFg=;
-  b=AwVRXfiFV6hX3m+3LF7zJnNfLWGfTON9ltYPpnxP88tguxjy5P+9HSDi
-   7zZe99t4FxLIZraVi/zEhSXufX/zzaWuY1uhm1M6rly/s28TjPoHmJTna
-   s96wmtrJLB3Pay0UCP0McsaMWqym24J89Uz3Bd5C2gJwAyVfMFPnjjlY6
-   OowYy2xnl7nX/1ZcoGK2WlK9NkR0osoJM5qkx+gmR5sZY1PEM/onC5zIj
-   U8H7nbRJ79/T5DToeqGsgodnqVQZdBoB3ReBupxThakaR+0zEMSYbT+Js
-   KIxESzzUYNVZYp8tIYY3acnOMFE1qcrtNclvWtbllgU+JGnAw+0pdWuJT
+  bh=CiSo38Rz8D/47DL/LqhUW7zxwMDCBDtJIrYv9FERmIY=;
+  b=l24PXbhiU7zIrxThO5rmp4aQR1QbugDuHExx2XDZF1xw7K3YeaWSQu3Z
+   PPPU5DBW7cLq4mWRijSjMH3c1Aj0pqSJn8lVjlUAuQs4Y7+691wB22tl4
+   6D/YBev8GKfUqMb1GVPz5ogSW5/jmat2BzacKbI6LZJ1tBl3VMBm2Mngq
+   LYdyFlhNM0Sw/7txcV6EpOlUnsuXhQQR4ICCEfTwodAjlgmkEMXiDnZ8e
+   HB/kdeQviia75G0dDGGEFeQUman82eM5iR0REWlm2DJK7U/BmDxhID22N
+   2GibhpkMUjKsgyqF5qLqp9xqBpj359URtQWVPp0IxqNodWM943SuRQqIU
    w==;
-X-CSE-ConnectionGUID: vZbp1NL6TqywD4gW2QtCoQ==
-X-CSE-MsgGUID: pf0hGTkDTrGEXGusvPHLkA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678724"
+X-CSE-ConnectionGUID: oxQ+PN7HRUOrgqGZWhTyTQ==
+X-CSE-MsgGUID: h2k15WMdRIWJp/IPXAOfwA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678732"
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="17678724"
+   d="scan'208";a="17678732"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:00:56 -0700
-X-CSE-ConnectionGUID: PlJXjUXCTtiMXcl0KHZs0Q==
-X-CSE-MsgGUID: I/VwUYewReu05n+gluy0sg==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:00:57 -0700
+X-CSE-ConnectionGUID: 7spFaC6LQ2GIQ3AxxXTuWA==
+X-CSE-MsgGUID: C4WTCg4RQcKMTbXdbrI9TA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="82499327"
+   d="scan'208";a="82499335"
 Received: from sramkris-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.223.186])
   by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:00:56 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
@@ -70,10 +70,13 @@ Cc: rick.p.edgecombe@intel.com,
 	tony.lindgren@linux.intel.com,
 	xiaoyao.li@intel.com,
 	reinette.chatre@intel.com,
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: [PATCH v2 04/25] x86/virt/tdx: Add tdx_guest_keyid_alloc/free() to alloc and free TDX guest KeyID
-Date: Wed, 30 Oct 2024 12:00:17 -0700
-Message-ID: <20241030190039.77971-5-rick.p.edgecombe@intel.com>
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	Yuan Yao <yuan.yao@intel.com>
+Subject: [PATCH v2 05/25] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID management
+Date: Wed, 30 Oct 2024 12:00:18 -0700
+Message-ID: <20241030190039.77971-6-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
 References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
@@ -90,99 +93,147 @@ From: Isaku Yamahata <isaku.yamahata@intel.com>
 Intel TDX protects guest VMs from malicious host and certain physical
 attacks. Pre-TDX Intel hardware has support for a memory encryption
 architecture called MK-TME, which repurposes several high bits of
-physical address as "KeyID". The BIOS reserves a sub-range of MK-TME
-KeyIDs as "TDX private KeyIDs".
+physical address as "KeyID". TDX ends up with reserving a sub-range of
+MK-TME KeyIDs as "TDX private KeyIDs".
 
-Each TDX guest must be assigned with a unique TDX KeyID when it is
-created. The kernel reserves the first TDX private KeyID for
-crypto-protection of specific TDX module data which has a lifecycle that
-exceeds the KeyID reserved for the TD's use. The rest of the KeyIDs are
-left for TDX guests to use.
+Like MK-TME, these KeyIDs can be associated with an ephemeral key. For TDX
+this association is done by the TDX module. It also has its own tracking
+for which KeyIDs are in use. To do this ephemeral key setup and manipulate
+the TDX module's internal tracking, KVM will use the following SEAMCALLs:
+ TDH.MNG.KEY.CONFIG: Mark the KeyID as in use, and initialize its
+                     ephemeral key.
+ TDH.MNG.KEY.FREEID: Mark the KeyID as not in use.
 
-Create a small KeyID allocator. Export
-tdx_guest_keyid_alloc()/tdx_guest_keyid_free() to allocate and free TDX
-guest KeyID for KVM to use.
+These SEAMCALLs both operate on TDR structures, which are setup using the
+previously added TDH.MNG.CREATE SEAMCALL. KVM's use of these operations
+will go like:
+ - tdx_guest_keyid_alloc()
+ - Initialize TD and TDR page with TDH.MNG.CREATE (not yet-added), passing
+   KeyID
+ - TDH.MNG.KEY.CONFIG to initialize the key
+ - TD runs, teardown is started
+ - TDH.MNG.KEY.FREEID
+ - tdx_guest_keyid_free()
 
-Don't provide the stub functions when CONFIG_INTEL_TDX_HOST=n since they
-are not supposed to be called in this case.
+Don't try to combine the tdx_guest_keyid_alloc() and TDH.MNG.KEY.CONFIG
+operations because TDH.MNG.CREATE and some locking need to be done in the
+middle. Don't combine TDH.MNG.KEY.FREEID and tdx_guest_keyid_free() so they
+are symmetrical with the creation path.
 
+So implement tdh_mng_key_config() and tdh_mng_key_freeid() as separate
+functions than tdx_guest_keyid_alloc() and tdx_guest_keyid_free().
+
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
 uAPI breakout v2:
- - Move code from KVM to x86 core, and export them.
- - Update log.
+ - Change to use 'u64' as function parameter to prepare to move
+   SEAMCALL wrappers to arch/x86. (Kai)
+ - Split to separate patch
+ - Move SEAMCALL wrappers from KVM to x86 core;
+ - Move TDH_xx macros from KVM to x86 core;
+ - Re-write log
 
 uAPI breakout v1:
- - Update the commit message
- - Delete stale comment on global hkdi
- - Deleted WARN_ON_ONCE() as it doesn't seemed very usefull
+ - Make argument to C wrapper function struct kvm_tdx * or
+   struct vcpu_tdx * .(Sean)
+ - Drop unused helpers (Kai)
+ - Fix bisectability issues in headers (Kai)
+ - Updates from seamcall overhaul (Kai)
 
 v19:
- - Removed stale comment in tdx_guest_keyid_alloc() by Binbin
- - Update sanity check in tdx_guest_keyid_free() by Binbin
+ - Update the commit message to match the patch by Yuan
+ - Use seamcall() and seamcall_ret() by paolo
 
 v18:
- - Moved the functions to kvm tdx from arch/x86/virt/vmx/tdx/
- - Drop exporting symbols as the host tdx does.
+ - removed stub functions for __seamcall{,_ret}()
+ - Added Reviewed-by Binbin
+ - Make tdx_seamcall() use struct tdx_module_args instead of taking
+  each inputs.
+
+v16:
+ - use struct tdx_module_args instead of struct tdx_module_output
+ - Add tdh_mem_sept_rd() for SEPT_VE_DISABLE=1.
 ---
- arch/x86/include/asm/tdx.h  |  3 +++
- arch/x86/virt/vmx/tdx/tdx.c | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
+ arch/x86/include/asm/tdx.h  |  4 ++++
+ arch/x86/virt/vmx/tdx/tdx.c | 20 ++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h | 16 +++++++++-------
+ 3 files changed, 33 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index b9758369d82c..d33e46d53d59 100644
+index d33e46d53d59..9897335a8e2f 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -118,6 +118,9 @@ int tdx_cpu_enable(void);
- int tdx_enable(void);
- const char *tdx_dump_mce_info(struct mce *m);
- const struct tdx_sys_info *tdx_get_sysinfo(void);
+@@ -121,6 +121,10 @@ const struct tdx_sys_info *tdx_get_sysinfo(void);
+ 
+ int tdx_guest_keyid_alloc(void);
+ void tdx_guest_keyid_free(unsigned int keyid);
 +
-+int tdx_guest_keyid_alloc(void);
-+void tdx_guest_keyid_free(unsigned int keyid);
++/* SEAMCALL wrappers for creating/destroying/running TDX guests */
++u64 tdh_mng_key_config(u64 tdr);
++u64 tdh_mng_key_freeid(u64 tdr);
  #else
  static inline void tdx_init(void) { }
  static inline int tdx_cpu_enable(void) { return -ENODEV; }
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 7589c75eaa6c..b883c1a4b002 100644
+index b883c1a4b002..c42eab8cc069 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -27,6 +27,7 @@
- #include <linux/log2.h>
- #include <linux/acpi.h>
- #include <linux/suspend.h>
-+#include <linux/idr.h>
- #include <asm/page.h>
- #include <asm/special_insns.h>
- #include <asm/msr-index.h>
-@@ -42,6 +43,8 @@ static u32 tdx_global_keyid __ro_after_init;
- static u32 tdx_guest_keyid_start __ro_after_init;
- static u32 tdx_nr_guest_keyids __ro_after_init;
- 
-+static DEFINE_IDA(tdx_guest_keyid_pool);
-+
- static DEFINE_PER_CPU(bool, tdx_lp_initialized);
- 
- static struct tdmr_info_list tdx_tdmr_list;
-@@ -1545,3 +1548,17 @@ const struct tdx_sys_info *tdx_get_sysinfo(void)
- 	return p;
+@@ -1562,3 +1562,23 @@ void tdx_guest_keyid_free(unsigned int keyid)
+ 	ida_free(&tdx_guest_keyid_pool, keyid);
  }
- EXPORT_SYMBOL_GPL(tdx_get_sysinfo);
+ EXPORT_SYMBOL_GPL(tdx_guest_keyid_free);
 +
-+int tdx_guest_keyid_alloc(void)
++u64 tdh_mng_key_config(u64 tdr)
 +{
-+	return ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start,
-+			       tdx_guest_keyid_start + tdx_nr_guest_keyids - 1,
-+			       GFP_KERNEL);
-+}
-+EXPORT_SYMBOL_GPL(tdx_guest_keyid_alloc);
++	struct tdx_module_args args = {
++		.rcx = tdr,
++	};
 +
-+void tdx_guest_keyid_free(unsigned int keyid)
-+{
-+	ida_free(&tdx_guest_keyid_pool, keyid);
++	return seamcall(TDH_MNG_KEY_CONFIG, &args);
 +}
-+EXPORT_SYMBOL_GPL(tdx_guest_keyid_free);
++EXPORT_SYMBOL_GPL(tdh_mng_key_config);
++
++u64 tdh_mng_key_freeid(u64 tdr)
++{
++	struct tdx_module_args args = {
++		.rcx = tdr,
++	};
++
++	return seamcall(TDH_MNG_KEY_FREEID, &args);
++}
++EXPORT_SYMBOL_GPL(tdh_mng_key_freeid);
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 9b708a8fb568..95002e7ff4c5 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -17,13 +17,15 @@
+ /*
+  * TDX module SEAMCALL leaf functions
+  */
+-#define TDH_PHYMEM_PAGE_RDMD	24
+-#define TDH_SYS_KEY_CONFIG	31
+-#define TDH_SYS_INIT		33
+-#define TDH_SYS_RD		34
+-#define TDH_SYS_LP_INIT		35
+-#define TDH_SYS_TDMR_INIT	36
+-#define TDH_SYS_CONFIG		45
++#define TDH_MNG_KEY_CONFIG		8
++#define TDH_MNG_KEY_FREEID		20
++#define TDH_PHYMEM_PAGE_RDMD		24
++#define TDH_SYS_KEY_CONFIG		31
++#define TDH_SYS_INIT			33
++#define TDH_SYS_RD			34
++#define TDH_SYS_LP_INIT			35
++#define TDH_SYS_TDMR_INIT		36
++#define TDH_SYS_CONFIG			45
+ 
+ /* TDX page types */
+ #define	PT_NDA		0x0
 -- 
 2.47.0
 
