@@ -1,278 +1,235 @@
-Return-Path: <kvm+bounces-29993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258F99B5A73
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 04:36:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2983B9B5A8D
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 05:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48AE71C2259B
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 03:36:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98DA21F24100
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 04:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1191919E968;
-	Wed, 30 Oct 2024 03:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C011991D8;
+	Wed, 30 Oct 2024 04:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J99NGQ6J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMJoN0sU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B20A199EAB
-	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 03:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF15194C76
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 04:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730259326; cv=none; b=GMewA8G2aT/tN64VtkB7FGt4fMCZjJBBEeX9zTrOaTCbyzHE5tyHI6wwmL7PZKpx/FeX3k/Wlz0sHdLLB98qE2YTWSXh+9N12ZCucIqf72pD0Am3rb2Pr5zwpxJQPCcO3omdLOqEztvWQT7kkOm2dxLIk5MT8W/yaZJX1OLCByY=
+	t=1730261192; cv=none; b=Qp0pwehU3VkiKp02oFDIIHMSLzOoL78xvUKH1v8lvGVP87Ym1j3iy8L9jZZ3qs808OuQ2TIUFu/RWL1Qq3yEOO+2gx0jw+qeHS1lCooZZPNIHZBMnxwt9JumYWC30iRv5bKycGEdqUXEmGOq+9rMJkDrJLRRh/x8yq2KbGFxKfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730259326; c=relaxed/simple;
-	bh=IpK3iCKepmRoHoRT3dTc56O3/n6KoDfaNOMfErPW1c8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HUJp/XQTtPzt6zmIeU56IyorqQbk99oq1CU8pKtsJvz22JiCYxysANgTUjqmG4KlOe0t3/i25VvE/TSdtigQziuyF4sBz1I5yA2KgMMDbl56PGpd//2n07ts3mgvdeve7WF5VuT3ObWgTiisyqa33AxEBjltfbYEQbApiXt+goY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=J99NGQ6J; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-460c316fc37so40437071cf.0
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 20:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730259322; x=1730864122; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BPCD1LndjblnaQOLlh+NJCoCkXHp7fNk6gTan5Du7Vo=;
-        b=J99NGQ6J4vvrrX8IMJWw8lFG4zcxI8atJ/mG7h2zdxsOEBbekMFxFHmD7BcstIwXDb
-         +F/b9Jl12rsLYvfjaaTetmLTEpjcn++3qVepPxh+uVN+VTZHIRxO2FqZWw9I9sOImVms
-         BIzvLH8aYfjLTLHh3NnofvFjIZRF4Ytmkwhrw=
+	s=arc-20240116; t=1730261192; c=relaxed/simple;
+	bh=632XpUZRsR5/aU6sbXBuVov/ZpV5a8Ycg2UuG1IRfFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UHPDY1OXp/jEzyz4fOWphFBV1JoDUYM1hN3ExD6Fm2RdAuTca67TznTcYAbTreqe2YArzf19haDaZrOnjwIJpWe2j6mZ57MHTaGV6ijXqF1m3YKu9EgAGvGj1XHajIrDod9bGbkUFQqAKpZbmv++hXlOHKUjYzj8W9TYLptfDFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMJoN0sU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730261188;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I6Fn1Bf3LTxjm3Pi7bGgRNx/dCat7AxttwP16Rp3WAQ=;
+	b=GMJoN0sUrYthfqD+CsV/HB7YqEIKsM9bWEzZaQC74+e2JdsYdr9iWfKlASAIGalXfYiRP0
+	vU7D6v5SmTZ4x4flkU9JKoGgp4QeyG1HLGRG/CJNDBSubAgk/fUdJCy43xOL1A1p5rzWMX
+	a5CZNBj1cpNuSKnoliz9xOlHMmVt72Q=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-575-QoKFE19JMp-I_L3BhhQk0Q-1; Wed, 30 Oct 2024 00:06:27 -0400
+X-MC-Unique: QoKFE19JMp-I_L3BhhQk0Q-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b155e23851so972658385a.2
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 21:06:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730259322; x=1730864122;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BPCD1LndjblnaQOLlh+NJCoCkXHp7fNk6gTan5Du7Vo=;
-        b=GMFpowgLHL7YxoJHELr4ufD/TOszzmDd5WfEhw5svMWVXeyRN//gPFwTrFWX96gYDC
-         ppqQJtLb17+wFGrhj13BDi8GH8d2XU4gUI2JQ+WTEuf1dF9MeBh+v4GkeAEsNidiJL28
-         +d8iYvpx0LRz3WaK+nxQ8peiNEiDYVAL7TeYaK11E8PNnFzeUWXiO9QulumNUf/qnN86
-         blggu4/rLoJ81Iwqb4R4FE0CX8sRzqDvW3d3Y5bI4QAU5nfoW/KGXYW1LvFifzdqnRF4
-         /MqHGtW+we7cNV6x+xf5ugLSgOXijPnEHRZ3Ktn0UhAg/RhrWrmJnpAFlrDkeF1/3y+1
-         xq9A==
-X-Gm-Message-State: AOJu0Yzf670xLJGQBaX40Wq1YT+Mo75EXcFbfJuF2Ona/nNO4LC3b8zj
-	A84upVRh/wBS4Gl3Y5L62K1g1ngC69VWsKng888lWkf5hAtnMtCM1FIc9qp30k8Z8BosNj5GAuv
-	PXFbwD7PzznieDfiRnpcztVih4C1lhXmOtoHjPjk4dGDpH3P70/wQZZPpw6lmYlMfuD5iMd0Ie8
-	1WcNpdVuI+g1qe4j1kezhLO1vOz6OdeSHZUw==
-X-Google-Smtp-Source: AGHT+IGvqvrGUPIW3W466krAijES6+oygZ/+5sDNjWbmWwE75flUdG/mkbK2Qqi4HXz/VvGz42EwRw==
-X-Received: by 2002:a05:622a:181c:b0:45e:fbd1:9890 with SMTP id d75a77b69052e-4613bfc868bmr200791401cf.8.1730259321901;
-        Tue, 29 Oct 2024 20:35:21 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-461323a4840sm51015561cf.86.2024.10.29.20.35.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 20:35:21 -0700 (PDT)
-From: Zack Rusin <zack.rusin@broadcom.com>
-To: kvm@vger.kernel.org
-Cc: Zack Rusin <zack.rusin@broadcom.com>,
-	Doug Covelli <doug.covelli@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Joel Stanley <joel@jms.id.au>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH 3/3] KVM: selftests: x86: Add a test for KVM_CAP_X86_VMWARE_HYPERCALL
-Date: Tue, 29 Oct 2024 23:34:09 -0400
-Message-ID: <20241030033514.1728937-4-zack.rusin@broadcom.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241030033514.1728937-1-zack.rusin@broadcom.com>
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
+        d=1e100.net; s=20230601; t=1730261187; x=1730865987;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I6Fn1Bf3LTxjm3Pi7bGgRNx/dCat7AxttwP16Rp3WAQ=;
+        b=UL4Tzc2ru/Wt9tbQfieikyTUMUYQeBdAmiHBHHI1lZkZlNjoYmhF3s+jFv82TbaNV+
+         9LcARmAxEOyV3JG1mtfec84Ec8jn2Ge0GxLcYiKlubrsWZwvnd+G27cLFLiOTeswzA2t
+         E7oo8JG5hAu+mbPryvgXlONO93MZj7/Mzlcsv0oPxcmUfOa8Rtmy2yIMOQ4rt6Vm534z
+         9iT8Z+1ESbluhOrJgKr6DSABdQSzFoNRFhxDjzJA2CI7RUmPr//LzX0NBvDwWlBisZ+a
+         NeXk2QqfQGoFJK8KnS0i86f7ya1CkFXl/SR/m1mO6HNUHnAr6zcSBkpfruw31ISGcE8i
+         vcOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkLMhBJSQDdc4aWY/pjWa7ZAzYf0xJZZ4EHdJsYUENuRopQqcRm4k5PfPGRQIDLFW1u9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9mbkvi9aTza2nuvr9zHQQe4Y1vXwl3EW3pKKZKsfsYNbigj0l
+	hylJnKjRXjv2+80K01MhD8wdvHEdo0VF1nOTj5Ws7tuQO9gqaPIW3kLceGNV6qqkW0r6V1sk7W4
+	3FBxsp3nRBRssfE8ddTX+cNglUhkrmg1d3BX+QCdICrEqeScR2Q==
+X-Received: by 2002:a05:620a:1a84:b0:7a9:b456:c5e6 with SMTP id af79cd13be357-7b193f35bf3mr1894408385a.42.1730261186700;
+        Tue, 29 Oct 2024 21:06:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHrx1mmIynIiSGSVPWiqtshULFjxIn2aPt/C14LDu8Kq33y8t5ez+1+bvieZGhRPfYYDYfiJQ==
+X-Received: by 2002:a05:620a:1a84:b0:7a9:b456:c5e6 with SMTP id af79cd13be357-7b193f35bf3mr1894405985a.42.1730261186319;
+        Tue, 29 Oct 2024 21:06:26 -0700 (PDT)
+Received: from [192.168.40.163] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d2ca347sm481562385a.71.2024.10.29.21.06.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 21:06:25 -0700 (PDT)
+Message-ID: <469bcbeb-97e0-4fc4-9c2b-b86c59dbe24a@redhat.com>
+Date: Wed, 30 Oct 2024 00:06:08 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/9] Initial support for SMMUv3 nested translation
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, acpica-devel@lists.linux.dev,
+ Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+ linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
+ Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Mostafa Saleh <smostafa@google.com>
+References: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <0-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a testcase to exercise KVM_CAP_X86_VMWARE_HYPERCALL and validate
-that KVM exits to userspace on hypercalls and registers are correctly
-preserved.
 
-Signed-off-by: Zack Rusin <zack.rusin@broadcom.com>
-Cc: Doug Covelli <doug.covelli@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>
-Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: Joel Stanley <joel@jms.id.au>
-Cc: Zack Rusin <zack.rusin@broadcom.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
----
- tools/include/uapi/linux/kvm.h                |   2 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/vmware_hypercall_test.c        | 108 ++++++++++++++++++
- 3 files changed, 111 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmware_hypercall_test.c
 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 637efc055145..4c2cc6ed29a0 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -933,6 +933,8 @@ struct kvm_enable_cap {
- #define KVM_CAP_PRE_FAULT_MEMORY 236
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
-+#define KVM_CAP_X86_VMWARE_BACKDOOR 239
-+#define KVM_CAP_X86_VMWARE_HYPERCALL 240
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 48d32c5aa3eb..fa538d01249b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -103,6 +103,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
- TEST_GEN_PROGS_x86_64 += x86_64/ucna_injection_test
- TEST_GEN_PROGS_x86_64 += x86_64/userspace_io_test
- TEST_GEN_PROGS_x86_64 += x86_64/userspace_msr_exit_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmware_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_apic_access_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
-diff --git a/tools/testing/selftests/kvm/x86_64/vmware_hypercall_test.c b/tools/testing/selftests/kvm/x86_64/vmware_hypercall_test.c
-new file mode 100644
-index 000000000000..0600919ecec8
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmware_hypercall_test.c
-@@ -0,0 +1,108 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmware_hypercall_test
-+ *
-+ * Copyright (c) 2024 Broadcom. All Rights Reserved. The term
-+ * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
-+ *
-+ * Based on:
-+ *    xen_vmcall_test.c
-+ *
-+ *    Copyright © 2020 Amazon.com, Inc. or its affiliates.
-+ *
-+ * VMware hypercall testing
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define ARGVALUE(x) (0xdeadbeef5a5a0000UL + (x))
-+#define RETVALUE(x) (0xcafef00dfbfbffffUL + (x))
-+
-+static void guest_code(void)
-+{
-+	unsigned long rax = ARGVALUE(1);
-+	unsigned long rbx = ARGVALUE(2);
-+	unsigned long rcx = ARGVALUE(3);
-+	unsigned long rdx = ARGVALUE(4);
-+	unsigned long rsi = ARGVALUE(5);
-+	unsigned long rdi = ARGVALUE(6);
-+	register unsigned long rbp __asm__("rbp") = ARGVALUE(7);
-+
-+	__asm__ __volatile__("vmcall" :
-+			     "=a"(rax),  "=b"(rbx), "=c"(rcx), "=d"(rdx),
-+			     "=S"(rsi), "=D"(rdi) :
-+			     "a"(rax), "b"(rbx), "c"(rcx), "d"(rdx),
-+			     "S"(rsi), "D"(rdi), "r"(rbp));
-+	GUEST_ASSERT_EQ(rax, RETVALUE(1));
-+	GUEST_ASSERT_EQ(rbx, RETVALUE(2));
-+	GUEST_ASSERT_EQ(rcx, RETVALUE(3));
-+	GUEST_ASSERT_EQ(rdx, RETVALUE(4));
-+	GUEST_ASSERT_EQ(rdi, RETVALUE(5));
-+	GUEST_ASSERT_EQ(rsi, RETVALUE(6));
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	if (!kvm_check_cap(KVM_CAP_X86_VMWARE_HYPERCALL)) {
-+		print_skip("KVM_CAP_X86_VMWARE_HYPERCALL not available");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	vm_enable_cap(vm, KVM_CAP_X86_VMWARE_HYPERCALL, 1);
-+
-+	for (;;) {
-+		struct kvm_run *run = vcpu->run;
-+		struct ucall uc;
-+
-+		vcpu_run(vcpu);
-+
-+		if (run->exit_reason == KVM_EXIT_HYPERCALL) {
-+			struct kvm_regs regs;
-+
-+			TEST_ASSERT_EQ(run->hypercall.ret, 0);
-+			TEST_ASSERT_EQ(run->hypercall.longmode, 1);
-+			TEST_ASSERT_EQ(run->hypercall.nr, ARGVALUE(1));
-+			TEST_ASSERT_EQ(run->hypercall.args[0], ARGVALUE(2));
-+			TEST_ASSERT_EQ(run->hypercall.args[1], ARGVALUE(3));
-+			TEST_ASSERT_EQ(run->hypercall.args[2], ARGVALUE(4));
-+			TEST_ASSERT_EQ(run->hypercall.args[3], ARGVALUE(5));
-+			TEST_ASSERT_EQ(run->hypercall.args[4], ARGVALUE(6));
-+			TEST_ASSERT_EQ(run->hypercall.args[5], ARGVALUE(7));
-+
-+			run->hypercall.ret = RETVALUE(1);
-+			vcpu_regs_get(vcpu, &regs);
-+			regs.rbx = RETVALUE(2);
-+			regs.rcx = RETVALUE(3);
-+			regs.rdx = RETVALUE(4);
-+			regs.rdi = RETVALUE(5);
-+			regs.rsi = RETVALUE(6);
-+			vcpu_regs_set(vcpu, &regs);
-+			continue;
-+		}
-+
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+		}
-+	}
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.43.0
+On 10/9/24 12:23 PM, Jason Gunthorpe wrote:
+> This brings support for the IOMMFD ioctls:
+> 
+>   - IOMMU_GET_HW_INFO
+>   - IOMMU_HWPT_ALLOC_NEST_PARENT
+>   - IOMMU_DOMAIN_NESTED
+>   - ops->enforce_cache_coherency()
+> 
+> This is quite straightforward as the nested STE can just be built in the
+> special NESTED domain op and fed through the generic update machinery.
+> 
+> The design allows the user provided STE fragment to control several
+> aspects of the translation, including putting the STE into a "virtual
+> bypass" or a aborting state. This duplicates functionality available by
+> other means, but it allows trivially preserving the VMID in the STE as we
+> eventually move towards the vIOMMU owning the VMID.
+> 
+> Nesting support requires the system to either support S2FWB or the
+> stronger CANWBS ACPI flag. This is to ensure the VM cannot bypass the
+> cache and view incoherent data, currently VFIO lacks any cache flushing
+> that would make this safe.
+> 
+> Yan has a series to add some of the needed infrastructure for VFIO cache
+> flushing here:
+> 
+>   https://lore.kernel.org/linux-iommu/20240507061802.20184-1-yan.y.zhao@intel.com/
+> 
+> Which may someday allow relaxing this further.
+> 
+> Remove VFIO_TYPE1_NESTING_IOMMU since it was never used and superseded by
+> this.
+> 
+> This is the first series in what will be several to complete nesting
+> support. At least:
+>   - IOMMU_RESV_SW_MSI related fixups
+>      https://lore.kernel.org/linux-iommu/cover.1722644866.git.nicolinc@nvidia.com/
+>   - vIOMMU object support to allow ATS and CD invalidations
+>      https://lore.kernel.org/linux-iommu/cover.1723061377.git.nicolinc@nvidia.com/
+>   - vCMDQ hypervisor support for direct invalidation queue assignment
+>      https://lore.kernel.org/linux-iommu/cover.1712978212.git.nicolinc@nvidia.com/
+>   - KVM pinned VMID using vIOMMU for vBTM
+>      https://lore.kernel.org/linux-iommu/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
+>   - Cross instance S2 sharing
+>   - Virtual Machine Structure using vIOMMU (for vMPAM?)
+>   - Fault forwarding support through IOMMUFD's fault fd for vSVA
+> 
+> The vIOMMU series is essential to allow the invalidations to be processed
+> for the CD as well.
+> 
+> It is enough to allow qemu work to progress.
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/smmuv3_nesting
+> 
+> v3:
+>   - Rebase on v6.12-rc2
+>   - Revise commit messages
+>   - Consolidate CANWB checks into arm_smmu_master_canwbs()
+>   - Add CONFIG_ARM_SMMU_V3_IOMMUFD to compile out iommufd only features
+>     like nesting
+>   - Shift code into arm-smmu-v3-iommufd.c
+>   - Add missed IS_ERR check
+>   - Add S2FWB to arm_smmu_get_ste_used()
+>   - Fixup quirks checks
+>   - Drop ARM_SMMU_FEAT_COHERENCY checks for S2FWB
+>   - Limit S2FWB to S2 Nesting Parent domains "just in case"
+> v2: https://patch.msgid.link/r/0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com
+>   - Revise commit messages
+>   - Guard S2FWB support with ARM_SMMU_FEAT_COHERENCY, since it doesn't make
+>     sense to use S2FWB to enforce coherency on inherently non-coherent hardware.
+>   - Add missing IO_PGTABLE_QUIRK_ARM_S2FWB validation
+>   - Include formal ACPIA commit for IORT built using
+>     generate/linux/gen-patch.sh
+>   - Use FEAT_NESTING to block creating a NESTING_PARENT
+>   - Use an abort STE instead of non-valid if the user requests a non-valid
+>     vSTE
+>   - Consistently use 'nest_parent' for naming variables
+>   - Use the right domain for arm_smmu_remove_master_domain() when it
+>     removes the master
+>   - Join bitfields together
+>   - Drop arm_smmu_cache_invalidate_user patch, invalidation will
+>     exclusively go via viommu
+> v1: https://patch.msgid.link/r/0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com
+> 
+> Jason Gunthorpe (6):
+>    vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+>    iommu/arm-smmu-v3: Report IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
+>    iommu/arm-smmu-v3: Implement IOMMU_HWPT_ALLOC_NEST_PARENT
+>    iommu/arm-smmu-v3: Expose the arm_smmu_attach interface
+>    iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
+>    iommu/arm-smmu-v3: Use S2FWB for NESTED domains
+> 
+> Nicolin Chen (3):
+>    ACPICA: IORT: Update for revision E.f
+>    ACPI/IORT: Support CANWBS memory access flag
+>    iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via struct
+>      arm_smmu_hw_info
+> 
+>   drivers/acpi/arm64/iort.c                     |  13 ++
+>   drivers/iommu/Kconfig                         |   9 +
+>   drivers/iommu/arm/arm-smmu-v3/Makefile        |   1 +
+>   .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 204 ++++++++++++++++++
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 114 ++++++----
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  83 ++++++-
+>   drivers/iommu/arm/arm-smmu/arm-smmu.c         |  16 --
+>   drivers/iommu/io-pgtable-arm.c                |  27 ++-
+>   drivers/iommu/iommu.c                         |  10 -
+>   drivers/iommu/iommufd/vfio_compat.c           |   7 +-
+>   drivers/vfio/vfio_iommu_type1.c               |  12 +-
+>   include/acpi/actbl2.h                         |   3 +-
+>   include/linux/io-pgtable.h                    |   2 +
+>   include/linux/iommu.h                         |   5 +-
+>   include/uapi/linux/iommufd.h                  |  55 +++++
+>   include/uapi/linux/vfio.h                     |   2 +-
+>   16 files changed, 465 insertions(+), 98 deletions(-)
+>   create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> 
+> 
+> base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+
+Apologies for the delay; quite a few spec bits to lookup, as well as some SMMU refresh-ing on my part.
+
+Reviewed-by: Donald Dutile <ddutile@redhat.com>
 
 
