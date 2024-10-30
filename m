@@ -1,98 +1,139 @@
-Return-Path: <kvm+bounces-29998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8299B5D3F
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 08:56:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF239B5D8F
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 09:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 913D7B21780
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 07:56:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4441E1F23672
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 08:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7451E0B70;
-	Wed, 30 Oct 2024 07:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C2F1E0E15;
+	Wed, 30 Oct 2024 08:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUH71srC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EajETXJv"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836AA33E1;
-	Wed, 30 Oct 2024 07:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94BA1DFE16;
+	Wed, 30 Oct 2024 08:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730274960; cv=none; b=jit7hMEE9QsDd0PUQMKt+pkVK0QgfEmbncryQt7tYAIzITywamkB7OFgZZ3jO/ykex9fC9EhXJiH3s8s45vXmhnkRdUestNnAkFsgqPv9CUv3xut51WTA8l754cL5Kko6QoklDVrG0ZPKh3tLlH2k++SUIdxr1pzJ1Cq159x8P0=
+	t=1730276570; cv=none; b=cnZtMfaqlQ70GJfz+0rwe2uG5S4d+aYa8SahNuR/+2UtWjfv/jYEdbpfMCZNrqgy9TzMsrnZWots9XqWsqImDiq5AzLTxReols7Jak238y4i7sPi/myA95fUuF4Uo098MP10gSRuqldvzr0QtSmpplKsBe7xMjYk4E3DWUymeBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730274960; c=relaxed/simple;
-	bh=gpPN7Q2sLWKjzaffkRwxaK7OnuNJs9eevr8SCuMuL/8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SDHHPxoeuNqn3mTU/Rb7yUVTyBNWDes6FHBoasKaF1/WNBv/MhO6KiUbxrrEInhPeG5uYI1IhOvbXMNd6T+iSi9tBoVPkmuOduWzpAQy0ReB7Ztoy9kKvH76wRWlKPW5uFMssoz0TSvfx86Ke/6/miv11J5QqnwV1Qc5+WE5S4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUH71srC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA6BC4CEE4;
-	Wed, 30 Oct 2024 07:55:52 +0000 (UTC)
+	s=arc-20240116; t=1730276570; c=relaxed/simple;
+	bh=3M44dfapTogOZEkofhgJIny5tBNB1l5zW1bJlM7opcA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hf+y1MIDu4HsJ2e54rOaN8dFnVkr0AELrkjXj6JYZqfX02iBahdvRdNRrZvXZ0pXnP0OW90Bw2DtP5BEBHBuDPx5WBVAQBuSHq/3WAxW+RpkJI0gB1toyb0SgsOc4JtENDxjoqySGbahCD6PJNDehbRn4x4XsV5kqD6AxlikFZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EajETXJv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B242C4CEE4;
+	Wed, 30 Oct 2024 08:22:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730274959;
-	bh=gpPN7Q2sLWKjzaffkRwxaK7OnuNJs9eevr8SCuMuL/8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=BUH71srCUmo6Yo5Zj5v596dWnv7WddJErBNA1I9FhssSS3QmxttSW4zKqVxPJmmzM
-	 FwaX85B7dxMEdrbjste6ixaE+mBcmzK97oIdEFOrElhG6c7/EN9j8Lh+1JQQ8kmQgJ
-	 rBc3jNaZyMfZFMxx/G7mTbs0kN+OX+cDz83YUE5FzMWOfzSDlIfGVx3nGq9PDDbgSi
-	 zV1/f5lKWlWY9W0oL1Gx9oRnU13wp86sP84dOlyL2AImYWFxN9bfk3ZyITpo7gVvHG
-	 V+uoeeNT289LOwVjjzCmOxhocS2ox3c0CjGFJ8/xXTQTa8/FAl5kcMOkqnpbkZLDAF
-	 T2qz6FxH2EucA==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 09/43] arm64: RME: ioctls to create and configure realms
-In-Reply-To: <20241004152804.72508-10-steven.price@arm.com>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-10-steven.price@arm.com>
-Date: Wed, 30 Oct 2024 13:25:49 +0530
-Message-ID: <yq5acyjic9dm.fsf@kernel.org>
+	s=k20201202; t=1730276570;
+	bh=3M44dfapTogOZEkofhgJIny5tBNB1l5zW1bJlM7opcA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EajETXJv8qf83oZumJdFmDKi1YuSTYcVJboRizdPM4kOF08PVYpgHsDuiL2irCxT/
+	 BcSNBlc4YlEGpAEN/+4GoZlrBtwoH0KRLcyBjwsKvfuoaw/xsgo4owrb9KK8q+V/g6
+	 Z45ExAUnwgBqaTjQmEWR2ZhdSAHI7RtsctQYQwGBjmUns1pDAhXykzfVRm8LWniZyI
+	 X626kEDouUsB/m4IuSDkecMChNtbfRLZgDM1vSvW47yIMO4cscfzTXic4mVZysjNXP
+	 5e+zvgw2NDrdleYej6e4LakesMFMiEzkpUQhRvLmoQiGmmCM45+QhMVihPwfxm0t0d
+	 iXSaje5ZYKoFw==
+Received: from 82-132-233-180.dab.02.net ([82.132.233.180] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t63yZ-008Bje-9r;
+	Wed, 30 Oct 2024 08:22:47 +0000
+Date: Wed, 30 Oct 2024 08:22:39 +0000
+Message-ID: <87iktat2y8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	stable@vger.kernel.org,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+In-Reply-To: <CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
+References: <20241028234533.942542-1-rananta@google.com>
+	<868qu63mdo.wl-maz@kernel.org>
+	<CAJHc60x3sGdi2_mg_9uxecPYwZMBR11m1oEKPEH4RTYaF8eHdQ@mail.gmail.com>
+	<865xpa3fwe.wl-maz@kernel.org>
+	<CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 82.132.233.180
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org, syzkaller@googlegroups.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Steven Price <steven.price@arm.com> writes:
+On Wed, 30 Oct 2024 00:16:48 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Tue, Oct 29, 2024 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> >
+> > On Tue, 29 Oct 2024 17:06:09 +0000,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > On Tue, Oct 29, 2024 at 9:27=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
+ wrote:
+> > > >
+> > > > On Mon, 28 Oct 2024 23:45:33 +0000,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > Did you have a chance to check whether this had any negative impact=
+ on
+> > > > actual workloads? Since the entry/exit code is a bit of a hot spot,
+> > > > I'd like to make sure we're not penalising the common case (I only
+> > > > wrote this patch while waiting in an airport, and didn't test it at
+> > > > all).
+> > > >
+> > > I ran the kvm selftests, kvm-unit-tests and booted a linux guest to
+> > > test the change and noticed no failures.
+> > > Any specific test you want to try out?
+> >
+> > My question is not about failures (I didn't expect any), but
+> > specifically about *performance*, and whether checking the flag
+> > without a static key can lead to any performance drop on the hot path.
+> >
+> > Can you please run an exit-heavy workload (such as hackbench, for
+> > example), and report any significant delta you could measure?
+>=20
+> Oh, I see. I ran hackbench and micro-bench from kvm-unit-tests (which
+> also causes a lot of entry/exits), on Ampere Altra with kernel at
+> v6.12-rc1, and see no significant difference in perf.
 
-> +
-> +out_undelegate_tables:
-> +	while (--i >= 0) {
-> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
-> +
-> +		WARN_ON(rmi_granule_undelegate(pgd_phys));
-> +	}
-> +	WARN_ON(rmi_granule_undelegate(rd_phys));
-> +free_rd:
-> +	free_page((unsigned long)rd);
-> +	return r;
-> +}
-> +
+Thanks for running this stuff.
 
-we should avoid that free_page on an undelegate failure? rd_phys we can
-handle here. Not sure how to handle the pgd_phys.
+> timer_10ms                          231040.0                          902=
+.0
+> timer_10ms                         234120.0                            91=
+4.0
 
--aneesh
+This seems to be the only case were we are adversely affected by this
+change. In the grand scheme of thins, that's noise. But this gives us
+a clear line of sight for the removal of the in-kernel interrupts back
+to userspace.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
 
