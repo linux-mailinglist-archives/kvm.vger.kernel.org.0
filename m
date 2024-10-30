@@ -1,239 +1,181 @@
-Return-Path: <kvm+bounces-29982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332219B5679
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 00:07:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CE19B5875
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 01:17:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87111F23D72
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2024 23:07:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63B581F24398
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 00:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E83920D4F6;
-	Tue, 29 Oct 2024 23:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EA214012;
+	Wed, 30 Oct 2024 00:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mCQKQDO9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="et+lIRlK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A5D20C49B;
-	Tue, 29 Oct 2024 23:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73818125DF
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 00:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730243179; cv=none; b=rwaLWGgbnS0gmR56RGQ/vZfTkCG5F0saoX9Yh7rGTwrkBCSvmTb2CbX7c80X0SaQca8UMyCYBK0+MExePcoWEL3sB3kvGJ3io2vhNXRyq2kGCiXECfAttfVgDPwZk00pkfMqP6dNgVqw47Kelh2nV1qBg2UMi3+aWGnVXgFYkx8=
+	t=1730247425; cv=none; b=KNpnOlNDOVCCXJN+e3stxlIhkWBK7JA5kYDsqpDmYB3EtV+YzQ2Qe7u2OxsEk1+BEkT7ed2MNtTTv6xw5pLeT8wBcj043hQeZxTwdu9hLGqPxmjAfclVEPwJ37RL8KPlPBOJWFcGvkbh+EJj2uHiIFU7FbO56+kb9uM1LddJlKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730243179; c=relaxed/simple;
-	bh=9W+AHt/u5MeZwhEMrDWMOoEiPok8YXhk3IbKNloyLig=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUZIFpMuQe0wlk3cqwPSDcoK9cmmeA4Nj/CYmQ0cOIIf6YGsHykmfLmZaYRpj8GjBu94EVs5P1eZqJJjPNJcemSUd+Rcfj/uQGN1DoIet/b0M2NZATK4rROGhTPw1dCXNEFapxe9VcJiawtae+qB8IIIpjrfzxquP89ts2epwVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mCQKQDO9; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TLjePI025437;
-	Tue, 29 Oct 2024 23:05:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=XvPjFHvm1+HBenMPEFmypiCz
-	DsR7VO/a8uKBoMokM3U=; b=mCQKQDO9bf3KfjOJU9ltheoQ4pi0fn1YYss4JVAT
-	q1v+p9+u9ONpdRk7Qgy5XsZ3UXOhgNR2wlEUyIZJiTATUwupgdqCX8w2AzPTkQHD
-	o7My0k7jrEgNK/E8DCtuwASBBQvKrb0z5dzki/3JQPD86QZg/Jx7q7OyRcpYlhX4
-	kL/qq7w+YWQzddaE2fHnJ3F7FG6kbEWr7MwYfkkeOIYh1k/UFHNc7Hezg+xvrhXG
-	9BAKuIplcwNjNJp/KZs98qV/cW4m01e13kPJS0HhNvYCtdWhMLpAjvVvjd87NFVK
-	tTp/G4ONtnEkJgL68a8jrsECbbgSoCHa4JrFK6nSf6Jnpw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gsq8hwyc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 23:05:56 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49TN5tQ9001175
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 23:05:55 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 29 Oct 2024 16:05:54 -0700
-Date: Tue, 29 Oct 2024 16:05:54 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: James Gowans <jgowans@amazon.com>
-CC: <linux-kernel@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Viro
-	<viro@zeniv.linux.org.uk>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Anthony
- Yznaga <anthony.yznaga@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Andrew
- Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>,
-        Jason Gunthorpe
-	<jgg@ziepe.ca>, <linux-fsdevel@vger.kernel.org>,
-        Usama Arif
-	<usama.arif@bytedance.com>, <kvm@vger.kernel.org>,
-        Alexander Graf
-	<graf@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
-        Paul Durrant
-	<pdurrant@amazon.co.uk>,
-        Nicolas Saenz Julienne <nsaenz@amazon.es>
-Subject: Re: [PATCH 05/10] guestmemfs: add file mmap callback
-Message-ID: <20241029120232032-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <20240805093245.889357-1-jgowans@amazon.com>
- <20240805093245.889357-6-jgowans@amazon.com>
+	s=arc-20240116; t=1730247425; c=relaxed/simple;
+	bh=kL+nSJs/k5eiTKkckVjqUhseoyaNVTxIYCNgVKz9HcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OHezEeN7mvlyjbT+ldeOtJBX1GWo336SSX/4fF4DdePC4nTWldnw7ryMViI8GCEaHa6N+HdRKYBjlWu8r8ga84urfjwfWwXP6fL9F7wGq7MKCXvQh7xgjuascLaYgpbfz7wr3clvCsmfJmwQTOV/jlJ8IRXzgpbQ+WDOZhQ0Mko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=et+lIRlK; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460b295b9eeso73591cf.1
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 17:17:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730247422; x=1730852222; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RCmWu47sjTGX3jar/Dwdhp+9K5zVvqpEnsEiRnQbuZ4=;
+        b=et+lIRlKegBfC2h9/n31J6d8TJkbDu440N5TWTD2sNhhoMXP6vXEOMh/inA93j6+F4
+         3DKkwv73/9t3NJyDIhv7jzemF2eXJg52P1ihLT74+/JXi0mWUeMhWG6qc3u+23ST3ebS
+         U3OHCEnqPzwjWtDThAAH611SkFBuqkumpinc/ISUBCuOZu5yUTrNox1dpJ+4h0SbzhOS
+         +SX/RqoypTPdwbV49RETbQL/htObPWplcinnvwcrw8vwp4JP0FFTsS4veGJK59w8BCYr
+         wT0rwWxwDaw0dQ/Udb1H+q/AGncW8O2b+boe9voF0/54KyXRoNJ5CEOQw/sDUCzwhMe3
+         beGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730247422; x=1730852222;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RCmWu47sjTGX3jar/Dwdhp+9K5zVvqpEnsEiRnQbuZ4=;
+        b=O58D45VGHOONd3wN9mIEkf5B70eP0DGs0t0xEoK2dopdJt9qolUs6MJiM0sawtNYcj
+         Efx4f8l2wRxta7fiGDfV0yywkpTEe/URxjWP+riAi9Sz+ixPjoMExtOYawyOG5vTLLMe
+         UoW6bDMGx/PtLa57h/7Y6rBdkPILvHHwSAaTQr9BmPBmdr6ufgC+MJrEUnbBHivIfI++
+         TQezDWwaCeg6HGW4ZRnZXHaj7sRuteHlYZjnT/u/qqS4RovgqA5NGcj4Cs02x3qDoNZQ
+         OjZTJtC3OtUToMx9lN8RPT5Yin++rqILaOYylBqwEuKQfLKeR4/RzZNEuzsS+GVO4Sot
+         0GDw==
+X-Forwarded-Encrypted: i=1; AJvYcCULCptuGU2hoS7TmuH6EGOrImJyzq0bIluyhsMZlpCbrP/nK4oszxDW4qpUmkbl+cmt8vk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8UeFd4fB7xB2u2qfBr7Pc28XMEC5nvTPkySXKimd/ECTyflmE
+	UMBYzguEwTIDcue6Hd6hRw2s1+4nTZGkLPliIc29kbAXg5jInSojfpAkWXOuUjssHWbHvdK03yY
+	PvGetqGZdbM3HxzR0j1AROQWtM3+rlfFsqALy
+X-Gm-Gg: ASbGncs9Z0cLfZu/PZC9tXmT5jZRsBPbsN8MDdWLRbThVdPaTuIeTFvmrpRq9DVFPRy
+	eYmSyJ5/pMiyirFFM8ch5DsbD+QBuE0dA+o4+Sovohm0QuHCJjPF+n6PXgQsFKR0I
+X-Google-Smtp-Source: AGHT+IEaPibastFimQxIGHeancJlv6kb2dWI4ioRIOkCpZsX0edKkHwzu5czUo3lz8BTR5AsStAJ1WI8kMngUNb28NI=
+X-Received: by 2002:ac8:5d91:0:b0:460:48f1:5a49 with SMTP id
+ d75a77b69052e-46164f057c4mr6157321cf.14.1730247422165; Tue, 29 Oct 2024
+ 17:17:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240805093245.889357-6-jgowans@amazon.com>
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YHT3SO5zWSaOsoLiIh9WLH0BmLD6E99w
-X-Proofpoint-ORIG-GUID: YHT3SO5zWSaOsoLiIh9WLH0BmLD6E99w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- adultscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1011 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410290175
+References: <20241028234533.942542-1-rananta@google.com> <868qu63mdo.wl-maz@kernel.org>
+ <CAJHc60x3sGdi2_mg_9uxecPYwZMBR11m1oEKPEH4RTYaF8eHdQ@mail.gmail.com> <865xpa3fwe.wl-maz@kernel.org>
+In-Reply-To: <865xpa3fwe.wl-maz@kernel.org>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Tue, 29 Oct 2024 17:16:48 -0700
+Message-ID: <CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	stable@vger.kernel.org, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 05, 2024 at 11:32:40AM +0200, James Gowans wrote:
-> Make the file data usable to userspace by adding mmap. That's all that
-> QEMU needs for guest RAM, so that's all be bother implementing for now.
-> 
-> When mmaping the file the VMA is marked as PFNMAP to indicate that there
-> are no struct pages for the memory in this VMA. Remap_pfn_range() is
-> used to actually populate the page tables. All PTEs are pre-faulted into
-> the pgtables at mmap time so that the pgtables are usable when this
-> virtual address range is given to VFIO's MAP_DMA.
+On Tue, Oct 29, 2024 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Tue, 29 Oct 2024 17:06:09 +0000,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > On Tue, Oct 29, 2024 at 9:27=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >
+> > > On Mon, 28 Oct 2024 23:45:33 +0000,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > Did you have a chance to check whether this had any negative impact o=
+n
+> > > actual workloads? Since the entry/exit code is a bit of a hot spot,
+> > > I'd like to make sure we're not penalising the common case (I only
+> > > wrote this patch while waiting in an airport, and didn't test it at
+> > > all).
+> > >
+> > I ran the kvm selftests, kvm-unit-tests and booted a linux guest to
+> > test the change and noticed no failures.
+> > Any specific test you want to try out?
+>
+> My question is not about failures (I didn't expect any), but
+> specifically about *performance*, and whether checking the flag
+> without a static key can lead to any performance drop on the hot path.
+>
+> Can you please run an exit-heavy workload (such as hackbench, for
+> example), and report any significant delta you could measure?
 
-Thanks for sending this out! I'm going through the series with the
-intention to see how it might fit within the existing guest_memfd work
-for pKVM/CoCo/Gunyah.
+Oh, I see. I ran hackbench and micro-bench from kvm-unit-tests (which
+also causes a lot of entry/exits), on Ampere Altra with kernel at
+v6.12-rc1, and see no significant difference in perf.
 
-It might've been mentioned in the MM alignment session -- you might be
-interested to join the guest_memfd bi-weekly call to see how we are
-overlapping [1].
+hackbench:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Ran on a guest with 64 vCPUs and backed by 8G of memory. The results
+are an average of 3 runs:
 
-[1]: https://lore.kernel.org/kvm/ae794891-fe69-411a-b82e-6963b594a62a@redhat.com/T/
+Task groups | Baseline | Patch | Approx. entry/exits
+----------------|------------|--------- |------------------------
+100              | 0.154     | 0.164  | 150k
+250              | 0.456     | 0.458  | 500k
+500              | 0.851     | 0.826  | 920k
+(Total tasks for each row =3D=3D task groups * 40)
 
----
+kvm-unit-tests micro-bench
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Was the decision to pre-fault everything because it was convenient to do
-or otherwise intentionally different from hugetlb?
+The test causes ~530k entry/exits.
 
-> 
-> Signed-off-by: James Gowans <jgowans@amazon.com>
-> ---
->  fs/guestmemfs/file.c       | 43 +++++++++++++++++++++++++++++++++++++-
->  fs/guestmemfs/guestmemfs.c |  2 +-
->  fs/guestmemfs/guestmemfs.h |  3 +++
->  3 files changed, 46 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/guestmemfs/file.c b/fs/guestmemfs/file.c
-> index 618c93b12196..b1a52abcde65 100644
-> --- a/fs/guestmemfs/file.c
-> +++ b/fs/guestmemfs/file.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  
->  #include "guestmemfs.h"
-> +#include <linux/mm.h>
->  
->  static int truncate(struct inode *inode, loff_t newsize)
->  {
-> @@ -41,6 +42,46 @@ static int inode_setattr(struct mnt_idmap *idmap, struct dentry *dentry, struct
->  	return 0;
->  }
->  
-> +/*
-> + * To be able to use PFNMAP VMAs for VFIO DMA mapping we need the page tables
-> + * populated with mappings. Pre-fault everything.
-> + */
-> +static int mmap(struct file *filp, struct vm_area_struct *vma)
-> +{
-> +	int rc;
-> +	unsigned long *mappings_block;
-> +	struct guestmemfs_inode *guestmemfs_inode;
-> +
-> +	guestmemfs_inode = guestmemfs_get_persisted_inode(filp->f_inode->i_sb,
-> +			filp->f_inode->i_ino);
-> +
-> +	mappings_block = guestmemfs_inode->mappings;
-> +
-> +	/* Remap-pfn-range will mark the range VM_IO */
-> +	for (unsigned long vma_addr_offset = vma->vm_start;
-> +			vma_addr_offset < vma->vm_end;
-> +			vma_addr_offset += PMD_SIZE) {
-> +		int block, mapped_block;
-> +		unsigned long map_size = min(PMD_SIZE, vma->vm_end - vma_addr_offset);
-> +
-> +		block = (vma_addr_offset - vma->vm_start) / PMD_SIZE;
-> +		mapped_block = *(mappings_block + block);
-> +		/*
-> +		 * It's wrong to use rempa_pfn_range; this will install PTE-level entries.
-> +		 * The whole point of 2 MiB allocs is to improve TLB perf!
-> +		 * We should use something like mm/huge_memory.c#insert_pfn_pmd
-> +		 * but that is currently static.
-> +		 * TODO: figure out the best way to install PMDs.
-> +		 */
-> +		rc = remap_pfn_range(vma,
-> +				vma_addr_offset,
-> +				(guestmemfs_base >> PAGE_SHIFT) + (mapped_block * 512),
-> +				map_size,
-> +				vma->vm_page_prot);
-> +	}
-> +	return 0;
-> +}
-> +
->  const struct inode_operations guestmemfs_file_inode_operations = {
->  	.setattr = inode_setattr,
->  	.getattr = simple_getattr,
-> @@ -48,5 +89,5 @@ const struct inode_operations guestmemfs_file_inode_operations = {
->  
->  const struct file_operations guestmemfs_file_fops = {
->  	.owner = THIS_MODULE,
-> -	.iterate_shared = NULL,
-> +	.mmap = mmap,
->  };
-> diff --git a/fs/guestmemfs/guestmemfs.c b/fs/guestmemfs/guestmemfs.c
-> index c45c796c497a..38f20ad25286 100644
-> --- a/fs/guestmemfs/guestmemfs.c
-> +++ b/fs/guestmemfs/guestmemfs.c
-> @@ -9,7 +9,7 @@
->  #include <linux/memblock.h>
->  #include <linux/statfs.h>
->  
-> -static phys_addr_t guestmemfs_base, guestmemfs_size;
-> +phys_addr_t guestmemfs_base, guestmemfs_size;
->  struct guestmemfs_sb *psb;
->  
->  static int statfs(struct dentry *root, struct kstatfs *buf)
-> diff --git a/fs/guestmemfs/guestmemfs.h b/fs/guestmemfs/guestmemfs.h
-> index 7ea03ac8ecca..0f2788ce740e 100644
-> --- a/fs/guestmemfs/guestmemfs.h
-> +++ b/fs/guestmemfs/guestmemfs.h
-> @@ -8,6 +8,9 @@
->  #define GUESTMEMFS_FILENAME_LEN 255
->  #define GUESTMEMFS_PSB(sb) ((struct guestmemfs_sb *)sb->s_fs_info)
->  
-> +/* Units of bytes */
-> +extern phys_addr_t guestmemfs_base, guestmemfs_size;
-> +
->  struct guestmemfs_sb {
->  	/* Inode number */
->  	unsigned long next_free_ino;
-> -- 
-> 2.34.1
-> 
-> 
+Baseline:
+
+name                                    total ns                         av=
+g ns
+---------------------------------------------------------------------------=
+-----------------
+hvc                                  20095360.0                          30=
+6.0
+mmio_read_user           110350040.0                         1683.0
+mmio_read_vgic              29572840.0                          451.0
+eoi                                        964080.0
+        14.0
+ipi                                   126236640.0                         1=
+926.0
+lpi                                   142848920.0                         2=
+179.0
+timer_10ms                          231040.0                          902.0
+
+
+Patch:
+
+name                                    total ns                         av=
+g ns
+---------------------------------------------------------------------------=
+-----------------
+hvc                                  20067680.0                            =
+306.0
+mmio_read_user           109513800.0                         1671.0
+mmio_read_vgic              29190080.0                           445.0
+eoi                                       963400.0
+        14.0
+ipi                                  116481640.0                          1=
+777.0
+lpi                                  136556000.0                          2=
+083.0
+timer_10ms                         234120.0                            914.=
+0
+
+Thank you.
+Raghavendra
 
