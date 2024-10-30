@@ -1,190 +1,163 @@
-Return-Path: <kvm+bounces-29989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685A09B5A2B
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 04:03:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F779B5A68
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 04:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C65A2846CC
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 03:03:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF9D1F237A8
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 03:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D946D194AF4;
-	Wed, 30 Oct 2024 03:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FE019925B;
+	Wed, 30 Oct 2024 03:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I80j+7DC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FTheNNpr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA67E9454;
-	Wed, 30 Oct 2024 03:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A0215E96
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 03:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730257427; cv=none; b=na0g6WCWbDh35dbyOC2mgD5DBMjB2lWD1ndkQ2tkMXyuFd/uG4zqtnV6ez03CRXR18UVVPcpM7lD49czgCxxPlrMGJgWdRURJjyez21r5KRv2/JR/y2NZKnzVd0JWlwnwVrpHdNPI8Z5yjJxV+GtktRySFlUKRrpoK8qifVjorM=
+	t=1730259321; cv=none; b=sVm+hdOcOEnWWTtt/c6sQU3c6iQeMLKOxUgfjIZlyuaKmuWIOkK4Z35+WCupRszkYHULtoWTT9abRYQqttY0YkMbhO/gtr4aoP+oTgt2rmUhPJxOIlDwghQzuixe9DgihRedYHeDEK2IK067l0zDeUjartHAcgL+x1wB0KZ7+EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730257427; c=relaxed/simple;
-	bh=KU8k3FnOxb8v1r7cvCsphwi31r6zyCks3F6SyZ23myQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=okw8BLZRAlVpBE9P6mqs9jtSor+csO+Ub9teTTwwE5CxfHECcE/3p6Baj4YWM2xqPJVJJ9MNd7RmimoQsr8b/vzzjg1Y+eE7ZktXoJHmfO/WoipgnrMLihouCzfKj4IC56Wybsbn0yUm4t6odmdK48y/OGKO2KVrV7iDcuQ5Hb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I80j+7DC; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730257425; x=1761793425;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KU8k3FnOxb8v1r7cvCsphwi31r6zyCks3F6SyZ23myQ=;
-  b=I80j+7DCpyq6scVQhsKJ5woGd7q6yd3uRfOHqHtp+wnyb2rT0oQpt33U
-   Tcllug8z/3mOBrvPL8VxKa1K0iQJeWIj88pFV4mOb3aQ16m0r/1MILz5W
-   zKxhtd83/eBVFk2x7M8ht3ggnzhxjd6G0QbWxiP+Do5DKlvrm+36WymOj
-   /eEI9tY2nNHC0WMwQRiwCHAlU/9woeMchx4Uqps+GJRgh+yQwxLGdvQNC
-   yo16dpkEXzgjEqfjwi8oQZPGvuIr49+414Hj9+tJbyAUTYPlJ0KcIGV79
-   jGgRv2n5lDv1EHMgMvCZb/xYurJ7yCRN+0ITKZ7Q3C8vcBLapD96mz3E2
-   w==;
-X-CSE-ConnectionGUID: Skdg8clATXeMx2BuZz+dvQ==
-X-CSE-MsgGUID: VyTgs+j/Ta21ZfdGjHNSyw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11240"; a="47420117"
-X-IronPort-AV: E=Sophos;i="6.11,243,1725346800"; 
-   d="scan'208";a="47420117"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 20:03:44 -0700
-X-CSE-ConnectionGUID: Hbhfu/3sS2uzQahYNQ2+Dg==
-X-CSE-MsgGUID: 1NcZzNDCRRmHlIGRsuLWoQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,243,1725346800"; 
-   d="scan'208";a="82338128"
-Received: from unknown (HELO [10.238.4.167]) ([10.238.4.167])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 20:03:42 -0700
-Message-ID: <35dc9358-0b1a-4325-818e-27ccdab7669b@linux.intel.com>
-Date: Wed, 30 Oct 2024 11:03:39 +0800
+	s=arc-20240116; t=1730259321; c=relaxed/simple;
+	bh=5e4ocqngMv3Nw+NiLalHLhMct3lABs8i5ufhVHb2AMA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aw1CmOWaJTcNH48dvjUJHrGVw3hqw1MCHcPsk6dv8fqXVNnSy6DSIyKhI2sWuQYCXADIKwDFiui9FsC+X3NORN9i0lltfjKrWR+nT9LtzoXqH2st2U8CznzrSrlCxJNtTkEOWwAKjCKF7uknHlThLh0TVDqgW/LQQWjLhnF+iWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FTheNNpr; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-46094b68e30so44439361cf.0
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2024 20:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1730259318; x=1730864118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9JEeBcFfasGQ6HuKHVexcEVIYh65tRgrqLCGh6hPlck=;
+        b=FTheNNprsoZcwjBwYZghPYXFnKSqw5kB/rs+t5a19dshLRbB3jMA+qyYAjIJCT66oC
+         Xj0RPG3HiszX0fkRwCpMx0pj9kjXChRiTpSf4ETXtRZZ+Uggm2epvOU1lFra37Kc0RMe
+         VkJ+2nXHZ3r+HElwBHwX46T7xqkd8PjmZuxJg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730259318; x=1730864118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9JEeBcFfasGQ6HuKHVexcEVIYh65tRgrqLCGh6hPlck=;
+        b=L2Rt4xtNvkE98Dghcy1+nTMT+FjkAFiCtQKMni2XDIZHSGsUUjccGldhiIYFjmBoFr
+         Lta9JDh+naRxYa6x5i1NRDB+p4iEk52i0nY35tFLo0KrXluG7dFsytb6WfLZtq5Wf7AH
+         P3q+EcQ9/jNt+/3shDriVV3bgpVgntZjOeER2bws4U0dqAIABII6CRL4mjBJr/Z7Z9n/
+         kl8UZQYoiZs2PMA5gcUpLfBkduSAJt8CQTAQ4Wsaog3gHFdP8ZFOsjzvD0ltyOC9lCjy
+         0EP0FZZ/WXs5juCdr1QN3nBjc/aHmnx3LVBQ/UVmhlo73Rd0WuzW48CYUh8/8VFC4rX1
+         5S6g==
+X-Gm-Message-State: AOJu0YwDIZLdJj81mef5x8XpqkQw4+IjyyH9TZIHKW11AwDM7Xrqcass
+	DoJaLLails5xgAak0ge99Sw/tcWxUwlmBzz3fD/Ys05WLHxKLStKd503g0PGeCj0TE2sVmUDmoR
+	u/VlWlVzInlLcLwnCps1bYnUArEFUvFWtOQtl9vClY//AK9x5UR1v7lEyu+PvHUJ/5un/jawrw3
+	c8ATlq/bPq49FAmfkPqX83ckxwbbU9SvzJVw==
+X-Google-Smtp-Source: AGHT+IGxokqRzi/WYjMzIeo65ayF9NndKXyEQUP6dEcLmqJeJbC/i1rAV4J0HLQa+JmeRHEVQS2NaA==
+X-Received: by 2002:a05:622a:14cd:b0:460:abf3:c454 with SMTP id d75a77b69052e-4613bffab89mr198985621cf.18.1730259318475;
+        Tue, 29 Oct 2024 20:35:18 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-461323a4840sm51015561cf.86.2024.10.29.20.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 20:35:18 -0700 (PDT)
+From: Zack Rusin <zack.rusin@broadcom.com>
+To: kvm@vger.kernel.org
+Cc: Zack Rusin <zack.rusin@broadcom.com>,
+	Doug Covelli <doug.covelli@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Joel Stanley <joel@jms.id.au>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/3] KVM: x86: Small changes to support VMware guests
+Date: Tue, 29 Oct 2024 23:34:06 -0400
+Message-ID: <20241030033514.1728937-1-zack.rusin@broadcom.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 14/21] KVM: TDX: Implement hooks to propagate changes of
- TDP MMU mirror page table
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-15-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240904030751.117579-15-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+To be able to switch VMware products running on Linux to KVM some minor
+changes are required to let KVM run/resume unmodified VMware guests.
 
+First allow enabling of the VMware backdoor via an api. Currently the
+setting of the VMware backdoor is limited to kernel boot parameters,
+which forces all VM's running on a host to either run with or without
+the VMware backdoor. Add a simple cap to allow enabling of the VMware
+backdoor on a per VM basis. The default for that setting remains the
+kvm.enable_vmware_backdoor boot parameter (which is false by default)
+and can be changed on a per-vm basis via the KVM_CAP_X86_VMWARE_BACKDOOR
+cap.
 
+Second add a cap to forward hypercalls to userspace. I know that in
+general that's frowned upon but VMwre guests send quite a few hypercalls
+from userspace and it would be both impractical and largelly impossible
+to handle all in the kernel. The change is trivial and I'd be maintaining
+this code so I hope it's not a big deal.
 
-On 9/4/2024 11:07 AM, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-[...]
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 6feb3ab96926..b8cd5a629a80 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -447,6 +447,177 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
->   	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa);
->   }
->   
-> +static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn)
-> +{
-> +	struct page *page = pfn_to_page(pfn);
-> +
-> +	put_page(page);
-Nit: It can be
-put_page(pfn_to_page(pfn));
+The third commit just adds a self-test for the "forward VMware hypercalls
+to userspace" functionality.
 
+Cc: Doug Covelli <doug.covelli@broadcom.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: x86@kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Joel Stanley <joel@jms.id.au>
+Cc: Zack Rusin <zack.rusin@broadcom.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
 
-> +}
-> +
-> +static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
-> +			    enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	u64 entry, level_state;
-> +	u64 err;
-> +
-> +	err = tdh_mem_page_aug(kvm_tdx, gpa, hpa, &entry, &level_state);
-Nit:
-Usually, kernel prefers to handle and return for error conditions first.
+Zack Rusin (3):
+  KVM: x86: Allow enabling of the vmware backdoor via a cap
+  KVM: x86: Add support for VMware guest specific hypercalls
+  KVM: selftests: x86: Add a test for KVM_CAP_X86_VMWARE_HYPERCALL
 
-But for this case, for all error conditions, it needs to unpin the page.
-Is it better to return the successful case first, so that it only needs
-to call tdx_unpin() once?
+ Documentation/virt/kvm/api.rst                |  56 ++++++++-
+ arch/x86/include/asm/kvm_host.h               |   2 +
+ arch/x86/kvm/emulate.c                        |   5 +-
+ arch/x86/kvm/svm/svm.c                        |   6 +-
+ arch/x86/kvm/vmx/vmx.c                        |   4 +-
+ arch/x86/kvm/x86.c                            |  47 ++++++++
+ arch/x86/kvm/x86.h                            |   7 +-
+ include/uapi/linux/kvm.h                      |   2 +
+ tools/include/uapi/linux/kvm.h                |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/vmware_hypercall_test.c        | 108 ++++++++++++++++++
+ 11 files changed, 227 insertions(+), 13 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmware_hypercall_test.c
 
-> +	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
-> +		tdx_unpin(kvm, pfn);
-> +		return -EAGAIN;
-> +	}
-> +	if (unlikely(err == (TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX))) {
-> +		if (tdx_get_sept_level(level_state) == tdx_level &&
-> +		    tdx_get_sept_state(level_state) == TDX_SEPT_PENDING &&
-> +		    is_last_spte(entry, level) &&
-> +		    spte_to_pfn(entry) == pfn &&
-> +		    entry & VMX_EPT_SUPPRESS_VE_BIT) {
-Can this condition be triggered?
-For contention from multiple vCPUs, the winner has frozen the SPTE,
-it shouldn't trigger this.
-Could KVM  do page aug for a same page multiple times somehow?
-
-
-> +			tdx_unpin(kvm, pfn);
-> +			return -EAGAIN;
-> +		}
-> +	}
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error_2(TDH_MEM_PAGE_AUG, err, entry, level_state);
-> +		tdx_unpin(kvm, pfn);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> +			      enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +
-> +	/* TODO: handle large pages. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Because guest_memfd doesn't support page migration with
-> +	 * a_ops->migrate_folio (yet), no callback is triggered for KVM on page
-> +	 * migration.  Until guest_memfd supports page migration, prevent page
-> +	 * migration.
-> +	 * TODO: Once guest_memfd introduces callback on page migration,
-> +	 * implement it and remove get_page/put_page().
-> +	 */
-> +	get_page(pfn_to_page(pfn));
-> +
-> +	if (likely(is_td_finalized(kvm_tdx)))
-> +		return tdx_mem_page_aug(kvm, gfn, level, pfn);
-> +
-> +	/*
-> +	 * TODO: KVM_MAP_MEMORY support to populate before finalize comes
-> +	 * here for the initial memory.
-> +	 */
-> +	return 0;
-Is it better to return error before adding the support?
-
-> +}
-> +
-[...]
+-- 
+2.43.0
 
 
