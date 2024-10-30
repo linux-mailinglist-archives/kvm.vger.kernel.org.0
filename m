@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-30101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3EC9B6CB9
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:10:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891E59B6CBD
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 20:10:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F479B23999
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:10:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FAC11F221E1
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 19:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13122281FD;
-	Wed, 30 Oct 2024 19:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2912296ED;
+	Wed, 30 Oct 2024 19:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AWk9ItZ8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KBB92bkW"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0B02281D3;
-	Wed, 30 Oct 2024 19:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0302281FE;
+	Wed, 30 Oct 2024 19:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730314881; cv=none; b=scuO+EeJCps2FwuvTtKjaID74zR4H336msU6x78pljVazXEsB/04lYRGiFEEkDEU1EXQ7jy8c5g2Q0RONTE4cduyiLMUW1wSOzOOvxWUrpldkswnHdYFADn/VNj1aNfwvpZEeu7YavktHCLU6QIHbVclgWWozJNtfohwdmlEhQk=
+	t=1730314883; cv=none; b=BiTgPPywhiqSqkFZYvqTeO5+6j4pf8oEqMw8j6S3nQmtrznCS/dkgA6y8nMmvGEjabkeIyJ2Q6rpv4Ahf0KoI8WOEmLYBg/l3RrmdtZuhA9NcyXeaf3QTbO3Pxxw2/frB4HZecgR1ZLcer/hJQeU0ioMuggoRie2i7aMU9y8sAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730314881; c=relaxed/simple;
-	bh=PFnZhuzjhmZwmPdfn+yrAnFOs+bLGYc33soDXvtJ5ls=;
+	s=arc-20240116; t=1730314883; c=relaxed/simple;
+	bh=2CVYgvFARR/9Ofmj+WCQSPOPjEa/ehZNBe3S2d4rNUg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HwiLpdGq84thZwD43ZNwZ/0MFs9MEz2RsbtJ/jwELML02gGcaIfNx0UCzXXmxMS+60ES2+//zsoDr19/6bIpYvam9VoHi8acLGz65blHdbqVl77pS+y0qegmQg73Fmb63XGUrX57q0mBi5P5mcF387Culh98b3kseHDBs4gNmw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AWk9ItZ8; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=kno2uF9kGanvvKLEOSsN7mphxG4bKsamWbv3dgv7rJk0RDVWiylJ+8Jf5ftfsc13azfmwjRbZDd0PLztmZATtbyr6QkcM4M1/zGnHc7Gmd2P3aQPKZQdNmhZJGGg6JQkoNvTZJsrWyYIzOlcrnOun5aJicOx8GgTREcn9V/sZ4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KBB92bkW; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730314879; x=1761850879;
+  t=1730314880; x=1761850880;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PFnZhuzjhmZwmPdfn+yrAnFOs+bLGYc33soDXvtJ5ls=;
-  b=AWk9ItZ8Ao5TFprHQetRZBb5prO4bihuhfWYJeTKcFA2JyhKrK4v2y3Y
-   aBRdsufqNJVR7OsVQ0QLcCyjZDhc0cdnjOt6LzXnktezc4Fd2vbwrScdM
-   qAEoqrfJU61m/ikg1QrjOgGsg4vvDol4FnI0AeSslOkXxlidfFqWmVtIg
-   kIsD5pH3YgdBHpbbezOnyEthzPQsJTIcQPnViQ/HdFk9/thLYRO0nubtf
-   YFX308+ZV7oM4NvNMIVI3d8OU7CLzPO7ci8qWW3ldYJpn/J8XLv7IwfIK
-   sU3kKTLJ/gBO+YKxCH+c27Mi+ZO/G9Qdus1HXhO6o5GjM4RGcLrX3kvPV
-   g==;
-X-CSE-ConnectionGUID: KEmDUjKKRS6opc7oaEorSA==
-X-CSE-MsgGUID: ANtsv8NnReurM0KbrxxpAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678857"
+  bh=2CVYgvFARR/9Ofmj+WCQSPOPjEa/ehZNBe3S2d4rNUg=;
+  b=KBB92bkWPjwQtUX3OFtFgMMW6uVo6gQG63tDHlCCOX6gEfmRJ4eZ4Sln
+   +h7imxeLtR3M8gFxrBRcp25gsj4CSRxXEnfLsef0OGhE4kPEAOxD7Bq75
+   Cb4bn+8Z69N+L5UaZ2by9rXESuzj9XEgpEIm5SvKi6pNe3DETzmlaO08X
+   EBYm/jMFnlbPohXDKtk4XPt3rzf2elCQTZB5aRNXQgysxBBnjbkXOLVAT
+   HEcNaBBHLWcT2HwkveaPN7V+ooZocYU4Fm4zDrDyPGNLn2xpWoGBdCDF0
+   o9a3wfGRv7UxYCgbgPXh9vC0W5p4x/AgqAVyK8c0YRz6WP9+v6oRPE3vG
+   w==;
+X-CSE-ConnectionGUID: q5xeqredS1GrvnP7rQ4abw==
+X-CSE-MsgGUID: TYCMro0ARxmenu3qS/0soQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="17678863"
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="17678857"
+   d="scan'208";a="17678863"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:08 -0700
-X-CSE-ConnectionGUID: HnAeGdStQMSH5siphOsnlA==
-X-CSE-MsgGUID: FHnolFZfSXyObX9m1gnFKQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:09 -0700
+X-CSE-ConnectionGUID: WxANfO81RhqAnMRdHJ9OsQ==
+X-CSE-MsgGUID: vbdhL48zSX2xJ2zq+5XdpQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,245,1725346800"; 
-   d="scan'208";a="82499465"
+   d="scan'208";a="82499471"
 Received: from sramkris-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.223.186])
   by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 12:01:08 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
@@ -70,9 +70,9 @@ Cc: rick.p.edgecombe@intel.com,
 	tony.lindgren@linux.intel.com,
 	xiaoyao.li@intel.com,
 	reinette.chatre@intel.com
-Subject: [PATCH v2 24/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-Date: Wed, 30 Oct 2024 12:00:37 -0700
-Message-ID: <20241030190039.77971-25-rick.p.edgecombe@intel.com>
+Subject: [PATCH v2 25/25] KVM: x86/mmu: Taking guest pa into consideration when calculate tdp level
+Date: Wed, 30 Oct 2024 12:00:38 -0700
+Message-ID: <20241030190039.77971-26-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
 References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
@@ -86,280 +86,88 @@ Content-Transfer-Encoding: 8bit
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Implement an IOCTL to allow userspace to read the CPUID bit values for a
-configured TD.
+For TDX, the maxpa (CPUID.0x80000008.EAX[7:0]) is fixed as native and
+the max_gpa (CPUID.0x80000008.EAX[23:16]) is configurable and used
+to configure the EPT level and GPAW.
 
-The TDX module doesn't provide the ability to set all CPUID bits. Instead
-some are configured indirectly, or have fixed values. But it does allow
-for the final resulting CPUID bits to be read. This information will be
-useful for userspace to understand the configuration of the TD, and set
-KVM's copy via KVM_SET_CPUID2.
-
-To prevent userspace from starting to use features that might not have KVM
-support yet, filter the reported values by KVM's support CPUID bits.
+Use max_gpa to determine the TDP level.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Co-developed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
-Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 uAPI breakout v2:
- - Improve error path for tdx_vcpu_get_cpuid() (Xu)
- - Drop unused cpuid in struct kvm_tdx (Xu)
- - Rip out cpuid bit filtering
- - Fixup SEAMCALL call sites due to function parameter changes to SEAMCALL
-   wrappers (Kai)
- - Add mmu.h for kvm_gfn_direct_bits() (Binbin)
- - Drop unused nr_premapped (Tao)
- - Fix formatting for tdx_vcpu_get_cpuid_leaf() (Tony)
- - Use helpers for phys_addr_bits (Paolo)
+ - Use if else for cpuid_query_maxguestphyaddr() (Paolo)
 
 uAPI breakout v1:
  - New patch
 ---
- arch/x86/include/uapi/asm/kvm.h |   1 +
- arch/x86/kvm/vmx/tdx.c          | 167 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx_arch.h     |   5 +
- arch/x86/kvm/vmx/tdx_errno.h    |   1 +
- 4 files changed, 174 insertions(+)
+ arch/x86/kvm/cpuid.c   | 14 ++++++++++++++
+ arch/x86/kvm/cpuid.h   |  1 +
+ arch/x86/kvm/mmu/mmu.c |  9 ++++++++-
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 2cfec4b42b9d..36fa03376581 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -931,6 +931,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_CAPABILITIES = 0,
- 	KVM_TDX_INIT_VM,
- 	KVM_TDX_INIT_VCPU,
-+	KVM_TDX_GET_CPUID,
- 
- 	KVM_TDX_CMD_NR_MAX,
- };
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 9008db6cf3b4..1feb3307fd70 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2,6 +2,7 @@
- #include <linux/cpu.h>
- #include <asm/tdx.h>
- #include "capabilities.h"
-+#include "mmu.h"
- #include "x86_ops.h"
- #include "tdx.h"
- 
-@@ -857,6 +858,94 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 	return ret;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 14be20e003f4..e7179ce8eadc 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -423,6 +423,20 @@ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
+ 	return 36;
  }
  
-+static u64 tdx_td_metadata_field_read(struct kvm_tdx *tdx, u64 field_id,
-+				      u64 *data)
++int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu)
 +{
-+	u64 err;
++	struct kvm_cpuid_entry2 *best;
 +
-+	err = tdh_mng_rd(tdx->tdr_pa, field_id, data);
-+
-+	return err;
-+}
-+
-+#define TDX_MD_UNREADABLE_LEAF_MASK	GENMASK(30, 7)
-+#define TDX_MD_UNREADABLE_SUBLEAF_MASK	GENMASK(31, 7)
-+
-+static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
-+			  bool sub_leaf_set, struct kvm_cpuid_entry2 *out)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	u64 field_id = TD_MD_FIELD_ID_CPUID_VALUES;
-+	u64 ebx_eax, edx_ecx;
-+	u64 err = 0;
-+
-+	if (sub_leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
-+	    sub_leaf_set & TDX_MD_UNREADABLE_SUBLEAF_MASK)
-+		return -EINVAL;
-+
-+	/*
-+	 * bit 23:17, REVSERVED: reserved, must be 0;
-+	 * bit 16,    LEAF_31: leaf number bit 31;
-+	 * bit 15:9,  LEAF_6_0: leaf number bits 6:0, leaf bits 30:7 are
-+	 *                      implicitly 0;
-+	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
-+	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
-+	 *                         the SUBLEAF_6_0 is all-1.
-+	 *                         sub-leaf bits 31:7 are implicitly 0;
-+	 * bit 0,     ELEMENT_I: Element index within field;
-+	 */
-+	field_id |= ((leaf & 0x80000000) ? 1 : 0) << 16;
-+	field_id |= (leaf & 0x7f) << 9;
-+	if (sub_leaf_set)
-+		field_id |= (sub_leaf & 0x7f) << 1;
-+	else
-+		field_id |= 0x1fe;
-+
-+	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &ebx_eax);
-+	if (err) //TODO check for specific errors
-+		goto err_out;
-+
-+	out->eax = (u32) ebx_eax;
-+	out->ebx = (u32) (ebx_eax >> 32);
-+
-+	field_id++;
-+	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &edx_ecx);
-+	/*
-+	 * It's weird that reading edx_ecx fails while reading ebx_eax
-+	 * succeeded.
-+	 */
-+	if (WARN_ON_ONCE(err))
-+		goto err_out;
-+
-+	out->ecx = (u32) edx_ecx;
-+	out->edx = (u32) (edx_ecx >> 32);
-+
-+	out->function = leaf;
-+	out->index = sub_leaf;
-+	out->flags |= sub_leaf_set ? KVM_CPUID_FLAG_SIGNIFCANT_INDEX : 0;
-+
-+	/*
-+	 * Work around missing support on old TDX modules, fetch
-+	 * guest maxpa from gfn_direct_bits.
-+	 */
-+	if (leaf == 0x80000008) {
-+		gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-+		unsigned int g_maxpa = __ffs(gpa_bits) + 1;
-+
-+		out->eax = tdx_set_guest_phys_addr_bits(out->eax, g_maxpa);
-+	}
-+
++	best = kvm_find_cpuid_entry(vcpu, 0x80000000);
++	if (!best || best->eax < 0x80000008)
++		goto not_found;
++	best = kvm_find_cpuid_entry(vcpu, 0x80000008);
++	if (best)
++		return (best->eax >> 16) & 0xff;
++not_found:
 +	return 0;
-+
-+err_out:
-+	out->eax = 0;
-+	out->ebx = 0;
-+	out->ecx = 0;
-+	out->edx = 0;
-+
-+	return -EIO;
 +}
 +
- static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -1055,6 +1144,81 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	return ret;
- }
- 
-+/* Sometimes reads multipple subleafs. Return how many enties were written. */
-+static int tdx_vcpu_get_cpuid_leaf(struct kvm_vcpu *vcpu, u32 leaf, int max_cnt,
-+				   struct kvm_cpuid_entry2 *output_e)
-+{
-+	int i;
-+
-+	if (!max_cnt)
-+		return 0;
-+
-+	/* First try without a subleaf */
-+	if (!tdx_read_cpuid(vcpu, leaf, 0, false, output_e))
-+		return 1;
-+
-+	/*
-+	 * If the try without a subleaf failed, try reading subleafs until
-+	 * failure. The TDX module only supports 6 bits of subleaf index.
-+	 */
-+	for (i = 0; i < 0b111111; i++) {
-+		if (i > max_cnt)
-+			goto out;
-+
-+		/* Keep reading subleafs until there is a failure. */
-+		if (tdx_read_cpuid(vcpu, leaf, i, true, output_e))
-+			return i;
-+
-+		output_e++;
-+	}
-+
-+out:
-+	return i;
-+}
-+
-+static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
-+{
-+	struct kvm_cpuid2 __user *output, *td_cpuid;
-+	struct kvm_cpuid_entry2 *output_e;
-+	int r = 0, i = 0, leaf;
-+
-+	output = u64_to_user_ptr(cmd->data);
-+	td_cpuid = kzalloc(sizeof(*td_cpuid) +
-+			sizeof(output->entries[0]) * KVM_MAX_CPUID_ENTRIES,
-+			GFP_KERNEL);
-+	if (!td_cpuid)
-+		return -ENOMEM;
-+
-+	for (leaf = 0; leaf <= 0x1f; leaf++) {
-+		output_e = &td_cpuid->entries[i];
-+		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
-+					     KVM_MAX_CPUID_ENTRIES - i - 1,
-+					     output_e);
-+	}
-+
-+	for (leaf = 0x80000000; leaf <= 0x80000008; leaf++) {
-+		output_e = &td_cpuid->entries[i];
-+		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
-+					     KVM_MAX_CPUID_ENTRIES - i - 1,
-+					     output_e);
-+	}
-+
-+	td_cpuid->nent = i;
-+
-+	if (copy_to_user(output, td_cpuid, sizeof(*output))) {
-+		r = -EFAULT;
-+		goto out;
-+	}
-+	if (copy_to_user(output->entries, td_cpuid->entries,
-+			 td_cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
-+		r = -EFAULT;
-+
-+out:
-+	kfree(td_cpuid);
-+
-+	return r;
-+}
-+
- static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
- {
- 	struct msr_data apic_base_msr;
-@@ -1108,6 +1272,9 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	case KVM_TDX_INIT_VCPU:
- 		ret = tdx_vcpu_init(vcpu, &cmd);
- 		break;
-+	case KVM_TDX_GET_CPUID:
-+		ret = tdx_vcpu_get_cpuid(vcpu, &cmd);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		break;
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index 9d41699e66a2..d80ec118834e 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -157,4 +157,9 @@ struct td_params {
- 
- #define MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM	BIT_ULL(20)
- 
-+/*
-+ * TD scope metadata field ID.
-+ */
-+#define TD_MD_FIELD_ID_CPUID_VALUES		0x9410000300000000ULL
-+
- #endif /* __KVM_X86_TDX_ARCH_H */
-diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-index dc3fa2a58c2c..f9dbb3a065cc 100644
---- a/arch/x86/kvm/vmx/tdx_errno.h
-+++ b/arch/x86/kvm/vmx/tdx_errno.h
-@@ -23,6 +23,7 @@
- #define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
- #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
- #define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
-+#define TDX_METADATA_FIELD_NOT_READABLE		0xC0000C0200000000ULL
- 
  /*
-  * TDX module operand ID, appears in 31:0 part of error code as
+  * This "raw" version returns the reserved GPA bits without any adjustments for
+  * encryption technologies that usurp bits.  The raw mask should be used if and
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 00570227e2ae..61b839aa3548 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -37,6 +37,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+ u32 xstate_required_size(u64 xstate_bv, bool compacted);
+ 
+ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
++int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu);
+ u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu);
+ 
+ static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 9a0fbec33984..2e253a488949 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5474,12 +5474,19 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+ 
+ static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+ {
++	int maxpa;
++
++	if (vcpu->kvm->arch.vm_type == KVM_X86_TDX_VM)
++		maxpa = cpuid_query_maxguestphyaddr(vcpu);
++	else
++		maxpa = cpuid_maxphyaddr(vcpu);
++
+ 	/* tdp_root_level is architecture forced level, use it if nonzero */
+ 	if (tdp_root_level)
+ 		return tdp_root_level;
+ 
+ 	/* Use 5-level TDP if and only if it's useful/necessary. */
+-	if (max_tdp_level == 5 && cpuid_maxphyaddr(vcpu) <= 48)
++	if (max_tdp_level == 5 && maxpa <= 48)
+ 		return 4;
+ 
+ 	return max_tdp_level;
 -- 
 2.47.0
 
