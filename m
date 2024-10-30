@@ -1,55 +1,56 @@
-Return-Path: <kvm+bounces-29997-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B6239B5D3A
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 08:52:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8299B5D3F
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 08:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 116C52846E7
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 07:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 913D7B21780
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 07:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685021E0B6D;
-	Wed, 30 Oct 2024 07:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7451E0B70;
+	Wed, 30 Oct 2024 07:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyf0LMJf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUH71srC"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFF533E1;
-	Wed, 30 Oct 2024 07:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836AA33E1;
+	Wed, 30 Oct 2024 07:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730274729; cv=none; b=U8mb9Azx10J5smgYGoPA6r+rQdg4dowGLKELwIHZq9JJ54dTJHwhthc7xShNxowBV9/uMIyvSPM7eiyaFkzYAYJOdXDC6sEXCXE7WWYxq+6FXEhe9kyQJK1rqiff5LVCqz3i5rhmYYtOH7R8PA+YX4CpVLs1jMhG0EHOkSr45yI=
+	t=1730274960; cv=none; b=jit7hMEE9QsDd0PUQMKt+pkVK0QgfEmbncryQt7tYAIzITywamkB7OFgZZ3jO/ykex9fC9EhXJiH3s8s45vXmhnkRdUestNnAkFsgqPv9CUv3xut51WTA8l754cL5Kko6QoklDVrG0ZPKh3tLlH2k++SUIdxr1pzJ1Cq159x8P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730274729; c=relaxed/simple;
-	bh=vrq3Hj0eASMy2KLVd52CUc8legLz7mDW/VncF6IQKRk=;
+	s=arc-20240116; t=1730274960; c=relaxed/simple;
+	bh=gpPN7Q2sLWKjzaffkRwxaK7OnuNJs9eevr8SCuMuL/8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HPTbywzR5PMqGoblaXgzILbqOOsPGjYeMeSN7/vpw3QIJIwJZ7OJZIphyX+uIFGD0BmFI1eALNoV+hz5uRVuoHHOTpToPRP6fMvc6UaZFouo41DoE2pQUIcU1QYBAAR5/oVO5jKHIoH6u5CzrK0GhiPI2cH0w7HWu/qLrsINbKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyf0LMJf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CBD3C4CEE4;
-	Wed, 30 Oct 2024 07:52:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SDHHPxoeuNqn3mTU/Rb7yUVTyBNWDes6FHBoasKaF1/WNBv/MhO6KiUbxrrEInhPeG5uYI1IhOvbXMNd6T+iSi9tBoVPkmuOduWzpAQy0ReB7Ztoy9kKvH76wRWlKPW5uFMssoz0TSvfx86Ke/6/miv11J5QqnwV1Qc5+WE5S4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUH71srC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA6BC4CEE4;
+	Wed, 30 Oct 2024 07:55:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730274729;
-	bh=vrq3Hj0eASMy2KLVd52CUc8legLz7mDW/VncF6IQKRk=;
+	s=k20201202; t=1730274959;
+	bh=gpPN7Q2sLWKjzaffkRwxaK7OnuNJs9eevr8SCuMuL/8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=fyf0LMJf7Dtu1xwovWtcG6BfS649d4d36jLDwt+BeNQyBUsWZQ/X0tcmIebTw/E9U
-	 aVV6KA+GAnRHC10my9qHaHTRstRTBSD8dW6oLM1GoPMFE2BhLQBO5vyPCezZzQ2dnZ
-	 +oDU45jvPEjKOX5qC77au6BuHcBFxOH7cNEDQIboSQbRKzACVfaJKensFd8+PzY6Z3
-	 bD2+bzGtuFPaTXfmMiJXEtpXafSuwz1KoCLyUgJNkPH7DiwWDFJ9uz/IkGg8gpf4ta
-	 g7Q+Mnthdgki4eFXTeWepnFh4HvsyZ/yYE8EG2Uij/iTGTHjMMoL9qSrfwU2vRA1R0
-	 J6Xt04LlfhfPA==
+	b=BUH71srCUmo6Yo5Zj5v596dWnv7WddJErBNA1I9FhssSS3QmxttSW4zKqVxPJmmzM
+	 FwaX85B7dxMEdrbjste6ixaE+mBcmzK97oIdEFOrElhG6c7/EN9j8Lh+1JQQ8kmQgJ
+	 rBc3jNaZyMfZFMxx/G7mTbs0kN+OX+cDz83YUE5FzMWOfzSDlIfGVx3nGq9PDDbgSi
+	 zV1/f5lKWlWY9W0oL1Gx9oRnU13wp86sP84dOlyL2AImYWFxN9bfk3ZyITpo7gVvHG
+	 V+uoeeNT289LOwVjjzCmOxhocS2ox3c0CjGFJ8/xXTQTa8/FAl5kcMOkqnpbkZLDAF
+	 T2qz6FxH2EucA==
 X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -60,13 +61,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 17/43] arm64: RME: Allow VMM to set RIPAS
-In-Reply-To: <4075a8bc-2f1e-441d-815e-aaf83e88d3d0@arm.com>
+Subject: Re: [PATCH v5 09/43] arm64: RME: ioctls to create and configure realms
+In-Reply-To: <20241004152804.72508-10-steven.price@arm.com>
 References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-18-steven.price@arm.com>
- <4075a8bc-2f1e-441d-815e-aaf83e88d3d0@arm.com>
-Date: Wed, 30 Oct 2024 13:22:00 +0530
-Message-ID: <yq5afroec9jz.fsf@kernel.org>
+ <20241004152804.72508-10-steven.price@arm.com>
+Date: Wed, 30 Oct 2024 13:25:49 +0530
+Message-ID: <yq5acyjic9dm.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,67 +75,24 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+Steven Price <steven.price@arm.com> writes:
 
-> Hi Steven
->
->
->> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
->> +		/* Undelegate failed: leak the page */
->> +		return;
->> +	}
->> +
->> +	free_page((unsigned long)phys_to_virt(phys));
->
-> The above pattern of undelegate and reclaim a granule or leak appears 
-> elsewhere in the KVM support code. Is it worth having a common helper to
-> do the same ?
->
-> something like: reclaim_delegated_granule()
->
+> +
+> +out_undelegate_tables:
+> +	while (--i >= 0) {
+> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +		WARN_ON(rmi_granule_undelegate(pgd_phys));
+> +	}
+> +	WARN_ON(rmi_granule_undelegate(rd_phys));
+> +free_rd:
+> +	free_page((unsigned long)rd);
+> +	return r;
+> +}
+> +
 
-free_delegated_page() which should really be renamed to
-free_delegated_granule() essentially does that.
+we should avoid that free_page on an undelegate failure? rd_phys we can
+handle here. Not sure how to handle the pgd_phys.
 
-IMHO we should convert all the delgated allocation and free to
-alloc_delegated_granule() and free_delegated_granule(). This will also
-help in switching to a slab for granule allocation. 
-
->
->
->> +}
->> +
->> +static int realm_rtt_create(struct realm *realm,
->> +			    unsigned long addr,
->> +			    int level,
->> +			    phys_addr_t phys)
->> +{
->> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
->> +	return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level);
->> +}
-
-.......
-
->> +static void realm_unmap_range_private(struct kvm *kvm,
->> +				      unsigned long start,
->> +				      unsigned long end)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	ssize_t map_size = RME_PAGE_SIZE;
->> +	unsigned long next_addr, addr;
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		int ret;
->> +
->> +		next_addr = ALIGN(addr + 1, map_size);
->> +
-
-Is that next_addr update needed? 
-
-
->> +		ret = realm_destroy_protected(realm, addr, &next_addr);
->> +
->> +		if (WARN_ON(ret))
->> +			break;
->
+-aneesh
 
