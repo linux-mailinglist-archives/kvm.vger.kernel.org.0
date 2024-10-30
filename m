@@ -1,129 +1,120 @@
-Return-Path: <kvm+bounces-30014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CAEE9B628C
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 13:05:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4F39B6294
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 13:08:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 114D6282976
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 12:05:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9FBF1F220FB
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2024 12:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD2D1E8856;
-	Wed, 30 Oct 2024 12:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DA71E7C07;
+	Wed, 30 Oct 2024 12:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/q3N7ou"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJ/DT42h"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A7C1E7C12
-	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 12:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44E71D0E01
+	for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 12:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730289935; cv=none; b=L4rkfuoI3flF6Z2OnyG3kbxTLDpO8K9YhZcAJr9/rPG7/L86pgkGBPL8qsZyX1AONEeZ1zcCIx10rZ5TbQ88NC9Kx1uQg+V861dDlzSvaCY6wpcAILLChroMWSKRFSnZkWEcZuINV7ucIZ3Rtr0wbw69DkqRpIQMS/8mcgwr58k=
+	t=1730290105; cv=none; b=TQKvNa9vtZE06ptvz+UTgE54dMCpfFSt3z/Pv8BvR8QvMygAH4/qlA1EOyynt5ZBxoBnPQgRI4imVPZ05vf3ULpd44kIoaAkh/Bg/DQZJ6g9ZUBWnO79XABXW4chfT7B3qx97KdEG8vJy3T7N1vou8KHuP/waOpqiwwVeuHPf4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730289935; c=relaxed/simple;
-	bh=s2jIZKjVASSagWv7J8y2mCoPBBGL1TgH2aw6o/mzsms=;
+	s=arc-20240116; t=1730290105; c=relaxed/simple;
+	bh=7RBagzl6zEJqchOvXw42/+EX+CaiILvVv1uynxO011A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sk/RXOO6YwKhsqfi+g8MWplUXBdl0ixkyxFLEY2+kZ69Flg+72hz+xpYY0jVentdIgWEiEJxfQ8qsfJzBrFxCEKfFF3pLjc7Ol/+s0KjifwCi93F/0Wtf7YVCKS/wzEDDUyitSizZTyUnoZkxZA6/9Iiw2uUBgQXfItgXfp+Owk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N/q3N7ou; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730289930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zN9Omir7RGktU56FM49D9j8ooMAVlCcEhdMTzZ3iJDM=;
-	b=N/q3N7ous+sZt/NqO/3gLq7xes7a6VYv+yopqr0uPd1DiStCc66ha5UKxKVWc+Ol0prHlh
-	l9BhNqoe1aQo744z+IL6ANhFpR/c5bC7RDgYvCjTxjBtTLRF+T0JAxsYdhyyI4I5N15OH0
-	NOcr9UA3S3dDk/e2JAL0MSkviC5MrJ4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-184-PgCCozAkOmmbEL-LCQTfWQ-1; Wed, 30 Oct 2024 08:05:29 -0400
-X-MC-Unique: PgCCozAkOmmbEL-LCQTfWQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4314f023f55so48931075e9.2
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 05:05:29 -0700 (PDT)
+	 To:Cc:Content-Type; b=cGSRmJh32HMMEqSqAxppYCZnY0AVywFF5gTPx0hDvzUfjevwlW77xm95ie9QoNY52r3KcFIU2a24S5b54jJCA8nRGpBk2XkDjGwcoIeYjNey81rJr5JeziXDlrY/KlDKHBi9Kg9ZFGtFixJNqf3ZTFx48SYO6HMhHztHDDVMP20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UJ/DT42h; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e3010478e6so5049086a91.1
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 05:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730290103; x=1730894903; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F/lzjFgjfESGuYlc9gXA+bSUCcZpVzEfbftBhWs1qkw=;
+        b=UJ/DT42hmkTxNjeG4GjvsxfbGlODNNvs3zF4GMBqbDQ2c+hc7/Fz0Xqo3OEeyXsnwC
+         Q9Y0xGCuu8C9Gw35B4lyPIhjXjTbdbSizjcJu4du5H4xBIdKtLvWNa3HJMT7QflXNQ1F
+         9BHUVda1QSe1LjkJHcEdle/jlRgEw1G+X2KjBNk0UGW7ruU3BudMmHwB8LwVVHA4PaHe
+         EhXjCj3OrErCR0LgVIcYNYqLDC/jWExn2HUIIlqzmbxCkpi0WmSjFXNBHyGcm+tDiC2X
+         vJRFgH6HgbTqMUFw0juglJ90Hreb3pkDrapNQtqw3Kp1+0zTDNMo2+qogNtLzD5K+PPD
+         /BoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730289928; x=1730894728;
+        d=1e100.net; s=20230601; t=1730290103; x=1730894903;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zN9Omir7RGktU56FM49D9j8ooMAVlCcEhdMTzZ3iJDM=;
-        b=OZQwfXgrbCELkwv1kcYh7aw57iQFL2xWFnbk4fCrac+Ehg6qAdcL63LCvF0NF2C6u+
-         YWNHF1A0hMtnQAtufALEvuhnPrYGBghh5DcimtesS1NsoNAIbKTAR1MdZWiXPF0pmSqO
-         Ap6fQZOEpUwhquKyUdJ6siZNAp2SMED9VeDaQaE6/2BcJf52iGfYGL7lTNhYEZYkidMa
-         awOkPrhNotEWGziUOSEJvGwCDM0mW+bMk7OrkOhVLcSne46lxuDcrGr99M1OPS2xk88Q
-         eenKNqKdd4VHZy1SCI0PPCgGi8NCIRdsfM251l/zE5fGoBG8aW3n8OkXOmO+7pSy6ll0
-         1NBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMdrcwVGa5Xl7heIVGodbDtihgPM48pNG7cFfJrcE7uAgeHq+6/sp1WHXfcWL7I0+6mAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVTfwuAjnCDHi6Ag19VW8VqJATf6+gsYKW6T0XP3gW91CZNvtp
-	5s7KFN7E+rY/uJi8X8ypbzT60AkMEY7SxYIJZ7JZRdqt9l+4qFRD6GVOF8Co2PZ/JxVhAVc4+LW
-	2hNLnEDuDG5hIO3j2xpitqJF6Kh8YQ1UF0vujJ7JKPCfkoYkC5IkAs7StVTcZSNkEO1grCbmIDZ
-	w9isHpUu4iFCYqoAfeCfJC2iHm
-X-Received: by 2002:a05:600c:4f03:b0:42c:ba83:3f0e with SMTP id 5b1f17b1804b1-4319ac7078dmr138182475e9.7.1730289928261;
-        Wed, 30 Oct 2024 05:05:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPOcTvI2OpHfBdeRHGM/CwVAnnPo4nT0ZvRaeeOvD/HvCljKuLnaVP9aPLTQINmXKlAk/UDwLwIy9SKX5EhrI=
-X-Received: by 2002:a05:600c:4f03:b0:42c:ba83:3f0e with SMTP id
- 5b1f17b1804b1-4319ac7078dmr138182275e9.7.1730289927895; Wed, 30 Oct 2024
- 05:05:27 -0700 (PDT)
+        bh=F/lzjFgjfESGuYlc9gXA+bSUCcZpVzEfbftBhWs1qkw=;
+        b=iA6wH+YeB1lhZ/P2n4hjZNmcJgbSLnP95DPxzrkIt6DjZSPacbZQGerW3S5gGKzTvu
+         tsVpNnlyILK9VHppNep7W3qTY+sA4HRVoRiKYpJ2fyRJpzoWITGYNDKz1cKIFoxSroOd
+         WldN2quXEDUSyQrpjm+fGJG+do9aKxTMnjj0zFF+H7EDJfbQcdqWRd+XYdTv9bF8cuvs
+         2ga6D/hZ2eT+dLo3svSkwxJjGFxvaqfizLSjHIMsO2tHRUDxX8G//vg/d+lOtVwMXC9X
+         0Qjg6gIL5mhQolUqNGz+ydyull4Cdb1ZXgfrnFtUqJmw+FQ98jhTDLFUyZt5wHneBNae
+         RvVg==
+X-Forwarded-Encrypted: i=1; AJvYcCU33fQNm1wJXrg6Rmd2dlF23PsS+y8SFTv6484bvHI3mBKa74BzCzlmnpsFJA6cs+8q+Bk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVJQ406KzNGOh9Im5vksTSWCYyA0BpdEenEMZngRxbW98FPEac
+	pTeqrfsT4o7qaFPRb4wYHmNGihxjl4rt878BWxaAW9sWoyB6OpROhUoogltGmv1/sImKlczMRfk
+	O+O1oslFBbOPPBtEZMx2IJd5geP0=
+X-Google-Smtp-Source: AGHT+IHuuQFjVhsOyU0HSbjnT3zjynT1gDoYPEjwk3+eA+T7ZltXxQ419VSEREz71mnMBiMoX+JbpG/Yjcpkeor3owc=
+X-Received: by 2002:a17:90a:a110:b0:2e2:ebbb:760c with SMTP id
+ 98e67ed59e1d1-2e8f105f412mr17749859a91.11.1730290103106; Wed, 30 Oct 2024
+ 05:08:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZyAnSAw34jwWicJl@slm.duckdns.org> <1998a069-50a0-46a2-8420-ebdce7725720@redhat.com>
- <ZyF858Ruj-jgdLLw@slm.duckdns.org>
-In-Reply-To: <ZyF858Ruj-jgdLLw@slm.duckdns.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 30 Oct 2024 13:05:16 +0100
-Message-ID: <CABgObfYR6e0XV94USugVOO5XcOfyctr1rAm+ZWJwfu9AHYPtiA@mail.gmail.com>
-Subject: Re: cgroup2 freezer and kvm_vm_worker_thread()
-To: Tejun Heo <tj@kernel.org>
-Cc: Luca Boccassi <bluca@debian.org>, Roman Gushchin <roman.gushchin@linux.dev>, kvm@vger.kernel.org, 
-	cgroups@vger.kernel.org, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	linux-kernel@vger.kernel.org
+References: <20241029031400.622854-1-alexyonghe@tencent.com>
+ <20241029031400.622854-2-alexyonghe@tencent.com> <ZyDz4S0dYsRcBrTn@google.com>
+In-Reply-To: <ZyDz4S0dYsRcBrTn@google.com>
+From: zhuangel570 <zhuangel570@gmail.com>
+Date: Wed, 30 Oct 2024 20:08:11 +0800
+Message-ID: <CANZk6aS_LcKY6XcCQHo1r6Rz4QC_TB_DxNXMdLQ6tyeJ9tM4nw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86: expand the LRU cache of previous CR3s
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com, junaids@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 30, 2024 at 1:25=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
-> > I'm not sure if the KVM worker thread should process signals.  We want =
-it
-> > to take the CPU time it uses from the guest, but otherwise it's not run=
-ning
-> > on behalf of userspace in the way that io_wq_worker() is.
+On Wed, Oct 30, 2024 at 3:44=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> I see, so io_wq_worker()'s handle signals only partially. It sets
-> PF_USER_WORKER which ignores fatal signals, so the only signals which tak=
+> KVM: x86/mmu:
+>
+> On Tue, Oct 29, 2024, Yong He wrote:
+> > From: Yong He <alexyonghe@tencent.com>
+> >
+> > Expand max number of LRU cache of previous CR3s, so that
+> > we could cache more entry when needed, such as KPTI is
+>
+> No "we".  Documentation/process/maintainer-kvm-x86.rst
+>
+> And I would argue this changelog is misleading.  I was expecting that the=
+ patch
+> would actually change the number of roots that KVM caches, whereas this s=
+imply
+> increases the capacity.  The changelog should also mention that the whole=
+ reason
+> for doing so is to allow for a module param.
+>
+> Something like:
+>
+>   KVM: x86/mmu: Expand max capacity of per-MMU CR3/PGD caches
+>
+>   Expand the maximum capacity of the "previous roots" cache in kvm_mmu so
+>   that a future patch can make the number of roots configurable via modul=
 e
-> effect are STOP/CONT (and friends) which is handled in do_signal_stop()
-> which is also where the cgroup2 freezer is implemented.
+>   param, without needing to dynamically allocate the array.
+>
+> That said, I hope we can avoid this entirely.  More in the next patch.
 
-What about SIGKILL? That's the one that I don't want to have for KVM
-workers, because they should only stop when the file descriptor is
-closed.
-
-(Replying to Luca: the kthreads are dropping some internal data
-structures that KVM had to "de-optimize" to deal with processor bugs.
-They allow the data structures to be rebuilt in the optimal way using
-large pages).
-
-> Given that the kthreads are tied to user processes, I think it'd be bette=
-r
-> to behave similarly to user tasks as possible in this regard if userspace
-> being able to stop/cont these kthreads are okay.
-
-Yes, I totally agree with you on that, I'm just not sure of the best
-way to do it.
-
-I will try keeping the kthread and adding allow_signal(SIGSTOP).  That
-should allow me to process the SIGSTOP via get_signal().
-
-Paolo
-
+Thanks for pointing out the problem, will fix in next version.
 
