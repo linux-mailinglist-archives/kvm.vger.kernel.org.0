@@ -1,272 +1,196 @@
-Return-Path: <kvm+bounces-30201-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112199B7EAE
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:40:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E807C9B7EE2
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346E41C215D0
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 15:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 173421C2119F
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 15:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B336D1B3F30;
-	Thu, 31 Oct 2024 15:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DEB132120;
+	Thu, 31 Oct 2024 15:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULJr67lf"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sjlZkiUe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2062.outbound.protection.outlook.com [40.107.100.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C860613342F;
-	Thu, 31 Oct 2024 15:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730389188; cv=none; b=Q2yEpoM/FsrBKj/h6JzMPXy8ur0LB4WiVdvZb0AswQQjKT6yR33fPOUpLkQT5izCtTm4LRCUPX4cmsb7CjuJ7+1t51ICl8Dy65wdi0R5P7B2JYJU7xHDrprpkBNe/CO4ZXMEQ7eyTDiLbfx6TTUu+TVd4R6VVJFNRkXa0OEWFsM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730389188; c=relaxed/simple;
-	bh=e71oB15xt8MmnWusRVcbVCxjQ6isEJHcrB9uA5JO/lc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YzG24kNMjH+nbgwtpMPhyQthX2CZQHRdf/OoLdowa6RWAbxKcHb4THxAVm4Rs1KwCxxrxgUqbt8Xf6fOmU6Lq2AhbPVsw8GJaE7wg/9dDd2Epw7REwVu3sHnYZ6buRjAc5whX2IlYZHrK0bsmzOsUyIshX92WAYSPv8Sd8P1jTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULJr67lf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D37EC4DDEF;
-	Thu, 31 Oct 2024 15:39:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730389188;
-	bh=e71oB15xt8MmnWusRVcbVCxjQ6isEJHcrB9uA5JO/lc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ULJr67lf+4KQuW7r9rwL1KDzGbwqfAOwmRBvRkKoF5RTN0gheHbDyKT2Pu/35w7b4
-	 5W6JIA5KGaiO/y/ZgVNQ1wZpH7ahk4rym+A9YNHjQinVWzt/1HlI6NI/DXdWoEzAC4
-	 7nHahXbe1dWWH7yxUNX7YQDiPGi1aQC1Mg1C5xYB1liy7Ad1MCUMnlhbUIiP+1QTy5
-	 L66yUwMWP8SkJ8VRO3NnnzWbzyTyI5rLpnzJ8lAEm4jLLmp2DVl1q982ezeajQGymB
-	 0PXinBfOeZlEDSlcZ6G/MIYtUpuv6vsOQ/ji6PhM7TSIVD07W4QpR5NN87X5HZKKYS
-	 TdnJpk0OBhJJw==
-From: Amit Shah <amit@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	linux-doc@vger.kernel.org
-Cc: amit.shah@amd.com,
-	thomas.lendacky@amd.com,
-	bp@alien8.de,
-	tglx@linutronix.de,
-	peterz@infradead.org,
-	jpoimboe@kernel.org,
-	pawan.kumar.gupta@linux.intel.com,
-	corbet@lwn.net,
-	mingo@redhat.com,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com,
-	sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com,
-	Babu.Moger@amd.com,
-	david.kaplan@amd.com
-Subject: [PATCH 2/2] x86: kvm: svm: add support for ERAPS and FLUSH_RAP_ON_VMRUN
-Date: Thu, 31 Oct 2024 16:39:25 +0100
-Message-ID: <20241031153925.36216-3-amit@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241031153925.36216-1-amit@kernel.org>
-References: <20241031153925.36216-1-amit@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8DE1A4F0C;
+	Thu, 31 Oct 2024 15:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730389524; cv=fail; b=ED+eRYw63lSwDaE+J9V+sYV5whOdob6puqXwJxkg+L1gWNehNzV5ayRBqL1zTcP7PbA983wRmgd1URvkD3OnW/DDHVhKCAo9zq9mJsuwN1MSJ74hdBi3mLN4xuc/X4/CjRtqAcdLTfXEKdXwNxf3O0zjd5vULFvTaZ800XbQe2E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730389524; c=relaxed/simple;
+	bh=jBMVZrYSyKlEElY1A1KJ8misrHcDGlWPHbNDvZW6934=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tF/rTmc5nAJRVRBVlb0Rxe8a1j+IjA2UoN+vp9AgNrn3CScEa3i7pMFCvx/MelUwza1zT/nuerzb5lstyBUPuG400buVF9CC6W9L+qEsDGUKOCE7BPlkEfTKAdHlJonT0uF+/5rs1InfiyB43FrGyn3FV/Z9moywbqJ2N9PpcaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sjlZkiUe; arc=fail smtp.client-ip=40.107.100.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZGIy3+bZt08QMeRH11cn8rr94gZ2+3J6ZyY5wCqNVwj7fpIZ3Q+Bj4T6Aw5pviDIcEjPuKXPzMCgRoyKekznUmsoSR1giG62wL7tEW2FzZBqCo/tx/VUNbFRorZ/GCxsHqv8O/NUP/kitZasd4Ykc5R1n4P7owoOCmt9oxoiNsItd4fGm62TF0cweJE+mFZqk56cX7UwbX8bwsSHMa/NeMQdHh6ztC/b+hRLvOnwcpgcBfFBuZ2vcNPK1qmeo40zjeloedxbWqv8v4NnzGvlS+T7XfSUfmWomCRAoQxDS/RSQ3+2FkGGvIr/FgZziht+sbX5daDgZKKMOF0php1d/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kuaH8HiwMBhqOk3r8DkMT8lp/nG3iBvGzqFlLv25Vs0=;
+ b=rvIMT55MLsV8VLzpCWPlVMygtx4s8wau2xj3WpNqRE93pZqFsY1ZPov4NuHkjr0PiPqnl6epLSwdSSynzOHEFILDhW7YwsKNUcF36tXnp7lJ2W2cDtc52Pwd7F/bvGAxHRTadv63bKaXcSDKIg5xoX+5wZK1YDCyOfUtZ6zBuHfgpSa5CGQEo6T36XnvrNl46cBSNvVZQLrAuyoKpHo84BnQmTp7bN+w+bEdVEAKITNWI5yPzu4mnMRqFBj8cUE2DVOfAvu4vWg9qOmV73ZXRwTvR3A34G87IxkK6qqEIcPnkZ+aifVvTSh/s6LiEwNI0cSB+YIAE7chz0v/aphWlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kuaH8HiwMBhqOk3r8DkMT8lp/nG3iBvGzqFlLv25Vs0=;
+ b=sjlZkiUewzg2jLJNwY7MDByQ/iTSJn4iC9xumnN2OCWaAFH70flsBDMPrnNzEG11bH6EOyMUc+4PiFKxhbQ5Aw6L5tmqa5xcNYaxRJ02mFOQed9z/ittkxoVbil1q2pGt7lFxcFYyWe8pMbJvLNhBJxFC31BJ5oqPNOBb1XlUGU=
+Received: from MN2PR20CA0066.namprd20.prod.outlook.com (2603:10b6:208:235::35)
+ by DS0PR12MB8072.namprd12.prod.outlook.com (2603:10b6:8:dd::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20; Thu, 31 Oct
+ 2024 15:45:14 +0000
+Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
+ (2603:10b6:208:235:cafe::f4) by MN2PR20CA0066.outlook.office365.com
+ (2603:10b6:208:235::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20 via Frontend
+ Transport; Thu, 31 Oct 2024 15:45:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8137.0 via Frontend Transport; Thu, 31 Oct 2024 15:45:14 +0000
+Received: from [10.236.186.64] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 31 Oct
+ 2024 10:45:08 -0500
+Message-ID: <11787a92-66ed-41ef-9623-d6c7220fb861@amd.com>
+Date: Thu, 31 Oct 2024 10:45:08 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/9] KVM: selftests: Add a basic SNP smoke test
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <pgonda@google.com>,
+	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <shuah@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240905124107.6954-1-pratikrajesh.sampat@amd.com>
+ <20240905124107.6954-3-pratikrajesh.sampat@amd.com>
+ <Zw2fW2AJU-_Yi5U6@google.com> <4984cba7-427a-4065-9fcc-97b9f67163ed@amd.com>
+ <Zx_QJJ1iAYewvP-k@google.com> <71f0fb41-d5a7-450b-ba47-ad6c39dce586@amd.com>
+ <ZyI4cRLsaTQ3FMk7@google.com> <de2a6758-a906-4dc0-b481-6ce73aba24b9@amd.com>
+ <ZyJzcOCPJstrumbE@google.com>
+Content-Language: en-US
+From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
+In-Reply-To: <ZyJzcOCPJstrumbE@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|DS0PR12MB8072:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d8c703b-1acc-4d65-42d0-08dcf9c302e2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bEhCNktSaE9YUExtYWZyQ3ZJVjRTb2gxYzNVOEpSVUpQSmc2dHNyRkIwOXd3?=
+ =?utf-8?B?MS9qZWs4U2FOOWc0RVozZXQxUkxQR2pnM0Qxa0tkb2dNRXAvV2sxOTMrdnkz?=
+ =?utf-8?B?VXdkVEFsU3hLTGlTZWw4c3ZsWmcwdE1oazlVa0gvUjVMWGFHdVB3TFIwN1Nj?=
+ =?utf-8?B?WjRyNkZKRFFPNGh4SGZxanBvK3RDM0dRTklranpwVExleTQ0QkE4WWttQnA5?=
+ =?utf-8?B?MnM2bFFxLzZ0dmN0dThtY3BYMkJtK3dKcnQ4QjNJN0FoSGJNK0dBaDY4RnBZ?=
+ =?utf-8?B?SjhSU1dOVUg4dFR5Yk51TnRkWmgvL01VYStVdUZ4L3JVYW42Q3pWcDEvSmNl?=
+ =?utf-8?B?TjVBY1g2d05HaURLOHB2d08rWkZTZ01VZG9lNlRuRFlXQXlCdnRJTkFqRldI?=
+ =?utf-8?B?ZFZzYkw4MEdod2tCZ1pSTm1GTEFJcFJBSmI1a3N4bVFqMlRhczZpYTV5R3Rj?=
+ =?utf-8?B?dXdWVkdSS0JBMTFPNC9EVnNlRitxVzRxWHJQd1laNXYvd0lPWjlmb3NYVExw?=
+ =?utf-8?B?bzVVTzloM3JmUHk3alBEbTJJSnh1MnJ2ZVc0WDVLWWtZMEFVYW5YUVBLOGVt?=
+ =?utf-8?B?cTJWeG5uT1hzV2NBU0hhTHUrUmF3eWFUNk1aR05ZeW8xbWYxbU54NUp0MGxX?=
+ =?utf-8?B?Qm9XR0VaZlE2aHhtR3A5ZlVPUkxORnEzakRwdVltNDNSc3BXaXdzSTZnSFo4?=
+ =?utf-8?B?MTJOT3JSdFFITlFGTVFTL3hwdUNJUHovM0VGZkpSM3RCRWZHb2FTL1FLcHkv?=
+ =?utf-8?B?enFBMWFvcERIeXRlSVNMUjIvMkt1Y2haZGRDaHVDZUVHeHRjTXhwSndMYVpm?=
+ =?utf-8?B?b3J1VVdJODVndklseitPWlRwQmJUR0JSWVVxdXlHbHRKZWd0YmtYcXRYd3lq?=
+ =?utf-8?B?S01OUDFIZlVlOWs4a1lwWTlUSnF2aFQzUFFOSmhFYlZjY1pIZko2cGJkQmFY?=
+ =?utf-8?B?WUdHQUJpVVhxZjBETHM5ZjB6NnA4aGdTdkZpY3hFbUxrQVlMcjVCTWtRdDZh?=
+ =?utf-8?B?bDl0b056QlhvOWl5cVNlWlRSYTA0QkhNSm15OWlGRE13S1NQR2MwL2h1SUkr?=
+ =?utf-8?B?VFB4cmZIcWNrWXNnZG9PalByVklhNkU2LzFaT3NaeTR0YlVYR2dzSUdWUDZB?=
+ =?utf-8?B?V3BpMFZHNTVqb054ZEQyS1FuT0dRUGZZa20rYzdVeUNnTW8vaGxnTzNtVnRj?=
+ =?utf-8?B?VmN2QkROemNSMVgrREdzSTl3Ni8yOWtxMFkxdmVCRzBmWmFqWm9Sai9ueHBr?=
+ =?utf-8?B?ZzMrYkhTaWV0cUNlNHV6OUpmdGdxZmZHZW4za1FneEkwMHR2d0hXWkU1WFVY?=
+ =?utf-8?B?ajhlVm40clI0cmxETWo4TTJiY0Z5a0k5eGVsQ3RBZWtoZFhYSHNmYjcyelVo?=
+ =?utf-8?B?MjN2RUFLZnVUY1NXbnUrSm1NREVNSDQzaWFrQ0NIOVdZclQ0eWRGVTVMVkhY?=
+ =?utf-8?B?NzA0RW42TDhiUm9ycjJUUy8xc2xoaU84Y0lGQ2diaDBLL25KUGZMWXEvVFlV?=
+ =?utf-8?B?Yi9pbU85ZkdHWVFsSVdSUUgvV0RFMHdSdFVITXVxejJ0Y1BxdlFqUFJDWDVv?=
+ =?utf-8?B?WGZlN29Vd3VLSXFab2wrclJ0ck5tOXRXRDJzd1VDRytGcUhIUXJhbHlBZDBN?=
+ =?utf-8?B?MW5pR0x1RlR5eCtiS3Z4My8vSWVUcFRmOUxaeWVpemQzUHd5NXpHV2FHQmdz?=
+ =?utf-8?B?SHB0cXpDc0tFbWhLZWU3K3UwTzFKQ3NZS0k5NWp3Z2lmTWRqUW9ybmtKZ1Zm?=
+ =?utf-8?B?SW1VYnhUVnhZc015SDRadE1VbHFkcUgrbG1Nc2hyaDRkMVJYYW5Od3l1T3pv?=
+ =?utf-8?Q?C2ymyHK8PsoBZTzf1k5sobsdYmSY3avVuSOY0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 15:45:14.0058
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d8c703b-1acc-4d65-42d0-08dcf9c302e2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B06B.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8072
 
-From: Amit Shah <amit.shah@amd.com>
+Hi Sean,
 
-AMD CPUs with the ERAPS feature (Turin+) have a larger RSB (aka RAP).
-While the new default RSB size is used on the host without any software
-modification necessary, the RSB usage for guests is limited to the older
-value (32 entries) for backwards compatibility.  With this patch, KVM
-enables guest mode to also use the default number of entries by setting
-the new ALLOW_LARGER_RAP bit in the VMCB.
+On 10/30/2024 12:57 PM, Sean Christopherson wrote:
+> On Wed, Oct 30, 2024, Pratik R. Sampat wrote:
+>> On 10/30/2024 8:46 AM, Sean Christopherson wrote:
+>>> +/* Minimum firmware version required for the SEV-SNP support */
+>>> +#define SNP_FW_REQ_VER_MAJOR   1
+>>> +#define SNP_FW_REQ_VER_MINOR   51
+>>>
+>>> Side topic, why are these hardcoded?  And where did they come from?  If they're
+>>> arbitrary KVM selftests values, make that super duper clear.
+>>
+>> Well, it's not entirely arbitrary. This was the version that SNP GA'd
+>> with first so that kind of became the minimum required version needed.
+>>
+>> I think the only place we've documented this is here -
+>> https://github.com/AMDESE/AMDSEV/tree/snp-latest?tab=readme-ov-file#upgrade-sev-firmware.
+>>
+>> Maybe, I can modify the comment above to say something like -
+>> Minimum general availability release firmware required for SEV-SNP support.
+> 
+> Hmm, so if AMD says SNP is only supported for firmware version >= 1.51, why on
+> earth is that not checked and enforced by the kernel?  Relying on userspace to
+> not crash the host (or worse) because of unsupported firmware is not a winning
+> strategy.
 
-The two cases for backward compatibility that need special handling are
-nested guests, and guests using shadow paging (or when NPT is disabled):
+We do check against the firmware level 1.51 while setting things up
+first (drivers/crypto/ccp/sev-dev.c:__sev_snp_init_locked()) and we bail
+out if it's otherwise. From the userspace, calls to KVM_SEV_INIT2 or any
+other corresponding SNP calls should fail cleanly without any adverse
+effects to the host.
 
-For nested guests: the ERAPS feature adds host/guest tagging to entries
-in the RSB, but does not distinguish between ASIDs.  On a nested exit,
-the L0 hypervisor instructs the microcode (via another new VMCB bit,
-FLUSH_RAP_ON_VMRUN) to flush the RSB on the next VMRUN to prevent RSB
-poisoning attacks from an L2 guest to an L1 guest.  With that in place,
-this feature can be exposed to guests.
+From the positive selftest perspective though, we want to make sure it's
+both supported and enabled, and skip the test if not.
+I believe we can tell if it's supported by the platform using the MSR -
+MSR_AMD64_SEV_SNP_ENABLED or the X86_FEATURE_SEV_SNP from the KVM
+capabilities. However, to determine if it's enabled from the kernel, I
+made this check here. Having said that, I do agree that there should
+probably be a better way to expose this support to the userspace.
 
-For shadow paging guests: do not expose this feature to guests; only
-expose if nested paging is enabled, to ensure context switches within
-guests trigger TLB flushes on the CPU -- thereby ensuring guest context
-switches flush guest RSB entries.  For shadow paging, the CPU's CR3 is
-not used for guest processes, and hence cannot benefit from this
-feature.
-
-Signed-off-by: Amit Shah <amit.shah@amd.com>
----
- arch/x86/include/asm/svm.h |  6 +++++-
- arch/x86/kvm/cpuid.c       | 15 ++++++++++++-
- arch/x86/kvm/svm/svm.c     | 44 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h     | 15 +++++++++++++
- 4 files changed, 78 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 2b59b9951c90..f8584a63c859 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -129,7 +129,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u64 tsc_offset;
- 	u32 asid;
- 	u8 tlb_ctl;
--	u8 reserved_2[3];
-+	u8 erap_ctl;
-+	u8 reserved_2[2];
- 	u32 int_ctl;
- 	u32 int_vector;
- 	u32 int_state;
-@@ -175,6 +176,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define TLB_CONTROL_FLUSH_ASID 3
- #define TLB_CONTROL_FLUSH_ASID_LOCAL 7
- 
-+#define ERAP_CONTROL_ALLOW_LARGER_RAP 0
-+#define ERAP_CONTROL_FLUSH_RAP 1
-+
- #define V_TPR_MASK 0x0f
- 
- #define V_IRQ_SHIFT 8
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 41786b834b16..2c2a60964a2e 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -797,6 +797,8 @@ void kvm_set_cpu_caps(void)
- 		F(WRMSR_XX_BASE_NS)
- 	);
- 
-+	if (tdp_enabled)
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_ERAPS);
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_IBPB_BRTYPE);
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
-@@ -1357,8 +1359,19 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
- 		break;
- 	case 0x80000021:
--		entry->ebx = entry->ecx = entry->edx = 0;
-+		unsigned int ebx_mask = 0;
-+
-+		entry->ecx = entry->edx = 0;
- 		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
-+
-+		/*
-+		 * Bits 23:16 in EBX indicate the size of the RSB.
-+		 * Expose the value in the hardware to the guest.
-+		 */
-+		if (kvm_cpu_cap_has(X86_FEATURE_ERAPS))
-+			ebx_mask |= GENMASK(23, 16);
-+
-+		entry->ebx &= ebx_mask;
- 		break;
- 	/* AMD Extended Performance Monitoring and Debug */
- 	case 0x80000022: {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 9df3e1e5ae81..ecd290ff38f8 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1360,6 +1360,28 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
- 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SPEC_CTRL, 1, 1);
- 
-+	/*
-+	 * If the hardware has a larger RSB, use it in the guest context as
-+	 * well.
-+	 *
-+	 * When running nested guests: the hardware tags host and guest RSB
-+	 * entries, but the entries are ASID agnostic.  Differentiating L1 and
-+	 * L2 guests isn't possible in hardware.  To prevent L2->L1 RSB
-+	 * poisoning attacks in this case, the L0 hypervisor must set
-+	 * FLUSH_RAP_ON_VMRUN in the L1's VMCB on a nested #VMEXIT to ensure
-+	 * the next VMRUN flushes the RSB.
-+	 *
-+	 * For shadow paging / NPT disabled case: the CPU's CR3 does not
-+	 * contain the CR3 of the running guest process, and hence intra-guest
-+	 * context switches will not cause a hardware TLB flush, which in turn
-+	 * does not result in a guest RSB flush that the ERAPS feature
-+	 * provides.  Do not expose ERAPS or the larger RSB to the guest in
-+	 * this case, so the guest continues implementing software mitigations
-+	 * as well as only sees 32 entries for the RSB.
-+	 */
-+	if (boot_cpu_has(X86_FEATURE_ERAPS) && npt_enabled)
-+		vmcb_set_larger_rap(svm->vmcb);
-+
- 	if (kvm_vcpu_apicv_active(vcpu))
- 		avic_init_vmcb(svm, vmcb);
- 
-@@ -3393,6 +3415,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
- 	pr_err("%-20s%016llx\n", "tsc_offset:", control->tsc_offset);
- 	pr_err("%-20s%d\n", "asid:", control->asid);
- 	pr_err("%-20s%d\n", "tlb_ctl:", control->tlb_ctl);
-+	pr_err("%-20s%d\n", "erap_ctl:", control->erap_ctl);
- 	pr_err("%-20s%08x\n", "int_ctl:", control->int_ctl);
- 	pr_err("%-20s%08x\n", "int_vector:", control->int_vector);
- 	pr_err("%-20s%08x\n", "int_state:", control->int_state);
-@@ -3559,6 +3582,27 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 
- 		trace_kvm_nested_vmexit(vcpu, KVM_ISA_SVM);
- 
-+		if (boot_cpu_has(X86_FEATURE_ERAPS)
-+		    && vmcb_is_larger_rap(svm->vmcb01.ptr)) {
-+			/*
-+			 * XXX a few further optimizations can be made:
-+			 *
-+			 * 1. In pre_svm_run() we can reset this bit when a hw
-+			 * TLB flush has happened - any context switch on a
-+			 * CPU (which causes a TLB flush) auto-flushes the RSB
-+			 * - eg when this vCPU is scheduled on a different
-+			 * pCPU.
-+			 *
-+			 * 2. This is also not needed in the case where the
-+			 * vCPU is being scheduled on the same pCPU, but there
-+			 * was a context switch between the #VMEXIT and VMRUN.
-+			 *
-+			 * 3. If the guest returns to L2 again after this
-+			 * #VMEXIT, there's no need to flush the RSB.
-+			 */
-+			vmcb_set_flush_rap(svm->vmcb01.ptr);
-+		}
-+
- 		vmexit = nested_svm_exit_special(svm);
- 
- 		if (vmexit == NESTED_EXIT_CONTINUE)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 43fa6a16eb19..8a7877f46dc5 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -500,6 +500,21 @@ static inline bool svm_is_intercept(struct vcpu_svm *svm, int bit)
- 	return vmcb_is_intercept(&svm->vmcb->control, bit);
- }
- 
-+static inline void vmcb_set_flush_rap(struct vmcb *vmcb)
-+{
-+	__set_bit(ERAP_CONTROL_FLUSH_RAP, (unsigned long *)&vmcb->control.erap_ctl);
-+}
-+
-+static inline void vmcb_set_larger_rap(struct vmcb *vmcb)
-+{
-+	__set_bit(ERAP_CONTROL_ALLOW_LARGER_RAP, (unsigned long *)&vmcb->control.erap_ctl);
-+}
-+
-+static inline bool vmcb_is_larger_rap(struct vmcb *vmcb)
-+{
-+	return test_bit(ERAP_CONTROL_ALLOW_LARGER_RAP, (unsigned long *)&vmcb->control.erap_ctl);
-+}
-+
- static inline bool nested_vgif_enabled(struct vcpu_svm *svm)
- {
- 	return guest_can_use(&svm->vcpu, X86_FEATURE_VGIF) &&
--- 
-2.47.0
-
+Thanks
+Pratik
 
