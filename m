@@ -1,340 +1,205 @@
-Return-Path: <kvm+bounces-30163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90AFE9B77CE
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:46:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDDF9B77E9
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 215521F233EC
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 09:46:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DD272866DD
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 09:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26993197A81;
-	Thu, 31 Oct 2024 09:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B9A198E83;
+	Thu, 31 Oct 2024 09:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="U3M6WM4w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y77Iweku"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2057.outbound.protection.outlook.com [40.107.223.57])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58DB14B092;
-	Thu, 31 Oct 2024 09:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730368000; cv=fail; b=AoS+AoANnrOX8zR7ffSPEqhRGUJr9lmIJynYcSDUMrxIxROEvoqpP3SFdLC/d3M6yKCHYvliFmwKRJj440XyAYTGeQO+Ht6wITdTPzUTbMRZyNpncAAX2xtV4/5+osE2uF28Psbq1t251ERmUWPz3vht7nSj3hS0U0/rp/dwJz0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730368000; c=relaxed/simple;
-	bh=X9f4zp5/EzzUVSSeCvcyKX8PAKk2QfzFtlBUqXEq/Wg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=KSEjoLamAA8uFDlvBM1JlK1OTwfbe1DCPa5Uke1UXKWQLpno9GHZI4TyA1pprh5zO0le7DL/doxdwO1VQZjOW/MzOIMInvLWiJZbG32Jzvp0fv4aD+bEvWxx/Wgbvdu352sCpcnseJt7Xm7VH8qkKlHP72sysqUgm1ofQtKMaO4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=U3M6WM4w; arc=fail smtp.client-ip=40.107.223.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YYly4d4D5t+xXJ9PFeCnq3FfQB/Ddx+RAnTO/P07zRjj0hSorLoYRm6+XzRobiZW3s9a/b1FQehnRbSV8a91WsFvl0A3/QFPv5Fj+4z5BP5lGpVKI4mB0z+6nd1NLfcA5Nbr/cbG7TWUmmS+RZASik7acG9q4Ux1Z0LpkSw3NjDBp8YJX2wCTLTkYarOFZHZjicOFJU5ejRbuK9nTLkUmAQxUAM/zYk5zJcP71tedgmUs9/DfXdXF6VqhXYTE8h5hfUuGxka1BGQdTLCBwfSlG5LxvRYCG5Vn4EizywUiMVVM6DwvPUOxLQqe+2FkkmutGejtzMe2V0BKm/B6CvQ6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9X7lddVfzX8W+m9ZAnIzLt9shx/Jl2UpvlkzMf265Bg=;
- b=wwUdqs2DB9FMaVXcCtHD9IodWzMMZmsP4yA0EBkMyOPXU6hyc/l+grvVzjo2mt3OPu+4gTTYo1lYfF+0EbTDU6GOc1y21RkXt84ld2LQATaTsjEFCQFcbS9DF6roC0DbCliuDVgEmJYth4RpuEN+Jj5fHzmzHadeLwQQXzyZtTsN/4RFUSMH5HWUiZEsyBaeO3H2M47IJaIl5hlkvv0BAqj4n3V2Q/tQ6CtaLvIk9Uy11n6zdj+PW4VyfR2alnowaF9AHy4MQdSkH1RPjpdNJ0qR116WBbKUr9KkhSRftAkaaQ2K44lhR4g2ZMPozmrsnsvxZ3emYWAJ+Bpsa5W5gQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9X7lddVfzX8W+m9ZAnIzLt9shx/Jl2UpvlkzMf265Bg=;
- b=U3M6WM4wGTvYMUBcC1hzPYmiG0Covf20zuWhrnTiIBLV2yczIFcB5fGEz7lrPVUjpVjERP52HLkZz2Lwkze/w3KBIZ6yxInCoLvGoPy5gEe+5mfw6U4/CiZ+NTa31MYkH/eg2VCiz2aINRAkYLUdjoloCUAXI5HYJzfTHyodraM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- CH3PR12MB8935.namprd12.prod.outlook.com (2603:10b6:610:169::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.28; Thu, 31 Oct
- 2024 09:46:35 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::a544:caf8:b505:5db6]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::a544:caf8:b505:5db6%4]) with mapi id 15.20.8114.015; Thu, 31 Oct 2024
- 09:46:35 +0000
-Message-ID: <682cefa6-9a74-4b8b-97e2-38a1c58c6e72@amd.com>
-Date: Thu, 31 Oct 2024 16:46:32 +0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: SVM: Increase X2AVIC limit to 4096 vcpus
-Content-Language: en-US
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, rkrcmar@redhat.com,
- jon.grimm@amd.com, santosh.shukla@amd.com
-References: <20241008171156.11972-1-suravee.suthikulpanit@amd.com>
-From: "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20241008171156.11972-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR02CA0024.apcprd02.prod.outlook.com
- (2603:1096:4:195::18) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3724881E
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 09:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730368223; cv=none; b=DRxnsNRlMjrJ5yXBKrXrdOfztCamO10f9OybBVyw+K9F/Fu6OG+lWJosXIcvWybNA69jWZU3W74wQcq2IRs68gEqoaeV7phGaJno4kDfgxc93s/E8A/sq/jfofAu9OSPrRMnbSxxZKBAFT5jZ+aJAfDBZiC6jXribYoAO0mJPlQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730368223; c=relaxed/simple;
+	bh=JeqHqYTQbXzcOkcj5SKrTxHQTcinplbKbGCznH/JgL4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GOV3b5VCnvihCbIM5HkqmLR8Jxlv8VL3cw6eL3gu9MSze9EoUSjHro3aU0fBRfrcy110D1R9pWafj9rB3HTj/OTPjM6GkQmgv308RLqynzAXhZ8Edil0C2TAu9fHeURh51yQY+vgcePKgda6yi/CFV8MNmrYR8K5U+FyRrp+r+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y77Iweku; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730368219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=8dIcxwobV6BNAuIuaE7aLzJugH838eIdiZ2hVMt1ILQ=;
+	b=Y77IwekubosuHnlyBYhV8pIE+nkrQSYf7GLTtGHGaPdxTf6HWE4vWGr3EBr+JKjg+l+BFJ
+	FlUTwV69p2I0qqEdByCvv8QGz6aYp7/o8Ualfbz+pCY30XSqHI1hI+BHfgcBS9d5j6+Jh9
+	HCycZPf2YlzaIEerJJvvIVycLIk/vaA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-8mz--kWCPWC1oJOkuXGGFA-1; Thu, 31 Oct 2024 05:50:17 -0400
+X-MC-Unique: 8mz--kWCPWC1oJOkuXGGFA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d47fdbbd6so393281f8f.3
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 02:50:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730368215; x=1730973015;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8dIcxwobV6BNAuIuaE7aLzJugH838eIdiZ2hVMt1ILQ=;
+        b=l1OeSe7hWR5Py0cx1OP7TG7ym4LXw3/jIiaacCU1mYV1bkiDB6KJdsuSciepRPHwfz
+         pnfVzFWcIPIt5q9XsQ9FmP5S7jTonFlC8DqSER4JrfNxLRkv37COwy1vETGyqPbnGHSp
+         cRx2VntaGIbAj2NFpD4d5x9FIHFI5GhqBf8EG8cPakLbmD8+2YUAx/3bqoCpkxl5nVEE
+         zTe4GCn1SmyiYnWELDmAjlaZCp9/1UAwMc9yTEm9OJo9phry1Yclb0yVeJi+w2bJR+pa
+         V7cNCrDwFjmuN/ml5eZ2v9JZ6a5T0/IKnIRzjnwUhlEI6/hgHl9IoohbnvcXgiiw3CFA
+         e0QA==
+X-Forwarded-Encrypted: i=1; AJvYcCVckdkvdFwYtnUCjp9Ln3mNjoG25dLfysP2MzGVm0mnfl1gRxsJwNUfCQ82LttJU4fzg/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4bET1Pf/q756MH3IqV9Kn89KfRO43pi+qZeyKrf9x5QHXI82m
+	i35j7eqG1dX/GoL40B8xuKJakJU2YcM4idFxq+59RCgaPVUSRaKC2ykIX6q4OjE5m1JvRkWpStI
+	084ZCiYAwGv5IBmaL5LfCUaCGVCHGkl7TS4NQHVt9phg/Ut2Iww==
+X-Received: by 2002:a05:6000:1866:b0:37d:33a3:de14 with SMTP id ffacd0b85a97d-381be7adfdemr2447474f8f.7.1730368214940;
+        Thu, 31 Oct 2024 02:50:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFeVaRdVGCqBIKY+7Vfj4lrlXB4BTEaQ/Q5YZsm5NFKJxn9YuGzq2b6/rrf6LYaZ8QcgqCaug==
+X-Received: by 2002:a05:6000:1866:b0:37d:33a3:de14 with SMTP id ffacd0b85a97d-381be7adfdemr2447426f8f.7.1730368214468;
+        Thu, 31 Oct 2024 02:50:14 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70a:ed00:7ddf:1ea9:4f7a:91fe? (p200300cbc70aed007ddf1ea94f7a91fe.dip0.t-ipconnect.de. [2003:cb:c70a:ed00:7ddf:1ea9:4f7a:91fe])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d49d4sm1605679f8f.34.2024.10.31.02.50.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 02:50:13 -0700 (PDT)
+Message-ID: <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
+Date: Thu, 31 Oct 2024 10:50:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|CH3PR12MB8935:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46eb099f-702c-4ad9-1857-08dcf990e84c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Qk1ORlYrYUYyQytGMlM0bGVYcS8zZDNNQ2o3R3Y0NkI4bC9KY3lnUXp5eFJ2?=
- =?utf-8?B?RkVGcmtOOU1DVjMxVUY0THV3dml1NzlaTWdnTEIvNXlnNFNpTTRlLzY4YVNL?=
- =?utf-8?B?V1B5TnBxUVdUc2gxREdxZVl1RHZ1UEtxNUxzQjUvN3pUNnFQS1Y2NEFtcmtV?=
- =?utf-8?B?OWZITk96MTBSWno4RlNmMkpVMzVXVkpHSWdsR3VYSkQ1ZS9PT2J2RnN2RmJG?=
- =?utf-8?B?N1ZkQkVqRURTcUcxczFpN013Z0UxbmZaZVZhZmRRV1RJZ0JOdmtWcXJOTGZL?=
- =?utf-8?B?MFN2L2lYRElNZkZEZUI1RDFSN0RYcCtQREVWTTA4UHExYW9ybHY4MWpzaUtC?=
- =?utf-8?B?aVdnMUhkRlIrcHZZdk42Ly8wVTZmVUFXYVlheHoxbURsUmlGYXRmUnNyN3ps?=
- =?utf-8?B?UVp6R0pkcFBmUXVYeHV6R042NGY0ajUxZFo2M21LeFBoMU43OU5BeU5BMDRO?=
- =?utf-8?B?dHJuRHlkakRmVit2MklYalNvNTl1ZE5zS3YvdUkvZzh5Tkxsc29XdnFJYnlp?=
- =?utf-8?B?Wno5MnU3WUtibFd1WW1lc2RwVk0wRU1ZbFpxbnpaUTg3Tnc0MFJjdGtsd2NO?=
- =?utf-8?B?czdwTGU2ODE0OGIwSXduWVJYZlR0Y0k3Nm04eUE2UlE2K1BSaFFiWXZvdk1L?=
- =?utf-8?B?ZG1SbVdtWVRDQlBrZ0lpcE1zNHNOS0E4c3U0RFlybzVSeXZydnNwdGpvTUho?=
- =?utf-8?B?b2VhTXdEeVZiQnpSdEFrTjEzNFJnOUxLaE5aeFAyUnVnSjE3aTZ3dUlOaTNM?=
- =?utf-8?B?RC84aHV1NFBYN0sveGJEV2paMWMvM3oyeU1va0pueENVR0t1KzdrOWoxUFZq?=
- =?utf-8?B?YVBMZ2ZiakdnOUtBclpybGFiQks5MWZsZ0o0WEcrUGJlK201Tys1K2U5RUlD?=
- =?utf-8?B?UjFDU0tTMmpsV2phYnI3eitVZS9GR0ZZbkZRaERQcXRsRWFhcWU4NHhxeEd6?=
- =?utf-8?B?SmlzY01uaUx2MS9oL3BJd09NRzhrOHdEeW9ocCtIZTllUnVBeU91QW1HZ1Ft?=
- =?utf-8?B?UWxEYnFEcnRQT2EzOXJLMUJpdGpFYUp4ZSs1M2tZeDBoSkt6bE0wa3VVV3U0?=
- =?utf-8?B?MmlSRWtkaFlEdUxVTmdRY0w1YTJKckNDd1pQem9lQk9GNXhuaVZrRHE3SzZ4?=
- =?utf-8?B?MHdDVTJvK3lNRkhnNjZFZmpFRXVMZFhkbjYrWG1lekloQkY4YkVmY3RrVjJT?=
- =?utf-8?B?MDVMZWlDd2NwMUNXc0ppakM4a3VUcVN2WDI5b2RhdlVhZUdXMkVHMVBWaFNE?=
- =?utf-8?B?cVRrZ1VyencxREZvelRCbjRicjRuNzNkaU41ck5LdkZLQnVOVC9zMW52Z0l1?=
- =?utf-8?B?amZKeGFhRFVIY0R4KzRlTFRITWNsOENsaEVoM1JZV0xkY3ZHaVhSQ0dIRnpJ?=
- =?utf-8?B?cU0wNnVlZXB5ejQ4K3Y4ZDE3eTlhSEptZlJ1STZSTFRqUjNoQllYNVhtZ05o?=
- =?utf-8?B?bFkrU0dnVmlIOGsvT2VkRTdqZTZncUswNEVNMnZDNTF0WkJHRnpBaVl2ZTZk?=
- =?utf-8?B?c2s2WEQ1WDUrY3o3UUFGbGtoNVc4U0lUWUoreHFIZXh1QXdzaUdjallpblpF?=
- =?utf-8?B?Y3dlWEdiYk9pdHVSNFdXSjRwUEZ0MFR0ajExdEhnZ2w2U3huRXplZjIvRWNt?=
- =?utf-8?B?enFsd3g1WlkyNGNrZWN2SEt4ZkU4WlFEbzdpYklhajlaODVmMVV1ZVI4anJx?=
- =?utf-8?B?QUN0QllzaDRGYTNqdS9MeC9rM0hrd3V3STBLYlZFOWFlRE44ZHVYcVcyQUJH?=
- =?utf-8?Q?s5Ygm9QsoqdRtji7ng=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VGRhR0ppU0lGZzQwUk9BbmNyTU1aTTVGVnMwTFFGd1dTTXAvbDE1dGdYeG13?=
- =?utf-8?B?WG9ybmdpL3dtK3ljSG5ha0tuUzFNRUVRMlp2L3BmMDN6TENKRTlGQnV4aUdn?=
- =?utf-8?B?YXE0ZDF2K1UydzZDMEhGcVJBek5OcFB3a2kvN1BFMmRsVjR5YURBUmtlNkNC?=
- =?utf-8?B?cHZyMzhieUFFUmc0Z0p6RG55SjdFT1R5T3pzaURyQmttemJnL0N4VkdLVG9Y?=
- =?utf-8?B?M2NFdzJaUWNPZUh1bUdWQkdvODRuQUFPWVUzNC9uSk1kU0ppbk9ubTZwVU1l?=
- =?utf-8?B?MVVRaHZJZFpWL1hRcEdlVmZzb01XR0ZJMVVsYy9uanJJaHVJWDFPRlhtSlE2?=
- =?utf-8?B?aUtQVWpuTFdBZlIxYjJ0ZnZnYjIyZTV3VHh2SC9tblJyaXpYaHNtakxwcy9s?=
- =?utf-8?B?bFVXMlRVN3lCYnZNQnBCQWlzRkpsY1BuNjB0L3p0K2lSV0oyUGdRaXEzZ2RW?=
- =?utf-8?B?QWlpSEN2WmNrQkxGNVVlemlFajVFYUtFeUF1SjdYaENBZGdaTFpva2J1ZEJa?=
- =?utf-8?B?ckpIZU5XRFRqWkYzMXRvd1BVNGlkSllicWNhZWFLb0VkcGxRRVJ2dzRMK1A4?=
- =?utf-8?B?aWdhS2pQa0YyYWx5c1owbVN1YkhhenQwSGlzMzN5endnamJQY0FwYmgyMnM4?=
- =?utf-8?B?UFgwZGFsdzFYRjNsSTZIdklKa09ScU9GQ0sraE1ROWFwUkVGaHcydEZxMDFn?=
- =?utf-8?B?ZnlEMDBZa3gzRVMzd25USHZZYUdpRE02NFpuRnh4cXBObXhWVFJ1ZFR6cVE1?=
- =?utf-8?B?RitQTndxeHFnRVBCUWdIVURDNjMrT2J1dWhMM09xcGoxeEVOdk02ZndRcUx0?=
- =?utf-8?B?WkZ5KzRzazg0NktMZEhUejZRMVdDcytIb2dKODBXZmpTZy9BMHhXWm1JaHZ2?=
- =?utf-8?B?VlhpY1BOUG9UenVONkx0UzA4aE9pU2M1MWdEUGIwdGhVdlhPMkZDbmJXSTB0?=
- =?utf-8?B?YXZqTE9YSERhS3Z6S2JDWDAvM1VGVmZKbU84Wk5zVjc2Ujg3Wk9FNXgyVTJF?=
- =?utf-8?B?M291TFg5cWNDS0lWdGwrNGdoYjkySmtia2gvUUpIZzFTanNHSkFlVXJXaHNZ?=
- =?utf-8?B?SzZGaFdad01lMTdwUk1Qcy8wRTRqWkRreEpndEpoTGZURXRGNXdSZmY4Tzd6?=
- =?utf-8?B?WDcrOVE1MjVFOFNRanR4RDRKY1BsS0Z4RXNjS2cyRmNVWWhobmdqQUNIeGhL?=
- =?utf-8?B?dmxpdFdkak0xME51VlhqUmxITGwwajVHeWRHUWFCL3A5Y1lOakVqdFJaTy9T?=
- =?utf-8?B?WkRtV3pEOVBuRjRlc2lZVmZQSHVuK1gzWkIvUkRYdTN6ZUw2dHVPamtoSkJz?=
- =?utf-8?B?THZjNkxxQnM5cGl4S0N4L1ZTdnBpVk9vcFdQY1ZWVkE4NXlSWThlajFoU1Rq?=
- =?utf-8?B?enUyZWM4czJKcTFXSGV2Rkh6U3ltR2RlTXk4K0hTalh3dFhtZHUyWm13OGVa?=
- =?utf-8?B?TlVFQ3JUL0UzbHp4SDV6akhnbklyWHRkc1lkRUFsUWJMY2IrUXE2ZUtBQTF4?=
- =?utf-8?B?a2o2NG1NN1BnNGJSUFpaUjlaejExcU4vSi92Vmo2c0hURVBUQitzdFZwVy9p?=
- =?utf-8?B?ZmVqNlFXSmZEck5PVFZNRXlIQ2tNNEJQR1dFVC85WHVwekNtZWh0bXBQVmJt?=
- =?utf-8?B?VXZwQ1hTQ1ArcGZ5clorMmYzS2dCWGNxY0RwY0ZSMmZsZXNmaFFwZUMxcjJr?=
- =?utf-8?B?U1R1dG1aVHU5Zzg5eTJ3MXVBbk9Qd0lwU3U4VW1KVDNUZytMclE0VVRMdFBj?=
- =?utf-8?B?U2R2SndZemFINFQzTzhZdUFtb1ptZXFYV0FwNWE0MHFZM05vSzlNY2tQYU12?=
- =?utf-8?B?SGlZTXpyYWY0OE9tZ21YU3FrakZBV1o0WHhpdUhLdkdnOCtCbFdidWJKM3Q1?=
- =?utf-8?B?YlU4N1lyWExKY09xVjQxVm5Pc0pzYm1peWpyNmtxa2d0T1FaYXE0QXJKbExs?=
- =?utf-8?B?NDFMZnhVcjV3eGwvNkFnWFdZNzRud2xIMXdwcGhOVFgzbGhDWDNxd2NpSUV2?=
- =?utf-8?B?U0FidUFHRHYwOTRKZ3hPVit0ZVRYcjM5UlRDQnd6U2xvZStDMzJXbGpFOExa?=
- =?utf-8?B?VzJrRVBZTm1JVSs3UGt1OGhMR3BhU2pieEYwM1NlVTMwUHowcmZRTGpoNzE1?=
- =?utf-8?Q?JkB5RIPAmt1NZEdVLtkkmx0tQ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46eb099f-702c-4ad9-1857-08dcf990e84c
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 09:46:35.1288
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3WDTv0NfF+xj5Kkjb2sdE7ifwLT6/oiN6QY6Kxq6/jBBR16d1/JGV2QdR1UTsJs3LYnNqvVl1O5NbvXCwR6GuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8935
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
+To: Patrick Roy <roypat@amazon.co.uk>, tabba@google.com,
+ quic_eberman@quicinc.com, seanjc@google.com, pbonzini@redhat.com,
+ jthoughton@google.com, ackerleytng@google.com, vannapurve@google.com,
+ rppt@kernel.org
+Cc: graf@amazon.com, jgowans@amazon.com, derekmn@amazon.com,
+ kalyazin@amazon.com, xmarcalx@amazon.com, linux-mm@kvack.org,
+ corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
+ chenhuacai@kernel.org, kernel@xen0n.name, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, luto@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, shuah@kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241030134912.515725-1-roypat@amazon.co.uk>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20241030134912.515725-1-roypat@amazon.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi All,
-
-Any concerns for this patch?
-
-Thanks,
-Suravee
-
-On 10/9/2024 12:11 AM, Suravee Suthikulpanit wrote:
-> Newer AMD platforms enhance x2AVIC feature to support up to 4096 vcpus.
-> This capatility is detected via CPUID_Fn8000000A_ECX[x2AVIC_EXT].
+On 30.10.24 14:49, Patrick Roy wrote:
+> Unmapping virtual machine guest memory from the host kernel's direct map
+> is a successful mitigation against Spectre-style transient execution
+> issues: If the kernel page tables do not contain entries pointing to
+> guest memory, then any attempted speculative read through the direct map
+> will necessarily be blocked by the MMU before any observable
+> microarchitectural side-effects happen. This means that Spectre-gadgets
+> and similar cannot be used to target virtual machine memory. Roughly 60%
+> of speculative execution issues fall into this category [1, Table 1].
 > 
-> Modify the SVM driver to check the capability. If detected, extend bitmask
-> for guest max physical APIC ID to 0xFFF, increase maximum vcpu index to
-> 4095, and increase the size of the Phyical APIC ID table from 4K to 32K in
-> order to accommodate up to 4096 entries.
+> This patch series extends guest_memfd with the ability to remove its
+> memory from the host kernel's direct map, to be able to attain the above
+> protection for KVM guests running inside guest_memfd.
 > 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->   arch/x86/include/asm/svm.h |  4 ++++
->   arch/x86/kvm/svm/avic.c    | 42 ++++++++++++++++++++++++++------------
->   2 files changed, 33 insertions(+), 13 deletions(-)
+> === Changes to v2 ===
 > 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 2b59b9951c90..2e9728cec242 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -268,6 +268,7 @@ enum avic_ipi_failure_cause {
->   };
->   
->   #define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(8, 0)
-> +#define AVIC_PHYSICAL_MAX_INDEX_4K_MASK	GENMASK_ULL(11, 0)
->   
->   /*
->    * For AVIC, the max index allowed for physical APIC ID table is 0xfe (254), as
-> @@ -277,11 +278,14 @@ enum avic_ipi_failure_cause {
->   
->   /*
->    * For x2AVIC, the max index allowed for physical APIC ID table is 0x1ff (511).
-> + * For extended x2AVIC, the max index allowed for physical APIC ID table is 0xfff (4095).
->    */
->   #define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
-> +#define X2AVIC_MAX_PHYSICAL_ID_4K	0xFFFUL
->   
->   static_assert((AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == AVIC_MAX_PHYSICAL_ID);
->   static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_MAX_PHYSICAL_ID);
-> +static_assert((X2AVIC_MAX_PHYSICAL_ID_4K & AVIC_PHYSICAL_MAX_INDEX_4K_MASK) == X2AVIC_MAX_PHYSICAL_ID_4K);
->   
->   #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
->   
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 4b74ea91f4e6..fe09e35dad42 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -38,9 +38,9 @@
->    * size of the GATag is defined by hardware (32 bits), but is an opaque value
->    * as far as hardware is concerned.
->    */
-> -#define AVIC_VCPU_ID_MASK		AVIC_PHYSICAL_MAX_INDEX_MASK
-> +#define AVIC_VCPU_ID_MASK		AVIC_PHYSICAL_MAX_INDEX_4K_MASK
->   
-> -#define AVIC_VM_ID_SHIFT		HWEIGHT32(AVIC_PHYSICAL_MAX_INDEX_MASK)
-> +#define AVIC_VM_ID_SHIFT		HWEIGHT32(AVIC_PHYSICAL_MAX_INDEX_4K_MASK)
->   #define AVIC_VM_ID_MASK			(GENMASK(31, AVIC_VM_ID_SHIFT) >> AVIC_VM_ID_SHIFT)
->   
->   #define AVIC_GATAG_TO_VMID(x)		((x >> AVIC_VM_ID_SHIFT) & AVIC_VM_ID_MASK)
-> @@ -73,6 +73,9 @@ static u32 next_vm_id = 0;
->   static bool next_vm_id_wrapped = 0;
->   static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
->   bool x2avic_enabled;
-> +static bool x2avic_4k_vcpu_supported;
-> +static u64 x2avic_max_physical_id;
-> +static u64 avic_physical_max_index_mask;
->   
->   /*
->    * This is a wrapper of struct amd_iommu_ir_data.
-> @@ -87,7 +90,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
->   	struct vmcb *vmcb = svm->vmcb01.ptr;
->   
->   	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> -	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-> +	vmcb->control.avic_physical_id &= ~avic_physical_max_index_mask;
->   
->   	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
->   
-> @@ -100,7 +103,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
->   	 */
->   	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
->   		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> -		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
-> +		vmcb->control.avic_physical_id |= x2avic_max_physical_id;
->   		/* Disabling MSR intercept for x2APIC registers */
->   		svm_set_x2apic_msr_interception(svm, false);
->   	} else {
-> @@ -122,7 +125,7 @@ static void avic_deactivate_vmcb(struct vcpu_svm *svm)
->   	struct vmcb *vmcb = svm->vmcb01.ptr;
->   
->   	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> -	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
-> +	vmcb->control.avic_physical_id &= ~avic_physical_max_index_mask;
->   
->   	/*
->   	 * If running nested and the guest uses its own MSR bitmap, there
-> @@ -197,13 +200,15 @@ int avic_vm_init(struct kvm *kvm)
->   	struct kvm_svm *k2;
->   	struct page *p_page;
->   	struct page *l_page;
-> -	u32 vm_id;
-> +	u32 vm_id, entries;
->   
->   	if (!enable_apicv)
->   		return 0;
->   
-> -	/* Allocating physical APIC ID table (4KB) */
-> -	p_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +	/* Allocating physical APIC ID table */
-> +	entries = x2avic_max_physical_id + 1;
-> +	p_page = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO,
-> +			     get_order(sizeof(u64) * entries));
->   	if (!p_page)
->   		goto free_avic;
->   
-> @@ -266,7 +271,7 @@ static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
->   	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
->   
->   	if ((!x2avic_enabled && index > AVIC_MAX_PHYSICAL_ID) ||
-> -	    (index > X2AVIC_MAX_PHYSICAL_ID))
-> +	    (index > x2avic_max_physical_id))
->   		return NULL;
->   
->   	avic_physical_id_table = page_address(kvm_svm->avic_physical_id_table_page);
-> @@ -281,7 +286,7 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
->   	struct vcpu_svm *svm = to_svm(vcpu);
->   
->   	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
-> -	    (id > X2AVIC_MAX_PHYSICAL_ID))
-> +	    (id > x2avic_max_physical_id))
->   		return -EINVAL;
->   
->   	if (!vcpu->arch.apic->regs)
-> @@ -493,7 +498,7 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
->   	u32 icrh = svm->vmcb->control.exit_info_1 >> 32;
->   	u32 icrl = svm->vmcb->control.exit_info_1;
->   	u32 id = svm->vmcb->control.exit_info_2 >> 32;
-> -	u32 index = svm->vmcb->control.exit_info_2 & 0x1FF;
-> +	u32 index = svm->vmcb->control.exit_info_2 & avic_physical_max_index_mask;
->   	struct kvm_lapic *apic = vcpu->arch.apic;
->   
->   	trace_kvm_avic_incomplete_ipi(vcpu->vcpu_id, icrh, icrl, id, index);
-> @@ -1212,8 +1217,19 @@ bool avic_hardware_setup(void)
->   
->   	/* AVIC is a prerequisite for x2AVIC. */
->   	x2avic_enabled = boot_cpu_has(X86_FEATURE_X2AVIC);
-> -	if (x2avic_enabled)
-> -		pr_info("x2AVIC enabled\n");
-> +	if (x2avic_enabled) {
-> +		x2avic_4k_vcpu_supported = !!(cpuid_ecx(0x8000000a) & 0x40);
-> +		if (x2avic_4k_vcpu_supported) {
-> +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID_4K;
-> +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_4K_MASK;
-> +		} else {
-> +			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID;
-> +			avic_physical_max_index_mask = AVIC_PHYSICAL_MAX_INDEX_MASK;
-> +		}
-> +
-> +		pr_info("x2AVIC enabled%s\n",
-> +			x2avic_4k_vcpu_supported ? " (w/ 4K-vcpu)" : "");
-> +	}
->   
->   	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
->   
+> - Handle direct map removal for physically contiguous pages in arch code
+>    (Mike R.)
+> - Track the direct map state in guest_memfd itself instead of at the
+>    folio level, to prepare for huge pages support (Sean C.)
+> - Allow configuring direct map state of not-yet faulted in memory
+>    (Vishal A.)
+> - Pay attention to alignment in ftrace structs (Steven R.)
+> 
+> Most significantly, I've reduced the patch series to focus only on
+> direct map removal for guest_memfd for now, leaving the whole "how to do
+> non-CoCo VMs in guest_memfd" for later. If this separation is
+> acceptable, then I think I can drop the RFC tag in the next revision
+> (I've mainly kept it here because I'm not entirely sure what to do with
+> patches 3 and 4).
+
+Hi,
+
+keeping upcoming "shared and private memory in guest_memfd" in mind, I 
+assume the focus would be to only remove the direct map for private memory?
+
+So in the current upstream state, you would only be removing the direct 
+map for private memory, currently translating to "encrypted"/"protected" 
+memory that is inaccessible either way already.
+
+Correct?
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
