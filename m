@@ -1,138 +1,125 @@
-Return-Path: <kvm+bounces-30169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516579B7A1A
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 12:57:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4569B7A30
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 13:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD1B2B24405
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 11:57:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352B41F235C5
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 12:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27D719C558;
-	Thu, 31 Oct 2024 11:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C60319C54F;
+	Thu, 31 Oct 2024 12:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PG5qthLY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qqJjygng"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E010719ABB3
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 11:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9007E1BC20;
+	Thu, 31 Oct 2024 12:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730375864; cv=none; b=An3+92kBj3ellB0GnPaKzdoD/rppAL3vr5PIxSzTUNcZWiiHbmHJaIPaTh0cVMplnSfrc5IY2+1T7+B7w6LUbgwHbLhUB047sWAu8zj1FrHsLTdn4Nf+bc7/DDhI+IPv3v2b3QvSVKfwQ0LuQHOqVHKX8K8ASs/L90p0XUE5MFo=
+	t=1730376204; cv=none; b=d2xqgD4ZKL0yA9W/NE51u9qNGSvL26eqKt4WULYHElyJ12W/t1JjTwQ6vFo6MKAxBz2NDHpWQbfy35QNU5/Wg3xiUpOJXzmVVs6HS19irJOjhoSgr5Q/OhlQMpqRg/cwN88gl1EwLK7pWVgAyl06uBUDrQdbNamgm6Lzgzj+v9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730375864; c=relaxed/simple;
-	bh=zZKWGwiMvhDwQja/mevBFJq2xE2C8PZjEb+Ypk4ZvzI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aJCJzs6ccfyXvDnoorfm0XDwO4IbTFstQImO/2f61Z1rJiZyRYle2OgwaAvzOJrjs0nxwX8mWL+rHa/OF1f5wjBY6S4awygR9yG3gD8ucxj+OroWOFpStfJl+cqdItb/Ht1MKuDAgJ9PknITj5gBRWwD7H6afYC23G4Z5JbgvbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PG5qthLY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730375860;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gO9cb0YlooU8sygRr/HovquupewbjtkPjySJ8kfPvRg=;
-	b=PG5qthLYAG3+QhpV2UcvJJt5Wd1g8iGqhoEax/Boytbg3i38klpy5Tqsyzxx8+GluW/l92
-	Z1aXlA7x51vnuKo4PeiqTvYrJ5xil2pRk2Sm+QbCPLM8o1AQl5jxMJwd1WS8mcklejxdtO
-	VFklzwgxOFp+tDFDOanHYA88mBzQljY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-107--wZ1JXEQOfeJdWAYf7uCdQ-1; Thu, 31 Oct 2024 07:57:39 -0400
-X-MC-Unique: -wZ1JXEQOfeJdWAYf7uCdQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d52ca258eso454897f8f.3
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 04:57:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730375858; x=1730980658;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gO9cb0YlooU8sygRr/HovquupewbjtkPjySJ8kfPvRg=;
-        b=WL8qpbcdIiL6pZaj7F+uOF8X6/pWcd2qah/9iu4aqSOQwETY1twJBT5Sw22GbcW+3n
-         gD+oWC8z/yK0to9UoPkKDbjBnXCkWlo3mEhsD62PwmMahdv8wM4I6eWyWyShY2gsCajL
-         NSgYZueXD4h7+MDqCvSvV+1qu3ozD44LTMUDifCRuybDiL80U+6QqJmWj/O0nGA+ak8V
-         TSqkLnpZamh3UL/lPlhvsrjkeqm9+aiRU3EJ5LmRCf+vm8sA0V3ivd1crV1XwwGd2ikN
-         bnSUACkY9cebTEnSapVqIJo0unOlL1RZ//WasQPskO+WEdB8pkqrh9FxJBrOGeNwmBau
-         +NRg==
-X-Gm-Message-State: AOJu0YwdNkfGNjMlgb8G56y4XTZMyAIIO5lgiGDsLP0WEVlUKcnT41YX
-	mNMfdNe/weZr/RRkVax3LLHaWxUA59cbUFrt8xd7eBEB4tDuqeQUvSNGOpq645EdNpOd9oZ2vb/
-	YdGx4OClfjDh7tJNXyK5BFJsQIBnbBQ9hUvLK8DxVZY38pxJ0hQ==
-X-Received: by 2002:a5d:4489:0:b0:37d:454f:b49a with SMTP id ffacd0b85a97d-381b70f0802mr5046426f8f.43.1730375858526;
-        Thu, 31 Oct 2024 04:57:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFvPg9OoklPkC7XD5CO2UqfNm1GBNIcJP1KBM9R11xEmvHkoaWokdbmagf6xD0zwrZ7mtP1hQ==
-X-Received: by 2002:a5d:4489:0:b0:37d:454f:b49a with SMTP id ffacd0b85a97d-381b70f0802mr5046410f8f.43.1730375858184;
-        Thu, 31 Oct 2024 04:57:38 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7c1esm1910589f8f.12.2024.10.31.04.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 04:57:37 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Sean Christopherson
- <seanjc@google.com>
-Subject: Re: [PATCH] KVM: selftests: Don't force -march=x86-64-v2 if it's
- unsupported
-In-Reply-To: <20241031045333.1209195-1-seanjc@google.com>
-References: <20241031045333.1209195-1-seanjc@google.com>
-Date: Thu, 31 Oct 2024 12:57:36 +0100
-Message-ID: <87froctrgv.fsf@redhat.com>
+	s=arc-20240116; t=1730376204; c=relaxed/simple;
+	bh=Qg4mJxs4fXCmXS7KB5laOTg+7yxkd7M8r4nAAkZ9adQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KfM96zXXUrJF/f1vlUD0A3Q9pLyLAzcIQOU8PV5WSBc8vHGlJVfipmG+l61EPehHqdhvfPBWl0b6mpJoC4Qitjhrw5VJKfMSpjQn9XMqfjcT0CYymYdJ4zrT9WPcyUHJWoBn7K3aqI4gYfZgqPqZBfN0V88W9UO7V2foHS9xg9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qqJjygng; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49V6vL49013181;
+	Thu, 31 Oct 2024 12:03:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=9APeEwQXPLuuVKK42xBYkPKUFePEi9WFCzuJSO91+
+	GE=; b=qqJjygngaYB5kwBLfuqTHlQH2fza25uBLy7IB6m9ylAPeEqz0yOhQaZq2
+	7uwmZC6QGWzFT1tKjtfO5FkcvRUJGtQ8RaQij8zpSdj7/UbltIBWGVrKwYgIMm0C
+	Npjg9W6nyFaxazNelj5q37KZR3sbafLkFMnKAELpLCFRHdvAOrXF1mVeAi2XG3U2
+	s3FaGsr6Zz1qoM7/X0ZbzvaLrO16SCVCCTyzaEqZXxW0K3BEqgNDXMvIyWTztiu8
+	aqJPYRPsyLvMbYIshgr1F4Sbxtf4y+V8Ey0wyyDshM5oqp26DEKwbhWGxmxM0otW
+	yUpFhl1JM8WvFR6qyAdHtV6HrFpqg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42m52c97rk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Oct 2024 12:03:21 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49VBI8p4015899;
+	Thu, 31 Oct 2024 12:03:20 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42hdf1mbxg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Oct 2024 12:03:20 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49VC3H0t40698144
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 31 Oct 2024 12:03:17 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2F66320043;
+	Thu, 31 Oct 2024 12:03:17 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 83FAC2004B;
+	Thu, 31 Oct 2024 12:03:16 +0000 (GMT)
+Received: from p-imbrenda.ibmuc.com (unknown [9.171.69.120])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 31 Oct 2024 12:03:16 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: linux-kernel@vger.kernel.org
+Cc: borntraeger@de.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, seiden@linux.ibm.com, hca@linux.ibm.com,
+        agordeev@linux.ibm.com, gor@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v1 1/1] s390/kvm: mask extra bits from program interrupt code
+Date: Thu, 31 Oct 2024 13:03:16 +0100
+Message-ID: <20241031120316.25462-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Qj_0wnjad3No7P3g8mDomxTi9CIg2yz4
+X-Proofpoint-ORIG-GUID: Qj_0wnjad3No7P3g8mDomxTi9CIg2yz4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ mlxlogscore=587 mlxscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1015 phishscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410310091
 
-Sean Christopherson <seanjc@google.com> writes:
+The program interrupt code has some extra bits that are sometimes set
+by hardware for various reasons; those bits should be ignored when the
+program interrupt number is needed for interrupt handling.
 
-> Force -march=x86-64-v2 to avoid SSE/AVX instructions if and only if the
-> uarch definition is supported by the compiler, e.g. gcc 7.5 only supports
-> x86-64.
->
-> Fixes: 9a400068a158 ("KVM: selftests: x86: Avoid using SSE/AVX instructions")
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->
-> My big ol' AVX enabling series ain't looking so bad now ;-)
+Fixes: ce2b276ebe51 ("s390/mm/fault: Handle guest-related program interrupts in KVM")
+Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Smaller the change, bigger the troubles :-)
-
->
->  tools/testing/selftests/kvm/Makefile | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 156fbfae940f..5fa282643cff 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -249,8 +249,10 @@ ifeq ($(ARCH),s390)
->  	CFLAGS += -march=z10
->  endif
->  ifeq ($(ARCH),x86)
-> +ifeq ($(shell echo "void foo(void) { }" | $(CC) -march=x86-64-v2 -x c - -c -o /dev/null 2>/dev/null; echo "$$?"),0)
-
-With this test, the outer "ifeq ($(ARCH),x86)" check is not really
-needed anymore I guess?
-
->  	CFLAGS += -march=x86-64-v2
->  endif
-> +endif
->  ifeq ($(ARCH),arm64)
->  tools_dir := $(top_srcdir)/tools
->  arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
->
-> base-commit: 81983758430957d9a5cb3333fe324fd70cf63e7e
-
-Reviewed-and-tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 8b3afda99397..f2d1351f6992 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4737,7 +4737,7 @@ static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
+ 	if (kvm_s390_cur_gmap_fault_is_write())
+ 		flags = FAULT_FLAG_WRITE;
+ 
+-	switch (current->thread.gmap_int_code) {
++	switch (current->thread.gmap_int_code & PGM_INT_CODE_MASK) {
+ 	case 0:
+ 		vcpu->stat.exit_null++;
+ 		break;
 -- 
-Vitaly
+2.47.0
 
 
