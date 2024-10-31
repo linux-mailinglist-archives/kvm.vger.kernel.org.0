@@ -1,74 +1,79 @@
-Return-Path: <kvm+bounces-30161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60AB89B77B2
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:38:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A85A9B77B4
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D3F5282F5E
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 09:38:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDFD31C21CB3
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 09:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D23198838;
-	Thu, 31 Oct 2024 09:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DC8196C7B;
+	Thu, 31 Oct 2024 09:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTQP7PS+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cy0BrY2P"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A7D18DF6B;
-	Thu, 31 Oct 2024 09:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAC91946CF;
+	Thu, 31 Oct 2024 09:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730367471; cv=none; b=gnx3mAItE3349SQP3Nbx1fRxBv1HoyZZGYcG9npJiiHawN/o0qrNGeKQvxJ9rAXkGwt2WzzTO9Ng5wD15yaMTyq0sx0sbHMiI5ptaPAKV/LMysD+g48kXBGD9XFbmzi1lyAEmBPGI3nbfgj1DFvxIfiTrqHkZ3mV74UaC2TQJpc=
+	t=1730367487; cv=none; b=TJnvZhVbhmOE7Fie6NoQTBAobA/4Iz7MKLt+tfXsGyCEHi5Bqg4v8EPeAp/xax+BM2JIaBT2WrrE6j+AVwl2UTlBBHRPGjjXBiR3F4PCUCmSnyBQ7ycKmeKrmuNuyLaqyNhQvI0WMDMmBzRY5UkeUNrZkF6zmmGn+4FhtufQc08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730367471; c=relaxed/simple;
-	bh=tqzJLh5GYRL2KEmKB06uhDKvLABRYtBWXtB3Y8bMEKA=;
+	s=arc-20240116; t=1730367487; c=relaxed/simple;
+	bh=hGJmDyB3p1Y6/eVa1XcO7bP2MXZb9GFzininqLTSFxw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=COhqTqf8iZbulguVzzjipvG112iSLyNCP7lYG/JfS/7MRWKU/0UTMrG94RvabryQB35LcklOkAPHfyhh93N5qV9Zi2SUdYT+a/cyf5QCGW4PFDaZ2vAK5t47+NsiG6Y6+485Fh/79wbseMnto1my9VEsHMGxDVQATasWRJ9H2bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTQP7PS+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04050C4CEC3;
-	Thu, 31 Oct 2024 09:37:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730367470;
-	bh=tqzJLh5GYRL2KEmKB06uhDKvLABRYtBWXtB3Y8bMEKA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dTQP7PS+/MTyTtUMPwFCdUdEd1qWr3BPPQ8pvyYPVrtbourx/L8sdNPTr9lPj1QPB
-	 g933lrXQqvAJxMV1kQiG2xyG7NF8LnS9wKQBA9lsBXrn5RHD1+siwDoEBnl+zfB8NV
-	 DrhOyVxwnAVdg5G2IeaEo3cxX9HtNdkNEj0b51HcYMeCY5S9sSDgNsPLzN1l7uwEAl
-	 8UAGh7dlC4XLOOvyRno1rlDrgXdZkQFymJIkdmkKL/RzKkO8mH98WS4qTpitL+TrzB
-	 j4UfpaLbeZXfuUbC0SIp4WAe0T7KDxaEbIsTC03s3SAkoAGz9+Sya4ZfdJPQPVNS6T
-	 b1awtly2cL7Qw==
-Date: Thu, 31 Oct 2024 11:37:46 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241031093746.GA88858@unreal>
-References: <cover.1730298502.git.leon@kernel.org>
- <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
- <20241031083450.GA30625@lst.de>
- <20241031090530.GC7473@unreal>
- <20241031092113.GA1791@lst.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=plcs28mvScUxE3PYhGbqJ1m8x27zhLXnDSA9wj21R5pXEog5fo4du7QK9H6KRxetVBr6yJOe+GyYjS4Ab9ZX/1mC4xpCus2GRT2emWSc6n4sHO9e0oRHWRmNuBnfsLNm4ikpa4pGyVqX+629TG7uieWg1WPZS7bd9dhh7k23u7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cy0BrY2P; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730367485; x=1761903485;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hGJmDyB3p1Y6/eVa1XcO7bP2MXZb9GFzininqLTSFxw=;
+  b=Cy0BrY2PMFUD4QKJr+Ei/51zOqKNjA9dNMYjDkd37h1fNF6vfF6BporH
+   nNsmFvHuHHNIxZlnfkfVUbubZqTYp9Xr5BLxEj2MZx4hd89EwmGNdoXjY
+   cA/YgEc10tR40jelJC6zs7n19Vtc7AcyavLsaE5jEn54u5mjZSxjaa87Y
+   C8oeKLJeWwrL+hLJbZmjBXck/gi3DYB+DoU36oFWlgUrvEu/jzLhKMNrl
+   O0DAinhgsrOPsaiknLuDhN/dHrQhAp90DUabCp5871u+zRKGwR9yWbrSO
+   5WBMzVHhqXHM4DE0XlQeazH/lgPMcsXeUbl83msM71K3R/NUKxXaktGml
+   g==;
+X-CSE-ConnectionGUID: wU/SsoaESlyM+RXp2r0/zA==
+X-CSE-MsgGUID: Jiim5T2PSNChpVhOHdx5OA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="34027227"
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="34027227"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 02:38:04 -0700
+X-CSE-ConnectionGUID: fXyzVN9ZT7uVl5DrNiSfaA==
+X-CSE-MsgGUID: 1uqweDCwRXmsrNNn/tUcLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="82232403"
+Received: from slindbla-desk.ger.corp.intel.com (HELO localhost) ([10.245.246.164])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 02:37:59 -0700
+Date: Thu, 31 Oct 2024 11:37:55 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
+	seanjc@google.com, yan.y.zhao@intel.com, isaku.yamahata@gmail.com,
+	kai.huang@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, reinette.chatre@intel.com,
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v2 16/25] KVM: TDX: Get system-wide info about TDX module
+ on initialization
+Message-ID: <ZyNP82ApuQQeNGJ3@tlindgre-MOBL1>
+References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
+ <20241030190039.77971-17-rick.p.edgecombe@intel.com>
+ <88ea52ea-df9f-45d6-9022-db4313c324e2@linux.intel.com>
+ <bb60b05d-5ccc-49ab-9a0c-a7f87b0c827c@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,29 +82,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241031092113.GA1791@lst.de>
+In-Reply-To: <bb60b05d-5ccc-49ab-9a0c-a7f87b0c827c@intel.com>
 
-On Thu, Oct 31, 2024 at 10:21:13AM +0100, Christoph Hellwig wrote:
-> On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
-> > This series is a subset of the series you tested and doesn't include the
-> > block layer changes which most likely were the cause of the performance
-> > regression.
-> > 
-> > This is why I separated the block layer changes from the rest of the series
-> > and marked them as RFC.
-> > 
-> > The current patch set is viable for HMM and VFIO. Can you please retest
-> > only this series and leave the block layer changes for later till Christoph
-> > finds the answer for the performance regression?
+On Thu, Oct 31, 2024 at 05:23:57PM +0800, Xiaoyao Li wrote:
+> here it is to initialize the configurable CPUID bits that get reported to
+> userspace. Though TDX module doesn't allow them to be set in TD_PARAM for
+> KVM_TDX_INIT_VM, they get set to 0xff because KVM reuse these bits
+> EBX[23:16] as the interface for userspace to configure GPAW of TD guest
+> (implemented in setup_tdparams_eptp_controls() in patch 19). That's why they
+> need to be set as all-1 to allow userspace to configure.
 > 
-> As the subset doesn't touch block code or code called by block I don't
-> think we need Jens to benchmark it, unless he really wants to.
+> And the comment above it is wrong and vague. we need to change it to
+> something like
+> 
+> 	/*
+>          * Though TDX module doesn't allow the configuration of guest
+>          * phys addr bits (EBX[23:16]), KVM uses it as the interface for
+>          * userspace to configure the GPAW. So need to report these bits
+>          * as configurable to userspace.
+>          */
 
-He wrote this sentence in his email, while responding on subset which doesn't change
-anything in block layer: "just want to make sure something like this doesn't get merged
-until that is both fully understood and sorted out."
+That sounds good to me.
 
-This series works like a charm for RDMA (HMM) and VFIO.
+Hmm so care to check if we can also just leave out another "old module"
+comment in tdx_read_cpuid()?
 
-Thanks
+Regards,
+
+Tony
 
