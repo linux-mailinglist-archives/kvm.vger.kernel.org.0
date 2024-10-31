@@ -1,155 +1,161 @@
-Return-Path: <kvm+bounces-30195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF799B7E15
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:16:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF139B7E2B
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:20:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48053B2173F
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 15:16:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F09672811A4
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 15:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC9D1BBBCF;
-	Thu, 31 Oct 2024 15:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328931A256A;
+	Thu, 31 Oct 2024 15:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="D8R3JnkO";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vSyDZ/mN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BXJaIIcR"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E111A255A;
-	Thu, 31 Oct 2024 15:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABB919D098
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 15:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730387706; cv=none; b=kQ4WHN8d0SlVHT+rrfYPDw5hpO7CH7PdR2NycLzt7+vEWhh30qAlrIUT2LUpbyAGiPk0kTIQ85fTsAx3blB/plGQLqcgJH3Ga5CuCkNcDMdPADs1EKKkADTxE4FiUwnjK7QsoPdUj1KTX9lOlTW3lVVAVb1XrFbBd1EALALfQSc=
+	t=1730387792; cv=none; b=qjROxR5FZReGBuuGFkFjmkS0aWRC06WhYPI70/Iy4oe8io15KxnAwPMVfWkZVQJFoLvIzZABGequ85NlAmxJDm3JEutOBn4dfwAqjwvLqvpLJzra56PMGJqfxzns1WaQ9lPrhiFGeuMTa0JeIc0WED3LO9rsGyrGTnXAJjeVDtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730387706; c=relaxed/simple;
-	bh=CACZtg7Ahs7t4V6bbE23m+iG9ROJhJ0ED5SHwYyp0Dw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uUVSXlUCsVGsoOdM8Vsza/2JabhFzARIq+FL+YkQ+hwFZkDxeeIR4YuKyu717gcWnBQjMYMx2rp9QQLecODfv9Aar15B6mvf+EmQkRBNPUeObaM80VUa8VQV3+G//zyWsh5xxl1elVQten2H82JFEGGdkGBibOJArqF+pCmzX00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D8R3JnkO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vSyDZ/mN; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1730387702;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HdVqhgFUx4wGhiyBVzB1j0RExe8nGmkufQErz8orPxA=;
-	b=D8R3JnkO+m2baGKosWMEPCCgHEh93eEj3i5YM9IrL8ArYpE8sw2m3aMJr+wEoCSXY8Sk0o
-	cNAwkYpIWaFLG/Hq2XJiVUcS+2TwzoEBxaJdnGTgTdUNaZDYPxCUahyT1R1Q2ZLKgAtlkC
-	RGS4x58PXmjWRlEO06mYDbfjn42Bl5gCV5yLqmk+XU+l7pzFjdQcD1DB4hvBdhkbxvKYVn
-	VQIs9hdbp/4lysS0E9Lr73R3hrjyUE0TZ1qUF3uy/S4GxCdrvN8y8ONJx8mE8TcNJpaftx
-	o+H+v+lYJ5bnvSf7068cGQ9ReuPpyPFB2jhD2I6tEYa4wi9D8UuYsg7tL5wujQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1730387702;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HdVqhgFUx4wGhiyBVzB1j0RExe8nGmkufQErz8orPxA=;
-	b=vSyDZ/mNZsHFwmAZ5X6uDDFZnl5blvdtESX/4yICVSJ/nHMJu3Ss4nFWwbP39h1ewJkXLG
-	oKAz3ELATfAAFmAA==
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	linux-kernel@vger.kernel.org
-Cc: Jani Nikula <jani.nikula@linux.intel.com>,
-	intel-gfx@lists.freedesktop.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	x86@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	John Stultz <jstultz@google.com>,
-	Nam Cao <namcao@linutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	kvm@vger.kernel.org
-Subject: [RESEND PATCH v2 03/19] KVM: x86/xen: Initialize hrtimer in kvm_xen_init_vcpu()
-Date: Thu, 31 Oct 2024 16:14:17 +0100
-Message-Id: <9c33c7224d97d08f4fa30d3cc8687981c1d3e953.1730386209.git.namcao@linutronix.de>
-In-Reply-To: <cover.1730386209.git.namcao@linutronix.de>
-References: <cover.1730386209.git.namcao@linutronix.de>
+	s=arc-20240116; t=1730387792; c=relaxed/simple;
+	bh=6iGWinUXtqbRxNAx0fpqrbY55VGEjPPTwMPQEwI4W/A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=TijKrQgHMqwa2oa2Kvi4oSY/rkbm5DB7dwFCuRAvCn4A2RnnfRq4zioWDaS72V5nLuGU/lMB9YQzsvVe/EnQsR3qwXNWpp9vdBYy4AfpCdcRVa+djsExq2EHD/mvbo1y1KzQvWle9FrgCjaZjJ8L0nUfdFCVBl87lJZpPEjWxKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BXJaIIcR; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7eda7c4f014so1004427a12.3
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 08:16:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730387790; x=1730992590; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7PC7N5+e08dtpORCdL76yKhFOdMWJc/mxzHSvNgjS1A=;
+        b=BXJaIIcRFY0iD+dmHn65HY+nblNp339BHbcgWIfI8yoRiS86w9GYt7QTKBOAtouyUm
+         AUd7jt59VL0YlLPCntNeDrRfuhu32mBvZ9bYD523oTN18k9INRD7XELa09SoFK24ieEj
+         XPsNiG+ffdeXZJ0U/PYR6UcpkLxvfy/4WomynsK62zugATvxqTWRv6ZEB/z+grTrmJTv
+         OO8MG+P5InTBAAKuglNAKIh2jHWx+9iAtWIkU5AWmLkhloS+wDr4qQcVYmtFSOFCKkvU
+         IRQdhqDTwsyRtHb0BQJnpcSx2CFg42A/JZ6ZsPnYhvXvv+Vibq/lCy+1cRDd6dJfBd20
+         H46g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730387790; x=1730992590;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7PC7N5+e08dtpORCdL76yKhFOdMWJc/mxzHSvNgjS1A=;
+        b=umRpvV7zmZiQsHrPvtKy6C1+f07P3vDpBAUtv5/yngRDtnADKBvpAc3qEA1LKCy0lo
+         SInRfRZSDQDgz5NKUAdhdJ68DF/Ed9ZwPVWsD2Ld7J1s1Rzy/KHPAmyKNhe3EkJpRGyP
+         C1PfU6fz2i5XxdO4c7faIjUj4OuQq+y4irlunzY9mfIHLQyFXCYU+Lu5JVNmqFZ/dQRn
+         qs7pYuRrIUhY4Zw2iR/7Hb2tI7CrTWOIWPQQ2l9DmOIumlqktZGFYckN6ZeBisHbMjdS
+         HgvpmP1EBEagmOc4r+bIoKXmyTbFikRu1/jJpO/IXw9NVNBqfcLgrD/pL/eXa2a/RyYZ
+         B+CA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlkz/Y1gpH31ILEBni/bQPIDtaIVLTdplSLI61Sw06SvKaJFV7PERJtuTLULH1D04IAhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ+SPsJE+pNlk8RY3fl+v7aj08+eFAG6fdI/fhqlyAoOuHZMVa
+	B5cX3ep4lyIvfhQxZ+giD8++kZyQAq3djCVJ+xQWdpqVx6nwStnF2HLNQgJc0vLxexH+MRcpWYx
+	4oQ==
+X-Google-Smtp-Source: AGHT+IG2VFG7/21UDLie69cmQsjkP4oLuob/J4Q5NswUjJ5IYcEKrQBEaHPNe6mf4H6kwoposy0bS20kkOA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:2c08:b0:7ea:6bf4:3643 with SMTP id
+ 41be03b00d2f7-7ee27e02db2mr7131a12.0.1730387789754; Thu, 31 Oct 2024 08:16:29
+ -0700 (PDT)
+Date: Thu, 31 Oct 2024 08:16:28 -0700
+In-Reply-To: <CANZk6aQEH=9EFdsBfuRcUWhTu88Oc=x=Wp3bcqzQd1AVjcTTEg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20241023124527.1092810-1-alexyonghe@tencent.com>
+ <ZyJ7ZsP4RaRfcFQF@google.com> <CANZk6aQEH=9EFdsBfuRcUWhTu88Oc=x=Wp3bcqzQd1AVjcTTEg@mail.gmail.com>
+Message-ID: <ZyOfTCy5dJ32tzTr@google.com>
+Subject: Re: [PATCH] KVM: x86: Try to enable irr_pending state with disabled APICv
+From: Sean Christopherson <seanjc@google.com>
+To: zhuangel570 <zhuangel570@gmail.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-The hrtimer is initialized in the KVM_XEN_VCPU_SET_ATTR ioctl. That caused
-problem in the past, because the hrtimer can be initialized multiple times,
-which was fixed by commit af735db31285 ("KVM: x86/xen: Initialize Xen timer
-only once"). This commit avoids initializing the timer multiple times by
-checking the field 'function' of struct hrtimer to determine if it has
-already been initialized.
+On Thu, Oct 31, 2024, zhuangel570 wrote:
+> On Thu, Oct 31, 2024 at 2:31=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Wed, Oct 23, 2024, Yong He wrote:
+> > > From: Yong He <alexyonghe@tencent.com>
+> > >
+> > > Try to enable irr_pending when set APIC state, if there is
+> > > pending interrupt in IRR with disabled APICv.
+> > >
+> > > In save/restore VM scenery with disabled APICv. Qemu/CloudHypervisor
+> > > always send signals to stop running vcpu threads, then save
+> > > entire VM state, including APIC state. There may be a pending
+> > > timer interrupt in the saved APIC IRR that is injected before
+> > > vcpu_run return. But when restoring the VM, since APICv is
+> > > disabled, irr_pending is disabled by default, so this may cause
+> > > the timer interrupt in the IRR to be suspended for a long time,
+> > > until the next interrupt comes.
+> > >
+> > > Signed-off-by: Yong He <alexyonghe@tencent.com>
+> > > ---
+> > >  arch/x86/kvm/lapic.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 2098dc689088..7373f649958b 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -3099,6 +3099,10 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, =
+struct kvm_lapic_state *s)
+> > >                                               apic_find_highest_irr(a=
+pic));
+> > >               kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(a=
+pic));
+> > >       }
+> > > +
+> > > +     /* Search the IRR and enable irr_pending state with disabled AP=
+ICv*/
+> > > +     if (!enable_apicv && apic_search_irr(apic) !=3D -1)
+> >
+> > This can/should be an "else" from the above "if (apic->apicv_active)". =
+ I also
+> > think KVM can safely clear irr_pending in this case, which is also why =
+irr_pending
+> > isn't handling in kvm_apic_update_apicv().  When APICv is disabled (inh=
+ibited) at
+> > runtime, an IRQ may be in-flight, i.e. apic_search_irr() can get a fals=
+e negative.
+>=20
+> Thank you for your review and suggestions.
+>=20
+> >
+> > But when stuffing APIC state, I don't see how that can happen.  So this=
+?
+>=20
+> Here is our case.
 
-This is not required and in the way to make the function field private.
+Sorry for not being clear.  I wasn't saying that the bug you encountered ca=
+n't
+happen.  I 100% agree it's a real bug.  What I was saying can't happen is a=
+n
+in-flight virtual IRQ from another vCPU or device racing with setting APIC =
+state,
+and the VM (or VMM) having any expectation that everything would work corre=
+ctly.
 
-Move the hrtimer initialization into kvm_xen_init_vcpu() so that it will
-only be initialized once.
+And so, I think it's save for KVM to explicitly set irr_pending, i.e. to po=
+tentially
+_clear_ irr_pending.
 
-Signed-off-by: Nam Cao <namcao@linutronix.de>
-Acked-by: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: x86@kernel.org
-Cc: kvm@vger.kernel.org
----
- arch/x86/kvm/xen.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 622fe24da910..a909b817b9c0 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -263,13 +263,6 @@ static void kvm_xen_stop_timer(struct kvm_vcpu *vcpu)
- 	atomic_set(&vcpu->arch.xen.timer_pending, 0);
- }
-=20
--static void kvm_xen_init_timer(struct kvm_vcpu *vcpu)
--{
--	hrtimer_init(&vcpu->arch.xen.timer, CLOCK_MONOTONIC,
--		     HRTIMER_MODE_ABS_HARD);
--	vcpu->arch.xen.timer.function =3D xen_timer_callback;
--}
--
- static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
- {
- 	struct kvm_vcpu_xen *vx =3D &v->arch.xen;
-@@ -1070,9 +1063,6 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, stru=
-ct kvm_xen_vcpu_attr *data)
- 			break;
- 		}
-=20
--		if (!vcpu->arch.xen.timer.function)
--			kvm_xen_init_timer(vcpu);
--
- 		/* Stop the timer (if it's running) before changing the vector */
- 		kvm_xen_stop_timer(vcpu);
- 		vcpu->arch.xen.timer_virq =3D data->u.timer.port;
-@@ -2235,6 +2225,8 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
- 	vcpu->arch.xen.poll_evtchn =3D 0;
-=20
- 	timer_setup(&vcpu->arch.xen.poll_timer, cancel_evtchn_poll, 0);
-+	hrtimer_init(&vcpu->arch.xen.timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HAR=
-D);
-+	vcpu->arch.xen.timer.function =3D xen_timer_callback;
-=20
- 	kvm_gpc_init(&vcpu->arch.xen.runstate_cache, vcpu->kvm);
- 	kvm_gpc_init(&vcpu->arch.xen.runstate2_cache, vcpu->kvm);
---=20
-2.39.5
-
+If you are able to verify the psuedo-patch I posted fixes the bug you encou=
+ntered,
+that is how I would like to fix the bug.
 
