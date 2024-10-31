@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-30214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A839D9B8170
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 18:42:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A4B9B8175
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 18:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36B681F21294
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:42:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52C261C21B64
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCB81C4612;
-	Thu, 31 Oct 2024 17:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758491C3F2B;
+	Thu, 31 Oct 2024 17:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="txQX41zQ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dZqBiU8D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7871F1BE852
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 17:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C777312D1EA
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 17:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730396533; cv=none; b=jCs35lwAGS2Zt7uWQGQV5xulXxbY4b75HHcpXcSV8dGv4Fil7nVCitfPh0/BzqK6eKVTnMyEFxb7wrK/fYERrfmwzLb5ZQa3VZXDmnutsFBbneW6f94YNTNiIgSdxTAkLtIwDCg8mTMWFM5CLHCLLzufQdUcoOm0lC3T6n1OuQA=
+	t=1730396635; cv=none; b=HqsAmx+MupKk7nPHnSb6Ui686Bu/01I6K4QT50U3Ivf7He6CitqUGXXJLkBU9L+9z6kMIhVAnhwVYIk7VP481FPqW1BHdf+IPJirmlVb8DTWxFt/at+Ld2hwkwRfhaUluySQXu5L6livqwpEMZm0K/PyTJrWKZqD4JU0retwKN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730396533; c=relaxed/simple;
-	bh=Rf6mnPpy9l06l6dtMxbRoYeknemanNGyXKBqhdu+XDA=;
+	s=arc-20240116; t=1730396635; c=relaxed/simple;
+	bh=mhTsv1ygiWFnjDiVQe/E1G0vEfNsEKPKJTElZp6SXYc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=axr+7N7AEJJYGz03Gm///6hWs6nxB6e7KH2I4ogvIH/2AZgX7GEFPp6NhS4uXpZT49Ton+Q6r0y45ZAfj+0Mf/q3Lqb3AwMT8TiKOrV1s59w/96pGkKXruPzcCNWlnER9+rlpjLjRZxF9N9xOIIkOIS1p4V41wAsjaqfh3HlAMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=txQX41zQ; arc=none smtp.client-ip=209.85.166.43
+	 In-Reply-To:Content-Type; b=o5drMGmat1IvtdmmbYJEJsLYns1OyoXbQk0RrPsNz/6OIO6LaNlZIabqJkwhkJS6CBT/YO741L29H5q6KfU6cvzUW0XfG+0rlq8TU72z/2kTt47wDfhE03fT/F9I1ScH/FUPmwscZ+9YX2CKPIyFE3+yh+rKELK+CAq7s183xMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dZqBiU8D; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-83a9cd37a11so44978239f.3
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 10:42:11 -0700 (PDT)
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-8377fd760b0so44243239f.2
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 10:43:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730396530; x=1731001330; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730396633; x=1731001433; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=x40+SjEaq5943TtiP/UXom9Wy7SciOs8xRpZ9sdjGNw=;
-        b=txQX41zQgMYFvp8EGoQK9Ckb1lRZIDT0QGY+GktWrrYaCVhOREhzDL4Hbh87LiexHY
-         0Wk/OY2SFmuGxtJB8Am2ukTVipM9VX4jfHp23oXDjKtIfQMe5V5mfZpkt9XqqYcuuYjn
-         i4vcJUHNuQbHxPf5JQvW0XtBTimyE4Gpe4xbe6ksoMKJb9py91Gqdfoolng1OmA+qEBo
-         d/SlzYamivnRYj/xWiMJAJcab0Gb0ZszImZZqMG5nGiMVnidiYFS8+H8hfBuqSFltyq2
-         6hgCjOJvyRlT8/iENBRpRDKrRE/uR4LqSXZl2QZxqJrj/HUPY3BVGph5nLYEBWDSGLM4
-         xKgA==
+        bh=cJN1S3OA8zjlhqH9iA1Z8bsg9GoFf4IOEEdKUROgci0=;
+        b=dZqBiU8DXpQWfL+3eDl4LNW0W8j+Gz/J02RI+YIltmvo+mXJ8sK+GXmVmFZki7saWo
+         EiOfNKfrdJx3cH16jzNPC4J1UW6Znf3Fl/LOGauWgtG+nlV9MvRTmmWSW6AdlRhGm/jV
+         PruJ2QGCXMvZiFufP41oXDueGWmKZx5GRxOMoWb0ks7naLXT2NhNcFb42vJMO6j/oPYs
+         sF3gAAC6PSuY+vA3Fy9x0bAH+9iJjo/A832nbSe1ZHD2UM/UnGW26frMvAhMmeuGc11m
+         XpHb/8EJldScXIeKUKhsgBZlD+JolvOaJA8QEP8jb3Jlp4Rr0giiK4Jb9loOapjHOiFD
+         oB+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730396530; x=1731001330;
+        d=1e100.net; s=20230601; t=1730396633; x=1731001433;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x40+SjEaq5943TtiP/UXom9Wy7SciOs8xRpZ9sdjGNw=;
-        b=PAEP4fEYLN1LjY8RdhBjzS9es3yZ68mMvNh8zHKPi0LXBUC9wvJuvwyzjZiKaHpwbU
-         sYlXQaN1wNiqxTrASKHL6aPh/Hpo3jvE8KViZgxlY5mGkG2kTCnpHYJVXUzuDp76s4bJ
-         gDq4ahAOiMiP6quhPwD4xxxEsxPp5B0nrVyKbXo0zgnc/8waW0tNLz+FuoOv8dX41NNe
-         ENqabVPk3jtT/6sBXHQJFmQBLpNlgB5EH9uuvFLauBg6vjQ+1dgbje40f7D+4ceVQxEx
-         iPaHzsV5N4kjxudFUMOgtp0FGVJ5LYwKAwcu2pK9URKeMC/o2JZA3q0+u4BSYjuxHS0f
-         o3UA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqGX350pixioXBPg/+y3Imd207YuO8AAg80RGPZ+/oonaZjpYJSS3ym/RNlTUBCJSMdNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwnmnmIMdl1qGOuREgYx5Nbh9s1hNzucA0otF/zIvpSU7SSJwz
-	bHzseGOBQtTegOxWPxucSgHxvAk6EJiDrpMax4vb0ZBPcNYcj1o03ecwx7GXljw=
-X-Google-Smtp-Source: AGHT+IG0ksmejkYn/tsWOFj5UDq65mB5fTjw0uagwhlJwyCNesDEnrmSpfLQj8+GbqVblFhVpBgdOw==
-X-Received: by 2002:a05:6602:15d4:b0:83a:c242:82aa with SMTP id ca18e2360f4ac-83b1c5cd123mr2127656539f.13.1730396530549;
-        Thu, 31 Oct 2024 10:42:10 -0700 (PDT)
+        bh=cJN1S3OA8zjlhqH9iA1Z8bsg9GoFf4IOEEdKUROgci0=;
+        b=t/ZHkeaDZJU67f2WshNYL1lkhUw5HSDmc6PBzCAEZwhZzZpq8CZYBSpWgqpwYZRvtw
+         Jqnzqi1wbqyNI2QH8nzSKUGzutN1CozqO+4U6PZXjEniwzX8IHiSvUmhh0R9EW06LB5a
+         KpHiYxkWtwoS6n3dViC11uL3hvxROw4FXyJKZ2xpiWcsgWG6snUfHmbOd9vtyT/5bZ/v
+         OQj4gQPclK/J+Lqq5S69oUmbO2VuZO4YPAwSQQaDsOsmjAMgnGgoRPbt/LNPVZfRQuU0
+         4pmypYQeTRfWmLilssK8tamez9pmUuX8N3R+xIty6k3bWydKt9LSvOJn5ZrCVlq+jr8W
+         CheQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQAvLCeQp2RjfpVvf9f8AmRyDkoo6GjsQ1Mh1g+xjEK08xr4UAV8obFQ8KPGWZ0lgy6oc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnsLwK1cD9p8VmYMQD35AD6YDYytPbQcRDZxiM8Qgbjm1wwVW+
+	0x0jHlAPIKO+g22H83WYYFIES+RLC3pt31ylBeiGqjEKramsonfK+KemWi7sN5E=
+X-Google-Smtp-Source: AGHT+IGqvDPac4jMToI9PP3ppL4bi2ob+amIyOKddZ0fGQ56qF7607m8ktK4Ur1sfUjByGfZ1fMmYA==
+X-Received: by 2002:a05:6602:6d0b:b0:83a:a9e9:6dc9 with SMTP id ca18e2360f4ac-83b1c4c27eemr2156317139f.12.1730396633080;
+        Thu, 31 Oct 2024 10:43:53 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83b67b4b157sm40604339f.22.2024.10.31.10.42.08
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de048e3736sm379375173.81.2024.10.31.10.43.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 10:42:09 -0700 (PDT)
-Message-ID: <2a0fc88a-53af-4d7e-b8fd-8cee3f0804a1@kernel.dk>
-Date: Thu, 31 Oct 2024 11:42:07 -0600
+        Thu, 31 Oct 2024 10:43:52 -0700 (PDT)
+Message-ID: <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
+Date: Thu, 31 Oct 2024 11:43:50 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,12 +77,12 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
+To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
+ Yishai Hadas <yishaih@nvidia.com>,
  Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
  Kevin Tian <kevin.tian@intel.com>,
  Alex Williamson <alex.williamson@redhat.com>,
@@ -95,28 +95,43 @@ Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
  linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
 References: <cover.1730298502.git.leon@kernel.org>
  <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
- <20241031083450.GA30625@lst.de>
+ <20241031083450.GA30625@lst.de> <20241031090530.GC7473@unreal>
+ <20241031092113.GA1791@lst.de> <20241031093746.GA88858@unreal>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241031083450.GA30625@lst.de>
+In-Reply-To: <20241031093746.GA88858@unreal>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/31/24 2:34 AM, Christoph Hellwig wrote:
-> On Wed, Oct 30, 2024 at 07:44:13PM -0600, Jens Axboe wrote:
->> On Christoph's request, I tested this series last week and saw some
->> pretty significant performance regressions on my box. I don't know what
->> the status is in terms of that, just want to make sure something like
->> this doesn't get merged until that is both fully understood and sorted
->> out.
+On 10/31/24 3:37 AM, Leon Romanovsky wrote:
+> On Thu, Oct 31, 2024 at 10:21:13AM +0100, Christoph Hellwig wrote:
+>> On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
+>>> This series is a subset of the series you tested and doesn't include the
+>>> block layer changes which most likely were the cause of the performance
+>>> regression.
+>>>
+>>> This is why I separated the block layer changes from the rest of the series
+>>> and marked them as RFC.
+>>>
+>>> The current patch set is viable for HMM and VFIO. Can you please retest
+>>> only this series and leave the block layer changes for later till Christoph
+>>> finds the answer for the performance regression?
+>>
+>> As the subset doesn't touch block code or code called by block I don't
+>> think we need Jens to benchmark it, unless he really wants to.
 > 
-> Working on it, but I have way too many things going on at once.  Note
-> that the weird thing about your setup was that we apparently dropped into
-> the slow path, which still puzzles me.  But I should probably also look
-> into making that path a little less slow.
+> He wrote this sentence in his email, while responding on subset which
+> doesn't change anything in block layer: "just want to make sure
+> something like this doesn't get merged until that is both fully
+> understood and sorted out."
+> 
+> This series works like a charm for RDMA (HMM) and VFIO.
 
-That's fine, just wanted to ensure that no push was being done on this
-before that was resolved.
+I don't care about rdma/vfio, nor do I test it, so you guys can do
+whatever you want there, as long as it doesn't regress the iommu side.
+The block series is separate, so we'll deal with that when we get there.
+
+I don't know why you CC'ed linux-block on the series.
 
 -- 
 Jens Axboe
