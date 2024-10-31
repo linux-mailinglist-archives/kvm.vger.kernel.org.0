@@ -1,125 +1,114 @@
-Return-Path: <kvm+bounces-30248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53359B848B
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 21:43:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18309B84B8
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 21:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3413BB25421
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:43:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D326E1C223AC
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F3C1CCEE2;
-	Thu, 31 Oct 2024 20:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5B31CF7D8;
+	Thu, 31 Oct 2024 20:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lr7kPUgI"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZtIOVQTD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4484149C55;
-	Thu, 31 Oct 2024 20:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63141CC8B3;
+	Thu, 31 Oct 2024 20:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730407391; cv=none; b=NKI2eZTcXD4gGnQ966LEFxyxOQQE1uOmDpmih0aXhFnqDXs0qXpT/tqnr1ja1sYM9NqKu6O64NDv4bjvrq8Y/VGpEjABgGODWS1RZZxideCeTM4372rZLGT22XLmIEMQQ3h7ssAThUqauzBbEO3+lbw1i/PKmLI5grqyAKF8K8E=
+	t=1730408146; cv=none; b=gM6KgDcvUG20Kd70L5smkXzgD1fYNJj1x4A5wkEVCoWf7isqpY3/Ek2KaDvVabcGvxBNWX6xkGvT5VwGJEPjEIuxmX9mmTxqxSRmVPGd0YpXRC0GwhvkmfDr/FW4IE4v+RtRNw8040pD9iNp+PK75rjjchaSMU7EGSarj5RGQ8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730407391; c=relaxed/simple;
-	bh=H9TYKTBvHoQ5rvWOlZrf5R8cp5gm744S0WtiOVj2YhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dQ6vyye8Y2R4V3qRUCATesG+f7RmUzE2M+Is2l+G1NUeK/6fHM7Qd/ZKl2NlNiRAbO8XyZNvOTYFegqzhiXJPT8kXgN87d7JSrcOjY6tw7PvylqA2DSCMULKkfWZnjov8kxP7DF5OGoAadJoji7wnuGIXVUbKiC3I+Kh7wTH9sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lr7kPUgI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7011FC4CEC3;
-	Thu, 31 Oct 2024 20:43:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730407391;
-	bh=H9TYKTBvHoQ5rvWOlZrf5R8cp5gm744S0WtiOVj2YhM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lr7kPUgI/7iVNgICJResGJ30FaV5ODcyHJ9WGRkVobW4I+2qmOuISPyR7TgVvtOL0
-	 SmzSJOoShZhbOMucGyUH2uuWA6uV+MEqkVpWqucL5pewOQIRjkLlpdRuvDl1QVDfWX
-	 j1897yIh4R6d4BkCIdg8zDSKqwvM5/ucAQVUt6ez1WZ9F859wkA3oJfZDIz3/BvZ9Q
-	 CFmDxviw5iM6FMEQKmQ/YcUbuNijZ7G5KlXaJgFBJfCLtyj90f3jtiAtedA93PWWwn
-	 Aojx0RCSHe5LU/8+xXjxLd+N9OOoZAjQdgre/g+5QavM+S81ng8FOAv7tC01+C4SFj
-	 e0eXzNVUyHdgQ==
-Date: Thu, 31 Oct 2024 22:43:06 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241031204306.GB88858@unreal>
-References: <cover.1730298502.git.leon@kernel.org>
- <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
- <20241031083450.GA30625@lst.de>
- <20241031090530.GC7473@unreal>
- <20241031092113.GA1791@lst.de>
- <20241031093746.GA88858@unreal>
- <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
+	s=arc-20240116; t=1730408146; c=relaxed/simple;
+	bh=Vx/GpNQjaPyOsXHD40m4L/SC/SsXyalg3igIGxAFPZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M2luBDeeXre3+YfyShK56TiSFgkfN3Pvq7BP7stCvyevqh8IkrAmznUULC9zeqs5tSy+BzffABhOqmZwACW/C1Ypyvi3QhFeF6bSl37AhVAOFF5CdADzxw8TaHdffCBaXgdh/SYX9kbvdHPkot4UD/A4vIbZnfJDYNhMLk4JHp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZtIOVQTD; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XfbqT6Dh1zlgMVS;
+	Thu, 31 Oct 2024 20:55:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1730408124; x=1733000125; bh=B/pEQTczTiq8UIkWg7TPO3VM
+	Ag1G//4dSD/mob7u6xE=; b=ZtIOVQTDUxy4QOQyeqVfTWcwWtIKOOg1Jac03tiI
+	A7rCqvb9vtKSHPFTp3wF/OdOCTXggfRQmjW1Xz2AyQuoNB4AiXSB6jL3uB70g+in
+	79BqU7XO0OVtBFrfJD3PLeY1HqTIVPag3Az5jepT8ofoaTAMY/ewHawQhH4R+bvg
+	NqlDCexeZlHL8u4+B7neARRpjrmuBRu8CaY9eoTp1+/XajADX9rfWmgbndjW9rLQ
+	XuadQP3u1OUiJL6NnXZlZfO6UYtdFeZQhmbg7NR4i+B2vLIqZ50DBphSoU0yOLfj
+	+sqOmryDNyCHXB3zQKpW/jPG+KIxEnZasIOEgmoiYq7Z1g==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 27aSEBHRr0Fw; Thu, 31 Oct 2024 20:55:24 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Xfbq63bYdzlgTWK;
+	Thu, 31 Oct 2024 20:55:14 +0000 (UTC)
+Message-ID: <4c7e679a-d3e6-4426-a679-ee581b5c728c@acm.org>
+Date: Thu, 31 Oct 2024 13:55:11 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/7] block: share more code for bio addition helpers
+To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <cover.1730037261.git.leon@kernel.org>
+ <e6be9d87a3ca1a2f9c27bce73fbab559c21c765f.1730037261.git.leon@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e6be9d87a3ca1a2f9c27bce73fbab559c21c765f.1730037261.git.leon@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 31, 2024 at 11:43:50AM -0600, Jens Axboe wrote:
-> On 10/31/24 3:37 AM, Leon Romanovsky wrote:
-> > On Thu, Oct 31, 2024 at 10:21:13AM +0100, Christoph Hellwig wrote:
-> >> On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
-> >>> This series is a subset of the series you tested and doesn't include the
-> >>> block layer changes which most likely were the cause of the performance
-> >>> regression.
-> >>>
-> >>> This is why I separated the block layer changes from the rest of the series
-> >>> and marked them as RFC.
-> >>>
-> >>> The current patch set is viable for HMM and VFIO. Can you please retest
-> >>> only this series and leave the block layer changes for later till Christoph
-> >>> finds the answer for the performance regression?
-> >>
-> >> As the subset doesn't touch block code or code called by block I don't
-> >> think we need Jens to benchmark it, unless he really wants to.
-> > 
-> > He wrote this sentence in his email, while responding on subset which
-> > doesn't change anything in block layer: "just want to make sure
-> > something like this doesn't get merged until that is both fully
-> > understood and sorted out."
-> > 
-> > This series works like a charm for RDMA (HMM) and VFIO.
-> 
-> I don't care about rdma/vfio, nor do I test it, so you guys can do
-> whatever you want there, as long as it doesn't regress the iommu side.
-> The block series is separate, so we'll deal with that when we get there.
-> 
-> I don't know why you CC'ed linux-block on the series.
+On 10/27/24 7:21 AM, Leon Romanovsky wrote:
+> +static int bio_add_zone_append_page_int(struct bio *bio, struct page *page,
+> +		unsigned int len, unsigned int offset, bool *same_page)
+> +{
+> +	struct block_device *bdev = bio->bi_bdev;
+> +
+> +	if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_ZONE_APPEND))
+> +		return 0;
+> +	if (WARN_ON_ONCE(!bdev_is_zoned(bdev)))
+> +		return 0;
+> +	return bio_add_hw_page(bdev_get_queue(bdev), bio, page, len, offset,
+> +			bdev_max_zone_append_sectors(bdev), same_page);
+> +}
 
-Because of the second part, which is marked as RFC and based on this
-one. I think that it is better to present whole picture to everyone
-interested in the discussion.
+Does "_int" stand for "_internal"? If so, please consider changing it
+into "_impl". I think that will prevent that anyone confuses this suffix
+with the "int" data type.
 
-Thanks
+Thanks,
 
-> 
-> -- 
-> Jens Axboe
-> 
+Bart.
 
