@@ -1,202 +1,276 @@
-Return-Path: <kvm+bounces-30144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB7D9B731A
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 04:40:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA429B7357
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 04:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48B021F25835
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 03:40:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D6A61C23FE9
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 03:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E60D13A256;
-	Thu, 31 Oct 2024 03:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B426413B280;
+	Thu, 31 Oct 2024 03:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ls9ubQuJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bnNE7Qlq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1E13A863
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 03:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730346003; cv=none; b=SQtD1cmZHTk7KvKmwkGpviiJDo1y/pIhclkV8+NXDZPicwA+KsFx8UlgR3bgchN0mpHDOJmDdCboeKPmi1obotOfho7I+yozeTDNvkdBNsjikFqQnjSBQahVlGD1xwH7jzIXzuYwcYN8sCbeFYFOHIbcIHM0zbpUowl/JiOnAmE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730346003; c=relaxed/simple;
-	bh=lqhlHqV3COwkx1tRe9N/vUG8LYb9ZaQRohHuJ0GFHgc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UOW7hn/sMRio9u3Y6JC9luTyQKi5PrxPMQQaQh3mxvaoUXVPlmw34vWOANB4Ju1ArUMZoKPlG9x25tgAoIS2fqDDBrIlGmOfK4oMtS4XzENwGRaTtrSQaxnePGzsMPo3rxdZ+9rdM/GMOq+yi8Z7v5sKRS/epiMsU0aPwIpVrI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ls9ubQuJ; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e2eb9dde40so402359a91.0
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 20:40:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730346000; x=1730950800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qDmZiV+NWIwT+X+k+LAFHUSHr7OingjAwQqLRVIU6I4=;
-        b=Ls9ubQuJtTMkpLd65nz0CjBqh5LjWOYWMz1JBwvIQqHe2OtUWtOF/JZd4Pot5e926h
-         YQVZVx6WPcWHLjklYe2q6mrYvZbbY8VL63D9RQaMT9OwHtXpBc8i+iTi45gyaZLRt8iP
-         Vsg6iTFkesNifeU8+axzR7qguPx1rde9LdRrJRlsfcZDRg8BpRa8/X1f+byp+XUDUONz
-         FDM0yQdN6WjYkKpcI3JIhpznggxG7UweImNYLaDT16pvCdx73BWnKxwGwONFJApaNraj
-         ExehGLvplf4LKENTovv9jK7CCb7j4Wjh32VJmHQznmA5pM7z3Bkj2I2clibrchql5kt3
-         VESw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730346000; x=1730950800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qDmZiV+NWIwT+X+k+LAFHUSHr7OingjAwQqLRVIU6I4=;
-        b=DDT9KXmMoQF+8qFcx1QAeS2kjcmsfp/Z2GdVJmT6hiuwf/fWy3ws4+sm681QSQCOr3
-         QtmflOuqnH7i8DJDOeWGksMAHd7Sf8VcPAfFc4ra4TtOpKTXIN3aY7oFABTNH3RSkYAx
-         svkRNHfMry+LU6tyhbQJecD8YwX65VuCIIWPfWXoTSd553QTNYGm0d7GZ8Y922/XTP3z
-         XMvp9aqmPaJVNFeWIdv7LfQsNEiiQK7xxWfxE0cfiVX4wt37GA0RnW16yryC6UF7X4rQ
-         xWBw9MwghZudhPUviSYZA0rBBNo+0xQXZUhduEPw206jaseWxt0xv7voVitNdmT1xI8e
-         EGMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwis54HoUz/2A2opLkBC2gdgB/CYg5tw95fviSV8UljF3x8PnVX0Jc9vpiW9ntJWL71iE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRAv8CMux6J+bBZRLZwfFhhnDZHWod5wM+e9LLFhsTfde9hF1T
-	ilq+kQrNcu43sKU4t0BdubfYJHnbermeeEvP3klNObg6szLff8Z7x5UdFp9+eDP3EGj9KhFV/gT
-	Szq2HG0ayv3bv9t7QIbGPhtuiL5Q=
-X-Google-Smtp-Source: AGHT+IHwNA/ciOAbP/RMMGgFOrSxmsSyi+XiO7uj18muYi44OJAU7w2GFJOYYZwwJWmjSUV5M9cnGGr8nNquoydXAl0=
-X-Received: by 2002:a17:90b:2d92:b0:2e2:c40c:6e8a with SMTP id
- 98e67ed59e1d1-2e93c1d3e42mr2258137a91.26.1730346000333; Wed, 30 Oct 2024
- 20:40:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A261BD9DC;
+	Thu, 31 Oct 2024 03:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730347177; cv=fail; b=Yyga/3FnOJhYI+tfCV8aL9Qa/xYf8SyF49giFTL4UVj66rVF7N4uBEu8Yp2L/PASmwsoSlDgPcybrlXZp/WW9fWqPaQ4SwV3rt0Z6VlameHtDqyMqSp9WMgpp2tdeX5rPTX7BYiSPQTQXBqdQq57T5aRiw9qTqaFLJ1Lw6jQ++U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730347177; c=relaxed/simple;
+	bh=p7LMUMoaeQ7SRuHC4KCnfNvkwURiyYFlJEncyQhxzGE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nakfrS4RTDVDy3fFHy8H75WdbtKnpUXpdhTx4U6MuwH6scNiTMH7ASENN06q8uF8hOwNtlglJawZCAfCe3cTA4l1+0+hszTC6O18PDMkhDapMMSKgzW9IxkqFrj9FQcm2RQxCC0q9Sk7mzqkOuMlb+UPuK+tlIO52PQzy+HQeOY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bnNE7Qlq; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730347175; x=1761883175;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=p7LMUMoaeQ7SRuHC4KCnfNvkwURiyYFlJEncyQhxzGE=;
+  b=bnNE7Qlq0uyvYhrCbxL0tj8rTF2yfMYrUJknEQA8dzoQc45C6WeIAaDZ
+   swct2a5WS8nK0Bwg+Eyjzp0gnjZHFjS3gK4z/Df0kF7877FbM+PK7a8W5
+   JXhwNW92odh80rHHv6MxRvU3AW5JmROy/bNhFDgWtNtl3ryF181lJGGKe
+   +rsAPPmms6RvCSYfPMJ+J65rpuNc4DfbQZy99XWJwJAWSGGkh3r34Jm1S
+   MbSBX9EI9VBAxtwyLkfG9Mbox4lZAGyGJLVSVya9VMntPJ00uqQ3j0qMS
+   MfTzc0162/JS2Sgjpx0hZHGLVuZn3VZFQyKpjWBzFxN3QwoaXReO5L44e
+   Q==;
+X-CSE-ConnectionGUID: GhpKamu5TPKtXViFq/6UZA==
+X-CSE-MsgGUID: 3p/BGzKfQJuEwYlDHfoxZw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41170623"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="41170623"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 20:59:34 -0700
+X-CSE-ConnectionGUID: Su1/gy2lSYuV22GT3naz2Q==
+X-CSE-MsgGUID: DLlxELT5SUqB0jb7TWXURw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,246,1725346800"; 
+   d="scan'208";a="87297523"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2024 20:59:34 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 30 Oct 2024 20:59:33 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 30 Oct 2024 20:59:33 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 30 Oct 2024 20:59:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZOldP+jYJJT3z0O5k9AqHnaH6lb6ePM+VhcOYmMfjlOfIGPnHGb61NbnJ0DMUck6tQuDh8ikLn2hS2WSOOZVO/ovmB1D4gSuQEXn8cC/xRnpt7XL1LpJ7kx+1b3FVzMp/8pWvZTL7Ca66NG/1yyFVlXAtwy+VzkRCMe92mAylyu4SwFbjRWXiqSQ1FojmiVaRkRRf/KGlCOzXql6Y+PiH+mLKSuvIr9aVD9uvqet2zSlA8z/iolBTVpL/SZQAquPx+MbmB0h9bVS6GR4yhfr+UZsBFMrxrerJ40bVG3ja9kiy6chxw2AksjbETpq+htvTxRGTfOmEmZpQREL5PmLYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dNHZtLAy+HKS0PgZxL2A++ifH3lt+O53/KiNL7/vlbo=;
+ b=F3ZSU2+3dJ5/DNo4qEaN+vrta2pv5KD5ysAsHQHS+b/AesnQ+k3tsC0JGhFB+XUAjQf70DnY6ZjU3IWAp18b5DKqziIOu6OYjIt+BL274Lr5PmgMaRMTQ1955AoMrfLv/4m/7rL1cP2/jrI6dcS/TGDytQNX80gHikux49ETNAScEggZBZEyv+zwGBwaw26vim926XD/zGtzxReaIDhjN8C/3EOWxDxQzBS+9HU0i92RLqXgvgqtsSNlAsF8kr1aENTh/ft79lqvRdSba+oBbLPCZupLpexTev3LjU7ayM8jND3pXzK5il5uxukvXjE0whA2ZdxgKCDdyiK7k3a7yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH7PR11MB8600.namprd11.prod.outlook.com (2603:10b6:510:30a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.23; Thu, 31 Oct
+ 2024 03:59:31 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8093.024; Thu, 31 Oct 2024
+ 03:59:30 +0000
+Date: Thu, 31 Oct 2024 11:57:03 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>, <isaku.yamahata@gmail.com>,
+	<kai.huang@intel.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<tony.lindgren@linux.intel.com>, <xiaoyao.li@intel.com>,
+	<reinette.chatre@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, "Sean
+ Christopherson" <sean.j.christopherson@intel.com>, Binbin Wu
+	<binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH v2 08/25] x86/virt/tdx: Add SEAMCALL wrappers for TDX
+ page cache management
+Message-ID: <ZyMAD0tSZiadZ/Yx@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
+ <20241030190039.77971-9-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241030190039.77971-9-rick.p.edgecombe@intel.com>
+X-ClientProxiedBy: SI2PR02CA0011.apcprd02.prod.outlook.com
+ (2603:1096:4:194::20) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241023124527.1092810-1-alexyonghe@tencent.com> <ZyJ7ZsP4RaRfcFQF@google.com>
-In-Reply-To: <ZyJ7ZsP4RaRfcFQF@google.com>
-From: zhuangel570 <zhuangel570@gmail.com>
-Date: Thu, 31 Oct 2024 11:39:49 +0800
-Message-ID: <CANZk6aQEH=9EFdsBfuRcUWhTu88Oc=x=Wp3bcqzQd1AVjcTTEg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Try to enable irr_pending state with disabled APICv
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
-	alexyonghe@tencent.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB8600:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2833328-4521-4cbe-f9db-08dcf9606c23
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?H5+Er/atk5EwJiKr6eCzBY18aQH0MS3BwbJfi6rkbJA3vO3MRVffsusUtR9z?=
+ =?us-ascii?Q?VQRf3acszLmWmTN8rUEBGQswuPrc8meyComBK/ZAvQEk8fDu+kF0mMf15ybK?=
+ =?us-ascii?Q?939RsH1aYVrqdSV6mLLIePVBV1wbZaq5443zESNyRFIlsqitVKyuAkHktMEj?=
+ =?us-ascii?Q?6s3LNxA8LiNd5VS7sAWKTr0Phq0Bd9saQ/qoir4XBRB0xVyaYoaqxq1SiFqA?=
+ =?us-ascii?Q?gMzKVabH0dBYPVdUrctjxv64lT0Jsj2UltRkAlmvwBsvPlLNhGG5s3VbtZ9P?=
+ =?us-ascii?Q?QHG1etYi9cnvXIVrSUPnT3rjA+TMEdPzbJ6k5mV7tiiKBgLBrYfpeZBTR9Bo?=
+ =?us-ascii?Q?h+bWH2f1ef1NOmLiO26ZbAkbPf3dBLWM6EYkiKRUcy3O5pLbXbdSOnB4765M?=
+ =?us-ascii?Q?riNDfdeMDYR5I+lSEz6mrO4oTtEDv1SwORpCcFEHMnT/n9lXMTygeYSugL29?=
+ =?us-ascii?Q?pXc46zULALVD9BLmILOtE2GGwT0vkKnDdnnOu5ui4IhqUsj5QjWLrO271zwC?=
+ =?us-ascii?Q?trCCeCKGfQqtbBix+NDKppv7esxexiPJJuvabhE+3wGqYqszMao72kggsA0D?=
+ =?us-ascii?Q?YAM/l1qIwi4mf0by7GPrGARpZ4s8m4z3SIkYCG3LU+oBHGPrA4SDkMDYr4JP?=
+ =?us-ascii?Q?Y9lqisLr0eSVRcWRCYLTYsyElLkRYLS0GyrvPv84rqnuvv06s5BJkoa3A13C?=
+ =?us-ascii?Q?qV96W2gk+vWjTXqzx8xuXV8bGNk4Muqzndytj2jLjvBfcF3L4G7c28EdVmOR?=
+ =?us-ascii?Q?sfPiWRPs3qxRlDkLQcjoFMBprcXEhuot3h15S4LXMnNq6LtDx3SMvkir7aD1?=
+ =?us-ascii?Q?C/qW2EwMUJZF2h8sQLeljUWBGY0CkpqJZ3mBOXi7JKPf3jxj78TT5S/ctct/?=
+ =?us-ascii?Q?0lPXrlOK5AceOYbjufJ7Oi/HWLV+8HuiWvRJgM4tikd5OF0fsyD9fr5l/jdh?=
+ =?us-ascii?Q?a4vL7nyuX5PLk4KQ8Ma/A48jFZkso1xhO95Y+4ICt9SdKSRqMXEY5+Z2zbTz?=
+ =?us-ascii?Q?xPnG0pMeJ3Aj7RDG4q7WR1OhN9fZq5fecXRD2CdqmBBnlO0gTptRFTMwStJt?=
+ =?us-ascii?Q?NygGOgNFglQM/RzUlnujgIECcsg1fBzmsabmaysmoBXm6ShMm74AW4tLatVS?=
+ =?us-ascii?Q?MbsGnBQ1Hxutt/ZgyCIImPk+dJjv/PfC7weO6CevqV8X34LP+VFZNWxvVwtD?=
+ =?us-ascii?Q?lHLelSSKn/6QMZdleDq3j1B8wVZnRFWlgMpIxm9dwaLGW5Zx+97O1lSB1KEm?=
+ =?us-ascii?Q?1tSzir+a4rfvmYqRPd4VZNmHKA02l+WYyu0njLJOFWpGhsbtniouE0SuK6q6?=
+ =?us-ascii?Q?qt/H94pwmn9bYCDFBPt1u4PJ?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+p7qyKVG8YaO3jzUS0qgEA93W5QTQ3/RPsPAXHP68RLQica499aNvUlrOBhF?=
+ =?us-ascii?Q?Dtlc61HG++M48FlktzfgLeN8PcXv5PlqXq7EJM2vT88Db5mSDFIXfKUEs/TF?=
+ =?us-ascii?Q?rqhiOWT7S8ArIMraps4CILOS6hImkwLAypDlests0OrlPjrf1GE7sgYxM3pK?=
+ =?us-ascii?Q?edOQDiUo8Iej0ea2ZA29b0ct8pg6QzuaZrdwP9Otn1mF1Qewj5vupJ5eFa4c?=
+ =?us-ascii?Q?p9bcQFQDUAAYtUgv86qcBRlIYj3DWHgBuCL30kT8bJ24HqV0gV9QDc2tH6El?=
+ =?us-ascii?Q?82vaprWuBIDeIifjpzBgnxHqwoSOyvNTt1Jwr5ChwNHtZJB+mcpEU43YNYSr?=
+ =?us-ascii?Q?1+GLbfNH8QtsrtFtj61ypW7ZQyNbVhYvSyRweC7li1au3Yc5qOOnuYhspi+t?=
+ =?us-ascii?Q?fvnSDZWjj8kXJQagu48uX8bvf3aQgVYk0EPQZifDor6L1XIDvkP9vY2WTwz+?=
+ =?us-ascii?Q?v6ienzJM+nWxumHF5sld10dkTfQoBCHIv7jfv0Ra2GIlkM0/HxrqNwHDfufc?=
+ =?us-ascii?Q?eh14o5sWehXM5XIv3nnz6HY7Q2Sy2Ws3McZjt6iOEt7jUBOPhP63S1QjDFSM?=
+ =?us-ascii?Q?JaTeAE488ET6TsFA9QqCAHbOxnYDXEMIzxCcFqErar+NDzXS/VxM9pT+bHV/?=
+ =?us-ascii?Q?dMg8f1L5K22bRb67KEfgxQOMOj/r3ZGhkfjrHA/2FDpoShaN5pCqw2nzx9Zz?=
+ =?us-ascii?Q?USB6y8lzwM1nUikuvxLkPGECrdpHtlrXIhT+47Q/6nVOQr5K1yC4mhclN5AA?=
+ =?us-ascii?Q?qJkhi3yr19LVHYt5aI0XhhGLOXj1is5midGbojLxOA4sE+5/+NOkmnX/uJVe?=
+ =?us-ascii?Q?kodzPHp2M9g4Mtn2XzNx5wmYLUcrMR1AwNz73qOa1zJyVaaIUKn82TyXjQun?=
+ =?us-ascii?Q?7nyrTV/8Ly8Zt+P1n+jcToIpul4wB0wt0PiQcwR+zoNZbBgW7nHVhiCRwQgt?=
+ =?us-ascii?Q?lJjds1obfyi+Mlyq1KFbNC9paUNv4tpO8HvSRLU93BBlNlafnPfy5QfbHna2?=
+ =?us-ascii?Q?BH/CBolSjR9EwT5Vp8Wi/blXjSLSZTme161wSTgpPmJdDP9eP4xKhpcmA86b?=
+ =?us-ascii?Q?w+Eqx5Tly0gFEfr3atsLfBdzSRI/IXRfABWwPayW/4uKUQqN0rOzj5DJRlYu?=
+ =?us-ascii?Q?ivPC6wqiCpQnFBrQ34Q/Xw2UEU6eo6hQCnZuZ2r6JQYIpeh39cF9t/H7P1ix?=
+ =?us-ascii?Q?eYdT6XoUxd7FOCN6BV1uI0xVxKmFsIt/cW666ucAsyKISpgimdVLT+MG07Yc?=
+ =?us-ascii?Q?OzDk/C/uxWDTDfvuOUGrRNAz/BZA1KTmGaJcW0hyVk6+eanMEx9i0pdAZ+4i?=
+ =?us-ascii?Q?6sSbSxXOnjbz9ahWDlVZNIW/qUn31jqxj+fSH0OkhjvcMVyPC4IHeDqc/yDm?=
+ =?us-ascii?Q?/zoXRcsfTFCcd/VbKwLrfrTcYPNnjZBWnScV8jZkJy0SvNQDQqoP5IYdhFml?=
+ =?us-ascii?Q?eiuQxt/lMotVSkvGqGD6vgyFkvDGXzl2ShW3ySij21ySQEH9u1vTpEwiydID?=
+ =?us-ascii?Q?VlRi7bfK6ry4hti8FwlCRWKqrCEPpNV+9QR6rOydhZbKiXUWvMfJjTuNsOWr?=
+ =?us-ascii?Q?0mGpbzSF2WmsDmPsqVYdLfpQcKz0JeMFYJZ50ZSH?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2833328-4521-4cbe-f9db-08dcf9606c23
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 03:59:30.7591
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DO6s5yWM2+BrAoLKWu9+ujNji17ELkPoARASl9MdIKT6wv+Lu/p+YBdzPc/B019556rMAdz26/py/md7LMBNLw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8600
+X-OriginatorOrg: intel.com
 
-On Thu, Oct 31, 2024 at 2:31=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, Oct 23, 2024, Yong He wrote:
-> > From: Yong He <alexyonghe@tencent.com>
-> >
-> > Try to enable irr_pending when set APIC state, if there is
-> > pending interrupt in IRR with disabled APICv.
-> >
-> > In save/restore VM scenery with disabled APICv. Qemu/CloudHypervisor
-> > always send signals to stop running vcpu threads, then save
-> > entire VM state, including APIC state. There may be a pending
-> > timer interrupt in the saved APIC IRR that is injected before
-> > vcpu_run return. But when restoring the VM, since APICv is
-> > disabled, irr_pending is disabled by default, so this may cause
-> > the timer interrupt in the IRR to be suspended for a long time,
-> > until the next interrupt comes.
-> >
-> > Signed-off-by: Yong He <alexyonghe@tencent.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 2098dc689088..7373f649958b 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -3099,6 +3099,10 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, st=
-ruct kvm_lapic_state *s)
-> >                                               apic_find_highest_irr(api=
-c));
-> >               kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(api=
-c));
-> >       }
-> > +
-> > +     /* Search the IRR and enable irr_pending state with disabled APIC=
-v*/
-> > +     if (!enable_apicv && apic_search_irr(apic) !=3D -1)
->
-> This can/should be an "else" from the above "if (apic->apicv_active)".  I=
- also
-> think KVM can safely clear irr_pending in this case, which is also why ir=
-r_pending
-> isn't handling in kvm_apic_update_apicv().  When APICv is disabled (inhib=
-ited) at
-> runtime, an IRQ may be in-flight, i.e. apic_search_irr() can get a false =
-negative.
+On Wed, Oct 30, 2024 at 12:00:21PM -0700, Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Thank you for your review and suggestions.
+> Add tdh_phymem_page_reclaim() to enable KVM to call
+> TDH.PHYMEM.PAGE.RECLAIM to reclaim the page for use by the host kernel.
+> This effectively resets its state in the TDX module's page tracking
+> (PAMT), if the page is available to be reclaimed. This will be used by KVM
+> to reclaim the various types of pages owned by the TDX module. It will
+> have a small wrapper in KVM that retries in the case of a relevant error
+> code. Don't implement this wrapper in arch/x86 because KVM's solution
+> around retrying SEAMCALLs will be better located in a single place.
+With the current KVM code, it looks that KVM may not need the wrapper to retry
+tdh_phymem_page_reclaim().
 
->
-> But when stuffing APIC state, I don't see how that can happen.  So this?
+The logic of SEAMCALL TDH_PHYMEM_PAGE_RECLAIM is like this:                               
+                                                                                 
+SEAMCALL TDH_PHYMEM_PAGE_RECLAIM:
+1.pamt_walk                                                                   
+  case (a):if to reclaim TDR:                                           
+           get shared lock of 1gb and 2mb pamt entries of TDR page,
+           get exclusive lock of 4k pamt entry of TDR page.
+  case (b):if to reclaim non-TDR & non-TD pages,
+           get shared lock of 1gb and 2mb pamt entries of the page to reclaim,
+           get exclusive lock of 4k pamt entry of the page to reclaim.
+  case (c):if to reclaim TD pages,
+           get exclusive lock of 1gb or 2mb or 4k pamt entry of the page to
+           reclaim, depending on the page size of page to reclaim,
+           get shared lock of pamt entries above the page size.
+2.check the exclusively locked pamt entry of page to reclaim (e.g. page type,
+  alignment)
+3:case (a):if to reclaim TDR, map and check TDR page
+  case (b)(c):if to reclaim non-TDR pages or TD pages,
+              get shared lock of 4k pamt entry of TDR page,
+              map, check of TDR page, atomically update TDR child cnt.
+4.set page type to NDA to the exclusively locked pamt entry of the page to
+  reclaim.
 
-Here is our case.
+In summary,
 
-APICv is disabled by set enable_apicv to 0. Create VM snapshot, then
-start/restore
-new VM base the snapshot. We occasionally encountered issues with VMs hangi=
-ng
-for long periods of time after restore. Investigation show that there
-is a timer IRQ
-pending in IRR, but the newly restored VM could not detect it, because
-irr_pending
-is not set when restoring the APIC state by kvm_apic_set_state().
+------------------------------------------------------------------------------
+page to reclaim     |        locks
+--------------------|---------------------------------------------------------
+     TDR            | exclusive lock of 4k pamt entry of TDR page
+--------------------|---------------------------------------------------------
+non-TDR and non-TD  | shared lock of 4k pamt entry of TDR page
+                    | exclusive lock of 4k pamt entry of page to reclaim
+--------------------|---------------------------------------------------------
+   TD page          | shared lock of 4k pamt entry of TDR page
+                    | exclusive lock of pamt entry of size of page to reclaim
+------------------------------------------------------------------------------
 
-Further investigation show when creating VM snapshot, VMM pause VCPUs by si=
-gnal,
-an in-flight timer pending in IRR, and the tscdeadline is 0 in saved
-APIC state. All these
-contexts in saved APIC state prove that kvm_inject_pending_timer_irqs
-had just injected
-a timer (will also set the tscdeadline to 0) before the VCPU handle the sig=
-nal.
+When TD is tearing down,
+- TD pages are removed and freed when hkid is assigned, so
+  tdh_phymem_page_reclaim() will not be called for them.
+- after vt_vm_destroy() releasing the hkid, kvm_arch_destroy_vm() calls
+  kvm_destroy_vcpus(), kvm_mmu_uninit_tdp_mmu() and tdx_vm_free() to reclaim
+  TDCX/TDVPR/EPT/TDR pages sequentially in a single thread.
 
-Maybe this patch is a fix for 755c2bf87860 (KVM: x86: lapic: don't
-touch irr_pending in
-kvm_apic_update_apicv when inhibiting it), the irr_pending enable
-check is missed in
-kvm_apic_set_state() after that.
+So, there should be no contentions expected for current KVM to call
+tdh_phymem_page_reclaim().
 
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 65412640cfc7..deb73aea2c06 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -3086,6 +3086,15 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, stru=
-ct kvm_lapic_state *s)
->                 kvm_x86_call(hwapic_irr_update)(vcpu,
->                                                 apic_find_highest_irr(api=
-c));
->                 kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(api=
-c));
-> +       } else {
-> +               /*
-> +                * Note, kvm_apic_update_apicv() is responsible for updat=
-ing
-> +                * isr_count and highest_isr_cache.  irr_pending is somew=
-hat
-> +                * special because it mustn't be cleared when APICv is di=
-sabled
-> +                * at runtime, and only state restore can cause an IRR bi=
-t to
-> +                * be set without also refreshing irr_pending.
-> +                */
-> +               apic->irr_pending =3D apic_search_irr(apic) !=3D -1;
->         }
->         kvm_make_request(KVM_REQ_EVENT, vcpu);
->         if (ioapic_in_kernel(vcpu->kvm))
->
-> > +             apic->irr_pending =3D true;
-> >       kvm_make_request(KVM_REQ_EVENT, vcpu);
-> >       if (ioapic_in_kernel(vcpu->kvm))
-> >               kvm_rtc_eoi_tracking_restore_one(vcpu);
-> > --
-> > 2.43.5
-> >
+> +u64 tdh_phymem_page_reclaim(u64 page, u64 *rcx, u64 *rdx, u64 *r8)
+> +{
+> +	struct tdx_module_args args = {
+> +		.rcx = page,
+> +	};
+> +	u64 ret;
+> +
+> +	ret = seamcall_ret(TDH_PHYMEM_PAGE_RECLAIM, &args);
+> +
+> +	/*
+> +	 * Additional error information:
+> +	 *
+> +	 *  - RCX: page type
+> +	 *  - RDX: owner
+> +	 *  - R8:  page size (4K, 2M or 1G)
+> +	 */
+> +	*rcx = args.rcx;
+> +	*rdx = args.rdx;
+> +	*r8 = args.r8;
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(tdh_phymem_page_reclaim);
+ 
 
