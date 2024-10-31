@@ -1,176 +1,325 @@
-Return-Path: <kvm+bounces-30166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA75F9B78DD
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 11:42:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB489B78ED
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 11:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC3D31C22152
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:42:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21ADF1F24F55
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 10:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B2D199EA1;
-	Thu, 31 Oct 2024 10:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E299719994D;
+	Thu, 31 Oct 2024 10:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="eE2nQMdK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gXb5rgHp"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2D6199395;
-	Thu, 31 Oct 2024 10:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E9B83CD9;
+	Thu, 31 Oct 2024 10:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730371346; cv=none; b=gnI2TVUtl5K/AJDuVZcHf1TtdelpCBH0YuoVQ/sYYWDFRxo7pSFV2AoaKuGTIMRT6os3Y8X7IDIyLERAwPr1rjd23w3BzJ5k3ahkS04jgid+8ISpmfUHKhG/ThrHRjoBzBfiapDlM/XMS/4QD21+IuPuhghq4e0J7884+kmH88w=
+	t=1730371541; cv=none; b=Ea4oWI5pAl3D92ZhxuJvCJpQ0AW4kwkM8VD+WYOyVfFLcvD5hozB6OK8HEZusuJSa7ZW1KpfbxeDreJpkpqj3D184yZtd8iKF0XVXtdfIfKnCDNAf2WN9zdi+7NIb3x73vcWhZ3IIQK7PwXiRkfO/VdQDBP03oLH0u46Tuv1V+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730371346; c=relaxed/simple;
-	bh=LirR3kzbScaAvwOKGcEk0tU8aX0hkYtaRdjnyAUg0cA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gMCcwrT8qGm18JX3KLTwGt8USSqCHAPTWHPx8psi55r7JDjVkLjHf2eWazlM0J7uF9yfY5HzBCpdd7qWG9Zzb8to1TBEtPx9yXeVpXYB1iq3sLyGzNgIA34P/726lzshHlrusc4RKRE05XnE3CODNjkcNDWBtOTk+gvUkVse31Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=eE2nQMdK; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1730371345; x=1761907345;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2XSQmg9XPL/tUl5Uy9X9cqzqndsoHfM/nyIda+DnmYs=;
-  b=eE2nQMdKcNLuqicCNqHp/j4fLUzG++kDn/aXTaIkjrxy5eY2/n2qc5ry
-   EzFguMwjRcOQS5VGG5a41lkhKP6ZfTWaqVDNzaPKrgKQYgBX0k0gFbeLE
-   JPgqQh8ZhswAKPqQP8H1Rp4WrKhK2Ha3PN+RHSxJuaQgS+TfABckgWvzv
-   0=;
-X-IronPort-AV: E=Sophos;i="6.11,247,1725321600"; 
-   d="scan'208";a="37873631"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 10:42:19 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:53488]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.121:2525] with esmtp (Farcaster)
- id f575b9e2-c87c-4dc7-9ccf-8641a67b176b; Thu, 31 Oct 2024 10:42:18 +0000 (UTC)
-X-Farcaster-Flow-ID: f575b9e2-c87c-4dc7-9ccf-8641a67b176b
-Received: from EX19D003UWB002.ant.amazon.com (10.13.138.11) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 31 Oct 2024 10:42:09 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D003UWB002.ant.amazon.com (10.13.138.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 31 Oct 2024 10:42:09 +0000
-Received: from email-imr-corp-prod-iad-all-1b-a03c1db8.us-east-1.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Thu, 31 Oct 2024 10:42:08 +0000
-Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-iad-all-1b-a03c1db8.us-east-1.amazon.com (Postfix) with ESMTPS id 524C0804C3;
-	Thu, 31 Oct 2024 10:42:02 +0000 (UTC)
-Message-ID: <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
-Date: Thu, 31 Oct 2024 10:42:00 +0000
+	s=arc-20240116; t=1730371541; c=relaxed/simple;
+	bh=J0lBZniKTaYEzckyEAV7RWTIBs3KnKUaGugySpgf+dE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O0dc4ltQJgydwK9Y0PbE63MMTMrSWqfFBJ2G88pRMvq+nadjRuAM1CI6gj75g7/LcFPHAZoFBu4DTsT4fuiZC3pf3zSqejGBUe2OmP/XuoQ1qWFopf/mMFz87kEwJp3OHzaaQvZxRIgAcgyomWxPZX6v+e/yra80nvUE+n+DhzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gXb5rgHp; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730371538; x=1761907538;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=J0lBZniKTaYEzckyEAV7RWTIBs3KnKUaGugySpgf+dE=;
+  b=gXb5rgHprdm3B4m44h73vuc+/SomRM6uc9++y7HLDlQaphKxfuo/H7gk
+   a0QgnfAuP84HXz9O74hakNXQamhB4MWV1EW1XlGLYkBe8pHFjKh78IE2V
+   FwddsI+zSqIpNpl6NJJ3VMZP/v7zAAI+m+g/FIQVJoiYjaFPYz5kAP6jX
+   JAhNu0PPtlIFGYxcvTAdF/ZH2z83nLJ3IRtGBtOL+Jnf95Y+iUVlXYDr3
+   qh+hOMW6CPDEsnwVLDvHd03lfDoIVmYoaJjfZoY511WuUiySkIXrPzxQN
+   NROVI1Cez7WvGgfSdLd7U79maBZppMTtxrFFuiL53iSNSWqsEgsNx9mKn
+   A==;
+X-CSE-ConnectionGUID: mO7Xp/UHR/uaBXsBDGPQdw==
+X-CSE-MsgGUID: RzH16BsTSSyYDJVwaC7gCA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="55501321"
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="55501321"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 03:45:37 -0700
+X-CSE-ConnectionGUID: YuNARll7SUaFHR0hRuAGuQ==
+X-CSE-MsgGUID: fNJz6c39RpeQ3aQwkz75Xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="83396329"
+Received: from ccbilbre-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.220.21])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 03:44:57 -0700
+From: Kai Huang <kai.huang@intel.com>
+To: dave.hansen@intel.com,
+	kirill.shutemov@linux.intel.com,
+	tglx@linutronix.de,
+	bp@alien8.de,
+	peterz@infradead.org,
+	mingo@redhat.com,
+	hpa@zytor.com,
+	dan.j.williams@intel.com,
+	seanjc@google.com,
+	pbonzini@redhat.com
+Cc: x86@kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com,
+	isaku.yamahata@intel.com,
+	adrian.hunter@intel.com,
+	nik.borisov@suse.com,
+	kai.huang@intel.com
+Subject: [PATCH 9/8] x86/virt/tdx: Add the global metadata code generation script
+Date: Thu, 31 Oct 2024 23:44:33 +1300
+Message-ID: <20241031104433.855336-1-kai.huang@intel.com>
+X-Mailer: git-send-email 2.46.2
+In-Reply-To: <cover.1730118186.git.kai.huang@intel.com>
+References: <cover.1730118186.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-To: David Hildenbrand <david@redhat.com>, <tabba@google.com>,
-	<quic_eberman@quicinc.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
-	<jthoughton@google.com>, <ackerleytng@google.com>, <vannapurve@google.com>,
-	<rppt@kernel.org>
-CC: <graf@amazon.com>, <jgowans@amazon.com>, <derekmn@amazon.com>,
-	<kalyazin@amazon.com>, <xmarcalx@amazon.com>, <linux-mm@kvack.org>,
-	<corbet@lwn.net>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<chenhuacai@kernel.org>, <kernel@xen0n.name>, <paul.walmsley@sifive.com>,
-	<palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <hca@linux.ibm.com>,
-	<gor@linux.ibm.com>, <agordeev@linux.ibm.com>, <borntraeger@linux.ibm.com>,
-	<svens@linux.ibm.com>, <gerald.schaefer@linux.ibm.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <luto@kernel.org>, <peterz@infradead.org>,
-	<rostedt@goodmis.org>, <mhiramat@kernel.org>,
-	<mathieu.desnoyers@efficios.com>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <loongarch@lists.linux.dev>,
-	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-References: <20241030134912.515725-1-roypat@amazon.co.uk>
- <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-10-31 at 09:50 +0000, David Hildenbrand wrote:
-> On 30.10.24 14:49, Patrick Roy wrote:
->> Unmapping virtual machine guest memory from the host kernel's direct map
->> is a successful mitigation against Spectre-style transient execution
->> issues: If the kernel page tables do not contain entries pointing to
->> guest memory, then any attempted speculative read through the direct map
->> will necessarily be blocked by the MMU before any observable
->> microarchitectural side-effects happen. This means that Spectre-gadgets
->> and similar cannot be used to target virtual machine memory. Roughly 60%
->> of speculative execution issues fall into this category [1, Table 1].
->>
->> This patch series extends guest_memfd with the ability to remove its
->> memory from the host kernel's direct map, to be able to attain the above
->> protection for KVM guests running inside guest_memfd.
->>
->> === Changes to v2 ===
->>
->> - Handle direct map removal for physically contiguous pages in arch code
->>    (Mike R.)
->> - Track the direct map state in guest_memfd itself instead of at the
->>    folio level, to prepare for huge pages support (Sean C.)
->> - Allow configuring direct map state of not-yet faulted in memory
->>    (Vishal A.)
->> - Pay attention to alignment in ftrace structs (Steven R.)
->>
->> Most significantly, I've reduced the patch series to focus only on
->> direct map removal for guest_memfd for now, leaving the whole "how to do
->> non-CoCo VMs in guest_memfd" for later. If this separation is
->> acceptable, then I think I can drop the RFC tag in the next revision
->> (I've mainly kept it here because I'm not entirely sure what to do with
->> patches 3 and 4).
-> 
-> Hi,
-> 
-> keeping upcoming "shared and private memory in guest_memfd" in mind, I
-> assume the focus would be to only remove the direct map for private memory?
-> 
-> So in the current upstream state, you would only be removing the direct
-> map for private memory, currently translating to "encrypted"/"protected"
-> memory that is inaccessible either way already.
-> 
-> Correct?
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Yea, with the upcomming "shared and private" stuff, I would expect the
-the shared<->private conversions would call the routines from patch 3 to
-restore direct map entries on private->shared, and zap them on
-shared->private.
+Currently, the global metadata reading code is auto-generated by a
+script [1].  Future work to support KVM TDX will need to read more
+fields thus will need to regenerate the metadata reading code.
 
-But as you said, the current upstream state has no notion of "shared"
-memory in guest_memfd, so everything is private and thus everything is
-direct map removed (although it is indeed already inaccessible anyway
-for TDX and friends. That's what makes this patch series a bit awkward
-:( )
+Add the script to the kernel tree to keep it under track [2].
 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+Note the script has some minor updates (to make it more readable)
+comparing to [1] but they don't change the generated code.  Also change
+the name to tdx_global_metadata.py to make it more specific.
 
-Best, 
-Patrick
+Link: https://lore.kernel.org/0853b155ec9aac09c594caa60914ed6ea4dc0a71.camel@intel.com/ [1]
+Link: https://lore.kernel.org/CABgObfZWjGc0FT2My_oEd6V8ZxYHD-RejndbU_FipuADgJkFbw@mail.gmail.com/ [2]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Co-developed-by: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ MAINTAINERS                    |   1 +
+ scripts/tdx_global_metadata.py | 187 +++++++++++++++++++++++++++++++++
+ 2 files changed, 188 insertions(+)
+ create mode 100644 scripts/tdx_global_metadata.py
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cf02cbf4bef1..fc983bc02109 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -24987,6 +24987,7 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/core
+ F:	Documentation/arch/x86/
+ F:	Documentation/devicetree/bindings/x86/
+ F:	arch/x86/
++F:	scripts/tdx_global_metadata.py
+ F:	tools/testing/selftests/x86
+ 
+ X86 CPUID DATABASE
+diff --git a/scripts/tdx_global_metadata.py b/scripts/tdx_global_metadata.py
+new file mode 100644
+index 000000000000..7f5cc13b1d78
+--- /dev/null
++++ b/scripts/tdx_global_metadata.py
+@@ -0,0 +1,187 @@
++#! /usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++import json
++import sys
++
++# Note: this script does not run as part of the build process.
++# It is used to generate structs from the TDX global_metadata.json
++# file, and functions to fill in said structs.  Rerun it if
++# you need more fields.
++
++TDX_STRUCTS = {
++    "version": [
++        "BUILD_DATE",
++        "BUILD_NUM",
++        "MINOR_VERSION",
++        "MAJOR_VERSION",
++        "UPDATE_VERSION",
++        "INTERNAL_VERSION",
++    ],
++    "features": [
++        "TDX_FEATURES0"
++    ],
++    "tdmr": [
++        "MAX_TDMRS",
++        "MAX_RESERVED_PER_TDMR",
++        "PAMT_4K_ENTRY_SIZE",
++        "PAMT_2M_ENTRY_SIZE",
++        "PAMT_1G_ENTRY_SIZE",
++    ],
++    "cmr": [
++        "NUM_CMRS", "CMR_BASE", "CMR_SIZE"
++    ],
++}
++
++STRUCT_PREFIX = "tdx_sys_info"
++FUNC_PREFIX = "get_tdx_sys_info"
++STRVAR_PREFIX = "sysinfo"
++
++def print_class_struct_field(field_name, element_bytes, num_fields, num_elements, file):
++    element_type = "u%s" % (element_bytes * 8)
++    element_array = ""
++    if num_fields > 1:
++        element_array += "[%d]" % (num_fields)
++    if num_elements > 1:
++        element_array += "[%d]" % (num_elements)
++    print("\t%s %s%s;" % (element_type, field_name, element_array), file=file)
++
++def print_class_struct(class_name, fields, file):
++    struct_name = "%s_%s" % (STRUCT_PREFIX, class_name)
++    print("struct %s {" % (struct_name), file=file)
++    for f in fields:
++        print_class_struct_field(
++            f["Field Name"].lower(),
++            int(f["Element Size (Bytes)"]),
++            int(f["Num Fields"]),
++            int(f["Num Elements"]),
++            file=file)
++    print("};", file=file)
++
++def print_read_field(field_id, struct_var, struct_member, indent, file):
++    print(
++        "%sif (!ret && !(ret = read_sys_metadata_field(%s, &val)))\n%s\t%s->%s = val;"
++        % (indent, field_id, indent, struct_var, struct_member),
++        file=file,
++    )
++
++def print_class_function(class_name, fields, file):
++    func_name = "%s_%s" % (FUNC_PREFIX, class_name)
++    struct_name = "%s_%s" % (STRUCT_PREFIX, class_name)
++    struct_var = "%s_%s" % (STRVAR_PREFIX, class_name)
++
++    print("static int %s(struct %s *%s)" % (func_name, struct_name, struct_var), file=file)
++    print("{", file=file)
++    print("\tint ret = 0;", file=file)
++    print("\tu64 val;", file=file)
++
++    has_i = 0
++    has_j = 0
++    for f in fields:
++        num_fields = int(f["Num Fields"])
++        num_elements = int(f["Num Elements"])
++        if num_fields > 1:
++            has_i = 1
++        if num_elements > 1:
++            has_j = 1
++
++    if has_i == 1 and has_j == 1:
++        print("\tint i, j;", file=file)
++    elif has_i == 1:
++        print("\tint i;", file=file)
++
++    print(file=file)
++    for f in fields:
++        fname = f["Field Name"]
++        field_id = f["Base FIELD_ID (Hex)"]
++        num_fields = int(f["Num Fields"])
++        num_elements = int(f["Num Elements"])
++        struct_member = fname.lower()
++        indent = "\t"
++        if num_fields > 1:
++            if fname == "CMR_BASE" or fname == "CMR_SIZE":
++                limit = "%s_%s->num_cmrs" %(STRVAR_PREFIX, "cmr")
++            elif fname == "CPUID_CONFIG_LEAVES" or fname == "CPUID_CONFIG_VALUES":
++                limit = "%s_%s->num_cpuid_config" %(STRVAR_PREFIX, "td_conf")
++            else:
++                limit = "%d" %(num_fields)
++            print("%sfor (i = 0; i < %s; i++)" % (indent, limit), file=file)
++            indent += "\t"
++            field_id += " + i"
++            struct_member += "[i]"
++        if num_elements > 1:
++            print("%sfor (j = 0; j < %d; j++)" % (indent, num_elements), file=file)
++            indent += "\t"
++            field_id += " * 2 + j"
++            struct_member += "[j]"
++
++        print_read_field(
++            field_id,
++            struct_var,
++            struct_member,
++            indent,
++            file=file,
++        )
++
++    print(file=file)
++    print("\treturn ret;", file=file)
++    print("}", file=file)
++
++def print_main_struct(file):
++    print("struct tdx_sys_info {", file=file)
++    for class_name, field_names in TDX_STRUCTS.items():
++        struct_name = "%s_%s" % (STRUCT_PREFIX, class_name)
++        struct_var = class_name
++        print("\tstruct %s %s;" % (struct_name, struct_var), file=file)
++    print("};", file=file)
++
++def print_main_function(file):
++    print("static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)", file=file)
++    print("{", file=file)
++    print("\tint ret = 0;", file=file)
++    print(file=file)
++    for class_name, field_names in TDX_STRUCTS.items():
++        func_name = "%s_%s" % (FUNC_PREFIX, class_name)
++        struct_var = class_name
++        print("\tret = ret ?: %s(&sysinfo->%s);" % (func_name, struct_var), file=file)
++    print(file=file)
++    print("\treturn ret;", file=file)
++    print("}", file=file)
++
++jsonfile = sys.argv[1]
++hfile = sys.argv[2]
++cfile = sys.argv[3]
++hfileifdef = hfile.replace(".", "_")
++
++with open(jsonfile, "r") as f:
++    json_in = json.load(f)
++    fields = {x["Field Name"]: x for x in json_in["Fields"]}
++
++with open(hfile, "w") as f:
++    print("/* SPDX-License-Identifier: GPL-2.0 */", file=f)
++    print("/* Automatically generated TDX global metadata structures. */", file=f)
++    print("#ifndef _X86_VIRT_TDX_AUTO_GENERATED_" + hfileifdef.upper(), file=f)
++    print("#define _X86_VIRT_TDX_AUTO_GENERATED_" + hfileifdef.upper(), file=f)
++    print(file=f)
++    print("#include <linux/types.h>", file=f)
++    print(file=f)
++    for class_name, field_names in TDX_STRUCTS.items():
++        print_class_struct(class_name, [fields[x] for x in field_names], file=f)
++        print(file=f)
++    print_main_struct(file=f)
++    print(file=f)
++    print("#endif", file=f)
++
++with open(cfile, "w") as f:
++    print("// SPDX-License-Identifier: GPL-2.0", file=f)
++    print("/*", file=f)
++    print(" * Automatically generated functions to read TDX global metadata.", file=f)
++    print(" *", file=f)
++    print(" * This file doesn't compile on its own as it lacks of inclusion", file=f)
++    print(" * of SEAMCALL wrapper primitive which reads global metadata.", file=f)
++    print(" * Include this file to other C file instead.", file=f)
++    print(" */", file=f)
++    for class_name, field_names in TDX_STRUCTS.items():
++        print(file=f)
++        print_class_function(class_name, [fields[x] for x in field_names], file=f)
++    print(file=f)
++    print_main_function(file=f)
+-- 
+2.46.2
+
 
