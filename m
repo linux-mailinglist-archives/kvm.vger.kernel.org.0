@@ -1,249 +1,202 @@
-Return-Path: <kvm+bounces-30143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EF09B72C2
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 04:14:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB7D9B731A
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 04:40:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86017B21BBB
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 03:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48B021F25835
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 03:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B56E12FF9C;
-	Thu, 31 Oct 2024 03:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E60D13A256;
+	Thu, 31 Oct 2024 03:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fTvOylPA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ls9ubQuJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAE034CDE;
-	Thu, 31 Oct 2024 03:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1E13A863
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 03:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730344461; cv=none; b=QaSDBPuDjIEvoL7uupYx7ChyU3I18qjlmNsUf+cj+3IecxgFkKgzD0fTQXiw6cmo8Dmw31aapRRCMHNNngUV1uF5Ge5ua5WaLdGA45PO8Uz3fltciHpk3ah+991IeC+QTdr+9kJZbA/ks87WPo+RZhc/2IrTz+P0Tm+JPz0s8cw=
+	t=1730346003; cv=none; b=SQtD1cmZHTk7KvKmwkGpviiJDo1y/pIhclkV8+NXDZPicwA+KsFx8UlgR3bgchN0mpHDOJmDdCboeKPmi1obotOfho7I+yozeTDNvkdBNsjikFqQnjSBQahVlGD1xwH7jzIXzuYwcYN8sCbeFYFOHIbcIHM0zbpUowl/JiOnAmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730344461; c=relaxed/simple;
-	bh=oHmtr5scO0FwSLZgcuTA2U+qmznB3p4d4+Sjpor4oig=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f0awhmCAEJlAhg/RQ833/qQuQ076SL4dsmHX/Vjhk/WHiGQIeLQ+6iviJt3ZHbStU445hhip5UhxmqwQ+pSdhasLwec4QMcuhLHzpy/R5ZKOFmsfx0yMX3S2S8s+a/jHfTjhfifeGCTugGO83/fU+ijzLmK+weU7XTU/ucCVQcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fTvOylPA; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730344460; x=1761880460;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oHmtr5scO0FwSLZgcuTA2U+qmznB3p4d4+Sjpor4oig=;
-  b=fTvOylPAG9tYEJBlXFjUISIi7xyZKVPFpVDwAv9G2x8WMlcZLqD9wNLX
-   8DpLl+Eijn8tuOFeCBnmtN0cWBwkmfb8Fnohl7i5kbDp395rio3+92oZq
-   3ru4iV77KS5hDqxPcjK3gf37LjNcoENW0jdgu2PBRpGq3SyO+er8bB8n0
-   /mMz8KRbkWF8q2L+SCyEFCRpyxM/sqXv2ldt2fQE1fOpRBeqqWsA04aex
-   aCdWyjIZUKDIetwKw8fH2P079+7WoYwyjGkSlZ9CJuKHI524qa4tHj80L
-   djNo6agJMuY2yXn3l1GKzhxzaNVPgSkvn366x8XBSwAl6s8Hmm2XNgpDK
-   Q==;
-X-CSE-ConnectionGUID: whY0OwYbRD+Or/czH+jspg==
-X-CSE-MsgGUID: aPnkxZ4JRmCPGouaEgn0MQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47530688"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="47530688"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 20:14:19 -0700
-X-CSE-ConnectionGUID: 2ONhQCDJTeeaI7n/nPBOvg==
-X-CSE-MsgGUID: FAA3zc5uSlOkGDbwR0Ji1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,246,1725346800"; 
-   d="scan'208";a="82931206"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 20:14:13 -0700
-Message-ID: <86578354-9241-4702-86bf-f0fff1539945@linux.intel.com>
-Date: Thu, 31 Oct 2024 11:14:11 +0800
+	s=arc-20240116; t=1730346003; c=relaxed/simple;
+	bh=lqhlHqV3COwkx1tRe9N/vUG8LYb9ZaQRohHuJ0GFHgc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UOW7hn/sMRio9u3Y6JC9luTyQKi5PrxPMQQaQh3mxvaoUXVPlmw34vWOANB4Ju1ArUMZoKPlG9x25tgAoIS2fqDDBrIlGmOfK4oMtS4XzENwGRaTtrSQaxnePGzsMPo3rxdZ+9rdM/GMOq+yi8Z7v5sKRS/epiMsU0aPwIpVrI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ls9ubQuJ; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e2eb9dde40so402359a91.0
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 20:40:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730346000; x=1730950800; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qDmZiV+NWIwT+X+k+LAFHUSHr7OingjAwQqLRVIU6I4=;
+        b=Ls9ubQuJtTMkpLd65nz0CjBqh5LjWOYWMz1JBwvIQqHe2OtUWtOF/JZd4Pot5e926h
+         YQVZVx6WPcWHLjklYe2q6mrYvZbbY8VL63D9RQaMT9OwHtXpBc8i+iTi45gyaZLRt8iP
+         Vsg6iTFkesNifeU8+axzR7qguPx1rde9LdRrJRlsfcZDRg8BpRa8/X1f+byp+XUDUONz
+         FDM0yQdN6WjYkKpcI3JIhpznggxG7UweImNYLaDT16pvCdx73BWnKxwGwONFJApaNraj
+         ExehGLvplf4LKENTovv9jK7CCb7j4Wjh32VJmHQznmA5pM7z3Bkj2I2clibrchql5kt3
+         VESw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730346000; x=1730950800;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qDmZiV+NWIwT+X+k+LAFHUSHr7OingjAwQqLRVIU6I4=;
+        b=DDT9KXmMoQF+8qFcx1QAeS2kjcmsfp/Z2GdVJmT6hiuwf/fWy3ws4+sm681QSQCOr3
+         QtmflOuqnH7i8DJDOeWGksMAHd7Sf8VcPAfFc4ra4TtOpKTXIN3aY7oFABTNH3RSkYAx
+         svkRNHfMry+LU6tyhbQJecD8YwX65VuCIIWPfWXoTSd553QTNYGm0d7GZ8Y922/XTP3z
+         XMvp9aqmPaJVNFeWIdv7LfQsNEiiQK7xxWfxE0cfiVX4wt37GA0RnW16yryC6UF7X4rQ
+         xWBw9MwghZudhPUviSYZA0rBBNo+0xQXZUhduEPw206jaseWxt0xv7voVitNdmT1xI8e
+         EGMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwis54HoUz/2A2opLkBC2gdgB/CYg5tw95fviSV8UljF3x8PnVX0Jc9vpiW9ntJWL71iE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRAv8CMux6J+bBZRLZwfFhhnDZHWod5wM+e9LLFhsTfde9hF1T
+	ilq+kQrNcu43sKU4t0BdubfYJHnbermeeEvP3klNObg6szLff8Z7x5UdFp9+eDP3EGj9KhFV/gT
+	Szq2HG0ayv3bv9t7QIbGPhtuiL5Q=
+X-Google-Smtp-Source: AGHT+IHwNA/ciOAbP/RMMGgFOrSxmsSyi+XiO7uj18muYi44OJAU7w2GFJOYYZwwJWmjSUV5M9cnGGr8nNquoydXAl0=
+X-Received: by 2002:a17:90b:2d92:b0:2e2:c40c:6e8a with SMTP id
+ 98e67ed59e1d1-2e93c1d3e42mr2258137a91.26.1730346000333; Wed, 30 Oct 2024
+ 20:40:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 37/58] KVM: x86/pmu: Switch IA32_PERF_GLOBAL_CTRL
- at VM boundary
-To: Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
-Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
- Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-38-mizhang@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20240801045907.4010984-38-mizhang@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241023124527.1092810-1-alexyonghe@tencent.com> <ZyJ7ZsP4RaRfcFQF@google.com>
+In-Reply-To: <ZyJ7ZsP4RaRfcFQF@google.com>
+From: zhuangel570 <zhuangel570@gmail.com>
+Date: Thu, 31 Oct 2024 11:39:49 +0800
+Message-ID: <CANZk6aQEH=9EFdsBfuRcUWhTu88Oc=x=Wp3bcqzQd1AVjcTTEg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Try to enable irr_pending state with disabled APICv
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 31, 2024 at 2:31=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Wed, Oct 23, 2024, Yong He wrote:
+> > From: Yong He <alexyonghe@tencent.com>
+> >
+> > Try to enable irr_pending when set APIC state, if there is
+> > pending interrupt in IRR with disabled APICv.
+> >
+> > In save/restore VM scenery with disabled APICv. Qemu/CloudHypervisor
+> > always send signals to stop running vcpu threads, then save
+> > entire VM state, including APIC state. There may be a pending
+> > timer interrupt in the saved APIC IRR that is injected before
+> > vcpu_run return. But when restoring the VM, since APICv is
+> > disabled, irr_pending is disabled by default, so this may cause
+> > the timer interrupt in the IRR to be suspended for a long time,
+> > until the next interrupt comes.
+> >
+> > Signed-off-by: Yong He <alexyonghe@tencent.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 2098dc689088..7373f649958b 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -3099,6 +3099,10 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, st=
+ruct kvm_lapic_state *s)
+> >                                               apic_find_highest_irr(api=
+c));
+> >               kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(api=
+c));
+> >       }
+> > +
+> > +     /* Search the IRR and enable irr_pending state with disabled APIC=
+v*/
+> > +     if (!enable_apicv && apic_search_irr(apic) !=3D -1)
+>
+> This can/should be an "else" from the above "if (apic->apicv_active)".  I=
+ also
+> think KVM can safely clear irr_pending in this case, which is also why ir=
+r_pending
+> isn't handling in kvm_apic_update_apicv().  When APICv is disabled (inhib=
+ited) at
+> runtime, an IRQ may be in-flight, i.e. apic_search_irr() can get a false =
+negative.
 
-On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
-> From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
->
-> In PMU passthrough mode, use global_ctrl field in struct kvm_pmu as the
-> cached value. This is convenient for KVM to set and get the value from the
-> host side. In addition, load and save the value across VM enter/exit
-> boundary in the following way:
->
->  - At VM exit, if processor supports
->    GUEST_VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL, read guest
->    IA32_PERF_GLOBAL_CTRL GUEST_IA32_PERF_GLOBAL_CTRL VMCS field, else read
->    it from VM-exit MSR-stroe array in VMCS. The value is then assigned to
->    global_ctrl.
->
->  - At VM Entry, if processor supports
->    GUEST_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL, read guest
->    IA32_PERF_GLOBAL_CTRL from GUEST_IA32_PERF_GLOBAL_CTRL VMCS field, else
->    read it from VM-entry MSR-load array in VMCS. The value is then
->    assigned to global ctrl.
->
-> Implement the above logic into two helper functions and invoke them around
-> VM Enter/exit boundary.
->
-> Co-developed-by: Mingwei Zhang <mizhang@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/vmx/vmx.c          | 49 ++++++++++++++++++++++++++++++++-
->  2 files changed, 50 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 93c17da8271d..7bf901a53543 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -601,6 +601,8 @@ struct kvm_pmu {
->  	u8 event_count;
->  
->  	bool passthrough;
-> +	int global_ctrl_slot_in_autoload;
-> +	int global_ctrl_slot_in_autostore;
->  };
->  
->  struct kvm_pmu_ops;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 41102658ed21..b126de6569c8 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4430,6 +4430,7 @@ static void vmx_set_perf_global_ctrl(struct vcpu_vmx *vmx)
->  			}
->  			m->val[i].index = MSR_CORE_PERF_GLOBAL_CTRL;
->  			m->val[i].value = 0;
-> +			vcpu_to_pmu(&vmx->vcpu)->global_ctrl_slot_in_autoload = i;
->  		}
->  		/*
->  		 * Setup auto clear host PERF_GLOBAL_CTRL msr at vm exit.
-> @@ -4457,6 +4458,7 @@ static void vmx_set_perf_global_ctrl(struct vcpu_vmx *vmx)
->  				vmcs_write32(VM_EXIT_MSR_STORE_COUNT, m->nr);
->  			}
->  			m->val[i].index = MSR_CORE_PERF_GLOBAL_CTRL;
-> +			vcpu_to_pmu(&vmx->vcpu)->global_ctrl_slot_in_autostore = i;
->  		}
->  	} else {
->  		if (!(vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)) {
-> @@ -4467,6 +4469,7 @@ static void vmx_set_perf_global_ctrl(struct vcpu_vmx *vmx)
->  				m->val[i] = m->val[m->nr];
->  				vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->nr);
->  			}
-> +			vcpu_to_pmu(&vmx->vcpu)->global_ctrl_slot_in_autoload = -ENOENT;
->  		}
->  		if (!(vmexit_ctrl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)) {
->  			m = &vmx->msr_autoload.host;
-> @@ -4485,6 +4488,7 @@ static void vmx_set_perf_global_ctrl(struct vcpu_vmx *vmx)
->  				m->val[i] = m->val[m->nr];
->  				vmcs_write32(VM_EXIT_MSR_STORE_COUNT, m->nr);
->  			}
-> +			vcpu_to_pmu(&vmx->vcpu)->global_ctrl_slot_in_autostore = -ENOENT;
->  		}
->  	}
->  
-> @@ -7272,7 +7276,7 @@ void vmx_cancel_injection(struct kvm_vcpu *vcpu)
->  	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, 0);
->  }
->  
-> -static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
-> +static void __atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->  {
->  	int i, nr_msrs;
->  	struct perf_guest_switch_msr *msrs;
-> @@ -7295,6 +7299,46 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->  					msrs[i].host, false);
->  }
->  
-> +static void save_perf_global_ctrl_in_passthrough_pmu(struct vcpu_vmx *vmx)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(&vmx->vcpu);
-> +	int i;
-> +
-> +	if (vm_exit_controls_get(vmx) & VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL) {
-> +		pmu->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
-> +	} else {
-> +		i = pmu->global_ctrl_slot_in_autostore;
-> +		pmu->global_ctrl = vmx->msr_autostore.guest.val[i].value;
-> +	}
+Thank you for your review and suggestions.
 
-When GLOBAL_CTRL MSR is in interception mode, if guest global_ctrl contains
-some invalid bit, there may be issue here. The saved guest_ctrl here would
-be restored in vm-entry, and it would contains invalid bit as well.
+>
+> But when stuffing APIC state, I don't see how that can happen.  So this?
 
-It looks we need to only save valid bits of guest global_ctrl here.
+Here is our case.
 
+APICv is disabled by set enable_apicv to 0. Create VM snapshot, then
+start/restore
+new VM base the snapshot. We occasionally encountered issues with VMs hangi=
+ng
+for long periods of time after restore. Investigation show that there
+is a timer IRQ
+pending in IRR, but the newly restored VM could not detect it, because
+irr_pending
+is not set when restoring the APIC state by kvm_apic_set_state().
 
-> +}
-> +
-> +static void load_perf_global_ctrl_in_passthrough_pmu(struct vcpu_vmx *vmx)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(&vmx->vcpu);
-> +	u64 global_ctrl = pmu->global_ctrl;
-> +	int i;
-> +
-> +	if (vm_entry_controls_get(vmx) & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) {
-> +		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, global_ctrl);
-> +	} else {
-> +		i = pmu->global_ctrl_slot_in_autoload;
-> +		vmx->msr_autoload.guest.val[i].value = global_ctrl;
-> +	}
-> +}
-> +
-> +static void __atomic_switch_perf_msrs_in_passthrough_pmu(struct vcpu_vmx *vmx)
-> +{
-> +	load_perf_global_ctrl_in_passthrough_pmu(vmx);
-> +}
-> +
-> +static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
-> +{
-> +	if (is_passthrough_pmu_enabled(&vmx->vcpu))
-> +		__atomic_switch_perf_msrs_in_passthrough_pmu(vmx);
-> +	else
-> +		__atomic_switch_perf_msrs(vmx);
-> +}
-> +
->  static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -7405,6 +7449,9 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->  	vcpu->arch.cr2 = native_read_cr2();
->  	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
->  
-> +	if (is_passthrough_pmu_enabled(vcpu))
-> +		save_perf_global_ctrl_in_passthrough_pmu(vmx);
-> +
->  	vmx->idt_vectoring_info = 0;
->  
->  	vmx_enable_fb_clear(vmx);
+Further investigation show when creating VM snapshot, VMM pause VCPUs by si=
+gnal,
+an in-flight timer pending in IRR, and the tscdeadline is 0 in saved
+APIC state. All these
+contexts in saved APIC state prove that kvm_inject_pending_timer_irqs
+had just injected
+a timer (will also set the tscdeadline to 0) before the VCPU handle the sig=
+nal.
+
+Maybe this patch is a fix for 755c2bf87860 (KVM: x86: lapic: don't
+touch irr_pending in
+kvm_apic_update_apicv when inhibiting it), the irr_pending enable
+check is missed in
+kvm_apic_set_state() after that.
+
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 65412640cfc7..deb73aea2c06 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -3086,6 +3086,15 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, stru=
+ct kvm_lapic_state *s)
+>                 kvm_x86_call(hwapic_irr_update)(vcpu,
+>                                                 apic_find_highest_irr(api=
+c));
+>                 kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(api=
+c));
+> +       } else {
+> +               /*
+> +                * Note, kvm_apic_update_apicv() is responsible for updat=
+ing
+> +                * isr_count and highest_isr_cache.  irr_pending is somew=
+hat
+> +                * special because it mustn't be cleared when APICv is di=
+sabled
+> +                * at runtime, and only state restore can cause an IRR bi=
+t to
+> +                * be set without also refreshing irr_pending.
+> +                */
+> +               apic->irr_pending =3D apic_search_irr(apic) !=3D -1;
+>         }
+>         kvm_make_request(KVM_REQ_EVENT, vcpu);
+>         if (ioapic_in_kernel(vcpu->kvm))
+>
+> > +             apic->irr_pending =3D true;
+> >       kvm_make_request(KVM_REQ_EVENT, vcpu);
+> >       if (ioapic_in_kernel(vcpu->kvm))
+> >               kvm_rtc_eoi_tracking_restore_one(vcpu);
+> > --
+> > 2.43.5
+> >
 
