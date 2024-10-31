@@ -1,160 +1,132 @@
-Return-Path: <kvm+bounces-30203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B0C9B7FA5
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:06:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7459B7FFA
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695041C21189
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:06:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656E5281F7F
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E3A1BB6B5;
-	Thu, 31 Oct 2024 16:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B63A1BBBE4;
+	Thu, 31 Oct 2024 16:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Rp81pflZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QdI0nsKZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706AB1A4F0C
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 16:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A76A1BB6B5
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 16:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730390801; cv=none; b=YV9CBX3Y9V7tB5R/mn+erxZShPVl+l7O+bXenNmuSRxiHVM8pSt2yZEP8x4WlSPeuYvbNEY07sCrhGmQvE4R4OG6SDI5eWKh+ErE9yqQHQ0G1K9gCUeaTm2o21NMXbc2vliP/OpcLDy+zUSm4H4zK3gU/iS2qs/paFkkY1NbSkU=
+	t=1730391874; cv=none; b=dFNbhTHShYce+1B2skYSYyeOMyzxR9XLa8BOcNfPABcbgvKR+/O2vKFzQIkEGrAqG/Qn1JDH+9Bl+wbGpRFH8XK0VPFQ1b+SA4+8pYZXL1nn1l5fDJ8tXX1sZDvfNJlZWoDX+eDLFDYDn70xbqwMBMXWT5tOtk+VC98KzOVf86Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730390801; c=relaxed/simple;
-	bh=3L16LhwJhmR5YVUl5G1cLEUacyJlZ/KxsP8N3vb0Qi4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dezBIn/JVT9hA49LwsS+Y0VWDXNZC/XsHyAlCiJyCUKKoKDAVstQwuKQtY2CyFceZv6EjNFTAc6srh1hZ+nFpp0V7nY0bornt3VDgXQV9OkKw3lvekNxVzzgYSrzJo4unDdXy5AvTxlq7Qhe95yzMazy1hWa21n6gUTXe4g7l5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Rp81pflZ; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-460ab1bc2aeso6977061cf.3
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 09:06:39 -0700 (PDT)
+	s=arc-20240116; t=1730391874; c=relaxed/simple;
+	bh=FghgVU+wo6hSEkFStLS26KZednPLjsA4abe1oslZ5QU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SGjenDlxrFe4T4K5t/mM/0Dbxfg97drYhFHRd8To2Ktj9rqEfdwXT9uAU95i8ZkzTDbOS9IvClJR1kcNg8xL9CY+SaxK96mFel9BYAgH31f5fsmHLjbEkcgpRa8S8kmCKzWe42xBndEnYCCtmzi1rqg9v2xV3kvxdP5hAevf2P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QdI0nsKZ; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e29205f6063so1714020276.1
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 09:24:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1730390798; x=1730995598; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SO7v+RfZoLfypZ4KKZMOHUyo7JMuVsRRPoIxDWu9s38=;
-        b=Rp81pflZkiAq1uY40rfspUrHNd3Y5gYKXtqfQuLjJxahBYKUaIAanunovQ2NG0vHYT
-         194vXatq99nOfPYCRvLSw7sklpStP8Mt/XVacQlO2VRBJhOgSjghCcjYxO+22yEZdy/n
-         8YwVqksefroZdtm9iny3ecDJ2X7AJyQXWemnSsK6/ft8eI1QmsWWPACQP+ZhyLUc7NQb
-         jCl1odvbVRVAiamnS4Ef5BK5ZKTbnQV7VxpcN42GlZk5yMAXvm83lNxdQ7akRojO/XIY
-         8wozGof9zy3up+/BeZTiypyYybcvdwA/D2F0/oBnaObWam+n3yK+orY9jb1olvV3UgFD
-         yGhQ==
+        d=google.com; s=20230601; t=1730391871; x=1730996671; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8lqAqnn2lvPMme1U2y97a/HFiMtT0KQ6DEfhQX5Zr9o=;
+        b=QdI0nsKZ9n11B6jYDmO2VHBrQXBebmKJ51NkbrrQEe5zxf2vEj9kmRuxh3Ke4cttiG
+         FyHorAmJJLVT26dGYPc0VlIw0iv9FBsiHR7Mge/FrmEtXIqlIS6RMuMAG3v67TJVKxUQ
+         WjXVHfNssmi74L5s0cc0LBn7JVJPZcBITYVH4TkmPPNvJx4icD4zD2DtD79O2QOnHbH4
+         AdFfsrIq1ajncs4tXvVn6bLfIT75PryRFRfnPCNL9Ova1HFRcWPkDihaibwm7qg2ALE7
+         c3ugDYZ5KwNDj2suDDcXszaU61gQr6SVuZedLPCx/52nHSsintIxBQrx4qpbsgVR624Y
+         LNEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730390798; x=1730995598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SO7v+RfZoLfypZ4KKZMOHUyo7JMuVsRRPoIxDWu9s38=;
-        b=Qx9+fN5DgrHOfsdv0pWYI1NmE0HRi+7NPig0T2Awj95Ch/bNI0jYEqS/+ddmitSfCH
-         we6eoz9XaU/wCLta6ZGebW3EOLnKX+mWPgFPPgOFFL8DepqQNkTky9Kddy5tL5qwkIre
-         8LXwUUbSR/QyrpIP/An3QNBBH3Iwt7lPee3XMS0cMHCmnd7sjLdaAMMXk2TOU9jw2q1S
-         5tJK01cEiygGXxBBKTQdMbdpLMX6WbP+sP+vrC2j9bc+fkbIR0QhFUF/bKrYZeUL5bLW
-         r2ftKkEqwPAJ3yz9QD7X8BAoSkwxS2/q0GkKKIDQZL5LeJLuYfAndPaM4psEGJfchuvr
-         BOMg==
-X-Forwarded-Encrypted: i=1; AJvYcCVgD4oKW+8iRxWjtMdeIwUusW9X3Vew2IxX4Kx8MCJ7Ry+GBZcvrm8dCFyhwmut1zQ3xs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw50C/19/TSLvg1NKSSOOLPEBhp2pJsrNfm6YijY6zhqP69b9s0
-	f+XOTcMfo0YrRUsZWtsnCMbJNmCNqRMh1M30fuUNsN4z7D4muYzmp8okEEtzAVI=
-X-Google-Smtp-Source: AGHT+IED7ZEPsYL/J2+WAEkVhkkEbmae8OqhC99bUW9D4jOFLXnCuUGOPCgezgCfHDV8eABlx8kETQ==
-X-Received: by 2002:a05:622a:144b:b0:461:15fc:7fe7 with SMTP id d75a77b69052e-462b86a6a75mr989681cf.28.1730390796638;
-        Thu, 31 Oct 2024 09:06:36 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d354177d2fsm9043376d6.107.2024.10.31.09.06.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 09:06:35 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t6Xgx-00000000Ic7-0kQP;
-	Thu, 31 Oct 2024 13:06:35 -0300
-Date: Thu, 31 Oct 2024 13:06:35 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Gowans, James" <jgowans@amazon.com>
-Cc: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"rppt@kernel.org" <rppt@kernel.org>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"Graf (AWS), Alexander" <graf@amazon.de>,
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>,
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Woodhouse, David" <dwmw@amazon.co.uk>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>,
-	"Durrant, Paul" <pdurrant@amazon.co.uk>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"jack@suse.cz" <jack@suse.cz>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>
-Subject: Re: [PATCH 05/10] guestmemfs: add file mmap callback
-Message-ID: <20241031160635.GA35848@ziepe.ca>
-References: <20240805093245.889357-1-jgowans@amazon.com>
- <20240805093245.889357-6-jgowans@amazon.com>
- <20241029120232032-0700.eberman@hu-eberman-lv.qualcomm.com>
- <33a2fd519edc917d933517842cc077a19e865e3f.camel@amazon.com>
+        d=1e100.net; s=20230601; t=1730391871; x=1730996671;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8lqAqnn2lvPMme1U2y97a/HFiMtT0KQ6DEfhQX5Zr9o=;
+        b=bA/Ua71DBwddtzDRr/Xq14AU10yvpDLVEQLLM46jOkiqZwbLXZXqzE2qhsBh7LpAxU
+         XtNMt5+a0kE5QfcHP99CPTTSK/XjHKm6lFGv2fk/ItTEQvtjsWJ7Qd7aS2BnyolhTBTb
+         /f74pIe2pXDvimGcav4Q6NGIU9ax1hhm+feuikta+ZAMyTbNI/J8VbUuDydBd36PRcaH
+         pMq+VGr6/1b2xRCzTimN8mucPZ12lrYWN3mHUxwDmEq6aUkiudBNus6pVmZkzN606oEB
+         2jGEygofaJSvqcT8B945Z0SMTkpMoBZ/JAWou3/bq2YAosqJCtAAZkijG2C1IpNtjve0
+         qvOg==
+X-Gm-Message-State: AOJu0YxutB00Qkj/WJWc2wYVh2MuCGB3fYrYRrIlxkNnviQcYpVSH6uO
+	/1mXmmoldtAOKKFIfGNB9omZOG7u6GVtHl4ADDw8z8k19hqe3EwMRhjooAHlIleQBegzW9JnPMp
+	aYQ==
+X-Google-Smtp-Source: AGHT+IEB483F5Zv9v+Z746MDaIVcz0jHusWl9dOWUZtSjSpIQ4oyN0kiaMgf5YNfjCgBqxpSevXF29Athqg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:bc0a:0:b0:e29:1893:f461 with SMTP id
+ 3f1490d57ef6-e33024354e7mr1591276.0.1730391871427; Thu, 31 Oct 2024 09:24:31
+ -0700 (PDT)
+Date: Thu, 31 Oct 2024 09:24:29 -0700
+In-Reply-To: <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33a2fd519edc917d933517842cc077a19e865e3f.camel@amazon.com>
+Mime-Version: 1.0
+References: <20241018100919.33814-1-bk@alpico.io> <Zxfhy9uifey4wShq@google.com>
+ <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
+Message-ID: <ZyOvPYHrpgPbxUtX@google.com>
+Subject: Re: [PATCH] KVM: drop the kvm_has_noapic_vcpu optimization
+From: Sean Christopherson <seanjc@google.com>
+To: Bernhard Kauer <bk@alpico.io>
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 31, 2024 at 03:30:59PM +0000, Gowans, James wrote:
-> On Tue, 2024-10-29 at 16:05 -0700, Elliot Berman wrote:
-> > On Mon, Aug 05, 2024 at 11:32:40AM +0200, James Gowans wrote:
-> > > Make the file data usable to userspace by adding mmap. That's all that
-> > > QEMU needs for guest RAM, so that's all be bother implementing for now.
-> > > 
-> > > When mmaping the file the VMA is marked as PFNMAP to indicate that there
-> > > are no struct pages for the memory in this VMA. Remap_pfn_range() is
-> > > used to actually populate the page tables. All PTEs are pre-faulted into
-> > > the pgtables at mmap time so that the pgtables are usable when this
-> > > virtual address range is given to VFIO's MAP_DMA.
+On Tue, Oct 22, 2024, Bernhard Kauer wrote:
+> On Tue, Oct 22, 2024 at 10:32:59AM -0700, Sean Christopherson wrote:
+> > On Fri, Oct 18, 2024, Bernhard Kauer wrote:
+> > > It used a static key to avoid loading the lapic pointer from
+> > > the vcpu->arch structure.  However, in the common case the load
+> > > is from a hot cacheline and the CPU should be able to perfectly
+> > > predict it. Thus there is no upside of this premature optimization.
 > > 
-> > Thanks for sending this out! I'm going through the series with the
-> > intention to see how it might fit within the existing guest_memfd work
-> > for pKVM/CoCo/Gunyah.
-> > 
-> > It might've been mentioned in the MM alignment session -- you might be
-> > interested to join the guest_memfd bi-weekly call to see how we are
-> > overlapping [1].
-> > 
-> > [1]: https://lore.kernel.org/kvm/ae794891-fe69-411a-b82e-6963b594a62a@redhat.com/T/
+> > Do you happen to have performance numbers? 
 > 
-> Hi Elliot, yes, I think that there is a lot more overlap with
-> guest_memfd necessary here. The idea was to extend guestmemfs at some
-> point to have a guest_memfd style interface, but it was pointed out at
-> the MM alignment call that doing so would require guestmemfs to
-> duplicate the API surface of guest_memfd. This is undesirable. Better
-> would be to have persistence implemented as a custom allocator behind a
-> normal guest_memfd. I'm not too sure how this would be actually done in
-> practice, specifically: 
-> - how the persistent pool would be defined
-> - how it would be supplied to guest_memfd
-> - how the guest_memfds would be re-discovered after kexec
-> But assuming we can figure out some way to do this, I think it's a
-> better way to go.
+> Sure.  I have some preliminary numbers as I'm still optimizing the
+> round-trip time for tiny virtual machines.
+> 
+> A hello-world micro benchmark on my AMD 6850U needs at least 331us.  With
+> the static keys it requires 579us.  That is a 75% increase.
 
-I think the filesystem interface seemed reasonable, you just want
-open() on the filesystem to return back a normal guest_memfd and
-re-use all of that code to implement it.
+For the first VM only though, correct?
 
-When opened through the filesystem guest_memfd would get hooked by the
-KHO stuff to manage its memory, somehow.
+> Take the absolute values with a grain of salt as not all of my patches might
+> be applicable to the general case.
+> 
+> For the other side I don't have a relevant benchmark yet.  But I doubt you
+> would see anything even with a very high IRQ rate.
+> 
+> 
+> > > The downside is that code patching including an IPI to all CPUs
+> > > is required whenever the first VM without an lapic is created or
+> > > the last is destroyed.
+> > 
+> > In practice, this almost never happens though.  Do you have a use case for
+> > creating VMs without in-kernel local APICs?
+> 
+> I switched from "full irqchip" to "no irqchip" due to a significant
+> performance gain 
 
-Really KHO just needs to keep track of the addresess in the
-guest_memfd when it serializes, right? So maybe all it needs is a way
-to freeze the guest_memfd so it's memory map doesn't change anymore,
-then a way to extract the addresses from it for serialization?
+Signifcant performance gain for what path?  I'm genuinely curious.  Unless your
+VM doesn't need a timer and doesn't need interrupts of any kind, emulating the
+local APIC in userspace is going to be much less performant.
 
-Jason
+> and the simplicity it promised.
+
+Similar to above, unless you are not emulating a local APIC anywhere, disabling
+KVM's in-kernel local APIC isn't a meaningful change in overall complexity.
+
+> I might have to go to "split irqchip" mode for performance reasons but I
+> didn't had time to look into it yet.
+> 
+> So in the end I assume it will be a trade-off: Do I want to rely on these
+> 3000 lines of kernel code to gain an X% performance increase, or not?
 
