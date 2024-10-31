@@ -1,132 +1,223 @@
-Return-Path: <kvm+bounces-30204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30206-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7459B7FFA
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:24:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43CCB9B800F
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 17:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656E5281F7F
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:24:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7FEB1F22411
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 16:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B63A1BBBE4;
-	Thu, 31 Oct 2024 16:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1161BDAAF;
+	Thu, 31 Oct 2024 16:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QdI0nsKZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gcEJKgEM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A76A1BB6B5
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 16:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8602C1BBBEA;
+	Thu, 31 Oct 2024 16:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730391874; cv=none; b=dFNbhTHShYce+1B2skYSYyeOMyzxR9XLa8BOcNfPABcbgvKR+/O2vKFzQIkEGrAqG/Qn1JDH+9Bl+wbGpRFH8XK0VPFQ1b+SA4+8pYZXL1nn1l5fDJ8tXX1sZDvfNJlZWoDX+eDLFDYDn70xbqwMBMXWT5tOtk+VC98KzOVf86Y=
+	t=1730392043; cv=none; b=OntE6zcxOHI/UR+qYM2brRk3xAG7ypV7KEkn7QoM3oA2T9oIYaIJkb97w5oHvxSnHUPkFJwldIYVQTpTspBhCH6WVw+g1jrumPVRouSuS7dkkU4UVOTkf685NEob4lkCZ2nRf2SRhOe/WapPpG0VgYv3Uq01Kt9betJ4F4siKmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730391874; c=relaxed/simple;
-	bh=FghgVU+wo6hSEkFStLS26KZednPLjsA4abe1oslZ5QU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SGjenDlxrFe4T4K5t/mM/0Dbxfg97drYhFHRd8To2Ktj9rqEfdwXT9uAU95i8ZkzTDbOS9IvClJR1kcNg8xL9CY+SaxK96mFel9BYAgH31f5fsmHLjbEkcgpRa8S8kmCKzWe42xBndEnYCCtmzi1rqg9v2xV3kvxdP5hAevf2P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QdI0nsKZ; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e29205f6063so1714020276.1
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 09:24:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730391871; x=1730996671; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8lqAqnn2lvPMme1U2y97a/HFiMtT0KQ6DEfhQX5Zr9o=;
-        b=QdI0nsKZ9n11B6jYDmO2VHBrQXBebmKJ51NkbrrQEe5zxf2vEj9kmRuxh3Ke4cttiG
-         FyHorAmJJLVT26dGYPc0VlIw0iv9FBsiHR7Mge/FrmEtXIqlIS6RMuMAG3v67TJVKxUQ
-         WjXVHfNssmi74L5s0cc0LBn7JVJPZcBITYVH4TkmPPNvJx4icD4zD2DtD79O2QOnHbH4
-         AdFfsrIq1ajncs4tXvVn6bLfIT75PryRFRfnPCNL9Ova1HFRcWPkDihaibwm7qg2ALE7
-         c3ugDYZ5KwNDj2suDDcXszaU61gQr6SVuZedLPCx/52nHSsintIxBQrx4qpbsgVR624Y
-         LNEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730391871; x=1730996671;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8lqAqnn2lvPMme1U2y97a/HFiMtT0KQ6DEfhQX5Zr9o=;
-        b=bA/Ua71DBwddtzDRr/Xq14AU10yvpDLVEQLLM46jOkiqZwbLXZXqzE2qhsBh7LpAxU
-         XtNMt5+a0kE5QfcHP99CPTTSK/XjHKm6lFGv2fk/ItTEQvtjsWJ7Qd7aS2BnyolhTBTb
-         /f74pIe2pXDvimGcav4Q6NGIU9ax1hhm+feuikta+ZAMyTbNI/J8VbUuDydBd36PRcaH
-         pMq+VGr6/1b2xRCzTimN8mucPZ12lrYWN3mHUxwDmEq6aUkiudBNus6pVmZkzN606oEB
-         2jGEygofaJSvqcT8B945Z0SMTkpMoBZ/JAWou3/bq2YAosqJCtAAZkijG2C1IpNtjve0
-         qvOg==
-X-Gm-Message-State: AOJu0YxutB00Qkj/WJWc2wYVh2MuCGB3fYrYRrIlxkNnviQcYpVSH6uO
-	/1mXmmoldtAOKKFIfGNB9omZOG7u6GVtHl4ADDw8z8k19hqe3EwMRhjooAHlIleQBegzW9JnPMp
-	aYQ==
-X-Google-Smtp-Source: AGHT+IEB483F5Zv9v+Z746MDaIVcz0jHusWl9dOWUZtSjSpIQ4oyN0kiaMgf5YNfjCgBqxpSevXF29Athqg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:bc0a:0:b0:e29:1893:f461 with SMTP id
- 3f1490d57ef6-e33024354e7mr1591276.0.1730391871427; Thu, 31 Oct 2024 09:24:31
- -0700 (PDT)
-Date: Thu, 31 Oct 2024 09:24:29 -0700
-In-Reply-To: <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
+	s=arc-20240116; t=1730392043; c=relaxed/simple;
+	bh=iH150H7FJWPWLYdUaAdEfQ/13mpK7ahZMpkRQ1FD1a8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=OWBlgwzYyk2xKO7qASaXG8NdPjw9hBmgDwcqUlpje8wAAPgAnLDxIe3Se0z2YcTKu+NhqtfKcMupBsGXnAXa+OCsuEskCMbx30GWY0ovTW32/+Rzb44iUR4GetwFBhDdKAMni9Aw32DZzbcsADPsn9B5ghurWqCDKQUf1Jefb2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gcEJKgEM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49VFvV8u013288;
+	Thu, 31 Oct 2024 16:27:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=zjAryE
+	KOETloLGYkEAicJv4Ye9LzgIY+dPDahJh00aE=; b=gcEJKgEMejrm5iqP0v7tYM
+	BWMvCeiJg5ESHTTh2J2QG7m9dmvuUyn4rtC5N0pXMc8B0ARkcqjECWrRxRkuVT/H
+	qJKKaYspyo0hpdOBhygBs8F98X1nXJ4bvEEk/qK1I5mQx9XwCj8jzr94eIaeoZEl
+	db7dilRan6XoCnh1GKH5HjcndQAeDMcOutFK6gyDhb137IMwJEcDavqhKZrwxiNM
+	IOjZ0RVLEGwzF2RwK5i2Ye6eAmV08a7y14fr5g4J3XHCkXf+LDgsjKk+USXEP+Ib
+	oVHWQIpybx4dwom7lkX00oRgiqMXuEC57UoxFbv3c5FAz3+nBGZhTtC3dD8PPoqg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42kkbn6vt0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Oct 2024 16:27:11 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49VGRAee010519;
+	Thu, 31 Oct 2024 16:27:10 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42kkbn6vst-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Oct 2024 16:27:10 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49VFYgsw015899;
+	Thu, 31 Oct 2024 16:27:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42hdf1n9xu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Oct 2024 16:27:09 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49VGR66Q33948176
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 31 Oct 2024 16:27:06 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1F93C2004B;
+	Thu, 31 Oct 2024 16:27:06 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BD43120040;
+	Thu, 31 Oct 2024 16:27:05 +0000 (GMT)
+Received: from li-2b55cdcc-350b-11b2-a85c-a78bff51fc11.ibm.com (unknown [9.155.203.167])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 31 Oct 2024 16:27:05 +0000 (GMT)
+Date: Thu, 31 Oct 2024 17:27:04 +0100
+From: Sumanth Korikkar <sumanthk@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH v3 0/7] virtio-mem: s390 support
+Message-ID: <ZyOv2E-WEcppbf3G@li-2b55cdcc-350b-11b2-a85c-a78bff51fc11.ibm.com>
+References: <20241025141453.1210600-1-david@redhat.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20241025141453.1210600-1-david@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: KkOr9GvzLSxQCyUeFHljQwa7fRHX3lDZ
+X-Proofpoint-GUID: YSSxnDKxiBsunEDZsaYs1a7k8GlH0CKE
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241018100919.33814-1-bk@alpico.io> <Zxfhy9uifey4wShq@google.com>
- <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
-Message-ID: <ZyOvPYHrpgPbxUtX@google.com>
-Subject: Re: [PATCH] KVM: drop the kvm_has_noapic_vcpu optimization
-From: Sean Christopherson <seanjc@google.com>
-To: Bernhard Kauer <bk@alpico.io>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410310121
 
-On Tue, Oct 22, 2024, Bernhard Kauer wrote:
-> On Tue, Oct 22, 2024 at 10:32:59AM -0700, Sean Christopherson wrote:
-> > On Fri, Oct 18, 2024, Bernhard Kauer wrote:
-> > > It used a static key to avoid loading the lapic pointer from
-> > > the vcpu->arch structure.  However, in the common case the load
-> > > is from a hot cacheline and the CPU should be able to perfectly
-> > > predict it. Thus there is no upside of this premature optimization.
-> > 
-> > Do you happen to have performance numbers? 
+On Fri, Oct 25, 2024 at 04:14:45PM +0200, David Hildenbrand wrote:
+> Let's finally add s390 support for virtio-mem; my last RFC was sent
+> 4 years ago, and a lot changed in the meantime.
 > 
-> Sure.  I have some preliminary numbers as I'm still optimizing the
-> round-trip time for tiny virtual machines.
+> The latest QEMU series is available at [1], which contains some more
+> details and a usage example on s390 (last patch).
 > 
-> A hello-world micro benchmark on my AMD 6850U needs at least 331us.  With
-> the static keys it requires 579us.  That is a 75% increase.
+> There is not too much in here: The biggest part is querying a new diag(500)
+> STORAGE_LIMIT hypercall to obtain the proper "max_physmem_end".
+> 
+> The last three patches are not strictly required but certainly nice-to-have.
+> 
+> Note that -- in contrast to standby memory -- virtio-mem memory must be
+> configured to be automatically onlined as soon as hotplugged. The easiest
+> approach is using the "memhp_default_state=" kernel parameter or by using
+> proper udev rules. More details can be found at [2].
+> 
+> I have reviving+upstreaming a systemd service to handle configuring
+> that on my todo list, but for some reason I keep getting distracted ...
+> 
+> I tested various things, including:
+>  * Various memory hotplug/hotunplug combinations
+>  * Device hotplug/hotunplug
+>  * /proc/iomem output
+>  * reboot
+>  * kexec
+>  * kdump: make sure we properly enter the "kdump mode" in the virtio-mem
+>    driver
+> 
+> kdump support for virtio-mem memory on s390 will be sent out separately.
+> 
+> v2 -> v3
+> * "s390/kdump: make is_kdump_kernel() consistently return "true" in kdump
+>    environments only"
+>  -> Sent out separately [3]
+> * "s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM memory
+>    devices"
+>  -> No query function for diag500 for now.
+>  -> Update comment above setup_ident_map_size().
+>  -> Optimize/rewrite diag500_storage_limit() [Heiko]
+>  -> Change handling in detect_physmem_online_ranges [Alexander]
+>  -> Improve documentation.
+> * "s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA"
+>  -> Added after testing on systems with CONFIG_NUMA=y
+> 
+> v1 -> v2:
+> * Document the new diag500 subfunction
+> * Use "s390" instead of "s390x" consistently
+> 
+> [1] https://lkml.kernel.org/r/20241008105455.2302628-1-david@redhat.com
+> [2] https://virtio-mem.gitlab.io/user-guide/user-guide-linux.html
+> [3] https://lkml.kernel.org/r/20241023090651.1115507-1-david@redhat.com
+> 
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Cc: "Eugenio P?rez" <eperezma@redhat.com>
+> Cc: Eric Farman <farman@linux.ibm.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> 
+> David Hildenbrand (7):
+>   Documentation: s390-diag.rst: make diag500 a generic KVM hypercall
+>   Documentation: s390-diag.rst: document diag500(STORAGE LIMIT)
+>     subfunction
+>   s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM
+>     memory devices
+>   virtio-mem: s390 support
+>   lib/Kconfig.debug: default STRICT_DEVMEM to "y" on s390
+>   s390/sparsemem: reduce section size to 128 MiB
+>   s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA
+> 
+>  Documentation/virt/kvm/s390/s390-diag.rst | 35 +++++++++++++----
+>  arch/s390/boot/physmem_info.c             | 47 ++++++++++++++++++++++-
+>  arch/s390/boot/startup.c                  |  7 +++-
+>  arch/s390/include/asm/physmem_info.h      |  3 ++
+>  arch/s390/include/asm/sparsemem.h         | 10 ++++-
+>  drivers/virtio/Kconfig                    | 12 +++---
+>  lib/Kconfig.debug                         |  2 +-
+>  7 files changed, 98 insertions(+), 18 deletions(-)
+> 
+> 
+> base-commit: ae90f6a6170d7a7a1aa4fddf664fbd093e3023bc
+> -- 
+> 2.46.1
+> 
 
-For the first VM only though, correct?
+Tested successfully various memory hotplug operations on lpar.
 
-> Take the absolute values with a grain of salt as not all of my patches might
-> be applicable to the general case.
-> 
-> For the other side I don't have a relevant benchmark yet.  But I doubt you
-> would see anything even with a very high IRQ rate.
-> 
-> 
-> > > The downside is that code patching including an IPI to all CPUs
-> > > is required whenever the first VM without an lapic is created or
-> > > the last is destroyed.
-> > 
-> > In practice, this almost never happens though.  Do you have a use case for
-> > creating VMs without in-kernel local APICs?
-> 
-> I switched from "full irqchip" to "no irqchip" due to a significant
-> performance gain 
-
-Signifcant performance gain for what path?  I'm genuinely curious.  Unless your
-VM doesn't need a timer and doesn't need interrupts of any kind, emulating the
-local APIC in userspace is going to be much less performant.
-
-> and the simplicity it promised.
-
-Similar to above, unless you are not emulating a local APIC anywhere, disabling
-KVM's in-kernel local APIC isn't a meaningful change in overall complexity.
-
-> I might have to go to "split irqchip" mode for performance reasons but I
-> didn't had time to look into it yet.
-> 
-> So in the end I assume it will be a trade-off: Do I want to rely on these
-> 3000 lines of kernel code to gain an X% performance increase, or not?
+Tested-by: Sumanth Korikkar <sumanthk@linux.ibm.com>
 
