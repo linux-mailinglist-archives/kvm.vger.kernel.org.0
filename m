@@ -1,108 +1,106 @@
-Return-Path: <kvm+bounces-30241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BC59B83E1
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:58:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F459B83DA
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DFE1C211B5
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:58:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FEEB1F22941
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617371CC162;
-	Thu, 31 Oct 2024 19:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF701CCEF8;
+	Thu, 31 Oct 2024 19:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAhPAd9g"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h0t050Bk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB53D1CC153
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED17F1CBEA2
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730404697; cv=none; b=hgbfxEPqM+Jg9xzapXzXJ12cyOd1YUvaXHSwAZeBTmK93tA3C4b2T/egWFIEKVuqmJUKVJKyiehFECgEbI8mdMEbPtUg14G52nMGw7mUOF0c8MjxIKvNAywC9sY8FpVWE5iC8ID6+9jZQr0xNwUpW1v7vhgOqmc3xJX2X7Q0TQA=
+	t=1730404607; cv=none; b=aiQ5nD7LhpEqNtxx41rFZKqaU3woUgWPs3hfJM9WPusoY4pCnu2itLsx9XIrDFjVmRymKd+Y4wKJDdMSIovOp25F4jPvvjK/2R3nxgKPF/vrmSjzw6LgYB+TvPd7qO5z6OdINSX/HF88s2lb691r8ySoudCl4DDfnYnsjWFhZfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730404697; c=relaxed/simple;
-	bh=wfVPuQjg4pTT8nITD0HM856Hwxi07sPDN/CPn9k8zSc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SJABCqfN/3Sv4FXqstxq7M3wsk3GERuIbgo8qP2pY8EpGVURJmSjBpxLplxVDXby4rRs5c5ivXV7lIPjk3+5S0w6cj2WPdFZfujhbMhh2Yn/KeH4dZEekCVQUirxfcw3F90ao+kwBHUv9lnjUs+NL5FzL8PMkaoeiDe2gqBoLbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAhPAd9g; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e35bdb6a31so24870947b3.1
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:58:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730404695; x=1731009495; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNICsHqwMdHeZvWy3hsB3nyNIVlSoJHA3dF6aNeWo6M=;
-        b=JAhPAd9gKVi01qoImGcXSMbl+zAZW00BYRYt+MrctRM7EHMX5O3AlDEs2vzjsu0PVG
-         mOn+7wp+ai6uIeMHJ0T/eV9ko+0LmamiBp7iofquzzynAELe0bZnnKDjvqkbQ9MgnZd3
-         eqk0cS06IxqM/bEIhKz+UmnF5ItN22HQx8GebaCwA8D0G6bX0pqMulhGLjrAZbwoCznY
-         D5jXYEE7xxRVmg1IVOvY1ORAOTKEmQebZO/hbOm7NuDrFzW2uTB9eJwpKQm70So6Btid
-         NyeHR9RTCnK4orJuOxmTiwXZhpeG9YK46hcbp7ldmEZGG+iT05yUAXv2aBmgPNtCXUyY
-         dlwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730404695; x=1731009495;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNICsHqwMdHeZvWy3hsB3nyNIVlSoJHA3dF6aNeWo6M=;
-        b=okDnAMvTeALhCXFqH8lmPqHc+YFtV35/5yOAVVfMT2cGWVBK1ytmMHcTyXpVDYCARr
-         IKuT0vHbvjiWArd2I5C71x4pjXq6J5OD0KpqrMQF0wK2uPsHRB5+iiFfcjQl6GaQ0b0g
-         GhLRMzb8A6/gOcIzHhHqh1+bCtJA+ahaBm/vwD8IFeNgsIiNJ7eauhCwoXySRf3DwdGK
-         YSO30SK+59ocXJ1ygh0NcxLkXPWscB/U7O8vojPLJ4etl44uF7rSGssI2DoF+0NuSaCK
-         7l7qbQNTWlokhn903lowgD4jQf7w31xY7wqXFdm1l6/S7Ls/Glt9AA+NTPPW1bVUaLyf
-         CEuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXvrUFFy2fJHVkwzD+C187fPREeVi95dvjqDqr5FsaoI1Y0gQvOdELfNcnNllUOxSYVpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuX/NzFYVXYw4isiq4n21/xTnW2/N0hulY9XYj8PVFjJ/xHSsC
-	erRaZ2YZQ/8yNWl0sOuhFB7rZuYuk1sKfZGwPuaY9HKMm/OubWMXZ/D+ECKkQupEI+pV6EzQFx5
-	D1A==
-X-Google-Smtp-Source: AGHT+IHIBAudi8+ePUHSP0AIZTVk5T1CCGOPq4+2lkCRsa14EhhW0npTIP2rwAL+igCci0qbI35PHNl2slY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1d1:b0:e2e:3031:3f0c with SMTP id
- 3f1490d57ef6-e30e5b0ee45mr2642276.7.1730404694604; Thu, 31 Oct 2024 12:58:14
- -0700 (PDT)
-Date: Thu, 31 Oct 2024 12:51:58 -0700
-In-Reply-To: <20241014045931.1061-1-yan.y.zhao@intel.com>
+	s=arc-20240116; t=1730404607; c=relaxed/simple;
+	bh=n42bIm0EJKSGiSdPBDn9xkTrd4XZQCY/ki0lBaAt+Bk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PB43wt9ML/fZtmdHeG6sknHRoo58raP7JKnwXPpdGzXa1+8gx3eNvtCqf7p3nlXi7pGC8EsFvJsuK6flP7QqG+c+MMBSTeLWGhc1FEyZnz7gtjBK++q6pKumXcZGsaPswrRFtEhke3q4OccoRx8xON2hxZ8Dbv+b1dN/x1D2zhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h0t050Bk; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730404601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ETPLCcFOzsbm2EUKzHQHpjrgkvcCKJmMREUbmAxMcBE=;
+	b=h0t050BkX3ihCZkm0W74a9hiZ/GkSTBi0EHcfzhpLzK/YJ1qkNFIaHnidJggXPZ2y98CAz
+	+QQQDV/z0K/cRFxB7iB9bC6zDRytorf1X/deRUGQClrGZKcG0MYC3n8M5EgSFI74RzFDRA
+	pJ2n8dZlCe24+bCRU88+I4G0KVC9jJs=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	stable@vger.kernel.org,
+	kvm@vger.kernel.org,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+Date: Thu, 31 Oct 2024 19:56:28 +0000
+Message-ID: <173040458509.3411583.4399376120814266828.b4-ty@linux.dev>
+In-Reply-To: <20241028234533.942542-1-rananta@google.com>
+References: <20241028234533.942542-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241014045931.1061-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <173039500886.1507775.1819808332270567216.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: VMX: Remove the unused variable "gpa" in __invept()
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, Yan Zhao <yan.y.zhao@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Yuan Yao <yuan.yao@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 14 Oct 2024 12:59:31 +0800, Yan Zhao wrote:
-> Remove the unused variable "gpa" in __invept().
+On Mon, 28 Oct 2024 23:45:33 +0000, Raghavendra Rao Ananta wrote:
+> Improper use of userspace_irqchip_in_use led to syzbot hitting the
+> following WARN_ON() in kvm_timer_update_irq():
 > 
-> The INVEPT instruction only supports two types: VMX_EPT_EXTENT_CONTEXT (1)
-> and VMX_EPT_EXTENT_GLOBAL (2). Neither of these types requires a third
-> variable "gpa".
-> 
-> The "gpa" variable for __invept() is always set to 0 and was originally
-> introduced for the old non-existent type VMX_EPT_EXTENT_INDIVIDUAL_ADDR
-> (0). This type was removed by commit 2b3c5cbc0d81 ("kvm: don't use bit24
-> for detecting address-specific invalidation capability") and
-> commit 63f3ac48133a ("KVM: VMX: clean up declaration of VPID/EPT
-> invalidation types").
+> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
+> kvm_timer_update_irq+0x21c/0x394
+> Call trace:
+>   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
+>   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
+>   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
+>   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
+>   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
+>   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
+>   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:907 [inline]
+>   __se_sys_ioctl fs/ioctl.c:893 [inline]
+>   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
+>   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+>   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
 > 
 > [...]
 
-Applied to kvm-x86 vmx, thanks!
+Applied to kvmarm/next, thanks!
 
-[1/1] KVM: VMX: Remove the unused variable "gpa" in __invept()
-      https://github.com/kvm-x86/linux/commit/bc17fccb37c8
+[1/1] KVM: arm64: Get rid of userspace_irqchip_in_use
+      https://git.kernel.org/kvmarm/kvmarm/c/e571ebcff926
 
 --
-https://github.com/kvm-x86/linux/tree/next
+Best,
+Oliver
 
