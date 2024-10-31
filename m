@@ -1,114 +1,117 @@
-Return-Path: <kvm+bounces-30230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBED9B83BD
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:54:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB299B83C5
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:55:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446C21C20D9F
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:54:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05754B21686
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8161CBEA0;
-	Thu, 31 Oct 2024 19:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4931CB53C;
+	Thu, 31 Oct 2024 19:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PYB2S1km"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rTD1TBDg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DDB1A2562
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9FC1CC153
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730404479; cv=none; b=D+TaDSt83Y8lSGPVHy0llF9K1SPTOiwFKtMwJuK566d2TRxs48RJYa4aSv0qhVk4Ie+D9pKDPL03OxYC1ZH/wfTKLg9e8XedKHoeiy7QkuJ5M4AGq7LoKRk6YK+WHyE13eqwHbE+pIPvBDOhiHoTbkAD1i7FLPE9d29FkAS7FCM=
+	t=1730404491; cv=none; b=FSeSXy06dZ80F66feLxa8SqTA65rB7f0R5ilNZ5F44vQG4Pm62wev4I5DOp8F/L+ScSjQyLQtflc3LiA9VarSieQKw2rDgy71U9Jwsd6T+2ja3JuNgdwp2ftpXSCmTtELuDENI30HEtpJ8zwQF2qPmh2qmB2bnwoK+FSHZjd/K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730404479; c=relaxed/simple;
-	bh=FZJmO/0nWtMIc1C67uozS/AO4KOMqF4YsxND6/5wyzI=;
+	s=arc-20240116; t=1730404491; c=relaxed/simple;
+	bh=ji1ZGggslDNLPdyPAEHksUOY3esBFrCQXJ+WzXWowTE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dX2D9u7BUVf73+L4gzdsugYplKz+VIfxgxC2ErSJG97lfmTBAdbQwXJisxFGgcm9TvwjSnB9iODuRq2As1IN7OU6z2I3dT0J7H5qrnsbCETWV6QzKHz/OxYB15Nu61XEP+dFlGOIijb0PptSCIy09h0RirOuiQWHQVHlXm/OspE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PYB2S1km; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=GNZcASawPNgTTGqSyXW9758bmXZjyEzzkzr4+/NPO+lMnQKl3WhSSrlLQLWgZs4slmjRDgYotom2Dr8hib0su0any6gPxg80Kya5b6mGwm4vAMdemtxhA2H6q5bTMWwAvXCXHKU1MtV8HNw/zH6FxbJXLzEnygIThH4ZC1FrCQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rTD1TBDg; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2b9f2c6559so2061306276.2
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:54:37 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e29142c79d6so2196507276.3
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:54:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730404477; x=1731009277; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730404489; x=1731009289; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Li5w4117oEfxJIQ/plzg7K0jEWXBrMaZ/ZZJ90PA74c=;
-        b=PYB2S1kmgmrh/tML2fZFU1fNIJX97gJwLi7aa0ACpRHMbwdWwIUXlM+ZwbZnqUsOax
-         ka4f3Y01WikV6Qhg6r8dx0zNllgokrL2S1Fiw08uTxwd2iAdUcT5rMrcpWh3dUrWXQYf
-         7/Dl8coTcZ8x9aXufVU5xPRTz+CddFfAl6t4t6Bw5IPB5vPmeH4V9hbwyN8g48Nqqaud
-         K3D0zAqUWLFyLqUip2EFI4POJVu7ChY733azwXY04oqZFRlUoNeDI1zeaEAhqfsxtp1M
-         V03suU0SGzBCLVAf1lzsdfOD9qgeuIHLjJch5x9XVcBOoCM0REF3R4ka2dRX2dz+FkHa
-         UVYQ==
+        bh=1hoGCK8+4LjEMDCBa93UaXD3fiD3DB3Wb4hPONNe9Rc=;
+        b=rTD1TBDgYaGoB+PSOHZXxODSYrERhTN3pWkTQQS2D10wHKdrtmqda0ST6JLMqno4w8
+         haCJ2CXp5Nvjzmdgd6CjQjE64MOsgGZIm5jtzaWViFueBCgzSF1pm2yXqfZv7PjRybL/
+         85mGthLcZgAb3vopyCV+9xf3hxMc1oNluclebwRISTJwzn9OmC2+vmNWHFI9cRxaHENE
+         ONB6jLg3j/YJMZf34S0atf9+x7peL2Q7HvlaczthL+kMsYIOrdNyyS69DkLnoRUMg0f0
+         jfdQqXnu4VJgIM165l9enK4ilQ7sor17vAksD4Gti/niHauXHqBMFNbopaYHmZ42fc4P
+         8Kpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730404477; x=1731009277;
+        d=1e100.net; s=20230601; t=1730404489; x=1731009289;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Li5w4117oEfxJIQ/plzg7K0jEWXBrMaZ/ZZJ90PA74c=;
-        b=ge1jEYxnF80jDTfkAkWh7q4hK/8bpMjPLPUaLQUhPd1WawvZUMod6V3vItyNewoKov
-         7OggEme9cFf11dMDvKGhuJod9G0jEAZUdyr0Zh0CAMQN8o1Yte/ajfP0PP8BnQ2jbQJi
-         xbfikkMdNxdhp6ZDhx8vzzhgx9lohaxpS6nZB6qP1tPefhFIZSsZCdhmjDygvyVLEBhH
-         B7dqlUMG8IZT/YZx2dsaOjW644nqSnaCXxIojiZN206NMsNP0tpdvLAIW2EDXL8Whb/U
-         tBertSPnE5jl8/58pclJCMY4WtPLJRfBbpjdPcsIUYRtlfGyuA1lIW9TBFbKgofVeoHK
-         kS8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGFhFfFyzk1Ed4qwH81NbHgUZ+uNBYqKMkBQ+OOC60agXx6D6RDdgy48q8RrBrC6HjAgk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjNItJNSxaz5rN8eXwJrkUKFJefT2kf8IKuVQDMXUbYXLP4IZa
-	tX5FrfO7LJOKf5Bf4TkrsuX5DpVOrZiNUKcXbcF0paavYtJw3uGUW5uKXjGNTNTsGg5dd2X20ST
-	O5w==
-X-Google-Smtp-Source: AGHT+IEjSKx38AkziKnvpwa1pyyJb4RIVHhdqq42lYLH5ZkJRj7QjsXDK3d8azul8LNNnP6ZucJo5Fk96nQ=
+        bh=1hoGCK8+4LjEMDCBa93UaXD3fiD3DB3Wb4hPONNe9Rc=;
+        b=tnn6+Q5DN1U1gUhsGW4kyjWWv13YfPWkAlvFnVYET4Qjf56IxPzvmMKapgimBj4Z+s
+         GhZVxDmbgY3dIB1PTTnT7u2D4cDFHMWlo1WcvKU9UhIntcNu3F5u7mwutgDN5q6Ct4vD
+         gpkTFIOTQzaApkPGqvhk6I2oyRBFKCDLIWShlai/5eJAdWSLlNRB54LtYFxByW79P7jJ
+         0IY0pqEyQ63c1hf6/jQb8+uM/aTcj+hGsmQkIAwgaNE820AG5ns4lOC/uTwhFFeDb/G+
+         ILzpZtK26Tti/cQhBwR1SbglUw0D0FGCyojTpjp2q0mMTqUVPYTgoI1ENaTqCcdQziNZ
+         nIWg==
+X-Gm-Message-State: AOJu0Yy2U2HAojk5iddKS9zxdTFU4qu9TNdV5hSb88PpEAGZRfcLX6W0
+	1lNxK2rJhgQgGKVvfh84xanrEW0n/ZGzB+1chfpW9EemKXEL0HfQLRCxLJZPQFSMWnTa+DQU+2M
+	nPw==
+X-Google-Smtp-Source: AGHT+IGx+dhXZZpZ1cMRDtZ0KNVGD2joed8AnfGFL98nEBItFp6t4i1krvCt4NoKfJwx2ah7sw+/LPgM/gY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:8541:0:b0:e28:e97f:5394 with SMTP id
- 3f1490d57ef6-e30e5a3e278mr2560276.4.1730404476895; Thu, 31 Oct 2024 12:54:36
+ (user=seanjc job=sendgmr) by 2002:a25:3054:0:b0:e30:d445:a7c with SMTP id
+ 3f1490d57ef6-e30e5a03f4bmr2444276.1.1730404488923; Thu, 31 Oct 2024 12:54:48
  -0700 (PDT)
-Date: Thu, 31 Oct 2024 12:51:37 -0700
-In-Reply-To: <20240906221824.491834-1-mlevitsk@redhat.com>
+Date: Thu, 31 Oct 2024 12:51:39 -0700
+In-Reply-To: <20240802185511.305849-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240906221824.491834-1-mlevitsk@redhat.com>
+References: <20240802185511.305849-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <173039506428.1508883.15289868954923615228.b4-ty@google.com>
-Subject: Re: [PATCH v4 0/4] Relax canonical checks on some arch msrs
+Message-ID: <173039507944.1509256.3272782345564937862.b4-ty@google.com>
+Subject: Re: [PATCH 0/9] KVM: x86: Add a quirk for feature MSR initialization
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, linux-kernel@vger.kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 06 Sep 2024 18:18:20 -0400, Maxim Levitsky wrote:
-> Recently we came up upon a failure where likely the guest writes
-> 0xff4547ceb1600000 to MSR_KERNEL_GS_BASE and later on, qemu
-> sets this value via KVM_PUT_MSRS, and is rejected by the
-> kernel, likely due to not being canonical in 4 level paging.
+On Fri, 02 Aug 2024 11:55:02 -0700, Sean Christopherson wrote:
+> The primary goal of this series to fix an issue where KVM's initialization
+> of feature MSRs during vCPU creation results in a failed save/restore of
+> PERF_CAPABILITIES.  If userspace configures the VM to _not_ have a PMU,
+> because KVM initializes the vCPU's PERF_CAPABILTIIES, trying to save/restore
+> the non-zero value will be rejected by the destination.
 > 
-> One of the way to trigger this is to make the guest enter SMM,
-> which causes paging to be disabled, which SMM bios re-enables
-> but not the whole 5 level. MSR_KERNEL_GS_BASE on the other
-> hand continues to contain old value.
+> The secondary goal is to try and avoid such goofs in the future, by making
+> it explicitly clear that userspace owns the vCPU model.
 > 
 > [...]
 
-Applied to kvm-x86 misc, with some massaging (see responsed to individual
-patches).  Thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/4] KVM: x86: drop x86.h include from cpuid.h
-      https://github.com/kvm-x86/linux/commit/391bd0c520c1
-[2/4] KVM: x86: implement emul_is_noncanonical_address using is_noncanonical_address
-      https://github.com/kvm-x86/linux/commit/6c45d62536d0
-[3/4] KVM: x86: model canonical checks more precisely
-      https://github.com/kvm-x86/linux/commit/1b1336d1d858
-[4/4] KVM: nVMX: fix canonical check of vmcs12 HOST_RIP
-      https://github.com/kvm-x86/linux/commit/14a95598b6e7
+[1/9] KVM: x86: Co-locate initialization of feature MSRs in kvm_arch_vcpu_create()
+      https://github.com/kvm-x86/linux/commit/383383cfd202
+[2/9] KVM: x86: Disallow changing MSR_PLATFORM_INFO after vCPU has run
+      https://github.com/kvm-x86/linux/commit/d76a5e78f16d
+[3/9] KVM: x86: Quirk initialization of feature MSRs to KVM's max configuration
+      https://github.com/kvm-x86/linux/commit/088b8eeb25ec
+[4/9] KVM: x86: Reject userspace attempts to access PERF_CAPABILITIES w/o PDCM
+      https://github.com/kvm-x86/linux/commit/c2eb2d0318c0
+[5/9] KVM: VMX: Remove restriction that PMU version > 0 for PERF_CAPABILITIES
+      https://github.com/kvm-x86/linux/commit/bae593b20e92
+[6/9] KVM: x86: Reject userspace attempts to access ARCH_CAPABILITIES w/o support
+      https://github.com/kvm-x86/linux/commit/83a5fe6cf1eb
+[7/9] KVM: x86: Remove ordering check b/w MSR_PLATFORM_INFO and MISC_FEATURES_ENABLES
+      https://github.com/kvm-x86/linux/commit/9d2dcfb82db1
+[8/9] KVM: selftests: Verify get/set PERF_CAPABILITIES w/o guest PDMC behavior
+      https://github.com/kvm-x86/linux/commit/6a4511f8602f
+[9/9] KVM: selftests: Add a testcase for disabling feature MSRs init quirk
+      https://github.com/kvm-x86/linux/commit/58a7368f104d
 
 --
 https://github.com/kvm-x86/linux/tree/next
