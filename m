@@ -1,106 +1,147 @@
-Return-Path: <kvm+bounces-30238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F459B83DA
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:57:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C6509B83E5
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 21:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FEEB1F22941
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:57:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34C53B21109
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF701CCEF8;
-	Thu, 31 Oct 2024 19:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF611C7B62;
+	Thu, 31 Oct 2024 20:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h0t050Bk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hrhgrof2"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED17F1CBEA2
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5354F1465B4
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 20:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730404607; cv=none; b=aiQ5nD7LhpEqNtxx41rFZKqaU3woUgWPs3hfJM9WPusoY4pCnu2itLsx9XIrDFjVmRymKd+Y4wKJDdMSIovOp25F4jPvvjK/2R3nxgKPF/vrmSjzw6LgYB+TvPd7qO5z6OdINSX/HF88s2lb691r8ySoudCl4DDfnYnsjWFhZfg=
+	t=1730404826; cv=none; b=lOH28JyVb6l/U7ke8kSqlOBrHqIp+zwxJdEK+6lZJoHQ2TSBU/BiE6sHNcsLinhsCjD/QRrtBK0Yx1rlyktInqAMiARk+yWdkIYLtDWEdvP9Lx/8YIZvq3vOAz6mhlZ43LaqxSLSGo0N+jAAx8lCzc7U6xrCceUq09PjoM0mb5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730404607; c=relaxed/simple;
-	bh=n42bIm0EJKSGiSdPBDn9xkTrd4XZQCY/ki0lBaAt+Bk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PB43wt9ML/fZtmdHeG6sknHRoo58raP7JKnwXPpdGzXa1+8gx3eNvtCqf7p3nlXi7pGC8EsFvJsuK6flP7QqG+c+MMBSTeLWGhc1FEyZnz7gtjBK++q6pKumXcZGsaPswrRFtEhke3q4OccoRx8xON2hxZ8Dbv+b1dN/x1D2zhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h0t050Bk; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730404601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ETPLCcFOzsbm2EUKzHQHpjrgkvcCKJmMREUbmAxMcBE=;
-	b=h0t050BkX3ihCZkm0W74a9hiZ/GkSTBi0EHcfzhpLzK/YJ1qkNFIaHnidJggXPZ2y98CAz
-	+QQQDV/z0K/cRFxB7iB9bC6zDRytorf1X/deRUGQClrGZKcG0MYC3n8M5EgSFI74RzFDRA
-	pJ2n8dZlCe24+bCRU88+I4G0KVC9jJs=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	stable@vger.kernel.org,
-	kvm@vger.kernel.org,
-	syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
-Date: Thu, 31 Oct 2024 19:56:28 +0000
-Message-ID: <173040458509.3411583.4399376120814266828.b4-ty@linux.dev>
-In-Reply-To: <20241028234533.942542-1-rananta@google.com>
-References: <20241028234533.942542-1-rananta@google.com>
+	s=arc-20240116; t=1730404826; c=relaxed/simple;
+	bh=zac5tECCZ+2hkAkLwkJPyOhq3zwtGkq5DKIb7eG/CQ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OtQz/QiA9/5UNmFXElY/p5hOODupSjSix5OvRO0nFXttKrq2L+PWAxSw4S1DOSv2CrQtQ0cJ2AtTiOmxbugwldKp9w0y9HeBRyK0tRY4wu9j2IYsmtHKaHtA05O9OF+vsBoi/k3Uv2/uZlB4ecnVZ8oGdD4qrqQwf7uq9BDJmEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hrhgrof2; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2fb583e4cso1573597a91.3
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 13:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730404823; x=1731009623; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FpwPxjJzeooRz07SKSO5nraJTuWvMLmzD1+H6hUBWMw=;
+        b=Hrhgrof2N6km3Kx81E3r1YWa+yqp1J5yxr9FZnBty4ftJ3PekaiaKoZC+jjLAGAZBw
+         N+3nHx8hHS7836SAt88PAMs8+BgBEqfZ8/RD5n3g/hBd+fL7N63zPZu1N6afS3SORTd2
+         20ryHGYrExZ/UaxBeXcRIHbSJ/97E5rhaAYrjH1pDzO1hIIaMVd1BMbh6alZkDYEu+py
+         gKM9SKDMInQf8R9c8d2cQEisps2QYasoSKxxwnQLn1q2MlfLCNG+idsw+sDSrB+k/dC5
+         HaOB8r9VRE/gTvscqrhuxh9pia+I/h+tagn8HfWJredKO7prFVp7wtP8voWpdUkePnG5
+         eAzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730404823; x=1731009623;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FpwPxjJzeooRz07SKSO5nraJTuWvMLmzD1+H6hUBWMw=;
+        b=BdUCHrp00XFUV2PKDaZuI1sK8gcuxaqL0u2YPE5b0qxamB33zGUbpt6fO4tgIuLcKv
+         qX0y8c29ouJP+6kXFoGzMxZkkn0d6WS/3+dCnaLD8BiKsoyddvSjHFnCq2SGyuG8b6Ye
+         AfKMfk/gBcSHtBMwBl4R8VZ6pUR4WOV+1WfrnCcRZJdNgG0HuT3F147uTWlywdAriv3B
+         iKVoWewObgmql7HaxFHWBfJnzEQcNHgM01xMM6cQpGiLRhZPFPegKL5Nnm0TnViM2ffR
+         ZV9GC1iXk45h4UY8tdMS0VseQRjH9X3Ik2E5s49Rr4ZH1ztTRPnUW2foNrctugeJhNtM
+         YALg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVJWQjsMSlbLfjTzMJ/4yXLH2ggRYkC6CFgMHjnfPGTmQQbd2S2iTQU0rMDTjtxjMUnnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy27nO5ONBPWRe05J00EjyjLtYyS6DTiDI9BAXJWU7dAXYf9AC2
+	QSPq7WjT2/UU5e2gTncGLbqH8XAhAQ0LAAwvf69ZI8tlxnHi8iXwQhR09/Mi/PgmnzRvU9AYPs8
+	5aQ==
+X-Google-Smtp-Source: AGHT+IGcnRyQTYSmsVPQsBmNa2lNRelM00ivU7678Q9L5jhj6IvHRBmjGrs4VnkYXZDxVV0uM0cn6s3ZqbA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:249:b0:2e2:ca33:1633 with SMTP id
+ 98e67ed59e1d1-2e8f104cab8mr41417a91.1.1730404823666; Thu, 31 Oct 2024
+ 13:00:23 -0700 (PDT)
+Date: Thu, 31 Oct 2024 13:00:22 -0700
+In-Reply-To: <20240823235648.3236880-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20240823235648.3236880-1-dmatlack@google.com>
+Message-ID: <ZyPh1nARL4vThB4J@google.com>
+Subject: Re: [PATCH v2 0/6] KVM: x86/mmu: Optimize TDP MMU huge page recovery
+ during disable-dirty-log
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 28 Oct 2024 23:45:33 +0000, Raghavendra Rao Ananta wrote:
-> Improper use of userspace_irqchip_in_use led to syzbot hitting the
-> following WARN_ON() in kvm_timer_update_irq():
+On Fri, Aug 23, 2024, David Matlack wrote:
+> Rework the TDP MMU disable-dirty-log path to batch TLB flushes and
+> recover huge page mappings, rather than zapping and flushing for every
+> potential huge page mapping.
 > 
-> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
-> kvm_timer_update_irq+0x21c/0x394
-> Call trace:
->   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
->   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
->   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
->   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
->   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
->   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
->   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   __do_sys_ioctl fs/ioctl.c:907 [inline]
->   __se_sys_ioctl fs/ioctl.c:893 [inline]
->   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
->   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
->   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
->   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
->   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
->   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
->   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> With this series, dirty_log_perf_test shows a decrease in the time it takes to
+> disable dirty logging, as well as a decrease in the number of vCPU faults:
 > 
-> [...]
+>  $ ./dirty_log_perf_test -s anonymous_hugetlb_2mb -v 64 -e -b 4g
+> 
+>  Before: Disabling dirty logging time: 14.334453428s (131072 flushes)
+>  After:  Disabling dirty logging time: 4.794969689s  (76 flushes)
+> 
+>  Before: 393,599      kvm:kvm_page_fault
+>  After:  262,575      kvm:kvm_page_fault
+> 
+> v2:
+>  - Use a separate iterator to walk down to child SPTEs during huge page
+>    recovery [Sean]
+>  - Return SHADOW_NONPRESENT_VALUE in error conditions in
+>    make_huge_spte() [Vipin][off-list]
+> 
+> v1: https://lore.kernel.org/kvm/20240805233114.4060019-8-dmatlack@google.com/
+> 
+> David Matlack (6):
+>   KVM: x86/mmu: Drop @max_level from kvm_mmu_max_mapping_level()
+>   KVM: x86/mmu: Batch TLB flushes when zapping collapsible TDP MMU SPTEs
+>   KVM: x86/mmu: Refactor TDP MMU iter need resched check
+>   KVM: x86/mmu: Recover TDP MMU huge page mappings in-place instead of
+>     zapping
+>   KVM: x86/mmu: Rename make_huge_page_split_spte() to make_small_spte()
+>   KVM: x86/mmu: WARN if huge page recovery triggered during dirty
+>     logging
+> 
+>  arch/x86/include/asm/kvm_host.h |   4 +-
+>  arch/x86/kvm/mmu/mmu.c          |  16 ++--
+>  arch/x86/kvm/mmu/mmu_internal.h |   3 +-
+>  arch/x86/kvm/mmu/spte.c         |  43 +++++++++--
+>  arch/x86/kvm/mmu/spte.h         |   5 +-
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 129 +++++++++++++++++---------------
+>  arch/x86/kvm/mmu/tdp_mmu.h      |   4 +-
+>  arch/x86/kvm/x86.c              |  18 ++---
+>  8 files changed, 128 insertions(+), 94 deletions(-)
 
-Applied to kvmarm/next, thanks!
+FYI, these are sitting in kvm-x86 mmu, but will be rebased next week, at which
+point I'll send the "official" thank yous.
 
-[1/1] KVM: arm64: Get rid of userspace_irqchip_in_use
-      https://git.kernel.org/kvmarm/kvmarm/c/e571ebcff926
-
---
-Best,
-Oliver
+[1/8] KVM: x86/mmu: Drop @max_level from kvm_mmu_max_mapping_level()
+      https://github.com/kvm-x86/linux/commit/8ccd51cb5911
+[2/8] KVM: x86/mmu: Batch TLB flushes when zapping collapsible TDP MMU SPTEs
+      https://github.com/kvm-x86/linux/commit/35ef80eb29ab
+[3/8] KVM: x86/mmu: Check yielded_gfn for forward progress iff resched is needed
+      https://github.com/kvm-x86/linux/commit/d400ce271d9c
+[4/8] KVM: x86/mmu: Demote the WARN on yielded in xxx_cond_resched() to KVM_MMU_WARN_ON
+      https://github.com/kvm-x86/linux/commit/012a5c17cba4
+[5/8] KVM: x86/mmu: Refactor TDP MMU iter need resched check
+      https://github.com/kvm-x86/linux/commit/cb059b9e2432
+[6/8] KVM: x86/mmu: Recover TDP MMU huge page mappings in-place instead of zapping
+      https://github.com/kvm-x86/linux/commit/13237fb40c74
+[7/8] KVM: x86/mmu: Rename make_huge_page_split_spte() to make_small_spte()
+      https://github.com/kvm-x86/linux/commit/1d2a6d0b6438
+[8/8] KVM: x86/mmu: WARN if huge page recovery triggered during dirty logging
+      https://github.com/kvm-x86/linux/commit/ed5ca61d995f
 
