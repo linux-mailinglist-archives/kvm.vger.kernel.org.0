@@ -1,115 +1,137 @@
-Return-Path: <kvm+bounces-30247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2D49B847C
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 21:40:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936259B8432
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 21:09:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A198B28389F
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:40:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 293C7B2478F
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB7D1CC17C;
-	Thu, 31 Oct 2024 20:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E049D1CBEA1;
+	Thu, 31 Oct 2024 20:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWHuCx5c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mediconcil.de (mail.mediconcil.de [91.107.198.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602AD199FAF
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 20:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.107.198.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277151BDA99
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 20:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730407194; cv=none; b=cwuSc/dPhrWr9mzzdf4y/YFzMfOTQIRHc6mS52vSA1xf5r1XBag6YXlpZ1a7XWBPFGdTL8Rgw96zn98BNu+DowvVOZs5Y8BoT4vpuCTL10dOZ8MNzdFdvK9HJumhyMUlZcLwNNiYKLmsKgATkN8zolc82E6LZcS2uCN+etbWmSI=
+	t=1730405390; cv=none; b=ox6do/NGlZAX2HVo96vLKn/IHLZVcAG5D4moqLlqTuOKOqsqEIl4dAdiZ7Ha8Tg2VTluNGcXGpthf/fAdsjUC5tIuhS5kKyxproFKWMlfGDS4u2p7XPdGPXl9c2N5nVaQlWP/IysBSWDqYkr9sMrMhApxNhXzKljlRhdp1LxwxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730407194; c=relaxed/simple;
-	bh=TvR5BYmZF8Ioi3rUdxIKWoxJqY1greZXSh4RxUX61ak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NwsucIHrBF2LZm2jYKefbeA+AniIQdwW4185qYcWM3wtMWcHGtAvs1OKR4x45yyonlhxEsp3KcM38/dJVKRQrJFE7+P3lpopOcF9dQ8F3zWJWQa+8NA6Mgr1jLefg7RnFetpSEWC5F/TQnEknNVryYlMNpVXTH36idSIfKU78E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io; spf=none smtp.mailfrom=mias.mediconcil.de; arc=none smtp.client-ip=91.107.198.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mias.mediconcil.de
-Received: from bernie by mediconcil.de with local (Exim 4.96)
-	(envelope-from <bernie@mias.mediconcil.de>)
-	id 1t6bT7-00ENqN-17;
-	Thu, 31 Oct 2024 21:08:33 +0100
-Date: Thu, 31 Oct 2024 21:08:33 +0100
-From: Bernhard Kauer <bk@alpico.io>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Bernhard Kauer <bk@alpico.io>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: drop the kvm_has_noapic_vcpu optimization
-Message-ID: <ZyPjwW55n0JHg0pu@mias.mediconcil.de>
-References: <20241018100919.33814-1-bk@alpico.io>
- <Zxfhy9uifey4wShq@google.com>
- <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
- <ZyOvPYHrpgPbxUtX@google.com>
+	s=arc-20240116; t=1730405390; c=relaxed/simple;
+	bh=Udpm6RI+vAu4DeQK4HRqdmPK9pOT5qP8mLEQJwd46mE=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=kTEbVmR4HG5GcOCxDqG6GJ1FXd2U/7VTncxjOXS02FJZVJMZkzF/94GQz+YD2NMgAqD6JA/P9JPd+udnZW5E/yALHl8yriq9hkcv6TrALrqyrDUvRwLdUtpvZGIA/wDRGaclJbk1qAztUaTg9JfbnFWYb/MlEHpPjOXrOrYw/Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWHuCx5c; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e370d76c15so26693197b3.2
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 13:09:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730405387; x=1731010187; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YYJVMBm1bZbfZ8BXA7U0ACFO0AHr0DoTfzETRNw+mrQ=;
+        b=fWHuCx5cDIIHZelGrsgLNx3xD+DnQeNFUTgNS8W1QPsGNgJcnIsA3fsViyrnxkxkpe
+         HW6xUxtayRY+3g1jiHnEG19m9fJ14qghiibOSvdwBv3BEDU/fyqkJen5D2JxFuKehIC8
+         vxivbQiAEbR+PWnzhVzKXtdm+heBGrQV1yRjl8I64AopbBXOrc/k3nBsAnGPN+Edu0CG
+         WabkXHum7FNXq8uayR6SrMo/U9gYMT/LOTEN0TgXqp0PoRBLDNAKVBp3pvumzQjmSvGN
+         NwL3BQN3Dp0D6AMCpjq7qLTpTOROFhrZFerBU/B1AmsSFSsabSYPgPnhvmEBin2/CbbL
+         2e9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730405387; x=1731010187;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YYJVMBm1bZbfZ8BXA7U0ACFO0AHr0DoTfzETRNw+mrQ=;
+        b=ZBlCBpgFW42/sdNbIapgu2BOyvdnG8LAjnc55M60zmu1us6gyvqm7dbi6GVKpGhDTQ
+         gjCfUOgJgHjbKlVzNvZD88qi6vrnUSfrjZeiNmQ9whxMmKBYNSTUQNHoe4mEYdDgZuTq
+         dUmy7FNyL3ETLn7TtIA1Y+svDDo0Q+fzNxQEfB0YMFWPOErzj0n10xNzupBt2JvL1kJI
+         UJAP+0dWeWn9hgiMDywx+FN8j+Lq0pUJhsBWubvGbnP0A4fyvDkGwcYhq47dvEQh2M8z
+         IS56Yqnsy+EUUp16kJXifohCNHS7xcSQbXkPNKyoj4ZqBYXkHcMrr7S/rlUgytYFgu+g
+         XhYw==
+X-Gm-Message-State: AOJu0YySLyFz5b0JkFVS8C8XMtvleVJ54Tk120bRGjAhoJvb8/0nTtT2
+	+fu17lcT5AAiVtlLyGRO6eQ0wBXcxhWxYnyrAxPeuL8N2R2RLVBKQMytMXQ1Y0kRd5c62nuBAD5
+	JWjsc2idwqsY9pdD2fkCWqw==
+X-Google-Smtp-Source: AGHT+IEpU/nsqHw2HNdrnKe90ZcgMwiw8711EjVnoYy7bqvyFHs6zt8GYUXoJCH86l1eGdVB7BBA9qy0Bkl/MtaP4g==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
+ (user=coltonlewis job=sendgmr) by 2002:a05:690c:6407:b0:6e3:8562:ffa with
+ SMTP id 00721157ae682-6e9d8b5f046mr14345247b3.5.1730405387276; Thu, 31 Oct
+ 2024 13:09:47 -0700 (PDT)
+Date: Thu, 31 Oct 2024 20:09:45 +0000
+In-Reply-To: <20240918205319.3517569-1-coltonlewis@google.com> (message from
+ Colton Lewis on Wed, 18 Sep 2024 20:53:13 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZyOvPYHrpgPbxUtX@google.com>
+Mime-Version: 1.0
+Message-ID: <gsnth68sf306.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 0/6] Extend pmu_counters_test to AMD CPUs
+From: Colton Lewis <coltonlewis@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, seanjc@google.com, 
+	pbonzini@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Thu, Oct 31, 2024 at 09:24:29AM -0700, Sean Christopherson wrote:
-> On Tue, Oct 22, 2024, Bernhard Kauer wrote:
-> > > > It used a static key to avoid loading the lapic pointer from
-> > > > the vcpu->arch structure.  However, in the common case the load
-> > > > is from a hot cacheline and the CPU should be able to perfectly
-> > > > predict it. Thus there is no upside of this premature optimization.
-> > >
-> > > Do you happen to have performance numbers?
-> >
-> > Sure.  I have some preliminary numbers as I'm still optimizing the
-> > round-trip time for tiny virtual machines.
-> >
-> > A hello-world micro benchmark on my AMD 6850U needs at least 331us.  With
-> > the static keys it requires 579us.  That is a 75% increase.
->
-> For the first VM only though, correct?
+Bumping this for Mingwei
 
-That is right. If I keep one VM in the background the overhead is not
-measureable anymore.
+Colton Lewis <coltonlewis@google.com> writes:
 
+> Extend pmu_counters_test to AMD CPUs.
 
-> > Take the absolute values with a grain of salt as not all of my patches might
-> > be applicable to the general case.
-> >
-> > For the other side I don't have a relevant benchmark yet.  But I doubt you
-> > would see anything even with a very high IRQ rate.
-> >
-> >
-> > > > The downside is that code patching including an IPI to all CPUs
-> > > > is required whenever the first VM without an lapic is created or
-> > > > the last is destroyed.
-> > >
-> > > In practice, this almost never happens though.  Do you have a use case for
-> > > creating VMs without in-kernel local APICs?
-> >
-> > I switched from "full irqchip" to "no irqchip" due to a significant
-> > performance gain
->
-> Signifcant performance gain for what path?  I'm genuinely curious.
+> As the AMD PMU is quite different from Intel with different events and
+> feature sets, this series introduces a new code path to test it,
+> specifically focusing on the core counters including the
+> PerfCtrExtCore and PerfMonV2 features. Northbridge counters and cache
+> counters exist, but are not as important and can be deferred to a
+> later series.
 
-I have this really slow PREEMPT_RT kernel (Debian 6.11.4-rt-amd64).
-The hello-world benchmark takes on average 100ms.  With IRQCHIP it goes
-up to 220ms.  An strace gives 83ms for the extra ioctl:
+> The first patch is a bug fix that could be submitted separately.
 
-        ioctl(4, KVM_CREATE_IRQCHIP, 0)         = 0 <0.083242>
+> The series has been tested on both Intel and AMD machines, but I have
+> not found an AMD machine old enough to lack PerfCtrExtCore. I have
+> made efforts that no part of the code has any dependency on its
+> presence.
 
-My current theory is that RCU takes ages on this kernel.  And creating an
-IOAPIC uses SRCU to synchronize the bus array...
+> I am aware of similar work in this direction done by Jinrong Liang
+> [1]. He told me he is not working on it currently and I am not
+> intruding by making my own submission.
 
-However, in my latest benchmark runs the overhead for IRQCHIP is down to 15
-microseconds.  So no big deal anymore.
+> [1]  
+> https://lore.kernel.org/kvm/20231121115457.76269-1-cloudliang@tencent.com/
 
+> v2:
+> * Test all combinations of VM setup rather than only the maximum
+>    allowed by hardware
+> * Add fixes tag to bug fix in patch 1
+> * Refine some names
 
-> Unless your VM doesn't need a timer and doesn't need interrupts of
-> any kind, emulating the local APIC in userspace is going to be much
-> less performant.
+> v1:
+> https://lore.kernel.org/kvm/20240813164244.751597-1-coltonlewis@google.com/
+
+> Colton Lewis (6):
+>    KVM: x86: selftests: Fix typos in macro variable use
+>    KVM: x86: selftests: Define AMD PMU CPUID leaves
+>    KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+>    KVM: x86: selftests: Test read/write core counters
+>    KVM: x86: selftests: Test core events
+>    KVM: x86: selftests: Test PerfMonV2
+
+>   .../selftests/kvm/include/x86_64/processor.h  |   7 +
+>   .../selftests/kvm/x86_64/pmu_counters_test.c  | 304 ++++++++++++++++--
+>   2 files changed, 277 insertions(+), 34 deletions(-)
 
 
-Do you have any performance numbers?
+> base-commit: da3ea35007d0af457a0afc87e84fddaebc4e0b63
+> --
+> 2.46.0.662.g92d0881bb0-goog
 
