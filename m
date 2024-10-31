@@ -1,232 +1,281 @@
-Return-Path: <kvm+bounces-30147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30148-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B4C9B73F8
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 05:56:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F019B7474
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 07:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E93E01C23116
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 04:56:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1852F1F256BE
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 06:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159CA13D8B4;
-	Thu, 31 Oct 2024 04:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7DB140E38;
+	Thu, 31 Oct 2024 06:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PQAlH1PV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IbQ2PG+H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D679E13CA8A;
-	Thu, 31 Oct 2024 04:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC0B1448DC
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 06:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730350583; cv=none; b=NhlatDjoY6dJjnbPNKR+Ez9CLSR/twyCiI/OfYkR1gnJ1LvUF8SFYiLmtq1KWCoL0FBdV9wN4Y6sxzQ/2tJed6zcz50gh92wi/4mgPBgowXIfyT5GQQMpmjJaj/Cn7Ile6m5N8RpOIBAiOgA+cnktBg3lU1uemFhAI/LGcar1Xg=
+	t=1730355688; cv=none; b=nVWBqI2Ikrb0eiJhHVwzOjoFfXD2cKPrTsWKg0H4tocy3GqgnQuOUZ+YASaBEg2BcY39lkDTsKausPUZrTKpuNUfPuryzjnDdUmXgINDYutmay+lMB25WRYPpyCda3n1iTmlIkeviRN9wRLlSubDUohKG/l4Hrvgxv2NPSkhqeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730350583; c=relaxed/simple;
-	bh=flCsxwyjLE26j5Y/rFURu6azx7PHBiVzA7lT9R6aWno=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqA++0Km3OFLuLGNltbikuW3DiMtLcRnCerc+Z5MMhLShmYs0nGbY1M/1nITxIgsuSIi9PANwH9swxZ13coHFHg4JCJiP0m/eZ9zYkw/uM0K2k4RnCrS7NnGCPwZH0Ti3Tinb3Ldzqf6grnHAxPsW2IxNCh2kw7ZGJsg0lcIa+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PQAlH1PV; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730350582; x=1761886582;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=flCsxwyjLE26j5Y/rFURu6azx7PHBiVzA7lT9R6aWno=;
-  b=PQAlH1PVNjPkF/GFCrTBeQd2CbapX86YRF3Msi0JanXtQgKVlDK0f3LZ
-   y1W1TTnWhCwlKQKYjDs9nVdKfgprfd6MRE6XNFQ2qOB/5H7rz7OWE49Rr
-   ZQjyIF04jiIHHe7XzoKWc1lkfy4DhfxvYYlInUtHRGjriBR0DfhDuoRtt
-   b9K27vwI6YhCCDOW1I9uecUOaUcGFKKxEBa7Gc3uWt8dgp/e25pnd3qh5
-   uWPFFXePVJdDYi0GsVrOqMya54rCN/4WZTv47C1LZar7K1cK03TwnFL3B
-   TCuZxUEwF1+R4lEQc+ECLN0yTdrN3PO5SV3vPE5m1EgWhzBUS9lg4o+yd
-   g==;
-X-CSE-ConnectionGUID: NoyoBI+OQ/6NYnmqqD2neg==
-X-CSE-MsgGUID: oc1MAIenS6acsvs9lHBJYA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="33866738"
-X-IronPort-AV: E=Sophos;i="6.11,246,1725346800"; 
-   d="scan'208";a="33866738"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 21:56:20 -0700
-X-CSE-ConnectionGUID: lA4uBXjaQHKh9JmtN8S87w==
-X-CSE-MsgGUID: aTI7/ZNRSrSJJBM/3DXaWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,246,1725346800"; 
-   d="scan'208";a="82172371"
-Received: from unknown (HELO [10.238.12.149]) ([10.238.12.149])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 21:56:17 -0700
-Message-ID: <4734379d-97c4-44c8-ae40-be46da6e6239@linux.intel.com>
-Date: Thu, 31 Oct 2024 12:56:14 +0800
+	s=arc-20240116; t=1730355688; c=relaxed/simple;
+	bh=XSZ6Hy52turl3LfxnjEUv5hVzdAx9oOcIHfaeoqhMiU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FPnasxBd1NFQI9OXK6o6j5HtGwThOtV2rnO+FADuCxxVm1MxdtLHQgJf5jH5UBYRg8bPIupQ8Wdhi6lWsJO0z12SIM2HFvnGiGvscsr1T2E8AVIrGjVdL2OfUsQKCUwo0eP/wSGPLjGWka8rN/uScZ+RU6pYWq1nZbQuXFEaJN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IbQ2PG+H; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53b13ea6b78so973448e87.2
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 23:21:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1730355683; x=1730960483; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCUVXtHK/IiMB+Oe4BWESMJU8Ob4rgGM97ZCX/sNfKI=;
+        b=IbQ2PG+Hgg7YT7gJqA1dQMmmGut5Eo7mDk3GFmH0VxYdV/HDp0pfS/4sR8pDVKi834
+         b3O5GY4KPkV65aKJEjY8NnEFOpV8HWqV3MiLlunRaGB9/Igqwp1bZh1AP2UCTpyxDl5n
+         GecggC2yreuC/KxAeZfh5+1i0XpVQUq911Zjh6foKC4iZcMGAbxxBuFLq3TVOBsEaBWd
+         lOBMY4jO65qqztRDvI94WD9rZV70zrrgpbi2+vSemb50BY3HP/bJX9rxnSH5LnOpIQjI
+         pnWS3i7KIzprJUv2LTq04VOZuZxG4x9Ljee2QvH8CE+AKk/VvVLNy4WB954PzSDvzuME
+         4Uog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730355683; x=1730960483;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uCUVXtHK/IiMB+Oe4BWESMJU8Ob4rgGM97ZCX/sNfKI=;
+        b=iQWxkyWkhLULA/fPEyON43ExoGJwjiBtiZs5uPlYrR6Q5TvGycGzibRkpYcdbWhq2D
+         CitDWxX+1WdAESRrj56bzf3hahK2Ay/CGrTzTFrDTM9lxOvmqdCO3jEDeSR/dGiMh4NC
+         ibvC9zcTRrZquSsL+64PHmOUlmIWjV9ru6FhnToHYBtPyeYQ0OO9vDvIHZvb0/4O3vaP
+         6yFJ5KrNMOJDCnkV7wIXJ0YSp3OoS6uRm3U1QODkMTrHe5WGbaYgsyhC6VYeC7afB1H/
+         TMMUiRlXqygbMJTY56E6YP+ZtAbNmVIN7UAhqM0nPWhuRuV1ixXbjmK0BzOU6GO1B6u0
+         IAMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTGC/DpWwWeLIZlzcKsGOU32PaEskvlW6gxxeGTv0WzOfIPiGwZG9GLfdc7pBe9iZu+ow=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt8s8yF5vHU4xVMvutoz3p27YGDNWoAUdOje8CRNgyqvhhdKyf
+	BVgv7FqpOrKLSMSe+UP35LvI3CsVdhZHkYYTKu145VVYHtFOwCOao9Eq65Lhouuey+sNoOxPuT9
+	yfxbB8+4U97KBQ19wsTrnpyVB9pNw22gNYeHDlQ==
+X-Google-Smtp-Source: AGHT+IH0g8oJXVs7VSlsOX60RHCa1G3irMHjbxsPtlD9vjSUFpsj7VgciJ4cq7Us8zzxRnsUwBQyyU+Qscm+a7G3kBw=
+X-Received: by 2002:a05:6512:3053:b0:539:a4ef:6765 with SMTP id
+ 2adb3069b0e04-53b348ba142mr14459958e87.7.1730355683052; Wed, 30 Oct 2024
+ 23:21:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace
- generically
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
- isaku.yamahata@intel.com, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- yuan.yao@linux.intel.com, xiaoyao.li@intel.com
-References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
- <20240826022255.361406-2-binbin.wu@linux.intel.com>
- <ZyKbxTWBZUdqRvca@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZyKbxTWBZUdqRvca@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com> <9-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+In-Reply-To: <9-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Thu, 31 Oct 2024 14:21:11 +0800
+Message-ID: <CABQgh9HoGFGDTEqziQt6WrJ7Bm9d-0c259PYsms3nOVEidn5BA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/12] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev, 
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Donald Dutile <ddutile@redhat.com>, 
+	Eric Auger <eric.auger@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Jerry Snitselaar <jsnitsel@redhat.com>, 
+	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, 
+	patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, 
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-
-
-On 10/31/2024 4:49 AM, Sean Christopherson wrote:
-> On Mon, Aug 26, 2024, Binbin Wu wrote:
->> Check whether a KVM hypercall needs to exit to userspace or not based on
->> hypercall_exit_enabled field of struct kvm_arch.
->>
->> Userspace can request a hypercall to exit to userspace for handling by
->> enable KVM_CAP_EXIT_HYPERCALL and the enabled hypercall will be set in
->> hypercall_exit_enabled.  Make the check code generic based on it.
->>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->> Reviewed-by: Kai Huang <kai.huang@intel.com>
->> ---
->>   arch/x86/kvm/x86.c | 5 +++--
->>   arch/x86/kvm/x86.h | 4 ++++
->>   2 files changed, 7 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 966fb301d44b..e521f14ad2b2 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -10220,8 +10220,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->>   	cpl = kvm_x86_call(get_cpl)(vcpu);
->>   
->>   	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
->> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
->> -		/* MAP_GPA tosses the request to the user space. */
->> +	/* Check !ret first to make sure nr is a valid KVM hypercall. */
->> +	if (!ret && user_exit_on_hypercall(vcpu->kvm, nr))
-> I don't love that the caller has to re-check for user_exit_on_hypercall().
-Agree, it is not ideal.
-
-But if __kvm_emulate_hypercall() returns 0 to indicate user exit and 1 to
-indicate success, then the callers have to convert the return code to set
-return value for guest.  E.g., TDX code also needs to do the conversion.
-
-> I also don't love that there's a surprising number of checks lurking in
-> __kvm_emulate_hypercall(), e.g. that CPL==0, especially since the above comment
-> about "a valid KVM hypercall" can be intrepreted as meaning KVM is *only* checking
-> if the hypercall number is valid.
+On Thu, 31 Oct 2024 at 08:21, Jason Gunthorpe <jgg@nvidia.com> wrote:
 >
-> E.g. my initial reaction was that we could add a separate path for userspace
-> hypercalls, but that would be subtly wrong.  And my second reaction was to hoist
-> the common checks out of __kvm_emulate_hypercall(), but then I remembered that
-> the only reason __kvm_emulate_hypercall() is separate is to allow it to be called
-> by TDX with different source/destionation registers.
+> For SMMUv3 a IOMMU_DOMAIN_NESTED is composed of a S2 iommu_domain acting
+> as the parent and a user provided STE fragment that defines the CD table
+> and related data with addresses translated by the S2 iommu_domain.
 >
-> So, I'm strongly leaning towards dropping the above change, squashing the addition
-> of the helper with patch 2, and then landing this on top.
+> The kernel only permits userspace to control certain allowed bits of the
+> STE that are safe for user/guest control.
 >
-> Thoughts?
-I have no strong preference and OK with the proposal below.
-
-Just some cases, which don't get the return value right as pointed by Kai
-in another thread.
-https://lore.kernel.org/kvm/3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com/
-
-
+> IOTLB maintenance is a bit subtle here, the S1 implicitly includes the S2
+> translation, but there is no way of knowing which S1 entries refer to a
+> range of S2.
 >
-> --
-> Subject: [PATCH] KVM: x86: Use '0' in __kvm_emulate_hypercall()  to signal
->   "exit to userspace"
+> For the IOTLB we follow ARM's guidance and issue a CMDQ_OP_TLBI_NH_ALL to
+> flush all ASIDs from the VMID after flushing the S2 on any change to the
+> S2.
 >
-> Rework __kvm_emulate_hypercall() to use '0' to indicate an exit to
-> userspace instead of relying on the caller to manually check for success
-> *and* if user_exit_on_hypercall() is true.  Use '1' for "success" to
-> (mostly) align with KVM's de factor return codes, where '0' == exit to
-> userspace, '1' == resume guest, and -errno == failure.  Unfortunately,
-> some of the PV error codes returned to the guest are postive values, so
-> the pattern doesn't exactly match KVM's "standard", but it should be close
-> enough to be intuitive for KVM readers.
+> The IOMMU_DOMAIN_NESTED can only be created from inside a VIOMMU as the
+> invalidation path relies on the VIOMMU to translate virtual stream ID used
+> in the invalidation commands for the CD table and ATS.
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
+> Reviewed-by: Donald Dutile <ddutile@redhat.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->   arch/x86/kvm/x86.c | 21 +++++++++++++++------
->   1 file changed, 15 insertions(+), 6 deletions(-)
+>  .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 157 ++++++++++++++++++
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  17 +-
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  26 +++
+>  include/uapi/linux/iommufd.h                  |  20 +++
+>  4 files changed, 219 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e09daa3b157c..5fdeb58221e2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10024,7 +10024,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   
->   	switch (nr) {
->   	case KVM_HC_VAPIC_POLL_IRQ:
-> -		ret = 0;
-> +		ret = 1;
->   		break;
->   	case KVM_HC_KICK_CPU:
->   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
-> @@ -10032,7 +10032,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   
->   		kvm_pv_kick_cpu_op(vcpu->kvm, a1);
->   		kvm_sched_yield(vcpu, a1);
-> -		ret = 0;
-> +		ret = 1;
->   		break;
->   #ifdef CONFIG_X86_64
->   	case KVM_HC_CLOCK_PAIRING:
-> @@ -10050,7 +10050,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   			break;
->   
->   		kvm_sched_yield(vcpu, a0);
-> -		ret = 0;
-> +		ret = 1;
->   		break;
->   	case KVM_HC_MAP_GPA_RANGE: {
->   		u64 gpa = a0, npages = a1, attrs = a2;
-> @@ -10111,12 +10111,21 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->   	cpl = kvm_x86_call(get_cpl)(vcpu);
->   
->   	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
-> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
-> -		/* MAP_GPA tosses the request to the user space. */
-> +	if (!ret)
->   		return 0;
->   
-> -	if (!op_64_bit)
-> +	/*
-> +	 * KVM's ABI with the guest is that '0' is success, and any other value
-> +	 * is an error code.  Internally, '0' == exit to userspace (see above)
-> +	 * and '1' == success, as KVM's de facto standard return codes are that
-> +	 * plus -errno == failure.  Explicitly check for '1' as some PV error
-> +	 * codes are positive values.
-> +	 */
-I didn't understand the last sentence:
-"Explicitly check for '1' as some PV error codes are positive values."
-
-The functions called in __kvm_emulate_hypercall() for PV features return
--KVM_EXXX for error code.
-Did you mean the functions like kvm_pv_enable_async_pf(), which return
-1 for error, would be called in __kvm_emulate_hypercall() in the future?
-If this is the concern, then we cannot simply convert 1 to 0 then.
-
-> +	if (ret == 1)
-> +		ret = 0;
-> +	else if (!op_64_bit)
->   		ret = (u32)ret;
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> index 60dd9e90759571..0b9fffc5b2f09b 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> @@ -30,7 +30,164 @@ void *arm_smmu_hw_info(struct device *dev, u32 *length, u32 *type)
+>         return info;
+>  }
+>
+> +static void arm_smmu_make_nested_cd_table_ste(
+> +       struct arm_smmu_ste *target, struct arm_smmu_master *master,
+> +       struct arm_smmu_nested_domain *nested_domain, bool ats_enabled)
+> +{
+> +       arm_smmu_make_s2_domain_ste(
+> +               target, master, nested_domain->vsmmu->s2_parent, ats_enabled);
 > +
->   	kvm_rax_write(vcpu, ret);
->   
->   	return kvm_skip_emulated_instruction(vcpu);
->
-> base-commit: 675248928970d33f7fc8ca9851a170c98f4f1c4f
+> +       target->data[0] = cpu_to_le64(STRTAB_STE_0_V |
+> +                                     FIELD_PREP(STRTAB_STE_0_CFG,
+> +                                                STRTAB_STE_0_CFG_NESTED));
+> +       target->data[0] |= nested_domain->ste[0] &
+> +                          ~cpu_to_le64(STRTAB_STE_0_CFG);
+> +       target->data[1] |= nested_domain->ste[1];
+> +}
+> +
+> +/*
+> + * Create a physical STE from the virtual STE that userspace provided when it
+> + * created the nested domain. Using the vSTE userspace can request:
+> + * - Non-valid STE
+> + * - Abort STE
+> + * - Bypass STE (install the S2, no CD table)
+> + * - CD table STE (install the S2 and the userspace CD table)
+> + */
+> +static void arm_smmu_make_nested_domain_ste(
+> +       struct arm_smmu_ste *target, struct arm_smmu_master *master,
+> +       struct arm_smmu_nested_domain *nested_domain, bool ats_enabled)
+> +{
+> +       unsigned int cfg =
+> +               FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(nested_domain->ste[0]));
+> +
+> +       /*
+> +        * Userspace can request a non-valid STE through the nesting interface.
+> +        * We relay that into an abort physical STE with the intention that
+> +        * C_BAD_STE for this SID can be generated to userspace.
+> +        */
+> +       if (!(nested_domain->ste[0] & cpu_to_le64(STRTAB_STE_0_V)))
+> +               cfg = STRTAB_STE_0_CFG_ABORT;
+> +
+> +       switch (cfg) {
+> +       case STRTAB_STE_0_CFG_S1_TRANS:
+> +               arm_smmu_make_nested_cd_table_ste(target, master, nested_domain,
+> +                                                 ats_enabled);
+> +               break;
+> +       case STRTAB_STE_0_CFG_BYPASS:
+> +               arm_smmu_make_s2_domain_ste(target, master,
+> +                                           nested_domain->vsmmu->s2_parent,
+> +                                           ats_enabled);
+> +               break;
+> +       case STRTAB_STE_0_CFG_ABORT:
+> +       default:
+> +               arm_smmu_make_abort_ste(target);
+> +               break;
+> +       }
+> +}
+> +
+> +static int arm_smmu_attach_dev_nested(struct iommu_domain *domain,
+> +                                     struct device *dev)
+> +{
+> +       struct arm_smmu_nested_domain *nested_domain =
+> +               to_smmu_nested_domain(domain);
+> +       struct arm_smmu_master *master = dev_iommu_priv_get(dev);
+> +       struct arm_smmu_attach_state state = {
+> +               .master = master,
+> +               .old_domain = iommu_get_domain_for_dev(dev),
+> +               .ssid = IOMMU_NO_PASID,
+> +               /* Currently invalidation of ATC is not supported */
+> +               .disable_ats = true,
+> +       };
+> +       struct arm_smmu_ste ste;
+> +       int ret;
+> +
+> +       if (nested_domain->vsmmu->smmu != master->smmu)
+> +               return -EINVAL;
+> +       if (arm_smmu_ssids_in_use(&master->cd_table))
+> +               return -EBUSY;
+> +
+> +       mutex_lock(&arm_smmu_asid_lock);
+> +       ret = arm_smmu_attach_prepare(&state, domain);
+> +       if (ret) {
+> +               mutex_unlock(&arm_smmu_asid_lock);
+> +               return ret;
+> +       }
+> +
+> +       arm_smmu_make_nested_domain_ste(&ste, master, nested_domain,
+> +                                       state.ats_enabled);
+> +       arm_smmu_install_ste_for_dev(master, &ste);
+> +       arm_smmu_attach_commit(&state);
+> +       mutex_unlock(&arm_smmu_asid_lock);
+> +       return 0;
+> +}
+> +
+> +static void arm_smmu_domain_nested_free(struct iommu_domain *domain)
+> +{
+> +       kfree(to_smmu_nested_domain(domain));
+> +}
+> +
+> +static const struct iommu_domain_ops arm_smmu_nested_ops = {
+> +       .attach_dev = arm_smmu_attach_dev_nested,
+> +       .free = arm_smmu_domain_nested_free,
+> +};
+> +
+> +static int arm_smmu_validate_vste(struct iommu_hwpt_arm_smmuv3 *arg)
+> +{
+> +       unsigned int cfg;
+> +
+> +       if (!(arg->ste[0] & cpu_to_le64(STRTAB_STE_0_V))) {
+> +               memset(arg->ste, 0, sizeof(arg->ste));
+> +               return 0;
+> +       }
+> +
+> +       /* EIO is reserved for invalid STE data. */
+> +       if ((arg->ste[0] & ~STRTAB_STE_0_NESTING_ALLOWED) ||
+> +           (arg->ste[1] & ~STRTAB_STE_1_NESTING_ALLOWED))
+> +               return -EIO;
+> +
+> +       cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(arg->ste[0]));
+> +       if (cfg != STRTAB_STE_0_CFG_ABORT && cfg != STRTAB_STE_0_CFG_BYPASS &&
+> +           cfg != STRTAB_STE_0_CFG_S1_TRANS)
+> +               return -EIO;
+> +       return 0;
+> +}
+> +
+> +static struct iommu_domain *
+> +arm_vsmmu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
+> +                             const struct iommu_user_data *user_data)
+> +{
+> +       struct arm_vsmmu *vsmmu = container_of(viommu, struct arm_vsmmu, core);
+> +       struct arm_smmu_nested_domain *nested_domain;
+> +       struct iommu_hwpt_arm_smmuv3 arg;
+> +       int ret;
+> +
+> +       if (flags)
+> +               return ERR_PTR(-EOPNOTSUPP);
 
+This check fails when using user page fault, with flags =
+IOMMU_HWPT_FAULT_ID_VALID (4)
+Strange, the check is not exist in last version?
+
+iommufd_viommu_alloc_hwpt_nested ->
+viommu->ops->alloc_domain_nested(viommu, flags, user_data) ->
+arm_vsmmu_alloc_domain_nested
+
+
+Thanks
 
