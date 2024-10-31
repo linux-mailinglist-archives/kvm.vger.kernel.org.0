@@ -1,99 +1,100 @@
-Return-Path: <kvm+bounces-30224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 994569B8340
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:21:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A5569B83AD
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:52:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D1322810B5
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C989F1F2267B
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AF91CB502;
-	Thu, 31 Oct 2024 19:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602681CC8B3;
+	Thu, 31 Oct 2024 19:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UwNTzx/O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kTGiUqhv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A19E347C7;
-	Thu, 31 Oct 2024 19:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415581CBE86
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730402502; cv=none; b=L2bJ/3En7xyqlkijFnHLxpwk3X3W5H3vdkhl6+WppvakC3hezUoL49VHubu8R8KbrhsqEkpbPoq9w3sNAGa9tDGLPfzAhlVupxRk15q5n6ermikiDTedhdPAae05mVNRErkGQu7bqNedaKBYKYxXJUMqZtVfANQ9cyXcO6UkZjU=
+	t=1730404318; cv=none; b=oOslO10D9elJ9xeIQ3Pl7PWhxAb3paKo63DsqJYb9J9FBlb88aygzzUlHGGXvdyVaYnODqCfVTrdrNLir2ewqxIxHGH9YHqgeBMveoJkLDkVVWDKgev3O065x+EFoOKNptuX5kq+ypJYPCEAMZXp4HymdDmKkyonR03hLc6/t4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730402502; c=relaxed/simple;
-	bh=JwqlDQ+7L58U5/0cq+CtWtI4arvDFq1yUmmHNP3l1h8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k2GkmrHf7A7kym5z2EejUlxO0IBHaISyIKSRq0zqj3DPpUV64XPxNuDxyPVk7nKbVomJAZwVWsKPmp0YQ09SKNStlIpCxw/0iMmF+7OCUWXOU7L8FAqQcc+NG9NzIA4yFT92gt/RlyftNzYsMJRYYCJLNVaDj+GBA6B93jsZxZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UwNTzx/O; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730402500; x=1761938500;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JwqlDQ+7L58U5/0cq+CtWtI4arvDFq1yUmmHNP3l1h8=;
-  b=UwNTzx/OLXjml2EFolCceKjOM+mIac0pJpK6aoVZ+8JyuJM+Rel91+DJ
-   AwJSX1zrHtihOL+R/m5+jxEhOLGCoezOcYofCoUfRjPBovMYsz/wTePN3
-   /UqdMecyEC+3efaL2zsjzb6GOre3CkbjKA37Qpr+XOuQTJHlBZfT6CFsl
-   G+Q5bsM/ubxW3zjevjxvCVwrxIEEU1uhKnBIM2wvb8vbQDaWK3j6QrOjx
-   v5xTXBf8Z9YpsRvlXgJhxmarXXyRDpYLBe2qA4+5Rfe9t8ydEYVrEo8yh
-   s+vXC/JvtWMMXxKlGwq8qNZPt1A3M1kU4icFx3IDSACCDRHxjTWdp/sLv
-   Q==;
-X-CSE-ConnectionGUID: oolvr/WgTp21ONnjIOSR0g==
-X-CSE-MsgGUID: DUpChuD2TIm8mp5CQnKmeA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="47639317"
-X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
-   d="scan'208";a="47639317"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 12:21:40 -0700
-X-CSE-ConnectionGUID: jkF4PW2gSZGOODde+mekIA==
-X-CSE-MsgGUID: QSV555ArS8SmfpM3S+iOOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
-   d="scan'208";a="83069517"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 12:21:35 -0700
-Message-ID: <d0cf8fb2-9cff-40d0-8ffb-5d0ba9c86539@intel.com>
-Date: Thu, 31 Oct 2024 21:21:29 +0200
+	s=arc-20240116; t=1730404318; c=relaxed/simple;
+	bh=wLw5iwt2gypufMKb/EV9w0fhXKsOY3s0moM3uYxxFko=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GvOLQor8uJV2nvU0oKs7tJSYW3C4xyQ+O9fb1WFkR8cLhuVOE8jw/ARSG2pQfiN1O2fLgo6XtM8RcPwaKX4i7BVCiPXSAe5jpTsyeg49yIy3NOG5knjEw+QTyYezTMqFMBR03BRA9gPtcI7Sdz/QtoAslmZHBwkuEqcM2l9rSMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kTGiUqhv; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7edbbc3a9f2so1069262a12.1
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:51:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730404314; x=1731009114; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Ftx9JHLtQDyGtXwHqfD+2M9M5G9Bcwu3Ym3sXqsUfs=;
+        b=kTGiUqhvFD7EjMsty6O1wAoIrHLI/VkBh+hLstd7Ny+VZy0m19UGuD4SZT/gIz1sb/
+         0/oGTPmXI1zanUZMkUJu9upP/RhaFDtwAjRHStVVhaPiJMCetV4s3Sj4qW4RE37U9sUt
+         KhB81V4oqB/GpKDw9174tylZQMYNTcNhjEdTGlZnhs8SbJBMWb3O79RvfAOMfiAYKG5l
+         XKDarzrAbHHWJ25qPqMFTzRwYmcyetnmIm8a2iLghrRc2RY+en9l0sEFCXXULDpsn6B8
+         tZHr7PDNElYDxQ0d7N1MGLKZt/Rk2YIj1X7Y5/kek/uSKnaQ55ip/q+JalCc/gtwOGGa
+         SeJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730404314; x=1731009114;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Ftx9JHLtQDyGtXwHqfD+2M9M5G9Bcwu3Ym3sXqsUfs=;
+        b=tvLIsT85B6skmupfu1BbYVvQ802lBZPBraWIkAkWZBiXx3hdvZFvZXnEZ4Wa6U5iDE
+         PFXZAImmoRR8SNXmnRIlR1OAvtP68foiWkfDNI7+wiIWaLE0ASenXULlV+vGvTkvl7qM
+         ykXVGRO+AcnP45UyWw/adJQNpZ4sE33wyAWDuTJ9s1oaggRHqP43b+n5t7F1B/6R163o
+         pQt9NTyYiwi71QABR8LAn/IdvHpALz7feeZY7ENzdN5FoQ3AxFqO+dzxa01RaeUFZfyS
+         wnZ6MNMZY5WzgTdq8B1LfjdfDKLAatw1qbuq1/Y95OA8I0JrRj91IiPterf/ao3WIytD
+         we1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNWTYluF+l8z6H8AAvpKTpgKHu7JS2FntvZ7yvviX6uWEzaqsLd2neyEtShNdMSAF9KR0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw63REgS2wc8a7CQIEGKgE67AUyoS4HaTmxSE4ifESihv5SYiVI
+	W857wT6dn/WwEY8pKq+oFkQUm59V2QyIou3tTk6tZmzVvjzNwxhJ3saqC3X91dfVr0q+nqg3Xzn
+	Mmw==
+X-Google-Smtp-Source: AGHT+IFlEZIkNXudx2X7J7YjSx8fHVO7lf47DdNIwVTSOKGkLmjFGPk8e0YZm0RFEMyjBPPV59yEo/X+h1E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a65:4389:0:b0:7ea:618:32b8 with SMTP id
+ 41be03b00d2f7-7edd7c9109bmr32518a12.10.1730404313729; Thu, 31 Oct 2024
+ 12:51:53 -0700 (PDT)
+Date: Thu, 31 Oct 2024 12:51:27 -0700
+In-Reply-To: <20241024095956.3668818-1-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
- seanjc@google.com
-Cc: yan.y.zhao@intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- reinette.chatre@intel.com
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20241024095956.3668818-1-roypat@amazon.co.uk>
+X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
+Message-ID: <173039504313.1508539.4634909288183844362.b4-ty@google.com>
+Subject: Re: [PATCH] kvm: selftest: fix noop test in guest_memfd_test.c
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Patrick Roy <roypat@amazon.co.uk>
+Cc: chao.p.peng@linux.intel.com, ackerleytng@google.com, graf@amazon.com, 
+	jgowans@amazon.com
+Content-Type: text/plain; charset="utf-8"
 
-On 30/10/24 21:00, Rick Edgecombe wrote:
-> Here is v2 of TDX VM/vCPU creation series. As discussed earlier, non-nits 
-> from v1[0] have been applied and it’s ready to hand off to Paolo. A few 
-> items remain that may be worth further discussion:
->  - Disable CET/PT in tdx_get_supported_xfam(), as these features haven’t 
->    been been tested.
+On Thu, 24 Oct 2024 10:59:53 +0100, Patrick Roy wrote:
+> The loop in test_create_guest_memfd_invalid that is supposed to test
+> that nothing is accepted as a valid flag to KVM_CREATE_GUEST_MEMFD was
+> initializing `flag` as 0 instead of BIT(0). This caused the loop to
+> immediately exit instead of iterating over BIT(0), BIT(1), ... .
 
-It seems for Intel PT we have no support for restoring host
-state.  IA32_RTIT_* MSR preservation is Init(XFAM(8)) which means
-the TDX Module sets the MSR to its RESET value after TD Enty/Exit.
-So it seems to me XFAM(8) does need to be disabled until that is
-supported.
+Applied to kvm-x86 fixes, thanks!
 
+[1/1] kvm: selftest: fix noop test in guest_memfd_test.c
+      https://github.com/kvm-x86/linux/commit/fd5b88cc7fbf
+
+--
+https://github.com/kvm-x86/linux/tree/next
 
