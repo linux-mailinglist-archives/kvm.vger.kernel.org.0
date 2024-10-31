@@ -1,103 +1,110 @@
-Return-Path: <kvm+bounces-30227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A019B83B8
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:54:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28AC59B83BA
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 20:54:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EE8FB21B54
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:54:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D46811F226F1
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 19:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B431CBEA2;
-	Thu, 31 Oct 2024 19:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895681CC888;
+	Thu, 31 Oct 2024 19:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lGrOt4cO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rf1dY3lO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA15C1CB53C
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022B61A2562
+	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 19:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730404435; cv=none; b=pAvJzD6KNXgesDvm9tGmAdxXiBf3MhdqyEAK6mXgGckX8jMeO4CO1sP4JsvzKNP4J5Lk/1Qbl4kEbRq5L/1Ih0ybK8V6V87Tow7+zw9LR1rJXg1bQPosqyEJn8ywumTfSBUJTtyt/tH6O7EWWYbfFQ3XEC5xVcE+AVFt1dyooh8=
+	t=1730404446; cv=none; b=kybojnaLyztST4f6tDULY4JtkoHoPNTvg+CM2mo9mor/Kb2WN9+ojpmqps9Zn7IzfzfrlY33ie1XGu7MFOFwIRFiGc0KjaryyAOUa8oD52HXlALIt4egakqB0YzovYAkoMR+v8BT9c9oxPYHIBJVFHzlxV86IDlqPuPXE++HeYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730404435; c=relaxed/simple;
-	bh=PdWqS76TntBj1o5y/ERo5t4OfLQCPNhFCHC/bosJaZU=;
+	s=arc-20240116; t=1730404446; c=relaxed/simple;
+	bh=YkBRNFEsN35dGfxgWRIwToGQglmdje/bR992AmSVZ2o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PuBUNZYsFpphJEKEcAhnSYoOv5Mk3l66C4pUUpPmbxUPvAWh/vY7IwYDAOBaelQ5BhXYi+jz0G4N6QaKInPpHWfndFbyxB3dO+5oUaKpwzyvLKCDam7hBrPvVSIWrvdD9cmJS+R77pOWKYjRh2qjYEi//Tb0ODcD0Qv4BmVXzBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lGrOt4cO; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=b4yKrFjrvUPNIOAXFHqnaI2r660o9moIYo5RNb3I2Oya8r2MtbgtUZQO+EtF8EXBVx/s2U40dB7Djf9Rf0jd+l+ZCRLaXorGC96aVKU0ptBJ7CHL2baPZEDoj0eAEQXo+HhOonDc3uFdsMw4ymQfbLhwChS4fZd5hvbs1mOelrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rf1dY3lO; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea258fe4b6so27118017b3.1
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:53:53 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-20c94f450c7so17394785ad.3
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 12:54:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730404433; x=1731009233; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730404443; x=1731009243; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gjbSgVjCkY0HoMuRTmWdgWHPQ8ANMkSeaY47F/g0Jas=;
-        b=lGrOt4cOtD1WX6ItktkFQaCxJcQt1n0zpWE4TxS7GzpCd7VnYeNuMFy0s1BWyYIQCG
-         D3sc0nluaCHdlnxrkNxaorHc5Hy6MAvXdN8WlnN71HphbX6vPIZlGxjtJCT2adDCteBZ
-         ALJLzsAirXHFWnMW279eBU/jMLrnHc6mPbUegau9z4iSreMomFkOFMifxaXr04d1Y7FF
-         owvzM5qPgj0AA2gqE6AG73Xidi2ffGgmDoCKYMzFBuD7nI2SEYIjuvpDEAW7yHnAAOn4
-         HuuFY0kOq5E//DLSUthzSg+0IyuaJOsUx80MZrXbw9jw6wt8ZuP5CQDX6lrTrwvhphFD
-         UYxA==
+        bh=tMWwOWR8YlKBIDqnosPHW958i6emqG1WTA/8O+fCvsI=;
+        b=rf1dY3lORaeWFkqbnf4zpb6HSwlpXXhCjenwOa7KG4sKjuop7nd9dpiLNRPxmPO8bp
+         I2Us7KEdcyI6A0jPjnnqdkIgP0qzimfnT6FKPtB0kYLH9LDz+2ROKHXPSjYdW2YYmMxg
+         gObfUfIgb8yE95U9JImyfm74GgBfmlfaFjUlUepqouroQESl2ww+ofIPmv1Kuk8oFlSz
+         fjCI6FYHDeZMVapP0w+BZUoBO/UQlddw2JzSjms8Ju+97YCEEIJfooneNbetQGN2IB7n
+         hKvDlhUpsGD16hOe4sfwp+eVmFB37G+3RlpnKRHbVG9Aisp8v/xNh/AEME/GrjS2lxxC
+         fWkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730404433; x=1731009233;
+        d=1e100.net; s=20230601; t=1730404443; x=1731009243;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gjbSgVjCkY0HoMuRTmWdgWHPQ8ANMkSeaY47F/g0Jas=;
-        b=Otd6yWjEoJJRRKFnl+yOV2fnJQ49f7ueAapp4Tz9NsHVpoOaOU6w/i4gDxrKCs7Ir5
-         L+oLygcgDuvWBTGbmWPLfqHDP6+XJs5s5/3p22lHPA/ub+qAj+6cwKga7dJXNtrrzotz
-         PUkfQYPXvJxYNSxDepj18MdzCQ8dD9igt9+10VGjHNvT/FVlMwdetqZlDsNn+iv9knfb
-         PBlFlWvrltRJFS6TjjHFNd6jXtWj6WP3bsgn2nuNvRHnYWGKkbwtU11HK2m67F5OQgdL
-         CZE9MtxNbVL/aUPQ/jD+L1sXT5Ku3AmN+5OnqSBSTT4s4uEGEdd+XzWHU3XhIrdXb/GZ
-         rBrw==
-X-Gm-Message-State: AOJu0YwOQ4kC7AFnwIbdzd68MeK8s1NLeBveEpmX5k5Y5owPIve4DlcR
-	ISDStSk5YtlWMea8Ck1Iql9O0N5E0W2UhpefqfSVmppwPEzRQ7kZFgDRqYP+5PXYrziiPTwm/8g
-	PsA==
-X-Google-Smtp-Source: AGHT+IE7o4sC1NJhy0BlEpH5scKVHImtCn1rOQ+RAwKY6xUxYUqqBj6/HkcqkBw17+DYOQTnbgDPsbRkiz4=
+        bh=tMWwOWR8YlKBIDqnosPHW958i6emqG1WTA/8O+fCvsI=;
+        b=aQMgIChfszKR97YO61Y8Vb01dsN7GcKn79Y22zy9paFfld/DUirn07KQXh0DlGs9fD
+         kWTWCpV4+PFq+f/i/Yvrmjy+N0rGGfYeslG0nPQgy5Aez3g4e7pBSFQihdpuPGqEmKmZ
+         JiHAHxqweIhKnY6VtFbUeprKWbAsX2rUSZ7lKUz8lZxN9WC+s/dG94PVolGv4zxDc89f
+         FuuU9gCEM3Yk6kSb271Cx06WtLBumYD0nImw1bImmsUUFU58Nv4v9F20h98JjQp9Iqf+
+         ObOV6vBkLrx8ZkfRq67Qa0B5FpDJuobeyLpvvswEnKi5OO+zLO4IlowJzYCY4Gq9wbzS
+         ONmg==
+X-Forwarded-Encrypted: i=1; AJvYcCVV0tEVxzLfHmcfu2OSRL6dephBpUff7qLOqLL5rNWXazZAZY8+/M5JtQuvM6OHPC8M7O8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+PkG1kEkz+K0+lVrfmHCdT+2bGf+Y8V3VFGPOZu3o/xU174Bs
+	SPD/Bzbmp90NkQPU+DIMxHxb+ffzgUpvQA2eenFzoeAGvWgzGFa1PsY9+uu0rxP1kYk1wb5qTXr
+	IwA==
+X-Google-Smtp-Source: AGHT+IHkmW04UVeplfmm6k9u29eDQmh1Q5dvhWh8Q5TKZvWf4BSK1EHAifK51R77vzNuuNteTnsMapgSrJE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6811:b0:6e3:14c3:379a with SMTP id
- 00721157ae682-6ea6479f2f6mr161017b3.0.1730404432792; Thu, 31 Oct 2024
- 12:53:52 -0700 (PDT)
-Date: Thu, 31 Oct 2024 12:51:31 -0700
-In-Reply-To: <20240802202121.341348-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:2310:b0:20c:686e:28c6 with SMTP id
+ d9443c01a7336-210f729e85fmr710135ad.0.1730404443326; Thu, 31 Oct 2024
+ 12:54:03 -0700 (PDT)
+Date: Thu, 31 Oct 2024 12:51:33 -0700
+In-Reply-To: <20241011214353.1625057-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240802202121.341348-1-seanjc@google.com>
+References: <20241011214353.1625057-1-jmattson@google.com>
 X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <173039526970.1510316.4428336973275011540.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: Rework core loop of kvm_vcpu_on_spin() to use a
- single for-loop
+Message-ID: <173039500211.1507616.16831780895322741303.b4-ty@google.com>
+Subject: Re: [PATCH v5 0/4] Distinguish between variants of IBPB
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	jpoimboe@kernel.org, kai.huang@intel.com, linux-kernel@vger.kernel.org, 
+	mingo@redhat.com, pawan.kumar.gupta@linux.intel.com, pbonzini@redhat.com, 
+	sandipan.das@amd.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 02 Aug 2024 13:21:21 -0700, Sean Christopherson wrote:
-> Rework kvm_vcpu_on_spin() to use a single for-loop instead of making "two"
-> passes over all vCPUs.  Given N=kvm->last_boosted_vcpu, the logic is to
-> iterate from vCPU[N+1]..vcpu[N-1], i.e. using two loops is just a kludgy
-> way of handling the wrap from the last vCPU to vCPU0 when a boostable vCPU
-> isn't found in vcpu[N+1]..vcpu[MAX].
-> 
-> Open code the xa_load() instead of using kvm_get_vcpu() to avoid reading
-> online_vcpus in every loop, as well as the accompanying smp_rmb(), i.e.
-> make it a custom kvm_for_each_vcpu(), for all intents and purposes.
+On Fri, 11 Oct 2024 14:43:49 -0700, Jim Mattson wrote:
+> Prior to Zen4, AMD's IBPB did not flush the RAS (or, in Intel
+> terminology, the RSB). Hence, the older version of AMD's IBPB was not
+> equivalent to Intel's IBPB. However, KVM has been treating them as
+> equivalent, synthesizing Intel's CPUID.(EAX=7,ECX=0):EDX[bit 26] on any
+> platform that supports the synthetic features X86_FEATURE_IBPB and
+> X86_FEATURE_IBRS.
 > 
 > [...]
 
-Applied to kvm-x86 generic, thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: Rework core loop of kvm_vcpu_on_spin() to use a single for-loop
-      https://github.com/kvm-x86/linux/commit/7e513617da71
+[1/4] x86/cpufeatures: Clarify semantics of X86_FEATURE_IBPB
+      https://github.com/kvm-x86/linux/commit/43801a0dbb38
+[2/4] x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
+      https://github.com/kvm-x86/linux/commit/99d252e3ae3e
+[3/4] KVM: x86: Advertise AMD_IBPB_RET to userspace
+      https://github.com/kvm-x86/linux/commit/df9328b0ef66
+[4/4] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
+      https://github.com/kvm-x86/linux/commit/d66e266427e4
 
 --
 https://github.com/kvm-x86/linux/tree/next
