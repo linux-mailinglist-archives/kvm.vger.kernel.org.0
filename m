@@ -1,281 +1,345 @@
-Return-Path: <kvm+bounces-30148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F019B7474
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 07:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7AD9B753B
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 08:19:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1852F1F256BE
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 06:21:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72BBE1F24F79
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2024 07:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7DB140E38;
-	Thu, 31 Oct 2024 06:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC23149C6F;
+	Thu, 31 Oct 2024 07:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IbQ2PG+H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rhwnvn7r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC0B1448DC
-	for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 06:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730355688; cv=none; b=nVWBqI2Ikrb0eiJhHVwzOjoFfXD2cKPrTsWKg0H4tocy3GqgnQuOUZ+YASaBEg2BcY39lkDTsKausPUZrTKpuNUfPuryzjnDdUmXgINDYutmay+lMB25WRYPpyCda3n1iTmlIkeviRN9wRLlSubDUohKG/l4Hrvgxv2NPSkhqeI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730355688; c=relaxed/simple;
-	bh=XSZ6Hy52turl3LfxnjEUv5hVzdAx9oOcIHfaeoqhMiU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FPnasxBd1NFQI9OXK6o6j5HtGwThOtV2rnO+FADuCxxVm1MxdtLHQgJf5jH5UBYRg8bPIupQ8Wdhi6lWsJO0z12SIM2HFvnGiGvscsr1T2E8AVIrGjVdL2OfUsQKCUwo0eP/wSGPLjGWka8rN/uScZ+RU6pYWq1nZbQuXFEaJN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IbQ2PG+H; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53b13ea6b78so973448e87.2
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2024 23:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730355683; x=1730960483; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uCUVXtHK/IiMB+Oe4BWESMJU8Ob4rgGM97ZCX/sNfKI=;
-        b=IbQ2PG+Hgg7YT7gJqA1dQMmmGut5Eo7mDk3GFmH0VxYdV/HDp0pfS/4sR8pDVKi834
-         b3O5GY4KPkV65aKJEjY8NnEFOpV8HWqV3MiLlunRaGB9/Igqwp1bZh1AP2UCTpyxDl5n
-         GecggC2yreuC/KxAeZfh5+1i0XpVQUq911Zjh6foKC4iZcMGAbxxBuFLq3TVOBsEaBWd
-         lOBMY4jO65qqztRDvI94WD9rZV70zrrgpbi2+vSemb50BY3HP/bJX9rxnSH5LnOpIQjI
-         pnWS3i7KIzprJUv2LTq04VOZuZxG4x9Ljee2QvH8CE+AKk/VvVLNy4WB954PzSDvzuME
-         4Uog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730355683; x=1730960483;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uCUVXtHK/IiMB+Oe4BWESMJU8Ob4rgGM97ZCX/sNfKI=;
-        b=iQWxkyWkhLULA/fPEyON43ExoGJwjiBtiZs5uPlYrR6Q5TvGycGzibRkpYcdbWhq2D
-         CitDWxX+1WdAESRrj56bzf3hahK2Ay/CGrTzTFrDTM9lxOvmqdCO3jEDeSR/dGiMh4NC
-         ibvC9zcTRrZquSsL+64PHmOUlmIWjV9ru6FhnToHYBtPyeYQ0OO9vDvIHZvb0/4O3vaP
-         6yFJ5KrNMOJDCnkV7wIXJ0YSp3OoS6uRm3U1QODkMTrHe5WGbaYgsyhC6VYeC7afB1H/
-         TMMUiRlXqygbMJTY56E6YP+ZtAbNmVIN7UAhqM0nPWhuRuV1ixXbjmK0BzOU6GO1B6u0
-         IAMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTGC/DpWwWeLIZlzcKsGOU32PaEskvlW6gxxeGTv0WzOfIPiGwZG9GLfdc7pBe9iZu+ow=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt8s8yF5vHU4xVMvutoz3p27YGDNWoAUdOje8CRNgyqvhhdKyf
-	BVgv7FqpOrKLSMSe+UP35LvI3CsVdhZHkYYTKu145VVYHtFOwCOao9Eq65Lhouuey+sNoOxPuT9
-	yfxbB8+4U97KBQ19wsTrnpyVB9pNw22gNYeHDlQ==
-X-Google-Smtp-Source: AGHT+IH0g8oJXVs7VSlsOX60RHCa1G3irMHjbxsPtlD9vjSUFpsj7VgciJ4cq7Us8zzxRnsUwBQyyU+Qscm+a7G3kBw=
-X-Received: by 2002:a05:6512:3053:b0:539:a4ef:6765 with SMTP id
- 2adb3069b0e04-53b348ba142mr14459958e87.7.1730355683052; Wed, 30 Oct 2024
- 23:21:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDE7149C7B;
+	Thu, 31 Oct 2024 07:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730359124; cv=fail; b=AZIGP2sund8SW6JZd7l4mCphilojBru09e9TZ/irKINJZbZHnQZ947krRTIP85coyXBnynEKSB5ZzIErEQHTL2e6GKDFeQTaHtaljB3inSrtHBlTBgERRPJ6A3B3QsWqbqbrnT5cgdGqGekevmpY/OoLLitbENuNvoWl3gKjkAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730359124; c=relaxed/simple;
+	bh=N7XyVQbVJqFtSzLQNWtQDB2opjLvnnYaI1NyqtlJ5Pg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UxMCzoapEnhNCA5sBieZxoUQ7b+z4a0DehV471uKA8xt4TdGdzANzcAMGUbcelW231jzhnHXVXQf6DNOwWQTEnHiz2puUxl4VR9D/WMnv/Ffshm0sQwLLT50pNLynEbInwQ1Pzpj4YbKdhflJsLznpZrFZ74R+e0Ump/nCvqtH0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rhwnvn7r; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730359121; x=1761895121;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=N7XyVQbVJqFtSzLQNWtQDB2opjLvnnYaI1NyqtlJ5Pg=;
+  b=Rhwnvn7rzk4Yj4JDqTQ38IAwsGbHai2J9tllxNBtKWuW3AfZBUA0i4iR
+   R7bItjgmIkuLsHS3EPgNpWEMrutoARMuZstVYHimHNh+LE2xjLC06LWJy
+   /geHYiiTcK1R26zx50Z7TFsxCkWuZOo+jUv+c+J5T4eeF4UzSEz+3MvDb
+   8Vd9MjLiVTygK11ewDXVJDyvcTAMDm02GfaxzMvFFYCFum3Nt2qcyPJ6s
+   KqyYtxDroSk+9fYr/2Cwvh0Da/hF9HYlsk3N9z6dBPk50WhgfpROnV6bm
+   HNOLMnuRJMl//70QtehPJ6kh0+wz15OyM386BBSZ+uOjuPM1gjtDSWwiK
+   A==;
+X-CSE-ConnectionGUID: TkS+qYAmTf6J2dlyQ51v5Q==
+X-CSE-MsgGUID: RYdeDMV/RIGxbUibTA+ISA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="30297903"
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="30297903"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 00:18:41 -0700
+X-CSE-ConnectionGUID: Xxsr2pUUT9uVWt45GfnUYQ==
+X-CSE-MsgGUID: Rxo0qWT9TNS1+FQB5IxUyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="86477841"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Oct 2024 00:18:41 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 31 Oct 2024 00:18:40 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 31 Oct 2024 00:18:40 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.45) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 31 Oct 2024 00:18:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DV3PmVD04+NtU4/N32DlytpeZ5GCBAq/zYNoSBzF/unnDc0Q/XXu17cLXjlHyFjbmwaSR5Ck1bRSJVatKZ33vMES/GnoIQc4m+zcVXR+b4+ew/QBZeTO0lk1XwIGLEOQLpS6i1mtuaEuWhWVvr9KF7YbbrZYkI8bfcp8a0Ndv9odeLe/p6enhMCEd9VnlQZAipOgg1Cbkkyqtw4qP6vyqGOJw6zd/J0N/Cg27irtWxUAyeAD20r7j9X+TXMzfGOTOqLs9R1Gy9ogHTH2va+zr5gmKDkNU4DG3pKNUWNWMlaodYw2e0UroIxS08BdwqzEGhK3tE7UiDRmmEa9rGjW9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QgVxbWeJcEBCQ9Ru/RnWj9nE3lUew9frG8n/X5oYANw=;
+ b=RaU33lzKizot6xHNknfGzygV5tL5oj7Ot1fU5MAWztucI0vGh16mKzL3a/l2483E23PB+Uun8S3U0gXnBey0Dzkxt0fG5rXcHGZaAVi537nWnsOe+1AqVY2VUYq0cAXeQk3PNTy5ent6kwQQ5Mq9RNwthVpdsobI2jBr5ghGWjaTFpU2eM8CXttsxwvQOE1djh2MFyLEC3lQsmz5+SZblgDyz61t/l55RRRLYWtb/E9ypGO9Q7vzheRD4EVLTtXbeLE15pNQGnn7rSBRULzVq0e1nwZmhwfVnwdhzAQedviifYvFDEgmnBRnA5KZrmYp6cHsWE7Mz7jkRqSPmaBKuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH7PR11MB8454.namprd11.prod.outlook.com (2603:10b6:510:30c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Thu, 31 Oct
+ 2024 07:18:37 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8093.027; Thu, 31 Oct 2024
+ 07:18:37 +0000
+Message-ID: <2e04d06c-24b5-4162-8b94-740b9544f951@intel.com>
+Date: Thu, 31 Oct 2024 15:23:12 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] vfio: Add VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"vasant.hegde@amd.com" <vasant.hegde@amd.com>
+References: <20240912131729.14951-1-yi.l.liu@intel.com>
+ <20240912131729.14951-4-yi.l.liu@intel.com>
+ <BN9PR11MB5276D2D0EEAC2904EDB60B048C762@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20241001121126.GC1365916@nvidia.com>
+ <a435de20-2c25-46f5-a883-f10d425ef37e@intel.com>
+ <20241014094911.46fba20e.alex.williamson@redhat.com>
+ <2e5733a2-560e-4e8f-b547-ed75618afca5@intel.com>
+ <20241015102215.05cd16c7.alex.williamson@redhat.com>
+ <e76e4dec-f4d7-4a69-a670-88a2f4e10dd7@intel.com>
+ <20241016101134.0e13f7d7.alex.williamson@redhat.com>
+ <7f95f2cc-6691-4f40-bc50-e4430ebdbf1e@intel.com>
+ <7d8b2457-8dc4-43d1-9a12-19e2a71a0821@intel.com>
+ <20241030115142.47272017.alex.williamson@redhat.com>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <20241030115142.47272017.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2P153CA0016.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::17) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com> <9-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
-In-Reply-To: <9-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Thu, 31 Oct 2024 14:21:11 +0800
-Message-ID: <CABQgh9HoGFGDTEqziQt6WrJ7Bm9d-0c259PYsms3nOVEidn5BA@mail.gmail.com>
-Subject: Re: [PATCH v4 09/12] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev, 
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Donald Dutile <ddutile@redhat.com>, 
-	Eric Auger <eric.auger@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Jerry Snitselaar <jsnitsel@redhat.com>, 
-	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, 
-	patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, 
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|PH7PR11MB8454:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b4ea2f1-d262-41a7-aed2-08dcf97c3cf0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?d21jZ2xtbWNtaWluR2ttY2xEYmFudUVmTkZVZStSQ2RPWXNDcVhaZWpxTnpz?=
+ =?utf-8?B?eU5zVnhQOFU1bTZuTGFwYUhZU3NieW83aGIydFUzcy85WWVUVVZyQ3JRa2RH?=
+ =?utf-8?B?ZkVaMk9BZk42RjZDMC96OER3ZWsvUFpXNk1rYUpWWXNabWlzM2xDNFhUejF3?=
+ =?utf-8?B?QXMra1JBMjZUQ1VXQzZEd0gwNS9veEROejdic3ZvWmZaODRRYnNSN1BKY1Br?=
+ =?utf-8?B?eXRRUzRrcXZEZWcrWW4wMkJsbXAxenVxTVdmRzlnUXUzaW9xVno1QXMxeGFz?=
+ =?utf-8?B?elNrWTBTUFJtS3lTdnpldmc2WDBYSE9DUzhJTXM1MGE4SlNpNGc3dDFVdEhZ?=
+ =?utf-8?B?MmdOVlNRVW1UWnhneHZQU3RZb2IwVlVDUXhSMDZnTUpiRDZlTGNZMk9UeDFY?=
+ =?utf-8?B?VWZldWlOWnhWSFpUeHVkaTNZV2o2K1c2dnV3UVJtOTAzNGhGanExUHJVL0Q2?=
+ =?utf-8?B?dEdYdGlSWkJmVytkcmFtQ1ZjZTFtUjBvQU9jcWdrZmZaZXFVVzQ4eUxCeVI5?=
+ =?utf-8?B?Z3ZudnpLZDVTZjVHY3lYYmgxbHAycnY5bjRpNE1pc2pKbXp4bnk1TVFRRWtp?=
+ =?utf-8?B?UThoTGlLUlRYZmQrMlEyZ0FOZzN0V1BuVEZrUVd6eC8vNVpsSVJBdnZOTHQ2?=
+ =?utf-8?B?aFdhQ2UvMERlTzduUCtRSHZ2YVZFY1I4OUNhM2t1ZHd5ajNVaGlQWDA2c25E?=
+ =?utf-8?B?b1FHM1RaQkNXK3VsY1c5a0NsTmdxdjZLVFIweXJRQlY3NldNVnZFeExVVkZl?=
+ =?utf-8?B?L29zWWdSZ3p5U1c2VEVoSzhHWUhiaTloaXBqU3pWOTEwUERqVjBsaWtJakJG?=
+ =?utf-8?B?K0xWd2xYREpvOG1iL3dPNzJBK1ZHQTdWemY1Y3gyMlI2NDF1VjFRRXMrSHJZ?=
+ =?utf-8?B?elNGZ0MreEY3MEtJaStucDVTOVo5TGhIMG1oSjMwSTA3aXJyQmRvOFEyWk1I?=
+ =?utf-8?B?Z1ovMnhQaXlSajBJak9VK3Z6LzRHYWJIK2g0WDVPZm5Bd3J6dU5CMHlVdm5U?=
+ =?utf-8?B?NlYwMDZHcjdRVHhNMk5qKzFnc1pWdUhJVzZESmNyUXF2TnZ3Z0pWQXI5Vll0?=
+ =?utf-8?B?bVVLL0EyLzhCYk1OSWhzMG9CZmJFV3V4NFUwSmhkWDBwWEthMXVPazlkOVcx?=
+ =?utf-8?B?RHV5N1R3aTQzbk50MUs4djVHc011MnROaTNrUE52Sk5sRkxFUXBTVCtucUJy?=
+ =?utf-8?B?MkJpWExNL0VRMlNaVmF4MkszbkJDeU9RWTVPUlJHbnFETEpkVmwySEM3bXBr?=
+ =?utf-8?B?QUxWUnNDVmhWWDhvOTlxcDMxZEMvT3JtYm5SNndNOUVvdENyRVhZcFo0VHQy?=
+ =?utf-8?B?V3MveExkalBnb1ZPWDh1bE9Cck84c1NtZWhmNjFTQzdKVDZrQnZRa2YrUUZ1?=
+ =?utf-8?B?S1BhSHcvWGdFblNDN3JHN3JIY1QvY0ZZZ0JjTnpUdWd3cDlENVUyN1hlR0Zn?=
+ =?utf-8?B?ZlYwQmV1enJiUlQ2RStVRDNwYUc4MzB1TmlnV1NZVDV2MGRoM3BSL2gwbkla?=
+ =?utf-8?B?Sll5K1ZsNlJCYllaWURVbWlmbGRiQ2VQczR2SXpCT25jd2orbFVmOWMxcDRx?=
+ =?utf-8?B?ejZUWkVzTVgxd3NtWnpydGZVUnpkNyt4UERsZHBPYUJkVFVzMHdsY0lUdGlK?=
+ =?utf-8?B?NjRURGtTN2RZMkVPVkVhZ2JzRTd0ajVVSHZyYVpxZzVmWGNKNmVJZkE3dTFO?=
+ =?utf-8?B?U3VCZ3hoSWJqclo1ZGlPYk8vOHJXVWpMSHVSeXVRN0RYVHRsZnI5aVJVV1c2?=
+ =?utf-8?Q?4DrrDASTVQCSWEDh/A=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c0M2aFNZVjJ3VVVaUS9qUncwcDhlK3A4OC91RDJzZ0VhUEdRYmRHUGpCZ1F6?=
+ =?utf-8?B?bDRsejZlemRGdDlSUjdtUCs3SnRYZVRXRUwwcThWbjVZUVhZMXE5UlZSSDZp?=
+ =?utf-8?B?QitiU01xTWg4SitzSUpxZ1lFb21jdFQ2UWFUdjJKUHVPcFphcitteUxHNUp1?=
+ =?utf-8?B?VXhXU0MrMWJOY2pvZzd4OC9SZUdBSExxV3gzdThVR2ZWaTVGMCtnZEloRUxn?=
+ =?utf-8?B?Y1ptZmhjRTN3VC9KbW5SdWkxMTkyaVNjY0tOTGVpSFZVRHhMd0Z6VkM1Uy9D?=
+ =?utf-8?B?YkJhZzEzcXU4bUNQR2VxdU9kbjJ5TitMYnpNazJTNjY3ZU9xZjM1aTIwNGVL?=
+ =?utf-8?B?Y0dHT09KSlhpVkhqUUFYeXM0eVYzcmFGcjBUY2FEdE5LdTBBaW13K2lyQm1r?=
+ =?utf-8?B?QXZWUE5DQmVhblhVa2FrTTBZeG53R2FCMFdzNlFGTE5vQlUvYytGU1lZanVE?=
+ =?utf-8?B?ZGJnVkloU2VMS0M2SkNPdWN1OVdMTjhIYzFCSUUyaXQzUW5ycjBlYlVjSmFT?=
+ =?utf-8?B?OEZER0xKQVcyOWg2VlJVd2I0R3Z2TkZlZDlFaEt6WVZ1cTRPVHNkMFIvSURh?=
+ =?utf-8?B?SXd2YzAxNjNMdWsxbjhveGVBazJjNmorZndOT25vYTc4cWdOSThFUHJVZkll?=
+ =?utf-8?B?eTU2ck1keEI2d3BrVnBBOW45WnFWTDh4SnhCL1RCQVZnT2VFMmVyajF0akZz?=
+ =?utf-8?B?SmVHUFVScGJOWDZja2xuU0pheDdmOGpoRzN5VFptYjBrQzJDbHhKcC9TSnFP?=
+ =?utf-8?B?WU5qTlZxRXY5L3RnTmhKZmJhQTFPU0FzM0Q4cTJHQVFiall3ZU0ySG5hQXN0?=
+ =?utf-8?B?dG13Qy8rR0lNVXdCRVJKTGhBRUpJdU1yS0N2b3BiZStrZnVjK25nbHpYamI2?=
+ =?utf-8?B?LzJEOWZXcjVOdms1d1ZBUUhYMkhuVFBtditNU3dTRC9SYkthcWxTblVhd3NG?=
+ =?utf-8?B?SnlVMVZLclhVUm92SENnUlZqR0N3b2pvdWlvdXpjcUg5NHkrTUU5R1dLcDB5?=
+ =?utf-8?B?UkYxdm5GTHh1YUVyMGw2b1NobVN4clJ2dElYOEZTemZ0TTd3NGpvYlR1amIw?=
+ =?utf-8?B?Nzc2WjNRMjhjQzlBSnlQa2NneFdsN1YzUUNWVHJGYUJGU2FMdVRTeVZQcTd6?=
+ =?utf-8?B?ZklnNFFUTWc0ZnFUZjdTTXl0OEVJWjJESStxQ1hhZ1YzNENhdVE5ck9lMlM0?=
+ =?utf-8?B?MUdWMEtTcjhPcGVFZ25Ua1dBTDF4eHV2VENaa1ZIZkxnODRPSncxU0RTTHJa?=
+ =?utf-8?B?M1IzS09jYUZobzlQdS85b2prMEpzUzhhL2UzZnpRU0tjMjFSdGZ6MVo4OEhu?=
+ =?utf-8?B?L2dTN09JalR6U0RHMnVHQ0VwZTZyTU9ycG9WSGZmbmlId3F1VnJJTnlEN0sy?=
+ =?utf-8?B?OVZjQzZzVTkwc0xKOTlaeU5uTUJtTkh2Z21uaDI0bU4rbThEYUNGMVYwMEhz?=
+ =?utf-8?B?Z29zNG1HUGRPMXB1MHhHc2lwVm9aTUdXK3M5dXhtVWZHQ1hLMkV3Y2IyZE5j?=
+ =?utf-8?B?ZzV3M3lkb3dJWWJaTWRQY3NTd0M0RFFaZ3hPZmpxNmp1ditKYUs2dE1RSTEz?=
+ =?utf-8?B?MlFIYk1Xd3ppTUs0WEk5ZHJvY1hib2MvQTgrSFFrTDN0aEJQQTk4bkVJSENh?=
+ =?utf-8?B?VGRLQ2dIQ0hpcEQyR1FDVHFQVzZoMXUyMjlHcTd6WFptWnBYU3RoZG9aMzJS?=
+ =?utf-8?B?bURQbXI5U1dsSHlTS0p1WCtzMEkxYmhTaWtqR1VxOHJsN291UzBxMGpjVnRZ?=
+ =?utf-8?B?Ykx1QXZxdEN5QzBIZXYxZ0tuVzM3aG9UeDlFaEhXYnRzem5JOEtrc0xqY2wv?=
+ =?utf-8?B?dFFUL2lpdVBnbnJaRUZHVkNOVHQ3dVFacWN2ZklzZWQvVmJNMlZHTTBnV0pn?=
+ =?utf-8?B?OG8zUGlueVoraHNPeVBadG4rWkhUVVJhVEZHbzU5b3N4ZVNIcDNvTTRTQUpE?=
+ =?utf-8?B?OWU0NXZDejFPN3Z1dTIrN3RoekwxdWhZVXQ0c0plMGRhT1EvZmZEOGtaNUJI?=
+ =?utf-8?B?azlJMEJQejByZnA1Ny9qMURRQ2RNMFZENzgyMSszV1JBb1k5NXp3a3BDZ2hD?=
+ =?utf-8?B?Z0Z2NVYzRHZGdDRGbDJjNGhFOGk5alJzdyt2MFdCYXZZSTB0TlYyOHlCNnlj?=
+ =?utf-8?Q?7Fb+K9UBZHzjUDkevGWvFd/af?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b4ea2f1-d262-41a7-aed2-08dcf97c3cf0
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 07:18:37.4977
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uFtAMl3xcU88O/oKim+D8ObdnMkqStaogBfRdnJQi100CpwHnJYoWJ41KtfSfn1aEsdS5Vu77b1Qi55Aba1lQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8454
+X-OriginatorOrg: intel.com
 
-On Thu, 31 Oct 2024 at 08:21, Jason Gunthorpe <jgg@nvidia.com> wrote:
->
-> For SMMUv3 a IOMMU_DOMAIN_NESTED is composed of a S2 iommu_domain acting
-> as the parent and a user provided STE fragment that defines the CD table
-> and related data with addresses translated by the S2 iommu_domain.
->
-> The kernel only permits userspace to control certain allowed bits of the
-> STE that are safe for user/guest control.
->
-> IOTLB maintenance is a bit subtle here, the S1 implicitly includes the S2
-> translation, but there is no way of knowing which S1 entries refer to a
-> range of S2.
->
-> For the IOTLB we follow ARM's guidance and issue a CMDQ_OP_TLBI_NH_ALL to
-> flush all ASIDs from the VMID after flushing the S2 on any change to the
-> S2.
->
-> The IOMMU_DOMAIN_NESTED can only be created from inside a VIOMMU as the
-> invalidation path relies on the VIOMMU to translate virtual stream ID used
-> in the invalidation commands for the CD table and ATS.
->
-> Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
-> Reviewed-by: Donald Dutile <ddutile@redhat.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 157 ++++++++++++++++++
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  17 +-
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  26 +++
->  include/uapi/linux/iommufd.h                  |  20 +++
->  4 files changed, 219 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
-> index 60dd9e90759571..0b9fffc5b2f09b 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
-> @@ -30,7 +30,164 @@ void *arm_smmu_hw_info(struct device *dev, u32 *length, u32 *type)
->         return info;
->  }
->
-> +static void arm_smmu_make_nested_cd_table_ste(
-> +       struct arm_smmu_ste *target, struct arm_smmu_master *master,
-> +       struct arm_smmu_nested_domain *nested_domain, bool ats_enabled)
-> +{
-> +       arm_smmu_make_s2_domain_ste(
-> +               target, master, nested_domain->vsmmu->s2_parent, ats_enabled);
-> +
-> +       target->data[0] = cpu_to_le64(STRTAB_STE_0_V |
-> +                                     FIELD_PREP(STRTAB_STE_0_CFG,
-> +                                                STRTAB_STE_0_CFG_NESTED));
-> +       target->data[0] |= nested_domain->ste[0] &
-> +                          ~cpu_to_le64(STRTAB_STE_0_CFG);
-> +       target->data[1] |= nested_domain->ste[1];
-> +}
-> +
-> +/*
-> + * Create a physical STE from the virtual STE that userspace provided when it
-> + * created the nested domain. Using the vSTE userspace can request:
-> + * - Non-valid STE
-> + * - Abort STE
-> + * - Bypass STE (install the S2, no CD table)
-> + * - CD table STE (install the S2 and the userspace CD table)
-> + */
-> +static void arm_smmu_make_nested_domain_ste(
-> +       struct arm_smmu_ste *target, struct arm_smmu_master *master,
-> +       struct arm_smmu_nested_domain *nested_domain, bool ats_enabled)
-> +{
-> +       unsigned int cfg =
-> +               FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(nested_domain->ste[0]));
-> +
-> +       /*
-> +        * Userspace can request a non-valid STE through the nesting interface.
-> +        * We relay that into an abort physical STE with the intention that
-> +        * C_BAD_STE for this SID can be generated to userspace.
-> +        */
-> +       if (!(nested_domain->ste[0] & cpu_to_le64(STRTAB_STE_0_V)))
-> +               cfg = STRTAB_STE_0_CFG_ABORT;
-> +
-> +       switch (cfg) {
-> +       case STRTAB_STE_0_CFG_S1_TRANS:
-> +               arm_smmu_make_nested_cd_table_ste(target, master, nested_domain,
-> +                                                 ats_enabled);
-> +               break;
-> +       case STRTAB_STE_0_CFG_BYPASS:
-> +               arm_smmu_make_s2_domain_ste(target, master,
-> +                                           nested_domain->vsmmu->s2_parent,
-> +                                           ats_enabled);
-> +               break;
-> +       case STRTAB_STE_0_CFG_ABORT:
-> +       default:
-> +               arm_smmu_make_abort_ste(target);
-> +               break;
-> +       }
-> +}
-> +
-> +static int arm_smmu_attach_dev_nested(struct iommu_domain *domain,
-> +                                     struct device *dev)
-> +{
-> +       struct arm_smmu_nested_domain *nested_domain =
-> +               to_smmu_nested_domain(domain);
-> +       struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-> +       struct arm_smmu_attach_state state = {
-> +               .master = master,
-> +               .old_domain = iommu_get_domain_for_dev(dev),
-> +               .ssid = IOMMU_NO_PASID,
-> +               /* Currently invalidation of ATC is not supported */
-> +               .disable_ats = true,
-> +       };
-> +       struct arm_smmu_ste ste;
-> +       int ret;
-> +
-> +       if (nested_domain->vsmmu->smmu != master->smmu)
-> +               return -EINVAL;
-> +       if (arm_smmu_ssids_in_use(&master->cd_table))
-> +               return -EBUSY;
-> +
-> +       mutex_lock(&arm_smmu_asid_lock);
-> +       ret = arm_smmu_attach_prepare(&state, domain);
-> +       if (ret) {
-> +               mutex_unlock(&arm_smmu_asid_lock);
-> +               return ret;
-> +       }
-> +
-> +       arm_smmu_make_nested_domain_ste(&ste, master, nested_domain,
-> +                                       state.ats_enabled);
-> +       arm_smmu_install_ste_for_dev(master, &ste);
-> +       arm_smmu_attach_commit(&state);
-> +       mutex_unlock(&arm_smmu_asid_lock);
-> +       return 0;
-> +}
-> +
-> +static void arm_smmu_domain_nested_free(struct iommu_domain *domain)
-> +{
-> +       kfree(to_smmu_nested_domain(domain));
-> +}
-> +
-> +static const struct iommu_domain_ops arm_smmu_nested_ops = {
-> +       .attach_dev = arm_smmu_attach_dev_nested,
-> +       .free = arm_smmu_domain_nested_free,
-> +};
-> +
-> +static int arm_smmu_validate_vste(struct iommu_hwpt_arm_smmuv3 *arg)
-> +{
-> +       unsigned int cfg;
-> +
-> +       if (!(arg->ste[0] & cpu_to_le64(STRTAB_STE_0_V))) {
-> +               memset(arg->ste, 0, sizeof(arg->ste));
-> +               return 0;
-> +       }
-> +
-> +       /* EIO is reserved for invalid STE data. */
-> +       if ((arg->ste[0] & ~STRTAB_STE_0_NESTING_ALLOWED) ||
-> +           (arg->ste[1] & ~STRTAB_STE_1_NESTING_ALLOWED))
-> +               return -EIO;
-> +
-> +       cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(arg->ste[0]));
-> +       if (cfg != STRTAB_STE_0_CFG_ABORT && cfg != STRTAB_STE_0_CFG_BYPASS &&
-> +           cfg != STRTAB_STE_0_CFG_S1_TRANS)
-> +               return -EIO;
-> +       return 0;
-> +}
-> +
-> +static struct iommu_domain *
-> +arm_vsmmu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
-> +                             const struct iommu_user_data *user_data)
-> +{
-> +       struct arm_vsmmu *vsmmu = container_of(viommu, struct arm_vsmmu, core);
-> +       struct arm_smmu_nested_domain *nested_domain;
-> +       struct iommu_hwpt_arm_smmuv3 arg;
-> +       int ret;
-> +
-> +       if (flags)
-> +               return ERR_PTR(-EOPNOTSUPP);
+On 2024/10/31 01:51, Alex Williamson wrote:
+> On Wed, 30 Oct 2024 20:54:09 +0800
+> Yi Liu <yi.l.liu@intel.com> wrote:
+> 
+>> Hi Alex,
+>>
+>> On 2024/10/18 13:40, Yi Liu wrote:
+>>>>>> I think we need to monotonically increase the structure size,
+>>>>>> but maybe something more like below, using flags.  The expectation
+>>>>>> would be that if we add another flag that extends the structure, we'd
+>>>>>> test that flag after PASID and clobber xend to a new value further into
+>>>>>> the new structure.  We'd also add that flag to the flags mask, but we'd
+>>>>>> share the copy code.
+>>>>>
+>>>>> agree, this share code might be needed for other path as well. Some macros
+>>>>> I guess.
+>>>>>   
+>>>>>>
+>>>>>>      if (attach.argsz < minsz)
+>>>>>>          return -EINVAL;
+>>>>>>
+>>>>>>      if (attach.flags & (~VFIO_DEVICE_ATTACH_PASID))
+>>>>>>          return -EINVAL;
+>>>>>>
+>>>>>>      if (attach.flags & VFIO_DEVICE_ATTACH_PASID)
+>>>>>>          xend = offsetofend(struct vfio_device_attach_iommufd_pt, pasid);
+>>>>>>
+>>>>>>      if (xend) {
+>>>>>>          if (attach.argsz < xend)
+>>>>>>              return -EINVAL;
+>>
+>> Need to check the future usage of 'xend'. In understanding, 'xend' should
+>> always be offsetofend(struct, the_last_field). A userspace that uses @pasid
+>> field would set argsz >= offsetofend(struct, pasid), most likely it would
+>> just set argsz==offsetofend(struct, pasid). If so, such userspace would be
+>> failed when running on a kernel that has added new fields behind @pasid.
+> 
+> No, xend denotes the end of the structure we need to satisfy the flags
+> that are requested by the user.
+>   
+>> Say two decades later, we add a new field (say @xyz) to this user struct,
+>> the 'xend' would be updated to be offsetofend(struct, xyz). This 'xend'
+>> would be larger than the argsz provided by the aforementioned userspace.
+>> Hence it would be failed in the above check.
+> 
+> New field xyz would require a new flag, VFIO_DEVICE_XYZ and we'd extend
+> the above code as:
+> 
+> 	if (attach.argsz < minsz)
+> 		return -EINVAL;
+> 
+> 	if (attach.flags & (~(VFIO_DEVICE_ATTACH_PASID |
+> 			      VFIO_DEVICE_XYZ)))
+> 		return -EINVAL;
+> 
+> 	if (attach.flags & VFIO_DEVICE_ATTACH_PASID)
+> 		xend = offsetofend(struct vfio_device_attach_iommufd_pt, pasid);
+> 
+> 	if (attach.flags & VFIO_DEVICE_XYZ)
+> 		xend = offsetofend(struct vfio_device_attach_iommufd_pt, xyz);
+> 
+> 	if (xend) {
+> 		if (attach.argsz < xend)
+> 			return -EINVAL;
+> 
+> New userspace can provide argsz = offsetofend(, xyz), just as it could
+> provide argsz = PAGE_SIZE now if it really wanted, but argsz > minsz is
+> only required if the user sets any of these new flags.  Therefore old
+> userspace on new kernel continues to work.
 
-This check fails when using user page fault, with flags =
-IOMMU_HWPT_FAULT_ID_VALID (4)
-Strange, the check is not exist in last version?
+got it. This should work. thanks.:)
 
-iommufd_viommu_alloc_hwpt_nested ->
-viommu->ops->alloc_domain_nested(viommu, flags, user_data) ->
-arm_vsmmu_alloc_domain_nested
+>> To make it work, I'm
+>> considering to make some changes to the code. When argsz < xend, we only
+>> copy extra data with size==argsz-minsz. Just as the below.
+>>
+>> 	if (xend) {
+>> 		unsigned long size;
+>>
+>> 		if (attach.argsz < xend)
+> 
+> This is an -EINVAL condition, xend tracks the flags the user has set.
+> The user must provide a sufficient buffer for the flags they've set.
+> 
+>> 			size = attach.argsz - minsz;
+>> 		else
+>> 			size = xend - minsz;
+> 
+> This is the only correct copy size.
+> 
+>>
+>> 		if (copy_from_user((void *)&attach + minsz,
+>> 				  (void __user *)arg + minsz, size))
+>> 			return -EFAULT;
+>> 	}
+>>
+>> However, it seems to have another problem. If the userspace that uses
+>> @pasid set the argsz==offsetofend(struct, pasid) - 1, such userspace is
+>> not supposed to work and should be failed by kernel. is it? However, my
+>> above code cannot fail it. :(
+>>
+>> Any suggestion about it?
+> 
+> If a user sets the ATTACH_PASID flag and argsz is less than
+> offsetofend(struct, pasid), we need to return -EINVAL as indicated
+> above.  Thanks,
 
+yep.
 
-Thanks
+> 
+>>
+>>>>>>
+>>>>>>          if (copy_from_user((void *)&attach + minsz,
+>>>>>>                      (void __user *)arg + minsz, xend - minsz))
+>>>>>>              return -EFAULT;
+>>>>>>      }
+>>>>>   
+>>
+> 
+> 
+
+-- 
+Regards,
+Yi Liu
 
