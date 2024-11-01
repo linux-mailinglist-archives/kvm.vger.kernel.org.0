@@ -1,179 +1,172 @@
-Return-Path: <kvm+bounces-30280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE7B9B8B43
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 07:39:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 635B09B8C2C
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 08:43:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A062B21B38
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 06:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 869A91C215EC
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 07:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB3814F9FA;
-	Fri,  1 Nov 2024 06:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A1F1547FD;
+	Fri,  1 Nov 2024 07:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VW9gx1zr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaZ1fmtp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485B713F42A;
-	Fri,  1 Nov 2024 06:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F18E153BF8
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 07:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730443152; cv=none; b=sOv1ECgAuj4oX9TJIx1jiyUH+0lDu0U2MQhE6r6Ppl8/H7Dd2idO0lA3drJqlyIobijzJib7Eagw/VzWZX5kX0Z0zL2Ve4Af5LfWifnmIjy0Sx1j8081/T6Beoh+NyV/8t6DArrPztdeZKGdqYZBa3USQ1Aej5RXj5e1Bnug8d8=
+	t=1730446990; cv=none; b=s3kIAGqE3YIwrtWmSrDfxqDVTKUNx0bqBL7lpxNDc0DLKh0IZRT+TKqZQvJRYC/8W6lPFovJWS1jsp2pL8WLaJCysJdRNkhdd4Z2ZXqzuXvvW7rRquHs9EuuGj6O9uBDOq9533eexcShJskUC3IomcfAnG5JdZhgiAB2NSAqkTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730443152; c=relaxed/simple;
-	bh=Wi+2HazRFkOLh+eSIuNMSvpLmsxZ9NNS+5DDJmOlUII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=te3t31ICkpaKFs761M3MnJ/QzIcJJrpuQR2uKZk9r+uaVJSy9rizcJ13z76NTFRffQyx3XUKEWLYDOBUmbVyV22M71B7fev3QReS9XL54UPTw5PKxBNyxkfObOGi7WkLuT77ZG7UVAFsL2VMrsk7BcLdBo183o7/kKm+I8VrGVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VW9gx1zr; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730443151; x=1761979151;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Wi+2HazRFkOLh+eSIuNMSvpLmsxZ9NNS+5DDJmOlUII=;
-  b=VW9gx1zrBCZ4TMjKYdEz8DCIk0tI/xQ/tXxw8nV1A8joHU6+oLKENnAx
-   n9HdmHCPcFvGfst737jwsQnyhsNpZ6bYZPXK0+TcAZIjPoCmET/Dy1tFs
-   D2OOQcbeeSeUpb1/B1+vjRM1BGBBCVCUkiap3oLqbdVTVYCtCLt7zBD9U
-   1nr9CmzHNtSnJBJi22Zc140mcuf/qSblBQPn/JWxk3GYXwN1X4LWL/opj
-   knAaGAAZx7Sy6KoT2y0wudtehn2Nzu4g4EbKc0p0oEEF8KNNEsouPTrkx
-   kktucArZBRsVXnFYcGBnjCBDpLntjTQ2X8lH5iA60oKgV+wXpJ2ZrtWXK
-   Q==;
-X-CSE-ConnectionGUID: P3c/woD8SjKR3w+yYogDPw==
-X-CSE-MsgGUID: hknjjrSsQ4qtgeAUwlkLyw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40750461"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40750461"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 23:39:10 -0700
-X-CSE-ConnectionGUID: QFvsIqq7Q8eK6AtxeByc6w==
-X-CSE-MsgGUID: pJ4zTw9UTca72J+DFCa4Kw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
-   d="scan'208";a="113668011"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.224.127]) ([10.124.224.127])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 23:39:07 -0700
-Message-ID: <cb9225e3-3e06-41ba-9f30-d38d1555bb32@linux.intel.com>
-Date: Fri, 1 Nov 2024 14:39:04 +0800
+	s=arc-20240116; t=1730446990; c=relaxed/simple;
+	bh=tvNnV5MECZVRu+hlHAjQvdjf98SRgQrhsiBPP45sJMc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BTZ+Fxs99slQKCUqPIsVq7sEufNVk4jbhmnMrsesETr4Q5wz1tsMgdZui+loA2KWL/5W4XuLHcxzz7J8XCXNT36DX6wh4voVA1zRAakrU/TV03kMMxmWb0BkmNyTh+XzP3aSAV9qqw3VWk24lM3FDaXTniZ0T/QfWl/ScOl2hgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DaZ1fmtp; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20cbca51687so16342915ad.1
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 00:43:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730446987; x=1731051787; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dODtoQitSBROE/XsLMUd7NwCqUhJC+ZZvderyAPghfs=;
+        b=DaZ1fmtpt+xGATJ1V07QkJqfVv/7EY318Lc0Srl+bBipva8IBq6JhhvTnd7uwTRhA1
+         XxWQlxwE6CVvS5DcEpfuDdzo9NXJ45a/PNgL8jP4I5iDl7j2qARu2J0T63+XJd9ay+ht
+         RYWl434/ICkdtXhuPwq/xCp44i4bhQ+O5OWABSSnHWV60IGgbu6O/BTS4L3A4Omsza5C
+         QM4q8fvZ5SRy4KSNvHySFwP2jga4SLmpkbShQNPHIondIGYKz24YHTRbjLaTHvGvNhlF
+         jtX+QqEwQKpBTSl0biikjkguZynLe1wdNX59Xpcvvl1WmEAsWztrPRquVRqoKX6L+GEz
+         bz0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730446987; x=1731051787;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dODtoQitSBROE/XsLMUd7NwCqUhJC+ZZvderyAPghfs=;
+        b=rPZTzexeDq0d4bJJ5Rmgg4CrtixZN4Yu3YpMnC0LB/EYfDb0WbCOsHJUsiCWT/oH1S
+         jCZxacNZpSWSJWIxLlIoM0/PwfyE8OT6Wa4hyj+GJcmou63xftUHGyMPMOMI8nzN1908
+         25tSipXDYuB2nquwnqusUxLQQoGd8Dm2uJdDjY6HEsIoUYftf4gG84iZcKuWiXgtjg8P
+         RxGThOWNgEsO3coUK7eZyLlHNW3W0amukN2UM4pX+K/mFP/ih2CdHP0ABE+KMY4FGNXF
+         IIAsy7aov8IL5bVyctQeJ5PsPXSlNuhhs2BXPmqNfypeuQxQbkqf9u554aPLW3meoN1+
+         KcdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXC5cBxpuLyXlndlFLTB63uIUkCUUejfM1cZYs6WQ8/OB3My8pyQ4RctmP661QTVuBTYPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs7W6nO/y/zt0vC0RxJm0f6PnySHg5mkk+FhN6FBHPg/AVJxc0
+	6HmXgFVj419OfsIn3NMMwrTpmB64OkiiV9zQiLlrO6nulGutHprp1JdTKpDSHsyh/dIlRIIsM2y
+	I60Zc97KU8aoSr+JMZp/8up7DBEU=
+X-Google-Smtp-Source: AGHT+IFCyc5usWs/7BxilId46aueDKh1a62dp0LNle3bBBnJHQlRodaSqn24Ui5wuhlH+o33ZgIijSPpk7HLFn4Nntw=
+X-Received: by 2002:a17:90a:e7c2:b0:2e2:c406:ec84 with SMTP id
+ 98e67ed59e1d1-2e94c53a6a2mr3401475a91.38.1730446987434; Fri, 01 Nov 2024
+ 00:43:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 24/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
- seanjc@google.com
-Cc: yan.y.zhao@intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- reinette.chatre@intel.com
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
- <20241030190039.77971-25-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20241030190039.77971-25-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241023124527.1092810-1-alexyonghe@tencent.com>
+ <ZyJ7ZsP4RaRfcFQF@google.com> <CANZk6aQEH=9EFdsBfuRcUWhTu88Oc=x=Wp3bcqzQd1AVjcTTEg@mail.gmail.com>
+ <ZyOfTCy5dJ32tzTr@google.com>
+In-Reply-To: <ZyOfTCy5dJ32tzTr@google.com>
+From: zhuangel570 <zhuangel570@gmail.com>
+Date: Fri, 1 Nov 2024 15:42:56 +0800
+Message-ID: <CANZk6aTQ5fn3AaKZq1uj1r45U6TMfkympu66yUEzEj_=ugQ51w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Try to enable irr_pending state with disabled APICv
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-
-On 10/31/2024 3:00 AM, Rick Edgecombe wrote:
-[...]
-> +
-> +#define TDX_MD_UNREADABLE_LEAF_MASK	GENMASK(30, 7)
-> +#define TDX_MD_UNREADABLE_SUBLEAF_MASK	GENMASK(31, 7)
-> +
-> +static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
-> +			  bool sub_leaf_set, struct kvm_cpuid_entry2 *out)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> +	u64 field_id = TD_MD_FIELD_ID_CPUID_VALUES;
-> +	u64 ebx_eax, edx_ecx;
-> +	u64 err = 0;
-> +
-> +	if (sub_leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
-> +	    sub_leaf_set & TDX_MD_UNREADABLE_SUBLEAF_MASK)
-> +		return -EINVAL;
-It looks weird.
-Should be the following?
-
-+	if (leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
-+	    sub_leaf & TDX_MD_UNREADABLE_SUBLEAF_MASK)
-+		return -EINVAL;
-
-
-> +
-> +	/*
-> +	 * bit 23:17, REVSERVED: reserved, must be 0;
-> +	 * bit 16,    LEAF_31: leaf number bit 31;
-> +	 * bit 15:9,  LEAF_6_0: leaf number bits 6:0, leaf bits 30:7 are
-> +	 *                      implicitly 0;
-> +	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
-> +	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
-> +	 *                         the SUBLEAF_6_0 is all-1.
-> +	 *                         sub-leaf bits 31:7 are implicitly 0;
-> +	 * bit 0,     ELEMENT_I: Element index within field;
-> +	 */
-> +	field_id |= ((leaf & 0x80000000) ? 1 : 0) << 16;
-> +	field_id |= (leaf & 0x7f) << 9;
-> +	if (sub_leaf_set)
-> +		field_id |= (sub_leaf & 0x7f) << 1;
-> +	else
-> +		field_id |= 0x1fe;
-> +
-> +	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &ebx_eax);
-> +	if (err) //TODO check for specific errors
-> +		goto err_out;
-> +
-> +	out->eax = (u32) ebx_eax;
-> +	out->ebx = (u32) (ebx_eax >> 32);
-> +
-> +	field_id++;
-> +	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &edx_ecx);
-> +	/*
-> +	 * It's weird that reading edx_ecx fails while reading ebx_eax
-> +	 * succeeded.
-> +	 */
-> +	if (WARN_ON_ONCE(err))
-> +		goto err_out;
-> +
-> +	out->ecx = (u32) edx_ecx;
-> +	out->edx = (u32) (edx_ecx >> 32);
-> +
-> +	out->function = leaf;
-> +	out->index = sub_leaf;
-> +	out->flags |= sub_leaf_set ? KVM_CPUID_FLAG_SIGNIFCANT_INDEX : 0;
-> +
-> +	/*
-> +	 * Work around missing support on old TDX modules, fetch
-> +	 * guest maxpa from gfn_direct_bits.
-> +	 */
-> +	if (leaf == 0x80000008) {
-> +		gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-> +		unsigned int g_maxpa = __ffs(gpa_bits) + 1;
-> +
-> +		out->eax = tdx_set_guest_phys_addr_bits(out->eax, g_maxpa);
-> +	}
-> +
-> +	return 0;
-> +
-> +err_out:
-> +	out->eax = 0;
-> +	out->ebx = 0;
-> +	out->ecx = 0;
-> +	out->edx = 0;
-> +
-> +	return -EIO;
-> +}
-> +
+On Thu, Oct 31, 2024 at 11:16=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-[...]
+> On Thu, Oct 31, 2024, zhuangel570 wrote:
+> > On Thu, Oct 31, 2024 at 2:31=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > >
+> > > On Wed, Oct 23, 2024, Yong He wrote:
+> > > > From: Yong He <alexyonghe@tencent.com>
+> > > >
+> > > > Try to enable irr_pending when set APIC state, if there is
+> > > > pending interrupt in IRR with disabled APICv.
+> > > >
+> > > > In save/restore VM scenery with disabled APICv. Qemu/CloudHyperviso=
+r
+> > > > always send signals to stop running vcpu threads, then save
+> > > > entire VM state, including APIC state. There may be a pending
+> > > > timer interrupt in the saved APIC IRR that is injected before
+> > > > vcpu_run return. But when restoring the VM, since APICv is
+> > > > disabled, irr_pending is disabled by default, so this may cause
+> > > > the timer interrupt in the IRR to be suspended for a long time,
+> > > > until the next interrupt comes.
+> > > >
+> > > > Signed-off-by: Yong He <alexyonghe@tencent.com>
+> > > > ---
+> > > >  arch/x86/kvm/lapic.c | 4 ++++
+> > > >  1 file changed, 4 insertions(+)
+> > > >
+> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > index 2098dc689088..7373f649958b 100644
+> > > > --- a/arch/x86/kvm/lapic.c
+> > > > +++ b/arch/x86/kvm/lapic.c
+> > > > @@ -3099,6 +3099,10 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu=
+, struct kvm_lapic_state *s)
+> > > >                                               apic_find_highest_irr=
+(apic));
+> > > >               kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr=
+(apic));
+> > > >       }
+> > > > +
+> > > > +     /* Search the IRR and enable irr_pending state with disabled =
+APICv*/
+> > > > +     if (!enable_apicv && apic_search_irr(apic) !=3D -1)
+> > >
+> > > This can/should be an "else" from the above "if (apic->apicv_active)"=
+.  I also
+> > > think KVM can safely clear irr_pending in this case, which is also wh=
+y irr_pending
+> > > isn't handling in kvm_apic_update_apicv().  When APICv is disabled (i=
+nhibited) at
+> > > runtime, an IRQ may be in-flight, i.e. apic_search_irr() can get a fa=
+lse negative.
+> >
+> > Thank you for your review and suggestions.
+> >
+> > >
+> > > But when stuffing APIC state, I don't see how that can happen.  So th=
+is?
+> >
+> > Here is our case.
+>
+> Sorry for not being clear.  I wasn't saying that the bug you encountered =
+can't
+> happen.  I 100% agree it's a real bug.  What I was saying can't happen is=
+ an
+> in-flight virtual IRQ from another vCPU or device racing with setting API=
+C state,
+> and the VM (or VMM) having any expectation that everything would work cor=
+rectly.
+>
+> And so, I think it's save for KVM to explicitly set irr_pending, i.e. to =
+potentially
+> _clear_ irr_pending.
+
+Got it, thanks.
+
+>
+> If you are able to verify the psuedo-patch I posted fixes the bug you enc=
+ountered,
+> that is how I would like to fix the bug.
+
+Yes, your patch may fix the issue better, and I have checked on my test mac=
+hine
+and it is fixed.
 
