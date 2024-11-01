@@ -1,304 +1,147 @@
-Return-Path: <kvm+bounces-30274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF1F09B894B
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 03:26:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F8B9B8945
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 03:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E99A282214
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 02:26:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C6F31F24967
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 02:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FD61386C9;
-	Fri,  1 Nov 2024 02:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964B8137742;
+	Fri,  1 Nov 2024 02:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PcTFvFBF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WbHXI+8a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0868D132106;
-	Fri,  1 Nov 2024 02:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9FF1369AE
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 02:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730428001; cv=none; b=YS+nLRcXvf098yXgNbGkpDbHiqXHaM4dV3s9yIGM1dAK4DVGCPZ01W53s15oLRlxn834dgQlp+BVh4/7/jqLwtOElQxqeudaLEq+2eZGjrwIIs9GtW3+frOjqmtJa91zKYqR69zr6FLalo/+L/aIMHl3ZP2IP287fSPEClAmkv8=
+	t=1730427677; cv=none; b=qdcoCs0yF9AT6D83dE4lml/EYHfG+1S950o0y/dtSEQ3NBZWt0AA5dz7T6M3Ll6JyxQc33NUsAo5UOA09CiwvuiyBuIep1EIPAVVAtKugFR5RFfEtlnDoRJZT1nUUemrkHTSsj4/VczRO/KDrn8VrhaGSo2NxmIaIoDc5cHUr9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730428001; c=relaxed/simple;
-	bh=36d/haT9WVEiYz68TrS3g6j6z+zykDcFIsogP8k278g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R4upFv7+LZuvJce5+5XjrIJdz8BY6mqjSdHQyJ2DjYSitakGnVwvU/2GfuV/KL9QRlrT6ZJUEfXKLhu5oGhc+Ka9IC3U8ozl8yp0tAnPV0XwiipeQuQRZvvN6bV73eYEpeUvkwiG2MByuLyaP4Z4bc+6iYsn97qKShqzhA/2mdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PcTFvFBF; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1730427677; c=relaxed/simple;
+	bh=f5edtnaWl0000c3Tv65SjcYIpMNCaJtIb4m9wYByLX8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfCuBv7XkG3exDDXa9O5bD7alr7a0R7/XgT1EJJMCiBZEjjmPIgrhrrKmTrVgtl3HFPg/33QGhlhDK740LGJkeQYOdoHjjixaLPezc7cVWY9mbkSDjeZF1HMmYw1RBOUSr5Fi6CjWJT2zKCE6LHxp0120jIzEynXds0J0smzI/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WbHXI+8a; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730427995; x=1761963995;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=36d/haT9WVEiYz68TrS3g6j6z+zykDcFIsogP8k278g=;
-  b=PcTFvFBFn9B/0N2h6Neoe9PFAepi70XkvXGOjD/SmjLaQkQVuJ8OtmaD
-   Qsn346jcLMdz3CHjBY5goVyVoeQyqPkPpfr1Rm45P1G2JTOj17LM92Hy8
-   qspoeGePDWeykCUZuN7KffNnbgqBwxawIasI0HMi4geJ1tdjZWEHfdniG
-   pDQ6M9LwZIQkEedarV/S9XtjFBZsw06ELlkc3mPAIbMh6s4HpzD0Sn6JB
-   MdTozHZvDvASH93zCUhyJWaHtQFJ11JN+SyxOSVj2u2/eN1pVtG5OwYLw
-   5tPCFEw74bUi4AS/SlK5NkufAZ6ufU8ufQ/pMV4ufWYBDNGZ24THe/grx
+  t=1730427672; x=1761963672;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=f5edtnaWl0000c3Tv65SjcYIpMNCaJtIb4m9wYByLX8=;
+  b=WbHXI+8agBtQC68rehL4scurz5CKNmd4SYp4e38xwF8m0s7P/vQQ0kdH
+   R5uQfVkdciBVegwCkzKg0E0GxG4zQJVf2xxcWbbKGHSzqBaPfof85yOs4
+   kOViHFm7VK6WeE3wTH1uXszwYGREYw+cuXZX0IenpcT3/DJBXL58yWjWz
+   lY1CB7U4fL13O7V1IbEh1IgDgTsNfsVtbUmBXJlb74Z6A2nBOQgZoNVUM
+   V04Mcizz6325pua4TZJ/SMoaZ/iUY4rGqRv852yYHLh36Fq7SkMbR+tIM
+   pPts3fXCq7EaSNhWRoi9lbTxlK1DVEd7j3nWlzR+QUSgnnnm5IQk0lkTo
    w==;
-X-CSE-ConnectionGUID: ARX7FLXCSAucEHoWDnFPlA==
-X-CSE-MsgGUID: RuQUJGNsSheYxexPgzF9Iw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="29624852"
+X-CSE-ConnectionGUID: lybGvBN9TXO1rQ5XoYVkgQ==
+X-CSE-MsgGUID: yNZ4PwObTE+CgDJjdCbXEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30082690"
 X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="29624852"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 19:26:34 -0700
-X-CSE-ConnectionGUID: dDnDVFxYS+WNs19XhhdKcA==
-X-CSE-MsgGUID: D9PTgFuuTrKLvQp2R0Y5SQ==
+   d="scan'208";a="30082690"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 19:21:11 -0700
+X-CSE-ConnectionGUID: FmrdQIZqQ9a0t/TsjpyEKg==
+X-CSE-MsgGUID: nzCFyinlQqu3gqOKIYVunQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="106155665"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.224.127]) ([10.124.224.127])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 19:25:45 -0700
-Message-ID: <9c55087b-e529-46cd-8678-51975a9acc71@linux.intel.com>
-Date: Fri, 1 Nov 2024 10:25:43 +0800
+   d="scan'208";a="82502436"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa007.fm.intel.com with ESMTP; 31 Oct 2024 19:21:05 -0700
+Date: Fri, 1 Nov 2024 10:38:56 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
+	Alireza Sanaee <alireza.sanaee@huawei.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH v4 2/9] hw/core: Make CPU topology enumeration
+ arch-agnostic
+Message-ID: <ZyQ/QJnTPvo9wO+H@intel.com>
+References: <20241022135151.2052198-1-zhao1.liu@intel.com>
+ <20241022135151.2052198-3-zhao1.liu@intel.com>
+ <31e8dc51-f70f-44eb-a768-61cfa50eed5b@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace
- generically
-To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
-Cc: "yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
- <20240826022255.361406-2-binbin.wu@linux.intel.com>
- <ZyKbxTWBZUdqRvca@google.com>
- <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
- <ZyLWMGcgj76YizSw@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZyLWMGcgj76YizSw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <31e8dc51-f70f-44eb-a768-61cfa50eed5b@linaro.org>
 
+Hi Phil,
 
-
-
-On 10/31/2024 10:54 PM, Sean Christopherson wrote:
-> My other idea was have an out-param to separate the return code intended for KVM
-> from the return code intended for the guest.  I generally dislike out-params, but
-> trying to juggle a return value that multiplexes guest and host values seems like
-> an even worse idea.
+> > -static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
+> > +static uint32_t cpuid1f_topo_type(enum CpuTopologyLevel topo_level)
+> >   {
+> >       switch (topo_level) {
+> > -    case CPU_TOPO_LEVEL_INVALID:
+> > +    case CPU_TOPOLOGY_LEVEL_INVALID:
+> 
+> Since we use an enum, I'd rather directly use CPU_TOPOLOGY_LEVEL__MAX.
 >
-> Also completely untested...
->
-> ---
->   arch/x86/include/asm/kvm_host.h |  8 +++----
->   arch/x86/kvm/x86.c              | 41 +++++++++++++++------------------
->   2 files changed, 23 insertions(+), 26 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6d9f763a7bb9..226df5c56811 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2179,10 +2179,10 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
->   	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
->   }
->   
-> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> -				      unsigned long a0, unsigned long a1,
-> -				      unsigned long a2, unsigned long a3,
-> -				      int op_64_bit, int cpl);
-> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> +			    unsigned long a0, unsigned long a1,
-> +			    unsigned long a2, unsigned long a3,
-> +			    int op_64_bit, int cpl, unsigned long *ret);
->   int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
->   
->   int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e09daa3b157c..e9ae09f1b45b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9998,13 +9998,11 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
->   	return kvm_skip_emulated_instruction(vcpu);
->   }
->   
-> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> -				      unsigned long a0, unsigned long a1,
-> -				      unsigned long a2, unsigned long a3,
-> -				      int op_64_bit, int cpl)
-> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> +			    unsigned long a0, unsigned long a1,
-> +			    unsigned long a2, unsigned long a3,
-> +			    int op_64_bit, int cpl, unsigned long *ret)
->   {
-> -	unsigned long ret;
-> -
->   	trace_kvm_hypercall(nr, a0, a1, a2, a3);
->   
->   	if (!op_64_bit) {
-> @@ -10016,15 +10014,15 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   	}
->   
->   	if (cpl) {
-> -		ret = -KVM_EPERM;
-> +		*ret = -KVM_EPERM;
->   		goto out;
->   	}
->   
-> -	ret = -KVM_ENOSYS;
-> +	*ret = -KVM_ENOSYS;
->   
->   	switch (nr) {
->   	case KVM_HC_VAPIC_POLL_IRQ:
-> -		ret = 0;
-> +		*ret = 0;
->   		break;
->   	case KVM_HC_KICK_CPU:
->   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
-> @@ -10032,36 +10030,36 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   
->   		kvm_pv_kick_cpu_op(vcpu->kvm, a1);
->   		kvm_sched_yield(vcpu, a1);
-> -		ret = 0;
-> +		*ret = 0;
->   		break;
->   #ifdef CONFIG_X86_64
->   	case KVM_HC_CLOCK_PAIRING:
-> -		ret = kvm_pv_clock_pairing(vcpu, a0, a1);
-> +		*ret = kvm_pv_clock_pairing(vcpu, a0, a1);
->   		break;
->   #endif
->   	case KVM_HC_SEND_IPI:
->   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SEND_IPI))
->   			break;
->   
-> -		ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
-> +		*ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
->   		break;
->   	case KVM_HC_SCHED_YIELD:
->   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED_YIELD))
->   			break;
->   
->   		kvm_sched_yield(vcpu, a0);
-> -		ret = 0;
-> +		*ret = 0;
->   		break;
->   	case KVM_HC_MAP_GPA_RANGE: {
->   		u64 gpa = a0, npages = a1, attrs = a2;
->   
-> -		ret = -KVM_ENOSYS;
-> +		*ret = -KVM_ENOSYS;
->   		if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE))
->   			break;
->   
->   		if (!PAGE_ALIGNED(gpa) || !npages ||
->   		    gpa_to_gfn(gpa) + npages <= gpa_to_gfn(gpa)) {
-> -			ret = -KVM_EINVAL;
-> +			*ret = -KVM_EINVAL;
->   			break;
->   		}
+> Or maybe in this case ...
+> 
+> >           return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
+> > -    case CPU_TOPO_LEVEL_SMT:
+> > +    case CPU_TOPOLOGY_LEVEL_THREAD:
+> >           return CPUID_1F_ECX_TOPO_LEVEL_SMT;
+> > -    case CPU_TOPO_LEVEL_CORE:
+> > +    case CPU_TOPOLOGY_LEVEL_CORE:
+> >           return CPUID_1F_ECX_TOPO_LEVEL_CORE;
+> > -    case CPU_TOPO_LEVEL_MODULE:
+> > +    case CPU_TOPOLOGY_LEVEL_MODULE:
+> >           return CPUID_1F_ECX_TOPO_LEVEL_MODULE;
+> > -    case CPU_TOPO_LEVEL_DIE:
+> > +    case CPU_TOPOLOGY_LEVEL_DIE:
+> >           return CPUID_1F_ECX_TOPO_LEVEL_DIE;
+> >       default:
+>            /* Other types are not supported in QEMU. */
+>            g_assert_not_reached();
+> 
+> ... return CPUID_1F_ECX_TOPO_LEVEL_INVALID as default.
 
-*ret needs to be set to 0 for this case before returning 0 to caller?
+I prefer the first way you mentioned since I want "default" to keep
+to detact unimplemented levels.
 
->   
-> @@ -10080,13 +10078,13 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->   		return 0;
->   	}
->   	default:
-> -		ret = -KVM_ENOSYS;
-> +		*ret = -KVM_ENOSYS;
->   		break;
->   	}
->   
->   out:
->   	++vcpu->stat.hypercalls;
-> -	return ret;
-> +	return 1;
->   }
->   EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
->   
-> @@ -10094,7 +10092,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->   {
->   	unsigned long nr, a0, a1, a2, a3, ret;
->   	int op_64_bit;
-> -	int cpl;
-> +	int cpl, r;
->   
->   	if (kvm_xen_hypercall_enabled(vcpu->kvm))
->   		return kvm_xen_hypercall(vcpu);
-> @@ -10110,10 +10108,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->   	op_64_bit = is_64_bit_hypercall(vcpu);
->   	cpl = kvm_x86_call(get_cpl)(vcpu);
->   
-> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
-> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
-> -		/* MAP_GPA tosses the request to the user space. */
-> -		return 0;
-> +	r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
-> +	if (r <= r)
-A typo here.
-I guess it meant to be "if (r <= ret)" ?
+> Can be cleaned on top, so:
 
-So the combinations will be
-----------------------------------------------------------------------------
-    |  r  |    ret    | r <= ret |
----|-----|-----------|----------|-------------------------------------------
-  1 |  0  |     0     |   true   |  return r, which is 0, exit to userspace
----|-----|-----------|----------|-------------------------------------------
-  2 |  1  |     0     |   false  |  set vcpu's RAX and return back to guest
----|-----|-----------|----------|-------------------------------------------
-  3 |  1  | -KVM_Exxx |   false  |  set vcpu's RAX and return back to guest
----|-----|-----------|----------|-------------------------------------------
-  4 |  1  |  Positive |   true   |  return r, which is 1,
-    |     |     N     |          |  back to guest without setting vcpu's RAX
-----------------------------------------------------------------------------
+Yes, I'll rebase (now there's the conflict) with this fixed.
 
-KVM_HC_SEND_IPI, which calls kvm_pv_send_ipi() can hit case 4, which will
-return back to guest without setting RAX. It is different from the current behavior.
+> Acked-by: Philippe Mathieu-Daud� <philmd@linaro.org>
 
-r can be 0 only if there is no other error detected during pre-checks.
-I think it can just check whether r is 0 or not.
-I.e.,
+Thanks!
 
-@@ -10094,7 +10092,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-  {
-      unsigned long nr, a0, a1, a2, a3, ret;
-      int op_64_bit;
--    int cpl;
-+    int cpl, r;
-
-      if (kvm_xen_hypercall_enabled(vcpu->kvm))
-          return kvm_xen_hypercall(vcpu);
-@@ -10110,10 +10108,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-      op_64_bit = is_64_bit_hypercall(vcpu);
-      cpl = kvm_x86_call(get_cpl)(vcpu);
-
--    ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
--    if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
--        /* MAP_GPA tosses the request to the user space. */
--        return 0;
-+    r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
-+    if (!r)
-+        return 0;
-
-      if (!op_64_bit)
-          ret = (u32)ret;
-
-
-> +		return r;
->   
->   	if (!op_64_bit)
->   		ret = (u32)ret;
->
-> base-commit: 675248928970d33f7fc8ca9851a170c98f4f1c4f
+Regards,
+Zhao
 
 
