@@ -1,152 +1,105 @@
-Return-Path: <kvm+bounces-30353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FCD79B97DB
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:44:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EDEE9B97E8
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3245281208
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14AF1C22A45
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4D61CEE96;
-	Fri,  1 Nov 2024 18:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336181CEE94;
+	Fri,  1 Nov 2024 18:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j5P6aRZU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZGnJWDVm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB31F14A629;
-	Fri,  1 Nov 2024 18:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD4A1A2658
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 18:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730486639; cv=none; b=pbRxmRsn9SkIaukoc1S0SzUH5//8yCLyht3m7QTMYICE3SbHjSDSnQwQvylKKGeYXZaIf2G+2up2vHXv1ine1qw/p5/Rmh4djdwaD7g72jJHpG5/a10YycXlYjPV+C2pAb/mkbD2n0VuxhdC6AkWxhmoZm+I+FseKWmNV+AKaaM=
+	t=1730487036; cv=none; b=VMgM7IXbOgYwVTeLBpeBDVjaRyDgjiON8+EqEU2fithXlCw1+xHZ+Febp83W9txAF37I2QGf9ISjhFMdacrDqrBNAcDeq5xtVNPBIh/tZpF0S1vQ6Yrnv8pLbf4R/3U+kiqL77zgRyvKa4ueaWfCIugBDseqBmELH+1RdqeLMh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730486639; c=relaxed/simple;
-	bh=vPc1Ldvq2PDuLY+WWtt/CAl7h5TN13wwfuaoOzg1fOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HWsvxwczBYqrg5KKZzUMdjWBtATwxmjS+GT0L6EGy3HVZHijdpzGabqKgu4yrKUDCP0j/GXFrh1UaxUrpMqga3RBKqImzI4rLhBPZpfZGJ3EF1LeFvTjF5+0ed1BfTPrxg+3GYFng4L/W7MYi1MWP0akujG3viNWWTR3AApeUx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j5P6aRZU; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730486638; x=1762022638;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vPc1Ldvq2PDuLY+WWtt/CAl7h5TN13wwfuaoOzg1fOA=;
-  b=j5P6aRZUN3ahm6l5e0/a5uSel7vkrrDQAP5iYFgiqKOuoWZgVj8f60Md
-   aytAzinOUx6KN70O3+idxVtUPdkRoHv2l72ZbS3nzpJylyFjAwHB4z9K7
-   KtYuKizpL3QxyUqecs4O59uHlkAzemIZ3vAHyoBJ7xFqVEhuU94bph0K7
-   OKqvxNySkSQAoqX9i279T1zufuHyn8uktucU6WJuA371Qm866i0bFf+lF
-   W1Hu6xNCM7Bn4Mqo0SgqBGCc/nCNGpd86exEiLBDMXY8kKW4NfjaG8CsU
-   Ox8n8ACtAgfSHUJ6COWExYxHP/RTX5gZPvjBQ+cNR8eSqfE+NCRXTr5jk
-   g==;
-X-CSE-ConnectionGUID: wHPEjQ4LTquWEuweCuo0Dw==
-X-CSE-MsgGUID: vG8bjfl3QoOkrq0IisCPvA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30216946"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30216946"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 11:43:57 -0700
-X-CSE-ConnectionGUID: nItOh5W8SBua+HcT4OK75w==
-X-CSE-MsgGUID: Rqmuf4uZTza2bSiqESaTiw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,250,1725346800"; 
-   d="scan'208";a="83866016"
-Received: from ccbilbre-mobl3.amr.corp.intel.com (HELO [10.124.220.146]) ([10.124.220.146])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 11:43:54 -0700
-Message-ID: <d467e6bd-c673-415f-8bb0-91603f06498a@intel.com>
-Date: Fri, 1 Nov 2024 11:43:52 -0700
+	s=arc-20240116; t=1730487036; c=relaxed/simple;
+	bh=JghzadJb1RzeYmUv5G9/I9KYuZLOl2NXdDiCkQzqMjM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZRBfm+JzwyY0/WQwmdrxDWTni8m2lzA7AruGvC2jxFq6T3iZBi8Gos/qSoMWvKkYmUFVUXxK6bzha5mvhlhO4uoxg9MM28EaEO+NweD9jE/vBQNFGsegd9XImuK4cqDKpOKv1bfMFbErln+knGr9k0zdxTWqVc947JTPboKqAME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZGnJWDVm; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e30c7a38bd7so2981869276.0
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 11:50:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730487034; x=1731091834; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F0yD6fxz/OxtK4CZyxTQ3jXuBHxwejODYX78SCol3Io=;
+        b=ZGnJWDVmTLgZDe4dtg9DPJ/6dcM4kZKum+TbvesJQkPwQuMXlckVnJWtnumQL5W8pA
+         KmQxRl1aZ7H1+mDEpuBpxvCNqbT8GC6+VrxHT6AKoe2uDaENdxv27bYZGbomynoW/+jQ
+         qHzBVa37ztF4293JsqRUzohQX6bQBYGu5LtFCixDKk1NMYHHhdZ+PbLkSWTYeSZk1PVR
+         oKFaEXy03SqPn7BzZpGOIkCz1rIkF07ZC416ni5m0bz0C2NcsjeMcjaHuWoUxTaclpvY
+         8soET/jrIc8gSuCLLiGBCukbGcHDj6gfVaa5GItz2yw9q7hdr2pdsGJ96wn0n9sazjlE
+         Q3Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730487034; x=1731091834;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F0yD6fxz/OxtK4CZyxTQ3jXuBHxwejODYX78SCol3Io=;
+        b=c/1woTZ+sftRtUdAXJm/QLcdCW99bhukp+Er7YDaiWLoG4Lwq2Bz+LngTlN4cBTIbH
+         O4eectVToc/TxWFBpvWX4Ly4nYoLFwiury4sWZK5skWJUOqi8yJw2cs26RK3JFiDAw8Y
+         kdnNP4nVQgyb/8NP7o/BvF5RrCqVoBQYj8aTA3gnJymaZzFPPzWeCXfPF9c9G+2wwvrP
+         IGrizauahkF8DCCTmDz3+Oq9RXC/tw89oNRnCmH90J7NrKSal0juY2BQZ1iGQo0IBvzl
+         U/ThjIDCJ4DTLPdD9DC1Wk/4hSotzepJ/7ll9nxl5GZknTURWAv+MSo7U31sSk6D46GP
+         Zq6g==
+X-Gm-Message-State: AOJu0YxjH8JK9QwF//OODC4nV6vtg5g0g5T3ugS6Etaqwp9dnxpGJgpp
+	ZZutl6ktx5Klkq8frJemTPyjSATCle+DyA3xLFbCO+5a7YfFUbl1lCZCvbooBLpToSbmH/vAguw
+	wIw==
+X-Google-Smtp-Source: AGHT+IHXZoWalcZy57W6wrfik1Rn3U8tlbZnbkCaEjoA8ZWubLTNsOhruGbtr6L94QWgRRFAxLRauROAibY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:8289:0:b0:e2b:cca2:69e1 with SMTP id
+ 3f1490d57ef6-e30e8d6b7edmr15277276.3.1730487033850; Fri, 01 Nov 2024 11:50:33
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  1 Nov 2024 11:50:29 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-To: "Manwaring, Derek" <derekmn@amazon.com>
-Cc: ackerleytng@google.com, agordeev@linux.ibm.com, aou@eecs.berkeley.edu,
- borntraeger@linux.ibm.com, bp@alien8.de, canellac@amazon.at,
- catalin.marinas@arm.com, chenhuacai@kernel.org, corbet@lwn.net,
- dave.hansen@linux.intel.com, david@redhat.com, elena.reshetova@intel.com,
- gerald.schaefer@linux.ibm.com, gor@linux.ibm.com, graf@amazon.com,
- hca@linux.ibm.com, hpa@zytor.com, jgowans@amazon.com, jthoughton@google.com,
- kalyazin@amazon.com, kernel@xen0n.name, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, luto@kernel.org, mathieu.desnoyers@efficios.com,
- mhiramat@kernel.org, mingo@redhat.com, mlipp@amazon.at, palmer@dabbelt.com,
- paul.walmsley@sifive.com, pbonzini@redhat.com, peterz@infradead.org,
- quic_eberman@quicinc.com, rostedt@goodmis.org, roypat@amazon.co.uk,
- rppt@kernel.org, seanjc@google.com, shuah@kernel.org, svens@linux.ibm.com,
- tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
- will@kernel.org, x86@kernel.org, xmarcalx@amazon.com
-References: <51fe5ad1-7057-4d43-b92c-580d187d2aeb@intel.com>
- <37fbfc65-b145-4a22-a48c-1921204d5635@amazon.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <37fbfc65-b145-4a22-a48c-1921204d5635@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
+Message-ID: <20241101185031.1799556-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: VMX: Mark Intel PT virtualization as BROKEN
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Adrian Hunter <adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/1/24 11:31, Manwaring, Derek wrote:
->>From that standpoint I'm still tempted to turn the question around a bit
-> for the host kernel's perspective. Like if the host kernel should not
-> (and indeed cannot with TDX controls in place) access guest private
-> memory, why not remove it from the direct map?
+Hide Intel PT virtualization behind BROKEN, as it has multiple fatal
+flaws, several which put the host at risk, and several of which are far
+too invasive to backport to stable trees.
 
-Pretend that the machine check warts aren't there.
+I included one of the easier fixes from Adrian to help show just how
+broken PT virtualization is, e.g. to illustrate the apparent lack of usage.
 
-It costs performance and complexity, for an only theoretical gain.  This
-is especially true for a VMM that's not doing a just doing confidential
-guests.  You fracture the direct map to pieces forever (for now).
+Adrian Hunter (1):
+  KVM: VMX: Allow toggling bits in MSR_IA32_RTIT_CTL when enable bit is
+    cleared
+
+Sean Christopherson (1):
+  KVM: VMX: Bury Intel PT virtualization (guest/host mode) behind
+    CONFIG_BROKEN
+
+ arch/x86/kvm/vmx/vmx.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+
+base-commit: e466901b947d529f7b091a3b00b19d2bdee206ee
+-- 
+2.47.0.163.g1226f6d8fa-goog
+
 
