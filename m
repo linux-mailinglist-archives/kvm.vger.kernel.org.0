@@ -1,124 +1,160 @@
-Return-Path: <kvm+bounces-30333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30334-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556639B95A3
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:41:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE8B9B95F5
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 085771F2287C
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2A4F1C218EF
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030FB1C9B97;
-	Fri,  1 Nov 2024 16:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4575C1CB513;
+	Fri,  1 Nov 2024 16:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GCUtdnxy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PCk7D6/X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031361798C;
-	Fri,  1 Nov 2024 16:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B681CA81;
+	Fri,  1 Nov 2024 16:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730479280; cv=none; b=UZJjxcPZNs1eMRnEQHpRh1lpsu/KDkzkNkqp9U5OgJD7Qz5dCKcgu/DEydJGMJHKtjkDNcYEo1mYq5xRHsK5wthZnIpQ/W9ec7RKy/dAN2AxEui9ev9KOa3h0cOTNCYvmhflF/RGATZBoxOK1iFoRe9HARftq/jA3yultctqUuM=
+	t=1730480185; cv=none; b=Iq/AZrugbDcDrZScwSAd/j2quUAj+xi9SQZHf2ZfvMajiO13pl921lb7wuqNRwKEjzP82Q3SWh6BVN4dIc/yNeSNyPX8tjKBI5yI9jtRjTdWW7mPjDiXLGbQ0njKopxPDIvQu3j9r6mmeqURMQZ7nM/guSWSAhEimi8qeL4sdko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730479280; c=relaxed/simple;
-	bh=lQWAHQP49L9EPI83ci/P6pNn65ds+hzTCghHwBXbPEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W76QoO1ZOIwmJQZ5z04ksxXHQgbYiMhlON7nK9m65ATdXDWL6uL135c9PQ546x8PbIpivAEKpeXZoImuSf2lDYm7HQOjFK8fkMg+XnoyUNPmCT63ylOgwPoRKVWn2ji+tH1lUC0tcEN/VHVTy+3jRKr7XhXKFoj4e7rHPApMxLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GCUtdnxy; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AA1D040E0220;
-	Fri,  1 Nov 2024 16:41:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id IxkFdDt0bs4B; Fri,  1 Nov 2024 16:41:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1730479270; bh=fzSSkxQVzzE+tCcSW0ZG2KSSM/Nhtusb1t/k+DswM4A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GCUtdnxykynOPbX9wjDcCmIsrGBc1gdfiD+WRUDn2QQ8afrcdRosRyQ0S2EyFHUxD
-	 DGwcsGt1BM1NojWvy60niSio2K8U1vEbplwvqITDFNBrNIxZz4TrqQ/96dq3q3sl+c
-	 gGV6FimbcBYVzcrI51J9AiBqCVl/ri5sl43jbs26cc0nwmickSRVxmQYDf4/CwSmnI
-	 CQQqdCW/9U3pZStwpfPHhIZ/LfiKiMb5HCdq5mB+vUnbkjkmDDvpfzIr1L+pitaQnC
-	 hgfsvJsrIJlitqoDbwYBOF74GJj4qSXpTRyjJKTENEqv7hocSjMacsBb6hxkn21+ed
-	 UyVzgnc3f5yDnbalYx9B1KbALTWX5RPuK1BH8WzJVZIORNADtdCtPwQDjuT5KbryZ/
-	 FsWOcJNSRZDelO8EnWeHK6VdfZIXGe78OXgZOj7gd4CL/dUT8cKhgYMBmYuf0uKhEz
-	 EH55iRXrppeh3LicIChtmhs2kUXNXfKk5LDJnnyd82ObH44ZegAPK9pPXYiMi2a4FQ
-	 KFNFh4ju9+C0eAtU8rswg7C9IvWFoOd8pWLuBiP1iLG2ruiSbWceChQQBJVL6IQNaB
-	 B+YcqZvKljKrNIcpHGMcvfRm5LY+hsxujcigG4LT/7sqMq0elRD9ZRzQPj5gf+2z8S
-	 oUUP0yBrQhUOi88Mfra0/nRg=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CA7840E019C;
-	Fri,  1 Nov 2024 16:40:59 +0000 (UTC)
-Date: Fri, 1 Nov 2024 17:40:53 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v14 04/13] x86/sev: Change TSC MSR behavior for Secure
- TSC enabled guests
-Message-ID: <20241101164053.GLZyUElVm8I22ZZjor@fat_crate.local>
-References: <20241028053431.3439593-1-nikunj@amd.com>
- <20241028053431.3439593-5-nikunj@amd.com>
+	s=arc-20240116; t=1730480185; c=relaxed/simple;
+	bh=KmcSGZZTBepw/haBxjfNfgGPXnl3daZOBZVZzzq5xe4=;
+	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
+	 In-Reply-To:Content-Type; b=Fk0ljucdrdtRL3rhaYIE/c4hLceyFDWYfzvcXPWK//4f6fJus2LK9I6XyDBZBYZ3BrozDnprQ/tZB8nymIARIK9EFgS9PmnHo5CzVAYfGEDSxCQUuLH0pJzWUH9Hd7vGcZ4kKGgKUJs1hkfiSmoTC/wq8s/HxlWunPUUyCpseXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PCk7D6/X; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730480183; x=1762016183;
+  h=message-id:date:mime-version:to:cc:references:subject:
+   from:in-reply-to:content-transfer-encoding;
+  bh=KmcSGZZTBepw/haBxjfNfgGPXnl3daZOBZVZzzq5xe4=;
+  b=PCk7D6/Xsej0yYJGNbxAPA+qHiAKeCt3/rm3MZKcin/UJ4i9Xlw8usDF
+   74YFiJIFV5pNWSgyXDidK4xnYBMdbXIg7Bbaex4VP8vHcUtep44nGDNTK
+   hbuSj1UrFzhta5y4XhmMB438agIqZasDU0cgObqoRmZjBjNpEUpR6dMam
+   A=;
+X-IronPort-AV: E=Sophos;i="6.11,250,1725321600"; 
+   d="scan'208";a="381765496"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 16:56:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:55997]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.72:2525] with esmtp (Farcaster)
+ id 6a9142ea-5ddd-46d3-9d40-2688c563fdd9; Fri, 1 Nov 2024 16:56:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 6a9142ea-5ddd-46d3-9d40-2688c563fdd9
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 1 Nov 2024 16:56:20 +0000
+Received: from [192.168.208.156] (10.106.101.42) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 1 Nov 2024 16:56:17 +0000
+Message-ID: <7bd627df-0303-4ded-b8c8-ceb84fb20f0d@amazon.com>
+Date: Fri, 1 Nov 2024 09:56:12 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241028053431.3439593-5-nikunj@amd.com>
+User-Agent: Mozilla Thunderbird
+To: <dave.hansen@intel.com>
+CC: <ackerleytng@google.com>, <agordeev@linux.ibm.com>,
+	<aou@eecs.berkeley.edu>, <borntraeger@linux.ibm.com>, <bp@alien8.de>,
+	<catalin.marinas@arm.com>, <chenhuacai@kernel.org>, <corbet@lwn.net>,
+	<dave.hansen@linux.intel.com>, <david@redhat.com>, <derekmn@amazon.com>,
+	<gerald.schaefer@linux.ibm.com>, <gor@linux.ibm.com>, <graf@amazon.com>,
+	<hca@linux.ibm.com>, <hpa@zytor.com>, <jgowans@amazon.com>,
+	<jthoughton@google.com>, <kalyazin@amazon.com>, <kernel@xen0n.name>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<luto@kernel.org>, <mathieu.desnoyers@efficios.com>, <mhiramat@kernel.org>,
+	<mingo@redhat.com>, <palmer@dabbelt.com>, <paul.walmsley@sifive.com>,
+	<pbonzini@redhat.com>, <peterz@infradead.org>, <quic_eberman@quicinc.com>,
+	<rostedt@goodmis.org>, <roypat@amazon.co.uk>, <rppt@kernel.org>,
+	<seanjc@google.com>, <shuah@kernel.org>, <svens@linux.ibm.com>,
+	<tabba@google.com>, <tglx@linutronix.de>, <vannapurve@google.com>,
+	<will@kernel.org>, <x86@kernel.org>, <xmarcalx@amazon.com>,
+	<mlipp@amazon.at>, <canellac@amazon.at>, <elena.reshetova@intel.com>
+References: <784d1522-0451-4844-a334-8b7d49019437@intel.com>
+Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
+Content-Language: en-US
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <784d1522-0451-4844-a334-8b7d49019437@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
 
-On Mon, Oct 28, 2024 at 11:04:22AM +0530, Nikunj A Dadhania wrote:
-> +	/*
-> +	 * TSC related accesses should not exit to the hypervisor when a
-> +	 * guest is executing with SecureTSC enabled, so special handling
-> +	 * is required for accesses of MSR_IA32_TSC:
-> +	 *
-> +	 * Writes: Writing to MSR_IA32_TSC can cause subsequent reads
-> +	 *         of the TSC to return undefined values, so ignore all
-> +	 *         writes.
-> +	 * Reads:  Reads of MSR_IA32_TSC should return the current TSC
-> +	 *         value, use the value returned by RDTSC.
-> +	 */
-> +	if (regs->cx == MSR_IA32_TSC && (sev_status & MSR_AMD64_SNP_SECURE_TSC)) {
-> +		u64 tsc;
-> +
-> +		if (exit_info_1)
-> +			return ES_OK;
-> +
-> +		tsc = rdtsc();
++Elena
 
-rdtsc_ordered() I guess.
+On 2024-11-01 at 16:06+0000, Dave Hansen wrote:
+> On 10/31/24 17:10, Manwaring, Derek wrote:
+> > TDX and SEV encryption happens between the core and main memory, so
+> > cached guest data we're most concerned about for transient execution
+> > attacks isn't necessarily inaccessible.
+> >
+> > I'd be interested what Intel, AMD, and other folks think on this, but I
+> > think direct map removal is worthwhile for CoCo cases as well.
+>
+> I'm not sure specifically which attacks you have in mind.  [...]
+>
+> I _think_ you might be thinking of attacks like MDS where some random
+> microarchitectural buffer contains guest data after a VM exit and then
+> an attacker extracts it.  Direct map removal doesn't affect these
+> buffers and doesn't mitigate an attacker getting the data out.
 
-> +		regs->ax = UINT_MAX & tsc;
-> +		regs->dx = UINT_MAX & (tsc >> 32);
-> +
-> +		return ES_OK;
-> +	}
-> +
+Right, the only attacks we can thwart with direct map removal are
+transient execution attacks on the host kernel whose leak origin is
+"Mapped memory" in Table 1 of the Quarantine paper [2]. Maybe the
+simplest hypothetical to consider here is a new spectre v1 gadget in the
+host kernel.
 
-All that you're adding - put that in a __vc_handle_msr_tsc() helper so that it
-doesn't distract from the function's flow.
+> The main thing I think you want to keep in mind is mentioned in the "TDX
+> Module v1.5 Base Architecture Specification"[1]:
+>
+> > Any software except guest TD or TDX module must not be able to
+> > speculatively or non-speculatively access TD private memory,
+>
+> That's a pretty broad claim and it involves mitigations in hardware and
+> the TDX module.
+>
+> 1. https://cdrdv2.intel.com/v1/dl/getContent/733575
 
-Thx.
+Thank you, I hadn't seen that. That is a very strong claim as far as
+preventing speculative access; I didn't realize Intel claimed that about
+TDX. The comma followed by "to detect if a prior corruption attempt was
+successful" makes me wonder a bit if the statement is not quite as broad
+as it sounds, but maybe that's just meant to relate it to the integrity
+section?
 
--- 
-Regards/Gruss,
-    Boris.
+> If the attack is mitigated when the > data is _mapped_, then it's
+> certainly not possible _unmapped_.
+>
+> So why bother with direct map removal for TDX?  A VMM write to TD
+> private data causes machine checks.  So any kernel bug that even
+> accidentally writes to kernel memory can bring the whole system down.
+> Not nice.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Fair enough. It hasn't been clear to me if there is a machine check when
+the host kernel accesses guest memory only transiently. I was assuming
+there is not. But if other mitigations completely prevent even
+speculative access of TD private memory like you're saying, then agree
+nothing to gain from direct map removal in the TDX case.
+
+Derek
+
+
+[2] https://download.vusec.net/papers/quarantine_raid23.pdf
 
