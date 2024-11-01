@@ -1,235 +1,137 @@
-Return-Path: <kvm+bounces-30365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BE39B9859
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:22:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585849B986B
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:24:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A2FA1F22B6B
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:22:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C3241C212D5
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5274D1D0153;
-	Fri,  1 Nov 2024 19:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3ECA1D0797;
+	Fri,  1 Nov 2024 19:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="abiI+iDF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K6TAtex+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE25A1CF7D3
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 19:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43401CFED6
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 19:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730488881; cv=none; b=BI1jGY+Z9+hjgeP0KFx+Dj1AU+UwmB3lUt8xTvyRv5GyEIEmk3ht+JhSO3H8q4SbAqJGF3X0ZrGcRHseZRBfiMODXfg2T5baq2WVH1jX3HwZnEVOkZ3n7iCZO8w7TDrXytr+VOmebFQ7ocKu57h0WCBRIlAwY+fcPfP1tke07hU=
+	t=1730489019; cv=none; b=h5TSUTwRfpTm+0hRb0SUgFEcpte+wwsb06yKOgXxt9EIJVI2sh4cHPyU588MANBK7YcAAn/AN5YjpVlOKB5aS7uoY1tAEyo1/ogNGTeK7gsCFz9H89J26/+yT5PFKC05LtZta8WI1h+MpFQ6ZuQ1e1r+qJMeUe+QIHJnqY1XmHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730488881; c=relaxed/simple;
-	bh=VNcFDJ/BfS8swfjaZOe+/CdaDzctcaVEvZ9LzvoVWGY=;
+	s=arc-20240116; t=1730489019; c=relaxed/simple;
+	bh=sveYKeM2yme+ujHJArRxhj9ybxkYoK9gDsio43V6pw4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sdiLsmZe32ts+pIZlmx/AnCYJiszlsMEe0Tjhq439ztoui84FTZhw6NLtBiJavxRAgk1CGP7imF3ngSMLOJ5WdmFRS7Pp8q4SqW2iSHRNDWwG05AYbCaf3X/+pwF8vGd30ifR07mm50TLD4hlR5Kmh0WbDhnMCBCjNpZE5xBUI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=abiI+iDF; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=LQy3X1cTei78pfwsIsLoUUngdOi8cyUSwI+G1Qvw6F+rg7uPVgtP7gW3ODKpMm1isEhwnlv1Bils3cSlC73cT+BkkVn7p/Nn49BdP4cT3TNdJIN08N3Z9JPe4ByfdKIyVOG30AwW8QNvTgwNpfld4MGHYYcUR+f4EW9JZuyUc7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K6TAtex+; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7ee61268369so754061a12.1
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 12:21:19 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2904d0cad0so4687446276.1
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 12:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730488879; x=1731093679; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zsWEN0kBrD1owmF1Hf4fam34LLlisqiiRf0es6GMZq0=;
-        b=abiI+iDFqVTrmZYyWAK/o1Cc/YrD3NvhYelDm1NHHZfzBoEedkUqtqIqpHg7J4YA7e
-         +HtK3WRYBNmbr/nleLoiy9KOk4IFN49Lj+StytkDiqI14MrH/08LmK+7D4aasc+K7xm2
-         ZXViSg2Evo2UVasmIumJK2zguc81Mbp3e2rhI2+q8boS6H0bkvKHDMtFgDZeZYZOUZhf
-         ObaUu/owpBoRT1RqgJpLol+A0JjHM9LBJfXQCO5WOg1yK+90jJCmio74OwdIiVgrEsYw
-         MNil4ejhqgdfo/8NMJxUjor1vXVJ8e+XEvYUI0LUuGPsHd3cuWS1/0jJ0cXIvua2msr8
-         dEXw==
+        d=google.com; s=20230601; t=1730489016; x=1731093816; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EMTZyxqf0e0xSkcUnGLZuVUXmROHi5jZ4VSvoQqdHYk=;
+        b=K6TAtex+8JoB90KxYK9wKRtBYHrFKc7r+QsJzqjqovgozjDjF54vpx2bNthDHC4TeY
+         uc3Lrs+eHPTz+UBNFm14fICaDS8MBy6PhRm+++g3dpxysSAbxRYGwRUgRO6kPBrWt6ZM
+         a4rLqVdgp81qvtayPNAb/4mZHPSdrJ0SauKYPKspJr0o4EY0i0ccpyWqQpliz1OrzXyf
+         L0Lnmw4fUIO+mHhVYs1B4wnmmAEAUWFClzC4UHrqTMvxdGBwV+YOeRNS36Tycqct7IHe
+         FcgB2TeKZ7VIJz4AO7CVW55DojevCywVPCzQlkW4HeMYqNZslR+NsArsW/Wjz2hKM/+W
+         xJWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730488879; x=1731093679;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zsWEN0kBrD1owmF1Hf4fam34LLlisqiiRf0es6GMZq0=;
-        b=PG3qsamH93O5Ia6DJplS2MfwrA7t/vLtjbB4AKap4iE4DrwGTVLHhSo12BUGLxjuQL
-         txYwR5Q8ps+1Blzq5ctaxQH4OXS6qyHYSgX4FsgcASNp9y3STYm7g97swyFsiZORDnA1
-         qWtz/IA5uYS0IlhCvXB1SfzOmqHSg9ZeX0n9vfXvFhlHzJbTxY4lIcJkL3QGbWRCcQmH
-         J1dPDYYKa+y50DSV8hqJUH54EsbMUJsj5b7jc2HdBrdbiGI7yxWIs2VJt+ONgbQ5XGqq
-         TnXJzX9WjLQG+xj4sKyh9FyIqBq02dgjohAqPoguoVYZstUC4L6lSqsIGuxQXNGxlYxC
-         JJRQ==
-X-Gm-Message-State: AOJu0YzyfFLpu0e8yfQU/0nS7KiZY0/Vqci7uOILEo/4pFDAnAnOHDHq
-	Jq5HvISyZxSucJkJs50NIoR/Al4nAGsp+m2F5LL7MT/uKDgmcAaG3OIab0Rq219D93urpx7lMkF
-	bMA==
-X-Google-Smtp-Source: AGHT+IEd6tYZSc6WgovK45TENJxXNwUmxrJ7BFek2I1PttGA6PQ0mW/mRddLhh9jqcQP8SP4bvK4BtqnipI=
+        d=1e100.net; s=20230601; t=1730489016; x=1731093816;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EMTZyxqf0e0xSkcUnGLZuVUXmROHi5jZ4VSvoQqdHYk=;
+        b=mccRj7GF26lL5hhKMXsNMcpzlQ78mIQ+3TU0uNbMWD+VmB6N+obE3oEQb2TTColln5
+         2yknFEWG61p/+PdijjLj/7ltHxj6oHwcHG1Zf0cFUwR1wB4+sKrgzN75aH1BWv1KRg5f
+         p98sniR/5MNeKhfiUyaBZKztUwv8axVC4sHV1yYXH2bH+wdYa+QyUyHF9G19ND1ZaBnA
+         J4/fWaVwc2FBSVjRzfBK/f7oAn/Tda/7522e5CQCfTLeSEAIgDzaG5ndv+dRZ+O6n8GQ
+         uFUfcDZXEQCIjNTTSuEQ5Jj9E7MkKFyjRQfr3fJjsfpDT0S7tWsjPVFWbw3+wkrpu/X0
+         AfAg==
+X-Gm-Message-State: AOJu0YxOLsJhQtZ4P4kpY3JCtIBk8ajT0txgzBS/MJ3syobMU15FSMdU
+	iQOTKoAVw9l4yCMWQePbYizmU7ZdxpG0QKue1cre4Yj/6hc39Y1kq40CKwNyDb9KYVDRRSIGi2i
+	S3g==
+X-Google-Smtp-Source: AGHT+IEPCxiGIildz/DMTJPZo+wbCpIsJ5qyYnWMb2i3RD+UzoO0m8EKAROcnxs4q3uYl284xuC1iof4Xhw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90b:3717:b0:2e2:bd9a:4ff0 with SMTP id
- 98e67ed59e1d1-2e94c53c2damr7112a91.7.1730488879319; Fri, 01 Nov 2024 12:21:19
+ (user=seanjc job=sendgmr) by 2002:a25:6844:0:b0:e03:53a4:1a7 with SMTP id
+ 3f1490d57ef6-e330268d7c8mr3045276.10.1730489015632; Fri, 01 Nov 2024 12:23:35
  -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  1 Nov 2024 12:21:14 -0700
-In-Reply-To: <20241101192114.1810198-1-seanjc@google.com>
+Date: Fri, 1 Nov 2024 12:23:34 -0700
+In-Reply-To: <173039507944.1509256.3272782345564937862.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241101192114.1810198-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <20241101192114.1810198-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: nVMX: Defer SVI update to vmcs01 on EOI when L2 is
- active w/o VID
+References: <20240802185511.305849-1-seanjc@google.com> <173039507944.1509256.3272782345564937862.b4-ty@google.com>
+Message-ID: <ZyUqtis_QI_otazX@google.com>
+Subject: Re: [PATCH 0/9] KVM: x86: Add a quirk for feature MSR initialization
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"=?UTF-8?q?Markku=20Ahvenj=C3=A4rvi?=" <mankku@gmail.com>, Janne Karhunen <janne.karhunen@gmail.com>, 
-	Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-From: Chao Gao <chao.gao@intel.com>
+On Thu, Oct 31, 2024, Sean Christopherson wrote:
+> On Fri, 02 Aug 2024 11:55:02 -0700, Sean Christopherson wrote:
+> > The primary goal of this series to fix an issue where KVM's initialization
+> > of feature MSRs during vCPU creation results in a failed save/restore of
+> > PERF_CAPABILITIES.  If userspace configures the VM to _not_ have a PMU,
+> > because KVM initializes the vCPU's PERF_CAPABILTIIES, trying to save/restore
+> > the non-zero value will be rejected by the destination.
+> > 
+> > The secondary goal is to try and avoid such goofs in the future, by making
+> > it explicitly clear that userspace owns the vCPU model.
+> > 
+> > [...]
+> 
+> Applied to kvm-x86 misc, thanks!
+> 
+> [1/9] KVM: x86: Co-locate initialization of feature MSRs in kvm_arch_vcpu_create()
+>       https://github.com/kvm-x86/linux/commit/383383cfd202
+> [2/9] KVM: x86: Disallow changing MSR_PLATFORM_INFO after vCPU has run
+>       https://github.com/kvm-x86/linux/commit/d76a5e78f16d
+> [3/9] KVM: x86: Quirk initialization of feature MSRs to KVM's max configuration
+>       https://github.com/kvm-x86/linux/commit/088b8eeb25ec
+> [4/9] KVM: x86: Reject userspace attempts to access PERF_CAPABILITIES w/o PDCM
+>       https://github.com/kvm-x86/linux/commit/c2eb2d0318c0
+> [5/9] KVM: VMX: Remove restriction that PMU version > 0 for PERF_CAPABILITIES
+>       https://github.com/kvm-x86/linux/commit/bae593b20e92
+> [6/9] KVM: x86: Reject userspace attempts to access ARCH_CAPABILITIES w/o support
+>       https://github.com/kvm-x86/linux/commit/83a5fe6cf1eb
+> [7/9] KVM: x86: Remove ordering check b/w MSR_PLATFORM_INFO and MISC_FEATURES_ENABLES
+>       https://github.com/kvm-x86/linux/commit/9d2dcfb82db1
+> [8/9] KVM: selftests: Verify get/set PERF_CAPABILITIES w/o guest PDMC behavior
+>       https://github.com/kvm-x86/linux/commit/6a4511f8602f
+> [9/9] KVM: selftests: Add a testcase for disabling feature MSRs init quirk
+>       https://github.com/kvm-x86/linux/commit/58a7368f104d
 
-If KVM emulates an EOI for L1's virtual APIC while L2 is active, defer
-updating GUEST_INTERUPT_STATUS.SVI, i.e. the VMCS's cache of the highest
-in-service IRQ, until L1 is active, as vmcs01, not vmcs02, needs to track
-vISR.  The missed SVI update for vmcs01 can result in L1 interrupts being
-incorrectly blocked, e.g. if there is a pending interrupt with lower
-priority than the interrupt that was EOI'd.
+FYI, I rebased misc to v6.12-rc5, as patches in another series had already been
+taken through the tip tree.  New hashes:
 
-This bug only affects use cases where L1's vAPIC is effectively passed
-through to L2, e.g. in a pKVM scenario where L2 is L1's depriveleged host,
-as KVM will only emulate an EOI for L1's vAPIC if Virtual Interrupt
-Delivery (VID) is disabled in vmc12, and L1 isn't intercepting L2 accesses
-to its (virtual) APIC page (or if x2APIC is enabled, the EOI MSR).
-
-WARN() if KVM updates L1's ISR while L2 is active with VID enabled, as an
-EOI from L2 is supposed to affect L2's vAPIC, but still defer the update,
-to try to keep L1 alive.  Specifically, KVM forwards all APICv-related
-VM-Exits to L1 via nested_vmx_l1_wants_exit():
-
-	case EXIT_REASON_APIC_ACCESS:
-	case EXIT_REASON_APIC_WRITE:
-	case EXIT_REASON_EOI_INDUCED:
-		/*
-		 * The controls for "virtualize APIC accesses," "APIC-
-		 * register virtualization," and "virtual-interrupt
-		 * delivery" only come from vmcs12.
-		 */
-		return true;
-
-Fixes: c7c9c56ca26f ("x86, apicv: add virtual interrupt delivery support")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/kvm/20230312180048.1778187-1-jason.cj.chen@in=
-tel.com
-Reported-by: Markku Ahvenj=C3=A4rvi <mankku@gmail.com>
-Closes: https://lore.kernel.org/all/20240920080012.74405-1-mankku@gmail.com
-Cc: Janne Karhunen <janne.karhunen@gmail.com>
-Signed-off-by: Chao Gao <chao.gao@intel.com>
-[sean: drop request, handle in VMX, write changelog]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c      | 11 +++++++++++
- arch/x86/kvm/lapic.h      |  1 +
- arch/x86/kvm/vmx/nested.c |  5 +++++
- arch/x86/kvm/vmx/vmx.c    | 17 +++++++++++++++++
- arch/x86/kvm/vmx/vmx.h    |  1 +
- 5 files changed, 35 insertions(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 5be2be44a188..66751bf9d4f4 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -816,6 +816,17 @@ static inline void apic_clear_isr(int vec, struct kvm_=
-lapic *apic)
- 	}
- }
-=20
-+void kvm_apic_update_hwapic_isr(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_lapic *apic =3D vcpu->arch.apic;
-+
-+	if (WARN_ON_ONCE(!lapic_in_kernel(vcpu)) || !apic->apicv_active)
-+		return;
-+
-+	kvm_x86_call(hwapic_isr_update)(apic->vcpu, apic_find_highest_isr(apic));
-+}
-+EXPORT_SYMBOL_GPL(kvm_apic_update_hwapic_isr);
-+
- int kvm_lapic_find_highest_irr(struct kvm_vcpu *vcpu)
- {
- 	/* This may race with setting of irr in __apic_accept_irq() and
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 1b8ef9856422..469a6f20e2db 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -122,6 +122,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr=
-_data *msr_info);
- int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
- int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
- enum lapic_mode kvm_get_apic_mode(struct kvm_vcpu *vcpu);
-+void kvm_apic_update_hwapic_isr(struct kvm_vcpu *vcpu);
- int kvm_lapic_find_highest_irr(struct kvm_vcpu *vcpu);
-=20
- u64 kvm_get_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 746cb41c5b98..0111539fcea1 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5036,6 +5036,11 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm=
-_exit_reason,
- 		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
- 	}
-=20
-+	if (vmx->nested.update_vmcs01_hwapic_isr) {
-+		vmx->nested.update_vmcs01_hwapic_isr =3D false;
-+		kvm_apic_update_hwapic_isr(vcpu);
-+	}
-+
- 	if ((vm_exit_reason !=3D -1) &&
- 	    (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx)))
- 		vmx->nested.need_vmcs12_to_shadow_sync =3D true;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe9887a5fa4a..a3513fc05a01 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6873,6 +6873,23 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, in=
-t max_isr)
- 	u16 status;
- 	u8 old;
-=20
-+	/*
-+	 * If L2 is active, defer the SVI update until vmcs01 is loaded, as SVI
-+	 * is only relevant for if and only if Virtual Interrupt Delivery is
-+	 * enabled in vmcs12, and if VID is enabled then L2 EOIs affect L2's
-+	 * vAPIC, not L1's vAPIC.  KVM must update vmcs01 on the next nested
-+	 * VM-Exit, otherwise L1 with run with a stale SVI.
-+	 */
-+	if (is_guest_mode(vcpu)) {
-+		/*
-+		 * KVM is supposed to forward intercepted L2 EOIs to L1 if VID
-+		 * is enabled in vmcs12; as above, the EOIs affect L2's vAPIC.
-+		 */
-+		WARN_ON_ONCE(nested_cpu_has_vid(get_vmcs12(vcpu)));
-+		to_vmx(vcpu)->nested.update_vmcs01_hwapic_isr =3D true;
-+		return;
-+	}
-+
- 	if (max_isr =3D=3D -1)
- 		max_isr =3D 0;
-=20
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 43f573f6ca46..892302022094 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -176,6 +176,7 @@ struct nested_vmx {
- 	bool reload_vmcs01_apic_access_page;
- 	bool update_vmcs01_cpu_dirty_logging;
- 	bool update_vmcs01_apicv_status;
-+	bool update_vmcs01_hwapic_isr;
-=20
- 	/*
- 	 * Enlightened VMCS has been enabled. It does not mean that L1 has to
---=20
-2.47.0.163.g1226f6d8fa-goog
-
+[1/9] KVM: x86: Co-locate initialization of feature MSRs in kvm_arch_vcpu_create()
+      https://github.com/kvm-x86/linux/commit/2142ac663a6a
+[2/9] KVM: x86: Disallow changing MSR_PLATFORM_INFO after vCPU has run
+      https://github.com/kvm-x86/linux/commit/bc2ca3680b30
+[3/9] KVM: x86: Quirk initialization of feature MSRs to KVM's max configuration
+      https://github.com/kvm-x86/linux/commit/dcb988cdac85
+[4/9] KVM: x86: Reject userspace attempts to access PERF_CAPABILITIES w/o PDCM
+      https://github.com/kvm-x86/linux/commit/d75cac366f44
+[5/9] KVM: VMX: Remove restriction that PMU version > 0 for PERF_CAPABILITIES
+      https://github.com/kvm-x86/linux/commit/a1039111192b
+[6/9] KVM: x86: Reject userspace attempts to access ARCH_CAPABILITIES w/o support
+      https://github.com/kvm-x86/linux/commit/a5d563890b8f
+[7/9] KVM: x86: Remove ordering check b/w MSR_PLATFORM_INFO and MISC_FEATURES_ENABLES
+      https://github.com/kvm-x86/linux/commit/1ded7a57b805
+[8/9] KVM: selftests: Verify get/set PERF_CAPABILITIES w/o guest PDMC behavior
+      https://github.com/kvm-x86/linux/commit/b799e3e7da2c
+[9/9] KVM: selftests: Add a testcase for disabling feature MSRs init quirk
+      https://github.com/kvm-x86/linux/commit/0581dfbad954
 
