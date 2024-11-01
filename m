@@ -1,160 +1,122 @@
-Return-Path: <kvm+bounces-30334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE8B9B95F5
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:56:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD14B9B9654
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2A4F1C218EF
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:56:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73045281295
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4575C1CB513;
-	Fri,  1 Nov 2024 16:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B971CB330;
+	Fri,  1 Nov 2024 17:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PCk7D6/X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJaqvonf"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B681CA81;
-	Fri,  1 Nov 2024 16:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C1E1C9DE5
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 17:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730480185; cv=none; b=Iq/AZrugbDcDrZScwSAd/j2quUAj+xi9SQZHf2ZfvMajiO13pl921lb7wuqNRwKEjzP82Q3SWh6BVN4dIc/yNeSNyPX8tjKBI5yI9jtRjTdWW7mPjDiXLGbQ0njKopxPDIvQu3j9r6mmeqURMQZ7nM/guSWSAhEimi8qeL4sdko=
+	t=1730481304; cv=none; b=VIIHis4aVKLbDt8SwcQKsg4O0qZIGNbSTKJoHScaHDnQ1uitZBirL4QKQe3oYvCvQLt65s2WyRjX23CTky6V8Hsl6LxHIXsceif+o8RHsvC2JGPWVU1gQoxZElb5wJwp8sDsUgCms9sdtTgm0xM76NkI6XquzLTJ83gkNDZsi38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730480185; c=relaxed/simple;
-	bh=KmcSGZZTBepw/haBxjfNfgGPXnl3daZOBZVZzzq5xe4=;
-	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
-	 In-Reply-To:Content-Type; b=Fk0ljucdrdtRL3rhaYIE/c4hLceyFDWYfzvcXPWK//4f6fJus2LK9I6XyDBZBYZ3BrozDnprQ/tZB8nymIARIK9EFgS9PmnHo5CzVAYfGEDSxCQUuLH0pJzWUH9Hd7vGcZ4kKGgKUJs1hkfiSmoTC/wq8s/HxlWunPUUyCpseXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PCk7D6/X; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1730481304; c=relaxed/simple;
+	bh=+Q8C3WVkar+gRBgM9zh5E/CuzXQcTMOL92452R8Vcww=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rXGGlXKIzkDd0d2RxT0LxDSYiKlOZdhHejCHRPS4BHd188d4y0dFLiU0R4/v5kk+8vafjE92dlnExnfUutyPAJFFcaW3KT3iZo1dN1Q2wj/akO3+aYx9gtvU0xQcYd+RhvoIz2L6SN/mBlGd7LQRlG8EKWKHnrTrzvxqcienJaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJaqvonf; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-206da734c53so24465265ad.2
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 10:15:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730480183; x=1762016183;
-  h=message-id:date:mime-version:to:cc:references:subject:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KmcSGZZTBepw/haBxjfNfgGPXnl3daZOBZVZzzq5xe4=;
-  b=PCk7D6/Xsej0yYJGNbxAPA+qHiAKeCt3/rm3MZKcin/UJ4i9Xlw8usDF
-   74YFiJIFV5pNWSgyXDidK4xnYBMdbXIg7Bbaex4VP8vHcUtep44nGDNTK
-   hbuSj1UrFzhta5y4XhmMB438agIqZasDU0cgObqoRmZjBjNpEUpR6dMam
-   A=;
-X-IronPort-AV: E=Sophos;i="6.11,250,1725321600"; 
-   d="scan'208";a="381765496"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 16:56:22 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:55997]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.72:2525] with esmtp (Farcaster)
- id 6a9142ea-5ddd-46d3-9d40-2688c563fdd9; Fri, 1 Nov 2024 16:56:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 6a9142ea-5ddd-46d3-9d40-2688c563fdd9
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 1 Nov 2024 16:56:20 +0000
-Received: from [192.168.208.156] (10.106.101.42) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 1 Nov 2024 16:56:17 +0000
-Message-ID: <7bd627df-0303-4ded-b8c8-ceb84fb20f0d@amazon.com>
-Date: Fri, 1 Nov 2024 09:56:12 -0700
+        d=google.com; s=20230601; t=1730481302; x=1731086102; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3WjphhVBeIg+7r0qHzagqZhNZbHBJirJ2EYUizEIggg=;
+        b=IJaqvonf7QavaEjyNkJ3Wrb46sJzK1YbLZleGMDS9JF1oXkIVIQo86/s6yMs6ve3v4
+         l97jiw1+vW+ZEwl4SCVZ7UUjrjFWDb1donAV5JliJgjBfWYBHcU+pBvVokhV3ZQ/Tppl
+         pFD/nB+MvqJeYpq33Qb2+0zWIYoW2ySxLaYgEDB+cnaaysEPheYTQ08qcTzC3CPx28g5
+         UQDUeCxsfox9CKEaSbckWl0gWoyUPzJumskXopDf0JhmqE9/SPj21Yn4jmJSNBF+Xh3p
+         qpw+mwtBDWIi0sJ07PHe1ZKKOPRiUQIAan5m01yPWDC2/svWmvoah5feK18vuiQeTvp1
+         e9Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730481302; x=1731086102;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3WjphhVBeIg+7r0qHzagqZhNZbHBJirJ2EYUizEIggg=;
+        b=DAFHzDxOqWFPAC/w1zV9/eMjhsqd19XuKv4kPLQUP4KcUCykkLGosmHmq+RTr0J37G
+         MZvikgrOUeD3hbYP3G3+VwNPv+bfXKGRfEY7gFNPTrqRsFL1F1vLcrSvIg89IzPgMTCS
+         KmtwRx3NDb1cwsuBvdNIQFpHgpyKQLbtawuFnlX6tGtoZE1lyO1iASfsVupdepXtkcWb
+         KaI80w0e9+NIkzDLvN/Cn890I9qsxGJyYHwmXrzpv0G/MMi+YLBTMRMoadTuwW9DrXKw
+         6vl6G8ZmK0pKSpXg3CCC0kb9T72uWUfZev02ncUZVY1GQj3eEy4KWiAw4eLlT7/psub1
+         kLLw==
+X-Gm-Message-State: AOJu0YxBgTjRl3F8oT/92LfQMhAMaBbg4QVQ3GhUxtpAAqonm/V0rW/H
+	ai2cHfHluj31kKsTOOBRpA4Rv2BbNDF3GygKXjq3YUhcMkE1peNrdkxK04x24NuGrBlpbFT9BCy
+	E+Q==
+X-Google-Smtp-Source: AGHT+IGiiMkgXigZOym5diL9lYG2iUONulsIdBggyaGMQ6PHY6vHPvHoiKnVDi2yvIMlqFpuiZ/Xg+eKsdM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:903:808:b0:20b:e5d:ab01 with SMTP id
+ d9443c01a7336-211039e344cmr61715ad.0.1730481302055; Fri, 01 Nov 2024 10:15:02
+ -0700 (PDT)
+Date: Fri, 1 Nov 2024 10:15:00 -0700
+In-Reply-To: <20241023083237.184359-1-bk@alpico.io>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: <dave.hansen@intel.com>
-CC: <ackerleytng@google.com>, <agordeev@linux.ibm.com>,
-	<aou@eecs.berkeley.edu>, <borntraeger@linux.ibm.com>, <bp@alien8.de>,
-	<catalin.marinas@arm.com>, <chenhuacai@kernel.org>, <corbet@lwn.net>,
-	<dave.hansen@linux.intel.com>, <david@redhat.com>, <derekmn@amazon.com>,
-	<gerald.schaefer@linux.ibm.com>, <gor@linux.ibm.com>, <graf@amazon.com>,
-	<hca@linux.ibm.com>, <hpa@zytor.com>, <jgowans@amazon.com>,
-	<jthoughton@google.com>, <kalyazin@amazon.com>, <kernel@xen0n.name>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<luto@kernel.org>, <mathieu.desnoyers@efficios.com>, <mhiramat@kernel.org>,
-	<mingo@redhat.com>, <palmer@dabbelt.com>, <paul.walmsley@sifive.com>,
-	<pbonzini@redhat.com>, <peterz@infradead.org>, <quic_eberman@quicinc.com>,
-	<rostedt@goodmis.org>, <roypat@amazon.co.uk>, <rppt@kernel.org>,
-	<seanjc@google.com>, <shuah@kernel.org>, <svens@linux.ibm.com>,
-	<tabba@google.com>, <tglx@linutronix.de>, <vannapurve@google.com>,
-	<will@kernel.org>, <x86@kernel.org>, <xmarcalx@amazon.com>,
-	<mlipp@amazon.at>, <canellac@amazon.at>, <elena.reshetova@intel.com>
-References: <784d1522-0451-4844-a334-8b7d49019437@intel.com>
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <784d1522-0451-4844-a334-8b7d49019437@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+Mime-Version: 1.0
+References: <20241023083237.184359-1-bk@alpico.io>
+Message-ID: <ZyUMlFSjNTJdQpU6@google.com>
+Subject: Re: [PATCH] KVM: x86: Make the debugfs per VM optional
+From: Sean Christopherson <seanjc@google.com>
+To: Bernhard Kauer <bk@alpico.io>
+Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-+Elena
++Paolo and others
 
-On 2024-11-01 at 16:06+0000, Dave Hansen wrote:
-> On 10/31/24 17:10, Manwaring, Derek wrote:
-> > TDX and SEV encryption happens between the core and main memory, so
-> > cached guest data we're most concerned about for transient execution
-> > attacks isn't necessarily inaccessible.
-> >
-> > I'd be interested what Intel, AMD, and other folks think on this, but I
-> > think direct map removal is worthwhile for CoCo cases as well.
->
-> I'm not sure specifically which attacks you have in mind.  [...]
->
-> I _think_ you might be thinking of attacks like MDS where some random
-> microarchitectural buffer contains guest data after a VM exit and then
-> an attacker extracts it.  Direct map removal doesn't affect these
-> buffers and doesn't mitigate an attacker getting the data out.
+Please use scripts/get_maintainer.pl, otherwise your patches are likely to be
+missed by key folks (Paolo, in this case).
 
-Right, the only attacks we can thwart with direct map removal are
-transient execution attacks on the host kernel whose leak origin is
-"Mapped memory" in Table 1 of the Quarantine paper [2]. Maybe the
-simplest hypothetical to consider here is a new spectre v1 gadget in the
-host kernel.
+On Wed, Oct 23, 2024, Bernhard Kauer wrote:
+> Creating a debugfs directory for each virtual machine is a suprisingly
+> costly operation as one has to synchronize multiple cores. However, short
+> living VMs seldom benefit from it.
+> 
+> Since there are valid use-cases we make this feature optional via a
+> module parameter. Disabling it saves 150us in the hello microbenchmark.
+> 
+> Signed-off-by: Bernhard Kauer <bk@alpico.io>
+> ---
+>  virt/kvm/kvm_main.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index a48861363649..760e39cf86a8 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -94,6 +94,9 @@ unsigned int halt_poll_ns_shrink = 2;
+>  module_param(halt_poll_ns_shrink, uint, 0644);
+>  EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
+>  
+> +bool debugfs_per_vm = true;
+> +module_param(debugfs_per_vm, bool, 0644);
 
-> The main thing I think you want to keep in mind is mentioned in the "TDX
-> Module v1.5 Base Architecture Specification"[1]:
->
-> > Any software except guest TD or TDX module must not be able to
-> > speculatively or non-speculatively access TD private memory,
->
-> That's a pretty broad claim and it involves mitigations in hardware and
-> the TDX module.
->
-> 1. https://cdrdv2.intel.com/v1/dl/getContent/733575
+I'm not opposed to letting userspace say "no debugfs for me", but I don't know
+that a module param is the right way to go.  It's obviously quite easy to
+implement and maintain (in code), but I'm mildly concerned that it'll have limited
+usefulness and/or lead to bad user experiences, e.g. because people turn off debugfs
+for startup latency without entirely realizing what they're sacrificing.
 
-Thank you, I hadn't seen that. That is a very strong claim as far as
-preventing speculative access; I didn't realize Intel claimed that about
-TDX. The comma followed by "to detect if a prior corruption attempt was
-successful" makes me wonder a bit if the statement is not quite as broad
-as it sounds, but maybe that's just meant to relate it to the integrity
-section?
-
-> If the attack is mitigated when the > data is _mapped_, then it's
-> certainly not possible _unmapped_.
->
-> So why bother with direct map removal for TDX?  A VMM write to TD
-> private data causes machine checks.  So any kernel bug that even
-> accidentally writes to kernel memory can bring the whole system down.
-> Not nice.
-
-Fair enough. It hasn't been clear to me if there is a machine check when
-the host kernel accesses guest memory only transiently. I was assuming
-there is not. But if other mitigations completely prevent even
-speculative access of TD private memory like you're saying, then agree
-nothing to gain from direct map removal in the TDX case.
-
-Derek
-
-
-[2] https://download.vusec.net/papers/quarantine_raid23.pdf
+One potentially terrible idea would be to setup debugfs asynchronously, so that
+the VM is runnable asap, but userspace still gets full debugfs information.  The
+two big wrinkles would be the vCPU debugfs creation and kvm_uevent_notify_change()
+(or at least the STATS_PATH event) would both need to be asynchronous as well.
 
