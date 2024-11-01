@@ -1,192 +1,128 @@
-Return-Path: <kvm+bounces-30336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2799B9676
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:21:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2479D9B96D5
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70BCB1F2147E
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:21:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5620D1C21DA7
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5DD1BD9DC;
-	Fri,  1 Nov 2024 17:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75A41CCB2A;
+	Fri,  1 Nov 2024 17:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OiIdnXga"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjtBASiJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5F41CACEB;
-	Fri,  1 Nov 2024 17:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89201CDA1E;
+	Fri,  1 Nov 2024 17:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730481646; cv=none; b=AlVaYw3ZPRc/1fic8kN5VZVd89BClNdM+LNjHPxI1woqp6+tFiAoWe8HHgWj7d7cvUc2KAFQbSMPsJ9YSnnaaLTgR1/GjMm0FrsnYWEylw96KezbpOjscdnJoCTA5Hz2+qkEFaos2ARIbUwRJdGAdJ1J4IqH2l9JUXL+LlAhRaQ=
+	t=1730483343; cv=none; b=tZY3HUMapFdNO77K7KQYxXlnU9j/FnKICgpCqKybG39nOh8Nx4HtjqsS5ugcPYmJ2dk7qq1y8gzfHuobZrf9pyq7SfFGZ2tqSe+gQTiCpL1oRwcGIml4fSCCUId4FSQnbpigAq3p+UdNtDzPnKxHlJEkoZYvy1j1DYnFOMaCr1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730481646; c=relaxed/simple;
-	bh=JQUGAkKtWtuixpyKXvV6X4p91cSL2otwfZ1ndMlp72U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1HPxPR4AASXjE0Tyw6citb4oUDHPNDEZgGv8e+7dUkvUYQUIvwT+bngchwGd4AHFwYnGYljC9HQkjN51IzMo4VqxDmOwDVR5vjzfN/X8YYV9HLTwzxnTTMHQCHpmfUDM31o9sfgMTVa0tkruFmWPrFL8LGy409hlr0lbzozJIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OiIdnXga; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730481645; x=1762017645;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JQUGAkKtWtuixpyKXvV6X4p91cSL2otwfZ1ndMlp72U=;
-  b=OiIdnXgazYHvyf7LnPm38f+e4xe8fmMS+ZoutlDsTLzEZZlJkDg03k0a
-   zjtZrzLnyV7OWISv0C3/5kgqJFD+iTihGsu8xw+6qNu2FPguzg5dY4kCP
-   hNmNyNZe2f30jlWuGkIWXG125s4B/8GR/n8tBBg29AxpGDjOASQ5gYnkv
-   ODc+JZIQ6VA2pVWawwBWdADNFHHzqqLhhP3sQiNO/9p6DeIXPDpVC23JW
-   H7g2e8e8S7gVaKeLZ5sdAQMcheDEmZNHxG+Ic2xrTDgKJ57qqRwLhYB22
-   BlbO1mpm6RmIk2uyrNpWNT4rYT/0zN+u0Hy33kdRfmBbnDW8w4md7H2gj
-   w==;
-X-CSE-ConnectionGUID: 9UDM6ekxRQGWftvr0SAOBQ==
-X-CSE-MsgGUID: OtkLbcadQBSVrX08e74Rpw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41352544"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41352544"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 10:20:44 -0700
-X-CSE-ConnectionGUID: P6WoitMvTceDc6oAW6kXww==
-X-CSE-MsgGUID: LNpDzPlsRxCpzCJmDkTCdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,250,1725346800"; 
-   d="scan'208";a="82899568"
-Received: from ccbilbre-mobl3.amr.corp.intel.com (HELO [10.124.220.146]) ([10.124.220.146])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 10:20:41 -0700
-Message-ID: <51fe5ad1-7057-4d43-b92c-580d187d2aeb@intel.com>
-Date: Fri, 1 Nov 2024 10:20:39 -0700
+	s=arc-20240116; t=1730483343; c=relaxed/simple;
+	bh=/b91CoH0L4+ZOxrMGr0zsD4PKr5FuOWyhTBccBHPH7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pY862RUOU+qViJAjj52Nv2gVmc4W5gp2DCC8UZV54Gn3TF9TcjTxI2PEQg0+W8cXl6wPIt+I7AwA/3Z3ZAqS1azIiIGimxWA5gPFVOPHu423TM7ciklJfpNEhRC1A7Aqnyt0dkrzDYv+u9FdaZeWR1sB1QEpPm8Bd5/80yVondc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjtBASiJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E5DC4CECD;
+	Fri,  1 Nov 2024 17:48:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730483343;
+	bh=/b91CoH0L4+ZOxrMGr0zsD4PKr5FuOWyhTBccBHPH7w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LjtBASiJpj3wSWJdTJkZgQD3yarqRwCy6apE0QFm4Yo6QoTSPUahEDoXH/eZR5Wd6
+	 loXUanal2E/JmK4aF1aCq61B4EkINhFbMdzBp21IbCNAnSVmM7wQEdroXQVurZg9Dl
+	 WdjtXYLh3YN+FlE7SojVKHollfTiMWZ3WUSCE/Vnl5hbcudFjg+YsV6bwC5VhD2hdW
+	 rwHsJ3S7bKIes/RzbFtfxPjx4qZDEoueK/xypG9lfrEjtOe5CpRmzRrkkS/a6RqPht
+	 so5a9ymD7x0VWkisb6FJTR0pGEnM+OYO8duhU05uFutMCvjJPGgA6Rl7Jdg6rGQ/lB
+	 ukMPsfwBG2mTg==
+Date: Fri, 1 Nov 2024 18:48:55 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>, sami.mujawar@arm.com,
+	ardb@kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Francesco Lavra <francescolavra.fl@gmail.com>,
+	Miguel Luis <miguel.luis@oracle.com>
+Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
+ hibernate
+Message-ID: <ZyUUh6KawapLkj0z@lpieralisi>
+References: <20241019172459.2241939-1-dwmw2@infradead.org>
+ <20241019172459.2241939-7-dwmw2@infradead.org>
+ <ZyPEn4qhaYyYqrzk@lpieralisi>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-To: "Manwaring, Derek" <derekmn@amazon.com>
-Cc: ackerleytng@google.com, agordeev@linux.ibm.com, aou@eecs.berkeley.edu,
- borntraeger@linux.ibm.com, bp@alien8.de, catalin.marinas@arm.com,
- chenhuacai@kernel.org, corbet@lwn.net, dave.hansen@linux.intel.com,
- david@redhat.com, gerald.schaefer@linux.ibm.com, gor@linux.ibm.com,
- graf@amazon.com, hca@linux.ibm.com, hpa@zytor.com, jgowans@amazon.com,
- jthoughton@google.com, kalyazin@amazon.com, kernel@xen0n.name,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, loongarch@lists.linux.dev,
- luto@kernel.org, mathieu.desnoyers@efficios.com, mhiramat@kernel.org,
- mingo@redhat.com, palmer@dabbelt.com, paul.walmsley@sifive.com,
- pbonzini@redhat.com, peterz@infradead.org, quic_eberman@quicinc.com,
- rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org,
- seanjc@google.com, shuah@kernel.org, svens@linux.ibm.com, tabba@google.com,
- tglx@linutronix.de, vannapurve@google.com, will@kernel.org, x86@kernel.org,
- xmarcalx@amazon.com, mlipp@amazon.at, canellac@amazon.at,
- elena.reshetova@intel.com
-References: <784d1522-0451-4844-a334-8b7d49019437@intel.com>
- <7bd627df-0303-4ded-b8c8-ceb84fb20f0d@amazon.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <7bd627df-0303-4ded-b8c8-ceb84fb20f0d@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZyPEn4qhaYyYqrzk@lpieralisi>
 
-On 11/1/24 09:56, Manwaring, Derek wrote:
-...
->>> Any software except guest TD or TDX module must not be able to
->>> speculatively or non-speculatively access TD private memory,
->>
->> That's a pretty broad claim and it involves mitigations in hardware and
->> the TDX module.
->>
->> 1. https://cdrdv2.intel.com/v1/dl/getContent/733575
+[+Ard, Sami, for EFI]
+
+On Thu, Oct 31, 2024 at 06:55:43PM +0100, Lorenzo Pieralisi wrote:
+> On Sat, Oct 19, 2024 at 06:15:47PM +0100, David Woodhouse wrote:
 > 
-> Thank you, I hadn't seen that. That is a very strong claim as far as
-> preventing speculative access; I didn't realize Intel claimed that about
-> TDX. The comma followed by "to detect if a prior corruption attempt was
-> successful" makes me wonder a bit if the statement is not quite as broad
-> as it sounds, but maybe that's just meant to relate it to the integrity
-> section?
-
-I think it's just relating it to the integrity section.
-
->> If the attack is mitigated when the > data is _mapped_, then it's
->> certainly not possible _unmapped_.
->>
->> So why bother with direct map removal for TDX?  A VMM write to TD
->> private data causes machine checks.  So any kernel bug that even
->> accidentally writes to kernel memory can bring the whole system down.
->> Not nice.
+> [...]
 > 
-> Fair enough. It hasn't been clear to me if there is a machine check when
-> the host kernel accesses guest memory only transiently. I was assuming
-> there is not. 
+> > +#ifdef CONFIG_HIBERNATION
+> > +static int psci_sys_hibernate(struct sys_off_data *data)
+> > +{
+> > +	/*
+> > +	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
+> > +	 * and is supported by hypervisors implementing an earlier version
+> > +	 * of the pSCI v1.3 spec.
+> > +	 */
+> 
+> It is obvious but with this patch applied a host kernel would start executing
+> SYSTEM_OFF2 too if supported in firmware to hibernate, it is not a hypervisor
+> only code path.
+> 
+> Related to that: is it now always safe to override
+> 
+> commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and poweroff")
+> 
+> for hibernation ? It is not very clear to me why overriding PSCI for
+> poweroff was the right thing to do - tried to follow that patch history but
+> the question remains (it is related to UpdateCapsule() but I don't know
+> how that applies to the hibernation use case).
 
-Previous generations of hardware have had some nastiness in this area.
-Speculative accesses were (I think) logged in the machine check banks,
-but wouldn't raise an #MC.  I believe TDX-capable hardware won't even
-log speculative accesses.
+RFC: It is unclear to me what happens in current mainline if we try to
+hibernate with EFI runtime services enabled and a capsule update pending (we
+issue EFI ResetSystem(EFI_RESET_SHUTDOWN,..) which might not be compatible
+with the reset required by the pending capsule update request) what happens
+in this case I don't know but at least the choice is all contained in
+EFI firmware.
 
-> But if other mitigations completely prevent even speculative access
-> of TD private memory like you're saying, then agree nothing to gain
-> from direct map removal in the TDX case.
-Remember, guest unmapping is done in the VMM.  The VMM is not trusted in
-the TDX (or SEV-SNP) model.  If any VMM can harm the protections on
-guest memory, then we have a big problem.
+Then if in the same scenario now we are switching to PSCI SYSTEM_OFF2 for the
+hibernate reset I suspect that what happens to the in-flight capsule
+update requests strictly depends on what "reset" PSCI SYSTEM_OFF2 will
+end up doing ?
 
-That isn't to say big problem can't happen.  Say some crazy attack comes
-to light where the VMM can attack TDX if the VMM has mapping for a guest
-(or TDX module) memory.  Crazier things have happened, and guest
-unmapping _would_ help there, if you trusted the VMM.
+I think this is just a corner case and it is unlikely it has been ever
+tested (is it even possible ? Looking at EFI folks) - it would be good
+to clarify it at least to make sure we understand this code path.
 
-Basically, I think guest unmapping only helps system security as a whole
-if you must _already_ trust the VMM.
+Thanks,
+Lorenzo
 
