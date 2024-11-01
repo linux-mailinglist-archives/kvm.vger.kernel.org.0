@@ -1,79 +1,65 @@
-Return-Path: <kvm+bounces-30272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8249B88D4
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 02:46:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1F09B894B
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 03:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3C71B22176
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 01:46:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E99A282214
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 02:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365B13A258;
-	Fri,  1 Nov 2024 01:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FD61386C9;
+	Fri,  1 Nov 2024 02:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hL5dc67r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PcTFvFBF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8159585628
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 01:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0868D132106;
+	Fri,  1 Nov 2024 02:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730425497; cv=none; b=Qepf2qQzEdbdOt0GWIheK475xAxbL5XEMJDJpCY8d6o91nK0GHcdeQvebDm1DX4/mhgEdzlQhK3YdyUYoHBP8Z8908dFsjL+LMKQbPPr3V01j2mr9JZZ9VIoVOYNVfttjriZvcd5Q3pp/hcF/TiAa4Q13YCnM6RwCRN1OW9Yd9c=
+	t=1730428001; cv=none; b=YS+nLRcXvf098yXgNbGkpDbHiqXHaM4dV3s9yIGM1dAK4DVGCPZ01W53s15oLRlxn834dgQlp+BVh4/7/jqLwtOElQxqeudaLEq+2eZGjrwIIs9GtW3+frOjqmtJa91zKYqR69zr6FLalo/+L/aIMHl3ZP2IP287fSPEClAmkv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730425497; c=relaxed/simple;
-	bh=g2yXyh/XuQDbdRvLq+7Ht6ad5jWCH8+9YqK2Ecn3XOc=;
+	s=arc-20240116; t=1730428001; c=relaxed/simple;
+	bh=36d/haT9WVEiYz68TrS3g6j6z+zykDcFIsogP8k278g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SMalT8sxzNLN+WwrQ+7EXITS1LQrnmCv2IMd8mO9rE6nuPLltPu3HCSPgFIC0AvPq8etkwFOuhh31kOoObi/sojDUDReAkpwdlamxLCqB8/zX7y83/+9j1LhoME1IIqm8u4/1KUTdLOZWWbf2DprlzlnHH/rx9Xew9mUOz2QJRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hL5dc67r; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20ca4877690so39635ad.1
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 18:44:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730425491; x=1731030291; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u3XP5Wkv+RNW2+r7bEHxQsIWfnBYd0uQeyY2higphAI=;
-        b=hL5dc67rtTtM3eA56qsiD2AU8EThdGWnIaQXzeNT6jMvfQ9zp7z5Pzx06DWj8UJ3OW
-         AwEWEFRBCmkE7YHHYS7OvjoraJXAiYb6PmJHSc9ZyIs2mR0VFGshp/GLdTOAHJXQRSqf
-         OK9NZkThOJ2UAPRdro4wRydw+ssdp5ctQBmV/s4rGbFwJhcU2z0KUFv+gbfDXwHSsBL2
-         pi5CPxDEXoWGIQW7FE2oCAPTJeKdtXbuJeH+OHIPo0COhVXE96YQc51i4yPFDfvZ5Xar
-         CPYjb6uQq+OH1DZDmEOc56oy9bVoEEdOBSc8lTKpl3uXmhImlsh5mKbEqGHKck8tf68h
-         Okww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730425491; x=1731030291;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u3XP5Wkv+RNW2+r7bEHxQsIWfnBYd0uQeyY2higphAI=;
-        b=uR3Sw54Dt/zVZRHepobQhPAMPDz4xJNx+lAgK8xoP1Yr8bbXIDxNHU2ZnT1fdojNRC
-         g3NCuSRvZChBI8OU64dCqGIkqJbd6zzoRhpGEnAqEQqQYtj89xX7PQ0ggofstiZaohbu
-         bVBKaikU2o4zsBelgQZrR76THVA4heBEiFlulOo/UrGJumDaa6Fxn8+RmRK6x9zZ/fM2
-         Q2ogokWDsvadMP+ZeTt0430m8R3vwiVoZeqgUxaoSRfU3r2JImcwPuHZ85JOLv1/EUWe
-         AqYC79Ol5KKHeYk3ZZOtWKjeoUCRIA5cAuQKA/sKrnAJzcxjcGUmh4oMKaeJtmYU4XI3
-         Z35A==
-X-Forwarded-Encrypted: i=1; AJvYcCW0d14G8Sq1kzo7B/zgdOcncmqXX5YaY0j09ysO3/bzFN2SvIKwVJnnCeSl3h+UrUvGIBI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB3rjguXjuNFJL2gApGvfJr8f/9OYVwUufxznu3w30p3q0NSUg
-	MzsOSXQKFT4OEh5vl/sgQkBzya0ow3rRzrQIjnvsjm/kIMlBt/YLphK/ik1B6w==
-X-Gm-Gg: ASbGncv36MLWzPsRyQLfyvXx9yXL2nmyj6K7ZF+xPQSgOEmeWhoJUl/J+NweE+W8Fz5
-	fWgMdFctD9LtVsYv5YdvjamDv1nE8wxBFniFC7vdlC17iyATXbTc+5PvwGKd4llrCcsKkYak5ml
-	xO0Ry2S9IfokXTxyxgCW2O/jdhrgf6YbhTH0eFeU/G0DeEVtLLnedRME8ueKx/U3bS/fBhGRbQY
-	lZvGIp6NQnZrbEQZ+RRGtMZ4ry6HkWuiQwLnY47ejRJASDVIc0sfinJIY+xXIObfUQCNUj3vlfR
-	IWaKHfxeyUROl7POc06UDoE=
-X-Google-Smtp-Source: AGHT+IE5Sl0gNcxBorXKwK80EliT1yn0U0hB4LI9lWcpW0YggnBB9NdstYuNqAFfcfuSQro9x8ORag==
-X-Received: by 2002:a17:902:ce91:b0:207:14ca:f0c1 with SMTP id d9443c01a7336-2110427ce3cmr4195975ad.16.1730425490601;
-        Thu, 31 Oct 2024 18:44:50 -0700 (PDT)
-Received: from ?IPV6:2600:1700:38d4:55d0:1ce2:4bd3:4446:5b60? ([2600:1700:38d4:55d0:1ce2:4bd3:4446:5b60])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e5839sm1799727b3a.68.2024.10.31.18.44.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 18:44:49 -0700 (PDT)
-Message-ID: <d0a38982-b811-4429-8b89-81e5da3aaf72@google.com>
-Date: Thu, 31 Oct 2024 18:44:46 -0700
+	 In-Reply-To:Content-Type; b=R4upFv7+LZuvJce5+5XjrIJdz8BY6mqjSdHQyJ2DjYSitakGnVwvU/2GfuV/KL9QRlrT6ZJUEfXKLhu5oGhc+Ka9IC3U8ozl8yp0tAnPV0XwiipeQuQRZvvN6bV73eYEpeUvkwiG2MByuLyaP4Z4bc+6iYsn97qKShqzhA/2mdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PcTFvFBF; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730427995; x=1761963995;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=36d/haT9WVEiYz68TrS3g6j6z+zykDcFIsogP8k278g=;
+  b=PcTFvFBFn9B/0N2h6Neoe9PFAepi70XkvXGOjD/SmjLaQkQVuJ8OtmaD
+   Qsn346jcLMdz3CHjBY5goVyVoeQyqPkPpfr1Rm45P1G2JTOj17LM92Hy8
+   qspoeGePDWeykCUZuN7KffNnbgqBwxawIasI0HMi4geJ1tdjZWEHfdniG
+   pDQ6M9LwZIQkEedarV/S9XtjFBZsw06ELlkc3mPAIbMh6s4HpzD0Sn6JB
+   MdTozHZvDvASH93zCUhyJWaHtQFJ11JN+SyxOSVj2u2/eN1pVtG5OwYLw
+   5tPCFEw74bUi4AS/SlK5NkufAZ6ufU8ufQ/pMV4ufWYBDNGZ24THe/grx
+   w==;
+X-CSE-ConnectionGUID: ARX7FLXCSAucEHoWDnFPlA==
+X-CSE-MsgGUID: RuQUJGNsSheYxexPgzF9Iw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="29624852"
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="29624852"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 19:26:34 -0700
+X-CSE-ConnectionGUID: dDnDVFxYS+WNs19XhhdKcA==
+X-CSE-MsgGUID: D9PTgFuuTrKLvQp2R0Y5SQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="106155665"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.224.127]) ([10.124.224.127])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 19:25:45 -0700
+Message-ID: <9c55087b-e529-46cd-8678-51975a9acc71@linux.intel.com>
+Date: Fri, 1 Nov 2024 10:25:43 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,70 +67,238 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr
- compatible
-To: Thomas Gleixner <tglx@linutronix.de>,
- Brendan Jackman <jackmanb@google.com>, Borislav Petkov <bp@alien8.de>
-Cc: Ingo Molnar <mingo@redhat.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Alexandre Chartre <alexandre.chartre@oracle.com>,
- Liran Alon <liran.alon@oracle.com>,
- Jan Setje-Eilers <jan.setjeeilers@oracle.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>,
- Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>,
- Vlastimil Babka <vbabka@suse.cz>, Michal Hocko <mhocko@kernel.org>,
- Khalid Aziz <khalid.aziz@oracle.com>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>,
- Reiji Watanabe <reijiw@google.com>, Ofir Weisse <oweisse@google.com>,
- Yosry Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>,
- KP Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>,
- Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kvm@vger.kernel.org
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com>
- <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
- <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
- <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com> <878qu6205g.ffs@tglx>
+Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace
+ generically
+To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
+Cc: "yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
+ <20240826022255.361406-2-binbin.wu@linux.intel.com>
+ <ZyKbxTWBZUdqRvca@google.com>
+ <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
+ <ZyLWMGcgj76YizSw@google.com>
 Content-Language: en-US
-From: Junaid Shahid <junaids@google.com>
-In-Reply-To: <878qu6205g.ffs@tglx>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZyLWMGcgj76YizSw@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 10/29/24 12:12 PM, Thomas Gleixner wrote:
-> 
-> I doubt that it works as you want it to work.
-> 
-> +	inline notrace __attribute((__section__(".noinstr.text")))	\
-> 
-> So this explicitely puts the inline into the .noinstr.text section,
-> which means when it is used in .text the compiler will generate an out-of
-> line function in the .noinstr.text section and insert a call into the
-> usage site. That's independent of the size of the inline.
-> 
-
-Oh, that's interesting. IIRC I had seen regular (.text) inline functions get 
-inlined into .noinstr.text callers. I assume the difference is that here the 
-section is marked explicitly rather than being implicit?
-
-In any case, I guess we could just mark these functions as plain noinstr. 
-(Unless there happens to be some other way to indicate to the compiler to place 
-any non-inlined copy of the function in .noinstr.text but still allow inlining 
-into .text if it makes sense optimization-wise.)
-
-Thanks,
-Junaid
+Content-Transfer-Encoding: 8bit
 
 
 
 
+On 10/31/2024 10:54 PM, Sean Christopherson wrote:
+> My other idea was have an out-param to separate the return code intended for KVM
+> from the return code intended for the guest.  I generally dislike out-params, but
+> trying to juggle a return value that multiplexes guest and host values seems like
+> an even worse idea.
+>
+> Also completely untested...
+>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  8 +++----
+>   arch/x86/kvm/x86.c              | 41 +++++++++++++++------------------
+>   2 files changed, 23 insertions(+), 26 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 6d9f763a7bb9..226df5c56811 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2179,10 +2179,10 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
+>   	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
+>   }
+>   
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl);
+> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			    unsigned long a0, unsigned long a1,
+> +			    unsigned long a2, unsigned long a3,
+> +			    int op_64_bit, int cpl, unsigned long *ret);
+>   int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>   
+>   int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e09daa3b157c..e9ae09f1b45b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9998,13 +9998,11 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>   	return kvm_skip_emulated_instruction(vcpu);
+>   }
+>   
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl)
+> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			    unsigned long a0, unsigned long a1,
+> +			    unsigned long a2, unsigned long a3,
+> +			    int op_64_bit, int cpl, unsigned long *ret)
+>   {
+> -	unsigned long ret;
+> -
+>   	trace_kvm_hypercall(nr, a0, a1, a2, a3);
+>   
+>   	if (!op_64_bit) {
+> @@ -10016,15 +10014,15 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>   	}
+>   
+>   	if (cpl) {
+> -		ret = -KVM_EPERM;
+> +		*ret = -KVM_EPERM;
+>   		goto out;
+>   	}
+>   
+> -	ret = -KVM_ENOSYS;
+> +	*ret = -KVM_ENOSYS;
+>   
+>   	switch (nr) {
+>   	case KVM_HC_VAPIC_POLL_IRQ:
+> -		ret = 0;
+> +		*ret = 0;
+>   		break;
+>   	case KVM_HC_KICK_CPU:
+>   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
+> @@ -10032,36 +10030,36 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>   
+>   		kvm_pv_kick_cpu_op(vcpu->kvm, a1);
+>   		kvm_sched_yield(vcpu, a1);
+> -		ret = 0;
+> +		*ret = 0;
+>   		break;
+>   #ifdef CONFIG_X86_64
+>   	case KVM_HC_CLOCK_PAIRING:
+> -		ret = kvm_pv_clock_pairing(vcpu, a0, a1);
+> +		*ret = kvm_pv_clock_pairing(vcpu, a0, a1);
+>   		break;
+>   #endif
+>   	case KVM_HC_SEND_IPI:
+>   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SEND_IPI))
+>   			break;
+>   
+> -		ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+> +		*ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+>   		break;
+>   	case KVM_HC_SCHED_YIELD:
+>   		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED_YIELD))
+>   			break;
+>   
+>   		kvm_sched_yield(vcpu, a0);
+> -		ret = 0;
+> +		*ret = 0;
+>   		break;
+>   	case KVM_HC_MAP_GPA_RANGE: {
+>   		u64 gpa = a0, npages = a1, attrs = a2;
+>   
+> -		ret = -KVM_ENOSYS;
+> +		*ret = -KVM_ENOSYS;
+>   		if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE))
+>   			break;
+>   
+>   		if (!PAGE_ALIGNED(gpa) || !npages ||
+>   		    gpa_to_gfn(gpa) + npages <= gpa_to_gfn(gpa)) {
+> -			ret = -KVM_EINVAL;
+> +			*ret = -KVM_EINVAL;
+>   			break;
+>   		}
+
+*ret needs to be set to 0 for this case before returning 0 to caller?
+
+>   
+> @@ -10080,13 +10078,13 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>   		return 0;
+>   	}
+>   	default:
+> -		ret = -KVM_ENOSYS;
+> +		*ret = -KVM_ENOSYS;
+>   		break;
+>   	}
+>   
+>   out:
+>   	++vcpu->stat.hypercalls;
+> -	return ret;
+> +	return 1;
+>   }
+>   EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
+>   
+> @@ -10094,7 +10092,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>   {
+>   	unsigned long nr, a0, a1, a2, a3, ret;
+>   	int op_64_bit;
+> -	int cpl;
+> +	int cpl, r;
+>   
+>   	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>   		return kvm_xen_hypercall(vcpu);
+> @@ -10110,10 +10108,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>   	op_64_bit = is_64_bit_hypercall(vcpu);
+>   	cpl = kvm_x86_call(get_cpl)(vcpu);
+>   
+> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+> -		/* MAP_GPA tosses the request to the user space. */
+> -		return 0;
+> +	r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
+> +	if (r <= r)
+A typo here.
+I guess it meant to be "if (r <= ret)" ?
+
+So the combinations will be
+----------------------------------------------------------------------------
+    |  r  |    ret    | r <= ret |
+---|-----|-----------|----------|-------------------------------------------
+  1 |  0  |     0     |   true   |  return r, which is 0, exit to userspace
+---|-----|-----------|----------|-------------------------------------------
+  2 |  1  |     0     |   false  |  set vcpu's RAX and return back to guest
+---|-----|-----------|----------|-------------------------------------------
+  3 |  1  | -KVM_Exxx |   false  |  set vcpu's RAX and return back to guest
+---|-----|-----------|----------|-------------------------------------------
+  4 |  1  |  Positive |   true   |  return r, which is 1,
+    |     |     N     |          |  back to guest without setting vcpu's RAX
+----------------------------------------------------------------------------
+
+KVM_HC_SEND_IPI, which calls kvm_pv_send_ipi() can hit case 4, which will
+return back to guest without setting RAX. It is different from the current behavior.
+
+r can be 0 only if there is no other error detected during pre-checks.
+I think it can just check whether r is 0 or not.
+I.e.,
+
+@@ -10094,7 +10092,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+  {
+      unsigned long nr, a0, a1, a2, a3, ret;
+      int op_64_bit;
+-    int cpl;
++    int cpl, r;
+
+      if (kvm_xen_hypercall_enabled(vcpu->kvm))
+          return kvm_xen_hypercall(vcpu);
+@@ -10110,10 +10108,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+      op_64_bit = is_64_bit_hypercall(vcpu);
+      cpl = kvm_x86_call(get_cpl)(vcpu);
+
+-    ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+-    if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+-        /* MAP_GPA tosses the request to the user space. */
+-        return 0;
++    r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
++    if (!r)
++        return 0;
+
+      if (!op_64_bit)
+          ret = (u32)ret;
+
+
+> +		return r;
+>   
+>   	if (!op_64_bit)
+>   		ret = (u32)ret;
+>
+> base-commit: 675248928970d33f7fc8ca9851a170c98f4f1c4f
 
 
