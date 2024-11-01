@@ -1,210 +1,140 @@
-Return-Path: <kvm+bounces-30315-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5E49B9461
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:27:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8C89B9490
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CCCA282239
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:27:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 033941F21D5A
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55221C8781;
-	Fri,  1 Nov 2024 15:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A14D1C876F;
+	Fri,  1 Nov 2024 15:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+LvVyWP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PClTnFcd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF67A1C5798
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 15:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FEC1ADFE8
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 15:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730474809; cv=none; b=JOEHtzVY2M1qFHBp4octZCZKsfhaaNZ+6QUO7QmDY83qJgVo0VjujvUaSm1KyM7k2th4XchhGWXqeUtfgErlbAaZL5IBiumYbifU36P/WA9xyiZt9/9Mghj2crHq+CU2FaRC/TGWGrgJq4R8e7ba+cv32b/Ms38o8aaTlA8TWXI=
+	t=1730475542; cv=none; b=qRsLHYJwSMJOTePxF7xtMooP+eBXrhxcGl+ytWMc+yQByQrxBvKXQkYSsHZVy4QCVmMbV0qaxMfhctIu1rCgH0/mm8Y8DSuQOrtbXbHgJpLbQeo8F+mQgSaHZfz0piEv9oGqQuKwxZTxqAV6LQlfiWt+8awTl9jvkJXbCj1bZCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730474809; c=relaxed/simple;
-	bh=wHAtH85ytanmYNA+QD9zRKwrYvKpOZ1yPwJIGLNUmVk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bgVmDXvr+sA1iZo6j2toPxAW3idTyJOywybYT0bKlpVXkuMg4At3V7hWKeKGXOlheqMkzVH4Kr17hLqAlp/DjSF/tHKvJErI/y71xa0eK5XdyrbtBUsryaa8zI1euJ2yfSS4cPuZKHMZYMhJNzsiJPxdcBmwHfkbCPomDwdaAw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+LvVyWP; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e35199eb2bso40879807b3.3
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 08:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730474806; x=1731079606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A0ftFmxWefug8znYAUp23wDUAHo5xr+BS9XzbNWaTbY=;
-        b=t+LvVyWPVEwDwJMMWe42e1+vhMgEzDpXlQoECVPk+yz4tf6L9vd1i/amucC2RcK415
-         h0HolyoLEai8Mqdlgt4KnsVmPKHBog320C8N5rChYV4XN6Ex2GIwvXsAZu/TVy9UVRNo
-         x7PSYaKnc9NZn4T4pZdIXjz5ulcFusCpMcZv2eIOdtAEmFAfIINbT9tqWDvon+GUlXnR
-         e4LJFkQ2ayOJs2rKC+NAUIvoiPl++DOboftFvN9ci77cye0GpHzAH5EVnZCEVvIYeznC
-         93VEIxZglMaFdhUk6J4ef4I89bjV4bKxDbSd1CKbFA1qE6GYY/7MY1zcZ3JctOypRSLJ
-         7uJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730474806; x=1731079606;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A0ftFmxWefug8znYAUp23wDUAHo5xr+BS9XzbNWaTbY=;
-        b=YeHioSdhOLcn3x8h+t4EM7shAeZE5Tdww8Ua86WbnJvKhUJKZQFiHQBP6nUxybujTW
-         qV/lFg1u36bjFI4Kqfu5w4qT5NCOcGbzWJ1ZVQZxHTfRoHCM+f4cewLGtvoN5pxfaXh/
-         +rCqu+P9AagKMLi6Ln212zxSk6v0fS5/vtQe36U14g/uSopbwVjXJAGWiR148pRzlZrC
-         itMHaBDaLvUGeLREOSQdw59ygbOG1fe1BNFh3VE9Z6R8C7KPSdhauAugrVGIxmAjrhPL
-         se8T4H/oxCmt4hFjMI53y5HZ/JoqYBUPiWI3hMjOM8ej/dQF6u0Cgi3yUjAhaYN1jKBS
-         oKdw==
-X-Forwarded-Encrypted: i=1; AJvYcCWehrVe2a9Q7pwFGa76cgrwzMkGHxRtDIi8S7SkHCd28MQPZ+GXSh2vcF6HA5Guj9OIe9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPZOLlHvhCmyNaUnnpUSDUgiNCMmnB3hdQaSb8kaiS+AH4k2xa
-	ynR68ohRVIGHkAreTaxJvUpvkwFgxjiMrhGBP5dHsTtzX2FekJO/CdXYeM5ZpLS7XE99xSZ6pUA
-	ekw==
-X-Google-Smtp-Source: AGHT+IHYLzsVc20vLRQwtzwWH/ZL6V83GRzYvw29uoFmous4MU437XqJXznaZoUcfr+GEJE6ovx7W6bgmVM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6f8e:b0:6e3:2bc1:da17 with SMTP id
- 00721157ae682-6ea64bc93a8mr394077b3.4.1730474805966; Fri, 01 Nov 2024
- 08:26:45 -0700 (PDT)
-Date: Fri, 1 Nov 2024 08:26:44 -0700
-In-Reply-To: <9c55087b-e529-46cd-8678-51975a9acc71@linux.intel.com>
+	s=arc-20240116; t=1730475542; c=relaxed/simple;
+	bh=MGpG9+U1NcrPw89BaqJoGGpatnrkgpDjLgz7qBB/IOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HmqBwBTsKlWy8jkVoO4ZgI8VwuLrJ1C5+SkFEDyAdsHrPw4aTXApwOr4JHQyfZ+6Xs45DbnSQk0m2aKEHDHDHyqV8LdJh890voDwxWixRm5ECWNF4XoW7BLJGcOH+5dR9RvfBvcvumS3/p/rgUhsT836VbihgMys3VlaMYYBwmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PClTnFcd; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 1 Nov 2024 08:38:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730475537;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDBDtrud5eJtuuxZyPOJXE2RSRr8v+TyeHi88AUx8RA=;
+	b=PClTnFcdIrcZ78W4jSshcODMfnNiSvNFtWKdgQXgVaJZCwGgQF3dDPomr/MvL2yA9B2Cwx
+	sIxnO1FBfdPS2fhSPK5ZXdGtgALWc9G1JWP6xyny1RXUjNkwgAnqURsd9JAi0B3Jon4w0B
+	kiA/rkElVf8i8EK1b4eQnPfLrgKPky8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Jones <ajones@ventanamicro.com>,
+	James Houghton <jthoughton@google.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
+Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
+ vcpu_get_reg() instead of using an out-param
+Message-ID: <ZyT2CB6zodtbWEI9@linux.dev>
+References: <20241009154953.1073471-1-seanjc@google.com>
+ <20241009154953.1073471-4-seanjc@google.com>
+ <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
+ <ZyTpwwm0s89iU9Pk@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
- <20240826022255.361406-2-binbin.wu@linux.intel.com> <ZyKbxTWBZUdqRvca@google.com>
- <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
- <ZyLWMGcgj76YizSw@google.com> <9c55087b-e529-46cd-8678-51975a9acc71@linux.intel.com>
-Message-ID: <ZyTzNHil-55v7D3r@google.com>
-Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace generically
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Kai Huang <kai.huang@intel.com>, 
-	"yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZyTpwwm0s89iU9Pk@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 01, 2024, Binbin Wu wrote:
-> On 10/31/2024 10:54 PM, Sean Christopherson wrote:
-> > My other idea was have an out-param to separate the return code intende=
-d for KVM
-> > from the return code intended for the guest.  I generally dislike out-p=
-arams, but
-> > trying to juggle a return value that multiplexes guest and host values =
-seems like
-> > an even worse idea.
-> >=20
-> > Also completely untested...
+Hey,
 
-...
+On Fri, Nov 01, 2024 at 07:48:00AM -0700, Sean Christopherson wrote:
+> On Fri, Nov 01, 2024, Mark Brown wrote:
+> > On Wed, Oct 09, 2024 at 08:49:42AM -0700, Sean Christopherson wrote:
+> > > Return a uint64_t from vcpu_get_reg() instead of having the caller provide
+> > > a pointer to storage, as none of the vcpu_get_reg() usage in KVM selftests
+> > > accesses a register larger than 64 bits, and vcpu_set_reg() only accepts a
+> > > 64-bit value.  If a use case comes along that needs to get a register that
+> > > is larger than 64 bits, then a utility can be added to assert success and
+> > > take a void pointer, but until then, forcing an out param yields ugly code
+> > > and prevents feeding the output of vcpu_get_reg() into vcpu_set_reg().
+> > 
+> > This commit, which is in today's -next as 5c6c7b71a45c9c, breaks the
+> > build on arm64:
+> > 
+> > aarch64/psci_test.c: In function ‘host_test_system_off2’:
+> > aarch64/psci_test.c:247:9: error: too many arguments to function ‘vcpu_get_reg’
+> >   247 |         vcpu_get_reg(target, KVM_REG_ARM_PSCI_VERSION, &psci_version);
+> >       |         ^~~~~~~~~~~~
+> > In file included from aarch64/psci_test.c:18:
+> > include/kvm_util.h:705:24: note: declared here
+> >   705 | static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64_t id)
+> >       |                        ^~~~~~~~~~~~
+> > At top level:
+> > cc1: note: unrecognized command-line option ‘-Wno-gnu-variable-sized-type-not-at
+> > -end’ may have been intended to silence earlier diagnostics
+> > 
+> > since the updates done to that file did not take account of 72be5aa6be4
+> > ("KVM: selftests: Add test for PSCI SYSTEM_OFF2") which has been merged
+> > in the kvm-arm64 tree.
+> 
+> Bugger.  In hindsight, it's obvious that of course arch selftests would add usage
+> of vcpu_get_reg().
+> 
+> Unless someone has a better idea, I'll drop the series from kvm-x86, post a new
+> version that applies on linux-next, and then re-apply the series just before the
+> v6.13 merge window (rinse and repeat as needed if more vcpu_get_reg() users come
+> along).
 
-> >   	case KVM_HC_MAP_GPA_RANGE: {
-> >   		u64 gpa =3D a0, npages =3D a1, attrs =3D a2;
-> > -		ret =3D -KVM_ENOSYS;
-> > +		*ret =3D -KVM_ENOSYS;
-> >   		if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE))
-> >   			break;
-> >   		if (!PAGE_ALIGNED(gpa) || !npages ||
-> >   		    gpa_to_gfn(gpa) + npages <=3D gpa_to_gfn(gpa)) {
-> > -			ret =3D -KVM_EINVAL;
-> > +			*ret =3D -KVM_EINVAL;
-> >   			break;
-> >   		}
->=20
-> *ret needs to be set to 0 for this case before returning 0 to caller?
+Can you instead just push out a topic branch and let the affected
+maintainers deal with it? This is the usual way we handle conflicts
+between trees...
 
-No, because the caller should consume *ret if and only if the function retu=
-rn value
-is '1', i.e. iff KVM should resume the guest.  And I think we actually want=
- to
-intentionally not touch *ret, because a sufficient smart compiler (or stati=
-c
-analysis tool) should be able to detect that incorrect usage of *ret is con=
-suming
-uninitialized data.
+> That would be a good oppurtunity to do the $(ARCH) directory switch[*] too, e.g.
+> have a "selftests_late" or whatever topic branch.
 
-> > @@ -10080,13 +10078,13 @@ unsigned long __kvm_emulate_hypercall(struct =
-kvm_vcpu *vcpu, unsigned long nr,
-> >   		return 0;
-> >   	}
-> >   	default:
-> > -		ret =3D -KVM_ENOSYS;
-> > +		*ret =3D -KVM_ENOSYS;
-> >   		break;
-> >   	}
-> >   out:
-> >   	++vcpu->stat.hypercalls;
-> > -	return ret;
-> > +	return 1;
-> >   }
-> >   EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
-> > @@ -10094,7 +10092,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu=
-)
-> >   {
-> >   	unsigned long nr, a0, a1, a2, a3, ret;
-> >   	int op_64_bit;
-> > -	int cpl;
-> > +	int cpl, r;
-> >   	if (kvm_xen_hypercall_enabled(vcpu->kvm))
-> >   		return kvm_xen_hypercall(vcpu);
-> > @@ -10110,10 +10108,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcp=
-u)
-> >   	op_64_bit =3D is_64_bit_hypercall(vcpu);
-> >   	cpl =3D kvm_x86_call(get_cpl)(vcpu);
-> > -	ret =3D __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, =
-cpl);
-> > -	if (nr =3D=3D KVM_HC_MAP_GPA_RANGE && !ret)
-> > -		/* MAP_GPA tosses the request to the user space. */
-> > -		return 0;
-> > +	r =3D __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cp=
-l, &ret);
-> > +	if (r <=3D r)
-> A typo here.
-> I guess it meant to be "if (r <=3D ret)" ?
+The right time to do KVM-wide changes (even selftests) is *early* in the
+development cycle, not last minute. It gives us plenty of time to iron out
+the wrinkles.
 
-No, "if (r <=3D 0)", i.e. exit to userspace on 0 or -errno.
+> Sorry for the pain Mark, you've been playing janitor for us too much lately.
 
-> So the combinations will be
-> -------------------------------------------------------------------------=
----
-> =C2=A0=C2=A0 |=C2=A0 r=C2=A0 |=C2=A0=C2=A0=C2=A0 ret=C2=A0=C2=A0=C2=A0 | =
-r <=3D ret |
-> ---|-----|-----------|----------|----------------------------------------=
----
-> =C2=A01 |=C2=A0 0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 true=C2=A0=C2=A0 |=C2=A0 return r, which is 0, exit to us=
-erspace
-> ---|-----|-----------|----------|----------------------------------------=
----
-> =C2=A02 |=C2=A0 1=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 false=C2=A0 |=C2=A0 set vcpu's RAX and return back to gue=
-st
-> ---|-----|-----------|----------|----------------------------------------=
----
-> =C2=A03 |=C2=A0 1=C2=A0 | -KVM_Exxx |=C2=A0=C2=A0 false=C2=A0 |=C2=A0 set=
- vcpu's RAX and return back to guest
-> ---|-----|-----------|----------|----------------------------------------=
----
-> =C2=A04 |=C2=A0 1=C2=A0 |=C2=A0 Positive |=C2=A0=C2=A0 true=C2=A0=C2=A0 |=
-=C2=A0 return r, which is 1,
-> =C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 N=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 back to guest without setting vcpu's RAX
-> -------------------------------------------------------------------------=
----
->=20
-> KVM_HC_SEND_IPI, which calls kvm_pv_send_ipi() can hit case 4, which will
-> return back to guest without setting RAX. It is different from the curren=
-t behavior.
->=20
-> r can be 0 only if there is no other error detected during pre-checks.
-> I think it can just check whether r is 0 or not.
++1, appreciate your help on this.
 
-Yeah, I just fat fingered the code (and didn't even compile test).
+-- 
+Thanks,
+Oliver
 
