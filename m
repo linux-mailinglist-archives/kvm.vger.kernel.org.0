@@ -1,162 +1,167 @@
-Return-Path: <kvm+bounces-30381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE479B998F
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 21:38:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0FD9B99B1
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 21:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0DD1F21EFB
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:38:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC2061F2215C
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F158C1DDC10;
-	Fri,  1 Nov 2024 20:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6701E32BD;
+	Fri,  1 Nov 2024 20:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m05eWXsw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s1+gWCx7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77000155330
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 20:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF081E25E7
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 20:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730493517; cv=none; b=kNBl7+E3j22O8+zyFd5ByoWDn8Kr7YAKpk5gKgJnBK0/FY4AhW0NRYrb0D48Th5uDr0ZfQpYxg5T7SPvYpkW3GV1AVGFov4M9F1zuD3fRZwB5pRLrxInFG7f7mR73MmEFEZOYn9AhtsCSRy+w8+Wr5WNJm7MOQAI7uVUloSiItc=
+	t=1730494422; cv=none; b=scGCBnKOQfPgaM3CGRQlxXeSa8CjrNEezWipmfJ1o+EMteA47SfJR1Wt9nhSt2BOZh8J9DABeF3EZgzHXcaUN3UxK/Kv5b7JLAbJhDbsLF3njihwjCPxiU3rqMO9xqH29H5Dst2/ovEi5CjCJ5cY3JNhz8wtlYw96aVueBoShpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730493517; c=relaxed/simple;
-	bh=2E0ss6fxrkLx7gCToCGGo1UWCNZ7U9hTeqIbgKHaGWo=;
+	s=arc-20240116; t=1730494422; c=relaxed/simple;
+	bh=YhxBh8Iax95XN2vr+xnyoQlastBvm7la0Lczo0OzpQs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cCJjXkRMaKF6TT7E58viCM2SXcFv1is6v6Yzv9/oEuhTOQIXfSDCMSIqaBuXEC3Ht2IUJAJGlnpqGoWVe23f9zqFPg1Y2CoAR7iqx6pfwcuM2QkB+/yndPIhzqBslzWsL4fDgJs0Eq0vSkf95ERegriDPz0373NXjmGflj/0YK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m05eWXsw; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=TaRaUjiJ9HdBAHr4xOMJ/MASkJkOkGSFnjfAbIE1Wx6DTkcr5CiN+FpE5IGm7EAVF0Ucpo6AeMzCHSu2Oizl+7P5Kx85tti4igWQ86ioK/3i32YxNu4g5K0/MRM7bkWSG6+DhrwBqRGXFbeFQ0pxp27fXmNPQKbLqjMpqDc8k8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s1+gWCx7; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539e617ef81so1341e87.1
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 13:38:35 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a9a2209bd7fso376865366b.2
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 13:53:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730493513; x=1731098313; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730494419; x=1731099219; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0S8SZ/gu2eXiOekIU0bSJdruZsNOZ1MYmQCtb/cNQgw=;
-        b=m05eWXswXD+LYARFAPOJ82/RcP39gHFWb8oGjI6rMmK49h8sHgYeU2B9UCkATunN8r
-         lhfKv0ZduPvBUxR3S4Vyp1CdoMv04uVH7qEjK1em4DXQS7kvkYZwqpmAV3YSWNVycNFr
-         PLiMD7DfhSXbqT74J7VdlFXu3KypuJrAvLmNYw17Lb7+qp2/dKc9XxPhIm81zgRZwGL/
-         2hoUhU2FOR/DKDbH5ko8gxCM0Qr7iZOTYGl4lRLNUXGV7pM8TzhyPao6Fjg2DOCdLfm9
-         oIsuGanKFgOjb3RjLAa6WtbOPBkrYe+hi0sWfgQhGnL17xsfiGOuVFowaNGEhvzYEy65
-         OjQA==
+        bh=58tht0yElv8TtI+sAULnDvoOIpdA327LXw1TPAfTplE=;
+        b=s1+gWCx7vatBiN++vFbDvqLiCeEinZHUNu1iV1j1hQSwastn77qvwQgs0gGeW8vlYz
+         xBL9p1eD4K9AjRZsZd2tJEey0DRFgfTOBZRyhv/hOFjO3DbYgHRNjABqlHuJVzWT6Owb
+         IQwHC50qJAEU9dkvUMYR4iK64Xf3MqSh4EEeJ8aKXyg4N7ysCbSZ5Xfs6Daod+t68hBo
+         RrezWrou8E1k4mFzfPUag550ZG4Y1qAd+t3Uc2OPhVfLW77aOrAuLo3UjzpawXEt/fa8
+         FhZvAHcIkS8M+DEVTnFvURSgdNWlPNdns+YZ4fViEeGgHRIwerb8JYCnO5YEXuQV15hE
+         DAig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730493513; x=1731098313;
+        d=1e100.net; s=20230601; t=1730494419; x=1731099219;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0S8SZ/gu2eXiOekIU0bSJdruZsNOZ1MYmQCtb/cNQgw=;
-        b=cHodNSwf3DxPNNlywuAsSE9/1bar+kj7PhHISuGEBDMyY2oZpDvCdAOuCH4bsfHhTh
-         HoWF+382PAUpmYtRS27hWV/3azMI1gMgmbzGnziamOEEySrs2SLUjUuxoNG6oL7/7rYl
-         J5jN+NrqNP2GZEADm2ydIY0a3Vq+QHPKKDU7Y3PVnLoOQIMQnFMSivay/HM1CjdWVR5q
-         AwzrDjZhPG0DGvgoApVUZ/Vdcn55WReNgTRD6QmKV5YhP7K3cqkL1u0YBUeqGS8T9kmS
-         6wE2VEkWJ07IcliO1VlzgHHGoN43BZ0pu90j1OhClX2nf0JIm2ul0+oU+mUrmFezI0sh
-         R6ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+gZeBXUa+fjWkVDZQnE0DYC+0FcCF/HfOQLAF8wkdHFUGuHoqhsp8rLfWBas6KFNYHvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxon/HQHf2ha5p7wwwid5OtTDi58LYe0fRlfHWrE+5kbQt81ydY
-	ZnPUK6ezmXZVX04J3gV5HvJOtAYTqNS6UwG9wNr9YxmXH/B3n5K2KVqKlNXhEb/zfWOAJNhC9/+
-	pRUM64+aHD1PtHJJs2UAtDtZdAt07APy1Spvs
-X-Gm-Gg: ASbGncumeQQBXKVNrYXyfbs8QFFrpXl7Yc2vdNaA9p0HLN/9QXLe9pD8Z4GNNZVpuvt
-	plfUAwcGLEN0EGu0UfqEsT+b3a9Dn7KtSqXw7Fe28k+qWSPgTWnCKEVsPETby
-X-Google-Smtp-Source: AGHT+IEQsTagRZjln5L5dgZDdUvGYh0A09kXflpjFuGnCCnyRuBSdgyZUma8MPjFfahqpeFF8bROqWSlwcWOc4c4Edg=
-X-Received: by 2002:a05:6512:2019:b0:536:88d0:420d with SMTP id
- 2adb3069b0e04-53d6acfb187mr120615e87.6.1730493513257; Fri, 01 Nov 2024
- 13:38:33 -0700 (PDT)
+        bh=58tht0yElv8TtI+sAULnDvoOIpdA327LXw1TPAfTplE=;
+        b=Ga1y4rEmUTPRTWUJ4NvwJQkZc2q4G0UWvfKar4WauXIYDgHFMAdNSJUbp4jRD256Wi
+         KVgg4WsJXDz4yPgGfbsLr5uFTMRTBInH8Ui5W1LOZCui6ln4O3Y8d9C+ctsWO7gH708r
+         6O/1dGKLQ2i+66KZwY4HFkqKVryUrFLKmSmhtpScZh7FKkeaoh3Np2lyqDcUIDFX/kYc
+         2vQbry6GX98HqDJE/PFzp+aVMNAsKzdEQHnrb1/8KZDCtIEt6XhDPx12ukjl1eifL4du
+         CyFsgBfUv7LPNPwRK1OtfupvcwN51Qid2vgpkkT77lYaVjgnYZXURVU3u6uxJ8fA8U+v
+         6REg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0BQyOCgUvtYS1mOiu3KbOb+pN/AU2sN/iggj21C9pcwr3S4/Ve7UadaRoAucIzjVyK3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTnaWPcpEahLEFIQwTwq9fK01cACHJ3eTc8E2YWCALCN5lNqr7
+	qY6NQcOCbTnM+cXTYCrSoZRV4ZtSg+V4HO0SPjSCRqPr/5WsHrcuSP3O5mdgWwu8Si9JXSV/cTJ
+	Y2xRo2ZrETdWRNaQx2lZIQtFaU4h9LO4QqotQ
+X-Google-Smtp-Source: AGHT+IE4TWdxH1MLmqqXHDxQAw+ZDcpavLufUykLmmX4/YLQSUoEUsRYxXg3C+icr7ZlE2NhvH0m2iLVncVh8fgUUXo=
+X-Received: by 2002:a17:907:7211:b0:a9a:ad8:fc56 with SMTP id
+ a640c23a62f3a-a9de6167c81mr2142334766b.44.1730494419041; Fri, 01 Nov 2024
+ 13:53:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240823235648.3236880-1-dmatlack@google.com> <20240823235648.3236880-5-dmatlack@google.com>
- <CAHVum0ffQFnu2-uGYCsxQJt4HxmC+dTKP=StzRJgHxajJ7tYoA@mail.gmail.com>
- <Zwa-9mItmmiKeVsd@google.com> <CAHVum0di0z1G7qDfexErzi_f99_T_fTPbZM0s2=TYFCQ8K5pBg@mail.gmail.com>
- <ZyLES2Ai4CC4W-0s@google.com>
-In-Reply-To: <ZyLES2Ai4CC4W-0s@google.com>
-From: Vipin Sharma <vipinsh@google.com>
-Date: Fri, 1 Nov 2024 13:37:56 -0700
-Message-ID: <CAHVum0fYkpU-UAyuqrRx+VGi2BFVSupwMhKQ+Q0hY9+15GSTCg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: Recover TDP MMU huge page mappings
- in-place instead of zapping
+References: <20240621134041.3170480-1-michael.roth@amd.com>
+ <20240621134041.3170480-5-michael.roth@amd.com> <ZnwkMyy1kgu0dFdv@google.com>
+ <r3tffokfww4yaytdfunj5kfy2aqqcsxp7sm3ga7wdytgyb3vnz@pfmstnvtuyg2>
+ <Zn8YM-s0TRUk-6T-@google.com> <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
+ <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com> <CAAH4kHZ-9ajaLH8C1N2MKzFuBKjx+BVk9-t24xhyEL3AKEeMQQ@mail.gmail.com>
+ <Zx_V5SHwzDAl8ZQR@google.com>
+In-Reply-To: <Zx_V5SHwzDAl8ZQR@google.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Fri, 1 Nov 2024 13:53:26 -0700
+Message-ID: <CAAH4kHaOy0s93vp96-ZeX3PykCv_XsGM3z36=Fr1dEADsctMrg@mail.gmail.com>
+Subject: Re: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
 To: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc: Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	pbonzini@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com, 
+	liam.merwick@oracle.com, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Chao P Peng <chao.p.peng@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 30, 2024 at 4:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Mon, Oct 28, 2024 at 11:20=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-> On Wed, Oct 09, 2024, Vipin Sharma wrote:
+> On Fri, Sep 13, 2024, Dionna Amalie Glaze wrote:
+> > We can extend the ccp driver to, on extended guest request, lock the
+> > command buffer, get the REPORTED_TCB, complete the request, unlock the
+> > command buffer, and return both the response and the REPORTED_TCB at
+> > the time of the request.
 >
-> Coming back to this, I opted to match the behavior of make_small_spte() a=
-nd do:
->
->         KVM_BUG_ON(!is_shadow_present_pte(small_spte) || level =3D=3D PG_=
-LEVEL_4K, kvm);
->
+> Holding a lock across an exit to userspace seems wildly unsafe.
 
-Should these be two separate KVM_BUG_ON(), to aid in debugging?
+I wasn't suggesting this. I was suggesting adding a special ccp symbol
+that would perform two sev commands under the same lock to ensure we
+know the REPORTED_TCB that was used to derive the VCEK that signs an
+attestation report in the MSG_REPORT_REQ guest request. We use that
+atomicity to be sure that when we exit to user space to request
+certificates that we're getting the right version certificates.
 
-> As explained in commit 3d4415ed75a57, the scenario is meant to be impossi=
-ble.
-> If the check fails in production, odds are good there's SPTE memory corru=
-ption
-> and we _want_ to kill the VM.
 >
->     KVM: x86/mmu: Bug the VM if KVM tries to split a !hugepage SPTE
->
->     Bug the VM instead of simply warning if KVM tries to split a SPTE tha=
-t is
->     non-present or not-huge.  KVM is guaranteed to end up in a broken sta=
-te as
->     the callers fully expect a valid SPTE, e.g. the shadow MMU will add a=
-n
->     rmap entry, and all MMUs will account the expected small page.  Retur=
-ning
->     '0' is also technically wrong now that SHADOW_NONPRESENT_VALUE exists=
-,
->     i.e. would cause KVM to create a potential #VE SPTE.
->
->     While it would be possible to have the callers gracefully handle fail=
-ure,
->     doing so would provide no practical value as the scenario really shou=
-ld be
->     impossible, while the error handling would add a non-trivial amount o=
-f
->     noise.
->
-> There's also no need to return SHADOW_NONPRESENT_VALUE.  KVM_BUG_ON() ens=
-ures
-> all vCPUs are kicked out of the guest, so while the return SPTE may be a =
-bit
-> nonsensical, it will never be consumed by hardware.  Theoretically, KVM c=
-ould
-> wander down a weird path in the future, but again, the most likely scenar=
-io is
-> that there was host memory corruption, so potential weird paths are the l=
-east of
-> KVM's worries at that point.
->
-> More importantly, in the _current_ code, returning SHADOW_NONPRESENT_VALU=
-E happens
-> to be benign, but that's 100% due to make_huge_spte() only being used by =
-the TDP
-> MMU.  If the shaduw MMU ever started using make_huge_spte(), returning a =
-!present
-> SPTE would be all but guaranteed to cause fatal problems.
+> Can you explain the race that you are trying to close, with the exact "ba=
+d" sequence
+> of events laid out in chronological order, and an explanation of why the =
+race can't
+> be sovled in userspace?  I read through your previous comment[*] (which I=
+ assume
+> is the race you want to close?), but I couldn't quite piece together exac=
+tly what's
+> broken.
 
-I think the caller should be given the opportunity to handle a
-failure. In the current code, TDP is able to handle the error
-condition, so penalizing a VM seems wrong. We have gone from a state
-of reduced performance to either very good performance or VM being
-killed.
+1. the control plane delivers a firmware update. Current TCB version
+goes up. The machine signals that it needs new certificates before it
+can commit.
+2. VM performs an extended guest request.
+3. KVM exits to user space to get certificates before getting the
+report from firmware.
+4. [what I understand Michael Roth was suggesting] User space grabs a
+file lock to see if it can read the cached certificates. It reads the
+certificates and releases the lock before returning to KVM.
+5. the control plane delivers the certificates to the machine and
+tells it to commit. The machine grabs the certificate file lock, runs
+SNP_COMMIT, and releases the file lock. This command updates both
+COMMITTED_TCB and REPORTED_TCB.
+6. KVM asks firmware to complete the MSG_REPORT_REQ request, but it's
+a different REPORTED_TCB.
+7. Guest receives the wrong certificates for certifying the report it
+just received.
 
-If shadow MMU starts using make_huge_spte() and doesn't add logic to
-handle this scenario (killing vm or something else) then that is a
-coding bug of that feature which should be fixed.
+The fact that 4 has to release the lock before getting the attestation
+report is the problem.
+If we instead get the report and know what the REPORTED_TCB was when
+serving that request, then we can exit to user space requesting the
+certificates for the report in hand.
+A concurrent update can update the reported_tcb like in the above
+scenario, but it won't interfere with certificates since the machine
+should have certificates for both TCB_VERSIONs to provide until the
+commit is complete.
+
+I don't think it's workable to have 1 grab the file lock and for 5 to
+release it. Waiting for a service to update stale certificates should
+not block user attestation requests. It would make 4's failure to get
+the lock return VMM_BUSY and eventually cause attestations to time out
+in sev-guest.
+
+>
+> [*] https://lore.kernel.org/all/CAAH4kHb03Una2kcvyC3W=3D1ZfANBWF_7a7zsSmW=
+hr_r9g3rCDZw@mail.gmail.com
+
+
+
+--=20
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
 
