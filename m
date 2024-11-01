@@ -1,205 +1,150 @@
-Return-Path: <kvm+bounces-30271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A629B87C0
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 01:36:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8249B88D4
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 02:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B6F282E7F
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 00:36:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3C71B22176
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 01:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8F317C77;
-	Fri,  1 Nov 2024 00:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365B13A258;
+	Fri,  1 Nov 2024 01:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iCEJHv3h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hL5dc67r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D083AD4B
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 00:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8159585628
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 01:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730421369; cv=none; b=cQqHhkuFff2KZLFqvGNKXB/bBBMWWlwTyaqmBLxTNql16vWqjHWqFSIiyZV8jmr4c4rqseazXWKwAhM0NgCHzFwY8nUZP6QE94G1dO6JX9NkV1LYqfpAEVXYQz+J7yAd6DjTjhY5bZMpviOh/mBKecX8yLdW3sj/PtrI2TG5G30=
+	t=1730425497; cv=none; b=Qepf2qQzEdbdOt0GWIheK475xAxbL5XEMJDJpCY8d6o91nK0GHcdeQvebDm1DX4/mhgEdzlQhK3YdyUYoHBP8Z8908dFsjL+LMKQbPPr3V01j2mr9JZZ9VIoVOYNVfttjriZvcd5Q3pp/hcF/TiAa4Q13YCnM6RwCRN1OW9Yd9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730421369; c=relaxed/simple;
-	bh=4/HsES9kFB+5RWVONeBQb5LIGIAwtM9s7tgILv01r00=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=L+IUif5Q0TuvHOMv54a+99qOl1KNj0pjmTkJNF++rHbG8YbzVATXKKbOgQATU9tAxok9um0GChG4mE1KbPABbI+t1WFuCHsjQhAYaMN15SrQunriKgHr8dg3axC/cYnHzNpYcLGbmBsYWD2d1n+yxoTefvgDxli9A26HR/OhUg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iCEJHv3h; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730421363; x=1761957363;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=4/HsES9kFB+5RWVONeBQb5LIGIAwtM9s7tgILv01r00=;
-  b=iCEJHv3htS9cGZYQsol6Cq1OQ/5r0z8fsUUobRMSJTuKr6sXJym0xP6j
-   9YP+jYRsrr+7oG+VwtvhNjaJl0bkFenuYs45C+Fd2VO4xb7CRrwDeqt2Q
-   wC7MwQFrQ9t1mOyWWwmFnVkZs2PkH2+yPsJZTv7SybT9w9+tHteHUQzzp
-   97HbzXe2kJRnue5pSRrT8hQdxUul5+bmECBCkbc/n0QdjHMRkuD3oc+2v
-   VhRoG29O0xPb45pFtT1nn40UlXGGQa8QNd7mAfNutJXERFwc/W2vBWVFe
-   1Dh+LNeI6+XMjg3gpmAzbERMGvd/JcP83hhMFrJlJErrzQxzIXtHXuw/2
-   w==;
-X-CSE-ConnectionGUID: 7qAGr9UHRvei75OApQxuow==
-X-CSE-MsgGUID: hh5a38BaRImI6dVWNAM4cw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="17823559"
-X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="17823559"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 17:36:00 -0700
-X-CSE-ConnectionGUID: lU/xmWc6Rf6/IEEBTUCC7w==
-X-CSE-MsgGUID: t6pVC3efRxGM1eJISQXjNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="87397819"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 31 Oct 2024 17:35:52 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t6fdm-000gtQ-10;
-	Fri, 01 Nov 2024 00:35:50 +0000
-Date: Fri, 1 Nov 2024 08:35:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Kai Huang <kai.huang@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [kvm:kvm-coco-queue 116/186] arch/x86/kvm/mmu/tdp_mmu.c:1171:25:
- sparse: sparse: incorrect type in argument 1 (different address spaces)
-Message-ID: <202411010854.46G4UJpa-lkp@intel.com>
+	s=arc-20240116; t=1730425497; c=relaxed/simple;
+	bh=g2yXyh/XuQDbdRvLq+7Ht6ad5jWCH8+9YqK2Ecn3XOc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SMalT8sxzNLN+WwrQ+7EXITS1LQrnmCv2IMd8mO9rE6nuPLltPu3HCSPgFIC0AvPq8etkwFOuhh31kOoObi/sojDUDReAkpwdlamxLCqB8/zX7y83/+9j1LhoME1IIqm8u4/1KUTdLOZWWbf2DprlzlnHH/rx9Xew9mUOz2QJRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hL5dc67r; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20ca4877690so39635ad.1
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2024 18:44:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730425491; x=1731030291; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=u3XP5Wkv+RNW2+r7bEHxQsIWfnBYd0uQeyY2higphAI=;
+        b=hL5dc67rtTtM3eA56qsiD2AU8EThdGWnIaQXzeNT6jMvfQ9zp7z5Pzx06DWj8UJ3OW
+         AwEWEFRBCmkE7YHHYS7OvjoraJXAiYb6PmJHSc9ZyIs2mR0VFGshp/GLdTOAHJXQRSqf
+         OK9NZkThOJ2UAPRdro4wRydw+ssdp5ctQBmV/s4rGbFwJhcU2z0KUFv+gbfDXwHSsBL2
+         pi5CPxDEXoWGIQW7FE2oCAPTJeKdtXbuJeH+OHIPo0COhVXE96YQc51i4yPFDfvZ5Xar
+         CPYjb6uQq+OH1DZDmEOc56oy9bVoEEdOBSc8lTKpl3uXmhImlsh5mKbEqGHKck8tf68h
+         Okww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730425491; x=1731030291;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3XP5Wkv+RNW2+r7bEHxQsIWfnBYd0uQeyY2higphAI=;
+        b=uR3Sw54Dt/zVZRHepobQhPAMPDz4xJNx+lAgK8xoP1Yr8bbXIDxNHU2ZnT1fdojNRC
+         g3NCuSRvZChBI8OU64dCqGIkqJbd6zzoRhpGEnAqEQqQYtj89xX7PQ0ggofstiZaohbu
+         bVBKaikU2o4zsBelgQZrR76THVA4heBEiFlulOo/UrGJumDaa6Fxn8+RmRK6x9zZ/fM2
+         Q2ogokWDsvadMP+ZeTt0430m8R3vwiVoZeqgUxaoSRfU3r2JImcwPuHZ85JOLv1/EUWe
+         AqYC79Ol5KKHeYk3ZZOtWKjeoUCRIA5cAuQKA/sKrnAJzcxjcGUmh4oMKaeJtmYU4XI3
+         Z35A==
+X-Forwarded-Encrypted: i=1; AJvYcCW0d14G8Sq1kzo7B/zgdOcncmqXX5YaY0j09ysO3/bzFN2SvIKwVJnnCeSl3h+UrUvGIBI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB3rjguXjuNFJL2gApGvfJr8f/9OYVwUufxznu3w30p3q0NSUg
+	MzsOSXQKFT4OEh5vl/sgQkBzya0ow3rRzrQIjnvsjm/kIMlBt/YLphK/ik1B6w==
+X-Gm-Gg: ASbGncv36MLWzPsRyQLfyvXx9yXL2nmyj6K7ZF+xPQSgOEmeWhoJUl/J+NweE+W8Fz5
+	fWgMdFctD9LtVsYv5YdvjamDv1nE8wxBFniFC7vdlC17iyATXbTc+5PvwGKd4llrCcsKkYak5ml
+	xO0Ry2S9IfokXTxyxgCW2O/jdhrgf6YbhTH0eFeU/G0DeEVtLLnedRME8ueKx/U3bS/fBhGRbQY
+	lZvGIp6NQnZrbEQZ+RRGtMZ4ry6HkWuiQwLnY47ejRJASDVIc0sfinJIY+xXIObfUQCNUj3vlfR
+	IWaKHfxeyUROl7POc06UDoE=
+X-Google-Smtp-Source: AGHT+IE5Sl0gNcxBorXKwK80EliT1yn0U0hB4LI9lWcpW0YggnBB9NdstYuNqAFfcfuSQro9x8ORag==
+X-Received: by 2002:a17:902:ce91:b0:207:14ca:f0c1 with SMTP id d9443c01a7336-2110427ce3cmr4195975ad.16.1730425490601;
+        Thu, 31 Oct 2024 18:44:50 -0700 (PDT)
+Received: from ?IPV6:2600:1700:38d4:55d0:1ce2:4bd3:4446:5b60? ([2600:1700:38d4:55d0:1ce2:4bd3:4446:5b60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e5839sm1799727b3a.68.2024.10.31.18.44.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 18:44:49 -0700 (PDT)
+Message-ID: <d0a38982-b811-4429-8b89-81e5da3aaf72@google.com>
+Date: Thu, 31 Oct 2024 18:44:46 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr
+ compatible
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Brendan Jackman <jackmanb@google.com>, Borislav Petkov <bp@alien8.de>
+Cc: Ingo Molnar <mingo@redhat.com>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Alexandre Chartre <alexandre.chartre@oracle.com>,
+ Liran Alon <liran.alon@oracle.com>,
+ Jan Setje-Eilers <jan.setjeeilers@oracle.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>,
+ Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Michal Hocko <mhocko@kernel.org>,
+ Khalid Aziz <khalid.aziz@oracle.com>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>,
+ Reiji Watanabe <reijiw@google.com>, Ofir Weisse <oweisse@google.com>,
+ Yosry Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>,
+ KP Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>,
+ Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>,
+ x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kvm@vger.kernel.org
+References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
+ <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com>
+ <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
+ <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
+ <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com> <878qu6205g.ffs@tglx>
+Content-Language: en-US
+From: Junaid Shahid <junaids@google.com>
+In-Reply-To: <878qu6205g.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   49c492a89914b02fa5011d9ea9848318c6c98dd9
-commit: 51bdd33b88604316f46202567d29b596721d8823 [116/186] KVM: x86/tdp_mmu: Support mirror root for TDP MMU
-config: x86_64-randconfig-123-20241101 (https://download.01.org/0day-ci/archive/20241101/202411010854.46G4UJpa-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241101/202411010854.46G4UJpa-lkp@intel.com/reproduce)
+On 10/29/24 12:12 PM, Thomas Gleixner wrote:
+> 
+> I doubt that it works as you want it to work.
+> 
+> +	inline notrace __attribute((__section__(".noinstr.text")))	\
+> 
+> So this explicitely puts the inline into the .noinstr.text section,
+> which means when it is used in .text the compiler will generate an out-of
+> line function in the .noinstr.text section and insert a call into the
+> usage site. That's independent of the size of the inline.
+> 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411010854.46G4UJpa-lkp@intel.com/
+Oh, that's interesting. IIRC I had seen regular (.text) inline functions get 
+inlined into .noinstr.text callers. I assume the difference is that here the 
+section is marked explicitly rather than being implicit?
 
-sparse warnings: (new ones prefixed by >>)
->> arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse:     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
-   include/linux/rcupdate.h:880:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
-   arch/x86/kvm/mmu/tdp_mmu.c:1447:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
+In any case, I guess we could just mark these functions as plain noinstr. 
+(Unless there happens to be some other way to indicate to the compiler to place 
+any non-inlined copy of the function in .noinstr.text but still allow inlining 
+into .text if it makes sense optimization-wise.)
 
-vim +1171 arch/x86/kvm/mmu/tdp_mmu.c
+Thanks,
+Junaid
 
-  1115	
-  1116	static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-  1117					   struct kvm_mmu_page *sp, bool shared);
-  1118	
-  1119	/*
-  1120	 * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  1121	 * page tables and SPTEs to translate the faulting guest physical address.
-  1122	 */
-  1123	int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-  1124	{
-  1125		struct kvm_mmu_page *root = tdp_mmu_get_root_for_fault(vcpu, fault);
-  1126		struct kvm *kvm = vcpu->kvm;
-  1127		struct tdp_iter iter;
-  1128		struct kvm_mmu_page *sp;
-  1129		int ret = RET_PF_RETRY;
-  1130	
-  1131		kvm_mmu_hugepage_adjust(vcpu, fault);
-  1132	
-  1133		trace_kvm_mmu_spte_requested(fault);
-  1134	
-  1135		rcu_read_lock();
-  1136	
-  1137		tdp_mmu_for_each_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
-  1138			int r;
-  1139	
-  1140			if (fault->nx_huge_page_workaround_enabled)
-  1141				disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
-  1142	
-  1143			/*
-  1144			 * If SPTE has been frozen by another thread, just give up and
-  1145			 * retry, avoiding unnecessary page table allocation and free.
-  1146			 */
-  1147			if (is_frozen_spte(iter.old_spte))
-  1148				goto retry;
-  1149	
-  1150			if (iter.level == fault->goal_level)
-  1151				goto map_target_level;
-  1152	
-  1153			/* Step down into the lower level page table if it exists. */
-  1154			if (is_shadow_present_pte(iter.old_spte) &&
-  1155			    !is_large_pte(iter.old_spte))
-  1156				continue;
-  1157	
-  1158			/*
-  1159			 * The SPTE is either non-present or points to a huge page that
-  1160			 * needs to be split.
-  1161			 */
-  1162			sp = tdp_mmu_alloc_sp(vcpu);
-  1163			tdp_mmu_init_child_sp(sp, &iter);
-  1164			if (is_mirror_sp(sp))
-  1165				kvm_mmu_alloc_external_spt(vcpu, sp);
-  1166	
-  1167			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-  1168	
-  1169			if (is_shadow_present_pte(iter.old_spte)) {
-  1170				/* Don't support large page for mirrored roots (TDX) */
-> 1171				KVM_BUG_ON(is_mirror_sptep(iter.sptep), vcpu->kvm);
-  1172				r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-  1173			} else {
-  1174				r = tdp_mmu_link_sp(kvm, &iter, sp, true);
-  1175			}
-  1176	
-  1177			/*
-  1178			 * Force the guest to retry if installing an upper level SPTE
-  1179			 * failed, e.g. because a different task modified the SPTE.
-  1180			 */
-  1181			if (r) {
-  1182				tdp_mmu_free_sp(sp);
-  1183				goto retry;
-  1184			}
-  1185	
-  1186			if (fault->huge_page_disallowed &&
-  1187			    fault->req_level >= iter.level) {
-  1188				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-  1189				if (sp->nx_huge_page_disallowed)
-  1190					track_possible_nx_huge_page(kvm, sp);
-  1191				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-  1192			}
-  1193		}
-  1194	
-  1195		/*
-  1196		 * The walk aborted before reaching the target level, e.g. because the
-  1197		 * iterator detected an upper level SPTE was frozen during traversal.
-  1198		 */
-  1199		WARN_ON_ONCE(iter.level == fault->goal_level);
-  1200		goto retry;
-  1201	
-  1202	map_target_level:
-  1203		ret = tdp_mmu_map_handle_target_level(vcpu, fault, &iter);
-  1204	
-  1205	retry:
-  1206		rcu_read_unlock();
-  1207		return ret;
-  1208	}
-  1209	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+
+
 
