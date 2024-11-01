@@ -1,139 +1,205 @@
-Return-Path: <kvm+bounces-30270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C1B9B8785
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 01:10:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A629B87C0
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 01:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF490282AE4
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 00:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B6F282E7F
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 00:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360F47482;
-	Fri,  1 Nov 2024 00:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8F317C77;
+	Fri,  1 Nov 2024 00:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PBjMG6r+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iCEJHv3h"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A4B36B;
-	Fri,  1 Nov 2024 00:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D083AD4B
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 00:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730419823; cv=none; b=ohBMag/8VrfoIZZpvC7QIXXq/5ThxSIGuYjwulu9W4CMMBICfkrI3BRXjdV+2qhBuENK0NgiUgQW/Fq623M8azVaMBXwQcUO7owdfsyRW7QoBJ9RVLS2Ok+gw1Qo4ndHWmGPyOw8oLuH7ndL7hJAFHjzDwk1elip9n5OEG00UF8=
+	t=1730421369; cv=none; b=cQqHhkuFff2KZLFqvGNKXB/bBBMWWlwTyaqmBLxTNql16vWqjHWqFSIiyZV8jmr4c4rqseazXWKwAhM0NgCHzFwY8nUZP6QE94G1dO6JX9NkV1LYqfpAEVXYQz+J7yAd6DjTjhY5bZMpviOh/mBKecX8yLdW3sj/PtrI2TG5G30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730419823; c=relaxed/simple;
-	bh=jNxyG945mWZFitSBBl3P/Pi37LkMXgLexJ4MyYO00SI=;
-	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
-	 In-Reply-To:Content-Type; b=niixt4GDyZOaJhLQPm4WH6TUz/iGLymPsIiqnMMwkr3oEasE63SYBaAD30riYeO5lnyXCttuSITXLioQDk0mnya7nO+KkmegbuIHntXgrul3q502Qu7oyVhhu8s5OI6LujHvZGtJnEO+O3msCZSCsI3gbeS9x5gQvY4dhkdXB4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PBjMG6r+; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730419818; x=1761955818;
-  h=message-id:date:mime-version:to:cc:references:subject:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jNxyG945mWZFitSBBl3P/Pi37LkMXgLexJ4MyYO00SI=;
-  b=PBjMG6r+2XgemzvXNiRS/nOv26MvOljajnGdveYrMBpmA1MwWUkwdHpn
-   0LAz0d39k1fVkEsQ+H8ilkocCRFpfEwi+SBZJtFtHrCuccr/i2HbIrzNC
-   Vzn1knGOIQtMoIqaIKI4RHXVOWTcnEdhNS/r/bhbu2U1Xe/JRt25G52Hl
-   o=;
-X-IronPort-AV: E=Sophos;i="6.11,248,1725321600"; 
-   d="scan'208";a="381598034"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 00:10:17 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:3117]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.158:2525] with esmtp (Farcaster)
- id 9403627f-3ea8-485f-95a8-ff158371f477; Fri, 1 Nov 2024 00:10:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 9403627f-3ea8-485f-95a8-ff158371f477
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 1 Nov 2024 00:10:15 +0000
-Received: from [192.168.20.174] (10.106.101.30) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 1 Nov 2024 00:10:12 +0000
-Message-ID: <2233397c-f423-40e3-8546-728b50ce0489@amazon.com>
-Date: Thu, 31 Oct 2024 17:10:11 -0700
+	s=arc-20240116; t=1730421369; c=relaxed/simple;
+	bh=4/HsES9kFB+5RWVONeBQb5LIGIAwtM9s7tgILv01r00=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=L+IUif5Q0TuvHOMv54a+99qOl1KNj0pjmTkJNF++rHbG8YbzVATXKKbOgQATU9tAxok9um0GChG4mE1KbPABbI+t1WFuCHsjQhAYaMN15SrQunriKgHr8dg3axC/cYnHzNpYcLGbmBsYWD2d1n+yxoTefvgDxli9A26HR/OhUg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iCEJHv3h; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730421363; x=1761957363;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=4/HsES9kFB+5RWVONeBQb5LIGIAwtM9s7tgILv01r00=;
+  b=iCEJHv3htS9cGZYQsol6Cq1OQ/5r0z8fsUUobRMSJTuKr6sXJym0xP6j
+   9YP+jYRsrr+7oG+VwtvhNjaJl0bkFenuYs45C+Fd2VO4xb7CRrwDeqt2Q
+   wC7MwQFrQ9t1mOyWWwmFnVkZs2PkH2+yPsJZTv7SybT9w9+tHteHUQzzp
+   97HbzXe2kJRnue5pSRrT8hQdxUul5+bmECBCkbc/n0QdjHMRkuD3oc+2v
+   VhRoG29O0xPb45pFtT1nn40UlXGGQa8QNd7mAfNutJXERFwc/W2vBWVFe
+   1Dh+LNeI6+XMjg3gpmAzbERMGvd/JcP83hhMFrJlJErrzQxzIXtHXuw/2
+   w==;
+X-CSE-ConnectionGUID: 7qAGr9UHRvei75OApQxuow==
+X-CSE-MsgGUID: hh5a38BaRImI6dVWNAM4cw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="17823559"
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="17823559"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 17:36:00 -0700
+X-CSE-ConnectionGUID: lU/xmWc6Rf6/IEEBTUCC7w==
+X-CSE-MsgGUID: t6pVC3efRxGM1eJISQXjNA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="87397819"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 31 Oct 2024 17:35:52 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6fdm-000gtQ-10;
+	Fri, 01 Nov 2024 00:35:50 +0000
+Date: Fri, 1 Nov 2024 08:35:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Farrah Chen <farrah.chen@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Kai Huang <kai.huang@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Subject: [kvm:kvm-coco-queue 116/186] arch/x86/kvm/mmu/tdp_mmu.c:1171:25:
+ sparse: sparse: incorrect type in argument 1 (different address spaces)
+Message-ID: <202411010854.46G4UJpa-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: <roypat@amazon.co.uk>
-CC: <ackerleytng@google.com>, <agordeev@linux.ibm.com>,
-	<aou@eecs.berkeley.edu>, <borntraeger@linux.ibm.com>, <bp@alien8.de>,
-	<catalin.marinas@arm.com>, <chenhuacai@kernel.org>, <corbet@lwn.net>,
-	<dave.hansen@linux.intel.com>, <david@redhat.com>, <derekmn@amazon.com>,
-	<gerald.schaefer@linux.ibm.com>, <gor@linux.ibm.com>, <graf@amazon.com>,
-	<hca@linux.ibm.com>, <hpa@zytor.com>, <jgowans@amazon.com>,
-	<jthoughton@google.com>, <kalyazin@amazon.com>, <kernel@xen0n.name>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<luto@kernel.org>, <mathieu.desnoyers@efficios.com>, <mhiramat@kernel.org>,
-	<mingo@redhat.com>, <palmer@dabbelt.com>, <paul.walmsley@sifive.com>,
-	<pbonzini@redhat.com>, <peterz@infradead.org>, <quic_eberman@quicinc.com>,
-	<rostedt@goodmis.org>, <rppt@kernel.org>, <seanjc@google.com>,
-	<shuah@kernel.org>, <svens@linux.ibm.com>, <tabba@google.com>,
-	<tglx@linutronix.de>, <vannapurve@google.com>, <will@kernel.org>,
-	<x86@kernel.org>, <xmarcalx@amazon.com>
-References: <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 2024-10-31 at 10:42+0000 Patrick Roy wrote:
-> On Thu, 2024-10-31 at 09:50 +0000, David Hildenbrand wrote:
-> > On 30.10.24 14:49, Patrick Roy wrote:
-> >> Most significantly, I've reduced the patch series to focus only on
-> >> direct map removal for guest_memfd for now, leaving the whole "how to do
-> >> non-CoCo VMs in guest_memfd" for later. If this separation is
-> >> acceptable, then I think I can drop the RFC tag in the next revision
-> >> (I've mainly kept it here because I'm not entirely sure what to do with
-> >> patches 3 and 4).
-> >
-> > Hi,
-> >
-> > keeping upcoming "shared and private memory in guest_memfd" in mind, I
-> > assume the focus would be to only remove the direct map for private memory?
-> >
-> > So in the current upstream state, you would only be removing the direct
-> > map for private memory, currently translating to "encrypted"/"protected"
-> > memory that is inaccessible either way already.
-> >
-> > Correct?
->
-> Yea, with the upcomming "shared and private" stuff, I would expect the
-> the shared<->private conversions would call the routines from patch 3 to
-> restore direct map entries on private->shared, and zap them on
-> shared->private.
->
-> But as you said, the current upstream state has no notion of "shared"
-> memory in guest_memfd, so everything is private and thus everything is
-> direct map removed (although it is indeed already inaccessible anyway
-> for TDX and friends. That's what makes this patch series a bit awkward
-> :( )
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
+head:   49c492a89914b02fa5011d9ea9848318c6c98dd9
+commit: 51bdd33b88604316f46202567d29b596721d8823 [116/186] KVM: x86/tdp_mmu: Support mirror root for TDP MMU
+config: x86_64-randconfig-123-20241101 (https://download.01.org/0day-ci/archive/20241101/202411010854.46G4UJpa-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241101/202411010854.46G4UJpa-lkp@intel.com/reproduce)
 
-TDX and SEV encryption happens between the core and main memory, so
-cached guest data we're most concerned about for transient execution
-attacks isn't necessarily inaccessible.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411010854.46G4UJpa-lkp@intel.com/
 
-I'd be interested what Intel, AMD, and other folks think on this, but I
-think direct map removal is worthwhile for CoCo cases as well.
+sparse warnings: (new ones prefixed by >>)
+>> arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:1171:25: sparse:     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
+   include/linux/rcupdate.h:880:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
+   arch/x86/kvm/mmu/tdp_mmu.c:1447:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
 
-Derek
+vim +1171 arch/x86/kvm/mmu/tdp_mmu.c
+
+  1115	
+  1116	static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+  1117					   struct kvm_mmu_page *sp, bool shared);
+  1118	
+  1119	/*
+  1120	 * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  1121	 * page tables and SPTEs to translate the faulting guest physical address.
+  1122	 */
+  1123	int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+  1124	{
+  1125		struct kvm_mmu_page *root = tdp_mmu_get_root_for_fault(vcpu, fault);
+  1126		struct kvm *kvm = vcpu->kvm;
+  1127		struct tdp_iter iter;
+  1128		struct kvm_mmu_page *sp;
+  1129		int ret = RET_PF_RETRY;
+  1130	
+  1131		kvm_mmu_hugepage_adjust(vcpu, fault);
+  1132	
+  1133		trace_kvm_mmu_spte_requested(fault);
+  1134	
+  1135		rcu_read_lock();
+  1136	
+  1137		tdp_mmu_for_each_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
+  1138			int r;
+  1139	
+  1140			if (fault->nx_huge_page_workaround_enabled)
+  1141				disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
+  1142	
+  1143			/*
+  1144			 * If SPTE has been frozen by another thread, just give up and
+  1145			 * retry, avoiding unnecessary page table allocation and free.
+  1146			 */
+  1147			if (is_frozen_spte(iter.old_spte))
+  1148				goto retry;
+  1149	
+  1150			if (iter.level == fault->goal_level)
+  1151				goto map_target_level;
+  1152	
+  1153			/* Step down into the lower level page table if it exists. */
+  1154			if (is_shadow_present_pte(iter.old_spte) &&
+  1155			    !is_large_pte(iter.old_spte))
+  1156				continue;
+  1157	
+  1158			/*
+  1159			 * The SPTE is either non-present or points to a huge page that
+  1160			 * needs to be split.
+  1161			 */
+  1162			sp = tdp_mmu_alloc_sp(vcpu);
+  1163			tdp_mmu_init_child_sp(sp, &iter);
+  1164			if (is_mirror_sp(sp))
+  1165				kvm_mmu_alloc_external_spt(vcpu, sp);
+  1166	
+  1167			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
+  1168	
+  1169			if (is_shadow_present_pte(iter.old_spte)) {
+  1170				/* Don't support large page for mirrored roots (TDX) */
+> 1171				KVM_BUG_ON(is_mirror_sptep(iter.sptep), vcpu->kvm);
+  1172				r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
+  1173			} else {
+  1174				r = tdp_mmu_link_sp(kvm, &iter, sp, true);
+  1175			}
+  1176	
+  1177			/*
+  1178			 * Force the guest to retry if installing an upper level SPTE
+  1179			 * failed, e.g. because a different task modified the SPTE.
+  1180			 */
+  1181			if (r) {
+  1182				tdp_mmu_free_sp(sp);
+  1183				goto retry;
+  1184			}
+  1185	
+  1186			if (fault->huge_page_disallowed &&
+  1187			    fault->req_level >= iter.level) {
+  1188				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+  1189				if (sp->nx_huge_page_disallowed)
+  1190					track_possible_nx_huge_page(kvm, sp);
+  1191				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+  1192			}
+  1193		}
+  1194	
+  1195		/*
+  1196		 * The walk aborted before reaching the target level, e.g. because the
+  1197		 * iterator detected an upper level SPTE was frozen during traversal.
+  1198		 */
+  1199		WARN_ON_ONCE(iter.level == fault->goal_level);
+  1200		goto retry;
+  1201	
+  1202	map_target_level:
+  1203		ret = tdp_mmu_map_handle_target_level(vcpu, fault, &iter);
+  1204	
+  1205	retry:
+  1206		rcu_read_unlock();
+  1207		return ret;
+  1208	}
+  1209	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
