@@ -1,93 +1,88 @@
-Return-Path: <kvm+bounces-30310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87D49B9373
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:38:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB979B9374
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32B59B23709
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 14:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF261C20DCA
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 14:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135BA1AA786;
-	Fri,  1 Nov 2024 14:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE86C1A7271;
+	Fri,  1 Nov 2024 14:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cn2Mnfum"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJIM8CHG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41E71A4F12
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 14:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9539F1531C5
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 14:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730471892; cv=none; b=YOYg90DvIzbg2KKWsNQr9dB7GTJoezytoAIY5ml9/3a2/ByblCpEFIHjNuRBUOpL8oKpJL+qzsIxQxPjPVWHlWfuN8v8e/Hn+H3UBm3G41QQePfP+fXB2WRLsMxgdPPekhwqw/Crx0xS8pSjUVI4aVDSzCks09x2OQ9rDyZUnM4=
+	t=1730471943; cv=none; b=qJLee5RhPFXet+cMPmJukXuOLn9TepLNUtHO3On8ugFLezOv3Fla5oexHXDk9KEunvdgoOsepOhLcFbmTjaRymolSnewn0qRO/cg7DsepF+MSBWpdp3vl/aPshWHxOZsmQZwLNmlGCJRqKkSPSOUQdHXhYlqkIFFZHjTIyvgPqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730471892; c=relaxed/simple;
-	bh=AjV3KOmTQnBtBgqgDRTdiS8Vk+F9jjcQQcys2nNY5GI=;
+	s=arc-20240116; t=1730471943; c=relaxed/simple;
+	bh=Y38QQrJXyIzC27Zb5Y70kq+LVb66PlU9agQi+H5nsOU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=paHEP45bzGswos/iBk3xLioeRccTvm8ecXD0ieM12OcHwW2oUzCYkIpwUv8Yowwr/BkC7Jiaw/QppSwTQ83P8oah5JGH8lJteB8nIEiUN5/8eDWrl3Ksg5DgOoUMPHo9n6jqKlc7ZRpoa5R6zjSDAxDHccQ6RNSXvkZJX/2Vbps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cn2Mnfum; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=lPFB4JEBPDL9oSdfyATc6ppzSrZl4rtxPOaFJD+2D43TazqKaZFzZt/czDOM2sowoG7OtnfDQ3giivOCSLuPaczk3fj8BEalWtmoYVQ0E+MEPOw8viWOx6dJvUo0TAOEHBnctT52r0jRNbFsCBFuf++b+USKFlhygJ3eeDO4k+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RJIM8CHG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730471888;
+	s=mimecast20190719; t=1730471940;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qV7dwY45yM9S1ZYcLQd9U+2DZJRTGxY0iWGmYsPKj1s=;
-	b=cn2MnfumRSuDVm3xnzo+7fcTE/4Ia7hGpr4W3cK0rLQbBvVaz+HW1Vmitr070pzQ2AaZij
-	2SEqvl18kAHXTc1YTEv9vT1PqvzHgmCxg4ExHWFGE71P08dg+7CCZw1h4cryk/EPbiHv5c
-	3WPVkeaKE9UPVIaa4qWGObitKFn0Wvg=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=PjBxXqU+pM0vC60LmXgGLO5qOIRdoqxNpK1lcWYvr1A=;
+	b=RJIM8CHGcrJb9zzANJfsPNeF0DdG9DiNUDZHdLXgP4/iW+6/5s8KFnk+NXtN3lhPy2r9pS
+	wWbnrD8bCTs6Z553SQM0weAS7xwrGlU6AfeQG60jxYuImE/MUG//AqttbqLO/UoIESrKTG
+	X+0nhzxQp2gwh6uyoLMlpl8GqXzNaUk=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-505-trfHUnvIMzuvYCZ5mG3dFQ-1; Fri, 01 Nov 2024 10:38:07 -0400
-X-MC-Unique: trfHUnvIMzuvYCZ5mG3dFQ-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a4da5c5c02so1794235ab.2
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 07:38:07 -0700 (PDT)
+ us-mta-490-3tLGc8e9M029lGWg7i2Cwg-1; Fri, 01 Nov 2024 10:38:59 -0400
+X-MC-Unique: 3tLGc8e9M029lGWg7i2Cwg-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a4f803aa47so1772035ab.3
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 07:38:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730471887; x=1731076687;
+        d=1e100.net; s=20230601; t=1730471938; x=1731076738;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=qV7dwY45yM9S1ZYcLQd9U+2DZJRTGxY0iWGmYsPKj1s=;
-        b=I1Wx9NNmXL78ZIDcHJ3xqHQxauzwtwCm2a693ur/SbjxVqnSk1NMnNP9BrOh42pKyv
-         LKLcgHAG7GKHM4RjM5Ve7h7GmA9FLqgr4pvAnBiYgmTykUZwfHM5Ghun8n0n+tQKdelp
-         92vk5e/AnxHUwFIp/HwaaaqRXJG0rzFseh7RuYjrg/kUrOCv3p/xw3cLXBk/XDQa5JeK
-         kM4L5fvZWyVAlm8ZMWSMPQOZxdAgO9BGthEeSL7RUuKBnxkjH1nCdQLlCMlEEHCMqke/
-         N4Vq+owVvAJV9hWjBQnf2VNKZswaLCC9EnzjvzyVLTcBw9lNipuaVTj7P7mXfQYu+TC4
-         pryQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjnntirA//VyubVa3cyBlEAhgYog1ibZJ8b4cvAieK6TlaKprkYKfnVs15YNKHutTzMLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuBjP/6isqZMPJI09ick5UuJTYEMERh6neuhpASivzsUSBMw31
-	3d4SDgvSSrDx9IXHAqtgC9hKaPyXOl4UZPM/lByLvwX3nXlhcyTL4curJyPERtDi9kUDUXf9IVz
-	rLPsPqfvXHroYp3ncoG7gUbs+3YGiPbuyoTArx7mlVMV5XU9HdQ==
-X-Received: by 2002:a05:6602:2150:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-83b1c62fb00mr540837239f.5.1730471886937;
-        Fri, 01 Nov 2024 07:38:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHXJW/i7LBIXYahlsw8I7b7GzGZ4pKFWW6BKIF/t1yROBU3vqy0nknibGhVjgr7ahX2TXz8DQ==
-X-Received: by 2002:a05:6602:2150:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-83b1c62fb00mr540836139f.5.1730471886606;
-        Fri, 01 Nov 2024 07:38:06 -0700 (PDT)
+        bh=PjBxXqU+pM0vC60LmXgGLO5qOIRdoqxNpK1lcWYvr1A=;
+        b=vCkz2ugx9t69fJOYngvMSAsBjmB94HPCmi1jpdMADX2R3g+yuOOK47giCM/6MJ1kjI
+         F+sZeMBBT3GxnT0gHdmX1uh8jELh0XYVl9S2LpEKyVWxQook33fzts1CHotcTFcn0+rV
+         eCJzwAD3t+EQfs7I3WXuspS81LbNxiIj2wEylHTZ2yMOba8QOrLKcDJ2IBuE4h3GtpPM
+         DxHdMyswWZFE9DfgFCLxsiK8+Ez7neU59HHac1mUXu0jzDiz4bnQdghyezSsCE/8IfBX
+         oZttykK48hxsmt3l9/xrYcrRmzoxqsLxxINOrecYV+Mm05C+M7Pyeef5ZSqcuJ+SrAvn
+         frxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSzK3KXFfqZYz20DwSRpLQibRSlJkGlvGu5ltLIn6OPuGztLFnKab2eVtLGkEpIj/n5po=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyfjfgd5eJ/43QaKmyKC+FBKJWvowh71sFfQmNbGIO13bnBuPhF
+	nGEdqSpEcZY6dd8LYfEVMDyrTOUm2GN9iXbp1Lbldmyix+hwqJClzbLCogfxhKHC8CourzkpiHX
+	vFXVhYBmMuII2+ZlhyrDf/f6M+E5Sr3GUTKJolrj8LLR8j8ELTw==
+X-Received: by 2002:a92:c264:0:b0:3a3:b4ec:b3fe with SMTP id e9e14a558f8ab-3a4ed30ccaamr64455415ab.5.1730471938352;
+        Fri, 01 Nov 2024 07:38:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7nZwd4QYd2Kqt6n+Vk5UKw8q+RJ0a/CtlOIPXX1gGRhLlpcRjOUVpYuIqY4BAyZdXiPM68A==
+X-Received: by 2002:a92:c264:0:b0:3a3:b4ec:b3fe with SMTP id e9e14a558f8ab-3a4ed30ccaamr64455235ab.5.1730471937957;
+        Fri, 01 Nov 2024 07:38:57 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83b67bbe8ddsm83510839f.32.2024.11.01.07.38.05
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de04acaa2csm748195173.172.2024.11.01.07.38.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 07:38:06 -0700 (PDT)
-Date: Fri, 1 Nov 2024 08:38:03 -0600
+        Fri, 01 Nov 2024 07:38:57 -0700 (PDT)
+Date: Fri, 1 Nov 2024 08:38:55 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
- <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
- <zhiw@nvidia.com>, <aniketa@nvidia.com>, <cjia@nvidia.com>,
- <kwankhede@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
- <acurrid@nvidia.com>, <apopple@nvidia.com>, <jhubbard@nvidia.com>,
- <danw@nvidia.com>, <anuaggarwal@nvidia.com>, <mochs@nvidia.com>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 1/1] vfio/nvgrace-gpu: Add a new GH200 SKU to the
- devid table
-Message-ID: <20241101083803.3418d15b.alex.williamson@redhat.com>
-In-Reply-To: <20241013075216.19229-1-ankita@nvidia.com>
-References: <20241013075216.19229-1-ankita@nvidia.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: jgg@ziepe.ca, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ kevin.tian@intel.com, xin.zeng@intel.com, kvm@vger.kernel.org,
+ qat-linux@intel.com, stable@vger.kernel.org, Zijie Zhao <zzjas98@gmail.com>
+Subject: Re: [PATCH] vfio/qat: fix overflow check in qat_vf_resume_write()
+Message-ID: <20241101083855.233afee0.alex.williamson@redhat.com>
+In-Reply-To: <20241021123843.42979-1-giovanni.cabiddu@intel.com>
+References: <20241021123843.42979-1-giovanni.cabiddu@intel.com>
 Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -98,34 +93,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 13 Oct 2024 07:52:16 +0000
-<ankita@nvidia.com> wrote:
+On Mon, 21 Oct 2024 13:37:53 +0100
+Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
 
-> From: Ankit Agrawal <ankita@nvidia.com>
+> The unsigned variable `size_t len` is cast to the signed type `loff_t`
+> when passed to the function check_add_overflow(). This function considers
+> the type of the destination, which is of type loff_t (signed),
+> potentially leading to an overflow. This issue is similar to the one
+> described in the link below.
 > 
-> NVIDIA is planning to productize a new Grace Hopper superchip
-> SKU with device ID 0x2348.
+> Remove the cast.
 > 
-> Add the SKU devid to nvgrace_gpu_vfio_pci_table.
+> Note that even if check_add_overflow() is bypassed, by setting `len` to
+> a value that is greater than LONG_MAX (which is considered as a negative
+> value after the cast), the function copy_from_user(), invoked a few lines
+> later, will not perform any copy and return `len` as (len > INT_MAX)
+> causing qat_vf_resume_write() to fail with -EFAULT.
 > 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> Fixes: bb208810b1ab ("vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices")
+> CC: stable@vger.kernel.org # 6.10+
+> Link: https://lore.kernel.org/all/138bd2e2-ede8-4bcc-aa7b-f3d9de167a37@moroto.mountain
+> Reported-by: Zijie Zhao <zzjas98@gmail.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
 > ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/vfio/pci/qat/main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index a7fd018aa548..a467085038f0 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -866,6 +866,8 @@ static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
->  	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2342) },
->  	/* GH200 480GB */
->  	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2345) },
-> +	/* GH200 SKU */
-> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2348) },
->  	{}
->  };
+> diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
+> index e36740a282e7..1e3563fe7cab 100644
+> --- a/drivers/vfio/pci/qat/main.c
+> +++ b/drivers/vfio/pci/qat/main.c
+> @@ -305,7 +305,7 @@ static ssize_t qat_vf_resume_write(struct file *filp, const char __user *buf,
+>  	offs = &filp->f_pos;
 >  
+>  	if (*offs < 0 ||
+> -	    check_add_overflow((loff_t)len, *offs, &end))
+> +	    check_add_overflow(len, *offs, &end))
+>  		return -EOVERFLOW;
+>  
+>  	if (end > mig_dev->state_size)
 
 Applied to vfio next branch for v6.13.  Thanks,
 
