@@ -1,129 +1,144 @@
-Return-Path: <kvm+bounces-30373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0DA9B989F
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:30:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F3A9B98AC
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEC2BB21F91
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77961C22042
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5ACE1D4177;
-	Fri,  1 Nov 2024 19:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352031D07BC;
+	Fri,  1 Nov 2024 19:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qUlMG2rG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ULkUw9c1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC8C1D3624;
-	Fri,  1 Nov 2024 19:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F144C13B792
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 19:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730489375; cv=none; b=IDDo+HRGl4voe4nJRjXLiK2n+zmwLS2XMm5kcqUKPwhn7C79TGzuURhLda8s43rOY82bF73/rRnEiawfbgZz5X+eBS35q0KHefnKPrLfWGNx6odRzcada0+QIJo9oIg7SU98Wckqpp5NQQr5LGBH1kpvszwWjJQrip31eFM4zwg=
+	t=1730489509; cv=none; b=L2bRuj4ST5slK9/ssJlEDxSwxtvnIVIlVOkRnU3zBnnTsRL11m4qRezeTaca8qBNP2J0kpCrRItqknNsI3zQjgBi3EKeSEIEtlVo2ZTqHCWxBaoG2YQRPoCSC5eUoDJ4hT44/T4woDQOmZo7foHTpmnvCxJvlENcpn5+MqE3k7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730489375; c=relaxed/simple;
-	bh=NjClUgMgjMVgsWcpgKIDByy4IpAOZ+8mqyCzWaNAYPY=;
-	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
-	 In-Reply-To:Content-Type; b=qZzb5G9q73nawQ46Dmc72lbr+eF83bczc8GAozsoCeXBBuVB4HcZTbBoO5HdWLQZUXJk6em6heA+7/nm4K+TGrdAY4/Jg6nBm03WQm2HF+zZ94pHoSynJdrXABbPYX4GTYUMptbqvLwurnDnYey/aGmSam0iGLodPvw+gcjpjaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qUlMG2rG; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1730489509; c=relaxed/simple;
+	bh=Ydtn34bo6yYS/1Yfgke+Vh3SnrVAuJi8koS7bnhJeH8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hEa/nS07N3dnxU5LPo+bTHGWc0OHk5M1Uw710ZGcx3G8zeB5UwGcYFlRyAhtEvpyJvbnVVUMukwnXUXUxUxqTuMf3llGapzux+nv3XLpNNmxQeDjXJePt2KhzIH8RyYi4vaoH4lYguY1CCVPi2491GPJbGrDruUPhMyqxYehyv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ULkUw9c1; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-20cb3d9f5eeso19992865ad.1
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 12:31:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730489373; x=1762025373;
-  h=message-id:date:mime-version:to:cc:references:subject:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NjClUgMgjMVgsWcpgKIDByy4IpAOZ+8mqyCzWaNAYPY=;
-  b=qUlMG2rGHtevMsFv/QioebdbXtzs0FYMASu8+bXlBC8zWGtD5VO5KPOG
-   +gCncqin707RV0fImbtfJ/uF8/+XdalaoeH5R+phCexXly63NwjuRj60Y
-   gxJyeXAXYRNgCMmU5HjMpW/zQ/3THPekndQJiZcVcZ3Pto8gLO348FsGM
-   0=;
-X-IronPort-AV: E=Sophos;i="6.11,250,1725321600"; 
-   d="scan'208";a="1341371"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 19:29:33 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:29829]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.158:2525] with esmtp (Farcaster)
- id 9b6a62cb-9bef-4c52-ac7f-cb4c542891d8; Fri, 1 Nov 2024 19:29:32 +0000 (UTC)
-X-Farcaster-Flow-ID: 9b6a62cb-9bef-4c52-ac7f-cb4c542891d8
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 1 Nov 2024 19:29:32 +0000
-Received: from [192.168.8.242] (10.106.101.33) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 1 Nov 2024 19:29:28 +0000
-Message-ID: <71e9b2c8-0cc4-4646-88f0-7780e108e610@amazon.com>
-Date: Fri, 1 Nov 2024 12:29:23 -0700
+        d=google.com; s=20230601; t=1730489507; x=1731094307; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WbaegUVJNOr9V01yWcgxuLVN1F7S/BsruvWxQD+2AsE=;
+        b=ULkUw9c1VeAQ7mxkprtBvVuvCfsl9s+27Zqy3IIaPdF0mga3qb1aipkMh2Q0sP+nRG
+         2YWkgJzsSXLR4EEtPO52lbgQVb6ToF0JmoayIhX6JzyWWK71FNLeFUjB57NMk0N/ZMlJ
+         XRmFIqow8ucmlo0gG4WaLk99YhTOY9Gq2qAFDSMU9GDwJwCT7hwB7+MLPPzhmzE9cq/B
+         gnXIeofBYNw/zaUBCVB9ztUTRbgiIhm1Lfyw8IdKHX5/JSE1n1SRtmO9XtJ5vEcDPJeB
+         fg1Yrg1nIB0umRlZrpF5sjk6ormsTz6OB/zFD0ZcWi1VSEZIGwKj81PZ7pkZpGStquXq
+         MYGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730489507; x=1731094307;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WbaegUVJNOr9V01yWcgxuLVN1F7S/BsruvWxQD+2AsE=;
+        b=c9pFSghz7ZH/59bgLjfF5Og9uKqgwEqIMsCa01MftlHuJpgn7ZxzFSD4RMUwnBwFdd
+         4ZmympbyTVCr2EXqyxRXxpYaBdEaET9AS88FFcz2z1V26WT5oQi55pPUtOjHYwFvV5kH
+         J9CCYgZEk2Ay3xSrKq+4AE6OH5I3AsE+WH2bIHS0kqBWtVNTc9wI5vNNDRArXesIEyDT
+         oegI6/FMIOqgo7joNlXpjNwAK/mvRaVSv95/CsTppJjyj661kAOU9xFJQaOvDT00DxKu
+         6f67tH2ffKHBW7I9OZlqLLY6Z7qqT7I3NhbGigiCYSNcVFcqY47JQUwTWcOXpe3ZQsVL
+         aqXQ==
+X-Gm-Message-State: AOJu0Yyu4OSLHvNe3xprXYIyoMgyu+rDXHrN1pns7+cQb/vK7Sgy1732
+	RQwN1cZKgtVyx+GrOamni5GmV6xoRl10PBM4pXaepvuRefocAlsiDyFBoSL5qGFzGIXfkPwG7IH
+	9Tw==
+X-Google-Smtp-Source: AGHT+IGrCzXLZqMTXley3z2HFHQYMw38eZK8/faOaOnxAdII/p+rSmb/BjvBGy9Iia9EgQNAqq4VHCZuJRo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:902:aa0c:b0:20c:5beb:9c6a with SMTP id
+ d9443c01a7336-2111946702emr76805ad.4.1730489507177; Fri, 01 Nov 2024 12:31:47
+ -0700 (PDT)
+Date: Fri, 1 Nov 2024 12:31:45 -0700
+In-Reply-To: <173039505052.1508646.12399325550980838662.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: <dave.hansen@intel.com>
-CC: <ackerleytng@google.com>, <agordeev@linux.ibm.com>,
-	<aou@eecs.berkeley.edu>, <borntraeger@linux.ibm.com>, <bp@alien8.de>,
-	<canellac@amazon.at>, <catalin.marinas@arm.com>, <chenhuacai@kernel.org>,
-	<corbet@lwn.net>, <dave.hansen@linux.intel.com>, <david@redhat.com>,
-	<derekmn@amazon.com>, <elena.reshetova@intel.com>,
-	<gerald.schaefer@linux.ibm.com>, <gor@linux.ibm.com>, <graf@amazon.com>,
-	<hca@linux.ibm.com>, <hpa@zytor.com>, <jgowans@amazon.com>,
-	<jthoughton@google.com>, <kalyazin@amazon.com>, <kernel@xen0n.name>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<luto@kernel.org>, <mathieu.desnoyers@efficios.com>, <mhiramat@kernel.org>,
-	<mingo@redhat.com>, <mlipp@amazon.at>, <palmer@dabbelt.com>,
-	<paul.walmsley@sifive.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-	<quic_eberman@quicinc.com>, <rostedt@goodmis.org>, <roypat@amazon.co.uk>,
-	<rppt@kernel.org>, <seanjc@google.com>, <shuah@kernel.org>,
-	<svens@linux.ibm.com>, <tabba@google.com>, <tglx@linutronix.de>,
-	<vannapurve@google.com>, <will@kernel.org>, <x86@kernel.org>,
-	<xmarcalx@amazon.com>
-References: <d467e6bd-c673-415f-8bb0-91603f06498a@intel.com>
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <d467e6bd-c673-415f-8bb0-91603f06498a@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+Mime-Version: 1.0
+References: <20241003234337.273364-1-seanjc@google.com> <173039505052.1508646.12399325550980838662.b4-ty@google.com>
+Message-ID: <ZyUsoew4e3XQQEvr@google.com>
+Subject: Re: [PATCH 00/11] KVM: selftests: AVX support + fixes
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2024-11-01 at 18:43+0000, Dave Hansen wrote:
-> On 11/1/24 11:31, Manwaring, Derek wrote:
-> > From that standpoint I'm still tempted to turn the question around a bit
-> > for the host kernel's perspective. Like if the host kernel should not
-> > (and indeed cannot with TDX controls in place) access guest private
-> > memory, why not remove it from the direct map?
->
-> Pretend that the machine check warts aren't there.
->
-> It costs performance and complexity, for an only theoretical gain.  This
-> is especially true for a VMM that's not doing a just doing confidential
-> guests.  You fracture the direct map to pieces forever (for now).
+On Thu, Oct 31, 2024, Sean Christopherson wrote:
+> On Thu, 03 Oct 2024 16:43:26 -0700, Sean Christopherson wrote:
+> > Enable CR4.OSXSAVE and XCR0.AVX by default when creating selftests vCPUs
+> > in order to play nice with compilers that have been configured to enable
+> > -march=x86-64-v3 by default.
+> > 
+> > While it would be easier to force v2 (or earlier), there are enough tests
+> > that want XCR0 configured that it will (hopefully) be a net postive to
+> > enable all XCR0 features by default.
+> > 
+> > [...]
+> 
+> Applied to kvm-x86 selftests, minus patch 1 which went into 6.12.  At some point
+> in the 6.13 cycle I'll send a revert for the "march" madness.
+> 
+> [01/11] KVM: selftests: Fix out-of-bounds reads in CPUID test's array lookups
+>         (no commit info)
+> [02/11] KVM: selftests: Precisely mask off dynamic fields in CPUID test
+>         https://github.com/kvm-x86/linux/commit/c0124e2e74a7
+> [03/11] KVM: selftests: Mask off OSPKE and OSXSAVE when comparing CPUID entries
+>         https://github.com/kvm-x86/linux/commit/01e2827157ef
+> [04/11] KVM: selftests: Rework OSXSAVE CR4=>CPUID test to play nice with AVX insns
+>         https://github.com/kvm-x86/linux/commit/cf50f01336d3
+> [05/11] KVM: selftests: Configure XCR0 to max supported value by default
+>         https://github.com/kvm-x86/linux/commit/331b8ddaebc1
+> [06/11] KVM: selftests: Verify XCR0 can be "downgraded" and "upgraded"
+>         https://github.com/kvm-x86/linux/commit/d87b459428c0
+> [07/11] KVM: selftests: Drop manual CR4.OSXSAVE enabling from CR4/CPUID sync test
+>         https://github.com/kvm-x86/linux/commit/86502f01b8b9
+> [08/11] KVM: selftests: Drop manual XCR0 configuration from AMX test
+>         https://github.com/kvm-x86/linux/commit/fd7b6d77fa6d
+> [09/11] KVM: selftests: Drop manual XCR0 configuration from state test
+>         https://github.com/kvm-x86/linux/commit/818646fea3ea
+> [10/11] KVM: selftests: Drop manual XCR0 configuration from SEV smoke test
+>         https://github.com/kvm-x86/linux/commit/ce22d24024ea
+> [11/11] KVM: selftests: Ensure KVM supports AVX for SEV-ES VMSA FPU test
+>         https://github.com/kvm-x86/linux/commit/08cc7ab1a6ca
 
-I'm hopeful we'll navigate the complexity in a worthwhile way for the
-non-CoCo case. Assuming we get there and have the option to remove from
-direct map, users with CoCo hardware could choose if they want to do
-both on their host. For me that's a sensible choice, but maybe that's
-just me.
+And because I mucked up the mmu_stress_test/vcpu_get_reg() series and had to yank
+it out, the hashes for this series got changed:
 
-As far as performance, are you talking about just the fracturing or
-something beyond that? The data Mike brought to LSFMMBPF 2023 showed the
-perf impact from direct map fragmentation for memfd_secret isn't "that
-bad" [1].
-
-Derek
-
-
-[1] https://lwn.net/Articles/931406/
+[02/11] KVM: selftests: Precisely mask off dynamic fields in CPUID test
+        https://github.com/kvm-x86/linux/commit/f2c5aa31670d
+[03/11] KVM: selftests: Mask off OSPKE and OSXSAVE when comparing CPUID entries
+        https://github.com/kvm-x86/linux/commit/164cea33bfed
+[04/11] KVM: selftests: Rework OSXSAVE CR4=>CPUID test to play nice with AVX insns
+        https://github.com/kvm-x86/linux/commit/2b9a126a2986
+[05/11] KVM: selftests: Configure XCR0 to max supported value by default
+        https://github.com/kvm-x86/linux/commit/8b14c4d85d03
+[06/11] KVM: selftests: Verify XCR0 can be "downgraded" and "upgraded"
+        https://github.com/kvm-x86/linux/commit/8ae01bf64caa
+[07/11] KVM: selftests: Drop manual CR4.OSXSAVE enabling from CR4/CPUID sync test
+        https://github.com/kvm-x86/linux/commit/3678c7f6114f
+[08/11] KVM: selftests: Drop manual XCR0 configuration from AMX test
+        https://github.com/kvm-x86/linux/commit/d87331890a38
+[09/11] KVM: selftests: Drop manual XCR0 configuration from state test
+        https://github.com/kvm-x86/linux/commit/28439090ece6
+[10/11] KVM: selftests: Drop manual XCR0 configuration from SEV smoke test
+        https://github.com/kvm-x86/linux/commit/3c4c128d02ed
+[11/11] KVM: selftests: Ensure KVM supports AVX for SEV-ES VMSA FPU test
+        https://github.com/kvm-x86/linux/commit/89f8869835e4
 
