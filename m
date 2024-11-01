@@ -1,90 +1,98 @@
-Return-Path: <kvm+bounces-30300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B122E9B9110
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 13:19:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385449B912E
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 13:35:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B290B20EDC
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 12:19:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15D7282BB8
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 12:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4F019D8BE;
-	Fri,  1 Nov 2024 12:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBHuxN/p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1014919E826;
+	Fri,  1 Nov 2024 12:35:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA65AC13C;
-	Fri,  1 Nov 2024 12:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6E022097
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 12:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730463539; cv=none; b=UJmUOXmKJYhUMtY/lR5P39HCvv3ppCjp2OzGVdVSuZW0XbgwAfo0bNsZLfxhPUuZONyhv9ojjrNvACyRESoEAqK4u5/WRz7YfEQHlW99KAMsZf5PuujbfdCxGksNuyilyo7VI8gA1KDuSm2ZrN0/LV+cf4fTnl6FUOPPvo/jrMQ=
+	t=1730464525; cv=none; b=BupxqulZ7vEgplnmWENi538Mcwwv1osqWMDT6v6f/2DN7xbjWJSSZeZdsbInKcGBPIp7pWeNsxTjpFzUbgoo1X4oqFN9NU3r8s9+/J9NMom8ozZgDrIzpe7FX8y8i7yG+hgNiwiFBjVrfkYlChCfZKi9b2ujBHgi5PczTUOxedQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730463539; c=relaxed/simple;
-	bh=+HDgzWKsUKx97E2mppbNA0tlv52sTXzgPdKbp7JsyHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EH2rRfi0EVqj+A25Al8Cs4RadLaY5Mwo+rAtJk0k7yCbJibz+5efhSdUp+sm4EIlz9iFL6EKrg7ePdZzcVxYPRiAHy3ubbGJQfxakjUF/x0zSlratMsvqdmDAINZ9WztHTaP9zWGYK1lOI2P3N3geBXw/q+QUJfG71BB4acM2D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBHuxN/p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C80BC4CECD;
-	Fri,  1 Nov 2024 12:18:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730463539;
-	bh=+HDgzWKsUKx97E2mppbNA0tlv52sTXzgPdKbp7JsyHc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NBHuxN/pAPf8IHixhryTxZ/futb2LvKpXXCyR/SW5uqdlFGHVLyrlBC+FoDgxJK/8
-	 BXZ1Fn1ywsP56K2duT3rd3UI+AOCVdZmtR/HykfvCUXf3jv+5ZNKavkqEnCI4LKVwF
-	 LRMnqS48aXxmJsDs31Z4xPwsC+bm4UTb7nLroxbppw7andSl//KM3oM0Tk4BPncaBZ
-	 w1Qs2YqwVqIpnwUXRzbOyRf6LMKWgSiY+Z1kSvOokZF2WryjywWEbsMTi0AdGzTtx3
-	 DxocfHC4sNGzai1qJLidnKNIKvKXS5sFlWCK6RoNSgw6FiIuVJ2TXQJsams+pxngiG
-	 /RIoyXXF0y6rQ==
-Date: Fri, 1 Nov 2024 12:18:50 +0000
-From: Will Deacon <will@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Hanjun Guo <guohanjun@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Jerry Snitselaar <jsnitsel@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
-Message-ID: <20241101121849.GD8518@willie-the-truck>
-References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+	s=arc-20240116; t=1730464525; c=relaxed/simple;
+	bh=HVB5/NVaiKyBGPvEmmfY/c7p0v/zE5OlN6CpY3SZbBY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZODiQkbN14MkdAujckt6jV4oJ6GvBL/ucG4qDGKME7A+KSDN685CfFwWLuNc3o7eUthuNqZZqloMF3oxXKWamhy1AhpIbY+bvlPmSzhrFCp0O2IhvTmGoNY3J5ucycZ5gBZx8gp9k1qwD87ukCI14bumdnlKP3e1g999ie4WKI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-83aac7e7fd7so187667639f.0
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 05:35:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730464523; x=1731069323;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AqxBdgu2xZeKw4i6FxiYHpI4dVZ37OtghOrpbdMwysQ=;
+        b=wDE6D/2fqgQoZYNOQGWk2uxW5R+Psor/PZLjGlEIk8G8FSNat5XxirkMT1UzI+T/lx
+         an0t+oYPa0s+tZZgLkHpA1U9kbQ5AXqndFaixLUAFtNATqBymM9dzNd32IF/PmpM2/Xl
+         ivDxRItHreo0nGac8r6i/zCSGe00wDoX6vCxo59YopNzyFuI32JckTLmGE6SoUS2q31t
+         D68Bf3gCh0Z1ZkzCgazzndNRAb1yKyIqMuFqw/oFoNwxhlywo2wEDgxFkmMWiOO43nhS
+         wadzf3CZulMq1t4yyWVx9C/YSJwtyPyFRnWt+cq8W+tOjJVN14/cDy4NsqR3UsM7N6u5
+         vS9Q==
+X-Gm-Message-State: AOJu0YwlgfGqkv7Ib4DPoBZp3/PqFkYS1L1DJVdQdxw2N3cxMGsbPiZA
+	8cuxDtLndGotshZ6nt6Gs3zy1oNJkUV4ZwTWaN3hwgoXI5KCf9j0WV4JZt/AID7YtaLG4EoJGNf
+	sQdSKxGUKA9lgSp1XF33xJp3aQSPvR5yCB2JbT03vs9LfDw9ZehTmvWc=
+X-Google-Smtp-Source: AGHT+IFIPth4ymIAQm9ibhbpxBXVRYZLXve0lYxevJygCkAGVPrqxwfn7PPjFPvflXzq1Zwov5RsoyfEpkNAg6sKsITuofe+kgCR
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Received: by 2002:a92:c54e:0:b0:3a3:f95f:2dd with SMTP id
+ e9e14a558f8ab-3a4ed2e0656mr273595655ab.19.1730464522993; Fri, 01 Nov 2024
+ 05:35:22 -0700 (PDT)
+Date: Fri, 01 Nov 2024 05:35:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6724cb0a.050a0220.529b6.00fe.GAE@google.com>
+Subject: [syzbot] Monthly kvm report (Nov 2024)
+From: syzbot <syzbot+list69ba935a6501a18718ab@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 30, 2024 at 09:20:44PM -0300, Jason Gunthorpe wrote:
-> [This is now based on Nicolin's iommufd patches for vIOMMU and will need
-> to go through the iommufd tree, please ack]
+Hello kvm maintainers/developers,
 
-Can't we separate out the SMMUv3 driver changes? They shouldn't depend on
-Nicolin's work afaict.
+This is a 31-day syzbot report for the kvm subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/kvm
 
-Will
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 3 issues are still open and 125 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 147     Yes   WARNING in handle_exception_nmi (2)
+                  https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
+<2> 3       Yes   WARNING in vcpu_run
+                  https://syzkaller.appspot.com/bug?extid=1522459a74d26b0ac33a
+<3> 1       No    WARNING in kvm_put_kvm (2)
+                  https://syzkaller.appspot.com/bug?extid=4f8d3ac3727ffc0ecd8a
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
