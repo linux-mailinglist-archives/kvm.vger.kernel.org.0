@@ -1,72 +1,77 @@
-Return-Path: <kvm+bounces-30316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8C89B9490
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:39:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4909E9B949C
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:41:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 033941F21D5A
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1669928200F
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A14D1C876F;
-	Fri,  1 Nov 2024 15:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860C51C6F70;
+	Fri,  1 Nov 2024 15:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PClTnFcd"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LgLRdBuU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FEC1ADFE8
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 15:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4ED425634;
+	Fri,  1 Nov 2024 15:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730475542; cv=none; b=qRsLHYJwSMJOTePxF7xtMooP+eBXrhxcGl+ytWMc+yQByQrxBvKXQkYSsHZVy4QCVmMbV0qaxMfhctIu1rCgH0/mm8Y8DSuQOrtbXbHgJpLbQeo8F+mQgSaHZfz0piEv9oGqQuKwxZTxqAV6LQlfiWt+8awTl9jvkJXbCj1bZCw=
+	t=1730475683; cv=none; b=ndck7yUjTy0dkjUjZjmVwFUdKH36Z1T6XrmCmJ+d/Qd7SISKyqhhOiEvRPsbkTlDZ29I+9k9yUExTpiWP1t6E/oNtJDKUzty7Hz3NdcOjGPigbjl4JhqiIXwhoBHv7zuJibyjTDAsxWwJw+hkI0c8LsvSTF02dtHqTRYPMpAZaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730475542; c=relaxed/simple;
-	bh=MGpG9+U1NcrPw89BaqJoGGpatnrkgpDjLgz7qBB/IOc=;
+	s=arc-20240116; t=1730475683; c=relaxed/simple;
+	bh=cGmqoPAClduOyOt6XXt32hAdlqVHl7u7myhZia60Ugs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HmqBwBTsKlWy8jkVoO4ZgI8VwuLrJ1C5+SkFEDyAdsHrPw4aTXApwOr4JHQyfZ+6Xs45DbnSQk0m2aKEHDHDHyqV8LdJh890voDwxWixRm5ECWNF4XoW7BLJGcOH+5dR9RvfBvcvumS3/p/rgUhsT836VbihgMys3VlaMYYBwmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PClTnFcd; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 1 Nov 2024 08:38:48 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730475537;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MDBDtrud5eJtuuxZyPOJXE2RSRr8v+TyeHi88AUx8RA=;
-	b=PClTnFcdIrcZ78W4jSshcODMfnNiSvNFtWKdgQXgVaJZCwGgQF3dDPomr/MvL2yA9B2Cwx
-	sIxnO1FBfdPS2fhSPK5ZXdGtgALWc9G1JWP6xyny1RXUjNkwgAnqURsd9JAi0B3Jon4w0B
-	kiA/rkElVf8i8EK1b4eQnPfLrgKPky8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bpK0tIEtzNEc1Xwx9EOVBa8JnWIqYvU6tZ+YRyZpUYxuX/AM+JM8QUZ5/xSbsmTYNGXtD0NtkeFboGhurqy6QOXxfQ44GYiwA6O0rYAxsQlPtSJ9tI+ayQk8lJVcmaR96P2Fka4a+YeLQch502/kEpIhnhdTVfRtGHBVovaxebk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LgLRdBuU; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C161240E0219;
+	Fri,  1 Nov 2024 15:41:11 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id oFcti8NUH9nU; Fri,  1 Nov 2024 15:41:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730475666; bh=2WQgbUYhsxZ+e+B0X/oet6pigceEqqN6jbulC7IX3jw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LgLRdBuU00QFUL5OUFiav9RxkYTc4r1N/GUtn/dy3eEubIYz1dzPFqfLtERNlrQQT
+	 ombbZqBKAUiwrieogPIRiMRqDptPe1DBw1c9E+/PZ571gYY9yVPFqE9yAOrpM66Z3s
+	 lhsLVvRWcMP3C5odi0ja+do3IZk1Lr9242aKCqzPWKrtGV5yTFLmkF7RR9W1QKL+Dp
+	 o5aNr4JmBrLgU9+U9GWNEt/hUU2fwUOmVLh9+54YlYq7SbZVZCd0IM+qh4vEiwS6AF
+	 CIhB5ONLTjcGqDAq6VhiBKQoNIihFGEilxJeDXjQ+l73at/CA1ul/WyoKW5T2ikjPb
+	 RQFdqRHmVgCo+nbGu+R/KmJ//C4XYXqWqmhi3+QpEHBQtTwpcsoi2hRafkfemYLx0z
+	 Yd8RycqAVdppVHV9KtlesRene4pmChgA+Gp7giOEROKy3tjjHSDDw4aVLpS2lDtJ02
+	 73Nfm+Kcj2Xt71nXGNdrbFm19UW+bfzvES6CzEBTIFZ/pxnijYT5+LradCpESturvM
+	 WeoaeJMnJ6CTyFwapQL9lNmIjuilu1hlp7oDPiNjnVNu+JQbHwW2O3lX28ynp/ANJ2
+	 BFwk2AyBpNb09mz6dHEe3iS6fwF9WZuC7euNunangNTchn8fbIuWmVsFlddSLNghlH
+	 /8iqJRLE4m8b0N6yYEr/x/O8=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5D44340E015F;
+	Fri,  1 Nov 2024 15:40:52 +0000 (UTC)
+Date: Fri, 1 Nov 2024 16:40:51 +0100
+From: Borislav Petkov <bp@alien8.de>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Andrew Jones <ajones@ventanamicro.com>,
-	James Houghton <jthoughton@google.com>,
-	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
-Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
- vcpu_get_reg() instead of using an out-param
-Message-ID: <ZyT2CB6zodtbWEI9@linux.dev>
-References: <20241009154953.1073471-1-seanjc@google.com>
- <20241009154953.1073471-4-seanjc@google.com>
- <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
- <ZyTpwwm0s89iU9Pk@google.com>
+Cc: kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+	dave.hansen@linux.intel.com, hpa@zytor.com, jpoimboe@kernel.org,
+	kai.huang@intel.com, linux-kernel@vger.kernel.org, mingo@redhat.com,
+	pawan.kumar.gupta@linux.intel.com, pbonzini@redhat.com,
+	sandipan.das@amd.com, tglx@linutronix.de, x86@kernel.org
+Subject: Re: [PATCH v5 0/4] Distinguish between variants of IBPB
+Message-ID: <20241101153857.GAZyT2EdLXKs7ZmDFx@fat_crate.local>
+References: <20241011214353.1625057-1-jmattson@google.com>
+ <173039500211.1507616.16831780895322741303.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,66 +80,19 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZyTpwwm0s89iU9Pk@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <173039500211.1507616.16831780895322741303.b4-ty@google.com>
 
-Hey,
+On Thu, Oct 31, 2024 at 12:51:33PM -0700, Sean Christopherson wrote:
+> [1/4] x86/cpufeatures: Clarify semantics of X86_FEATURE_IBPB
+>       https://github.com/kvm-x86/linux/commit/43801a0dbb38
+> [2/4] x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
+>       https://github.com/kvm-x86/linux/commit/99d252e3ae3e
 
-On Fri, Nov 01, 2024 at 07:48:00AM -0700, Sean Christopherson wrote:
-> On Fri, Nov 01, 2024, Mark Brown wrote:
-> > On Wed, Oct 09, 2024 at 08:49:42AM -0700, Sean Christopherson wrote:
-> > > Return a uint64_t from vcpu_get_reg() instead of having the caller provide
-> > > a pointer to storage, as none of the vcpu_get_reg() usage in KVM selftests
-> > > accesses a register larger than 64 bits, and vcpu_set_reg() only accepts a
-> > > 64-bit value.  If a use case comes along that needs to get a register that
-> > > is larger than 64 bits, then a utility can be added to assert success and
-> > > take a void pointer, but until then, forcing an out param yields ugly code
-> > > and prevents feeding the output of vcpu_get_reg() into vcpu_set_reg().
-> > 
-> > This commit, which is in today's -next as 5c6c7b71a45c9c, breaks the
-> > build on arm64:
-> > 
-> > aarch64/psci_test.c: In function ‘host_test_system_off2’:
-> > aarch64/psci_test.c:247:9: error: too many arguments to function ‘vcpu_get_reg’
-> >   247 |         vcpu_get_reg(target, KVM_REG_ARM_PSCI_VERSION, &psci_version);
-> >       |         ^~~~~~~~~~~~
-> > In file included from aarch64/psci_test.c:18:
-> > include/kvm_util.h:705:24: note: declared here
-> >   705 | static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64_t id)
-> >       |                        ^~~~~~~~~~~~
-> > At top level:
-> > cc1: note: unrecognized command-line option ‘-Wno-gnu-variable-sized-type-not-at
-> > -end’ may have been intended to silence earlier diagnostics
-> > 
-> > since the updates done to that file did not take account of 72be5aa6be4
-> > ("KVM: selftests: Add test for PSCI SYSTEM_OFF2") which has been merged
-> > in the kvm-arm64 tree.
-> 
-> Bugger.  In hindsight, it's obvious that of course arch selftests would add usage
-> of vcpu_get_reg().
-> 
-> Unless someone has a better idea, I'll drop the series from kvm-x86, post a new
-> version that applies on linux-next, and then re-apply the series just before the
-> v6.13 merge window (rinse and repeat as needed if more vcpu_get_reg() users come
-> along).
-
-Can you instead just push out a topic branch and let the affected
-maintainers deal with it? This is the usual way we handle conflicts
-between trees...
-
-> That would be a good oppurtunity to do the $(ARCH) directory switch[*] too, e.g.
-> have a "selftests_late" or whatever topic branch.
-
-The right time to do KVM-wide changes (even selftests) is *early* in the
-development cycle, not last minute. It gives us plenty of time to iron out
-the wrinkles.
-
-> Sorry for the pain Mark, you've been playing janitor for us too much lately.
-
-+1, appreciate your help on this.
+ff898623af2e ("x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET")
 
 -- 
-Thanks,
-Oliver
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
