@@ -1,298 +1,125 @@
-Return-Path: <kvm+bounces-30329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0700B9B9582
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:35:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D377C9B9594
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:37:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B974028115E
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:35:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 102A01C21C0F
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EACA1C876F;
-	Fri,  1 Nov 2024 16:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B211CB506;
+	Fri,  1 Nov 2024 16:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uh05FzQo"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1991A2562;
-	Fri,  1 Nov 2024 16:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0EB381BA;
+	Fri,  1 Nov 2024 16:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730478912; cv=none; b=rGvPh4x/t7P+jxrdabSycaCX9GrMa3RRChxxXotpvshkdPm2DDsBvCDG9Zgdf3t3cStSUtqYFhLkshDaMFLf7Qa5QMnkjL60p6eGTkNlm38DpIO791fqKOAAliVH608FeOEJyOSk/p/3t0QW9JQ0DzwxhfBForfXO+rT/6YS7E8=
+	t=1730479036; cv=none; b=t7QzkcZbMOHskaWhlD7kSGxppFQS94EDbKGmMphJ2UyJhC2z9gcfyZojodAOWogu2cIi3EdQODe4ErGM2SNKD4ZQheMGO2RT7FPAWOHNrj2sbH5vYUWwULjdD93XXjDwATD9WOso60LiA63wu3EfqIO1hOtejNEn6vxK/8b4Jmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730478912; c=relaxed/simple;
-	bh=o46VcC1mKK5Q/DGJ86Np2D51az0KeT7BhewSv58MrLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PMTFRtMLafkZ1GSJ115Iz2f+ZtPMv9jndpuhxzMFdCC2WplPueCcTwPJkByqBPQ7M3rHW/aTF2tx5eo0c5+1kD/cNnaDrFkcFCG5bRiVBYi1JdEeOE6nOWTi4iqDVCLHgTv4r7DgFUAosRZhi4uH9oAjoE1xwdALIptSvccv78Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3815FEC;
-	Fri,  1 Nov 2024 09:35:37 -0700 (PDT)
-Received: from [10.1.33.21] (e122027.cambridge.arm.com [10.1.33.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27FBA3F73B;
-	Fri,  1 Nov 2024 09:35:02 -0700 (PDT)
-Message-ID: <5e23ce30-494b-43a5-9514-7701e799e49b@arm.com>
-Date: Fri, 1 Nov 2024 16:35:00 +0000
+	s=arc-20240116; t=1730479036; c=relaxed/simple;
+	bh=9cb/qIM5GkNHvDl4cwky8lRENEhP+MSleP+ED061UOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jysNCS2S0+eq+ClBZRivGNwmwIWPHGk/34JBNWNZUtm91Yui4X3iCrurrkeOgG7CDkZeOiJ7qBZn1590X7rwtRLgBAhJ9hFMkokzOPcqcizQgOcyxlSa2hpQOWAlf/8mqmEFMUQZnwhZJOmcE3yKecqVksN8XtGW00r0unIO7i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uh05FzQo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A122C4CED1;
+	Fri,  1 Nov 2024 16:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730479036;
+	bh=9cb/qIM5GkNHvDl4cwky8lRENEhP+MSleP+ED061UOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uh05FzQohbCjpLPYZYiml+DBPG180jE/ft2iaztx7zdHObx0fRlIrEPAlxioA9rcz
+	 +wRvnqqNwgJRpMWjOOmxtuVVbeAR9g9B99Ox8qTevpgx21JJfi5ND/9pWsI1Hx4YbZ
+	 sxEV8RuzAEdsYosylUirvfywlml0oXIHTeeNsym6IuCQkG6u+VKwfIP0ZhN/Hotfni
+	 xvUDHx0/XqGHacfhf/JuOQaMcZZey97NEHMW2czpefWD6Ky/KG7q0rlhrN68zqQxr7
+	 BHs8TYKpiWOzhi0byj6MM09cFWw7TBIiArMsOybXd66+nsfTVQGGQFFWa3H6C8JZNa
+	 u2/RrSX9ce07g==
+Date: Fri, 1 Nov 2024 16:37:09 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Jones <ajones@ventanamicro.com>,
+	James Houghton <jthoughton@google.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
+Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
+ vcpu_get_reg() instead of using an out-param
+Message-ID: <0bd90020-4175-48f9-9017-2eb6073101d0@sirena.org.uk>
+References: <20241009154953.1073471-1-seanjc@google.com>
+ <20241009154953.1073471-4-seanjc@google.com>
+ <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
+ <ZyTpwwm0s89iU9Pk@google.com>
+ <ZyT2CB6zodtbWEI9@linux.dev>
+ <ZyT61FF0-g8gKZfc@google.com>
+ <ZyT9rSnLcDWkWoL_@linux.dev>
+ <ZyT-6iCNlA1VSAV3@google.com>
+ <ZyUARgGV4G6DOrRL@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 13/43] arm64: RME: RTT tear down
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-14-steven.price@arm.com>
- <a4dc1efc-8202-4440-8106-cf475da1a7d5@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <a4dc1efc-8202-4440-8106-cf475da1a7d5@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6kYfSRqCQpL5xm5l"
+Content-Disposition: inline
+In-Reply-To: <ZyUARgGV4G6DOrRL@linux.dev>
+X-Cookie: We read to say that we have read.
 
-On 15/10/2024 12:25, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 04/10/2024 16:27, Steven Price wrote:
->> The RMM owns the stage 2 page tables for a realm, and KVM must request
->> that the RMM creates/destroys entries as necessary. The physical pages
->> to store the page tables are delegated to the realm as required, and can
->> be undelegated when no longer used.
->>
->> Creating new RTTs is the easy part, tearing down is a little more
->> tricky. The result of realm_rtt_destroy() can be used to effectively
->> walk the tree and destroy the entries (undelegating pages that were
->> given to the realm).
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v2:
->>   * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
->>     later patch when they are actually used.
->>   * Some simplifications now rmi_xxx() functions allow NULL as an output
->>     parameter.
->>   * Improved comments and code layout.
->> ---
->>   arch/arm64/include/asm/kvm_rme.h |  19 ++++++
->>   arch/arm64/kvm/mmu.c             |   6 +-
->>   arch/arm64/kvm/rme.c             | 113 +++++++++++++++++++++++++++++++
->>   3 files changed, 135 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h
->> b/arch/arm64/include/asm/kvm_rme.h
->> index bd306bd7b64b..e5704859a6e5 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -76,5 +76,24 @@ u32 kvm_realm_ipa_limit(void);
->>   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->>   int kvm_init_realm_vm(struct kvm *kvm);
->>   void kvm_destroy_realm(struct kvm *kvm);
->> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
->> +
->> +#define RME_RTT_BLOCK_LEVEL    2
->> +#define RME_RTT_MAX_LEVEL    3
->> +
->> +#define RME_PAGE_SHIFT        12
->> +#define RME_PAGE_SIZE        BIT(RME_PAGE_SHIFT)
->> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
->> +#define RME_RTT_LEVEL_SHIFT(l)    \
->> +    ((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
->> +#define RME_L2_BLOCK_SIZE    BIT(RME_RTT_LEVEL_SHIFT(2))
->> +
->> +static inline unsigned long rme_rtt_level_mapsize(int level)
->> +{
->> +    if (WARN_ON(level > RME_RTT_MAX_LEVEL))
->> +        return RME_PAGE_SIZE;
->> +
->> +    return (1UL << RME_RTT_LEVEL_SHIFT(level));
->> +}
->>     #endif
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index d4ef6dcf8eb7..a26cdac59eb3 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1054,17 +1054,17 @@ void stage2_unmap_vm(struct kvm *kvm)
->>   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->>   {
->>       struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->> -    struct kvm_pgtable *pgt = NULL;
->> +    struct kvm_pgtable *pgt;
->>         write_lock(&kvm->mmu_lock);
->> +    pgt = mmu->pgt;
->>       if (kvm_is_realm(kvm) &&
->>           (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
->>            kvm_realm_state(kvm) != REALM_STATE_NONE)) {
->> -        /* Tearing down RTTs will be added in a later patch */
->>           write_unlock(&kvm->mmu_lock);
->> +        kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
->>           return;
->>       }
->> -    pgt = mmu->pgt;
->>       if (pgt) {
->>           mmu->pgd_phys = 0;
->>           mmu->pgt = NULL;
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index f6430d460519..7db405d2b2b2 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -125,6 +125,119 @@ static int realm_create_rd(struct kvm *kvm)
->>       return r;
->>   }
->>   +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
->> +                 int level, phys_addr_t *rtt_granule,
->> +                 unsigned long *next_addr)
->> +{
->> +    unsigned long out_rtt;
-> 
-> minor nit: You could drop the local variable out_rtt.
 
-I could, but I was trying to avoid assuming that phys_addr_t was
-compatible with unsigned long - i.e. I don't want to do the type-punning
-to pass rtt_granule straight into rmi_rtt_destroy(). I would expect the
-compiler will inline this function and get rid of the temporary.
+--6kYfSRqCQpL5xm5l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->> +    int ret;
->> +
->> +    ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
->> +                  &out_rtt, next_addr);
->> +
->> +    *rtt_granule = out_rtt;
->> +
->> +    return ret;
->> +}
->> +
->> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
->> +                     unsigned long start, unsigned long end)
->> +{
->> +    ssize_t map_size;
->> +    unsigned long addr, next_addr;
->> +
->> +    if (WARN_ON(level > RME_RTT_MAX_LEVEL))
->> +        return -EINVAL;
->> +
->> +    map_size = rme_rtt_level_mapsize(level - 1);
->> +
->> +    for (addr = start; addr < end; addr = next_addr) {
->> +        phys_addr_t rtt_granule;
->> +        int ret;
->> +        unsigned long align_addr = ALIGN(addr, map_size);
->> +
->> +        next_addr = ALIGN(addr + 1, map_size);
->> +
->> +        if (next_addr > end || align_addr != addr) {
->> +            /*
->> +             * The target range is smaller than what this level
->> +             * covers, recurse deeper.
->> +             */
->> +            ret = realm_tear_down_rtt_level(realm,
->> +                            level + 1,
->> +                            addr,
->> +                            min(next_addr, end));
->> +            if (ret)
->> +                return ret;
->> +            continue;
->> +        }
->> +
->> +        ret = realm_rtt_destroy(realm, addr, level,
->> +                    &rtt_granule, &next_addr);
->> +
->> +        switch (RMI_RETURN_STATUS(ret)) {
->> +        case RMI_SUCCESS:
->> +            if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
->> +                free_page((unsigned long)phys_to_virt(rtt_granule));
->> +            break;
->> +        case RMI_ERROR_RTT:
->> +            if (next_addr > addr) {
->> +                /* Missing RTT, skip */
->> +                break;
->> +            }
->> +            if (WARN_ON(RMI_RETURN_INDEX(ret) != level))
->> +                return -EBUSY;
->> +            /*
->> +             * We tear down the RTT range for the full IPA
->> +             * space, after everything is unmapped. Also we
->> +             * descend down only if we cannot tear down a
->> +             * top level RTT. Thus RMM must be able to walk
->> +             * to the requested level. e.g., a block mapping
->> +             * exists at L1 or L2.
->> +             */
-> 
-> This comment really applies to the if (RMI_RETURN_INDEX(ret) != level)
-> check above. Please move it up.
+On Fri, Nov 01, 2024 at 09:22:30AM -0700, Oliver Upton wrote:
+> On Fri, Nov 01, 2024 at 09:16:42AM -0700, Sean Christopherson wrote:
 
-Good spot.
+> > One thing I'll add to my workflow would be to do a local merge (and smoke test)
+> > of linux-next into kvm-x86 next before pushing it out.  This isn't the only snafu
+> > this cycle where such a sanity check would have saved me and others a bit of pain.
 
-> With that :
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
+> Eh, shit happens, that's what -next is for :)
 
-Thanks,
-Steve
+> The only point I wanted to make was that it is perfectly fine by me to
+> spread the workload w/ a topic branch if things blow up sometime after
+> your changes show up in -next.
 
-> 
-> 
-> 
->> +            if (WARN_ON(level == RME_RTT_MAX_LEVEL))
->> +                return -EBUSY;    > +
->> +            /*
->> +             * The table has active entries in it, recurse deeper
->> +             * and tear down the RTTs.
->> +             */
->> +            next_addr = ALIGN(addr + 1, map_size);
->> +            ret = realm_tear_down_rtt_level(realm,
->> +                            level + 1,
->> +                            addr,
->> +                            next_addr);
->> +            if (ret)
->> +                return ret;
->> +            /*
->> +             * Now that the child RTTs are destroyed,
->> +             * retry at this level.
->> +             */
->> +            next_addr = addr;
->> +            break;
->> +        default:
->> +            WARN_ON(1);
->> +            return -ENXIO;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static int realm_tear_down_rtt_range(struct realm *realm,
->> +                     unsigned long start, unsigned long end)
->> +{
->> +    return realm_tear_down_rtt_level(realm, get_start_level(realm) + 1,
->> +                     start, end);
->> +}
->> +
->> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits)
->> +{
->> +    struct realm *realm = &kvm->arch.realm;
->> +
->> +    WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
->> +}
->> +
->>   /* Protects access to rme_vmid_bitmap */
->>   static DEFINE_SPINLOCK(rme_vmid_lock);
->>   static unsigned long *rme_vmid_bitmap;
-> 
+Yeah, the -next breakage is a bit annoying but so long as it gets fixed
+promptly it's kind of what it's there for.  It's much more of an issue
+when things make it into mainline, and can be very problematic if it
+makes it into a tagged -rc (especially -rc1) or something.
 
+--6kYfSRqCQpL5xm5l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmclA7QACgkQJNaLcl1U
+h9Diegf/bQqyrBGdbW3sZYLGgcu7GKElqVo35sLnznNUwNVBjwT3ED3phcFvs0e+
+ykVAaeCQQQhw8p45KLci5zxYxGlymTW+lThmUSLbxAAiqZEOaP/nVcS+aKw+iS2a
+2nVXVegHJ0RXjxyupuOHJ5fEyCjnr46tPbW4Ok3W3cGrEvAhEsFqB5K9leegPLwn
+XZBPXERi3tAFS1Y57FBz9EjPLijPil2knc3/sEapi/7kjV7mZ9ahYYkscl88Fmms
+8lH1QX/Im7iQ0ayGvSFRd+o6AnCeN/vI8aGInfytJwchPrlKxDKDYlOPd6uRBj86
+6F4W4ExH23evr6zeMxhiNHXMyGbMqg==
+=KB5M
+-----END PGP SIGNATURE-----
+
+--6kYfSRqCQpL5xm5l--
 
