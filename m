@@ -1,304 +1,137 @@
-Return-Path: <kvm+bounces-30341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267D79B9792
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:32:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DDB9B979F
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC67A1F23260
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:32:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B3EC1C215EF
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8811CEAAC;
-	Fri,  1 Nov 2024 18:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2561A0BE7;
+	Fri,  1 Nov 2024 18:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bSaQCnj1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j+Ah9SCV"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2063.outbound.protection.outlook.com [40.107.237.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E316146592;
-	Fri,  1 Nov 2024 18:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730485963; cv=fail; b=VsBfNMUpNbkaEMKQUDCwGY9gz7RakP15JMitr66KLdYt4AugOQi4+lVuRz0zjfBKBqfA+jGq5uww5trdv8nVpLUrkkC7vgaE9A0EppWsRn2b0NgtJ7SBvj16Y3SYFskKObvKg6fY2GMIZS+GgamhMNZLBYgQqFg4Dna6HmEWPAU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730485963; c=relaxed/simple;
-	bh=Aup3PSJBD1eZa9AMaYt6WUm8gJPcPV991GVjA/KLB9M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PtLnOJifj2/KPH+vYOS1OvlR/b0guAGgCRI1n6q0wTeENjr7QwEm/I6XWV3TI4n6hxLAgSwXXb1ivkuSKD/QXXo+6Bgi1Vm60S+tl1+wWWWxveKD+KXZKPPsU9uorE+2gXTACfovAUhJsUMrpTIBgjPoN6fmtoyY3cke7nxLvKA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bSaQCnj1; arc=fail smtp.client-ip=40.107.237.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eRZVlR5j3hqtxRQYeFXTSErUvx1RRubGlDVNTvEjEntIacgQ6BJLn9ArXKrJwTl3k7Ay5k1oUjnfNARhOmnYY9nHkmrjCRJ8abixZiCoizVVY8qNufsNn3PNwutWMfZVzsg7ps2TszsE9jFRG/z1hWuFe22iogk3N4iO0CChAxCyFN+CipGpgzJqZXDmrxS+cw1Q1eTJdvLh3kAxKdPpd5mKWEQyVnMP+Rm9nBhCt80aSqtkT58907iIGnPhUuQ8R4fLafRMomGDo74bO3nX61GMXkPZAOp7THHQFyHzu2aMnS7xMeSk2+fNC1TLNAwSX68na3mB1ZdHe0zO9khU1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kHUPC37EGWnPKHcuK5ROYeSIEHiJg2nJ8tViRLOtqtA=;
- b=HpM10Zm9yxi3G8gnx6S9xvYrlZBPEOAZAX9EvIYsv0WDJlAztH8L06iI2pTkpjTFlaauASVVZFRcBKg/Vb7oPBOopPjCo8qi5WU3bcXVLQHm6ywu13CbJptzM43MF24b3v8AU8ZjOiX/sY4GoTojLjSqUY2hfEwxOqk9OE54xGrhDpKHp2XItL9PgHmZdNb/l6zIocfqxmKNnQYfFtdCDGlOQ4Yyxc5cno1AcbSSC1woPhysHTi/pP94EWhpzs2fPwrJOUTdezZ6XbvIPLnmplecN9Eey6QN4jrsL62ZUV/efxDxfBzyuFFANCPGhbiuV31+HKQJIhAHYtqJzCEeFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kHUPC37EGWnPKHcuK5ROYeSIEHiJg2nJ8tViRLOtqtA=;
- b=bSaQCnj1q8y+BfP4XvxUBKIe/oAFI2/nvu3T1rslfJnCr+z9WUfYONdZ/0qoY7tYL4XU6cH3YJRVjf87NHTmMNu1GdDtQ6rUX+VqXO8ZWm+Opt9xvswBE6+z9unJS+CIEeinVd1J0qwtNFgu8pp5Yd/JF2fwKg4ON+IpdxaRGkk=
-Received: from LV3PR12MB9265.namprd12.prod.outlook.com (2603:10b6:408:215::14)
- by SA1PR12MB7198.namprd12.prod.outlook.com (2603:10b6:806:2bf::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Fri, 1 Nov
- 2024 18:32:38 +0000
-Received: from LV3PR12MB9265.namprd12.prod.outlook.com
- ([fe80::cf78:fbc:4475:b427]) by LV3PR12MB9265.namprd12.prod.outlook.com
- ([fe80::cf78:fbc:4475:b427%5]) with mapi id 15.20.8114.028; Fri, 1 Nov 2024
- 18:32:38 +0000
-From: "Kaplan, David" <David.Kaplan@amd.com>
-To: Sean Christopherson <seanjc@google.com>, Derek Manwaring
-	<derekmn@amazon.com>
-CC: "roypat@amazon.co.uk" <roypat@amazon.co.uk>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "chenhuacai@kernel.org"
-	<chenhuacai@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"david@redhat.com" <david@redhat.com>, "gerald.schaefer@linux.ibm.com"
-	<gerald.schaefer@linux.ibm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>,
-	"graf@amazon.com" <graf@amazon.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"hpa@zytor.com" <hpa@zytor.com>, "jgowans@amazon.com" <jgowans@amazon.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "kalyazin@amazon.com"
-	<kalyazin@amazon.com>, "kernel@xen0n.name" <kernel@xen0n.name>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, "luto@kernel.org"
-	<luto@kernel.org>, "mathieu.desnoyers@efficios.com"
-	<mathieu.desnoyers@efficios.com>, "mhiramat@kernel.org"
-	<mhiramat@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"peterz@infradead.org" <peterz@infradead.org>, "quic_eberman@quicinc.com"
-	<quic_eberman@quicinc.com>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"rppt@kernel.org" <rppt@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>, "tabba@google.com"
-	<tabba@google.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"vannapurve@google.com" <vannapurve@google.com>, "will@kernel.org"
-	<will@kernel.org>, "x86@kernel.org" <x86@kernel.org>, "xmarcalx@amazon.com"
-	<xmarcalx@amazon.com>
-Subject: RE: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-Thread-Topic: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-Thread-Index: AQHbLHFMjLMyCV8maUKgtkq2gP29j7Kivv0g
-Date: Fri, 1 Nov 2024 18:32:38 +0000
-Message-ID:
- <LV3PR12MB9265A91412AFCF7B65AD0BA694562@LV3PR12MB9265.namprd12.prod.outlook.com>
-References: <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
- <2233397c-f423-40e3-8546-728b50ce0489@amazon.com>
- <ZyTxM7Po4v7VkmHO@google.com>
-In-Reply-To: <ZyTxM7Po4v7VkmHO@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ActionId=412bc965-1282-46ef-82c3-d3676a9be80b;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=0;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=true;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2024-11-01T18:29:07Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9265:EE_|SA1PR12MB7198:EE_
-x-ms-office365-filtering-correlation-id: f2cf34b9-4b5b-457e-e941-08dcfaa38fe9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?aJQR+O09fnjj47ZLovde2xDH2UR/xeM01lIDlkyvbTKtPuU/Llw76M7WHlzs?=
- =?us-ascii?Q?c0RrVagrdsOTA/s3jPBOu208ZjqpXl1ZUC4XyrHx1I4fM0590MX1eiJEVl9r?=
- =?us-ascii?Q?6yMcWZKI7Brpp7BrFg8El7b3BmtgbIt6unZRWpcf154vh6j4v9duyWLDM4jD?=
- =?us-ascii?Q?s9YgXQAqORiyyPAvcWHGfpqslomQEEb2dLZ5FpgIwCp1QvyncL5AkPS/ouSp?=
- =?us-ascii?Q?MjqYiaEWxI7jX+wSx+2rCflrF57NhW67fSU6fxFGXLSwu2/wERAz1gyyUk4F?=
- =?us-ascii?Q?CZDwl/YvUdQ4QbXfJWcHqJxWlepA0zkTHd69vJ5b2aQrgt2uKDmuRSpcgI/u?=
- =?us-ascii?Q?LUXftreGn5kLOpyuCOs3gyTy7UXHiocJAUM95QuaDllQqlQ11M6P+KLjNI3V?=
- =?us-ascii?Q?AZkrvgqpTGnm2BOmck9knGba4ixQnhLmjHZl0zzVsFzEu108I7ZT9dOIdTPt?=
- =?us-ascii?Q?ZvhSjdbTsMT6AjNHzh/2qWBGWim3JZnC5PYT11RvGD7yTTad1vnLAcyM9fZM?=
- =?us-ascii?Q?3Dy4QAE7gqxjdMvwUE8OvueWzaqxvpAuQB/Cu2UeSabcr9xL8oQjMrtnSn+e?=
- =?us-ascii?Q?2fttmm6zY6J7T6NbyJTA1lhgfYa/WkUAlztdlVuPoikKE2nKZwN3gFxVGoYS?=
- =?us-ascii?Q?90nsWZ/QigEb4nNQZgp1UQqYEO9+s6+4DC5/RTuwnx0uEeYk3vBUC6/VM3IA?=
- =?us-ascii?Q?v3P7jJIIIukL73SIyjU/aOvUV6CHk0aQkQFQCFO+3mroPiG9uSmeK5pEi6uA?=
- =?us-ascii?Q?yR/7YVOiWmaFt8mDR+WtDlnHZgns9l3j5VHUa/V8TTtN6ggry2UXDJn/v+Mb?=
- =?us-ascii?Q?w2EmV0opnUMJzfum4D0U1kGXY70U6NMootyseII2EmuLDLKxzyOneahoNwP+?=
- =?us-ascii?Q?3QwJ/KTpLetchZ7ZNeAj0KjxyYM0ZhT7oNOYfiS1Ykj0hQyOCcGAzB1xBBM7?=
- =?us-ascii?Q?Bw2crZAlU11XjPRyswrPfWnL8RcEQBb45SC+o5OEYWAjl618jcpb0sIWAwrk?=
- =?us-ascii?Q?7zj1X7zbDOhzgRVk0IOhqUnKvQvh+iUYIiS2vdpK4aqxOnwiqOU5ZZQtYbdl?=
- =?us-ascii?Q?NuEY8yHUSvVRAWtLmvsKEqLmIQwl2Jo90UnCfBICHiuEQkYomiwom3aOi6sS?=
- =?us-ascii?Q?OD6yi9qTB/1ny++Yhj/zUYcxkgRT45jNsR6MlkWtqelP5LZyQKXioxqOtWCj?=
- =?us-ascii?Q?3aSks3hoQ2/+03qVCqO0tJQGHMGksIUKip2TLU7cfsupa7AF9OP/qbOQ1RaS?=
- =?us-ascii?Q?g0qpTD3nZQhzRR9HoKC52+QeBIY/CN15FbU9WoaDfUIYl3Q65jGBHB57vu8u?=
- =?us-ascii?Q?7Er74b7jIjDhppCb9aruzB6LxdXVC2t3A9NFTzMsd1uKZVglylBWKSAl64C0?=
- =?us-ascii?Q?ooXSL5w=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9265.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?KDdQKwnWYRiGTcOlRzhBWSpMmrIgmyOgQfKIhqsdYWQFDVzt7pQyPZsZAfks?=
- =?us-ascii?Q?Klk0WA83V0qLuhimnK5DMUEDm7EPaQEpaSQgYOkJ44QO6wShBJblTHBOpH6E?=
- =?us-ascii?Q?3NDpRQ9O5kvTRHcsS4jeg42rm+K8BL7aPttHBmZw9nqnRoSX3swcjFhszQ7g?=
- =?us-ascii?Q?VXETqoL/ITVa6Hiau9MUBOnpF7MVA0rN0msOc0ab7q4xWnsFgHDHvQM0tbj1?=
- =?us-ascii?Q?w0SsL+XrhZB/mX9wUDlDMiT2mtCBDkPARuY2duMXZU6GuUReuOhy7pdisS9q?=
- =?us-ascii?Q?mv5f4Ki/zwIpxijvysPFBgrORdGCWWcp3ztvwXDrgavPWCEWc+12THM2N+Qm?=
- =?us-ascii?Q?2fXD3G6Jihz7+vsQSPpCzABRTfLBakodNC1gWBXRlvuKojCQQ9IRZvhRdcwb?=
- =?us-ascii?Q?5A8+WYwSG9JVfcHZ5blBmfZhZ/Holkqcyb0tp3NOegbw0qnY3KMtq++KyP9k?=
- =?us-ascii?Q?+2D7QsybM5akfgQ2vNSVOy6FhfbXTin0GG66qSjLMeXi9t/5Fp67rEv8qN2a?=
- =?us-ascii?Q?ZVNbtGSSSzyygNY6cYxE2STKRSbs6bDV5VpWUh8WGsuIxuKa6j05UXbhTjkO?=
- =?us-ascii?Q?W1GlO//01LRiXiC3CIbJU2KJaZdLVTgF6tvhHTqTRgj6nt2PvadUDa530Uh2?=
- =?us-ascii?Q?P4zhZjTa48m5d9XPvvs0JUnEWhvRomFVogOfFHTyRhUysKJhxVkLcszNlgKl?=
- =?us-ascii?Q?KmuwJKJ5AtyrpirZY4A7M0R4DTc5zsDyWSCwLZHiWkv1mYJrKMKoPVCk1Ey7?=
- =?us-ascii?Q?lbDSoekqRo17gl/wPUXX/fe1CHIa95LKRlAYSKDKblCbFTYzbf0Sumu/4Pls?=
- =?us-ascii?Q?h+dqvEdaK9Klgay4nSvsLQc0IvBspD0XKQNBfFG5WqESpeZDVj4QMweP2bDq?=
- =?us-ascii?Q?iacWSsJw26XVrCdKdcBgzlLoE5ZruDG8UUzdvm+I5XjrDTxjQDHDLS4S1y5F?=
- =?us-ascii?Q?1yMwJcimB2uLZZRcKpr12LVnh6HARaU9Yq12QPnUbypdFe0mhboTpg0ELJBt?=
- =?us-ascii?Q?z/ocLth3MPcwDmV33Y/xNthSYqLxwEb4bPDNrMJ37UnxFQviBf1h2CnY87zT?=
- =?us-ascii?Q?6g3Fs8SXtlBk64dTOpZfSi0/Z06QL5DBwLRJQ1BrhGn7wQN6muqXrklsH7Um?=
- =?us-ascii?Q?Lowcnj2gANTeKDDi1wdSmgUBtL1PCbdq5gk5xe2jCbUgAGJNzRqEHUdgpnPE?=
- =?us-ascii?Q?afByuD+iqJb39cCIeFB36x0Sjz1urVkqKRklMafxEMy9FfDxW/hoxiVWb7yj?=
- =?us-ascii?Q?WHtH0pEwQ/akDwXL0jUdBe50fhTjP6Q/JELShvQdfXwini7Wo26cu/X26Jer?=
- =?us-ascii?Q?o7UUZvxIrU05zl0XjIc/ktUncKsz1tqlrP+V/dIvx27EM4UmUxwxWUP+FX7b?=
- =?us-ascii?Q?A0gyFlq37YQsZheO0mzmi0H1n+DNIN10XKlcx6VWEmnwlpuaGv9Dt8Mjm41w?=
- =?us-ascii?Q?KII2z0ro8Kg9AUGuMGThSDc4YjL+y/iwn2XpCPNGN1YyFhPZ7rngL/SEBmCB?=
- =?us-ascii?Q?u3HOxXKvX6M+q8oV4JL1blE1a/mHPSQGpG2iLuoyoB4tMYIuWcxyPOzUz6N6?=
- =?us-ascii?Q?Vyno17j+ZVCwMpgrvcw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08541CDFCB
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 18:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730486059; cv=none; b=EwnsCM2aRdn7DpHMM4pH9usm6leuPtMWKUPsBoepajrke1tl2DbjdgobBr/DgDxOKC7qkrnnzKXJqAlSLRKlcka4LsjeypB/MtXChA+/Zyj8jlU/qdKayXGIcfzpsJkfG1rZZK2ALzrqCq7P3Mor2bkF9BVqjuT29zYvDUUgSIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730486059; c=relaxed/simple;
+	bh=oN0vujRXhSbTaSgamD07yGLZLfJwliF1KUGYf3X5eyQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=Vgdh/WSM6E9yDoEneOhtcNY5oW8zlt36LaMFneOE9LObBmcudlSTUc3M1o4CjL+LULxH97oK3YqygSFQt3zEsERBMkrMThGJSA8G069slr6ug2IiKFuyhn4g+52+qBP+pgGwY5FHP7eB4FoQTCbubsxD6TJFf71B5W0j65wswjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j+Ah9SCV; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e1e989aa2so2737244b3a.3
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 11:34:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730486057; x=1731090857; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ILZtmXmmPjUA1g0mznhbcMlteKfyuGhztP/uRth5K5c=;
+        b=j+Ah9SCV5NTHqwIihCZcHzAPTAbejWQfPqBZHkT24HwS8Kg0PBjGehIUF3mb3RReex
+         ODEyHgLvT2BCYbouO5NOMU1qeX6RHXV7W3vbCoY0CzM2txy+eaUJeSLuEp7JJ+T3i+dV
+         0ibJthDmGHqKe8PcVvS5f/93gLqvDjjHXssu0B2WktfvLvMcTb1liQfePHBzhoNWqpOB
+         ClkuHVDSHpwxgpFyCviXkkdV+S6JG5hZZtBJ+/RgzXQ+xTy7DhYo8Dvx57WPc7b0jG3u
+         Qz7MYpwTxScxEvIayEnPHEpNaxp9mzlrX+wpxpR7CAS5zHsSyaT2ab5PaCHRR+DTesCD
+         1S9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730486057; x=1731090857;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILZtmXmmPjUA1g0mznhbcMlteKfyuGhztP/uRth5K5c=;
+        b=GfjOrWR+u4/vQ8Lyv2yw3cQVQw0gh1nhjF6Mu442/Gd1rBG43LQW4RA/t+R4COrpgR
+         fuOzWG9u/4YsV/ls2qAPLiMpM1MWL50mmlldzQYOPfLmrRFRrRNzYOp71UZ8l5TAVcMd
+         KFNFpemzHcgOI56GljG5LeaU4r5M6MnKcgRYqs4TpLzNO6oDp7ExCaeCR6O2aE2WApjT
+         9zbdjZpz9Z9bX7aY2YJDL8ZrJRgXZg8PdR9iuJqy9l41RIPrRHG116snWMjpQK2cKWbN
+         deuNsoTSuRAMUQttXMFXKjR+SH7lXyUxiyorhYhvy7qbYSu+fkXle1qxEJOdp6hhpg5/
+         6/nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsdGK0KLRatktilj6vliFj0nrRli400ZlUXwxeSSjtvYO8V6IjwZJEBtdEwbB2+hVgVTw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSwg4p1WSFHJaiTkFwtg7q85E2oe62BQs+sG/j1xZbnAtn42eS
+	eej+qu0kqTcFpF0p0IXS9UuYyOO2YyVTUN3oVDL9g1q1zwIfAT2lqwwvBZ5DRsGEDhmtOEyVYaw
+	3qQ==
+X-Google-Smtp-Source: AGHT+IHeghFUa1oTqrPglV/po8yE2iF0JL0zdJIwGuRvfOvetTscuU7ZphiSgLb/o0u6deVXPooDkiBAglo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:4604:b0:71e:4535:9310 with SMTP id
+ d2e1a72fcca58-720c964ca2dmr12052b3a.0.1730486057285; Fri, 01 Nov 2024
+ 11:34:17 -0700 (PDT)
+Date: Fri, 1 Nov 2024 11:34:15 -0700
+In-Reply-To: <20240719235107.3023592-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9265.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2cf34b9-4b5b-457e-e941-08dcfaa38fe9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2024 18:32:38.0505
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3DRxfjXFmkfnfRxP91h4yuircTS0cTRkFMnXV9WNrHHh0+7Y7CorGFbo73beV2gL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7198
+Mime-Version: 1.0
+References: <20240719235107.3023592-1-seanjc@google.com> <20240719235107.3023592-2-seanjc@google.com>
+Message-ID: <ZyUfJ4NFyb3OShjY@google.com>
+Subject: Re: [PATCH v2 01/10] KVM: x86: Enforce x2APIC's must-be-zero reserved
+ ICR bits
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+On Fri, Jul 19, 2024, Sean Christopherson wrote:
+> Inject a #GP on a WRMSR(ICR) that attempts to set any reserved bits that
+> are must-be-zero on both Intel and AMD, i.e. any reserved bits other than
+> the BUSY bit, which Intel ignores and basically says is undefined.
+> 
+> KVM's xapic_state_test selftest has been fudging the bug since commit
+> 4b88b1a518b3 ("KVM: selftests: Enhance handling WRMSR ICR register in
+> x2APIC mode"), which essentially removed the testcase instead of fixing
+> the bug.
+> 
+> WARN if the nodecode path triggers a #GP, as the CPU is supposed to check
+> reserved bits for ICR when it's partially virtualized.
 
-> -----Original Message-----
-> From: Sean Christopherson <seanjc@google.com>
-> Sent: Friday, November 1, 2024 10:18 AM
-> To: Derek Manwaring <derekmn@amazon.com>
-> Cc: roypat@amazon.co.uk; ackerleytng@google.com;
-> agordeev@linux.ibm.com; aou@eecs.berkeley.edu;
-> borntraeger@linux.ibm.com; bp@alien8.de; catalin.marinas@arm.com;
-> chenhuacai@kernel.org; corbet@lwn.net; dave.hansen@linux.intel.com;
-> david@redhat.com; gerald.schaefer@linux.ibm.com; gor@linux.ibm.com;
-> graf@amazon.com; hca@linux.ibm.com; hpa@zytor.com;
-> jgowans@amazon.com; jthoughton@google.com; kalyazin@amazon.com;
-> kernel@xen0n.name; kvm@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; linux-doc@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-kselftest@vger.kernel.org; linux-
-> mm@kvack.org; linux-riscv@lists.infradead.org; linux-s390@vger.kernel.org=
-;
-> linux-trace-kernel@vger.kernel.org; loongarch@lists.linux.dev;
-> luto@kernel.org; mathieu.desnoyers@efficios.com; mhiramat@kernel.org;
-> mingo@redhat.com; palmer@dabbelt.com; paul.walmsley@sifive.com;
-> pbonzini@redhat.com; peterz@infradead.org; quic_eberman@quicinc.com;
-> rostedt@goodmis.org; rppt@kernel.org; shuah@kernel.org;
-> svens@linux.ibm.com; tabba@google.com; tglx@linutronix.de;
-> vannapurve@google.com; will@kernel.org; x86@kernel.org;
-> xmarcalx@amazon.com; Kaplan, David <David.Kaplan@amd.com>
-> Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
->
-> Caution: This message originated from an External Source. Use proper
-> caution when opening attachments, clicking links, or responding.
->
->
-> +David Kaplan
->
-> On Thu, Oct 31, 2024, Derek Manwaring wrote:
-> > On 2024-10-31 at 10:42+0000 Patrick Roy wrote:
-> > > On Thu, 2024-10-31 at 09:50 +0000, David Hildenbrand wrote:
-> > > > On 30.10.24 14:49, Patrick Roy wrote:
-> > > >> Most significantly, I've reduced the patch series to focus only
-> > > >> on direct map removal for guest_memfd for now, leaving the whole
-> > > >> "how to do non-CoCo VMs in guest_memfd" for later. If this
-> > > >> separation is acceptable, then I think I can drop the RFC tag in
-> > > >> the next revision (I've mainly kept it here because I'm not
-> > > >> entirely sure what to do with patches 3 and 4).
-> > > >
-> > > > Hi,
-> > > >
-> > > > keeping upcoming "shared and private memory in guest_memfd" in
-> > > > mind, I assume the focus would be to only remove the direct map for
-> private memory?
-> > > >
-> > > > So in the current upstream state, you would only be removing the
-> > > > direct map for private memory, currently translating to
-> "encrypted"/"protected"
-> > > > memory that is inaccessible either way already.
-> > > >
-> > > > Correct?
-> > >
-> > > Yea, with the upcomming "shared and private" stuff, I would expect
-> > > the the shared<->private conversions would call the routines from
-> > > patch 3 to restore direct map entries on private->shared, and zap
-> > > them on
-> > > shared->private.
-> > >
-> > > But as you said, the current upstream state has no notion of "shared"
-> > > memory in guest_memfd, so everything is private and thus everything
-> > > is direct map removed (although it is indeed already inaccessible
-> > > anyway for TDX and friends. That's what makes this patch series a
-> > > bit awkward :( )
-> >
-> > TDX and SEV encryption happens between the core and main memory, so
-> > cached guest data we're most concerned about for transient execution
-> > attacks isn't necessarily inaccessible.
-> >
-> > I'd be interested what Intel, AMD, and other folks think on this, but
-> > I think direct map removal is worthwhile for CoCo cases as well.
->
-> Removal of the direct map entries for guest private PFNs likely won't aff=
-ect
-> the ability of an attacker to glean information from the unencrypted data
-> that's in the CPU caches, at least not on x86.  Both TDX and SEV steal ph=
-ysical
-> address
-> bit(s) for tagging encrypted memory, and unless things have changed on
-> recent AMD microarchitectures (I'm 99.9% certain Intel CPUs haven't
-> changed), those stolen address bits are propagated into the caches.  I.e.=
- the
-> encrypted and unencrypted forms of a given PFN are actually two different
-> physical addresses under the hood.
->
-> I don't actually know how SEV uses the stolen PA bits though.  I don't se=
-e
-> how it simply be the ASID, because IIUC, AMD CPUs allow for more unique
-> SEV-capable ASIDs than uniquely addressable PAs by the number of stolen
-> bits.  But I would be very surprised if the tag for the cache isn't guara=
-nteed to
-> be unique per encryption key.
->
-> David?
+Apparently this isn't accurate, as I've now hit the WARN twice with x2AVIC.  I
+haven't debugged in depth, but it's either INVALID_TARGET and INVALID_INT_TYPE.
+Which is odd, because the WARN only happens rarely, e.g. appears to be a race of
+some form.  But I wouldn't expect those checks to be subject to races.
 
-How the stolen PA bits are used is a microarchitectural implementation deta=
-il.  It is true that the tag will be unique per encryption key.  Beyond tha=
-t, I'm not sure what other details are relevant to SW.
+Ah, but maybe this one is referring to the VALID bit?
 
---David Kaplan
+  address is not present in the physical or logical ID tables
+
+If that's the case, then (a) ucode is buggy (IMO) and is doing table lookups
+*before* reserved bits checks, and (b) I don't see a better option than simply
+deleting the WARN.
+
+  ------------[ cut here ]------------
+  WARNING: CPU: 146 PID: 274555 at arch/x86/kvm/lapic.c:2521 kvm_apic_write_nodecode+0x7a/0x90 [kvm]
+  Modules linked in: kvm_amd kvm ... [last unloaded: kvm]
+  CPU: 146 UID: 0 PID: 274555 Comm: qemu Not tainted 6.12.0-smp--41585e8a34cb-sink #458
+  Hardware name: Google Astoria/astoria, BIOS 0.20240617.0-0 06/17/2024
+  RIP: 0010:kvm_apic_write_nodecode+0x7a/0x90 [kvm]
+  RSP: 0018:ff51c04b4d133be8 EFLAGS: 00010202
+  RAX: 0000000000000001 RBX: 0000000000000000 RCX: 00000000000cffff
+  RDX: 0000000087fd0e00 RSI: 00000000000cffff RDI: ff42132c9e336f00
+  RBP: ff51c04b4d133e50 R08: 0000000000000000 R09: 0000000000060000
+  R10: ffffffffc067428f R11: ffffffffc080aa20 R12: 00000000000cffff
+  R13: 0000000000000000 R14: ff42132d09e7c2c0 R15: 0000000000000000
+  FS:  00007fc1af0006c0(0000) GS:ff42138a08500000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 0000000000000000 CR3: 0000006267e52001 CR4: 0000000000771ef0
+  PKRU: 00000000
+  Call Trace:
+   <TASK>
+   avic_incomplete_ipi_interception+0x24a/0x4c0 [kvm_amd]
+   kvm_arch_vcpu_ioctl_run+0x1e11/0x2720 [kvm]
+   kvm_vcpu_ioctl+0x54f/0x630 [kvm]
+   __se_sys_ioctl+0x6b/0xc0
+   do_syscall_64+0x83/0x160
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  RIP: 0033:0x7fc1b584624b
+   </TASK>
+  ---[ end trace 0000000000000000 ]---
 
