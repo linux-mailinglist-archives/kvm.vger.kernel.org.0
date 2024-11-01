@@ -1,197 +1,162 @@
-Return-Path: <kvm+bounces-30380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A4B9B996A
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 21:27:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE479B998F
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 21:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 262361F22149
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:27:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0DD1F21EFB
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 20:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1949C1D9A62;
-	Fri,  1 Nov 2024 20:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F158C1DDC10;
+	Fri,  1 Nov 2024 20:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bdKYNoLR";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="z/S8Ff0J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m05eWXsw"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBDC1D4340;
-	Fri,  1 Nov 2024 20:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77000155330
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 20:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730492828; cv=none; b=EItjAToQaA2aw94jp/YA5m7n4cp0lzil96mBnAcxMK2P1n6KiU+fOikfW+v53TdmcgzPaEhEt4qmFoVrSDzVAUdmJ4Zd/yhzxEf9yVccBB0HB1L72VKFimt0ezbRFJeUsHBgxJSgMn4htWtGVraEIS700yUxdCm5eo/jFs/4LuY=
+	t=1730493517; cv=none; b=kNBl7+E3j22O8+zyFd5ByoWDn8Kr7YAKpk5gKgJnBK0/FY4AhW0NRYrb0D48Th5uDr0ZfQpYxg5T7SPvYpkW3GV1AVGFov4M9F1zuD3fRZwB5pRLrxInFG7f7mR73MmEFEZOYn9AhtsCSRy+w8+Wr5WNJm7MOQAI7uVUloSiItc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730492828; c=relaxed/simple;
-	bh=ISQjNBpVnwth0z+xcapjqqbKON+VNDQxUdZT8Zeo8l8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=og2Am4o1u4vsYqcFr1MhwBlOTzSvVTjZ3TMKsmV/exGLlI/RPuLa2DCKcRi+HI3XLaLjlNpGtLG2nwKxup04V87Uw/FM66Dwinr9CKik0yE4lPtd+2sm1ntbp24trAED5yzHLli2o5dAMtDfuPCT0jtRCbUFjDq0SeXa3LHP/pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bdKYNoLR; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=z/S8Ff0J; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1730492824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1xV06QTqGl9nixnpVpVhm4ITfCkevbgwfgxifl3glXs=;
-	b=bdKYNoLRW/D6u9dVR1Re/YsN9u1+39ZdE7c7n6w6JMSHxUgegbgrQ2/feVQH4Ns2UhxbXv
-	5R/lMYH3/5wnLbxfNPjnJ28b+8WzHCswX8tJ30IwZIkbQTOpTbNDANbI2rkOU28grnlFqG
-	6vV1ixY5sS+dLUhowYMcqqeHVGn5/rSUVvyARdl9YNW/1PDIU9wiwP9iRFnY0fkLLqrzEE
-	FQdULVwLCjeZ+djwB0KHPNcn1hotUoCwvvSDsEYT74Nowrcn4ZqHU06Aowwe5wr6qp2RJh
-	DtsZ2zF+0sS/DcC5jxWrAPms2vH29ByFylYP0EVgME3ujZ53UrsAANqMBB7dQA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1730492824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1xV06QTqGl9nixnpVpVhm4ITfCkevbgwfgxifl3glXs=;
-	b=z/S8Ff0JoHnOXPst4EdLogpr30PKrdNkL8kIbeI27e7fNEc8RRebLhMh+dJv1eMqVIf0ua
-	wm8hdcOmpHV/gmCg==
-To: Junaid Shahid <junaids@google.com>, Brendan Jackman
- <jackmanb@google.com>, Borislav Petkov <bp@alien8.de>
-Cc: Ingo Molnar <mingo@redhat.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy
- Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Sean
- Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandre Chartre <alexandre.chartre@oracle.com>, Liran Alon
- <liran.alon@oracle.com>, Jan Setje-Eilers <jan.setjeeilers@oracle.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Andrew Morton
- <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>, Lorenzo Stoakes
- <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>, Vlastimil
- Babka <vbabka@suse.cz>, Michal Hocko <mhocko@kernel.org>, Khalid Aziz
- <khalid.aziz@oracle.com>, Juri Lelli <juri.lelli@redhat.com>, Vincent
- Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Valentin
- Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>, Reiji
- Watanabe <reijiw@google.com>, Ofir Weisse <oweisse@google.com>, Yosry
- Ahmed <yosryahmed@google.com>, Patrick Bellasi <derkling@google.com>, KP
- Singh <kpsingh@google.com>, Alexandra Sandulescu <aesa@google.com>, Matteo
- Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kvm@vger.kernel.org, linux-toolchains@vger.kernel.org
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr
- compatible
-In-Reply-To: <d0a38982-b811-4429-8b89-81e5da3aaf72@google.com>
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com>
- <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
- <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
- <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com> <878qu6205g.ffs@tglx>
- <d0a38982-b811-4429-8b89-81e5da3aaf72@google.com>
-Date: Fri, 01 Nov 2024 21:27:03 +0100
-Message-ID: <87cyjevgx4.ffs@tglx>
+	s=arc-20240116; t=1730493517; c=relaxed/simple;
+	bh=2E0ss6fxrkLx7gCToCGGo1UWCNZ7U9hTeqIbgKHaGWo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cCJjXkRMaKF6TT7E58viCM2SXcFv1is6v6Yzv9/oEuhTOQIXfSDCMSIqaBuXEC3Ht2IUJAJGlnpqGoWVe23f9zqFPg1Y2CoAR7iqx6pfwcuM2QkB+/yndPIhzqBslzWsL4fDgJs0Eq0vSkf95ERegriDPz0373NXjmGflj/0YK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m05eWXsw; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539e617ef81so1341e87.1
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 13:38:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730493513; x=1731098313; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0S8SZ/gu2eXiOekIU0bSJdruZsNOZ1MYmQCtb/cNQgw=;
+        b=m05eWXswXD+LYARFAPOJ82/RcP39gHFWb8oGjI6rMmK49h8sHgYeU2B9UCkATunN8r
+         lhfKv0ZduPvBUxR3S4Vyp1CdoMv04uVH7qEjK1em4DXQS7kvkYZwqpmAV3YSWNVycNFr
+         PLiMD7DfhSXbqT74J7VdlFXu3KypuJrAvLmNYw17Lb7+qp2/dKc9XxPhIm81zgRZwGL/
+         2hoUhU2FOR/DKDbH5ko8gxCM0Qr7iZOTYGl4lRLNUXGV7pM8TzhyPao6Fjg2DOCdLfm9
+         oIsuGanKFgOjb3RjLAa6WtbOPBkrYe+hi0sWfgQhGnL17xsfiGOuVFowaNGEhvzYEy65
+         OjQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730493513; x=1731098313;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0S8SZ/gu2eXiOekIU0bSJdruZsNOZ1MYmQCtb/cNQgw=;
+        b=cHodNSwf3DxPNNlywuAsSE9/1bar+kj7PhHISuGEBDMyY2oZpDvCdAOuCH4bsfHhTh
+         HoWF+382PAUpmYtRS27hWV/3azMI1gMgmbzGnziamOEEySrs2SLUjUuxoNG6oL7/7rYl
+         J5jN+NrqNP2GZEADm2ydIY0a3Vq+QHPKKDU7Y3PVnLoOQIMQnFMSivay/HM1CjdWVR5q
+         AwzrDjZhPG0DGvgoApVUZ/Vdcn55WReNgTRD6QmKV5YhP7K3cqkL1u0YBUeqGS8T9kmS
+         6wE2VEkWJ07IcliO1VlzgHHGoN43BZ0pu90j1OhClX2nf0JIm2ul0+oU+mUrmFezI0sh
+         R6ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+gZeBXUa+fjWkVDZQnE0DYC+0FcCF/HfOQLAF8wkdHFUGuHoqhsp8rLfWBas6KFNYHvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxon/HQHf2ha5p7wwwid5OtTDi58LYe0fRlfHWrE+5kbQt81ydY
+	ZnPUK6ezmXZVX04J3gV5HvJOtAYTqNS6UwG9wNr9YxmXH/B3n5K2KVqKlNXhEb/zfWOAJNhC9/+
+	pRUM64+aHD1PtHJJs2UAtDtZdAt07APy1Spvs
+X-Gm-Gg: ASbGncumeQQBXKVNrYXyfbs8QFFrpXl7Yc2vdNaA9p0HLN/9QXLe9pD8Z4GNNZVpuvt
+	plfUAwcGLEN0EGu0UfqEsT+b3a9Dn7KtSqXw7Fe28k+qWSPgTWnCKEVsPETby
+X-Google-Smtp-Source: AGHT+IEQsTagRZjln5L5dgZDdUvGYh0A09kXflpjFuGnCCnyRuBSdgyZUma8MPjFfahqpeFF8bROqWSlwcWOc4c4Edg=
+X-Received: by 2002:a05:6512:2019:b0:536:88d0:420d with SMTP id
+ 2adb3069b0e04-53d6acfb187mr120615e87.6.1730493513257; Fri, 01 Nov 2024
+ 13:38:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240823235648.3236880-1-dmatlack@google.com> <20240823235648.3236880-5-dmatlack@google.com>
+ <CAHVum0ffQFnu2-uGYCsxQJt4HxmC+dTKP=StzRJgHxajJ7tYoA@mail.gmail.com>
+ <Zwa-9mItmmiKeVsd@google.com> <CAHVum0di0z1G7qDfexErzi_f99_T_fTPbZM0s2=TYFCQ8K5pBg@mail.gmail.com>
+ <ZyLES2Ai4CC4W-0s@google.com>
+In-Reply-To: <ZyLES2Ai4CC4W-0s@google.com>
+From: Vipin Sharma <vipinsh@google.com>
+Date: Fri, 1 Nov 2024 13:37:56 -0700
+Message-ID: <CAHVum0fYkpU-UAyuqrRx+VGi2BFVSupwMhKQ+Q0hY9+15GSTCg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: Recover TDP MMU huge page mappings
+ in-place instead of zapping
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 31 2024 at 18:44, Junaid Shahid wrote:
-> On 10/29/24 12:12 PM, Thomas Gleixner wrote:
->> 
->> I doubt that it works as you want it to work.
->> 
->> +	inline notrace __attribute((__section__(".noinstr.text")))	\
->> 
->> So this explicitely puts the inline into the .noinstr.text section,
->> which means when it is used in .text the compiler will generate an out-of
->> line function in the .noinstr.text section and insert a call into the
->> usage site. That's independent of the size of the inline.
->> 
+On Wed, Oct 30, 2024 at 4:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> Oh, that's interesting. IIRC I had seen regular (.text) inline functions get 
-> inlined into .noinstr.text callers. I assume the difference is that here the 
-> section is marked explicitly rather than being implicit?
+> On Wed, Oct 09, 2024, Vipin Sharma wrote:
+>
+> Coming back to this, I opted to match the behavior of make_small_spte() a=
+nd do:
+>
+>         KVM_BUG_ON(!is_shadow_present_pte(small_spte) || level =3D=3D PG_=
+LEVEL_4K, kvm);
+>
 
-Correct. Inlines without any section attribute are free to be inlined in
-any section, but if the compiler decides to uninline them, then it
-sticks the uninlined version into the default section ".text".
+Should these be two separate KVM_BUG_ON(), to aid in debugging?
 
-The other problem there is that an out of line version can be
-instrumented if not explicitely forbidden.
+> As explained in commit 3d4415ed75a57, the scenario is meant to be impossi=
+ble.
+> If the check fails in production, odds are good there's SPTE memory corru=
+ption
+> and we _want_ to kill the VM.
+>
+>     KVM: x86/mmu: Bug the VM if KVM tries to split a !hugepage SPTE
+>
+>     Bug the VM instead of simply warning if KVM tries to split a SPTE tha=
+t is
+>     non-present or not-huge.  KVM is guaranteed to end up in a broken sta=
+te as
+>     the callers fully expect a valid SPTE, e.g. the shadow MMU will add a=
+n
+>     rmap entry, and all MMUs will account the expected small page.  Retur=
+ning
+>     '0' is also technically wrong now that SHADOW_NONPRESENT_VALUE exists=
+,
+>     i.e. would cause KVM to create a potential #VE SPTE.
+>
+>     While it would be possible to have the callers gracefully handle fail=
+ure,
+>     doing so would provide no practical value as the scenario really shou=
+ld be
+>     impossible, while the error handling would add a non-trivial amount o=
+f
+>     noise.
+>
+> There's also no need to return SHADOW_NONPRESENT_VALUE.  KVM_BUG_ON() ens=
+ures
+> all vCPUs are kicked out of the guest, so while the return SPTE may be a =
+bit
+> nonsensical, it will never be consumed by hardware.  Theoretically, KVM c=
+ould
+> wander down a weird path in the future, but again, the most likely scenar=
+io is
+> that there was host memory corruption, so potential weird paths are the l=
+east of
+> KVM's worries at that point.
+>
+> More importantly, in the _current_ code, returning SHADOW_NONPRESENT_VALU=
+E happens
+> to be benign, but that's 100% due to make_huge_spte() only being used by =
+the TDP
+> MMU.  If the shaduw MMU ever started using make_huge_spte(), returning a =
+!present
+> SPTE would be all but guaranteed to cause fatal problems.
 
-That's why we mark them __always_inline, which forces the compiler to
-inline it into the usage site unconditionally.
+I think the caller should be given the opportunity to handle a
+failure. In the current code, TDP is able to handle the error
+condition, so penalizing a VM seems wrong. We have gone from a state
+of reduced performance to either very good performance or VM being
+killed.
 
-> In any case, I guess we could just mark these functions as plain
-> noinstr.
-
-No. Some of them are used in hotpath '.text'. 'noinstr' prevents them to
-be actually inlined then as I explained to you before.
-
-> (Unless there happens to be some other way to indicate to the compiler to place 
-> any non-inlined copy of the function in .noinstr.text but still allow inlining 
-> into .text if it makes sense optimization-wise.)
-
-Ideally the compilers would provide
-
-        __attribute__(force_caller_section)
-
-which makes them place an out of line inline into the section of the
-function from which it is called. But we can't have useful things or
-they are so badly documented that I can't find them ...
-
-What actually works by some definition of "works" is:
-
-       static __always_inline void __foo(void) { }
-
-       static inline void foo(void)
-       {
-                __(foo);
-       }
-
-       static inline noinstr void foo_noinstr(void)
-       {
-                __(foo);
-       }
-
-The problem is that both GCC and clang optimize foo[_noinstr]() away and
-then follow the __always_inline directive of __foo() even if I make
-__foo() insanely large and have a gazillion of different functions
-marked noinline invoking foo() or foo_noinstr(), unless I add -fno-inline
-to the command line.
-
-Which means it's not much different from just having '__always_inline
-foo()' without the wrappers....
-
-Compilers clearly lack a --do-what-I-mean command line option.
-
-Now if I'm truly nasty then both compilers do what I mean even without a
-magic command line option:
-
-       static __always_inline void __foo(void) { }
-
-       static __maybe_unused void foo(void)
-       {
-                __(foo);
-       }
-
-       static __maybe_unused noinstr void foo_noinstr(void)
-       {
-                __(foo);
-       }
-
-If there is a single invocation of either foo() or foo_noinstr() and
-they are small enough then the compiler inlines them, unless -fno-inline
-is on the command line. If there are multiple invocations and/or foo
-gets big enough then both compilers out of line them. The out of line
-wrappers with __foo() inlined in them end always up in the correct
-section.
-
-I actually really like the programming model as it is very clear about
-the intention of usage and it allows static checkers to validate.
-
-Thoughts?
-
-Thanks,
-
-        tglx
+If shadow MMU starts using make_huge_spte() and doesn't add logic to
+handle this scenario (killing vm or something else) then that is a
+coding bug of that feature which should be fixed.
 
