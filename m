@@ -1,139 +1,130 @@
-Return-Path: <kvm+bounces-30339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931289B9737
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:16:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A5189B978E
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09CABB21807
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:16:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F24FB227AC
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B5E1CF2B7;
-	Fri,  1 Nov 2024 18:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A02E1CEAAF;
+	Fri,  1 Nov 2024 18:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YpTHgRMA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eCAhZMbj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7696E1CF286
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 18:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF61A146592;
+	Fri,  1 Nov 2024 18:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730484955; cv=none; b=HjkEN2f0h98VNgryj7r0BNb6XUWxL2JrH89uS59VfTBwNTm2aBSaxyd02uyHG2BbeeP/2+/86rqutcKH5uKexP96lUpdho771t3nO5AU4u4cTLGGT8ZNscme/jtpIHQMw+tC4RMmZvHHK0broxo6vjtDS6CJrS74YtqZm0DLADM=
+	t=1730485880; cv=none; b=pIYomHORwYEI9SiEnfS6jdUwwmIBP3xZeK71ocDAY3Un/zLv6YOSmzROwq+tN12uQFluB4GxjlLI756HNXuGuS+FLpY3RGkd/FetX2t9aJopXb7AZzx6LiRGpomyU0vIreLotMyNNj60MMuUMJoDFSG7l05Mnxoea55Rz7SafUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730484955; c=relaxed/simple;
-	bh=GSHbBwZfkYhqvZmnpUSaXG42ezayg8nwJR7cfig/aho=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OWsxoJKt2iK14p93d2fDEockK5wA1SkxWQ8kdT5nHDPGA7N2E41mCBA6sH7hzUGhoMYzoaz1qO4roLEQL0FC99fUmBSjwyxqLMfDx39jbB3bgS9HYQ3juFPkWWke6Jo4wmmu5NKK/2jdY2Qp1YOMBhXix6DDvrb/sCHGKIg3d0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YpTHgRMA; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2fc2b1ce1so2545555a91.0
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 11:15:54 -0700 (PDT)
+	s=arc-20240116; t=1730485880; c=relaxed/simple;
+	bh=VBXbIFvMdAI0b5axWwLGdBXRoBbolCT6d2ZfYFcgkm4=;
+	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
+	 In-Reply-To:Content-Type; b=eoZwB+eV71tk5QqFs6PCGXJCgsKWn3L1T0vnoxMDjbA76LJOrckRAy0tbzq1whHgioXBSWwxLWuUDKtGiTsAASZUnjntd5u+V+0jcCyZlI4xPcEAh9xBoxnu1d5pSWKzvu7FcBsMXh74mMbH/fS4/87mxNOgNM2kYXPsvN8Ok/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eCAhZMbj; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730484954; x=1731089754; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MEZAnkCadaVg1BrSWxgRmpQSE/TbQcmppmH+q7yf6WQ=;
-        b=YpTHgRMAdoZAKkHFfRpC6r90RhqV0TD28pXPHSyTRIlrKLTuXKZA3RT+jLb9A+siZ4
-         itulhAA4Yjk+kzxe09vqyvG+OEq7iV0EnBEVNxzKrEbxzQZC/938l+ci149VTBvIPzrZ
-         WAdZvDFKD3rZ9oo0vWUfuRMl+Fo2dm9oSesxWg1OPy51yZFdw1Ixsum4ha8XajpBkvdM
-         up5Nzb6a+F9Ald2mzE81CzXdkQD9W64EIhqRu1F/trpWNTL7XHuM32xDPM3YUOXOOUt6
-         TZ+xEJzh9Ma9CAKccIYa/X2HUnBc3O0461XALm0ivGX5ZgXEcfQBMdbjRbmbU2UojZWx
-         x2kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730484954; x=1731089754;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MEZAnkCadaVg1BrSWxgRmpQSE/TbQcmppmH+q7yf6WQ=;
-        b=qRPdkYvcD2ctmIWoy6KX2y3LsqGmvL7NMXQLiHYOc+6oBu21DTP/v4kmQ/kd5x7W6o
-         zbqe0orQcqtwjHGsGQF17DSk99aPAHK3Sr6dItplD4K4/oEtE6lyshEfE4foz/szy0KK
-         E+mpw9PbW/iY764gWCbVV6iD/fk0gFaw/dOLSfptVyEjywGt94xSJRIPZ+M8kN+aLA1Z
-         MtfsVRVwDOME4onpjdc3FpF5t31bQ1BtbBnhHyqoi5VSqFIiXIFp8z8ukHVnD6z8jpsd
-         gWQeiNax2B4owytBEVZcj+t8GL05Lw2l9J3u+Nlu/HwwUjuhrOLonnHthFBX7BQpJH28
-         8Njw==
-X-Forwarded-Encrypted: i=1; AJvYcCXtEYjn0vDpTPLG1Bucws2Y2yz+mnRqxDd/6Aa9FYmECqi4LQtYIdazo3WxYQDh6PufS2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaGoDFGcd9Gb38ElQIhO/UdVg4l+g2Jv8fmmG4cOy62QatJjjG
-	OEErfRCoinnoT6oTGjlO9YFxy/qp522QijBpF8n6rClpa2U9+yuNZl3tESf2vRoF1u3EQT/lJNo
-	S/6oRqFGV5Lyr8rQHgY8dew==
-X-Google-Smtp-Source: AGHT+IEXa+QnTPnVNgHoaewOLlIH8wFAnb+M/ihAEAGqYML1uHaPbaA1TFQ+R1PS5raQE1UTHGA6cnlOKUra43n49A==
-X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a17:90b:616:b0:2e2:af52:a7c3 with SMTP
- id 98e67ed59e1d1-2e92cf4f915mr20243a91.8.1730484953636; Fri, 01 Nov 2024
- 11:15:53 -0700 (PDT)
-Date: Fri,  1 Nov 2024 18:15:29 +0000
-In-Reply-To: <20241101181533.1976040-1-dionnaglaze@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730485878; x=1762021878;
+  h=message-id:date:mime-version:to:cc:references:subject:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VBXbIFvMdAI0b5axWwLGdBXRoBbolCT6d2ZfYFcgkm4=;
+  b=eCAhZMbjCsb1Ubg5PIF0neLVul3DHRNBD4YRpV/5j/xrdj+lEIZiS04b
+   DhYuyza5iscJnNXF103HVVzmUFPjzwETJuL4RiFO8nRdj0Xlan2TeqLmt
+   ZTNjpjkM/yKJFh2Zi84tkjV2yLQVOQkLoYFN9OOxiH5sVoeot3iWUMVfh
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.11,250,1725321600"; 
+   d="scan'208";a="142665536"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 18:31:18 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:58862]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.72:2525] with esmtp (Farcaster)
+ id dae0559c-5720-41e8-8da6-e0592ac6ae3b; Fri, 1 Nov 2024 18:31:17 +0000 (UTC)
+X-Farcaster-Flow-ID: dae0559c-5720-41e8-8da6-e0592ac6ae3b
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 1 Nov 2024 18:31:17 +0000
+Received: from [10.142.234.83] (10.142.234.83) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 1 Nov 2024 18:31:14 +0000
+Message-ID: <37fbfc65-b145-4a22-a48c-1921204d5635@amazon.com>
+Date: Fri, 1 Nov 2024 11:31:09 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241101181533.1976040-1-dionnaglaze@google.com>
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <20241101181533.1976040-5-dionnaglaze@google.com>
-Subject: [PATCH v2 4/4] KVM: SVM: Delay legacy platform initialization on SNP
-From: Dionna Glaze <dionnaglaze@google.com>
-To: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Dionna Glaze <dionnaglaze@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Tianfei zhang <tianfei.zhang@intel.com>, kvm@vger.kernel.org
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: <dave.hansen@intel.com>
+CC: <ackerleytng@google.com>, <agordeev@linux.ibm.com>,
+	<aou@eecs.berkeley.edu>, <borntraeger@linux.ibm.com>, <bp@alien8.de>,
+	<canellac@amazon.at>, <catalin.marinas@arm.com>, <chenhuacai@kernel.org>,
+	<corbet@lwn.net>, <dave.hansen@linux.intel.com>, <david@redhat.com>,
+	<derekmn@amazon.com>, <elena.reshetova@intel.com>,
+	<gerald.schaefer@linux.ibm.com>, <gor@linux.ibm.com>, <graf@amazon.com>,
+	<hca@linux.ibm.com>, <hpa@zytor.com>, <jgowans@amazon.com>,
+	<jthoughton@google.com>, <kalyazin@amazon.com>, <kernel@xen0n.name>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<luto@kernel.org>, <mathieu.desnoyers@efficios.com>, <mhiramat@kernel.org>,
+	<mingo@redhat.com>, <mlipp@amazon.at>, <palmer@dabbelt.com>,
+	<paul.walmsley@sifive.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
+	<quic_eberman@quicinc.com>, <rostedt@goodmis.org>, <roypat@amazon.co.uk>,
+	<rppt@kernel.org>, <seanjc@google.com>, <shuah@kernel.org>,
+	<svens@linux.ibm.com>, <tabba@google.com>, <tglx@linutronix.de>,
+	<vannapurve@google.com>, <will@kernel.org>, <x86@kernel.org>,
+	<xmarcalx@amazon.com>
+References: <51fe5ad1-7057-4d43-b92c-580d187d2aeb@intel.com>
+Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
+Content-Language: en-US
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <51fe5ad1-7057-4d43-b92c-580d187d2aeb@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
 
-When no SEV or SEV-ES guests are active, then the firmware can be
-updated while (SEV-SNP) VM guests are active.
+On 2024-11-01 at 17:20+0000, Dave Hansen wrote:
+> On 11/1/24 09:56, Manwaring, Derek wrote:
+> > But if other mitigations completely prevent even speculative access
+> > of TD private memory like you're saying, then agree nothing to gain
+> > from direct map removal in the TDX case.
+> Remember, guest unmapping is done in the VMM.  The VMM is not trusted in
+> the TDX (or SEV-SNP) model.  If any VMM can harm the protections on
+> guest memory, then we have a big problem.
+>
+> That isn't to say big problem can't happen.  Say some crazy attack comes
+> to light where the VMM can attack TDX if the VMM has mapping for a guest
+> (or TDX module) memory.  Crazier things have happened, and guest
+> unmapping _would_ help there, if you trusted the VMM.
+>
+> Basically, I think guest unmapping only helps system security as a whole
+> if you must _already_ trust the VMM.
 
-CC: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Thomas Gleixner <tglx@linutronix.de>
-CC: Ingo Molnar <mingo@redhat.com>
-CC: Borislav Petkov <bp@alien8.de>
-CC: Dave Hansen <dave.hansen@linux.intel.com>
-CC: Ashish Kalra <ashish.kalra@amd.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>
-CC: John Allen <john.allen@amd.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Michael Roth <michael.roth@amd.com>
-CC: Luis Chamberlain <mcgrof@kernel.org>
-CC: Russ Weight <russ.weight@linux.dev>
-CC: Danilo Krummrich <dakr@redhat.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Tianfei zhang <tianfei.zhang@intel.com>
+Yeah that makes a lot of sense. I just view the ideal outcome as a
+composition of strong, independent defenses. So as a guest you have the
+confidentiality and integrity guarantees of the hardware, *and* you have
+an up-to-date, good-hygiene (albeit not attested) host kernel just in
+case some crazy attack/gap comes up.
 
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Reviewed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
----
- arch/x86/kvm/svm/sev.c | 2 ++
- 1 file changed, 2 insertions(+)
+From that standpoint I'm still tempted to turn the question around a bit
+for the host kernel's perspective. Like if the host kernel should not
+(and indeed cannot with TDX controls in place) access guest private
+memory, why not remove it from the direct map?
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f6e96ec0a5caa..8d365e2e3c1b1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -445,6 +445,8 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 		goto e_no_asid;
- 
- 	init_args.probe = false;
-+	init_args.supports_download_firmware_ex =
-+		vm_type != KVM_X86_SEV_VM && vm_type != KVM_X86_SEV_ES_VM;
- 	ret = sev_platform_init(&init_args);
- 	if (ret)
- 		goto e_free;
--- 
-2.47.0.163.g1226f6d8fa-goog
-
+Derek
 
