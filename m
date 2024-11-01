@@ -1,264 +1,124 @@
-Return-Path: <kvm+bounces-30332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AF79B9598
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:39:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556639B95A3
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 17:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7033A1C20F65
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:39:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 085771F2287C
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 16:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61BA1C75E2;
-	Fri,  1 Nov 2024 16:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030FB1C9B97;
+	Fri,  1 Nov 2024 16:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kJFIDUCy"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GCUtdnxy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB241381BA
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 16:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031361798C;
+	Fri,  1 Nov 2024 16:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730479157; cv=none; b=pj8iNbL73mjEbBQU846mTN2GKkrUpI8ERg5vt4vxW8Q5FY8XC6wP+HdO2J56A0CfrLL0yDmp3XlPfcIVoKNvbdUiyClCyFpqeNktYPsoGiCz5v/uzMTkoVnved7Vs2lfJQCXH/EA8wh+E+9WyphWFFrXafoCWjiNcsxR+o1fORE=
+	t=1730479280; cv=none; b=UZJjxcPZNs1eMRnEQHpRh1lpsu/KDkzkNkqp9U5OgJD7Qz5dCKcgu/DEydJGMJHKtjkDNcYEo1mYq5xRHsK5wthZnIpQ/W9ec7RKy/dAN2AxEui9ev9KOa3h0cOTNCYvmhflF/RGATZBoxOK1iFoRe9HARftq/jA3yultctqUuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730479157; c=relaxed/simple;
-	bh=uQ8uo+vABx8f5nA+/74ndXUQovEhFjcPT/qHC7gnL8E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eJ/thQXkVtONPQLN0U2XH8ngIB6NXbvod/VANqbWImIIXu368dXcvjVCSXe0XQuhYzaCzzmuTzFRIEXOil/Ut6gFgszp8fy5g6DVkD74knjJFAHSKG0Kp/eaSLj8G89M/rlNKoDSaT4Lt6s6P9IKUEyc/cciumUzEJooPyyJkIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kJFIDUCy; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e35a643200so46726297b3.0
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 09:39:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730479154; x=1731083954; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HbKJeki4dzd2XPRMM44KMwAEciOK8zIOcm2qr7s1wcQ=;
-        b=kJFIDUCyJ7E1KXCs6goijwzhXxTdE7p5z/03sTDrZfOB/qxt4ifZlA88lmEhVQeUYS
-         M8+ACEiFKNcaiOn+4NIFHcBjApNytfa7mAYOO+ZEaLivnoNBCniealGtC5VCEPQ9G470
-         qKZjOOdpzEI7d1My9V9r7Jvf7YgHxxRYg6ctK3RbqqdVscSBPAufG4L/zOrN13C4cvTS
-         EDIgyKkBa/vA3xeUVnW15he5zoWLrOGJ4tms5N7Pvn14f3FC1LCmqpz3YDOvkevigU09
-         5oYrJtigHVF+3NTGZY3JhFykuJc/OJNP1837mRr0dGPjY9xQ5kOOyaF+7wauwjzJPMKM
-         3PjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730479154; x=1731083954;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HbKJeki4dzd2XPRMM44KMwAEciOK8zIOcm2qr7s1wcQ=;
-        b=Imxz7obDGxBRL/YQgls+r3GhvZTzOWKSnCpRUpH4P/bDubcWgQX9qm/zPzHCtyHKRM
-         A5uvB8KivcSfmpWi1dxXZRNFJtSY59t9M1n5OZBBof0T5lec8rPx5RJOsuVM3uVLKmAf
-         EPrC6yJjkHwpIpXB83Nnq4mW7RUR0SCPXeDCpK9WbbsPGKaenV91Anqjlbr+v3xx6VfF
-         YxTLddptN2dNCHp4UsXf/ZOYGezxNJA4saQbsap6dCAeqM56XAhnTSkdd5IDPNrUw/2h
-         66UFkog/Hog2Sdw3bThRYLx3PjUsHp9qdDuPamgpJvsaODAa06/IfKyVb+V3c4gQozXa
-         spVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIdQI3RI1OBkX/QmZKRtHIQLPPMR+6tP5y+dO53E/xtaB9gYoMV8shLpjGYzQp1VPMez4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgRstQm0iN9ei9xt/Ui4TIOY/c9RZyzKdwMdccqrJ2jcKisl02
-	LglHtF3CJ3WHPSxoC3dxZKyPf19zaAuygVDYf2t6ZnMZvsj2vvSxJaZlxERtXnaCn7UAYjvtimP
-	0pQ==
-X-Google-Smtp-Source: AGHT+IEZ/As1CqiUNvhsvRDX72pDJbWbYUewG6GHPtYMfGfRk/DC8Z0VB7WVVgFtrlwKk4B3jrTtoBP5VLU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:67ca:b0:6e3:d670:f62a with SMTP id
- 00721157ae682-6ea52518e31mr269617b3.3.1730479153876; Fri, 01 Nov 2024
- 09:39:13 -0700 (PDT)
-Date: Fri, 1 Nov 2024 09:39:12 -0700
-In-Reply-To: <1cace497215b025ed8b5f7815bdeb23382ecad32.camel@intel.com>
+	s=arc-20240116; t=1730479280; c=relaxed/simple;
+	bh=lQWAHQP49L9EPI83ci/P6pNn65ds+hzTCghHwBXbPEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W76QoO1ZOIwmJQZ5z04ksxXHQgbYiMhlON7nK9m65ATdXDWL6uL135c9PQ546x8PbIpivAEKpeXZoImuSf2lDYm7HQOjFK8fkMg+XnoyUNPmCT63ylOgwPoRKVWn2ji+tH1lUC0tcEN/VHVTy+3jRKr7XhXKFoj4e7rHPApMxLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GCUtdnxy; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AA1D040E0220;
+	Fri,  1 Nov 2024 16:41:14 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id IxkFdDt0bs4B; Fri,  1 Nov 2024 16:41:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730479270; bh=fzSSkxQVzzE+tCcSW0ZG2KSSM/Nhtusb1t/k+DswM4A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GCUtdnxykynOPbX9wjDcCmIsrGBc1gdfiD+WRUDn2QQ8afrcdRosRyQ0S2EyFHUxD
+	 DGwcsGt1BM1NojWvy60niSio2K8U1vEbplwvqITDFNBrNIxZz4TrqQ/96dq3q3sl+c
+	 gGV6FimbcBYVzcrI51J9AiBqCVl/ri5sl43jbs26cc0nwmickSRVxmQYDf4/CwSmnI
+	 CQQqdCW/9U3pZStwpfPHhIZ/LfiKiMb5HCdq5mB+vUnbkjkmDDvpfzIr1L+pitaQnC
+	 hgfsvJsrIJlitqoDbwYBOF74GJj4qSXpTRyjJKTENEqv7hocSjMacsBb6hxkn21+ed
+	 UyVzgnc3f5yDnbalYx9B1KbALTWX5RPuK1BH8WzJVZIORNADtdCtPwQDjuT5KbryZ/
+	 FsWOcJNSRZDelO8EnWeHK6VdfZIXGe78OXgZOj7gd4CL/dUT8cKhgYMBmYuf0uKhEz
+	 EH55iRXrppeh3LicIChtmhs2kUXNXfKk5LDJnnyd82ObH44ZegAPK9pPXYiMi2a4FQ
+	 KFNFh4ju9+C0eAtU8rswg7C9IvWFoOd8pWLuBiP1iLG2ruiSbWceChQQBJVL6IQNaB
+	 B+YcqZvKljKrNIcpHGMcvfRm5LY+hsxujcigG4LT/7sqMq0elRD9ZRzQPj5gf+2z8S
+	 oUUP0yBrQhUOi88Mfra0/nRg=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CA7840E019C;
+	Fri,  1 Nov 2024 16:40:59 +0000 (UTC)
+Date: Fri, 1 Nov 2024 17:40:53 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v14 04/13] x86/sev: Change TSC MSR behavior for Secure
+ TSC enabled guests
+Message-ID: <20241101164053.GLZyUElVm8I22ZZjor@fat_crate.local>
+References: <20241028053431.3439593-1-nikunj@amd.com>
+ <20241028053431.3439593-5-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
- <20240826022255.361406-2-binbin.wu@linux.intel.com> <ZyKbxTWBZUdqRvca@google.com>
- <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
- <ZyLWMGcgj76YizSw@google.com> <1cace497215b025ed8b5f7815bdeb23382ecad32.camel@intel.com>
-Message-ID: <ZyUEMLoy6U3L4E8v@google.com>
-Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace generically
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241028053431.3439593-5-nikunj@amd.com>
 
-On Fri, Nov 01, 2024, Kai Huang wrote:
-> On Thu, 2024-10-31 at 07:54 -0700, Sean Christopherson wrote:
-> > On Thu, Oct 31, 2024, Kai Huang wrote:
-> > -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
-> > -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
-> > -		/* MAP_GPA tosses the request to the user space. */
-> > -		return 0;
-> > +	r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
-> > +	if (r <= r)
-> > +		return r;
-> 
-> ... should be:
-> 
-> 	if (r <= 0)
-> 		return r;
-> 
-> ?
-> 
-> Another option might be we move "set hypercall return value" code inside
-> __kvm_emulate_hypercall().  So IIUC the reason to split
-> __kvm_emulate_hypercall() out is for TDX, and while non-TDX uses RAX to carry
-> the hypercall return value, TDX uses R10.
-> 
-> We can additionally pass a "kvm_hypercall_set_ret_func" function pointer to
-> __kvm_emulate_hypercall(), and invoke it inside.  Then we can change
-> __kvm_emulate_hypercall() to return: 
->     < 0 error, 
->     ==0 return to userspace, 
->     > 0 go back to guest.
+On Mon, Oct 28, 2024 at 11:04:22AM +0530, Nikunj A Dadhania wrote:
+> +	/*
+> +	 * TSC related accesses should not exit to the hypervisor when a
+> +	 * guest is executing with SecureTSC enabled, so special handling
+> +	 * is required for accesses of MSR_IA32_TSC:
+> +	 *
+> +	 * Writes: Writing to MSR_IA32_TSC can cause subsequent reads
+> +	 *         of the TSC to return undefined values, so ignore all
+> +	 *         writes.
+> +	 * Reads:  Reads of MSR_IA32_TSC should return the current TSC
+> +	 *         value, use the value returned by RDTSC.
+> +	 */
+> +	if (regs->cx == MSR_IA32_TSC && (sev_status & MSR_AMD64_SNP_SECURE_TSC)) {
+> +		u64 tsc;
+> +
+> +		if (exit_info_1)
+> +			return ES_OK;
+> +
+> +		tsc = rdtsc();
 
-Hmm, and the caller can still handle kvm_skip_emulated_instruction(), because the
-return value is KVM's normal pattern.
+rdtsc_ordered() I guess.
 
-I like it!
+> +		regs->ax = UINT_MAX & tsc;
+> +		regs->dx = UINT_MAX & (tsc >> 32);
+> +
+> +		return ES_OK;
+> +	}
+> +
 
-But, there's no need to pass a function pointer, KVM can write (and read) arbitrary
-GPRs, it's just avoided in most cases so that the sanity checks and available/dirty
-updates are elided.  For this code though, it's easy enough to keep kvm_rxx_read()
-for getting values, and eating the overhead of a single GPR write is a perfectly
-fine tradeoff for eliminating the return multiplexing.
+All that you're adding - put that in a __vc_handle_msr_tsc() helper so that it
+doesn't distract from the function's flow.
 
-Lightly tested.  Assuming this works for TDX and passes testing, I'll post a
-mini-series next week.
+Thx.
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 1 Nov 2024 09:04:00 -0700
-Subject: [PATCH] KVM: x86: Refactor __kvm_emulate_hypercall() to accept reg
- names, not values
-
-Rework __kvm_emulate_hypercall() to take the names of input and output
-(guest return value) registers, as opposed to taking the input values and
-returning the output value.  As part of the refactor, change the actual
-return value from __kvm_emulate_hypercall() to be KVM's de facto standard
-of '0' == exit to userspace, '1' == resume guest, and -errno == failure.
-
-Using the return value for KVM's control flow eliminates the multiplexed
-return value, where '0' for KVM_HC_MAP_GPA_RANGE (and only that hypercall)
-means "exit to userspace".
-
-Use the direct GPR accessors to read values to avoid the pointless marking
-of the registers as available, but use kvm_register_write_raw() for the
-guest return value so that the innermost helper doesn't need to multiplex
-its return value.  Using the generic kvm_register_write_raw() adds very
-minimal overhead, so as a one-off in a relatively slow path it's well
-worth the code simplification.
-
-Suggested-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h | 15 +++++++++----
- arch/x86/kvm/x86.c              | 40 +++++++++++++--------------------
- 2 files changed, 27 insertions(+), 28 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6d9f763a7bb9..9e66fde1c4e4 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2179,10 +2179,17 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
- 	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
- }
- 
--unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
--				      unsigned long a0, unsigned long a1,
--				      unsigned long a2, unsigned long a3,
--				      int op_64_bit, int cpl);
-+int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-+			      unsigned long a0, unsigned long a1,
-+			      unsigned long a2, unsigned long a3,
-+			      int op_64_bit, int cpl, int ret_reg);
-+
-+#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, ret)	\
-+	____kvm_emulate_hypercall(vcpu,						\
-+				  kvm_##nr##_read(vcpu), kvm_##a0##_read(vcpu),	\
-+				  kvm_##a1##_read(vcpu), kvm_##a2##_read(vcpu),	\
-+				  kvm_##a3##_read(vcpu), op_64_bit, cpl, VCPU_REGS_##ret)
-+
- int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
- 
- int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e09daa3b157c..425a301911a6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9998,10 +9998,10 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- 	return kvm_skip_emulated_instruction(vcpu);
- }
- 
--unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
--				      unsigned long a0, unsigned long a1,
--				      unsigned long a2, unsigned long a3,
--				      int op_64_bit, int cpl)
-+int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-+			      unsigned long a0, unsigned long a1,
-+			      unsigned long a2, unsigned long a3,
-+			      int op_64_bit, int cpl, int ret_reg)
- {
- 	unsigned long ret;
- 
-@@ -10086,15 +10086,18 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
- 
- out:
- 	++vcpu->stat.hypercalls;
--	return ret;
-+
-+	if (!op_64_bit)
-+		ret = (u32)ret;
-+
-+	kvm_register_write_raw(vcpu, ret_reg, ret);
-+	return 1;
- }
--EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
-+EXPORT_SYMBOL_GPL(____kvm_emulate_hypercall);
- 
- int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- {
--	unsigned long nr, a0, a1, a2, a3, ret;
--	int op_64_bit;
--	int cpl;
-+	int r;
- 
- 	if (kvm_xen_hypercall_enabled(vcpu->kvm))
- 		return kvm_xen_hypercall(vcpu);
-@@ -10102,23 +10105,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 	if (kvm_hv_hypercall_enabled(vcpu))
- 		return kvm_hv_hypercall(vcpu);
- 
--	nr = kvm_rax_read(vcpu);
--	a0 = kvm_rbx_read(vcpu);
--	a1 = kvm_rcx_read(vcpu);
--	a2 = kvm_rdx_read(vcpu);
--	a3 = kvm_rsi_read(vcpu);
--	op_64_bit = is_64_bit_hypercall(vcpu);
--	cpl = kvm_x86_call(get_cpl)(vcpu);
--
--	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
--	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
--		/* MAP_GPA tosses the request to the user space. */
-+	r = __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
-+				    is_64_bit_hypercall(vcpu),
-+				    kvm_x86_call(get_cpl)(vcpu), RAX);
-+	if (r <= 0)
- 		return 0;
- 
--	if (!op_64_bit)
--		ret = (u32)ret;
--	kvm_rax_write(vcpu, ret);
--
- 	return kvm_skip_emulated_instruction(vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
-
-base-commit: 911785b796e325dec83b32050f294e278a306211
 -- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
