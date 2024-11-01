@@ -1,141 +1,156 @@
-Return-Path: <kvm+bounces-30311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB979B9374
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:39:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1CCC9B93AF
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 15:48:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF261C20DCA
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 14:39:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 722F528341B
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 14:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE86C1A7271;
-	Fri,  1 Nov 2024 14:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F0C1AA7AB;
+	Fri,  1 Nov 2024 14:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJIM8CHG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cIX6fuKv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9539F1531C5
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 14:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7340B1A265D
+	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 14:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730471943; cv=none; b=qJLee5RhPFXet+cMPmJukXuOLn9TepLNUtHO3On8ugFLezOv3Fla5oexHXDk9KEunvdgoOsepOhLcFbmTjaRymolSnewn0qRO/cg7DsepF+MSBWpdp3vl/aPshWHxOZsmQZwLNmlGCJRqKkSPSOUQdHXhYlqkIFFZHjTIyvgPqw=
+	t=1730472484; cv=none; b=t1DErzjcC2k+QVCKvdx+5Tn2DTQHEyIKjddb5qArl/zefzrPVGb/0pVDnVq8wEvQ9E42h439VBOx4ruqIrgL0LIGPED3XWU8nd2Efx49RLNx056kn5LnT5xuhq9wkMmBiw3uGPomSA/IeUBzzg+A7F9KjwkCLStDdBSXkUCMOH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730471943; c=relaxed/simple;
-	bh=Y38QQrJXyIzC27Zb5Y70kq+LVb66PlU9agQi+H5nsOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lPFB4JEBPDL9oSdfyATc6ppzSrZl4rtxPOaFJD+2D43TazqKaZFzZt/czDOM2sowoG7OtnfDQ3giivOCSLuPaczk3fj8BEalWtmoYVQ0E+MEPOw8viWOx6dJvUo0TAOEHBnctT52r0jRNbFsCBFuf++b+USKFlhygJ3eeDO4k+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RJIM8CHG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730471940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PjBxXqU+pM0vC60LmXgGLO5qOIRdoqxNpK1lcWYvr1A=;
-	b=RJIM8CHGcrJb9zzANJfsPNeF0DdG9DiNUDZHdLXgP4/iW+6/5s8KFnk+NXtN3lhPy2r9pS
-	wWbnrD8bCTs6Z553SQM0weAS7xwrGlU6AfeQG60jxYuImE/MUG//AqttbqLO/UoIESrKTG
-	X+0nhzxQp2gwh6uyoLMlpl8GqXzNaUk=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-3tLGc8e9M029lGWg7i2Cwg-1; Fri, 01 Nov 2024 10:38:59 -0400
-X-MC-Unique: 3tLGc8e9M029lGWg7i2Cwg-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a4f803aa47so1772035ab.3
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 07:38:58 -0700 (PDT)
+	s=arc-20240116; t=1730472484; c=relaxed/simple;
+	bh=/Lo0SSKZxUY4iHjD0LeZv0mV6fASOYVUcG7mLz+tc54=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z6N1WcCyJT/+ncXGB39ltPj6Rztas/tK91ymaW+oMWLh8Z7D9TKc6dumDfGVvnTs1qJga6zPjl/X7VWZleHT0Jy8/TtIE1QVoSP4pVbPG77ZfziQSaGROl/+og+EKBb8rm6zfFPzwHEcWajQqUIiKRzFvcL/aMB/er0PRIhscjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cIX6fuKv; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7eda7c4f014so2025000a12.3
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 07:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730472482; x=1731077282; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G/DE0DbUg8M7Q/DJxS90r+0tog95n4HSr4HfODo/BC0=;
+        b=cIX6fuKv+3yuHboiGIHTTkhC7T3EUaXfQVDxPB+oAiRohNO+puS96HIJ14w+gM4QVJ
+         Qe85l8fGO/H8SSUP0i3EDU6ZHX0GxK42FQ9R4hj23EmYigpyCJrE5Z2c6zeywsSK2YaL
+         mq4nzc9fXVEKHJrcdElI07AhpD/KXsZ0QF1KqcCnunuLUmdfSrBnx1ovgf93KqRbA3IO
+         K6rM9onYyCiXDl2XYaaJygmes06VX3wUS7o7IkOl8sZlISR/PE4XUU4ryLht+AVW5LCU
+         z4K00RjybpXCz1hqUwoVDh/cfGGNGR+V+p+X3DwgSDvnhGwlCOy8CKIokuLSMOnixqEM
+         5xlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730471938; x=1731076738;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PjBxXqU+pM0vC60LmXgGLO5qOIRdoqxNpK1lcWYvr1A=;
-        b=vCkz2ugx9t69fJOYngvMSAsBjmB94HPCmi1jpdMADX2R3g+yuOOK47giCM/6MJ1kjI
-         F+sZeMBBT3GxnT0gHdmX1uh8jELh0XYVl9S2LpEKyVWxQook33fzts1CHotcTFcn0+rV
-         eCJzwAD3t+EQfs7I3WXuspS81LbNxiIj2wEylHTZ2yMOba8QOrLKcDJ2IBuE4h3GtpPM
-         DxHdMyswWZFE9DfgFCLxsiK8+Ez7neU59HHac1mUXu0jzDiz4bnQdghyezSsCE/8IfBX
-         oZttykK48hxsmt3l9/xrYcrRmzoxqsLxxINOrecYV+Mm05C+M7Pyeef5ZSqcuJ+SrAvn
-         frxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSzK3KXFfqZYz20DwSRpLQibRSlJkGlvGu5ltLIn6OPuGztLFnKab2eVtLGkEpIj/n5po=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyfjfgd5eJ/43QaKmyKC+FBKJWvowh71sFfQmNbGIO13bnBuPhF
-	nGEdqSpEcZY6dd8LYfEVMDyrTOUm2GN9iXbp1Lbldmyix+hwqJClzbLCogfxhKHC8CourzkpiHX
-	vFXVhYBmMuII2+ZlhyrDf/f6M+E5Sr3GUTKJolrj8LLR8j8ELTw==
-X-Received: by 2002:a92:c264:0:b0:3a3:b4ec:b3fe with SMTP id e9e14a558f8ab-3a4ed30ccaamr64455415ab.5.1730471938352;
-        Fri, 01 Nov 2024 07:38:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7nZwd4QYd2Kqt6n+Vk5UKw8q+RJ0a/CtlOIPXX1gGRhLlpcRjOUVpYuIqY4BAyZdXiPM68A==
-X-Received: by 2002:a92:c264:0:b0:3a3:b4ec:b3fe with SMTP id e9e14a558f8ab-3a4ed30ccaamr64455235ab.5.1730471937957;
-        Fri, 01 Nov 2024 07:38:57 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de04acaa2csm748195173.172.2024.11.01.07.38.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 07:38:57 -0700 (PDT)
-Date: Fri, 1 Nov 2024 08:38:55 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: jgg@ziepe.ca, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- kevin.tian@intel.com, xin.zeng@intel.com, kvm@vger.kernel.org,
- qat-linux@intel.com, stable@vger.kernel.org, Zijie Zhao <zzjas98@gmail.com>
-Subject: Re: [PATCH] vfio/qat: fix overflow check in qat_vf_resume_write()
-Message-ID: <20241101083855.233afee0.alex.williamson@redhat.com>
-In-Reply-To: <20241021123843.42979-1-giovanni.cabiddu@intel.com>
-References: <20241021123843.42979-1-giovanni.cabiddu@intel.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1730472482; x=1731077282;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=G/DE0DbUg8M7Q/DJxS90r+0tog95n4HSr4HfODo/BC0=;
+        b=wYJLBT4DPk2V8KH4uoWmItPU6KSFjficpdd3tp9X/DEf1HwSobW7zbrlJQeziZ0lgA
+         JMud6iXIAOYQA/zyFoJFQbdaTSLab/MqwInY+lMye7cttCQaydwnWzI+h2j/syqmqNdi
+         i8FWw98nasxnc6sxxOQbKFxBrSkgDzXtwcru9mqX/i16fnkYwIhPHwwMXrPMqJc5LBrQ
+         lsfQN3P4ZcvJUpLXrcYF1Z+MsCVbQtplTR2fDeOyrOTX6xImObFROEVorlmuFQxK+SEc
+         ijhzX15zJXeJbKT4sWb0D5zIn7SYiaqwxiaLtfAicWtVk7INVCUBt3JSzt8n8G3+ACFB
+         dWsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxpkwv7UKjPqaiusnOyZqXrIyoPHEfdeAsM4VCXb7+eapMFmygseHgO6Is0zaDAWSp0rE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykmHA5twQtOKSDToer3OtAUnOXTEcgCV0LNa3qhARMsuA48Vd0
+	piQrGJv9Q90I3pxHrXcGVNgb7L3sH/mpLnI4zGCWVqbr5ZHieJw/fQ2qNArEOAtwO216am964yM
+	Yog==
+X-Google-Smtp-Source: AGHT+IHIf47dwb0nbkXT8QGaJrWq+fHjP6RSYp5sBCxZxmiVg/IHgboRnjvSBKMyLIM+q34Z1vnYxW9f4KA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:fa55:0:b0:7ea:83fc:1f0c with SMTP id
+ 41be03b00d2f7-7edd7c3149dmr31512a12.5.1730472481723; Fri, 01 Nov 2024
+ 07:48:01 -0700 (PDT)
+Date: Fri, 1 Nov 2024 07:48:00 -0700
+In-Reply-To: <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241009154953.1073471-1-seanjc@google.com> <20241009154953.1073471-4-seanjc@google.com>
+ <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
+Message-ID: <ZyTpwwm0s89iU9Pk@google.com>
+Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
+ vcpu_get_reg() instead of using an out-param
+From: Sean Christopherson <seanjc@google.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Andrew Jones <ajones@ventanamicro.com>, James Houghton <jthoughton@google.com>, 
+	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 21 Oct 2024 13:37:53 +0100
-Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
+On Fri, Nov 01, 2024, Mark Brown wrote:
+> On Wed, Oct 09, 2024 at 08:49:42AM -0700, Sean Christopherson wrote:
+> > Return a uint64_t from vcpu_get_reg() instead of having the caller prov=
+ide
+> > a pointer to storage, as none of the vcpu_get_reg() usage in KVM selfte=
+sts
+> > accesses a register larger than 64 bits, and vcpu_set_reg() only accept=
+s a
+> > 64-bit value.  If a use case comes along that needs to get a register t=
+hat
+> > is larger than 64 bits, then a utility can be added to assert success a=
+nd
+> > take a void pointer, but until then, forcing an out param yields ugly c=
+ode
+> > and prevents feeding the output of vcpu_get_reg() into vcpu_set_reg().
+>=20
+> This commit, which is in today's -next as 5c6c7b71a45c9c, breaks the
+> build on arm64:
+>=20
+> aarch64/psci_test.c: In function =E2=80=98host_test_system_off2=E2=80=99:
+> aarch64/psci_test.c:247:9: error: too many arguments to function =E2=80=
+=98vcpu_get_reg=E2=80=99
+>   247 |         vcpu_get_reg(target, KVM_REG_ARM_PSCI_VERSION, &psci_vers=
+ion);
+>       |         ^~~~~~~~~~~~
+> In file included from aarch64/psci_test.c:18:
+> include/kvm_util.h:705:24: note: declared here
+>   705 | static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64=
+_t id)
+>       |                        ^~~~~~~~~~~~
+> At top level:
+> cc1: note: unrecognized command-line option =E2=80=98-Wno-gnu-variable-si=
+zed-type-not-at
+> -end=E2=80=99 may have been intended to silence earlier diagnostics
+>=20
+> since the updates done to that file did not take account of 72be5aa6be4
+> ("KVM: selftests: Add test for PSCI SYSTEM_OFF2") which has been merged
+> in the kvm-arm64 tree.
 
-> The unsigned variable `size_t len` is cast to the signed type `loff_t`
-> when passed to the function check_add_overflow(). This function considers
-> the type of the destination, which is of type loff_t (signed),
-> potentially leading to an overflow. This issue is similar to the one
-> described in the link below.
-> 
-> Remove the cast.
-> 
-> Note that even if check_add_overflow() is bypassed, by setting `len` to
-> a value that is greater than LONG_MAX (which is considered as a negative
-> value after the cast), the function copy_from_user(), invoked a few lines
-> later, will not perform any copy and return `len` as (len > INT_MAX)
-> causing qat_vf_resume_write() to fail with -EFAULT.
-> 
-> Fixes: bb208810b1ab ("vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices")
-> CC: stable@vger.kernel.org # 6.10+
-> Link: https://lore.kernel.org/all/138bd2e2-ede8-4bcc-aa7b-f3d9de167a37@moroto.mountain
-> Reported-by: Zijie Zhao <zzjas98@gmail.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
-> ---
->  drivers/vfio/pci/qat/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
-> index e36740a282e7..1e3563fe7cab 100644
-> --- a/drivers/vfio/pci/qat/main.c
-> +++ b/drivers/vfio/pci/qat/main.c
-> @@ -305,7 +305,7 @@ static ssize_t qat_vf_resume_write(struct file *filp, const char __user *buf,
->  	offs = &filp->f_pos;
->  
->  	if (*offs < 0 ||
-> -	    check_add_overflow((loff_t)len, *offs, &end))
-> +	    check_add_overflow(len, *offs, &end))
->  		return -EOVERFLOW;
->  
->  	if (end > mig_dev->state_size)
+Bugger.  In hindsight, it's obvious that of course arch selftests would add=
+ usage
+of vcpu_get_reg().
 
-Applied to vfio next branch for v6.13.  Thanks,
+Unless someone has a better idea, I'll drop the series from kvm-x86, post a=
+ new
+version that applies on linux-next, and then re-apply the series just befor=
+e the
+v6.13 merge window (rinse and repeat as needed if more vcpu_get_reg() users=
+ come
+along).
 
-Alex
+That would be a good oppurtunity to do the $(ARCH) directory switch[*] too,=
+ e.g.
+have a "selftests_late" or whatever topic branch.
 
+Sorry for the pain Mark, you've been playing janitor for us too much lately=
+.
+
+[*] https://lore.kernel.org/all/20240826190116.145945-1-seanjc@google.com
 
