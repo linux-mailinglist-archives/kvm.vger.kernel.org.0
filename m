@@ -1,131 +1,152 @@
-Return-Path: <kvm+bounces-30352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484E29B97BE
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:39:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FCD79B97DB
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 19:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A06F0B21D0E
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:39:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3245281208
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2024 18:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067321D90CC;
-	Fri,  1 Nov 2024 18:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4D61CEE96;
+	Fri,  1 Nov 2024 18:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MDHk3TRy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j5P6aRZU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2BB1D2F5D
-	for <kvm@vger.kernel.org>; Fri,  1 Nov 2024 18:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB31F14A629;
+	Fri,  1 Nov 2024 18:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730486180; cv=none; b=GcmT+Z0CoyT1yE0BhiG0ECscDemx7O/jHiPoUS/w8JA/JjM6L2eCl68wbSsXfrOWaIf622m2siEw1Bv6HJh7K775+w//nn06Ez6hjv8FvPRLwbVxVYlJ4DZpbPzzxyd3y8rPUje+tgSLjds8Uo0iClfKyAZ6WJSF3oNNNPIX7KA=
+	t=1730486639; cv=none; b=pbRxmRsn9SkIaukoc1S0SzUH5//8yCLyht3m7QTMYICE3SbHjSDSnQwQvylKKGeYXZaIf2G+2up2vHXv1ine1qw/p5/Rmh4djdwaD7g72jJHpG5/a10YycXlYjPV+C2pAb/mkbD2n0VuxhdC6AkWxhmoZm+I+FseKWmNV+AKaaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730486180; c=relaxed/simple;
-	bh=wETa+dLcXchkDF6niCLZKhIJhZbg0XK3Wfx1WgkxMCc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TiSgTxCnOJGmvOxQBUUTpaOVX4erJs310BQOFnv7DC3GLpiZODtPSMwOzp96yrF5wryKCpmhpQGuhNniOrYN0TYj8lm0A0TChBjdKOmKKZMTr9hO60PzKsmXvNCLj+rIrX9jQRoLV2ncgSPlChS8T0KoTgYJgZZwPzYTJzI1uRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MDHk3TRy; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7cd9ac1fa89so2555843a12.1
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2024 11:36:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730486178; x=1731090978; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=t6n3TCROGALKBhF87tS4HVc6hSldgq3keX1Nmca5GdQ=;
-        b=MDHk3TRyDF0J5zovlyekZcJk15Cg90yrmpNGQnIykNg4UT/vWmf2MFi8otvSWkgtDD
-         0ShRvpELKEW7cj+rT0B8yo9L8pAs0R1+iJAcuSNODEj1SIzSZ6rg08GMp2aB4t7EnPDU
-         HNw0NBkH8reDlTtAFQ0m5k0dHbMJsv8GVy7gMtPdu0UozJf+fcKg6R28H/J5nOSCAxEn
-         mOdWVRcMdcmtHt0xahGe6B+0M5cDxlq76L8ExAw6KpA8mgp0yIon3EZ4L/tf15iR9CKV
-         NXDsVJt3ICxYv92h9zIhc0eSM+/3OeTy07vRX/YMauqzqMbPIEGHVbn+KofzrIoX7wit
-         Hqrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730486178; x=1731090978;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t6n3TCROGALKBhF87tS4HVc6hSldgq3keX1Nmca5GdQ=;
-        b=dvexJYbrCKeeTVglOdrHAFh/wi/l/4h9+gVhBCnTNdGqU140VhZelnuypls8bO0vH3
-         GokdvFxUcfjCCuXVmvr8KfiRVUe4pelxpiGdismpYKHFuOFbtVexCzGiRsGe7drYDLrn
-         2eRyMYOlpjalZ2XO4AxW46V7HDBDNmhJGaw7MC1jxDjYaiZhIpXpqj63N/ahFsBbvHMy
-         8vP9oRUpHfNI1ynTiBzRviuVBUh9sP/gM/ymsoDgdY+AX7zOrfuFu9y3/rBc2pgqCPVu
-         trxem18zMxQ/e6jdzXzF1AWx/42acCpNkWsOK9bvTbAb1+J7GYozgkRdzJhK2T1SrmwA
-         lgJw==
-X-Gm-Message-State: AOJu0YxFH9lQ1gHQpRcViR3xIBue3ZBizQFpWOdwCjD9k4R+CSQ42fID
-	IM1glJSA/TJUCTqLBJPdvEayjd88X1KM+4hcGG0H7n7xIQykne2jTHfTHMbEASo8vxN8/Rz3Yy4
-	ujg==
-X-Google-Smtp-Source: AGHT+IH9li/61FEUW1xJGw5b33eDgRmdCZyYAPvyxxo44gUVaRYqdHjdk4v5TgKyy+vIqOwzof42J6bDicI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:902:e54b:b0:20b:7be8:8ecc with SMTP id
- d9443c01a7336-210c68803d5mr2548335ad.1.1730486178136; Fri, 01 Nov 2024
- 11:36:18 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  1 Nov 2024 11:35:55 -0700
-In-Reply-To: <20241101183555.1794700-1-seanjc@google.com>
+	s=arc-20240116; t=1730486639; c=relaxed/simple;
+	bh=vPc1Ldvq2PDuLY+WWtt/CAl7h5TN13wwfuaoOzg1fOA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HWsvxwczBYqrg5KKZzUMdjWBtATwxmjS+GT0L6EGy3HVZHijdpzGabqKgu4yrKUDCP0j/GXFrh1UaxUrpMqga3RBKqImzI4rLhBPZpfZGJ3EF1LeFvTjF5+0ed1BfTPrxg+3GYFng4L/W7MYi1MWP0akujG3viNWWTR3AApeUx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j5P6aRZU; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730486638; x=1762022638;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vPc1Ldvq2PDuLY+WWtt/CAl7h5TN13wwfuaoOzg1fOA=;
+  b=j5P6aRZUN3ahm6l5e0/a5uSel7vkrrDQAP5iYFgiqKOuoWZgVj8f60Md
+   aytAzinOUx6KN70O3+idxVtUPdkRoHv2l72ZbS3nzpJylyFjAwHB4z9K7
+   KtYuKizpL3QxyUqecs4O59uHlkAzemIZ3vAHyoBJ7xFqVEhuU94bph0K7
+   OKqvxNySkSQAoqX9i279T1zufuHyn8uktucU6WJuA371Qm866i0bFf+lF
+   W1Hu6xNCM7Bn4Mqo0SgqBGCc/nCNGpd86exEiLBDMXY8kKW4NfjaG8CsU
+   Ox8n8ACtAgfSHUJ6COWExYxHP/RTX5gZPvjBQ+cNR8eSqfE+NCRXTr5jk
+   g==;
+X-CSE-ConnectionGUID: wHPEjQ4LTquWEuweCuo0Dw==
+X-CSE-MsgGUID: vG8bjfl3QoOkrq0IisCPvA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30216946"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30216946"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 11:43:57 -0700
+X-CSE-ConnectionGUID: nItOh5W8SBua+HcT4OK75w==
+X-CSE-MsgGUID: Rqmuf4uZTza2bSiqESaTiw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,250,1725346800"; 
+   d="scan'208";a="83866016"
+Received: from ccbilbre-mobl3.amr.corp.intel.com (HELO [10.124.220.146]) ([10.124.220.146])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 11:43:54 -0700
+Message-ID: <d467e6bd-c673-415f-8bb0-91603f06498a@intel.com>
+Date: Fri, 1 Nov 2024 11:43:52 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241101183555.1794700-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <20241101183555.1794700-10-seanjc@google.com>
-Subject: [PATCH v2 9/9] KVM: x86: Short-circuit all of kvm_apic_set_base() if
- MSR value is unchanged
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
+To: "Manwaring, Derek" <derekmn@amazon.com>
+Cc: ackerleytng@google.com, agordeev@linux.ibm.com, aou@eecs.berkeley.edu,
+ borntraeger@linux.ibm.com, bp@alien8.de, canellac@amazon.at,
+ catalin.marinas@arm.com, chenhuacai@kernel.org, corbet@lwn.net,
+ dave.hansen@linux.intel.com, david@redhat.com, elena.reshetova@intel.com,
+ gerald.schaefer@linux.ibm.com, gor@linux.ibm.com, graf@amazon.com,
+ hca@linux.ibm.com, hpa@zytor.com, jgowans@amazon.com, jthoughton@google.com,
+ kalyazin@amazon.com, kernel@xen0n.name, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ loongarch@lists.linux.dev, luto@kernel.org, mathieu.desnoyers@efficios.com,
+ mhiramat@kernel.org, mingo@redhat.com, mlipp@amazon.at, palmer@dabbelt.com,
+ paul.walmsley@sifive.com, pbonzini@redhat.com, peterz@infradead.org,
+ quic_eberman@quicinc.com, rostedt@goodmis.org, roypat@amazon.co.uk,
+ rppt@kernel.org, seanjc@google.com, shuah@kernel.org, svens@linux.ibm.com,
+ tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+ will@kernel.org, x86@kernel.org, xmarcalx@amazon.com
+References: <51fe5ad1-7057-4d43-b92c-580d187d2aeb@intel.com>
+ <37fbfc65-b145-4a22-a48c-1921204d5635@amazon.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <37fbfc65-b145-4a22-a48c-1921204d5635@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Do nothing in from kvm_apic_set_base() if the incoming MSR value is the
-same as the current value, as validating the mode transitions is obviously
-unnecessary, and rejecting the write is pointless if the vCPU already has
-an invalid value, e.g. if userspace is doing weird things and modified
-guest CPUID after setting MSR_IA32_APICBASE.
+On 11/1/24 11:31, Manwaring, Derek wrote:
+>>From that standpoint I'm still tempted to turn the question around a bit
+> for the host kernel's perspective. Like if the host kernel should not
+> (and indeed cannot with TDX controls in place) access guest private
+> memory, why not remove it from the direct map?
 
-Bailing early avoids kvm_recalculate_apic_map()'s slow path in the rare
-scenario where the map is DIRTY due to some other vCPU dirtying the map,
-in which case it's the other vCPU/task's responsibility to recalculate the
-map.
+Pretend that the machine check warts aren't there.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 7b2342e40e4e..59a64b703aad 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2582,9 +2582,6 @@ static void __kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value)
- 	u64 old_value = vcpu->arch.apic_base;
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 
--	if (old_value == value)
--		return;
--
- 	vcpu->arch.apic_base = value;
- 
- 	if ((old_value ^ value) & MSR_IA32_APICBASE_ENABLE)
-@@ -2632,6 +2629,10 @@ int kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value, bool host_initiated)
- {
- 	enum lapic_mode old_mode = kvm_get_apic_mode(vcpu);
- 	enum lapic_mode new_mode = kvm_apic_mode(value);
-+
-+	if (vcpu->arch.apic_base == value)
-+		return 0;
-+
- 	u64 reserved_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu) | 0x2ff |
- 		(guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) ? 0 : X2APIC_ENABLE);
- 
--- 
-2.47.0.163.g1226f6d8fa-goog
-
+It costs performance and complexity, for an only theoretical gain.  This
+is especially true for a VMM that's not doing a just doing confidential
+guests.  You fracture the direct map to pieces forever (for now).
 
