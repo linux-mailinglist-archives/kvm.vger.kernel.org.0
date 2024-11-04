@@ -1,194 +1,132 @@
-Return-Path: <kvm+bounces-30470-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0BF49BAF98
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:27:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD879BAFF0
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:39:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F7A11C21529
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:27:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FC741C21E70
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761571ADFEB;
-	Mon,  4 Nov 2024 09:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hs7Ppm7w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79CA1AE877;
+	Mon,  4 Nov 2024 09:39:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2841F19D086
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 09:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E128C1ADFE2;
+	Mon,  4 Nov 2024 09:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730712419; cv=none; b=lKPkSwYKe6nkn/hZCXqRsukoObX19rL9ljZwrRBpNX1kQwM4SyyrbrnxSy3JMtokiFHQ+cIQjvsvhW1yMdlXM0WmX+n9BmvP+WH/Rfbn0ExU/p5G6ZmS8ePViawVYCB11Qxy+qDXeU8G0BMt++AjMQ6D4gERC2M4oeuwujGwecs=
+	t=1730713185; cv=none; b=Xev+EUh0MN8oROUbYdDIS4TSF9m3sMsTC+h0CUIi5H3VwKrbUad6cSJqZIWaYSX6yAR3m0Pvt+d0IJtHk+g2mWV7LWKQSMAPpB5lSmJqx71tiE9utjcE8AZyAxUSOPLuZIoxtl7nk34EcSjju+FBLLH78sV+G3blG/DSopWRtvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730712419; c=relaxed/simple;
-	bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Q+Wap/Mri/ThOu1eEwhOmyCCflaqN7kH1m8lWiIruZh251B7DWg70SXHw3c6cXpBn7ISMTPITTDFz8mjrDc/eBu6oeVQMUMjiGZmdSvgn7NWQNmmtFlAAP4FoGqGgT6kc0JDB5ZlooO9zxIlQwafMfbNdVtCkizAGJvBiU1+dHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hs7Ppm7w; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730712417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-	b=hs7Ppm7wXaEwXylZk3WlnuRhOBVi9EZFeFaHA5C2kpvSH/VjkVm6K0TiNsnRe0z8Kj9ISO
-	QeHbTMdAtNM8OMz7ZsX56g97CaQyWzdOZ7ETkNzghr2NW+8F20RyIMZTCqi56KBYvwZI4U
-	2b2TxZfnuV5aUNIoqBdGJ9P5nVrVU+4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-U07a_yprNF2_7WhHa0ogEw-1; Mon, 04 Nov 2024 04:26:56 -0500
-X-MC-Unique: U07a_yprNF2_7WhHa0ogEw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d45f1e935so2020276f8f.0
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 01:26:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730712415; x=1731317215;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-        b=KSUjsyRKEAkmHGr9QOpYk205vJh+BB29Y1ov/O68PlI8DtWYSUq1vFGOT9u0INitMB
-         CrG4tW+hPFncIIiwGHuDmaFBVP4gDBWIBFysq7WozSasnK40J3ntQQktpzCFzT+fqpIF
-         cEhdukeGN3xm45Z4azKKIex8VrODZCyEeAHw33syUoMRosiMrspwLH4xP9Fyg61XNkRg
-         sTvt0ontsX8YoZndAVDkUK9Os+TR+78i9OYoYumIGs1dflSyB9xy5i+uwZ6fppfUlEmc
-         DYaOJ/GoguenbZYZGPlWhCsJdCwOMSpxYlX6+YQnnOYbX7LzUoLLSWGp5hsww+y9GF+E
-         OUuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgM1jimQJ+J5QzKiTd4hzVELNXOUAxRH9ndL4vRNkKXr17UaTnvU07f30aTku4YjTGH3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVqJNubPMnjRa0oMeLWMBQjNucpAu6XRGZoxD2X/twCHIHXuQs
-	TUHTjq4nUeTVL4L5GCBtZgKGYoMTJI1VWeKpunD0cDNgGbPrMF1FzZIIzosAd6wYC+Xk+sZhq3x
-	lj7urT43ashs6DW2tCDTLayyXvNmZ20YDsYPvglhuuCGL9g0OkA==
-X-Received: by 2002:a5d:5f54:0:b0:37d:373c:ed24 with SMTP id ffacd0b85a97d-381c7a3a49cmr8192686f8f.4.1730712414713;
-        Mon, 04 Nov 2024 01:26:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUG4i3r4RT/0mDz+U1cY7m40dZcu2ijC6eEouX1uNQBldOHTZd5hoduIq2TUsnjYO3wLrnew==
-X-Received: by 2002:a5d:5f54:0:b0:37d:373c:ed24 with SMTP id ffacd0b85a97d-381c7a3a49cmr8192628f8f.4.1730712414212;
-        Mon, 04 Nov 2024 01:26:54 -0800 (PST)
-Received: from ?IPv6:2001:16b8:2d7f:e400:7f8:722c:bb2e:bb7f? (200116b82d7fe40007f8722cbb2ebb7f.dip.versatel-1u1.de. [2001:16b8:2d7f:e400:7f8:722c:bb2e:bb7f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7d20sm12817150f8f.7.2024.11.04.01.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 01:26:53 -0800 (PST)
-Message-ID: <a8d9f32f60f55c58d79943c4409b8b94535ff853.camel@redhat.com>
-Subject: Re: [PATCH 01/13] PCI: Prepare removing devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Damien Le Moal
- <dlemoal@kernel.org>,  Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
- <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
- Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
- Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Ilpo =?ISO-8859-1?Q?J=E4rvinen?=
- <ilpo.jarvinen@linux.intel.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Christian
- Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
- <eric.auger@redhat.com>, Reinette Chatre <reinette.chatre@intel.com>, Ye
- Bin <yebin10@huawei.com>, Marek =?ISO-8859-1?Q?Marczykowski-G=F3recki?=
- <marmarek@invisiblethingslab.com>, Pierre-Louis Bossart
- <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Mon, 04 Nov 2024 10:26:51 +0100
-In-Reply-To: <87cyjgwfmo.ffs@tglx>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241015185124.64726-2-pstanner@redhat.com> <87cyjgwfmo.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1730713185; c=relaxed/simple;
+	bh=W32oNkulwtwhEDioXljJnDxL8PjHM91WVcY5wZM+wMw=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=t5XP/cBFFxtFmQpuG3wU8HE1OafqhTvjPASXDHR6nNJltLmQJw+oxR79vr96f1kA7o45GRzsEXpMeM+R2YawLG2eyS10bC1pFZ+eSPJHBU6rmnwbfccswXr6tkF9jd3olbVDV65aD7rj9ne5tN7aXWtSHOAO2syg4XVVk8+WX6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xhmdw5jmpz1ypC0;
+	Mon,  4 Nov 2024 17:39:48 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1FEFC1A016C;
+	Mon,  4 Nov 2024 17:39:39 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 17:39:38 +0800
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 4 Nov 2024 17:39:38 +0800
+Subject: Re: [PATCH v11 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+ migration driver
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Alex
+ Williamson" <alex.williamson@redhat.com>
+CC: "jgg@nvidia.com" <jgg@nvidia.com>, Jonathan Cameron
+	<jonathan.cameron@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20241025090143.64472-1-liulongfang@huawei.com>
+ <20241025090143.64472-4-liulongfang@huawei.com>
+ <20241031160430.59f4b944.alex.williamson@redhat.com>
+ <df5129f8-e9c2-b1c0-e2de-9211738d88c4@huawei.com>
+ <019a0cab-76b7-a3c0-d93f-5384efea1f67@huawei.com>
+ <133e223b22df4ab4b4802163d0c42407@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <d0e80aa2-b44a-1862-bdcb-aa8268cc0fc5@huawei.com>
+Date: Mon, 4 Nov 2024 17:39:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <133e223b22df4ab4b4802163d0c42407@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-On Thu, 2024-10-31 at 14:45 +0100, Thomas Gleixner wrote:
-> On Tue, Oct 15 2024 at 20:51, Philipp Stanner wrote:
-> > +/**
-> > + * pci_intx - enables/disables PCI INTx for device dev, unmanaged
-> > version
->=20
-> mismatch vs. actual function name.
+On 2024/11/4 16:56, Shameerali Kolothum Thodi wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Monday, November 4, 2024 8:31 AM
+>> To: Alex Williamson <alex.williamson@redhat.com>
+>> Cc: jgg@nvidia.com; Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; kvm@vger.kernel.org; linux-
+>> kernel@vger.kernel.org; linuxarm@openeuler.org
+>> Subject: Re: [PATCH v11 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+>> migration driver
+> [...]
+> 
+>>>>> +
+>>>>> +	seq_printf(seq,
+>>>>> +		 "acc device:\n"
+>>>>> +		 "guest driver load: %u\n"
+>>>>> +		 "device opened: %d\n"
+>>>>> +		 "migrate data length: %lu\n",
+>>>>> +		 hisi_acc_vdev->vf_qm_state,
+>>>>> +		 hisi_acc_vdev->dev_opened,
+>>>>> +		 debug_migf->total_length);
+>>>>
+>>>> This debugfs entry is described as returning the data from the last
+>>>> migration, but vf_qm_state and dev_opened are relative to the current
+>>>> device/guest driver state.  Both seem to have no relevance to the data
+>>>> in debug_migf.
+>>>>
+>>>
+>>> The benefit of dev_opened retention is that user can obtain the device
+>> status
+>>> during the cat migf_data operation.
+>>>
+>>
+>> I will remove dev_opened in the next version.
+>> And hisi_acc_vdev->vf_qm_state is changed to debug_migf-
+>>> vf_data.vf_qm_state
+>> Keep information about whether the device driver in the Guest OS is loaded
+>> when live migration occurs.
+> 
+> I think you already get that when you dump debug_migf->vf_data.
+> So not required.
+>
+OK, vf_qm_state still needs to be deleted.
 
-ACK, will fix
+Thanks,
+Longfang.
 
->=20
-> > + * @pdev: the PCI device to operate on
-> > + * @enable: boolean: whether to enable or disable PCI INTx
-> > + *
-> > + * Enables/disables PCI INTx for device @pdev
-> > + *
-> > + * This function behavios identically to pci_intx(), but is never
-> > managed with
-> > + * devres.
-> > + */
-> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
->=20
-> This is a misnomer. The function controls the INTX_DISABLE bit of a
-> PCI device. Something like this:
->=20
-> void __pci_intx_control()
-> {
-> }
->=20
-> static inline void pci_intx_enable(d)
-> {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __pci_intx_control(d, true);
-> }
->=20
-> .....
->=20
-> makes it entirely clear what this is about.
-
-Well, I would agree if it were about writing a 'real' new function. But
-this is actually about creating a _temporary_ function which is added
-here and removed again in patch 12 of this same series.
-
-It wouldn't even be needed; the only reason why it exists is to make it
-easy for the driver maintainers concerned by patches 2-11 to review the
-change and understand what's going on. Hence it is
-"pci_intx_unmanaged()" =3D=3D "Attention, we take automatic management away
-from your driver"
-
-pci_intx() is then fully restored after patch 12 and it keeps its old
-name.
-
-Gr=C3=BC=C3=9Fe,
-Philipp
-
-
->=20
-> Hmm?
->=20
 > Thanks,
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tglx
->=20
-
+> Shameer
+> 
+> .
+> 
 
