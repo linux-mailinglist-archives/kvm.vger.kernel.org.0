@@ -1,113 +1,119 @@
-Return-Path: <kvm+bounces-30445-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D08519BACDC
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 07:52:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9929BACFB
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DCD71C20F36
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 06:52:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FB711C20E40
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 07:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2248A18E04E;
-	Mon,  4 Nov 2024 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88C5192588;
+	Mon,  4 Nov 2024 07:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ezbALbJV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PqITj/bX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E3218E04C
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 06:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1B918BC1C
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 07:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730703133; cv=none; b=Sw4mslnJFNrIjaqk7RtlT1vwUNdQutCSxBINrkFE86e6ks/F7a/Yglr3Zl1s5m7/k5CUO86bUPpDMqE9IsZ9Z5YiEXlw8+E4VMEdORynkpRN4TYU3ITK74jU4NcUCz6N4y2yf1wsR6kkEnMYT+6UOOJ18lWeMsRagB+OFQSBTwA=
+	t=1730704190; cv=none; b=o3pZXr/xWLr2f1T3HwtwP+pxHJMe6Vw6tv6ALJ3pjxv0ASY/FxYjdCnfXNM66xrGcqkpqeMYHJ9Y/h7X5E8oQhNAJLqIaIV4EDC6qMfsNn8vY7xpUsxgmf7EpfbyyX1S9MmsvMIoTBX+pvsN940YwPP3k8jdD5KMgzGVul25G+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730703133; c=relaxed/simple;
-	bh=kiv/XMDEoCHEhQr6YyvTbfvRLq4fdjJ9wLXODaw4jeA=;
+	s=arc-20240116; t=1730704190; c=relaxed/simple;
+	bh=7cxi2Id8YWrPfwRXnu9GLfPlyvIGsyEtkFXYgr014kk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YPtUA7QbHX+kpXNjmSQDXA16EcTd0B7ykE0QiGkGZ8M8MPhjuAZGGK2Pu1QnLTHupsAbZLopNRjPc7h7RKZOJpiQeQ1pVraxlv7QBJds9yR5l8ujHLSTQRv6+XtIhDnX6UyyKIpE0+SbRMb9W/uomXsmJrlZAP0VtWlKTjy1Evk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ezbALbJV; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 93DC640E0263;
-	Mon,  4 Nov 2024 06:52:08 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id jJZvCiCKsGd6; Mon,  4 Nov 2024 06:52:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1730703123; bh=yydbaFFm4dOuzObK6xHrob0aSN4LlaZeLQVKWu2JJ/A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ezbALbJVFCF8lhHcOchxjx9YSBvOwrs9UlkcguiRvxCJ0+m9OSmpwVUZwqiD2DGFa
-	 veJmTQVf9GfNZMWz832oUuPN0TKRBwdc1cL+SEbVOygQRyBHvlHEgfx+nvAyUTjVTm
-	 IexMQAFMeeKypVHamHOvyypojcchKnQY0tEPU4B1ifl3j39DDJBc8jDGfym0P07E3I
-	 JoEC0c9wh75dQ9PCMHu9kR5tqjRTKirqtfqBrpoFc5fXMRGgd0veParI/yUZ01Ehh9
-	 lzYpnoqh9l++sugJqbTXIn8O873NFHut4IOyKF7EAAVyid5gkjVf3FvzT9AVVSSXTv
-	 fAv+38mQOsZqoDiXsX17kDNcqV2ULNpRMk5EPph6ymHmloRp6fm1AQZUhJS8chq/n2
-	 zQHCmAk7nlV4MNZpUcc31v+s+MziKC1Ic8Bj030QAMdds1CSYRZQd+SokLfrbsB2nY
-	 Kl+QzAXiIBGkJbsLWDEeRF2KdlyQGzKlWh8zPz0nHFfVFXtuBcUhHAyalCX+dKwCbN
-	 2CrECKeQs8MHJ3HYnuVJ2b8EuOV/krOrVbuw1eE0p16MMCjPNsXcpR/nGEByrdeVeV
-	 6m3NLVghuJCegZLHaqlaXYRS2rHC7hTltfKqQIl6doM/22Sn7K3bp/cNzNwovD4O5C
-	 SpCZmlG5S86LhMzuL6Bhif1o=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 49A1640E0261;
-	Mon,  4 Nov 2024 06:51:53 +0000 (UTC)
-Date: Mon, 4 Nov 2024 07:51:47 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tao Su <tao1.su@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=a+7bNt3duLim8FSefnkOa190S4n/XKc7xYaM8LG827DnY2fn3b3pI4g8L2tEgeRlF1L9oap/RoR/IzSdwITKHSPW44FbM5FSW3DUZA+P8DIyOhTIPqZV6RpYVmmj9eTnBox60aa7CiN4BZHF95qfSTBxlTswGgUBQ2staxtbyiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PqITj/bX; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730704189; x=1762240189;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7cxi2Id8YWrPfwRXnu9GLfPlyvIGsyEtkFXYgr014kk=;
+  b=PqITj/bX4lMRLL6Ks2z/VKC9g6+4c7dxzEPzlWKuaG6gYl8P9HfVHMSi
+   rVXgRjBVrLwW2/VrUypJQpOynLPuv/Qy6lfLGADlmLsQ4gQw4hSkPDHau
+   /eDxEFcS8AmTfQKkuWWQqVYeICDE6Qq1HehajPtqyR0WqrSQQexzMuzCB
+   Eqk6wnnQHGGjLJBJhsjgOSa29Cu/XECq8qdzTxC6FpjhEy+2HwOS9RVVk
+   fDuoxRePIP7mtnwS+jb/7IZRxGMBQo/7hMzp7H5EpsfLG1zvuzufj9g1V
+   tXxF9vhBnPNuMHMy7ATEtrfgySP1XpVmhFR54LGvg3Z+0U7FVdmHQpIW/
+   A==;
+X-CSE-ConnectionGUID: LeZ8F0+IQTusHZ35jcyQmw==
+X-CSE-MsgGUID: iBCpsUewTv6YCllvJ9nRkA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="55786346"
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="55786346"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 23:09:49 -0800
+X-CSE-ConnectionGUID: IXLSJlGhQQSbdybblCQuag==
+X-CSE-MsgGUID: swbEfGpFSQS6x9e7vxaJNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="88381857"
+Received: from linux.bj.intel.com ([10.238.157.71])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 23:09:46 -0800
+Date: Mon, 4 Nov 2024 15:04:41 +0800
+From: Tao Su <tao1.su@linux.intel.com>
+To: Borislav Petkov <bp@alien8.de>
 Cc: kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
 	pbonzini@redhat.com, dave.hansen@linux.intel.com,
 	chao.gao@intel.com, xiaoyao.li@intel.com, jiaan.lu@intel.com,
 	xuelian.guo@intel.com
 Subject: Re: [PATCH 0/4] Advertise CPUID for new instructions in Clearwater
  Forest
-Message-ID: <20241104065147.GAZyhvAyYCD0GdSMD5@fat_crate.local>
+Message-ID: <ZyhyCU16iZysIFSc@linux.bj.intel.com>
 References: <20241104063559.727228-1-tao1.su@linux.intel.com>
+ <20241104065147.GAZyhvAyYCD0GdSMD5@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241104063559.727228-1-tao1.su@linux.intel.com>
+In-Reply-To: <20241104065147.GAZyhvAyYCD0GdSMD5@fat_crate.local>
 
-On Mon, Nov 04, 2024 at 02:35:55PM +0800, Tao Su wrote:
-> Latest Intel platform Clearwater Forest has introduced new instructions
-> for SHA512, SM3, SM4 and AVX-VNNI-INT16.
+On Mon, Nov 04, 2024 at 07:51:47AM +0100, Borislav Petkov wrote:
+> On Mon, Nov 04, 2024 at 02:35:55PM +0800, Tao Su wrote:
+> > Latest Intel platform Clearwater Forest has introduced new instructions
+> > for SHA512, SM3, SM4 and AVX-VNNI-INT16.
+> > 
+> > This patch set is for advertising these CPUIDs to userspace so that guests
+> > can query them directly. Since these new instructions can't be intercepted
+> > and only use xmm, ymm registers, host doesn't require to do additional
+> > enabling for guest.
+> > 
+> > These new instructions are already updated into SDM [1].
+> > 
+> > ---
+> > [1] https://cdrdv2.intel.com/v1/dl/getContent/671200
 > 
-> This patch set is for advertising these CPUIDs to userspace so that guests
-> can query them directly. Since these new instructions can't be intercepted
-> and only use xmm, ymm registers, host doesn't require to do additional
-> enabling for guest.
+> I'm willing to bet some money that this URL will become invalid in a while.
 > 
-> These new instructions are already updated into SDM [1].
+
+Thanks for such a quick review. Yes, the link may be invalid.
+
+Would it be better if I attach rev, chapter and section?
+
+> > Tao Su (4):
+> >   x86: KVM: Advertise SHA512 CPUID to userspace
+> >   x86: KVM: Advertise SM3 CPUID to userspace
+> >   x86: KVM: Advertise SM4 CPUID to userspace
+> >   KVM: x86: Advertise AVX-VNNI-INT16 CPUID to userspace
 > 
-> ---
-> [1] https://cdrdv2.intel.com/v1/dl/getContent/671200
+> Why aren't those a single patch instead of 4 very similar ones?
+> 
 
-I'm willing to bet some money that this URL will become invalid in a while.
+I mainly referred to the previous patch set [*] which is very similar to
+this one. If you think a patch is better, I can send a v2 with only one
+patch.
 
-> Tao Su (4):
->   x86: KVM: Advertise SHA512 CPUID to userspace
->   x86: KVM: Advertise SM3 CPUID to userspace
->   x86: KVM: Advertise SM4 CPUID to userspace
->   KVM: x86: Advertise AVX-VNNI-INT16 CPUID to userspace
-
-Why aren't those a single patch instead of 4 very similar ones?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+[*] https://lore.kernel.org/all/20221125125845.1182922-1-jiaxi.chen@linux.intel.com/
 
