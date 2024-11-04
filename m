@@ -1,152 +1,111 @@
-Return-Path: <kvm+bounces-30483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30484-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961969BB06F
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:58:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C2B9BB070
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:59:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B80F2823EC
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:58:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E214628183D
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FA71B0F04;
-	Mon,  4 Nov 2024 09:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB701AF0C8;
+	Mon,  4 Nov 2024 09:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GR5U+lli"
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0431F1AC43A;
-	Mon,  4 Nov 2024 09:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F29382
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 09:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730714322; cv=none; b=V73v9GV5bllLdY5Tsdl4wamL1QtjxwKIqfd7qzOdplSj3vOD7Uut4XkdT2N3PCwvj4ymQ4no3NdDY1TQPpdKhshBVroo76t3unchcHXORlJjMu4jS4avEzigsUeZvzux9p4bryI0iOOK5Ek4nlToL1f7nYiZjUloHxeMyPhTk+c=
+	t=1730714339; cv=none; b=j0Waa7zz7ftAe5u6wLNeIfVPOUtxsHE+1JaRYlry4dnHcPe0R0bvDzE4WhTJOXA1DJInyzSoNr8vnpc8IH6C4mXfoS5lI4cTAZTY2jg5re9RksavJEAKk+GCJnjtcTvPgC9yJm8TyiEDm2rZUYRFEHeBt7Cf0kLdrugwNR2U25k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730714322; c=relaxed/simple;
-	bh=cGc3p1RFcABDoSgLbkrGYjJv7Mesj0EoAuHiRfKkhAs=;
+	s=arc-20240116; t=1730714339; c=relaxed/simple;
+	bh=oPIM2Ejl9q/Q28Gg1E6jOm6FY3vOapXN9hCz8tBUj/8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r5JeEGzYWMvq9KMV6l6lu6ywy5BptCkhHy+dSFPzflj+VtaNNrSN2tm398mpI1d4fC9/aDsPFa5MLrFx5VBjMegLZo2Ug45+5l30KCx6YNhcyv0tSLZOmsSPoUkYuhBaCJy0fUuVqSTuW9ZgVJjWayxo17Zi/DwVocIIKaQF1gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EF664227AAD; Mon,  4 Nov 2024 10:58:31 +0100 (CET)
-Date: Mon, 4 Nov 2024 10:58:31 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241104095831.GA28751@lst.de>
-References: <cover.1730298502.git.leon@kernel.org> <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bVZZN+SRWkcAAHrHIDU7gJHofpgWD8ikezlZLc1iZszvSP6t2woBwyU6tvD/gYwH0uNZQ3RU9bjIg70+vD5vmHwwhXJhKjapwXJO49JINnKt8Pig0TAmX8EK50FXT5W4lUtkDxJTProcRvS1XH4Wh37N3enuILwcWVdiMLJAHLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GR5U+lli; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4334640E0220;
+	Mon,  4 Nov 2024 09:58:55 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id GqoBv4eiko_Q; Mon,  4 Nov 2024 09:58:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730714331; bh=hlPxuVLPf8XlaWeHmR9XzldHKjWQzxKu4ZP2wva3CnY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GR5U+llitCODPid7IDrP2wiNWmgguDf8T1CQ98fGYT7V/iAH29MHq+aiuYJPS0DLi
+	 BPOOY206cYw0HBUobC67PZGvYk5TRn6TOLfDB/F8TIAudWKRIavOKcF/PQ+q48fZgJ
+	 ghVeTmhv61Z5NsSZMt3A5hA5sCkbXoX2CUoXsJPms/ClUcW6TWKdKcDptO9J4O2vv9
+	 bSEN8TDlfknsg6YODWYyOI57L764iuPIA9XMIsJ+q3s4CMByCZkjZGkdjyraSpPOEa
+	 dXc+aXY0KMiUGleI8cBLNdiqBhjgzg2ohCtjrz85JJWFgqeQQp/EvpYaiKaM4ZytvU
+	 d6q2zJ52Smnh9z57U7288H6Tb85H1UduU9CEL1BoU6wiqmoSq6vgdnvZirtLL+Ev64
+	 UR2dJyan5X5Jqmrs5hb8UnMHeS2Y9878oVlHORBfeDylmY59jLisTtILGI7XUxvfPj
+	 c0OA1QhJ+fpP3dEbrhivr8gNYFn7o3PkJbAlPEJKGjddJwwFbra2zlkdW0+5KAudHO
+	 ALK5dkYVUgMWPA5dOWPl+Zns1P+SZ9zVD8r1NqaPULi2hD6ehWU8OMsTtT6H0Cs0RA
+	 OBSqPrkNi075rlTV8kQyCSfrCLW0uoxzcoW+fzB3chvQVuvpPyJgoQLINgWpw0gaqD
+	 /G/UfMx9gcQ+h0UdP6sRFvp8=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2EC3540E0263;
+	Mon,  4 Nov 2024 09:58:41 +0000 (UTC)
+Date: Mon, 4 Nov 2024 10:58:34 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Tao Su <tao1.su@linux.intel.com>
+Cc: kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+	pbonzini@redhat.com, dave.hansen@linux.intel.com,
+	chao.gao@intel.com, xiaoyao.li@intel.com, jiaan.lu@intel.com,
+	xuelian.guo@intel.com
+Subject: Re: [PATCH 0/4] Advertise CPUID for new instructions in Clearwater
+ Forest
+Message-ID: <20241104095834.GBZyiaytJCvXylJgc2@fat_crate.local>
+References: <20241104063559.727228-1-tao1.su@linux.intel.com>
+ <20241104065147.GAZyhvAyYCD0GdSMD5@fat_crate.local>
+ <ZyhyCU16iZysIFSc@linux.bj.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ZyhyCU16iZysIFSc@linux.bj.intel.com>
 
-On Thu, Oct 31, 2024 at 09:17:45PM +0000, Robin Murphy wrote:
-> The hilarious amount of work that iommu_dma_map_sg() does is pretty much 
-> entirely for the benefit of v4l2 and dma-buf importers who *depend* on 
-> being able to linearise a scatterlist in DMA address space. TBH I doubt 
-> there are many actual scatter-gather-capable devices with significant 
-> enough limitations to meaningfully benefit from DMA segment combining these 
-> days - I've often thought that by now it might be a good idea to turn that 
-> behaviour off by default and add an attribute for callers to explicitly 
-> request it.
+On Mon, Nov 04, 2024 at 03:04:41PM +0800, Tao Su wrote:
+> Would it be better if I attach rev, chapter and section?
 
-Even when devices are not limited they often perform significantly better
-when IOVA space is not completely fragmented.  While the dma_map_sg code
-is a bit gross due to the fact that it has to deal with unaligned segments,
-the coalescing itself often is a big win.
+Put enough information from the document so that one can find it doing a web
+search. So that even if the vendor URL changes, a search engine will index it
+shortly after again.
 
-Note that dma_map_sg also has two other very useful features:  batching
-of the iotlb flushing, and support for P2P, which to be efficient also
-requires batching the lookups.
+> I mainly referred to the previous patch set [*] which is very similar to
+> this one.
 
->> This uniqueness has been a long standing pain point as the scatterlist API
->> is mandatory, but expensive to use.
->
-> Huh? When and where has anything ever called it mandatory? Nobody's getting 
-> sent to DMA jail for open-coding:
+That patch set is doing more than just adding bits although I still would've
+merged patches 3-8 as they're simply adding feature bits and are obvious.
 
-You don't get sent to jail.  But you do not get batched iotlb sync, you
-don't get properly working P2P, and you don't get IOVA coalescing.
+> If you think a patch is better, I can send a v2 with only one
+> patch.
 
->> Several approaches have been explored to expand the DMA API with additional
->> scatterlist-like structures (BIO, rlist), instead split up the DMA API
->> to allow callers to bring their own data structure.
->
-> And this line of reasoning is still "2 + 2 = Thursday" - what is to say 
-> those two notions in any way related? We literally already have one generic 
-> DMA operation which doesn't operate on struct page, yet needed nothing 
-> "split up" to be possible.
+Yes please.
 
-Yeah, I don't really get the struct page argument.  In fact if we look
-at the nitty-gritty details of dma_map_page it doesn't really need a
-page at all.  I've been looking at cleaning some of this up and providing
-a dma_map_phys/paddr which would be quite handy in a few places.  Note
-because we don't have a struct page for the memory, but because converting
-to/from it all the time is not very efficient.
+Thx.
 
->>   2. VFIO PCI live migration code is building a very large "page list"
->>      for the device. Instead of allocating a scatter list entry per allocated
->>      page it can just allocate an array of 'struct page *', saving a large
->>      amount of memory.
->
-> VFIO already assumes a coherent device with (realistically) an IOMMU which 
-> it explicitly manages - why is it even pretending to need a generic DMA 
-> API?
+-- 
+Regards/Gruss,
+    Boris.
 
-AFAIK that does isn't really vfio as we know it but the control device
-for live migration.  But Leon or Jason might fill in more.
-
-The point is that quite a few devices have these page list based APIs
-(RDMA where mlx5 comes from, NVMe with PRPs, AHCI, GPUs).
-
->
->>   3. NVMe PCI demonstrates how a BIO can be converted to a HW scatter
->>      list without having to allocate then populate an intermediate SG table.
->
-> As above, given that a bio_vec still deals in struct pages, that could 
-> seemingly already be done by just mapping the pages, so how is it proving 
-> any benefit of a fragile new interface?
-
-Because we only need to preallocate the tiny constant sized dma_iova_state
-as part of the request instead of an additional scatterlist that requires
-sizeof(struct page *) + sizeof(dma_addr_t) + 3 * sizeof(unsigned int)
-per segment, including a memory allocation per I/O for that.
-
-> My big concern here is that a thin and vaguely-defined wrapper around the 
-> IOMMU API is itself a step which smells strongly of "abuse and design 
-> mistake", given that the basic notion of allocating DMA addresses in 
-> advance clearly cannot generalise. Thus it really demands some considered 
-> justification beyond "We must do something; This is something; Therefore we 
-> must do this." to be convincing.
-
-At least for the block code we have a nice little core wrapper that is
-very easy to use, and provides a great reduction of memory use and
-allocations.  The HMM use case I'll let others talk about.
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
