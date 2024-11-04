@@ -1,240 +1,276 @@
-Return-Path: <kvm+bounces-30486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1D09BB0BF
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:15:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403DD9BB0EE
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AF8B283465
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:15:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3A642815C4
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59FA1AF0DD;
-	Mon,  4 Nov 2024 10:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C311B0F18;
+	Mon,  4 Nov 2024 10:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHFm9Fly"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hDWM6RDd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2044.outbound.protection.outlook.com [40.107.95.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32B120ED;
-	Mon,  4 Nov 2024 10:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730715348; cv=none; b=V1gRVtfWoBL1AZ0rYaS34UxOL7a/k5T7d4dYs0AVSPE9Urtyv5DWFvXYDgOljfuSC/Xqv3rWPElDatvKrmOss9GBDwGSL+jpvRdmjIAixZApqRcnIcOPHzYprMdDtSyERxuWtMXqVXCYQ4V8F6xw8Nz3mVmTPmtsW/O+HBkA9Vc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730715348; c=relaxed/simple;
-	bh=InWUU3D2Dk79W7Gl9bItAteAnFGljFzsGKpkdweMKHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLBSSlDiOgkAjzE0pvqaakKwZ/Mf1EEV8jbksaLUbhxyka+o3/uAxoex2jqDhWe8DXRunT+DSuigh5fbky4Ss0xwXeGaiYz4fTGwmXls/xwQS5MDpNO9ubMmBYu6a5Y17RgzvRc/6cEAam5ATo1wh17cKOKPMzvkV6vQ0BqS1Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHFm9Fly; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA24CC4CECE;
-	Mon,  4 Nov 2024 10:15:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730715348;
-	bh=InWUU3D2Dk79W7Gl9bItAteAnFGljFzsGKpkdweMKHY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EHFm9FlyAD2DFhNZT2J0RbMcZoapYZ2+aOcmOxGsdi67+47XT64Qi+Av8s7/MzsE+
-	 F4Z/WUczB7PISowE3ja8a83AFgLl/q1gGnL1cD5+Len9SQY3VrsxeT93jL6n8RhlUi
-	 4BzhV4nhkeR5LExaV8M17SbLJW8OfUnHBnPwBotvZn9N2CBLppQVz5c8beqzyZe/n5
-	 cjw1xtsmne12YIdNpcrog7cdF8eIEzbdnRBhRKt4bLP3mEcqMUEFNjIM2A10TUaSrE
-	 hVmzFsDbiPLBnjHR5NkU3hDLCl0ssFDEGREA6N1v+n/ZpJzsr9uOt+TuKUDEpGygI4
-	 68xVBJ5GfeFgQ==
-From: Borislav Petkov <bp@kernel.org>
-To: X86 ML <x86@kernel.org>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	kvm@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	"Borislav Petkov (AMD)" <bp@alien8.de>
-Subject: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
-Date: Mon,  4 Nov 2024 11:15:43 +0100
-Message-ID: <20241104101543.31885-1-bp@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010B01ABEBD
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 10:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730715802; cv=fail; b=aPjfYg9YeYkDk7eCPxHDahmAYGB0cds6wdjsMh1WoUedxkouKXrthkPwisXv9cp+l1jFPSP0GgtbncOjhPCof/Pa/BreTC7FcyJLzGB61fYIpAHwLd9nP90G60/JGtToTjKr/uCeEekbqHEh7QfbvsQoGIp670vC3XIeXTrrpDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730715802; c=relaxed/simple;
+	bh=z+Z3y9gWt6jbbvCTMElq4tSqRa74hjblB8ae1/TRk3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bUO2eRfJS/m4BwVl93GoEPAskSsAWFmdlhFuxr8VFx+Np9qjbLsBit4BT+87OWb0VhXBC9AAIMDzi5+DaWW1ptI/YAkb/Upk7+nOZj3aJ7FWTdaKnxtXlQRvWlTtEIpVHhJOzOZKLEoHCDsfMX5OVdd9tRIaiUkHTuWe9sc+O60=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hDWM6RDd; arc=fail smtp.client-ip=40.107.95.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ye1O9fmwhfH7tAHCcjxzpZlir54+2XiTzuUKp/CHZ/9K2lwNSNL3nNset01QG300driV7TlfdUUNuriPrD+DptqBm2EZ/zb6RT3sxCjgZ5vNbCiWZFlydC5HQs48wDtYkfmayJVYbYGTlCyUsKuO+xn/J3b+fIv9S/Dg1QORj5cvNhjEzpGF1uh9pjenJIScCfK2vmZznQCdx/3eYeskJSeC+8mPAxUlQWI11gal7nxAJk49kiPfyf3JXrlk1HA8sKikIW2lS8EkiUcZJkvmGjAbLiAKvSsXZ6c1+nog4OoVm/b7Xh26mrvKRgR4F57cUr8DHgcAKaJJIigcr6FA+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iYENykhwxnpGV4NPoy1HdAE5Yq6nNphIEDBzUZgRoj4=;
+ b=v4YJIDrgH/se+ZDld0j9ty/4XEQEV/Hm5MhU/QEbw0ry6UMMQr3obQAK/QK2GAfirGHr1u6TvlPyzJ3qjx8MKrlRzdcGVIfFNpWtoVVgkO6GD4Obb48C4GAQlmqBA0YH/HNXp9NiZ2e+8XPTvuGY3KYLhjl+3BLl49WPyxrqd5v1cNbje7pIh+2a8vvGhiaxk3aHFqzjJEcYOE6xBjvBfICSyl+PnOC/fEmz8PO1F139uU2PVX1Nl9fjRC3OENM2mEaLk/H9aqILaj0xfkvd2URHsdKZxYi57Bre/7JjAmUcXvEx8ZnkGIas11OjjW2nNnlx7CtOTLAZQFZKVnc2LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iYENykhwxnpGV4NPoy1HdAE5Yq6nNphIEDBzUZgRoj4=;
+ b=hDWM6RDdhZ98Rz+0F9jeameBRfDPtvmUJwX6xrWMGDA4011w8EA+Mqk0g2yVSF/EPmIzwFefFIsxIT3mN5ulzLmc6unIaRf6XLxV1uqYHm9Te8G6HEuof11/iJrxQ/ZTnrNWa0dNKtHBRvFSIRmqnRHYda54hQIQqNUOfLHR/FsEuDrDWOAUiouWH1Q+7yyc4IPUCcsA77dlC3BTCRraLC6FBcjHc++8ydYkbN1u9h3EVGrCnFJBMFxYlur9gpU70E0SQtpJcfhB75/uVlIRzrq7PMAOvSpSvl8RqPtOvTAor4fjILvbHCDbK2uavtLtD/C2FGXoQ5XktdEgmF/uYQ==
+Received: from BN9PR03CA0765.namprd03.prod.outlook.com (2603:10b6:408:13a::20)
+ by CH3PR12MB7596.namprd12.prod.outlook.com (2603:10b6:610:14b::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
+ 2024 10:23:15 +0000
+Received: from BN1PEPF0000468D.namprd05.prod.outlook.com
+ (2603:10b6:408:13a:cafe::80) by BN9PR03CA0765.outlook.office365.com
+ (2603:10b6:408:13a::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30 via Frontend
+ Transport; Mon, 4 Nov 2024 10:23:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN1PEPF0000468D.mail.protection.outlook.com (10.167.243.138) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.17 via Frontend Transport; Mon, 4 Nov 2024 10:23:15 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 4 Nov 2024
+ 02:23:03 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 4 Nov 2024 02:23:02 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 4 Nov 2024 02:23:00 -0800
+From: Yishai Hadas <yishaih@nvidia.com>
+To: <alex.williamson@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
+	<jgg@nvidia.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
+	<joao.m.martins@oracle.com>, <leonro@nvidia.com>, <yishaih@nvidia.com>,
+	<maorg@nvidia.com>
+Subject: [PATCH V1 vfio 0/7] Enhance the vfio-virtio driver to support live migration
+Date: Mon, 4 Nov 2024 12:21:24 +0200
+Message-ID: <20241104102131.184193-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF0000468D:EE_|CH3PR12MB7596:EE_
+X-MS-Office365-Filtering-Correlation-Id: e44c5a25-92d4-48bf-6428-08dcfcbab1b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d2Y0aE9GeWpMTDNpSWc5MGtwSU9SRGNnNFdVanV4b1I5cklBZlNBWWtheG1H?=
+ =?utf-8?B?S1drY0ZieTdmeFAvUmJSRUkwRVl2aGxodWpNSjE2N0xoTnA4R1hsV01yMTRa?=
+ =?utf-8?B?VUxOS3Zqbncyc0tIZ2hTTkkxb0d6NVh5RUQwaXVoSkYxckwxQmRJcWs5S2xY?=
+ =?utf-8?B?K0pFVzJ1Z00vbisyMFU5MWdxZi9OLytSUHZyQTdvd2IvdkY1NTN0QlpqUk9L?=
+ =?utf-8?B?aVRtOS83eGsrbzNHTU1KbkZjZjFRc0J0U0pWUDRUS2xibTd5OEZrdDZsc2Zn?=
+ =?utf-8?B?WVVqYSt3djk0WGlJOU5zUTRWcHBDc0o2VDlYdzdwWUVsby90ZU50bCtQV1FM?=
+ =?utf-8?B?YTkyMk9PRWpEbGdqYysxWlJVblc3U3YrVU9XL3pOWGlabEcrSDVNYXBzV3V2?=
+ =?utf-8?B?YzkvWlZHeUtya3FUVXRtQ1NNNnFab1NJREVXWnJ4WHE1QlVhSHhMYU5xNjhG?=
+ =?utf-8?B?L2hEb3oxcWlOOEpuU09oMmlVNTR6YnhVWGpudGFpUWdSVldNTlE3dWVaeFJp?=
+ =?utf-8?B?MEg1YTErVEZEZDIzRVJ5a2UxekhZOTYwZTY3UlNhTG5LbEZXRUxQWHZBTGNH?=
+ =?utf-8?B?NDFxaElXNCs0UVpOTVZ6S1BoZnI4aFlFWEJ0RlB1OGpvZGZ6dXVpNi9leHBL?=
+ =?utf-8?B?aFlPRjdzY1ZIQytldEpYSnZYY2Vod3BQNTBlaDFkT2dGVjJGaVpGQnV5dlJ5?=
+ =?utf-8?B?Q1lKQzRBcEFUdCtDZDJWZmlKdFBSdy85QXY5UmNkVjNCY1pjcmVycWZTSm91?=
+ =?utf-8?B?SlJKenVLNk9vUkZwRVgzSlFDL1F1WXUyRTRzNm9OSXliTzYzYkthT1hmbVh5?=
+ =?utf-8?B?Q0x3MUlhdXc0Yk4rVXZjWmpkY0ZFVFB2aGFyTlZ1bEtENW9qeUpWdHhXT0pT?=
+ =?utf-8?B?dnNCUWJ6VlMwU0krZjNVR1cyZnBmNG5YZk1SWkhOTWhIdXhnMzVEbVl2K2N5?=
+ =?utf-8?B?R0FEZXJiMjZabkVnL0VzeFJIN0VhdUhCZ1E4L2dnczRlMEVlRVpxem5xaEN4?=
+ =?utf-8?B?d2M3R3VkeFkrOWMraWsycUhZVGQzeTFPY1M4K29LcTN0UVk4YnFjTHRrR3R5?=
+ =?utf-8?B?T1JpZm1VRDR3azFpcEh5VVlCelhyT2RLVHR5WmtvY2tlbVhKZDBnU0U1WVcz?=
+ =?utf-8?B?a2lLWEpjN082RHFGcng0YzdzWXdDb1hwUDhxdk5qclVIVWdtVFQ4Mnk0MFFq?=
+ =?utf-8?B?YWdENDY1d2EvczBVZUtyUTFZRmpmaHhYU0lYN3BCUkxFWGpnUHpVcmV3a2Ry?=
+ =?utf-8?B?endveWN2QXdEandhMmJrKzNhOG85L1NGT1ZyYk5ITCtUTk9wS3VoTCtUbW1y?=
+ =?utf-8?B?UC9wSSthYkpSWUlGcncvSEdRak1UVGY4cFFYZzllMkk5SHJ4aEtkanhBM1ls?=
+ =?utf-8?B?Smh3VzJJNnArcHNRSmJNRlM3NkhVVk9qQ1Y1YVQ5UnZqcFJmcXF3TmIvdWxE?=
+ =?utf-8?B?dVFSZ3dtQ1MwYkV3UDRvaXZkQm9hVGUveDN4NEJWMFBPcEVQdEtWRFBGckFH?=
+ =?utf-8?B?WUxEOE8xcU9wQ000ZXljUE1nanlkK2N5NVRHbytXWHExRmo4QW9JZHhIeFUx?=
+ =?utf-8?B?dk5yWUxxbGxqd1pJUXNxelluZFdrRUxGZjk2ZnBSS0R3aVpZa05TZkwwb2c2?=
+ =?utf-8?B?NkE1WFA0U2k2NHRYczhSa2JRc01IbEZtT1h5T1NNSVp0aVArd1UvbWxZTmtT?=
+ =?utf-8?B?VUVhTVI2bVF6TG5hQmZRRFk0K1pYQkdZVmxKYlFmWVJQalllaWFWSitmSEJr?=
+ =?utf-8?B?b0x5VjRVZDViWVZqUzN2ekVWM2haeTliTVBoQTRxS1JwSlQ5Y2E4OGJXbCt6?=
+ =?utf-8?B?dTlWV2xLQndpSGcxUWlRcFA4QjNYMk40L1BqdU9vK2FxaDVyYmV6ZlV4OWUr?=
+ =?utf-8?B?TkJPVHgzeUhjSzlWVXFBZ0oxRFU4K3FidzlUb2UxME9yWkE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2024 10:23:15.3504
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e44c5a25-92d4-48bf-6428-08dcfcbab1b8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF0000468D.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7596
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+This series enhances the vfio-virtio driver to support live migration
+for virtio-net Virtual Functions (VFs) that are migration-capable.
+ 
+This series follows the Virtio 1.4 specification to implement the
+necessary device parts commands, enabling a device to participate in the
+live migration process.
 
-If the machine has:
+The key VFIO features implemented include: VFIO_MIGRATION_STOP_COPY,
+VFIO_MIGRATION_P2P, VFIO_MIGRATION_PRE_COPY.
+ 
+The implementation integrates with the VFIO subsystem via vfio_pci_core
+and incorporates Virtio-specific logic to handle the migration process.
+ 
+Migration functionality follows the definitions in uapi/vfio.h and uses
+the Virtio VF-to-PF admin queue command channel for executing the device
+parts related commands.
+ 
+Patch Overview:
+The first four patches focus on the Virtio layer and address the
+following:
+- Define the layout of the device parts commands required as part of the
+  migration process.
+- Provide APIs to enable upper layers (e.g., VFIO, net) to execute the
+  related device parts commands.
+ 
+The last three patches focus on the VFIO layer:
+- Extend the vfio-virtio driver to support live migration for Virtio-net
+  VFs.
+- Move legacy I/O operations to a separate file, which is compiled only
+  when VIRTIO_PCI_ADMIN_LEGACY is configured, ensuring that live
+  migration depends solely on VIRTIO_PCI.
+ 
+Additional Notes:
+- The kernel protocol between the source and target devices includes a
+  header containing metadata such as record size, tag, and flags.
+  The record size allows the target to read a complete image from the
+  source before passing device part data. This follows the Virtio
+  specification, which mandates that partial device parts are not
+  supplied. The tag and flags serve as placeholders for future extensions
+  to the kernel protocol between the source and target, ensuring backward
+  and forward compatibility.
+ 
+- Both the source and target comply with the Virtio specification by
+  using a device part object with a unique ID during the migration
+  process. As this resource is limited to a maximum of 255, its lifecycle
+  is confined to periods when live migration is active.
 
-  CPUID Fn8000_0021_EAX[30] (SRSO_USER_KERNEL_NO) -- If this bit is 1, it
-  indicates the CPU is not subject to the SRSO vulnerability across
-  user/kernel boundaries.
+- According to the Virtio specification, a device has only two states:
+  RUNNING and STOPPED. Consequently, certain VFIO transitions (e.g.,
+  RUNNING_P2P->STOP, STOP->RUNNING_P2P) are treated as no-ops. When
+  transitioning to RUNNING_P2P, the device state is set to STOP and
+  remains STOPPED until it transitions back from RUNNING_P2P->RUNNING, at
+  which point it resumes its RUNNING state. During transition to STOP,
+  the virtio device only stops initiating outgoing requests(e.g. DMA,
+  MSIx, etc.) but still must accept incoming operations.
 
-have it fall back to IBPB on VMEXIT only, in the case it is going to run
-VMs:
+- Furthermore, the Virtio specification does not support reading partial
+  or incremental device contexts. This means that during the PRE_COPY
+  state, the vfio-virtio driver reads the full device state. This step is
+  beneficial because it allows the device to send some "initial data"
+  before moving to the STOP_COPY state, thus reducing downtime by
+  preparing early and warming-up. As the device state can be changed and
+  the benefit is highest when the pre copy data closely matches the final
+  data we read it in a rate limiter mode and reporting no data available
+  for some time interval after the previous call. With PRE_COPY enabled,
+  we observed a downtime reduction of approximately 70-75% in various
+  scenarios compared to when PRE_COPY was disabled, while keeping the
+  total migration time nearly the same.
 
-  Speculative Return Stack Overflow: CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT
-  Speculative Return Stack Overflow: Mitigation: IBPB on VMEXIT only
+- Support for dirty page tracking during migration will be provided via
+  the IOMMUFD framework.
+ 
+- This series has been successfully tested on Virtio-net VF devices.
 
-Then, upon KVM module load and in case the machine has
+Changes from V0:
+https://lore.kernel.org/kvm/20241101102518.1bf2c6e6.alex.williamson@redhat.com/T/
 
-  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it indicates
-  that software may use MSR BP_CFG[BpSpecReduce] to mitigate SRSO.
+Vfio:
+Patch #5:
+- Enhance the commit log to provide a clearer explanation of P2P
+  behavior over Virtio devices, as discussed on the mailing list.
+Patch #6:
+- Implement the rate limiter mechanism as part of the PRE_COPY state,
+  following Alex’s suggestion.
+- Update the commit log to include actual data demonstrating the impact of
+  PRE_COPY, as requested by Alex.
+Patch #7:
+- Update the default driver operations (i.e., vfio_device_ops) to use
+  the live migration set, and expand it to include the legacy I/O
+  operations if they are compiled and supported.
 
-enable this BpSpecReduce bit to mitigate SRSO across guest/host
-boundaries.
+Yishai
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
----
- arch/x86/include/asm/cpufeatures.h |  2 ++
- arch/x86/include/asm/msr-index.h   |  1 +
- arch/x86/kernel/cpu/bugs.c         | 16 +++++++++++++++-
- arch/x86/kernel/cpu/common.c       |  1 +
- arch/x86/kvm/cpuid.c               |  1 +
- arch/x86/kvm/svm/svm.c             |  6 ++++++
- arch/x86/lib/msr.c                 |  2 ++
- 7 files changed, 28 insertions(+), 1 deletion(-)
+Yishai Hadas (7):
+  virtio_pci: Introduce device parts access commands
+  virtio: Extend the admin command to include the result size
+  virtio: Manage device and driver capabilities via the admin commands
+  virtio-pci: Introduce APIs to execute device parts admin commands
+  vfio/virtio: Add support for the basic live migration functionality
+  vfio/virtio: Add PRE_COPY support for live migration
+  vfio/virtio: Enable live migration once VIRTIO_PCI was configured
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 924f530129d7..9d71f06e09a4 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -462,6 +462,8 @@
- #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barrier */
- #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
- #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
-+#define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
-+#define X86_FEATURE_SRSO_MSR_FIX	(20*32+31) /* MSR BP_CFG[BpSpecReduce] can be used to mitigate SRSO */
- 
- /*
-  * Extended auxiliary flags: Linux defined - for features scattered in various
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 3ae84c3b8e6d..1372a569fb58 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -717,6 +717,7 @@
- 
- /* Zen4 */
- #define MSR_ZEN4_BP_CFG                 0xc001102e
-+#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
- #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
- 
- /* Fam 19h MSRs */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 83b34a522dd7..5dffd1e679da 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2536,6 +2536,7 @@ enum srso_mitigation {
- 	SRSO_MITIGATION_SAFE_RET,
- 	SRSO_MITIGATION_IBPB,
- 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
-+	SRSO_MITIGATION_BP_SPEC_REDUCE,
- };
- 
- enum srso_mitigation_cmd {
-@@ -2553,7 +2554,8 @@ static const char * const srso_strings[] = {
- 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
- 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
- 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
--	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
-+	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
-+	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
- };
- 
- static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
-@@ -2628,6 +2630,11 @@ static void __init srso_select_mitigation(void)
- 		break;
- 
- 	case SRSO_CMD_SAFE_RET:
-+		if (boot_cpu_has(X86_FEATURE_SRSO_USER_KERNEL_NO)) {
-+			pr_notice("CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT\n");
-+			goto ibpb_on_vmexit;
-+		}
-+
- 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
- 			/*
- 			 * Enable the return thunk for generated code
-@@ -2671,7 +2678,14 @@ static void __init srso_select_mitigation(void)
- 		}
- 		break;
- 
-+ibpb_on_vmexit:
- 	case SRSO_CMD_IBPB_ON_VMEXIT:
-+		if (boot_cpu_has(X86_FEATURE_SRSO_MSR_FIX)) {
-+			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-+			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-+			break;
-+		}
-+
- 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
- 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
- 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 8f41ab219cf1..ca3b588b51aa 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1273,6 +1273,7 @@ static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
- 	VULNBL_AMD(0x17, RETBLEED | SMT_RSB | SRSO),
- 	VULNBL_HYGON(0x18, RETBLEED | SMT_RSB | SRSO),
- 	VULNBL_AMD(0x19, SRSO),
-+	VULNBL_AMD(0x1a, SRSO),
- 	{}
- };
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 41786b834b16..d54cd67c8c50 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -799,6 +799,7 @@ void kvm_set_cpu_caps(void)
- 
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_IBPB_BRTYPE);
-+	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_USER_KERNEL_NO);
- 	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
- 
- 	kvm_cpu_cap_init_kvm_defined(CPUID_8000_0022_EAX,
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 9df3e1e5ae81..03f29912a638 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -608,6 +608,9 @@ static void svm_disable_virtualization_cpu(void)
- 	kvm_cpu_svm_disable();
- 
- 	amd_pmu_disable_virt();
-+
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-+		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
- }
- 
- static int svm_enable_virtualization_cpu(void)
-@@ -685,6 +688,9 @@ static int svm_enable_virtualization_cpu(void)
- 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
- 	}
- 
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-+		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
-index 4bf4fad5b148..5a18ecc04a6c 100644
---- a/arch/x86/lib/msr.c
-+++ b/arch/x86/lib/msr.c
-@@ -103,6 +103,7 @@ int msr_set_bit(u32 msr, u8 bit)
- {
- 	return __flip_bit(msr, bit, true);
- }
-+EXPORT_SYMBOL_GPL(msr_set_bit);
- 
- /**
-  * msr_clear_bit - Clear @bit in a MSR @msr.
-@@ -118,6 +119,7 @@ int msr_clear_bit(u32 msr, u8 bit)
- {
- 	return __flip_bit(msr, bit, false);
- }
-+EXPORT_SYMBOL_GPL(msr_clear_bit);
- 
- #ifdef CONFIG_TRACEPOINTS
- void do_trace_write_msr(unsigned int msr, u64 val, int failed)
+ drivers/vfio/pci/virtio/Kconfig     |    4 +-
+ drivers/vfio/pci/virtio/Makefile    |    3 +-
+ drivers/vfio/pci/virtio/common.h    |  127 +++
+ drivers/vfio/pci/virtio/legacy_io.c |  420 +++++++++
+ drivers/vfio/pci/virtio/main.c      |  500 ++--------
+ drivers/vfio/pci/virtio/migrate.c   | 1336 +++++++++++++++++++++++++++
+ drivers/virtio/virtio_pci_common.h  |   19 +-
+ drivers/virtio/virtio_pci_modern.c  |  457 ++++++++-
+ include/linux/virtio.h              |    1 +
+ include/linux/virtio_pci_admin.h    |   11 +
+ include/uapi/linux/virtio_pci.h     |  131 +++
+ 11 files changed, 2594 insertions(+), 415 deletions(-)
+ create mode 100644 drivers/vfio/pci/virtio/common.h
+ create mode 100644 drivers/vfio/pci/virtio/legacy_io.c
+ create mode 100644 drivers/vfio/pci/virtio/migrate.c
+
 -- 
-2.43.0
+2.27.0
 
 
