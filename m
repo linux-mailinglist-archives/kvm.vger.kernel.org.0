@@ -1,206 +1,337 @@
-Return-Path: <kvm+bounces-30458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5889BAE6D
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:45:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D6C9BAE88
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF2011C218A7
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:45:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1518A1C2147E
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B9A1AB517;
-	Mon,  4 Nov 2024 08:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08C01AB6CC;
+	Mon,  4 Nov 2024 08:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U3mXCPQN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mTvW/bXY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB76C1422D4;
-	Mon,  4 Nov 2024 08:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F86E1494B1;
+	Mon,  4 Nov 2024 08:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730709930; cv=none; b=Xo4JrVVyG6oUpQnRusOsc82WZzlgOh3TRnIxFCWcqgcDkQMuRNoAc/kuBKLvwQEKjYfi0/G8NP3U5YE2sLZ1xtZuL011hEFO4htQKzcVj311RmpTcDfI767chhkdztWXTDKVBS4s5CE0i1N9DG6BVxBI4eWZaF0WlDMkWC26lVI=
+	t=1730710206; cv=none; b=OsjOevcrGHLvDeKGvqj3gsgwMBqB9LUBy17XB4p/6Ld7dNXXPeKmaZ7yLkN9GBtreCGp0AxrIxqwUjP7dn6+XlIFW/nJy8hIlWrHLKV3vaX6tqR+J+mX90wd0AULvNzLLUrYwvVfdAFeFd5fStrWZE4ZGLaiHYtB/9gFUkCS7KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730709930; c=relaxed/simple;
-	bh=2/5Ky+jC5gjVZXuR/smrXJRvzH5WRkbXn2obO6nTz5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IjFK+5GYy9BMmsFKWKXjsI9RE5mUEz7kQVmy4zD6iBdadwdGkEUEEf6PeBYNeHca6gomragCywbcNaV2aGH/QkiiRacn8TPZsAfzdkKtuHj/yXbkRYgA/lrCBRq8oYdW8wql/+isL3D9bIU3Xpyvs+4ozkeRPoR9X5UO1wHPix0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U3mXCPQN; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1730710206; c=relaxed/simple;
+	bh=5o4cDQtU8wPPXLF0ckxsf8HLWysGFSinbqKa6qqgBoc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R/odKmXmlxDFfBSqUR9edqrZfvtTeFh3fwcfAtHdeywVHix0luSvDaC6v9bdLb95nDZ3P2se3sg2Fs174Ikx3cYbs9RMH2OZoMPCIXfo3Zpgg1CvN1/m7Yx9JXPU25sU8yYIqcbLIiGx2eg3IaozjcxoZK8B8x4914EEW1vIpow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mTvW/bXY; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730709929; x=1762245929;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2/5Ky+jC5gjVZXuR/smrXJRvzH5WRkbXn2obO6nTz5w=;
-  b=U3mXCPQNyScr4NgdPruGnBK7MiDMwzhcgMDkLjcAy23cTO+OHvb16Q49
-   hIqRrfdQSd6Hg4XExhoObmTj0nlLxE4wg2d3l69DDi619bnmFTyFXMxDi
-   iL5uMmAp4JxUZB0F84RDkVho4X+e0yrNd0pvXgf6z2bH6/aD1e2bcgBcw
-   /xziyXCbiG5x1gN7u9CDfRQ6GX/+tT07nf878kZTajtZw+5rYjE8sP44g
-   DJd5Bl8Pzrv1fd/gPAUJs3Qlt3x/TBUT6u1ZIKicDN23s/4bkKxbrMZRQ
-   +3vtQjjzJeFUHRbqT/SnjHNlBMC4DeVMQyrdEpiYtYcA1lvNanzqE3vh4
+  t=1730710204; x=1762246204;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5o4cDQtU8wPPXLF0ckxsf8HLWysGFSinbqKa6qqgBoc=;
+  b=mTvW/bXYlavZ0mrCzfy5gJmlPg7hkN5qjPrYuuIvZJMnQ7AIMA1xsXoM
+   uEIC/0OQAWXJFTK8IgOeOW/1lahYu/mTaepTxt9PCSuqTyZqwdm0p6K5Z
+   oifosgMWYbtZBwrX3mBOSbmYElrcWCw8UwSGMYj8ok7SW0H0nfElLvOxA
+   0hj0xDlLuV4oUJDZ2Rj0fHld0AkbTlCGV3AT9Uj3s4gK8vMYga+jI7qoG
+   6b5TBYubWbO1NUvUyHwv51Opnc/RUK+xQULJAnJtPNU2eznLcnDcIMoAx
+   wJd0qqBaywKXbwTtIv1/7cVwbPxTuwuiMxgr+JGurFdKhdMfJS552tXCI
    g==;
-X-CSE-ConnectionGUID: csutf2fCQEqPxAm1m7ZISw==
-X-CSE-MsgGUID: dBsrUo0PR0agPPOiijgY+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="29824335"
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="29824335"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:45:28 -0800
-X-CSE-ConnectionGUID: 5QDdrfw8QH+l0ctJyqaGrA==
-X-CSE-MsgGUID: fq6N5rDITgCTh03ASNidTQ==
+X-CSE-ConnectionGUID: gY9UTFOITsKX+S0/nTFmgQ==
+X-CSE-MsgGUID: /l5dCslKSpmomd6bMgEEBg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="52957360"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="52957360"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:50:01 -0800
+X-CSE-ConnectionGUID: HPnvxhSkRHq83KnY8LJc4Q==
+X-CSE-MsgGUID: qXQqZ0N7RHWSBd3Dg9zOow==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="83473311"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:45:26 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 2/2] KVM: guest_memfd: Remove RCU-protected attribute from slot->gmem.file
-Date: Mon,  4 Nov 2024 16:43:03 +0800
-Message-ID: <20241104084303.29909-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20241104084137.29855-1-yan.y.zhao@intel.com>
-References: <20241104084137.29855-1-yan.y.zhao@intel.com>
+   d="scan'208";a="106938291"
+Received: from unknown (HELO [10.238.12.149]) ([10.238.12.149])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:49:55 -0800
+Message-ID: <f95cd8c6-af5c-4d8f-99a8-16d0ec56d9a4@linux.intel.com>
+Date: Mon, 4 Nov 2024 16:49:52 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace
+ generically
+To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
+References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
+ <20240826022255.361406-2-binbin.wu@linux.intel.com>
+ <ZyKbxTWBZUdqRvca@google.com>
+ <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
+ <ZyLWMGcgj76YizSw@google.com>
+ <1cace497215b025ed8b5f7815bdeb23382ecad32.camel@intel.com>
+ <ZyUEMLoy6U3L4E8v@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZyUEMLoy6U3L4E8v@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Remove the RCU-protected attribute from slot->gmem.file. No need to use RCU
-primitives rcu_assign_pointer()/synchronize_rcu() to update this pointer.
 
-- slot->gmem.file is updated in 3 places:
-  kvm_gmem_bind(), kvm_gmem_unbind(), kvm_gmem_release().
-  All of them are protected by kvm->slots_lock.
 
-- slot->gmem.file is read in 2 paths:
-  (1) kvm_gmem_populate
-        kvm_gmem_get_file
-        __kvm_gmem_get_pfn
 
-  (2) kvm_gmem_get_pfn
-         kvm_gmem_get_file
-         __kvm_gmem_get_pfn
+On 11/2/2024 12:39 AM, Sean Christopherson wrote:
+> On Fri, Nov 01, 2024, Kai Huang wrote:
+>> On Thu, 2024-10-31 at 07:54 -0700, Sean Christopherson wrote:
+>>> On Thu, Oct 31, 2024, Kai Huang wrote:
+>>> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+>>> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+>>> -		/* MAP_GPA tosses the request to the user space. */
+>>> -		return 0;
+>>> +	r = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, &ret);
+>>> +	if (r <= r)
+>>> +		return r;
+>> ... should be:
+>>
+>> 	if (r <= 0)
+>> 		return r;
+>>
+>> ?
+>>
+>> Another option might be we move "set hypercall return value" code inside
+>> __kvm_emulate_hypercall().  So IIUC the reason to split
+>> __kvm_emulate_hypercall() out is for TDX, and while non-TDX uses RAX to carry
+>> the hypercall return value, TDX uses R10.
+>>
+>> We can additionally pass a "kvm_hypercall_set_ret_func" function pointer to
+>> __kvm_emulate_hypercall(), and invoke it inside.  Then we can change
+>> __kvm_emulate_hypercall() to return:
+>>      < 0 error,
+>>      ==0 return to userspace,
+>>      > 0 go back to guest.
+> Hmm, and the caller can still handle kvm_skip_emulated_instruction(), because the
+> return value is KVM's normal pattern.
+>
+> I like it!
+>
+> But, there's no need to pass a function pointer, KVM can write (and read) arbitrary
+> GPRs, it's just avoided in most cases so that the sanity checks and available/dirty
+> updates are elided.  For this code though, it's easy enough to keep kvm_rxx_read()
+> for getting values, and eating the overhead of a single GPR write is a perfectly
+> fine tradeoff for eliminating the return multiplexing.
+>
+> Lightly tested.  Assuming this works for TDX and passes testing, I'll post a
+> mini-series next week.
+>
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 1 Nov 2024 09:04:00 -0700
+> Subject: [PATCH] KVM: x86: Refactor __kvm_emulate_hypercall() to accept reg
+>   names, not values
+>
+> Rework __kvm_emulate_hypercall() to take the names of input and output
+> (guest return value) registers, as opposed to taking the input values and
+> returning the output value.  As part of the refactor, change the actual
+> return value from __kvm_emulate_hypercall() to be KVM's de facto standard
+> of '0' == exit to userspace, '1' == resume guest, and -errno == failure.
+>
+> Using the return value for KVM's control flow eliminates the multiplexed
+> return value, where '0' for KVM_HC_MAP_GPA_RANGE (and only that hypercall)
+> means "exit to userspace".
+>
+> Use the direct GPR accessors to read values to avoid the pointless marking
+> of the registers as available, but use kvm_register_write_raw() for the
+> guest return value so that the innermost helper doesn't need to multiplex
+> its return value.  Using the generic kvm_register_write_raw() adds very
+> minimal overhead, so as a one-off in a relatively slow path it's well
+> worth the code simplification.
+>
+> Suggested-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 15 +++++++++----
+>   arch/x86/kvm/x86.c              | 40 +++++++++++++--------------------
+>   2 files changed, 27 insertions(+), 28 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 6d9f763a7bb9..9e66fde1c4e4 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2179,10 +2179,17 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
+>   	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
+>   }
+>   
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl);
+> +int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			      unsigned long a0, unsigned long a1,
+> +			      unsigned long a2, unsigned long a3,
+> +			      int op_64_bit, int cpl, int ret_reg);
+> +
+> +#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, ret)	\
+> +	____kvm_emulate_hypercall(vcpu,						\
+> +				  kvm_##nr##_read(vcpu), kvm_##a0##_read(vcpu),	\
+> +				  kvm_##a1##_read(vcpu), kvm_##a2##_read(vcpu),	\
+> +				  kvm_##a3##_read(vcpu), op_64_bit, cpl, VCPU_REGS_##ret)
+> +
+>   int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>   
+>   int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e09daa3b157c..425a301911a6 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9998,10 +9998,10 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>   	return kvm_skip_emulated_instruction(vcpu);
+>   }
+>   
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl)
+> +int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			      unsigned long a0, unsigned long a1,
+> +			      unsigned long a2, unsigned long a3,
+> +			      int op_64_bit, int cpl, int ret_reg)
+>   {
+>   	unsigned long ret;
+>   
+> @@ -10086,15 +10086,18 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>   
+>   out:
+>   	++vcpu->stat.hypercalls;
+> -	return ret;
+> +
+> +	if (!op_64_bit)
+> +		ret = (u32)ret;
+> +
+> +	kvm_register_write_raw(vcpu, ret_reg, ret);
+> +	return 1;
+>   }
+> -EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
+> +EXPORT_SYMBOL_GPL(____kvm_emulate_hypercall);
+>   
+>   int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>   {
+> -	unsigned long nr, a0, a1, a2, a3, ret;
+> -	int op_64_bit;
+> -	int cpl;
+> +	int r;
+>   
+>   	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>   		return kvm_xen_hypercall(vcpu);
+> @@ -10102,23 +10105,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>   	if (kvm_hv_hypercall_enabled(vcpu))
+>   		return kvm_hv_hypercall(vcpu);
+>   
+> -	nr = kvm_rax_read(vcpu);
+> -	a0 = kvm_rbx_read(vcpu);
+> -	a1 = kvm_rcx_read(vcpu);
+> -	a2 = kvm_rdx_read(vcpu);
+> -	a3 = kvm_rsi_read(vcpu);
+> -	op_64_bit = is_64_bit_hypercall(vcpu);
+> -	cpl = kvm_x86_call(get_cpl)(vcpu);
+> -
+> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+> -		/* MAP_GPA tosses the request to the user space. */
+> +	r = __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+> +				    is_64_bit_hypercall(vcpu),
+> +				    kvm_x86_call(get_cpl)(vcpu), RAX);
+Now, the register for return code of the hypercall can be specified.
+But in  ____kvm_emulate_hypercall(), the complete_userspace_io callback
+is hardcoded to complete_hypercall_exit(), which always set return code
+to RAX.
 
-  Path (1) kvm_gmem_populate() requires holding kvm->slots_lock, so
-  slot->gmem.file is protected by the kvm->slots_lock in this path.
+We can allow the caller to pass in the cui callback, or assign different
+version according to the input 'ret_reg'.  So that different callers can use
+different cui callbacks.  E.g., TDX needs to set return code to R10 in cui
+callback.
 
-  Path (2) kvm_gmem_get_pfn() does not require holding kvm->slots_lock.
-  However, it's also not guarded by rcu_read_lock() and rcu_read_unlock().
-  So synchronize_rcu() in kvm_gmem_unbind()/kvm_gmem_release() actually
-  will not wait for the readers in kvm_gmem_get_pfn() due to lack of RCU
-  read-side critical section.
+How about:
 
-  The path (2) kvm_gmem_get_pfn() is safe without RCU protection because:
-  a) kvm_gmem_bind() is called on a new memslot, before the memslot is
-     visible to kvm_gmem_get_pfn().
-  b) kvm->srcu ensures that kvm_gmem_unbind() and freeing of a memslot
-     occur after the memslot is no longer visible to kvm_gmem_get_pfn().
-  c) get_file_active() ensures that kvm_gmem_get_pfn() will not access the
-     stale file if kvm_gmem_release() sets it to NULL.  This is because if
-     kvm_gmem_release() occurs before kvm_gmem_get_pfn(), get_file_active()
-     will return NULL; if get_file_active() does not return NULL,
-     kvm_gmem_release() should not occur until after kvm_gmem_get_pfn()
-     releases the file reference.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index dba78f22ab27..0fba98685f42 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2226,13 +2226,15 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
+  int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+                               unsigned long a0, unsigned long a1,
+                               unsigned long a2, unsigned long a3,
+-                             int op_64_bit, int cpl, int ret_reg);
++                             int op_64_bit, int cpl, int ret_reg,
++                             int (*cui)(struct kvm_vcpu *vcpu));
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- include/linux/kvm_host.h |  2 +-
- virt/kvm/guest_memfd.c   | 23 ++++++++++-------------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+-#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, ret)        \
++#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, ret, cui)   \
+____kvm_emulate_hypercall(vcpu, \
+                                   kvm_##nr##_read(vcpu), kvm_##a0##_read(vcpu), \
+                                   kvm_##a1##_read(vcpu), kvm_##a2##_read(vcpu), \
+-                                 kvm_##a3##_read(vcpu), op_64_bit, cpl, VCPU_REGS_##ret)
++                                 kvm_##a3##_read(vcpu), op_64_bit, cpl, VCPU_REGS_##ret, \
++                                 cui)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c7e4f8be3e17..3c3088a9e336 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -600,7 +600,7 @@ struct kvm_memory_slot {
- 
- #ifdef CONFIG_KVM_PRIVATE_MEM
- 	struct {
--		struct file __rcu *file;
-+		struct file *file;
- 		pgoff_t pgoff;
- 	} gmem;
- #endif
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 651c2f08df62..9d9bf3d033bd 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -267,9 +267,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	filemap_invalidate_lock(inode->i_mapping);
- 
- 	xa_for_each(&gmem->bindings, index, slot)
--		rcu_assign_pointer(slot->gmem.file, NULL);
--
--	synchronize_rcu();
-+		WRITE_ONCE(slot->gmem.file, NULL);
- 
- 	/*
- 	 * All in-flight operations are gone and new bindings can be created.
-@@ -298,8 +296,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
- 	/*
- 	 * Do not return slot->gmem.file if it has already been closed;
- 	 * there might be some time between the last fput() and when
--	 * kvm_gmem_release() clears slot->gmem.file, and you do not
--	 * want to spin in the meanwhile.
-+	 * kvm_gmem_release() clears slot->gmem.file.
- 	 */
- 	return get_file_active(&slot->gmem.file);
- }
-@@ -510,11 +507,11 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	}
- 
- 	/*
--	 * No synchronize_rcu() needed, any in-flight readers are guaranteed to
--	 * be see either a NULL file or this new file, no need for them to go
--	 * away.
-+	 * memslots of flag KVM_MEM_GUEST_MEMFD are immutable to change, so
-+	 * kvm_gmem_bind() must occur on a new memslot.
-+	 * Readers are guaranteed to see this new file.
- 	 */
--	rcu_assign_pointer(slot->gmem.file, file);
-+	WRITE_ONCE(slot->gmem.file, file);
- 	slot->gmem.pgoff = start;
- 
- 	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
-@@ -550,8 +547,7 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
- 
- 	filemap_invalidate_lock(file->f_mapping);
- 	xa_store_range(&gmem->bindings, start, end - 1, NULL, GFP_KERNEL);
--	rcu_assign_pointer(slot->gmem.file, NULL);
--	synchronize_rcu();
-+	WRITE_ONCE(slot->gmem.file, NULL);
- 	filemap_invalidate_unlock(file->f_mapping);
- 
- 	fput(file);
-@@ -563,11 +559,12 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- 					pgoff_t index, kvm_pfn_t *pfn,
- 					bool *is_prepared, int *max_order)
- {
-+	struct file *gmem_file = READ_ONCE(slot->gmem.file);
- 	struct kvm_gmem *gmem = file->private_data;
- 	struct folio *folio;
- 
--	if (file != slot->gmem.file) {
--		WARN_ON_ONCE(slot->gmem.file);
-+	if (file != gmem_file) {
-+		WARN_ON_ONCE(gmem_file);
- 		return ERR_PTR(-EFAULT);
- 	}
- 
--- 
-2.43.2
+  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6e0a518aec4a..b68690c4a4c0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10019,7 +10019,8 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+  int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+                               unsigned long a0, unsigned long a1,
+                               unsigned long a2, unsigned long a3,
+-                             int op_64_bit, int cpl, int ret_reg)
++                             int op_64_bit, int cpl, int ret_reg,
++                             int (*cui)(struct kvm_vcpu *vcpu))
+  {
+         unsigned long ret;
+
+@@ -10093,7 +10094,7 @@ int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+                         vcpu->run->hypercall.flags |= KVM_EXIT_HYPERCALL_LONG_MODE;
+
+                 WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
+-               vcpu->arch.complete_userspace_io = complete_hypercall_exit;
++               vcpu->arch.complete_userspace_io = cui;
+                 /* stat is incremented on completion. */
+                 return 0;
+         }
+@@ -10125,7 +10126,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+
+         r = __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+                                     is_64_bit_hypercall(vcpu),
+-                                   kvm_x86_call(get_cpl)(vcpu), RAX);
++                                   kvm_x86_call(get_cpl)(vcpu), RAX, complete_hypercall_exit);
+         if (r <= 0)
+                 return 0;
+
+
+> +	if (r <= 0)
+>   		return 0;
+>   
+> -	if (!op_64_bit)
+> -		ret = (u32)ret;
+> -	kvm_rax_write(vcpu, ret);
+> -
+>   	return kvm_skip_emulated_instruction(vcpu);
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+>
+> base-commit: 911785b796e325dec83b32050f294e278a306211
 
 
