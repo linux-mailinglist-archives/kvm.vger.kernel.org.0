@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-30560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30561-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8819BBA56
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 17:27:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C869BBA72
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 17:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FABF1F20FD8
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 16:27:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 939032822D2
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 16:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC971C3038;
-	Mon,  4 Nov 2024 16:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262C11C2317;
+	Mon,  4 Nov 2024 16:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dNQN7FN9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jeYfdsYE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EE84A08;
-	Mon,  4 Nov 2024 16:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BD520326
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 16:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730737608; cv=none; b=rhRIu5GTDSAavPb/jWxYo+sLNj5qeHgqeezxPovx/mAz+hiPZFLJC2SqPJHJ8tebBsulkjXMs3mPnzhtK5cPYp7PQaIvYUXr2w0sJQfvP1tIryIfn2ceX6BtCtmkflG7e/ETxFSZtC3Ex42uVzWKebIYpgeCE9xESUi6R01hE5Q=
+	t=1730738461; cv=none; b=a7Qm6cSmzBPQQEQBqHaELX//4cm3dAeO9yCa3oRAfTAxqyZGzZgZeoTJcBcF8gqW05vA8FQLf8RHg4AbLj8pRfiqUutzqqe1LPAtcc9p6pYECLDEXaWxn/2zvqK0vyZsMphAof8m2BxO2h57EO48R40G66ObP5bslMJb6veESLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730737608; c=relaxed/simple;
-	bh=iVHZaWIxb1vbiCD6AvV5gqbVLV2k3/LS/b1t9CjFQZ4=;
+	s=arc-20240116; t=1730738461; c=relaxed/simple;
+	bh=znPx141/aVF7V2hbLToXsd+lak+Q/LyDJlPuK3ziWPI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kEqqW42HzwUu8njmTq5v06tVpoUH4pNEOEkMtZTeZb/cIty8RDXhXKVnHP0oygkXnK3JDBXh4UrAdlDrPWt4khQEwdW72WFlsDNx/u6BddIXF+Tz7Pvp6ar6DyJtKzqSJbS0FH9wctpnJh0KMm58fkp5PcntUq6YlnuKECuvejA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dNQN7FN9; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:Content-Type; b=cfQux+BDJAadqdSZoUwh0U9iWkZNMXEy0ILY70+qlR3AymrDDKbOchwSp50RirHQTB3xtx38oCdUMOi/p3SzBO5spWMx18qR5StSyZ2xlOYI6svtQZU1mrvxeK3MRuPAqnMyVz48JznDarCV99ZSgCMYgbXeo0lShJVni9mpD1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jeYfdsYE; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730737607; x=1762273607;
+  t=1730738460; x=1762274460;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=iVHZaWIxb1vbiCD6AvV5gqbVLV2k3/LS/b1t9CjFQZ4=;
-  b=dNQN7FN9PpoIn20p1YbTqbiBEDVn+IEnP8Icgou4mPD7Ix/e9EmF6847
-   BfdD7xIg1e6csk4LtJh7c/zqIjJWG4TiUvT8G+pb7HzIFKC3NYoMeuC0k
-   wqlLLmgxy1Wy0jvvwlLFry64W02K1wk8OJHen8TfsbvsWsafpE4qjQltJ
-   URpXAAenyyB22a7lsnvy2aIuKTpBhmUn5TLFERojwWyBGpyL4vcLE5mwv
-   vP1E9mwhsz1/w4cWH1zH1BP6DeBn3dsFwApF+LfTEOnchD1NaMCS8WAHB
-   8sbrUcxoMlTBrBuXS2GLTeM1UW3Qn0BRSaXJ1GZ+WxtsL9iBw965zqCLi
-   g==;
-X-CSE-ConnectionGUID: VUHqm79tTvK7tLON3qaW/g==
-X-CSE-MsgGUID: Y3UyqmeAQ6a6vxXfLCXbEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41549021"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41549021"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:26:46 -0800
-X-CSE-ConnectionGUID: ILa6z2FFSoeyqMIr75+u2g==
-X-CSE-MsgGUID: coYb8hJuTomn81C6XwiwAA==
+  bh=znPx141/aVF7V2hbLToXsd+lak+Q/LyDJlPuK3ziWPI=;
+  b=jeYfdsYE02CiESPPKe/lMXQvwHjTxpH3qbMPTYsWCKT/Wm2MpVD9GhB4
+   27vQyrn98QIltBAsRnEMhicLcwySPx30MrccFUOq8lJD2pKgc9QMaV6eg
+   vYzKypc4K+5JD/ZioE8c9lFIIMrPVVsz7Bl7TsGpIlJfAp5OFb3F8lspv
+   nMJ14Rlv6SFJ08knsnPtpjevTa4H2sQ9RGXe5ddCFyFFxHPDG0IWflQ4A
+   9v+ov7fWr49PoyqjacUorcbFIsTdTDyzTUkZvQnifdtvC7tRVsnC4jdzJ
+   fpe8C6kH9ihFi/vR10UOyR3zbTal/F0AtayBF8scvEuI/GPXehn3vQiML
+   w==;
+X-CSE-ConnectionGUID: 7dj9KdP6QF+j5AEG1/aOLw==
+X-CSE-MsgGUID: 8E9DS+I+TdaqKJ5RTeUCZw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30557521"
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="30557521"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:40:59 -0800
+X-CSE-ConnectionGUID: 5SPIFmQmS/ek79M2QvZOeQ==
+X-CSE-MsgGUID: zbLKyBlpRs2qoRiVyFhIdQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
-   d="scan'208";a="84049655"
+   d="scan'208";a="83389338"
 Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.221.97]) ([10.124.221.97])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:26:45 -0800
-Message-ID: <53c918b4-2e03-4f68-b3f3-d18f62d5805c@intel.com>
-Date: Mon, 4 Nov 2024 08:26:44 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:40:59 -0800
+Message-ID: <c4e28cbf-c90c-4b7f-b45a-e59b384b03b7@intel.com>
+Date: Mon, 4 Nov 2024 08:40:57 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,35 +67,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86: cpu/bugs: add support for AMD ERAPS feature
-To: "Shah, Amit" <Amit.Shah@amd.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "x86@kernel.org" <x86@kernel.org>
-Cc: "corbet@lwn.net" <corbet@lwn.net>,
- "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
- "kai.huang@intel.com" <kai.huang@intel.com>,
- "pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
- "jpoimboe@kernel.org" <jpoimboe@kernel.org>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
- "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
- "seanjc@google.com" <seanjc@google.com>, "mingo@redhat.com"
- <mingo@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, "Moger, Babu"
- <Babu.Moger@amd.com>, "Das1, Sandipan" <Sandipan.Das@amd.com>,
- "hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
- <peterz@infradead.org>, "bp@alien8.de" <bp@alien8.de>,
- "Kaplan, David" <David.Kaplan@amd.com>
-References: <20241031153925.36216-1-amit@kernel.org>
- <20241031153925.36216-2-amit@kernel.org>
- <05c12dec-3f39-4811-8e15-82cfd229b66a@intel.com>
- <4b23d73d450d284bbefc4f23d8a7f0798517e24e.camel@amd.com>
- <bb90dce4-8963-476a-900b-40c3c00d8aac@intel.com>
- <b79c02aab50080cc8bee132eb5a0b12c42c4be06.camel@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH 2/4] x86: KVM: Advertise SM3 CPUID to userspace
+To: Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org, x86@kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, chao.gao@intel.com, xiaoyao.li@intel.com,
+ jiaan.lu@intel.com, xuelian.guo@intel.com
+References: <20241104063559.727228-1-tao1.su@linux.intel.com>
+ <20241104063559.727228-3-tao1.su@linux.intel.com>
 Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
  oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
@@ -139,37 +119,13 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <b79c02aab50080cc8bee132eb5a0b12c42c4be06.camel@amd.com>
+In-Reply-To: <20241104063559.727228-3-tao1.su@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/4/24 08:13, Shah, Amit wrote:
-> I want to justify that not setting X86_FEATURE_RSB_CTXSW is still doing
-> the right thing, albeit in hardware.
+On 11/3/24 22:35, Tao Su wrote:
+> SM3 is enumerated via CPUID.(EAX=7,ECX=1):EAX[bit 1].
 
-Let's back up a bit.
-
-In the kernel, we have security concerns if RSB contents remain across
-context switches.  If process A's RSB entries are left and then process
-B uses them, there's a problem.
-
-Today, we mitigate that issue with manual kernel RSB state zapping on
-context switches (X86_FEATURE_RSB_CTXSW).
-
-You're saying that this fancy new ERAPS feature includes a new mechanism
-to zap RSB state.  But that only triggers "each time a TLB flush happens".
-
-So what you're saying above is that you are concerned about RSB contents
-sticking around across context switches.  But instead of using
-X86_FEATURE_RSB_CTXSW, you believe that the new TLB-flush-triggered
-ERAPS flush can be used instead.
-
-Are we all on the same page so far?
-
-I think you're wrong.  We can't depend on ERAPS for this.  Linux doesn't
-flush the TLB on context switches when PCIDs are in play.  Thus, ERAPS
-won't flush the RSB and will leave bad state in there and will leave the
-system vulnerable.
-
-Or what am I missing?
+Please don't put things like this in the changelog.  They're just a near
+literal copy of what the code says and don't need to be duplicated.
 
