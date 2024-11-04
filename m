@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771B29BB5A7
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 14:19:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB9F9BB5A6
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 14:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3546C282FEE
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 13:19:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C84B11F22255
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 13:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF8617C68;
-	Mon,  4 Nov 2024 13:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5933B18651;
+	Mon,  4 Nov 2024 13:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bBfkf16y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F8HtzCju"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7C479C0
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 13:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132AEAD5E
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 13:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730726328; cv=none; b=mrddQgfNHaoj6fn4FzhrBufJ4RwfpdF48t7HvMv072PPhW+1U375mYeJUhEe7qe1C0D8gvW3SX9hjBof1GsEiMtewjD8W0rq68R2e81HPU7zBA0VMyNJpunEGLia8haP5YwpZGC0SlZctv2F1kcFMNYluQElVNHrBs2SoAbUQM8=
+	t=1730726327; cv=none; b=UBY1v06wHBZ1HAGL/+qeZaH9E1+6retLaLLiAswcF7v9blIEgaoGWt8zkdUxxtHtvXfZ/MRtYx6KnKlcNN3g8/+dQdABmlvzsfRfpvEFUt/GwOYhoTpEDOZW+N4V9JUByqTdqd+8irc3MyuaYISm/evvgmT6U6ZC4+xnTmklv6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730726328; c=relaxed/simple;
-	bh=//FzTA/bifjMLlL3gQzvpnR1JJLHzU2meJr0MN2TX8Q=;
+	s=arc-20240116; t=1730726327; c=relaxed/simple;
+	bh=ex4Om9fad/v+LS38u5dL5eAurC92Q3cu+eJ3PQ8HqY4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uV1m3XuU0uAGAtkRzDY6fUZlRnUfja0wwkq0q8svPjUg7mZO8UMzxr7aDylqi+hzH7kyt9IDIepXSUPKeRhcRR7V4xQ6Pi2ek84yeVg8ssFjx98NoQNP52s6Ekb5IXXlqOZ17gaRM/fQSTNb45NtnmYASPGAZlzXfpyVKXxvMa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bBfkf16y; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version:Content-Type; b=FKmJYD/Ak/ihdg2jux9/H/mj8ZlFGArHgvsbPNoZGmOaH3kbSdHl+jlevixsKKGUtVFM/vV5wX7sBWD4Wn0dhKESNIqerUlfi9qv+2CTKBx1WqucdE46a+46VOAldp+/YJiSznw3OsVCH2k4pX7npRufnDXeFMx1UkkCmC1kyB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F8HtzCju; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730726325; x=1762262325;
+  t=1730726326; x=1762262326;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=//FzTA/bifjMLlL3gQzvpnR1JJLHzU2meJr0MN2TX8Q=;
-  b=bBfkf16yiE8gXR8B3NYD8Knl4B2/19f2xPWKeKgVemUYszmXhJsTnRt0
-   M9PcbY33h2HyNGxvRJi6oEFlEyjPnZwRTEgsQC0jdTeKLID4t6ClCWdhf
-   tPP+lJ1LQBCWg0SBhc+Z9QgxQPm3LrNzj93l6e0t2aPgpTMb6B5UVZ5A6
-   4lnAwtvh+0S2vo7t3wZJOMYYeCb6akxLjUFV7qhui8Yyy318WcbIK2cfS
-   NbX6HqaYJwfJtAcFypLfmaYE+OlvQlRapUuZVAf0hOUZaTSSnuGKR0GiX
-   7INFyVX7e6v5D2Z2XioduGgXqg+sYykmneVLai1SRhH+0Je6KKYbWx4y/
-   A==;
-X-CSE-ConnectionGUID: wNyG/gZeTBSlq1oYR6Y/og==
-X-CSE-MsgGUID: CaDq6d7QToijs5jy3cTmJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="41003700"
+  bh=ex4Om9fad/v+LS38u5dL5eAurC92Q3cu+eJ3PQ8HqY4=;
+  b=F8HtzCju5En2uEv4xyloPPWs/G32ULnDjt83+D+uVdCzyUludy4VVKjO
+   TO2dtxR9Ga9kpTozFKjByIo1V/kQJu0uL2so5LMTOXc/O/yM7PzOySuxh
+   eAGEE3Rfh+725IrI7oI8tekQWF5tUd5DpZZISAHH8msdeq0vAAyL1szII
+   P87JhK1O5ui8Lwu7ja51NWsk3AvpxQTqxgE6nLWOz/Yq8KdmijLPoMa0W
+   +3xnFGihWK1X+OdImsJ5HDefoZX+2+7FY/1NZQ+G2McmdxrC1USeVvW2O
+   X92Hak1SZrkA5/Wg/uihkfkI0ZwBXBEMbRVM2WEOhUjZN+i5d83wD8Wtd
+   g==;
+X-CSE-ConnectionGUID: lX5YrtKbQ8WRml0BQ7Cw6A==
+X-CSE-MsgGUID: baMyDuLrRVG4dgOiONjHVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="41003708"
 X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
-   d="scan'208";a="41003700"
+   d="scan'208";a="41003708"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 05:18:45 -0800
-X-CSE-ConnectionGUID: s2xaIZQcRUKhhOwDu5TVHA==
-X-CSE-MsgGUID: DlfFNN2LQM2Erfj2LyVTyw==
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 05:18:46 -0800
+X-CSE-ConnectionGUID: +MNcs6OHSjqJdRBlNyuRDA==
+X-CSE-MsgGUID: 3lnhEF8BQQmjSZpATbRN6Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
-   d="scan'208";a="83999465"
+   d="scan'208";a="83999470"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmviesa010.fm.intel.com with ESMTP; 04 Nov 2024 05:18:44 -0800
+  by fmviesa010.fm.intel.com with ESMTP; 04 Nov 2024 05:18:45 -0800
 From: Yi Liu <yi.l.liu@intel.com>
 To: joro@8bytes.org,
 	jgg@nvidia.com,
@@ -73,9 +73,9 @@ Cc: alex.williamson@redhat.com,
 	zhenzhong.duan@intel.com,
 	vasant.hegde@amd.com,
 	will@kernel.org
-Subject: [PATCH v4 01/13] iommu: Pass old domain to set_dev_pasid op
-Date: Mon,  4 Nov 2024 05:18:30 -0800
-Message-Id: <20241104131842.13303-2-yi.l.liu@intel.com>
+Subject: [PATCH v4 02/13] iommu/vt-d: Add a helper to flush cache for updating present pasid entry
+Date: Mon,  4 Nov 2024 05:18:31 -0800
+Message-Id: <20241104131842.13303-3-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241104131842.13303-1-yi.l.liu@intel.com>
 References: <20241104131842.13303-1-yi.l.liu@intel.com>
@@ -85,154 +85,94 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-To support domain replacement for pasid, the underlying iommu driver needs
-to know the old domain hence be able to clean up the existing attachment.
-It would be much convenient for iommu layer to pass down the old domain.
-Otherwise, iommu drivers would need to track domain for pasids by themselves,
-this would duplicate code among the iommu drivers. Or iommu drivers would
-rely group->pasid_array to get domain, which may not always the correct
-one.
+There are more paths that need to flush cache for present pasid entry
+after adding pasid replacement. Hence, add a helper for it. Per the
+VT-d spec, the changes to the fields other than SSADE and P bit can
+share the same code. So intel_pasid_setup_page_snoop_control() is the
+first user of this helper.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+No functional change is intended.
+
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/amd/amd_iommu.h                   | 3 ++-
- drivers/iommu/amd/pasid.c                       | 3 ++-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c | 3 ++-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c     | 3 ++-
- drivers/iommu/intel/iommu.c                     | 6 ++++--
- drivers/iommu/intel/svm.c                       | 3 ++-
- drivers/iommu/iommu.c                           | 3 ++-
- include/linux/iommu.h                           | 2 +-
- 8 files changed, 17 insertions(+), 9 deletions(-)
+ drivers/iommu/intel/pasid.c | 54 ++++++++++++++++++++++++-------------
+ 1 file changed, 36 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
-index 38509e1019e9..1bef5d55b2f9 100644
---- a/drivers/iommu/amd/amd_iommu.h
-+++ b/drivers/iommu/amd/amd_iommu.h
-@@ -53,7 +53,8 @@ struct iommu_domain *amd_iommu_domain_alloc_sva(struct device *dev,
- 						struct mm_struct *mm);
- void amd_iommu_domain_free(struct iommu_domain *dom);
- int iommu_sva_set_dev_pasid(struct iommu_domain *domain,
--			    struct device *dev, ioasid_t pasid);
-+			    struct device *dev, ioasid_t pasid,
-+			    struct iommu_domain *old);
- void amd_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
- 				struct iommu_domain *domain);
- 
-diff --git a/drivers/iommu/amd/pasid.c b/drivers/iommu/amd/pasid.c
-index 0657b9373be5..d1dfc745f55e 100644
---- a/drivers/iommu/amd/pasid.c
-+++ b/drivers/iommu/amd/pasid.c
-@@ -100,7 +100,8 @@ static const struct mmu_notifier_ops sva_mn = {
- };
- 
- int iommu_sva_set_dev_pasid(struct iommu_domain *domain,
--			    struct device *dev, ioasid_t pasid)
-+			    struct device *dev, ioasid_t pasid,
-+			    struct iommu_domain *old)
- {
- 	struct pdom_dev_data *pdom_dev_data;
- 	struct protection_domain *sva_pdom = to_pdomain(domain);
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-index a7c36654dee5..645da7b69bed 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-@@ -332,7 +332,8 @@ void arm_smmu_sva_notifier_synchronize(void)
- }
- 
- static int arm_smmu_sva_set_dev_pasid(struct iommu_domain *domain,
--				      struct device *dev, ioasid_t id)
-+				      struct device *dev, ioasid_t id,
-+				      struct iommu_domain *old)
- {
- 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
- 	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 826db8894fb7..a40681f8c348 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2856,7 +2856,8 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- }
- 
- static int arm_smmu_s1_set_dev_pasid(struct iommu_domain *domain,
--				      struct device *dev, ioasid_t id)
-+				     struct device *dev, ioasid_t id,
-+				     struct iommu_domain *old)
- {
- 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
- 	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index e860bc9439a2..86000901de46 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -4287,7 +4287,8 @@ static void intel_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
- }
- 
- static int intel_iommu_set_dev_pasid(struct iommu_domain *domain,
--				     struct device *dev, ioasid_t pasid)
-+				     struct device *dev, ioasid_t pasid,
-+				     struct iommu_domain *old)
- {
- 	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-@@ -4573,7 +4574,8 @@ static int identity_domain_attach_dev(struct iommu_domain *domain, struct device
- }
- 
- static int identity_domain_set_dev_pasid(struct iommu_domain *domain,
--					 struct device *dev, ioasid_t pasid)
-+					 struct device *dev, ioasid_t pasid,
-+					 struct iommu_domain *old)
- {
- 	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	struct intel_iommu *iommu = info->iommu;
-diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-index 078d1e32a24e..3b5e3da24f19 100644
---- a/drivers/iommu/intel/svm.c
-+++ b/drivers/iommu/intel/svm.c
-@@ -197,7 +197,8 @@ static const struct mmu_notifier_ops intel_mmuops = {
- };
- 
- static int intel_svm_set_dev_pasid(struct iommu_domain *domain,
--				   struct device *dev, ioasid_t pasid)
-+				   struct device *dev, ioasid_t pasid,
-+				   struct iommu_domain *old)
- {
- 	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index dfc2f9816086..ea6b4a96186d 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -3407,7 +3407,8 @@ static int __iommu_set_group_pasid(struct iommu_domain *domain,
- 	int ret;
- 
- 	for_each_group_device(group, device) {
--		ret = domain->ops->set_dev_pasid(domain, device->dev, pasid);
-+		ret = domain->ops->set_dev_pasid(domain, device->dev,
-+						 pasid, NULL);
- 		if (ret)
- 			goto err_revert;
+diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
+index 977c4ac00c4c..81d038222414 100644
+--- a/drivers/iommu/intel/pasid.c
++++ b/drivers/iommu/intel/pasid.c
+@@ -286,6 +286,41 @@ static void pasid_flush_caches(struct intel_iommu *iommu,
  	}
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 42243183e81d..e1c8e92170e9 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -640,7 +640,7 @@ struct iommu_ops {
- struct iommu_domain_ops {
- 	int (*attach_dev)(struct iommu_domain *domain, struct device *dev);
- 	int (*set_dev_pasid)(struct iommu_domain *domain, struct device *dev,
--			     ioasid_t pasid);
-+			     ioasid_t pasid, struct iommu_domain *old);
+ }
  
- 	int (*map_pages)(struct iommu_domain *domain, unsigned long iova,
- 			 phys_addr_t paddr, size_t pgsize, size_t pgcount,
++/*
++ * This function is supposed to be used after caller updates the fields
++ * except for the SSADE and P bit of a pasid table entry. It does the
++ * below:
++ * - Flush cacheline if needed
++ * - Flush the caches per the guidance of VT-d spec 5.0 Table 28.
++ *   ”Guidance to Software for Invalidations“
++ *
++ * Caller of it should not modify the in-use pasid table entries.
++ */
++static void intel_pasid_flush_present(struct intel_iommu *iommu,
++				      struct device *dev,
++				      u32 pasid, u16 did,
++				      struct pasid_entry *pte)
++{
++	if (!ecap_coherent(iommu->ecap))
++		clflush_cache_range(pte, sizeof(*pte));
++
++	/*
++	 * VT-d spec 5.0 table28 states guides for cache invalidation:
++	 *
++	 * - PASID-selective-within-Domain PASID-cache invalidation
++	 * - PASID-selective PASID-based IOTLB invalidation
++	 * - If (pasid is RID_PASID)
++	 *    - Global Device-TLB invalidation to affected functions
++	 *   Else
++	 *    - PASID-based Device-TLB invalidation (with S=1 and
++	 *      Addr[63:12]=0x7FFFFFFF_FFFFF) to affected functions
++	 */
++	pasid_cache_invalidation_with_pasid(iommu, did, pasid);
++	qi_flush_piotlb(iommu, did, pasid, 0, -1, 0);
++
++	devtlb_invalidation_with_pasid(iommu, dev, pasid);
++}
++
+ /*
+  * Set up the scalable mode pasid table entry for first only
+  * translation type.
+@@ -551,24 +586,7 @@ void intel_pasid_setup_page_snoop_control(struct intel_iommu *iommu,
+ 	did = pasid_get_domain_id(pte);
+ 	spin_unlock(&iommu->lock);
+ 
+-	if (!ecap_coherent(iommu->ecap))
+-		clflush_cache_range(pte, sizeof(*pte));
+-
+-	/*
+-	 * VT-d spec 3.4 table23 states guides for cache invalidation:
+-	 *
+-	 * - PASID-selective-within-Domain PASID-cache invalidation
+-	 * - PASID-selective PASID-based IOTLB invalidation
+-	 * - If (pasid is RID_PASID)
+-	 *    - Global Device-TLB invalidation to affected functions
+-	 *   Else
+-	 *    - PASID-based Device-TLB invalidation (with S=1 and
+-	 *      Addr[63:12]=0x7FFFFFFF_FFFFF) to affected functions
+-	 */
+-	pasid_cache_invalidation_with_pasid(iommu, did, pasid);
+-	qi_flush_piotlb(iommu, did, pasid, 0, -1, 0);
+-
+-	devtlb_invalidation_with_pasid(iommu, dev, pasid);
++	intel_pasid_flush_present(iommu, dev, pasid, did, pte);
+ }
+ 
+ /**
 -- 
 2.34.1
 
