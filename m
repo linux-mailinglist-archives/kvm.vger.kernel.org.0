@@ -1,294 +1,293 @@
-Return-Path: <kvm+bounces-30550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 564359BB629
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 14:30:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277309BB64E
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 14:37:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1645D2837E4
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 13:30:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48E401C21E9C
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 13:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C3922611;
-	Mon,  4 Nov 2024 13:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F7E224F6;
+	Mon,  4 Nov 2024 13:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QKM+AxID"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E9ddnbQu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFA88BEE
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 13:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730727036; cv=none; b=t8WJx3befgO4wKqc/5taC8i/sH2WWS9nj1YVi7OG/L2HuwNMrF7KXt3rG0XGy+Vl7Zqk57QiwiJHuq+cGrMTuXl3V5/c+CxkigKjK1hiR32wiKR+SehvT3OiVClfZfXmUhR4WTUyIPPYmHyt0IOHiVv8Z/+u70RDV5TNe1AAV3A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730727036; c=relaxed/simple;
-	bh=RvddaWTWVjmOwgmrtpL8rDKW+PNJcfO8369touBBN3I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t0jBz0ZpW0sauvp/0Yg1jJ9g/Ub5wGmwZ/DJoUQaplQ8upqJKMKRJQXf6XSOcxZyUJxd0YMdt0GqZhaqzLDc73hk+7+IEbS2xHLJ3EhXMxTCfHe7muXqBNfchd7gkRL/63AVct5Cj0Wa4gTp9z2w/ljtGNJNiMiVVnHyXtc8VFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QKM+AxID; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730727033;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=aGiEtRKqelpqDSUzw09EH7hKIXBP+iprJTrDTUj8CNs=;
-	b=QKM+AxID++TzRlDhqX3A2eOPifm9oCwL3cLvgjFOIYh/5fAK5q3+QyBMzQ9xQDnEfeydZp
-	vHvletXRB1IWiZ8nC5ahZF28Bb6I727eBFTJBFkqsWBJPRwPXTdpxaTAYhR9UpsYFTjj+E
-	eGFsfvGivTNbFqlBM48lsrCia0bes8Y=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-512-9chIT1NQM6-hR-o3GD-DaA-1; Mon, 04 Nov 2024 08:30:32 -0500
-X-MC-Unique: 9chIT1NQM6-hR-o3GD-DaA-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-539f7abe2e6so2892455e87.1
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 05:30:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730727031; x=1731331831;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aGiEtRKqelpqDSUzw09EH7hKIXBP+iprJTrDTUj8CNs=;
-        b=EA4UmTh/wQMiLYRxKmLI3TPw8Fw94VAIHRhBgHr9cC2H89yX7jlai62n9ZtbMGkKNj
-         70IJ2qaTIu5fXQPd6BU+lkDUrNDAZw30u1tKehNjMQ+YNSmfeRl2pZaFY6YXLcOJv5p1
-         6cCgxdx4YgYt5Dbgfr4f7z63AMV1Q/L0FC7lxOFyRZ6KQeZgebgEbNZ1CN2uLXmuLHSd
-         dxbASoNEAgtEhs7Fze9tIfI897D2jFVSmxIdWBtGvkTIOMwTZ+QA6tS/jN7Wscc+/VcY
-         pZ1bcG162QARLjMZh826bklSRM/LyG7aAw2VBD+u34E1ejcNTtuxaUKEwDwdAwPfo+zf
-         Ppnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWpVSAhF9/sQciQ0u9eDb3oRWZC+RVMGkv82ShfNlAkHPP+ZjKLGoUymxLSBT5vzQcPrtU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8YX6o4MMdkEl5EMLr3W8GVAKstDoP73MoGGXOqctMoQpvhvys
-	WuCC6ZDMR3afeIExljKdgBtATSQtuwo3P5rpdvPmNMsCMAZii898hgum4gHYGYKHPwsaNP+Vmmg
-	RCZk84bW6+nHtvMM+Da+n/zTqy+ZkV4uj7EWwlnn6laAJufqRhA==
-X-Received: by 2002:a05:6512:1047:b0:53a:40e:d547 with SMTP id 2adb3069b0e04-53b7ecd58damr10405418e87.5.1730727030556;
-        Mon, 04 Nov 2024 05:30:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEu70+9VEpBhJV/6ZV29SVUscDAC5NTYpysQnlRRUYzhBxE6sqcIKpndZ2qmPIhXBt9CPcswA==
-X-Received: by 2002:a05:6512:1047:b0:53a:40e:d547 with SMTP id 2adb3069b0e04-53b7ecd58damr10405390e87.5.1730727029838;
-        Mon, 04 Nov 2024 05:30:29 -0800 (PST)
-Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5e7c9asm158736435e9.21.2024.11.04.05.30.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 05:30:28 -0800 (PST)
-Message-ID: <e2ac7ad0-aa26-4af2-8bb3-825cba4ffca0@redhat.com>
-Date: Mon, 4 Nov 2024 14:30:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221AF182B4
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 13:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730727409; cv=fail; b=jS0VaE7SuCIdZ4xm0n12mYjY1DB34Faapbbfqaht/dBkBDshITH6yrQScWZDIbp1ZelBuumzzAjS6FJsCSR18JlRzVHg/a3CRhcRAwFeEDpFIZSt3FzG3PrYXBWFlznRibgWsyXGsoUXShcDlVeZc1b1Hdpw8dO2sjnLFfS+8y0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730727409; c=relaxed/simple;
+	bh=vdM9InzD6GfW0SYDMNCW2F3EHwFf8TrwtnSZtEV9RZc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rQ15p8/VIa2ku1dxi1JsGhBvP0eGy8I9IRrCyKEN5rYZDlP0ISBI3BapKHzZr0BcRDc6hOqwLPpnycLlsFvwMfE5xQelXD8Q4QBcE7XrMmpvXx7OUOWd+Cx3og4yMb6q0CqF0f+IvBs6vjIVCrGwUbtQvikr1WKj0f0V2Tzv11k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E9ddnbQu; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730727407; x=1762263407;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vdM9InzD6GfW0SYDMNCW2F3EHwFf8TrwtnSZtEV9RZc=;
+  b=E9ddnbQuoq2dBF1FGgeFMEEKqpg2wV23ZOVLj5Cefh1bZgf7d9nldLNG
+   rYHwyzqkw1X03jBjdZ3aQL38iaQ7w9VfvmI6WvwyxTZucaEWlZQs3wdyy
+   mSaWCpt1woojyX/L9OiIOCrnvvVFUQ6HQ1HDXOptjqyc8U8brF+PUkohD
+   GbsAGv1s6kMSRH+LnG9mBQ4XFsgOJhatSjoHpAHzesylayssI22i5BKVN
+   bXvChrOQCJqgXSAn8pn7GC/YmtNKycwbrfrqqgBnboiBgW1QZ2erU7vEH
+   +6lOI91ZN/ERFME+sKH6FWgZWt2e5X/7uvxy+55J9SBFCFY+cD9a9ATkt
+   g==;
+X-CSE-ConnectionGUID: LsgpnRjOTqWAnNoiHNqwwQ==
+X-CSE-MsgGUID: d2iHan7tSbOdYqHGx61lew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="41057978"
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="41057978"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 05:36:47 -0800
+X-CSE-ConnectionGUID: AuEJP21BRW+5AlUzREzGGA==
+X-CSE-MsgGUID: NnWXkldTRaqqvZTozaRepw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="83336730"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 05:36:46 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 4 Nov 2024 05:36:45 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 05:36:45 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 05:36:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZW2YUXvzEv4SFwZZuCn8iq2C+Qg3P4Cs3KcdtnZ5W2OgIEZkV4f5M3+wfDK5b7J+xpnakIbNlmgdO4tqSC63ZiTnhaJUk4iBqtk3JSVQJDBK0iIiExBZ+cqAPNZJ7SMU+Y3UH3co+2GivBmmARM237PpLq9G1aUAtfvR4mRm70if0f5aBnKgRN0gWZ2PtOO5IzmNHZRQzYA5Ofv+IkZ3xRnBMw8xKa4c3PVVkrqPoUO3SpBpZkQig/IfhO4qGRpXyjqe85EK3qc+1ECQg/x3Q6GV8Zmz9jrprZCw+si02Z0DLqZwGKELtZzeMmYxhJIFJnn9VPDXM5TeUZQKJlrbrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ztynpdl5z0uPF9jHEvbnBdA5didWo39yv+Su/eDsS+0=;
+ b=UbU27n9C/f7GLLHyBmn/0y5mYKvlTMWg+dxHqQeEyR6cwPbg6MOpNaLJcSXHFl6H+LclV5gab2zfTjFT0qBzyKU+9bEEk4z8whVYmovFabxKz0/77Hg0LM8Kwvxc4OVik2Zxkn6cKNwRkS3QgMgvLIaj3SYG0oqrJD6tSDnPO/MjsdJ+kabbSk/tNnJSolc9V3dWZVnGx7JmGxq7lJ3XUVBzMH2uvry7NtAUUAvywxQY+d5l7aXofVaq3kQolr9KwgsUcaGWFyWZqtuPbs5Ex8Muthd+a0KjbLfZ2xaghs+Upu4QnTKGCHq8CDVcQmqTQfq/yJCJT8w8CICTGZ8HWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA1PR11MB8523.namprd11.prod.outlook.com (2603:10b6:806:3b5::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.29; Mon, 4 Nov
+ 2024 13:36:42 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%6]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
+ 13:36:42 +0000
+Message-ID: <509078e4-1bab-4ada-99ba-81ea00779ceb@intel.com>
+Date: Mon, 4 Nov 2024 21:41:18 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/4] vfio-pci support pasid attach/detach
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>, <kevin.tian@intel.com>
+CC: <joro@8bytes.org>, <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+	<kvm@vger.kernel.org>, <chao.p.peng@linux.intel.com>,
+	<iommu@lists.linux.dev>, <baolu.lu@linux.intel.com>,
+	<zhenzhong.duan@intel.com>, <vasant.hegde@amd.com>, <willy@infradead.org>
+References: <20241104132732.16759-1-yi.l.liu@intel.com>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <20241104132732.16759-1-yi.l.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR01CA0017.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::19) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 3/4] system/physmem: Largepage punch hole before reset
- of memory pages
-To: William Roche <william.roche@oracle.com>, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
- philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
- joao.m.martins@oracle.com
-References: <ZwalK7Dq_cf-EA_0@x1n>
- <20241022213503.1189954-1-william.roche@oracle.com>
- <20241022213503.1189954-4-william.roche@oracle.com>
- <0cda6b34-d62c-49c7-b30c-33f171985817@redhat.com>
- <e9f8e404-50db-4e0f-a5e1-749acad49325@oracle.com>
- <6cc00e04-6e38-4970-9d6b-52b56ee20a64@redhat.com>
- <416a47ff-3324-444b-a2e2-9ea775e61244@oracle.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <416a47ff-3324-444b-a2e2-9ea775e61244@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB8523:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59bf0502-7ade-4755-6f2e-08dcfcd5b792
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SEZYUDhESCt4SGtUSUJYNGg1T2xncnFaVS9Uc2phWm5mWWJXUHJmc0pHU1Nw?=
+ =?utf-8?B?c25QczVUYzhQQTlDam1kQUpqYWRKaVVPZS91ZE1IY3BUY1R1QTF0NWszclhL?=
+ =?utf-8?B?dDFHZ21wRWFGZmVBWTloNHBueW5wK1lFT25MZktPMG9rMjBEc21CRjNwR2dr?=
+ =?utf-8?B?bUJrOFBnM2dFZDEyUldvSlZvNHgxdmdwaGF1bmxWd1Nkc0UzZHlYRjVXK0pa?=
+ =?utf-8?B?WTlzZ0E3a0JDTEh4VjhVNitpSGU1RVpVKy9DNklmTXEvVmF6V3ZoS3FrejhF?=
+ =?utf-8?B?R096NEEraktSOG53TjBDMndLY2JvTTljY3d2amVaeER3cHlrSUFnR29iY1pV?=
+ =?utf-8?B?VStxNHBsYjMybGQ4enByTHZLa0toYWRYYkp3ZFA1UXNoWFpCaDNYaFN2TE1D?=
+ =?utf-8?B?U2s1R1JydUtVZEIwL3BPOEtpWDU3QmhpY0locWxLY3prZmVPVHhMTXJtTDBP?=
+ =?utf-8?B?QmQ5UFZVdkE4aDVhQ0l6NmZyOGREeUx5cFd1UVE2enFrRGZXeTArdFlib05I?=
+ =?utf-8?B?R1ZFT3hEY3d5YkNGUWJNYlI0ZzlmdmJHZG9oZmRIOFlwNjBlN1hsWHU3dFB3?=
+ =?utf-8?B?UjFiNENKYS83U1Q5azE0Qytzd0RIcmd5dXV3Z0xsQnBVT1hDSUhJa2FOZUxO?=
+ =?utf-8?B?dmdaQUxqc09mQjBEMHhjMmlOaHZNalpBZVIwdFRWSFVHMVdqdDZlWnd3WlU2?=
+ =?utf-8?B?blk4akl0Q1pXSG1NcVRFc1ZKRHdkTTlNVENJSzg5KzdTTWc2SUJ4RHVnWkww?=
+ =?utf-8?B?WGZ1bHMyZkxSL0xUNFJ0aE1IM1VHSVJuSk9ha3E1emVMUjZuSFNoa0RLbE95?=
+ =?utf-8?B?NitOVUl2QzZKMkJXdFJSQ2lLQi9HV2pvb1FMUFJISzR5d2czWmRCOFFUU2tr?=
+ =?utf-8?B?Vm01YzZYNXhDa1VRcDNaSE12MWxVaHR5dnRZZlNqU2FjekFIdjE3ZFVLNmIr?=
+ =?utf-8?B?RmY3WkswKzBpWE5wc0xlL1BpQ2RaYldKdDYvZVZnZjFnK1RyYVlhSHlUOHRn?=
+ =?utf-8?B?ZTRGdmp6UUJMWEpmTVBYak5LYlNVUHo4c0NLQlpURTcrRzV5cS95RDRpUkRv?=
+ =?utf-8?B?NUJoUFNlZzRnQkdOaktSUTZ0OHU5cHJleUFaSHgrRmVDa0NuRHdpUHAyWEgw?=
+ =?utf-8?B?OEVSQ1hOL0VxYzNxaHhYTkcwUEtnUEJuMVJ4b2NQUXNmdzVPOHZ5cC93WkRv?=
+ =?utf-8?B?N0xTTVBPelVvV2FIUFdpcVNXd2M3QWc3YzFSWXEyQTNEN1NNVCtrUHJObnRw?=
+ =?utf-8?B?b3pmSkxrSXpmUUVwQTNwcjRsZ3I2Z2MyNThVcmI0SDZzNlloV0hOOUFmNS9n?=
+ =?utf-8?B?cEQ1dHVUU3BBazQrU3kwUHZyNENBZVJ5S1pwUk9ldUd3SDdPdmhVVkpOclNi?=
+ =?utf-8?B?YkZsdjFFbCtaSTZHUXhkblpNQXdXK3hsaU1RMzQ0dklQdERFM0VhVzA0dUJh?=
+ =?utf-8?B?Vm9EYmtWRlk1eFV5STNTQ1JBT2d0dC85RGl1b1dtemQ3bERnbmYzKzRobU45?=
+ =?utf-8?B?OEUvdzg5ZlpyUHhJUUNuc2M5Njd4Q2RQWHNFOVlOakNZVlJyRkM0Q1g5Qy8w?=
+ =?utf-8?B?TkpTd0IyS3M5QkYyNEt0R2pva1hmbjhselZlVUxUaVp6Vi80UmwrWWFDaXhU?=
+ =?utf-8?B?M3VqS1UrU285VmJ2bklJblFqWjQwWmpYT3JLaTJUWUpMQTlpL2RMemJRSG1h?=
+ =?utf-8?Q?j4QR3cmRDOBZz07/0vUX?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UXMxS0xhZ3V0QXp4ZDFLcWZsLzNYTVYxa2J2QmtvSlNmTWRzUnYxbFNEYTRw?=
+ =?utf-8?B?UGVRRitvVVU3QzBOcXUxZGdFVUtSVEhtL29jNkdIT3AxbDIvL1hMODF0OUlB?=
+ =?utf-8?B?NDlPV1BCMTcrVWI4T3J4YWNaUHhkdVM0cUtBVUJ1SG9ZRkM5K0dIRnhYYXBP?=
+ =?utf-8?B?Smg3NTZEY3gwMzlLMkRqb242UGlvUlFHSWNqYVZLM01WRjZoSVNhUGlJbm9N?=
+ =?utf-8?B?Sy9jZ2RqZkpJK1JxZ2QyWElKS01LM3hXT2U1V0t1c0hYeUFsZ2EveUI5T0kr?=
+ =?utf-8?B?WUN2L29Qa1RrV3oveFN1NVZVdG5YVGswcDIzaFhVSTRMQVRvdHZYdDFEOUJF?=
+ =?utf-8?B?N3lZQ2o3TVZGbXdMRHE2Z1lMVFlINTlHajNBMkdXcmJ5UnBkbkhPY3BxMWk1?=
+ =?utf-8?B?WnZXb3E2THIxR0Y2K2tTTyt5N1FWeURyTWNreHZreEtTdTRWMXY4U2hDbFlC?=
+ =?utf-8?B?aktLblkwUlcwL2tjcU5wQ2gwMk1tbDJpcGlCTDBISGcwdXNOZUNnb2Jnb1Vi?=
+ =?utf-8?B?dEM5WEtKY09Ed0lNMEpVck5wTmN3cGxvRHpsTmZ0STZocEtSRnRKeTNMdGRh?=
+ =?utf-8?B?YXhHR2hoUkE1YldXVDZnSXdLckNTT3lmVVlJTHpWTGkwVEFtWWZWeDkxeVRl?=
+ =?utf-8?B?cHBlTElvZWJ6VGZjN2FINFljOXRxY3N2RktrbktrS093RjlBaTVWMS9hZDZZ?=
+ =?utf-8?B?VTZjSUFQbmIxaUZzSHVsdTlIejFKKzJoTis0Y2tQc29zZEdWTTRyaGNoTk1F?=
+ =?utf-8?B?V1pUbVdlOGVHSjVuTHZrTkIzTSt2V3h4Ykc4cDkrKzB2eEZoZXdMWDVRVFdi?=
+ =?utf-8?B?Mk90cTJ2SjF3S1YzOWpmN0RrdGsxV0hONmVHeFhIWWNIckJLb0lnUGN4QUFh?=
+ =?utf-8?B?Z1pESE16SjBrU09ydndCcHp4QWlJVkZnUmduWGZocWRhVnZsUEw0OXdSVUpL?=
+ =?utf-8?B?R0JjYWNvYnE5ZzJCWWxtZWRPdE52eUNHZWFpVWxTb2VyNWxzMnlzeVZ3VVdq?=
+ =?utf-8?B?NkFWUFg0WWlBWjNxNTE1OG1qY0E1NjR2YmcxZmFSR3c0VFBmOVJHczlwQW85?=
+ =?utf-8?B?UUpvelhLSnhGOTRDaHR4OFpKeUE1cXRBUTNnVjdKVVNBS2hrTFFGamc4TEFu?=
+ =?utf-8?B?UGlWd1RTVGc5OVdLQWYyWS9uZzJ3dHROeVJtVUwyczJxMHo4ci83cUoycHlw?=
+ =?utf-8?B?MWRqSnJCc0xFMkF2NytZVzczNlBlMFJhMVp2b29RcDBQVkpjbWx4YVczRHM5?=
+ =?utf-8?B?OGtBL0Y5bE1aTjdiVXFQcGFFS2RuUTZpOHVOSXNvL29vV25Hc0poWXJqZVVl?=
+ =?utf-8?B?K0YwYUZ2OThwQ2JYT3dxZXkxQXArdFk5RDRMcy9lT0pYd1FOSEROQlJkSkpP?=
+ =?utf-8?B?TDlMTmdZOEpqZGJJNVUySjFUOGVvVmJIRzhEZmN0MjdiVERzVXQzMzJSZUNi?=
+ =?utf-8?B?dnNTSEN4clB5aXFZeGFFR2QxZXpHQm9ORVNUTFhSV2Jhb2dSVlNsTjJRQ2FU?=
+ =?utf-8?B?NUJTV3BaL0djRldaUnVXMlFRci9ISTdwV3gySzcrd2lFVjVHVkNwdERJdzlU?=
+ =?utf-8?B?b1ZvcnJSL0orRGUzR0M2QkY2emtMK1hqMWJzelhNUE82Qi9JTzRkUE9tOWQy?=
+ =?utf-8?B?YnhZSTEzZnM3UFZ5a0RqdmFObm5HQXFHQlBSZ2w0ZXh0RUQ5eWh4NzFxdElL?=
+ =?utf-8?B?dFpiK0R3YjVSY2NtSzUrb1lIdFkwQmNoMnYrWERQVXVnZ282a2hSS3cwZkd5?=
+ =?utf-8?B?U3ZDdlBWa05kc3NtVngweGFmcGlwZi9QamdHL1VVS09OV0YyaEUvUE5FVFF3?=
+ =?utf-8?B?bWhjTFZCZ2hEb0FLWmlXYjFhbnhCWDA3aDFJMG1qanBBSHlSRDF2d01PL2dL?=
+ =?utf-8?B?ZzVYODF3elhBVEpVK3c0TXZlM0lBYldmL3VXZ0poRkxDSGlLT0xnbG9tK0M5?=
+ =?utf-8?B?UVYreWRrZ0lMVUJ5QTRpME1pNmtnQXBHbGtEQ0tWOVJRS0llNlVrUWZsZ0ZT?=
+ =?utf-8?B?c05KQ0pJSDJDOFVZQ1Y2OUNHL1BJcVVxZ0F0R3VzWVdOUXdYd3pTeVIrUzY5?=
+ =?utf-8?B?M2dqelVEM0Z6WmNnYVNMcjcvTGVvbFhuOE5wSnVmK1JZeXpodmwvUERKYkhQ?=
+ =?utf-8?Q?ClDBaHP4Ctn4ku9V1Q95imfme?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59bf0502-7ade-4755-6f2e-08dcfcd5b792
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2024 13:36:42.1032
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HeQIxzUxUqeQur8NCxUiJMp4IisNK4xsR7fxhyua6dgChXu6xDe012sFZWB+1EbpJLtRohScNNE8rwhjR5eZPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8523
+X-OriginatorOrg: intel.com
 
->>>
->>> Remapping the page is needed to get rid of the poison. So if we want to
->>> avoid the mmap(), we have to shrink the memory address space -- which
->>> can be a real problem if we imagine a VM with 1G large pages for
->>> example. qemu_ram_remap() is used to regenerate the lost memory and the
->>> mmap() call looks mandatory on the reset phase.
->>
->> Why can't we use ram_block_discard_range() to zap the poisoned page
->> (unmap from page tables + conditionally drop from the page cache)? Is
->> there anything important I am missing?
+On 2024/11/4 21:27, Yi Liu wrote:
+> This adds the pasid attach/detach uAPIs for userspace to attach/detach
+> a PASID of a device to/from a given ioas/hwpt. Only vfio-pci driver is
+> enabled in this series. After this series, PASID-capable devices bound
+> with vfio-pci can report PASID capability to userspace and VM to enable
+> PASID usages like Shared Virtual Addressing (SVA).
 > 
-> Or maybe _I'm_ missing something important, but what I understand is that:
->      need_madvise = (rb->page_size == qemu_real_host_page_size());
+> Based on the discussion about reporting the vPASID to VM [1], it's agreed
+> that we will let the userspace VMM to synthesize the vPASID capability.
+> The VMM needs to figure out a hole to put the vPASID cap. This includes
+> the hidden bits handling for some devices. While, it's up to the userspace,
+> it's not the focus of this series.
 > 
-> ensures that the madvise call on ram_block_discard_range() is not done
-> in the case off hugepages.
-> In this case, we need to call mmap the remap the hugetlbfs large page.
-
-Right, madvise(DONTNEED) works ever since "90e7e7f5ef3f ("mm: enable 
-MADV_DONTNEED for hugetlb mappings")".
-
-But as you note, in QEMU we never called madvise(DONTNEED) for hugetlb 
-as of today. But note that we always have an "fd" with hugetlb, because 
-we never use mmap(MAP_ANON|MAP_PRIVATE|MAP_HUGETLB) in QEMU.
-
-The weird thing is that if you have a mmap(fd, MAP_PRIVATE) hugetlb 
-mapping, fallocate(fd, FALLOC_FL_PUNCH_HOLE) will *also* zap any private 
-pages. So in contrast to "ordinary" memory, the madvise(DONTNEED) is not 
-required.
-
-(yes, it's very weird)
-
-So the fallocate(fd, FALLOC_FL_PUNCH_HOLE) will zap the hugetlb page and 
-you will get a fresh one on next fault.
-
-For all the glorious details, see:
-
-https://lore.kernel.org/linux-mm/2ddd0a26-33fd-9cde-3501-f0584bbffefc@redhat.com/
-
-
+> This series first adds the helpers for pasid attach in vfio core and then
+> extends the device cdev attach/detach ioctls for pasid attach/detach. In the
+> end of this series, the IOMMU_GET_HW_INFO ioctl is extended to report the
+> PCI PASID capability to the userspace. Userspace should check this before
+> using any PASID related uAPIs provided by VFIO, which is the agreement in [2].
+> This series depends on the iommufd pasid attach/detach series [3].
 > 
-> As I said in the previous email, recent kernels start to implement these
-> calls for hugetlbfs, but I'm not sure that changing the mechanism of
-> this ram_block_discard_range() function now is appropriate.
-> Do you agree with that ?
-
-The key point is that it works for hugetlb without madvise(DONTNEED), 
-which is weird :)
-
-Which is also why the introducing kernel change added "Do note that 
-there is no compelling use case for adding this support.
-This was discussed in the RFC [1].  However, adding support makes sense
-as it is fairly trivial and brings hugetlb functionality more in line
-with 'normal' memory."
-
-[...]
-
->>
->> So one would implement a ram_block_notify_remap() and maybe indicate if
->> we had to do MAP_FIXED or if we only discarded the page.
->>
->> I once had a prototype for that, let me dig ...
+> The completed code can be found at [4], tested with a hacky Qemu branch [5].
 > 
-> That would be great !  Thanks.
+> [1] https://lore.kernel.org/kvm/BN9PR11MB5276318969A212AD0649C7BE8CBE2@BN9PR11MB5276.namprd11.prod.outlook.com/
+> [2] https://lore.kernel.org/kvm/4f2daf50-a5ad-4599-ab59-bcfc008688d8@intel.com/
+> [3] https://lore.kernel.org/linux-iommu/20240912131255.13305-1-yi.l.liu@intel.com/
 
-Found them:
+correct the latest link.
 
-https://gitlab.com/virtio-mem/qemu/-/commit/f528c861897d1086ae84ea1bcd6a0be43e8fea7d
+https://lore.kernel.org/linux-iommu/20241104132513.15890-1-yi.l.liu@intel.com/
 
-https://gitlab.com/virtio-mem/qemu/-/commit/c5b0328654def8f168497715409d6364096eb63f
-
-https://gitlab.com/virtio-mem/qemu/-/commit/15e9737907835105c132091ad10f9d0c9c68ea64
-
-But note that I didn't realize back then that the mmap(MAP_FIXED) is the 
-wrong way to do it, and that we actually have to DONTNEED/PUNCH_HOLE to 
-do it properly. But to get the preallocation performed by the backend, 
-it should still be valuable.
-
-Note that I wonder if we can get rid of the mmap(MAP_FIXED) handling 
-completely: likely we only support Linux with MCE recovery, and 
-ram_block_discard_range() should do what we need under Linux.
-
-That would make it a lot simpler.
-
+> [4] https://github.com/yiliu1765/iommufd/tree/iommufd_pasid
+> [5] https://github.com/yiliu1765/qemu/tree/wip/zhenzhong/iommufd_nesting_rfcv2-test-pasid
 > 
->>
->>>
->>> I can send a new version using ram_block_discard_range() as you
->>> suggested to replace the direct call to fallocate(), if you think it
->>> would be better.
->>> Please let me know what other enhancement(s) you'd like to see in this
->>> code change.
->>
->> Something along the lines above. Please let me know if you see problems
->> with that approach that I am missing.
+> Change log:
 > 
+> v4:
+>   - Add acked-by for the ida patch from Matthew
+>   - Add r-b from Kevin and Jason on patch 01, 02 and 04 of v3
+>   - Add common code to copy user data for the user struct with new fields
+>   - Extend the VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT to support pasid, patch 03
+>     is updated per this change. Hence drop r-b of it. (Kevin, Alex)
+>   - Add t-b from Zhangfei for patch 4 of v3
+>   - Nits from Vasant
 > 
-> Let me check the madvise use on hugetlbfs and if it works as expected,
-> I'll try to implement a V2 version of the fix proposal integrating a
-> modified ram_block_discard_range() function.
-
-As discussed, it might all be working. If not, we would have to fix 
-ram_block_discard_range().
-
+> v3: https://lore.kernel.org/linux-iommu/20240912131729.14951-1-yi.l.liu@intel.com/
+>   - Misc enhancement on patch 01 of v2 (Alex, Jason)
+>   - Add Jason's r-b to patch 03 of v2
+>   - Drop the logic that report PASID via VFIO_DEVICE_FEATURE ioctl
+>   - Extend IOMMU_GET_HW_INFO to report PASID support (Kevin, Jason, Alex)
 > 
-> I'll also remove the page size information from the signal handlers
-> and only keep it in the kvm_hwpoison_page_add() function.
-
-That's good. Especially because there was talk in the last bi-weekly MM 
-sync [1] about possibly indicating only the actually failed cachelines 
-in the future, not necessarily the full page.
-
-So relying on that interface to return the actual pagesize would no be 
-future proof.
-
-That session was in general very interesting and very relevant for your 
-work; did you by any chance attend it? If not, we should find you the 
-recordings, because the idea is to be able to configure to 
-not-unmap-during-mce, and instead only inform the guest OS about the MCE 
-(forward it). Which avoids any HGM (high-granularity mapping) issues 
-completely.
-
-Only during reboot of the VM we will have to do exactly what is being 
-done in this series: zap the whole *page* so our fresh OS will see "all 
-non-faulty" memory.
-
-[1] 
-https://lkml.kernel.org/r/9242f7cc-6b9d-b807-9079-db0ca81f3c6d@google.com
-
+> v2: https://lore.kernel.org/kvm/20240412082121.33382-1-yi.l.liu@intel.com/
+>   - Use IDA to track if PASID is attached or not in VFIO. (Jason)
+>   - Fix the issue of calling pasid_at[de]tach_ioas callback unconditionally (Alex)
+>   - Fix the wrong data copy in vfio_df_ioctl_pasid_detach_pt() (Zhenzhong)
+>   - Minor tweaks in comments (Kevin)
 > 
-> I'll investigate how to keep track of the 'prealloc' attribute to
-> optionally use when remapping the hugepages (on older kernels).
-> And if you find the prototype code you talked about that would
-> definitely help :)
-
-Right, the above should help getting that sorted out (but code id 4 
-years old, so it won't "just apply").
+> v1: https://lore.kernel.org/kvm/20231127063909.129153-1-yi.l.liu@intel.com/
+>   - Report PASID capability via VFIO_DEVICE_FEATURE (Alex)
+> 
+> rfc: https://lore.kernel.org/linux-iommu/20230926093121.18676-1-yi.l.liu@intel.com/
+> 
+> Regards,
+> 	Yi Liu
+> 
+> Yi Liu (4):
+>    ida: Add ida_find_first_range()
+>    vfio-iommufd: Support pasid [at|de]tach for physical VFIO devices
+>    vfio: VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT support pasid
+>    iommufd: Extend IOMMU_GET_HW_INFO to report PASID capability
+> 
+>   drivers/iommu/iommufd/device.c | 24 +++++++++++-
+>   drivers/pci/ats.c              | 33 ++++++++++++++++
+>   drivers/vfio/device_cdev.c     | 62 +++++++++++++++++++++---------
+>   drivers/vfio/iommufd.c         | 50 ++++++++++++++++++++++++
+>   drivers/vfio/pci/vfio_pci.c    |  2 +
+>   drivers/vfio/vfio.h            | 18 +++++++++
+>   drivers/vfio/vfio_main.c       | 55 ++++++++++++++++++++++++++
+>   include/linux/idr.h            | 11 ++++++
+>   include/linux/pci-ats.h        |  3 ++
+>   include/linux/vfio.h           | 11 ++++++
+>   include/uapi/linux/iommufd.h   | 14 ++++++-
+>   include/uapi/linux/vfio.h      | 29 +++++++++-----
+>   lib/idr.c                      | 67 ++++++++++++++++++++++++++++++++
+>   lib/test_ida.c                 | 70 ++++++++++++++++++++++++++++++++++
+>   14 files changed, 419 insertions(+), 30 deletions(-)
+> 
 
 -- 
-Cheers,
-
-David / dhildenb
-
+Regards,
+Yi Liu
 
