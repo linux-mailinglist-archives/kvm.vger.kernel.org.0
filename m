@@ -1,306 +1,322 @@
-Return-Path: <kvm+bounces-30571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805029BC017
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 22:31:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5743E9BC0A4
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 23:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1425C2828C8
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 21:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B1BB1C2206E
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 22:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C04E1FCF4B;
-	Mon,  4 Nov 2024 21:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC491FDF9D;
+	Mon,  4 Nov 2024 22:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2YttPEt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L2pGzTI6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD911C304A
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 21:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B4F1FCF69
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 22:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730755864; cv=none; b=scIpiY8i9pnI3PeuKHnmpijfHMMXAwvidi4qlkOmKV/Cikcp3AhkVoc8Obxxv8Q9X7ECyi1VjXctA40ODPjyHY6cPBsoFgWtrdn20yr/i/IGg2ioCBmoPdac2qGDLPXL/lc6LCZ2dwPL1GOukQva4Rix5q5JsdiEhrntC54evWs=
+	t=1730758420; cv=none; b=a4CNcF0i4ynYY8gev789iVCsc8heZh+ONz8v7ZRiT7ci1FXiamcBAah6tqBsLPy0sLaAzl4yAg36kOlN5pDDhxbLgUy1WQ227Dy4c6QSPVBKUj51RYOJmIOVMRAn4z4J3Ue6TmoNTy5R8KqvcMPAxgL8OFQfRxNkTZQghNwEw6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730755864; c=relaxed/simple;
-	bh=L4YNKSkuZEV/hZj7pOw8iiKxbPrnNSbHsVLEZvSgA0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dB9c6TAMlFCvirSQNwrGuNdYMC+/2wtS1oFjWdUtuJS/CtnIE1IpMWzUgvnL8zOz19TWhEHrzWW/AJA7YZwrnEfPxdcMF8dn0skNe37tbbC9K0ZW5DSg/xbcdp/JR0G6SkgHy+2xSe/3L5bxmvmtJieHfEpolkXBf6jwDxYQHD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D2YttPEt; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1730758420; c=relaxed/simple;
+	bh=cJ2iwD6JRX1oQ7TlSGkMpG6bt4+iE1zrhCDc/1XXcoQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bUctVLfBcil7p5ud4gTHMCvjVfrUiDKrW+G7ypd5mw6JaFfWnLHn4g1YLACjjBTJcp12wkQbkKoK133KB9jEP9ZR2GyRIzldvlSbd0nDVxdoF5DTpMx9P1Ozb/Nq98Q7S1keFs//pxP+01JU7VICzqqxiM/4XgZZjQhjBZwJX/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L2pGzTI6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730755861;
+	s=mimecast20190719; t=1730758416;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8gtfMet1sTXUCLzJyNvknJfnL40j6MbNvJoVn8lPrro=;
-	b=D2YttPEtZHRKjYlwGGej9OzOBqWCIhLhHiByXn9EbE5I8jp1cpe6+gKGQst+D0I98GBdEn
-	8BSDh8/Hh6mielGVvSqiMGjGmhf2H1bufwTFkKowK0wsPcHEJcNoBZMp99PDlRFAEFToZx
-	3UygCMJg9SsdY+6P/s29MhwqL2LRdaE=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=+n54qAXwoDA0o8dpKjuMOMxb/8VNmkgzn+Qg2NOh5q8=;
+	b=L2pGzTI6Ayi+ZiM2hBi++zRDa48v/DcKdgBd3dB1+TH080X6qbdPw2Tdojb9ez7JLgJc1n
+	nxRfVx2ibitoukVNuXbPWKcfrRZ9Bo6NAoDnGA7nxeGDWWenQf4/gbz74CVzgY93glNj8+
+	OXf7qx78K2LomHiXphQx0GWrn3Pfy3o=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-588-eXQ43k0FMvuNqv3CBsY_rw-1; Mon, 04 Nov 2024 16:31:00 -0500
-X-MC-Unique: eXQ43k0FMvuNqv3CBsY_rw-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-539f067414fso2781415e87.2
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 13:30:59 -0800 (PST)
+ us-mta-108-cQVKoQy6OYGe7W2zfI9qyw-1; Mon, 04 Nov 2024 17:13:34 -0500
+X-MC-Unique: cQVKoQy6OYGe7W2zfI9qyw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a9a157d028aso368387666b.2
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 14:13:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730755858; x=1731360658;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8gtfMet1sTXUCLzJyNvknJfnL40j6MbNvJoVn8lPrro=;
-        b=jwaejHjS2y3r2zq4a2c5gbF7oMnj639OG/4Ceyyzov7p9HdWC4S/MOHP/wyrf8duyI
-         2jzjJmwobqeuFeI1NdU1f85uUxGjAGRktj9dh2luTqeMu1xqQYbmacxOCbsG0ZhU5C/4
-         ytQ1aCAZknyyl2PYIL4mOL/f2XBm4GWQvoHGi7/s5hSWgdIcalXHL4sf5PSOhQctJylJ
-         U+wLqufUg82TdwNizROTYp0VZ50DiV//IYBPFUozXjw/iR3Iy2bkn35zcu5I7/4WFDdK
-         sAXabYxc9JzWBV1/Fh5RCWYqwepmhFetq/WxA2LcPoREOkjmCRiGMgMoiPmEB8Zg6UFO
-         BoHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrPVaYe6NNjDOZXa7ACaR7SoypDBnMm2Zt6WI4OTp6Z5o75Y53xaMsrM4eyPLfibaL79I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhbH0BL6XF/Y3HDy9p7ouiuJBbOEmyvhIUM5byl8VFiTkcjsav
-	SaR45ZTJrwLkPEfmVbQZjN06My/hrWLmuhefBAifcZK+uFOiMydTpD6tNIkErbh4sIUNtQZvPNG
-	TCXkXu3BFzRcv3sCV0ubV8qJTRperPp5ahdLc6Bl5e84jEEeQIw==
-X-Received: by 2002:a05:6512:118a:b0:53b:1526:3a4c with SMTP id 2adb3069b0e04-53b348d894amr16609347e87.26.1730755858326;
-        Mon, 04 Nov 2024 13:30:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7ORituTFTzp2MdetjVSX333muBt/1oz+5gl2SMZriCSkTuHWz0TGj9Uec44RVhT9sC9SApw==
-X-Received: by 2002:a05:6512:118a:b0:53b:1526:3a4c with SMTP id 2adb3069b0e04-53b348d894amr16609326e87.26.1730755857778;
-        Mon, 04 Nov 2024 13:30:57 -0800 (PST)
-Received: from ?IPV6:2003:cb:c72f:e500:e96a:8043:1211:8e6a? (p200300cbc72fe500e96a804312118e6a.dip0.t-ipconnect.de. [2003:cb:c72f:e500:e96a:8043:1211:8e6a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10e7435sm14249477f8f.52.2024.11.04.13.30.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 13:30:56 -0800 (PST)
-Message-ID: <10e4d078-3cdb-4d1c-a1a3-80e91b247217@redhat.com>
-Date: Mon, 4 Nov 2024 22:30:53 +0100
+        d=1e100.net; s=20230601; t=1730758412; x=1731363212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+n54qAXwoDA0o8dpKjuMOMxb/8VNmkgzn+Qg2NOh5q8=;
+        b=oCjPbMiXE2FF1ZeaEul2ly5PK+SruRfDg5FjmX+9sLRPDXlhyf0PCIgvA0ydVH9YEA
+         ChNAJyZ+DMmDsBcLSpIJ43lvM3wgSaZMT7QzUPHIPWacRmTxVCncbFmuc2Y3LQpSZ8IC
+         wlxxFPVN6UhWYtr5nekLPXuhNNxcV4a6887sMexNpeNoPn+zJhCoFVX2LUauhzRPFhiW
+         RpP1qsv/8S9wjqEo/doeSdBygq1IJQ02p7PdJkac7CLMJH3lmusHfa6my0uzN9OrJQgn
+         D8AvaAZdBxH2B5sgIX4k4YcT2ussaYt9SZ6gCpm3jeIMq3niKoxrtDzQMcPH5n2jGKJg
+         8wWQ==
+X-Gm-Message-State: AOJu0Yw3k2Ed3QbfeTDYX8zO8kNOq+zAFDBcMRPuHune3yeUbD+JEApG
+	+Mn9Id2d42eqnU9h8RytlvHiLFgZpqTJf3MaW0m3PWK9h/hxTWrDlN2Gfv+FIy4VHaImLAbC8Jp
+	P8EgBoxHHdwyqT7zOUGPM3NfmfRiNw6w+5QzWRBRz+pMJ/wEW9lt/1R9u1KJb149ejg9jcSSGox
+	vhNvpRkCvq4ls2c5YQtz283S/yIv4OyHBIOhw=
+X-Received: by 2002:a17:906:bc02:b0:a9e:b150:a99d with SMTP id a640c23a62f3a-a9eb150ac01mr87098066b.5.1730758412404;
+        Mon, 04 Nov 2024 14:13:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHH2wZtDD4ih8RSP9Ec74C122Mrbbr52FxVrmRQ+KVDAu3AMFOkZE+zT7hfkabKsdI7s2BGZw234GeAMJiwEY8=
+X-Received: by 2002:a17:906:bc02:b0:a9e:b150:a99d with SMTP id
+ a640c23a62f3a-a9eb150ac01mr87095466b.5.1730758411924; Mon, 04 Nov 2024
+ 14:13:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-To: Patrick Roy <roypat@amazon.co.uk>, tabba@google.com,
- quic_eberman@quicinc.com, seanjc@google.com, pbonzini@redhat.com,
- jthoughton@google.com, ackerleytng@google.com, vannapurve@google.com,
- rppt@kernel.org
-Cc: graf@amazon.com, jgowans@amazon.com, derekmn@amazon.com,
- kalyazin@amazon.com, xmarcalx@amazon.com, linux-mm@kvack.org,
- corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
- chenhuacai@kernel.org, kernel@xen0n.name, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, luto@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
- mhiramat@kernel.org, mathieu.desnoyers@efficios.com, shuah@kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241030134912.515725-1-roypat@amazon.co.uk>
- <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
- <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
- <d1a69eb7-85d5-4ffa-88e2-f4841713c1d7@redhat.com>
- <90c9d8c0-814e-4c86-86ef-439cb5552cb6@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <90c9d8c0-814e-4c86-86ef-439cb5552cb6@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241030033514.1728937-1-zack.rusin@broadcom.com> <20241030033514.1728937-3-zack.rusin@broadcom.com>
+In-Reply-To: <20241030033514.1728937-3-zack.rusin@broadcom.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 4 Nov 2024 23:13:19 +0100
+Message-ID: <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
+To: Zack Rusin <zack.rusin@broadcom.com>
+Cc: kvm@vger.kernel.org, Doug Covelli <doug.covelli@broadcom.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> We talked about shared (faultable) vs. private (unfaultable), and how it
->> would interact with the directmap patches here.
->>
->> As discussed, having private (unfaultable) memory with the direct-map
->> removed and shared (faultable) memory with the direct-mapping can make
->> sense for non-TDX/AMD-SEV/... non-CoCo use cases. Not sure about CoCo,
->> the discussion here seems to indicate that it might currently not be
->> required.
->>
->> So one thing we could do is that shared (faultable) will have a direct
->> mapping and be gup-able and private (unfaultable) memory will not have a
->> direct mapping and is, by design, not gup-able.>
->> Maybe it could make sense to not have a direct map for all guest_memfd
->> memory, making it behave like secretmem (and it would be easy to
->> implement)? But I'm not sure if that is really desirable in VM context.
-> 
-> This would work for us (in this scenario, the swiotlb areas would be
-> "traditional" memory, e.g. set to shared via mem attributes instead of
-> "shared" inside KVM), it's kinda what I had prototyped in my v1 of this
-> series (well, we'd need to figure out how to get the mappings of gmem
-> back into KVM, since in this setup, short-circuiting it into
-> userspace_addr wouldn't work, unless we banish swiotlb into a different
-> memslot altogether somehow).
+On Wed, Oct 30, 2024 at 4:35=E2=80=AFAM Zack Rusin <zack.rusin@broadcom.com=
+> wrote:
+>
+> VMware products handle hypercalls in userspace. Give KVM the ability
+> to run VMware guests unmodified by fowarding all hypercalls to the
+> userspace.
+>
+> Enabling of the KVM_CAP_X86_VMWARE_HYPERCALL_ENABLE capability turns
+> the feature on - it's off by default. This allows vmx's built on top
+> of KVM to support VMware specific hypercalls.
 
-Right.
+Hi Zack,
 
-> But I don't think it'd work for pKVM, iirc
-> they need GUP on gmem, and also want direct map removal (... but maybe,
-> the gmem VMA for non-CoCo usecase and the gmem VMA for pKVM could be
-> behave differently?  non-CoCo gets essentially memfd_secret, pKVM gets
-> GUP+no faults of private mem).
+is there a spec of the hypercalls that are supported by userspace? I
+would like to understand if there's anything that's best handled in
+the kernel.
 
-Good question. So far my perception was that the directmap removal on 
-"private/unfaultable" would be sufficient.
+If we allow forwarding _all_ hypercalls to userspace, then people will
+use it for things other than VMware and there goes all hope of
+accelerating stuff in the kernel in the future.
 
-> 
->> Having a mixture of "has directmap" and "has no directmap" for shared
->> (faultable) memory should not be done. Similarly, private memory really
->> should stay "unfaultable".
-> 
-> You've convinced me that having both GUP-able and non GUP-able
-> memory in the same VMA will be tricky. However, I'm less convinced on
-> why private memory should stay unfaultable; only that it shouldn't be
-> faultable into a VMA that also allows GUP. Can we have two VMAs? One
-> that disallows GUP, but allows userspace access to shared and private,
-> and one that allows GUP, but disallows accessing private memory? Maybe
-> via some `PROT_NOGUP` flag to `mmap`? I guess this is a slightly
-> different spin of the above idea.
+So even having _some_ checks in the kernel before going out to
+userspace would keep that door open, or at least try.
 
-What we are trying to achieve is making guest_memfd not behave 
-completely different on that level for different "types" of VMs. So one 
-of the goals should be to try to unify it as much as possible.
+Patch 1 instead looks good from an API point of view.
 
-shared -> faultable: GUP-able
-private -> unfaultable: unGUP-able
+Paolo
 
-
-And it makes sense, because a lot of future work will rely on some 
-important properties: for example, if private memory cannot be faulted 
-in + GUPed, core-MM will never have obtained valid references to such a 
-page. There is no need to split large folios into smaller ones for 
-tracking purposes; there is no need to maintain per-page refcounts and 
-pincounts ...
-
-It doesn't mean that we cannot consider it if really required, but there 
-really has to be a strong case for it, because it will all get really messy.
-
-For example, one issue is that a folio only has a single mapping 
-(folio->mapping), and that is used in the GUP-fast path (no VMA) to 
-determine whether GUP-fast is allowed or not.
-
-So you'd have to force everything through GUP-slow, where you could 
-consider VMA properties :( It sounds quite suboptimal.
-
-I don't think multiple VMAs are what we really want. See below.
-
-> 
->> I think one of the points raised during the bi-weekly call was that
->> using a viommu/swiotlb might be the right call, such that all memory can
->> be considered private (unfaultable) that is not explicitly
->> shared/expected to be modified by the hypervisor (-> faultable, ->
->> GUP-able).
->>
->> Further, I think Sean had some good points why we should explore that
->> direction, but I recall that there were some issue to be sorted out
->> (interpreted instructions requiring direct map when accessing "private"
->> memory?), not sure if that is already working/can be made working in KVM.
-> 
-> Yeah, the big one is MMIO instruction emulation on x86, which does guest
-> page table walks and instruction fetch (and particularly the latter
-> cannot be known ahead-of-time by the guest, aka cannot be explicitly
-> "shared"). That's what the majority of my v2 series was about. For
-> traditional memslots, KVM handles these via get_user and friends, but if
-> we don't have a VMA that allows faulting all of gmem, then that's
-> impossible, and we're in "temporarily restore direct map" land. Which
-> comes with significantly performance penalties due to TLB flushes.
-
-Agreed.
-
- > >> What's your opinion after the call and the next step for use cases 
-like
->> you have in mind (IIRC firecracker, which wants to not have the
->> direct-map for guest memory where it can be avoided)?
-> 
-> Yea, the usecase is for Firecracker to not have direct map entries for
-> guest memory, unless needed for I/O (-> swiotlb).
-> 
-> As for next steps, let's determine once and for all if we can do the
-> KVM-internal guest memory accesses for MMIO emulation through userspace
-> mappings (although if we can't I'll have some serious soul-searching to
-> do, because all other solutions we talked about so far also have fairly
-> big drawbacks; on-demand direct map reinsertion has terrible
-> performance
-So IIUC, KVM would have to access "unfaultable" guest_memfd memory using 
-fd+offset, and that's problematic because "no-directmap".
-
-So you'd have to map+unmap the directmap repeatedly, and still expose it 
-temporarily in the direct map to others. I see how that is undesirable, 
-even when trying to cache hotspots (partly destroying the purpose of the 
-directmap removal).
-
-
-Would a per-MM kernel mapping of these pages work, so KVM can access them?
-
-It sounds a bit like what is required for clean per-MM allocations [1]: 
-establish a per-MM kernel mapping of (selected?) pages. Not necessarily 
-all of them.
-
-Yes, we'd be avoiding VMAs, GUP, mapcounts, pincounts and everything 
-involved with ordinary user mappings for these private/unfaultable 
-thingies. Just like as discussed in, and similar to [1].
-
-Just throwing it out there, maybe we really want to avoid the directmap 
-(keep it unmapped) and maintain a per-mm mapping for a bunch of folios 
-that can be easily removed when required by guest_memfd (ftruncate, 
-conversion private->shared) on request.
-
-[1] https://lore.kernel.org/all/20240911143421.85612-1-faresx@amazon.de/T/#u
-
--- 
-Cheers,
-
-David / dhildenb
+> Signed-off-by: Zack Rusin <zack.rusin@broadcom.com>
+> Cc: Doug Covelli <doug.covelli@broadcom.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: x86@kernel.org
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Namhyung Kim <namhyung@kernel.org>
+> Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+> Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+> Cc: Joel Stanley <joel@jms.id.au>
+> Cc: Zack Rusin <zack.rusin@broadcom.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
+> ---
+>  Documentation/virt/kvm/api.rst  | 41 +++++++++++++++++++++++++++++----
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/x86.c              | 33 ++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h        |  1 +
+>  4 files changed, 72 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 33ef3cc785e4..5a8c7922f64f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6601,10 +6601,11 @@ to the byte array.
+>  .. note::
+>
+>        For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_E=
+XIT_XEN,
+> -      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR the corres=
+ponding
+> -      operations are complete (and guest state is consistent) only after=
+ userspace
+> -      has re-entered the kernel with KVM_RUN.  The kernel side will firs=
+t finish
+> -      incomplete operations and then check for pending signals.
+> +      KVM_EXIT_EPR, KVM_EXIT_HYPERCALL, KVM_EXIT_X86_RDMSR and KVM_EXIT_=
+X86_WRMSR
+> +      the corresponding operations are complete (and guest state is cons=
+istent)
+> +      only after userspace has re-entered the kernel with KVM_RUN. The k=
+ernel
+> +      side will first finish incomplete operations and then check for pe=
+nding
+> +      signals.
+>
+>        The pending state of the operation is not preserved in state which=
+ is
+>        visible to userspace, thus userspace should ensure that the operat=
+ion is
+> @@ -8201,6 +8202,38 @@ default value for it is set via the kvm.enable_vmw=
+are_backdoor
+>  kernel parameter (false when not set). Must be set before any
+>  VCPUs have been created.
+>
+> +7.38 KVM_CAP_X86_VMWARE_HYPERCALL
+> +---------------------------------
+> +
+> +:Architectures: x86
+> +:Parameters: args[0] whether the feature should be enabled or not
+> +:Returns: 0 on success.
+> +
+> +Capability allows userspace to handle hypercalls. When enabled
+> +whenever the vcpu has executed a VMCALL(Intel) or a VMMCALL(AMD)
+> +instruction kvm will exit to userspace with KVM_EXIT_HYPERCALL.
+> +
+> +On exit the hypercall structure of the kvm_run structure will
+> +look as follows:
+> +
+> +::
+> +   /* KVM_EXIT_HYPERCALL */
+> +   struct {
+> +      __u64 nr;      // rax
+> +      __u64 args[6]; // rbx, rcx, rdx, rsi, rdi, rbp
+> +      __u64 ret;     // cpl, whatever userspace
+> +                     // sets this to on return will be
+> +                     // written to the rax
+> +      __u64 flags;   // KVM_EXIT_HYPERCALL_LONG_MODE if
+> +                     // the hypercall was executed in
+> +                     // 64bit mode, 0 otherwise
+> +   } hypercall;
+> +
+> +Except when running in compatibility mode with VMware hypervisors
+> +userspace handling of hypercalls is discouraged. To implement
+> +such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO
+> +(all except s390).
+> +
+>  8. Other capabilities.
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 7fcf185e337f..7fbb11682517 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1404,6 +1404,7 @@ struct kvm_arch {
+>         struct kvm_xen xen;
+>  #endif
+>         bool vmware_backdoor_enabled;
+> +       bool vmware_hypercall_enabled;
+>
+>         bool backwards_tsc_observed;
+>         bool boot_vcpu_runs_old_kvmclock;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d7071907d6a5..b676c54266e7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4689,6 +4689,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+>         case KVM_CAP_MEMORY_FAULT_INFO:
+>         case KVM_CAP_X86_GUEST_MODE:
+>         case KVM_CAP_X86_VMWARE_BACKDOOR:
+> +       case KVM_CAP_X86_VMWARE_HYPERCALL:
+>                 r =3D 1;
+>                 break;
+>         case KVM_CAP_PRE_FAULT_MEMORY:
+> @@ -6784,6 +6785,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                 }
+>                 mutex_unlock(&kvm->lock);
+>                 break;
+> +       case KVM_CAP_X86_VMWARE_HYPERCALL:
+> +               r =3D -EINVAL;
+> +               if (cap->args[0] & ~1)
+> +                       break;
+> +               kvm->arch.vmware_hypercall_enabled =3D cap->args[0];
+> +               r =3D 0;
+> +               break;
+>         default:
+>                 r =3D -EINVAL;
+>                 break;
+> @@ -10127,6 +10135,28 @@ static int complete_hypercall_exit(struct kvm_vc=
+pu *vcpu)
+>         return kvm_skip_emulated_instruction(vcpu);
+>  }
+>
+> +static int kvm_vmware_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +       struct kvm_run *run =3D vcpu->run;
+> +       bool is_64_bit =3D is_64_bit_hypercall(vcpu);
+> +       u64 mask =3D is_64_bit ? U64_MAX : U32_MAX;
+> +
+> +       vcpu->run->hypercall.flags =3D is_64_bit ? KVM_EXIT_HYPERCALL_LON=
+G_MODE : 0;
+> +       run->hypercall.nr =3D kvm_rax_read(vcpu) & mask;
+> +       run->hypercall.args[0] =3D kvm_rbx_read(vcpu) & mask;
+> +       run->hypercall.args[1] =3D kvm_rcx_read(vcpu) & mask;
+> +       run->hypercall.args[2] =3D kvm_rdx_read(vcpu) & mask;
+> +       run->hypercall.args[3] =3D kvm_rsi_read(vcpu) & mask;
+> +       run->hypercall.args[4] =3D kvm_rdi_read(vcpu) & mask;
+> +       run->hypercall.args[5] =3D kvm_rbp_read(vcpu) & mask;
+> +       run->hypercall.ret =3D kvm_x86_call(get_cpl)(vcpu);
+> +
+> +       run->exit_reason =3D KVM_EXIT_HYPERCALL;
+> +       vcpu->arch.complete_userspace_io =3D complete_hypercall_exit;
+> +
+> +       return 0;
+> +}
+> +
+>  unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned lo=
+ng nr,
+>                                       unsigned long a0, unsigned long a1,
+>                                       unsigned long a2, unsigned long a3,
+> @@ -10225,6 +10255,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>         int op_64_bit;
+>         int cpl;
+>
+> +       if (vcpu->kvm->arch.vmware_hypercall_enabled)
+> +               return kvm_vmware_hypercall(vcpu);
+> +
+>         if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>                 return kvm_xen_hypercall(vcpu);
+>
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index c7b5f1c2ee1c..4c2cc6ed29a0 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -934,6 +934,7 @@ struct kvm_enable_cap {
+>  #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+>  #define KVM_CAP_X86_GUEST_MODE 238
+>  #define KVM_CAP_X86_VMWARE_BACKDOOR 239
+> +#define KVM_CAP_X86_VMWARE_HYPERCALL 240
+>
+>  struct kvm_irq_routing_irqchip {
+>         __u32 irqchip;
+> --
+> 2.43.0
+>
 
 
