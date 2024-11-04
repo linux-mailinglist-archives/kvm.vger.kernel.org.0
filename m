@@ -1,72 +1,75 @@
-Return-Path: <kvm+bounces-30500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130809BB3A3
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 12:39:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728C69BB3CD
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 12:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE6481F23144
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:39:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9B11C2187F
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C73F1B21BC;
-	Mon,  4 Nov 2024 11:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DF41B395E;
+	Mon,  4 Nov 2024 11:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FCNZl80y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6Mb8pBY"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3C185B4D;
-	Mon,  4 Nov 2024 11:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07271B2199;
+	Mon,  4 Nov 2024 11:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730720369; cv=none; b=IfXP4NHpuW3B2eJ8lYZxrEY/8SzRa3zN2jfDv3NV5EdzB52FMbbfKFGNZpEaRqTIpG5Y3BpEL+q0GUrFDjGjSwAF8xxhC1Z8wayKx2J7akm4FRT1EJ6ljZ3kk05q0b2Z9nSGrWkjrB7cL/QoOlVXMIPGp3NryKVAO1tY2qkSiRo=
+	t=1730720852; cv=none; b=GSBfKQjRIML4L9NnJ6LnSdzK230Srr2/ANN+5rB33dcns/lE4rx+5D65+B9qOiojfaCVdJHTXfkcqmZFrPNAUJdHSvGLcv7rU0+gqnkYYvM4qRZiOn6rY+r97CkSZ5a5ZQFZtD/YKYnBoE1OF7+Rtmut2H7HqKQZslXUNts6ggM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730720369; c=relaxed/simple;
-	bh=NEDVbMitndD/iK6JWHs2o1S6pn7h57zEQ83wRjOGbwM=;
+	s=arc-20240116; t=1730720852; c=relaxed/simple;
+	bh=YrBkBW416lpDyjoa3v17d3AWN56gLB1Iew1HdUSXMQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4X21Z2//bEFcE/Mnm7SRAEbSe2Hv30g+1ieVBA2BegoCMvZRAoZOdSYFpbC4l5dWo/3l6/XioIhCYr0byPK6IIo/c0GUEkwnb/QtZ52vhrykbqbJ639Y5Z0Py3PptiFz59LSlKcCL2rXk+pa2DGBNiLTqUUqvjENG+VpJVB3hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FCNZl80y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E43EC4CECE;
-	Mon,  4 Nov 2024 11:39:25 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=g/HQ46tfW24OBie4uXmxyHctin2X3jYfHkasedkLxo37VSgnMcbNpjrTPzrLFA3sdQryZSqDJ+HdJpF/zdf3y0gLrU5W2nAA3aXWlN+e/MaJ0HAByWPtJsmb0wYWv1r8lUa3MCtnBgXuuWeTn6pmM3WwEiUGn+JfMvtxjtBZkec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6Mb8pBY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE59FC4CECE;
+	Mon,  4 Nov 2024 11:47:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730720366;
-	bh=NEDVbMitndD/iK6JWHs2o1S6pn7h57zEQ83wRjOGbwM=;
+	s=k20201202; t=1730720852;
+	bh=YrBkBW416lpDyjoa3v17d3AWN56gLB1Iew1HdUSXMQ0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FCNZl80yEk5l8SaYaoCBd/ngvAnMVCC2ZjSDbwZfQ8mrGoQAQHq0KZ0YySad2w6iD
-	 bhKUdk2VJPuLxk2n0zNkeYqVTjWimCe0KY+EoWT4fqvV1+YLhQUvABpjnzxQEgdqFM
-	 2BpPxg0LwBCTYbhkxkUYZgp3KkOsOZRDo+BKC3lH3JeAsOEk2fzj8ARLQQ14RhFnrX
-	 uXWBkNGPfoaMl6N4kDz6OiMk0Mf/BwrYcYvvPP+t71xWn1ZjQA3Q6lgcGNVObYG5Gq
-	 GbS2qup3wwHfcN9yIP+AIN4pioJI5Luew6aYTY7gCJ1DnGQC9xzlf55e02PVxyG0ae
-	 QwBznLzmgrROQ==
-Date: Mon, 4 Nov 2024 13:39:20 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Jens Axboe <axboe@kernel.dk>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
+	b=J6Mb8pBYnu5iaGLA4V3tZYV5eSMnr/XQ2i98fhHzsNVHsgFRUPHP+4iy33vy7otHF
+	 SYZm903IjYWYnRn/UsuLTl+EWAski+HVZbIzfthuTDK4GjPn1aRaMC0I85LTkJH/+W
+	 rzNlNPEep5itEHFRU586JMeXTp71VoLdm+uvE0YBudRzch1/5/Zogu0W6m7FVSm+yX
+	 1IOwOnvitenBXc7Szlsq0+q9775HnLPRaUAept+DZl3u0v5DCmEo664L6yTAnqqFc1
+	 f8HXWCYTDWd65Eux6GdM6a+wSdXuEbf57AjXA2IfqFOMQeW8dyA43RH/HyIgJo+Zua
+	 9Kk5tpB4z1OjQ==
+Date: Mon, 4 Nov 2024 11:47:24 +0000
+From: Will Deacon <will@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241104113920.GD99170@unreal>
-References: <cover.1730298502.git.leon@kernel.org>
- <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
- <20241104095831.GA28751@lst.de>
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Jerry Snitselaar <jsnitsel@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO
+ via struct arm_smmu_hw_info
+Message-ID: <20241104114723.GA11511@willie-the-truck>
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <5-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,62 +78,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241104095831.GA28751@lst.de>
+In-Reply-To: <5-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Nov 04, 2024 at 10:58:31AM +0100, Christoph Hellwig wrote:
-> On Thu, Oct 31, 2024 at 09:17:45PM +0000, Robin Murphy wrote:
-
-<...>
-
-> >>   2. VFIO PCI live migration code is building a very large "page list"
-> >>      for the device. Instead of allocating a scatter list entry per allocated
-> >>      page it can just allocate an array of 'struct page *', saving a large
-> >>      amount of memory.
-> >
-> > VFIO already assumes a coherent device with (realistically) an IOMMU which 
-> > it explicitly manages - why is it even pretending to need a generic DMA 
-> > API?
+On Wed, Oct 30, 2024 at 09:20:49PM -0300, Jason Gunthorpe wrote:
+> From: Nicolin Chen <nicolinc@nvidia.com>
 > 
-> AFAIK that does isn't really vfio as we know it but the control device
-> for live migration.  But Leon or Jason might fill in more.
+> For virtualization cases the IDR/IIDR/AIDR values of the actual SMMU
+> instance need to be available to the VMM so it can construct an
+> appropriate vSMMUv3 that reflects the correct HW capabilities.
+> 
+> For userspace page tables these values are required to constrain the valid
+> values within the CD table and the IOPTEs.
+> 
+> The kernel does not sanitize these values. If building a VMM then
+> userspace is required to only forward bits into a VM that it knows it can
+> implement. Some bits will also require a VMM to detect if appropriate
+> kernel support is available such as for ATS and BTM.
+> 
+> Start a new file and kconfig for the advanced iommufd support. This lets
+> it be compiled out for kernels that are not intended to support
+> virtualization, and allows distros to leave it disabled until they are
+> shipping a matching qemu too.
+> 
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
+> Reviewed-by: Donald Dutile <ddutile@redhat.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Yes, you are right, as it is written above "VFIO PCI live migration ...".
-That piece of code directly connected to the underlying real HW device
-and uses DMA API to provide live migration functionality to/from that
-device.
+--->8
 
-> 
-> The point is that quite a few devices have these page list based APIs
-> (RDMA where mlx5 comes from, NVMe with PRPs, AHCI, GPUs).
-> 
-> >
-> >>   3. NVMe PCI demonstrates how a BIO can be converted to a HW scatter
-> >>      list without having to allocate then populate an intermediate SG table.
-> >
-> > As above, given that a bio_vec still deals in struct pages, that could 
-> > seemingly already be done by just mapping the pages, so how is it proving 
-> > any benefit of a fragile new interface?
-> 
-> Because we only need to preallocate the tiny constant sized dma_iova_state
-> as part of the request instead of an additional scatterlist that requires
-> sizeof(struct page *) + sizeof(dma_addr_t) + 3 * sizeof(unsigned int)
-> per segment, including a memory allocation per I/O for that.
-> 
-> > My big concern here is that a thin and vaguely-defined wrapper around the 
-> > IOMMU API is itself a step which smells strongly of "abuse and design 
-> > mistake", given that the basic notion of allocating DMA addresses in 
-> > advance clearly cannot generalise. Thus it really demands some considered 
-> > justification beyond "We must do something; This is something; Therefore we 
-> > must do this." to be convincing.
-> 
-> At least for the block code we have a nice little core wrapper that is
-> very easy to use, and provides a great reduction of memory use and
-> allocations.  The HMM use case I'll let others talk about.
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index e266dfa6a38d9d..b227ac16333fe1 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -488,15 +488,50 @@ struct iommu_hw_info_vtd {
+>  	__aligned_u64 ecap_reg;
+>  };
+>  
+> +/**
+> + * struct iommu_hw_info_arm_smmuv3 - ARM SMMUv3 hardware information
+> + *                                   (IOMMU_HW_INFO_TYPE_ARM_SMMUV3)
+> + *
+> + * @flags: Must be set to 0
+> + * @__reserved: Must be 0
+> + * @idr: Implemented features for ARM SMMU Non-secure programming interface
+> + * @iidr: Information about the implementation and implementer of ARM SMMU,
+> + *        and architecture version supported
+> + * @aidr: ARM SMMU architecture version
+> + *
+> + * For the details of @idr, @iidr and @aidr, please refer to the chapters
+> + * from 6.3.1 to 6.3.6 in the SMMUv3 Spec.
+> + *
+> + * User space should read the underlying ARM SMMUv3 hardware information for
+> + * the list of supported features.
+> + *
+> + * Note that these values reflect the raw HW capability, without any insight if
+> + * any required kernel driver support is present. Bits may be set indicating the
+> + * HW has functionality that is lacking kernel software support, such as BTM. If
+> + * a VMM is using this information to construct emulated copies of these
+> + * registers it should only forward bits that it knows it can support.
+> + *
+> + * In future, presence of required kernel support will be indicated in flags.
 
-I'm not sure about which wrappers Robin talks, but if we are talking
-about HMM wrappers, they gave us perfect combination of usability,
-performance and maintenance. All HMM users use same pattern, same
-structures and don't need to worry about internal DMA/IOMMU details.
+What about the case where we _know_ that some functionality is broken in
+the hardware? For example, we nobble BTM support on MMU 700 thanks to
+erratum #2812531 yet we'll still cheerfully advertise it in IDR0 here.
+Similarly, HTTU can be overridden by IORT, so should we update the view
+that we advertise for that as well?
 
-Thanks
+Will
 
