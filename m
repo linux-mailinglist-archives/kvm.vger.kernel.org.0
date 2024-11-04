@@ -1,148 +1,240 @@
-Return-Path: <kvm+bounces-30485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D939C9BB0BD
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:15:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1D09BB0BF
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 11:15:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C41281D39
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:15:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AF8B283465
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 10:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C6D1B0F2F;
-	Mon,  4 Nov 2024 10:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59FA1AF0DD;
+	Mon,  4 Nov 2024 10:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bc2GFbbO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHFm9Fly"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28E01B0F12;
-	Mon,  4 Nov 2024 10:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32B120ED;
+	Mon,  4 Nov 2024 10:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730715305; cv=none; b=bcmQXn4Anc+44k1EhSNY4oas2+pR0Rrm7OQ6+28djHc7E5/3v4QywhrqBkdiCCxK0j66NT7fkdKxedbaSlPxOTUciFZGA5PJeRuU340eoX0aG6F1INdj73gucxkuiKRGolZxT4KTgCvOu6j1pywAEqlDscv0vvVDiSZDSoK7mEM=
+	t=1730715348; cv=none; b=V1gRVtfWoBL1AZ0rYaS34UxOL7a/k5T7d4dYs0AVSPE9Urtyv5DWFvXYDgOljfuSC/Xqv3rWPElDatvKrmOss9GBDwGSL+jpvRdmjIAixZApqRcnIcOPHzYprMdDtSyERxuWtMXqVXCYQ4V8F6xw8Nz3mVmTPmtsW/O+HBkA9Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730715305; c=relaxed/simple;
-	bh=mcIce5Fq/hEFHVI7AkWHxaRExFRL0bAcIhE1CoWgubY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ec4fFsLVD50VTD1VUuhLiunct51+9GZFzfboSzX9Ujz/olBAUfg7Q3HhwZbhbOBAEnFSB+kKo8QxoBxCvWzkMQqHkpg0UIXsRhSRhnr9VpD084G03RQY/UnuUvKDqnqRNWTZUNOEybFGLF0iI+DyzKr1SHzIU25b9s3k4RGtIpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bc2GFbbO; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A4AAXVT016625;
-	Mon, 4 Nov 2024 10:14:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=0pvu1h2wXjRKNrgWewAcE0S2SfJqBR
-	QG0tc62qAKP1Q=; b=bc2GFbbOrUg75hb8XWifBlNgNziOkjtTBeEn/bsEhj4I45
-	ELj+3HePqnGj2/YkyqgACqS+hWhpOjncwtFu1Mlc5bvFDsKSnBB8ye+hFW3l8f1d
-	dK0IITttHJwU6DpIWhHFXYZEUGSKf3f2X6Os52VbjyqfVaJGUGWUUI3Qyya+mAx9
-	/jCPOJhhfall7WT56KGgt6yqFTtbDbMZS+WZMcv/PDrUpUBy1f4653UbX4DqF7uZ
-	zeu12fyHgh9mTOyV6AsonE3drxfFpXk+w+51ESoCVhgd+Gdl+k5lpnbaWKrvhQQq
-	OVWrjYn8ABEmtULhfmBxnsiCdQrSvBJCAcyBdm5A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42pv9b80e5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 10:14:54 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A4ABm80018784;
-	Mon, 4 Nov 2024 10:14:53 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42pv9b80e1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 10:14:53 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A49iji3008453;
-	Mon, 4 Nov 2024 10:14:53 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nywk3mwx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 10:14:53 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A4AEn4J35062488
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Nov 2024 10:14:49 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15E3B20076;
-	Mon,  4 Nov 2024 10:14:49 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA99820073;
-	Mon,  4 Nov 2024 10:14:47 +0000 (GMT)
-Received: from osiris (unknown [9.171.95.25])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  4 Nov 2024 10:14:47 +0000 (GMT)
-Date: Mon, 4 Nov 2024 11:14:46 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v3 0/7] virtio-mem: s390 support
-Message-ID: <20241104101446.9483-B-hca@linux.ibm.com>
-References: <20241025141453.1210600-1-david@redhat.com>
+	s=arc-20240116; t=1730715348; c=relaxed/simple;
+	bh=InWUU3D2Dk79W7Gl9bItAteAnFGljFzsGKpkdweMKHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLBSSlDiOgkAjzE0pvqaakKwZ/Mf1EEV8jbksaLUbhxyka+o3/uAxoex2jqDhWe8DXRunT+DSuigh5fbky4Ss0xwXeGaiYz4fTGwmXls/xwQS5MDpNO9ubMmBYu6a5Y17RgzvRc/6cEAam5ATo1wh17cKOKPMzvkV6vQ0BqS1Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHFm9Fly; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA24CC4CECE;
+	Mon,  4 Nov 2024 10:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730715348;
+	bh=InWUU3D2Dk79W7Gl9bItAteAnFGljFzsGKpkdweMKHY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EHFm9FlyAD2DFhNZT2J0RbMcZoapYZ2+aOcmOxGsdi67+47XT64Qi+Av8s7/MzsE+
+	 F4Z/WUczB7PISowE3ja8a83AFgLl/q1gGnL1cD5+Len9SQY3VrsxeT93jL6n8RhlUi
+	 4BzhV4nhkeR5LExaV8M17SbLJW8OfUnHBnPwBotvZn9N2CBLppQVz5c8beqzyZe/n5
+	 cjw1xtsmne12YIdNpcrog7cdF8eIEzbdnRBhRKt4bLP3mEcqMUEFNjIM2A10TUaSrE
+	 hVmzFsDbiPLBnjHR5NkU3hDLCl0ssFDEGREA6N1v+n/ZpJzsr9uOt+TuKUDEpGygI4
+	 68xVBJ5GfeFgQ==
+From: Borislav Petkov <bp@kernel.org>
+To: X86 ML <x86@kernel.org>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	kvm@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	"Borislav Petkov (AMD)" <bp@alien8.de>
+Subject: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
+Date: Mon,  4 Nov 2024 11:15:43 +0100
+Message-ID: <20241104101543.31885-1-bp@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025141453.1210600-1-david@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VHeFIyuzTNW6zfc61Cu-HEnOAgIKsDwU
-X-Proofpoint-ORIG-GUID: sEYZz5grUf9yUrSKVVfQ3jI2KcH0p6Ka
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- impostorscore=0 phishscore=0 malwarescore=0 priorityscore=1501
- suspectscore=0 spamscore=0 mlxlogscore=647 mlxscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411040089
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 25, 2024 at 04:14:45PM +0200, David Hildenbrand wrote:
-> Let's finally add s390 support for virtio-mem; my last RFC was sent
-> 4 years ago, and a lot changed in the meantime.
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-...
+If the machine has:
 
-> David Hildenbrand (7):
->   Documentation: s390-diag.rst: make diag500 a generic KVM hypercall
->   Documentation: s390-diag.rst: document diag500(STORAGE LIMIT)
->     subfunction
->   s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM
->     memory devices
->   virtio-mem: s390 support
->   lib/Kconfig.debug: default STRICT_DEVMEM to "y" on s390
->   s390/sparsemem: reduce section size to 128 MiB
->   s390/sparsemem: provide memory_add_physaddr_to_nid() with CONFIG_NUMA
-> 
->  Documentation/virt/kvm/s390/s390-diag.rst | 35 +++++++++++++----
->  arch/s390/boot/physmem_info.c             | 47 ++++++++++++++++++++++-
->  arch/s390/boot/startup.c                  |  7 +++-
->  arch/s390/include/asm/physmem_info.h      |  3 ++
->  arch/s390/include/asm/sparsemem.h         | 10 ++++-
->  drivers/virtio/Kconfig                    | 12 +++---
->  lib/Kconfig.debug                         |  2 +-
->  7 files changed, 98 insertions(+), 18 deletions(-)
+  CPUID Fn8000_0021_EAX[30] (SRSO_USER_KERNEL_NO) -- If this bit is 1, it
+  indicates the CPU is not subject to the SRSO vulnerability across
+  user/kernel boundaries.
 
-Series applied. Thanks a lot!
+have it fall back to IBPB on VMEXIT only, in the case it is going to run
+VMs:
+
+  Speculative Return Stack Overflow: CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT
+  Speculative Return Stack Overflow: Mitigation: IBPB on VMEXIT only
+
+Then, upon KVM module load and in case the machine has
+
+  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it indicates
+  that software may use MSR BP_CFG[BpSpecReduce] to mitigate SRSO.
+
+enable this BpSpecReduce bit to mitigate SRSO across guest/host
+boundaries.
+
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+---
+ arch/x86/include/asm/cpufeatures.h |  2 ++
+ arch/x86/include/asm/msr-index.h   |  1 +
+ arch/x86/kernel/cpu/bugs.c         | 16 +++++++++++++++-
+ arch/x86/kernel/cpu/common.c       |  1 +
+ arch/x86/kvm/cpuid.c               |  1 +
+ arch/x86/kvm/svm/svm.c             |  6 ++++++
+ arch/x86/lib/msr.c                 |  2 ++
+ 7 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 924f530129d7..9d71f06e09a4 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -462,6 +462,8 @@
+ #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barrier */
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
++#define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
++#define X86_FEATURE_SRSO_MSR_FIX	(20*32+31) /* MSR BP_CFG[BpSpecReduce] can be used to mitigate SRSO */
+ 
+ /*
+  * Extended auxiliary flags: Linux defined - for features scattered in various
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 3ae84c3b8e6d..1372a569fb58 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -717,6 +717,7 @@
+ 
+ /* Zen4 */
+ #define MSR_ZEN4_BP_CFG                 0xc001102e
++#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
+ #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
+ 
+ /* Fam 19h MSRs */
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 83b34a522dd7..5dffd1e679da 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2536,6 +2536,7 @@ enum srso_mitigation {
+ 	SRSO_MITIGATION_SAFE_RET,
+ 	SRSO_MITIGATION_IBPB,
+ 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
++	SRSO_MITIGATION_BP_SPEC_REDUCE,
+ };
+ 
+ enum srso_mitigation_cmd {
+@@ -2553,7 +2554,8 @@ static const char * const srso_strings[] = {
+ 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
+ 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
+ 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
+-	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
++	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
++	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
+ };
+ 
+ static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
+@@ -2628,6 +2630,11 @@ static void __init srso_select_mitigation(void)
+ 		break;
+ 
+ 	case SRSO_CMD_SAFE_RET:
++		if (boot_cpu_has(X86_FEATURE_SRSO_USER_KERNEL_NO)) {
++			pr_notice("CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT\n");
++			goto ibpb_on_vmexit;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
+ 			/*
+ 			 * Enable the return thunk for generated code
+@@ -2671,7 +2678,14 @@ static void __init srso_select_mitigation(void)
+ 		}
+ 		break;
+ 
++ibpb_on_vmexit:
+ 	case SRSO_CMD_IBPB_ON_VMEXIT:
++		if (boot_cpu_has(X86_FEATURE_SRSO_MSR_FIX)) {
++			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
++			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
++			break;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
+ 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
+ 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 8f41ab219cf1..ca3b588b51aa 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1273,6 +1273,7 @@ static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
+ 	VULNBL_AMD(0x17, RETBLEED | SMT_RSB | SRSO),
+ 	VULNBL_HYGON(0x18, RETBLEED | SMT_RSB | SRSO),
+ 	VULNBL_AMD(0x19, SRSO),
++	VULNBL_AMD(0x1a, SRSO),
+ 	{}
+ };
+ 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 41786b834b16..d54cd67c8c50 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -799,6 +799,7 @@ void kvm_set_cpu_caps(void)
+ 
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_IBPB_BRTYPE);
++	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_USER_KERNEL_NO);
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
+ 
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_8000_0022_EAX,
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9df3e1e5ae81..03f29912a638 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -608,6 +608,9 @@ static void svm_disable_virtualization_cpu(void)
+ 	kvm_cpu_svm_disable();
+ 
+ 	amd_pmu_disable_virt();
++
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
++		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+ }
+ 
+ static int svm_enable_virtualization_cpu(void)
+@@ -685,6 +688,9 @@ static int svm_enable_virtualization_cpu(void)
+ 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
+ 	}
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
++		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
+index 4bf4fad5b148..5a18ecc04a6c 100644
+--- a/arch/x86/lib/msr.c
++++ b/arch/x86/lib/msr.c
+@@ -103,6 +103,7 @@ int msr_set_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, true);
+ }
++EXPORT_SYMBOL_GPL(msr_set_bit);
+ 
+ /**
+  * msr_clear_bit - Clear @bit in a MSR @msr.
+@@ -118,6 +119,7 @@ int msr_clear_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, false);
+ }
++EXPORT_SYMBOL_GPL(msr_clear_bit);
+ 
+ #ifdef CONFIG_TRACEPOINTS
+ void do_trace_write_msr(unsigned int msr, u64 val, int failed)
+-- 
+2.43.0
+
 
