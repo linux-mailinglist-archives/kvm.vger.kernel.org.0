@@ -1,146 +1,569 @@
-Return-Path: <kvm+bounces-30453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ADB99BADFA
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:23:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 316F59BAE1D
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:31:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ED431C2146F
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:23:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E57EB2814C3
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1146E1AB505;
-	Mon,  4 Nov 2024 08:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N29o0ux2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583B11AB52D;
+	Mon,  4 Nov 2024 08:31:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6920618BC0E;
-	Mon,  4 Nov 2024 08:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC29018F2F7;
+	Mon,  4 Nov 2024 08:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730708605; cv=none; b=h5riMuwFDtsaWuB0hk0U3JNnx5ywMOraLjqmARvwfXrj3U5VxQZZ+G1YJSOZgjt5KdbVMFZd/1CftYwlM0U+3V5C2m/4TJ5wLTz3iryfArwNBac60bUaXpc6h6qI5Eg+gCv+9d3sR4Okl+kIM96lHVGAC+Kwp6/lf0j/lUznDvI=
+	t=1730709091; cv=none; b=H0A76WR9tzfOwAOKkSkOa39cZWpYOyUcglDHgO6cW+3dnwwRp0mS9xgS0/uq1bUz8JkRRT4HXqCLR+SeeJ1VNF4Pv2V4EIht+2OSMQ9vn99naeyx2muj3JGTqPM1IEk0P7u4Hcy2KQFtuBb2wiQXfbZXhfsUvW+LBCm14OxtkAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730708605; c=relaxed/simple;
-	bh=2EXNNiwtoQ6nf5tB5KTCBIc1YohxLwQ/VVy3SQ+EZ38=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ABGms0MULFvS8Xvh2hlo8MQIFs3cr3YSIL1VJpiarLVpjcRnmhti4OXrKIQBFXADLhaYPWVNJQ9OhEMRTEZ6blxG1FBdefAGCV1k1D3lZlerxCCt6Ac45bcz0L4DllItpscNoj+4A1l6HDTYd3xcFVy1Mlyj3K0HGDljoATpGKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N29o0ux2; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730708604; x=1762244604;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2EXNNiwtoQ6nf5tB5KTCBIc1YohxLwQ/VVy3SQ+EZ38=;
-  b=N29o0ux2/U6xOH8whrL4ztbclixw1/q8X7VYtxZglTMFDZTXU6jdRSkA
-   vjQ9+zhPk65kOy57BLl3vlfdd8293miZZ970nwDyohMX0MxszxWXveUQW
-   hUchDYR9X1b4aRlMo8g9EmD2FRuWKXH0NUylPqPWeiH+W6+T9rn8VxmAk
-   Kmw1V9nm3p3sJX8Rn1K2X88a93h/SqSFYVrL7w83vlqr8eXSYPu8gD7Ir
-   W8wLlm5TROTKdj0BtEIFn8x1akjMR36T/6zNbozxqdUDoD9qZcu2J422g
-   YIiB39piO8wh6EQ+lp2B7cxX68jT+dwKCTKvL8/wxdurYT+oOSX5vzZ6H
-   w==;
-X-CSE-ConnectionGUID: Ah4y+sv8SNGmkeZPlXwQcA==
-X-CSE-MsgGUID: ZyM2c2GaSSOhHFl7VQZCfA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40940981"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40940981"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:23:23 -0800
-X-CSE-ConnectionGUID: bXOkro8zQuu/JjDDFzEymg==
-X-CSE-MsgGUID: vX0P50diRiiq0X9nUK/H8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="83924235"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.81])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:23:21 -0800
-Message-ID: <448c8367-9f54-4ab1-80c3-bb13c9ac4664@intel.com>
-Date: Mon, 4 Nov 2024 10:23:17 +0200
+	s=arc-20240116; t=1730709091; c=relaxed/simple;
+	bh=jW8Fz+i8fA5p+PPxU9qJXY2ispERM/0yGyXuqTLAW+A=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UbRRPUv/1Rx1GGX9pEmj2MBaSpZ1hFBerH9VIm9BVCwkp3JFV2nK9MgR2iOyLdnQD6g3VoHIDa1mz/N4K5YOOH3oSp6cYazGTuqj6b8jDbwu4A6Y9uE+XGzuy/kMLSqHrpqxeJdMr+A9rvxvBDs7u8q6izlnTBffdy7v1EtDeE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xhl752rxLz1ypCg;
+	Mon,  4 Nov 2024 16:31:29 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id B39491A016C;
+	Mon,  4 Nov 2024 16:31:19 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 16:31:19 +0800
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 4 Nov 2024 16:31:18 +0800
+Subject: Re: [PATCH v11 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+ migration driver
+From: liulongfang <liulongfang@huawei.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20241025090143.64472-1-liulongfang@huawei.com>
+ <20241025090143.64472-4-liulongfang@huawei.com>
+ <20241031160430.59f4b944.alex.williamson@redhat.com>
+ <df5129f8-e9c2-b1c0-e2de-9211738d88c4@huawei.com>
+Message-ID: <019a0cab-76b7-a3c0-d93f-5384efea1f67@huawei.com>
+Date: Mon, 4 Nov 2024 16:31:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: VMX: Bury Intel PT virtualization (guest/host
- mode) behind CONFIG_BROKEN
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241101185031.1799556-1-seanjc@google.com>
- <20241101185031.1799556-2-seanjc@google.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <20241101185031.1799556-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <df5129f8-e9c2-b1c0-e2de-9211738d88c4@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-On 1/11/24 20:50, Sean Christopherson wrote:
-> Hide KVM's pt_mode module param behind CONFIG_BROKEN, i.e. disable support
-> for virtualizing Intel PT via guest/host mode unless BROKEN=y.  There are
-> myriad bugs in the implementation, some of which are fatal to the guest,
-> and others which put the stability and health of the host at risk.
+On 2024/11/4 15:54, liulongfang wrote:
+> On 2024/11/1 6:04, Alex Williamson wrote:
+>> On Fri, 25 Oct 2024 17:01:42 +0800
+>> Longfang Liu <liulongfang@huawei.com> wrote:
+>>
+>>> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
+>>> enabled, the debug function is registered for the live migration driver
+>>> of the HiSilicon accelerator device.
+>>>
+>>> After registering the HiSilicon accelerator device on the debugfs
+>>> framework of live migration of vfio, a directory file "hisi_acc"
+>>> of debugfs is created, and then three debug function files are
+>>> created in this directory:
+>>>
+>>>    vfio
+>>>     |
+>>>     +---<dev_name1>
+>>>     |    +---migration
+>>>     |        +--state
+>>>     |        +--hisi_acc
+>>>     |            +--dev_data
+>>>     |            +--migf_data
+>>>     |            +--cmd_state
+>>>     |
+>>>     +---<dev_name2>
+>>>          +---migration
+>>>              +--state
+>>>              +--hisi_acc
+>>>                  +--dev_data
+>>>                  +--migf_data
+>>>                  +--cmd_state
+>>>
+>>> dev_data file: read device data that needs to be migrated from the
+>>> current device in real time
+>>> migf_data file: read the migration data of the last live migration
+>>> from the current driver.
+>>> cmd_state: used to get the cmd channel state for the device.
+>>>
+>>> +----------------+        +--------------+       +---------------+
+>>> | migration dev  |        |   src  dev   |       |   dst  dev    |
+>>> +-------+--------+        +------+-------+       +-------+-------+
+>>>         |                        |                       |
+>>>         |                 +------v-------+       +-------v-------+
+>>>         |                 |  saving_migf |       | resuming_migf |
+>>>   read  |                 |     file     |       |     file      |
+>>>         |                 +------+-------+       +-------+-------+
+>>>         |                        |          copy         |
+>>>         |                        +------------+----------+
+>>>         |                                     |
+>>> +-------v--------+                    +-------v--------+
+>>> |   data buffer  |                    |   debug_migf   |
+>>> +-------+--------+                    +-------+--------+
+>>>         |                                     |
+>>>    cat  |                                 cat |
+>>> +-------v--------+                    +-------v--------+
+>>> |   dev_data     |                    |   migf_data    |
+>>> +----------------+                    +----------------+
+>>>
+>>> When accessing debugfs, user can obtain the most recent status data
+>>> of the device through the "dev_data" file. It can read recent
+>>> complete status data of the device. If the current device is being
+>>> migrated, it will wait for it to complete.
+>>> The data for the last completed migration function will be stored
+>>> in debug_migf. Users can read it via "migf_data".
+>>>
+>>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>>> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>> ---
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 204 ++++++++++++++++++
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>>>  2 files changed, 211 insertions(+)
+>>>
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> index a8c53952d82e..0577d4ddfb34 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
+>>>  	mutex_unlock(&migf->lock);
+>>>  }
+>>>  
+>>> +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>> +	struct hisi_acc_vf_migration_file *src_migf)
+>>> +{
+>>> +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev->debug_migf;
+>>> +
+>>> +	if (!dst_migf)
+>>> +		return;
+>>> +
+>>> +	dst_migf->total_length = src_migf->total_length;
+>>> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
+>>> +		sizeof(struct acc_vf_data));
+>>> +}
+>>> +
+>>>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>>  {
+>>>  	if (hisi_acc_vdev->resuming_migf) {
+>>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev->resuming_migf);
+>>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
+>>>  		fput(hisi_acc_vdev->resuming_migf->filp);
+>>>  		hisi_acc_vdev->resuming_migf = NULL;
+>>>  	}
+>>>  
+>>>  	if (hisi_acc_vdev->saving_migf) {
+>>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev->saving_migf);
+>>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
+>>>  		fput(hisi_acc_vdev->saving_migf->filp);
+>>>  		hisi_acc_vdev->saving_migf = NULL;
+>>> @@ -1294,6 +1309,140 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>>>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+>>>  }
+>>>  
+>>> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device *vdev)
+>>> +{
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>> +	int ret;
+>>> +
+>>> +	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
+>>> +	/*
+>>> +	 * When the device is not opened, the io_base is not mapped.
+>>> +	 * The driver cannot perform device read and write operations.
+>>> +	 */
+>>> +	if (!hisi_acc_vdev->dev_opened) {
+>>> +		seq_printf(seq, "device not opened!\n");
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	ret = qm_wait_dev_not_ready(vf_qm);
+>>> +	if (ret) {
+>>> +		seq_printf(seq, "VF device not ready!\n");
+>>> +		return -EBUSY;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>> +	u64 value;
+>>> +	int ret;
+>>> +
+>>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>>> +	if (ret) {
+>>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
+>>> +	if (value == QM_MB_CMD_NOT_READY) {
+>>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>> +		seq_printf(seq, "mailbox cmd channel not ready!\n");
+>>> +		return -EINVAL;
+>>> +	}
+>>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>> +	seq_printf(seq, "mailbox cmd channel ready!\n");
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>>> +	struct acc_vf_data *vf_data = NULL;
+>>
+>> Nit, this initialization is unnecessary.
+>>
 > 
-> For guest fatalities, the most glaring issue is that KVM fails to ensure
-> tracing is disabled, and *stays* disabled prior to VM-Enter, which is
-> necessary as hardware disallows loading (the guest's) RTIT_CTL if tracing
-> is enabled (enforced via a VMX consistency check).  Per the SDM:
+> OK, delete it in next version.
 > 
->   If the logical processor is operating with Intel PT enabled (if
->   IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the "load
->   IA32_RTIT_CTL" VM-entry control must be 0.
+>>> +	int ret;
+>>> +
+>>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>>> +	if (ret) {
+>>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	mutex_lock(&hisi_acc_vdev->state_mutex);
+>>> +	vf_data = kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
+>>> +	if (!vf_data) {
+>>> +		ret = -ENOMEM;
+>>> +		goto mutex_release;
+>>> +	}
+>>> +
+>>> +	vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
+>>> +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
+>>> +	if (ret)
+>>> +		goto migf_err;
+>>> +
+>>> +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>>> +			(unsigned char *)vf_data,
+>>
+>> Casting to (const void *) would match the prototype.  This line should
+>> also wrap to just inside the opening parenthesis of the previous line, 2
+>> tabs, 5 spaces.
+>>
 > 
-> On the host side, KVM doesn't validate the guest CPUID configuration
-> provided by userspace, and even worse, uses the guest configuration to
-> decide what MSRs to save/load at VM-Enter and VM-Exit.  E.g. configuring
-> guest CPUID to enumerate more address ranges than are supported in hardware
-> will result in KVM trying to passthrough, save, and load non-existent MSRs,
-> which generates a variety of WARNs, ToPA ERRORs in the host, a potential
-> deadlock, etc.
+> OK, I will adjust it in the next version.
 > 
-> Fixes: f99e3daf94ff ("KVM: x86: Add Intel PT virtualization work mode")
-> Cc: stable@vger.kernel.org
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>>> +			vf_data_sz, false);
+>>> +
+>>> +	seq_printf(seq,
+>>> +		 "acc device:\n"
+>>> +		 "guest driver load: %u\n"
+>>> +		 "data size: %lu\n",
+>>> +		 hisi_acc_vdev->vf_qm_state,
+>>> +		 sizeof(struct acc_vf_data));
+>>
+>> Same here and throughout, wrap aligned to the relevant parenthesis.
+>>
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6ed801ffe33f..087504fb1589 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -217,9 +217,11 @@ module_param(ple_window_shrink, uint, 0444);
->  static unsigned int ple_window_max        = KVM_VMX_DEFAULT_PLE_WINDOW_MAX;
->  module_param(ple_window_max, uint, 0444);
->  
-> -/* Default is SYSTEM mode, 1 for host-guest mode */
-> +/* Default is SYSTEM mode, 1 for host-guest mode (which is BROKEN) */
->  int __read_mostly pt_mode = PT_MODE_SYSTEM;
-> +#ifdef CONFIG_BROKEN
->  module_param(pt_mode, int, S_IRUGO);
-> +#endif
+> OK.
+> 
+>> I know you've described vf_qm_state as indicating whether or not the
+>> guest driver is loaded, but I still can't figure out how to discern
+>> that from the code.  It's largely only set based on the return value of
+>> qm_wait_dev_not_ready(), which tests QM_VF_STATE, and describes the
+>> function as testing if the device is ready.  Improved comments would
+>> help future reviews.
+>>
+> 
+> This QM_VF_STATE register will be written to QM_READY when the acc device
+> driver is loaded, and QM_NOT_READY will be written after the device
+> driver is unloaded.
+>> I will add a comment where vf_qm_state is declared.
+> 
+>> What's the purpose of the "acc device:" prefix?
+>>
+> 
+> OK, it can be deleted.
+> 
+>>> +
+>>> +migf_err:
+>>> +	kfree(vf_data);
+>>> +mutex_release:
+>>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>
+>> Locks should be released in the reverse order they were acquired.
+>>
+> 
+> OK.
+> 
+>>> +
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>>> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
+>>> +
+>>> +	/* Check whether the live migration operation has been performed */
+>>> +	if (debug_migf->total_length < QM_MATCH_SIZE) {
+>>> +		seq_printf(seq, "device not migrated!\n");
+>>> +		return -EAGAIN;
+>>> +	}
+>>> +
+>>> +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>>> +			(unsigned char *)&debug_migf->vf_data,
+>>> +			vf_data_sz, false);
+>>> +
+>>> +	seq_printf(seq,
+>>> +		 "acc device:\n"
+>>> +		 "guest driver load: %u\n"
+>>> +		 "device opened: %d\n"
+>>> +		 "migrate data length: %lu\n",
+>>> +		 hisi_acc_vdev->vf_qm_state,
+>>> +		 hisi_acc_vdev->dev_opened,
+>>> +		 debug_migf->total_length);
+>>
+>> This debugfs entry is described as returning the data from the last
+>> migration, but vf_qm_state and dev_opened are relative to the current
+>> device/guest driver state.  Both seem to have no relevance to the data
+>> in debug_migf.
+>>
+> 
+> The benefit of dev_opened retention is that user can obtain the device status
+> during the cat migf_data operation.
+>
 
-Side effects are:
-1. If pt_mode is passed via modprobe, there will be a warning in kernel messages:
-	kvm_intel: unknown parameter 'pt_mode' ignored
-2. The sysfs module parameter file pt_mode will be gone:
-	# cat /sys/module/kvm_intel/parameters/pt_mode
-	cat: /sys/module/kvm_intel/parameters/pt_mode: No such file or directory
+I will remove dev_opened in the next version.
+And hisi_acc_vdev->vf_qm_state is changed to debug_migf->vf_data.vf_qm_state
+Keep information about whether the device driver in the Guest OS is loaded
+when live migration occurs.
 
-Nevertheless:
+Thanks£¬
+Longfang.
 
-Tested-by: Adrian Hunter <adrian.hunter@intel.com>
-
->  
->  struct x86_pmu_lbr __ro_after_init vmx_lbr_caps;
->  
-
+> And vf_qm_state does need to be retained.
+> Because adding a driver or not adding a driver to the Guest OS has a great impact
+> on the results of live migration, it is a key factor. It has a great impact on
+> the success or failure of live migration.
+> 
+> When adding a driver, live migration will read device status data, and data will
+> be written back to device after the migration is completed.
+> When no driver is added, live migration only executes a process. It does not
+> perform data reading and data recovery operations.
+> 
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>>>  {
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+>>> @@ -1305,12 +1454,16 @@ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>>>  		return ret;
+>>>  
+>>>  	if (core_vdev->mig_ops) {
+>>> +		mutex_lock(&hisi_acc_vdev->open_mutex);
+>>>  		ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
+>>>  		if (ret) {
+>>> +			mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>>  			vfio_pci_core_disable(vdev);
+>>>  			return ret;
+>>>  		}
+>>>  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+>>> +		hisi_acc_vdev->dev_opened = true;
+>>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>>  	}
+>>>  
+>>>  	vfio_pci_core_finish_enable(vdev);
+>>> @@ -1322,7 +1475,10 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+>>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>>  
+>>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>> +	hisi_acc_vdev->dev_opened = false;
+>>>  	iounmap(vf_qm->io_base);
+>>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>>  	vfio_pci_core_close_device(core_vdev);
+>>>  }
+>>>  
+>>> @@ -1342,6 +1498,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
+>>>  	hisi_acc_vdev->pf_qm = pf_qm;
+>>>  	hisi_acc_vdev->vf_dev = pdev;
+>>>  	mutex_init(&hisi_acc_vdev->state_mutex);
+>>> +	mutex_init(&hisi_acc_vdev->open_mutex);
+>>>  
+>>>  	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_PRE_COPY;
+>>>  	core_vdev->mig_ops = &hisi_acc_vfio_pci_migrn_state_ops;
+>>> @@ -1387,6 +1544,50 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>>>  	.detach_ioas = vfio_iommufd_physical_detach_ioas,
+>>>  };
+>>>  
+>>> +static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>> +{
+>>> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
+>>> +	struct dentry *vfio_dev_migration = NULL;
+>>> +	struct dentry *vfio_hisi_acc = NULL;
+>>> +	struct device *dev = vdev->dev;
+>>> +	void *migf = NULL;
+>>> +
+>>> +	if (!debugfs_initialized() ||
+>>> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
+>>> +		return;
+>>> +
+>>> +	if (vdev->ops != &hisi_acc_vfio_pci_migrn_ops)
+>>> +		return;
+>>> +
+>>> +	vfio_dev_migration = debugfs_lookup("migration", vdev->debug_root);
+>>> +	if (!vfio_dev_migration) {
+>>> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file), GFP_KERNEL);
+>>> +	if (!migf)
+>>> +		return;
+>>> +	hisi_acc_vdev->debug_migf = migf;
+>>> +
+>>> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
+>>> +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_dev_read);
+>>> +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_migf_read);
+>>> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_debug_cmd);
+>>> +}
+>>> +
+>>> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>> +{
+>>> +	/* If migrn_ops is not used, debug_migf is NULL */
+>>> +	if (hisi_acc_vdev->debug_migf) {
+>>
+>> This test is unnecessary, kfree(NULL) is valid.
+>>
+> 
+> OK, It will be deleted. Comments will also be updated.
+> 
+>>> +		kfree(hisi_acc_vdev->debug_migf);
+>>> +		hisi_acc_vdev->debug_migf = NULL;
+>>> +	}
+>>> +}
+>>> +
+>>>  static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>>  {
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev;
+>>> @@ -1413,6 +1614,8 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
+>>>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
+>>>  	if (ret)
+>>>  		goto out_put_vdev;
+>>> +
+>>> +	hisi_acc_vfio_debug_init(hisi_acc_vdev);
+>>>  	return 0;
+>>>  
+>>>  out_put_vdev:
+>>> @@ -1425,6 +1628,7 @@ static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
+>>>  
+>>>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
+>>> +	hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
+>>>  	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
+>>>  }
+>>>  
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> index 5bab46602fad..2a78ffd060c3 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> @@ -32,6 +32,7 @@
+>>>  #define QM_SQC_VFT_BASE_MASK_V2		GENMASK(15, 0)
+>>>  #define QM_SQC_VFT_NUM_SHIFT_V2		45
+>>>  #define QM_SQC_VFT_NUM_MASK_V2		GENMASK(9, 0)
+>>> +#define QM_MB_CMD_NOT_READY	0xffffffff
+>>>  
+>>>  /* RW regs */
+>>>  #define QM_REGS_MAX_LEN		7
+>>> @@ -99,6 +100,8 @@ struct hisi_acc_vf_migration_file {
+>>>  struct hisi_acc_vf_core_device {
+>>>  	struct vfio_pci_core_device core_device;
+>>>  	u8 match_done;
+>>> +	/* To make sure the device is opened */
+>>
+>> We can infer that from the field name, it would be more useful to
+>> comment that io_base is only valid when dev_opened, which is protected
+>> by open_mutex.
+>>
+> 
+> OK, the comments will be updated according to your instructions.
+> 
+>>> +	bool dev_opened;
+>>
+>> Seems like open_mutex would fit just as well here and have better
+>> proximity to the data it protects.
+>>
+> 
+> OK, I'm going to move it over here.
+> 
+>>>  
+>>>  	/* For migration state */
+>>>  	struct mutex state_mutex;
+>>> @@ -111,5 +114,9 @@ struct hisi_acc_vf_core_device {
+>>>  	int vf_id;
+>>>  	struct hisi_acc_vf_migration_file *resuming_migf;
+>>>  	struct hisi_acc_vf_migration_file *saving_migf;
+>>> +
+>>> +	/* To save migration data */
+>>
+>> Clearly.  Describing it as an extra buffer for reporting migration data
+>> through debugfs might be more useful.  Thanks,
+>>
+> 
+> OK, the comments will be updated according to your instructions.
+> 
+> Thanks.
+> Longfang.
+> 
+>> Alex
+>>
+>>> +	struct hisi_acc_vf_migration_file *debug_migf;
+>>> +	struct mutex open_mutex;
+>>>  };
+>>>  #endif /* HISI_ACC_VFIO_PCI_H */
+>>
+>>
+>> .
+>>
+> 
+> .
+> 
 
