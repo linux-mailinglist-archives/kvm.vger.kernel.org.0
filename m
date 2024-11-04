@@ -1,149 +1,145 @@
-Return-Path: <kvm+bounces-30576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C819BC13E
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 00:03:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB9A9BC19F
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 00:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EDD91F22931
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 23:03:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13118B20F09
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 23:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523201FDF9D;
-	Mon,  4 Nov 2024 23:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4091FE0F2;
+	Mon,  4 Nov 2024 23:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bz6OXLDZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3WO+zhJo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9DA166F29
-	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 23:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE36118C015
+	for <kvm@vger.kernel.org>; Mon,  4 Nov 2024 23:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730761409; cv=none; b=ZSIF+f8BJ0UV9977vpk4oKiurlxZkIsxTWLserBWEPI7qcFSG8CjhS1puGYq06ZlGQkp+ILu6YaPWnSmTxo8JqqrnzQdaY4EKNeVU+0EVzl+G9GMqDeqDD79NJk96EJmyDB9ZSSK7KBYf6o7+cKHdUmq/8KowGv05Wp5NyLRJI0=
+	t=1730764075; cv=none; b=AAVzptMyXc9AP53ekmINL0UkB3Qx0p9bgz3clWHikqpeI62ZhuVWjDmYk6EF9GPCLlGokmyN1Gq755CIQKUaADnG47EHw7uyURBQ+XCBRg2sosZHByGDZnHz1S2AgEY9nBXNlwy2tfIaqYsQJPH/SmcVUjBz1/5vB5gYbxPfHAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730761409; c=relaxed/simple;
-	bh=OFCzxIW1aRKuCDP4ZBg+/guooKUHjyfQX+U386WCXbc=;
+	s=arc-20240116; t=1730764075; c=relaxed/simple;
+	bh=VuTrEz6B0CL5GysxR1XqZO55nsdBJCTkuJOlegC2ybk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CZFuO7Rnhe2Cwg33AL5e9HsxsA5syeNIzXhOFrjttXcBSrAaFHqHMXKZMOD+8zxaNRoAJFI7yUxB9O1WoN3Od/4Tao3LmlNuLZCDhctdpx+I3KJDdQyzPC7nsqABYDZm21JO4qHXPaJKTBZDdPclY+wjh6k+q6K/KfFu/4OxOMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bz6OXLDZ; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=YdLlWnVgNTK5JYaFsf8/xap2lWp2FNLyR6uohCdMj9RYtSIi2iAuXT47/mntzMSSD8lUm8ENK/PqzpYwF15PJnjOmqPn4s9kFfSwiTb81KYW12ap8Yhj4Fiw5hUm8cp3DniSktFBhu3DBUsZzbH8GgAJD2rxgnJe3AfYwpm5prs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3WO+zhJo; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e55c9d23cso3735264b3a.0
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 15:03:27 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e32ff6f578eso5694449276.1
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 15:47:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730761407; x=1731366207; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730764073; x=1731368873; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T1Mz/8fwbax6GoRK0U2Dm3yySugCYydj6rxxh10aGxM=;
-        b=Bz6OXLDZEseLIvsiRlfZJuI8lBOS9roFCaoPn5qHjwo1Jg1QcnvyGFsYKpo1FPffOt
-         +Sjn2oXDL/1e87LGmTU9/lFAlAvoC4QvMpeO+Oe7YYHs68MoDVtAm3XNxT4rBIGPUWSP
-         FuoFFJMLvoJK3bHoKAhe4liPeZXDQ8pnciapeescrJ7dGhmWRq1Ou6yLwZ0e0vhP8qSg
-         BVvriDRLWghECn+wd2fNGskYLrsBDuyOaWE51LMc5bVJ+iKZ/WP1un1UJpy2nmncVEGs
-         WwSDjBg/kTYPsoa2MuAemAoKFZ8YlhC0de1YK4OEdVO7tdllPGJFfiYnot3tEfWgXKRc
-         8Ivg==
+        bh=xLgb93E3IdFKE55fub5g3LbNpslMgv2LsluELOEVe/A=;
+        b=3WO+zhJoclvtWAwEuQ9gGryZ6B2GmLqkMaPgo12KNa3GYoHwy7vIbfhk5UXI8qTXx/
+         5TJ2z5pZ2ruaBg7UShQrq1/G0uu8hQOdGnISD2LDqWZGXJH6MSkGFzsj8238j7GHb6yD
+         vO3Pg5DOCezcrg4+WVohCDlX6vLetQThQC4lOXJp0NAuO/CHQ3+NWrf3rYDut5Pzamqd
+         n0dNetfzOwlfHDTC8x4YOBdQVzO/YuUT5I9zvgaYkxmtAKAQ47JhD9sVwDi3ln7h5N41
+         dOohCH+xcV2v6Gn7aW639ecTqX4vywYqzrwrlXePkiqmndKwDCior/V3XMfRW2f+RB1B
+         lZww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730761407; x=1731366207;
+        d=1e100.net; s=20230601; t=1730764073; x=1731368873;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T1Mz/8fwbax6GoRK0U2Dm3yySugCYydj6rxxh10aGxM=;
-        b=j4wMa8OyhQ3roV2koYH09ODvbmlGHQ6FVocaIBlkBkQxiVHBkQwsXtY4O0OBt4jqOX
-         MZ6hupB+kSznTeD/iw5EHD9lhK4918f6VZW+jWv4xFQCk4djg/AAxaTl1MUbjC2DEdiO
-         utO2Fvfg6IU7o79p/tOds70WWPZjuDzTlUAaj4gfKsUjpVjEs6rQQtLnVcMtZ5ArsVVM
-         xVcMKf5e4okJ0VVWTkb3JpPgcbuWJD1DVqKMi1Vl/EiaL7AjIqi5Vs5uvHjtdYixFz5r
-         w0RAa6IcRczNg/kTJvVn72JfXAM0YPOxjwAJkh0/QRH271G8wuVeV8qo6UcKzSuV4j1W
-         AzeA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDOnwL0/nST4a9nqRntENO7SQzj0D1Ibegw5l/ml/s1R+TNolALs5iC7oaVHmuPds4yqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztSVlLORGtm9VlhpPsWk9t50DLhnQllmAeYEN+iyiCSGLrgUtf
-	Y8FkFccLK9MjaVya4aP6DRnY8y8T0xJtlcjXMabUcCC08/whJdqaRHlBbFDAjM3/MyNEU3E/sgy
-	1yA==
-X-Google-Smtp-Source: AGHT+IEdrKErOUUlhVXttDB5QpU41vsiU/X3Aqyy8XyYnWrl10UXd7jO5Q2He9ErNzBvvYkhA7HYe8lJf1M=
+        bh=xLgb93E3IdFKE55fub5g3LbNpslMgv2LsluELOEVe/A=;
+        b=hzwY1nw662FU4hjUWS2JpCKBF3h3Vy1PM/BsEJQuuJIwcT6JM1iwDG96NVhJ33uHqF
+         ZivODzSuqclxr2hOXZ9fp+bbc9QP4+1yzOFbPkBgWM41RTmBP6go9aDt+R2DEIMT0GFR
+         D/mN6+aGEok7LO4W6f14Jpi949Mov2lZooWcESWG4iGS99Udgw9iqXtG+3S1MM35Mgvx
+         Qgr4qi4+r5yZGuzjNpWaTiKxg0fqLoGDJ017DG0iuwbNSSkdCFhD6TgZrv+3tclx/Y5d
+         zTSerotWSfBEzcnHaqjJhNqpE4LHpol45tWRCLZ9/PlK6ztXWMtJIKr4jzli/sjW3Oeh
+         PbxA==
+X-Gm-Message-State: AOJu0Yw8fCRrUud0A1Bl1MPZdQfiuhICBgvTFXlLuYoVXDkw8ZXSJg1n
+	3cLQ/wyTv4TPOKMMIm+DSPVqsocn1Dnu+B8N7BJ+36yqD4HjUq8Tg1j7gX1I7r49LkQiaKhWNMU
+	OEA==
+X-Google-Smtp-Source: AGHT+IGlEaEwGXJLOuGe7dS/h+aYhSdJnamUhYbSPbu0dExqPSuu9RSvVN/ohcjekyhnvf4uwfUmNaCQo2Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2790:b0:71e:6b3b:9f2d with SMTP id
- d2e1a72fcca58-720bc83e022mr67436b3a.1.1730761407408; Mon, 04 Nov 2024
- 15:03:27 -0800 (PST)
-Date: Mon, 4 Nov 2024 15:03:25 -0800
-In-Reply-To: <004816c9b56ac5b9a56592578caa3a5941045788.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a25:3617:0:b0:e30:d5cf:775a with SMTP id
+ 3f1490d57ef6-e30e8dbf785mr36896276.6.1730764072761; Mon, 04 Nov 2024 15:47:52
+ -0800 (PST)
+Date: Mon, 4 Nov 2024 15:47:51 -0800
+In-Reply-To: <99e64d8e-2d10-41c7-8b7e-cd059c7e7f29@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241101183555.1794700-1-seanjc@google.com> <20241101183555.1794700-10-seanjc@google.com>
- <004816c9b56ac5b9a56592578caa3a5941045788.camel@intel.com>
-Message-ID: <ZylSvX4yjYyhVJxC@google.com>
-Subject: Re: [PATCH v2 9/9] KVM: x86: Short-circuit all of kvm_apic_set_base()
- if MSR value is unchanged
+References: <Zw2fW2AJU-_Yi5U6@google.com> <4984cba7-427a-4065-9fcc-97b9f67163ed@amd.com>
+ <Zx_QJJ1iAYewvP-k@google.com> <71f0fb41-d5a7-450b-ba47-ad6c39dce586@amd.com>
+ <ZyI4cRLsaTQ3FMk7@google.com> <de2a6758-a906-4dc0-b481-6ce73aba24b9@amd.com>
+ <ZyJzcOCPJstrumbE@google.com> <11787a92-66ed-41ef-9623-d6c7220fb861@amd.com>
+ <ZyOv5US9u22lAiPU@google.com> <99e64d8e-2d10-41c7-8b7e-cd059c7e7f29@amd.com>
+Message-ID: <ZyldJ_ociCLg-b9a@google.com>
+Subject: Re: [PATCH v3 2/9] KVM: selftests: Add a basic SNP smoke test
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, pgonda@google.com, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, shuah@kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Nov 04, 2024, Kai Huang wrote:
-> On Fri, 2024-11-01 at 11:35 -0700, Sean Christopherson wrote:
-> > Do nothing in from kvm_apic_set_base() if the incoming MSR value is the
-> > same as the current value, as validating the mode transitions is obviously
-> > unnecessary, and rejecting the write is pointless if the vCPU already has
-> > an invalid value, e.g. if userspace is doing weird things and modified
-> > guest CPUID after setting MSR_IA32_APICBASE.
-> > 
-> > Bailing early avoids kvm_recalculate_apic_map()'s slow path in the rare
-> > scenario where the map is DIRTY due to some other vCPU dirtying the map,
-> > in which case it's the other vCPU/task's responsibility to recalculate the
-> > map.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 7b2342e40e4e..59a64b703aad 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2582,9 +2582,6 @@ static void __kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value)
-> >  	u64 old_value = vcpu->arch.apic_base;
-> >  	struct kvm_lapic *apic = vcpu->arch.apic;
-> >  
-> > -	if (old_value == value)
-> > -		return;
-> > -
+On Mon, Nov 04, 2024, Pratik R. Sampat wrote:
 > 
-> Could you clarify why this is removed?  AFAICT kvm_lapic_reset() still calls
-> directly.
+> 
+> On 10/31/2024 11:27 AM, Sean Christopherson wrote:
+> > On Thu, Oct 31, 2024, Pratik R. Sampat wrote:
+> >> Hi Sean,
+> >>
+> >> On 10/30/2024 12:57 PM, Sean Christopherson wrote:
+> >>> On Wed, Oct 30, 2024, Pratik R. Sampat wrote:
+> >>>> On 10/30/2024 8:46 AM, Sean Christopherson wrote:
+> >>>>> +/* Minimum firmware version required for the SEV-SNP support */
+> >>>>> +#define SNP_FW_REQ_VER_MAJOR   1
+> >>>>> +#define SNP_FW_REQ_VER_MINOR   51
+> >>>>>
+> >>>>> Side topic, why are these hardcoded?  And where did they come from?  If they're
+> >>>>> arbitrary KVM selftests values, make that super duper clear.
+> >>>>
+> >>>> Well, it's not entirely arbitrary. This was the version that SNP GA'd
+> >>>> with first so that kind of became the minimum required version needed.
+> >>>>
+> >>>> I think the only place we've documented this is here -
+> >>>> https://github.com/AMDESE/AMDSEV/tree/snp-latest?tab=readme-ov-file#upgrade-sev-firmware.
+> >>>>
+> >>>> Maybe, I can modify the comment above to say something like -
+> >>>> Minimum general availability release firmware required for SEV-SNP support.
+> >>>
+> >>> Hmm, so if AMD says SNP is only supported for firmware version >= 1.51, why on
+> >>> earth is that not checked and enforced by the kernel?  Relying on userspace to
+> >>> not crash the host (or worse) because of unsupported firmware is not a winning
+> >>> strategy.
+> >>
+> >> We do check against the firmware level 1.51 while setting things up
+> >> first (drivers/crypto/ccp/sev-dev.c:__sev_snp_init_locked()) and we bail
+> >> out if it's otherwise. From the userspace, calls to KVM_SEV_INIT2 or any
+> >> other corresponding SNP calls should fail cleanly without any adverse
+> >> effects to the host.
+> > 
+> > And I'm saying, that's not good enough.  If the platform doesn't support SNP,
+> > the KVM *must not* advertise support for SNP.
+> > 
+> 
+> Sure, fair to expect this. Currently, if the FW check fails, SNP is not
+> setup and there is nothing that indicates in the KVM capabilities (apart
+> from one dmesg error) that the support does not exist.
+> 
+> One thing I could do (as an independent patch) is to introduce a CC API
+> that abstracts the FW version check made by the CCP module. Since sev
+> platform status can be gotten before INIT to extract the major and minor
+> version numbers, KVM can also call into this API and use that to decide
+> if the KVM capabilities for SNP must be set or not.
 
-It does, but in that case, @old_value is guaranteed to be zero, and @value is
-guaranteed to be non-zero, i.e. the check is unnecesary.  At that point, the
-check in __kvm_apic_set_base() is 100% dead code, and I think it would do more
-harm than good, e.g. might confuse readers.
+Why is CC_ATTR_HOST_SEV_SNP set if hardware/firmware can't actually support SNP?
+KVM shouldn't have to care about some arbitrary firmware API version, the whole
+point of a driver is so that KVM doesn't have to deal with such details.
 
-I thought about adding a WARN, but that seems excessive.
-
-That said, the changelog definitely needs to explain why the check is moved from
-__kvm_apic_set_base(), as opposed to another check being added.  How about this?
-
---
-Do nothing in all of kvm_apic_set_base(), not just __kvm_apic_set_base(),
-if the incoming MSR value is the same as the current value.  Validating
-the mode transitions is obviously unnecessary, and rejecting the write is
-pointless if the vCPU already has an invalid value, e.g. if userspace is
-doing weird things and modified guest CPUID after setting MSR_IA32_APICBASE.
-
-Bailing early avoids kvm_recalculate_apic_map()'s slow path in the rare
-scenario where the map is DIRTY due to some other vCPU dirtying the map,
-in which case it's the other vCPU/task's responsibility to recalculate the
-map.
-
-Note, kvm_lapic_reset() calls __kvm_apic_set_base() only when emulating
-RESET, in which case the old value is guaranteed to be zero, and the new
-value is guaranteed to be non-zero.  I.e. all callers of
-__kvm_apic_set_base() effectively pre-check for the MSR value actually
-changing.  Don't bother keeping the check in __kvm_apic_set_base(), as no
-additional callers are expected, and implying that the MSR might already
-be non-zero at the time of kvm_lapic_reset() could confuse readers.
---
+I'm a-ok with a KVM selftest *asserting* that the kernel isn't broken, but KVM
+itself shouldn't need to manually check the firmware version.
 
