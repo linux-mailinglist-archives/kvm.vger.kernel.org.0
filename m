@@ -1,74 +1,72 @@
-Return-Path: <kvm+bounces-30457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A6E9BAE69
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:45:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC5889BAE6D
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 09:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C66911F22B49
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:45:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF2011C218A7
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 08:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4401AB507;
-	Mon,  4 Nov 2024 08:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B9A1AB517;
+	Mon,  4 Nov 2024 08:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fjeKMbNh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U3mXCPQN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C7718BC21;
-	Mon,  4 Nov 2024 08:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB76C1422D4;
+	Mon,  4 Nov 2024 08:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730709897; cv=none; b=k04oOyWCor4zgaYWaJs0Qdswsc5XT580nJXCAodHSmNnL2LDikRA1cBkbiDtdx8pjK637YgdEqqH/sDKciV0xoPbI0upcEdX9S9SSPmXJ8UElx2n6LiUgHLbHXl1Flmlroyf03u6zw5t9VqewikyuttGjssL/ZrVJJ8IfftRKmY=
+	t=1730709930; cv=none; b=Xo4JrVVyG6oUpQnRusOsc82WZzlgOh3TRnIxFCWcqgcDkQMuRNoAc/kuBKLvwQEKjYfi0/G8NP3U5YE2sLZ1xtZuL011hEFO4htQKzcVj311RmpTcDfI767chhkdztWXTDKVBS4s5CE0i1N9DG6BVxBI4eWZaF0WlDMkWC26lVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730709897; c=relaxed/simple;
-	bh=WXe+1g9hJjbnrumUeVMcn94TiAct027Qwd/gvVK+69s=;
+	s=arc-20240116; t=1730709930; c=relaxed/simple;
+	bh=2/5Ky+jC5gjVZXuR/smrXJRvzH5WRkbXn2obO6nTz5w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=luIZ5gyZMUQNXtq7htI8wsIDrSWJqcA3B6pR4DGXS7aG9buZwiKeSxM6GOMdIglvk8LiJs0oQJOhnf8gsQ9hWDfBabOYy0PgNXy9afmwiD3ShtMyrf5Gi1Mki5rEEQ8NttWTlllHqHlcM8RpDTrqqKHGQr1DNeszfnTfhCRyYHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fjeKMbNh; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=IjFK+5GYy9BMmsFKWKXjsI9RE5mUEz7kQVmy4zD6iBdadwdGkEUEEf6PeBYNeHca6gomragCywbcNaV2aGH/QkiiRacn8TPZsAfzdkKtuHj/yXbkRYgA/lrCBRq8oYdW8wql/+isL3D9bIU3Xpyvs+4ozkeRPoR9X5UO1wHPix0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U3mXCPQN; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730709895; x=1762245895;
+  t=1730709929; x=1762245929;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WXe+1g9hJjbnrumUeVMcn94TiAct027Qwd/gvVK+69s=;
-  b=fjeKMbNhd1OcwgEpY9BpbrGOVkKu/Y0RX3kOZiQ7QOUcB3VPXCoQS11a
-   l1o+AG62BAWWU4Rug+v8Pszsb5NFmHBOOtaHa6hgmJed312K+UkmkQ3U4
-   2v6lFSoaTfuEoYh+BoU0hkQ60udhFH9m7yFgveV9Xpz41M0fNN1+ySD25
-   DqcGtVwS676WR8NV36m0qKqVKLYBYpNjOAf9qFBFhel7di3XUgJ7vokNf
-   v+ToqGRKJwXu4oKy3W6UxOedp/6eKvtVlp6942bY/nFAZWRK6SPmuk5nz
-   LmUD7NDfrwGp/c5PCq78SpWCIwg+jPNMskqwY9qVsR7agbdM/AXMWagr+
-   A==;
-X-CSE-ConnectionGUID: 11alLq4ISF+5GryHQe/xwQ==
-X-CSE-MsgGUID: y7d/saQqQ7OZnupx3Ni9XA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40946474"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40946474"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:44:55 -0800
-X-CSE-ConnectionGUID: ygr69nuUQB21KWVr/PJ+Ig==
-X-CSE-MsgGUID: DPVo+WaqQIqCFp5wUyLBBA==
+  bh=2/5Ky+jC5gjVZXuR/smrXJRvzH5WRkbXn2obO6nTz5w=;
+  b=U3mXCPQNyScr4NgdPruGnBK7MiDMwzhcgMDkLjcAy23cTO+OHvb16Q49
+   hIqRrfdQSd6Hg4XExhoObmTj0nlLxE4wg2d3l69DDi619bnmFTyFXMxDi
+   iL5uMmAp4JxUZB0F84RDkVho4X+e0yrNd0pvXgf6z2bH6/aD1e2bcgBcw
+   /xziyXCbiG5x1gN7u9CDfRQ6GX/+tT07nf878kZTajtZw+5rYjE8sP44g
+   DJd5Bl8Pzrv1fd/gPAUJs3Qlt3x/TBUT6u1ZIKicDN23s/4bkKxbrMZRQ
+   +3vtQjjzJeFUHRbqT/SnjHNlBMC4DeVMQyrdEpiYtYcA1lvNanzqE3vh4
+   g==;
+X-CSE-ConnectionGUID: csutf2fCQEqPxAm1m7ZISw==
+X-CSE-MsgGUID: dBsrUo0PR0agPPOiijgY+A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="29824335"
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="29824335"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:45:28 -0800
+X-CSE-ConnectionGUID: 5QDdrfw8QH+l0ctJyqaGrA==
+X-CSE-MsgGUID: fq6N5rDITgCTh03ASNidTQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="83927932"
+   d="scan'208";a="83473311"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:44:53 -0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:45:26 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
 Cc: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	kernel test robot <lkp@intel.com>,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 1/2] KVM: x86/tdp_mmu: Use rcu_dereference() to protect sptep for dereferencing
-Date: Mon,  4 Nov 2024 16:42:29 +0800
-Message-ID: <20241104084229.29882-1-yan.y.zhao@intel.com>
+Subject: [PATCH 2/2] KVM: guest_memfd: Remove RCU-protected attribute from slot->gmem.file
+Date: Mon,  4 Nov 2024 16:43:03 +0800
+Message-ID: <20241104084303.29909-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20241104084137.29855-1-yan.y.zhao@intel.com>
 References: <20241104084137.29855-1-yan.y.zhao@intel.com>
@@ -80,76 +78,128 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Remove the RCU-protected attribute from slot->gmem.file. No need to use RCU
+primitives rcu_assign_pointer()/synchronize_rcu() to update this pointer.
 
-Use rcu_dereference() to copy the RCU-protected pointer sptep into a local
-variable for later dereferencing. This also checks that the dereferencing
-occurs within the RCU read-side critical section.
+- slot->gmem.file is updated in 3 places:
+  kvm_gmem_bind(), kvm_gmem_unbind(), kvm_gmem_release().
+  All of them are protected by kvm->slots_lock.
 
-Change is_mirror_sptep()'s input type from "u64 *" to "tdp_ptep_t" (typedef
-as "u64 __rcu *") to centralize the call of rcu_dereference().
+- slot->gmem.file is read in 2 paths:
+  (1) kvm_gmem_populate
+        kvm_gmem_get_file
+        __kvm_gmem_get_pfn
 
-Opportunistically, since try_cmpxchg64() is now the only place in
-__tdp_mmu_set_spte_atomic() that dereferences the local variable, move
-the rcu_dereference() call closer to its point of use.
+  (2) kvm_gmem_get_pfn
+         kvm_gmem_get_file
+         __kvm_gmem_get_pfn
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202410121644.Eq7zRGPO-lkp@intel.com
-Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+  Path (1) kvm_gmem_populate() requires holding kvm->slots_lock, so
+  slot->gmem.file is protected by the kvm->slots_lock in this path.
+
+  Path (2) kvm_gmem_get_pfn() does not require holding kvm->slots_lock.
+  However, it's also not guarded by rcu_read_lock() and rcu_read_unlock().
+  So synchronize_rcu() in kvm_gmem_unbind()/kvm_gmem_release() actually
+  will not wait for the readers in kvm_gmem_get_pfn() due to lack of RCU
+  read-side critical section.
+
+  The path (2) kvm_gmem_get_pfn() is safe without RCU protection because:
+  a) kvm_gmem_bind() is called on a new memslot, before the memslot is
+     visible to kvm_gmem_get_pfn().
+  b) kvm->srcu ensures that kvm_gmem_unbind() and freeing of a memslot
+     occur after the memslot is no longer visible to kvm_gmem_get_pfn().
+  c) get_file_active() ensures that kvm_gmem_get_pfn() will not access the
+     stale file if kvm_gmem_release() sets it to NULL.  This is because if
+     kvm_gmem_release() occurs before kvm_gmem_get_pfn(), get_file_active()
+     will return NULL; if get_file_active() does not return NULL,
+     kvm_gmem_release() should not occur until after kvm_gmem_get_pfn()
+     releases the file reference.
+
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
- arch/x86/kvm/mmu/spte.h    | 4 ++--
- arch/x86/kvm/mmu/tdp_mmu.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ include/linux/kvm_host.h |  2 +-
+ virt/kvm/guest_memfd.c   | 23 ++++++++++-------------
+ 2 files changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 8496a2abbde2..ef322f972948 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -267,9 +267,9 @@ static inline struct kvm_mmu_page *root_to_sp(hpa_t root)
- 	return spte_to_child_sp(root);
- }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c7e4f8be3e17..3c3088a9e336 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -600,7 +600,7 @@ struct kvm_memory_slot {
  
--static inline bool is_mirror_sptep(u64 *sptep)
-+static inline bool is_mirror_sptep(tdp_ptep_t sptep)
- {
--	return is_mirror_sp(sptep_to_sp(sptep));
-+	return is_mirror_sp(sptep_to_sp(rcu_dereference(sptep)));
- }
+ #ifdef CONFIG_KVM_PRIVATE_MEM
+ 	struct {
+-		struct file __rcu *file;
++		struct file *file;
+ 		pgoff_t pgoff;
+ 	} gmem;
+ #endif
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 651c2f08df62..9d9bf3d033bd 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -267,9 +267,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
+ 	filemap_invalidate_lock(inode->i_mapping);
  
- static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b0e1c4cb3004..2741b6587ec9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -511,7 +511,7 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
- 	 * page table has been modified. Use FROZEN_SPTE similar to
- 	 * the zapping case.
- 	 */
--	if (!try_cmpxchg64(sptep, &old_spte, FROZEN_SPTE))
-+	if (!try_cmpxchg64(rcu_dereference(sptep), &old_spte, FROZEN_SPTE))
- 		return -EBUSY;
- 
- 	/*
-@@ -637,8 +637,6 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 							 struct tdp_iter *iter,
- 							 u64 new_spte)
- {
--	u64 *sptep = rcu_dereference(iter->sptep);
+ 	xa_for_each(&gmem->bindings, index, slot)
+-		rcu_assign_pointer(slot->gmem.file, NULL);
 -
+-	synchronize_rcu();
++		WRITE_ONCE(slot->gmem.file, NULL);
+ 
  	/*
- 	 * The caller is responsible for ensuring the old SPTE is not a FROZEN
- 	 * SPTE.  KVM should never attempt to zap or manipulate a FROZEN SPTE,
-@@ -662,6 +660,8 @@ static inline int __must_check __tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 		if (ret)
- 			return ret;
- 	} else {
-+		u64 *sptep = rcu_dereference(iter->sptep);
-+
- 		/*
- 		 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs
- 		 * and does not hold the mmu_lock.  On failure, i.e. if a
+ 	 * All in-flight operations are gone and new bindings can be created.
+@@ -298,8 +296,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
+ 	/*
+ 	 * Do not return slot->gmem.file if it has already been closed;
+ 	 * there might be some time between the last fput() and when
+-	 * kvm_gmem_release() clears slot->gmem.file, and you do not
+-	 * want to spin in the meanwhile.
++	 * kvm_gmem_release() clears slot->gmem.file.
+ 	 */
+ 	return get_file_active(&slot->gmem.file);
+ }
+@@ -510,11 +507,11 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	}
+ 
+ 	/*
+-	 * No synchronize_rcu() needed, any in-flight readers are guaranteed to
+-	 * be see either a NULL file or this new file, no need for them to go
+-	 * away.
++	 * memslots of flag KVM_MEM_GUEST_MEMFD are immutable to change, so
++	 * kvm_gmem_bind() must occur on a new memslot.
++	 * Readers are guaranteed to see this new file.
+ 	 */
+-	rcu_assign_pointer(slot->gmem.file, file);
++	WRITE_ONCE(slot->gmem.file, file);
+ 	slot->gmem.pgoff = start;
+ 
+ 	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
+@@ -550,8 +547,7 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
+ 
+ 	filemap_invalidate_lock(file->f_mapping);
+ 	xa_store_range(&gmem->bindings, start, end - 1, NULL, GFP_KERNEL);
+-	rcu_assign_pointer(slot->gmem.file, NULL);
+-	synchronize_rcu();
++	WRITE_ONCE(slot->gmem.file, NULL);
+ 	filemap_invalidate_unlock(file->f_mapping);
+ 
+ 	fput(file);
+@@ -563,11 +559,12 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
+ 					pgoff_t index, kvm_pfn_t *pfn,
+ 					bool *is_prepared, int *max_order)
+ {
++	struct file *gmem_file = READ_ONCE(slot->gmem.file);
+ 	struct kvm_gmem *gmem = file->private_data;
+ 	struct folio *folio;
+ 
+-	if (file != slot->gmem.file) {
+-		WARN_ON_ONCE(slot->gmem.file);
++	if (file != gmem_file) {
++		WARN_ON_ONCE(gmem_file);
+ 		return ERR_PTR(-EFAULT);
+ 	}
+ 
 -- 
 2.43.2
 
