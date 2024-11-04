@@ -1,147 +1,156 @@
-Return-Path: <kvm+bounces-30557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03CF69BB8A6
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 16:11:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA9B9BB9E4
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 17:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB615283AE6
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 15:11:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C5721F22684
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2024 16:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AA51BDA95;
-	Mon,  4 Nov 2024 15:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3741C2DB4;
+	Mon,  4 Nov 2024 16:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxceTN5N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="atgnDu0k"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3407D4A08;
-	Mon,  4 Nov 2024 15:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBE01C07F7;
+	Mon,  4 Nov 2024 16:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730733096; cv=none; b=KEnJpt3f8QHCEV6AttZFYTsAr5voZ5++aWHrEtSmxGw468dfa8lIjKXpr2XlL4zKWZZMVW07fJTtCETZJ4elgnhQTINg+a7OVgdlBF9XB9/zg9onRGhZKyhzGWYhuQF2DfkWMaYINi+o1yyj5SfFZl82Gw6dSg7Th6tn6sipj8w=
+	t=1730736673; cv=none; b=YL5gQfrUk6KJdQ2h9MJovxcAGkaH3RoTksfo+4Uu9gP6L+kP2DQTKcpHzm8DHMI+RYA2yTQYABUb8BgU3UffMnhIMVXjKDROmHzJoi77orLYOHGK7yh2310qoLaj5EsYv4+1gHNgHTTZoDhUgbWp994fvt4XG2rT7eyoUHWQ6f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730733096; c=relaxed/simple;
-	bh=kTcIvo7yioetmpNQbu0IC5h4s6IrPCBWdMVl5D73t7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/4MfXs2h+9gsFfPmilwtAYpQkgUwk6S05C5oHqmpFIz0Z9ZYutPwMQ+02wIfwFjKa/SJePEV8nX4ww7DplNcppNQMooYqFZBBLZJrISpYPeYMGfTWodu6hbYc9zeoLV6UvkhQrCFz9FLv94WDE4yj9jV1tO49q6IgZ/Fc1KT4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxceTN5N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3BEC4CECE;
-	Mon,  4 Nov 2024 15:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730733095;
-	bh=kTcIvo7yioetmpNQbu0IC5h4s6IrPCBWdMVl5D73t7g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lxceTN5NoMnOb7R/VPtFgRQBTl8fQIQGc+4Gk8OT4K//G+8yFdf1m763nh4hbSYjQ
-	 Q8L0dM+aIbjCHQBdLLToU6JHIkL0xE1N1MhABdTFa4no5VZJo28LxZQQBoWB/t2irM
-	 h5+K4mIJXpoBeCpFomfpoaJA0yVQ95MKtcPaM1xFuLRiXCcZpu4o9nJ6qlaqTN5121
-	 YfE8P7UqD3VEHAvSGFS2dsG4TFkL6XuDxtv562XTMv3j6/0Cdx0wFHXFycCvk81Ndz
-	 w+K2Nd4Qks64XUx2V2qChbExvIWBEDSFoFlvjbEWoQUHMeDg67rC+qPPhYHGReiBK2
-	 bN5bKB2JDwa6w==
-Date: Mon, 4 Nov 2024 16:11:23 +0100
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, sami.mujawar@arm.com,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Miguel Luis <miguel.luis@oracle.com>
-Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
- hibernate
-Message-ID: <ZyjkGwkrQ+R+fI8m@lpieralisi>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
- <20241019172459.2241939-7-dwmw2@infradead.org>
- <ZyPEn4qhaYyYqrzk@lpieralisi>
- <ZyUUh6KawapLkj0z@lpieralisi>
- <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+	s=arc-20240116; t=1730736673; c=relaxed/simple;
+	bh=xlwG91sqvbwr8gY7k/hOnYyoca121yxMkzroWr0NrrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LFfKZ17FeAsILyGizswoz/i1s/cprXjOaEtP2ylkJffaEx35KqYNgZJSSBNH0qMzym0oFwfjRtx0h63Nq4nFYl4EY9FTzJ8YAuuwaKc7GJIHFm4t+ux0CV+y0FnPxJ+aIMp2V++BZA2ZvMYJoUdUiI5o+/tBaFzcufX4stL+NeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=atgnDu0k; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730736672; x=1762272672;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xlwG91sqvbwr8gY7k/hOnYyoca121yxMkzroWr0NrrY=;
+  b=atgnDu0kmc3N355tKAFct8FVjNXrrB4PMGqTuuWGPu84zSsPXiWCfmVb
+   ITUJPHBuGsHvGcczCixNjzW/FS6cVcZCKiyFDMtcj5ycC3JGKnsQCJCH7
+   mhkqSiS++h7/sooUP3wwZxz2x1hvt90mxdDT9+SUcgiE4gYsBHhZgQZbl
+   RYXIyTljr29+hr3ahGfJRpIL/l+yB2JcJU4wQ14AYtJyELrET1w7uvPkZ
+   SgfFRPquhbcHc+tLk9xFN1nhPVIpDYjemNlX0iBrYzlfVm97I4V5ZEC9k
+   6vbgImoPElZCsHD2cJyeV82CI1/xhwHoeU/6PLHncYxmZDNCU/XKf65Cq
+   w==;
+X-CSE-ConnectionGUID: Oj/a+8KHSV2hfXUJISMSLA==
+X-CSE-MsgGUID: k73BR+K5SMKKjbGq6i8Q3Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34133822"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="34133822"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:11:11 -0800
+X-CSE-ConnectionGUID: HM/YiO7VS72V+6Zdzkifrw==
+X-CSE-MsgGUID: yEz47og9SrWC4CZ+iVIkHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="84526115"
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.221.97]) ([10.124.221.97])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 08:11:10 -0800
+Message-ID: <bb90dce4-8963-476a-900b-40c3c00d8aac@intel.com>
+Date: Mon, 4 Nov 2024 08:11:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] x86: cpu/bugs: add support for AMD ERAPS feature
+To: "Shah, Amit" <Amit.Shah@amd.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "x86@kernel.org" <x86@kernel.org>
+Cc: "corbet@lwn.net" <corbet@lwn.net>,
+ "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+ "kai.huang@intel.com" <kai.huang@intel.com>,
+ "pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
+ "jpoimboe@kernel.org" <jpoimboe@kernel.org>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+ "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+ "seanjc@google.com" <seanjc@google.com>, "mingo@redhat.com"
+ <mingo@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, "Moger, Babu"
+ <Babu.Moger@amd.com>, "Das1, Sandipan" <Sandipan.Das@amd.com>,
+ "hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
+ <peterz@infradead.org>, "bp@alien8.de" <bp@alien8.de>,
+ "Kaplan, David" <David.Kaplan@amd.com>
+References: <20241031153925.36216-1-amit@kernel.org>
+ <20241031153925.36216-2-amit@kernel.org>
+ <05c12dec-3f39-4811-8e15-82cfd229b66a@intel.com>
+ <4b23d73d450d284bbefc4f23d8a7f0798517e24e.camel@amd.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <4b23d73d450d284bbefc4f23d8a7f0798517e24e.camel@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 04, 2024 at 02:54:12PM +0100, Ard Biesheuvel wrote:
-> On Fri, 1 Nov 2024 at 18:49, Lorenzo Pieralisi <lpieralisi@kernel.org> wrote:
-> >
-> > [+Ard, Sami, for EFI]
-> >
-> > On Thu, Oct 31, 2024 at 06:55:43PM +0100, Lorenzo Pieralisi wrote:
-> > > On Sat, Oct 19, 2024 at 06:15:47PM +0100, David Woodhouse wrote:
-> > >
-> > > [...]
-> > >
-> > > > +#ifdef CONFIG_HIBERNATION
-> > > > +static int psci_sys_hibernate(struct sys_off_data *data)
-> > > > +{
-> > > > +   /*
-> > > > +    * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
-> > > > +    * and is supported by hypervisors implementing an earlier version
-> > > > +    * of the pSCI v1.3 spec.
-> > > > +    */
-> > >
-> > > It is obvious but with this patch applied a host kernel would start executing
-> > > SYSTEM_OFF2 too if supported in firmware to hibernate, it is not a hypervisor
-> > > only code path.
-> > >
-> > > Related to that: is it now always safe to override
-> > >
-> > > commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and poweroff")
-> > >
-> > > for hibernation ? It is not very clear to me why overriding PSCI for
-> > > poweroff was the right thing to do - tried to follow that patch history but
-> > > the question remains (it is related to UpdateCapsule() but I don't know
-> > > how that applies to the hibernation use case).
-> >
-> > RFC: It is unclear to me what happens in current mainline if we try to
-> > hibernate with EFI runtime services enabled and a capsule update pending (we
-> > issue EFI ResetSystem(EFI_RESET_SHUTDOWN,..) which might not be compatible
-> > with the reset required by the pending capsule update request) what happens
-> > in this case I don't know but at least the choice is all contained in
-> > EFI firmware.
-> >
-> > Then if in the same scenario now we are switching to PSCI SYSTEM_OFF2 for the
-> > hibernate reset I suspect that what happens to the in-flight capsule
-> > update requests strictly depends on what "reset" PSCI SYSTEM_OFF2 will
-> > end up doing ?
-> >
-> > I think this is just a corner case and it is unlikely it has been ever
-> > tested (is it even possible ? Looking at EFI folks) - it would be good
-> > to clarify it at least to make sure we understand this code path.
-> >
-> 
-> I'm not aware of any OS that actually uses capsule update at runtime
-> (both Windows and Linux queue up the capsule and call the
-> UpdateCapsule() runtime service at boot time after a reboot).
-> 
-> So it is unlikely that this would break anything, and I'd actually be
-> inclined to disable capsule update at runtime altogether.
-> 
-> I will also note that hibernation with EFI is flaky in general, given
-> that EFI memory regions may move around
+On 11/4/24 00:58, Shah, Amit wrote:
+> Right - thanks, I'll have to reword that to say the RSB is flushed
+> along with the TLB - so any action that causes the TLB to be flushed
+> will also cause the RSB to be flushed.
 
-Thank you for chiming in, I think we are OK (I don't think this patch
-will create more issues than the ones that are already there for hibernate
-anyway) - the reasoning behind the change is in the commit logs.
+Hold on though.
 
-Lorenzo
+Is there a need for the RSB to be flushed at context switch?  You talked
+about it like there was a need:
+
+> any hardware TLB flush results in flushing of the RSB (aka RAP in
+> AMD spec). This guarantees an RSB flush across context switches.
 
