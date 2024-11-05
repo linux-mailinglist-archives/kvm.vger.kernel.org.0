@@ -1,142 +1,170 @@
-Return-Path: <kvm+bounces-30796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5319BD5D7
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:29:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC309BD5E8
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84B51B21C11
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:29:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 504681F23FC2
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312321FF7BE;
-	Tue,  5 Nov 2024 19:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A2520D511;
+	Tue,  5 Nov 2024 19:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XemYl18E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="giPWTiM5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F321D5AD3
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 19:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76381EB9EC
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 19:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730834935; cv=none; b=N+5TiykOkwVcQ+Q71+GwzeevQ/DonaPMVMcCAQe5oAEcHQK+kOPgNrN27J2qNkG+gRGHh2p/oUCW2+IXeI+6bWBpL6o+cRr7jwUKU4sJ/C+MN7/oQ2k2NP2jrO3fYaOSGWQQnkex/oOOwEvWHd4HOOmptTlzc3iEN7eo5WgqiOg=
+	t=1730835277; cv=none; b=FRZhYfaDb3EbPNDYP/WNwvkS7h+pQZ5oTDizkRCXSQ78ynRjXVDdao/8+CaIXw68KXVLOjej26Ne4LTl3/gHWzBc5wGFiLTkTiVBFspEav1Zr29BLIG6qP69YAJVREiaYkvH5mFCxu8g1rDojgf46fxy0lplus5NSBzQIquFov0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730834935; c=relaxed/simple;
-	bh=aV1GBmfWwECTnh3xy+hQGhDmcKjtbAaLxtRrWStQAok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kczCDhiQpGw2kXIHyGu9WC0qj1RtLmzJFkqaRCIleeFhc0oW4PR7KmUU3I7Wp5ROaOn57uQQGtrOEyiwXhMghh6W39lhrXUun5mTsOiyLuiRR38ecEpGCFFeq005fAwB1xnl5bd5lsLj9UG7zUEZuxfXA7QozXRKrsT3HX5vk4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XemYl18E; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1730835277; c=relaxed/simple;
+	bh=RjOB1weeIm0Fvad3NPlxI/Iwb9RCMfzoaaroDP6RpP4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PbcjSawuA8+FaP7iFOOGb3Jown7du7Gsxe6XFlsuj82zlwH9wbCjGNxxmw4VqYJVvAHb/SmZ9MW20L/NUmixYdqr1G9ZSXCYtfCXtTMbdUOsnTe+3+66tBYFsFvvEA4D69gOTO+ywX1JUdsCWzG8luQNJX905zS3j10DDynaKAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=giPWTiM5; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-50dc984bf5dso1975823e0c.0
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 11:28:53 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e30daaf5928so11224539276.1
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 11:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730834933; x=1731439733; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aV1GBmfWwECTnh3xy+hQGhDmcKjtbAaLxtRrWStQAok=;
-        b=XemYl18ENZvN3AhGGy3XPGd12REf7WovqpTjFmmZIXTXk+o211g4aJoIPUYwLG9HWp
-         tPGwXdVyf8WtMYtIQDZ0ddu6tNh2h7Yq6bjLBI088sF7j0VCK0eqfWx3wLleQbZUJS2s
-         1raZ4CBlvilr/k8+gsB133lxGAd3Q8vrRnEcGbml/5WMnuFS4qFYZozArZXAFiy4axQF
-         Kqpsicibe5EoSuxlEEj1DcXj1nojPYEWop06rg4dX/7Vv3QY4wJq0IK8nOgZBm5pmx94
-         wu2jQYvfV1UpsVQg/aoN3oz8JwmT9mV/lj0nfTmZeFkEK0FXBQsC4RABN69eLcuxlhMM
-         KUIQ==
+        d=google.com; s=20230601; t=1730835275; x=1731440075; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1kDemeRRcfLF2O+g89Ve347OTeAjaVFT/WyHCeg28DI=;
+        b=giPWTiM5zB6ifti71/H8E+i5jhEfFwE2PFq1hexXeTG9atHLEC7i9m0b9e9U25BMrj
+         One6tLdBB4tcJCYbrzyvrw/NmJ16/8DAGUvtGpx6U13toWeEswlC4u6F+Zx4Ri07iKnw
+         LIv62313qRG9+HNT04LsJcwNzRRpOhClZLq2P2YGIyNXiLzTXE1OfKqSK3mN7mMbL0AL
+         AbVtakYT/XDW6nTpuGT0cXBUjuGJHVKs51sT/SX+7xsGrphViUnLID1ovMB7Hr4fa93p
+         53KxDJxFUfc2IZQQ4t/MowJ3py0DpOtyNdobbJ6+/h0CELAb8CWpsW5BLjow9FDJ2AR9
+         9apQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730834933; x=1731439733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aV1GBmfWwECTnh3xy+hQGhDmcKjtbAaLxtRrWStQAok=;
-        b=F7NzoM2SRBHkCP/UuEB6b+ldCtMZ5WwJYOtfQhQAu86zFm74qGljtHfoAIjOAPsbPi
-         n4dnsNnWMCsWbxux2QQ38R6CpklrKuN6HHLiaacUj5sTqzb6fqA+y6t+Dp6C6C4vE38O
-         gcKeBbTxXZhemnN0mqaMr2iK58EH6oDx9KGBPPbwa5gh26IQfrYw/95HCfZu4h+hE2nf
-         hBQJA4z9dYMwSm66UIcY2Ug+5FjOeYKB0TUtZU1i1YZDqn2FxM6juWP7WKGmRC2gSjSc
-         bYZPN/46zqbDQiHdgimMlMr5edQp/XIdbPIowVeK+QxV0qIU2vY4qSOX2uC2m0k0K71v
-         zI+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXoNV714ylO9yx8AseoYLsu1Zelzw/l+zxx4D0SpVgfdw9wAybxvFxWcrzGRA/mQ45ly1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp8CtaUqE7tjYg1FS519hMRSShcA79yYb3jo26AAv+MVbh8vk6
-	UdaiiX8QXWx7I2e4vok/goZWznbkIPcsogkNep+0MUrl49DcTdTPhAkQoixbtafIv/uB+kgO0pF
-	WsLjVQvp/0irWC86TT2jhEGxOggiOei4gh1pD
-X-Google-Smtp-Source: AGHT+IFPlCCiewSZ6qz8bcLHkHivbB20ubjuUQ31T2KZYTtpAPhMRahB4La6g3xvfoM46VOamf93kqFuQDDNQFJVMtw=
-X-Received: by 2002:a05:6102:1890:b0:4a9:61c1:4e56 with SMTP id
- ada2fe7eead31-4a961c14ea1mr12336943137.13.1730834932474; Tue, 05 Nov 2024
- 11:28:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730835275; x=1731440075;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1kDemeRRcfLF2O+g89Ve347OTeAjaVFT/WyHCeg28DI=;
+        b=VfC2Qsf1gYbDeLYNWto5Unr1HXbsb4Kxu3jXiK4kUmhe2U24BpaI8Sd/1jhVULW60D
+         PQ/pvZzmqev/y6AUKdq2Kg56GZaUm9OZj05uKQmm+c+1VHlT45Qcn12Mcn+38IUPCjYY
+         onPh2eDfhIkZaeNTIV4SlDu8S2EFCP7fmlpb0ze/0SBeYOfP+TRHBjD0sLhnTDu+iNEF
+         Rv34zJWar8y02FDMHQB2MTI2fawCTqBodPM0jciT+3wUAHOlJqnjguIrX4DaUtaoFGa/
+         ySzAGutGEJ2t7owp+2ly9d2UqvPoxKXZ6AiZ5BICD/XfyapkWrIidKiBiH+RnOJcAXiQ
+         Xw8g==
+X-Gm-Message-State: AOJu0YyiIwwgfJzXOqhM/cU5yQZbnPA8eRi5YgsEwoZ5ZqGljIq4n3x4
+	DmykH75flCOj+IGfYduRe5lb/0o4aHlzL2wqvxpx3cnVj5XbHKoloAS2TVy/gX9m+9l0CSXb0cI
+	RTA2wLDzg23Q/gX8ZyoBJyb51XwON8gQMUABWPV3lsVAH7hYEH5NdDdyWDRcgs0o4+W5S8OR4Tu
+	o54Ojnx+FnF9rygqM8SnuBQaZ8FICmhAKrd6GC6bFVjv83JDii2CUUhDI=
+X-Google-Smtp-Source: AGHT+IEfQN1GX0nvXB8mRoHxNkSjhHGvcGwolBcEqfNEKCNyhhGmJmIBlngJwnRFkHrfsc5HAiabELF0rMUBpWgruw==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c96f])
+ (user=jingzhangos job=sendgmr) by 2002:a25:ff19:0:b0:e2b:d0e9:1cdc with SMTP
+ id 3f1490d57ef6-e33110bc767mr17266276.10.1730835274324; Tue, 05 Nov 2024
+ 11:34:34 -0800 (PST)
+Date: Tue,  5 Nov 2024 11:34:18 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241105184333.2305744-1-jthoughton@google.com> <CAOUHufYS0XyLEf_V+q5SCW54Zy2aW5nL8CnSWreM8d1rX5NKYg@mail.gmail.com>
-In-Reply-To: <CAOUHufYS0XyLEf_V+q5SCW54Zy2aW5nL8CnSWreM8d1rX5NKYg@mail.gmail.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Tue, 5 Nov 2024 12:28:15 -0700
-Message-ID: <CAOUHufadf0kmHTY4=gvMtm4LfFFjijYHWmX5VcYqwDEhw18=+A@mail.gmail.com>
-Subject: Re: [PATCH v8 00/11] KVM: x86/mmu: Age sptes locklessly
-To: James Houghton <jthoughton@google.com>, Jonathan Corbet <corbet@lwn.net>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
+Message-ID: <20241105193422.1094875-1-jingzhangos@google.com>
+Subject: [PATCH v1 0/4] Fix a bug in VGIC ITS tables' save/restore
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Colton Lewis <coltonlewis@google.coma>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 5, 2024 at 12:21=E2=80=AFPM Yu Zhao <yuzhao@google.com> wrote:
->
-> On Tue, Nov 5, 2024 at 11:43=E2=80=AFAM James Houghton <jthoughton@google=
-.com> wrote:
-> >
-> > Andrew has queued patches to make MGLRU consult KVM when doing aging[8]=
-.
-> > Now, make aging lockless for the shadow MMU and the TDP MMU. This allow=
-s
-> > us to reduce the time/CPU it takes to do aging and the performance
-> > impact on the vCPUs while we are aging.
-> >
-> > The final patch in this series modifies access_tracking_stress_test to
-> > age using MGLRU. There is a mode (-p) where it will age while the vCPUs
-> > are faulting memory in. Here are some results with that mode:
->
-> Additional background in case I didn't provide it before:
->
-> At Google we keep track of hotness/coldness of VM memory to identify
-> opportunities to demote cold memory into slower tiers of storage. This
-> is done in a controlled manner so that while we benefit from the
-> improved memory efficiency through improved bin-packing, without
-> violating customer SLOs.
->
-> However, the monitoring/tracking introduced two major overheads [1] for u=
-s:
-> 1. the traditional (host) PFN + rmap data structures [2] used to
-> locate host PTEs (containing the accessed bits).
-> 2. the KVM MMU lock required to clear the accessed bits in
-> secondary/shadow PTEs.
->
-> MGLRU provides the infrastructure for us to reach out into page tables
-> directly from a list of mm_struct's, and therefore allows us to bypass
-> the first problem above and reduce the CPU overhead by ~80% for our
-> workloads (90%+ mmaped memory). This series solves the second problem:
-> by supporting locklessly clearing the accessed bits in SPTEs, it would
-> reduce our current KVM MMU lock contention by >80% [3]. All other
-> existing mechanisms, e.g., Idle Page Tracking, DAMON, etc., can also
-> seamlessly benefit from this series when monitoring/tracking VM
-> memory.
->
-> [1] https://lwn.net/Articles/787611/
-> [2] https://docs.kernel.org/admin-guide/mm/idle_page_tracking.html
-> [3] https://research.google/pubs/profiling-a-warehouse-scale-computer/
+This patch series addresses a critical issue in the VGIC ITS tables'
+save/restore mechanism, accompanied by a comprehensive selftest for bug
+reproduction and verification.
 
-And we also ran an A/B experiment on quarter million Chromebooks
-running Android in VMs last year (with an older version of this
-series):
+The identified bug manifests as a failure in VM suspend/resume operations.
+The root cause lies in the repeated suspend attempts often required for
+successful VM suspension, coupled with concurrent device interrupt registration
+and freeing. This concurrency leads to inconsistencies in ITS mappings before
+the save operation, potentially leaving orphaned Device Translation Entries
+(DTEs) and Interrupt Translation Entries (ITEs) in the respective tables.
 
-It reduced PSI by 10% at the 99th percentile and "janks" by 8% at the
-95th percentile, which resulted in an overall improvement in user
-engagement by 16% at the 75th percentile (all statistically
-significant).
+During the subsequent restore operation, encountering these orphaned entries
+can result in two error scenarios:
+* EINVAL Error: If an orphaned entry lacks a corresponding collection ID, the
+  restore operation fails with an EINVAL error.
+* Mapping Corruption: If an orphaned entry possesses a valid collection ID, the
+  restore operation may succeed but with incorrect or lost mappings,
+  compromising system integrity.
+
+The provided selftest facilitates the reproduction of both error scenarios:
+* EINVAL Reproduction: Execute ./vgic_its_tables without any options.
+* Mapping Corruption Reproduction: Execute ./vgic_its_tables -s
+  The -s option enforces identical collection IDs for all mappings.
+* A workaround within the selftest involves clearing the tables before the save
+  operation using the command ./vgic_its_tables -c. With this, we can run the
+  the selftest successfully on host w/o the fix.
+
+The core issue stems from the static linked list implementation of DTEs/ITEs,
+requiring a full table scan to locate the list head during restoration. This
+scan increases the likelihood of encountering orphaned entries.  To rectify
+this, the patch series introduces a dummy head to the list, enabling immediate
+access to the list head and bypassing the scan. This optimization not only
+resolves the bug but also significantly enhances restore performance,
+particularly in edge cases where valid entries reside at the end of the table.
+
+Result from the test demonstrates a remarkable 1000x performance improvement in
+such edge cases. For instance, with a single L2 device table (64KB) and 8192
+mappings (one event per device at the table's end), the restore time is reduced
+from 6 seconds to 6 milliseconds.
+
+Importantly, these modifications maintain compatibility with the existing ITS
+TABLE ABI REV0.
+The table entry was a valid DTE/ITE, or an orphaned DTE/ITE, or an entry of 0.
+The dummy entry added in this patch series presents a fourth kind, which is an
+invalid entry w/ an offset field pointing to the first valid entry in the table.
+The dummy head entry is always the first entry in the table if it exists.
+
+An alternative solution, proposed in patch series [1], involves clearing
+DTEs/ITEs during MAPD/DISCARD commands. While this approach requires fewer code
+changes, it lacks the performance benefits offered by the dummy head solution
+presented in this patch series.
+
+---
+
+* v1:
+  - Based on v6.12-rc6
+
+[1] https://lore.kernel.org/linux-arm-kernel/20240704142319.728-1-jiangkunkun@huawei.com
+
+---
+
+Jing Zhang (4):
+  KVM: selftests: aarch64: Test VGIC ITS tables save/restore
+  KVM: arm64: vgic-its: Add a dummy DTE/ITE if necessary in ITS tables
+    save operation
+  KVM: arm64: vgic-its: Return device/event id instead of offset in ITS
+    tables restore
+  KVM: arm64: vgic-its: Utilize the dummy entry in ITS tables restoring
+
+ arch/arm64/kvm/vgic/vgic-its.c                | 154 +++--
+ arch/arm64/kvm/vgic/vgic.h                    |   6 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/vgic_its_tables.c   | 562 ++++++++++++++++++
+ .../kvm/include/aarch64/gic_v3_its.h          |   3 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
+ .../selftests/kvm/lib/aarch64/gic_v3_its.c    |  24 +-
+ 7 files changed, 713 insertions(+), 41 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_its_tables.c
+
+
+base-commit: 59b723cd2adbac2a34fc8e12c74ae26ae45bf230
+-- 
+2.47.0.199.ga7371fff76-goog
+
 
