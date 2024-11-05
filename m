@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D309BC5BA
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:41:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301C59BC5BB
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:41:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11D94B230A4
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:41:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7868281A9B
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3501FEFAC;
-	Tue,  5 Nov 2024 06:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC641FDFA0;
+	Tue,  5 Nov 2024 06:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O9LaLOdX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OweGKFtz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5500C1FCC63
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E38119047D
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730788806; cv=none; b=Sd/6Mx9naIU29Tl2Pgj/kf5BwsZC/uCMXwNxb683YKbjzeN/cFqvnrfOu2CenKU4O6ceX9MEqRutmOEjspsIpEBO50teq111ViRAL17sn+vq0YDiJjtvmZ91tzCLxo5ZIkKvSdH/Sv+08ziwXEaEbG4bxgDO/uBPRNe3LdX8j/U=
+	t=1730788810; cv=none; b=kfDNjSIzWZzp+obvs5+9tlhHM9M7kuWga6BoNmJAzi9M35fgCDYawOY1smbd5etHRXhWTRgqu6JIsjWRzLLEF3uDXOMx++MxPxUkP84rq+VlWsZE2Zfz05QO725KMqIT5xXt4b8LrXzD+G4y8wzFR5ipWohVEkuaxELnnf40B+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730788806; c=relaxed/simple;
-	bh=P5Dpgnlq8pIkngj4xnDuBRfdAfvVDs1AjzLSgYZekNU=;
+	s=arc-20240116; t=1730788810; c=relaxed/simple;
+	bh=Cd6UQJeNLnYBe3u2FXzM6iswu2YcXGcY/0+XpTAWb5M=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MLKFmiQDIRicHpTFwfiA3Idd56Y1WeNTzVthcvebnsIxMYKyH75Y7x2TPZjBNUKU3q74Psya+/mZ8VSm3xGTX/+TkbFJsbf06yjEceZdyFXYW6k8KvWAS39HT8ci4KbokRcchWkFzvrtwRlG/D1m6AIuLY+v0nQczadBy+KETMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O9LaLOdX; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=l+uVmCczFwj9VOeWrxiROX2PSKoVW+o5n09OfZ7++0SKEW51S7uN+K7Rqn6ybllDr//zb8bOUi6J35QiDaPGO0iCLFehgdDpycwYa/Lohs80pFR8Y2teM6AZCG7JQVo5R6DiRNtDpC9NjjZO61TqYb9uq705uQMbW0m8YtUF5AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OweGKFtz; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730788805; x=1762324805;
+  t=1730788809; x=1762324809;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=P5Dpgnlq8pIkngj4xnDuBRfdAfvVDs1AjzLSgYZekNU=;
-  b=O9LaLOdXX+os+p0sQX33rYz0KO8C28GhlBHTSZ+1DjFue2TPStiDGmwo
-   PeWB9l4T91Z8QplS+UCWfPPBI8oPkb99t5ut52RtDgzMOwwa8OTdbyele
-   ucBSXl0SShdYARGGeutLMU4ygC01Y22LB43J1YK8AEoGFmnuKwYaIwRdQ
-   I52RGBQK0s7NRQx9Kp8NBhM5qGsZ2+629ACPoMJGePgMR7QLxkPosh2Dm
-   xN6+RAszML0LGOkgRr9ak7gRAE+u1Uyx23ADamctYI17I6xSBr1seEGz3
-   JNdnSJX3F/kncE+jNMPg/6YUObQuxN7mn/KiEjIIQmeoaGue0xEeqHE8t
-   g==;
-X-CSE-ConnectionGUID: HXMNOdPHQkauczZRrdDsCg==
-X-CSE-MsgGUID: zCyF67HgQ/2HkhNKITX3LQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689886"
+  bh=Cd6UQJeNLnYBe3u2FXzM6iswu2YcXGcY/0+XpTAWb5M=;
+  b=OweGKFtz9olkZSs9FXw8mN9a59SOgvzlwOh4WEbT/CbbzZPrgz2KDti8
+   13H2rroWiZ/sbEqZsecYKGwJ7upXx9/lWFzZ7igxihg5OyUzbbkhbOE16
+   +XRYsqFCUgqmEEFMPhB3BzAbEVNXzoio0SK8tJKtnfGGLRYi1bJEZo/Ez
+   Qv6abnY0t5yuniE/fW96Rno5HKDacd0EJXvSQxixykxFR5GIwpOydZBRg
+   WIRV3g+neXZBt/c9CRWLdArtMNhlK3kSXI10nwFC55jBoLMbLut0Ulp2V
+   A/YVIOWoWeNmulmrZ0M1/OXsUdoztPm3FPBIRNbcYv6eETH1Ie9yoFRYG
+   Q==;
+X-CSE-ConnectionGUID: ywJ03oHARlSUsK5SqaDRQg==
+X-CSE-MsgGUID: 1+G/l8s7Sy6W0Q/9IgjU5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689898"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30689886"
+   d="scan'208";a="30689898"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:40:05 -0800
-X-CSE-ConnectionGUID: c9TSTQY7QYKD76jrtTi9Dw==
-X-CSE-MsgGUID: zpSR5Yn5SvKva1MN49xPSA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:40:09 -0800
+X-CSE-ConnectionGUID: rHLLn7tpR9W0Ru67Q1UL8w==
+X-CSE-MsgGUID: ttu57Bs2RkOUlOsMPVmdKQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="83989906"
+   d="scan'208";a="83989941"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:40:01 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:40:05 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Riku Voipio <riku.voipio@iki.fi>,
@@ -78,9 +78,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org,
 	xiaoyao.li@intel.com
-Subject: [PATCH v6 52/60] i386/cpu: Expose mark_unavailable_features() for TDX
-Date: Tue,  5 Nov 2024 01:24:00 -0500
-Message-Id: <20241105062408.3533704-53-xiaoyao.li@intel.com>
+Subject: [PATCH v6 53/60] i386/cpu: introduce mark_forced_on_features()
+Date: Tue,  5 Nov 2024 01:24:01 -0500
+Message-Id: <20241105062408.3533704-54-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241105062408.3533704-1-xiaoyao.li@intel.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
@@ -92,40 +92,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Expose mark_unavailable_features() out of cpu.c so that it can be used
-by TDX when features are masked off.
-
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/cpu.c | 4 ++--
- target/i386/cpu.h | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ target/i386/cpu.c | 29 +++++++++++++++++++++++++++++
+ target/i386/cpu.h |  5 +++++
+ 2 files changed, 34 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 8c507ad406e7..e728fb6b9f10 100644
+index e728fb6b9f10..472ab206d8fe 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -5479,8 +5479,8 @@ static bool x86_cpu_have_filtered_features(X86CPU *cpu)
-     return false;
+@@ -5507,6 +5507,35 @@ void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
+     }
  }
  
--static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
--                                      const char *verbose_prefix)
-+void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
-+                               const char *verbose_prefix)
- {
-     CPUX86State *env = &cpu->env;
-     FeatureWordInfo *f = &feature_word_info[w];
++void mark_forced_on_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
++                             const char *verbose_prefix)
++{
++    CPUX86State *env = &cpu->env;
++    FeatureWordInfo *f = &feature_word_info[w];
++    int i;
++
++    if (!cpu->force_features) {
++        env->features[w] |= mask;
++    }
++
++    cpu->forced_on_features[w] |= mask;
++
++    if (!verbose_prefix) {
++        return;
++    }
++
++    for (i = 0; i < 64; ++i) {
++        if ((1ULL << i) & mask) {
++            g_autofree char *feat_word_str = feature_word_description(f, i);
++            warn_report("%s: %s%s%s [bit %d]",
++                        verbose_prefix,
++                        feat_word_str,
++                        f->feat_names[i] ? "." : "",
++                        f->feat_names[i] ? f->feat_names[i] : "", i);
++        }
++    }
++}
++
+ static void x86_cpuid_version_get_family(Object *obj, Visitor *v,
+                                          const char *name, void *opaque,
+                                          Error **errp)
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0cc88c470dfb..e70e7f5ced4b 100644
+index e70e7f5ced4b..b5b1c3917427 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -2444,6 +2444,8 @@ void cpu_set_apic_feature(CPUX86State *env);
- void host_cpuid(uint32_t function, uint32_t count,
-                 uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
+@@ -2135,6 +2135,9 @@ struct ArchCPU {
+     /* Features that were filtered out because of missing host capabilities */
+     FeatureWordArray filtered_features;
+ 
++    /* Features that are forced enabled by underlying hypervisor, e.g., TDX */
++    FeatureWordArray forced_on_features;
++
+     /* Enable PMU CPUID bits. This can't be enabled by default yet because
+      * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
+      * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
+@@ -2446,6 +2449,8 @@ void host_cpuid(uint32_t function, uint32_t count,
  bool cpu_has_x2apic_feature(CPUX86State *env);
-+void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
-+                               const char *verbose_prefix);
+ void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
+                                const char *verbose_prefix);
++void mark_forced_on_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
++                             const char *verbose_prefix);
  
  static inline bool x86_has_cpuid_0x1f(X86CPU *cpu)
  {
