@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-30720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30721-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A47A9BCAC1
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:46:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DEDB9BCAC9
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5E45B226FC
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:45:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 313FC1C2242B
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D381CB9F6;
-	Tue,  5 Nov 2024 10:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6EFB1D2B10;
+	Tue,  5 Nov 2024 10:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NN3q0GqZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bh7gQ7At"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FFB1D174E
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 10:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB85C18DF89
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 10:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730803553; cv=none; b=p6PFYKJDoTkShNZTkVTMlESnwDITrzJYOZfP7KYe4FRl2vBPLzjAGtu8v15GQeAYZPkbF//hkI4hiZnOlK2JFvZcEqEd2nvSwM0f99M7nyAE09phG+0qgKZDAxgVAeV9vVX8DG4Rjpc0AvEd35Z5WRvAoB9t/xMkWCgxzRNnnG8=
+	t=1730803613; cv=none; b=JYSVn/6Od/dzJ0gBELnKMxqsGXcl82tqzXVoh1FlcOJjeD4Ix0y0ocDKXlAXsl6YXc/F0TJk91fyH2fhhsbobUw0aDVz6gvIHBa3TVj8mkn7UJmuGbiVqnjnbL1Lgxp+2yyvF1qmukz62HAfvVQtCaQAur0M3bVyhrHWRr2wdwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730803553; c=relaxed/simple;
-	bh=oYVTDhrXx4ROXIzFc3BsfFU1QfGcuaeSETewCVEnDVs=;
+	s=arc-20240116; t=1730803613; c=relaxed/simple;
+	bh=yLTXfIHizRD39hNPZtozNGZYxJLTeEUcFKgHXap2gMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dNZIaCfQB5K28427n3koomKYl4j33Bh3oHidABhddgbnu6ufT9MW5NN3cmhnSeGwbKIZVpUmBuGHiQ1aboUn4m0Tx+sdAmhdZ4VikVzjVbBCGvo2/yDoqiASynMhMycA7BN5Q9dtNe2Q56Mmn6xljmj5+EAQS4i8KeyrS4NbSpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NN3q0GqZ; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ovnowQXeuR350o1HuuYokYflOaFuV1i1QYFLXYiQFK4x3GB4KJukQ+bt9Sy6svdQX9umW2SiHRmZCLvSE+H6caBlUzmyucfYLvmRvpYJJfoxD+fXsJWIsuU2AL84fdWlPipmdFLDSy4KWxmaKZtCW+wySV5IhQ4vnmQMdeZ2Ea4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bh7gQ7At; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730803550;
+	s=mimecast20190719; t=1730803609;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=a4sSjMu6dy5LcbB+3OMviQ9WUC614rkcnLLhl6yR5pw=;
-	b=NN3q0GqZA700sUYfXxlqcnmYsy/2g9UtWho0Sw6ufaLqAFzV6qpKdPJ0PUHeg648pCoAvr
-	gBR1GNokjXtW0Axj5cMuISAJZy40OFh2/kLP+22V664Exda8TCQwiS2T1DsiqmyC1EJrLg
-	kdnd4KObtcQjOFNuIH/5RoQKv5IUOU8=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/WEwL9TkWSySnRfQq6doKrURf9dgdkbqXzEf7AEuYg4=;
+	b=bh7gQ7AtfrvsVe7BHEuKglw2q9vYmiEuLro3fHUQzSg4UfdozWF5s+wQg2KY3lf5lm5uyT
+	dibpPtxikb9scuZw7ebcLXbzepprCkKzLCH2Ej9N08PABWEKFwnw/yBQQUIUdcERkF5/pX
+	vnZE6gNXo4jBl8nDU0FPjZLAzHyYLx8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-537-4i_KOLDhOV-B2tk-F2jYrQ-1; Tue,
- 05 Nov 2024 05:45:46 -0500
-X-MC-Unique: 4i_KOLDhOV-B2tk-F2jYrQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-367-54uIS3cwMyOIjc-eRyHuIQ-1; Tue,
+ 05 Nov 2024 05:46:46 -0500
+X-MC-Unique: 54uIS3cwMyOIjc-eRyHuIQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E8F61955EE8;
-	Tue,  5 Nov 2024 10:45:44 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D0861956048;
+	Tue,  5 Nov 2024 10:46:44 +0000 (UTC)
 Received: from redhat.com (unknown [10.42.28.52])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E1C53000198;
-	Tue,  5 Nov 2024 10:45:38 +0000 (UTC)
-Date: Tue, 5 Nov 2024 10:45:34 +0000
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7633E19560A2;
+	Tue,  5 Nov 2024 10:46:38 +0000 (UTC)
+Date: Tue, 5 Nov 2024 10:46:34 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
@@ -71,12 +71,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
 	Markus Armbruster <armbru@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
 	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 23/60] headers: Add definitions from UEFI spec for
- volumes, resources, etc...
-Message-ID: <Zyn3TsMTINMpg5zF@redhat.com>
+Subject: Re: [PATCH v6 24/60] i386/tdx: Setup the TD HOB list
+Message-ID: <Zyn3irziLxvAzNCU@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-24-xiaoyao.li@intel.com>
+ <20241105062408.3533704-25-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,38 +84,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241105062408.3533704-24-xiaoyao.li@intel.com>
+In-Reply-To: <20241105062408.3533704-25-xiaoyao.li@intel.com>
 User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Nov 05, 2024 at 01:23:31AM -0500, Xiaoyao Li wrote:
-> Add UEFI definitions for literals, enums, structs, GUIDs, etc... that
-> will be used by TDX to build the UEFI Hand-Off Block (HOB) that is passed
-> to the Trusted Domain Virtual Firmware (TDVF).
+On Tue, Nov 05, 2024 at 01:23:32AM -0500, Xiaoyao Li wrote:
+> The TD HOB list is used to pass the information from VMM to TDVF. The TD
+> HOB must include PHIT HOB and Resource Descriptor HOB. More details can
+> be found in TDVF specification and PI specification.
 > 
-> All values come from the UEFI specification [1], PI spec [2] and TDVF
-> design guide[3].
+> Build the TD HOB in TDX's machine_init_done callback.
 > 
-> [1] UEFI Specification v2.1.0 https://uefi.org/sites/default/files/resources/UEFI_Spec_2_10_Aug29.pdf
-> [2] UEFI PI spec v1.8 https://uefi.org/sites/default/files/resources/UEFI_PI_Spec_1_8_March3.pdf
-> [3] https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.pdf
-> 
+> Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/standard-headers/uefi/uefi.h | 198 +++++++++++++++++++++++++++
->  1 file changed, 198 insertions(+)
->  create mode 100644 include/standard-headers/uefi/uefi.h
 > 
-> diff --git a/include/standard-headers/uefi/uefi.h b/include/standard-headers/uefi/uefi.h
+> ---
+> Changes in v1:
+>   - drop the code of adding mmio resources since OVMF prepares all the
+>     MMIO hob itself.
+> ---
+>  hw/i386/meson.build   |   2 +-
+>  hw/i386/tdvf-hob.c    | 147 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/tdvf-hob.h    |  24 +++++++
+>  target/i386/kvm/tdx.c |  16 +++++
+>  4 files changed, 188 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/i386/tdvf-hob.c
+>  create mode 100644 hw/i386/tdvf-hob.h
+> 
+> diff --git a/hw/i386/meson.build b/hw/i386/meson.build
+> index 3bc1da2b6eb4..7896f348cff8 100644
+> --- a/hw/i386/meson.build
+> +++ b/hw/i386/meson.build
+> @@ -32,7 +32,7 @@ i386_ss.add(when: 'CONFIG_PC', if_true: files(
+>    'port92.c'))
+>  i386_ss.add(when: 'CONFIG_X86_FW_OVMF', if_true: files('pc_sysfw_ovmf.c'),
+>                                          if_false: files('pc_sysfw_ovmf-stubs.c'))
+> -i386_ss.add(when: 'CONFIG_TDX', if_true: files('tdvf.c'))
+> +i386_ss.add(when: 'CONFIG_TDX', if_true: files('tdvf.c', 'tdvf-hob.c'))
+>  
+>  subdir('kvm')
+>  subdir('xen')
+> diff --git a/hw/i386/tdvf-hob.c b/hw/i386/tdvf-hob.c
 > new file mode 100644
-> index 000000000000..b15aba796156
+> index 000000000000..e00de256ea8c
 > --- /dev/null
-> +++ b/include/standard-headers/uefi/uefi.h
-> @@ -0,0 +1,198 @@
+> +++ b/hw/i386/tdvf-hob.c
+> @@ -0,0 +1,147 @@
 > +/*
-> + * Copyright (C) 2020 Intel Corporation
-> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> + * Copyright (c) 2020 Intel Corporation
 > + * Author: Isaku Yamahata <isaku.yamahata at gmail.com>
 > + *                        <isaku.yamahata at intel.com>
 > + *
@@ -132,10 +153,21 @@ On Tue, Nov 05, 2024 at 01:23:31AM -0500, Xiaoyao Li wrote:
 > +
 > + * You should have received a copy of the GNU General Public License along
 > + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
 > + */
 
-Remove the boilerplate text in favour of adding a SPDX tag.
+Remove the boilerplate in favour of the SPDX tag.
+
+
+> diff --git a/hw/i386/tdvf-hob.h b/hw/i386/tdvf-hob.h
+> new file mode 100644
+> index 000000000000..1b737e946a8d
+> --- /dev/null
+> +++ b/hw/i386/tdvf-hob.h
+> @@ -0,0 +1,24 @@
+> +#ifndef HW_I386_TD_HOB_H
+> +#define HW_I386_TD_HOB_H
+
+Add the SPDX tag to this file
 
 
 With regards,
