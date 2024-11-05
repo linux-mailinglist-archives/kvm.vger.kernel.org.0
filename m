@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-30716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06D159BCA99
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:36:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F199BCA9D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF390286364
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:36:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9E632865A0
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B471D2B0F;
-	Tue,  5 Nov 2024 10:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21161D2B17;
+	Tue,  5 Nov 2024 10:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iY08fjO+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CImgJkj5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7281D14EC
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 10:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250822EB1F
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 10:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730802999; cv=none; b=s6da0+re10+fxdF1/ukVZhbpemoAXw9BCv9jmL6Bed7LyJWsryoRYN9dldmAcNzC1GjAP5WeTBGVeR0XoYveir1657veoLqj98b4/EklhByGScMTNVlf08inMYws3kyiRv20LmtuTlI07Sh8PU9hrFkO7zjKb/6VutuNu6ho5nM=
+	t=1730803131; cv=none; b=B6Wp0q1imoxBWfnvwtaavsKokYvALqDBxeCQBQ/n4be9RjkWOQ2BNzxbwgpHGHPFOgQV0QcNKJyvWFcepjgXuX0jkJ1eaKTSXE8fgL1zb9QZ38qCziCBics0L5s17bVhOj8YlJgz8Mo/4+T4FeoGphEXhpOZWtjJCLHa59+SEf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730802999; c=relaxed/simple;
-	bh=0+flqrgj6rNwl+GjVX0DGHa1MrLWnzI5wNNQmMaoslI=;
+	s=arc-20240116; t=1730803131; c=relaxed/simple;
+	bh=29FhFDkFux7c/h96556NBBqwKD8Cve/k3oHkN77e/FM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZJRrHyuuodkp2oAI8Fr/lQ8lkElroV4HW3VAz5LTnf0fwqHmzInwKBBBM8XBFtxLXiwYYEIqMG18klsSfBYBJ1/I8dPGUzD0zsoYNjqUNqWrgKHnzjTaXr+6PTLraFf28WxuIkD7+3ZZzkhnuyoMverKKwFncFNja3jNwV3D5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iY08fjO+; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=iBLQbfYKliQ9wWp+PAp1FrLRA6HEKNbUoC65/qOp3ZBakC+dxOjH6M6IIoz6r7ZiUK9ta6elEpFoSDEoqscTXjrZaFaPcFD/ZV5LlraAEvJhounQbjdExktEz60kQKZwj3zGlVdFe9WjWoJ4QMU+K1bbhlThr4qfXUGi5byDNZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CImgJkj5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730802996;
+	s=mimecast20190719; t=1730803128;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=H0znRKfH8gmYCM0WkzrwE+98pPw9YmwZD9RIHXl2Dek=;
-	b=iY08fjO+naAm3pJ3TZtdBwXEUMjiIndymPNvr9PKZ05DKHwSgRzYY+dA6uigDNIq0k2MFQ
-	Xg4WCPxJKF8QRimrMoRm7Zuhgmj3xwqxE7t3so5txe/poBRtIvZZoWj8fGDZLOxK99BSbF
-	tSPmPdX5LQpW6JN40ukqQnGATVh2o3o=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=sK/6DimcM6s/4CQKE4lNadkNqe4oszzONtph8blZGq0=;
+	b=CImgJkj5BZLuV4onl4hh1FPo6GdomPswPCrL2+3Ag2h/24cOXh5OBwV0AfucxYru3ba44l
+	ZU1TtVcdfgsKskeUReVUy+L2tcsQ7jY2UyK+3H+0SxLYtcIixPbGbLJDZhIkwcWFIq0vNr
+	3ZtKcrNI/1YZeR/Gwvv1vuRFoB4MseY=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-586--NhhC3l6M9yuZexxitc6SQ-1; Tue,
- 05 Nov 2024 05:36:33 -0500
-X-MC-Unique: -NhhC3l6M9yuZexxitc6SQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-2919mB85NKGfOIKEA8-5HA-1; Tue,
+ 05 Nov 2024 05:38:45 -0500
+X-MC-Unique: 2919mB85NKGfOIKEA8-5HA-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F057A19560A1;
-	Tue,  5 Nov 2024 10:36:31 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 730E019560A5;
+	Tue,  5 Nov 2024 10:38:43 +0000 (UTC)
 Received: from redhat.com (unknown [10.42.28.52])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6967C19560A3;
-	Tue,  5 Nov 2024 10:36:26 +0000 (UTC)
-Date: Tue, 5 Nov 2024 10:36:22 +0000
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E60B519560A3;
+	Tue,  5 Nov 2024 10:38:36 +0000 (UTC)
+Date: Tue, 5 Nov 2024 10:38:33 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
@@ -71,11 +71,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
 	Markus Armbruster <armbru@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
 	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 13/60] i386/tdx: Validate TD attributes
-Message-ID: <Zyn1Jhxr8ip0lIcs@redhat.com>
+Subject: Re: [PATCH v6 14/60] i386/tdx: Support user configurable
+ mrconfigid/mrowner/mrownerconfig
+Message-ID: <Zyn1qW36aJeIGqbC@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-14-xiaoyao.li@intel.com>
+ <20241105062408.3533704-15-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,65 +85,113 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241105062408.3533704-14-xiaoyao.li@intel.com>
+In-Reply-To: <20241105062408.3533704-15-xiaoyao.li@intel.com>
 User-Agent: Mutt/2.2.13 (2024-03-09)
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Nov 05, 2024 at 01:23:21AM -0500, Xiaoyao Li wrote:
-> Validate TD attributes with tdx_caps that fixed-0 bits must be zero and
-> fixed-1 bits must be set.
+On Tue, Nov 05, 2024 at 01:23:22AM -0500, Xiaoyao Li wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Besides, sanity check the attribute bits that have not been supported by
-> QEMU yet. e.g., debug bit, it will be allowed in the future when debug
-> TD support lands in QEMU.
+> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
+> can be provided for TDX attestation. Detailed meaning of them can be
+> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f4e0ff92@intel.com/
 > 
+> Allow user to specify those values via property mrconfigid, mrowner and
+> mrownerconfig. They are all in base64 format.
+> 
+> example
+> -object tdx-guest, \
+>   mrconfigid=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
+>   mrowner=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
+>   mrownerconfig=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> 
 > ---
+> Changes in v6:
+>  - refine the doc comment of QAPI properties;
+> 
+> Changes in v5:
+>  - refine the description of QAPI properties and add description of
+>    default value when not specified;
+> 
+> Changes in v4:
+>  - describe more of there fields in qom.json
+>  - free the old value before set new value to avoid memory leak in
+>    _setter(); (Daniel)
+> 
 > Changes in v3:
-> - using error_setg() for error report; (Daniel)
+>  - use base64 encoding instread of hex-string;
 > ---
->  target/i386/kvm/tdx.c | 28 ++++++++++++++++++++++++++--
->  1 file changed, 26 insertions(+), 2 deletions(-)
-> 
+>  qapi/qom.json         | 16 +++++++-
+>  target/i386/kvm/tdx.c | 86 +++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/tdx.h |  3 ++
+>  3 files changed, 104 insertions(+), 1 deletion(-)
+
 > diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 6cf81f788fe0..5a9ce2ada89d 100644
+> index 5a9ce2ada89d..887a5324b439 100644
 > --- a/target/i386/kvm/tdx.c
 > +++ b/target/i386/kvm/tdx.c
-> @@ -20,6 +20,7 @@
->  #include "kvm_i386.h"
->  #include "tdx.h"
+> @@ -13,6 +13,7 @@
 >  
-> +#define TDX_TD_ATTRIBUTES_DEBUG             BIT_ULL(0)
->  #define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
->  #define TDX_TD_ATTRIBUTES_PKS               BIT_ULL(30)
->  #define TDX_TD_ATTRIBUTES_PERFMON           BIT_ULL(63)
-> @@ -141,13 +142,33 @@ static int tdx_kvm_type(X86ConfidentialGuest *cg)
->      return KVM_X86_TDX_VM;
->  }
+>  #include "qemu/osdep.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/base64.h"
+>  #include "qapi/error.h"
+>  #include "qom/object_interfaces.h"
 >  
-> -static void setup_td_guest_attributes(X86CPU *x86cpu)
-> +static int tdx_validate_attributes(TdxGuest *tdx, Error **errp)
-> +{
-> +    if ((tdx->attributes & ~tdx_caps->supported_attrs)) {
-> +            error_setg(errp, "Invalid attributes 0x%lx for TDX VM "
-> +                       "(supported: 0x%llx)",
-> +                       tdx->attributes, tdx_caps->supported_attrs);
+> @@ -222,6 +223,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      X86CPU *x86cpu = X86_CPU(cpu);
+>      CPUX86State *env = &x86cpu->env;
+>      g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
+> +    size_t data_len;
+>      int r = 0;
+>  
+>      QEMU_LOCK_GUARD(&tdx_guest->lock);
+> @@ -232,6 +234,37 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+>      init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
+>                          sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
+>  
+> +#define SHA384_DIGEST_SIZE  48
+
+Don't define this - as of fairly recently, we now have
+QCRYPTO_HASH_DIGEST_LEN_SHA384 in QEMU's "crypto/hash.h"
+header.
+
+> +    if (tdx_guest->mrconfigid) {
+> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrconfigid,
+> +                              strlen(tdx_guest->mrconfigid), &data_len, errp);
+> +        if (!data || data_len != SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrconfigid");
 > +            return -1;
-
-Minor whitespace accident, with indentation too deep.
-
+> +        }
+> +        memcpy(init_vm->mrconfigid, data, data_len);
 > +    }
 > +
-> +    if (tdx->attributes & TDX_TD_ATTRIBUTES_DEBUG) {
-> +        error_setg(errp, "Current QEMU doesn't support attributes.debug[bit 0] "
-> +                         "for TDX VM");
-> +        return -1;
+> +    if (tdx_guest->mrowner) {
+> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrowner,
+> +                              strlen(tdx_guest->mrowner), &data_len, errp);
+> +        if (!data || data_len != SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrowner");
+> +            return -1;
+> +        }
+> +        memcpy(init_vm->mrowner, data, data_len);
 > +    }
 > +
-> +    return 0;
-> +}
+> +    if (tdx_guest->mrownerconfig) {
+> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrownerconfig,
+> +                            strlen(tdx_guest->mrownerconfig), &data_len, errp);
+> +        if (!data || data_len != SHA384_DIGEST_SIZE) {
+> +            error_setg(errp, "TDX: failed to decode mrownerconfig");
+> +            return -1;
+> +        }
+> +        memcpy(init_vm->mrownerconfig, data, data_len);
+> +    }
+> +
+>      r = setup_td_guest_attributes(x86cpu, errp);
+>      if (r) {
+>          return r;
 
 With regards,
 Daniel
