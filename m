@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB849BC57A
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:36:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E0F9BC57B
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:36:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC2F282ECB
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:36:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73BCD1C216D0
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB291F76A8;
-	Tue,  5 Nov 2024 06:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D551FDF90;
+	Tue,  5 Nov 2024 06:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kUVH4UCi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A+LvCwdU"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B791F16B
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACCF1F16B
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730788596; cv=none; b=XL4TMbUK0XlRh7swQQU5378+/5WNNvrm9T3xN3JaKEv0NE/e+iPpaaPQF84SLhFNn51xNDRq/2FcLxanX8vGgEyPl1+Bu1v2cTorkq27mr+7yJyqrU1LzLIpIFQLBc2TQHy5LjDwxVhNmvPy8lS1qA3RBuU4KGTVGP1csrsTw6U=
+	t=1730788600; cv=none; b=qyYXKlJiTrTmEq4wgRRn3Ts4SQeIZNzYfQWYpI+1Ibp6rjfQ/C5paqmm7TNf8CnhP2BYqQWYIJeoo3TgvSdZE46V3uUhM63mgJQmJ2fOTpZD+sJv1+VobamtOiIwGBoLNf1awWQJPwQHXPxdicHc7epaNkUiPYXwAbOoWgKuZGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730788596; c=relaxed/simple;
-	bh=OubJ0frbbHV7MSdZrZwfSjPq/m9f7s+BIewp1R/ME4Y=;
+	s=arc-20240116; t=1730788600; c=relaxed/simple;
+	bh=ou+Mdobmm1tQq2ArTm7wdCK4exn2TLAYJgjckbytn0A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ffkY7IyX+z+jpbr7psu13Vo5IG2Y2cDih0ghfEUIRWXUUwfMzYNVCIOpn9z3vucCTwC9cMJjUi2zcFpnncyJb+L1V53V5oI7E5SKyNl5aF9qDMdFdf29uOe4ezWZDN81vviT1G6POpDR3Up6IKSYZsQGCut/NUXSVBZaFylzMrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kUVH4UCi; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=hmi4RcnnztUTNAFiGj1bep+uvKvsRKCmFPdJRCoGYUobilS18KK1JcPYRV6QDEKqwPLBoaoC5lbXI4D6d0/ErBU5VgZuwQ9D1PvqteUd5Szl0xb60/XCFJucOm1XRGSB9bWDsNFlSSojBesgPA366EkmRY88pLRf4ztfWGTmiuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A+LvCwdU; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730788594; x=1762324594;
+  t=1730788599; x=1762324599;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OubJ0frbbHV7MSdZrZwfSjPq/m9f7s+BIewp1R/ME4Y=;
-  b=kUVH4UCiOhidEEGjsh5PYQPanbuiqGmNBSvowIOzWn2H0WICphbeN0Pd
-   0H0xoMGPoo0neR5r1xWpe/EN2bOdNHXSQwwmuZUsjxFO+RXpATv/Aj/77
-   5ynG2FR1U8LmDiNUwdI8JkzJKCxJjPD+HaXIyMm8yO5H7pv8xfTxSJJ48
-   CGLR8l4rw/NZrzSvj6KiO8MEjPJYyJQwvS8PWtKkHT8JZxl0fmsyIFA2g
-   MqgO2ZLQE433eqSRFo7Npe0V/VmTpcbl+9/xik5pz14CNecK5WqlxOyjJ
-   z418EY+xi5Xl3tqZS/puPHWL+gaC2s6ztuhkhE6KdhuPP8fumvmr3aVx1
-   Q==;
-X-CSE-ConnectionGUID: Of3QTW5VTb2kmBICIRhK1A==
-X-CSE-MsgGUID: +AvS7N7HSkG9FA/ZqT0Izg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689237"
+  bh=ou+Mdobmm1tQq2ArTm7wdCK4exn2TLAYJgjckbytn0A=;
+  b=A+LvCwdUJl5Wt4Xq02ub6C8tEdUDfCBVG7eW6sp0H0emya/Vl85l7fRr
+   DwQVpvih/VqEg9tOlsq3EUZewuE2K47XRzn4ri0UeqyY98OJRqi5MFQCt
+   opQmZI0FqR5agWMXiYrDDsgUscv94CVYTt089SSAj77ab8xuuXVdlairj
+   Z9YtgDC1PWtx6zRqEfdq/bYQ2Qq3Z2FOfATjqBMGOMpF6Y7Bn/C325Dg2
+   lISfNAQ6Bj5wF5uiLFa81faUy8OccApheM1Ma73NArIwNFTMzf0ttJ4wB
+   jyDi14zhzvHTcqe4laKhzjBW96xd8g7FfBuLKJkGRvsFfJettH08jJ3Fq
+   w==;
+X-CSE-ConnectionGUID: YoxPk2X7TV+isH0qGGWGtg==
+X-CSE-MsgGUID: 6zX7bMqERa6AmP0cEqxY3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689256"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30689237"
+   d="scan'208";a="30689256"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:36:34 -0800
-X-CSE-ConnectionGUID: xfz50WFbT2mM6g0uRJBg8A==
-X-CSE-MsgGUID: 23LnzFrqQVehOjvo+qmMZw==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:36:39 -0800
+X-CSE-ConnectionGUID: r1o3UWJtR+OrzWAUBbZ4Gw==
+X-CSE-MsgGUID: /2AI0GzRRKefGwjrd6onTg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="83988589"
+   d="scan'208";a="83988607"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:36:30 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:36:34 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Riku Voipio <riku.voipio@iki.fi>,
@@ -78,9 +78,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org,
 	xiaoyao.li@intel.com
-Subject: [PATCH v6 03/60] i386/tdx: Implement tdx_kvm_type() for TDX
-Date: Tue,  5 Nov 2024 01:23:11 -0500
-Message-Id: <20241105062408.3533704-4-xiaoyao.li@intel.com>
+Subject: [PATCH v6 04/60] i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
+Date: Tue,  5 Nov 2024 01:23:12 -0500
+Message-Id: <20241105062408.3533704-5-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241105062408.3533704-1-xiaoyao.li@intel.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
@@ -92,59 +92,75 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX VM requires VM type to be KVM_X86_TDX_VM. Implement tdx_kvm_type()
-as X86ConfidentialGuestClass->kvm_type.
+Implement TDX specific ConfidentialGuestSupportClass::kvm_init()
+callback, tdx_kvm_init().
+
+Mark guest state is proctected for TDX VM.  More TDX specific
+initialization will be added later.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
 Changes in v6:
- - new added patch;
+ - remove Acked-by from Gerd since the patch changed due to use
+   ConfidentialGuestSupportClass::kvm_init();
 ---
- target/i386/kvm/kvm.c |  1 +
- target/i386/kvm/tdx.c | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
+ target/i386/kvm/kvm.c | 11 +----------
+ target/i386/kvm/tdx.c | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 8e17942c3ba1..ed2e89946c44 100644
+index ed2e89946c44..2bbac603da70 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -194,6 +194,7 @@ static const char *vm_type_name[] = {
-     [KVM_X86_SEV_VM] = "SEV",
-     [KVM_X86_SEV_ES_VM] = "SEV-ES",
-     [KVM_X86_SNP_VM] = "SEV-SNP",
-+    [KVM_X86_TDX_VM] = "TDX",
- };
+@@ -3204,16 +3204,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     Error *local_err = NULL;
  
- bool kvm_is_vm_type_supported(int type)
+     /*
+-     * Initialize SEV context, if required
+-     *
+-     * If no memory encryption is requested (ms->cgs == NULL) this is
+-     * a no-op.
+-     *
+-     * It's also a no-op if a non-SEV confidential guest support
+-     * mechanism is selected.  SEV is the only mechanism available to
+-     * select on x86 at present, so this doesn't arise, but if new
+-     * mechanisms are supported in future (e.g. TDX), they'll need
+-     * their own initialization either here or elsewhere.
++     * Initialize confidential guest (SEV/TDX) context, if required
+      */
+     if (ms->cgs) {
+         ret = confidential_guest_kvm_init(ms->cgs, &local_err);
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 166f53d2b9e3..bf8947549a96 100644
+index bf8947549a96..85f006c1d6b4 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -14,8 +14,17 @@
+@@ -14,9 +14,17 @@
  #include "qemu/osdep.h"
  #include "qom/object_interfaces.h"
  
-+#include "kvm_i386.h"
++#include "hw/i386/x86.h"
+ #include "kvm_i386.h"
  #include "tdx.h"
  
-+static int tdx_kvm_type(X86ConfidentialGuest *cg)
++static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
 +{
-+    /* Do the object check */
-+    TDX_GUEST(cg);
++    kvm_mark_guest_state_protected();
 +
-+    return KVM_X86_TDX_VM;
++    return 0;
 +}
 +
- /* tdx guest */
- OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
-                                    tdx_guest,
-@@ -42,4 +51,7 @@ static void tdx_guest_finalize(Object *obj)
+ static int tdx_kvm_type(X86ConfidentialGuest *cg)
+ {
+     /* Do the object check */
+@@ -51,7 +59,9 @@ static void tdx_guest_finalize(Object *obj)
  
  static void tdx_guest_class_init(ObjectClass *oc, void *data)
  {
-+    X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
-+
-+    x86_klass->kvm_type = tdx_kvm_type;
++    ConfidentialGuestSupportClass *klass = CONFIDENTIAL_GUEST_SUPPORT_CLASS(oc);
+     X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
+ 
++    klass->kvm_init = tdx_kvm_init;
+     x86_klass->kvm_type = tdx_kvm_type;
  }
 -- 
 2.34.1
