@@ -1,182 +1,157 @@
-Return-Path: <kvm+bounces-30724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780209BCB5F
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:14:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E796B9BCBC2
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:26:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36E12284155
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:14:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39F9EB2402C
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3F91D4154;
-	Tue,  5 Nov 2024 11:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740561D5174;
+	Tue,  5 Nov 2024 11:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxK+EoZ/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FaeTpw35"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82961D3629
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 11:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03691D417C
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 11:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730805261; cv=none; b=RauvX+C+SRHn3RMpysy0F4eUOyKH4WA1Lm2v6CZVDS/+fzr88DofD6YxbdEF7Wupq1XB9HvDjYmAcwzH9fOTCqjC/BOlRoL3+1PY7cJ6/tVXJrSix+Drw9MJdv6zX92MgONQYqd+uvgbtW9RnMLDVaoanYbh1NjmoKig8zkyDvA=
+	t=1730805926; cv=none; b=GmLL4hT5ucxpPK8f2S5fsTmeqaOr+8j24whV+HKXVTix7oPz/26o96qqmUvHoilwjeshu1C8pZMRwmzjcpFfCZfZpagc18ad594K18/YdPmTFlordbGxJ2Wc/He7pCEla7KblmDoAc88jtEL5/U8J9dcjfKsdf4n8dirht0ioo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730805261; c=relaxed/simple;
-	bh=ep8vzmwDe5FFVnuMaBH29D5iLcnRLgVXlfwlOWEv2CQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YADtaN+1KO1GexrwB5dbitgEIswhjsxfCWbl+jkDYGH4cwt7gU0PjyCrYceEFr5f2Al/FJMWhs0oxwizIOwGg1xhTVVKnyoo9bDXoATuABCDhGtCkdmmwTCAKjaqkjVCFZwmlF94aPTtR9nik/ydlrKvWLJghyS+N5d+elMNxv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OxK+EoZ/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730805258;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=3FG8T0t0tfqrLp1wc3X1sk+VoTwvl6f29BL4XZWT+3M=;
-	b=OxK+EoZ//OQhaUXl+H5/wa4mA1FI4b2m5STvSAHmHliZrE1QnT19D2OgYCLI9kuFKEXs4j
-	og4DZ0xmOfQSWQv7b0tH9AiBKtlA0gqf/1gGeTZhp5v6H4VvId5YstDwyIQtNqwKKtN061
-	1ohjteLtSY7Y1zQWlcr3aLMxPTVFFr8=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-eTruY0xTNCeV66htOz5sfw-1; Tue,
- 05 Nov 2024 06:14:15 -0500
-X-MC-Unique: eTruY0xTNCeV66htOz5sfw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61CD219560B5;
-	Tue,  5 Nov 2024 11:14:13 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.52])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AE4D19560AD;
-	Tue,  5 Nov 2024 11:14:06 +0000 (UTC)
-Date: Tue, 5 Nov 2024 11:14:03 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
-	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 60/60] docs: Add TDX documentation
-Message-ID: <Zyn9-1N0XyOwjmf1@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-61-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1730805926; c=relaxed/simple;
+	bh=s1wswE6/InO1G4xUqdts8qxxRWQM31X334rkUkdhdgU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mx+t8yQAIV6tr5ZMFc3eDyAxz1rxzQBOGqqwDd3nlPhVhNmGW5mBLUUwizc+IXDTuJoD3TDuGk8mxPrjhEYUmlzPpjNAcdjyjHhhhZXlf3du4ix3bfldcwr2Vve1YFLjb6arfe2VmuYsS3WlJ6VJFpvUSbbUvhq4IUoLOjcfmx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FaeTpw35; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730805924; x=1762341924;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=s1wswE6/InO1G4xUqdts8qxxRWQM31X334rkUkdhdgU=;
+  b=FaeTpw35jNKRbgw9OEUr81Xt9TelK4RC/mBcvlLMGelmroY+y3R31/Mt
+   UTWmQlxM+USuVfQfl5PH8KdGQ+bTJIHZvRX/ZY/bNURbafIr/8T4QHn6F
+   n+RlnQvuYvEhf2hOwStJGF/1LIqo9EvML2XgKiVU6g4qyv6UelHkxUoYe
+   eC9ZiABSQ2eYRLeZSMxcb/9cF3obpO3CIm5xq5Nbh2G2NOdZ+EcEYTBwX
+   YgIvdhLlj8PnzeJQqoRr8XfbXhWyxTgtvOQ5hiDOOxLCxBM9+GVQD0tNc
+   u+xCKy7YDFaEJmvr7CTsWqT3KillM06jFMN8utETzVKv5LWeVkpjxt1v8
+   w==;
+X-CSE-ConnectionGUID: nQoNxDtrQ/q6MZOiqgdNwg==
+X-CSE-MsgGUID: WtuUsuiDSL6muZ7mhzqZyQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30503043"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30503043"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 03:25:23 -0800
+X-CSE-ConnectionGUID: DKTS63VqThuubrGE6o9gdg==
+X-CSE-MsgGUID: vLe/cltnQ9e0hJSfCrxoqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
+   d="scan'208";a="84092452"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 03:25:20 -0800
+Message-ID: <e5d02d7f-a989-4484-b0c1-3d7ac804ec73@intel.com>
+Date: Tue, 5 Nov 2024 19:25:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241105062408.3533704-61-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 45/60] i386/tdx: Don't get/put guest state for TDX VMs
+To: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Ani Sinha <anisinha@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-46-xiaoyao.li@intel.com>
+ <8cd78103-5f49-4cbd-814d-a03a82a59231@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <8cd78103-5f49-4cbd-814d-a03a82a59231@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 05, 2024 at 01:24:08AM -0500, Xiaoyao Li wrote:
-> Add docs/system/i386/tdx.rst for TDX support, and add tdx in
-> confidential-guest-support.rst
+On 11/5/2024 5:55 PM, Paolo Bonzini wrote:
+> On 11/5/24 07:23, Xiaoyao Li wrote:
+>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>
+>> Don't get/put state of TDX VMs since accessing/mutating guest state of
+>> production TDs is not supported.
+>>
+>> Note, it will be allowed for a debug TD. Corresponding support will be
+>> introduced when debug TD support is implemented in the future.
+>>
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
-> Changes in v6:
->  - Add more information of "Feature configuration"
->  - Mark TD Attestation as future work because KVM now drops the support
->    of it.
+> This should be unnecessary now that QEMU has 
+> kvm_mark_guest_state_protected().
+
+Reverting this patch, we get:
+
+tdx: tdx: error: failed to set MSR 0x174 to 0x0
+tdx: ../../../go/src/tdx/tdx-qemu/target/i386/kvm/kvm.c:3859: 
+kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+error: failed to set MSR 0x174 to 0x0
+tdx: ../../../go/src/tdx/tdx-qemu/target/i386/kvm/kvm.c:3859: 
+kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+
+> Paolo
 > 
-> Changes in v5:
->  - Add TD attestation section and update the QEMU parameter;
+>> ---
+>>   target/i386/kvm/kvm.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>> index c39e879a77e9..e47aa32233e6 100644
+>> --- a/target/i386/kvm/kvm.c
+>> +++ b/target/i386/kvm/kvm.c
+>> @@ -5254,6 +5254,11 @@ int kvm_arch_put_registers(CPUState *cpu, int 
+>> level, Error **errp)
+>>       assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
+>> +    /* TODO: Allow accessing guest state for debug TDs. */
+>> +    if (is_tdx_vm()) {
+>> +        return 0;
+>> +    }
+>> +
+>>       /*
+>>        * Put MSR_IA32_FEATURE_CONTROL first, this ensures the VM gets 
+>> out of VMX
+>>        * root operation upon vCPU reset. kvm_put_msr_feature_control() 
+>> should also
+>> @@ -5368,6 +5373,12 @@ int kvm_arch_get_registers(CPUState *cs, Error 
+>> **errp)
+>>           error_setg_errno(errp, -ret, "Failed to get MP state");
+>>           goto out;
+>>       }
+>> +
+>> +    /* TODO: Allow accessing guest state for debug TDs. */
+>> +    if (is_tdx_vm()) {
+>> +        return 0;
+>> +    }
+>> +
+>>       ret = kvm_getput_regs(cpu, 0);
+>>       if (ret < 0) {
+>>           error_setg_errno(errp, -ret, "Failed to get general purpose 
+>> registers");
 > 
-> Changes since v1:
->  - Add prerequisite of private gmem;
->  - update example command to launch TD;
-> 
-> Changes since RFC v4:
->  - add the restriction that kernel-irqchip must be split
-> ---
->  docs/system/confidential-guest-support.rst |   1 +
->  docs/system/i386/tdx.rst                   | 155 +++++++++++++++++++++
->  docs/system/target-i386.rst                |   1 +
->  3 files changed, 157 insertions(+)
->  create mode 100644 docs/system/i386/tdx.rst
-> 
-> diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
-> index 0c490dbda2b7..66129fbab64c 100644
-> --- a/docs/system/confidential-guest-support.rst
-> +++ b/docs/system/confidential-guest-support.rst
-> @@ -38,6 +38,7 @@ Supported mechanisms
->  Currently supported confidential guest mechanisms are:
->  
->  * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
-> +* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
->  * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
->  * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
->  
-> diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
-> new file mode 100644
-> index 000000000000..60106b29bf72
-> --- /dev/null
-> +++ b/docs/system/i386/tdx.rst
-
-> +Feature check
-> +~~~~~~~~~~~~~
-> +
-> +QEMU checks if the final (CPU) features, determined by given cpu model and
-> +explicit feature adjustment of "+featureA/-featureB", can be supported or not.
-> +It can produce feature not supported warnning like
-
-Typo in 'warnning' - repeated 'n'
-
-> +
-> +  "warning: host doesn't support requested feature: CPUID.07H:EBX.intel-pt [bit 25]"
-> +
-> +It will also procude warning like
-> +
-> +  "warning: TDX forcibly sets the feature: CPUID.80000007H:EDX.invtsc [bit 8]"
-> +
-> +if the fixed-1 feature is requested to be disabled explicitly. This is newly
-> +added to QEMU for TDX because TDX has fixed-1 features that are enfored enabled
-> +by TDX module and VMM cannot disable them.
-> +
-> +Launching a TD (TDX VM)
-> +-----------------------
-> +
-> +To launch a TDX guest, below are new added and required:
-> +
-> +.. parsed-literal::
-> +
-> +    |qemu_system_x86| \\
-> +        -object tdx-guest,id=tdx0 \\
-> +        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
-> +        -bios OVMF.fd \\
-> +
-> +restrictions
-
-Capitalize initial "R"
-
-> +------------
-
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
