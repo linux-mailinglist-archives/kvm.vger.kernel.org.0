@@ -1,169 +1,119 @@
-Return-Path: <kvm+bounces-30608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A309BC429
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:59:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F0E9BC42D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 05:02:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46FC7B21EBE
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:59:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC10E1F23A0C
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA813188A15;
-	Tue,  5 Nov 2024 03:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D113819047D;
+	Tue,  5 Nov 2024 04:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l+j10IX+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yLISp5xV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B86D199E8D
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 03:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8E118EAD
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 04:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730779166; cv=none; b=iUFvu4ebnUiQGtrwYb0JWVgT8t/EGv2pLa58cYjaHmbX0iVTbyeHSXk2eH0JRE6tAMmHJ7bvTweOTZBk4WzYnaw2HeTUPsFHwufA9gg/A0WeFQRftuDyMtBufaugG4xD6Jqa8ZdGvMwDarjEmR+Wl6vwqH9ApmhMjWZE6hj+SG8=
+	t=1730779345; cv=none; b=r5wpcw6gE/b5XEy0/VDV7wB84uECe/Sp3i3dXpV6kKPM9vnHBaP8g9h9K4+qA+ZEEp+iJj+Ho3435W1mFgUioI66tDI9smCIPeKymljlOOp+xd1JHHLvcJyJzVjI1Sy3ROgiJ2qRelmJVgNE8zPhf89ONw6ro8LMv4ySJ5isVps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730779166; c=relaxed/simple;
-	bh=kGBq+d3R+Hh8of2SkeqKhgopn5RgHSwjU/41XNNpnHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NqbLjNJwhMp8/D6D8PJHE0hoIr8JIrUYbeTd6l4l/YYfCwXopEbuuEdkg/DZK4hj4zeRtS7hlxWlR1fmJIbSzBgV1JlCdJT5ukM29fyux/UXoBfYpmLF6PlHh9LtoHaTWsj7WzmkB5BfYVaJBkC1qtkvp04JjczijPGsWNyGfAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l+j10IX+; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730779165; x=1762315165;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kGBq+d3R+Hh8of2SkeqKhgopn5RgHSwjU/41XNNpnHY=;
-  b=l+j10IX+SPgWDai5vsQk/xGMawyFO4ruy3Q2be0FXTVF+Z1AhgNfjFX+
-   GZfT8CaWXv1tvtU1fRjOQceJWIheaIpNIkEe/j0c8O0YfV3JVvOuheqrs
-   GekhRbGT3+alPR7PwnH+6Sopi6qw5PhYthQwS8I2WKWTQ+H5iAYomQFzj
-   QfKccpsIuGT+XIVuRz8/yKeRqiFpzv4DMcEXUwQrWVFZNbS+kLp/otl2n
-   xvzfjoXphBCQ0k3DjB7tdSDFVvEXHOK0muo1vpSmGak6akXfJl7Q2ViTD
-   eFM2NBrv1MogfH9GcMwMzxdUfj2h1XsEpnM33gQyTgBjqLtpFcSbp2r0g
-   g==;
-X-CSE-ConnectionGUID: YvVfttqETsehn39SWYM9KA==
-X-CSE-MsgGUID: 9vnB1SpHQ/ipESEalzgd3A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30723647"
-X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="30723647"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:59:25 -0800
-X-CSE-ConnectionGUID: FVn2spouSmy40ipyVhKgog==
-X-CSE-MsgGUID: ZkKyxblLSdmPZUtvB47/IQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="84192702"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:59:22 -0800
-Message-ID: <9846d58f-c6c8-41e8-b9fc-aa782ea8b585@linux.intel.com>
-Date: Tue, 5 Nov 2024 11:58:36 +0800
+	s=arc-20240116; t=1730779345; c=relaxed/simple;
+	bh=Q2ss3K0zUMNodh6re2TKxKMMxEsGdxBpibUn+uIdaRY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=mJJEgIV+SCM7EisfN/nYsLuphH+86BzKEwKe8D9KVcjEt/JW+iIg3PZNWAgZKnsmAWZmDC865parlDYJdDLC4cKKHxoCXPWQun2SgY6dBRusJGozjG7YaaLkZi7Wh7h++udrzjVErtGW9xM6cFAbZuR47FO5CzU1kk4LVSLdhCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yLISp5xV; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e290947f6f8so8928939276.2
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 20:02:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730779342; x=1731384142; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sgrjmNrE+sRa4HOuh2Xl136a90BP2rGwHQTnSwPDwGg=;
+        b=yLISp5xVh10DgW/Um3mq1wUA9ZR0ImO0vuSiEuo32FpZ4xj3evejokqna/B57uFczp
+         oEy+N4BKUjjemo+gtk1IQ1ZiWIWMj6vT4CjIIUJTJFSDJh2jRDa6mrQ0tceZmejf2LE/
+         61L+80Mv5mZzXEfj6vXYeq+5QHk43roXcw4avuFqgUMQGqPWgFLgLQyeCiXyBveXzTM1
+         SBoNhbuaNlf4cHJXhIO9l1MdQuYjCae679NLKqD44HGJaXe9WP9yhS7N32b+wdNSdfyu
+         Zpn6oDa1S49Oap1JbJI2D06adnzkvCZWeKjWxs1afGwSkDE8RjfZubThrFvIYp9Fq5N3
+         /dsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730779342; x=1731384142;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sgrjmNrE+sRa4HOuh2Xl136a90BP2rGwHQTnSwPDwGg=;
+        b=LH49PadjPP56xnE9SptrGX1ZC30dfm3P9bHSgkagyofGriUfJ9yF6RwY/wm4cVY8xw
+         Qq8VFmFxnVnHQYZtXc4h3X3WMY82LwG8fkuWcG29/UKRtwHdQnNuOkkg1Mhy+YNAPoWM
+         oMqB9VpiibKUVsztS3RhEdjIlkBsc0/k6Smv6PrIdgFz2j1le9EqIMYHG4aFNaviTvWZ
+         XQ8pW1A/lK6uO1+KXWke184yLxTgGKjvVAV6hmI2cRGgnETIDq2s65smZednP9OoZHO1
+         X1sHjlJshgxlby8RZPzM8GvkYdYQSM/P8cBfcjXkTWDW6p0oZPgxVTxUiwgiNpPgIXms
+         YEQA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxyCdQyt1U/i1t3g4BeRdnqjz/rKNrg/c6W95IMPyqXWI7OxdTOTQ2yo5Xz87lPlXoqfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTebmNb+D9aj9W9dI0Y5sFabQqy2DDT6NpXEbcL90Feg7+L7CT
+	B9TRVGHwVdVhwzXOqeUgdFpdieBjRNhMCll4zFSdiWwvcozbvTVZnrTf0ccp7ujxC3+zptVtc6Z
+	VyA==
+X-Google-Smtp-Source: AGHT+IHspGosbXbU/DsEEGHwYchnFt8SVWi/UJ4FV3mIGekpd4lux+5J+U19BVyi5SEyfjeTUHJXXPx5ZQ8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:a291:0:b0:e28:e510:6ab1 with SMTP id
+ 3f1490d57ef6-e33026b3c56mr9958276.8.1730779342553; Mon, 04 Nov 2024 20:02:22
+ -0800 (PST)
+Date: Mon, 4 Nov 2024 20:02:21 -0800
+In-Reply-To: <20241101192114.1810198-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 01/12] iommu: Introduce a replace API for device pasid
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com
-References: <20241104132513.15890-1-yi.l.liu@intel.com>
- <20241104132513.15890-2-yi.l.liu@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241104132513.15890-2-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241101192114.1810198-1-seanjc@google.com> <20241101192114.1810198-2-seanjc@google.com>
+Message-ID: <ZymYzawDv2wGA2c_@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Plumb in the vCPU to kvm_x86_ops.hwapic_isr_update()
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Markku =?utf-8?Q?Ahvenj=C3=A4rvi?=" <mankku@gmail.com>, Janne Karhunen <janne.karhunen@gmail.com>, 
+	Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 11/4/24 21:25, Yi Liu wrote:
-> +/**
-> + * iommu_replace_device_pasid - Replace the domain that a pasid is attached to
-> + * @domain: the new iommu domain
-> + * @dev: the attached device.
-> + * @pasid: the pasid of the device.
-> + * @handle: the attach handle.
-> + *
-> + * This API allows the pasid to switch domains. Return 0 on success, or an
-> + * error. The pasid will keep the old configuration if replacement failed.
-> + * This is supposed to be used by iommufd, and iommufd can guarantee that
-> + * both iommu_attach_device_pasid() and iommu_replace_device_pasid() would
-> + * pass in a valid @handle.
-> + */
-> +int iommu_replace_device_pasid(struct iommu_domain *domain,
-> +			       struct device *dev, ioasid_t pasid,
-> +			       struct iommu_attach_handle *handle)
-> +{
-> +	/* Caller must be a probed driver on dev */
-> +	struct iommu_group *group = dev->iommu_group;
-> +	struct iommu_attach_handle *curr;
-> +	int ret;
-> +
-> +	if (!domain->ops->set_dev_pasid)
-> +		return -EOPNOTSUPP;
-> +
-> +	if (!group)
-> +		return -ENODEV;
-> +
-> +	if (!dev_has_iommu(dev) || dev_iommu_ops(dev) != domain->owner ||
-> +	    pasid == IOMMU_NO_PASID || !handle)
-> +		return -EINVAL;
-> +
-> +	handle->domain = domain;
-> +
-> +	mutex_lock(&group->mutex);
-> +	/*
-> +	 * The iommu_attach_handle of the pasid becomes inconsistent with the
-> +	 * actual handle per the below operation. The concurrent PRI path will
-> +	 * deliver the PRQs per the new handle, this does not have a functional
-> +	 * impact. The PRI path would eventually become consistent when the
-> +	 * replacement is done.
-> +	 */
-> +	curr = (struct iommu_attach_handle *)xa_store(&group->pasid_array,
-> +						      pasid, handle,
-> +						      GFP_KERNEL);
+On Fri, Nov 01, 2024, Sean Christopherson wrote:
+> Pass the target vCPU to the hwapic_isr_update() vendor hook so that VMX
+> can defer the update until after nested VM-Exit if an EOI for L1's vAPIC
+> occurs while L2 is active.
+> 
+> No functional change intended.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/lapic.c            | 11 +++++------
+>  arch/x86/kvm/vmx/vmx.c          |  2 +-
+>  arch/x86/kvm/vmx/x86_ops.h      |  2 +-
+>  4 files changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 70c7ed0ef184..3f3de047cbfd 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1734,7 +1734,7 @@ struct kvm_x86_ops {
+>  	bool allow_apicv_in_x2apic_without_x2apic_virtualization;
+>  	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
+>  	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
+> -	void (*hwapic_isr_update)(int isr);
+> +	void (*hwapic_isr_update)(struct kvm_vcpu *vcpu, int isr);
 
-The iommu drivers can only flush pending PRs in the hardware queue when
-__iommu_set_group_pasid() is called. So, it appears more reasonable to
-reorder things like this:
+Oh, the hilarity.  Got that one wrong.
+ 
+  d39850f57d21 ("KVM: x86: Drop @vcpu parameter from kvm_x86_ops.hwapic_isr_update()")
 
-	__iommu_set_group_pasid();
-	switch_attach_handle();
-
-Or anything I overlooked?
-
-> +	if (!curr) {
-> +		xa_erase(&group->pasid_array, pasid);
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = xa_err(curr);
-> +	if (ret)
-> +		goto out_unlock;
-> +
-> +	if (curr->domain == domain)
-> +		goto out_unlock;
-> +
-> +	ret = __iommu_set_group_pasid(domain, group, pasid, curr->domain);
-> +	if (ret)
-> +		WARN_ON(handle != xa_store(&group->pasid_array, pasid,
-> +					   curr, GFP_KERNEL));
-> +out_unlock:
-> +	mutex_unlock(&group->mutex);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(iommu_replace_device_pasid, IOMMUFD_INTERNAL);
-> +
->   /*
->    * iommu_detach_device_pasid() - Detach the domain from pasid of device
->    * @domain: the iommu domain.
-
---
-baolu
+Not entirely sure what cleanups were made possible by dropping @vcpu at the time.
+I assume the end goal was ce0a58f4756c ("KVM: x86: Move "apicv_active" into "struct
+kvm_lapic""), but that should have been possible, if slightly more annoying, without
+modifying hwapic_isr_update().  *sigh*
 
