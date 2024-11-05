@@ -1,115 +1,169 @@
-Return-Path: <kvm+bounces-30607-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67AD9BC422
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:55:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A309BC429
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E795B220B7
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:55:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46FC7B21EBE
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC4618E030;
-	Tue,  5 Nov 2024 03:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA813188A15;
+	Tue,  5 Nov 2024 03:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l+j10IX+"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B17187347;
-	Tue,  5 Nov 2024 03:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B86D199E8D
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 03:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730778934; cv=none; b=hgOkqHnLEgk2lEiD76TH83gIfxmqMyoP8xvPITG0C9DTsinELqFMaU1W+4QEEdOgml19gzegTJBbaOT66REytvYzn3KhfwWBvalcKIr6Tt+u7L8VmxVlaJ6kCdfM/QzMPR35aiVNDD4eFZtvlLK9ADvOgKQcRapmeOB76870QTk=
+	t=1730779166; cv=none; b=iUFvu4ebnUiQGtrwYb0JWVgT8t/EGv2pLa58cYjaHmbX0iVTbyeHSXk2eH0JRE6tAMmHJ7bvTweOTZBk4WzYnaw2HeTUPsFHwufA9gg/A0WeFQRftuDyMtBufaugG4xD6Jqa8ZdGvMwDarjEmR+Wl6vwqH9ApmhMjWZE6hj+SG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730778934; c=relaxed/simple;
-	bh=/p+aqP93T3K4PYoazZPh+X0mdSLojNh6PgukGvcdpIs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Izt5rH5wsdgZ5HlwaJ7iDnxjm6lSyLO/yNfV+tPNIX8gfJcprzFUZbscUw/mRKCAuAQCNAteZx54sjwz+yGyZxXFlDMSkzDn/xoJIzqds5LfKmvsKgVa20AyAGsHOtdrOm24yFA8zCSGrV1TeOz+2SHXOajjZ6BOyAhD1mVQHCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XjDw84Wn7zyVK6;
-	Tue,  5 Nov 2024 11:53:44 +0800 (CST)
-Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id EB0E114022D;
-	Tue,  5 Nov 2024 11:55:29 +0800 (CST)
-Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 5 Nov 2024 11:55:29 +0800
-Received: from huawei.com (10.50.165.33) by kwepemn100017.china.huawei.com
- (7.202.194.122) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 5 Nov
- 2024 11:55:29 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v12 4/4] Documentation: add debugfs description for hisi migration
-Date: Tue, 5 Nov 2024 11:52:54 +0800
-Message-ID: <20241105035254.24636-5-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20241105035254.24636-1-liulongfang@huawei.com>
-References: <20241105035254.24636-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1730779166; c=relaxed/simple;
+	bh=kGBq+d3R+Hh8of2SkeqKhgopn5RgHSwjU/41XNNpnHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NqbLjNJwhMp8/D6D8PJHE0hoIr8JIrUYbeTd6l4l/YYfCwXopEbuuEdkg/DZK4hj4zeRtS7hlxWlR1fmJIbSzBgV1JlCdJT5ukM29fyux/UXoBfYpmLF6PlHh9LtoHaTWsj7WzmkB5BfYVaJBkC1qtkvp04JjczijPGsWNyGfAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l+j10IX+; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730779165; x=1762315165;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kGBq+d3R+Hh8of2SkeqKhgopn5RgHSwjU/41XNNpnHY=;
+  b=l+j10IX+SPgWDai5vsQk/xGMawyFO4ruy3Q2be0FXTVF+Z1AhgNfjFX+
+   GZfT8CaWXv1tvtU1fRjOQceJWIheaIpNIkEe/j0c8O0YfV3JVvOuheqrs
+   GekhRbGT3+alPR7PwnH+6Sopi6qw5PhYthQwS8I2WKWTQ+H5iAYomQFzj
+   QfKccpsIuGT+XIVuRz8/yKeRqiFpzv4DMcEXUwQrWVFZNbS+kLp/otl2n
+   xvzfjoXphBCQ0k3DjB7tdSDFVvEXHOK0muo1vpSmGak6akXfJl7Q2ViTD
+   eFM2NBrv1MogfH9GcMwMzxdUfj2h1XsEpnM33gQyTgBjqLtpFcSbp2r0g
+   g==;
+X-CSE-ConnectionGUID: YvVfttqETsehn39SWYM9KA==
+X-CSE-MsgGUID: 9vnB1SpHQ/ipESEalzgd3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30723647"
+X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
+   d="scan'208";a="30723647"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:59:25 -0800
+X-CSE-ConnectionGUID: FVn2spouSmy40ipyVhKgog==
+X-CSE-MsgGUID: ZkKyxblLSdmPZUtvB47/IQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
+   d="scan'208";a="84192702"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:59:22 -0800
+Message-ID: <9846d58f-c6c8-41e8-b9fc-aa782ea8b585@linux.intel.com>
+Date: Tue, 5 Nov 2024 11:58:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemn100017.china.huawei.com (7.202.194.122)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/12] iommu: Introduce a replace API for device pasid
+To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
+ kevin.tian@intel.com
+Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+ kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
+ zhenzhong.duan@intel.com, vasant.hegde@amd.com
+References: <20241104132513.15890-1-yi.l.liu@intel.com>
+ <20241104132513.15890-2-yi.l.liu@intel.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20241104132513.15890-2-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a debugfs document description file to help users understand
-how to use the hisilicon accelerator live migration driver's
-debugfs.
+On 11/4/24 21:25, Yi Liu wrote:
+> +/**
+> + * iommu_replace_device_pasid - Replace the domain that a pasid is attached to
+> + * @domain: the new iommu domain
+> + * @dev: the attached device.
+> + * @pasid: the pasid of the device.
+> + * @handle: the attach handle.
+> + *
+> + * This API allows the pasid to switch domains. Return 0 on success, or an
+> + * error. The pasid will keep the old configuration if replacement failed.
+> + * This is supposed to be used by iommufd, and iommufd can guarantee that
+> + * both iommu_attach_device_pasid() and iommu_replace_device_pasid() would
+> + * pass in a valid @handle.
+> + */
+> +int iommu_replace_device_pasid(struct iommu_domain *domain,
+> +			       struct device *dev, ioasid_t pasid,
+> +			       struct iommu_attach_handle *handle)
+> +{
+> +	/* Caller must be a probed driver on dev */
+> +	struct iommu_group *group = dev->iommu_group;
+> +	struct iommu_attach_handle *curr;
+> +	int ret;
+> +
+> +	if (!domain->ops->set_dev_pasid)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!group)
+> +		return -ENODEV;
+> +
+> +	if (!dev_has_iommu(dev) || dev_iommu_ops(dev) != domain->owner ||
+> +	    pasid == IOMMU_NO_PASID || !handle)
+> +		return -EINVAL;
+> +
+> +	handle->domain = domain;
+> +
+> +	mutex_lock(&group->mutex);
+> +	/*
+> +	 * The iommu_attach_handle of the pasid becomes inconsistent with the
+> +	 * actual handle per the below operation. The concurrent PRI path will
+> +	 * deliver the PRQs per the new handle, this does not have a functional
+> +	 * impact. The PRI path would eventually become consistent when the
+> +	 * replacement is done.
+> +	 */
+> +	curr = (struct iommu_attach_handle *)xa_store(&group->pasid_array,
+> +						      pasid, handle,
+> +						      GFP_KERNEL);
 
-Update the file paths that need to be maintained in MAINTAINERS
+The iommu drivers can only flush pending PRs in the hardware queue when
+__iommu_set_group_pasid() is called. So, it appears more reasonable to
+reorder things like this:
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../ABI/testing/debugfs-hisi-migration        | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
+	__iommu_set_group_pasid();
+	switch_attach_handle();
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-migration b/Documentation/ABI/testing/debugfs-hisi-migration
-new file mode 100644
-index 000000000000..2c01b2d387dd
---- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-hisi-migration
-@@ -0,0 +1,25 @@
-+What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/dev_data
-+Date:		Jan 2025
-+KernelVersion:  6.13
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	Read the configuration data and some status data
-+		required for device live migration. These data include device
-+		status data, queue configuration data, some task configuration
-+		data and device attribute data. The output format of the data
-+		is defined by the live migration driver.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/migf_data
-+Date:		Jan 2025
-+KernelVersion:  6.13
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	Read the data from the last completed live migration.
-+		This data includes the same device status data as in "dev_data".
-+		The migf_data is the dev_data that is migrated.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/cmd_state
-+Date:		Jan 2025
-+KernelVersion:  6.13
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	Used to obtain the device command sending and receiving
-+		channel status. Returns failure or success logs based on the
-+		results.
--- 
-2.24.0
+Or anything I overlooked?
 
+> +	if (!curr) {
+> +		xa_erase(&group->pasid_array, pasid);
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = xa_err(curr);
+> +	if (ret)
+> +		goto out_unlock;
+> +
+> +	if (curr->domain == domain)
+> +		goto out_unlock;
+> +
+> +	ret = __iommu_set_group_pasid(domain, group, pasid, curr->domain);
+> +	if (ret)
+> +		WARN_ON(handle != xa_store(&group->pasid_array, pasid,
+> +					   curr, GFP_KERNEL));
+> +out_unlock:
+> +	mutex_unlock(&group->mutex);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommu_replace_device_pasid, IOMMUFD_INTERNAL);
+> +
+>   /*
+>    * iommu_detach_device_pasid() - Detach the domain from pasid of device
+>    * @domain: the iommu domain.
+
+--
+baolu
 
