@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-30723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D290F9BCB4C
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:08:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780209BCB5F
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F71A1C235FC
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:08:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36E12284155
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588581D362B;
-	Tue,  5 Nov 2024 11:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3F91D4154;
+	Tue,  5 Nov 2024 11:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ijs5XE6y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxK+EoZ/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEA81D3564
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 11:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82961D3629
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 11:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730804887; cv=none; b=TOj4bx1uxJrUbYSfh4jpDFOxyBxKD1gWXdUPfL+MVRfAkv4AohAfaNRFFSpgVnSvEKOyxCNwdRMSMvOH1Lvovhoibfox4vc6DZ06PxxEu/mKTzVE0rMHarsDoJTWozu1dxhDeYHGiChGS9RfojfZdOB6h+6zjxdA1l3Hii8agOY=
+	t=1730805261; cv=none; b=RauvX+C+SRHn3RMpysy0F4eUOyKH4WA1Lm2v6CZVDS/+fzr88DofD6YxbdEF7Wupq1XB9HvDjYmAcwzH9fOTCqjC/BOlRoL3+1PY7cJ6/tVXJrSix+Drw9MJdv6zX92MgONQYqd+uvgbtW9RnMLDVaoanYbh1NjmoKig8zkyDvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730804887; c=relaxed/simple;
-	bh=VHfpHDtLbZ+67i+8S4GPE0ftPAaW7c/LlJCovyHFkH8=;
+	s=arc-20240116; t=1730805261; c=relaxed/simple;
+	bh=ep8vzmwDe5FFVnuMaBH29D5iLcnRLgVXlfwlOWEv2CQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BcG/z0D1PC7PMXnlr+y486Iv8a8gddIten9twyY3jMUs9GcIGXBI/Gg6KXKO1ZxFvxxmYb0UT/WSOBPdFvYCIwrDO1Ii9C7j60GyncA9jzPo2wQkTwDa5C/vWCCOYSnERWVk/TqGpFq5UjI8uqeJ7wdTKC0i4n5acaryvQSdScM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ijs5XE6y; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=YADtaN+1KO1GexrwB5dbitgEIswhjsxfCWbl+jkDYGH4cwt7gU0PjyCrYceEFr5f2Al/FJMWhs0oxwizIOwGg1xhTVVKnyoo9bDXoATuABCDhGtCkdmmwTCAKjaqkjVCFZwmlF94aPTtR9nik/ydlrKvWLJghyS+N5d+elMNxv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OxK+EoZ/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730804884;
+	s=mimecast20190719; t=1730805258;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=fFlpBvsbBPoFcpImpRRKJS4XnWpYyAeG6Jhz2wg2Hp8=;
-	b=Ijs5XE6y5rYcTfJEbTq+FrpGQhHiSWCjIBKT8LGGhIbEdlNw8I3qxtMLt8fz6G8qsrXYJG
-	zFFBLKNqdNkE+RShGUbkZcSkRz33HhL3CoKTUKySnnzZjkM7RrY6VonQbVk+q4wMZV8/is
-	e4TcLuDCHGHW2Z8RTb0Bl60cX5UaNZk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=3FG8T0t0tfqrLp1wc3X1sk+VoTwvl6f29BL4XZWT+3M=;
+	b=OxK+EoZ//OQhaUXl+H5/wa4mA1FI4b2m5STvSAHmHliZrE1QnT19D2OgYCLI9kuFKEXs4j
+	og4DZ0xmOfQSWQv7b0tH9AiBKtlA0gqf/1gGeTZhp5v6H4VvId5YstDwyIQtNqwKKtN061
+	1ohjteLtSY7Y1zQWlcr3aLMxPTVFFr8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-212-3Z_Fto3vPTalG53sC869AA-1; Tue,
- 05 Nov 2024 06:08:01 -0500
-X-MC-Unique: 3Z_Fto3vPTalG53sC869AA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-eTruY0xTNCeV66htOz5sfw-1; Tue,
+ 05 Nov 2024 06:14:15 -0500
+X-MC-Unique: eTruY0xTNCeV66htOz5sfw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 55F171956064;
-	Tue,  5 Nov 2024 11:07:59 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61CD219560B5;
+	Tue,  5 Nov 2024 11:14:13 +0000 (UTC)
 Received: from redhat.com (unknown [10.42.28.52])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4335F195607C;
-	Tue,  5 Nov 2024 11:07:51 +0000 (UTC)
-Date: Tue, 5 Nov 2024 11:07:48 +0000
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AE4D19560AD;
+	Tue,  5 Nov 2024 11:14:06 +0000 (UTC)
+Date: Tue, 5 Nov 2024 11:14:03 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
@@ -71,11 +71,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
 	Markus Armbruster <armbru@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
 	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 56/60] i386/tdx: Don't treat SYSCALL as unavailable
-Message-ID: <Zyn8hHs7x18aMrLi@redhat.com>
+Subject: Re: [PATCH v6 60/60] docs: Add TDX documentation
+Message-ID: <Zyn9-1N0XyOwjmf1@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-57-xiaoyao.li@intel.com>
+ <20241105062408.3533704-61-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,41 +84,93 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241105062408.3533704-57-xiaoyao.li@intel.com>
+In-Reply-To: <20241105062408.3533704-61-xiaoyao.li@intel.com>
 User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, Nov 05, 2024 at 01:24:04AM -0500, Xiaoyao Li wrote:
-
-Preferrably explain the rationale for why this is needed in
-the commit message.
-
+On Tue, Nov 05, 2024 at 01:24:08AM -0500, Xiaoyao Li wrote:
+> Add docs/system/i386/tdx.rst for TDX support, and add tdx in
+> confidential-guest-support.rst
+> 
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  target/i386/kvm/tdx.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Changes in v6:
+>  - Add more information of "Feature configuration"
+>  - Mark TD Attestation as future work because KVM now drops the support
+>    of it.
 > 
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 9cb099e160e4..05475edf72bd 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -734,6 +734,13 @@ static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
+> Changes in v5:
+>  - Add TD attestation section and update the QEMU parameter;
+> 
+> Changes since v1:
+>  - Add prerequisite of private gmem;
+>  - update example command to launch TD;
+> 
+> Changes since RFC v4:
+>  - add the restriction that kernel-irqchip must be split
+> ---
+>  docs/system/confidential-guest-support.rst |   1 +
+>  docs/system/i386/tdx.rst                   | 155 +++++++++++++++++++++
+>  docs/system/target-i386.rst                |   1 +
+>  3 files changed, 157 insertions(+)
+>  create mode 100644 docs/system/i386/tdx.rst
+> 
+> diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
+> index 0c490dbda2b7..66129fbab64c 100644
+> --- a/docs/system/confidential-guest-support.rst
+> +++ b/docs/system/confidential-guest-support.rst
+> @@ -38,6 +38,7 @@ Supported mechanisms
+>  Currently supported confidential guest mechanisms are:
 >  
->          requested = env->features[w];
->          unavailable = requested & ~actual;
-> +        /*
-> +         * Intel enumerates SYSCALL bit as 1 only when processor in 64-bit
-> +         * mode and before vcpu running it's not in 64-bit mode.
-> +         */
-> +        if (w == FEAT_8000_0001_EDX && unavailable & CPUID_EXT2_SYSCALL) {
-> +            unavailable &= ~CPUID_EXT2_SYSCALL;
-> +        }
->          mark_unavailable_features(cpu, w, unavailable, unav_prefix);
->          if (unavailable) {
->              mismatch = true;
-> -- 
-> 2.34.1
-> 
+>  * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
+> +* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
+>  * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
+>  * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
+>  
+> diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
+> new file mode 100644
+> index 000000000000..60106b29bf72
+> --- /dev/null
+> +++ b/docs/system/i386/tdx.rst
+
+> +Feature check
+> +~~~~~~~~~~~~~
+> +
+> +QEMU checks if the final (CPU) features, determined by given cpu model and
+> +explicit feature adjustment of "+featureA/-featureB", can be supported or not.
+> +It can produce feature not supported warnning like
+
+Typo in 'warnning' - repeated 'n'
+
+> +
+> +  "warning: host doesn't support requested feature: CPUID.07H:EBX.intel-pt [bit 25]"
+> +
+> +It will also procude warning like
+> +
+> +  "warning: TDX forcibly sets the feature: CPUID.80000007H:EDX.invtsc [bit 8]"
+> +
+> +if the fixed-1 feature is requested to be disabled explicitly. This is newly
+> +added to QEMU for TDX because TDX has fixed-1 features that are enfored enabled
+> +by TDX module and VMM cannot disable them.
+> +
+> +Launching a TD (TDX VM)
+> +-----------------------
+> +
+> +To launch a TDX guest, below are new added and required:
+> +
+> +.. parsed-literal::
+> +
+> +    |qemu_system_x86| \\
+> +        -object tdx-guest,id=tdx0 \\
+> +        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
+> +        -bios OVMF.fd \\
+> +
+> +restrictions
+
+Capitalize initial "R"
+
+> +------------
+
 
 With regards,
 Daniel
