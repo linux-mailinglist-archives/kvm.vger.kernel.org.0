@@ -1,140 +1,188 @@
-Return-Path: <kvm+bounces-30584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19AA9BC251
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 02:07:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C479BC252
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 02:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902D2282F78
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 01:07:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01865282FE0
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 01:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5B774059;
-	Tue,  5 Nov 2024 01:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583F51C68F;
+	Tue,  5 Nov 2024 01:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O+dDM6zL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q9ZnANM/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF99052F71
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 01:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93A518622;
+	Tue,  5 Nov 2024 01:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730768788; cv=none; b=ACOWVs2cLlD/CNGnRlQxst2e6Ib/v/7fGkwI+Lxs1TQY4y8qwX/vXxfzFqQ8lMoPv97E0FiQwBm4EaMYuFqiea6b4rOH22dzpQ0yVedLn62ihtWAfwpk0FnNquD1hhq1Gyg887D0P+iDwMaHZwPaHLsyMjP6RKTGFfyoSa4Acm8=
+	t=1730768841; cv=none; b=WPEhzX71pPUSZlS1XZ6OdZxCc7+rAxBtqTyTwm/dpgHVfd6SMxWmc4eS7ORUVCoajaqYOpKyJXbaVTe31FUJ8GAJOqu6ki62eg8OvdVFr9ToGrBHvgN1g1gerPwDRW2PIpn30u52t+divZCHI/Ke5olxi39S5dM+IF3XMvx2f7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730768788; c=relaxed/simple;
-	bh=PrkZM6Xy8UF0mEloWiv1/ygTi//WCDu6vFaQAcQxgaY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VBDv2dwMN8ClT8VFuhR2dlndCT7UrA+ZksEZ8sSLARij6AbsfnU8pvMGND6+G0Q+6uJ5GDyIn8hyQzKzqCZSdhfkLTdz3Kdvebdcb/yvgupB8jZWzO9eh+tdUNj30THxH4hDmZvWrvCfh0Yp8DotCQHUOctFTBPFZQLKMNDbIsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O+dDM6zL; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea8a5e83a3so41125557b3.2
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 17:06:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730768786; x=1731373586; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JS3XxluJTES3Wiur3lmc4TEkrd8MuXF3kmtmu8pwE5Y=;
-        b=O+dDM6zLw62e/tcs6Q7rF+NuDoPAnnY/2Vhfa9sUZQnZFrEx1tZTg7OjYSmGPvmwfw
-         44Q+9fdXv4I+kzh4ipsZ/mxRWwUMD6fvwFZ0bb9zIPypP2C7gqmfpRoab5ooLcR3xXZP
-         vIaCaTeg1EPLv0ssuMoiL/C0n0CtBL/tNbdNdvXEBLQ1SfDA9pwdBRSBhTS3+jE5iKue
-         kmx3o3f6EBrjXOrdbQ3Z4D8nuxy0XCbvOg9L9Kt8k71+f+MYcRkb1IyhvClDfPaSxbRG
-         gTVZFTCAO3JLi0dbGhbTvKTQv0v9o9zDTjFz43bTzsBj6dRAXmi88JmOJdeeU2mfedsy
-         zDKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730768786; x=1731373586;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JS3XxluJTES3Wiur3lmc4TEkrd8MuXF3kmtmu8pwE5Y=;
-        b=O1cKUSrRTJcC3vS3QSEKub0rsw7OJbyMfdWTa7kK2D5CI+iKD2Orv4oG7LUoHeOkwR
-         5ffW6VB/0lleW88GbtU7s47M/+LLuwkhGPNSdr9G8+oIoqCKWu7mBzE7MYEKsrs6V2wN
-         5WHwdYNiIUqxiOEtWN6OewYsPysZp4SYcZO5LCCqNmQtP09vHJYmlJt+kFovS6hu1dVS
-         jaYgoKzKIs+LgHIKM5cPdSCNdouzBkdquOAgCcaN8VdmVl/FgJVHZetcMOS7/oPuFHBI
-         x8PdXE+SfEFtDDw+jK1ZoDM4Ck6pE/YtquuFzoKmxpylZB9mzv5lOZY1xaOF9+zYXkhU
-         aqQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAGL4Zng/sxEWIeYQrxMAKJCsGfpW2GMp4Pr/8fXAs6nuuOy9hfbhKAmT1boCP0M4eWWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0IWP+OBkdd4sRr3mhBB0q5+ZNg9Ak1DZxYp7PHSFrrpGAmavn
-	ttmn1EIy+LwXrJlzKHFDN1sp5Q7HcmjNMT9KIXN55Gj7L+UgylsDUh9aFI5ZN3JPep2PbrMEV+8
-	JQLxNkT9DpLB6LIPh3BxNBA==
-X-Google-Smtp-Source: AGHT+IFO2JgTdSt2JVSAlE6aLJiAl18hccyke07Vi/GlLOEcPNFzRu1IUPbLnPUPUc1RIzAgyPoMizpEQTsA/tZYFg==
-X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a81:a8c6:0:b0:6ea:7c90:41f2 with SMTP
- id 00721157ae682-6ea7c904377mr279887b3.6.1730768785769; Mon, 04 Nov 2024
- 17:06:25 -0800 (PST)
-Date: Tue,  5 Nov 2024 01:05:53 +0000
-In-Reply-To: <20241105010558.1266699-1-dionnaglaze@google.com>
+	s=arc-20240116; t=1730768841; c=relaxed/simple;
+	bh=l8DfQn5o9vFOLgOjvh00A/2LWCZJcea+IHrefb+e5XA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hjiQSAae9LFPwb+cVxXDDFCPNAXhJTHY6NPvbKi6wqNNUtEVthaJJCTC2bHJg+afAEb9c9d7zPC6kT1V2380nNbGR5UPuanZ0JHgauw1djfflJTjuY733rBBx8uTY8paxvq1kgVSB318rbcvp8at2iioYUe21jy2ie89oKMyhE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q9ZnANM/; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730768840; x=1762304840;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=l8DfQn5o9vFOLgOjvh00A/2LWCZJcea+IHrefb+e5XA=;
+  b=Q9ZnANM/uaZ+t9+fGdUw5LBdVmh2TYtr8WA7h+dRR/fBb9TXfT2qwszN
+   u5DJqTHOeS9gZU09vUdhS4NHeX//CwWU57Nk8rAXDaP5viUfUvfVbe4le
+   zcfpNvE6pEn3JoiXgfXzyWBuqg4QxqsR4XRjjV8wd8Tfn/o8dWwEbUJiO
+   roY+g/PTFt95vtG+RKd1Tf+3WyEF77kAqfcpaXOcTrA5N1i09KGZCKA5H
+   UFeS/M/4Ce0mJi93iFs7YTCvHMkJqp/LLDWOajG6QdKNCgTiI09n86ICw
+   X4e9NZMVr65JYTA+/6T/U3Rj61p2FHKJsfkJkXDPdpPKAFTOBXDWZBrcR
+   w==;
+X-CSE-ConnectionGUID: SzMGS2cPTqWfSIiPOw1H9Q==
+X-CSE-MsgGUID: MjnbYTbdRAWM8Y8hoNSHpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30372804"
+X-IronPort-AV: E=Sophos;i="6.11,258,1725346800"; 
+   d="scan'208";a="30372804"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 17:07:19 -0800
+X-CSE-ConnectionGUID: XeKeeuNkQ3S/7Y42Ho9weQ==
+X-CSE-MsgGUID: HypnBqjyQPeOOyIFyRNpIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,258,1725346800"; 
+   d="scan'208";a="83765655"
+Received: from unknown (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 17:07:17 -0800
+Message-ID: <ea6bdf59-312e-45ea-9ed7-19272ec1beb9@linux.intel.com>
+Date: Tue, 5 Nov 2024 09:07:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241105010558.1266699-1-dionnaglaze@google.com>
-X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
-Message-ID: <20241105010558.1266699-7-dionnaglaze@google.com>
-Subject: [PATCH v4 6/6] KVM: SVM: Delay legacy platform initialization on SNP
-From: Dionna Glaze <dionnaglaze@google.com>
-To: x86@kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Dionna Glaze <dionnaglaze@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace
+ generically
+To: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com"
+ <seanjc@google.com>
+Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <20240826022255.361406-1-binbin.wu@linux.intel.com>
+ <20240826022255.361406-2-binbin.wu@linux.intel.com>
+ <ZyKbxTWBZUdqRvca@google.com>
+ <3f158732a66829faaeb527a94b8df78d6173befa.camel@intel.com>
+ <ZyLWMGcgj76YizSw@google.com>
+ <1cace497215b025ed8b5f7815bdeb23382ecad32.camel@intel.com>
+ <ZyUEMLoy6U3L4E8v@google.com>
+ <f95cd8c6-af5c-4d8f-99a8-16d0ec56d9a4@linux.intel.com>
+ <95c92ff265cfa48f5459009d48a161e5cbe7ab3d.camel@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <95c92ff265cfa48f5459009d48a161e5cbe7ab3d.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-When no SEV or SEV-ES guests are active, then the firmware can be
-updated while (SEV-SNP) VM guests are active.
 
-CC: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Thomas Gleixner <tglx@linutronix.de>
-CC: Ingo Molnar <mingo@redhat.com>
-CC: Borislav Petkov <bp@alien8.de>
-CC: Dave Hansen <dave.hansen@linux.intel.com>
-CC: Ashish Kalra <ashish.kalra@amd.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>
-CC: John Allen <john.allen@amd.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Michael Roth <michael.roth@amd.com>
-CC: Luis Chamberlain <mcgrof@kernel.org>
-CC: Russ Weight <russ.weight@linux.dev>
-CC: Danilo Krummrich <dakr@redhat.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Tianfei zhang <tianfei.zhang@intel.com>
-CC: Alexey Kardashevskiy <aik@amd.com>
 
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Reviewed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
----
- arch/x86/kvm/svm/sev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f6e96ec0a5caa..3c2079ba7c76f 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -444,7 +444,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	if (ret)
- 		goto e_no_asid;
- 
--	init_args.probe = false;
-+	init_args.probe = vm_type != KVM_X86_SEV_VM && vm_type != KVM_X86_SEV_ES_VM;
- 	ret = sev_platform_init(&init_args);
- 	if (ret)
- 		goto e_free;
--- 
-2.47.0.199.ga7371fff76-goog
+On 11/4/2024 5:55 PM, Huang, Kai wrote:
+[...]
+>>>    int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>>    {
+>>> -	unsigned long nr, a0, a1, a2, a3, ret;
+>>> -	int op_64_bit;
+>>> -	int cpl;
+>>> +	int r;
+>>>    
+>>>    	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>>>    		return kvm_xen_hypercall(vcpu);
+>>> @@ -10102,23 +10105,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>>    	if (kvm_hv_hypercall_enabled(vcpu))
+>>>    		return kvm_hv_hypercall(vcpu);
+>>>    
+>>> -	nr = kvm_rax_read(vcpu);
+>>> -	a0 = kvm_rbx_read(vcpu);
+>>> -	a1 = kvm_rcx_read(vcpu);
+>>> -	a2 = kvm_rdx_read(vcpu);
+>>> -	a3 = kvm_rsi_read(vcpu);
+>>> -	op_64_bit = is_64_bit_hypercall(vcpu);
+>>> -	cpl = kvm_x86_call(get_cpl)(vcpu);
+>>> -
+>>> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+>>> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+>>> -		/* MAP_GPA tosses the request to the user space. */
+>>> +	r = __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+>>> +				    is_64_bit_hypercall(vcpu),
+>>> +				    kvm_x86_call(get_cpl)(vcpu), RAX);
+>> Now, the register for return code of the hypercall can be specified.
+>> But in  ____kvm_emulate_hypercall(), the complete_userspace_io callback
+>> is hardcoded to complete_hypercall_exit(), which always set return code
+>> to RAX.
+>>
+>> We can allow the caller to pass in the cui callback, or assign different
+>> version according to the input 'ret_reg'.  So that different callers can use
+>> different cui callbacks.  E.g., TDX needs to set return code to R10 in cui
+>> callback.
+>>
+>> How about:
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index dba78f22ab27..0fba98685f42 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -2226,13 +2226,15 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
+>>    int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>>                                 unsigned long a0, unsigned long a1,
+>>                                 unsigned long a2, unsigned long a3,
+>> -                             int op_64_bit, int cpl, int ret_reg);
+>> +                             int op_64_bit, int cpl, int ret_reg,
+>> +                             int (*cui)(struct kvm_vcpu *vcpu));
+>>
+> Does below (incremental diff based on Sean's) work?
+
+Yes, it can work.
+
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 734dac079453..5131af97968d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10075,7 +10075,6 @@ int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu,
+> unsigned long nr,
+>                          vcpu->run->hypercall.flags |=
+> KVM_EXIT_HYPERCALL_LONG_MODE;
+>   
+>                  WARN_ON_ONCE(vcpu->run->hypercall.flags &
+> KVM_EXIT_HYPERCALL_MBZ);
+> -               vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+>                  /* stat is incremented on completion. */
+>                  return 0;
+>          }
+> @@ -10108,8 +10107,11 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>          r = __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+>                                      is_64_bit_hypercall(vcpu),
+>                                      kvm_x86_call(get_cpl)(vcpu), RAX);
+> -       if (r <= 0)
+> +       if (r <= 0) {
+> +               if (!r)
+> +                       vcpu->arch.complete_userspace_io =
+> complete_hypercall_exit;
+>                  return 0;
+> +       }
+>   
+>          return kvm_skip_emulated_instruction(vcpu);
+>   }
+>
 
 
