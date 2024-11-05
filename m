@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142D19BC5AA
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:40:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B7E9BC5AB
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C76022832E9
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:40:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CFF72832D8
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133261FCF4D;
-	Tue,  5 Nov 2024 06:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EF61FE0E0;
+	Tue,  5 Nov 2024 06:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e7bw9pGT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dc+6YsvU"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CE31FDF96
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF061FDFA3
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730788747; cv=none; b=R//xVYhXQTVQlFuqqj0JZ/xAQKj1vW7MnVakjDsUuUKR3dcS0s9dgygSCkoHGN53DR0hrE44G6RCI2793PpH0iwlxjeq/uwp/iewQJ0+xHy93zqj2//r3igptXpUPIzUqdUbJ4tUPNCtg9Vt/a1Ql/KVI4vpBwS/AZLkW2z8NM4=
+	t=1730788751; cv=none; b=pmgKGdZLurB07F+GE03mkkxWBw/LvT6daSKZzwCPEY/ymYt0CG2wVk6XAZUpRSIUnW3D3X/KkMdMvedcZRJVOcCxvpleg25SEem69f+rA456zMBAVyAgrTXIvxx26VNIrLt0KD8btOSy4mpc0515tyDJA6HvV/bIgcWFiDrqNs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730788747; c=relaxed/simple;
-	bh=oaeUYxWxoTsbbEf4Af9Nw3NbJLsiof0AXokRyvVuUyo=;
+	s=arc-20240116; t=1730788751; c=relaxed/simple;
+	bh=ETTKI5+hacWoJJE2C+uh6AGfusJHWOqz7xoddYnIUoE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RmwrxFDvoyiW5OeHPQtgjCbPev2LvXOmaR3VxdCRcUKitMjwKefpsJ0W/Svx03MLE0bi6IVbC4tpx6K9kzp8Qj01OweVYN9TILQ+lfoi0tzTnlvjO9LUudgS/sKnm/LRVFxpUC7Cj3btfMiowTiEwDLXxZHQtl/nnWXbuMYQSnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e7bw9pGT; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=hQT3fyawgKAxpQYKLdTYD0I0Gbe/ARm5IDlpdERm+pc9FVknTsaCrxB/d33Amc1Z/JgpAKBgU+r89+lrmTF5kKQzuk6qjMeLl+q+Yu5ExZP8IL1OrvSx/OrAE96UVxblSu0zphivUQzLYNmJjKNnVfY5Ym/IBJArVXecC3/3pro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dc+6YsvU; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730788746; x=1762324746;
+  t=1730788750; x=1762324750;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oaeUYxWxoTsbbEf4Af9Nw3NbJLsiof0AXokRyvVuUyo=;
-  b=e7bw9pGTQdIwqwcc9v9FZDuUPIZ0GbWdBDx2lveytNuNQR1GVZfrHpB9
-   zqps8ZM9pHTxZgFwY6Jcupf9/syGVd13Cqa6LmrMyFnS0OMMC47hsvKmo
-   iulk3RlKC0D7unxuNwDr8XHv/gFqGjBLt6gv3jNpkC/UtAc4kcv11VclD
-   hhcDuG/jhayOaJVAWUjiARsAYWU06SEQFLWlEkWTMMvqJ6pQRz7iWov4v
-   pofpqndVlp5ubYk3NMTurpibPfbT5+fZ+BeJ6ebPBub5dG/gnxtUaNLBb
-   NJIZYVDY6Z71mPDMFyqJVR4UPFHXuVlQX+a81Qed/PysYVazeiDbPeiwV
+  bh=ETTKI5+hacWoJJE2C+uh6AGfusJHWOqz7xoddYnIUoE=;
+  b=Dc+6YsvUflwWrzCC3KHTnckWUUjzLl+gqmFKxxiDIozvGbYyoGlkNR5F
+   bkPcVT4VVQsWt8t/EP109SYQOG0zQ1zkURlZceWOeEx/FHDRgfAZ0uoyO
+   iCPipHMf7x3Z3toyDmbIjLuJe9RSMc0CJXlqjBnGsIkcLB+BcvJ8/pgpi
+   4vt4puUXy1mNYUNLQhnQULBARYuSOivUI1HA91UN433n6PowKc2Av+Fvf
+   2NZsdcUUtbrSXVJhAJ9He/cu4XdiuZ5vl2J52+EN5ndVMeJK28fZ+xbLR
+   +HZWlpmEWxjsNQhx6uiqbCkE9xh+noOJLAQ1yDOV4rgSmAsH+KPT8Q5M6
    g==;
-X-CSE-ConnectionGUID: kglpdMlfQpiiSm3MNyA5HA==
-X-CSE-MsgGUID: S6BiPMUiS02HQUd4905yEg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689735"
+X-CSE-ConnectionGUID: RrmD8pycQSyP3Tpo1JW98g==
+X-CSE-MsgGUID: VKID7HB4R8acpjR+z1+6cg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689750"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30689735"
+   d="scan'208";a="30689750"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:39:06 -0800
-X-CSE-ConnectionGUID: EI5xNTcOT4uw11Kv11bggg==
-X-CSE-MsgGUID: 2ryCymgaT3yCWbd2Jfig5A==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:39:10 -0800
+X-CSE-ConnectionGUID: aHXP1H8NQpSpWutRAMliPQ==
+X-CSE-MsgGUID: 8S17/192T7WLzQnztIR5qQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="83989510"
+   d="scan'208";a="83989534"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:39:01 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:39:06 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Riku Voipio <riku.voipio@iki.fi>,
@@ -78,9 +78,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org,
 	xiaoyao.li@intel.com
-Subject: [PATCH v6 38/60] i386/tdx: Disable SMM for TDX VMs
-Date: Tue,  5 Nov 2024 01:23:46 -0500
-Message-Id: <20241105062408.3533704-39-xiaoyao.li@intel.com>
+Subject: [PATCH v6 39/60] i386/tdx: Disable PIC for TDX VMs
+Date: Tue,  5 Nov 2024 01:23:47 -0500
+Message-Id: <20241105062408.3533704-40-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241105062408.3533704-1-xiaoyao.li@intel.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
@@ -92,36 +92,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX doesn't support SMM and VMM cannot emulate SMM for TDX VMs because
-VMM cannot manipulate TDX VM's memory.
+Legacy PIC (8259) cannot be supported for TDX VMs since TDX module
+doesn't allow directly interrupt injection.  Using posted interrupts
+for the PIC is not a viable option as the guest BIOS/kernel will not
+do EOI for PIC IRQs, i.e. will leave the vIRR bit set.
 
-Disable SMM for TDX VMs and error out if user requests to enable SMM.
+Hence disable PIC for TDX VMs and error out if user wants PIC.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ target/i386/kvm/tdx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 00faffa891e4..68d90a180db7 100644
+index 68d90a180db7..9ab4e911f78a 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -355,11 +355,20 @@ static Notifier tdx_machine_done_notify = {
+@@ -369,6 +369,13 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+         return -EINVAL;
+     }
  
- static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    X86MachineState *x86ms = X86_MACHINE(ms);
-     TdxGuest *tdx = TDX_GUEST(cgs);
-     int r = 0;
- 
-     kvm_mark_guest_state_protected();
- 
-+    if (x86ms->smm == ON_OFF_AUTO_AUTO) {
-+        x86ms->smm = ON_OFF_AUTO_OFF;
-+    } else if (x86ms->smm == ON_OFF_AUTO_ON) {
-+        error_setg(errp, "TDX VM doesn't support SMM");
++    if (x86ms->pic == ON_OFF_AUTO_AUTO) {
++        x86ms->pic = ON_OFF_AUTO_OFF;
++    } else if (x86ms->pic == ON_OFF_AUTO_ON) {
++        error_setg(errp, "TDX VM doesn't support PIC");
 +        return -EINVAL;
 +    }
 +
