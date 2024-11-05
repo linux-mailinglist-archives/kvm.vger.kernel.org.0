@@ -1,85 +1,76 @@
-Return-Path: <kvm+bounces-30733-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1459BCC3A
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:55:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3909BCCD7
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 13:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 207AA283D47
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 11:55:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A90DCB218B9
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 12:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDC41D47C8;
-	Tue,  5 Nov 2024 11:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51B71D5AB2;
+	Tue,  5 Nov 2024 12:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPg1pZzg"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ergJIKcb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5CE1D3593
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 11:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AECF1E485;
+	Tue,  5 Nov 2024 12:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730807716; cv=none; b=JCOLUZo8bGeVsicudpdYSnQ/WOdDjH/V7voExzhk+VBJpNFspsdv7d5/xu03CFSBT4KS7yqJUzgsGZ439jEFkhKjdXJrzf45QWI/t/CGlU/mtV9XxlMq/a5NZclAr2JnTJdf8rZLU64SVB10bkJOPgqdA6Pa4huIXMMUBZ2TVDw=
+	t=1730810085; cv=none; b=L5aI8cs4SMqPJmSnzW5Iwi96kpWecqQ+oBfrVTUQJEW+oBwVC8aHuCDAo/53HLqzKJJ0ikI65++SaIQXYVccgkiAig1HFZNPRikCtJQY1SOjw38/O1HNVhIo47pqIaPUyyPZws483YQvBUcbd9wnek6jzVCYbnCMesmRN6J5mCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730807716; c=relaxed/simple;
-	bh=8YaXvTzJ7JklhVt7flNR6pmyzP2d1LQ9wcZBn6iSBKQ=;
+	s=arc-20240116; t=1730810085; c=relaxed/simple;
+	bh=6ab9A01Fg8dPT+qGLjlSuPeA/zf+1hft8BB4Pq9R68Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YvleE3RuOC+L8f7SLK6CArHn1SzHnFN040mBhvnHePma7z3sWiMbDjdzHkr7zyTauTTFkgOmGJFlhhlER577hi4iwZZuoUpjicRUJvc4PIX8Ox8OfE421xL+hot6mb7tbLMJja+EF5yT4SGueGI+3ZkfvTkCIN0sA5k97Gu2G3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aPg1pZzg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730807713;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbGyVdIM0bilx3FdtiaVh2tHO0JsOM+LxjXtPCL7FKo=;
-	b=aPg1pZzgL5mQMu8k6WdEXPlNrRNFkS3fp5c1m2YK5xyavVG3pGajE7fsyeOQu3xTzuopqd
-	kFi4XVoDWoY2ghtT58ysWl8LDQY5pOuuNLVLO/ScqW7h3U775fMq5jdCukT9LGBcmSWsNC
-	6g9H5nN+9MiuFGvj3KxJK+fOQhwDc0U=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-614-75U2yIvnMamJ_vNCKkpwRQ-1; Tue,
- 05 Nov 2024 06:55:10 -0500
-X-MC-Unique: 75U2yIvnMamJ_vNCKkpwRQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	 Content-Type:Content-Disposition:In-Reply-To; b=qd5APPkjQdNvEgCtG0VehUJ5eXqln8eJB5pPKMzE0Om6yZP+Os0z0KdUOeP4kJdAca/u9A8MQBav8OA00lPNKBDYHLECykMpHUo7fkn2DOMtwuFk6SyiiKEIqwFp4v+rL3m9IupRQZy7gJ+UT/sskN2ps2Wa8bfSVmWFmnLAp3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ergJIKcb; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6F70840E0028;
+	Tue,  5 Nov 2024 12:34:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id EsCHnnPfGnqn; Tue,  5 Nov 2024 12:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730810069; bh=JXfaLIhH5QD5lDtFbiYdHHjo04xpl0JyGhMdeRWp1+A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ergJIKcbw8gGoxtFQNfmfd2FWAeWIElCWPi3a3UwjzPgaMLGQoiOxMN/Qfd0MN6MN
+	 mpRXkHUsLnSa55XLs4Ont4IOcC3X2M/0fyX3sWbZYh+uNEgVz04XLUVOkmMpPpSp37
+	 j8+BjSusrm3fm+tpaAD5fy+wkmi2SX0OFYEc9olCh1gU69J3ip13/TeGtdnXPQjBIC
+	 I7eZ7lZdgjuw1FTWRbVZWnN6ZSa6PAZbPVhBXleYZKcIGU+fFGzkHm7aiehfNiW0Y+
+	 l+MR6YFiWnWQSttE1bVMMdFG6iVhOWJXnXDHtaIMQiFTVN95eVVe0UCouAGvVAGrNi
+	 jXFysfYSclJbLEVOyFHfgk2FpH++tX85PqIW7ccMpd32K9xUrFnohcI3evH2Ar8ygc
+	 0Ssy1E0Hyl4VpivB8qkAAIxLERFHHfxaxp5MbH5XhTXIbVBMhPASBXGSWFu0/9BPC1
+	 BqTzhrdwSyQhmwEOzkPScwtBhQHGTSdWV69PZt4Kzd+VIASmMeU/tXFvu5YI8IB9CE
+	 JR8eUqP4w++VThA6k3iaIkbDWvuQi1kbw9qyDgrhCTC8eGPCWX5S5bwjr5hgGsRobx
+	 Y040wIRQPiErF6mBInwai6dvoSBCF/YFwim6WwP8g8xSk6jBFEEyfnXMLPfQ4mpUyk
+	 tQzee+vyiAp04bFMyzCy7roQ=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94FA2195608F;
-	Tue,  5 Nov 2024 11:55:07 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.52])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 36011300018D;
-	Tue,  5 Nov 2024 11:54:59 +0000 (UTC)
-Date: Tue, 5 Nov 2024 11:54:56 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
-	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 13/60] i386/tdx: Validate TD attributes
-Message-ID: <ZyoHkCyknQZTeISs@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-14-xiaoyao.li@intel.com>
- <Zyn1Jhxr8ip0lIcs@redhat.com>
- <7fbf9071-493a-4929-afaa-d0a669346f17@intel.com>
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E69B140E0191;
+	Tue,  5 Nov 2024 12:34:21 +0000 (UTC)
+Date: Tue, 5 Nov 2024 13:34:16 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
+Message-ID: <20241105123416.GBZyoQyAoUmZi9eMkk@fat_crate.local>
+References: <20241104101543.31885-1-bp@kernel.org>
+ <ZyltcHfyCiIXTsHu@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,79 +79,132 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7fbf9071-493a-4929-afaa-d0a669346f17@intel.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <ZyltcHfyCiIXTsHu@google.com>
 
-On Tue, Nov 05, 2024 at 07:53:57PM +0800, Xiaoyao Li wrote:
-> On 11/5/2024 6:36 PM, Daniel P. Berrangé wrote:
-> > On Tue, Nov 05, 2024 at 01:23:21AM -0500, Xiaoyao Li wrote:
-> > > Validate TD attributes with tdx_caps that fixed-0 bits must be zero and
-> > > fixed-1 bits must be set.
-> > > 
-> > > Besides, sanity check the attribute bits that have not been supported by
-> > > QEMU yet. e.g., debug bit, it will be allowed in the future when debug
-> > > TD support lands in QEMU.
-> > > 
-> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> > > 
-> > > ---
-> > > Changes in v3:
-> > > - using error_setg() for error report; (Daniel)
-> > > ---
-> > >   target/i386/kvm/tdx.c | 28 ++++++++++++++++++++++++++--
-> > >   1 file changed, 26 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> > > index 6cf81f788fe0..5a9ce2ada89d 100644
-> > > --- a/target/i386/kvm/tdx.c
-> > > +++ b/target/i386/kvm/tdx.c
-> > > @@ -20,6 +20,7 @@
-> > >   #include "kvm_i386.h"
-> > >   #include "tdx.h"
-> > > +#define TDX_TD_ATTRIBUTES_DEBUG             BIT_ULL(0)
-> > >   #define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
-> > >   #define TDX_TD_ATTRIBUTES_PKS               BIT_ULL(30)
-> > >   #define TDX_TD_ATTRIBUTES_PERFMON           BIT_ULL(63)
-> > > @@ -141,13 +142,33 @@ static int tdx_kvm_type(X86ConfidentialGuest *cg)
-> > >       return KVM_X86_TDX_VM;
-> > >   }
-> > > -static void setup_td_guest_attributes(X86CPU *x86cpu)
-> > > +static int tdx_validate_attributes(TdxGuest *tdx, Error **errp)
-> > > +{
-> > > +    if ((tdx->attributes & ~tdx_caps->supported_attrs)) {
-> > > +            error_setg(errp, "Invalid attributes 0x%lx for TDX VM "
-> > > +                       "(supported: 0x%llx)",
-> > > +                       tdx->attributes, tdx_caps->supported_attrs);
-> > > +            return -1;
-> > 
-> > Minor whitespace accident, with indentation too deep.
+On Mon, Nov 04, 2024 at 04:57:20PM -0800, Sean Christopherson wrote:
+> scripts/get_maintainer.pl :-)
+
+That's what I used but I pruned the list.
+
+Why, did I miss anyone?
+ 
+> It's not strictly KVM module load, it's when KVM enables virtualization.
+
+Yeah, the KVM CPU hotplug callback.
+
+> E.g. if userspace clears enable_virt_at_load,
+
+/me reads the documentation on that...
+
+Intersting :-)
+
+Put all the work possible in the module load so that VM startup is minimal.
+
+> the MSR will be toggled every time the number of VMs goes from 0=>1 and
+> 1=>0.
+
+I guess that's fine. 
+
+> But why do this in KVM?  E.g. why not set-and-forget in init_amd_zen4()?
+
+Because there's no need to impose an unnecessary - albeit small - perf impact
+on users who don't do virt.
+
+I'm currently gravitating towards the MSR toggling thing, i.e., only when the
+VMs number goes 0=>1 but I'm not sure. If udev rules *always* load kvm.ko then
+yes, the toggling thing sounds better. I.e., set it only when really needed.
+
+> Shouldn't these be two separate patches?  AFAICT, while the two are related,
+> there are no strict dependencies between SRSO_USER_KERNEL_NO and
+> SRSO_MSR_FIX.
+
+Meh, I can split them if you really want me to.
+
+> If the expectation is that X86_FEATURE_SRSO_USER_KERNEL_NO will only ever come
+> from hardware, i.e. won't be force-set by the kernel, then I would prefer to set
+> the bit in the "standard" way
 > 
-> Good catch!
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 41786b834b16..eb65336c2168 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -794,7 +794,7 @@ void kvm_set_cpu_caps(void)
+>         kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
+>                 F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
+>                 F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */ |
+> -               F(WRMSR_XX_BASE_NS)
+> +               F(WRMSR_XX_BASE_NS) | F(SRSO_USER_KERNEL_NO)
+
+Ok, sure, ofc.
+
+>         );
+>  
+>         kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
 > 
-> btw, how did you catch it? any tool like checkpatch.pl or just by your eyes?
+> The kvm_cpu_cap_check_and_set() trickery is necessary only for features that are
+> force-set by the kernel, in order to avoid kvm_cpu_cap_mask()'s masking of the
+> features by actual CPUID.  I'm trying to clean things up to make that more obvious;
+> hopefully that'll land in 6.14[*].
 
-Nah, I just notice the mis-alignment when reading the patches.
+Oh please. It took me a while to figure out what each *cap* function is for so
+yeah, cleanup would be nice theere.
+
+> And advertising X86_FEATURE_SRSO_USER_KERNEL_NO should also be a separate patch,
+> no?  I.e. 
+> 
+>  1. Use SRSO_USER_KERNEL_NO in the host
+>  2. Update KVM to advertise SRSO_USER_KERNEL_NO to userspace, i.e. let userspace
+>     know that it can be enumerate to the guest.
+>  3. Add support for SRSO_MSR_FIX.
+
+Sure, I can split. I'm lazy and all but ok... :-P
+
+> [*] https://lore.kernel.org/all/20240517173926.965351-49-seanjc@google.com
+
+Cool.
 
 > 
-> > > +    }
-> > > +
-> > > +    if (tdx->attributes & TDX_TD_ATTRIBUTES_DEBUG) {
-> > > +        error_setg(errp, "Current QEMU doesn't support attributes.debug[bit 0] "
-> > > +                         "for TDX VM");
-> > > +        return -1;
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +}
+> >  	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
+> >  
+> >  	kvm_cpu_cap_init_kvm_defined(CPUID_8000_0022_EAX,
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 9df3e1e5ae81..03f29912a638 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -608,6 +608,9 @@ static void svm_disable_virtualization_cpu(void)
+> >  	kvm_cpu_svm_disable();
+> >  
+> >  	amd_pmu_disable_virt();
+> > +
+> > +	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
+> > +		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+> 
+> I don't like assuming the state of hardware.  E.g. if MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT
+> was already set, then KVM shouldn't clear it.
 
-With regards,
-Daniel
+Right, I don't see that happening tho. If we have to sync the toggling of this
+bit between different places, we'll have to do some dance but so far its only
+user is KVM.
+
+> KVM's usual method of restoring host MSRs is to snapshot the MSR into
+> "struct kvm_host_values" on module load, and then restore from there as
+> needed.  But that assumes all CPUs have the same value, which might not be
+> the case here?
+
+Yes, the default value is 0 out of reset and it should be set on each logical
+CPU whenever we run VMs on it. I'd love to make it part of the VMRUN microcode
+but... :-)
+
+> All that said, I'd still prefer that MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT is set
+> during boot, unless there's a good reason not to do so.
+
+Yeah, unnecessary penalty on machines not running virt.
+
+Thx.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
