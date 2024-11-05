@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50409BC5BD
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:41:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D367D9BC5BE
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 07:41:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12177B233DA
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:41:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02DD11C212BF
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F26A1FDFA3;
-	Tue,  5 Nov 2024 06:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A692B1FF5FB;
+	Tue,  5 Nov 2024 06:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nU4BAzbw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KRdNBOA+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A5619047D
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F35C1FDF9B
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 06:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730788819; cv=none; b=FJ32HzMNpLekH9bDLr2K/Lgl2QrOi5sAh5+I9r6r1wSEHE8fEM8dY4ypdTH0rboftMg+zEKNhH4oKUZzqyOm8duKRTyNvJS25QgtCrcuxKCR20+94T57wGoDMfRBYec+L+k15QUd//8O5IMgrI6PaD7JOhHPlzal4r3WdnH3h7Q=
+	t=1730788823; cv=none; b=NOa/Jfcricq11xxwYkndru48EulOuL2yZJob8XSXJZzvnu9Sfwq4pcoyKTlq/HfadDJy8yLm4jwD0OJ/XEnrEaNSeyt9rE64Pza2A8/BgotIwL8C0MrhnNOUxgvLtjpd926kwcog6FLT861mWbDGqiiKSU1WWM3clykuSdH5/Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730788819; c=relaxed/simple;
-	bh=R3qGJveZ2fmuHjYuT93ENGzexAuyNwuq1EZaJ0+cqc0=;
+	s=arc-20240116; t=1730788823; c=relaxed/simple;
+	bh=N6wZGF3LbJuiZwh2h+P0qnuOeIsvhZtITe8MucmhR3Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RfD3H3T5YMfjvxG3WU4IecUqV7wDx5HbMNU8tYhDuzvIANxAfSZc2rddziU9wpc2JCRXePjLDA42EKQ9MvkO6z0GilNTlqaLtpWkrvTRanXRldZTPgoB2cAN2Im/7R57VS2/ThiP9w1UYrSPwwSN0SJQ6JqkPL/NERtf8Diigf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nU4BAzbw; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=NwZm2LhlSXsNqZbQKIBmJBBGmGxP19/ppyo04pBAH9uszNL4fZcucyHOS2ED+pHPFsLZ8teNw9pCC3BPQDH0hzBMdOR+mIMwP7uoj957sAtsNydx2fsP0IRYIpGeFIqBAh57SawFYuzgmjpi22FAdQPBIbO4pCL0MVCZ1qZo3cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KRdNBOA+; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730788818; x=1762324818;
+  t=1730788822; x=1762324822;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=R3qGJveZ2fmuHjYuT93ENGzexAuyNwuq1EZaJ0+cqc0=;
-  b=nU4BAzbwUw6Dijc2oR1g8ZxpUtnnU5RiUx/ogKM6jIldaO9Zgs0hR6gJ
-   wjzQecShgsMeHhpDPqmzYDTFxvShj5VLaAmZIGA0i/EPiCEPL5Kwf775e
-   HRjMFj+ZUnYkF9uKhosUVLD6768Qy2qDfGlpJDpgUJTR8jSe3t6Pmgn3Q
-   b+Lr63iz99SsULfaulFkUEtLXSDnx+nFAqcIx2TSqmHbYByQFJd4947hw
-   MhySCLJcSa14+F8WDOEfKrhIk5/YsHPzu3tWPqi1URjjzUz5dsV9gkVlC
-   MEhe29SFr2+Wnz97RaGq5jBWSkV9nczrBZeCAf0RIRqRtsovJD/D4cd2G
+  bh=N6wZGF3LbJuiZwh2h+P0qnuOeIsvhZtITe8MucmhR3Y=;
+  b=KRdNBOA+jId0z3h/xuhv3xGTPZzgwx8CYvagqpCcbuCFakjmlGnXp9dW
+   qL+VSI5QRjA4kSe6fak6faGtC+KY0OKvS1xR0x3j2efWEtpfuvZ3HLPp3
+   VZaKjrtHumHPmAKTISn6QA9JG1QO+/yNyZnwU5mqeJjvlOQNi5LEjcQkn
+   LGFsiTsKQ2W2alfR0xlMjP6DhPFAA/nJYGA0zEexgqPlmNnF5a/GLniUO
+   xJpya1VshM2+XNH0VRh4x/+otVJ74YGpu5KLXH4mEDvlmpZf8GE2DULSw
+   vHEmpZ2O0MraTUW3IWP5niUOAgnefqWQLD6iwi7VK34dtBsZQcJEfQ8op
    Q==;
-X-CSE-ConnectionGUID: dd2wNkVEQJq6qAIviLXmCQ==
-X-CSE-MsgGUID: uHlpKDPpRL2noHRwlQQc7g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689919"
+X-CSE-ConnectionGUID: zQtDtrbQT16KEBIP56BcFA==
+X-CSE-MsgGUID: pecEVBq2QXOcelc6wqsdIw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30689927"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30689919"
+   d="scan'208";a="30689927"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:40:18 -0800
-X-CSE-ConnectionGUID: cCHE70fzS4uPY/tjfHAGjA==
-X-CSE-MsgGUID: 4cVcz/YWTguoW1CHzdYfFA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 22:40:22 -0800
+X-CSE-ConnectionGUID: cui/g9wYSTW/R2q/F+xxag==
+X-CSE-MsgGUID: BO/sHFRmRSK/ivSD8JW1yA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="83990026"
+   d="scan'208";a="83990064"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:40:14 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 04 Nov 2024 22:40:18 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Riku Voipio <riku.voipio@iki.fi>,
@@ -78,9 +78,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org,
 	xiaoyao.li@intel.com
-Subject: [PATCH v6 55/60] i386/tdx: Fetch and validate CPUID of TD guest
-Date: Tue,  5 Nov 2024 01:24:03 -0500
-Message-Id: <20241105062408.3533704-56-xiaoyao.li@intel.com>
+Subject: [PATCH v6 56/60] i386/tdx: Don't treat SYSCALL as unavailable
+Date: Tue,  5 Nov 2024 01:24:04 -0500
+Message-Id: <20241105062408.3533704-57-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241105062408.3533704-1-xiaoyao.li@intel.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
@@ -92,121 +92,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use KVM_TDX_GET_CPUID to get the CPUIDs that are managed and enfored
-by TDX module for TD guest. Check QEMU's configuration against the
-fetched data.
-
-Print wanring  message when 1. a feature is not supported but requested
-by QEMU or 2. QEMU doesn't want to expose a feature while it is enforced
-enabled.
-
-- If cpu->enforced_cpuid is not set, prints the warning message of both
-1) and 2) and tweak QEMU's configuration.
-
-- If cpu->enforced_cpuid is set, quit if any case of 1) or 2).
-
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/tdx.c | 81 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 81 insertions(+)
+ target/i386/kvm/tdx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index e7e0f073dfc9..9cb099e160e4 100644
+index 9cb099e160e4..05475edf72bd 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -673,6 +673,86 @@ static uint32_t tdx_adjust_cpuid_features(X86ConfidentialGuest *cg,
-     return value;
- }
+@@ -734,6 +734,13 @@ static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
  
-+
-+static void tdx_fetch_cpuid(CPUState *cpu, struct kvm_cpuid2 *fetch_cpuid)
-+{
-+    int r;
-+
-+    r = tdx_vcpu_ioctl(cpu, KVM_TDX_GET_CPUID, 0, fetch_cpuid);
-+    if (r) {
-+        error_report("KVM_TDX_GET_CPUID failed %s", strerror(-r));
-+        exit(1);
-+    }
-+}
-+
-+static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
-+{
-+    uint64_t actual, requested, unavailable, forced_on;
-+    g_autofree struct kvm_cpuid2 *fetch_cpuid;
-+    const char *forced_on_prefix = NULL;
-+    const char *unav_prefix = NULL;
-+    struct kvm_cpuid_entry2 *entry;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+    FeatureWordInfo *wi;
-+    FeatureWord w;
-+    bool mismatch = false;
-+
-+    fetch_cpuid = g_malloc0(sizeof(*fetch_cpuid) +
-+                    sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
-+    tdx_fetch_cpuid(cs, fetch_cpuid);
-+
-+    if (cpu->check_cpuid || cpu->enforce_cpuid) {
-+        unav_prefix = "TDX doesn't support requested feature";
-+        forced_on_prefix = "TDX forcibly sets the feature";
-+    }
-+
-+    for (w = 0; w < FEATURE_WORDS; w++) {
-+        wi = &feature_word_info[w];
-+        actual = 0;
-+
-+        switch (wi->type) {
-+        case CPUID_FEATURE_WORD:
-+            entry = cpuid_find_entry(fetch_cpuid, wi->cpuid.eax, wi->cpuid.ecx);
-+            if (!entry) {
-+                /*
-+                 * If KVM doesn't report it means it's totally configurable
-+                 * by QEMU
-+                 */
-+                continue;
-+            }
-+
-+            actual = cpuid_entry_get_reg(entry, wi->cpuid.reg);
-+            break;
-+        case MSR_FEATURE_WORD:
-+            /*
-+             * TODO:
-+             * validate MSR features when KVM has interface report them.
-+             */
-+            continue;
+         requested = env->features[w];
+         unavailable = requested & ~actual;
++        /*
++         * Intel enumerates SYSCALL bit as 1 only when processor in 64-bit
++         * mode and before vcpu running it's not in 64-bit mode.
++         */
++        if (w == FEAT_8000_0001_EDX && unavailable & CPUID_EXT2_SYSCALL) {
++            unavailable &= ~CPUID_EXT2_SYSCALL;
 +        }
-+
-+        requested = env->features[w];
-+        unavailable = requested & ~actual;
-+        mark_unavailable_features(cpu, w, unavailable, unav_prefix);
-+        if (unavailable) {
-+            mismatch = true;
-+        }
-+
-+        forced_on = actual & ~requested;
-+        mark_forced_on_features(cpu, w, forced_on, forced_on_prefix);
-+        if (forced_on) {
-+            mismatch = true;
-+        }
-+    }
-+
-+    if (cpu->enforce_cpuid && mismatch) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
- static int tdx_validate_attributes(TdxGuest *tdx, Error **errp)
- {
-     if ((tdx->attributes & ~tdx_caps->supported_attrs)) {
-@@ -1019,4 +1099,5 @@ static void tdx_guest_class_init(ObjectClass *oc, void *data)
-     x86_klass->cpu_instance_init = tdx_cpu_instance_init;
-     x86_klass->cpu_realizefn = tdx_cpu_realizefn;
-     x86_klass->adjust_cpuid_features = tdx_adjust_cpuid_features;
-+    x86_klass->check_features = tdx_check_features;
- }
+         mark_unavailable_features(cpu, w, unavailable, unav_prefix);
+         if (unavailable) {
+             mismatch = true;
 -- 
 2.34.1
 
