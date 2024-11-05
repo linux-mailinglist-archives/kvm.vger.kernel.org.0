@@ -1,236 +1,232 @@
-Return-Path: <kvm+bounces-30600-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30601-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633569BC3F4
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:39:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7429BC400
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 04:44:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E367C1F21D40
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:39:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72C0D1C21077
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F42C187870;
-	Tue,  5 Nov 2024 03:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FDC188714;
+	Tue,  5 Nov 2024 03:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UvpK8b4z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GHucp5W1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F0E4D9FE
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 03:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC0524B29
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 03:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730777939; cv=none; b=A4c93U/farWrZAfygEF1oFYRgtiZt9SWSozZljAvgHHO+U4/dPV9duoDGqkOvy7tBvbNg7MoThe46zMaDreyobUgrr3TEvObvskrsau1ByW6ZfIAPTsuSZYT1nJj+KMW4yP5ATxYYZZ8ZipEID+1/ZRKkfFtX8pPnlg7Jh2kEGE=
+	t=1730778236; cv=none; b=UMUWULC4pGAezsTVKrpkqLYNi7QcZg6TuSYbaXaokIFMipZNXkuzQ3aL9QKRuSf1LGUA9S24r4sUzqHfL7S3pw4nxywjHQmTl8dDReZas149nUCzwMtTgVfeY6zFs5K7LoW76yDrBdF5TRHCtvIhZW2DWTnetx4eIDLUxh1j2gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730777939; c=relaxed/simple;
-	bh=pli57L/PI2PdF6meJNMHYu+iNu2hcdYsBPqUagn44Zc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VQr1URxMWOmvUPI/ow+L+Yh+npvqN5lPiUwT1oU1DJIYp8d4OzSrvlnr7dqjI03R9njB5WBkqXDI+YX/plbgRqoFIc+BAdER5g9colJ3yLiGzC5r6nk4qwPQNtpnw3osAOmx4efjyn1IeWrs6sfHL3/Neg0Pn+QAYEiGcSZTSvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UvpK8b4z; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730777938; x=1762313938;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pli57L/PI2PdF6meJNMHYu+iNu2hcdYsBPqUagn44Zc=;
-  b=UvpK8b4zgIks61Tbkf9EbFte+QD5E4VB9SGQlXfqW07zsqkjmwIW2NIV
-   4RbCTsblBDSJRmdkt7SYFTx7HFhnY5ZrhvAzKjSGzGxVy5NtI7aeo48gn
-   wJ/f4NPpetQW2XyZKFebsktJOoXNtcjhyOrjUh4m3l2v3iMT/VdjraACL
-   ntgYYIxnL40VexPjZ8A8rIRUOqltL0r6GwrNflJvtBzxpqwROvY75EKRc
-   lpXDlCHj06QbTua1kiAd5OzpM6GzzF/xhid6W1+y0OfOjRzWD8E/ljBUk
-   IdVoqnywTZuWTAAiN6KxeyF0Xi7Ggv8f5eBRValItJxhngEUImM7NXN+V
-   g==;
-X-CSE-ConnectionGUID: 6fvazHivSsCWhNDflbPlXg==
-X-CSE-MsgGUID: 8C69hC73RsWZ8gE9ynXvyg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="18122516"
-X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="18122516"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:38:57 -0800
-X-CSE-ConnectionGUID: RYng68VJSPOm8/UCS+NdQw==
-X-CSE-MsgGUID: WNI4FsQITuq7uSOFIgZ5Tg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="83956764"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:38:55 -0800
-Message-ID: <1076c17a-b053-4332-8684-926842126b36@linux.intel.com>
-Date: Tue, 5 Nov 2024 11:38:08 +0800
+	s=arc-20240116; t=1730778236; c=relaxed/simple;
+	bh=Q4bP60HMOUubd5FtS15MOfgaJ0cgmiqcBFbJE+oWJdQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VTef0qQsP2/VLO3u7YSP037IOHjU5hn9YcvQbTo0F8jzV1x9AiCp5CNqSod9Pq3aKcLtO6EGH8FyJAnXCxkLcjFIizmn7eBCBfglhpFB4G7zGstsDCOVw/N9B3vnHVUSjxspA/MveT1kiGGrzOSz5mttkMXL6iTTmcH0qGQ7slg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GHucp5W1; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7edd6662154so4445633a12.0
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 19:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730778234; x=1731383034; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UnVKs0osASzkouG8eBoK3DKaxhriO4YY5mBFJ/kJW1o=;
+        b=GHucp5W1jqYzeVYLhGnnOOhlGaqo9QNVApTidkbwIk0KeNKIKURJWvfSk/4TqH++KT
+         mUFCHQn9vbjBmowuPfSTV+60izcXarM5JTvN+Ga4mKm0zZG7pXxDdONbZjo+sHq7Xm4g
+         w7d9IMC9t99LzU2MbzaEJhswV0PBYEU/c0iq/hjbf1oyCq+ghbil7GrC/WPBhdELt6FG
+         1Bs3hoS3lN8HTPN0Di2ZvqVx3n5iy/T+4erWpiTQUJSaBNk/2dYLYZPteygTl6Z42x66
+         m13dbouTD1RpQlj2lL9ezucS+kg0QGsSTxMCkbwLdV1zffG/EXkkKxPLJb35rwPTNqqw
+         5Z+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730778234; x=1731383034;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UnVKs0osASzkouG8eBoK3DKaxhriO4YY5mBFJ/kJW1o=;
+        b=l/X7J2xyEzFPsi6v/kDlAaU5v72pboNZ0DfKhxIJBNR7db1b7pBrW0hAy8Io652ZiN
+         Ts/eHgVfmNbvtyI9vddENL4D5pyapd6rn1rGW4MCGeqRnFDh5f6csmdnO7lZOfq0y5EO
+         ZH6PXVgYrjUq3NQ4CNuljWW0XlnsiOUidhDH5MOG7HOCv+udscjPVCyEGhHxrLR+zlwO
+         GdWXqgRIOfkT4h0V4oceP+B7oYrS3hs/qh5/x0NacBRUXOnNDpgg7zh+V7MXpSZ6eqEY
+         MHCDGZC84pJZXQRRbfLc/Fdil7rWwrn+rr52ZHrDrbN2rGW0b+yTP6Evs5jf1/3ojuoZ
+         FP5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUDx0+Hd5+EBW0wHEVn8Ulhy7y/bmLdJsZxLVLE8R+FqFQP3rSnmUIpUgtgG+p0CqCln4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ3rfZdmtDNRddK9URE5/0mfF4HL65PUS0iIgg78eivy+X0F8n
+	AB2gR504oiuISChoKfK49QwBotKzcX4nA9C9OdAKvvrl1nnddhk5hz7J+bqmK4yUlxVVTRwWJdA
+	gqg==
+X-Google-Smtp-Source: AGHT+IFocQz+imkZhpKg1tLjXX2+FNWMIhufYbEV0uhMIV+xRwIm53f+H8VvwfazbMYkrRO4gX3yEhs3IVs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:1c46:0:b0:7ea:94aa:c649 with SMTP id
+ 41be03b00d2f7-7ee4107aa76mr52462a12.2.1730778233522; Mon, 04 Nov 2024
+ 19:43:53 -0800 (PST)
+Date: Mon, 4 Nov 2024 19:43:52 -0800
+In-Reply-To: <CAHVum0eZ1z4NfmQEmr2T34LFY9EEhM0rdkEEx_yxF-zijhmLYA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 11/13] iommu/vt-d: Add set_dev_pasid callback for
- nested domain
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com, will@kernel.org
-References: <20241104131842.13303-1-yi.l.liu@intel.com>
- <20241104131842.13303-12-yi.l.liu@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241104131842.13303-12-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241101201437.1604321-1-vipinsh@google.com> <20241101201437.1604321-2-vipinsh@google.com>
+ <CAHVum0eZ1z4NfmQEmr2T34LFY9EEhM0rdkEEx_yxF-zijhmLYA@mail.gmail.com>
+Message-ID: <ZymUeC3WiIRH_Jqs@google.com>
+Subject: Re: [PATCH v3 1/1] KVM: x86/mmu: Remove KVM mmu shrinker
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: pbonzini@redhat.com, dmatlack@google.com, zhi.wang.linux@gmail.com, 
+	weijiang.yang@intel.com, mizhang@google.com, liangchen.linux@gmail.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/4/24 21:18, Yi Liu wrote:
-> From: Lu Baolu <baolu.lu@linux.intel.com>
-> 
-> Add intel_nested_set_dev_pasid() to set a nested type domain to a PASID
-> of a device.
-> 
+On Fri, Nov 01, 2024, Vipin Sharma wrote:
+> On Fri, Nov 1, 2024 at 1:14=E2=80=AFPM Vipin Sharma <vipinsh@google.com> =
+wrote:
+> >
+> > Remove KVM MMU shrinker and all its related code. Remove global
+> > kvm_total_used_mmu_pages and page zapping flow from MMU shrinker.
 
-Co-developed-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Co-developed-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+Don't provide a play-by-play of the code changes.  Simply stating "all its
+related code" is sufficient.  From that, readers know the *intent* of the p=
+atch,
+and that allows reviewers to double check that all code is indeed removed.
+Stating what the patch literally does verbatim adds a lot of noise and very=
+ little
+value.
 
-And convert the patch author to you.
+> > Remove zapped_obsolete_pages list from struct kvm_arch{} and use local
+> > list in kvm_zap_obsolete_pages() since MMU shrinker is not using it
+> > anymore.
+> >
+> > Current flow of KVM MMU shrinker is very disruptive to VMs.
 
-> ---
->   drivers/iommu/intel/iommu.c  |  2 +-
->   drivers/iommu/intel/iommu.h  |  7 ++++++
->   drivers/iommu/intel/nested.c | 43 ++++++++++++++++++++++++++++++++++++
->   drivers/iommu/intel/pasid.h  | 11 +++++++++
->   4 files changed, 62 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index 7e82b3a4bba7..7f1ca3c342a3 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -1944,7 +1944,7 @@ static int domain_setup_first_level(struct intel_iommu *iommu,
->   					     flags);
->   }
->   
-> -static bool dev_is_real_dma_subdevice(struct device *dev)
-> +bool dev_is_real_dma_subdevice(struct device *dev)
+Please use full sentences.
 
-How about making this a static inline in the header?
+> > It picks the first VM in the vm_list, zaps the oldest page which is mos=
+t
+> > likely an upper level SPTEs and most like to be reused. Prior to TDP MM=
+U,
+> > this is even more disruptive in nested VMs case, considering L1 SPTEs w=
+ill
+> > be the oldest even though most of the entries are for L2 SPTEs.
 
->   {
->   	return dev && dev_is_pci(dev) &&
->   	       pci_real_dma_dev(to_pci_dev(dev)) != to_pci_dev(dev);
-> diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-> index 8e7ffb421ac4..55478d7b64cf 100644
-> --- a/drivers/iommu/intel/iommu.h
-> +++ b/drivers/iommu/intel/iommu.h
-> @@ -818,6 +818,11 @@ domain_id_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
->   	return info->did;
->   }
->   
-> +static inline int domain_type_is_nested(struct dmar_domain *domain)
-> +{
-> +	return domain->domain.type == IOMMU_DOMAIN_NESTED;
-> +}
+This flaw isn't limited to the shrinker though, it's inherent to all of KVM=
+'s
+force page table reclamation.
 
-Why do you need this?
+> > As discussed in [1] shrinker logic has not be very useful in actually
+> > keeping VMs performant
 
-> +
->   /*
->    * 0: readable
->    * 1: writable
-> @@ -1225,6 +1230,8 @@ void __iommu_flush_iotlb(struct intel_iommu *iommu, u16 did, u64 addr,
->    */
->   #define QI_OPT_WAIT_DRAIN		BIT(0)
->   
-> +bool dev_is_real_dma_subdevice(struct device *dev);
-> +
->   int domain_attach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu);
->   void domain_detach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu);
->   void device_block_translation(struct device *dev);
-> diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-> index 3ce3c4fd210e..890087f3509f 100644
-> --- a/drivers/iommu/intel/nested.c
-> +++ b/drivers/iommu/intel/nested.c
-> @@ -130,8 +130,51 @@ static int intel_nested_cache_invalidate_user(struct iommu_domain *domain,
->   	return ret;
->   }
->   
-> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
-> +				      struct device *dev, ioasid_t pasid,
-> +				      struct iommu_domain *old)
-> +{
-> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
-> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> +	struct intel_iommu *iommu = info->iommu;
-> +	struct dev_pasid_info *dev_pasid;
-> +	int ret;
-> +
-> +	/* No SVA domain replacement usage so far */
-> +	if (old && old->type == IOMMU_DOMAIN_SVA)
-> +		return -EOPNOTSUPP;
+I don't think anyone has ever claimed that the shrinker would be useful in
+providing performance for VMs.  AFAICT, it's always been about memory usage=
+, and
+nothing more.
 
-No need for this check from driver's point of view. If there is really a
-need, it should go to the iommu core.
+> > and reducing memory usage.
 
-> +
-> +	if (!pasid_supported(iommu) || dev_is_real_dma_subdevice(dev))
- > +		return -EOPNOTSUPP;> +
-> +	if (context_copied(iommu, info->bus, info->devfn))
-> +		return -EBUSY;
-> +
-> +	ret = prepare_domain_attach_device(&dmar_domain->s2_domain->domain,
-> +					   dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	dev_pasid = domain_add_dev_pasid(domain, dev, pasid);
-> +	if (IS_ERR(dev_pasid))
-> +		return PTR_ERR(dev_pasid);
-> +
-> +	ret = domain_setup_nested(iommu, dmar_domain, dev, pasid, old);
-> +	if (ret)
-> +		goto out_remove_dev_pasid;
-> +
-> +	domain_remove_dev_pasid(old, dev, pasid);
-> +
-> +	return 0;
-> +
-> +out_remove_dev_pasid:
-> +	domain_remove_dev_pasid(domain, dev, pasid);
-> +	return ret;
-> +}
-> +
->   static const struct iommu_domain_ops intel_nested_domain_ops = {
->   	.attach_dev		= intel_nested_attach_dev,
-> +	.set_dev_pasid		= intel_nested_set_dev_pasid,
->   	.free			= intel_nested_domain_free,
->   	.cache_invalidate_user	= intel_nested_cache_invalidate_user,
->   };
-> diff --git a/drivers/iommu/intel/pasid.h b/drivers/iommu/intel/pasid.h
-> index a3b5945a1812..31a4e7c01853 100644
-> --- a/drivers/iommu/intel/pasid.h
-> +++ b/drivers/iommu/intel/pasid.h
-> @@ -335,6 +335,17 @@ static inline int domain_setup_passthrough(struct intel_iommu *iommu,
->   	return intel_pasid_setup_pass_through(iommu, dev, pasid);
->   }
->   
-> +static inline int domain_setup_nested(struct intel_iommu *iommu,
-> +				      struct dmar_domain *domain,
-> +				      struct device *dev, ioasid_t pasid,
-> +				      struct iommu_domain *old)
-> +{
-> +	if (old)
-> +		return intel_pasid_replace_nested(iommu, dev,
-> +						  pasid, domain);
-> +	return intel_pasid_setup_nested(iommu, dev, pasid, domain);
-> +}
-> +
->   void intel_pasid_tear_down_entry(struct intel_iommu *iommu,
->   				 struct device *dev, u32 pasid,
->   				 bool fault_ignore);
+This one I definitely agree on :-)
 
-Others look good to me.
+> > There was an alternative suggested [2] to repurpose shrinker for
+> > shrinking vCPU caches. But considering that in all of the KVM MMU
+> > shrinker history it hasn't been used/needed/complained, and there has
+> > not been any conversation regarding KVM using lots of page tables, it
+> > might be better to just not have shrinker.
 
---
-baolu
+A complaint about KVM's page table usage would be an argument for keeping (=
+and
+improving) the current shrinker implementation, not for dropping the per-vC=
+PU
+caches.  And _that_ to me leads to the the real argument for not wiring up =
+the
+shrinker to the per-vCPU caches: it doesn't scale.  E.g. a VM with 4 vCPUs =
+and
+4 TiB of memory will, at most, reclaim a laugable 640KiB (4*40*4KiB) of mem=
+ory.
+That's obviously more than a bit contrived, but IMO it really shows that ta=
+rgeting
+the per-vCPU caches is unlikely to be useful in practice.  At best, it woul=
+d be
+a premature memory optimization.
+
+> > If the need arise [2] can be revisited.
+
+Everything can be revisited, I think what's important here is to state why =
+forcing
+future developers to (re)start from scratch is a non-issue.
+
+> >
+> > [1] https://lore.kernel.org/lkml/Y45dldZnI6OIf+a5@google.com/
+> > [2] https://lore.kernel.org/kvm/20241004195540.210396-3-vipinsh@google.=
+com/
+> >
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Suggested-by: David Matlack <dmatlack@google.com>
+> > Reviewed-by: David Matlack <dmatlack@google.com>
+>=20
+> FYI, I carried forward David's Reviewed-by from the previous versions.
+> Extra change from the previous version is removing registration of KVM
+> MMU shrinker in kvm_mmu_vendor_module_init() and mmu_shrinker object
+> along with its callback functions.
+
+Heh, I'm going to drop David's review, because I am going to split this int=
+o two
+patches when applying.  One to yank out the shrinker, and one to use a loca=
+l list
+in kvm_zap_obsolete_pages() and drop zapped_obsolete_pages.
+
+Somewhat subtly, the only reason dropping zapped_obsolete_pages doesn't int=
+roduce
+a functional change is because kvm_zap_obsolete_pages() is called under slo=
+ts_lock,
+and doesn't drop said lock when yielding.  I.e. there can't be multiple wri=
+ters
+(or readers) of zapped_obsolete_pages, and so the list is guaranteed to be =
+empty
+on entry and exit.  That's worth a changelog and bisection point of its own=
+.
+
+With the patch split in two, this is what I ended up with for the main chan=
+gelog.
+
+Please speak up if you want to change anything!
+
+    KVM: x86/mmu: Remove KVM's MMU shrinker
+   =20
+    Remove KVM's MMU shrinker and (almost) all of its related code, as the
+    current implementation is very disruptive to VMs (if it ever runs),
+    without providing any meaningful benefit[1].
+   =20
+    Alternatively, KVM could repurpose its shrinker, e.g. to reclaim pages
+    from the per-vCPU caches[2], but given that no one has complained about
+    lack of TDP MMU support for the shrinker in the 3+ years since the TDP =
+MMU
+    was enabled by default, it's safe to say that there is likely no real u=
+se
+    case for initiating reclaim of KVM's page tables from the shrinker.
+   =20
+    And while clever/cute, reclaiming the per-vCPU caches doesn't scale the
+    same way that reclaiming in-use page table pages does.  E.g. the amount=
+ of
+    memory being used by a VM doesn't always directly correlate with the
+    number vCPUs, and even when it does, reclaiming a few pages from per-vC=
+PU
+    caches likely won't make much of a dent in the VM's total memory usage,
+    especially for VMs with huge amounts of memory.
+   =20
+    Lastly, if it turns out that there is a strong use case for dropping th=
+e
+    per-vCPU caches, re-introducing the shrinker registration is trivial
+    compared to the complexity of actually reclaiming pages from the caches=
+.
+   =20
+    [1] https://lore.kernel.org/lkml/Y45dldZnI6OIf+a5@google.com
+    [2] https://lore.kernel.org/kvm/20241004195540.210396-3-vipinsh@google.=
+com
 
