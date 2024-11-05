@@ -1,207 +1,203 @@
-Return-Path: <kvm+bounces-30591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C25859BC2E8
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:07:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 875649BC322
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 03:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C964281A7F
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 02:07:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10FD81F22D71
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 02:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE390364BA;
-	Tue,  5 Nov 2024 02:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58B34CB47;
+	Tue,  5 Nov 2024 02:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EUJO/hk7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iAKmoQB7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC82322F1C
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 02:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8405247A5C
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 02:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730772424; cv=none; b=dvcFAoeAqTTkixZZLoiJ+0GFXAjrkfOpeCnhVP3bNRK2PLcsdiH07n8O8w7IzA03tPfas+CmFLqTn8XInDOfCDNe1s/3Q08ild27s7yjbdfVq+AdD0pzVread5cDuEsmdkGnHHvD2jVk7XWWIqZ+a+VVyLupT5UH5wUwUyY5zeI=
+	t=1730773362; cv=none; b=ZldSZa79bgBgSNFUTxO3FM82dVb8IJO6/AKcNY8GEsi5Eif95cg7WSTJtuSGSisZEmG840n04jEL1/bJWM6llLZRTjfQKCfnTZRKeo3Axy7RjJddgc5gJSINlqvryOcfaU/qg6Y+U/JPsesGgsQ/AjfxbsPEa7+Iq/ur0nyZ+mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730772424; c=relaxed/simple;
-	bh=vluMpp8ZWItN8pJZXKoSedoGbDikGFDgiyAjaJ2wtEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZfIktzC3cB/RKoGRdLjXIeXG/fXNMSPyRhm/iJVGV79oGgnSPhUYSv2bV793nh4oiBg2f8WlEMiiPXF7oY5Q6DWvLpSY/PO8oB9rvsnyKt/LlhqKIKKqrAtiCmPrcLOKdwencWd6o305/CH5GKiyTaoMJn+M4mWJCW0RKPXSL8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EUJO/hk7; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730772423; x=1762308423;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vluMpp8ZWItN8pJZXKoSedoGbDikGFDgiyAjaJ2wtEI=;
-  b=EUJO/hk7u9pDHjl6PqPw1p4uDXB8TX7Er/Ii6c3kEma1XkT6pMct1LvX
-   R7AztnKI6CbgiR2aNPy+NLQN/aQdcUnr9QOpkp+t1nK74X7dNc6hIHGBe
-   Ha/ot1ppU/N06PcgQZXsJ/Lbqi5myYkwd/TSXejwZi5OafpvUyw2hMImz
-   bDBncLqX+MpKmit33dIjJuB+B4oafNEhi3jzQoj6xUsnFywgmrPDiHB+G
-   aBMcoqWZjFDm2mgT8wgecxJ9SZ/xKChZ507hI7lBhQFlK+IpRhACpUYMQ
-   1i/BUPtwozfKpMop9LKQJvZXbz4i7HzYmelvp4S3Tzp8KMIuuHhzkhnRP
-   Q==;
-X-CSE-ConnectionGUID: ZmWf6UgqRW2RICDFI3ZeJQ==
-X-CSE-MsgGUID: Kulj2ve4RpCz80+50kU3/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30612613"
-X-IronPort-AV: E=Sophos;i="6.11,258,1725346800"; 
-   d="scan'208";a="30612613"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 18:07:03 -0800
-X-CSE-ConnectionGUID: p/a9eYMxQNOM8nwlWTjulg==
-X-CSE-MsgGUID: in8m8QgYT0GyVn00unInwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,258,1725346800"; 
-   d="scan'208";a="87767734"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 18:06:59 -0800
-Message-ID: <de7cbf75-930f-42b3-beb5-3be697defe50@linux.intel.com>
-Date: Tue, 5 Nov 2024 10:06:13 +0800
+	s=arc-20240116; t=1730773362; c=relaxed/simple;
+	bh=fASZrlOrGSWP18gmYt8bKLkLXj2wDQ1MzYPz3q9daX0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Lys316NTc2nNM7T8S+xVt7k2s3A0tgT+PZvP7GjFdCbH61yjf38EKCKjVzXTQPQRYTKhanpMjMiVIVWlaAro8HFQxvVxR69UVjN+t/KPyqPxc45/QlvpF1rhprF/9c0pCGr3Ur6zMW8Xc9noPmi5UJLDLnJHaoV9caNsAmmHLWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iAKmoQB7; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7d4dee4dfdcso4785122a12.2
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2024 18:22:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730773360; x=1731378160; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rTrj4Vb+gjmZyvOereONM4xaExQ9e1t81Zeg65PUba4=;
+        b=iAKmoQB71pLTav7c9f1jte4hXpXhoLYra/46jA8BKdnxGvHglOC5M81NOxHFyIAovM
+         c6J65z/iZHJO5ta4k+EoRB5e6JsDvkRAZox+K/b7JeaiGcXNT/LeT9yV+MjYEeTuqPd9
+         +Hk1rUmsuBH+ogF9a5u/EAyUIUkd/FedM/oxeuj53T84f6RZ4rRD06vkfMm3S7T4h2ff
+         L22bJoHwqM3viX3/34rIz35z5wqOPR5dfRSkZBlt3w11TdGImoVk7Inp9B+6KnzuGKc3
+         eqb/AZ2jG/KGOWftp40HLfBdO1icyzxMubQrKX1U4qCdH6YMuSagxgA71KqgSGB9ct7q
+         8SwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730773360; x=1731378160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rTrj4Vb+gjmZyvOereONM4xaExQ9e1t81Zeg65PUba4=;
+        b=pvDW7nME5+w1VbhKEh9Gj3NO5vKia442jtx15HN89xvVTKIeNp5DZJZfpQW0XcL+Hk
+         PKVSZJhSAX+5eXed7VXlxhCjcGdfuAkSC0yrQADKMTy2QuHLGKQTh+cIdCbCLYLNxiyA
+         1znA9HFKoHrFcHXAubf4dKpylBPjJleMNJrIlGeU4b51YjJPrckN8U/zYHBXjSndZGE7
+         IuXpK9KEIr8MMDcrqYl4WTfAgDWNYf2MAwZV0DytpGTCEuGFmX+hI0uVYAzIeq8f2tB7
+         IZM4HofhB2gJqQoWzbcMdAUESuJFzChcEz/SSKLEhhFJJni9RIvYaBgtMNGDNffkAP9U
+         FOvQ==
+X-Gm-Message-State: AOJu0YyukkZ1YU8Lz1wUVdSQdUVC8HDQsG8QbMKtUHizNElmWwRZiHwy
+	GbYIQYNSAxJef8EeU9k3VRWhm9vkUCvK0qx+/hwhWrFD6barlHxAjuOWdVD05XKSPL0g6z5oIJ5
+	yKg==
+X-Google-Smtp-Source: AGHT+IH0unGMBQfLgioqGmr0yzEMUoopms0yCwfTp21z4CVHah4e9K57FkA7ZEnCFrqk1qMnNAGjr3IC698=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:4d07:b0:7ea:97c3:7a8f with SMTP id
+ 41be03b00d2f7-7ee3a90d751mr34651a12.10.1730773359794; Mon, 04 Nov 2024
+ 18:22:39 -0800 (PST)
+Date: Mon, 4 Nov 2024 18:22:38 -0800
+In-Reply-To: <74089281-3208-435d-93b3-22f1d794dfae@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/13] iommu/vt-d: Add pasid replace helpers
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com, will@kernel.org
-References: <20241104131842.13303-1-yi.l.liu@intel.com>
- <20241104131842.13303-5-yi.l.liu@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241104131842.13303-5-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241004053341.5726-1-manali.shukla@amd.com> <20241004053341.5726-3-manali.shukla@amd.com>
+ <Zw6rJ3y_F-10xBcH@google.com> <74089281-3208-435d-93b3-22f1d794dfae@amd.com>
+Message-ID: <ZymBbk829lGCY8dp@google.com>
+Subject: Re: [PATCH v3 2/4] KVM: SVM: Enable Bus lock threshold exit
+From: Sean Christopherson <seanjc@google.com>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
+	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
+	vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com, 
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 11/4/24 21:18, Yi Liu wrote:
-> pasid replacement allows converting a present pasid entry to be FS, SS,
-> PT or nested, hence add helpers for such operations. This simplifies the
-> callers as well since the caller can switch the pasid to the new domain
-> by one-shot.
+On Sun, Nov 03, 2024, Manali Shukla wrote:
+> On 10/15/2024 11:19 PM, Sean Christopherson wrote:
+> > On Fri, Oct 04, 2024, Manali Shukla wrote:
+> ...
+> >>  
+> >> +static int bus_lock_exit(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vcpu_svm *svm = to_svm(vcpu);
+> >> +
+> >> +	vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
+> >> +	vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
+> >> +
+> >> +	/*
+> >> +	 * Reload the counter with value greater than '0'.
+> > 
+> > The value quite obviously must be exactly '1', not simply greater than '0.  I also
+> > think this is the wrong place to set the counter.  Rather than set the counter at
+> > the time of exit, KVM should implement a vcpu->arch.complete_userspace_io callback
+> > and set the counter to '1' if and only if RIP (or LIP, but I have no objection to
+> > keeping things simple) is unchanged.  It's a bit of extra complexity, but it will
+> > make it super obvious why KVM is setting the counter to '1'.  And, if userspace
+> > wants to stuff state and move past the instruction, e.g. by emulating the guilty
+> > instruction, then KVM won't unnecessarily allow a bus lock in the guest.
+> > 
+> > And then the comment can be:
+> > 
+> > 	/*
+> > 	 * If userspace has NOT change RIP, then KVM's ABI is to let the guest
+> > 	 * execute the bus-locking instruction.  Set the bus lock counter to '1'
+> > 	 * to effectively step past the bus lock.
+> > 	 */
+> > 
 > 
-> Suggested-by: Lu Baolu<baolu.lu@linux.intel.com>
-> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
-> ---
->   drivers/iommu/intel/pasid.c | 173 ++++++++++++++++++++++++++++++++++++
->   drivers/iommu/intel/pasid.h |  12 +++
->   2 files changed, 185 insertions(+)
-
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-
-with a nit below
-
+> The bus lock threshold intercept feature is available for SEV-ES and SEV-SNP
+> guests too. The rip where the bus lock exit occurred, is not available in
+> bus_lock_exit handler for SEV-ES and SEV-SNP guests, so the above-mentioned
+> solution won't work with SEV-ES and SEV-SNP guests.
 > 
-> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
-> index 65fd2fee01b7..b7c2d65b8726 100644
-> --- a/drivers/iommu/intel/pasid.c
-> +++ b/drivers/iommu/intel/pasid.c
-> @@ -390,6 +390,40 @@ int intel_pasid_setup_first_level(struct intel_iommu *iommu,
->   	return 0;
->   }
->   
-> +int intel_pasid_replace_first_level(struct intel_iommu *iommu,
-> +				    struct device *dev, pgd_t *pgd,
-> +				    u32 pasid, u16 did, int flags)
-> +{
-> +	struct pasid_entry *pte;
-> +	u16 old_did;
-> +
-> +	if (!ecap_flts(iommu->ecap) ||
-> +	    ((flags & PASID_FLAG_FL5LP) && !cap_fl5lp_support(iommu->cap)))
-> +		return -EINVAL;
-> +
-> +	spin_lock(&iommu->lock);
-> +	pte = intel_pasid_get_entry(dev, pasid);
-> +	if (!pte) {
-> +		spin_unlock(&iommu->lock);
-> +		return -ENODEV;
-> +	}
-> +
-> +	if (!pasid_pte_is_present(pte)) {
-> +		spin_unlock(&iommu->lock);
-> +		return -EINVAL;
-> +	}
-> +
-> +	old_did = pasid_get_domain_id(pte);
-> +
-> +	pasid_pte_config_first_level(iommu, pte, pgd, did, flags);
-> +	spin_unlock(&iommu->lock);
-> +
-> +	intel_pasid_flush_present(iommu, dev, pasid, old_did, pte);
-> +	intel_drain_pasid_prq(dev, pasid);
-> +
-> +	return 0;
-> +}
-> +
->   /*
->    * Skip top levels of page tables for iommu which has less agaw
->    * than default. Unnecessary for PT mode.
-> @@ -483,6 +517,55 @@ int intel_pasid_setup_second_level(struct intel_iommu *iommu,
->   	return 0;
->   }
->   
-> +int intel_pasid_replace_second_level(struct intel_iommu *iommu,
-> +				     struct dmar_domain *domain,
-> +				     struct device *dev, u32 pasid)
-> +{
-> +	struct pasid_entry *pte;
-> +	struct dma_pte *pgd;
-> +	u16 did, old_did;
-> +	u64 pgd_val;
-> +	int agaw;
-> +
-> +	/*
-> +	 * If hardware advertises no support for second level
-> +	 * translation, return directly.
-> +	 */
-> +	if (!ecap_slts(iommu->ecap))
-> +		return -EINVAL;
-> +
-> +	pgd = domain->pgd;
-> +	agaw = iommu_skip_agaw(domain, iommu, &pgd);
+> I would propose to add the above-mentioned solution only for normal and SEV guests
+> and unconditionally reloading of bus_lock_counter to 1 in complete_userspace_io
+> for SEV-ES and SEV-SNP guests.
 
-iommu_skip_agaw() has been removed after domain_alloc_paging is
-supported in this driver. Perhaps you need a rebase if you have a new
-version.
+Yeah, that works.  Though I would condition the check on guest_state_protected.
+Actually, and this is going to seem really stupid, but everything will Just Work
+if you use kvm_get_linear_rip() and kvm_is_linear_rip(), because kvm_get_linear_rip()
+returns '0' for vCPUs with protected state.  I.e. KVM will do a rather superfluous
+cui() callback, but otherwise it's fine.  Silly, but in many ways preferable to
+special casing ES and SNP guests.
 
-> +	if (agaw < 0)
-> +		return -EINVAL;
-> +
-> +	pgd_val = virt_to_phys(pgd);
-> +	did = domain_id_iommu(domain, iommu);
-> +
-> +	spin_lock(&iommu->lock);
-> +	pte = intel_pasid_get_entry(dev, pasid);
-> +	if (!pte) {
-> +		spin_unlock(&iommu->lock);
-> +		return -ENODEV;
-> +	}
-> +
-> +	if (!pasid_pte_is_present(pte)) {
-> +		spin_unlock(&iommu->lock);
-> +		return -EINVAL;
-> +	}
-> +
-> +	old_did = pasid_get_domain_id(pte);
-> +
-> +	pasid_pte_config_second_level(iommu, pte, pgd_val, agaw,
-> +				      did, domain->dirty_tracking);
-> +	spin_unlock(&iommu->lock);
-> +
-> +	intel_pasid_flush_present(iommu, dev, pasid, old_did, pte);
-> +	intel_drain_pasid_prq(dev, pasid);
-> +
-> +	return 0;
-> +}
+On a related topic, can you add a refacotring prep patch to move linear_rip out
+of kvm_pio_request and place it next to complete_userspace_io?  There's nothing
+port I/O specific about that field, it just so happens to that port I/O is the
+only case where KVM's ABI is to let userspace stuff state (to emulate RESET)
+without first completing the I/O instruction.
 
---
-baolu
+I.e.
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 8e8ca6dab2b2..8617b15096a6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -406,7 +406,6 @@ struct kvm_rmap_head {
+ };
+ 
+ struct kvm_pio_request {
+-       unsigned long linear_rip;
+        unsigned long count;
+        int in;
+        int port;
+@@ -884,6 +883,7 @@ struct kvm_vcpu_arch {
+        bool emulate_regs_need_sync_to_vcpu;
+        bool emulate_regs_need_sync_from_vcpu;
+        int (*complete_userspace_io)(struct kvm_vcpu *vcpu);
++       unsigned long cui_linear_rip;
+ 
+        gpa_t time;
+        struct pvclock_vcpu_time_info hv_clock;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 425a301911a6..7704d3901481 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9308,7 +9308,7 @@ static int complete_fast_pio_out(struct kvm_vcpu *vcpu)
+ {
+        vcpu->arch.pio.count = 0;
+ 
+-       if (unlikely(!kvm_is_linear_rip(vcpu, vcpu->arch.pio.linear_rip)))
++       if (unlikely(!kvm_is_linear_rip(vcpu, vcpu->arch.cui_linear_rip)))
+                return 1;
+ 
+        return kvm_skip_emulated_instruction(vcpu);
+@@ -9333,7 +9333,7 @@ static int kvm_fast_pio_out(struct kvm_vcpu *vcpu, int size,
+                        complete_fast_pio_out_port_0x7e;
+                kvm_skip_emulated_instruction(vcpu);
+        } else {
+-               vcpu->arch.pio.linear_rip = kvm_get_linear_rip(vcpu);
++               vcpu->arch.cui_linear_rip = kvm_get_linear_rip(vcpu);
+                vcpu->arch.complete_userspace_io = complete_fast_pio_out;
+        }
+        return 0;
+@@ -9346,7 +9346,7 @@ static int complete_fast_pio_in(struct kvm_vcpu *vcpu)
+        /* We should only ever be called with arch.pio.count equal to 1 */
+        BUG_ON(vcpu->arch.pio.count != 1);
+ 
+-       if (unlikely(!kvm_is_linear_rip(vcpu, vcpu->arch.pio.linear_rip))) {
++       if (unlikely(!kvm_is_linear_rip(vcpu, vcpu->arch.cui_linear_rip))) {
+                vcpu->arch.pio.count = 0;
+                return 1;
+        }
+@@ -9375,7 +9375,7 @@ static int kvm_fast_pio_in(struct kvm_vcpu *vcpu, int size,
+                return ret;
+        }
+ 
+-       vcpu->arch.pio.linear_rip = kvm_get_linear_rip(vcpu);
++       vcpu->arch.cui_linear_rip = kvm_get_linear_rip(vcpu);
+        vcpu->arch.complete_userspace_io = complete_fast_pio_in;
+ 
+        return 0;
 
