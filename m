@@ -1,324 +1,124 @@
-Return-Path: <kvm+bounces-30753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650C99BD2C3
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 17:48:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DBD9BD2C6
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 17:48:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2460C283456
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 16:48:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011861F2331F
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 16:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01ECF1DC070;
-	Tue,  5 Nov 2024 16:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569F41DBB36;
+	Tue,  5 Nov 2024 16:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="R5xll6PA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmtn0Fc+"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2074.outbound.protection.outlook.com [40.107.244.74])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87631D47B4;
-	Tue,  5 Nov 2024 16:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730825290; cv=fail; b=cxzuQVny5naBRYV+nC3GPDx4E4TtjfO0abfASAZddlMOIvBxeZIN3r4EUcOtD3NHGe4w3Tj8+ajDn3GwmGKg22w3Zzadif0DkkmqzNFlQbdphcSPtlCXNFh45YQFeelfnfNTJigrBYFTNXCQOz7wp4BbTb7rbOxwEWtQC7fPE2A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730825290; c=relaxed/simple;
-	bh=+UfxFrGXVTVyE8HLUd/UN+Bn0M6fPmxlIpYY0+yPiHE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VMq1ZXYYkFAOYqtbcsGTCKMAqICLNmq3+4k8nW7L4+/D45dCavQP7iiD26e/Fn8EVGQ5l3DsOZqfozfrullbOxA+P291afm9kl3bfj3qV0reAscV3YVHWFkZUawD9+DyEk9FR+czJu4dQk27GJXzv+JAGnoVHguifjomIf6/f6Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=R5xll6PA; arc=fail smtp.client-ip=40.107.244.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SUQgAChdj0ph1Rg6tt286Ueoi+YWXb/k4ZQdwVdY0+ZGyIfbUH+KUwGe8CbXfOOWzJQQXf39knC4deaVPwURnkQzs+8L+x2iKi/rC3TmZeCjYHYT9bT8JnqFKpPnPyVzEH1E6p7ScN1LdVSCofRX63yFLpJGy1eKMhR24mYqacBcL1nwZoaxwTTnOCngq6BANQTrbmV07DMZvDgl8a8HQPW3jegRGFojSf+ihXkFrtRmPQ1cTr40PYEwA30Ky7U8WfJqrjZczZsCEpEOwSzv40l92bHvEBG6xNFpdiVdkjj+mS/JX8bc9YiKWfCrEgdm8q6gOKpgk4Qcix/tMUlhfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9SNmEP9ffiNaTSzFYP+hIwyVz5gMf9kYO9erAqnd/kk=;
- b=d1aIOp/falsOP5bYoVTJfyNb+knNOc96sBkgsZuPyE2TGQdcieACj+6ZII0mM/mPJzDDMmtszDqie40wxCwFP75+SaBemToucLmTxg9peVD4LsJkIM87jecf1ChgrdX4uIym8dWF4+3SSjKJglxMCvz1TnOLuVxG9YELg8AZ4TIDieR/1a4RPMBNGOKxzbeqEd0KQWq9bydU5xJn+eSlx5tNBhqIrtULrHmDl28fbjtmI+ew4ZB43rQvGu1cgy1oDXTm8gkWM8NWgsfiPwwk7lTRGrt7EDXkPStMAQe9PSs8LDhCGL/buvvIemGyPbdoj15GRHEd4Mx0zSwIFr5k4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9SNmEP9ffiNaTSzFYP+hIwyVz5gMf9kYO9erAqnd/kk=;
- b=R5xll6PA9pyJZJMMjcPryFmYbNQ2v7Vwwe6HlGdxNn3AblAGXDdMj2PtC6+D4x02pbQddvJQdA+Jep+lyz7rH0O62cjHLTqAxGzGyjcl92RGFxVOUHKTI+h5a7ap1+ZRlvXmCBjS0dFHyeRCv7xeoXFpP9xIIaZ8dASngDzHu30=
-Received: from CH2PR11CA0007.namprd11.prod.outlook.com (2603:10b6:610:54::17)
- by DM6PR12MB4169.namprd12.prod.outlook.com (2603:10b6:5:215::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.31; Tue, 5 Nov
- 2024 16:48:03 +0000
-Received: from CH2PEPF0000014A.namprd02.prod.outlook.com
- (2603:10b6:610:54:cafe::23) by CH2PR11CA0007.outlook.office365.com
- (2603:10b6:610:54::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19 via Frontend
- Transport; Tue, 5 Nov 2024 16:48:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF0000014A.mail.protection.outlook.com (10.167.244.107) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8137.17 via Frontend Transport; Tue, 5 Nov 2024 16:48:03 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 5 Nov
- 2024 10:47:54 -0600
-From: Shivank Garg <shivankg@amd.com>
-To: <x86@kernel.org>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<jack@suse.cz>, <akpm@linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-api@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-CC: <chao.gao@intel.com>, <pgonda@google.com>, <thomas.lendacky@amd.com>,
-	<seanjc@google.com>, <luto@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<willy@infradead.org>, <arnd@arndb.de>, <pbonzini@redhat.com>,
-	<kees@kernel.org>, <shivankg@amd.com>, <bharata@amd.com>, <nikunj@amd.com>,
-	<michael.day@amd.com>, <Neeraj.Upadhyay@amd.com>, Shivansh Dhiman
-	<shivansh.dhiman@amd.com>
-Subject: [RFC PATCH 1/4] mm: Add mempolicy support to the filemap layer
-Date: Tue, 5 Nov 2024 16:45:47 +0000
-Message-ID: <20241105164549.154700-2-shivankg@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241105164549.154700-1-shivankg@amd.com>
-References: <20241105164549.154700-1-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FD91D516F;
+	Tue,  5 Nov 2024 16:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730825318; cv=none; b=ERDNomZcxnjETe4XdItTbw78dAvZWd3Bq+bY7IPkF9A6sLP5tzmKp18po/agIhN4U6aCmVPMgK3xCKfuiVAsDCzl2CI9KRyerfzzUlMG4VspV+oRvR9QFoGGtPy1zlJxhSiuDTsI9YwE4m1U1cLR5uyWv0uJRFb1AwtIwH1yPgk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730825318; c=relaxed/simple;
+	bh=C6Hk6/eHmDS2AcJbkrwiislpkRQ+Eud/EQoVHtBaVi4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jav1RawW/cg6gfohV/NDvzLMoSp9qrSLsp6i3a2VN14LaZouhcBIg/TXIsTI6qH8C6rO/qdQKT+ZltvLKDalLtXjQ8TAyPOWTwU2v9Z7ebRNA9AxVZahbM1Jl7emPZQfdJ0W5kB0OCyoVWP1nGFtujNad/hq4qpn4+8rXGhE0oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmtn0Fc+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75888C4CECF;
+	Tue,  5 Nov 2024 16:48:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730825318;
+	bh=C6Hk6/eHmDS2AcJbkrwiislpkRQ+Eud/EQoVHtBaVi4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rmtn0Fc+AfgQDPMBkouiMKC3eMbKISVCgolNAoUN/NA08NJsrDiDA9CHq+EyGxYSX
+	 x2ht6NAKiLYE7I83LKoVjs7jg+WAKplOum+cjLQwPnx6QE9f02LK28NYh1DXSPoCIc
+	 V2jJkCSywBTrXd5witeNe/+Mem8bo9sJiXuA6P+kvoMMIBSHTeozVamDGGbscZz8rq
+	 PsqlL2kps4ABTYU7rNalIhA4+bFroEHsgrPpcKIHDt4XA+9J0K5MhGl6Jy0ZFq24yK
+	 YPX0YKXKx4Bnece0a0viT+b8tEQ2HwOFXJfdcO2IFpDmtcJjlCjHkk1rJw7Zj2OCDK
+	 qwTGI0NNtQgBw==
+Date: Tue, 5 Nov 2024 16:48:29 +0000
+From: Will Deacon <will@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Jerry Snitselaar <jsnitsel@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
+Message-ID: <20241105164829.GA12923@willie-the-truck>
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <20241101121849.GD8518@willie-the-truck>
+ <20241101132503.GU10193@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|DM6PR12MB4169:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c16f1cd-ec3f-4683-3814-08dcfdb99d8d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|36860700013|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kXLT1+MmoGgnJidDw3N+BCOGj6D9ulCKNMq2wsmGmpgJXwOtfsXWSFTdsrWz?=
- =?us-ascii?Q?xb97Wk1i46hf8l4q9SMzUcBLct7cqYIqcZ6pPmsLrHUDCEiaXhWO/6vTGN5c?=
- =?us-ascii?Q?NohVS914x6yJLGqdKVzF973CZGoyrNSWtveF2UdVLj0w9uVdRBFTNeKD573v?=
- =?us-ascii?Q?9rVvkk5yfIxUuURJMtiYOKhILwXXYjKTWzMMR6xS+71OVBW7+X6KVZeVersR?=
- =?us-ascii?Q?awwa40b5BGBv4mMFBKuX7RwnGBkxyRFYFVdCZh/KOjYexJa2kXCfJCmuinhE?=
- =?us-ascii?Q?W5l6Z/UMqeFxPfz37ZcgUJhWbOBfwIP2IFSPlhlzy+M1tpbTm3LN99sNBXm1?=
- =?us-ascii?Q?XtcfQ1yBC0U6aaMvT6I6vI4yUrXAXhZG4mS9c3lWQxbXcrDf+R46k1mdR6d7?=
- =?us-ascii?Q?PfKbwBfwNAW1oWhg52Th10782/nZfk5xcW1fd/Le3LSDvoWYA918CCnNH17b?=
- =?us-ascii?Q?Qm8SLI0h96bMoeqft7RBdFl7GNbdkdBg6KkF7z8zs0dMPrzCSpNLINE7M//a?=
- =?us-ascii?Q?Kru8yftl8SqnHONCglvP/qDgqrzXyPLNYZocNrWJsvAe2VbsLrsJoIyJ64WL?=
- =?us-ascii?Q?43nKRH4zksdXgjQ2vvak+8XkK1Jc5fKoVyFwclWT3x0eZH1/u48vzOywviRs?=
- =?us-ascii?Q?t9FL2SR5VoqqvBtCJK+fiHB+6sXjj1szqFd+mwiaGRL/X7bF4iPLox6tL+nK?=
- =?us-ascii?Q?FFeveswX1WwTDB/OjJAxiccPnvWrL0Gj+/GpXb6JjejOW1bV+mrFulqV7FT7?=
- =?us-ascii?Q?a70HW1UModw9+hnfaD8kQv3JxNQxHMYDsGKLpsZhylfcRVfsoxx1bTtcqagX?=
- =?us-ascii?Q?MJ7IBbaFrXyiTB8F3GHo8Xk9PXZgxAjDccBFcI25Lyw+DAOmB5ECL//x2fGA?=
- =?us-ascii?Q?vtoHtJwqBfnaVFx4F6ub4QySq0zeSPl9pHGMrRqMJ8zfWwe7qyzYoFjkdafG?=
- =?us-ascii?Q?sRKUbs6BkTVCXIOS/CelJddT36d/HuDWxrjXt8dvoBZYUTH/ZfsSFkU5XzUl?=
- =?us-ascii?Q?88GKwJay/cXNuOlOXQ3kXCZohZq1oQORJqDp2IiGjt2+136GymjNUvgCMT4u?=
- =?us-ascii?Q?HZMMflFns7hksaMRjoyizegI0dXDXTNguBihUKtolFhY+d5FFt6mNJSIjmJS?=
- =?us-ascii?Q?sDEI02TUd8ig/1oDEuuWfSa+kGF8wRTg5MgoZZpHn/OuiKDQbmHVJ9Ji724j?=
- =?us-ascii?Q?daunl6M+sx45R+bjUqv4lTic2fn+iwKrYjZPgUWtMU3KjTk+LlLdwLo6vlHk?=
- =?us-ascii?Q?c8IUPpavguUpgn+fMaQAgccGmkqWjby0VqcZ5Fu2P/IbdwWg/iz3qYcfnYXC?=
- =?us-ascii?Q?Cl2fdt0+bsD6utnHnzJxNiuFYphMv2H6K4s1hkNgNciveKjud9dSgbBYQ1RR?=
- =?us-ascii?Q?QM55PTlHhM8H+MYZMJKe+iLAnkq2D2oaWYvuMsFKv9Xua2NAtseODcf15cby?=
- =?us-ascii?Q?iLFH95W8LsU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 16:48:03.3041
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c16f1cd-ec3f-4683-3814-08dcfdb99d8d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000014A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4169
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101132503.GU10193@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Hi Jason,
 
-Introduce mempolicy support to the filemap. Add filemap_grab_folio_mpol,
-filemap_alloc_folio_mpol_noprof() and __filemap_get_folio_mpol() APIs that
-take mempolicy struct as an argument.
+On Fri, Nov 01, 2024 at 10:25:03AM -0300, Jason Gunthorpe wrote:
+> On Fri, Nov 01, 2024 at 12:18:50PM +0000, Will Deacon wrote:
+> > On Wed, Oct 30, 2024 at 09:20:44PM -0300, Jason Gunthorpe wrote:
+> > > [This is now based on Nicolin's iommufd patches for vIOMMU and will need
+> > > to go through the iommufd tree, please ack]
+> > 
+> > Can't we separate out the SMMUv3 driver changes? They shouldn't depend on
+> > Nicolin's work afaict.
+> 
+> We can put everything before "iommu/arm-smmu-v3: Support
+> IOMMU_VIOMMU_ALLOC" directly on a rc and share a branch with your tree.
+> 
+> That patch and following all depend on Nicolin's work, as they rely on
+> the VIOMMU due to how different ARM is from Intel.
+> 
+> How about you take these patches:
+> 
+>  [PATCH v4 01/12] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+>  [PATCH v4 02/12] ACPICA: IORT: Update for revision E.f
+>  [PATCH v4 03/12] ACPI/IORT: Support CANWBS memory access flag
+>  [PATCH v4 04/12] iommu/arm-smmu-v3: Report IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
+>  [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via struct arm_smmu_hw_info
+>  [PATCH v4 06/12] iommu/arm-smmu-v3: Implement IOMMU_HWPT_ALLOC_NEST_PARENT
+>  [PATCH v4 07/12] iommu/arm-smmu-v3: Expose the arm_smmu_attach interface
+> 
+> Onto a branch.
 
-The API is required by VMs using KVM guest-memfd memory backends for NUMA
-mempolicy aware allocations.
+I've pushed these onto a new branch in the IOMMU tree:
 
-Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- include/linux/pagemap.h | 40 ++++++++++++++++++++++++++++++++++++++++
- mm/filemap.c            | 30 +++++++++++++++++++++++++-----
- 2 files changed, 65 insertions(+), 5 deletions(-)
+	iommufd/arm-smmuv3-nested
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index d9c7edb6422b..b05b696f310b 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -564,15 +564,25 @@ static inline void *detach_page_private(struct page *page)
- 
- #ifdef CONFIG_NUMA
- struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order);
-+struct folio *filemap_alloc_folio_mpol_noprof(gfp_t gfp, unsigned int order,
-+						struct mempolicy *mpol);
- #else
- static inline struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
- {
- 	return folio_alloc_noprof(gfp, order);
- }
-+static inline struct folio *filemap_alloc_folio_mpol_noprof(gfp_t gfp,
-+						unsigned int order,
-+						struct mempolicy *mpol)
-+{
-+	return filemap_alloc_folio_noprof(gfp, order);
-+}
- #endif
- 
- #define filemap_alloc_folio(...)				\
- 	alloc_hooks(filemap_alloc_folio_noprof(__VA_ARGS__))
-+#define filemap_alloc_folio_mpol(...)				\
-+	alloc_hooks(filemap_alloc_folio_mpol_noprof(__VA_ARGS__))
- 
- static inline struct page *__page_cache_alloc(gfp_t gfp)
- {
-@@ -652,6 +662,8 @@ static inline fgf_t fgf_set_order(size_t size)
- void *filemap_get_entry(struct address_space *mapping, pgoff_t index);
- struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
- 		fgf_t fgp_flags, gfp_t gfp);
-+struct folio *__filemap_get_folio_mpol(struct address_space *mapping,
-+		pgoff_t index, fgf_t fgp_flags, gfp_t gfp, struct mempolicy *mpol);
- struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
- 		fgf_t fgp_flags, gfp_t gfp);
- 
-@@ -710,6 +722,34 @@ static inline struct folio *filemap_grab_folio(struct address_space *mapping,
- 			mapping_gfp_mask(mapping));
- }
- 
-+/**
-+ * filemap_grab_folio_mpol - grab a folio from the page cache
-+ * @mapping: The address space to search
-+ * @index: The page index
-+ * @mpol: The mempolicy to apply
-+ *
-+ * Same as filemap_grab_folio(), except that it allocates the folio using
-+ * given memory policy.
-+ *
-+ * Return: A found or created folio. ERR_PTR(-ENOMEM) if no folio is found
-+ * and failed to create a folio.
-+ */
-+#ifdef CONFIG_NUMA
-+static inline struct folio *filemap_grab_folio_mpol(struct address_space *mapping,
-+					pgoff_t index, struct mempolicy *mpol)
-+{
-+	return __filemap_get_folio_mpol(mapping, index,
-+			FGP_LOCK | FGP_ACCESSED | FGP_CREAT,
-+			mapping_gfp_mask(mapping), mpol);
-+}
-+#else
-+static inline struct folio *filemap_grab_folio_mpol(struct address_space *mapping,
-+					pgoff_t index, struct mempolicy *mpol)
-+{
-+	return filemap_grab_folio(mapping, index);
-+}
-+#endif /* CONFIG_NUMA */
-+
- /**
-  * find_get_page - find and get a page reference
-  * @mapping: the address_space to search
-diff --git a/mm/filemap.c b/mm/filemap.c
-index d62150418b91..a870a05296c8 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -990,8 +990,13 @@ int filemap_add_folio(struct address_space *mapping, struct folio *folio,
- EXPORT_SYMBOL_GPL(filemap_add_folio);
- 
- #ifdef CONFIG_NUMA
--struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
-+struct folio *filemap_alloc_folio_mpol_noprof(gfp_t gfp, unsigned int order,
-+			struct mempolicy *mpol)
- {
-+	if (mpol)
-+		return folio_alloc_mpol_noprof(gfp, order, mpol,
-+				NO_INTERLEAVE_INDEX, numa_node_id());
-+
- 	int n;
- 	struct folio *folio;
- 
-@@ -1007,6 +1012,12 @@ struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
- 	}
- 	return folio_alloc_noprof(gfp, order);
- }
-+EXPORT_SYMBOL(filemap_alloc_folio_mpol_noprof);
-+
-+struct folio *filemap_alloc_folio_noprof(gfp_t gfp, unsigned int order)
-+{
-+	return filemap_alloc_folio_mpol_noprof(gfp, order, NULL);
-+}
- EXPORT_SYMBOL(filemap_alloc_folio_noprof);
- #endif
- 
-@@ -1861,11 +1872,12 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
- }
- 
- /**
-- * __filemap_get_folio - Find and get a reference to a folio.
-+ * __filemap_get_folio_mpol - Find and get a reference to a folio.
-  * @mapping: The address_space to search.
-  * @index: The page index.
-  * @fgp_flags: %FGP flags modify how the folio is returned.
-  * @gfp: Memory allocation flags to use if %FGP_CREAT is specified.
-+ * @mpol: The mempolicy to apply.
-  *
-  * Looks up the page cache entry at @mapping & @index.
-  *
-@@ -1876,8 +1888,8 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
-  *
-  * Return: The found folio or an ERR_PTR() otherwise.
-  */
--struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
--		fgf_t fgp_flags, gfp_t gfp)
-+struct folio *__filemap_get_folio_mpol(struct address_space *mapping, pgoff_t index,
-+		fgf_t fgp_flags, gfp_t gfp, struct mempolicy *mpol)
- {
- 	struct folio *folio;
- 
-@@ -1947,7 +1959,7 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
- 			err = -ENOMEM;
- 			if (order > 0)
- 				alloc_gfp |= __GFP_NORETRY | __GFP_NOWARN;
--			folio = filemap_alloc_folio(alloc_gfp, order);
-+			folio = filemap_alloc_folio_mpol(alloc_gfp, order, mpol);
- 			if (!folio)
- 				continue;
- 
-@@ -1978,6 +1990,14 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
- 		return ERR_PTR(-ENOENT);
- 	return folio;
- }
-+EXPORT_SYMBOL(__filemap_get_folio_mpol);
-+
-+struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
-+		fgf_t fgp_flags, gfp_t gfp)
-+{
-+	return __filemap_get_folio_mpol(mapping, index,
-+			fgp_flags, gfp, NULL);
-+}
- EXPORT_SYMBOL(__filemap_get_folio);
- 
- static inline struct folio *find_get_entry(struct xa_state *xas, pgoff_t max,
--- 
-2.34.1
+However, please can you give it a day or two to get some exposure in
+-next before you merge that into iommufd? I'll ping back here later in
+the week.
 
+Cheers,
+
+Will
 
