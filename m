@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-30767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3539BD493
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:31:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7918F9BD496
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:32:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AD731C224C0
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 18:31:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46267284014
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 18:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A247A1E882C;
-	Tue,  5 Nov 2024 18:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9EF1E882C;
+	Tue,  5 Nov 2024 18:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="q4/6g4yV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lgahfxVR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955D11D2B2C;
-	Tue,  5 Nov 2024 18:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDCC1DA62E;
+	Tue,  5 Nov 2024 18:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730831505; cv=none; b=aNbGz2Ci/zkITleRJTtfmjjTG8ZQCPXMgLRk/WKv32wpZKbsdM3rvwVJjrUqvJkLOycjZ5pmPTGEtcYqv4nndMqHuQDege+CF5Pw0xr3d8paihc5dgzxW0GwSUEm1WQhdBKR7aMyzAIWe1gsBtap3UM8DtqBxhnJtAWarldV5wU=
+	t=1730831518; cv=none; b=Bgj+GkB3aZFtXfPT1yn7GtGBZMmjzV8dDOFkzNwilwS8wJRAVUv+5HDtF/Ds70I7fiZhGpqe/sh5fCP+zvk3jSDYhfSenkSPFbWmwcKTn9dtWKo6PXAZIJ7ZPArxZLR8tJvmKxdiScja+lxTdTcoQ3d8SQLW8W1KRwqeCS+KKMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730831505; c=relaxed/simple;
-	bh=SagvYHKJt5auxGJRJjhhxBCccjHkSwJYzBlZUkeQVJw=;
+	s=arc-20240116; t=1730831518; c=relaxed/simple;
+	bh=g3RI6aaPgmokkAIMFdNnpTUOZMxevHUOt3dhCDGsmO4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PIeyGhIQt9urIf/9a3wwRTtKjnPTz5gpOE3+938tvpGPSHb3eVoYgR/ggfjlakQqGbY9GN1o59eUcnVOkpqc2bia2yAJBVHtbDQB8LnupQgXIhGQ4H624LZ+DpdAz82+4fe+lsCYzQAvHEvHTY1NMxmZj1+4HHJd52eZbxu3cpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=q4/6g4yV; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=UEdqFvS2zOon1Owf9Wq1rtxzi9BCwgCRTLkmPwuVcwLEW1WcsNXwCJ+trN2iNjO51B6tr0NHA+GccFsYZnZ1dAhk3jJdLBNEg1VQHBBF+2ZsVytXzFGDDDNP3uKrZQ37XNYKqa7RavEaCLaPqY+P01BLsOh8+0hX+omltATKMDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lgahfxVR; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730831504; x=1762367504;
+  t=1730831517; x=1762367517;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bT6rRx7a7sWccvBSdvoPKKTuXoItJoU+EpMvF26uVsc=;
-  b=q4/6g4yVcoJJcEP3lmqXJIY+zo/mB3ptDXxMj0EdHC9cbw2crAbBM6Rb
-   FL/xqn2Na+EZie6vKU+Vvl4pkLEr+C+yarE8i/hpLf2BTrEeM660eDyBt
-   tQm0n3e6pgVyZDE+gfDkfKolxhj0+T56rBjNwOL9lo5tfnAY/ePOhuebU
-   Q=;
+  bh=aZOVkbd/aqSS6wL2tHU2ZYavLfm4wZ7pJZkt2CDBd7U=;
+  b=lgahfxVR8Rr5NjZ0abKtetzZwqeJURjgg3Hv4o01q7EFbRgrC7j5nFfC
+   R3DLEpPdkRzEg45t9i70KDfuaxB9L6zgLPTpk0VA/cwNURlwxNp+eXAPq
+   HNDVRVsASJ6xIvcOAiQFr95WTXZnTCmnIIDoFS6oGOqaa7F3xVP9cTmUk
+   A=;
 X-IronPort-AV: E=Sophos;i="6.11,260,1725321600"; 
-   d="scan'208";a="245128567"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 18:31:40 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:50603]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.125:2525] with esmtp (Farcaster)
- id 39bb5814-4f48-4caf-ba41-fae750bfbae2; Tue, 5 Nov 2024 18:31:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 39bb5814-4f48-4caf-ba41-fae750bfbae2
+   d="scan'208";a="382672781"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 18:31:56 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:51046]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.37:2525] with esmtp (Farcaster)
+ id 3cfefb00-6800-4172-8693-375f47215f5a; Tue, 5 Nov 2024 18:31:55 +0000 (UTC)
+X-Farcaster-Flow-ID: 3cfefb00-6800-4172-8693-375f47215f5a
 Received: from EX19D001UWA003.ant.amazon.com (10.13.138.211) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 5 Nov 2024 18:31:39 +0000
+ Tue, 5 Nov 2024 18:31:55 +0000
 Received: from u34cccd802f2d52.amazon.com (10.106.239.17) by
  EX19D001UWA003.ant.amazon.com (10.13.138.211) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 5 Nov 2024 18:31:34 +0000
+ Tue, 5 Nov 2024 18:31:50 +0000
 From: Haris Okanovic <harisokn@amazon.com>
 To: <ankur.a.arora@oracle.com>, <catalin.marinas@arm.com>
 CC: <linux-pm@vger.kernel.org>, <kvm@vger.kernel.org>,
@@ -70,9 +70,9 @@ CC: <linux-pm@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<cl@gentwo.org>, <misono.tomohiro@fujitsu.com>, <maobibo@loongson.cn>,
 	<joao.m.martins@oracle.com>, <boris.ostrovsky@oracle.com>,
 	<konrad.wilk@oracle.com>
-Subject: [PATCH 1/5] asm-generic: add smp_vcond_load_relaxed()
-Date: Tue, 5 Nov 2024 12:30:37 -0600
-Message-ID: <20241105183041.1531976-2-harisokn@amazon.com>
+Subject: [PATCH 2/5] arm64: add __READ_ONCE_EX()
+Date: Tue, 5 Nov 2024 12:30:38 -0600
+Message-ID: <20241105183041.1531976-3-harisokn@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241105183041.1531976-1-harisokn@amazon.com>
 References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
@@ -88,55 +88,69 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D033UWA004.ant.amazon.com (10.13.139.85) To
  EX19D001UWA003.ant.amazon.com (10.13.138.211)
 
-Relaxed poll until desired mask/value is observed at the specified
-address or timeout.
+Perform an exclusive load, which atomically loads a word and arms the
+exclusive monitor to enable wfet()/wfe() accelerated polling.
 
-This macro is a specialization of the generic smp_cond_load_relaxed(),
-which takes a simple mask/value condition (vcond) instead of an
-arbitrary expression. It allows architectures to better specialize the
-implementation, e.g. to enable wfe() polling of the address on arm.
+https://developer.arm.com/documentation/dht0008/a/arm-synchronization-primitives/exclusive-accesses/exclusive-monitors
 
 Signed-off-by: Haris Okanovic <harisokn@amazon.com>
 ---
- include/asm-generic/barrier.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ arch/arm64/include/asm/readex.h | 46 +++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 arch/arm64/include/asm/readex.h
 
-diff --git a/include/asm-generic/barrier.h b/include/asm-generic/barrier.h
-index d4f581c1e21d..112027eabbfc 100644
---- a/include/asm-generic/barrier.h
-+++ b/include/asm-generic/barrier.h
-@@ -256,6 +256,31 @@ do {									\
- })
- #endif
- 
-+/**
-+ * smp_vcond_load_relaxed() - (Spin) wait until an expected value at address
-+ * with no ordering guarantees. Spins until `(*addr & mask) == val` or
-+ * `nsecs` elapse, and returns the last observed `*addr` value.
+diff --git a/arch/arm64/include/asm/readex.h b/arch/arm64/include/asm/readex.h
+new file mode 100644
+index 000000000000..51963c3107e1
+--- /dev/null
++++ b/arch/arm64/include/asm/readex.h
+@@ -0,0 +1,46 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Based on arch/arm64/include/asm/rwonce.h
 + *
-+ * @nsecs: timeout in nanoseconds
-+ * @addr: pointer to an integer
-+ * @mask: a bit mask applied to read values
-+ * @val: Expected value with mask
++ * Copyright (C) 2020 Google LLC.
++ * Copyright (C) 2024 Amazon.com, Inc. or its affiliates.
 + */
-+#ifndef smp_vcond_load_relaxed
-+#define smp_vcond_load_relaxed(nsecs, addr, mask, val) ({	\
-+	const u64 __start = local_clock_noinstr();		\
-+	u64 __nsecs = (nsecs);					\
-+	typeof(addr) __addr = (addr);				\
-+	typeof(*__addr) __mask = (mask);			\
-+	typeof(*__addr) __val = (val);				\
-+	typeof(*__addr) __cur;					\
-+	smp_cond_load_relaxed(__addr, (				\
-+		(VAL & __mask) == __val ||			\
-+		local_clock_noinstr() - __start > __nsecs	\
-+	));							\
-+})
-+#endif
 +
- /**
-  * smp_cond_load_acquire() - (Spin) wait for cond with ACQUIRE ordering
-  * @ptr: pointer to the variable to wait on
++#ifndef __ASM_READEX_H
++#define __ASM_READEX_H
++
++#define __LOAD_EX(sfx, regs...) "ldaxr" #sfx "\t" #regs
++
++#define __READ_ONCE_EX(x)						\
++({									\
++	typeof(&(x)) __x = &(x);					\
++	int atomic = 1;							\
++	union { __unqual_scalar_typeof(*__x) __val; char __c[1]; } __u;	\
++	switch (sizeof(x)) {						\
++	case 1:								\
++		asm volatile(__LOAD_EX(b, %w0, %1)			\
++			: "=r" (*(__u8 *)__u.__c)			\
++			: "Q" (*__x) : "memory");			\
++		break;							\
++	case 2:								\
++		asm volatile(__LOAD_EX(h, %w0, %1)			\
++			: "=r" (*(__u16 *)__u.__c)			\
++			: "Q" (*__x) : "memory");			\
++		break;							\
++	case 4:								\
++		asm volatile(__LOAD_EX(, %w0, %1)			\
++			: "=r" (*(__u32 *)__u.__c)			\
++			: "Q" (*__x) : "memory");			\
++		break;							\
++	case 8:								\
++		asm volatile(__LOAD_EX(, %0, %1)			\
++			: "=r" (*(__u64 *)__u.__c)			\
++			: "Q" (*__x) : "memory");			\
++		break;							\
++	default:							\
++		atomic = 0;						\
++	}								\
++	atomic ? (typeof(*__x))__u.__val : (*(volatile typeof(__x))__x);\
++})
++
++#endif
 -- 
 2.34.1
 
