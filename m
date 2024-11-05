@@ -1,128 +1,114 @@
-Return-Path: <kvm+bounces-30794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D319BD5C5
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:21:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258CC9BD5D0
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:25:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38758B21368
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:21:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9971F238A3
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED071EBFE4;
-	Tue,  5 Nov 2024 19:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353A01EC00A;
+	Tue,  5 Nov 2024 19:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gR4d4Y7Z"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jCRwbbzQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182261E7C27
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 19:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B881DD0D0;
+	Tue,  5 Nov 2024 19:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730834504; cv=none; b=GB8tr+qJ43Qscu9lR3SO/b+wvxyrvojTjhx+KOK73dr5QZQNta7R8UFzYKOpOqlwhH5S1hnmSu4J6zRTF27YnflnZ6iw1W7TyzFzCFWoZGntbX0G1yJFgc6ImjtX6d9BB4GJi6rS7GUSC5i3CNdgMyVu5PVKT2XLczyQXrk9xRs=
+	t=1730834693; cv=none; b=aRuUdAT8DCPI8jNj0KS+g33f8ZkekdXnu3QNuPrEgDfkWdRHvcX5R9eLzVIaJnj2JmtxB2CVfsKsmio7H+Ltfu7SwZEIXcoJwC2BdvYQtCS34J86FJQQ8lfD2qLTs8byYwXE9UurWapj9YSv11VvDvL7jeFDybEdxhryXujhJ5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730834504; c=relaxed/simple;
-	bh=5WjO8kooJsNK7ZBxwniHhJKcVajJEn35p+jeOFdCYDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s3KrOfGZnnylMUYaZi4bDcbRBRKD0fD/iuBtvmRiZ9bXa2cZjWbaKX1AAjrt/+2LWa4XSWoV3243OpClApcvjcqfk4ktzMBlRYOPmOavBhvVQGrRlzhV4p6BwLjRd6AQznk++zNg0Du04ibEJ0SRGQCI03LhA6Hp3mzx67y/mjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gR4d4Y7Z; arc=none smtp.client-ip=209.85.222.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-855f2dfb682so1573585241.3
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 11:21:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730834502; x=1731439302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5WjO8kooJsNK7ZBxwniHhJKcVajJEn35p+jeOFdCYDw=;
-        b=gR4d4Y7ZGIwhk3TG6FM458VXATERvSxalgXXENHz8cYItp7cllUhCR6FQTz8sr4z/S
-         gMIwxujvKY1QrNaviUqrtDt2dgXORk1PB8B+2nLghG1ihOAMS6jhS7Wy2px1qM3dyTcj
-         cHiSD1EtFKXwv4yskydmSRL78mt8j8CanV+ah61YNYLe3Xqk/FH/Ej/cUkhjOU7XhoHn
-         GaJ0CwOF8e916mRKLUbUYpFYLAShsdA2HYneZXhQxGUBTkbPOBT1JCZ+GGw11C+fVUo9
-         R9W/JtmjPCay/JtN3D9t7nG8MKLSa8JE7/vigHDyseIvaAtfVOw+HnaUJPQbPNXq/ZDg
-         EzPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730834502; x=1731439302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5WjO8kooJsNK7ZBxwniHhJKcVajJEn35p+jeOFdCYDw=;
-        b=lQgsF4DcAsjQAH6lnat26FtqhoboMnbmDFbbDZnZHL6k8SnPglBtr0lGPYioLi9vAU
-         UYy2eYhHiQaKOkUTuPTDCIgSKSLOSJN7VOqRJlgoo6AEoHHJcJRIAUglVYXo/WJjQhKp
-         VH+qdhFX4ap86SZ7UigfBvKhvIwZvi0y7nvgK9yG971LEwOBTRaZQp9vHMcG0KMQ8JY5
-         pnJK7Zit7b2QYptCwT86h+RpXPn+n4qkrfHDgHski48KAKTwgcBK+X0NwrBuNd1yqubl
-         +5TTzYfQeFtzH5nu4qEyAhGbOkbAGZXYBM7l5lZT+mUTP0Wg1axIYeqaWn+iXaxjPjVs
-         gLOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUjUY5ixGSRD/xkDZM926Cnw11nLbUsHy7O3K16hpLX9f7mLF3joot1Mo9EjolqNFynGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa84GLCa9HKqgBVZXhzSNxmIG1wc/IDFhOazw5QyYdlCz/mMGZ
-	NX1+lReIT2UYm04V/F+MdoUSKDw9cDO8zndWnFjnHUOsWNEjp6BOVMCbhcbwN50Bni14G52f7da
-	O8Yide5j/netSRZZDewIpa0PWgImktoX/q7Tu
-X-Google-Smtp-Source: AGHT+IEo+Kzl8oq8hn5GP7PubF/mZ9ZN65TG13mkSZTKtWpHUHtBiEPxJIfZWEDkljfh9z2TeQ4oGnRnMXvz3siHkys=
-X-Received: by 2002:a05:6102:6c5:b0:4a4:7257:e71e with SMTP id
- ada2fe7eead31-4a8cfb4b70emr36918399137.7.1730834501695; Tue, 05 Nov 2024
- 11:21:41 -0800 (PST)
+	s=arc-20240116; t=1730834693; c=relaxed/simple;
+	bh=qwSYttQIfuIGWDJnGrwNQ7ztYvm8AwbNmNq5uaUdPlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sjuCSpfxJhvM8aReP55r6K+KFiU735WI7cP9bC77W3EpUumUF27wB+osJak7jnu1upYzDCVIvw65AGdip7o/SDpozxS7DoEb4cBUWJajiYGb8tBwVL6iEpCArS+tCu35KJdfm0bggXaxyZzdAjBNJZcIyoYeoYNLidmHKs/XoRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jCRwbbzQ; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E2EC640E0191;
+	Tue,  5 Nov 2024 19:24:48 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id OvbG-xBIpPWQ; Tue,  5 Nov 2024 19:24:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730834684; bh=bpUdtWQq60oY7NHfKxuRWAg2XjlYpcz2VP30d1zYrq8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jCRwbbzQyZTbyGr0mNMmnMwxGiuekoIvGhAIOuifvB9pZZp4dgH9xPKIJ2N1yMTCT
+	 fvOUD28f8msYGhEcg1CGrs04DWF9rzmkG3ULCdnCL9GJaNRAHqE4O+1zIwdWzcTkYm
+	 sYxWrs12ZLoCRQuRLJfFSnQSf9sthQH/T3rlEFxLlBc1kwADC6xvVuPxYmDcIPy55e
+	 s7R9QTEOgo3wDzLO0NJzLZ8gOMVwUbLJ7SOYyEd2mhRNo10y+lXJCFBqFPkQbU+FTp
+	 AMX/LttqgHBkrOkkHZJa+CpfJ/33WWZnX6bLrcq+EgHz7jvVrp79AUv/2HlojGYkd9
+	 ipormw4RkWb++esf43LD5DtooLAMwMu6GuHxRDiRJM4hAobfNRQ+DqA33R5GOprrH7
+	 ToR23+0VuBZhSqLc48zlpUQwvQwnVWn/iyyFfyyZxOc4drcRpirYaFpDET7Pu2z4rD
+	 35GGov2WQ1FOmUztbrQxWqSmDcOtvN0evool1QDcE8ZMMsmxsfzB2I6hXmKfg1+S9X
+	 wq4rFwUnOGcH1VCBaNwulsZcKLtZibPDYqoOylQ+vNRHdBW3h22pVt7RYXqc0uUXtX
+	 BQpo2HQotVA+bMjyjSEmLP0Jmb88YVvI1IRM8z1mVO56hiRg2MKpl+D6tBDcUQy0nt
+	 xj+Fuji2/aknvmGPcrRHnkzs=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8D32C40E015F;
+	Tue,  5 Nov 2024 19:24:37 +0000 (UTC)
+Date: Tue, 5 Nov 2024 20:24:36 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
+Message-ID: <20241105192436.GFZypw9DqdNIObaWn5@fat_crate.local>
+References: <20241104101543.31885-1-bp@kernel.org>
+ <ZyltcHfyCiIXTsHu@google.com>
+ <20241105123416.GBZyoQyAoUmZi9eMkk@fat_crate.local>
+ <ZypfjFjk5XVL-Grv@google.com>
+ <20241105185622.GEZypqVul2vRh6yDys@fat_crate.local>
+ <ZypvePo2M0ZvC4RF@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105184333.2305744-1-jthoughton@google.com>
-In-Reply-To: <20241105184333.2305744-1-jthoughton@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Tue, 5 Nov 2024 12:21:05 -0700
-Message-ID: <CAOUHufYS0XyLEf_V+q5SCW54Zy2aW5nL8CnSWreM8d1rX5NKYg@mail.gmail.com>
-Subject: Re: [PATCH v8 00/11] KVM: x86/mmu: Age sptes locklessly
-To: James Houghton <jthoughton@google.com>, Jonathan Corbet <corbet@lwn.net>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZypvePo2M0ZvC4RF@google.com>
 
-On Tue, Nov 5, 2024 at 11:43=E2=80=AFAM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> Andrew has queued patches to make MGLRU consult KVM when doing aging[8].
-> Now, make aging lockless for the shadow MMU and the TDP MMU. This allows
-> us to reduce the time/CPU it takes to do aging and the performance
-> impact on the vCPUs while we are aging.
->
-> The final patch in this series modifies access_tracking_stress_test to
-> age using MGLRU. There is a mode (-p) where it will age while the vCPUs
-> are faulting memory in. Here are some results with that mode:
+On Tue, Nov 05, 2024 at 11:18:16AM -0800, Sean Christopherson wrote:
+> It gets there, usually (as evidenced by my response).  But even for me, there's
+> a non-zero chance I'll miss something that's only Cc'd to kvm@, largely because
+> kvm@ is used by all things virt, i.e. it's a bit noisy:
+> 
+> $ git grep kvm@ MAINTAINERS | wc -l
+> 29
 
-Additional background in case I didn't provide it before:
+Hm, ok, so what do you guys prefer to be CCed on? Everyone from
+get_maintainer.pl's output? commit signers, authors, everyone? Or?
 
-At Google we keep track of hotness/coldness of VM memory to identify
-opportunities to demote cold memory into slower tiers of storage. This
-is done in a controlled manner so that while we benefit from the
-improved memory efficiency through improved bin-packing, without
-violating customer SLOs.
+> Heh, I found that.  Not very helpful.
+> 
+> If you can't document the specifics, can you at least describe the performance
+> implications?  It's practically impossible to give meaningful feedback without
+> having any idea what the magic bit does.
 
-However, the monitoring/tracking introduced two major overheads [1] for us:
-1. the traditional (host) PFN + rmap data structures [2] used to
-locate host PTEs (containing the accessed bits).
-2. the KVM MMU lock required to clear the accessed bits in
-secondary/shadow PTEs.
+Lemme see what I can get clearance on...
 
-MGLRU provides the infrastructure for us to reach out into page tables
-directly from a list of mm_struct's, and therefore allows us to bypass
-the first problem above and reduce the CPU overhead by ~80% for our
-workloads (90%+ mmaped memory). This series solves the second problem:
-by supporting locklessly clearing the accessed bits in SPTEs, it would
-reduce our current KVM MMU lock contention by >80% [3]. All other
-existing mechanisms, e.g., Idle Page Tracking, DAMON, etc., can also
-seamlessly benefit from this series when monitoring/tracking VM
-memory.
+Stay tuned.
 
-[1] https://lwn.net/Articles/787611/
-[2] https://docs.kernel.org/admin-guide/mm/idle_page_tracking.html
-[3] https://research.google/pubs/profiling-a-warehouse-scale-computer/
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
