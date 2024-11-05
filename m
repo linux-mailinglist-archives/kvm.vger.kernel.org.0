@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-30710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30711-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B705C9BC9A8
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:55:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 096F69BC9D2
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47A181F22BE6
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 09:55:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE6F28318D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 09:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32C61D150C;
-	Tue,  5 Nov 2024 09:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCA81D173F;
+	Tue,  5 Nov 2024 09:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlFNyvb2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEaLEvGL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FAF1367
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 09:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8091D172A
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 09:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730800509; cv=none; b=T4AUng6AzPcjQEXavMRijUtVng+/FHQMZsKyheHeq02NwAhgJ8fUXjFtx69OnhdSJ2TcHAxtUyp3bDWwvZ5VNZAbFB6XizhVIc7Id/Z5ZtA4Mq/LUJF97VKOUU1v+tM0ZGhzf80gLWE1juzzmqn9mZHmDMj0w+UlTDlsPsOKnmY=
+	t=1730800788; cv=none; b=gvnj8I2LX1mB8Ckdo3opXyXFFF9OTTAojFxnkCRt2xgy00AdqvG3xV0O98IAZ6fUePGiAGW3XjhNdFNFdeooFMCMRF4T+DJZPkUDL29E95A2wLfNdEAGzVR+5MOs7aQhgnsCQXzdAQp/oZbQbM939Y9CKtrKhRYoaPZGl6KrIJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730800509; c=relaxed/simple;
-	bh=wPrZG7Z9PHiRsM1LbgP4kdxYbYVMFfj9trOU4/Sp7tU=;
+	s=arc-20240116; t=1730800788; c=relaxed/simple;
+	bh=auKbAwmDVLuLzDePYeb9+7433lrdAyJ4IcErJw4WynQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YS+8dq/em5QeM8s2O6q9lly2CyLXJ5b9KSpOzZeNCXqvr+Mnq4xKi5jKQ5h7NBWIyRXvDv47DVQgSVZf67GYt6xKn3hBGBITrd0Jp6KJBNjevNibMVLRt71S8EY2Qpb5m0TZ5UjGH/0aKZ/G37Zcstp8l6Ymyp7haX0jPtcSUT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KlFNyvb2; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uysJdsM9XF7cdj0wBM6/M84Q0T32UFZMuJgbS1YzT5cC4B1e+TGDByix5OiW4m9UoJiDHB9F+xzTXPL4+kyY8MQyCS0IxlV9izB/eZsAncEcZC1H3nWTLRgYP6O+Yd9+lFonZO/howyYThlRde04pao+jZ5x7jgyh//cs+n3M8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QEaLEvGL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730800506;
+	s=mimecast20190719; t=1730800785;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UMnqGPsLhzGV3tgVD4vrw9ZCnrqJY7nkw/coAWDxYBU=;
-	b=KlFNyvb2rlsi5SlXExePAqDhQuo+sJne2orU1wFo0/+82f5wWcc+IwQ/A6yk1u9y0pjLf2
-	2xhPqKJ09+/vGloOvzCfZ0KBqIJNc/C6HWVEz6xDyq60+u8l6dXYWywVubFHtM4q+lJZ1B
-	LLeLACXxwmG7UgiNsXrusaFVpT3+fvQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QInjCe2HZxMiS9t3tTItXMpvJOBheXFw8ILfgZfDc04=;
+	b=QEaLEvGLpIzWMJAo42yG7fWD+H+opeOskGQuBgolEn9/EOZJhuzDxh/fOMww5R29vKZgjK
+	i3zdmybxDnd9wT5zKBU7K7RUEIaW5poKTnKanL+kInCczqzW2UP0Ev/pjlc/Ud7QSo6Gro
+	MKoCu6lekb+pNKsRUiKX+eePFVFJHTA=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-378-zWb_nl9NOi-qQsjMIl7PsQ-1; Tue, 05 Nov 2024 04:55:05 -0500
-X-MC-Unique: zWb_nl9NOi-qQsjMIl7PsQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43157cff1d1so38764165e9.2
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 01:55:04 -0800 (PST)
+ us-mta-569-7r82p7XQPI-2UfDLMW0nGg-1; Tue, 05 Nov 2024 04:59:43 -0500
+X-MC-Unique: 7r82p7XQPI-2UfDLMW0nGg-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-539e75025f9so2931153e87.3
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 01:59:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730800504; x=1731405304;
+        d=1e100.net; s=20230601; t=1730800782; x=1731405582;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UMnqGPsLhzGV3tgVD4vrw9ZCnrqJY7nkw/coAWDxYBU=;
-        b=tSWn5bePOLCgVOqg2SUxRQxCtD5x9ChvSZRulIS78vMiMbKc2qg7lsjdhqIODG67yb
-         aYRBfIBBf3jwa+KlkT5av2B5X2Ittw2di8S7TbKdTXAL9BcfbxxPsNVXti/tPbVA56HJ
-         Dycvzgt+WrGdIqYjGdH9jtYa2u4R7uXpeWMlj8tLuJyRCMNm029LfmZPlAv9fqUwyOw/
-         WHObbuioCdrgpbyDXMNodN9Lyyw6cP9CDtErvQbHAVRn7TWIStsHL8aHm27vRWsEkOUh
-         JhW3CvARzgQBN+n6PxdGW3GBFhiL6lMYGoGL63gZXrd5Y7TH4iDzY/2cnzVh0eOmXHvX
-         /EAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1+D4+9TWHEVnqWaahPQz4hmTmkIVz4o3sHYrNYR0GB7Kxvqmh11Tgh8ooxwO/PnTKbJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzke/r04yLrSXxk2gCjYGzwlnGUjUD1KBmGbiVx1WtfxSPpc78M
-	8HWg3u6sU0tEQSTde83HFYXQ+pnQDHMqacHzYDu3YhYgdKU42DjtgzjiytlTt/XwYiaZW98+8zb
-	5HpBiKmAdLxF9GHgEeOVzS7osre8U/EjR8Y/EppUq+Is2IlpQWA==
-X-Received: by 2002:a05:600c:45d1:b0:42c:b220:4778 with SMTP id 5b1f17b1804b1-4327b821a22mr158161475e9.33.1730800503783;
-        Tue, 05 Nov 2024 01:55:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFgqZFAj5cEWzunmN2i2lkUEud/B8H9xs4ZPFK/2z7oRNWRWjBDLSYk9rN11tAiGxKN6zWUOw==
-X-Received: by 2002:a05:600c:45d1:b0:42c:b220:4778 with SMTP id 5b1f17b1804b1-4327b821a22mr158161165e9.33.1730800503384;
-        Tue, 05 Nov 2024 01:55:03 -0800 (PST)
+        bh=QInjCe2HZxMiS9t3tTItXMpvJOBheXFw8ILfgZfDc04=;
+        b=I7ec6a/Xfqe0h304hjmOvWYOrLE5034zwh7C6teCUJwj4m7lTawIonvQJK3eKiivDk
+         4X9QEF5uRFQzfQ7ZtUoe3VdjVQwaXoaPSOJUn/nCVgKEZHxBa/nqyL5rfmOhyBjvER+6
+         3w3u9BMPP3RNJnvkxPwgEa3DkazEhdKvZmSXTcqMaYo/GPu0zmcmYkkJppHQfI8hieGU
+         AD/peM6Uzit9NYumyGmEqaulmpyxbKufP1GEzkP57nVAVFoJQh6mw744Llz6OdJvXx3P
+         5cp41yisnKvQCewmYgXpP8qmcrkZK0vQbf2V+vrTKCkU9ZFyzSXMV0/y50N/lXKPAwVN
+         hxgg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbW3KgcQAKjHBEOTwFqLqrpAwRQwN1n/eVxkdByFoWI/xwn91u0B5LD/HjOSf/Hsk9oyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj3F2nbNJdoqqJQInV8Gncu8/NjQmZKvEPq55ZydwoayzgnxOf
+	jqbDlQ1fhM8Ma5EhUGaoDeNsdDjnbOjo+iYxhQS7+N0fYUa+PhfmCTuqzv8N/lsxjYTDtq3o6av
+	gUl6bBW5tYGn05ciDchoZMtpxy0HUnfrhztPBwPRuCI1YSd/f+A==
+X-Received: by 2002:a05:6512:3091:b0:539:ea7a:7688 with SMTP id 2adb3069b0e04-53b348b9130mr16974775e87.1.1730800782275;
+        Tue, 05 Nov 2024 01:59:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzMuWVU/ndch0oUzHzWK5tBEpoZHJkJ1/PzWbUd+f2Le81X2BJN/p+vKXeYJ1oT0Rc+ksAww==
+X-Received: by 2002:a05:6512:3091:b0:539:ea7a:7688 with SMTP id 2adb3069b0e04-53b348b9130mr16974745e87.1.1730800781730;
+        Tue, 05 Nov 2024 01:59:41 -0800 (PST)
 Received: from [192.168.10.3] ([151.49.226.83])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd947c0esm220011165e9.24.2024.11.05.01.55.01
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd947c0esm220305265e9.24.2024.11.05.01.59.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2024 01:55:02 -0800 (PST)
-Message-ID: <8cd78103-5f49-4cbd-814d-a03a82a59231@redhat.com>
-Date: Tue, 5 Nov 2024 10:55:00 +0100
+        Tue, 05 Nov 2024 01:59:41 -0800 (PST)
+Message-ID: <f1c7bba2-7b21-4e10-a245-36673e93f8b7@redhat.com>
+Date: Tue, 5 Nov 2024 10:59:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 45/60] i386/tdx: Don't get/put guest state for TDX VMs
+Subject: Re: [PATCH v6 56/60] i386/tdx: Don't treat SYSCALL as unavailable
 To: Xiaoyao Li <xiaoyao.li@intel.com>, Riku Voipio <riku.voipio@iki.fi>,
  Richard Henderson <richard.henderson@linaro.org>,
  Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
@@ -96,7 +96,7 @@ Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
  kvm@vger.kernel.org, qemu-devel@nongnu.org
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-46-xiaoyao.li@intel.com>
+ <20241105062408.3533704-57-xiaoyao.li@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -134,60 +134,48 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241105062408.3533704-46-xiaoyao.li@intel.com>
+In-Reply-To: <20241105062408.3533704-57-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/5/24 07:23, Xiaoyao Li wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Don't get/put state of TDX VMs since accessing/mutating guest state of
-> production TDs is not supported.
-> 
-> Note, it will be allowed for a debug TD. Corresponding support will be
-> introduced when debug TD support is implemented in the future.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 11/5/24 07:24, Xiaoyao Li wrote:
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   target/i386/kvm/tdx.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index 9cb099e160e4..05475edf72bd 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -734,6 +734,13 @@ static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
+>   
+>           requested = env->features[w];
+>           unavailable = requested & ~actual;
+> +        /*
+> +         * Intel enumerates SYSCALL bit as 1 only when processor in 64-bit
+> +         * mode and before vcpu running it's not in 64-bit mode.
+> +         */
+> +        if (w == FEAT_8000_0001_EDX && unavailable & CPUID_EXT2_SYSCALL) {
+> +            unavailable &= ~CPUID_EXT2_SYSCALL;
+> +        }
+>           mark_unavailable_features(cpu, w, unavailable, unav_prefix);
+>           if (unavailable) {
+>               mismatch = true;
 
-This should be unnecessary now that QEMU has 
-kvm_mark_guest_state_protected().
+This seems like a TDX module bug?  It's the kind of thing that I guess 
+could be worked around in KVM.
+
+If we do it in QEMU, I'd rather see it as
+
+             actual = cpuid_entry_get_reg(entry, wi->cpuid.reg);
+             switch (w) {
+             case FEAT_8000_0001_EDX:
+                 actual |= CPUID_EXT2_SYSCALL;
+                 break;
+             }
+             break;
 
 Paolo
-
-> ---
->   target/i386/kvm/kvm.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index c39e879a77e9..e47aa32233e6 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -5254,6 +5254,11 @@ int kvm_arch_put_registers(CPUState *cpu, int level, Error **errp)
->   
->       assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
->   
-> +    /* TODO: Allow accessing guest state for debug TDs. */
-> +    if (is_tdx_vm()) {
-> +        return 0;
-> +    }
-> +
->       /*
->        * Put MSR_IA32_FEATURE_CONTROL first, this ensures the VM gets out of VMX
->        * root operation upon vCPU reset. kvm_put_msr_feature_control() should also
-> @@ -5368,6 +5373,12 @@ int kvm_arch_get_registers(CPUState *cs, Error **errp)
->           error_setg_errno(errp, -ret, "Failed to get MP state");
->           goto out;
->       }
-> +
-> +    /* TODO: Allow accessing guest state for debug TDs. */
-> +    if (is_tdx_vm()) {
-> +        return 0;
-> +    }
-> +
->       ret = kvm_getput_regs(cpu, 0);
->       if (ret < 0) {
->           error_setg_errno(errp, -ret, "Failed to get general purpose registers");
 
 
