@@ -1,395 +1,200 @@
-Return-Path: <kvm+bounces-30704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30705-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345259BC875
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 09:57:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 164F29BC8C7
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 10:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7D56282ECF
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 08:57:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9EBC284E6C
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 09:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D9D1D2B0F;
-	Tue,  5 Nov 2024 08:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7431D0784;
+	Tue,  5 Nov 2024 09:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ao73BCl2"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEC41D26EA;
-	Tue,  5 Nov 2024 08:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C928D1D041B
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 09:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730796958; cv=none; b=FXKV9atlELIyG2bO7fVBPp/ekgp30k2bwC20G/EN+zW4a57J699ORhw/DbJOHAh5oOlj2hOkgA7ug7PsWbQJwlYh27Nfxg20r6eLBByj67BRGNZ8kpi/V52J1z8JJzAqfK/1IAtzd8DvXX+ETdN4cLppwqoKXUYEBLrWBohbahg=
+	t=1730797949; cv=none; b=FGAnIMthuxiYh8vPtLb3QDoOtx+Fc8QDGAK4cr5/xDxgj+0iy/sVfamv6QTXsHIKRpVKarUURhU4HDKycRdSJHv6Jnxcfq+iB5PYBSsgLmMomsPrL/MEuw5PwcU76F1wvseH+xeF4IJwKuOE0ipBZoqcfrx9iJfT9Ao+na38xzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730796958; c=relaxed/simple;
-	bh=tZ2HBCBwJ12WhcIXBC02sjAqyO4cta4FFBr6GDHI5N4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y0AT31rvQ7uCyYLOjakedmuRxRR6RetiULXtqK50ZhnhaBCxiWbBV1TOOgq9GXo1JEQ9gOIlcPrsArqHSXKG8m0lNRu3IJF1W+IuMZiRhCUuQo9cShaq6+kRI0yzOKySBAUSDYfYVHkM6X29d81IIwX+WjYXtCi8GsvfJ82L8rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XjMck6q8yz6LDfS;
-	Tue,  5 Nov 2024 16:55:50 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id B7A621400CB;
-	Tue,  5 Nov 2024 16:55:51 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml500005.china.huawei.com (7.182.85.13) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 5 Nov 2024 09:55:51 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 5 Nov 2024 09:55:51 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v12 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
- migration driver
-Thread-Topic: [PATCH v12 3/4] hisi_acc_vfio_pci: register debugfs for
- hisilicon migration driver
-Thread-Index: AQHbLzZ9E+Ip5Nj6eEy59hj6TfvRZ7KoVfVA
-Date: Tue, 5 Nov 2024 08:55:51 +0000
-Message-ID: <fc776543a1d14531b28b5fa693925518@huawei.com>
-References: <20241105035254.24636-1-liulongfang@huawei.com>
- <20241105035254.24636-4-liulongfang@huawei.com>
-In-Reply-To: <20241105035254.24636-4-liulongfang@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1730797949; c=relaxed/simple;
+	bh=7KjBvHKrJIOsYx3RhSM1CAcJbmdtjwxF3so75dMqKic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UX5CReqZAF8H0yqb00DolpHlGyVop277z49ABDl61p1sOOgrBbPaNseRhQinr4LUgZmD2y+bEKTaDHzm7aPxb4dI4oi+lF6rJiUxikK3IImZGlaGBplvgtdJBfg+jPi3NGrBwEqrHPMBuZDQQ+jfqErIAm3i6MV9YnhUXeKfqbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ao73BCl2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730797945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NhHekBJKBLKEFOcVbXBFd9KjnJiTeNetvbObd1n9nOI=;
+	b=Ao73BCl26dpqlLWsoBEbiHDZm0VarAw2Icr03okYlnexw0firkA3K+PscjNZwf5YVlfnHu
+	WPzfD2xe36CMlna83Ij17Lrp8VVLEAn8HtnvnINxCftQdwgNIaDg/xsaYN1jTeeSn9saDK
+	8xpKj5Dvk1fs5r187VdxfmCsOYy0AM0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-9XYlI3hPNya9VHSPKlZ2eA-1; Tue, 05 Nov 2024 04:12:24 -0500
+X-MC-Unique: 9XYlI3hPNya9VHSPKlZ2eA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315c1b5befso33061105e9.1
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 01:12:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730797943; x=1731402743;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NhHekBJKBLKEFOcVbXBFd9KjnJiTeNetvbObd1n9nOI=;
+        b=WmvR1KlaTLfWyqJbwi+0jVVMtloiWQl7Axt3pT+pE1Tr/EnFpRSTND9IHXiQ0gau9Q
+         W0HNPZaubH0P3jp3NdJOBQCzocKYRDrJgLRblN+o7YsKnCznt1alco9axDZPOfCnbJsv
+         CV3pE3i8/IjFy2MRDKgguDdaorzomqBugE4Pm/D2WHBsJsI8XgNoHIc44K5Gfupa5/0x
+         48CSNQ1UFtAEq85Y8mrSn0qpopUHTAWYStyocl+8lVLrqIAVfu+0Fr8iMApvbwc5ta7n
+         K2pVxaFImFY6YoaNcEThusTExc5K6++7S1NTZKaH6ODZk781Najrx03Bm2jLW8/LmLIF
+         UalA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSOyJS1+I8D6VAcI+lLE6Bjkvdpz5DRvktssWwp75NlMDQbzrxzMiW7UGz9S87bV+7MTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD/1Kyo1ERWQI5W6fMT8JM/qaLH3sj2NbCIs9SQhs+RSzbBBUN
+	lSH7XQm+MdToBYfKpK4QcnX7TaPhFs5S+y0w9Afq1LiNuGU764pTSPfTaxMTlHoLK8bT8smYHbq
+	wL6E5wmrvYk5cCSBKOvt2JZHYrgrbPJJhN8x0/Tve9SCJmxNesg==
+X-Received: by 2002:a05:600c:1d01:b0:42c:a6da:a149 with SMTP id 5b1f17b1804b1-4319ad048cdmr327242785e9.25.1730797943141;
+        Tue, 05 Nov 2024 01:12:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6zUjTp7xP0AwB0ZSBo252NNKx5L6LZGi6+tnqrcbUMgGK5sFPj5ZjdSvFrJqfhDDyesQb7A==
+X-Received: by 2002:a05:600c:1d01:b0:42c:a6da:a149 with SMTP id 5b1f17b1804b1-4319ad048cdmr327242375e9.25.1730797942776;
+        Tue, 05 Nov 2024 01:12:22 -0800 (PST)
+Received: from [192.168.10.3] ([151.49.226.83])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-381c10d4342sm15432868f8f.32.2024.11.05.01.12.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 01:12:22 -0800 (PST)
+Message-ID: <9601f5a1-f1f1-47ab-a240-30331946b584@redhat.com>
+Date: Tue, 5 Nov 2024 10:12:19 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 59/60] i386/cpu: Set up CPUID_HT in x86_cpu_realizefn()
+ instead of cpu_x86_cpuid()
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Ani Sinha <anisinha@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-60-xiaoyao.li@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
+ CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
+ hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
+ DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
+ P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
+ Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
+ UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
+ tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
+ wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAc0j
+ UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT7CwU0EEwECACMFAlRCcBICGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
+ 11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
+ jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
+ VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
+ CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
+ SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
+ AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
+ AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
+ nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
+ bQ4tlFFuVjArBZcapSIe6NV8C4cEiSTOwE0EVEJx7gEIAMeHcVzuv2bp9HlWDp6+RkZe+vtl
+ KwAHplb/WH59j2wyG8V6i33+6MlSSJMOFnYUCCL77bucx9uImI5nX24PIlqT+zasVEEVGSRF
+ m8dgkcJDB7Tps0IkNrUi4yof3B3shR+vMY3i3Ip0e41zKx0CvlAhMOo6otaHmcxr35sWq1Jk
+ tLkbn3wG+fPQCVudJJECvVQ//UAthSSEklA50QtD2sBkmQ14ZryEyTHQ+E42K3j2IUmOLriF
+ dNr9NvE1QGmGyIcbw2NIVEBOK/GWxkS5+dmxM2iD4Jdaf2nSn3jlHjEXoPwpMs0KZsgdU0pP
+ JQzMUMwmB1wM8JxovFlPYrhNT9MAEQEAAcLBMwQYAQIACQUCVEJx7gIbDAAKCRB+FRAMzTZp
+ sadRDqCctLmYICZu4GSnie4lKXl+HqlLanpVMOoFNnWs9oRP47MbE2wv8OaYh5pNR9VVgyhD
+ OG0AU7oidG36OeUlrFDTfnPYYSF/mPCxHttosyt8O5kabxnIPv2URuAxDByz+iVbL+RjKaGM
+ GDph56ZTswlx75nZVtIukqzLAQ5fa8OALSGum0cFi4ptZUOhDNz1onz61klD6z3MODi0sBZN
+ Aj6guB2L/+2ZwElZEeRBERRd/uommlYuToAXfNRdUwrwl9gRMiA0WSyTb190zneRRDfpSK5d
+ usXnM/O+kr3Dm+Ui+UioPf6wgbn3T0o6I5BhVhs4h4hWmIW7iNhPjX1iybXfmb1gAFfjtHfL
+ xRUr64svXpyfJMScIQtBAm0ihWPltXkyITA92ngCmPdHa6M1hMh4RDX+Jf1fiWubzp1voAg0
+ JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
+ dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
+ b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
+In-Reply-To: <20241105062408.3533704-60-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 11/5/24 07:24, Xiaoyao Li wrote:
+> Otherwise, it gets warnings like below when number of vcpus > 1:
+> 
+>    warning: TDX enforces set the feature: CPUID.01H:EDX.ht [bit 28]
+> 
+> This is because x86_confidential_guest_check_features() checks
+> env->features[] instead of the cpuid date set up by cpu_x86_cpuid()
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>   target/i386/cpu.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 472ab206d8fe..214a1b00a815 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6571,7 +6571,6 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           *edx = env->features[FEAT_1_EDX];
+>           if (threads_per_pkg > 1) {
+>               *ebx |= threads_per_pkg << 16;
+> -            *edx |= CPUID_HT;
+>           }
+>           if (!cpu->enable_pmu) {
+>               *ecx &= ~CPUID_EXT_PDCM;
+> @@ -7784,6 +7783,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>       Error *local_err = NULL;
+>       unsigned requested_lbr_fmt;
+>   
+> +    qemu_early_init_vcpu(cs);
+> +
+>   #if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
+>       /* Use pc-relative instructions in system-mode */
+>       tcg_cflags_set(cs, CF_PCREL);
+> @@ -7851,6 +7852,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>           }
+>       }
+>   
+> +    /*
+> +     * It needs to called after feature filter because KVM doesn't report HT
+> +     * as supported
 
+Does it, since kvm_arch_get_supported_cpuid() has the following line?
 
-> -----Original Message-----
-> From: liulongfang <liulongfang@huawei.com>
-> Sent: Tuesday, November 5, 2024 3:53 AM
-> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> Subject: [PATCH v12 3/4] hisi_acc_vfio_pci: register debugfs for hisilico=
-n
-> migration driver
+     if (function == 1 && reg == R_EDX) {
+         ...
+         /* KVM never reports CPUID_HT but QEMU can support when vcpus > 1 */
+         ret |= CPUID_HT;
 
-Hi,
+?
 
-Few minor comments below. Please don't re-spin just for these yet.
-Please wait for others to review as well.
+Paolo
 
-Thanks,
-Shameer
-
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index a8c53952d82e..7728c9745b9d 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct
-> hisi_acc_vf_migration_file *migf)
->  	mutex_unlock(&migf->lock);
->  }
->=20
-> +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device
-> *hisi_acc_vdev,
-> +	struct hisi_acc_vf_migration_file *src_migf)
-
-Alignment should match open parenthesis here.
-
-> +{
-> +	struct hisi_acc_vf_migration_file *dst_migf =3D hisi_acc_vdev-
-> >debug_migf;
-> +
-> +	if (!dst_migf)
-> +		return;
-> +
-> +	dst_migf->total_length =3D src_migf->total_length;
-> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
-> +		sizeof(struct acc_vf_data));
-
-Here too, alignment not correct. It is better to run,
-./scripts/checkpatch --strict on these patches if you haven't done already.
-
-> +}
-> +
->  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device
-> *hisi_acc_vdev)
->  {
->  	if (hisi_acc_vdev->resuming_migf) {
-> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
-> >resuming_migf);
->  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
->  		fput(hisi_acc_vdev->resuming_migf->filp);
->  		hisi_acc_vdev->resuming_migf =3D NULL;
->  	}
->=20
->  	if (hisi_acc_vdev->saving_migf) {
-> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
-> >saving_migf);
->  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
->  		fput(hisi_acc_vdev->saving_migf->filp);
->  		hisi_acc_vdev->saving_migf =3D NULL;
-> @@ -1294,6 +1309,129 @@ static long hisi_acc_vfio_pci_ioctl(struct
-> vfio_device *core_vdev, unsigned int
->  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
->  }
->=20
-> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_dev=
-ice
-> *vdev)
-> +{
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(vdev);
-> +	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
-> +	int ret;
-> +
-> +	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
-> +	/*
-> +	 * When the device is not opened, the io_base is not mapped.
-> +	 * The driver cannot perform device read and write operations.
-> +	 */
-> +	if (!hisi_acc_vdev->dev_opened) {
-> +		seq_printf(seq, "device not opened!\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret =3D qm_wait_dev_not_ready(vf_qm);
-> +	if (ret) {
-> +		seq_printf(seq, "VF device not ready!\n");
-> +		return -EBUSY;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
-> +{
-> +	struct device *vf_dev =3D seq->private;
-> +	struct vfio_pci_core_device *core_device =3D
-> dev_get_drvdata(vf_dev);
-> +	struct vfio_device *vdev =3D &core_device->vdev;
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(vdev);
-> +	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
-> +	u64 value;
-> +	int ret;
-> +
-> +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> +	ret =3D hisi_acc_vf_debug_check(seq, vdev);
-> +	if (ret) {
-> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> +		return ret;
-> +	}
-> +
-> +	value =3D readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
-> +	if (value =3D=3D QM_MB_CMD_NOT_READY) {
-> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> +		seq_printf(seq, "mailbox cmd channel not ready!\n");
-> +		return -EINVAL;
-> +	}
-> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
-> +	seq_printf(seq, "mailbox cmd channel ready!\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
-> +{
-> +	struct device *vf_dev =3D seq->private;
-> +	struct vfio_pci_core_device *core_device =3D
-> dev_get_drvdata(vf_dev);
-> +	struct vfio_device *vdev =3D &core_device->vdev;
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(vdev);
-> +	size_t vf_data_sz =3D offsetofend(struct acc_vf_data, padding);
-> +	struct acc_vf_data *vf_data;
-> +	int ret;
-> +
-> +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> +	ret =3D hisi_acc_vf_debug_check(seq, vdev);
-> +	if (ret) {
-> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> +		return ret;
-> +	}
-> +
-> +	mutex_lock(&hisi_acc_vdev->state_mutex);
-> +	vf_data =3D kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
-> +	if (!vf_data) {
-> +		ret =3D -ENOMEM;
-> +		goto mutex_release;
-> +	}
-> +
-> +	vf_data->vf_qm_state =3D hisi_acc_vdev->vf_qm_state;
-> +	ret =3D vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
-> +	if (ret)
-> +		goto migf_err;
-> +
-> +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
-> +		     (const void *)vf_data, vf_data_sz, false);
-> +
-> +	seq_printf(seq,
-> +		   "guest driver load: %u\n"
-> +		   "data size: %lu\n",
-> +		   hisi_acc_vdev->vf_qm_state,
-> +		   sizeof(struct acc_vf_data));
-
-There was a suggestion to add a comment here to describe vf_qm_state better=
-.
-May be something like,
-
-vf_qm_state here indicates whether the Guest has loaded the driver for the =
-ACC VF
-device or not.
-
-> +
-> +migf_err:
-> +	kfree(vf_data);
-> +mutex_release:
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
-> +
-> +	return ret;
-> +}
-> +
-> +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
-> +{
-> +	struct device *vf_dev =3D seq->private;
-> +	struct vfio_pci_core_device *core_device =3D
-> dev_get_drvdata(vf_dev);
-> +	struct vfio_device *vdev =3D &core_device->vdev;
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(vdev);
-> +	size_t vf_data_sz =3D offsetofend(struct acc_vf_data, padding);
-> +	struct hisi_acc_vf_migration_file *debug_migf =3D hisi_acc_vdev-
-> >debug_migf;
-> +
-> +	/* Check whether the live migration operation has been performed
-> */
-> +	if (debug_migf->total_length < QM_MATCH_SIZE) {
-> +		seq_printf(seq, "device not migrated!\n");
-> +		return -EAGAIN;
-> +	}
-> +
-> +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
-> +		     (const void *)&debug_migf->vf_data, vf_data_sz, false);
-> +	seq_printf(seq, "migrate data length: %lu\n", debug_migf-
-> >total_length);
-> +
-> +	return 0;
-> +}
-> +
->  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
->  {
->  	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(core_vdev);
-> @@ -1305,12 +1443,16 @@ static int hisi_acc_vfio_pci_open_device(struct
-> vfio_device *core_vdev)
->  		return ret;
->=20
->  	if (core_vdev->mig_ops) {
-> +		mutex_lock(&hisi_acc_vdev->open_mutex);
->  		ret =3D hisi_acc_vf_qm_init(hisi_acc_vdev);
->  		if (ret) {
-> +			mutex_unlock(&hisi_acc_vdev->open_mutex);
->  			vfio_pci_core_disable(vdev);
->  			return ret;
->  		}
->  		hisi_acc_vdev->mig_state =3D VFIO_DEVICE_STATE_RUNNING;
-> +		hisi_acc_vdev->dev_opened =3D true;
-> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->  	}
->=20
->  	vfio_pci_core_finish_enable(vdev);
-> @@ -1322,7 +1464,10 @@ static void hisi_acc_vfio_pci_close_device(struct
-> vfio_device *core_vdev)
->  	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(core_vdev);
->  	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
->=20
-> +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> +	hisi_acc_vdev->dev_opened =3D false;
->  	iounmap(vf_qm->io_base);
-> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
->  	vfio_pci_core_close_device(core_vdev);
->  }
->=20
-> @@ -1342,6 +1487,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
-> vfio_device *core_vdev)
->  	hisi_acc_vdev->pf_qm =3D pf_qm;
->  	hisi_acc_vdev->vf_dev =3D pdev;
->  	mutex_init(&hisi_acc_vdev->state_mutex);
-> +	mutex_init(&hisi_acc_vdev->open_mutex);
->=20
->  	core_vdev->migration_flags =3D VFIO_MIGRATION_STOP_COPY |
-> VFIO_MIGRATION_PRE_COPY;
->  	core_vdev->mig_ops =3D &hisi_acc_vfio_pci_migrn_state_ops;
-> @@ -1387,6 +1533,48 @@ static const struct vfio_device_ops
-> hisi_acc_vfio_pci_ops =3D {
->  	.detach_ioas =3D vfio_iommufd_physical_detach_ioas,
->  };
->=20
-> +static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device
-> *hisi_acc_vdev)
-> +{
-> +	struct vfio_device *vdev =3D &hisi_acc_vdev->core_device.vdev;
-> +	struct dentry *vfio_dev_migration =3D NULL;
-> +	struct dentry *vfio_hisi_acc =3D NULL;
-> +	struct device *dev =3D vdev->dev;
-> +	void *migf =3D NULL;
-> +
-> +	if (!debugfs_initialized() ||
-> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
-> +		return;
-> +
-> +	if (vdev->ops !=3D &hisi_acc_vfio_pci_migrn_ops)
-> +		return;
-> +
-> +	vfio_dev_migration =3D debugfs_lookup("migration", vdev-
-> >debug_root);
-> +	if (!vfio_dev_migration) {
-> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
-> +		return;
-> +	}
-> +
-> +	migf =3D kzalloc(sizeof(struct hisi_acc_vf_migration_file),
-> GFP_KERNEL);
-> +	if (!migf)
-> +		return;
-> +	hisi_acc_vdev->debug_migf =3D migf;
-> +
-> +	vfio_hisi_acc =3D debugfs_create_dir("hisi_acc", vfio_dev_migration);
-> +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
-> +				    hisi_acc_vf_dev_read);
-> +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
-> +				    hisi_acc_vf_migf_read);
-> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
-> +				    hisi_acc_vf_debug_cmd);
-> +}
-> +
-> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device
-> *hisi_acc_vdev)
-> +{
-> +	/* If migrn_ops is not used, kfree(NULL) is valid */
-
-The above comment is not required. Please remove.
-
-> +	kfree(hisi_acc_vdev->debug_migf);
-> +	hisi_acc_vdev->debug_migf =3D NULL;
-> +}
-> +
+> +     */
+> +    if (cs->nr_cores * cs->nr_threads > 1) {
+> +        env->features[FEAT_1_EDX] |= CPUID_HT;
+> +    }
 
 
