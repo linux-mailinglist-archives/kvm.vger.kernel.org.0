@@ -1,469 +1,239 @@
-Return-Path: <kvm+bounces-30764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E4C9BD471
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:21:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3389BD47D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247F42839D5
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 18:21:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD6931C2224D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 18:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C174B1E907E;
-	Tue,  5 Nov 2024 18:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB8F1E7C28;
+	Tue,  5 Nov 2024 18:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="csaNn6fP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="drGzZw5a"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A731E8856
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 18:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730830879; cv=none; b=gdFQ/z9V2VckcuYdMCKAZm2llB9Jf+21Qi92GDXP41MYwsNQsSVZc/Z9tFiGTG034IqgY7eEEqaRdWaiHoz3uNWtnD6APv0RAawdu8IF6V5BqoNeRwD+iC0SsnXD7UxK8SboWT/WHtY1HOYGFG7eMNIKvrZE69A4jQ4msk8L5kE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730830879; c=relaxed/simple;
-	bh=ZZi3BcgW8dU/FmeUVRlwP7F9yP6S9iLsceuLt7FnGRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IU5TRhZvrDLzXCkG+/LhlhxX563auO/gqIlYi8gKmrmWY0oxWmlUSGMvv5G0b0aLHcbiUR7jMmqxIjHtIpHNs3kVCvBo0l9J0MINCIwQrjNCS42KdIfzydWuuYkOzApmAQRsgNeAchlqfUSFXmU/Xv0e02ZMmQar+WU3PykNLeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=csaNn6fP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730830873;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tEbuJjrTaFih7whargvvzvNhhaeDsTSzRPC2gHGEaos=;
-	b=csaNn6fPQI1kHF2DlbGXSCiEujhVlQsolfc1M9Gwjh7BL8aJCZRnxwKqOYrgnLndxcQL2r
-	68W9o2chKLfp69ZjUWQpyR0a4pNRWit8N4+um8LxyyMguQBXymBNb1j+jqB7neJG7ZhEo8
-	NKZTqUCKpLzeplsjFQ4N47Ubkvg4xDc=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-60-IJ7mv7EOOpGIpzjvAtXdhQ-1; Tue, 05 Nov 2024 13:21:11 -0500
-X-MC-Unique: IJ7mv7EOOpGIpzjvAtXdhQ-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6c4c46af8so4510205ab.3
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 10:21:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730830871; x=1731435671;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tEbuJjrTaFih7whargvvzvNhhaeDsTSzRPC2gHGEaos=;
-        b=CSFeMsrOv7SVu4g5FwZda8WrXCvpEs/a4kYKnwYnLrdVBrI+xwSWwq3nb9PKlZzFlF
-         HZr/zzJK47D3xHZhcJNZfc7cSJjGNbxULCsp09IwQ7RE4gGZAcMp154wbuhZzXBXU0vy
-         6sWzZkhNmHlfDqn6EsBtoPk7w+4jMyMw+GUt138i2pkjXld9E38m50jtwqEryHgXOr2b
-         qmrVUfEqPCLncK6956cjI2hhOqsly4NjmqNJjUAYjdfkaHxr/06bL3l39+qxG4St1T8x
-         OkmLtHSLZt7YThksDQ++AUOLpMv9cl8/vAnb7bWOKbSldQQH6LvuD9FWeJNytPBQYZvR
-         skig==
-X-Forwarded-Encrypted: i=1; AJvYcCU3vIj5NbzCmuCiltUkNakfLr3ZYQWOY9ntAE5X+BLPeaosFd65bJhSOoSvF9MJXsC4g+U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUdXLuPCBTNDuQ63hlt4ZNDdowVckzVPoKz/cb5BYsTjClbRpx
-	BPoPy7KL/g9A/k9RCfOxj4t22wMiOdv3UcshVnAFM+bItY13Zwmf9H4PgXrCvNTJpPCH+s4D7DP
-	X3bp0MifzCPwfU8NORUDpJOIG9qN+Rs5CqHTvAiDcQTuh9fmoQw==
-X-Received: by 2002:a05:6602:258c:b0:83a:96ce:342e with SMTP id ca18e2360f4ac-83b1c5d15cfmr819572139f.3.1730830871074;
-        Tue, 05 Nov 2024 10:21:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFBPbW7d/AXkUPWEwQLaNHgfje0IBrygT+rEkkO4QMX7PEgzzDLAxuZwgIdrUXOYP5FjL8+6A==
-X-Received: by 2002:a05:6602:258c:b0:83a:96ce:342e with SMTP id ca18e2360f4ac-83b1c5d15cfmr819571539f.3.1730830870691;
-        Tue, 05 Nov 2024 10:21:10 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83b67b2542fsm278088839f.12.2024.11.05.10.21.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 10:21:10 -0800 (PST)
-Date: Tue, 5 Nov 2024 11:21:08 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: liulongfang <liulongfang@huawei.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
- "Jonathan Cameron" <jonathan.cameron@huawei.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linuxarm@openeuler.org"
- <linuxarm@openeuler.org>
-Subject: Re: [PATCH v12 3/4] hisi_acc_vfio_pci: register debugfs for
- hisilicon migration driver
-Message-ID: <20241105112108.14255a9e.alex.williamson@redhat.com>
-In-Reply-To: <fc776543a1d14531b28b5fa693925518@huawei.com>
-References: <20241105035254.24636-1-liulongfang@huawei.com>
-	<20241105035254.24636-4-liulongfang@huawei.com>
-	<fc776543a1d14531b28b5fa693925518@huawei.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C719213D52E;
+	Tue,  5 Nov 2024 18:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730831126; cv=fail; b=DUp1c/Cb3/G5MF5B4BQUGBfYxgr9taHwe19k0890F9V2mCgzMEvyCBLIYkJwH4hoMw0M1pNI9D4rwMXChkZJF8C2zfd9ghAX2SzCs9ORAIz3qu9kieq6OUXsOJTrbqeluCsASvr95qkge2d3LrNqrVGn79UX6r+4/J2Qd4uFD3U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730831126; c=relaxed/simple;
+	bh=0SJdL4oeEJh4ZG4mZKjGW29jURuZVYEj5rx/tb90PVw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=K0O9MUnWXvbtBuqwS2p0fjrRwkCfq8jOpCtdzFeeXERNqmUQkOZPQaRgKJi6y/wLq8Oik7uxWgn+2VkLSksGIXrVChs0FYdu7iw867ucue9JEOch0yh4mPmr+aGkiw/L8MGnXcQ3lHXa/M82fk225DtURuQaQQ5VNmFNClpPBtc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=drGzZw5a; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730831125; x=1762367125;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=0SJdL4oeEJh4ZG4mZKjGW29jURuZVYEj5rx/tb90PVw=;
+  b=drGzZw5aUHXlIdbICOokEafXYSQePYE8sPfXK9y357kKfRZp1f0xh6u/
+   GFhT2EDf6nZrAvQuBadBBtCbv/ZRGnuxLTj9Q1eTAI7/CInLJMuDXs+z1
+   GLYD9qq5wwwf457f+5kyjMh+l6g5OqwwVzwmCuGXp+2r4BfRulGUyujug
+   poorv1PSalTaZ9clpFaCNJYouR44V0vqkxaahTy028iQWoB1P8ndZFV4X
+   2pJZJsm85LGtJRJjejgBBRelGqZHD0DkQwWBSXf19sQyTDNEP1DCLb3rR
+   Izf57z1uaTHvBL/mg+RNlliTA1+KI2fJoqrHoZqNFrHT0mArtdubsSN4G
+   g==;
+X-CSE-ConnectionGUID: Zc2g4ZDBSua7R/4dR/K1PA==
+X-CSE-MsgGUID: jtM2i/G4TUyJ97KRqa44Pg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48058942"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="48058942"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 10:25:24 -0800
+X-CSE-ConnectionGUID: tPzh3RtWSJieQXQ5WAMX+w==
+X-CSE-MsgGUID: 2L6XaMzZSbinWrgeXHC4Ng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
+   d="scan'208";a="84025454"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Nov 2024 10:25:23 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 5 Nov 2024 10:25:22 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 5 Nov 2024 10:25:22 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 5 Nov 2024 10:25:22 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V1fKd6W9CaS1pecOqQ+P18Nn+5b6gKhxCdTghH0yci17qpu612PwC7a0eAbvCOmb3uaZ2NkzFvJ5GCPiLTc7lyvbbS/l5Vj/14/gpWbHbYbX2VTXlU08IK/doc80O9xii+IQhMAlaee8MhDLs6ubpFXBWkDsLqgPZH0aeYKzleE8HFH1SkvA+vVretXeIy4fLikBlnfptKCFLrSBP10w75itHxCoae8Jk7Ciu2IrNNVMwDyoO86oJC7HnNPAzWLjuaBaHAMrhQvOaM6gftnzStIhb+91GFBGuQX/hYtSMDoNDbezckfkQDvxLhG5gkmx4pZt8pFA7pMj55NyrDfe+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0SJdL4oeEJh4ZG4mZKjGW29jURuZVYEj5rx/tb90PVw=;
+ b=jwWxwP+APsGDPiUnzuHTJieH9T2OwqKFEnJCU9ohZDGDlHSNfK49pBwSbC+Ick9gfxYhdMqKWgkDwSd3TGVBZJBIbhrFozPFl1f7NMT9epTDDpmgYeIIpCLiI2JzvveYBBQMQ+yhqEtD8EdC8GM2zOmJV0P3pP6MAVZr1E1biv+5zpSgnNoXmCu+3oMz/6DV3fpJjFtLctPsnvmZCNxNuZEZiiGmVAFvk2PwL8gLr8tmkxqKUKTN9GIAdNk/zliOuRdCKq5YxyVzNWAlvP+UYcMS7hD/PFbKW+nczOkLUJRTAH0PjRIPbUNwoVRoaCIZnWk5EkPWZyYZRbDLNKqwIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by PH0PR11MB4886.namprd11.prod.outlook.com (2603:10b6:510:33::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.29; Tue, 5 Nov
+ 2024 18:25:18 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.8114.028; Tue, 5 Nov 2024
+ 18:25:18 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "Yang, Weijiang" <weijiang.yang@intel.com>, "seanjc@google.com"
+	<seanjc@google.com>
+CC: "Gao, Chao" <chao.gao@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "john.allen@amd.com" <john.allen@amd.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v10 00/27] Enable CET Virtualization
+Thread-Topic: [PATCH v10 00/27] Enable CET Virtualization
+Thread-Index: AQHaYwfwUq77Vfr47kSTqCeNyaqv3bGDeEgAgAbx4wCBIC/lgA==
+Date: Tue, 5 Nov 2024 18:25:18 +0000
+Message-ID: <838cbb8b21fddf14665376360df4b858ec0e6eaf.camel@intel.com>
+References: <20240219074733.122080-1-weijiang.yang@intel.com>
+	 <ZjLP8jLWGOWnNnau@google.com>
+	 <0d8141b7-804c-40e4-b9f8-ac0ebc0a84cb@intel.com>
+In-Reply-To: <0d8141b7-804c-40e4-b9f8-ac0ebc0a84cb@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|PH0PR11MB4886:EE_
+x-ms-office365-filtering-correlation-id: 1e83e2e1-1e0d-4848-e69f-08dcfdc733a5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?bDRBWVFtRG5wNkh4Z0dWczRadmhDL3VUaVg1bHJESSt2MVZ6SGRDNGUreFZS?=
+ =?utf-8?B?NElMVG9jaTA5SHhFUVJjczlYVFdaazEvZ2RVNG5Na2lHRWxCZDZCL1FaVFpU?=
+ =?utf-8?B?VTczNDJEMmlyS3NSY1QyU0QvcVBlaDNBT2ZEdzJEcTBBNmVnc2phaGxGZEZQ?=
+ =?utf-8?B?U0c5MkM4Q05nU0FnMHd1R3ppU1MrTmhOU2luNFB2SzFyVlF2bms5cWdrcHNw?=
+ =?utf-8?B?M1NsaTJPc3VFazZqYnl0UDMrb0FjRlpibnFMYmVoMkVwOThmZ1lGU25qcUZh?=
+ =?utf-8?B?KzZNQTVpZ1RpNVg1MVdDMDBlYkgyWHFFSVpScnJlNUN1Z3NodDE5NE5JUm42?=
+ =?utf-8?B?QytsUkdBaVFPVkcvOEd4MWJ1WXFFQ1JmZGx5RW4wZlJraUJrNkg4Zjc0Ulha?=
+ =?utf-8?B?NlRrSEgyYms2M3AydWV6b1AxcG4wK3pIUTl5MU5mYVpDck5DK2VyQXZKWGsv?=
+ =?utf-8?B?SmVCSHAzNzRKTDFwYXM0WTlKaEFrYlNVS3VJeWI0Mk9CRE9ndVJtM3VneDhO?=
+ =?utf-8?B?NjRic3NpdzU0bVd0NFUxWEhwUVJERTZkZVNhMjltK1R3SlRGczVLTzU1MVB4?=
+ =?utf-8?B?U3RiOWpFblZRY1BTS0Ztcm5FdVRqdS9TZS81blQ4TC9YUEQwUVdabVNtSGtU?=
+ =?utf-8?B?UmdJVGpoZ3VMQXdlK2lSZ2FUM051WDZZcm1QNndnUWl3WHJXeFNqV1BaVzhM?=
+ =?utf-8?B?SXhuQ0ZYWFJ4clpUTWEyQzBqaGNidEhkL3Zid0JZNXdLTHc3R1cybDNWRlFV?=
+ =?utf-8?B?c0lxOWVUWlhpTFpMT21nRlJBYUQzY2NZWnc2QXExTE15d0xYSnNselYyTUpI?=
+ =?utf-8?B?b2htMHptbDg3V3R2TXhzcncyY1ptdDR4cTZIZlh2TUcrWjJtVktLVjhlZXcy?=
+ =?utf-8?B?TXZFMzZpeUpVaUpMQmEybUU1NjFsSm0xVWs2UE5xbnlsalNabFRlcjFFbnFq?=
+ =?utf-8?B?Mzh5SFFEb2FQWTZqQ0tlK0ZUZVRId2h1K0tydWRrSXBGY1BTTm9ZQzh2cjJy?=
+ =?utf-8?B?OHQxa0J2MzJhanN0c21QOURobC9ZNXZjdkNTckRuRGwvTEZ2WHIvS3lSV2hQ?=
+ =?utf-8?B?cU1DVVhWV2htSlV0dFY4WFpRb3hESmdSU2Q5RVhscjQvUTQzTHlkdXRRQzNN?=
+ =?utf-8?B?anB2ZEdTeFlldFRHaDNVeVpoVTVpQWFINHp1QTBsLzRUZTc4NFlhOEduNG05?=
+ =?utf-8?B?T2pYdzZBQUtxcDBEVmR5M1RaZUlBU2JmVGt6UUNqMXJHckhndGd5TDcwa1Jm?=
+ =?utf-8?B?dUhxV1RQYjRJdkdaT3JNTEJlRTRMa013TWQzMGZMN29UM0w3YVEzWkplMkJP?=
+ =?utf-8?B?NXd1RTd0bmN3Mk4vbzdqZ1VFdmJKc0ZGWDE4TkFWVS9JWXUwTUxxY0hmaEht?=
+ =?utf-8?B?VzdKbEpnd2JUTHhTU0hqVmk3eHNaVGNLZzEwd0U0M3RUN2NyRnpsd3JyZkZu?=
+ =?utf-8?B?dEQ2ZXY0Ni8rWUFxc3dRZi9rWkJwRnVjMTNvbHF1MTNIT1ZuMjk4L3VEN1VL?=
+ =?utf-8?B?L2xKeUlWRE45Ukh2cTIrV000dm9yaWUvZDZaY2Y5eDd0ZmpBYzBjYVVlYVRx?=
+ =?utf-8?B?VEJWcmpOakw4cVdUS1l2YS9ua0NaeDRleUo0dk4vR1BqQ0pWaXY0UTdIb3B0?=
+ =?utf-8?B?ZmpEanJQdCs3TXNHYTVZT3JFcHRMb2FYc0M2TmtYUjJsQWEvK290QTkxZkVt?=
+ =?utf-8?B?YjgyVElDcndoakdhVnhZZ0hjV2RMWUVFaVdLVHBtNmV6NEM5VFJvZEhaa1I2?=
+ =?utf-8?B?SEtLQlRLT090RUZTeUdIYXd1NHZxZmMvMGZoS21iRjJvV2REcFZ5dFFOd2tM?=
+ =?utf-8?B?dHFpOTArTkxjSGNxbUx0a21xOU5KcG4zR0IxRzB5S2hMaEFTWEg1eWRXbEdl?=
+ =?utf-8?Q?3sgx5FROJszot?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aWJycG5vbEpTaEgxSWIwK0ZSenVvQWhobnFpSlRtWUxnTVZXNExNYlBTSjEr?=
+ =?utf-8?B?T3lUTWo2WFNOemdJQ1NyeENLQXd1WExTN05xNk1qazg2TlkxT3UzRGxwa3F4?=
+ =?utf-8?B?VGZnOGxIRVpzNGg1T1gwU2NrS1dPK0kwalNIMks3UEs4ZkZSWUlNM0Q0MjN0?=
+ =?utf-8?B?bzZCUitUUXlsbE8rZWJYNENUN280OVJXaldnMkFhT0U2cFRtK2RhS0hmTG04?=
+ =?utf-8?B?UVdxckdZb3lsVzYrV2ZFK0VzR0d0STJudHlSQ005OE1QanROeE1qVXowTFda?=
+ =?utf-8?B?VTJURElHdWRuNHRYeG0rWVhabmowWHhxQ0NzUUdUZFk0Vk1qUWFITW9uY3Ny?=
+ =?utf-8?B?YjN4djVXbitxSVhscVFsTWFjYjloMGpCbGNoU0tjUnh0b2NhTmNSaWNWR2k5?=
+ =?utf-8?B?TXduVm9MOUtVWFE2VGRkWjhwTkVrVzJpdG9jaUx1UTJOYzlRUnU1VUNESHE3?=
+ =?utf-8?B?Ly83SVRpVG5SK2M5OERoQW94T1JRZ2xpYXhjcnZ5VzV1UnBucERabTNYVDFY?=
+ =?utf-8?B?MFVOUG1EL1V4UEFoTTlWTmphN29BTkhvb2U3WG9RNG44ZkJmVWtBTVBzbGJ0?=
+ =?utf-8?B?NEI1bnFhRS9WOVVWQ0lZemY5RWhWZWdsUkQreVNuYTFGelRvOU8reTBQMGh6?=
+ =?utf-8?B?dDVMTkpndDA3Z3A1MjNLaDEvR1VXNnVhVE4vT2d0U0lqUXJKSTFMN0pLSVky?=
+ =?utf-8?B?ajJEaDRXMUFzcGNWend4amVLWmJZMHBlYmxKR1R5Q0FJTW1jZndobEFhRG4v?=
+ =?utf-8?B?aXAvUWRZT296bDIzTTBORkdkM0lBbndmV2h2VzFWRG1iaG54dGxxSW1uRFZa?=
+ =?utf-8?B?dG02enZ0TklvY2xVK0xmUXdveWNIQXdBVnlvQlNaY29Rb0orajQ0dGlqOC9w?=
+ =?utf-8?B?cGlPTit4aXZQY3lqSU1wOUVydXBJYTk4NGduWkhpRkhqb1FCalpCWFhVaUVs?=
+ =?utf-8?B?SnlkZi9yUHJXbHJaZi9XYnNRZWFqZ3hpRUs5bVpheXFpWExrNXkwc3doT3pt?=
+ =?utf-8?B?dGRyV0RqRmlpMFNjWm9jQ2hYTERBTVh0UWswc0pBekhIL0l4YnJySGN4WUVa?=
+ =?utf-8?B?VUxXbHhKaTg3andhQnRScU1ZZ0dlNkVnaVFmOGFmZ1Y5ZEtGWDkxQ0VGOUU1?=
+ =?utf-8?B?L1FBMFZ4cWN5ZzR4QjJoYks5aUZzSE1JQzdod2NRVFdJbjl0bUxRMm1IREx1?=
+ =?utf-8?B?R1F3UndpL3AyNk9ldUdtS1g1UEgwUTQxSEpCenJrODdiWTFWM3Q4dytPTVQ1?=
+ =?utf-8?B?bURtYWUxMUN0Z3ZmallUTmdUUEdQc0gySmxGV0x1NmZaK0lEeXVseDJEOWhN?=
+ =?utf-8?B?dDBSci9BZm1sOWd6ekhYY2dHTDlzQWIxa2FaMWVEM0YrcHEvYmRDZU9PUzN5?=
+ =?utf-8?B?b3pXMnVhZjdzaFRWSVFnNVRKdFdOTk5za3RMWStzeTk1MzNnaE5rRDdRaDNw?=
+ =?utf-8?B?cjdXbTVRSWNlOGl1ZWl0MGx6dDhXcWh0RnJhZElkc0xKVWMyTjhzR00zdXZw?=
+ =?utf-8?B?N0U4cWFIQlhsNEpzbVppbnhEUUIvL0c4cXBrYkVtUENjNXg4ZjF4MmQ5OWR3?=
+ =?utf-8?B?N1NUVlZBd1hGaVNJelJOZVl4WGJQOGxWZnFRc0pMZktiaVF5ZWhHWGFSQkNa?=
+ =?utf-8?B?a3UwY0ljWmRIZThKWU9WdkU1NUkrUVA5N0RsRVVjRXFKMThiWlJWeW5KSEpa?=
+ =?utf-8?B?OFdLTXoxeW1IYm1jb0ltK2NMWk9udjBNeWRadU92ZW5FNGdCQ2JyTDZQQ09U?=
+ =?utf-8?B?di9YR1liTTJIczJiZjQyOTBuTFBDMC9hTThlZERJZFBiNUhYRkpYMk5uV3NH?=
+ =?utf-8?B?MWQ2RkgxLzRqN0VoUVRvMUhGOEh1RkVjZ2lURVJPNHFBS3BmTjJjRTRWZmda?=
+ =?utf-8?B?QXV1SHpzYmQxWVRMUG5NdHYxZyt4SzFKSHozK2YwckdJTEJNUWJ0WXlCRUdp?=
+ =?utf-8?B?Y1ZhNTcvcjRoakMvR3VMUjNKUk5PYnpab2loZ1Z3am9kYkdaL1RXM2dqb2ZK?=
+ =?utf-8?B?RVdIWDhYUFpZN1lnREV4ZUNLV243VFBkY2d4UGZSRjFXcThtUDRkNUY0U1Z4?=
+ =?utf-8?B?Z2hVTXVyWWlOMkVBc1QwYmtxMDZWYlAzV3ZieW5MZnVWczhTNTZyalFDWDJG?=
+ =?utf-8?B?M3BWbzlJem5pRllBU3RaZVVyU0ZTR3h4U0I2VGlvdGg5MEtOalV0OS9wYkpi?=
+ =?utf-8?B?dkE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <67E8BEDBAC107244970D52ED42003C1C@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e83e2e1-1e0d-4848-e69f-08dcfdc733a5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2024 18:25:18.5978
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W5myd8sk4bL3WBljmzeJEQDmeYSxqWsUDi/KzeQuiT46uHHF+vnkGUu4uATGBarx7y+e5JokF/Wwajp+jxUnNVVMUKLaqqcqXMmQoHLAxRs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4886
+X-OriginatorOrg: intel.com
 
-On Tue, 5 Nov 2024 08:55:51 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> > -----Original Message-----
-> > From: liulongfang <liulongfang@huawei.com>
-> > Sent: Tuesday, November 5, 2024 3:53 AM
-> > To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
-> > Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> > <jonathan.cameron@huawei.com>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> > Subject: [PATCH v12 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
-> > migration driver  
-> 
-> Hi,
-> 
-> Few minor comments below. Please don't re-spin just for these yet.
-> Please wait for others to review as well.
-> 
-> Thanks,
-> Shameer
-> 
-> > diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> > b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> > index a8c53952d82e..7728c9745b9d 100644
-> > --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> > +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> > @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct
-> > hisi_acc_vf_migration_file *migf)
-> >  	mutex_unlock(&migf->lock);
-> >  }
-> > 
-> > +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device
-> > *hisi_acc_vdev,
-> > +	struct hisi_acc_vf_migration_file *src_migf)  
-> 
-> Alignment should match open parenthesis here.
-
-I might also shorten the first line to 80 chars by putting "static" or
-"static void" on a line by itself, but we're getting into personal
-preference at that point and this driver already has lines exceeding 80
-columns.
-
-> > +{
-> > +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev-  
-> > >debug_migf;  
-> > +
-> > +	if (!dst_migf)
-> > +		return;
-> > +
-> > +	dst_migf->total_length = src_migf->total_length;
-> > +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
-> > +		sizeof(struct acc_vf_data));  
-> 
-> Here too, alignment not correct. It is better to run,
-> ./scripts/checkpatch --strict on these patches if you haven't done already.
-
-Yup.  Only those two were missed as far as I see, but checkpatch does
-warn several places where we should use seq_puts() rather than
-seq_printf() for cases of printing a constant format without additional
-arguments.  For example "device not opened!\n" is the first one below
-but there are others.
-
-> > +}
-> > +
-> >  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device
-> > *hisi_acc_vdev)
-> >  {
-> >  	if (hisi_acc_vdev->resuming_migf) {
-> > +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-  
-> > >resuming_migf);  
-> >  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
-> >  		fput(hisi_acc_vdev->resuming_migf->filp);
-> >  		hisi_acc_vdev->resuming_migf = NULL;
-> >  	}
-> > 
-> >  	if (hisi_acc_vdev->saving_migf) {
-> > +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-  
-> > >saving_migf);  
-> >  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
-> >  		fput(hisi_acc_vdev->saving_migf->filp);
-> >  		hisi_acc_vdev->saving_migf = NULL;
-> > @@ -1294,6 +1309,129 @@ static long hisi_acc_vfio_pci_ioctl(struct
-> > vfio_device *core_vdev, unsigned int
-> >  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-> >  }
-> > 
-> > +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device
-> > *vdev)
-> > +{
-> > +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(vdev);
-> > +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> > +	int ret;
-> > +
-> > +	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
-> > +	/*
-> > +	 * When the device is not opened, the io_base is not mapped.
-> > +	 * The driver cannot perform device read and write operations.
-> > +	 */
-> > +	if (!hisi_acc_vdev->dev_opened) {
-> > +		seq_printf(seq, "device not opened!\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	ret = qm_wait_dev_not_ready(vf_qm);
-> > +	if (ret) {
-> > +		seq_printf(seq, "VF device not ready!\n");
-> > +		return -EBUSY;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
-> > +{
-> > +	struct device *vf_dev = seq->private;
-> > +	struct vfio_pci_core_device *core_device =
-> > dev_get_drvdata(vf_dev);
-> > +	struct vfio_device *vdev = &core_device->vdev;
-> > +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(vdev);
-> > +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> > +	u64 value;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> > +	ret = hisi_acc_vf_debug_check(seq, vdev);
-> > +	if (ret) {
-> > +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> > +		return ret;
-> > +	}
-> > +
-> > +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
-> > +	if (value == QM_MB_CMD_NOT_READY) {
-> > +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> > +		seq_printf(seq, "mailbox cmd channel not ready!\n");
-> > +		return -EINVAL;
-> > +	}
-> > +	mutex_unlock(&hisi_acc_vdev->open_mutex);
-> > +	seq_printf(seq, "mailbox cmd channel ready!\n");
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
-> > +{
-> > +	struct device *vf_dev = seq->private;
-> > +	struct vfio_pci_core_device *core_device =
-> > dev_get_drvdata(vf_dev);
-> > +	struct vfio_device *vdev = &core_device->vdev;
-> > +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(vdev);
-> > +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
-> > +	struct acc_vf_data *vf_data;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> > +	ret = hisi_acc_vf_debug_check(seq, vdev);
-> > +	if (ret) {
-> > +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> > +		return ret;
-> > +	}
-> > +
-> > +	mutex_lock(&hisi_acc_vdev->state_mutex);
-> > +	vf_data = kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
-> > +	if (!vf_data) {
-> > +		ret = -ENOMEM;
-> > +		goto mutex_release;
-> > +	}
-> > +
-> > +	vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
-> > +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
-> > +	if (ret)
-> > +		goto migf_err;
-> > +
-> > +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
-> > +		     (const void *)vf_data, vf_data_sz, false);
-> > +
-> > +	seq_printf(seq,
-> > +		   "guest driver load: %u\n"
-> > +		   "data size: %lu\n",
-> > +		   hisi_acc_vdev->vf_qm_state,
-> > +		   sizeof(struct acc_vf_data));  
-> 
-> There was a suggestion to add a comment here to describe vf_qm_state better.
-> May be something like,
-> 
-> vf_qm_state here indicates whether the Guest has loaded the driver for the ACC VF
-> device or not.
-
-I think the comment ended up at the declaration of vf_qm_state in the
-header file:
-
-> @@ -107,9 +114,17 @@ struct hisi_acc_vf_core_device {
->  	struct pci_dev *vf_dev;
->  	struct hisi_qm *pf_qm;
->  	struct hisi_qm vf_qm;
-> +	/*
-> +	 * Record whether a driver is added to the acc device in Guest OS.
-> +	 * The value of QM_VF_STATE is set by the acc device driver.
-> +	 * The migration driver queries through the QM_VF_STATE register.
-> +	 */
->  	u32 vf_qm_state;
->  	int vf_id;
->  	struct hisi_acc_vf_migration_file *resuming_migf;
->  	struct hisi_acc_vf_migration_file *saving_migf;
-> +
-> +	/* An extra buffer for reporting migration data via debugfs */
-> +	struct hisi_acc_vf_migration_file *debug_migf;
->  };
->  #endif /* HISI_ACC_VFIO_PCI_H */
-
-Is that satisfactory?
-
-> > +
-> > +migf_err:
-> > +	kfree(vf_data);
-> > +mutex_release:
-> > +	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> > +	mutex_unlock(&hisi_acc_vdev->open_mutex);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
-> > +{
-> > +	struct device *vf_dev = seq->private;
-> > +	struct vfio_pci_core_device *core_device =
-> > dev_get_drvdata(vf_dev);
-> > +	struct vfio_device *vdev = &core_device->vdev;
-> > +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(vdev);
-> > +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
-> > +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev-  
-> > >debug_migf;  
-> > +
-> > +	/* Check whether the live migration operation has been performed
-> > */
-> > +	if (debug_migf->total_length < QM_MATCH_SIZE) {
-> > +		seq_printf(seq, "device not migrated!\n");
-> > +		return -EAGAIN;
-> > +	}
-> > +
-> > +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
-> > +		     (const void *)&debug_migf->vf_data, vf_data_sz, false);
-> > +	seq_printf(seq, "migrate data length: %lu\n", debug_migf-  
-> > >total_length);  
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
-> >  {
-> >  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(core_vdev);
-> > @@ -1305,12 +1443,16 @@ static int hisi_acc_vfio_pci_open_device(struct
-> > vfio_device *core_vdev)
-> >  		return ret;
-> > 
-> >  	if (core_vdev->mig_ops) {
-> > +		mutex_lock(&hisi_acc_vdev->open_mutex);
-> >  		ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
-> >  		if (ret) {
-> > +			mutex_unlock(&hisi_acc_vdev->open_mutex);
-> >  			vfio_pci_core_disable(vdev);
-> >  			return ret;
-> >  		}
-> >  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-> > +		hisi_acc_vdev->dev_opened = true;
-> > +		mutex_unlock(&hisi_acc_vdev->open_mutex);
-> >  	}
-> > 
-> >  	vfio_pci_core_finish_enable(vdev);
-> > @@ -1322,7 +1464,10 @@ static void hisi_acc_vfio_pci_close_device(struct
-> > vfio_device *core_vdev)
-> >  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-> > hisi_acc_get_vf_dev(core_vdev);
-> >  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> > 
-> > +	mutex_lock(&hisi_acc_vdev->open_mutex);
-> > +	hisi_acc_vdev->dev_opened = false;
-> >  	iounmap(vf_qm->io_base);
-> > +	mutex_unlock(&hisi_acc_vdev->open_mutex);
-> >  	vfio_pci_core_close_device(core_vdev);
-> >  }
-> > 
-> > @@ -1342,6 +1487,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
-> > vfio_device *core_vdev)
-> >  	hisi_acc_vdev->pf_qm = pf_qm;
-> >  	hisi_acc_vdev->vf_dev = pdev;
-> >  	mutex_init(&hisi_acc_vdev->state_mutex);
-> > +	mutex_init(&hisi_acc_vdev->open_mutex);
-> > 
-> >  	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
-> > VFIO_MIGRATION_PRE_COPY;
-> >  	core_vdev->mig_ops = &hisi_acc_vfio_pci_migrn_state_ops;
-> > @@ -1387,6 +1533,48 @@ static const struct vfio_device_ops
-> > hisi_acc_vfio_pci_ops = {
-> >  	.detach_ioas = vfio_iommufd_physical_detach_ioas,
-> >  };
-> > 
-> > +static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device
-> > *hisi_acc_vdev)
-> > +{
-> > +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
-> > +	struct dentry *vfio_dev_migration = NULL;
-> > +	struct dentry *vfio_hisi_acc = NULL;
-> > +	struct device *dev = vdev->dev;
-> > +	void *migf = NULL;
-> > +
-> > +	if (!debugfs_initialized() ||
-> > +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
-> > +		return;
-> > +
-> > +	if (vdev->ops != &hisi_acc_vfio_pci_migrn_ops)
-> > +		return;
-> > +
-> > +	vfio_dev_migration = debugfs_lookup("migration", vdev-  
-> > >debug_root);  
-> > +	if (!vfio_dev_migration) {
-> > +		dev_err(dev, "failed to lookup migration debugfs file!\n");
-> > +		return;
-> > +	}
-> > +
-> > +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file),
-> > GFP_KERNEL);
-
-checkpatch --strict also advises this could be written as:
-
-	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-
-There's another one above with acc_vf_data.  I'd consider these
-optional, but I think it is good practice and is more consistent with
-existing allocations in this file.
-
-> > +	if (!migf)
-> > +		return;
-> > +	hisi_acc_vdev->debug_migf = migf;
-> > +
-> > +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
-> > +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
-> > +				    hisi_acc_vf_dev_read);
-> > +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
-> > +				    hisi_acc_vf_migf_read);
-> > +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
-> > +				    hisi_acc_vf_debug_cmd);
-> > +}
-> > +
-> > +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device
-> > *hisi_acc_vdev)
-> > +{
-> > +	/* If migrn_ops is not used, kfree(NULL) is valid */  
-> 
-> The above comment is not required. Please remove.
-
-I don't have a problem with it, but I'll let the two of you decide as
-co-owners of the file.  Thanks,
-
-Alex
-
-
-> > +	kfree(hisi_acc_vdev->debug_migf);
-> > +	hisi_acc_vdev->debug_migf = NULL;
-> > +}
-> > +  
-> 
-
+T24gTW9uLCAyMDI0LTA1LTA2IGF0IDE3OjMxICswODAwLCBZYW5nLCBXZWlqaWFuZyB3cm90ZToN
+Cj4gPiBBIGRlY2VudCBudW1iZXIgb2YgY29tbWVudHMsIGJ1dCBhbG1vc3QgYWxsIG9mIHRoZW0g
+YXJlIHF1aXRlIG1pbm9yLsKgIFRoZQ0KPiA+IGJpZw0KPiA+IG9wZW4gaXMgaG93IHRvIGhhbmRs
+ZSBzYXZlL3Jlc3RvcmUgb2YgU1NQIGZyb20gdXNlcnNwYWNlLg0KPiA+IA0KPiA+IEluc3RlYWQg
+b2Ygc3Bpbm5pbmcgYSBmdWxsIHYxMCwgbWF5YmUgc2VuZCBhbiBSRkMgZm9yIEtWTV97RyxTfUVU
+X09ORV9SRUcNCj4gPiBpZGVhPw0KPiANCj4gT0ssIEknbGwgc2VuZCBhbiBSRkMgcGF0Y2ggYWZ0
+ZXIgcmVsZXZhbnQgZGlzY3Vzc2lvbiBpcyBzZXR0bGVkLg0KPiANCj4gPiBUaGF0IHdpbGwgbWFr
+ZSBpdCBlYXNpZXIgdG8gcmV2aWV3LCBhbmQgaWYgeW91IGRlbGF5IHYxMSBhIGJpdCwgSSBzaG91
+bGQgYmUNCj4gPiBhYmxlDQo+ID4gdG8gZ2V0IHZhcmlvdXMgc2VyaWVzIGFwcGxpZWQgdGhhdCBo
+YXZlIG1pbm9yIGNvbmZsaWN0cy9kZXBlbmRlbmNpZXMsIGUuZy4NCj4gPiB0aGUNCj4gPiBNU1Ig
+YWNjZXNzIGFuZCB0aGUga3ZtX2hvc3Qgc2VyaWVzLg0KPiBJIGNhbiB3YWl0IHVudGlsIHRoZSBz
+ZXJpZXMgbGFuZGVkIGluIHg4Ni1rdm0gdHJlZS4NCj4gQXBwcmVjaWF0ZWQgZm9yIHlvdXIgcmV2
+aWV3IGFuZCBjb21tZW50cyENCg0KSXQgbG9va3MgbGlrZSB0aGlzIHNlcmllcyBpcyB2ZXJ5IGNs
+b3NlLiBTaW5jZSB0aGlzIHYxMCwgdGhlcmUgd2FzIHNvbWUNCmRpc2N1c3Npb24gb24gdGhlIEZQ
+VSBwYXJ0IHRoYXQgc2VlbWVkIHNldHRsZWQ6DQpodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21s
+LzFjMmZkMDZlLTJlOTctNDcyNC04MGFiLTg2OTVhYTQzMzRlN0BpbnRlbC5jb20vDQoNClRoZW4g
+dGhlcmUgd2FzIGFsc28gc29tZSBkaXNjdXNzaW9uIG9uIHRoZSBzeW50aGV0aWMgTVNSIHNvbHV0
+aW9uLCB3aGljaCBzZWVtZWQNCnByZXNjcmlwdGl2ZSBlbm91Z2g6DQpodHRwczovL2xvcmUua2Vy
+bmVsLm9yZy9rdm0vMjAyNDA1MDkwNzU0MjMuMTU2ODU4LTEtd2VpamlhbmcueWFuZ0BpbnRlbC5j
+b20vDQoNCldlaWppYW5nLCBoYWQgeW91IHN0YXJ0ZWQgYSB2MiBvbiB0aGUgc3ludGhldGljIE1T
+UiBzZXJpZXM/IFdoZXJlIGRpZCB5b3UgZ2V0IHRvDQpvbiBpbmNvcnBvcmF0aW5nIHRoZSBvdGhl
+ciBzbWFsbCB2MTAgZmVlZGJhY2s/DQo=
 
