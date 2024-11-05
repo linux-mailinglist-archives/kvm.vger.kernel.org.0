@@ -1,223 +1,199 @@
-Return-Path: <kvm+bounces-30806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5018A9BD629
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:54:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236159BD640
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 20:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D615F1F2360E
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:54:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A84051F23F76
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 19:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58078214432;
-	Tue,  5 Nov 2024 19:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5049F215C6E;
+	Tue,  5 Nov 2024 19:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="cCnrWGzn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CpOwXO6/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7391212EF8
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 19:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F63213EEF
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 19:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730836442; cv=none; b=tUEnBfyn65e6BmZZjP0kvgFDFU6Ed48qs3BoXYoWWHHHbRe9W2JPPQFSeyXO0wsIfmz7r96YbRjSGzYXyGFf/Ra4URxWxKFwSaxndUkg6ydAjccEtGjRnKWWNJlZT7hMoSpmG4glPhBhnqRMlWbkhdT/ZBU9L2ie4PPg/spOzJ0=
+	t=1730836592; cv=none; b=SfUfNenSPv1D2sOh0FDgXLCN5BIlYmnvfVhF59rFWkV7Cp8zWTfskWGQkd4/C6nR3OTfOnLcpdEQIh64US58hxMxewgmS/R1i26F6E6yoRcSckAxBssLkH747KLtvgLjVeADks8PDgHkZUFlCWnUXgLHgQ2T4PS070LwL887Gfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730836442; c=relaxed/simple;
-	bh=q3kRFS0aC9llW2hXigplm+6X6nuxwR5TAuU7KtMvtNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LxYTggPtyT4ob9b4UrovckKlxfR/Aoyv7u9Y3Ru1UKHl7PdD4inVrW09RF1Ro+y8MjTvXAnKQNFP4HEPSZZCYsWuYyKr0AtZqHFLNkpp1E3rCN2vqAm66Xjnd17ubJiSWarniuNdGJ4NGiwpKGJfig0lwphe3O0LYT/LULoNxyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=cCnrWGzn; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460a23ad00eso1473351cf.0
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 11:53:59 -0800 (PST)
+	s=arc-20240116; t=1730836592; c=relaxed/simple;
+	bh=sAKKgucoI4QTRhj9J+f6y3dNEk0UUb1jSv7yTfaZEHk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=J3DhuxtaVeY1Ey0ISC7/zwOv3iQ6f3X+i0Mp9uEU+88RFE+MTKaTBvt9asiZ/XjRdOFX7W1B0HxrMAO3V1zc7rLy7tCNC69hQr+j2X2bOBFtmvOTG1/JZFqTXtxV4EnGAfnlCGHLd7kHPdF2ni27S5grJWWnEMgENva9NBvQ1Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CpOwXO6/; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e3313b47a95so8037223276.3
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 11:56:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1730836439; x=1731441239; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+fX00798BJ3ATWBHAwavTUTImd2ssZMf/WzAfMHnat0=;
-        b=cCnrWGznqeSBxBybSIX9KF2jm+YHihlVV6QSsqvER5HCYWOvEMYWGMMrUPl6GATwiZ
-         srLlBdBWXyC4dDZ9YWe3VWgJGOBPRvDEFxnahCiNSoGSK8bsmnQxtRiboeppWUadKGCS
-         P0/6mWuTEfwnZ1pXQCym0DsT+gHAJHBeVYSJiwS3/eJ6vh4YNHNi7skohTpFGvza6lWl
-         fkKSEpvQfMWtstvuZMSaGHptv80S6FNKODFfEMfpGP7fRaQ/eU4VJbTXyRIKbK2qiPC3
-         5qsFAaTWTC9aUfiNVu8c4B7nPODBl1MRoHORCscuhmjiWPpV8Au1arDi3GEwmKgoOGUS
-         NoAg==
+        d=google.com; s=20230601; t=1730836590; x=1731441390; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hzMiS31Q99SH+ivi/H+fLjhfNr8W/1ENyadMPU3uzYk=;
+        b=CpOwXO6/T1OJLj+V+zxTM5S40VZK73u0z+JDZmZRZu+Qkb1ZkeRk8oyp8CVDzNpwV5
+         JUnSP6YNepbqtf921rLtYfHzA25xh/PKSB+btR0NqcvqRWPvBTOnh+sYqbIBjYO83Jvq
+         TThPyihb8OzQNoxKjptTXdW7uG68D5+Xo+Ikp94/nSmsF5eiKYm/8qyw5LiSeGAAZew9
+         L5RiQBGrwjQL3CZexzyxVa+a0EH1ICWLbN698GSplZ+CPA+IFRLttinVa0PL8F/J2RLu
+         tsZC7pH7Ob6y1M0yr+PzWf1Ji1m5O3ZM2/ajRD3elAfKtXoviduoPTSpHJr8IFFFIJOV
+         41tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730836439; x=1731441239;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+fX00798BJ3ATWBHAwavTUTImd2ssZMf/WzAfMHnat0=;
-        b=vaz0B06Ei3Z7hcufdzO7GKJuybuQOuGoP577iJABoRoFMhnHURp68PivnM+YOhXpmh
-         uI8gzWfmPel9wu1asum5g77u/gbDCtVsDUaV6w02URyp51tPh2VFugR/1qdSVwo8mVdq
-         VvIooxtDVaOB9Dvq7+bYu3gWWz0LcpHjRRaQKjlex8Um1WaajV1YdoONrd/boBCxQ5uV
-         BimlMFL6UHWMcvdXXT1sJuPerWCAt5O/hr6tyEG5ZhbwyVNpPPoEoObu1AO62ya+Hu/9
-         mUkqbMgoPR/nnrgCq8ACZqvmn8MRdXRrYtynuYNdotu51vc50xGRqzuwVf9EIGV/UzFx
-         oD5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUTtZ4rjfNvfaWWZvXlQnH2Szr6VTHNrzvdrd4x+nlNuOuR9p9379z4A9qcPeVyIIynX2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb7kERSkQBUU05hqaqSpnbq7+mwUnvAEMOUbBlaux5iB3iDVRS
-	QnK2PrT/kKf7JP5cJVh0w7LvbwFSMPI/A60TMAkZTYHF4hnko5UVg1h2lhAnLYw=
-X-Google-Smtp-Source: AGHT+IEaav3D7n+muLVYjXAvVqOfQiyB3KvOcn2o5SW6dcKTwKh96GbO3Tfnssa4/aNZfrPdV+MQVQ==
-X-Received: by 2002:ad4:4eeb:0:b0:6cb:ed27:145c with SMTP id 6a1803df08f44-6d35b9510a3mr302739006d6.19.1730836438787;
-        Tue, 05 Nov 2024 11:53:58 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d35415a62asm63870536d6.80.2024.11.05.11.53.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 11:53:58 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t8Pcj-000000023mq-1vDZ;
-	Tue, 05 Nov 2024 15:53:57 -0400
-Date: Tue, 5 Nov 2024 15:53:57 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241105195357.GI35848@ziepe.ca>
-References: <cover.1730298502.git.leon@kernel.org>
- <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
- <20241104095831.GA28751@lst.de>
+        d=1e100.net; s=20230601; t=1730836590; x=1731441390;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hzMiS31Q99SH+ivi/H+fLjhfNr8W/1ENyadMPU3uzYk=;
+        b=I+osm8rn+vSOw+iTaryKk9FZO41APrIyQf3eGhiYKtr7d8Da/mbcfJ2zcWTgnvryge
+         8uAybyLF8uuqRMN5FRgRaZUJwKoRcpbhB9u9SpXpvbI0nNxYs/K1q6b34c3lTG241KCw
+         weZCwMogVQ+XOKamXNHUOeDa7+dHKeZwnOHFddpd89NaX9rfe/GstZloO9GFcPpP02CL
+         zKs+tWwanjLmzglIrVQuw4ZujIu9T30Tc+jpxGM59nnUXpFr4RM4IWvjZ4ww9kGA9zgJ
+         06qDL9B5NYH+b1QNA0wmTsNFJ1+o0xfdZQxeJhyVi2kt5JCdSqbXkj6LaLqlQUpk/29w
+         dysQ==
+X-Gm-Message-State: AOJu0Yx/jbsFGDsw36qzrqbxfnAdqMb691cOsCIj3go1rp9oOYJOpcxJ
+	6Sudl6p24ju8RCV/9vl2alIkAkK8cwXtrMnpj3hX/5tZBdTy2JIK/hd4TxHxv+mWB9Pd2VJPpAY
+	wNwU+QoG7M3m5JQ4f7RYvc3SYxLdU3yCW200CZgiaKQNzv8pEl64KewBbeQuUWWlKYY9+lj+xyN
+	+S6N8ML2+AKaKQeEY6z+5/VVqvFgcQMJaxoovY6VgMvE6Z5b2Zqp1VDBs=
+X-Google-Smtp-Source: AGHT+IGCeubudBZvDHKVyK9hoysogwq8Oy8BphtTGtN9ESDHF0Oe45MlIu4/byZXs6BbgdCbpbF4nba1Gh+JSm/9sQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
+ (user=coltonlewis job=sendgmr) by 2002:a25:b28e:0:b0:e29:6df8:ef58 with SMTP
+ id 3f1490d57ef6-e3087a5bd64mr143088276.4.1730836589136; Tue, 05 Nov 2024
+ 11:56:29 -0800 (PST)
+Date: Tue,  5 Nov 2024 19:55:57 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104095831.GA28751@lst.de>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
+Message-ID: <20241105195603.2317483-1-coltonlewis@google.com>
+Subject: [PATCH v6 0/5] Correct perf sampling with Guest VMs
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, Will Deacon <will@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 04, 2024 at 10:58:31AM +0100, Christoph Hellwig wrote:
-> On Thu, Oct 31, 2024 at 09:17:45PM +0000, Robin Murphy wrote:
-> > The hilarious amount of work that iommu_dma_map_sg() does is pretty much 
-> > entirely for the benefit of v4l2 and dma-buf importers who *depend* on 
-> > being able to linearise a scatterlist in DMA address space. TBH I doubt 
-> > there are many actual scatter-gather-capable devices with significant 
-> > enough limitations to meaningfully benefit from DMA segment combining these 
-> > days - I've often thought that by now it might be a good idea to turn that 
-> > behaviour off by default and add an attribute for callers to explicitly 
-> > request it.
-> 
-> Even when devices are not limited they often perform significantly better
-> when IOVA space is not completely fragmented.  While the dma_map_sg code
-> is a bit gross due to the fact that it has to deal with unaligned segments,
-> the coalescing itself often is a big win.
+v6:
+* Apply all Reviewed-by and Acked-by trailers from previous versions
+* Rebase to v6.12-rc6
 
-RDMA is like this too, Almost all the MR HW gets big wins if the
-entire scatter list is IOVA contiguous. One of the future steps I'd
-like to see on top of this is to fine tune the IOVA allocation backing
-MRs to exactly match the HW needs. Having proper alignment and
-contiguity can be huge reduction in device overhead, like a 100MB MR
-may need to store 200K of mapping information on-device, but with a
-properly aligned IOVA this can be reduced to only 16 bytes.
+v5:
+https://lore.kernel.org/all/20240920174740.781614-1-coltonlewis@google.com/
 
-Avoiding a double translation tax when the iommu HW is enabled is
-potentially significant. We have some RDMA workloads with VMs where
-the NIC is holding ~1GB of memory just for translations, but the iommu
-is active as the S2. ie we are paying a double tax on translation.
+v4:
+https://lore.kernel.org/kvm/20240919190750.4163977-1-coltonlewis@google.com/
 
-It could be a very interesting trade off to reduce the NIC side to
-nothing and rely on the CPU IOMMU with nested translation instead.
+v3:
+https://lore.kernel.org/kvm/20240912205133.4171576-1-coltonlewis@google.com/
 
-> Note that dma_map_sg also has two other very useful features:  batching
-> of the iotlb flushing, and support for P2P, which to be efficient also
-> requires batching the lookups.
+v2:
+https://lore.kernel.org/kvm/20240911222433.3415301-1-coltonlewis@google.com/
 
-This is the main point, and I think, is the uniqueness Leon is talking
-about. We don't get those properties through any other API and this
-one series preserves them.
+v1:
+https://lore.kernel.org/kvm/20240904204133.1442132-1-coltonlewis@google.com/
 
-In fact I would say that is the entire point of this series: preserve
-everything special about dma_map_sg() compared to dma_map_page() but
-don't require a scatterlist.
+This series cleans up perf recording around guest events and improves
+the accuracy of the resulting perf reports.
 
-> >> Several approaches have been explored to expand the DMA API with additional
-> >> scatterlist-like structures (BIO, rlist), instead split up the DMA API
-> >> to allow callers to bring their own data structure.
-> >
-> > And this line of reasoning is still "2 + 2 = Thursday" - what is to say 
-> > those two notions in any way related? We literally already have one generic 
-> > DMA operation which doesn't operate on struct page, yet needed nothing 
-> > "split up" to be possible.
-> 
-> Yeah, I don't really get the struct page argument.  In fact if we look
-> at the nitty-gritty details of dma_map_page it doesn't really need a
-> page at all. 
+Perf was incorrectly counting any PMU overflow interrupt that occurred
+while a VCPU was loaded as a guest event even when the events were not
+truely guest events. This lead to much less accurate and useful perf
+recordings.
 
-Today, if you want to map a P2P address you must have a struct page,
-because page->pgmap is the only source of information on the P2P
-topology.
+See as an example the below reports of `perf record
+dirty_log_perf_test -m 2 -v 4` before and after the series on ARM64.
 
-So the logic is, to get P2P without struct page we need a way to have
-all the features of dma_map_sg() but without a mandatory scatterlist
-because we cannot remove struct page from scatterlist.
+Without series:
 
-This series gets to the first step - no scatterlist. There will need
-to be another series to provide an alternative to page->pgmap to get
-the P2P information. Then we really won't have struct page dependence
-in the DMA API.
+Samples: 15K of event 'instructions', Event count (approx.): 31830580924
+Overhead  Command          Shared Object        Symbol
+  54.54%  dirty_log_perf_  dirty_log_perf_test  [.] run_test
+   5.39%  dirty_log_perf_  dirty_log_perf_test  [.] vcpu_worker
+   0.89%  dirty_log_perf_  [kernel.vmlinux]     [k] release_pages
+   0.70%  dirty_log_perf_  [kernel.vmlinux]     [k] free_pcppages_bulk
+   0.62%  dirty_log_perf_  dirty_log_perf_test  [.] userspace_mem_region_find
+   0.49%  dirty_log_perf_  dirty_log_perf_test  [.] sparsebit_is_set
+   0.46%  dirty_log_perf_  dirty_log_perf_test  [.] _virt_pg_map
+   0.46%  dirty_log_perf_  dirty_log_perf_test  [.] node_add
+   0.37%  dirty_log_perf_  dirty_log_perf_test  [.] node_reduce
+   0.35%  dirty_log_perf_  [kernel.vmlinux]     [k] free_unref_page_commit
+   0.33%  dirty_log_perf_  [kernel.vmlinux]     [k] __kvm_pgtable_walk
+   0.31%  dirty_log_perf_  [kernel.vmlinux]     [k] stage2_attr_walker
+   0.29%  dirty_log_perf_  [kernel.vmlinux]     [k] unmap_page_range
+   0.29%  dirty_log_perf_  dirty_log_perf_test  [.] test_assert
+   0.26%  dirty_log_perf_  [kernel.vmlinux]     [k] __mod_memcg_lruvec_state
+   0.24%  dirty_log_perf_  [kernel.vmlinux]     [k] kvm_s2_put_page
 
-I actually once looked at how to enhance dma_map_resource() to support
-P2P and it was not very nice, the unmap side became quite complex. I
-think this is a more elgant solution than what I was sketching.
+With series:
 
-> >>      for the device. Instead of allocating a scatter list entry per allocated
-> >>      page it can just allocate an array of 'struct page *', saving a large
-> >>      amount of memory.
-> >
-> > VFIO already assumes a coherent device with (realistically) an IOMMU which 
-> > it explicitly manages - why is it even pretending to need a generic DMA 
-> > API?
-> 
-> AFAIK that does isn't really vfio as we know it but the control device
-> for live migration.  But Leon or Jason might fill in more.
+Samples: 15K of event 'instructions', Event count (approx.): 31830580924
+Samples: 15K of event 'instructions', Event count (approx.): 30898031385
+Overhead  Command          Shared Object        Symbol
+  54.05%  dirty_log_perf_  dirty_log_perf_test  [.] run_test
+   5.48%  dirty_log_perf_  [kernel.kallsyms]    [k] kvm_arch_vcpu_ioctl_run
+   4.70%  dirty_log_perf_  dirty_log_perf_test  [.] vcpu_worker
+   3.11%  dirty_log_perf_  [kernel.kallsyms]    [k] kvm_handle_guest_abort
+   2.24%  dirty_log_perf_  [kernel.kallsyms]    [k] up_read
+   1.98%  dirty_log_perf_  [kernel.kallsyms]    [k] __kvm_tlb_flush_vmid_ipa_nsh
+   1.97%  dirty_log_perf_  [kernel.kallsyms]    [k] __pi_clear_page
+   1.30%  dirty_log_perf_  [kernel.kallsyms]    [k] down_read
+   1.13%  dirty_log_perf_  [kernel.kallsyms]    [k] release_pages
+   1.12%  dirty_log_perf_  [kernel.kallsyms]    [k] __kvm_pgtable_walk
+   1.08%  dirty_log_perf_  [kernel.kallsyms]    [k] folio_batch_move_lru
+   1.06%  dirty_log_perf_  [kernel.kallsyms]    [k] __srcu_read_lock
+   1.03%  dirty_log_perf_  [kernel.kallsyms]    [k] get_page_from_freelist
+   1.01%  dirty_log_perf_  [kernel.kallsyms]    [k] __pte_offset_map_lock
+   0.82%  dirty_log_perf_  [kernel.kallsyms]    [k] handle_mm_fault
+   0.74%  dirty_log_perf_  [kernel.kallsyms]    [k] mas_state_walk
 
-Yes, this is the control side of the VFIO live migration driver that
-needs rather a lot of memory to store the migration blob. There is
-definitely an iommu, and the VF function is definitely translating,
-but it doesn't mean the PF function is using dma-iommu.c, it is often
-in iommu passthrough/identity and using DMA direct.
+Colton Lewis (5):
+  arm: perf: Drop unused functions
+  perf: Hoist perf_instruction_pointer() and perf_misc_flags()
+  powerpc: perf: Use perf_arch_instruction_pointer()
+  x86: perf: Refactor misc flag assignments
+  perf: Correct perf sampling with guest VMs
 
-It was done as an alternative example on how to use the API. Again
-there are more improvements possible there, the driver does not take
-advantage of contiguity or alignment when programming the HW.
+ arch/arm/include/asm/perf_event.h            |  7 ---
+ arch/arm/kernel/perf_callchain.c             | 17 -------
+ arch/arm64/include/asm/perf_event.h          |  4 --
+ arch/arm64/kernel/perf_callchain.c           | 28 ------------
+ arch/powerpc/include/asm/perf_event_server.h |  6 +--
+ arch/powerpc/perf/callchain.c                |  2 +-
+ arch/powerpc/perf/callchain_32.c             |  2 +-
+ arch/powerpc/perf/callchain_64.c             |  2 +-
+ arch/powerpc/perf/core-book3s.c              |  4 +-
+ arch/s390/include/asm/perf_event.h           |  6 +--
+ arch/s390/kernel/perf_event.c                |  4 +-
+ arch/x86/events/core.c                       | 47 +++++++++++---------
+ arch/x86/include/asm/perf_event.h            | 12 ++---
+ include/linux/perf_event.h                   | 26 +++++++++--
+ kernel/events/core.c                         | 27 ++++++++++-
+ 15 files changed, 95 insertions(+), 99 deletions(-)
 
-> Because we only need to preallocate the tiny constant sized dma_iova_state
-> as part of the request instead of an additional scatterlist that requires
-> sizeof(struct page *) + sizeof(dma_addr_t) + 3 * sizeof(unsigned int)
-> per segment, including a memory allocation per I/O for that.
 
-Right, eliminating scatterlist entirely on fast paths is a big
-point. I recall Chuck was keen on the same thing for NFSoRDMA as well.
-
-> At least for the block code we have a nice little core wrapper that is
-> very easy to use, and provides a great reduction of memory use and
-> allocations.  The HMM use case I'll let others talk about.
-
-I saw the Intel XE team make a complicated integration with the DMA
-API that wasn't so good. They were looking at an earlier version of
-this and I think the feedback was positive. It should make a big
-difference, but we will need to see what they come up and possibly
-tweak things.
-
-Jason
+base-commit: 59b723cd2adbac2a34fc8e12c74ae26ae45bf230
+--
+2.47.0.199.ga7371fff76-goog
 
