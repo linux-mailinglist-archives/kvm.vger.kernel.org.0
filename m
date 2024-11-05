@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-30621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 313C29BC4D7
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:46:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BE89BC4E3
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 06:48:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA5A8B21B46
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 05:46:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C007FB2200C
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 05:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0351C07D9;
-	Tue,  5 Nov 2024 05:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172DA1F754A;
+	Tue,  5 Nov 2024 05:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OPqBIXXQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LB1Kxb2A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DE03C38
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 05:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99A51C57A5
+	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 05:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730785567; cv=none; b=pC8jQqq2p1jmCzkd5Zvkpy4rDCOdrslXq0Q4x2ev+pa7dfgDxEyQfoes6vtN61KvsjONnvjH/zvg1lau6UDm3dMUQQoPvpi/CO3vv+LcG4s0cSyOl4OZlI5YGPniFeUgqWqVKWcgw7EbSpJgfQtAU5kY+96zUcqCti9hRkwO38c=
+	t=1730785688; cv=none; b=r/6+1xSL5dXCMuSn7rEOFF38nnb2qz1Y9EWDU4gAjSVdp5VP5nx1WznJ+sUzVhgh2NZqz+2j0o4lEXa81afcKWZCrwZ8lHLb3uoIF8J4QIcgUbz/o/30jFiMXrVLOEPETClZL523nJV03KlKOH4Wuxf+6Ep78gUuSt5qSo5KzkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730785567; c=relaxed/simple;
-	bh=n9HFrIuS0BnFwnxReDtoLbpLUxOCkv4ucFZ6Od1vwcg=;
+	s=arc-20240116; t=1730785688; c=relaxed/simple;
+	bh=jmEXyz4VwD9eXFBJILlwng64IHSdm8vMkBB9NeY981c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CZEGe2VXsQrVHikB/t8dnwlT9qVPn7beu1D6QaSVa6lm2qmcueR8pjYDA/Ux4wy8da+coe502soSjFrYViYLrfe1QxbEUh9B5mMH+4VRCfuVbcXGRlXF9ZSBmLAPXQeh24o1aS55xrNZqL2RuOviRWJFKnOxEwUnng9X/Q2FHtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OPqBIXXQ; arc=none smtp.client-ip=192.198.163.14
+	 In-Reply-To:Content-Type; b=jL9f53oDozukYr4UK0UwRXiP9G/ejumSEsP9WqM4GAApI5KnnasRz1cxy3yGZ6tsG6jLUTKl85kb11aOIiDancrAkN3YRNuktIMLraRCTxQQiwKHrfr/wiyhTbHSbAW3f/Gqb0pWtRXIqoKoB16PqIF+f6j4OYgDX8aFnM/Ah60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LB1Kxb2A; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730785565; x=1762321565;
+  t=1730785687; x=1762321687;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=n9HFrIuS0BnFwnxReDtoLbpLUxOCkv4ucFZ6Od1vwcg=;
-  b=OPqBIXXQ5nQfwj3s/pMgkNoEhTAEIkBzOuBbZbuCQIQWW6Lake8537xG
-   L7EtKqFlJwZZJXYeMuYzSPCDuqBmTXlfNxsMqs1GKNSNlbjbbnqeWt8HB
-   pS7KW7CmfZ/UVxYtS2qhqjCvCvA4S9H3iav7637HAaUsvdawRnZot8mbR
-   8tLiOWyEY/tcwh8JbxJkvJZNkY72DZMivGWAUx4pmbsykSu/bS8I2KyB6
-   c9u7wkNG17bKK2z3EEHBKDCbB0MdaORK5jQ8V5ln0kZU1PBQv6btqRj4s
-   aTyxJrIT0B5GhgGQMc0t5aBtBosG5vgc5OUQdajEIFeOmnlHFDz2pUVhs
+  bh=jmEXyz4VwD9eXFBJILlwng64IHSdm8vMkBB9NeY981c=;
+  b=LB1Kxb2AJCu1RDGzPpAqaacEmIjbIl0seiq23xGG2+ee9BgnR93FIwm2
+   Ecd/cbfAWNLse6oz5F0+QO5EEr20z1IWLkoOW5Q8bDyT6X/LVh9exw8zi
+   tEaicWtBs9V0lgt7HnzwqWWXrxWvi59DWyza34ij9zmV/aEiUKID5OmDu
+   o8TU6XoqJNCHcRYZNOnBDj8tzKoCRIS0B5MIYMz/wwK28ygZtgZJZxbf4
+   Bm1U/3EDW9vPxmCHIaYrUyfUPD0YZvcmCXPSSv6OjWwS3gZr2NK5bpbyO
+   7Tc6UOgPPLZcr4FV1CHGaHkiyU9IWPCVabV087bXzXbi0vfjp56Oy4cWH
    Q==;
-X-CSE-ConnectionGUID: dNJPzdQITXqI9t3dxer2zA==
-X-CSE-MsgGUID: 56CGXK2UTcStyUcFFX2UmA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="30738031"
+X-CSE-ConnectionGUID: xyPjlxeGQkiD+L5TpPlaEQ==
+X-CSE-MsgGUID: vcOX2wtDT3GaIoOJc5dINQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="34296034"
 X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="30738031"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 21:46:04 -0800
-X-CSE-ConnectionGUID: VmEvy1OOS+eYBgNY3wXvAg==
-X-CSE-MsgGUID: Ii6fkVZTTYmHS6ytPFj+Tg==
+   d="scan'208";a="34296034"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 21:48:07 -0800
+X-CSE-ConnectionGUID: 2IWyqnm9TqKKZeDF/qKxQw==
+X-CSE-MsgGUID: 1bq5UDDKQP2lUZKxixQBtg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="88635690"
+X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
+   d="scan'208";a="88446957"
 Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 21:46:01 -0800
-Message-ID: <1349c2c7-f3e8-4538-b23e-8c0b3d441a11@linux.intel.com>
-Date: Tue, 5 Nov 2024 13:45:14 +0800
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 21:48:03 -0800
+Message-ID: <edca2671-b6b4-4c61-a30d-48c4bd68317b@linux.intel.com>
+Date: Tue, 5 Nov 2024 13:47:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,59 +67,43 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/7] iommu/vt-d: Make the blocked domain support PASID
+Subject: Re: [PATCH v4 10/13] iommu/vt-d: Fail SVA domain replacement
 To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
  kevin.tian@intel.com
 Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
  kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
  zhenzhong.duan@intel.com, vasant.hegde@amd.com, will@kernel.org
-References: <20241104132033.14027-1-yi.l.liu@intel.com>
- <20241104132033.14027-6-yi.l.liu@intel.com>
- <557b9c59-1ecb-485a-9e36-c926180a199b@linux.intel.com>
- <421c5022-eeef-42b4-b173-63e52d6f4361@intel.com>
+References: <20241104131842.13303-1-yi.l.liu@intel.com>
+ <20241104131842.13303-11-yi.l.liu@intel.com>
+ <0781f329-49a5-4652-ae94-d0bbefa8dbb0@linux.intel.com>
+ <2b6a427e-bd3b-436d-9f24-b44d28ec4778@intel.com>
 Content-Language: en-US
 From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <421c5022-eeef-42b4-b173-63e52d6f4361@intel.com>
+In-Reply-To: <2b6a427e-bd3b-436d-9f24-b44d28ec4778@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 11/5/24 13:11, Yi Liu wrote:
-> On 2024/11/5 11:46, Baolu Lu wrote:
->> On 11/4/24 21:20, Yi Liu wrote:
->>> @@ -4291,15 +4296,18 @@ void domain_remove_dev_pasid(struct 
->>> iommu_domain *domain,
->>>       kfree(dev_pasid);
->>>   }
->>> -static void intel_iommu_remove_dev_pasid(struct device *dev, 
->>> ioasid_t pasid,
->>> -                     struct iommu_domain *domain)
->>> +static int blocking_domain_set_dev_pasid(struct iommu_domain *domain,
->>> +                     struct device *dev, ioasid_t pasid,
->>> +                     struct iommu_domain *old)
->>>   {
->>>       struct device_domain_info *info = dev_iommu_priv_get(dev);
->>>       struct intel_iommu *iommu = info->iommu;
->>>       intel_pasid_tear_down_entry(iommu, dev, pasid, false);
->>>       intel_drain_pasid_prq(dev, pasid);
->>> -    domain_remove_dev_pasid(domain, dev, pasid);
->>> +    domain_remove_dev_pasid(old, dev, pasid);
->>> +
->>> +    return 0;
->>>   }
->>>   struct dev_pasid_info *
->>> @@ -4664,7 +4672,6 @@ const struct iommu_ops intel_iommu_ops = {
->>>       .dev_disable_feat    = intel_iommu_dev_disable_feat,
->>>       .is_attach_deferred    = intel_iommu_is_attach_deferred,
->>>       .def_domain_type    = device_def_domain_type,
->>> -    .remove_dev_pasid    = intel_iommu_remove_dev_pasid,
+On 11/5/24 13:30, Yi Liu wrote:
+> On 2024/11/5 11:30, Baolu Lu wrote:
+>> On 11/4/24 21:18, Yi Liu wrote:
+>>> There is no known usage that will attach SVA domain or detach SVA domain
+>>> by replacing PASID to or from SVA domain. It is supposed to use the
+>>> iommu_sva_{un}bind_device() which invoke the iommu_{at|de} 
+>>> tach_device_pasid().
+>>> So Intel iommu driver decides to fail the domain replacement if the old
+>>> domain or new domain is SVA type.
 >>
->> This will cause iommu_attach_device_pasid() to fail due to the check and
->> failure condition introduced in patch 1/7.
+>> I would suggest dropping this patch.
+>>
+>> The iommu driver now supports switching SVA domains to and from other
+>> types of domains. The current limitation comes from the iommu core,
+>> where the SVA interface doesn't use replace.
 > 
-> the check introduced in patch 1 were enhanced in patch 3. So removing
-> remove_dev_pasid op does not fail as intel iommu driver provides
-> blocked domain which has the set_dev_pasid op.
-> 
+> I also noticed other iommu drivers (like ARM SMMUv3 and AMD iommu) would
+> support SVA replacement. So may we also make intel_svm_set_dev_pasid() be
+> able to handle the case in which @old==non-null? At first, it looks to be
+> dead code when SVA interface does not use replace. But this may make all
+> drivers aligned.
 
-Okay, I see. Thanks!
+yeah, that works for me.
 
