@@ -1,174 +1,134 @@
-Return-Path: <kvm+bounces-30995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDC59BF2E0
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:11:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76C0D9BF2F7
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAAD9B21D6F
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:11:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A89311C246B9
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0961A204086;
-	Wed,  6 Nov 2024 16:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C338204942;
+	Wed,  6 Nov 2024 16:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DBqfOGk7"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="K1QDha32"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07372EAE0
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B743A1DEFC7;
+	Wed,  6 Nov 2024 16:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730909472; cv=none; b=NaaOnpiHRQ8QAQUGOfXZ6GXxHa51VqzZC1sSEJ3xnvnZvYBkkWyU1zoWNH81VAINdSBZZs0qdvw+IzJJZ6QEWOzDQDAKcc+Gwse0Do7paEjiQrrMTh/swh/Tb59Ezbg7REKT+m6FWP4tWXjdiBq7rybtbUsnlXcqTx8tmCdRsQY=
+	t=1730909625; cv=none; b=kvAkdHfoE8AbNenl9caNkEAKjOOGbv8qZ6gX4srRcsC0+Bofqzw1m9iyVlPcjtgZns8d/5HROCUGTF2cYBBTndd+3v3f65o68/oQ+AIXRAc0ijT8MqZ7AMxsNSeCpmf6KhNg4rEkspPPKBfNX5mI70FXostISBydxsj7RReH2bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730909472; c=relaxed/simple;
-	bh=mQWGP2+2dHnsJHAp4+gKGfAR7r4pUwuigIwI+pjGUI0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TEHVOosYbgug0EUFZCECIH02OClafLP/OA0UwruJyJvQZhHkejRz3ianOus11AJ+aT1fwpg7zkqxoDpJ7K0b2qEg2VZwWKDNADq0mLYATgSyKgNM/YINKwrV0hp317vhU1GdjbWm8c6qpICWcvAY8QunW9rU87wHW+hJhWaFrMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DBqfOGk7; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e55c9d23cso7739b3a.0
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:11:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730909470; x=1731514270; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6k40+fe0KdTgjyeXKK2jvU+7V/OtIEet3QC+IoUobOs=;
-        b=DBqfOGk7uVhSn3LMY88MKgiFBxCsliGdLcoUb6eJlyRXJu5bXkFoIPDwOx3gF+FSvT
-         zZKuCbiOcF1d8mKC4W8hyLjub0XxwlWhElcYHZ1siOyVIE+d3flTamNWYYMDP7Mp/uxg
-         bIk7Or4wkIVAYPTCkUyoeWhwnhFwbJYEqM3SjOZjDgbJtluDzKPvsYnQ/s+JVJTlKfcT
-         1VA/GbW8qtf8HUXyUThpngDFLrG9ZUTtZiwH+uR1QdoE/L2L4lV4FwTUaGYlQYmrQssf
-         JQFcSpKF9geRh6uVNvIDYauLiPFX946Yi+DW1XP7fAMlLAzJ79bvRWi+KRcYk1G1+psp
-         Xhcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730909470; x=1731514270;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6k40+fe0KdTgjyeXKK2jvU+7V/OtIEet3QC+IoUobOs=;
-        b=gDQFRLCh8JP5CSHSeEFRQEaYblz2CJnqy0p8DptH8O5AJGlyY9mUP6uKhGaTqZSWRT
-         bcukx1FC6VXPN3LgYYs5pL4jHhPwDq0P3FeeWMG5clUTwbL2OBBuLOwmS1OJijwrGhlB
-         AztHA7htU5iIhMztdCHC0+WNbUVZQjIcrmoqHzTUInOSSx+hb7JWhuP9QCi0es8YC9Km
-         iop9BQMSGF6100DCxnr8e9Yh6VIE7TqyjIFVa5VIPGAHDlx7VA7rQTNB+m3f7WzqafXV
-         cUsKACTi0EctQ3zBD9Mo1DDARNZU1QHNyOIPEpCKeao916FaTg6Znop+ikrgl46yEPr4
-         1jgA==
-X-Forwarded-Encrypted: i=1; AJvYcCW13twGD8ifRRocUVjlOUcc1l8PkqUIF85mRVH47wBA3J4mEAUqdnZaHiphr9lfaMaTOlY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXAADP6DInYPhcFdIsdheOwkyeOYWrmSeeEuhd8U6gfT4jz9HO
-	XX6BusSDOhTflPtKwqJhPx0vxSSFucJ5HtP1GXOHo+FUBXZAo5rvmhgmpEWxIEL9hpfcV7iQBDK
-	F2g==
-X-Google-Smtp-Source: AGHT+IEtwl30f9l4Gs0C51y2tW7a7XqFq8bJr1VL5oboFCNh3+W8lcmupQoDyH6ZL/YX2BlKlpTgCO+1PW8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:846:b0:71e:466a:5b32 with SMTP id
- d2e1a72fcca58-723f7aac2c6mr192924b3a.2.1730909470100; Wed, 06 Nov 2024
- 08:11:10 -0800 (PST)
-Date: Wed, 6 Nov 2024 08:11:08 -0800
-In-Reply-To: <65fdc558-21e9-4311-b2b0-8b35131c7aac@kernel.org>
+	s=arc-20240116; t=1730909625; c=relaxed/simple;
+	bh=fMW/VsOUBf/Zzj/r5YgUE0W40cX8c/8i64nz6ZYNeH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mBqARlLz0jYJ9fU0E0qAmTaEhVG1nB/Vz7WcD+fWbrTOlp940rVjYS3dSwnUObSQGdWZdKKWqmZIrWivX8drNdHMPbp0Rg/yp7hSFvePOaUSo2zxeqPXHO7y9PNom1LXk2ES068l5gDeqw04Yw43WMc66F3d7UZUkM87FuGtRMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=K1QDha32; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A727340E0169;
+	Wed,  6 Nov 2024 16:13:40 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id lFXbq98d3ilJ; Wed,  6 Nov 2024 16:13:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730909615; bh=yem5yUNBo739fH9yVwWSEMahuq8YLo7+oLjxfHLmaBY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K1QDha32VM+gvATPnBylkqxb7p/63c29FuKywJ98uiYe189FEdixJM+JckTpBromM
+	 Lg2ZjyHGgqp7x7iTS4IUywRzQ01m4S+fCPO3oGnB4ffc0tPXjmCy1GRmF9TNGx1L5w
+	 Je8wR4Kg4q3NJ4Ml//Bs64J9yoqpPTvhH2c9x7G4HRI/eVj8u8te+EOcvAMr8xSmPl
+	 d3HLo7tiMZnZqISypm0WTjZpOBwxhTnvYq2ZqQ9AqNq/rZNOK1pZ1VrqPBVnMUbrxh
+	 Wv8VaNe1GFzHTQ+8iSsvFY523cqnHU1McvZA6JFnBB3lRnCCDqs6YhFuHOn0NLnVKG
+	 Kg2v1aVDmnGK0TzlYq9M0NSQ4MZUxtEQTqzzbCrgbnXaBfyyEeMOBzXbbqir9s+LPN
+	 iBQZ/qc7FLu2IkE+j16SetEn9TWkmJS9DEPsI0dPOOrdM2CToydl7I3jUn7zKWdVoc
+	 yXJWPBd0X/HkwkCUULIoXTulyA+PTzKdN50Npm4/eJkENPSyMx16B4gwzYhbK1/jgo
+	 Bd0MWOZwhfiV/56n1Sy4Mkl40008JcMGRIHUN5DE9D15q6SNfZ167ClMP9Qll8L8cd
+	 6QZv717JiKGvI8vyRPx8fn2p2y1F+xP3Bk6YbEN8bIDNvGFX99JBrV+shhJadqpH7I
+	 +mrMK8DFcVhqSGBnnyGfqeZI=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7200040E0191;
+	Wed,  6 Nov 2024 16:13:28 +0000 (UTC)
+Date: Wed, 6 Nov 2024 17:13:23 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
+Message-ID: <20241106161323.GGZyuVo2Vwg8CCIpxR@fat_crate.local>
+References: <20241104101543.31885-1-bp@kernel.org>
+ <ZyltcHfyCiIXTsHu@google.com>
+ <20241105123416.GBZyoQyAoUmZi9eMkk@fat_crate.local>
+ <ZypfjFjk5XVL-Grv@google.com>
+ <20241105185622.GEZypqVul2vRh6yDys@fat_crate.local>
+ <ZypvePo2M0ZvC4RF@google.com>
+ <20241105192436.GFZypw9DqdNIObaWn5@fat_crate.local>
+ <ZyuJQlZqLS6K8zN2@google.com>
+ <20241106152914.GFZyuLSvhKDCRWOeHa@fat_crate.local>
+ <ZyuMsz5p26h_XbRR@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241105160234.1300702-1-superm1@kernel.org> <ZyuFMtYSneOFrsvs@google.com>
- <fb72d616-dba8-410f-a377-3774aa7a5295@kernel.org> <ZyuIINwBdiztWhi3@google.com>
- <37b73861cb86508a337b299a5ae77ab875638fe4.camel@redhat.com> <65fdc558-21e9-4311-b2b0-8b35131c7aac@kernel.org>
-Message-ID: <ZyuVHJ9K51tOkOMM@google.com>
-Subject: Re: [PATCH] x86/CPU/AMD: Clear virtualized VMLOAD/VMSAVE on Zen4 client
-From: Sean Christopherson <seanjc@google.com>
-To: Mario Limonciello <superm1@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, 
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>, 
-	Mario Limonciello <mario.limonciello@amd.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZyuMsz5p26h_XbRR@google.com>
 
-On Wed, Nov 06, 2024, Mario Limonciello wrote:
-> On 11/6/2024 09:48, Maxim Levitsky wrote:
-> > On Wed, 2024-11-06 at 07:15 -0800, Sean Christopherson wrote:
-> > > On Wed, Nov 06, 2024, Mario Limonciello wrote:
-> > > > On 11/6/2024 09:03, Sean Christopherson wrote:
+On Wed, Nov 06, 2024 at 07:35:15AM -0800, Sean Christopherson wrote:
+> You didn't though.  The original mail Cc'd kvm@, but neither Paolo nor I.
 
-...
+I think we established that tho - I didn't know that kvm@ doesn't CC you guys.
+Probably should document that somewhere.
 
-> > > > > > diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> > > > > > index 015971adadfc7..ecd42c2b3242e 100644
-> > > > > > --- a/arch/x86/kernel/cpu/amd.c
-> > > > > > +++ b/arch/x86/kernel/cpu/amd.c
-> > > > > > @@ -924,6 +924,17 @@ static void init_amd_zen4(struct cpuinfo_x86 *c)
-> > > > > >    {
-> > > > > >    	if (!cpu_has(c, X86_FEATURE_HYPERVISOR))
-> > > > > >    		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT);
-> > > > > > +
-> > > > > > +	/*
-> > > > > > +	 * These Zen4 SoCs advertise support for virtualized VMLOAD/VMSAVE
-> > > > > > +	 * in some BIOS versions but they can lead to random host reboots.
-> > > > > 
-> > > > > Uh, CPU bug?  Erratum?
-> > > > 
-> > > > BIOS bug.  Those shouldn't have been advertised.
-> > 
-> > Hi!
-> > 
-> > My question is, why would AMD drop support intentionally for VLS on client machines?
-> > 
-> > I understand that there might be a errata, and I don't object disabling the
-> > feature because of this.
-> > 
-> > But hearing that 'These instructions aren't intended to be advertised' means that
-> > AMD intends to stop supporting virtualization on client systems or at least partially
-> > do so.
-> 
-> Don't read into it too far.  It's just a BIOS problem with those
-> instructions "specifically" on the processors indicated here.  Other
-> processors (for example Zen 5 client processors) do correctly advertise
-> support where applicable.
-> 
-> When they launched those bits weren't supposed to be set to indicate
-> support, but BIOS did set them.
+Uff, lemme try again. As already explained:
 
-As you quite clearly call out below, this isn't simply a BIOS problem.
+>   $ ./scripts/get_maintainer.pl --nogit --nogit-fallback --norolestats --nofixes -- <patch>
+>   Thomas Gleixner <tglx@linutronix.de>
+>   Ingo Molnar <mingo@redhat.com>
+>   Borislav Petkov <bp@alien8.de>
+>   Dave Hansen <dave.hansen@linux.intel.com>
+>   "H. Peter Anvin" <hpa@zytor.com>
+>   Peter Zijlstra <peterz@infradead.org>
 
-> > That worries me. So far AMD was much better that Intel supporting most of the
-> > features across all of the systems which is very helpful in various scenarios,
-> > and this is very appreciated by the community.
-> > 
-> > Speaking strictly personally here, as a AMD fan.
-> > 
-> > Best regards,> 	Maxim Levitsky
-> > 
-> > 
-> > > 
-> > > Why not?  "but they can lead to random host reboots" is a description of the
-> > > symptom, not an explanation for why KVM is unable to use a feature that is
-> > > apparently support by the CPU.
-> > > 
-> > > And if the CPU doesn't actually support virtualized VMLOAD/VMSAVE, then this is
-> > > a much bigger problem, because it means KVM is effectively giving the guest read
-> > > and write access to all of host memory.
-> > > 
-> > 
-> > 
-> 
-> I'm gathering that what supported means to you and what it means to me are
-> different things.
+those above are behind the mail alias x86@kernel.org so no need to CC each and
+every one of them.
 
-Yes.  And the distinction matters greatly in this case, because "VMLOAD/VMSAVE
-in the guest are broken" is *very* different than "VMLOAD/VMSAVE in the guest
-actually operate on SPAs, not GPAs".
+>   Josh Poimboeuf <jpoimboe@kernel.org>
+>   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
-> "Architecturally" the instructions for virtualized VMLOAD/VMSAVE exist.
+Those folks are CCed as per MAINTAINERS as they wanted to look at bugs.c
+tragedies.
 
-Which means they're supported, but broken.
+>   Sean Christopherson <seanjc@google.com>
+>   Paolo Bonzini <pbonzini@redhat.com>
+>   linux-kernel@vger.kernel.org
 
-> There are problems with them on these processors, and for that reason the
-> BIOS was not supposed to set those bits but it did.
+LKML is CCed.
 
-In other words, this a CPU bug.  The kernel comment absolutely needs to reflect
-that.  Passing this off as BIOS going rogue is misleading and confusing.
+>   kvm@vger.kernel.org
+
+I hope that clarifies the situation.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
