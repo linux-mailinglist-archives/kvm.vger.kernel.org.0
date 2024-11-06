@@ -1,142 +1,129 @@
-Return-Path: <kvm+bounces-30946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30949-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5BDE9BE6BD
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:05:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274DC9BE8CC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DBD5B25039
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:05:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D25351F216AF
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D2E1DEFE3;
-	Wed,  6 Nov 2024 12:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF341DFD84;
+	Wed,  6 Nov 2024 12:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGGGrkyU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WtUY2h+3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF01DF729;
-	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1366D1DFD8D
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 12:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730894617; cv=none; b=mbevG6V/EQgwEA55Jk8+cX6oDpdkCXM/pXm46pOZEVzetU4CenjNAOffnbL2HBKuTRUHBGAuHKXKbhzgquTcBIJCRFxAqELEm5V+RH81phlmSLVfmzb0wNd71T1kaPJbcIwDt75dsr2/tT+KnW4W9SEZJ9nZUkQWZCaaNNocgUU=
+	t=1730896055; cv=none; b=sYI0OmdZJCgDM+KTxG8aoZJKqTHg1eI40Rl1YcAILf20+RysAbs83XLV041KjVmXIrn/KSn2nGfyIMb63l7Gx3QU3n9ZDJ39e9Rv+OG6umCUMus6xMAmF00P7xq0+NgMaCYRItCigAffjXDkMUhdhZn9zFHiAIdu+En/toOLDug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730894617; c=relaxed/simple;
-	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YzmD5P7lJ2+KbAxRw3p2yMIzZDdcKc21ww34gA7rbAOvFbN1xN35xhlNv7bjho2y5pH9OBTBKJnrknqo9CLe3RWEfJ8V2Z5TOYvyMROuMonxzJivqb68r/OBuKgLbW9212GLNbQxZ88EvfdA4DumqNUI2oAtvHvS9/orVurpPDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGGrkyU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471E1C4CECD;
-	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730894617;
-	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PGGGrkyUUUy0z1Mqcx5xqROA9jQDy6vuGf3cBZFvuzU0aUts8N9/2g/F0F9ssiIVo
-	 ZraIpV02Np+JVSYY+PHiS/v7Vfq1jeNjn+YghIkATbHmbg89oOqE37AaUcipNak0l+
-	 7cLUcOvr5iZo57XfgF3pjY6J8gfIXS67F6WRm/m5OBI+WESXazuYgEwxjrIiYuvG/K
-	 B8pHWJO7LU4uR2dmzxeGfLkZg6RqCTnfdF78+HQHL3hBZ7lfRq4qSZkW+DNSpKD1yw
-	 Yj/8eZXyaP9+wKZqQPvtPCmNa+Zp0l02m8o2jvShxbgtsBrFP8/n2GJe7uPyiylH5z
-	 S4tGuHYqsb1OA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t8el5-00AM93-6N;
-	Wed, 06 Nov 2024 12:03:35 +0000
-Date: Wed, 06 Nov 2024 12:03:34 +0000
-Message-ID: <86cyj81sdl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Shusen Li <lishusen2@huawei.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
-In-Reply-To: <20241106083035.2813799-2-jingzhangos@google.com>
-References: <20241106083035.2813799-1-jingzhangos@google.com>
-	<20241106083035.2813799-2-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1730896055; c=relaxed/simple;
+	bh=Q5mAGqr6fBZa46ptlj0c2tOjO/AVkSYXS7mLE8kdevc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MmjpZhhM0fVIWVJuiDgDZFZDJW+o1YC7IL3HRmUhwDWT1uokAdZAUtX+D3vKpcTnx09qI67o3J3ufipsYttogiqL7W7c1R/3zBF0hA1bc499bOQ9PjAipBHA/w+AgmQMTvAGFQGJTRqc9WcMrINmX8Y7gXs6zvz//RAJ8nxLmNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WtUY2h+3; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730896054; x=1762432054;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q5mAGqr6fBZa46ptlj0c2tOjO/AVkSYXS7mLE8kdevc=;
+  b=WtUY2h+3+gAHaOLB7duHXd4ma4kzEpSoN5Rj/38g5JLiSk2G3MCA+Til
+   /V1JZvTRZfCi2VoFfU+D0iZSMGY79QWOPwo6rsnaJubvmH95B5t/XuNI+
+   jyKUn0CEKveJvjB9XkbuHqf9UUEfmjNBUeOaGlYeZJWe8RrZLNwp8VFtB
+   WWOJLZ5ZjJeY+AqlgYWLYO01sEfdEvkFSjRFzeahWvg0We5biCdi6e2CG
+   b44uL7HwPV6Rxy2a0fPV+67T7egKujPqLmmz/IzIPT0UzJKWqIog2S0Up
+   S+N5xi0dWcBbobpkap6gYja3O9AeWVo3im5GuySLH1wLWHJiOihwNlFGe
+   A==;
+X-CSE-ConnectionGUID: hS/12FBkRjCE8jxMCisv7g==
+X-CSE-MsgGUID: GYUsU9JUSfyL9hQtsqNNpg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="30117918"
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="30117918"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 04:27:34 -0800
+X-CSE-ConnectionGUID: pcgVXOXpTwKtm7Qqb+LBAw==
+X-CSE-MsgGUID: oEPzkh84Qme5i7cGVAyMIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="89635785"
+Received: from linux.bj.intel.com ([10.238.157.71])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 04:27:30 -0800
+Date: Wed, 6 Nov 2024 20:22:23 +0800
+From: Tao Su <tao1.su@linux.intel.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Pankaj Gupta <pankaj.gupta@amd.com>,
+	Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-stable@nongnu.org
+Subject: Re: [PATCH v5 01/11 for v9.2?] i386/cpu: Mark avx10_version filtered
+ when prefix is NULL
+Message-ID: <Zytffxz6DMfQSv0G@linux.bj.intel.com>
+References: <20241106030728.553238-1-zhao1.liu@intel.com>
+ <20241106030728.553238-2-zhao1.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106030728.553238-2-zhao1.liu@intel.com>
 
-On Wed, 06 Nov 2024 08:30:32 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
+On Wed, Nov 06, 2024 at 11:07:18AM +0800, Zhao Liu wrote:
+> In x86_cpu_filter_features(), if host doesn't support AVX10, the
+> configured avx10_version should be marked as filtered regardless of
+> whether prefix is NULL or not.
 > 
-> From: Kunkun Jiang <jiangkunkun@huawei.com>
+> Check prefix before warn_report() instead of checking for
+> have_filtered_features.
 > 
-> In all the vgic_its_save_*() functinos, they do not check whether
-> the data length is 8 bytes before calling vgic_write_guest_lock.
-> This patch adds the check. To prevent the kernel from being blown up
-> when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
-> are replaced together.
-> 
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> Cc: qemu-stable@nongnu.org
+> Fixes: commit bccfb846fd52 ("target/i386: add AVX10 feature and AVX10 version property")
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+
+Reviewed-by: Tao Su <tao1.su@linux.intel.com>
+
 > ---
->  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
+> v5: new commit.
+> ---
+>  target/i386/cpu.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index ba945ba78cc7..2381bc5ce544 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
->  	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
->  		ite->collection->collection_id;
->  	val = cpu_to_le64(val);
-> +
-> +	if (KVM_BUG_ON(ite_esz != sizeof(val), kvm))
-> +		return -EINVAL;
-> +
->  	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
->  }
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3baa95481fbc..77c1233daa13 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7711,8 +7711,10 @@ static bool x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+>              env->avx10_version = version;
+>              have_filtered_features = true;
+>          }
+> -    } else if (env->avx10_version && prefix) {
+> -        warn_report("%s: avx10.%d.", prefix, env->avx10_version);
+> +    } else if (env->avx10_version) {
+> +        if (prefix) {
+> +            warn_report("%s: avx10.%d.", prefix, env->avx10_version);
+> +        }
+>          have_filtered_features = true;
+>      }
 >  
-> @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
->  	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
->  		(dev->num_eventid_bits - 1));
->  	val = cpu_to_le64(val);
-> +
-> +	if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
-> +		return -EINVAL;
-> +
->  	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
->  }
->  
-> @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *its,
->  			     struct its_collection *collection,
->  			     gpa_t gpa, int esz)
->  {
-> +	struct kvm *kvm = its->dev->kvm;
-
-nit: just use its->dev->kvm consistently, as this is what we are
-already doing in this function.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> -- 
+> 2.34.1
+> 
 
