@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-30951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985239BEE29
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:16:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 370009BEEFF
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28EB91F23EC6
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:16:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E16491F2499E
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E581F5833;
-	Wed,  6 Nov 2024 13:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5F41DF995;
+	Wed,  6 Nov 2024 13:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDXVl+LE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crHz1lLz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B331F5825;
-	Wed,  6 Nov 2024 13:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07424191461;
+	Wed,  6 Nov 2024 13:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730898846; cv=none; b=FMlGLowbiOmrw7cXqWI4twhuBBq17TaVM2Kb/3B1zvopjnxQ2Z455hZ2Gj5NUoqLfDeqyTHqa5GvPTmB1w550SFOaHtN5VASFK5NUWP4Mfad2SdlgrqNJ3hZDfY4jsu0b4HpPkCsmlTlXNZlxEic2WNZ3waaR/kGKC24TJTuKwg=
+	t=1730899621; cv=none; b=YIQEcLaY65JMQzHTUdRYIFD8e6Z5JXE31N3ly+3xj7H35qC7D9JPUitb+hzv6/YvOWWlSUvVCpmOMfQa8OU+YVepNifIjdbrxdTI1/Wel4fztHxJ7qCzQkI7iGFNn8lrY1Xjy2zSK+NZZg0EwfAhN/PC2aNUz5Wu/AlAUIiuUvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730898846; c=relaxed/simple;
-	bh=MmGh5gnPG4ku4438t9wd6nhTmZITzHrRx9liC5G5jFQ=;
+	s=arc-20240116; t=1730899621; c=relaxed/simple;
+	bh=YsdgsNLn3Pt94qYHQp37MqqUXQnx1YcTHDZKk+avfN0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GjNEFRvNraEmndrvhGZLaf7QwBI7UnvzEpLZEO6fywcXYIByJJATrAZDrdRUHn9JRHhI7Y0ywKuU2w2bNBlFAe9W32AktgJNX4ySaucrWXWE5j/ajCu/HFMDo4wacyIELTm+azP1V79JAStXgYu1vLjYL8aYJBaku9B8Z2b2t9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDXVl+LE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C02DC4CECD;
-	Wed,  6 Nov 2024 13:14:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MxSqh1Uz4AC+XP/p8OpcaU9U9fKP2zi2uz+aDhrZEAmXJUnxpSSqmCIuXtmtnnV1QpvwVv8M+31BIyBb3PseZbE8OPmMpz2pkZYrOjvPVtDy2uyBQMuSunMxD9R7Lnxus/GxtQQSs62QYO7ePuIQZM8YZaVYq5Is0coNiwWfbN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crHz1lLz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1B1C4CECD;
+	Wed,  6 Nov 2024 13:27:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730898846;
-	bh=MmGh5gnPG4ku4438t9wd6nhTmZITzHrRx9liC5G5jFQ=;
+	s=k20201202; t=1730899620;
+	bh=YsdgsNLn3Pt94qYHQp37MqqUXQnx1YcTHDZKk+avfN0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IDXVl+LEXd/wyx3XOjQDob0T+MiPN1VloT44CWnpCTwy/KdgfZd9pPNPsCNpzbAAW
-	 PD11WODvJst53qsb+lR5TlXq2F1GA3/ITB5zmGykjiO3RxEVxrSWiC2cn8tm+Yvu19
-	 9mzV1vweS2GFOWjJVC4xeL6ULQVrq51jLfLNdtRUDKGl6ZR9rXKrz2Lq1dtm49toQp
-	 sXVcB1ejVB/Mb6qBFRexOmBqRnWckXxCxhmv74Dy1oOz2P6XWpYHN/a8Emif82+Y9L
-	 j7ZLlB9iQpLJGX0vuwWajcZgLa0W4myZOKmxtXmCpKQ9OVuReusJ3br36TSFtN0aZU
-	 uU3pWdb/WjnMQ==
+	b=crHz1lLzZMb7i/uvSwBbyrGkEUN8bOUEZEnF9f8JAwv8cUCLPO+mWcZsYhF7bHFx/
+	 JQGwm2lV7eH7Of+HF0L5wXqRLQamQIITuhJMsiJH6aLlD0FpEJ8IGRAfhBmS5Y0CGC
+	 6lL4zO2okkyEXHXDeXcc2k8qekasXR64FcOHbsTTATUzZN1j9Klhu+2w1AjkUE9LmB
+	 ZJ3spHnXLMLVVIgzAaAepFVtxWcsaysfPq4Wk6O8+t+PKyHSHPkLzAUtnozE/QEtYw
+	 vAN/FkdjSxaCIuOZ5LEaPRMSMKfw52Fr+q58DGdNuieJhtdAlw7NdZI4s/mRAiyNTa
+	 1rVbDV1ANxMkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t8frH-00ANY6-Nt;
-	Wed, 06 Nov 2024 13:14:03 +0000
-Date: Wed, 06 Nov 2024 13:14:02 +0000
-Message-ID: <86bjys1p45.wl-maz@kernel.org>
+	id 1t8g3m-00ANoh-KU;
+	Wed, 06 Nov 2024 13:26:58 +0000
+Date: Wed, 06 Nov 2024 13:26:57 +0000
+Message-ID: <86a5ec1oim.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
 Cc: KVM <kvm@vger.kernel.org>,
@@ -63,11 +63,12 @@ Cc: KVM <kvm@vger.kernel.org>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
-	Shusen Li <lishusen2@huawei.com>
-Subject: Re: [PATCH v3 2/4] KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
-In-Reply-To: <20241106083035.2813799-3-jingzhangos@google.com>
+	Shusen Li <lishusen2@huawei.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v3 4/4] KVM: selftests: aarch64: Test VGIC ITS tables save/restore
+In-Reply-To: <20241106083035.2813799-5-jingzhangos@google.com>
 References: <20241106083035.2813799-1-jingzhangos@google.com>
-	<20241106083035.2813799-3-jingzhangos@google.com>
+	<20241106083035.2813799-5-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,127 +79,56 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com, eauger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 06 Nov 2024 08:30:33 +0000,
+[Adding Eric to the list, since he worked a lot on the save/restore code]
+
+On Wed, 06 Nov 2024 08:30:35 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> From: Kunkun Jiang <jiangkunkun@huawei.com>
-> 
-> vgic_its_save_device_tables will traverse its->device_list to
-> save DTE for each device. vgic_its_restore_device_tables will
-> traverse each entry of device table and check if it is valid.
-> Restore if valid.
-> 
-> But when MAPD unmaps a device, it does not invalidate the
-> corresponding DTE. In the scenario of continuous saves
-> and restores, there may be a situation where a device's DTE
-> is not saved but is restored. This is unreasonable and may
-> cause restore to fail. This patch clears the corresponding
-> DTE when MAPD unmaps a device.
-> 
-> Co-developed-by: Shusen Li <lishusen2@huawei.com>
-> Signed-off-by: Shusen Li <lishusen2@huawei.com>
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 2381bc5ce544..7c57c7c6fbff 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1140,8 +1140,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->  	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
->  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
->  	struct its_device *device;
-> +	gpa_t gpa;
->  
-> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
-> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
->  		return E_ITS_MAPD_DEVICE_OOR;
->  
->  	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-> @@ -1161,8 +1162,17 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->  	 * The spec does not say whether unmapping a not-mapped device
->  	 * is an error, so we are done in any case.
->  	 */
-> -	if (!valid)
-> +	if (!valid) {
-> +		struct kvm *kvm = its->dev->kvm;
-> +		int dte_esz = vgic_its_get_abi(its)->dte_esz;
-> +		u64 val = 0;
-> +
-> +		if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
-> +			return -EINVAL;
+>=20
+> Add a selftest to verify the correctness of the VGIC ITS mappings after
+> the save/restore operations (KVM_DEV_ARM_ITS_SAVE_TABLES /
+> KVM_DEV_ARM_ITS_RESTORE_TABLES).
 
-I find it pretty odd to bug only in that case, and the sprinkling of
-these checks all over the place is horrible. I'm starting to wonder if
-we shouldn't simply wrap vgic_write_guest() and co to do the checking.
+What are you checking? The saved data? The restored data?
 
-> +
-> +		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+> Also calculate the time spending on save/restore operations.
 
-I'm thinking of something like:
+Is that really relevant? I don't think performance matters at this
+stage, if we can't even have reliable data.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index ba945ba78cc7d..d8e57aefcd3a5 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1128,6 +1128,19 @@ static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
- 	return device;
- }
- 
-+
-+#define its_write_entry_lock(i, g, valp, t)				\
-+	({								\
-+		struct kvm *__k = (i)->dev->kvm;			\
-+		int __sz = vgic_its_get_abi(i)->t;			\
-+		int __ret = 0;						\
-+		if (KVM_BUG_ON(__sz != sizeof(*(valp)), __k))		\
-+			__ret = -EINVAL;				\
-+		else							\
-+			vgic_write_guest_lock(__k, (g), (valp), __sz);	\
-+		__ret;							\
-+	})
-+
- /*
-  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
-  * Must be called with the its_lock mutex held.
-@@ -1140,8 +1153,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
- 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
- 	struct its_device *device;
-+	gpa_t gpa;
- 
--	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
-+	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
- 		return E_ITS_MAPD_DEVICE_OOR;
- 
- 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-@@ -1161,8 +1175,10 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	 * The spec does not say whether unmapping a not-mapped device
- 	 * is an error, so we are done in any case.
- 	 */
--	if (!valid)
--		return 0;
-+	if (!valid) {
-+		u64 val = 0;
-+		return its_write_entry_lock(its, gpa, &val, dte_esz);
-+	}
- 
- 	device = vgic_its_alloc_device(its, device_id, itt_addr,
- 				       num_eventid_bits);
+> This test uses some corner cases to capture the save/restore bugs. It
 
-which can be generalised everywhere (you can even extract the check
-and move it to an out-of-line helper as required).
+Which corner cases?
+
+> will be used to verify the future incoming changes for the VGIC ITS
+> tables save/restore.
+>=20
+> To capture the "Invalid argument (-22)" error, run the test without any
+> option. To capture the wrong/lost mappings, run the test with '-s'
+> option.
+> Since the VGIC ITS save/restore bug is caused by orphaned DTE/ITE
+> entries, if we run the test with '-c' option whih clears the tables
+> before the save operation, the test will complete successfully.
+
+I'm sorry, but this description is meaningless, as you need to know
+what is the bug that has been fixed.
+
+Also, how is someone supposed to run this thing? Without options? With
+options? With any combination of options?
+
+=46rom what I understand, the various options are designed to help
+debugging a broken vgic implementation. So please document what the
+options do rather than an bug that is supposed to be already fixed.
+
+Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
 
