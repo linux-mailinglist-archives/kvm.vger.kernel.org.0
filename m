@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-30836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592989BDD34
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 03:50:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9D79BDD35
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 03:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B2781C2309C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 02:50:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D77B2B23797
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 02:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D3519067C;
-	Wed,  6 Nov 2024 02:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B3D191499;
+	Wed,  6 Nov 2024 02:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PeJ1Kage"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dNaqAnjf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A036190056
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 02:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7DD18B47E
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 02:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730861406; cv=none; b=eIFEfMdPUu1GhGHZWYB3VQke28M7C8v3HY+3LwTjG8cHEqd+2poPl3Ke35w3nJwFzNzGFAFljoHpDWUIqwduoTztnqd3wJQV62FP3n329b08iAXjZDjj51hlsGMcacDAO0KXudpc1fZJoP0DpwydYLxhRHGsZxZg9LFzu1IcM/c=
+	t=1730861409; cv=none; b=J6bDfDdSpEt9OERHJ/AnoxNxYRfyntyMj89Q+56f0KiN067RNUTiEFys8j2U7m+5KZA8hfUjMKkUiTb7L8VuzmZbuVaFoyRf8HSRoWzgGK1LLwBR9KZ58O7osUcF9xCk5Tt8yanIEMNVxqw9fiDXcVqTfV28A+9dk4Z27kMXoQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730861406; c=relaxed/simple;
-	bh=JcVwYkgHmlLrfByBJgICNQrNbswie+WUwEU7n23xvn8=;
+	s=arc-20240116; t=1730861409; c=relaxed/simple;
+	bh=M4sDt9QkECcSbT07XJdCv1wUJiDP78YRHjt03Sbegi4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HxK4PqmCu3NDb0QvBDj5EjhcBDCwTbf/AnXh09A173tbohMle9GY4D7Ei9uWu2TUWrXLXLb41Pg5LEQarjL0EKR/N5EdS7aZ16FE7XMMr7ccQXgjO/rn4gE5nlhNC3eoCRPmIyH69XhlhOuZx6v/0J06aK5CBsQZ0HeqMkEWy7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PeJ1Kage; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=L/B53XNLRa0zhTBuZxFOH9fH53Qs6QvdWz6Rl6BmW1B+C4ruJr2rpom/HNPsGtuvLxtINoB1OpcWR91T32NFyrAkMC2OjaRYR4HQzqdAXRr5GRnu7BxmNi/1AgBaTU3ruUtZv0q+QZ1v2r39D9hdWJHPyMb8lDg3FgcDtKw67gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dNaqAnjf; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730861405; x=1762397405;
+  t=1730861408; x=1762397408;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JcVwYkgHmlLrfByBJgICNQrNbswie+WUwEU7n23xvn8=;
-  b=PeJ1Kage2MCxJUE4vbI7rdNMR3yqN1V/K5YgjhxmvBjmk08LdEp2ocTo
-   7RDaRcIT7A73pVdxXMqyxVE7HfHWmHQgR3kgRUeKTO02r02iCVagWZCyK
-   iumvmdJ9+/fv6mW1Y8oMeOPmtkL7KI6Zg9MfRMUwx2vSJeuz7KMeW/a6/
-   /yKRl5YW0tcIy40Tzl6w5nHAPL336dh82utdBa021QZ7ng3JIrcKFwENt
-   l7vMsFtMALzeQnRZF9SR0Q06AihAffOKwA/jwjIg5JAjwXIzjrfhvVx61
-   rR56outVl1+WWZBZtvYIFMWp9QQ1i8Gwp/YWr+SiOKcHbEY+4PIF2oaFF
-   Q==;
-X-CSE-ConnectionGUID: YDPoDqDUTfGO6Ev2z7CtSQ==
-X-CSE-MsgGUID: uik7HcDoQYGsZlBEg3JolA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30492269"
+  bh=M4sDt9QkECcSbT07XJdCv1wUJiDP78YRHjt03Sbegi4=;
+  b=dNaqAnjfDLvwEbcynU4WrFQBWBSlcSuBCLnYfMal+3HEcZTnMyR6arom
+   Mooa/3T3bfMy1KCvqOW92A2e+EEaM+kGxTyDiMk9SrvW6Tnge37Tri1r4
+   WZGQXRqGH9EQGcd6D/t9kNN9+rpdhMfH1uuyGUh5OeLOQc+OIQQv5ahdf
+   wR6gvSQxTBTSG6/B9FMjvm/bMYy1ElCOvqzTdhBVyKcr5j7H3ZFtjq/wc
+   D2jBOhBFTkHwOQvS7K+Et9r5a8Hvp0qyNSauXxjBkKIJQIbqMZ49m2MD8
+   KT5j7BeQ0A2C05fhhDp00yKqDKqNwuoke6aV2Y4h7OK1ANIPaCpJD7YWl
+   w==;
+X-CSE-ConnectionGUID: DDuj7ppUQSC47wOA4zFSfA==
+X-CSE-MsgGUID: sdbvqcjYQvCemmBsW0V93A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30492279"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30492269"
+   d="scan'208";a="30492279"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 18:50:05 -0800
-X-CSE-ConnectionGUID: T5TLU2G+Su6PkrVLoalTGw==
-X-CSE-MsgGUID: YSLwJp0WSqyljdTgl/zOVA==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 18:50:08 -0800
+X-CSE-ConnectionGUID: Ynv9OBZpTo6N0P/HesUs/Q==
+X-CSE-MsgGUID: +GUGd9ljSzuNoTo1fYV/8A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="115077998"
+   d="scan'208";a="115078006"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa001.fm.intel.com with ESMTP; 05 Nov 2024 18:50:02 -0800
+  by fmviesa001.fm.intel.com with ESMTP; 05 Nov 2024 18:50:05 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
@@ -72,9 +72,9 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 05/11] target/i386/kvm: Save/load MSRs of kvmclock2 (KVM_FEATURE_CLOCKSOURCE2)
-Date: Wed,  6 Nov 2024 11:07:22 +0800
-Message-Id: <20241106030728.553238-6-zhao1.liu@intel.com>
+Subject: [PATCH v5 06/11] target/i386/kvm: Drop workaround for KVM_X86_DISABLE_EXITS_HTL typo
+Date: Wed,  6 Nov 2024 11:07:23 +0800
+Message-Id: <20241106030728.553238-7-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241106030728.553238-1-zhao1.liu@intel.com>
 References: <20241106030728.553238-1-zhao1.liu@intel.com>
@@ -86,72 +86,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MSR_KVM_SYSTEM_TIME_NEW and MSR_KVM_WALL_CLOCK_NEW are bound to
-kvmclock2 (KVM_FEATURE_CLOCKSOURCE2).
+The KVM_X86_DISABLE_EXITS_HTL typo has been fixed in commit
+77d361b13c19 ("linux-headers: Update to kernel mainline commit
+b357bf602").
 
-Add the save/load support for these 2 MSRs just like kvmclock MSRs.
+Drop the related workaround.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 Reviewed-by: Zide Chen <zide.chen@intel.com>
 ---
- target/i386/cpu.h     |  2 ++
- target/i386/kvm/kvm.c | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+)
+ target/i386/kvm/kvm.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c4ec64e0078f..79c28a48eb70 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1886,6 +1886,8 @@ typedef struct CPUArchState {
- 
-     uint64_t system_time_msr;
-     uint64_t wall_clock_msr;
-+    uint64_t system_time_new_msr;
-+    uint64_t wall_clock_new_msr;
-     uint64_t steal_time_msr;
-     uint64_t async_pf_en_msr;
-     uint64_t async_pf_int_msr;
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 4aba034865bb..b175cd4a4bcb 100644
+index b175cd4a4bcb..1fb4bd19fcf7 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -3962,6 +3962,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-             kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, env->system_time_msr);
-             kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, env->wall_clock_msr);
-         }
-+        if (env->features[FEAT_KVM] & CPUID_KVM_CLOCK2) {
-+            kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME_NEW,
-+                              env->system_time_new_msr);
-+            kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK_NEW,
-+                              env->wall_clock_new_msr);
-+        }
-         if (env->features[FEAT_KVM] & CPUID_KVM_ASYNCPF_INT) {
-             kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_INT, env->async_pf_int_msr);
-         }
-@@ -4442,6 +4448,10 @@ static int kvm_get_msrs(X86CPU *cpu)
-         kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, 0);
-         kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, 0);
-     }
-+    if (env->features[FEAT_KVM] & CPUID_KVM_CLOCK2) {
-+        kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME_NEW, 0);
-+        kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK_NEW, 0);
-+    }
-     if (env->features[FEAT_KVM] & CPUID_KVM_ASYNCPF_INT) {
-         kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_INT, 0);
-     }
-@@ -4708,6 +4718,12 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_KVM_WALL_CLOCK:
-             env->wall_clock_msr = msrs[i].data;
-             break;
-+        case MSR_KVM_SYSTEM_TIME_NEW:
-+            env->system_time_new_msr = msrs[i].data;
-+            break;
-+        case MSR_KVM_WALL_CLOCK_NEW:
-+            env->wall_clock_new_msr = msrs[i].data;
-+            break;
-         case MSR_MCG_STATUS:
-             env->mcg_status = msrs[i].data;
-             break;
+@@ -3085,10 +3085,7 @@ static int kvm_vm_set_tss_addr(KVMState *s, uint64_t tss_base)
+ static int kvm_vm_enable_disable_exits(KVMState *s)
+ {
+     int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
+-/* Work around for kernel header with a typo. TODO: fix header and drop. */
+-#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
+-#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
+-#endif
++
+     if (disable_exits) {
+         disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+                           KVM_X86_DISABLE_EXITS_HLT |
 -- 
 2.34.1
 
