@@ -1,127 +1,125 @@
-Return-Path: <kvm+bounces-30901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B479BE373
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 11:04:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EABE9BE374
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 11:04:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9791C20CBF
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 10:04:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04CAE285803
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 10:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC98A1DDA1B;
-	Wed,  6 Nov 2024 10:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BrziH8Gr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212AA2E400;
+	Wed,  6 Nov 2024 10:04:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2561173;
-	Wed,  6 Nov 2024 10:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3B41D9341;
+	Wed,  6 Nov 2024 10:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730887422; cv=none; b=jdXdcn8ooiTeWeFbiPfXpsLtQu7qQ7Ws1fleu4+9wJGXVAhqO1Jx0UhNTfB/3OH9slmYW/KgsqcKYJeKZpx0qbKahKHvoFyw1/wWWQKKESVXaq1gWxHcoZRPy9vsFRACCi1pQxbZBN+SkG5Qp5IBLh+jAaZ0uZD37525aEmy02U=
+	t=1730887467; cv=none; b=bOfewqJQjMCZ8GED4nMKg1lAz3GTg+N3ve9ixqdly9MnksLmBCRuLs3uelberAzsEH53EP5BhVQv08io/uqo90Y9H/hhIfbjmNNtQ8QDqmM8RBFbTh4VAgXT0DP4fDyaDW67a6IV2VzKJp8623GSQO+VdRend7WgqYzlXfb9sx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730887422; c=relaxed/simple;
-	bh=RqW/PLYszbKVRbzKd1XTwtY3NTuWYNXvgeKpbxrXWKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Elz7SJyqf699C/UjfelaMLDxU1R3HRREdbH0m0NzTpPtxEVGYqiyC20rTpnrEuhXLQg+5Ig+YujJbhxORJtjj0EHqbV2LDr+EgSxRDRkfRJfiC2fc0q7tH3gWogTKGCFSj2Dp00g+uYA2+bX8dueu1u6iEUWbRYV/YbNmNG7xXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BrziH8Gr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB0E7C4CECD;
-	Wed,  6 Nov 2024 10:03:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730887421;
-	bh=RqW/PLYszbKVRbzKd1XTwtY3NTuWYNXvgeKpbxrXWKQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BrziH8Gr2qx7PhK64n3kricgJW7FsJKQwaBwhqReMzhugV2UA9XidDWUEjP+gZWBs
-	 Q9RrMg0w+Qkj2BTmfN1z38DpY1qaZkHXpFvnuyiw5kEMSjlAbVjL4kbfPDi7M8wnzU
-	 C/hxJNSHi7+84Rc+jIHCnkkN46BoDi3mvzxH1U2fTBmyFPXm5RainWHvd/iAvj1g2j
-	 armhe52ryvOBcqACfZSmvCJoXivytmsJfZnWAKq6XIfVicjYbJAt14IC0f+uTHqEmg
-	 rTY0mId8wxcuf1SKun4SQYhc0gmh+NF4G4DF71OE5DmNJYAG5RTmTYmLvTSxyjdDQk
-	 7u1v9v69e58Jw==
-Date: Wed, 6 Nov 2024 10:03:37 +0000
-From: Simon Horman <horms@kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org, brauner@kernel.org,
-	cgroups@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, torvalds@linux-foundation.org
-Subject: Re: [PATCH v3 01/28] net/socket.c: switch to CLASS(fd)
-Message-ID: <20241106100337.GL4507@kernel.org>
-References: <20241102050219.GA2450028@ZenIV>
- <20241102050827.2451599-1-viro@zeniv.linux.org.uk>
- <20241102122132.GH1838431@kernel.org>
- <20241103063113.GR1350452@ZenIV>
+	s=arc-20240116; t=1730887467; c=relaxed/simple;
+	bh=+wzOn7yqyZd9iOFvQopl/sxH63ViRLCfuJLJoLINwxU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j2jvAoRue/npvNGDq0PLvQ+rez2KzAFbCM7us92Wga6ztciAulyvtV5ic6IiWW8k+ijMmGxwVL9UXkh89VGngLKpfPATXob/D6T/kphZYhKLblhjmsR3TJbyyP11pzYtfmluhsUu9uqUHTeoaiIB25kAjvwoVsZazznOJprfXRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Xk13x0wV5zQppn;
+	Wed,  6 Nov 2024 18:03:09 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 40C2318007C;
+	Wed,  6 Nov 2024 18:04:16 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 6 Nov 2024 18:04:16 +0800
+Received: from huawei.com (10.50.165.33) by kwepemn100017.china.huawei.com
+ (7.202.194.122) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 6 Nov
+ 2024 18:04:15 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
+Subject: [PATCH v13 0/4] debugfs to hisilicon migration driver
+Date: Wed, 6 Nov 2024 18:03:39 +0800
+Message-ID: <20241106100343.21593-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.24.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241103063113.GR1350452@ZenIV>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-On Sun, Nov 03, 2024 at 06:31:13AM +0000, Al Viro wrote:
-> On Sat, Nov 02, 2024 at 12:21:32PM +0000, Simon Horman wrote:
-> 
-> > > @@ -2926,16 +2900,18 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
-> > >  
-> > >  	datagrams = 0;
-> > >  
-> > > -	sock = sockfd_lookup_light(fd, &err, &fput_needed);
-> > > -	if (!sock)
-> > > -		return err;
-> > > +	CLASS(fd, f)(fd);
-> > > +
-> > > +	if (fd_empty(f))
-> > > +		return -EBADF;
-> > > +	sock = sock_from_file(fd_file(f));
-> > > +	if (unlikely(!sock))
-> > > +		return -ENOTSOCK;
-> > 
-> > Hi Al,
-> > 
-> > There is an unconditional check on err down on line 2977.
-> > However, with the above change err is now only conditionally
-> > set before we reach that line. Are you sure that it will always
-> > be initialised by the time line 2977 is reached?
-> 
-> Nice catch, thank you.  It is possible, if you call recvmmsg(2) with
-> zero vlen and MSG_ERRQUEUE in flags.  Which is not going to be done in
-> any well-behaving code, making it really nasty - nothing like a kernel
-> bug that shows up only when trying to narrow down a userland bug upstream
-> of the syscall in question ;-/
+Add a debugfs function to the hisilicon migration driver in VFIO to
+provide intermediate state values and data during device migration.
 
-Ouch.
+When the execution of live migration fails, the user can view the
+status and data during the migration process separately from the
+source and the destination, which is convenient for users to analyze
+and locate problems.
 
-> AFAICS, that's the only bug of that sort in this commit - all other
-> places that used to rely upon successful sockfd_lookup_light() zeroing
-> err have an unconditional assignment to err shortly downstream of that.
+Changes v12 -> v13
+	Replace seq_printf() with seq_puts()
 
-Yes, I was unable to find any others either.
+Changes v11 -> v12
+	Update comments and delete unnecessary logs
 
-> 
-> Fix folded into commit in question, branch force-pushed; incremental follows
-> (I would rather not spam the lists with repost of the entire patchset for
-> the sake of that):
+Changes v10 -> v11
+	Update conditions for debugfs registration
 
-Thanks, will run some checks for good measure.
-But the fix below looks good to me.
+Changes v9 -> v10
+	Optimize symmetry processing of mutex
 
-> diff --git a/net/socket.c b/net/socket.c
-> index fb3806a11f94..c3ac02d060c0 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2885,7 +2885,7 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
->  			  unsigned int vlen, unsigned int flags,
->  			  struct timespec64 *timeout)
->  {
-> -	int err, datagrams;
-> +	int err = 0, datagrams;
->  	struct socket *sock;
->  	struct mmsghdr __user *entry;
->  	struct compat_mmsghdr __user *compat_entry;
-> 
+Changes v8 -> v9
+	Added device enable mutex
+
+Changes v7 -> v8
+	Delete unnecessary information
+
+Changes v6 -> v7
+	Remove redundant kernel error log printing and
+	remove unrelated bugfix code
+
+Changes v5 -> v6
+	Modify log output calling error
+
+Changes v4 -> v5
+	Adjust the descriptioniptionbugfs file directory
+
+Changes v3 -> v4
+	Rebased on kernel6.9
+
+Changes 2 -> v3
+	Solve debugfs serialization problem.
+
+Changes v1 -> v2
+	Solve the racy problem of io_base.
+
+Longfang Liu (4):
+  hisi_acc_vfio_pci: extract public functions for container_of
+  hisi_acc_vfio_pci: create subfunction for data reading
+  hisi_acc_vfio_pci: register debugfs for hisilicon migration driver
+  Documentation: add debugfs description for hisi migration
+
+ .../ABI/testing/debugfs-hisi-migration        |  25 ++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 266 ++++++++++++++++--
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  18 ++
+ 3 files changed, 278 insertions(+), 31 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
+
+-- 
+2.24.0
+
 
