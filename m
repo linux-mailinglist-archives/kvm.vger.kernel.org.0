@@ -1,211 +1,246 @@
-Return-Path: <kvm+bounces-31039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179AC9BF855
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 22:11:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B166D9BF88C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 22:33:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8FC6283E29
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:11:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70F5F284324
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4B120CCC8;
-	Wed,  6 Nov 2024 21:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA7C20CCE0;
+	Wed,  6 Nov 2024 21:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K2w5ZPXC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRClz3jO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F55F20C473;
-	Wed,  6 Nov 2024 21:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F65F20C47E
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 21:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730927503; cv=none; b=WF3nLM7w9iMcfwXp3Oa7aNhrpKbFxIHZRv22oiSI0bRYirXisgEY4BqC3hyZ8bMTjkGYWDgSInJjLyLc7gfUPsxbd4Ej51170HuFq5XFHkF5uprOB2sQ622ImXXjzvl6EiCjGfUuvEpDHab7BQ9W9Sp1NRbwAziXwGU3IirWTM0=
+	t=1730928828; cv=none; b=oP09BW8ZSunSgCx8+YQ7A4FrrVU+XhEThcXX134wNq37RDIt4czRIkuIoi5JZmFcQI8IWAAO4ebIXHLR+J3q+8pK3uke3O71Mx2eZeB91ZEjT53bX9UChd8wwZIlsFmQbZXTmotzUOH2cPtgoGxd/5qLE3OLQh0rnU1xP2f9HeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730927503; c=relaxed/simple;
-	bh=huYLARWenfwUcsC3qlGBR/nDXR80KJL1574pQn4aHRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oQpPjpzcazDGYrwOD6JTvMb4oJTeeBoR8TdeancgV4qmSPVsIxwoaQ+vpkWjvxPdahjLdPzLsQ6QpEPKAbeTer3CWYoSc6AU6IdHEpnZMerTyLLQIFrwtuPvl8pJ7jQmhgINdOgN+pZN4TlPCO4VQ4qKfFhjOakw+KZwGwIERio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K2w5ZPXC; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730927501; x=1762463501;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=huYLARWenfwUcsC3qlGBR/nDXR80KJL1574pQn4aHRQ=;
-  b=K2w5ZPXCDvFCW8+XZXWrBSv5RJbWIY5JSrZAP3dBD1g+CiV8wiuW1c8M
-   2y4rLE50+9PM6IbJarxL3Q2lVhS/N2ZbctTp+ndwkdzgoE3pwQg4NVZeu
-   wm+HPCrv9MLUN3LRNTFMLArxTA2o10jEyotg6+gwYPuZUsliWhu2wc7ML
-   npbUug9rvKWLG5fGBBrvhmcuG49RzyRpIfkypiQWNf6gkms3gdIZuY6Nu
-   uFKh6m7FgiWhRVIYzisw36kcvhT/59ifW/wPKFELBLtqpLZ70so4+WQ0t
-   OZMyjbkzfhPy56kT0znCpOuh8kR20H4ODsREIHYQpeh0Y3GmXbHjwy6WY
-   g==;
-X-CSE-ConnectionGUID: Z+majKsRSsqtifboXAoHGA==
-X-CSE-MsgGUID: V/aTrz0fSU+tmUrAHoh8mA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="30970714"
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="30970714"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 13:11:40 -0800
-X-CSE-ConnectionGUID: +xIJCD1iQhSFhOG6nRINnw==
-X-CSE-MsgGUID: WPJFrZdcRNeCUd+wMt4OZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="89546581"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 06 Nov 2024 13:11:38 -0800
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t8nJO-000pQk-1w;
-	Wed, 06 Nov 2024 21:11:34 +0000
-Date: Thu, 7 Nov 2024 05:11:31 +0800
-From: kernel test robot <lkp@intel.com>
-To: Longfang Liu <liulongfang@huawei.com>, alex.williamson@redhat.com,
-	jgg@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	jonathan.cameron@huawei.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linuxarm@openeuler.org, liulongfang@huawei.com
-Subject: Re: [PATCH v13 3/4] hisi_acc_vfio_pci: register debugfs for
- hisilicon migration driver
-Message-ID: <202411070400.I8XzogJF-lkp@intel.com>
-References: <20241106100343.21593-4-liulongfang@huawei.com>
+	s=arc-20240116; t=1730928828; c=relaxed/simple;
+	bh=fdOaNFvjHNhZvAo41H3nYbZtuHMgOflDpg4KuZc1jzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MjnvvILiaV8y4OP+2fK+Wj969OetgyDOA2UVPMmsaYzXpFYcqTQzBluQ+WF0gvemxOrRziim3L2vAAAs4vggkJeSyfh6RrSONf1LfShNrslHxTGUEek4DAFJvVWXbizVSHRQbbz5keEzq6fXanXf6ll7IOoDn6LxHAPedkcnMHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRClz3jO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730928825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3rFuWga3DWj70TxE9k7zWnQDJYpC4sUfbe1+XXpU5Mo=;
+	b=ZRClz3jOJnFTw/Rslvc4FyK5hPTmuBrCn562MN283zlVuKTLzFINZWY+7AxZ+jeoEM+1cW
+	K/4SDTRcWHv2lKYsKmVLYKZj9Lr7hQkrLAt4BGMBYir8/AeBBCgDkVMZ8GKCddZSf18S3p
+	pMplibFpeHGQUvqvz0xIXh23jQqer2I=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-124-FTYMPgNtMsOkDbAJKixwYA-1; Wed, 06 Nov 2024 16:33:44 -0500
+X-MC-Unique: FTYMPgNtMsOkDbAJKixwYA-1
+X-Mimecast-MFC-AGG-ID: FTYMPgNtMsOkDbAJKixwYA
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83b7cce903cso6143839f.2
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 13:33:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730928824; x=1731533624;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3rFuWga3DWj70TxE9k7zWnQDJYpC4sUfbe1+XXpU5Mo=;
+        b=ShCXJdXHo400nkktHvzLtUJYrn8QiuZwX471QiakxIwnwqgQWkg7xTX1MhHesMxUdP
+         A456p3ve3Yb4hUS+m3btnxDmdVr77UOIMLDNOIlBHfc6wVBmNW8Z1XxVURNwelxrxzm8
+         b4fVpW9XDmlDiYP7oqu1hNudUO2aoVilY613Qm9kze7BMB5c0hfBMZ+vysiDyJZiYxEv
+         SpVY50QkqUNUUKqUv0Ii4HU0w4xxMKfG4KAeArer2uQKMGobuD78EoD7tsW9lNRZe7Rp
+         b3KN7v35hMYIQiNHzkYxy887TTqqRqkRekgOH+XjlxTz452F/lEXpywdY3KJo6SVHQi9
+         TBOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKyXNA/VApoNtj8c3tj6EaU2Aw8JVKlDsN/DKL2AQtKkyt60YK78c2N1l5YzU3DiKLTew=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv0NhPoRiTo6yu7q2ujc0TPwIX7tlCMYlP2ici6X3C6V+4u3hM
+	/AMltw7tHUzAd/d6kVpHXo1ZjHqxTAAtrWrTCBDrP/+nxciCiVb7ScvcBfQrc7etJ/qoHZhM7Bc
+	cf9f0qaPKfiVmTskDE0SijZDMR2UUXQwoY+dtyUIrjJNdNk8COA==
+X-Received: by 2002:a05:6e02:218a:b0:3a2:6cd7:3255 with SMTP id e9e14a558f8ab-3a6e84df7d1mr3656925ab.6.1730928824180;
+        Wed, 06 Nov 2024 13:33:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEuT+VT9roBsHPUnIHBvMzoBnoPeaxTloo7Ag+mF34Wwwx3rkMzbNjX101Do2BtnATBTfkrHQ==
+X-Received: by 2002:a05:6e02:218a:b0:3a2:6cd7:3255 with SMTP id e9e14a558f8ab-3a6e84df7d1mr3656805ab.6.1730928823737;
+        Wed, 06 Nov 2024 13:33:43 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a6c6643853sm23973195ab.43.2024.11.06.13.33.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 13:33:43 -0800 (PST)
+Date: Wed, 6 Nov 2024 14:33:41 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+ <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+ <parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
+ <joao.m.martins@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V1 vfio 5/7] vfio/virtio: Add support for the basic live
+ migration functionality
+Message-ID: <20241106143341.1b23936c.alex.williamson@redhat.com>
+In-Reply-To: <eebad7d5-d7c2-4910-872c-c362c246aa78@nvidia.com>
+References: <20241104102131.184193-1-yishaih@nvidia.com>
+	<20241104102131.184193-6-yishaih@nvidia.com>
+	<20241105154746.60e06e75.alex.williamson@redhat.com>
+	<eebad7d5-d7c2-4910-872c-c362c246aa78@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106100343.21593-4-liulongfang@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Longfang,
+On Wed, 6 Nov 2024 12:21:03 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-kernel test robot noticed the following build errors:
+> On 06/11/2024 0:47, Alex Williamson wrote:
+> > On Mon, 4 Nov 2024 12:21:29 +0200
+> > Yishai Hadas <yishaih@nvidia.com> wrote:  
+> >> diff --git a/drivers/vfio/pci/virtio/main.c b/drivers/vfio/pci/virtio/main.c
+> >> index b5d3a8c5bbc9..e2cdf2d48200 100644
+> >> --- a/drivers/vfio/pci/virtio/main.c
+> >> +++ b/drivers/vfio/pci/virtio/main.c  
+> > ...  
+> >> @@ -485,16 +478,66 @@ static bool virtiovf_bar0_exists(struct pci_dev *pdev)
+> >>   	return res->flags;
+> >>   }
+> >>   
+> >> +static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
+> >> +{
+> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(core_vdev,
+> >> +			struct virtiovf_pci_core_device, core_device.vdev);
+> >> +	struct pci_dev *pdev;
+> >> +	bool sup_legacy_io;
+> >> +	bool sup_lm;
+> >> +	int ret;
+> >> +
+> >> +	ret = vfio_pci_core_init_dev(core_vdev);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >> +	pdev = virtvdev->core_device.pdev;
+> >> +	sup_legacy_io = virtio_pci_admin_has_legacy_io(pdev) &&
+> >> +				!virtiovf_bar0_exists(pdev);
+> >> +	sup_lm = virtio_pci_admin_has_dev_parts(pdev);
+> >> +
+> >> +	/*
+> >> +	 * If the device is not capable to this driver functionality, fallback
+> >> +	 * to the default vfio-pci ops
+> >> +	 */
+> >> +	if (!sup_legacy_io && !sup_lm) {
+> >> +		core_vdev->ops = &virtiovf_vfio_pci_ops;
+> >> +		return 0;
+> >> +	}
+> >> +
+> >> +	if (sup_legacy_io) {
+> >> +		ret = virtiovf_read_notify_info(virtvdev);
+> >> +		if (ret)
+> >> +			return ret;
+> >> +
+> >> +		virtvdev->bar0_virtual_buf_size = VIRTIO_PCI_CONFIG_OFF(true) +
+> >> +					virtiovf_get_device_config_size(pdev->device);
+> >> +		BUILD_BUG_ON(!is_power_of_2(virtvdev->bar0_virtual_buf_size));
+> >> +		virtvdev->bar0_virtual_buf = kzalloc(virtvdev->bar0_virtual_buf_size,
+> >> +						     GFP_KERNEL);
+> >> +		if (!virtvdev->bar0_virtual_buf)
+> >> +			return -ENOMEM;
+> >> +		mutex_init(&virtvdev->bar_mutex);
+> >> +	}
+> >> +
+> >> +	if (sup_lm)
+> >> +		virtiovf_set_migratable(virtvdev);
+> >> +
+> >> +	if (sup_lm && !sup_legacy_io)
+> >> +		core_vdev->ops = &virtiovf_vfio_pci_lm_ops;
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >>   static int virtiovf_pci_probe(struct pci_dev *pdev,
+> >>   			      const struct pci_device_id *id)
+> >>   {
+> >> -	const struct vfio_device_ops *ops = &virtiovf_vfio_pci_ops;
+> >>   	struct virtiovf_pci_core_device *virtvdev;
+> >> +	const struct vfio_device_ops *ops;
+> >>   	int ret;
+> >>   
+> >> -	if (pdev->is_virtfn && virtio_pci_admin_has_legacy_io(pdev) &&
+> >> -	    !virtiovf_bar0_exists(pdev))
+> >> -		ops = &virtiovf_vfio_pci_tran_ops;
+> >> +	ops = (pdev->is_virtfn) ? &virtiovf_vfio_pci_tran_lm_ops :
+> >> +				  &virtiovf_vfio_pci_ops;  
+> > 
+> > I can't figure out why we moved the more thorough ops setup to the
+> > .init() callback of the ops themselves.  Clearly we can do the legacy
+> > IO and BAR0 test here and the dev parts test uses the same mechanisms
+> > as the legacy IO test, so it seems we could know sup_legacy_io and
+> > sup_lm here.  I think we can even do virtiovf_set_migratable() here
+> > after virtvdev is allocated below.
+> >   
+> 
+> Setting the 'ops' as part of the probe() seems actually doable, 
+> including calling virtiovf_set_migratable() following the virtiodev 
+> allocation below.
+> 
+> The main issue with that approach will be the init part of the legacy IO 
+> (i.e. virtiovf_init_legacy_io()) as part of virtiovf_pci_init_device().
+> 
+> Assuming that we don't want to repeat calling 
+> virtiovf_support_legacy_io() as part of virtiovf_pci_init_device() to 
+> know whether legacy IO is supported, we can consider calling 
+> virtiovf_init_legacy_io() as part of the probe() as well, which IMO 
+> doesn't look clean as it's actually seems to match the init flow.
+> 
+> Alternatively, we can consider checking inside 
+> virtiovf_pci_init_device() whether the 'ops' actually equals the 'tran' 
+> ones and then call it.
+> 
+> Something like the below.
+> 
+> static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
+> {
+> 	...
+> 
+> #ifdef CONFIG_VIRTIO_PCI_ADMIN_LEGACY
+> 	if (core_vdev->ops == &virtiovf_vfio_pci_tran_lm_ops)
+> 		return virtiovf_init_legacy_io(virtvdev);
+> #endif
+> 
+> 	return 0;
+> }
+> 
+> Do you prefer the above approach rather than current V1 code which has a 
+>   single check as part of virtiovf_init_legacy_io() ?
 
-[auto build test ERROR on awilliam-vfio/next]
-[also build test ERROR on awilliam-vfio/for-linus linus/master v6.12-rc6 next-20241106]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+If ops is properly configured and set-migratable is done in probe,
+then doesn't only the legacy ops .init callback need to init the legacy
+setup?  The non-legacy, migration ops structure would just use
+vfio_pci_core_init_dev.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Longfang-Liu/hisi_acc_vfio_pci-extract-public-functions-for-container_of/20241106-182913
-base:   https://github.com/awilliam/linux-vfio.git next
-patch link:    https://lore.kernel.org/r/20241106100343.21593-4-liulongfang%40huawei.com
-patch subject: [PATCH v13 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon migration driver
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20241107/202411070400.I8XzogJF-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241107/202411070400.I8XzogJF-lkp@intel.com/reproduce)
+> 
+> > I think the API to vfio core also suggests we shouldn't be modifying the
+> > ops pointer after the core device is allocated.  
+> 
+> Any pointer for that ?
+> Do we actually see a problem with replacing the 'ops' as part of the 
+> init flow ?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411070400.I8XzogJF-lkp@intel.com/
+What makes it that way to me is that it's an argument to and set by the
+object constructor.  The ops callbacks should be considered live once
+set.  It's probably safe to do as you've done here because the
+constructor calls the init callback directly, so we don't have any
+races.  However as Jason agreed, it's generally a pattern to avoid and I
+think we can rather easily do so here.  Thanks,
 
-All errors (new ones prefixed by >>):
+Alex
 
-   In file included from drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:9:
-   In file included from include/linux/hisi_acc_qm.h:10:
-   In file included from include/linux/pci.h:1650:
-   In file included from include/linux/dmapool.h:14:
-   In file included from include/linux/scatterlist.h:8:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1400:4: error: too many arguments to function call, expected 2, have 4
-    1397 |         seq_puts(seq,
-         |         ~~~~~~~~
-    1398 |                  "guest driver load: %u\n"
-    1399 |                  "data size: %lu\n",
-    1400 |                  hisi_acc_vdev->vf_qm_state,
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1401 |                  sizeof(struct acc_vf_data));
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/seq_file.h:122:29: note: 'seq_puts' declared here
-     122 | static __always_inline void seq_puts(struct seq_file *m, const char *s)
-         |                             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1429:46: error: too many arguments to function call, expected 2, have 3
-    1429 |         seq_puts(seq, "migrate data length: %lu\n", debug_migf->total_length);
-         |         ~~~~~~~~                                    ^~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/seq_file.h:122:29: note: 'seq_puts' declared here
-     122 | static __always_inline void seq_puts(struct seq_file *m, const char *s)
-         |                             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 warnings and 2 errors generated.
-
-
-vim +1400 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-
-  1364	
-  1365	static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
-  1366	{
-  1367		struct device *vf_dev = seq->private;
-  1368		struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
-  1369		struct vfio_device *vdev = &core_device->vdev;
-  1370		struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
-  1371		size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
-  1372		struct acc_vf_data *vf_data;
-  1373		int ret;
-  1374	
-  1375		mutex_lock(&hisi_acc_vdev->open_mutex);
-  1376		ret = hisi_acc_vf_debug_check(seq, vdev);
-  1377		if (ret) {
-  1378			mutex_unlock(&hisi_acc_vdev->open_mutex);
-  1379			return ret;
-  1380		}
-  1381	
-  1382		mutex_lock(&hisi_acc_vdev->state_mutex);
-  1383		vf_data = kzalloc(sizeof(*vf_data), GFP_KERNEL);
-  1384		if (!vf_data) {
-  1385			ret = -ENOMEM;
-  1386			goto mutex_release;
-  1387		}
-  1388	
-  1389		vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
-  1390		ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
-  1391		if (ret)
-  1392			goto migf_err;
-  1393	
-  1394		seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
-  1395			     (const void *)vf_data, vf_data_sz, false);
-  1396	
-  1397		seq_puts(seq,
-  1398			 "guest driver load: %u\n"
-  1399			 "data size: %lu\n",
-> 1400			 hisi_acc_vdev->vf_qm_state,
-  1401			 sizeof(struct acc_vf_data));
-  1402	
-  1403	migf_err:
-  1404		kfree(vf_data);
-  1405	mutex_release:
-  1406		mutex_unlock(&hisi_acc_vdev->state_mutex);
-  1407		mutex_unlock(&hisi_acc_vdev->open_mutex);
-  1408	
-  1409		return ret;
-  1410	}
-  1411	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
