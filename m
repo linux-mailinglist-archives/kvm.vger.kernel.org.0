@@ -1,289 +1,230 @@
-Return-Path: <kvm+bounces-30886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CAB29BE27A
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 10:27:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69999BE290
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 10:32:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05228281022
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 09:27:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E09661C22E4E
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 09:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378031D95A1;
-	Wed,  6 Nov 2024 09:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C1A1DA10A;
+	Wed,  6 Nov 2024 09:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XuIL0C1U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h88ZiNiH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DD01CF2A6
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 09:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730885220; cv=fail; b=iS8Clg1cP1LH6BygOo0qFR/n3djrV3VxHJuCrzrisDTjhLdHe5P7Zy4W3AhgF1JJubkDHsMOrx7x5S9BlLNw2eceIft2viC0K4NUJjU8SZboPu98OB+vpLXfaMVQoMB6FskNmkBCYVNx4ZYUYvYs1vXWAkD9jtVw0Y25nsViQuk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730885220; c=relaxed/simple;
-	bh=39+S2SGOfe983tarZaA2l1zY9RC37UXteN5wAhBbYnc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=F0c7Lxmx7h/qTecIn40xARco2pCu0R3leJCq6usKN7c0lyf1QaJiFE7ZswrHRSnfbNHh56B6D6cFChQ1NnuDzre/vC3U/MQJ5AqkYT/UVMxTPew4XrrLnpodKJfy/W/QlfHSwQM58W/Zl/lJfnO+qERgbiCyA53b3DI1wAj7MgE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XuIL0C1U; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730885218; x=1762421218;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=39+S2SGOfe983tarZaA2l1zY9RC37UXteN5wAhBbYnc=;
-  b=XuIL0C1UQCiuZVTRBrDfYMTcD/b1XgrztLBsffCj3UObQK9sE82hvb43
-   1QV+XlYYNDcNjbWx1TnytzrwntDuEq7oAODPoLB4+ME9vrQI+p9V7Nvbc
-   OfaTuv57z+ea8SOvkCSpyd0KQT/Fxlqb+1wlD191HzIuCOP8wiYfeGdgy
-   XM1N8htAZy5M2MHQFp2h4sODziyMFm4NVLFyIgvBJmacJOq6GAjFRheZk
-   kPM8eSo71uGy5HDUapDl1HSgmylp2tfb+o5KzmPxv1sLQRFgD9Busaf0f
-   o0cls272p9ryLc+Urws1TEuHn5Gx5rlzrCwW2aahSEfV9E1vRJItAq2KQ
-   w==;
-X-CSE-ConnectionGUID: 1HVfYOKpSBqTe7UXcHso+w==
-X-CSE-MsgGUID: 0yMxymbgTeWpP4hOxNk5vg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="42072856"
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="42072856"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 01:26:57 -0800
-X-CSE-ConnectionGUID: opeaEJyWSragC+t7wiOIGQ==
-X-CSE-MsgGUID: 0VxSTavTT8m1iP8/EAMXMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="84351491"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2024 01:26:57 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 6 Nov 2024 01:26:55 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 6 Nov 2024 01:26:55 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 6 Nov 2024 01:26:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r32kC3rUaJcUKmKluwWGsfNpF7CO9BHher4DKmM7q9vHPgUrg0BuA5hrQ3Uz7I0r66b2t5gJwjxssveNNI8OhNDDrKKKEJBzhSYlC0DLSPuVTWBUjfCmdNbVF6D0/LmiR4bjpx9T3e2O91zTVQrm9tDjCNgmDi2BitX5BzJeLtWeFp0MFJMPXCzncFRSXVtJ1h1UA2whOYJoFqI6oMaqDz2opx5OcydfTbqPxmLt/GhkH4UoXbFkJYpB158q3LmYbeKuQgHTHWnMF/7AHdNcPLHgixkcD/hIMcktHKLmaawBR2EIO439Z9/A9O/nyLWWqYS2cW7WDsropdI2FxhyNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lDMVkQ7fKwfAVeNcRrBG7SFSRWrD5GOp7ovSPDJAAjA=;
- b=KasaMRtj7v96crW3HS6PjaO7JIZfG8oh1Z3RLRGESWUIatqf58kFO2K91cmH9WSxTpCGVHiFys9JImVHm/oL0QPC+ZlO1a163QbIGEWSJjs5Ky6NbN4QgFzsr6uYSEaHEO7Nf6iZKDm1+MQiB74FmAa3Mr+V2Tmj77+wd4EF13ogHXaC4at3jb4xvydXfAcjgYSn2R65qRBXUFBqm8Lvf3Kq9GwBCuJK4OJ4DWNNQSNv6E5dvhes/TVPQwR3iMXwNmL36yMxUOS9g+dmMBJnCVrKJYHxs+fGJq5m0lLB0tHuHzgPjNGBoQNSPzSioyg8IJC5GMixxIqRcALuCWoeLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by SA1PR11MB6824.namprd11.prod.outlook.com (2603:10b6:806:29e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Wed, 6 Nov
- 2024 09:26:52 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8137.018; Wed, 6 Nov 2024
- 09:26:52 +0000
-Message-ID: <d218eb1c-ca02-4975-bd6a-310a81b3d88c@intel.com>
-Date: Wed, 6 Nov 2024 17:31:29 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/13] iommu/vt-d: Add pasid replace helpers
-To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"jgg@nvidia.com" <jgg@nvidia.com>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>
-CC: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
-	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "Duan, Zhenzhong"
-	<zhenzhong.duan@intel.com>, "vasant.hegde@amd.com" <vasant.hegde@amd.com>,
-	"will@kernel.org" <will@kernel.org>
-References: <20241104131842.13303-1-yi.l.liu@intel.com>
- <20241104131842.13303-5-yi.l.liu@intel.com>
- <BN9PR11MB5276B9F6A5D42D30579E05E28C532@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <BN9PR11MB5276B9F6A5D42D30579E05E28C532@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR04CA0152.apcprd04.prod.outlook.com (2603:1096:4::14)
- To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC671D934D
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 09:32:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730885561; cv=none; b=LcVBi+1zpErZ6VtQPjiRhBUTFG5XQ/3IG/L8xHX4PVKMOwEQI1zMBzfW8v+qxiuUhz2LENEU3sJf8E7+UBMK2MxB36thcJvqcE3sc78gxSzyNBBQztShwl8jtURcDkB6dP9RjpYlWmLGnnEsTf4a2pfNMPt+2nopFgvl0lbyhwc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730885561; c=relaxed/simple;
+	bh=zLZtrbOm3tQO4cPR6OaXWHUBAUHtdy+WeL4yJVZKFZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FPtyA7I4rwJYPIVd+MSRx81hMqfKcle7jMng44EPBTrup8jlUBdh1qAe0dav7PE5z+yJZftLsK5btSsjmZtlG3GNXXuIER//8vnjJWb3oT/vzxQM2jDUdjsgmUqtCiQvaN7L3qGeL+mYQoEe26AyDltp+OLgLEY+QhBA1PonMFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h88ZiNiH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730885558;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7YQCOzaaqSacr7sTCquGBzU/j66yk4mLPH1LOn1N3AI=;
+	b=h88ZiNiHJYxu7sojYH4425RK4mfRUTQWa6EaiI7BFYkYk5H+b/N7prW9Cz2NxOdWDVhKfD
+	6RJd8db2uT6OrTxbKVdMJq3helayhn+bcgueHJhaDi56rX/EqS4HKlYxw7sm3gJkMwgoIz
+	NQ8KmGmP4R9drWXb1wZsCk/29LYF1i4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-DB7LPZoqPmCFBkaZt9ysRg-1; Wed, 06 Nov 2024 04:32:37 -0500
+X-MC-Unique: DB7LPZoqPmCFBkaZt9ysRg-1
+X-Mimecast-MFC-AGG-ID: DB7LPZoqPmCFBkaZt9ysRg
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d462b64e3so3379370f8f.3
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 01:32:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730885556; x=1731490356;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7YQCOzaaqSacr7sTCquGBzU/j66yk4mLPH1LOn1N3AI=;
+        b=FPRROhFtH6tHyEobT3o/NLiwJIvDZHwHI9lRvvNwt3vELRs7YyfvXQ75DVLMtrLx/0
+         zxxeNoyZNA/7aYDoe+0kmtAWnqtPlIf7z2hPwFcKyg6TctUQEItjno2o7DHUFOBw7nro
+         gdi1cCWlBZGd/eiRpgdohSITvqgGUe5sF059fUjzt7v7gEEvxjkmQYnWzV4v25dRT08L
+         561836EJiFq02JQKC81DC5hIJEGqWpGydnBJWdNJ6iEDeEyqQ+D0miJAoKqMnbHR3hZ3
+         qeYqCZBbu3Bq8OpOuFMEEUZxMzuuAMoCnLqxGc/LQQXOg2xrV4M/dkL/wAKrSNvKih8v
+         3gGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXaIgj8bp79t1x8tx+mg5Wcb8QEBtvFsucbV15soVZawsmAUXUri+cHtcwH6Z4mq9OYa7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqTQp8OJY7ogfeksO9HFXlRbkj2y3bH2ScKFGqNRUKUHke3l9y
+	YT5O3a71QRhPS8TEkEOSIN2N/OpY/6oz3ZV05KdUd//sx2B/OCOY9iL0lVtOWqtsVmw16hp+kTb
+	QGhxIOzy/Ht/DyMVbEiwNSAtSBadhiGwVzvexSkMHK7IuUrLz6w==
+X-Received: by 2002:a5d:64c5:0:b0:37d:37b2:385d with SMTP id ffacd0b85a97d-381c7a47416mr16606925f8f.12.1730885556274;
+        Wed, 06 Nov 2024 01:32:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGi1IM4BOoEQNw8UW9f+P1oxQf6UCUsiEK4Wx2gCs9qwZs3LuTdRj7XQ0sMEcPYmbuf2blZGA==
+X-Received: by 2002:a5d:64c5:0:b0:37d:37b2:385d with SMTP id ffacd0b85a97d-381c7a47416mr16606899f8f.12.1730885555823;
+        Wed, 06 Nov 2024 01:32:35 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d4983sm18419369f8f.33.2024.11.06.01.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 01:32:35 -0800 (PST)
+Date: Wed, 6 Nov 2024 04:32:31 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: alex.williamson@redhat.com, jasowang@redhat.com, jgg@nvidia.com,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	parav@nvidia.com, feliu@nvidia.com, kevin.tian@intel.com,
+	joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 vfio 0/7] Enhance the vfio-virtio driver to support
+ live migration
+Message-ID: <20241106043151-mutt-send-email-mst@kernel.org>
+References: <20241104102131.184193-1-yishaih@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB6824:EE_
-X-MS-Office365-Filtering-Correlation-Id: 497ce2f0-4da4-42ae-5b78-08dcfe452602
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WXBwaUEvb2VTSEl0bVVJemZ6TG1acFduRXgvbnJaQVRxRHJXZzZJcHlnMld2?=
- =?utf-8?B?ZGdVMFRuQkg5US9xcktocDA2c3NqZmVSelY0Vy9pSTIvR0JSd1d1QXJ4SDhS?=
- =?utf-8?B?T01OdXQ0MkxkZlg2MVdXbDNvOG4veUsrU0VWcW1TS3dUMFVBT3dvV0J3Y2lr?=
- =?utf-8?B?VUJRSjI3THpaWmpMcC95dENqK3I0VUpUODE1cVpWTDVSa0pMRnVsbkl1OGc5?=
- =?utf-8?B?dTlKZUNWTTdYdHgrUTN0ZFFHQ3RxbTFsVVdRNnZ1QUJ5NitwUVdCdnlRL0JM?=
- =?utf-8?B?cHlFWUI0UnpxT2VrN0drYjlEbHNNQVBqQjBMZFAvRjhkRGUxYVJrOHBFV0lz?=
- =?utf-8?B?LzRSVDg2RHRuYVd2RFdWWVFYSStiL3FlV2RwakpiSmxrOHdkOUlrQjlKbkpT?=
- =?utf-8?B?RkR1bzdLbWR4WHZ3UXc1OUNXM0loekRwUkRYMzhMT1N2RUJIdzhHU2pPbVA0?=
- =?utf-8?B?UHVsWnhQeWFJVWl3N1FwdGQxbGptbUFFOW5LR3ZFTXV4bFRIcmlucWpyRmJ6?=
- =?utf-8?B?Q2Niek0weDhHOUNnM1R0V2VxUnViWUxzZlBsRmhmMDhEQ05CN3hKcThZRUxK?=
- =?utf-8?B?bHBoOVlObkZmRWhGSS9LbTVlT0thc1lyMHd2N0xHSmphUkVvWDQ0a1ZxcHpa?=
- =?utf-8?B?QVVmNDdFajd5RXp5bWM5amZKNkNNUEJFYldGYlR2Z3h6RkU3S0FGL1VYQm05?=
- =?utf-8?B?NXRTTmRmM05sOGw3TnNUVk9hc1NtZ1F5QTU5SlN4V3hYZDFMVVVrR0Fjbzli?=
- =?utf-8?B?bEhUNWxzTWY5QXc0eWN5eGw2ejdOSGxoZms5dkdNL295NFZ0Z01vcC92eXhk?=
- =?utf-8?B?Z25FcWNrOHJaRVBvVGZNbFl3Y1RPTjF3anRJRW5yU3F5ZEVNV2QrM05VeVdV?=
- =?utf-8?B?WXpNMUNnYmZoRlozaWtxU3dqQnlVcHZRR0U0UVpPRjZpaHE1bENkcWtvc1lh?=
- =?utf-8?B?QlVSS21LK1Ria2hUaUp1bGJnUTVXUVJVZUhta1NwV1diVzRWMnhqV3ZYektp?=
- =?utf-8?B?VUprbWEzREVxT2hLVDlDcXJsUTExaTQ0aUFibUdLazdXUUNzeXNLWDR2cUo1?=
- =?utf-8?B?QTh2eXplWE52eEFOV1VrSGNCa2QzS1VLdklZMEYrQjJ1ZlJFaEFHcDJJbGd0?=
- =?utf-8?B?YXFMaFZWWml5WW9OcTV6dG5NM3BXOWlKMWs5dmkwU3lqYU9TYjdDWHZ5bkRw?=
- =?utf-8?B?U2ZOM2Rzem9tMy9ZMmtOcE5xL1JCVFZCOCt3cVJOUG1GUkpXUjE1TnY3eGVK?=
- =?utf-8?B?UDgwVUtMUHpNNU5POHR2V3pWaHZ0NG1peng1M0ZLZVExYUFLa0ZOMGNoTWpB?=
- =?utf-8?B?QTdTS0x1MGpTQko5V01jbmtyUTNaTnY5M2hkVzBMcS81bTZmVGlpcXRxdkZF?=
- =?utf-8?B?ZEt0QjMzNWUvUlZ0NDhJS0hJQUpzWFRwRjdxR2JVN25sVDY1bi9lSTJzeXZt?=
- =?utf-8?B?cXRGaGpEZmxxTlI5NEVLLzBsR3NvL0Y5d0labFM3T3MrdjlNVjVTamhid0dT?=
- =?utf-8?B?L3RPY1d5Q3Q2V3pvclJWdW81RjR2eXBNL3ZUeU1HZ1hEZWpTeThCYlBOZ25B?=
- =?utf-8?B?a2VhYWxHSk1iOU51bld0b2NGU0F3UlkxbUpyNzdaQmkxdm9ENmY3Y0o1RFVr?=
- =?utf-8?B?VURLM2ExekxjSGpsU1BxM1hPbFFyOVBBc0FlVWR0Rkcyc2QzMktXd0p3aWRB?=
- =?utf-8?B?TkNSZzFrTUNCR3Q1Z2NIQXJkZEJkakRhZTliYTdaN1NjZHVlR3pUam9TKzB2?=
- =?utf-8?Q?ytFJNNtCCOfeeFc+so=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NGNHR2RVN2IyUndFZTBMczNDNVBzVklua2ZqSE5NSkcwbWZHTURMRVpoUHp1?=
- =?utf-8?B?ZW9nVUFkcTBMdWhScWNrUjIwNE13WWZBVUtFV2MwQWxhcmJtT0Ruak1lRjNr?=
- =?utf-8?B?SWx5Q0lySkJ3dmRjZ0hTdVNPS3dPZjNLWnh3ZkxOTWwyOU5xR2M4NW9aTzV2?=
- =?utf-8?B?VlNyYWlvMEpoVmFieG14Q3pvYUVORmQ2c21tZHFBeWpaN2xsNW9kMkVrS0Ny?=
- =?utf-8?B?ZWQ2WUpwL2pkV3E5S0JUamFsSEtpZ245Y3g0N0tuQXZTYWgzRmFYeU91ZFdG?=
- =?utf-8?B?WlRZcU5NZm5icmNTYVRJa0Q5Yk9RaGxIM1F3Zlk0ekVoRWYwV0Z5ZUpXYjFP?=
- =?utf-8?B?YU1ialZCNmkvV2UrWjZmandtZ291QU1zeitUeTdUUkEvYmVVSGJWb1lXTEs3?=
- =?utf-8?B?Z204TkxwT2tnV2NlVXhnYW13MEJFb0d1YW8ySEJJdWRkRTBrczArOGFNVExJ?=
- =?utf-8?B?cVZWa0ZhbDl4K004elNCcFdMamc1VEUvb0VKb1hxMDdlRW0xM1NXaHFFbDVU?=
- =?utf-8?B?R3VpcHRyVkJHMUxoRGl1Yzhya2NTa1FnT1pqUlp6WHcvUkQvbDhBd2tsR0oy?=
- =?utf-8?B?K2NXS3RhdDdNMS9mZkQ3bEZha1B5QWpVZlBpS0h4SDEzRDZ1WUE0WUthSG9s?=
- =?utf-8?B?U0ZKQmhaOXY5b1AwSDRKTk8rTHpBdG1uTDQ0Z1ljNU9iR0M0c2UxY1dReTdI?=
- =?utf-8?B?cnI2QVRVS01DeDZyQzRrMksvZk5PQ0p0L0w0eDNDVXZDRFp6MGtuN094WEZi?=
- =?utf-8?B?K05oR3VPUnR2bkF4bi9IRS9kTjBMazB3RGg1RDJXZytqbVM3UmMzbHRTQ3BE?=
- =?utf-8?B?Qm9oZTBsMXRzcXhXaVBoeUpnd3NaTllQQUpqM0QycElyOUdndSt6aXdJczgr?=
- =?utf-8?B?SklvN29Oa09HNWNXTDVWekZXbmZSV0lucWJ5WGJBNVhwSkFCdnhJdDNrdE1q?=
- =?utf-8?B?ZUlsdTNQOEVVcWVTc1VueTdDZmN2d0czVkVsT3pxTklnc2pIaVFSZkRhcGxV?=
- =?utf-8?B?TWxrTTBmKzVkK1g0czA0QUVDWnhlYmRNdEE5M3VSS2M3MW9VREdPeFFlY3JX?=
- =?utf-8?B?cW1VdnVXSG1seGViQWZhK3RYOU16b1ZuZGtaTFc2Q2JkdUtJNXdBQmMxQldM?=
- =?utf-8?B?WWtaVk9lZmpqdFgzaE5YUnA2bVk1cGtPcmVXdWNSQVI0aHQvQ2Fwam9SU2kz?=
- =?utf-8?B?OHAxUm1uNzRqb1ptbjZSYXl0VTMyOGlhNWNSQTc3S21SckxybDhRM0ZwWnZl?=
- =?utf-8?B?ckZUNEpJNjdRcEVXOVA4V2xWd2wwVU5Xd2dZbUxEcktJOSsrcVpGdDJLN1Rt?=
- =?utf-8?B?ZDFCVXhnSkJ2cytvRXlLVnZJc2UrQno3alFnUVdOSnZRbm45b25xOW1PanNw?=
- =?utf-8?B?RW9Fd0QrbHJIL0FxcG9xbDRlVUNBUmdtekNxOGVWNDh0RzhBc3UwbVBINk11?=
- =?utf-8?B?U0UvYlY5L2V6TFlWYUNDV2Q0RkxNKzN5WjRodHA4N3J6QjBKc3RPWEVRMTg4?=
- =?utf-8?B?L2R0eVJXRUZ1b0V2TnpBWDIweFl4NFladXY5Y3RnNEhNdXg2M0RzRTBjallm?=
- =?utf-8?B?VDczdm0yK3pWWXVyeFhGYnVKeGtLbFlRYWJWaFJOWUcrOVZIUTE0ZjNuWjBi?=
- =?utf-8?B?NUc2ekdtUG0yeHVPdkRRUDNSRHZWUHFWT21iYzRDOGczYzV3aUgzZ3l4QVl4?=
- =?utf-8?B?bVNSMi92enJrQTJjR21aWGZYYVo0SDhtL1V1WUNaVmFuc3FjbnJRVlNoWGhL?=
- =?utf-8?B?K25jWW5YbDFtUkIwdFNwb2kzazNiRzZiUHdGNC9FZjZFUjgvenRmMUFmWjM1?=
- =?utf-8?B?dmJlYXdheHVjQUZ5OXMrSnVGK0t4bk9KVHI3Z3FWVlRYaGt3RHNVd2ZjaWRD?=
- =?utf-8?B?YzZyWXNzRklFc2c4cm1ScTV4a3YzTzJUYjNVNVE1M3E0VngzazhpZkNVekpW?=
- =?utf-8?B?cE85M1pHN2V5RHhuLzZKTU0wL3BBajNkQ0cwRjRHdjNXQ2ZvaUFDU1ZUcXUz?=
- =?utf-8?B?bTJpS2hVaU80c1RaK2dsTUp0L1hUWm5oTlh3aFpIN3k5R2szM0N0MFNOdXEw?=
- =?utf-8?B?eHRkOW54YlcrdEZ6S01jTktiRGh5UUYxWmg0eE5EN0p2SVNEUFZvU1BjblJN?=
- =?utf-8?Q?TFJ9TUrpUbO8ZxpRKicD0He9h?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 497ce2f0-4da4-42ae-5b78-08dcfe452602
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2024 09:26:52.6716
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W3wxvABG9m53WLM0uohZc+rRLLS8fbckDPpEn/gQ9DS+dAEnUBFhhJhDcBKWrH+QuB1+VVw9eC7xdagOTmOaXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6824
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241104102131.184193-1-yishaih@nvidia.com>
 
-On 2024/11/6 15:31, Tian, Kevin wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Monday, November 4, 2024 9:19 PM
->>
->> pasid replacement allows converting a present pasid entry to be FS, SS,
->> PT or nested, hence add helpers for such operations. This simplifies the
->> callers as well since the caller can switch the pasid to the new domain
->> by one-shot.
+On Mon, Nov 04, 2024 at 12:21:24PM +0200, Yishai Hadas wrote:
+> This series enhances the vfio-virtio driver to support live migration
+> for virtio-net Virtual Functions (VFs) that are migration-capable.
+>  
+> This series follows the Virtio 1.4 specification to implement the
+> necessary device parts commands, enabling a device to participate in the
+> live migration process.
 > 
-> 'simplify' compared to what? if it's an obvious result from creating
-> the helpers then no need to talk about it.
+> The key VFIO features implemented include: VFIO_MIGRATION_STOP_COPY,
+> VFIO_MIGRATION_P2P, VFIO_MIGRATION_PRE_COPY.
+>  
+> The implementation integrates with the VFIO subsystem via vfio_pci_core
+> and incorporates Virtio-specific logic to handle the migration process.
+>  
+> Migration functionality follows the definitions in uapi/vfio.h and uses
+> the Virtio VF-to-PF admin queue command channel for executing the device
+> parts related commands.
 
-agreed, no need to talk about it.
 
->>
->> Suggested-by: Lu Baolu <baolu.lu@linux.intel.com>
->> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
->> ---
->>   drivers/iommu/intel/pasid.c | 173
->> ++++++++++++++++++++++++++++++++++++
->>   drivers/iommu/intel/pasid.h |  12 +++
->>   2 files changed, 185 insertions(+)
->>
->> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
->> index 65fd2fee01b7..b7c2d65b8726 100644
->> --- a/drivers/iommu/intel/pasid.c
->> +++ b/drivers/iommu/intel/pasid.c
->> @@ -390,6 +390,40 @@ int intel_pasid_setup_first_level(struct intel_iommu
->> *iommu,
->>   	return 0;
->>   }
->>
->> +int intel_pasid_replace_first_level(struct intel_iommu *iommu,
->> +				    struct device *dev, pgd_t *pgd,
->> +				    u32 pasid, u16 did, int flags)
->> +{
->> +	struct pasid_entry *pte;
->> +	u16 old_did;
->> +
->> +	if (!ecap_flts(iommu->ecap) ||
->> +	    ((flags & PASID_FLAG_FL5LP) && !cap_fl5lp_support(iommu->cap)))
->> +		return -EINVAL;
+virtio things here:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+Alex, your tree I presume? I hope the virtio changes do not
+cause conflicts.
+
+
+> Patch Overview:
+> The first four patches focus on the Virtio layer and address the
+> following:
+> - Define the layout of the device parts commands required as part of the
+>   migration process.
+> - Provide APIs to enable upper layers (e.g., VFIO, net) to execute the
+>   related device parts commands.
+>  
+> The last three patches focus on the VFIO layer:
+> - Extend the vfio-virtio driver to support live migration for Virtio-net
+>   VFs.
+> - Move legacy I/O operations to a separate file, which is compiled only
+>   when VIRTIO_PCI_ADMIN_LEGACY is configured, ensuring that live
+>   migration depends solely on VIRTIO_PCI.
+>  
+> Additional Notes:
+> - The kernel protocol between the source and target devices includes a
+>   header containing metadata such as record size, tag, and flags.
+>   The record size allows the target to read a complete image from the
+>   source before passing device part data. This follows the Virtio
+>   specification, which mandates that partial device parts are not
+>   supplied. The tag and flags serve as placeholders for future extensions
+>   to the kernel protocol between the source and target, ensuring backward
+>   and forward compatibility.
+>  
+> - Both the source and target comply with the Virtio specification by
+>   using a device part object with a unique ID during the migration
+>   process. As this resource is limited to a maximum of 255, its lifecycle
+>   is confined to periods when live migration is active.
 > 
-> better copy the error messages from the setup part.
+> - According to the Virtio specification, a device has only two states:
+>   RUNNING and STOPPED. Consequently, certain VFIO transitions (e.g.,
+>   RUNNING_P2P->STOP, STOP->RUNNING_P2P) are treated as no-ops. When
+>   transitioning to RUNNING_P2P, the device state is set to STOP and
+>   remains STOPPED until it transitions back from RUNNING_P2P->RUNNING, at
+>   which point it resumes its RUNNING state. During transition to STOP,
+>   the virtio device only stops initiating outgoing requests(e.g. DMA,
+>   MSIx, etc.) but still must accept incoming operations.
 > 
-> there may be further chance to consolidate them later but no clear
-> reason why different error warning schemes should be used
-> between them.
+> - Furthermore, the Virtio specification does not support reading partial
+>   or incremental device contexts. This means that during the PRE_COPY
+>   state, the vfio-virtio driver reads the full device state. This step is
+>   beneficial because it allows the device to send some "initial data"
+>   before moving to the STOP_COPY state, thus reducing downtime by
+>   preparing early and warming-up. As the device state can be changed and
+>   the benefit is highest when the pre copy data closely matches the final
+>   data we read it in a rate limiter mode and reporting no data available
+>   for some time interval after the previous call. With PRE_COPY enabled,
+>   we observed a downtime reduction of approximately 70-75% in various
+>   scenarios compared to when PRE_COPY was disabled, while keeping the
+>   total migration time nearly the same.
 > 
-> same for other helpers.
-
-sure. I think Baolu has a point that this may be trigger-able by userspace
-hence drop the error message to avoid DOS.
-
->> +
->> +	spin_lock(&iommu->lock);
->> +	pte = intel_pasid_get_entry(dev, pasid);
->> +	if (!pte) {
->> +		spin_unlock(&iommu->lock);
->> +		return -ENODEV;
->> +	}
->> +
->> +	if (!pasid_pte_is_present(pte)) {
->> +		spin_unlock(&iommu->lock);
->> +		return -EINVAL;
->> +	}
->> +
->> +	old_did = pasid_get_domain_id(pte);
+> - Support for dirty page tracking during migration will be provided via
+>   the IOMMUFD framework.
+>  
+> - This series has been successfully tested on Virtio-net VF devices.
 > 
-> probably should pass the old domain in and check whether the
-> domain->did is same as the one in the pasid entry and warn otherwise.
+> Changes from V0:
+> https://lore.kernel.org/kvm/20241101102518.1bf2c6e6.alex.williamson@redhat.com/T/
+> 
+> Vfio:
+> Patch #5:
+> - Enhance the commit log to provide a clearer explanation of P2P
+>   behavior over Virtio devices, as discussed on the mailing list.
+> Patch #6:
+> - Implement the rate limiter mechanism as part of the PRE_COPY state,
+>   following Alex’s suggestion.
+> - Update the commit log to include actual data demonstrating the impact of
+>   PRE_COPY, as requested by Alex.
+> Patch #7:
+> - Update the default driver operations (i.e., vfio_device_ops) to use
+>   the live migration set, and expand it to include the legacy I/O
+>   operations if they are compiled and supported.
+> 
+> Yishai
+> 
+> Yishai Hadas (7):
+>   virtio_pci: Introduce device parts access commands
+>   virtio: Extend the admin command to include the result size
+>   virtio: Manage device and driver capabilities via the admin commands
+>   virtio-pci: Introduce APIs to execute device parts admin commands
+>   vfio/virtio: Add support for the basic live migration functionality
+>   vfio/virtio: Add PRE_COPY support for live migration
+>   vfio/virtio: Enable live migration once VIRTIO_PCI was configured
+> 
+>  drivers/vfio/pci/virtio/Kconfig     |    4 +-
+>  drivers/vfio/pci/virtio/Makefile    |    3 +-
+>  drivers/vfio/pci/virtio/common.h    |  127 +++
+>  drivers/vfio/pci/virtio/legacy_io.c |  420 +++++++++
+>  drivers/vfio/pci/virtio/main.c      |  500 ++--------
+>  drivers/vfio/pci/virtio/migrate.c   | 1336 +++++++++++++++++++++++++++
+>  drivers/virtio/virtio_pci_common.h  |   19 +-
+>  drivers/virtio/virtio_pci_modern.c  |  457 ++++++++-
+>  include/linux/virtio.h              |    1 +
+>  include/linux/virtio_pci_admin.h    |   11 +
+>  include/uapi/linux/virtio_pci.h     |  131 +++
+>  11 files changed, 2594 insertions(+), 415 deletions(-)
+>  create mode 100644 drivers/vfio/pci/virtio/common.h
+>  create mode 100644 drivers/vfio/pci/virtio/legacy_io.c
+>  create mode 100644 drivers/vfio/pci/virtio/migrate.c
+> 
+> -- 
+> 2.27.0
 
-this would be a sw bug. :) Do we really want to catch every bug by warn? :)
-
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-
--- 
-Regards,
-Yi Liu
 
