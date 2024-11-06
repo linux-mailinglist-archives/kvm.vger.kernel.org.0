@@ -1,114 +1,151 @@
-Return-Path: <kvm+bounces-30953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD2A9BEF81
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:54:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0C19BEFA2
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 151A71F23871
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D5391C248B8
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE61A201018;
-	Wed,  6 Nov 2024 13:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2BD201029;
+	Wed,  6 Nov 2024 13:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="krTkBLMu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="im+CynPU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFF717DFF2
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 13:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F373200CB4
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 13:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730901263; cv=none; b=G46K49vq3IvkSYEp3wJ3UTM4WVYskTzhk8kKwrGVDgdU2Dr0IanFCPGfnCQ9ETmWlwP6N8/5m82vDp2/aEcpjW/7cMce3mJglwQEaj8nPemx21gVqPGNi1WTA928YEVMnwHZe2/kPDEH+cyBTMF8ZPoB+Ip1Q2j4D4FuSwwpipQ=
+	t=1730901464; cv=none; b=DW6hR6Dmqh4+lrs0L9lBW3gI/2EZAYp2AYdWT+KMqkkfanjcM4MZHN1nd/LZIjDcE1GU/tulQdvEx0HcZ8xzPsdZeI5d2TrZ/2H853aGX3oJhFFqy3Vdo6BpBDCfb5GMgOKiKUlf+zSR4hJAhcGR17tz3fFf568AnzLr4D9TUcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730901263; c=relaxed/simple;
-	bh=JQBIHPmPJN2CvTRqnCyvMz01lP1GgryuaD6L7iVuScA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TnZT9eODYmQRnx3GYn52rr0g5PMKr8joOh6QS0fqcvfB8GfF9vpe8nXghJmporrFNXx9NnOwlxMQy6rspbJQmcKqdUeUcQ45BNaR95wb1gnMfND/r2m+oWVVZxXDWxaad1x5DAoLKxgbDHTvRlvxtLz4t/OrS3lTikl6Rnq6wvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=krTkBLMu; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7ed98536f95so734109a12.1
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 05:54:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730901261; x=1731506061; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J8Jp5664XXxvLT8kd1+cxeFbBOkGmXp2vl44rKC+LTM=;
-        b=krTkBLMu5VD+mVajdNcTuK4by72bU2AaW6UXCjcZ+ZNAVHMakpSzasd6hYTkCVhUYo
-         zumbBsZsddSehEOj3kY07orJt7r6UlK9gsadiKU/Rq4TZig0vWD2tR2NwK++i+dyWq8Z
-         rU6cHZs0v2/DU8dMhmjUG+6pXqFgSKYW/DO3qN//dJ0taLI9hZE9HAGpIp0HAb1+Lwal
-         Jne7CCqKKclzG+D6UVcnTjwZ1kk++rfTA/M4TWWhNM/YJPWuWt6V2rZw9l5VUU7XpEfS
-         RSirZCVLWKLmmxbo3+ihC5VnzVL/2lzKI2C1QSUQX6EKvCp6rMR2qvkoqakD4j7kG97u
-         IT/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730901261; x=1731506061;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J8Jp5664XXxvLT8kd1+cxeFbBOkGmXp2vl44rKC+LTM=;
-        b=arwhzy5xa5amhKeclg/d2QCoSSiSnXmtDPgo+nMq4wlqgnpTTn51SaWvILpSnXKbge
-         GVS3DSq0i32YifK3Tv6jbf5+3EeI3FjmVQMmv/Gmn3HiqZ8wSRd3ycW6ZBSaaDm4gnQ8
-         bJW6HoHXMOJBgJsB31IdM7uIyLB2beOex+ji8O+3Y2o2b8+yIe+tUosBehzjg+TFPf75
-         0KYgaRMMOVcuJcEVwKZxTiyc25BO0BQzB1E7oLxubBhBNr1yhZuwWEWHs7ocDHv8th8u
-         /E5EftHj7smU2L8HK6iF8hLplbkYgbSjQ80Cc+1pQOZRvSEX2czQBmCSEGvT+DzPL68Q
-         shIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVP58uYa7CxRk01Ucm3YtVKg+YcLefumR0/9ttwX4paHImjHkYQ24Qvb6nTOTLKEeppQa0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0bPlUrvEGtPKKlwsTSSkU/uJA+nXV3K0ugpnKSLcCpRY1COXU
-	EYp/osT7KgCZYGv1UpO/hDeVhp165OeKLLN66jo2Vmts7h21fhVFefk9pRQ4WC3r0rKDkGPPrpF
-	ZAg==
-X-Google-Smtp-Source: AGHT+IG0dd6L1RqL0LIJscy8aKUpn6cXn5VoRBJhMyp2MBFEuW/dbIVRXe82qw1RNKHqa1lWIksmKSUAFHo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:1641:0:b0:7ea:8c4c:d07c with SMTP id
- 41be03b00d2f7-7f40585a9cbmr26890a12.3.1730901260830; Wed, 06 Nov 2024
- 05:54:20 -0800 (PST)
-Date: Wed, 6 Nov 2024 05:54:19 -0800
-In-Reply-To: <ZytLLD6wbQgNIHuL@intel.com>
+	s=arc-20240116; t=1730901464; c=relaxed/simple;
+	bh=zwAC45OJhmnmO548e21DRwBu5ZsdXTpXh46ezboPAA0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gUKWfUuHEmfjJEvWlDCjhdpgJDpNrH4AmEbXlSQIk/E8ceCCTMcQS3ndIcRXNgC1COcuWfkdJqQZ//CIHgr2r1nC2UWgdDrhkCeUzSS79CSZtHfl2S/yUGAKok2eIgaCbij1Iy+fOJ/AdL6NjzMS46+h/CEnIPB0hIc+C4tgeIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=im+CynPU; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730901463; x=1762437463;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zwAC45OJhmnmO548e21DRwBu5ZsdXTpXh46ezboPAA0=;
+  b=im+CynPUSOgwsxNBS7TKEXPkuA31BFddoYuNcNDKKzkPQDmCCScyGM6F
+   IFlwldWCWu+M0RbPIQAGK4tNfE893FuxCEtp7h6XBvpDmqYR+Hck+Hoal
+   YxWg7u9+bbbPtkbwrg+5n3sN/Vf/lOOKT+lg0vHsR3otG+vsRcHv4pf0m
+   wrcI+kw6hLaq9NhtYP4jtenJiP+Gey7cUnjG+PDAwJUWD3KoxrzzvHieD
+   99mktK0susjdvHDOv6IERpniBhAAIiyPqPtHTdctulOLHFwB+WIgDSAOP
+   iba+tvXneKuNx4rug4BwZ5/NcAGegZ6CKeZMEC/3YmeEAIyWjH6GYcKyE
+   w==;
+X-CSE-ConnectionGUID: 3QgDdi36ShyjX/02f1JZFA==
+X-CSE-MsgGUID: 8+DkHHswSeudOfFRPza1kw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="30812700"
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="30812700"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 05:57:41 -0800
+X-CSE-ConnectionGUID: 9/wVuzWVSm+bO4Sl9QL7Gw==
+X-CSE-MsgGUID: o/0fKsyyQkKtzT+HyjzVuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="84680014"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 05:57:35 -0800
+Message-ID: <35233d1f-eb6c-4882-abd6-884c1f559e12@intel.com>
+Date: Wed, 6 Nov 2024 21:57:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241101193532.1817004-1-seanjc@google.com> <Zymk_EaHkk7FPqru@google.com>
- <ZytLLD6wbQgNIHuL@intel.com>
-Message-ID: <Zyt1Cw8LT50rMKvf@google.com>
-Subject: Re: [PATCH] KVM: x86: Update irr_pending when setting APIC state with
- APICv disabled
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yong He <zhuangel570@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 45/60] i386/tdx: Don't get/put guest state for TDX VMs
+To: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Ani Sinha <anisinha@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-46-xiaoyao.li@intel.com>
+ <8cd78103-5f49-4cbd-814d-a03a82a59231@redhat.com>
+ <e5d02d7f-a989-4484-b0c1-3d7ac804ec73@intel.com>
+ <a90e29a6-0e07-46a3-8dfc-658e02af9856@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <a90e29a6-0e07-46a3-8dfc-658e02af9856@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 06, 2024, Chao Gao wrote:
-> >Furthermore, in addition to introducing this issue, commit 755c2bf87860 also
-> >papered over the underlying bug: KVM doesn't ensure CPUs and devices see APICv
-> >as disabled prior to searching the IRR.  Waiting until KVM emulates EOI to update
-> >irr_pending works because KVM won't emulate EOI until after refresh_apicv_exec_ctrl(),
-> >and because there are plenty of memory barries in between, but leaving irr_pending
-> >set is basically hacking around bad ordering, which I _think_ can be fixed by:
-> >
-> >diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> >index 83fe0a78146f..85d330b56c7e 100644
-> >--- a/arch/x86/kvm/x86.c
-> >+++ b/arch/x86/kvm/x86.c
-> >@@ -10548,8 +10548,8 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-> >                goto out;
-> > 
-> >        apic->apicv_active = activate;
-> >-       kvm_apic_update_apicv(vcpu);
-> >        kvm_x86_call(refresh_apicv_exec_ctrl)(vcpu);
-> >+       kvm_apic_update_apicv(vcpu);
+On 11/5/2024 10:23 PM, Paolo Bonzini wrote:
+> On 11/5/24 12:25, Xiaoyao Li wrote:
+>> On 11/5/2024 5:55 PM, Paolo Bonzini wrote:
+>>> On 11/5/24 07:23, Xiaoyao Li wrote:
+>>>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>>
+>>>> Don't get/put state of TDX VMs since accessing/mutating guest state of
+>>>> production TDs is not supported.
+>>>>
+>>>> Note, it will be allowed for a debug TD. Corresponding support will be
+>>>> introduced when debug TD support is implemented in the future.
+>>>>
+>>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+>>>
+>>> This should be unnecessary now that QEMU has 
+>>> kvm_mark_guest_state_protected().
+>>
+>> Reverting this patch, we get:
+>>
+>> tdx: tdx: error: failed to set MSR 0x174 to 0x0
+>> tdx: ../../../go/src/tdx/tdx-qemu/target/i386/kvm/kvm.c:3859: 
+>> kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+>> error: failed to set MSR 0x174 to 0x0
+>> tdx: ../../../go/src/tdx/tdx-qemu/target/i386/kvm/kvm.c:3859: 
+>> kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> Difficult to "debug" without even a backtrace, but you might be calling 
+> kvm_mark_guest_state_protected() too late.  For SNP, the entry values of 
+> the registers are customizable, for TDX they're not.  So for TDX I think 
+> it should be called even before realize completes, whereas SNP only 
+> calls it on the first transition to RUNNING.
+
+TDX calls kvm_mark_guest_state_protected() very early in
+   kvm_arch_init() -> tdx_kvm_init()
+
+I find the call site. It's caused by kvm_arch_put_register() called in 
+kvm_cpu_exec() because cpu->vcpu_dirty is set to true in kvm_create_vcpu().
+
+Maybe we can do something like below?
+
+8<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -457,7 +457,9 @@ int kvm_create_vcpu(CPUState *cpu)
+
+      cpu->kvm_fd = kvm_fd;
+      cpu->kvm_state = s;
+-    cpu->vcpu_dirty = true;
++    if (!s->guest_state_protected) {
++        cpu->vcpu_dirty = true;
++    }
+      cpu->dirty_pages = 0;
+      cpu->throttle_us_per_full = 0;
+
+> Paolo
 > 
-> I may miss something important. how does this change ensure CPUs and devices see
-> APICv as disabled (thus won't manipulate the vCPU's IRR)? Other CPUs when
-> performing IPI virtualization just looks up the PID_table while IOMMU looks up
-> the IRTE table. ->refresh_apicv_exec_ctrl() doesn't change any of them.
 
-For Intel, which is a bug (one of many in this area).  AMD does update both.  The
-failure Maxim was addressing was on AMD (AVIC), which has many more scenarios where
-it needs to be inhibited/disabled.
 
