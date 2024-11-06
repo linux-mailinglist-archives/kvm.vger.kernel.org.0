@@ -1,100 +1,119 @@
-Return-Path: <kvm+bounces-31001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1CA9BF334
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:28:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B449BF344
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C2B281E6B
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:28:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C701C22213
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A48C205143;
-	Wed,  6 Nov 2024 16:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F8D204F77;
+	Wed,  6 Nov 2024 16:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yeiDOyOs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JscTBjRW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6350E204086
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D33C18C006
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730910470; cv=none; b=B996elhHx1UJ+BJwd++KaiJ2wT0mU2gEWsHIG2k1nPeP6pg9UR4CD3n6HvJ+RJVzeOQsdKH2VJnqJx0MUj+MOzNZkpumS1uilWKiWmAatClQcWfHBy7oThoHLJn3QxxSevRTNK6Fh7V2zjkETnSeCGx/bYVUg+Ox7DlN3AxNQPc=
+	t=1730910743; cv=none; b=epOsnypi0XfU7Go7/uqx1EIym4ILU7LFiL1yMQ/h88f4OxKI9iHG3q5aAEL5tz+VQKQpJ8au5YW57xNyA6m8jkC0/j7uAoHzJsRMV9BoYRu5I/QqRooHC97HWR0VnGCq9M/ebCld14VrVJOFla6bVde0hh0vKHHg0Ua0gbY53Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730910470; c=relaxed/simple;
-	bh=ph8WgCziHmWfyswsDBnx5qg6csF9c5Z6bkRrBHlPhds=;
+	s=arc-20240116; t=1730910743; c=relaxed/simple;
+	bh=nSd24sVQRoAp1t1XZEnlfr+xfgk2O456H2Wp8H2P1nw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rTQwQMDJlsZr0ibFWSexacMp0yYCpdE4BcOjeIeLMw90MIR9o/9q1P5tEn0FbkOR8JB2BIYKUtfQGfsCiw6vLzZBW/dEQhqLZIFcHsr/xFbXI6Pr5RwM6MT7Zwssf7DnPSXJ0G24JP1WNXfbRb3emJFnPVICoZYwKK1PSvmMML4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yeiDOyOs; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=uOUoaEh2aF9hUCCtP/8IdE8B/hofM7opzdCv2CCtAFvTxnqBfaqypnbgeft6O0VzkOOTbRPU5HhvwfQyrii59HrR6s1DyyKOXBN4uE5kNe1FlQRZ2J6WE1aFcB+pXoahi5hobfbk+nKanuVEkzLOBKyKqV5VvVJ7edrjQDyTl2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JscTBjRW; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7ea0069a8b0so29575a12.0
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:27:49 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ea8a5e862eso579067b3.0
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:32:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730910469; x=1731515269; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730910741; x=1731515541; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FCXUf644XlkJphA6SVk+8Af9SxQm8DuQmfcSkYLayzs=;
-        b=yeiDOyOs/fY4CnfqJW/K33m2cWdqxFCjYyVgWvNMl0Omo9Q45D1uvrVNdpfqZiE8uY
-         jhWulJNAcfZNi4p+XEi3/MFO1gfJezFOVf4UpwjLlOgc0DlGtuSAyY4rRjB4fNdlZC29
-         KOmUTjpxfxnFcR9rvoxK9Pwqd2NECLdr2Qgb/+QF2u4tevMS7EXjm9iwwl3CHze+omz6
-         Ie/2FACHH6CUk3WDddUbrXZzXPXvz0EbHl7a9KglaJeKTU0jGbKJEbETcAFssmly4iJD
-         8k7fA0SxH3jXiXEvguj/kqEtrBjUuWBBrsyqFtL2dD79DEJVDh6+UJC4hxB0pIDaJbw2
-         RCEQ==
+        bh=qbY6DKBNE1QQfrptJr4NxQ9zPHPnsHZbV4Pcue/bRDM=;
+        b=JscTBjRWbsnkmZMNBYhHZxNS7LieviJgdLlZtDvtklsWpWF8waRK00EaIoiY44VroH
+         51loxkKLEtcHrKDZrB+Gs1uPoKXaM1sZRf56a6HIAMQKt30taz/KGJ37DkjlBgtvQK9e
+         eQR+UM9FUsjUrhoEoMCI9ruynh7LEIYltJbT4BsVYPeyB7G49klvH18y4ZOagZJCad63
+         hK9ZHyiW7USXYwkgTZv6DYr424rRgSVzpau3O+yAFf+gTZV/92eqVh583+IDpyfdSqo4
+         AtNCAL3mbMsPJR+8mS/pr3Ur90gRj5UiGhzKGLvxttTi+GFtczPKvT3cw7ytwOmIHljS
+         yEOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730910469; x=1731515269;
+        d=1e100.net; s=20230601; t=1730910741; x=1731515541;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FCXUf644XlkJphA6SVk+8Af9SxQm8DuQmfcSkYLayzs=;
-        b=w0rMv39Nhup3VFYtCJloaEmkPHGwB9MYb7L37JNo5LrYdoa0ZW+B801Dij+BnJG+Rc
-         9Dqu+DFJvDbDW+0VUHOD2E/sQ5ufz7GHdrL/VHydgQ7oIlgTw0+DdqepwYrQxV8hbAbn
-         2HEAzjFOcmpAy1xgOEenIVvN3ZI0mSb5JPaCbd4kZsRvHKMQ47TJ3WsYpGMBtNAN3thX
-         1vZVNL7aUol1wMtQ5PCPhg6PEvY2HamRT5ZvV/4Jcr5M0Jp3wymAhO+mS8lGfWBsr9HG
-         ffsX35K2UdD2zES5kVc1A4DiyO72rsn0u7MvX2ntaWHKeSLvKi7IfXc40ljeHjbdmDuv
-         +oBA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJXTaurEYXv+X1GiaEWoZmK8mFcuZNEHHTEdUU+VJGmbEpHYQ2AfQ4s18G40dkovLKa6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5mmUChVuKmFIYNt7XGP1CVdS70pnnYVNo2u8VTB3iVPKAsvwU
-	FoSzpwj2a92svBdr0U0cseE/Ipj9TOQdQbvFk/DtWki15Pm3bdkutG8X6/Ns+sn3dQQZj8y57s1
-	u2w==
-X-Google-Smtp-Source: AGHT+IG3df/kZk2fCqxxe+LGQm+PfVIDi52PzJ3ZNYNOJoCeWKyXHryfz8LDsbPSuUIbUhymUD1+KWX23yo=
+        bh=qbY6DKBNE1QQfrptJr4NxQ9zPHPnsHZbV4Pcue/bRDM=;
+        b=NG/dN+kyGUV/8jgQI7H+XL6jf6gi6l+K4valxx7OZWsP8n97WjoAsxvuKDJIsBRU7h
+         G693GOEU6GGAQYP4DwHwj7c54KjZ8U10a2jU3TCYHuAuiTqUaDEszs+L8R0UlylElgLB
+         cqz2/BwzX6bwDS8lKHpW0iF37DuJQSvshTD/HdMLbY1eAnKJQsAB9lkOxljD8t7IbG12
+         oz2q3fHpH7Xjyzl/rgjZZYzy+VHZGa3T0OMrK6RUn+g1Wt62GIhIUORFb5vkWLbrfT7B
+         5Nf1O+EdCuw3+LnPDN/MCai1EBmy3lfuajtwA7v8vckx5YSDJYXWimfbd8x7SbwBJAQP
+         AfEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcy9TNxKLKZSjeSl8mhnoxTXDsp/bLMBsDzUBRDVFnvtmBmYRS6ajO5P27S1aTOnM7QqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjiWdHQRLB0PhOpKmSJePiDPIXZgZZZPgzCvb/N5b5JpTSppJ8
+	+J+RwHJWZxP5rYF70o+mzLIHg+sMANGILkkzFYE6McCse6H3es6p/mXnXQd2wf+wkm5kBCjuzHY
+	cfg==
+X-Google-Smtp-Source: AGHT+IFRjqQNM953xMuFIWpGheosTFQ4blOhXMTFf4OB6HIR2lAkuX9eFWWNIVkf9x2I18xzmZhDojhoW+Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:1a0e:0:b0:7e6:b3ab:697 with SMTP id
- 41be03b00d2f7-7ee2908a4e4mr46438a12.5.1730910468750; Wed, 06 Nov 2024
- 08:27:48 -0800 (PST)
-Date: Wed, 6 Nov 2024 08:27:47 -0800
-In-Reply-To: <20241106162525.GHZyuYdWswAoGAUEUM@fat_crate.local>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6305:b0:6ea:4b3a:6703 with SMTP id
+ 00721157ae682-6eabeee1708mr857197b3.5.1730910741352; Wed, 06 Nov 2024
+ 08:32:21 -0800 (PST)
+Date: Wed, 6 Nov 2024 08:32:19 -0800
+In-Reply-To: <00a94b5e31fba738b0ad7f35859d8e7b8dceada7.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <ZypfjFjk5XVL-Grv@google.com> <20241105185622.GEZypqVul2vRh6yDys@fat_crate.local>
- <ZypvePo2M0ZvC4RF@google.com> <20241105192436.GFZypw9DqdNIObaWn5@fat_crate.local>
- <ZyuJQlZqLS6K8zN2@google.com> <20241106152914.GFZyuLSvhKDCRWOeHa@fat_crate.local>
- <ZyuMsz5p26h_XbRR@google.com> <20241106161323.GGZyuVo2Vwg8CCIpxR@fat_crate.local>
- <ZyuWoiUf2ghGvj7s@google.com> <20241106162525.GHZyuYdWswAoGAUEUM@fat_crate.local>
-Message-ID: <ZyuZAzqQIXudhbxi@google.com>
-Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
+References: <20240219074733.122080-1-weijiang.yang@intel.com>
+ <ZjLP8jLWGOWnNnau@google.com> <0d8141b7-804c-40e4-b9f8-ac0ebc0a84cb@intel.com>
+ <838cbb8b21fddf14665376360df4b858ec0e6eaf.camel@intel.com>
+ <8e9f8613-7d3a-4628-9b77-b6ad226b0872@intel.com> <00a94b5e31fba738b0ad7f35859d8e7b8dceada7.camel@intel.com>
+Message-ID: <ZyuaE9ye3J56foBf@google.com>
+Subject: Re: [PATCH v10 00/27] Enable CET Virtualization
 From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, kvm@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Weijiang Yang <weijiang.yang@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Dave Hansen <dave.hansen@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com" <john.allen@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 06, 2024, Borislav Petkov wrote:
-> On Wed, Nov 06, 2024 at 08:17:38AM -0800, Sean Christopherson wrote:
-> > I do subscribe to kvm@, but it's a mailing list, not at alias like x86@.  AFAIK,
-> > x86@ is unique in that regard.  In other words, I don't see a need to document
-> > the kvm@ behavior, because that's the behavior for every L: entry in MAINTAINERS
-> > except the few "L:	x86@kernel.org" cases.
+On Wed, Nov 06, 2024, Rick P Edgecombe wrote:
+> On Wed, 2024-11-06 at 09:45 +0800, Yang, Weijiang wrote:
+> > > > Appreciated for your review and comments!
+> > > It looks like this series is very close. Since this v10, there was some
+> > > discussion on the FPU part that seemed settled:
+> > > https://lore.kernel.org/lkml/1c2fd06e-2e97-4724-80ab-8695aa4334e7@intel.com/
+> > 
+> > Hi, Rick,
+> > I have an internal branch to hold a v11 candidate for this series, which
+> > resolved Sean's comments
+> > for this v10, waiting for someone to take over and continue the upstream work.
+> > 
+> > > 
+> > > Then there was also some discussion on the synthetic MSR solution, which
+> > > seemed
+> > > prescriptive enough:
+> > > https://lore.kernel.org/kvm/20240509075423.156858-1-weijiang.yang@intel.com/
+> > > 
+> > > Weijiang, had you started a v2 on the synthetic MSR series? Where did you
+> > > get to
+> > > on incorporating the other small v10 feedback?
+> > 
+> > Yes, Sean's review feedback for v1 is also included in my above v11 candidate.
 > 
-> I have had maintainers in the past not like to be CCed directly as long as the
-> corresponding mailing list is CCed.
+> Nice, sounds like another version (which could be the last) is basically ready
+> to go. Please let me know if it gets stuck for lack of someone to take it over.
 
-LOL, doesn't that kind of defeat the purpose of MAINTAINERS?
+Or me, if Intel can't conjure up the resource.  I have spent way, way too much
+time and effort on CET virtualization to let it die on the vine :-)
 
