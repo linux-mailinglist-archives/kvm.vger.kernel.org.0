@@ -1,205 +1,154 @@
-Return-Path: <kvm+bounces-30993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CF19BF27E
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:04:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 717159BF2EF
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ADD1B20B93
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:04:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DB91F22581
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E513D206045;
-	Wed,  6 Nov 2024 16:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360F720493C;
+	Wed,  6 Nov 2024 16:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NKC//QNW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KNbfNSoC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D366F204028;
-	Wed,  6 Nov 2024 16:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF1E2038A1
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730909001; cv=none; b=IxfyfprJ1sHeCHEz3J2bVHNQZ2nnFRZG07pcynG103IpwbBO6aO4pBhno6wCTVw0aWj9IvfGil9dvGjZqaNcMPN+Hvue57TIp0jyEEmwFM+DA423yp2fYn5jfc/Lm2932Cm5tMrv3JKHfQxIGHYmirfF9pcKdt6meicN9Z4UetM=
+	t=1730909563; cv=none; b=HVooKOL42jQM392eySiySIgTFv1T6ZzztoALThqlAeZkszQvIbpV4/+PQKUamr2Z3w+64PC7TSAe75Syc+PP/Vx2Fpql6FX4dxNVciaHKPauW371IIDinIAjEdViSayVdf+zQ0WCJp3ESPeEGnYKN6o6bBZBUQ6Yxvx4w4qIC+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730909001; c=relaxed/simple;
-	bh=eeEXuIJ2vlczIF22PZRVZhnTIMIbHqdB4rwbCI1c/Sg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ioHxjZvG2b/rKl6i/a9S1Pg1BDRxa0z/4iLF/c/FJbM0VqV0EHMGsIS4X9gifo/pSYDnIP7wsKPjBNBS7wDV6lgPJzDoUdiMPaDa/1gTKI1ISVPvBY142jZaCISZLGzbvfs2TEc3tP0Tk1bhI7CVZBvXTaA+mIY6rE8lrgENED4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NKC//QNW; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730908999; x=1762444999;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eeEXuIJ2vlczIF22PZRVZhnTIMIbHqdB4rwbCI1c/Sg=;
-  b=NKC//QNWBYXoeHvZEqxuSnuxCT8KPuPef2vRSskVLfPrVkXKORdjfijW
-   PT7V0JcFNbWVVXXhZwlVA794AgC694G7LGkNkSz2IbCO1hDExl+sq3xG7
-   /fRkRkG5ju89ymQYYguwuEomHa1v/GjWw8MjjK28lvNUNJOBNDv7AcMWZ
-   yxw0QRmo+0ToBCzstBTRpq6oTMdqgIVJr7/PZ8W2ga3++bO5+X8dG+MrF
-   K1YcUPu0accPxz4YTPXOifFZJSr29oIB8TOZSmE/1ttypxAeeUppdpFAP
-   F5DBWDDDNkKxnuwtnTrUfyig6yjxQPRNXpi7UcMAHMhIUtz0PiPYhRudm
-   w==;
-X-CSE-ConnectionGUID: Nh3lJl2hQrih+hUTaZUwAg==
-X-CSE-MsgGUID: kfGnJJAiTmm8xeWlk7XzkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48176917"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="48176917"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 08:03:17 -0800
-X-CSE-ConnectionGUID: a5M3gJ+/QYaSWgS/qH6ALg==
-X-CSE-MsgGUID: phJVPBFJQuabQWlVho3xvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="84715253"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 08:03:17 -0800
-Received: from [10.212.82.230] (kliang2-mobl1.ccr.corp.intel.com [10.212.82.230])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 2C51820B5703;
-	Wed,  6 Nov 2024 08:03:12 -0800 (PST)
-Message-ID: <65675ed8-e569-47f8-b1eb-40c853751bfb@linux.intel.com>
-Date: Wed, 6 Nov 2024 11:03:10 -0500
+	s=arc-20240116; t=1730909563; c=relaxed/simple;
+	bh=QHlKEhY/AIIUdJMFadNDpFCHHpgPYS9bjBlO3hMTQYg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LMpSoVJjWyvAnwckBa6V+2a67MTMknyqC35KhyBVR3XdgDCcZIP8S3Y4j8WwXWz/E945m8KZxVEGxyj2Y+EIlH2DOpOHzZZmjBKLU0AwPA0YEp2ShZUuYVzFqVdqPID+wPO4I0OlnwsuIfZUyUYdYUAQTzJJ+gZGPgqUL7wzl2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KNbfNSoC; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e30b8fd4ca1so11210302276.3
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:12:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730909561; x=1731514361; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NdMD5BosN2RfbHLWrwz8uCn9Mhxge705v2wH/rUtjSM=;
+        b=KNbfNSoCz+8v5zjHLxzThsQgMdRr2bB0Gvty5n4HgxREQUNNlvPq253P8Gare0GeRa
+         5EdYOskda8iT8nSOA0oFs26M5uuo1vah4x44GRf9bDA94tHID/+uv6sXuxI+nygRgg3x
+         J9EmkX94r6Xvf4HR3SK85o0+bigKozMBYP0Oh2ptPmJah7GiPVQzN+bYol3ehQfQbdqK
+         vjyJi4kiocZgjIsfaOxYen+yOZuJJU4WIYW8zHU8+cw9BRNq8+K+2obiAeom3ezxlDk7
+         msItvpX2jkGEJiVC0m9Dr5gj9aio1cy2MFE0cx9Z38UiyCKv2ewgomhS8mjtLpE3AJbk
+         sNcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730909561; x=1731514361;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NdMD5BosN2RfbHLWrwz8uCn9Mhxge705v2wH/rUtjSM=;
+        b=Ae0saWr+whvW6nQbW+vriZpYt+TvmfQE/FkFlt0RsfBYwS9Fk8somF4nWmwpyPWfh/
+         sjlUD3SNjRx5di32bKQCEl4xZRcOyzHqrCAXHNV/tESz0v6rQZPUVfizzBd0XYfQ7iTk
+         GXoAtPJEEkXMi80kPDPR5c30Qc1esy/gphRMYL1OhSF5bj9NIE/ItoD4HXVm361x7RmM
+         2Y7cL1CE1V4ATyHsfPJiEll18HbMpVi+2ePdNQ0SFlrOO1kNJX79QUI+xXVVZ36DgPG5
+         EbsU9v+dci4TciTZwaOTRAmzon3kdKaGp1wSq2dmxGsFBOTihlhGYzN/RYtsszfBkUst
+         EHEw==
+X-Gm-Message-State: AOJu0Ywcfqml1H81XeYxddzT1zHO7mVpRnnd6vKVOz0he2laanQnDSIc
+	N/qJTWlwWGmkj4jZ9LT5EtEMwdMm4JOtmHp18e2/lE+GVRjrY4WpoMoEsAu6Tih9LcFHFIYsVdR
+	epQ==
+X-Google-Smtp-Source: AGHT+IFeE3a1gJ6+WLFgBQh9esgy9tnUuYeur36tttYGKm/72J+XCTEWa6Yc3oe1D9Q+GM9+45nD0LS+SK0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:181e:b0:e28:fdfc:b788 with SMTP id
+ 3f1490d57ef6-e30cf4d455bmr19596276.9.1730909560885; Wed, 06 Nov 2024 08:12:40
+ -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  6 Nov 2024 08:04:25 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/5] x86: perf: Refactor misc flag assignments
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Will Deacon <will@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org
-References: <20241105195603.2317483-1-coltonlewis@google.com>
- <20241105195603.2317483-5-coltonlewis@google.com>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20241105195603.2317483-5-coltonlewis@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
+Message-ID: <20241106160425.2622481-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86 and selftests fixes for 6.12-rcN
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Please pull several fixes for 6.12, and to save us both effort, please also
+apply several fixes that should probably go into 6.12 (the selftest fix
+definitely needs to land in 6.12).
 
+  https://lore.kernel.org/all/20241106034031.503291-1-jsperbeck@google.com
+  https://lore.kernel.org/all/20241105010558.1266699-2-dionnaglaze@google.com
+  https://lore.kernel.org/all/20241106015135.2462147-1-seanjc@google.com
 
-On 2024-11-05 2:56 p.m., Colton Lewis wrote:
-> Break the assignment logic for misc flags into their own respective
-> functions to reduce the complexity of the nested logic.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/x86/events/core.c            | 31 +++++++++++++++++++++++--------
->  arch/x86/include/asm/perf_event.h |  2 ++
->  2 files changed, 25 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index d19e939f3998..24910c625e3d 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -3011,16 +3011,34 @@ unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  	return regs->ip + code_segment_base(regs);
->  }
->  
-> +static unsigned long common_misc_flags(struct pt_regs *regs)
-> +{
-> +	if (regs->flags & PERF_EFLAGS_EXACT)
-> +		return PERF_RECORD_MISC_EXACT_IP;
-> +
-> +	return 0;
-> +}
-> +
-> +unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-> +{
-> +	unsigned long guest_state = perf_guest_state();
-> +	unsigned long flags = common_misc_flags(regs);
-> +
-> +	if (guest_state & PERF_GUEST_USER)
-> +		flags |= PERF_RECORD_MISC_GUEST_USER;
-> +	else if (guest_state & PERF_GUEST_ACTIVE)
-> +		flags |= PERF_RECORD_MISC_GUEST_KERNEL;
-> +
+And while I have your attention, I'd also like your input on a proposed "fix"
+for Intel PT virtualization, which is probably belongs in 6.12 too, if you
+agree with the direction. 
 
-The logic of setting the GUEST_KERNEL flag is implicitly changed here.
+  https://lore.kernel.org/all/20241101185031.1799556-2-seanjc@google.com
 
-For the current code, the GUEST_KERNEL flag is set for !PERF_GUEST_USER,
-which include both guest_in_kernel and guest_in_NMI.
+Note, this is based on v6.12-rc5 in order to pull in the necessary base for
+the -march=x86-64-v2 fix.
 
-With the above change, the GUEST_KERNEL flag should be only set for the
-guest_in_kernel case.
-IIUC, this is the series's target, right?
+The following changes since commit 81983758430957d9a5cb3333fe324fd70cf63e7e:
 
-If so, could you please move the explanation into this patch?
-For x86, the behavior has already been changed since this patch.
+  Linux 6.12-rc5 (2024-10-27 12:52:02 -1000)
 
-Thanks,
-Kan
+are available in the Git repository at:
 
-> +	return flags;
-> +}
-> +
->  unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	unsigned int guest_state = perf_guest_state();
-> -	int misc = 0;
-> +	unsigned long misc = common_misc_flags(regs);
->  
->  	if (guest_state) {
-> -		if (guest_state & PERF_GUEST_USER)
-> -			misc |= PERF_RECORD_MISC_GUEST_USER;
-> -		else
-> -			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
-> +		misc |= perf_arch_guest_misc_flags(regs);
->  	} else {
->  		if (user_mode(regs))
->  			misc |= PERF_RECORD_MISC_USER;
-> @@ -3028,9 +3046,6 @@ unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  			misc |= PERF_RECORD_MISC_KERNEL;
->  	}
->  
-> -	if (regs->flags & PERF_EFLAGS_EXACT)
-> -		misc |= PERF_RECORD_MISC_EXACT_IP;
-> -
->  	return misc;
->  }
->  
-> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-> index feb87bf3d2e9..d95f902acc52 100644
-> --- a/arch/x86/include/asm/perf_event.h
-> +++ b/arch/x86/include/asm/perf_event.h
-> @@ -538,7 +538,9 @@ struct x86_perf_regs {
->  
->  extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
->  extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> +extern unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs);
->  #define perf_arch_misc_flags(regs)	perf_arch_misc_flags(regs)
-> +#define perf_arch_guest_misc_flags(regs)	perf_arch_guest_misc_flags(regs)
->  
->  #include <asm/stacktrace.h>
->  
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.12-rcN
 
+for you to fetch changes up to e5d253c60e9627a22940e00a05a6115d722f07ed:
+
+  KVM: SVM: Propagate error from snp_guest_req_init() to userspace (2024-11-04 22:03:04 -0800)
+
+----------------------------------------------------------------
+KVM x86 and selftests fixes for 6.12:
+
+ - Increase the timeout for the memslot performance selftest to avoid false
+   failures on arm64 and nested x86 platforms.
+
+ - Fix a goof in the guest_memfd selftest where a for-loop initialized a
+   bit mask to zero instead of BIT(0).
+
+ - Disable strict aliasing when building KVM selftests to prevent the
+   compiler from treating things like "u64 *" to "uint64_t *" cases as
+   undefined behavior, which can lead to nasty, hard to debug failures.
+
+ - Force -march=x86-64-v2 for KVM x86 selftests if and only if the uarch
+   is supported by the compiler.
+
+ - When emulating a guest TLB flush for a nested guest, flush vpid01, not
+   vpid02, if L2 is active but VPID is disabled in vmcs12, i.e. if L2 and
+   L1 are sharing VPID '0' (from L1's perspective).
+
+ - Fix a bug in the SNP initialization flow where KVM would return '0' to
+   userspace instead of -errno on failure.
+
+----------------------------------------------------------------
+Maxim Levitsky (1):
+      KVM: selftests: memslot_perf_test: increase guest sync timeout
+
+Patrick Roy (1):
+      KVM: selftests: fix unintentional noop test in guest_memfd_test.c
+
+Sean Christopherson (4):
+      KVM: selftests: Disable strict aliasing
+      KVM: selftests: Don't force -march=x86-64-v2 if it's unsupported
+      KVM: nVMX: Treat vpid01 as current if L2 is active, but with VPID disabled
+      KVM: SVM: Propagate error from snp_guest_req_init() to userspace
+
+ arch/x86/kvm/svm/sev.c                          |  7 ++++--
+ arch/x86/kvm/vmx/nested.c                       | 30 ++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c                          |  2 +-
+ tools/testing/selftests/kvm/Makefile            | 10 +++++----
+ tools/testing/selftests/kvm/guest_memfd_test.c  |  2 +-
+ tools/testing/selftests/kvm/memslot_perf_test.c |  2 +-
+ 6 files changed, 39 insertions(+), 14 deletions(-)
 
