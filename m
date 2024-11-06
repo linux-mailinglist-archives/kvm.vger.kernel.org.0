@@ -1,122 +1,119 @@
-Return-Path: <kvm+bounces-30872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB9D9BE12B
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 09:39:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA4C9BE12C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 09:39:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF999B227B9
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 08:39:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5BDA1F241DC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 08:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE667FBAC;
-	Wed,  6 Nov 2024 08:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8AC1D54D1;
+	Wed,  6 Nov 2024 08:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dINt2q7A"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sYAxvGel"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117AD199243
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 08:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0017D3F4
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 08:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730882357; cv=none; b=k/A5fAow3f72p/YEsK8fxNnejnOUzVC8pk0JRiBIvE0g9Pj8hmcQ7Siz8/RkFpdmTWo98QZ7qgWd0TbwriOmuxtKuAxbg11JF6BQOexlO5a5vrhLSWBldSc02c2he/5emjOb00kS9y+w8aieWNh87dTMcNYPa0tO/vVPGF3+qRo=
+	t=1730882374; cv=none; b=qpWbImTKKVpb+TM4U9scVzbI5iWZz36ATj3iKULQdnoSN2FZ6c9Va6fKtAGMEmHQ6cqCdp7lC2ovDmVcZH8VNi8qzy8ZewKfLfbzigl1Tv5/DcPm+xsC0aDboyRBrHLaK7NgMUzm//ZWnq1Hw4mC7lKgxWV3/7rFl9i2GUwGlo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730882357; c=relaxed/simple;
-	bh=o1eaAKP0q0OP2r3SIEN4yXE0MkgX6WCPxtaq68fETkU=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=pM+Xs4UbOQbPfGEX0024yjiwnzFx2mBaJ/BkvUj74qESecrtrEHISMPQ6KIwn4/soPuIrUV2bJvcd0L95nYofduGreiB8bhiKgwQjD2q5ZQdCI37FVTAXG2Iz0XXlDehp2jJ6Yi2LGvUQqP0mznyg19hJ37vq7ZeMNhEByXjAc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dINt2q7A; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730882356; x=1762418356;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=o1eaAKP0q0OP2r3SIEN4yXE0MkgX6WCPxtaq68fETkU=;
-  b=dINt2q7AuKCoxWd3RWHChgqCX4yetbrB4qbbHerRcFiEj9xGGjFyUUpA
-   2Ub8JX8KpVo8OnELAhT7zcbjYXw1PmVg9ixli659LmnTzAdDZxj0pibJw
-   PDoVjk0ylG1D4rSbdG8H0p8ZDQ3GoibZEm9QEZkyq5ZV3Y6Mc9W26YiOX
-   exW6k6un9EtJtUZLo+aihwkbPZrzWDbOCGblb056PgiNxj8XI91p4tQdV
-   opErZWj7/TAsQxSW6qItt/wE8The2c0kAbFY3uOO0vvljZUvevVKwSKVx
-   t6nd/PE42kr+01db/OtHUsJ+8Xm2IRMnMR6G87kg5F4PPNV29fcemmwuW
-   A==;
-X-CSE-ConnectionGUID: oJCLInd4T4qHxPkzgdjYYQ==
-X-CSE-MsgGUID: FdO/yBh/QqqKwUoGc1nrlA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="30552695"
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="30552695"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 00:39:15 -0800
-X-CSE-ConnectionGUID: 8AOAmdFaS2mKhTbQPB2A3Q==
-X-CSE-MsgGUID: TcQlq8rqQu2b37SjD1BVfQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="84536789"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.124.240.228]) ([10.124.240.228])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 00:39:12 -0800
-Message-ID: <c47a9f3a-cb36-499a-a788-c84a14cb4f48@linux.intel.com>
-Date: Wed, 6 Nov 2024 16:39:10 +0800
+	s=arc-20240116; t=1730882374; c=relaxed/simple;
+	bh=FO2ifaA4FIs1iMGipAgqd1nFX9yYIQsGlR8BdAFDUN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E25pN7UGyzHb13M1PSf/frqif90mFknWuFxjUoggsXc2Kp8ZERzreT1L+DNzTlAy/cxjelKKlluaIuORqqVpsC7+l8jgRxjZvGtPUpgkfn0DPEZyBkf3zUgkNCwTzjShl5xezGTfb++CxjsavAPbMgmDfVNkn2kwL5j3rgy9Wqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sYAxvGel; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730882370;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i29cIvXq/FeIo2TGOkd1TjVGAgWemdxZM+ncT1KUj9o=;
+	b=sYAxvGelwggw7R0yIHMwh5CvNvNRSqOhnzul/iG7IXienNtp3fYH3A5MrjUMnxKhxJkoPs
+	Ys/JHckiH+7hnTzuj8Dd16mCs9+OseGdY0ke8WfHICvdlDqtur8FDEaXW5TtvcBqYsW97b
+	kEzd6yp9sTXr6jn6rlLE7eoIl0EWrzk=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: atishp@rivosinc.com,
+	jamestiotio@gmail.com
+Subject: [kvm-unit-tests PATCH v2] riscv: sbi: Improve spec version test
+Date: Wed,  6 Nov 2024 09:39:27 +0100
+Message-ID: <20241106083926.14595-2-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "vasant.hegde@amd.com" <vasant.hegde@amd.com>,
- "will@kernel.org" <will@kernel.org>
-Subject: Re: [PATCH v4 05/13] iommu/vt-d: Prepare intel_iommu_set_dev_pasid()
- handle replacement
-To: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "jgg@nvidia.com" <jgg@nvidia.com>
-References: <20241104131842.13303-1-yi.l.liu@intel.com>
- <20241104131842.13303-6-yi.l.liu@intel.com>
- <BN9PR11MB52769400A082C0CE51B48EA98C532@BN9PR11MB5276.namprd11.prod.outlook.com>
- <9e00e062-6a05-4658-84fb-1ac5f2502bd9@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <9e00e062-6a05-4658-84fb-1ac5f2502bd9@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/11/6 16:02, Yi Liu wrote:
->>> @@ -4329,24 +4368,17 @@ static int intel_iommu_set_dev_pasid(struct
->>> iommu_domain *domain,
->>>           ret = intel_pasid_setup_second_level(iommu, dmar_domain,
->>>                                dev, pasid);
->>>       if (ret)
->>> -        goto out_unassign_tag;
->>> +        goto out_remove_dev_pasid;
->>>
->>> -    dev_pasid->dev = dev;
->>> -    dev_pasid->pasid = pasid;
->>> -    spin_lock_irqsave(&dmar_domain->lock, flags);
->>> -    list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
->>> -    spin_unlock_irqrestore(&dmar_domain->lock, flags);
->>> +    domain_remove_dev_pasid(old, dev, pasid);
->>
->> My preference is moving the check of non-NULL old out here.
-> 
-> @Baolu, how about your thought?
+SBI spec version states that bit 31 must be zero and, when xlen
+is greater than 32, that bit 32 and higher must be zero. Check
+these bits are zero in the expected value to ensure we test
+appropriately.
 
-If we move the check out of this helper, there will be boilerplate code
-in multiple places. Something like,
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ lib/riscv/sbi.c |  2 +-
+ riscv/sbi.c     | 13 +++++++++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-	if (old)
-		domain_remove_dev_pasid(old, dev, pasid);
+diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
+index 8972e765fea2..f25bde169490 100644
+--- a/lib/riscv/sbi.c
++++ b/lib/riscv/sbi.c
+@@ -107,7 +107,7 @@ long sbi_probe(int ext)
+ 	struct sbiret ret;
+ 
+ 	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_SPEC_VERSION, 0, 0, 0, 0, 0, 0);
+-	assert(!ret.error && ret.value >= 2);
++	assert(!ret.error && (ret.value & 0x7ffffffful) >= 2);
+ 
+ 	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, ext, 0, 0, 0, 0, 0);
+ 	assert(!ret.error);
+diff --git a/riscv/sbi.c b/riscv/sbi.c
+index 52434e0ca86f..c081953c877c 100644
+--- a/riscv/sbi.c
++++ b/riscv/sbi.c
+@@ -105,18 +105,23 @@ static void check_base(void)
+ 	report_prefix_push("base");
+ 
+ 	ret = sbi_base(SBI_EXT_BASE_GET_SPEC_VERSION, 0);
+-	if (ret.error || ret.value < 2) {
+-		report_skip("SBI spec version 0.2 or higher required");
+-		return;
+-	}
+ 
+ 	report_prefix_push("spec_version");
+ 	if (env_or_skip("SBI_SPEC_VERSION")) {
+ 		expected = (long)strtoul(getenv("SBI_SPEC_VERSION"), NULL, 0);
++		assert_msg(!(expected & BIT(31)), "SBI spec version bit 31 must be zero");
++		assert_msg(__riscv_xlen == 32 || !(expected >> 32), "SBI spec version bits greater than 31 must be zero");
+ 		gen_report(&ret, 0, expected);
+ 	}
+ 	report_prefix_pop();
+ 
++	ret.value &= 0x7ffffffful;
++
++	if (ret.error || ret.value < 2) {
++		report_skip("SBI spec version 0.2 or higher required");
++		return;
++	}
++
+ 	report_prefix_push("impl_id");
+ 	if (env_or_skip("SBI_IMPL_ID")) {
+ 		expected = (long)strtoul(getenv("SBI_IMPL_ID"), NULL, 0);
+-- 
+2.47.0
 
---
-baolu
 
