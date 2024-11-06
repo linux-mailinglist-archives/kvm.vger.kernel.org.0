@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-30926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E23F89BE5C7
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:40:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AE9BE5D7
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:43:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98DB81F248C2
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 11:40:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC72CB22341
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 11:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128591DEFC5;
-	Wed,  6 Nov 2024 11:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5996A1DEFE3;
+	Wed,  6 Nov 2024 11:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMLUxF40"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f55ksqmW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E1B1DE3AC;
-	Wed,  6 Nov 2024 11:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749F457333;
+	Wed,  6 Nov 2024 11:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730893203; cv=none; b=kI/qO93UgpHV9NUztVa6vRKLUABOiSrK78zn2AJEpV4dUNHLWGeX4jGQJ7XzqryWzj7QWcfGWQ46FbmAyaue6bhWbDOfKNPDY5ncsOLGKRlF+88JE1z3avfjFMG6Z5m0g/wy2W4xEdd5uFGJ3q5yR8UoCwED1i3XTT/ZhS7Br04=
+	t=1730893392; cv=none; b=j+yWniQE6jr+IhvUJ2QvNV5o6fOTELn8zSaE2H5p9xrXxOBA3hcV0VYOlVGQ6LrwfP9Ywxwy/b0ORDhGW21ekVSsnqyoE3KSNK3R0JI6CbRqhj32chg9EsfFWvMm3JaVKkz8+nR9n5rvfEGdV3VI6xeTlbNoOUv+Klo6AVLdQYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730893203; c=relaxed/simple;
-	bh=LfdnWgo5Tult/Ytob/TpTZCRMLZX+e2O5Aaq1lroTOk=;
+	s=arc-20240116; t=1730893392; c=relaxed/simple;
+	bh=CZlxUMF7h6qY7n2j8niZdY+BvTgqh4tqKKQndIQgF1s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TL9203C4S/qLgePATzaPFGD78PIKsqdvNrcwZ6M1Pz7Haq3GqY1c1cw3XWHc6qcyqJVAFxrYCxQ6muAD+6GV8vjIX8P1CpJIgqKdPoclb12iFU1KTswfMcbot1JMpXP6PUO1TT7vMslhqZZdItMA32GDWJV32R2msnhwiBxRuxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMLUxF40; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DEAC4CECD;
-	Wed,  6 Nov 2024 11:39:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mVA9+P7V7kXMs1Teij5xsY3vIeOB6pd92IckPTa+jNkouO2mXOS1cUpXYqIy1aejCSb+zVGjxjNC9mV7mirQqfWjVRQURjqJIroZ1yqjFEc3oEONC1IvGmOGa8tjApDhiJxzn7I6zqB2GRfMDTC95xRmUaWG8ZSCVvVhddgDdmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f55ksqmW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D46F5C4CECD;
+	Wed,  6 Nov 2024 11:43:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730893202;
-	bh=LfdnWgo5Tult/Ytob/TpTZCRMLZX+e2O5Aaq1lroTOk=;
+	s=k20201202; t=1730893392;
+	bh=CZlxUMF7h6qY7n2j8niZdY+BvTgqh4tqKKQndIQgF1s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DMLUxF40Npvnh/AMFOwVE8QdM/kIH6EKpa2TMU3PnrLvzoByUUD2PJ69DHK6+lvXM
-	 +P1Xf/ScqLVAK+44sbMBY+wWkgGaoK3rUU1ax1KCIxzmGjyFkYor/nNZOHWmcLs4YQ
-	 tnDumX4PAM4bmx/Oc4/+ER7sml9dnjUBQW/iCLsOv6QV78QamVA/0ZCprB0U6wdU6O
-	 zvUUGCE0sESuBvyd/P2dJx7Hh0YWN3Klb+47AFXFQFyamEyQLdyPOz/uy+IZ06p5My
-	 JKou7Ixdg9i4eg8fqzBi9IfsCBT99V/ga/V2zDNlCy3rlBYsiulnKPsEgVnQq2ASjd
-	 ejpqgVZZChPPg==
-Date: Wed, 6 Nov 2024 11:39:54 +0000
+	b=f55ksqmW4WB2ytuUuaXqtOk6lZw8OU1h4fp86og9ZiCOIrMBrE56cTF38d2+5GMu7
+	 RSx7v4nNpm3AYPjXHPDyHlzDP0hBlB8hOk/HMZ5ZmqQpWIcJEonVGFgVvOASKI2Xyd
+	 YtJwHV7PoP5fIKWwwT0r4zCG0pKoLDeB7lP16WpRXeL1XJKtcY/m3vFTDPBeAoy47/
+	 MbtHn3oXogSwreZvOTbEJFIQlcWBw6/KsIsmU+PRtStWAvMUjrci7TvZxitmIHLKCk
+	 wvEs4Os+qFnvW6z1kAdtHpan1tvKOx5EZYKz3it1Arl35EeafMmG9mpb/Y0m9S5Ib5
+	 1Bq/ZfwniUT7g==
+Date: Wed, 6 Nov 2024 11:43:03 +0000
 From: Will Deacon <will@kernel.org>
 To: Haris Okanovic <harisokn@amazon.com>
 Cc: ankur.a.arora@oracle.com, catalin.marinas@arm.com,
@@ -56,11 +56,11 @@ Cc: ankur.a.arora@oracle.com, catalin.marinas@arm.com,
 	misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
 	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
 	konrad.wilk@oracle.com
-Subject: Re: [PATCH 1/5] asm-generic: add smp_vcond_load_relaxed()
-Message-ID: <20241106113953.GA13801@willie-the-truck>
+Subject: Re: [PATCH 2/5] arm64: add __READ_ONCE_EX()
+Message-ID: <20241106114302.GB13801@willie-the-truck>
 References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
  <20241105183041.1531976-1-harisokn@amazon.com>
- <20241105183041.1531976-2-harisokn@amazon.com>
+ <20241105183041.1531976-3-harisokn@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,49 +69,79 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105183041.1531976-2-harisokn@amazon.com>
+In-Reply-To: <20241105183041.1531976-3-harisokn@amazon.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Nov 05, 2024 at 12:30:37PM -0600, Haris Okanovic wrote:
-> Relaxed poll until desired mask/value is observed at the specified
-> address or timeout.
+On Tue, Nov 05, 2024 at 12:30:38PM -0600, Haris Okanovic wrote:
+> Perform an exclusive load, which atomically loads a word and arms the
+> exclusive monitor to enable wfet()/wfe() accelerated polling.
 > 
-> This macro is a specialization of the generic smp_cond_load_relaxed(),
-> which takes a simple mask/value condition (vcond) instead of an
-> arbitrary expression. It allows architectures to better specialize the
-> implementation, e.g. to enable wfe() polling of the address on arm.
-
-This doesn't make sense to me. The existing smp_cond_load() functions
-already use wfe on arm64 and I don't see why we need a special helper
-just to do a mask.
-
+> https://developer.arm.com/documentation/dht0008/a/arm-synchronization-primitives/exclusive-accesses/exclusive-monitors
+> 
 > Signed-off-by: Haris Okanovic <harisokn@amazon.com>
 > ---
->  include/asm-generic/barrier.h | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+>  arch/arm64/include/asm/readex.h | 46 +++++++++++++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/readex.h
 > 
-> diff --git a/include/asm-generic/barrier.h b/include/asm-generic/barrier.h
-> index d4f581c1e21d..112027eabbfc 100644
-> --- a/include/asm-generic/barrier.h
-> +++ b/include/asm-generic/barrier.h
-> @@ -256,6 +256,31 @@ do {									\
->  })
->  #endif
->  
-> +/**
-> + * smp_vcond_load_relaxed() - (Spin) wait until an expected value at address
-> + * with no ordering guarantees. Spins until `(*addr & mask) == val` or
-> + * `nsecs` elapse, and returns the last observed `*addr` value.
+> diff --git a/arch/arm64/include/asm/readex.h b/arch/arm64/include/asm/readex.h
+> new file mode 100644
+> index 000000000000..51963c3107e1
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/readex.h
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Based on arch/arm64/include/asm/rwonce.h
 > + *
-> + * @nsecs: timeout in nanoseconds
-> + * @addr: pointer to an integer
-> + * @mask: a bit mask applied to read values
-> + * @val: Expected value with mask
+> + * Copyright (C) 2020 Google LLC.
+> + * Copyright (C) 2024 Amazon.com, Inc. or its affiliates.
 > + */
-> +#ifndef smp_vcond_load_relaxed
+> +
+> +#ifndef __ASM_READEX_H
+> +#define __ASM_READEX_H
+> +
+> +#define __LOAD_EX(sfx, regs...) "ldaxr" #sfx "\t" #regs
+> +
+> +#define __READ_ONCE_EX(x)						\
+> +({									\
+> +	typeof(&(x)) __x = &(x);					\
+> +	int atomic = 1;							\
+> +	union { __unqual_scalar_typeof(*__x) __val; char __c[1]; } __u;	\
+> +	switch (sizeof(x)) {						\
+> +	case 1:								\
+> +		asm volatile(__LOAD_EX(b, %w0, %1)			\
+> +			: "=r" (*(__u8 *)__u.__c)			\
+> +			: "Q" (*__x) : "memory");			\
+> +		break;							\
+> +	case 2:								\
+> +		asm volatile(__LOAD_EX(h, %w0, %1)			\
+> +			: "=r" (*(__u16 *)__u.__c)			\
+> +			: "Q" (*__x) : "memory");			\
+> +		break;							\
+> +	case 4:								\
+> +		asm volatile(__LOAD_EX(, %w0, %1)			\
+> +			: "=r" (*(__u32 *)__u.__c)			\
+> +			: "Q" (*__x) : "memory");			\
+> +		break;							\
+> +	case 8:								\
+> +		asm volatile(__LOAD_EX(, %0, %1)			\
+> +			: "=r" (*(__u64 *)__u.__c)			\
+> +			: "Q" (*__x) : "memory");			\
+> +		break;							\
+> +	default:							\
+> +		atomic = 0;						\
+> +	}								\
+> +	atomic ? (typeof(*__x))__u.__val : (*(volatile typeof(__x))__x);\
+> +})
 
-I know naming is hard, but "vcond" is especially terrible.
-Perhaps smp_cond_load_timeout()?
+I think this is a bad idea. Load-exclusive needs to be used very carefully,
+preferably when you're able to see exactly what instructions it's
+interacting with. By making this into a macro, we're at the mercy of the
+compiler and we give the wrong impression that you could e.g. build atomic
+critical sections out of this macro.
+
+So I'm fairly strongly against this interface.
 
 Will
 
