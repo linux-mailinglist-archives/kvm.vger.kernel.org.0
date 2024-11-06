@@ -1,155 +1,236 @@
-Return-Path: <kvm+bounces-31020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17139BF508
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 19:16:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D4F9BF50F
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 19:17:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 597021F21B6B
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:16:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E5811F21B6B
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C733E2076DE;
-	Wed,  6 Nov 2024 18:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25BF20821A;
+	Wed,  6 Nov 2024 18:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0JtvWboH"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UbXwfjMt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B7B1922FC
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 18:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B91A204934;
+	Wed,  6 Nov 2024 18:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730917009; cv=none; b=AsuKmn3GDZaa7Duxh+HykNdYnv/1QKG4tEMMo2IVrLoLxnmbEEwj0JbFqrE/xzwtAp/bqO6wTqaBJwCP/n0UM/0DzhceLeDXNpl5w/m+UbfKDo6ONljWfpcOKZ5X6Ybv8gOlUhH1iEmXmhc4SDlbSlsC1QOrXtKxvJEO2q3hygw=
+	t=1730917046; cv=none; b=b/yq9Nb8ivw2AbMdRwKjNXkuL0rVRMGIHfm8FKlFajbEWl0wjgsAroMF/mOq+ynB4JimcchGdypYwKEPeggGC14srgjFrOQZ8pb8wxJ85VCtSrDsMR17QJYChoOrqw1rq3UCVYj0+3nbPhHgqO7XuwCJGUyLq2N4kr7ODUyB6lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730917009; c=relaxed/simple;
-	bh=akr2pHWvlpxX6Fg1IQ3TT51LBTF7P5k6M3NIk8ktde8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n4Uj1oZOF9/i4MhZIV3dUy1rIlalUYBnPtKPAw/B7wDTRJ+S0oPmaCKv9E74OHB+xaUkHZRt5+GVL33LHITyhmGezqEqktec/MvuNPeD9iI9Et9X4rb5LylRCvVUmQA10W48N38kjOQjUyXz0OAO+uswTD8qRg1MqBMSq/bMhXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0JtvWboH; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539e8607c2aso4974e87.3
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 10:16:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730917005; x=1731521805; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LeWA172BYFuvJUs17jk2BLJpPj+VSqEWSdhQr3Tt5lU=;
-        b=0JtvWboH3eEW5OFU4FEkGSPWVz7e5CaDSAefUiLYMGiNdyurRGpz3m94gH8I1Q91aH
-         TAOHNCms7kxUlQ6HkP26itRt7DVrL+t1jFiGjvfJBWr5giyerfqH2Yfs7RkWPde8mPTc
-         47oZO9mWv7rIwQ1rObUa1dihidz0ILmp+PrYqS3nnz3GuPJQl6r79/6JiZwvQmKuVvlj
-         27G2C8AsyshjTvliTyCJ9bcseIclALsfzYvyREtzmPKXn0Xd5XuSfKtqjPQwSWPxlP4J
-         P0VoxRLeRfo0dmuCGGcA/BeXK7d7IKUAznJecKVc0ZgfPef1ekqiOXeggpeNCWzfuZMg
-         6H3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730917005; x=1731521805;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LeWA172BYFuvJUs17jk2BLJpPj+VSqEWSdhQr3Tt5lU=;
-        b=sNz5+KoYZczqE5cnPFfS7x31PamyAqZZ/UboKJRfUViGRnc4ByUH42qyFxhFY2fHI0
-         PneMzED00dc53RXd1kIjGdlLbH/6dSybhsCQS1lN2NXljkMclGp98Yq6ycrc2VTiNxks
-         zUm2tvjOZD/qa4AI3/uXJ0xPzEXlyZOSeIByNsU7wCvDW5eVnN0reOtPMElSfXN7Bnvz
-         UZ122dBis9XB5AuYMrFX4r6qKFLevbw8HTfd2ttUMEo5tHFxxux6A+L4OCia7508t9KF
-         1vA27quq778uKTUwxecxM1S+phL9GOyk81fxlleibxGjMHeIfnz4H5GnyVDFTT1C9V2N
-         QCZA==
-X-Gm-Message-State: AOJu0YyDf/Dqj0Ma6ctdQ+Bkz4MfAXHPM5jlbnqWziSx9z5Q12CfgVTX
-	3WFGNX0Wao8QS9ssjcFKhbJxv2IkyG4gQ1gV8y2tGk8+WVjieNGza5o7VFj74ynvgx7Ufs1FT/o
-	sH3sd963VwmBxM21sC+epjyqY/RtsFgC0OD7OtT5MCwrepOUMwA==
-X-Google-Smtp-Source: AGHT+IH0eyYrDiApka0FCPYt2gCEKlK4/mAq7uw29tSP1xJ7qJxDTSHGX9xhi6kEHhZbsrB00EH2FETbJzZH1P9TZow=
-X-Received: by 2002:a05:6512:12c5:b0:539:e88f:23a1 with SMTP id
- 2adb3069b0e04-53b3491c80emr21831365e87.44.1730917005120; Wed, 06 Nov 2024
- 10:16:45 -0800 (PST)
+	s=arc-20240116; t=1730917046; c=relaxed/simple;
+	bh=iOz1kyK1h6dpyS+gFYdERgAcIkwyLqV7rqyjyDHqGME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LJ/o1dcG0/Hq5mCIR4LwKRY/2r6nLK/ZGgmvvYFn8w+hSCPtkBfAdFlihtI2Q0Nf8Q4yTnlc5/0ifTg7RGUzx4hYjXV+kQtavrGwsYavU/R9FF8HWOlFuctIdMOzsfujFWNNOov8OPdRC7iihm7fGa7Zkwcj01s8y9OpzZogO+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UbXwfjMt; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9334640E0163;
+	Wed,  6 Nov 2024 18:17:21 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id mhpTMvEGzZ3n; Wed,  6 Nov 2024 18:17:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730917037; bh=ZCw6KZ56wNE+x3+fx0qZaa5aMg59QwoMP17Ar6mfZ0I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UbXwfjMtVaJKDReZ5xCe0stdzqv3JKcqAoFkjgtD4EyXqJHonBgTUAW3ZziahTcKG
+	 F5zGxxGayLyGEXocmrKfMvlgzg3uvCOwXPBHUWtF3/8Rg8k/l9XyY9gwbhErZhoizi
+	 HGXIjVUViDyobGE11uYx3ubolPXUEGnn+V+czkb1OMCjrGuzDvqkWr5VlwDc5U/81G
+	 uawT+mK8yLsKsrZCtQn7ky/U9oyUJH5XFB/pcsb7CcwdCZePZjOgLSv0zTXLL/3fly
+	 z9OHJrtJ6cx7gRbHpjVMNwcf6a9SKPJoquK9/xVQ1BzHXHqbadCx0j0sTCp3MU8Nwz
+	 DAWH+nt7NVjRt9YhJvoRXdYqAHpCy3xcBe1bxZRa+XBWLjgHMWU0E2hRSOAI7tdjV4
+	 XnSFsNXrIZOJJYEdVtYsHecY47CRw66+zS+PHyrTJyKHVGqhA5MXm4TBWO2OvObJdf
+	 Qj6QM6rowrjzMSdCquFsnKqEsEpqzUpcZC21iEmtBJD9ias3tPtOYWreh0/v2o408j
+	 xiBiq1BEYshdlpBSnZlPkIxKj4jGt9DU1q2jcxr+3zqD0QM53AQZcKeBpZM7C8nF8Z
+	 UqEsjSOubt0Lq+lVXoTuKMB8+Q0DAvn5PE9RpFwmfc6u5Un2SHp2PWGjK9XrGp02km
+	 OLF/VpS2XzUKuScLsDNwnkpY=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6F91140E0169;
+	Wed,  6 Nov 2024 18:17:00 +0000 (UTC)
+Date: Wed, 6 Nov 2024 19:16:55 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 03/14] x86/apic: Populate .read()/.write() callbacks of
+ Secure AVIC driver
+Message-ID: <20241106181655.GYZyuyl0zDTTmlMKzz@fat_crate.local>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-4-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106083035.2813799-1-jingzhangos@google.com>
- <20241106083035.2813799-2-jingzhangos@google.com> <86cyj81sdl.wl-maz@kernel.org>
-In-Reply-To: <86cyj81sdl.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 6 Nov 2024 10:16:33 -0800
-Message-ID: <CAAdAUtgiWxhY6DQrS_B=6PhL3+V-qfJVSsqWWeVuGqW7DLcotw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
-To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Kunkun Jiang <jiangkunkun@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Shusen Li <lishusen2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240913113705.419146-4-Neeraj.Upadhyay@amd.com>
 
-On Wed, Nov 6, 2024 at 4:03=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 06 Nov 2024 08:30:32 +0000,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > From: Kunkun Jiang <jiangkunkun@huawei.com>
-> >
-> > In all the vgic_its_save_*() functinos, they do not check whether
-> > the data length is 8 bytes before calling vgic_write_guest_lock.
-> > This patch adds the check. To prevent the kernel from being blown up
-> > when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
-> > are replaced together.
-> >
-> > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
-> >  1 file changed, 19 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
-its.c
-> > index ba945ba78cc7..2381bc5ce544 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *it=
-s, struct its_device *dev,
-> >              ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
-> >               ite->collection->collection_id;
-> >       val =3D cpu_to_le64(val);
-> > +
-> > +     if (KVM_BUG_ON(ite_esz !=3D sizeof(val), kvm))
-> > +             return -EINVAL;
-> > +
-> >       return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
-> >  }
-> >
-> > @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *it=
-s, struct its_device *dev,
-> >              (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
-> >               (dev->num_eventid_bits - 1));
-> >       val =3D cpu_to_le64(val);
-> > +
-> > +     if (KVM_BUG_ON(dte_esz !=3D sizeof(val), kvm))
-> > +             return -EINVAL;
-> > +
-> >       return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
-> >  }
-> >
-> > @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *i=
-ts,
-> >                            struct its_collection *collection,
-> >                            gpa_t gpa, int esz)
-> >  {
-> > +     struct kvm *kvm =3D its->dev->kvm;
->
-> nit: just use its->dev->kvm consistently, as this is what we are
-> already doing in this function.
+On Fri, Sep 13, 2024 at 05:06:54PM +0530, Neeraj Upadhyay wrote:
+> @@ -24,6 +25,108 @@ static int x2apic_savic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
+>  	return x2apic_enabled() && cc_platform_has(CC_ATTR_SNP_SECURE_AVIC);
+>  }
+>  
+> +static inline u32 get_reg(char *page, int reg_off)
 
-Sure. Will do.
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Just "reg" like the other APICs.
+
+> +{
+> +	return READ_ONCE(*((u32 *)(page + reg_off)));
+> +}
+> +
+> +static inline void set_reg(char *page, int reg_off, u32 val)
+> +{
+> +	WRITE_ONCE(*((u32 *)(page + reg_off)), val);
+> +}
+> +
+> +#define SAVIC_ALLOWED_IRR_OFFSET	0x204
+> +
+> +static u32 x2apic_savic_read(u32 reg)
+> +{
+> +	void *backing_page = this_cpu_read(apic_backing_page);
+> +
+> +	switch (reg) {
+> +	case APIC_LVTT:
+> +	case APIC_TMICT:
+> +	case APIC_TMCCT:
+> +	case APIC_TDCR:
+> +	case APIC_ID:
+> +	case APIC_LVR:
+> +	case APIC_TASKPRI:
+> +	case APIC_ARBPRI:
+> +	case APIC_PROCPRI:
+> +	case APIC_LDR:
+> +	case APIC_SPIV:
+> +	case APIC_ESR:
+> +	case APIC_ICR:
+> +	case APIC_LVTTHMR:
+> +	case APIC_LVTPC:
+> +	case APIC_LVT0:
+> +	case APIC_LVT1:
+> +	case APIC_LVTERR:
+> +	case APIC_EFEAT:
+> +	case APIC_ECTRL:
+> +	case APIC_SEOI:
+> +	case APIC_IER:
+
+I'm sure those can be turned into ranges instead of enumerating every single
+APIC register...
+
+> +	case APIC_EILVTn(0) ... APIC_EILVTn(3):
+
+Like here.
+
+> +		return get_reg(backing_page, reg);
+> +	case APIC_ISR ... APIC_ISR + 0x70:
+> +	case APIC_TMR ... APIC_TMR + 0x70:
+> +		WARN_ONCE(!IS_ALIGNED(reg, 16), "Reg offset %#x not aligned at 16 bytes", reg);
+
+What's the point of a WARN...
+
+> +		return get_reg(backing_page, reg);
+
+... and then allowing the register access anyway?
+
+> +	/* IRR and ALLOWED_IRR offset range */
+> +	case APIC_IRR ... APIC_IRR + 0x74:
+> +		/*
+> +		 * Either aligned at 16 bytes for valid IRR reg offset or a
+> +		 * valid Secure AVIC ALLOWED_IRR offset.
+> +		 */
+> +		WARN_ONCE(!(IS_ALIGNED(reg, 16) || IS_ALIGNED(reg - SAVIC_ALLOWED_IRR_OFFSET, 16)),
+> +			  "Misaligned IRR/ALLOWED_IRR reg offset %#x", reg);
+> +		return get_reg(backing_page, reg);
+
+Ditto.
+
+And below too.
+
+> +	default:
+> +		pr_err("Permission denied: read of Secure AVIC reg offset %#x\n", reg);
+> +		return 0;
+> +	}
+> +}
+> +
+> +#define SAVIC_NMI_REQ_OFFSET		0x278
+> +
+> +static void x2apic_savic_write(u32 reg, u32 data)
+> +{
+> +	void *backing_page = this_cpu_read(apic_backing_page);
+> +
+> +	switch (reg) {
+> +	case APIC_LVTT:
+> +	case APIC_LVT0:
+> +	case APIC_LVT1:
+> +	case APIC_TMICT:
+> +	case APIC_TDCR:
+> +	case APIC_SELF_IPI:
+> +	/* APIC_ID is writable and configured by guest for Secure AVIC */
+> +	case APIC_ID:
+> +	case APIC_TASKPRI:
+> +	case APIC_EOI:
+> +	case APIC_SPIV:
+> +	case SAVIC_NMI_REQ_OFFSET:
+> +	case APIC_ESR:
+> +	case APIC_ICR:
+> +	case APIC_LVTTHMR:
+> +	case APIC_LVTPC:
+> +	case APIC_LVTERR:
+> +	case APIC_ECTRL:
+> +	case APIC_SEOI:
+> +	case APIC_IER:
+> +	case APIC_EILVTn(0) ... APIC_EILVTn(3):
+> +		set_reg(backing_page, reg, data);
+> +		break;
+> +	/* ALLOWED_IRR offsets are writable */
+> +	case SAVIC_ALLOWED_IRR_OFFSET ... SAVIC_ALLOWED_IRR_OFFSET + 0x70:
+> +		if (IS_ALIGNED(reg - SAVIC_ALLOWED_IRR_OFFSET, 16)) {
+> +			set_reg(backing_page, reg, data);
+> +			break;
+> +		}
+> +		fallthrough;
+> +	default:
+> +		pr_err("Permission denied: write to Secure AVIC reg offset %#x\n", reg);
+> +	}
+> +}
+> +
+>  static void x2apic_savic_send_IPI(int cpu, int vector)
+>  {
+>  	u32 dest = per_cpu(x86_cpu_to_apicid, cpu);
+> @@ -140,8 +243,8 @@ static struct apic apic_x2apic_savic __ro_after_init = {
+>  	.send_IPI_self			= x2apic_send_IPI_self,
+>  	.nmi_to_offline_cpu		= true,
+>  
+> -	.read				= native_apic_msr_read,
+> -	.write				= native_apic_msr_write,
+> +	.read				= x2apic_savic_read,
+> +	.write				= x2apic_savic_write,
+>  	.eoi				= native_apic_msr_eoi,
+>  	.icr_read			= native_x2apic_icr_read,
+>  	.icr_write			= native_x2apic_icr_write,
+> -- 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
