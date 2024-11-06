@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-30982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5579BF215
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:48:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB359BF216
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A929AB20F58
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:48:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E21B61F23C9D
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE4B20820E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D8D20821C;
 	Wed,  6 Nov 2024 15:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QPgPiyZs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AGJqTnq/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AE320721C
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 15:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E0C2076AA
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 15:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730907977; cv=none; b=cYDclswslcmKu5Ya5YkleIEJbHrptJ/Z1vYWmui/dxMBEF0RaFHUvtav8CRwI2X0UOcUVhCoW3LevjQWUllncwOSjzdYxsjeHMt1lr/y3JnLQW1gf1OihT15JC3cOhU0tTFrQBcFxN+11tUkFByeHf3wmtCzXfLH9E7J4Cj+oN4=
+	t=1730907977; cv=none; b=VjBxfy9OFL6HHVqAhQvbAGAiTT7Az9DLVVpJd/i79FKNM6rI6OIPuiYiMyRspjgy+5zfZpBGdIKORW8Ej3wW/NrHPBORaNXZoCe91G9X/H9RhvSf8kUN3mIlhCEH2fZ/3qQjheZ5a0K3Vz3CAE3mgjBF9XXps37SIa9SEGJJTas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730907977; c=relaxed/simple;
-	bh=StPLIHdHMILZf4wA2ehuHqX9QaXNphD0GtF6wSM9b0E=;
+	bh=eN1brumGZm1DOEHRsvSaTj1vMJ7Ez8a6+p6iWljH5ac=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ybg0mox15vVyNSnraaVG9ZMwIDLTucQasD1M++zOnIkWGFu3BiKwLsAL4/rJK6wlFVCUO1TyAUhauRfk423+/kuZUIWN73lquSkGJdq95mIwWoHRsjfVAeDCOM/y0CrAOkXFzxNs1AE+XEErALfmdamNohYDFmedIB4BLnCPoVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QPgPiyZs; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=FOIQZpimIbFt9AUYvfQ51E+47HTzX03pj7xPVnUNZljK4xuAZxjkeEQ1XGkbXodOPZ3Y/0bEI8s6OBOIUPeqzYst75f7HLfh41Ygyi1FjpSCZDMeKRbqj7KeRgv+ORgnH+/qf+vPB2QJ8KpJKbAOgu1SRqjcMQeP8A+VKAsBdvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AGJqTnq/; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1730907976; x=1762443976;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=StPLIHdHMILZf4wA2ehuHqX9QaXNphD0GtF6wSM9b0E=;
-  b=QPgPiyZspaptemuj8eqUDtH4sELvRiVu6q61WBQNFdKZ2tRYDdbnTQtt
-   tTZYttY4sx0FPuqceS8Ffbgq5HvHmTFr/XRlBnTix7zRd+CGPLq7T24Cw
-   z6faJHS7EyvmJyNDY8ffo7tEUE0+GUOxKogtLbVsVvtQmovhd18bLPre5
-   J+DER3EDxcbQ4PZ8HCD8J95Rlk3H9C1pVkyKwNdSv/ZdkN2aMO8jnqFvs
-   5HxWHLAuO40xVJ88xRlnBUdLZuC/TkNexmnSqNUO8D9PCaN6lB3jNF2Lv
-   T6hzjsuYO7QpjrZbtYOxJHnwSjETyjCkmzoHsf+ajQNIAm88Vgslligb8
-   g==;
-X-CSE-ConnectionGUID: NkvZn7z6SjCqWxzkkdJsmw==
-X-CSE-MsgGUID: browshQoRxquVQFPAS9KUQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48174269"
+  bh=eN1brumGZm1DOEHRsvSaTj1vMJ7Ez8a6+p6iWljH5ac=;
+  b=AGJqTnq/nkYvoLl8oUcqY+2abQxveAK9EUV9N0UJ2QoyUiYarBdJx8PC
+   sTGhVHCPr7VNVvXoBqTdlVDU2ZRaef9FPRQ1okYTvO34NmA7XraLs1wIj
+   fEJdUVLik2l5RaRzyhVoRL0HX6Zqjxj9V1DznynpAWMhTdCZ2ZpOW0cqj
+   a290r4K1ELV2BM2yGQlnZIhw2RFjAIKHbo0PGYpqSZ5xvFoKa1Yszs4Pe
+   tSSAsvpitMb3E94XsLsSav7Ycwv2kKY2DOJ4eaxaqzSOukuv1cxNK6vgb
+   C0vk/EXlN7FsCxDpPxHcMOdQLHqnDOT8gA4pjlz1WMjufR1xZvPoNkPNR
+   w==;
+X-CSE-ConnectionGUID: +KBrFEVQR1SRZjTZTNNQMg==
+X-CSE-MsgGUID: wNPOHO/LSMekNh14Mq2BgQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48174276"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="48174269"
+   d="scan'208";a="48174276"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 07:46:11 -0800
-X-CSE-ConnectionGUID: Ijf6F0wPQGCEY0G8aT+wlw==
-X-CSE-MsgGUID: iuTUwI+QQuy2tECElwfFgQ==
+X-CSE-ConnectionGUID: 92EqyUk0RYCs1jDvWazIbw==
+X-CSE-MsgGUID: iAcFbbohRfuwqorbLWFQQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="89468240"
+   d="scan'208";a="89468245"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
   by orviesa005.jf.intel.com with ESMTP; 06 Nov 2024 07:46:11 -0800
 From: Yi Liu <yi.l.liu@intel.com>
@@ -73,9 +73,9 @@ Cc: alex.williamson@redhat.com,
 	zhenzhong.duan@intel.com,
 	vasant.hegde@amd.com,
 	willy@infradead.org
-Subject: [PATCH v5 08/13] iommu/vt-d: Limit intel_iommu_set_dev_pasid() for paging domain
-Date: Wed,  6 Nov 2024 07:46:01 -0800
-Message-Id: <20241106154606.9564-9-yi.l.liu@intel.com>
+Subject: [PATCH v5 09/13] iommu/vt-d: Make intel_svm_set_dev_pasid() support domain replacement
+Date: Wed,  6 Nov 2024 07:46:02 -0800
+Message-Id: <20241106154606.9564-10-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241106154606.9564-1-yi.l.liu@intel.com>
 References: <20241106154606.9564-1-yi.l.liu@intel.com>
@@ -87,39 +87,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-intel_iommu_set_dev_pasid() is only supposed to be used by paging domain,
-so limit it.
+Make intel_svm_set_dev_pasid() support replacement.
 
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/intel/iommu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/iommu/intel/iommu.c | 8 ++++----
+ drivers/iommu/intel/iommu.h | 5 +++++
+ drivers/iommu/intel/svm.c   | 5 +++--
+ 3 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 6b7f48119502..3c1b92fa5877 100644
+index 3c1b92fa5877..06a7c4bf31e0 100644
 --- a/drivers/iommu/intel/iommu.c
 +++ b/drivers/iommu/intel/iommu.c
-@@ -4156,6 +4156,9 @@ static int intel_iommu_set_dev_pasid(struct iommu_domain *domain,
- 	struct dev_pasid_info *dev_pasid;
- 	int ret;
+@@ -1752,10 +1752,10 @@ static void domain_context_clear_one(struct device_domain_info *info, u8 bus, u8
+ 	intel_context_flush_present(info, context, did, true);
+ }
  
-+	if (WARN_ON_ONCE(!(domain->type & __IOMMU_DOMAIN_PAGING)))
-+		return -EINVAL;
+-static int __domain_setup_first_level(struct intel_iommu *iommu,
+-				      struct device *dev, ioasid_t pasid,
+-				      u16 did, pgd_t *pgd, int flags,
+-				      struct iommu_domain *old)
++int __domain_setup_first_level(struct intel_iommu *iommu,
++			       struct device *dev, ioasid_t pasid,
++			       u16 did, pgd_t *pgd, int flags,
++			       struct iommu_domain *old)
+ {
+ 	if (!old)
+ 		return intel_pasid_setup_first_level(iommu, dev, pgd,
+diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
+index cdca7d5061a7..d23977cc7d90 100644
+--- a/drivers/iommu/intel/iommu.h
++++ b/drivers/iommu/intel/iommu.h
+@@ -1250,6 +1250,11 @@ domain_add_dev_pasid(struct iommu_domain *domain,
+ void domain_remove_dev_pasid(struct iommu_domain *domain,
+ 			     struct device *dev, ioasid_t pasid);
+ 
++int __domain_setup_first_level(struct intel_iommu *iommu,
++			       struct device *dev, ioasid_t pasid,
++			       u16 did, pgd_t *pgd, int flags,
++			       struct iommu_domain *old);
 +
- 	if (!pasid_supported(iommu) || dev_is_real_dma_subdevice(dev))
- 		return -EOPNOTSUPP;
+ int dmar_ir_support(void);
  
-@@ -4184,8 +4187,7 @@ static int intel_iommu_set_dev_pasid(struct iommu_domain *domain,
+ void iommu_flush_write_buffer(struct intel_iommu *iommu);
+diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
+index 6c0685ea8466..f5569347591f 100644
+--- a/drivers/iommu/intel/svm.c
++++ b/drivers/iommu/intel/svm.c
+@@ -127,8 +127,9 @@ static int intel_svm_set_dev_pasid(struct iommu_domain *domain,
  
- 	domain_remove_dev_pasid(old, dev, pasid);
- 
--	if (domain->type & __IOMMU_DOMAIN_PAGING)
--		intel_iommu_debugfs_create_dev_pasid(dev_pasid);
-+	intel_iommu_debugfs_create_dev_pasid(dev_pasid);
- 
- 	return 0;
+ 	/* Setup the pasid table: */
+ 	sflags = cpu_feature_enabled(X86_FEATURE_LA57) ? PASID_FLAG_FL5LP : 0;
+-	ret = intel_pasid_setup_first_level(iommu, dev, mm->pgd, pasid,
+-					    FLPT_DEFAULT_DID, sflags);
++	ret = __domain_setup_first_level(iommu, dev, pasid,
++					 FLPT_DEFAULT_DID, mm->pgd,
++					 sflags, old);
+ 	if (ret)
+ 		goto out_remove_dev_pasid;
  
 -- 
 2.34.1
