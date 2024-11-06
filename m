@@ -1,119 +1,159 @@
-Return-Path: <kvm+bounces-31002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B449BF344
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:32:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 372BA9BF35C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C701C22213
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:32:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AAC41C20B1C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F8D204F77;
-	Wed,  6 Nov 2024 16:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JscTBjRW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8520E20513F;
+	Wed,  6 Nov 2024 16:38:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D33C18C006
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3183C18FC8C;
+	Wed,  6 Nov 2024 16:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730910743; cv=none; b=epOsnypi0XfU7Go7/uqx1EIym4ILU7LFiL1yMQ/h88f4OxKI9iHG3q5aAEL5tz+VQKQpJ8au5YW57xNyA6m8jkC0/j7uAoHzJsRMV9BoYRu5I/QqRooHC97HWR0VnGCq9M/ebCld14VrVJOFla6bVde0hh0vKHHg0Ua0gbY53Vs=
+	t=1730911081; cv=none; b=XQx2vwb8sPMK2XiXgn5OgOTVc5JH8pzXepKhyo1NOVQvvsVyEpEkfzIDedb6IfpruxOSUFdrRES9GTeWvJbOQQW7Mn0ggbUO/2Bdd2O7YgOvDcIOOwCm1jR5Mpg7efEc/rdntQUGIbdPoT/91HmPwwLSoaiUrYFSMDTUu05Mhec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730910743; c=relaxed/simple;
-	bh=nSd24sVQRoAp1t1XZEnlfr+xfgk2O456H2Wp8H2P1nw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uOUoaEh2aF9hUCCtP/8IdE8B/hofM7opzdCv2CCtAFvTxnqBfaqypnbgeft6O0VzkOOTbRPU5HhvwfQyrii59HrR6s1DyyKOXBN4uE5kNe1FlQRZ2J6WE1aFcB+pXoahi5hobfbk+nKanuVEkzLOBKyKqV5VvVJ7edrjQDyTl2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JscTBjRW; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ea8a5e862eso579067b3.0
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:32:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730910741; x=1731515541; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qbY6DKBNE1QQfrptJr4NxQ9zPHPnsHZbV4Pcue/bRDM=;
-        b=JscTBjRWbsnkmZMNBYhHZxNS7LieviJgdLlZtDvtklsWpWF8waRK00EaIoiY44VroH
-         51loxkKLEtcHrKDZrB+Gs1uPoKXaM1sZRf56a6HIAMQKt30taz/KGJ37DkjlBgtvQK9e
-         eQR+UM9FUsjUrhoEoMCI9ruynh7LEIYltJbT4BsVYPeyB7G49klvH18y4ZOagZJCad63
-         hK9ZHyiW7USXYwkgTZv6DYr424rRgSVzpau3O+yAFf+gTZV/92eqVh583+IDpyfdSqo4
-         AtNCAL3mbMsPJR+8mS/pr3Ur90gRj5UiGhzKGLvxttTi+GFtczPKvT3cw7ytwOmIHljS
-         yEOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730910741; x=1731515541;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qbY6DKBNE1QQfrptJr4NxQ9zPHPnsHZbV4Pcue/bRDM=;
-        b=NG/dN+kyGUV/8jgQI7H+XL6jf6gi6l+K4valxx7OZWsP8n97WjoAsxvuKDJIsBRU7h
-         G693GOEU6GGAQYP4DwHwj7c54KjZ8U10a2jU3TCYHuAuiTqUaDEszs+L8R0UlylElgLB
-         cqz2/BwzX6bwDS8lKHpW0iF37DuJQSvshTD/HdMLbY1eAnKJQsAB9lkOxljD8t7IbG12
-         oz2q3fHpH7Xjyzl/rgjZZYzy+VHZGa3T0OMrK6RUn+g1Wt62GIhIUORFb5vkWLbrfT7B
-         5Nf1O+EdCuw3+LnPDN/MCai1EBmy3lfuajtwA7v8vckx5YSDJYXWimfbd8x7SbwBJAQP
-         AfEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcy9TNxKLKZSjeSl8mhnoxTXDsp/bLMBsDzUBRDVFnvtmBmYRS6ajO5P27S1aTOnM7QqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjiWdHQRLB0PhOpKmSJePiDPIXZgZZZPgzCvb/N5b5JpTSppJ8
-	+J+RwHJWZxP5rYF70o+mzLIHg+sMANGILkkzFYE6McCse6H3es6p/mXnXQd2wf+wkm5kBCjuzHY
-	cfg==
-X-Google-Smtp-Source: AGHT+IFRjqQNM953xMuFIWpGheosTFQ4blOhXMTFf4OB6HIR2lAkuX9eFWWNIVkf9x2I18xzmZhDojhoW+Q=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6305:b0:6ea:4b3a:6703 with SMTP id
- 00721157ae682-6eabeee1708mr857197b3.5.1730910741352; Wed, 06 Nov 2024
- 08:32:21 -0800 (PST)
-Date: Wed, 6 Nov 2024 08:32:19 -0800
-In-Reply-To: <00a94b5e31fba738b0ad7f35859d8e7b8dceada7.camel@intel.com>
+	s=arc-20240116; t=1730911081; c=relaxed/simple;
+	bh=NoUPWQGZ3FMIWDA+UGAU977oicgCj2D+ncc6vpw6caU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WNaHgcETXkzfeWBCmb5aQYYblnVrC7qwdtLlQW0Oc9EEgxYc+xSpwxdZqi4BdRcKxIBL0OYiLfHGuvYLWLeV4Ln4K4V8jZvcc4yrLZw6OXqVy4xFs5JAXFNHhXl8sf8RPpjJEzlvnDgdIhwMOuH0IXTdI8lRAwOH9c9p68IDkB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 118FC497;
+	Wed,  6 Nov 2024 08:38:28 -0800 (PST)
+Received: from [10.57.90.5] (unknown [10.57.90.5])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6850B3F528;
+	Wed,  6 Nov 2024 08:37:54 -0800 (PST)
+Message-ID: <8a5940b0-08f3-48b1-9498-f09f0527a964@arm.com>
+Date: Wed, 6 Nov 2024 16:37:53 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240219074733.122080-1-weijiang.yang@intel.com>
- <ZjLP8jLWGOWnNnau@google.com> <0d8141b7-804c-40e4-b9f8-ac0ebc0a84cb@intel.com>
- <838cbb8b21fddf14665376360df4b858ec0e6eaf.camel@intel.com>
- <8e9f8613-7d3a-4628-9b77-b6ad226b0872@intel.com> <00a94b5e31fba738b0ad7f35859d8e7b8dceada7.camel@intel.com>
-Message-ID: <ZyuaE9ye3J56foBf@google.com>
-Subject: Re: [PATCH v10 00/27] Enable CET Virtualization
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Weijiang Yang <weijiang.yang@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Dave Hansen <dave.hansen@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com" <john.allen@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via
+ struct arm_smmu_hw_info
+To: Jason Gunthorpe <jgg@nvidia.com>, Will Deacon <will@kernel.org>
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+ linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Robert Moore <robert.moore@intel.com>, Sudeep Holla <sudeep.holla@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Donald Dutile <ddutile@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Hanjun Guo <guohanjun@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Jerry Snitselaar <jsnitsel@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+ Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>,
+ patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Mostafa Saleh <smostafa@google.com>
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <5-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <20241104114723.GA11511@willie-the-truck> <20241104124102.GX10193@nvidia.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20241104124102.GX10193@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 06, 2024, Rick P Edgecombe wrote:
-> On Wed, 2024-11-06 at 09:45 +0800, Yang, Weijiang wrote:
-> > > > Appreciated for your review and comments!
-> > > It looks like this series is very close. Since this v10, there was some
-> > > discussion on the FPU part that seemed settled:
-> > > https://lore.kernel.org/lkml/1c2fd06e-2e97-4724-80ab-8695aa4334e7@intel.com/
-> > 
-> > Hi, Rick,
-> > I have an internal branch to hold a v11 candidate for this series, which
-> > resolved Sean's comments
-> > for this v10, waiting for someone to take over and continue the upstream work.
-> > 
-> > > 
-> > > Then there was also some discussion on the synthetic MSR solution, which
-> > > seemed
-> > > prescriptive enough:
-> > > https://lore.kernel.org/kvm/20240509075423.156858-1-weijiang.yang@intel.com/
-> > > 
-> > > Weijiang, had you started a v2 on the synthetic MSR series? Where did you
-> > > get to
-> > > on incorporating the other small v10 feedback?
-> > 
-> > Yes, Sean's review feedback for v1 is also included in my above v11 candidate.
+On 2024-11-04 12:41 pm, Jason Gunthorpe wrote:
+> On Mon, Nov 04, 2024 at 11:47:24AM +0000, Will Deacon wrote:
+>>> +/**
+>>> + * struct iommu_hw_info_arm_smmuv3 - ARM SMMUv3 hardware information
+>>> + *                                   (IOMMU_HW_INFO_TYPE_ARM_SMMUV3)
+>>> + *
+>>> + * @flags: Must be set to 0
+>>> + * @__reserved: Must be 0
+>>> + * @idr: Implemented features for ARM SMMU Non-secure programming interface
+>>> + * @iidr: Information about the implementation and implementer of ARM SMMU,
+>>> + *        and architecture version supported
+>>> + * @aidr: ARM SMMU architecture version
+>>> + *
+>>> + * For the details of @idr, @iidr and @aidr, please refer to the chapters
+>>> + * from 6.3.1 to 6.3.6 in the SMMUv3 Spec.
+>>> + *
+>>> + * User space should read the underlying ARM SMMUv3 hardware information for
+>>> + * the list of supported features.
+>>> + *
+>>> + * Note that these values reflect the raw HW capability, without any insight if
+>>> + * any required kernel driver support is present. Bits may be set indicating the
+>>> + * HW has functionality that is lacking kernel software support, such as BTM. If
+>>> + * a VMM is using this information to construct emulated copies of these
+>>> + * registers it should only forward bits that it knows it can support.
+
+But how *is* a VMM supposed to know what it can support? Are they all 
+expected to grovel the host devicetree/ACPI tables and maintain their 
+own knowledge of implementation errata to understand what's actually usable?
+
+>>> + *
+>>> + * In future, presence of required kernel support will be indicated in flags.
+>>
+>> What about the case where we _know_ that some functionality is broken in
+>> the hardware? For example, we nobble BTM support on MMU 700 thanks to
+>> erratum #2812531 yet we'll still cheerfully advertise it in IDR0 here.
+>> Similarly, HTTU can be overridden by IORT, so should we update the view
+>> that we advertise for that as well?
 > 
-> Nice, sounds like another version (which could be the last) is basically ready
-> to go. Please let me know if it gets stuck for lack of someone to take it over.
+> My knee jerk answer is no, these struct fields should just report the
+> raw HW register. A VMM should not copy these fields directly into a
+> VM. The principle purpose is to give the VMM the same details about the
+> HW as the kernel so it can apply erratas/etc.
+> 
+> For instance, if we hide these fields how will the VMM/VM know to
+> apply the various flushing errata? With vCMDQ/etc the VM is directly
+> pushing flushes to HW, it must know the errata.
 
-Or me, if Intel can't conjure up the resource.  I have spent way, way too much
-time and effort on CET virtualization to let it die on the vine :-)
+That doesn't seem like a valid argument. We obviously can't abstract 
+SMMU_IIDR, that would indeed be an invitation for trouble, but 
+otherwise, if an erratum affects S1 operation under conditions dependent 
+on an optional feature, then not advertising that feature would make the 
+workaround irrelevant anyway, since as far as the VM is concerned it 
+would be wrong to expect a non-existent feature to work in the first place.
+
+> For BTM/HTTU/etc - those all require kernel SW support and per-device
+> permission in the kernel to turn on. For instance requesting a nested
+> vSTE that needs BTM will fail today during attach. Turning on HTTU on
+> the S2 already has an API that will fail if the IORT blocks it.
+
+What does S2 HTTU have to do with the VM? How the host wants to maintain 
+its S2 tables it its own business. AFAICS, unless the VMM wants to do 
+some fiddly CD shadowing, it's going to be kinda hard to prevent the 
+SMMU seeing a guest CD with CD.HA and/or CD.HD set if the guest expects 
+S1 HTTU to work.
+
+I'm not sure what "vSTE that needs BTM" means. Even if the system does 
+support BTM, the only control is the global SMMU_CR2.PTM, and a vSMMU 
+can't usefully emulate changing that either way. Either the host set 
+PTM=0 before enabling the SMMU, so BTM can be advertised and expected to 
+work, or it didn't, in which case there can be no BTM, full stop.
+
+> Incrementally dealing with expanding the support is part of the
+> "required kernel support will be indicated in flags."
+> 
+> Basically, exposing the information as-is doesn't do any harm.
+
+I would say it does. Advertising a feature when we already know it's not 
+usable at all puts a non-trivial and unnecessary burden on the VMM and 
+VM to then have to somehow derive that information from other sources, 
+at the risk of being confused by unexpected behaviour if they don't.
+
+We sanitise CPU ID registers for userspace and KVM, so I see no 
+compelling reason for SMMU ID registers to be different.
+
+Thanks,
+Robin.
 
