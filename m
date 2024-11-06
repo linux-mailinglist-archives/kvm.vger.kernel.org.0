@@ -1,154 +1,147 @@
-Return-Path: <kvm+bounces-30823-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30824-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 864189BD9B7
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 00:29:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A6F9BDAEC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 02:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1831C1F23EC8
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2024 23:29:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D4C7B21245
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 01:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7856216A2C;
-	Tue,  5 Nov 2024 23:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC53176AC8;
+	Wed,  6 Nov 2024 01:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBA6az7X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UG26ljVa"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E915216A18
-	for <kvm@vger.kernel.org>; Tue,  5 Nov 2024 23:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F5C6088F
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 01:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730849350; cv=none; b=J1zvdNJQuaUC3eCt1Cw2ndg3VpnxqAwrp2rsQA8sJ8Gp9FZqO8FY4mLPgVmoQ34JYR4ad7T8Z0FHSh7V/BH4NMi5fP9I6bc+CVxuBBQahPIlr9YVEHnwPJ3m9jEgA+H58Oy+y4UnTyiIH7NdbHV/vXvU3HPxDg7xa8V+Wil+IEw=
+	t=1730855327; cv=none; b=WSSN4XwMoeA28klBxpXobz2F/jluRQhcDqjIJd8J+sW0Ux0XLTfc4oMZqZI0TRW99YTu4sKTCylDT9mib1AmPlOHYHzOu7VUt9wRWyLnU4EzYLWy75Iybx9LFFclcss4BEabvbdHaWZ6/QvYHhof5LQg4sznsRhxswmP1W9D18k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730849350; c=relaxed/simple;
-	bh=c+O1aCV2hHScg23TJ/rGo6MfIEAdK07rMuZqdGFa4ac=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cPfTt4vvbCj4VHpJOfqW8IdJRzUAbNfNvicyG46/QVpS2vFhOfP9JfXVMAJgolwocCFa8e4jFq5YYJ4V6T6zgBxwBb/tjlSTbM2maXWIiHj9xlwKepY79mGdFl3k0x+1GlS24/D4jHNGgPlkoynHO1wrPNDwVrX6tY6oTEe8J5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QBA6az7X; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730849348;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1NZ0zx9SE1uKHc2bVZ86v1ZGK5me+n6DQA6Bc2mp/i0=;
-	b=QBA6az7Xb1Lxi34egKAw3+Zj4XsQnfzR6e9lgvHoX6OGjAvhMyuyxpGIzZVbH0Zg2K5WfC
-	NRzAUKLU1i8Xwsn4vH0bwnadMkgqtO619ZqYpVgFtyl7LmO+enn3AhwNDnX3GekCwLzXvc
-	l/Q2sIBMZmKBD2BoKUjMYy5NdaiVXkE=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-8MjPSzhpO9KNlCV_sBoemA-1; Tue, 05 Nov 2024 18:29:06 -0500
-X-MC-Unique: 8MjPSzhpO9KNlCV_sBoemA-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a4da5c5c02so9302475ab.2
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 15:29:06 -0800 (PST)
+	s=arc-20240116; t=1730855327; c=relaxed/simple;
+	bh=x7qQsnnVw4bPxyLG+CE9kBQPkeGC1GJpqcxEHiYft0g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=begqdAeSzIH1hb1tr5ejx+Q4cHdhi1UVHEbptsWQw5foikyRx5y8S9UzzQj8p13dBmIwocP8Su/IonX82OMeILV5ZyVh/9+qD/u4tn9xzonsEoxV/06WLyzFGfwnT+WWidWFEG3GfZizJngd2AedNCsHVJmhvGpEKrsup66Bl2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UG26ljVa; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea6aa3b68bso77584937b3.3
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 17:08:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730855325; x=1731460125; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UMgtJ0KzOhmo9rIc3kh4+kOac/nNqUwcudzaP6/Cffs=;
+        b=UG26ljValdw9unrCFFTKRD078DHF7FM5gl12fqgBg+QkZCXozBRUjZHndXn6RQjXXy
+         f4cRZq9myn9drAALoN0dr2Ujm2ROCARbVTEvjxYkDMhXDP6eUQQJG/Yi0WoMIREpOt3d
+         rTEx11udNH1QVRb7ma0My++gHfX6M3AJ89NAj5LF/sXNpcUomsVp8cCmAJsOFzj7yX0e
+         u9OBTgerNENQ5rLnSU/rMgzOz14aJe77vYCZDGZurIzR5/Krg1uA4shGXs5qMiQ3QRLY
+         WxlPTblaYByVmK54qopVDLKUJ+RVBhG03oGZFkK/nkGYKk0kW+JteGsaDC+enjhv6l4q
+         jSZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730849346; x=1731454146;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1NZ0zx9SE1uKHc2bVZ86v1ZGK5me+n6DQA6Bc2mp/i0=;
-        b=PEAaxUDjbquLwpOMjAE6n7g/2R7w7baz4jX124XmZlxLgvAxERG9N4Co2YDy9riC9c
-         A/4D53ASUqITN1A7+/Z8mpMd6r+JU7ULWL0A0qclVTy9Qld2CViLQJ+aJ753HXsWS45s
-         NFuO2eYTbTS7WPhorsaJAw5FmDsdoCy0mJ+7rDWi07syecP1hbAJJlGqCwpAhzaF6Us+
-         sp/i0K93IDKevtdnxFif/tqPBXIQj+FP6k4Hd8kp/goi4qAa41V9Evv6VoM+z1g7pDrn
-         7nvsRUourp+67O6n+EkZcs7HZiAeiREmVtfTUca1YDer9BKvwgcTlRqPzEFJ4BVA/NUN
-         od7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWb7jzj73rGXB2QSpHpFq7/a39Bb3fltQlgWSNYLg0xfeFNEKqT3bz8HXQq29RJlZRHP/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTSX11UZJKEx8+wf/Zu9nZtWBFH4nbZyNJSoIMVCprrX1+aVoJ
-	WI2e19GElRcshBVS66o6Z1r+OP1UXu2HLpXqV1rLkUiJ8kRHXenwkUTilATO7yWoF0P5Xo7ty8C
-	eIlxxyBDhby8dbXImSwjlOf5JS68wTJwsS711AcLKeTrGCzinOQ==
-X-Received: by 2002:a05:6e02:1385:b0:3a6:c048:4194 with SMTP id e9e14a558f8ab-3a6c04842aemr32218245ab.1.1730849345948;
-        Tue, 05 Nov 2024 15:29:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3/LzSIQREr27YcRyo458y8lltHd7KixOnzZv+XiAf1/o6pv7/b6gDajkbSPHSdFza38BG9A==
-X-Received: by 2002:a05:6e02:1385:b0:3a6:c048:4194 with SMTP id e9e14a558f8ab-3a6c04842aemr32218095ab.1.1730849345459;
-        Tue, 05 Nov 2024 15:29:05 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de049a45b8sm2608291173.132.2024.11.05.15.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 15:29:05 -0800 (PST)
-Date: Tue, 5 Nov 2024 16:29:04 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
- <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
- <parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
- <joao.m.martins@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V1 vfio 7/7] vfio/virtio: Enable live migration once
- VIRTIO_PCI was configured
-Message-ID: <20241105162904.34b2114d.alex.williamson@redhat.com>
-In-Reply-To: <20241104102131.184193-8-yishaih@nvidia.com>
-References: <20241104102131.184193-1-yishaih@nvidia.com>
-	<20241104102131.184193-8-yishaih@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1730855325; x=1731460125;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UMgtJ0KzOhmo9rIc3kh4+kOac/nNqUwcudzaP6/Cffs=;
+        b=OyDpEwGu3e9/XCMKwCvb2WtUSGqbdOs7O5K8cCMjt5jEQ4ydhGYzRrVN5mTvcbeIzH
+         8iznLeExo25K6brZotwmW/nRFrp4+MgurO7OBuU9bHaE47DB4u2ZmEDL7eEahrPgHiZ0
+         9hi/cDyGTs6wtC+c2N3TOORehrsxXJeWKoee6uV69YXKFpHKDV9TXq+uKPnr5mHBhXyz
+         Vwlsj484OVeLyPMDuNbN3HJJAnl+KWt0OrkolvfqTMBy0dY+nzQSEqvSM+W3NYKmipNa
+         9qzjb8LdWPCe9V/undWZVofoaisS3eo8phXhSqu1vJ8d0LfUy4lxjWf2VgbevcOska0S
+         iHNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXanSDtpAKShgyxBDTWVcDK35DrjCcj/MTHZCaqjHaijJE25Wm0c7FWUmwT0Z7+XIaPzjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBbf9dPc2T2ZAgTSMIYbHKsvU5dbIHfVIu6qOsEwky9GT8TSi1
+	td2PpVJ2EapgHsPLPtldSX3ru1Ergv35G6oQyH7Vx0zwaoUKqIVW6S19glhoqRxNba49nXTCFhx
+	5xg==
+X-Google-Smtp-Source: AGHT+IGX5AnXwVptVRYCTmYijITYZQXNG5Ljn81Ng3J/Wc79SvOmCCyPXICY2sJgH0SuFzxPk+mYHO6MGJ0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:4c09:b0:6db:b2ed:7625 with SMTP id
+ 00721157ae682-6ea521c92b4mr1265787b3.0.1730855324900; Tue, 05 Nov 2024
+ 17:08:44 -0800 (PST)
+Date: Tue, 5 Nov 2024 17:08:43 -0800
+In-Reply-To: <20241105105248.812dc586921df56e5bf78a5e@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <6729f475.050a0220.701a.0019.GAE@google.com> <20241105105248.812dc586921df56e5bf78a5e@linux-foundation.org>
+Message-ID: <ZyrBmwxOa0ewvh3n@google.com>
+Subject: Re: [syzbot] [mm?] BUG: Bad page state in kvm_coalesced_mmio_init
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: syzbot <syzbot+e985d3026c4fd041578e@syzkaller.appspotmail.com>, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	syzkaller-bugs@googlegroups.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 4 Nov 2024 12:21:31 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
-
-> Now that the driver supports live migration, only the legacy IO
-> functionality depends on config VIRTIO_PCI_ADMIN_LEGACY.
+On Tue, Nov 05, 2024, Andrew Morton wrote:
+> (cc kvm list)
 > 
-> Move the legacy IO into a separate file to be compiled only once
-> VIRTIO_PCI_ADMIN_LEGACY was configured and let the live migration
-> depends only on VIRTIO_PCI.
+> On Tue, 05 Nov 2024 02:33:25 -0800 syzbot <syzbot+e985d3026c4fd041578e@syzkaller.appspotmail.com> wrote:
 > 
-> As part of this, modify the default driver operations (i.e.,
-> vfio_device_ops) to use the live migration set, and extend it to include
-> legacy I/O operations if they are compiled and supported.
-> 
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/pci/virtio/Kconfig     |   4 +-
->  drivers/vfio/pci/virtio/Makefile    |   1 +
->  drivers/vfio/pci/virtio/common.h    |  19 ++
->  drivers/vfio/pci/virtio/legacy_io.c | 420 ++++++++++++++++++++++++++++
->  drivers/vfio/pci/virtio/main.c      | 416 ++-------------------------
->  5 files changed, 469 insertions(+), 391 deletions(-)
->  create mode 100644 drivers/vfio/pci/virtio/legacy_io.c
-> 
-> diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
-> index bd80eca4a196..af1dd9e84a5c 100644
-> --- a/drivers/vfio/pci/virtio/Kconfig
-> +++ b/drivers/vfio/pci/virtio/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config VIRTIO_VFIO_PCI
->          tristate "VFIO support for VIRTIO NET PCI devices"
-> -        depends on VIRTIO_PCI && VIRTIO_PCI_ADMIN_LEGACY
-> +        depends on VIRTIO_PCI
->          select VFIO_PCI_CORE
->          help
->            This provides support for exposing VIRTIO NET VF devices which support
-> @@ -11,5 +11,7 @@ config VIRTIO_VFIO_PCI
->            As of that this driver emulates I/O BAR in software to let a VF be
->            seen as a transitional device by its users and let it work with
->            a legacy driver.
-> +          In addition, it provides migration support for VIRTIO NET VF devices
-> +          using the VFIO framework.
+> > Hello,
+> > 
+> > syzbot found the following issue on:
+> > 
+> > HEAD commit:    59b723cd2adb Linux 6.12-rc6
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=17996587980000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=11254d3590b16717
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=e985d3026c4fd041578e
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> > userspace arch: i386
+> > 
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> > 
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/202d791be971/disk-59b723cd.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/9bfa02908d87/vmlinux-59b723cd.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/93c8c8740b4d/bzImage-59b723cd.xz
+> > 
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+e985d3026c4fd041578e@syzkaller.appspotmail.com
+> > 
+> > BUG: Bad page state in process syz.5.504  pfn:61f45
+> > page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x61f45
+> > flags: 0xfff00000080204(referenced|workingset|mlocked|node=0|zone=1|lastcpupid=0x7ff)
+> > raw: 00fff00000080204 0000000000000000 dead000000000122 0000000000000000
+> > raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+> > page dumped because: PAGE_FLAGS_CHECK_AT_FREE flag(s) set
+> > page_owner tracks the page as allocated
+> > page last allocated via order 0, migratetype Unmovable, gfp_mask 0x400dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO), pid 8443, tgid 8442 (syz.5.504), ts 201884660643, free_ts 201499827394
+> >  set_page_owner include/linux/page_owner.h:32 [inline]
+> >  post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1537
+> >  prep_new_page mm/page_alloc.c:1545 [inline]
+> >  get_page_from_freelist+0x303f/0x3190 mm/page_alloc.c:3457
+> >  __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4733
+> >  alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
+> >  kvm_coalesced_mmio_init+0x1f/0xf0 virt/kvm/coalesced_mmio.c:99
+> >  kvm_create_vm virt/kvm/kvm_main.c:1235 [inline]
+> >  kvm_dev_ioctl_create_vm virt/kvm/kvm_main.c:5488 [inline]
+> >  kvm_dev_ioctl+0x12dc/0x2240 virt/kvm/kvm_main.c:5530
+> >  __do_compat_sys_ioctl fs/ioctl.c:1007 [inline]
+> >  __se_compat_sys_ioctl+0x510/0xc90 fs/ioctl.c:950
+> >  do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+> >  __do_fast_syscall_32+0xb4/0x110 arch/x86/entry/common.c:386
+> >  do_fast_syscall_32+0x34/0x80 arch/x86/entry/common.c:411
+> >  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
 
-The first half of this now describes something that may or may not be
-enabled by this config option and the additional help text for
-migration is vague enough relative to PF requirements to get user
-reports that the driver doesn't work as intended.
+...
 
-For the former, maybe we still want a separate config item that's
-optionally enabled if VIRTIO_VFIO_PCI && VFIO_PCI_ADMIN_LEGACY.
+> > If the report is a duplicate of another one, reply with:
+> > #syz dup: exact-subject-of-another-report
 
-Thanks,
-Alex
+There's already a proposed fix (and long discussion) for this issue[*], but AFAIK
+there's no upstream visible report to dup this against.  Ah, yep, looks like Roman
+was working off a Google-internal report.  I'll point him at this one.
 
+[*] https://lore.kernel.org/all/20241021164837.2681358-1-roman.gushchin@linux.dev
 
