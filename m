@@ -1,157 +1,150 @@
-Return-Path: <kvm+bounces-30845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703E09BDDA9
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 04:36:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 237989BDE37
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 06:14:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01CF11F2358C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 03:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B42C41F24521
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 05:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA76E19047F;
-	Wed,  6 Nov 2024 03:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1182190678;
+	Wed,  6 Nov 2024 05:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDR3niQ8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OhQFUejs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961F19006F
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 03:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30882190462
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 05:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730864179; cv=none; b=SwTjYoExSfUbL7GOMJA1/JqaG2bBdG+N47fNk+rSoFvlD/DKpBCo9PtIZcv4jD4fbTuUFEIViBte8pgzfTleN/U81hNfSH+OCKMR24n0Bs01XB4qzkxdTxrZEjfV+onMwQjleWwl2mMK/rBaz0IvHCZwGoe3atl/NYyUK47eRFA=
+	t=1730870049; cv=none; b=lfuOaOq9JZuCkDvg3TkM7oql+UtCVcg8VMA3VVrhy+FhvRbiwdHEGMKaP/HH78RmLBGDIXPWAGGOnxUMtk411qDYGbYaKkyOcHxRpemApIuVDsxgwXirBZcARuj6LqpKsuxDaBUCpV3tockkPRZty+a+twuKW/7U5dll54dSzPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730864179; c=relaxed/simple;
-	bh=b/LjEV98+IEYePScSsvtFe/I008tMdVIcy/1aEMTVQg=;
+	s=arc-20240116; t=1730870049; c=relaxed/simple;
+	bh=+GUtlbwkwgEWibYVDjD+xb0kv0/BuZe7m5hWZoXt4oA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RONTn0NNMGmhnlLCcDqd+UxVbUwotPtha+L/axZAa/r8k17t+pQAJdoRYlgkMePgC5pSh+odredh9hZ2/Fsl8u3TXSunkT6d8Vnn1f6g/obUtNZt5u8bEHlfMqEdMDr7k7WDrdEu24iP82/b4bVjDSihhFOzl3owvFnWGqnWBm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDR3niQ8; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=I0nUSF9J/b+XO89fEU0zh/So/PWhH9qJXPXwSmNCi4yurF102cw59+dYmC+jJKKiJAL2nQOzAiWzfLr+KkwggUB2V8WtOXXUW6vP68jGV+fhz70SXhUwnWwGoNNT0eHKMnADkJJW+6rGInMo2XQcVP8wE0yU6rO3T5cRz1SRmUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OhQFUejs; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730864177; x=1762400177;
+  t=1730870048; x=1762406048;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=b/LjEV98+IEYePScSsvtFe/I008tMdVIcy/1aEMTVQg=;
-  b=mDR3niQ8oOIAv+NAzOVGUk2JCbRGdwBw3wPc7ENLFX0OuGFa5vjmpeLm
-   p0xnKBKXI+OGHFldOsGqKYq80BhaSkhhvKMLZf7umSpNZZcx+VnmYlDx3
-   hwLzU21BK7NFAP5SxE82C+HLF80/LiOarnMYYupSFxkPffk+OB5AiRW9B
-   dUoGx3TF/xZrpdeAbsM6eWl2VH9+KOeZOxxWUPs6MTHtMLllQSirVYpIk
-   vbiOpP7eukhTIaktGPezvPtDv69EbbAvRxhdWQ2L/DPw+RRkxf2E9aJUE
-   2PonIrj6eBbKxiIbF0jPdosO7lQFzExlo78oUX0YcrjfWHihzH2v1xGjM
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=+GUtlbwkwgEWibYVDjD+xb0kv0/BuZe7m5hWZoXt4oA=;
+  b=OhQFUejss5JFXb8whodTnZ3yuSHNrzJErvta3aRXXPBKxZutn8U1BvHn
+   +FbJ2GVLNZhGl0H2soIoIZ1KmKLypWC7vgfBPAbiSml1Bm958zFJdEVTB
+   hUqXacLT7sksvMJxAImcTEGZfghjEwZspMd5qBM6rYsyjE+6KQsiYzhZM
+   wDsSYc3XCLAzamihGWm/VIrRUpod0lq/61AzRLBUJ5NbuNFWUZ05lkkh9
+   nSSTnaFc+smxouai10RDKGiVdoYzJSKRbWCCO6FlJzKxZfOm3jTGVzB5y
+   84dun5HDdfsxHVk0sPq41Hyw8YiZ9cDMTGyF2HJEoJweJv/9Vaj0f/ehl
    g==;
-X-CSE-ConnectionGUID: 0mloQcXbQiyaDP8bcvvKwg==
-X-CSE-MsgGUID: QxiQLKG/QNCd1kcWCjvAvg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="34571407"
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="34571407"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 19:36:16 -0800
-X-CSE-ConnectionGUID: J1yWAnCQSK60motsMdSHig==
-X-CSE-MsgGUID: LYxdUWSaT22FcM+nT4VHcg==
+X-CSE-ConnectionGUID: eXHAKzM5Ty6+zFY271Zvtg==
+X-CSE-MsgGUID: hMGHxWcOTxKSlfnwEe417Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="42033297"
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="42033297"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 21:14:07 -0800
+X-CSE-ConnectionGUID: fQA3sH3PQSqWqeOLGAOP3A==
+X-CSE-MsgGUID: kDnoeCr3Rl6N+jQwZCQX9A==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="88855947"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa004.fm.intel.com with ESMTP; 05 Nov 2024 19:36:12 -0800
-Date: Wed, 6 Nov 2024 11:54:04 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-	mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
-	likexu@tencent.com, like.xu.linux@gmail.com,
-	zhenyuw@linux.intel.com, groug@kaod.org, lyan@digitalocean.com,
-	khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
-	den@virtuozzo.com, joe.jin@oracle.com, davydov-max@yandex-team.ru
-Subject: Re: [PATCH 1/7] target/i386: disable PerfMonV2 when PERFCORE
- unavailable
-Message-ID: <ZyroXEOsRPonKD7x@intel.com>
-References: <20241104094119.4131-1-dongli.zhang@oracle.com>
- <20241104094119.4131-2-dongli.zhang@oracle.com>
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="89144608"
+Received: from bergbenj-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.120])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 21:14:01 -0800
+Date: Wed, 6 Nov 2024 07:13:56 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+	"imammedo@redhat.com" <imammedo@redhat.com>,
+	"Liu, Zhao1" <zhao1.liu@intel.com>,
+	"marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
+	"anisinha@redhat.com" <anisinha@redhat.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"philmd@linaro.org" <philmd@linaro.org>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"mtosatti@redhat.com" <mtosatti@redhat.com>,
+	"eblake@redhat.com" <eblake@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"wangyanan55@huawei.com" <wangyanan55@huawei.com>,
+	"berrange@redhat.com" <berrange@redhat.com>
+Subject: Re: [PATCH v6 09/60] i386/tdx: Initialize TDX before creating TD
+ vcpus
+Message-ID: <Zyr7FA10pmLhZBxL@tlindgre-MOBL1>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-10-xiaoyao.li@intel.com>
+ <1235bac6ffe7be6662839adb2630c1a97d1cc4c5.camel@intel.com>
+ <c0ef6c19-756e-43f3-8342-66b032238265@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241104094119.4131-2-dongli.zhang@oracle.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c0ef6c19-756e-43f3-8342-66b032238265@intel.com>
 
-Hi Dongli,
+On Wed, Nov 06, 2024 at 10:01:04AM +0800, Xiaoyao Li wrote:
+> On 11/6/2024 4:51 AM, Edgecombe, Rick P wrote:
+> > +Tony
+> > 
+> > On Tue, 2024-11-05 at 01:23 -0500, Xiaoyao Li wrote:
+> > > +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+> > > +{
+> > > +    X86CPU *x86cpu = X86_CPU(cpu);
+> > > +    CPUX86State *env = &x86cpu->env;
+> > > +    g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
+> > > +    int r = 0;
+> > > +
+> > > +    QEMU_LOCK_GUARD(&tdx_guest->lock);
+> > > +    if (tdx_guest->initialized) {
+> > > +        return r;
+> > > +    }
+> > > +
+> > > +    init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
+> > > +                        sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
+> > > +
+> > > +    r = setup_td_xfam(x86cpu, errp);
+> > > +    if (r) {
+> > > +        return r;
+> > > +    }
+> > > +
+> > > +    init_vm->cpuid.nent = kvm_x86_build_cpuid(env, init_vm->cpuid.entries, 0);
+> > > +    tdx_filter_cpuid(&init_vm->cpuid);
+> > > +
+> > > +    init_vm->attributes = tdx_guest->attributes;
+> > > +    init_vm->xfam = tdx_guest->xfam;
+> > > +
+> > > +    do {
+> > > +        r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, init_vm);
+> > > +    } while (r == -EAGAIN);
+> > 
+> > KVM_TDX_INIT_VM can also return EBUSY. This should check for it, or KVM should
+> > standardize on one for both conditions. In KVM, both cases handle
+> > TDX_RND_NO_ENTROPY, but one tries to save some of the initialization for the
+> > next attempt. I don't know why userspace would need to differentiate between the
+> > two cases though, which makes me think we should just change the KVM side.
+> 
+> I remember I tested retrying on the two cases and no surprise showed.
+> 
+> I agree to change KVM side to return -EAGAIN for the two cases.
 
-On Mon, Nov 04, 2024 at 01:40:16AM -0800, Dongli Zhang wrote:
-> Date: Mon,  4 Nov 2024 01:40:16 -0800
-> From: Dongli Zhang <dongli.zhang@oracle.com>
-> Subject: [PATCH 1/7] target/i386: disable PerfMonV2 when PERFCORE
->  unavailable
-> X-Mailer: git-send-email 2.43.5
-> 
-> When the PERFCORE is disabled with "-cpu host,-perfctr-core", it is
-> reflected in in guest dmesg.
-> 
-> [    0.285136] Performance Events: AMD PMU driver.
-> 
-> However, the guest cpuid indicates the PerfMonV2 is still available.
-> 
-> CPU:
->    Extended Performance Monitoring and Debugging (0x80000022):
->       AMD performance monitoring V2         = true
->       AMD LBR V2                            = false
->       AMD LBR stack & PMC freezing          = false
->       number of core perf ctrs              = 0x6 (6)
->       number of LBR stack entries           = 0x0 (0)
->       number of avail Northbridge perf ctrs = 0x0 (0)
->       number of available UMC PMCs          = 0x0 (0)
->       active UMCs bitmask                   = 0x0
-> 
-> Disable PerfMonV2 in cpuid when PERFCORE is disabled.
-> 
-> Fixes: 209b0ac12074 ("target/i386: Add PerfMonV2 feature bit")
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
->  target/i386/cpu.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 3baa95481f..4490a7a8d6 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7103,6 +7103,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          *eax = *ebx = *ecx = *edx = 0;
->          /* AMD Extended Performance Monitoring and Debug */
->          if (kvm_enabled() && cpu->enable_pmu &&
-> +            (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_PERFCORE) &&
->              (env->features[FEAT_8000_0022_EAX] & CPUID_8000_0022_EAX_PERFMON_V2)) {
->              *eax |= CPUID_8000_0022_EAX_PERFMON_V2;
->              *ebx |= kvm_arch_get_supported_cpuid(cs->kvm_state, index, count,
-
-You can define dependency like this:
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3baa95481fbc..99c69ec9f369 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1803,6 +1803,10 @@ static FeatureDep feature_dependencies[] = {
-         .from = { FEAT_7_1_EDX,             CPUID_7_1_EDX_AVX10 },
-         .to = { FEAT_24_0_EBX,              ~0ull },
-     },
-+    {
-+        .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_PERFCORE },
-+        .to = { FEAT_8000_0022_EAX,         CPUID_8000_0022_EAX_PERFMON_V2 }
-+    }
- };
-
- typedef struct X86RegisterInfo32 {
-
----
-Does this meet your needs?
+OK yeah let's patch KVM for it.
 
 Regards,
-Zhao
 
+Tony
 
