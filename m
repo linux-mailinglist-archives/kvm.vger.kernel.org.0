@@ -1,125 +1,97 @@
-Return-Path: <kvm+bounces-30972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10D69BF1CF
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:35:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3FED9BF1FD
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 591E7284DDA
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765011F23CCF
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D836020127C;
-	Wed,  6 Nov 2024 15:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330D02022F9;
+	Wed,  6 Nov 2024 15:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pL4T9+o0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fXeG2DLl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A280318CC15
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 15:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BE42EAE0;
+	Wed,  6 Nov 2024 15:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730907319; cv=none; b=QTvdqAbDV2gqnaR90es5XtU+qLhiBKxqxjtTsGz73FwRR2RIQ6V97J1Yzi6EfJl0YWa18GVGxKwFAzf/TpdhVpI2qjackqWf5aSCJg3RylsnRfvac4HvvlXsdA55wXlUpAhFWSFN+z409rQLkODv2JL9CmQtW12lY3gw8mDhKBQ=
+	t=1730907957; cv=none; b=m5Wmslp2iL0qDWnGMu43X+RsSMehkBGlZhlbBoM1UhCHKW0CXmGKtdjVxTAtqJ3FMCooAJuRa3tV6KeP6b3iqT4BYQ3bCiGZc8zWCFCvzsWaWhzOWUdxNigUwiKBTtKjKfExlkdnYHmcSd1tpMvTdXeDNwkwl8hod1NX1yadC+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730907319; c=relaxed/simple;
-	bh=BzMh/SkjF/vZhwo25zJAi8RA4wwY7ojx5tSTsjGDWMQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N4L2tPKKPHmS2Gyssm3e378dyPIneH+N8bhfu0sman3xD+/Xq+vTIvtpbeTws9V13E2oyLXaOVxuoQEssQLfi5EVjYQaXpmVCPswTV1SOPjdgYR3HeokBqIh3rcwem0Ve8sLgct/i3Mt/hYD5N32Opmapae9OGSlEANgtqQw0WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pL4T9+o0; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e5bdb9244eso108260307b3.2
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 07:35:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730907316; x=1731512116; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/yuAQmTAdCCAAaxxu5QbRxg4oOjJGHpnFzwE4CldcWU=;
-        b=pL4T9+o0brGcw/QHzoU85hJtJ7RZz//gBFvuPkxZ4UME+7pqOFxvp//Leh6KdOx/jq
-         OlS7SHxpOqT1VH6P4qpWyJQfReEm/2jVRkOEvMvVBLexV55rt707jgS50rp5Hdfngl0t
-         /Ba92a6QM2PIlV39DCknXeaNmJ7SYFP8Gg8O7VArks8eiEZYQ5ReZ7FiSqZJxWk6FMxF
-         yk0fhrbU4NyhL1d+a4TzIgVmtSY7MJXy0wtffNAoA5NoMx32rcK9B9eMfRzWHYzUnPN1
-         Dpq17oLuJNB8oSDbyelpJ1SXwjUTcNq3gIZHlPqqtumartL/+wvUc+st5hRhBFAzf8lr
-         r7XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730907316; x=1731512116;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/yuAQmTAdCCAAaxxu5QbRxg4oOjJGHpnFzwE4CldcWU=;
-        b=S0V0YEiFFaIX7i5JM8SrEegWtZ3Tote48pysuFcYSX4gWGYQ+zg8oQWgmxDnI/Ha62
-         Iu694X8GSQ5HB1OC2zEelYTYfYTKK4gJN5ooJNOb2nVW382OItsbtXZDEAGJrW/Z0JdG
-         0Gkph+IqZunGXstTFCzKgPtrQ6h+2aKIaMYhGyS3fykNa2+fkFUYNzCCeFBtpGq3onws
-         vG2hsTeriKt2FvT00rsF6u3/9GkHIfBc937TwDV5Gs74D8UUhT46xQrbQU129kGTfGcY
-         Dvs2q8SzWIMHbBux1+YV5AnrVzcbG5TQY2HjQ1ZaGd0Z98omR7uBPu0jrC7C3xP0BQr3
-         e5Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCWynDwPK2CtuLab0D+OOcnUPdzKQmI6vd8ngKd4DHjuMy5w4YvXo1mQBEhlc7BJOJGtsf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb+1ys18mCiuFxmBiktrcav7vDBhBolS07jq6Sbv6iR54tIp/2
-	IgGP70huZGZvBk7QReYgJvSodAYD6B8IOmZa+K0iuOWHoDjXXq9fL4pdKPUW0UQLV7G6/Sgp8rE
-	0hA==
-X-Google-Smtp-Source: AGHT+IHmNxgiraaP+U1uT1ChKSKhhI4xy7BUPpqdGKKVhBllQrZbqSbHpux9zDxuCCy+elXJIEPKqQ6aqPM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:25c7:b0:6e2:6f2:efc with SMTP id
- 00721157ae682-6e9d8ad570amr9938387b3.5.1730907316561; Wed, 06 Nov 2024
- 07:35:16 -0800 (PST)
-Date: Wed, 6 Nov 2024 07:35:15 -0800
-In-Reply-To: <20241106152914.GFZyuLSvhKDCRWOeHa@fat_crate.local>
+	s=arc-20240116; t=1730907957; c=relaxed/simple;
+	bh=vwmdwh9p0MkC8M3txKwd05mOaAC7dFJH8WNu6iNevo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i98KLOcD/vTfMX6B+oixeanA4l2nTgONvghZVc/fHiSiUhHh4Ym38TFdXmV5QsqiIUGA/fAMyO8p1VQHpBwT8cHGTZIqtx1Xrh2zHVlh8SHETNkUyH1QqNsvY2/moNAIqa9ql7y+d2JKdqVkL/03T59Wmdhltp57fN8CmIfeN+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fXeG2DLl; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=wyQu6vowSRFmkW1quebGYzpajWeL2fiYU3+PvoZUQlc=; b=fXeG2DLl+Aq9S30LzjI6tdZM5n
+	4y/6TXuliWDLEehkumnvXwWbUAhv7eF32g/m053D7wJ209SiuwkYhdKNKyzEKzB7lbU66cFIk0qaI
+	K9VoLrViDgxfDDtVGJFfDa6gUIRQtO4qKGW0gLpVlseY1TnQSUwCLzQunwp0sW2uokQFY35EKjz7/
+	4S3qm/vPZPqNT8bNrXm9KDvxfBDFBxV8N+XanRpP+3zJqis6hlE7VDaJsUiEDbBy+7DdI3JKJCbWb
+	zoBplHJ9Qco6SphCd/PQqOaE01ahPruhJoOAyWbVnQTDL9otD8pPsF4lSdJdD1Y9UxDLAkcj/nzp2
+	hyiukz1g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t8iEC-00000003sNS-1QqQ;
+	Wed, 06 Nov 2024 15:45:52 +0000
+Date: Wed, 6 Nov 2024 07:45:52 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Srujana Challa <schalla@marvell.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
+ NO-IOMMU mode
+Message-ID: <ZyuPMI-VOp8eK-dP@infradead.org>
+References: <Zvu3HktM4imgHpUw@infradead.org>
+ <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <Zw3mC3Ej7m0KyZVv@infradead.org>
+ <20241016134127-mutt-send-email-mst@kernel.org>
+ <ZxCrqPPbidzZb6w1@infradead.org>
+ <20241019201059-mutt-send-email-mst@kernel.org>
+ <ZxieizC7zeS7zyrd@infradead.org>
+ <20241023041739-mutt-send-email-mst@kernel.org>
+ <ZxoN57kleWecXejY@infradead.org>
+ <DS0PR18MB5368B1BCC3CFAE5D7E4EB627A0532@DS0PR18MB5368.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241104101543.31885-1-bp@kernel.org> <ZyltcHfyCiIXTsHu@google.com>
- <20241105123416.GBZyoQyAoUmZi9eMkk@fat_crate.local> <ZypfjFjk5XVL-Grv@google.com>
- <20241105185622.GEZypqVul2vRh6yDys@fat_crate.local> <ZypvePo2M0ZvC4RF@google.com>
- <20241105192436.GFZypw9DqdNIObaWn5@fat_crate.local> <ZyuJQlZqLS6K8zN2@google.com>
- <20241106152914.GFZyuLSvhKDCRWOeHa@fat_crate.local>
-Message-ID: <ZyuMsz5p26h_XbRR@google.com>
-Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, kvm@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR18MB5368B1BCC3CFAE5D7E4EB627A0532@DS0PR18MB5368.namprd18.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Nov 06, 2024, Borislav Petkov wrote:
-> On Wed, Nov 06, 2024 at 07:20:34AM -0800, Sean Christopherson wrote:
-> > I prefer to be To:/Cc:'d on any patches that touch files that are covered by
-> > relevant MAINTAINERS entries.  IMO, pulling names/emails from git is useless noise
-> > the vast majority of the time.
-> 
-> Huh, that's what I did!
+On Wed, Nov 06, 2024 at 12:38:02PM +0000, Srujana Challa wrote:
+> It is going in circles, let me give the summary,
+> Issue: We need to address the lack of no-IOMMU support in the vhost vDPA driver for better performance.
+> Measured Performance: On the machine "13th Gen Intel(R) Core(TM) i9-13900K, 32 Cores", we observed
 
-You didn't though.  The original mail Cc'd kvm@, but neither Paolo nor I.
+Looks ike you are going in circles indeed.  Lack of performance is never
+a reason to disable the basic memoy safety for userspace drivers.
 
-> Please run this patch through get_maintainer.pl and tell me who else I should
-> have CCed.
+The (also quite bad) reason why vfio-nummu was added was to support
+hardware entirely with an iommu.
 
-  $ ./scripts/get_maintainer.pl --nogit --nogit-fallback --norolestats --nofixes -- <patch>
-  Thomas Gleixner <tglx@linutronix.de>
-  Ingo Molnar <mingo@redhat.com>
-  Borislav Petkov <bp@alien8.de>
-  Dave Hansen <dave.hansen@linux.intel.com>
-  x86@kernel.org
-  "H. Peter Anvin" <hpa@zytor.com>
-  Peter Zijlstra <peterz@infradead.org>
-  Josh Poimboeuf <jpoimboe@kernel.org>
-  Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-  Sean Christopherson <seanjc@google.com>
-  Paolo Bonzini <pbonzini@redhat.com>
-  linux-kernel@vger.kernel.org
-  kvm@vger.kernel.org
+There is absolutely no reason to add krnel code for new methods of
+unsafer userspace I/O without an IOMMU ever.
 
-Versus the actual To + Cc:
-
-  X86 ML <x86@kernel.org>
-  Josh Poimboeuf <jpoimboe@redhat.com>,
-  Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-  kvm@vger.kernel.org,
-  LKML <linux-kernel@vger.kernel.org>,
-  "Borislav Petkov (AMD)" <bp@alien8.de>
 
