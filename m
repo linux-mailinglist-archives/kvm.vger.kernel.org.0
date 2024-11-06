@@ -1,109 +1,157 @@
-Return-Path: <kvm+bounces-30846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373699BDDB7
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 04:40:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 703E09BDDA9
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 04:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DADB41F24607
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 03:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01CF11F2358C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 03:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59AB190662;
-	Wed,  6 Nov 2024 03:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA76E19047F;
+	Wed,  6 Nov 2024 03:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="osFozrZ4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDR3niQ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAB2190477
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 03:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961F19006F
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 03:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730864443; cv=none; b=DYToByLUv/V7jIDtXFk8VJFyKsSerYZSJOUJrEeF8c3c+QD2or/DF3DHYctiQ66wxxXS+k6OdFoR9jeOmpvUTV7xvva+JskV8ce7Ilg4MnzuSHvfZf5Yh6GGgzdHLczkkCzKJWIexea1M2LnXKbN9/1c9lzp+MyFyVdtf2DfC0w=
+	t=1730864179; cv=none; b=SwTjYoExSfUbL7GOMJA1/JqaG2bBdG+N47fNk+rSoFvlD/DKpBCo9PtIZcv4jD4fbTuUFEIViBte8pgzfTleN/U81hNfSH+OCKMR24n0Bs01XB4qzkxdTxrZEjfV+onMwQjleWwl2mMK/rBaz0IvHCZwGoe3atl/NYyUK47eRFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730864443; c=relaxed/simple;
-	bh=CMQ76uKI1FEpDkwvFQyA0kPM9eXSHdq8hIlxtAz4vQA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KWqOqFgt0GD/EM77EsFZ3fn3YbQB5Dcpj4n0Jpkdqf8VLEz1VVi/+WRzl3yA8dhlcW/53eHIWMqyDGlL59Sex1I/BMCM8d1Paz6VBaQBaMqGj5OklTHir+BkkTFqurMdrxeBgBQnDhxJM9gHA2Xn/7EQJyb+qyOlwM19nHUhcvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jsperbeck.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=osFozrZ4; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jsperbeck.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e376aa4586so118426177b3.1
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 19:40:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730864441; x=1731469241; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LplVTGJVvGJFvhtTV6mcwx8iPQDI2scKmqd+ot8fMsw=;
-        b=osFozrZ4fRRdbnpx21dSCPnFkfbAyJQBT5sS9E9BHyQLY1lhn+iHBdu3R2h99tlUva
-         zQzeBN6MOf1M48V+4MqlkOQh8naoZaW/cioPiDnSkNSnI4mjYGKC9GBodMHiOQgsIIMK
-         aFUiGb572Av1HqXsjuPhXU8EWtpLV3MIiJTA27gdfWsDP/UZnJEoYoxyDyOAgUitfxV2
-         fqTKoOF2se6ApRH/+qoLLltX0oKhSPiYy+7dSmi2q/uNnobUEo11UzrgotMdb4dNaGmr
-         KvtxaT8IyqJQ4F60W4ghIcAM/2ffin85slLbqVQDiwUkY0nKhngb1UT13Nah/S9a3KjH
-         YuEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730864441; x=1731469241;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LplVTGJVvGJFvhtTV6mcwx8iPQDI2scKmqd+ot8fMsw=;
-        b=f80Pi8QTtkCZYrzC8atkmJCoR1K/g0AvK/rFwG9Qm+TsfSGc39+KcYi0A2sgeMKxDt
-         4da7TjD7NdzTNAgk64f64rggeQ2IAsc5JjSJLkE8YisLiduN7nHrp0u9SvEQYCzzoGi4
-         hja0ZF6wor6sRmPTJwHlZhRv/LkaBbJ9dFSvLoqwWCFv0ySi+6o+9/yNywRuFtdecEOt
-         mk1kCMLv1ldszlTN5eBQbU5tZEQCZda4xZTBo+dDAth5JiZWCkx+cKvgWWTbFu7LMFLl
-         uDtAQLQYYpmgS1JEaHYz3HicyKz61+HuNgBLYfgbcq8xYzWtcdVlhxh89HvznjPkxOnu
-         P4rQ==
-X-Gm-Message-State: AOJu0YyVFk9Pd74+FaUOq65hWLOx3jplv/UXODrzNWidftb1u9sm8tk0
-	Cgl4PkaPhbLAwhNGTi86gv253jxbmMF936uVLSS3UUznuYRuaQzpGSmN/bPrYrg50ocQhB1LQb8
-	Cu6CNqAZ04vUNoQ==
-X-Google-Smtp-Source: AGHT+IGzB+ojrRUXG2iLAlNNLqDQ7VKHBuH5SLcr3K23iMUurWN3UCPuphjmVaHR+inkaEx7vzmb8A5IqZO0L4g=
-X-Received: from jsperbeck7.c.googlers.com ([fda3:e722:ac3:cc00:59:977b:ac1c:3a1d])
- (user=jsperbeck job=sendgmr) by 2002:a05:690c:4c09:b0:6e7:e493:2db6 with SMTP
- id 00721157ae682-6ea3b951361mr2818897b3.3.1730864440817; Tue, 05 Nov 2024
- 19:40:40 -0800 (PST)
-Date: Tue,  5 Nov 2024 19:40:31 -0800
+	s=arc-20240116; t=1730864179; c=relaxed/simple;
+	bh=b/LjEV98+IEYePScSsvtFe/I008tMdVIcy/1aEMTVQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RONTn0NNMGmhnlLCcDqd+UxVbUwotPtha+L/axZAa/r8k17t+pQAJdoRYlgkMePgC5pSh+odredh9hZ2/Fsl8u3TXSunkT6d8Vnn1f6g/obUtNZt5u8bEHlfMqEdMDr7k7WDrdEu24iP82/b4bVjDSihhFOzl3owvFnWGqnWBm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDR3niQ8; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730864177; x=1762400177;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=b/LjEV98+IEYePScSsvtFe/I008tMdVIcy/1aEMTVQg=;
+  b=mDR3niQ8oOIAv+NAzOVGUk2JCbRGdwBw3wPc7ENLFX0OuGFa5vjmpeLm
+   p0xnKBKXI+OGHFldOsGqKYq80BhaSkhhvKMLZf7umSpNZZcx+VnmYlDx3
+   hwLzU21BK7NFAP5SxE82C+HLF80/LiOarnMYYupSFxkPffk+OB5AiRW9B
+   dUoGx3TF/xZrpdeAbsM6eWl2VH9+KOeZOxxWUPs6MTHtMLllQSirVYpIk
+   vbiOpP7eukhTIaktGPezvPtDv69EbbAvRxhdWQ2L/DPw+RRkxf2E9aJUE
+   2PonIrj6eBbKxiIbF0jPdosO7lQFzExlo78oUX0YcrjfWHihzH2v1xGjM
+   g==;
+X-CSE-ConnectionGUID: 0mloQcXbQiyaDP8bcvvKwg==
+X-CSE-MsgGUID: QxiQLKG/QNCd1kcWCjvAvg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="34571407"
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="34571407"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 19:36:16 -0800
+X-CSE-ConnectionGUID: J1yWAnCQSK60motsMdSHig==
+X-CSE-MsgGUID: LYxdUWSaT22FcM+nT4VHcg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="88855947"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa004.fm.intel.com with ESMTP; 05 Nov 2024 19:36:12 -0800
+Date: Wed, 6 Nov 2024 11:54:04 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+	mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
+	likexu@tencent.com, like.xu.linux@gmail.com,
+	zhenyuw@linux.intel.com, groug@kaod.org, lyan@digitalocean.com,
+	khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+	den@virtuozzo.com, joe.jin@oracle.com, davydov-max@yandex-team.ru
+Subject: Re: [PATCH 1/7] target/i386: disable PerfMonV2 when PERFCORE
+ unavailable
+Message-ID: <ZyroXEOsRPonKD7x@intel.com>
+References: <20241104094119.4131-1-dongli.zhang@oracle.com>
+ <20241104094119.4131-2-dongli.zhang@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241106034031.503291-1-jsperbeck@google.com>
-Subject: [PATCH] KVM: selftests: use X86_MEMTYPE_WB instead of VMX_BASIC_MEM_TYPE_WB
-From: John Sperbeck <jsperbeck@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	John Sperbeck <jsperbeck@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104094119.4131-2-dongli.zhang@oracle.com>
 
-In 08a7d2525511 ("tools arch x86: Sync the msr-index.h copy with the
-kernel sources"), VMX_BASIC_MEM_TYPE_WB was removed.  Use X86_MEMTYPE_WB
-instead.
+Hi Dongli,
 
-Fixes: 08a7d2525511 ("tools arch x86: Sync the msr-index.h copy with the
-kernel sources")
-Signed-off-by: John Sperbeck <jsperbeck@google.com>
+On Mon, Nov 04, 2024 at 01:40:16AM -0800, Dongli Zhang wrote:
+> Date: Mon,  4 Nov 2024 01:40:16 -0800
+> From: Dongli Zhang <dongli.zhang@oracle.com>
+> Subject: [PATCH 1/7] target/i386: disable PerfMonV2 when PERFCORE
+>  unavailable
+> X-Mailer: git-send-email 2.43.5
+> 
+> When the PERFCORE is disabled with "-cpu host,-perfctr-core", it is
+> reflected in in guest dmesg.
+> 
+> [    0.285136] Performance Events: AMD PMU driver.
+> 
+> However, the guest cpuid indicates the PerfMonV2 is still available.
+> 
+> CPU:
+>    Extended Performance Monitoring and Debugging (0x80000022):
+>       AMD performance monitoring V2         = true
+>       AMD LBR V2                            = false
+>       AMD LBR stack & PMC freezing          = false
+>       number of core perf ctrs              = 0x6 (6)
+>       number of LBR stack entries           = 0x0 (0)
+>       number of avail Northbridge perf ctrs = 0x0 (0)
+>       number of available UMC PMCs          = 0x0 (0)
+>       active UMCs bitmask                   = 0x0
+> 
+> Disable PerfMonV2 in cpuid when PERFCORE is disabled.
+> 
+> Fixes: 209b0ac12074 ("target/i386: Add PerfMonV2 feature bit")
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+>  target/i386/cpu.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3baa95481f..4490a7a8d6 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7103,6 +7103,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          *eax = *ebx = *ecx = *edx = 0;
+>          /* AMD Extended Performance Monitoring and Debug */
+>          if (kvm_enabled() && cpu->enable_pmu &&
+> +            (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_PERFCORE) &&
+>              (env->features[FEAT_8000_0022_EAX] & CPUID_8000_0022_EAX_PERFMON_V2)) {
+>              *eax |= CPUID_8000_0022_EAX_PERFMON_V2;
+>              *ebx |= kvm_arch_get_supported_cpuid(cs->kvm_state, index, count,
+
+You can define dependency like this:
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 3baa95481fbc..99c69ec9f369 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1803,6 +1803,10 @@ static FeatureDep feature_dependencies[] = {
+         .from = { FEAT_7_1_EDX,             CPUID_7_1_EDX_AVX10 },
+         .to = { FEAT_24_0_EBX,              ~0ull },
+     },
++    {
++        .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_PERFCORE },
++        .to = { FEAT_8000_0022_EAX,         CPUID_8000_0022_EAX_PERFMON_V2 }
++    }
+ };
+
+ typedef struct X86RegisterInfo32 {
+
 ---
- tools/testing/selftests/kvm/lib/x86_64/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Does this meet your needs?
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index 089b8925b6b2..d7ac122820bf 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -200,7 +200,7 @@ static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
- 	if (vmx->eptp_gpa) {
- 		uint64_t ept_paddr;
- 		struct eptPageTablePointer eptp = {
--			.memory_type = VMX_BASIC_MEM_TYPE_WB,
-+			.memory_type = X86_MEMTYPE_WB,
- 			.page_walk_length = 3, /* + 1 */
- 			.ad_enabled = ept_vpid_cap_supported(VMX_EPT_VPID_CAP_AD_BITS),
- 			.address = vmx->eptp_gpa >> PAGE_SHIFT_4K,
--- 
-2.47.0.277.g8800431eea-goog
+Regards,
+Zhao
 
 
