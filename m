@@ -1,126 +1,175 @@
-Return-Path: <kvm+bounces-30960-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30961-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59479BF046
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:30:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0431B9BF072
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C7D285A00
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:30:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 239D11C21B44
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 14:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA292040B7;
-	Wed,  6 Nov 2024 14:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453722022E5;
+	Wed,  6 Nov 2024 14:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cCB014Ev"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sIBBCyfr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A661DEFD7
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 14:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C871E7C1A
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 14:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730903359; cv=none; b=NK8uIlpTI+PRn9Tr3mqJz3n6qJDb6yNW4VYdKeroE4vnyYLP+kvWBx4jhYe2VysbWsJYoGdrcStcTacC3x9AAqvLZR5IKJdDYxmj/jgbdPQVlUB0/UJmkPTsVIuo6CTQ60Xpnr2dpk/ABU2TQzqbLrTBWRo3tW733JScYFptvvk=
+	t=1730903699; cv=none; b=QwJSxW08AgaPmsXulh9/JzrFiwRb6VAFryRueIp8h5Ha/qKMxR4VO+G5qINH2a09AOl/bt4KVvcJhCD1wVONi4W8xhnAftY3w1F+QjnVsPeQSwHvncEjU4fdvO/p8yn8kYHSA/8lYg1G9xgbst/yUnPWcjL9I/ZM984K1aZI9jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730903359; c=relaxed/simple;
-	bh=YQRPILUC8pxqFiXOJMl/jAfX7hkH7PV7OV37EcrGHiw=;
+	s=arc-20240116; t=1730903699; c=relaxed/simple;
+	bh=pup6Bx2H6bbZiQK7VkJk+5M1i4APEfd+U0AYUwlyulw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JlpjexsIGCaFL4DZx3y/FM+uctBeA7tv2F0gfaixA0nT40kwSRxAzZ+zUcLtneYzFjGlO/1bXdqUB3QL8e1D3XNk98FNePX7tJeayMA5lBVmVSQRmyrhMCmqL2F0UxSQ6uzJB7VuKT4RogerEywD4xeDGF9l18Nubt7qK+usEBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cCB014Ev; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=SOh0RIgbz5yTcqQGNcDaMQ0TKBN+VfHmjSRLmFCFVXVuvqmUQBZGc33+Q5KJflIStcRY4pDDe1InmSe5liEQQY5z2mS8y2dz9Z4b+aMSWnGTL6gUDN1tNbP+aeTGGfgvUwX1eDuwlmbQIOlotA6SQv0npVq6oQQDuPtNy3iUrlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sIBBCyfr; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2eb765285so8361993a91.1
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 06:29:17 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea33aad097so10889537b3.0
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 06:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730903357; x=1731508157; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730903697; x=1731508497; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tgkg1h6fJIChs1xp/Mp0C8zbhKIs+XwcnBA6dAqcGF0=;
-        b=cCB014EvQ+6nF5NUTq34/5vPb6DOFrSzlh/mEzTWRv2EEbYbFzcOD43LiV/KVRipC+
-         U9KZGCV3dDGkRAVdrRD6tJBlbRQL6UMA3g2tkpr3Gg9vyNXMyTKxx3jd3CNSCNi6CxdI
-         O0kr+Q7SpD3dOcqK7XZ62Mf3NHdPqogOJwNcngFHr3Qvl4HjkTV1LlHw4i9G1sCGGr+u
-         JGRU1PBQRXTc2IsefpeCKWkybOjV2uR3YWQJQv2t54U0jXt//AHA69AnMCPmKPwvA7LL
-         CAKPPuv6YLO9fM+4WNtBw43KbJvYbYRaYDulIhjbcM2KVla1z4f3aOVl3hMcyVDqmMGf
-         iS5Q==
+        bh=bdNfAfJ6uGcIqvjU9RF/tIhJYkjaGkmkvEaPHVyDj9c=;
+        b=sIBBCyfrbPpwK57DS58zU/XruZESGoDjrQk0W/9las4ndCpx7xz/3ekGjJE/krbn2K
+         pR3DsP8Qy/nLrCA1p6nBykt0LK49X/nhG1SbPro4+1ms2G+9cWuruV/J9PVfYEUWd4rc
+         qysryyKFxV12solcI5Yy2s11XrRSMEPPaYKAsc+iR0lRxx2pQAKHht6Qv6JUYa8l2kRo
+         lUxR3QF0KEcS3P1iiZCGbD47lE36JGKCX1mtd1uV8bN5BZtBDGNK+NDMjCJW3J85WC3k
+         vVEI5zfha+WqudcdzuhS0SI0CZ+IfZyuQyqzCfzHgY4EZilHhQqJsS5rt0YSkJMmpNhx
+         j0mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730903357; x=1731508157;
+        d=1e100.net; s=20230601; t=1730903697; x=1731508497;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tgkg1h6fJIChs1xp/Mp0C8zbhKIs+XwcnBA6dAqcGF0=;
-        b=MozRXO43qsxSlC4Jw6r03FNWnkCywJbaHcMfzxwxaynVbTL1cMITj+9QpG3zuEHd2y
-         7qhqgJ5iKDP/BA2Nikhy4fCQlLyBrmXPEOKOd5SSfAHo+ZOQMdXeKSRy6Q2IFwqsceH5
-         aZ1l27ppMXn/aQ2iSGkbuWk0rVs94J10INx3c9kpUOLEx3R2HWUUrDC2ohZRl9AyH8Ma
-         Nz91CFlX1x/fNuwsR3z6j7kBNevh0RmbTOcM63c5v2T+rYWoCV6MhUMe1/MIHN77Q72J
-         QvWIT1yy7bkm9GRe7L7kPE4IKErjmi3cqCzoAaGTbN2EWK0olI4e24CJq+zW8Df21BZs
-         SzAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCPEHnOdXb8frTCIQBg+vxrbTA+GsZYTuDMtBDQpUL4FdItzKuXmBg/5C/5HRF1jVYqX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNPZbYECZXiXiKCoRPTnxRSjRDUbMkw5g/suzeeoA5O2U0Jtna
-	srAnp48vZIaWAKAuBD/Ab3AMgenmH8vmLUR51/1IwVO8dsBVP4f3Yn9k3BhMzlj2aqw2YhnHSNM
-	pVg==
-X-Google-Smtp-Source: AGHT+IEome3VDcewPA1RuUuqmYyqWnEqRt40Bbv3VczeQeBrsEbbik49BwGwTAM8DguZ+ILjWAKYeIormzw=
+        bh=bdNfAfJ6uGcIqvjU9RF/tIhJYkjaGkmkvEaPHVyDj9c=;
+        b=l2XvYcR6hsNmMZkN/kaqjbV/YDIu+4Qn5Tsp5NRZjK/pcwaJhY1hZkrI0TwNZN0pTP
+         HEZWcj1WO3dcyFHO9bdwgcrWyr4V9ioqV3g+pHtfBMd9TFB53C//36QlAW7PqPQ0dv5K
+         V+hSHQ2aLdbFzXUaYAKG8g70oEeH2KHFSGngA118Z+miXNT9rlO7+Do92IzKpvWdZAun
+         KY4h49zdMYNLxtjeb0sMKM4wYGVQDQIHdUiy2e3qQnd4sYql80RBXl7RBeRqYVylS7lL
+         a+r2IeZSKbjmr2yKf5xivz7kSWU+N0w4ijWn6u7HILTcVCyX+SGscxtIQDSxMpkbNxB9
+         94Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQyBbS1srjfr9kQI6SuEkebGqXNxbZa5+xWOxm8dtWBzXbQwT4JHHW01QWuvTsy4Sl51A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfZyCzXI+OikR6Cyn4XcwibuSTF7tsHxpQgiVfJMxIC48SVtfh
+	eaHstuWmKDp7TjfgpdCSerT+QFWowsl0eU4NnNdKiFi0MiVPhkPKYoJ4J1UI8bEI7krmmpu9+Y0
+	A2A==
+X-Google-Smtp-Source: AGHT+IGLhqOze19LuZ5LfgYsjD+OI29UKlxovPVi1+TpctQx01BSgPbC/lpV7t9qzY5XocCyloyf4mmjJBI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90b:288a:b0:2e9:47ad:c4f9 with SMTP id
- 98e67ed59e1d1-2e94bdff721mr68311a91.0.1730903357492; Wed, 06 Nov 2024
- 06:29:17 -0800 (PST)
-Date: Wed, 6 Nov 2024 06:29:16 -0800
-In-Reply-To: <20241106034031.503291-1-jsperbeck@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:ce0e:0:b0:e24:c330:f4cc with SMTP id
+ 3f1490d57ef6-e335abea802mr11076276.6.1730903696980; Wed, 06 Nov 2024 06:34:56
+ -0800 (PST)
+Date: Wed, 6 Nov 2024 06:34:55 -0800
+In-Reply-To: <20241105010558.1266699-2-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241106034031.503291-1-jsperbeck@google.com>
-Message-ID: <Zyt9PPB5AGE73HHC@google.com>
-Subject: Re: [PATCH] KVM: selftests: use X86_MEMTYPE_WB instead of VMX_BASIC_MEM_TYPE_WB
+References: <20241105010558.1266699-1-dionnaglaze@google.com> <20241105010558.1266699-2-dionnaglaze@google.com>
+Message-ID: <Zyt-jxNsyMTH4f3q@google.com>
+Subject: Re: [PATCH v4 1/6] kvm: svm: Fix gctx page leak on invalid inputs
 From: Sean Christopherson <seanjc@google.com>
-To: John Sperbeck <jsperbeck@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Dionna Glaze <dionnaglaze@google.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Michael Roth <michael.roth@amd.com>, 
+	Brijesh Singh <brijesh.singh@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Danilo Krummrich <dakr@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Tianfei zhang <tianfei.zhang@intel.com>, 
+	Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 05, 2024, John Sperbeck wrote:
-> In 08a7d2525511 ("tools arch x86: Sync the msr-index.h copy with the
-> kernel sources"), VMX_BASIC_MEM_TYPE_WB was removed.  Use X86_MEMTYPE_WB
-> instead.
+KVM: SVM:
 
-Drat.  For all my talk about KVM selftests not caring about kernel headers, that's
-obviously not entirely true.  Most of the selftests code is standalone, e.g. CR4
-and xfeature bits are all manually defined.  But redefining the myriad MSR #defines
-does seem like a complete waste of time and effort.
+In the future, please post bug fixes separately from new features series, especially
+when the fix has very little to do with the rest of the series (AFAICT, this has
+no relation whatsoever beyond SNP).
 
-> Fixes: 08a7d2525511 ("tools arch x86: Sync the msr-index.h copy with the
-> kernel sources")
+On Tue, Nov 05, 2024, Dionna Glaze wrote:
+> Ensure that snp gctx page allocation is adequately deallocated on
+> failure during snp_launch_start.
+> 
+> Fixes: 136d8bc931c8 ("KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command")
 
-Unnecessary newline, i.e. don't wrap metadata tags.
+This needs
 
-> Signed-off-by: John Sperbeck <jsperbeck@google.com>
+Cc: stable@vger.kernel.org
+
+especially if it doesn't get into 6.12.
+
+> CC: Sean Christopherson <seanjc@google.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Thomas Gleixner <tglx@linutronix.de>
+> CC: Ingo Molnar <mingo@redhat.com>
+> CC: Borislav Petkov <bp@alien8.de>
+> CC: Dave Hansen <dave.hansen@linux.intel.com>
+> CC: Ashish Kalra <ashish.kalra@amd.com>
+> CC: Tom Lendacky <thomas.lendacky@amd.com>
+> CC: John Allen <john.allen@amd.com>
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Michael Roth <michael.roth@amd.com>
+> CC: Luis Chamberlain <mcgrof@kernel.org>
+> CC: Russ Weight <russ.weight@linux.dev>
+> CC: Danilo Krummrich <dakr@redhat.com>
+> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> CC: "Rafael J. Wysocki" <rafael@kernel.org>
+> CC: Tianfei zhang <tianfei.zhang@intel.com>
+> CC: Alexey Kardashevskiy <aik@amd.com>
+> 
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 
 Acked-by: Sean Christopherson <seanjc@google.com>
 
-Paolo, can you grab this for 6.12-rc7?  And fixup the Fixes.  I'll mention this
-again in the pull request I have planned for later today.
+Paolo, do you want to grab this one for 6.12 too?
 
 > ---
->  tools/testing/selftests/kvm/lib/x86_64/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/svm/sev.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> index 089b8925b6b2..d7ac122820bf 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> @@ -200,7 +200,7 @@ static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
->  	if (vmx->eptp_gpa) {
->  		uint64_t ept_paddr;
->  		struct eptPageTablePointer eptp = {
-> -			.memory_type = VMX_BASIC_MEM_TYPE_WB,
-> +			.memory_type = X86_MEMTYPE_WB,
->  			.page_walk_length = 3, /* + 1 */
->  			.ad_enabled = ept_vpid_cap_supported(VMX_EPT_VPID_CAP_AD_BITS),
->  			.address = vmx->eptp_gpa >> PAGE_SHIFT_4K,
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 714c517dd4b72..f6e96ec0a5caa 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2212,10 +2212,6 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (sev->snp_context)
+>  		return -EINVAL;
+>  
+> -	sev->snp_context = snp_context_create(kvm, argp);
+> -	if (!sev->snp_context)
+> -		return -ENOTTY;
+> -
+>  	if (params.flags)
+>  		return -EINVAL;
+>  
+> @@ -2230,6 +2226,10 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET)
+>  		return -EINVAL;
+>  
+> +	sev->snp_context = snp_context_create(kvm, argp);
+> +	if (!sev->snp_context)
+> +		return -ENOTTY;
+
+Related to this fix, the return values from snp_context_create() are garbage.  It
+should return ERR_PTR(), not NULL.  -ENOTTY on an OOM scenatio is blatantly wrong,
+as -ENOTTY on any SEV_CMD_SNP_GCTX_CREATE failure is too.
+
+> +
+>  	start.gctx_paddr = __psp_pa(sev->snp_context);
+>  	start.policy = params.policy;
+>  	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
 > -- 
-> 2.47.0.277.g8800431eea-goog
+> 2.47.0.199.ga7371fff76-goog
 > 
 
