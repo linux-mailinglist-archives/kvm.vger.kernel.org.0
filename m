@@ -1,134 +1,108 @@
-Return-Path: <kvm+bounces-31014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2EC9BF477
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:43:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6739BF4A4
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:52:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9105B1F246F9
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:43:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 980F01C21530
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E854C2071F9;
-	Wed,  6 Nov 2024 17:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E37207A19;
+	Wed,  6 Nov 2024 17:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MrkOjQe0"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Hg2S8iU/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F342645;
-	Wed,  6 Nov 2024 17:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF3420408D;
+	Wed,  6 Nov 2024 17:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730914985; cv=none; b=BtJN1xgT2ObCDK8et+IEjMAipKnRAwVl6ByHsuD3bu4Aye/8uJEslmWV1KCNWT58V0NEhTdIMkP5/nuIVHZSZ1PGHwghDCegdW9XVj+p2OiKwGoODwzaqwSt6U0NgaNUzv95skVaSqnamy4wiRFs64uDJT3KzaUCAL/BMVofreE=
+	t=1730915547; cv=none; b=kAVc4Yb6w/g3+0IjYFgQvBA8vDNCXY4fmAMQwtjpRzCWW7wklQwdEIfPJGyO9mOhv6JM9PUONzveG32UbQqSySZ2YBz7GqNwcDO4pqcuYF7zyeZFFZ0FmQsWG7mqPflfxRNrbiZr2GMa6d9vtBWYJi/WlBYedYv8fjLE/vZnTfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730914985; c=relaxed/simple;
-	bh=W1X5rDQFCgExyY0Epc7bMWiWhw1daz1M7vG9x/tyeiI=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lALwwDEwYgGW+Z/3AQedUySX1kA2LAEgbFpUamjBL4fE8qKgnSr1PRq6K/RuHULG+QI+QFQ6D1kF+rQz8DRCUzG8ihyD2sSvl28XgZRzH4i6xRMJ/F2J+LRNjYuwvQ7zYzFFcVxH9lpKrLpQ1Dv/B5p2aoHmVE+OOcSpTdcTpR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MrkOjQe0; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730914984; x=1762450984;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=W1X5rDQFCgExyY0Epc7bMWiWhw1daz1M7vG9x/tyeiI=;
-  b=MrkOjQe0MisOUna8rEmX/60/hDiN0teAU8g0vK6d3Uk22qOq2NykLFfp
-   da6hDQvJIC0oaJV7DjEy0yPgBHxPNAxbQR36RrlPyoHrPnEMzEfliAdUt
-   lhM/p7E0Nz9jVLyxnid97W+vSr8bW0SVrJcy3NM/nQmj4wYB4urXZ07In
-   U=;
-X-IronPort-AV: E=Sophos;i="6.11,263,1725321600"; 
-   d="scan'208";a="693553406"
-Subject: Re: [PATCH 3/5] arm64: refactor delay() to enable polling for value
-Thread-Topic: [PATCH 3/5] arm64: refactor delay() to enable polling for value
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 17:42:55 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:13502]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.168:2525] with esmtp (Farcaster)
- id 4ebbe4e2-78ed-4697-b2ed-e404fbebf4fe; Wed, 6 Nov 2024 17:42:39 +0000 (UTC)
-X-Farcaster-Flow-ID: 4ebbe4e2-78ed-4697-b2ed-e404fbebf4fe
-Received: from EX19D001UWA002.ant.amazon.com (10.13.138.236) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 6 Nov 2024 17:42:39 +0000
-Received: from EX19D001UWA003.ant.amazon.com (10.13.138.211) by
- EX19D001UWA002.ant.amazon.com (10.13.138.236) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 6 Nov 2024 17:42:38 +0000
-Received: from EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2]) by
- EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2%7]) with mapi id
- 15.02.1258.035; Wed, 6 Nov 2024 17:42:38 +0000
-From: "Okanovic, Haris" <harisokn@amazon.com>
-To: "cl@gentwo.org" <cl@gentwo.org>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rafael@kernel.org"
-	<rafael@kernel.org>, "sudeep.holla@arm.com" <sudeep.holla@arm.com>,
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-	"ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "wanpengli@tencent.com"
-	<wanpengli@tencent.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "mingo@redhat.com" <mingo@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "misono.tomohiro@fujitsu.com"
-	<misono.tomohiro@fujitsu.com>, "daniel.lezcano@linaro.org"
-	<daniel.lezcano@linaro.org>, "arnd@arndb.de" <arnd@arndb.de>,
-	"lenb@kernel.org" <lenb@kernel.org>, "will@kernel.org" <will@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "Okanovic, Haris"
-	<harisokn@amazon.com>, "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"bp@alien8.de" <bp@alien8.de>, "mtosatti@redhat.com" <mtosatti@redhat.com>,
-	"x86@kernel.org" <x86@kernel.org>, "mark.rutland@arm.com"
-	<mark.rutland@arm.com>
-Thread-Index: AQHbL7EHko86fTfE7kuIbrTyhHlrvrKpFnIAgAFwtgA=
-Date: Wed, 6 Nov 2024 17:42:38 +0000
-Message-ID: <193a81555a87a6d499fbe889406eeb2014465ec5.camel@amazon.com>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
-	 <20241105183041.1531976-1-harisokn@amazon.com>
-	 <20241105183041.1531976-4-harisokn@amazon.com>
-	 <efd92a03-f5a9-ba9b-338f-b9a5ad93174f@gentwo.org>
-In-Reply-To: <efd92a03-f5a9-ba9b-338f-b9a5ad93174f@gentwo.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A9E0998F1AEF2E4095A2603921A4002F@amazon.com>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1730915547; c=relaxed/simple;
+	bh=KtPMXe1Kaoi+D+0zuVsHi/7XVFuHe7pLT3yUgBvsPWA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EL8hdsuglkZRwNifAAzMXMPDQqbrukWIaTVTCxSDcGOjuaow+q6QfvQ8i0FDaQQrRrromBAKAbcHvQnP9eLdpp6mUEgTbO3cFAMhm6XuKSzIBBEbsW3jcRuT7ZM7WGJSMTDn8cSigBHPFrL7bmQcPhRO3faqwpg7FkOYKALARbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Hg2S8iU/; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1t8kCZ-00GBfK-Fk; Wed, 06 Nov 2024 18:52:19 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=wAYzmgNEdIPQcm7RdwInLHDyAgTWgXzUWExQ3LJunH4=
+	; b=Hg2S8iU/9HTIGKTP6qhlMJhACuhDz3iPyAC2mhkLZGzyyuzkLnylkxU1m0pz+rs06mPL7D2hq
+	9kaMKgwIpd4bQ90GDA3CUg7ZiCZM4vBqhZ2ofCNpsCkvAxQLhNivSEbgIUvaVVYI0oBIQo7ig4vvB
+	jIBJDy43PJXGh547KK9Fz/q+i2+mn4YnkL/EBc2tMmrFe/M4qYE2CR7YZo7Ajte46dF7kzB1n3zrL
+	GfJW9mKA0hgyX5qSPduC7wG6NBizoYPgzE+QuMNrQRxeUNyeU8OtvyiXO1AVjQ6Ja8XOvKCamZ3TC
+	saDK4FfLzCdVfBUzWKLEsoR5AO5P1AELM1jBqQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1t8kCT-0001ra-VZ; Wed, 06 Nov 2024 18:52:14 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1t8kCH-002ver-47; Wed, 06 Nov 2024 18:52:01 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net 0/4] virtio/vsock: Fix memory leaks
+Date: Wed, 06 Nov 2024 18:51:17 +0100
+Message-Id: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJWsK2cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDQwMz3bLi/ORs3dzUXN2c1MTsYl3LJDPjVEtDI1Mzg0QloK6CotS0zAq
+ widFKeaklSrG1tQDW+Q+8ZgAAAA==
+X-Change-ID: 20241106-vsock-mem-leaks-9b63e912560a
+To: Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jia He <justin.he@arm.com>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+ Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+ George Zhang <georgezhang@vmware.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-T24gVHVlLCAyMDI0LTExLTA1IGF0IDExOjQyIC0wODAwLCBDaHJpc3RvcGggTGFtZXRlciAoQW1w
-ZXJlKSB3cm90ZToNCj4gQ0FVVElPTjogVGhpcyBlbWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lk
-ZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2ht
-ZW50cyB1bmxlc3MgeW91IGNhbiBjb25maXJtIHRoZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRl
-bnQgaXMgc2FmZS4NCj4gDQo+IA0KPiANCj4gT24gVHVlLCA1IE5vdiAyMDI0LCBIYXJpcyBPa2Fu
-b3ZpYyB3cm90ZToNCj4gDQo+ID4gLSNkZWZpbmUgVVNFQ1NfVE9fQ1lDTEVTKHRpbWVfdXNlY3Mp
-ICAgICAgICAgICAgICAgICAgXA0KPiA+IC0gICAgIHhsb29wc190b19jeWNsZXMoKHRpbWVfdXNl
-Y3MpICogMHgxMEM3VUwpDQo+ID4gLQ0KPiA+IC1zdGF0aWMgaW5saW5lIHVuc2lnbmVkIGxvbmcg
-eGxvb3BzX3RvX2N5Y2xlcyh1bnNpZ25lZCBsb25nIHhsb29wcykNCj4gPiArc3RhdGljIGlubGlu
-ZSB1NjQgeGxvb3BzX3RvX2N5Y2xlcyh1NjQgeGxvb3BzKQ0KPiA+ICB7DQo+ID4gICAgICAgcmV0
-dXJuICh4bG9vcHMgKiBsb29wc19wZXJfamlmZnkgKiBIWikgPj4gMzI7DQo+ID4gIH0NCj4gPiAN
-Cj4gPiAtdm9pZCBfX2RlbGF5KHVuc2lnbmVkIGxvbmcgY3ljbGVzKQ0KPiA+ICsjZGVmaW5lIFVT
-RUNTX1RPX1hMT09QUyh0aW1lX3VzZWNzKSBcDQo+ID4gKyAgICAgKCh0aW1lX3VzZWNzKSAqIDB4
-MTBDN1VMKQ0KPiA+ICsNCj4gPiArI2RlZmluZSBVU0VDU19UT19DWUNMRVModGltZV91c2Vjcykg
-XA0KPiA+ICsgICAgIHhsb29wc190b19jeWNsZXMoVVNFQ1NfVE9fWExPT1BTKHRpbWVfdXNlY3Mp
-KQ0KPiA+ICsNCj4gDQo+IA0KPiA+ICsjZGVmaW5lIE5TRUNTX1RPX1hMT09QUyh0aW1lX25zZWNz
-KSBcDQo+ID4gKyAgICAgKCh0aW1lX25zZWNzKSAqIDB4MTBDN1VMKQ0KPiANCj4gVGhlIGNvbnN0
-YW50IGhlcmUgaXMgdGhlIHNhbWUgdmFsdWUgYXMgZm9yIG1pY3Jvc2Vjb25kcy4gSWYgSSByZW1l
-bWJlcg0KPiBjb3JyZWN0bHkgaXRzIDVVTCBmb3IgbmFub3NlY29uZHMuDQo+IA0KDQpZb3UncmUg
-cmlnaHQsIGdvb2QgY2F0Y2guIFNob3VsZCBiZSBgbnNlY3MgKiAweDVVTGAgcGVyIG9sZCBjb2Rl
-Lg0KDQo=
+Short series fixing some memory leaks that I've stumbled upon while toying
+with the selftests.
+
+The last patch is a refactoring.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (4):
+      virtio/vsock: Fix accept_queue memory leak
+      virtio/vsock: Fix sk_error_queue memory leak
+      virtio/vsock: Improve MSG_ZEROCOPY error handling
+      virtio/vsock: Put vsock_connected_sockets_vsk() to use
+
+ net/vmw_vsock/af_vsock.c                | 6 ++++--
+ net/vmw_vsock/virtio_transport_common.c | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+---
+base-commit: 372ea06d6187810351ed778faf683e93f16a5de4
+change-id: 20241106-vsock-mem-leaks-9b63e912560a
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
