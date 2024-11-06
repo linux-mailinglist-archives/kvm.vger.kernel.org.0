@@ -1,59 +1,60 @@
-Return-Path: <kvm+bounces-31015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C6739BF4A4
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:52:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912DE9BF50B
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 19:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 980F01C21530
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:52:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4310A1F242C2
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 18:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E37207A19;
-	Wed,  6 Nov 2024 17:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFD9208217;
+	Wed,  6 Nov 2024 18:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Hg2S8iU/"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="k3pff0QC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF3420408D;
-	Wed,  6 Nov 2024 17:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2A317BB0F;
+	Wed,  6 Nov 2024 18:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730915547; cv=none; b=kAVc4Yb6w/g3+0IjYFgQvBA8vDNCXY4fmAMQwtjpRzCWW7wklQwdEIfPJGyO9mOhv6JM9PUONzveG32UbQqSySZ2YBz7GqNwcDO4pqcuYF7zyeZFFZ0FmQsWG7mqPflfxRNrbiZr2GMa6d9vtBWYJi/WlBYedYv8fjLE/vZnTfM=
+	t=1730917027; cv=none; b=V1sF3sKLKiRBol0N/Q0BhSbcBnWCoyr3KTXD/667IaWU2UyG0iLt/cKJdXyrsvCM+YHHjH2ZTWlxLj9EzQ8XI8Tio0sQ0wApVjUarOrtIpMrzBULrprPNQIA0G8jBchp62a2EAmFkyX7vXONLUYT/6/xnyHDEPPUeENS2jI1tMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730915547; c=relaxed/simple;
-	bh=KtPMXe1Kaoi+D+0zuVsHi/7XVFuHe7pLT3yUgBvsPWA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EL8hdsuglkZRwNifAAzMXMPDQqbrukWIaTVTCxSDcGOjuaow+q6QfvQ8i0FDaQQrRrromBAKAbcHvQnP9eLdpp6mUEgTbO3cFAMhm6XuKSzIBBEbsW3jcRuT7ZM7WGJSMTDn8cSigBHPFrL7bmQcPhRO3faqwpg7FkOYKALARbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Hg2S8iU/; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1730917027; c=relaxed/simple;
+	bh=7JRzx1UgEQQWBP6Jr+1QV83wR6xUeWOjkJYXM4uWv3Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ixPcQjDTk5/YaThT7e5XgT7KbT8i7vS77DUVFYH5tIOvIQw8y6Eccov5xVhx+Eev1sk3qQGlHxqnYx4NghX5Wer2Ilp0QWPINaeUYxSfuM1ttMHQKL9+oWrpTzAp3io4IFQgnML/XPz6jnhkQ5+FLfumtVggpE63co8E8aD2XDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=k3pff0QC; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1t8kCZ-00GBfK-Fk; Wed, 06 Nov 2024 18:52:19 +0100
+	id 1t8kCT-00GBen-B3; Wed, 06 Nov 2024 18:52:13 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From; bh=wAYzmgNEdIPQcm7RdwInLHDyAgTWgXzUWExQ3LJunH4=
-	; b=Hg2S8iU/9HTIGKTP6qhlMJhACuhDz3iPyAC2mhkLZGzyyuzkLnylkxU1m0pz+rs06mPL7D2hq
-	9kaMKgwIpd4bQ90GDA3CUg7ZiCZM4vBqhZ2ofCNpsCkvAxQLhNivSEbgIUvaVVYI0oBIQo7ig4vvB
-	jIBJDy43PJXGh547KK9Fz/q+i2+mn4YnkL/EBc2tMmrFe/M4qYE2CR7YZo7Ajte46dF7kzB1n3zrL
-	GfJW9mKA0hgyX5qSPduC7wG6NBizoYPgzE+QuMNrQRxeUNyeU8OtvyiXO1AVjQ6Ja8XOvKCamZ3TC
-	saDK4FfLzCdVfBUzWKLEsoR5AO5P1AELM1jBqQ==;
+	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=LBac3zL9ZPZQLfgdHj+CoiRzpyIdxumYQNZim816CMc=; b=k3pff0QC4zOecxiIeK12Ts7Hgb
+	174ZP04mieJ5KwiHE3EvQe2BG+/CuMM/xqsYHt/QTtivl3wNTqOafKT6w+3OhZOaKPku7zzDASJek
+	30JO8LHkUWL2DL0BMZVf6ZIW5U0soIr1ZvrIxHlXJzCBnnJC6bJuE0ZomoJ+Z+FsZ16t1LPvWTet2
+	dWnxd50XuejmChBQVP+hh6mde3j7nvQAeEzl7ElNyUvZIDhdl+87X+7mHn6TM8zNj0Hzasa829ZZG
+	1S4XQ1ZDlSlH4MuVlMv2CsfPdtn+dnfP1BTg/UoFLVYCdnFnTXv5D75pNZ9+9qEt5mrKUk8LSLCml
+	964E/QuA==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1t8kCT-0001ra-VZ; Wed, 06 Nov 2024 18:52:14 +0100
+	id 1t8kCS-0001o6-Lh; Wed, 06 Nov 2024 18:52:13 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1t8kCH-002ver-47; Wed, 06 Nov 2024 18:52:01 +0100
+	id 1t8kCH-002ver-Vw; Wed, 06 Nov 2024 18:52:02 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH net 0/4] virtio/vsock: Fix memory leaks
-Date: Wed, 06 Nov 2024 18:51:17 +0100
-Message-Id: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
+Date: Wed, 06 Nov 2024 18:51:18 +0100
+Subject: [PATCH net 1/4] virtio/vsock: Fix accept_queue memory leak
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,10 +63,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJWsK2cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIxNDQwMz3bLi/ORs3dzUXN2c1MTsYl3LJDPjVEtDI1Mzg0QloK6CotS0zAq
- widFKeaklSrG1tQDW+Q+8ZgAAAA==
-X-Change-ID: 20241106-vsock-mem-leaks-9b63e912560a
+Message-Id: <20241106-vsock-mem-leaks-v1-1-8f4ffc3099e6@rbox.co>
+References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
+In-Reply-To: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
 To: Stefan Hajnoczi <stefanha@redhat.com>, 
  Stefano Garzarella <sgarzare@redhat.com>, 
  "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
@@ -81,28 +81,86 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
  netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Short series fixing some memory leaks that I've stumbled upon while toying
-with the selftests.
+As the final stages of socket destruction may be delayed, it is possible
+that virtio_transport_recv_listen() will be called after the accept_queue
+has been flushed, but before the SOCK_DONE flag has been set. As a result,
+sockets enqueued after the flush would remain unremoved, leading to a
+memory leak.
 
-The last patch is a refactoring.
+vsock_release
+  __vsock_release
+    lock
+    virtio_transport_release
+      virtio_transport_close
+        schedule_delayed_work(close_work)
+    sk_shutdown = SHUTDOWN_MASK
+(!) flush accept_queue
+    release
+                                        virtio_transport_recv_pkt
+                                          vsock_find_bound_socket
+                                          lock
+                                          if flag(SOCK_DONE) return
+                                          virtio_transport_recv_listen
+                                            child = vsock_create_connected
+                                      (!)   vsock_enqueue_accept(child)
+                                          release
+close_work
+  lock
+  virtio_transport_do_close
+    set_flag(SOCK_DONE)
+    virtio_transport_remove_sock
+      vsock_remove_sock
+        vsock_remove_bound
+  release
 
+Introduce a sk_shutdown check to disallow vsock_enqueue_accept() during
+socket destruction.
+
+unreferenced object 0xffff888109e3f800 (size 2040):
+  comm "kworker/5:2", pid 371, jiffies 4294940105
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    28 00 0b 40 00 00 00 00 00 00 00 00 00 00 00 00  (..@............
+  backtrace (crc 9e5f4e84):
+    [<ffffffff81418ff1>] kmem_cache_alloc_noprof+0x2c1/0x360
+    [<ffffffff81d27aa0>] sk_prot_alloc+0x30/0x120
+    [<ffffffff81d2b54c>] sk_alloc+0x2c/0x4b0
+    [<ffffffff81fe049a>] __vsock_create.constprop.0+0x2a/0x310
+    [<ffffffff81fe6d6c>] virtio_transport_recv_pkt+0x4dc/0x9a0
+    [<ffffffff81fe745d>] vsock_loopback_work+0xfd/0x140
+    [<ffffffff810fc6ac>] process_one_work+0x20c/0x570
+    [<ffffffff810fce3f>] worker_thread+0x1bf/0x3a0
+    [<ffffffff811070dd>] kthread+0xdd/0x110
+    [<ffffffff81044fdd>] ret_from_fork+0x2d/0x50
+    [<ffffffff8100785a>] ret_from_fork_asm+0x1a/0x30
+
+Fixes: 3fe356d58efa ("vsock/virtio: discard packets only when socket is really closed")
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
-Michal Luczaj (4):
-      virtio/vsock: Fix accept_queue memory leak
-      virtio/vsock: Fix sk_error_queue memory leak
-      virtio/vsock: Improve MSG_ZEROCOPY error handling
-      virtio/vsock: Put vsock_connected_sockets_vsk() to use
+ net/vmw_vsock/virtio_transport_common.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
- net/vmw_vsock/af_vsock.c                | 6 ++++--
- net/vmw_vsock/virtio_transport_common.c | 9 +++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
----
-base-commit: 372ea06d6187810351ed778faf683e93f16a5de4
-change-id: 20241106-vsock-mem-leaks-9b63e912560a
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index ccbd2bc0d2109aea4f19e79a0438f85893e1d89c..cd075f608d4f6f48f894543e5e9c966d3e5f22df 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1512,6 +1512,14 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 		return -ENOMEM;
+ 	}
+ 
++	/* __vsock_release() might have already flushed accept_queue.
++	 * Subsequent enqueues would lead to a memory leak.
++	 */
++	if (sk->sk_shutdown == SHUTDOWN_MASK) {
++		virtio_transport_reset_no_sock(t, skb);
++		return -ESHUTDOWN;
++	}
++
+ 	child = vsock_create_connected(sk);
+ 	if (!child) {
+ 		virtio_transport_reset_no_sock(t, skb);
 
-Best regards,
 -- 
-Michal Luczaj <mhal@rbox.co>
+2.46.2
 
 
