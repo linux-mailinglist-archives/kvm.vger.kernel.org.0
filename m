@@ -1,321 +1,174 @@
-Return-Path: <kvm+bounces-30994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B709BF2CC
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:09:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FDC59BF2E0
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 17:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEB771F22928
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:09:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAAD9B21D6F
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A40204F7E;
-	Wed,  6 Nov 2024 16:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0961A204086;
+	Wed,  6 Nov 2024 16:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AiPxPu/9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DBqfOGk7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044B5203703;
-	Wed,  6 Nov 2024 16:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07372EAE0
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 16:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730909284; cv=none; b=KH8NfhLD/zhqi1Q2AWO1LTWt9Q+eM1x/drS8tBo0R78wAHu8/6gJLEq3MQfrltrGeZOJaPM+fW6mPKLb99314wjTkm3pG2FNiPw6zSqOk5iZ3pac+ITFt9gZUlyxPxDOlBVQnPTyMuyO5citLGnJkJqYXeSvbid0oLDyUMke7MA=
+	t=1730909472; cv=none; b=NaaOnpiHRQ8QAQUGOfXZ6GXxHa51VqzZC1sSEJ3xnvnZvYBkkWyU1zoWNH81VAINdSBZZs0qdvw+IzJJZ6QEWOzDQDAKcc+Gwse0Do7paEjiQrrMTh/swh/Tb59Ezbg7REKT+m6FWP4tWXjdiBq7rybtbUsnlXcqTx8tmCdRsQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730909284; c=relaxed/simple;
-	bh=YqxQs5N7780pZPl+viPzrqgEiiSjrsm9V2x3PaeBgBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OmaxjU1CnOsPS0Zm2U+kcLRwjhx3yIC/BNgcKYY5oUFa46MkWMi7VT/aGXXt6f1SP5v55cWcgkoSPm9kQhpIyqvQy3/s7PYxBW1wGX0bs44pbefRy19opUSHoYNMPhNmpRygp5pE3pt6V81D2/4k71XHJ0hNyyT53qE6O+AGOFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AiPxPu/9; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730909283; x=1762445283;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=YqxQs5N7780pZPl+viPzrqgEiiSjrsm9V2x3PaeBgBM=;
-  b=AiPxPu/9BW93C01IeU9xSyMjWsMgtdLdy2gIyUvtfvAEN/3Qcmisl3e+
-   jae/y5vRSJ6JsKw+1nA/Nxnaz96frQhNv4vEbJY0ludroxP3mX+H3UZzz
-   E063LF/YNn4F6n/bBNkq53MH10XjiKlHB15ho29vpczEF9hYNf/h//1bU
-   LCjH9n/ztrmhWHR/pKfKqGh+/LJwmeo6+C9OEKBJWUuGuSr6AMJnNNUtO
-   BPTvTzwmy4Pp1Y40Rb5u2Xch8fnNhMj5HCnQqsLJpJJCxirHq0/XZqc9A
-   V9ScaVG3H6Gx5LBVMpqG6aFSKZmGymhH4XbOU1aSYTS+y9qoZ3XKck+aW
-   g==;
-X-CSE-ConnectionGUID: dVdQsUfcRwKlR7cbA1KMVA==
-X-CSE-MsgGUID: dIXMeLMRRiuYMq/+tNqmww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="30932615"
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="30932615"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 08:08:02 -0800
-X-CSE-ConnectionGUID: 09YIEWwaQoulcZ9i16jkuA==
-X-CSE-MsgGUID: iezak7uMSDC1ynrtqPQ/4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="89211010"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 08:07:58 -0800
-Received: from [10.212.82.230] (kliang2-mobl1.ccr.corp.intel.com [10.212.82.230])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 2CB5920B5703;
-	Wed,  6 Nov 2024 08:07:54 -0800 (PST)
-Message-ID: <007cfed1-111d-45aa-b873-24cca9d4af01@linux.intel.com>
-Date: Wed, 6 Nov 2024 11:07:53 -0500
+	s=arc-20240116; t=1730909472; c=relaxed/simple;
+	bh=mQWGP2+2dHnsJHAp4+gKGfAR7r4pUwuigIwI+pjGUI0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=TEHVOosYbgug0EUFZCECIH02OClafLP/OA0UwruJyJvQZhHkejRz3ianOus11AJ+aT1fwpg7zkqxoDpJ7K0b2qEg2VZwWKDNADq0mLYATgSyKgNM/YINKwrV0hp317vhU1GdjbWm8c6qpICWcvAY8QunW9rU87wHW+hJhWaFrMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DBqfOGk7; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e55c9d23cso7739b3a.0
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 08:11:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730909470; x=1731514270; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6k40+fe0KdTgjyeXKK2jvU+7V/OtIEet3QC+IoUobOs=;
+        b=DBqfOGk7uVhSn3LMY88MKgiFBxCsliGdLcoUb6eJlyRXJu5bXkFoIPDwOx3gF+FSvT
+         zZKuCbiOcF1d8mKC4W8hyLjub0XxwlWhElcYHZ1siOyVIE+d3flTamNWYYMDP7Mp/uxg
+         bIk7Or4wkIVAYPTCkUyoeWhwnhFwbJYEqM3SjOZjDgbJtluDzKPvsYnQ/s+JVJTlKfcT
+         1VA/GbW8qtf8HUXyUThpngDFLrG9ZUTtZiwH+uR1QdoE/L2L4lV4FwTUaGYlQYmrQssf
+         JQFcSpKF9geRh6uVNvIDYauLiPFX946Yi+DW1XP7fAMlLAzJ79bvRWi+KRcYk1G1+psp
+         Xhcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730909470; x=1731514270;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6k40+fe0KdTgjyeXKK2jvU+7V/OtIEet3QC+IoUobOs=;
+        b=gDQFRLCh8JP5CSHSeEFRQEaYblz2CJnqy0p8DptH8O5AJGlyY9mUP6uKhGaTqZSWRT
+         bcukx1FC6VXPN3LgYYs5pL4jHhPwDq0P3FeeWMG5clUTwbL2OBBuLOwmS1OJijwrGhlB
+         AztHA7htU5iIhMztdCHC0+WNbUVZQjIcrmoqHzTUInOSSx+hb7JWhuP9QCi0es8YC9Km
+         iop9BQMSGF6100DCxnr8e9Yh6VIE7TqyjIFVa5VIPGAHDlx7VA7rQTNB+m3f7WzqafXV
+         cUsKACTi0EctQ3zBD9Mo1DDARNZU1QHNyOIPEpCKeao916FaTg6Znop+ikrgl46yEPr4
+         1jgA==
+X-Forwarded-Encrypted: i=1; AJvYcCW13twGD8ifRRocUVjlOUcc1l8PkqUIF85mRVH47wBA3J4mEAUqdnZaHiphr9lfaMaTOlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXAADP6DInYPhcFdIsdheOwkyeOYWrmSeeEuhd8U6gfT4jz9HO
+	XX6BusSDOhTflPtKwqJhPx0vxSSFucJ5HtP1GXOHo+FUBXZAo5rvmhgmpEWxIEL9hpfcV7iQBDK
+	F2g==
+X-Google-Smtp-Source: AGHT+IEtwl30f9l4Gs0C51y2tW7a7XqFq8bJr1VL5oboFCNh3+W8lcmupQoDyH6ZL/YX2BlKlpTgCO+1PW8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:846:b0:71e:466a:5b32 with SMTP id
+ d2e1a72fcca58-723f7aac2c6mr192924b3a.2.1730909470100; Wed, 06 Nov 2024
+ 08:11:10 -0800 (PST)
+Date: Wed, 6 Nov 2024 08:11:08 -0800
+In-Reply-To: <65fdc558-21e9-4311-b2b0-8b35131c7aac@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 5/5] perf: Correct perf sampling with guest VMs
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Will Deacon <will@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org
-References: <20241105195603.2317483-1-coltonlewis@google.com>
- <20241105195603.2317483-6-coltonlewis@google.com>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20241105195603.2317483-6-coltonlewis@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241105160234.1300702-1-superm1@kernel.org> <ZyuFMtYSneOFrsvs@google.com>
+ <fb72d616-dba8-410f-a377-3774aa7a5295@kernel.org> <ZyuIINwBdiztWhi3@google.com>
+ <37b73861cb86508a337b299a5ae77ab875638fe4.camel@redhat.com> <65fdc558-21e9-4311-b2b0-8b35131c7aac@kernel.org>
+Message-ID: <ZyuVHJ9K51tOkOMM@google.com>
+Subject: Re: [PATCH] x86/CPU/AMD: Clear virtualized VMLOAD/VMSAVE on Zen4 client
+From: Sean Christopherson <seanjc@google.com>
+To: Mario Limonciello <superm1@kernel.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, 
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>, 
+	Mario Limonciello <mario.limonciello@amd.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Wed, Nov 06, 2024, Mario Limonciello wrote:
+> On 11/6/2024 09:48, Maxim Levitsky wrote:
+> > On Wed, 2024-11-06 at 07:15 -0800, Sean Christopherson wrote:
+> > > On Wed, Nov 06, 2024, Mario Limonciello wrote:
+> > > > On 11/6/2024 09:03, Sean Christopherson wrote:
 
+...
 
-On 2024-11-05 2:56 p.m., Colton Lewis wrote:
-> Previously any PMU overflow interrupt that fired while a VCPU was
-> loaded was recorded as a guest event whether it truly was or not. This
-> resulted in nonsense perf recordings that did not honor
-> perf_event_attr.exclude_guest and recorded guest IPs where it should
-> have recorded host IPs.
+> > > > > > diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+> > > > > > index 015971adadfc7..ecd42c2b3242e 100644
+> > > > > > --- a/arch/x86/kernel/cpu/amd.c
+> > > > > > +++ b/arch/x86/kernel/cpu/amd.c
+> > > > > > @@ -924,6 +924,17 @@ static void init_amd_zen4(struct cpuinfo_x86 *c)
+> > > > > >    {
+> > > > > >    	if (!cpu_has(c, X86_FEATURE_HYPERVISOR))
+> > > > > >    		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT);
+> > > > > > +
+> > > > > > +	/*
+> > > > > > +	 * These Zen4 SoCs advertise support for virtualized VMLOAD/VMSAVE
+> > > > > > +	 * in some BIOS versions but they can lead to random host reboots.
+> > > > > 
+> > > > > Uh, CPU bug?  Erratum?
+> > > > 
+> > > > BIOS bug.  Those shouldn't have been advertised.
+> > 
+> > Hi!
+> > 
+> > My question is, why would AMD drop support intentionally for VLS on client machines?
+> > 
+> > I understand that there might be a errata, and I don't object disabling the
+> > feature because of this.
+> > 
+> > But hearing that 'These instructions aren't intended to be advertised' means that
+> > AMD intends to stop supporting virtualization on client systems or at least partially
+> > do so.
 > 
-> Rework the sampling logic to only record guest samples for events with
-> exclude_guest = 0. This way any host-only events with exclude_guest
-> set will never see unexpected guest samples. The behaviour of events
-> with exclude_guest = 0 is unchanged.
+> Don't read into it too far.  It's just a BIOS problem with those
+> instructions "specifically" on the processors indicated here.  Other
+> processors (for example Zen 5 client processors) do correctly advertise
+> support where applicable.
 > 
-> Note that events configured to sample both host and guest may still
-> misattribute a PMI that arrived in the host as a guest event depending
-> on KVM arch and vendor behavior.
+> When they launched those bits weren't supposed to be set to indicate
+> support, but BIOS did set them.
+
+As you quite clearly call out below, this isn't simply a BIOS problem.
+
+> > That worries me. So far AMD was much better that Intel supporting most of the
+> > features across all of the systems which is very helpful in various scenarios,
+> > and this is very appreciated by the community.
+> > 
+> > Speaking strictly personally here, as a AMD fan.
+> > 
+> > Best regards,> 	Maxim Levitsky
+> > 
+> > 
+> > > 
+> > > Why not?  "but they can lead to random host reboots" is a description of the
+> > > symptom, not an explanation for why KVM is unable to use a feature that is
+> > > apparently support by the CPU.
+> > > 
+> > > And if the CPU doesn't actually support virtualized VMLOAD/VMSAVE, then this is
+> > > a much bigger problem, because it means KVM is effectively giving the guest read
+> > > and write access to all of host memory.
+> > > 
+> > 
+> > 
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/perf_event.h |  4 ----
->  arch/arm64/kernel/perf_callchain.c  | 28 ----------------------------
->  arch/x86/events/core.c              | 16 ++++------------
->  include/linux/perf_event.h          | 21 +++++++++++++++++++--
->  kernel/events/core.c                | 21 +++++++++++++++++----
->  5 files changed, 40 insertions(+), 50 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-> index 31a5584ed423..ee45b4e77347 100644
-> --- a/arch/arm64/include/asm/perf_event.h
-> +++ b/arch/arm64/include/asm/perf_event.h
-> @@ -10,10 +10,6 @@
->  #include <asm/ptrace.h>
->  
->  #ifdef CONFIG_PERF_EVENTS
-> -struct pt_regs;
-> -extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
-> -extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> -#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
->  #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
->  #endif
->  
-> diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
-> index 01a9d08fc009..9b7f26b128b5 100644
-> --- a/arch/arm64/kernel/perf_callchain.c
-> +++ b/arch/arm64/kernel/perf_callchain.c
-> @@ -38,31 +38,3 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
->  
->  	arch_stack_walk(callchain_trace, entry, current, regs);
->  }
-> -
-> -unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
-> -{
-> -	if (perf_guest_state())
-> -		return perf_guest_get_ip();
-> -
-> -	return instruction_pointer(regs);
-> -}
-> -
-> -unsigned long perf_arch_misc_flags(struct pt_regs *regs)
-> -{
-> -	unsigned int guest_state = perf_guest_state();
-> -	int misc = 0;
-> -
-> -	if (guest_state) {
-> -		if (guest_state & PERF_GUEST_USER)
-> -			misc |= PERF_RECORD_MISC_GUEST_USER;
-> -		else
-> -			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
-> -	} else {
-> -		if (user_mode(regs))
-> -			misc |= PERF_RECORD_MISC_USER;
-> -		else
-> -			misc |= PERF_RECORD_MISC_KERNEL;
-> -	}
-> -
-> -	return misc;
-> -}
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index 24910c625e3d..aae0c5eabf09 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -3005,9 +3005,6 @@ static unsigned long code_segment_base(struct pt_regs *regs)
->  
->  unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  {
-> -	if (perf_guest_state())
-> -		return perf_guest_get_ip();
-> -
->  	return regs->ip + code_segment_base(regs);
->  }
->  
-> @@ -3034,17 +3031,12 @@ unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
->  
->  unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
-> -	unsigned int guest_state = perf_guest_state();
->  	unsigned long misc = common_misc_flags(regs);
->  
-> -	if (guest_state) {
-> -		misc |= perf_arch_guest_misc_flags(regs);
-> -	} else {
-> -		if (user_mode(regs))
-> -			misc |= PERF_RECORD_MISC_USER;
-> -		else
-> -			misc |= PERF_RECORD_MISC_KERNEL;
-> -	}
-> +	if (user_mode(regs))
-> +		misc |= PERF_RECORD_MISC_USER;
-> +	else
-> +		misc |= PERF_RECORD_MISC_KERNEL;
->  
->  	return misc;
->  }
-> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-> index 772ad352856b..e207acdd9e73 100644
-> --- a/include/linux/perf_event.h
-> +++ b/include/linux/perf_event.h
-> @@ -1655,8 +1655,9 @@ extern void perf_tp_event(u16 event_type, u64 count, void *record,
->  			  struct task_struct *task);
->  extern void perf_bp_event(struct perf_event *event, void *data);
->  
-> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned long perf_misc_flags(struct perf_event *event, struct pt_regs *regs);
-> +extern unsigned long perf_instruction_pointer(struct perf_event *event,
-> +					      struct pt_regs *regs);
->  
->  #ifndef perf_arch_misc_flags
->  # define perf_arch_misc_flags(regs) \
-> @@ -1667,6 +1668,22 @@ extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
->  # define perf_arch_bpf_user_pt_regs(regs) regs
->  #endif
->  
-> +#ifndef perf_arch_guest_misc_flags
-> +static inline unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-> +{
-> +	unsigned long guest_state = perf_guest_state();
-> +
-> +	if (guest_state & PERF_GUEST_USER)
-> +		return PERF_RECORD_MISC_GUEST_USER;
-> +
-> +	if (guest_state & PERF_GUEST_ACTIVE)
-> +		return PERF_RECORD_MISC_GUEST_KERNEL;
+> I'm gathering that what supported means to you and what it means to me are
+> different things.
 
-Is there by any chance to add a PERF_GUEST_KERNEL flag in KVM?
+Yes.  And the distinction matters greatly in this case, because "VMLOAD/VMSAVE
+in the guest are broken" is *very* different than "VMLOAD/VMSAVE in the guest
+actually operate on SPAs, not GPAs".
 
-The PERF_GUEST_ACTIVE flag check looks really confusing.
+> "Architecturally" the instructions for virtualized VMLOAD/VMSAVE exist.
 
-Thanks,
-Kan
-> +
-> +	return 0;
-> +}
-> +# define perf_arch_guest_misc_flags(regs)	perf_arch_guest_misc_flags(regs)
-> +#endif
-> +
->  static inline bool has_branch_stack(struct perf_event *event)
->  {
->  	return event->attr.sample_type & PERF_SAMPLE_BRANCH_STACK;
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 2c44ffd6f4d8..c62164a2ff23 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -7022,13 +7022,26 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->  EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
->  #endif
->  
-> -unsigned long perf_misc_flags(struct pt_regs *regs)
-> +static bool should_sample_guest(struct perf_event *event)
->  {
-> +	return !event->attr.exclude_guest && perf_guest_state();
-> +}
-> +
-> +unsigned long perf_misc_flags(struct perf_event *event,
-> +			      struct pt_regs *regs)
-> +{
-> +	if (should_sample_guest(event))
-> +		return perf_arch_guest_misc_flags(regs);
-> +
->  	return perf_arch_misc_flags(regs);
->  }
->  
-> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +unsigned long perf_instruction_pointer(struct perf_event *event,
-> +				       struct pt_regs *regs)
->  {
-> +	if (should_sample_guest(event))
-> +		return perf_guest_get_ip();
-> +
->  	return perf_arch_instruction_pointer(regs);
->  }
->  
-> @@ -7849,7 +7862,7 @@ void perf_prepare_sample(struct perf_sample_data *data,
->  	__perf_event_header__init_id(data, event, filtered_sample_type);
->  
->  	if (filtered_sample_type & PERF_SAMPLE_IP) {
-> -		data->ip = perf_instruction_pointer(regs);
-> +		data->ip = perf_instruction_pointer(event, regs);
->  		data->sample_flags |= PERF_SAMPLE_IP;
->  	}
->  
-> @@ -8013,7 +8026,7 @@ void perf_prepare_header(struct perf_event_header *header,
->  {
->  	header->type = PERF_RECORD_SAMPLE;
->  	header->size = perf_sample_data_size(data, event);
-> -	header->misc = perf_misc_flags(regs);
-> +	header->misc = perf_misc_flags(event, regs);
->  
->  	/*
->  	 * If you're adding more sample types here, you likely need to do
+Which means they're supported, but broken.
 
+> There are problems with them on these processors, and for that reason the
+> BIOS was not supposed to set those bits but it did.
+
+In other words, this a CPU bug.  The kernel comment absolutely needs to reflect
+that.  Passing this off as BIOS going rogue is misleading and confusing.
 
