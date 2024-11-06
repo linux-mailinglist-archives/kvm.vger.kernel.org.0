@@ -1,150 +1,145 @@
-Return-Path: <kvm+bounces-30847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30848-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237989BDE37
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 06:14:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F209BDE55
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 06:39:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B42C41F24521
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 05:14:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3ED21F23F10
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 05:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1182190678;
-	Wed,  6 Nov 2024 05:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15DD1917E8;
+	Wed,  6 Nov 2024 05:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OhQFUejs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gkxY0evp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30882190462
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 05:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37113189902
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 05:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730870049; cv=none; b=lfuOaOq9JZuCkDvg3TkM7oql+UtCVcg8VMA3VVrhy+FhvRbiwdHEGMKaP/HH78RmLBGDIXPWAGGOnxUMtk411qDYGbYaKkyOcHxRpemApIuVDsxgwXirBZcARuj6LqpKsuxDaBUCpV3tockkPRZty+a+twuKW/7U5dll54dSzPg=
+	t=1730871570; cv=none; b=bq48kr7OOgxVwNEenCb3VCyRvObrVnlYhgBWhqVnYaeKB2HerqGfP0GKDFHIsiTZ5wrzx9V8HVRGpP082ncU4ghHKiiD2nS7qJrItpVY5X4eEgxHYlk2iFNAXNV7IdFHbzs+cCpUbgQqxbhrkBsswjvQiM8AP3hGqNQeo/brb2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730870049; c=relaxed/simple;
-	bh=+GUtlbwkwgEWibYVDjD+xb0kv0/BuZe7m5hWZoXt4oA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0nUSF9J/b+XO89fEU0zh/So/PWhH9qJXPXwSmNCi4yurF102cw59+dYmC+jJKKiJAL2nQOzAiWzfLr+KkwggUB2V8WtOXXUW6vP68jGV+fhz70SXhUwnWwGoNNT0eHKMnADkJJW+6rGInMo2XQcVP8wE0yU6rO3T5cRz1SRmUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OhQFUejs; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730870048; x=1762406048;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=+GUtlbwkwgEWibYVDjD+xb0kv0/BuZe7m5hWZoXt4oA=;
-  b=OhQFUejss5JFXb8whodTnZ3yuSHNrzJErvta3aRXXPBKxZutn8U1BvHn
-   +FbJ2GVLNZhGl0H2soIoIZ1KmKLypWC7vgfBPAbiSml1Bm958zFJdEVTB
-   hUqXacLT7sksvMJxAImcTEGZfghjEwZspMd5qBM6rYsyjE+6KQsiYzhZM
-   wDsSYc3XCLAzamihGWm/VIrRUpod0lq/61AzRLBUJ5NbuNFWUZ05lkkh9
-   nSSTnaFc+smxouai10RDKGiVdoYzJSKRbWCCO6FlJzKxZfOm3jTGVzB5y
-   84dun5HDdfsxHVk0sPq41Hyw8YiZ9cDMTGyF2HJEoJweJv/9Vaj0f/ehl
-   g==;
-X-CSE-ConnectionGUID: eXHAKzM5Ty6+zFY271Zvtg==
-X-CSE-MsgGUID: hMGHxWcOTxKSlfnwEe417Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="42033297"
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="42033297"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 21:14:07 -0800
-X-CSE-ConnectionGUID: fQA3sH3PQSqWqeOLGAOP3A==
-X-CSE-MsgGUID: kDnoeCr3Rl6N+jQwZCQX9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="89144608"
-Received: from bergbenj-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.120])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 21:14:01 -0800
-Date: Wed, 6 Nov 2024 07:13:56 +0200
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
-	"imammedo@redhat.com" <imammedo@redhat.com>,
-	"Liu, Zhao1" <zhao1.liu@intel.com>,
-	"marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
-	"anisinha@redhat.com" <anisinha@redhat.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"philmd@linaro.org" <philmd@linaro.org>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"mtosatti@redhat.com" <mtosatti@redhat.com>,
-	"eblake@redhat.com" <eblake@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"wangyanan55@huawei.com" <wangyanan55@huawei.com>,
-	"berrange@redhat.com" <berrange@redhat.com>
-Subject: Re: [PATCH v6 09/60] i386/tdx: Initialize TDX before creating TD
- vcpus
-Message-ID: <Zyr7FA10pmLhZBxL@tlindgre-MOBL1>
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-10-xiaoyao.li@intel.com>
- <1235bac6ffe7be6662839adb2630c1a97d1cc4c5.camel@intel.com>
- <c0ef6c19-756e-43f3-8342-66b032238265@intel.com>
+	s=arc-20240116; t=1730871570; c=relaxed/simple;
+	bh=3qBDiqpY9XDqbY2Y9odYYAPqOm9MdhCQLElgiaodrH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y2vIu+HtZYJq/rJuEmTsVgw1orJteAu6RXpVKAs44BcNBpxodlBXFEnkJ2u9Mak4SZ90NLcR/dlAwR2+tJPPNldlzAF3DtWL+9wnZdss/A6pnWIMEFHlI1T9CEgONtyYIe2hmYAgESbx9VNeSqfZF+IhaHLvOhs3ptnWNdZ1bmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gkxY0evp; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539e4b7409fso540546e87.0
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 21:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1730871565; x=1731476365; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=AN4uQlg4JmmnskoZUbD9ajWs6/v+l9dkVw03I1zm8cw=;
+        b=gkxY0evpc78lyNkTILVk409H9nFTRzkmUYLkkxqIXf9UU6lmHGyKrEFkeynN+XO6WG
+         /Q9Tm8PR3aYI1fwbAtPXk2pus0+f4b8dgy22oH7m87l/yy3N6YUz4T1LB2DCfDi/L9CS
+         pJWvrrXJIqtam7RlqNMhIyC2s53syrMYWv6k7/GOpKntprws5X7vLWHi+wIAHn0/NKED
+         pjKlAOCNBMpENcEdrDYvuk5sObDjpoHESmLHh1HpQRgXBTE5Rs7EgdO03GvFzSqUFtJj
+         IQRf0mFOQGC9v+vPWaepd/nBs8s+SrNibqV2+EAmcfGdth+kaLRJ6zxQ+eczbIeKwNe+
+         pRWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730871565; x=1731476365;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AN4uQlg4JmmnskoZUbD9ajWs6/v+l9dkVw03I1zm8cw=;
+        b=Ebm04XYSRiO3CrcZI0+GQadjOTwO91TOo2yzF+vHJ/26ixwCUBk0jBkRXHABDE2qQs
+         vrGE6ZuNUXjqyBbx4SLdKGpgAlKswLWq2MVn1qAxXQnSsHyZxIB3jnVmz/Sf3DDg6B09
+         wDk8s3vjwH0ad1GzpKutuI1YxTeDx0X693PYgAyhum2JgtjbRBhYQ3pkFGzV9gZtS2rI
+         hWiUk4VlNQf2jWqua+22H10+d9ar98HWrIIn2nqKEMX0dpLn9MhXPH1QD2vN9moDIZqM
+         pryKC46Wsc1hqcbgexAKRTPutM0Ebyc61YEV3sC/Qw6YYmYdhutyvqHh0J5PuCjaTqSD
+         SDbw==
+X-Forwarded-Encrypted: i=1; AJvYcCWT/Ljpo2gbfM0xe6SQWwGYV+d3YG0LfPAcFGwoQPhsQh1r9qIfA7v6fFHP3YAIA4p4o4A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3JQ2BapMb8hp81dt60LTQffslIrYEeD/HeFwZY7H6sNONkD3a
+	Gj8W+r5GPK5plHxCgxqO1lDVfEqWGf7dhfmTlk9R6AGRjcmDvfDmgrWpgLa3aA+DT3m8jmDte8/
+	hGw4KkyhAAOBk6emxFjK1/6lJdnxoj5sNBACviw==
+X-Google-Smtp-Source: AGHT+IHkFZmS15Yat+yA6wTIjddaBPNP6Qu4/1YXgkU7r7C/EE/mZc+JCaJP3gRrzyZ+p7mBuvSg1qn/MJDQimjHDOk=
+X-Received: by 2002:a05:6512:4803:b0:53b:1ede:9174 with SMTP id
+ 2adb3069b0e04-53d7cff7502mr316569e87.28.1730871564937; Tue, 05 Nov 2024
+ 21:39:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c0ef6c19-756e-43f3-8342-66b032238265@intel.com>
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <9-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com> <CABQgh9HoGFGDTEqziQt6WrJ7Bm9d-0c259PYsms3nOVEidn5BA@mail.gmail.com>
+ <20241104171931.GB10193@nvidia.com>
+In-Reply-To: <20241104171931.GB10193@nvidia.com>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Wed, 6 Nov 2024 05:39:13 +0000
+Message-ID: <CABQgh9HSAhat3_P43F_z07oqDaJ9h_YrZ-+SdHZ=ijzrZD1CVw@mail.gmail.com>
+Subject: Re: [PATCH v4 09/12] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev, 
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Donald Dutile <ddutile@redhat.com>, 
+	Eric Auger <eric.auger@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Jerry Snitselaar <jsnitsel@redhat.com>, 
+	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, 
+	patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, 
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 06, 2024 at 10:01:04AM +0800, Xiaoyao Li wrote:
-> On 11/6/2024 4:51 AM, Edgecombe, Rick P wrote:
-> > +Tony
-> > 
-> > On Tue, 2024-11-05 at 01:23 -0500, Xiaoyao Li wrote:
-> > > +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+On Mon, 4 Nov 2024 at 17:19, Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Thu, Oct 31, 2024 at 02:21:11PM +0800, Zhangfei Gao wrote:
+>
+> > > +static struct iommu_domain *
+> > > +arm_vsmmu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
+> > > +                             const struct iommu_user_data *user_data)
 > > > +{
-> > > +    X86CPU *x86cpu = X86_CPU(cpu);
-> > > +    CPUX86State *env = &x86cpu->env;
-> > > +    g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
-> > > +    int r = 0;
+> > > +       struct arm_vsmmu *vsmmu = container_of(viommu, struct arm_vsmmu, core);
+> > > +       struct arm_smmu_nested_domain *nested_domain;
+> > > +       struct iommu_hwpt_arm_smmuv3 arg;
+> > > +       int ret;
 > > > +
-> > > +    QEMU_LOCK_GUARD(&tdx_guest->lock);
-> > > +    if (tdx_guest->initialized) {
-> > > +        return r;
-> > > +    }
-> > > +
-> > > +    init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
-> > > +                        sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
-> > > +
-> > > +    r = setup_td_xfam(x86cpu, errp);
-> > > +    if (r) {
-> > > +        return r;
-> > > +    }
-> > > +
-> > > +    init_vm->cpuid.nent = kvm_x86_build_cpuid(env, init_vm->cpuid.entries, 0);
-> > > +    tdx_filter_cpuid(&init_vm->cpuid);
-> > > +
-> > > +    init_vm->attributes = tdx_guest->attributes;
-> > > +    init_vm->xfam = tdx_guest->xfam;
-> > > +
-> > > +    do {
-> > > +        r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, init_vm);
-> > > +    } while (r == -EAGAIN);
-> > 
-> > KVM_TDX_INIT_VM can also return EBUSY. This should check for it, or KVM should
-> > standardize on one for both conditions. In KVM, both cases handle
-> > TDX_RND_NO_ENTROPY, but one tries to save some of the initialization for the
-> > next attempt. I don't know why userspace would need to differentiate between the
-> > two cases though, which makes me think we should just change the KVM side.
-> 
-> I remember I tested retrying on the two cases and no surprise showed.
-> 
-> I agree to change KVM side to return -EAGAIN for the two cases.
+> > > +       if (flags)
+> > > +               return ERR_PTR(-EOPNOTSUPP);
+> >
+> > This check fails when using user page fault, with flags =
+> > IOMMU_HWPT_FAULT_ID_VALID (4)
+> > Strange, the check is not exist in last version?
+> >
+> > iommufd_viommu_alloc_hwpt_nested ->
+> > viommu->ops->alloc_domain_nested(viommu, flags, user_data) ->
+> > arm_vsmmu_alloc_domain_nested
+>
+> It should permit IOMMU_HWPT_FAULT_ID_VALID, I'll add this hunk:
+>
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-iommufd.c
+> @@ -178,12 +178,18 @@ arm_vsmmu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
+>                               const struct iommu_user_data *user_data)
+>  {
+>         struct arm_vsmmu *vsmmu = container_of(viommu, struct arm_vsmmu, core);
+> +       const u32 SUPPORTED_FLAGS = IOMMU_HWPT_FAULT_ID_VALID;
+>         struct arm_smmu_nested_domain *nested_domain;
+>         struct iommu_hwpt_arm_smmuv3 arg;
+>         bool enable_ats = false;
+>         int ret;
+>
+> -       if (flags)
+> +       /*
+> +        * Faults delivered to the nested domain are faults that originated by
+> +        * the S1 in the domain. The core code will match all PASIDs when
+> +        * delivering the fault due to user_pasid_table
+> +        */
+> +       if (flags & ~SUPPORTED_FLAGS)
+>                 return ERR_PTR(-EOPNOTSUPP);
 
-OK yeah let's patch KVM for it.
-
-Regards,
-
-Tony
+Thanks Jason, this works
 
