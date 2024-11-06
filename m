@@ -1,147 +1,142 @@
-Return-Path: <kvm+bounces-30927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30946-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AE9BE5D7
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:43:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BDE9BE6BD
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 13:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC72CB22341
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 11:43:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DBD5B25039
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 12:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5996A1DEFE3;
-	Wed,  6 Nov 2024 11:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D2E1DEFE3;
+	Wed,  6 Nov 2024 12:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f55ksqmW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGGGrkyU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749F457333;
-	Wed,  6 Nov 2024 11:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF01DF729;
+	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730893392; cv=none; b=j+yWniQE6jr+IhvUJ2QvNV5o6fOTELn8zSaE2H5p9xrXxOBA3hcV0VYOlVGQ6LrwfP9Ywxwy/b0ORDhGW21ekVSsnqyoE3KSNK3R0JI6CbRqhj32chg9EsfFWvMm3JaVKkz8+nR9n5rvfEGdV3VI6xeTlbNoOUv+Klo6AVLdQYQ=
+	t=1730894617; cv=none; b=mbevG6V/EQgwEA55Jk8+cX6oDpdkCXM/pXm46pOZEVzetU4CenjNAOffnbL2HBKuTRUHBGAuHKXKbhzgquTcBIJCRFxAqELEm5V+RH81phlmSLVfmzb0wNd71T1kaPJbcIwDt75dsr2/tT+KnW4W9SEZJ9nZUkQWZCaaNNocgUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730893392; c=relaxed/simple;
-	bh=CZlxUMF7h6qY7n2j8niZdY+BvTgqh4tqKKQndIQgF1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mVA9+P7V7kXMs1Teij5xsY3vIeOB6pd92IckPTa+jNkouO2mXOS1cUpXYqIy1aejCSb+zVGjxjNC9mV7mirQqfWjVRQURjqJIroZ1yqjFEc3oEONC1IvGmOGa8tjApDhiJxzn7I6zqB2GRfMDTC95xRmUaWG8ZSCVvVhddgDdmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f55ksqmW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D46F5C4CECD;
-	Wed,  6 Nov 2024 11:43:06 +0000 (UTC)
+	s=arc-20240116; t=1730894617; c=relaxed/simple;
+	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YzmD5P7lJ2+KbAxRw3p2yMIzZDdcKc21ww34gA7rbAOvFbN1xN35xhlNv7bjho2y5pH9OBTBKJnrknqo9CLe3RWEfJ8V2Z5TOYvyMROuMonxzJivqb68r/OBuKgLbW9212GLNbQxZ88EvfdA4DumqNUI2oAtvHvS9/orVurpPDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGGrkyU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471E1C4CECD;
+	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730893392;
-	bh=CZlxUMF7h6qY7n2j8niZdY+BvTgqh4tqKKQndIQgF1s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f55ksqmW4WB2ytuUuaXqtOk6lZw8OU1h4fp86og9ZiCOIrMBrE56cTF38d2+5GMu7
-	 RSx7v4nNpm3AYPjXHPDyHlzDP0hBlB8hOk/HMZ5ZmqQpWIcJEonVGFgVvOASKI2Xyd
-	 YtJwHV7PoP5fIKWwwT0r4zCG0pKoLDeB7lP16WpRXeL1XJKtcY/m3vFTDPBeAoy47/
-	 MbtHn3oXogSwreZvOTbEJFIQlcWBw6/KsIsmU+PRtStWAvMUjrci7TvZxitmIHLKCk
-	 wvEs4Os+qFnvW6z1kAdtHpan1tvKOx5EZYKz3it1Arl35EeafMmG9mpb/Y0m9S5Ib5
-	 1Bq/ZfwniUT7g==
-Date: Wed, 6 Nov 2024 11:43:03 +0000
-From: Will Deacon <will@kernel.org>
-To: Haris Okanovic <harisokn@amazon.com>
-Cc: ankur.a.arora@oracle.com, catalin.marinas@arm.com,
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com,
-	rafael@kernel.org, daniel.lezcano@linaro.org, peterz@infradead.org,
-	arnd@arndb.de, lenb@kernel.org, mark.rutland@arm.com,
-	mtosatti@redhat.com, sudeep.holla@arm.com, cl@gentwo.org,
-	misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
-	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
-	konrad.wilk@oracle.com
-Subject: Re: [PATCH 2/5] arm64: add __READ_ONCE_EX()
-Message-ID: <20241106114302.GB13801@willie-the-truck>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
- <20241105183041.1531976-1-harisokn@amazon.com>
- <20241105183041.1531976-3-harisokn@amazon.com>
+	s=k20201202; t=1730894617;
+	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PGGGrkyUUUy0z1Mqcx5xqROA9jQDy6vuGf3cBZFvuzU0aUts8N9/2g/F0F9ssiIVo
+	 ZraIpV02Np+JVSYY+PHiS/v7Vfq1jeNjn+YghIkATbHmbg89oOqE37AaUcipNak0l+
+	 7cLUcOvr5iZo57XfgF3pjY6J8gfIXS67F6WRm/m5OBI+WESXazuYgEwxjrIiYuvG/K
+	 B8pHWJO7LU4uR2dmzxeGfLkZg6RqCTnfdF78+HQHL3hBZ7lfRq4qSZkW+DNSpKD1yw
+	 Yj/8eZXyaP9+wKZqQPvtPCmNa+Zp0l02m8o2jvShxbgtsBrFP8/n2GJe7uPyiylH5z
+	 S4tGuHYqsb1OA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t8el5-00AM93-6N;
+	Wed, 06 Nov 2024 12:03:35 +0000
+Date: Wed, 06 Nov 2024 12:03:34 +0000
+Message-ID: <86cyj81sdl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>
+Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+In-Reply-To: <20241106083035.2813799-2-jingzhangos@google.com>
+References: <20241106083035.2813799-1-jingzhangos@google.com>
+	<20241106083035.2813799-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241105183041.1531976-3-harisokn@amazon.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 05, 2024 at 12:30:38PM -0600, Haris Okanovic wrote:
-> Perform an exclusive load, which atomically loads a word and arms the
-> exclusive monitor to enable wfet()/wfe() accelerated polling.
+On Wed, 06 Nov 2024 08:30:32 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> https://developer.arm.com/documentation/dht0008/a/arm-synchronization-primitives/exclusive-accesses/exclusive-monitors
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
 > 
-> Signed-off-by: Haris Okanovic <harisokn@amazon.com>
+> In all the vgic_its_save_*() functinos, they do not check whether
+> the data length is 8 bytes before calling vgic_write_guest_lock.
+> This patch adds the check. To prevent the kernel from being blown up
+> when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
+> are replaced together.
+> 
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/include/asm/readex.h | 46 +++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
->  create mode 100644 arch/arm64/include/asm/readex.h
+>  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/readex.h b/arch/arm64/include/asm/readex.h
-> new file mode 100644
-> index 000000000000..51963c3107e1
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/readex.h
-> @@ -0,0 +1,46 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Based on arch/arm64/include/asm/rwonce.h
-> + *
-> + * Copyright (C) 2020 Google LLC.
-> + * Copyright (C) 2024 Amazon.com, Inc. or its affiliates.
-> + */
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index ba945ba78cc7..2381bc5ce544 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+>  		ite->collection->collection_id;
+>  	val = cpu_to_le64(val);
 > +
-> +#ifndef __ASM_READEX_H
-> +#define __ASM_READEX_H
+> +	if (KVM_BUG_ON(ite_esz != sizeof(val), kvm))
+> +		return -EINVAL;
 > +
-> +#define __LOAD_EX(sfx, regs...) "ldaxr" #sfx "\t" #regs
+>  	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+>  }
+>  
+> @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+>  	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+>  		(dev->num_eventid_bits - 1));
+>  	val = cpu_to_le64(val);
 > +
-> +#define __READ_ONCE_EX(x)						\
-> +({									\
-> +	typeof(&(x)) __x = &(x);					\
-> +	int atomic = 1;							\
-> +	union { __unqual_scalar_typeof(*__x) __val; char __c[1]; } __u;	\
-> +	switch (sizeof(x)) {						\
-> +	case 1:								\
-> +		asm volatile(__LOAD_EX(b, %w0, %1)			\
-> +			: "=r" (*(__u8 *)__u.__c)			\
-> +			: "Q" (*__x) : "memory");			\
-> +		break;							\
-> +	case 2:								\
-> +		asm volatile(__LOAD_EX(h, %w0, %1)			\
-> +			: "=r" (*(__u16 *)__u.__c)			\
-> +			: "Q" (*__x) : "memory");			\
-> +		break;							\
-> +	case 4:								\
-> +		asm volatile(__LOAD_EX(, %w0, %1)			\
-> +			: "=r" (*(__u32 *)__u.__c)			\
-> +			: "Q" (*__x) : "memory");			\
-> +		break;							\
-> +	case 8:								\
-> +		asm volatile(__LOAD_EX(, %0, %1)			\
-> +			: "=r" (*(__u64 *)__u.__c)			\
-> +			: "Q" (*__x) : "memory");			\
-> +		break;							\
-> +	default:							\
-> +		atomic = 0;						\
-> +	}								\
-> +	atomic ? (typeof(*__x))__u.__val : (*(volatile typeof(__x))__x);\
-> +})
+> +	if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
+> +		return -EINVAL;
+> +
+>  	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
+>  }
+>  
+> @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *its,
+>  			     struct its_collection *collection,
+>  			     gpa_t gpa, int esz)
+>  {
+> +	struct kvm *kvm = its->dev->kvm;
 
-I think this is a bad idea. Load-exclusive needs to be used very carefully,
-preferably when you're able to see exactly what instructions it's
-interacting with. By making this into a macro, we're at the mercy of the
-compiler and we give the wrong impression that you could e.g. build atomic
-critical sections out of this macro.
+nit: just use its->dev->kvm consistently, as this is what we are
+already doing in this function.
 
-So I'm fairly strongly against this interface.
+	M.
 
-Will
+-- 
+Without deviation from the norm, progress is not possible.
 
