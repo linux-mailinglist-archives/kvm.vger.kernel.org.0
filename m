@@ -1,129 +1,163 @@
-Return-Path: <kvm+bounces-30825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74779BDB41
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 02:38:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 112419BDB55
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 02:42:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65EE6284865
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 01:38:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C06C62849C6
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 01:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A05188A18;
-	Wed,  6 Nov 2024 01:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E62189F5C;
+	Wed,  6 Nov 2024 01:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nskBNwSs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v0I6Y+Lp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C78E17B50E
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 01:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD77E1865E2
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 01:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730857120; cv=none; b=LuDLgZX7B0/jdG9ACzHtllCQ0agZebtwNqlgnoaFQliFv/rv+AVkF9DYdUHoD/SDSzd7RtSHxIRFHikjeLi6Fub/K4rS7Ds56ptyUggaNtYQlu3qsR7zVwXenHgrPa+eBQCnW7Yt/yk6HIb1O09v/2Ftq8t0eADVtIUO+CXXJLg=
+	t=1730857350; cv=none; b=BwxS9w4oPw6g55dn2Pd2pGcH28VyAAPA6apkWVn6Sulip6EPkaMVA+6Ay1yi1SIKVYV1OVXtMq9NZEPEiMrdp2Xut7e/pPZ7tM1XNUHgjfb4isikuBC6NC4E7/eQEug6Ta2HmuL9uh2CxfOIQrtrvwXlaymzfDQY/AQ9FnGThqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730857120; c=relaxed/simple;
-	bh=tPRFNaKPEicvx6Pu2FMYGhCu8omtRaZM7BmqKmrKu/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YgraSBRM5XI+WpI8AncoBZqFNhrEMF4N2IciHnxpV85Tc7bhf+eESdL2ZXT5SQs9AQNQGePW5y/RRPpzHQBnFZqh8eHpVVUEyvk1h0AabmOtIClugJHCDM34RCUnggwaqZHrJVXB7+h4+3tTtezMLgo4/OWGsvJLeiQ0Z7PV6sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nskBNwSs; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730857119; x=1762393119;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tPRFNaKPEicvx6Pu2FMYGhCu8omtRaZM7BmqKmrKu/A=;
-  b=nskBNwSs4u2VekKafbMj2ZpQUajcYnsygxuYZPTSANWmu0vUVGfIxfqp
-   2Q/yow0i5oauNSQvIrE04CIhBfzOj5E9q1uOxo8iwXqaVn7016Ct1lXJV
-   eXA/5x9IuD7QVBWT6QTWGLJGV3mnDIPbbrUlScM3HvJMt3fGmRGeVOMqI
-   ShwWkRyhdMSYIyN7uB5ik6AkD29oCd6CgvpyRXwWb5qIPCYoVV62sE3G5
-   VU/5ANOCVbnXLCxz9ZNX2Rc7E6um1GrXC9Q2zDpDGEk/R7kfe/zpIdCzG
-   CApmlCuZusfIwni/WPNcfcLEmN0nNe2sfHpdVzpaRccsWbOcSnms13Mym
-   g==;
-X-CSE-ConnectionGUID: Q0hQfLwGQaiURfkxBs5hvg==
-X-CSE-MsgGUID: DFTGdphSTRqTqJVTCEdjLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="30752125"
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="30752125"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 17:38:38 -0800
-X-CSE-ConnectionGUID: VtImLotQSI2a516wWfDHcg==
-X-CSE-MsgGUID: IzcenzUFR1ih90v0KRtW4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="88815774"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 17:38:32 -0800
-Message-ID: <4b28eb7d-e600-4e83-b067-7f4f52691564@intel.com>
-Date: Wed, 6 Nov 2024 09:38:29 +0800
+	s=arc-20240116; t=1730857350; c=relaxed/simple;
+	bh=fUj69fUtHJsNp2U8QyTi97PKN8BvhyDx7F71wiOBVfw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RAf+1J3ib2YmtlbufPWw1Qt7r4sK3sfWOLiUaPC5Cap3qpPAHxBk7qPu8zIxyiDrOJ0k/fYnW86pWHsePfhk5828RpftWgZApisjMZNZzrRAqIswHR3iUQFpqA9Z17s3TenbtAMAnqopadk7/63nsd9QC+7sLJdkWqisgxgbZxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v0I6Y+Lp; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290947f6f8so10796963276.2
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2024 17:42:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730857348; x=1731462148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=79NlkuP86plJrzGKUva1SSFLp344klrVOU35cyVmWNw=;
+        b=v0I6Y+LpE2GEX+4m5lkFcwhT9IIMgxEsdczzqKbPv5ZTz0RcmX7JK+BR6ZSFalj9Er
+         6Rrpy5rqFfTnA2m9ptwZEuJVbKdQkpDsRGY4BWLSKiqxJIqEYQOhjp1LTh8AORG+a+2s
+         Ac6biAgs+28c+1Lf2IavD58u9lQ7s2Umz+dOp+cATum3/nudw3LncBOjNW5wGTTZFhMy
+         9g0HkSkOEcLvRQgO9avtt6JsdvY1l/xw2rYDBCBKU3Sslljyz+6seqkPu7FUHJew6OY1
+         Tn1ins/l+im/NUR/T2mkuOQFMG0a6pde9g7DPrdYrDd5fW05mPvcC+1+RKTj+FDIO+ja
+         nc7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730857348; x=1731462148;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=79NlkuP86plJrzGKUva1SSFLp344klrVOU35cyVmWNw=;
+        b=sATqL9FupNJ0xm4M1udp2A+A4uQrqzFucWfKwEVmw293WGXNXxJ5YM41+ECclMIMxb
+         TdYug8CcTVQz3TTuLNhszsteXV0LJstudxiOx7tIJbKpZfXE0Snrrali+hg1Hkh6M0pp
+         uzGPwDXk4azcDEWH9dseDZkuDnvZrYzjtyr2CfA7uZFp9KO+8ouAa4/EMwlkp5Dd+Xam
+         kjiyML313oWGKw5rQSZ0ywWs3z8VQhZzWomRDcNjjlYcj1fRea3V4PxxWJ8lcNkMUyun
+         8tIzaG7bKq9EJ3JGLpxSeaAbf+zoETz0mBjrqmrWbtbJFhaXAaCAA7a1xxBuRtsl1Xme
+         jCwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYXQ9bsfEagfy2dN/Az/LJ6qntv7PPdY3UEiRAqhMpBe/cc6xSASEQoOn9BD13Q0E06Jo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5f3A0Q6IkRamRHURrTfn2D8fqDQfz4pivHyWT/2tmD/DNXmSk
+	ivJcjSF4iDhrFKoi/yj5PsXLqpefm6fmNbFqXC2zgwg+heOePsmP7GReyDdEbIBRIdJKwO/qWh3
+	T4w==
+X-Google-Smtp-Source: AGHT+IE7MOG0VDSVDIX11bsiwcWg3GJ7OtgAr+VkxT8HH54dZtUVNELgdDPSd5EDlaV1+PN3XhDIrXF0jl0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:7486:0:b0:e29:74e3:616c with SMTP id
+ 3f1490d57ef6-e3302556d2bmr11973276.3.1730857347759; Tue, 05 Nov 2024 17:42:27
+ -0800 (PST)
+Date: Tue, 5 Nov 2024 17:42:26 -0800
+In-Reply-To: <CANZk6aSUzdxT-QjCoaSe2BJJnr=W9Gz0WfBV2Lg+SctgZ2DiHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 13/60] i386/tdx: Validate TD attributes
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "imammedo@redhat.com" <imammedo@redhat.com>, "Liu, Zhao1"
- <zhao1.liu@intel.com>,
- "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
- "anisinha@redhat.com" <anisinha@redhat.com>, "mst@redhat.com"
- <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>,
- "philmd@linaro.org" <philmd@linaro.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "eblake@redhat.com" <eblake@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "wangyanan55@huawei.com" <wangyanan55@huawei.com>,
- "berrange@redhat.com" <berrange@redhat.com>
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-14-xiaoyao.li@intel.com>
- <1e6cd4c21496452c7dae254ae80fe16a712d0d21.camel@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <1e6cd4c21496452c7dae254ae80fe16a712d0d21.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20241029031400.622854-1-alexyonghe@tencent.com>
+ <20241029031400.622854-3-alexyonghe@tencent.com> <ZyD76t8kY3dvO6Yg@google.com>
+ <CANZk6aSUzdxT-QjCoaSe2BJJnr=W9Gz0WfBV2Lg+SctgZ2DiHQ@mail.gmail.com>
+Message-ID: <ZyrJgh_9q-PoDfL1@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: introduce cache configurations for previous CR3s
+From: Sean Christopherson <seanjc@google.com>
+To: zhuangel570 <zhuangel570@gmail.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com, 
+	alexyonghe@tencent.com, junaids@google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/6/2024 4:56 AM, Edgecombe, Rick P wrote:
-> On Tue, 2024-11-05 at 01:23 -0500, Xiaoyao Li wrote:
->> -static void setup_td_guest_attributes(X86CPU *x86cpu)
->> +static int tdx_validate_attributes(TdxGuest *tdx, Error **errp)
->> +{
->> +    if ((tdx->attributes & ~tdx_caps->supported_attrs)) {
->> +            error_setg(errp, "Invalid attributes 0x%lx for TDX VM "
->> +                       "(supported: 0x%llx)",
->> +                       tdx->attributes, tdx_caps->supported_attrs);
->> +            return -1;
->> +    }
->> +
->> +    if (tdx->attributes & TDX_TD_ATTRIBUTES_DEBUG) {
-> 
-> What is going on here? It doesn't look like debug attribute could be set in this
-> series, so this is dead code I guess. If there is some concern that attributes
-> that need extra qemu support could be set in QEMU somehow, it would be better to
-> have a mask of qemu supported attributes and reject any not in the mask.
+On Wed, Oct 30, 2024, zhuangel570 wrote:
+> On Wed, Oct 30, 2024 at 4:38=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Tue, Oct 29, 2024, Yong He wrote:
+> > The only potential downside to larger caches I can think of, is that ke=
+eping
+> > root_count elevated would make it more difficult to reclaim shadow page=
+s from
+> > roots that are no longer relevant to the guest.  kvm_mmu_zap_oldest_mmu=
+_pages()
+> > in particular would refuse to reclaim roots.  That shouldn't be problem=
+atic for
+> > legacy shadow paging, because KVM doesn't recursively zap shadow pages.=
+  But for
+> > nested TDP, mmu_page_zap_pte() frees the entire tree, in the common cas=
+e that
+> > child SPTEs aren't shared across multiple trees (common in legacy shado=
+w paging,
+> > extremely uncommon in nested TDP).
+> >
+> > And for the nested TDP issue, if it's actually a problem, I would *love=
+* to
+> > solve that problem by making KVM's forced reclaim more sophisticated.  =
+E.g. one
+> > idea would be to kick all vCPUs if the maximum number of pages has been=
+ reached,
+> > have each vCPU purge old roots from prev_roots, and then reclaim unused=
+ roots.
+> > It would be a bit more complicated than that, as KVM would need a way t=
+o ensure
+> > forward progress, e.g. if the shadow pages limit has been reach with a =
+single
+> > root.  But even then, kvm_mmu_zap_oldest_mmu_pages() could be made a _l=
+ot_ smarter.
+>=20
+> I not very familiar with TDP on TDP.
+> I think you mean force free cached roots in kvm_mmu_zap_oldest_mmu_pages(=
+) when
+> no mmu pages could be zapped. Such as kick all VCPUs and purge cached roo=
+ts.
 
-Good catch and good idea!
+Not just when no MMU pages could be zapped; any time KVM needs to reclaim M=
+MU
+pages due to n_max_mmu_pages.
 
-Will maintain a mask of supported attributes in QEMU.
+> > TL;DR: what if we simply bump the number of cached roots to ~16?
+>=20
+> I set the number to 11 because the PCID in guest kernel is 6 (11+current=
+=3D12),
+> when there are more than 6 processes in guest, the PCID will be reused, t=
+hen
+> cached roots will not easily to hit.  The context switch case shows no
+> performance gain when process are 7 and 8.
 
->> +        error_setg(errp, "Current QEMU doesn't support attributes.debug[bit 0] "
->> +                         "for TDX VM");
->> +        return -1;
->> +    }
->> +
->> +    return 0;
->> +}
-> 
+Do you control the guest kernel?  If so, it'd be interesting to see what ha=
+ppens
+when you bump TLB_NR_DYN_ASIDS in the guest to something higher, and then a=
+djust
+KVM to match.
 
+IIRC, Andy arrived at '6' in 10af6235e0d3 ("x86/mm: Implement PCID based op=
+timization:
+try to preserve old TLB entries using PCID") because that was the "sweet sp=
+ot" for
+hardware.  E.g. using fewer PCIDs wouldn't fully utilize hardware, and usin=
+g more
+PCIDs would oversubscribe the number of ASID tags too much.
+
+For KVM shadow paging, the only meaningful limitation is the number of shad=
+ow
+pages that KVM allows.  E.g. with a sufficiently high n_max_mmu_pages, the =
+guest
+could theoretically use hundreds of PCIDs will no ill effects.
 
