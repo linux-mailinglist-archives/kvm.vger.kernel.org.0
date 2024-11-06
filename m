@@ -1,242 +1,188 @@
-Return-Path: <kvm+bounces-31041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2FA9BF898
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 22:41:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1809BF8C0
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 22:53:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D781A283A6C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:41:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D3E1C21ABC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE32F20CCF2;
-	Wed,  6 Nov 2024 21:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3B920C48B;
+	Wed,  6 Nov 2024 21:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="df3HFfEv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KizVLTiv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343A2204958
-	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 21:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730929260; cv=none; b=eWkHTo49aEmJoDyMHujJsA4Hz8K1xwDZNQnPWhPzo4qGPglSwE+sA9kVyEubbbeb5plQBMzH5GhJ0OlWVoLle6Z018hir0ERPi64YJGxmFDR9qnaLaUjX2rvSMEmLThfP3hwsUMLATzAEHLoyTyFGvDXN3+g7mwpJejbs7ZYcAc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730929260; c=relaxed/simple;
-	bh=9Y+RRzsvAYCa/G23SNNKkBP82ujzZCoCFSvTIEULxsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z2rnhHBlFRtGBSgC7w4OD9Wk+3suyXtegvNw58nb4LQ5UIsifJlBkWlrZ2r3hqwrB7s/UWRKaFYHo7nGz9SKe1S2UI+JiAD10eqPWmTG5JqDLw3ZraRYI8wzc8xFy/mNQIzJiLgpP4/GHoURg/ra5/FJnKXscWeAuoMDjD6CGCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=df3HFfEv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730929257;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LkAv1xv3L+lLwsH5N6TnynV2mpC7hr2h9WvHLXOozvM=;
-	b=df3HFfEvRirEm4HXBlo3qwtxbV9FjpzM8PrR4qAO4yyGeJkeXbb3WOn6AMq8JCjbpgPGZ/
-	62mSGG+wsWYfbiZ2T8whtUiDe0mnx1ZDvKbziONCymxsr3ujk6w0Ln/mtehwZpBmC6oSw/
-	8XnGU/n60nYt95bQnXEp2HHUO99u4qc=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-aBemTmTpN4aLyc_DrAiu7w-1; Wed, 06 Nov 2024 16:40:55 -0500
-X-MC-Unique: aBemTmTpN4aLyc_DrAiu7w-1
-X-Mimecast-MFC-AGG-ID: aBemTmTpN4aLyc_DrAiu7w
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a6cabd39e9so701835ab.0
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 13:40:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730929255; x=1731534055;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LkAv1xv3L+lLwsH5N6TnynV2mpC7hr2h9WvHLXOozvM=;
-        b=iMqXHQuMFr9gqiApVMCIgjg1T4YM1iTXrZh1TgiO9j48FaouKk6L0SVFupCSBtqERa
-         oas8o+bItwA+DjINZhQelrAzNFSXQRw0al3e4YK7QIjZ3+eWv1EcwFAkzuJ71P72PArV
-         XpA9BHeZvuopNRofTQC2zM10YskLpiSNzZI1NUyLT9gGZoc0Ly8qSYNRORBj+DdcmE21
-         nJpQN4n2WFUIBYWeD0wr3pHESR2XTER8YxprfsEZJbbLkPehGci5FvvHc96HXfCfZT7R
-         pmuNS/DCees+ZS0yRf+VnKro73ttojB2DbHemrQsx9nhl+5zBHjwWGK832N/grF3kjip
-         zjpg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8FiFMWxCAfc+AbCEzQxhxTWfdabAqAJwI3qFRxUii4N85wan440E+k9JWrtNf9xHZjYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuGr3ydXUT6MdW7ZAoS55MpifxvpDt7gSLdnHQdyJuIOYsafoi
-	FWLzxWfW4bbrKOsb997roZiCBwcMsqgKYonLWxT/NDQ9S2KGIRI2pUlFUbXq00tFqPAALY5+QSF
-	8neGZlIIU3YHWzJ0FtiZJosMuY/4vbxeU66zQzTCP+8shUwvylw==
-X-Received: by 2002:a05:6602:6423:b0:83a:abd1:6af2 with SMTP id ca18e2360f4ac-83df2442e08mr31343239f.3.1730929255178;
-        Wed, 06 Nov 2024 13:40:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFmaJCa6K1T+N21UQP7q5cHuDh9w/YU3TsQUPNVu6zTjgnwEmuBfGqqe4PZwEt0qklkr+LM9A==
-X-Received: by 2002:a05:6602:6423:b0:83a:abd1:6af2 with SMTP id ca18e2360f4ac-83df2442e08mr31341339f.3.1730929254742;
-        Wed, 06 Nov 2024 13:40:54 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de048e4f56sm3023903173.78.2024.11.06.13.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 13:40:54 -0800 (PST)
-Date: Wed, 6 Nov 2024 14:40:53 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
- <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
- <parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
- <joao.m.martins@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V1 vfio 6/7] vfio/virtio: Add PRE_COPY support for live
- migration
-Message-ID: <20241106144053.2f365e22.alex.williamson@redhat.com>
-In-Reply-To: <977be8e4-e52c-41bc-8a43-31ae906e6665@nvidia.com>
-References: <20241104102131.184193-1-yishaih@nvidia.com>
-	<20241104102131.184193-7-yishaih@nvidia.com>
-	<20241105161845.734e777e.alex.williamson@redhat.com>
-	<977be8e4-e52c-41bc-8a43-31ae906e6665@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8738320C008;
+	Wed,  6 Nov 2024 21:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730930015; cv=fail; b=Boh0sebQ5ecdt4EvHbixKBveyMpQ6KqLhQXaXydZx5oI8HdRi06IKdQKktOt4fFH+FPV5F8SDiQguGS9CaoVtwZtgIFsHa1E/XXhjb9JFl3rzmQGkf8x485g8PWieE0jkxbdXmLdQ3x989+lT8XQGBtCMRdtH16ikwq0NOePsPE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730930015; c=relaxed/simple;
+	bh=sbY1mUUl0mRsCygGqjnd1ersfTua6mNbznTxsZ7RXUU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ERFc5ujI6OZtlcLdlmBs0qvEhliBlu5A9Dkyo5BdUeMvI5EaWCKmPGIcCx/P+tqN1Ubfh4uwhyyS4gDXaG0eWdxs3sA5A4zWhr1NHMLolVA8dH7alUb8pFOYtyIIdL0ZMY5+gFsK+QABNvJwDi0cZwO7UO0hqJcB1HLv1aWGRPc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KizVLTiv; arc=fail smtp.client-ip=40.107.223.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QNOS9lGqv22Bo1IWRI68p37sZnF35VFUgZRi0Nv0fCb7HqU66TW2z0Y2ugUEemv/HRyQF36aE/QiLUnEOU0NKn4OVyQ27EHpMeLQ+2VvlGaFcGsTrJpERBYc1+5tiVgF3iuEZKlepxiBalW3cCcjFsnRevySkheLgxjYWVHl7SPQQqNzpN/OY3OxTheWBjfmWhJWAbyH0J3TNiyO4+cUTplVLQDN/ayDpy2jqjc2ha87DcjXHAMOjRlPWCyy4+z6jCaASpVNASIVh63fXn2v1Azlios/Sz9TBSWPg9oEHt1C38VuHJP3qxuBF9305FE1KKnn+mxe3Hrbow1Z/VjjmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eeBrkSbmAmRJo7VDs4EymTa1Gnln7vU9FxxHjW2QMQU=;
+ b=xOEq+voR8CVO2wd4QIDVud1hQfm0fzqDx0l93ZkDljhRDjQtT6N04kAHhys3DuBmtMs3hET6uVwZzZobvuhfViOLqXit16J0r3YQoDlCSSqN4tjOVA+kRRYOA3z5Ai8txU8FmIO/bPpVbfxyyO2Nv8Pk5vqHJkm3Fj9XPHBz2Joujl8i4euODgzfECzXBb1+gCSodjBWRmrmVysFmXJQ3yzgkPJR5iq6jIyZVWT1OE0EJ6wLaQrZ4mPpB9QhrDR3UALPzMv5wj+5BaCcUHPVviE/mXtMXGEQFXTd26bHaV2OQxpcBexHjUtiHxtNPCy3VEiUsBjVVCeJo5yvh8uQMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eeBrkSbmAmRJo7VDs4EymTa1Gnln7vU9FxxHjW2QMQU=;
+ b=KizVLTivxXOCe22WVAd48I6d9ZWncp0SpzUXQFK8IbI6FcoVGELHRB7kTSxkhnQiIH/KLu0pzBlgbYACNQ92fV6GZfdwr3O7phBVcgyMUCF/pDbvZaGQd8dzFq+MgDQTmuMajPvwGvhIzYMR/orDDh0BkjwtAofm76AKTgDOYwqUOn/qy2UkwpKPSOe3XHh7ZBw+WD8d+kA3apMCmkBfB34wYV7WeOEcZ3e46ZZWmE2aHgqS0H9NLogUOisK50LfBVbn4U4T7u0EigeRdhaPBBKRZpYpY5YJ8jyPD6SSlXSlu4oROVOjSegYQOGXfxRdZXauOMlK0kOElr52F3Nouw==
+Received: from BY5PR13CA0004.namprd13.prod.outlook.com (2603:10b6:a03:180::17)
+ by SA0PR12MB4494.namprd12.prod.outlook.com (2603:10b6:806:94::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Wed, 6 Nov
+ 2024 21:53:30 +0000
+Received: from CO1PEPF000066E7.namprd05.prod.outlook.com
+ (2603:10b6:a03:180:cafe::32) by BY5PR13CA0004.outlook.office365.com
+ (2603:10b6:a03:180::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.16 via Frontend
+ Transport; Wed, 6 Nov 2024 21:53:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000066E7.mail.protection.outlook.com (10.167.249.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.17 via Frontend Transport; Wed, 6 Nov 2024 21:53:29 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 6 Nov 2024
+ 13:53:13 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 6 Nov 2024
+ 13:53:12 -0800
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
+ Transport; Wed, 6 Nov 2024 13:53:10 -0800
+Date: Wed, 6 Nov 2024 13:53:08 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Robin Murphy <robin.murphy@arm.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, Will Deacon <will@kernel.org>,
+	<acpica-devel@lists.linux.dev>, <iommu@lists.linux.dev>, Joerg Roedel
+	<joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+	Len Brown <lenb@kernel.org>, <linux-acpi@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Robert
+ Moore" <robert.moore@intel.com>, Sudeep Holla <sudeep.holla@arm.com>, "Alex
+ Williamson" <alex.williamson@redhat.com>, Donald Dutile <ddutile@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>, Hanjun Guo <guohanjun@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Jerry Snitselaar
+	<jsnitsel@redhat.com>, Moritz Fischer <mdf@kernel.org>, Michael Shavit
+	<mshavit@google.com>, <patches@lists.linux.dev>, "Rafael J. Wysocki"
+	<rafael.j.wysocki@intel.com>, Shameerali Kolothum Thodi
+	<shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO
+ via struct arm_smmu_hw_info
+Message-ID: <ZyvlRFi6W9vK5IZj@Asurada-Nvidia>
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <5-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <20241104114723.GA11511@willie-the-truck>
+ <20241104124102.GX10193@nvidia.com>
+ <8a5940b0-08f3-48b1-9498-f09f0527a964@arm.com>
+ <20241106180531.GA520535@nvidia.com>
+ <2a0e69e3-63ba-475b-a5a9-0863ad0f2bf8@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <2a0e69e3-63ba-475b-a5a9-0863ad0f2bf8@arm.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000066E7:EE_|SA0PR12MB4494:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9afa297-7052-44fb-44ed-08dcfead7361
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?O+OxZ18LkgHYRMoy2Clx9IHj0aqOtiI6ajxDREEePuvtE6Wkvj0gxtzErgRO?=
+ =?us-ascii?Q?x8dGEPEHuiuMacPdiAHvrYuiRKviYUHTTu+qI4MINbctNnJnI2SCVsBJhm+c?=
+ =?us-ascii?Q?2UPikwOAbaIbnB6LmpX/050WdCjkfyIR+hBhoECv3fJo1fZczesQDi3QC0ZK?=
+ =?us-ascii?Q?Sfu0GwBnPu8PWHo80+XMZICVw+tR8RASUlGR94heCOGqEM6eH6rSI7+LJMHq?=
+ =?us-ascii?Q?hTyIQOHkegTq7Sm/WQAGE4JR616TPOdRIoroi2R2XC7ITeoxz3uRx4oawu84?=
+ =?us-ascii?Q?fMTc756oR7fx7ZDkc6ihOy6dWU2yUqj9PmYXlB7bwCa8b4LNgXkPpOHayhVX?=
+ =?us-ascii?Q?slj0F92aWGPG9qj9E15qXVHs7YHeo1+JxIqjZC+/bR7AeCp26aG1dG9hqwKW?=
+ =?us-ascii?Q?cZ8IEA7Vw058prdpZYZChqvcnNhAORYmJ+AdSCgfRKAuL1H3aYxtoFRlfhWU?=
+ =?us-ascii?Q?Efe9pvsakMxFaACfpKoVRDBaTJnWkPz5kK44MDilXrfWhTipcE5bnDnkbM1j?=
+ =?us-ascii?Q?pW/wl2Hqu/ThBEtCig0rDyHxKvyxmsjLQto7g/ay4CvkOzmI1daIx3PCM7f+?=
+ =?us-ascii?Q?XT07ks6T8KwgrhE1nWWTOkA594ivotbQjgNlx3/R2iG/8qKy8WrDhatjFD8H?=
+ =?us-ascii?Q?XeFk0NduaPAnSPLWa41xJaLDha+1XgeFbv5dMGRoaQORNxer0QLpuka8d1yn?=
+ =?us-ascii?Q?u05i52Edc6Q+exX9Flb2osHEOG6NM8916sgwOF1q8StZ3bNpX9TmLmH0M3vr?=
+ =?us-ascii?Q?58BU6/XcLdJ4TggF5GNQgTgTw+u16jOqNOzwc0K2n588NXl50jAWtAzKuVdR?=
+ =?us-ascii?Q?OW/s0ZaMoPKSz3SsERVAP77VqH3ftKaDqSyhbl385PNvgeqPaf1EbIh26UcK?=
+ =?us-ascii?Q?rY1iO46Kfs0em4IdoEILvL8P0ucAFFC5eQTdUJNh7mTvRcZcHDFaPiOldOnR?=
+ =?us-ascii?Q?nF04CR+KLVCsEz4hbIEEBXWVRYHdReLzeILVKds1KgjFIO7H4Yf5IZWmognH?=
+ =?us-ascii?Q?s+2Ov8k++S5M1c46OEdYQGx3/0OHTG8aJo+1Y0Q+Fqxtfs67v4AiJOBwyDLa?=
+ =?us-ascii?Q?ROt1ebMTp+VIAN54jwuU9YtvZsHJP/gmpYnMrt8/y9aMu26anYByyWAOiCo0?=
+ =?us-ascii?Q?Tl6/QPl+nVEPk2oMgvGqNiw7Big4EbVlTJXwltoeaXDkb/cO3WF/YRtN7vVR?=
+ =?us-ascii?Q?sPZgDHOaguMmGgkLEsWUrQ4w+KfL8CbZ1tPelCnTYuGcLgI535BwxaeHOuTq?=
+ =?us-ascii?Q?X8y9AmilcDfanmpXnwcfjqLS/GAzWhf2RFLVQfIov2eg/v6t/GNi5GetWL7i?=
+ =?us-ascii?Q?o2xGtDe2kanbTLBS5mLnPV9bfjcWc/wkSQlz9wAfnON0NXflcPTJ96Nv83X8?=
+ =?us-ascii?Q?hUmSnVYxu601Mk2AHMya2sNAgiUd5d0RIji3gI2YHGu9jGF6Bw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2024 21:53:29.7382
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9afa297-7052-44fb-44ed-08dcfead7361
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000066E7.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4494
 
-On Wed, 6 Nov 2024 13:16:34 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Wed, Nov 06, 2024 at 09:05:26PM +0000, Robin Murphy wrote:
+> On 2024-11-06 6:05 pm, Jason Gunthorpe wrote:
+> > If you still feel strongly about this please let me know by Friday and
+> > I will drop the idr[] array from this cycle. We can continue to
+> > discuss a solution for the next cycle.
+> 
+> It already can't work as-is, I don't see how making it even more broken
+> would help. IMO it doesn't seem like a good idea to be merging UAPI at
+> all while it's still clearly incomplete and by its own definition unusable.
 
-> On 06/11/2024 1:18, Alex Williamson wrote:
-> > On Mon, 4 Nov 2024 12:21:30 +0200
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >   
-> >> Add PRE_COPY support for live migration.
-> >>
-> >> This functionality may reduce the downtime upon STOP_COPY as of letting
-> >> the target machine to get some 'initial data' from the source once the
-> >> machine is still in its RUNNING state and let it prepares itself
-> >> pre-ahead to get the final STOP_COPY data.
-> >>
-> >> As the Virtio specification does not support reading partial or
-> >> incremental device contexts. This means that during the PRE_COPY state,
-> >> the vfio-virtio driver reads the full device state.
-> >>
-> >> As the device state can be changed and the benefit is highest when the
-> >> pre copy data closely matches the final data we read it in a rate
-> >> limiter mode and reporting no data available for some time interval
-> >> after the previous call.
-> >>
-> >> With PRE_COPY enabled, we observed a downtime reduction of approximately
-> >> 70-75% in various scenarios compared to when PRE_COPY was disabled,
-> >> while keeping the total migration time nearly the same.
-> >>
-> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> >> ---
-> >>   drivers/vfio/pci/virtio/common.h  |   4 +
-> >>   drivers/vfio/pci/virtio/migrate.c | 233 +++++++++++++++++++++++++++++-
-> >>   2 files changed, 229 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/pci/virtio/common.h b/drivers/vfio/pci/virtio/common.h
-> >> index 3bdfb3ea1174..5704603f0f9d 100644
-> >> --- a/drivers/vfio/pci/virtio/common.h
-> >> +++ b/drivers/vfio/pci/virtio/common.h
-> >> @@ -10,6 +10,8 @@
-> >>   
-> >>   enum virtiovf_migf_state {
-> >>   	VIRTIOVF_MIGF_STATE_ERROR = 1,
-> >> +	VIRTIOVF_MIGF_STATE_PRECOPY = 2,
-> >> +	VIRTIOVF_MIGF_STATE_COMPLETE = 3,
-> >>   };
-> >>   
-> >>   enum virtiovf_load_state {
-> >> @@ -57,6 +59,8 @@ struct virtiovf_migration_file {
-> >>   	/* synchronize access to the file state */
-> >>   	struct mutex lock;
-> >>   	loff_t max_pos;
-> >> +	u64 pre_copy_initial_bytes;
-> >> +	struct ratelimit_state pre_copy_rl_state;
-> >>   	u64 record_size;
-> >>   	u32 record_tag;
-> >>   	u8 has_obj_id:1;
-> >> diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
-> >> index 2a9614c2ef07..cdb252f6fd80 100644
-> >> --- a/drivers/vfio/pci/virtio/migrate.c
-> >> +++ b/drivers/vfio/pci/virtio/migrate.c  
-> > ...  
-> >> @@ -379,9 +432,104 @@ static ssize_t virtiovf_save_read(struct file *filp, char __user *buf, size_t le
-> >>   	return done;
-> >>   }
-> >>   
-> >> +static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
-> >> +				   unsigned long arg)
-> >> +{
-> >> +	struct virtiovf_migration_file *migf = filp->private_data;
-> >> +	struct virtiovf_pci_core_device *virtvdev = migf->virtvdev;
-> >> +	struct vfio_precopy_info info = {};
-> >> +	loff_t *pos = &filp->f_pos;
-> >> +	bool end_of_data = false;
-> >> +	unsigned long minsz;
-> >> +	u32 ctx_size;
-> >> +	int ret;
-> >> +
-> >> +	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
-> >> +		return -ENOTTY;
-> >> +
-> >> +	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
-> >> +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> >> +		return -EFAULT;
-> >> +
-> >> +	if (info.argsz < minsz)
-> >> +		return -EINVAL;
-> >> +
-> >> +	mutex_lock(&virtvdev->state_mutex);
-> >> +	if (virtvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
-> >> +	    virtvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY_P2P) {
-> >> +		ret = -EINVAL;
-> >> +		goto err_state_unlock;
-> >> +	}
-> >> +
-> >> +	/*
-> >> +	 * The virtio specification does not include a PRE_COPY concept.
-> >> +	 * Since we can expect the data to remain the same for a certain period,
-> >> +	 * we use a rate limiter mechanism before making a call to the device.
-> >> +	 */
-> >> +	if (!__ratelimit(&migf->pre_copy_rl_state)) {
-> >> +		/* Reporting no data available */
-> >> +		ret = 0;
-> >> +		goto done;  
-> > 
-> > @ret is not used by the done: goto target.  Don't we need to zero dirty
-> > bytes, or account for initial bytes not being fully read yet?  
-> 
-> The 'dirty bytes' are actually zero as we used the below line [1] of 
-> code above.
-> 
-> [1] struct vfio_precopy_info info = {};
+Robin, would you please give a clear suggestion for the hw_info?
 
-Ah, missed that.
- 
-> However, I agree, we may better account for the 'initial bytes' which 
-> potentially might not being fully read yet.
-> Same can be true for returning the actual 'dirty bytes' that we may have 
-> from the previous call.
-> 
-> So, in V2 I'll change the logic to initially set:
-> u32 ctx_size = 0;
-> 
-> Then, will call the device to get its 'ctx_size' only if time has passed 
-> according to the rate limiter.
-> 
-> Something as of the below.
-> 
-> if (__ratelimit(&migf->pre_copy_rl_state)) {
-> 	ret = virtio_pci_admin_dev_parts_metadata_get(.., &ctx_size);
-> 	if (ret)
-> 		goto err_state_unlock;
-> }
-> 
->  From that point the function will proceed with its V1 flow to return 
-> the actual 'initial bytes' and 'dirty_bytes' while considering the extra 
-> context size from the device to be 0.
+My takeaway is that you would want the unsupported features (per
+firmware overrides and errata) to be stripped from the reporting
+IDR array. Alternatively, we could start with some basic nesting
+features less those advanced ones (HTTU/PRI or so), and then add
+then later once we're comfortable to advertise.
 
-That appears correct to me.  Thanks,
+Does this sound okay to you?
 
-Alex
-
+Thanks
+Nicolin
 
