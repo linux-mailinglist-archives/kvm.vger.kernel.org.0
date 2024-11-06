@@ -1,105 +1,133 @@
-Return-Path: <kvm+bounces-30968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-30970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2615F9BF1AD
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:30:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCCF9BF1B2
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 16:30:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3D8AB25B90
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D81F1C2365D
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 15:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2134D203707;
-	Wed,  6 Nov 2024 15:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1622038B5;
+	Wed,  6 Nov 2024 15:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="V1gbekAz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dyXcW9St"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A070E2036ED;
-	Wed,  6 Nov 2024 15:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0083203709
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 15:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730906985; cv=none; b=qnjCAA/JArXv2LnIFlS5Mee/GGgzAkNo947Uzr78Vz7O3zPBNB6T9kgohDjvzQtwMHQlomuaT+TOb+ponPYs7hWNcdmwoDxgWK1otPR4Wl1zjsO+GoAnkn72h6GCRLtwcOgDqSbYj4Uy3c8bknEf6ANZBsc87pjqFpxCTRzyY5E=
+	t=1730907012; cv=none; b=SVCqCEcRbG+OcokfHfhwXqahPE/5+iITqrQ/TOHOJP53WpcFE1hR94ggxdWkLYEgdcu+YIJ7ABH85PW0GfKASJ7IOu183jJzMme5N7X5GIY94QwdrWqydEUSuXqIfaG7MMu4+MQmKsBNWdx/f/v0751T3Gx17iUG/32Y93X8Sdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730906985; c=relaxed/simple;
-	bh=W19tRKOCMa+pU1wWhYzQOPLI8ukpvgHQLEsR3J2Xqkc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e6acTlaxX459e1yy/W7xJ9tiSeDBxSn3qS5Z6Rj/7SWDwpJgIjLUiPRZOHv9EVKUyGA2ID0FdhXqhewk1MUd8uw21XLFJx+DsSnXOhRjnEm2KjZX5MYDyrH0epq+/Rk9bcyDnIPrWJlSe/cRctPAg5DJaftYpbHuEJzs0+EgtUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=V1gbekAz; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 62FC740E0163;
-	Wed,  6 Nov 2024 15:29:34 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id bg2MlC6n-Sc0; Wed,  6 Nov 2024 15:29:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1730906966; bh=eracO3TKdAG3lpmuW8AzlLLISI0xIUf6Lhrw64wxFpI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V1gbekAzy+c/P4HIsgM3/A4aL7KKEkppqyVOlPQhZnBvAyFvY2b5Dezpca7r2Cg8u
-	 nYWeNQ2fSstY5ZUzVgmnJsJFFiFmS4iCuuPOKhcqgJr9jUCRtN/goSIul07tJFMaye
-	 i73YqPBWN3+zn2veeRZzXZfjZEnYZCcF6cT5sVY15FqYnbdo2vtYP7h0Ia6AXV4Ffp
-	 /5cbTFd3C+8gRj6f7H2j+xGTXghYauTpqPh3t77F55Alf6nDB1XpHfesAz2pRncMAB
-	 ypaX2pGzvNqz42WMWtYdQ5Rb85xTEIu2LnJ8IPInid/qf8LeAnD6fw3vdiPhmgoLDi
-	 ShSCxneUdoi0f3C1I37HmlSd4hiairoqgV9tlxxFogYBkUfG3CkTP6e8ofKBGNKyM+
-	 B78T4lPh2V6fMSGZ0My7Tezz74pHjjyE67uX7UaIy/k9XqvFnTLbmjK2gausfFhaxF
-	 93iCSqrThjPP7PDA847izYhT1hPmJp+POk8HhB50bk6HMALG+OfsCnGFmhtaggzMjT
-	 D2CRpBMh+zvOj+BUskmwgt6Uv6/3GdpffP1pxLXOzIHTTI95NdG/d8ZmZwcXvjQy4l
-	 3rEST6oLqrrsF87SYtzP7R3vIFKe/D6kO+eG/wzWi1n6VpDqnLOyE9+JHwFNxcSeru
-	 dzuu2YGbst/qlBEc8CobpqCo=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AFB3640E0261;
-	Wed,  6 Nov 2024 15:29:19 +0000 (UTC)
-Date: Wed, 6 Nov 2024 16:29:14 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] x86/bugs: Adjust SRSO mitigation to new features
-Message-ID: <20241106152914.GFZyuLSvhKDCRWOeHa@fat_crate.local>
-References: <20241104101543.31885-1-bp@kernel.org>
- <ZyltcHfyCiIXTsHu@google.com>
- <20241105123416.GBZyoQyAoUmZi9eMkk@fat_crate.local>
- <ZypfjFjk5XVL-Grv@google.com>
- <20241105185622.GEZypqVul2vRh6yDys@fat_crate.local>
- <ZypvePo2M0ZvC4RF@google.com>
- <20241105192436.GFZypw9DqdNIObaWn5@fat_crate.local>
- <ZyuJQlZqLS6K8zN2@google.com>
+	s=arc-20240116; t=1730907012; c=relaxed/simple;
+	bh=dtSFWhS+miN5aZpkYJUpgHDtDeC0gvc+87KXOLrh29E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z6olbcW5UcGW8j9TgjQ4E5qkeXh3uaLq99lpof0FXmrJJCzKN3j8aIRYtTncceZyiMjQDtyA5zNrXwsqMuPsBJykVgt6bThJhGsGiG2wLAUyztIDwYV8LdQ/Rg+b4kWpkYxQPId9QFhWdZNE6BjvdypjpH51zlFbCrIRj1sCIcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dyXcW9St; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2e5af7e33aeso6867543a91.2
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2024 07:30:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730907010; x=1731511810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fsBhbUtkiFCV/FsrzlcCyG8rzV32ZiUxSoiLe78knMI=;
+        b=dyXcW9St3hVLSZmpnwxmR9qA2sfN1QgmLuj/Dx4aJG+rhzBoSHO7BjH2s/Ny5L2aUr
+         PscGMNfmM7TGUzJPdXNW+p0Spp8rANKOA92/H0DZm7v4LFmMd1avYRwusNOU0me77yxS
+         p2umjMV8XT/4v/E8upF/a4iKxa/ZuyHC2CMOQ2xVHyy+XGxZnQseekw82WyvuHBI0ieF
+         /9Er1N2rGB++8QBLw1C4BgKvRJ1RhS9No/YVF4h1NwY8HMEmnq2u29gUDjSmc/BVk6KI
+         gmyI1yfHsxrjLgP7c+bsIxaquriH6KDB/Ai1IaEJoDMgbK3Alnsqv0FTzNb/mxyP25Lv
+         XhmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730907010; x=1731511810;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fsBhbUtkiFCV/FsrzlcCyG8rzV32ZiUxSoiLe78knMI=;
+        b=vPWrgJ3/iqOtHeBIw5nKBp7qG1XRBkivEYT1pmeNECkWjS2Fv8TFE9jSXSCKPwmNgR
+         eCM4MepjDRbp3qOODnt4+7Pkzkucm90YsvTAFTngp+zdm7UL0ku4PVPoI3MF54zZSDxH
+         JlRGvEB/G++fq9XLwToO5qWpRmMkN0TSqvqYUto5ceYFDXCXAR9/RFgwS+I3s8nbn4Ax
+         STbrFzpA4YflC5TkHKjddSO7v1407TCc4xFH9Zl+PPlNQ8StBP6Tjh9BAjasdrh24+0a
+         Ejbhy7jKtissbK3Ro2eNO9qK1EWwLGG0aoEjO7KGPGhU12rKrgiROzKM3vgAYwJNH4Mg
+         7cyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcbqW2SFdldZWkdz5m25RnnGCGImnON5js/hYFCGc28SHb/E19lko/MTsDsygGUOJyhGc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyjroZBdKJGLEfnM9icbI7kRa2XP5RMMOypln48xH29ee4Ob6d
+	7gtRoHaudmV2Cjn6oth4oEi3cqn5lqlr7ZJbFApA+P/8ilJcaiS3OvhTlhGmMOIRYmNCfelVy0q
+	1Jw==
+X-Google-Smtp-Source: AGHT+IGKQHNKS+7Ak+6aqNVefPS2IXAs2Ic9KYt9yUn1rFvCR8SBX93AbpPqcJjM+99s4d9IaZInqln9zog=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:db91:b0:2e9:3299:76ab with SMTP id
+ 98e67ed59e1d1-2e93c1f98f5mr99827a91.8.1730907009333; Wed, 06 Nov 2024
+ 07:30:09 -0800 (PST)
+Date: Wed, 6 Nov 2024 07:30:07 -0800
+In-Reply-To: <b7fd2ddf-77a4-423c-b5cf-36505997990d@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZyuJQlZqLS6K8zN2@google.com>
+Mime-Version: 1.0
+References: <ZyLWMGcgj76YizSw@google.com> <1cace497215b025ed8b5f7815bdeb23382ecad32.camel@intel.com>
+ <ZyUEMLoy6U3L4E8v@google.com> <f95cd8c6-af5c-4d8f-99a8-16d0ec56d9a4@linux.intel.com>
+ <95c92ff265cfa48f5459009d48a161e5cbe7ab3d.camel@intel.com>
+ <ZymDgtd3VquVwsn_@google.com> <662b4aa037bfd5e8f3653a833b460f18636e2bc1.camel@intel.com>
+ <cef7b663-bc6d-44a1-9d5e-736aa097ea68@linux.intel.com> <e2c19b20b11c307cc6b4ae47cd7f891e690b419b.camel@intel.com>
+ <b7fd2ddf-77a4-423c-b5cf-36505997990d@linux.intel.com>
+Message-ID: <ZyuLf5evSQlZqG6w@google.com>
+Subject: Re: [PATCH v3 1/2] KVM: x86: Check hypercall's exit to userspace generically
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 06, 2024 at 07:20:34AM -0800, Sean Christopherson wrote:
-> I prefer to be To:/Cc:'d on any patches that touch files that are covered by
-> relevant MAINTAINERS entries.  IMO, pulling names/emails from git is useless noise
-> the vast majority of the time.
+On Wed, Nov 06, 2024, Binbin Wu wrote:
+> On 11/6/2024 4:54 PM, Huang, Kai wrote:
+> > On Wed, 2024-11-06 at 16:32 +0800, Binbin Wu wrote:
+> > > > static void kvm_complete_hypercall_exit(struct kvm_vcpu *vcpu, int =
+ret_reg,
+> > > >  =C2=A0				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long=
+ ret, bool op_64_bit)
+> > > > {
+> > > >  =C2=A0	if (!op_64_bit)
+> > > >  =C2=A0		ret =3D (u32)ret;
+> > > >  =C2=A0	kvm_register_write_raw(vcpu, ret_reg, ret);
+> > > >  =C2=A0	++vcpu->stat.hypercalls;
+> > > > }
+> > > If this is going to be the final version, it would be better to make =
+it
+> > > public, and export the symbol, so that TDX code can reuse it.
+> > Does making it 'static inline' and moving to kvm_host.h work?
+> It doesn't have a complete definition of struct kvm_vcpu in
+> arch/x86/include/asm/kvm_host.h, and the code is dereferencing
+> struct kvm_vcpu.
+> Also, the definition of kvm_register_write_raw() is in
+> arch/x86/kvm/kvm_cache_regs.h, which make it difficult to be called
+> there.
 
-Huh, that's what I did!
+A way around that would be to move the declarations from asm/kvm_host.h to =
+x86.h,
+and then kvm_complete_hypercall_exit() can be inlined (or not), without hav=
+ing to
+deal with the kvm_host.h ordering issues.
 
-Please run this patch through get_maintainer.pl and tell me who else I should
-have CCed.
+IMO, KVM x86 would ideally put as much as possible in x86.h.  The vast majo=
+rity
+of KVM x86's exports are intended only for the vendor modules.  Declaring t=
+hose
+exports in kvm_host.h is effectively bleeding KVM internals to the broader =
+kernel.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+I'll go that route for the series, assuming it works as I intend :-)
 
