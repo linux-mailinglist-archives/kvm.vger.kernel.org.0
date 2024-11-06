@@ -1,152 +1,150 @@
-Return-Path: <kvm+bounces-31036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2459BF815
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:38:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A5C9BF839
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 21:52:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E26E71F23BFF
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 20:38:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77F451C22B99
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2024 20:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B7220C473;
-	Wed,  6 Nov 2024 20:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF0A20C499;
+	Wed,  6 Nov 2024 20:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eIc2QBo5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bw/NSx1j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D377A1D358C;
-	Wed,  6 Nov 2024 20:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A2514F9D9
+	for <kvm@vger.kernel.org>; Wed,  6 Nov 2024 20:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730925513; cv=none; b=I9aZt5JSntXK+W8MP8lx7ne4FZ8AvJusClqueA4NWeLdiqAttI85Kyl61INbc+06gTOKmk+bWEryzmp33W9fEdTSv66rXgoP4CGFVrW1Dlo16B7Up8orTHV8kjX+FUYKcYmPpkSLRJdropafA+JVyaoSsT2RaUDp+FESsixx1L8=
+	t=1730926320; cv=none; b=b1U06Kt7fgXALgbVlAATALXHvZSb/sYwFjPPT4M4tlF8w5CRh3Q8BDeu+4pdoiSgBkktSmn6oMMzxg/RUmaGcoFb3JN8Npljne3lqY7u7v5Oi7iymKHXTVkcPRLxbvoiJRsCs2nbO0GokdrRKZ4PTCTD3UKUuOAPzbRpnZakXBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730925513; c=relaxed/simple;
-	bh=t1T0JqltTt1br9rO+URcAmslVziWyZeSdcV2iKnx4V4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5J06iVFkiZkICIf8ap1aEmyTtbz6dB/V9Mlj9rXFqsZP/3X0Qa/kg2N65GEhY5U7uHyihUT2/MBSgwdazZ8Z6rCrQ1A2X6lBnsB57+L5S5m/hWoahtV46V8yTowX/+gpLQl3Gv8AWpII+zQdSHxVVOv381d5cmMMB380J/HFYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eIc2QBo5; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730925512; x=1762461512;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=t1T0JqltTt1br9rO+URcAmslVziWyZeSdcV2iKnx4V4=;
-  b=eIc2QBo5LHAv7yeQxN0NNsNzg8CR9ZPijh1MCmsvm8Sh2iFs/RpnAU4J
-   kVEkfLkJ4N3SKelTgWsP7OaUhvuXLbeBYCuzMC1Ao/JcamHlcpQRAJR0h
-   ye0OQM8eC63r36JAzSMDKTaqT88OyZHCBFF63qwa4TxHTjFQks5NSTCIF
-   aj4FUqiSHEl+c7yQH+sOi75F7PmrFPsp6R3V2y6dNe1X6aDi3ig1YS8+Q
-   qP4xl6tP6rW/VBRaXo3kZd7VAMTKaNOaiihCSmTXGofpRsMy80N2j6a0e
-   PXqGGK4m6rZRRxIemnBJ8C/X29cgoQItVg7iCGtg2JQUF/k8xfX5d2aWc
-   g==;
-X-CSE-ConnectionGUID: wuV0iq3STWqNvMWBuOq0kw==
-X-CSE-MsgGUID: /Tn2Z6r7QTqgvL/FuE64cQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="41340839"
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="41340839"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 12:38:31 -0800
-X-CSE-ConnectionGUID: d6sAQXYbTuCw0s8JjLqdMw==
-X-CSE-MsgGUID: 0q6Tkfi4S2Wgas+639rTLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="108044520"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 12:38:30 -0800
-Received: from [10.212.82.230] (kliang2-mobl1.ccr.corp.intel.com [10.212.82.230])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 2880520B5703;
-	Wed,  6 Nov 2024 12:38:26 -0800 (PST)
-Message-ID: <89b46b99-e9fc-4ce4-84b2-b24f565db8d5@linux.intel.com>
-Date: Wed, 6 Nov 2024 15:38:25 -0500
+	s=arc-20240116; t=1730926320; c=relaxed/simple;
+	bh=BUiy1Lrkui/QDhUO26WuXJ0XiAVZDQ7hDrKZilM9VkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/bb4I1wLbfJe2Y5j2LypaByParugpocn8v27TpVHeJYBVh7rgX8uWzpYofXLIuqLI8PQJyXnb3d5sZ9npnKrGrFxhG0XXr4/fQMtGWp1kidds8bcRV1xDRVjg8oCprYSxK6j68GGFwHcFsH0DbJzXsLlEFW1mT4s49TaN5CZT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bw/NSx1j; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 6 Nov 2024 12:51:40 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730926316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iTbQ6DPhP6MjHwSaDILXhZVjYXEH8BwsiSbm61YVqgE=;
+	b=Bw/NSx1j2z8iH74+2uUPsORZOF/lHwjDSE1XgPO3bR7hc3VDGRgJjxxqihTFVbyt2Vu2w8
+	raQ7DhoPXKD5HHKOAaOJujYj6vS582FOQLBKtpnd3xvd1RSxRYMmmhyO+1CxVOE0maifyR
+	a4U5OreS2n4YhRCs77wj4S8lLE19n7c=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: "Liang, Kan" <kan.liang@linux.intel.com>
+Cc: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Will Deacon <will@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v6 4/5] x86: perf: Refactor misc flag assignments
+Message-ID: <ZyvW3FxcezmYyOMa@linux.dev>
+References: <20241105195603.2317483-1-coltonlewis@google.com>
+ <20241105195603.2317483-5-coltonlewis@google.com>
+ <65675ed8-e569-47f8-b1eb-40c853751bfb@linux.intel.com>
+ <ZyvLOjy8Vfvai5cG@linux.dev>
+ <597dbcf6-8169-4084-881c-8942ed363189@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 5/5] perf: Correct perf sampling with guest VMs
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Will Deacon <will@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org
-References: <20241105195603.2317483-1-coltonlewis@google.com>
- <20241105195603.2317483-6-coltonlewis@google.com>
- <007cfed1-111d-45aa-b873-24cca9d4af01@linux.intel.com>
- <ZyvJIx-UHXawnUYs@linux.dev>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <ZyvJIx-UHXawnUYs@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <597dbcf6-8169-4084-881c-8942ed363189@linux.intel.com>
+X-Migadu-Flow: FLOW_OUT
 
+On Wed, Nov 06, 2024 at 03:33:30PM -0500, Liang, Kan wrote:
+> On 2024-11-06 3:02 p.m., Oliver Upton wrote:
+> > On Wed, Nov 06, 2024 at 11:03:10AM -0500, Liang, Kan wrote:
+> >>> +static unsigned long common_misc_flags(struct pt_regs *regs)
+> >>> +{
+> >>> +	if (regs->flags & PERF_EFLAGS_EXACT)
+> >>> +		return PERF_RECORD_MISC_EXACT_IP;
+> >>> +
+> >>> +	return 0;
+> >>> +}
+> >>> +
+> >>> +unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
+> >>> +{
+> >>> +	unsigned long guest_state = perf_guest_state();
+> >>> +	unsigned long flags = common_misc_flags(regs);
+> >>> +
+> >>> +	if (guest_state & PERF_GUEST_USER)
+> >>> +		flags |= PERF_RECORD_MISC_GUEST_USER;
+> >>> +	else if (guest_state & PERF_GUEST_ACTIVE)
+> >>> +		flags |= PERF_RECORD_MISC_GUEST_KERNEL;
+> >>> +
+> >>
+> >> The logic of setting the GUEST_KERNEL flag is implicitly changed here.
+> >>
+> >> For the current code, the GUEST_KERNEL flag is set for !PERF_GUEST_USER,
+> >> which include both guest_in_kernel and guest_in_NMI.
+> > 
+> > Where is the "guest_in_NMI" state coming from? KVM only reports user v.
+> > kernel mode.
+> 
+> I may understand the kvm_arch_pmi_in_guest() wrong.
 
+kvm_arch_pmi_in_guest() is trying to *guess* whether or not an overflow
+interrupt caused the most recent VM-exit, implying a counter overflowed
+while in the VM. It has no idea what events are loaded on the PMU and
+which contexts they're intended to sample in.
 
-On 2024-11-06 2:53 p.m., Oliver Upton wrote:
-> On Wed, Nov 06, 2024 at 11:07:53AM -0500, Liang, Kan wrote:
->>> +#ifndef perf_arch_guest_misc_flags
->>> +static inline unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
->>> +{
->>> +	unsigned long guest_state = perf_guest_state();
->>> +
->>> +	if (guest_state & PERF_GUEST_USER)
->>> +		return PERF_RECORD_MISC_GUEST_USER;
->>> +
->>> +	if (guest_state & PERF_GUEST_ACTIVE)
->>> +		return PERF_RECORD_MISC_GUEST_KERNEL;
->>
->> Is there by any chance to add a PERF_GUEST_KERNEL flag in KVM?
-> 
-> Why do we need another flag? As it stands today, the vCPU is either in
-> user mode or kernel mode.
-> 
->> The PERF_GUEST_ACTIVE flag check looks really confusing.
-> 
-> Perhaps instead:
-> 
-> static inline unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-> {
-> 	unsigned long guest_state = perf_guest_state();
-> 
-> 	if (!(guest_state & PERF_GUEST_ACTIVE))
-> 		return 0;
-> 
-> 	return (guest_state & PERF_GUEST_USER) ? PERF_RECORD_MISC_GUEST_USER :
-> 						 PERF_RECORD_MISC_GUEST_KERNEL;
-> }
+It only makes sense to check kvm_arch_pmi_in_guest() if you're dealing with
+an event that counts in both host and guest modes and you need to decide who
+to sample.
 
-Yes, this one is much clear.
+> However, the kvm_guest_state() at least return 3 states.
+> 0
+> PERF_GUEST_ACTIVE
+> PERF_GUEST_ACTIVE | PERF_GUEST_USER
+> 
+> The existing code indeed assumes two modes. If it's not user mode, it
+> must be kernel mode.
+> However, the proposed code behave differently, or at least implies there
+> are more modes.
+> If it's not user mode and sets PERF_GUEST_ACTIVE, it's kernel mode.
 
-Can a similar change be done for the x86 perf_arch_guest_misc_flags() in
-the previous patch?
+A precondition of the call to perf_arch_guest_misc_flags() is that guest
+state is nonzero, meaning a vCPU is loaded presently on this CPU.
 
+-- 
 Thanks,
-Kan
-
+Oliver
 
