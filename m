@@ -1,59 +1,53 @@
-Return-Path: <kvm+bounces-31180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D124F9C1017
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:50:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 083369C109E
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 22:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50501B22778
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 20:50:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87F341F21955
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22784218333;
-	Thu,  7 Nov 2024 20:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF3F21A4C3;
+	Thu,  7 Nov 2024 21:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="m1xESsL1"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="nJvMBmhJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9B918F2C3;
-	Thu,  7 Nov 2024 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C2B2281C0
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 21:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731012619; cv=none; b=syz9Hz9vOBRVRO8nIUF9rZ124WV/y5buo1DV2cgBidvzME26pAYfNRJdz6zC5OYY7OwVxfQdMvjrz1b9SbrsFx23+1DrodhIvsNZPhD0hcDurW+dlV8Zd6YqEAsBPNrjJtcBDAqk/h+wiUnfk0DavRseskELhhzIyrk3Vw4z3iI=
+	t=1731013250; cv=none; b=uDFUEdUai7/TeLSRyjSZsiOEOapiwHkC7vyZ5FxqZOtBvYNYy9f/nM76f+57JQF1aC/s6g8raIrLV3J1aq4Y6EzIT04SNhDLTxrwOi+j77K/NCGrd7iMOyAmxqd09bCTyhKSG4GHd8lB+CMctbql/VxQ925qSIwRznl+6DKifms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731012619; c=relaxed/simple;
-	bh=75CmgpEUiFxNaINSNyji5exhmMbinVN6FHw3Iqi0zKM=;
+	s=arc-20240116; t=1731013250; c=relaxed/simple;
+	bh=aFelMSaJwJpA3OkkA95y0lZ8JM3uKHDlnOM8LLX2fx4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uZfWmrm3j4n4wiGOEByXVzXvBHeBizBuRKv89zrwize6CuvH6TR0S7brfB5v3YLfXKCamFc8GGEuXr1Gz/YWE5ih82l2LiCv3VmmW+3ZeFRFiTE6j0MxWYBLfMtf1SxOWLsrW4NfuREWlt13aM1tk8+dEPd1cX9Q3CLs/hE9vFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=m1xESsL1; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99SD-001b80-Lc; Thu, 07 Nov 2024 21:50:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=IDOCcFgf0OUYloIAVth+wW23XWBOmQgJTVgWj1Hzoq4=; b=m1xESsL1AgLboIIcgv78T+RyD/
-	llCu1PywaSBL1BNO/rP0/MCtKPTLCIQ4QolF0qLzcrWeKXCFf8uiKQmKZvWyrv171Tw9A7xl0IlVj
-	0g6LLrdzxi6m4ggYqrp4zdJdkmQL4d62m7QD6Nope8uOB5USV/V6XKGlvydigW+c8mxe2h5wuT0B2
-	xnjxIMpSRWws952TtMBHSoy3sFOf4Wnyr6c4J0i2c/JuzmFqg4l6VpenNnVo17DizFEj6edbFfRe0
-	Bnw2mmamuIsyJYwTvHGPtXGlxcOUUtX5CJxukbWsgY2/eAKP2qwt8mVKw6RmMz6vm4SrgAZrz3FxJ
-	UabaJSPw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99SB-0002sb-7z; Thu, 07 Nov 2024 21:50:07 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1t99S1-002t1L-OZ; Thu, 07 Nov 2024 21:49:57 +0100
-Message-ID: <a3c80efc-94b2-463a-ab2e-e7f87245fd09@rbox.co>
-Date: Thu, 7 Nov 2024 21:49:56 +0100
+	 In-Reply-To:Content-Type; b=sXrYNSmdH7lty2aHO2IWvk0kfRTzHRsFWqIYWu68cqE8rcqpCrDFHtzhPTDxd08Mmk1fWpH+YVv0BQlHp/ZC2dWCaFIYLvdqWPFFUw3aKVS2mwFo4rzCyYigxv1CgHZ2k7pH+ClzEgvR9YMzMy2gq2cBSGiZtMEMVxc1VA3tHBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=nJvMBmhJ; arc=none smtp.client-ip=178.154.239.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:b1cb:0:640:2a1e:0])
+	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 2AD6960A55;
+	Fri,  8 Nov 2024 00:00:34 +0300 (MSK)
+Received: from [IPV6:2a02:6b8:b081:a507::1:28] (unknown [2a02:6b8:b081:a507::1:28])
+	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id T0q7j21BR8c0-YG5zpvlF;
+	Fri, 08 Nov 2024 00:00:33 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1731013233;
+	bh=Dp6A0mIoBNs+G/dTAJYWiWkc14VowCV14QzHck7kYiU=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=nJvMBmhJHSZ0l3MCm5R0ne45ejLwNTFpZMXA1wBcp9Gg0j0Kj/XEwbibPmWbRUCHZ
+	 0CPbq3/6il6XEhpvkzQWToINE/OqwKPdiqT0MMFD9A5HY79ilHXPuA+4WSKxMsEI63
+	 Eacw0y3lzF2saeARIH4kF3AC7nT2lw++8nePCoLs=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Message-ID: <a7f9c3c9-09af-4941-b137-2cb83ef8ceb3@yandex-team.ru>
+Date: Fri, 8 Nov 2024 00:00:29 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,81 +55,321 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/4] virtio/vsock: Fix sk_error_queue memory leak
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>,
- George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
- <20241106-vsock-mem-leaks-v1-2-8f4ffc3099e6@rbox.co>
- <vxc6tv6433tnyfhdq2gsh7edhuskawwh4g6ehafvrt2ca3cqf2@q3kxjlygq366>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <vxc6tv6433tnyfhdq2gsh7edhuskawwh4g6ehafvrt2ca3cqf2@q3kxjlygq366>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 5/7] target/i386/kvm: reset AMD PMU registers during VM
+ reset
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, sandipan.das@amd.com,
+ babu.moger@amd.com, zhao1.liu@intel.com, likexu@tencent.com,
+ like.xu.linux@gmail.com, zhenyuw@linux.intel.com, groug@kaod.org,
+ lyan@digitalocean.com, khorenko@virtuozzo.com,
+ alexander.ivanov@virtuozzo.com, den@virtuozzo.com, joe.jin@oracle.com,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20241104094119.4131-1-dongli.zhang@oracle.com>
+ <20241104094119.4131-6-dongli.zhang@oracle.com>
+Content-Language: en-US
+From: Maksim Davydov <davydov-max@yandex-team.ru>
+In-Reply-To: <20241104094119.4131-6-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/7/24 11:17, Stefano Garzarella wrote:
-> On Wed, Nov 06, 2024 at 06:51:19PM +0100, Michal Luczaj wrote:
->> Kernel queues MSG_ZEROCOPY completion notifications on the error queue.
->> Where they remain, until explicitly recv()ed. To prevent memory leaks,
->> clean up the queue when the socket is destroyed.
->>
->> unreferenced object 0xffff8881028beb00 (size 224):
->>  comm "vsock_test", pid 1218, jiffies 4294694897
->>  hex dump (first 32 bytes):
->>    90 b0 21 17 81 88 ff ff 90 b0 21 17 81 88 ff ff  ..!.......!.....
->>    00 00 00 00 00 00 00 00 00 b0 21 17 81 88 ff ff  ..........!.....
->>  backtrace (crc 6c7031ca):
->>    [<ffffffff81418ef7>] kmem_cache_alloc_node_noprof+0x2f7/0x370
->>    [<ffffffff81d35882>] __alloc_skb+0x132/0x180
->>    [<ffffffff81d2d32b>] sock_omalloc+0x4b/0x80
->>    [<ffffffff81d3a8ae>] msg_zerocopy_realloc+0x9e/0x240
->>    [<ffffffff81fe5cb2>] virtio_transport_send_pkt_info+0x412/0x4c0
->>    [<ffffffff81fe6183>] virtio_transport_stream_enqueue+0x43/0x50
->>    [<ffffffff81fe0813>] vsock_connectible_sendmsg+0x373/0x450
->>    [<ffffffff81d233d5>] ____sys_sendmsg+0x365/0x3a0
->>    [<ffffffff81d246f4>] ___sys_sendmsg+0x84/0xd0
->>    [<ffffffff81d26f47>] __sys_sendmsg+0x47/0x80
->>    [<ffffffff820d3df3>] do_syscall_64+0x93/0x180
->>    [<ffffffff8220012b>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> net/vmw_vsock/af_vsock.c | 3 +++
->> 1 file changed, 3 insertions(+)
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 35681adedd9aaec3565495158f5342b8aa76c9bc..dfd29160fe11c4675f872c1ee123d65b2da0dae6 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -836,6 +836,9 @@ static void vsock_sk_destruct(struct sock *sk)
->> {
->> 	struct vsock_sock *vsk = vsock_sk(sk);
->>
->> +	/* Flush MSG_ZEROCOPY leftovers. */
->> +	__skb_queue_purge(&sk->sk_error_queue);
->> +
+
+
+On 11/4/24 12:40, Dongli Zhang wrote:
+> QEMU uses the kvm_get_msrs() function to save Intel PMU registers from KVM
+> and kvm_put_msrs() to restore them to KVM. However, there is no support for
+> AMD PMU registers. Currently, has_pmu_version and num_pmu_gp_counters are
+> initialized based on cpuid(0xa), which does not apply to AMD processors.
+> For AMD CPUs, prior to PerfMonV2, the number of general-purpose registers
+> is determined based on the CPU version.
 > 
-> It is true that for now this is supported only in the virtio transport, 
-> but it's more related to the core, so please remove `virtio` from the 
-> commit title.
+> To address this issue, we need to add support for AMD PMU registers.
+> Without this support, the following problems can arise:
 > 
-> The rest LGTM.
-> ...
+> 1. If the VM is reset (e.g., via QEMU system_reset or VM kdump/kexec) while
+> running "perf top", the PMU registers are not disabled properly.
+> 
+> 2. Despite x86_cpu_reset() resetting many registers to zero, kvm_put_msrs()
+> does not handle AMD PMU registers, causing some PMU events to remain
+> enabled in KVM.
+> 
+> 3. The KVM kvm_pmc_speculative_in_use() function consistently returns true,
+> preventing the reclamation of these events. Consequently, the
+> kvm_pmc->perf_event remains active.
+> 
+> 4. After a reboot, the VM kernel may report the following error:
+> 
+> [    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+> [    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+> 
+> 5. In the worst case, the active kvm_pmc->perf_event may inject unknown
+> NMIs randomly into the VM kernel:
+> 
+> [...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+> 
+> To resolve these issues, we propose resetting AMD PMU registers during the
+> VM reset process.
+> 
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+>   target/i386/cpu.h     |   8 +++
+>   target/i386/kvm/kvm.c | 156 +++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 161 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 59959b8b7a..0505eb3b08 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -488,6 +488,14 @@ typedef enum X86Seg {
+>   #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
+>   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL   0x390
+>   
+> +#define MSR_K7_EVNTSEL0                 0xc0010000
+> +#define MSR_K7_PERFCTR0                 0xc0010004
+> +#define MSR_F15H_PERF_CTL0              0xc0010200
+> +#define MSR_F15H_PERF_CTR0              0xc0010201
+> +
+> +#define AMD64_NUM_COUNTERS              4
+> +#define AMD64_NUM_COUNTERS_CORE         6
+> +
+>   #define MSR_MC0_CTL                     0x400
+>   #define MSR_MC0_STATUS                  0x401
+>   #define MSR_MC0_ADDR                    0x402
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index ca2b644e2c..83ec85a9b9 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -2035,7 +2035,7 @@ full:
+>       abort();
+>   }
+>   
+> -static void kvm_init_pmu_info(CPUX86State *env)
+> +static void kvm_init_pmu_info_intel(CPUX86State *env)
+>   {
+>       uint32_t eax, edx;
+>       uint32_t unused;
+> @@ -2072,6 +2072,80 @@ static void kvm_init_pmu_info(CPUX86State *env)
+>       }
+>   }
+>   
+> +static void kvm_init_pmu_info_amd(CPUX86State *env)
+> +{
+> +    int64_t family;
+> +
+> +    has_pmu_version = 0;
+> +
+> +    /*
+> +     * To determine the CPU family, the following code is derived from
+> +     * x86_cpuid_version_get_family().
+> +     */
+> +    family = (env->cpuid_version >> 8) & 0xf;
+> +    if (family == 0xf) {
+> +        family += (env->cpuid_version >> 20) & 0xff;
+> +    }
+> +
+> +    /*
+> +     * Performance-monitoring supported from K7 and later.
+> +     */
+> +    if (family < 6) {
+> +        return;
+> +    }
+> +
+> +    has_pmu_version = 1;
+> +
+> +    if (!(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_PERFCORE)) {
+> +        num_pmu_gp_counters = AMD64_NUM_COUNTERS;
+> +        return;
+> +    }
+> +
+> +    num_pmu_gp_counters = AMD64_NUM_COUNTERS_CORE;
+> +}
 
-OK, done. Here's v2 of the series:
-https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
+It seems that AMD implementation has one issue.
+KVM has parameter `enable_pmu`. So vPMU can be disabled in another way, 
+not only via KVM_PMU_CAP_DISABLE. For Intel it's not a problem, because 
+the vPMU initialization uses info from KVM_GET_SUPPORTED_CPUID. The 
+enable_pmu state is reflected in KVM_GET_SUPPORTED_CPUID.  Thus no PMU 
+MSRs in kvm_put_msrs/kvm_get_msrs will be used.
 
-Thanks for the reviews,
-Michal
+But on AMD we don't use information from KVM_GET_SUPPORTED_CPUID to set 
+an appropriate number of PMU registers. So, if vPMU is disabled by KVM 
+parameter `enable_pmu` and pmu-cap-disable=false, then has_pmu_version 
+will be 1 after kvm_init_pmu_info_amd execution. It means that in 
+kvm_put_msrs/kvm_get_msrs 4 PMU counters will be processed, but the 
+correct behavior in that situation is to skip all PMU registers.
+I think we should get info from KVM to fix that.
 
+I tested this series on Zen2 and found that PMU MSRs were still 
+processed during initialization even with enable_pmu=N. But it doesn't 
+lead to any errors in QEMU
+
+> +
+> +static bool is_same_vendor(CPUX86State *env)
+> +{
+> +    static uint32_t host_cpuid_vendor1;
+> +    static uint32_t host_cpuid_vendor2;
+> +    static uint32_t host_cpuid_vendor3;
+> +
+> +    host_cpuid(0x0, 0, NULL, &host_cpuid_vendor1, &host_cpuid_vendor3,
+> +               &host_cpuid_vendor2);
+> +
+> +    return env->cpuid_vendor1 == host_cpuid_vendor1 &&
+> +           env->cpuid_vendor2 == host_cpuid_vendor2 &&
+> +           env->cpuid_vendor3 == host_cpuid_vendor3;
+> +}
+> +
+> +static void kvm_init_pmu_info(CPUX86State *env)
+> +{
+> +    /*
+> +     * It is not supported to virtualize AMD PMU registers on Intel
+> +     * processors, nor to virtualize Intel PMU registers on AMD processors.
+> +     */
+> +    if (!is_same_vendor(env)) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * If KVM_CAP_PMU_CAPABILITY is not supported, there is no way to
+> +     * disable the AMD pmu virtualization.
+> +     *
+> +     * If KVM_CAP_PMU_CAPABILITY is supported, kvm_state->pmu_cap_disabled
+> +     * indicates the KVM has already disabled the pmu virtualization.
+> +     */
+> +    if (kvm_state->pmu_cap_disabled) {
+> +        return;
+> +    }
+> +
+
+It seems that after these changes the issue concerning using
+pmu-cap-disable=true with +pmu on Intel platform (that Zhao Liu has 
+mentioned before) is fixed
+
+> +    if (IS_INTEL_CPU(env)) {
+> +        kvm_init_pmu_info_intel(env);
+> +    } else if (IS_AMD_CPU(env)) {
+> +        kvm_init_pmu_info_amd(env);
+> +    }
+> +}
+> +
+>   int kvm_arch_init_vcpu(CPUState *cs)
+>   {
+>       struct {
+> @@ -4027,7 +4101,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>               kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_control_msr);
+>           }
+>   
+> -        if (has_pmu_version > 0) {
+> +        if (IS_INTEL_CPU(env) && has_pmu_version > 0) {
+>               if (has_pmu_version > 1) {
+>                   /* Stop the counter.  */
+>                   kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+> @@ -4058,6 +4132,38 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>                                     env->msr_global_ctrl);
+>               }
+>           }
+> +
+> +        if (IS_AMD_CPU(env) && has_pmu_version > 0) {
+> +            uint32_t sel_base = MSR_K7_EVNTSEL0;
+> +            uint32_t ctr_base = MSR_K7_PERFCTR0;
+> +            /*
+> +             * The address of the next selector or counter register is
+> +             * obtained by incrementing the address of the current selector
+> +             * or counter register by one.
+> +             */
+> +            uint32_t step = 1;
+> +
+> +            /*
+> +             * When PERFCORE is enabled, AMD PMU uses a separate set of
+> +             * addresses for the selector and counter registers.
+> +             * Additionally, the address of the next selector or counter
+> +             * register is determined by incrementing the address of the
+> +             * current register by two.
+> +             */
+> +            if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE) {
+> +                sel_base = MSR_F15H_PERF_CTL0;
+> +                ctr_base = MSR_F15H_PERF_CTR0;
+> +                step = 2;
+> +            }
+> +
+> +            for (i = 0; i < num_pmu_gp_counters; i++) {
+> +                kvm_msr_entry_add(cpu, ctr_base + i * step,
+> +                                  env->msr_gp_counters[i]);
+> +                kvm_msr_entry_add(cpu, sel_base + i * step,
+> +                                  env->msr_gp_evtsel[i]);
+> +            }
+> +        }
+> +
+>           /*
+>            * Hyper-V partition-wide MSRs: to avoid clearing them on cpu hot-add,
+>            * only sync them to KVM on the first cpu
+> @@ -4503,7 +4609,8 @@ static int kvm_get_msrs(X86CPU *cpu)
+>       if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
+>           kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
+>       }
+> -    if (has_pmu_version > 0) {
+> +
+> +    if (IS_INTEL_CPU(env) && has_pmu_version > 0) {
+>           if (has_pmu_version > 1) {
+>               kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+>               kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> @@ -4519,6 +4626,35 @@ static int kvm_get_msrs(X86CPU *cpu)
+>           }
+>       }
+>   
+> +    if (IS_AMD_CPU(env) && has_pmu_version > 0) {
+> +        uint32_t sel_base = MSR_K7_EVNTSEL0;
+> +        uint32_t ctr_base = MSR_K7_PERFCTR0;
+> +        /*
+> +         * The address of the next selector or counter register is
+> +         * obtained by incrementing the address of the current selector
+> +         * or counter register by one.
+> +         */
+> +        uint32_t step = 1;
+> +
+> +        /*
+> +         * When PERFCORE is enabled, AMD PMU uses a separate set of
+> +         * addresses for the selector and counter registers.
+> +         * Additionally, the address of the next selector or counter
+> +         * register is determined by incrementing the address of the
+> +         * current register by two.
+> +         */
+> +        if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE) {
+> +            sel_base = MSR_F15H_PERF_CTL0;
+> +            ctr_base = MSR_F15H_PERF_CTR0;
+> +            step = 2;
+> +        }
+> +
+> +        for (i = 0; i < num_pmu_gp_counters; i++) {
+> +            kvm_msr_entry_add(cpu, ctr_base + i * step, 0);
+> +            kvm_msr_entry_add(cpu, sel_base + i * step, 0);
+> +        }
+> +    }
+> +
+>       if (env->mcg_cap) {
+>           kvm_msr_entry_add(cpu, MSR_MCG_STATUS, 0);
+>           kvm_msr_entry_add(cpu, MSR_MCG_CTL, 0);
+> @@ -4830,6 +4966,20 @@ static int kvm_get_msrs(X86CPU *cpu)
+>           case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL0 + MAX_GP_COUNTERS - 1:
+>               env->msr_gp_evtsel[index - MSR_P6_EVNTSEL0] = msrs[i].data;
+>               break;
+> +        case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL0 + 3:
+> +            env->msr_gp_evtsel[index - MSR_K7_EVNTSEL0] = msrs[i].data;
+> +            break;
+> +        case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR0 + 3:
+> +            env->msr_gp_counters[index - MSR_K7_PERFCTR0] = msrs[i].data;
+> +            break;
+> +        case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTL0 + 0xb:
+> +            index = index - MSR_F15H_PERF_CTL0;
+> +            if (index & 0x1) {
+> +                env->msr_gp_counters[index] = msrs[i].data;
+> +            } else {
+> +                env->msr_gp_evtsel[index] = msrs[i].data;
+> +            }
+> +            break;
+>           case HV_X64_MSR_HYPERCALL:
+>               env->msr_hv_hypercall = msrs[i].data;
+>               break;
+
+-- 
+Best regards,
+Maksim Davydov
 
