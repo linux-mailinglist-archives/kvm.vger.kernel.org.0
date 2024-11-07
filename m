@@ -1,101 +1,184 @@
-Return-Path: <kvm+bounces-31115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 778B69C0815
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 14:51:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4C69C08A0
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F992B22B7A
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 13:51:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D17DF1C233B5
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 14:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5F9212D1B;
-	Thu,  7 Nov 2024 13:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B597212EF5;
+	Thu,  7 Nov 2024 14:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="est/mzpe"
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5A3212630;
-	Thu,  7 Nov 2024 13:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAE6212D15;
+	Thu,  7 Nov 2024 14:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730987436; cv=none; b=Q/S/ZMD1m0iubazk22sMU3LGYFJHPFpBpVCt9Y0A0Pp9NC6GdJpfO4LxENHGnItsHes9CPVMuit5x5NhXCL0ISdY6ZcurdzUuVcD+n2Bjx+wkoC34U2FxHeZTRGjUbN3eus3PiIkJ17pBN2UNKc9xhKEaIxUKYkf8Bp+Ht3jdLs=
+	t=1730988816; cv=none; b=tBFhOjIHw8wMx3vsK7L0ftu/BRU3XjTEGnK5GNyiP5l7gRYNyDDt99b40GFK9ZBNtU2H7pM09ArEgYrfBJ35JHDBHUh8hFOWiTwzDPrnsIHwa6ewWzLZpMG8lTKvVxH6uf9U9uXUlbPeqWcYx5kt/9AKRkqkj/Dg/lk/lqDo4Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730987436; c=relaxed/simple;
-	bh=fgn4sel1p5t88qRO7ExDxdwas+YGL5pgazTpkpcAbsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XcpimXPVJD83fYXhJFY+17l/p+NaV6tC+Z2cqNF9OVbYx6B61qgYsWRbahep1NQCupPVFr152ApssVBReAs6J7qodQvhf6AqjSa17VVB6yF0uES4V4i2xxkpYfH+eq/yKDoEM1hQcUQAhTWPw9Dglcxs8tJgEbuQ6PygakgDQXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A292468C4E; Thu,  7 Nov 2024 14:50:25 +0100 (CET)
-Date: Thu, 7 Nov 2024 14:50:25 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
-	Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, matthew.brost@intel.com,
-	Thomas.Hellstrom@linux.intel.com, brian.welty@intel.com,
-	himal.prasad.ghimiray@intel.com, krishnaiah.bommu@intel.com,
-	niranjana.vishwanathapura@intel.com
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241107135025.GA14996@lst.de>
-References: <cover.1730298502.git.leon@kernel.org> <3567312e-5942-4037-93dc-587f25f0778c@arm.com> <20241104095831.GA28751@lst.de> <20241105195357.GI35848@ziepe.ca> <20241107083256.GA9071@lst.de> <20241107132808.GK35848@ziepe.ca>
+	s=arc-20240116; t=1730988816; c=relaxed/simple;
+	bh=iq6DAdQIRaZvWkmzepjntWW5vksSWQLsxCK4eVySb80=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u76G71yz9Gpru7PB1sEmoN48MD2QCRf4RP0aRcdgE/VHYL509W0QCBU7msjEDO9rcyMpT5GJqtHouCSdFxMmMcohavXtesV9kV9wGQfatQJVVHnkTiTXLZ2h6vkBL9LJZsHMBhBtfg0swna+kJZsjNVLAhT1gracOMFUd8ptYQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=est/mzpe; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7E9uId031248;
+	Thu, 7 Nov 2024 14:10:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=5HgN7AsomUIK+0ZKL8G9kZwooD3hI9sMpOuiPCMTi
+	8E=; b=est/mzpeqSflfJeIJiDWZaQgH10lB2vDufYbqD0BYnrj2Wl/Dyx3KoYz/
+	Y4gk5kFulGgawZdt+AyCCmTOqO0Th13FFQffOXw5M1n/oDEhUgHTkmEiILULo+Dk
+	Kf/ODFjhV0VDPj3bGcsdxswcLwJT1sk2zfkyBcXm//GbXwg12Jj6k7EipXDibJ33
+	Uz+HHEAbIKCbfXakO/KBwPE6pzp6pa3WZp/+n2sQaO2Vjy/aUwVZntDyrBm5LmSy
+	bj/PDTuoyzrM41wzR3no+fPOtVOwFL83UzBMikqR5soUXNxx/v+DoctYjSBDgTmF
+	pg5WlWqcMWtoX3mkF0KY6YkpMnFoQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rxmrr4kq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 14:10:37 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7DhvW1019625;
+	Thu, 7 Nov 2024 14:10:36 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p0mj87vr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 14:10:36 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7EAXTM35127974
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Nov 2024 14:10:33 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 20B712004B;
+	Thu,  7 Nov 2024 14:10:33 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFD7920049;
+	Thu,  7 Nov 2024 14:10:32 +0000 (GMT)
+Received: from darkmoore.boeblingen.de.ibm.com (unknown [9.152.222.253])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Nov 2024 14:10:32 +0000 (GMT)
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, schlameuss@linux.ibm.com
+Subject: [PATCH v7 0/5] selftests: kvm: s390: Add ucontrol memory selftests
+Date: Thu,  7 Nov 2024 15:10:19 +0100
+Message-ID: <20241107141024.238916-1-schlameuss@linux.ibm.com>
+X-Mailer: git-send-email 2.47.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4y-_h8GtILUojSmEPdJJcAGKbR1BSrPl
+X-Proofpoint-GUID: 4y-_h8GtILUojSmEPdJJcAGKbR1BSrPl
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241107132808.GK35848@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 clxscore=1011 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
+ phishscore=0 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411070110
 
-On Thu, Nov 07, 2024 at 09:28:08AM -0400, Jason Gunthorpe wrote:
-> Once we are freed from scatterlist we can explore a design that would
-> pass the P2P routing information directly. For instance imagine
-> something like:
-> 
->    dma_map_p2p(dev, phys, p2p_provider);
-> 
-> Then dma_map_page(dev, page) could be something like
-> 
->    if (is_pci_p2pdma_page(page))
->       dev_map_p2p(dev, page_to_phys(page), page->pgmap->p2p_provider)
+This patch series adds a some not yet picked selftests to the kvm s390x
+selftest suite.
 
-One thing that this series does is to move the P2P mapping decisions out
-of the low-level dma mapping helpers and into the caller (again) for
-the non-sg callers and moves the special switch based bus mapping into
-a routine that can be called directly.
+The additional test cases are covering:
+* Assert KVM_EXIT_S390_UCONTROL exit on not mapped memory access
+* Assert functionality of storage keys in ucontrol VM
+* Assert that memory region operations are rejected for ucontrol VMs
 
-Take a look at blk_rq_dma_map_iter_start, which now literally uses
-dma_map_page for the no-iommu, no-switch P2P case.  It also is a good
-use case for the proposed dma_map_phys.
+Running the test cases requires sys_admin capabilities to start the
+ucontrol VM.
+This can be achieved by running as root or with a command like:
 
-> GPU driver
-> 
-> https://lore.kernel.org/dri-devel/20240117221223.18540-7-oak.zeng@intel.com/
+    sudo setpriv --reuid nobody --inh-caps -all,+sys_admin \
+      --ambient-caps -all,+sys_admin --bounding-set -all,+sys_admin \
+      ./ucontrol_test
 
-Eww, that's horrible.  Converting this to Leon's new hmm helpers
-would be really nice (and how that they are useful for more than
-mlx5).
+---
+
+The patches in this series have been part of the previous patch series.
+The test cases added here do depend on the fixture added in the earlier
+patches.
+From v5 PATCH 7-9 the segment and page table generation has been removed
+and DAT
+has been disabled. Since DAT is not necessary to validate the KVM code.
+
+https://lore.kernel.org/kvm/20240807154512.316936-1-schlameuss@linux.ibm.com/
+
+v7:
+- skip uc_skey test when execution is in vsie
+
+v6:
+- add instruction intercept handling for skey specific instructions
+  (iske, sske, rrbe) in addition to kss intercept to work properly on
+  all machines
+- reorder local variables
+- fixup some method comments
+- add a patch correcting the IP.b value length a debug message
+
+v5:
+- rebased to current upstream master
+- corrected assertion on 0x00 to 0
+- reworded fixup commit so that it can be merged on top of current
+  upstream
+
+v4:
+- fix whitespaces in pointer function arguments (thanks Claudio)
+- fix whitespaces in comments (thanks Janosch)
+
+v3:
+- fix skey assertion (thanks Claudio)
+- introduce a wrapper around UCAS map and unmap ioctls to improve
+  readability (Claudio)
+- add an displacement to accessed memory to assert translation
+  intercepts actually point to segments to the uc_map_unmap test
+- add an misaligned failing mapping try to the uc_map_unmap test
+
+v2:
+- Reenable KSS intercept and handle it within skey test.
+- Modify the checked register between storing (sske) and reading (iske)
+  it within the test program to make sure the.
+- Add an additional state assertion in the end of uc_skey
+- Fix some typos and white spaces.
+
+v1:
+- Remove segment and page table generation and disable DAT. This is not
+  necessary to validate the KVM code.
+
+Christoph Schlameuss (5):
+  selftests: kvm: s390: Add uc_map_unmap VM test case
+  selftests: kvm: s390: Add uc_skey VM test case
+  selftests: kvm: s390: Verify reject memory region operations for
+    ucontrol VMs
+  selftests: kvm: s390: Fix whitespace confusion in ucontrol test
+  selftests: kvm: s390: correct IP.b length in uc_handle_sieic debug
+    output
+
+ .../selftests/kvm/include/s390x/processor.h   |   6 +
+ .../selftests/kvm/s390x/ucontrol_test.c       | 321 +++++++++++++++++-
+ 2 files changed, 319 insertions(+), 8 deletions(-)
+
+-- 
+2.47.0
 
 
