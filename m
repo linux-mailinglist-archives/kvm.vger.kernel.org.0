@@ -1,156 +1,149 @@
-Return-Path: <kvm+bounces-31133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C789C0A03
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 16:24:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BB79C0A0B
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 16:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCFDD28132B
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:24:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D531C21FB6
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48163214431;
-	Thu,  7 Nov 2024 15:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5900A213149;
+	Thu,  7 Nov 2024 15:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XcndR4Wh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3bD8yNNH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15729212F08;
-	Thu,  7 Nov 2024 15:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3B7212F13
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 15:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730993022; cv=none; b=nKwTbcVyHSfIiDUqgA9Qe2oC5vebn41gED7/2Uf1csZG9mAxZ79qaDDkYJJ5xpBUk0ESr1IZpEuuIytueafWYnb3IMSmi1sAjPllASjI4Op/+JG2zG2RALQkEwm9mZZKbuz2p1EiMsBjh/QKCkxSiBua+3chiIZtCc6RHG5jTe0=
+	t=1730993107; cv=none; b=gpO8Od4+xQcQTz4Vy4MsBjsTHAGW/UUXOswGxRR1pxzZRkK/OmVMMsXqP/AL0h654LqaiGyqHSvAJSMzk/IzdtWrwesGqTiqdt95x+HZkyQ+vvMKRuq18lEA1/FDaPRz5z/Bgwg4y8/1FiumPi/E51xgqjf0VF1eZvXNgWlBZ8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730993022; c=relaxed/simple;
-	bh=q7r113h8V27m9wIjZYJBUSQrGnWgrXFlDKCfyRLutmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JzqKxRATCw9AC85RBhsWoYZLy+A58w9dRRhK2IBo2dpKGGfSuSiQq9lItojiKqq49GsunhKoKviSfHEq3NcJM0c3RUaoSzoiLCU1rsG7aJT8u6cN0N398tF9qTzCfDRbmh8HJlROf8MwTfPezOWB13BgOGrCw+3p6WloRNLFqXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XcndR4Wh; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7EeB54027536;
-	Thu, 7 Nov 2024 15:23:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=xJomWUTv1MPMrre1/
-	tUDz0SI3tdQkeweYB39erzEUSg=; b=XcndR4Whh0z4ikgTRlOH/DefBrVtEfKHg
-	Hq3OiV7/Ex2aRO232otCXzOntGUBCn8um/SYxGFk5nlf3QMYmVj49EKJuv5vYY1n
-	91Zy4GZmk3QiytjoCY/Z902e89fhdCHbzbXZ7eljrthyKAi0tFH4MjL9vOWrQePS
-	yGUMI4/YDWygOAOd0PvE6IVzojdnx+rqtTVHJozQK+A5tVkzQTwEmbt6iT+0JLkn
-	00KOXboXrlvTjBhHzB/HlO6pVDXg9fVbEaZI4eQ09PinX6YVqmEM0mDkAjHX+UpW
-	74PGOOHs+PcGKh9qLKmyG2cBBWVvrcVDLASOdV8o9rMq/FtsG7ilQ==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rygs883j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 15:23:38 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A76q8IM024314;
-	Thu, 7 Nov 2024 15:23:37 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p0mj8b48-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 15:23:37 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7FNX8E45089258
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Nov 2024 15:23:34 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D80C020040;
-	Thu,  7 Nov 2024 15:23:33 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AA7A120049;
-	Thu,  7 Nov 2024 15:23:33 +0000 (GMT)
-Received: from vela.boeblingen.de.ibm.com (unknown [9.155.210.79])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  7 Nov 2024 15:23:33 +0000 (GMT)
-From: Hendrik Brueckner <brueckner@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com
-Subject: [PATCH 4/4] KVM: s390: selftests: Add regression tests for PFCR subfunctions
-Date: Thu,  7 Nov 2024 16:23:19 +0100
-Message-ID: <20241107152319.77816-5-brueckner@linux.ibm.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241107152319.77816-1-brueckner@linux.ibm.com>
-References: <20241107152319.77816-1-brueckner@linux.ibm.com>
+	s=arc-20240116; t=1730993107; c=relaxed/simple;
+	bh=p7dJkGag38x6jmOuugAhlDPsy/e762twANsn0sug05U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ic8M4AUOY+55WkmEnYdxodo3X3djQNrgNC2jpMzFukw8cVegcRgF0QWh096q+5UmHT44fxk6AITeYTkQ3NOFS4m307Uq9I15xmacAR5WHg1tD5Pz8CPSVnzmf6Vy/p2vbFNtB2Pn9YpVS7b3AUapSXrcoz2zUa0MxK87+KecSVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3bD8yNNH; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20e5ab8e022so10542895ad.3
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 07:25:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730993105; x=1731597905; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1i/NT8kDl1I5UdgWhggo9LMsrphRB6xVVGaoWe7u/PI=;
+        b=3bD8yNNHMf3Z0rhlkjYiO7Z61ASVi7kElXwKRUwomA5rES/Y9NQwcIB0UXIPDb4W1W
+         qnyiQK8/LrIXtRi47P5eyGgMoOpxpHjZhkNa68cFmmVx5E1YoxMVr2O3mEZjpjHmVKuP
+         CQ4TPQvIrOfsE+X+u62u/F3IBQtbl+3lQKAlurCZovPDpBYxTLYV6uOxyi4onIrPf0sf
+         z1PVG9G/dkYfoANmoFcl1A582Qt6MU/xGbrVwqq240ORF+tAV+qYhCU7tSPqSdVCWKpC
+         2XC5DFXRK/JskBiKBbd272wFcrDlwxO7iEZwtq8srEcKIFdZT3HNNOwfoRP+XZ+xVU+b
+         j9Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730993105; x=1731597905;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1i/NT8kDl1I5UdgWhggo9LMsrphRB6xVVGaoWe7u/PI=;
+        b=CdVl4OSDOiRpKioTg0Nb4/42I57ik+vJl6d+bcK0iyRaR9UszH6VWRW8BKuAihPOic
+         xHhel7v2FnkTXJnwGOURQ9lUoPnDSKX34MT2DC78TfOFX8Qb2dR0X6Rg82Ht1kLSeK4y
+         MvlgR7wTnaKqluej2L5yrwLDFGr3Z+g+cTcWUP+NsXn1ZF2ouA+tT7reXpXrygY4k3ol
+         p6VhKetS980GYlssxwy/hJczIfHrdpuoly/rK2d1yryS2AKw5QyyMUI0O8Hdql8X98uA
+         3BLVOR/jmN6L8qNJuQHroxQSrlWrg9+M/6iq5q1bCYhzwNf2UKzxm7zknu7ZIjIBMTOf
+         ykGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ2H/yrDMVbSE56lb4ArYXnRS0vZedQ3eqEeqsGsUvKdyAJckLLsw5rNtglX7BZPmOluM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSZpUfI7I8j8/2aADHi2qrR+aVvKPBKVvld/QmAXG92+gB9Of3
+	Oj4sGqwxP629lKel5efEb6Vf7QLRMQkc/E6nMEA0bX8QnppFQlEY/HMOLF12VnazQ8JYnYcETrV
+	j+w==
+X-Google-Smtp-Source: AGHT+IHPf44zPu0w6mRTvI9zgBOzfAIWQRG6xMMazGzKoTTtcnxVL4NPfPHzTXy46v9QHxXsNcsXsXr29n0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:903:22cf:b0:20c:857b:5dcb with SMTP id
+ d9443c01a7336-210c6c1493amr8234475ad.4.1730993105409; Thu, 07 Nov 2024
+ 07:25:05 -0800 (PST)
+Date: Thu, 7 Nov 2024 07:25:03 -0800
+In-Reply-To: <ZyxJMoYMfQKug02q@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7iskTDdG9lmVnW-WWL2xJynXihGDjpnP
-X-Proofpoint-GUID: 7iskTDdG9lmVnW-WWL2xJynXihGDjpnP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 priorityscore=1501 malwarescore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 mlxscore=0 spamscore=0 bulkscore=0
- mlxlogscore=892 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2411070114
+Mime-Version: 1.0
+References: <20241101193532.1817004-1-seanjc@google.com> <Zymk_EaHkk7FPqru@google.com>
+ <ZytLLD6wbQgNIHuL@intel.com> <Zyt1Cw8LT50rMKvf@google.com> <ZyxJMoYMfQKug02q@intel.com>
+Message-ID: <ZyzaxakxCPMxT7Hs@google.com>
+Subject: Re: [PATCH] KVM: x86: Update irr_pending when setting APIC state with
+ APICv disabled
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yong He <zhuangel570@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
-Reviewed-by: Hariharan Mari <hari55@linux.ibm.com>
----
- tools/arch/s390/include/uapi/asm/kvm.h            |  3 ++-
- .../selftests/kvm/s390x/cpumodel_subfuncs_test.c  | 15 +++++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+On Thu, Nov 07, 2024, Chao Gao wrote:
+> On Wed, Nov 06, 2024 at 05:54:19AM -0800, Sean Christopherson wrote:
+> >On Wed, Nov 06, 2024, Chao Gao wrote:
+> >> >Furthermore, in addition to introducing this issue, commit 755c2bf87860 also
+> >> >papered over the underlying bug: KVM doesn't ensure CPUs and devices see APICv
+> >> >as disabled prior to searching the IRR.  Waiting until KVM emulates EOI to update
+> >> >irr_pending works because KVM won't emulate EOI until after refresh_apicv_exec_ctrl(),
+> >> >and because there are plenty of memory barries in between, but leaving irr_pending
+> >> >set is basically hacking around bad ordering, which I _think_ can be fixed by:
+> >> >
+> >> >diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >> >index 83fe0a78146f..85d330b56c7e 100644
+> >> >--- a/arch/x86/kvm/x86.c
+> >> >+++ b/arch/x86/kvm/x86.c
+> >> >@@ -10548,8 +10548,8 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
+> >> >                goto out;
+> >> > 
+> >> >        apic->apicv_active = activate;
+> >> >-       kvm_apic_update_apicv(vcpu);
+> >> >        kvm_x86_call(refresh_apicv_exec_ctrl)(vcpu);
+> >> >+       kvm_apic_update_apicv(vcpu);
+> >> 
+> >> I may miss something important. how does this change ensure CPUs and devices see
+> >> APICv as disabled (thus won't manipulate the vCPU's IRR)? Other CPUs when
+> >> performing IPI virtualization just looks up the PID_table while IOMMU looks up
+> >> the IRTE table. ->refresh_apicv_exec_ctrl() doesn't change any of them.
+> >
+> >For Intel, which is a bug (one of many in this area).  AMD does update both.  The
+> >failure Maxim was addressing was on AMD (AVIC), which has many more scenarios where
+> >it needs to be inhibited/disabled.
+> 
+> Yes indeed. Actually the commit below fixes the bug for Intel already. Just the
+> approach isn't to let other CPUs and devices see APICv disabled. Instead, pick
+> up all pending IRQs (in PIR) before VM-entry and cancel VM-entry if needed.
+> 
+>   1 commit 7e1901f6c86c896acff6609e0176f93f756d8b2a
+>   2 Author: Paolo Bonzini <pbonzini@redhat.com>
+>   3 Date:   Mon Nov 22 19:43:09 2021 -0500
+>   4
+>   5     KVM: VMX: prepare sync_pir_to_irr for running with APICv disabled
+>   6
+>   7     If APICv is disabled for this vCPU, assigned devices may still attempt to
+>   8     post interrupts.  In that case, we need to cancel the vmentry and deliver
+>   9     the interrupt with KVM_REQ_EVENT.  Extend the existing code that handles
+>  10     injection of L1 interrupts into L2 to cover this case as well.
+>  11
+>  12     vmx_hwapic_irr_update is only called when APICv is active so it would be
+>  13     confusing to add a check for vcpu->arch.apicv_active in there.  Instead,
+>  14     just use vmx_set_rvi directly in vmx_sync_pir_to_irr.
 
-diff --git a/tools/arch/s390/include/uapi/asm/kvm.h b/tools/arch/s390/include/uapi/asm/kvm.h
-index 05eaf6db3ad4..60345dd2cba2 100644
---- a/tools/arch/s390/include/uapi/asm/kvm.h
-+++ b/tools/arch/s390/include/uapi/asm/kvm.h
-@@ -469,7 +469,8 @@ struct kvm_s390_vm_cpu_subfunc {
- 	__u8 kdsa[16];		/* with MSA9 */
- 	__u8 sortl[32];		/* with STFLE.150 */
- 	__u8 dfltcc[32];	/* with STFLE.151 */
--	__u8 reserved[1728];
-+	__u8 pfcr[16];		/* with STFLE.201 */
-+	__u8 reserved[1712];
- };
- 
- #define KVM_S390_VM_CPU_PROCESSOR_UV_FEAT_GUEST	6
-diff --git a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-index 222ba1cc3cac..27255880dabd 100644
---- a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-+++ b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-@@ -214,6 +214,19 @@ static void test_dfltcc_asm_block(u8 (*query)[32])
- 			: "cc", "0", "1");
- }
- 
-+/*
-+ * Testing Perform Function with Concurrent Results (PFCR)
-+ * CPU subfunctions's ASM block
-+ */
-+static void test_pfcr_asm_block(u8 (*query)[16])
-+{
-+	asm volatile("	lghi	0,0\n"
-+			"	.insn   rsy,0xeb0000000016,0,0,%[query]\n"
-+			: [query] "=QS" (*query)
-+			:
-+			: "cc", "0");
-+}
-+
- typedef void (*testfunc_t)(u8 (*array)[]);
- 
- struct testdef {
-@@ -249,6 +262,8 @@ struct testdef {
- 	{ "SORTL", cpu_subfunc.sortl, sizeof(cpu_subfunc.sortl), test_sortl_asm_block, 150 },
- 	/* DFLTCC - Facility bit 151 */
- 	{ "DFLTCC", cpu_subfunc.dfltcc, sizeof(cpu_subfunc.dfltcc), test_dfltcc_asm_block, 151 },
-+	/* Concurrent-function facility - Facility bit 201 */
-+	{ "PFCR", cpu_subfunc.pfcr, sizeof(cpu_subfunc.pfcr), test_pfcr_asm_block, 201 },
- };
- 
- int main(int argc, char *argv[])
--- 
-2.43.5
+Ah, right, and that approach works because the posted interrupt notification IRQ
+is guaranteed to cause a VM-Exit, and KVM keeps the destination CPU in the PID
+up-to-date even if APICv is inhibited.
 
+But on AMD, the GA log interrupt is per-IOMMU and so isn't affined to the CPU on
+which the vCPU that generated that log entry is running, i.e. won't force an exit
+on the destination.  Oh, and the vCPU's entry in the IPI virtualization table
+needs to be marked as not-running so that the sender is forced to exit and kick
+the target.
+
+In theory, kicking the target vCPU in avic_ga_log_notifier() would allow keeping
+the associated IRTEs in guest/posted mode.  I'm mildly curious if that would
+yield better or worse performance/latency than going through the per-IRQ handler.
 
