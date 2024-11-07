@@ -1,128 +1,108 @@
-Return-Path: <kvm+bounces-31121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4CB9C08A6
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:14:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93AB09C08E2
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6D691F21F71
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 14:14:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9F51F243BC
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 14:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42061212F01;
-	Thu,  7 Nov 2024 14:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E2F212D16;
+	Thu,  7 Nov 2024 14:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cJw0WTWn"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="WpXfZWMF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC34D212EFC;
-	Thu,  7 Nov 2024 14:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914C929CF4;
+	Thu,  7 Nov 2024 14:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730988819; cv=none; b=ExazhsUarq/aLmSV4wxma0HmzUZLsB8VO08cvIX481jEZZWRguvJxzNgC+QqzN0W9Q9po4CXA70w2VNkspkPeRuiNL0dCAAZWkTtqF7jPzdu4yFVn3OF9/+rKOSIycYQ40vW1me7iVngHuucFf6fFihSN0mzvkH1nGQkDxYCOGs=
+	t=1730989774; cv=none; b=rWp2itFz0u6ylqN/37n29iQM0g8ONnPjN1+/LfgVMMQpjvHf4beRdV/SfGTJ+NdqM5cFvBIpijXjr4MjoeP3P5bpwKkOLh8zTUbMtpys5TBQ85fDuSeSHcegERoUdzaPDqb3BU6WSec7+hsN7qjTy1V6rqMi5YzSosqjWV1aqm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730988819; c=relaxed/simple;
-	bh=0Akm99fiUjDLQWjgdtQxgIzIU4uZqg4GICm+FUUmUrM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DWfFF2MHgPRMYSzn/Mxj5CW6Vj4INFrV/hNSXvIMNSwg4UK7LBmcAqc7aS/iOya3RGv1hWer++fXBvn2ByHFeOdNg1QtKI71R9oFlTRxQ29dN4QLYqTidg2uRlH0s+BhixTMpgmhJw3d2eVVZ+J70gFjgyirxEDxGo0T1NdWJL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cJw0WTWn; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7E9ujb031318;
-	Thu, 7 Nov 2024 14:10:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=XCx6W3n9SVzNXJdyU
-	8z+Gfygwq4oHLz88kpgVI2eLc0=; b=cJw0WTWnTuldImspDCWPMNnD86tjqP+JC
-	WE36T9fI+vTc0dVNNIh24SBT9waA/YuOohV9DD2P1A5Hs2fwC2AIOf2x+iOaJPqI
-	RsM68eHsNVkDAbqY4SNfuJaABtq+HmRg++TvCKYrcQ1BSDfaptzaivVK2HIjlFLf
-	3nhCcMJnThw1gKKIC1cxUD0QK6Sg1oI1lFPv3Pecn4/n1VF0fyy88RApV4N2XOgu
-	7g0JYGuOlwdpVMhMDOVZtoUEj78OupYlkhY7WUpVxs+4v1ucJmNtGOZMD56zdh/G
-	OdU4WT3DLQtElcpkQAhcfzmgc/5xZSJxgg94POQddmAGcu2PrJMuA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rxmrr4m0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 14:10:39 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7CdeHF024242;
-	Thu, 7 Nov 2024 14:10:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nxsyydvu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 14:10:38 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7EAZRV47186370
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Nov 2024 14:10:35 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ED8B720040;
-	Thu,  7 Nov 2024 14:10:34 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C0F3720049;
-	Thu,  7 Nov 2024 14:10:34 +0000 (GMT)
-Received: from darkmoore.boeblingen.de.ibm.com (unknown [9.152.222.253])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  7 Nov 2024 14:10:34 +0000 (GMT)
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, schlameuss@linux.ibm.com
-Subject: [PATCH v7 5/5] selftests: kvm: s390: correct IP.b length in uc_handle_sieic debug output
-Date: Thu,  7 Nov 2024 15:10:24 +0100
-Message-ID: <20241107141024.238916-6-schlameuss@linux.ibm.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241107141024.238916-1-schlameuss@linux.ibm.com>
-References: <20241107141024.238916-1-schlameuss@linux.ibm.com>
+	s=arc-20240116; t=1730989774; c=relaxed/simple;
+	bh=qTJCPmQc0wQPBA2t7FrvNJQ16tzLCuQde9NWc/cfJes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CbrArvSpr+TtEfsMroVqq9MqeYMWcTapH8sS0Kk1LnMmJ8i4BwZ5qc3gmENV2rkM9V4vD3a/9dlOeqkcLHmzUKngbXWCm7yuAXifDtpC1dP5yg8/q7LYlwTGTLDvU7DMS0jPmnYp4DkO96sMBxwxZuejYJKldoCrBp17WYKIgws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=WpXfZWMF; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0CBE640E0261;
+	Thu,  7 Nov 2024 14:29:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id hgWXCkSHF6Hg; Thu,  7 Nov 2024 14:29:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1730989762; bh=CpUSF5wV943nizZbTHFsAvrf8peZivoamSj5AQOYqJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WpXfZWMFRF5y5R+ioYc3w7GP+hIGkgzbVfsM8qPcriZ+3iC534kr1LRL+I2tMObag
+	 0Z+pq3c+PeV/2W2H//suly6l/wQxUaooRGZei6O63O65g7pp/oPurHUzt8xStpMsqr
+	 0lTC+uTnm4ajBfhdbCkrpJEiwRKfN90EyRTsxcA6loRME/FSbNGgZdTHhrF3E4CKal
+	 4w2ynibYDKeIbfR/6Omndza4dNTQmSB1Ugwi+rPgCHc9yIWqb3pQsErOjNiAsQjWqK
+	 BycMwJ8rWLb83Dj+eShm+uhiAAFEfv0oefOIiks8v6TyYnuN7Yaxhm1+JmoYskay2g
+	 DgK+ohuZhgMhVWg+Qe5HBaRYrYm6NBXVRKhnm+VbEsFG84Zxr8ys2uOYHIb1Jp6eQY
+	 qN7NWwORvI5fEerafRrv5uQUIfKj+2H886bxGhLyr3sDJbNdTzIby333DN+te1WcAs
+	 2NRpAcESBhoRjdUOdcCmsZbrawHx2EsWF/RJ2P3D2vuqtc5QpgnaVybIaWxzuHjYQ9
+	 UKJyUwPOoICwBBmO2e4RG0BH8xFcJzqaAYIh8k9U4wFub5MVuTkH/xrEdzhzDz5Ltz
+	 dm5PqOghgZkrjWNfWVMWnsMiVOrKRJHUHNPOh23K+ZWlu1zgXBIIgrc09D2WKRFVIf
+	 0UB7TAysopDld7Zeh/dIQmTY=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 671E840E0163;
+	Thu,  7 Nov 2024 14:29:05 +0000 (UTC)
+Date: Thu, 7 Nov 2024 15:28:56 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 03/14] x86/apic: Populate .read()/.write() callbacks of
+ Secure AVIC driver
+Message-ID: <20241107142856.GBZyzOqHvusxcskYR1@fat_crate.local>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-4-Neeraj.Upadhyay@amd.com>
+ <20241106181655.GYZyuyl0zDTTmlMKzz@fat_crate.local>
+ <72878fd9-6b04-4336-a409-8118c4306171@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: izty_Qe93jeS9L-krbVGxPLrytEKAD27
-X-Proofpoint-GUID: izty_Qe93jeS9L-krbVGxPLrytEKAD27
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=620 lowpriorityscore=0
- phishscore=0 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411070110
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <72878fd9-6b04-4336-a409-8118c4306171@amd.com>
 
-The length of the interrupt parameters (IP) are:
-a: 2 bytes
-b: 4 bytes
+On Thu, Nov 07, 2024 at 09:02:16AM +0530, Neeraj Upadhyay wrote:
+> Intention of doing per reg is to be explicit about which registers
+> are accessed from backing page, which from hv and which are not allowed
+> access. As access (and their perms) are per-reg and not range-based, this
+> made sense to me. Also, if ranges are used, I think 16-byte aligned
+> checks are needed for the range. If using ranges looks more logical grouping
+> here, I can update it as per the above range groupings.
 
-Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/ucontrol_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Is this list of registers going to remain or are we going to keep adding to
+it so that the ranges become contiguous?
 
-diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-index 71e76337d9dc..549021ada4d2 100644
---- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-+++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-@@ -375,7 +375,7 @@ static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) *self)
- 	struct kvm_run *run = self->run;
- 
- 	/* check SIE interception code */
--	pr_info("sieic: 0x%.2x 0x%.4x 0x%.4x\n",
-+	pr_info("sieic: 0x%.2x 0x%.4x 0x%.8x\n",
- 		run->s390_sieic.icptcode,
- 		run->s390_sieic.ipa,
- 		run->s390_sieic.ipb);
+And yes, there is some merit to explicitly naming them but you can also put
+that in a comment once above those functions too.
+
 -- 
-2.47.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
