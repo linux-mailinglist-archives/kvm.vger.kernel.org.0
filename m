@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-31199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73319C1269
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:29:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CAFC9C1276
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455E41F231FD
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:29:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C090D1C21D00
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF2621A4DC;
-	Thu,  7 Nov 2024 23:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF9B21F4BF;
+	Thu,  7 Nov 2024 23:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WbGOVIs0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9n5jryM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B244219CB1
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 23:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3387321C170
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 23:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731022129; cv=none; b=LcsBMbz8ryuPXvq5YTx+eR7/AeShQobQJL6nt8ZaxuNzxj84tKuQHKXjVIgXBDuM1eMAhrsCKTlzsmTjCnPFhmwYPYgJj70Kd7VXgQmO5UN4ENQI3KsO3TqNTr16VjwtBPwKG86zu5hcjksBZaNVSQTonkIqrXHL2YyF3Xz9MjE=
+	t=1731022142; cv=none; b=gdyZ2JiaHaqtgSjYmthZdrg9Qrm1xUo4y668oeIL7tM/megcLJhvGo+B6Eqqt0GRB+U/u3JJg9BcFWJd2iBrUPnTTzFpeZNtm0wHOO+bR2BL7VaMRJzoIKY9hZMV3Nuiav8bSq2Bo1B8M2Md+i5YQ4H9Q/HyswWFigBl6y26/3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731022129; c=relaxed/simple;
-	bh=ayby78yQOyjOz6ls+yE5cxTfghhQvc3yyzZlL7gs+bU=;
+	s=arc-20240116; t=1731022142; c=relaxed/simple;
+	bh=6WWSW1vJ35TJDlbJJB5qq6nYTs9fwiNRbSVBdPgx3NQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=E587HyikrAoz6s8cD9vagVyYDupHhPPqEv+GUfZiLok6xgoJD52d88yYd2lI6fcuI/i3V35P8/9d24oCmu16tC5t2NN5R1Oq2sppxa9WuYYTDVRNJ+SOkOXAa8VVNhEaHGC8W4yLcYX+kbA5O3h+9a3IptaBJjbfOQDQYlPhJP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WbGOVIs0; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=t2bncRw7crBGKqjXaxI7u5n14Ger3m9IWm6Papf40Rd++Fwv9LdHhWQ2A94nhHKGcBttL1Ih7WFdCVdgh9TGooLP+2kSxWYk3x6ArqPuRjgQ0KXn2TXrmEGmNS3H++nvHH/T11dTxfB7ObLtliFry8EE5+k3uOCbjB7odx6pD5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9n5jryM; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea9618de40so27304357b3.3
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 15:28:47 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7202dfaa53fso1842053b3a.0
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 15:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731022126; x=1731626926; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731022140; x=1731626940; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmL++hD8fgHMSusvyHDFwqq57StgWysj/njcEHmccMk=;
-        b=WbGOVIs05QBUu/kA+FtWQ6Ah9sHo6mDXK7iTFwS0M04KUafF529xhoIFIdV/STizsN
-         m9BS9V2iO3vsGFT7QdWpMbbf8BVhnFeK4GESfNf4/FLs5B+hArggrfO+0BcdGU79qZ2w
-         zwcmAvBRBnk3hsnTMm+8hWgGFdhClxjIE3idIHM2+Az4ToNihkkGBObgYxIoZte9dQ4J
-         BPPOhXN7nr/RLIeZDPCVjuJ6j5szypZr1QCdkuFnd3Jf1th05otOnOO0X4GynZ3emycH
-         JBkqtXHttdAnsmX13O8R9K3di9vHRch/xN0nF+tvPmWwFslgyvq1uQVw/O1xdNwSvFwR
-         QKnw==
+        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
+        b=t9n5jryMvuxkkLWzOEvxOf01La2djguOC4Dy8Pi7tlZFHGjTvc3fxMJXG70s6oFVdo
+         LQKfu6pHNNaGvzbwgppBXuvphJU8kBe/+DE+Q3pV27iNIO9NUwxZkprJumGYosp2BELU
+         tB5RZ1YgLlSGRWoXc8CdWsritPKklLh4GMjBpjExxdv33XtSYfv9dzdw0JzQ9AQqD5Qh
+         LaRjJQN8dSeasmH3IIJodo84UiRgM7hQwcf1G08fBQN7HK/A+AbG45BE0sgfBiFKpSus
+         TbXH+dckazAnqosLEulcJKWWVZghweLe+jGQrsm1A492gIV06nkEYJO+/7Qonbjxcysq
+         5SaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731022126; x=1731626926;
+        d=1e100.net; s=20230601; t=1731022140; x=1731626940;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmL++hD8fgHMSusvyHDFwqq57StgWysj/njcEHmccMk=;
-        b=hlDpXt30eD/UbJGYkbpoTdPNKA2qfCvNTujafQnfqgruY53eHwZY0xWhwvuobKafRO
-         cVeb5Y6ymW/na6TIzn+EC9s11kn7OtlzRojnro/2vI/OI1PnOb9OY1pUh1pwmjiR4Vgq
-         npvRC+o4rB1Aek5pxdjgYzsmvXd7ps63k1MSIn5kVsmHB82a8xwaWKdBSdWIQV1hDCWz
-         nT4uGgfKoCb/ScOZx9z6jHzYzpEJI/9RrSaayGL/mdcHMdOXk8ewSVQnrPoEjnscgIs2
-         J0QB6MU/dXNxIA43YjcLatVh3MTSA0f/VBY6pWs4V0K3HRfBvmmn7/WrMh0gzsBu08kc
-         FN1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW1EI5hfiaFNgGmREmIeo8hSQxp5toBFJf5f1MPL/SM3CxPY1gNOVe47PXYcBCanEkSK2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8y8K67NgBZOH4THBShmjetG7as9O0XmAVDC+FTes/gnI/DPOP
-	Iestw7DP0TA0fZz7BqRe5d1CjBsrUoOE98tMso+6XzBgfc2ZxDFSYH0/dLUBwIhR9M/F1m4IWLi
-	WjL8f4SohNN6cVCGiXH2kcw==
-X-Google-Smtp-Source: AGHT+IHZp/clRKmQZ8fJk7ELtkAKGCrs2CU91VNe+31QXmURSkfx5SINiU/puhbXGTHvPt4yQyv2DjU9QK+SpStkvA==
+        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
+        b=Lk/Iv1/NnmAK1C9LQIFWGobmLSTSGZhtkG/OrT8uw0FdWopcHoSrtMlDIfc/6bz0st
+         DmR6qjTFxwyVV10D9NHETdKcmd8bZ8O05b9ZlbuTg1WeeSIR0T1H4HOwcSg/4TTmgA0o
+         9PtZfdrMVLxelmJFY1O5FcgMzIbGQEownabdzki22nIAlfT/RRSOoPSpv1wKmEiVojQY
+         2BqQpVyOw2kQE0MsGd5W1aCjwe7f7fjr8pLFfXfy0GJwsfigT1dzKin3+2GumWhgYIde
+         5VXq1uHeX1XQwvYPcXOrkIvqxo5RM5+TQBbpDsu+iOUr4PhjQHdB1yFy3ZX6RKaRxT2X
+         SMhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWEv39pon1oemzN39qYDcIvtakcaOjGCQPEJvwCDuysDwu5k2Jef3lC1wdIq8FNj6oFYbE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3K4kDiO9FIZTdZbX7cDj8Th8QpMlcM/MrfzeUzu8fG2xIBvFA
+	PGjJpSUL1xndbmr6KGYtuO5VGH/9KMJSqjXbdC6P+ewz17oU41h0aPWsxctbuQ6vW8N6eYqGXkU
+	pOe3wThoNHQgAXk5R5AWnOA==
+X-Google-Smtp-Source: AGHT+IG3FN+utE5DtZk1yqn4OdrPXgq7d6fljLLlDC+Gkt63/91sIHkgMPRqozoEz65kcTQskewlqi/wialMoW0yqA==
 X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a05:690c:7307:b0:6ea:3c62:17c1 with
- SMTP id 00721157ae682-6eaddd75f83mr94917b3.1.1731022126529; Thu, 07 Nov 2024
- 15:28:46 -0800 (PST)
-Date: Thu,  7 Nov 2024 23:24:42 +0000
+ (user=dionnaglaze job=sendgmr) by 2002:a62:b401:0:b0:71e:5f55:86f1 with SMTP
+ id d2e1a72fcca58-724133cd470mr5045b3a.5.1731022140524; Thu, 07 Nov 2024
+ 15:29:00 -0800 (PST)
+Date: Thu,  7 Nov 2024 23:24:48 +0000
 In-Reply-To: <20241107232457.4059785-1-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,28 +74,27 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241107232457.4059785-1-dionnaglaze@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107232457.4059785-3-dionnaglaze@google.com>
-Subject: [PATCH v5 02/10] KVM: SVM: Fix snp_context_create error reporting
+Message-ID: <20241107232457.4059785-9-dionnaglaze@google.com>
+Subject: [PATCH v5 08/10] KVM: SVM: move sev_issue_cmd_external_user to new API
 From: Dionna Glaze <dionnaglaze@google.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
-	Michael Roth <michael.roth@amd.com>
+	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>
 Cc: linux-coco@lists.linux.dev, Dionna Glaze <dionnaglaze@google.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Danilo Krummrich <dakr@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Tianfei zhang <tianfei.zhang@intel.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, stable@vger.kernel.org, kvm@vger.kernel.org
+	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Failure to allocate should not return -ENOTTY.
-Command failure has multiple possible error modes.
-
-Fixes: 136d8bc931c8 ("KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command")
+ccp now prefers all calls from external drivers to dominate all calls
+into the driver on behalf of a user with a successful
+sev_check_external_user call.
 
 CC: Sean Christopherson <seanjc@google.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>
@@ -116,46 +115,123 @@ CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 CC: "Rafael J. Wysocki" <rafael@kernel.org>
 CC: Tianfei zhang <tianfei.zhang@intel.com>
 CC: Alexey Kardashevskiy <aik@amd.com>
-CC: stable@vger.kernel.org
 
 Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/sev.c       | 18 +++++++++++++++---
+ drivers/crypto/ccp/sev-dev.c | 12 ------------
+ include/linux/psp-sev.h      | 27 ---------------------------
+ 3 files changed, 15 insertions(+), 42 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 357906375ec59..d0e0152aefb32 100644
+index d0e0152aefb32..cea41b8cdabe4 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2171,7 +2171,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	/* Allocate memory for context page */
- 	context = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
- 	if (!context)
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
+@@ -528,21 +528,33 @@ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
+ 	return ret;
+ }
  
- 	data.address = __psp_pa(context);
- 	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
-@@ -2179,7 +2179,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		pr_warn("Failed to create SEV-SNP context, rc %d fw_error %d",
- 			rc, argp->error);
- 		snp_free_firmware_page(context);
--		return NULL;
-+		return ERR_PTR(rc);
- 	}
+-static int __sev_issue_cmd(int fd, int id, void *data, int *error)
++static int sev_check_external_user(int fd)
+ {
+ 	struct fd f;
+-	int ret;
++	int ret = 0;
  
- 	return context;
-@@ -2227,8 +2227,8 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		return -EINVAL;
+ 	f = fdget(fd);
+ 	if (!fd_file(f))
+ 		return -EBADF;
  
- 	sev->snp_context = snp_context_create(kvm, argp);
--	if (!sev->snp_context)
--		return -ENOTTY;
-+	if (IS_ERR(sev->snp_context))
-+		return PTR_ERR(sev->snp_context);
+-	ret = sev_issue_cmd_external_user(fd_file(f), id, data, error);
++	if (!file_is_sev(fd_file(f)))
++		ret = -EBADF;
  
- 	start.gctx_paddr = __psp_pa(sev->snp_context);
- 	start.policy = params.policy;
+ 	fdput(f);
+ 	return ret;
+ }
+ 
++static int __sev_issue_cmd(int fd, int id, void *data, int *error)
++{
++	int ret;
++
++	ret = sev_check_external_user(fd);
++	if (ret)
++		return ret;
++
++	return sev_do_cmd(id, data, error);
++}
++
+ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index f92e6a222da8a..67f6425b7ed07 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2493,18 +2493,6 @@ bool file_is_sev(struct file *p)
+ }
+ EXPORT_SYMBOL_GPL(file_is_sev);
+ 
+-int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
+-				void *data, int *error)
+-{
+-	int rc = file_is_sev(filep) ? 0 : -EBADF;
+-
+-	if (rc)
+-		return rc;
+-
+-	return sev_do_cmd(cmd, data, error);
+-}
+-EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+-
+ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index ed85c0cfcfcbe..b4164d3600702 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -860,30 +860,6 @@ int sev_platform_init(struct sev_platform_init_args *args);
+  */
+ int sev_platform_status(struct sev_user_data_status *status, int *error);
+ 
+-/**
+- * sev_issue_cmd_external_user - issue SEV command by other driver with a file
+- * handle.
+- *
+- * This function can be used by other drivers to issue a SEV command on
+- * behalf of userspace. The caller must pass a valid SEV file descriptor
+- * so that we know that it has access to SEV device.
+- *
+- * @filep - SEV device file pointer
+- * @cmd - command to issue
+- * @data - command buffer
+- * @error: SEV command return code
+- *
+- * Returns:
+- * 0 if the SEV successfully processed the command
+- * -%ENODEV    if the SEV device is not available
+- * -%ENOTSUPP  if the SEV does not support SEV
+- * -%ETIMEDOUT if the SEV command timed out
+- * -%EIO       if the SEV returned a non-zero return code
+- * -%EBADF     if the file pointer is bad or does not grant access
+- */
+-int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
+-				void *data, int *error);
+-
+ /**
+  * file_is_sev - returns whether a file pointer is for the SEV device
+  *
+@@ -1043,9 +1019,6 @@ sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV;
+ 
+ static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
+ 
+-static inline int
+-sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
+-
+ static inline bool file_is_sev(struct file *filep) { return false; }
+ 
+ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
 -- 
 2.47.0.277.g8800431eea-goog
 
