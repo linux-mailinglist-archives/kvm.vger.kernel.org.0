@@ -1,101 +1,118 @@
-Return-Path: <kvm+bounces-31173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 357099C0F9A
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:20:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5527C9C0FA6
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:26:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA730B23A4F
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 20:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7849D1C21B8C
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 20:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4197218330;
-	Thu,  7 Nov 2024 20:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972A1217F55;
+	Thu,  7 Nov 2024 20:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rbWCU6p1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JwvEiTp7"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEAF188CC6;
-	Thu,  7 Nov 2024 20:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D12161E6
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 20:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731010804; cv=none; b=uvfs0rF13BsyigxCHUqfIurjXLBw1PmbuqmEuQJeqNy5i1f9vGnEw3Lbut1NZ2Hagf/Cpa2yQeLLlKxgXK/kO2kejjsJ31vNc3FPGAB9JJv7pCxGRt979ERD62BzQU4gDLkEgCvWexJqbC6C3/lUrKJ2tPjQcG0QhMlbnK13ebo=
+	t=1731011209; cv=none; b=STm18Kfj0HVvQoJQKsQAwyQrUqhOE8ywf3Ne0Yizrzsb/zCFxLSqphDIa5GoRUASWae+ioMVhJColDCTnXsnC0APddW3qr79Odqzh3aRzoHjjSlg9cD1KprBAD2zjbDYWLcbGgd8w6wwqJQEMW8mvFUxgcbOcaa+k+avfSMMnzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731010804; c=relaxed/simple;
-	bh=DZULhkNtIKVgrZSI1ZQHnxEFQHoKswm8s5buWEDQRmA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDYUAFPCQ+LIo1j5ZP0YajdRK5XiRxzNi2d38hyntJ+NkBm/OkyHej1yYROcx0PVlOPTGoLEFhcFFxduJ7jsrxv8NiIKtcKuTBYKaA4C1VtTIj3jiYdkGjNyH8wkJs0FfzKYxkeb+T7u8BSx3x1DOfLWfFtZhPcsb2amQ6HtXkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rbWCU6p1; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WBdml7YjmERUT8SVBwJP9R+7xZP2+k1OGM6A0zqovvs=; b=rbWCU6p19KhlwSTEPtF5J0EJBt
-	LSf714Sv1wrXB29l5QtvRIF10xdPqfq15PfALw27p3i31Hc3o8MrDU+Mh8TVlAqthI+pNzUIbzkZG
-	ncEoWd5qQ5MgfcM89DZlpRn8JvEZxf42YTDyi3aC2OOAHSw2AaqFCym8ELxz//aKjzOzyqIr67ikL
-	o7uUiltBB5NDbQaoz3ryf9+N/t1W/X7F4xKL1MaCFfMWHrJaZicsgv1s70p5nfpQ1JfpKl/rY/Bar
-	cpBq8eRUhPhKGbAMcsZy4H8rfc9Qg8RY7xepQpgXBUSbQ/Qh1sUb6FBugvS1T7SCIsu4IAaSrv4QA
-	iZ5fYy0Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t98z2-00000007Kj7-2nAz;
-	Thu, 07 Nov 2024 20:20:00 +0000
-Date: Thu, 7 Nov 2024 20:20:00 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, kvm@vger.kernel.org,
-	Zi Yan <ziy@nvidia.com>, Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>
-Subject: Re: [ISSUE] split_folio() and dirty IOMAP folios
-Message-ID: <Zy0g8DdnuZxQly3b@casper.infradead.org>
-References: <4febc035-a4ff-4afe-a9a0-d127826852a9@redhat.com>
- <ZyzmUW7rKrkIbQ0X@casper.infradead.org>
- <ada851da-70c2-424e-b396-6153cecf7179@redhat.com>
+	s=arc-20240116; t=1731011209; c=relaxed/simple;
+	bh=5+dKjp4NFaoQsFGHLDX4etrIGMptFEHaNLPNJNjWcpA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fPaBm0ySJefBVHNnHVjCVCZcHNxA4ocJamldj+RJnozrWiIZxxhg0/+vY2CuwUz3s8f2TcYpNFHfHP+jvgfppZ2sLIZYTDBo1AiahbBlyA3FtGHCo2v9oVD4n8LfHmxW9glVD6ssuuAqhYMRDi/lPg7+rmb2+iTvMePZb6VyBOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JwvEiTp7; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e38fabff35so27468597b3.0
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 12:26:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731011207; x=1731616007; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DaXja48Eoul2mL0v8OhTPkrroMKx/GLkawdW4wfS5s=;
+        b=JwvEiTp7sdqRNkz79MeEriRoj/WRbraWnTAsC17ku1ps5nX1dqaLa1nDros+b6LcGW
+         BLDoEl8G/y/ElWlmySjDZFg+bYSDsrVgjK3RJqSgAJh+Wx9IRwYmBalT4EpDdrc1H3DL
+         96DowUwv4Uyt5stswwoXUJU3z6z9wH/9JxpAbneyJahHKFwCL3jseMktUgU8tSt5qD+B
+         Sh6WFehsAllGBml2qa5tk4KZq+BqtOscepInxXTcf+5fSG9+bVPAKzLJ8uAinl9PumeJ
+         4Chz83jHD/s2P0qraK7yMa4ISYzCtKwk92iI5+TXDO+FWxzMkV10PFAObY/ETji1hLs4
+         /W4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731011207; x=1731616007;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DaXja48Eoul2mL0v8OhTPkrroMKx/GLkawdW4wfS5s=;
+        b=GLprvjCNck/0TQL8PSIYvqkDzYtFtLttkys6YtxVlQ2SH8ev0OrmcVbcNGlR7cE0ji
+         YEsCcwWyL/Tla3GgdvZRGBRrWNE7W4Llrq3F8BrSV8qGX4EAZjr+zfEpvn2yTae8yl51
+         V0VRg3MR0nbCleGpqtNjSZICqJ0WJK5IxytffjWraqE8MavqtHwn8dqcG1Jfy2w0RcDC
+         sA7a0/LnDI6AtncHVRMce2r2Cm5BSH8j4H9A3BJZwGIFm1RhOLeNZZXrIRT/YzCqqvYN
+         YF1qnNBBNPcYwY7+5blxGwfNoQBdV24Sse5sNjsFlXZs1A4YMW/xRjh+SBMGsy9LEWtm
+         +PIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoL2bbYenggea6ODN9gILagGR9Sre9/dOACNT1k9u3QlowlfGUAZqlcJ3KOySI5TwxLQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXTlHBNo/MDlW0GLEH9ZOz6MU7nSfftzERLTIKVYstXkEfgTlP
+	92uHpXPYWzF45CyvbSvToC8xOzx1YFb4765Ew/yZQ1cscEp6CK5kyjuDScFuYmx2OqcRqPZPeGm
+	y3A==
+X-Google-Smtp-Source: AGHT+IFGnCavdqNWrqQzhvzEc2Nc4+MjfMOxSGbHqWn9yrACMcOtJh8NbYcCcVft7/QoNWhW/fUDme7cQ9Y=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:7307:b0:6ea:3c62:17c1 with SMTP id
+ 00721157ae682-6eaddd75f83mr31897b3.1.1731011207357; Thu, 07 Nov 2024 12:26:47
+ -0800 (PST)
+Date: Thu, 7 Nov 2024 12:26:45 -0800
+In-Reply-To: <Zy0fPgwymCdBwLd_@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ada851da-70c2-424e-b396-6153cecf7179@redhat.com>
+Mime-Version: 1.0
+References: <20241107094000.70705-1-eric.auger@redhat.com> <20241107094000.70705-3-eric.auger@redhat.com>
+ <Zyz_KGtoXt0gnMM8@google.com> <Zy0QFhFsICeNt8kF@linux.dev>
+ <Zy0bcM0m-N18gAZz@google.com> <Zy0fPgwymCdBwLd_@linux.dev>
+Message-ID: <Zy0ihQlkexIWc1fq@google.com>
+Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, broonie@kernel.org, 
+	maz@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	joey.gouly@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 07, 2024 at 05:34:40PM +0100, David Hildenbrand wrote:
-> On 07.11.24 17:09, Matthew Wilcox wrote:
-> > On Thu, Nov 07, 2024 at 04:07:08PM +0100, David Hildenbrand wrote:
-> > > I'm debugging an interesting problem: split_folio() will fail on dirty
-> > > folios on XFS, and I am not sure who will trigger the writeback in a timely
-> > > manner so code relying on the split to work at some point (in sane setups
-> > > where page pinning is not applicable) can make progress.
+On Thu, Nov 07, 2024, Oliver Upton wrote:
+> On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
+> > ---
+> > From: Sean Christopherson <seanjc@google.com>
+> > Date: Thu, 7 Nov 2024 11:39:59 -0800
+> > Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
+> >  freeing VMs
 > > 
-> > You could call something like filemap_write_and_wait_range()?
+> > When freeing a VM, don't call into KVM to manually remove each memslot,
+> > simply cleanup and free any userspace assets associated with the memory
+> > region.  KVM is ultimately responsible for ensuring kernel resources are
+> > freed when the VM is destroyed, deleting memslots one-by-one is
+> > unnecessarily slow, and unless a test is already leaking the VM fd, the
+> > VM will be destroyed when kvm_vm_release() is called.
+> > 
+> > Not deleting KVM's memslot also allows cleaning up dead VMs without having
+> > to care whether or not the to-be-freed VM is dead or alive.
 > 
-> Thanks, have to look into some details of that.
+> Can you add a comment to kvm_vm_free() about why we want to avoid ioctls
+> in that helper? It'd help discourage this situation from happening again
+> in the future in the unlikely case someone wants to park an ioctl there.
 > 
-> Looks like the folio_clear_dirty_for_io() is buried in
-> folio_prepare_writeback(), so that part is taken care of.
+> > Reported-by: Eric Auger <eric.auger@redhat.com>
+> > Reported-by: Mark Brown <broonie@kernel.org>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
-> Guess I have to fo from folio to "mapping,lstart,lend" such that
-> __filemap_fdatawrite_range() would look up the folio again. Sounds doable.
-> 
-> (I assume I have to drop the folio lock+reference before calling that)
+> I'm assuming you want to take this, happy to grab it otherwise.
 
-I was thinking you'd do it higher in the callchain than
-gmap_make_secure().  Presumably userspace says "I want to make this
-256MB range secure" and we can start by writing back that entire
-256MB chunk of address space.
-
-That doesn't prevent anybody from dirtying it in-between, of course,
-so you can still get -EBUSY and have to loop round again.
-
+You take it.  Unless my git foo is off the rails, this is needs to go into 6.12,
+along with a fix for the vGIC test.  That, and I already sent Paolo a pull request
+for rc7; I don't want to overwork myself ;-)
 
