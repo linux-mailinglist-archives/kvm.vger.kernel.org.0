@@ -1,128 +1,108 @@
-Return-Path: <kvm+bounces-31197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83899C1256
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:26:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85DB9C12B3
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 470C2B21EE1
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 932E1283627
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D32A219C82;
-	Thu,  7 Nov 2024 23:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5F11E6DC1;
+	Thu,  7 Nov 2024 23:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KNcSHW+p"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GjYStS/F";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="PNqPskB6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F1F19B5B1;
-	Thu,  7 Nov 2024 23:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02A51D86ED
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 23:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731021947; cv=fail; b=RwlXdNkzMj5/9qhMWk0AOKikcg4UhRKCB2rVERoI4ohXf6as42rUa/zDuLg/Lmc7tii6gAKBTKojTnNaVdRmW56YZZQY5gLJYSlN2ZPqKobfohgZWkYzwG3wLpwrhyBNuiARniHO0+vR+ARFcZVYOKj2tHpQ93uMsgggZK0hWTs=
+	t=1731023133; cv=fail; b=Y1pv9yWibloVsDABrk/+iSTa7fxsLb/VeMuO4wnFiv5yPwMg7uARH+jMEz8IZy9p9j/ovB2USzw+tHKYKgJl4NYnlfcuJP0+SPeGYaz0Lt+aTo9MYG/7UlNpdpnW3PMWxwD7bApEE59fKbp7EiO/pEkQ4zp742ZdXPLMjhmDjhk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731021947; c=relaxed/simple;
-	bh=o2IczxdcueVah39dzoB2uXCEcG4ekpy7p+onbDFBqDk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MXDrhUIjkUSjl1vQF+tc2h8OfPcb+KXy+UilAl7heiyvFbVbjvAzc9r5keTxMt+Qkff50OgstVW4bwN04Win83chG9WSfnmVTY2tTDiX96AfdN1hPCpiyn7uGsem0d6xVYU+R3V1PZ3EeddCufUf07xuKjFgGv8HsPkxTk6dX9A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KNcSHW+p; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731021945; x=1762557945;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=o2IczxdcueVah39dzoB2uXCEcG4ekpy7p+onbDFBqDk=;
-  b=KNcSHW+pAYMXiZenubhvI63+6tAjfTc+VieLaR0Hbrt88YFWQ+LmWaX2
-   Wee6AcQ1E6tuqp8vZBfCYgm8WshhskG0C+aIZ6X3umwZiWCdkoOM0h4Vj
-   F1nlq7XyrfDQ0Z1B6kd9P17P6NRqaJ1ILl3eSL0KlatO4u+MgaPf2cRwm
-   BsJdzfnIOTNQRY316tDqv7aFUPvSs0oPi2AL69mFi9N6WkBHR1VkppDt0
-   dywUJ56vbgmC+FEpSsPhtSmEJDsRMQsYFueyn80zcHXUCoz6sYfvZs9OP
-   ICjAVrO+16P7wRe5CcRvLERduTT4kwF5uaEgBz5TBzpaE2Qm26bdf6Ph1
-   g==;
-X-CSE-ConnectionGUID: XcOUXcf+T2KWvPd9Y3MX8A==
-X-CSE-MsgGUID: o7UhM5DhSZGftWHjjJkJRA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="34675535"
-X-IronPort-AV: E=Sophos;i="6.12,136,1728975600"; 
-   d="scan'208";a="34675535"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 15:25:32 -0800
-X-CSE-ConnectionGUID: Ot8Y329kTlG1x87rWSu0SA==
-X-CSE-MsgGUID: 8hi+qctgSOyEl3ZaaM+o9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,136,1728975600"; 
-   d="scan'208";a="89221426"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Nov 2024 15:25:31 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 7 Nov 2024 15:25:30 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 7 Nov 2024 15:25:30 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 7 Nov 2024 15:25:30 -0800
+	s=arc-20240116; t=1731023133; c=relaxed/simple;
+	bh=EWV/FBMaXL+7zW4qva2gKVlPcJ2ME6bkXR96WnXoFdU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O09D44JG4L0o6CiWk8pIGnRq5KtDRABYwq2oVykiUywEnvhez3YC4xPur8E7s2VQgnWE9UsP9wsmn4bNMV9go+gVsmtsbXY71TM20IW/vP4SweeJywmsZ+vN+2Wh19OcblQeEVvxPfC99NmXbsi9nSPv7rlMir93J8JJFZVXVz8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=GjYStS/F; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=PNqPskB6; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7MtWOL009306;
+	Thu, 7 Nov 2024 23:45:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=In5YDfwn+ensvNmrelFgcRPyJmH4FZfoWXO2lXge2OA=; b=
+	GjYStS/FXd8TCtkFazZv6Z3GFU2x3gF4Z2Fl529TtPqduW0gV49c7EmB7+WwXTD1
+	qQM+3bXovX6nv/1M9IqUHR1yhoOM8rxakFzRH/E3OUPXdPpPJGkqSypq0o1v2shU
+	jkJhnSTg+v6bUFipYnQRT+lY8GQY1Yj/98EkHuERNqCD6olga/r69pNVSX2NS2DF
+	5pGaDE6lDtcamtsgzxzuSvwT82gTbWPAgez8VCNTmj2lRVI+6BAHWP2DUf8Q8/lq
+	XmjuGsqOh9t84VB+eR8/6fV/Lpa85Rz6brij/0flInzWRkXfK8HOXQoabyGPHER3
+	YNrkVYaiQhWXq52f61Wo4Q==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42s6jtg28e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 07 Nov 2024 23:45:04 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7MKKmS008594;
+	Thu, 7 Nov 2024 23:45:04 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2170.outbound.protection.outlook.com [104.47.56.170])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42nahaqp1k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 07 Nov 2024 23:45:04 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=retTw2GMLnFBw1lrqPKxPHuUpb2fioActq5GUZtEPPXUqdCrOGvgRTj2soaKvKc1buaQtZdlRVl3bPtEqmfkBSiGrwdpVxY5b490GBsvVpSkqOl39FPo1f1bRyRnFQDyU+J92nmhNpTsJQZO4PQkuw+D17OoRsHi8hvq1aKa/XhRTdN8uM9ErHhIgfzrxfqXWgCmM8dt3iJO4lEeCrYZ+csJAGoujIf301FnaDD/LTGst+Y+IEuMs0KDuTE3gqXKY8gcpIqjqug8qN82U1ZFC6dge8CA+Dvb5uapJgqr07DftXYe/pph8A7s4e1wluVHvlE0l/YipJNgEVANtB/A6Q==
+ b=KVlnnT0mnauV5KKCs8X0oCDdqjVvHCeqwBAgyV7F2wb9zKz/AMwt624TKS5KJUYMR26Z7S5O2bdRzfNBvjM0xsX/3vYkayRmaCA6x34cqx+NYe3MwqCd/z0ikt4VTVIwXB6P2lXGKy2Rh69eIMpi/VogsqsRGmDbk5WTmBYm4K/MEfJ7AW/b9oB8spb4AT4utC7AQsDlb3zeBjxJWz42+N4Fj6q6MzEnlZwgO8VIiip2X65jL7FnkZQziq2MJVQJTAh9y9Fx9yl0jU5wL/25/x14vcfRgomgrwxnSQdJcaiBEi3tH3dBwTWVJUlcFSq+iGTQilC4g1NVgBOT7iVH4Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jiYd8XVkZeMdYAwcZY4vXCvfRMEMV9WWuj0WRqYTG3A=;
- b=WsLjdQRNp+Hl3iLu+NKSBLOqpdcobcKlLVniWTV3DGotu8aIfDgZU4JxcMvt13Sp2s/H1l7IdJlgJgpj4+2w1xZBmyQ7tpJzaIe9/HZO6cBe1pwLQbp7HuilSv3PS6R2RU4XLsG/727m92Z+ib19lyYdra0/Ttdwd6PWvtfRP1mvlrZ/PoiA+FSB5Xn8NdLIh0CZqvi84odjl8f1EHCu8b36O9RUZiwWDPJKKZA/EpcpF/GwLRTs6Drgm6M75b9DUcBnYAgoDC7ZZsra4m6ef404gIWFbsYT+fAt30R+PkdTb6b9YcCcoEi6PtuTre+12TNViFrBzHlWnAjdRChf5A==
+ bh=In5YDfwn+ensvNmrelFgcRPyJmH4FZfoWXO2lXge2OA=;
+ b=f+no2+W2gu52/z0KgScVBk7Sl/y0cMVuRkrt1Xl6GLk4AQ9H4BkjWTncOkBJqjFaHkNB0atCF3lluANgM4iiZJq1yo8pokS8P6NRR8aFvQVouee2VBNF4559Z6ymMK9LOxIp9qIj4LC9KpGiY2ju4uhxczglK1SEiU21Nedcivp0Lv3aTsY1RhsAKCbVSgqj4KuOVO6tX0wUnuMR14WEc/9rEwRdmk52u848e2ua8hbpQTtak4QnM6os4d0UgMIJTORX+IS4TalXxnlCojXwJuxyjzJZoxLmMxdPN8w43mWyzClgXoiCC74GSd5FjhLEyPvO4/9vmT/1qeCSgIN05w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SJ2PR11MB8346.namprd11.prod.outlook.com (2603:10b6:a03:536::13) with
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=In5YDfwn+ensvNmrelFgcRPyJmH4FZfoWXO2lXge2OA=;
+ b=PNqPskB6CWpDb9VDt8eLcClOZSeWxIRD5DF5BKUk7kvzs7Cz+y++HXQWAF+GIiQVWymJWG2hZQ0I99WfpALDRdo/dVDE34XPerfRsRiR8DQUkHUsPBZKdVn1MiJNlrYx00FK3F9QPr73PKJsZvhp7dKB0Hd3K998ANZdVoRSmC8=
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com (2603:10b6:806:2c0::8)
+ by SA2PR10MB4777.namprd10.prod.outlook.com (2603:10b6:806:116::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.20; Thu, 7 Nov
- 2024 23:25:26 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.8137.018; Thu, 7 Nov 2024
- 23:25:26 +0000
-Message-ID: <54c79d38-5103-4233-a903-72e045fc1429@intel.com>
-Date: Fri, 8 Nov 2024 12:25:18 +1300
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Thu, 7 Nov
+ 2024 23:45:01 +0000
+Received: from SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::a37d:ab3f:9a23:c32d]) by SA0PR10MB6425.namprd10.prod.outlook.com
+ ([fe80::a37d:ab3f:9a23:c32d%3]) with mapi id 15.20.8137.018; Thu, 7 Nov 2024
+ 23:45:01 +0000
+Message-ID: <57b4b74d-67d2-4fcf-aa59-c788afc93619@oracle.com>
+Date: Thu, 7 Nov 2024 15:44:57 -0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] KVM: VMX: Initialize TDX during KVM module load
-To: Sean Christopherson <seanjc@google.com>
-CC: "Lindgren, Tony" <tony.lindgren@intel.com>, "Hansen, Dave"
-	<dave.hansen@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "binbin.wu@linux.intel.com"
-	<binbin.wu@linux.intel.com>, "Li, Xiaoyao" <Xiaoyao.Li@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>, "Williams, Dan J" <dan.j.williams@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hunter, Adrian"
-	<adrian.hunter@intel.com>, "Chatre, Reinette" <reinette.chatre@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kristen@linux.intel.com"
-	<kristen@linux.intel.com>
-References: <cover.1730120881.git.kai.huang@intel.com>
- <f7394b88a22e52774f23854950d45c1bfeafe42c.1730120881.git.kai.huang@intel.com>
- <ZyJOiPQnBz31qLZ7@google.com>
- <46ea74bcd8eebe241a143e9280c65ca33cb8dcce.camel@intel.com>
- <ZyPnC3K9hjjKAWCM@google.com>
- <37f497d9e6e624b56632021f122b81dd05f5d845.camel@intel.com>
- <ZyuDgLycfadLDg3A@google.com>
- <2d69e11d8afc90e16a2bed5769f812663c123c14.camel@intel.com>
- <Zy05af5Qxkc4uRtn@google.com>
+Subject: Re: [PATCH 2/7] target/i386/kvm: introduce 'pmu-cap-disabled' to set
+ KVM_PMU_CAP_DISABLE
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+        mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
+        likexu@tencent.com, like.xu.linux@gmail.com, zhenyuw@linux.intel.com,
+        groug@kaod.org, lyan@digitalocean.com, khorenko@virtuozzo.com,
+        alexander.ivanov@virtuozzo.com, den@virtuozzo.com, joe.jin@oracle.com,
+        davydov-max@yandex-team.ru, dapeng1.mi@linux.intel.com,
+        zide.chen@intel.com
+References: <20241104094119.4131-1-dongli.zhang@oracle.com>
+ <20241104094119.4131-3-dongli.zhang@oracle.com> <ZyxxygVaufOntpZJ@intel.com>
 Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <Zy05af5Qxkc4uRtn@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR17CA0069.namprd17.prod.outlook.com
- (2603:10b6:a03:167::46) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+From: dongli.zhang@oracle.com
+In-Reply-To: <ZyxxygVaufOntpZJ@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN0P220CA0021.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:52e::11) To SA0PR10MB6425.namprd10.prod.outlook.com
+ (2603:10b6:806:2c0::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -130,348 +110,289 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|SJ2PR11MB8346:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4b52a2c-ca52-4a10-20ce-08dcff8375b3
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SA0PR10MB6425:EE_|SA2PR10MB4777:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b9100f4-4ef9-41bb-4966-08dcff863229
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?emRPNnMrdEYzT21LK3pTZ2hBS0VUTXNNMkpDVTVDcVFqaUNRYkhPMnE5NXhn?=
- =?utf-8?B?QThoOGRrcE5BTXRKNUVpcDNLZmpGMmRoWXFEeHVpV1ZkdGYxYi8vUVY4Uis2?=
- =?utf-8?B?MFQxbkVLTHRCM3JHbHU2eWNTUXJEUTJMSHZtSUcvN2xReTNCTHNMSklMdWJC?=
- =?utf-8?B?TzlXdzlDMThRaTBnRW1LWisrMHAvdEdEalVvbExQQmZ5WXI4akRNUmJESGF5?=
- =?utf-8?B?RHdIM2pxUGx1VW9saVFsOGFwUlI4T29IT3JmdU1wZ2NBNE9XVXZqM2c4bTNK?=
- =?utf-8?B?WWc1blR0NFNzaVFlZWU4YWZrVjVKUDI4dXBCd3BMbGRHSkZtekxITGhlK2RK?=
- =?utf-8?B?N3Y2Q05vRE1VUWhCZERLd04yd3hsYVpFQnVBQmR0NWRFS0JkVTZsWTdvdU1F?=
- =?utf-8?B?d2FKcHcxWUtVS2R4eVJFdXlBVkNJUUFUUkNWa1lJU0xNdGFHdytXYko2K0do?=
- =?utf-8?B?Vms2VmRzOXFaTkp3WkFJdVROcU4vT2VpWlg0Rmp1MThVaDBqSXFXMUtKdEVU?=
- =?utf-8?B?dUZTRS9RRVlMcy83WThuemh3bW9YL1VYRUJWUVo4SWREOThUS0V6ZDIvRDEz?=
- =?utf-8?B?ZXRrNGNUWm9RZ0l0ME93M0tWMTNGUE9FSThCOGI0eGZZUlNoam1XNnZhSnYx?=
- =?utf-8?B?N3JXcCtRaVozSWZOUmRPcWN5dnNUcVJDZ1JYYzhaVjBYaGhGYUtLdXRVMGJn?=
- =?utf-8?B?cmg0bkpTUS84WUxxK1VBQXI4bUhTRWN4dzJpQjlWU1Q1aUhJOHk1R3hUU3oz?=
- =?utf-8?B?cll5aVo1MVNPOTBvU1Z6M1VDWWdFNnBpby9mN29ibTJOYkdHeGNEcEhGR0o4?=
- =?utf-8?B?QzJPYTYzekdIN0VHUnJwcFl1SVJabUt6d0d1Z0VYSkNPMm9RcVFITTR5Y3dL?=
- =?utf-8?B?MURFRHFEY0R3V3JVaW5mdnBKd1JVcFBEN0MrcVpTdlhJVnJWM1BrTlplSCtl?=
- =?utf-8?B?dXpuTy9xRE5VNWlPaGRXaFBrU1RKNS95UnBER0pxckJiNkthNmRzbEUyQ3Va?=
- =?utf-8?B?d1QzQm5HVjRQMW9lR2lpQUtrQ3UySmtEWTlTOG4wOWZTR1ZWRHN6VFI4L3ZP?=
- =?utf-8?B?QnlkMFZnYml5bUs5aWFNellVSGw4R0daOFVmMmhabDFUdWVMNDBCT1JZWmtC?=
- =?utf-8?B?WmtFbno1cnVBWE54cVgyVC9TM1hCNlBCTGZsNlRaeEd3WHE5QjZwR3R3T1hr?=
- =?utf-8?B?OFprSGhLYkFBd1VsVWZQMEo3WUQzNFg0Ym5FaFhmdUFwRWlURmZtODZKbVg2?=
- =?utf-8?B?VWdZT2RZLzJCRzBvYlRGQjg3djZxOXdva3QxMWJQOUJVdjQrb0VjMnE0djJm?=
- =?utf-8?B?d0J5RlQ0UmpLY1ZsMzBxOE1Kdk1PWkpWUSsxbi9GVm5QKzQzTnpiem9ZUXN4?=
- =?utf-8?B?M3FxOVFjS1ZBb1ZKK2RyUzY1MEl1NlowcndzSmJqUnZkSlJ5SWp3cnRST3dq?=
- =?utf-8?B?eW8vbko3T2xqSjV6YzBvQ0dmdmwyVHBqcnZQRmd6a3BIS3N6ZUt3dXgzdWRm?=
- =?utf-8?B?ZzlFbzNpUllBQVpTb09oeWpGMVdkVVhiZGx4U0hkQ0FRV1JXOFcycyszRTds?=
- =?utf-8?B?V255bEhVTDZ2QjV3N3Q1bjlBcFJBZksrZXhzajVURGhya291bEh3Q1VIWG5M?=
- =?utf-8?B?Q2hldXNjdFFjRVoyeVgxdjEwNHg0MFYxRk10UnQwVENsSThNKzhZUHRYQmlz?=
- =?utf-8?Q?yVmOhLT6/4la/Vo/a3Im?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?alBwZFp3T3Rtbm9wc0FPTXg3VUJ6QUR5MUVnREQ1blFBU2tSVEpBSDA0aTN3?=
+ =?utf-8?B?d1ZwK2k0SFZBUE5pZUk5TXFwcHA1SCt0eDFscE5OVHlsRHoxUE11QitzN053?=
+ =?utf-8?B?V3B2SFJ1TjF5TzNkUGxnRERXSGpSUDlndTlSUjFyM0hpbDhzSXFOVHd6cjQ0?=
+ =?utf-8?B?bGJiejVMVWVTVUVhajFMMjdoMnRUZEwwTm9wYnRINWVOZUptOWV2ajNCdTdv?=
+ =?utf-8?B?UVhJQU41SWtRZG9uTHpPdEZ4c2NSbklhVjduOVZoNXp4OTViOUZOdWgwZEpG?=
+ =?utf-8?B?LzFrZnhzU2ltTmYzVFRaTTlHSzFQL0NpQStrcERHdUp5MmVjYkFXWkR3V04x?=
+ =?utf-8?B?cnZkYWdpYVpzeU1LcWYvSkpHUS9ucmthR1NxYmZsNFpBb3lPSHNRSlprVjc5?=
+ =?utf-8?B?cG5uR1lvb1dyekpUV2p5MCt2ODg1N3pyeGdJTVppZ2V1Z1VnRmlnYVllbUJ0?=
+ =?utf-8?B?N2Zzbm9zVjl5TmVIMHlLZDN1L2d6WkFLMWlNQXRSbXI0NkRySlM0VFJkUVRX?=
+ =?utf-8?B?Q0F0U1lzcHIxVG1IcVo1SHZKbTNjVmp5VFBzMU8xMC9Ud0R1MFljcVNhUXly?=
+ =?utf-8?B?Qyt4WWxyc3p6QWhlZFNlcW54QjJaeHBMb2VCZFR5NW0yMk1Yd1BQeFZHaU1G?=
+ =?utf-8?B?VnQ4ZUp2aWFpV0lscGtnOS9OU1pMZEk5bGYrYWdmNk56SHVZOUFDanRiWGlH?=
+ =?utf-8?B?NzNTNVUwa2ltUkQxSEJDNVoyZmZUUlhRVHpoOTJOQzZ0ME9XS0tmQW4wZ2Ux?=
+ =?utf-8?B?MStzRjFMQjdCdUFYdFhoR0hOM012bnhsd242RWpBcFBvd25uaDZHZDNHSGxv?=
+ =?utf-8?B?MTlrMXNYem5ja1N2SmU5N0RVZi9vSWxNU3p5SUlveEFDdElqY0JpYWhYMWNR?=
+ =?utf-8?B?NERPVjBSZjFicEdzSSt6clYyT1ZEa2t6ODJWQ3hndlVnaDM2Smx1RG9GaXFy?=
+ =?utf-8?B?WG9NS2FHVkMvK04yck5Zc1JOaHI2RjJLVHZyRG1QUnJ0TXJoYUY2RkpNcUFR?=
+ =?utf-8?B?QkpVbUJWN3V0dDE3U2pDRkREakhDL1NySU53YmtYUkRYSmkzMm9lN1dGVGRq?=
+ =?utf-8?B?Um9sdjE2SGVnQitsYngzbUN3bUZ4ZG9laGJyNWczTmlTMmhiMmJlTzJGb0Fw?=
+ =?utf-8?B?S3o3VC9WeHQ5Vi9JckgwZlFzTzc2QlJQWm1MdDJ6VUlkZUlWV1V3aytQNTFz?=
+ =?utf-8?B?Y2kxdEdmemkrMEc5eFFCUlB0WUdiRk81eFArRmZOOEhEMkFhRktrdnBJMkd0?=
+ =?utf-8?B?MEVYWlNlalo5WXJmN2ljenlNQ0Ura2NjY3hMN1h0ZXA1U0p6Z0tSTThGcWs5?=
+ =?utf-8?B?MU8waDhoRlE2SDVWZkJmbzZ6Wm9rR0RIUnpyRzlYQzRSQTNLekoxVURUZG5V?=
+ =?utf-8?B?Z2lnNG53MnRmdkFtbVlzdWVaQ0xhZFJkWG1kRmlicSthQy9nbzdycDdZT090?=
+ =?utf-8?B?U0NXbzBlcndyak1uRVFOTUowUm95Z3Y4QzRObG5rT2NSSHE2NGlodkZFcjlx?=
+ =?utf-8?B?Yy80T1N3U3RDdyt6UlI0RmZpcFowQWpJM29vanVIajNWa0llakdoMEdVN3Ra?=
+ =?utf-8?B?TTRCMWlMUVFYeWI2RmVVZS9SUTI3eVpHRUhEc2d2bk15ZnBoQ2owT1dNWWMr?=
+ =?utf-8?B?MTJEem5ySzExRkUxNkJTSEtURGhUeGxkZUlMNkpTTm0xZ1VFd1ZOTERXbmwy?=
+ =?utf-8?B?YzhRR3NHU1V1YUkwditoM1JCalVxd2M2T3RaYXZMTjJzRkJuUjE2YWtMa0dy?=
+ =?utf-8?Q?Mdi6WRIfE6EK7oxJTtmxUxGdeOf14mWDT3j/lzZ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR10MB6425.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NWpQT2JvT01TOWFxclFMaDRGZmlNWm1QcDFOU1dXK2gvK2ZEWlNxWklWZHNx?=
- =?utf-8?B?S0h1UkxXU042S1BsNElqUUp5dWZsdlhNcFRVRC9WWEprTnl0aTM1eDkzY1Rr?=
- =?utf-8?B?eVk3S1NzMmxlazNNUjMwWWkxcU5OMkRkbEZGRnkyQXhnZGIxbWM3Z3JlWUVV?=
- =?utf-8?B?U2xqKzBZU1VCQk9pSFpxd3dLWk5aWjNMbXRDV3hKa2dzbUJXb255OUlwM1Fi?=
- =?utf-8?B?ZW1jUmczSW5ubGZvU1dLYm42NTd1c3lVMFRKSjBET1RzM0dFWm1vcGExRnNx?=
- =?utf-8?B?NVN3alZXYVFYOVZLTXViZlFMMWQ2MlpnUStuQlpiaUg5OEpud2F6Rlg3RFhk?=
- =?utf-8?B?d0NXbUFvTFFJOXNFUXlOSlREMzNLZmNBSFc5VVJpdlpBTVAzMVJzck16Vnd4?=
- =?utf-8?B?S210RmFoVnZndjhZWW9rYXFJVGlnUk5vMEI4S29wcUFKbHpLaFdGc3JjNDY5?=
- =?utf-8?B?NXozV3MzWS9yRXlDcnRBNTBCemppSzBaZ0RjekRzVnFpZGdRb3lwNlF1YnAr?=
- =?utf-8?B?dFUrNTJyQnJPcmQxZkJUZlg0a1lRa0thd0d4WktXMlRZOC93bUNmblBSWUlI?=
- =?utf-8?B?YysyQlVueHp2VzBabGRJbFN6Z3ZRd2RsMWpQSXVhQUdhL2pOZWlRSVRTVDhR?=
- =?utf-8?B?U1FXekE5RjRzcTBzblBCeXdOSDZaekFzQWh4Nzg4aGRBWmpveVV3WUVlVlFB?=
- =?utf-8?B?WHhFTzZaalBKWndlazRQN3RlNVFsd00vOWpJVVo4ZE56djlHTVlydHFZdWtO?=
- =?utf-8?B?N1dvbGJtdG1ycGFZV3h5WDRENzRlMHpQTDdLQVRRc3hsZG1zbXR4RDFvTEFI?=
- =?utf-8?B?TENvT3hBRU9SUVRYSm5GdGFNb2xjWC9oU1NCeE1vVVdBam92SDNCQXlIRWFl?=
- =?utf-8?B?cW9VSTg0Y1lUaENoZnhPMDZXallHNk43UGlYazNSNHJVY1c2QVFueHhZSk1m?=
- =?utf-8?B?RkVQSXoxalpXMERScWRobmxJbUtQSnRyZzc0L0VuWkZUT3kwTis5eWg5RUxI?=
- =?utf-8?B?STJKSXRVeFRQYk5rZkduK3pobmpXcWJYa3p4bjVodjlBdDVXU2lodzVab0VZ?=
- =?utf-8?B?RHhad090cktHUWg5NXpBZlR1ZkNyVktHS1hnaE5tMVVEZnA0bU4rekYvcmVQ?=
- =?utf-8?B?Y2MwQjhhZXpVam94U2dNR2pGWG1hcm5IMXd1cVN1WWdkWW9RY0RFK3kybHdj?=
- =?utf-8?B?U2RUb1VkWUZGaHorOWxGSWwwM0ladlRYS3RzS2F3WGl3NlZKMTh3UUkzNEly?=
- =?utf-8?B?eng0MERNbFUyb0lVSWl0NlV0dkkvai9EZ1V1QWVhVFMxTVBjZE5BK1JHZG9D?=
- =?utf-8?B?Y3pZSkh6VVhFblU0ZnZIb0N4NHJaL2FtQ1J5WUtNTTBoWlRGVHcwSUxVT0RJ?=
- =?utf-8?B?VWJPQm5kL2ViYmt0RE0zamFHZXdkMWU0Z3o2NWFCckdXRDk1Q0p4YXdpRnBT?=
- =?utf-8?B?V1U5bXJGQlJJaVc3V2ZLNU5PaEJzVStYZWRpZUxxelczNFNwdkRNR3FIWHBQ?=
- =?utf-8?B?c0V4Mmd5d1BCSGZlREVPZ25oT1dYamR3UktDSklKcEJEY1BmTW5OakVQVFdG?=
- =?utf-8?B?YXBsczVYT09Jb1MzbEFFUG9JUWhQZnRaWGtRcVp3cklkQVRhZzJ6b3dlakZL?=
- =?utf-8?B?aFBpWXRNTnZWY3ZqcWE4Tlhsb3A0NDU1alE4dkdUL1Z3UFdBL1BxY1lsci9a?=
- =?utf-8?B?ME5SVkhuakNKQUpTTzFCdks0cmRuQWZpS3l0cVhCUzY5cUwvakxrQnhDeWpp?=
- =?utf-8?B?bzgvTXhDbmxDb3dnQVBQNk1qQ0NQYlZDSW9PM2RSVXJ3VFA4bjNlNWpmeC9K?=
- =?utf-8?B?UVU5anZneGp2WXF5TXhiQUs0NU9FUTBiMVRDbFFzZmhKTHp0VUxxY0ZIUjlX?=
- =?utf-8?B?M0dhemJzWHFDYzBjWC9VOVdSZml1V0duNGpKa0V6VjFiajY4eVdBeWNoOGZZ?=
- =?utf-8?B?QWgxYkZYL0NKUkNZMXpIYVIrdWErM0xhckZ0UzVoQitrbXBIREFLL09ZMm51?=
- =?utf-8?B?L3ZsTTE4VTNCaG43WG1qZGZjeEFRSzZFcVFocnkzeGdydUJOOWdqaEVjOU5W?=
- =?utf-8?B?N3dNbURYdlZnMmt2MGJmUWJUMWdmMW5sVlQzZHNQeGhLZy9Ec2dLd0VQU1p6?=
- =?utf-8?Q?Zdyy+hAXc/RH54C3jW+07hxrE?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4b52a2c-ca52-4a10-20ce-08dcff8375b3
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bTYzOGtzN1NhTzBHeXNZYjI0UXF0ODJ2d25NTEQ2RUVWdlh1citTdlo2dE9T?=
+ =?utf-8?B?Q1ExeHFRS3pEWWVCNXNobzZadGE0UG9PZ3M4Z2o5NU5YQ3BRTjVBeExQR29V?=
+ =?utf-8?B?MU9JT2NleVhNSFZMSzIyUmhITVpZUnNiRnV6MjlJdnR1QmdueTBLUXpnQ1BG?=
+ =?utf-8?B?OW8zOTg1MWtKdEpzNmVRQU5RQ2JxZVo4QUo1K2dBOERKenYyeG1SRU80SExP?=
+ =?utf-8?B?ODZTSkl0VkdsUG91djQvbEpIbytUNzNXQzdVWlNseXhaazBmNzdJUmRQSjNm?=
+ =?utf-8?B?S3g2N2p3VjlWL1V5K3Irdm5nVldiazZMMnQ5Nm9ZQ01KSGFqdERVRDVyS3dq?=
+ =?utf-8?B?NWxHa0t6ODRmcXk1VTZtekZGaXB0VzZNbmJSVFAyaU45LzhKTTFjMFhDUkpu?=
+ =?utf-8?B?bDBSeVZycUg3TytKN05HZ0hWam9vOXp0RURXbTRsUFE2Nm9SSFFKR3BPMkUx?=
+ =?utf-8?B?cTQ3VVZLTnU1V2R2VWRibXdhc2dPWnowbnExa3lCQ1hFdzhRNEE5OE5RSXdh?=
+ =?utf-8?B?TVhhaC9TSytUMjNrVjRzQkRzSWFoaThoUkZ0bDhIOTJzS0ZSKzVMOW9SVCtZ?=
+ =?utf-8?B?WFFock9vRlRZSEV3NzU3WFdoZ0tCRnF4Y3g4eTRsRE9Fc1d1bW1FY0trdXV1?=
+ =?utf-8?B?ZnY4VlBxSFRydStEdUNMaXBQT2JCeG1JTmVIZ09LOGFJU2dUUHdZLzhMaGVM?=
+ =?utf-8?B?ZUZ3NTM5bndZRytTNkowMnJvWUgvc0V3ZkRmcTN0WHQwNnZVRUk5RnZNYkF2?=
+ =?utf-8?B?VWVPQXQ4WmdnblI5Nk54T1JxeHNoVlRMN1JBZWlybXRKSVN5VFRoQk5mZXJo?=
+ =?utf-8?B?Vzl3aGE0ZkhicmhJelJ2MzYzSlBMRUdQUWV6eTlvNTkyYWlsSk9kQ2tnWDNN?=
+ =?utf-8?B?SzI5SmZ0KzZzamhpVml6U25rZFhIaVUxMmJta3FybXlIRkhpUllKRXkzNm1U?=
+ =?utf-8?B?NzM0UFkzSlZoWXZsbnB1d29heUxuTnhlSmJiWnhtVjlFcUV5dmowSHBDMHpK?=
+ =?utf-8?B?QmZrVTVMU0pqNXdJRG0xbks3bWhXOHFoMVRCMnNZeEg3bnVqdkJUcENFL3pY?=
+ =?utf-8?B?V1RsOWx3SlRvZUd4RDZvTFYwbHU2V2JHOVFUYWtobndZUWp2Q1hOeUdaU0FQ?=
+ =?utf-8?B?cDFGMnpQNWN6a0ZDOGpuNElVb1BtSkFjcDJOTEZ2NXp6YnpNUkkvaWEwcTBk?=
+ =?utf-8?B?cWcwTUs4dzQ3dklzUHZTcDNWVG9RU0VlckcwalRGSHlVWjlIcWtHQjVHNnk3?=
+ =?utf-8?B?RlRaTW1rMS9TdDdFOTNONmwvQU9hNExXQkNXV2tWaWR2MkZudC9mSTJ3Y2FF?=
+ =?utf-8?B?dkUwT0lBbUJDMmswcUVCa0VzeFc3QjcrV09CczE2cGMxZnM0Zk44d2lURGVz?=
+ =?utf-8?B?U2xRTThOaDZxVURjVFlTUnFId1pBeTBVYWM1eDB1Q0lBZTFPck1wTjE3WWVv?=
+ =?utf-8?B?WVBCaE9qM2ZVU2JQWmNmK2FYQXF4WmExdWwzY2V5MjNGOVYxMzdZYURTSkJR?=
+ =?utf-8?B?dmZENFZQbzcyOTBTNWpBbGhPd200TFl6aXdYSzNTRnk4MkRPRkJ1Q0JydlVu?=
+ =?utf-8?B?d21LZldaZlFBNE4ycHNFeDlJeXRNNy93L3c2dFdIb040SU5rRmx5b1UwOEti?=
+ =?utf-8?B?VU9XVzRRUGFwa0VVWmI3NDFMNk9KMUFyeDczVlVTdFYzL25peXcxVGk0VUUy?=
+ =?utf-8?B?NE5XMWRNSDAraWJpKy9wSVhGak9xamhtVTIxRFpNRFNuSHZjQ1N3TXFpSk5o?=
+ =?utf-8?B?WXZjcnEyaktGRnRKUHlXMXBGNTJ4QTR2UDl3MG5RejdQVTNSWm9BdVVQaklH?=
+ =?utf-8?B?Ym1lT05lbEZjbW5pZFc5MitMSzRvUVVianlzbTFObXp0VjQ1aWpaRjVHKzFG?=
+ =?utf-8?B?QjJrY3VabnpxY24vYzNDZlZoWUI5VXJIS3VkamQwOWtvNXpkZ1ljUGJicG83?=
+ =?utf-8?B?cEhNVXNwcE5KTERJSmVZNllpcHRScCt2VkJCUGQyTC9VbXd3ZUNSNHNQMjIw?=
+ =?utf-8?B?ck5xUmZpTjJNTW5Odi9HTGh1dG54d1QrNXBTVG1LU3RTbWptV2Z1VzdoYjh1?=
+ =?utf-8?B?MlFJMFJLZi8xTjRLK1VraDg5QU80QngySzZzeGRKM0xrSGsxdTk4MkpRWjhH?=
+ =?utf-8?Q?pbVcFCCzGzS5CJRzQGK9IPAkl?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	DuiqHzTpWZS0jrXox7AmjHbYX2T+xO+psWtDlVYRHlPxrpAG9WMFNhV5uO4y3W4h2kBWTqP2NIpO/MEruqDjdXYBWzdQNYgKjKL/szbTY9xqTCMowsA2jYL05jqGd0kVHSJnaT751M+1IsZBv1c5srjiDJYjyyvx+kW3KPH8oq/V1yYZfTMtM6m2xGls2nPqCS1ZN2q5gzXb2fStx7vpLKBZmzjhNxurPiADtRYk7xI54xJSr1BhQ6aiIcBYoRQlc8hie8xfI07FJM9AdZAjWm2rMLIE7k8GZYeQqUTcoTf3RHuNfd9OltOpzIpnrzxCYw4OQ43fncPKI7F3gtE085xetWGE+AZ7iN+T18GDtYpNP8fJ1yRfo/n+JOiAQzGHy47EuWKFHRtCR/7xz1zyF3lHdVw37SGCizSXMWBJXQgStqMpllu1HExH2UvZq+iULRkyjIz4VnEIFAMhOJqIJ2UNFGVAPQ/JiLGJbwb8WdKWpTAI8MY32rCT3XAyIXcdbEegRMnwnRy0AHMMd4uZh66irDmZ6jX1ouEcxln7eB+tRO30onyoixvbUly4/c503B9poL4uVHaXoSVyeZAIC/h1C2BnE+BuEwhfXC86bhs=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b9100f4-4ef9-41bb-4966-08dcff863229
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR10MB6425.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2024 23:25:26.2232
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2024 23:45:01.3924
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zjedj/lwNhW6yXE6AsiPyJglzNxvq41mMXfQ8/YTNTpsYx3ZU0R3THrzdCIFT8T21P4BlW9TDDh3c0JVsUVEKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8346
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: XfjSyN5URLQPuYYhJHVnCWBE+d4cuJxlY2MeVpy68jp4l/ieqif7a6roLYsExFiu8ybbL9yk5uJ9L1ZV8nOoLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4777
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-07_10,2024-11-07_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ adultscore=0 phishscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
+ definitions=main-2411070185
+X-Proofpoint-ORIG-GUID: AGPUmh_NKTDFZjyLsUz53TiZd30yNAKg
+X-Proofpoint-GUID: AGPUmh_NKTDFZjyLsUz53TiZd30yNAKg
+
+Hi Zhao,
 
 
-
-On 8/11/2024 11:04 am, Sean Christopherson wrote:
-> On Wed, Nov 06, 2024, Kai Huang wrote:
->> On Wed, 2024-11-06 at 07:01 -0800, Sean Christopherson wrote:
->>> On Wed, Nov 06, 2024, Kai Huang wrote:
->>>> For this we only disable TDX but continue to load module.  The reason is I think
->>>> this is similar to enable a specific KVM feature but the hardware doesn't
->>>> support it.  We can go further to check the return value of tdx_cpu_enable() to
->>>> distinguish cases like "module not loaded" and "unexpected error", but I really
->>>> don't want to go that far.
->>>
->>> Hrm, tdx_cpu_enable() is a bit of a mess.  Ideally, there would be a separate
->>> "probe" API so that KVM could detect if TDX is supported.  Though maybe it's the
->>> TDX module itself is flawed, e.g. if TDH_SYS_INIT is literally the only way to
->>> detect whether or not a module is loaded.
+On 11/6/24 11:52 PM, Zhao Liu wrote:
+> (+Dapang & Zide)
+> 
+> Hi Dongli,
+> 
+> On Mon, Nov 04, 2024 at 01:40:17AM -0800, Dongli Zhang wrote:
+>> Date: Mon,  4 Nov 2024 01:40:17 -0800
+>> From: Dongli Zhang <dongli.zhang@oracle.com>
+>> Subject: [PATCH 2/7] target/i386/kvm: introduce 'pmu-cap-disabled' to set
+>>  KVM_PMU_CAP_DISABLE
+>> X-Mailer: git-send-email 2.43.5
 >>
->> We can also use P-SEAMLDR SEAMCALL to query, but I see no difference between
->> using TDH_SYS_INIT.  If you are asking whether there's CPUID or MSR to query
->> then no.
-> 
-> Doesn't have to be a CPUID or MSR, anything idempotent would work.  Which begs
-> the question, is that P-SEAMLDR SEAMCALL query you have in mind idempotent? :-)
-
-It is the SEAMLDR.INFO SEAMCALL, which writes bunch of information to a 
-SEAMLDR_INFO structure.  There's one bit "SEAM_READY" which (when true) 
-indicates the TDX module is ready for SEAMCALL, i.e., the module is loaded.
-
-And yes it is idempotent I believe, even we consider TDX module runtime 
-reload/update.
-
-The problem is it is a SEAMCALL, and being a SEAMCALL requires all 
-things like enabling virtualization first and adding another wrapper API 
-and structure definition to do SEAMLDR.INFO (and we are still in 
-discussion how to export SEAMCALLs to let KVM make).
-
- From this perspective, I don't see a big difference between using 
-SEAMLDR.INFO and tdx_cpu_enable() for probing TDX.
-
-I agree we can change to use SEAMLDR.INFO to detect in the long term 
-after we move VMXON out of KVM, though, because we can get a lot more 
-information with that besides whether module is loaded.  But before 
-that, I see no big difference.
-
-> 
->>> So, absent a way to clean up tdx_cpu_enable(), maybe disable the module param if
->>> it returns -ENODEV, otherwise fail the module load?
+>> The AMD PMU virtualization is not disabled when configuring
+>> "-cpu host,-pmu" in the QEMU command line on an AMD server. Neither
+>> "-cpu host,-pmu" nor "-cpu EPYC" effectively disables AMD PMU
+>> virtualization in such an environment.
 >>
->> We can, but we need to assume cpuhp_setup_state_cpuslocked() itself will not
->> return -ENODEV (it is true now), otherwise we won't be able to distinguish
->> whether the -ENODEV was from cpuhp_setup_state_cpuslocked() or tdx_cpu_enable().
+>> As a result, VM logs typically show:
 >>
->> Unless we choose to do tdx_cpu_enable() via on_each_cpu() separately.
+>> [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
 >>
->> Btw tdx_cpu_enable() itself will print "module not loaded" in case of -ENODEV,
->> so the user will be aware anyway if we only disable TDX but not fail module
->> loading.
-> 
-> That only helps if a human looks at dmesg before attempting to run a TDX VM on
-> the host, and parsing dmesg to treat that particular scenario as fatal isn't
-> something I want to recommend to end users.  E.g. if our platform configuration
-> screwed up and failed to load a TDX module, then I want that to be surfaced as
-> an alarm of sorts, not a silent "this platform doesn't support TDX" flag.
-> 
->> My concern is still the whole "different handling of error cases" seems over-
->> engineering.
-> 
-> IMO, that's a symptom of the TDX enabling code not cleanly separating "probe"
-> from "enable", and at a glance, that seems very solvable.  
-
-I am not so sure about this at this stage, because you need to make a 
-SEAMCALL anyway for that. :-)
-
-I think we can document this imperfection for now and enhance after 
-moving VMXON out of KVM.
-
-Btw we are going to add P-SEAMLDR SEAMCALLs to support TDX runtime 
-reload/update anyway, so we can add SEAMLDR.INFO there (or before that...).
-
-> And I suspect that
-> cleaning things up will allow for additional hardening.  E.g. I assume the lack
-> of MOVDIR64B should be a WARN, but because KVM checks for MOVDIR64B before
-> checking for basic TDX support, it's an non-commitalpr_warn().
-
-Yeah if we check TDX_HOST_PLATFORM first then we can WARN() on MOVDIR64B.
-
-> 
->>>> 4) tdx_enable() fails.
->>>>
->>>> Ditto to 3).
->>>
->>> No, this should fail the module load.  E.g. most of the error conditions are
->>> -ENOMEM, which has nothing to do with host support for TDX.
->>>
->>>> 5) tdx_get_sysinfo() fails.
->>>>
->>>> This is a kernel bug since tdx_get_sysinfo() should always return valid TDX
->>>> sysinfo structure pointer after tdx_enable() is done successfully.  Currently we
->>>> just WARN() if the returned pointer is NULL and disable TDX only.  I think it's
->>>> also fine.
->>>>
->>>> 6) TDX global metadata check fails, e.g., MAX_VCPUS etc.
->>>>
->>>> Ditto to 3).  For this we disable TDX only.
->>>
->>> Where is this code?
+>> whereas the expected logs should be:
 >>
->> Please check:
+>> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+>> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
 >>
->> https://github.com/intel/tdx/blob/tdx_kvm_dev-2024-10-25.1-host-metadata-v6-rebase/arch/x86/kvm/vmx/tdx.c
+>> This discrepancy occurs because AMD PMU does not use CPUID to determine
+>> whether PMU virtualization is supported.
+> 
+> Intel platform doesn't have this issue since Linux kernel fails to check
+> the CPU family & model when "-cpu *,-pmu" option clears PMU version.
+> 
+> The difference between Intel and AMD platforms, however, is that it seems
+> Intel hardly ever reaches the “...due virtualization” message, but
+> instead reports an error because it recognizes a mismatched family/model.
+> 
+> This may be a drawback of the PMU driver's print message, but the result
+> is the same, it prevents the PMU driver from enabling.
+> 
+> So, please mention that KVM_PMU_CAP_DISABLE doesn't change the PMU
+> behavior on Intel platform because current "pmu" property works as
+> expected.
+
+Sure. I will mention this in v2.
+
+> 
+>> To address this, we introduce a new property, 'pmu-cap-disabled', for KVM
+>> acceleration. This property sets KVM_PMU_CAP_DISABLE if
+>> KVM_CAP_PMU_CAPABILITY is supported. Note that this feature currently
+>> supports only x86 hosts, as KVM_CAP_PMU_CAPABILITY is used exclusively for
+>> x86 systems.
 >>
->> .. starting at line 3320.
+>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>> ---
+>> Another previous solution to re-use '-cpu host,-pmu':
+>> https://urldefense.com/v3/__https://lore.kernel.org/all/20221119122901.2469-1-dongli.zhang@oracle.com/__;!!ACWV5N9M2RV99hQ!Nm8Db-mwBoMIwKkRqzC9kgNi5uZ7SCIf43zUBn92Ar_NEbLXq-ZkrDDvpvDQ4cnS2i4VyKAp6CRVE12bRkMF$ 
 > 
-> Before I forget, that code has a bug.  This
+> IMO, I prefer the previous version. This VM-level KVM property is
+> difficult to integrate with the existing CPU properties. Pls refer later
+> comments for reasons.
 > 
-> 	/* Check TDX module and KVM capabilities */
-> 	if (!tdx_get_supported_attrs(&tdx_sysinfo->td_conf) ||
-> 	    !tdx_get_supported_xfam(&tdx_sysinfo->td_conf))
-> 		goto get_sysinfo_err;
+>>  accel/kvm/kvm-all.c        |  1 +
+>>  include/sysemu/kvm_int.h   |  1 +
+>>  qemu-options.hx            |  9 ++++++-
+>>  target/i386/cpu.c          |  2 +-
+>>  target/i386/kvm/kvm.c      | 52 ++++++++++++++++++++++++++++++++++++++
+>>  target/i386/kvm/kvm_i386.h |  2 ++
+>>  6 files changed, 65 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index 801cff16a5..8b5ba45cf7 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -3933,6 +3933,7 @@ static void kvm_accel_instance_init(Object *obj)
+>>      s->xen_evtchn_max_pirq = 256;
+>>      s->device = NULL;
+>>      s->msr_energy.enable = false;
+>> +    s->pmu_cap_disabled = false;
+>>  }
 > 
-> will return '0' on error, instead of -EINVAL (or whatever it intends).
+> The CPU property "pmu" also defaults to "false"...but:
+> 
+>  * max CPU would override this and try to enable PMU by default in
+>    max_x86_cpu_initfn().
+> 
+>  * Other named CPU models keep the default setting to avoid affecting
+>    the migration.
+> 
+> The pmu_cap_disabled and “pmu” property look unbound and unassociated,
+> so this can cause the conflict when they are not synchronized. For
+> example,
+> 
+> -cpu host -accel kvm,pmu-cap-disabled=on
+> 
+> The above options will fail to launch a VM (on Intel platform).
+> 
+> Ideally, the “pmu” property and pmu-cap-disabled should be bound to each
+> other and be consistent. But it's not easy because:
+>  - There is no proper way to have pmu_cap_disabled set different default
+>    values (e.g., "false" for max CPU and "true" for named CPU models)
+>    based on different CPU models.
+>  - And, no proper place to check the consistency of pmu_cap_disabled and
+>    enable_pmu.
+> 
+> Therefore, I prefer your previous approach, to reuse current CPU "pmu"
+> property.
 
-Indeed.  Thanks for catching this.  I'll report to Xiaoyao.
+Thank you very much for the suggestion and reasons.
+
+I am going to follow your suggestion to switch back to the previous solution in v2.
 
 > 
-> Back to the main discussion, these checks are obvious "probe" failures and so
-> should disable TDX without failing module load:
+> Further, considering that this is currently the only case that needs to
+> to set the VM level's capability in the CPU context, there is no need to
+> introduce a new kvm interface (in your previous patch), which can instead
+> be set in kvm_cpu_realizefn(), like:
 > 
-> 	if (!tdp_mmu_enabled || !enable_mmio_caching)
-> 		return -EOPNOTSUPP;
 > 
-> 	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
-> 		pr_warn("MOVDIR64B is reqiured for TDX\n");
-> 		return -EOPNOTSUPP;
-> 	}
+> diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+> index 99d1941cf51c..05e9c9a1a0cf 100644
+> --- a/target/i386/kvm/kvm-cpu.c
+> +++ b/target/i386/kvm/kvm-cpu.c
+> @@ -42,6 +42,8 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
+>  {
+>      X86CPU *cpu = X86_CPU(cs);
+>      CPUX86State *env = &cpu->env;
+> +    KVMState *s = kvm_state;
+> +    static bool first = true;
+>      bool ret;
+> 
+>      /*
+> @@ -63,6 +65,29 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
+>       *   check/update ucode_rev, phys_bits, guest_phys_bits, mwait
+>       *   cpu_common_realizefn() (via xcc->parent_realize)
+>       */
+> +
+> +    if (first) {
+> +        first = false;
+> +
+> +        /*
+> +         * Since Linux v5.18, KVM provides a VM-level capability to easily
+> +         * disable PMUs; however, QEMU has been providing PMU property per
+> +         * CPU since v1.6. In order to accommodate both, have to configure
+> +         * the VM-level capability here.
+> +         */
+> +        if (!cpu->enable_pmu &&
+> +            kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY)) {
+> +            int r = kvm_vm_enable_cap(s, KVM_CAP_PMU_CAPABILITY, 0,
+> +                                      KVM_PMU_CAP_DISABLE);
+> +
+> +            if (r < 0) {
+> +                error_setg(errp, "kvm: Failed to disable pmu cap: %s",
+> +                           strerror(-r));
+> +                return false;
+> +            }
+> +        }
+> +    }
+> +
+>      if (cpu->max_features) {
+>          if (enable_cpu_pm) {
+>              if (kvm_has_waitpkg()) {
+> ---
 
-Yeah sure.
+Sure. I will limit the change within only x86 + KVM.
 
 > 
-> A kvm_find_user_return_msr() error is obviously a KVM bug, i.e. should definitely
-> WARN and fail module module.  Ditto for kvm_enable_virtualization().
-
-OK agreed.
-
+> In addition, if PMU is disabled, why not mask the perf related bits in
+> 8000_0001_ECX? :)
 > 
-> The boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM) that's buried in tdx_enable()
-> really belongs in KVM.  Having it in both is totally fine, but KVM shouldn't do
-> a bunch of work and _then_ check if all that work was pointless.
 
-Fine to me.
+My fault. I have masked only 0x80000022, and I forgot 0x80000001 for AMD.
 
-> 
-> I am ok treating everything at or after tdx_get_sysinfo() as fatal to module load,
-> especially since, IIUC, TD_SYS_INIT can't be undone, i.e. KVM has crossed a point
-> of no return.
-> 
-> In short, assuming KVM can query if a TDX module is a loaded, I don't think it's
-> all that much work to do:
-> 
->    static bool kvm_is_tdx_supported(void)
->    {
-> 	if (boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM))
-> 		return false;
-> 
-> 	if (!<is TDX module loaded>)
-> 		return false;
-> 
-> 	if (!tdp_mmu_enabled || !enable_mmio_caching)
-> 		return false;
-> 
-> 	if (WARN_ON_ONCE(!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)))
-> 		return false;
-> 
-> 	return true;
->    }
-> 
->    int __init tdx_bringup(void)
->    {
-> 	enable_tdx = enable_tdx && kvm_is_tdx_supported();
-> 	if (!enable_tdx)
-> 		return 0;
-> 
-> 	return __tdx_bringup();
->    }
+Thank you very much for the reminder.
 
-Thanks for clarifying this.
 
-As mentioned above, I would say we just use tdx_cpu_enable() to "probe" 
-whether module is present before moving VMXON out of KVM.  We can 
-document this imperfection for now and revisit later.
+I will wait for a day or maybe the weekend. I am going to switch to the previous
+solution in v2 if there isn't any further objection with a more valid reason.
 
-How about:
+Thank you very much for the feedback!
 
-static bool kvm_can_support_tdx(void)
-{
-	if (boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM))
-		return false;
-
-	if (!tdp_mmu_enabled || !enable_mmio_caching)
-  		return false;
-
-	if (WARN_ON_ONCE(!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)))
-		return false;
-}
-
-int __init tdx_bringup(void)
-{
-	int r;
-
-	enable_tdx = enable_tdx && kvm_can_support_tdx();
-
-	if (!enable_tdx)
-		return 0;
-
-	/*
-	 * Ideally KVM should probe whether TDX module has been loaded
-	 * first and then try to bring it up, because KVM should treat
-	 * them differently.  I.e., KVM should just disable TDX while
-	 * still allow module to be loaded when TDX module is not
-	 * loaded, but fail to load module at all when fail to bring up
-	 * TDX.
-	 *
-	 * But unfortunately TDX needs to use SEAMCALL to probe whether
-	 * the module is loaded (there is not CPUID or MSR for that),
-	 * and making SEAMCALL requires enabling virtualization first (
-	 * like the rest steps of bringing up TDX module).
-	 *
-	 * For simplicity, do the probing and bringing up together for
-	 * now.
-	 *
-	 * Note the first SEAMCALL to bringing up TDX will return
-	 * -ENODEV when module is not loaded, and this serves the probe
-	 * albeit it is not perfect.
-	 *
-	 * Another option is using P-SEAMLDR's SEAMLDR.INFO SEAMCALL to
-	 * probe, but it is still a SEAMCALL.  Currently kernel doesn't
-	 * support P-SEAMLDR SEAMCALLs so don't bother to add it just
-	 * for probing TDX module.
-	 *
-	 * Again, this is not perfect, and can be revisited once VMXON
-	 * is moved to the core-kernel.
-	 */
-	r = __tdx_probe_and_bringup();
-	if (r) {
-		enable_tdx = 0;
-		/*
-		 * Disable TDX only but don't fail to load module when
-		 * TDX module is not loaded.  No need to print error
-		 * message since __tdx_probe_and_bringup() already did
-		 * that in this case.
-		 */
-		if (r == -ENODEV)
-			r = 0;
-	}
-	
-	return r;
-}
-
+Dongli Zhang
 
 
