@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-31200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CAFC9C1276
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:31:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB1B9C1278
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 00:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C090D1C21D00
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E772880A4
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF9B21F4BF;
-	Thu,  7 Nov 2024 23:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5AE21A4A6;
+	Thu,  7 Nov 2024 23:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9n5jryM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4dEhn4k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3387321C170
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 23:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CB021C189
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 23:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731022142; cv=none; b=gdyZ2JiaHaqtgSjYmthZdrg9Qrm1xUo4y668oeIL7tM/megcLJhvGo+B6Eqqt0GRB+U/u3JJg9BcFWJd2iBrUPnTTzFpeZNtm0wHOO+bR2BL7VaMRJzoIKY9hZMV3Nuiav8bSq2Bo1B8M2Md+i5YQ4H9Q/HyswWFigBl6y26/3M=
+	t=1731022145; cv=none; b=QzV0FbNZpMFPdriCHW8CljCm/MnhzoNXiXMbujDYoumJGBA2Y3r6OhUFd3887yI+fRefrZFlYZP01LHxbNFgFUZ0OXnUwoOs67Zu/X8RhRlUaj21mEZEk4tSyXjDxeVyPE4KkDgOAtz0inmoLOmXk82qzMPcjfEJpSPClKUwA04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731022142; c=relaxed/simple;
-	bh=6WWSW1vJ35TJDlbJJB5qq6nYTs9fwiNRbSVBdPgx3NQ=;
+	s=arc-20240116; t=1731022145; c=relaxed/simple;
+	bh=1I6XFvUtmCom2RZyjUxF7YPvoFnwsK/7UmqVzImMUPU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t2bncRw7crBGKqjXaxI7u5n14Ger3m9IWm6Papf40Rd++Fwv9LdHhWQ2A94nhHKGcBttL1Ih7WFdCVdgh9TGooLP+2kSxWYk3x6ArqPuRjgQ0KXn2TXrmEGmNS3H++nvHH/T11dTxfB7ObLtliFry8EE5+k3uOCbjB7odx6pD5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9n5jryM; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=S2eYhUJTd5ddp5GfTzZ4dBznXuxG9MgYK1jutqkTGI1/z+ZMkFsLisx7BPFBqbCKB0Rmw6xCIHrMJgkFie+oUGqJ4WI7nSamCn86Splf1uzJ3UZx/Z1F2SDfqzqZmacY+7ysHSuhRfL1kWI6xBJorL9IHMSuD4ECdiOHsUX1aqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4dEhn4k; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7202dfaa53fso1842053b3a.0
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 15:29:01 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20d54663b3fso14810505ad.0
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 15:29:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731022140; x=1731626940; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731022143; x=1731626943; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
-        b=t9n5jryMvuxkkLWzOEvxOf01La2djguOC4Dy8Pi7tlZFHGjTvc3fxMJXG70s6oFVdo
-         LQKfu6pHNNaGvzbwgppBXuvphJU8kBe/+DE+Q3pV27iNIO9NUwxZkprJumGYosp2BELU
-         tB5RZ1YgLlSGRWoXc8CdWsritPKklLh4GMjBpjExxdv33XtSYfv9dzdw0JzQ9AQqD5Qh
-         LaRjJQN8dSeasmH3IIJodo84UiRgM7hQwcf1G08fBQN7HK/A+AbG45BE0sgfBiFKpSus
-         TbXH+dckazAnqosLEulcJKWWVZghweLe+jGQrsm1A492gIV06nkEYJO+/7Qonbjxcysq
-         5SaQ==
+        bh=6Qcg1fuqFpd6J4LqEu191n3/4PbMXxCo3T2JUFbEGZc=;
+        b=J4dEhn4kNJzn033fZjqurEcfCqnViIII/QHBYnup2gy17ZYz6rrplNX0Ta3LD2auxA
+         UwVkNDqV9W6Jzb96ScgvQMo+CRlO4SO6xVmeDdM+VcHJPYFbZX06WQSqpd0x9aFtFM4s
+         rQWsbQgVPsUXeWqTvc2bBU4LK5McfqrhTkBKXx2crY6KcCoxuEpK5lZKH3vqsqGPm3cu
+         M45F+21ll6fNohFUlZzsqQXyJCeNkfI4jP/Xq3PuY3/TbZObiWYhFpR+9431HFxWOaCg
+         pYZLIca9WF0fHU110n2lzCuG5CPxuUVcSVIc7xrIxS/l//Atazru9zWDnqNdkO542jAw
+         qjVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731022140; x=1731626940;
+        d=1e100.net; s=20230601; t=1731022143; x=1731626943;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
-        b=Lk/Iv1/NnmAK1C9LQIFWGobmLSTSGZhtkG/OrT8uw0FdWopcHoSrtMlDIfc/6bz0st
-         DmR6qjTFxwyVV10D9NHETdKcmd8bZ8O05b9ZlbuTg1WeeSIR0T1H4HOwcSg/4TTmgA0o
-         9PtZfdrMVLxelmJFY1O5FcgMzIbGQEownabdzki22nIAlfT/RRSOoPSpv1wKmEiVojQY
-         2BqQpVyOw2kQE0MsGd5W1aCjwe7f7fjr8pLFfXfy0GJwsfigT1dzKin3+2GumWhgYIde
-         5VXq1uHeX1XQwvYPcXOrkIvqxo5RM5+TQBbpDsu+iOUr4PhjQHdB1yFy3ZX6RKaRxT2X
-         SMhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWEv39pon1oemzN39qYDcIvtakcaOjGCQPEJvwCDuysDwu5k2Jef3lC1wdIq8FNj6oFYbE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3K4kDiO9FIZTdZbX7cDj8Th8QpMlcM/MrfzeUzu8fG2xIBvFA
-	PGjJpSUL1xndbmr6KGYtuO5VGH/9KMJSqjXbdC6P+ewz17oU41h0aPWsxctbuQ6vW8N6eYqGXkU
-	pOe3wThoNHQgAXk5R5AWnOA==
-X-Google-Smtp-Source: AGHT+IG3FN+utE5DtZk1yqn4OdrPXgq7d6fljLLlDC+Gkt63/91sIHkgMPRqozoEz65kcTQskewlqi/wialMoW0yqA==
+        bh=6Qcg1fuqFpd6J4LqEu191n3/4PbMXxCo3T2JUFbEGZc=;
+        b=pwoRT5rNw3pqnI2HABOnYXEP2NyvSnsvfRHKZ6b+Pd4ukKGJejHLvKxhvyGmxcXNkx
+         5wAjXTvcCiKFrOecTwPY77a5JdpPfZ7C5LFM7ohPjEyEXvBCw/4XbHx7cGP5lNzBxX+c
+         SBG9Jf4Ef+z94J7h3ckpiAnSbp6fR7JCwkcRIC2BnvbQf7S2NtmrCTHIgyoSbkrcG6Af
+         7cIQoyJePNesWmIJZFJIEowtRc8yT8IDYaB72nETYuKvWSlPnGy1q1LD2/aZjBuVl0aI
+         dGjTzBZDMuaThv7DJTpHLygOMjpogBgMh4sCFmm5jaxMLbOOOFgoNVfNKYVkuZidfx1J
+         FDNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXii8NcCenx0LOCPl1d2IdRd7vG0UNYo6Bqd06o+bnKuxacjbfpy2k/TWhzvH3chLJucs0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTF/CxakDDUxR64tPlsjz4Xf/KDHghdhORkcg4J6XH0ga1GdFO
+	gqWtClonLRKbHs9gcGMhRWqMzY3pa6WVEEr025qdJppk1ydyYxZaVXZh07efaOBsZI7uCT1UF7w
+	AuT1xp/j380ru3jmYfg56OA==
+X-Google-Smtp-Source: AGHT+IGwHbIEmNZ/RBKktF+iIBZkwlEOgQl3w9w6Ss/EO+FVqyDtTE308o2deCvUylBHP84P1pav03ZGURiZtPBoiw==
 X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a62:b401:0:b0:71e:5f55:86f1 with SMTP
- id d2e1a72fcca58-724133cd470mr5045b3a.5.1731022140524; Thu, 07 Nov 2024
- 15:29:00 -0800 (PST)
-Date: Thu,  7 Nov 2024 23:24:48 +0000
+ (user=dionnaglaze job=sendgmr) by 2002:a17:902:6b48:b0:211:4a37:bfed with
+ SMTP id d9443c01a7336-211834f5ea4mr13955ad.4.1731022142705; Thu, 07 Nov 2024
+ 15:29:02 -0800 (PST)
+Date: Thu,  7 Nov 2024 23:24:49 +0000
 In-Reply-To: <20241107232457.4059785-1-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,27 +74,30 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241107232457.4059785-1-dionnaglaze@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107232457.4059785-9-dionnaglaze@google.com>
-Subject: [PATCH v5 08/10] KVM: SVM: move sev_issue_cmd_external_user to new API
+Message-ID: <20241107232457.4059785-10-dionnaglaze@google.com>
+Subject: [PATCH v5 09/10] KVM: SVM: Use new ccp GCTX API
 From: Dionna Glaze <dionnaglaze@google.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-coco@lists.linux.dev, Dionna Glaze <dionnaglaze@google.com>, 
 	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
 	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-coco@lists.linux.dev, Dionna Glaze <dionnaglaze@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
+	"David S. Miller" <davem@davemloft.net>, Michael Roth <michael.roth@amd.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Danilo Krummrich <dakr@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Tianfei zhang <tianfei.zhang@intel.com>, 
+	Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-ccp now prefers all calls from external drivers to dominate all calls
-into the driver on behalf of a user with a successful
-sev_check_external_user call.
+Guest context pages should be near 1-to-1 with allocated ASIDs. With the
+GCTX API, the ccp driver is better able to associate guest context pages
+with the ASID that is/will be bound to it.
+
+This is important to the firmware hotloading implementation to not
+corrupt any running VM's guest context page before userspace commits a
+new firmware.
 
 CC: Sean Christopherson <seanjc@google.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>
@@ -118,120 +121,159 @@ CC: Alexey Kardashevskiy <aik@amd.com>
 
 Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 ---
- arch/x86/kvm/svm/sev.c       | 18 +++++++++++++++---
- drivers/crypto/ccp/sev-dev.c | 12 ------------
- include/linux/psp-sev.h      | 27 ---------------------------
- 3 files changed, 15 insertions(+), 42 deletions(-)
+ arch/x86/kvm/svm/sev.c | 74 ++++++++++++------------------------------
+ 1 file changed, 20 insertions(+), 54 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d0e0152aefb32..cea41b8cdabe4 100644
+index cea41b8cdabe4..d7cef84750b33 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -528,21 +528,33 @@ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
- 	return ret;
+@@ -89,7 +89,7 @@ static unsigned int nr_asids;
+ static unsigned long *sev_asid_bitmap;
+ static unsigned long *sev_reclaim_asid_bitmap;
+ 
+-static int snp_decommission_context(struct kvm *kvm);
++static int kvm_decommission_snp_context(struct kvm *kvm);
+ 
+ struct enc_region {
+ 	struct list_head list;
+@@ -2168,51 +2168,12 @@ int sev_dev_get_attr(u32 group, u64 attr, u64 *val)
+ 	}
  }
  
--static int __sev_issue_cmd(int fd, int id, void *data, int *error)
-+static int sev_check_external_user(int fd)
- {
- 	struct fd f;
--	int ret;
-+	int ret = 0;
- 
- 	f = fdget(fd);
- 	if (!fd_file(f))
- 		return -EBADF;
- 
--	ret = sev_issue_cmd_external_user(fd_file(f), id, data, error);
-+	if (!file_is_sev(fd_file(f)))
-+		ret = -EBADF;
- 
- 	fdput(f);
- 	return ret;
- }
- 
-+static int __sev_issue_cmd(int fd, int id, void *data, int *error)
-+{
-+	int ret;
-+
-+	ret = sev_check_external_user(fd);
-+	if (ret)
-+		return ret;
-+
-+	return sev_do_cmd(id, data, error);
-+}
-+
- static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+-/*
+- * The guest context contains all the information, keys and metadata
+- * associated with the guest that the firmware tracks to implement SEV
+- * and SNP features. The firmware stores the guest context in hypervisor
+- * provide page via the SNP_GCTX_CREATE command.
+- */
+-static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+-{
+-	struct sev_data_snp_addr data = {};
+-	void *context;
+-	int rc;
+-
+-	/* Allocate memory for context page */
+-	context = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
+-	if (!context)
+-		return ERR_PTR(-ENOMEM);
+-
+-	data.address = __psp_pa(context);
+-	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
+-	if (rc) {
+-		pr_warn("Failed to create SEV-SNP context, rc %d fw_error %d",
+-			rc, argp->error);
+-		snp_free_firmware_page(context);
+-		return ERR_PTR(rc);
+-	}
+-
+-	return context;
+-}
+-
+-static int snp_bind_asid(struct kvm *kvm, int *error)
+-{
+-	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_snp_activate data = {0};
+-
+-	data.gctx_paddr = __psp_pa(sev->snp_context);
+-	data.asid = sev_get_asid(kvm);
+-	return sev_issue_cmd(kvm, SEV_CMD_SNP_ACTIVATE, &data, error);
+-}
+-
+ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
  {
  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index f92e6a222da8a..67f6425b7ed07 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2493,18 +2493,6 @@ bool file_is_sev(struct file *p)
+ 	struct sev_data_snp_launch_start start = {0};
+ 	struct kvm_sev_snp_launch_start params;
+-	int rc;
++	int rc, asid;
+ 
+ 	if (!sev_snp_guest(kvm))
+ 		return -ENOTTY;
+@@ -2238,14 +2199,19 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET)
+ 		return -EINVAL;
+ 
+-	sev->snp_context = snp_context_create(kvm, argp);
++	rc = sev_check_external_user(argp->sev_fd);
++	if (rc)
++		return rc;
++
++	asid = sev_get_asid(kvm);
++	sev->snp_context = sev_snp_create_context(asid, &argp->error);
+ 	if (IS_ERR(sev->snp_context))
+ 		return PTR_ERR(sev->snp_context);
+ 
+ 	start.gctx_paddr = __psp_pa(sev->snp_context);
+ 	start.policy = params.policy;
+ 	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
+-	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
++	rc = sev_do_cmd(SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
+ 	if (rc) {
+ 		pr_debug("%s: SEV_CMD_SNP_LAUNCH_START firmware command failed, rc %d\n",
+ 			 __func__, rc);
+@@ -2253,7 +2219,7 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	}
+ 
+ 	sev->fd = argp->sev_fd;
+-	rc = snp_bind_asid(kvm, &argp->error);
++	rc = sev_snp_activate_asid(asid, &argp->error);
+ 	if (rc) {
+ 		pr_debug("%s: Failed to bind ASID to SEV-SNP context, rc %d\n",
+ 			 __func__, rc);
+@@ -2263,7 +2229,7 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return 0;
+ 
+ e_free_context:
+-	snp_decommission_context(kvm);
++	kvm_decommission_snp_context(kvm);
+ 
+ 	return rc;
  }
- EXPORT_SYMBOL_GPL(file_is_sev);
+@@ -2874,26 +2840,26 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	return ret;
+ }
  
--int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
--				void *data, int *error)
--{
--	int rc = file_is_sev(filep) ? 0 : -EBADF;
--
--	if (rc)
--		return rc;
--
--	return sev_do_cmd(cmd, data, error);
--}
--EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
--
- void sev_pci_init(void)
+-static int snp_decommission_context(struct kvm *kvm)
++static int kvm_decommission_snp_context(struct kvm *kvm)
  {
- 	struct sev_device *sev = psp_master->sev_data;
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index ed85c0cfcfcbe..b4164d3600702 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -860,30 +860,6 @@ int sev_platform_init(struct sev_platform_init_args *args);
-  */
- int sev_platform_status(struct sev_user_data_status *status, int *error);
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_snp_addr data = {};
+-	int ret;
++	int ret, error;
  
--/**
-- * sev_issue_cmd_external_user - issue SEV command by other driver with a file
-- * handle.
-- *
-- * This function can be used by other drivers to issue a SEV command on
-- * behalf of userspace. The caller must pass a valid SEV file descriptor
-- * so that we know that it has access to SEV device.
-- *
-- * @filep - SEV device file pointer
-- * @cmd - command to issue
-- * @data - command buffer
-- * @error: SEV command return code
-- *
-- * Returns:
-- * 0 if the SEV successfully processed the command
-- * -%ENODEV    if the SEV device is not available
-- * -%ENOTSUPP  if the SEV does not support SEV
-- * -%ETIMEDOUT if the SEV command timed out
-- * -%EIO       if the SEV returned a non-zero return code
-- * -%EBADF     if the file pointer is bad or does not grant access
-- */
--int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
--				void *data, int *error);
--
- /**
-  * file_is_sev - returns whether a file pointer is for the SEV device
-  *
-@@ -1043,9 +1019,6 @@ sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV;
+ 	/* If context is not created then do nothing */
+ 	if (!sev->snp_context)
+ 		return 0;
  
- static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
+-	/* Do the decommision, which will unbind the ASID from the SNP context */
+-	data.address = __sme_pa(sev->snp_context);
++	/*
++	 * Do the decommision, which will unbind the ASID from the SNP context
++	 * and free the context page.
++	 */
+ 	down_write(&sev_deactivate_lock);
+-	ret = sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
++	ret = sev_snp_guest_decommission(sev->asid, &error);
+ 	up_write(&sev_deactivate_lock);
  
--static inline int
--sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
--
- static inline bool file_is_sev(struct file *filep) { return false; }
+-	if (WARN_ONCE(ret, "Failed to release guest context, ret %d", ret))
++	if (WARN_ONCE(ret, "Failed to release guest context, ret %d fw err %d", ret, error))
+ 		return ret;
  
- static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+-	snp_free_firmware_page(sev->snp_context);
+ 	sev->snp_context = NULL;
+ 
+ 	return 0;
+@@ -2947,7 +2913,7 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		 * Decomission handles unbinding of the ASID. If it fails for
+ 		 * some unexpected reason, just leak the ASID.
+ 		 */
+-		if (snp_decommission_context(kvm))
++		if (kvm_decommission_snp_context(kvm))
+ 			return;
+ 	} else {
+ 		sev_unbind_asid(kvm, sev->handle);
 -- 
 2.47.0.277.g8800431eea-goog
 
