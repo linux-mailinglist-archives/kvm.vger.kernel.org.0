@@ -1,102 +1,128 @@
-Return-Path: <kvm+bounces-31125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45C59C09B0
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 16:10:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F0B9C09B3
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 16:10:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 061E51C23477
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F35971F24B90
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 15:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CD521315B;
-	Thu,  7 Nov 2024 15:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A88B2141BE;
+	Thu,  7 Nov 2024 15:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GuCmWcel"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iym5bu1D"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A1F12B63;
-	Thu,  7 Nov 2024 15:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E569213141
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 15:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730992216; cv=none; b=FTHZ7lg7LDu/ENe3v7PmB0O/yP+DHcvTtu4M9rsWltYa/RkIprtfuFTk8HGoK0s55GCgh3bUV+YUUMC/Py0SjW8i2JAZ9ZiQFgRM3q5TYIXERJf5vGRuM2s9K/Yi9sTwSFI4Fi80eHSRmdwGZnT9ESsvZ7xU1/Al+Ae9YQwD0gw=
+	t=1730992230; cv=none; b=XJEqLYpQysnUgDTfgVfFFRGb3DLJmqoJBAyXNnjAk8YVk97MfnkZ9PfNIQGG1gl1PeIEjRnqrH+LJ5IcsWWIcg0rLxloGCVklFNmHjN/WF0kLauRXoDTOfqHs2PXTWM8BydMn4AmG9DUjl9b5Bu+7WSY8bKsZihs3MykYG3Cmd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730992216; c=relaxed/simple;
-	bh=dF5XVTxIII6iMggWIEemDLIC7Cxe07E6GULEaQ+Lc60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eQndNuMuedmJb3dtHuc5qNGRgVUZQgieh2pbZil1a3vCBve3TYcpocqTzhLIub8j+9w12MGcdbLQuiYo404AhihM7qTlwwZeR/Iw++bnrr3jAKd2ypu8twMjrR5qfklDq5ll4OP8idqbvUGpBLVvfzBRjuY6qNqe86TL4YmSxkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GuCmWcel; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Vom1WJYdLvjku2r/Xl0EhIhQ5E31YZkW3BtO+U5Dsek=; b=GuCmWcelHu3QNDVTgzwIceTERX
-	/vZoa+fZx0pT+5jVIJzTCv4ZeGycAXKZ3WwH8ZIMz+UT6M09CyrfQf1dpKHT0h9TQDt7wIIwZFQMR
-	jqTi79AogfM+fEMudUmIdznL/18LTQnR5GyxB3te8KLOPk2/tBUc41LuSKeak40E/SdOtz73JCu6G
-	XqwMJZZPYY+Ahs8ZDynRIykD5DX82jInNorF8DV35Rroz+gdSejfsjnLsw+r9X9jP0LPRRRbCHyyU
-	BTuDrcnLXh+iFBOFnLbAulo4+xDfmkRer56WnCT4YEvMuRMroRNIuix2qLa2bU/s9nzQ0smuqQsK9
-	dgIZeC2Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t949B-00000006rdv-0Z6w;
-	Thu, 07 Nov 2024 15:10:09 +0000
-Date: Thu, 7 Nov 2024 15:10:08 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Shivank Garg <shivankg@amd.com>
-Cc: x86@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	jack@suse.cz, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org, kvm@vger.kernel.org, chao.gao@intel.com,
-	pgonda@google.com, thomas.lendacky@amd.com, seanjc@google.com,
-	luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, arnd@arndb.de, pbonzini@redhat.com,
-	kees@kernel.org, bharata@amd.com, nikunj@amd.com,
-	michael.day@amd.com, Neeraj.Upadhyay@amd.com,
-	linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 0/4] Add fbind() and NUMA mempolicy support for KVM
- guest_memfd
-Message-ID: <ZyzYUOX_r3uWin5f@casper.infradead.org>
-References: <20241105164549.154700-1-shivankg@amd.com>
- <ZypqJ0e-J3C_K8LA@casper.infradead.org>
- <6004eaa4-934c-48f4-b502-cf7e436462fc@amd.com>
+	s=arc-20240116; t=1730992230; c=relaxed/simple;
+	bh=KsTG/igdk//wwpXY7Y3QxoZ0hz+j87r2VAhmwTK71Xc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JVC1Zq+gWT5guw5PilhCNoH9AxNwhggasxOmwELNTIIdBQYc9ZQOzSMocBX8CG+4seUJCR6shnigBRtsZBEnuVnCSaF569RC4ZKSdLPKFPSd75uiI9ltUTJfAZJFxN2skLJGZomjNpAAug9ZlJZKK2xi62pChLN49Y+v5Kcf9zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iym5bu1D; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730992228;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YpvhEKsdq9nlGeRZSZmlJvSbxDPJsov2mUU+VC+WFq0=;
+	b=iym5bu1D/niQNTbJJI2CP7r7cQ3AZg5jB5t0Cs6jADIDX6ySAL+bMRcY+gtyIRQ9VNB6I0
+	8gLu7puxgqx1RRp6CazwEnD5OZsuSaXNWj31RXqx6hCgPR7XD3BjP7hqag+zIansVfkQXW
+	h5BmX39kKjfq+6jDDF4nn75HSIiu+MA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-P8tu-UDdMIWlbNjgGFWr-Q-1; Thu, 07 Nov 2024 10:10:26 -0500
+X-MC-Unique: P8tu-UDdMIWlbNjgGFWr-Q-1
+X-Mimecast-MFC-AGG-ID: P8tu-UDdMIWlbNjgGFWr-Q
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4314c6ca114so7786805e9.1
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 07:10:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730992225; x=1731597025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YpvhEKsdq9nlGeRZSZmlJvSbxDPJsov2mUU+VC+WFq0=;
+        b=urh7fhUVgn6xU287z6BjmOVsiYQTOkXpPNtTadlOuXdOIt/03YVX3NAqOxwcT4m+SH
+         NJtAveTfOuaiD9adggZ69Rkk5K/cG+LPNR7OTJJSbyeI8hp3k1cZQVzdqq8EoO70Jpcr
+         5v4bGY7roUhd6lT3Xyibg45kJ6+cL/kFHiUyHhUNr3faz1BkL/fJX+mUmHx4GikXqVGq
+         ZCxkLQcohCvwM1uyHAANW1EVuNoRkR4zXGwZiwZ031WZmIUCiQwDglnYGXUQBRgaX7R4
+         nG/SAY0DaNbCivTbXa39badhZlItx/bIsnHT5YpgwwpYphbtv6aXZIc3t+r9OqWJf5Io
+         lQVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWL2QOIgL5FGbDxg57LSZRFI7pqz/jf2zNyuPdQLpyOq7c1LsODqvxkPTb3gDujg3zrfa8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgCwfr/ULHjJ94ZI/U+f5ulSLC27tmbAouWX8t7/zWhNmZtLoS
+	xDFs16MBXE/nB/RbrYsecMcXq+BMDDSsjdZjVEbXlJWN9yFurz/MwFmuSvjmTm0S61B5DtyIPaX
+	Ynewbe9LYeqVxo4YTUHCzg5GkeqtuLIOSqvUu12A8cghwLAmulD9pC0LkbGi9sy/enDlhGN/aLH
+	AhvAu37GwX31WF5ao1zO7K50R/
+X-Received: by 2002:a05:600c:4f4d:b0:426:61e8:fb3b with SMTP id 5b1f17b1804b1-432b5fadf06mr2942655e9.27.1730992225639;
+        Thu, 07 Nov 2024 07:10:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHnmBJCvwyfFGRxFF0wUd/g4DeAkHO+zUL3FZsLbSIdoqw0lMuNoVrgIsThXhHyDPsgg3eAPlYTuEQKalxH/nI=
+X-Received: by 2002:a05:600c:4f4d:b0:426:61e8:fb3b with SMTP id
+ 5b1f17b1804b1-432b5fadf06mr2942435e9.27.1730992225298; Thu, 07 Nov 2024
+ 07:10:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6004eaa4-934c-48f4-b502-cf7e436462fc@amd.com>
+References: <20241023083237.184359-1-bk@alpico.io> <ZyUMlFSjNTJdQpU6@google.com>
+In-Reply-To: <ZyUMlFSjNTJdQpU6@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 7 Nov 2024 16:10:13 +0100
+Message-ID: <CABgObfZ+ZiQWJ_x2AJ2bgModK7ziv+qUvWaS-HySq4SRwvFMCw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Make the debugfs per VM optional
+To: Sean Christopherson <seanjc@google.com>
+Cc: Bernhard Kauer <bk@alpico.io>, kvm@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 07, 2024 at 02:24:20PM +0530, Shivank Garg wrote:
-> The folio allocation path from guest_memfd typically looks like this...
-> 
-> kvm_gmem_get_folio
->   filemap_grab_folio
->     __filemap_get_folio
->       filemap_alloc_folio
->         __folio_alloc_node_noprof
->           -> goes to the buddy allocator
-> 
-> Hence, I am trying to have a version of filemap_alloc_folio() that takes an mpol.
+On Fri, Nov 1, 2024 at 6:15=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> I'm not opposed to letting userspace say "no debugfs for me", but I don't=
+ know
+> that a module param is the right way to go.  It's obviously quite easy to
+> implement and maintain (in code), but I'm mildly concerned that it'll hav=
+e limited
+> usefulness and/or lead to bad user experiences, e.g. because people turn =
+off debugfs
+> for startup latency without entirely realizing what they're sacrificing.
 
-It only takes that path if cpuset_do_page_mem_spread() is true.  Is the
-real problem that you're trying to solve that cpusets are being used
-incorrectly?
+What are they sacrificing? :) The per-VM statistics information is
+also accessible without debugfs, even though kvm_stat does not support
+it.
 
-Backing up, it seems like you want to make a change to the page cache,
-you've had a long discussion with people who aren't the page cache
-maintainer, and you all understand the pros and cons of everything,
-and here you are dumping a solution on me without talking to me, even
-though I was at Plumbers, you didn't find me to tell me I needed to go
-to your talk.
+However I'd make the module parameter read-only, so you don't have
+half-and-half setups. And maybe even in this mode we should create the
+directory anyway to hold the vcpu%d/pid files, which are not
+accessible in other ways.
 
-So you haven't explained a damned thing to me, and I'm annoyed at you.
-Do better.  Starting with your cover letter.
+> One potentially terrible idea would be to setup debugfs asynchronously, s=
+o that
+> the VM is runnable asap, but userspace still gets full debugfs informatio=
+n.  The
+> two big wrinkles would be the vCPU debugfs creation and kvm_uevent_notify=
+_change()
+> (or at least the STATS_PATH event) would both need to be asynchronous as =
+well.
+
+STATS_PATH is easy because you can create the toplevel directory
+synchronously; same for vCPUs. I'd be willing to at least see what a
+patch looks like.
+
+Paolo
+
 
