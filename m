@@ -1,118 +1,112 @@
-Return-Path: <kvm+bounces-31174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5527C9C0FA6
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:26:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42779C1002
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7849D1C21B8C
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 20:26:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF7311C20F40
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 20:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972A1217F55;
-	Thu,  7 Nov 2024 20:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87DC194C92;
+	Thu,  7 Nov 2024 20:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JwvEiTp7"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="JaLsUXbY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D12161E6
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 20:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24161D88C3;
+	Thu,  7 Nov 2024 20:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731011209; cv=none; b=STm18Kfj0HVvQoJQKsQAwyQrUqhOE8ywf3Ne0Yizrzsb/zCFxLSqphDIa5GoRUASWae+ioMVhJColDCTnXsnC0APddW3qr79Odqzh3aRzoHjjSlg9cD1KprBAD2zjbDYWLcbGgd8w6wwqJQEMW8mvFUxgcbOcaa+k+avfSMMnzI=
+	t=1731012414; cv=none; b=N9fBazJOwQfotYmgTLKb1mVI+swmekgBp8VJIM5L//vBkbffvrWT3NbJjmVfO2m4feoONrKPAg4tHFDLUFCfXldMpkZdIxv+AX6qh+cquUkxvZBrvLk61AxmCdd4vPCpetun27VTjDEMHwuN5EySyWgGvv3z/e831YnWf2j44PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731011209; c=relaxed/simple;
-	bh=5+dKjp4NFaoQsFGHLDX4etrIGMptFEHaNLPNJNjWcpA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fPaBm0ySJefBVHNnHVjCVCZcHNxA4ocJamldj+RJnozrWiIZxxhg0/+vY2CuwUz3s8f2TcYpNFHfHP+jvgfppZ2sLIZYTDBo1AiahbBlyA3FtGHCo2v9oVD4n8LfHmxW9glVD6ssuuAqhYMRDi/lPg7+rmb2+iTvMePZb6VyBOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JwvEiTp7; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e38fabff35so27468597b3.0
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 12:26:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731011207; x=1731616007; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0DaXja48Eoul2mL0v8OhTPkrroMKx/GLkawdW4wfS5s=;
-        b=JwvEiTp7sdqRNkz79MeEriRoj/WRbraWnTAsC17ku1ps5nX1dqaLa1nDros+b6LcGW
-         BLDoEl8G/y/ElWlmySjDZFg+bYSDsrVgjK3RJqSgAJh+Wx9IRwYmBalT4EpDdrc1H3DL
-         96DowUwv4Uyt5stswwoXUJU3z6z9wH/9JxpAbneyJahHKFwCL3jseMktUgU8tSt5qD+B
-         Sh6WFehsAllGBml2qa5tk4KZq+BqtOscepInxXTcf+5fSG9+bVPAKzLJ8uAinl9PumeJ
-         4Chz83jHD/s2P0qraK7yMa4ISYzCtKwk92iI5+TXDO+FWxzMkV10PFAObY/ETji1hLs4
-         /W4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731011207; x=1731616007;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0DaXja48Eoul2mL0v8OhTPkrroMKx/GLkawdW4wfS5s=;
-        b=GLprvjCNck/0TQL8PSIYvqkDzYtFtLttkys6YtxVlQ2SH8ev0OrmcVbcNGlR7cE0ji
-         YEsCcwWyL/Tla3GgdvZRGBRrWNE7W4Llrq3F8BrSV8qGX4EAZjr+zfEpvn2yTae8yl51
-         V0VRg3MR0nbCleGpqtNjSZICqJ0WJK5IxytffjWraqE8MavqtHwn8dqcG1Jfy2w0RcDC
-         sA7a0/LnDI6AtncHVRMce2r2Cm5BSH8j4H9A3BJZwGIFm1RhOLeNZZXrIRT/YzCqqvYN
-         YF1qnNBBNPcYwY7+5blxGwfNoQBdV24Sse5sNjsFlXZs1A4YMW/xRjh+SBMGsy9LEWtm
-         +PIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoL2bbYenggea6ODN9gILagGR9Sre9/dOACNT1k9u3QlowlfGUAZqlcJ3KOySI5TwxLQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXTlHBNo/MDlW0GLEH9ZOz6MU7nSfftzERLTIKVYstXkEfgTlP
-	92uHpXPYWzF45CyvbSvToC8xOzx1YFb4765Ew/yZQ1cscEp6CK5kyjuDScFuYmx2OqcRqPZPeGm
-	y3A==
-X-Google-Smtp-Source: AGHT+IFGnCavdqNWrqQzhvzEc2Nc4+MjfMOxSGbHqWn9yrACMcOtJh8NbYcCcVft7/QoNWhW/fUDme7cQ9Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:7307:b0:6ea:3c62:17c1 with SMTP id
- 00721157ae682-6eaddd75f83mr31897b3.1.1731011207357; Thu, 07 Nov 2024 12:26:47
- -0800 (PST)
-Date: Thu, 7 Nov 2024 12:26:45 -0800
-In-Reply-To: <Zy0fPgwymCdBwLd_@linux.dev>
+	s=arc-20240116; t=1731012414; c=relaxed/simple;
+	bh=mhU9jxgV9z83Hv+GVH2dKHtzgraCtM5ha8gUXXnGMKc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nmmULW1KC3T6BlHnO+Bf2wcppYaQXj4CNY8cWhBbZUE588BBovfGM6Y4XaviehsOTpxwGQjgOIOAl8CFuJvqOves89GFM40ijNzYTR5fGrQHOTiRapPBwLWXvzAFCDAiUodq7Ap/UzXzUdgNuEEpoYHlgrcTFzb2A5oldYckhPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=JaLsUXbY; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1t99Oo-001cxv-AC; Thu, 07 Nov 2024 21:46:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=Gv34US8GRBXtP87nryXTAC5SJFGYHzg1EnEJGs1AL7c=
+	; b=JaLsUXbYo1BLPH5dPn7t3I2nPNXUpR6T63/pWZMSytcC/nf2gecrpBqNWQ0206nGzmGDFbKdd
+	0+4YQyR2ykkTOWNc1TGWiujY2QdgiMZQlGijDO2t3fWHg38eJQMbAZPbDfmdSyB2XkKD9A3Cod4XW
+	S5Tu6icjDQRfXCKFP68ozbJ7E27qiPbFhMrBrvPz1Bv9qZdc709iazkq5/A4wa0ZV3xRxAZKOc+hV
+	guy9eJSCLGcLvUgbnfvR5Gkl+tP/GbIwMcYldXSY3XNTZWnLVQT6LWyQXZLqzq1m9j5p/5SJsViqc
+	sMrWTyPjetKYGEbhKP0wE1ecdOzAQTxmtijjOw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1t99Oh-0002fi-47; Thu, 07 Nov 2024 21:46:31 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1t99Of-00303e-44; Thu, 07 Nov 2024 21:46:29 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v2 0/3] virtio/vsock: Fix memory leaks
+Date: Thu, 07 Nov 2024 21:46:11 +0100
+Message-Id: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241107094000.70705-1-eric.auger@redhat.com> <20241107094000.70705-3-eric.auger@redhat.com>
- <Zyz_KGtoXt0gnMM8@google.com> <Zy0QFhFsICeNt8kF@linux.dev>
- <Zy0bcM0m-N18gAZz@google.com> <Zy0fPgwymCdBwLd_@linux.dev>
-Message-ID: <Zy0ihQlkexIWc1fq@google.com>
-Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, broonie@kernel.org, 
-	maz@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	joey.gouly@arm.com, shuah@kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABMnLWcC/3WNQQ7CIBREr9L8td8ArURceQ/TBcWPJbVgoCE1D
+ XeXsHf5ZjJvDkgUHSW4dQdEyi654CuIUwdm1v5F6J6VQTAxcM4k5hTMgiut+Ca9JFST7ElxcZF
+ MQ119Ilm3N+MDPG0w1nB2aQvx214yb9VfYebI8GoHa03PlCJ5j1PYzybAWEr5ASJqsVyxAAAA
+X-Change-ID: 20241106-vsock-mem-leaks-9b63e912560a
+To: Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jia He <justin.he@arm.com>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+ Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+ George Zhang <georgezhang@vmware.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On Thu, Nov 07, 2024, Oliver Upton wrote:
-> On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
-> > ---
-> > From: Sean Christopherson <seanjc@google.com>
-> > Date: Thu, 7 Nov 2024 11:39:59 -0800
-> > Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
-> >  freeing VMs
-> > 
-> > When freeing a VM, don't call into KVM to manually remove each memslot,
-> > simply cleanup and free any userspace assets associated with the memory
-> > region.  KVM is ultimately responsible for ensuring kernel resources are
-> > freed when the VM is destroyed, deleting memslots one-by-one is
-> > unnecessarily slow, and unless a test is already leaking the VM fd, the
-> > VM will be destroyed when kvm_vm_release() is called.
-> > 
-> > Not deleting KVM's memslot also allows cleaning up dead VMs without having
-> > to care whether or not the to-be-freed VM is dead or alive.
-> 
-> Can you add a comment to kvm_vm_free() about why we want to avoid ioctls
-> in that helper? It'd help discourage this situation from happening again
-> in the future in the unlikely case someone wants to park an ioctl there.
-> 
-> > Reported-by: Eric Auger <eric.auger@redhat.com>
-> > Reported-by: Mark Brown <broonie@kernel.org>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> I'm assuming you want to take this, happy to grab it otherwise.
+Short series fixing some memory leaks that I've stumbled upon while toying
+with the selftests.
 
-You take it.  Unless my git foo is off the rails, this is needs to go into 6.12,
-along with a fix for the vGIC test.  That, and I already sent Paolo a pull request
-for rc7; I don't want to overwork myself ;-)
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v2:
+- Remove the refactoring patch from the series [Stefano]
+- PATCH 2: Drop "virtio" from the commit title [Stefano]
+- Collect Reviewed-by [Stefano]
+- Link to v1: https://lore.kernel.org/r/20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co
+
+---
+Michal Luczaj (3):
+      virtio/vsock: Fix accept_queue memory leak
+      vsock: Fix sk_error_queue memory leak
+      virtio/vsock: Improve MSG_ZEROCOPY error handling
+
+ net/vmw_vsock/af_vsock.c                | 3 +++
+ net/vmw_vsock/virtio_transport_common.c | 9 +++++++++
+ 2 files changed, 12 insertions(+)
+---
+base-commit: 71712cf519faeed529549a79559c06c7fc250a15
+change-id: 20241106-vsock-mem-leaks-9b63e912560a
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
