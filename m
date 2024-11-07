@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-31087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95F949C0218
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 11:17:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13D479C021E
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 11:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47EFE1F21BD7
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 10:17:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37BD91C21D52
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 10:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF271EBA1B;
-	Thu,  7 Nov 2024 10:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D881EC01C;
+	Thu,  7 Nov 2024 10:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRKhWJKM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aTTvOKnu"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2729C1E6DD5
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 10:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B152C1CC8A3
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 10:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730974654; cv=none; b=Iil15Y39Z67I3ZZxwnmtdX1U3Wnp1/YEZ5heYKTdSpL4ajvIpv0g1OknIu2KdfkOSWwVdZXFMu59hvcBILI/vDdBtkxoN3pzP8MqrRg/ckN8tssdsiMTIlxB+noAn2nqmFo6LUFO0fLjLwg8KXCC29Su3tORMShTheYs39SIOAw=
+	t=1730974766; cv=none; b=Jty2npxtCn2zKlxCelu5b3At/UvaRubryJEHwk7zSqmU8AZc7Sjv8+NgBm++IvNo8bugy6etBOcHhe/Y8yGWwKflb+e9/9QkOmbonYT9pKmYAYcNfkyqEAN2YQ2pW5ZvIOLYjg8SGhOoWreLAg/aCC92Maj6bM9tARGL+xp1PMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730974654; c=relaxed/simple;
-	bh=i2bWLU6m00p8TlV+OMcgPPhsJkVRY5pKKD5A+R1u5eY=;
+	s=arc-20240116; t=1730974766; c=relaxed/simple;
+	bh=MuNWhYrw8F/gSr00QNLIh4DtWvDQaY0ROHYlSaTNVt8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gxSpXFmkcsMnMY1LGnToZLX6WBV74/V841eYvDT+H7QbEG9j9guYnQRYSroiVw+p0BuELC5L6Eq61gOX4niXsZCrqpFB4i+ueIz3qLrp/7E7VPz3w4JTt/qPWBqLGpxJRc34z9KHH9ZzTCbfkaUvRz7uL0D/uiV7B9LG2k8ROBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DRKhWJKM; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQssaGYvhsJhB1ozsZL5mG2h2KynMootsJ9nVFtGu4X3BNpMsIVQzd1Uf3kdtC1+5S+pTi4q7vosUcSUFbCJseF1e/ujELvZmOnKAmcTtvjxKniMrOBCsEd/TZ0SG4D7YpM6PzN5WVptpZkErC3UothsT4Yhl21+WJzUIs9+3L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aTTvOKnu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730974652;
+	s=mimecast20190719; t=1730974763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RT+TotpfDd8T0LMPg0eVo1dThYn+tyWQ9cxcGi4C2c0=;
-	b=DRKhWJKMHOjKbdZVornnyvuaj+QEnNnqQgtetfU+aQvjrhWr5aPVr26wwOVu05f8cinBJP
-	GCMgSgPZAQ0eKN3BZc629fr1s9FBGCJy0excguGRMiYVb72Ue6ZOtQYoKY+t13eXgxzVH3
-	OOtXTSIMXa49PgC8+PDbiBKWP0JPizU=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=eUPJBtFS5dfBIUKGBSTul1nLycqN5459o9xMHL54qwM=;
+	b=aTTvOKnuLxtFBIWnmn6mKojLTflhAwwG59qtbDHY9Z/F4em60HFarbLxWgyIbdg7x7Do+e
+	3pmyyGYL1HqFvsEuS3NNPDgGPKkJVPdp43ZZoFGVUkZ+UDHjoawAV7K6IY0tb3O4nlgFBH
+	HUFJsMH3UGPUlt/t+/3A5aiy41dA+vo=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-p3e0p2JcNgGiLn1ETIomTA-1; Thu, 07 Nov 2024 05:17:30 -0500
-X-MC-Unique: p3e0p2JcNgGiLn1ETIomTA-1
-X-Mimecast-MFC-AGG-ID: p3e0p2JcNgGiLn1ETIomTA
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b15d3cd6dcso90516085a.0
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 02:17:30 -0800 (PST)
+ us-mta-510--CiisEwgM6WSFA4u44IhXg-1; Thu, 07 Nov 2024 05:19:22 -0500
+X-MC-Unique: -CiisEwgM6WSFA4u44IhXg-1
+X-Mimecast-MFC-AGG-ID: -CiisEwgM6WSFA4u44IhXg
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5eb8b4b3eeaso584276eaf.2
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 02:19:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730974650; x=1731579450;
+        d=1e100.net; s=20230601; t=1730974762; x=1731579562;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RT+TotpfDd8T0LMPg0eVo1dThYn+tyWQ9cxcGi4C2c0=;
-        b=IjC77TyJ/Kd6LSfr9K+TIByF7+pLAdKojedpuHMtqBm9sAMROUYBO1uMMLoWQFvmtB
-         3gldBFo1PKzsjZWkg6wr2BDbMA6Um2E1uRggX2Of94rLTj50J2OGfJqkIp5w44AiX15X
-         bHobgGC3CEujU/JMqKtpilhASB/FKPpbttBNnSo6EVmAtJrUqBRSp6vw9Xu0rJJyTdqS
-         1/JFK00bSi7x0UGfzlGd18z14P2pYz1le+eTQtjY6gW5uqc0huCI3YYhAkvzCGZXInj8
-         n1DZUuE41DkbvTeF9JtTqZbNuqwaZoltlW5W1aVJdLKzT6IM6BFMg7ZCpelsSLVGvsDT
-         xs0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGYMgIFa3+jNPaq6s7DkUvAOQd9zIaqa4D+0WOUYPoFJpRun7WZS9RkGpUN4wgd8EXWEY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE2JCaNbzQsN8Ik0QBQjEX7N9I3Clu5aUEK+es27wQVKmBsxOt
-	FXdXSrUHFLq3ymAhJx8pbIbfF0cK9Qu8bT+oPVpJYFoL76RQYvRvxY02CTp2XJucrE66UV3S2FI
-	jdlwWbEYDYZh1MHGqXJlLyOp7Agba1nXbvVKjqp9GrcBy3iAy5g==
-X-Received: by 2002:a05:620a:190c:b0:7b1:3fe8:8f11 with SMTP id af79cd13be357-7b2fb982995mr3303736485a.33.1730974650101;
-        Thu, 07 Nov 2024 02:17:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFxQk+y8ShdAUuI0XQTmhaMq5PkmFGd1rW8NElHzMk7ilpzQEiLfRkwxbgbYsdg4ZaY/uBVng==
-X-Received: by 2002:a05:620a:190c:b0:7b1:3fe8:8f11 with SMTP id af79cd13be357-7b2fb982995mr3303733985a.33.1730974649719;
-        Thu, 07 Nov 2024 02:17:29 -0800 (PST)
+        bh=eUPJBtFS5dfBIUKGBSTul1nLycqN5459o9xMHL54qwM=;
+        b=dwQbtUDqKNWXy5g5FIDyMP/+1tbFv61cIoRUPLGPPyHr3JhRPaNIBuA4OQX5grtRIP
+         4+CFITPcv+eXhPGi+9np8qDgXdmt0ZdYGS6vSRC8G47d4cHd7oh/Z2DJoFz1Al0Ycxp4
+         /3TxV5J8yxye76x0sCLQbPZPV6WpLLfezmZkjHmYHqgvXHllv3SglVYk5SffOozp4Zz2
+         zyrrjet3Sk3cv4kPk0j4SvmioMVy54lcrLjxpJ1UiPh/okLWuoDxzT7jtBfSZVDg7FGX
+         1BEAk7VjXgwxE4HlZm/KYTJxmTymMBDmk6b7rZXYoFpFkuOXdlOf3OQzt87VsBuN2xRE
+         R4kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7KrxpPQDPRQk6UwbqNpSHmjXOOUpKRjwsjjTYxwDToU4HPHxz/GYS7liUSO/C3LpVtI4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5HFwi7ZqMtX9JiwEEWY5Fe8GFfWC9EKE0glN0J+ujUk8k1oZF
+	IfxVJSujzD2R6VOO3b8VYSGX/6MqxLUpoC1pzbPiredFTksm8qXkJoIP1wxfaqrqvyd9VjG9Obv
+	m40sArjVLJ2bWC3t6GR/MUPCdILti0UHU6hfn/aghfmv7YvJKkA==
+X-Received: by 2002:a05:6358:d595:b0:1c3:878d:286e with SMTP id e5c5f4694b2df-1c5f99f6192mr1267418955d.22.1730974761854;
+        Thu, 07 Nov 2024 02:19:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGb0h9WGNnQfHK+osDGOMOYjYkH7je/1Uc03OD4ourSiBQ1DFDDlBICtkFFZrGGHTcwY75ndw==
+X-Received: by 2002:a05:6358:d595:b0:1c3:878d:286e with SMTP id e5c5f4694b2df-1c5f99f6192mr1267417255d.22.1730974761369;
+        Thu, 07 Nov 2024 02:19:21 -0800 (PST)
 Received: from sgarzare-redhat ([5.77.70.124])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac57c9bsm49118885a.54.2024.11.07.02.17.25
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961df2desm5996176d6.21.2024.11.07.02.19.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 02:17:29 -0800 (PST)
-Date: Thu, 7 Nov 2024 11:17:20 +0100
+        Thu, 07 Nov 2024 02:19:20 -0800 (PST)
+Date: Thu, 7 Nov 2024 11:19:11 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
@@ -85,10 +85,10 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>,
 	Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
 	George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net 2/4] virtio/vsock: Fix sk_error_queue memory leak
-Message-ID: <vxc6tv6433tnyfhdq2gsh7edhuskawwh4g6ehafvrt2ca3cqf2@q3kxjlygq366>
+Subject: Re: [PATCH net 3/4] virtio/vsock: Improve MSG_ZEROCOPY error handling
+Message-ID: <5zv6gmfg45gu3km6srpjlby2z7th7pnosfeorixhgivb3cgfvw@to6bkzdjvkob>
 References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
- <20241106-vsock-mem-leaks-v1-2-8f4ffc3099e6@rbox.co>
+ <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -97,62 +97,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20241106-vsock-mem-leaks-v1-2-8f4ffc3099e6@rbox.co>
+In-Reply-To: <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
 
-On Wed, Nov 06, 2024 at 06:51:19PM +0100, Michal Luczaj wrote:
->Kernel queues MSG_ZEROCOPY completion notifications on the error queue.
->Where they remain, until explicitly recv()ed. To prevent memory leaks,
->clean up the queue when the socket is destroyed.
->
->unreferenced object 0xffff8881028beb00 (size 224):
->  comm "vsock_test", pid 1218, jiffies 4294694897
->  hex dump (first 32 bytes):
->    90 b0 21 17 81 88 ff ff 90 b0 21 17 81 88 ff ff  ..!.......!.....
->    00 00 00 00 00 00 00 00 00 b0 21 17 81 88 ff ff  ..........!.....
->  backtrace (crc 6c7031ca):
->    [<ffffffff81418ef7>] kmem_cache_alloc_node_noprof+0x2f7/0x370
->    [<ffffffff81d35882>] __alloc_skb+0x132/0x180
->    [<ffffffff81d2d32b>] sock_omalloc+0x4b/0x80
->    [<ffffffff81d3a8ae>] msg_zerocopy_realloc+0x9e/0x240
->    [<ffffffff81fe5cb2>] virtio_transport_send_pkt_info+0x412/0x4c0
->    [<ffffffff81fe6183>] virtio_transport_stream_enqueue+0x43/0x50
->    [<ffffffff81fe0813>] vsock_connectible_sendmsg+0x373/0x450
->    [<ffffffff81d233d5>] ____sys_sendmsg+0x365/0x3a0
->    [<ffffffff81d246f4>] ___sys_sendmsg+0x84/0xd0
->    [<ffffffff81d26f47>] __sys_sendmsg+0x47/0x80
->    [<ffffffff820d3df3>] do_syscall_64+0x93/0x180
->    [<ffffffff8220012b>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+On Wed, Nov 06, 2024 at 06:51:20PM +0100, Michal Luczaj wrote:
+>Add a missing kfree_skb() to prevent memory leaks.
 >
 >Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
 >Signed-off-by: Michal Luczaj <mhal@rbox.co>
 >---
-> net/vmw_vsock/af_vsock.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> net/vmw_vsock/virtio_transport_common.c | 1 +
+> 1 file changed, 1 insertion(+)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
 >
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 35681adedd9aaec3565495158f5342b8aa76c9bc..dfd29160fe11c4675f872c1ee123d65b2da0dae6 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -836,6 +836,9 @@ static void vsock_sk_destruct(struct sock *sk)
-> {
-> 	struct vsock_sock *vsk = vsock_sk(sk);
->
->+	/* Flush MSG_ZEROCOPY leftovers. */
->+	__skb_queue_purge(&sk->sk_error_queue);
->+
-
-It is true that for now this is supported only in the virtio transport, 
-but it's more related to the core, so please remove `virtio` from the 
-commit title.
-
-The rest LGTM.
-
-Thanks,
-Stefano
-
-> 	vsock_deassign_transport(vsk);
->
-> 	/* When clearing these addresses, there's no need to set the family and
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> 			if (virtio_transport_init_zcopy_skb(vsk, skb,
+> 							    info->msg,
+> 							    can_zcopy)) {
+>+				kfree_skb(skb);
+> 				ret = -ENOMEM;
+> 				break;
+> 			}
 >
 >-- 
 >2.46.2
