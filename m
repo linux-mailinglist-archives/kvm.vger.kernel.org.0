@@ -1,184 +1,154 @@
-Return-Path: <kvm+bounces-31141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5ACD9C0D5F
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 18:56:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C539E9C0D76
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 19:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 855A4283315
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 17:56:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3201F22D6B
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 18:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADE1217325;
-	Thu,  7 Nov 2024 17:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C812170D5;
+	Thu,  7 Nov 2024 18:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKG0vwgm"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WrylWrsn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFC2216DE8
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 17:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D798212177
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 18:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731002167; cv=none; b=RO9VEfInwXYK4IpUQsLdnoGbRhMQyEFiEkLPQ5bdXZRsYxmTLjN2m3EAPnmuZxTv3TpNeS/sFt/3OV5sDTQ4D24V56bkp0QP7MldciZlrxMeN82vRv55QGRT7lBwXnYvYMrR0fi42HUeD1xsral0PwKO7TodRFxfQeahMYoW88g=
+	t=1731002752; cv=none; b=k227lCkN5sLINCgyb5eSffNimWjsdzL56JA05f5JLvC6hs13BovLIKSTo7zwRd2ueWeuB0XIamrhGzKoUr7Kbq8hLtpMDeaQOqRO7ICXHATMpaJRn6M3wslzUKQr8yIMH/k0OudSY+Mhh+2K5GDDyfzVtfCt6bN556xbGs6mlFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731002167; c=relaxed/simple;
-	bh=Ve+RSaEYMJhnNDsXjuDtqnqP0abDltYBaZlYOWL4ptI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H5aps/3NcJ8LbhqqF1Xdyt0ctzv4hdfoJXznLimHX09Jecnp8li7yxDa92RfEi4MGp3phOqkG9Q4KQVcI7nO+aw344XJN20OPN+W/eFPjNj8fgJbBEoyMmn+Zb/4NdssD3DJZ/0RwoA8i/j5ji5OizwX5LgA5+DP5Xm4kfGvfh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YKG0vwgm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731002165;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nIvkqFWOBnpaxs9X2j4yQ/cA3cQgdm32nOtnZY57FZA=;
-	b=YKG0vwgm7s4rd6/OHIhimy8f9OBI13zZrTp88t0oTPqsPLdSbE1mWlIzGhI5/2dsXFx8Ys
-	6eHz5c6A/bfsdVuZqKDNyf+e8JmuNko/fXD/bV9cEDBnpgDGPbSfpP7+sR8crrMDi6MhHF
-	kXNDOeXflV7OXe/GmLvp1goA+FYBk6g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-244-vNX4vVGqP_iLief1mdQJRw-1; Thu, 07 Nov 2024 12:56:04 -0500
-X-MC-Unique: vNX4vVGqP_iLief1mdQJRw-1
-X-Mimecast-MFC-AGG-ID: vNX4vVGqP_iLief1mdQJRw
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43159c07193so11545815e9.0
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 09:56:03 -0800 (PST)
+	s=arc-20240116; t=1731002752; c=relaxed/simple;
+	bh=KUxyXwz3ijMwI9yruBeARGSaKdWcNDBaCOKWP0VGGm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TOvaQsVfZjBhau9/OsiOlAcGhbyy+4y6/mM4KPteMdgCQJEw6Ik0l9Vp7NF0YYf7EPst9WMgyiBsL1ojXJSyhP1RB3a8ytQZfS4kLBf5vUucozGdxy9XWtn5eBGdF56RCbq1XaDPoMjuX+sEbBd6KJAqbnPk2VS8e/ev/AklvDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WrylWrsn; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c96b2a10e1so1743028a12.2
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 10:05:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1731002748; x=1731607548; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSbrYYBrI/p/5x0d2n3UNYuWW/+v5ncY+edUOAUibFk=;
+        b=WrylWrsn+dmnKPImq81fa+6sZpwIF5WozWtdbebYEyjW8lBhqZSrovghVy0jKE44IY
+         OZPyFwz6+wfGa6tPmfRdRyiujvOUh5lU+JSHGxf3FBAkIb3UKbw4w4co8KxldlngJtuP
+         JsJuMOxFDQKSshcxzTzERdisOcrUUkmhhSwQw/f/YM9nj6Hh/c7aKUFAFFkixz6Im6YE
+         3x/pwwoypVA22RzxQgx7tXgtqSLuVBnruWVnUB7ahY5EkCpfuLPQJDhSnEE2iyMFd8Xl
+         MVT5iwepusXCviU9k0Ggr8GCVEu+xyUOBn0zjxU+kgEWFy7++YrO0VNV0i3om5QPNTTz
+         EDrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731002163; x=1731606963;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nIvkqFWOBnpaxs9X2j4yQ/cA3cQgdm32nOtnZY57FZA=;
-        b=Zy2ZY7BxIPc1hs0aP9MPSsAaQeUNmmmEN8jDEQOZW6M7WOS/j/VUCtU+I943KHbXri
-         sSlqTwUc0ElTMT6rQq+N5qlJpADynxma/SJfZWJk4RCqB0JSzSnher8K1t55Y5WMRxi6
-         GnE2GvKIrDVZbuJOxUDBciEZ2beRrsFTyIT6eEKc4RG1sljftZ8u/nRSVCFktcDLlEUi
-         FHMRzFpjvgRLVgfBRmqD4s2WwX2PDJJhngh5rxKayXQz4DTMFzRCi6P+D8b5lw8mdd+Z
-         xnq7s24UENOzdWZgEMPSUCo1DGOwfJsPmE/0PQUScAs2qlIqFokgspPgLqjteDdThFZc
-         fuLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwVkAT+oGgzD7B79uKnlFgtTMktc6ImO19Ch11nIGnkVC7AINSCw96AiSIfhd16ZVm7Lo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq/EU0Uhic1lNmtS25hcSK4moHdik9Z5so6myCYjzOALq41nUr
-	p68UKumvvfVcDVUQ1RemkifgzQCRq60hOHprGc3Ob29i1SzJjlMSBveI5HcVp9+9599xkUA3lWO
-	CHeHJWgY8YurOXt9A5USR2kDfQFTCzMy7ud+NASUbz+smdslDdQ==
-X-Received: by 2002:a7b:c459:0:b0:431:5f8c:ccb9 with SMTP id 5b1f17b1804b1-43283255a2cmr293641365e9.17.1731002162825;
-        Thu, 07 Nov 2024 09:56:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNl1hiiW0EzosaMDaaHsyEroTn91oZ8mTZl1tDs9onS6Y3lW4fxtG4nWFez6Jkv/e2k7ohsg==
-X-Received: by 2002:a7b:c459:0:b0:431:5f8c:ccb9 with SMTP id 5b1f17b1804b1-43283255a2cmr293641045e9.17.1731002162446;
-        Thu, 07 Nov 2024 09:56:02 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97cab2sm2295737f8f.23.2024.11.07.09.56.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 09:56:01 -0800 (PST)
-Message-ID: <69196410-be02-4957-a871-a599dafe32d6@redhat.com>
-Date: Thu, 7 Nov 2024 18:55:59 +0100
+        d=1e100.net; s=20230601; t=1731002748; x=1731607548;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zSbrYYBrI/p/5x0d2n3UNYuWW/+v5ncY+edUOAUibFk=;
+        b=R8pIhNxhcld02Ur84fUxfTtlUq3hvLuPClflRXxglKuTryNpkrfDF2wBnIc2vNzIW4
+         EKBUYwyTToBP4MdgCT3ipN/jRCOId1ytMpuBk0bcAqWtm8Jt7NhkN7EzVTa5mvrSn0NR
+         PjhF6peYmcOXCLhEgDKq1bPMx1PKYCAS8y/UygTFJwiaCv7807DusXIj7a0C/4t74Sy7
+         mO6vCPjkHvlU3Jc55qkkuFg0BS+eR/g+YTAfk+cdvP0simzNFO9F/1/NVaEsnV/WNV8j
+         VVHNVh4rFF5XBB1qnk7HNzziSBAsSbvO4QqyzMyvLMBhdAjfuc6h2C4AXLfXWSEYS806
+         eQCw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4NSuZteLyTwwty55uFejxEnYI8BncOi4OjGZnicNVZn/WZVasLU8OApTD5k5myRBCgT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye7fN0WzYhcXIHoJ3NxFzZYiJkTxsXjgMh1YXcwhf3vGZ+JRp7
+	K+drUGZOop1d6FW5WETgvTMhSAJG5Mevqsj/cGoOQlBHTmvATFjA2AbTIKhk16w=
+X-Google-Smtp-Source: AGHT+IH/KWT01CAzD8ky5ouYbcYfN5C3FED8l6ogIpQP/5B/enmGcQM4WkUVsaO/f92hCV5EgwfPEA==
+X-Received: by 2002:a17:907:3f02:b0:a9a:e0b8:5b7c with SMTP id a640c23a62f3a-a9de5c91d25mr4463270266b.7.1731002748381;
+        Thu, 07 Nov 2024 10:05:48 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0abf305sm126140866b.86.2024.11.07.10.05.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 10:05:47 -0800 (PST)
+Date: Thu, 7 Nov 2024 19:05:46 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Luca Boccassi <bluca@debian.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, kvm@vger.kernel.org, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: cgroup2 freezer and kvm_vm_worker_thread()
+Message-ID: <nlcen6mwyduof423wzfyf3gmvt77uqywzikby2gionpu4mz6za@635i633henks>
+References: <ZyAnSAw34jwWicJl@slm.duckdns.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib/on-cpus: Fix on_cpumask
-Content-Language: en-US
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: atishp@rivosinc.com, jamestiotio@gmail.com, alexandru.elisei@arm.com
-References: <20241031123948.320652-5-andrew.jones@linux.dev>
- <20241031123948.320652-8-andrew.jones@linux.dev>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20241031123948.320652-8-andrew.jones@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2flxw46ilch26h54"
+Content-Disposition: inline
+In-Reply-To: <ZyAnSAw34jwWicJl@slm.duckdns.org>
 
-Hi Drew,
 
-On 10/31/24 13:39, Andrew Jones wrote:
-> on_cpumask should wait until the cpus in the mask, not including
-> the calling cpu, are idle. Checking the weight against nr_cpus
-> minus 1 only works when the mask is the same as the present mask.
->
-> Fixes: d012cfd5d309 ("lib/on-cpus: Introduce on_cpumask and on_cpumask_async")
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+--2flxw46ilch26h54
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-looks good to me as well
+On Mon, Oct 28, 2024 at 02:07:36PM GMT, Tejun Heo <tj@kernel.org> wrote:
+> There are two paths that we can take:
+>=20
+> 1. Make kvm_vm_worker_thread() call into signal delivery path.
+>    io_wq_worker() is in a similar boat and handles signal delivery and can
+>    be frozen and trapped like regular threads.
+>=20
+> 2. Keep the count of threads which can't be frozen per cgroup so that cgr=
+oup
+>    freezer can ignore these threads.
+>=20
+> #1 is better in that the cgroup will actually be frozen when reported
+> frozen. However, the rather ambiguous criterion we've been using for cgro=
+up
+> freezer is whether the cgroup can be safely snapshotted whil frozen and as
+> long as the workers not being frozen doesn't break that, we can go for #2
+> too.
+>=20
+> What do you guys think?
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+I'd first ask why the kvm_vm_worker_thread needs to be in the KVM task's
+cgroup (and copy its priority at creation time but no later adjustments)?
 
-Eric
-> ---
->  lib/cpumask.h | 14 ++++++++++++++
->  lib/on-cpus.c | 17 ++++++++---------
->  2 files changed, 22 insertions(+), 9 deletions(-)
->
-> diff --git a/lib/cpumask.h b/lib/cpumask.h
-> index e1e92aacd1f1..37d360786573 100644
-> --- a/lib/cpumask.h
-> +++ b/lib/cpumask.h
-> @@ -58,6 +58,20 @@ static inline void cpumask_clear(cpumask_t *mask)
->  	memset(mask, 0, sizeof(*mask));
->  }
->  
-> +/* true if src1 is a subset of src2 */
-> +static inline bool cpumask_subset(const struct cpumask *src1, const struct cpumask *src2)
-> +{
-> +	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
-> +	int i;
-> +
-> +	for (i = 0; i < BIT_WORD(nr_cpus); ++i) {
-> +		if (cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i])
-> +			return false;
-> +	}
-> +
-> +	return !lastmask || !((cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i]) & lastmask);
-> +}
-> +
->  static inline bool cpumask_empty(const cpumask_t *mask)
->  {
->  	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
-> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-> index 356f284be61b..889b6bc8a186 100644
-> --- a/lib/on-cpus.c
-> +++ b/lib/on-cpus.c
-> @@ -127,24 +127,23 @@ void on_cpumask_async(const cpumask_t *mask, void (*func)(void *data), void *dat
->  void on_cpumask(const cpumask_t *mask, void (*func)(void *data), void *data)
->  {
->  	int cpu, me = smp_processor_id();
-> +	cpumask_t tmp;
->  
-> -	for_each_cpu(cpu, mask) {
-> -		if (cpu == me)
-> -			continue;
-> +	cpumask_copy(&tmp, mask);
-> +	cpumask_clear_cpu(me, &tmp);
-> +
-> +	for_each_cpu(cpu, &tmp)
->  		on_cpu_async(cpu, func, data);
-> -	}
->  	if (cpumask_test_cpu(me, mask))
->  		func(data);
->  
-> -	for_each_cpu(cpu, mask) {
-> -		if (cpu == me)
-> -			continue;
-> +	for_each_cpu(cpu, &tmp) {
->  		cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
->  		deadlock_check(me, cpu);
->  	}
-> -	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
-> +	while (!cpumask_subset(&tmp, &cpu_idle_mask))
->  		smp_wait_for_event();
-> -	for_each_cpu(cpu, mask)
-> +	for_each_cpu(cpu, &tmp)
->  		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
->  	smp_rmb(); /* pairs with the smp_wmb() in do_idle() */
->  }
+If it can remain inside root cgroup (like any other good kthread) its
+job may be even chunked into periodic/deferred workqueue pieces with no
+kthread per KVM at all.
 
+If there are resource control/charging concerns, I was thinking about
+the approach of cloning from the KVM task and never returning to
+userspace, which I see you already discussed with PF_USER_WORKER (based
+on #1). All context would be regularly inherited and no migration would
+be needed.
+
+(I remember issues with the kvm_vm_worker_thread surviving lifespan of
+KVM task and preventing removal of the cgroup. Not sure if that was only
+a race or there's real need for doing some cleanups on an exited task.)
+
+As for #2, I'm not sure there's a good criterion for what to ignore.
+Here it could possibly be PF_KTHREAD or PF_NOFREEZE (I get the latter
+has purpose for system-wide (or v1) freezer). Generally, we can't tell
+what's the effect of thread's liveliness so it seems better to
+conservatively treat the cgroup as unfrozen.
+
+
+HTH,
+Michal
+
+--2flxw46ilch26h54
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZy0BdwAKCRAt3Wney77B
+SYLIAQCuNDE3wTgZN3p9SAWDtSNXhwYcoK26f77RKTJcTmBEUwD8Cs/j4rnKyut3
+wTfnUQ9EoseHo9YzGHkO2Hhuq3vjTgY=
+=An9+
+-----END PGP SIGNATURE-----
+
+--2flxw46ilch26h54--
 
