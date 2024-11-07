@@ -1,226 +1,185 @@
-Return-Path: <kvm+bounces-31190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7F39C1175
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:04:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9116B9C11C5
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 23:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99C10B2209F
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 22:04:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4107E1F2512E
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 22:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB2521832F;
-	Thu,  7 Nov 2024 22:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE6C21A4CC;
+	Thu,  7 Nov 2024 22:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QyCSQT/h"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="E85Vpx1X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9C4215C6D
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 22:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B832194A6;
+	Thu,  7 Nov 2024 22:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731017069; cv=none; b=mvfx0lCfJnuzoyV43XmFuQ3NE5LDh9k9TMyZAdSnZcGAKz/KLuSNWRr2IlM+vRsFojAS3Z9/RCvZ2eyOjr9gVhoni4Ci2jTZEI/6uIAbpGAaQeTFcQ+tNUmm0PFFtRXhJldC9EziycNvH5i2ctyLeOuAuq4lqamZJAFV0aJpGHA=
+	t=1731018759; cv=none; b=HlLt9PNEcNkanV/ObtH5eiDtOtB8jt58aJkOof/Ohc1AoqIc6URtKUnM0UpIGzz5JOZOj7Y1HfeYbmwu49R0SJ5T/cKbfKYNrH7rwSvEpEctBqYUTyrS61zfC+g62WvuVN+R+KMN3/xl1t1SZyshsL0qqIkjyd8OiTfZKYHXnKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731017069; c=relaxed/simple;
-	bh=lpsB0Lhao14pSHuIsoNAfLMQVqkvehe9MRaIJTGgGQM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=p7a8pZY+pp+yLa4exznOx3JQXYRVTgM73gcMIZEmer3czeIu2h9vAK0cFYvBvUbICssH2A31hGiIvdNLGqjZprDFd8CPzPJF5dkXqBhuqOaQOKdG089wKbOsVeeoTdLOIPrVF8NxqUXo60asNY2vd533SHvOPYLBJ5dflI1Jzmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QyCSQT/h; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290b8b69f8so2352905276.2
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 14:04:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731017066; x=1731621866; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xbGhGQD3dLGHOdZf79vl2DnONOHtbHblmt/KrMX34JM=;
-        b=QyCSQT/hDiEnj+elNoSQ8RsnNXW/LbMbl4WOWB1gYBPSh8FDbk12Ea5Jc9At7jd+eM
-         LbJkpJX5AJMdwqH4/g8nDx9hhfGzx7yHhi3T9IZNVkrpNXJKKhFZE6y7OZHF2/6nROZV
-         D2Y7MfCoPfko6EUehfGjOVAtBZnGo8Q8spK5cassIymH5Y7Nn4hKUGjKTQjHF9wDUn1+
-         oHOuCn/mytsE34uh5wNbV4fsKe5fKljoCJo0n+Xeo0wkkdJ35eeUmQakOsEhjzRjI3gM
-         +CjMMa6EFDvNNWcjdYF2kQ1WgtgjXaZVtYrPrunaY4IvhEpFprdObgS6fqGn8NLI0qZ2
-         myQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731017066; x=1731621866;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xbGhGQD3dLGHOdZf79vl2DnONOHtbHblmt/KrMX34JM=;
-        b=O33glBIi7kTMagXBR5EwFWx+uAy/3dfS4ovFCDwY1Fabwbmj+CIZ6xjcyZJB/zG5EB
-         8GR0GvdBeD9BbqtY5aDpmdAETVOUMkz5vDdYsvxlaMl2Zfc57c5F5TCUXHFsYDk1MhkA
-         xwMZPtEOgBUJvosv+bYyT3vt0laV9UVP93WondJPmL8F1Y8Lw/uBEQL00ZvvSzXDZaIx
-         szPbbrpzJAYNyCxZbYDw8+vWQJvli4U2LkYCzEKuP9qfKBu8KnZh5WLyHCqlVxIqRIEB
-         HWXiSNoqbKVsVQWmvbxW8rvZU7B5Y5rJp+/sE9Ej8rWfRWCzxJg7suGaVm7xNHA56EdB
-         Em7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUWAJP3W+35Nz5arzIe/1Uvs+PevrWCBdsZ5mExyXvMWvtQbR/xx8fUS08pAP5IzdzgOeQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9KSqyOhuxdtLbxWBkUiLOlaBk51cr9u5o3VOLeYqrHm+LvhzN
-	Mk3n54xqXNp4jqiQgIhkr5OYLqtgA+WKIxR9MWlt9TqRh9DqrhaO5Q4yaITozfMhgKzh61M/hYp
-	U3Q==
-X-Google-Smtp-Source: AGHT+IGAD4bX7VHgyHjrfJRov5ldRUBUOAvZsIHOxd9qJY11CpezC67q3aZc2w/ppTDS+z3xlmpJz1tjiN0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:a423:0:b0:e20:2502:be14 with SMTP id
- 3f1490d57ef6-e337f8df4fbmr490276.7.1731017066602; Thu, 07 Nov 2024 14:04:26
- -0800 (PST)
-Date: Thu, 7 Nov 2024 14:04:25 -0800
-In-Reply-To: <2d69e11d8afc90e16a2bed5769f812663c123c14.camel@intel.com>
+	s=arc-20240116; t=1731018759; c=relaxed/simple;
+	bh=3axHTgWvPaJXU6x/HwYNyCImPTdzE7DJqPuDZ6F6AzE=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=fXJr0IiAV0cpTIlsanSD2sh+/NW+SL9MLqf3Y+HxDssH74J2LWCiaq0vv7TojBwx3z0ZawPrjiuNjvxtEvd82K+HYPkDiPwETQ3tnfKnllAvu67wmRbpaiHjfH2t5CJLHbGnGo0rLKgQddLgYpdkT5hme3bowV+UjoX/8L64+Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=E85Vpx1X; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id A7369212C4BF;
+	Thu,  7 Nov 2024 14:32:30 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A7369212C4BF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731018750;
+	bh=dXEOtZcKhs1OyrLOGbwwuM7yb0GGsFy0HJU2nlATJVM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=E85Vpx1XKF/7gIXBsoZOI6XnWD4pHDLIv62Hmm0sqgJpnOf8/Cgg8V/QCKee3Vppr
+	 ry4FPI40feJ1miQYl+Dx+/AvjsAcrxqUrJygt4jVjT3OJnYKE30CU4CoZ3KZny5GG9
+	 XD4lpSNQQEk/X8UUGLdqFqJ/fa8hg8d9V2jWrOLw=
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	iommu@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	mhklinux@outlook.com,
+	decui@microsoft.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	luto@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	daniel.lezcano@linaro.org,
+	joro@8bytes.org,
+	robin.murphy@arm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lpieralisi@kernel.org,
+	kw@linux.com,
+	robh@kernel.org,
+	bhelgaas@google.com,
+	arnd@arndb.de,
+	sgarzare@redhat.com,
+	jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com,
+	skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com,
+	vkuznets@redhat.com,
+	ssengar@linux.microsoft.com,
+	apais@linux.microsoft.com
+Subject: [PATCH v2 0/4] Add new headers for Hyper-V Dom0
+Date: Thu,  7 Nov 2024 14:32:22 -0800
+Message-Id: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1730120881.git.kai.huang@intel.com> <f7394b88a22e52774f23854950d45c1bfeafe42c.1730120881.git.kai.huang@intel.com>
- <ZyJOiPQnBz31qLZ7@google.com> <46ea74bcd8eebe241a143e9280c65ca33cb8dcce.camel@intel.com>
- <ZyPnC3K9hjjKAWCM@google.com> <37f497d9e6e624b56632021f122b81dd05f5d845.camel@intel.com>
- <ZyuDgLycfadLDg3A@google.com> <2d69e11d8afc90e16a2bed5769f812663c123c14.camel@intel.com>
-Message-ID: <Zy05af5Qxkc4uRtn@google.com>
-Subject: Re: [PATCH 3/3] KVM: VMX: Initialize TDX during KVM module load
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Tony Lindgren <tony.lindgren@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	Dan J Williams <dan.j.williams@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kristen@linux.intel.com" <kristen@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 06, 2024, Kai Huang wrote:
-> On Wed, 2024-11-06 at 07:01 -0800, Sean Christopherson wrote:
-> > On Wed, Nov 06, 2024, Kai Huang wrote:
-> > > For this we only disable TDX but continue to load module.  The reason is I think
-> > > this is similar to enable a specific KVM feature but the hardware doesn't
-> > > support it.  We can go further to check the return value of tdx_cpu_enable() to
-> > > distinguish cases like "module not loaded" and "unexpected error", but I really
-> > > don't want to go that far.
-> > 
-> > Hrm, tdx_cpu_enable() is a bit of a mess.  Ideally, there would be a separate
-> > "probe" API so that KVM could detect if TDX is supported.  Though maybe it's the
-> > TDX module itself is flawed, e.g. if TDH_SYS_INIT is literally the only way to
-> > detect whether or not a module is loaded.
-> 
-> We can also use P-SEAMLDR SEAMCALL to query, but I see no difference between
-> using TDH_SYS_INIT.  If you are asking whether there's CPUID or MSR to query
-> then no.
+To support Hyper-V Dom0 (aka Linux as root partition), many new
+definitions are required.
 
-Doesn't have to be a CPUID or MSR, anything idempotent would work.  Which begs
-the question, is that P-SEAMLDR SEAMCALL query you have in mind idempotent? :-)
+The plan going forward is to directly import definitions from
+Hyper-V code without waiting for them to land in the TLFS document.
+This is a quicker and more maintainable way to import definitions,
+and is a step toward the eventual goal of exporting headers directly
+from Hyper-V for use in Linux.
 
-> > So, absent a way to clean up tdx_cpu_enable(), maybe disable the module param if
-> > it returns -ENODEV, otherwise fail the module load?
-> 
-> We can, but we need to assume cpuhp_setup_state_cpuslocked() itself will not
-> return -ENODEV (it is true now), otherwise we won't be able to distinguish
-> whether the -ENODEV was from cpuhp_setup_state_cpuslocked() or tdx_cpu_enable().
-> 
-> Unless we choose to do tdx_cpu_enable() via on_each_cpu() separately.
-> 
-> Btw tdx_cpu_enable() itself will print "module not loaded" in case of -ENODEV,
-> so the user will be aware anyway if we only disable TDX but not fail module
-> loading.
+This patch series introduces new headers (hvhdk.h, hvgdk.h, etc,
+see patch #3) derived directly from Hyper-V code. hyperv-tlfs.h is
+replaced with hvhdk.h (which includes the other new headers)
+everywhere.
 
-That only helps if a human looks at dmesg before attempting to run a TDX VM on
-the host, and parsing dmesg to treat that particular scenario as fatal isn't
-something I want to recommend to end users.  E.g. if our platform configuration
-screwed up and failed to load a TDX module, then I want that to be surfaced as
-an alarm of sorts, not a silent "this platform doesn't support TDX" flag.
+No functional change is expected.
 
-> My concern is still the whole "different handling of error cases" seems over-
-> engineering.
+Summary:
+Patch 1-2: Minor cleanup patches
+Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+Patch 4: Switch to the new headers
 
-IMO, that's a symptom of the TDX enabling code not cleanly separating "probe"
-from "enable", and at a glance, that seems very solvable.  And I suspect that
-cleaning things up will allow for additional hardening.  E.g. I assume the lack
-of MOVDIR64B should be a WARN, but because KVM checks for MOVDIR64B before
-checking for basic TDX support, it's an non-commitalpr_warn().
+Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+---
+Changelog:
+v2:
+- Rework the series to simply use the new headers everywhere
+  instead of fiddling around to keep hyperv-tlfs.h used in some
+  places, suggested by Michael Kelley and Easwar Hariharan
+- Fix compilation errors with some configs by adding missing
+  definitions and changing some names, thanks to Simon Horman for
+  catching those
+- Add additional definitions to the new headers to support them now
+  replacing hyperv-tlfs.h everywhere
+- Add additional context in the commit messages for patches #3 and #4
+- In patch #2, don't remove indirect includes. Only remove includes
+  which truly aren't used, suggested by Michael Kelley
 
-> > > 4) tdx_enable() fails.
-> > > 
-> > > Ditto to 3).
-> > 
-> > No, this should fail the module load.  E.g. most of the error conditions are
-> > -ENOMEM, which has nothing to do with host support for TDX.
-> > 
-> > > 5) tdx_get_sysinfo() fails.
-> > > 
-> > > This is a kernel bug since tdx_get_sysinfo() should always return valid TDX
-> > > sysinfo structure pointer after tdx_enable() is done successfully.  Currently we
-> > > just WARN() if the returned pointer is NULL and disable TDX only.  I think it's
-> > > also fine.
-> > > 
-> > > 6) TDX global metadata check fails, e.g., MAX_VCPUS etc.
-> > > 
-> > > Ditto to 3).  For this we disable TDX only.
-> > 
-> > Where is this code?
-> 
-> Please check:
-> 
-> https://github.com/intel/tdx/blob/tdx_kvm_dev-2024-10-25.1-host-metadata-v6-rebase/arch/x86/kvm/vmx/tdx.c
-> 
-> .. starting at line 3320.
+---
+Nuno Das Neves (4):
+  hyperv: Move hv_connection_id to hyperv-tlfs.h
+  hyperv: Clean up unnecessary #includes
+  hyperv: Add new Hyper-V headers in include/hyperv
+  hyperv: Switch from hyperv-tlfs.h to hyperv/hvhdk.h
 
-Before I forget, that code has a bug.  This
+ arch/arm64/hyperv/hv_core.c        |    3 +-
+ arch/arm64/hyperv/mshyperv.c       |    4 +-
+ arch/arm64/include/asm/mshyperv.h  |    2 +-
+ arch/x86/hyperv/hv_apic.c          |    1 -
+ arch/x86/hyperv/hv_init.c          |   21 +-
+ arch/x86/hyperv/hv_proc.c          |    3 +-
+ arch/x86/hyperv/ivm.c              |    1 -
+ arch/x86/hyperv/mmu.c              |    1 -
+ arch/x86/hyperv/nested.c           |    2 +-
+ arch/x86/include/asm/kvm_host.h    |    3 +-
+ arch/x86/include/asm/mshyperv.h    |    3 +-
+ arch/x86/include/asm/svm.h         |    2 +-
+ arch/x86/kernel/cpu/mshyperv.c     |    2 +-
+ arch/x86/kvm/vmx/hyperv_evmcs.h    |    2 +-
+ arch/x86/kvm/vmx/vmx_onhyperv.h    |    2 +-
+ arch/x86/mm/pat/set_memory.c       |    2 -
+ drivers/clocksource/hyperv_timer.c |    2 +-
+ drivers/hv/hv_balloon.c            |    4 +-
+ drivers/hv/hv_common.c             |    2 +-
+ drivers/hv/hv_kvp.c                |    2 +-
+ drivers/hv/hv_snapshot.c           |    2 +-
+ drivers/hv/hyperv_vmbus.h          |    2 +-
+ include/asm-generic/hyperv-tlfs.h  |    9 +
+ include/asm-generic/mshyperv.h     |    2 +-
+ include/clocksource/hyperv_timer.h |    2 +-
+ include/hyperv/hvgdk.h             |  303 +++++++
+ include/hyperv/hvgdk_ext.h         |   46 +
+ include/hyperv/hvgdk_mini.h        | 1295 ++++++++++++++++++++++++++++
+ include/hyperv/hvhdk.h             |  733 ++++++++++++++++
+ include/hyperv/hvhdk_mini.h        |  310 +++++++
+ include/linux/hyperv.h             |   11 +-
+ net/vmw_vsock/hyperv_transport.c   |    2 +-
+ 32 files changed, 2729 insertions(+), 52 deletions(-)
+ create mode 100644 include/hyperv/hvgdk.h
+ create mode 100644 include/hyperv/hvgdk_ext.h
+ create mode 100644 include/hyperv/hvgdk_mini.h
+ create mode 100644 include/hyperv/hvhdk.h
+ create mode 100644 include/hyperv/hvhdk_mini.h
 
-	/* Check TDX module and KVM capabilities */
-	if (!tdx_get_supported_attrs(&tdx_sysinfo->td_conf) ||
-	    !tdx_get_supported_xfam(&tdx_sysinfo->td_conf))
-		goto get_sysinfo_err;
+-- 
+2.34.1
 
-will return '0' on error, instead of -EINVAL (or whatever it intends).
-
-Back to the main discussion, these checks are obvious "probe" failures and so
-should disable TDX without failing module load:
-
-	if (!tdp_mmu_enabled || !enable_mmio_caching)
-		return -EOPNOTSUPP;
-
-	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
-		pr_warn("MOVDIR64B is reqiured for TDX\n");
-		return -EOPNOTSUPP;
-	}
-
-A kvm_find_user_return_msr() error is obviously a KVM bug, i.e. should definitely
-WARN and fail module module.  Ditto for kvm_enable_virtualization().
-
-The boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM) that's buried in tdx_enable()
-really belongs in KVM.  Having it in both is totally fine, but KVM shouldn't do
-a bunch of work and _then_ check if all that work was pointless.
-
-I am ok treating everything at or after tdx_get_sysinfo() as fatal to module load,
-especially since, IIUC, TD_SYS_INIT can't be undone, i.e. KVM has crossed a point
-of no return.
-
-In short, assuming KVM can query if a TDX module is a loaded, I don't think it's
-all that much work to do:
-
-  static bool kvm_is_tdx_supported(void)
-  {
-	if (boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM))
-		return false;
-
-	if (!<is TDX module loaded>)
-		return false;
-
-	if (!tdp_mmu_enabled || !enable_mmio_caching)
-		return false;
-
-	if (WARN_ON_ONCE(!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)))
-		return false;
-
-	return true;
-  }
-
-  int __init tdx_bringup(void)
-  {
-	enable_tdx = enable_tdx && kvm_is_tdx_supported();
-	if (!enable_tdx)
-		return 0;
-
-	return __tdx_bringup();
-  }
 
