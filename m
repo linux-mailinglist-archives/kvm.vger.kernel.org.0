@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-31186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 539319C1130
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 22:42:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6019C1131
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 22:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18793285800
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:42:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1580D1F24DB3
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2024 21:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D771E2185BA;
-	Thu,  7 Nov 2024 21:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10C7218D99;
+	Thu,  7 Nov 2024 21:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="id/dN6KV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TYLNIOy0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D101218D6F
-	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 21:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5CC2185B9
+	for <kvm@vger.kernel.org>; Thu,  7 Nov 2024 21:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731015706; cv=none; b=Nm8mN6lAmWJojtSXr54DsIxaT8R+GJ+Amfickd7FWTLUdPjE3Sf4Qg8wk6QMZXjbEvBY22L3gi9KrOmofNmtm4JgZpxbu7wca8KFdfoUyyo4GgjeDXg/K83Q+Jgl0Jxfr16hhInYCHA3WJkrsUN2l7hLyhqqABSUVj61j7nRvv8=
+	t=1731015707; cv=none; b=fpVXd/q63v3tUVOUSCdJWjSssP+mBc1PQEJPlP3nq6WMGexDx2nMxd8a9RKxAlslQuCeKRIX5sEVd3z2H+4qUBHMaN+I3Tp+FdRh1VWlKXY6g9nqoHcJVqLvgQPLdROXmUPFwUkgpmNi9gotRCX9PA6j4c4NP2O8FRFY/uA3/wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731015706; c=relaxed/simple;
-	bh=2pbUMDr5DJLxz76a4PYkqqphNu7dpq8aJ2XhdaDTv9k=;
+	s=arc-20240116; t=1731015707; c=relaxed/simple;
+	bh=ycEwchMVeREbQDrNSvN/2lCAjf1GulsvRaTBPk8AK3Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FQ7YruYPyq7bKaSUmM3h76olTzCWCYmLfZSOPJRm+k1z87gX4em2xCac4J9n43eWShw2SnLpoW1oKDA+onffvUZxAkeMv6qGiV7ljWsPQiRFRv7MYr5IDRJL/9fq73Nlzh0V+CYzCV9iUIw1XM9We8xCaIfapT+LzOjo8JY6n9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=id/dN6KV; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=q4uY2J32bhVv62b+RB+8PKC+rmX/RyrjEX+UGh0iETT3xlH9Kj8sDoofgMJXpMxX1ULHfZu10KX2hKloAO2I2061SIJ5MveLQsxOGegQcfD+XLEc5OLByzh+ZU060jaHdPpj8zFiMtIPDFFvWWW8Ow0H4NH4HuMQHT+szSZ4dOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TYLNIOy0; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e59dc7df64so18956097b3.1
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 13:41:44 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e330f65bcd9so2268533276.1
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 13:41:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731015703; x=1731620503; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731015705; x=1731620505; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hiCU49kQ7nM6OEw67YOfyReqqCaE0LkMlzZtaslGJ+8=;
-        b=id/dN6KVHt0RNJfVO7to6zkj4vZxIMz2JnaEAi0YZyijLUFGD1zmztKWSkUQZBxmlW
-         NPZ1zFq1w6FkPpFdI6hjk35h5I7OZ90AsagrGK9Gq2FjX6ggP4bFnrcA2Iyd4+RjYovy
-         HGSlS5DJxm5IRQvuqnUziQA/7QEczKd73p3YefeZz6PCHDxzmbe+h+1scxuWaAfge4XR
-         ZYQrD6gIqqamT7Tp9ly1DYqO4RmCcHr8VGW7gqJSXKH4tONfwOOMTUj+O2uykFhNI8fr
-         Pm0kYri2Lp2kv7HD4i4DOHK53EGTZrI3bfMCt83V7acWn5wqcVCZF+FRdZ6qWqq1NUq9
-         a74g==
+        bh=+HGLva8x9odObzptOfMBkr9/TxQLRpKS7Miz1lBZC1M=;
+        b=TYLNIOy0exkmQPD7bdgm8fqZDGARQ+cT/AbKEd76gYI4FZpMJ/Ip5b/L4hmdh35YJM
+         nbX5MovZiuNeLVecTl45+I6WTrUB0ZJwLiPVKPh2Mxo4CYrjzXwZN0opRW/0k8A24fe0
+         4nqOBtgWHEwsalLozgVCkOA7/F1PSILX2GEk+G8ZGlf7Ut1L3aqB7SMpf+tVGnEG36OE
+         iLJIOI4CSAnNWjfVBwUj4AQwYuM6UNBGM0ToBFTd4jOsBTKdbS+BsPgUM0NefNeP+6I/
+         7ghoq96VrdDA3EuV4gIDzp/1jijNNOlpCfus0zSvTYH4X3nX4JkgNTYvQcLXhmt9otKS
+         HE+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731015703; x=1731620503;
+        d=1e100.net; s=20230601; t=1731015705; x=1731620505;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hiCU49kQ7nM6OEw67YOfyReqqCaE0LkMlzZtaslGJ+8=;
-        b=PAQQe8Uk4E40RYDv0D612qbe7sUhc5Vch0M77MrXKq84oZxQ3dqcaksPh2W/yzMY3P
-         RtHSuzH92MKqYhDzFNgjPf6h/9mYaowGIvrNqP46WH5dx+pFtcEyZYurYK75mBVDRjm6
-         twu7lc5GWDBJXZXP46/ahJGRZ7hbyvnki5wETi4hl+OZzIaUtksRmzDCKqQyhWhMqUKn
-         ye8srx72EYZ9xyYaez2cSY5rHT4cHAIC/PCESVOzAsjXKjWtu2TYynWZc7CqTI/AK4jW
-         UfoDrxabd0JSuUuy5nwmxY3LzxiebYF158wjUdCAKWT0k4N4SefqefduWqQ0y7Flnj+d
-         9a3w==
-X-Gm-Message-State: AOJu0Yy9bveJJ+ClwpNSOW1rrBWwbEBQLoDgXZAPkKvcDHizGKDDyTlH
-	XWZ/9ZfD9WF53II2LYfUt7Sa1Vj/q5t7mlJnH3XQiVYIeYgeBiBDmQOwQk1jAMJJ4f41h1SfMHu
-	NZ9fBBAxB2oNcgBscBlRRqz0lOmi24cEMDm2Ls8Ey8/LfmCALj0y3hJMEr4SVWiTpPVkCEJdi/b
-	yzHr7aeheJoNTjVxugOt4YU8LOfPoztwrRyBs/Rs3VVQnVJxS2XBIOSKE=
-X-Google-Smtp-Source: AGHT+IFmgY5AoHS66JpJ0ifa3vDhWyv/RjJrFb6ac4d0BLBtWrLWqHo8sUtLA5mcEv0UhGNPrlRByVBRLG34IueAkQ==
+        bh=+HGLva8x9odObzptOfMBkr9/TxQLRpKS7Miz1lBZC1M=;
+        b=ZAxiz0g4vF74yyf2Fv4tUEvsLjz+K2+f2HD62KzQg90JpplYoFaNUQzy6pltRKXXjG
+         NyAW+Uq7c49zqWm8Ik11ScG3gBCIm7fXFDJw6h+4elx3gAletgpEpwJ6jCUYGEI9GllP
+         dpQqz7wSEag4tpaxmNKjgI4WVL49vaqRKPX6AB/hOgPsvmu53r1Z4073orNd/1/vZzPw
+         EudmjM3TppOq0gNpF8jFFAP21KXdnoHIEekI8h0sQipZppGSuBezZ57M504UcDdn4J5C
+         GtZyHKcEop5onkv7hoFLnbouzbZ1FINReGbFfXV+qB0+O9BQX/So+nmRxqrV5uqrcSJl
+         sVKw==
+X-Gm-Message-State: AOJu0YzwjIROM3s1+HHc8Sr1GQ0FFJDqsv3tdh+DKBxSTbYfpcPqkgF/
+	gc0yRSYDMKocEGlCdccrDgtZy4sHZmq8y0StCRkJS6F4VEsfNK/Qv2lsP89+u0NvkwGA2tUin9I
+	ODVr/P6XLad5Wa3TdWCzSnFxVHu8xHlGvLND7CX33aT4NbfRkC9vxCKIV/EKDe7jDVYXY1/x0Vt
+	ka1Yw4Sg47c56ZkQzuRd0yPhiwt1UF32SIzYbrfCqo5q0FN9Nq3Tp+J3A=
+X-Google-Smtp-Source: AGHT+IFc0PLyo+kb0an1Crt410TnBfN08WjncHVRt9wOAEQvXdRMVzovySNeUUyzLZxRzXVJhn2du4OY9kLn+4Hz5w==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c96f])
- (user=jingzhangos job=sendgmr) by 2002:a05:690c:7407:b0:68e:8de6:617c with
- SMTP id 00721157ae682-6eade552a04mr73357b3.5.1731015703380; Thu, 07 Nov 2024
- 13:41:43 -0800 (PST)
-Date: Thu,  7 Nov 2024 13:41:34 -0800
+ (user=jingzhangos job=sendgmr) by 2002:a25:abac:0:b0:e2b:db24:905e with SMTP
+ id 3f1490d57ef6-e338017a945mr1306276.5.1731015704930; Thu, 07 Nov 2024
+ 13:41:44 -0800 (PST)
+Date: Thu,  7 Nov 2024 13:41:35 -0800
 In-Reply-To: <20241107214137.428439-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241107214137.428439-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107214137.428439-3-jingzhangos@google.com>
-Subject: [PATCH v4 2/5] KVM: arm64: vgic-its: Add read/write helpers on ITS
- table entries.
+Message-ID: <20241107214137.428439-4-jingzhangos@google.com>
+Subject: [PATCH v4 3/5] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -89,49 +88,93 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>
 	Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-To simplify read/write operations on ITS table entries, two helper
-functions have been implemented. These functions incorporate the
-necessary entry size validation.
+From: Kunkun Jiang <jiangkunkun@huawei.com>
 
+In all the vgic_its_save_*() functinos, they do not check whether
+the data length is 8 bytes before calling vgic_write_guest_lock.
+This patch adds the check. To prevent the kernel from being blown up
+when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
+are replaced together.
+
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+[Jing: Update with the new entry read/write helpers]
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/vgic/vgic.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ arch/arm64/kvm/vgic/vgic-its.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index f2486b4d9f95..309295f5e1b0 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -146,6 +146,29 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
- 	return ret;
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index ba945ba78cc7..9ccf00731ad2 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2086,7 +2086,6 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 			      struct its_ite *ite, gpa_t gpa, int ite_esz)
+ {
+-	struct kvm *kvm = its->dev->kvm;
+ 	u32 next_offset;
+ 	u64 val;
+ 
+@@ -2095,7 +2094,8 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+ 		ite->collection->collection_id;
+ 	val = cpu_to_le64(val);
+-	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
++
++	return vgic_its_write_entry_lock(its, gpa, val, ite_esz);
  }
  
-+static inline int vgic_its_read_entry_lock(struct vgic_its *its, gpa_t eaddr,
-+					   u64 *eval, unsigned long esize)
-+{
-+	struct kvm *kvm = its->dev->kvm;
+ /**
+@@ -2239,7 +2239,6 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+ 			     gpa_t ptr, int dte_esz)
+ {
+-	struct kvm *kvm = its->dev->kvm;
+ 	u64 val, itt_addr_field;
+ 	u32 next_offset;
+ 
+@@ -2250,7 +2249,8 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+ 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+ 		(dev->num_eventid_bits - 1));
+ 	val = cpu_to_le64(val);
+-	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
 +
-+	if (KVM_BUG_ON(esize != sizeof(*eval), kvm))
-+		return -EINVAL;
++	return vgic_its_write_entry_lock(its, ptr, val, dte_esz);
+ }
+ 
+ /**
+@@ -2437,7 +2437,8 @@ static int vgic_its_save_cte(struct vgic_its *its,
+ 	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
+ 	       collection->collection_id);
+ 	val = cpu_to_le64(val);
+-	return vgic_write_guest_lock(its->dev->kvm, gpa, &val, esz);
 +
-+	return kvm_read_guest_lock(kvm, eaddr, eval, esize);
-+
-+}
-+
-+static inline int vgic_its_write_entry_lock(struct vgic_its *its, gpa_t eaddr,
-+					    u64 eval, unsigned long esize)
-+{
-+	struct kvm *kvm = its->dev->kvm;
-+
-+	if (KVM_BUG_ON(esize != sizeof(eval), kvm))
-+		return -EINVAL;
-+
-+	return vgic_write_guest_lock(kvm, eaddr, &eval, esize);
-+}
-+
++	return vgic_its_write_entry_lock(its, gpa, val, esz);
+ }
+ 
  /*
-  * This struct provides an intermediate representation of the fields contained
-  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+@@ -2453,8 +2454,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+ 	u64 val;
+ 	int ret;
+ 
+-	BUG_ON(esz > sizeof(val));
+-	ret = kvm_read_guest_lock(kvm, gpa, &val, esz);
++	ret = vgic_its_read_entry_lock(its, gpa, &val, esz);
+ 	if (ret)
+ 		return ret;
+ 	val = le64_to_cpu(val);
+@@ -2516,10 +2516,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ 	 * table is not fully filled, add a last dummy element
+ 	 * with valid bit unset
+ 	 */
+-	val = 0;
+-	BUG_ON(cte_esz > sizeof(val));
+-	ret = vgic_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
+-	return ret;
++	return vgic_its_write_entry_lock(its, gpa, 0, cte_esz);
+ }
+ 
+ /*
 -- 
 2.47.0.277.g8800431eea-goog
 
