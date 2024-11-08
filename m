@@ -1,210 +1,154 @@
-Return-Path: <kvm+bounces-31245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31246-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10579C18DD
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:12:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FFA89C18E1
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4589AB23F6A
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2F6B1F21A91
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FB71E105B;
-	Fri,  8 Nov 2024 09:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8052B1D356C;
+	Fri,  8 Nov 2024 09:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="afwHBocK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RNzik05j"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499831E1022
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454F31E00AC
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731057092; cv=none; b=nktFptGSLU9e8RpEAB0FsE5hzLIsrrIw2ebWaoVioRXYV0tK+upAKd6NpEPdYm5o1Qca6KWajSLFUKYHtdYfmiC/0Gn8zNmzwPYmYwf+DkmB+Dw7QPG4ovdDCoZJt9pYlNzwQK3Svw+9ChUr7ecWZm7V6ebz05lqjlbjtXjMznQ=
+	t=1731057211; cv=none; b=kP515fCkWdPc2vpkP1+87EkfUIcffw86IBb5Ksw4GK69E2Zw7r0oHDhyHILfqRAPPCF+mfe/7pv9iEhoNdG+qAJFbrzQOV/1bG5Pjm16Uoi0utr7zCLaVkR4NFxk3yJ7RJsOPUpAtBgJz9WbN/5ZoLSCqPA6W1FDrTV/D/ajJ/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731057092; c=relaxed/simple;
-	bh=P18VhREfrugG/qHzr6teADAUJc2Z4IK8RZWU+Ghq12s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O8ZTJZLoYItGWcDDpfWoWfoGLhrC/LkBPbWtp0w9ZDLrX/jpoyhSbuaAbEUM6LmIg1UZ7zMrH8X3Bvd0EWkZLi0P8Qp5wuAJR7irYInpdrqgD463g/AeFOWYW80P2fIjipHghct+vNSmStxFhZifBW6Ge/2Fdvye8X00vuCHPcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=afwHBocK; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1731057211; c=relaxed/simple;
+	bh=HEAsdYLwkrtGtogdvIBPZEXWue42gncPQ87YECUk5kY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qGwjJ4hYnWQvoH4vZR4VRbXmC2o7gdj7FreR0soVLSNrziVPT6cs/dQ8mY5dtnw+n2PQUbIhfiCo4kopZManBc9YALGvbzMO00PVLcMDkVEEucdUnVWFAZRYyHjS15BooPvsuFFgdCB5lxhO1hmg7pOZSMyGRFq6jMfvCnjLeWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RNzik05j; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731057089;
+	s=mimecast20190719; t=1731057208;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0WsuT3DC9bRgfcNtNIX7eohD3jKZ/flCBZ9q9PWdOEI=;
-	b=afwHBocKo5llks//1fOhHT+4fc5x93FlwSYKhKk5xVm76hAHxS1LusyXIMINjhX3DSaA03
-	MfA0bqnRxMWkHy26trpmgMca8zyd/U6wJJs65TqJgjSG3Fjc9BS/G+W3YWqqvJFxgK5WKn
-	m4liLdEpiduj1+VXJcps/6OM1Aw/iGw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=GO0OGIRGWxKfjRBGTtqAfw57F84sGfgBv8XkGbO8UBE=;
+	b=RNzik05jnXLZqJ9feI2reYharozV0DXk7KH98pr8XHdBcBqGH/60AwaZdKEvN81o5iym+k
+	2RaeS+mfqN8Kpka9g8R6FqfpKtyFu1aeaOhEP9L9WNJ5N57Kf7OYJzsynwTHbOE27aoLHx
+	0Ey55xd+g7TxmtYRUS7BfAvM0E9hbEs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-b91A1LmZOFWL34ykj4G-0w-1; Fri, 08 Nov 2024 04:11:27 -0500
-X-MC-Unique: b91A1LmZOFWL34ykj4G-0w-1
-X-Mimecast-MFC-AGG-ID: b91A1LmZOFWL34ykj4G-0w
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d52ca258eso968384f8f.3
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:11:27 -0800 (PST)
+ us-mta-267-5F-Mfi9nNB2MKH7Rymhf-w-1; Fri, 08 Nov 2024 04:13:26 -0500
+X-MC-Unique: 5F-Mfi9nNB2MKH7Rymhf-w-1
+X-Mimecast-MFC-AGG-ID: 5F-Mfi9nNB2MKH7Rymhf-w
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315a0f25afso13490065e9.3
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:13:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731057086; x=1731661886;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0WsuT3DC9bRgfcNtNIX7eohD3jKZ/flCBZ9q9PWdOEI=;
-        b=rfD72ohznSesPBjeIlNTAv32AmNjEYD0NYBl6WOfn0zRWNPdk/dqh8X9pUEAHVPL2w
-         oXTEDMVrbBxFOH4jLrP3RSL/ng/XnPOtImRT9GONbV1eSJiYtCePjwn6jymrCNgZ2bhk
-         U1Q/s6orhzkPWk+INndevg+E3uTQOwC5XVH5vVecz1ntkeNmNwzDfVQFufwtjC5bEIbI
-         taqEz2pk5YR5NC2rJNXcyPMki2kQNDtUy31EF9Q3UUthSUCaxixNYNiAxNqdQpt4gs9t
-         6oAb3RwFVyms5+R2N2fkxw85Oj6BIz4O8DsggavvAmY9lCbBvalO/k8mzt7JmfYXU1g7
-         nIxA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7BehJkU8msQjKnKtAdUodKRN/3BlP+WZcu7Mc6Db8Zv3YZEh6LBRisIaYhrTY8wuyHVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhMx0x6LkiQMNZKObNGV7DSdkXX6iOI83nPhDuoXtYBO98gaLJ
-	1YfYf9v152382inls/myZLVHU2ihHLqZTfr3yVupYZYN6FPC7dWaE1lnNSaXLn2R1g33ANgrpLY
-	3FkA9O6IF2oebdIQ37cKMiet9Rvhmhn4XrT5bfMyrfQWS6rwcSg==
-X-Received: by 2002:a05:6000:470c:b0:37d:36f2:e2cb with SMTP id ffacd0b85a97d-381f16180cdmr1817973f8f.0.1731057086600;
-        Fri, 08 Nov 2024 01:11:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEzIFbKup5v9N/vkT3yVeYe4zKp1d/9iZQMTZ+mtjlmwHCic7JOR4NiaQ1QPh2UX2o2j7ng2Q==
-X-Received: by 2002:a05:6000:470c:b0:37d:36f2:e2cb with SMTP id ffacd0b85a97d-381f16180cdmr1817947f8f.0.1731057086207;
-        Fri, 08 Nov 2024 01:11:26 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70f:b600:4a55:861a:f768:72a8? (p200300cbc70fb6004a55861af76872a8.dip0.t-ipconnect.de. [2003:cb:c70f:b600:4a55:861a:f768:72a8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97cfefsm3976303f8f.26.2024.11.08.01.11.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 01:11:25 -0800 (PST)
-Message-ID: <6099e202-ef0a-4d21-958c-2c42db43a5bb@redhat.com>
-Date: Fri, 8 Nov 2024 10:11:24 +0100
+        d=1e100.net; s=20230601; t=1731057205; x=1731662005;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GO0OGIRGWxKfjRBGTtqAfw57F84sGfgBv8XkGbO8UBE=;
+        b=r2xc2gD45uKUnDj1DgtjqcAChw99J+DH/9Ql6m/y2/w2pehlYIpZ8X37g8DWjdtu3p
+         JblZ3lQB0VK4HCh2xueVRTOGG+O1aHNuXSltvQc3dXDLUUwykd86He7rWYLQecKEnw5x
+         NHJZeycQXbp8Pbb6Ch+RLRAp7fLyJaXvYCTiKgTw2ov27qEt9tEvJBVGDT4tkKYvQlp9
+         Jf5veSPOzKmqwSTT3ehDmBv8fzh/Z/a3bm9UoIiG9SBfwH+WaLv7KAmQy5xtuwY39IIg
+         ekiy2AZlLY5TiijPRz0xWd5ZjArOBkOcydmNRUxeF3tYce+XZGpy2sQpDTJJdDX5c62T
+         AbCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbvmGy9PLfrIPkvUzqrIx9XQI0sex+9m1QgWmk9wBnPQ3wtZCEmz2hKEZn1adhRyFEfrU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1ENWdWLAxcwBnc6mBg25nLC3OwUisw4N72VK67C6b6M9pncpP
+	x9TAiSYRwo/Sz145VCHnzlpFTkCtiRpM90Ctoy71F+uOiJsLgB98z6PDIv8mZssSj24hrwT20qR
+	VuYf+Bqmk2Z3vGKDCJ99JazjddqSh1iit2WM2iMc1mlrwMxpgbA==
+X-Received: by 2002:a05:600c:1c88:b0:42c:de34:34be with SMTP id 5b1f17b1804b1-432b74fa92amr16075615e9.3.1731057205634;
+        Fri, 08 Nov 2024 01:13:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFAK5vTncKeqE+EzHOeYy/PGvMNPyTWcejCYkWGsZcXDWCK4COat90VpxuJseJwMBr3OSiYWQ==
+X-Received: by 2002:a05:600c:1c88:b0:42c:de34:34be with SMTP id 5b1f17b1804b1-432b74fa92amr16075165e9.3.1731057205008;
+        Fri, 08 Nov 2024 01:13:25 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.101.111])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1c81sm56640315e9.32.2024.11.08.01.13.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 01:13:24 -0800 (PST)
+Date: Fri, 8 Nov 2024 10:13:17 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+	George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 2/3] vsock: Fix sk_error_queue memory leak
+Message-ID: <qjib7qrjxitohmdyjdvnxh7pavzkqohzthwn3mxiaot5copoh2@yg4dstc2fx5w>
+References: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
+ <20241107-vsock-mem-leaks-v2-2-4e21bfcfc818@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ISSUE] split_folio() and dirty IOMAP folios
-To: Matthew Wilcox <willy@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- kvm@vger.kernel.org, Zi Yan <ziy@nvidia.com>,
- Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
- <djwong@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <4febc035-a4ff-4afe-a9a0-d127826852a9@redhat.com>
- <ZyzmUW7rKrkIbQ0X@casper.infradead.org>
- <ada851da-70c2-424e-b396-6153cecf7179@redhat.com>
- <Zy0g8DdnuZxQly3b@casper.infradead.org>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <Zy0g8DdnuZxQly3b@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241107-vsock-mem-leaks-v2-2-4e21bfcfc818@rbox.co>
 
-On 07.11.24 21:20, Matthew Wilcox wrote:
-> On Thu, Nov 07, 2024 at 05:34:40PM +0100, David Hildenbrand wrote:
->> On 07.11.24 17:09, Matthew Wilcox wrote:
->>> On Thu, Nov 07, 2024 at 04:07:08PM +0100, David Hildenbrand wrote:
->>>> I'm debugging an interesting problem: split_folio() will fail on dirty
->>>> folios on XFS, and I am not sure who will trigger the writeback in a timely
->>>> manner so code relying on the split to work at some point (in sane setups
->>>> where page pinning is not applicable) can make progress.
->>>
->>> You could call something like filemap_write_and_wait_range()?
->>
->> Thanks, have to look into some details of that.
->>
->> Looks like the folio_clear_dirty_for_io() is buried in
->> folio_prepare_writeback(), so that part is taken care of.
->>
->> Guess I have to fo from folio to "mapping,lstart,lend" such that
->> __filemap_fdatawrite_range() would look up the folio again. Sounds doable.
->>
->> (I assume I have to drop the folio lock+reference before calling that)
-> 
-> I was thinking you'd do it higher in the callchain than
-> gmap_make_secure().  Presumably userspace says "I want to make this
-> 256MB range secure" and we can start by writing back that entire
-> 256MB chunk of address space.
-> 
-> That doesn't prevent anybody from dirtying it in-between, of course,
-> so you can still get -EBUSY and have to loop round again.
+On Thu, Nov 07, 2024 at 09:46:13PM +0100, Michal Luczaj wrote:
+>Kernel queues MSG_ZEROCOPY completion notifications on the error queue.
+>Where they remain, until explicitly recv()ed. To prevent memory leaks,
+>clean up the queue when the socket is destroyed.
+>
+>unreferenced object 0xffff8881028beb00 (size 224):
+>  comm "vsock_test", pid 1218, jiffies 4294694897
+>  hex dump (first 32 bytes):
+>    90 b0 21 17 81 88 ff ff 90 b0 21 17 81 88 ff ff  ..!.......!.....
+>    00 00 00 00 00 00 00 00 00 b0 21 17 81 88 ff ff  ..........!.....
+>  backtrace (crc 6c7031ca):
+>    [<ffffffff81418ef7>] kmem_cache_alloc_node_noprof+0x2f7/0x370
+>    [<ffffffff81d35882>] __alloc_skb+0x132/0x180
+>    [<ffffffff81d2d32b>] sock_omalloc+0x4b/0x80
+>    [<ffffffff81d3a8ae>] msg_zerocopy_realloc+0x9e/0x240
+>    [<ffffffff81fe5cb2>] virtio_transport_send_pkt_info+0x412/0x4c0
+>    [<ffffffff81fe6183>] virtio_transport_stream_enqueue+0x43/0x50
+>    [<ffffffff81fe0813>] vsock_connectible_sendmsg+0x373/0x450
+>    [<ffffffff81d233d5>] ____sys_sendmsg+0x365/0x3a0
+>    [<ffffffff81d246f4>] ___sys_sendmsg+0x84/0xd0
+>    [<ffffffff81d26f47>] __sys_sendmsg+0x47/0x80
+>    [<ffffffff820d3df3>] do_syscall_64+0x93/0x180
+>    [<ffffffff8220012b>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-I'm afraid that won't really work.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-On the one hand, we might be allocating these pages (+disk blocks) 
-during the unpack operation -- where we essentially trigger page faults 
-first using gmap_fault() -- so the pages might not even exist before the 
-gmap_make_secure() during unpack. One work around would be to 
-preallocate+writeback from user space, but it doesn't sound quite right.
-
-But the bigger problem I see is that the initial "unpack" operation is 
-not the only case where we trigger this conversion to "secure" state. 
-Once the VM is running, we can see calls on arbitrary guest memory even 
-during page faults, when gmap_make_secure() is called via 
-gmap_convert_to_secure().
-
-
-I'm still not sure why we see essentially no progress being made, even 
-though we temporarily drop the PTL, mmap lock, folio lock, folio ref ... 
-maybe related to us triggering a write fault that somehow ends up 
-setting the folio dirty :/ Or because writeback is simply too slow / 
-backs off.
-
-I'll play with handling -EBUSY from split_folio() differently: if the 
-folio is under writeback, wait on that. If the folio is dirty, trigger 
-writeback. And I'll look into whether we really need a writable PTE, I 
-suspect not, because we are not actually "modifying" page content.
-
--- 
-Cheers,
-
-David / dhildenb
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 35681adedd9aaec3565495158f5342b8aa76c9bc..dfd29160fe11c4675f872c1ee123d65b2da0dae6 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -836,6 +836,9 @@ static void vsock_sk_destruct(struct sock *sk)
+> {
+> 	struct vsock_sock *vsk = vsock_sk(sk);
+>
+>+	/* Flush MSG_ZEROCOPY leftovers. */
+>+	__skb_queue_purge(&sk->sk_error_queue);
+>+
+> 	vsock_deassign_transport(vsk);
+>
+> 	/* When clearing these addresses, there's no need to set the family and
+>
+>-- 
+>2.46.2
+>
 
 
