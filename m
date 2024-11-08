@@ -1,81 +1,82 @@
-Return-Path: <kvm+bounces-31243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 559A19C18C7
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:08:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 866CA9C18CA
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:09:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67DA4B23AF2
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:08:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E74A1B2187E
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0213D1E0DFE;
-	Fri,  8 Nov 2024 09:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0E71E0DE0;
+	Fri,  8 Nov 2024 09:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jMQhL9Il"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UoLLy5yS"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EBD1E00AC
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565821E00AC
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731056887; cv=none; b=l48i2iacJsOB3wCHdt4DsA5b1jE3s0ZFoidYroeb6LhvcuxkbC/H6h/pAgN9Xnh3yRsoj4ZnfvweGKR/u+1biz+lCaPnbMju4/JsUNnCC9RqCII9LJaWs+xRevTuqDfLWHa3Wka3ngPQVLGJMmuxyYZ35coqRkUzVYiQYQG+xj8=
+	t=1731056929; cv=none; b=PDOc6Hqe5HO5oXVxPEvyS3aCKZSLvkNOHkzBgQcxODVfoNkTZUnb8S61DIHLeJR8cnp+UNGpTM5z6IJoq3tyQ5NERh7N3vK36sYvxC5f+ziBd0j5pqYaXWmlKyLMPCusYoqqSHRV7pLK4/8tQlFMWCpKpEKbGC93FTp3NnV3KbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731056887; c=relaxed/simple;
-	bh=rji1NgSEnYG766seny/oF7vzi/0rqzl71uSHuI2ayVI=;
+	s=arc-20240116; t=1731056929; c=relaxed/simple;
+	bh=WFc3Q9Mb4YnWrd+oQcX8uE9XxGi7mkMSsY7Q/8EXo/s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mH2GAIswzlhcDni5wVkQd4NWJnDsdQ/8V18On/pD5ult6fU6UA3e78Fx2Sq/0Z6WIa4imG7qkX7DoxamDyuUVGgZVSmQBOxm52k6Hl0uOYvL239JldvVDI3LwyyVfLLgXcMKgO6ilBPZvcyjOybB3oN7YSS+SdfZsB/+aoC7gcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jMQhL9Il; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=tyNvPKlJt8P8+tQSgNQveMWJNZYPETjdAH4OFr3YZ80VTCIozSugoM4rKfgn7fx5mPgjhL2fPZH1zcZtHAmusGS/Cv5qwcztc3t41Dz4HLwnS5zY8jdrEU0Sk7Jua8ufI1nVG5bzfvlhcYnPuXlOUl62mX+K8Lej58Paxr8GKIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UoLLy5yS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731056883;
+	s=mimecast20190719; t=1731056926;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pXJT4fvshfkZ9WGr4kVPztJYZRbyLmUyPApislAWUUw=;
-	b=jMQhL9IlKU/eCvq+Bc3hY6oRwBp99gikgiwDZRGuuFBirSG0LliPqJgbkIPSd4M9aTmPJv
-	yIx0cEz08OO1YkEWBuPOKJR+zgrO6HiWwLIf/epCuGPAKlA0mSzCgIrF/L05LkZMXlMmqZ
-	0Dp49FnGqOfaQanXzleAtA0cpPjPRZY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4zjoLu3X9DAY4JQpfTcJl0/52UxwxHvuqwd6q7efGUc=;
+	b=UoLLy5yS8Et0w4I4Ddj0Qrpcx1qsx7v0JTLZRsrGuNm7r+IjF35VwtwExoau7+5NkQ6e5T
+	Wzq/LdjV6J1pOgvnRbscKu+RixP+1FtcTrF8qRoVDTT7VPNGLv5rVE2HETmucF/nTXmphK
+	/Ni2G97lrEWp5oyWgXUfD+CS1AoreQc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-Ycw1Kk8UM_eDJXj3ahxNkw-1; Fri, 08 Nov 2024 04:08:02 -0500
-X-MC-Unique: Ycw1Kk8UM_eDJXj3ahxNkw-1
-X-Mimecast-MFC-AGG-ID: Ycw1Kk8UM_eDJXj3ahxNkw
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4314f1e0f2bso13746805e9.1
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:08:02 -0800 (PST)
+ us-mta-227--3h_e7RdOUiwFEkqspTxqA-1; Fri, 08 Nov 2024 04:08:44 -0500
+X-MC-Unique: -3h_e7RdOUiwFEkqspTxqA-1
+X-Mimecast-MFC-AGG-ID: -3h_e7RdOUiwFEkqspTxqA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43159c07193so17073665e9.0
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:08:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731056880; x=1731661680;
+        d=1e100.net; s=20230601; t=1731056923; x=1731661723;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pXJT4fvshfkZ9WGr4kVPztJYZRbyLmUyPApislAWUUw=;
-        b=Xk8YBc3Z4av/3kSaVxOLoEmlHzeyq1K7FdkmJ0dgqOiGZadwKSnItLqe+X/rmCDM2A
-         /NlhS/ru3v/MM7Wz4KglJsrHh1T4UvRbdpSezQQ6zc6hN29+TK7X0FFWsPhJOOeRhklm
-         pzH09yuMZe1bSFv8QyH5N/JQJk4VrKUxIE/sLbuoo5UntSxa9d/dZZPe5vXtpc+q+23i
-         Rz1mh3/SV0oMPizSuFXMhk+zvEr+8jHmAUqEAX3yxhEjKGdwvu7oKC2DjdSpnR0M8OQ/
-         Pd2XTrn9HdYMRuENKbGDfVUq+stpmh2mB4gy1aF9OAbTWKGhZ2k4LXbI4KfqeAVV2f3z
-         K2ZQ==
-X-Gm-Message-State: AOJu0YynuWBMmhJ53sfRxGPA8HAh6mOKgiB0XJy2p1gbnklrf7gR+q3i
-	AHhpYdZp/5Io5zQm4C459oYUkounkb3W3bpQ2nVwHZDV9jTTIfDiCVLXItQzjG9+M5VphCXXu5e
-	6pomquJLg6iOqA/EdKwrLL87Pwa8TyVAslkqsosdyDTIJNznmIfum8hzMKb+y
-X-Received: by 2002:a05:600c:a42:b0:42f:8fcd:486c with SMTP id 5b1f17b1804b1-432b751f5f8mr14620135e9.33.1731056880631;
-        Fri, 08 Nov 2024 01:08:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGGUvT8AVR9wC5DZNJzYXbfHT1WEe0sZH4euqeeNl3BRR3mGOctibneYjQL/yXyjBjT68UOUQ==
-X-Received: by 2002:a05:600c:a42:b0:42f:8fcd:486c with SMTP id 5b1f17b1804b1-432b751f5f8mr14619965e9.33.1731056880222;
-        Fri, 08 Nov 2024 01:08:00 -0800 (PST)
+        bh=4zjoLu3X9DAY4JQpfTcJl0/52UxwxHvuqwd6q7efGUc=;
+        b=PZRsD9Ld8EnzsvzfvkF6ufDH3r8OZAkfFEGu+ZQOV3XaHW3e96Qcxj03axxieNuA4P
+         jJizyL+60cTzqpkL82tvO6g2BwDdXwnAtb8qSrD2q9GzunT9s+kJzt9XUF6RqdO6GzcT
+         i7ugZlrt4OtKvRwe8601zzMZT0f+jZeLagTJxMelJl8RPD9YDbsp5/B1+gh8jNBfgxru
+         A2Dhzr2/DUQoSpmM7zNZQaIoNRkqi34+EodU6dxgtR50rfokFMRi3Yzk6kMo4L5zS94u
+         lJ7dTH7Dc/MM1XT94i5P8nDNk0v4vrKTCUyMV08GKbXIj1Fcyltxbvk4OwCboUIvjGse
+         6eCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW51lpmu8aspShgp8rii2cB8YMudTcQYKFJtg+RnchA7qE62YbXiF/3/fOF3jQPadffT54=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvMjJmt2f86K8qmf6jzRH8gUbZ7zAyo+347seoGwWObDTYHv1H
+	+aX9CbCjdPQxiU72Xl/4QMrAI3RIQ6jjMgJLGWEFG2hgztMHYGAnTqnfFdw8faMGmyrEZIEvdGS
+	XuBWql5Da/VTCoItGocz2loqdL9MkqFiruUPbUHn4HlPy/L4TWQ==
+X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr16519265e9.28.1731056922850;
+        Fri, 08 Nov 2024 01:08:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXS+cqyTfle4rH6KhTwr187aMVV3GDgGEJWyKzmdTnx+Rn7WxfiZ/RnrVdoicvqr2Lr55snA==
+X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr16518905e9.28.1731056922486;
+        Fri, 08 Nov 2024 01:08:42 -0800 (PST)
 Received: from [192.168.10.47] ([151.49.84.243])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-381ed97ce27sm3968972f8f.29.2024.11.08.01.07.59
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432aa5b5e56sm95082935e9.2.2024.11.08.01.08.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 01:07:59 -0800 (PST)
-Message-ID: <dfd53dc4-f62e-4923-b2d1-6b24fa37959e@redhat.com>
-Date: Fri, 8 Nov 2024 10:07:58 +0100
+        Fri, 08 Nov 2024 01:08:41 -0800 (PST)
+Message-ID: <68770651-f7cc-4032-aabc-90c72ee648a6@redhat.com>
+Date: Fri, 8 Nov 2024 10:08:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +84,25 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: VMX: Bury Intel PT virtualization (guest/host
- mode) behind CONFIG_BROKEN
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Adrian Hunter <adrian.hunter@intel.com>
-References: <20241101185031.1799556-1-seanjc@google.com>
- <20241101185031.1799556-2-seanjc@google.com>
+Subject: Re: [PATCH v4 1/6] kvm: svm: Fix gctx page leak on invalid inputs
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+ Dionna Glaze <dionnaglaze@google.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Michael Roth <michael.roth@amd.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, Ashish Kalra <ashish.kalra@amd.com>
+Cc: John Allen <john.allen@amd.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
+ Danilo Krummrich <dakr@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>,
+ kvm@vger.kernel.org
+References: <20241105010558.1266699-1-dionnaglaze@google.com>
+ <20241105010558.1266699-2-dionnaglaze@google.com>
+ <867da10c-352b-317e-6ba8-7e4369000773@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -127,58 +140,72 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241101185031.1799556-2-seanjc@google.com>
+In-Reply-To: <867da10c-352b-317e-6ba8-7e4369000773@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/1/24 19:50, Sean Christopherson wrote:
-> Hide KVM's pt_mode module param behind CONFIG_BROKEN, i.e. disable support
-> for virtualizing Intel PT via guest/host mode unless BROKEN=y.  There are
-> myriad bugs in the implementation, some of which are fatal to the guest,
-> and others which put the stability and health of the host at risk.
+On 11/6/24 15:29, Tom Lendacky wrote:
+> On 11/4/24 19:05, Dionna Glaze wrote:
+>> Ensure that snp gctx page allocation is adequately deallocated on
+>> failure during snp_launch_start.
+>>
+>> Fixes: 136d8bc931c8 ("KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command")
+>>
+>> CC: Sean Christopherson <seanjc@google.com>
+>> CC: Paolo Bonzini <pbonzini@redhat.com>
+>> CC: Thomas Gleixner <tglx@linutronix.de>
+>> CC: Ingo Molnar <mingo@redhat.com>
+>> CC: Borislav Petkov <bp@alien8.de>
+>> CC: Dave Hansen <dave.hansen@linux.intel.com>
+>> CC: Ashish Kalra <ashish.kalra@amd.com>
+>> CC: Tom Lendacky <thomas.lendacky@amd.com>
+>> CC: John Allen <john.allen@amd.com>
+>> CC: Herbert Xu <herbert@gondor.apana.org.au>
+>> CC: "David S. Miller" <davem@davemloft.net>
+>> CC: Michael Roth <michael.roth@amd.com>
+>> CC: Luis Chamberlain <mcgrof@kernel.org>
+>> CC: Russ Weight <russ.weight@linux.dev>
+>> CC: Danilo Krummrich <dakr@redhat.com>
+>> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> CC: "Rafael J. Wysocki" <rafael@kernel.org>
+>> CC: Tianfei zhang <tianfei.zhang@intel.com>
+>> CC: Alexey Kardashevskiy <aik@amd.com>
+>>
+>> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 > 
-> For guest fatalities, the most glaring issue is that KVM fails to ensure
-> tracing is disabled, and *stays* disabled prior to VM-Enter, which is
-> necessary as hardware disallows loading (the guest's) RTIT_CTL if tracing
-> is enabled (enforced via a VMX consistency check).  Per the SDM:
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 > 
->    If the logical processor is operating with Intel PT enabled (if
->    IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the "load
->    IA32_RTIT_CTL" VM-entry control must be 0.
+>> ---
+>>   arch/x86/kvm/svm/sev.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 714c517dd4b72..f6e96ec0a5caa 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -2212,10 +2212,6 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   	if (sev->snp_context)
+>>   		return -EINVAL;
+>>   
+>> -	sev->snp_context = snp_context_create(kvm, argp);
+>> -	if (!sev->snp_context)
+>> -		return -ENOTTY;
+>> -
+>>   	if (params.flags)
+>>   		return -EINVAL;
+>>   
+>> @@ -2230,6 +2226,10 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET)
+>>   		return -EINVAL;
+>>   
+>> +	sev->snp_context = snp_context_create(kvm, argp);
+>> +	if (!sev->snp_context)
+>> +		return -ENOTTY;
+>> +
+>>   	start.gctx_paddr = __psp_pa(sev->snp_context);
+>>   	start.policy = params.policy;
+>>   	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
 > 
-> On the host side, KVM doesn't validate the guest CPUID configuration
-> provided by userspace, and even worse, uses the guest configuration to
-> decide what MSRs to save/load at VM-Enter and VM-Exit.  E.g. configuring
-> guest CPUID to enumerate more address ranges than are supported in hardware
-> will result in KVM trying to passthrough, save, and load non-existent MSRs,
-> which generates a variety of WARNs, ToPA ERRORs in the host, a potential
-> deadlock, etc.
-> 
-> Fixes: f99e3daf94ff ("KVM: x86: Add Intel PT virtualization work mode")
-> Cc: stable@vger.kernel.org
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6ed801ffe33f..087504fb1589 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -217,9 +217,11 @@ module_param(ple_window_shrink, uint, 0444);
->   static unsigned int ple_window_max        = KVM_VMX_DEFAULT_PLE_WINDOW_MAX;
->   module_param(ple_window_max, uint, 0444);
->   
-> -/* Default is SYSTEM mode, 1 for host-guest mode */
-> +/* Default is SYSTEM mode, 1 for host-guest mode (which is BROKEN) */
->   int __read_mostly pt_mode = PT_MODE_SYSTEM;
-> +#ifdef CONFIG_BROKEN
->   module_param(pt_mode, int, S_IRUGO);
-> +#endif
->   
->   struct x86_pmu_lbr __ro_after_init vmx_lbr_caps;
->   
 
 Applied, thanks.
 
