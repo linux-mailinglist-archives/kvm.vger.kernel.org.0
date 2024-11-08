@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-31263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0549F9C1CC2
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:18:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C50B9C1CC3
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 862A81F23E33
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:18:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC7C4B23DC0
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466D81E8852;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCC61E885D;
 	Fri,  8 Nov 2024 12:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GHb9wERE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W3rVPHA6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEB21E7C0B
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 12:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4031E7C13
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 12:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731068271; cv=none; b=rgfbqz8G+6tJuD7F9wFDuoH5uf7t6GnskIfIPbvILAyHVgJhTnM0yxnqULMkDQ4RpNqV1f3p4ACK30BxPT9aNb7F/BJGKbRHzVImhpZkr076YVhsPj7k/7OU6s0rX7LZIZF1o9nAoEnbS0N0GwKVweiA0KZKy7exnE0FTJDkcXU=
+	t=1731068271; cv=none; b=rb23nsHT3LootBSUmsIc3zyTN+hW09X0NgCZ3vbvEidAU3m+N9SsUiX2L9VYibXTE26kw9adN1dvwcbJ2epFfa1AX/WuAjdR4KqNc5qZf231BNLGjtpl+V/VpPl3TrUoimSrH36/DrvCf/15iKZPQg1CmjHGHGU9tjnzgk8L2X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731068271; c=relaxed/simple;
-	bh=DPzSxv9vMP7mIpXdsVlzuxzRhKS8p8nA3AZc3wGiDlM=;
+	bh=0AE17RqoKgAiRcTE9GKa3HBCcyLWgeaREVzR/lJSCLg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e8pdtU82tdERX//qSvVAK8gKrzzTxZP/w2hXdUddxVUPc3XYx1YtpXVxxrSAcq/sqY9eL0ivpYG6looQaekCH6FNG+VoL87PY+G7+T8lwAna9EUHvwkseEmQZLAPNQtWzXAMojYuz5w8jwuNVq4+/3/78XdFmgjFOGnaEeR0L2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GHb9wERE; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=guP4cAC8SAnAYot7LGTK3+NmctOJdsmNn+vO1hIGEVs7M8VZLEXue0h39jih9mIMngkGo1Zae5Rah/vBvZ/FfOzORqCf5MZAp61rrnPiaONWzOjNFDjCGWGCiW49a5biQi/WVqXJytOjvqEBjtQhdRPXqXmOZAlo6iIOoIP4m70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W3rVPHA6; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731068269; x=1762604269;
+  t=1731068270; x=1762604270;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DPzSxv9vMP7mIpXdsVlzuxzRhKS8p8nA3AZc3wGiDlM=;
-  b=GHb9wEREeYO17pskZLu8Xq5SPD/RB1u0AtqX4SeYfl1GOVRXuoi5R4zd
-   9Abpn/purZ8wQDZY/gmiarAixDpSFaABVI+QZhDtQqtXeLtS3BISE+UGn
-   ZJLtdr941dHW76DnKkLRozm/feK+b6xwkuJA1at8gGwB9nkxn0lXPRDRD
-   4w/8ctJj/qGhNPkU8IcpfjcyCUlYQXRkupT/cnaMG0j1MxtD0Smjkf+YN
-   MF3QxPoC58ELzAy/z/Tt31QkeX45G5hffy5p9JUvTAPmS29lElY0FQtz7
-   SPCTj1ekGQWwQgBg7APWh2YSGg9zpRV7JHT+sS1gt+ij9cI0r3PjEul0e
-   Q==;
-X-CSE-ConnectionGUID: DJZB4VurQciMbJFEUPZARA==
-X-CSE-MsgGUID: hEUUociwRU+YVEd6QdNY0Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="41560810"
+  bh=0AE17RqoKgAiRcTE9GKa3HBCcyLWgeaREVzR/lJSCLg=;
+  b=W3rVPHA6MXoSrIVnBiNh1k4BIcCnLW0zV0q+rmeZg5QPrbPJH273gTrg
+   k3lhocPYkEJR4+9f+jZlxmH6oewToAWrShYpxXtR4z0rmQKfs5Esg9IzX
+   4+8zEIb69tiUaBC4ZJkgS0REKs5PZsZWqbWs0QbFoZDKnewVkWAWO/OmR
+   oUbA/69hHbDHg9y5YJmmNEtCJaryFAleSpIkVTQO7f9b9YUz5BMJxVIvP
+   IuJ1tf0sb6PB5KPFZsWjw3VFcbECW9GYFpolrMLPmjHi47FzRGMOSX5GP
+   E20V9CRO7Le/9nXD00geaY6L+XZ0mea7eM/CT8JrHBzRwclIgLUZ2nm4O
+   g==;
+X-CSE-ConnectionGUID: at3o/fOnTfu3sS4rmvcPcw==
+X-CSE-MsgGUID: lyMz4IsSR5itk/fNDkf3nA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="41560820"
 X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="41560810"
+   d="scan'208";a="41560820"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
   by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 04:17:48 -0800
-X-CSE-ConnectionGUID: 4klG1wyfTnuqsgts1fGY5g==
-X-CSE-MsgGUID: RlntINaeTMmT9ko6SrMurw==
+X-CSE-ConnectionGUID: Su5J+SG3TrWJ5kTCl0Ve/w==
+X-CSE-MsgGUID: 5hjKFy75RrygqtuO2Ya7kA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="85865442"
+   d="scan'208";a="85865447"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmviesa010.fm.intel.com with ESMTP; 08 Nov 2024 04:17:47 -0800
+  by fmviesa010.fm.intel.com with ESMTP; 08 Nov 2024 04:17:48 -0800
 From: Yi Liu <yi.l.liu@intel.com>
 To: alex.williamson@redhat.com,
 	jgg@nvidia.com,
@@ -72,11 +72,10 @@ Cc: joro@8bytes.org,
 	iommu@lists.linux.dev,
 	zhenzhong.duan@intel.com,
 	vasant.hegde@amd.com,
-	will@kernel.org,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v5 1/5] ida: Add ida_find_first_range()
-Date: Fri,  8 Nov 2024 04:17:38 -0800
-Message-Id: <20241108121742.18889-2-yi.l.liu@intel.com>
+	will@kernel.org
+Subject: [PATCH v5 2/5] vfio-iommufd: Support pasid [at|de]tach for physical VFIO devices
+Date: Fri,  8 Nov 2024 04:17:39 -0800
+Message-Id: <20241108121742.18889-3-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241108121742.18889-1-yi.l.liu@intel.com>
 References: <20241108121742.18889-1-yi.l.liu@intel.com>
@@ -88,228 +87,158 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There is no helpers for user to check if a given ID is allocated or not,
-neither a helper to loop all the allocated IDs in an IDA and do something
-for cleanup. With the two needs, a helper to get the lowest allocated ID
-of a range and two variants based on it.
+This adds pasid_at|de]tach_ioas ops for attaching hwpt to pasid of a
+device and the helpers for it. For now, only vfio-pci supports pasid
+attach/detach.
 
-Caller can check if a given ID is allocated or not by:
-
-	bool ida_exists(struct ida *ida, unsigned int id)
-
-Caller can iterate all allocated IDs by:
-
-	int id;
-	while ((id = ida_find_first(&pasid_ida)) >= 0) {
-		//anything to do with the allocated ID
-		ida_free(pasid_ida, pasid);
-	}
-
-Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Acked-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- include/linux/idr.h | 11 +++++++
- lib/idr.c           | 67 +++++++++++++++++++++++++++++++++++++++++++
- lib/test_ida.c      | 70 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 148 insertions(+)
+ drivers/vfio/iommufd.c      | 50 +++++++++++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci.c |  2 ++
+ include/linux/vfio.h        | 11 ++++++++
+ 3 files changed, 63 insertions(+)
 
-diff --git a/include/linux/idr.h b/include/linux/idr.h
-index da5f5fa4a3a6..718f9b1b91af 100644
---- a/include/linux/idr.h
-+++ b/include/linux/idr.h
-@@ -257,6 +257,7 @@ struct ida {
- int ida_alloc_range(struct ida *, unsigned int min, unsigned int max, gfp_t);
- void ida_free(struct ida *, unsigned int id);
- void ida_destroy(struct ida *ida);
-+int ida_find_first_range(struct ida *ida, unsigned int min, unsigned int max);
+diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+index 82eba6966fa5..039c0157ac1c 100644
+--- a/drivers/vfio/iommufd.c
++++ b/drivers/vfio/iommufd.c
+@@ -119,14 +119,22 @@ int vfio_iommufd_physical_bind(struct vfio_device *vdev,
+ 	if (IS_ERR(idev))
+ 		return PTR_ERR(idev);
+ 	vdev->iommufd_device = idev;
++	ida_init(&vdev->pasids);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(vfio_iommufd_physical_bind);
  
- /**
-  * ida_alloc() - Allocate an unused ID.
-@@ -328,4 +329,14 @@ static inline bool ida_is_empty(const struct ida *ida)
+ void vfio_iommufd_physical_unbind(struct vfio_device *vdev)
  {
- 	return xa_empty(&ida->xa);
- }
++	int pasid;
 +
-+static inline bool ida_exists(struct ida *ida, unsigned int id)
-+{
-+	return ida_find_first_range(ida, id, id) == id;
-+}
-+
-+static inline int ida_find_first(struct ida *ida)
-+{
-+	return ida_find_first_range(ida, 0, ~0);
-+}
- #endif /* __IDR_H__ */
-diff --git a/lib/idr.c b/lib/idr.c
-index da36054c3ca0..e2adc457abb4 100644
---- a/lib/idr.c
-+++ b/lib/idr.c
-@@ -476,6 +476,73 @@ int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max,
- }
- EXPORT_SYMBOL(ida_alloc_range);
+ 	lockdep_assert_held(&vdev->dev_set->lock);
  
-+/**
-+ * ida_find_first_range - Get the lowest used ID.
-+ * @ida: IDA handle.
-+ * @min: Lowest ID to get.
-+ * @max: Highest ID to get.
-+ *
-+ * Get the lowest used ID between @min and @max, inclusive.  The returned
-+ * ID will not exceed %INT_MAX, even if @max is larger.
-+ *
-+ * Context: Any context. Takes and releases the xa_lock.
-+ * Return: The lowest used ID, or errno if no used ID is found.
-+ */
-+int ida_find_first_range(struct ida *ida, unsigned int min, unsigned int max)
-+{
-+	unsigned long index = min / IDA_BITMAP_BITS;
-+	unsigned int offset = min % IDA_BITMAP_BITS;
-+	unsigned long *addr, size, bit;
-+	unsigned long tmp = 0;
-+	unsigned long flags;
-+	void *entry;
-+	int ret;
++	while ((pasid = ida_find_first(&vdev->pasids)) >= 0) {
++		iommufd_device_pasid_detach(vdev->iommufd_device, pasid);
++		ida_free(&vdev->pasids, pasid);
++	}
 +
-+	if ((int)min < 0)
+ 	if (vdev->iommufd_attached) {
+ 		iommufd_device_detach(vdev->iommufd_device);
+ 		vdev->iommufd_attached = false;
+@@ -168,6 +176,48 @@ void vfio_iommufd_physical_detach_ioas(struct vfio_device *vdev)
+ }
+ EXPORT_SYMBOL_GPL(vfio_iommufd_physical_detach_ioas);
+ 
++int vfio_iommufd_physical_pasid_attach_ioas(struct vfio_device *vdev,
++					    u32 pasid, u32 *pt_id)
++{
++	int rc;
++
++	lockdep_assert_held(&vdev->dev_set->lock);
++
++	if (WARN_ON(!vdev->iommufd_device))
 +		return -EINVAL;
-+	if ((int)max < 0)
-+		max = INT_MAX;
 +
-+	xa_lock_irqsave(&ida->xa, flags);
++	if (ida_exists(&vdev->pasids, pasid))
++		return iommufd_device_pasid_replace(vdev->iommufd_device,
++						    pasid, pt_id);
 +
-+	entry = xa_find(&ida->xa, &index, max / IDA_BITMAP_BITS, XA_PRESENT);
-+	if (!entry) {
-+		ret = -ENOENT;
-+		goto err_unlock;
-+	}
++	rc = ida_alloc_range(&vdev->pasids, pasid, pasid, GFP_KERNEL);
++	if (rc < 0)
++		return rc;
 +
-+	if (index > min / IDA_BITMAP_BITS)
-+		offset = 0;
-+	if (index * IDA_BITMAP_BITS + offset > max) {
-+		ret = -ENOENT;
-+		goto err_unlock;
-+	}
++	rc = iommufd_device_pasid_attach(vdev->iommufd_device, pasid, pt_id);
++	if (rc)
++		ida_free(&vdev->pasids, pasid);
 +
-+	if (xa_is_value(entry)) {
-+		tmp = xa_to_value(entry);
-+		addr = &tmp;
-+		size = BITS_PER_XA_VALUE;
-+	} else {
-+		addr = ((struct ida_bitmap *)entry)->bitmap;
-+		size = IDA_BITMAP_BITS;
-+	}
-+
-+	bit = find_next_bit(addr, size, offset);
-+
-+	xa_unlock_irqrestore(&ida->xa, flags);
-+
-+	if (bit == size ||
-+	    index * IDA_BITMAP_BITS + bit > max)
-+		return -ENOENT;
-+
-+	return index * IDA_BITMAP_BITS + bit;
-+
-+err_unlock:
-+	xa_unlock_irqrestore(&ida->xa, flags);
-+	return ret;
++	return rc;
 +}
-+EXPORT_SYMBOL(ida_find_first_range);
++EXPORT_SYMBOL_GPL(vfio_iommufd_physical_pasid_attach_ioas);
 +
- /**
-  * ida_free() - Release an allocated ID.
-  * @ida: IDA handle.
-diff --git a/lib/test_ida.c b/lib/test_ida.c
-index c80155a1956d..63078f8dc13f 100644
---- a/lib/test_ida.c
-+++ b/lib/test_ida.c
-@@ -189,6 +189,75 @@ static void ida_check_bad_free(struct ida *ida)
- 	IDA_BUG_ON(ida, !ida_is_empty(ida));
- }
- 
-+/*
-+ * Check ida_find_first_range() and varriants.
-+ */
-+static void ida_check_find_first(struct ida *ida)
++void vfio_iommufd_physical_pasid_detach_ioas(struct vfio_device *vdev,
++					     u32 pasid)
 +{
-+	/* IDA is empty; all of the below should be not exist */
-+	IDA_BUG_ON(ida, ida_exists(ida, 0));
-+	IDA_BUG_ON(ida, ida_exists(ida, 3));
-+	IDA_BUG_ON(ida, ida_exists(ida, 63));
-+	IDA_BUG_ON(ida, ida_exists(ida, 1023));
-+	IDA_BUG_ON(ida, ida_exists(ida, (1 << 20) - 1));
++	lockdep_assert_held(&vdev->dev_set->lock);
 +
-+	/* IDA contains a single value entry */
-+	IDA_BUG_ON(ida, ida_alloc_min(ida, 3, GFP_KERNEL) != 3);
-+	IDA_BUG_ON(ida, ida_exists(ida, 0));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 3));
-+	IDA_BUG_ON(ida, ida_exists(ida, 63));
-+	IDA_BUG_ON(ida, ida_exists(ida, 1023));
-+	IDA_BUG_ON(ida, ida_exists(ida, (1 << 20) - 1));
++	if (WARN_ON(!vdev->iommufd_device))
++		return;
 +
-+	IDA_BUG_ON(ida, ida_alloc_min(ida, 63, GFP_KERNEL) != 63);
-+	IDA_BUG_ON(ida, ida_exists(ida, 0));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 3));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 63));
-+	IDA_BUG_ON(ida, ida_exists(ida, 1023));
-+	IDA_BUG_ON(ida, ida_exists(ida, (1 << 20) - 1));
++	if (!ida_exists(&vdev->pasids, pasid))
++		return;
 +
-+	/* IDA contains a single bitmap */
-+	IDA_BUG_ON(ida, ida_alloc_min(ida, 1023, GFP_KERNEL) != 1023);
-+	IDA_BUG_ON(ida, ida_exists(ida, 0));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 3));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 63));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 1023));
-+	IDA_BUG_ON(ida, ida_exists(ida, (1 << 20) - 1));
-+
-+	/* IDA contains a tree */
-+	IDA_BUG_ON(ida, ida_alloc_min(ida, (1 << 20) - 1, GFP_KERNEL) != (1 << 20) - 1);
-+	IDA_BUG_ON(ida, ida_exists(ida, 0));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 3));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 63));
-+	IDA_BUG_ON(ida, !ida_exists(ida, 1023));
-+	IDA_BUG_ON(ida, !ida_exists(ida, (1 << 20) - 1));
-+
-+	/* Now try to find first */
-+	IDA_BUG_ON(ida, ida_find_first(ida) != 3);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, -1, 2) != -EINVAL);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 0, 2) != -ENOENT); // no used ID
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 0, 3) != 3);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 1, 3) != 3);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 3, 3) != 3);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 2, 4) != 3);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 4, 3) != -ENOENT); // min > max, fail
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 4, 60) != -ENOENT); // no used ID
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 4, 64) != 63);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 63, 63) != 63);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 64, 1026) != 1023);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 1023, 1023) != 1023);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 1023, (1 << 20) - 1) != 1023);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, 1024, (1 << 20) - 1) != (1 << 20) - 1);
-+	IDA_BUG_ON(ida, ida_find_first_range(ida, (1 << 20), INT_MAX) != -ENOENT);
-+
-+	ida_free(ida, 3);
-+	ida_free(ida, 63);
-+	ida_free(ida, 1023);
-+	ida_free(ida, (1 << 20) - 1);
-+
-+	IDA_BUG_ON(ida, !ida_is_empty(ida));
++	iommufd_device_pasid_detach(vdev->iommufd_device, pasid);
++	ida_free(&vdev->pasids, pasid);
 +}
++EXPORT_SYMBOL_GPL(vfio_iommufd_physical_pasid_detach_ioas);
 +
- static DEFINE_IDA(ida);
+ /*
+  * The emulated standard ops mean that vfio_device is going to use the
+  * "mdev path" and will call vfio_pin_pages()/vfio_dma_rw(). Drivers using this
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index e727941f589d..6f7ae7e5b7b0 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -144,6 +144,8 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.unbind_iommufd	= vfio_iommufd_physical_unbind,
+ 	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
+ 	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
++	.pasid_attach_ioas	= vfio_iommufd_physical_pasid_attach_ioas,
++	.pasid_detach_ioas	= vfio_iommufd_physical_pasid_detach_ioas,
+ };
  
- static int ida_checks(void)
-@@ -202,6 +271,7 @@ static int ida_checks(void)
- 	ida_check_max(&ida);
- 	ida_check_conv(&ida);
- 	ida_check_bad_free(&ida);
-+	ida_check_find_first(&ida);
- 
- 	printk("IDA: %u of %u tests passed\n", tests_passed, tests_run);
- 	return (tests_run != tests_passed) ? 0 : -EINVAL;
+ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 000a6cab2d31..11b3b453752e 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -67,6 +67,7 @@ struct vfio_device {
+ 	struct inode *inode;
+ #if IS_ENABLED(CONFIG_IOMMUFD)
+ 	struct iommufd_device *iommufd_device;
++	struct ida pasids;
+ 	u8 iommufd_attached:1;
+ #endif
+ 	u8 cdev_opened:1;
+@@ -91,6 +92,8 @@ struct vfio_device {
+  *		 bound iommufd. Undo in unbind_iommufd if @detach_ioas is not
+  *		 called.
+  * @detach_ioas: Opposite of attach_ioas
++ * @pasid_attach_ioas: The pasid variation of attach_ioas
++ * @pasid_detach_ioas: Opposite of pasid_attach_ioas
+  * @open_device: Called when the first file descriptor is opened for this device
+  * @close_device: Opposite of open_device
+  * @read: Perform read(2) on device file descriptor
+@@ -115,6 +118,8 @@ struct vfio_device_ops {
+ 	void	(*unbind_iommufd)(struct vfio_device *vdev);
+ 	int	(*attach_ioas)(struct vfio_device *vdev, u32 *pt_id);
+ 	void	(*detach_ioas)(struct vfio_device *vdev);
++	int	(*pasid_attach_ioas)(struct vfio_device *vdev, u32 pasid, u32 *pt_id);
++	void	(*pasid_detach_ioas)(struct vfio_device *vdev, u32 pasid);
+ 	int	(*open_device)(struct vfio_device *vdev);
+ 	void	(*close_device)(struct vfio_device *vdev);
+ 	ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
+@@ -139,6 +144,8 @@ int vfio_iommufd_physical_bind(struct vfio_device *vdev,
+ void vfio_iommufd_physical_unbind(struct vfio_device *vdev);
+ int vfio_iommufd_physical_attach_ioas(struct vfio_device *vdev, u32 *pt_id);
+ void vfio_iommufd_physical_detach_ioas(struct vfio_device *vdev);
++int vfio_iommufd_physical_pasid_attach_ioas(struct vfio_device *vdev, u32 pasid, u32 *pt_id);
++void vfio_iommufd_physical_pasid_detach_ioas(struct vfio_device *vdev, u32 pasid);
+ int vfio_iommufd_emulated_bind(struct vfio_device *vdev,
+ 			       struct iommufd_ctx *ictx, u32 *out_device_id);
+ void vfio_iommufd_emulated_unbind(struct vfio_device *vdev);
+@@ -166,6 +173,10 @@ vfio_iommufd_get_dev_id(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+ 	((int (*)(struct vfio_device *vdev, u32 *pt_id)) NULL)
+ #define vfio_iommufd_physical_detach_ioas \
+ 	((void (*)(struct vfio_device *vdev)) NULL)
++#define vfio_iommufd_physical_pasid_attach_ioas \
++	((int (*)(struct vfio_device *vdev, u32 pasid, u32 *pt_id)) NULL)
++#define vfio_iommufd_physical_pasid_detach_ioas \
++	((void (*)(struct vfio_device *vdev, u32 pasid)) NULL)
+ #define vfio_iommufd_emulated_bind                                      \
+ 	((int (*)(struct vfio_device *vdev, struct iommufd_ctx *ictx,   \
+ 		  u32 *out_device_id)) NULL)
 -- 
 2.34.1
 
