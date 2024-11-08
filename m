@@ -1,409 +1,328 @@
-Return-Path: <kvm+bounces-31269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFF29C1D9E
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 14:08:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8762A9C1DA6
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 14:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F28B71F219EB
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA0C91C22E66
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2C11E909F;
-	Fri,  8 Nov 2024 13:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4671EB9F5;
+	Fri,  8 Nov 2024 13:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aw3dFgnW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gtfh1brq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB511E6DE1
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 13:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731071274; cv=none; b=YhTwyaEvEHMNHZhfiqP2Wf70L5d+S9UP+wOpoESJKo3wOXLUUZtpLnn7vGmipkfMoOFh45Z/xHbyS9RhVsVaWfCOofnU/1ZXO1XryqrQqLK2RbZUddLPbHFA99EwYSnP+W8lihpV4z9anyCa9CElykVq+hLQNiWB1gbPPJjNxUo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731071274; c=relaxed/simple;
-	bh=CYH0PXwxfG8TxAVh3+79MgWgHVWV3jjOl4trZuJEiNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZxVYXFms+BF0gHTydx4c9GcaEP3pPQFK6To7u+yJY50gpTU2GC7uNB6LzMgz0HxXoSluIHA2tB7uWic9t0E+rOXUDX31SuNZ+4PzH9j1Yw69jYlHNga41GjzhHQv0sofKFOMy35B1KODwYGZWRN3GR+umH94Keu+i+nBtZzJ6z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aw3dFgnW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731071271;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=UBKmK8tEl4j/lViVvAFgYObQhSYvDrj2ltyuK7C2hYo=;
-	b=aw3dFgnWkGwZpIZUjvorp10fb9DIkH+uP0TiBkHiBBy7FskUZi7uLD5veoikyuTxuqXi11
-	pI2ast0PrL408VCsT6Nl8whKLOByjiTKloW5Ld4QMs1gbIubnmfwY8c04NnwjEFWkPHLbH
-	yDPX/qtMpq/Xf3oej2lHhrJp7HAPfXc=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-XCmSUF_aOQuC86HEG8PGIA-1; Fri,
- 08 Nov 2024 08:07:45 -0500
-X-MC-Unique: XCmSUF_aOQuC86HEG8PGIA-1
-X-Mimecast-MFC-AGG-ID: XCmSUF_aOQuC86HEG8PGIA
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D15919540EF;
-	Fri,  8 Nov 2024 13:07:44 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A5757300019E;
-	Fri,  8 Nov 2024 13:07:43 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: michael.christie@oracle.com,
-	Tejun Heo <tj@kernel.org>,
-	Luca Boccassi <bluca@debian.org>
-Subject: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-Date: Fri,  8 Nov 2024 08:07:37 -0500
-Message-ID: <20241108130737.126567-1-pbonzini@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E631E909E
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 13:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731071372; cv=fail; b=jvvTuOn5DcKJHW56AfZfs41VxYFtzfvY1VrVeM7x5pP9svxOUdDu320sAuuTUCi1ufr/aQu8uzuMwWgkBd39iBZdSX1ztzQn4nuWI3EnZTFVnzo+FGpapgNI9WYurO6n46Zan9cxZCUPSaCQFGeWxn8LDsq4+0khUd/g1ekytTU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731071372; c=relaxed/simple;
+	bh=d4Bq+Vc2WlU1C5wv11cONoslP4QxzbcDCTk4YJSxHBw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZMn374s+q/h1+CVOgMGCiYCk9ZwmQ5XgRRKuAuIcmDKdEnGKJJjAZYux9Y9xKd7R7epyXKb5tMdlpbAz6L3USN+9M6AbylCrw43kJ6c4D59mwnzjTNLzPgYHxUF6a7o+54ChOH57yT1WG6h0X+ktIB34f3mS7bDdhLIZoN26iF8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gtfh1brq; arc=fail smtp.client-ip=40.107.92.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vSl1QpIMyg0j/K3pi3/XgXHZu9kFqiHzYyg8bzQQvPVFvM9Zis0yzEAgVBeG8YMuz62VTloBOFKArNTvjECJmzjb69aT2OqAiOsXVKL29M6HrZGP/7bycfYvBGSNYjpIBsaodpCdwzKOm8Ug3pZs9Nph/a9nAHAN+Aph3Nku0xNLAn99DHOhJP69XpLN7M08egHuK02Z4RrsYOl/+Y4D8zQwe7n/aHdskiSFkoBAfbDq2HV1eCaYC8TO5rVHRhUJSqAn5i4+5MOsjjcBggL77S6uqceG5W0+6pMqq/wTdTe2Vwo5StUSP+0WrIryUwgidVem/ShSZs4crjHpHobL+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ietir5NQ89GqBuUU3MdDZdlob8s6/DbThdQ9K3BJ37c=;
+ b=fvE3ceH/S87FwkKcCXZyiClg5n4iXxwlkwFLogZGFBVdPg5Z74QZAlnwW21Kko3CLNq4iRkWxNs5MVXPWC8NFPYNCfl7Us4hhTGQ0YQlxKr6di5x6TbTGooakew0vTNwyLhyE5zFiigIYZ6spbv+iGfAAi+x6A9XX5K4UhmrhSVROdxHE79b6ptO2QdkZ6PFHvtZaNcNtS71D4ykj4AWMnDso40eW6WtgakbS4U00YIyPc4LoeMfCQ5LddqW7GBMniWAmuzFCgqrk+u7cJ8J3qDyIWzmM1Nl9jz8gbsfSTZlqCF8OyRplGj0VSGquTu+e9CwijROg/8Fga/6rfWtAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ietir5NQ89GqBuUU3MdDZdlob8s6/DbThdQ9K3BJ37c=;
+ b=gtfh1brqEulI0n2Grm1UjsKoPcO8abzgLNBoGqP+EqLXE9jJS67XHxbbIXlswUoWfntaHvkNAe0u4pgyp4teiIUlZSHrB9wOjwaIYqybzN6dbjWqjk8TYMGH67yHwwk1tE9PLCuaB1izgZ6Wee5noqTvlxfkhwr2S2roj5/TvCg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5712.namprd12.prod.outlook.com (2603:10b6:510:1e3::13)
+ by MW6PR12MB8916.namprd12.prod.outlook.com (2603:10b6:303:24b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.21; Fri, 8 Nov
+ 2024 13:09:26 +0000
+Received: from PH7PR12MB5712.namprd12.prod.outlook.com
+ ([fe80::2efc:dc9f:3ba8:3291]) by PH7PR12MB5712.namprd12.prod.outlook.com
+ ([fe80::2efc:dc9f:3ba8:3291%6]) with mapi id 15.20.8137.019; Fri, 8 Nov 2024
+ 13:09:26 +0000
+Message-ID: <2b9766eb-9181-4d11-a00f-770cef63bf10@amd.com>
+Date: Fri, 8 Nov 2024 18:39:16 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/7] target/i386/kvm: support perfmon-v2 for reset
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+ mtosatti@redhat.com, babu.moger@amd.com, zhao1.liu@intel.com,
+ likexu@tencent.com, like.xu.linux@gmail.com, zhenyuw@linux.intel.com,
+ groug@kaod.org, lyan@digitalocean.com, khorenko@virtuozzo.com,
+ alexander.ivanov@virtuozzo.com, den@virtuozzo.com, joe.jin@oracle.com,
+ davydov-max@yandex-team.ru
+References: <20241104094119.4131-1-dongli.zhang@oracle.com>
+ <20241104094119.4131-7-dongli.zhang@oracle.com>
+Content-Language: en-US
+From: Sandipan Das <sandipan.das@amd.com>
+In-Reply-To: <20241104094119.4131-7-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI1PR02CA0054.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::13) To PH7PR12MB5712.namprd12.prod.outlook.com
+ (2603:10b6:510:1e3::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5712:EE_|MW6PR12MB8916:EE_
+X-MS-Office365-Filtering-Correlation-Id: cdfe7e40-1230-4fb4-32fd-08dcfff69277
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VWwzRG5ONS9aMWNBelRueWlPNzhRZlBDanpMc21XcTdVdGdBNTNpMjBLek5Y?=
+ =?utf-8?B?TUhXVjY4enZYOEFnaXEvMW5JME9TOWErWFJKdjBIZ1JuMHJOV1d0TEhXd2pO?=
+ =?utf-8?B?eW94cVErOGtLTTY2T1Jxd2xhTW5waWJOTDd4c1BaODI5K3Z5R3EvZWN0ck5N?=
+ =?utf-8?B?M0F1dWJGMTVOenlpcGxJZTRENUZLaFVyMEtSSlEwbnJxYVdndzdYRmJxd1Z5?=
+ =?utf-8?B?S0xjUWl1OGVtYUEyOXZDcjJDTTFIUEVINHY5TDlHU1ZzMjA5VHNMR0FVdTVS?=
+ =?utf-8?B?MkJkeUo4NkpUakNuTzY0Qm8reG44L1NxbXFldWRnNU5zZlMvMHZZODVicysz?=
+ =?utf-8?B?ZjVkTm8wSnJEODFKL3pvSVI1SmUxT2xRS1BKSXdPcmFKU2JFUEdIakFBeG9H?=
+ =?utf-8?B?Y3dXSUVFNVFpSk4rTTVNUGZwSHJNZjRMS1ZFb01ZT2pEVnRTVC9MQlFLYkIy?=
+ =?utf-8?B?ejN1TVpPSmpQL2ZUMTlhSUdLMzN3bGNqRy92b0QwcmxWbVJtdDlEbVg3YndB?=
+ =?utf-8?B?c0N6MU0xUTI4YlVnS0VTaElOK3Nodlh0dXAybk5YakdTenpJNTJUQ01zem1T?=
+ =?utf-8?B?TWR3SXIyVllobkZRZklEWGs0TDlrRzhJTWdOSWxQWnIxTkF2MFkramVVa1N6?=
+ =?utf-8?B?L29DaFhFTXQ3RmZWWDVvNUNwWElhUzZsNitxdng4VkJhMldwRGl0SzJsQ001?=
+ =?utf-8?B?YWxFemF4aWY4dnpOUEdOejJiMFlQTG14amI1Y0Fwc3Q3bFFrcXI2OTQ1dnd6?=
+ =?utf-8?B?bGpFZ3lyUGM5akM1L2VpRVBKVHVCUlRyMzd1d1RmRGc2M0w5N0tZcTRxQnhH?=
+ =?utf-8?B?M0NLcFlLSzR4eWxmVkI5bXoxRTJNSHJ6SU5LdE9ObnpBVHVHM3lUVGsxSC8z?=
+ =?utf-8?B?VVpYOXpGV0I4UmM4S3E0SFVUTHRnalN4YmcvaGNvL1h0ZWdMazk1QU1WM0VM?=
+ =?utf-8?B?S0hqWitZWUVYaitDYnJxWW1qTUQwb2dHcFBITnNFL3hnYzBYZFJMZG42RWEx?=
+ =?utf-8?B?cmtURmsrUjJ4MUhhUlVRT0J0K2VSTmZya2pTT3VKei83bVdPWlF4TmNpUVMx?=
+ =?utf-8?B?YkNKNURLenNUb0lMbUppeHNzd1VYdldDSkhoMVZzMmJYWWlZMlk5Y2U5cys4?=
+ =?utf-8?B?dys4NWVlb1FHeTQxcFp2bEdxdUE3bGJiSGh1R0NaMm9JUmU2WFpDcWZtRk16?=
+ =?utf-8?B?d3NweWwyWDhieVVYMjJjK0hENVlkUUozbU82elJSUkEzaDlmb1pCSlZEMFdV?=
+ =?utf-8?B?QktMdE53U2JHMHNvTHhoWnROZWZsYjVYUVJ4NjBnczlLSVR0Sy92aGNwc1ZG?=
+ =?utf-8?B?dnlON2MwMS9jMGJlUm1JazFvNk01bXAvUTRlMzZHa0tzNmlSY0YxaDR1RWpl?=
+ =?utf-8?B?NjUxSGVVbFRPV0VCaklLL2NzMGlzZjQvL3ZjeklyMWFwRjRLZWJFRDAvQTg4?=
+ =?utf-8?B?a05DR01wTmRFd1UvU1l2dTJOZk9EOWRZNUxKSWVhSnZxaVp2YWJSWkhkcld6?=
+ =?utf-8?B?T09WQUlpMlBrQ2Y2R0hUQ3RaK0NkTWsxR3dhd1hydTkwZ1k4eEpMNUNHNldQ?=
+ =?utf-8?B?UW1mV29hRTJmNGJma04yd2Z3NERkZlpJNk90QkJ0NWI4OEtKRnY3SE1XZjRR?=
+ =?utf-8?B?OCtkVFh3T2NzdFY1TEEzNWxUZ3JNcDMvSllEQ0dzTUk4aXdzVW9WTnJ0bnp1?=
+ =?utf-8?B?R2tYTUw0TnhrdWc0N1Q4R2NoUk14eXBidllCM3F3TTRFSjBSSHRiQUQvaTVu?=
+ =?utf-8?Q?loK1QRKNXpijpOh1V4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5712.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?amlPSUdLOGEySHY5YXNjcFNvY0gyc3ZmVW83TGNYbnVERnhPaW8xZmlsRGQ4?=
+ =?utf-8?B?bzh5Z3l0cHV2dm9rZkMyMG1EZEk5aUtMUjlSWnUxaWhsd3dJMDJjL2JzbmJo?=
+ =?utf-8?B?ZDJRRUxUdnNCMGlMYVc0UnJJU0NBTzBLKzBYWmRpSHpaa2tubkJqckxubDh1?=
+ =?utf-8?B?Y3lyekUyMjJFSWtRVlU4RWErRVg3eGM1eGM2SEpSV2l3S3VKcVhEYjd6d05h?=
+ =?utf-8?B?Z3ZSdUljOG9LME5MRThTcmdvTjNBWXdyVlNXcjZRVUt5b1l1L1BobTNOVDE5?=
+ =?utf-8?B?dlVmVWcyZkV2UUNLOHNiZG44d1pDd1J1RFNNQjBicjdVNnlPNGdIcDBiYzR3?=
+ =?utf-8?B?djcyZ0t3cFA2QUMvWGdkUmZLaldBdTltQWUxNkpITGtjU01iUkl1NUFVR2d0?=
+ =?utf-8?B?RkNqdkR5UDhWU1dteXJkZXJTTE5oR2I2M2dpRmtLRUZPN0tXTDBUc0xxY0FU?=
+ =?utf-8?B?aXRqSThUb0RxZFZ1QlJFY2MwWTl0TUhjTmV0Vmk1b09qOXl4YmRHNE9DR3di?=
+ =?utf-8?B?dWdhTXdVTks3eDI0RDRUQ0w0Z1pyM0N1dm80Tmh3c1RDRk9xeEdXNXcvbWd4?=
+ =?utf-8?B?RFRrUCtoeHdEU1p4T21CdXE2QjYvcmVsSElTa24wdnFDZFRRWUpQY2dIV2tn?=
+ =?utf-8?B?cjRMS3RHOUlSdlEyOXFPbG1iZ0IzSWYvZ2VQYy9HSEhNd2dkdG5xOG1QcVcw?=
+ =?utf-8?B?cFVMSHdsMHg2azRhbWhZTkZUMkVyR1RuRGJvMitsYjFseVRUYjRva0ZDNEt3?=
+ =?utf-8?B?d2Z1QmQrVS9HaFdveGtKSmhYdWpZTGFLY1haTXNaRXVqY2xsTWhSRzZtQysv?=
+ =?utf-8?B?WWZyK0tUL25NWUNITnRzVi9uNG0rNUttNzNROG5xaEluRW4vaUh5cmFPeExW?=
+ =?utf-8?B?WjdOMEZGWkZyV0VQSVloNkhoQUEzVlNicEV1YjNWTTBYUW1FR2dHVXhNcDVE?=
+ =?utf-8?B?ZllieFFlWGs5T2ZvNXR3M3RCQWdqa05VR0VmRXk2RGx1Y2J5YWJBbURQc0FS?=
+ =?utf-8?B?RDhEUE4zd0JlOXh3cm13cjNlV2MwaUpLbDBQK3RUblNoZVUwV3lOSXVwenNM?=
+ =?utf-8?B?ZmR6TzJQN0prdUdpbmNnYVJkdGJpUVA1eVZ6OUptN2RBdWt5NWhFaVg2a2d4?=
+ =?utf-8?B?QWVNS28vZlhqZThwWnNkS1Q4NFVRRzJ0TW1XQk1aVzcyeG4wa3lDUFIwNEp0?=
+ =?utf-8?B?TEk0eURZMmJ3UkVQZUg0N1N3QzBJZ1JVcjdPVGt1aWV1SVhxcS9LWVJRSWZM?=
+ =?utf-8?B?ZjV2RW14N0lKeEVTTnJZRHpDRUZLcE1CT01uRDN0T1VLM3h0RkdqTkY0eldk?=
+ =?utf-8?B?TndteTl4ME1ocUVWUHErWHRFajViMXdZVzhmNjBRZGNHMitkZUFqNThpL0ho?=
+ =?utf-8?B?QmJqUFQ0a1R2ZzByUmltSDNETjZ4RWJkQzB3bkxqOXFwSWR0U014cDI5cjlv?=
+ =?utf-8?B?bno5OGpOWGl1QU9qWHVkQzVtcytJT1J0V2EvYloyYUQ0cTQ4R2ZLWXduQnhS?=
+ =?utf-8?B?V0xGM3VsSHc5NytNSlQ0NVBFYkhXZWIrencwcXJaNm1UQW85bmhXeC9zMnc3?=
+ =?utf-8?B?MUZ4YTd5UWYrL21xOWNzblFZQVdFdFNKKzBVbDBUbnRpbm5MdElZMUh1Ymwr?=
+ =?utf-8?B?MERveEhZTklUZ1lBd0dvOE9xRW8rTGpLV1JwMHg5ZWlZa05icWlGUklmZWE0?=
+ =?utf-8?B?ZUFvaVo5b0FneEUrK2NLdm5TRDdyc2lPZ2J2bGlKb1NaUlVUZE1tSE1Pdnl2?=
+ =?utf-8?B?RUVHaG81R0hyd2p2c2NmMGNveS9BOFROUzgvVCs2cmE0T3JsbHV6UTgwejFj?=
+ =?utf-8?B?dXh1RU9wZ09MQjUzRTlqZ3NENVBsR3VLMGNpNmFhZGNXZzJxcHkxYlA4dGxy?=
+ =?utf-8?B?SXVDakpBOGNMQmZ4V3VtZmp4Y1RDWXVyMHRVeTVXRFV0VHFJVklIM3pRKy8w?=
+ =?utf-8?B?VnhjdnRLbzJuNkpWeVVDaHYvY3EvbEVRVXhUL1JZc0xFNnlEQkpiZ2t1NXc3?=
+ =?utf-8?B?RlNRVGR4YXRzck5PODdWblcyRzNlQlBSQjJwdnBFVENvQXdPUkdzTERWYUNK?=
+ =?utf-8?B?ZGNHaXo2NWhZWnNwdk1aTjdTa3h2L2ZQR0RzVm1CUGplUUNRbnVzR1Zka2ZV?=
+ =?utf-8?Q?THpSyTQdlOwd8OUp2BSiRRKQx?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cdfe7e40-1230-4fb4-32fd-08dcfff69277
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5712.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2024 13:09:26.7465
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kwVlZlhJDjpWMdLzAUDgpaVbg4Ek4k3fC6LzjjY/TlfX5nJ0PWb5iipHELXKhlYt5LwF74t3xoj0K9oUoXEETQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8916
 
-kvm_vm_create_worker_thread() is meant to be used for kthreads that
-can consume significant amounts of CPU time on behalf of a VM or in
-response to how the VM behaves (for example how it accesses its memory).
-Therefore it wants to charge the CPU time consumed by that work to
-the VM's container.
+On 11/4/2024 3:10 PM, Dongli Zhang wrote:
+> Since perfmon-v2, the AMD PMU supports additional registers. This update
+> includes get/put functionality for these extra registers.
+> 
+> Similar to the implementation in KVM:
+> 
+> - MSR_CORE_PERF_GLOBAL_STATUS and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS both
+> use env->msr_global_status.
+> - MSR_CORE_PERF_GLOBAL_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_CTL both use
+> env->msr_global_ctrl.
+> - MSR_CORE_PERF_GLOBAL_OVF_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR
+> both use env->msr_global_ovf_ctrl.
+> 
+> No changes are needed for vmstate_msr_architectural_pmu or
+> pmu_enable_needed().
+> 
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+>  target/i386/cpu.h     |  4 ++++
+>  target/i386/kvm/kvm.c | 47 ++++++++++++++++++++++++++++++++++---------
+>  2 files changed, 42 insertions(+), 9 deletions(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 0505eb3b08..68ed798808 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -488,6 +488,10 @@ typedef enum X86Seg {
+>  #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
+>  #define MSR_CORE_PERF_GLOBAL_OVF_CTRL   0x390
+>  
+> +#define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS       0xc0000300
+> +#define MSR_AMD64_PERF_CNTR_GLOBAL_CTL          0xc0000301
+> +#define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR   0xc0000302
+> +
+>  #define MSR_K7_EVNTSEL0                 0xc0010000
+>  #define MSR_K7_PERFCTR0                 0xc0010004
+>  #define MSR_F15H_PERF_CTL0              0xc0010200
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 83ec85a9b9..918dcb61fe 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -2074,6 +2074,8 @@ static void kvm_init_pmu_info_intel(CPUX86State *env)
+>  
+>  static void kvm_init_pmu_info_amd(CPUX86State *env)
+>  {
+> +    uint32_t eax, ebx;
+> +    uint32_t unused;
+>      int64_t family;
+>  
+>      has_pmu_version = 0;
+> @@ -2102,6 +2104,13 @@ static void kvm_init_pmu_info_amd(CPUX86State *env)
+>      }
+>  
+>      num_pmu_gp_counters = AMD64_NUM_COUNTERS_CORE;
+> +
+> +    cpu_x86_cpuid(env, 0x80000022, 0, &eax, &ebx, &unused, &unused);
+> +
+> +    if (eax & CPUID_8000_0022_EAX_PERFMON_V2) {
+> +        has_pmu_version = 2;
+> +        num_pmu_gp_counters = ebx & 0xf;
+> +    }
+>  }
+>  
+>  static bool is_same_vendor(CPUX86State *env)
+> @@ -4144,13 +4153,14 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>              uint32_t step = 1;
+>  
+>              /*
+> -             * When PERFCORE is enabled, AMD PMU uses a separate set of
+> -             * addresses for the selector and counter registers.
+> -             * Additionally, the address of the next selector or counter
+> -             * register is determined by incrementing the address of the
+> -             * current register by two.
+> +             * When PERFCORE or PerfMonV2 is enabled, AMD PMU uses a
+> +             * separate set of addresses for the selector and counter
+> +             * registers. Additionally, the address of the next selector or
+> +             * counter register is determined by incrementing the address
+> +             * of the current register by two.
+>               */
+> -            if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE) {
+> +            if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE ||
+> +                has_pmu_version == 2) {
 
-However, because of these threads, cgroups which have kvm instances inside
-never complete freezing.  This can be trivially reproduced:
+Future PMU versions are expected to be backwards compatible. So it may be
+better to look for has_pmu_version > 1.
 
-  root@test ~# mkdir /sys/fs/cgroup/test
-  root@test ~# echo $fish_pid > /sys/fs/cgroup/test/cgroup.procs
-  root@test ~# qemu-system-x86_64 --nographic -enable-kvm
-
-and in another terminal:
-
-  root@test ~# echo 1 > /sys/fs/cgroup/test/cgroup.freeze
-  root@test ~# cat /sys/fs/cgroup/test/cgroup.events
-  populated 1
-  frozen 0
-
-The cgroup freezing happens in the signal delivery path but
-kvm_vm_worker_thread() thread never call into the signal delivery path while
-joining non-root cgroups, so they never get frozen. Because the cgroup
-freezer determines whether a given cgroup is frozen by comparing the number
-of frozen threads to the total number of threads in the cgroup, the cgroup
-never becomes frozen and users waiting for the state transition may hang
-indefinitely.
-
-Since the worker kthread is tied to a user process, it's better if
-it behaves similarly to user tasks as much as possible, including
-being able to send SIGSTOP and SIGCONT.  In fact, vhost_task is all
-that kvm_vm_create_worker_thread() wanted to be and more: not only it
-inherits the userspace process's cgroups, it has other niceties like
-being parented properly in the process tree.  Use it instead of the
-homegrown alternative.
-
-(Commit message based on emails from Tejun).
-
-Reported-by: Tejun Heo <tj@kernel.org>
-Reported-by: Luca Boccassi <bluca@debian.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |   4 +-
- arch/x86/kvm/Kconfig            |   1 +
- arch/x86/kvm/mmu/mmu.c          |  67 +++++++++++----------
- include/linux/kvm_host.h        |   6 --
- virt/kvm/kvm_main.c             | 103 --------------------------------
- 5 files changed, 39 insertions(+), 142 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6d9f763a7bb9..d6657cc0fe6b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -26,6 +26,7 @@
- #include <linux/irqbypass.h>
- #include <linux/hyperv.h>
- #include <linux/kfifo.h>
-+#include <linux/sched/vhost_task.h>
- 
- #include <asm/apic.h>
- #include <asm/pvclock-abi.h>
-@@ -1443,7 +1444,8 @@ struct kvm_arch {
- 	bool sgx_provisioning_allowed;
- 
- 	struct kvm_x86_pmu_event_filter __rcu *pmu_event_filter;
--	struct task_struct *nx_huge_page_recovery_thread;
-+	struct vhost_task *nx_huge_page_recovery_thread;
-+	u64 nx_huge_page_next;
- 
- #ifdef CONFIG_X86_64
- 	/* The number of TDP MMU pages across all roots. */
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index f09f13c01c6b..b387d61af44f 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -29,6 +29,7 @@ config KVM_X86
- 	select HAVE_KVM_IRQ_BYPASS
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_READONLY_MEM
-+	select VHOST_TASK
- 	select KVM_ASYNC_PF
- 	select USER_RETURN_NOTIFIER
- 	select KVM_MMIO
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8e853a5fc867..d5af4f8c5a6a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7281,7 +7281,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- 			kvm_mmu_zap_all_fast(kvm);
- 			mutex_unlock(&kvm->slots_lock);
- 
--			wake_up_process(kvm->arch.nx_huge_page_recovery_thread);
-+			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
- 		}
- 		mutex_unlock(&kvm_lock);
- 	}
-@@ -7427,7 +7427,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
- 		mutex_lock(&kvm_lock);
- 
- 		list_for_each_entry(kvm, &vm_list, vm_list)
--			wake_up_process(kvm->arch.nx_huge_page_recovery_thread);
-+			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
- 
- 		mutex_unlock(&kvm_lock);
- 	}
-@@ -7530,62 +7530,65 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
- 	srcu_read_unlock(&kvm->srcu, rcu_idx);
- }
- 
--static long get_nx_huge_page_recovery_timeout(u64 start_time)
-+#define NX_HUGE_PAGE_DISABLED (-1)
-+
-+static u64 get_nx_huge_page_recovery_next(void)
- {
- 	bool enabled;
- 	uint period;
- 
- 	enabled = calc_nx_huge_pages_recovery_period(&period);
- 
--	return enabled ? start_time + msecs_to_jiffies(period) - get_jiffies_64()
--		       : MAX_SCHEDULE_TIMEOUT;
-+	return enabled ? get_jiffies_64() + msecs_to_jiffies(period)
-+		: NX_HUGE_PAGE_DISABLED;
- }
- 
--static int kvm_nx_huge_page_recovery_worker(struct kvm *kvm, uintptr_t data)
-+static void kvm_nx_huge_page_recovery_worker_kill(void *data)
- {
--	u64 start_time;
-+}
-+
-+static bool kvm_nx_huge_page_recovery_worker(void *data)
-+{
-+	struct kvm *kvm = data;
- 	long remaining_time;
- 
--	while (true) {
--		start_time = get_jiffies_64();
--		remaining_time = get_nx_huge_page_recovery_timeout(start_time);
-+	if (kvm->arch.nx_huge_page_next == NX_HUGE_PAGE_DISABLED)
-+		return false;
- 
--		set_current_state(TASK_INTERRUPTIBLE);
--		while (!kthread_should_stop() && remaining_time > 0) {
--			schedule_timeout(remaining_time);
--			remaining_time = get_nx_huge_page_recovery_timeout(start_time);
--			set_current_state(TASK_INTERRUPTIBLE);
--		}
--
--		set_current_state(TASK_RUNNING);
--
--		if (kthread_should_stop())
--			return 0;
--
--		kvm_recover_nx_huge_pages(kvm);
-+	remaining_time = kvm->arch.nx_huge_page_next - get_jiffies_64();
-+	if (remaining_time > 0) {
-+		schedule_timeout(remaining_time);
-+		/* check for signals and come back */
-+		return true;
- 	}
-+
-+	__set_current_state(TASK_RUNNING);
-+	kvm_recover_nx_huge_pages(kvm);
-+	kvm->arch.nx_huge_page_next = get_nx_huge_page_recovery_next();
-+	return true;
- }
- 
- int kvm_mmu_post_init_vm(struct kvm *kvm)
- {
--	int err;
--
- 	if (nx_hugepage_mitigation_hard_disabled)
- 		return 0;
- 
--	err = kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recovery_worker, 0,
--					  "kvm-nx-lpage-recovery",
--					  &kvm->arch.nx_huge_page_recovery_thread);
--	if (!err)
--		kthread_unpark(kvm->arch.nx_huge_page_recovery_thread);
-+	kvm->arch.nx_huge_page_next = get_nx_huge_page_recovery_next();
-+	kvm->arch.nx_huge_page_recovery_thread = vhost_task_create(
-+		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kill,
-+		kvm, "kvm-nx-lpage-recovery");
-+	
-+	if (!kvm->arch.nx_huge_page_recovery_thread)
-+		return -ENOMEM;
- 
--	return err;
-+	vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
-+	return 0;
- }
- 
- void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
- {
- 	if (kvm->arch.nx_huge_page_recovery_thread)
--		kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
-+		vhost_task_stop(kvm->arch.nx_huge_page_recovery_thread);
- }
- 
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 45be36e5285f..85fe9d0ebb91 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2382,12 +2382,6 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- }
- #endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
- 
--typedef int (*kvm_vm_thread_fn_t)(struct kvm *kvm, uintptr_t data);
--
--int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
--				uintptr_t data, const char *name,
--				struct task_struct **thread_ptr);
--
- #ifdef CONFIG_KVM_XFER_TO_GUEST_WORK
- static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
- {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6ca7a1045bbb..279e03029ce1 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6561,106 +6561,3 @@ void kvm_exit(void)
- 	kvm_irqfd_exit();
- }
- EXPORT_SYMBOL_GPL(kvm_exit);
--
--struct kvm_vm_worker_thread_context {
--	struct kvm *kvm;
--	struct task_struct *parent;
--	struct completion init_done;
--	kvm_vm_thread_fn_t thread_fn;
--	uintptr_t data;
--	int err;
--};
--
--static int kvm_vm_worker_thread(void *context)
--{
--	/*
--	 * The init_context is allocated on the stack of the parent thread, so
--	 * we have to locally copy anything that is needed beyond initialization
--	 */
--	struct kvm_vm_worker_thread_context *init_context = context;
--	struct task_struct *parent;
--	struct kvm *kvm = init_context->kvm;
--	kvm_vm_thread_fn_t thread_fn = init_context->thread_fn;
--	uintptr_t data = init_context->data;
--	int err;
--
--	err = kthread_park(current);
--	/* kthread_park(current) is never supposed to return an error */
--	WARN_ON(err != 0);
--	if (err)
--		goto init_complete;
--
--	err = cgroup_attach_task_all(init_context->parent, current);
--	if (err) {
--		kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
--			__func__, err);
--		goto init_complete;
--	}
--
--	set_user_nice(current, task_nice(init_context->parent));
--
--init_complete:
--	init_context->err = err;
--	complete(&init_context->init_done);
--	init_context = NULL;
--
--	if (err)
--		goto out;
--
--	/* Wait to be woken up by the spawner before proceeding. */
--	kthread_parkme();
--
--	if (!kthread_should_stop())
--		err = thread_fn(kvm, data);
--
--out:
--	/*
--	 * Move kthread back to its original cgroup to prevent it lingering in
--	 * the cgroup of the VM process, after the latter finishes its
--	 * execution.
--	 *
--	 * kthread_stop() waits on the 'exited' completion condition which is
--	 * set in exit_mm(), via mm_release(), in do_exit(). However, the
--	 * kthread is removed from the cgroup in the cgroup_exit() which is
--	 * called after the exit_mm(). This causes the kthread_stop() to return
--	 * before the kthread actually quits the cgroup.
--	 */
--	rcu_read_lock();
--	parent = rcu_dereference(current->real_parent);
--	get_task_struct(parent);
--	rcu_read_unlock();
--	cgroup_attach_task_all(parent, current);
--	put_task_struct(parent);
--
--	return err;
--}
--
--int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
--				uintptr_t data, const char *name,
--				struct task_struct **thread_ptr)
--{
--	struct kvm_vm_worker_thread_context init_context = {};
--	struct task_struct *thread;
--
--	*thread_ptr = NULL;
--	init_context.kvm = kvm;
--	init_context.parent = current;
--	init_context.thread_fn = thread_fn;
--	init_context.data = data;
--	init_completion(&init_context.init_done);
--
--	thread = kthread_run(kvm_vm_worker_thread, &init_context,
--			     "%s-%d", name, task_pid_nr(current));
--	if (IS_ERR(thread))
--		return PTR_ERR(thread);
--
--	/* kthread_run is never supposed to return NULL */
--	WARN_ON(thread == NULL);
--
--	wait_for_completion(&init_context.init_done);
--
--	if (!init_context.err)
--		*thread_ptr = thread;
--
--	return init_context.err;
--}
--- 
-2.43.5
+>                  sel_base = MSR_F15H_PERF_CTL0;
+>                  ctr_base = MSR_F15H_PERF_CTR0;
+>                  step = 2;
+> @@ -4162,6 +4172,15 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>                  kvm_msr_entry_add(cpu, sel_base + i * step,
+>                                    env->msr_gp_evtsel[i]);
+>              }
+> +
+> +            if (has_pmu_version == 2) {
+> +                kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS,
+> +                                  env->msr_global_status);
+> +                kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR,
+> +                                  env->msr_global_ovf_ctrl);
+> +                kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_CTL,
+> +                                  env->msr_global_ctrl);
+> +            }
+>          }
+>  
+>          /*
+> @@ -4637,13 +4656,14 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          uint32_t step = 1;
+>  
+>          /*
+> -         * When PERFCORE is enabled, AMD PMU uses a separate set of
+> -         * addresses for the selector and counter registers.
+> +         * When PERFCORE or PerfMonV2 is enabled, AMD PMU uses a separate
+> +         * set of addresses for the selector and counter registers.
+>           * Additionally, the address of the next selector or counter
+>           * register is determined by incrementing the address of the
+>           * current register by two.
+>           */
+> -        if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE) {
+> +        if (num_pmu_gp_counters == AMD64_NUM_COUNTERS_CORE ||
+> +            has_pmu_version == 2) {
+>              sel_base = MSR_F15H_PERF_CTL0;
+>              ctr_base = MSR_F15H_PERF_CTR0;
+>              step = 2;
+> @@ -4653,6 +4673,12 @@ static int kvm_get_msrs(X86CPU *cpu)
+>              kvm_msr_entry_add(cpu, ctr_base + i * step, 0);
+>              kvm_msr_entry_add(cpu, sel_base + i * step, 0);
+>          }
+> +
+> +        if (has_pmu_version == 2) {
+> +            kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+> +            kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, 0);
+> +            kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, 0);
+> +        }
+>      }
+>  
+>      if (env->mcg_cap) {
+> @@ -4949,12 +4975,15 @@ static int kvm_get_msrs(X86CPU *cpu)
+>              env->msr_fixed_ctr_ctrl = msrs[i].data;
+>              break;
+>          case MSR_CORE_PERF_GLOBAL_CTRL:
+> +        case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
+>              env->msr_global_ctrl = msrs[i].data;
+>              break;
+>          case MSR_CORE_PERF_GLOBAL_STATUS:
+> +        case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
+>              env->msr_global_status = msrs[i].data;
+>              break;
+>          case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+> +        case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
+>              env->msr_global_ovf_ctrl = msrs[i].data;
+>              break;
+>          case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
 
 
