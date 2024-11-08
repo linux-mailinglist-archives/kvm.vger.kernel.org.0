@@ -1,67 +1,110 @@
-Return-Path: <kvm+bounces-31279-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31280-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8159C2022
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:13:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C4859C204E
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B2381C220CE
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:13:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9B4285733
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD31D1F6660;
-	Fri,  8 Nov 2024 15:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28392071E5;
+	Fri,  8 Nov 2024 15:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pJsaR6uO"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="bJY1kfzU"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A5D1F4FC8;
-	Fri,  8 Nov 2024 15:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68169206E7D
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 15:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731078822; cv=none; b=nMFVOJShtjcMAZSSe2AgDhZrlSY+8EKV8GqG8ODKXlvC506riCfZkbDnxt6ps1pcUEA3dWQrphN56BeBEy3BafVVXHlltrX+TqfO1m9WuBmPqxLJnkzNIAZAqShz9cVumrVXvoP6K3JikDZFWqnWvsQB05JO1wayJF6yAbePjJY=
+	t=1731079541; cv=none; b=dVScRJGsKhnKam/mF/0YdFVzCViTW7Hxr+B1c90yufpDAnYfxkFGJJ0rhSvIKwWkYNH6JN4i9ZF4/5x85zzq/RYHwkpNiO/1wIJnIoO1ols02pu/JepZpS7s01zzuoQF5yidGr16xPxEuNiKqGvaZpBqzf/BwXGTlkkd5goagMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731078822; c=relaxed/simple;
-	bh=3r7xZK+cnyxCIUhmCO7JDwOTXvuhlBk3z62KWQXwkzw=;
+	s=arc-20240116; t=1731079541; c=relaxed/simple;
+	bh=2feMVd+moXqEWqG7qu0YrJc0Jboh9RPoNC48SzdPbeI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gW0MJWrIKl7BdvZA7f2+/LbHHYJ4Vrg5XOFyBVECLUvUhcXFZ2v+ZSsCB8BCQwXHzFqb2zK42nsWDLRCzuMEbDLt6s/sDM6eS/3a/3/SdE2fy6S0rf4oArpSsNfmLG47dvuoZAb7g887VNhE570LMRtijwp03LA8MtVv3l7sgpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pJsaR6uO; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+Sg40T9b35S825tpW2ULb0mqYo7ceLM00Jqrjyl1LD4=; b=pJsaR6uOgvqCmd0VngJ7YVkhLj
-	U6RmYDfnSQK9wrW1MuGCS1RdXLh5P6V51nGqPICAmT6iJZXvAJSjuo2o3bK2F8jxJ6QNAi40zuOAu
-	MguC2u9aeT5SWaxCzh0XF0QjnFO7CPS/Qi5csuvMFKt3iXXihGb/04oV1VVAGtOKbYfLEr7L3kgiu
-	PI5qj1c4+xlDMl5SUP5kHwgh577aWFKuyRpsrtwT3KkcQP/eSdqo+d6HH++aT6nQm5iCJdkD37uWt
-	zSlIMn1aT5vdl0m0lBo83RyQZ4mDg3CXGzxWo1zBroEY8aDIP4x3tkTevBPkGNKV1+WEAsx4kz7/T
-	ffTrjB6w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t9Qfz-00000008zAO-2uVh;
-	Fri, 08 Nov 2024 15:13:32 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8E36830049D; Fri,  8 Nov 2024 16:13:31 +0100 (CET)
-Date: Fri, 8 Nov 2024 16:13:31 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Fangrui Song <i@maskray.me>, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, kvm@vger.kernel.org, ndesaulniers@google.com,
-	morbo@google.com, justinstitt@google.com, llvm@lists.linux.dev
-Subject: Re: [PATCH 01/11] objtool: Generic annotation infrastructure
-Message-ID: <20241108151331.GC6497@noisy.programming.kicks-ass.net>
-References: <20231204093702.989848513@infradead.org>
- <20231204093731.356358182@infradead.org>
- <20241108141600.GB6497@noisy.programming.kicks-ass.net>
- <20241108145716.GA2564051@thelio-3990X>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tAAXTnS73/fctH1a9sYVX1bOZskptu6qDlUsPbpHxj0+qO66Z22iBfb7BzWnDMmPGYAQIixAF4qQ0bwYqGAC/aao1Jd4RBbyl2HhOPLWxUJXIBhoWYuLOT6xgeYd7CQ631LMnU5xe3ewPXkNRRv9bEMcS0RvTgpOAlsC6sgC5qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=bJY1kfzU; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b14077ec5aso311525385a.1
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 07:25:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1731079538; x=1731684338; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nbYXv3yCM9yQzCKa6ScUYgOxj5i+yJ5Ve18Z6DNxO2Y=;
+        b=bJY1kfzUcarj5CrCE4Tih3DZkR2MPvb0tUrbaV67brM/zWFSSH4XDEINs+3lIpIn9G
+         XOUMKNr+TXsHV43VcaUCVNsg5hkY7HaAjzisjsOFkPzkqf2wjChDM10bgh71BOaOrrfv
+         Wf6a323Mkj68kqXlq68GFa2rqc+uNuFUgjNtHz9TLtkg/mwEQunzUDbDYQ4Y0v4vyRfK
+         eYeQFHi1h45hnN0WM3KDpaY3MeBuVFFiuikvP0SCR8XP2sOmgPpOSFobXNSzQZP+uGtV
+         N+NEaqh2K3YlIz3AKWeGCR7MPSMrKQ7XBJrkprKqy/9YgJoMrfrlr2YcXspzBqjS4ET4
+         QXag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731079538; x=1731684338;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nbYXv3yCM9yQzCKa6ScUYgOxj5i+yJ5Ve18Z6DNxO2Y=;
+        b=oXQW/pmSpbGI36xTtmTeTEIUbQvlqpFD9/sS75MlusJ2fw6bJNHGKoGZkpSdbuDkDZ
+         3Idiqfu+ebyNAqnfMxp8bnCAo5cxyw823l7b2elG66/D7Pn4YSedRi4+O39aLebwL0Ag
+         E1XuIuNUYwbKlnMcfywdVgBzt33JrDhOaOQBU2LlvRivFjxF4s0ITqCN7cZ79W1yl/TY
+         1K1kOd711EnMHpK1b5wGIpAik+/5WMUSNmE4szS2yUMcP7BGFf0XZzSUfMeV45pYsGqA
+         tXarJOe0BCiwXVZWlxZjuDK+inhJz5LJ9j1jfSI+wU2Mt2jKn5vQQzr2LDOvxIOcu7P6
+         3ZPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUb8kX6JBNsiuppPrVhEQm/pV/dSnJXkyBEnXRDKmgsP/xwvNI0Uk9wlZtQIoEMSdFWj3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7ZnKgs9K1bfxoAShbM8xR1cW8cegxVwxzeasAcbb4q7Sv3r/+
+	bsBfAUDIzuDZCgrJ5ppQqV3dkpiz1Z9DDZI6HsirYsgUVfGLwwf76jvYS+A+dR0=
+X-Google-Smtp-Source: AGHT+IH4eRArrUDZm2rUOb5KR+8EAvAFtyYH0Fr2uIHFPXrPpQnSMiiNxtBbq8LowDrIix/biyMB3w==
+X-Received: by 2002:a05:620a:4049:b0:7b1:4cc0:5e32 with SMTP id af79cd13be357-7b3328aeb7dmr490547585a.9.1731079538361;
+        Fri, 08 Nov 2024 07:25:38 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac51659sm170158385a.42.2024.11.08.07.25.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 07:25:37 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1t9Qrh-00000002Zza-1RVx;
+	Fri, 08 Nov 2024 11:25:37 -0400
+Date: Fri, 8 Nov 2024 11:25:37 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org, matthew.brost@intel.com,
+	Thomas.Hellstrom@linux.intel.com, brian.welty@intel.com,
+	himal.prasad.ghimiray@intel.com, krishnaiah.bommu@intel.com,
+	niranjana.vishwanathapura@intel.com
+Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241108152537.GN35848@ziepe.ca>
+References: <cover.1730298502.git.leon@kernel.org>
+ <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
+ <20241104095831.GA28751@lst.de>
+ <20241105195357.GI35848@ziepe.ca>
+ <20241107083256.GA9071@lst.de>
+ <20241107132808.GK35848@ziepe.ca>
+ <20241107135025.GA14996@lst.de>
+ <20241108150226.GM35848@ziepe.ca>
+ <20241108150500.GA10102@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,133 +113,41 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108145716.GA2564051@thelio-3990X>
+In-Reply-To: <20241108150500.GA10102@lst.de>
 
-On Fri, Nov 08, 2024 at 07:57:16AM -0700, Nathan Chancellor wrote:
-> On Fri, Nov 08, 2024 at 03:16:00PM +0100, Peter Zijlstra wrote:
-> > On Mon, Dec 04, 2023 at 10:37:03AM +0100, Peter Zijlstra wrote:
-> > > Avoid endless .discard.foo sections for each annotation, create a
-> > > single .discard.annotate section that takes an annotation type along
-> > > with the instruction.
-> > > 
-> > > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> > > ---
-> > > --- a/include/linux/objtool.h
-> > > +++ b/include/linux/objtool.h
-> > > @@ -57,6 +57,13 @@
-> > >  	".long 998b\n\t"						\
-> > >  	".popsection\n\t"
-> > >  
-> > > +#define ASM_ANNOTATE(x)						\
-> > > +	"911:\n\t"						\
-> > > +	".pushsection .discard.annotate,\"M\",@progbits,8\n\t"	\
-> > > +	".long 911b - .\n\t"					\
-> > > +	".long " __stringify(x) "\n\t"				\
-> > > +	".popsection\n\t"
-> > > +
-> > >  #else /* __ASSEMBLY__ */
-> > >  
-> > >  /*
-> > > @@ -146,6 +153,14 @@
-> > >  	.popsection
-> > >  .endm
-> > >  
-> > > +.macro ANNOTATE type:req
-> > > +.Lhere_\@:
-> > > +	.pushsection .discard.annotate,"M",@progbits,8
-> > > +	.long	.Lhere_\@ - .
-> > > +	.long	\type
-> > > +	.popsection
-> > > +.endm
-> > > +
-> > >  #endif /* __ASSEMBLY__ */
-> > >  
-> > >  #else /* !CONFIG_OBJTOOL */
-> > > @@ -167,6 +182,8 @@
-> > >  .endm
-> > >  .macro REACHABLE
-> > >  .endm
-> > > +.macro ANNOTATE
-> > > +.endm
-> > >  #endif
-> > >  
-> > >  #endif /* CONFIG_OBJTOOL */
-> > > --- a/tools/objtool/check.c
-> > > +++ b/tools/objtool/check.c
-> > > @@ -2308,6 +2308,41 @@ static int read_unwind_hints(struct objt
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static int read_annotate(struct objtool_file *file, void (*func)(int type, struct instruction *insn))
-> > > +{
-> > > +	struct section *rsec, *sec;
-> > > +	struct instruction *insn;
-> > > +	struct reloc *reloc;
-> > > +	int type;
-> > > +
-> > > +	rsec = find_section_by_name(file->elf, ".rela.discard.annotate");
-> > > +	if (!rsec)
-> > > +		return 0;
-> > > +
-> > > +	sec = find_section_by_name(file->elf, ".discard.annotate");
-> > > +	if (!sec)
-> > > +		return 0;
-> > > +
-> > > +	for_each_reloc(rsec, reloc) {
-> > > +		insn = find_insn(file, reloc->sym->sec,
-> > > +				 reloc->sym->offset + reloc_addend(reloc));
-> > > +		if (!insn) {
-> > > +			WARN("bad .discard.annotate entry: %d", reloc_idx(reloc));
-> > > +			return -1;
-> > > +		}
-> > > +
-> > > +		type = *(u32 *)(sec->data->d_buf + (reloc_idx(reloc) * sec->sh.sh_entsize) + 4);
-> > > +
-> > > +		func(type, insn);
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > 
-> > So... ld.lld hates this :-(
-> > 
-> > From an LLVM=-19 build we can see that:
-> > 
-> > $ readelf -WS tmp-build/arch/x86/kvm/vmx/vmenter.o | grep annotate
-> >   [13] .discard.annotate PROGBITS        0000000000000000 00028c 000018 08   M  0   0  1
-> > 
-> > $ readelf -WS tmp-build/arch/x86/kvm/kvm-intel.o | grep annotate
-> >   [ 3] .discard.annotate PROGBITS        0000000000000000 069fe0 0089d0 00   M  0   0  1
-> > 
-> > Which tells us that the translation unit itself has a sh_entsize of 8,
-> > while the linked object has sh_entsize of 0.
-> > 
-> > This then completely messes up the indexing objtool does, which relies
-> > on it being a sane number.
-> > 
-> > GCC/binutils very much does not do this, it retains the 8.
-> > 
-> > Dear clang folks, help?
+On Fri, Nov 08, 2024 at 04:05:00PM +0100, Christoph Hellwig wrote:
+> On Fri, Nov 08, 2024 at 11:02:26AM -0400, Jason Gunthorpe wrote:
+> > It is fully OK? Can't dma_map_page() trigger swiotlb? It must not do
+> > that for P2P. How does it know the difference if it just gets a phys?
 > 
-> Perhaps Fangrui has immediate thoughts, since this appears to be an
-> ld.lld thing? Otherwise, I will see if I can dig into this in the next
-> couple of weeks (I have an LF webinar on Wednesday that I am still
-> prepping for). Is this reproducible with just defconfig or something
-> else?
+> dma_direct_map_page checks for p2p pages in the swiotlb bounce
+> path already in the current kernel, and dma_map_sg relies on exactly
+> that check to prevent bouncing for p2p.
 
-I took the .config from the report you pointed me at yesterday.
+I'm asking how it will work if you change the struct page argument to
+physical, because today dma_direct_map_page() has:
 
-  https://lore.kernel.org/202411071743.HZsCuurm-lkp@intel.com/
+		if (is_pci_p2pdma_page(page))
+			return DMA_MAPPING_ERROR;
 
-And specifically the kvm build targets from:
+Which is exactly the sorts of things I'm looking at when when I say to
+get rid of struct page.
 
-$ make O=tmp-build/ LLVM=-19 arch/x86/kvm/
+What I'm thinking about is replacing code like the above with something like:
 
-show this problem.
+		if (p2p_provider)
+			return DMA_MAPPING_ERROR;
 
-I just ran a defconfig, and that seems to behave properly. Notably,
-vmlinux.o (definitely a link target) has entsize=8 for the relevant
-section.
+And the caller is the one that would have done is_pci_p2pdma_page()
+and either passes p2p_provider=NULL or page->pgmap->p2p_provider.
 
-I'm not sure how the kvm targets might be 'special'.
+Anyhow, I hope Leon will attempt this once this is settled and it will
+make more sense in patches. I'm just brainstorming how I've been
+thinking of it.
+
+Another option would be some 'is_pci_p2pdma_page_phys(phys)', but I
+think that is going to be worse performance than managing a
+p2p_provider pointer in the mapping call chain explicitly.
+
+Jason
 
