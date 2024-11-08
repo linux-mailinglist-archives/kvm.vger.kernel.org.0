@@ -1,137 +1,200 @@
-Return-Path: <kvm+bounces-31209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E46689C1462
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 04:01:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C9899C14E1
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 04:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C645283111
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 03:01:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8CC2B22D2D
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 03:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB5812C544;
-	Fri,  8 Nov 2024 03:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f2xeLC9R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BC51C3F00;
+	Fri,  8 Nov 2024 03:53:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CF51BD9C2
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 03:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553143209;
+	Fri,  8 Nov 2024 03:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731034852; cv=none; b=h2qKBqpPeju/S035DXpLS1QSX4dwQAtFr7bCe3OyulHlR+J9LYj3waNe/0MIM5kkQzJJeCo4c/LRK7vCsQMYMlbj3otsFFDkB3+11+vgRh4HI2uq+Nc7GbQCUKlZ8LGTR3bnl6zAqoAsutiMifN1FIi0RUtS2sDRv7M/JjDcrv4=
+	t=1731037996; cv=none; b=MnEy7sWurGZnKvh1alcyHIrhxik1vHVdgkK360ShfxObbGDfvCxF+PZZPXebo/yTOf4jGjYorX4434QBFsfrgayCAl6D9Zq+f3/oawpJkxkM8VLs87r3RZFDU9Q1aA8mMJbrdApDf/U2C4K43xmGwT15qyMMVB/hjwaNpCRFVkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731034852; c=relaxed/simple;
-	bh=1lqzFGn1eXbAen/HouRQEXecZLXqEsPyxz4EZS5zSGs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4aKuEwnZdzeXm6doFjRE+jBtWkfJFbLDY4SDo7l/2sEduYHPaskWNR1bbrit11ptZGgWBevJSlAWvnOK53HQqcixUNpB8K6BTSJRoIgOblVb69qusKkLpQMvrWLsO5fQOL3taDbePKpqh2d7rm21pgxqq2Uz+t1utOzXs5j/LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f2xeLC9R; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6e38fc62b9fso14783977b3.2
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 19:00:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731034849; x=1731639649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gpzEZp7ZlditrMUaR0RY215WGeQ8zIPi7Ck1Zq/zD0c=;
-        b=f2xeLC9RyPjTVxtYjwz6c9oV/mfXWe7ymKeFka+D6KP5W7r7Hw0ehmtYuw3LuPjs1q
-         y0/Wq7nauH8sdcHDe3Ln2bj97mwEcLSE8oAuHiytYRWUYEOMaofwXCoz3y88POrAzBon
-         klPz7Ayjrviz2ukj/+Y1UB93kXLkKh7a2+I9WcwNPvjfJ2iAzJJL8qfekCFsIZnjmoQ1
-         MJRblWBs257JmKyaxLughKWhAGc1XSpV42pnE9CWOfcNJiCH7pQT0+f85gQb/Z6gZaTq
-         WZaRmVjjYWwek/+ZahclALkCGWDBbtId8xLF0Hoe8k3QsEnr1aw/vIf2S+H0DMPU9LsP
-         VUiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731034849; x=1731639649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gpzEZp7ZlditrMUaR0RY215WGeQ8zIPi7Ck1Zq/zD0c=;
-        b=IZrEka84AJKQ9QsawTv83hPUFlyaY/8V3Nmm2MnETcpYlrm4UxW4UMu5F47u0GZaXg
-         2pe+YYMrmn3MorCSzb3B3MD1rHkYlZISOvpn1Nyj5CZVJ04kMsMICzMVjQtDsAUKL+zn
-         L3kuGOGCjFktol073VIzRVxUhlclyn5MEE0YwYMMooNRtjv9V8uvAJ503hYDiYKXGU5v
-         5Xv1d+WOOdRMgrmZvgVIXzz/dGLynnkYoPzD+FYoLD7s6KvfI8l66n6EHgB7Jevzb5vF
-         /EOw1kwlUeSDGzH93yKYy6oaUtNs4GNpWQgD2l3RKkfnJCuRmHTLOPNGA1A7vk8WPRRo
-         SFCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFR276wUbCAWkhE+dLOqbUaSmzQn1yY4riGpFD4CMG0r+w+1LOTGLYvfNuPQ0yp6X6Ipg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXIHOi5XYonp9JtVYx1oVIYFS4uIzDHVM4mgoLecEUf9ZwcDTF
-	cquB4ilEfEPczu1WJudVxHsGL0cmjWDr4BEfu34pEnQDQ6XRi3euRw/1gwSjsoH7OnIHHfDg/4p
-	MIRbdxjp3Q9//HjZSVwPAAmYLtagsOoe+IVbY
-X-Google-Smtp-Source: AGHT+IHR4yckEoMuQ7L6FZx8C9n+6mGcTLb5/EhQ62bRePk5jVdh0KVFPZSYTuKhRFZX0cTeNXh9dAaW7vwAUxwoHQM=
-X-Received: by 2002:a05:690c:c93:b0:6e3:3336:7932 with SMTP id
- 00721157ae682-6eaddf8dc3emr16216267b3.27.1731034849279; Thu, 07 Nov 2024
- 19:00:49 -0800 (PST)
+	s=arc-20240116; t=1731037996; c=relaxed/simple;
+	bh=K3kQT8ebkZIqUO/iTdfzccfDTBN19VZhPUmLSL5rvds=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ufDxZk+noSv+/KL4v2gZyMlgsMyK6vTwKiiQ62awa9eLaW8S5Wf4sIksQjf5o7IxsJBbGi4K4b50BHVkXwP27IMBaCtXzaRDvaoIybg8E8fw3tRsYLtHJYH633qDJ4PHwKHRSNh6yA974CPYppxGLacwVpd3q3J5VEKJsIUn/A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.185])
+	by gateway (Coremail) with SMTP id _____8CxCeEfiy1nRdg4AA--.46471S3;
+	Fri, 08 Nov 2024 11:53:03 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+	by front1 (Coremail) with SMTP id qMiowMAxXcIbiy1nsTNMAA--.31272S2;
+	Fri, 08 Nov 2024 11:52:59 +0800 (CST)
+From: Xianglai Li <lixianglai@loongson.cn>
+To: linux-kernel@vger.kernel.org
+Cc: Bibo Mao <maobibo@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Xianglai li <lixianglai@loongson.cn>
+Subject: [PATCH V4 00/11] Added Interrupt controller emulation for loongarch kvm
+Date: Fri,  8 Nov 2024 11:34:37 +0800
+Message-Id: <20241108033437.2727574-1-lixianglai@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105184333.2305744-5-jthoughton@google.com> <202411061526.RAuCXKJh-lkp@intel.com>
-In-Reply-To: <202411061526.RAuCXKJh-lkp@intel.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 7 Nov 2024 22:00:13 -0500
-Message-ID: <CADrL8HU3KzDxrLsxD1+578zG6E__AjK3TMCfs-nQAnqFTZM2vQ@mail.gmail.com>
-Subject: Re: [PATCH v8 04/11] KVM: x86/mmu: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-To: kernel test robot <lkp@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	oe-kbuild-all@lists.linux.dev, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAxXcIbiy1nsTNMAA--.31272S2
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Wed, Nov 6, 2024 at 3:22=E2=80=AFAM kernel test robot <lkp@intel.com> wr=
-ote:
->
-> Hi James,
->
-> kernel test robot noticed the following build warnings:
->
-> [auto build test WARNING on a27e0515592ec9ca28e0d027f42568c47b314784]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM=
--Remove-kvm_handle_hva_range-helper-functions/20241106-025133
-> base:   a27e0515592ec9ca28e0d027f42568c47b314784
-> patch link:    https://lore.kernel.org/r/20241105184333.2305744-5-jthough=
-ton%40google.com
-> patch subject: [PATCH v8 04/11] KVM: x86/mmu: Relax locking for kvm_test_=
-age_gfn and kvm_age_gfn
-> config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20241106=
-/202411061526.RAuCXKJh-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20241106/202411061526.RAuCXKJh-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202411061526.RAuCXKJh-lkp=
-@intel.com/
->
-> All warnings (new ones prefixed by >>):
->
->    arch/x86/kvm/mmu/tdp_mmu.c: In function 'kvm_tdp_mmu_age_spte':
-> >> arch/x86/kvm/mmu/tdp_mmu.c:1189:23: warning: ignoring return value of =
-'__tdp_mmu_set_spte_atomic' declared with attribute 'warn_unused_result' [-=
-Wunused-result]
->     1189 |                 (void)__tdp_mmu_set_spte_atomic(iter, new_spte=
-);
->          |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~
->
+Before this, the interrupt controller simulation has been completed
+in the user mode program. In order to reduce the loss caused by frequent
+switching of the virtual machine monitor from kernel mode to user mode
+when the guest accesses the interrupt controller, we add the interrupt
+controller simulation in kvm.
 
-Well, I saw this compiler warning in my latest rebase and thought the
-`(void)` would fix it. I guess the next best way to fix it would be to
-assign to an `int __maybe_unused`. I'll do for a v9, or Sean if you're
-going to take the series (maybe? :)), go ahead and apply whatever fix
-you like.
+The following is a virtual machine simulation diagram of interrupted
+connections:
+  +-----+    +---------+     +-------+
+  | IPI |--> | CPUINTC | <-- | Timer |
+  +-----+    +---------+     +-------+
+                 ^
+                 |
+           +---------+
+           | EIOINTC |
+           +---------+
+            ^       ^
+            |       |
+     +---------+ +---------+
+     | PCH-PIC | | PCH-MSI |
+     +---------+ +---------+
+       ^      ^          ^
+       |      |          |
++--------+ +---------+ +---------+
+| UARTs  | | Devices | | Devices |
++--------+ +---------+ +---------+
+
+In this series of patches, we mainly realized the simulation of
+IPI EIOINTC PCH-PIC interrupt controller.
+
+The simulation of IPI EIOINTC PCH-PIC interrupt controller mainly
+completes the creation simulation of the interrupt controller,
+the register address space read and write simulation,
+and the interface with user mode to obtain and set the interrupt
+controller state for the preservation,
+recovery and migration of virtual machines.
+
+IPI simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongson-3A5000-usermanual-EN/inter-processor-interrupts-and-communication
+
+EIOINTC simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongson-3A5000-usermanual-EN/io-interrupts/extended-io-interrupts
+
+PCH-PIC simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/blob/main/docs/Loongson-7A1000-usermanual-EN/interrupt-controller.adoc
+
+For PCH-MSI, we used irqfd mechanism to send the interrupt signal
+generated by user state to kernel state and then to EIOINTC without
+maintaining PCH-MSI state in kernel state.
+
+You can easily get the code from the link below:
+the kernel:
+https://github.com/lixianglai/linux
+the branch is: interrupt-v4
+
+the qemu:
+https://github.com/lixianglai/qemu
+the branch is: interrupt-v3
+
+Please note that the code above is regularly updated based on community
+reviews.
+
+change log:
+V3->V4:
+1.Fix some macro definition names and some formatting errors
+2.Combine the IPI two device address Spaces into one address device space
+3.Optimize the function kvm_vm_ioctl_irq_line implementation, directly call the public function kvm_set_irq for interrupt distribution
+4.Optimize the description of the commit log
+5.Deleting an interface trace_kvm_iocsr
+
+V2->V3:
+1.Modify the macro definition name:
+KVM_DEV_TYPE_LA_* ->  KVM_DEV_TYPE_LOONGARCH_*
+2.Change the short name for "Extended I/O Interrupt Controller" from EXTIOI to EIOINTC
+Rename file extioi.c to eiointc.c
+Rename file extioi.h to eiointc.h
+
+V1->V2:
+1.Remove redundant blank lines according to community comments
+2.Remove simplified redundant code
+3.Adds 16 bits of read/write interface to the eiointc iocsr address space
+4.Optimize user - and kernel-mode data access interfaces: Access
+fixed length data each time to prevent memory overruns
+5.Added virtual eiointc, where interrupts can be routed to cpus other than cpu 4
+
+Cc: Bibo Mao <maobibo@loongson.cn> 
+Cc: Huacai Chen <chenhuacai@kernel.org> 
+Cc: kvm@vger.kernel.org 
+Cc: loongarch@lists.linux.dev 
+Cc: Paolo Bonzini <pbonzini@redhat.com> 
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn> 
+Cc: WANG Xuerui <kernel@xen0n.name> 
+Cc: Xianglai li <lixianglai@loongson.cn> 
+
+Xianglai Li (11):
+  LoongArch: KVM: Add iocsr and mmio bus simulation in kernel
+  LoongArch: KVM: Add IPI device support
+  LoongArch: KVM: Add IPI read and write function
+  LoongArch: KVM: Add IPI user mode read and write function
+  LoongArch: KVM: Add EIOINTC device support
+  LoongArch: KVM: Add EIOINTC read and write functions
+  LoongArch: KVM: Add EIOINTC user mode read and write functions
+  LoongArch: KVM: Add PCHPIC device support
+  LoongArch: KVM: Add PCHPIC read and write functions
+  LoongArch: KVM: Add PCHPIC user mode read and write functions
+  LoongArch: KVM: Add irqfd support
+
+ arch/loongarch/include/asm/kvm_eiointc.h |  122 +++
+ arch/loongarch/include/asm/kvm_host.h    |   18 +-
+ arch/loongarch/include/asm/kvm_ipi.h     |   46 +
+ arch/loongarch/include/asm/kvm_pch_pic.h |   61 ++
+ arch/loongarch/include/uapi/asm/kvm.h    |   19 +
+ arch/loongarch/kvm/Kconfig               |    5 +-
+ arch/loongarch/kvm/Makefile              |    4 +
+ arch/loongarch/kvm/exit.c                |   80 +-
+ arch/loongarch/kvm/intc/eiointc.c        | 1055 ++++++++++++++++++++++
+ arch/loongarch/kvm/intc/ipi.c            |  468 ++++++++++
+ arch/loongarch/kvm/intc/pch_pic.c        |  523 +++++++++++
+ arch/loongarch/kvm/irqfd.c               |   97 ++
+ arch/loongarch/kvm/main.c                |   19 +-
+ arch/loongarch/kvm/vcpu.c                |    3 +
+ arch/loongarch/kvm/vm.c                  |   22 +
+ include/linux/kvm_host.h                 |    1 +
+ include/uapi/linux/kvm.h                 |    8 +
+ 17 files changed, 2522 insertions(+), 29 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/kvm_eiointc.h
+ create mode 100644 arch/loongarch/include/asm/kvm_ipi.h
+ create mode 100644 arch/loongarch/include/asm/kvm_pch_pic.h
+ create mode 100644 arch/loongarch/kvm/intc/eiointc.c
+ create mode 100644 arch/loongarch/kvm/intc/ipi.c
+ create mode 100644 arch/loongarch/kvm/intc/pch_pic.c
+ create mode 100644 arch/loongarch/kvm/irqfd.c
+
+
+base-commit: 906bd684e4b1e517dd424a354744c5b0aebef8af
+-- 
+2.39.1
+
 
