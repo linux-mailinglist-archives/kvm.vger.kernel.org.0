@@ -1,86 +1,111 @@
-Return-Path: <kvm+bounces-31282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3595C9C2082
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:34:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8489C20C6
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5180E1C22FD3
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:34:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBED9285F9F
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3BB21A712;
-	Fri,  8 Nov 2024 15:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F93921B453;
+	Fri,  8 Nov 2024 15:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Yrlsi7At"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aexEmqOU"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3F51E5708;
-	Fri,  8 Nov 2024 15:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A7B21B424
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 15:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731080079; cv=none; b=QNpvjT07YTxhbm35bDjH2GbY94o0nKFARh5Zhju0T9vKc1J7hXlxQNoj6l7ZiiWof6vrcH+QA/GqY/g7/YjV18xYv56Ylr4BEjp8M/J9cSlaU2KuTd9OPzUCBJ+99aUpOkz8mvzfkFoTJ0Cai/a15tw7wIDgZpx7JluQ3DfYAC0=
+	t=1731080330; cv=none; b=tEcyl7/jC9/qCZmE5TMcz1j8S+2mN1Sm8i++T/ofsOu1ovDWSeT8wDQy9GyqWNRXdzQHVZQKM+QAmqW7M7czh/00leIF/pM8aTcDjdXcR/S/8+Vf9vZgzsW7ubH5dV/FGdZWH1cQj4LDlrw63UJpEaD77y3cQPRPwnffqFJfNIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731080079; c=relaxed/simple;
-	bh=U/9AlEbPsyJXfUCtQk5OJgeixtftufu+eceurvg7r3A=;
+	s=arc-20240116; t=1731080330; c=relaxed/simple;
+	bh=OaBx3Fh/Km3ELqbio7v031NeuRfzJ9+4kTiWipNjW34=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d1l8r6SBDl930jaNLeieKCUJkIptpd5Zu8tZw+h21V2zX+QeqdrGJt1rcfxDPIVlChl695hOVKFM8pNkhrd/oz13Bcw/ySJlSSJM+jKd/OdBkake4rLCxeJeYSCtbSXm4WqU6GkmhPXBhi1afGFc4xWfI3HtV/YV4tmr9WWUwWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Yrlsi7At; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vjqYkG8ff4c+T4YdMOMbIeQIrZmZCxBiG8+gykwYd68=; b=Yrlsi7At3LEJP0uIS6NkE1jR0Z
-	oEDQN829mzVxadI/xT+kHJyj5id3FRDTMankwY09OZVfoGLKoqsmLmgVU1Lu1pazKwCxc0rCgk1MQ
-	xtxACAOrflTnYJ1gsq35M/GrEku0PXrYo1NmUlRg3/xm/yNXfSqjxdFSGnOXTyYmYxf2oekxv9FLP
-	wEOzongRu606SdS0S8qnLTBPFqmALtmejbk/mXmEr2UTL7qA+UAscv+0HOvdCrD1PTIU4PbUBjS+W
-	/Lg0PXKc83CciAUL2IEcvj4nySJ8JJocIaAq2CpM/eee1apM5FIwT9nN1SxiZwdtiiRR7++R4EU95
-	TbKChe7A==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t9Qzz-000000090KC-0Eqo;
-	Fri, 08 Nov 2024 15:34:11 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 2EC8930049D; Fri,  8 Nov 2024 16:34:11 +0100 (CET)
-Date: Fri, 8 Nov 2024 16:34:11 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Kan Liang <kan.liang@linux.intel.com>,
-	Will Deacon <will@kernel.org>, Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v7 4/5] x86: perf: Refactor misc flag assignments
-Message-ID: <20241108153411.GF38786@noisy.programming.kicks-ass.net>
-References: <20241107190336.2963882-1-coltonlewis@google.com>
- <20241107190336.2963882-5-coltonlewis@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PDT/TYddYnpiUsz+FE/ykWlkYRcra4SQAjUaPIQWVWsB6pCPWsszwxVTYADEKT5p4cdNx8WkXxClmPclNSiTHwod497QiISQiMSg5KRmOF49Zm4JoR9/+5Dle3LODNwA4cTHhTCmfc4iJ+3QgJzzRC3CWwR4C48bcZZp9ReaS0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=aexEmqOU; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b1474b1377so148271585a.2
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 07:38:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1731080328; x=1731685128; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7sMW5Kuv5sIzIjhBbBygI9fJdJpSk6eqM7+xgs0I9dY=;
+        b=aexEmqOUtoWo0nIxpp53mWmhgcdamtlMoWnc7v23Dq2R4nF+XhtjhKeEQukniU5tde
+         Vce5KIwE2ZP9zCpfoy/YAiCAgwmM+QhLn3FHxZhCVqcMcnaWCLkDNsKSdaR7TEYQYQny
+         I7V8/zeoQnhPgNDMziuf1jeRFibRMTmxh1Jfgd73c+9VMrzfs8b59x9r8L0WM1bTzHZG
+         X4YyruWQtaCHeiW6iXjx8oFUyTMzlhRe6kIpwqDXRLz/HFKrM3zjhj7yegME3+gB8JUw
+         w3XqR9e5cqtLx9oPgONMCEZKywjVgwCbdxTX4YQWSbGgXCYWTAg8upYA74ViTR7IznHA
+         v2dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731080328; x=1731685128;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7sMW5Kuv5sIzIjhBbBygI9fJdJpSk6eqM7+xgs0I9dY=;
+        b=wgnd72C3/Bj90OszO4F0PFIMMpUK9DiGoBk33L+zAKFd6OSLO74GKnqun95RCyLQuk
+         /CCQnIm5gbLQrHR5SbBCxAV687jXaYioViF8NE+fE+uTtOSbKB5NI8DM8Ulgb+8ZRxuA
+         g4t1KoogZ7JRH6qDv3vxLP4rWKDCSj0Cs4PEou/bB+HHhB0y2XzpunWkhhJnRSpztRNv
+         yg+O+cRaAOvrYsNsLlzA6VgRmCCrXuttBWYpEEfp+QzFFeQgnj1kdGM2ozBUSivegbht
+         Ke3Ss19L1v2MLWVy61M6q6Zgje1rOhFVzXicmVLbeIskJeCIJdCe0FuvSyynS9ihh0Np
+         MZ0g==
+X-Forwarded-Encrypted: i=1; AJvYcCW8QACIJYCKjzOp7nmo6HdXUlGIDwKHDdZJtDmLsaC0aGP2RxlucMr6h3u0QGbBT2CLghk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypHCRd2ZUyEe1e0T1Wgf+W1VAdJmNyFNHasTVzCrMF6+u/HQEl
+	p9N3bXvD79Xat3AscAl2RTTvpvNmGQ+qN/dqkahDN8qfUPbfjF902JskK1jnuTA=
+X-Google-Smtp-Source: AGHT+IHfTg/iLCK5GxrqZ9aoCzAZ7JH1FinF3HAR4KRwwnugOPp1CtA3KrYQyOs3W/lc98NgBjpBFQ==
+X-Received: by 2002:a05:620a:1a21:b0:7ac:bb00:cd42 with SMTP id af79cd13be357-7b331dd2d55mr406755285a.27.1731080327649;
+        Fri, 08 Nov 2024 07:38:47 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac2dd1fsm170869085a.15.2024.11.08.07.38.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 07:38:47 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1t9R4Q-00000002a9N-29Xq;
+	Fri, 08 Nov 2024 11:38:46 -0400
+Date: Fri, 8 Nov 2024 11:38:46 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org, matthew.brost@intel.com,
+	Thomas.Hellstrom@linux.intel.com, brian.welty@intel.com,
+	himal.prasad.ghimiray@intel.com, krishnaiah.bommu@intel.com,
+	niranjana.vishwanathapura@intel.com
+Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241108153846.GO35848@ziepe.ca>
+References: <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
+ <20241104095831.GA28751@lst.de>
+ <20241105195357.GI35848@ziepe.ca>
+ <20241107083256.GA9071@lst.de>
+ <20241107132808.GK35848@ziepe.ca>
+ <20241107135025.GA14996@lst.de>
+ <20241108150226.GM35848@ziepe.ca>
+ <20241108150500.GA10102@lst.de>
+ <20241108152537.GN35848@ziepe.ca>
+ <20241108152956.GA12130@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,91 +114,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107190336.2963882-5-coltonlewis@google.com>
+In-Reply-To: <20241108152956.GA12130@lst.de>
 
-On Thu, Nov 07, 2024 at 07:03:35PM +0000, Colton Lewis wrote:
-> Break the assignment logic for misc flags into their own respective
-> functions to reduce the complexity of the nested logic.
+On Fri, Nov 08, 2024 at 04:29:56PM +0100, Christoph Hellwig wrote:
+> On Fri, Nov 08, 2024 at 11:25:37AM -0400, Jason Gunthorpe wrote:
+> > I'm asking how it will work if you change the struct page argument to
+> > physical, because today dma_direct_map_page() has:
+> > 
+> > 		if (is_pci_p2pdma_page(page))
+> > 			return DMA_MAPPING_ERROR;
+> > 
+> > Which is exactly the sorts of things I'm looking at when when I say to
+> > get rid of struct page.
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/x86/events/core.c            | 32 +++++++++++++++++++++++--------
->  arch/x86/include/asm/perf_event.h |  2 ++
->  2 files changed, 26 insertions(+), 8 deletions(-)
+> It will have to look up the page from the physical address obviously.
+> But at least only in the error path.
+
+I'm thinking we can largely avoid searching on physical, or at least
+we can optimize this so there is only one search on physical at the
+start of the DMA mapping. (since we are now saying all pages are the
+same type)
+
+> > What I'm thinking about is replacing code like the above with something like:
+> > 
+> > 		if (p2p_provider)
+> > 			return DMA_MAPPING_ERROR;
+> > 
+> > And the caller is the one that would have done is_pci_p2pdma_page()
+> > and either passes p2p_provider=NULL or page->pgmap->p2p_provider.
 > 
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index d19e939f3998..9fdc5fa22c66 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -3011,16 +3011,35 @@ unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  	return regs->ip + code_segment_base(regs);
->  }
->  
-> +static unsigned long common_misc_flags(struct pt_regs *regs)
-> +{
-> +	if (regs->flags & PERF_EFLAGS_EXACT)
-> +		return PERF_RECORD_MISC_EXACT_IP;
-> +
-> +	return 0;
-> +}
-> +
-> +unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-> +{
-> +	unsigned long guest_state = perf_guest_state();
-> +	unsigned long flags = common_misc_flags(regs);
+> And where do you get that one from?
 
-This is double common_misc and makes no sense
+Which one?
 
-> +
-> +	if (!(guest_state & PERF_GUEST_ACTIVE))
-> +		return flags;
-> +
-> +	if (guest_state & PERF_GUEST_USER)
-> +		return flags & PERF_RECORD_MISC_GUEST_USER;
-> +	else
-> +		return flags & PERF_RECORD_MISC_GUEST_KERNEL;
+The caller must know the p2p properties of what it is doing because it
+is driving all the P2P logic around what APIs to call.
 
-And this is just broken garbage, right?
+Either because it is already working with struct page and gets it out
+of the pgmap.
 
-> +}
+Or it is working with non-struct page memory and has a (MMIO address,
+p2p_provider) tuple that it got from the original driver that gave it
+the MMIO address.
 
-Did you mean to write:
+Or it really does have a naked phys_addr_t and it did the search on
+physical, but only once.
 
-unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-{
-	unsigned long guest_state = perf_guest_state();
-	unsigned long flags = 0;
-
-	if (guest_state & PERF_GUEST_ACTIVE) {
-		if (guest_state & PERF_GUEST_USER)
-			flags |= PERF_RECORD_MISC_GUEST_USER;
-		else
-			flags |= PERF_RECORD_MISC_GUEST_KERNEL;
-	}
-
-	return flags;
-}
-
->  unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	unsigned int guest_state = perf_guest_state();
-> -	int misc = 0;
-> +	unsigned long misc = common_misc_flags(regs);
-
-Because here you do the common thing..
-
->  
->  	if (guest_state) {
-> -		if (guest_state & PERF_GUEST_USER)
-> -			misc |= PERF_RECORD_MISC_GUEST_USER;
-> -		else
-> -			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
-> +		misc |= perf_arch_guest_misc_flags(regs);
-
-And here you mix in the guest things.
-
->  	} else {
->  		if (user_mode(regs))
->  			misc |= PERF_RECORD_MISC_USER;
+Jason
 
