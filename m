@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-31274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31275-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB9E9C1FB5
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:53:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 226C99C1FC2
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 15:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C85B71C211E5
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 14:53:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6591C20FE8
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 14:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A561F4730;
-	Fri,  8 Nov 2024 14:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08C31F4701;
+	Fri,  8 Nov 2024 14:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZh606o7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9hZFeNV"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CFD1803A;
-	Fri,  8 Nov 2024 14:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0494A1D0400;
+	Fri,  8 Nov 2024 14:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731077611; cv=none; b=jRcplzXzObUN9sMHzAFf6I1+STtiICq46rfn3mZjCLDfO/j7ag7v+2UrtASkDt07igXcPEcodHGMVK3d7L6WUXpv0CuVL6rboE6/N52Gsr8h0tIn+Qgh2fSrqP1BO+9miertVdBOzFfMhl+T/MadCAtKUx109Et13EINfnvhb3A=
+	t=1731077783; cv=none; b=OX4BaZqt5kaoiJ7Pt1bq9SGPQZ1o0fGPzxYZK6Llu3H4NoTsRI3OZC4vJ0I8wKlXF/FWGEhRueZRTXZKspJcA/uyn7N959GCetHhvAOqt1SucIWBRFYcCkwIzR4escosbDrRjhPI4g1lEnfYDQocV4JPVr98KWNtzPM0V7/DXV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731077611; c=relaxed/simple;
-	bh=kZbPfuZ0ikYZXriOFOyM/wtjpbX2/SuwojvsPEaqSLA=;
+	s=arc-20240116; t=1731077783; c=relaxed/simple;
+	bh=6FAwEz1aNs6pjulAvH3wCg9nOjDsVb0l9FuLjHXGFtI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPcNgYSDeZg/EglCRPD406jjMej4FNk5RUDZIJN2rNoRCTw+bXUkF1Mo9Y/Batxxg0LgbRV7GLJhAipjFY71AgH8u4ac2l6ci+8xnUZlayq0Xl2Iqm992mkHRD/5xopsHj/rDvUdjq/ZhsdBGHTN2NRn6AVU684VFFB1PwUajTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZh606o7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F1CCC4CED5;
-	Fri,  8 Nov 2024 14:53:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=AFT8T8n/qxI2wegeuxpqGc8aE9s50Bgt7U5dDtHycLK/nX9ddxyBGASzP+xe0wvPdbWfE/1hY9bGVZkeaNL0fz9r5ps15yFYTqEgvC7L5kl1pNejPDqpR6eMG2NiFXi3j2tVR71aHeTYtFpjWr1WCPb04V3ECLScgHf1T1/Uxis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9hZFeNV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CD3C4CECD;
+	Fri,  8 Nov 2024 14:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731077611;
-	bh=kZbPfuZ0ikYZXriOFOyM/wtjpbX2/SuwojvsPEaqSLA=;
+	s=k20201202; t=1731077782;
+	bh=6FAwEz1aNs6pjulAvH3wCg9nOjDsVb0l9FuLjHXGFtI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rZh606o7uJMo6Rkf6Lz4RxQEyMr7vA756y0kFoEQhrTmohzr9Rp23gAVJj0gPMiLJ
-	 fiXqcWwVsoZGUl2E1KYIZdbZGgQgoAxcy2j0yAULt+/HhwCWGPl7QQ10YIxm/N7GGE
-	 7HwCs+UTOIW82PdunYNwSqmiCw/688dnKn1I9smPqqH4dK5e4pkg6bUKnLWUeFXz1D
-	 jmlU9f6QgL0uLbtdWuN195GnRy/Q3rTRqlJHzsOyTbQUklcr9SF0nNwXgiyMyMbdaM
-	 uXxVGrW0J8Um2aCgd+5douR6vdS7u6p21BHrCfHKPj2T6ojdtMqDWvKmv2J3OKSwTA
-	 uQV4/Bd+cHtMA==
-Date: Fri, 8 Nov 2024 14:53:22 +0000
+	b=b9hZFeNVj8VpGUF0f27FLcnlwN8hRdEybVmw28VptgICFG1V13MnGp3yEMYfBMgLF
+	 qX/rFwNSfcv6bGXMcrHN8aqlcZJLH8/ebuueRx4DuApb7umf0a73hsVDq9dTwb3u5+
+	 6sLvOCk4DKWF4jlO7DvWI9Agl3/36SYxws1x7QNr/FKjeAnR21CHXWHKToEKVvIyTN
+	 IDVZ+ob4t2u0QPax7OJ8MG5Wr8LNPlnwXdoAKe4KRH6mWxcge8Ftmj7JhkBp7kbI86
+	 C6EM6SEYAebI18+wacEEL8/H9ag8KIaqO8kbE/S3KvBuIE/bSahpBE4+XVgADcl5FV
+	 yBC9lwPvpCnwg==
+Date: Fri, 8 Nov 2024 14:56:14 +0000
 From: Will Deacon <will@kernel.org>
 To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Robin Murphy <robin.murphy@arm.com>, acpica-devel@lists.linux.dev,
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+Cc: acpica-devel@lists.linux.dev, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
 	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
 	Sudeep Holla <sudeep.holla@arm.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Donald Dutile <ddutile@redhat.com>,
@@ -65,17 +65,12 @@ Cc: Robin Murphy <robin.murphy@arm.com>, acpica-devel@lists.linux.dev,
 	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO
- via struct arm_smmu_hw_info
-Message-ID: <20241108145320.GA17325@willie-the-truck>
+Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
+Message-ID: <20241108145611.GB17325@willie-the-truck>
 References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
- <5-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
- <20241104114723.GA11511@willie-the-truck>
- <20241104124102.GX10193@nvidia.com>
- <8a5940b0-08f3-48b1-9498-f09f0527a964@arm.com>
- <20241106180531.GA520535@nvidia.com>
- <2a0e69e3-63ba-475b-a5a9-0863ad0f2bf8@arm.com>
- <20241107023506.GC520535@nvidia.com>
+ <20241101121849.GD8518@willie-the-truck>
+ <20241101132503.GU10193@nvidia.com>
+ <20241105164829.GA12923@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,62 +79,47 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107023506.GC520535@nvidia.com>
+In-Reply-To: <20241105164829.GA12923@willie-the-truck>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi guys,
-
-On Wed, Nov 06, 2024 at 10:35:06PM -0400, Jason Gunthorpe wrote:
-> On Wed, Nov 06, 2024 at 09:05:26PM +0000, Robin Murphy wrote:
-> > You should take "We discussed this already"
-> > as more of a clue to yourself than to me - if 4 different people have all
-> > said the exact same thing in so many words, perhaps there's something in
-> > it...
+On Tue, Nov 05, 2024 at 04:48:29PM +0000, Will Deacon wrote:
+> On Fri, Nov 01, 2024 at 10:25:03AM -0300, Jason Gunthorpe wrote:
+> > On Fri, Nov 01, 2024 at 12:18:50PM +0000, Will Deacon wrote:
+> > > On Wed, Oct 30, 2024 at 09:20:44PM -0300, Jason Gunthorpe wrote:
+> > > > [This is now based on Nicolin's iommufd patches for vIOMMU and will need
+> > > > to go through the iommufd tree, please ack]
+> > > 
+> > > Can't we separate out the SMMUv3 driver changes? They shouldn't depend on
+> > > Nicolin's work afaict.
+> > 
+> > We can put everything before "iommu/arm-smmu-v3: Support
+> > IOMMU_VIOMMU_ALLOC" directly on a rc and share a branch with your tree.
+> > 
+> > That patch and following all depend on Nicolin's work, as they rely on
+> > the VIOMMU due to how different ARM is from Intel.
+> > 
+> > How about you take these patches:
+> > 
+> >  [PATCH v4 01/12] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+> >  [PATCH v4 02/12] ACPICA: IORT: Update for revision E.f
+> >  [PATCH v4 03/12] ACPI/IORT: Support CANWBS memory access flag
+> >  [PATCH v4 04/12] iommu/arm-smmu-v3: Report IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
+> >  [PATCH v4 05/12] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via struct arm_smmu_hw_info
+> >  [PATCH v4 06/12] iommu/arm-smmu-v3: Implement IOMMU_HWPT_ALLOC_NEST_PARENT
+> >  [PATCH v4 07/12] iommu/arm-smmu-v3: Expose the arm_smmu_attach interface
+> > 
+> > Onto a branch.
 > 
-> And all seemed to agree it was not a big deal after the discussion.
+> I've pushed these onto a new branch in the IOMMU tree:
 > 
-> I think Mostafa was driving in a direction that we break up the IDR
-> into explicit fields and thus be explicit about what information the
-> VMM is able to access. This would effectively document and enforce
-> what the baseline is.
+> 	iommufd/arm-smmuv3-nested
+> 
+> However, please can you give it a day or two to get some exposure in
+> -next before you merge that into iommufd? I'll ping back here later in
+> the week.
 
-As one of the four people mentioned above, I figured I'd chime in with
-my rationale for queuing this in case it's of any help or interest.
-
-Initially, I was reasonably sure that we should be sanitising the ID
-registers and being selective about what we advertise to userspace.
-However, after Jason's reply to my comments, mulling it over in my head
-and having lively conversations with Mostafa at lunchtime, I've come
-full circle. Is it a great interface? Not at all. It's 8 register values
-copied from the hardware to userspace. But is it good enough? I think it
-is. It's also extremely simple (i.e. easy to explain what it does and
-trivial to implement), which I think is a huge benefit given that the
-IOMMUFD work around it is still evolving.
-
-I'm firmly of the opinion that the VMM is going to need a tonne of help
-from other sources to expose a virtual IOMMU successfully. For example,
-anything relating to policy or configuration choices should be driven
-from userspace rather than the kernel. If we start to expose policy in
-the id registers for the cases where it happens to fit nicely, I fear
-that this will backfire and the VMM will end up second-guessing the
-kernel in cases where it decides it knows best. I'm not sold on the
-analogy with CPU ID registers as (a) we don't have big/little idiocy to
-deal with in the SMMU and (b) I don't think SMMU features always need
-support code in the host, which is quite unlike many CPU features that
-cannot be exposed safely without hypervisor context-switching support.
-
-On top of all that, this interface can be extended if we change our
-minds. If we decide we need to mask out fields, I think we could add
-that after the fact. Hell, if we all decide that it's a disaster in a
-few releases time, we can try something else. Ultimately, Jason is the
-one maintaining IOMMUFD and he gets to deal with the problems if his
-UAPI doesn't work out :)
-
-So, given where we are in the cycle, I think the pragmatic thing to do
-is to land this change now and enable the ongoing IOMMUFD work to
-continue. We still have over two months to resolve any major problems
-with the interface (and even unplug it entirely from the driver if we
-really get stuck) but for now I think it's "fine".
+Not seen anything go bang in -next, so I think we can consider this
+branch stable now.
 
 Will
 
