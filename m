@@ -1,217 +1,165 @@
-Return-Path: <kvm+bounces-31225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ED649C15DA
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 06:03:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB2729C15EC
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 06:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E84E1F21DBA
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 05:03:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 481E61F24331
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 05:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05381CC161;
-	Fri,  8 Nov 2024 05:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E421C9EB4;
+	Fri,  8 Nov 2024 05:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ejAqgG+S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ect/Yf32"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D100ACA6F
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 05:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F220619C571
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 05:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731042229; cv=none; b=sajH2K9WkGYDJwQDsUsdzp/l9TB+VyyeF6C+heS7cW0cRrluxH5VSH9BhO8oyj0dForZ4OPrfWb0+l9a65nUWQeGLmeIMYMA1fopNj+s/tANY0N0XfKpTaUXnrxRZ3EGddJyrOQfYYjY49RarrtiaIoBgRH6Trx0Jd3h9A2b+28=
+	t=1731042836; cv=none; b=ecxtOdoEifgOuLmgGkIbFtwJjA+nVhlDCT7SM+pBdDo70XQGWzy4UxmK/I58EtfMmKRWyP8Mzrxc0bFdMBAy+WjqrAwDfNCuHu8mx7zk0+dvVDVJCky2I+wq1ny2oq49oPqxuui6Jepz5mK8/LwuwzawcVTem1Ysu53GA8YflFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731042229; c=relaxed/simple;
-	bh=uf+L32/DgNO20OcfZBNfGBo/WqndrTtsLpsVzys+KCQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zv8/5tpn55QYLuUVG9EPttZ73p9QLA+b7Ervky4BffLi7Bod9w1Pa1tQ3xebBH6GmTLEqQLg+4fS0mWrwtVh9dOobKss2WZ7GCIGjtxHPQut/AEI5YkLCyleHrN8R7VJdktqItVUqq+KAuykM5ePl/FLc7wSfSf7K+WeUrIpPiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ejAqgG+S; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e28fea0f5b8so1677577276.1
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 21:03:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731042226; x=1731647026; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WNGdr8+SBlIbzBqb5yEvyPo04wuD7xhCU+afHPhO0gw=;
-        b=ejAqgG+SXERsk7UNaA++paZ25Y2xK3zQaqxsoV2Q6Zj/8Dp90EdlJifDnr8qZHaL7b
-         b4Y2hPHvSkXAHeKmCX2ZsYSHR/QQA/Xttt1Z4ANGTWBOCRB/Y5MP48Xmg/ju3Yg3JiIy
-         uG6WvqyTlEJzxCDpycnNJPL5I6/F+e8HqC0L0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731042226; x=1731647026;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WNGdr8+SBlIbzBqb5yEvyPo04wuD7xhCU+afHPhO0gw=;
-        b=DJf95CjH1e2omyxZmlU7gjTR/Jy4SxQNNJ4m4Uni6vUIewaZ71Wy9HqIbXm5bU6rQ0
-         dZM6OFWmFiqXZOVFHAC+Y3OGX5PTiKvw1kUYyITzqCgfNAopufVnMuAxiVb9MJbQ4Pad
-         NIcpYTqMV1A/TXf/dgD6v4u+czbdZC7tfMU6hCgY1MjaeNMwNrLgG2jb+1RMB5e/oN36
-         b2O/R0YfBW/jjbpoOoMcm2m/1Nh7mdleRAcxEFBAyrOmXxXVikgpkKRI1GlkTsp6v0tu
-         MA40pFNMO36Gg8tGenGz/MXFpajspGVJk8vl4oDbwCg24MbI4CdDyoH2Px8h48jmcBkm
-         EqwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaNWc9QK43tCDVAPKGOf0Po9f2eBmSfWIekhO+HUdVkGGU7FYsi5wd9ZPOOLeEDtYxf/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoREKu/jk/0qzx0JL1ZHqBmU6WwlXBkDIHDahiMHPeepoyz0oG
-	QwTlSF7aE1rmONGy5+8q8pRup/ST+53q3HOSXB3Q5SCcM/RTQqsBDxJBK8wR4ab/v4f/qpicdvC
-	FrPsb9t2taF4olBE6jjsPhSm35zmnuhK+7dKQ
-X-Google-Smtp-Source: AGHT+IGoDwbKayxL5xzE6wZajGslwRdrnVXJFWNNltqAroKkGgy5sDfUc56OmQSlt11eQdDI1FCAj0JxG5Xs8SCXiV8=
-X-Received: by 2002:a05:6902:2891:b0:e26:1422:400b with SMTP id
- 3f1490d57ef6-e337f8dbf9fmr1496961276.53.1731042225686; Thu, 07 Nov 2024
- 21:03:45 -0800 (PST)
+	s=arc-20240116; t=1731042836; c=relaxed/simple;
+	bh=pYc9Qbhl30laTpqG2U4WFIYnywiRC9RUCYu1mKTYEf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJWrouJzZf1ck6CJlx8bvxVcRIxKaPhvBVphf88XBPKmy5P/Q5l43JutgC2QDcSjLU6WFvp8UddwQfo+F1gj6OFfh44zGo760dE9yrZ8tTwkqA6GfYkD2Ma4IJuyZ5Wo0W09FgU8dTa39GuKUOE/iSwdE9SLDBFE18TXAyVg01A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ect/Yf32; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731042835; x=1762578835;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pYc9Qbhl30laTpqG2U4WFIYnywiRC9RUCYu1mKTYEf0=;
+  b=ect/Yf32HSgJ6Ac7i/jFTpKf2wbSVQn+wlIrwVbPZmz6H2tMMkrR2L0Q
+   e5q6wP8521eX7uPDHwhDCwjLBQRzAfJ6x6XS0m3DA3gbXRLp3Jyh+wKZs
+   4JoWT7nrR0D9HYHyjpFunSAg8jTDXd0ZnpPq2sqpSLJQaANXqGcaVnySQ
+   VNBDtbRGKOP9rZBXCoNM9Zr6z4qpdWAepziUB9XAp3KocNC17jBWtQk6f
+   pA/4s0gnmohhBCgesCfAAIC8ylDisNrrkTwabHdDVhMw0YLDTG3BQOjx3
+   w1JOazPzV22ALARl3mAmV+b5A9b0ayfSfmjG/uaSHxRqhyFVWMdu83Twu
+   w==;
+X-CSE-ConnectionGUID: epriIcfcSwufnhgHg4f4mw==
+X-CSE-MsgGUID: dQY6P00mRrS2b/rybdjpXA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="34842600"
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="34842600"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 21:13:54 -0800
+X-CSE-ConnectionGUID: hj1jmGEURHufH/7Z2oU9RA==
+X-CSE-MsgGUID: nD8TOoO9TvCWTbnMnhN+5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="90033772"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 07 Nov 2024 21:13:50 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t9HJc-000r3c-0f;
+	Fri, 08 Nov 2024 05:13:48 +0000
+Date: Fri, 8 Nov 2024 13:13:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: oe-kbuild-all@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v4 3/5] KVM: arm64: vgic-its: Add a data length check in
+ vgic_its_save_*
+Message-ID: <202411081338.47eReEKu-lkp@intel.com>
+References: <20241107214137.428439-4-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
- <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
- <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com> <Zy0__5YB9F5d0eZn@google.com>
-In-Reply-To: <Zy0__5YB9F5d0eZn@google.com>
-From: Zack Rusin <zack.rusin@broadcom.com>
-Date: Fri, 8 Nov 2024 00:03:34 -0500
-Message-ID: <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Doug Covelli <doug.covelli@broadcom.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107214137.428439-4-jingzhangos@google.com>
 
-On Thu, Nov 7, 2024 at 5:32=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Nov 04, 2024, Zack Rusin wrote:
-> > On Mon, Nov 4, 2024 at 5:13=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.c=
-om> wrote:
-> > >
-> > > On Wed, Oct 30, 2024 at 4:35=E2=80=AFAM Zack Rusin <zack.rusin@broadc=
-om.com> wrote:
-> > > >
-> > > > VMware products handle hypercalls in userspace. Give KVM the abilit=
-y
-> > > > to run VMware guests unmodified by fowarding all hypercalls to the
-> > > > userspace.
-> > > >
-> > > > Enabling of the KVM_CAP_X86_VMWARE_HYPERCALL_ENABLE capability turn=
-s
-> > > > the feature on - it's off by default. This allows vmx's built on to=
-p
-> > > > of KVM to support VMware specific hypercalls.
-> > >
-> > > Hi Zack,
-> >
-> > Hi, Paolo.
-> >
-> > Thank you for looking at this.
-> >
-> > > is there a spec of the hypercalls that are supported by userspace? I
-> > > would like to understand if there's anything that's best handled in
-> > > the kernel.
-> >
-> > There's no spec but we have open headers listing the hypercalls.
-> > There's about a 100 of them (a few were deprecated), the full
-> > list starts here:
-> > https://github.com/vmware/open-vm-tools/blob/739c5a2f4bfd4cdda491e6a6f6=
-869d88c0bd6972/open-vm-tools/lib/include/backdoor_def.h#L97
-> > They're not well documented, but the names are pretty self-explenatory.
->
-> At a quick glance, this one needs to be handled in KVM:
->
->   BDOOR_CMD_VCPU_MMIO_HONORS_PAT
->
-> and these probably should be in KVM:
->
->   BDOOR_CMD_GETTIME
->   BDOOR_CMD_SIDT
->   BDOOR_CMD_SGDT
->   BDOOR_CMD_SLDT_STR
->   BDOOR_CMD_GETTIMEFULL
->   BDOOR_CMD_VCPU_LEGACY_X2APIC_OK
->   BDOOR_CMD_STEALCLOCK
->
-> and these maybe? (it's not clear what they do, from the name alone)
->
->   BDOOR_CMD_GET_VCPU_INFO
->   BDOOR_CMD_VCPU_RESERVED
+Hi Jing,
 
-I'm not sure if there's any value in implementing a few of them. iirc
-there's 101 of them (as I mentioned a lot have been deprecated but
-that's for userspace, on the host we still have to do something for
-old guests using them) and, if out of those 101 we implement 100 in
-the kernel then, as far as this patch is concerned, it's no different
-than if we had 0 out of 101 because we're still going to have to exit
-to userspace to handle that 1 remaining.
+kernel test robot noticed the following build warnings:
 
-Unless you're saying that those would be useful to you. In which case
-I'd be glad to implement them for you, but I'd put them behind some
-kind of a cap or a kernel config because we wouldn't be using them -
-besides what Doug mentioned - we already maintain the shared code for
-them that's used on Windows, MacOS, ESX and Linux so even if we had
-them in the Linux kernel it would still make more sense to use the
-code that's shared with the other OSes to lessen the maintenance
-burden (so that changing anything within that code consistently
-changes across all the OSes).
+[auto build test WARNING on 59b723cd2adbac2a34fc8e12c74ae26ae45bf230]
 
-> > > If we allow forwarding _all_ hypercalls to userspace, then people wil=
-l
-> > > use it for things other than VMware and there goes all hope of
-> > > accelerating stuff in the kernel in the future.
->
-> To some extent, that ship has sailed, no?  E.g. do KVM_XEN_HVM_CONFIG wit=
-h
-> KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL set, and userspace can intercept prett=
-y much
-> all hypercalls with very few side effects.
->
-> > > So even having _some_ checks in the kernel before going out to
-> > > userspace would keep that door open, or at least try.
-> >
-> > Doug just looked at this and I think I might have an idea on how to
-> > limit the scope at least a bit: if you think it would help we could
-> > limit forwarding of hypercalls to userspace only to those that that
-> > come with a BDOOR_MAGIC (which is 0x564D5868) in eax. Would that help?
->
-> I don't think it addresses Paolo's concern (if I understood Paolo's conce=
-rn
-> correctly), but it would help from the perspective of allowing KVM to sup=
-port
-> VMware hypercalls and Xen/Hyper-V/KVM hypercalls in the same VM.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-selftests-aarch64-Add-VGIC-selftest-for-save-restore-ITS-table-mappings/20241108-054433
+base:   59b723cd2adbac2a34fc8e12c74ae26ae45bf230
+patch link:    https://lore.kernel.org/r/20241107214137.428439-4-jingzhangos%40google.com
+patch subject: [PATCH v4 3/5] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+config: arm64-randconfig-004-20241108 (https://download.01.org/0day-ci/archive/20241108/202411081338.47eReEKu-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241108/202411081338.47eReEKu-lkp@intel.com/reproduce)
 
-Yea, I just don't think there's any realistic way we could handle all
-of those hypercalls in the kernel so I'm trying to offer some ideas on
-how to lessen the scope to make it as painless as possible. Unless you
-think we could somehow parlay my piercing blue eyes into getting those
-patches in as is, in which case let's do that ;)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411081338.47eReEKu-lkp@intel.com/
 
-> I also think we should add CONFIG_KVM_VMWARE from the get-go, and if we'r=
-e feeling
-> lucky, maybe even retroactively bury KVM_CAP_X86_VMWARE_BACKDOOR behind t=
-hat
-> Kconfig.  That would allow limiting the exposure to VMware specific code,=
- e.g. if
-> KVM does end up handling hypercalls in-kernel.  And it might deter abuse =
-to some
-> extent.
+All warnings (new ones prefixed by >>):
 
-I thought about that too. I was worried that even if we make it on by
-default it will require quite a bit of handholding to make sure all
-the distros include it, or otherwise on desktops Workstation still
-wouldn't work with KVM by default, I also felt a little silly trying
-to add a kernel config for those few lines that would be on pretty
-much everywhere and since we didn't implement the vmware backdoor
-functionality I didn't want to presume and try to shield a feature
-that might be in production by others with a new kernel config.
+   arch/arm64/kvm/vgic/vgic-its.c: In function 'vgic_its_save_collection_table':
+>> arch/arm64/kvm/vgic/vgic-its.c:2495:13: warning: unused variable 'val' [-Wunused-variable]
+    2495 |         u64 val;
+         |             ^~~
 
-z
+
+vim +/val +2495 arch/arm64/kvm/vgic/vgic-its.c
+
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2484  
+0aa34b37a78d06 arch/arm64/kvm/vgic/vgic-its.c Sebastian Ott      2024-07-23  2485  /*
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2486   * vgic_its_save_collection_table - Save the collection table into
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2487   * guest RAM
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2488   */
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2489  static int vgic_its_save_collection_table(struct vgic_its *its)
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2490  {
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2491  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2492  	u64 baser = its->baser_coll_table;
+8ad50c8985d805 virt/kvm/arm/vgic/vgic-its.c   Kristina Martsenko 2018-09-26  2493  	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2494  	struct its_collection *collection;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09 @2495  	u64 val;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2496  	size_t max_size, filled = 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2497  	int ret, cte_esz = abi->cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2498  
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2499  	if (!(baser & GITS_BASER_VALID))
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2500  		return 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2501  
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2502  	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2503  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2504  	list_for_each_entry(collection, &its->collection_list, coll_list) {
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2505  		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2506  		if (ret)
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2507  			return ret;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2508  		gpa += cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2509  		filled += cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2510  	}
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2511  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2512  	if (filled == max_size)
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2513  		return 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2514  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2515  	/*
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2516  	 * table is not fully filled, add a last dummy element
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2517  	 * with valid bit unset
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2518  	 */
+c4380c338c9607 arch/arm64/kvm/vgic/vgic-its.c Kunkun Jiang       2024-11-07  2519  	return vgic_its_write_entry_lock(its, gpa, 0, cte_esz);
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2520  }
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2521  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
