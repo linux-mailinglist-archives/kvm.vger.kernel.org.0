@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-31299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F359C21F1
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 17:21:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E549C21F2
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 17:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4DE01C20EDD
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:21:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D82C91C21303
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA05192D97;
-	Fri,  8 Nov 2024 16:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39DE199FBF;
+	Fri,  8 Nov 2024 16:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hvDUJ5mb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mNLFtrbU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D736D199949
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 16:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C0919922F
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 16:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731082860; cv=none; b=N+amCRQ2Mpal66nLbJRh4Iwm+YBuneARtaTpYDTFfCPizYTVtnwhH2KIqK40SpXqa3UCB/QPmSGMMO+jM5xl+ff+sEFSHkdCZfgzqiRTbzugzTyElQR/zZbfeBnMCHaNnKgPx77y6Wwc1Fr/++V+hK5Tii3Cn+7Tke/XSS1q3Dc=
+	t=1731082862; cv=none; b=IJukS/LWUCCL6iRToXDsCsxtDrqS84BOQAjInvJVoVxgOGw6oOX8llv0t+6JrjlvpRSpodzaZEo0Y3BL94MclRwtc/flRqOHliWn/2I9Qg9ILMtUhQI9F4FlphHWDgL6g/apcepqWFOexeq6up7mgZNkSG+WlzbiLa2g+LsYISM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731082860; c=relaxed/simple;
-	bh=Wt0QuJ/nK2kslZQtPgjF86inbNMfPlwA9VGFo12XwmM=;
+	s=arc-20240116; t=1731082862; c=relaxed/simple;
+	bh=0CzrKZAjiGyTLtq31cuunQlobWkpgK5KVAaAiEa5a4o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IZw2MoX2nkpM1klCTfdgZ5vqhP9qijAuEkNrrmbrKLNUzW28MltjgndZgwbMYZtaHHCvZpHngL/+E57M7izv7MtxzLqwcIGJS1roweeEVjl1BT+94W0te6WKxgMHNbWTN37u0Jsj29q4acZnsrcAl5zvdRJ5YhoPb/Bise7pOUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hvDUJ5mb; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=hPxWxCi2o0a84x4Yp72N+SV7jl9mFOhK0qUXCs4eMot9tFexXrIMDIkEjq3ER7vHL2VZWppdyoDoU/tGjqF3kjUdJEfHG24CZevwFdvsTRB4GxLIZSNOvBa95P5JLqDkOdO+V05ZqBaTqwLha532w+2wEwPB5/U3b0axviKlWpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mNLFtrbU; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4316300bb15so15120005e9.2
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 08:20:57 -0800 (PST)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-37d5016d21eso1218046f8f.3
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 08:20:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731082856; x=1731687656; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731082858; x=1731687658; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=djjKrUl0oR5lK1iUj5wBqHv7X6lVNwT0SqGCjb6L8ss=;
-        b=hvDUJ5mbepNnsFDkP4R8j3B4BCP7FmCc1yC0JiZdov5D2XPxuQcxJZnwY/Obgrp1YF
-         7KxYNbDAXjYOr6hLq2Vx4wcfuxNkbhPRWQ7m5qW7bLzbQcfdYUlOM1TID2H/CGbEmTnO
-         obPeEqRIpRYF1rJMZR7iiZJnN7zuEZDSqGap3cmSNeYMLMbvOC01P7mCoX3ze44Yhl5D
-         UPjRlV97rT+offCVP1KYcqhhwySOU4O2x8y2ALdbL+E+fESkmEfLEH3O0FYeC4JQciSM
-         aB08JQBf99jyiFlYjTmM7RYdWICg/Wb2rIOEfeS4QVNRVXAElOhnKzCAPl3ySyXBnohY
-         HFnA==
+        bh=Z1UKVDyubm+0FNKQOmqAnK7wACyIXxMp06jV3hLqPe8=;
+        b=mNLFtrbUiEjNHHmVzFdhnnZBxcAfHBXrJBhe3msSA5stgw/V/XBIy8FzWeVLYZgIZV
+         fGu6MbkUyXnnZZajSTuTzi9Hcbn5K+Ela1iBsFQexv4FqHyszXDYgLbvYJ59/U/aK6tp
+         kXrW0DmbAAKShJR3PwAgTXLEKp7xCkPSawUZJFVwk4CrlbusmbJakSsuVfPMdphVEta2
+         W2Xb3+9Gtz1+Q9GwmryAygp/gVBwxt9sF3IDgpnRTbEbDRHn0rhOTc0QaA+NHJy2HJ28
+         zeRVYMWaCfxXbwfTWJJSoV0rmS/mDuiLp+Ux9yfL2qiZqKyEGHGoL4E8lJsP4vsD7R4p
+         9M3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731082856; x=1731687656;
+        d=1e100.net; s=20230601; t=1731082858; x=1731687658;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=djjKrUl0oR5lK1iUj5wBqHv7X6lVNwT0SqGCjb6L8ss=;
-        b=jjCvj/nL3KCHA0uXtVfegfcfUn0UKV2ibx0CGF/B8OT0M3P3WMT4Z+dKsjNXBLVik1
-         oJl3XR1gubxaM2l/KctFsEeKStVu1E6eGRzCUyXuiBbOh5OqN8FL0GAgd8jr5gBuV2sa
-         ziqgkhwXHtdqNRqvSk34eHDKANrLPbih7X+2Ne2LqeDiL8psUR4pGoO2E9plLKxHorJ7
-         tyWjODZTkPt7a2s+J4Vb0jl0GC3ifGWpxBr0SJescwXIRBvkrNaMTFOBplhmOZfUqufx
-         fomiEqt1KnrCzofvTtLMlTpZxBSQCEhaFzcZdEOcv3kZEDeElkgtVzDEs1FxmJXhnSx0
-         1Veg==
-X-Gm-Message-State: AOJu0YxBmRbjDff+ELRSnRHVVxsfgKO9nshrFgN916N3yMwLpzPJoHIp
-	9teKhmr3snfb4PbOK7VV6WU9TW3N7Bl0snWeJgdWsMA30juXVDlkYRSqfu0j1urh4TsPtwahpg=
+        bh=Z1UKVDyubm+0FNKQOmqAnK7wACyIXxMp06jV3hLqPe8=;
+        b=bsjjj7Qp6UuIYUyIgFNHADqF7UUTKob0XKn+HMaBy1hozut1phhRMKPcl250LTigIh
+         mGMcBWXsQfp6N0FrTfPvn2kdd1U2CsEKV5UdR/YqQWEE2Q7unug5RRH8SPyUWwjitVjr
+         d4zm/5DxzDTPWARdJHJTNJf1UCnkXuIF6l1y1K0/iJZEsMCZoyBDEyGpjDwCFe1uMut/
+         SmdKH6Z6BT1r9FQRxUu+/4iGUrkpbR1gF6jyavnfxXvY5OU6PPjiISv/9qadJXAz3itn
+         jm9jwi2uk7BThomHB6hOdBDLvPUqhBDLLkred/0xf2vqjOgSofgOT0OViwSbRDzXBryn
+         vU4Q==
+X-Gm-Message-State: AOJu0YyCpYHEnoy1KcGEkzbBCHO5gGX7Nm9shyL7w3hXk7BnKTrUhnvK
+	tzTIza6jAKmNe/tM0Nd+dt0FKbQDpcmtroexv2yXn3TrU6Ai+T+RnsUJuhAu4pS+FcsQWCqjiA=
 	=
-X-Google-Smtp-Source: AGHT+IG8oqeRtBHhwUKqiIKTnkqXE8W7GFfQboidk/t9PyUEaqaxv663mtEdw0kf/yfOyooXYNVI8Y+B3g==
+X-Google-Smtp-Source: AGHT+IHkZAD0auPV4emIDnQo0+EU0NmTafyVDODnqw54sbX8+2pfhiQ95jeQsPF/8IsVn+XR42DkmZua1Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a7b:c845:0:b0:42c:b995:20f1 with SMTP id
- 5b1f17b1804b1-432b7515d74mr74205e9.4.1731082856332; Fri, 08 Nov 2024 08:20:56
+ (user=tabba job=sendgmr) by 2002:adf:ffca:0:b0:37d:4cee:559 with SMTP id
+ ffacd0b85a97d-381f1862148mr2432f8f.3.1731082858585; Fri, 08 Nov 2024 08:20:58
  -0800 (PST)
-Date: Fri,  8 Nov 2024 16:20:36 +0000
+Date: Fri,  8 Nov 2024 16:20:37 +0000
 In-Reply-To: <20241108162040.159038-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,9 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241108162040.159038-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241108162040.159038-7-tabba@google.com>
-Subject: [RFC PATCH v1 06/10] mm/hugetlb: use separate folio->_hugetlb_list
- for hugetlb-internals
+Message-ID: <20241108162040.159038-8-tabba@google.com>
+Subject: [RFC PATCH v1 07/10] mm: Introduce struct folio_owner_ops
 From: Fuad Tabba <tabba@google.com>
 To: linux-mm@kvack.org
 Cc: kvm@vger.kernel.org, nouveau@lists.freedesktop.org, 
@@ -89,455 +88,186 @@ Cc: kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: David Hildenbrand <david@redhat.com>
+Introduce struct folio_owner_ops, a method table that contains
+callbacks to owners of folios that need special handling for
+certain operations. For now, it only contains a callback for
+folio free(), which is called immediately after the folio
+refcount drops to 0.
 
-Let's use a separate list head in the folio, as long as hugetlb folios are
-not isolated. This way, we can reuse folio->lru for different purpose
-(e.g., owner_ops) as long as they are not isolated.
+Add a pointer to this struct overlaid on struct page
+compound_head, pgmap, and struct page/folio lru. The users of
+this struct either will not use lru (e.g., zone device), or would
+be able to easily isolate when lru is being used (e.g., hugetlb)
+and handle it accordingly. While folios are isolated, they cannot
+get freed and the owner_ops are unstable. This is sufficient for
+the current use case of returning these folios to a custom
+allocator.
 
-Consequently, folio->lru will only be used while there is an additional
-folio reference that cannot be dropped until putback/un-isolated.
+To identify that a folio has owner_ops, we set bit 1 of the
+field, in a similar way to that bit 0 of compound_head is used to
+identify compound pages.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/linux/mm_types.h | 18 +++++++++
- mm/hugetlb.c             | 81 +++++++++++++++++++++-------------------
- mm/hugetlb_cgroup.c      |  4 +-
- mm/hugetlb_vmemmap.c     |  8 ++--
- 4 files changed, 66 insertions(+), 45 deletions(-)
+ include/linux/mm_types.h | 64 +++++++++++++++++++++++++++++++++++++---
+ mm/swap.c                | 19 ++++++++++++
+ 2 files changed, 79 insertions(+), 4 deletions(-)
 
 diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 80fef38d9d64..365c73be0bb4 100644
+index 365c73be0bb4..6e06286f44f1 100644
 --- a/include/linux/mm_types.h
 +++ b/include/linux/mm_types.h
-@@ -310,6 +310,7 @@ typedef struct {
-  * @_hugetlb_cgroup: Do not use directly, use accessor in hugetlb_cgroup.h.
-  * @_hugetlb_cgroup_rsvd: Do not use directly, use accessor in hugetlb_cgroup.h.
-  * @_hugetlb_hwpoison: Do not use directly, call raw_hwp_list_head().
-+ * @_hugetlb_list: To be used in hugetlb core code only.
-  * @_deferred_list: Folios to be split under memory pressure.
-  * @_unused_slab_obj_exts: Placeholder to match obj_exts in struct slab.
+@@ -41,10 +41,12 @@ struct mem_cgroup;
   *
-@@ -397,6 +398,17 @@ struct folio {
- 		};
- 		struct page __page_2;
- 	};
-+	union {
-+		struct {
-+			unsigned long _flags_3;
-+			unsigned long _head_3;
-+	/* public: */
-+			struct list_head _hugetlb_list;
-+	/* private: the union with struct page is transitional */
-+		};
-+		struct page __page_3;
-+	};
+  * If you allocate the page using alloc_pages(), you can use some of the
+  * space in struct page for your own purposes.  The five words in the main
+- * union are available, except for bit 0 of the first word which must be
+- * kept clear.  Many users use this word to store a pointer to an object
+- * which is guaranteed to be aligned.  If you use the same storage as
+- * page->mapping, you must restore it to NULL before freeing the page.
++ * union are available, except for bit 0 (used for compound_head pages)
++ * and bit 1 (used for owner_ops) of the first word, which must be kept
++ * clear and used with care.  Many users use this word to store a pointer
++ * to an object which is guaranteed to be aligned.  If you use the same
++ * storage as page->mapping, you must restore it to NULL before freeing
++ * the page.
+  *
+  * The mapcount field must not be used for own purposes.
+  *
+@@ -283,10 +285,16 @@ typedef struct {
+ 	unsigned long val;
+ } swp_entry_t;
+ 
++struct folio_owner_ops;
 +
- };
- 
- #define FOLIO_MATCH(pg, fl)						\
-@@ -433,6 +445,12 @@ FOLIO_MATCH(compound_head, _head_2);
- FOLIO_MATCH(flags, _flags_2a);
- FOLIO_MATCH(compound_head, _head_2a);
+ /**
+  * struct folio - Represents a contiguous set of bytes.
+  * @flags: Identical to the page flags.
+  * @lru: Least Recently Used list; tracks how recently this folio was used.
++ * @owner_ops: Pointer to callback operations of the folio owner. Valid if bit 1
++ *    is set.
++ *    NOTE: Cannot be used with lru, since it is overlaid with it. To use lru,
++ *          owner_ops must be cleared first, and restored once done with lru.
+  * @mlock_count: Number of times this folio has been pinned by mlock().
+  * @mapping: The file this page belongs to, or refers to the anon_vma for
+  *    anonymous memory.
+@@ -330,6 +338,7 @@ struct folio {
+ 			unsigned long flags;
+ 			union {
+ 				struct list_head lru;
++				const struct folio_owner_ops *owner_ops; /* Bit 1 is set */
+ 	/* private: avoid cluttering the output */
+ 				struct {
+ 					void *__filler;
+@@ -417,6 +426,7 @@ FOLIO_MATCH(flags, flags);
+ FOLIO_MATCH(lru, lru);
+ FOLIO_MATCH(mapping, mapping);
+ FOLIO_MATCH(compound_head, lru);
++FOLIO_MATCH(compound_head, owner_ops);
+ FOLIO_MATCH(index, index);
+ FOLIO_MATCH(private, private);
+ FOLIO_MATCH(_mapcount, _mapcount);
+@@ -452,6 +462,13 @@ FOLIO_MATCH(flags, _flags_3);
+ FOLIO_MATCH(compound_head, _head_3);
  #undef FOLIO_MATCH
-+#define FOLIO_MATCH(pg, fl)						\
-+	static_assert(offsetof(struct folio, fl) ==			\
-+			offsetof(struct page, pg) + 3 * sizeof(struct page))
-+FOLIO_MATCH(flags, _flags_3);
-+FOLIO_MATCH(compound_head, _head_3);
-+#undef FOLIO_MATCH
  
++struct folio_owner_ops {
++	/*
++	 * Called once the folio refcount reaches 0.
++	 */
++	void (*free)(struct folio *folio);
++};
++
  /**
   * struct ptdesc -    Memory descriptor for page tables.
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index a64852280213..2308e94d8615 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -1316,7 +1316,7 @@ static void enqueue_hugetlb_folio(struct hstate *h, struct folio *folio)
- 	lockdep_assert_held(&hugetlb_lock);
- 	VM_BUG_ON_FOLIO(folio_ref_count(folio), folio);
+  * @__page_flags:     Same as page flags. Powerpc only.
+@@ -560,6 +577,45 @@ static inline void *folio_get_private(struct folio *folio)
+ 	return folio->private;
+ }
  
--	list_move(&folio->lru, &h->hugepage_freelists[nid]);
-+	list_move(&folio->_hugetlb_list, &h->hugepage_freelists[nid]);
- 	h->free_huge_pages++;
- 	h->free_huge_pages_node[nid]++;
- 	folio_set_hugetlb_freed(folio);
-@@ -1329,14 +1329,14 @@ static struct folio *dequeue_hugetlb_folio_node_exact(struct hstate *h,
- 	bool pin = !!(current->flags & PF_MEMALLOC_PIN);
- 
- 	lockdep_assert_held(&hugetlb_lock);
--	list_for_each_entry(folio, &h->hugepage_freelists[nid], lru) {
-+	list_for_each_entry(folio, &h->hugepage_freelists[nid], _hugetlb_list) {
- 		if (pin && !folio_is_longterm_pinnable(folio))
- 			continue;
- 
- 		if (folio_test_hwpoison(folio))
- 			continue;
- 
--		list_move(&folio->lru, &h->hugepage_activelist);
-+		list_move(&folio->_hugetlb_list, &h->hugepage_activelist);
- 		folio_ref_unfreeze(folio, 1);
- 		folio_clear_hugetlb_freed(folio);
- 		h->free_huge_pages--;
-@@ -1599,7 +1599,7 @@ static void remove_hugetlb_folio(struct hstate *h, struct folio *folio,
- 	if (hstate_is_gigantic(h) && !gigantic_page_runtime_supported())
- 		return;
- 
--	list_del(&folio->lru);
-+	list_del(&folio->_hugetlb_list);
- 
- 	if (folio_test_hugetlb_freed(folio)) {
- 		folio_clear_hugetlb_freed(folio);
-@@ -1616,8 +1616,9 @@ static void remove_hugetlb_folio(struct hstate *h, struct folio *folio,
- 	 * pages.  Otherwise, someone (memory error handling) may try to write
- 	 * to tail struct pages.
- 	 */
--	if (!folio_test_hugetlb_vmemmap_optimized(folio))
-+	if (!folio_test_hugetlb_vmemmap_optimized(folio)) {
- 		__folio_clear_hugetlb(folio);
-+	}
- 
- 	h->nr_huge_pages--;
- 	h->nr_huge_pages_node[nid]--;
-@@ -1632,7 +1633,7 @@ static void add_hugetlb_folio(struct hstate *h, struct folio *folio,
- 
- 	lockdep_assert_held(&hugetlb_lock);
- 
--	INIT_LIST_HEAD(&folio->lru);
-+	INIT_LIST_HEAD(&folio->_hugetlb_list);
- 	h->nr_huge_pages++;
- 	h->nr_huge_pages_node[nid]++;
- 
-@@ -1640,8 +1641,8 @@ static void add_hugetlb_folio(struct hstate *h, struct folio *folio,
- 		h->surplus_huge_pages++;
- 		h->surplus_huge_pages_node[nid]++;
- 	}
--
- 	__folio_set_hugetlb(folio);
++/*
++ * Use bit 1, since bit 0 is used to indicate a compound page in compound_head,
++ * which owner_ops is overlaid with.
++ */
++#define FOLIO_OWNER_OPS_BIT    1UL
++#define FOLIO_OWNER_OPS        (1UL << FOLIO_OWNER_OPS_BIT)
 +
- 	folio_change_private(folio, NULL);
- 	/*
- 	 * We have to set hugetlb_vmemmap_optimized again as above
-@@ -1789,8 +1790,8 @@ static void bulk_vmemmap_restore_error(struct hstate *h,
- 		 * hugetlb pages with vmemmap we will free up memory so that we
- 		 * can allocate vmemmap for more hugetlb pages.
- 		 */
--		list_for_each_entry_safe(folio, t_folio, non_hvo_folios, lru) {
--			list_del(&folio->lru);
-+		list_for_each_entry_safe(folio, t_folio, non_hvo_folios, _hugetlb_list) {
-+			list_del(&folio->_hugetlb_list);
- 			spin_lock_irq(&hugetlb_lock);
- 			__folio_clear_hugetlb(folio);
- 			spin_unlock_irq(&hugetlb_lock);
-@@ -1808,14 +1809,14 @@ static void bulk_vmemmap_restore_error(struct hstate *h,
- 		 * If are able to restore vmemmap and free one hugetlb page, we
- 		 * quit processing the list to retry the bulk operation.
- 		 */
--		list_for_each_entry_safe(folio, t_folio, folio_list, lru)
-+		list_for_each_entry_safe(folio, t_folio, folio_list, _hugetlb_list)
- 			if (hugetlb_vmemmap_restore_folio(h, folio)) {
--				list_del(&folio->lru);
-+				list_del(&folio->_hugetlb_list);
- 				spin_lock_irq(&hugetlb_lock);
- 				add_hugetlb_folio(h, folio, true);
- 				spin_unlock_irq(&hugetlb_lock);
- 			} else {
--				list_del(&folio->lru);
-+				list_del(&folio->_hugetlb_list);
- 				spin_lock_irq(&hugetlb_lock);
- 				__folio_clear_hugetlb(folio);
- 				spin_unlock_irq(&hugetlb_lock);
-@@ -1856,12 +1857,12 @@ static void update_and_free_pages_bulk(struct hstate *h,
- 	VM_WARN_ON(ret < 0);
- 	if (!list_empty(&non_hvo_folios) && ret) {
- 		spin_lock_irq(&hugetlb_lock);
--		list_for_each_entry(folio, &non_hvo_folios, lru)
-+		list_for_each_entry(folio, &non_hvo_folios, _hugetlb_list)
- 			__folio_clear_hugetlb(folio);
- 		spin_unlock_irq(&hugetlb_lock);
- 	}
++/*
++ * Set the folio owner_ops as well as bit 1 of the pointer to indicate that the
++ * folio has owner_ops.
++ */
++static inline void folio_set_owner_ops(struct folio *folio, const struct folio_owner_ops *owner_ops)
++{
++	owner_ops = (const struct folio_owner_ops *)((unsigned long)owner_ops | FOLIO_OWNER_OPS);
++	folio->owner_ops = owner_ops;
++}
++
++/*
++ * Clear the folio owner_ops including bit 1 of the pointer.
++ */
++static inline void folio_clear_owner_ops(struct folio *folio)
++{
++	folio->owner_ops = NULL;
++}
++
++/*
++ * Return the folio's owner_ops if it has them, otherwise, return NULL.
++ */
++static inline const struct folio_owner_ops *folio_get_owner_ops(struct folio *folio)
++{
++	const struct folio_owner_ops *owner_ops = folio->owner_ops;
++
++	if (!((unsigned long)owner_ops & FOLIO_OWNER_OPS))
++		return NULL;
++
++	owner_ops = (const struct folio_owner_ops *)((unsigned long)owner_ops & ~FOLIO_OWNER_OPS);
++	return owner_ops;
++}
++
+ struct page_frag_cache {
+ 	void * va;
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+diff --git a/mm/swap.c b/mm/swap.c
+index 638a3f001676..767ff6d8f47b 100644
+--- a/mm/swap.c
++++ b/mm/swap.c
+@@ -110,6 +110,13 @@ static void page_cache_release(struct folio *folio)
  
--	list_for_each_entry_safe(folio, t_folio, &non_hvo_folios, lru) {
-+	list_for_each_entry_safe(folio, t_folio, &non_hvo_folios, _hugetlb_list) {
- 		update_and_free_hugetlb_folio(h, folio, false);
- 		cond_resched();
- 	}
-@@ -1959,7 +1960,7 @@ static void __prep_account_new_huge_page(struct hstate *h, int nid)
- static void init_new_hugetlb_folio(struct hstate *h, struct folio *folio)
+ void __folio_put(struct folio *folio)
  {
- 	__folio_set_hugetlb(folio);
--	INIT_LIST_HEAD(&folio->lru);
-+	INIT_LIST_HEAD(&folio->_hugetlb_list);
- 	hugetlb_set_folio_subpool(folio, NULL);
- 	set_hugetlb_cgroup(folio, NULL);
- 	set_hugetlb_cgroup_rsvd(folio, NULL);
-@@ -2112,7 +2113,7 @@ static void prep_and_add_allocated_folios(struct hstate *h,
++	const struct folio_owner_ops *owner_ops = folio_get_owner_ops(folio);
++
++	if (unlikely(owner_ops)) {
++		owner_ops->free(folio);
++		return;
++	}
++
+ 	if (unlikely(folio_is_zone_device(folio))) {
+ 		free_zone_device_folio(folio);
+ 		return;
+@@ -929,10 +936,22 @@ void folios_put_refs(struct folio_batch *folios, unsigned int *refs)
+ 	for (i = 0, j = 0; i < folios->nr; i++) {
+ 		struct folio *folio = folios->folios[i];
+ 		unsigned int nr_refs = refs ? refs[i] : 1;
++		const struct folio_owner_ops *owner_ops;
  
- 	/* Add all new pool pages to free lists in one lock cycle */
- 	spin_lock_irqsave(&hugetlb_lock, flags);
--	list_for_each_entry_safe(folio, tmp_f, folio_list, lru) {
-+	list_for_each_entry_safe(folio, tmp_f, folio_list, _hugetlb_list) {
- 		__prep_account_new_huge_page(h, folio_nid(folio));
- 		enqueue_hugetlb_folio(h, folio);
- 	}
-@@ -2165,7 +2166,7 @@ static struct folio *remove_pool_hugetlb_folio(struct hstate *h,
- 		if ((!acct_surplus || h->surplus_huge_pages_node[node]) &&
- 		    !list_empty(&h->hugepage_freelists[node])) {
- 			folio = list_entry(h->hugepage_freelists[node].next,
--					  struct folio, lru);
-+					  struct folio, _hugetlb_list);
- 			remove_hugetlb_folio(h, folio, acct_surplus);
- 			break;
- 		}
-@@ -2491,7 +2492,7 @@ static int gather_surplus_pages(struct hstate *h, long delta)
- 			alloc_ok = false;
- 			break;
- 		}
--		list_add(&folio->lru, &surplus_list);
-+		list_add(&folio->_hugetlb_list, &surplus_list);
- 		cond_resched();
- 	}
- 	allocated += i;
-@@ -2526,7 +2527,7 @@ static int gather_surplus_pages(struct hstate *h, long delta)
- 	ret = 0;
- 
- 	/* Free the needed pages to the hugetlb pool */
--	list_for_each_entry_safe(folio, tmp, &surplus_list, lru) {
-+	list_for_each_entry_safe(folio, tmp, &surplus_list, _hugetlb_list) {
- 		if ((--needed) < 0)
- 			break;
- 		/* Add the page to the hugetlb allocator */
-@@ -2539,7 +2540,7 @@ static int gather_surplus_pages(struct hstate *h, long delta)
- 	 * Free unnecessary surplus pages to the buddy allocator.
- 	 * Pages have no ref count, call free_huge_folio directly.
- 	 */
--	list_for_each_entry_safe(folio, tmp, &surplus_list, lru)
-+	list_for_each_entry_safe(folio, tmp, &surplus_list, _hugetlb_list)
- 		free_huge_folio(folio);
- 	spin_lock_irq(&hugetlb_lock);
- 
-@@ -2588,7 +2589,7 @@ static void return_unused_surplus_pages(struct hstate *h,
- 		if (!folio)
- 			goto out;
- 
--		list_add(&folio->lru, &page_list);
-+		list_add(&folio->_hugetlb_list, &page_list);
- 	}
- 
- out:
-@@ -3051,7 +3052,7 @@ struct folio *alloc_hugetlb_folio(struct vm_area_struct *vma,
- 			folio_set_hugetlb_restore_reserve(folio);
- 			h->resv_huge_pages--;
- 		}
--		list_add(&folio->lru, &h->hugepage_activelist);
-+		list_add(&folio->_hugetlb_list, &h->hugepage_activelist);
- 		folio_ref_unfreeze(folio, 1);
- 		/* Fall through */
- 	}
-@@ -3211,7 +3212,7 @@ static void __init prep_and_add_bootmem_folios(struct hstate *h,
- 	/* Send list for bulk vmemmap optimization processing */
- 	hugetlb_vmemmap_optimize_folios(h, folio_list);
- 
--	list_for_each_entry_safe(folio, tmp_f, folio_list, lru) {
-+	list_for_each_entry_safe(folio, tmp_f, folio_list, _hugetlb_list) {
- 		if (!folio_test_hugetlb_vmemmap_optimized(folio)) {
- 			/*
- 			 * If HVO fails, initialize all tail struct pages
-@@ -3260,7 +3261,7 @@ static void __init gather_bootmem_prealloc_node(unsigned long nid)
- 		hugetlb_folio_init_vmemmap(folio, h,
- 					   HUGETLB_VMEMMAP_RESERVE_PAGES);
- 		init_new_hugetlb_folio(h, folio);
--		list_add(&folio->lru, &folio_list);
-+		list_add(&folio->_hugetlb_list, &folio_list);
- 
- 		/*
- 		 * We need to restore the 'stolen' pages to totalram_pages
-@@ -3317,7 +3318,7 @@ static void __init hugetlb_hstate_alloc_pages_onenode(struct hstate *h, int nid)
- 					&node_states[N_MEMORY], NULL);
- 			if (!folio)
- 				break;
--			list_add(&folio->lru, &folio_list);
-+			list_add(&folio->_hugetlb_list, &folio_list);
- 		}
- 		cond_resched();
- 	}
-@@ -3379,7 +3380,7 @@ static void __init hugetlb_pages_alloc_boot_node(unsigned long start, unsigned l
- 		if (!folio)
- 			break;
- 
--		list_move(&folio->lru, &folio_list);
-+		list_move(&folio->_hugetlb_list, &folio_list);
- 		cond_resched();
- 	}
- 
-@@ -3544,13 +3545,13 @@ static void try_to_free_low(struct hstate *h, unsigned long count,
- 	for_each_node_mask(i, *nodes_allowed) {
- 		struct folio *folio, *next;
- 		struct list_head *freel = &h->hugepage_freelists[i];
--		list_for_each_entry_safe(folio, next, freel, lru) {
-+		list_for_each_entry_safe(folio, next, freel, _hugetlb_list) {
- 			if (count >= h->nr_huge_pages)
- 				goto out;
- 			if (folio_test_highmem(folio))
- 				continue;
- 			remove_hugetlb_folio(h, folio, false);
--			list_add(&folio->lru, &page_list);
-+			list_add(&folio->_hugetlb_list, &page_list);
- 		}
- 	}
- 
-@@ -3703,7 +3704,7 @@ static int set_max_huge_pages(struct hstate *h, unsigned long count, int nid,
- 			goto out;
- 		}
- 
--		list_add(&folio->lru, &page_list);
-+		list_add(&folio->_hugetlb_list, &page_list);
- 		allocated++;
- 
- 		/* Bail for signals. Probably ctrl-c from user */
-@@ -3750,7 +3751,7 @@ static int set_max_huge_pages(struct hstate *h, unsigned long count, int nid,
- 		if (!folio)
- 			break;
- 
--		list_add(&folio->lru, &page_list);
-+		list_add(&folio->_hugetlb_list, &page_list);
- 	}
- 	/* free the pages after dropping lock */
- 	spin_unlock_irq(&hugetlb_lock);
-@@ -3793,13 +3794,13 @@ static long demote_free_hugetlb_folios(struct hstate *src, struct hstate *dst,
- 	 */
- 	mutex_lock(&dst->resize_lock);
- 
--	list_for_each_entry_safe(folio, next, src_list, lru) {
-+	list_for_each_entry_safe(folio, next, src_list, _hugetlb_list) {
- 		int i;
- 
- 		if (folio_test_hugetlb_vmemmap_optimized(folio))
+ 		if (is_huge_zero_folio(folio))
  			continue;
  
--		list_del(&folio->lru);
-+		list_del(&folio->_hugetlb_list);
- 
- 		split_page_owner(&folio->page, huge_page_order(src), huge_page_order(dst));
- 		pgalloc_tag_split(folio, huge_page_order(src), huge_page_order(dst));
-@@ -3814,7 +3815,7 @@ static long demote_free_hugetlb_folios(struct hstate *src, struct hstate *dst,
- 			new_folio = page_folio(page);
- 
- 			init_new_hugetlb_folio(dst, new_folio);
--			list_add(&new_folio->lru, &dst_list);
-+			list_add(&new_folio->_hugetlb_list, &dst_list);
- 		}
- 	}
- 
-@@ -3847,12 +3848,12 @@ static long demote_pool_huge_page(struct hstate *src, nodemask_t *nodes_allowed,
- 		LIST_HEAD(list);
- 		struct folio *folio, *next;
- 
--		list_for_each_entry_safe(folio, next, &src->hugepage_freelists[node], lru) {
-+		list_for_each_entry_safe(folio, next, &src->hugepage_freelists[node], _hugetlb_list) {
- 			if (folio_test_hwpoison(folio))
- 				continue;
- 
- 			remove_hugetlb_folio(src, folio, false);
--			list_add(&folio->lru, &list);
-+			list_add(&folio->_hugetlb_list, &list);
- 
- 			if (++nr_demoted == nr_to_demote)
- 				break;
-@@ -3864,8 +3865,8 @@ static long demote_pool_huge_page(struct hstate *src, nodemask_t *nodes_allowed,
- 
- 		spin_lock_irq(&hugetlb_lock);
- 
--		list_for_each_entry_safe(folio, next, &list, lru) {
--			list_del(&folio->lru);
-+		list_for_each_entry_safe(folio, next, &list, _hugetlb_list) {
-+			list_del(&folio->_hugetlb_list);
- 			add_hugetlb_folio(src, folio, false);
- 
- 			nr_demoted--;
-@@ -7427,7 +7428,8 @@ bool folio_isolate_hugetlb(struct folio *folio, struct list_head *list)
- 		goto unlock;
- 	}
- 	folio_clear_hugetlb_migratable(folio);
--	list_move_tail(&folio->lru, list);
-+	list_del_init(&folio->_hugetlb_list);
-+	list_add_tail(&folio->lru, list);
- unlock:
- 	spin_unlock_irq(&hugetlb_lock);
- 	return ret;
-@@ -7478,7 +7480,8 @@ void folio_putback_hugetlb(struct folio *folio)
- {
- 	spin_lock_irq(&hugetlb_lock);
- 	folio_set_hugetlb_migratable(folio);
--	list_move_tail(&folio->lru, &(folio_hstate(folio))->hugepage_activelist);
-+	list_del_init(&folio->lru);
-+	list_add_tail(&folio->_hugetlb_list, &(folio_hstate(folio))->hugepage_activelist);
- 	spin_unlock_irq(&hugetlb_lock);
- 	folio_put(folio);
- }
-diff --git a/mm/hugetlb_cgroup.c b/mm/hugetlb_cgroup.c
-index 1bdeaf25f640..ee720eeaf6b1 100644
---- a/mm/hugetlb_cgroup.c
-+++ b/mm/hugetlb_cgroup.c
-@@ -239,7 +239,7 @@ static void hugetlb_cgroup_css_offline(struct cgroup_subsys_state *css)
- 	do {
- 		for_each_hstate(h) {
- 			spin_lock_irq(&hugetlb_lock);
--			list_for_each_entry(folio, &h->hugepage_activelist, lru)
-+			list_for_each_entry(folio, &h->hugepage_activelist, _hugetlb_list)
- 				hugetlb_cgroup_move_parent(hstate_index(h), h_cg, folio);
- 
- 			spin_unlock_irq(&hugetlb_lock);
-@@ -933,7 +933,7 @@ void hugetlb_cgroup_migrate(struct folio *old_folio, struct folio *new_folio)
- 	/* move the h_cg details to new cgroup */
- 	set_hugetlb_cgroup(new_folio, h_cg);
- 	set_hugetlb_cgroup_rsvd(new_folio, h_cg_rsvd);
--	list_move(&new_folio->lru, &h->hugepage_activelist);
-+	list_move(&new_folio->_hugetlb_list, &h->hugepage_activelist);
- 	spin_unlock_irq(&hugetlb_lock);
- 	return;
- }
-diff --git a/mm/hugetlb_vmemmap.c b/mm/hugetlb_vmemmap.c
-index 57b7f591eee8..b2cb8d328aac 100644
---- a/mm/hugetlb_vmemmap.c
-+++ b/mm/hugetlb_vmemmap.c
-@@ -519,7 +519,7 @@ long hugetlb_vmemmap_restore_folios(const struct hstate *h,
- 	long ret = 0;
- 	unsigned long flags = VMEMMAP_REMAP_NO_TLB_FLUSH | VMEMMAP_SYNCHRONIZE_RCU;
- 
--	list_for_each_entry_safe(folio, t_folio, folio_list, lru) {
-+	list_for_each_entry_safe(folio, t_folio, folio_list, _hugetlb_list) {
- 		if (folio_test_hugetlb_vmemmap_optimized(folio)) {
- 			ret = __hugetlb_vmemmap_restore_folio(h, folio, flags);
- 			/* only need to synchronize_rcu() once for each batch */
-@@ -531,7 +531,7 @@ long hugetlb_vmemmap_restore_folios(const struct hstate *h,
- 		}
- 
- 		/* Add non-optimized folios to output list */
--		list_move(&folio->lru, non_hvo_folios);
-+		list_move(&folio->_hugetlb_list, non_hvo_folios);
- 	}
- 
- 	if (restored)
-@@ -651,7 +651,7 @@ void hugetlb_vmemmap_optimize_folios(struct hstate *h, struct list_head *folio_l
- 	LIST_HEAD(vmemmap_pages);
- 	unsigned long flags = VMEMMAP_REMAP_NO_TLB_FLUSH | VMEMMAP_SYNCHRONIZE_RCU;
- 
--	list_for_each_entry(folio, folio_list, lru) {
-+	list_for_each_entry(folio, folio_list, _hugetlb_list) {
- 		int ret = hugetlb_vmemmap_split_folio(h, folio);
- 
- 		/*
-@@ -666,7 +666,7 @@ void hugetlb_vmemmap_optimize_folios(struct hstate *h, struct list_head *folio_l
- 
- 	flush_tlb_all();
- 
--	list_for_each_entry(folio, folio_list, lru) {
-+	list_for_each_entry(folio, folio_list, _hugetlb_list) {
- 		int ret;
- 
- 		ret = __hugetlb_vmemmap_optimize_folio(h, folio, &vmemmap_pages, flags);
++		owner_ops = folio_get_owner_ops(folio);
++		if (unlikely(owner_ops)) {
++			if (lruvec) {
++				unlock_page_lruvec_irqrestore(lruvec, flags);
++				lruvec = NULL;
++			}
++			if (folio_ref_sub_and_test(folio, nr_refs))
++				owner_ops->free(folio);
++			continue;
++		}
++
+ 		if (folio_is_zone_device(folio)) {
+ 			if (lruvec) {
+ 				unlock_page_lruvec_irqrestore(lruvec, flags);
 -- 
 2.47.0.277.g8800431eea-goog
 
