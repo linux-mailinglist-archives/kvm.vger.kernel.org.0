@@ -1,169 +1,144 @@
-Return-Path: <kvm+bounces-31253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 588B99C1C45
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:37:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739989C1C9A
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF20282FE9
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 11:37:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A61D91C22E06
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6089C1E47B2;
-	Fri,  8 Nov 2024 11:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7629F38DC8;
+	Fri,  8 Nov 2024 12:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="VYxTQUY/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KeZbZb/X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730881E22FA
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 11:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C4E1E47CE
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 12:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731065868; cv=none; b=XAxHWUppmankdrA9hXiqgO9lHyvAkXj0K8D5+t0gMW0nCjA9Ig46Nefegoy6BjaDqaYIFqyHZ/gmWNgCePpmf5d+GURyHOuEUdSzRPJfmwHGG4fi9QQ9stghM86PU4X/odkKqiXkBTSy3EMOmpOVHb3S2fkeWMIr7Iwe/pBxD6M=
+	t=1731067473; cv=none; b=b6aBZnnXAN3NDxSWyTk6e2qS+FU8mwUxdQFVsbZ5Smqsor3jWN+vuVe9mJUCpmxkjWzist3O3beQnTObao11QXPgKSlvNGsx18f1Hau+96mmr5nMwqLIslE0M8BU1HKquJPnAD/O2zKII+BT41+CyaThYNxjlVzmTlXDxvG98pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731065868; c=relaxed/simple;
-	bh=kyf5fw0B6194YqwWfY8S7EexyJexO76CPyACncH8VQ0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=uVYsd23lpcGhWe4onQ4S8RteYIzxSrRNt6o7ydI2YGHODjDSox6gWXOl48BMDHLbGYhWS5/agLCEkhzm+nqnvL4FBv0GNTyRqlsit7uO/bdWshuy6AWyMr+8DdOtS4JgEjUh3gtT9UTwSkGspi0PZAQVciBZjQqOLMAUaGTY+s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=VYxTQUY/; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a4e5e57678so10086915ab.1
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 03:37:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1731065865; x=1731670665; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uOXTxT3QVzkr6+CIu71XOWqnHn0lKuAZkobd+xubmCQ=;
-        b=VYxTQUY/9apivZOy19QjYxAeSesmqSVm0qwM4LCx2f1ljMkcda3KqHuPmzSgV9s9RW
-         40aJslzTGOKLRfwZ3BKLYcC+qkqdmVK1wt2aBk8QcH2bQmTEcSOL4ssKfk3XhqmSTSGK
-         7wXIn7meQuL8/6hpr1EHdf+y5IU0KvC1kNt9aLuPQfyAHZTuffukUODjPDpf7J9an6dE
-         Tqjro37MhNAqhxoiQY7WOgk/2FHiM0YNklKd+okgVrBveqqHoAtUpvAJwDem4FWDsX4b
-         C/ZmKc6bU9SoOVWXhZ0oQrbf2lOxiIjiCqMqQX2P0FJIE4QMUyh3JQP4RG3l1ZsNBC82
-         sT3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731065865; x=1731670665;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uOXTxT3QVzkr6+CIu71XOWqnHn0lKuAZkobd+xubmCQ=;
-        b=cp2CIIQRdXD/jxKvoxmamw1cyMuZ/u2vlcp4fxmUQftAIIXNcE2BGWhhaoNnjGFEku
-         L9TomXliayIBuP/UNVm0zcw/nCzIPHYsAh4O53+XE5Yp9Ad593N3GATd6xzedgW7JEpC
-         V1XBV2tKp91wHs/TmbTAAvbimne972trgwWPlSElN+sOajQID452XZqLx5KYwwOSQE+d
-         WOl1Zz4FLb/+Qu7N27AP+uNmCcfi4r9AGCpXHo1+uXfTREBoSRy6gZIH+dgYkWFGs10o
-         PEpyI/VPNikrrUcfqWxd7MmjhBJMWdG5xXnVJUSfqE3+hcF11QNqOGhQk/gnSb4oLh/j
-         2bPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBmJ5UGRGQW+DxZOP7y/bQlnNYM7tvB9l6S0zW06lV6MNVGt9bPvKd7aYiaehi0Kg9DIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY2P73MPWAQcrbsCusRYaMuxaWjcO4cchnb7zgDiGaFxUudztJ
-	C4jP6aZQsVegkaw9a7ME4v1ajC5XqVVmU/x+wWfTL9UlIYXRVyWCmjox23Hss9vZP95/aSCaEbS
-	y4ZfTIVTqdUijkyIzgsmTeiY9guMjSW3u/hREGw==
-X-Google-Smtp-Source: AGHT+IF+ciN17ub4TIrETUvpzLaSq6I/9rWGP4XRPhpnawOHx3FcfWs8O7SeGXcL/Hobw0nycafCJTqEinG8leLSWHc=
-X-Received: by 2002:a05:6e02:349c:b0:3a0:9c04:8047 with SMTP id
- e9e14a558f8ab-3a6f24b2433mr21370795ab.6.1731065865452; Fri, 08 Nov 2024
- 03:37:45 -0800 (PST)
+	s=arc-20240116; t=1731067473; c=relaxed/simple;
+	bh=BvuhGDkQ5Q/eUzXO09pJmHXIx5K3lL48DuqpFV4pfes=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uXzyF64f2cScQ3K3auYk+QmYhyFsxQd/dFMJRLuGpg8cnGnUuH9gQNR/B7diwf5mDQgQEynCyf7BXFXsxiiKQx5JGYj6tV3IQQTxudZRu0chQL4bCCAHrZmrjFfMZI+fa82pnALBn95rWQhs4Ydwz9f2yUU5+/4bgpP/KSkZGmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KeZbZb/X; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731067472; x=1762603472;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BvuhGDkQ5Q/eUzXO09pJmHXIx5K3lL48DuqpFV4pfes=;
+  b=KeZbZb/XSo5Lgy3M5wbHneSbohWvTMXWz1D9Y65UN8tHDOosMeW1kMnW
+   wQQ0hj8a7q5M6jNcQI+boQQlQdAGeAKssbKm5UxExRBXx/hdP/EkT8hgV
+   ag/vOXgfmP2zN6im6CETy6lj7X/Xpr2YAz78Jcwh7Iw7aGIsINijD9vSc
+   YTGR/rIitz+ez3YXCxM4RoOf87FtVFMs6thhaO8DeHxLoTwtHAd4dj/Rm
+   n9bi5L559yca7vs822Qonrn1nAI51y4W75bMm7y30nY4AZEyc6iVyjXqJ
+   CN/Dk15DUOSJSgymL6hfti6nKyMu8wOyV+DcuDFSK9U+Z7U9PWlfl8TkS
+   Q==;
+X-CSE-ConnectionGUID: QuH+zKldRnOt7HpJbZ0XRw==
+X-CSE-MsgGUID: 2J/PeSd9Ru63vbNyFpgqrQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31116397"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="31116397"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 04:04:30 -0800
+X-CSE-ConnectionGUID: fv3my8bwRAe5kGPUoDC7kg==
+X-CSE-MsgGUID: rPOg7a+GSmagIiPRkInLkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="85679015"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmviesa008.fm.intel.com with ESMTP; 08 Nov 2024 04:04:29 -0800
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	jgg@nvidia.com,
+	kevin.tian@intel.com,
+	baolu.lu@linux.intel.com
+Cc: alex.williamson@redhat.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	chao.p.peng@linux.intel.com,
+	yi.l.liu@intel.com,
+	iommu@lists.linux.dev,
+	zhenzhong.duan@intel.com,
+	vasant.hegde@amd.com,
+	willy@infradead.org
+Subject: [PATCH v4 0/7] Support attaching PASID to the blocked_domain
+Date: Fri,  8 Nov 2024 04:04:20 -0800
+Message-Id: <20241108120427.13562-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 8 Nov 2024 17:07:34 +0530
-Message-ID: <CAAhSdy1iTNc5QG34ceebMzA137-pNGzTva33VQ83j-yMoaw8Fg@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.13
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@atishpatra.org>, 
-	Atish Patra <atishp@rivosinc.com>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+During the review of iommufd pasid series, Kevin and Jason suggested
+attaching PASID to the blocked domain hence replacing the usage of
+remove_dev_pasid() op [1]. This makes sense as it makes the PASID path
+aligned with the RID path which attaches the RID to the blocked_domain
+when it is to be blocked. To do it, it requires passing the old domain
+to the iommu driver. This has been done in [2].
 
-We have the following KVM RISC-V changes for 6.13:
-1) Accelerate KVM RISC-V when running as a guest
-2) Perf support to collect KVM guest statistics from host side
+This series makes the Intel iommu driver, ARM SMMUv3 driver and AMD iommu
+driver support attaching PASID to the blocked domain. And in the end remove
+the remove_dev_pasid op from iommu_ops.
 
-In addition, the pointer masking support (Ssnpm and
-Smnpm) for KVM guest is going through the RISC-V tree.
+[1] https://lore.kernel.org/linux-iommu/20240816130202.GB2032816@nvidia.com/
+[2] https://lore.kernel.org/linux-iommu/20241104131842.13303-1-yi.l.liu@intel.com/
 
-I also have Svade and Svadu support for host and guest
-in my queue which I will send in the second week of the
-merge window to avoid conflict with the RISC-V tree.
+v4:
+ - Remove unnecessary braces in patch 02 (Vasant)
+ - Minor tweaks to patch 01 and 03 (Kevin)
+ - Add r-b tags from Jason, Vasant, Kevin
 
-Please pull.
+v3: https://lore.kernel.org/linux-iommu/20241104132033.14027-1-yi.l.liu@intel.com/
+ - Add a patch to check remove_dev_pasid() in iommu_attach_device_pasid()
+ - Split patch 01 of v2 into two patches, drop the r-b of this patch due the
+   split.
+ - Add AMD iommu blocked domain pasid support (Jason)
+ - Remove the remove_dev_pasid op as all the iommu drivers that support pasid
+   attach have supported attaching pasid to blocked domain.
+
+v2: https://lore.kernel.org/linux-iommu/20241018055824.24880-1-yi.l.liu@intel.com/#t
+ - Add Kevin's r-b
+ - Adjust the order of patch 03 of v1, it should be the first patch (Baolu)
+
+v1: https://lore.kernel.org/linux-iommu/20240912130653.11028-1-yi.l.liu@intel.com/
 
 Regards,
-Anup
+	Yi Liu
 
-The following changes since commit 81983758430957d9a5cb3333fe324fd70cf63e7e=
-:
+Jason Gunthorpe (1):
+  iommu/arm-smmu-v3: Make the blocked domain support PASID
 
-  Linux 6.12-rc5 (2024-10-27 12:52:02 -1000)
+Yi Liu (6):
+  iommu: Prevent pasid attach if no ops->remove_dev_pasid
+  iommu: Consolidate the ops->remove_dev_pasid usage into a helper
+  iommu: Detaching pasid by attaching to the blocked_domain
+  iommu/vt-d: Make the blocked domain support PASID
+  iommu/amd: Make the blocked domain support PASID
+  iommu: Remove the remove_dev_pasid op
 
-are available in the Git repository at:
+ drivers/iommu/amd/iommu.c                   | 10 +++++++-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 12 ++++-----
+ drivers/iommu/intel/iommu.c                 | 15 ++++++++---
+ drivers/iommu/iommu.c                       | 28 +++++++++++++--------
+ include/linux/iommu.h                       |  5 ----
+ 5 files changed, 44 insertions(+), 26 deletions(-)
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.13-1
+-- 
+2.34.1
 
-for you to fetch changes up to 332fa4a802b16ccb727199da685294f85f9880cb:
-
-  riscv: kvm: Fix out-of-bounds array access (2024-11-05 13:27:32 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.13
-
-- Accelerate KVM RISC-V when running as a guest
-- Perf support to collect KVM guest statistics from host side
-
-----------------------------------------------------------------
-Anup Patel (13):
-      RISC-V: KVM: Order the object files alphabetically
-      RISC-V: KVM: Save/restore HSTATUS in C source
-      RISC-V: KVM: Save/restore SCOUNTEREN in C source
-      RISC-V: KVM: Break down the __kvm_riscv_switch_to() into macros
-      RISC-V: KVM: Replace aia_set_hvictl() with aia_hvictl_value()
-      RISC-V: KVM: Don't setup SGEI for zero guest external interrupts
-      RISC-V: Add defines for the SBI nested acceleration extension
-      RISC-V: KVM: Add common nested acceleration support
-      RISC-V: KVM: Use nacl_csr_xyz() for accessing H-extension CSRs
-      RISC-V: KVM: Use nacl_csr_xyz() for accessing AIA CSRs
-      RISC-V: KVM: Use SBI sync SRET call when available
-      RISC-V: KVM: Save trap CSRs in kvm_riscv_vcpu_enter_exit()
-      RISC-V: KVM: Use NACL HFENCEs for KVM request based HFENCEs
-
-Bj=C3=B6rn T=C3=B6pel (1):
-      riscv: kvm: Fix out-of-bounds array access
-
-Quan Zhou (2):
-      riscv: perf: add guest vs host distinction
-      riscv: KVM: add basic support for host vs guest profiling
-
-Yong-Xuan Wang (1):
-      RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
-
- arch/riscv/include/asm/kvm_host.h   |  10 ++
- arch/riscv/include/asm/kvm_nacl.h   | 245 ++++++++++++++++++++++++++++++++=
-++++
- arch/riscv/include/asm/perf_event.h |   6 +
- arch/riscv/include/asm/sbi.h        | 120 ++++++++++++++++++
- arch/riscv/kernel/perf_callchain.c  |  38 ++++++
- arch/riscv/kvm/Kconfig              |   1 +
- arch/riscv/kvm/Makefile             |  27 ++--
- arch/riscv/kvm/aia.c                | 114 +++++++++++------
- arch/riscv/kvm/aia_aplic.c          |   3 +-
- arch/riscv/kvm/main.c               |  63 +++++++++-
- arch/riscv/kvm/mmu.c                |   4 +-
- arch/riscv/kvm/nacl.c               | 152 ++++++++++++++++++++++
- arch/riscv/kvm/tlb.c                |  57 ++++++---
- arch/riscv/kvm/vcpu.c               | 191 +++++++++++++++++++++-------
- arch/riscv/kvm/vcpu_sbi.c           |  11 +-
- arch/riscv/kvm/vcpu_switch.S        | 137 ++++++++++++--------
- arch/riscv/kvm/vcpu_timer.c         |  28 ++---
- 17 files changed, 1022 insertions(+), 185 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_nacl.h
- create mode 100644 arch/riscv/kvm/nacl.c
 
