@@ -1,194 +1,105 @@
-Return-Path: <kvm+bounces-31316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E003E9C2546
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 20:01:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D89889C2550
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 20:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A428B2843EF
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 19:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A07482845BF
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 19:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4516A19C572;
-	Fri,  8 Nov 2024 19:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AC71AA1DB;
+	Fri,  8 Nov 2024 19:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GOrqArq6"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IrHHirVr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC9E1AA1DC
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 19:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CB9233D80;
+	Fri,  8 Nov 2024 19:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731092481; cv=none; b=rB333bVxmA7ZAgTPdgibj/cYKt8+XIvGg5HNQ5v/Sz9Ix/cCvsCUXrDVminpZy+NidCtHnF8PNCTSHBCyAfdtwDHLqXvzXkfMtUgIBDcv8xA7WbrqcZQQlFYBToDAff1a5gy76yeB1IolJD3jkm7hIIR06kfXejYpvnzHDIBjIc=
+	t=1731092622; cv=none; b=D4VJVg+pIUwv7da6J22n7WT8ui6GHPjNfnk/XvPniiOV6ElojZSonC72TieuWGWVjfDv0/H6N8Fn0+h8H7fXgXdpZfo+efWNQ7Vdu4I880wzFWclXTAuHM/GhbRojv05MYE/Eu2V0EXdA6Jq9TuCAHq3Zl3TN4mcgiHBFdYbNZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731092481; c=relaxed/simple;
-	bh=osKkh8o/4ZEkyOIZVRVY+2aEgfDt/7qhPpuXstOv05g=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=EsscmSVARTbhr3mJY/mGZ6U8it7M/e9Q0gQeznsG+JUG+qUzztYCEXMUqjHQ9nZ5aE2IxJTYvCmIo56bPe3BU2cqsUHD7BUN2Etbu+U25fenaBZmiwzZ8n5eIeOHdzZY0FAU/6z7aMfQSOAYvlo51NJKCVQurohfeVdlWJnGyb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GOrqArq6; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea6aa3b68bso46485417b3.3
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 11:01:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731092477; x=1731697277; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=X/YH5u+uVD0X+IYthPhg6GmXA/jaE5JARCEDgbJjUV8=;
-        b=GOrqArq6EMibI9fiJTyKYP0obQ4Opu9eIIK24AF6Ue/JgY3v0lLVD+hhK/UWiTT3sg
-         tKqVQtNhIzPc0jPJjhwvtx//O35a7pEl9bPhBrlonNe+oYqkpohSszIACVeplMepVpEr
-         ZXbCKlbuHsr5t2D5eLG8/LvYOM70b5J1wwyWR4MfPa3KEW/Nub/+BN4aIphVYi5kgu+s
-         RyTXyX/pQ8a9wxcqTG0Q18uS0aNittHu0MUBQsTKoUwIfWVBFU4pSYPUEl3pp3MXbsoP
-         Rr1vTwKNKDs3kh7r6oeVkQFfhGZJTjxKj88CQUod9EOq/1IMPtnp2oPqiP1scpHdIMl3
-         YLew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731092477; x=1731697277;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/YH5u+uVD0X+IYthPhg6GmXA/jaE5JARCEDgbJjUV8=;
-        b=HujWnAGZs663saZIaDOueKonAVGAqliM88QvRC9/W+1pG8WYka0PrTmCw3jINP6LYD
-         1vgRecCg+3hXJHhMP8IbJAN4A9aVm/L5OpkuS98VkA0GKk8afB+aEMEeYzQ0caWT4S9X
-         zVnrkpMm04t3bOPKwoY16grT4v1r4oCF0+mc8+xHph1MmLlAvF0O4u5EFkrDI8Ys2FXB
-         IucmmyEgVq34a//ng8mkgxzOLPmChXkfupnHdsJAsZDz/xh2bl2PzbcasO2vYvl+ldxb
-         KcRvGtaAEAh+IhzdZBuMDhKugIT9+PtqnIKYG1/quk4dB6nmTtTrEYGKW3ZC1ZnhA8NN
-         YfIg==
-X-Gm-Message-State: AOJu0YzJO/3bkE98gl28VuArkAFvOR8aBMiamPtCGnfBcLwPzGoVJDp+
-	2a9fUuie4iEIrHm3JBabTjYPDrU7u3o0okoBZAD9juTMEPsXbdAXpttIJQxxKCdid2h4QTQz5b3
-	1MjokX8XFpIjv3WUGAt13dQ==
-X-Google-Smtp-Source: AGHT+IHf5E46yE8Goi3JQ3NCwqhgizTTCCoxt5IIbUtqVWxYQ8qv+MmQFEFlUtd8c2orQuarK4c0d4RFcTxIc3XLxg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
- (user=coltonlewis job=sendgmr) by 2002:a05:690c:25c3:b0:6e3:d670:f62a with
- SMTP id 00721157ae682-6eadde333e0mr258367b3.3.1731092477590; Fri, 08 Nov 2024
- 11:01:17 -0800 (PST)
-Date: Fri, 08 Nov 2024 19:01:16 +0000
-In-Reply-To: <20241108153411.GF38786@noisy.programming.kicks-ass.net> (message
- from Peter Zijlstra on Fri, 8 Nov 2024 16:34:11 +0100)
+	s=arc-20240116; t=1731092622; c=relaxed/simple;
+	bh=Vc+It44rnvsd8SN/33MzeG10nJs7XAhLqnpj1GkG1/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GEZYSGDWpZhspeNJYaMK+6W4dq4m9NhxZgtc/pZs7+JI0uMK5EZ2xUSHiYgasWTmDXyWcYJXa/6VszHCkGdoJbizN4fpzMflAa5bBgizjux7WIwizznHRr5Pb2PVNinMjuLhboS3SOH/Mg2K2bhIhs+7BaAfegckpJglqHjYEHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IrHHirVr; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RuBlv2VOyF1R3bO3plu7ki21Z1Ln2a55IM7vJZ7vxyM=; b=IrHHirVrd1Mbarn13fF2L24IOC
+	z8xLdCumFkD9yfyh36aC62vGyNYGYe6baS+Wtf3gyleVfVqhXa+pvkozF9DwywWsZQlOcb7uTUESs
+	D14WMnOQIg18qirnQIOJv2YoOhEFo/ptW2Tni5D3G9cvwYoZiqk3h6s7SD/XR7ba7f2X9eUIRlOQT
+	BJpSCIyP2V9Xduwbn6e7pUrvFU8x4CDCaXG6dDHcm6sEQ59ATgVLKFQggYGLIP79WgyiDFo6WwNDx
+	YjGej4gTca/9FS1JwPPuvvYJkvQKX2baOxYzuhun4cUEw3/f0qTCbwWHrfeprrv8tPWoZq7Y4Z9uK
+	wmIo5PHQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t9UGf-0000000CMXS-2k8M;
+	Fri, 08 Nov 2024 19:03:37 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 4948330049D; Fri,  8 Nov 2024 20:03:37 +0100 (CET)
+Date: Fri, 8 Nov 2024 20:03:37 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+	nathan@kernel.org, ndesaulniers@google.com, morbo@google.com,
+	justinstitt@google.com, llvm@lists.linux.dev
+Subject: Re: [PATCH 01/11] objtool: Generic annotation infrastructure
+Message-ID: <20241108190337.GB38972@noisy.programming.kicks-ass.net>
+References: <20231204093702.989848513@infradead.org>
+ <20231204093731.356358182@infradead.org>
+ <20241108141600.GB6497@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntbjypft37.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v7 4/5] x86: perf: Refactor misc flag assignments
-From: Colton Lewis <coltonlewis@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, seanjc@google.com, 
-	mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, 
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
-	adrian.hunter@intel.com, kan.liang@linux.intel.com, will@kernel.org, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, mpe@ellerman.id.au, 
-	npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org, 
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, 
-	borntraeger@linux.ibm.com, svens@linux.ibm.com, tglx@linutronix.de, 
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241108141600.GB6497@noisy.programming.kicks-ass.net>
 
-Peter Zijlstra <peterz@infradead.org> writes:
+On Fri, Nov 08, 2024 at 03:16:00PM +0100, Peter Zijlstra wrote:
 
-> On Thu, Nov 07, 2024 at 07:03:35PM +0000, Colton Lewis wrote:
->> Break the assignment logic for misc flags into their own respective
->> functions to reduce the complexity of the nested logic.
+> From an LLVM=-19 build we can see that:
+> 
+> $ readelf -WS tmp-build/arch/x86/kvm/vmx/vmenter.o | grep annotate
+>   [13] .discard.annotate PROGBITS        0000000000000000 00028c 000018 08   M  0   0  1
+> 
+> $ readelf -WS tmp-build/arch/x86/kvm/kvm-intel.o | grep annotate
+>   [ 3] .discard.annotate PROGBITS        0000000000000000 069fe0 0089d0 00   M  0   0  1
+> 
+> Which tells us that the translation unit itself has a sh_entsize of 8,
+> while the linked object has sh_entsize of 0.
+> 
+> This then completely messes up the indexing objtool does, which relies
+> on it being a sane number.
+> 
+> GCC/binutils very much does not do this, it retains the 8.
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
->> ---
->>   arch/x86/events/core.c            | 32 +++++++++++++++++++++++--------
->>   arch/x86/include/asm/perf_event.h |  2 ++
->>   2 files changed, 26 insertions(+), 8 deletions(-)
+Anyway, for now I've added:
 
->> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
->> index d19e939f3998..9fdc5fa22c66 100644
->> --- a/arch/x86/events/core.c
->> +++ b/arch/x86/events/core.c
->> @@ -3011,16 +3011,35 @@ unsigned long  
->> perf_arch_instruction_pointer(struct pt_regs *regs)
->>   	return regs->ip + code_segment_base(regs);
->>   }
++       if (sec->sh.sh_entsize != 8) {
++               static bool warn = false;
++               if (!warn) {
++                       WARN("%s: dodgy linker, sh_entsize != 8", sec->name);
++                       warn = true;
++               }
++               sec->sh.sh_entsize = 8;
++       }
 
->> +static unsigned long common_misc_flags(struct pt_regs *regs)
->> +{
->> +	if (regs->flags & PERF_EFLAGS_EXACT)
->> +		return PERF_RECORD_MISC_EXACT_IP;
->> +
->> +	return 0;
->> +}
->> +
->> +unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
->> +{
->> +	unsigned long guest_state = perf_guest_state();
->> +	unsigned long flags = common_misc_flags(regs);
-
-> This is double common_misc and makes no sense
-
-I'm confused what you mean. Are you referring to starting with
-common_misc_flags in both perf_arch_misc_flags and
-perf_arch_guest_misc_flags so possibly the common_msic_flags are set
-twice?
-
-That seems like a good thing that common flags are set wherever they
-apply. You can't guarantee where perf_arch_guest_misc_flags may be
-called in the future.
->> +
->> +	if (!(guest_state & PERF_GUEST_ACTIVE))
->> +		return flags;
->> +
->> +	if (guest_state & PERF_GUEST_USER)
->> +		return flags & PERF_RECORD_MISC_GUEST_USER;
->> +	else
->> +		return flags & PERF_RECORD_MISC_GUEST_KERNEL;
-
-> And this is just broken garbage, right?
-
->> +}
-
-> Did you mean to write:
-
-> unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-> {
-> 	unsigned long guest_state = perf_guest_state();
-> 	unsigned long flags = 0;
-
-> 	if (guest_state & PERF_GUEST_ACTIVE) {
-> 		if (guest_state & PERF_GUEST_USER)
-> 			flags |= PERF_RECORD_MISC_GUEST_USER;
-> 		else
-> 			flags |= PERF_RECORD_MISC_GUEST_KERNEL;
-> 	}
-
-> 	return flags;
-> }
-
-Ok, my mistake was using & instead of |, but the branches are
-functionally the same.
-
-I'll use something closer to your suggestion.
-
->>   unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->>   {
->>   	unsigned int guest_state = perf_guest_state();
->> -	int misc = 0;
->> +	unsigned long misc = common_misc_flags(regs);
-
-> Because here you do the common thing..
-
-
->>   	if (guest_state) {
->> -		if (guest_state & PERF_GUEST_USER)
->> -			misc |= PERF_RECORD_MISC_GUEST_USER;
->> -		else
->> -			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
->> +		misc |= perf_arch_guest_misc_flags(regs);
-
-> And here you mix in the guest things.
-
->>   	} else {
->>   		if (user_mode(regs))
->>   			misc |= PERF_RECORD_MISC_USER;
+To objtool, this allows it function correctly and prints this reminder
+to for us to figure out the linker story.
 
