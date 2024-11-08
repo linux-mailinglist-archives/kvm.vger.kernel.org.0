@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-31300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E549C21F2
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 17:21:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC539C21F3
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 17:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D82C91C21303
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:21:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E052282229
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 16:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39DE199FBF;
-	Fri,  8 Nov 2024 16:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E0B1E3DF5;
+	Fri,  8 Nov 2024 16:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mNLFtrbU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VIBppyD2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C0919922F
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 16:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B38B199FAD
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 16:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731082862; cv=none; b=IJukS/LWUCCL6iRToXDsCsxtDrqS84BOQAjInvJVoVxgOGw6oOX8llv0t+6JrjlvpRSpodzaZEo0Y3BL94MclRwtc/flRqOHliWn/2I9Qg9ILMtUhQI9F4FlphHWDgL6g/apcepqWFOexeq6up7mgZNkSG+WlzbiLa2g+LsYISM=
+	t=1731082864; cv=none; b=WwiWvZt+g6OF7Bh0y9C4ztOn+cJ+5CwhyU7gA5Y33k4S528vjmdsC3AL7XCb4sEhFuAi8fjIEjr3Dr+32JdSTzMLaUNSV52uUw28egS7g8EZPTBWkxk/V6iZyPXHf9XaYJ0w5/e9VIHy3rOoLM3O1DGakc7n8LwPGL15+N5d/KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731082862; c=relaxed/simple;
-	bh=0CzrKZAjiGyTLtq31cuunQlobWkpgK5KVAaAiEa5a4o=;
+	s=arc-20240116; t=1731082864; c=relaxed/simple;
+	bh=K1b6tyL4L39G1de+nnSTbXKIMTHDWGrE84WevKk4PlE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hPxWxCi2o0a84x4Yp72N+SV7jl9mFOhK0qUXCs4eMot9tFexXrIMDIkEjq3ER7vHL2VZWppdyoDoU/tGjqF3kjUdJEfHG24CZevwFdvsTRB4GxLIZSNOvBa95P5JLqDkOdO+V05ZqBaTqwLha532w+2wEwPB5/U3b0axviKlWpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mNLFtrbU; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=J5OwWIWimaATdm7y2TRp8RgNuM09XC/9vApIyunSSwK9ydKE7bkrv3cMUW0s0/ceG9GpGK9C6DksoWjsmnU7FXg3lfzzk1+xuhNd1Zl+G+niXgHYBbOJEDgyz2AJcLdtoDZTg2i1t6ztL4HogGT9BKiQLo60AO/c9QSL3Ms2IBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VIBppyD2; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-37d5016d21eso1218046f8f.3
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 08:20:59 -0800 (PST)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43151a9ea95so18037475e9.1
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 08:21:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731082858; x=1731687658; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731082861; x=1731687661; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1UKVDyubm+0FNKQOmqAnK7wACyIXxMp06jV3hLqPe8=;
-        b=mNLFtrbUiEjNHHmVzFdhnnZBxcAfHBXrJBhe3msSA5stgw/V/XBIy8FzWeVLYZgIZV
-         fGu6MbkUyXnnZZajSTuTzi9Hcbn5K+Ela1iBsFQexv4FqHyszXDYgLbvYJ59/U/aK6tp
-         kXrW0DmbAAKShJR3PwAgTXLEKp7xCkPSawUZJFVwk4CrlbusmbJakSsuVfPMdphVEta2
-         W2Xb3+9Gtz1+Q9GwmryAygp/gVBwxt9sF3IDgpnRTbEbDRHn0rhOTc0QaA+NHJy2HJ28
-         zeRVYMWaCfxXbwfTWJJSoV0rmS/mDuiLp+Ux9yfL2qiZqKyEGHGoL4E8lJsP4vsD7R4p
-         9M3w==
+        bh=Zc2jp+pMldWQELuiNGfEMyRAPqgAV/dSRAey9KCp9+8=;
+        b=VIBppyD2FgCT+4sPPfp61utzdKkL778hOeWl4EurHITmZU/fko7FdnjrqtbWGmoHYL
+         ihg5OWP352bS8dKf6+uHhinY5BAAGfyooAAnaxUajqFmhVlBmD2kkcNiVWM8CdUvxGdz
+         FpOUzRMXvfbocWWqR/7B3MtORRtYLW0s7uliHUaEG0j37Eg7aWCTLWDV10LO4Fi/PXIH
+         /h1bwpyTASbt00l3EpKlAtuehbUbNYaKxY4oLoJEUgrJUUmxbCH4j8pIwnMxCyyTuWbR
+         HhEpZzzXe4kUMvcUGKItXHd3r+VwvHkTzWe6c9PsqiKzDHMvfBK66LoKlxtUZ6rSIU3M
+         ipyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731082858; x=1731687658;
+        d=1e100.net; s=20230601; t=1731082861; x=1731687661;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1UKVDyubm+0FNKQOmqAnK7wACyIXxMp06jV3hLqPe8=;
-        b=bsjjj7Qp6UuIYUyIgFNHADqF7UUTKob0XKn+HMaBy1hozut1phhRMKPcl250LTigIh
-         mGMcBWXsQfp6N0FrTfPvn2kdd1U2CsEKV5UdR/YqQWEE2Q7unug5RRH8SPyUWwjitVjr
-         d4zm/5DxzDTPWARdJHJTNJf1UCnkXuIF6l1y1K0/iJZEsMCZoyBDEyGpjDwCFe1uMut/
-         SmdKH6Z6BT1r9FQRxUu+/4iGUrkpbR1gF6jyavnfxXvY5OU6PPjiISv/9qadJXAz3itn
-         jm9jwi2uk7BThomHB6hOdBDLvPUqhBDLLkred/0xf2vqjOgSofgOT0OViwSbRDzXBryn
-         vU4Q==
-X-Gm-Message-State: AOJu0YyCpYHEnoy1KcGEkzbBCHO5gGX7Nm9shyL7w3hXk7BnKTrUhnvK
-	tzTIza6jAKmNe/tM0Nd+dt0FKbQDpcmtroexv2yXn3TrU6Ai+T+RnsUJuhAu4pS+FcsQWCqjiA=
+        bh=Zc2jp+pMldWQELuiNGfEMyRAPqgAV/dSRAey9KCp9+8=;
+        b=HzxmmykjWVaWAYXg3gUc5z2bWcam+viZ5iWYRw1/AxBEYkf2AJAeEndIBHnUnZyjys
+         uTjLecQfl6r3X9wk0MWwA8IO9beKgOAFWSx0Lx3ukGC0JJ72ts542I040g89F4XfyCnW
+         DpT1Wg5495LqC/7QvgRuaWssHnicDWpy/mwSN5/KQqYvGsBVbl68L0xD5jM8eb82TGYn
+         EJItraTYxaFnC9P0QuQNOi5hwJ0QJDsJidbUQJL8lEjia7H4LpcYmwnYaFf7sKx3hMv7
+         9FdkbRsFtkF857hCzDTED+Yf5rKdjPPXFmtT7RsAkuZY8t7qk0K2knszgEkRAtyLQVwg
+         h0tQ==
+X-Gm-Message-State: AOJu0Yx2XmznDMF1JeGbW+loZQvMwLcbIGUIVGoqYswWF1ed32IUyyWG
+	VfTkVNP2xX0/4iGFhj/YPqro74NrW//Czc4pNWKeXdRHRnTjipNOAbUk/cKWVkrnkzFSfA8kJA=
 	=
-X-Google-Smtp-Source: AGHT+IHkZAD0auPV4emIDnQo0+EU0NmTafyVDODnqw54sbX8+2pfhiQ95jeQsPF/8IsVn+XR42DkmZua1Q==
+X-Google-Smtp-Source: AGHT+IEFnogtOzb1Xio0nKmbj4KqgDBTNvMMzqTZB5Q0tAq5Rm4eo6VUxTjFp/Ump5nYGzIZAg3lfcnSTA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:ffca:0:b0:37d:4cee:559 with SMTP id
- ffacd0b85a97d-381f1862148mr2432f8f.3.1731082858585; Fri, 08 Nov 2024 08:20:58
- -0800 (PST)
-Date: Fri,  8 Nov 2024 16:20:37 +0000
+ (user=tabba job=sendgmr) by 2002:a7b:cbc9:0:b0:42e:6ad4:e411 with SMTP id
+ 5b1f17b1804b1-432b741c9b5mr131765e9.1.1731082860803; Fri, 08 Nov 2024
+ 08:21:00 -0800 (PST)
+Date: Fri,  8 Nov 2024 16:20:38 +0000
 In-Reply-To: <20241108162040.159038-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241108162040.159038-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241108162040.159038-8-tabba@google.com>
-Subject: [RFC PATCH v1 07/10] mm: Introduce struct folio_owner_ops
+Message-ID: <20241108162040.159038-9-tabba@google.com>
+Subject: [RFC PATCH v1 08/10] mm: Use getters and setters to access page pgmap
 From: Fuad Tabba <tabba@google.com>
 To: linux-mm@kvack.org
 Cc: kvm@vger.kernel.org, nouveau@lists.freedesktop.org, 
@@ -88,186 +88,257 @@ Cc: kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce struct folio_owner_ops, a method table that contains
-callbacks to owners of folios that need special handling for
-certain operations. For now, it only contains a callback for
-folio free(), which is called immediately after the folio
-refcount drops to 0.
+The pointer to pgmap in struct page is overlaid with folio
+owner_ops. To indicate that a page/folio has owner ops, bit 1 is
+set. Therefore, before we can start to using owner_ops, we need
+to ensure that all accesses to page pgmap sanitize the pointer
+value.
 
-Add a pointer to this struct overlaid on struct page
-compound_head, pgmap, and struct page/folio lru. The users of
-this struct either will not use lru (e.g., zone device), or would
-be able to easily isolate when lru is being used (e.g., hugetlb)
-and handle it accordingly. While folios are isolated, they cannot
-get freed and the owner_ops are unstable. This is sufficient for
-the current use case of returning these folios to a custom
-allocator.
+This patch introduces the accessors, which will be modified in
+the following patch to sanitize the pointer values.
 
-To identify that a folio has owner_ops, we set bit 1 of the
-field, in a similar way to that bit 0 of compound_head is used to
-identify compound pages.
+No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/linux/mm_types.h | 64 +++++++++++++++++++++++++++++++++++++---
- mm/swap.c                | 19 ++++++++++++
- 2 files changed, 79 insertions(+), 4 deletions(-)
+ drivers/gpu/drm/nouveau/nouveau_dmem.c |  4 +++-
+ drivers/pci/p2pdma.c                   |  8 +++++---
+ include/linux/memremap.h               |  6 +++---
+ include/linux/mm_types.h               | 13 +++++++++++++
+ lib/test_hmm.c                         |  2 +-
+ mm/hmm.c                               |  2 +-
+ mm/memory.c                            |  2 +-
+ mm/memremap.c                          | 19 +++++++++++--------
+ mm/migrate_device.c                    |  4 ++--
+ mm/mm_init.c                           |  2 +-
+ 10 files changed, 41 insertions(+), 21 deletions(-)
 
+diff --git a/drivers/gpu/drm/nouveau/nouveau_dmem.c b/drivers/gpu/drm/nouveau/nouveau_dmem.c
+index 1a072568cef6..d7d9d9476bb0 100644
+--- a/drivers/gpu/drm/nouveau/nouveau_dmem.c
++++ b/drivers/gpu/drm/nouveau/nouveau_dmem.c
+@@ -88,7 +88,9 @@ struct nouveau_dmem {
+ 
+ static struct nouveau_dmem_chunk *nouveau_page_to_chunk(struct page *page)
+ {
+-	return container_of(page->pgmap, struct nouveau_dmem_chunk, pagemap);
++	struct dev_pagemap *pgmap = page_get_pgmap(page);
++
++	return container_of(pgmap, struct nouveau_dmem_chunk, pagemap);
+ }
+ 
+ static struct nouveau_drm *page_to_drm(struct page *page)
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 4f47a13cb500..19519bb4ba56 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -193,7 +193,7 @@ static const struct attribute_group p2pmem_group = {
+ 
+ static void p2pdma_page_free(struct page *page)
+ {
+-	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page->pgmap);
++	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page_get_pgmap(page));
+ 	/* safe to dereference while a reference is held to the percpu ref */
+ 	struct pci_p2pdma *p2pdma =
+ 		rcu_dereference_protected(pgmap->provider->p2pdma, 1);
+@@ -1016,8 +1016,10 @@ enum pci_p2pdma_map_type
+ pci_p2pdma_map_segment(struct pci_p2pdma_map_state *state, struct device *dev,
+ 		       struct scatterlist *sg)
+ {
+-	if (state->pgmap != sg_page(sg)->pgmap) {
+-		state->pgmap = sg_page(sg)->pgmap;
++	struct dev_pagemap *pgmap = page_get_pgmap(sg_page(sg));
++
++	if (state->pgmap != pgmap) {
++		state->pgmap = pgmap;
+ 		state->map = pci_p2pdma_map_type(state->pgmap, dev);
+ 		state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
+ 	}
+diff --git a/include/linux/memremap.h b/include/linux/memremap.h
+index 3f7143ade32c..060e27b6aee0 100644
+--- a/include/linux/memremap.h
++++ b/include/linux/memremap.h
+@@ -161,7 +161,7 @@ static inline bool is_device_private_page(const struct page *page)
+ {
+ 	return IS_ENABLED(CONFIG_DEVICE_PRIVATE) &&
+ 		is_zone_device_page(page) &&
+-		page->pgmap->type == MEMORY_DEVICE_PRIVATE;
++		page_get_pgmap(page)->type == MEMORY_DEVICE_PRIVATE;
+ }
+ 
+ static inline bool folio_is_device_private(const struct folio *folio)
+@@ -173,13 +173,13 @@ static inline bool is_pci_p2pdma_page(const struct page *page)
+ {
+ 	return IS_ENABLED(CONFIG_PCI_P2PDMA) &&
+ 		is_zone_device_page(page) &&
+-		page->pgmap->type == MEMORY_DEVICE_PCI_P2PDMA;
++		page_get_pgmap(page)->type == MEMORY_DEVICE_PCI_P2PDMA;
+ }
+ 
+ static inline bool is_device_coherent_page(const struct page *page)
+ {
+ 	return is_zone_device_page(page) &&
+-		page->pgmap->type == MEMORY_DEVICE_COHERENT;
++		page_get_pgmap(page)->type == MEMORY_DEVICE_COHERENT;
+ }
+ 
+ static inline bool folio_is_device_coherent(const struct folio *folio)
 diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 365c73be0bb4..6e06286f44f1 100644
+index 6e06286f44f1..27075ea24e67 100644
 --- a/include/linux/mm_types.h
 +++ b/include/linux/mm_types.h
-@@ -41,10 +41,12 @@ struct mem_cgroup;
-  *
-  * If you allocate the page using alloc_pages(), you can use some of the
-  * space in struct page for your own purposes.  The five words in the main
-- * union are available, except for bit 0 of the first word which must be
-- * kept clear.  Many users use this word to store a pointer to an object
-- * which is guaranteed to be aligned.  If you use the same storage as
-- * page->mapping, you must restore it to NULL before freeing the page.
-+ * union are available, except for bit 0 (used for compound_head pages)
-+ * and bit 1 (used for owner_ops) of the first word, which must be kept
-+ * clear and used with care.  Many users use this word to store a pointer
-+ * to an object which is guaranteed to be aligned.  If you use the same
-+ * storage as page->mapping, you must restore it to NULL before freeing
-+ * the page.
-  *
-  * The mapcount field must not be used for own purposes.
-  *
-@@ -283,10 +285,16 @@ typedef struct {
- 	unsigned long val;
- } swp_entry_t;
- 
-+struct folio_owner_ops;
-+
- /**
-  * struct folio - Represents a contiguous set of bytes.
-  * @flags: Identical to the page flags.
-  * @lru: Least Recently Used list; tracks how recently this folio was used.
-+ * @owner_ops: Pointer to callback operations of the folio owner. Valid if bit 1
-+ *    is set.
-+ *    NOTE: Cannot be used with lru, since it is overlaid with it. To use lru,
-+ *          owner_ops must be cleared first, and restored once done with lru.
-  * @mlock_count: Number of times this folio has been pinned by mlock().
-  * @mapping: The file this page belongs to, or refers to the anon_vma for
-  *    anonymous memory.
-@@ -330,6 +338,7 @@ struct folio {
- 			unsigned long flags;
- 			union {
- 				struct list_head lru;
-+				const struct folio_owner_ops *owner_ops; /* Bit 1 is set */
- 	/* private: avoid cluttering the output */
- 				struct {
- 					void *__filler;
-@@ -417,6 +426,7 @@ FOLIO_MATCH(flags, flags);
- FOLIO_MATCH(lru, lru);
- FOLIO_MATCH(mapping, mapping);
- FOLIO_MATCH(compound_head, lru);
-+FOLIO_MATCH(compound_head, owner_ops);
- FOLIO_MATCH(index, index);
- FOLIO_MATCH(private, private);
- FOLIO_MATCH(_mapcount, _mapcount);
-@@ -452,6 +462,13 @@ FOLIO_MATCH(flags, _flags_3);
- FOLIO_MATCH(compound_head, _head_3);
- #undef FOLIO_MATCH
- 
-+struct folio_owner_ops {
-+	/*
-+	 * Called once the folio refcount reaches 0.
-+	 */
-+	void (*free)(struct folio *folio);
-+};
-+
- /**
-  * struct ptdesc -    Memory descriptor for page tables.
-  * @__page_flags:     Same as page flags. Powerpc only.
-@@ -560,6 +577,45 @@ static inline void *folio_get_private(struct folio *folio)
- 	return folio->private;
+@@ -616,6 +616,19 @@ static inline const struct folio_owner_ops *folio_get_owner_ops(struct folio *fo
+ 	return owner_ops;
  }
  
 +/*
-+ * Use bit 1, since bit 0 is used to indicate a compound page in compound_head,
-+ * which owner_ops is overlaid with.
++ * Get the page dev_pagemap pgmap pointer.
 + */
-+#define FOLIO_OWNER_OPS_BIT    1UL
-+#define FOLIO_OWNER_OPS        (1UL << FOLIO_OWNER_OPS_BIT)
++#define page_get_pgmap(page)	((page)->pgmap)
 +
 +/*
-+ * Set the folio owner_ops as well as bit 1 of the pointer to indicate that the
-+ * folio has owner_ops.
++ * Set the page dev_pagemap pgmap pointer.
 + */
-+static inline void folio_set_owner_ops(struct folio *folio, const struct folio_owner_ops *owner_ops)
++static inline void page_set_pgmap(struct page *page, struct dev_pagemap *pgmap)
 +{
-+	owner_ops = (const struct folio_owner_ops *)((unsigned long)owner_ops | FOLIO_OWNER_OPS);
-+	folio->owner_ops = owner_ops;
-+}
-+
-+/*
-+ * Clear the folio owner_ops including bit 1 of the pointer.
-+ */
-+static inline void folio_clear_owner_ops(struct folio *folio)
-+{
-+	folio->owner_ops = NULL;
-+}
-+
-+/*
-+ * Return the folio's owner_ops if it has them, otherwise, return NULL.
-+ */
-+static inline const struct folio_owner_ops *folio_get_owner_ops(struct folio *folio)
-+{
-+	const struct folio_owner_ops *owner_ops = folio->owner_ops;
-+
-+	if (!((unsigned long)owner_ops & FOLIO_OWNER_OPS))
-+		return NULL;
-+
-+	owner_ops = (const struct folio_owner_ops *)((unsigned long)owner_ops & ~FOLIO_OWNER_OPS);
-+	return owner_ops;
++	page->pgmap = pgmap;
 +}
 +
  struct page_frag_cache {
  	void * va;
  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-diff --git a/mm/swap.c b/mm/swap.c
-index 638a3f001676..767ff6d8f47b 100644
---- a/mm/swap.c
-+++ b/mm/swap.c
-@@ -110,6 +110,13 @@ static void page_cache_release(struct folio *folio)
+diff --git a/lib/test_hmm.c b/lib/test_hmm.c
+index 056f2e411d7b..d3e3843f57dd 100644
+--- a/lib/test_hmm.c
++++ b/lib/test_hmm.c
+@@ -195,7 +195,7 @@ static int dmirror_fops_release(struct inode *inode, struct file *filp)
  
- void __folio_put(struct folio *folio)
+ static struct dmirror_chunk *dmirror_page_to_chunk(struct page *page)
  {
-+	const struct folio_owner_ops *owner_ops = folio_get_owner_ops(folio);
+-	return container_of(page->pgmap, struct dmirror_chunk, pagemap);
++	return container_of(page_get_pgmap(page), struct dmirror_chunk, pagemap);
+ }
+ 
+ static struct dmirror_device *dmirror_page_to_device(struct page *page)
+diff --git a/mm/hmm.c b/mm/hmm.c
+index 7e0229ae4a5a..b5f5ac218fda 100644
+--- a/mm/hmm.c
++++ b/mm/hmm.c
+@@ -248,7 +248,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 		 * just report the PFN.
+ 		 */
+ 		if (is_device_private_entry(entry) &&
+-		    pfn_swap_entry_to_page(entry)->pgmap->owner ==
++		    page_get_pgmap(pfn_swap_entry_to_page(entry))->owner ==
+ 		    range->dev_private_owner) {
+ 			cpu_flags = HMM_PFN_VALID;
+ 			if (is_writable_device_private_entry(entry))
+diff --git a/mm/memory.c b/mm/memory.c
+index 80850cad0e6f..5853fa5767c7 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4276,7 +4276,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
+ 			 */
+ 			get_page(vmf->page);
+ 			pte_unmap_unlock(vmf->pte, vmf->ptl);
+-			ret = vmf->page->pgmap->ops->migrate_to_ram(vmf);
++			ret = page_get_pgmap(vmf->page)->ops->migrate_to_ram(vmf);
+ 			put_page(vmf->page);
+ 		} else if (is_hwpoison_entry(entry)) {
+ 			ret = VM_FAULT_HWPOISON;
+diff --git a/mm/memremap.c b/mm/memremap.c
+index 40d4547ce514..931bc85da1df 100644
+--- a/mm/memremap.c
++++ b/mm/memremap.c
+@@ -458,8 +458,9 @@ EXPORT_SYMBOL_GPL(get_dev_pagemap);
+ 
+ void free_zone_device_folio(struct folio *folio)
+ {
+-	if (WARN_ON_ONCE(!folio->page.pgmap->ops ||
+-			!folio->page.pgmap->ops->page_free))
++	struct dev_pagemap *pgmap = page_get_pgmap(&folio->page);
 +
-+	if (unlikely(owner_ops)) {
-+		owner_ops->free(folio);
-+		return;
-+	}
-+
- 	if (unlikely(folio_is_zone_device(folio))) {
- 		free_zone_device_folio(folio);
++	if (WARN_ON_ONCE(!pgmap->ops || !pgmap->ops->page_free))
  		return;
-@@ -929,10 +936,22 @@ void folios_put_refs(struct folio_batch *folios, unsigned int *refs)
- 	for (i = 0, j = 0; i < folios->nr; i++) {
- 		struct folio *folio = folios->folios[i];
- 		unsigned int nr_refs = refs ? refs[i] : 1;
-+		const struct folio_owner_ops *owner_ops;
  
- 		if (is_huge_zero_folio(folio))
- 			continue;
+ 	mem_cgroup_uncharge(folio);
+@@ -486,17 +487,17 @@ void free_zone_device_folio(struct folio *folio)
+ 	 * to clear folio->mapping.
+ 	 */
+ 	folio->mapping = NULL;
+-	folio->page.pgmap->ops->page_free(folio_page(folio, 0));
++	pgmap->ops->page_free(folio_page(folio, 0));
  
-+		owner_ops = folio_get_owner_ops(folio);
-+		if (unlikely(owner_ops)) {
-+			if (lruvec) {
-+				unlock_page_lruvec_irqrestore(lruvec, flags);
-+				lruvec = NULL;
-+			}
-+			if (folio_ref_sub_and_test(folio, nr_refs))
-+				owner_ops->free(folio);
-+			continue;
-+		}
+-	if (folio->page.pgmap->type != MEMORY_DEVICE_PRIVATE &&
+-	    folio->page.pgmap->type != MEMORY_DEVICE_COHERENT)
++	if (pgmap->type != MEMORY_DEVICE_PRIVATE &&
++	    pgmap->type != MEMORY_DEVICE_COHERENT)
+ 		/*
+ 		 * Reset the refcount to 1 to prepare for handing out the page
+ 		 * again.
+ 		 */
+ 		folio_set_count(folio, 1);
+ 	else
+-		put_dev_pagemap(folio->page.pgmap);
++		put_dev_pagemap(pgmap);
+ }
+ 
+ void zone_device_page_init(struct page *page)
+@@ -505,7 +506,7 @@ void zone_device_page_init(struct page *page)
+ 	 * Drivers shouldn't be allocating pages after calling
+ 	 * memunmap_pages().
+ 	 */
+-	WARN_ON_ONCE(!percpu_ref_tryget_live(&page->pgmap->ref));
++	WARN_ON_ONCE(!percpu_ref_tryget_live(&page_get_pgmap(page)->ref));
+ 	set_page_count(page, 1);
+ 	lock_page(page);
+ }
+@@ -514,7 +515,9 @@ EXPORT_SYMBOL_GPL(zone_device_page_init);
+ #ifdef CONFIG_FS_DAX
+ bool __put_devmap_managed_folio_refs(struct folio *folio, int refs)
+ {
+-	if (folio->page.pgmap->type != MEMORY_DEVICE_FS_DAX)
++	struct dev_pagemap *pgmap = page_get_pgmap(&folio->page);
 +
- 		if (folio_is_zone_device(folio)) {
- 			if (lruvec) {
- 				unlock_page_lruvec_irqrestore(lruvec, flags);
++	if (pgmap->type != MEMORY_DEVICE_FS_DAX)
+ 		return false;
+ 
+ 	/*
+diff --git a/mm/migrate_device.c b/mm/migrate_device.c
+index 9cf26592ac93..368def358d02 100644
+--- a/mm/migrate_device.c
++++ b/mm/migrate_device.c
+@@ -135,7 +135,7 @@ static int migrate_vma_collect_pmd(pmd_t *pmdp,
+ 			page = pfn_swap_entry_to_page(entry);
+ 			if (!(migrate->flags &
+ 				MIGRATE_VMA_SELECT_DEVICE_PRIVATE) ||
+-			    page->pgmap->owner != migrate->pgmap_owner)
++			    page_get_pgmap(page)->owner != migrate->pgmap_owner)
+ 				goto next;
+ 
+ 			mpfn = migrate_pfn(page_to_pfn(page)) |
+@@ -156,7 +156,7 @@ static int migrate_vma_collect_pmd(pmd_t *pmdp,
+ 				goto next;
+ 			else if (page && is_device_coherent_page(page) &&
+ 			    (!(migrate->flags & MIGRATE_VMA_SELECT_DEVICE_COHERENT) ||
+-			     page->pgmap->owner != migrate->pgmap_owner))
++			     page_get_pgmap(page)->owner != migrate->pgmap_owner))
+ 				goto next;
+ 			mpfn = migrate_pfn(pfn) | MIGRATE_PFN_MIGRATE;
+ 			mpfn |= pte_write(pte) ? MIGRATE_PFN_WRITE : 0;
+diff --git a/mm/mm_init.c b/mm/mm_init.c
+index 1c205b0a86ed..279cdaebfd2b 100644
+--- a/mm/mm_init.c
++++ b/mm/mm_init.c
+@@ -995,7 +995,7 @@ static void __ref __init_zone_device_page(struct page *page, unsigned long pfn,
+ 	 * and zone_device_data.  It is a bug if a ZONE_DEVICE page is
+ 	 * ever freed or placed on a driver-private list.
+ 	 */
+-	page->pgmap = pgmap;
++	page_set_pgmap(page, pgmap);
+ 	page->zone_device_data = NULL;
+ 
+ 	/*
 -- 
 2.47.0.277.g8800431eea-goog
 
