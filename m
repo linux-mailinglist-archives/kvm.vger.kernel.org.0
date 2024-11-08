@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-31259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF609C1C9F
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:05:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D031F9C1CA1
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 13:05:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47DCFB24563
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:05:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962F128421C
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 12:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE671E882D;
-	Fri,  8 Nov 2024 12:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE111E884E;
+	Fri,  8 Nov 2024 12:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hHKk23/E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HWdhtepZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FE01E7C1B
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 12:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75E81E2834
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 12:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731067483; cv=none; b=JvJvH/+MVuOcdVex81ukafEKGPZL+wXGM5MzBmN7UiNC6ZtUUvEeBsO4g98pel2xi0Oi7c27EkxA20+cRwHCWcqqdAkxj7DKPGunHY0aDwoTnF2f2+jRh6vTl4rQY68OKolKx/w+6/cmIykPt0Z0V9bagsWL92AP4dlS5zF7cmU=
+	t=1731067484; cv=none; b=JqAtHjuhU234DON+8H6sX0v944oWjEVAehCMr65D2TTV0jF0vUWeLaAOg59eE7p52lkAP8svSeqt3v7n4pthc/tGb/SsD+3AmIJiqjhmLxigu6F+fOX5PBcKds6nu7pwZQQuDq5nfYO9bUIUGANQJnINm3623ZzDXu4c2MdRekg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731067483; c=relaxed/simple;
-	bh=Mejinn7dwxrWFJJxi0gYE+6CIjdQ4PZ7QCUJBDIlsZY=;
+	s=arc-20240116; t=1731067484; c=relaxed/simple;
+	bh=2s1wQPEzFpmggA2jawJvQiccvDr/ayphBD/48j9DeAE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qjEDkp0lGyao18nH6Nk/4IqvUZC5yukxYABpo9+DGgfXJJTHgpqY5eIMGY/gUxt+2/E7T9GCzsl5qEFiynpVG7n5KTL8QBCCTD3KKdS9LbbTmYI6n5BDs70w043KAG4Yqp/l0D2olfWDu13qZCXTiVWD009WJW1CFLiNYmrzaTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hHKk23/E; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=IX9gjvePcUGc7zhyCT1glCNWg3rk96v7N37nGQkHXNRqSXLhWROUxMhH4A2ON9cZTB1b8OTWrC2ThnBk0cocA8fmkNpuxgd64sBBIiUCMd7ElukQSFZYH0QPyKqtWNLwZQqD4B36RcPp9mwsMMEOaIZM66VDwJB7XVMA4jxZCik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HWdhtepZ; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731067483; x=1762603483;
+  t=1731067484; x=1762603484;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Mejinn7dwxrWFJJxi0gYE+6CIjdQ4PZ7QCUJBDIlsZY=;
-  b=hHKk23/EoFTKOlJwqVV9XOsql7H24N0vMTJLPp3hrTad622SvQk6yJ1P
-   /ZaRpJRG+pY2aecbqnvYrbLhBf3TmUdwsyDOuXEeAE3v4lWTLzK2JDzKX
-   LqXooBmc4zLqdw4fg6fL5FJZLad1q0RyFhA596YStEf+Oj5gPT+TrxXBH
-   VSpPj4Dkv7SeF/yiBW/Ccl8vAkcp6oq0LLmqExv+6UPSbnLPU3QUJHiJm
-   8z2kQu2PrpliYuMzF/Jq96WLVG4TGp+PIufFIeE40gUQvS3f9thhsErn0
-   sETP8mX1iekwXtuTpuSXC1JV2whu+nrjPGBe3sahdg0yz4TP6YPCKae7g
-   A==;
-X-CSE-ConnectionGUID: U7A82M5tRL+Z7Jwb6mSNIw==
-X-CSE-MsgGUID: rcKuPaK7TreDGas5Vpn8ng==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31116448"
+  bh=2s1wQPEzFpmggA2jawJvQiccvDr/ayphBD/48j9DeAE=;
+  b=HWdhtepZFf9CMY/6YSUc1S/JR/FoDzme9YgbmCyQfHHNmIqFrI0Z78Bv
+   aCjoSguv0caP0LDwqUzenb9CBLdQm+I/QiKeHBRz2/3k7Ic6h7I5c+1tk
+   1J7m0SWt3JDZX81OSIAvE4Gz7hZnLnQVjmYKuX5CmKzYBadJpaZ0mvFkO
+   cImcRPo9BKghT1ykMJJP2c1OUgXsxi0AchF+2e3juIDd4djAFI1z4Euk2
+   QeY4MqXzdsLueVomQyeVvHt177gsfh9aCdc0w6uxmQ7MrniGzJoY5ciJT
+   0lhnMIVD+VC0Qh2J9xHmCJey4zTDfCnup3BPnBv2DT0rxLZ4QQ7XW26pW
+   g==;
+X-CSE-ConnectionGUID: r+j/jhg5Sj2Gx+4kxTzQ8w==
+X-CSE-MsgGUID: +xae70bfScGhelrkccjU4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31116455"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31116448"
+   d="scan'208";a="31116455"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 04:04:34 -0800
-X-CSE-ConnectionGUID: HeJOK7pPTzO1DxBE0Wu1HA==
-X-CSE-MsgGUID: xGl0tHZJTbawrD+vXM23Bw==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 04:04:35 -0800
+X-CSE-ConnectionGUID: x/xJPLzuR/OL30nH6Ryz0g==
+X-CSE-MsgGUID: LFS4smFFRXO+0Ncx01WDww==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="85679050"
+   d="scan'208";a="85679056"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmviesa008.fm.intel.com with ESMTP; 08 Nov 2024 04:04:33 -0800
+  by fmviesa008.fm.intel.com with ESMTP; 08 Nov 2024 04:04:34 -0800
 From: Yi Liu <yi.l.liu@intel.com>
 To: joro@8bytes.org,
 	jgg@nvidia.com,
@@ -73,9 +73,9 @@ Cc: alex.williamson@redhat.com,
 	zhenzhong.duan@intel.com,
 	vasant.hegde@amd.com,
 	willy@infradead.org
-Subject: [PATCH v4 6/7] iommu/amd: Make the blocked domain support PASID
-Date: Fri,  8 Nov 2024 04:04:26 -0800
-Message-Id: <20241108120427.13562-7-yi.l.liu@intel.com>
+Subject: [PATCH v4 7/7] iommu: Remove the remove_dev_pasid op
+Date: Fri,  8 Nov 2024 04:04:27 -0800
+Message-Id: <20241108120427.13562-8-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241108120427.13562-1-yi.l.liu@intel.com>
 References: <20241108120427.13562-1-yi.l.liu@intel.com>
@@ -87,54 +87,77 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The blocked domain can be extended to park PASID of a device to be the
-DMA blocking state. By this the remove_dev_pasid() op is dropped.
+The iommu drivers that supports PASID have supported attaching pasid to the
+blocked_domain, hence remove the remove_dev_pasid op from the iommu_ops.
 
-Remove PASID from old domain and device GCR3 table. No need to attach
-PASID to the blocked domain as clearing PASID from GCR3 table will make
-sure all DMAs for that PASID are blocked.
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/amd/iommu.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/iommu/iommu.c | 17 ++++-------------
+ include/linux/iommu.h |  5 -----
+ 2 files changed, 4 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index 5ce8e6504ba7..d216313b6d44 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -2468,10 +2468,19 @@ static int blocked_domain_attach_device(struct iommu_domain *domain,
- 	return 0;
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 6fd4b904f270..e970893168d8 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -3303,17 +3303,9 @@ static void iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
+ {
+ 	const struct iommu_ops *ops = dev_iommu_ops(dev);
+ 	struct iommu_domain *blocked_domain = ops->blocked_domain;
+-	int ret = 1;
+ 
+-	if (blocked_domain && blocked_domain->ops->set_dev_pasid) {
+-		ret = blocked_domain->ops->set_dev_pasid(blocked_domain,
+-							 dev, pasid, domain);
+-	} else {
+-		ops->remove_dev_pasid(dev, pasid, domain);
+-		ret = 0;
+-	}
+-
+-	WARN_ON(ret);
++	WARN_ON(blocked_domain->ops->set_dev_pasid(blocked_domain,
++						   dev, pasid, domain));
  }
  
-+static int blocked_domain_set_dev_pasid(struct iommu_domain *domain,
-+					struct device *dev, ioasid_t pasid,
-+					struct iommu_domain *old)
-+{
-+	amd_iommu_remove_dev_pasid(dev, pasid, old);
-+	return 0;
-+}
-+
- static struct iommu_domain blocked_domain = {
- 	.type = IOMMU_DOMAIN_BLOCKED,
- 	.ops = &(const struct iommu_domain_ops) {
- 		.attach_dev     = blocked_domain_attach_device,
-+		.set_dev_pasid  = blocked_domain_set_dev_pasid,
- 	}
- };
+ static int __iommu_set_group_pasid(struct iommu_domain *domain,
+@@ -3371,9 +3363,8 @@ int iommu_attach_device_pasid(struct iommu_domain *domain,
+ 	int ret;
  
-@@ -2894,7 +2903,6 @@ const struct iommu_ops amd_iommu_ops = {
- 	.def_domain_type = amd_iommu_def_domain_type,
- 	.dev_enable_feat = amd_iommu_dev_enable_feature,
- 	.dev_disable_feat = amd_iommu_dev_disable_feature,
--	.remove_dev_pasid = amd_iommu_remove_dev_pasid,
- 	.page_response = amd_iommu_page_response,
- 	.default_domain_ops = &(const struct iommu_domain_ops) {
- 		.attach_dev	= amd_iommu_attach_device,
+ 	if (!domain->ops->set_dev_pasid ||
+-	    (!ops->remove_dev_pasid &&
+-	     (!ops->blocked_domain ||
+-	      !ops->blocked_domain->ops->set_dev_pasid)))
++	    !ops->blocked_domain ||
++	    !ops->blocked_domain->ops->set_dev_pasid)
+ 		return -EOPNOTSUPP;
+ 
+ 	if (!group)
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 0c3bfb66dc7c..1d033121bf00 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -537,9 +537,6 @@ static inline int __iommu_copy_struct_from_user_array(
+  *		- IOMMU_DOMAIN_DMA: must use a dma domain
+  *		- 0: use the default setting
+  * @default_domain_ops: the default ops for domains
+- * @remove_dev_pasid: Remove any translation configurations of a specific
+- *                    pasid, so that any DMA transactions with this pasid
+- *                    will be blocked by the hardware.
+  * @pgsize_bitmap: bitmap of all possible supported page sizes
+  * @owner: Driver module providing these ops
+  * @identity_domain: An always available, always attachable identity
+@@ -586,8 +583,6 @@ struct iommu_ops {
+ 			      struct iommu_page_response *msg);
+ 
+ 	int (*def_domain_type)(struct device *dev);
+-	void (*remove_dev_pasid)(struct device *dev, ioasid_t pasid,
+-				 struct iommu_domain *domain);
+ 
+ 	const struct iommu_domain_ops *default_domain_ops;
+ 	unsigned long pgsize_bitmap;
 -- 
 2.34.1
 
