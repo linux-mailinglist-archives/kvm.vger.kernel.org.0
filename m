@@ -1,231 +1,217 @@
-Return-Path: <kvm+bounces-31224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D4A9C15C0
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 05:57:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ED649C15DA
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 06:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59EA7284B5B
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 04:57:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E84E1F21DBA
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 05:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9908F1CF7B1;
-	Fri,  8 Nov 2024 04:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05381CC161;
+	Fri,  8 Nov 2024 05:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cmYh+Ftz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ejAqgG+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFFA29CEF
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 04:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D100ACA6F
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 05:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731041698; cv=none; b=bPOPlMdq+QOjG+ifOVBQ91AmSL/A2iGd5ugUlAPoBq8Ao41p4MV1FmRpUSeo7Hz8sda4/YUDz5HddhkwGZ/RvHxM6+UWdktOPOMlJ2DbM5QqMdhmUsgHiXb6dgYrgfXsLkgqR1/e49CeHpsXlibn9mZGMlNkOyHnFIMhntZdKMM=
+	t=1731042229; cv=none; b=sajH2K9WkGYDJwQDsUsdzp/l9TB+VyyeF6C+heS7cW0cRrluxH5VSH9BhO8oyj0dForZ4OPrfWb0+l9a65nUWQeGLmeIMYMA1fopNj+s/tANY0N0XfKpTaUXnrxRZ3EGddJyrOQfYYjY49RarrtiaIoBgRH6Trx0Jd3h9A2b+28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731041698; c=relaxed/simple;
-	bh=2xQmX4s0JykS7A/Tc6c/t/SLBjSG0+FumPRaKt9camw=;
+	s=arc-20240116; t=1731042229; c=relaxed/simple;
+	bh=uf+L32/DgNO20OcfZBNfGBo/WqndrTtsLpsVzys+KCQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=My/skOIi6imStw/n016GrU2lbJADQTZai/XIhdwQry/5nRAzqx0l7sChXOr6Igj5rrsEeupKgkwu7ElF0eRLAFAxvYnO+ZgMT4aZGwmIEDnDP04l0NNNjhMlmHA8Vm39g/dk5H4Q3HRYQfsERHgVuJ6stmmsWPGdVbJ7Rg46aR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cmYh+Ftz; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539e617ef81so6460e87.1
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 20:54:56 -0800 (PST)
+	 To:Cc:Content-Type; b=Zv8/5tpn55QYLuUVG9EPttZ73p9QLA+b7Ervky4BffLi7Bod9w1Pa1tQ3xebBH6GmTLEqQLg+4fS0mWrwtVh9dOobKss2WZ7GCIGjtxHPQut/AEI5YkLCyleHrN8R7VJdktqItVUqq+KAuykM5ePl/FLc7wSfSf7K+WeUrIpPiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ejAqgG+S; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e28fea0f5b8so1677577276.1
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2024 21:03:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731041695; x=1731646495; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731042226; x=1731647026; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bSKJzjh5rurwLh+xIWMq383kU498LySuuCRBu3PfCQM=;
-        b=cmYh+FtzgXQX4eMouSB983xQwa0FwYFl0kvEzgk+aebyKRcWP1PWVNUTJzS7eHueb3
-         PIS+cQrq1vlbil/uRrQjR6f//Cd0e4m7Edizs3MvKtAS3K1za4hex1FWO8W+vQTK1EgO
-         MPjrOe0VMbWmYNp3pQBiUsG18HWbcgFniYDw9F63/CbwLQxyJg2P5zmeOD0vRL/6Igpl
-         H0oGpgeEn1luyIrdcWm1Z3qc5D7AXXGFGgaoj4YTQ3++HLnYsBRuBpRsBdLB4OlLim9M
-         eH0RkwmcqeNHYoh7jiXEH4MNIhvuimxrrz0LvIOPFECAkqMC98TNPvbwvN+obrp9ZftF
-         NiqA==
+        bh=WNGdr8+SBlIbzBqb5yEvyPo04wuD7xhCU+afHPhO0gw=;
+        b=ejAqgG+SXERsk7UNaA++paZ25Y2xK3zQaqxsoV2Q6Zj/8Dp90EdlJifDnr8qZHaL7b
+         b4Y2hPHvSkXAHeKmCX2ZsYSHR/QQA/Xttt1Z4ANGTWBOCRB/Y5MP48Xmg/ju3Yg3JiIy
+         uG6WvqyTlEJzxCDpycnNJPL5I6/F+e8HqC0L0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731041695; x=1731646495;
+        d=1e100.net; s=20230601; t=1731042226; x=1731647026;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bSKJzjh5rurwLh+xIWMq383kU498LySuuCRBu3PfCQM=;
-        b=o4+lyUYL29sT//G4V2Rp9m6Knvj+6YVgnyGLimTxNtn6Od3xFlDMLAblT+xYM6p+1v
-         FfsoEF0l6Ha0y8BZrBXfBsjnUzZDW4s42Y7wLjc2eQvZqWcFxc74m+Q/j3sMRtl4CRU0
-         iP3Lv5hHKOOMClyk3sPj44C6I1d8X34bKmK5NZOzzIFrNsV6Jws7kGBiiybryBhbWZIW
-         rqUKBOgjFB17F3Qzow+CynFlp0vcYEVADgnaOOLHqi6yXXqxJzE2Ejd37F0USdp+ep14
-         3fHcj2a0tyZghKX7ptBgFayB4TFGTpmc/AaJQAYbcDuxtxLNMvsvYjcMaiqzSxV0FTQL
-         bgSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVht56bQGAW2oAEekjofgER/EvGXo9y1vIO8EGq+LNMvXViAvrOBBFPznEaqs6igwkGqzo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5IJatCyWWYYfdH0BbOmXiv++0gHlVD9xN0G/6p/8igqupZ9lP
-	+7ARIyrSLnLu9WNVJRL1yfQwxpsb8Xfxg/EcM0Y3oKn6k/Ptpm9v/18H13ID8towpavBGuMBRj3
-	ABCWdbDq5p/m4eV4yKDh3+EkzC7MxL6c/CGDt
-X-Gm-Gg: ASbGncvt038VGokSo+jH3FGKCdhep9bJvEqQMztmmF9SxGu+FO+CoWNFX5Hjg88ijww
-	MNKX//DkZihdeqSpXU04Cl72wsmLve9NTtJgsjm8oY/JzF0ooW8CA7y81r2GEw0ed
-X-Google-Smtp-Source: AGHT+IGKIXIuAP01ZsVM+BlzRdxZ0Zhznc/LCRKvW3Ub125dSvD8M1+JFH8FKnICGQVhmKF54W/LE3eK5eVmHfeVlwM=
-X-Received: by 2002:ac2:4e44:0:b0:53c:7652:6c97 with SMTP id
- 2adb3069b0e04-53d811f1d2cmr527773e87.2.1731041694586; Thu, 07 Nov 2024
- 20:54:54 -0800 (PST)
+        bh=WNGdr8+SBlIbzBqb5yEvyPo04wuD7xhCU+afHPhO0gw=;
+        b=DJf95CjH1e2omyxZmlU7gjTR/Jy4SxQNNJ4m4Uni6vUIewaZ71Wy9HqIbXm5bU6rQ0
+         dZM6OFWmFiqXZOVFHAC+Y3OGX5PTiKvw1kUYyITzqCgfNAopufVnMuAxiVb9MJbQ4Pad
+         NIcpYTqMV1A/TXf/dgD6v4u+czbdZC7tfMU6hCgY1MjaeNMwNrLgG2jb+1RMB5e/oN36
+         b2O/R0YfBW/jjbpoOoMcm2m/1Nh7mdleRAcxEFBAyrOmXxXVikgpkKRI1GlkTsp6v0tu
+         MA40pFNMO36Gg8tGenGz/MXFpajspGVJk8vl4oDbwCg24MbI4CdDyoH2Px8h48jmcBkm
+         EqwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVaNWc9QK43tCDVAPKGOf0Po9f2eBmSfWIekhO+HUdVkGGU7FYsi5wd9ZPOOLeEDtYxf/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoREKu/jk/0qzx0JL1ZHqBmU6WwlXBkDIHDahiMHPeepoyz0oG
+	QwTlSF7aE1rmONGy5+8q8pRup/ST+53q3HOSXB3Q5SCcM/RTQqsBDxJBK8wR4ab/v4f/qpicdvC
+	FrPsb9t2taF4olBE6jjsPhSm35zmnuhK+7dKQ
+X-Google-Smtp-Source: AGHT+IGoDwbKayxL5xzE6wZajGslwRdrnVXJFWNNltqAroKkGgy5sDfUc56OmQSlt11eQdDI1FCAj0JxG5Xs8SCXiV8=
+X-Received: by 2002:a05:6902:2891:b0:e26:1422:400b with SMTP id
+ 3f1490d57ef6-e337f8dbf9fmr1496961276.53.1731042225686; Thu, 07 Nov 2024
+ 21:03:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031212104.1429609-1-jiaqiyan@google.com> <ZyP6whdv4bmsI13x@linux.dev>
-In-Reply-To: <ZyP6whdv4bmsI13x@linux.dev>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Thu, 7 Nov 2024 20:54:43 -0800
-Message-ID: <CACw3F53Mz_5pqFRyZtQBuF2Qq9314ANnOc360SNM5DtkCNweaw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1] KVM: arm64: Introduce KVM_CAP_ARM_SIGBUS_ON_SEA
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, duenwen@google.com, 
-	rananta@google.com
+References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
+ <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
+ <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com> <Zy0__5YB9F5d0eZn@google.com>
+In-Reply-To: <Zy0__5YB9F5d0eZn@google.com>
+From: Zack Rusin <zack.rusin@broadcom.com>
+Date: Fri, 8 Nov 2024 00:03:34 -0500
+Message-ID: <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Doug Covelli <doug.covelli@broadcom.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
-
-Sorry for getting back to you late...
-
-On Thu, Oct 31, 2024 at 2:46=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
+On Thu, Nov 7, 2024 at 5:32=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
 >
-> Hi Jiaqi,
->
-> Thank you for sending this out.
->
-> On Thu, Oct 31, 2024 at 09:21:04PM +0000, Jiaqi Yan wrote:
-> > Currently KVM handles SEA in guest by injecting async SError into
-> > guest directly, bypassing VMM, usually results in guest kernel panic.
-> >
-> > One major situation of guest SEA is when vCPU consumes uncorrectable
-> > memory error on the physical memory. Although SError and guest kernel
-> > panic effectively stops the propagation of corrupted memory, it is not
-> > easy for VMM and guest to recover from memory error in a more graceful
-> > manner.
-> >
-> > Alternatively KVM can send a SIGBUS BUS_OBJERR to VMM/vCPU, just like
-> > how core kernel signals SIGBUS BUS_OBJERR to the poison consuming
-> > thread.
-> > In addition to the benifit that KVM's handling for SEA becomes aligned
-> > with core kernel behavior
-> > - The blast radius in VM can be limited to only the consuming thread
-> >   in guest, instead of entire guest kernel, unless the consumption is
-> >   from guest kernel.
-> > - VMM now has the chance to do its duties to stop the VM from repeatedl=
+> On Mon, Nov 04, 2024, Zack Rusin wrote:
+> > On Mon, Nov 4, 2024 at 5:13=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.c=
+om> wrote:
+> > >
+> > > On Wed, Oct 30, 2024 at 4:35=E2=80=AFAM Zack Rusin <zack.rusin@broadc=
+om.com> wrote:
+> > > >
+> > > > VMware products handle hypercalls in userspace. Give KVM the abilit=
 y
-> >   consuming corrupted data. For example, VMM can unmap the guest page
-> >   from stage-2 table to intercept forseen memory poison consumption,
-> >   and for every consumption injects SEA to EL1 with synthetic memory
-> >   error CPER.
+> > > > to run VMware guests unmodified by fowarding all hypercalls to the
+> > > > userspace.
+> > > >
+> > > > Enabling of the KVM_CAP_X86_VMWARE_HYPERCALL_ENABLE capability turn=
+s
+> > > > the feature on - it's off by default. This allows vmx's built on to=
+p
+> > > > of KVM to support VMware specific hypercalls.
+> > >
+> > > Hi Zack,
 > >
-> > Introduce a new KVM ARM capability KVM_CAP_ARM_SIGBUS_ON_SEA. VMM
-> > can opt in this new capability if it prefers SIGBUS than SError
-> > injection during VM init. Now SEA handling in KVM works as follows:
+> > Hi, Paolo.
+> >
+> > Thank you for looking at this.
+> >
+> > > is there a spec of the hypercalls that are supported by userspace? I
+> > > would like to understand if there's anything that's best handled in
+> > > the kernel.
+> >
+> > There's no spec but we have open headers listing the hypercalls.
+> > There's about a 100 of them (a few were deprecated), the full
+> > list starts here:
+> > https://github.com/vmware/open-vm-tools/blob/739c5a2f4bfd4cdda491e6a6f6=
+869d88c0bd6972/open-vm-tools/lib/include/backdoor_def.h#L97
+> > They're not well documented, but the names are pretty self-explenatory.
 >
-> I'm somewhat tempted to force the new behavior on userspace
-> unconditionally. Working back from an unexpected SError in the VM to the
-> KVM SEA handler is a bit of a mess, and can be annoying if the operator
-> can't access console logs of the VM.
-
-Ack, I also think involving VMM is preferable than injecting SError
-directly to guest.
-
+> At a quick glance, this one needs to be handled in KVM:
 >
-> As it stands today, UAPI expectations around SEAs are platform
-> dependent. If APEI claims the SEA and decides to offline a page, the
-> user will get a SIGBUS.
+>   BDOOR_CMD_VCPU_MMIO_HONORS_PAT
 >
-> So sending a SIGBUS for the case that firmware _doesn't_ claim the SEA
-> seems like a good move from a consistency PoV. But it is a decently-sized
-> change to do without explicit buy-in from userspace so let's see what
-> others think.
-
-Sounds good, I will wait for a couple of more days, and if the opt-in
-part isn't necessary to anyone else, I will remove it from the next
-revision.
-
+> and these probably should be in KVM:
 >
-> > 1. Delegate to APEI/GHES to see if SEA can be claimed by them.
-> > 2. If APEI failed to claim the SEA and KVM_CAP_ARM_SIGBUS_ON_SEA is
-> >    enabled for the VM, and the SEA is NOT about translation table,
-> >    send SIGBUS BUS_OBJERR signal with host virtual address.
-> > 3. Otherwise directly inject async SError to guest.
+>   BDOOR_CMD_GETTIME
+>   BDOOR_CMD_SIDT
+>   BDOOR_CMD_SGDT
+>   BDOOR_CMD_SLDT_STR
+>   BDOOR_CMD_GETTIMEFULL
+>   BDOOR_CMD_VCPU_LEGACY_X2APIC_OK
+>   BDOOR_CMD_STEALCLOCK
 >
-> The other reason I'm a bit lukewarm on user buy in is the UAPI suffers
-> from the same issue we do today: it depends on the platform. If the SEA
-> is claimed by APEI/GHES then the cap does nothing.
-
-Good point, yeah, the path of KVM handling SEA and sending SIGBUS
-should be treated as fallback code to APEI/GHES.
-
+> and these maybe? (it's not clear what they do, from the name alone)
 >
-> > +static int kvm_delegate_guest_sea(phys_addr_t addr, u64 esr)
-> > +{
-> > +     /* apei_claim_sea(NULL) expects to mask interrupts itself */
-> > +     lockdep_assert_irqs_enabled();
-> > +     return apei_claim_sea(NULL);
-> > +}
+>   BDOOR_CMD_GET_VCPU_INFO
+>   BDOOR_CMD_VCPU_RESERVED
+
+I'm not sure if there's any value in implementing a few of them. iirc
+there's 101 of them (as I mentioned a lot have been deprecated but
+that's for userspace, on the host we still have to do something for
+old guests using them) and, if out of those 101 we implement 100 in
+the kernel then, as far as this patch is concerned, it's no different
+than if we had 0 out of 101 because we're still going to have to exit
+to userspace to handle that 1 remaining.
+
+Unless you're saying that those would be useful to you. In which case
+I'd be glad to implement them for you, but I'd put them behind some
+kind of a cap or a kernel config because we wouldn't be using them -
+besides what Doug mentioned - we already maintain the shared code for
+them that's used on Windows, MacOS, ESX and Linux so even if we had
+them in the Linux kernel it would still make more sense to use the
+code that's shared with the other OSes to lessen the maintenance
+burden (so that changing anything within that code consistently
+changes across all the OSes).
+
+> > > If we allow forwarding _all_ hypercalls to userspace, then people wil=
+l
+> > > use it for things other than VMware and there goes all hope of
+> > > accelerating stuff in the kernel in the future.
 >
-> Consider dropping parameters from this since they're unused.
-
-Ack, will do in the next revision.
-
+> To some extent, that ship has sailed, no?  E.g. do KVM_XEN_HVM_CONFIG wit=
+h
+> KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL set, and userspace can intercept prett=
+y much
+> all hypercalls with very few side effects.
 >
-> > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-> > +{
-> > +     bool sigbus_on_sea;
-> > +     int idx;
-> > +     u64 vcpu_esr =3D kvm_vcpu_get_esr(vcpu);
-> > +     u8 fsc =3D kvm_vcpu_trap_get_fault(vcpu);
-> > +     phys_addr_t fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
-> > +     gfn_t gfn =3D fault_ipa >> PAGE_SHIFT;
-> > +     /* When FnV is set, send 0 as si_addr like what do_sea() does. */
-> > +     unsigned long hva =3D 0UL;
-> > +
-> > +     /*
-> > +      * For RAS the host kernel may handle this abort.
-> > +      * There is no need to SIGBUS VMM, or pass the error into the gue=
-st.
-> > +      */
-> > +     if (kvm_delegate_guest_sea(fault_ipa, vcpu_esr) =3D=3D 0)
-> > +             return;
-> > +
-> > +     sigbus_on_sea =3D test_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA,
-> > +                              &(vcpu->kvm->arch.flags));
-> > +
-> > +     /*
-> > +      * In addition to userspace opt-in, SIGBUS only makes sense if th=
-e
-> > +      * abort is NOT about translation table walk and NOT about hardwa=
-re
-> > +      * update of translation table.
-> > +      */
-> > +     sigbus_on_sea &=3D (fsc =3D=3D ESR_ELx_FSC_EXTABT || fsc =3D=3D E=
-SR_ELx_FSC_SECC);
+> > > So even having _some_ checks in the kernel before going out to
+> > > userspace would keep that door open, or at least try.
+> >
+> > Doug just looked at this and I think I might have an idea on how to
+> > limit the scope at least a bit: if you think it would help we could
+> > limit forwarding of hypercalls to userspace only to those that that
+> > come with a BDOOR_MAGIC (which is 0x564D5868) in eax. Would that help?
 >
-> Is this because we potentially can't determine a valid HVA for the
-> fault? Maybe these should go out to userspace still with si_addr =3D 0.
+> I don't think it addresses Paolo's concern (if I understood Paolo's conce=
+rn
+> correctly), but it would help from the perspective of allowing KVM to sup=
+port
+> VMware hypercalls and Xen/Hyper-V/KVM hypercalls in the same VM.
 
-No, it is not related to the availability of a valid HVA. In this
-patch, as long as it decides to sigbus_on_sea, si_addr can be 0 if a
-valid HVA isn't available when !kvm_vcpu_sea_far_valid (OR when
-HPFAR_EL2 cannot be translated from a valid FAR_EL2, which I think
-requires some improvement).
+Yea, I just don't think there's any realistic way we could handle all
+of those hypercalls in the kernel so I'm trying to offer some ideas on
+how to lessen the scope to make it as painless as possible. Unless you
+think we could somehow parlay my piercing blue eyes into getting those
+patches in as is, in which case let's do that ;)
 
-The code here wants to limit SIGBUS _BUS_OBJERR_ to only SEA and
-parity+ECC error, similar to the code here (for SEA)
-https://elixir.bootlin.com/linux/v6.11.6/source/arch/arm64/mm/fault.c#L771
-and here (for synchronous parity or ECC error)
-https://elixir.bootlin.com/linux/v6.11.6/source/arch/arm64/mm/fault.c#L779.
+> I also think we should add CONFIG_KVM_VMWARE from the get-go, and if we'r=
+e feeling
+> lucky, maybe even retroactively bury KVM_CAP_X86_VMWARE_BACKDOOR behind t=
+hat
+> Kconfig.  That would allow limiting the exposure to VMware specific code,=
+ e.g. if
+> KVM does end up handling hypercalls in-kernel.  And it might deter abuse =
+to some
+> extent.
 
->
-> --
-> Thanks,
-> Oliver
+I thought about that too. I was worried that even if we make it on by
+default it will require quite a bit of handholding to make sure all
+the distros include it, or otherwise on desktops Workstation still
+wouldn't work with KVM by default, I also felt a little silly trying
+to add a kernel config for those few lines that would be on pretty
+much everywhere and since we didn't implement the vmware backdoor
+functionality I didn't want to presume and try to shield a feature
+that might be in production by others with a new kernel config.
+
+z
 
