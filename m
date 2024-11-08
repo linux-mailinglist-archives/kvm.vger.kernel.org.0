@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-31244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866CA9C18CA
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:09:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E10579C18DD
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 10:12:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E74A1B2187E
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:08:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4589AB23F6A
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2024 09:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0E71E0DE0;
-	Fri,  8 Nov 2024 09:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FB71E105B;
+	Fri,  8 Nov 2024 09:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UoLLy5yS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="afwHBocK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565821E00AC
-	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499831E1022
+	for <kvm@vger.kernel.org>; Fri,  8 Nov 2024 09:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731056929; cv=none; b=PDOc6Hqe5HO5oXVxPEvyS3aCKZSLvkNOHkzBgQcxODVfoNkTZUnb8S61DIHLeJR8cnp+UNGpTM5z6IJoq3tyQ5NERh7N3vK36sYvxC5f+ziBd0j5pqYaXWmlKyLMPCusYoqqSHRV7pLK4/8tQlFMWCpKpEKbGC93FTp3NnV3KbQ=
+	t=1731057092; cv=none; b=nktFptGSLU9e8RpEAB0FsE5hzLIsrrIw2ebWaoVioRXYV0tK+upAKd6NpEPdYm5o1Qca6KWajSLFUKYHtdYfmiC/0Gn8zNmzwPYmYwf+DkmB+Dw7QPG4ovdDCoZJt9pYlNzwQK3Svw+9ChUr7ecWZm7V6ebz05lqjlbjtXjMznQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731056929; c=relaxed/simple;
-	bh=WFc3Q9Mb4YnWrd+oQcX8uE9XxGi7mkMSsY7Q/8EXo/s=;
+	s=arc-20240116; t=1731057092; c=relaxed/simple;
+	bh=P18VhREfrugG/qHzr6teADAUJc2Z4IK8RZWU+Ghq12s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tyNvPKlJt8P8+tQSgNQveMWJNZYPETjdAH4OFr3YZ80VTCIozSugoM4rKfgn7fx5mPgjhL2fPZH1zcZtHAmusGS/Cv5qwcztc3t41Dz4HLwnS5zY8jdrEU0Sk7Jua8ufI1nVG5bzfvlhcYnPuXlOUl62mX+K8Lej58Paxr8GKIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UoLLy5yS; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=O8ZTJZLoYItGWcDDpfWoWfoGLhrC/LkBPbWtp0w9ZDLrX/jpoyhSbuaAbEUM6LmIg1UZ7zMrH8X3Bvd0EWkZLi0P8Qp5wuAJR7irYInpdrqgD463g/AeFOWYW80P2fIjipHghct+vNSmStxFhZifBW6Ge/2Fdvye8X00vuCHPcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=afwHBocK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731056926;
+	s=mimecast20190719; t=1731057089;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=4zjoLu3X9DAY4JQpfTcJl0/52UxwxHvuqwd6q7efGUc=;
-	b=UoLLy5yS8Et0w4I4Ddj0Qrpcx1qsx7v0JTLZRsrGuNm7r+IjF35VwtwExoau7+5NkQ6e5T
-	Wzq/LdjV6J1pOgvnRbscKu+RixP+1FtcTrF8qRoVDTT7VPNGLv5rVE2HETmucF/nTXmphK
-	/Ni2G97lrEWp5oyWgXUfD+CS1AoreQc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0WsuT3DC9bRgfcNtNIX7eohD3jKZ/flCBZ9q9PWdOEI=;
+	b=afwHBocKo5llks//1fOhHT+4fc5x93FlwSYKhKk5xVm76hAHxS1LusyXIMINjhX3DSaA03
+	MfA0bqnRxMWkHy26trpmgMca8zyd/U6wJJs65TqJgjSG3Fjc9BS/G+W3YWqqvJFxgK5WKn
+	m4liLdEpiduj1+VXJcps/6OM1Aw/iGw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-227--3h_e7RdOUiwFEkqspTxqA-1; Fri, 08 Nov 2024 04:08:44 -0500
-X-MC-Unique: -3h_e7RdOUiwFEkqspTxqA-1
-X-Mimecast-MFC-AGG-ID: -3h_e7RdOUiwFEkqspTxqA
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43159c07193so17073665e9.0
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:08:43 -0800 (PST)
+ us-mta-106-b91A1LmZOFWL34ykj4G-0w-1; Fri, 08 Nov 2024 04:11:27 -0500
+X-MC-Unique: b91A1LmZOFWL34ykj4G-0w-1
+X-Mimecast-MFC-AGG-ID: b91A1LmZOFWL34ykj4G-0w
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d52ca258eso968384f8f.3
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2024 01:11:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731056923; x=1731661723;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4zjoLu3X9DAY4JQpfTcJl0/52UxwxHvuqwd6q7efGUc=;
-        b=PZRsD9Ld8EnzsvzfvkF6ufDH3r8OZAkfFEGu+ZQOV3XaHW3e96Qcxj03axxieNuA4P
-         jJizyL+60cTzqpkL82tvO6g2BwDdXwnAtb8qSrD2q9GzunT9s+kJzt9XUF6RqdO6GzcT
-         i7ugZlrt4OtKvRwe8601zzMZT0f+jZeLagTJxMelJl8RPD9YDbsp5/B1+gh8jNBfgxru
-         A2Dhzr2/DUQoSpmM7zNZQaIoNRkqi34+EodU6dxgtR50rfokFMRi3Yzk6kMo4L5zS94u
-         lJ7dTH7Dc/MM1XT94i5P8nDNk0v4vrKTCUyMV08GKbXIj1Fcyltxbvk4OwCboUIvjGse
-         6eCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW51lpmu8aspShgp8rii2cB8YMudTcQYKFJtg+RnchA7qE62YbXiF/3/fOF3jQPadffT54=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvMjJmt2f86K8qmf6jzRH8gUbZ7zAyo+347seoGwWObDTYHv1H
-	+aX9CbCjdPQxiU72Xl/4QMrAI3RIQ6jjMgJLGWEFG2hgztMHYGAnTqnfFdw8faMGmyrEZIEvdGS
-	XuBWql5Da/VTCoItGocz2loqdL9MkqFiruUPbUHn4HlPy/L4TWQ==
-X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr16519265e9.28.1731056922850;
-        Fri, 08 Nov 2024 01:08:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFXS+cqyTfle4rH6KhTwr187aMVV3GDgGEJWyKzmdTnx+Rn7WxfiZ/RnrVdoicvqr2Lr55snA==
-X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr16518905e9.28.1731056922486;
-        Fri, 08 Nov 2024 01:08:42 -0800 (PST)
-Received: from [192.168.10.47] ([151.49.84.243])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432aa5b5e56sm95082935e9.2.2024.11.08.01.08.40
+        d=1e100.net; s=20230601; t=1731057086; x=1731661886;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0WsuT3DC9bRgfcNtNIX7eohD3jKZ/flCBZ9q9PWdOEI=;
+        b=rfD72ohznSesPBjeIlNTAv32AmNjEYD0NYBl6WOfn0zRWNPdk/dqh8X9pUEAHVPL2w
+         oXTEDMVrbBxFOH4jLrP3RSL/ng/XnPOtImRT9GONbV1eSJiYtCePjwn6jymrCNgZ2bhk
+         U1Q/s6orhzkPWk+INndevg+E3uTQOwC5XVH5vVecz1ntkeNmNwzDfVQFufwtjC5bEIbI
+         taqEz2pk5YR5NC2rJNXcyPMki2kQNDtUy31EF9Q3UUthSUCaxixNYNiAxNqdQpt4gs9t
+         6oAb3RwFVyms5+R2N2fkxw85Oj6BIz4O8DsggavvAmY9lCbBvalO/k8mzt7JmfYXU1g7
+         nIxA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7BehJkU8msQjKnKtAdUodKRN/3BlP+WZcu7Mc6Db8Zv3YZEh6LBRisIaYhrTY8wuyHVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhMx0x6LkiQMNZKObNGV7DSdkXX6iOI83nPhDuoXtYBO98gaLJ
+	1YfYf9v152382inls/myZLVHU2ihHLqZTfr3yVupYZYN6FPC7dWaE1lnNSaXLn2R1g33ANgrpLY
+	3FkA9O6IF2oebdIQ37cKMiet9Rvhmhn4XrT5bfMyrfQWS6rwcSg==
+X-Received: by 2002:a05:6000:470c:b0:37d:36f2:e2cb with SMTP id ffacd0b85a97d-381f16180cdmr1817973f8f.0.1731057086600;
+        Fri, 08 Nov 2024 01:11:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzIFbKup5v9N/vkT3yVeYe4zKp1d/9iZQMTZ+mtjlmwHCic7JOR4NiaQ1QPh2UX2o2j7ng2Q==
+X-Received: by 2002:a05:6000:470c:b0:37d:36f2:e2cb with SMTP id ffacd0b85a97d-381f16180cdmr1817947f8f.0.1731057086207;
+        Fri, 08 Nov 2024 01:11:26 -0800 (PST)
+Received: from ?IPV6:2003:cb:c70f:b600:4a55:861a:f768:72a8? (p200300cbc70fb6004a55861af76872a8.dip0.t-ipconnect.de. [2003:cb:c70f:b600:4a55:861a:f768:72a8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97cfefsm3976303f8f.26.2024.11.08.01.11.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 01:08:41 -0800 (PST)
-Message-ID: <68770651-f7cc-4032-aabc-90c72ee648a6@redhat.com>
-Date: Fri, 8 Nov 2024 10:08:32 +0100
+        Fri, 08 Nov 2024 01:11:25 -0800 (PST)
+Message-ID: <6099e202-ef0a-4d21-958c-2c42db43a5bb@redhat.com>
+Date: Fri, 8 Nov 2024 10:11:24 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,131 +84,127 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/6] kvm: svm: Fix gctx page leak on invalid inputs
-To: Tom Lendacky <thomas.lendacky@amd.com>,
- Dionna Glaze <dionnaglaze@google.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Michael Roth <michael.roth@amd.com>,
- Brijesh Singh <brijesh.singh@amd.com>, Ashish Kalra <ashish.kalra@amd.com>
-Cc: John Allen <john.allen@amd.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
- Danilo Krummrich <dakr@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>,
- kvm@vger.kernel.org
-References: <20241105010558.1266699-1-dionnaglaze@google.com>
- <20241105010558.1266699-2-dionnaglaze@google.com>
- <867da10c-352b-317e-6ba8-7e4369000773@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [ISSUE] split_folio() and dirty IOMAP folios
+To: Matthew Wilcox <willy@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ kvm@vger.kernel.org, Zi Yan <ziy@nvidia.com>,
+ Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
+ <djwong@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+References: <4febc035-a4ff-4afe-a9a0-d127826852a9@redhat.com>
+ <ZyzmUW7rKrkIbQ0X@casper.infradead.org>
+ <ada851da-70c2-424e-b396-6153cecf7179@redhat.com>
+ <Zy0g8DdnuZxQly3b@casper.infradead.org>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <867da10c-352b-317e-6ba8-7e4369000773@amd.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zy0g8DdnuZxQly3b@casper.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/6/24 15:29, Tom Lendacky wrote:
-> On 11/4/24 19:05, Dionna Glaze wrote:
->> Ensure that snp gctx page allocation is adequately deallocated on
->> failure during snp_launch_start.
+On 07.11.24 21:20, Matthew Wilcox wrote:
+> On Thu, Nov 07, 2024 at 05:34:40PM +0100, David Hildenbrand wrote:
+>> On 07.11.24 17:09, Matthew Wilcox wrote:
+>>> On Thu, Nov 07, 2024 at 04:07:08PM +0100, David Hildenbrand wrote:
+>>>> I'm debugging an interesting problem: split_folio() will fail on dirty
+>>>> folios on XFS, and I am not sure who will trigger the writeback in a timely
+>>>> manner so code relying on the split to work at some point (in sane setups
+>>>> where page pinning is not applicable) can make progress.
+>>>
+>>> You could call something like filemap_write_and_wait_range()?
 >>
->> Fixes: 136d8bc931c8 ("KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command")
+>> Thanks, have to look into some details of that.
 >>
->> CC: Sean Christopherson <seanjc@google.com>
->> CC: Paolo Bonzini <pbonzini@redhat.com>
->> CC: Thomas Gleixner <tglx@linutronix.de>
->> CC: Ingo Molnar <mingo@redhat.com>
->> CC: Borislav Petkov <bp@alien8.de>
->> CC: Dave Hansen <dave.hansen@linux.intel.com>
->> CC: Ashish Kalra <ashish.kalra@amd.com>
->> CC: Tom Lendacky <thomas.lendacky@amd.com>
->> CC: John Allen <john.allen@amd.com>
->> CC: Herbert Xu <herbert@gondor.apana.org.au>
->> CC: "David S. Miller" <davem@davemloft.net>
->> CC: Michael Roth <michael.roth@amd.com>
->> CC: Luis Chamberlain <mcgrof@kernel.org>
->> CC: Russ Weight <russ.weight@linux.dev>
->> CC: Danilo Krummrich <dakr@redhat.com>
->> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> CC: "Rafael J. Wysocki" <rafael@kernel.org>
->> CC: Tianfei zhang <tianfei.zhang@intel.com>
->> CC: Alexey Kardashevskiy <aik@amd.com>
+>> Looks like the folio_clear_dirty_for_io() is buried in
+>> folio_prepare_writeback(), so that part is taken care of.
 >>
->> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+>> Guess I have to fo from folio to "mapping,lstart,lend" such that
+>> __filemap_fdatawrite_range() would look up the folio again. Sounds doable.
+>>
+>> (I assume I have to drop the folio lock+reference before calling that)
 > 
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> I was thinking you'd do it higher in the callchain than
+> gmap_make_secure().  Presumably userspace says "I want to make this
+> 256MB range secure" and we can start by writing back that entire
+> 256MB chunk of address space.
 > 
->> ---
->>   arch/x86/kvm/svm/sev.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 714c517dd4b72..f6e96ec0a5caa 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -2212,10 +2212,6 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>   	if (sev->snp_context)
->>   		return -EINVAL;
->>   
->> -	sev->snp_context = snp_context_create(kvm, argp);
->> -	if (!sev->snp_context)
->> -		return -ENOTTY;
->> -
->>   	if (params.flags)
->>   		return -EINVAL;
->>   
->> @@ -2230,6 +2226,10 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>   	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET)
->>   		return -EINVAL;
->>   
->> +	sev->snp_context = snp_context_create(kvm, argp);
->> +	if (!sev->snp_context)
->> +		return -ENOTTY;
->> +
->>   	start.gctx_paddr = __psp_pa(sev->snp_context);
->>   	start.policy = params.policy;
->>   	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
-> 
+> That doesn't prevent anybody from dirtying it in-between, of course,
+> so you can still get -EBUSY and have to loop round again.
 
-Applied, thanks.
+I'm afraid that won't really work.
 
-Paolo
+On the one hand, we might be allocating these pages (+disk blocks) 
+during the unpack operation -- where we essentially trigger page faults 
+first using gmap_fault() -- so the pages might not even exist before the 
+gmap_make_secure() during unpack. One work around would be to 
+preallocate+writeback from user space, but it doesn't sound quite right.
+
+But the bigger problem I see is that the initial "unpack" operation is 
+not the only case where we trigger this conversion to "secure" state. 
+Once the VM is running, we can see calls on arbitrary guest memory even 
+during page faults, when gmap_make_secure() is called via 
+gmap_convert_to_secure().
+
+
+I'm still not sure why we see essentially no progress being made, even 
+though we temporarily drop the PTL, mmap lock, folio lock, folio ref ... 
+maybe related to us triggering a write fault that somehow ends up 
+setting the folio dirty :/ Or because writeback is simply too slow / 
+backs off.
+
+I'll play with handling -EBUSY from split_folio() differently: if the 
+folio is under writeback, wait on that. If the folio is dirty, trigger 
+writeback. And I'll look into whether we really need a writable PTE, I 
+suspect not, because we are not actually "modifying" page content.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
