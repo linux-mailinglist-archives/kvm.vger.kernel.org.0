@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-31339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A1C09C2A65
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 06:51:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0659C2A68
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 06:51:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF8C31F213F8
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 05:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349FA1F213C9
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 05:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA2A14EC73;
-	Sat,  9 Nov 2024 05:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7158015443D;
+	Sat,  9 Nov 2024 05:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Vs4BBe/q"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j6AuxkNK"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2062.outbound.protection.outlook.com [40.107.237.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987FD14BF8F;
-	Sat,  9 Nov 2024 05:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF2A14EC6E;
+	Sat,  9 Nov 2024 05:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731131358; cv=fail; b=SPjnf0PoMGPcPUubHoERUJMTk3CXAnS5UT4WO9OOR3Ma+qb65pbjLKkcO0G+pxw9wvo/rVLpNmr7q5gnHXIC7hZ8SDfsY7xBFWSAKHr2llSxsxFlUK3gpKMyaI9sw237zPU1XUB6MkWCs/10Q1EMvCvjnmM/24uxrBBJSL5RvIY=
+	t=1731131360; cv=fail; b=plau+gu537ZQB63+tH3PASPieVTRpmiUeZ3liXd8dwqFPVCxr++vDHWrM8mT46Dnx9RPjZcweK3kri3Cxe7I9DfmZPiB/EgYFcTJj5bms3MGPAcESRg5pgIRZmuFtPVEUS78ikKGPUK8h5tCZ8NZOzd2h4yezbx0LMVxDc9ylWM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731131358; c=relaxed/simple;
-	bh=bXFYO9rTdO6i2O/H47RIRRSCcdl5k5Z7u1d2cCLTd/Q=;
+	s=arc-20240116; t=1731131360; c=relaxed/simple;
+	bh=23xKKbf/j1S6hNl4xZwEF2353LFR75gZbNylkWy0VPY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J0oO5EnW7FE4kIlVl1VO7uqWOOQLxKIf+dMjWLYAKHgaArKtQjbrqCDwHrhdlPsSnkOx/EVrwSxd7+Bgzlx3W/za031unrbD6Yi9vRzltb7n0QcBIYAc+VFs4O6+63tWsZmQm4Exgqba+cWac6X+6BFoqkebWWam31fhkR9kbgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Vs4BBe/q; arc=fail smtp.client-ip=40.107.92.57
+	 MIME-Version:Content-Type; b=FKw7h4psDDdZP6YkJ2rMj0QHtSJQY+hXY+L0Da4Jn995axawGRReP8R/n8G7S8dRD46bKhljNNmINya8BqX9vOwv2nH1LNiw/xGcBG/xxTgYl38TkIdTx1q+qYHgTetk3A9wgywfrAVdrAxiL6nkjlm4ggUPUJHxXcBF9xFiAfA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j6AuxkNK; arc=fail smtp.client-ip=40.107.237.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V19DnOCfd36gGSO+A/Bb93wEjA1lZ0qI8TqhDJi2GhPrq35zNUQ2Gva5CnSuyzJWvmMRPxMnSw/oI+S+Qu/rsrxY3puQ7sq1dLyHmtuSpenzFBT5q7JQZITTJXtFAX2gRAg1eGgvi3g+zYbHWGVhWQ/ytR5JaCoDCQZTGEDVVZavtuNEV/INld4wumkvDEM2JeP6q1U+wCXGQq8VfdEfpy6JPl9ivuO8yAPGYcDKELOojYZU1sr+qLnBmL9ADgiuYPv9hSd8l9ht8NzK3a8xXLzTnLcMqqwtSPgdPhP6qxedJq1mlMz/LkPksMyFrkjJISYbzZYt8zJINZUCQS3xsw==
+ b=l8B+ABRE8I4yx5KqnT+cYj0+3YHmJQjoLxWtdbMKY5MnIR+9OoG86gtl7+hP1edz+UqoPyU0Ak11erq2G8peQ++1P232GFF7yBpBGuWW3hz6JsrgiBCzmGJAf4O8qtIQxz/uApXQzY6SfHt5xgADR/yn1puIon0vLGgiWZurNxYyYe99q9V7m/RNEFblxZ0i8UpeI3y7A8XyGpo/2PGyQwQxTWKP8oD1AMgjGvevZTws2mvkWk2QxDfE+iDcZb6S6TCiIK3R0xKOOWnt9MW7+ROBMUmCwo8XfkuddL2ihh/uf3fRw4pcjImPnDRNb5k2BoHgrcZvAi7yGSIsAQAHew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+91tI5iywXyBRXTWmayMkejXNh87K1xSpnzg/y9ISXE=;
- b=n1piVh0feFcTSJpbk0p9pcRjqGAXrhFtIRV88HQXNsqjrJwm7XszU2ojSX5d7VnJsqeVr2uyuSYPGsspQtlNZZWtJrIiIBbU1exAPJWeEFkbgZu/+xEPwR1CyfAWDWYsE/TvICZr1p26N35aytq3hfnupgM1m0p6FLDU9Wyd8HQblfpl1OUdtquZSIL+D5TrpleL8jXzGYayJIgXW5MA5bcvcHss0mv1lvC2jyeOACKgWG1ltBQW4miyvEuMi5u5KqspCB98iwln1fGGQ6d49X0COUm9/Hx1YR9iklW3YPc6AhpdcOeZIFBUPS0TUHgrT7QDRrbWH1evH/WaOIJrPg==
+ bh=VDCsucoqKNwEFGz7GO3myzJx524PBXAsZR6DsVkLebw=;
+ b=c6J3dMcfEmE8JLWH769wZ5yrTsNNak7qi2OtOQbXQdDh46jNeW94NB5LDBhFVrh5bOPeSuxtZQgnNY88IFz/e+d3wbTQq3mD7SG+aQXDdjkNLhMYDfU11e/70WSRfOZ9HjUs7UZbb8oqIKNrJUXaIb4r+/5HxB4vGT7eJ6NmhZfyR7Ob0KpND8QQ2cgQ8LUbm6YjoDjPMIAdTcvcdjdinFwPED/0X9b3y5Apwlebz1FyuvoQxpiqC2lYhll11SbqHzbvJlm3FYsQVzwNexVZRaFesKK1P7sxoBo1XXp7o4xHBIXHqeRD5O+Ar7nTPk7vPKU5f5G5Wf2QfAsyYyw7xw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.233) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,17 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+91tI5iywXyBRXTWmayMkejXNh87K1xSpnzg/y9ISXE=;
- b=Vs4BBe/qpOPBDbc4pg3LEy2v3NPlIyeVfDU9+8ScQ7wu9R58OxCC2hMsAXmJRFtPM9kMfH+GHxM7w/Wp2AJcsnMsUCPm8BWz4TxSv+uL6pDmVzuWIsmMwN1ErVd0nc/CVolcMKUPbcDPfAhsu6x/OyJpDaPJ9kUbqeVsvkQoA1Yjai2TYV2IBAoaXBQiYKv3CaPHqWBv8x6gOUkD5mH0bj6KFqjy2QIhPx5GcRr8yzmngIVLNVGnwDxY9kM9E8AJLqK/rYBRdPtR94JgwgbiOt60+MLxeWbFvSZ6HjnEYcPqbMEKs8jFDu2fYtjGDbQy42463uaBM5Iz3mzczd+ffQ==
-Received: from BN9PR03CA0252.namprd03.prod.outlook.com (2603:10b6:408:ff::17)
- by DS7PR12MB8372.namprd12.prod.outlook.com (2603:10b6:8:eb::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.22; Sat, 9 Nov 2024 05:49:09 +0000
+ bh=VDCsucoqKNwEFGz7GO3myzJx524PBXAsZR6DsVkLebw=;
+ b=j6AuxkNK8uCesbS92SMSGvXKbPSjND/KaCgAvrDZKiXldI+9UX3okxt683Zd3F7z7UCgzUWnZBH8DMymVZ633XveNuIM1yFEtroY0MsQ3I+krmvgiXJLspB0eQ41YJTICs03iMH6AKwHR7sM43JHK0R1vmZLLsrY5pwUXhzqbOuQdxPr/RpzSKrUw2kgqkiQm9LmY+y5PUI8Xe/VPGTa6qCJG40Lnm7hTZO93ilLhIQ0DgiSyQePZ/e05dMnarx1IqR8Nq5xdBUYr+9onfB31XPqOwsJZBzWLGFMRHIVw0KCcs+4B/QKqDM8BL8dpNECHGHA2GuqPsUda0ssY2xFdg==
+Received: from BN9PR03CA0262.namprd03.prod.outlook.com (2603:10b6:408:ff::27)
+ by SN7PR12MB8103.namprd12.prod.outlook.com (2603:10b6:806:355::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Sat, 9 Nov
+ 2024 05:49:13 +0000
 Received: from BL02EPF0001A104.namprd05.prod.outlook.com
- (2603:10b6:408:ff:cafe::3c) by BN9PR03CA0252.outlook.office365.com
- (2603:10b6:408:ff::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.20 via Frontend
- Transport; Sat, 9 Nov 2024 05:49:09 +0000
+ (2603:10b6:408:ff:cafe::a5) by BN9PR03CA0262.outlook.office365.com
+ (2603:10b6:408:ff::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.21 via Frontend
+ Transport; Sat, 9 Nov 2024 05:49:12 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -65,18 +66,18 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.118.233) by
  BL02EPF0001A104.mail.protection.outlook.com (10.167.241.135) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.17 via Frontend Transport; Sat, 9 Nov 2024 05:49:08 +0000
+ 15.20.8137.17 via Frontend Transport; Sat, 9 Nov 2024 05:49:12 +0000
 Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
  (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 8 Nov 2024
- 21:49:01 -0800
+ 21:49:03 -0800
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 8 Nov 2024 21:49:01 -0800
+ 15.2.1544.4; Fri, 8 Nov 2024 21:49:02 -0800
 Received: from Asurada-Nvidia.nvidia.com (10.127.8.13) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 8 Nov 2024 21:49:00 -0800
+ Transport; Fri, 8 Nov 2024 21:49:01 -0800
 From: Nicolin Chen <nicolinc@nvidia.com>
 To: <maz@kernel.org>, <tglx@linutronix.de>, <bhelgaas@google.com>,
 	<alex.williamson@redhat.com>
@@ -90,9 +91,9 @@ CC: <jgg@nvidia.com>, <leonro@nvidia.com>,
 	<nipun.gupta@amd.com>, <marek.vasut+renesas@mailbox.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
 	<linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: [PATCH RFCv1 4/7] PCI/MSI: Allow __pci_enable_msi_range to pass in iova
-Date: Fri, 8 Nov 2024 21:48:49 -0800
-Message-ID: <7406707cbcf225fe8f6ec3ce497bdcfc51f27afb.1731130093.git.nicolinc@nvidia.com>
+Subject: [PATCH RFCv1 5/7] PCI/MSI: Extract a common __pci_alloc_irq_vectors function
+Date: Fri, 8 Nov 2024 21:48:50 -0800
+Message-ID: <0c09c2b1cef3eb085a2f4fd33105eb18aed2b611.1731130093.git.nicolinc@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1731130093.git.nicolinc@nvidia.com>
 References: <cover.1731130093.git.nicolinc@nvidia.com>
@@ -107,120 +108,197 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A104:EE_|DS7PR12MB8372:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a22acb9-c352-4df2-63ca-08dd00823ac0
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A104:EE_|SN7PR12MB8103:EE_
+X-MS-Office365-Filtering-Correlation-Id: a84e2032-2e31-45be-a94f-08dd00823d2e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|376014|82310400026|1800799024;
+	BCL:0;ARA:13230040|7416014|376014|1800799024|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+BxGLQyfguj1Hwk2IQFxNgNS/8XzZOQ0d+YklEHOPj3HusDo+AS++Y5mFjwO?=
- =?us-ascii?Q?pyLLdRrae+JaLcyXACFQ6iskc/sRbSAdyk/m/Due9m5ohc2RuFDlqKX+pcEE?=
- =?us-ascii?Q?DlCertcX+HZGQIWh5jjFmZzufR9OsscyWRyLCXKacHSrwENe1ckFg0rvYLpc?=
- =?us-ascii?Q?83H2VHL94/Eeyku7WfQjif0rMmzOxKIiAzvHid9MwX8BUj8yhiqWM77XO+g8?=
- =?us-ascii?Q?5okVLHe+lekTzXAHjS55p/1OdxFH6sa2TOGoUfAJa/gMWBP/w8M8JhfmPnUf?=
- =?us-ascii?Q?59LPAFnxNGnOCw3HhMwOowyjfs298jbIJH/cNV8AEF9iLyFUow0d9HQxLXqN?=
- =?us-ascii?Q?1ecZjESTpvcHf5qQQ6mMNAOsk7rLYT1kHMcBWruvtr4QEM4flgSYYCk65KlX?=
- =?us-ascii?Q?8/Ri5R3KpoFFOrQQVdhGao5ktboGbOljvG+vvwgiACL/NxREwNrX7CnsjPb5?=
- =?us-ascii?Q?ddGR9l8vY8DHMn4jr3dQZ+KJU1YWs2ttZYs/3/NuU7Bhsj97ShziyaHlWjaH?=
- =?us-ascii?Q?TBtV+bZ0upYeO7kieYAI+YsFoAAqyR9ZNeU5c4jxOYpKzBsGYXSwb+QdC+Br?=
- =?us-ascii?Q?ReodGVJURiYqX6Qxj0L7e9c2PtLwtzexJRHlw2/j+CSfZKI7flGg4sBg96Hw?=
- =?us-ascii?Q?LsYIKZkkNdVjI64IuruIt0D2Eln3UhvdWunAzVamzXvf8bBdcm9hnavshGoz?=
- =?us-ascii?Q?+CeReF6R5Vb8iR8bWjxgJl5lcGj7CeNIj3BVPmr7rG7VP+JhF0Jz0LkVFqy+?=
- =?us-ascii?Q?DLUG2wzXyXNdqPJw0T6eAz1R089QYfzXXEtHR2JdC3NKzAj0Nsaqfo3FropJ?=
- =?us-ascii?Q?x3yPQW0aUWEMTVHV+sWc1sYsa6lWMve2LbBgjVG8OnvzPVqU25M9Wpgj4aNH?=
- =?us-ascii?Q?7BNx11onfur+vErH515y6IoS0QBXHj6GQglpnrWFbV6n6HuQZiulQyERShX+?=
- =?us-ascii?Q?EFYKVFqhWm0x8fDJRHRKCLMXIv6HUWRJUpUMOCPlUqDzbe2+PB/X7C/ULIZk?=
- =?us-ascii?Q?QmEE42iNcQ6GU1X0CbhQ6pvxcj1BHtcgRsMPSxqno497m+ku82cz6v5EFucZ?=
- =?us-ascii?Q?lfy0bsPu9FnTzt4Tivka7A9fcvHVdnRRdl+1+W5+YnjUkBUGwfJP0IN46gmf?=
- =?us-ascii?Q?oCRDDIwU60uGg6/4Pi3bC6b87yBRLUqhERR6lNMibgBtTzhi8GkXM5G1vTWh?=
- =?us-ascii?Q?gRTJMFir1t0RNl8++8nYuXUAWEibuUh/V6FRIyrZy45axEgvxR3y+M4FFAN+?=
- =?us-ascii?Q?7crVnVnZjhq/6E/U4VasL+NOEMIw5l0VMclHvRH9xYjZOHdSid9PiAMwlFIE?=
- =?us-ascii?Q?b99aYH5/zvmykFMBwTTdRa9TVJPO04WztyF4+367bcOhk78+TvNKJcAf6i1E?=
- =?us-ascii?Q?H8OWm8OR5iGy1y5+Ys2Eal1jEMDdkgNYWBsP8hYayV/nf/lZvw=3D=3D?=
+	=?us-ascii?Q?jU6MCsoweLdVtWf3F1s+Vge4zLy4yxylCa+JsSdnVT62SYTR8w9DNhU03YB0?=
+ =?us-ascii?Q?BGf6pSFaRxtxiqHSJGjLQeAWbFyzL+aKAUWU3OHU6tySbixiFFxMVyQb03wN?=
+ =?us-ascii?Q?P3ZU7TXrIIWQEtM/Cj2yzxPTxdeqUZBfO1tHgtk4iMTVA7DM/Ryve3WVH6mO?=
+ =?us-ascii?Q?NgewTRKkiRUNV2UTcZBeTkwq3ee7/Pf0b0lWc6aP/xQ75TETGoAnpOEhIfER?=
+ =?us-ascii?Q?fbTenYdhanqo0ZTMftVIqr4D2mctFh/aag4LO1x/vtR/XKAmLYMDUCXEC4hv?=
+ =?us-ascii?Q?3njMMJvTfn8mA0RX7/QgFsX3vfMEg/R9IakQP2pstJIZmWzppPKDtqgix7cb?=
+ =?us-ascii?Q?oHsQgmVAn/iKFN+SHeCT64hNAwjM+KdLkwWt1yfJkr4pENYoe5UQm67M7AvP?=
+ =?us-ascii?Q?u0HT/+yagE0vaMBhnwQ0VBZOuJm2kIBpuyjwFeTAjswKThCvIcs6wxV2p+GV?=
+ =?us-ascii?Q?HIYojQ7zAjjgchF+jHJCJ+aHwSsCAGtcE4UXsbrh1gdfLkSWyG3N4hbspaJJ?=
+ =?us-ascii?Q?J1AHkmutq6eFeA63+qve6lR91VLpIODqjDrdxtVTHvAQxfhj3T+jH8ug4NXq?=
+ =?us-ascii?Q?ggV6ufAv/bZ0IjF4CzLWkm1DBAitOg6AjAOqz8ufx5Bw4YejD9N65iM9cqCE?=
+ =?us-ascii?Q?guP0rJWCt3eTcvziJDCjDA67jUlck2nRK5ZSb78FJm07lWvE5XhqmPNWEmoO?=
+ =?us-ascii?Q?c6w6XobJXoLkBqxDPVg1sp518xbeGYzjFxcv9aDqyih9lb4QhkE2zCJAcT5e?=
+ =?us-ascii?Q?md71kS+rHQRBduig0Sm5MrKJ4nwAkXBw8IDBmG6BamuEm87j0ei2D++my7uE?=
+ =?us-ascii?Q?1PpdlIgLwPjX194kHWqbGQ2an/awDuKCE0rE+M6hDUbYTBbswd+iGhD0ycPj?=
+ =?us-ascii?Q?wQKEdHYCv6YUuNl312MaQ9SIJpM+nHAKs97RdLtYcyeaAsYg92UAklNj4M+3?=
+ =?us-ascii?Q?WnEstexyfFVJxzloAu0Rha8qfy5aDQxhf7w8v/n06/k3oui06Y2cF8dWs2RD?=
+ =?us-ascii?Q?YF9z+g/WkG4Bfx5iqhS6yAkIzN+2qz7xYevXk2rXjztDZLxRnNRertLd/on6?=
+ =?us-ascii?Q?kALPJoUbiv1k8wiO0ghMMMZwp6BfmwJP5plkHz0mQeunmUaHafaAKncu7qaq?=
+ =?us-ascii?Q?pGYIZ8Ss9rCPkTg8V+Cgnf/Mw2TakP7W/ddTr0TWL3Xi3LfTwUVkKe5hKOT5?=
+ =?us-ascii?Q?ak5BFge14w2ZB5ohdhs5sWhDwfZOYYwhlK+ExHNMuz7AcoeO/JpZkF0lgqP/?=
+ =?us-ascii?Q?1NaKygJlje8YN/8Dg6pd3YKSeeTaWcPJcIeYqJ3MRBFVztujxqBpE0hTAPIW?=
+ =?us-ascii?Q?oks5s5ZganaEl++b0u+FLjI3Fn6Gmi5/Gt4t3ndjvxge9hAtiu7ZBA8nVS6E?=
+ =?us-ascii?Q?iGsX3AHIRalxALHDx5MRHw/Nq2WMA6wVwSLqBDXr9PgxVIDwsw=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2024 05:49:08.6351
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2024 05:49:12.6663
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a22acb9-c352-4df2-63ca-08dd00823ac0
+X-MS-Exchange-CrossTenant-Network-Message-Id: a84e2032-2e31-45be-a94f-08dd00823d2e
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL02EPF0001A104.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8372
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8103
 
-The previous patch passes in the msi_iova to msi_capability_init, so this
-allows its caller to do the same.
+Extract a common function from the existing callers, to prepare for a new
+helper that provides an array of msi_iovas. Also, extract the msi_iova(s)
+from the array and pass in properly down to __pci_enable_msi/msix_range().
 
 Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 ---
- drivers/pci/msi/msi.h | 3 ++-
- drivers/pci/msi/api.c | 6 ++++--
- drivers/pci/msi/msi.c | 4 ++--
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ drivers/pci/msi/api.c | 113 ++++++++++++++++++++++++++----------------
+ 1 file changed, 70 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/pci/msi/msi.h b/drivers/pci/msi/msi.h
-index ee53cf079f4e..8009d69bf9a5 100644
---- a/drivers/pci/msi/msi.h
-+++ b/drivers/pci/msi/msi.h
-@@ -93,7 +93,8 @@ extern int pci_msi_enable;
- void pci_msi_shutdown(struct pci_dev *dev);
- void pci_msix_shutdown(struct pci_dev *dev);
- void pci_free_msi_irqs(struct pci_dev *dev);
--int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec, struct irq_affinity *affd);
-+int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
-+			   struct irq_affinity *affd, dma_addr_t iova);
- int __pci_enable_msix_range(struct pci_dev *dev, struct msix_entry *entries, int minvec,
- 			    int maxvec,  struct irq_affinity *affd, int flags);
- void __pci_restore_msi_state(struct pci_dev *dev);
 diff --git a/drivers/pci/msi/api.c b/drivers/pci/msi/api.c
-index b956ce591f96..99ade7f69cd4 100644
+index 99ade7f69cd4..dff3d7350b38 100644
 --- a/drivers/pci/msi/api.c
 +++ b/drivers/pci/msi/api.c
-@@ -29,7 +29,8 @@
-  */
- int pci_enable_msi(struct pci_dev *dev)
- {
--	int rc = __pci_enable_msi_range(dev, 1, 1, NULL);
-+	int rc = __pci_enable_msi_range(dev, 1, 1, NULL,
-+					PHYS_ADDR_MAX);
- 	if (rc < 0)
- 		return rc;
- 	return 0;
-@@ -274,7 +275,8 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
- 	}
- 
- 	if (flags & PCI_IRQ_MSI) {
--		nvecs = __pci_enable_msi_range(dev, min_vecs, max_vecs, affd);
-+		nvecs = __pci_enable_msi_range(dev, min_vecs, max_vecs,
-+					       affd, PHYS_ADDR_MAX);
- 		if (nvecs > 0)
- 			return nvecs;
- 	}
-diff --git a/drivers/pci/msi/msi.c b/drivers/pci/msi/msi.c
-index 95caa81d3421..25da0435c674 100644
---- a/drivers/pci/msi/msi.c
-+++ b/drivers/pci/msi/msi.c
-@@ -417,7 +417,7 @@ static int msi_capability_init(struct pci_dev *dev, int nvec,
+@@ -204,6 +204,72 @@ void pci_disable_msix(struct pci_dev *dev)
  }
+ EXPORT_SYMBOL(pci_disable_msix);
  
- int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
--			   struct irq_affinity *affd)
-+			   struct irq_affinity *affd, dma_addr_t iova)
++static int __pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
++				   unsigned int max_vecs, unsigned int flags,
++				   struct irq_affinity *affd,
++				   dma_addr_t *msi_iovas)
++{
++	struct irq_affinity msi_default_affd = {0};
++	int nvecs = -ENOSPC;
++
++	if (flags & PCI_IRQ_AFFINITY) {
++		if (!affd)
++			affd = &msi_default_affd;
++	} else {
++		if (WARN_ON(affd))
++			affd = NULL;
++	}
++
++	if (flags & PCI_IRQ_MSIX) {
++		struct msix_entry *entries = NULL;
++
++		if (msi_iovas) {
++			int count = max_vecs - min_vecs + 1;
++			int i;
++
++			entries = kcalloc(max_vecs - min_vecs + 1,
++					  sizeof(*entries), GFP_KERNEL);
++			if (!entries)
++				return -ENOMEM;
++			for (i = 0; i < count; i++) {
++				entries[i].entry = i;
++				entries[i].iova = msi_iovas[i];
++			}
++		}
++
++		nvecs = __pci_enable_msix_range(dev, entries, min_vecs,
++						max_vecs, affd, flags);
++		kfree(entries);
++		if (nvecs > 0)
++			return nvecs;
++	}
++
++	if (flags & PCI_IRQ_MSI) {
++		nvecs = __pci_enable_msi_range(dev, min_vecs, max_vecs, affd,
++					       msi_iovas ? *msi_iovas :
++							   PHYS_ADDR_MAX);
++		if (nvecs > 0)
++			return nvecs;
++	}
++
++	/* use INTx IRQ if allowed */
++	if (flags & PCI_IRQ_INTX) {
++		if (min_vecs == 1 && dev->irq) {
++			/*
++			 * Invoke the affinity spreading logic to ensure that
++			 * the device driver can adjust queue configuration
++			 * for the single interrupt case.
++			 */
++			if (affd)
++				irq_create_affinity_masks(1, affd);
++			pci_intx(dev, 1);
++			return 1;
++		}
++	}
++
++	return nvecs;
++}
++
+ /**
+  * pci_alloc_irq_vectors() - Allocate multiple device interrupt vectors
+  * @dev:      the PCI device to operate on
+@@ -235,8 +301,8 @@ EXPORT_SYMBOL(pci_disable_msix);
+ int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+ 			  unsigned int max_vecs, unsigned int flags)
  {
- 	int nvec;
- 	int rc;
-@@ -460,7 +460,7 @@ int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
- 				return -ENOSPC;
- 		}
+-	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
+-					      flags, NULL);
++	return __pci_alloc_irq_vectors(dev, min_vecs, max_vecs,
++				       flags, NULL, NULL);
+ }
+ EXPORT_SYMBOL(pci_alloc_irq_vectors);
  
--		rc = msi_capability_init(dev, nvec, affd, PHYS_ADDR_MAX);
-+		rc = msi_capability_init(dev, nvec, affd, iova);
- 		if (rc == 0)
- 			return nvec;
+@@ -256,47 +322,8 @@ int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+ 				   unsigned int max_vecs, unsigned int flags,
+ 				   struct irq_affinity *affd)
+ {
+-	struct irq_affinity msi_default_affd = {0};
+-	int nvecs = -ENOSPC;
+-
+-	if (flags & PCI_IRQ_AFFINITY) {
+-		if (!affd)
+-			affd = &msi_default_affd;
+-	} else {
+-		if (WARN_ON(affd))
+-			affd = NULL;
+-	}
+-
+-	if (flags & PCI_IRQ_MSIX) {
+-		nvecs = __pci_enable_msix_range(dev, NULL, min_vecs, max_vecs,
+-						affd, flags);
+-		if (nvecs > 0)
+-			return nvecs;
+-	}
+-
+-	if (flags & PCI_IRQ_MSI) {
+-		nvecs = __pci_enable_msi_range(dev, min_vecs, max_vecs,
+-					       affd, PHYS_ADDR_MAX);
+-		if (nvecs > 0)
+-			return nvecs;
+-	}
+-
+-	/* use INTx IRQ if allowed */
+-	if (flags & PCI_IRQ_INTX) {
+-		if (min_vecs == 1 && dev->irq) {
+-			/*
+-			 * Invoke the affinity spreading logic to ensure that
+-			 * the device driver can adjust queue configuration
+-			 * for the single interrupt case.
+-			 */
+-			if (affd)
+-				irq_create_affinity_masks(1, affd);
+-			pci_intx(dev, 1);
+-			return 1;
+-		}
+-	}
+-
+-	return nvecs;
++	return __pci_alloc_irq_vectors(dev, min_vecs, max_vecs,
++				       flags, affd, NULL);
+ }
+ EXPORT_SYMBOL(pci_alloc_irq_vectors_affinity);
  
 -- 
 2.43.0
