@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-31376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31377-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61B999C3282
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 14:51:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4059C3288
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 14:52:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E81E21F210E7
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 13:51:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5329C1C2217D
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 13:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC6482D91;
-	Sun, 10 Nov 2024 13:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA40A1946C2;
+	Sun, 10 Nov 2024 13:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QyY++tR7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdR/vQXF"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6324CDEC;
-	Sun, 10 Nov 2024 13:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0736884FAD;
+	Sun, 10 Nov 2024 13:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731246498; cv=none; b=gv3aXgMZK4pGEPnAhGKbZ+wl3PKv04GxqZQVTxZRzY+uwHu1AnVaJayPmhQLDNQgOC2pI/UjTIKdBtQeMil215iYH7x9rwqi65GIDVRvybiqIg3HYUqII0m7tpKt+5mDfmjDaIi+g2aXr0H+oI5XRdBZtuTDhBKMdGs/CFdK10w=
+	t=1731246504; cv=none; b=uNdZEfDjPJ3DIjUY8eRwqedk62x+ff//5jSVxvXH8zTRFeQLq9s5mLh3e4pNaNSdHq//gKRRnudQM/Vk+aGRalP4cqM0mQeeqFsN75KEbLyY9GgYaS6SmP81nuT3BjkjR3kBkRIZsX1rfDxl3kIvU8zU2sMW/sYV1DZ39O8FxEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731246498; c=relaxed/simple;
-	bh=OVMuvqTci96EKbY7lmU5/zGTKOUOeaUCfE9+tMX5WxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hQpMW2SVzTuylJB6eK4zS9kyrZ57TgeTMPJ7GPQZcJAz+vgjRg3o0t0U1zCMpPryW2O4TLNZrpyLs331Cj9qLxTQ3Tlwb0CgkIGkMM6TEQx089IR8tyBrbI6gz8SXh/76lcHcBPVPR7NMIlDh4SRv766qI00Phlzm9kYV0QDbY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QyY++tR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC700C4CED0;
-	Sun, 10 Nov 2024 13:48:16 +0000 (UTC)
+	s=arc-20240116; t=1731246504; c=relaxed/simple;
+	bh=d+uKs0GYZW5W2UKBX1M+yeru6myD2v4gQMKNi0BRyd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IIfWHmBc0yrbtbMSMl/967sV2nTrFne8wyQaaO8KZS0Bid5u03abWzidfT7m5CySWjRqpjLApOptWC1X+ZCLUFogIaa8Dcl+eeRaUkYYqd0VXHwQJIzl1Nl8nCnH2enk8Pl7LJb9XTjUJMYzEpnoTyacB6pG60b4xx1WCZ+X/AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdR/vQXF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DEC3C4CED0;
+	Sun, 10 Nov 2024 13:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731246497;
-	bh=OVMuvqTci96EKbY7lmU5/zGTKOUOeaUCfE9+tMX5WxA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QyY++tR7SpkClag0xkz2EwzAMumld5UIL5id/PBMWc0U4lHDmDa7kmmbW47mgUOZv
-	 xnjoQl9JK8QPuxUUQK8Ux8R8k3LwDcjn6m+iB2JOTobxz1/Lg12TNVXGloV63uDaTk
-	 Azy7vw++ep46f36AodKlSKTRGmWDFUv0/eVa+qSdup6b9SFtqV1MxQEDoAwYdM0mkM
-	 M6MSl8uy98mPTYlLkq/bPf1ddeZtVe/yExD+b57RmYYvBLv2gRaRy8FBFQQh1pQlJo
-	 dULFoqYNCnx6t8Z78aAt5hC0GQr53XMov0Pmrwp5OvRXX7U604j0bUSnMDrKfGZ6kP
-	 cnAkFWgJ0T4WQ==
+	s=k20201202; t=1731246503;
+	bh=d+uKs0GYZW5W2UKBX1M+yeru6myD2v4gQMKNi0BRyd0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DdR/vQXFHPgS3BZenwffB//VagsS3KtxnYzufIIukWw5XGuEBSbohgjtdouNIXjq9
+	 8u8tZp0UYSims/JFF7anbcAqFvRlwgATR9E8a+5JKGz6sSQxuXTqu1xwAZHV8kGkyi
+	 0JPblvlhHZPUJoLoljMhDxABgUDF8UDeb58weJ44+paDldUth90fe23LRU4Zr0rIZ6
+	 NrKML3awO2k1IyE0UxeH/novgss8H87Dznt6AdMsnUx3il0iw9l/uX5g4+g0rmbdUb
+	 Wrgfha9h34jendbnLKyy85P8vLr+FDI8cBPpo8OMHqK1ACQmF1TgmUQltZ4K3az7Qp
+	 QC3rdNXWO9xbg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -70,10 +71,12 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 11/17] mm/hmm: provide generic DMA managing logic
-Date: Sun, 10 Nov 2024 15:46:58 +0200
-Message-ID: <a42f5a1ede10d4181c5cab3c88ed43a04be79565.1731245995.git.leon@kernel.org>
+Subject: [PATCH v3 12/17] RDMA/umem: Store ODP access mask information in PFN
+Date: Sun, 10 Nov 2024 15:46:59 +0200
+Message-ID: <2c8de8796a52d408e5e74785962630f9ece08b8e.1731244445.git.leon@kernel.org>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <cover.1731244445.git.leon@kernel.org>
+References: <cover.1731244445.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,326 +87,326 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-HMM callers use PFN list to populate range while calling
-to hmm_range_fault(), the conversion from PFN to DMA address
-is done by the callers with help of another DMA list. However,
-it is wasteful on any modern platform and by doing the right
-logic, that DMA list can be avoided.
-
-Provide generic logic to manage these lists and gave an interface
-to map/unmap PFNs to DMA addresses, without requiring from the callers
-to be an experts in DMA core API.
+As a preparation to remove dma_list, store access mask in PFN pointer
+and not in dma_addr_t.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/linux/hmm-dma.h |  32 ++++++
- include/linux/hmm.h     |   4 +
- mm/hmm.c                | 213 +++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 248 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/hmm-dma.h
+ drivers/infiniband/core/umem_odp.c   | 100 +++++++++++----------------
+ drivers/infiniband/hw/mlx5/mlx5_ib.h |   1 +
+ drivers/infiniband/hw/mlx5/odp.c     |  37 +++++-----
+ include/rdma/ib_umem_odp.h           |  14 +---
+ 4 files changed, 61 insertions(+), 91 deletions(-)
 
-diff --git a/include/linux/hmm-dma.h b/include/linux/hmm-dma.h
-new file mode 100644
-index 000000000000..f6ce2a00d74d
---- /dev/null
-+++ b/include/linux/hmm-dma.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
-+#ifndef LINUX_HMM_DMA_H
-+#define LINUX_HMM_DMA_H
-+
-+#include <linux/dma-mapping.h>
-+
-+struct dma_iova_state;
-+struct pci_p2pdma_map_state;
-+
-+/*
-+ * struct hmm_dma_map - array of PFNs and DMA addresses
-+ *
-+ * @state: DMA IOVA state
-+ * @pfns: array of PFNs
-+ * @dma_list: array of DMA addresses
-+ * @dma_entry_size: size of each DMA entry in the array
-+ */
-+struct hmm_dma_map {
-+	struct dma_iova_state state;
-+	unsigned long *pfn_list;
-+	dma_addr_t *dma_list;
-+	size_t dma_entry_size;
-+};
-+
-+int hmm_dma_map_alloc(struct device *dev, struct hmm_dma_map *map,
-+		      size_t nr_entries, size_t dma_entry_size);
-+void hmm_dma_map_free(struct device *dev, struct hmm_dma_map *map);
-+dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
-+			   size_t idx, struct pci_p2pdma_map_state *p2pdma_state);
-+bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx);
-+#endif /* LINUX_HMM_DMA_H */
-diff --git a/include/linux/hmm.h b/include/linux/hmm.h
-index a1ddbedc19c0..1bc33e4c20ea 100644
---- a/include/linux/hmm.h
-+++ b/include/linux/hmm.h
-@@ -23,6 +23,8 @@ struct mmu_interval_notifier;
-  * HMM_PFN_WRITE - if the page memory can be written to (requires HMM_PFN_VALID)
-  * HMM_PFN_ERROR - accessing the pfn is impossible and the device should
-  *                 fail. ie poisoned memory, special pages, no vma, etc
-+ * HMM_PFN_P2PDMA - P2P page
-+ * HMM_PFN_P2PDMA_BUS - Bus mapped P2P transfer
-  * HMM_PFN_DMA_MAPPED - Flag preserved on input-to-output transformation
-  *                      to mark that page is already DMA mapped
-  *
-@@ -43,6 +45,8 @@ enum hmm_pfn_flags {
- 	 * Sticky flags, carried from input to output,
- 	 * don't forget to update HMM_PFN_INOUT_FLAGS
- 	 */
-+	HMM_PFN_P2PDMA     = 1UL << (BITS_PER_LONG - 5),
-+	HMM_PFN_P2PDMA_BUS = 1UL << (BITS_PER_LONG - 6),
- 	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
+diff --git a/drivers/infiniband/core/umem_odp.c b/drivers/infiniband/core/umem_odp.c
+index e9fa22d31c23..9dba369365af 100644
+--- a/drivers/infiniband/core/umem_odp.c
++++ b/drivers/infiniband/core/umem_odp.c
+@@ -296,22 +296,11 @@ EXPORT_SYMBOL(ib_umem_odp_release);
+ static int ib_umem_odp_map_dma_single_page(
+ 		struct ib_umem_odp *umem_odp,
+ 		unsigned int dma_index,
+-		struct page *page,
+-		u64 access_mask)
++		struct page *page)
+ {
+ 	struct ib_device *dev = umem_odp->umem.ibdev;
+ 	dma_addr_t *dma_addr = &umem_odp->dma_list[dma_index];
  
- 	HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 8),
-diff --git a/mm/hmm.c b/mm/hmm.c
-index c16cfa03430c..e4d94615c032 100644
---- a/mm/hmm.c
-+++ b/mm/hmm.c
-@@ -10,6 +10,7 @@
-  */
- #include <linux/pagewalk.h>
- #include <linux/hmm.h>
-+#include <linux/hmm-dma.h>
- #include <linux/init.h>
- #include <linux/rmap.h>
- #include <linux/swap.h>
-@@ -23,6 +24,7 @@
- #include <linux/sched/mm.h>
- #include <linux/jump_label.h>
- #include <linux/dma-mapping.h>
-+#include <linux/pci-p2pdma.h>
- #include <linux/mmu_notifier.h>
- #include <linux/memory_hotplug.h>
- 
-@@ -41,7 +43,8 @@ enum {
- 
- enum {
- 	/* These flags are carried from input-to-output */
--	HMM_PFN_INOUT_FLAGS = HMM_PFN_DMA_MAPPED,
-+	HMM_PFN_INOUT_FLAGS = HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA |
-+			      HMM_PFN_P2PDMA_BUS,
- };
- 
- static int hmm_pfns_fill(unsigned long addr, unsigned long end,
-@@ -620,3 +623,211 @@ int hmm_range_fault(struct hmm_range *range)
- 	return ret;
+-	if (*dma_addr) {
+-		/*
+-		 * If the page is already dma mapped it means it went through
+-		 * a non-invalidating trasition, like read-only to writable.
+-		 * Resync the flags.
+-		 */
+-		*dma_addr = (*dma_addr & ODP_DMA_ADDR_MASK) | access_mask;
+-		return 0;
+-	}
+-
+ 	*dma_addr = ib_dma_map_page(dev, page, 0, 1 << umem_odp->page_shift,
+ 				    DMA_BIDIRECTIONAL);
+ 	if (ib_dma_mapping_error(dev, *dma_addr)) {
+@@ -319,7 +308,6 @@ static int ib_umem_odp_map_dma_single_page(
+ 		return -EFAULT;
+ 	}
+ 	umem_odp->npages++;
+-	*dma_addr |= access_mask;
+ 	return 0;
  }
- EXPORT_SYMBOL(hmm_range_fault);
-+
-+/**
-+ * hmm_dma_map_alloc - Allocate HMM map structure
-+ * @dev: device to allocate structure for
-+ * @map: HMM map to allocate
-+ * @nr_entries: number of entries in the map
-+ * @dma_entry_size: size of the DMA entry in the map
-+ *
-+ * Allocate the HMM map structure and all the lists it contains.
-+ * Return 0 on success, -ENOMEM on failure.
-+ */
-+int hmm_dma_map_alloc(struct device *dev, struct hmm_dma_map *map,
-+		      size_t nr_entries, size_t dma_entry_size)
-+{
-+	bool dma_need_sync = false;
-+	bool use_iova;
-+
-+	if (!(nr_entries * PAGE_SIZE / dma_entry_size))
-+		return -EINVAL;
-+
-+	/*
-+	 * The HMM API violates our normal DMA buffer ownership rules and can't
-+	 * transfer buffer ownership.  The dma_addressing_limited() check is a
-+	 * best approximation to ensure no swiotlb buffering happens.
-+	 */
-+#ifdef CONFIG_DMA_NEED_SYNC
-+	dma_need_sync = !dev->dma_skip_sync;
-+#endif /* CONFIG_DMA_NEED_SYNC */
-+	if (dma_need_sync || dma_addressing_limited(dev))
-+		return -EOPNOTSUPP;
-+
-+	map->dma_entry_size = dma_entry_size;
-+	map->pfn_list =
-+		kvcalloc(nr_entries, sizeof(*map->pfn_list), GFP_KERNEL);
-+	if (!map->pfn_list)
-+		return -ENOMEM;
-+
-+	use_iova = dma_iova_try_alloc(dev, &map->state, 0,
-+			nr_entries * PAGE_SIZE);
-+	if (!use_iova && dma_need_unmap(dev)) {
-+		map->dma_list = kvcalloc(nr_entries, sizeof(*map->dma_list),
-+					 GFP_KERNEL);
-+		if (!map->dma_list)
-+			goto err_dma;
-+	}
-+	return 0;
-+
-+err_dma:
-+	kvfree(map->pfn_list);
-+	return -ENOMEM;
-+}
-+EXPORT_SYMBOL_GPL(hmm_dma_map_alloc);
-+
-+/**
-+ * hmm_dma_map_free - iFree HMM map structure
-+ * @dev: device to free structure from
-+ * @map: HMM map containing the various lists and state
-+ *
-+ * Free the HMM map structure and all the lists it contains.
-+ */
-+void hmm_dma_map_free(struct device *dev, struct hmm_dma_map *map)
-+{
-+	if (dma_use_iova(&map->state))
-+		dma_iova_free(dev, &map->state);
-+	kvfree(map->pfn_list);
-+	kvfree(map->dma_list);
-+}
-+EXPORT_SYMBOL_GPL(hmm_dma_map_free);
-+
-+/**
-+ * hmm_dma_map_pfn - Map a physical HMM page to DMA address
-+ * @dev: Device to map the page for
-+ * @map: HMM map
-+ * @idx: Index into the PFN and dma address arrays
-+ * @pci_p2pdma_map_state: PCI P2P state.
-+ *
-+ * dma_alloc_iova() allocates IOVA based on the size specified by their use in
-+ * iova->size. Call this function after IOVA allocation to link whole @page
-+ * to get the DMA address. Note that very first call to this function
-+ * will have @offset set to 0 in the IOVA space allocated from
-+ * dma_alloc_iova(). For subsequent calls to this function on same @iova,
-+ * @offset needs to be advanced by the caller with the size of previous
-+ * page that was linked + DMA address returned for the previous page that was
-+ * linked by this function.
-+ */
-+dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
-+			   size_t idx, struct pci_p2pdma_map_state *p2pdma_state)
-+{
-+	struct dma_iova_state *state = &map->state;
-+	dma_addr_t *dma_addrs = map->dma_list;
-+	unsigned long *pfns = map->pfn_list;
-+	struct page *page = hmm_pfn_to_page(pfns[idx]);
-+	phys_addr_t paddr = hmm_pfn_to_phys(pfns[idx]);
-+	size_t offset = idx * map->dma_entry_size;
-+	unsigned long attrs = 0;
-+	dma_addr_t dma_addr;
-+	int ret;
-+
-+	if ((pfns[idx] & HMM_PFN_DMA_MAPPED) &&
-+	    !(pfns[idx] & HMM_PFN_P2PDMA_BUS)) {
+ 
+@@ -355,9 +343,6 @@ int ib_umem_odp_map_dma_and_lock(struct ib_umem_odp *umem_odp, u64 user_virt,
+ 	struct hmm_range range = {};
+ 	unsigned long timeout;
+ 
+-	if (access_mask == 0)
+-		return -EINVAL;
+-
+ 	if (user_virt < ib_umem_start(umem_odp) ||
+ 	    user_virt + bcnt > ib_umem_end(umem_odp))
+ 		return -EFAULT;
+@@ -383,7 +368,7 @@ int ib_umem_odp_map_dma_and_lock(struct ib_umem_odp *umem_odp, u64 user_virt,
+ 	if (fault) {
+ 		range.default_flags = HMM_PFN_REQ_FAULT;
+ 
+-		if (access_mask & ODP_WRITE_ALLOWED_BIT)
++		if (access_mask & HMM_PFN_WRITE)
+ 			range.default_flags |= HMM_PFN_REQ_WRITE;
+ 	}
+ 
+@@ -415,22 +400,17 @@ int ib_umem_odp_map_dma_and_lock(struct ib_umem_odp *umem_odp, u64 user_virt,
+ 	for (pfn_index = 0; pfn_index < num_pfns;
+ 		pfn_index += 1 << (page_shift - PAGE_SHIFT), dma_index++) {
+ 
+-		if (fault) {
+-			/*
+-			 * Since we asked for hmm_range_fault() to populate
+-			 * pages it shouldn't return an error entry on success.
+-			 */
+-			WARN_ON(range.hmm_pfns[pfn_index] & HMM_PFN_ERROR);
+-			WARN_ON(!(range.hmm_pfns[pfn_index] & HMM_PFN_VALID));
+-		} else {
+-			if (!(range.hmm_pfns[pfn_index] & HMM_PFN_VALID)) {
+-				WARN_ON(umem_odp->dma_list[dma_index]);
+-				continue;
+-			}
+-			access_mask = ODP_READ_ALLOWED_BIT;
+-			if (range.hmm_pfns[pfn_index] & HMM_PFN_WRITE)
+-				access_mask |= ODP_WRITE_ALLOWED_BIT;
+-		}
 +		/*
-+		 * We are in this flow when there is a need to resync flags,
-+		 * for example when page was already linked in prefetch call
-+		 * with READ flag and now we need to add WRITE flag
-+		 *
-+		 * This page was already programmed to HW and we don't want/need
-+		 * to unlink and link it again just to resync flags.
++		 * Since we asked for hmm_range_fault() to populate
++		 * pages it shouldn't return an error entry on success.
 +		 */
-+		if (dma_use_iova(state))
-+			return state->addr + offset;
++		WARN_ON(fault && range.hmm_pfns[pfn_index] & HMM_PFN_ERROR);
++		WARN_ON(fault && !(range.hmm_pfns[pfn_index] & HMM_PFN_VALID));
++		if (!(range.hmm_pfns[pfn_index] & HMM_PFN_VALID))
++			continue;
 +
-+		/*
-+		 * Without dma_need_unmap, the dma_addrs array is NULL, thus we
-+		 * need to regenerate the address below even if there already
-+		 * was a mapping. But !dma_need_unmap implies that the
-+		 * mapping stateless, so this is fine.
-+		 */
-+		if (dma_need_unmap(dev))
-+			return dma_addrs[idx];
++		if (range.hmm_pfns[pfn_index] & HMM_PFN_DMA_MAPPED)
++			continue;
+ 
+ 		hmm_order = hmm_pfn_to_map_order(range.hmm_pfns[pfn_index]);
+ 		/* If a hugepage was detected and ODP wasn't set for, the umem
+@@ -445,13 +425,13 @@ int ib_umem_odp_map_dma_and_lock(struct ib_umem_odp *umem_odp, u64 user_virt,
+ 		}
+ 
+ 		ret = ib_umem_odp_map_dma_single_page(
+-				umem_odp, dma_index, hmm_pfn_to_page(range.hmm_pfns[pfn_index]),
+-				access_mask);
++				umem_odp, dma_index, hmm_pfn_to_page(range.hmm_pfns[pfn_index]));
+ 		if (ret < 0) {
+ 			ibdev_dbg(umem_odp->umem.ibdev,
+ 				  "ib_umem_odp_map_dma_single_page failed with error %d\n", ret);
+ 			break;
+ 		}
++		range.hmm_pfns[pfn_index] |= HMM_PFN_DMA_MAPPED;
+ 	}
+ 	/* upon success lock should stay on hold for the callee */
+ 	if (!ret)
+@@ -471,7 +451,6 @@ EXPORT_SYMBOL(ib_umem_odp_map_dma_and_lock);
+ void ib_umem_odp_unmap_dma_pages(struct ib_umem_odp *umem_odp, u64 virt,
+ 				 u64 bound)
+ {
+-	dma_addr_t dma_addr;
+ 	dma_addr_t dma;
+ 	int idx;
+ 	u64 addr;
+@@ -482,34 +461,35 @@ void ib_umem_odp_unmap_dma_pages(struct ib_umem_odp *umem_odp, u64 virt,
+ 	virt = max_t(u64, virt, ib_umem_start(umem_odp));
+ 	bound = min_t(u64, bound, ib_umem_end(umem_odp));
+ 	for (addr = virt; addr < bound; addr += BIT(umem_odp->page_shift)) {
++		unsigned long pfn_idx = (addr - ib_umem_start(umem_odp)) >> PAGE_SHIFT;
++		struct page *page = hmm_pfn_to_page(umem_odp->pfn_list[pfn_idx]);
 +
-+		/* Continue to remapping */
-+	}
+ 		idx = (addr - ib_umem_start(umem_odp)) >> umem_odp->page_shift;
+ 		dma = umem_odp->dma_list[idx];
+ 
+-		/* The access flags guaranteed a valid DMA address in case was NULL */
+-		if (dma) {
+-			unsigned long pfn_idx = (addr - ib_umem_start(umem_odp)) >> PAGE_SHIFT;
+-			struct page *page = hmm_pfn_to_page(umem_odp->pfn_list[pfn_idx]);
+-
+-			dma_addr = dma & ODP_DMA_ADDR_MASK;
+-			ib_dma_unmap_page(dev, dma_addr,
+-					  BIT(umem_odp->page_shift),
+-					  DMA_BIDIRECTIONAL);
+-			if (dma & ODP_WRITE_ALLOWED_BIT) {
+-				struct page *head_page = compound_head(page);
+-				/*
+-				 * set_page_dirty prefers being called with
+-				 * the page lock. However, MMU notifiers are
+-				 * called sometimes with and sometimes without
+-				 * the lock. We rely on the umem_mutex instead
+-				 * to prevent other mmu notifiers from
+-				 * continuing and allowing the page mapping to
+-				 * be removed.
+-				 */
+-				set_page_dirty(head_page);
+-			}
+-			umem_odp->dma_list[idx] = 0;
+-			umem_odp->npages--;
++		if (!(umem_odp->pfn_list[pfn_idx] & HMM_PFN_VALID))
++			goto clear;
++		if (!(umem_odp->pfn_list[pfn_idx] & HMM_PFN_DMA_MAPPED))
++			goto clear;
 +
-+	switch (pci_p2pdma_state(p2pdma_state, dev, page)) {
-+	case PCI_P2PDMA_MAP_NONE:
-+		break;
-+	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-+		attrs |= DMA_ATTR_SKIP_CPU_SYNC;
-+		pfns[idx] |= HMM_PFN_P2PDMA;
-+		break;
-+	case PCI_P2PDMA_MAP_BUS_ADDR:
-+		pfns[idx] |= HMM_PFN_P2PDMA_BUS | HMM_PFN_DMA_MAPPED;
-+		return pci_p2pdma_bus_addr_map(p2pdma_state, paddr);
-+	default:
-+		return DMA_MAPPING_ERROR;
-+	}
++		ib_dma_unmap_page(dev, dma, BIT(umem_odp->page_shift),
++				  DMA_BIDIRECTIONAL);
++		if (umem_odp->pfn_list[pfn_idx] & HMM_PFN_WRITE) {
++			struct page *head_page = compound_head(page);
++			/*
++			 * set_page_dirty prefers being called with
++			 * the page lock. However, MMU notifiers are
++			 * called sometimes with and sometimes without
++			 * the lock. We rely on the umem_mutex instead
++			 * to prevent other mmu notifiers from
++			 * continuing and allowing the page mapping to
++			 * be removed.
++			 */
++			set_page_dirty(head_page);
+ 		}
++		umem_odp->npages--;
++clear:
++		umem_odp->pfn_list[pfn_idx] &= ~HMM_PFN_FLAGS;
+ 	}
+ }
+ EXPORT_SYMBOL(ib_umem_odp_unmap_dma_pages);
+diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+index 23fd72f7f63d..3e4aaa6319db 100644
+--- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
++++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+@@ -336,6 +336,7 @@ struct mlx5_ib_flow_db {
+ #define MLX5_IB_UPD_XLT_PD	      BIT(4)
+ #define MLX5_IB_UPD_XLT_ACCESS	      BIT(5)
+ #define MLX5_IB_UPD_XLT_INDIRECT      BIT(6)
++#define MLX5_IB_UPD_XLT_DOWNGRADE     BIT(7)
+ 
+ /* Private QP creation flags to be passed in ib_qp_init_attr.create_flags.
+  *
+diff --git a/drivers/infiniband/hw/mlx5/odp.c b/drivers/infiniband/hw/mlx5/odp.c
+index 4b37446758fd..78887500ce15 100644
+--- a/drivers/infiniband/hw/mlx5/odp.c
++++ b/drivers/infiniband/hw/mlx5/odp.c
+@@ -34,6 +34,7 @@
+ #include <linux/kernel.h>
+ #include <linux/dma-buf.h>
+ #include <linux/dma-resv.h>
++#include <linux/hmm.h>
+ 
+ #include "mlx5_ib.h"
+ #include "cmd.h"
+@@ -158,22 +159,12 @@ static void populate_klm(struct mlx5_klm *pklm, size_t idx, size_t nentries,
+ 	}
+ }
+ 
+-static u64 umem_dma_to_mtt(dma_addr_t umem_dma)
+-{
+-	u64 mtt_entry = umem_dma & ODP_DMA_ADDR_MASK;
+-
+-	if (umem_dma & ODP_READ_ALLOWED_BIT)
+-		mtt_entry |= MLX5_IB_MTT_READ;
+-	if (umem_dma & ODP_WRITE_ALLOWED_BIT)
+-		mtt_entry |= MLX5_IB_MTT_WRITE;
+-
+-	return mtt_entry;
+-}
+-
+ static void populate_mtt(__be64 *pas, size_t idx, size_t nentries,
+ 			 struct mlx5_ib_mr *mr, int flags)
+ {
+ 	struct ib_umem_odp *odp = to_ib_umem_odp(mr->umem);
++	bool downgrade = flags & MLX5_IB_UPD_XLT_DOWNGRADE;
++	unsigned long pfn;
+ 	dma_addr_t pa;
+ 	size_t i;
+ 
+@@ -181,8 +172,17 @@ static void populate_mtt(__be64 *pas, size_t idx, size_t nentries,
+ 		return;
+ 
+ 	for (i = 0; i < nentries; i++) {
++		pfn = odp->pfn_list[idx + i];
++		if (!(pfn & HMM_PFN_VALID))
++			/* ODP initialization */
++			continue;
 +
-+	if (dma_use_iova(state)) {
-+		ret = dma_iova_link(dev, state, paddr, offset,
-+				    map->dma_entry_size, DMA_BIDIRECTIONAL,
-+				    attrs);
-+		if (ret)
-+			goto error;
+ 		pa = odp->dma_list[idx + i];
+-		pas[i] = cpu_to_be64(umem_dma_to_mtt(pa));
++		pa |= MLX5_IB_MTT_READ;
++		if ((pfn & HMM_PFN_WRITE) && !downgrade)
++			pa |= MLX5_IB_MTT_WRITE;
 +
-+		ret = dma_iova_sync(dev, state, offset, map->dma_entry_size);
-+		if (ret) {
-+			dma_iova_unlink(dev, state, offset, map->dma_entry_size,
-+					DMA_BIDIRECTIONAL, attrs);
-+			goto error;
-+		}
++		pas[i] = cpu_to_be64(pa);
+ 	}
+ }
+ 
+@@ -286,8 +286,7 @@ static bool mlx5_ib_invalidate_range(struct mmu_interval_notifier *mni,
+ 		 * estimate the cost of another UMR vs. the cost of bigger
+ 		 * UMR.
+ 		 */
+-		if (umem_odp->dma_list[idx] &
+-		    (ODP_READ_ALLOWED_BIT | ODP_WRITE_ALLOWED_BIT)) {
++		if (umem_odp->pfn_list[idx] & HMM_PFN_VALID) {
+ 			if (!in_block) {
+ 				blk_start_idx = idx;
+ 				in_block = 1;
+@@ -668,7 +667,7 @@ static int pagefault_real_mr(struct mlx5_ib_mr *mr, struct ib_umem_odp *odp,
+ {
+ 	int page_shift, ret, np;
+ 	bool downgrade = flags & MLX5_PF_FLAGS_DOWNGRADE;
+-	u64 access_mask;
++	u64 access_mask = 0;
+ 	u64 start_idx;
+ 	bool fault = !(flags & MLX5_PF_FLAGS_SNAPSHOT);
+ 	u32 xlt_flags = MLX5_IB_UPD_XLT_ATOMIC;
+@@ -676,12 +675,14 @@ static int pagefault_real_mr(struct mlx5_ib_mr *mr, struct ib_umem_odp *odp,
+ 	if (flags & MLX5_PF_FLAGS_ENABLE)
+ 		xlt_flags |= MLX5_IB_UPD_XLT_ENABLE;
+ 
++	if (flags & MLX5_PF_FLAGS_DOWNGRADE)
++		xlt_flags |= MLX5_IB_UPD_XLT_DOWNGRADE;
 +
-+		dma_addr = state->addr + offset;
-+	} else {
-+		if (WARN_ON_ONCE(dma_need_unmap(dev) && !dma_addrs))
-+			goto error;
-+
-+		dma_addr = dma_map_page(dev, page, 0, map->dma_entry_size,
-+					DMA_BIDIRECTIONAL);
-+		if (dma_mapping_error(dev, dma_addr))
-+			goto error;
-+
-+		if (dma_need_unmap(dev))
-+			dma_addrs[idx] = dma_addr;
-+	}
-+	pfns[idx] |= HMM_PFN_DMA_MAPPED;
-+	return dma_addr;
-+error:
-+	pfns[idx] &= ~HMM_PFN_P2PDMA;
-+	return DMA_MAPPING_ERROR;
-+
-+}
-+EXPORT_SYMBOL_GPL(hmm_dma_map_pfn);
-+
-+/**
-+ * hmm_dma_unmap_pfn - Unmap a physical HMM page from DMA address
-+ * @dev: Device to unmap the page from
-+ * @map: HMM map
-+ * @idx: Index of the PFN to unmap
-+ *
-+ * Returns true if the PFN was mapped and has been unmapped, false otherwise.
-+ */
-+bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
-+{
-+	struct dma_iova_state *state = &map->state;
-+	dma_addr_t *dma_addrs = map->dma_list;
-+	unsigned long *pfns = map->pfn_list;
-+	unsigned long attrs = 0;
-+
-+#define HMM_PFN_VALID_DMA (HMM_PFN_VALID | HMM_PFN_DMA_MAPPED)
-+	if ((pfns[idx] & HMM_PFN_VALID_DMA) != HMM_PFN_VALID_DMA)
-+		return false;
-+#undef HMM_PFN_VALID_DMA
-+
-+	if (pfns[idx] & HMM_PFN_P2PDMA_BUS)
-+		; /* no need to unmap bus address P2P mappings */
-+	else if (dma_use_iova(state)) {
-+		if (pfns[idx] & HMM_PFN_P2PDMA)
-+			attrs |= DMA_ATTR_SKIP_CPU_SYNC;
-+		dma_iova_unlink(dev, state, idx * map->dma_entry_size,
-+				map->dma_entry_size, DMA_BIDIRECTIONAL, attrs);
-+	} else if (dma_need_unmap(dev))
-+		dma_unmap_page(dev, dma_addrs[idx], map->dma_entry_size,
-+			       DMA_BIDIRECTIONAL);
-+
-+	pfns[idx] &= ~(HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA | HMM_PFN_P2PDMA_BUS);
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(hmm_dma_unmap_pfn);
+ 	page_shift = odp->page_shift;
+ 	start_idx = (user_va - ib_umem_start(odp)) >> page_shift;
+-	access_mask = ODP_READ_ALLOWED_BIT;
+ 
+ 	if (odp->umem.writable && !downgrade)
+-		access_mask |= ODP_WRITE_ALLOWED_BIT;
++		access_mask |= HMM_PFN_WRITE;
+ 
+ 	np = ib_umem_odp_map_dma_and_lock(odp, user_va, bcnt, access_mask, fault);
+ 	if (np < 0)
+diff --git a/include/rdma/ib_umem_odp.h b/include/rdma/ib_umem_odp.h
+index 0844c1d05ac6..a345c26a745d 100644
+--- a/include/rdma/ib_umem_odp.h
++++ b/include/rdma/ib_umem_odp.h
+@@ -8,6 +8,7 @@
+ 
+ #include <rdma/ib_umem.h>
+ #include <rdma/ib_verbs.h>
++#include <linux/hmm.h>
+ 
+ struct ib_umem_odp {
+ 	struct ib_umem umem;
+@@ -67,19 +68,6 @@ static inline size_t ib_umem_odp_num_pages(struct ib_umem_odp *umem_odp)
+ 	       umem_odp->page_shift;
+ }
+ 
+-/*
+- * The lower 2 bits of the DMA address signal the R/W permissions for
+- * the entry. To upgrade the permissions, provide the appropriate
+- * bitmask to the map_dma_pages function.
+- *
+- * Be aware that upgrading a mapped address might result in change of
+- * the DMA address for the page.
+- */
+-#define ODP_READ_ALLOWED_BIT  (1<<0ULL)
+-#define ODP_WRITE_ALLOWED_BIT (1<<1ULL)
+-
+-#define ODP_DMA_ADDR_MASK (~(ODP_READ_ALLOWED_BIT | ODP_WRITE_ALLOWED_BIT))
+-
+ #ifdef CONFIG_INFINIBAND_ON_DEMAND_PAGING
+ 
+ struct ib_umem_odp *
 -- 
 2.47.0
 
