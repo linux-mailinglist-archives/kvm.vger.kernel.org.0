@@ -1,135 +1,123 @@
-Return-Path: <kvm+bounces-31362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C259C30DF
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 05:22:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99BEE9C31AA
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 11:41:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 744A51C206A8
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 04:22:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A68281876
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 10:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740A11482F6;
-	Sun, 10 Nov 2024 04:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33683155385;
+	Sun, 10 Nov 2024 10:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EbUfpwke"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JW8duPR4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4A41422B8
-	for <kvm@vger.kernel.org>; Sun, 10 Nov 2024 04:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D367142E7C;
+	Sun, 10 Nov 2024 10:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731212529; cv=none; b=tWHi9+Gnwb7QijZuGb36B77uv1UYOP/fZZsaXHdrI3DnMK8UxumBjvkeAN8Z6+cycfSfcpt/DcjRryY7jcToAz6/fhz+fwqbFQaCzIjSkKvY3zsIMy7aomFfQCG6RbooNch5BdHGkuM6t/6VXVzhIoqwZw7Yvx9av826JIeLzwY=
+	t=1731235298; cv=none; b=TZnUl+2jMH5+ry0rhEY8QcMtRNsMd2mYwDslnS8SlQCgY3/YwGGmsF+MsCPD8g4DHkmjCXrU1c3W71kXJckTmOEjS/KLvDUzkw+mZriIVkZ/LGNy1dS2EUBfww7RN3tm+WSONcrvbluncK+qx1QkXqZzsIfI5tC4aqimg8W5PMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731212529; c=relaxed/simple;
-	bh=Cm5TVd6VQlBobuAKhNtEy2l/TI5QJc4INMnPDvdTiPg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=U+RrwRH8HCsSpU83LGukLqqpbEXb9LiZXrADsBB3RZQRiHEghzMQCR8YUbNDoisx8UvDtRo0y1AG9KE0utR+HGW5YiBH5R4rmvYGa6E8O1eNrOUkLeHGIfV8hY0bVNB5aT2DJD9soGBUNEeTv0Hf4Am/LNFTbE4K9QcoXHJawm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EbUfpwke; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731212528; x=1762748528;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=Cm5TVd6VQlBobuAKhNtEy2l/TI5QJc4INMnPDvdTiPg=;
-  b=EbUfpwkecWFnMPG9mHq9LXCp8UEY6Yo0xZVDYbPakeGK2bZPfPLLVkmZ
-   PbA8mmV/Lotf/cR4Hd0kCJf8ajzygTGjm5rTu8s0uz0aOlj0dYgPS8IQY
-   g4YcRfAooLd/LjScBnXgkkgDBxAjXB/+fATjQn6ZMxH0k0cwYzl7DfgI/
-   ufoO+tZ/N7jNRMmgMlw2KnXCKzF+9w6zkWJ+rX2wDGSQs6KYClJplb479
-   YdDQ7iKGnWQvruSfRxOaC6/zXvekuVWl4jK0QdtIAr5LXBzuU7tMW6UGc
-   0ZJZLTwp7g8n8ezw9QCbNV56rSLNemggFw/Hram9AJykPz0f+h7wvBFT0
-   g==;
-X-CSE-ConnectionGUID: HfbXB335Rw2FBDr7b0LQhA==
-X-CSE-MsgGUID: rk/hybSzSLmkMm/T6ZniJg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11251"; a="41676410"
-X-IronPort-AV: E=Sophos;i="6.12,142,1728975600"; 
-   d="scan'208";a="41676410"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:22:08 -0800
-X-CSE-ConnectionGUID: S5zd6FXvTUO3vNBje+mWcA==
-X-CSE-MsgGUID: lrNp4/ztRVWOkP2hGUgg6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,142,1728975600"; 
-   d="scan'208";a="90208364"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:22:05 -0800
-Message-ID: <0df1d7b2-5fa4-4635-a210-cd7c54270ef0@linux.intel.com>
-Date: Sun, 10 Nov 2024 12:21:10 +0800
+	s=arc-20240116; t=1731235298; c=relaxed/simple;
+	bh=KJTVz52sJu2oQj0BOPzh46r/ng+VWSz4cJfy6f2DTow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rrjRRUscW6sF9gtF1X9gjp6Q+I7nc8kjMLZPgBtFLcGwpGfE8Gg+IIfTLigpkDs5F2KTOB91TKSKiDoD+3A1Y1fK707EhgsjdWVJhI70O49Kgen0CTfg8PgSYluf9kDtxqCo16iNqbpsl9SF52gNTfxTzwt7cv3Iw7FFM698Gnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JW8duPR4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A12DC4CECD;
+	Sun, 10 Nov 2024 10:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731235297;
+	bh=KJTVz52sJu2oQj0BOPzh46r/ng+VWSz4cJfy6f2DTow=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JW8duPR4zgtshHYsGnyTHtlzUbI9C7VSu6DKWCkFGrApkoWJWSxhGLCw5xgUraK37
+	 KyNCPb36UhLBki49PXkqcD2sBnsPb3pSEYoDPi+P4LFHLRa96gSHPosI6C7dqbYMip
+	 vIVxA0qXAzTZEbJq1b7ufQuqLIfu45BQHuHyL9EX1PQY+YtgJ833g0BRQjd7iEAg3m
+	 WndbNLaXlStjkG2lTw6sbX+1iBBO11XE41go4jd7Z15Ik1RN38Prs+eyzYb42sG812
+	 MOTUu7mg3HBNZVbtRKgzK0VBiDj1HOzE5fnpSg4ms0Wa3VJ7O+NYsKsaWDPF/fo35+
+	 lxhrXIwkV8nJA==
+Date: Sun, 10 Nov 2024 12:41:30 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
+Message-ID: <20241110104130.GA19265@unreal>
+References: <cover.1730298502.git.leon@kernel.org>
+ <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
+ <87ttchwmde.fsf@trenco.lwn.net>
+ <20241108200355.GC189042@unreal>
+ <87h68hwkk8.fsf@trenco.lwn.net>
+ <20241108202736.GD189042@unreal>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/7] iommu: Detaching pasid by attaching to the
- blocked_domain
-From: Baolu Lu <baolu.lu@linux.intel.com>
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com, willy@infradead.org
-References: <20241108120427.13562-1-yi.l.liu@intel.com>
- <20241108120427.13562-4-yi.l.liu@intel.com>
- <64e190bd-6d4a-4d43-b908-222e0bc766c5@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <64e190bd-6d4a-4d43-b908-222e0bc766c5@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241108202736.GD189042@unreal>
 
-On 11/10/24 12:15, Baolu Lu wrote:
-> On 11/8/24 20:04, Yi Liu wrote:
->> The iommu drivers are on the way to detach pasid by attaching to the 
->> blocked
->> domain. However, this cannot be done in one shot. During the 
->> transition, iommu
->> core would select between the remove_dev_pasid op and the blocked domain.
->>
->> Suggested-by: Kevin Tian<kevin.tian@intel.com>
->> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
->> Reviewed-by: Kevin Tian<kevin.tian@intel.com>
->> Reviewed-by: Vasant Hegde<vasant.hegde@amd.com>
->> Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
->> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
->> ---
->>   drivers/iommu/iommu.c | 16 ++++++++++++++--
->>   1 file changed, 14 insertions(+), 2 deletions(-)
+On Fri, Nov 08, 2024 at 10:27:36PM +0200, Leon Romanovsky wrote:
+> On Fri, Nov 08, 2024 at 01:13:27PM -0700, Jonathan Corbet wrote:
+> > Leon Romanovsky <leon@kernel.org> writes:
+> > 
+> > >> So, I see that you have nice kernel-doc comments for these; why not just
+> > >> pull them in here with a kernel-doc directive rather than duplicating
+> > >> the information?
+> > >
+> > > Can I you please point me to commit/lore link/documentation with example
+> > > of such directive and I will do it?
+> > 
+> > Documentation/doc-guide/kernel-doc.rst has all the information you need.
+> > It could be as simple as replacing your inline descriptions with:
+> > 
+> >   .. kernel-doc:: drivers/iommu/dma-iommu.c
+> >      :export:
+> > 
+> > That will pull in documentation for other, unrelated functions, though;
+> > assuming you don't want those, something like:
+> > 
+> >   .. kernel-doc:: drivers/iommu/dma-iommu.c
+> >      :identifiers: dma_iova_try_alloc dma_iova_free ...
+> > 
+> > Then do a docs build and see the nice results you get :)
 > 
-> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-> 
-> with a minor comment below
-> 
->>
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index 819c6e0188d5..6fd4b904f270 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -3302,8 +3302,18 @@ static void iommu_remove_dev_pasid(struct 
->> device *dev, ioasid_t pasid,
->>                      struct iommu_domain *domain)
->>   {
->>       const struct iommu_ops *ops = dev_iommu_ops(dev);
->> +    struct iommu_domain *blocked_domain = ops->blocked_domain;
->> +    int ret = 1;
->> -    ops->remove_dev_pasid(dev, pasid, domain);
->> +    if (blocked_domain && blocked_domain->ops->set_dev_pasid) {
->> +        ret = blocked_domain->ops->set_dev_pasid(blocked_domain,
->> +                             dev, pasid, domain);
-> 
-> How about removing "ret" and just add a WARN_ON around the return of
-> setting blocking domain?
-> 
->      /* Driver should never fail to set a blocking domain. */
->      WARN_ON(blocked_domain->ops->set_dev_pasid(...));
+> Thanks for the explanation, will change it.
 
-I saw this in patch 7/7. So never mind about this.
+Jonathan,
 
---
-baolu
+I tried this today and the output (HTML) in the new section looks
+so different from the rest of dma-api.rst that I lean to leave
+the current doc implementation as is.
+
+Thanks
+
+> 
+> > 
+> > Thanks,
+> > 
+> > jon
+> 
 
