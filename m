@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-31358-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31359-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D808D9C30DA
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 05:09:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FEC59C30DB
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 05:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EB45B20F54
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 04:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8DB1C20AD3
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 04:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDA61482E6;
-	Sun, 10 Nov 2024 04:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777871482E5;
+	Sun, 10 Nov 2024 04:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BPjNI9yj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iy4HqPUy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F02847B
-	for <kvm@vger.kernel.org>; Sun, 10 Nov 2024 04:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5582F9DA
+	for <kvm@vger.kernel.org>; Sun, 10 Nov 2024 04:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731211755; cv=none; b=hMUT7rN+GoZgj2D7tOuBKvBZRch40fmeQh+17h+QMls0dUtPFpHwMJaI88li5ckrnpuC4r61gW6hqJM0JXyGD1I/8161NsRGS0HFTp7ioFjLBmzIUFGYWaPx3W2EeU28odTXh/rzhKQYyoz02BY8N9jDN+BX6V2KKaJOe5cox+0=
+	t=1731212191; cv=none; b=eoXcE3Fjtl9fKMsC4eGn9KSnRWZ0ShQ7OPENHSFFqqNttBCBuRGLn5I7aXz0FWmMhqtL+M22FreTu7D0mAtjTVDzXq6dC+hPUqfNxT7n+UnfZx8ck5B5paEbLDsaCMIJSqbILQ0sk97TKvOnAfKOCjodH1HYzAEVNYtbmJU0Yb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731211755; c=relaxed/simple;
-	bh=0m4G8wid9HQTY/HDuTEaCuW28rl1xrPM09B1xOR002Q=;
+	s=arc-20240116; t=1731212191; c=relaxed/simple;
+	bh=VqhPhaEvvJFiGRzcKSoEuhmpIU7/gc+vywtAOPWZNlc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fk/Bbw8qfkmL6Z7dRj2pyfTZfT9wBdp5UPWH5oYSpjocA1I1jVhi8cdHNzq7/tWPrgG8qEB6KZyN/0ECBU22rl6bVBdN3aB6j16PBlaDDj/BGmi9sgtGDYAX/YjFf27F7VosfvH1lKVVOf0nn+/q/JUa8QIzvFiQ9x+P2Gy6r9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BPjNI9yj; arc=none smtp.client-ip=192.198.163.8
+	 In-Reply-To:Content-Type; b=Zy9PZuA4nc16UMcUYUSYl1iw3sxUfLwixnNo21RAXoMwhxnCk4fr5yGT9wQEXPuVj9ToJBul78icqI5AYQWT97ctIOikV6rk2YjGjlP9RL8XK4DCwZp7LJj9WtM/ns6+PDLIQtvjbuvKRIuIpULKVcSa7g7SqeRZ1aLMUgM+91M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iy4HqPUy; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731211753; x=1762747753;
+  t=1731212190; x=1762748190;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=0m4G8wid9HQTY/HDuTEaCuW28rl1xrPM09B1xOR002Q=;
-  b=BPjNI9yjShaSxigm7OIY6s0q75W2wl3LurSTF1UTFOzY6UKmBkaM38FT
-   ir9RdrwICKvRfMSwvWyuaMSfgAYJz+lXY29wjsmigy2GIpKehbpcABRfU
-   OqplTEREeR2m4c5WVYTPyUu5+ar8DQexUkIPV+pmiSZR7Rj+pdhVwz6ZU
-   QF32lgyo89sz31wonCfoRVLbQKSaBHNeMzm5hnOFDGXVIXLjKzveWVNEQ
-   C1pHwJctXGOBdixdi41S3l6CPD4fuRnLL41/8MSR6tg28231LohDad5Ax
-   F+Gp3AgsLFJ4/PYHTHOtzMXLaXJaI5b8vy7HZFgSxvcE1yTTx3LlpLNyr
-   A==;
-X-CSE-ConnectionGUID: zUi4UHCkS5iMDRo4PeP6PA==
-X-CSE-MsgGUID: 0sTUKXEHSgKCbh/vmMSoxw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11251"; a="48567910"
+  bh=VqhPhaEvvJFiGRzcKSoEuhmpIU7/gc+vywtAOPWZNlc=;
+  b=iy4HqPUy/k/9Drxr37njBLsO4B3ofhuhR9QACgFxSyzbj6tSYq1M5TSy
+   5V+VnCeAX1NWRpHMNhIw8k6GgFQWcT/amMS6ei+urj9iRhrICddwr2cEU
+   7J/MBEngpRZM/zfw0Mef7QhM72QPZbng/0rKdkSBuCbAD344RHgeDWmoV
+   zriHmp7dlHNx8NB52IZCpBTZy6vmTnPm0qzB/IN56+TF9BK0UIsogIaoN
+   BsJcRoFsTxLaWog+dbLkWbZIwR1CaZ0rqlOhXDiityAzd432H6Cpu7QJX
+   IVXNwQqZ5AiuQK30PAlP6bpygEIdU64PiEBYNOPk/tIpyak5yStGZZ9QX
+   w==;
+X-CSE-ConnectionGUID: KKDc5rdsTZ6USnKSgWpJ/w==
+X-CSE-MsgGUID: tCGOQa4HQpOn9w4jpzXyww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11251"; a="41662373"
 X-IronPort-AV: E=Sophos;i="6.12,142,1728975600"; 
-   d="scan'208";a="48567910"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:09:12 -0800
-X-CSE-ConnectionGUID: Je9ck4oAQzKdlTA++1svxQ==
-X-CSE-MsgGUID: zlNpK7kLTNeAZd6/5EyLFw==
+   d="scan'208";a="41662373"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:16:29 -0800
+X-CSE-ConnectionGUID: wZBR3UxaSpil9xZzscA5XA==
+X-CSE-MsgGUID: SVSN/Tz5SX2Vuz3WPFw6SA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,142,1728975600"; 
-   d="scan'208";a="86369526"
+   d="scan'208";a="86197944"
 Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:09:10 -0800
-Message-ID: <559ae236-c0d7-42e2-8df2-97c073f729e9@linux.intel.com>
-Date: Sun, 10 Nov 2024 12:08:14 +0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2024 20:16:26 -0800
+Message-ID: <64e190bd-6d4a-4d43-b908-222e0bc766c5@linux.intel.com>
+Date: Sun, 10 Nov 2024 12:15:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,34 +67,71 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/7] iommu: Consolidate the ops->remove_dev_pasid usage
- into a helper
+Subject: Re: [PATCH v4 3/7] iommu: Detaching pasid by attaching to the
+ blocked_domain
 To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
  kevin.tian@intel.com
 Cc: alex.williamson@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
  kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
  zhenzhong.duan@intel.com, vasant.hegde@amd.com, willy@infradead.org
 References: <20241108120427.13562-1-yi.l.liu@intel.com>
- <20241108120427.13562-3-yi.l.liu@intel.com>
+ <20241108120427.13562-4-yi.l.liu@intel.com>
 Content-Language: en-US
 From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241108120427.13562-3-yi.l.liu@intel.com>
+In-Reply-To: <20241108120427.13562-4-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/8/24 20:04, Yi Liu wrote:
-> Add a wrapper for the ops->remove_dev_pasid, this consolidates the iommu_ops
-> fetching and callback invoking. It is also a preparation for starting the
-> transition from using remove_dev_pasid op to detach pasid to the way using
-> blocked_domain to detach pasid.
+> The iommu drivers are on the way to detach pasid by attaching to the blocked
+> domain. However, this cannot be done in one shot. During the transition, iommu
+> core would select between the remove_dev_pasid op and the blocked domain.
 > 
-> Reviewed-by: Vasant Hegde<vasant.hegde@amd.com>
+> Suggested-by: Kevin Tian<kevin.tian@intel.com>
+> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
 > Reviewed-by: Kevin Tian<kevin.tian@intel.com>
+> Reviewed-by: Vasant Hegde<vasant.hegde@amd.com>
 > Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
 > Signed-off-by: Yi Liu<yi.l.liu@intel.com>
 > ---
->   drivers/iommu/iommu.c | 19 +++++++++++--------
->   1 file changed, 11 insertions(+), 8 deletions(-)
+>   drivers/iommu/iommu.c | 16 ++++++++++++++--
+>   1 file changed, 14 insertions(+), 2 deletions(-)
 
 Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+with a minor comment below
+
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 819c6e0188d5..6fd4b904f270 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -3302,8 +3302,18 @@ static void iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
+>   				   struct iommu_domain *domain)
+>   {
+>   	const struct iommu_ops *ops = dev_iommu_ops(dev);
+> +	struct iommu_domain *blocked_domain = ops->blocked_domain;
+> +	int ret = 1;
+>   
+> -	ops->remove_dev_pasid(dev, pasid, domain);
+> +	if (blocked_domain && blocked_domain->ops->set_dev_pasid) {
+> +		ret = blocked_domain->ops->set_dev_pasid(blocked_domain,
+> +							 dev, pasid, domain);
+
+How about removing "ret" and just add a WARN_ON around the return of
+setting blocking domain?
+
+	/* Driver should never fail to set a blocking domain. */
+	WARN_ON(blocked_domain->ops->set_dev_pasid(...));
+
+> +	} else {
+> +		ops->remove_dev_pasid(dev, pasid, domain);
+> +		ret = 0;
+> +	}
+> +
+> +	WARN_ON(ret);
+>   }
+
+--
+baolu
 
