@@ -1,293 +1,229 @@
-Return-Path: <kvm+bounces-31355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18B509C2F9B
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 22:12:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC0E9C30D0
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 04:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6D031C2106B
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2024 21:12:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D697281AFC
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 03:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC911A2630;
-	Sat,  9 Nov 2024 21:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42C91474A5;
+	Sun, 10 Nov 2024 03:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Epr4fNIs"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sH4sxhtg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2065.outbound.protection.outlook.com [40.107.96.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A01E19F411
-	for <kvm@vger.kernel.org>; Sat,  9 Nov 2024 21:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731186711; cv=none; b=RYLtCIatBn4uY865v4Y+iaTvCBn71mVX++NjrBVIC3UOsaGpUYs2NcEuA6gW24DijShIKgFjGl9bWN3uMagOPy19glVtERWFuHn7N3JEzrdnmW+1t9rEo+MJOTbhhF1iRqZ7POcsD3araBy93KSPzxVTBi3HkJceWpxGAwGodyE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731186711; c=relaxed/simple;
-	bh=ABgMM+icK5ddNiMD+2j3K13rmHK3dfBaOBo3S2H0nVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZZKFCD7LsMv6Plrew2WqJKNUaKU1dOhJKnK6UzILG3zStBwLfpvA5QJ1sP37IAN2M/2RvQMa9nWN/whazt6wIUAjBQI+4hO2OPXJSTZp0aJIDJtO7+8/S0BUk2QhJ6YOLoW9xr/ziJQvrycsL0o6rnFpMp/de8DNXfTs/QV/9RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Epr4fNIs; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a99f646ff1bso496134366b.2
-        for <kvm@vger.kernel.org>; Sat, 09 Nov 2024 13:11:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731186708; x=1731791508; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dzaEFRktAkP/klNBiZ+4cVbDvhXpkICC/aLo7wIIblk=;
-        b=Epr4fNIsLr/Q9A6X3OKNfK8yFo+m/Y7wl0fw6/tY2f01yP2pkpodl1OcCHHueGTN5B
-         xPt69W1enLtqw+iTDE0v4F9zk7AY8RteyJnfQX2Ux0nOYqWIa5cc97YDBwGZK5wncQvE
-         phZOz+iR1X5Z9GrS6ITFoSy44N2Jb6vroIGSQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731186708; x=1731791508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dzaEFRktAkP/klNBiZ+4cVbDvhXpkICC/aLo7wIIblk=;
-        b=KyJFjwR2U+HOcESkWbDTmVlLA4CpCZt+WMdDJd6eJj7kwoel2aBgCIb4hTqLruLqkN
-         GmuopMJfY1Iv6sSoOdwZk/XPM5rjpI7ThVQ7xxq2hMFkdp2yBvCqSFAbJqrRuriNvBjZ
-         NZN9eTQujGr+Tdrag9nryr5tIAVpa7NJphgP1TBghcu9Msm9DwwKgJmWLhmbPb1KPg5E
-         aq4+I0MxXy8x+81qpynKP59HohklJFJKxS4VwciQYav38Dp80bSS3gH51nDA9gm3tQiq
-         VkP+8miODvAHjlmMSWmcSWWbuu271vlEADq4mZ0odhBmAc1Crqx+we8UCmcSMiM+uW8F
-         8nMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYDjHxuSuf9MKtoeVQDr/rMtmAWeDU0H353dLk08cOJ1jM6Ln/XTNPOZ5gAjZ4uw4lfQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnCnlaOa3F6kcNTP7H8e3XMuIQLRaPA37G2Zcwk3A+Byv4cc7T
-	rRiY4QVvkffh2Szuwx809Fvcc+ngQftkoPexn100pyAgFVnZPlWG9z50tnaB/YSCNXv0y6r3xcP
-	UsKnQrHPooEeyVobopXi3+kJo4JvqTDV7kcqU3wFMWp41E5vu3f8AxHI+qEt1CvJF4ehHfEKeeO
-	QJpHloKGLUTRVnaw==
-X-Google-Smtp-Source: AGHT+IFPcoJr8nElnRzhiZR4oQp1IJiFbpTh6X8yXbkRXn/08dHID1yw3BffYyZCmclFQvK6f6wwrWN6dDpKgJ1VYG8=
-X-Received: by 2002:a17:907:8693:b0:a9a:1b32:5aa8 with SMTP id
- a640c23a62f3a-a9eefebd42dmr758229066b.4.1731186707577; Sat, 09 Nov 2024
- 13:11:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E602813B7BC;
+	Sun, 10 Nov 2024 03:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731210961; cv=fail; b=HSF3vzqGoYEP8k7tWiA2zE06yigbg0szO8RBsW4IaIQF8MbhxmerfsX67C2v7NrJ9iW6udNo42pzjB+73kmsu5qQJ99Ihp+7Ei+EyrUFLABrHtq/rOv030K2J+TWZDJpNZJkIGwteAdX9+iwb45iQXZEPZhELtAu+J724iXh6pQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731210961; c=relaxed/simple;
+	bh=Xg1MGd4+J+59LH4CNHbi/tONW80TwsNXt8iCrkIFA3I=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=V6seoI3m1PvRO7g/rP7Nf5kLdId42aidRkfUI7X/kzIhTl4VUlaeRZBUhHpRlQfypeR77WXOoaVu/IGkadsLEKWSLlSWWVqSHzoRV6D6oANcOF6qrb+W9OSzTwt46S7HoxQ6Oxin/8x+64ID9DRk3IaTi0/t9yua8OSbUZJ59h4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sH4sxhtg; arc=fail smtp.client-ip=40.107.96.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EDlXop+XYXUREA76pswnZRYQRJrkugnhbmPjzfmyaiyV71IRa+9iOE7xr2DVk29dmD5vqMnrDSfG3NG5mUFb+IIzlsm6X88wkK6GJp+odOvhP+j28BT0CW2v2VyLJjzTMaxFhPygKXxw5orBdRu8uJYzVxlmuOrTytQDKc9r2DS94gI8DBdmAuS4JLK3kNd50Z71it3kmOVWjDvAr/U5zYqzMM2VRhcm5haTHIEUjEDK9Z0E394UtlgzeOQwIU8pyhRhtKY7yZ6p5GNvLllRYvD98g8Yj8tynSRqnliS9ulJKpFQUezAoMBriVLU8F4cv2isZMZLx7/Aje03YQyk7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7S1nClL0jNMnze6QcYhuR3TdyKFIWJaSzLXrebJk0Hw=;
+ b=PMn//HCDkiCkRtJdn1demneubk5Kf2JhmiBqTWe9Sgpt8ilsNqv52kJ3JJZwhLDqdO8Vgjavuk1MzOsbWbAd83hvpPcBCmTEWCUtRckseDhF8YuiSdwGKjqhjf9ufsMlRL1lplRtwle9CyDBKN0bR05Hwi5V9VHDj3csZAPKICnJzDJhHGJ4R7WOs3TZpLNHItaxsx2t0n7L4xMFQJa9XJIjeVA6b2XNggMAKmqf5n04IeGN7oxYbm7boEE38+DCD9YfN9p+gNuq0wlD9xWK4Drp8mNl6d1MHYEoMaalrPjtaj7w+5ZFyieD1HW7CZ8aqPeZZT+A+b7egrO9NnEKVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7S1nClL0jNMnze6QcYhuR3TdyKFIWJaSzLXrebJk0Hw=;
+ b=sH4sxhtg5oHdk5abmwg8cMBEuFo+aq4jNgQLjbFGVrD5gn/T1C4gQ1d6b2VpZMbVwwRhJS6ltxN3G3lwvOsYXqhQ6NS+s/68i1Fh/SPBdvqTP1c5ClaT7pdUK2BNK9GoPUc98xVv68d7VbaQr6Quf8ZR9aPdB57/dcqJm9UjC14=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ PH7PR12MB7209.namprd12.prod.outlook.com (2603:10b6:510:204::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.21; Sun, 10 Nov
+ 2024 03:55:54 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%3]) with mapi id 15.20.8137.019; Sun, 10 Nov 2024
+ 03:55:47 +0000
+Message-ID: <29d161f1-e4b1-473b-a1f5-20c5868a631a@amd.com>
+Date: Sun, 10 Nov 2024 09:25:34 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [sos-linux-ext-patches] [RFC 05/14] x86/apic: Initialize APIC ID
+ for Secure AVIC
+To: "Melody (Huibo) Wang" <huibo.wang@amd.com>, linux-kernel@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+ Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de,
+ David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-6-Neeraj.Upadhyay@amd.com>
+ <f4ce3668-28e7-4974-bfe9-2f81da41d19e@amd.com>
+Content-Language: en-US
+From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+In-Reply-To: <f4ce3668-28e7-4974-bfe9-2f81da41d19e@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR03CA0006.namprd03.prod.outlook.com
+ (2603:10b6:806:20::11) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
- <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
- <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com>
- <Zy0__5YB9F5d0eZn@google.com> <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
- <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com>
-In-Reply-To: <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com>
-From: Doug Covelli <doug.covelli@broadcom.com>
-Date: Sat, 9 Nov 2024 16:11:36 -0500
-Message-ID: <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Zack Rusin <zack.rusin@broadcom.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|PH7PR12MB7209:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7b45b3b-4f96-411c-a9fe-08dd013b8f0f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bGNDUDYwbEttc3V6SFl3dFlONHRpUnJ6RDcvclF2SUZGMjlDaCtSdjMxRVlT?=
+ =?utf-8?B?blhGNFZNSG5GajNUU1lhMGI0TnFObWJCdllnalZ3M1VuS2NnTXdycWQ5dmxM?=
+ =?utf-8?B?QlZBekVSVzErMjB3blBtVm00cGdPamRSd0xkVmZVKzBrSnVOR2VFSTg3TEJQ?=
+ =?utf-8?B?QTVGNzF2NllhRkw3R1AyWFNXMGViNERmTUZDVVZEbDZUTkhJSC9jaEJsM1hK?=
+ =?utf-8?B?RjRtLzhWdnVLWUwyUHFsZWNEeXBKWWNsWU03cklEWWoyd3M3a3o4djFsa0sy?=
+ =?utf-8?B?cUlUeDhIVnpkTERPdWd2anVLazdFRFR0cGtUZ1dqcXAvK0U5OWRMMVFhdzh1?=
+ =?utf-8?B?WjlRQW5Xak1kaEplbGdVQkM3Q1A5dCtYY0IrMVBhNzZmTUJ1N0k0THo0anJa?=
+ =?utf-8?B?dmh6bTA1S3NJR3N4K0N3M2I3RjVINDVKUkxZak4vcHRlbEdoaXdoUkhkTUor?=
+ =?utf-8?B?cTJYaVQyT0VKNWxJV3hJSVF1blF4MUVwbUVod1JndFA5SmZoT0pzZHZlcS9I?=
+ =?utf-8?B?eTR4eS8yTXVOWmt2bHpWVGlWQndRclhnSHo5YTlndTVJMlBNZWl3MXNocjRV?=
+ =?utf-8?B?SWRQN3hyOTQ5a1dJaXdQOS83UGkvMElmKzVWaVpNelpXZk5JY2FjYXpiOGJ1?=
+ =?utf-8?B?MVNUNlBBRG5RM2dvMTkxK1FEdHkvczJJN1hjOWo1Z1pYdklMaEhsTFYzczBF?=
+ =?utf-8?B?dldrbmFndUNSWG1hWGpHdE5TVFB0aUp4OGY5cE15RjlQS0NvYjZ5WTArbWlB?=
+ =?utf-8?B?QWtWZmJneWJJVlcvU1VuNmh2WGpZbmowYmlDQStkUzlqc1p5SVBHaTZtZEpD?=
+ =?utf-8?B?OW1xVUlOMFVDTDlzd242dy9YMi9TRXJWNUVzOUI1TnZzbXFxNlBUSERYL1V0?=
+ =?utf-8?B?VmFLS3pRd1JkWno3NWhzVlg5Q3NGaDgyeFl5eUZJd3g0N3B5WlljMFlzcFEv?=
+ =?utf-8?B?VnZ2Z2U0QXAxcy9qa0tTNVZaQUlQU2NTbTUyaEowVWVzWGgxdGpIN08xYTVo?=
+ =?utf-8?B?ak5Kc2NKZ2FidHlYN0pKMm0xOWM4dTJCRWtTN3d5OUg2NExmTTlsWWQ0Wkdj?=
+ =?utf-8?B?c2FnQjBoQkNZaFdTNEFBWFowNFphb3pBT0s2MmltVUE1Y0t4ajEzV1MwS3lF?=
+ =?utf-8?B?Zm43YVBkUXVSZkcyVGRtcnpWTSt2YTFxVlk5L3ROUllrMFZnRmlBZnZCWU05?=
+ =?utf-8?B?MHBkSFRQSTYzQ0xaZ005c1ovdk1zbFJlNHJWbld4NjFVL2V2S3M5YjJ4dEcz?=
+ =?utf-8?B?RHZLTERzSEhCaTBvcmhXdVNiQzJXck9mekNXNUFobnhpdWRjc1BVenNuTWdE?=
+ =?utf-8?B?UkFZaVJ4eDJOc1JydTRucmFJMEZlZy8xOGM1N0V0U2ZDQUs0QW5nYldDVW9y?=
+ =?utf-8?B?N0pRRGk4RzY1Vmh0V3c4aWU1cnB5UHlmSWtidHlRTXdlQ1ptZFFKdVFXTVY5?=
+ =?utf-8?B?UnVnM0JaakxCVmtWaUEyb2ptM1Y1OU5mcHdCcWpVZzZVY21qdWxHZVY0cTZr?=
+ =?utf-8?B?L3JkSDNOMVZ2Mi9EOVpsakx5RDNlSVV1OG5xaTdFc05VNkNWLzBlWitrK3Fp?=
+ =?utf-8?B?eEdHSm9yS016U0JjTW4rUFNwRndBd3FodW0zd0d5SEtGM1VaU3lqT0RkWmZQ?=
+ =?utf-8?B?QUUvWkswQVZpY0lHWmVpV2VNVGRLZmVMMDVDdGJiYnRBMmZBZm0rdDF4SGNl?=
+ =?utf-8?B?dGt1Yk9KWUtaZ0lGcTRKeTNVTllHRHFBT3VYTXZ6dEtkak1iQm1LL3Q5MTNL?=
+ =?utf-8?Q?1QoNzc9fNsuzNgFqWgdIH/8jIAQ/XOEsCLDefz2?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?K1JuQUpkYXdHOFJQMVV1VDV3YXNGMmVjYzFlNTlUR3BaM2JlNDlwVE1RUlYz?=
+ =?utf-8?B?T1FrQURKYWQ5eDkwOWtIbUhuRGdteXkrT05ibCtaR3FJREkvU2xLcGlTcmEw?=
+ =?utf-8?B?UWk1d2dWelhLQWRYbzlhQzVrYnpkRHFCQmR3VnAvWmRpUmdOZHNiUE54YXVV?=
+ =?utf-8?B?N0ttbFhFY2hrUitaS2l2anBkRUs4Q2NTR2ZSUTR3WDVDQnFhNjU0MEk0SHp4?=
+ =?utf-8?B?dnA1ODYycVNPbU5BTzBsM3RmOWxHRmdRemtHYVlMdExhQlJTQ0R4WkN3OGdM?=
+ =?utf-8?B?K2lDeU01cy9IVEFha3FlKzh4QVJObFdzM3lXRnZXUFhwczZrS3FVU1RSdnJS?=
+ =?utf-8?B?VnVZRjlBMlBsWWJ5WXFSRThkUG9uaVhMRHZWNitFZHM3NGw1Uyt3WmszbXlo?=
+ =?utf-8?B?NzhqcTdhdWdURUNDWFovc005UC8xRmE5bXpITUc4ZENFcXpvbkpNeHZBYUhP?=
+ =?utf-8?B?OTBuWndJWUJndzd5b1EyQitWOGdJZGY1d21aVEFKNGp6Q0pWQTVybmQ2VUVT?=
+ =?utf-8?B?bTFyQ1ZBYmhGenVNTnFTT1RUY080ZzI3eXNWUUpnRHRlSncwSDhabUtsVGVZ?=
+ =?utf-8?B?U3JuRkkveFd4K1ozM3E2TFJMRUxFVU5IQ3Nlc1duYVBVTlc0MzM0cWJGdzIw?=
+ =?utf-8?B?SUFEQThIUUlranRWT2VqbXdWMmVYNERwcDl0Z1ZoT1BiRkFRRUI3RHovemMw?=
+ =?utf-8?B?V0dpM0MxNm9qcGduRUJNWUdTQVI0aVJ1aTJoazFIU3YwTUZxbWYwMzh5V2Zq?=
+ =?utf-8?B?aFd5OEZyMVZFUGdjT3J1MUE2K0RETjNZM2RyRktTTWVNZkpaVGFDYjBIejBn?=
+ =?utf-8?B?TUtlY3lsVWVBSk1DOEZGQmgxVDlqRkQ0ZjZiQmVPOHEzSlJYaTJTNlFvaWk2?=
+ =?utf-8?B?Z0hGRHp4c3NXRXVsT2dySmQ1WUtjbXdOS0daeGpobTMvWGR0Y1Qzb2pkNThm?=
+ =?utf-8?B?ZU50WlNPQnRJdkdRaUpuNVBoSUJHcEhLRmt3OXdtWGpWNkxtOGRSTll1bmRr?=
+ =?utf-8?B?Y1hKaC9NQXFQaDhDbzkzRmdGeWhObjN3RmJ5NDV1MXBURWhuT3NXbU5TYkZu?=
+ =?utf-8?B?UlgvSUN2cm1yencxQnJIWWZLWDdwc1VxMHlXVmN0NkgxNHd5WklkU0xubWlD?=
+ =?utf-8?B?QU9xQ3JXNHAxdWkzNjdocTVNbDhFckJ4Y3RqMlhTR0g4VFJybm1YSnF3alN4?=
+ =?utf-8?B?VWswZU9yWXdET2lFS3JDdng2ckNxSHNMNFVBRzZlY1NqRDQ0U3pMRE1JdWVh?=
+ =?utf-8?B?WTRjbjQzNDdrWFVRakIybVIzQTRvWjhHaVJKVHErOEJteUIrOFVOZ3d2STFH?=
+ =?utf-8?B?TytvMFFBeUFVaE4ranVsSzFrbDdHeXRjUUhyVldXZ0xvZlNmY29LaStvendi?=
+ =?utf-8?B?K2VYTGtZb24rM1dRMlFsS3FwQk9FcnV6UFJ4Y3FTRzEyYnBZZUw2ckN5SXFW?=
+ =?utf-8?B?T3k5dzB2TGxpUG9EZjRFMkhhMk5mVmNldy84bjIwdkhJOHJWZ1VERHB6Rm5i?=
+ =?utf-8?B?ZWh0VFJEekV5WU9BNnhFVE5xTGpPR3NJaDlWTVlzd0dnQWl0WWxqdWF2YzVJ?=
+ =?utf-8?B?RE5CTnRYTHhtbDVuMkJhKzJYVWFodUtmbndReEVYb2o4dlFFU01US2ZpeDA1?=
+ =?utf-8?B?eEp2TlNJTmJKeEFyZWNWSUozYUNVWU5zZWMwMXhvY1JqeVlUeWl4bU5aY2Ft?=
+ =?utf-8?B?Q1BiU2ZvMEFBVjhXTjR6RWVXdlMyOEIzUXNRV2txYlhwVnZEdjdrVVNSakpF?=
+ =?utf-8?B?blNsRW1WaEFoems2LzQ5d3U2VzlwOWsvbXp1T1dFSW9ZYUZCRTNXYkU3UWQ0?=
+ =?utf-8?B?ZlZnZlZ4SGZEN29xRFFzUlB3ZnFWTW53NSs1a2tKUXR4eXE4YTFjeXRjWEVT?=
+ =?utf-8?B?cnY2QU1VcGRzcEtyWUdXYmRmWmEvMDFsNVlTbE5MNVV4c21DaSt0K0ZyZXRK?=
+ =?utf-8?B?Y2UyaXJKdzc3UHpzbE0zMWxPb2cvZSt6VmM3WWZ6MXdzekYySXNndzM0OHR0?=
+ =?utf-8?B?T1VNalIyS2hoUlVEdkdNOXJoZzlsRHYvVS90OG94azRLTVdwd0pBRmpod2F1?=
+ =?utf-8?B?QTNDWVNzUmVjaHovc2dhZm1FekFGU1BIenRIRGVCSWxTU3Z5SnFXYW43MGs3?=
+ =?utf-8?Q?slUa0cFh1BEzk3OoEYqJu/VDw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7b45b3b-4f96-411c-a9fe-08dd013b8f0f
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2024 03:55:47.3449
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ogxh/GM3GDGJrfDHcd/FG5GbcV2KwMd8ykiNn5wykcIhdHvFHJ9eexyHUOlTye+Jny9SVYL4FUaGbmM+FnX0dg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7209
 
-On Sat, Nov 9, 2024 at 1:20=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> On 11/8/24 06:03, Zack Rusin wrote:
-> >>> There's no spec but we have open headers listing the hypercalls.
-> >>> There's about a 100 of them (a few were deprecated), the full
-> >>> list starts here:
-> >>> https://github.com/vmware/open-vm-tools/blob/739c5a2f4bfd4cdda491e6a6=
-f6869d88c0bd6972/open-vm-tools/lib/include/backdoor_def.h#L97
-> >>> They're not well documented, but the names are pretty self-explenator=
-y.
-> >>
-> >> At a quick glance, this one needs to be handled in KVM:
-> >>
-> >>    BDOOR_CMD_VCPU_MMIO_HONORS_PAT
-> >>
-> >> and these probably should be in KVM:
-> >>
-> >>    BDOOR_CMD_GETTIME
-> >>    BDOOR_CMD_SIDT
-> >>    BDOOR_CMD_SGDT
-> >>    BDOOR_CMD_SLDT_STR
-> >>    BDOOR_CMD_GETTIMEFULL
-> >>    BDOOR_CMD_VCPU_LEGACY_X2APIC_OK
-> >>    BDOOR_CMD_STEALCLOCK
-> >
-> > I'm not sure if there's any value in implementing a few of them.
->
-> The value is that some of these depend on what the hypervisor does, not
-> on what userspace does.  For Hypervisor.framework you have a lot of
-> leeway, for KVM and Hyper-V less so.
->
-> Please understand that adding support for a closed spec is already a bit
-> of a tall ask.  We can meet in the middle and make up for the
-> closedness, but the way to do it is not technical; it's essentially
-> trust.  You are the guys that know the spec and the userspace code best,
-> so we trust you to make choices that make technical sense for both KVM
-> and VMware.  But without a spec we even have to trust you on what makes
-> sense or not to have in the kernel, so we ask you to be... honest about
-> that.
->
-> One important point is that from the KVM maintainers' point of view, the
-> feature you're adding might be used by others and not just VMware
-> Workstation.  Microsoft and Apple might see things differently (Apple in
-> particular has a much thinner wrapper around the processor's
-> virtualization capbilities).
->
-> > iirc
-> > there's 101 of them (as I mentioned a lot have been deprecated but
-> > that's for userspace, on the host we still have to do something for
-> > old guests using them) and, if out of those 101 we implement 100 in
-> > the kernel then, as far as this patch is concerned, it's no different
-> > than if we had 0 out of 101 because we're still going to have to exit
-> > to userspace to handle that 1 remaining.
-> >
-> > Unless you're saying that those would be useful to you. In which case
-> > I'd be glad to implement them for you, but I'd put them behind some
-> > kind of a cap or a kernel config because we wouldn't be using them -
->
-> Actually we'd ask you to _not_ put them behind a cap, and live with the
-> kernel implementation.  Obviously that's not a requirement for all the
-> 100+ hypercalls, only for those where it makes sense.
->
-> > besides what Doug mentioned - we already maintain the shared code for
-> > them that's used on Windows, MacOS, ESX and Linux so even if we had
-> > them in the Linux kernel it would still make more sense to use the
-> > code that's shared with the other OSes to lessen the maintenance
-> > burden (so that changing anything within that code consistently
-> > changes across all the OSes).
->
-> If some of them can have shared code across all OSes, then that's a good
-> sign that they do not belong in the kernel.  On the other hand, if the
-> code is specific to Windows/macOS/ESX/Linux, and maybe it even calls
-> into low-level Hypervisor.framework APIs on macOS, then it's possible or
-> even likely that the best implementation for Linux is "just assume that
-> KVM will do it" and assert(0).
->
-> In yet other cases (maybe those SGDT/SLDT/STR/SIDT ones??), if the code
-> that you have for Linux is "just do this KVM ioctl to do it", it may
-> provide better performance if you save the roundtrip to userspace and
-> back.  If KVM is the best performing hypervisor for VMware Workstation,
-> then we're happy, :) and if you have some performance issue we want to
-> help you too.
 
-Appreciate the concern about performance however I don't think it is
-something we should worry about.  Even with our existing VMM, which
-runs at CPL0, all of these backdoor calls are handled by userspace
-which means they are very slow (~28K cycles overhead on my Zen2) and
-are not used in any perf critical code (if they were we would have
-handled them at CPL0). Running on KVM the overhead is significantly
-less.
 
-As for the SGDT/SLDT/STR/SIDT backdoor calls these were added > 20
-years ago for SW that used these instructions from CPL3 which did not
-work well before VT/SVM were introduced.  These are really of no use
-on modern CPUs and will be blocked if the guest OS has enabled UMIP.
-Adding support for these to the KVM code would be a bit of a waste
-IMHO  I have no objection to adding support for handling some backdoor
-calls in the kernel if we find ones where it would be advantageous to
-do so I'm just not aware of any where this would be the caase..
+>>  static void init_backing_page(void *backing_page)
+>>  {
+>> +	u32 hv_apic_id;
+>> +	u32 apic_id;
+>>  	u32 val;
+>>  	int i;
+>>  
+>> @@ -220,6 +223,13 @@ static void init_backing_page(void *backing_page)
+>>  
+>>  	val = read_msr_from_hv(APIC_LDR);
+>>  	set_reg(backing_page, APIC_LDR, val);
+>> +
+>> +	/* Read APIC ID from Extended Topology Enumeration CPUID */
+>> +	apic_id = cpuid_edx(0x0000000b);
+>> +	hv_apic_id = read_msr_from_hv(APIC_ID);
+>> +	WARN_ONCE(hv_apic_id != apic_id, "Inconsistent APIC_ID values: %d (cpuid), %d (msr)",
+>> +			apic_id, hv_apic_id);
+>> +	set_reg(backing_page, APIC_ID, apic_id);
+>>  }
+>>  
+> With this warning that hv_apic_id and apic_id  is different, do you still want to set_reg after that? If so, wonder why we have this warning?
+> 
 
-> A related topic is that a good implementation, equivalent to what the
-> proprietary hypervisor implemented, might require adding a ioctl to
-> query something that KVM currently does not provide (maybe the current
-> steal clock? IIRC it's only available via a Xen ioctl, not a generic
-> one).  In that case you'd need to contribute that extra API.  Doing that
-> now is easier for both you guys and the KVM maintainers, so that's
-> another reason to go through the list and share your findings.
+"apic_id" as read from cpuid is the source of truth for guest and is the one
+guest would be  using for its interrupt/IPI flow.
 
-For stolen time the backdoor call is used to enable the functionality
-not to get/set the stolen time.  I agree that we would probably want
-to do something KVM specific for this one however this is currently
-really only supported by ESX (and only currently used by Photon OS) so
-I don't think adding that support to KVM is critical.
+Guest IPI flow does below:
 
-> Anyway, one question apart from this: is the API the same for the I/O
-> port and hypercall backdoors?
+1. Source vCPU updates the IRR bit in the destination vCPU's backing page.
+2. Source vCPU takes an Automatic Exit to hv by doing ICR wrmsr operation.
+   The destination APIC ID in ICR write data contains "apic_id".
+3. Hv uses "apic_id" to either kick the corresponding destination vCPU (
+   if not running) or write to AVIC doorbell to notify the running
+   destination vCPU about the new interrupt.
 
-Yeah the calls and arguments are the same.  The hypercall based
-interface is an attempt to modernize the backdoor since as you pointed
-out the I/O based interface is kind of hacky as it bypasses the normal
-checks for an I/O port access at CPL3.  It would be nice to get rid of
-it but unfortunately I don't think that will happen in the foreseeable
-future as there are a lot of existing VMs out there with older SW that
-still uses this interface.
+Given that in step 3, hv uses "apic_id" (provided by guest) to find the
+corresponding vCPU information, "apic_id" and "hv_apic_id" need to match.
+Mismatch is not considered as a fatal event for guest (snp_abort() is not
+triggered) and a warning is raise, as even if hv fails to kick or notify
+the target vCPU, the IPI (though delayed) will get handled the next time
+target vCPU vmrun happens.
 
-> >> I don't think it addresses Paolo's concern (if I understood Paolo's co=
-ncern
-> >> correctly), but it would help from the perspective of allowing KVM to =
-support
-> >> VMware hypercalls and Xen/Hyper-V/KVM hypercalls in the same VM.
-> >
-> > Yea, I just don't think there's any realistic way we could handle all
-> > of those hypercalls in the kernel so I'm trying to offer some ideas on
-> > how to lessen the scope to make it as painless as possible. Unless you
-> > think we could somehow parlay my piercing blue eyes into getting those
-> > patches in as is, in which case let's do that ;)
->
-> Unlikely :) but it's not in bad shape at all!  The main remaining
-> discussion point is the subset of hypercalls that need support in the
-> kernel (either as a kernel implementation, or as a new ioctl).
-> Hopefully the above guidelines will help you.
->
-> >> I also think we should add CONFIG_KVM_VMWARE from the get-go, and if w=
-e're feeling
-> >> lucky, maybe even retroactively bury KVM_CAP_X86_VMWARE_BACKDOOR behin=
-d that
-> >> Kconfig.  That would allow limiting the exposure to VMware specific co=
-de, e.g. if
-> >> KVM does end up handling hypercalls in-kernel.  And it might deter abu=
-se to some
-> >> extent.
-> >
-> > I thought about that too. I was worried that even if we make it on by
-> > default it will require quite a bit of handholding to make sure all
-> > the distros include it, or otherwise on desktops Workstation still
-> > wouldn't work with KVM by default, I also felt a little silly trying
-> > to add a kernel config for those few lines that would be on pretty
-> > much everywhere and since we didn't implement the vmware backdoor
-> > functionality I didn't want to presume and try to shield a feature
-> > that might be in production by others with a new kernel config.
-> We don't have a huge number of such knobs but based on experience I
-> expect that it will be turned off only by cloud providers or appliance
-> manufacturers that want to reduce the attack surface.  If it's enabled
-> by default, distros will generally leave it on.  You can also add "If
-> unsure, say Y" to the help message as we already do in several cases.(*)
->
-> In fact, if someone wants to turn it off, they will send the patch
-> themselves to add CONFIG_KVM_VMWARE and it will be accepted.  So we
-> might as well ask for it from the start. :)
->
-> Thanks,
->
-> Paolo
->
-> (*) In fact I am wondering if we should flip the default for Xen, in the
-> beginning it was just an Amazon thing but since then David has
-> contributed support in QEMU and CI.  To be clear, I am *not* asking
-> VMware for anything but selftests to make CONFIG_KVM_VMWARE default to
-> enabled.
->
+I will include this information in commit message and change WARN_ONCE() to
+pr_warn() (while at it, will change the format specifiers from %d to %u).
 
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+
+- Neeraj
+
+
+
+
 
