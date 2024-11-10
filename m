@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-31375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D169C327D
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 14:51:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C909C9C3271
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 14:50:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2EFE2814E5
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 13:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64412B20FB4
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2024 13:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15F516C453;
-	Sun, 10 Nov 2024 13:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1AD158DC6;
+	Sun, 10 Nov 2024 13:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pbpZa65v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="idrcjwEq"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1FC1E495;
-	Sun, 10 Nov 2024 13:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980CD156879;
+	Sun, 10 Nov 2024 13:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731246493; cv=none; b=WE+BiiD36xIhulri/o5Pw8Yt0oUWXS/FDWNAB3e9dgMHdCjM+Zg+PZQbuD0940F5fC6HB37HY0wzkTtmmGfJOKoAErLDJWaWs98Z/BzA6TnJTFXO6Uc3gqcC1lxE47qlsrw8D5DtkOiy6gHXNs4aZ8+HmVChbHrm3kcfDoSieqc=
+	t=1731246478; cv=none; b=X6HaiWoX5NDlJSNaOSOJXwRdYRF9fpsvcCt0Dj7mNhxzrcu1KWTiTz6U/EC8UtMRrPnpMXr5sLtJkExzlKg7UfblrD2NMclwSFIDMwloX7/N9fufVoGqCzSpGXc4Z+04BgqfqbpDL62WG+tZAJhYofb4ilwfTO5LAXdt6pYs8h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731246493; c=relaxed/simple;
-	bh=pdG8tJYtOOpW9U88JXztIsRHViZt5iy73W9I0cDiHOE=;
+	s=arc-20240116; t=1731246478; c=relaxed/simple;
+	bh=YpLncFZbCC4w0IIg6h/rxYvmMz7724GLt2jYf2BJ9P8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D12+SjzkGIC3XGerEtVwHBIEWdtkZCqNbdduZawTlZDdlkXM2PRztX/gpL79T8+uAuVr0Hej1e0/6fmZD3RgVszox/EdetaLBASGLDOsWgLjK8Vy8i4y1EX87zxZd1MlFxsqUIzMC/PHboSbzt2xdGWbTt2AsC9KcidGrSLRqkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pbpZa65v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A46FC4CECD;
-	Sun, 10 Nov 2024 13:48:10 +0000 (UTC)
+	 MIME-Version; b=gXzl1GpcNBhlEJHqMHx6zjK/SoCTo8eEzyj5zWirbG+6Yz9a9psWAokoQJQ8lANDRZ5CKT84SjwsJqdKpHgdHB7vdoXH3nhw1F/3vGR9ALyOj4ZAETOfLSxoqFOs3W7A5WvLzJwAjWOgiHL0tlZ0IBq8kLuw5f+BAw5vQLS9ebg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=idrcjwEq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0280EC4CED0;
+	Sun, 10 Nov 2024 13:47:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731246492;
-	bh=pdG8tJYtOOpW9U88JXztIsRHViZt5iy73W9I0cDiHOE=;
+	s=k20201202; t=1731246478;
+	bh=YpLncFZbCC4w0IIg6h/rxYvmMz7724GLt2jYf2BJ9P8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pbpZa65vIR2DqPSZ4TsPvtcw/+wMVaVuzHxc3556j06QBCSQPo8LTQLVlo3p5cEgx
-	 JtWAtYHyo2H3tyg1+4RE7PP6xXCdeWJ5pL4/yLDO7TyLDwiPNFaKJDJKeIS5Gt173n
-	 JVA05lNSVumatT80bDLow7ats8HMzVu32eDepejth9izPkfmzubf/cGYMkl7dfht9+
-	 VkTSucA+HclKies6MxsdkWYwDtk5Y5WVLCMiCJLlMohCCXElFB4jUbKgoAreuqRNUY
-	 elm+Wef/bXH1pbzObHQBMwMikpdmdSBUYu8I56YdbPjPZTFmAiX+4gAkCI8XDMpk2v
-	 dN+Gx1cJp3CJg==
+	b=idrcjwEq/EoT0LUqwuaWreqLebO5SDcBQgDV1O//O+FYNGTiFV3xTldlVeDGerZl3
+	 dVkni7ghlSq1heDpuSI32+VDBkUSGZMqC4GpaAVV9juagT/xvqqNqUvGMJvlY7O97O
+	 TLPvmYWSuWzKU9d8iDg+ff05guyyUGBjJksXHCpamrZypv0Kw0MdbKpuqC8flunhS8
+	 X6HrzF+Ea4oua7kVsWSu80BB+da6iiFR95zz86amHsQZeskTApWXCoeg23kJYEbW+j
+	 NDcmkfCp51GuTuLWkGnLvv7nRa3sSmVXpmesSHOtc/vQ8uQGNt1qvI3h1jR3zM+9Z2
+	 SuUKDe5+SsCBA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -70,9 +70,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 08/17] dma-mapping: add a dma_need_unmap helper
-Date: Sun, 10 Nov 2024 15:46:55 +0200
-Message-ID: <b912495d307d92ac7071553db99b3badc477fb12.1731244445.git.leon@kernel.org>
+Subject: [PATCH v3 09/17] docs: core-api: document the IOVA-based API
+Date: Sun, 10 Nov 2024 15:46:56 +0200
+Message-ID: <dca3aecdeeaa962c7842bc488378cdf069201d65.1731244445.git.leon@kernel.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <cover.1731244445.git.leon@kernel.org>
 References: <cover.1731244445.git.leon@kernel.org>
@@ -86,68 +86,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Christoph Hellwig <hch@lst.de>
 
-Add helper that allows a driver to skip calling dma_unmap_*
-if the DMA layer can guarantee that they are no-nops.
+Add an explanation of the newly added IOVA-based mapping API.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/linux/dma-mapping.h |  5 +++++
- kernel/dma/mapping.c        | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ Documentation/core-api/dma-api.rst | 70 ++++++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index 8074a3b5c807..6906edde505d 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -410,6 +410,7 @@ static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
- {
- 	return dma_dev_need_sync(dev) ? __dma_need_sync(dev, dma_addr) : false;
- }
-+bool dma_need_unmap(struct device *dev);
- #else /* !CONFIG_HAS_DMA || !CONFIG_DMA_NEED_SYNC */
- static inline bool dma_dev_need_sync(const struct device *dev)
- {
-@@ -435,6 +436,10 @@ static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
- {
- 	return false;
- }
-+static inline bool dma_need_unmap(struct device *dev)
-+{
-+	return false;
-+}
- #endif /* !CONFIG_HAS_DMA || !CONFIG_DMA_NEED_SYNC */
+diff --git a/Documentation/core-api/dma-api.rst b/Documentation/core-api/dma-api.rst
+index 8e3cce3d0a23..61d6f4fe3d88 100644
+--- a/Documentation/core-api/dma-api.rst
++++ b/Documentation/core-api/dma-api.rst
+@@ -530,6 +530,76 @@ routines, e.g.:::
+ 		....
+ 	}
  
- struct page *dma_alloc_pages(struct device *dev, size_t size,
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index 864a1121bf08..ed1c10e5c242 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -442,6 +442,24 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr)
- }
- EXPORT_SYMBOL_GPL(__dma_need_sync);
- 
-+/**
-+ * dma_need_unmap - does this device need dma_unmap_* operations
-+ * @dev: device to check
-+ *
-+ * If this function returns %false, drivers can skip calling dma_unmap_* after
-+ * finishing an I/O.  This function must be called after all mappings that might
-+ * need to be unmapped have been performed.
-+ */
-+bool dma_need_unmap(struct device *dev)
-+{
-+	if (!dma_map_direct(dev, get_dma_ops(dev)))
-+		return true;
-+	if (!dev->dma_skip_sync)
-+		return true;
-+	return IS_ENABLED(CONFIG_DMA_API_DEBUG);
-+}
-+EXPORT_SYMBOL_GPL(dma_need_unmap);
++Part Ie - IOVA-based DMA mappings
++---------------------------------
 +
- static void dma_setup_need_sync(struct device *dev)
- {
- 	const struct dma_map_ops *ops = get_dma_ops(dev);
++These APIs allow a very efficient mapping when using an IOMMU.  They are an
++optional path that requires extra code and are only recommended for drivers
++where DMA mapping performance, or the space usage for storing the DMA addresses
++matter.  All the considerations from the previous section apply here as well.
++
++::
++
++    bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
++		phys_addr_t phys, size_t size);
++
++Is used to try to allocate IOVA space for mapping operation.  If it returns
++false this API can't be used for the given device and the normal streaming
++DMA mapping API should be used.  The ``struct dma_iova_state`` is allocated
++by the driver and must be kept around until unmap time.
++
++::
++
++    static inline bool dma_use_iova(struct dma_iova_state *state)
++
++Can be used by the driver to check if the IOVA-based API is used after a
++call to dma_iova_try_alloc.  This can be useful in the unmap path.
++
++::
++
++    int dma_iova_link(struct device *dev, struct dma_iova_state *state,
++		phys_addr_t phys, size_t offset, size_t size,
++		enum dma_data_direction dir, unsigned long attrs);
++
++Is used to link ranges to the IOVA previously allocated.  The start of all
++but the first call to dma_iova_link for a given state must be aligned
++to the DMA merge boundary returned by ``dma_get_merge_boundary())``, and
++the size of all but the last range must be aligned to the DMA merge boundary
++as well.
++
++::
++
++    int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
++		size_t offset, size_t size);
++
++Must be called to sync the IOMMU page tables for IOVA-range mapped by one or
++more calls to ``dma_iova_link()``.
++
++For drivers that use a one-shot mapping, all ranges can be unmapped and the
++IOVA freed by calling:
++
++::
++
++   void dma_iova_destroy(struct device *dev, struct dma_iova_state *state,
++		enum dma_data_direction dir, unsigned long attrs);
++
++Alternatively drivers can dynamically manage the IOVA space by unmapping
++and mapping individual regions.  In that case
++
++::
++
++    void dma_iova_unlink(struct device *dev, struct dma_iova_state *state,
++		size_t offset, size_t size, enum dma_data_direction dir,
++		unsigned long attrs);
++
++is used to unmap a range previously mapped, and
++
++::
++
++   void dma_iova_free(struct device *dev, struct dma_iova_state *state);
++
++is used to free the IOVA space.  All regions must have been unmapped using
++``dma_iova_unlink()`` before calling ``dma_iova_free()``.
+ 
+ Part II - Non-coherent DMA allocations
+ --------------------------------------
 -- 
 2.47.0
 
