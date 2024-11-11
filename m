@@ -1,181 +1,167 @@
-Return-Path: <kvm+bounces-31507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660529C437A
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:22:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4499C4391
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 260362843A0
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:22:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C49BB286F1
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E2C1A76B2;
-	Mon, 11 Nov 2024 17:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E1D1AA1D6;
+	Mon, 11 Nov 2024 17:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSHhWanb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1aB2vl0z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC4553389;
-	Mon, 11 Nov 2024 17:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6CB1A76AC
+	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 17:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731345748; cv=none; b=VqClxIaobaUbue8/vU3/Ghatct7JutBSrb3jNBN4n4Bmi7F9yyFTxmI9GHkPQUSdUBzeofjoULgZ/MjRWFEQ8vWYgsfn5HA2avNU9ARXnqFjbmXVwdCLN0Pq79EAyRH4pYDEW6xOokN039h+DDFfPIVP7XmTXJRHwz8QJl8ZWgI=
+	t=1731346009; cv=none; b=KWP9dpQMc0U5PzlDjb4WcgxxKNWRMi6HBKd/6rfdIZSTboZmyiOojEnXcVj5am/5Du3IsFgc9TJZBzRKWpl7g8mn/7u2Vis6dG/9W+0OHnqmZI1WeeoeOZDzlzKtaNbLOI7t2CEMmOVRiqo6DqVCOXPHG+OORA/dl/9qY89uzs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731345748; c=relaxed/simple;
-	bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=he6/PCE+FBOOH3eNTE+8gPK3uT3OxEbHerv38qr0/mr1ZMNx6shGE5UCkS1mozPsrxIKIUhmvxs+sdGoNbtB6O1WIOB7WAnF4RzMTvphRnMPBsCiGkZfem8iJBagOw5pYZ1GF9d932DdIE8XOTzjHfqXN0kUkZJa2MNmTBwQqH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSHhWanb; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9e71401844so609328266b.3;
-        Mon, 11 Nov 2024 09:22:26 -0800 (PST)
+	s=arc-20240116; t=1731346009; c=relaxed/simple;
+	bh=23WrqE374qcPavVAt8ak/FTD8NqfQn53RxX/2JCrZmM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=e9SAETIjmTNwy0d/xFWlt28mNWZ2qf9/jGLjG5yeDzjbE7Tt3gZ9wMlIAobQjOxPfoU8XcbdryTXWNWh6gVWF9vRtfo1zI282MvhQMmqGc+sryl2R+ru/mphZNCD/c2iCgOv+9my+2b+/WyXb/OYJVoihhA6quwKt2o+TjA2wh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1aB2vl0z; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6eae6aba72fso49155347b3.2
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 09:26:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731345745; x=1731950545; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
-        b=JSHhWanbb0uI1IYmzz+5O8DAvmKqgt7Kg+uC1Y1jK0kJTw58flwWQJqW8ruf904Jt4
-         T0ztYXhW3lsBX9xquZeQGfvhR9EpCfwt6Xo2g6/CJIQehhoHsl7rLXc8avPwZ5egq+b+
-         z+VfxO7tHIoqZUoCHouxhEBRjAjsUCFswt9rnwo9EYPbYqWbyxTBYOItOXXhxxULvjxU
-         wdf1AsUGQGkaUNo0A0aXCJ7Y57zegzNKfkjpHTCNN3+u5Nc63Nbx3iZWwnaLhYXYTTGb
-         OykExxWYg4VogrKqz8uy51bE45Y0o0NrzRDzj0sbouSLrE0Lu2VSKGcjt2zXfeK89Lc2
-         5C4w==
+        d=google.com; s=20230601; t=1731346006; x=1731950806; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFNzzBptbqFMn5hbeVzVEvhXPizvBNs5CQtEzxCma9I=;
+        b=1aB2vl0zUTiRw/c861HhWUMHfQD0RF/hSG/RUB66+azolO2oKnW4HEkRl0ND8+1nBg
+         XHItKAJGGobjimfyhIZeTI21nIgyhzrRkzzdwfUI+pbKxayuZ41c2keaYnYWFfT2bjU0
+         kY77QegWCAdIJc+F6NyPMR8jV2DH21jEGgzZK6jMsOy7PvbBSpBH66Yc5P62SFjps1Sy
+         xdcr7o+2yd1gDKApwo2DoN9VKsL8OCVjX3XU/M0OC04IBa9Rz5yiFQEGNXFWN6l1ki5E
+         6LjC/3kET0ZEm67+KBnmszEuDjGkmHP0fxuZAsT2ioUMc0qbcXwd1u2u2F8YkLDTPgu4
+         jBZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731345745; x=1731950545;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
-        b=UKR7QlHeWfau12OwRpNCXQfFgduONLvYbNVKbxQN4TIRQZdw4R6EnJs/1rsPIs4xsx
-         8nJJm72D9xz2Tj0XUvx5ip5KcNINVMrdNBXQBViizFk9bVzhS1qP/ErJLoZ54tB7rXEv
-         JeV0dcxUXtN6pA2kPM5TBQVB0RTLH+wBfuaH/A5k41AD77NFkb+qhIXi9enGFZCnpMUV
-         jLr/tAR+rex2vflQSHhM6bCMnU293Ek6u4i1tG7a3w7UNw1d6nYZrVAENOWVgLElT7O3
-         q7Tm3MTKdjxX/WMpZFLIu500+66fOEw+vN27Z1+O9ZT7YMI9FpzLfKqvfuwU3vGOVzGk
-         iFQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUkrBzJpwJVzS2xSm5K3NwEOTRvVlwX8zklIvr4yNMBtr7Qynje+xEGZr2xyfAJ9zjW5K2cTNw2@vger.kernel.org, AJvYcCWHMTptRW1Lysh9Bw0Ugo/K1oEUVFr6CHNZZ7dWNxctcQlX83j/C82b59HSfe43YjjJA9Ui@vger.kernel.org, AJvYcCWiEmeXVGSFEIGbfltYHDy0wuNTuLc1oD9RLtxcvFM1j8biaLy1xNKC3Eha96Tgpn68w/4AZylB/Bpp832FHg==@vger.kernel.org, AJvYcCXNnECAfKkJI7MC6H4pFCvJLalj/tv4FRgYOkZb90Nqg0E+zLUh0kSwH7lWkAbNXocfEb4dbmnv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq8YyDMniAq/OGwgHg3tyCdtXlHAqkPv/lLi3oarWK9TcFHsiL
-	8J4+nx3J6CUQvBHyhZ3tzOHH/xuwO0+g73vCSAF7D6sujL+IWNUe
-X-Google-Smtp-Source: AGHT+IEx8OnbykPGy4f6eWQoWmDySenWo8hIPrT3zblQC9L6SbeYzeZpoVaF6fTVt7NttLnO1TF+Gw==
-X-Received: by 2002:a17:907:7b89:b0:a9e:b093:2422 with SMTP id a640c23a62f3a-a9eeffe9665mr1131551766b.48.1731345745148;
-        Mon, 11 Nov 2024 09:22:25 -0800 (PST)
-Received: from ?IPv6:2001:b07:5d29:f42d:fe70:af48:a973:5fa7? ([2001:b07:5d29:f42d:fe70:af48:a973:5fa7])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0def47esm609209666b.160.2024.11.11.09.22.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 09:22:24 -0800 (PST)
-Message-ID: <a70cedcc4389cc90ecac7b7c477481724c71824a.camel@gmail.com>
-Subject: Re: [PATCH v3 14/28] fdget(), trivial conversions
-From: Francesco Lavra <francescolavra.fl@gmail.com>
-To: Al Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org
-Cc: brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	netdev@vger.kernel.org, torvalds@linux-foundation.org
-Date: Mon, 11 Nov 2024 18:22:23 +0100
-In-Reply-To: <20241102050827.2451599-14-viro@zeniv.linux.org.uk>
-References: <20241102050219.GA2450028@ZenIV>
-	 <20241102050827.2451599-1-viro@zeniv.linux.org.uk>
-	 <20241102050827.2451599-14-viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+        d=1e100.net; s=20230601; t=1731346006; x=1731950806;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFNzzBptbqFMn5hbeVzVEvhXPizvBNs5CQtEzxCma9I=;
+        b=iAr9k1S7ugWcSgHD3jj0Lr0fUIlneZ6F8WRn+brz5ppFXemmMPESUBxBUNr4jHDxMU
+         6Ygs3v5oBodjn9Sokp5YzqJPB58adkIN0KwAWc41m+xEQfXW7LxHVjhRwgeLCQ5Mq5xc
+         M1VzpWnZO8Bz+wzCy1nU1r61VwC4KGdLr/2WzOERQIw2QQvKtSjW9NDeCq4w25qtWGpx
+         pRAV6JEW5EWIm7cFV63jCFIkxAMQlu8gH9xDVs90UV2KyjG5469odrA+9fIgxK7v6fVO
+         F6qeY0UG+2Xed76mELBGMJfNCRgWGk0xjh/WdzxUQQD7SkgWBB6DTr//1Ll597Zs2kYa
+         POfA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnjzGOB+Vt+PniJpkXO7nlymTavCBIuscFaj2jnoStYrpehQXv5nNaDoU7QcWFBZ4BaFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yypcv/gSGF7UwJE1E90i4i5VEXoesEWESPpcdC+5XDcqKrp3cL3
+	ziGSiYDfHD9r/cmhm0x/h+gUY/b6GwA+1FJM6Q5z8dRmhH3lXaLfSZ7DxPqKfbza2C5I34ppTuD
+	34Q==
+X-Google-Smtp-Source: AGHT+IEImE/FFMrQDP3H8KYOmoDoy1BC8s/LYapy2rg6qs6vaGT8I3mAESoIofDSpW3UbZ66iGTODCiktXk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3688:b0:6ea:fa4:a365 with SMTP id
+ 00721157ae682-6eaddfec9efmr925017b3.8.1731346005823; Mon, 11 Nov 2024
+ 09:26:45 -0800 (PST)
+Date: Mon, 11 Nov 2024 09:26:44 -0800
+In-Reply-To: <20241111125219.361243118@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20241111115935.796797988@infradead.org> <20241111125219.361243118@infradead.org>
+Message-ID: <ZzI-VHh0GpBUph3l@google.com>
+Subject: Re: [PATCH v2 12/12] x86/kvm/emulate: Avoid RET for fastops
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: pbonzini@redhat.com, jpoimboe@redhat.com, tglx@linutronix.de, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-T24gU2F0LCAyMDI0LTExLTAyIGF0IDA1OjA4ICswMDAwLCBBbCBWaXJvIHdyb3RlOgo+IGZkZ2V0
-KCkgaXMgdGhlIGZpcnN0IHRoaW5nIGRvbmUgaW4gc2NvcGUsIGFsbCBtYXRjaGluZyBmZHB1dCgp
-IGFyZQo+IGltbWVkaWF0ZWx5IGZvbGxvd2VkIGJ5IGxlYXZpbmcgdGhlIHNjb3BlLgo+IAo+IFJl
-dmlld2VkLWJ5OiBDaHJpc3RpYW4gQnJhdW5lciA8YnJhdW5lckBrZXJuZWwub3JnPgo+IFNpZ25l
-ZC1vZmYtYnk6IEFsIFZpcm8gPHZpcm9AemVuaXYubGludXgub3JnLnVrPgo+IC0tLQo+IMKgYXJj
-aC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfdmlvLmPCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIxICsr
-Ky0tLS0tLS0tLQo+IMKgYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmPCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCB8IDI0ICsrKystLS0tLS0tLS0KPiDCoGFyY2gvcG93ZXJwYy9wbGF0
-Zm9ybXMvY2VsbC9zcHVfc3lzY2FsbHMuYyB8wqAgNiArKy0tCj4gwqBhcmNoL3g4Ni9rZXJuZWwv
-Y3B1L3NneC9tYWluLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKy0tLS0KPiDCoGFy
-Y2gveDg2L2t2bS9zdm0vc2V2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIHwgMzkgKysrKysrKystLS0tLS0tLS0tLS0KPiAtLQo+IMKgZHJpdmVycy9ncHUvZHJtL2Ft
-ZC9hbWRncHUvYW1kZ3B1X3NjaGVkLmPCoCB8IDIzICsrKystLS0tLS0tLS0KPiDCoGRyaXZlcnMv
-Z3B1L2RybS9kcm1fc3luY29iai5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDkgKyst
-LS0KPiDCoGRyaXZlcnMvbWVkaWEvcmMvbGlyY19kZXYuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCB8IDEzICsrKy0tLS0tCj4gwqBmcy9idHJmcy9pb2N0bC5jwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSArKy0KPiDCoGZzL2V2
-ZW50ZmQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB8wqAgOSArKy0tLQo+IMKgZnMvZXZlbnRwb2xsLmPCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIzICsrKystLS0tLS0t
-LS0KPiDCoGZzL2ZoYW5kbGUuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSArKy0KPiDCoGZzL2lvY3RsLmPCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwg
-MjMgKysrKystLS0tLS0tLQo+IMKgZnMva2VybmVsX3JlYWRfZmlsZS5jwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMTIgKysrLS0tLQo+IMKgZnMvbm90aWZ5L2Zh
-bm90aWZ5L2Zhbm90aWZ5X3VzZXIuY8KgwqDCoMKgwqDCoMKgwqAgfCAxNSArKystLS0tLS0KPiDC
-oGZzL25vdGlmeS9pbm90aWZ5L2lub3RpZnlfdXNlci5jwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAx
-NyArKystLS0tLS0tCj4gwqBmcy9vcGVuLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAzNiArKysrKysrKystLS0tLS0t
-LS0tLQo+IMKgZnMvcmVhZF93cml0ZS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjggKysrKystLS0tLS0tLS0tLQo+IMKgZnMvc2lnbmFs
-ZmQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgfMKgIDkgKystLS0KPiDCoGZzL3N5bmMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDI5ICsrKysrKy0tLS0t
-LS0tLS0KPiDCoGlvX3VyaW5nL3NxcG9sbC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAyOSArKysrKy0tLS0tLS0tLS0tCj4gwqBrZXJuZWwvZXZl
-bnRzL2NvcmUuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwg
-MTQgKysrLS0tLS0KPiDCoGtlcm5lbC9uc3Byb3h5LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA1ICsrLQo+IMKga2VybmVsL3BpZC5jwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHzCoCA3ICsrLS0KPiDCoGtlcm5lbC9zeXMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE1ICsrKy0tLS0tLQo+IMKga2VybmVs
-L3dhdGNoX3F1ZXVlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCB8wqAgNiArKy0tCj4gwqBtbS9mYWR2aXNlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKy0tLS0KPiDCoG1tL3JlYWRh
-aGVhZC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgfCAxNyArKystLS0tLS0tCj4gwqBuZXQvY29yZS9uZXRfbmFtZXNwYWNlLmPCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKystLS0KPiDCoHNlY3VyaXR5L2xh
-bmRsb2NrL3N5c2NhbGxzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjYgKysrKyst
-LS0tLS0tLS0tCj4gwqB2aXJ0L2t2bS92ZmlvLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDggKystLS0KPiDCoDMxIGZpbGVzIGNoYW5n
-ZWQsIDE2NCBpbnNlcnRpb25zKCspLCAzMzkgZGVsZXRpb25zKC0pCgpbLi4uXQoKPiBkaWZmIC0t
-Z2l0IGEvZnMvcmVhZF93cml0ZS5jIGIvZnMvcmVhZF93cml0ZS5jCj4gaW5kZXggZWYzZWUzNzI1
-NzE0Li41ZTNkZjJkMzkyODMgMTAwNjQ0Cj4gLS0tIGEvZnMvcmVhZF93cml0ZS5jCj4gKysrIGIv
-ZnMvcmVhZF93cml0ZS5jCj4gQEAgLTE2NjMsMzYgKzE2NjMsMzIgQEAgU1lTQ0FMTF9ERUZJTkU2
-KGNvcHlfZmlsZV9yYW5nZSwgaW50LCBmZF9pbiwKPiBsb2ZmX3QgX191c2VyICosIG9mZl9pbiwK
-PiDCoHsKPiDCoMKgwqDCoMKgwqDCoMKgbG9mZl90IHBvc19pbjsKPiDCoMKgwqDCoMKgwqDCoMKg
-bG9mZl90IHBvc19vdXQ7Cj4gLcKgwqDCoMKgwqDCoMKgc3RydWN0IGZkIGZfaW47Cj4gLcKgwqDC
-oMKgwqDCoMKgc3RydWN0IGZkIGZfb3V0Owo+IMKgwqDCoMKgwqDCoMKgwqBzc2l6ZV90IHJldCA9
-IC1FQkFERjsKClRoaXMgaW5pdGlhbGl6YXRpb24gaXMgbm8gbG9uZ2VyIG5lZWRlZC4KCj4gwqAK
-PiAtwqDCoMKgwqDCoMKgwqBmX2luID0gZmRnZXQoZmRfaW4pOwo+IC3CoMKgwqDCoMKgwqDCoGlm
-ICghZmRfZmlsZShmX2luKSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBv
-dXQyOwo+ICvCoMKgwqDCoMKgwqDCoENMQVNTKGZkLCBmX2luKShmZF9pbik7Cj4gK8KgwqDCoMKg
-wqDCoMKgaWYgKGZkX2VtcHR5KGZfaW4pKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqByZXR1cm4gLUVCQURGOwo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgZl9vdXQgPSBmZGdldChmZF9v
-dXQpOwo+IC3CoMKgwqDCoMKgwqDCoGlmICghZmRfZmlsZShmX291dCkpCj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0MTsKPiArwqDCoMKgwqDCoMKgwqBDTEFTUyhmZCwg
-Zl9vdXQpKGZkX291dCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGZkX2VtcHR5KGZfb3V0KSkKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FQkFERjsKPiDCoAo+IC3CoMKg
-wqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gwqDCoMKgwqDCoMKgwqDCoGlmIChvZmZfaW4pIHsK
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChjb3B5X2Zyb21fdXNlcigmcG9z
-X2luLCBvZmZfaW4sIHNpemVvZihsb2ZmX3QpKSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FRkFVTFQ7Cj4gwqDCoMKgwqDCoMKgwqDC
-oH0gZWxzZSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwb3NfaW4gPSBmZF9m
-aWxlKGZfaW4pLT5mX3BvczsKPiDCoMKgwqDCoMKgwqDCoMKgfQo+IMKgCj4gwqDCoMKgwqDCoMKg
-wqDCoGlmIChvZmZfb3V0KSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAo
-Y29weV9mcm9tX3VzZXIoJnBvc19vdXQsIG9mZl9vdXQsCj4gc2l6ZW9mKGxvZmZfdCkpKQo+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7Cj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVG
-QVVMVDsKPiDCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIHsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHBvc19vdXQgPSBmZF9maWxlKGZfb3V0KS0+Zl9wb3M7Cj4gwqDCoMKgwqDCoMKg
-wqDCoH0KPiDCoAo+IC3CoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gwqDCoMKgwqDCoMKg
-wqDCoGlmIChmbGFncyAhPSAwKQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3Rv
-IG91dDsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FSU5WQUw7Cj4g
-wqAKPiDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gdmZzX2NvcHlfZmlsZV9yYW5nZShmZF9maWxlKGZf
-aW4pLCBwb3NfaW4sCj4gZmRfZmlsZShmX291dCksIHBvc19vdXQsIGxlbiwKPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-ZmxhZ3MpOwoK
+KVM: x86:
 
+On Mon, Nov 11, 2024, Peter Zijlstra wrote:
+> Since there is only a single fastop() function, convert the FASTOP
+> stuff from CALL_NOSPEC+RET to JMP_NOSPEC+JMP, avoiding the return
+> thunks and all that jazz.
+> 
+> Specifically FASTOPs rely on the return thunk to preserve EFLAGS,
+> which not all of them can trivially do (call depth tracing suffers
+> here).
+
+Maybe add an example?  Mostly as a reminder of how to reproduce the call depth
+issues.
+
+  E.g. booting with "retbleed=force,stuff spectre_v2=retpoline,generic" causes
+  KVM-Unit-Test's "emulator" test to fail due to flags being clobbered.
+
+> Objtool strenuously complains about this:
+> 
+>  - indirect call without a .rodata, fails to determine JUMP_TABLE,
+>    annotate
+>  - fastop functions fall through, exception
+>  - unreachable instruction after fastop_return, save/restore
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+The original patch works, but with the fixup KVM fails emulation of an ADC and
+generates:
+
+  ------------[ cut here ]------------
+  Unpatched return thunk in use. This should not happen!
+  WARNING: CPU: 4 PID: 1452 at arch/x86/kernel/cpu/bugs.c:3063 __warn_thunk+0x26/0x30
+  Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel kvm
+  CPU: 4 UID: 1000 PID: 1452 Comm: qemu Not tainted 6.12.0-rc5-22582d7d68a6-rev/fastops-miti #11
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:__warn_thunk+0x26/0x30
+  Code: 5e ff 7e 05 0f 1f 44 00 00 80 3d 5d 06 5c 01 00 74 05 e9 bd 7d a0 00 48 c7 c7 10 4a 13 82 c6 05 48 06 5c 01 01 e8 31 48 04 00 <0f> 0b e9 a3 7d a0 00 cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90
+  RSP: 0018:ffffc90001743c78 EFLAGS: 00010287
+  RAX: 0000000000000000 RBX: ffff88811877a040 RCX: 0000000000000027
+  RDX: ffff88846f91b208 RSI: 0000000000000001 RDI: ffff88846f91b200
+  RBP: ffffc90001743cc8 R08: ffffffff825195c8 R09: 0000000000000003
+  R10: ffffffff824395e0 R11: ffffffff824e95e0 R12: 0000000000000000
+  R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+  FS:  00007f3027400700(0000) GS:ffff88846f900000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00007f3029ba3001 CR3: 000000010cdc0000 CR4: 0000000000352eb0
+  Call Trace:
+   <TASK>
+   ? __warn+0x85/0x120
+   ? __warn_thunk+0x26/0x30
+   ? report_bug+0x17d/0x190
+   ? handle_bug+0x53/0x90
+   ? exc_invalid_op+0x14/0x70
+   ? asm_exc_invalid_op+0x16/0x20
+   ? __warn_thunk+0x26/0x30
+   ? __warn_thunk+0x26/0x30
+   warn_thunk_thunk+0x16/0x30
+   ? __kvm_mmu_topup_memory_cache+0x57/0x150 [kvm]
+   init_emulate_ctxt+0xae/0x110 [kvm]
+   x86_decode_emulated_instruction+0x25/0x80 [kvm]
+   x86_emulate_instruction+0x2cb/0x6f0 [kvm]
+   vmx_handle_exit+0x394/0x6e0 [kvm_intel]
+   kvm_arch_vcpu_ioctl_run+0xf40/0x1db0 [kvm]
+   kvm_vcpu_ioctl+0x2e9/0x870 [kvm]
+   ? futex_wake+0x81/0x180
+   ? call_depth_return_thunk+0x6c/0x90
+   ? call_depth_return_thunk+0x66/0x90
+   ? call_depth_return_thunk+0x60/0x90
+   ? call_depth_return_thunk+0x5a/0x90
+   __x64_sys_ioctl+0x8a/0xc0
+   do_syscall_64+0x5b/0x170
+   entry_SYSCALL_64_after_hwframe+0x71/0x79
+  RIP: 0033:0x7f30290cedeb
+  Code: 0f 92 c0 84 c0 75 b0 49 8d 3c 1c e8 ff 47 04 00 85 c0 78 b1 48 83 c4 08 4c 89 e0 5b 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a0 ff ff ff f7 d8 64 89 01 48
+  RSP: 002b:00007f30273ff748 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+  RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007f30290cedeb
+  RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000e
+  RBP: 0000555587e2f1e0 R08: 00007f302923fc10 R09: 0000000000000000
+  R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+  R13: 00007f3029b90780 R14: 00007ffea5ab9640 R15: 00007f30273ffa00
+   </TASK>
+  ---[ end trace 0000000000000000 ]---
 
