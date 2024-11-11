@@ -1,213 +1,188 @@
-Return-Path: <kvm+bounces-31423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0AC19C3A5A
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 10:00:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB19C9C3AB9
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 10:18:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E03FB216FD
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA0D1C2161F
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E8716CD1D;
-	Mon, 11 Nov 2024 09:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328F51714B9;
+	Mon, 11 Nov 2024 09:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3XRrk42"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iEAgo/GY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AE3A933;
-	Mon, 11 Nov 2024 09:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8650F1684B4
+	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 09:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731315630; cv=none; b=YhQpMKkSaXbqvbbYRFLci5dOx0dYacC0Ji7MzwrdNz+eIsZvBtnEg24vqQrl2h5VJYkDV2SHu746ty5d+e/HTxirSmEaVtcynwWL1s6Gi74lnQR+m5+sq9z7rrCdzJRiX/9vmi4hhgP0rH+dYWfSX0aum1Ho8uAtvRXT/5OhpRE=
+	t=1731316690; cv=none; b=gQaBieLyoXgr07D/n6UuBpxImWPT8zbPYt86E84sQL801+M8LEOqvWzRxHW0zShI+FfFirofwPS1+h9sYyenwbt3fyet3JwKqhPGWu7AoKSxN+j3eCEqXL8n8VgqQJHekwZt89AdNA7WOrntyih3hoYX2a6KfGEawhVn2wI3atM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731315630; c=relaxed/simple;
-	bh=loTNOLmAdA71QdyDe/0WgDlOoKF9wgs054AZGs6HB9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hT7mJx/KHHqpZRpGa2gunMzOKZFzNROFUMqqtLFM4ExkemhjWcgZk7HbsoJf9RsVHloeTZcpnLuksU5fNtUQewwD8/nPlLxnHNEFd2ke+TVK8dJ24UibImznDYFmoH9CRNHo2gzRZaK54Z54+TH8JciWsc8ZyJCGLMDIuNzxe88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3XRrk42; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731315628; x=1762851628;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=loTNOLmAdA71QdyDe/0WgDlOoKF9wgs054AZGs6HB9U=;
-  b=g3XRrk423JgNfacFdn4vWFMhD1ebsnMSSzEi9ueBKBCcec+nVCIe97HF
-   y0al1jU4a0gK42hl+Er2EAYpe9+wVrNj8HJmPfIn8bMwdoDAUNn5Ou73+
-   gvVRj3+yrhBb25weMeiQht5DxL+iDjekZouDX6mgkZIxMXW7wz1PkyrQD
-   rg+AorC9sjayXbimnmrH/W+2SlMvXa87J+/RbrxrbppH387GK2/gFwiRA
-   9ImMMeXg+8/b8Gx8tj+4nR3n4HcWnYQM4oopG7JHZPi/XBWravtEldXPS
-   ii7I8wyjfrCuFIxVjY5xX7PEY1+7ZB9gu+VZKiz0hchdckAzGY1hBzEBM
-   A==;
-X-CSE-ConnectionGUID: /nsM4j5MTfaugOFWZYe3Gg==
-X-CSE-MsgGUID: R45FHKmiSviBKVkO9oFBXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="30526945"
-X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="30526945"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 01:00:26 -0800
-X-CSE-ConnectionGUID: r2wigX/3QuqjEy20I10C0g==
-X-CSE-MsgGUID: FfJ5VEcJRp2PHfmypg3kew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="86928885"
-Received: from spr.sh.intel.com ([10.239.53.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 01:00:23 -0800
-From: Chao Gao <chao.gao@intel.com>
-To: kvm@vger.kernel.org
-Cc: Chao Gao <chao.gao@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: Remove hwapic_irr_update() from kvm_x86_ops
-Date: Mon, 11 Nov 2024 16:59:46 +0800
-Message-ID: <20241111085947.432645-1-chao.gao@intel.com>
-X-Mailer: git-send-email 2.46.1
+	s=arc-20240116; t=1731316690; c=relaxed/simple;
+	bh=vrtmAc4UMCfpJL2tWdhzjeS9kERJKnjRRm/3+8kKzcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UYN0bW1953M02upWuASlP9vmEtSuQtz37RXie/Tdj2Muq3oIxYhs7MSLDzYgrbKLoGnud9q8GJVFr5EoNlSxvqSJvZ5LRlnV1hpp0aSDoE+wN8KjHj6X5k2e/0rTtXdYuVixLnq338HjlcSOjD6dFek7XsWksTxHTwQbKtelIjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iEAgo/GY; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 11 Nov 2024 10:17:56 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731316685;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EzUeKtePNrNEApOWSpMcpLhGzcTsAYgUR4N7OcjYIW4=;
+	b=iEAgo/GYRgdMHv9z4cM68mqIrUsUUMkM9Kq2r+2iWJiFdWv4AvJrqQ+w5EkJq/RpqAqmTG
+	DnxnwiFTqi4mOGhpCxps+dFzs58W8YvrgJpHIe4AnGMc+8K/psGHYqRfoLUfsPfAr9+8lL
+	MLwH+ziVQjXNSj1fFU4lDm0KD32bg7c=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH v7 1/2] riscv: sbi: Fix entry point of HSM
+ tests
+Message-ID: <20241111-a92e91173a670b48b3620222@orel>
+References: <20241110171633.113515-1-jamestiotio@gmail.com>
+ <20241110171633.113515-2-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241110171633.113515-2-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Remove the redundant .hwapic_irr_update() ops.
+On Mon, Nov 11, 2024 at 01:16:32AM +0800, James Raphael Tiovalen wrote:
+> With the current trick of setting opaque as hartid, the HSM tests would
+> not be able to catch a bug where a0 is set to opaque and a1 is set to
+> hartid. Fix this issue by setting a1 to an array with some magic number
+> as the first element and hartid as the second element, following the
+> behavior of the SUSP tests.
+> 
+> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+> ---
+>  riscv/sbi-tests.h | 13 ++++++++++---
+>  riscv/sbi-asm.S   | 33 +++++++++++++++++++--------------
+>  riscv/sbi.c       |  1 +
+>  3 files changed, 30 insertions(+), 17 deletions(-)
 
-If a vCPU has APICv enabled, KVM updates its RVI before VM-enter to L1
-in vmx_sync_pir_to_irr(). This guarantees RVI is up-to-date and aligned
-with the vIRR in the virtual APIC. So, no need to update RVI every time
-the vIRR changes.
+This doesn't apply to the latest riscv/sbi branch, but I'll try to sort it
+out.
 
-Note that KVM never updates vmcs02 RVI in .hwapic_irr_update() or
-vmx_sync_pir_to_irr(). So, removing .hwapic_irr_update() has no
-impact to the nested case.
+Thanks,
+drew
 
-Signed-off-by: Chao Gao <chao.gao@intel.com>
----
- arch/x86/include/asm/kvm-x86-ops.h |  1 -
- arch/x86/include/asm/kvm_host.h    |  1 -
- arch/x86/kvm/lapic.c               |  6 ------
- arch/x86/kvm/vmx/main.c            |  1 -
- arch/x86/kvm/vmx/vmx.c             | 14 --------------
- arch/x86/kvm/vmx/x86_ops.h         |  1 -
- 6 files changed, 24 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 861d080ed4c6..68505a9ac3c6 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -82,7 +82,6 @@ KVM_X86_OP(enable_nmi_window)
- KVM_X86_OP(enable_irq_window)
- KVM_X86_OP_OPTIONAL(update_cr8_intercept)
- KVM_X86_OP(refresh_apicv_exec_ctrl)
--KVM_X86_OP_OPTIONAL(hwapic_irr_update)
- KVM_X86_OP_OPTIONAL(hwapic_isr_update)
- KVM_X86_OP_OPTIONAL(load_eoi_exitmap)
- KVM_X86_OP_OPTIONAL(set_virtual_apic_mode)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6d9f763a7bb9..f654ecb99917 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1732,7 +1732,6 @@ struct kvm_x86_ops {
- 	const unsigned long required_apicv_inhibits;
- 	bool allow_apicv_in_x2apic_without_x2apic_virtualization;
- 	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
--	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
- 	void (*hwapic_isr_update)(int isr);
- 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
- 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 65412640cfc7..6a81233c304d 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -734,10 +734,7 @@ static inline int apic_find_highest_irr(struct kvm_lapic *apic)
- static inline void apic_clear_irr(int vec, struct kvm_lapic *apic)
- {
- 	if (unlikely(apic->apicv_active)) {
--		/* need to update RVI */
- 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
--		kvm_x86_call(hwapic_irr_update)(apic->vcpu,
--						apic_find_highest_irr(apic));
- 	} else {
- 		apic->irr_pending = false;
- 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
-@@ -2766,7 +2763,6 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	apic_update_ppr(apic);
- 	if (apic->apicv_active) {
- 		kvm_x86_call(apicv_post_state_restore)(vcpu);
--		kvm_x86_call(hwapic_irr_update)(vcpu, -1);
- 		kvm_x86_call(hwapic_isr_update)(-1);
- 	}
- 
-@@ -3083,8 +3079,6 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	kvm_apic_update_apicv(vcpu);
- 	if (apic->apicv_active) {
- 		kvm_x86_call(apicv_post_state_restore)(vcpu);
--		kvm_x86_call(hwapic_irr_update)(vcpu,
--						apic_find_highest_irr(apic));
- 		kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(apic));
- 	}
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 7668e2fb8043..7ba7d416af58 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -99,7 +99,6 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
- 	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
- 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
--	.hwapic_irr_update = vmx_hwapic_irr_update,
- 	.hwapic_isr_update = vmx_hwapic_isr_update,
- 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
- 	.deliver_interrupt = vmx_deliver_interrupt,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b1bb64890cb2..17fc191efd5d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6888,20 +6888,6 @@ static void vmx_set_rvi(int vector)
- 	}
- }
- 
--void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
--{
--	/*
--	 * When running L2, updating RVI is only relevant when
--	 * vmcs12 virtual-interrupt-delivery enabled.
--	 * However, it can be enabled only when L1 also
--	 * intercepts external-interrupts and in that case
--	 * we should not update vmcs02 RVI but instead intercept
--	 * interrupt. Therefore, do nothing when running L2.
--	 */
--	if (!is_guest_mode(vcpu))
--		vmx_set_rvi(max_irr);
--}
--
- int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index a55981c5216e..847080d5fb70 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -47,7 +47,6 @@ bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu);
- void vmx_migrate_timers(struct kvm_vcpu *vcpu);
- void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- void vmx_apicv_pre_state_restore(struct kvm_vcpu *vcpu);
--void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr);
- void vmx_hwapic_isr_update(int max_isr);
- int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu);
- void vmx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
--- 
-2.46.1
-
+> 
+> diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
+> index d0a7561a..162f0d53 100644
+> --- a/riscv/sbi-tests.h
+> +++ b/riscv/sbi-tests.h
+> @@ -9,9 +9,16 @@
+>  #define SBI_CSR_SATP_IDX	4
+>  
+>  #define SBI_HSM_TEST_DONE	(1 << 0)
+> -#define SBI_HSM_TEST_HARTID_A1	(1 << 1)
+> -#define SBI_HSM_TEST_SATP	(1 << 2)
+> -#define SBI_HSM_TEST_SIE	(1 << 3)
+> +#define SBI_HSM_TEST_MAGIC_A1	(1 << 1)
+> +#define SBI_HSM_TEST_HARTID_A1	(1 << 2)
+> +#define SBI_HSM_TEST_SATP	(1 << 3)
+> +#define SBI_HSM_TEST_SIE	(1 << 4)
+> +
+> +#define SBI_HSM_MAGIC		0x453
+> +
+> +#define SBI_HSM_MAGIC_IDX	0
+> +#define SBI_HSM_HARTID_IDX	1
+> +#define SBI_HSM_NUM_OF_PARAMS	2
+>  
+>  #define SBI_SUSP_TEST_SATP	(1 << 0)
+>  #define SBI_SUSP_TEST_SIE	(1 << 1)
+> diff --git a/riscv/sbi-asm.S b/riscv/sbi-asm.S
+> index e871ea50..9ac77c5c 100644
+> --- a/riscv/sbi-asm.S
+> +++ b/riscv/sbi-asm.S
+> @@ -30,34 +30,39 @@
+>  .balign 4
+>  sbi_hsm_check:
+>  	li	HSM_RESULTS_MAP, 0
+> -	bne	a0, a1, 1f
+> +	REG_L	t0, ASMARR(a1, SBI_HSM_MAGIC_IDX)
+> +	li	t1, SBI_HSM_MAGIC
+> +	bne	t0, t1, 1f
+> +	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_MAGIC_A1
+> +1:	REG_L	t0, ASMARR(a1, SBI_HSM_HARTID_IDX)
+> +	bne	a0, t0, 2f
+>  	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_HARTID_A1
+> -1:	csrr	t0, CSR_SATP
+> -	bnez	t0, 2f
+> +2:	csrr	t0, CSR_SATP
+> +	bnez	t0, 3f
+>  	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_SATP
+> -2:	csrr	t0, CSR_SSTATUS
+> +3:	csrr	t0, CSR_SSTATUS
+>  	andi	t0, t0, SR_SIE
+> -	bnez	t0, 3f
+> +	bnez	t0, 4f
+>  	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_SIE
+> -3:	call	hartid_to_cpu
+> +4:	call	hartid_to_cpu
+>  	mv	HSM_CPU_INDEX, a0
+>  	li	t0, -1
+> -	bne	HSM_CPU_INDEX, t0, 5f
+> -4:	pause
+> -	j	4b
+> -5:	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_DONE
+> +	bne	HSM_CPU_INDEX, t0, 6f
+> +5:	pause
+> +	j	5b
+> +6:	ori	HSM_RESULTS_MAP, HSM_RESULTS_MAP, SBI_HSM_TEST_DONE
+>  	add	t0, HSM_RESULTS_ARRAY, HSM_CPU_INDEX
+>  	sb	HSM_RESULTS_MAP, 0(t0)
+>  	la	t1, sbi_hsm_stop_hart
+>  	add	t1, t1, HSM_CPU_INDEX
+> -6:	lb	t0, 0(t1)
+> +7:	lb	t0, 0(t1)
+>  	pause
+> -	beqz	t0, 6b
+> +	beqz	t0, 7b
+>  	li	a7, 0x48534d	/* SBI_EXT_HSM */
+>  	li	a6, 1		/* SBI_EXT_HSM_HART_STOP */
+>  	ecall
+> -7:	pause
+> -	j	7b
+> +8:	pause
+> +	j	8b
+>  
+>  .balign 4
+>  .global sbi_hsm_check_hart_start
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 6f2d3e35..300e5cc9 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -483,6 +483,7 @@ static void check_ipi(void)
+>  unsigned char sbi_hsm_stop_hart[NR_CPUS];
+>  unsigned char sbi_hsm_hart_start_checks[NR_CPUS];
+>  unsigned char sbi_hsm_non_retentive_hart_suspend_checks[NR_CPUS];
+> +unsigned long sbi_hsm_hart_start_params[NR_CPUS * SBI_HSM_NUM_OF_PARAMS];
+>  
+>  #define DBCN_WRITE_TEST_STRING		"DBCN_WRITE_TEST_STRING\n"
+>  #define DBCN_WRITE_BYTE_TEST_BYTE	((u8)'a')
+> -- 
+> 2.43.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
