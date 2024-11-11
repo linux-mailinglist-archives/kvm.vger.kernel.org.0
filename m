@@ -1,102 +1,119 @@
-Return-Path: <kvm+bounces-31512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD229C44F4
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 19:29:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6DA39C4548
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 19:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D48E6283307
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:28:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75532B28310
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E2E1AAE00;
-	Mon, 11 Nov 2024 18:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532171AAE3B;
+	Mon, 11 Nov 2024 18:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N69zjM7Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QTvSjVLN"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C921A76CD;
-	Mon, 11 Nov 2024 18:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8AB450EE;
+	Mon, 11 Nov 2024 18:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731349727; cv=none; b=CuBnFOB3h/kQoazEpCcgwQ0p4TxijVgg26iwima6X9u9bIQkRQQSisEDLA8zQ1+gzn/pnyrSLbMbREfIbKW/kseL6l7CR5VK447LaaViQ3ZUp1+NB1nyCT51LH9QUkS8J/N6Pz3LnmsyEFZtbX7NZp5olzuVfCR5tb1TVc8pQnk=
+	t=1731350398; cv=none; b=FKJXqhBIytOrbxQ1QrjbgVgsfFiQ23SgI/yZWuxZ9khWU/qQybiJDHE4MgzJVJ/EkZBQHkY3ZWmsIBbTcLt83tuHaOwMDr2NpNYd84L45rD5iflcQ4PRt0iGcvwO5ZUoVuOgiwAb91EKrYYtFmYhDQH5saLcvRkGpvy7nHIBcyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731349727; c=relaxed/simple;
-	bh=f32c2TkG7RKPZS1ZR39BM78SjOeMOw1mBaRO3DH5SGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kGbhQnvQF3xwPtRXIgUVM+hprItQy+HuiFCm51zMa3VjqJ4Z189H1iEVddpzOME4RV5kAajHRVFHuRT7R+Ur5k5tkw+83j0J9klWWSKPFqkAeXgcjidWWARFtyYf7hAN5r9Cm/1aKY5V/LwS/IPMSlDEnMPSvP6bvNjKHqvR3xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=N69zjM7Z; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G/UCR3WmKpMCMBpcDE7cPgAljVEs9mxddTCtZNEhxXc=; b=N69zjM7ZrttAVvy4dCOkgDs1yP
-	VlN++AJOcx2LO+WmYrxDP3X+joET5UzSI/pw/tWXAEcY+gJHvxSObYKkDRTc9vAfcxeBAHFVOTWcG
-	dA4+mXiSe/Ffjk6bjxcS31gR70Rt6Xqk7yAno2DP++7JQFdjmEEyWFDv80kaVtM2pYlqulKGkQQPo
-	nbL1OcsPtwccinRm9CrlISvaWZx2xTKbuzRzMgq0m7rHf0XxKzjourtiVLDm0EPFyj/UBKg6+jxNu
-	VV5QccWDSaD1byQtuzLEgSLgzIgMe24In6hQSm0yL2BT7l/xcfon1jEI4072vigLfmk3XCTLotcT6
-	XAsGzHiw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tAZ9W-0000000D8mX-3D5H;
-	Mon, 11 Nov 2024 18:28:42 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id EE57A300472; Mon, 11 Nov 2024 19:28:41 +0100 (CET)
-Date: Mon, 11 Nov 2024 19:28:41 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, jpoimboe@redhat.com, tglx@linutronix.de,
-	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-	jthoughton@google.com
-Subject: Re: [PATCH v2 12/12] x86/kvm/emulate: Avoid RET for fastops
-Message-ID: <20241111182841.GJ22801@noisy.programming.kicks-ass.net>
-References: <20241111115935.796797988@infradead.org>
- <20241111125219.361243118@infradead.org>
- <ZzI-VHh0GpBUph3l@google.com>
+	s=arc-20240116; t=1731350398; c=relaxed/simple;
+	bh=Mkf8d4ycutLC3OawYLhiBBp12Y3I2OyMomLoWhibygY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MXJ0sb46uOM7B8/BYfUUsSYRiQB9k981ou8PkEJu9BS3NbNGJCt85DjqVLYxF/+/wDZ6aIRb9yfKthhUWBLTOSHxgfGnsRl3jVWqLwOLVBVtdvVZMc3Yc27QeammzsW93qk3878t1cNLDNsQHZJE27uTtSh6LIcnt+NBS7MdFnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QTvSjVLN; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20c805a0753so45913895ad.0;
+        Mon, 11 Nov 2024 10:39:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731350397; x=1731955197; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=is2dX1BvkV4gQvPfSQkwfTIdaReamJ5nfgtDMnPyLNk=;
+        b=QTvSjVLNIng+EH4zzlJGK59jrzQh/qfU4qn4tMlOjZ5K/1ZFem+RNbI6IjBbLqrbcT
+         s2BSVNqEcKaUrk1mpMCTjW4fawbyCWs1ghhL9EW1LcgnQyl+l/KbOQ0YVDyLA35S/Gnu
+         s2UGJEx/2I/mc78hJzY7tKfgTr51Jxv/P7eiujn7rB66sCtY/r7oAi+pO4ij4KWu+wqL
+         DQbULRvi/cGx/7xsKAj5WpIWgFm31oC7dCUR9C6PxyURw/kPVC1yBt1MCravv1z7k9np
+         gE7HUMw8lmNjGTh6POl8dX3yJofKMly/qO8bE00tyhIMQEWVDDmhg6upYm9XPkW41IsR
+         +UGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731350397; x=1731955197;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=is2dX1BvkV4gQvPfSQkwfTIdaReamJ5nfgtDMnPyLNk=;
+        b=FtFjjG8zQonpsZiNYq8/LI6gGeTDh6jlQYCIlqeQQQdIgMdVco/E6tm04R2xKs8iak
+         Pfvgzh76iZquVvdMFvvaj0e3sNDiqlqbWPhxM1+REG8Smsxg70Ms1bNy8gytTVDwu98u
+         bAhVmNKqWHKdlKY3BNfkucPqT/mQFMU0UWv5YNs1a0GHJNgFDzlSAVkQqGcxJ1bgqsbU
+         7h7eG00XsDZA0U5WNzDr+iV2ME/9+mvYhGJldNQS8GgwjtRqlcnuXgO88xMC4wrUi/K1
+         k7gTd0nRGuLBm58qtKSW9xP/NMygg+60/Qackf7y5X+negIRg1kt8g9sr/Qgd8lTh26N
+         uKDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnM+1T7TNINWPVCDYP4Ca0Q0y/hDOJu3EBUpiq0D/KpZIMOo4UaKZoHdBY/TyRxZLZdrL27yFGtRgt7wI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl+5apeKteFduWeXjzG0j/PXvyq8/11IxU1KJqMhIPIDYQW+An
+	Cg1zMao5RfIEAsuCHBA8y6bxcBuR2z9NMpoiLKJUaGq8bsWNWoAnC/t0lwys
+X-Google-Smtp-Source: AGHT+IGEYA+Tlv87Xjls4JLjmwWZezIuJutVxmFPz43mU/MFltEMX24LiSAfLkHDhngqoU4rDwvLtw==
+X-Received: by 2002:a17:902:f541:b0:20d:1866:ed6f with SMTP id d9443c01a7336-21183ccf11bmr185647305ad.4.1731350396455;
+        Mon, 11 Nov 2024 10:39:56 -0800 (PST)
+Received: from advait-kdeneon.lan ([2409:40d0:1170:6e90:2801:34a4:f903:135])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e4278dsm78621345ad.159.2024.11.11.10.39.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 10:39:55 -0800 (PST)
+From: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	hpa@zytor.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	anupnewsmail@gmail.com,
+	Advait Dhamorikar <advaitdhamorikar@gmail.com>
+Subject: [PATCH-next] KVM: x86/tdp_mmu: Fix redundant u16 compared to 0
+Date: Tue, 12 Nov 2024 00:09:35 +0530
+Message-Id: <20241111183935.8550-1-advaitdhamorikar@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZzI-VHh0GpBUph3l@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 11, 2024 at 09:26:44AM -0800, Sean Christopherson wrote:
-> KVM: x86:
-> 
-> On Mon, Nov 11, 2024, Peter Zijlstra wrote:
-> > Since there is only a single fastop() function, convert the FASTOP
-> > stuff from CALL_NOSPEC+RET to JMP_NOSPEC+JMP, avoiding the return
-> > thunks and all that jazz.
-> > 
-> > Specifically FASTOPs rely on the return thunk to preserve EFLAGS,
-> > which not all of them can trivially do (call depth tracing suffers
-> > here).
-> 
-> Maybe add an example?  Mostly as a reminder of how to reproduce the call depth
-> issues.
-> 
->   E.g. booting with "retbleed=force,stuff spectre_v2=retpoline,generic" causes
->   KVM-Unit-Test's "emulator" test to fail due to flags being clobbered.
-> 
-> > Objtool strenuously complains about this:
-> > 
-> >  - indirect call without a .rodata, fails to determine JUMP_TABLE,
-> >    annotate
-> >  - fastop functions fall through, exception
-> >  - unreachable instruction after fastop_return, save/restore
-> > 
-> > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> 
-> The original patch works, but with the fixup KVM fails emulation of an ADC and
-> generates:
+An unsigned value can never be negative,
+so this test will always evaluate the same way.
+`_as_id` a u16 is compared to 0.
 
-Bah, I'll go chase it down. Thanks!
+Signed-off-by: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 4508d868f1cd..b4e7b6a264d6 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -153,7 +153,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ 	for (_root = tdp_mmu_next_root(_kvm, NULL, _only_valid);		\
+ 	     ({ lockdep_assert_held(&(_kvm)->mmu_lock); }), _root;		\
+ 	     _root = tdp_mmu_next_root(_kvm, _root, _only_valid))		\
+-		if (_as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id) {	\
++		if (kvm_mmu_page_as_id(_root) != _as_id) {	\
+ 		} else
+ 
+ #define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id)	\
+-- 
+2.34.1
+
 
