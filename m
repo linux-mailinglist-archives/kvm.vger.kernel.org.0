@@ -1,162 +1,225 @@
-Return-Path: <kvm+bounces-31393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221FF9C35E6
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 02:28:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274E49C365B
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 03:06:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D3F1C21676
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 01:28:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC46B1F2127D
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 02:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149A7250F8;
-	Mon, 11 Nov 2024 01:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD637F48C;
+	Mon, 11 Nov 2024 02:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Szm8xdL7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFK9Cyfo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A0718E2A
-	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 01:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440242595;
+	Mon, 11 Nov 2024 02:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731288483; cv=none; b=XsasSOwUvyWU3a86yO7EAqLIlEPAdEsTyjixiKTVIXrlaPAxwIA7YuzfxIpi5wx817i2VvsPxB0h8m5mS8YUzbUNiixgx5ejsL8IP9impEXtMm6VhVdTxB2n+e/S0MnW0Ky2H69sCJ4X4N++QxyZfsokt5PMsejkoVvfAZxLWZk=
+	t=1731290752; cv=none; b=Mr0hcG3hZ7Rv472niDGUc9Xq4Bb0XBuD9JD8Ijy9wc9UrYPbjzlGGs3YKYJ/KFJgxLX8Jzk2wOpYDtEP0fZhjSq7+O2cp468seTrJvTvBvXw6K+Hd2Zk1v72jYSS08O5YwYfI6NczpD8aDQo+V/NH9isl95KjCouhMHTwiYXV5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731288483; c=relaxed/simple;
-	bh=rmJaCFWLaEKukmoQFYXTWoPzcVFVMWyE+/yJXxOx6k4=;
+	s=arc-20240116; t=1731290752; c=relaxed/simple;
+	bh=bWyRCGTcPRNkiQbPV1UIZK/QkxgPyfNx5HGKdVQ0DSQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rAfHfgsTTgmS73lEHPF7l2mKKB2YSr2tve2o7rolretXqRqpKXRWU+z7Ki8hiY3YkjmYly6PHmuEnU+FAdqJuCcKi4CsuFLbraWfUbFtHoiXvRgOJxwoCIpT+fPylvo0TKlH4FIFbQ9hRtmcLaVSyw8P7UOzFE2a3yY2drDW2hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Szm8xdL7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731288480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XsueIyR21StC8z8Y1fH80OpJCx4CEL4++SzGNpSB0e8=;
-	b=Szm8xdL7I100eOq4lOPRPL4063eIlQKzSKIt0m+OA06xZSBSbBTUf76b92yIuYGVknSMhr
-	wlty2Aa2q3JLWBDz3aDzT22sTMDTZy+O2tsWOm7aJVeb8zQl/FsLusJgrhYyckuar+Ivhp
-	akCKaDB/H5GRdg0XleJ8+56O6Be0EhQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-HXicIU0aPnqZtM5zn4skng-1; Sun, 10 Nov 2024 20:27:59 -0500
-X-MC-Unique: HXicIU0aPnqZtM5zn4skng-1
-X-Mimecast-MFC-AGG-ID: HXicIU0aPnqZtM5zn4skng
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2e2d396c77fso5007680a91.2
-        for <kvm@vger.kernel.org>; Sun, 10 Nov 2024 17:27:58 -0800 (PST)
+	 To:Cc:Content-Type; b=dAIWiktJVOro7AWm3cKyo5KVtnHgyLJ3/whJK+NksWJjmCSZImmnNkcQievHcgW470LlJS8ptQ2+XBP4zY9+1C5bnSLbR315/WvAggXC66mwORGVfNsYyockuoGFhLGmekEFDrsXSrXr29gJpZMXY7f/zHksTGundu/RiVe8xZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFK9Cyfo; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso33894481fa.0;
+        Sun, 10 Nov 2024 18:05:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731290747; x=1731895547; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GdEkfAJOsElSV+ujZ/1dK2DOAkU54yl3So/8rs20Jag=;
+        b=TFK9CyfoYPA3xi/BnMiYSy2AZc+3QS03ZSbcciD9ujKPMayJSD5iXScOTnTamENIwR
+         1eTjtNG9BiHj0/48GqvKhZTByuE0lmexlVbH4GZt9zib4iuwWU4vJqXjv9SrpmqahZ2/
+         dmFJvdBgiIUL4ncrY1hazNeY+R4ewAhfDpgTqDstXMgl5Kqob6TCbM+LGfVzy/Ppogfg
+         AEuIEx/80ZICocy4zps4aj7K7Ioon8rOtD9nWXkt8GUJd4HH0HRU/rVUbOx9phGHwecR
+         Vd0VZbmRAdCvhLyCV1cGo7ZIGnnE3Hme0pNo2lA48QQL7DJ98nWmPf06d+8uYsAeDcrY
+         ZJcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731288477; x=1731893277;
+        d=1e100.net; s=20230601; t=1731290747; x=1731895547;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XsueIyR21StC8z8Y1fH80OpJCx4CEL4++SzGNpSB0e8=;
-        b=quocXANeWpxTACIc0T4OrMM2SWdY5KYpdcdukgIsqb5kDWNXiYuyNUJ7fM+C5i3UNP
-         uGCOwsiViJb0XF2q5N/M1FwEDvJFoU1UTO2XXx/qDfBG+L1vZxCW5sPYxFF37czDjd82
-         71oi5AyoQtNonSnwaiKwu8EfnxWEkNgVWGfEAq3qdFrBPJaZB7iPjuFP+NkS7wDnxPJK
-         pu6yZgpmr+P0SxRbCqhLX8veCibWMnoeobmkOT/7z9vVsm3XnNWqJxTOA2WK3vb2Zcmw
-         3FCJDdsmWQtdlTbU8SRXqXrAUJn8EzECdS26mEp28ele5SnpsXZcFMUpbAeTToBGdHHD
-         XoUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUahO8r0bFsi+YaC3/wkk31XMYUygdfHtBhkq9wX/gM8Gh3oiSCpTJHtE0cQt2bT5ALHjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4iiK6KvuAbqxjI7vhTFuk9zAwALflcVf4xjFEjdt5dVFmfKo2
-	HVJeCXvKHFoPfch61xaVVR30b/JIEP1G5NRYn41/c2cGLuItn0vCOQx3YWHGI2pkc+b+9Z7aH8V
-	qeyLbRaLdleMbTDZABRjJVWmqP+kcNruxrGFW7xiEvVs7a51l7VNYVsPYKWKXg7u+SBNCEw8qTe
-	739mr+aOA5XT6JMfFzT3Zx0EaO
-X-Received: by 2002:a17:90b:3847:b0:2e2:e159:8f7b with SMTP id 98e67ed59e1d1-2e9b16e6415mr13589091a91.3.1731288477646;
-        Sun, 10 Nov 2024 17:27:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG2UZCxZDdjpET0emSMpwkmcUbnJkxi3e/4YjQOK8fT8UOV7uYIqku2wZHJSDGRMo1459z1m7GHz7ZEy+uOkt4=
-X-Received: by 2002:a17:90b:3847:b0:2e2:e159:8f7b with SMTP id
- 98e67ed59e1d1-2e9b16e6415mr13589069a91.3.1731288477175; Sun, 10 Nov 2024
- 17:27:57 -0800 (PST)
+        bh=GdEkfAJOsElSV+ujZ/1dK2DOAkU54yl3So/8rs20Jag=;
+        b=S/4delkvH62/eogfJL78YQs8DUzfMupTrvJJYrkHspJqbL6FfYDcSnKwecYjw8bpe3
+         GsnsIN+zUOlm9hBp3rkiyjgPQIzbTB1SZHC3aNW8txWhtKgAlIkuxM3/Hz1v0pxPe4sH
+         xuszKnN77CarCSS5WiZrWTk5sdIKAuotDCf9XvD7EhlbHhM6Aa59C5GnmwIaQk08ANdn
+         JM+AmzmjfZH12dFnlgV60V84oMstm5nLltm5oNbSo+tYV44skKFO73emN8WXlxrXCJDb
+         oUWkfXAodbiEPyaUSBHdjC0d1whbNC+4LccvWx8n+Z/VYEpaZszHz+rz6xSsyxg0omXB
+         v+VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUdESwwDHmZfmJ521sofsn2EZ67Z8i7YGI4CUiWLL1k+MRLSbXO0yIZ3Q+R2akvpmkRTtW6q+EOXBBO+b4=@vger.kernel.org, AJvYcCUeiehGzvIPBQRCYMTKlbLvIY3a5XiDpHb0xnWAr8dATf54P8zFUiWz12AHkinWxoMUbMr60O8vSiqa@vger.kernel.org, AJvYcCUy05lnbbyUMhB+O1vJRsXJmpU4lXoEg8DuZTHFtepvZXJg9auyGshuBIVfiahg7+5RKFi7Cp79rfDk@vger.kernel.org, AJvYcCV5TtRSa0vzGjLs6D8vr7xKDxrNkDYiUQQTBN8qP0vpDOOnHh/WXpxePoSnDZXqqeFxTQaDy/q5Rok5Rzxz@vger.kernel.org, AJvYcCVV5ck3dhrIVNT69VaDePYUrclbeOx9PG10iyUW/zAneQbKKXVTc724v5I/B0zltPtDyAU=@vger.kernel.org, AJvYcCXHpuVsut4y3Tw3LkZV/lnSUejTJhe9ZjmSKGrFHYlA6VGs5BirF2DZ63vd0Lv0O70ZQ9r+wgeG18IB2w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaKYI7iABcv1/nhqVQxU7Gs5+ka9LpUbLYHp+78YrnqE6YtyFg
+	v+AeMcyipGkd4Ssq6FHlMTQMIf4YuemG/4lykIgyZ7JJYPEPPF9BB7YD/B7r63p5ZDT+0yEyJc+
+	f65hmku2a+kHuhsa3iPfNNNOn1+Y=
+X-Google-Smtp-Source: AGHT+IF0tJPIolZyNYPTT2b/MpCJe82Fg/iZslXB6gzAqlmjhMUqVGRF2M5H+UaSiVlIP433HQ0w2T+2CyxfkrVJL68=
+X-Received: by 2002:a2e:bc1d:0:b0:2fb:5014:8eb9 with SMTP id
+ 38308e7fff4ca-2ff2014ec60mr46592301fa.10.1731290746959; Sun, 10 Nov 2024
+ 18:05:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com> <20241106035029-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20241106035029-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 11 Nov 2024 09:27:45 +0800
-Message-ID: <CACGkMEt0spn59oLyoCwcJDdLeYUEibePF7gppxdVX1YvmAr72Q@mail.gmail.com>
-Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <cover.1731244445.git.leon@kernel.org> <dca3aecdeeaa962c7842bc488378cdf069201d65.1731244445.git.leon@kernel.org>
+In-Reply-To: <dca3aecdeeaa962c7842bc488378cdf069201d65.1731244445.git.leon@kernel.org>
+From: anish kumar <yesanishhere@gmail.com>
+Date: Sun, 10 Nov 2024 18:05:35 -0800
+Message-ID: <CABCoZhAN-eeu=E5r+ZbZGTNwQta5yUw86sy8e_Je+Yri-+iuoQ@mail.gmail.com>
+Subject: Re: [PATCH v3 09/17] docs: core-api: document the IOVA-based API
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
+	Yishai Hadas <yishaih@nvidia.com>, 
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-mm@kvack.org, Randy Dunlap <rdunlap@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 6, 2024 at 4:54=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
+On Sun, Nov 10, 2024 at 5:50=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
 >
-> On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
-> > The specification says the device MUST set num_buffers to 1 if
-> > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
-> >
-> > Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
-> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> From: Christoph Hellwig <hch@lst.de>
 >
-> True, this is out of spec. But, qemu is also out of spec :(
+> Add an explanation of the newly added IOVA-based mapping API.
 >
-> Given how many years this was out there, I wonder whether
-> we should just fix the spec, instead of changing now.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  Documentation/core-api/dma-api.rst | 70 ++++++++++++++++++++++++++++++
+>  1 file changed, 70 insertions(+)
 >
-> Jason, what's your take?
+> diff --git a/Documentation/core-api/dma-api.rst b/Documentation/core-api/=
+dma-api.rst
+> index 8e3cce3d0a23..61d6f4fe3d88 100644
+> --- a/Documentation/core-api/dma-api.rst
+> +++ b/Documentation/core-api/dma-api.rst
+> @@ -530,6 +530,76 @@ routines, e.g.:::
+>                 ....
+>         }
+>
+> +Part Ie - IOVA-based DMA mappings
+> +---------------------------------
+> +
+> +These APIs allow a very efficient mapping when using an IOMMU.  They are=
+ an
 
-Fixing the spec (if you mean release the requirement) seems to be less risk=
-y.
+"They" doesn't sound nice.
+> +optional path that requires extra code and are only recommended for driv=
+ers
+> +where DMA mapping performance, or the space usage for storing the DMA ad=
+dresses
+> +matter.  All the considerations from the previous section apply here as =
+well.
 
-Thanks
+These APIs provide an efficient mapping when using an IOMMU. However, they
+are optional and require additional code. They are recommended primarily fo=
+r
+drivers where performance in DMA mapping or the storage space for DMA
+addresses are critical. All the considerations discussed in the previous se=
+ction
+also apply in this case.
 
+You can disregard this comment, as anyone reading this paragraph will
+understand the intended message.
+
+> +
+> +::
+> +
+> +    bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *s=
+tate,
+> +               phys_addr_t phys, size_t size);
+> +
+> +Is used to try to allocate IOVA space for mapping operation.  If it retu=
+rns
+> +false this API can't be used for the given device and the normal streami=
+ng
+> +DMA mapping API should be used.  The ``struct dma_iova_state`` is alloca=
+ted
+> +by the driver and must be kept around until unmap time.
+> +
+> +::
+> +
+> +    static inline bool dma_use_iova(struct dma_iova_state *state)
+> +
+> +Can be used by the driver to check if the IOVA-based API is used after a
+> +call to dma_iova_try_alloc.  This can be useful in the unmap path.
+> +
+> +::
+> +
+> +    int dma_iova_link(struct device *dev, struct dma_iova_state *state,
+> +               phys_addr_t phys, size_t offset, size_t size,
+> +               enum dma_data_direction dir, unsigned long attrs);
+> +
+> +Is used to link ranges to the IOVA previously allocated.  The start of a=
+ll
+> +but the first call to dma_iova_link for a given state must be aligned
+> +to the DMA merge boundary returned by ``dma_get_merge_boundary())``, and
+> +the size of all but the last range must be aligned to the DMA merge boun=
+dary
+> +as well.
+> +
+> +::
+> +
+> +    int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
+> +               size_t offset, size_t size);
+> +
+> +Must be called to sync the IOMMU page tables for IOVA-range mapped by on=
+e or
+> +more calls to ``dma_iova_link()``.
+> +
+> +For drivers that use a one-shot mapping, all ranges can be unmapped and =
+the
+> +IOVA freed by calling:
+> +
+> +::
+> +
+> +   void dma_iova_destroy(struct device *dev, struct dma_iova_state *stat=
+e,
+> +               enum dma_data_direction dir, unsigned long attrs);
+> +
+> +Alternatively drivers can dynamically manage the IOVA space by unmapping
+> +and mapping individual regions.  In that case
+> +
+> +::
+> +
+> +    void dma_iova_unlink(struct device *dev, struct dma_iova_state *stat=
+e,
+> +               size_t offset, size_t size, enum dma_data_direction dir,
+> +               unsigned long attrs);
+> +
+> +is used to unmap a range previously mapped, and
+> +
+> +::
+> +
+> +   void dma_iova_free(struct device *dev, struct dma_iova_state *state);
+> +
+> +is used to free the IOVA space.  All regions must have been unmapped usi=
+ng
+> +``dma_iova_unlink()`` before calling ``dma_iova_free()``.
+>
+>  Part II - Non-coherent DMA allocations
+>  --------------------------------------
+> --
+> 2.47.0
 >
 >
-> > ---
-> >  drivers/vhost/net.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index f16279351db5..d4d97fa9cc8f 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -1107,6 +1107,7 @@ static void handle_rx(struct vhost_net *net)
-> >       size_t vhost_hlen, sock_hlen;
-> >       size_t vhost_len, sock_len;
-> >       bool busyloop_intr =3D false;
-> > +     bool set_num_buffers;
-> >       struct socket *sock;
-> >       struct iov_iter fixup;
-> >       __virtio16 num_buffers;
-> > @@ -1129,6 +1130,8 @@ static void handle_rx(struct vhost_net *net)
-> >       vq_log =3D unlikely(vhost_has_feature(vq, VHOST_F_LOG_ALL)) ?
-> >               vq->log : NULL;
-> >       mergeable =3D vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-> > +     set_num_buffers =3D mergeable ||
-> > +                       vhost_has_feature(vq, VIRTIO_F_VERSION_1);
-> >
-> >       do {
-> >               sock_len =3D vhost_net_rx_peek_head_len(net, sock->sk,
-> > @@ -1205,7 +1208,7 @@ static void handle_rx(struct vhost_net *net)
-> >               /* TODO: Should check and handle checksum. */
-> >
-> >               num_buffers =3D cpu_to_vhost16(vq, headcount);
-> > -             if (likely(mergeable) &&
-> > +             if (likely(set_num_buffers) &&
-> >                   copy_to_iter(&num_buffers, sizeof num_buffers,
-> >                                &fixup) !=3D sizeof num_buffers) {
-> >                       vq_err(vq, "Failed num_buffers write");
-> >
-> > ---
-> > base-commit: 46a0057a5853cbdb58211c19e89ba7777dc6fd50
-> > change-id: 20240908-v1-90fc83ff8b09
-> >
-> > Best regards,
-> > --
-> > Akihiko Odaki <akihiko.odaki@daynix.com>
->
-
 
