@@ -1,233 +1,181 @@
-Return-Path: <kvm+bounces-31506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4919C434F
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 660529C437A
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 18:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C14E52827D1
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 260362843A0
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207DB1A706F;
-	Mon, 11 Nov 2024 17:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E2C1A76B2;
+	Mon, 11 Nov 2024 17:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NHMo+lmP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSHhWanb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9C91A4E98
-	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 17:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC4553389;
+	Mon, 11 Nov 2024 17:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731345229; cv=none; b=B830eCN1F0wqq6XREhjfjgis6Zz0U6SAOs/Kg+MmCoc2tSRqTScasKL2NbzevE/Ngj/4FxEgJm61Ose8acSzTaQv0O/FbW5O7HTaa3z2bY0dZ8yPglveOW79ecq/WDykuHGS+aE8Fdoa5QwnTDHUeuJYAVew9MQdLCnNv86HH4g=
+	t=1731345748; cv=none; b=VqClxIaobaUbue8/vU3/Ghatct7JutBSrb3jNBN4n4Bmi7F9yyFTxmI9GHkPQUSdUBzeofjoULgZ/MjRWFEQ8vWYgsfn5HA2avNU9ARXnqFjbmXVwdCLN0Pq79EAyRH4pYDEW6xOokN039h+DDFfPIVP7XmTXJRHwz8QJl8ZWgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731345229; c=relaxed/simple;
-	bh=ret7sqyESc5ruXA3nhuPZ3KHNPXoIw4dcOwwP4EC084=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ePS7HpMG6K8h283xUrWjsVe91fA82YA8V2m/lx2uwV6Oxk4iBbHQiQBCqWz8CIqiQsMlZ0a+Uv2Dd83nq5A8cVznfdAT1JEZU3i2/SNJYNT9CDbi9ZqMf+OT0Yv0bURC1htTb3N4r7O15kXwsQAkmR+PRNz3kTi3c+qI3nGXgQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NHMo+lmP; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e49ae1172so4351358b3a.2
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 09:13:47 -0800 (PST)
+	s=arc-20240116; t=1731345748; c=relaxed/simple;
+	bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=he6/PCE+FBOOH3eNTE+8gPK3uT3OxEbHerv38qr0/mr1ZMNx6shGE5UCkS1mozPsrxIKIUhmvxs+sdGoNbtB6O1WIOB7WAnF4RzMTvphRnMPBsCiGkZfem8iJBagOw5pYZ1GF9d932DdIE8XOTzjHfqXN0kUkZJa2MNmTBwQqH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSHhWanb; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9e71401844so609328266b.3;
+        Mon, 11 Nov 2024 09:22:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731345227; x=1731950027; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SF+DpAbHUmcXzFvmBd4F+PWQudXrAabpaBlA9QzlTpM=;
-        b=NHMo+lmPF5hKzpo1YbEXsTarRiGiTBb41iMmclPnQyxpKlDpXjAK4WA02glmfY+owQ
-         FqHQIDaYjAI8vex8derkAkSQ2HUeR3KZFGwyrplhwS5CbmuhVZF6707R7Et00eE9grs6
-         VXEh6X97vVflpslmlHQ9xnqtGUcOaXbhPLsVZYtTwn2RtrRCeQaKdDkP1WllY/1Wc5pm
-         Z2RsjEgq9rk/1GLB4lqGci6Wmg9nJDxEktRPAmgyFQiW6FAQh3LU8NmQRL4/PYUuPOoI
-         yZ4LO0QHpvyRPQmzPGuGut8flS1mSbHDV5lKw8ibE7lHpCVk1U7d32bkPgQTTQLyFJ2F
-         ZihQ==
+        d=gmail.com; s=20230601; t=1731345745; x=1731950545; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
+        b=JSHhWanbb0uI1IYmzz+5O8DAvmKqgt7Kg+uC1Y1jK0kJTw58flwWQJqW8ruf904Jt4
+         T0ztYXhW3lsBX9xquZeQGfvhR9EpCfwt6Xo2g6/CJIQehhoHsl7rLXc8avPwZ5egq+b+
+         z+VfxO7tHIoqZUoCHouxhEBRjAjsUCFswt9rnwo9EYPbYqWbyxTBYOItOXXhxxULvjxU
+         wdf1AsUGQGkaUNo0A0aXCJ7Y57zegzNKfkjpHTCNN3+u5Nc63Nbx3iZWwnaLhYXYTTGb
+         OykExxWYg4VogrKqz8uy51bE45Y0o0NrzRDzj0sbouSLrE0Lu2VSKGcjt2zXfeK89Lc2
+         5C4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731345227; x=1731950027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SF+DpAbHUmcXzFvmBd4F+PWQudXrAabpaBlA9QzlTpM=;
-        b=XWTferLIEc/2CLaDuPguM37fKwYvF0Al1xBNf0GAaFGBnfsIFGit1mv+SphCGPM7c3
-         ZOwxSXN4vO0Asn92/k5OTupxc5rV4NQqtHj93w3itFl2lrM9NyKxRKrWfbneOOYdsktD
-         kiO+iVwEerqqoOgTfN4lLZPY3zaRDRU6Vu8IaI8WaKTwbfS+EUlugN6UIuWHTZvONUeC
-         nAC5WJcxJbMhkj7DQPlhZ+dBwqOTQDKWkx2F+Y8GwL7EsgOhDHLUUutcq3h7c1XeWFG+
-         sisTgSdd3WUmKw/7iBJZ8jPrdCk1JHX2z7mqDpTueEKzXaC+QyY1reb5rEwYyBqa4dRw
-         wbAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBQJ63y/o/5owd7QWTehNVUIwYFAQ+/VTsIvPGMAzBGNDZ2+FYDe59lpuNGcEKJa3HNiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygfrMXdE+eNtfrkItZLT+1csZzHwqCnNykHUrUeJY4tHLL7jLe
-	I/m6980jHYgnDhwqxCREx9Sl7X6mFdDD4gYaMZdWk1lqoWzqIdTi75WkL08xOmeu3gpDCYmpYo1
-	lVQ==
-X-Google-Smtp-Source: AGHT+IEq5f1Lu3Rh31Wea8fuGHNmDS+fJf+Kyq0/eZwavPBgk4wsyTcpVC6U2U12WYNBrtAGigqVlq9MOgI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:a18:b0:71e:69bb:d0f8 with SMTP id
- d2e1a72fcca58-7241325edcdmr780540b3a.1.1731345227229; Mon, 11 Nov 2024
- 09:13:47 -0800 (PST)
-Date: Mon, 11 Nov 2024 09:13:45 -0800
-In-Reply-To: <20241111125219.248649120@infradead.org>
+        d=1e100.net; s=20230601; t=1731345745; x=1731950545;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2yCvhy5w1wUJs3yDzbydKGxRKFF4D4l6onN7VM+5Uck=;
+        b=UKR7QlHeWfau12OwRpNCXQfFgduONLvYbNVKbxQN4TIRQZdw4R6EnJs/1rsPIs4xsx
+         8nJJm72D9xz2Tj0XUvx5ip5KcNINVMrdNBXQBViizFk9bVzhS1qP/ErJLoZ54tB7rXEv
+         JeV0dcxUXtN6pA2kPM5TBQVB0RTLH+wBfuaH/A5k41AD77NFkb+qhIXi9enGFZCnpMUV
+         jLr/tAR+rex2vflQSHhM6bCMnU293Ek6u4i1tG7a3w7UNw1d6nYZrVAENOWVgLElT7O3
+         q7Tm3MTKdjxX/WMpZFLIu500+66fOEw+vN27Z1+O9ZT7YMI9FpzLfKqvfuwU3vGOVzGk
+         iFQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkrBzJpwJVzS2xSm5K3NwEOTRvVlwX8zklIvr4yNMBtr7Qynje+xEGZr2xyfAJ9zjW5K2cTNw2@vger.kernel.org, AJvYcCWHMTptRW1Lysh9Bw0Ugo/K1oEUVFr6CHNZZ7dWNxctcQlX83j/C82b59HSfe43YjjJA9Ui@vger.kernel.org, AJvYcCWiEmeXVGSFEIGbfltYHDy0wuNTuLc1oD9RLtxcvFM1j8biaLy1xNKC3Eha96Tgpn68w/4AZylB/Bpp832FHg==@vger.kernel.org, AJvYcCXNnECAfKkJI7MC6H4pFCvJLalj/tv4FRgYOkZb90Nqg0E+zLUh0kSwH7lWkAbNXocfEb4dbmnv@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq8YyDMniAq/OGwgHg3tyCdtXlHAqkPv/lLi3oarWK9TcFHsiL
+	8J4+nx3J6CUQvBHyhZ3tzOHH/xuwO0+g73vCSAF7D6sujL+IWNUe
+X-Google-Smtp-Source: AGHT+IEx8OnbykPGy4f6eWQoWmDySenWo8hIPrT3zblQC9L6SbeYzeZpoVaF6fTVt7NttLnO1TF+Gw==
+X-Received: by 2002:a17:907:7b89:b0:a9e:b093:2422 with SMTP id a640c23a62f3a-a9eeffe9665mr1131551766b.48.1731345745148;
+        Mon, 11 Nov 2024 09:22:25 -0800 (PST)
+Received: from ?IPv6:2001:b07:5d29:f42d:fe70:af48:a973:5fa7? ([2001:b07:5d29:f42d:fe70:af48:a973:5fa7])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0def47esm609209666b.160.2024.11.11.09.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 09:22:24 -0800 (PST)
+Message-ID: <a70cedcc4389cc90ecac7b7c477481724c71824a.camel@gmail.com>
+Subject: Re: [PATCH v3 14/28] fdget(), trivial conversions
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: Al Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org
+Cc: brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, torvalds@linux-foundation.org
+Date: Mon, 11 Nov 2024 18:22:23 +0100
+In-Reply-To: <20241102050827.2451599-14-viro@zeniv.linux.org.uk>
+References: <20241102050219.GA2450028@ZenIV>
+	 <20241102050827.2451599-1-viro@zeniv.linux.org.uk>
+	 <20241102050827.2451599-14-viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241111115935.796797988@infradead.org> <20241111125219.248649120@infradead.org>
-Message-ID: <ZzI7SYxeXWOJmlun@google.com>
-Subject: Re: [PATCH v2 11/12] x86/kvm/emulate: Implement test_cc() in C
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: pbonzini@redhat.com, jpoimboe@redhat.com, tglx@linutronix.de, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-Can you use "KVM: x86" for the scope?  "x86/kvm" is used for guest changes, i.e.
-for paravirt code when running as a KVM guest.
+T24gU2F0LCAyMDI0LTExLTAyIGF0IDA1OjA4ICswMDAwLCBBbCBWaXJvIHdyb3RlOgo+IGZkZ2V0
+KCkgaXMgdGhlIGZpcnN0IHRoaW5nIGRvbmUgaW4gc2NvcGUsIGFsbCBtYXRjaGluZyBmZHB1dCgp
+IGFyZQo+IGltbWVkaWF0ZWx5IGZvbGxvd2VkIGJ5IGxlYXZpbmcgdGhlIHNjb3BlLgo+IAo+IFJl
+dmlld2VkLWJ5OiBDaHJpc3RpYW4gQnJhdW5lciA8YnJhdW5lckBrZXJuZWwub3JnPgo+IFNpZ25l
+ZC1vZmYtYnk6IEFsIFZpcm8gPHZpcm9AemVuaXYubGludXgub3JnLnVrPgo+IC0tLQo+IMKgYXJj
+aC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfdmlvLmPCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIxICsr
+Ky0tLS0tLS0tLQo+IMKgYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmPCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCB8IDI0ICsrKystLS0tLS0tLS0KPiDCoGFyY2gvcG93ZXJwYy9wbGF0
+Zm9ybXMvY2VsbC9zcHVfc3lzY2FsbHMuYyB8wqAgNiArKy0tCj4gwqBhcmNoL3g4Ni9rZXJuZWwv
+Y3B1L3NneC9tYWluLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKy0tLS0KPiDCoGFy
+Y2gveDg2L2t2bS9zdm0vc2V2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHwgMzkgKysrKysrKystLS0tLS0tLS0tLS0KPiAtLQo+IMKgZHJpdmVycy9ncHUvZHJtL2Ft
+ZC9hbWRncHUvYW1kZ3B1X3NjaGVkLmPCoCB8IDIzICsrKystLS0tLS0tLS0KPiDCoGRyaXZlcnMv
+Z3B1L2RybS9kcm1fc3luY29iai5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDkgKyst
+LS0KPiDCoGRyaXZlcnMvbWVkaWEvcmMvbGlyY19kZXYuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCB8IDEzICsrKy0tLS0tCj4gwqBmcy9idHJmcy9pb2N0bC5jwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSArKy0KPiDCoGZzL2V2
+ZW50ZmQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCB8wqAgOSArKy0tLQo+IMKgZnMvZXZlbnRwb2xsLmPCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIzICsrKystLS0tLS0t
+LS0KPiDCoGZzL2ZoYW5kbGUuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSArKy0KPiDCoGZzL2lvY3RsLmPCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwg
+MjMgKysrKystLS0tLS0tLQo+IMKgZnMva2VybmVsX3JlYWRfZmlsZS5jwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMTIgKysrLS0tLQo+IMKgZnMvbm90aWZ5L2Zh
+bm90aWZ5L2Zhbm90aWZ5X3VzZXIuY8KgwqDCoMKgwqDCoMKgwqAgfCAxNSArKystLS0tLS0KPiDC
+oGZzL25vdGlmeS9pbm90aWZ5L2lub3RpZnlfdXNlci5jwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAx
+NyArKystLS0tLS0tCj4gwqBmcy9vcGVuLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAzNiArKysrKysrKystLS0tLS0t
+LS0tLQo+IMKgZnMvcmVhZF93cml0ZS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjggKysrKystLS0tLS0tLS0tLQo+IMKgZnMvc2lnbmFs
+ZmQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfMKgIDkgKystLS0KPiDCoGZzL3N5bmMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDI5ICsrKysrKy0tLS0t
+LS0tLS0KPiDCoGlvX3VyaW5nL3NxcG9sbC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAyOSArKysrKy0tLS0tLS0tLS0tCj4gwqBrZXJuZWwvZXZl
+bnRzL2NvcmUuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwg
+MTQgKysrLS0tLS0KPiDCoGtlcm5lbC9uc3Byb3h5LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA1ICsrLQo+IMKga2VybmVsL3BpZC5jwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHzCoCA3ICsrLS0KPiDCoGtlcm5lbC9zeXMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE1ICsrKy0tLS0tLQo+IMKga2VybmVs
+L3dhdGNoX3F1ZXVlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCB8wqAgNiArKy0tCj4gwqBtbS9mYWR2aXNlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKy0tLS0KPiDCoG1tL3JlYWRh
+aGVhZC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfCAxNyArKystLS0tLS0tCj4gwqBuZXQvY29yZS9uZXRfbmFtZXNwYWNlLmPCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKystLS0KPiDCoHNlY3VyaXR5L2xh
+bmRsb2NrL3N5c2NhbGxzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjYgKysrKyst
+LS0tLS0tLS0tCj4gwqB2aXJ0L2t2bS92ZmlvLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDggKystLS0KPiDCoDMxIGZpbGVzIGNoYW5n
+ZWQsIDE2NCBpbnNlcnRpb25zKCspLCAzMzkgZGVsZXRpb25zKC0pCgpbLi4uXQoKPiBkaWZmIC0t
+Z2l0IGEvZnMvcmVhZF93cml0ZS5jIGIvZnMvcmVhZF93cml0ZS5jCj4gaW5kZXggZWYzZWUzNzI1
+NzE0Li41ZTNkZjJkMzkyODMgMTAwNjQ0Cj4gLS0tIGEvZnMvcmVhZF93cml0ZS5jCj4gKysrIGIv
+ZnMvcmVhZF93cml0ZS5jCj4gQEAgLTE2NjMsMzYgKzE2NjMsMzIgQEAgU1lTQ0FMTF9ERUZJTkU2
+KGNvcHlfZmlsZV9yYW5nZSwgaW50LCBmZF9pbiwKPiBsb2ZmX3QgX191c2VyICosIG9mZl9pbiwK
+PiDCoHsKPiDCoMKgwqDCoMKgwqDCoMKgbG9mZl90IHBvc19pbjsKPiDCoMKgwqDCoMKgwqDCoMKg
+bG9mZl90IHBvc19vdXQ7Cj4gLcKgwqDCoMKgwqDCoMKgc3RydWN0IGZkIGZfaW47Cj4gLcKgwqDC
+oMKgwqDCoMKgc3RydWN0IGZkIGZfb3V0Owo+IMKgwqDCoMKgwqDCoMKgwqBzc2l6ZV90IHJldCA9
+IC1FQkFERjsKClRoaXMgaW5pdGlhbGl6YXRpb24gaXMgbm8gbG9uZ2VyIG5lZWRlZC4KCj4gwqAK
+PiAtwqDCoMKgwqDCoMKgwqBmX2luID0gZmRnZXQoZmRfaW4pOwo+IC3CoMKgwqDCoMKgwqDCoGlm
+ICghZmRfZmlsZShmX2luKSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBv
+dXQyOwo+ICvCoMKgwqDCoMKgwqDCoENMQVNTKGZkLCBmX2luKShmZF9pbik7Cj4gK8KgwqDCoMKg
+wqDCoMKgaWYgKGZkX2VtcHR5KGZfaW4pKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqByZXR1cm4gLUVCQURGOwo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgZl9vdXQgPSBmZGdldChmZF9v
+dXQpOwo+IC3CoMKgwqDCoMKgwqDCoGlmICghZmRfZmlsZShmX291dCkpCj4gLcKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0MTsKPiArwqDCoMKgwqDCoMKgwqBDTEFTUyhmZCwg
+Zl9vdXQpKGZkX291dCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGZkX2VtcHR5KGZfb3V0KSkKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FQkFERjsKPiDCoAo+IC3CoMKg
+wqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gwqDCoMKgwqDCoMKgwqDCoGlmIChvZmZfaW4pIHsK
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChjb3B5X2Zyb21fdXNlcigmcG9z
+X2luLCBvZmZfaW4sIHNpemVvZihsb2ZmX3QpKSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FRkFVTFQ7Cj4gwqDCoMKgwqDCoMKgwqDC
+oH0gZWxzZSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwb3NfaW4gPSBmZF9m
+aWxlKGZfaW4pLT5mX3BvczsKPiDCoMKgwqDCoMKgwqDCoMKgfQo+IMKgCj4gwqDCoMKgwqDCoMKg
+wqDCoGlmIChvZmZfb3V0KSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAo
+Y29weV9mcm9tX3VzZXIoJnBvc19vdXQsIG9mZl9vdXQsCj4gc2l6ZW9mKGxvZmZfdCkpKQo+IC3C
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7Cj4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVG
+QVVMVDsKPiDCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIHsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoHBvc19vdXQgPSBmZF9maWxlKGZfb3V0KS0+Zl9wb3M7Cj4gwqDCoMKgwqDCoMKg
+wqDCoH0KPiDCoAo+IC3CoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gwqDCoMKgwqDCoMKg
+wqDCoGlmIChmbGFncyAhPSAwKQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3Rv
+IG91dDsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FSU5WQUw7Cj4g
+wqAKPiDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gdmZzX2NvcHlfZmlsZV9yYW5nZShmZF9maWxlKGZf
+aW4pLCBwb3NfaW4sCj4gZmRfZmlsZShmX291dCksIHBvc19vdXQsIGxlbiwKPiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+ZmxhZ3MpOwoK
 
-On Mon, Nov 11, 2024, Peter Zijlstra wrote:
-> Current test_cc() uses the fastop infrastructure to test flags using
-> SETcc instructions. However, int3_emulate_jcc() already fully
-> implements the flags->CC mapping, use that.
-
-I think it's worth presenting this as a revert of sorts, even though it's not a
-strict revert.  KVM also emulated jcc-like operations in software prior to commit
-9ae9febae950 ("KVM: x86 emulator: covert SETCC to fastop"), i.e. the fastop
-madness was introduced for performance reasons, not because writing the code was
-hard.
-
-Looking at the output of the fastop versus __emulate_cc(), the worst case cost is
-two extra conditional branches.  Assuming that eliminating the test_cc() fastop
-code avoids having to add another special case in objtool, I am a-ok with the
-tradeoff.  Especially since emulating instructions that use test_cc() is largely
-limited to older hardware running guest firmware that uses (emulated) SMM, and
-maybe a few bespoke use cases.  E.g. I get literally zero hits on test_cc() when
-booting a 24 vCPU VM (64-bit or 32-bit kernel) with EPT and unrestricted guest
-disabled, as the OVMF build I use doesn't rely on SMM.
-
-And FWIW, a straight revert appears to generate worse code.  I see no reason to
-bring it back.
-
-With a massaged shortlog+changelog,
-
-Acked-by: Sean Christopherson <seanjc@google.com>
-
-
-fastop:
-   0x0000000000042c41 <+1537>:  movzbl 0x61(%rbp),%eax
-   0x0000000000042c45 <+1541>:  mov    0x10(%rbp),%rdx
-   0x0000000000042c49 <+1545>:  shl    $0x4,%rax
-   0x0000000000042c4d <+1549>:  and    $0xf0,%eax
-   0x0000000000042c52 <+1554>:  and    $0x8d5,%edx
-   0x0000000000042c58 <+1560>:  or     $0x2,%dh
-   0x0000000000042c5b <+1563>:  add    $0x0,%rax
-   0x0000000000042c61 <+1569>:  push   %rdx
-   0x0000000000042c62 <+1570>:  popf   
-   0x0000000000042c63 <+1571>:  call   0x42c68 <x86_emulate_insn+1576>
-   0x0000000000042c68 <+1576>:  mov    %eax,%edx
-   0x0000000000042c6a <+1578>:  xor    %eax,%eax
-   0x0000000000042c6c <+1580>:  test   %dl,%dl
-   0x0000000000042c6e <+1582>:  jne    0x42f24 <x86_emulate_insn+2276>
-
-__emulate_cc:
-   0x0000000000042b95 <+1541>:	movzbl 0x61(%rbp),%eax
-   0x0000000000042b99 <+1545>:	mov    0x10(%rbp),%rcx
-   0x0000000000042b9d <+1549>:	and    $0xf,%eax
-   0x0000000000042ba0 <+1552>:	cmp    $0xb,%al
-   0x0000000000042ba2 <+1554>:	ja     0x42e90 <x86_emulate_insn+2304>
-        0x0000000000042e90 <+2304>:  mov    %rcx,%rdx
-        0x0000000000042e93 <+2307>:  mov    %rcx,%rsi
-        0x0000000000042e96 <+2310>:  shr    $0x7,%rdx
-        0x0000000000042e9a <+2314>:  shr    $0xb,%rsi
-        0x0000000000042e9e <+2318>:  xor    %rsi,%rdx
-        0x0000000000042ea1 <+2321>:  cmp    $0xd,%al
-        0x0000000000042ea3 <+2323>:  ja     0x4339a <x86_emulate_insn+3594>
-                0x000000000004339a <+3594>:  and    $0x1,%edx
-                0x000000000004339d <+3597>:  and    $0x40,%ecx
-                0x00000000000433a0 <+3600>:  or     %rcx,%rdx
-                0x00000000000433a3 <+3603>:  setne  %dl
-                0x00000000000433a6 <+3606>:  jmp    0x42bba <x86_emulate_insn+1578>
-        0x0000000000042ea9 <+2329>:  and    $0x1,%edx
-        0x0000000000042eac <+2332>:  jmp    0x42bba <x86_emulate_insn+1578>
-   0x0000000000042ba8 <+1560>:	mov    %eax,%edx
-   0x0000000000042baa <+1562>:	shr    %dl
-   0x0000000000042bac <+1564>:	and    $0x7,%edx
-   0x0000000000042baf <+1567>:	and    0x0(,%rdx,8),%rcx
-   0x0000000000042bb7 <+1575>:	setne  %dl
-   0x0000000000042bba <+1578>:	test   $0x1,%al
-   0x0000000000042bbc <+1580>:	jne    0x43323 <x86_emulate_insn+3475>
-        0x0000000000043323 <+3475>:  test   %dl,%dl
-        0x0000000000043325 <+3477>:  jne    0x4332f <x86_emulate_insn+3487>
-        0x0000000000043327 <+3479>:  test   $0x1,%al
-        0x0000000000043329 <+3481>:  jne    0x42bca <x86_emulate_insn+1594>
-        0x000000000004332f <+3487>:  xor    %eax,%eax
-        0x0000000000043331 <+3489>:  jmp    0x42be0 <x86_emulate_insn+1616>
-   0x0000000000042bc2 <+1586>:	test   %dl,%dl
-   0x0000000000042bc4 <+1588>:	je     0x43327 <x86_emulate_insn+3479>
-        0x0000000000043327 <+3479>:  test   $0x1,%al
-        0x0000000000043329 <+3481>:  jne    0x42bca <x86_emulate_insn+1594>
-        0x000000000004332f <+3487>:  xor    %eax,%eax
-        0x0000000000043331 <+3489>:  jmp    0x42be0 <x86_emulate_insn+1616>
-   0x0000000000042bca <+1594>:	movslq 0xd0(%rbp),%rsi
-   0x0000000000042bd1 <+1601>:	mov    %rbp,%rdi
-   0x0000000000042bd4 <+1604>:	add    0x90(%rbp),%rsi
-   0x0000000000042bdb <+1611>:	call   0x3a7c0 <assign_eip>
-
-revert:
-   0x0000000000042bc9 <+1545>:  movzbl 0x61(%rbp),%esi
-   0x0000000000042bcd <+1549>:  mov    0x10(%rbp),%rdx
-   0x0000000000042bd1 <+1553>:  mov    %esi,%eax
-   0x0000000000042bd3 <+1555>:  shr    %eax
-   0x0000000000042bd5 <+1557>:  and    $0x7,%eax
-   0x0000000000042bd8 <+1560>:  cmp    $0x4,%eax
-   0x0000000000042bdb <+1563>:  je     0x42ed4 <x86_emulate_insn+2324>
-        0x0000000000042ed4 <+2324>:  mov    %edx,%ecx
-        0x0000000000042ed6 <+2326>:  and    $0x80,%ecx
-        0x0000000000042edc <+2332>:  jmp    0x42bff <x86_emulate_insn+1599>
-   0x0000000000042be1 <+1569>:  ja     0x43225 <x86_emulate_insn+3173>
-        0x0000000000043225 <+3173>:  cmp    $0x6,%eax
-        0x0000000000043228 <+3176>:  je     0x434ec <x86_emulate_insn+3884>
-                0x00000000000434ec <+3884>:  xor    %edi,%edi
-                0x00000000000434ee <+3886>:  jmp    0x43238 <x86_emulate_insn+3192>
-        0x000000000004322e <+3182>:  mov    %edx,%edi
-        0x0000000000043230 <+3184>:  and    $0x40,%edi
-        0x0000000000043233 <+3187>:  cmp    $0x7,%eax
-        0x0000000000043236 <+3190>:  jne    0x4325c <x86_emulate_insn+3228>
-                0x000000000004325c <+3228>:  mov    %edx,%ecx
-                0x000000000004325e <+3230>:  and    $0x4,%ecx
-                0x0000000000043261 <+3233>:  cmp    $0x5,%eax
-                0x0000000000043264 <+3236>:  je     0x42bff <x86_emulate_insn+1599>
-                0x000000000004326a <+3242>:  jmp    0x43218 <x86_emulate_insn+3160>
-        0x0000000000043238 <+3192>:  mov    %rdx,%rcx
-        0x000000000004323b <+3195>:  shr    $0xb,%rdx
-        0x000000000004323f <+3199>:  shr    $0x7,%rcx
-        0x0000000000043243 <+3203>:  xor    %edx,%ecx
-        0x0000000000043245 <+3205>:  and    $0x1,%ecx
-        0x0000000000043248 <+3208>:  or     %edi,%ecx
-        0x000000000004324a <+3210>:  jmp    0x42bff <x86_emulate_insn+1599>
-   0x0000000000042be7 <+1575>:  mov    %edx,%ecx
-   0x0000000000042be9 <+1577>:  and    $0x40,%ecx
-   0x0000000000042bec <+1580>:  cmp    $0x2,%eax
-   0x0000000000042bef <+1583>:  je     0x42bff <x86_emulate_insn+1599>
-   0x0000000000042bf1 <+1585>:  mov    %edx,%ecx
-   0x0000000000042bf3 <+1587>:  and    $0x41,%ecx
-   0x0000000000042bf6 <+1590>:  cmp    $0x3,%eax
-   0x0000000000042bf9 <+1593>:  jne    0x4320a <x86_emulate_insn+3146>
-        0x000000000004320a <+3146>:  mov    %edx,%ecx
-        0x000000000004320c <+3148>:  and    $0x1,%ecx
-        0x000000000004320f <+3151>:  cmp    $0x1,%eax
-        0x0000000000043212 <+3154>:  je     0x42bff <x86_emulate_insn+1599>
-        0x0000000000043218 <+3160>:  mov    %edx,%ecx
-        0x000000000004321a <+3162>:  and    $0x800,%ecx
-        0x0000000000043220 <+3168>:  jmp    0x42bff <x86_emulate_insn+1599>
-   0x0000000000042bff <+1599>:  test   %ecx,%ecx
-   0x0000000000042c01 <+1601>:  setne  %dl
-   0x0000000000042c04 <+1604>:  and    $0x1,%esi
-   0x0000000000042c07 <+1607>:  xor    %eax,%eax
-   0x0000000000042c09 <+1609>:  cmp    %sil,%dl
-   0x0000000000042c0c <+1612>:  je     0x42c24 <x86_emulate_insn+1636>
-   0x0000000000042c0e <+1614>:  movslq 0xd0(%rbp),%rsi
-   0x0000000000042c15 <+1621>:  mov    %rbp,%rdi
-   0x0000000000042c18 <+1624>:  add    0x90(%rbp),%rsi
-   0x0000000000042c1f <+1631>:  call   0x3a7c0 <assign_eip>
 
