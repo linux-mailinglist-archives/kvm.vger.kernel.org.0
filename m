@@ -1,231 +1,149 @@
-Return-Path: <kvm+bounces-31534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3912F9C47B6
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 22:10:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13FAB9C47BC
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 22:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF6F41F21037
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 21:10:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7F1D28B4F6
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 21:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0291F7569;
-	Mon, 11 Nov 2024 20:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B8F1B3B28;
+	Mon, 11 Nov 2024 21:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eZn6Py1d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtuLLDAA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80301F6665
-	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 20:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6B213698E;
+	Mon, 11 Nov 2024 21:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731358532; cv=none; b=T5bNj8HP4tTKXmJYvKPqttyMGeJOgRoAnleskxIsBJKG1bfmjA1eWJPtosNe4Htr4FLz1EDBbPMeQuaHY/X+MUzqVMOJnQfEEhGBiqGaS+mfCtvEyjb9q9aEzU3jyIVdnRIbSHD7Z3mVJJAy9tZwkxh5p/YwdUg5lzokUcB3keQ=
+	t=1731358826; cv=none; b=pCoRHp+P3Vu4Z4nSi9sIJnhf9DNozTDsoWYyMOpQcV0yBvatoulj0TbFxNIB6rMzponwfMiL2LqET9WV5HScYmPp9nP2xwT/zoIlvSJSfcOCcl6qawgqTjxkZFcBIYu3QQ+so2r4cE7o1RatEmCJJ4+2VZRx0KVUn4M94SVUZts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731358532; c=relaxed/simple;
-	bh=LgM4AE7Tzv9AeqRy7Q+sooaI9o29H4tTVyGDKuUHyHY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cwRJIQIDo8dOSlI4V7V5OpnHAvX0DSzZ7OcaFiROxWTmwp9qpk/bAjXp7M1mvn7HSv50S1m7Z1MuEcNIT7GjCkYeCsSxRurniVH4pcsDDJ5eBu0yqwrEajgYvbtXWXpv/o+lbwWvmoIoDclNimNg4e1BnvKp7nX4a2wKwod9XwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eZn6Py1d; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9eb68e0bd1so686950666b.3
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 12:55:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731358528; x=1731963328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5PzwaJfpjCWLO4jufnqOHdSuICRaS5WL/Td3je3MgZo=;
-        b=eZn6Py1dfumgs1cm6dhEDE1YmLGi3J74BijEyhzL8aDGHwnAclF7mOsMXgUog28FuH
-         ZI8X/Z6w/HKJxtsRVXdTJAJOciZlVF0JxYneHt4YQX/uHtL+85wbFv4x+PfsdwhowN+w
-         yl+UTGGsugdjwNq0G+d7jXtSbgFldcX2bdfVo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731358528; x=1731963328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5PzwaJfpjCWLO4jufnqOHdSuICRaS5WL/Td3je3MgZo=;
-        b=mKr0HkwRROpQ8bA9mDONMuAQIkEHd4lBk/zm0gN6hK0IOxAY8THL9mwJspkbFab51g
-         74Jtfkx3Np7KzFztdgf7OcLVHiZrVuorgM9jsnCziUXxq8KFgShO5jxzFZYDe8Kepgk9
-         csNueJyj4Y8hAVJn1E5r5Pk5eah6KKanXEFkR2Zmzoc/A08HoBVr5e9wImOFUc2EnWtH
-         +dBAncGLN+nU7p2lQTrGUYmV60m0cz5dvpp1vgcgRSGZGO9c80DIshNC98aMb/UFfKPv
-         7b7fT6xtGXFolhwauvToPSaRBZnPt8Vh3cuNPmGaDl/pW5OSOLmJ4S8qyl4IH1oCbNHd
-         o7Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDqizq8THY8MEqQb50MUnwkIJvLSob4jobu9e3l264nI8MdzRuaiB308ngUg1eKYze6JE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY5crX1VkOv7mj7Eea3DWGSSIwhZDpo/y+ZdI5CNKoEoxMXzvt
-	jZ8dNxEV7w6YQwd3peebkimHd4uXMW0X8r4rJWVvUEIuDjHdWTOE8kEGUnnWMASoiWZTB2PYAz9
-	S6THbPtev/HPxdvxJlfzn1gKGEEGmA1J1eSKq1W6l2/J2xsTWFo+rJ6aMYv26MMHFnyT96MCpbW
-	JfuJAjRlyNTKlx3A==
-X-Google-Smtp-Source: AGHT+IHtHJN2wlO/dS5Ho/xwNaDeL38A3oTas8GP+XhFN9vBlIEyqtN762oFpzrjya5bJyQoWb9F5Nm6P8AF1PfXcNY=
-X-Received: by 2002:a17:907:2cc7:b0:a9e:6e77:3ecd with SMTP id
- a640c23a62f3a-a9ef00191a8mr1012446866b.54.1731358527999; Mon, 11 Nov 2024
- 12:55:27 -0800 (PST)
+	s=arc-20240116; t=1731358826; c=relaxed/simple;
+	bh=/Br54z6T0qS7Wbf6l+prUwGUWQjI1w3sLhzxdzz7bFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kZ2bGilCTGwUql94yQww+FI7WL+ZGgyIxIM3vNdrxC3rMuJ1GEOOY7CyMfW6iEDrNia/So2QD9s60EVywDLaRpT+n+dSOgvDzji+6n+PQt4HmXdUJkuZJ1gJvNiRL3lQHaoh8woNVt2lKoUM2/BbIdQeZEdWkynpzxJu+HVbiac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtuLLDAA; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731358824; x=1762894824;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/Br54z6T0qS7Wbf6l+prUwGUWQjI1w3sLhzxdzz7bFg=;
+  b=LtuLLDAAG4GB4/Eyzcyg+asDgqceO7qQK0Pj6xVl90qsydXCtAHBHTl6
+   1Isrdjbf57t/jRWAoaUWAQ0qsFYr0IEsU3vclFtBK7W67XjSN7SpflMb2
+   O7c2Cz3QNxMcgZjV1AcjdSITPVkCK4cdzzrh86XfpHa2T2bgF0q627Wns
+   cOlk2+1cIKlpKpVlDDjlibUb3NEENaKEcKfJ4760I49lfAaL1ertHQsHE
+   7Svtj36NnzGR0JUOvOqrQ6Pnqq46QzQlQJWcHnFYsiju5/yVywTgQU6QT
+   E4UyOhWCGpkb3iPFitqHnE6ngsHIYI811GRQ2yxYFAUKkzD+xmsyIZAEG
+   A==;
+X-CSE-ConnectionGUID: Z95lEN6cQc+JRKTOPDpzxQ==
+X-CSE-MsgGUID: ZkGu+/rNR3CObXXroajysQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31142218"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="31142218"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 13:00:24 -0800
+X-CSE-ConnectionGUID: u9Ydgm7MTh6l7cOFDhJ/Xg==
+X-CSE-MsgGUID: zJYmaCWhTsCaNfXI+Ni5Fw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,146,1728975600"; 
+   d="scan'208";a="87468342"
+Received: from rfrazer-mobl3.amr.corp.intel.com (HELO [10.124.223.216]) ([10.124.223.216])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 13:00:21 -0800
+Message-ID: <c4adf8da-fac0-4a1a-9b83-7a585fc63ca2@intel.com>
+Date: Mon, 11 Nov 2024 13:00:20 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
- <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
- <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com>
- <Zy0__5YB9F5d0eZn@google.com> <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
- <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com> <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
- <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com>
-In-Reply-To: <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com>
-From: Doug Covelli <doug.covelli@broadcom.com>
-Date: Mon, 11 Nov 2024 15:55:17 -0500
-Message-ID: <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Zack Rusin <zack.rusin@broadcom.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 00/10] TDX host: metadata reading tweaks, bug fix and
+ info dump
+To: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com"
+ <seanjc@google.com>, "bp@alien8.de" <bp@alien8.de>,
+ "peterz@infradead.org" <peterz@infradead.org>, "hpa@zytor.com"
+ <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "nik.borisov@suse.com" <nik.borisov@suse.com>,
+ "Hunter, Adrian" <adrian.hunter@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "Yamahata, Isaku"
+ <isaku.yamahata@intel.com>
+References: <cover.1731318868.git.kai.huang@intel.com>
+ <0adb0785-286c-4702-8454-372d4bb3b862@intel.com>
+ <f5bc2da140f16da41af948adb50a369840ff890c.camel@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <f5bc2da140f16da41af948adb50a369840ff890c.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 11, 2024 at 1:49=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On 11/9/24 22:11, Doug Covelli wrote:
-> > On Sat, Nov 9, 2024 at 1:20=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.c=
-om> wrote:
-> >> On 11/8/24 06:03, Zack Rusin wrote:
-> >>>>> There's no spec but we have open headers listing the hypercalls.
-> >>>>> There's about a 100 of them (a few were deprecated), the full
-> >>>>> list starts here:
-> >>>>> https://github.com/vmware/open-vm-tools/blob/739c5a2f4bfd4cdda491e6=
-a6f6869d88c0bd6972/open-vm-tools/lib/include/backdoor_def.h#L97
-> >>>>> They're not well documented, but the names are pretty self-explenat=
-ory.
-> >>>>
-> >>>> At a quick glance, this one needs to be handled in KVM:
-> >>>>
-> >>>>     BDOOR_CMD_VCPU_MMIO_HONORS_PAT
-> >>>>
-> >>>> and these probably should be in KVM:
-> >>>>
-> >>>>     BDOOR_CMD_GETTIME
-> >>>>     BDOOR_CMD_SIDT
-> >>>>     BDOOR_CMD_SGDT
-> >>>>     BDOOR_CMD_SLDT_STR
-> >>>>     BDOOR_CMD_GETTIMEFULL
-> >>>>     BDOOR_CMD_VCPU_LEGACY_X2APIC_OK
-> >>>>     BDOOR_CMD_STEALCLOCK
-> >>>
-> >>> I'm not sure if there's any value in implementing a few of them.
-> >>
-> >> The value is that some of these depend on what the hypervisor does, no=
-t
-> >> on what userspace does.  For Hypervisor.framework you have a lot of
-> >> leeway, for KVM and Hyper-V less so. [..] From the KVM maintainers'
-> >> point of view, the feature you're adding might be used by others and
-> >> not just VMware Workstation.  Microsoft and Apple might see things
-> >> differently (Apple in particular has a much thinner wrapper around
-> >> the processor's virtualization capbilities).
-> >
-> > [...]
-> >
-> > the SGDT/SLDT/STR/SIDT backdoor calls these were added > 20
-> > years ago for SW that used these instructions from CPL3 which did not
-> > work well before VT/SVM were introduced.  These are really of no use
-> > on modern CPUs and will be blocked if the guest OS has enabled UMIP.
-> > [...]
-> >
-> > For stolen time the backdoor call is [...] currently
-> > really only supported by ESX (and only currently used by Photon OS) so
-> > I don't think adding that support to KVM is critical.
->
-> Sounds good.  All I want is ensuring that someone with access to the
-> spec did the exercise.
->
-> Still guessing, but for MMIO_HONORS_PAT we probably want to add a
-> separate KVM_CHECK_EXTENSION capability.
->
-> Is BDOOR_CMD_VCPU_LEGACY_X2APIC_OK something where you can just return a
-> constant?
->
-> This leaves just GETTIME and GETTIMEFULL.  If four hypercalls require
-> some care in the hypervisor (which may or may not be an in-kernel
-> implementation), that's not bad.  Can you share a bit more about these fo=
-ur?
+On 11/11/24 12:49, Huang, Kai wrote:
+> It also has a patch to fail module initialization when NO_MOD_BBP feature is not
+> support.
+> 
+> Just want to confirm, do you want to remove the code to:
+> 
+>  - print CMRs;
+>  - print TDX module versoin;
 
-BDOOR_CMD_VCPU_MMIO_HONORS_PAT and BDOOR_CMD_VCPU_LEGACY_X2APIC_OK are not
-actually backdoor calls - they are flags returned by BDOOR_CMD_GET_VCPU_INF=
-O.
-
-BDOOR_CMD_VCPU_MMIO_HONORS_PAT is only ever set to 1 on ESX as it is only
-relevant for PCI passthru which is not supported on Linux/Windows/macOS.  I=
-IRC
-this was added over 10 years ago for some Infiniband device vendor to use i=
-n
-their driver although I'm not sure that ever materialized.
-
-BDOOR_CMD_VCPU_LEGACY_X2APIC_OK indicates if it is OK to use x2APIC w/o
-interrupt remapping (e.g a virtual IOMMU).  I'm not sure if KVM supports th=
-is
-but I think this one can be set to TRUE unconditionally as we have no plans=
- to
-use KVM_CREATE_IRQCHIP - if anything we would use KVM_CAP_SPLIT_IRQCHIP alt=
-hough
-my preference would be to handle all APIC/IOAPIC/PIC emulation ourselves
-provided we can avoid CR8 exits but that is another discussion.
-
-For now I think it makes sense to handle BDOOR_CMD_GET_VCPU_INFO at userlev=
-el
-like we do on Windows and macOS.
-
-BDOOR_CMD_GETTIME/BDOOR_CMD_GETTIMEFULL are similar with the former being
-deprecated in favor of the latter.  Both do essentially the same thing whic=
-h is
-to return the host OS's time - on Linux this is obtained via gettimeofday. =
- I
-believe this is mainly used by tools to fix up the VM's time when resuming =
-from
-suspend.  I think it is fine to continue handling these at userlevel.
-
-Doug
-
-> >> Anyway, one question apart from this: is the API the same for the I/O
-> >> port and hypercall backdoors?
-> >
-> > Yeah the calls and arguments are the same.  The hypercall based
-> > interface is an attempt to modernize the backdoor since as you pointed
-> > out the I/O based interface is kind of hacky as it bypasses the normal
-> > checks for an I/O port access at CPL3.  It would be nice to get rid of
-> > it but unfortunately I don't think that will happen in the foreseeable
-> > future as there are a lot of existing VMs out there with older SW that
-> > still uses this interface.
->
-> Yeah, but I think it still justifies that the KVM_ENABLE_CAP API can
-> enable the hypercall but not the I/O port.
->
-> Paolo
->
-
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+What is your goal?  What is the bare minimum amount of code to get there?
 
