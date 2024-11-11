@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-31443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94529C3C3E
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 11:43:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23129C3C40
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 11:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 818B41F21256
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 10:43:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBAE5B221AC
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 10:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7C319DF62;
-	Mon, 11 Nov 2024 10:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889CD19E833;
+	Mon, 11 Nov 2024 10:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q8ssbYll"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VqKTBahC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519ED17C7BD;
-	Mon, 11 Nov 2024 10:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377E419E7E0;
+	Mon, 11 Nov 2024 10:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731321629; cv=none; b=LSp7KL9qILJdQKo/2pn/7VEJ3GciS5snm0a7VAtMc3qZLUvwhf0/d3VghyYwOhAznykwTpl7IQZ6fdALjrPTJhyM4qfLHu6RZCjT6HA1UcQQB2yMUdUtEq9fiyjendTitMwMBDQTRLjCwjfSX5ICYbV8Q18B91ygMC0NbOxOyFA=
+	t=1731321633; cv=none; b=B/cWpp3Qy76AwdRQE4JN02XlW15AXC8uZD0Txtc6P4Ov8LFcaOlaYYUQ6lrVPgtkCq67D8gxFk7JYXgqE+CLWjRM6B4NfgQtwGuD6QwV4Jk0h9hSlavcs2fYLGg54A4Jjzciaz6eD//u8Df/FdN7xu1JNrssn8a0EEdp61sYTgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731321629; c=relaxed/simple;
-	bh=MiDuW3xv90eOoJn+KPKLwF+2gnSv91ApeTBM2COmSK8=;
+	s=arc-20240116; t=1731321633; c=relaxed/simple;
+	bh=l/tx6drXiAgelgHqBNwM3hv3iSO7tz9rpGpCDs4Ltsc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=olqzx9EfuQdgtkqi59NgKn/5+qYESZGGQ7DC0xuhrGr0ePUYVyDLBEoeuE7jXUUul0CuvXpYA5LMsJcCj5I/o/FSciBeQvHZrJ1V1kFvpoKjh7qW43+JwbALCMOjrzE4gAVwN2/+eGduh09khwz9ji/mgfRIwn4pSj8sUxo8IEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q8ssbYll; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=HYHlXK5I5oIiKJf1CuHrvuBzC3AcJGLl7q0GJkmI5QNxEC5B2jxIsaMvvmTk0R54BEUFgTfyUJYUgz2fvRFs2cVBfZ7yeRVKdJMj/FbTb7vqrOeOWpMRh8DbhUHz6SPD5KmaNpUwGB5qinalCcfUkQCnJVhSb1fHNDFrXUP1fH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VqKTBahC; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731321629; x=1762857629;
+  t=1731321633; x=1762857633;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MiDuW3xv90eOoJn+KPKLwF+2gnSv91ApeTBM2COmSK8=;
-  b=Q8ssbYllPTtEhnvFN3bUP+011iyvkLPPoIN5fR8Fxr0e4ObpWSLtYDmd
-   ttNlPPX3s4sFJwSXxNt3AuZEsa8L0iFCip3YTGoMFp/8AkX/2jJiAZ9la
-   rJWcXAz0Ts/eLgchvSwHP5onQe8mz9DfMPokxTcb84f8uwI/wU6CJ7Knp
-   26cBARHy8hQa+4n4tROPSyeij4TleMfRw5Fmf+5Ym9LCYVaSIS35bwTVA
-   LHPswcPoeNRqj0cBjmPDXiZMQek/fuCFiUkyjT5n/j5ZvFu248jXRjsn+
-   hjxXb930RSoivNr3IJisFbu1mQzvfYAkyPrS3/aCmuYeNN16pogmixc89
+  bh=l/tx6drXiAgelgHqBNwM3hv3iSO7tz9rpGpCDs4Ltsc=;
+  b=VqKTBahCvnofaBi5/GEItgh/mUyaPIXPfh8nTH777GyBNckg7jAjDgQf
+   sC0vAj5XJQRhr4EAP3Bi1rmZCCoYRGdggrKCFMNVjN+tBmHbtjucy+tTz
+   p4lj++w1TgA4PkRQedXDgYanERUi6pbem8sK4Wcf0gLD0yaNzj/FDfnWQ
+   HrAKrgWz8xnsJRPWUB9Zsw7IaKlvpgbXEKJ0psB2+zju9Qzcn0LP1iAKN
+   MtLKT245/yVeTJVi+tkQCyXgilvFCVwY9UDkdFtLU4FwZZekK0/s6vAA3
+   77GRj7u4YgtVOwp+M7fFH0x1fPn6TReqWd2zPbuMtKD3RUyVGcOFmcQSy
    Q==;
-X-CSE-ConnectionGUID: Vp6QI4hwRAqLV7sTsjQapw==
-X-CSE-MsgGUID: FOiJ/eTQTOGpwaMgiLDxIg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41682674"
+X-CSE-ConnectionGUID: pLHLFac7TzqloeIhAbVbpA==
+X-CSE-MsgGUID: A5mpHm2XS4anom5712Ud8Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41682685"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41682674"
+   d="scan'208";a="41682685"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 02:40:29 -0800
-X-CSE-ConnectionGUID: 7xQ1lm3HQKWkpE2bHP46NQ==
-X-CSE-MsgGUID: wQi3sSrJQhOvMWejb3LA7A==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 02:40:33 -0800
+X-CSE-ConnectionGUID: OgUpB0wVQ2SR9+VPqqn6eQ==
+X-CSE-MsgGUID: 2icPPM8WRBuYG87YlPfnyQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="117667242"
+   d="scan'208";a="117667411"
 Received: from uaeoff-desk2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.223.207])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 02:40:24 -0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 02:40:28 -0800
 From: Kai Huang <kai.huang@intel.com>
 To: dave.hansen@intel.com,
 	kirill.shutemov@linux.intel.com,
@@ -77,9 +77,9 @@ Cc: x86@kernel.org,
 	adrian.hunter@intel.com,
 	nik.borisov@suse.com,
 	kai.huang@intel.com
-Subject: [PATCH v7 04/10] x86/virt/tdx: Use dedicated struct members for PAMT entry sizes
-Date: Mon, 11 Nov 2024 23:39:40 +1300
-Message-ID: <6ab90fd332bccdec7b64e5909cb4637732d6bb01.1731318868.git.kai.huang@intel.com>
+Subject: [PATCH v7 05/10] x86/virt/tdx: Add missing header file inclusion to local tdx.h
+Date: Mon, 11 Nov 2024 23:39:41 +1300
+Message-ID: <d345fd627f93f23bb621ac4bf40c349ec31b9073.1731318868.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <cover.1731318868.git.kai.huang@intel.com>
 References: <cover.1731318868.git.kai.huang@intel.com>
@@ -91,104 +91,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, the 'struct tdmr_sys_info_tdmr' which includes TDMR related
-fields defines the PAMT entry sizes for TDX supported page sizes (4KB,
-2MB and 1GB) as an array:
+Compiler attributes __packed and __aligned, and DECLARE_FLEX_ARRAY() are
+currently used in arch/x86/virt/vmx/tdx/tdx.h, but the relevant headers
+are not included explicitly.
 
-	struct tdx_sys_info_tdmr {
-		...
-		u16 pamt_entry_sizes[TDX_PS_NR];
-	};
-
-PAMT entry sizes are needed when allocating PAMTs for each TDMR.  Using
-the array to contain PAMT entry sizes reduces the number of arguments
-that need to be passed when calling tdmr_set_up_pamt().  It also makes
-the code pattern like below clearer:
-
-	for (pgsz = TDX_PS_4K; pgsz < TDX_PS_NR; pgsz++) {
-		pamt_size[pgsz] = tdmr_get_pamt_sz(tdmr, pgsz,
-					pamt_entry_size[pgsz]);
-		tdmr_pamt_size += pamt_size[pgsz];
-	}
-
-However, the auto-generated metadata reading code generates a structure
-member for each field.  The 'global_metadata.json' has a dedicated field
-for each PAMT entry size, and the new 'struct tdx_sys_info_tdmr' looks
-like:
-
-	struct tdx_sys_info_tdmr {
-		...
-		u16 pamt_4k_entry_size;
-		u16 pamt_2m_entry_size;
-		u16 pamt_1g_entry_size;
-	};
-
-To prepare to use the auto-generated code, make the existing 'struct
-tdx_sys_info_tdmr' look like the generated one.  But when passing to
-tdmrs_set_up_pamt_all(), build a local array of PAMT entry sizes from
-the structure so the code to allocate PAMTs can stay the same.
+There's no build issue in the current code since this "tdx.h" is only
+included by arch/x86/virt/vmx/tdx/tdx.c and it includes bunch of other
+<linux/xxx.h> before including "tdx.h".  But for the better explicitly
+include the relevant headers to "tdx.h".  Also include <linux/types.h>
+for basic variable types like u16.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 14 +++++++++-----
- arch/x86/virt/vmx/tdx/tdx.h |  4 +++-
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 7a2f979092e7..28537a6c47fc 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -304,9 +304,9 @@ struct field_mapping {
- static const struct field_mapping fields[] = {
- 	TD_SYSINFO_MAP(MAX_TDMRS,	      max_tdmrs),
- 	TD_SYSINFO_MAP(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr),
--	TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]),
--	TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]),
--	TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]),
-+	TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_4k_entry_size),
-+	TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_2m_entry_size),
-+	TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_1g_entry_size),
- };
- 
- static int get_tdx_sys_info_tdmr(struct tdx_sys_info_tdmr *sysinfo_tdmr)
-@@ -932,14 +932,18 @@ static int construct_tdmrs(struct list_head *tmb_list,
- 			   struct tdmr_info_list *tdmr_list,
- 			   struct tdx_sys_info_tdmr *sysinfo_tdmr)
- {
-+	u16 pamt_entry_size[TDX_PS_NR] = {
-+		sysinfo_tdmr->pamt_4k_entry_size,
-+		sysinfo_tdmr->pamt_2m_entry_size,
-+		sysinfo_tdmr->pamt_1g_entry_size,
-+	};
- 	int ret;
- 
- 	ret = fill_out_tdmrs(tmb_list, tdmr_list);
- 	if (ret)
- 		return ret;
- 
--	ret = tdmrs_set_up_pamt_all(tdmr_list, tmb_list,
--			sysinfo_tdmr->pamt_entry_size);
-+	ret = tdmrs_set_up_pamt_all(tdmr_list, tmb_list, pamt_entry_size);
- 	if (ret)
- 		return ret;
- 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 2600ec3752f5..ec879d54eb5c 100644
+index ec879d54eb5c..b1d705c3ab2a 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -84,7 +84,9 @@ struct tdmr_info {
- struct tdx_sys_info_tdmr {
- 	u16 max_tdmrs;
- 	u16 max_reserved_per_tdmr;
--	u16 pamt_entry_size[TDX_PS_NR];
-+	u16 pamt_4k_entry_size;
-+	u16 pamt_2m_entry_size;
-+	u16 pamt_1g_entry_size;
- };
+@@ -2,6 +2,9 @@
+ #ifndef _X86_VIRT_TDX_H
+ #define _X86_VIRT_TDX_H
  
- /* Kernel used global metadata fields */
++#include <linux/types.h>
++#include <linux/compiler_attributes.h>
++#include <linux/stddef.h>
+ #include <linux/bits.h>
+ 
+ /*
 -- 
 2.46.2
 
