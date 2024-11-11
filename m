@@ -1,192 +1,221 @@
-Return-Path: <kvm+bounces-31468-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 046399C3ED1
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 13:56:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E919C3E14
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 13:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36C031C21C0B
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 12:56:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA6BA1C21836
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 12:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C86F1A08A0;
-	Mon, 11 Nov 2024 12:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D1C19CD12;
+	Mon, 11 Nov 2024 12:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WoxR2q26"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ok8U02Fv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="j2QD2NXf";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ok8U02Fv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="j2QD2NXf"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34A119CC20;
-	Mon, 11 Nov 2024 12:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A86455C29;
+	Mon, 11 Nov 2024 12:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731329679; cv=none; b=dav2UBF9ZUgDEqs8DzVOSyEHDm4ycGUX/5dDduwRz+UTWlFS2817GC/o50xL3XUKrVO8pq+7uwvY2i5BRjV9WCIY/XLftF9cqX9FSODGF+livEGlxGJc5WQPR7PZynFvE6MjBHQRBjVOY+QP02RPShiOtBJOxxlStut6KxqbsJ0=
+	t=1731327152; cv=none; b=k/Po21RM3F6k3+z5ISgRQdxfZctsctoBHXi1obmQnqQTCJkCNBDVLsbcZ7yAoGkGpNbvNe4Jx3H2Y36y8g6N/jqgnqBZU76BSElTdWKWFdu4VV7g3TZUEaA1SlNxNwGmnaJoS1xipeOA1aSg43rjTcz3Oj/JGcZAParR6Z6lGsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731329679; c=relaxed/simple;
-	bh=kDi+TVCXm76xbQAD1/onHdkrODKXEEtiHXcBLawYGW4=;
-	h=Message-Id:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type; b=pjaoi/11X1/zt0OCW0idZmgOUPV9OBXcqRUrriYRzp8I8Y32fEw9i5UsjHaLbUL1xk27uNpDEcbkPoGzz7jDHdZkAbn1jJD6lQ40Xpj7DkwS9YfbbNWEDdwTuSNlK09Kt/NI6yOQ8+QuAeKKz5I5RBAucqzBoClK2Ii87tOSJe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WoxR2q26; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
-	Subject:Cc:To:From:Date:Message-Id:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:In-Reply-To;
-	bh=cKtSfZ5sWaSTj7tZINYGDLIwyP/HVC5Nz5I81xWPCwk=; b=WoxR2q26i+JGKuI+u/OTnBS/As
-	fN2FnAawEqX+BeWD0xU8yoKIHkTbWmmIgJNS0w0wfaX+hAMsSCpueVLcPkHDCLSCBTY7T9lzNugWl
-	yBNCYhG9B6gpLKORP0MAw4J2cByVteC6b1QeZ6xT7/ZPP//bDHr16bWYcsEnoGHIx7lE+dxIqBU9h
-	y6xnub51UBoGZ67ajic4ja9gVG3eRS1IUqNKXFDyhAu35eRydrLEkgoOl+ndQdKPzgeqpvtHvwlXX
-	tBkjjrwbbbhug7Ix6u0q1XTf46MXqCT+bq+MUwAn2RqIr8heZZesK3QEp7zyRPyG+E0amY/eO4AcE
-	h5kq3Z3A==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tATwA-0000000Coet-23KF;
-	Mon, 11 Nov 2024 12:54:34 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 0)
-	id F102C302795; Mon, 11 Nov 2024 13:54:32 +0100 (CET)
-Message-Id: <20241111125219.361243118@infradead.org>
-User-Agent: quilt/0.65
-Date: Mon, 11 Nov 2024 12:59:47 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: seanjc@google.com,
- pbonzini@redhat.com,
- jpoimboe@redhat.com,
- tglx@linutronix.de
-Cc: linux-kernel@vger.kernel.org,
- x86@kernel.org,
- kvm@vger.kernel.org,
- jthoughton@google.com,
- "Peter Zijlstra (Intel)" <peterz@infradead.org>
-Subject: [PATCH v2 12/12] x86/kvm/emulate: Avoid RET for fastops
-References: <20241111115935.796797988@infradead.org>
+	s=arc-20240116; t=1731327152; c=relaxed/simple;
+	bh=C5a3WgYas6C+NlJraY++KxxfeUbEzRoYnh50hG/Xvxc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s3XWs3FAqGafmYjDlbyWrXTcSrj9aNme/X7yQ5mWrmxDKdVbwkktbn48wuBr7J3VhnHnbvDcBsz5d/9CxF4kuHKqen5DTWMLWGESeE0nyNCGcQTwiWh4QLY3mtLvcpp8Db5XVNtRjI77d7q1ohiF8U3CRe5q/SdVIwvilnrQOAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ok8U02Fv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=j2QD2NXf; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ok8U02Fv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=j2QD2NXf; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 00DAA219A1;
+	Mon, 11 Nov 2024 12:12:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1731327148; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iANPCmTdrG0dfddLD/86nECIn88ibsqSoXP4uV8W0vU=;
+	b=Ok8U02Fvt0EU9i9W5t0LJJfjpgxj3N3vYS/lMurPRF+CO64VmWLVaQh52hGZ5/bxJ77RVi
+	ZUJGYmyk7rmeRok10pV6QqnDmHvUlTDYXZorzD1Ntw96EBRRYDHaQGlLYFcHIPulUrHdK5
+	HAA6nPdMD0ZmsbSRhl/QliSqO2u8lEs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1731327148;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iANPCmTdrG0dfddLD/86nECIn88ibsqSoXP4uV8W0vU=;
+	b=j2QD2NXf9iM6A3lDT0znetsKbwYNYmvFMFBtxvge+XwxrwBvEJ5ESvs6RQp1PCXkHb/5U7
+	2okHicBRuUxbSHBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Ok8U02Fv;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=j2QD2NXf
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1731327148; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iANPCmTdrG0dfddLD/86nECIn88ibsqSoXP4uV8W0vU=;
+	b=Ok8U02Fvt0EU9i9W5t0LJJfjpgxj3N3vYS/lMurPRF+CO64VmWLVaQh52hGZ5/bxJ77RVi
+	ZUJGYmyk7rmeRok10pV6QqnDmHvUlTDYXZorzD1Ntw96EBRRYDHaQGlLYFcHIPulUrHdK5
+	HAA6nPdMD0ZmsbSRhl/QliSqO2u8lEs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1731327148;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iANPCmTdrG0dfddLD/86nECIn88ibsqSoXP4uV8W0vU=;
+	b=j2QD2NXf9iM6A3lDT0znetsKbwYNYmvFMFBtxvge+XwxrwBvEJ5ESvs6RQp1PCXkHb/5U7
+	2okHicBRuUxbSHBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 95C9B13301;
+	Mon, 11 Nov 2024 12:12:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id zH8/JKv0MWdjOgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 11 Nov 2024 12:12:27 +0000
+Message-ID: <440b2682-dbfb-4a5c-927c-2397413a7f9c@suse.cz>
+Date: Mon, 11 Nov 2024 13:12:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 1/6] arch: introduce set_direct_map_valid_noflush()
+Content-Language: en-US
+To: David Hildenbrand <david@redhat.com>, Patrick Roy <roypat@amazon.co.uk>,
+ tabba@google.com, quic_eberman@quicinc.com, seanjc@google.com,
+ pbonzini@redhat.com, jthoughton@google.com, ackerleytng@google.com,
+ vannapurve@google.com, rppt@kernel.org
+Cc: graf@amazon.com, jgowans@amazon.com, derekmn@amazon.com,
+ kalyazin@amazon.com, xmarcalx@amazon.com, linux-mm@kvack.org,
+ corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
+ chenhuacai@kernel.org, kernel@xen0n.name, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, luto@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, shuah@kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241030134912.515725-1-roypat@amazon.co.uk>
+ <20241030134912.515725-2-roypat@amazon.co.uk>
+ <a774e13e-0616-4d96-bb51-bac0fcb2cb9b@redhat.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <a774e13e-0616-4d96-bb51-bac0fcb2cb9b@redhat.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 00DAA219A1
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLisu716frudqkg98kczdd9eac)];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:dkim]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Since there is only a single fastop() function, convert the FASTOP
-stuff from CALL_NOSPEC+RET to JMP_NOSPEC+JMP, avoiding the return
-thunks and all that jazz.
+On 10/31/24 10:57, David Hildenbrand wrote:
+> On 30.10.24 14:49, Patrick Roy wrote:
+>> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+>> 
+>> From: Mike Rapoport (Microsoft) <rppt@kernel.org>
+>> 
+>> Add an API that will allow updates of the direct/linear map for a set of
+>> physically contiguous pages.
+>> 
+>> It will be used in the following patches.
+>> 
+>> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> 
+> 
+> [...]
+> 
+>>   #ifdef CONFIG_DEBUG_PAGEALLOC
+>>   void __kernel_map_pages(struct page *page, int numpages, int enable)
+>>   {
+>> diff --git a/include/linux/set_memory.h b/include/linux/set_memory.h
+>> index e7aec20fb44f1..3030d9245f5ac 100644
+>> --- a/include/linux/set_memory.h
+>> +++ b/include/linux/set_memory.h
+>> @@ -34,6 +34,12 @@ static inline int set_direct_map_default_noflush(struct page *page)
+>>   	return 0;
+>>   }
+>>   
+>> +static inline int set_direct_map_valid_noflush(struct page *page,
+>> +					       unsigned nr, bool valid)
+> 
+> I recall that "unsigned" is frowned upon; "unsigned int".
+> 
+>> +{
+>> +	return 0;
+>> +}
+> 
+> Can we add some kernel doc for this?
+> 
+> In particular
+> 
+> (a) What does it mean when we return 0? That it worked? Then, this
 
-Specifically FASTOPs rely on the return thunk to preserve EFLAGS,
-which not all of them can trivially do (call depth tracing suffers
-here).
+Seems so.
 
-Objtool strenuously complains about this:
+>      dummy function looks wrong. Or this it return the
 
- - indirect call without a .rodata, fails to determine JUMP_TABLE,
-   annotate
- - fastop functions fall through, exception
- - unreachable instruction after fastop_return, save/restore
+That's !CONFIG_ARCH_HAS_SET_DIRECT_MAP and other functions around do it the
+same way. Looks like the current callers can only exist with the CONFIG_
+enabled in the first place.
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- arch/x86/kvm/emulate.c              |   20 +++++++++++++++-----
- include/linux/objtool_types.h       |    1 +
- tools/include/linux/objtool_types.h |    1 +
- tools/objtool/check.c               |   11 ++++++++++-
- 4 files changed, 27 insertions(+), 6 deletions(-)
+>      number of processed entries? Then we'd have a possible "int" vs.
+>      "unsigned int" inconsistency.
+> 
+> (b) What are the semantics when we fail halfway through the operation
+>      when processing nr > 1? Is it "all or nothing"?
 
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -285,8 +285,8 @@ static void invalidate_registers(struct
-  * different operand sizes can be reached by calculation, rather than a jump
-  * table (which would be bigger than the code).
-  *
-- * The 16 byte alignment, considering 5 bytes for the RET thunk, 3 for ENDBR
-- * and 1 for the straight line speculation INT3, leaves 7 bytes for the
-+ * The 16 byte alignment, considering 5 bytes for the JMP, 4 for ENDBR
-+ * and 1 for the straight line speculation INT3, leaves 6 bytes for the
-  * body of the function.  Currently none is larger than 4.
-  */
- static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
-@@ -304,7 +304,7 @@ static int fastop(struct x86_emulate_ctx
- 	__FOP_FUNC(#name)
- 
- #define __FOP_RET(name) \
--	"11: " ASM_RET \
-+	"11: jmp fastop_return; int3 \n\t" \
- 	".size " name ", .-" name "\n\t"
- 
- #define FOP_RET(name) \
-@@ -5071,14 +5071,24 @@ static void fetch_possible_mmx_operand(s
- 		kvm_read_mmx_reg(op->addr.mm, &op->mm_val);
- }
- 
--static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
-+/*
-+ * All the FASTOP magic above relies on there being *one* instance of this
-+ * so it can JMP back, avoiding RET and it's various thunks.
-+ */
-+static noinline int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
- {
- 	ulong flags = (ctxt->eflags & EFLAGS_MASK) | X86_EFLAGS_IF;
- 
- 	if (!(ctxt->d & ByteOp))
- 		fop += __ffs(ctxt->dst.bytes) * FASTOP_SIZE;
- 
--	asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
-+	asm("push %[flags]; popf \n\t"
-+	    UNWIND_HINT(UNWIND_HINT_TYPE_SAVE, 0, 0, 0)
-+	    ASM_ANNOTATE(ANNOTYPE_JUMP_TABLE)
-+	    JMP_NOSPEC
-+	    "fastop_return: \n\t"
-+	    UNWIND_HINT(UNWIND_HINT_TYPE_RESTORE, 0, 0, 0)
-+	    "pushf; pop %[flags]\n"
- 	    : "+a"(ctxt->dst.val), "+d"(ctxt->src.val), [flags]"+D"(flags),
- 	      [thunk_target]"+S"(fop), ASM_CALL_CONSTRAINT
- 	    : "c"(ctxt->src2.val));
---- a/include/linux/objtool_types.h
-+++ b/include/linux/objtool_types.h
-@@ -64,5 +64,6 @@ struct unwind_hint {
- #define ANNOTYPE_UNRET_BEGIN		5
- #define ANNOTYPE_IGNORE_ALTS		6
- #define ANNOTYPE_INTRA_FUNCTION_CALLS	7
-+#define ANNOTYPE_JUMP_TABLE		8
- 
- #endif /* _LINUX_OBJTOOL_TYPES_H */
---- a/tools/include/linux/objtool_types.h
-+++ b/tools/include/linux/objtool_types.h
-@@ -64,5 +64,6 @@ struct unwind_hint {
- #define ANNOTYPE_UNRET_BEGIN		5
- #define ANNOTYPE_IGNORE_ALTS		6
- #define ANNOTYPE_INTRA_FUNCTION_CALLS	7
-+#define ANNOTYPE_JUMP_TABLE		8
- 
- #endif /* _LINUX_OBJTOOL_TYPES_H */
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -2386,6 +2386,14 @@ static int __annotate_late(struct objtoo
- 		insn->unret = 1;
- 		break;
- 
-+	/*
-+	 * Must be after add_jump_table(); for it doesn't set a sane
-+	 * _jump_table value.
-+	 */
-+	case ANNOTYPE_JUMP_TABLE:
-+		insn->_jump_table = (void *)1;
-+		break;
-+
- 	default:
- 		break;
- 	}
-@@ -3459,7 +3467,8 @@ static int validate_branch(struct objtoo
- 		if (func && insn_func(insn) && func != insn_func(insn)->pfunc) {
- 			/* Ignore KCFI type preambles, which always fall through */
- 			if (!strncmp(func->name, "__cfi_", 6) ||
--			    !strncmp(func->name, "__pfx_", 6))
-+			    !strncmp(func->name, "__pfx_", 6) ||
-+			    !strcmp(insn_func(insn)->name, "fastop"))
- 				return 0;
- 
- 			WARN("%s() falls through to next function %s()",
+Looking at x86 implementation it seems like it can just bail out in the
+middle, but then I'm not sure if it can really fail in the middle, hmm...
 
 
 
