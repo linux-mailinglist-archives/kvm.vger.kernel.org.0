@@ -1,152 +1,158 @@
-Return-Path: <kvm+bounces-31480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273489C4007
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 14:59:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936829C4078
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 15:14:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9CC9280C81
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 13:59:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C44B11C21815
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 14:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5F319E999;
-	Mon, 11 Nov 2024 13:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7895D19F40A;
+	Mon, 11 Nov 2024 14:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k27hNG3z"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC4419E7F3;
-	Mon, 11 Nov 2024 13:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA1F19D881;
+	Mon, 11 Nov 2024 14:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731333569; cv=none; b=J+HTrFIOEgZvaInVTuukHsOW1dvMgP5A+UDm7y8dceEzoIw36DBsDRAdR+s4lSDaOgBLb+fQ8qEYPQSDmH8asECjJdmLcOR3nY/0BA2jlpLMd6mms6JLJ/KHmdTkY1gEvIdyUiOmQSIeCDdnfKsbf8uMcXO5feIaTCdwLaWGtS0=
+	t=1731334460; cv=none; b=WouuU36uzpbryhUoca4l1/GO0hsYrd/GePw0lTzNDEr5UyplXEFl+tqcdhxaN9EnciJeqvKV2kl4YCSkxnNVeqMuiMNv0vS4YFFI96B+ISdqS3gLIJSMTS8y4HohouV+quMvuva8/2Y7YoomO+VgeUS11Qz2m1kf6qKMFTDzOsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731333569; c=relaxed/simple;
-	bh=H1xgZnseHHJnnzlMLApMafjzYRiKcmE/ec0tzDvi5Fo=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=q+HoYVOlUyeUrvMOhZC2qXxwvBVftTvJPLv8sedGio3heHknPRdkR327dDHgLojtnnD7l6bvvtbFPlp4oAD8vRDNVU5VzjCtjGA9Nu1zChGBPt6NSjEBnAEdDOWv/EYgQ++mJBpmN1v+H2xD1WxpX5midlfj1Lfg+zYvjQoEvlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XnB2g0K30zQssk;
-	Mon, 11 Nov 2024 21:58:03 +0800 (CST)
-Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
-	by mail.maildlp.com (Postfix) with ESMTPS id BE6C0180064;
-	Mon, 11 Nov 2024 21:59:15 +0800 (CST)
-Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 11 Nov 2024 21:59:15 +0800
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 11 Nov 2024 21:59:14 +0800
-Subject: Re: [PATCH v14 0/4] debugfs to hisilicon migration driver
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-References: <20241108065538.45710-1-liulongfang@huawei.com>
- <20241108140121.1032a68a.alex.williamson@redhat.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <b546eed4-3b5f-36f3-4a7f-fc97306bbbe3@huawei.com>
-Date: Mon, 11 Nov 2024 21:59:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1731334460; c=relaxed/simple;
+	bh=PoPdwj1OQ3NAGnnRRgFR/1m9IjlmuXmKSCrXN0KMYnI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ChKSqqVrEDijJ2F9FdPEyZgVQKKNpOolkNlYpa2GD6cAh2Rhq2hQnu60BWLBWCrwcmP3mTo8gsfwbfI+qxekr1TZ0SFt4dXg7hjVf/db03EFEtLpWL47pIfCr+P7eijGD6N2YcfjmnOnkbXXqc6nXdZHc9neettwW/kET2z+HQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k27hNG3z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301A0C4CECF;
+	Mon, 11 Nov 2024 14:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731334459;
+	bh=PoPdwj1OQ3NAGnnRRgFR/1m9IjlmuXmKSCrXN0KMYnI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k27hNG3zdyrQjrjJlks+mEgxDtHxY3SQ+EK/+jcSreLIOQf8WQaUjYn23dS+3Dj9f
+	 wEYpMNPSMoNzvlRj3Pfa6lVCfha1+8/uYZ9UgPKtxgQ73Cljb3g6hJwqGWvqID4neW
+	 cAcRvAcEc6vvNLZF1lFqzASOtf5FId14eIkXpQOfZFx6rpyoT9kjpxdSVt3qNmoLqP
+	 +O6ZaLqD2ih3BDLt1wy8YDCJm6cYqp/EtuhSipP/Y7JOk8ExpSUk6abaTCXUZjxRC2
+	 rvGBRz+GWbeniUhP8nOlxGmUHSeZf7Db3CGqxooLeSNZr2seCGIZvlG8ABxfCwl3yl
+	 4M2Kz8Gkq6kCQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tAVBI-00Bsig-MM;
+	Mon, 11 Nov 2024 14:14:16 +0000
+Date: Mon, 11 Nov 2024 14:14:15 +0000
+Message-ID: <86pln1zwlk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>,
+	tglx@linutronix.de,
+	bhelgaas@google.com,
+	alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	leonro@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com,
+	dlemoal@kernel.org,
+	kevin.tian@intel.com,
+	smostafa@google.com,
+	andriy.shevchenko@linux.intel.com,
+	reinette.chatre@intel.com,
+	eric.auger@redhat.com,
+	ddutile@redhat.com,
+	yebin10@huawei.com,
+	brauner@kernel.org,
+	apatel@ventanamicro.com,
+	shivamurthy.shastri@linutronix.de,
+	anna-maria@linutronix.de,
+	nipun.gupta@amd.com,
+	marek.vasut+renesas@mailbox.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address for each MSI vector
+In-Reply-To: <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
+References: <cover.1731130093.git.nicolinc@nvidia.com>
+	<a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20241108140121.1032a68a.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemn100017.china.huawei.com (7.202.194.122)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, nicolinc@nvidia.com, tglx@linutronix.de, bhelgaas@google.com, alex.williamson@redhat.com, jgg@nvidia.com, leonro@nvidia.com, shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org, kevin.tian@intel.com, smostafa@google.com, andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com, eric.auger@redhat.com, ddutile@redhat.com, yebin10@huawei.com, brauner@kernel.org, apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de, anna-maria@linutronix.de, nipun.gupta@amd.com, marek.vasut+renesas@mailbox.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/11/9 5:01, Alex Williamson wrote:
-> On Fri, 8 Nov 2024 14:55:34 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
+On Mon, 11 Nov 2024 13:09:20 +0000,
+Robin Murphy <robin.murphy@arm.com> wrote:
 > 
->> Add a debugfs function to the hisilicon migration driver in VFIO to
->> provide intermediate state values and data during device migration.
->>
->> When the execution of live migration fails, the user can view the
->> status and data during the migration process separately from the
->> source and the destination, which is convenient for users to analyze
->> and locate problems.
->>
->> Changes v13 -> v14
->> 	Bugfix the parameter problem of seq_puts()
+> On 2024-11-09 5:48 am, Nicolin Chen wrote:
+> > On ARM GIC systems and others, the target address of the MSI is translated
+> > by the IOMMU. For GIC, the MSI address page is called "ITS" page. When the
+> > IOMMU is disabled, the MSI address is programmed to the physical location
+> > of the GIC ITS page (e.g. 0x20200000). When the IOMMU is enabled, the ITS
+> > page is behind the IOMMU, so the MSI address is programmed to an allocated
+> > IO virtual address (a.k.a IOVA), e.g. 0xFFFF0000, which must be mapped to
+> > the physical ITS page: IOVA (0xFFFF0000) ===> PA (0x20200000).
+> > When a 2-stage translation is enabled, IOVA will be still used to program
+> > the MSI address, though the mappings will be in two stages:
+> >    IOVA (0xFFFF0000) ===> IPA (e.g. 0x80900000) ===> 0x20200000
+> > (IPA stands for Intermediate Physical Address).
+> > 
+> > If the device that generates MSI is attached to an IOMMU_DOMAIN_DMA, the
+> > IOVA is dynamically allocated from the top of the IOVA space. If attached
+> > to an IOMMU_DOMAIN_UNMANAGED (e.g. a VFIO passthrough device), the IOVA is
+> > fixed to an MSI window reported by the IOMMU driver via IOMMU_RESV_SW_MSI,
+> > which is hardwired to MSI_IOVA_BASE (IOVA==0x8000000) for ARM IOMMUs.
+> > 
+> > So far, this IOMMU_RESV_SW_MSI works well as kernel is entirely in charge
+> > of the IOMMU translation (1-stage translation), since the IOVA for the ITS
+> > page is fixed and known by kernel. However, with virtual machine enabling
+> > a nested IOMMU translation (2-stage), a guest kernel directly controls the
+> > stage-1 translation with an IOMMU_DOMAIN_DMA, mapping a vITS page (at an
+> > IPA 0x80900000) onto its own IOVA space (e.g. 0xEEEE0000). Then, the host
+> > kernel can't know that guest-level IOVA to program the MSI address.
+> > 
+> > To solve this problem the VMM should capture the MSI IOVA allocated by the
+> > guest kernel and relay it to the GIC driver in the host kernel, to program
+> > the correct MSI IOVA. And this requires a new ioctl via VFIO.
 > 
-> Should we assume this one is at least compile tested?  Thanks,
-> 
-> Alex
->
-Yes, the patch needs to be fully tested..
-I use the latest kernel6.12 and openEuler file system.
-The verification test found that there is no problem with seq_printf()
-and seq_puts(). But there is something wrong with the memory allocated
-by "migf" and it needs to be fixed.
+> Once VFIO has that information from userspace, though, do we really
+> need the whole complicated dance to push it right down into the
+> irqchip layer just so it can be passed back up again? AFAICS
+> vfio_msi_set_vector_signal() via VFIO_DEVICE_SET_IRQS already
+> explicitly rewrites MSI-X vectors, so it seems like it should be
+> pretty straightforward to override the message address in general at
+> that level, without the lower layers having to be aware at all, no?
 
-Thanks.
-Longfang.
++1.
 
->>
->> Changes v12 -> v13
->> 	Replace seq_printf() with seq_puts()
->>
->> Changes v11 -> v12
->> 	Update comments and delete unnecessary logs
->>
->> Changes v10 -> v11
->> 	Update conditions for debugfs registration
->>
->> Changes v9 -> v10
->> 	Optimize symmetry processing of mutex
->>
->> Changes v8 -> v9
->> 	Added device enable mutex
->>
->> Changes v7 -> v8
->> 	Delete unnecessary information
->>
->> Changes v6 -> v7
->> 	Remove redundant kernel error log printing and
->> 	remove unrelated bugfix code
->>
->> Changes v5 -> v6
->> 	Modify log output calling error
->>
->> Changes v4 -> v5
->> 	Adjust the descriptioniptionbugfs file directory
->>
->> Changes v3 -> v4
->> 	Rebased on kernel6.9
->>
->> Changes 2 -> v3
->> 	Solve debugfs serialization problem.
->>
->> Changes v1 -> v2
->> 	Solve the racy problem of io_base.
->>
->> Longfang Liu (4):
->>   hisi_acc_vfio_pci: extract public functions for container_of
->>   hisi_acc_vfio_pci: create subfunction for data reading
->>   hisi_acc_vfio_pci: register debugfs for hisilicon migration driver
->>   Documentation: add debugfs description for hisi migration
->>
->>  .../ABI/testing/debugfs-hisi-migration        |  25 ++
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 266 ++++++++++++++++--
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  19 ++
->>  3 files changed, 279 insertions(+), 31 deletions(-)
->>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
->>
-> 
-> 
-> .
-> 
+I would like to avoid polluting each and every interrupt controller
+with usage-specific knowledge (they usually are brain-damaged enough).
+We already have an indirection into the IOMMU subsystem and it
+shouldn't be a big deal to intercept the message for all
+implementations at this level.
+
+I also wonder how to handle the case of braindead^Wwonderful platforms
+where ITS transactions are not translated by the SMMU. Somehow, VFIO
+should be made aware of this situation.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
