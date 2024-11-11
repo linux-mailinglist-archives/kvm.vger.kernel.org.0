@@ -1,225 +1,233 @@
-Return-Path: <kvm+bounces-31394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274E49C365B
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 03:06:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4942A9C36B5
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 03:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC46B1F2127D
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 02:06:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE15C1F21FC4
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 02:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD637F48C;
-	Mon, 11 Nov 2024 02:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F34813AD20;
+	Mon, 11 Nov 2024 02:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFK9Cyfo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBvKOBmS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440242595;
-	Mon, 11 Nov 2024 02:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E90D224D4;
+	Mon, 11 Nov 2024 02:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731290752; cv=none; b=Mr0hcG3hZ7Rv472niDGUc9Xq4Bb0XBuD9JD8Ijy9wc9UrYPbjzlGGs3YKYJ/KFJgxLX8Jzk2wOpYDtEP0fZhjSq7+O2cp468seTrJvTvBvXw6K+Hd2Zk1v72jYSS08O5YwYfI6NczpD8aDQo+V/NH9isl95KjCouhMHTwiYXV5c=
+	t=1731293751; cv=none; b=XLFdUIsWEeq2VUEK8l3Kb+Ai6JUEw7U3rz4jXwy6Wur5jfQkbAuNB/4pjAXRvTsTllbX+nNQQQCD6HX4Gq1D5UOY4ekFBwVd58AWR43OLOMGOYfMkcNY3aNGQAk6tnDZbsD2Zbvku8CxOFqKEZrx+4ZEGmXoijVMvENmPyWIrJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731290752; c=relaxed/simple;
-	bh=bWyRCGTcPRNkiQbPV1UIZK/QkxgPyfNx5HGKdVQ0DSQ=;
+	s=arc-20240116; t=1731293751; c=relaxed/simple;
+	bh=HScUf/0mJI0h2P0D1CtSIPUJdAuxe+P+7zYDm1Fxna8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dAIWiktJVOro7AWm3cKyo5KVtnHgyLJ3/whJK+NksWJjmCSZImmnNkcQievHcgW470LlJS8ptQ2+XBP4zY9+1C5bnSLbR315/WvAggXC66mwORGVfNsYyockuoGFhLGmekEFDrsXSrXr29gJpZMXY7f/zHksTGundu/RiVe8xZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFK9Cyfo; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso33894481fa.0;
-        Sun, 10 Nov 2024 18:05:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731290747; x=1731895547; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GdEkfAJOsElSV+ujZ/1dK2DOAkU54yl3So/8rs20Jag=;
-        b=TFK9CyfoYPA3xi/BnMiYSy2AZc+3QS03ZSbcciD9ujKPMayJSD5iXScOTnTamENIwR
-         1eTjtNG9BiHj0/48GqvKhZTByuE0lmexlVbH4GZt9zib4iuwWU4vJqXjv9SrpmqahZ2/
-         dmFJvdBgiIUL4ncrY1hazNeY+R4ewAhfDpgTqDstXMgl5Kqob6TCbM+LGfVzy/Ppogfg
-         AEuIEx/80ZICocy4zps4aj7K7Ioon8rOtD9nWXkt8GUJd4HH0HRU/rVUbOx9phGHwecR
-         Vd0VZbmRAdCvhLyCV1cGo7ZIGnnE3Hme0pNo2lA48QQL7DJ98nWmPf06d+8uYsAeDcrY
-         ZJcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731290747; x=1731895547;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GdEkfAJOsElSV+ujZ/1dK2DOAkU54yl3So/8rs20Jag=;
-        b=S/4delkvH62/eogfJL78YQs8DUzfMupTrvJJYrkHspJqbL6FfYDcSnKwecYjw8bpe3
-         GsnsIN+zUOlm9hBp3rkiyjgPQIzbTB1SZHC3aNW8txWhtKgAlIkuxM3/Hz1v0pxPe4sH
-         xuszKnN77CarCSS5WiZrWTk5sdIKAuotDCf9XvD7EhlbHhM6Aa59C5GnmwIaQk08ANdn
-         JM+AmzmjfZH12dFnlgV60V84oMstm5nLltm5oNbSo+tYV44skKFO73emN8WXlxrXCJDb
-         oUWkfXAodbiEPyaUSBHdjC0d1whbNC+4LccvWx8n+Z/VYEpaZszHz+rz6xSsyxg0omXB
-         v+VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUdESwwDHmZfmJ521sofsn2EZ67Z8i7YGI4CUiWLL1k+MRLSbXO0yIZ3Q+R2akvpmkRTtW6q+EOXBBO+b4=@vger.kernel.org, AJvYcCUeiehGzvIPBQRCYMTKlbLvIY3a5XiDpHb0xnWAr8dATf54P8zFUiWz12AHkinWxoMUbMr60O8vSiqa@vger.kernel.org, AJvYcCUy05lnbbyUMhB+O1vJRsXJmpU4lXoEg8DuZTHFtepvZXJg9auyGshuBIVfiahg7+5RKFi7Cp79rfDk@vger.kernel.org, AJvYcCV5TtRSa0vzGjLs6D8vr7xKDxrNkDYiUQQTBN8qP0vpDOOnHh/WXpxePoSnDZXqqeFxTQaDy/q5Rok5Rzxz@vger.kernel.org, AJvYcCVV5ck3dhrIVNT69VaDePYUrclbeOx9PG10iyUW/zAneQbKKXVTc724v5I/B0zltPtDyAU=@vger.kernel.org, AJvYcCXHpuVsut4y3Tw3LkZV/lnSUejTJhe9ZjmSKGrFHYlA6VGs5BirF2DZ63vd0Lv0O70ZQ9r+wgeG18IB2w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaKYI7iABcv1/nhqVQxU7Gs5+ka9LpUbLYHp+78YrnqE6YtyFg
-	v+AeMcyipGkd4Ssq6FHlMTQMIf4YuemG/4lykIgyZ7JJYPEPPF9BB7YD/B7r63p5ZDT+0yEyJc+
-	f65hmku2a+kHuhsa3iPfNNNOn1+Y=
-X-Google-Smtp-Source: AGHT+IF0tJPIolZyNYPTT2b/MpCJe82Fg/iZslXB6gzAqlmjhMUqVGRF2M5H+UaSiVlIP433HQ0w2T+2CyxfkrVJL68=
-X-Received: by 2002:a2e:bc1d:0:b0:2fb:5014:8eb9 with SMTP id
- 38308e7fff4ca-2ff2014ec60mr46592301fa.10.1731290746959; Sun, 10 Nov 2024
- 18:05:46 -0800 (PST)
+	 To:Cc:Content-Type; b=HLUVrMr2HfNDvrCod1mC+2Dt7o70rfRUnJdicLc3f+9YDl8cXXg2PHR714YINo/hET8HL4cyHeRasO2vZRcTR3ol6R6vAWN7d8X9KaB+Ck+B1m7ctOjUsBwTUp95f1nKYSwPxFFqxKkGDFabgvTXojd7gDhY/oMYQSsGukH9dd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBvKOBmS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7FE5C4CECD;
+	Mon, 11 Nov 2024 02:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731293750;
+	bh=HScUf/0mJI0h2P0D1CtSIPUJdAuxe+P+7zYDm1Fxna8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bBvKOBmS2SEx2ss/TPyZHvX2/b9bEfNE1orxM5YqSvJBWTjMTk2biN/hmJDZoniiq
+	 JyrOsRMlAZd/KyDuPCDxLjwZrUZgcWxkfs2EBK8Lp9EQyhhrSM/H/ZtDKBMLK+Ag55
+	 YeZS07o01iXHyZfqkcLqQvNv/tUZo6G6mdQavmWxgNUr1orWWkMXEDjhVWMYIekf1k
+	 41pwM+Ldqlf//Dn9T7EHnA7WTwSp/elcY4+O10SzPl0LJU7yTukoewPvwwP610dKGZ
+	 CzPjLHrb28nt4nw7FMjzvtSV8ju17S2pZLCSosGspyIuZxUF2TIJ0jsJVDKkqban/+
+	 CpjgIDnUYPTPw==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c9634c9160so4965083a12.2;
+        Sun, 10 Nov 2024 18:55:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX9zsQ+Yba/rj3knO0j7jRuR1vfI/EIosmKx6K7beXk4VIJ5stB0N4C1mDprcrFR7CER8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytEgG6wvbmq9CWMitGtxWh1FRDohJrnM78f6FrWYeSAUObdXkX
+	7GOVoowOuAJEo1dDrfCOXBoLhLpZwR+TrerP2pjs7bZgGrdDHRxmWvmjZMsWM4D0zDwBliwUQ6z
+	Kq1E4AqP3wmzKkNi9N+I6k6LkpLM=
+X-Google-Smtp-Source: AGHT+IE9ZVU6MUnQyJE3IEZDEKcc4yDVpoQPgjNAf/AzyzceYa7gsBsvYyyHQWmatNCKqPWzX8N5Di7puhbpLxstkDE=
+X-Received: by 2002:a17:907:9603:b0:a99:ed0c:1d6 with SMTP id
+ a640c23a62f3a-a9ef000750cmr1066361766b.49.1731293749308; Sun, 10 Nov 2024
+ 18:55:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1731244445.git.leon@kernel.org> <dca3aecdeeaa962c7842bc488378cdf069201d65.1731244445.git.leon@kernel.org>
-In-Reply-To: <dca3aecdeeaa962c7842bc488378cdf069201d65.1731244445.git.leon@kernel.org>
-From: anish kumar <yesanishhere@gmail.com>
-Date: Sun, 10 Nov 2024 18:05:35 -0800
-Message-ID: <CABCoZhAN-eeu=E5r+ZbZGTNwQta5yUw86sy8e_Je+Yri-+iuoQ@mail.gmail.com>
-Subject: Re: [PATCH v3 09/17] docs: core-api: document the IOVA-based API
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, 
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
-	Yishai Hadas <yishaih@nvidia.com>, 
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org, Randy Dunlap <rdunlap@infradead.org>
+References: <20241108033437.2727574-1-lixianglai@loongson.cn>
+In-Reply-To: <20241108033437.2727574-1-lixianglai@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 11 Nov 2024 10:55:37 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7Tmi8LSn6kDsMj8HkhcUb9zY1EOx2-KnpeTriickbaKQ@mail.gmail.com>
+Message-ID: <CAAhV-H7Tmi8LSn6kDsMj8HkhcUb9zY1EOx2-KnpeTriickbaKQ@mail.gmail.com>
+Subject: Re: [PATCH V4 00/11] Added Interrupt controller emulation for
+ loongarch kvm
+To: Xianglai Li <lixianglai@loongson.cn>
+Cc: linux-kernel@vger.kernel.org, Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 10, 2024 at 5:50=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> From: Christoph Hellwig <hch@lst.de>
->
-> Add an explanation of the newly added IOVA-based mapping API.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  Documentation/core-api/dma-api.rst | 70 ++++++++++++++++++++++++++++++
->  1 file changed, 70 insertions(+)
->
-> diff --git a/Documentation/core-api/dma-api.rst b/Documentation/core-api/=
-dma-api.rst
-> index 8e3cce3d0a23..61d6f4fe3d88 100644
-> --- a/Documentation/core-api/dma-api.rst
-> +++ b/Documentation/core-api/dma-api.rst
-> @@ -530,6 +530,76 @@ routines, e.g.:::
->                 ....
->         }
->
-> +Part Ie - IOVA-based DMA mappings
-> +---------------------------------
-> +
-> +These APIs allow a very efficient mapping when using an IOMMU.  They are=
- an
+Hi, Xianglai,
 
-"They" doesn't sound nice.
-> +optional path that requires extra code and are only recommended for driv=
-ers
-> +where DMA mapping performance, or the space usage for storing the DMA ad=
-dresses
-> +matter.  All the considerations from the previous section apply here as =
-well.
+I have applied this series with some build fixes and style fixes at:
+https://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.g=
+it/log/?h=3Dloongarch-kvm
 
-These APIs provide an efficient mapping when using an IOMMU. However, they
-are optional and require additional code. They are recommended primarily fo=
-r
-drivers where performance in DMA mapping or the storage space for DMA
-addresses are critical. All the considerations discussed in the previous se=
-ction
-also apply in this case.
+Please confirm whether it works as expected, thanks.
 
-You can disregard this comment, as anyone reading this paragraph will
-understand the intended message.
 
-> +
-> +::
-> +
-> +    bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *s=
-tate,
-> +               phys_addr_t phys, size_t size);
-> +
-> +Is used to try to allocate IOVA space for mapping operation.  If it retu=
-rns
-> +false this API can't be used for the given device and the normal streami=
-ng
-> +DMA mapping API should be used.  The ``struct dma_iova_state`` is alloca=
-ted
-> +by the driver and must be kept around until unmap time.
-> +
-> +::
-> +
-> +    static inline bool dma_use_iova(struct dma_iova_state *state)
-> +
-> +Can be used by the driver to check if the IOVA-based API is used after a
-> +call to dma_iova_try_alloc.  This can be useful in the unmap path.
-> +
-> +::
-> +
-> +    int dma_iova_link(struct device *dev, struct dma_iova_state *state,
-> +               phys_addr_t phys, size_t offset, size_t size,
-> +               enum dma_data_direction dir, unsigned long attrs);
-> +
-> +Is used to link ranges to the IOVA previously allocated.  The start of a=
-ll
-> +but the first call to dma_iova_link for a given state must be aligned
-> +to the DMA merge boundary returned by ``dma_get_merge_boundary())``, and
-> +the size of all but the last range must be aligned to the DMA merge boun=
-dary
-> +as well.
-> +
-> +::
-> +
-> +    int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
-> +               size_t offset, size_t size);
-> +
-> +Must be called to sync the IOMMU page tables for IOVA-range mapped by on=
-e or
-> +more calls to ``dma_iova_link()``.
-> +
-> +For drivers that use a one-shot mapping, all ranges can be unmapped and =
-the
-> +IOVA freed by calling:
-> +
-> +::
-> +
-> +   void dma_iova_destroy(struct device *dev, struct dma_iova_state *stat=
-e,
-> +               enum dma_data_direction dir, unsigned long attrs);
-> +
-> +Alternatively drivers can dynamically manage the IOVA space by unmapping
-> +and mapping individual regions.  In that case
-> +
-> +::
-> +
-> +    void dma_iova_unlink(struct device *dev, struct dma_iova_state *stat=
-e,
-> +               size_t offset, size_t size, enum dma_data_direction dir,
-> +               unsigned long attrs);
-> +
-> +is used to unmap a range previously mapped, and
-> +
-> +::
-> +
-> +   void dma_iova_free(struct device *dev, struct dma_iova_state *state);
-> +
-> +is used to free the IOVA space.  All regions must have been unmapped usi=
-ng
-> +``dma_iova_unlink()`` before calling ``dma_iova_free()``.
+Huacai
+
+On Fri, Nov 8, 2024 at 11:53=E2=80=AFAM Xianglai Li <lixianglai@loongson.cn=
+> wrote:
 >
->  Part II - Non-coherent DMA allocations
->  --------------------------------------
+> Before this, the interrupt controller simulation has been completed
+> in the user mode program. In order to reduce the loss caused by frequent
+> switching of the virtual machine monitor from kernel mode to user mode
+> when the guest accesses the interrupt controller, we add the interrupt
+> controller simulation in kvm.
+>
+> The following is a virtual machine simulation diagram of interrupted
+> connections:
+>   +-----+    +---------+     +-------+
+>   | IPI |--> | CPUINTC | <-- | Timer |
+>   +-----+    +---------+     +-------+
+>                  ^
+>                  |
+>            +---------+
+>            | EIOINTC |
+>            +---------+
+>             ^       ^
+>             |       |
+>      +---------+ +---------+
+>      | PCH-PIC | | PCH-MSI |
+>      +---------+ +---------+
+>        ^      ^          ^
+>        |      |          |
+> +--------+ +---------+ +---------+
+> | UARTs  | | Devices | | Devices |
+> +--------+ +---------+ +---------+
+>
+> In this series of patches, we mainly realized the simulation of
+> IPI EIOINTC PCH-PIC interrupt controller.
+>
+> The simulation of IPI EIOINTC PCH-PIC interrupt controller mainly
+> completes the creation simulation of the interrupt controller,
+> the register address space read and write simulation,
+> and the interface with user mode to obtain and set the interrupt
+> controller state for the preservation,
+> recovery and migration of virtual machines.
+>
+> IPI simulation implementation reference:
+> https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongs=
+on-3A5000-usermanual-EN/inter-processor-interrupts-and-communication
+>
+> EIOINTC simulation implementation reference:
+> https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongs=
+on-3A5000-usermanual-EN/io-interrupts/extended-io-interrupts
+>
+> PCH-PIC simulation implementation reference:
+> https://github.com/loongson/LoongArch-Documentation/blob/main/docs/Loongs=
+on-7A1000-usermanual-EN/interrupt-controller.adoc
+>
+> For PCH-MSI, we used irqfd mechanism to send the interrupt signal
+> generated by user state to kernel state and then to EIOINTC without
+> maintaining PCH-MSI state in kernel state.
+>
+> You can easily get the code from the link below:
+> the kernel:
+> https://github.com/lixianglai/linux
+> the branch is: interrupt-v4
+>
+> the qemu:
+> https://github.com/lixianglai/qemu
+> the branch is: interrupt-v3
+>
+> Please note that the code above is regularly updated based on community
+> reviews.
+>
+> change log:
+> V3->V4:
+> 1.Fix some macro definition names and some formatting errors
+> 2.Combine the IPI two device address Spaces into one address device space
+> 3.Optimize the function kvm_vm_ioctl_irq_line implementation, directly ca=
+ll the public function kvm_set_irq for interrupt distribution
+> 4.Optimize the description of the commit log
+> 5.Deleting an interface trace_kvm_iocsr
+>
+> V2->V3:
+> 1.Modify the macro definition name:
+> KVM_DEV_TYPE_LA_* ->  KVM_DEV_TYPE_LOONGARCH_*
+> 2.Change the short name for "Extended I/O Interrupt Controller" from EXTI=
+OI to EIOINTC
+> Rename file extioi.c to eiointc.c
+> Rename file extioi.h to eiointc.h
+>
+> V1->V2:
+> 1.Remove redundant blank lines according to community comments
+> 2.Remove simplified redundant code
+> 3.Adds 16 bits of read/write interface to the eiointc iocsr address space
+> 4.Optimize user - and kernel-mode data access interfaces: Access
+> fixed length data each time to prevent memory overruns
+> 5.Added virtual eiointc, where interrupts can be routed to cpus other tha=
+n cpu 4
+>
+> Cc: Bibo Mao <maobibo@loongson.cn>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: kvm@vger.kernel.org
+> Cc: loongarch@lists.linux.dev
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+> Cc: WANG Xuerui <kernel@xen0n.name>
+> Cc: Xianglai li <lixianglai@loongson.cn>
+>
+> Xianglai Li (11):
+>   LoongArch: KVM: Add iocsr and mmio bus simulation in kernel
+>   LoongArch: KVM: Add IPI device support
+>   LoongArch: KVM: Add IPI read and write function
+>   LoongArch: KVM: Add IPI user mode read and write function
+>   LoongArch: KVM: Add EIOINTC device support
+>   LoongArch: KVM: Add EIOINTC read and write functions
+>   LoongArch: KVM: Add EIOINTC user mode read and write functions
+>   LoongArch: KVM: Add PCHPIC device support
+>   LoongArch: KVM: Add PCHPIC read and write functions
+>   LoongArch: KVM: Add PCHPIC user mode read and write functions
+>   LoongArch: KVM: Add irqfd support
+>
+>  arch/loongarch/include/asm/kvm_eiointc.h |  122 +++
+>  arch/loongarch/include/asm/kvm_host.h    |   18 +-
+>  arch/loongarch/include/asm/kvm_ipi.h     |   46 +
+>  arch/loongarch/include/asm/kvm_pch_pic.h |   61 ++
+>  arch/loongarch/include/uapi/asm/kvm.h    |   19 +
+>  arch/loongarch/kvm/Kconfig               |    5 +-
+>  arch/loongarch/kvm/Makefile              |    4 +
+>  arch/loongarch/kvm/exit.c                |   80 +-
+>  arch/loongarch/kvm/intc/eiointc.c        | 1055 ++++++++++++++++++++++
+>  arch/loongarch/kvm/intc/ipi.c            |  468 ++++++++++
+>  arch/loongarch/kvm/intc/pch_pic.c        |  523 +++++++++++
+>  arch/loongarch/kvm/irqfd.c               |   97 ++
+>  arch/loongarch/kvm/main.c                |   19 +-
+>  arch/loongarch/kvm/vcpu.c                |    3 +
+>  arch/loongarch/kvm/vm.c                  |   22 +
+>  include/linux/kvm_host.h                 |    1 +
+>  include/uapi/linux/kvm.h                 |    8 +
+>  17 files changed, 2522 insertions(+), 29 deletions(-)
+>  create mode 100644 arch/loongarch/include/asm/kvm_eiointc.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_ipi.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_pch_pic.h
+>  create mode 100644 arch/loongarch/kvm/intc/eiointc.c
+>  create mode 100644 arch/loongarch/kvm/intc/ipi.c
+>  create mode 100644 arch/loongarch/kvm/intc/pch_pic.c
+>  create mode 100644 arch/loongarch/kvm/irqfd.c
+>
+>
+> base-commit: 906bd684e4b1e517dd424a354744c5b0aebef8af
 > --
-> 2.47.0
->
+> 2.39.1
 >
 
