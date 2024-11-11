@@ -1,201 +1,213 @@
-Return-Path: <kvm+bounces-31422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF53D9C3A55
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:58:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AC19C3A5A
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 10:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FD581F22012
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 08:58:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E03FB216FD
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75E516F287;
-	Mon, 11 Nov 2024 08:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E8716CD1D;
+	Mon, 11 Nov 2024 09:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c0/HLaFA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3XRrk42"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2066.outbound.protection.outlook.com [40.107.95.66])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB9A16D9AF;
-	Mon, 11 Nov 2024 08:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731315514; cv=fail; b=iL8P40NwQmw2a0JRAIZyaO3uxl7/n7I/8eBHCL5C9TW23FITSNdI8oUiUZv8U4PGWY+GX+8d/3MCrvIAYAAXYKYP0NGMf25nSrv8K5CNzQ42yNA5P/hnTGhRkByhA6U9/d9xzvC4xJS2uQMijLDghYM5iW4PLKQkbr1KCZHwHyA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731315514; c=relaxed/simple;
-	bh=i1Ec5FsG4AmS7QVGSbumKCzi3V+b90PKisELF+QHK0s=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ezr1uFLwrJD7bhB3AhBjJBi3vcjSfTwaLnk2ptHBimffZTF+ERU3E/4gurWTByHbm1kTh8lS3yZVhQLgpxPyqsek9MSvOemXDawknWGBnFle0EqkQhWrFEyoFxVWdsjY99DCrulHJmkI6ae5fKZW8LZI3M3tALkOhT7tOOIUhxw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c0/HLaFA; arc=fail smtp.client-ip=40.107.95.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bf8burDY7cIl8F/v6lw+muEbO8T2SiazWgUIhaDMsLkHEpODgLZJEPKgyTAKnHUC7DpbGrYUYUIWntL57Yw9X3MVofZwlWV/p1K1aWc1t5zhBQAc17OyRyuO9h0z8HE4cqkt89Rk5LCu0JcCESWgEq7GWBYBkJ4Cr3V6zX6zMU9GtFAEdM/B/nEPteqw5anZD2o8WTlYlRAmyXXQrV8DFxuwBhG4hOCpXdPa7yBvcEJ1bcI19euqBY928AAycDgZtSFJnxWFvS2EU+lfb71/cAyS6oObzV4WLxYhhnHkicR/51p+0g8TrCbWyWbsMW8A7VKTICCLlCAXLl3jyLyf1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Sz+iufSOhAbF0xcPP6jNgzUAur+fyVoM26/jhDY6wCI=;
- b=FCOqwXvyYgMhsTP7WmWvu7v1V+Lbk9tYfDkKi3lNGe74hbcHALBJiGlyQUug6vzjdqG2aYP2gb+rmGRf7sQvA23Bi3YzVZaCuJkN3cJgyNcyTpCtYlA5VwE1EWwgqdItIhkUuhWtlcOgWW9MG1nuJIZVJ6rOIscvsAep/qWOTcLpoZgAe0vocZjoURBcYmBN8hGkVFyP7Bjn5MG0rdfZkbYAo3Khp+2MyfrPxa2qWk3xG0qXSaldY7SqI2vym3t0BJbcK4/0syb7UzjtuXjj3K70iJrq6nOOmAshrF6wHhpwCa3/vBrAeV4WPgvnyrjT7NufLtiokJb9c5GObwCWyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sz+iufSOhAbF0xcPP6jNgzUAur+fyVoM26/jhDY6wCI=;
- b=c0/HLaFAlJcPdaVmlkqotgBks7914oovcIkdMChdn/UxMC4KYjNkp5tWU3HSd5CgyXFdd09qYz/W1FzRpzP2WVcSF8sshKhwwluOA3p3/mvTDmiX+fLdcDR9jYqK45pq6d//SytqwaUW8LSizdt1Kje5chkOf3tTCsLgSarF6LPI9z4C6Da7tIv5wzM8jh/tEeWJOi93MHVM17YFEI8eR6BaJ0F6ikmXChp4qhitmxs817hRjj4bsi8fyJ9WCW8su8G1jretKYKGgcfRjbRgbnZcHn7HbzS/JYx0C+t3Phy1AimvCTtl23rsC4P19jKjRwOQ8NJCSm1mmlXfjehepw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by PH8PR12MB6940.namprd12.prod.outlook.com (2603:10b6:510:1bf::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.27; Mon, 11 Nov
- 2024 08:58:27 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.8137.027; Mon, 11 Nov 2024
- 08:58:27 +0000
-Message-ID: <8e93cd9e-7237-4863-a5a7-a6561d5ca015@nvidia.com>
-Date: Mon, 11 Nov 2024 09:58:23 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH vhost 0/2] vdpa/mlx5: Iova mapping related fixes
-To: "Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
- Si-Wei Liu <si-wei.liu@oracle.com>
-Cc: Jason Wang <jasowang@redhat.com>,
- Eugenio Perez Martin <eperezma@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <20241021134040.975221-1-dtatulea@nvidia.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <20241021134040.975221-1-dtatulea@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0120.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a3::18) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AE3A933;
+	Mon, 11 Nov 2024 09:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731315630; cv=none; b=YhQpMKkSaXbqvbbYRFLci5dOx0dYacC0Ji7MzwrdNz+eIsZvBtnEg24vqQrl2h5VJYkDV2SHu746ty5d+e/HTxirSmEaVtcynwWL1s6Gi74lnQR+m5+sq9z7rrCdzJRiX/9vmi4hhgP0rH+dYWfSX0aum1Ho8uAtvRXT/5OhpRE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731315630; c=relaxed/simple;
+	bh=loTNOLmAdA71QdyDe/0WgDlOoKF9wgs054AZGs6HB9U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hT7mJx/KHHqpZRpGa2gunMzOKZFzNROFUMqqtLFM4ExkemhjWcgZk7HbsoJf9RsVHloeTZcpnLuksU5fNtUQewwD8/nPlLxnHNEFd2ke+TVK8dJ24UibImznDYFmoH9CRNHo2gzRZaK54Z54+TH8JciWsc8ZyJCGLMDIuNzxe88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3XRrk42; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731315628; x=1762851628;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=loTNOLmAdA71QdyDe/0WgDlOoKF9wgs054AZGs6HB9U=;
+  b=g3XRrk423JgNfacFdn4vWFMhD1ebsnMSSzEi9ueBKBCcec+nVCIe97HF
+   y0al1jU4a0gK42hl+Er2EAYpe9+wVrNj8HJmPfIn8bMwdoDAUNn5Ou73+
+   gvVRj3+yrhBb25weMeiQht5DxL+iDjekZouDX6mgkZIxMXW7wz1PkyrQD
+   rg+AorC9sjayXbimnmrH/W+2SlMvXa87J+/RbrxrbppH387GK2/gFwiRA
+   9ImMMeXg+8/b8Gx8tj+4nR3n4HcWnYQM4oopG7JHZPi/XBWravtEldXPS
+   ii7I8wyjfrCuFIxVjY5xX7PEY1+7ZB9gu+VZKiz0hchdckAzGY1hBzEBM
+   A==;
+X-CSE-ConnectionGUID: /nsM4j5MTfaugOFWZYe3Gg==
+X-CSE-MsgGUID: R45FHKmiSviBKVkO9oFBXQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="30526945"
+X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
+   d="scan'208";a="30526945"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 01:00:26 -0800
+X-CSE-ConnectionGUID: r2wigX/3QuqjEy20I10C0g==
+X-CSE-MsgGUID: FfJ5VEcJRp2PHfmypg3kew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
+   d="scan'208";a="86928885"
+Received: from spr.sh.intel.com ([10.239.53.31])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 01:00:23 -0800
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org
+Cc: Chao Gao <chao.gao@intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Remove hwapic_irr_update() from kvm_x86_ops
+Date: Mon, 11 Nov 2024 16:59:46 +0800
+Message-ID: <20241111085947.432645-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|PH8PR12MB6940:EE_
-X-MS-Office365-Filtering-Correlation-Id: edab8020-8748-4358-e891-08dd022f018d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OHFVNWlVRi91bzRjemdLSG94eko5Vmc0WjJYTkRmZVR6Wk9XL05iWkluVEUr?=
- =?utf-8?B?ZEUxWW9kVERIRnRGckJtbnZNMS9TSFpvbGRuQ1FhTDdLU2Z1SnJ2aFZWUVRs?=
- =?utf-8?B?b1FuMDI5bUFEaFVGdXZMZFZ2cU9nZ1owNmJwVmhyNVJydXo3bXFqbFRxV3dz?=
- =?utf-8?B?UEZjaXhNTjNwTk03dTgxbHdFbkwzcjBHSXVCRTZPOTdkSytxRkRRMmZ5SFV6?=
- =?utf-8?B?a0dMUjZUMUxFaU1GQnp3SjNPUGVPVlZORVBnQldxaHdvQmxaZCtGMlo2V3ZR?=
- =?utf-8?B?dUdDc1VmY2oxcE9zcm1yYVJOY3U2a2pWelJlYUNGRmcxZ1RNTS9UQjdGakpS?=
- =?utf-8?B?Y0JxT05ZVVVuNHh0Y1hZaDRzK2xLLzJUSmpXb3ZwSnQvVGRsdHd0ZHRBekF1?=
- =?utf-8?B?UXRXT0g0OThHdXlKM2pBck0zUzM5STdkVDUxbHd4U1JrSkNmTEdOTkhla0t2?=
- =?utf-8?B?dzVqYWdiMmpoQlBpaHUvbXAveGFmTmtuS0NSMVFWaVVpeC9WaklwamFWMVFo?=
- =?utf-8?B?dVVBa2dKMU1aWjNQWnlBZzA1NlE1Lys2N3RCM3dDdXNGYWdTbFRreDBVUkFU?=
- =?utf-8?B?ZEJVQjNxZVZ4Y280eDNjRjNoVjV3Y1V0cGVSRHc2K1FnSjg0MDJBMzlmaUhK?=
- =?utf-8?B?VjdRZHpmSG1sY0pKNVBBMFpFeWNQTmFQNEFSeDR3SmJPRU41OGJmQXFGU0lx?=
- =?utf-8?B?KzdIeVpweTdhOUFBckZLZzNEeW1uRCtrWWRvanQxcUFSWnJqbk9SdUdnUEhw?=
- =?utf-8?B?UjRDL0ZXc01rYXBabElNUGdUUlpXcWtoQnBWandPdEJpZmc2dVY0SjlpbVUv?=
- =?utf-8?B?ajA1K0Z3OVBJTzZYUDlwdjJWS1VpYnBWbVFYV1B2OWxjOVpOSFljVWhuSmxK?=
- =?utf-8?B?WTBvaTJoUDhQTVN0eTVTUlVyRG9pZ3JISklGUUhqdEFhZVgyTHhFVnBPR1h4?=
- =?utf-8?B?N0NHT0NSQnlFS1RwVE51UklLemlvdUJpQk1WRWVrRklaNU11Q1BpRVNtT3JP?=
- =?utf-8?B?clI0S0NXc0ZMR3pYRzJlT05vYmZoL3hUamlwMlhjR0t5Rk9xTW5EbmlRVGVT?=
- =?utf-8?B?bVJVdUdUbFlJSkpHWUduN1NFRFB5Y2VPQi9MMW9pN2xJVXoyZERQM2xrTnZE?=
- =?utf-8?B?WGNYbm5pVDBpQXZpN1piczZQRWdGeWdVbC82VmhHWXJWQW1zV1EzNFRUbjdF?=
- =?utf-8?B?WERNLzdKeFdMMklMVFZGbW96TmtJSEh5R0lCTHpMZXluYmZROTdJaGlKYzFG?=
- =?utf-8?B?dGVrV0EyY3FBQnRJZEhhTDNvUWVXc0xVZXFWNVJid3RrN1BEZXJJRE04TDAr?=
- =?utf-8?B?ME1uRm0vd1F5dmMvRFRFZkFFWlJrNUpJMHV5aWI2OTdaajBqWnBnQms1eEx2?=
- =?utf-8?B?R0xubFJOUlJQaDV0THl1c2JHNHRwU2Y0UzlUZVpZYTcxUlc0cmFYMDZpd1Uw?=
- =?utf-8?B?Z3pxa2x5Vm4vS3pRYThHRHdKWnJFWUdzS2pKaTVXWkI3VTc4amFVQm5kYzJZ?=
- =?utf-8?B?K1NoRnBZbUkyS1hCTDRKODg3dllhdVI2T0dJUDd2U1cwbmZ2VGJDKzJ5YmE3?=
- =?utf-8?B?SjRhVmJoWFhkNjZPU0lYMTA2K3d2R044akpDWFlZS0p3MnJvSU4xbTg0ZEJn?=
- =?utf-8?B?Y3hxZXdIeUZ5V05UcUZmUElCbHZ5RFQrZ29RdUJvQWpVWkQ5VFJRNCtMYlo4?=
- =?utf-8?B?OVNNcnNMWVdmV28ycG93TXRsaDdjYWV1bGIwVlc0aGNqdE5SQkFySU8xd21m?=
- =?utf-8?Q?6hkN0WLQ9V4C8pP79Ik9NWVK40NzNUDFvCyG154?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U2hiREZRbEFaQ0RBODViUE84aUN1THZoZjU5ak9JbjNJOWpEaXlZdHkvaGo3?=
- =?utf-8?B?WEM0cjBsQk1ZWmQ0RE5yQUZjYlpwSitHRFhpWUV3b1d5TERySC9aNGJqcllV?=
- =?utf-8?B?ekhyS0Fhak01ZEF1bWdHdUJlQzYzdVFGdmtFWmRFQVNDaTMwamFnRFJ3MThs?=
- =?utf-8?B?TE5Wc0FTdkpGTHJUUXpxa0ZianZYd0k5ZDFyUWZiNGg4K2YzTDA4MURqWERZ?=
- =?utf-8?B?RWhiZGM1UW1PNHZHVnRObEM3UVJlL1I5ZDZJQUR0TWFvTXJxWm0weE1lZ1JI?=
- =?utf-8?B?c0xrYlhLbEFlelU3cloxL25vYnVxdjlQMlFUQ0tveXJpbzhFQ0ZjMnZFUWhj?=
- =?utf-8?B?V1BLZTcyM0cxOFM0THUvbTUxcGw0VnFDU1ZmejRld2ZJTjNVVUc2V1owZkw0?=
- =?utf-8?B?YVVpanZvdkxUN2JaQk5jYmJ0WEh3a3ZUMFBkMjlINklzbytORTM2K2R3bXQ4?=
- =?utf-8?B?Q3dLU0txd3p1ZzZySkkxK2ViMnpzazJMclpmQkpiSU1objhMTDlPdXNQQVcy?=
- =?utf-8?B?Ukd2M20vd2Fjc0pjYzNMRzBTcWVEWHBxWUloL0lNZDFYV0w5UEdKU3ZudkFY?=
- =?utf-8?B?Z2g1cXpFZ1JQQlZqWkNKZ0hnN2J4NmVXdUpETEJXOE5XRXQ4TGcwZXdjSTlT?=
- =?utf-8?B?Zkd1NVlYMUg1Nm9Nc2o4QkJ2QThrOWVkbUhOeGUxeFRaaWJYSG10MDIxdmdy?=
- =?utf-8?B?dzlvQ0FBdWFlbis2TGVPbWV5MlJoWmxUeDhSbC9tR2xXSmpGMUl0OVRZc3A2?=
- =?utf-8?B?anVSVkhVSmlSbktRWkVKRGJzUzVOTHZYRU1ZSXNFUHdhMmQ0bXc0Nm9EMXVU?=
- =?utf-8?B?OHQ1dnY4WGVjNEJqd0tUR2xlYm02ZTd2bnIrTEdiazlYN1BLRjBWRXNXVnNk?=
- =?utf-8?B?N2RWVExCSnovL3M1ck5vSmlTNEw5RGRzSG1XbUtqZnhuWVA0UDlsOGlkem9K?=
- =?utf-8?B?aE10RmxNOXFhdXA3ZkdWQVdZMmNpdUtxNHhVWG13QTMwWS85amZYcUJ6bXNh?=
- =?utf-8?B?UUZZVGRpRm1ndmtqdWQ2aFJOS3B5VGZYcmFaNUxERkRPRENUK01HUGV4cHdx?=
- =?utf-8?B?SXdUY2N1azhEYWpmYVNHaTZUYUxuTDJGOEFhbWo1dWdrQ3FSNEZtT1M4dlB0?=
- =?utf-8?B?VVdzWjNuSlBaUkI2U05mNXpLUFRVSFhNbHZoS1h6K2o1YnFsREVpbys2Yy81?=
- =?utf-8?B?eVlhVzltYjZxTy9FZHNjOEc1U05qbnJteUhySy82WTBkeElXK3c1akkyRTBG?=
- =?utf-8?B?b2VJMU5LRThlODFzRTFhQVFRa2ZaR0pGQ1ZzcEVjWjBrQnhWWlMySHdEWitW?=
- =?utf-8?B?Z0IxQ2FiWVZDSjByQWFYSHFPM1NqdnRURGJ5ZElWaHJXNGIramt0c0c4R3Rk?=
- =?utf-8?B?RFdBdDg5M2M2UG5pWUhLUk9GMlVyQXNoeUxGQWV5bVhaRnRPZWJadC9CVEQ5?=
- =?utf-8?B?WDFRbHRqNzhCTGVKOEFmYS9VSEFjOGMweTJLSjNaMmNsd0pTTU80VkVDMlZj?=
- =?utf-8?B?eUtBR3R2R0puMEpKSzNadUZhOXBCZUF1WU54cTdYV1BmUTd0Um1ydzBDMWVn?=
- =?utf-8?B?SCt6Mm1vZm9uR0xJSVpPcjQvd01Cb20yWGJMeDgyaEM5VERab3V6czNMS3ZE?=
- =?utf-8?B?TUhRUEZOZUpSTjk2Wmhud0NJNFNRYXhYNEUwVW9VcGZ4VWZlZ2JjeUdYUHBQ?=
- =?utf-8?B?ZmhPdTVKY2k2Z09XaGJTRUNtanZRTEhNbnVnTzRqbUpIcnUvOTZFNlNIaXdr?=
- =?utf-8?B?OWRzdjJWQVdweHFqbFAxMnpBVmVId1pLZW5oclphVkpFR0x6b0lrZjRxRzM1?=
- =?utf-8?B?UWhFMlRtbGNUcmhFWmtlMEl3RFM0UzRsU080Z2NMemJ6VEZlbHozU0JFc0Zy?=
- =?utf-8?B?RVNTZFF1NHJnRGhOaEk2S0NzYW5XaHRncSszbXJBRktkNEh2a0NVUmZub2I0?=
- =?utf-8?B?UThjSnNhSC91S0h5Y0oxVXFrY0lzOFdxT01OVDE3a0VVZnZ1cVlpWEpoZkFL?=
- =?utf-8?B?NTdHTzZ1cWhzenNwdHNpd2tFNnlqRHBnRDdNZmI4MVJMa2FlMHVwLzMwcSts?=
- =?utf-8?B?L3JnNUtnV3JPay8xL0NoNTNSb29Ba3pSZEZaajlNREtPcnVGMVA5TllpQnJB?=
- =?utf-8?Q?GsNC34fdsTrPfAGSTva45GxBS?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: edab8020-8748-4358-e891-08dd022f018d
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2024 08:58:27.1447
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mF/8UqrBc5Hiun82C0NBTc6JUZ06xEVIKRWu3Pd6HFxoHX294SnxjVDPOh2a/0dG8oc3mDiqYVBm1qSDBYKa2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6940
+Content-Transfer-Encoding: 8bit
 
+Remove the redundant .hwapic_irr_update() ops.
 
+If a vCPU has APICv enabled, KVM updates its RVI before VM-enter to L1
+in vmx_sync_pir_to_irr(). This guarantees RVI is up-to-date and aligned
+with the vIRR in the virtual APIC. So, no need to update RVI every time
+the vIRR changes.
 
-On 21.10.24 15:40, Dragos Tatulea wrote:
-> Here are 2 fixes from Si-Wei:
-> - The first one is an important fix that has to be applied as far
->   back as possible (hence CC'ing linux-stable).
-> - The second is more of an improvement. That's why it doesn't have the
->   Fixes tag.
-> 
-> I'd like to thank Si-Wei for the effort of finding and fixing these
-> issues. Especially the first issue which was very well hidden and
-> was there since day 1.
-> 
-> Si-Wei Liu (2):
->   vdpa/mlx5: Fix PA offset with unaligned starting iotlb map
->   vdpa/mlx5: Fix suboptimal range on iotlb iteration
-> 
->  drivers/vdpa/mlx5/core/mr.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-Gentle nudge for a review. The bug fixed by the first patch is a very
-serious and insidious one.
+Note that KVM never updates vmcs02 RVI in .hwapic_irr_update() or
+vmx_sync_pir_to_irr(). So, removing .hwapic_irr_update() has no
+impact to the nested case.
 
-Thanks,
-Dragos
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+---
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -
+ arch/x86/include/asm/kvm_host.h    |  1 -
+ arch/x86/kvm/lapic.c               |  6 ------
+ arch/x86/kvm/vmx/main.c            |  1 -
+ arch/x86/kvm/vmx/vmx.c             | 14 --------------
+ arch/x86/kvm/vmx/x86_ops.h         |  1 -
+ 6 files changed, 24 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 861d080ed4c6..68505a9ac3c6 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -82,7 +82,6 @@ KVM_X86_OP(enable_nmi_window)
+ KVM_X86_OP(enable_irq_window)
+ KVM_X86_OP_OPTIONAL(update_cr8_intercept)
+ KVM_X86_OP(refresh_apicv_exec_ctrl)
+-KVM_X86_OP_OPTIONAL(hwapic_irr_update)
+ KVM_X86_OP_OPTIONAL(hwapic_isr_update)
+ KVM_X86_OP_OPTIONAL(load_eoi_exitmap)
+ KVM_X86_OP_OPTIONAL(set_virtual_apic_mode)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6d9f763a7bb9..f654ecb99917 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1732,7 +1732,6 @@ struct kvm_x86_ops {
+ 	const unsigned long required_apicv_inhibits;
+ 	bool allow_apicv_in_x2apic_without_x2apic_virtualization;
+ 	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
+-	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
+ 	void (*hwapic_isr_update)(int isr);
+ 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+ 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 65412640cfc7..6a81233c304d 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -734,10 +734,7 @@ static inline int apic_find_highest_irr(struct kvm_lapic *apic)
+ static inline void apic_clear_irr(int vec, struct kvm_lapic *apic)
+ {
+ 	if (unlikely(apic->apicv_active)) {
+-		/* need to update RVI */
+ 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
+-		kvm_x86_call(hwapic_irr_update)(apic->vcpu,
+-						apic_find_highest_irr(apic));
+ 	} else {
+ 		apic->irr_pending = false;
+ 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
+@@ -2766,7 +2763,6 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	apic_update_ppr(apic);
+ 	if (apic->apicv_active) {
+ 		kvm_x86_call(apicv_post_state_restore)(vcpu);
+-		kvm_x86_call(hwapic_irr_update)(vcpu, -1);
+ 		kvm_x86_call(hwapic_isr_update)(-1);
+ 	}
  
+@@ -3083,8 +3079,6 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+ 	kvm_apic_update_apicv(vcpu);
+ 	if (apic->apicv_active) {
+ 		kvm_x86_call(apicv_post_state_restore)(vcpu);
+-		kvm_x86_call(hwapic_irr_update)(vcpu,
+-						apic_find_highest_irr(apic));
+ 		kvm_x86_call(hwapic_isr_update)(apic_find_highest_isr(apic));
+ 	}
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 7668e2fb8043..7ba7d416af58 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -99,7 +99,6 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
+ 	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
+ 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
+-	.hwapic_irr_update = vmx_hwapic_irr_update,
+ 	.hwapic_isr_update = vmx_hwapic_isr_update,
+ 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
+ 	.deliver_interrupt = vmx_deliver_interrupt,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b1bb64890cb2..17fc191efd5d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6888,20 +6888,6 @@ static void vmx_set_rvi(int vector)
+ 	}
+ }
+ 
+-void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
+-{
+-	/*
+-	 * When running L2, updating RVI is only relevant when
+-	 * vmcs12 virtual-interrupt-delivery enabled.
+-	 * However, it can be enabled only when L1 also
+-	 * intercepts external-interrupts and in that case
+-	 * we should not update vmcs02 RVI but instead intercept
+-	 * interrupt. Therefore, do nothing when running L2.
+-	 */
+-	if (!is_guest_mode(vcpu))
+-		vmx_set_rvi(max_irr);
+-}
+-
+ int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index a55981c5216e..847080d5fb70 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -47,7 +47,6 @@ bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu);
+ void vmx_migrate_timers(struct kvm_vcpu *vcpu);
+ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ void vmx_apicv_pre_state_restore(struct kvm_vcpu *vcpu);
+-void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr);
+ void vmx_hwapic_isr_update(int max_isr);
+ int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu);
+ void vmx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+-- 
+2.46.1
 
 
