@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-31498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61789C42BD
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:39:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E9D9C42C1
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 17:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D40E2845FC
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 16:39:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B234D1F220B5
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 16:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDCA1A256F;
-	Mon, 11 Nov 2024 16:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCC61A3BC8;
+	Mon, 11 Nov 2024 16:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9sdQfw6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BB5+8ioJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AE71A0B13;
-	Mon, 11 Nov 2024 16:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07ADC1A0B13;
+	Mon, 11 Nov 2024 16:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731343171; cv=none; b=RT/7f3pLjaIdQ8sMabWvYitDv7f+vu7KsOo2O3CcbOeYCwzBhDjaxJ9YWKGb62UlZjC+CJzdOBC1wX0rKzbEoiuFNJK1H6Ile7VvAnd4g8Ycp7OmQSDre+Ybtjvlw9ivQ36dWQlrZeqDnDPYtJ7ddgXdGXqrgfeIojiGzeZxRKA=
+	t=1731343177; cv=none; b=NGYos0ttCALpIfaOnnEa7LX0RUKcpZZq7Ke+lVkhfiUBQtQNYkvHnUx58m8KAL2I2gUBebp3ZsYOp9DMRHlQgSMQ4eX6M5lsLv25uoQf8Cb34W/+0kxVsfxa+nXdSj2Xi83FQXr3BgXDJacUrWDJMOlPMGnhpRVBKVe/0cqYC14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731343171; c=relaxed/simple;
-	bh=CPBhudnuPHjnrtj9sZ573qgLAxZlwozAgd+JQpg1yFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gdzRnvRqj0JbKG1RzNGD9HODbLNWu+XsF5fgUUL5ck7sVrPnASc4UQovChSYXf2Rw8NwA/RYcv6p06xT/HkiJa5VPlozO4c9+7taJZoedfDZyrbZ4oVHgtZiKLAgR90HdeHzucog8Uhlk0/l5ijpvVXVRwP6LZ3TvnEzc4cQL3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9sdQfw6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CADCCC4CECF;
-	Mon, 11 Nov 2024 16:39:25 +0000 (UTC)
+	s=arc-20240116; t=1731343177; c=relaxed/simple;
+	bh=7HDQrOeHzesoq08mXwj6oE4jK5rhJKQzrH8b34Uv2k4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CR45blTQ0kgn7zZ2Lxk44H02RIFFxtgGYfO5o5pw0k/ywLrjXCzr14NKWHK59NbLYZrUicc8lSEdVjUrF0tKhIiY69/ToRbiqrrgYdqsXX3m+Aqzw3f+qGjkjJZQbPWcDTfgJ885K7we7rxOlhKLZPgG8Y0OVixlxpSEUJLzcSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BB5+8ioJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C122C4CED7;
+	Mon, 11 Nov 2024 16:39:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731343171;
-	bh=CPBhudnuPHjnrtj9sZ573qgLAxZlwozAgd+JQpg1yFs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=J9sdQfw6h82dzj6t7DC4KAkU2I1UcRYN4yzN3Go4Ek3Da/Zt1U0z5z7abUfjS0lzk
-	 oAF+c+SPqCXYG9PcZKW8e4zUK5OG/05CFRMUjsGmhernuqpSK6NCDkPPNBWcdvCaoZ
-	 qEspsYXuFXgDTgIQ5InrqV/A2YS1BCqMlaJ2WGRwzgQgLO8xJrf/tLKyK/09nApGec
-	 2JFK6amypbNcXFA0XMHjoo5ZCPztfHCRBiSomriZujxwVKTirNkNn3LFlggVBeZgZ7
-	 s+oFX3PLIu53VGSjX3qmq4lQ6n2ntp5Dj4eUv2doJFC6WxS5OZ5JLIZ3CO8v/x7/NU
-	 S3xekm48pG0nQ==
+	s=k20201202; t=1731343176;
+	bh=7HDQrOeHzesoq08mXwj6oE4jK5rhJKQzrH8b34Uv2k4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BB5+8ioJvp+yzp8h3GJLoj/X/aCEDdrslkwehkNhxnVwIQp17Hm7Of1tA+qdosGGp
+	 nd4WKni+7IDBguleEa4dPdzpwmpyxUBtblng3ITt2X2ASMMVLSq1vhT0ubeYP6H6m+
+	 qVOeFANgJWoQmKPRTFr5uhWu1rMj5QNsEz6HCYFfcNizBr1G6NnV455mAq1tqp/+KJ
+	 jHofPd164o6IoPytkZKX+ZKLdVHuiCK22nBzmQegCLGAZ0pqF6dEZfzxZwp8wSwX+u
+	 o3/OjESIAZ+7aXuOVSjx6AId92dnrZluHkFAaV3D7uAKt0FMOjh11MCqdRV5T1kMhw
+	 jKAO/gcTzLMtA==
 From: Amit Shah <amit@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
@@ -65,12 +66,13 @@ Cc: amit.shah@amd.com,
 	Babu.Moger@amd.com,
 	david.kaplan@amd.com,
 	dwmw@amazon.co.uk,
-	andrew.cooper3@citrix.com,
-	Amit Shah <amit@kernel.org>
-Subject: [RFC PATCH v2 0/3] Add support for the ERAPS feature
-Date: Mon, 11 Nov 2024 17:39:10 +0100
-Message-ID: <20241111163913.36139-1-amit@kernel.org>
+	andrew.cooper3@citrix.com
+Subject: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for AMD
+Date: Mon, 11 Nov 2024 17:39:11 +0100
+Message-ID: <20241111163913.36139-2-amit@kernel.org>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241111163913.36139-1-amit@kernel.org>
+References: <20241111163913.36139-1-amit@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,45 +81,43 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Newer AMD CPUs (Zen5+) have the ERAPS feature bit that allows us to remove the
-RSB filling loops required during context switches and VM exits.
+From: Amit Shah <amit.shah@amd.com>
 
-This patchset implements the feature to:
-* remove the need for RSB filling on context switches and VMEXITs in host and
-  guests
-* allow KVM guests to use the full default RSB stack
+AMD CPUs do not fall back to the BTB when the RSB underflows for RET
+address speculation.  AMD CPUs have not needed to stuff the RSB for
+underflow conditions.
 
-The feature isn't yet part of an APM update that details its working, so this
-is still tagged as RFC.
+The RSB poisoning case is addressed by RSB filling - clean up the FIXME
+comment about it.
 
-The v1 posting resulted in some questions on patch 1 -- I've included the
-context and comments in the commit text for patch 1 in this posting.
+Signed-off-by: Amit Shah <amit.shah@amd.com>
+---
+ arch/x86/kernel/cpu/bugs.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-v2:
-* reword comments to highlight context switch as the main trigger for RSB
-  flushes in hardware (Dave Hansen)
-* Split out outdated comment updates in (v1) patch1 to be a standalone
-  patch1 in this series, to reinforce RSB filling is only required for RSB
-  poisoning cases for AMD
-  * Remove mentions of BTC/BTC_NO (Andrew Cooper)
-* Add braces in case stmt (kernel test robot)
-* s/boot_cpu_has/cpu_feature_enabled (Boris Petkov)
-
-Amit Shah (3):
-  x86: cpu/bugs: update SpectreRSB comments for AMD
-  x86: cpu/bugs: add support for AMD ERAPS feature
-  x86: kvm: svm: add support for ERAPS and FLUSH_RAP_ON_VMRUN
-
- Documentation/admin-guide/hw-vuln/spectre.rst |  5 ++-
- arch/x86/include/asm/cpufeatures.h            |  1 +
- arch/x86/include/asm/nospec-branch.h          | 12 +++++
- arch/x86/include/asm/svm.h                    |  6 ++-
- arch/x86/kernel/cpu/bugs.c                    | 34 ++++++++------
- arch/x86/kvm/cpuid.c                          | 18 +++++++-
- arch/x86/kvm/svm/svm.c                        | 44 +++++++++++++++++++
- arch/x86/kvm/svm/svm.h                        | 15 +++++++
- 8 files changed, 117 insertions(+), 18 deletions(-)
-
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 47a01d4028f6..0aa629b5537d 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -1828,9 +1828,6 @@ static void __init spectre_v2_select_mitigation(void)
+ 	 *    speculated return targets may come from the branch predictor,
+ 	 *    which could have a user-poisoned BTB or BHB entry.
+ 	 *
+-	 *    AMD has it even worse: *all* returns are speculated from the BTB,
+-	 *    regardless of the state of the RSB.
+-	 *
+ 	 *    When IBRS or eIBRS is enabled, the "user -> kernel" attack
+ 	 *    scenario is mitigated by the IBRS branch prediction isolation
+ 	 *    properties, so the RSB buffer filling wouldn't be necessary to
+@@ -1852,8 +1849,6 @@ static void __init spectre_v2_select_mitigation(void)
+ 	 *
+ 	 * So to mitigate all cases, unconditionally fill RSB on context
+ 	 * switches.
+-	 *
+-	 * FIXME: Is this pointless for retbleed-affected AMD?
+ 	 */
+ 	setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+ 	pr_info("Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\n");
 -- 
 2.47.0
 
