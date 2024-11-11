@@ -1,83 +1,82 @@
-Return-Path: <kvm+bounces-31419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDBB89C39E9
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:44:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F5F9C39E7
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 09:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877D82824A3
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 08:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74C29280F22
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2024 08:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515D4175D47;
-	Mon, 11 Nov 2024 08:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEC816DC3C;
+	Mon, 11 Nov 2024 08:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="l0sjvCEk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dsGyDcic"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8607116A930
-	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 08:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C40016C69F
+	for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 08:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731314595; cv=fail; b=h1LgsXPvmg0TXxPibXX+tFM5A6FIjtYVng3LQqb+yI0dy8wT6S8x1BEHwOQso8f9jQxlcyVwA45XlfnVgU3WMBG8yQD+DetYjnM1LmoOgaTDpTbT8G7h7Vz+NFxpiWZDKpkxe+sD9rNwIWHBNU3nboo7HmDrgXBSB33arUKGZWc=
+	t=1731314593; cv=fail; b=nUAXEWP1T0dHb/5Mef8fX0w8vk/3/4A4CY3QkQKvh6Lbv385A/oMacYYxdQLs+Y1HKAK94JYXzDzopsspJMpLIlDDBv1t7Dv5GRDFfa6kAwlikSCs7smoULqJNzSEuzEtAQyinR9cCHTDUFxDsnxKXjkaNu9RWgbYRnfgLPKeYU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731314595; c=relaxed/simple;
-	bh=cekZlI8AnETTnU/lbaDgI6a9W2I1H6c+IzcTkv+MYto=;
+	s=arc-20240116; t=1731314593; c=relaxed/simple;
+	bh=sJuOYMXDIuSbq9w5xKvDGObmCVc6TuLJzcQfiZLPFq0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=raZVtGG3vxHQJNtrZPLjQFRsQmqN4Pq9dJDoND9MNspEX+vaCmtwOt9yy15gZbMI2t3O2wrPjij3bMXwJONIaBi/GUXsPe/kHV3plvFCqVaiU+QYdznF6O6IwpHXTYEml87EEuDaQ9H2YEjX2m4qPKyup8FxIflyhlgVte5L+c8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=l0sjvCEk; arc=fail smtp.client-ip=40.107.101.81
+	 MIME-Version:Content-Type; b=I2ghUz3I0uDHAUnuJRSRmSM+ThVCGSiBwr/HLKHNSCGtjlyFECTLLNsNaFS/tobdNqFGHbJDoiMfH99iFL/BJCe4fP0kHs/EChqBNWwtGPLPYjSU8ZBpi9VDktPLBDnsHU3TmidGDsuXZJIxONBH3LWOUQb9slBUG2c3403Vgr4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dsGyDcic; arc=fail smtp.client-ip=40.107.236.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xzBs8wgR5ZVo9xfwQZnYtyeyA0lruQszOIsMAvjwNcPLdYgtDdc70UFq40r7bFuEOh0CXTV09KdSpeOSo827vo9NjwYHnBJdcxe7+IutSIALBrEUMa5zbLVXC4aUNsR4O3qhoOrrJyccBawEfojou/mGAallktJ8iENHGcj73pissEJUYwKzub+HgxF/jp5nmpum7qvgQ+OxoZb7W5zZM/4vnPRdznw4QdYQ3N9SriHrrgHZcjZElRpKEyFxjbZtF7sP7Cl3dm+R/eWNNNvfVdW2vemD4zfrs12W4Y0HCOD2AfzMK06hHzgfe72cNKKM2H20PJCIut5DsiPSr/4Tdw==
+ b=geWJLmVhCYUI+PJIaOicwdoBADcFfPMWJCYr3x4TTojTxz30s7n0WwtzLEjTYI0aBvxJ/kUnlqUxY6xZArFdX680AY+eaVHunIfzxkqX8fSNhbQHUhaJDxmoW9be6mxwFgAr8Vkzz1vC6qcwqzX7lmcxyxOAjs3ywvLSXqY0u8O5exYYUef/qQPQiQ2c3/CeK+e0RsvAf5NrHABx6M9RRKdci4B31lmwJWo5cAuQ14Er02XPT+aG5GGHry6kNE8AIdRQtCBwp/LNc4ntF2dvu3ESV7nanWs0jIovX5LPtRDOSAeGuo/HvHwa3s9kjyKaHhs/7azPtFHlih1ky71T+w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6w6pQyCB9/4/EDNabHO1rfoHnVpx/taWYIbnIvQNUOE=;
- b=QJpXbJWnJ+rjSwiwjdUWo8bKlg4qqQMOyQPlnDH/LP5M9UtGs5caBlVh0v223GP24Yz0ml1l/tj8u7BTbAqCWUDfJyhyDrPfHYu+QQUlDIcm0gMEElFMNO21BF5kPP9TL9KogG4FdUsDk6WpYcd4ETB8z7e/Vi/pPRapowb9s0yXwxQSnhCfkQgBW0Nng3JrHjH90DzyTSum5Qwzhw8MrMbwaYL+6aDZNJ+X16UME3ufeLTYR8rN9LFjBcEPLDG7nzSyxbG7cUZhp/8/93d/DEWTDnVUac3ofsI7kp9VeB3/Qm7GDwjuKsSJCQRH2O2dzR3iQuih0xSJs7XcC4m48g==
+ bh=nUgMiQEwGrniVi1wVBLHMqNuqqEeCW5GdVnih0vXrI0=;
+ b=w82vjegL6R59qCHFQ3LXXb8JIpxBrfXxz8wPMh0h2DumxdB9v18kGZxxM5KA/I3+tSM6S1jpoisCK1itRHjXy+cXD3KazB60RhW6e3a2Jm9fIKWStvo+fxrdo854KSdinWDnPjUJExIGCm5md8O+ADIojCgz2+J3gK3szTWl4RgBHcwZP/f6PvzIV6Ttt9VJUboKEk735eo0Dp/WdnzIkcRBHxcu8YQwcTDeMgx7zyILS3+jbsyK86dJ/5hizWnGBnhBNkl3A4cVXqpMSSjCxtwgNY1r0jYj/XmvQ4JxJLuUB2i1KD+ordKz3L8ccyRAR+RlOeXiQvbaKz4D/Rc/RA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6w6pQyCB9/4/EDNabHO1rfoHnVpx/taWYIbnIvQNUOE=;
- b=l0sjvCEk70F2RgoHu98rEkk11+n9zqZ7np8ggWxZHZ1cBef5u6CFJvG7W/V1GxJpGX8yOzmeyyQwHSffX8EkFVS0olSc5HIpW+BoqSyI9qIp3fJ1LszupRA2FE6+vqLN6udkkywpY5UV2SipmOWYeKGaOk1OU2QxNYCMWzpoQQtDdxfJEVuxYd9Fnntj10wuF+hVomV5jldVd/6SjzqH3jDOyxa6/+rvRrKEQd0vy28UGLsS55fLHvH5wm5Z1FuH24ItBJXySCAOIds1/WCavlgiev8ZJVLdeq2/rzwLdafqxmvSGqCF+6o+TVAZtfGexZiF4M3ppZBN6OcE55REAw==
-Received: from MW4PR04CA0048.namprd04.prod.outlook.com (2603:10b6:303:6a::23)
- by IA0PR12MB8327.namprd12.prod.outlook.com (2603:10b6:208:40e::11) with
+ bh=nUgMiQEwGrniVi1wVBLHMqNuqqEeCW5GdVnih0vXrI0=;
+ b=dsGyDcicJUb3h9rDjCgicfGssK7th5Ybpu1xcaFd5YNNdlQxg4CYd+ui1xdFRcEMagz97lP2w8xAObezlpq11+pSy85jla62upk7qKupX3jDTNFoFzfV0pAXk9XvZrf817L0E1VmTDETdhGzvuTD29FQmCgx+GLOjdEN2HibTtrOydS2WqgFqPVLh/S2Ovw+lYQy3VdQMWNEt85+sa2jp7RJ8HzdO4nD1qXpyAm9yXIvhOqo0PeImq6+nYcKR5D+ZH62Euu6ltwT/UBoGiIyMk7Q9mLPZstzXK1RcYGov4EIxU2Fo7zWeXnt+Wkvbhiz7nnVGZ+er4psH6+dSHiUpw==
+Received: from CH0PR03CA0182.namprd03.prod.outlook.com (2603:10b6:610:e4::7)
+ by DM4PR12MB7672.namprd12.prod.outlook.com (2603:10b6:8:103::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Mon, 11 Nov
- 2024 08:43:08 +0000
-Received: from MWH0EPF000971E9.namprd02.prod.outlook.com
- (2603:10b6:303:6a:cafe::30) by MW4PR04CA0048.outlook.office365.com
- (2603:10b6:303:6a::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.27 via Frontend
- Transport; Mon, 11 Nov 2024 08:43:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ 2024 08:43:05 +0000
+Received: from CH2PEPF00000141.namprd02.prod.outlook.com (2603:10b6:610:e4::4)
+ by CH0PR03CA0182.outlook.office365.com (2603:10b6:610:e4::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.28 via Frontend Transport; Mon, 11 Nov 2024 08:43:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000971E9.mail.protection.outlook.com (10.167.243.71) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH2PEPF00000141.mail.protection.outlook.com (10.167.244.74) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Mon, 11 Nov 2024 08:43:07 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8158.14 via Frontend Transport; Mon, 11 Nov 2024 08:43:05 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 11 Nov
- 2024 00:42:50 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 00:42:54 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 11 Nov
- 2024 00:42:49 -0800
+ 2024 00:42:54 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
  with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Mon, 11 Nov
- 2024 00:42:46 -0800
+ 2024 00:42:50 -0800
 From: Yishai Hadas <yishaih@nvidia.com>
 To: <alex.williamson@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
 	<jgg@nvidia.com>
@@ -85,9 +84,9 @@ CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
 	<parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
 	<joao.m.martins@oracle.com>, <leonro@nvidia.com>, <yishaih@nvidia.com>,
 	<maorg@nvidia.com>
-Subject: [PATCH V2 vfio 5/7] vfio/virtio: Add support for the basic live migration functionality
-Date: Mon, 11 Nov 2024 10:41:55 +0200
-Message-ID: <20241111084157.88044-6-yishaih@nvidia.com>
+Subject: [PATCH V2 vfio 6/7] vfio/virtio: Add PRE_COPY support for live migration
+Date: Mon, 11 Nov 2024 10:41:56 +0200
+Message-ID: <20241111084157.88044-7-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20241111084157.88044-1-yishaih@nvidia.com>
 References: <20241111084157.88044-1-yishaih@nvidia.com>
@@ -102,1359 +101,420 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E9:EE_|IA0PR12MB8327:EE_
-X-MS-Office365-Filtering-Correlation-Id: 149a1817-0c1b-4f42-da53-08dd022cdd81
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000141:EE_|DM4PR12MB7672:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d2e093e-d794-4ab8-594c-08dd022cdc73
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?wPCiuW6NHfmh2O4tzwh1q9zTpH7naKCm3ZnauvJxpvXjdQd52ACM5++HM5mm?=
- =?us-ascii?Q?45mP1bcVYyZPn0crQZtdu1obc85DcjMzwHmpqH+Q63Kby0+gsHHIiLI73ps5?=
- =?us-ascii?Q?Mw5g9ZzGiqQt18peIPvmSSzwzdAQMj7FEYMFwS8gNS58qptggboDebzW55RI?=
- =?us-ascii?Q?omI31XqRjxXnFnvFPMXKuts/INIILoET6hYulh4fj17dn2kEwM8543rMWgKc?=
- =?us-ascii?Q?cfsPRXoPqPRNrRZ81i/t9cbVGmhAUe1aq3mLQ/JRMKgi3mMn2jyZlNwB9sOk?=
- =?us-ascii?Q?AVocP6c3TA7GPrd/ulHtCqxTwmT9qFwheC+bZ6x6lmxC0f1IYQblmEtWQ+A+?=
- =?us-ascii?Q?Eo9CSlNGGwvD/TcWqS5ao9GMR147bxcfaVbBXNdsJZpXsMMQCqTZhOGqglpI?=
- =?us-ascii?Q?omh79W9RToinhKWlKYyY9Qj8zxfpUPoxg1YmTNrrBOZhKqwIdNoOz8JKRWWv?=
- =?us-ascii?Q?17WtNJsDU8rIReii/XZhAcdWbHyfik1XlXQsih/uscglUsPi5RG/BXOeLEVr?=
- =?us-ascii?Q?Bm7EnFElcRMP05OjcJDmLWvut/NyfeJKOACs4ldevF0YdufkkRjKldYs7jR+?=
- =?us-ascii?Q?W7l0lbx5F8qSq3XrIOHLGAZrvyjwYJ+A8f/4xLzwzelgBmsuRYrRklEK565S?=
- =?us-ascii?Q?tabMqbL4W2e8oIGeIagDm5NdVulyQipW7YbslNHQ3nMCWaNWunwBb3jyUxah?=
- =?us-ascii?Q?ehQLdXlEPPl0S2WbrvtiNSz48Z9V5r16sMpPhERBytDEDVc8M+OADy4HyZrS?=
- =?us-ascii?Q?Uqs1zp7EL3vMRBHGsYmcwG6vLLV2Gv8Yola/VlL5utfHyBp2Dp+dxhTyo8K+?=
- =?us-ascii?Q?2adnitueaZVeIIdn6rRLLDLweKEjVv5DilcOSJ7gvjd6NKf3wRgF1yZzYVTd?=
- =?us-ascii?Q?1vtJGkgX0d4l/pSvxLJZ30w3hMkM14Coau+8tJLFlKaCMTzseWTQUBDTE+Cl?=
- =?us-ascii?Q?iSYbJbEWy51d1LODWQ7qypKdFgCeEK5MImaVXEg97r3inraW+fD1ZSRkI4p3?=
- =?us-ascii?Q?U366Izic4dWwEQtZRuNQXbiQ39qhm24uV6cqTeVgfFkcr4KmzqXvwPA16aE4?=
- =?us-ascii?Q?iW6WCrSQJtnXJzVIFY8Y+l1FzfZRONIqZnI8AmJ4qYIrtpMn6hplE0GG4EZ6?=
- =?us-ascii?Q?eDY/57OQ7IoPqixmFmwXJx/mGWCP2Wqe5/NFx+bESAtPHsx5rOuj3bjE43P8?=
- =?us-ascii?Q?YSDlpRVt1D8JMH5sgEWQMt72XgHLBREw7y0TCPNqEJYBO6ZeICnOwb2yDbV3?=
- =?us-ascii?Q?Q80CH8LXFWe8OfNUI7fOmORDGMHKNKfQNw2H8E+ttvZkLqzIyEzk1u4ZGcrI?=
- =?us-ascii?Q?s0GBP1FCVp9nXm8+y5Na9MVkSQSzMGMJd9k0TRxEW0SgDoRiYvouumjZ6Zw0?=
- =?us-ascii?Q?G8AWtet23FZUGXU/NXH9oazUob7/Tr3mD58puK7g4Fv+8K5exQ=3D=3D?=
+	=?us-ascii?Q?Bs2kDnYEtEKGNvPZISJ3U89dmOBzh08TpFyDyGEfWh1xB+F8FucCSuuozrFg?=
+ =?us-ascii?Q?sVcwFojlCxr1Nr8GQ8dQhs/6B2VLZagWcjTly5PzPXiZaZ4dsVu9Kx2/WjMq?=
+ =?us-ascii?Q?85aGmcntHeT0r5LLe9jfmln2KFC2vt5UxvAsAZBN75vu1g3pgAKyX/RHxFEu?=
+ =?us-ascii?Q?UuL13nK4DF6j4IlexEnDjvAHF4yogOMAJAXE3Ym9rldwl/lxLrAl5wzGPE2k?=
+ =?us-ascii?Q?um4zSxZq78iiOdvQS5Dq6bBu1luK8iR+kfAAglUQ/8y1j/rt4beUP0UWHUfF?=
+ =?us-ascii?Q?uSKPcfUqzSORfKrEJsKK5/hjhcQgN4OTahYR0xBHchZexpZ8OuM1ZohFGM7U?=
+ =?us-ascii?Q?j+f/gxkj10tC/2XDTBiJ9JeAn4Os4cymmQISFINo3ztkNSP2KCDZeAqxs3gV?=
+ =?us-ascii?Q?Ee7cNW/INYcLHcqpWf67Ks1jtyrQ/GPeCa3B3L2b8T3C+H5l05Xz3/edP7Tq?=
+ =?us-ascii?Q?Kh4PVhpWtMidcRpVdOs7THwd7jSpv1VDsjAuokiQnIbR0FSuziro4ID1//Ze?=
+ =?us-ascii?Q?q/nBm30uA9SUNdtOMVtmwVU5k/wlr0JeXxcusDFMa4bEbjn+cNeE0Ms9B35K?=
+ =?us-ascii?Q?vmydPvzUEkV0Cnq59J5JS1uFkkcexR31NoxtpLIYn3Nxd1pWkuY9f0r2WYAe?=
+ =?us-ascii?Q?DA5P/aOgIw0rvE9pev8InII9UqiQomaXdrUWZZUwsC6sxe0Bym+H3nIkd6+B?=
+ =?us-ascii?Q?GkJCPoeK/weSFD+9EG6L8ghopuc1tnXD82//FW6zpBRqkCGIpaNM7KtF7O8f?=
+ =?us-ascii?Q?X7dPlbSrHgWGqHILd+MjcJiuLVWvzSyxloXeAedYD2VixCcC/gQ+0AoeQBe9?=
+ =?us-ascii?Q?0lf+mIBnq/gNWJ1oUvz5bcF1dlliw+sZ89F/mu6PpuV78STJOhpc+un5ippY?=
+ =?us-ascii?Q?gLHhCHn4AxckNQOnUfl6MkXGfWOIdFdjOzt60P81u9ucgMxrXXKAP6v4yTyw?=
+ =?us-ascii?Q?+4iP14SLgHkGu5Qdpqhds/vJnj+ifzQuLaPrM4IApNxeMNRvliz96Liy/enA?=
+ =?us-ascii?Q?vJVPh8mLYEleoQbssb7innFm3Dl+Xlj/fyt1j3fc5Ommm3cMTpLfxrNTjI22?=
+ =?us-ascii?Q?Uez20bEk7PQjv/E6WUXn0Hnfn2iUExjmGQ2vRuLQ4Ivclh7FiN05aoH6THQj?=
+ =?us-ascii?Q?JwGfuvsMyda+Gntta103awNZ+v0IIfV54OXKYpxY/VjpVOVHs1+fEZIz9AKY?=
+ =?us-ascii?Q?p0B7X2dHXXnhDTwheKrYAOqx0zToK65xD0nkUvxuqUKGYnJKodxezlc5sO2x?=
+ =?us-ascii?Q?mQwKK96bHy492wXboo7URFOhsuIO99/02Y9fYv9YIaye9MAoudp4x/IjUQH6?=
+ =?us-ascii?Q?UL/MTtUBbO5fcP28GWtqokbrLPaTKTJKP/B7dq7fqyKKPvila5n8lO/t3UHG?=
+ =?us-ascii?Q?kZv0JYAj28+a/eAaRW5QI2Mkso9qN4KyLG/HodByiR1Rr9/U+g=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2024 08:43:07.3007
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2024 08:43:05.5592
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 149a1817-0c1b-4f42-da53-08dd022cdd81
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2e093e-d794-4ab8-594c-08dd022cdc73
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E9.namprd02.prod.outlook.com
+	CH2PEPF00000141.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8327
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7672
 
-Add support for basic live migration functionality in VFIO over
-virtio-net devices, aligned with the virtio device specification 1.4.
+Add PRE_COPY support for live migration.
 
-This includes the following VFIO features:
-VFIO_MIGRATION_STOP_COPY, VFIO_MIGRATION_P2P.
+This functionality may reduce the downtime upon STOP_COPY as of letting
+the target machine to get some 'initial data' from the source once the
+machine is still in its RUNNING state and let it prepares itself
+pre-ahead to get the final STOP_COPY data.
 
-The implementation registers with the VFIO subsystem using vfio_pci_core
-and then incorporates the virtio-specific logic for the migration
-process.
+As the Virtio specification does not support reading partial or
+incremental device contexts. This means that during the PRE_COPY state,
+the vfio-virtio driver reads the full device state.
 
-The migration follows the definitions in uapi/vfio.h and leverages the
-virtio VF-to-PF admin queue command channel for execution device parts
-related commands.
+As the device state can be changed and the benefit is highest when the
+pre copy data closely matches the final data we read it in a rate
+limiter mode.
 
-Additional Notes:
------------------
-The kernel protocol between the source and target devices contains a
-header with metadata, including record size, tag, and flags.
+This means we avoid reading new data from the device for a specified
+time interval after the last read.
 
-The record size allows the target to recognize and read a complete image
-from the source before passing the device part data. This adheres to the
-virtio device specification, which mandates that partial device parts
-cannot be supplied.
-
-The tag and flags serve as placeholders for future extensions of the
-kernel protocol between the source and target, ensuring backward and
-forward compatibility.
-
-Both the source and target comply with the virtio device specification
-by using a device part object with a unique ID as part of the migration
-process. Since this resource is limited to a maximum of 255, its
-lifecycle is confined to periods with an active live migration flow.
-
-According to the virtio specification, a device has only two modes:
-RUNNING and STOPPED. As a result, certain VFIO transitions (i.e.,
-RUNNING_P2P->STOP, STOP->RUNNING_P2P) are treated as no-ops. When
-transitioning to RUNNING_P2P, the device state is set to STOP, and it
-will remain STOPPED until the transition out of RUNNING_P2P->RUNNING, at
-which point it returns to RUNNING. During transition to STOP, the virtio
-device only stops initiating outgoing requests(e.g. DMA, MSIx, etc.) but
-still must accept incoming operations.
+With PRE_COPY enabled, we observed a downtime reduction of approximately
+70-75% in various scenarios compared to when PRE_COPY was disabled,
+while keeping the total migration time nearly the same.
 
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/virtio/Makefile  |    2 +-
- drivers/vfio/pci/virtio/common.h  |  104 +++
- drivers/vfio/pci/virtio/main.c    |   82 ++-
- drivers/vfio/pci/virtio/migrate.c | 1120 +++++++++++++++++++++++++++++
- 4 files changed, 1283 insertions(+), 25 deletions(-)
- create mode 100644 drivers/vfio/pci/virtio/common.h
- create mode 100644 drivers/vfio/pci/virtio/migrate.c
+ drivers/vfio/pci/virtio/common.h  |   4 +
+ drivers/vfio/pci/virtio/migrate.c | 231 ++++++++++++++++++++++++++++--
+ 2 files changed, 227 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/vfio/pci/virtio/Makefile b/drivers/vfio/pci/virtio/Makefile
-index 7171105baf33..bf0ccde6a91a 100644
---- a/drivers/vfio/pci/virtio/Makefile
-+++ b/drivers/vfio/pci/virtio/Makefile
-@@ -1,3 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
- obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio-vfio-pci.o
--virtio-vfio-pci-y := main.o
-+virtio-vfio-pci-y := main.o migrate.o
 diff --git a/drivers/vfio/pci/virtio/common.h b/drivers/vfio/pci/virtio/common.h
-new file mode 100644
-index 000000000000..3bdfb3ea1174
---- /dev/null
+index 3bdfb3ea1174..5704603f0f9d 100644
+--- a/drivers/vfio/pci/virtio/common.h
 +++ b/drivers/vfio/pci/virtio/common.h
-@@ -0,0 +1,104 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef VIRTIO_VFIO_COMMON_H
-+#define VIRTIO_VFIO_COMMON_H
-+
-+#include <linux/kernel.h>
-+#include <linux/virtio.h>
-+#include <linux/vfio_pci_core.h>
-+#include <linux/virtio_pci.h>
-+
-+enum virtiovf_migf_state {
-+	VIRTIOVF_MIGF_STATE_ERROR = 1,
-+};
-+
-+enum virtiovf_load_state {
-+	VIRTIOVF_LOAD_STATE_READ_HEADER,
-+	VIRTIOVF_LOAD_STATE_PREP_HEADER_DATA,
-+	VIRTIOVF_LOAD_STATE_READ_HEADER_DATA,
-+	VIRTIOVF_LOAD_STATE_PREP_CHUNK,
-+	VIRTIOVF_LOAD_STATE_READ_CHUNK,
-+	VIRTIOVF_LOAD_STATE_LOAD_CHUNK,
-+};
-+
-+struct virtiovf_data_buffer {
-+	struct sg_append_table table;
-+	loff_t start_pos;
-+	u64 length;
-+	u64 allocated_length;
-+	struct list_head buf_elm;
-+	u8 include_header_object:1;
-+	struct virtiovf_migration_file *migf;
-+	/* Optimize virtiovf_get_migration_page() for sequential access */
-+	struct scatterlist *last_offset_sg;
-+	unsigned int sg_last_entry;
-+	unsigned long last_offset;
-+};
-+
-+enum virtiovf_migf_header_flags {
-+	VIRTIOVF_MIGF_HEADER_FLAGS_TAG_MANDATORY = 0,
-+	VIRTIOVF_MIGF_HEADER_FLAGS_TAG_OPTIONAL = 1 << 0,
-+};
-+
-+enum virtiovf_migf_header_tag {
-+	VIRTIOVF_MIGF_HEADER_TAG_DEVICE_DATA = 0,
-+};
-+
-+struct virtiovf_migration_header {
-+	__le64 record_size;
-+	/* For future use in case we may need to change the kernel protocol */
-+	__le32 flags; /* Use virtiovf_migf_header_flags */
-+	__le32 tag; /* Use virtiovf_migf_header_tag */
-+	__u8 data[]; /* Its size is given in the record_size */
-+};
-+
-+struct virtiovf_migration_file {
-+	struct file *filp;
-+	/* synchronize access to the file state */
-+	struct mutex lock;
-+	loff_t max_pos;
-+	u64 record_size;
-+	u32 record_tag;
-+	u8 has_obj_id:1;
-+	u32 obj_id;
-+	enum virtiovf_migf_state state;
-+	enum virtiovf_load_state load_state;
-+	/* synchronize access to the lists */
-+	spinlock_t list_lock;
-+	struct list_head buf_list;
-+	struct list_head avail_list;
-+	struct virtiovf_data_buffer *buf;
-+	struct virtiovf_data_buffer *buf_header;
-+	struct virtiovf_pci_core_device *virtvdev;
-+};
-+
-+struct virtiovf_pci_core_device {
-+	struct vfio_pci_core_device core_device;
-+	u8 *bar0_virtual_buf;
-+	/* synchronize access to the virtual buf */
-+	struct mutex bar_mutex;
-+	void __iomem *notify_addr;
-+	u64 notify_offset;
-+	__le32 pci_base_addr_0;
-+	__le16 pci_cmd;
-+	u8 bar0_virtual_buf_size;
-+	u8 notify_bar;
-+
-+	/* LM related */
-+	u8 migrate_cap:1;
-+	u8 deferred_reset:1;
-+	/* protect migration state */
-+	struct mutex state_mutex;
-+	enum vfio_device_mig_state mig_state;
-+	/* protect the reset_done flow */
-+	spinlock_t reset_lock;
-+	struct virtiovf_migration_file *resuming_migf;
-+	struct virtiovf_migration_file *saving_migf;
-+};
-+
-+void virtiovf_set_migratable(struct virtiovf_pci_core_device *virtvdev);
-+void virtiovf_open_migration(struct virtiovf_pci_core_device *virtvdev);
-+void virtiovf_close_migration(struct virtiovf_pci_core_device *virtvdev);
-+void virtiovf_migration_reset_done(struct pci_dev *pdev);
-+
-+#endif /* VIRTIO_VFIO_COMMON_H */
-diff --git a/drivers/vfio/pci/virtio/main.c b/drivers/vfio/pci/virtio/main.c
-index b5d3a8c5bbc9..e9ae17209026 100644
---- a/drivers/vfio/pci/virtio/main.c
-+++ b/drivers/vfio/pci/virtio/main.c
-@@ -16,18 +16,7 @@
- #include <linux/virtio_net.h>
- #include <linux/virtio_pci_admin.h>
+@@ -10,6 +10,8 @@
  
--struct virtiovf_pci_core_device {
--	struct vfio_pci_core_device core_device;
--	u8 *bar0_virtual_buf;
--	/* synchronize access to the virtual buf */
--	struct mutex bar_mutex;
--	void __iomem *notify_addr;
--	u64 notify_offset;
--	__le32 pci_base_addr_0;
--	__le16 pci_cmd;
--	u8 bar0_virtual_buf_size;
--	u8 notify_bar;
--};
-+#include "common.h"
+ enum virtiovf_migf_state {
+ 	VIRTIOVF_MIGF_STATE_ERROR = 1,
++	VIRTIOVF_MIGF_STATE_PRECOPY = 2,
++	VIRTIOVF_MIGF_STATE_COMPLETE = 3,
+ };
  
- static int
- virtiovf_issue_legacy_rw_cmd(struct virtiovf_pci_core_device *virtvdev,
-@@ -355,8 +344,8 @@ virtiovf_set_notify_addr(struct virtiovf_pci_core_device *virtvdev)
- 
- static int virtiovf_pci_open_device(struct vfio_device *core_vdev)
- {
--	struct virtiovf_pci_core_device *virtvdev = container_of(
--		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+	struct virtiovf_pci_core_device *virtvdev = container_of(core_vdev,
-+			struct virtiovf_pci_core_device, core_device.vdev);
- 	struct vfio_pci_core_device *vdev = &virtvdev->core_device;
- 	int ret;
- 
-@@ -377,10 +366,20 @@ static int virtiovf_pci_open_device(struct vfio_device *core_vdev)
- 		}
- 	}
- 
-+	virtiovf_open_migration(virtvdev);
- 	vfio_pci_core_finish_enable(vdev);
- 	return 0;
- }
- 
-+static void virtiovf_pci_close_device(struct vfio_device *core_vdev)
-+{
-+	struct virtiovf_pci_core_device *virtvdev = container_of(core_vdev,
-+			struct virtiovf_pci_core_device, core_device.vdev);
-+
-+	virtiovf_close_migration(virtvdev);
-+	vfio_pci_core_close_device(core_vdev);
-+}
-+
- static int virtiovf_get_device_config_size(unsigned short device)
- {
- 	/* Network card */
-@@ -406,8 +405,8 @@ static int virtiovf_read_notify_info(struct virtiovf_pci_core_device *virtvdev)
- 
- static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
- {
--	struct virtiovf_pci_core_device *virtvdev = container_of(
--		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+	struct virtiovf_pci_core_device *virtvdev = container_of(core_vdev,
-+			struct virtiovf_pci_core_device, core_device.vdev);
- 	struct pci_dev *pdev;
- 	int ret;
- 
-@@ -416,6 +415,10 @@ static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
- 		return ret;
- 
- 	pdev = virtvdev->core_device.pdev;
-+	/*
-+	 * The vfio_device_ops.init() callback is set to virtiovf_pci_init_device()
-+	 * only when legacy I/O is supported. Now, let's initialize it.
-+	 */
- 	ret = virtiovf_read_notify_info(virtvdev);
- 	if (ret)
- 		return ret;
-@@ -433,19 +436,38 @@ static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
- 
- static void virtiovf_pci_core_release_dev(struct vfio_device *core_vdev)
- {
--	struct virtiovf_pci_core_device *virtvdev = container_of(
--		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+	struct virtiovf_pci_core_device *virtvdev = container_of(core_vdev,
-+			struct virtiovf_pci_core_device, core_device.vdev);
- 
- 	kfree(virtvdev->bar0_virtual_buf);
- 	vfio_pci_core_release_dev(core_vdev);
- }
- 
--static const struct vfio_device_ops virtiovf_vfio_pci_tran_ops = {
--	.name = "virtio-vfio-pci-trans",
-+static const struct vfio_device_ops virtiovf_vfio_pci_lm_ops = {
-+	.name = "virtio-vfio-pci-lm",
-+	.init = vfio_pci_core_init_dev,
-+	.release = virtiovf_pci_core_release_dev,
-+	.open_device = virtiovf_pci_open_device,
-+	.close_device = virtiovf_pci_close_device,
-+	.ioctl = vfio_pci_core_ioctl,
-+	.device_feature = vfio_pci_core_ioctl_feature,
-+	.read = vfio_pci_core_read,
-+	.write = vfio_pci_core_write,
-+	.mmap = vfio_pci_core_mmap,
-+	.request = vfio_pci_core_request,
-+	.match = vfio_pci_core_match,
-+	.bind_iommufd = vfio_iommufd_physical_bind,
-+	.unbind_iommufd = vfio_iommufd_physical_unbind,
-+	.attach_ioas = vfio_iommufd_physical_attach_ioas,
-+	.detach_ioas = vfio_iommufd_physical_detach_ioas,
-+};
-+
-+static const struct vfio_device_ops virtiovf_vfio_pci_tran_lm_ops = {
-+	.name = "virtio-vfio-pci-trans-lm",
- 	.init = virtiovf_pci_init_device,
- 	.release = virtiovf_pci_core_release_dev,
- 	.open_device = virtiovf_pci_open_device,
--	.close_device = vfio_pci_core_close_device,
-+	.close_device = virtiovf_pci_close_device,
- 	.ioctl = virtiovf_vfio_pci_core_ioctl,
- 	.device_feature = vfio_pci_core_ioctl_feature,
- 	.read = virtiovf_pci_core_read,
-@@ -490,17 +512,28 @@ static int virtiovf_pci_probe(struct pci_dev *pdev,
- {
- 	const struct vfio_device_ops *ops = &virtiovf_vfio_pci_ops;
- 	struct virtiovf_pci_core_device *virtvdev;
-+	bool sup_legacy_io = false;
-+	bool sup_lm = false;
- 	int ret;
- 
--	if (pdev->is_virtfn && virtio_pci_admin_has_legacy_io(pdev) &&
--	    !virtiovf_bar0_exists(pdev))
--		ops = &virtiovf_vfio_pci_tran_ops;
-+	if (pdev->is_virtfn) {
-+		sup_legacy_io = virtio_pci_admin_has_legacy_io(pdev) &&
-+				!virtiovf_bar0_exists(pdev);
-+		sup_lm = virtio_pci_admin_has_dev_parts(pdev);
-+		if (sup_legacy_io)
-+			ops = &virtiovf_vfio_pci_tran_lm_ops;
-+		else if (sup_lm)
-+			ops = &virtiovf_vfio_pci_lm_ops;
-+	}
- 
- 	virtvdev = vfio_alloc_device(virtiovf_pci_core_device, core_device.vdev,
- 				     &pdev->dev, ops);
- 	if (IS_ERR(virtvdev))
- 		return PTR_ERR(virtvdev);
- 
-+	if (sup_lm)
-+		virtiovf_set_migratable(virtvdev);
-+
- 	dev_set_drvdata(&pdev->dev, &virtvdev->core_device);
- 	ret = vfio_pci_core_register_device(&virtvdev->core_device);
- 	if (ret)
-@@ -532,6 +565,7 @@ static void virtiovf_pci_aer_reset_done(struct pci_dev *pdev)
- 	struct virtiovf_pci_core_device *virtvdev = dev_get_drvdata(&pdev->dev);
- 
- 	virtvdev->pci_cmd = 0;
-+	virtiovf_migration_reset_done(pdev);
- }
- 
- static const struct pci_error_handlers virtiovf_err_handlers = {
+ enum virtiovf_load_state {
+@@ -57,6 +59,8 @@ struct virtiovf_migration_file {
+ 	/* synchronize access to the file state */
+ 	struct mutex lock;
+ 	loff_t max_pos;
++	u64 pre_copy_initial_bytes;
++	struct ratelimit_state pre_copy_rl_state;
+ 	u64 record_size;
+ 	u32 record_tag;
+ 	u8 has_obj_id:1;
 diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
-new file mode 100644
-index 000000000000..3d5eaa1cbcdb
---- /dev/null
+index 3d5eaa1cbcdb..70fae7de11e9 100644
+--- a/drivers/vfio/pci/virtio/migrate.c
 +++ b/drivers/vfio/pci/virtio/migrate.c
-@@ -0,0 +1,1120 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/pci.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+#include <linux/vfio.h>
-+#include <linux/vfio_pci_core.h>
-+#include <linux/virtio_pci.h>
-+#include <linux/virtio_net.h>
-+#include <linux/virtio_pci_admin.h>
-+#include <linux/anon_inodes.h>
-+
-+#include "common.h"
-+
-+/* Device specification max parts size */
-+#define MAX_LOAD_SIZE (BIT_ULL(BITS_PER_TYPE \
-+	(((struct virtio_admin_cmd_dev_parts_metadata_result *)0)->parts_size.size)) - 1)
-+
-+/* Initial target buffer size */
-+#define VIRTIOVF_TARGET_INITIAL_BUF_SIZE SZ_1M
-+
-+static struct page *
-+virtiovf_get_migration_page(struct virtiovf_data_buffer *buf,
-+			    unsigned long offset)
-+{
-+	unsigned long cur_offset = 0;
-+	struct scatterlist *sg;
-+	unsigned int i;
-+
-+	/* All accesses are sequential */
-+	if (offset < buf->last_offset || !buf->last_offset_sg) {
-+		buf->last_offset = 0;
-+		buf->last_offset_sg = buf->table.sgt.sgl;
-+		buf->sg_last_entry = 0;
-+	}
-+
-+	cur_offset = buf->last_offset;
-+
-+	for_each_sg(buf->last_offset_sg, sg,
-+		    buf->table.sgt.orig_nents - buf->sg_last_entry, i) {
-+		if (offset < sg->length + cur_offset) {
-+			buf->last_offset_sg = sg;
-+			buf->sg_last_entry += i;
-+			buf->last_offset = cur_offset;
-+			return nth_page(sg_page(sg),
-+					(offset - cur_offset) / PAGE_SIZE);
-+		}
-+		cur_offset += sg->length;
-+	}
-+	return NULL;
-+}
-+
-+static int virtiovf_add_migration_pages(struct virtiovf_data_buffer *buf,
-+					unsigned int npages)
-+{
-+	unsigned int to_alloc = npages;
-+	struct page **page_list;
-+	unsigned long filled;
-+	unsigned int to_fill;
-+	int ret;
-+
-+	to_fill = min_t(unsigned int, npages, PAGE_SIZE / sizeof(*page_list));
-+	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
-+	if (!page_list)
-+		return -ENOMEM;
-+
-+	do {
-+		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT, to_fill,
-+						page_list);
-+		if (!filled) {
-+			ret = -ENOMEM;
-+			goto err;
-+		}
-+		to_alloc -= filled;
-+		ret = sg_alloc_append_table_from_pages(&buf->table, page_list,
-+			filled, 0, filled << PAGE_SHIFT, UINT_MAX,
-+			SG_MAX_SINGLE_ALLOC, GFP_KERNEL_ACCOUNT);
-+
-+		if (ret)
-+			goto err;
-+		buf->allocated_length += filled * PAGE_SIZE;
-+		/* clean input for another bulk allocation */
-+		memset(page_list, 0, filled * sizeof(*page_list));
-+		to_fill = min_t(unsigned int, to_alloc,
-+				PAGE_SIZE / sizeof(*page_list));
-+	} while (to_alloc > 0);
-+
-+	kvfree(page_list);
-+	return 0;
-+
-+err:
-+	kvfree(page_list);
-+	return ret;
-+}
-+
-+static void virtiovf_free_data_buffer(struct virtiovf_data_buffer *buf)
-+{
-+	struct sg_page_iter sg_iter;
-+
-+	/* Undo alloc_pages_bulk_array() */
-+	for_each_sgtable_page(&buf->table.sgt, &sg_iter, 0)
-+		__free_page(sg_page_iter_page(&sg_iter));
-+	sg_free_append_table(&buf->table);
-+	kfree(buf);
-+}
-+
-+static struct virtiovf_data_buffer *
-+virtiovf_alloc_data_buffer(struct virtiovf_migration_file *migf, size_t length)
-+{
-+	struct virtiovf_data_buffer *buf;
-+	int ret;
-+
-+	buf = kzalloc(sizeof(*buf), GFP_KERNEL_ACCOUNT);
-+	if (!buf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ret = virtiovf_add_migration_pages(buf,
-+				DIV_ROUND_UP_ULL(length, PAGE_SIZE));
-+	if (ret)
-+		goto end;
-+
-+	buf->migf = migf;
-+	return buf;
-+end:
-+	virtiovf_free_data_buffer(buf);
-+	return ERR_PTR(ret);
-+}
-+
-+static void virtiovf_put_data_buffer(struct virtiovf_data_buffer *buf)
-+{
-+	spin_lock_irq(&buf->migf->list_lock);
-+	list_add_tail(&buf->buf_elm, &buf->migf->avail_list);
-+	spin_unlock_irq(&buf->migf->list_lock);
-+}
-+
+@@ -26,6 +26,10 @@
+ /* Initial target buffer size */
+ #define VIRTIOVF_TARGET_INITIAL_BUF_SIZE SZ_1M
+ 
 +static int
-+virtiovf_pci_alloc_obj_id(struct virtiovf_pci_core_device *virtvdev, u8 type,
-+			  u32 *obj_id)
-+{
-+	return virtio_pci_admin_obj_create(virtvdev->core_device.pdev,
-+					   VIRTIO_RESOURCE_OBJ_DEV_PARTS, type, obj_id);
-+}
++virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
++				   u32 ctx_size);
 +
-+static void
-+virtiovf_pci_free_obj_id(struct virtiovf_pci_core_device *virtvdev, u32 obj_id)
-+{
-+	virtio_pci_admin_obj_destroy(virtvdev->core_device.pdev,
-+			VIRTIO_RESOURCE_OBJ_DEV_PARTS, obj_id);
-+}
-+
-+static void virtiovf_clean_migf_resources(struct virtiovf_migration_file *migf)
-+{
-+	struct virtiovf_data_buffer *entry;
-+
-+	if (migf->buf) {
-+		virtiovf_free_data_buffer(migf->buf);
-+		migf->buf = NULL;
-+	}
-+
-+	if (migf->buf_header) {
-+		virtiovf_free_data_buffer(migf->buf_header);
-+		migf->buf_header = NULL;
-+	}
-+
-+	list_splice(&migf->avail_list, &migf->buf_list);
-+
-+	while ((entry = list_first_entry_or_null(&migf->buf_list,
-+				struct virtiovf_data_buffer, buf_elm))) {
-+		list_del(&entry->buf_elm);
-+		virtiovf_free_data_buffer(entry);
-+	}
-+
-+	if (migf->has_obj_id)
-+		virtiovf_pci_free_obj_id(migf->virtvdev, migf->obj_id);
-+}
-+
-+static void virtiovf_disable_fd(struct virtiovf_migration_file *migf)
-+{
-+	mutex_lock(&migf->lock);
-+	migf->state = VIRTIOVF_MIGF_STATE_ERROR;
-+	migf->filp->f_pos = 0;
-+	mutex_unlock(&migf->lock);
-+}
-+
-+static void virtiovf_disable_fds(struct virtiovf_pci_core_device *virtvdev)
-+{
-+	if (virtvdev->resuming_migf) {
-+		virtiovf_disable_fd(virtvdev->resuming_migf);
-+		virtiovf_clean_migf_resources(virtvdev->resuming_migf);
-+		fput(virtvdev->resuming_migf->filp);
-+		virtvdev->resuming_migf = NULL;
-+	}
-+	if (virtvdev->saving_migf) {
-+		virtiovf_disable_fd(virtvdev->saving_migf);
-+		virtiovf_clean_migf_resources(virtvdev->saving_migf);
-+		fput(virtvdev->saving_migf->filp);
-+		virtvdev->saving_migf = NULL;
-+	}
-+}
-+
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ */
-+static void virtiovf_state_mutex_unlock(struct virtiovf_pci_core_device *virtvdev)
-+{
-+again:
-+	spin_lock(&virtvdev->reset_lock);
-+	if (virtvdev->deferred_reset) {
-+		virtvdev->deferred_reset = false;
-+		spin_unlock(&virtvdev->reset_lock);
-+		virtvdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		virtiovf_disable_fds(virtvdev);
-+		goto again;
-+	}
-+	mutex_unlock(&virtvdev->state_mutex);
-+	spin_unlock(&virtvdev->reset_lock);
-+}
-+
-+void virtiovf_migration_reset_done(struct pci_dev *pdev)
-+{
-+	struct virtiovf_pci_core_device *virtvdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (!virtvdev->migrate_cap)
-+		return;
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&virtvdev->reset_lock);
-+	virtvdev->deferred_reset = true;
-+	if (!mutex_trylock(&virtvdev->state_mutex)) {
-+		spin_unlock(&virtvdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&virtvdev->reset_lock);
-+	virtiovf_state_mutex_unlock(virtvdev);
-+}
-+
-+static int virtiovf_release_file(struct inode *inode, struct file *filp)
-+{
-+	struct virtiovf_migration_file *migf = filp->private_data;
-+
-+	virtiovf_disable_fd(migf);
-+	mutex_destroy(&migf->lock);
-+	kfree(migf);
-+	return 0;
-+}
-+
+ static struct page *
+ virtiovf_get_migration_page(struct virtiovf_data_buffer *buf,
+ 			    unsigned long offset)
+@@ -155,6 +159,41 @@ virtiovf_pci_free_obj_id(struct virtiovf_pci_core_device *virtvdev, u32 obj_id)
+ 			VIRTIO_RESOURCE_OBJ_DEV_PARTS, obj_id);
+ }
+ 
 +static struct virtiovf_data_buffer *
-+virtiovf_get_data_buff_from_pos(struct virtiovf_migration_file *migf,
-+				loff_t pos, bool *end_of_data)
++virtiovf_get_data_buffer(struct virtiovf_migration_file *migf, size_t length)
 +{
-+	struct virtiovf_data_buffer *buf;
-+	bool found = false;
++	struct virtiovf_data_buffer *buf, *temp_buf;
++	struct list_head free_list;
 +
-+	*end_of_data = false;
++	INIT_LIST_HEAD(&free_list);
++
 +	spin_lock_irq(&migf->list_lock);
-+	if (list_empty(&migf->buf_list)) {
-+		*end_of_data = true;
-+		goto end;
++	list_for_each_entry_safe(buf, temp_buf, &migf->avail_list, buf_elm) {
++		list_del_init(&buf->buf_elm);
++		if (buf->allocated_length >= length) {
++			spin_unlock_irq(&migf->list_lock);
++			goto found;
++		}
++		/*
++		 * Prevent holding redundant buffers. Put in a free
++		 * list and call at the end not under the spin lock
++		 * (&migf->list_lock) to minimize its scope usage.
++		 */
++		list_add(&buf->buf_elm, &free_list);
++	}
++	spin_unlock_irq(&migf->list_lock);
++	buf = virtiovf_alloc_data_buffer(migf, length);
++
++found:
++	while ((temp_buf = list_first_entry_or_null(&free_list,
++				struct virtiovf_data_buffer, buf_elm))) {
++		list_del(&temp_buf->buf_elm);
++		virtiovf_free_data_buffer(temp_buf);
 +	}
 +
-+	buf = list_first_entry(&migf->buf_list, struct virtiovf_data_buffer,
-+			       buf_elm);
-+	if (pos >= buf->start_pos &&
-+	    pos < buf->start_pos + buf->length) {
-+		found = true;
-+		goto end;
++	return buf;
++}
++
+ static void virtiovf_clean_migf_resources(struct virtiovf_migration_file *migf)
+ {
+ 	struct virtiovf_data_buffer *entry;
+@@ -341,6 +380,7 @@ static ssize_t virtiovf_save_read(struct file *filp, char __user *buf, size_t le
+ {
+ 	struct virtiovf_migration_file *migf = filp->private_data;
+ 	struct virtiovf_data_buffer *vhca_buf;
++	bool first_loop_call = true;
+ 	bool end_of_data;
+ 	ssize_t done = 0;
+ 
+@@ -358,6 +398,19 @@ static ssize_t virtiovf_save_read(struct file *filp, char __user *buf, size_t le
+ 		ssize_t count;
+ 
+ 		vhca_buf = virtiovf_get_data_buff_from_pos(migf, *pos, &end_of_data);
++		if (first_loop_call) {
++			first_loop_call = false;
++			/* Temporary end of file as part of PRE_COPY */
++			if (end_of_data && migf->state == VIRTIOVF_MIGF_STATE_PRECOPY) {
++				done = -ENOMSG;
++				goto out_unlock;
++			}
++			if (end_of_data && migf->state != VIRTIOVF_MIGF_STATE_COMPLETE) {
++				done = -EINVAL;
++				goto out_unlock;
++			}
++		}
++
+ 		if (end_of_data)
+ 			goto out_unlock;
+ 
+@@ -379,9 +432,101 @@ static ssize_t virtiovf_save_read(struct file *filp, char __user *buf, size_t le
+ 	return done;
+ }
+ 
++static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
++				   unsigned long arg)
++{
++	struct virtiovf_migration_file *migf = filp->private_data;
++	struct virtiovf_pci_core_device *virtvdev = migf->virtvdev;
++	struct vfio_precopy_info info = {};
++	loff_t *pos = &filp->f_pos;
++	bool end_of_data = false;
++	unsigned long minsz;
++	u32 ctx_size = 0;
++	int ret;
++
++	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
++		return -ENOTTY;
++
++	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
++	if (copy_from_user(&info, (void __user *)arg, minsz))
++		return -EFAULT;
++
++	if (info.argsz < minsz)
++		return -EINVAL;
++
++	mutex_lock(&virtvdev->state_mutex);
++	if (virtvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
++	    virtvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY_P2P) {
++		ret = -EINVAL;
++		goto err_state_unlock;
 +	}
 +
 +	/*
-+	 * As we use a stream based FD we may expect having the data always
-+	 * on first chunk
++	 * The virtio specification does not include a PRE_COPY concept.
++	 * Since we can expect the data to remain the same for a certain period,
++	 * we use a rate limiter mechanism before making a call to the device.
 +	 */
-+	migf->state = VIRTIOVF_MIGF_STATE_ERROR;
++	if (__ratelimit(&migf->pre_copy_rl_state)) {
 +
-+end:
-+	spin_unlock_irq(&migf->list_lock);
-+	return found ? buf : NULL;
-+}
-+
-+static ssize_t virtiovf_buf_read(struct virtiovf_data_buffer *vhca_buf,
-+				 char __user **buf, size_t *len, loff_t *pos)
-+{
-+	unsigned long offset;
-+	ssize_t done = 0;
-+	size_t copy_len;
-+
-+	copy_len = min_t(size_t,
-+			 vhca_buf->start_pos + vhca_buf->length - *pos, *len);
-+	while (copy_len) {
-+		size_t page_offset;
-+		struct page *page;
-+		size_t page_len;
-+		u8 *from_buff;
-+		int ret;
-+
-+		offset = *pos - vhca_buf->start_pos;
-+		page_offset = offset % PAGE_SIZE;
-+		offset -= page_offset;
-+		page = virtiovf_get_migration_page(vhca_buf, offset);
-+		if (!page)
-+			return -EINVAL;
-+		page_len = min_t(size_t, copy_len, PAGE_SIZE - page_offset);
-+		from_buff = kmap_local_page(page);
-+		ret = copy_to_user(*buf, from_buff + page_offset, page_len);
-+		kunmap_local(from_buff);
++		ret = virtio_pci_admin_dev_parts_metadata_get(virtvdev->core_device.pdev,
++					VIRTIO_RESOURCE_OBJ_DEV_PARTS, migf->obj_id,
++					VIRTIO_ADMIN_CMD_DEV_PARTS_METADATA_TYPE_SIZE,
++					&ctx_size);
 +		if (ret)
-+			return -EFAULT;
-+		*pos += page_len;
-+		*len -= page_len;
-+		*buf += page_len;
-+		done += page_len;
-+		copy_len -= page_len;
++			goto err_state_unlock;
 +	}
-+
-+	if (*pos >= vhca_buf->start_pos + vhca_buf->length) {
-+		spin_lock_irq(&vhca_buf->migf->list_lock);
-+		list_del_init(&vhca_buf->buf_elm);
-+		list_add_tail(&vhca_buf->buf_elm, &vhca_buf->migf->avail_list);
-+		spin_unlock_irq(&vhca_buf->migf->list_lock);
-+	}
-+
-+	return done;
-+}
-+
-+static ssize_t virtiovf_save_read(struct file *filp, char __user *buf, size_t len,
-+				  loff_t *pos)
-+{
-+	struct virtiovf_migration_file *migf = filp->private_data;
-+	struct virtiovf_data_buffer *vhca_buf;
-+	bool end_of_data;
-+	ssize_t done = 0;
-+
-+	if (pos)
-+		return -ESPIPE;
-+	pos = &filp->f_pos;
 +
 +	mutex_lock(&migf->lock);
 +	if (migf->state == VIRTIOVF_MIGF_STATE_ERROR) {
-+		done = -ENODEV;
-+		goto out_unlock;
++		ret = -ENODEV;
++		goto err_migf_unlock;
 +	}
 +
-+	while (len) {
-+		ssize_t count;
-+
-+		vhca_buf = virtiovf_get_data_buff_from_pos(migf, *pos, &end_of_data);
-+		if (end_of_data)
-+			goto out_unlock;
-+
-+		if (!vhca_buf) {
-+			done = -EINVAL;
-+			goto out_unlock;
-+		}
-+
-+		count = virtiovf_buf_read(vhca_buf, &buf, &len, pos);
-+		if (count < 0) {
-+			done = count;
-+			goto out_unlock;
-+		}
-+		done += count;
++	if (migf->pre_copy_initial_bytes > *pos) {
++		info.initial_bytes = migf->pre_copy_initial_bytes - *pos;
++	} else {
++		info.dirty_bytes = migf->max_pos - *pos;
++		if (!info.dirty_bytes)
++			end_of_data = true;
++		info.dirty_bytes += ctx_size;
 +	}
 +
-+out_unlock:
++	if (!end_of_data || !ctx_size) {
++		mutex_unlock(&migf->lock);
++		goto done;
++	}
++
 +	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations virtiovf_save_fops = {
-+	.owner = THIS_MODULE,
-+	.read = virtiovf_save_read,
-+	.release = virtiovf_release_file,
-+};
-+
-+static int
-+virtiovf_add_buf_header(struct virtiovf_data_buffer *header_buf,
-+			u32 data_size)
-+{
-+	struct virtiovf_migration_file *migf = header_buf->migf;
-+	struct virtiovf_migration_header header = {};
-+	struct page *page;
-+	u8 *to_buff;
-+
-+	header.record_size = cpu_to_le64(data_size);
-+	header.flags = cpu_to_le32(VIRTIOVF_MIGF_HEADER_FLAGS_TAG_MANDATORY);
-+	header.tag = cpu_to_le32(VIRTIOVF_MIGF_HEADER_TAG_DEVICE_DATA);
-+	page = virtiovf_get_migration_page(header_buf, 0);
-+	if (!page)
-+		return -EINVAL;
-+	to_buff = kmap_local_page(page);
-+	memcpy(to_buff, &header, sizeof(header));
-+	kunmap_local(to_buff);
-+	header_buf->length = sizeof(header);
-+	header_buf->start_pos = header_buf->migf->max_pos;
-+	migf->max_pos += header_buf->length;
-+	spin_lock_irq(&migf->list_lock);
-+	list_add_tail(&header_buf->buf_elm, &migf->buf_list);
-+	spin_unlock_irq(&migf->list_lock);
-+	return 0;
-+}
-+
-+static int
-+virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
-+				   u32 ctx_size)
-+{
-+	struct virtiovf_data_buffer *header_buf;
-+	struct virtiovf_data_buffer *buf;
-+	bool unmark_end = false;
-+	struct scatterlist *sg;
-+	unsigned int i;
-+	u32 res_size;
-+	int nent;
-+	int ret;
-+
-+	buf = virtiovf_alloc_data_buffer(migf, ctx_size);
-+	if (IS_ERR(buf))
-+		return PTR_ERR(buf);
-+
-+	/* Find the total count of SG entries which satisfies the size */
-+	nent = sg_nents_for_len(buf->table.sgt.sgl, ctx_size);
-+	if (nent <= 0) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
 +	/*
-+	 * Iterate to that SG entry and mark it as last (if it's not already)
-+	 * to let underlay layers iterate only till that entry.
++	 * We finished transferring the current state and the device has a
++	 * dirty state, read a new state.
 +	 */
-+	for_each_sg(buf->table.sgt.sgl, sg, nent - 1, i)
-+		;
-+
-+	if (!sg_is_last(sg)) {
-+		unmark_end = true;
-+		sg_mark_end(sg);
-+	}
-+
-+	ret = virtio_pci_admin_dev_parts_get(migf->virtvdev->core_device.pdev,
-+					     VIRTIO_RESOURCE_OBJ_DEV_PARTS,
-+					     migf->obj_id,
-+					     VIRTIO_ADMIN_CMD_DEV_PARTS_GET_TYPE_ALL,
-+					     buf->table.sgt.sgl, &res_size);
-+	/* Restore the original SG mark end */
-+	if (unmark_end)
-+		sg_unmark_end(sg);
++	ret = virtiovf_read_device_context_chunk(migf, ctx_size);
 +	if (ret)
-+		goto out;
++		/*
++		 * The machine is running, and context size could be grow, so no reason to mark
++		 * the device state as VIRTIOVF_MIGF_STATE_ERROR.
++		 */
++		goto err_state_unlock;
 +
-+	buf->length = res_size;
-+	header_buf = virtiovf_alloc_data_buffer(migf,
-+				sizeof(struct virtiovf_migration_header));
-+	if (IS_ERR(header_buf)) {
-+		ret = PTR_ERR(header_buf);
-+		goto out;
-+	}
-+
-+	ret = virtiovf_add_buf_header(header_buf, res_size);
-+	if (ret)
-+		goto out_header;
-+
-+	buf->start_pos = buf->migf->max_pos;
-+	migf->max_pos += buf->length;
-+	spin_lock(&migf->list_lock);
-+	list_add_tail(&buf->buf_elm, &migf->buf_list);
-+	spin_unlock_irq(&migf->list_lock);
++done:
++	virtiovf_state_mutex_unlock(virtvdev);
++	if (copy_to_user((void __user *)arg, &info, minsz))
++		return -EFAULT;
 +	return 0;
 +
-+out_header:
-+	virtiovf_put_data_buffer(header_buf);
-+out:
-+	virtiovf_put_data_buffer(buf);
++err_migf_unlock:
++	mutex_unlock(&migf->lock);
++err_state_unlock:
++	virtiovf_state_mutex_unlock(virtvdev);
 +	return ret;
 +}
 +
-+static struct virtiovf_migration_file *
-+virtiovf_pci_save_device_data(struct virtiovf_pci_core_device *virtvdev)
+ static const struct file_operations virtiovf_save_fops = {
+ 	.owner = THIS_MODULE,
+ 	.read = virtiovf_save_read,
++	.unlocked_ioctl = virtiovf_precopy_ioctl,
++	.compat_ioctl = compat_ptr_ioctl,
+ 	.release = virtiovf_release_file,
+ };
+ 
+@@ -425,7 +570,7 @@ virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
+ 	int nent;
+ 	int ret;
+ 
+-	buf = virtiovf_alloc_data_buffer(migf, ctx_size);
++	buf = virtiovf_get_data_buffer(migf, ctx_size);
+ 	if (IS_ERR(buf))
+ 		return PTR_ERR(buf);
+ 
+@@ -460,7 +605,7 @@ virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
+ 		goto out;
+ 
+ 	buf->length = res_size;
+-	header_buf = virtiovf_alloc_data_buffer(migf,
++	header_buf = virtiovf_get_data_buffer(migf,
+ 				sizeof(struct virtiovf_migration_header));
+ 	if (IS_ERR(header_buf)) {
+ 		ret = PTR_ERR(header_buf);
+@@ -485,8 +630,43 @@ virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
+ 	return ret;
+ }
+ 
++static int
++virtiovf_pci_save_device_final_data(struct virtiovf_pci_core_device *virtvdev)
 +{
-+	struct virtiovf_migration_file *migf;
++	struct virtiovf_migration_file *migf = virtvdev->saving_migf;
 +	u32 ctx_size;
-+	u32 obj_id;
 +	int ret;
 +
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
++	if (migf->state == VIRTIOVF_MIGF_STATE_ERROR)
++		return -ENODEV;
 +
-+	migf->filp = anon_inode_getfile("virtiovf_mig", &virtiovf_save_fops, migf,
-+					O_RDONLY);
-+	if (IS_ERR(migf->filp)) {
-+		ret = PTR_ERR(migf->filp);
-+		goto end;
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+	INIT_LIST_HEAD(&migf->buf_list);
-+	INIT_LIST_HEAD(&migf->avail_list);
-+	spin_lock_init(&migf->list_lock);
-+	migf->virtvdev = virtvdev;
-+
-+	lockdep_assert_held(&virtvdev->state_mutex);
-+	ret = virtiovf_pci_alloc_obj_id(virtvdev, VIRTIO_RESOURCE_OBJ_DEV_PARTS_TYPE_GET,
-+					&obj_id);
-+	if (ret)
-+		goto out;
-+
-+	migf->obj_id = obj_id;
-+	/* Mark as having a valid obj id which can be even 0 */
-+	migf->has_obj_id = true;
 +	ret = virtio_pci_admin_dev_parts_metadata_get(virtvdev->core_device.pdev,
-+				VIRTIO_RESOURCE_OBJ_DEV_PARTS, obj_id,
++				VIRTIO_RESOURCE_OBJ_DEV_PARTS, migf->obj_id,
 +				VIRTIO_ADMIN_CMD_DEV_PARTS_METADATA_TYPE_SIZE,
 +				&ctx_size);
 +	if (ret)
-+		goto out_clean;
++		goto err;
 +
 +	if (!ctx_size) {
 +		ret = -EINVAL;
-+		goto out_clean;
++		goto err;
 +	}
 +
 +	ret = virtiovf_read_device_context_chunk(migf, ctx_size);
 +	if (ret)
-+		goto out_clean;
++		goto err;
 +
-+	return migf;
-+
-+out_clean:
-+	virtiovf_clean_migf_resources(migf);
-+out:
-+	fput(migf->filp);
-+end:
-+	kfree(migf);
-+	return ERR_PTR(ret);
-+}
-+
-+/*
-+ * Set the required object header at the beginning of the buffer.
-+ * The actual device parts data will be written post of the header offset.
-+ */
-+static int virtiovf_set_obj_cmd_header(struct virtiovf_data_buffer *vhca_buf)
-+{
-+	struct virtio_admin_cmd_resource_obj_cmd_hdr obj_hdr = {};
-+	struct page *page;
-+	u8 *to_buff;
-+
-+	obj_hdr.type = cpu_to_le16(VIRTIO_RESOURCE_OBJ_DEV_PARTS);
-+	obj_hdr.id = cpu_to_le32(vhca_buf->migf->obj_id);
-+	page = virtiovf_get_migration_page(vhca_buf, 0);
-+	if (!page)
-+		return -EINVAL;
-+	to_buff = kmap_local_page(page);
-+	memcpy(to_buff, &obj_hdr, sizeof(obj_hdr));
-+	kunmap_local(to_buff);
-+
-+	/* Mark the buffer as including the header object data */
-+	vhca_buf->include_header_object = 1;
++	migf->state = VIRTIOVF_MIGF_STATE_COMPLETE;
 +	return 0;
-+}
 +
-+static int
-+virtiovf_append_page_to_mig_buf(struct virtiovf_data_buffer *vhca_buf,
-+				const char __user **buf, size_t *len,
-+				loff_t *pos, ssize_t *done)
-+{
-+	unsigned long offset;
-+	size_t page_offset;
-+	struct page *page;
-+	size_t page_len;
-+	u8 *to_buff;
-+	int ret;
-+
-+	offset = *pos - vhca_buf->start_pos;
-+
-+	if (vhca_buf->include_header_object)
-+		/* The buffer holds the object header, update the offset accordingly */
-+		offset += sizeof(struct virtio_admin_cmd_resource_obj_cmd_hdr);
-+
-+	page_offset = offset % PAGE_SIZE;
-+
-+	page = virtiovf_get_migration_page(vhca_buf, offset - page_offset);
-+	if (!page)
-+		return -EINVAL;
-+
-+	page_len = min_t(size_t, *len, PAGE_SIZE - page_offset);
-+	to_buff = kmap_local_page(page);
-+	ret = copy_from_user(to_buff + page_offset, *buf, page_len);
-+	kunmap_local(to_buff);
-+	if (ret)
-+		return -EFAULT;
-+
-+	*pos += page_len;
-+	*done += page_len;
-+	*buf += page_len;
-+	*len -= page_len;
-+	vhca_buf->length += page_len;
-+	return 0;
-+}
-+
-+static ssize_t
-+virtiovf_resume_read_chunk(struct virtiovf_migration_file *migf,
-+			   struct virtiovf_data_buffer *vhca_buf,
-+			   size_t chunk_size, const char __user **buf,
-+			   size_t *len, loff_t *pos, ssize_t *done,
-+			   bool *has_work)
-+{
-+	size_t copy_len, to_copy;
-+	int ret;
-+
-+	to_copy = min_t(size_t, *len, chunk_size - vhca_buf->length);
-+	copy_len = to_copy;
-+	while (to_copy) {
-+		ret = virtiovf_append_page_to_mig_buf(vhca_buf, buf, &to_copy,
-+						      pos, done);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	*len -= copy_len;
-+	if (vhca_buf->length == chunk_size) {
-+		migf->load_state = VIRTIOVF_LOAD_STATE_LOAD_CHUNK;
-+		migf->max_pos += chunk_size;
-+		*has_work = true;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+virtiovf_resume_read_header_data(struct virtiovf_migration_file *migf,
-+				 struct virtiovf_data_buffer *vhca_buf,
-+				 const char __user **buf, size_t *len,
-+				 loff_t *pos, ssize_t *done)
-+{
-+	size_t copy_len, to_copy;
-+	size_t required_data;
-+	int ret;
-+
-+	required_data = migf->record_size - vhca_buf->length;
-+	to_copy = min_t(size_t, *len, required_data);
-+	copy_len = to_copy;
-+	while (to_copy) {
-+		ret = virtiovf_append_page_to_mig_buf(vhca_buf, buf, &to_copy,
-+						      pos, done);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	*len -= copy_len;
-+	if (vhca_buf->length == migf->record_size) {
-+		switch (migf->record_tag) {
-+		default:
-+			/* Optional tag */
-+			break;
-+		}
-+
-+		migf->load_state = VIRTIOVF_LOAD_STATE_READ_HEADER;
-+		migf->max_pos += migf->record_size;
-+		vhca_buf->length = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+virtiovf_resume_read_header(struct virtiovf_migration_file *migf,
-+			    struct virtiovf_data_buffer *vhca_buf,
-+			    const char __user **buf,
-+			    size_t *len, loff_t *pos,
-+			    ssize_t *done, bool *has_work)
-+{
-+	struct page *page;
-+	size_t copy_len;
-+	u8 *to_buff;
-+	int ret;
-+
-+	copy_len = min_t(size_t, *len,
-+		sizeof(struct virtiovf_migration_header) - vhca_buf->length);
-+	page = virtiovf_get_migration_page(vhca_buf, 0);
-+	if (!page)
-+		return -EINVAL;
-+	to_buff = kmap_local_page(page);
-+	ret = copy_from_user(to_buff + vhca_buf->length, *buf, copy_len);
-+	if (ret) {
-+		ret = -EFAULT;
-+		goto end;
-+	}
-+
-+	*buf += copy_len;
-+	*pos += copy_len;
-+	*done += copy_len;
-+	*len -= copy_len;
-+	vhca_buf->length += copy_len;
-+	if (vhca_buf->length == sizeof(struct virtiovf_migration_header)) {
-+		u64 record_size;
-+		u32 flags;
-+
-+		record_size = le64_to_cpup((__le64 *)to_buff);
-+		if (record_size > MAX_LOAD_SIZE) {
-+			ret = -ENOMEM;
-+			goto end;
-+		}
-+
-+		migf->record_size = record_size;
-+		flags = le32_to_cpup((__le32 *)(to_buff +
-+			    offsetof(struct virtiovf_migration_header, flags)));
-+		migf->record_tag = le32_to_cpup((__le32 *)(to_buff +
-+			    offsetof(struct virtiovf_migration_header, tag)));
-+		switch (migf->record_tag) {
-+		case VIRTIOVF_MIGF_HEADER_TAG_DEVICE_DATA:
-+			migf->load_state = VIRTIOVF_LOAD_STATE_PREP_CHUNK;
-+			break;
-+		default:
-+			if (!(flags & VIRTIOVF_MIGF_HEADER_FLAGS_TAG_OPTIONAL)) {
-+				ret = -EOPNOTSUPP;
-+				goto end;
-+			}
-+			/* We may read and skip this optional record data */
-+			migf->load_state = VIRTIOVF_LOAD_STATE_PREP_HEADER_DATA;
-+		}
-+
-+		migf->max_pos += vhca_buf->length;
-+		vhca_buf->length = 0;
-+		*has_work = true;
-+	}
-+end:
-+	kunmap_local(to_buff);
++err:
++	migf->state = VIRTIOVF_MIGF_STATE_ERROR;
 +	return ret;
 +}
 +
-+static ssize_t virtiovf_resume_write(struct file *filp, const char __user *buf,
-+				     size_t len, loff_t *pos)
-+{
-+	struct virtiovf_migration_file *migf = filp->private_data;
-+	struct virtiovf_data_buffer *vhca_buf = migf->buf;
-+	struct virtiovf_data_buffer *vhca_buf_header = migf->buf_header;
-+	unsigned int orig_length;
-+	bool has_work = false;
-+	ssize_t done = 0;
-+	int ret = 0;
-+
-+	if (pos)
-+		return -ESPIPE;
-+
-+	pos = &filp->f_pos;
-+	if (*pos < vhca_buf->start_pos)
-+		return -EINVAL;
-+
-+	mutex_lock(&migf->virtvdev->state_mutex);
-+	mutex_lock(&migf->lock);
-+	if (migf->state == VIRTIOVF_MIGF_STATE_ERROR) {
-+		done = -ENODEV;
-+		goto out_unlock;
+ static struct virtiovf_migration_file *
+-virtiovf_pci_save_device_data(struct virtiovf_pci_core_device *virtvdev)
++virtiovf_pci_save_device_data(struct virtiovf_pci_core_device *virtvdev,
++			      bool pre_copy)
+ {
+ 	struct virtiovf_migration_file *migf;
+ 	u32 ctx_size;
+@@ -536,6 +716,18 @@ virtiovf_pci_save_device_data(struct virtiovf_pci_core_device *virtvdev)
+ 	if (ret)
+ 		goto out_clean;
+ 
++	if (pre_copy) {
++		migf->pre_copy_initial_bytes = migf->max_pos;
++		/* Arbitrarily set the pre-copy rate limit to 1-second intervals */
++		ratelimit_state_init(&migf->pre_copy_rl_state, 1 * HZ, 1);
++		/* Prevent any rate messages upon its usage */
++		ratelimit_set_flags(&migf->pre_copy_rl_state,
++				    RATELIMIT_MSG_ON_RELEASE);
++		migf->state = VIRTIOVF_MIGF_STATE_PRECOPY;
++	} else {
++		migf->state = VIRTIOVF_MIGF_STATE_COMPLETE;
 +	}
 +
-+	while (len || has_work) {
-+		has_work = false;
-+		switch (migf->load_state) {
-+		case VIRTIOVF_LOAD_STATE_READ_HEADER:
-+			ret = virtiovf_resume_read_header(migf, vhca_buf_header, &buf,
-+							  &len, pos, &done, &has_work);
-+			if (ret)
-+				goto out_unlock;
-+			break;
-+		case VIRTIOVF_LOAD_STATE_PREP_HEADER_DATA:
-+			if (vhca_buf_header->allocated_length < migf->record_size) {
-+				virtiovf_free_data_buffer(vhca_buf_header);
-+
-+				migf->buf_header = virtiovf_alloc_data_buffer(migf,
-+						migf->record_size);
-+				if (IS_ERR(migf->buf_header)) {
-+					ret = PTR_ERR(migf->buf_header);
-+					migf->buf_header = NULL;
-+					goto out_unlock;
-+				}
-+
-+				vhca_buf_header = migf->buf_header;
-+			}
-+
-+			vhca_buf_header->start_pos = migf->max_pos;
-+			migf->load_state = VIRTIOVF_LOAD_STATE_READ_HEADER_DATA;
-+			break;
-+		case VIRTIOVF_LOAD_STATE_READ_HEADER_DATA:
-+			ret = virtiovf_resume_read_header_data(migf, vhca_buf_header,
-+							       &buf, &len, pos, &done);
-+			if (ret)
-+				goto out_unlock;
-+			break;
-+		case VIRTIOVF_LOAD_STATE_PREP_CHUNK:
-+		{
-+			u32 cmd_size = migf->record_size +
-+				sizeof(struct virtio_admin_cmd_resource_obj_cmd_hdr);
-+
-+			/*
-+			 * The DMA map/unmap is managed in virtio layer, we just need to extend
-+			 * the SG pages to hold the extra required chunk data.
-+			 */
-+			if (vhca_buf->allocated_length < cmd_size) {
-+				ret = virtiovf_add_migration_pages(vhca_buf,
-+					DIV_ROUND_UP_ULL(cmd_size - vhca_buf->allocated_length,
-+							 PAGE_SIZE));
-+				if (ret)
-+					goto out_unlock;
-+			}
-+
-+			vhca_buf->start_pos = migf->max_pos;
-+			migf->load_state = VIRTIOVF_LOAD_STATE_READ_CHUNK;
-+			break;
-+		}
-+		case VIRTIOVF_LOAD_STATE_READ_CHUNK:
-+			ret = virtiovf_resume_read_chunk(migf, vhca_buf, migf->record_size,
-+							 &buf, &len, pos, &done, &has_work);
-+			if (ret)
-+				goto out_unlock;
-+			break;
-+		case VIRTIOVF_LOAD_STATE_LOAD_CHUNK:
-+			/* Mark the last SG entry and set its length */
-+			sg_mark_end(vhca_buf->last_offset_sg);
-+			orig_length = vhca_buf->last_offset_sg->length;
-+			/* Length should include the resource object command header */
-+			vhca_buf->last_offset_sg->length = vhca_buf->length +
-+					sizeof(struct virtio_admin_cmd_resource_obj_cmd_hdr) -
-+					vhca_buf->last_offset;
-+			ret = virtio_pci_admin_dev_parts_set(migf->virtvdev->core_device.pdev,
-+							     vhca_buf->table.sgt.sgl);
-+			/* Restore the original SG data */
-+			vhca_buf->last_offset_sg->length = orig_length;
-+			sg_unmark_end(vhca_buf->last_offset_sg);
-+			if (ret)
-+				goto out_unlock;
-+			migf->load_state = VIRTIOVF_LOAD_STATE_READ_HEADER;
-+			/* be ready for reading the next chunk */
-+			vhca_buf->length = 0;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+out_unlock:
-+	if (ret)
-+		migf->state = VIRTIOVF_MIGF_STATE_ERROR;
-+	mutex_unlock(&migf->lock);
-+	virtiovf_state_mutex_unlock(migf->virtvdev);
-+	return ret ? ret : done;
-+}
-+
-+static const struct file_operations virtiovf_resume_fops = {
-+	.owner = THIS_MODULE,
-+	.write = virtiovf_resume_write,
-+	.release = virtiovf_release_file,
-+};
-+
-+static struct virtiovf_migration_file *
-+virtiovf_pci_resume_device_data(struct virtiovf_pci_core_device *virtvdev)
-+{
-+	struct virtiovf_migration_file *migf;
-+	struct virtiovf_data_buffer *buf;
-+	u32 obj_id;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("virtiovf_mig", &virtiovf_resume_fops, migf,
-+					O_WRONLY);
-+	if (IS_ERR(migf->filp)) {
-+		ret = PTR_ERR(migf->filp);
-+		goto end;
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+	INIT_LIST_HEAD(&migf->buf_list);
-+	INIT_LIST_HEAD(&migf->avail_list);
-+	spin_lock_init(&migf->list_lock);
-+
-+	buf = virtiovf_alloc_data_buffer(migf, VIRTIOVF_TARGET_INITIAL_BUF_SIZE);
-+	if (IS_ERR(buf)) {
-+		ret = PTR_ERR(buf);
-+		goto out_free;
-+	}
-+
-+	migf->buf = buf;
-+
-+	buf = virtiovf_alloc_data_buffer(migf,
-+		sizeof(struct virtiovf_migration_header));
-+	if (IS_ERR(buf)) {
-+		ret = PTR_ERR(buf);
-+		goto out_clean;
-+	}
-+
-+	migf->buf_header = buf;
-+	migf->load_state = VIRTIOVF_LOAD_STATE_READ_HEADER;
-+
-+	migf->virtvdev = virtvdev;
-+	ret = virtiovf_pci_alloc_obj_id(virtvdev, VIRTIO_RESOURCE_OBJ_DEV_PARTS_TYPE_SET,
-+					&obj_id);
-+	if (ret)
-+		goto out_clean;
-+
-+	migf->obj_id = obj_id;
-+	/* Mark as having a valid obj id which can be even 0 */
-+	migf->has_obj_id = true;
-+	ret = virtiovf_set_obj_cmd_header(migf->buf);
-+	if (ret)
-+		goto out_clean;
-+
-+	return migf;
-+
-+out_clean:
-+	virtiovf_clean_migf_resources(migf);
-+out_free:
-+	fput(migf->filp);
-+end:
-+	kfree(migf);
-+	return ERR_PTR(ret);
-+}
-+
-+static struct file *
-+virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
-+				      u32 new)
-+{
-+	u32 cur = virtvdev->mig_state;
-+	int ret;
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_STOP) {
-+		/* NOP */
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		/* NOP */
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		ret = virtio_pci_admin_mode_set(virtvdev->core_device.pdev,
-+						BIT(VIRTIO_ADMIN_CMD_DEV_MODE_F_STOPPED));
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING) {
-+		ret = virtio_pci_admin_mode_set(virtvdev->core_device.pdev, 0);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
+ 	return migf;
+ 
+ out_clean:
+@@ -948,7 +1140,8 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
+ 		return NULL;
+ 	}
+ 
+-	if (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
++	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) ||
++	    (cur == VFIO_DEVICE_STATE_PRE_COPY && new == VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
+ 		ret = virtio_pci_admin_mode_set(virtvdev->core_device.pdev,
+ 						BIT(VIRTIO_ADMIN_CMD_DEV_MODE_F_STOPPED));
+ 		if (ret)
+@@ -956,7 +1149,8 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
+ 		return NULL;
+ 	}
+ 
+-	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING) {
++	if ((cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING) ||
++	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_PRE_COPY)) {
+ 		ret = virtio_pci_admin_mode_set(virtvdev->core_device.pdev, 0);
+ 		if (ret)
+ 			return ERR_PTR(ret);
+@@ -966,7 +1160,7 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
+ 	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
+ 		struct virtiovf_migration_file *migf;
+ 
+-		migf = virtiovf_pci_save_device_data(virtvdev);
++		migf = virtiovf_pci_save_device_data(virtvdev, false);
+ 		if (IS_ERR(migf))
+ 			return ERR_CAST(migf);
+ 		get_file(migf->filp);
+@@ -974,7 +1168,9 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
+ 		return migf->filp;
+ 	}
+ 
+-	if (cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) {
++	if ((cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) ||
++	    (cur == VFIO_DEVICE_STATE_PRE_COPY && new == VFIO_DEVICE_STATE_RUNNING) ||
++	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_RUNNING_P2P)) {
+ 		virtiovf_disable_fds(virtvdev);
+ 		return NULL;
+ 	}
+@@ -995,6 +1191,24 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
+ 		return NULL;
+ 	}
+ 
++	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_PRE_COPY) ||
++	    (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
++	     new == VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
 +		struct virtiovf_migration_file *migf;
 +
-+		migf = virtiovf_pci_save_device_data(virtvdev);
++		migf = virtiovf_pci_save_device_data(virtvdev, true);
 +		if (IS_ERR(migf))
 +			return ERR_CAST(migf);
 +		get_file(migf->filp);
@@ -1462,150 +522,24 @@ index 000000000000..3d5eaa1cbcdb
 +		return migf->filp;
 +	}
 +
-+	if (cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) {
-+		virtiovf_disable_fds(virtvdev);
-+		return NULL;
++	if (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_STOP_COPY) {
++		ret = virtiovf_pci_save_device_final_data(virtvdev);
++		return ret ? ERR_PTR(ret) : NULL;
 +	}
 +
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RESUMING) {
-+		struct virtiovf_migration_file *migf;
-+
-+		migf = virtiovf_pci_resume_device_data(virtvdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		virtvdev->resuming_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP) {
-+		virtiovf_disable_fds(virtvdev);
-+		return NULL;
-+	}
-+
-+	/*
-+	 * vfio_mig_get_next_state() does not use arcs other than the above
-+	 */
-+	WARN_ON(true);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static struct file *
-+virtiovf_pci_set_device_state(struct vfio_device *vdev,
-+			      enum vfio_device_mig_state new_state)
-+{
-+	struct virtiovf_pci_core_device *virtvdev = container_of(
-+		vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+	enum vfio_device_mig_state next_state;
-+	struct file *res = NULL;
-+	int ret;
-+
-+	mutex_lock(&virtvdev->state_mutex);
-+	while (new_state != virtvdev->mig_state) {
-+		ret = vfio_mig_get_next_state(vdev, virtvdev->mig_state,
-+					      new_state, &next_state);
-+		if (ret) {
-+			res = ERR_PTR(ret);
-+			break;
-+		}
-+		res = virtiovf_pci_step_device_state_locked(virtvdev, next_state);
-+		if (IS_ERR(res))
-+			break;
-+		virtvdev->mig_state = next_state;
-+		if (WARN_ON(res && new_state != virtvdev->mig_state)) {
-+			fput(res);
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+	}
-+	virtiovf_state_mutex_unlock(virtvdev);
-+	return res;
-+}
-+
-+static int virtiovf_pci_get_device_state(struct vfio_device *vdev,
-+				       enum vfio_device_mig_state *curr_state)
-+{
-+	struct virtiovf_pci_core_device *virtvdev = container_of(
-+		vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+
-+	mutex_lock(&virtvdev->state_mutex);
-+	*curr_state = virtvdev->mig_state;
-+	virtiovf_state_mutex_unlock(virtvdev);
-+	return 0;
-+}
-+
-+static int virtiovf_pci_get_data_size(struct vfio_device *vdev,
-+				      unsigned long *stop_copy_length)
-+{
-+	struct virtiovf_pci_core_device *virtvdev = container_of(
-+		vdev, struct virtiovf_pci_core_device, core_device.vdev);
-+	bool obj_id_exists;
-+	u32 res_size;
-+	u32 obj_id;
-+	int ret;
-+
-+	mutex_lock(&virtvdev->state_mutex);
-+	obj_id_exists = virtvdev->saving_migf && virtvdev->saving_migf->has_obj_id;
-+	if (!obj_id_exists) {
-+		ret = virtiovf_pci_alloc_obj_id(virtvdev,
-+						VIRTIO_RESOURCE_OBJ_DEV_PARTS_TYPE_GET,
-+						&obj_id);
-+		if (ret)
-+			goto end;
-+	} else {
-+		obj_id = virtvdev->saving_migf->obj_id;
-+	}
-+
-+	ret = virtio_pci_admin_dev_parts_metadata_get(virtvdev->core_device.pdev,
-+				VIRTIO_RESOURCE_OBJ_DEV_PARTS, obj_id,
-+				VIRTIO_ADMIN_CMD_DEV_PARTS_METADATA_TYPE_SIZE,
-+				&res_size);
-+	if (!ret)
-+		*stop_copy_length = res_size;
-+
-+	/*
-+	 * We can't leave this obj_id alive if didn't exist before, otherwise, it might
-+	 * stay alive, even without an active migration flow (e.g. migration was cancelled)
-+	 */
-+	if (!obj_id_exists)
-+		virtiovf_pci_free_obj_id(virtvdev, obj_id);
-+end:
-+	virtiovf_state_mutex_unlock(virtvdev);
-+	return ret;
-+}
-+
-+static const struct vfio_migration_ops virtvdev_pci_mig_ops = {
-+	.migration_set_state = virtiovf_pci_set_device_state,
-+	.migration_get_state = virtiovf_pci_get_device_state,
-+	.migration_get_data_size = virtiovf_pci_get_data_size,
-+};
-+
-+void virtiovf_set_migratable(struct virtiovf_pci_core_device *virtvdev)
-+{
-+	virtvdev->migrate_cap = 1;
-+	mutex_init(&virtvdev->state_mutex);
-+	spin_lock_init(&virtvdev->reset_lock);
-+	virtvdev->core_device.vdev.migration_flags =
-+		VFIO_MIGRATION_STOP_COPY |
-+		VFIO_MIGRATION_P2P;
-+	virtvdev->core_device.vdev.mig_ops = &virtvdev_pci_mig_ops;
-+}
-+
-+void virtiovf_open_migration(struct virtiovf_pci_core_device *virtvdev)
-+{
-+	if (!virtvdev->migrate_cap)
-+		return;
-+
-+	virtvdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+}
-+
-+void virtiovf_close_migration(struct virtiovf_pci_core_device *virtvdev)
-+{
-+	if (!virtvdev->migrate_cap)
-+		return;
-+
-+	virtiovf_disable_fds(virtvdev);
-+}
+ 	/*
+ 	 * vfio_mig_get_next_state() does not use arcs other than the above
+ 	 */
+@@ -1099,7 +1313,8 @@ void virtiovf_set_migratable(struct virtiovf_pci_core_device *virtvdev)
+ 	spin_lock_init(&virtvdev->reset_lock);
+ 	virtvdev->core_device.vdev.migration_flags =
+ 		VFIO_MIGRATION_STOP_COPY |
+-		VFIO_MIGRATION_P2P;
++		VFIO_MIGRATION_P2P |
++		VFIO_MIGRATION_PRE_COPY;
+ 	virtvdev->core_device.vdev.mig_ops = &virtvdev_pci_mig_ops;
+ }
+ 
 -- 
 2.27.0
 
