@@ -1,97 +1,159 @@
-Return-Path: <kvm+bounces-31648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31649-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFEEC9C5FFA
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 19:12:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C2509C6025
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 19:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A35DA28469B
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 18:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04CF61F21F5A
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 18:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C7A216E07;
-	Tue, 12 Nov 2024 18:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D62215C68;
+	Tue, 12 Nov 2024 18:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="AP13VNhF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AItSE5nR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BFC216449;
-	Tue, 12 Nov 2024 18:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378591FC7F8
+	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 18:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731435058; cv=none; b=YG1P+5znpwLasTaymlIUL21/e2uIS2B+UMnYfEJdg3NxnxPPc/7BLR6BiEQpREj+qNc4XVvmg1dlA1FeUMSMoFk0ZbsFVc4wSfzo993HOkq376jKNKrqNZaN2jCq+OneVEFVKO1Vx8iVQIFIpvlj5y02FvlJqBuLFwQCgQT+sUc=
+	t=1731435429; cv=none; b=ecRqf/8iZvr5S8stfPf7CIO/n/IIbUBO95Wdj+4T8HBBvPr+U9JpyYeUhmVzwJdHejilIcrGlgYkHpZHIb1+m95qI1mDuQqD0MxaiWJUB157RHDqZrh2gIo9RE8IZ+20KBKEYigbPeWXkQOg3tRxGXlkN6NAQiEmW/dvsAiNLgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731435058; c=relaxed/simple;
-	bh=LEQ3H94W9G+4p1zBDNvVrlmIym5MwkCk8vk1Mz9frXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fP+uuqBUYNvHGBSDFZU5EB5yJHXSjEJOTRreH1V+s04chEHojV1uhMHqTseRmiXI6AXSwHkdB+XmRZ5lMO0iO85BlEXi6JQUdETCNFEFLHNjlQgU7l+JKTXOSQcAkhwsyRbr3E4oMGjGAWCJjJLvIa34PRHGa9HOfdW7ZERHoMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=AP13VNhF; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [172.27.3.244] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 4ACIAE083429129
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 12 Nov 2024 10:10:14 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 4ACIAE083429129
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024101701; t=1731435015;
-	bh=6Kx7RtEhxS9ERAWk+qY7jBAYM7lxFcKMRDRKdoGvtOc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AP13VNhFxKlW2B9mIEBBxfwn4PhNlLH+AqHj29XlAWqwf/a37gjL1uL9DkZHwdkqZ
-	 lBvEdDhGfXoJgNofNIf7KT2Q1YPqMjto5ISr2VFVvt8+ia3eUY+VE8WS0RHe2Ej0OC
-	 P6nV81LRCQ5OJ7CSyxwIJGQM/5fyZXB9WNx3CbBRPjPgoTeb1rLovKWzt7mt1yhzHi
-	 Wa2gjYRNbTfL/Sv9nMcpmvm58+FG72Iv1DpkOyWVd5F++r5206Fuausdkkjb8NN0hL
-	 rpnNl0Yn/UICTfZFhxK9ybCUVjuHoTCElUlWVbga4QGHPzy66gKSZOBpuI4PCYYZEy
-	 LdiZ5prEbc4cQ==
-Message-ID: <8c70586e-2513-42d4-b2cd-476caa416c16@zytor.com>
-Date: Tue, 12 Nov 2024 10:10:14 -0800
+	s=arc-20240116; t=1731435429; c=relaxed/simple;
+	bh=xK5HOA2LNsN0wxu7/nfc+HoQUfhGTyz3JySS+gepupQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NtMFk2fkxKXAHLBNT/xBNYIm5QQjLUKlwX4hqwyGUIkRmH1zS70xxSKVseth4fkfU2UV2NZf7r7G3qgiqAS/IdIymrpwEsIrZJwnaqdfkzx56qLcQBATP5XgaTlDqMCTvk+Y8cQMzxrvgPakz+qLvmdPkunnDjp93Co4qJ0RQA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AItSE5nR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731435427;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UN31SK4HZ8LG9aqwjD3UUbiCVM5Zzt1ZT9FMaSigEAM=;
+	b=AItSE5nRhbK10M+LSuJy6PJawDwPENmM51JtXeFqjnq6cmKnxLH5AwBcEIzOgWzUeb5UaJ
+	nPMgEClaklw1aW+ibKSZZ9o44kpYfGAsHRV8EMt5Eje5Td7C4my+Xh8DaB61C5V50YEfwh
+	d7hbBo1E2zIBMS8M0mhILmEW4ueLd3c=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-467-j7arXNJbMReA734ZpwpGlQ-1; Tue,
+ 12 Nov 2024 13:17:03 -0500
+X-MC-Unique: j7arXNJbMReA734ZpwpGlQ-1
+X-Mimecast-MFC-AGG-ID: j7arXNJbMReA734ZpwpGlQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A86891955BD2;
+	Tue, 12 Nov 2024 18:17:02 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1705430000DF;
+	Tue, 12 Nov 2024 18:17:01 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.12-rc8 or final
+Date: Tue, 12 Nov 2024 13:17:00 -0500
+Message-ID: <20241112181700.384873-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86: kvm: add back X86_LOCAL_APIC dependency
-To: Sean Christopherson <seanjc@google.com>, Arnd Bergmann <arnd@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, kernel test robot <lkp@intel.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20241112065415.3974321-1-arnd@kernel.org>
- <ZzOY-AlBgouiIbDB@google.com>
-Content-Language: en-US
-From: "H. Peter Anvin" <hpa@zytor.com>
-In-Reply-To: <ZzOY-AlBgouiIbDB@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 11/12/24 10:05, Sean Christopherson wrote:
->>
->> Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
->> Reported-by: kernel test robot <lkp@intel.com>
->> Closes: https://lore.kernel.org/oe-kbuild-all/202410060426.e9Xsnkvi-lkp@intel.com/
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->> Question: is there actually any point in keeping KVM support for 32-bit host
->> processors?
-> 
-> Nope.  We need _a_ 32-bit KVM build to run as a nested (L1) hypervisor for testing
-> purposes, but AFAIK there's zero need to keep 32-bit KVM up-to-date.
-> 
+Linus,
 
-What do you mean here? Running an old kernel with the 32-bit KVM in a VM 
-for testing the L0 hypervisor?
+The following changes since commit 59b723cd2adbac2a34fc8e12c74ae26ae45bf230:
 
-	-hpa
+  Linux 6.12-rc6 (2024-11-03 14:05:52 -1000)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to aa0d42cacf093a6fcca872edc954f6f812926a17:
+
+  KVM: VMX: Bury Intel PT virtualization (guest/host mode) behind CONFIG_BROKEN (2024-11-08 05:57:13 -0500)
+
+----------------------------------------------------------------
+KVM x86 and selftests fixes for 6.12:
+
+x86:
+
+- When emulating a guest TLB flush for a nested guest, flush vpid01, not
+  vpid02, if L2 is active but VPID is disabled in vmcs12, i.e. if L2 and
+  L1 are sharing VPID '0' (from L1's perspective).
+
+- Fix a bug in the SNP initialization flow where KVM would return '0' to
+  userspace instead of -errno on failure.
+
+- Move the Intel PT virtualization (i.e. outputting host trace to host
+  buffer and guest trace to guest buffer) behind CONFIG_BROKEN.
+
+- Fix memory leak on failure of KVM_SEV_SNP_LAUNCH_START
+
+- Fix a bug where KVM fails to inject an interrupt from the IRR after
+  KVM_SET_LAPIC.
+
+Selftests:
+
+- Increase the timeout for the memslot performance selftest to avoid false
+  failures on arm64 and nested x86 platforms.
+
+- Fix a goof in the guest_memfd selftest where a for-loop initialized a
+  bit mask to zero instead of BIT(0).
+
+- Disable strict aliasing when building KVM selftests to prevent the
+  compiler from treating things like "u64 *" to "uint64_t *" cases as
+  undefined behavior, which can lead to nasty, hard to debug failures.
+
+- Force -march=x86-64-v2 for KVM x86 selftests if and only if the uarch
+  is supported by the compiler.
+
+- Fix broken compilation of kvm selftests after a header sync in tools/
+
+----------------------------------------------------------------
+Dionna Glaze (1):
+      kvm: svm: Fix gctx page leak on invalid inputs
+
+John Sperbeck (1):
+      KVM: selftests: use X86_MEMTYPE_WB instead of VMX_BASIC_MEM_TYPE_WB
+
+Maxim Levitsky (1):
+      KVM: selftests: memslot_perf_test: increase guest sync timeout
+
+Paolo Bonzini (1):
+      Merge tag 'kvm-x86-fixes-6.12-rcN' of https://github.com/kvm-x86/linux into HEAD
+
+Patrick Roy (1):
+      KVM: selftests: fix unintentional noop test in guest_memfd_test.c
+
+Sean Christopherson (6):
+      KVM: selftests: Disable strict aliasing
+      KVM: selftests: Don't force -march=x86-64-v2 if it's unsupported
+      KVM: nVMX: Treat vpid01 as current if L2 is active, but with VPID disabled
+      KVM: SVM: Propagate error from snp_guest_req_init() to userspace
+      KVM: x86: Unconditionally set irr_pending when updating APICv state
+      KVM: VMX: Bury Intel PT virtualization (guest/host mode) behind CONFIG_BROKEN
+
+ arch/x86/kvm/lapic.c                            | 29 +++++++++++++++---------
+ arch/x86/kvm/svm/sev.c                          | 15 ++++++++-----
+ arch/x86/kvm/vmx/nested.c                       | 30 ++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c                          |  6 +++--
+ tools/testing/selftests/kvm/Makefile            | 10 +++++----
+ tools/testing/selftests/kvm/guest_memfd_test.c  |  2 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c    |  2 +-
+ tools/testing/selftests/kvm/memslot_perf_test.c |  2 +-
+ 8 files changed, 65 insertions(+), 31 deletions(-)
 
 
