@@ -1,412 +1,240 @@
-Return-Path: <kvm+bounces-31544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D219C4AAD
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 01:26:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 973C59C4B18
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 01:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49706B34F19
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 00:04:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA8C5B2ED96
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 00:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D298F4C98;
-	Tue, 12 Nov 2024 00:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BF61F8198;
+	Tue, 12 Nov 2024 00:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XIVDq/KO"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="mU/W2cMy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0D23FC2
-	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 00:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324261F80CC
+	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 00:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731369798; cv=none; b=q6C2MXA5PuWH3oyHPN5XcAhfRbOAhfMaK42T2Ci87HktEowGeIAxscCvWwugm2LeqxWvHj7U8+Z/6SbGikTKD+fqAk2kRbBW3mi+3jrTw6nbqrVcuEsWwzdko7KeqN5LzPQtGR58/IRGUpaPEKeQzNs94F0T7Zff4p1ks9hYRJA=
+	t=1731371374; cv=none; b=unmRalZcObDZYr69rU6a2Clr/L3XhtMeaXeJl6rWBVVprhHxmEIgztNmxSFo3HbuFUlEAE0I9TrsOoojxDIl2euZtSwz5aXVz3fG+AYV54pNutmlrfwE1b9MddV6JxtPS0qLQk0sVtRmvuVJgCvtvDfraiRLz7qsfrrN8sle3oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731369798; c=relaxed/simple;
-	bh=LnXyPKY2IyZxYBCdDm3Lz+iKuwOmQlzw6lO505QTA64=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tEmzFQ9i/xFo3/UsF8F1IfWeL5Krn7ZbDUY4ZzHzFO/LELkEBICHujdyqrIdJNqE+oyNZWKETEAoRVJOzAEKFZzhD9lFCPjaoHX9bNX9r42RnhD3Zf4Md2h/OMFSeNLoInUN6H0ZAaJ7Ld09CdbCtk2EGw6Ueel9HfE/MaEL0yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XIVDq/KO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731369793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P3pBdOWCPRmncVQk4ueck/gairwtTj/00dz1e3lH3oI=;
-	b=XIVDq/KOPc/pOJ5y1uv5XN9Bfu+vgiLgrzW7myigPDzCH+FfT3xoy7PxWaYcnUq3bSXMU/
-	T8sI4aL/pwoTGenxw7EDMhsfuxidSt7r8kQD1+kcrlJX0K304WWjUGTIT6r755gwDhR+MY
-	/74gEWZpCKFjtyRMxs/O4eCWEFG4fWk=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-412-p7ghzvsXM4SPk9J9wcNBCg-1; Mon, 11 Nov 2024 19:03:11 -0500
-X-MC-Unique: p7ghzvsXM4SPk9J9wcNBCg-1
-X-Mimecast-MFC-AGG-ID: p7ghzvsXM4SPk9J9wcNBCg
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83ac0a1c419so28439439f.2
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 16:03:11 -0800 (PST)
+	s=arc-20240116; t=1731371374; c=relaxed/simple;
+	bh=y+sIlGlK1ot+NL5bRt+3ik7yX/0qUa+/oiTZJS1j8sk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fk0hmqDGiGW/v1MmcN2Bt5Kzq3U5Ti+t2M+JZQ1DNkIVsz9RDYHbUoCsIiFuSB4XXpmSFzmvyfPChfLfz/KtapRGqN3tWxhyNExR4/3mdPvVpw3jJJThif9b4uHE8Woc9RT72AOYQA8Jkvzrd9Ovh9qua7cOj/DTxyMvU09Z8rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=mU/W2cMy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso6251839a12.0
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2024 16:29:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1731371370; x=1731976170; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1qlKXme+AbrFb5QeQvTrDduzfdq4287bHR+Jn2oguKE=;
+        b=mU/W2cMyL5HV9yn4TiunlrZtxy+/G0LX4Q8SOlIS3C9VqoQtU4hEtmUiaSwkWGmkjT
+         ZjYHXEXRmTl1P3YJK8T9SFmXe05zfPGfoU91ihuf62o5ZTIdLPLQKYvF2lQ3l4pq5W0P
+         dZi4UjZpNdgIjyLCaS2gVvgzxUUOsrt98Lh3M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731369791; x=1731974591;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P3pBdOWCPRmncVQk4ueck/gairwtTj/00dz1e3lH3oI=;
-        b=eHCOI70a6O0LQlpm5fkWVUM83EdpbEwKVPMNTMvLOmn/Wa5ACQYeoeG8QZB1jh5uHb
-         7ydTTTStW0ydilz+xVwG1T5XR8owIXBbYP3Vy9xgNZimMu5itoEtKJ3AOW2/sqQmFLle
-         jAjc4UlaOWJPVDNfhfxpxpHSZFsArzxqwA3HgC1pLgHxgjjwDfx3pbPZRThwUl6ISgqS
-         7wWgHWJWe1knORLwqcUX+f3a4ZMw3oHkZr7zwo9t9Sk9zUefv9xBpXtWssXQuCP5K4q6
-         G45csVbAE4q1Ajhuo/8n+KGf8blAMKqXyqPfXqgcv0mNWoG9UU6GvQf9nOVKcRflPFXz
-         c/iA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgOuKK4YeEpbnLvWPnnofhvy1mbXr4p1XA4S4dWEyi0hLQadeDOU4VAlOg87lJkS7euRw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWPSdV6T4ugJV63Vjo+2tr/r7OQCYFq/D+E0NkIVy/9vjg+61P
-	I8TOam7zAiesqBTyJRyV+7dK0Ij5EIJ16fXM4W2xvND2b2mnAQ7+HFN5JeZ4lpT58TSB269M3M3
-	Vz2S8wnv7G0Yen3iFqeexT6IDenJteStN1Gf1VK4EnDjCN4J9Gg==
-X-Received: by 2002:a05:6e02:1fc9:b0:3a0:9c8e:9647 with SMTP id e9e14a558f8ab-3a6f198ae93mr44116285ab.1.1731369790786;
-        Mon, 11 Nov 2024 16:03:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFSfv9JNmgETpx4sRcFf2+uMjT/XRUSwgIK+TUgZlYDRMx0/JaQ+HFFjfQsVdnrQsm/GKYoxg==
-X-Received: by 2002:a05:6e02:1fc9:b0:3a0:9c8e:9647 with SMTP id e9e14a558f8ab-3a6f198ae93mr44116095ab.1.1731369790191;
-        Mon, 11 Nov 2024 16:03:10 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a6f98437b9sm17573635ab.38.2024.11.11.16.03.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 16:03:09 -0800 (PST)
-Date: Mon, 11 Nov 2024 17:03:08 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: jgg@nvidia.com, kevin.tian@intel.com, baolu.lu@linux.intel.com,
- joro@8bytes.org, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com, will@kernel.org
-Subject: Re: [PATCH v5 4/5] vfio: Add vfio_copy_user_data()
-Message-ID: <20241111170308.0a14160f.alex.williamson@redhat.com>
-In-Reply-To: <20241108121742.18889-5-yi.l.liu@intel.com>
-References: <20241108121742.18889-1-yi.l.liu@intel.com>
-	<20241108121742.18889-5-yi.l.liu@intel.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1731371370; x=1731976170;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1qlKXme+AbrFb5QeQvTrDduzfdq4287bHR+Jn2oguKE=;
+        b=evse/eKLjMB08M22OJmmiTCbhNwiiQuBJ1Ss2tBVJ90VrABg0HieLVO8fpd3z1pP6x
+         fBmR/FJV3UoqA2JVvOcXlnc3z/7PMYtrLBpFHwkM9njA2IUXlZ4Lf4FjBBMo1+KV3yXE
+         mSa/bDznx31kypxalP9SRgG74MG/dNC30LrYtq58LpqSZPulJ9hJnj7Wmgzye7F5jQyD
+         z9OmdccZm4gXxzr6W1GzpLwE8rZ49v8YqXi7SCYdWzsY9JXlicAJG8OAgSECYT/FwiTZ
+         0rAjzDyxUg7gbDcKfiYcvgBH9hcZmrjBZXz9DlBXChfiw6nYo9yYqOYtjhJAh61N/bFj
+         nUcA==
+X-Forwarded-Encrypted: i=1; AJvYcCUThSPSNVBXnOx/EqdB3dppfpUHAXItevnULYx/Ds4SuP9v+WpyrgcdmA7mYlfn1x92zzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/f95AXnbl05iYI+5mFIsvz7HPR4CRcFNvuZnD+YXBuUTovbzJ
+	xoAhJx9YMFOUIH/295BQQgbBlHBtl6IVPMbeZhpPkKascdxw/3U67mXl1KRLTOk=
+X-Google-Smtp-Source: AGHT+IFb5jx4LoluBnkScmR+/SpzJlq7p0iJwO44PQYlIFWaCoWA8xIBUCZWk2JqmroLeW5QnN6rdQ==
+X-Received: by 2002:a05:6402:5213:b0:5ce:fc3c:3c3 with SMTP id 4fb4d7f45d1cf-5cf0a45c690mr13056306a12.28.1731371370424;
+        Mon, 11 Nov 2024 16:29:30 -0800 (PST)
+Received: from [192.168.1.10] (host-92-26-98-202.as13285.net. [92.26.98.202])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03bb5ed3sm5428338a12.38.2024.11.11.16.29.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2024 16:29:29 -0800 (PST)
+Message-ID: <564a19e6-963d-4cd5-9144-2323bdb4f4e8@citrix.com>
+Date: Tue, 12 Nov 2024 00:29:28 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for
+ AMD
+To: Josh Poimboeuf <jpoimboe@kernel.org>, Amit Shah <amit@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+ linux-doc@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com,
+ bp@alien8.de, tglx@linutronix.de, peterz@infradead.org,
+ pawan.kumar.gupta@linux.intel.com, corbet@lwn.net, mingo@redhat.com,
+ dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+ pbonzini@redhat.com, daniel.sneddon@linux.intel.com, kai.huang@intel.com,
+ sandipan.das@amd.com, boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
+ david.kaplan@amd.com, dwmw@amazon.co.uk
+References: <20241111163913.36139-1-amit@kernel.org>
+ <20241111163913.36139-2-amit@kernel.org>
+ <20241111193304.fjysuttl6lypb6ng@jpoimboe>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <20241111193304.fjysuttl6lypb6ng@jpoimboe>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri,  8 Nov 2024 04:17:41 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
-
-> This generalizes the logic of copying user data when the user struct
-> Have new fields introduced. The helpers can be used by the vfio uapis
-> that have the argsz and flags fields in the beginning 8 bytes.
-> 
-> As an example, the vfio_device_{at|de}tach_iommufd_pt paths are updated
-> to use the helpers.
-> 
-> The flags may be defined to mark a new field in the structure, reuse
-> reserved fields, or special handling of an existing field. The extended
-> size would differ for different flags. Each user API that wants to use
-> the generalized helpers should define an array to store the corresponding
-> extended sizes for each defined flag.
-> 
-> For example, we start out with the below, minsz is 12.
-> 
->   struct vfio_foo_struct {
->   	__u32   argsz;
->   	__u32   flags;
->   	__u32   pt_id;
->   };
-> 
-> And then here it becomes:
-> 
->   struct vfio_foo_struct {
->   	__u32   argsz;
->   	__u32   flags;
->   #define VFIO_FOO_STRUCT_PASID   (1 << 0)
->   	__u32   pt_id;
->   	__u32   pasid;
->   };
-> 
-> The array is { 16 }.
-> 
-> If the next flag is simply related to the processing of @pt_id and
-> doesn't require @pasid, then the extended size of the new flag is
-> 12. The array become { 16, 12 }
-> 
->   struct vfio_foo_struct {
->   	__u32   argsz;
->   	__u32   flags;
->   #define VFIO_FOO_STRUCT_PASID   (1 << 0)
->   #define VFIO_FOO_STRUCT_SPECICAL_PTID   (1 << 1)
->   	__u32   pt_id;
->   	__u32   pasid;
->   };
-> 
-> Similarly, rather than adding new field, we might have reused a previously
-> reserved field, for instance what if we already expanded the structure
-> as the below, array is already { 24 }.
-> 
->   struct vfio_foo_struct {
->   	__u32   argsz;
->   	__u32   flags;
->   #define VFIO_FOO_STRUCT_XXX     (1 << 0)
->   	__u32   pt_id;
->   	__u32   reserved;
->   	__u64   xxx;
->   };
-> 
-> If we then want to add @pasid, we might really prefer to take advantage
-> of that reserved field and the array becomes { 24, 16 }.
-> 
->   struct vfio_foo_struct {
->   	__u32   argsz;
->   	__u32   flags;
->   #define VFIO_FOO_STRUCT_XXX     (1 << 0)
->   #define VFIO_FOO_STRUCT_PASID   (1 << 1)
->   	__u32   pt_id;
->   	__u32   reserved;
-
-I think this was supposed to be s/reserved/pasid/
-
->   	__u64   xxx;
->   };
-> 
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/device_cdev.c | 81 +++++++++++++-------------------------
->  drivers/vfio/vfio.h        | 18 +++++++++
->  drivers/vfio/vfio_main.c   | 55 ++++++++++++++++++++++++++
->  3 files changed, 100 insertions(+), 54 deletions(-)
+On 11/11/2024 7:33 pm, Josh Poimboeuf wrote:
+> On Mon, Nov 11, 2024 at 05:39:11PM +0100, Amit Shah wrote:
+>> From: Amit Shah <amit.shah@amd.com>
+>>
+>> AMD CPUs do not fall back to the BTB when the RSB underflows for RET
+>> address speculation.  AMD CPUs have not needed to stuff the RSB for
+>> underflow conditions.
+>>
+>> The RSB poisoning case is addressed by RSB filling - clean up the FIXME
+>> comment about it.
+> I'm thinking the comments need more clarification in light of BTC and
+> SRSO.
 >
-> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-> index 4519f482e212..35c7664b9a97 100644
-> --- a/drivers/vfio/device_cdev.c
-> +++ b/drivers/vfio/device_cdev.c
-> @@ -159,40 +159,33 @@ void vfio_df_unbind_iommufd(struct vfio_device_file *df)
->  	vfio_device_unblock_group(device);
->  }
->  
-> +#define VFIO_ATTACH_FLAGS_MASK VFIO_DEVICE_ATTACH_PASID
-> +static unsigned long
-> +vfio_attach_xends[ilog2(VFIO_ATTACH_FLAGS_MASK) + 1] = {
-> +	XEND_SIZE(VFIO_DEVICE_ATTACH_PASID,
-> +		  struct vfio_device_attach_iommufd_pt, pasid),
-> +};
-> +
-> +#define VFIO_DETACH_FLAGS_MASK VFIO_DEVICE_DETACH_PASID
-> +static unsigned long
-> +vfio_detach_xends[ilog2(VFIO_DETACH_FLAGS_MASK) + 1] = {
-> +	XEND_SIZE(VFIO_DEVICE_DETACH_PASID,
-> +		  struct vfio_device_detach_iommufd_pt, pasid),
-> +};
-> +
->  int vfio_df_ioctl_attach_pt(struct vfio_device_file *df,
->  			    struct vfio_device_attach_iommufd_pt __user *arg)
->  {
->  	struct vfio_device_attach_iommufd_pt attach;
->  	struct vfio_device *device = df->device;
-> -	unsigned long minsz, xend = 0;
->  	int ret;
->  
-> -	minsz = offsetofend(struct vfio_device_attach_iommufd_pt, pt_id);
-> -
-> -	if (copy_from_user(&attach, arg, minsz))
-> -		return -EFAULT;
-> -
-> -	if (attach.argsz < minsz)
-> -		return -EINVAL;
-> -
-> -	if (attach.flags & (~VFIO_DEVICE_ATTACH_PASID))
-> -		return -EINVAL;
-> -
-> -	if (attach.flags & VFIO_DEVICE_ATTACH_PASID)
-> -		xend = offsetofend(struct vfio_device_attach_iommufd_pt, pasid);
-> -
-> -	/*
-> -	 * xend may be equal to minsz if a flag is defined for reusing a
-> -	 * reserved field or a special usage of an existing field.
-> -	 */
-> -	if (xend > minsz) {
-> -		if (attach.argsz < xend)
-> -			return -EINVAL;
-> -
-> -		if (copy_from_user((void *)&attach + minsz,
-> -				   (void __user *)arg + minsz, xend - minsz))
-> -			return -EFAULT;
-> -	}
-> +	ret = vfio_copy_user_data((void __user *)arg, &attach,
-> +				  struct vfio_device_attach_iommufd_pt,
-> +				  pt_id, VFIO_ATTACH_FLAGS_MASK,
-> +				  vfio_attach_xends);
-> +	if (ret)
-> +		return ret;
->  
->  	if ((attach.flags & VFIO_DEVICE_ATTACH_PASID) &&
->  	    !device->ops->pasid_attach_ioas)
-> @@ -227,34 +220,14 @@ int vfio_df_ioctl_detach_pt(struct vfio_device_file *df,
->  {
->  	struct vfio_device_detach_iommufd_pt detach;
->  	struct vfio_device *device = df->device;
-> -	unsigned long minsz, xend = 0;
-> -
-> -	minsz = offsetofend(struct vfio_device_detach_iommufd_pt, flags);
-> -
-> -	if (copy_from_user(&detach, arg, minsz))
-> -		return -EFAULT;
-> -
-> -	if (detach.argsz < minsz)
-> -		return -EINVAL;
-> -
-> -	if (detach.flags & (~VFIO_DEVICE_DETACH_PASID))
-> -		return -EINVAL;
-> -
-> -	if (detach.flags & VFIO_DEVICE_DETACH_PASID)
-> -		xend = offsetofend(struct vfio_device_detach_iommufd_pt, pasid);
-> -
-> -	/*
-> -	 * xend may be equal to minsz if a flag is defined for reusing a
-> -	 * reserved field or a special usage of an existing field.
-> -	 */
-> -	if (xend > minsz) {
-> -		if (detach.argsz < xend)
-> -			return -EINVAL;
-> +	int ret;
->  
-> -		if (copy_from_user((void *)&detach + minsz,
-> -				   (void __user *)arg + minsz, xend - minsz))
-> -			return -EFAULT;
-> -	}
-> +	ret = vfio_copy_user_data((void __user *)arg, &detach,
-> +				  struct vfio_device_detach_iommufd_pt,
-> +				  flags, VFIO_DETACH_FLAGS_MASK,
-> +				  vfio_detach_xends);
-> +	if (ret)
-> +		return ret;
->  
->  	if ((detach.flags & VFIO_DEVICE_DETACH_PASID) &&
->  	    !device->ops->pasid_detach_ioas)
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 50128da18bca..87bed550c46e 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -34,6 +34,24 @@ void vfio_df_close(struct vfio_device_file *df);
->  struct vfio_device_file *
->  vfio_allocate_device_file(struct vfio_device *device);
->  
-> +int vfio_copy_from_user(void *buffer, void __user *arg,
-> +			unsigned long minsz, u32 flags_mask,
-> +			unsigned long *xend_array);
-> +
-> +#define vfio_copy_user_data(_arg, _local_buffer, _struct, _min_last,          \
-> +			    _flags_mask, _xend_array)                         \
-> +	vfio_copy_from_user(_local_buffer, _arg,                              \
-> +			    offsetofend(_struct, _min_last) +                \
-> +			    BUILD_BUG_ON_ZERO(offsetof(_struct, argsz) !=     \
-> +					      0) +                            \
-> +			    BUILD_BUG_ON_ZERO(offsetof(_struct, flags) !=     \
-> +					      sizeof(u32)),                   \
-> +			    _flags_mask, _xend_array)
-> +
-> +#define XEND_SIZE(_flag, _struct, _xlast)                                    \
-> +	[ilog2(_flag)] = offsetofend(_struct, _xlast) +                      \
-> +			 BUILD_BUG_ON_ZERO(_flag == 0)                       \
-> +
->  extern const struct file_operations vfio_device_fops;
->  
->  #ifdef CONFIG_VFIO_NOIOMMU
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index a5a62d9d963f..c61336ea5123 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1694,6 +1694,61 @@ int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova, void *data,
->  }
->  EXPORT_SYMBOL(vfio_dma_rw);
->  
-> +/**
-> + * vfio_copy_from_user - Copy the user struct that may have extended fields
-> + *
-> + * @buffer: The local buffer to store the data copied from user
-> + * @arg: The user buffer pointer
-> + * @minsz: The minimum size of the user struct
-> + * @flags_mask: The combination of all the falgs defined
-> + * @xend_array: The array that stores the xend size for set flags.
-> + *
-> + * This helper requires the user struct put the argsz and flags fields in
-> + * the first 8 bytes.
-> + *
-> + * Return 0 for success, otherwise -errno
-> + */
-> +int vfio_copy_from_user(void *buffer, void __user *arg,
+> This:
+>
+>> -	 *    AMD has it even worse: *all* returns are speculated from the BTB,
+>> -	 *    regardless of the state of the RSB.
+> is still true (mostly: "all" should be "some"), though it doesn't belong
+> in the "RSB underflow" section.
+>
+> Also the RSB stuffing not only mitigates RET, it mitigates any other
+> instruction which happen to be predicted as a RET.  Which is presumably
+> why it's still needed even when SRSO is enabled.
+>
+> Something like below?
+>
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 47a01d4028f6..e95d3aa14259 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -1828,9 +1828,6 @@ static void __init spectre_v2_select_mitigation(void)
+>  	 *    speculated return targets may come from the branch predictor,
+>  	 *    which could have a user-poisoned BTB or BHB entry.
+>  	 *
+> -	 *    AMD has it even worse: *all* returns are speculated from the BTB,
+> -	 *    regardless of the state of the RSB.
+> -	 *
+>  	 *    When IBRS or eIBRS is enabled, the "user -> kernel" attack
+>  	 *    scenario is mitigated by the IBRS branch prediction isolation
+>  	 *    properties, so the RSB buffer filling wouldn't be necessary to
+> @@ -1850,10 +1847,22 @@ static void __init spectre_v2_select_mitigation(void)
+>  	 *    The "user -> user" scenario, also known as SpectreBHB, requires
+>  	 *    RSB clearing.
+>  	 *
+> +	 *    AMD Branch Type Confusion (aka "AMD retbleed") adds some
+> +	 *    additional wrinkles:
+> +	 *
+> +	 *      - A RET can be mispredicted as a direct or indirect branch,
+> +	 *        causing the CPU to speculatively branch to a BTB target, in
+> +	 *        which case the RSB filling obviously doesn't help.  That case
+> +	 *        is mitigated by removing all the RETs (SRSO mitigation).
+> +	 *
+> +	 *      - The RSB is not only used for architectural RET instructions,
+> +	 *        it may also be used for other instructions which happen to
+> +	 *        get mispredicted as RETs.  Therefore RSB filling is still
+> +	 *        needed even when the RETs have all been removed by the SRSO
+> +	 *        mitigation.
 
-This should probably be prefixed with an underscore and note that
-callers should use the wrapper function to impose the parameter
-checking.
+This is my take.  On AMD CPUs, there are two unrelated issues to take
+into account:
 
-> +			unsigned long minsz, u32 flags_mask,
-> +			unsigned long *xend_array)
-> +{
-> +	unsigned long xend = minsz;
-> +	struct user_header {
-> +		u32 argsz;
-> +		u32 flags;
-> +	} *header;
-> +	unsigned long flags;
-> +	u32 flag;
-> +
-> +	if (copy_from_user(buffer, arg, minsz))
-> +		return -EFAULT;
-> +
-> +	header = (struct user_header *)buffer;
-> +	if (header->argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	if (header->flags & ~flags_mask)
-> +		return -EINVAL;
+1) SRSO
 
-I'm already wrestling with whether this is an over engineered solution
-to remove a couple dozen lines of mostly duplicate logic between attach
-and detach, but a couple points that could make it more versatile:
+Affects anything which doesn't enumerate SRSO_NO, which is all parts to
+date including Zen5.
 
-(1) Test xend_array here:
+SRSO ends up overflowing the RAS with arbitrary BTB targets, such that a
+subsequent genuine RET follows a prediction which never came from a real
+CALL instruction.
 
-	if (!xend_array)
-		return 0;
+Mitigations for SRSO are either safe-ret, or IBPB-on-entry.  Parts
+without IBPB_RET using IBPB-on-entry need to manually flush the RAS.
 
-(2) Return ssize_t/-errno for the caller to know the resulting copy
-size.
+Importantly, SMEP does not protection you against SRSO across the
+user->kernel boundary, because the bad RAS entries are arbitrary.  New
+in Zen5 is the SRSO_U/S_NO bit which says this case can't occur any
+more.  So on Zen5, you can in principle get away without a RAS flush on
+entry.
 
-> +
-> +	/* Loop each set flag to decide the xend */
-> +	flags = header->flags;
-> +	for_each_set_bit(flag, &flags, BITS_PER_TYPE(u32)) {
-> +		if (xend_array[flag] > xend)
-> +			xend = xend_array[flag];
 
-Can we craft a BUILD_BUG in the wrapper to test that xend_array is at
-least long enough to match the highest bit in flags?  Thanks,
+2) BTC
 
-Alex
+Affects anything which doesn't enumerate BTC_NO, which is Zen2 and older
+(Fam17h for AMD, Fam18h for Hygon).
 
-> +	}
-> +
-> +	if (xend > minsz) {
-> +		if (header->argsz < xend)
-> +			return -EINVAL;
-> +
-> +		if (copy_from_user(buffer + minsz,
-> +				   arg + minsz, xend - minsz))
-> +			return -EFAULT;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * Module/class support
->   */
+Attacker can forge any branch type prediction, and the most dangerous
+one is RET-mispredicted-as-INDIRECT.  This causes a genuine RET
+instruction to follow a prediction that was believed to be an indirect
+branch.
 
+All CPUs which suffer BTC also suffer SRSO, so while jmp2ret is a
+mitigation for BTC, it's utility became 0 when SRSO was discovered. 
+(Which as shame, because it's equal parts beautiful and terrifying.) 
+Mitigations for BTC are therefore safe-ret or IBPB-on-entry.
+
+Flushing the RAS has no effect on BTC, because the whole problem with
+BTC is that the prediction comes from the "wrong" predictor, but you
+need to do it for other reasons.
+
+~Andrew
 
