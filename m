@@ -1,128 +1,136 @@
-Return-Path: <kvm+bounces-31643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091299C5E42
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 18:06:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1125E9C5FDF
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 19:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C10DC28196A
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 17:06:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FF3B283875
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 18:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6954213142;
-	Tue, 12 Nov 2024 17:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEFF215028;
+	Tue, 12 Nov 2024 18:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqR2b69D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q1KN+lI9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A762076D2;
-	Tue, 12 Nov 2024 17:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284EF215007
+	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 18:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430929; cv=none; b=I3YZEBxDv7oW/iWJN9UDKvjgMudgp70ZL6jdpfPH4dxfy7/BIuXToLkUuPwcrOSS347N7SKpYaN8wHT9cIZEM5c1p5Gowo8ckJGQpkJbPrbr2Eicxkp0Nrze76MB+oU3tiYAbArhKliCSBf62e0YgAsjkGSEbz8G2VsUpqX04Ok=
+	t=1731434748; cv=none; b=V6GYiqt9gkarMSCDQDgTe1HMqcqyzJaVa8L5vY8YXD84tpKfM8m7kuTPOLaIU08+QDcmjXFbfAMvKUZl2O2/ejvV3kXPFumQ18YGh/xsNEHZ0ofq5lm1GZuKt9G3lacoJa6dNge1cLzSt9ofw9QTFL+/e/1NlLW81n9GqWF7LuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430929; c=relaxed/simple;
-	bh=M7ma40ELUhNvpjlyWrEKeeikRjFdp5fR7WH70jTeKyk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NxFgz03G1tkQT4dti1EHPtovam7dI6ul3OAtIl1V5cSuQdY6c6KKFBOo6tmbPuj8a9lKd4GqVuaOOUKIrJWxAMab9oDawkVepSgUvFhl6f8hNAP/UPpbWnnXiEyjHEw8NFdCOvkMyA0O1svqydF7G2VyjAexhNtB61Ej/MBuiSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqR2b69D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FF8C4CECD;
-	Tue, 12 Nov 2024 17:02:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731430928;
-	bh=M7ma40ELUhNvpjlyWrEKeeikRjFdp5fR7WH70jTeKyk=;
-	h=From:Date:Subject:To:Cc:From;
-	b=SqR2b69DC6UN/itpJEpDivAQ0WvaMssRwPhcspNX/mBkej8BPF1Rw5mvH/VmvJnwr
-	 j+KBHXnB+P72BUU6kRisTvThNZzKNzsAZu2I8OCTS3ccQNp6RkjSGElf05GWaapgeq
-	 GygTNfQq4WFPFD6HbZjFMM9L4k5NQWAg1/dt7wEPZ7rSBwYG9vhqmtlGPIDIqUUfDz
-	 eeqo1aGJPX5InyoQIJ1OGBznqxkgIaih249umw8VFgNpHn5vOG1JG/kv90KfPl7/e/
-	 C0IDVpeKNFSzaj+tFoySzfF3F65anDOQd9IrpLBAN9rXoCoD6W3AYFQ3D0MP1hzdPq
-	 xhGAifx0T49Yw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 12 Nov 2024 10:02:04 -0700
-Subject: [PATCH] LoongArch: KVM: Ensure ret is always initialized in
- kvm_eiointc_{read,write}()
+	s=arc-20240116; t=1731434748; c=relaxed/simple;
+	bh=1TNtYrw0cI+4IbhwahK3f27e0NBbir3ttqfscikF/Tc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=X8quWoEWk/4WXr+XNG/hWhT8Z9z7TnjFfHyAGxm41Y2H0Iu6mkmRQCozolEa2hh3DjjNxy+qGJ0t6Gviprg3bl0JEiIZv8qckON9kFGPGlP/AboeKv4/xtP+7oSD3W81Gm9Ov6Cf9mE6xNgmNCe+zke0kHMkeV57LOy3r4kMfNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q1KN+lI9; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2118b20e83aso57509015ad.0
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 10:05:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731434746; x=1732039546; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6syIpXROohiAYDOvSaTBOoRkASAnslDzHcGzJCB1UlA=;
+        b=Q1KN+lI96oQNSWTGl2pHpOuMsfPJ32PkiO0JY4MyeFfcIG+oXG7rDMS50YCHmMNV2p
+         tPqGAvLndJ6FceUyoY3IhR1HGK+ywIm9jeO2VSMJ5AtFbkrIp/7s7nKXiF7+aXXdauFi
+         VhZfuE2Id5FblglCgX38OEEDpOPbPmdz2PY9IbW0fnl9cYAFFPDfwZU23v2gVp9tigEW
+         UbJlOrco+AeUsTLeDxw8nBv86epgViDFUkaHUF4d8dFPn8IXyfRv28X/N/kEXadTVOds
+         k10uDJ+JpHo8n/l7HVPvpXhNjplY5Ma3u441WlWzRerm2aS2NwkiH/9cMY5Ka7n2ZXHg
+         8dXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731434746; x=1732039546;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6syIpXROohiAYDOvSaTBOoRkASAnslDzHcGzJCB1UlA=;
+        b=PgArassUGuvoufD2xbUu3EnLAGReDti80Bp1AwktlDirzARP5YNFi9QwHKpJ54DnnH
+         IhdWgsvphyKmEhxJdJoIc1/4S9hj6m6QEdiVjlWHP5Y8dHB/ZSMOAGbGp+81fYSCIkgv
+         kq+FHezgoGylM1N3pSNIMVSFUIJJGQzSvny/Nc/+UAzpdw22c03SFbAsDS2HlqKUfhcE
+         h7WK5eSgPuRniARLmekY+4cYQVeJll679Yd3ctYpSguMYFQQIiTrya5btokygbSBvE60
+         ptsl1hePkbOfgSmNNPuf+0oBfQJQlv+meG1dzUXbRgG0Zj5hJPvGqX8omsVBcTy7I9wT
+         He5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX1TuxVPCwpWM/hyAvn0HVRT4NdiiSodhzgxOftXJBzvFD9zIMJXHVVktH1z5EGENFONMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYF7DkOjdZ+NMI7fU1CWUg8GTJE48Esdbmb+13rTvJZ4xx2c+a
+	RAO3hqTwGEaWypDsrUuq2IdR6CAqDCSbB1hQV7+SZ/zQLvndSA82Axfn06UCqqr+HCwovnZKfcK
+	eDA==
+X-Google-Smtp-Source: AGHT+IH4kIZHreHu/wwqMQNUg569gEssFax5NR336gUa63Ml5d5Oc6cqepxT2wPIVMkXWwz+u3m8I7kF464=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:902:7596:b0:20b:96e2:59a2 with SMTP id
+ d9443c01a7336-211833138acmr1094805ad.0.1731434746498; Tue, 12 Nov 2024
+ 10:05:46 -0800 (PST)
+Date: Tue, 12 Nov 2024 10:05:44 -0800
+In-Reply-To: <20241112065415.3974321-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-7d881f728d67@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAuKM2cC/x2NwQrCMBAFf6Xs2QUT60F/RTzEZNs+bDaSxCIt/
- fcGjwPDzEZFMqTQvdsoy4KCpA3MqSM/OR2FERqTPdveGGN5TklHl/3E7yWyIEGr5wE/LilKRZT
- CX4Wiws1YJbAJt+HaX8LLBkut+8nS9P/z8dz3Ayn4i+SDAAAA
-X-Change-ID: 20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-1d9f543db2d2
-To: Huacai Chen <chenhuacai@kernel.org>, 
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>
-Cc: WANG Xuerui <kernel@xen0n.name>, Xianglai Li <lixianglai@loongson.cn>, 
- kvm@vger.kernel.org, loongarch@lists.linux.dev, llvm@lists.linux.dev, 
- patches@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2092; i=nathan@kernel.org;
- h=from:subject:message-id; bh=M7ma40ELUhNvpjlyWrEKeeikRjFdp5fR7WH70jTeKyk=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDOnGXfwfr9Tscn6wWXnZO4P13Smcx9d9U1hz6dpJIR7d6
- O+uszd0d5SyMIhxMciKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICJMLAxMrRt2i9n3hHp2hvo
- XGSinp6h8jmfeePJI7Jf+7KVrDn03zP8U2hUcJ74foXf4vOxe091zapQWOHgkC9zdz1nvpK9eP8
- CLgA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Mime-Version: 1.0
+References: <20241112065415.3974321-1-arnd@kernel.org>
+Message-ID: <ZzOY-AlBgouiIbDB@google.com>
+Subject: Re: [PATCH] x86: kvm: add back X86_LOCAL_APIC dependency
+From: Sean Christopherson <seanjc@google.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	kernel test robot <lkp@intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Michael Roth <michael.roth@amd.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Clang warns (or errors with CONFIG_WERROR=y):
+On Tue, Nov 12, 2024, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Enabling KVM now causes a build failure on x86-32 if X86_LOCAL_APIC
+> is disabled:
+> 
+> arch/x86/kvm/svm/svm.c: In function 'svm_emergency_disable_virtualization_cpu':
+> arch/x86/kvm/svm/svm.c:597:9: error: 'kvm_rebooting' undeclared (first use in this function); did you mean 'kvm_irq_routing'?
+>   597 |         kvm_rebooting = true;
+>       |         ^~~~~~~~~~~~~
+>       |         kvm_irq_routing
+> arch/x86/kvm/svm/svm.c:597:9: note: each undeclared identifier is reported only once for each function it appears in
+> make[6]: *** [scripts/Makefile.build:221: arch/x86/kvm/svm/svm.o] Error 1
+> In file included from include/linux/rculist.h:11,
+>                  from include/linux/hashtable.h:14,
+>                  from arch/x86/kvm/svm/avic.c:18:
+> arch/x86/kvm/svm/avic.c: In function 'avic_pi_update_irte':
+> arch/x86/kvm/svm/avic.c:909:38: error: 'struct kvm' has no member named 'irq_routing'
+>   909 |         irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
+>       |                                      ^~
+> include/linux/rcupdate.h:538:17: note: in definition of macro '__rcu_dereference_check'
+>   538 |         typeof(*p) *local = (typeof(*p) *__force)READ_ONCE(p); \
+> 
+> Move the dependency to the same place as before.
+> 
+> Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202410060426.e9Xsnkvi-lkp@intel.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> Question: is there actually any point in keeping KVM support for 32-bit host
+> processors?
 
-  arch/loongarch/kvm/intc/eiointc.c:323:2: error: variable 'ret' is used uninitialized whenever switch default is taken [-Werror,-Wsometimes-uninitialized]
-    323 |         default:
-        |         ^~~~~~~
-  arch/loongarch/kvm/intc/eiointc.c:697:2: error: variable 'ret' is used uninitialized whenever switch default is taken [-Werror,-Wsometimes-uninitialized]
-    697 |         default:
-        |         ^~~~~~~
+Nope.  We need _a_ 32-bit KVM build to run as a nested (L1) hypervisor for testing
+purposes, but AFAIK there's zero need to keep 32-bit KVM up-to-date.
 
-Set ret to -EINVAL in the default case to resolve the warning, as len
-was not a valid value for the functions to handle.
+> From what I can tell, the only 32-bit CPUs that support this are
+> the rare Atom E6xx and Z5xx models and the even older Yonah/Sossaman "Core
+> Duo", everything else is presumably better off just running a 64-bit kernel
+> even for 32-bit guests?
 
-Fixes: e24e9e0c1da4 ("LoongArch: KVM: Add EIOINTC read and write functions")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-It appears that my previous version of this change did not get
-incorporated in the new revision. I did not mark this as a v2 since it
-has been some time.
+Yep.  I am 99.9% certain there are no users of 32-bit KVM.  There have been
+multiple instances in the past few years where 32-bit KVM was quite broken, for
+several kernel releases, and no one complained.
 
-https://lore.kernel.org/r/20240916-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-85142dcb2274@kernel.org
----
- arch/loongarch/kvm/intc/eiointc.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
-index 0084839f41506eb3b99c2c38f9721f3c0101e384..6af3ecbe29caaaef1582b1fbb941c01638e721cf 100644
---- a/arch/loongarch/kvm/intc/eiointc.c
-+++ b/arch/loongarch/kvm/intc/eiointc.c
-@@ -323,6 +323,7 @@ static int kvm_eiointc_read(struct kvm_vcpu *vcpu,
- 	default:
- 		WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, size %d\n",
- 						__func__, addr, len);
-+		ret = -EINVAL;
- 	}
- 	spin_unlock_irqrestore(&eiointc->lock, flags);
- 
-@@ -697,6 +698,7 @@ static int kvm_eiointc_write(struct kvm_vcpu *vcpu,
- 	default:
- 		WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, size %d\n",
- 						__func__, addr, len);
-+		ret = -EINVAL;
- 	}
- 	spin_unlock_irqrestore(&eiointc->lock, flags);
- 
-
----
-base-commit: f7cc7a98fb7124abc269ebf162fcb3a8893b660a
-change-id: 20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-1d9f543db2d2
-
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
-
+Paolo, should we go ahead and start the process of removing 32-bit support in x86?
+I forget who it was, but someone from the QEMU world mentioned that dropping 32-bit
+support in KVM would allow dropping a rather large pile of code in QEMU too.
 
