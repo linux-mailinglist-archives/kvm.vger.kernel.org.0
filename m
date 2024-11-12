@@ -1,166 +1,107 @@
-Return-Path: <kvm+bounces-31612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9879C5878
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 14:02:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737A89C5720
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 12:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD86AB605AD
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 11:28:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA331F223A2
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 11:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C07170A3A;
-	Tue, 12 Nov 2024 11:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630EE1CD213;
+	Tue, 12 Nov 2024 11:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwrYh+PS"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NW0Cnhro"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A95D215007
-	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 11:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E7F1BCA11;
+	Tue, 12 Nov 2024 11:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731410026; cv=none; b=LJHOBEYbpHBGboBESOQGhR/V6OwkAwgIx+MAi7WnBSCgIMpjuJC8W/BqCVlrVpj/gzmUFeKUyWl6IeHFbyodgKhGnlsJHmYFs8mX2BRsBpTuUNdq3o6Kce/ivxNK6lnqkEOiADA+E3ys5FYWS85AMSqSbJhKeyVSqMM8iqFr8fE=
+	t=1731412736; cv=none; b=Qbo6G8k8npuF2xUOrDVU3Do+0cMtvGbQKF6OlBiovuSk7vzDY894PqDHGvVukeMT1GtlOA6GCBswk5L4Lg/24ilRRGBSyY5AuKovfG6BJoI9xvNNoSy4ZeZr9QpSm5cmyjTDCt0qjJlv8xuYuA+StGj6JRnJ3IcpW4HLiMJ8QpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731410026; c=relaxed/simple;
-	bh=qtqXsLcgweTg0CZr5YGAfFq/4t4LicnMU77zEJ6wBqg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RVhlwv+tVnLuST6Ov9yJXeY3F2l4Esem3X14b46DCeis2VyZF8Z9zoPUEHWXThU435DZbXwfS7C6EC0LRB2/VWMPSiPgV2RnBZ/U/vuk4S/+ye598iUgctdRCWRVBH/W7QcvjrzVv1KaqtpXPK7YVBjm+BaVdVR4yBkM/2ytjPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WwrYh+PS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731410024;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=SzTxMEuDp8444TtWjJA2KU2Ps/WIqufTO2E/1rzCe3I=;
-	b=WwrYh+PSpX5XZLrFIMI6K2HqcW2PNAQWkHlE2Ne/4TSdXpB4+EjPqx4ag3G/ufGnK0N6dP
-	7Z0ySqw2IVBVeHeJTQVdX390SHCLgzwRdQGI27s/vdyteIwm7kJkWzNXlGNWeBXOHsLURh
-	28Hv1C3k1acNu1NKXiuykQ0QQbpxBvc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-462-lEZOGhJLNF6xuIz9T5hmYA-1; Tue, 12 Nov 2024 06:13:42 -0500
-X-MC-Unique: lEZOGhJLNF6xuIz9T5hmYA-1
-X-Mimecast-MFC-AGG-ID: lEZOGhJLNF6xuIz9T5hmYA
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d5ca5bfc8so2950057f8f.0
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 03:13:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731410021; x=1732014821;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SzTxMEuDp8444TtWjJA2KU2Ps/WIqufTO2E/1rzCe3I=;
-        b=RtVv7LE1TqSwSWCN8WNWgxhjIS+wF1Bb3+XjMHvGj/6Qel2+pkfYfsfy96Go13KiUb
-         6n5JCbzsOd0EaWe/90LoKK0X/FubEg8Tk6toRjnGXaBiBVJ9UJQ1MVQqG2c77iZZDZjO
-         l7xWLmYR4gRH+TpL/RK1hvJFl/R3p+kx/TVKTW+6sgy7LHC35YamoWcqIppTg18VTMQv
-         hr9j9LF/oAIz9Iig13fOYmOiNS8oiXNE6eThYG422j5M1ug489/+xCGPVx4j9lb2x10b
-         V1aN2XM7H06Z8/70o6phLa5XuBoSBxSPTYiqlwm9dXegBBD7Dp8imoBzbjHBc01wZ5+s
-         vZtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRUUcYIaCkzTYquiQAamcqJSJfoGdjzXiSEo5OABbSm1l4l8nDlCAWa2VlwdgR92j0C6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUBT8BEnlXQv53+G0kWPhGztQO88gJOK5WTq5Afhumh/fxZhL7
-	5E44P0k92Khc5AImfkr+mVbnIFZNSJNsAnJ+pY0nSFEENqHbkvM2QEwdYSk+8ILdZCV/iCZ6HPY
-	BpcyQBwHAMCc0/1DUkqMnHZ2LG1WlkG3JhIm1iNVpr74nb4OAAQ==
-X-Received: by 2002:a5d:6da8:0:b0:37d:4e74:67f with SMTP id ffacd0b85a97d-381f183f6c7mr14598449f8f.37.1731410021356;
-        Tue, 12 Nov 2024 03:13:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEj5B7he/sREMSXDurDScPLqtb9aPRjKOyFK71PBxW8R3EdcWVcletITLxA8ukNvyrGU76ujw==
-X-Received: by 2002:a5d:6da8:0:b0:37d:4e74:67f with SMTP id ffacd0b85a97d-381f183f6c7mr14598426f8f.37.1731410021015;
-        Tue, 12 Nov 2024 03:13:41 -0800 (PST)
-Received: from ?IPV6:2003:cb:c739:8e00:7a46:1b8c:8b13:d3d? (p200300cbc7398e007a461b8c8b130d3d.dip0.t-ipconnect.de. [2003:cb:c739:8e00:7a46:1b8c:8b13:d3d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381eda03e8asm15134253f8f.90.2024.11.12.03.13.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 03:13:39 -0800 (PST)
-Message-ID: <f5b43126-acbd-4e3f-8ec4-3a5c20957445@redhat.com>
-Date: Tue, 12 Nov 2024 12:13:37 +0100
+	s=arc-20240116; t=1731412736; c=relaxed/simple;
+	bh=TUNmIAPn6+pKk5nzKQZ1OjgyCLxgxK7kaAVkQhXghrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uHCDUQlNftbl/GL43xtYnfDSKYlmra4qSAF6j9K32//FRfl1SaBEg8bCtwE6hkJ6KGZqGsHywR07PVWToWCjza0oKrE/YWffO5/Lb4N6gkpLGKcc8Pbx3v3u9yDABdJZtbjnm4iy0hWnYQ9qHR07FQMJB+KOA62WeshA7Ula7MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=NW0Cnhro; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3B28440E0219;
+	Tue, 12 Nov 2024 11:58:50 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id K0mb3qn6eQ2E; Tue, 12 Nov 2024 11:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1731412724; bh=pUkUnh5KepZX+fycGuZ0Jah4PiIPhoLoA1x5Uf4hXQk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NW0CnhroUylwEPqyeQXOXk8N75MoxkYs5HX51aINwz3/N/Sc7QvF6fhvnOXKzoZRf
+	 xHSLAW//IkLuS48CV8o11VTS6McVekMZAMwpamDs4YVLPhQDNmf64ZEaxxus0GGAh1
+	 qSm0zujyK+5Aa3NjLrR3izo2/Fax5WjEvrBPKKyOJlpU30V3d45abZlL1dz5IgzPRx
+	 GXYmy23QGxIHNOEK1PhwMAAO87iixqGjQNabWLH+NZbhIaRq+QqJpHr/7VqLypeI2m
+	 ScUs8D9oodqzw53BS8LofG4633bSXF0nx64RDWGHc8Ia/zrNSdtEYHGYo8tFxRfGdh
+	 4FspwmabVVWm0tBOtytantZjshy+wSmwCh5zk9kS0vs3PHtgq0xZk6hPsVqUN8TGMe
+	 Ehd0UMrKfLP0EW6Kvj5FMTGqr49PWzuOI+XzN4N4RnPJ9CSv9Kx0lE5HavG8Oet23k
+	 40HNeBNrEPuBeq0ifurBg2yRkYUwIjnx1YzxQ6dFQr47sTeKYNVE08/QY6aZWncPwu
+	 LSFoR6is7HANMt4McbKCzKnrpbjq0T2OSV79cnZD4yOSD8iw7LludXMY0cYHfsbLr2
+	 oLGPqeuAjK/Vnit3Shi4DXwmAxSwAC2+k9HHEtponuRrHhnTgrI+L79/9oN18K7WEk
+	 B77eLJ7GBNfM7YBGD/6uFgVc=
+Received: from zn.tnic (p200300ea973a31e1329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:973a:31e1:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 42A8D40E019C;
+	Tue, 12 Nov 2024 11:58:19 +0000 (UTC)
+Date: Tue, 12 Nov 2024 12:58:11 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Amit Shah <amit@kernel.org>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+	linux-doc@vger.kernel.org, amit.shah@amd.com,
+	thomas.lendacky@amd.com, tglx@linutronix.de, peterz@infradead.org,
+	pawan.kumar.gupta@linux.intel.com, corbet@lwn.net, mingo@redhat.com,
+	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
+	kai.huang@intel.com, sandipan.das@amd.com,
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
+	david.kaplan@amd.com, dwmw@amazon.co.uk
+Subject: Re: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for
+ AMD
+Message-ID: <20241112115811.GAZzNC08WU5h8bLFcf@fat_crate.local>
+References: <20241111163913.36139-1-amit@kernel.org>
+ <20241111163913.36139-2-amit@kernel.org>
+ <20241111193304.fjysuttl6lypb6ng@jpoimboe>
+ <564a19e6-963d-4cd5-9144-2323bdb4f4e8@citrix.com>
+ <20241112014644.3p2a6te3sbh5x55c@jpoimboe>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] accel/kvm: Report the loss of a large memory page
-To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
- kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
- philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
- imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
- wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
-References: <e2ac7ad0-aa26-4af2-8bb3-825cba4ffca0@redhat.com>
- <20241107102126.2183152-1-william.roche@oracle.com>
- <20241107102126.2183152-4-william.roche@oracle.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20241107102126.2183152-4-william.roche@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241112014644.3p2a6te3sbh5x55c@jpoimboe>
 
-On 07.11.24 11:21, “William Roche wrote:
-> From: William Roche <william.roche@oracle.com>
-> 
-> When an entire large page is impacted by an error (hugetlbfs case),
-> report better the size and location of this large memory hole, so
-> give a warning message when this page is first hit:
-> Memory error: Loosing a large page (size: X) at QEMU addr Y and GUEST addr Z
-> 
+On Mon, Nov 11, 2024 at 05:46:44PM -0800, Josh Poimboeuf wrote:
+> Subject: [PATCH] x86/bugs: Update insanely long comment about RSB attacks
 
-Hm, I wonder if we really want to special-case hugetlb here.
+Why don't you stick this insanely long comment in
+Documentation/admin-guide/hw-vuln/ while at it?
 
-Why not make the warning independent of the underlying page size?
+Its place is hardly in the code. You can point to it from the code tho...
 
 -- 
-Cheers,
+Regards/Gruss,
+    Boris.
 
-David / dhildenb
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
