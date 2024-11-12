@@ -1,145 +1,118 @@
-Return-Path: <kvm+bounces-31688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1819C65AB
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 01:03:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1CE99C65D5
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 01:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0A84B44C05
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 23:26:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6406B2D049
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 23:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8C621F4A8;
-	Tue, 12 Nov 2024 23:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEE121C18A;
+	Tue, 12 Nov 2024 23:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csQXeJbp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoIzRvBg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BD321EBAC
-	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 23:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21314230997
+	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 23:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731453806; cv=none; b=rwplYECBdXFTHs1TIpUi/sCHLzvxn0TilY6QwQyrT8dIO61J+4Sr4rOcI9N/QhoecKwbcFaFu2U3Hj3RfFvQ/o6EXbImpzjViX3i5X7uO3PjJOMVKQ7nl0sZ7+6hc6wcc0nihgGpvudzAhlCQHyw7+OS3AbGdG3dkVRmL+xO6hQ=
+	t=1731454249; cv=none; b=nn+7++EcIGRRAJfkufQS05affndy006gDm0L5kKEkiGLTUskkNrKnikbo9ESP193VvxFv9M0a70Nw9dfMRRxYmkV+xz++Di53ByFTBPymbYtflzs1fyfZQco27vIHdIOzmnLhwIQTy0z0rDl5EmXP8h3nq5bIJMSKCCIrOLsBBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731453806; c=relaxed/simple;
-	bh=YSlU6X6JKLSeLbKMBuH/mDkE4l3HevChh3sRmgLUBXI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MuRe/rvSQ9bQczavjL5ahnoOckk5vL6D4JdNhpRSpWDbOf8w1Ood5y72qv0NnXX8o3XQjDPcbJPeBpiXIVdsjnoN+44OuDbNiJMSlwdAbKxpJ8YdyPSuZR2lsiTA2HwUSVrtTa8g7NndAGXoEahAL+LzTHEcVZhRu2RVQq4Tklg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=csQXeJbp; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7203cdc239dso7506353b3a.3
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 15:23:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731453805; x=1732058605; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OuDWJG60RHXCqzpUFxAGPdqK8IqvXAJsitjiTXr/4nE=;
-        b=csQXeJbpQqUsr1rFqQk+3XMj9E7wiBs3k93Fk+1wU6y4CertYGm0oMQkedpQbOc0um
-         d+aeQz9Xz6QaN97XkR0eH8CmaMQDUJM1m2VmMrmwwraHu4XqydLhM3VhpNwirvNT698G
-         6e0f71+aVqIFQmK8qaU3olVH8k8hUFHjvgChHyJOE99HLQzZqWxqQaczXEiBH0CUmCHY
-         cKY3IZOrGxSMVmqlAUr3i/2niWv5ahFNGwl7sWpvGzZ+3f6aoLz7cOSDfE6cFelaHCBO
-         19bAN10HAEuLgwX0WKzex7erSZhtPL1KPMxUtv2pIqzBWWAslkFTvyx0KZSz7dBHgVVC
-         96Kg==
+	s=arc-20240116; t=1731454249; c=relaxed/simple;
+	bh=QPZOFakwbsms/8IqUz2OaUZCjNqpmAIZnLYHPR78u4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PGaSAbFBGEQmfZ8K7DvTE6mqQxUths+9n/nbXgd5xeTceOOAlmSqfcENIOfRtOqp0a2AYTuW7BophoIOIaW3fguz8X2/GU/YbcDXDI/0S4rFXdLGgHWka45Tp5opTJyRlgPGlb5iuOtT1Elwni1oYyzWkFNR5zsq91U/VocWRV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HoIzRvBg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731454246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=pahYg5ShvYI1JYFWF5WGQMVXj9AMRp+maWU01U95G10=;
+	b=HoIzRvBg+IFws7rUo/HZgj6MrkSA4WBfKdpd4/2nkkmbJSh/2xIrFt5u/22UrJmAKhXF5V
+	a//D86x4uCMRK43GUyYnShFNI4+VXSVtyBsRr/b5YRXcmLSbnol0/tsB1LsHsdHfbAXD7C
+	/IWxJa9s4jmInUbgy7CrGbrY0736MfA=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-60-8X_LGGxrNZWfPvAqp97tXA-1; Tue, 12 Nov 2024 18:30:43 -0500
+X-MC-Unique: 8X_LGGxrNZWfPvAqp97tXA-1
+X-Mimecast-MFC-AGG-ID: 8X_LGGxrNZWfPvAqp97tXA
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2fb4c35f728so46112371fa.2
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 15:30:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731453805; x=1732058605;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OuDWJG60RHXCqzpUFxAGPdqK8IqvXAJsitjiTXr/4nE=;
-        b=kLfd8jzgspbQSnaVCMo/sHQy2OnVrgMpx//skseu29DYFP0ajmAnZj0DHkQ3YR3Avw
-         QemAihf8Lp6WNq6Z4URnvrULdbUn4qS/WfG6dK1DG/qXf0M6dl9rKsHWo85c6R/azYdW
-         Yk8s2v0gxHmBC7FYVhCN2irz+TZMi2uqyNH3f+HwRHQ6qvpmWXoUTkJMZncfimzPcmZ8
-         aFo0hYfqevpdupZGSm86rN4rY/RD8dhAlYOT4X5kxIJauMkjhYpCa49ytzSNXR3mXILU
-         dBQV4QYacKkuMAf2KKEDcxixMP0vDi/KWvMQYuBhY3oJb+AwW2XODEQsqRJjPfIejafZ
-         RVcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUH66MDxtFh1anTnwdY07UIdWf9oGEp1sGZaVr+cRUG+0QZuCsIRopXvHn3CYh/MaJqJA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYkrNHF3eKFVQx5HDj/kw7bgBziwqrY5S7R0zTRnK/iR/spNGI
-	nxpVmtF/1y489kAmux1fmIsz2WGuTKPN2giDTokNSAuZ75Maao8hvJOB93tjoIVlQj2e+DT758v
-	357hL9WkinjZ8EIuIfilt1Q==
-X-Google-Smtp-Source: AGHT+IE6zPnpQVIS7blTj/Vhu9TTjYHNmJoBXH4WGKbfY0DY+2UePrQxclpNCjF7vH3HqWjU/xgzhv/gANZuiZaWCA==
-X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a62:ee0d:0:b0:720:2e1a:de with SMTP id
- d2e1a72fcca58-7244a4fcc54mr33020b3a.1.1731453804651; Tue, 12 Nov 2024
- 15:23:24 -0800 (PST)
-Date: Tue, 12 Nov 2024 23:22:47 +0000
-In-Reply-To: <20241112232253.3379178-1-dionnaglaze@google.com>
+        d=1e100.net; s=20230601; t=1731454242; x=1732059042;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pahYg5ShvYI1JYFWF5WGQMVXj9AMRp+maWU01U95G10=;
+        b=bjQgcHYqQVdjbhQKqEh7Zwi7Uf5Cj+dh1Xe5vE5j+Mb8eW/Tyl+XG8QiTbeac5STUt
+         B7h96h+YdPGr00vcoOfHkS6Z5j8uOkW4V7HjlXpKw77zK/NpFkDTFAew2WGUDa0P0EdP
+         syGLE/2IYD0nUmUnMqRuH1Vw7gAsuFszkNYSbGUDrRJUAgy25Fgj0AMPmCYeRrzv/gbM
+         mgdUrC/QTquuBjD3eipnELz5EtyweuHTmS9jcI3ZD3VyjtXqGp/AMdNb4+07Ef0RnWeW
+         FVp3ctizZjRLtG5O8+V6D3XJ/q1WKhqWjYiGDRPkP9RILvywrZ1/auT4ejGEgILHDpcN
+         SfRw==
+X-Gm-Message-State: AOJu0YwkY6Z7abxvx5FNsf94+BCHBL6yu8axGn7sUSwfimQFo8LdKBxk
+	pnUjZIn+UKmg1B042/awZN33n+tsl0kqrLc0/iNxxSKws0FvSJR6UU4YL3df/myGWUtHpbF2RMy
+	UQag+PuxqmQvv7BRSrG3Da2v51pPmlK9elCm/e+6q4OYRQEW0KA==
+X-Received: by 2002:a2e:b896:0:b0:2fa:fdd1:be23 with SMTP id 38308e7fff4ca-2ff2028aadamr130045321fa.28.1731454242086;
+        Tue, 12 Nov 2024 15:30:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHZ8235xoIzEDFqX8Iqts1f1b/TTKzRbzsKbik0jYFi7YnSriOxnAuUaNNRZk63pcxv8z4I2w==
+X-Received: by 2002:a2e:b896:0:b0:2fa:fdd1:be23 with SMTP id 38308e7fff4ca-2ff2028aadamr130045111fa.28.1731454241621;
+        Tue, 12 Nov 2024 15:30:41 -0800 (PST)
+Received: from redhat.com ([31.187.78.204])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a17662sm796178366b.28.2024.11.12.15.30.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 15:30:40 -0800 (PST)
+Date: Tue, 12 Nov 2024 18:30:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com,
+	si-wei.liu@oracle.com
+Subject: [GIT PULL] virtio: bugfix
+Message-ID: <20241112183037-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241112232253.3379178-1-dionnaglaze@google.com>
-X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241112232253.3379178-9-dionnaglaze@google.com>
-Subject: [PATCH v6 8/8] KVM: SVM: Delay legacy platform initialization on SNP
-From: Dionna Glaze <dionnaglaze@google.com>
-To: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-coco@lists.linux.dev, Dionna Glaze <dionnaglaze@google.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Michael Roth <michael.roth@amd.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Danilo Krummrich <dakr@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Tianfei zhang <tianfei.zhang@intel.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 
-When no SEV or SEV-ES guests are active, then the firmware can be
-updated while (SEV-SNP) VM guests are active.
+The following changes since commit 83e445e64f48bdae3f25013e788fcf592f142576:
 
-CC: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Thomas Gleixner <tglx@linutronix.de>
-CC: Ingo Molnar <mingo@redhat.com>
-CC: Borislav Petkov <bp@alien8.de>
-CC: Dave Hansen <dave.hansen@linux.intel.com>
-CC: Ashish Kalra <ashish.kalra@amd.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>
-CC: John Allen <john.allen@amd.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Michael Roth <michael.roth@amd.com>
-CC: Luis Chamberlain <mcgrof@kernel.org>
-CC: Russ Weight <russ.weight@linux.dev>
-CC: Danilo Krummrich <dakr@redhat.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Tianfei zhang <tianfei.zhang@intel.com>
-CC: Alexey Kardashevskiy <aik@amd.com>
+  vdpa/mlx5: Fix error path during device add (2024-11-07 16:51:16 -0500)
 
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Reviewed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
----
- arch/x86/kvm/svm/sev.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5e6d1f1c14dfd..507ed87749f55 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -444,7 +444,11 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	if (ret)
- 		goto e_no_asid;
- 
--	init_args.probe = false;
-+	/*
-+	 * Setting probe will skip SEV/SEV-ES platform initialization for an SEV-SNP guest in order
-+	 * for SNP firmware hotloading to be available when only SEV-SNP VMs are running.
-+	 */
-+	init_args.probe = vm_type != KVM_X86_SEV_VM && vm_type != KVM_X86_SEV_ES_VM;
- 	ret = sev_platform_init(&init_args);
- 	if (ret)
- 		goto e_free;
--- 
-2.47.0.277.g8800431eea-goog
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 29ce8b8a4fa74e841342c8b8f8941848a3c6f29f:
+
+  vdpa/mlx5: Fix PA offset with unaligned starting iotlb map (2024-11-12 18:05:04 -0500)
+
+----------------------------------------------------------------
+virtio: bugfix
+
+A last minute mlx5 bugfix
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Si-Wei Liu (1):
+      vdpa/mlx5: Fix PA offset with unaligned starting iotlb map
+
+ drivers/vdpa/mlx5/core/mr.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 
