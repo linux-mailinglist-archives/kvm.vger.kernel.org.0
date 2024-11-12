@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-31631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ABE99C5D20
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 17:26:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD81C9C5D30
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 17:27:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EDEF1F2429F
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 16:26:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A62B1F2572B
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 16:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7BB206046;
-	Tue, 12 Nov 2024 16:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEEE206E76;
+	Tue, 12 Nov 2024 16:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sIU9agvv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RPk94e/h"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9AF205ABC;
-	Tue, 12 Nov 2024 16:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5F820695B;
+	Tue, 12 Nov 2024 16:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731428777; cv=none; b=cWGR7so9D2084yf+FtGx9ftyrIxecgDdfcAGhDJXrhlxPdiKVI7fv0rvt+HxmHAVt30JMTHM8vnfLgTitm5QeoAiE1zel8oEU/HadYgYRpZRl62+BEFHE/R7cngn5v6v0M8G0COVOf5rujNaOUuryrnhTuZtxNRXDve+qHl5kR8=
+	t=1731428782; cv=none; b=VNMBPl4hPmd7nCx3PMbnHFe3rlehv0K4xuqbLBJhBeh3/hF2e51CrnEXJI5F1myiFWH7gux6adtzrno0OEOj8wyPGknpuq2sTwEt7ny1cGuJcfJ9/rWOXZVaXMBplKkyCMnETgDag0tQG4+9oZkJlVOULu0UpjfHfy997HphWVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731428777; c=relaxed/simple;
-	bh=SCrVBy8m85GnFCgiy/M6SmOvxLdF/GPJUMSkAlJa/uY=;
+	s=arc-20240116; t=1731428782; c=relaxed/simple;
+	bh=klC6CgZUvC72M9K9UTHccsNZuPgdrJwij7ZHSE6D2kk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D2VxaqaK9sZEouL2togLzwcCkTkmULuyMJrCyaC+VHODm3N1OrEPBrWUvZHZiiVJLX8KfH4iVsvTnyefZy0jyazwv1UyLMK7SPujh+BC+mxrsxsWogSRpDliZqgLYzJwLhSFZl7KAVaT7U4Pyt7rRv95HG9NceFySH7R4E5A4Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sIU9agvv; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=IZAiQUFjVR+bLTHJueLs52Dse8PN8yTl+3oDus8uVN0tnoDT4v2dOHsH6w1gCDV/nvrRWr7nYTxbvSPUinz3gjpnc6ner9VhnwgdccH3dTt7+Nz6sznADATLO89ax/EZ1Uch8ft+ibGSHtUInqfwYjpGqzPrvqTh2BycKZsk4Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RPk94e/h; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACEfEQW008736;
-	Tue, 12 Nov 2024 16:26:12 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACEfEQX008736;
+	Tue, 12 Nov 2024 16:26:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=EEE1YPnkWIod4iHmy
-	sdm382dXIx6n5mh3YIe53PqykE=; b=sIU9agvvPjf/Qstfd0neCZ1YNFnf8OITl
-	C0Pv1r/M9vuDhYp8seDkBbObsTwHvp8X6JENiLSVkOlDCFMdNpNxTWz5f/jowom7
-	lHCnejvkTZVZAAkOxWMxswA7oma4wFz+5Zg7GUT4ugoOXB+9oaK2QijV/ACPobor
-	f6qJFJcS4Am9GWMmG4L2LKVxf78uarjGHorS+/BOC75bV/SfrOreyE2r7oZn8FBJ
-	3b/vrZZXPoSA2bWtko6EW8yLWlXHxmM+r+ibhEmHRUMvFEa9O4YiIMPm4BLarUOI
-	hur67GI4ffBNPoxBfI5fAt1NBOJNiX2/3VBI08v9/QQH/iN5erdaQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42v9020g1v-1
+	:mime-version:references:subject:to; s=pp1; bh=2CMys+O6bsSvd+EjS
+	fgirWq6P5mEKjyezKFMbMb9B6A=; b=RPk94e/hH6eBSIIpvNWj/WUH+got/0bVe
+	PLwv2kQgjVXW5XERX02A5kDMMPyXd5Z01oMTicQEGrapivbOv5F+8fPLrfoexokY
+	iTfCC5jFhLPdeC+MKpV9qSB5u2jt0UdSd9zlDubHsw++nXGAyx9elncYEw3S2c+M
+	T51TYUlnhMYRcWWZrIYtyOn+7wl8X+bKxVnLysQ0GPdO7pOy8ym0M4EyJc9ba6Gm
+	NVRuddW/csN10fzAx5QPyTWN1E9K3ZYgOtszGHuGvLLP0/At4EoL3Yqhp7pFzwY/
+	Wip4UBKxkBXgfcJuDK79uvScMCpY3Es1BcLWAbaCYkrgRAe/+Odew==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42v9020g1x-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Nov 2024 16:26:12 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACGGS6t008228;
-	Tue, 12 Nov 2024 16:26:11 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42tjeyk9b0-1
+	Tue, 12 Nov 2024 16:26:14 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AC63bku007703;
+	Tue, 12 Nov 2024 16:26:13 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42tm9jcena-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 12 Nov 2024 16:26:11 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4ACGQ7Vc33161744
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4ACGQ8xW33489206
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 16:26:07 GMT
+	Tue, 12 Nov 2024 16:26:08 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C40C820040;
-	Tue, 12 Nov 2024 16:26:07 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4F59620040;
+	Tue, 12 Nov 2024 16:26:08 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5319D20049;
+	by IMSVA (Postfix) with ESMTP id D47D32004B;
 	Tue, 12 Nov 2024 16:26:07 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.fritz.box (unknown [9.179.25.251])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -74,15 +74,15 @@ Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, hca@linux.ibm.com,
         Hariharan Mari <hari55@linux.ibm.com>,
         Christoph Schlameuss <schlameuss@linux.ibm.com>
-Subject: [GIT PULL 03/14] KVM: s390: selftests: Add regression tests for KMCTR, KMF, KMO and PCC crypto subfunctions
-Date: Tue, 12 Nov 2024 17:23:17 +0100
-Message-ID: <20241112162536.144980-4-frankja@linux.ibm.com>
+Subject: [GIT PULL 04/14] KVM: s390: selftests: Add regression tests for KMAC, KMC, KM, KIMD and KLMD crypto subfunctions
+Date: Tue, 12 Nov 2024 17:23:18 +0100
+Message-ID: <20241112162536.144980-5-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241112162536.144980-1-frankja@linux.ibm.com>
 References: <20241112162536.144980-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 6J89BcPihLcwaTI_Qt5KNMyRRYmC8M1K
-X-Proofpoint-GUID: 6J89BcPihLcwaTI_Qt5KNMyRRYmC8M1K
+X-Proofpoint-ORIG-GUID: wZBhVrJt4enyJB13HCo0MPwxuM1wuAeg
+X-Proofpoint-GUID: wZBhVrJt4enyJB13HCo0MPwxuM1wuAeg
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
@@ -103,9 +103,10 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 imposto
 From: Hariharan Mari <hari55@linux.ibm.com>
 
 Extend the existing regression test framework for s390x CPU subfunctions
-to include tests for the KMCTR (Cipher Message with Counter) KMO
-(Cipher Message with Output Feedback), KMF (Cipher Message with Cipher
-Feedback) and PCC (Perform Cryptographic Computation) crypto functions.
+to include tests for the KMAC (Compute Message Authentication Code),
+KMC (Cipher Message with Chaining), KM (Cipher Message) KIMD (Compute
+Intermediate Message Digest) and KLMD (Compute Last Message Digest)
+crypto functions.
 
 The test procedure follows the established pattern.
 
@@ -113,80 +114,92 @@ Suggested-by: Janosch Frank <frankja@linux.ibm.com>
 Signed-off-by: Hariharan Mari <hari55@linux.ibm.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Link: https://lore.kernel.org/r/20240823130947.38323-4-hari55@linux.ibm.com
+Link: https://lore.kernel.org/r/20240823130947.38323-5-hari55@linux.ibm.com
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <20240823130947.38323-4-hari55@linux.ibm.com>
+Message-ID: <20240823130947.38323-5-hari55@linux.ibm.com>
 ---
- .../kvm/s390x/cpumodel_subfuncs_test.c        | 49 +++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ .../kvm/s390x/cpumodel_subfuncs_test.c        | 61 +++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-index 96e7ca07220f..28faceeaf089 100644
+index 28faceeaf089..fe45fb131583 100644
 --- a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
 +++ b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-@@ -33,6 +33,50 @@ static void get_cpu_machine_subfuntions(struct kvm_vm *vm,
+@@ -33,6 +33,61 @@ static void get_cpu_machine_subfuntions(struct kvm_vm *vm,
  	TEST_ASSERT(!r, "Get cpu subfunctions failed r=%d errno=%d", r, errno);
  }
  
-+/* Testing Crypto Cipher Message with Counter (KMCTR) CPU subfunction's ASM block */
-+static void test_kmctr_asm_block(u8 (*query)[16])
++/* Testing Crypto Compute Message Authentication Code (KMAC) CPU subfunction's ASM block */
++static void test_kmac_asm_block(u8 (*query)[16])
 +{
 +	asm volatile("	la	%%r1,%[query]\n"
 +			"	xgr	%%r0,%%r0\n"
-+			"	.insn	rrf,0xb92d0000,2,4,6,0\n"
++			"	.insn	rre,0xb91e0000,0,2\n"
 +			: [query] "=R" (*query)
 +			:
 +			: "cc", "r0", "r1");
 +}
 +
-+/* Testing Crypto Cipher Message with Cipher Feedback (KMF) CPU subfunction's ASM block */
-+static void test_kmf_asm_block(u8 (*query)[16])
++/* Testing Crypto Cipher Message with Chaining (KMC) CPU subfunction's ASM block */
++static void test_kmc_asm_block(u8 (*query)[16])
 +{
 +	asm volatile("	la	%%r1,%[query]\n"
 +			"	xgr	%%r0,%%r0\n"
-+			"	.insn	rre,0xb92a0000,2,4\n"
++			"	.insn	rre,0xb92f0000,2,4\n"
 +			: [query] "=R" (*query)
 +			:
 +			: "cc", "r0", "r1");
 +}
 +
-+/* Testing Crypto Cipher Message with Output Feedback (KMO) CPU subfunction's ASM block */
-+static void test_kmo_asm_block(u8 (*query)[16])
++/* Testing Crypto Cipher Message (KM) CPU subfunction's ASM block */
++static void test_km_asm_block(u8 (*query)[16])
 +{
 +	asm volatile("	la	%%r1,%[query]\n"
 +			"	xgr	%%r0,%%r0\n"
-+			"	.insn	rre,0xb92b0000,2,4\n"
++			"	.insn	rre,0xb92e0000,2,4\n"
 +			: [query] "=R" (*query)
 +			:
 +			: "cc", "r0", "r1");
 +}
 +
-+/* Testing Crypto Perform Cryptographic Computation (PCC) CPU subfunction's ASM block */
-+static void test_pcc_asm_block(u8 (*query)[16])
++/* Testing Crypto Compute Intermediate Message Digest (KIMD) CPU subfunction's ASM block */
++static void test_kimd_asm_block(u8 (*query)[16])
 +{
 +	asm volatile("	la	%%r1,%[query]\n"
 +			"	xgr	%%r0,%%r0\n"
-+			"	.insn	rre,0xb92c0000,0,0\n"
++			"	.insn	rre,0xb93e0000,0,2\n"
 +			: [query] "=R" (*query)
 +			:
 +			: "cc", "r0", "r1");
 +}
 +
- /* Testing Crypto Perform Random Number Operation (PRNO) CPU subfunction's ASM block */
- static void test_prno_asm_block(u8 (*query)[16])
++/* Testing Crypto Compute Last Message Digest (KLMD) CPU subfunction's ASM block */
++static void test_klmd_asm_block(u8 (*query)[16])
++{
++	asm volatile("	la	%%r1,%[query]\n"
++			"	xgr	%%r0,%%r0\n"
++			"	.insn	rre,0xb93f0000,0,2\n"
++			: [query] "=R" (*query)
++			:
++			: "cc", "r0", "r1");
++}
++
+ /* Testing Crypto Cipher Message with Counter (KMCTR) CPU subfunction's ASM block */
+ static void test_kmctr_asm_block(u8 (*query)[16])
  {
-@@ -97,6 +141,11 @@ struct testdef {
+@@ -141,6 +196,12 @@ struct testdef {
  	testfunc_t test;
  	int facility_bit;
  } testlist[] = {
-+	/* MSA - Facility bit 77 */
-+	{ "KMCTR", cpu_subfunc.kmctr, sizeof(cpu_subfunc.kmctr), test_kmctr_asm_block, 77 },
-+	{ "KMF", cpu_subfunc.kmf, sizeof(cpu_subfunc.kmf), test_kmf_asm_block, 77 },
-+	{ "KMO", cpu_subfunc.kmo, sizeof(cpu_subfunc.kmo), test_kmo_asm_block, 77 },
-+	{ "PCC", cpu_subfunc.pcc, sizeof(cpu_subfunc.pcc), test_pcc_asm_block, 77 },
- 	/* MSA5 - Facility bit 57 */
- 	{ "PPNO", cpu_subfunc.ppno, sizeof(cpu_subfunc.ppno), test_prno_asm_block, 57 },
- 	/* MSA8 - Facility bit 146 */
++	/* MSA - Facility bit 17 */
++	{ "KMAC", cpu_subfunc.kmac, sizeof(cpu_subfunc.kmac), test_kmac_asm_block, 17 },
++	{ "KMC", cpu_subfunc.kmc, sizeof(cpu_subfunc.kmc), test_kmc_asm_block, 17 },
++	{ "KM", cpu_subfunc.km, sizeof(cpu_subfunc.km), test_km_asm_block, 17 },
++	{ "KIMD", cpu_subfunc.kimd, sizeof(cpu_subfunc.kimd), test_kimd_asm_block, 17 },
++	{ "KLMD", cpu_subfunc.klmd, sizeof(cpu_subfunc.klmd), test_klmd_asm_block, 17 },
+ 	/* MSA - Facility bit 77 */
+ 	{ "KMCTR", cpu_subfunc.kmctr, sizeof(cpu_subfunc.kmctr), test_kmctr_asm_block, 77 },
+ 	{ "KMF", cpu_subfunc.kmf, sizeof(cpu_subfunc.kmf), test_kmf_asm_block, 77 },
 -- 
 2.47.0
 
