@@ -1,146 +1,238 @@
-Return-Path: <kvm+bounces-31666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31668-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15DE9C623E
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 21:10:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12639C62C9
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 21:44:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9606F283385
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 20:10:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 319AD1F24AB5
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 20:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7128221A4C8;
-	Tue, 12 Nov 2024 20:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987C721A4A0;
+	Tue, 12 Nov 2024 20:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aFb1+/wO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TTnoRsf6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568B521A4A0;
-	Tue, 12 Nov 2024 20:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1CF218D85
+	for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 20:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731442189; cv=none; b=eIFXAPRn2Mb9yhdKYaUBLUFH5BxiKowtkFFc21yLNSBLuBnNbat+aqyFBOmUHEu8dA9wO4lbbISDG11axjUi1GES4qmp7dFTwNSgn8DTtb8aiVUMnC5I1GoHGK0s4T+tpp387SN+FXNk2z7DBjsnzgOdxQTcKsmzr+LNoAoBFWU=
+	t=1731444265; cv=none; b=JUNfMdXg6uhmqubIswXa0V1rIsJ58c4e9buH5spEBmcYd4n3wOZfy8QfuTdDHnOf60VOEaAgSGIeR0JDbFUj5v/wepW9q37X/YWrokS2Pfb3GZ7jLTrgO5UDAz/8nIevs0LpGptOur8+EtnLQxt2n6yvzAxabzOKg+zrKE9b2rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731442189; c=relaxed/simple;
-	bh=NrSy1gcbCnYaZdvche+ClurqCbL4Ri/JGOE72EFEnhI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UxE9Dls8cXc6DF5BlmioLtCstlxl/a0mtChUA/7RahlDL/gFnas8AWEUqQ3OftfFJqclt9HtXm0thsoyQ8WAZ+r0cN0WrO5zWPK0avdqRR4ox8iolkoRHtww92iYeN/7hg+xpZWzXlgm1EJ9tbasDLxHy91PugwgqET1yTK9UBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aFb1+/wO; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731442188; x=1762978188;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NrSy1gcbCnYaZdvche+ClurqCbL4Ri/JGOE72EFEnhI=;
-  b=aFb1+/wOl3I7DRstQr93RPdxIpaVM87+U2AO6+S+W9pnhzJp67hipHGm
-   muPK1Q13Sz4nFmKBUKLAFoRrHvzeSjprHs32UThJ539qtzuVXUxfjLZZi
-   oYPu2KjB5ukrrvEg/ozzUkbakck9i/d6FKIfB2+bltvgJirE86xOWM33m
-   L3YGgchgJPeBIjaFEU2P7H2rJanXiYHR0Zk1X23ua9/6z2ZvXVwF1LhVm
-   OmAocGNv6vnRtfFyKrMdivPS8x1Fc0pznA3vbT6n14JyaWlL/TOwF+Ql0
-   c20fBAAYazgG1K1F4/90E2sy1desSWBl+tsFwqncbAr/yFwFqx+yKr0aK
-   w==;
-X-CSE-ConnectionGUID: bun7+JtUR++PqiLbC5IYjg==
-X-CSE-MsgGUID: n+8JCCzvR5u/eWgPwFnR8g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31266803"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31266803"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 12:09:46 -0800
-X-CSE-ConnectionGUID: 67ptqpQoTXOdNgJ+dr7m2A==
-X-CSE-MsgGUID: eE0Thl9SThWiZUtRxsOLog==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,149,1728975600"; 
-   d="scan'208";a="87536575"
-Received: from jairdeje-mobl1.amr.corp.intel.com (HELO [10.124.220.61]) ([10.124.220.61])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 12:09:44 -0800
-Message-ID: <235f3512-9949-4d69-ae43-1280548fd983@intel.com>
-Date: Tue, 12 Nov 2024 12:09:44 -0800
+	s=arc-20240116; t=1731444265; c=relaxed/simple;
+	bh=el0r2bRkdPPBOR4oInIoihU80U4XbTLMYSnoHJA5iSo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Roedcx/DkbXlsazhyU8r/ubKSQNXBMQxzAL9Z5nEhLeo5SSqVoJUp5Y2U0CKOtVaXyXYH/41ejsuO0qqgWYWWMfVX51S6eLezoq1odPHsIHZrXyEDaMeKUPRu6q6dDn/4Tne7JEroBNXDhZOzYLh9OxN1BpUkY2xbeMKd3C/7pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TTnoRsf6; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9e71401844so773703966b.3
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 12:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1731444262; x=1732049062; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ci3AOpKOMh+qQE+IxW9xvHQ5UYC3MnDiR3fLpgFFWsw=;
+        b=TTnoRsf6X1BY6CnHKXgJ/LclxkBauOXAkypLruREgbk9JxKJpbK0LVh1B1nOh5W97y
+         IkMoAfsaOFWWdBmGpDshaRqfhE9ZFlam8aFdk03J/3lRlPwzbZu+1U9yqjpE9t3NP/5S
+         yGzJM6uF8alxMRZNeJFmMKvexmtsWkYKigwg8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731444262; x=1732049062;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ci3AOpKOMh+qQE+IxW9xvHQ5UYC3MnDiR3fLpgFFWsw=;
+        b=TQx0xh3Ii7XjYzneZoCjsv+ohYmKCf/m8Ru053ADz72ucGrN453oFDfVPVXArt9rIr
+         E6PBxf+80aCKahfzt13CuVnkp9/kJkHYSpXp5GaEWNmwwcqNzJo0Bf47nBLQ1wyBF+vY
+         X7/wNrc0sfb3LfycCua/X0hCmrfG00xiJBi9/zIZxWQI8iCC2bC2LNOx/ht+/X2BAcah
+         mvJAi+Mq7kTdPkA2qe0CmMnJCazSWqbAdy7qH8+vHZue8TSNhPoPRalM352g6aNMpKre
+         RAkM8xWJnc0Z8OZMkBcUZvFfDAL7iVv5hBrnDit4ySnNL5E3pOFiO2IOhg5rNK2n22Ft
+         RQtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcVmXRv23whFRxG1+ZGHcTTaAykxyqd6/uxkEGn/Wi2eaBP22SxROzWHl3EVYjTUFkn7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrlSfvvI/dxt3IrCSi1xJupx+MJgUnUQrJN4xe7oH0B3hORBKK
+	m0b6/y0VF5Xt5OlJmzkCvZok4EfrwsgE06ZwFAHdG1sgMHdOE/3oO7xPJ25++FWA4pDddMxDBgV
+	8/Ac6uktr2XLuiMI64i0k8WvKfssHsvWZQv8imOtQ51VkDOnMd3dtf5nmL7dzW34eITHw4OGay+
+	rvN/Y43jFZSSz+2w==
+X-Google-Smtp-Source: AGHT+IG740NFxkx0vp+a1R5LySlw7AKNXAm4MBS09Ocb5RmGWJM/vc/T05dI8LgZ/LVvJavNohmip80HjcmCjvFy7Hk=
+X-Received: by 2002:a17:906:c14e:b0:a9a:5d15:26c2 with SMTP id
+ a640c23a62f3a-aa1f80f60d7mr30502366b.45.1731444262225; Tue, 12 Nov 2024
+ 12:44:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/25] x86/virt/tdx: Add SEAMCALL wrappers for TDX
- KeyID management
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
- seanjc@google.com
-Cc: yan.y.zhao@intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- reinette.chatre@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
- <20241030190039.77971-6-rick.p.edgecombe@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20241030190039.77971-6-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
+ <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
+ <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com>
+ <Zy0__5YB9F5d0eZn@google.com> <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
+ <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com> <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
+ <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com> <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
+ <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
+In-Reply-To: <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
+From: Doug Covelli <doug.covelli@broadcom.com>
+Date: Tue, 12 Nov 2024 15:44:11 -0500
+Message-ID: <CADH9ctA_C1dAOus1K+wOH_SOKTb=-X1sVawt5R=dkH1iGt8QUg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Zack Rusin <zack.rusin@broadcom.com>, Sean Christopherson <seanjc@google.com>, 
+	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, 
+	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, 
+	linux-kselftest <linux-kselftest@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/30/24 12:00, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Intel TDX protects guest VMs from malicious host and certain physical
-> attacks. Pre-TDX Intel hardware has support for a memory encryption
-> architecture called MK-TME, which repurposes several high bits of
-> physical address as "KeyID". TDX ends up with reserving a sub-range of
-> MK-TME KeyIDs as "TDX private KeyIDs".
+On Tue, Nov 12, 2024 at 12:44=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+>
+> Il lun 11 nov 2024, 21:55 Doug Covelli <doug.covelli@broadcom.com> ha scr=
+itto:
+> >
+> > BDOOR_CMD_VCPU_MMIO_HONORS_PAT and BDOOR_CMD_VCPU_LEGACY_X2APIC_OK are =
+not
+> > actually backdoor calls - they are flags returned by BDOOR_CMD_GET_VCPU=
+_INFO.
+> >
+> > BDOOR_CMD_VCPU_MMIO_HONORS_PAT is only ever set to 1 on ESX as it is on=
+ly
+> > relevant for PCI passthru which is not supported on Linux/Windows/macOS=
+.  IIRC
+> > this was added over 10 years ago for some Infiniband device vendor to u=
+se in
+> > their driver although I'm not sure that ever materialized.
+>
+> Ok. So I guess false is safe.
+>
+> > BDOOR_CMD_VCPU_LEGACY_X2APIC_OK indicates if it is OK to use x2APIC w/o
+> > interrupt remapping (e.g a virtual IOMMU).  I'm not sure if KVM support=
+s this
+> > but I think this one can be set to TRUE unconditionally as we have no p=
+lans to
+> > use KVM_CREATE_IRQCHIP - if anything we would use KVM_CAP_SPLIT_IRQCHIP=
+ although
+> > my preference would be to handle all APIC/IOAPIC/PIC emulation ourselve=
+s
+> > provided we can avoid CR8 exits but that is another discussion.
+>
+> Split irqchip should be the best tradeoff. Without it, moves from cr8
+> stay in the kernel, but moves to cr8 always go to userspace with a
+> KVM_EXIT_SET_TPR exit. You also won't be able to use Intel
+> flexpriority (in-processor accelerated TPR) because KVM does not know
+> which bits are set in IRR. So it will be *really* every move to cr8
+> that goes to userspace.
 
-The changelog there was great.  It read my mind because I was wondering
-why some of the operations didn't get combined in helper functions which
-could be exported.
+Sorry to hijack this thread but is there a technical reason not to allow CR=
+8
+based accesses to the TPR (not MMIO accesses) when the in-kernel local APIC=
+ is
+not in use?  Both MSFT's WHP and Apple's hypervisor framework allow this an=
+d it
+seems like it would be generally useful for any Hypervisor that does not wa=
+nt to
+use the in-kernel APIC but still want to run Windows guests with decent
+performance.
 
-Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+When we switched to WHP the biggest source of problems by far was from tryi=
+ng
+to integrate our monitor with MSFT's APIC emulation code.  Even if we do wa=
+nt
+to use the KVM in-kernel APIC at some point in the future it is still nice =
+to
+be able to fall back on our own APIC emulation code if necessary.
 
+Also I could not find these documented anywhere but with MSFT's APIC our mo=
+nitor
+relies on extensions for trapping certain events such as INIT/SIPI plus LIN=
+T0
+and SVR writes:
+
+UINT64 X64ApicInitSipiExitTrap    : 1; // WHvRunVpExitReasonX64ApicInitSipi=
+Trap
+UINT64 X64ApicWriteLint0ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWriteTra=
+p
+UINT64 X64ApicWriteLint1ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWriteTra=
+p
+UINT64 X64ApicWriteSvrExitTrap    : 1; // WHvRunVpExitReasonX64ApicWriteTra=
+p
+
+I did not see any similar functionality for KVM.  Does anything like that e=
+xist?
+In any case we would be happy to add support for handling CR8 accesses w/o
+exiting w/o the in-kernel APIC along with some sort of a way to configure t=
+he
+TPR threshold if folks are not opposed to that.
+
+Doug
+
+> > For now I think it makes sense to handle BDOOR_CMD_GET_VCPU_INFO at use=
+rlevel
+> > like we do on Windows and macOS.
+> >
+> > BDOOR_CMD_GETTIME/BDOOR_CMD_GETTIMEFULL are similar with the former bei=
+ng
+> > deprecated in favor of the latter.  Both do essentially the same thing =
+which is
+> > to return the host OS's time - on Linux this is obtained via gettimeofd=
+ay.  I
+> > believe this is mainly used by tools to fix up the VM's time when resum=
+ing from
+> > suspend.  I think it is fine to continue handling these at userlevel.
+>
+> As long as the TSC is not involved it should be okay.
+>
+> Paolo
+>
+> > > >> Anyway, one question apart from this: is the API the same for the =
+I/O
+> > > >> port and hypercall backdoors?
+> > > >
+> > > > Yeah the calls and arguments are the same.  The hypercall based
+> > > > interface is an attempt to modernize the backdoor since as you poin=
+ted
+> > > > out the I/O based interface is kind of hacky as it bypasses the nor=
+mal
+> > > > checks for an I/O port access at CPL3.  It would be nice to get rid=
+ of
+> > > > it but unfortunately I don't think that will happen in the foreseea=
+ble
+> > > > future as there are a lot of existing VMs out there with older SW t=
+hat
+> > > > still uses this interface.
+> > >
+> > > Yeah, but I think it still justifies that the KVM_ENABLE_CAP API can
+> > > enable the hypercall but not the I/O port.
+> > >
+> > > Paolo
+>
+
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
