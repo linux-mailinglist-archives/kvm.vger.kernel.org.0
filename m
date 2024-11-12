@@ -1,180 +1,151 @@
-Return-Path: <kvm+bounces-31588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADE19C505C
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 09:16:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E899C507E
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 09:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92CFD1F229D6
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 08:16:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CE22B2599E
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2024 08:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC01A20B210;
-	Tue, 12 Nov 2024 08:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DC620B21E;
+	Tue, 12 Nov 2024 08:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgwhsehY"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B75E79C4;
-	Tue, 12 Nov 2024 08:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2911AB535;
+	Tue, 12 Nov 2024 08:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731399356; cv=none; b=LaMD0DMsOfoHDTsw8E5DugC0js7b1BwHXTpjOGobuxHs8XE17zcjF2nOCfwliLrC87+LwFlz3McjfVKeqWoo7FrHzdkOFqGtAriVAtUWQ3NB4kNggYGTjdDIoHtJP+DiP2tj63zDcYFDzqImGw84I7aSBuXVNRwzY9GZ+Q2ByIQ=
+	t=1731399915; cv=none; b=SXCMky6qvVHhFWAkYbZYBHJ+4RVysF2e/1F9G3M3qp7X84ZqeJW2FkjxE1SrjJxYXBvWgQCFMIowDzcS/vbRWURsxqiIjMyzF7na9VmWZ1DpXfquTc/uK8QbB/MlrAAzC0tdxZDaxod1k3MOpcdXfZyiE45SZRsINn9jGUYmS6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731399356; c=relaxed/simple;
-	bh=X2pqQTR1ih3jbpnM0w6zWU4zqT80DyMPwYiUZjm8MvE=;
-	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rJ7XnhADobeSeLflwr7/O/TUewf3qjfJCCtJ1M9uRpymzr+ACLuFxtG7BQ5PnoRLT/8w7agBKwTZQC+FDbzWn1yY02DS3BeLPbvizGtYsrKqDrPg4anJx5PXokL0U9QnJCzV4l2jNBZKyK3VP5IOWGkHnFCoRMUYJKfPiHJKhvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XnfMG2Cjyz1jy0R;
-	Tue, 12 Nov 2024 16:14:02 +0800 (CST)
-Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id B63A1180043;
-	Tue, 12 Nov 2024 16:15:50 +0800 (CST)
-Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 12 Nov 2024 16:15:50 +0800
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 12 Nov 2024 16:15:49 +0800
-Subject: Re: [PATCH v14 0/4] debugfs to hisilicon migration driver
-From: liulongfang <liulongfang@huawei.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-References: <20241108065538.45710-1-liulongfang@huawei.com>
- <20241108140121.1032a68a.alex.williamson@redhat.com>
- <b546eed4-3b5f-36f3-4a7f-fc97306bbbe3@huawei.com>
-Message-ID: <0deb2283-cf1c-9ca8-9863-f35c7de6d588@huawei.com>
-Date: Tue, 12 Nov 2024 16:15:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1731399915; c=relaxed/simple;
+	bh=UQHIGIVA0u7P7NQ/xWz8yr+S0vW04Pvq9teQHjkqPLE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PCxryT9MuNeEzChK/LaLFYfvDvVO4csekGJyL+tBQF3PvdLJ6FJwqJa/j3MnlLrkXyumj7yEgOqeAVGrmsEgbs2tK+52F18xKK5WwmK7lkw2xE94PUyVnBhklRpfwMasUsmc2pJmc8ku12pOR8F48mLVPYer01rlU67b7kPH5jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgwhsehY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14EF0C4CECD;
+	Tue, 12 Nov 2024 08:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731399915;
+	bh=UQHIGIVA0u7P7NQ/xWz8yr+S0vW04Pvq9teQHjkqPLE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cgwhsehYLQvL5cAnckoU4Zfc9JYnOYn4Xul3QiWT6nt0NWSIRHqIJuBVhrZ0LC/7X
+	 NNyOObVxaDsROGf2ZsJGLIHZOr9yAnPW7w1NRyerGDqnn8+0r/waFIeGy8c+CdWvnD
+	 SmiNfBaYnLfaNF1FKg7r5+ieARxuS8awCxVcVsd2yW+PP2Cqwh/hskaG4E+TkJ6Y2x
+	 S++Sm8E5xl1KzaxlHBP4r/LwWAr4diGnpHijCrdReJ8GTWSaiHuNgyWAsvIw4g3H63
+	 mP4ZukQpxzuInd9clDb3ICLX+6AoVvTcwhZKxFmFM6QfpIpeFXjX5jd+dqnppQo0th
+	 Rh+7mU1Og7RNA==
+Received: from 82-132-232-70.dab.02.net ([82.132.232.70] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tAmD2-00C6tU-IB;
+	Tue, 12 Nov 2024 08:25:12 +0000
+Date: Tue, 12 Nov 2024 08:25:09 +0000
+Message-ID: <87a5e4uae2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v4 2/5] KVM: arm64: vgic-its: Add read/write helpers on ITS table entries.
+In-Reply-To: <20241107214137.428439-3-jingzhangos@google.com>
+References: <20241107214137.428439-1-jingzhangos@google.com>
+	<20241107214137.428439-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <b546eed4-3b5f-36f3-4a7f-fc97306bbbe3@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemn100017.china.huawei.com (7.202.194.122)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.232.70
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com, eauger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/11/11 21:59, liulongfang wrote:
-> On 2024/11/9 5:01, Alex Williamson wrote:
->> On Fri, 8 Nov 2024 14:55:34 +0800
->> Longfang Liu <liulongfang@huawei.com> wrote:
->>
->>> Add a debugfs function to the hisilicon migration driver in VFIO to
->>> provide intermediate state values and data during device migration.
->>>
->>> When the execution of live migration fails, the user can view the
->>> status and data during the migration process separately from the
->>> source and the destination, which is convenient for users to analyze
->>> and locate problems.
->>>
->>> Changes v13 -> v14
->>> 	Bugfix the parameter problem of seq_puts()
->>
->> Should we assume this one is at least compile tested?  Thanks,
->>
->> Alex
->>
-> Yes, the patch needs to be fully tested..
-> I use the latest kernel6.12 and openEuler file system.
-> The verification test found that there is no problem with seq_printf()
-> and seq_puts(). But there is something wrong with the memory allocated
-> by "migf" and it needs to be fixed.
->
-
-"migf" issue:
-
-void *migf = NULL;
-migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file), GFP_KERNEL);
-
-modified since last review:
-void *migf = NULL;
-migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-
-The length after kzalloc allocates memory is wrong.
-We need to modify the definition of "migf" as follows:
-
-struct hisi_acc_vf_migration_file *migf = NULL;
-migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-
-It has been modified in the next version v15.
-And completed its functional testing using the latest
-kernel 6.12 and openEuler file system.
-
-Thanks.
-Longfang.
-
-> Thanks.
-> Longfang.
+On Thu, 07 Nov 2024 21:41:34 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
->>>
->>> Changes v12 -> v13
->>> 	Replace seq_printf() with seq_puts()
->>>
->>> Changes v11 -> v12
->>> 	Update comments and delete unnecessary logs
->>>
->>> Changes v10 -> v11
->>> 	Update conditions for debugfs registration
->>>
->>> Changes v9 -> v10
->>> 	Optimize symmetry processing of mutex
->>>
->>> Changes v8 -> v9
->>> 	Added device enable mutex
->>>
->>> Changes v7 -> v8
->>> 	Delete unnecessary information
->>>
->>> Changes v6 -> v7
->>> 	Remove redundant kernel error log printing and
->>> 	remove unrelated bugfix code
->>>
->>> Changes v5 -> v6
->>> 	Modify log output calling error
->>>
->>> Changes v4 -> v5
->>> 	Adjust the descriptioniptionbugfs file directory
->>>
->>> Changes v3 -> v4
->>> 	Rebased on kernel6.9
->>>
->>> Changes 2 -> v3
->>> 	Solve debugfs serialization problem.
->>>
->>> Changes v1 -> v2
->>> 	Solve the racy problem of io_base.
->>>
->>> Longfang Liu (4):
->>>   hisi_acc_vfio_pci: extract public functions for container_of
->>>   hisi_acc_vfio_pci: create subfunction for data reading
->>>   hisi_acc_vfio_pci: register debugfs for hisilicon migration driver
->>>   Documentation: add debugfs description for hisi migration
->>>
->>>  .../ABI/testing/debugfs-hisi-migration        |  25 ++
->>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 266 ++++++++++++++++--
->>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  19 ++
->>>  3 files changed, 279 insertions(+), 31 deletions(-)
->>>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
->>>
->>
->>
->> .
->>
+> To simplify read/write operations on ITS table entries, two helper
+> functions have been implemented. These functions incorporate the
+> necessary entry size validation.
 > 
-> .
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 > 
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index f2486b4d9f95..309295f5e1b0 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -146,6 +146,29 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+>  	return ret;
+>  }
+>  
+> +static inline int vgic_its_read_entry_lock(struct vgic_its *its, gpa_t eaddr,
+> +					   u64 *eval, unsigned long esize)
+> +{
+> +	struct kvm *kvm = its->dev->kvm;
+> +
+> +	if (KVM_BUG_ON(esize != sizeof(*eval), kvm))
+> +		return -EINVAL;
+> +
+> +	return kvm_read_guest_lock(kvm, eaddr, eval, esize);
+> +
+> +}
+> +
+> +static inline int vgic_its_write_entry_lock(struct vgic_its *its, gpa_t eaddr,
+> +					    u64 eval, unsigned long esize)
+> +{
+> +	struct kvm *kvm = its->dev->kvm;
+> +
+> +	if (KVM_BUG_ON(esize != sizeof(eval), kvm))
+> +		return -EINVAL;
+> +
+> +	return vgic_write_guest_lock(kvm, eaddr, &eval, esize);
+> +}
+> +
+
+I don't think this is right. Or at least not what I had in mind.
+
+What I wanted was to abstract both the element size and the ABI, and
+check for the type of 'eval'.
+
+Here, you implicitly case the caller's data on a u64, which C will
+happily do without warnings. So this KVM_BUG_ON() checks very little
+on writes.
+
+Also, you force the caller to explicitly extract the element-size from
+the ABI. Yes, it is available most of the time. But this is about
+checking consistency, and you are missing this opportunity.
+
+So while this code isn't wrong, it really doesn't make anything more
+robust. It's just another indirection.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
