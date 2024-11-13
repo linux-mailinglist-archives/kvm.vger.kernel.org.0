@@ -1,150 +1,249 @@
-Return-Path: <kvm+bounces-31821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31822-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAE89C7EC7
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 00:28:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A019C7ED1
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 00:33:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E38602825FF
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 23:28:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678D11F22EB6
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 23:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D3A18C92C;
-	Wed, 13 Nov 2024 23:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECB818DF67;
+	Wed, 13 Nov 2024 23:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtYPUXVZ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="k8PVw4nb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC4C18C01F
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 23:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4B717C;
+	Wed, 13 Nov 2024 23:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731540506; cv=none; b=hzfeTlCMA3zVqgtI4v7rb1oWwZOZKtexRvxhxPNqZMBLGWq5vtLjbmMJugmkdAa3gVgDng5NMk8wy2tUzfOoLygfLc1O55IGT0H0cEcTsBtevbDvJBLfxlY9MUaCmcwkGNoGZM+ML1zOeMV8efpJO+y83Svxyy46hTcZcqzmwIw=
+	t=1731540759; cv=none; b=LUZACpPnuG9syEI2s5itnt0XKyP5mzcEBdEFzowj1YdNuVw9Ej4Wj7fjk0929uNp9sX7Br9BjTrE5A6o8j37FAGuPxD7AgSFNDO2R7vnYkmWgH2LGl4GZTsrwzTIv7SqhFAhqcK1hyDdRDbodQ3g+HabXn7nO7lCMZFRcnFewuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731540506; c=relaxed/simple;
-	bh=YjU9s9ZaDbxHYGeaV2C6N8/SfLJnNYOE0SEesrqDb04=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tEFuVKkGhFpY2zu7FsW6vxbmDdCvCUrYzcKMl116DZMq4RrEM+WZzzlDgxpjuIAFu/MgkOiuExcjplQpX7EggTB7KV3eBiWChbbt0D7BgIEv0FmwRO215l0dePe399ulch2wQuWQJOvmyrSw+Id4Bm97cICMVtFwyiMopzMrgWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OtYPUXVZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731540503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CByKMOgU0eVBz2mkNWqRqmAJAX+dEHJdylhbZFnmBaU=;
-	b=OtYPUXVZNSXA3hHJYAzRy53gGVd39Iq8Moyk8mAzsfvPFD8Fm0P1ZnXqjWk5/Rxs8vCjGi
-	mW8h1aa5Px6HD0GpFts/z5PrlgY68nbMBEiCW90TkoOGSbjgX3Sz6p3bvZQq9kSj+NPVjd
-	Vfes/Ia6kykDiJugG+0Rgv7Rtydc6RE=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-96-wiYk0P-VOqCZ2tZqnvLJ9Q-1; Wed, 13 Nov 2024 18:28:22 -0500
-X-MC-Unique: wiYk0P-VOqCZ2tZqnvLJ9Q-1
-X-Mimecast-MFC-AGG-ID: wiYk0P-VOqCZ2tZqnvLJ9Q
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a71d04b04cso18345ab.1
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 15:28:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731540502; x=1732145302;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CByKMOgU0eVBz2mkNWqRqmAJAX+dEHJdylhbZFnmBaU=;
-        b=bB9s9JcYZrpsphkwONrioIJ//GNbTvvszNyXTJDM4Vc2ufqW5eAPW1yOVatYWwe13+
-         3hLHUT8RP5zDpm1X+poNEophVTyuKzYG1MwNB4jZqkhth77eN+GwWbLUZeDvK6M5QxyD
-         e5LdzZ2Jan9FEMavoO64KYcZ1f5wSFDBGnrOuxdLvJu+6btfHmKYZDzUQb39tZqrogc5
-         DPGyFsMO1F62l59E8ZQkeh784xbpfrxFEOeHcVKDAkO7ZiFu3G6v4g3erM2MYQooS2rg
-         eNT0emQhpzlI+1p577KWtIH6Kg8KaPbX9VzGd0rtr8XkXx/U/pbu6YQx9cIqmRFoMF6E
-         WZ0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVC0Jsh4M0pvPU5yTWeARFHE++t+J3hR4J6sRrwfxJ0np7e/dBRxdrvCklM13F/LjWQDCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh2v6LfzLl73kQXfU5h+1JXqBTvvnO3IklKc/EfFGDPO08FsWU
-	0t2WVEN6EuRlCtR8613J08ZGIzkvgDrWIHz6rJseFc4kv32rcGxOj06BFNn7u8BVC0l2ioijQhj
-	1C62uLVDSFlDod3lwd0OB916RuD790YCSAAPjJZKrywnONah17Q==
-X-Gm-Gg: ASbGncuE2ZsD0NVDMedCuu/IMPj/qNHgRupl9oD2AkdxLEwpUW9GjJCLwjrCEabN946
-	+2XCh5//awFg1g3LQBuB5H0+ELgfClfcUC4JFJnsLL24WyDZBFJqaUBBSQEEUGG44GdvrC/hZmA
-	UEkt58huXOZO4Sn/+F8gFQbS/X3qa/ZzG4pztzqeBVM7pp8J0l4rMjofOp5cCxx46khZStF/BUi
-	xv69BM+Oz/Uw3vlBC60WbbnL4XoSYd+1SK4VsyLM+Zd3iy1c6SzDg==
-X-Received: by 2002:a05:6602:1355:b0:82a:249e:bdfd with SMTP id ca18e2360f4ac-83e0336c2d5mr666721839f.3.1731540501878;
-        Wed, 13 Nov 2024 15:28:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEQTrkqTWB+qDVFYGCr8R0nJM12ERLnPB/kUAvT+bqN4as4eTVubwQThRFN253QDhFxM2PlMw==
-X-Received: by 2002:a05:6602:1355:b0:82a:249e:bdfd with SMTP id ca18e2360f4ac-83e0336c2d5mr666720939f.3.1731540501430;
-        Wed, 13 Nov 2024 15:28:21 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4deacf3013dsm1296353173.122.2024.11.13.15.28.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 15:28:20 -0800 (PST)
-Date: Wed, 13 Nov 2024 16:28:19 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
- <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
- <parav@nvidia.com>, <feliu@nvidia.com>, <kevin.tian@intel.com>,
- <joao.m.martins@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V4 vfio 5/7] vfio/virtio: Add support for the basic live
- migration functionality
-Message-ID: <20241113162819.698fd35a.alex.williamson@redhat.com>
-In-Reply-To: <20241113115200.209269-6-yishaih@nvidia.com>
-References: <20241113115200.209269-1-yishaih@nvidia.com>
-	<20241113115200.209269-6-yishaih@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1731540759; c=relaxed/simple;
+	bh=BZz8M8dA30sPg7gVl2T2380eKnaxbf2iUQX4W3szZMA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cfJfgzbsnGx+oQN1vJN1MnP1o2jIfnBqzqJ11nfBOX3GpM5IQe508yzZuUURpyNtxhJbZHMFYjB0IRQn9mVsIGo2hHHClEct/7gXUbve/aIF7Stkp9GCibuiyBr4PlP2WHyjX1Lro/9kyNZM5V1G9xbgIIxqTwsoAKl8f/x8x14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=k8PVw4nb; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 67C2C20BEBE8;
+	Wed, 13 Nov 2024 15:32:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 67C2C20BEBE8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731540757;
+	bh=18HJxeyRm3uSI4Swy2JMMEvrdkL3oWWV9AKPCAM4Vjo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k8PVw4nbkREJts0W0LLdSZ42CRybu1r1Xhyg6//i5lh5h22jmKQC5Lcd8aMOB/jYM
+	 HLQu6/qNMJUeGZmWA1itysWr/etRtR5KK0CiaR/7bY7XLVFMzfApOBiyev/vQ/vj4+
+	 bnJU3aZtjNHiFSBT13DVIlauDGkjJGEyGoyLGSkQ=
+Message-ID: <6d2a6bd4-a7cf-4672-9fb0-975acdc8ed31@linux.microsoft.com>
+Date: Wed, 13 Nov 2024 15:32:32 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] hyperv: Add new Hyper-V headers in include/hyperv
+To: Michael Kelley <mhklinux@outlook.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
+ "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
+ <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
+ "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
+ "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
+ "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "apais@linux.microsoft.com" <apais@linux.microsoft.com>
+References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
+ <BN7PR02MB4148025D8757B917013297E0D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
+ <b8ef1f71-9f13-48c3-adab-aa52b68d2e33@linux.microsoft.com>
+ <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Nov 2024 13:51:58 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
-> diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
-> new file mode 100644
-> index 000000000000..a0ce3ec2c734
-> --- /dev/null
-> +++ b/drivers/vfio/pci/virtio/migrate.c
-...
-> +static int virtiovf_add_migration_pages(struct virtiovf_data_buffer *buf,
-> +					unsigned int npages)
-> +{
-> +	unsigned int to_alloc = npages;
-> +	struct page **page_list;
-> +	unsigned long filled;
-> +	unsigned int to_fill;
-> +	int ret;
-> +	int i;
-> +
-> +	to_fill = min_t(unsigned int, npages, PAGE_SIZE / sizeof(*page_list));
-> +	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
+On 11/11/2024 11:31 AM, Michael Kelley wrote:
+> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Monday, November 11, 2024 10:45 AM
+>>
+>> On 11/10/2024 8:13 PM, Michael Kelley wrote:
+>>> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday,
+>> November 7, 2024 2:32 PM
+>>>>
+>>>> These headers contain definitions for regular Hyper-V guests (as in
+>>>> hyperv-tlfs.h), as well as interfaces for more privileged guests like
+>>>> Dom0.
+>>>
+>>> See my comment on Patch 0/4 about use of "dom0" terminology.
+>>>
+>>
+>> Thanks, noted.
+>>
+>>>>
+>>>> These files are derived from headers exported from Hyper-V, rather than
+>>>> being derived from the TLFS document. (Although, to preserve
+>>>> compatibility with existing Linux code, some definitions are copied
+>>>> directly from hyperv-tlfs.h too).
+>>>>
+>>>> The new files follow a naming convention according to their original
+>>>> use:
+>>>> - hdk "host development kit"
+>>>> - gdk "guest development kit"
+>>>> With postfix "_mini" implying userspace-only headers, and "_ext" for
+>>>> extended hypercalls.
+>>>>
+>>>> These names should be considered a rough guide only - since there are
+>>>> many places already where both host and guest code are in the same
+>>>> place, hvhdk.h (which includes everything) can be used most of the time.
+>>>
+>>> Just curious -- are there really cases where hvhdk.h can't be used?
+>>> If so, could you summarize why?
+>>>
+>>
+>> No, there aren't cases where it "can't" be used. I suppose if someone
+>> doesn't want to include everything, perhaps they could just include
+>> hvgdk.h, for example. It doesn't really matter though.
+>>
+>>> I ask because it would be nice to expand slightly on your paragraph
+>>> below, as follows:  (if indeed what I've added is correct)
+>>>
+>>> The use of multiple files and their original names is primarily to
+>>> keep the provenance of exactly where they came from in Hyper-V
+>>> code, which is helpful for manual maintenance and extension
+>>> of these definitions. Microsoft maintainers importing new definitions
+>>> should take care to put them in the right file. However, Linux kernel code
+>>> that uses any of the definitions need not be aware of the multiple files
+>>> or assign any meaning to the new names. Linux kernel uses should
+>>> always just include hvhdk.h
+>>>
+>>
+>> Thanks, I think that additional sentence helps clarify things. I'll
+>> include it in the next version, and I think I can probably omit the prior
+>> paragraph: "These names should be considered a rough guide only...".
+>>
+> 
+> Omitting that prior paragraph is OK with me.  The key thoughts from my
+> standpoint are:
+> * The separation into multiple files and the file names come from
+>    the Windows Hyper-V world and are maintained to ease bringing
+>    the definitions over from that world
+>    
+> * Linux code can ignore the multiple files and their names. Just
+>    #include hvhdk.h.
+> 
 
-checkpatch spots the following:
+Agreed, thanks for helping clarify the points.
 
-WARNING: Prefer kvcalloc over kvzalloc with multiply
-#416: FILE: drivers/vfio/pci/virtio/migrate.c:71:
-+	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
+>>>>
+>>>> The original names are kept intact primarily to keep the provenance of
+>>>> exactly where they came from in Hyper-V code, which is helpful for
+>>>> manual maintenance and extension of these definitions. Microsoft
+>>>> maintainers importing new definitions should take care to put them in
+>>>> the right file.
+>>>>
+>>>> Note also that the files contain both arm64 and x86_64 code guarded by
+>>>> \#ifdefs, which is how the definitions originally appear in Hyper-V.
+>>>
+>>> Spurious backslash?
+>>>
+>>
+>> Indeed, thanks.
+>>
+>>> I would suggest some additional clarification:  The #ifdef guards are
+>>> employed minimally where necessary to prevent conflicts due to
+>>> different definitions for the same thing on x86_64 and arm64. Where
+>>> there are no conflicts, the union of x86_64 definitions and arm64
+>>> definitions is visible when building for either architecture. In other
+>>> words, not all definitions specific to x86_64 are protected by #ifdef
+>>> x86_64. Such unprotected definitions may be visible when building
+>>> for arm64. And vice versa.
+>>>
+>>
+>> Is there a reason you specifically want to point out that "Such
+>> unprotected definitions may be visible when building for arm64. And vice
+>> versa."? I think, in all the cases where #ifdefs are not used, an
+>> arch-specific prefix is used - hv_x64_ or hv_arm64_.
+>>
+>> The main thing I wanted to call out here was the reasoning for not
+>> splitting arch-specific definitions into separate files in arch/x86/
+>> and arch/arm64/ as is typical in Linux.
+>>
+>> Maybe this is a bit clearer:
+>> "
+>> Note the new headers contain both arm64 and x86_64 definitions. Some are
+>> guarded by #ifdefs, and some are instead prefixed with the architecture,
+>> e.g. hv_x64_*. These conventions are kept from Hyper-V code as another
+>> tactic to simplify the process of importing and maintaining the
+>> definitions, rather than splitting them up into their own files in
+>> arch/x86/ and arch/arm64/.
+>> "
+> 
+> Yes, your new paragraph works for me. Your original statement was
+> "the files contain both arm64 and x86_64 code guarded by #ifdefs",
+> which sounds like the more typical Linux approach of using #ifdefs
+> to segregate into x86-specific, arm64-specific, and common. I was
+> just trying to be explicit that full segregation isn't done, and isn't a
+> goal, because of wanting to maintain alignment with the original
+> Hyper-V definitions.
+> 
+> It's "Hey, we know we're not handling this in the typical Linux way,
+> and here's why". Your revised paragraph covers that in a less
+> heavyweight way than what I wrote. :-)
+> 
 
+Ok, great. I'll use that for the next version then.
 
-With your approval I'll update with the following on commit:
+Thanks again!
+Nuno
 
-diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
-index a0ce3ec2c734..4fdf6ca17a3a 100644
---- a/drivers/vfio/pci/virtio/migrate.c
-+++ b/drivers/vfio/pci/virtio/migrate.c
-@@ -68,7 +68,7 @@ static int virtiovf_add_migration_pages(struct virtiovf_data_buffer *buf,
- 	int i;
- 
- 	to_fill = min_t(unsigned int, npages, PAGE_SIZE / sizeof(*page_list));
--	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
-+	page_list = kvcalloc(to_fill, sizeof(*page_list), GFP_KERNEL_ACCOUNT);
- 	if (!page_list)
- 		return -ENOMEM;
- 
-Thanks,
-Alex
+> Michael
+> 
+>>
+>> I hope it's reasonably clear that it's a good tradeoff to go against
+>> Linux convention in this case, to make it easy to import and maintain
+>> Hyper-V definitions.
+>>
+>> Thanks
+>> Nuno
+>>
 
 
