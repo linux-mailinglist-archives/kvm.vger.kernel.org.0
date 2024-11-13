@@ -1,97 +1,151 @@
-Return-Path: <kvm+bounces-31700-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31701-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64A29C6788
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 04:03:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E27F9C679D
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 04:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 490EDB25888
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 03:03:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97CA4B24010
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 03:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23FD915ADA6;
-	Wed, 13 Nov 2024 03:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903571632C9;
+	Wed, 13 Nov 2024 03:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cdU90jkL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLiJyBYE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7132AF04
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 03:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D3216190C
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 03:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731466977; cv=none; b=ot7ZNkMLEtrTTDaczwjicFdWSDKvkIrjyRX1tcYVkUg3nGf3L9PeXBbdRvk9I9RLoAYSb6L2Nj6dIB7lFgTfKt/AgQooP9kKNvZANxhL/LE8iyBK3u7G9dP8mP9JNlVAned2tD/uapn8R2c7yUbFoOtjKjWvEOAOM0HHdzXLT74=
+	t=1731467579; cv=none; b=HWmDwusf+S5BkAzGN2GEa2uuDKxBwN0gY57oOnwHflg5WwKijOPZYpEXvpLpbsWMA1wP8f4s0EZn0KUJOz2yXh2mkgNoLcqGCnZZJchxtvENRzA8GU08w9YVJzKhdQ1aT+3HSHmniFlteEP63263ffjCvTXv/sAdou+qeAnZ3fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731466977; c=relaxed/simple;
-	bh=W9HUswfZabqVw5NlfsqrtOqWOo/9BnmPMJyuBEewJss=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UZ+SrqSomf9lBvBxTB2R8jrXVVHRv70fkgZNyGe0kJUmvHEV/5IAD9mtHN3esbbQHz3rrl+z5K4AIIxC7JqgyEWhP+0J26k80DVLCe0CYNjfUy//RnTjlKWwP5qflEvpdqz78yk5lisl5lTIC4m1uza7PZaBYXjHFL3XBrp3TcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cdU90jkL; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731466976; x=1763002976;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=W9HUswfZabqVw5NlfsqrtOqWOo/9BnmPMJyuBEewJss=;
-  b=cdU90jkLzC810weQid8PJbmGI9eDBeqdTve0Frh8/kMiEqu1+nBl7Yai
-   oLygGP++PMvnTvqjJfjaHCalU9TbCJ/gRyRjRzPpfCc2MH4IyFFZ0RlDA
-   KqAWxVutdzQ/wyVDY/6VZO67K+0wTpEPjjPWLpGwi0nFHMgU0OeEfzcHe
-   zy/SDiMadDiG4u8zU3LEBipd+bP9TRO8Fxk1570sskOUnaNDbPSRDAwQA
-   laRonN4X4lt4oYhvMsirNaGVPCbl3OV7qv67EgZp55ygOzmgYu4FqPg9B
-   svliubZUe/tdSjxE2r84M5DVr+hZ0Ie8ZEE4eg1/XMDjVvR/8G5ahaKsh
-   g==;
-X-CSE-ConnectionGUID: wBaNWCoaSyqXJrJBGArJ9Q==
-X-CSE-MsgGUID: o9Q3uKZSSpG7xiTDTsPWdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="18950034"
-X-IronPort-AV: E=Sophos;i="6.12,149,1728975600"; 
-   d="scan'208";a="18950034"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 19:02:55 -0800
-X-CSE-ConnectionGUID: K8iSxJ3BSieLcSiRAtQoSw==
-X-CSE-MsgGUID: xhnuZOAvTm6Z+Jlu4pdHpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,149,1728975600"; 
-   d="scan'208";a="92183070"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 19:02:53 -0800
-Message-ID: <4d0173f0-2739-47aa-a9f0-429bf3173c0c@linux.intel.com>
-Date: Wed, 13 Nov 2024 11:01:53 +0800
+	s=arc-20240116; t=1731467579; c=relaxed/simple;
+	bh=aGDEPDsF+Q8EyDgP5RZSD4WuzW+6IkJfG/aIFBd5lFE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dUrJpWMSDvYJ3pEaKVvloCIVfBi+kefc4N3KAFZa8SlF8cnluYoaKp8ots+4cU3da3ktEKxBbOhvCTnOJ/BATCBvBgQnd29Tu/prQDd5JCsLCGWLmVrXHSBFzd4H59lR+yTBXWgGsK9FQzYejqv9rX3Hxwp9tpcziiEDemQOl8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLiJyBYE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B6DC4AF09
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 03:12:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731467579;
+	bh=aGDEPDsF+Q8EyDgP5RZSD4WuzW+6IkJfG/aIFBd5lFE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=BLiJyBYEJRpTjkVtCCWSblUch2sTiexyWIOPgikJ23CEogS6ViDLuU7UCJOnnLLPu
+	 03MgqI7T2ZQWGIBxtvsFmQ114XG/QK+yTIfaHGmxmgkJONVcosclQQRgEcL/jx/r2h
+	 QY5QPQ08T85ssQf7/yI6iPnPTCYXya1V93A2uv4DmUrrSH87bK28CuSI/B5xCoBvXP
+	 OwMimYfurjumoBgOqEhZeRPqwqcwK7P6Q71FpiSkxSCvHABDrbKjDm4VCnT8jklZiq
+	 AYGr5E+PeVZ8Q0WvJOqSyeGLF/3aT/iy2+ueazppPsLdX3OZ8JT9lzFX+QRDBYgEkx
+	 dmeWjBn5s9R9w==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cf04f75e1aso7667182a12.1
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 19:12:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXIuh7FJo1VpXw0c8Cz8k5hU7U5v02H7H7yMluI1mx7JRFvhhzuhTUren0VOJLYzWLfzZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL4d8ghgdUPSLmyqOkkSiIUeb57CDLJl41vmoYOteBx762rqJ2
+	Mmhy+Ne4GJ2aTYSI4lT1cPlGO6VCfN1VeAkpLBxnULssb5xIs8d+agESGZwt20SsdEvdjwVITzX
+	g59Jc0JWK75MuOsMXelsNF9HHHY4=
+X-Google-Smtp-Source: AGHT+IFBL4MFKWJ2gLMX0Nr5x8TFoj/k14rM6zCbF60i169syTOCZtRjYj9uG4d+KOypD4ObRoxyS5hP/fYn0kHCOTI=
+X-Received: by 2002:a17:907:7dab:b0:a99:f283:8147 with SMTP id
+ a640c23a62f3a-a9eeff25cb5mr1714039466b.27.1731467577782; Tue, 12 Nov 2024
+ 19:12:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/12] iommufd support pasid attach/replace
-To: Jason Gunthorpe <jgg@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Cc: joro@8bytes.org, kevin.tian@intel.com, alex.williamson@redhat.com,
- eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
- chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, vasant.hegde@amd.com
-References: <20241104132513.15890-1-yi.l.liu@intel.com>
- <20241113013748.GD35230@nvidia.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20241113013748.GD35230@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-7d881f728d67@kernel.org>
+In-Reply-To: <20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-7d881f728d67@kernel.org>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 13 Nov 2024 11:12:47 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7dfLLD6wjpVFBvfH3ZZO2-jDRQt6sA6FUL3pXfj2JnZA@mail.gmail.com>
+Message-ID: <CAAhV-H7dfLLD6wjpVFBvfH3ZZO2-jDRQt6sA6FUL3pXfj2JnZA@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Ensure ret is always initialized in kvm_eiointc_{read,write}()
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	WANG Xuerui <kernel@xen0n.name>, Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, llvm@lists.linux.dev, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/13/24 09:37, Jason Gunthorpe wrote:
-> On Mon, Nov 04, 2024 at 05:25:01AM -0800, Yi Liu wrote:
-> 
->> This series is based on the preparation series [1] [2], it first adds a
->> missing iommu API to replace the domain for a pasid.
-> Let's try hard to get some of these dependencies merged this cycle..
+Hi, Nathan,
 
-The pasid replace has been merged in the iommu tree.
+Thank you for your patch, but I think it is better to initialize it at
+declaration, and I will squash the change to the original patch since
+it hasn't been upstream.
 
-Yi, did I overlook anything?
+On Wed, Nov 13, 2024 at 1:02=E2=80=AFAM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> Clang warns (or errors with CONFIG_WERROR=3Dy):
+>
+>   arch/loongarch/kvm/intc/eiointc.c:323:2: error: variable 'ret' is used =
+uninitialized whenever switch default is taken [-Werror,-Wsometimes-uniniti=
+alized]
+>     323 |         default:
+>         |         ^~~~~~~
+>   arch/loongarch/kvm/intc/eiointc.c:697:2: error: variable 'ret' is used =
+uninitialized whenever switch default is taken [-Werror,-Wsometimes-uniniti=
+alized]
+>     697 |         default:
+>         |         ^~~~~~~
+>
+> Set ret to -EINVAL in the default case to resolve the warning, as len
+> was not a valid value for the functions to handle.
+>
+> Fixes: e24e9e0c1da4 ("LoongArch: KVM: Add EIOINTC read and write function=
+s")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+> It appears that my previous version of this change did not get
+> incorporated in the new revision. I did not mark this as a v2 since it
+> has been some time.
+>
+> https://lore.kernel.org/r/20240916-loongarch-kvm-eiointc-fix-sometimes-un=
+initialized-v1-1-85142dcb2274@kernel.org
+I'm very sorry that I have ignored this and didn't signal Xianglai.
 
---
-baolu
+Huacai
+
+> ---
+>  arch/loongarch/kvm/intc/eiointc.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/=
+eiointc.c
+> index 0084839f41506eb3b99c2c38f9721f3c0101e384..6af3ecbe29caaaef1582b1fbb=
+941c01638e721cf 100644
+> --- a/arch/loongarch/kvm/intc/eiointc.c
+> +++ b/arch/loongarch/kvm/intc/eiointc.c
+> @@ -323,6 +323,7 @@ static int kvm_eiointc_read(struct kvm_vcpu *vcpu,
+>         default:
+>                 WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, s=
+ize %d\n",
+>                                                 __func__, addr, len);
+> +               ret =3D -EINVAL;
+>         }
+>         spin_unlock_irqrestore(&eiointc->lock, flags);
+>
+> @@ -697,6 +698,7 @@ static int kvm_eiointc_write(struct kvm_vcpu *vcpu,
+>         default:
+>                 WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, s=
+ize %d\n",
+>                                                 __func__, addr, len);
+> +               ret =3D -EINVAL;
+>         }
+>         spin_unlock_irqrestore(&eiointc->lock, flags);
+>
+>
+> ---
+> base-commit: f7cc7a98fb7124abc269ebf162fcb3a8893b660a
+> change-id: 20241112-loongarch-kvm-eiointc-fix-sometimes-uninitialized-1d9=
+f543db2d2
+>
+> Best regards,
+> --
+> Nathan Chancellor <nathan@kernel.org>
+>
 
