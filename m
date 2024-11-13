@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-31786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7982E9C7A8C
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:02:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377819C7AAE
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 390562819D1
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 18:02:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE39D1F27899
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 18:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1E620966F;
-	Wed, 13 Nov 2024 18:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54402203712;
+	Wed, 13 Nov 2024 18:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWr5Tj6B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TFV0PBGy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBE9201113
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 17:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F102022DC
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 18:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731520803; cv=none; b=kpOusGJLKDXzluC5Wuvo3oZS23Gdy5s7ujcONpjOE1CgNvPbnci1jcmMzIImhRGOEW6vmID8goUkZ/FHnWLCVfjzrT0NWwJpP7ba5ASVBmiv9aaiAx1AOPG658VUyDdZRVjPLiq9X8/g+I0KIj9h4SxQsPNvl+5zYo3A4jf8ARk=
+	t=1731521221; cv=none; b=mRNe+o1R4x3INetxSF3Weoij0bvTAt4g6YdqIFBXnc4X8VZzzeVs1qKksiA8iKPtYUgcwCPXkluEGt91d5UaVJbdOJHa4oCI+IfusF3OhWRhOZsqssySSN7yRtwd/I6rt41FzzgBBhrXyiJhujYqBedXdRXQeKVHBqn/UZKhDF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731520803; c=relaxed/simple;
-	bh=pKjj2+Cv5RVya63su3M8gauw10wpOz6WwG+RdfrjUP0=;
+	s=arc-20240116; t=1731521221; c=relaxed/simple;
+	bh=/GuK59t3U4oKkx/l4VQtIVZCUGo46tDLii0qLHJB/cQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q7+U5P0TIxxbQoK14KFEDhfoXvWNxTYtLSUrXSrvOLG8IcDFBH3H6WE36JR8MalVNLE3215OWW67NbR/Pwz0jUMFC2pD6TVn6O6NyFJCZpFLHNIkpRgKF1Rpkp07op1sJ5UahZnfLbkJ60bjsiuwfo4txgHYsSR5aCAOEbpMNFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dWr5Tj6B; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=dOYR6Gpz8GVD2itMqXtOuqzhX0TuxkLubwjX5YnqOntwll13c2wmL+btyWLwT5SgENy8G/gBnbCpifZm+wtjko2aa2TMagonLCbjRiEBlYkv8XDlVdh6V+Q/WXbVhK8k/GODULqO6Dr0lMS+sZ78w7plC22ZHP98I8WXw89ez4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TFV0PBGy; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731520798;
+	s=mimecast20190719; t=1731521218;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dblJkbxFu+E1XmXn1xUYxXtUULG/yL/Mmf7WkR1K4ew=;
-	b=dWr5Tj6BkmbO7SPqOnwkMQV/Tiw0EbCDOUmv5Tjc8wMWIpfnY7vfIFeirqRtZp+oozsLG9
-	cWfZjJmRjXyvpMXhSWxOGDPZWmbBq45cNeCjfesvABMjUAH7nv437fLNg794YwTsBtWHSp
-	gDKlrnBvEm4cAQxSbUJPsr4Dkc253nc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zHGil4zFWVB1dC6k5RpDLCueLmdtUVVuQDry9KYFhb8=;
+	b=TFV0PBGyAAncQvsy8s01BAvWKdJXN5pf2QGZi9uhPqkORNOxe/D7Aq63KxYZlWLrLzmxY3
+	d6+nhBQYsU66fJ4BwvQLmKS1e7QlQpgcjPVtoA56vT5jTaeXdG0nB0ZnzXg4GoKezYz4ml
+	ztCoV+EGshUtv6Zy+Nh693fX4KRTJJk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-272-UvchUOBDN-GXpP_ZX4xQ-Q-1; Wed, 13 Nov 2024 12:59:57 -0500
-X-MC-Unique: UvchUOBDN-GXpP_ZX4xQ-Q-1
-X-Mimecast-MFC-AGG-ID: UvchUOBDN-GXpP_ZX4xQ-Q
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4315ad4938fso49608275e9.0
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 09:59:57 -0800 (PST)
+ us-mta-615-W7QX7ZT3Nzm0Kh40uzUGKQ-1; Wed, 13 Nov 2024 13:06:57 -0500
+X-MC-Unique: W7QX7ZT3Nzm0Kh40uzUGKQ-1
+X-Mimecast-MFC-AGG-ID: W7QX7ZT3Nzm0Kh40uzUGKQ
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4316e2dde9eso66096275e9.2
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 10:06:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731520796; x=1732125596;
+        d=1e100.net; s=20230601; t=1731521216; x=1732126016;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dblJkbxFu+E1XmXn1xUYxXtUULG/yL/Mmf7WkR1K4ew=;
-        b=CQpqDK52gAZ/R0sAGiHfwsBm/FRaI+0Ce9ens9OZdP2UaqFmdfuHYtLX7AU32pM4f9
-         OvzZOsO6Nrm3FIiH794CfC6TeVLB3RwnGgwGl5t4oVOdfJRXTIBOl9GCOD/Na3aPHgMX
-         smA2M7JcKP7e9kSQo578CPvb8xCF+7DgglS2jKN79btaB2In6SyJ02SylBwSxOdp+Haf
-         WvSyYIBZ7vIXV7T/7vzwFDkwntVeZERImwBSTwAp7N9wZnxrjxQ1osAgAumnffQSjEU8
-         +Y5wq5QZ+XB06e2xRWfEL+CdTyI5NRQo8BcSiNgU6+X3Nbh5kN8s85aq3HA07bwgOGOm
-         +31g==
-X-Forwarded-Encrypted: i=1; AJvYcCXWRXofPyjHrYfowtDRjQpn6ns1qnzPx4mgj188Slf2DWeX2JrEnOqVQkNgMbF9L41uyhA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2+BGkQH/XfSgzg+T12enFxGUxyKg4x6L20GFKfNuQYGmAfKPu
-	vHN+ILX+DrYeJJkW9tfxXuQnQxCzjJ1XTgpIE+iRTTrufczpDswqkvsWpWrpn4pbRDdt5mRynBk
-	DL43Dqwd5eZdSbOe8Q2sdEw2fyKQX0tn9laARDlaUnsDlubny5w==
-X-Received: by 2002:a05:600c:1e89:b0:426:60b8:d8ba with SMTP id 5b1f17b1804b1-432b751dc3cmr162297325e9.28.1731520796103;
-        Wed, 13 Nov 2024 09:59:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEmAdVNv4lE+G0uFJYG3tpSf03OwGRFjpW25aIwlVpY7CYnWL5GPLCuFsbc38AS7YrClVheUA==
-X-Received: by 2002:a05:600c:1e89:b0:426:60b8:d8ba with SMTP id 5b1f17b1804b1-432b751dc3cmr162297245e9.28.1731520795740;
-        Wed, 13 Nov 2024 09:59:55 -0800 (PST)
+        bh=zHGil4zFWVB1dC6k5RpDLCueLmdtUVVuQDry9KYFhb8=;
+        b=EWdfmbvFWg63l7DM+FggFhCE23j7X58ysANe5v91fnZBIBCEZAUiuMC2aNIEu7J18j
+         WtCbQtbk++pgKiG5a0IGLmrHmN5745r8YDamoXCIaTDqkJtIrCYCVDE3IzXnrfIMsdY3
+         rz4tLxVzAMes8T9ylBOZVAOKhXDfpHWkzJ59v7TmPsrwA5sLy3Wo8C/bV7XrqYztWk1a
+         xneXywiEc4XR+uXq8dKiTH0pYbLIBN2x0jOjpQI1mhGvrnGzVQ1rwq+I7BuLqbCw7xc8
+         r4+ohkHJGSjW8DFiMRXLRZorQMBTN6PslEZaUaZCvf/k1g5cFgvqGFiO4wg28V7Jxj10
+         FJRg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+WxNdjxCEqBt3xoqH8xb+XAcMAb1xraQtfkB3XYegQ/1txNiBqbWVG0HQfalaNzLAJWc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfitLCbVi5AOb5BLNPt+LywPjH0e0ruqOF20l6b59vpv2PdZsb
+	nojvsD1kYRQS0+fq9Q7i38e8rtV2yAZPzfKTO0xyxDZpCjPFen7eSefsf8izvzchqsJuZYK7QzE
+	CY7cXGEId8FWV6wSL2edGtUNCU8VN0Q3iM/0G52sfk92vugXi8w==
+X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr205041175e9.28.1731521215883;
+        Wed, 13 Nov 2024 10:06:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtF/Bm2sFvD8NMykTFnHKS/2fM8FKDNzbG9+c53bHdp6YlEv9GFdeiwAoFxnPEJlyF5VVV5w==
+X-Received: by 2002:a05:600c:1d20:b0:430:57e8:3c7e with SMTP id 5b1f17b1804b1-432b751ee6bmr205041015e9.28.1731521215539;
+        Wed, 13 Nov 2024 10:06:55 -0800 (PST)
 Received: from [192.168.10.47] ([151.49.84.243])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432d550412csm31975525e9.19.2024.11.13.09.59.54
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432d5503c63sm31784555e9.26.2024.11.13.10.06.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2024 09:59:54 -0800 (PST)
-Message-ID: <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com>
-Date: Wed, 13 Nov 2024 18:59:53 +0100
+        Wed, 13 Nov 2024 10:06:55 -0800 (PST)
+Message-ID: <02dcb7aa-f8d7-4044-93af-24b6d2e4c688@redhat.com>
+Date: Wed, 13 Nov 2024 19:06:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,35 +84,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific
- hypercalls
-To: Doug Covelli <doug.covelli@broadcom.com>
-Cc: Zack Rusin <zack.rusin@broadcom.com>,
- Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- the arch/x86 maintainers <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
- Arnaldo Carvalho de Melo <acme@redhat.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, Joel Stanley <joel@jms.id.au>,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
- linux-kselftest <linux-kselftest@vger.kernel.org>
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
- <20241030033514.1728937-3-zack.rusin@broadcom.com>
- <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
- <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com>
- <Zy0__5YB9F5d0eZn@google.com>
- <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
- <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com>
- <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
- <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com>
- <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
- <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
- <CADH9ctA_C1dAOus1K+wOH_SOKTb=-X1sVawt5R=dkH1iGt8QUg@mail.gmail.com>
- <CABgObfZrTyft-3vqMz5w0ZiAhp-v6c32brgftynZGJO8OafrdA@mail.gmail.com>
- <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com>
+Subject: Re: [PATCH] i386/kvm: Fix kvm_enable_x2apic link error in non-KVM
+ builds
+To: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, mtosatti@redhat.com
+Cc: santosh.shukla@amd.com, suravee.suthikulpanit@amd.com
+References: <20241113144923.41225-1-phil@philjordan.eu>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -150,178 +127,84 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com>
+In-Reply-To: <20241113144923.41225-1-phil@philjordan.eu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/13/24 17:24, Doug Covelli wrote:
->> No worries, you're not hijacking :) The only reason is that it would
->> be more code for a seldom used feature and anyway with worse performance.
->> (To be clear, CR8 based accesses are allowed, but stores cause an exit
->> in order to check the new TPR against IRR. That's because KVM's API
->> does not have an equivalent of the TPR threshold as you point out below).
+On 11/13/24 15:49, Phil Dennis-Jordan wrote:
+> It appears that existing call sites for the kvm_enable_x2apic()
+> function rely on the compiler eliding the calls during optimisation
+> when building with KVM disabled, or on platforms other than Linux,
+> where that function is declared but not defined.
 > 
-> I have not really looked at the code but it seems like it could also
-> simplify things as CR8 would be handled more uniformly regardless of
-> who is virtualizing the local APIC.
+> This fragile reliance recently broke down when commit b12cb38 added
+> a new call site which apparently failed to be optimised away when
+> building QEMU on macOS with clang, resulting in a link error.
 
-Not much because CR8 basically does not exist at all (it's just a byte
-in memory) with userspace APIC.  So it's not easy to make it simpler, even
-though it's less uniform.
+That's weird, can you check the preprocessor output?  The definition
+of kvm_irqchip_in_kernel() should be just "false" on macOS, in fact
+even the area you're changing should be simplified like
 
-That said, there is an optimization: you only get KVM_EXIT_SET_TPR if
-CR8 decreases.
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index 9de9c0d3038..7edb154a16e 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -13,8 +13,7 @@
 
->>> Also I could not find these documented anywhere but with MSFT's APIC our monitor
->>> relies on extensions for trapping certain events such as INIT/SIPI plus LINT0
->>> and SVR writes:
->>>
->>> UINT64 X64ApicInitSipiExitTrap    : 1; // WHvRunVpExitReasonX64ApicInitSipiTrap
->>> UINT64 X64ApicWriteLint0ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWriteTrap
->>> UINT64 X64ApicWriteLint1ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWriteTrap
->>> UINT64 X64ApicWriteSvrExitTrap    : 1; // WHvRunVpExitReasonX64ApicWriteTrap
->>
->> There's no need for this in KVM's in-kernel APIC model. INIT and
->> SIPI are handled in the hypervisor and you can get the current
->> state of APs via KVM_GET_MPSTATE. LINT0 and LINT1 are injected
->> with KVM_INTERRUPT and KVM_NMI respectively, and they obey IF/PPR
->> and NMI blocking respectively, plus the interrupt shadow; so
->> there's no need for userspace to know when LINT0/LINT1 themselves
->> change. The spurious interrupt vector register is also handled
->> completely in kernel.
-> 
-> I realize that KVM can handle LINT0/SVR updates themselves but our
-> interrupt subsystem relies on knowing the current values of these
-> registers even when not virtualizing the local APIC.  I suppose we
-> could use KVM_GET_LAPIC to sync things up on demand but that seems
-> like it might nor be great from a performance point of view.
+  #include "sysemu/kvm.h"
 
-Ah no, you're right---you want to track the CPU that has ExtINT enabled
-and send KVM_INTERRUPT to that one, I guess?  And you need the spurious
-vector registers because writes can set the mask bit in LINTx, but
-essentially you want to trap LINT0 changes.
+-#ifdef CONFIG_KVM
+-
++/* always false if !CONFIG_KVM */
+  #define kvm_pit_in_kernel() \
+      (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+  #define kvm_pic_in_kernel()  \
+@@ -22,14 +21,6 @@
+  #define kvm_ioapic_in_kernel() \
+      (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
 
-Something like this (missing the KVM_ENABLE_CAP and KVM_CHECK_EXTENSION
-code) is good, feel free to include it in your v2 (Co-developed-by
-and Signed-off-by me):
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5fb29ca3263b..b7dd89c99613 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -122,6 +122,7 @@
-  #define KVM_REQ_HV_TLB_FLUSH \
-  	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-  #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(34)
-+#define KVM_REQ_REPORT_LINT0_ACCESS	KVM_ARCH_REQ(35)
-  
-  #define CR0_RESERVED_BITS                                               \
-  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-@@ -775,6 +776,7 @@ struct kvm_vcpu_arch {
-  	u64 smi_count;
-  	bool at_instruction_boundary;
-  	bool tpr_access_reporting;
-+	bool lint0_access_reporting;
-  	bool xfd_no_write_intercept;
-  	u64 ia32_xss;
-  	u64 microcode_version;
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 88dc43660d23..0e070f447aa2 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1561,6 +1561,21 @@ static u32 apic_get_tmcct(struct kvm_lapic *apic)
-  			      apic->divide_count));
-  }
-  
-+static void __report_lint0_access(struct kvm_lapic *apic, u32 value)
-+{
-+	struct kvm_vcpu *vcpu = apic->vcpu;
-+	struct kvm_run *run = vcpu->run;
-+
-+	kvm_make_request(KVM_REQ_REPORT_LINT0_ACCESS, vcpu);
-+	run->lint0_access.value = value;
-+}
-+
-+static inline void report_lint0_access(struct kvm_lapic *apic, u32 value)
-+{
-+	if (apic->vcpu->arch.lint0_access_reporting)
-+		__report_lint0_access(apic, value);
-+}
-+
-  static void __report_tpr_access(struct kvm_lapic *apic, bool write)
-  {
-  	struct kvm_vcpu *vcpu = apic->vcpu;
-@@ -2312,8 +2327,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-  			int i;
-  
-  			for (i = 0; i < apic->nr_lvt_entries; i++) {
--				kvm_lapic_set_reg(apic, APIC_LVTx(i),
--					kvm_lapic_get_reg(apic, APIC_LVTx(i)) | APIC_LVT_MASKED);
-+				u32 old = kvm_lapic_get_reg(apic, APIC_LVTx(i));
-+				kvm_lapic_set_reg(apic, APIC_LVTx(i), old | APIC_LVT_MASKED);
-+				if (i == 0 && !(old & APIC_LVT_MASKED))
-+					report_lint0_access(apic, old | APIC_LVT_MASKED);
-  			}
-  			apic_update_lvtt(apic);
-  			atomic_set(&apic->lapic_timer.pending, 0);
-@@ -2352,6 +2369,8 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-  		if (!kvm_apic_sw_enabled(apic))
-  			val |= APIC_LVT_MASKED;
-  		val &= apic_lvt_mask[index];
-+		if (index == 0 && val != kvm_lapic_get_reg(apic, reg))
-+			report_lint0_access(apic, val);
-  		kvm_lapic_set_reg(apic, reg, val);
-  		break;
-  	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d0d3dc3b7ef6..2b039b372c3f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10879,6 +10879,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-  			kvm_vcpu_flush_tlb_guest(vcpu);
-  #endif
-  
-+		if (kvm_check_request(KVM_REQ_REPORT_LINT0_ACCESS, vcpu)) {
-+			vcpu->run->exit_reason = KVM_EXIT_LINT0_ACCESS;
-+			r = 0;
-+			goto out;
-+		}
-  		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
-  			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
-  			r = 0;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 637efc055145..ec97727f9de4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -178,6 +178,7 @@ struct kvm_xen_exit {
-  #define KVM_EXIT_NOTIFY           37
-  #define KVM_EXIT_LOONGARCH_IOCSR  38
-  #define KVM_EXIT_MEMORY_FAULT     39
-+#define KVM_EXIT_LINT0_ACCESS     40
-  
-  /* For KVM_EXIT_INTERNAL_ERROR */
-  /* Emulate instruction failed. */
-@@ -283,6 +284,10 @@ struct kvm_run {
-  				__u64 flags;
-  			};
-  		} hypercall;
-+		/* KVM_EXIT_LINT0_ACCESS */
-+		struct {
-+			__u32 value;
-+		} lint0_access;
-  		/* KVM_EXIT_TPR_ACCESS */
-  		struct {
-  			__u64 rip;
-
-
-For LINT1, it should be less performance critical; if it's possible
-to just go through all vCPUs, and do KVM_GET_LAPIC to check who you
-should send a KVM_NMI to, then I'd do that.  I'd also accept a patch
-that adds a VM-wide KVM_NMI ioctl that does the same in the hypervisor
-if it's useful for you.
-
-And since I've been proven wrong already, what do you need INIT/SIPI for?
+-#else
+-
+-#define kvm_pit_in_kernel()      0
+-#define kvm_pic_in_kernel()      0
+-#define kvm_ioapic_in_kernel()   0
+-
+-#endif  /* CONFIG_KVM */
+-
+  bool kvm_has_smm(void);
+  bool kvm_enable_x2apic(void);
 
 Paolo
+
+> 
+> Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+> ---
+>   target/i386/kvm/kvm_i386.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+> index 9de9c0d3038..7ce47388d90 100644
+> --- a/target/i386/kvm/kvm_i386.h
+> +++ b/target/i386/kvm/kvm_i386.h
+> @@ -21,17 +21,18 @@
+>       (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+>   #define kvm_ioapic_in_kernel() \
+>       (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> +bool kvm_enable_x2apic(void);
+>   
+>   #else
+>   
+>   #define kvm_pit_in_kernel()      0
+>   #define kvm_pic_in_kernel()      0
+>   #define kvm_ioapic_in_kernel()   0
+> +#define kvm_enable_x2apic()      0
+>   
+>   #endif  /* CONFIG_KVM */
+>   
+>   bool kvm_has_smm(void);
+> -bool kvm_enable_x2apic(void);
+>   bool kvm_hv_vpindex_settable(void);
+>   bool kvm_enable_hypercall(uint64_t enable_mask);
+>   
 
 
