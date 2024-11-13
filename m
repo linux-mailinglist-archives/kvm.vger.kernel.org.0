@@ -1,249 +1,289 @@
-Return-Path: <kvm+bounces-31822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4A019C7ED1
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 00:33:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF5C9C7EFD
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 00:56:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678D11F22EB6
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 23:33:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 294BD2845F6
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 23:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECB818DF67;
-	Wed, 13 Nov 2024 23:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D17E18D634;
+	Wed, 13 Nov 2024 23:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="k8PVw4nb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eLAY1U3X"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4B717C;
-	Wed, 13 Nov 2024 23:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327A118BB82
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 23:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731540759; cv=none; b=LUZACpPnuG9syEI2s5itnt0XKyP5mzcEBdEFzowj1YdNuVw9Ej4Wj7fjk0929uNp9sX7Br9BjTrE5A6o8j37FAGuPxD7AgSFNDO2R7vnYkmWgH2LGl4GZTsrwzTIv7SqhFAhqcK1hyDdRDbodQ3g+HabXn7nO7lCMZFRcnFewuk=
+	t=1731542188; cv=none; b=Z9bh35EkCDjtIMNePZxWtx9qatPOqDpp1T9ujjFRQBP+XawhXcdfkIeX4C3ikI54eS+6F7/yDb7ehCvXY1+NOBepoT5dRD6RX3HxmBc4t6A3CE/jJy0s75MTs9wqY7/2pyImm1Ma+6e6zJTW0ngOki5Z/Mgt4Yits5q5B/gy24Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731540759; c=relaxed/simple;
-	bh=BZz8M8dA30sPg7gVl2T2380eKnaxbf2iUQX4W3szZMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cfJfgzbsnGx+oQN1vJN1MnP1o2jIfnBqzqJ11nfBOX3GpM5IQe508yzZuUURpyNtxhJbZHMFYjB0IRQn9mVsIGo2hHHClEct/7gXUbve/aIF7Stkp9GCibuiyBr4PlP2WHyjX1Lro/9kyNZM5V1G9xbgIIxqTwsoAKl8f/x8x14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=k8PVw4nb; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 67C2C20BEBE8;
-	Wed, 13 Nov 2024 15:32:36 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 67C2C20BEBE8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1731540757;
-	bh=18HJxeyRm3uSI4Swy2JMMEvrdkL3oWWV9AKPCAM4Vjo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k8PVw4nbkREJts0W0LLdSZ42CRybu1r1Xhyg6//i5lh5h22jmKQC5Lcd8aMOB/jYM
-	 HLQu6/qNMJUeGZmWA1itysWr/etRtR5KK0CiaR/7bY7XLVFMzfApOBiyev/vQ/vj4+
-	 bnJU3aZtjNHiFSBT13DVIlauDGkjJGEyGoyLGSkQ=
-Message-ID: <6d2a6bd4-a7cf-4672-9fb0-975acdc8ed31@linux.microsoft.com>
-Date: Wed, 13 Nov 2024 15:32:32 -0800
+	s=arc-20240116; t=1731542188; c=relaxed/simple;
+	bh=NonNEb/p36N4aNw8pMOp1DVBkj1VagGzEXC4C3d0/os=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UytJBujGZ2tVSSRZP64aQfngPJuG0fJ3TAV+oV48KHq900R91v+FSGWOTT86mhhyFoDv41zgfHTj9j37q3QgFEWWqQbFuj3vI27zXvI8pmbA5pFZIQ1SNyi58jpAc9DwVQh/66OXOPM8k9OLhDLkOLrU1IpegBtjC0R8tDFrNaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eLAY1U3X; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2118b20e83aso35ad.0
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 15:56:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731542186; x=1732146986; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vr5S5GUuRLNtWM92jKG2I81mlCSBw1utW8NJkCQ7Lb8=;
+        b=eLAY1U3X2YSTNXQr/Kfk9eZFfUFj6DYoKTBx7PHrh3ybxcVbME2fSPrfEf4sG8MnZ0
+         6fokLZyS6oNZ19exrkgU81JVSzf+tl+AyEPi3WWQ/AeXvLO20elNvh7a0SvDvmYc1sd7
+         aH2SYqWEA7XNOv3EiyyhxNh6HQQd1F/A2mQOAEOZjvsgezqijKpxeEZMDjt93krpKiYv
+         /8GD07vk19KQaZyvV5uUzfOZrpU0jWGDOmgllppDFd4l4XlAfNV4TOpKdg4/r3eSDWi2
+         ZI6jEtRZomZ1MZr96bZNA7TG34JqPSI9dC8Id4fwMhhoY9uV1PxKsjg/mzf+BTe+k4Uv
+         213A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731542186; x=1732146986;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vr5S5GUuRLNtWM92jKG2I81mlCSBw1utW8NJkCQ7Lb8=;
+        b=C6+h+xijoL3o+gZ8oyS5/s4A9oROzJVzuis1V9ZVT/HWAQh19Otjg1A8iJGyc0m33G
+         YcBcXUvdxhd4IPTNNWm4oTa9XLUi8pvUtlljYJ7VsFdQgjQemzUmbLw2nqEaZGlZYGhx
+         U1w/a5c7esag3yJo/wQiT1LnfKeJSh+2Sa642wqnyWJfTo036mqpnLHU3UA7gkP2Jm07
+         1TGiS0qly8d9gbqceKy0nLuhzuxfuuJlkyYspF5KxH6mmBpx+ajmecZPXjStUFG2kSuc
+         Pdqii7o/3gjqG1jQmvJ1ZUPhSF2nDWqOaa/5Bb02+6hkBAhF2OoYNLODmYhG4cQk5++M
+         C1wg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8MK3kSdZJRhtRJU/JnAmOrc+u6teT6c6Ll5EPTeXXHwtBi90XzfA6m0JupAFQXG93mFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4x6WNveJvvAuBFdK3eHka9BuCBV+FbnqqRFYT15pIWLv860lO
+	2EAqtYQUF2y2oC6SJNxQA9AfvqKqdJQuGWWhXy5tErP45yiDllLzo0E9DnJk6DFB1vkIJTT0vl8
+	Zeg==
+X-Google-Smtp-Source: AGHT+IEn0Egc9e+jdjdcl5p3lcxUZPaJq7jsZW0myyVy6Dwg4xCLPAlzYX1BQwwv9eyILE9wT9IYH/2e6DA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e20b:b0:20c:857b:5dcb with SMTP id
+ d9443c01a7336-211835150d4mr863225ad.4.1731542186557; Wed, 13 Nov 2024
+ 15:56:26 -0800 (PST)
+Date: Wed, 13 Nov 2024 15:56:25 -0800
+In-Reply-To: <20241108130737.126567-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] hyperv: Add new Hyper-V headers in include/hyperv
-To: Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
- "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- "apais@linux.microsoft.com" <apais@linux.microsoft.com>
-References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
- <BN7PR02MB4148025D8757B917013297E0D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
- <b8ef1f71-9f13-48c3-adab-aa52b68d2e33@linux.microsoft.com>
- <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241108130737.126567-1-pbonzini@redhat.com>
+Message-ID: <ZzU8qY92Q2QNtuyg@google.com>
+Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, 
+	Luca Boccassi <bluca@debian.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On 11/11/2024 11:31 AM, Michael Kelley wrote:
-> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Monday, November 11, 2024 10:45 AM
->>
->> On 11/10/2024 8:13 PM, Michael Kelley wrote:
->>> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday,
->> November 7, 2024 2:32 PM
->>>>
->>>> These headers contain definitions for regular Hyper-V guests (as in
->>>> hyperv-tlfs.h), as well as interfaces for more privileged guests like
->>>> Dom0.
->>>
->>> See my comment on Patch 0/4 about use of "dom0" terminology.
->>>
->>
->> Thanks, noted.
->>
->>>>
->>>> These files are derived from headers exported from Hyper-V, rather than
->>>> being derived from the TLFS document. (Although, to preserve
->>>> compatibility with existing Linux code, some definitions are copied
->>>> directly from hyperv-tlfs.h too).
->>>>
->>>> The new files follow a naming convention according to their original
->>>> use:
->>>> - hdk "host development kit"
->>>> - gdk "guest development kit"
->>>> With postfix "_mini" implying userspace-only headers, and "_ext" for
->>>> extended hypercalls.
->>>>
->>>> These names should be considered a rough guide only - since there are
->>>> many places already where both host and guest code are in the same
->>>> place, hvhdk.h (which includes everything) can be used most of the time.
->>>
->>> Just curious -- are there really cases where hvhdk.h can't be used?
->>> If so, could you summarize why?
->>>
->>
->> No, there aren't cases where it "can't" be used. I suppose if someone
->> doesn't want to include everything, perhaps they could just include
->> hvgdk.h, for example. It doesn't really matter though.
->>
->>> I ask because it would be nice to expand slightly on your paragraph
->>> below, as follows:  (if indeed what I've added is correct)
->>>
->>> The use of multiple files and their original names is primarily to
->>> keep the provenance of exactly where they came from in Hyper-V
->>> code, which is helpful for manual maintenance and extension
->>> of these definitions. Microsoft maintainers importing new definitions
->>> should take care to put them in the right file. However, Linux kernel code
->>> that uses any of the definitions need not be aware of the multiple files
->>> or assign any meaning to the new names. Linux kernel uses should
->>> always just include hvhdk.h
->>>
->>
->> Thanks, I think that additional sentence helps clarify things. I'll
->> include it in the next version, and I think I can probably omit the prior
->> paragraph: "These names should be considered a rough guide only...".
->>
-> 
-> Omitting that prior paragraph is OK with me.  The key thoughts from my
-> standpoint are:
-> * The separation into multiple files and the file names come from
->    the Windows Hyper-V world and are maintained to ease bringing
->    the definitions over from that world
->    
-> * Linux code can ignore the multiple files and their names. Just
->    #include hvhdk.h.
-> 
+On Fri, Nov 08, 2024, Paolo Bonzini wrote:
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 8e853a5fc867..d5af4f8c5a6a 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -7281,7 +7281,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  			kvm_mmu_zap_all_fast(kvm);
+>  			mutex_unlock(&kvm->slots_lock);
+>  
+> -			wake_up_process(kvm->arch.nx_huge_page_recovery_thread);
+> +			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+>  		}
+>  		mutex_unlock(&kvm_lock);
+>  	}
+> @@ -7427,7 +7427,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+>  		mutex_lock(&kvm_lock);
+>  
+>  		list_for_each_entry(kvm, &vm_list, vm_list)
+> -			wake_up_process(kvm->arch.nx_huge_page_recovery_thread);
+> +			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+>  
+>  		mutex_unlock(&kvm_lock);
+>  	}
+> @@ -7530,62 +7530,65 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
+>  	srcu_read_unlock(&kvm->srcu, rcu_idx);
+>  }
+>  
+> -static long get_nx_huge_page_recovery_timeout(u64 start_time)
+> +#define NX_HUGE_PAGE_DISABLED (-1)
 
-Agreed, thanks for helping clarify the points.
+I don't see any point in using -1.  That's more legal (though still impossible
+and absurd) than an deadline of '0'.  And it's somewhat confusing because KVM
+uses -1 for the default nx_huge_pages value to indicate "enable the NX huge page
+mitigation if the CPU is vulnerable to L1TF", not "disable the mitigation".
 
->>>>
->>>> The original names are kept intact primarily to keep the provenance of
->>>> exactly where they came from in Hyper-V code, which is helpful for
->>>> manual maintenance and extension of these definitions. Microsoft
->>>> maintainers importing new definitions should take care to put them in
->>>> the right file.
->>>>
->>>> Note also that the files contain both arm64 and x86_64 code guarded by
->>>> \#ifdefs, which is how the definitions originally appear in Hyper-V.
->>>
->>> Spurious backslash?
->>>
->>
->> Indeed, thanks.
->>
->>> I would suggest some additional clarification:  The #ifdef guards are
->>> employed minimally where necessary to prevent conflicts due to
->>> different definitions for the same thing on x86_64 and arm64. Where
->>> there are no conflicts, the union of x86_64 definitions and arm64
->>> definitions is visible when building for either architecture. In other
->>> words, not all definitions specific to x86_64 are protected by #ifdef
->>> x86_64. Such unprotected definitions may be visible when building
->>> for arm64. And vice versa.
->>>
->>
->> Is there a reason you specifically want to point out that "Such
->> unprotected definitions may be visible when building for arm64. And vice
->> versa."? I think, in all the cases where #ifdefs are not used, an
->> arch-specific prefix is used - hv_x64_ or hv_arm64_.
->>
->> The main thing I wanted to call out here was the reasoning for not
->> splitting arch-specific definitions into separate files in arch/x86/
->> and arch/arm64/ as is typical in Linux.
->>
->> Maybe this is a bit clearer:
->> "
->> Note the new headers contain both arm64 and x86_64 definitions. Some are
->> guarded by #ifdefs, and some are instead prefixed with the architecture,
->> e.g. hv_x64_*. These conventions are kept from Hyper-V code as another
->> tactic to simplify the process of importing and maintaining the
->> definitions, rather than splitting them up into their own files in
->> arch/x86/ and arch/arm64/.
->> "
-> 
-> Yes, your new paragraph works for me. Your original statement was
-> "the files contain both arm64 and x86_64 code guarded by #ifdefs",
-> which sounds like the more typical Linux approach of using #ifdefs
-> to segregate into x86-specific, arm64-specific, and common. I was
-> just trying to be explicit that full segregation isn't done, and isn't a
-> goal, because of wanting to maintain alignment with the original
-> Hyper-V definitions.
-> 
-> It's "Hey, we know we're not handling this in the typical Linux way,
-> and here's why". Your revised paragraph covers that in a less
-> heavyweight way than what I wrote. :-)
-> 
+> +static u64 get_nx_huge_page_recovery_next(void)
+>  {
+>  	bool enabled;
+>  	uint period;
+>  
+>  	enabled = calc_nx_huge_pages_recovery_period(&period);
+>  
+> -	return enabled ? start_time + msecs_to_jiffies(period) - get_jiffies_64()
+> -		       : MAX_SCHEDULE_TIMEOUT;
+> +	return enabled ? get_jiffies_64() + msecs_to_jiffies(period)
+> +		: NX_HUGE_PAGE_DISABLED;
 
-Ok, great. I'll use that for the next version then.
+Please align the '?' and ':' to show that they are related paths of the ternary
+operator.  Moot point if we go without a literal '0'.
 
-Thanks again!
-Nuno
+>  }
+>  
+> -static int kvm_nx_huge_page_recovery_worker(struct kvm *kvm, uintptr_t data)
+> +static void kvm_nx_huge_page_recovery_worker_kill(void *data)
+>  {
+> -	u64 start_time;
+> +}
+> +
+> +static bool kvm_nx_huge_page_recovery_worker(void *data)
+> +{
+> +	struct kvm *kvm = data;
+>  	long remaining_time;
+>  
+> -	while (true) {
+> -		start_time = get_jiffies_64();
+> -		remaining_time = get_nx_huge_page_recovery_timeout(start_time);
+> +	if (kvm->arch.nx_huge_page_next == NX_HUGE_PAGE_DISABLED)
+> +		return false;
 
-> Michael
-> 
->>
->> I hope it's reasonably clear that it's a good tradeoff to go against
->> Linux convention in this case, to make it easy to import and maintain
->> Hyper-V definitions.
->>
->> Thanks
->> Nuno
->>
+The "next" concept is broken.  Once KVM sees NX_HUGE_PAGE_DISABLED for a given VM,
+KVM will never re-evaluate nx_huge_page_next.  Similarly, if the recovery period
+and/or ratio changes, KVM won't recompute the "next" time until the current timeout
+has expired.
 
+I fiddled around with various ideas, but I don't see a better solution that something
+along the lines of KVM's request system, e.g. set a bool to indicate the params
+changed, and sprinkle smp_{r,w}mb() barriers to ensure the vhost task sees the
+new params.
+
+FWIW, I also found "next" to be confusing.  How about "deadline"? KVM uses that
+terminology for the APIC timer, i.e. it's familiar, intuitive, and accurate(ish).
+
+Something like this as fixup?  (comments would be nice)
+
+---
+ arch/x86/include/asm/kvm_host.h |  3 ++-
+ arch/x86/kvm/mmu/mmu.c          | 34 +++++++++++++++++++++------------
+ 2 files changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 72f3bcfc54d7..e9fb8b9a9c2b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1444,7 +1444,8 @@ struct kvm_arch {
+ 
+ 	struct kvm_x86_pmu_event_filter __rcu *pmu_event_filter;
+ 	struct vhost_task *nx_huge_page_recovery_thread;
+-	u64 nx_huge_page_next;
++	u64 nx_huge_page_deadline;
++	bool nx_huge_page_params_changed;
+ 
+ #ifdef CONFIG_X86_64
+ 	/* The number of TDP MMU pages across all roots. */
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d0c2d9d2588f..acfa14d4248b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7102,6 +7102,13 @@ static void mmu_destroy_caches(void)
+ 	kmem_cache_destroy(mmu_page_header_cache);
+ }
+ 
++static void mmu_wake_nx_huge_page_task(struct kvm *kvm)
++{
++	smp_wmb();
++	WRITE_ONCE(kvm->arch.nx_huge_page_deadline, true);
++	vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
++}
++
+ static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp)
+ {
+ 	if (nx_hugepage_mitigation_hard_disabled)
+@@ -7162,7 +7169,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ 			kvm_mmu_zap_all_fast(kvm);
+ 			mutex_unlock(&kvm->slots_lock);
+ 
+-			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
++			mmu_wake_nx_huge_page_task(kvm);
+ 		}
+ 		mutex_unlock(&kvm_lock);
+ 	}
+@@ -7291,7 +7298,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+ 		mutex_lock(&kvm_lock);
+ 
+ 		list_for_each_entry(kvm, &vm_list, vm_list)
+-			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
++			mmu_wake_nx_huge_page_task(kvm);
+ 
+ 		mutex_unlock(&kvm_lock);
+ 	}
+@@ -7394,17 +7401,14 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
+ 	srcu_read_unlock(&kvm->srcu, rcu_idx);
+ }
+ 
+-#define NX_HUGE_PAGE_DISABLED (-1)
+-
+-static u64 get_nx_huge_page_recovery_next(void)
++static u64 get_nx_huge_page_recovery_deadline(void)
+ {
+ 	bool enabled;
+ 	uint period;
+ 
+ 	enabled = calc_nx_huge_pages_recovery_period(&period);
+ 
+-	return enabled ? get_jiffies_64() + msecs_to_jiffies(period)
+-		: NX_HUGE_PAGE_DISABLED;
++	return enabled ? get_jiffies_64() + msecs_to_jiffies(period) : 0;
+ }
+ 
+ static void kvm_nx_huge_page_recovery_worker_kill(void *data)
+@@ -7416,10 +7420,16 @@ static bool kvm_nx_huge_page_recovery_worker(void *data)
+ 	struct kvm *kvm = data;
+ 	long remaining_time;
+ 
+-	if (kvm->arch.nx_huge_page_next == NX_HUGE_PAGE_DISABLED)
++	if (READ_ONCE(kvm->arch.nx_huge_page_params_changed)) {
++		smp_rmb();
++		WRITE_ONCE(kvm->arch.nx_huge_page_params_changed, false);
++		kvm->arch.nx_huge_page_deadline = get_nx_huge_page_recovery_deadline();
++	}
++
++	if (!kvm->arch.nx_huge_page_deadline)
+ 		return false;
+ 
+-	remaining_time = kvm->arch.nx_huge_page_next - get_jiffies_64();
++	remaining_time = kvm->arch.nx_huge_page_deadline - get_jiffies_64();
+ 	if (remaining_time > 0) {
+ 		schedule_timeout(remaining_time);
+ 		/* check for signals and come back */
+@@ -7428,7 +7438,7 @@ static bool kvm_nx_huge_page_recovery_worker(void *data)
+ 
+ 	__set_current_state(TASK_RUNNING);
+ 	kvm_recover_nx_huge_pages(kvm);
+-	kvm->arch.nx_huge_page_next = get_nx_huge_page_recovery_next();
++	kvm->arch.nx_huge_page_deadline = get_nx_huge_page_recovery_deadline();
+ 	return true;
+ }
+ 
+@@ -7437,11 +7447,11 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+ 	if (nx_hugepage_mitigation_hard_disabled)
+ 		return 0;
+ 
+-	kvm->arch.nx_huge_page_next = get_nx_huge_page_recovery_next();
++	WRITE_ONCE(kvm->arch.nx_huge_page_params_changed, true);
+ 	kvm->arch.nx_huge_page_recovery_thread = vhost_task_create(
+ 		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kill,
+ 		kvm, "kvm-nx-lpage-recovery");
+-	
++
+ 	if (!kvm->arch.nx_huge_page_recovery_thread)
+ 		return -ENOMEM;
+ 
+
+base-commit: 922a5630cd31e4414f964aa64f45a5884f40188c
+--
 
