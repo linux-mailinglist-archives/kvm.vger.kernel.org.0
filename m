@@ -1,170 +1,205 @@
-Return-Path: <kvm+bounces-31795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB339C7B78
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:45:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85ED89C7BD1
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 20:02:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D63EB34D3C
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 18:41:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D161F22149
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D27374C4;
-	Wed, 13 Nov 2024 18:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A309B205AD0;
+	Wed, 13 Nov 2024 19:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="md40WSJz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q3L4AAuY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EAE202630
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 18:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B874202647
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 19:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731523294; cv=none; b=mZJLCqQcvv/RyaJPnKvTYHE6TvSNTR8ukHfGq0HTsPwa+yoNbWP+NTwFb9lq4pQopFBk7ivLPF2fj2NAW3B4wu0xmMlcMZtIYzIGMyjeWcH/oruJc+6Yb6uOlHmmLttnjX25Dr+zH0YNdgC689/R06kYtEQBDNcBiryPajzH8Qo=
+	t=1731524521; cv=none; b=r24gApUV+kQ7od6SOGsYukVecs0lIK6efSfp/IVlNPfRNqB/xNlEh50tcKj2D6HysXbXwHZ3SGUgHRG8HILDD2zGjwTWpXduxPBbWRzujFhUBEurBcJ+X9vVxcNMCgwD8QCB5+tPDbcJi817SbFt23B2cTgqEZJuNPXsEtQcdm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731523294; c=relaxed/simple;
-	bh=/6cAFmMHE1TEpLz6LqHni1bfuBBiGvBf+Q9klO/pZOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tbrlR4O3QKoqTtpKUZHjsZAlf+w/gNxhP1uOLhr3Es5DTp/kZ3hpE2Nur4RGz6Yx86vCPadY4tYsEcd+8x06ZfJXLzUgjSBmoC0rsstIpiZCzTO/X1zB2hN6d4Jfknvxosjri0bFSGV/yCi2BjSSDZ4uROJZ8ksfK4vfYodkU4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=md40WSJz; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7b15467f383so526884285a.3
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 10:41:31 -0800 (PST)
+	s=arc-20240116; t=1731524521; c=relaxed/simple;
+	bh=wSkHLXFPrs83Pn5/F539ICRvLrsaXMik0UWJ3y+YCFI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IKAP+eQOasA6dlXLSenDAx/hAPSVwsSslDQ3EM8quIT1CJ2MoTS9vdx8aZHliKOy+9hDrsqidniqTjl8lAiNzI0A5MZhUZRZEnwAxB0yeGcxpy3d3arSYv5s8rbKPrOi8bNZMM4u+pew2cztaKqtgb7rlrCzf98ULTxcEU+4hf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q3L4AAuY; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-83adc5130e3so768577439f.0
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 11:01:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1731523291; x=1732128091; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G2y1TaKaV2g4XFVY3gJwH3zViZ7RCzLm1QmvK0MsuyE=;
-        b=md40WSJzXnh4zt4zBALYkynrbuAtS0evfqRbhhEdXfTSrU9X//rj7qQ+WdPBI/PFWv
-         iS9kVQ8Hqca7Z2agBU1ihwZ8FbOJVfmbsEztd3LDbnwvlUDRvVz1TFbRGxEV9cCgYiBL
-         9JD2ADXGsTSWmv4p1ePEyujwJIfg4hbu1xhv6Pb4Qa8tPR7Fu5QDq/X5YjYjBTPgB75i
-         wYqkTjfVm8EDxG4SqIwukURwEZPgrbRth8FEc/cM9gxfCigiWMpoZ8QWHdSRAnr879lx
-         M1ZzRlqPwNjY+l6nl20XTHr7PPErXX8QKmPEo4WzkBoKYxSKbhr70o8LjSsisjMwpHpD
-         pPhQ==
+        d=google.com; s=20230601; t=1731524519; x=1732129319; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PXcTglpRYSGUG70owXD7nOF+NHWPUf0sMel4JnLxMI0=;
+        b=q3L4AAuYm4lvQ/PUvEMyoNQTbtVPNUM54kMpNNpE3LVIdu+hK9bP+KRUDSGwVB6MWS
+         beg1sajh0YqZFcpFvMluPTbO+9z7t799P2QpA/+iKnVdbHHLn3wHnoea36cGQQXiEy6O
+         Gra/zYxL1FSmVn35g+UPM3su8/h+elv2DPuu+z/YF4Gl8VNEuEB3lUzL2T0knurK9u+k
+         3suD8oWFU66HammbakuVrn5xYrSsoQr6D8/FZg8yDnrsyg6UV9WhJjscMbgg7oF3f3b7
+         x+jcUYRJXR5WPS+yv+W5nB1GSyaZZ2MJW3Q4DNfr2bH+tz+ak9cvRnjT90YdQVlOaGeO
+         tGKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731523291; x=1732128091;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G2y1TaKaV2g4XFVY3gJwH3zViZ7RCzLm1QmvK0MsuyE=;
-        b=N3zpVCuyNe970dfv3UkeI22nkczJU4BeeCeEGlRHzls68lnsSBBIHX2ZBT6i70cj9j
-         u4kId4XQpzddWHTns+h6Gqa+6yaM/DCSmSoa/kZ1KlADbji90gyFAFXzltKMfaosqDfN
-         z1YI8LNsDTZJ+ctLMVk4AQi9OrbjjB8wf3mMTSakgsm10lFCUdLn7XuvmsPm+QsLBVAV
-         BX8/vWmaJV3rlbGDODoWeaGHINyxRbL5D1V9iRjXeiet/Te66KBOP3k5R0+ohR1I4/qb
-         y2HPZ+1IV1TmTyIxTDuYyt6aqekKJX6tRWieJpATNhESlRnHuP/ok7eZPivlspRMsIaL
-         aTjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXChcN/lCzGkoYcv8rE8u9dphT3FLfxZZkJmMI4vG6ceh7cW9xxYhdWKrQdfcCZY3RkJEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyX+332eLLZPHp0NSpn7ZDr1VUzGaDIVXTJv9GABFerk2YMvhh
-	YkKo1oyTt7qAiOHvPb4V2K+NOcxTFFv7uwtcMAe1PjxsLAbCm8dbnC2hfNZcLyY=
-X-Google-Smtp-Source: AGHT+IGHlQ3B6cgvg7LHp9B0an1V9l7W1otIHEU9XZtLf2twbE4ctDauWQrxx5wsqcBmnHpCgDTZBw==
-X-Received: by 2002:a05:620a:4150:b0:7a2:1db:e286 with SMTP id af79cd13be357-7b35293bd6emr455709785a.52.1731523291038;
-        Wed, 13 Nov 2024 10:41:31 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32acb0496sm718091885a.89.2024.11.13.10.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 10:41:30 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tBIIz-000000011lJ-0zht;
-	Wed, 13 Nov 2024 14:41:29 -0400
-Date: Wed, 13 Nov 2024 14:41:29 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, matthew.brost@intel.com,
-	Thomas.Hellstrom@linux.intel.com, brian.welty@intel.com,
-	himal.prasad.ghimiray@intel.com, krishnaiah.bommu@intel.com,
-	niranjana.vishwanathapura@intel.com
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241113184129.GA173265@ziepe.ca>
-References: <20241105195357.GI35848@ziepe.ca>
- <20241107083256.GA9071@lst.de>
- <20241107132808.GK35848@ziepe.ca>
- <20241107135025.GA14996@lst.de>
- <20241108150226.GM35848@ziepe.ca>
- <20241108150500.GA10102@lst.de>
- <20241108152537.GN35848@ziepe.ca>
- <20241108152956.GA12130@lst.de>
- <20241108153846.GO35848@ziepe.ca>
- <20241112060108.GA10056@lst.de>
+        d=1e100.net; s=20230601; t=1731524519; x=1732129319;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PXcTglpRYSGUG70owXD7nOF+NHWPUf0sMel4JnLxMI0=;
+        b=X+5jnr/VJjqiX3klEe5CP/SG/JkZLoRpSSp8BCJkNr4DLX/eAlpTglLGhRfw8iPFVt
+         ab/5VZ2rRxXXiIioTqBxv4Qze4QwBGWdOEpbBzstpCJKKGhjYzhtndayQgSyqdDvOOog
+         cT7V59Enq8ld1CUf7e/pX34LcbxxcV2K4pWef7OkIjXB7n1vFGA14Mt9BOrPl/rgfBoY
+         hsenHyINuzg39bTinFo38faNY7zYD9Ky7Y/s7NzExAuZNjwh8tC+Q7s3CfFutYcRKZe7
+         fjGvwFAMAHTsny0sbHq5mCSXh9yzMr0nTI3Sb88mU/vwTXNosi2uGAqkiP6P3IsH7s94
+         72sQ==
+X-Gm-Message-State: AOJu0Yzo7UV7sILxgh/+0LF+TIFHRAVjZG/dpl4AKO99E+tCTWMvfUUh
+	+d5PBfGL1lhE4CVKjFsTA0lX3/NWAvkEYA113+1rDtJpl8CC8k+gHkbz/fD+0jNLsczgrXOOw+F
+	+dt+GTU8NXksHrF8p+mYeuMnkV2Kke6D+AalWYjPbEjcLKdQ9AmjCEe32xUGGw+jwFRAMWBUAUs
+	MwItofs0pBHbKHBySJVcOLY4qaic+Y6jiDNbreUe0EhN9zTNFTad4+OmI=
+X-Google-Smtp-Source: AGHT+IFIUdSo/WNLK0PV98lBe9m4ohTkfvDAOqn44oZ30S/C6GtrbtwtcCTbX1AO1mQEzViQLH/wGxNpeNufHAxBww==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6602:255a:b0:83a:9936:d1a6 with
+ SMTP id ca18e2360f4ac-83e4fb9178dmr1860539f.4.1731524519017; Wed, 13 Nov 2024
+ 11:01:59 -0800 (PST)
+Date: Wed, 13 Nov 2024 19:01:50 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241112060108.GA10056@lst.de>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241113190156.2145593-1-coltonlewis@google.com>
+Subject: [PATCH v8 0/5] Correct perf sampling with Guest VMs
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, Will Deacon <will@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 12, 2024 at 07:01:08AM +0100, Christoph Hellwig wrote:
-> On Fri, Nov 08, 2024 at 11:38:46AM -0400, Jason Gunthorpe wrote:
-> > > > What I'm thinking about is replacing code like the above with something like:
-> > > > 
-> > > > 		if (p2p_provider)
-> > > > 			return DMA_MAPPING_ERROR;
-> > > > 
-> > > > And the caller is the one that would have done is_pci_p2pdma_page()
-> > > > and either passes p2p_provider=NULL or page->pgmap->p2p_provider.
-> > > 
-> > > And where do you get that one from?
-> > 
-> > Which one?
-> 
-> The p2p_provider thing (whatever that will actually be).
+v8:
+* Improve patch 4 perf flags refactor
+* Rebase to v6.12-rc7
 
-p2p_provider would be splitting out the information in
-pci_p2pdma_pagemap to it's own type:
+v7:
+https://lore.kernel.org/all/20241107190336.2963882-1-coltonlewis@google.com/
 
-struct pci_p2pdma_pagemap {
-	struct pci_dev *provider;
-	u64 bus_offset;
+v6:
+https://lore.kernel.org/all/20241105195603.2317483-1-coltonlewis@google.com/
 
-That is the essential information to compute PCI_P2PDMA_MAP_*.
+v5:
+https://lore.kernel.org/all/20240920174740.781614-1-coltonlewis@google.com/
 
-For example when blk_rq_dma_map_iter_start() calls pci_p2pdma_state(),
-it has this information from page->pgmap. It would still have the
-information via the pgmap when we split it out of the
-pci_p2pdma_pagemap.
+v4:
+https://lore.kernel.org/kvm/20240919190750.4163977-1-coltonlewis@google.com/
 
-Since everything doing a dma map has to do the pci_p2pdma_state() to
-compute PCI_P2PDMA_MAP_* every dma mapping operation has already got
-the provider. Since everything is uniform within a mapping operation
-the provider is constant for the whole map.
+v3:
+https://lore.kernel.org/kvm/20240912205133.4171576-1-coltonlewis@google.com/
 
-For future non-struct page cases the provider comes along with the
-address list from whatever created the address list in the first
-place.
+v2:
+https://lore.kernel.org/kvm/20240911222433.3415301-1-coltonlewis@google.com/
 
-Looking at dmabuf for example, I expect dmabuf to provide a new data
-structure which is a list of lists:
+v1:
+https://lore.kernel.org/kvm/20240904204133.1442132-1-coltonlewis@google.com/
 
- [[provider GPU: [mmio_addr1,mmio_addr2,mmio_addr3],
-  [provider NULL: [cpu_addr1, cpu_addr2, ...],
-   ..
- ]
+This series cleans up perf recording around guest events and improves
+the accuracy of the resulting perf reports.
 
-And each uniform group would be dma map'd on its own using the
-embedded provider instead of page->pgmap.
+Perf was incorrectly counting any PMU overflow interrupt that occurred
+while a VCPU was loaded as a guest event even when the events were not
+truely guest events. This lead to much less accurate and useful perf
+recordings.
 
-Jason
+See as an example the below reports of `perf record
+dirty_log_perf_test -m 2 -v 4` before and after the series on ARM64.
+
+Without series:
+
+Samples: 15K of event 'instructions', Event count (approx.): 31830580924
+Overhead  Command          Shared Object        Symbol
+  54.54%  dirty_log_perf_  dirty_log_perf_test  [.] run_test
+   5.39%  dirty_log_perf_  dirty_log_perf_test  [.] vcpu_worker
+   0.89%  dirty_log_perf_  [kernel.vmlinux]     [k] release_pages
+   0.70%  dirty_log_perf_  [kernel.vmlinux]     [k] free_pcppages_bulk
+   0.62%  dirty_log_perf_  dirty_log_perf_test  [.] userspace_mem_region_find
+   0.49%  dirty_log_perf_  dirty_log_perf_test  [.] sparsebit_is_set
+   0.46%  dirty_log_perf_  dirty_log_perf_test  [.] _virt_pg_map
+   0.46%  dirty_log_perf_  dirty_log_perf_test  [.] node_add
+   0.37%  dirty_log_perf_  dirty_log_perf_test  [.] node_reduce
+   0.35%  dirty_log_perf_  [kernel.vmlinux]     [k] free_unref_page_commit
+   0.33%  dirty_log_perf_  [kernel.vmlinux]     [k] __kvm_pgtable_walk
+   0.31%  dirty_log_perf_  [kernel.vmlinux]     [k] stage2_attr_walker
+   0.29%  dirty_log_perf_  [kernel.vmlinux]     [k] unmap_page_range
+   0.29%  dirty_log_perf_  dirty_log_perf_test  [.] test_assert
+   0.26%  dirty_log_perf_  [kernel.vmlinux]     [k] __mod_memcg_lruvec_state
+   0.24%  dirty_log_perf_  [kernel.vmlinux]     [k] kvm_s2_put_page
+
+With series:
+
+Samples: 15K of event 'instructions', Event count (approx.): 31830580924
+Samples: 15K of event 'instructions', Event count (approx.): 30898031385
+Overhead  Command          Shared Object        Symbol
+  54.05%  dirty_log_perf_  dirty_log_perf_test  [.] run_test
+   5.48%  dirty_log_perf_  [kernel.kallsyms]    [k] kvm_arch_vcpu_ioctl_run
+   4.70%  dirty_log_perf_  dirty_log_perf_test  [.] vcpu_worker
+   3.11%  dirty_log_perf_  [kernel.kallsyms]    [k] kvm_handle_guest_abort
+   2.24%  dirty_log_perf_  [kernel.kallsyms]    [k] up_read
+   1.98%  dirty_log_perf_  [kernel.kallsyms]    [k] __kvm_tlb_flush_vmid_ipa_nsh
+   1.97%  dirty_log_perf_  [kernel.kallsyms]    [k] __pi_clear_page
+   1.30%  dirty_log_perf_  [kernel.kallsyms]    [k] down_read
+   1.13%  dirty_log_perf_  [kernel.kallsyms]    [k] release_pages
+   1.12%  dirty_log_perf_  [kernel.kallsyms]    [k] __kvm_pgtable_walk
+   1.08%  dirty_log_perf_  [kernel.kallsyms]    [k] folio_batch_move_lru
+   1.06%  dirty_log_perf_  [kernel.kallsyms]    [k] __srcu_read_lock
+   1.03%  dirty_log_perf_  [kernel.kallsyms]    [k] get_page_from_freelist
+   1.01%  dirty_log_perf_  [kernel.kallsyms]    [k] __pte_offset_map_lock
+   0.82%  dirty_log_perf_  [kernel.kallsyms]    [k] handle_mm_fault
+   0.74%  dirty_log_perf_  [kernel.kallsyms]    [k] mas_state_walk
+
+Colton Lewis (5):
+  arm: perf: Drop unused functions
+  perf: Hoist perf_instruction_pointer() and perf_misc_flags()
+  powerpc: perf: Use perf_arch_instruction_pointer()
+  x86: perf: Refactor misc flag assignments
+  perf: Correct perf sampling with guest VMs
+
+ arch/arm/include/asm/perf_event.h            |  7 ---
+ arch/arm/kernel/perf_callchain.c             | 17 ------
+ arch/arm64/include/asm/perf_event.h          |  4 --
+ arch/arm64/kernel/perf_callchain.c           | 28 ---------
+ arch/powerpc/include/asm/perf_event_server.h |  6 +-
+ arch/powerpc/perf/callchain.c                |  2 +-
+ arch/powerpc/perf/callchain_32.c             |  2 +-
+ arch/powerpc/perf/callchain_64.c             |  2 +-
+ arch/powerpc/perf/core-book3s.c              |  4 +-
+ arch/s390/include/asm/perf_event.h           |  6 +-
+ arch/s390/kernel/perf_event.c                |  4 +-
+ arch/x86/events/core.c                       | 64 +++++++++++++-------
+ arch/x86/include/asm/perf_event.h            | 12 ++--
+ include/linux/perf_event.h                   | 26 +++++++-
+ kernel/events/core.c                         | 27 ++++++++-
+ 15 files changed, 111 insertions(+), 100 deletions(-)
+
+
+base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
+--
+2.47.0.338.g60cca15819-goog
 
