@@ -1,160 +1,136 @@
-Return-Path: <kvm+bounces-31713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90FD99C693E
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 07:28:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52AE29C6943
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 07:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6101B1F23962
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 06:28:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 043821F2383E
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 06:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02E417B4E1;
-	Wed, 13 Nov 2024 06:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E905C185939;
+	Wed, 13 Nov 2024 06:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+DWPjRI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WQtqY1j5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D71C1714BC
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 06:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F7B17837A
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 06:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731479314; cv=none; b=OFpgTlPmUvmVyx9/hdOYCTnVtafxA1nnbO5HbBPkKZ+zb4bBUwh5ehglLuVtg0d6FZe4zwSkRahx/Kk67ml7ZoUmqSet0As4GrQrn+ashqLmLKdZgEXqoVsFPQ+vZejPsXEI7RCrck5LJ7bOsO0/B7oWeG0fg74YDwbZsMRadNA=
+	t=1731479353; cv=none; b=V1O+pI9q8h8NFZmVg8I/cShqhv/OV5GyXWNp6FwKrHocqpdMVpFKoiUPSPh1nmQJLAQ1u0ihwceVtT6bIfBbhFI4X+KLgWdcyjV5gPdxiQMmUg3bmzE1iEdS4aF4bZpXdV5EgHlns0IxBjcoQoS9xCBDImJT8LZ3uP30Bi61xQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731479314; c=relaxed/simple;
-	bh=bJpEoLa9wR6aB8KQXz8zxFwUUi3xAhl87Kw/wI78IZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qy8tQW7ZHICfxgs190g01/xBHzJE+XU8Bt6vgonkEVa9m92mYgTQ7lmtFL2pyYfaxoXWYj5Y1V53ltA2mhtDuy/6akTTMaq0yQsGRrDix1CufNSrXUhmB/dfZ6n7ZjC5gj1kmNHPiP+E9Bb1QNFqQoYnaejJEUn38g1GKjVs710=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=I+DWPjRI; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1731479353; c=relaxed/simple;
+	bh=ryKZ3ZF7sN+kjlkdznbBZ1GozgBjmJSrP4P2jIodaXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YlsMU1LksAWAxkD1DzgA3SVWIKzdZba7slGUgcCUUu3Mg7cIIHim56Phrv6bpbKmRNku4yaHGpUvhT+8QT4jsEcH65QiqERu6JObAyiUnNwDSqaoutw4dL0o6lZOObLE28Esm+dfXAnBER3paz4uvmuf+4pf3IJ/4OC6kOS6J5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WQtqY1j5; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb4af0b6beso88883321fa.3
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 22:28:32 -0800 (PST)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53d9ff8f1e4so575495e87.2
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2024 22:29:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731479310; x=1732084110; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7MydHF9t/w/ct/1EMVG3dItdPgKvgvLeI/8cIryhFm4=;
-        b=I+DWPjRIY0umYiv7S6Fr+Rczcy/Tw9MhcNF5u+WgIgTrQZg8XW3Th1Bf/McAkGQ6ot
-         qNIz2QAqWlj2P6fDgtm5bcW5Klsg7aFwIoEhGYKvvpUPCQcbhWFjzmlRdbRDMKxZemtt
-         Aroh3ZajG6ZT/a2WyigCdetb0y56dMdjq8bkrJJYJlXXVdZQ/kNroFrc88BUb19XqLyJ
-         cgnZNo25Sn/SBJRfIcecZuWLu5fORiG9Si8FhU2T8IHjt9+/0NMZDwMhmZUSNPfOR//H
-         3+ENkmSOjU7uQsKUGQr+m1Zw7fJ2L7zJv2iOKzVBEVTgaEbryDt0qQo5D1XChcxixENZ
-         tCLg==
+        d=linaro.org; s=google; t=1731479348; x=1732084148; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9QCU/JLa948seWzRrNmkByaOgxKmnVBehQKimS55YRs=;
+        b=WQtqY1j5mGUp6K+OS8i21t023WgFcGnaPntb4Obk23sKqdmFCVqIEJ0Cm7yaZEanMV
+         gUOXp/4VV96oUyHB/rN22VI82czJAUNuFWPMUqL5GS8bFruFqO/+nlf6vgQ/iqU7JkJ+
+         xxdA5cpHOwmFJqb1xeCCJ8mJB3a9aPBwUcBYgitplO7IKEl1vDaALu81C5g+DbnWnZkP
+         BWC8+t0bp0bbM7VXEpAyIdNG6tf/H96kzWUcBeaR+WiDNNsZU1CMYCJWOBa0fhim/5NC
+         FcuPfwzGgBuEwuFEroqNB4vVJSQ7hkiwE/JQiV8S2ZxVWV/5WU89zm4f5j0Ql3NyA6KU
+         yjqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731479310; x=1732084110;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7MydHF9t/w/ct/1EMVG3dItdPgKvgvLeI/8cIryhFm4=;
-        b=tVMYOg0pb8JYX2GUGLwtKbGdnlWRXvkNFVhJJlO1VfBUPr+CUI/2/mAjijOpYxDZ40
-         mWpac4Jo6tBQe20puimq9sdlZioQKvmeJr6fkEjMWVvzedNPVwU0dxWZ+4H6Q7IsYS08
-         s0ncWCla2CjtfaNGEn+yQEm8WEXf3fw4NaTRqlld/dPH5PN/y3RH84f67tBy7FkcZmEA
-         Xjc7V/4U50U+Q8sa/ADltWMSA3NCiahS5KjjP4yYEhdsFsHuU1z5UKpQ7HN4VMuHagVR
-         gQM69IdxpA42p6Z/KA2dl3O5AR8j/l7d9b+7GmvjKIVNxMKbRkJU/E8VoTCeRd1rDUvD
-         Yj+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXrWYKrX88JO1WKdG+NmkWYtX1K1JCRhQEsRlwonaCjhQ9fStYVG0IPi2OlmVF38Cka3wY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXvsCmn5D2a8pUgFcCrr+35L2BfuZjVWU5S2CVHQiAAo1rwYHp
-	4xunkp3mBNDnjJPLN+VLAoYg/70uSfQZD/Ez3B76IxZsOYqc2PzOQJ+Y8Tp4G34=
-X-Google-Smtp-Source: AGHT+IGKzyDVFYR5ZYN3HiQLZfu0/jwK8IkxuMCc19BP0lOmLqZNHBgQkW5X9nnsF64mV94mzsXOqQ==
-X-Received: by 2002:a2e:a551:0:b0:2fa:cdac:8732 with SMTP id 38308e7fff4ca-2ff2028ad8fmr133177161fa.30.1731479310254;
-        Tue, 12 Nov 2024 22:28:30 -0800 (PST)
-Received: from [192.168.69.126] (cnf78-h01-176-184-27-250.dsl.sta.abo.bbox.fr. [176.184.27.250])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a17b64sm816138766b.39.2024.11.12.22.28.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 22:28:29 -0800 (PST)
-Message-ID: <fbe5da1d-9a0e-4aa4-91f9-dfb729f39dc9@linaro.org>
-Date: Wed, 13 Nov 2024 07:28:26 +0100
+        d=1e100.net; s=20230601; t=1731479348; x=1732084148;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9QCU/JLa948seWzRrNmkByaOgxKmnVBehQKimS55YRs=;
+        b=xIO2NvkdMt4TJiS0CGV3W7awKk7QoOoMy1Unbko7Nf857MtyxT/tg2GemZ2TMGd1CK
+         LBYoVpciwXfS5ZPlpfPDDJ11lL8TwutSdD2iFL7ZRl+F5p0/93eARgRWBj4ysBtfWMPw
+         vb/7kr0Gmg1B8su5flhXXblqEbqpvZG4X7Uv3U3oh7AwGjfQZCugUMkcYhc/Q3yHh44L
+         jzWsi7zfEJTM4cyWDvJDfK8+5FSU9OrieT2tTRohttcg1vM0lLctqEaMdnEkmR4LobCY
+         3dLSRjqcSd08Qc4URF+0GHEf/fgBRKq5CK7ur51LEq5a6lho8iW9mZNqFDgvh8IriEgY
+         KJKw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9aqrYNMeG/EpwQU9tEe0mWm/wvRjKr30TJFTzgJq8MvfujHkdIPbEAOHFGG34nTc8teY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFI4eK+5da+WMP18BvmzWHHGQPZwufl3KC7covTnHNJKKBtJaN
+	ZcPqBgz9P8IJFykJ0qaIQd19C0yzPL1IU4n9xvwDrbkGpDXyNP3OQgXUuWAs/7xAVSDzCw5e7La
+	rxxddOzja9Lo/AONMFywt3slSCjUEGMEIRmoT8w==
+X-Google-Smtp-Source: AGHT+IEEpcf7Vups7lw1NP9O1FTEPXG1XjljcLFymoWHBWMOkn9tB109/qtbls5Dq+XYyRVJ67vPr0ofrW4PZLq41wk=
+X-Received: by 2002:a05:6512:281b:b0:536:54fd:275b with SMTP id
+ 2adb3069b0e04-53d86303095mr9309340e87.54.1731479348058; Tue, 12 Nov 2024
+ 22:29:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 07/60] kvm: Introduce kvm_arch_pre_create_vcpu()
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>, Ani Sinha <anisinha@redhat.com>
-Cc: Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
- kvm@vger.kernel.org, qemu-devel@nongnu.org
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-8-xiaoyao.li@intel.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20241105062408.3533704-8-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <0-v4-9e99b76f3518+3a8-smmuv3_nesting_jgg@nvidia.com>
+ <20241112182938.GA172989@nvidia.com> <CABQgh9HOHzeRF7JfrXrRAcGB53o29HkW9rnVTf4JefeVWDvzyQ@mail.gmail.com>
+ <20241113012359.GB35230@nvidia.com> <9df3dd17-375a-4327-b2a8-e9f7690d81b1@linux.intel.com>
+In-Reply-To: <9df3dd17-375a-4327-b2a8-e9f7690d81b1@linux.intel.com>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Wed, 13 Nov 2024 14:28:56 +0800
+Message-ID: <CABQgh9F+K67YDYeg4==0dhdjya1YuX6uUttQA8zadWEZyRhNKw@mail.gmail.com>
+Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, acpica-devel@lists.linux.dev, iommu@lists.linux.dev, 
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Donald Dutile <ddutile@redhat.com>, 
+	Eric Auger <eric.auger@redhat.com>, Hanjun Guo <guohanjun@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Jerry Snitselaar <jsnitsel@redhat.com>, 
+	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, 
+	patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, 
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi, Baolu
 
-On 5/11/24 06:23, Xiaoyao Li wrote:
-> Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
-> work prior to create any vcpu. This is for i386 TDX because it needs
-> call TDX_INIT_VM before creating any vcpu.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> Changes in v3:
-> - pass @errp to kvm_arch_pre_create_vcpu(); (Per Daniel)
-> ---
->   accel/kvm/kvm-all.c  | 10 ++++++++++
->   include/sysemu/kvm.h |  1 +
->   2 files changed, 11 insertions(+)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 930a5bfed58f..1732fa1adecd 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -523,6 +523,11 @@ void kvm_destroy_vcpu(CPUState *cpu)
->       }
->   }
->   
-> +int __attribute__ ((weak)) kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
+On Wed, 13 Nov 2024 at 10:56, Baolu Lu <baolu.lu@linux.intel.com> wrote:
+>
+> On 11/13/24 09:23, Jason Gunthorpe wrote:
+> >> https://github.com/Linaro/linux-kernel-uadk/tree/6.12-wip
+> >> https://github.com/Linaro/qemu/tree/6.12-wip
+> >>
+> >> Still need this hack
+> >> https://github.com/Linaro/linux-kernel-uadk/commit/
+> >> eaa194d954112cad4da7852e29343e546baf8683
+> >>
+> >> One is adding iommu_dev_enable/disable_feature IOMMU_DEV_FEAT_SVA,
+> >> which you have patchset before.
+> > Yes, I have a more complete version of that here someplace. Need some
+> > help on vt-d but hope to get that done next cycle.
+>
+> Can you please elaborate this a bit more? Are you talking about below
+> change
+>
+> +       ret = iommu_dev_enable_feature(idev->dev, IOMMU_DEV_FEAT_SVA);
+> +       if (ret)
+> +               return ret;
+>
+> in iommufd_fault_iopf_enable()?
+>
+> I have no idea about why SVA is affected when enabling iopf.
 
-We don't use the weak attribute. Maybe declare stubs for each arch?
+In drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c,
+iommu_dev_enable_feature(IOMMU_DEV_FEAT_SVA) will real call
+iopf_queue_add_device,
+while iommu_dev_enable_feature(IOPF)  only set flag.
 
-> +{
-> +    return 0;
-> +}
-> +
->   int kvm_init_vcpu(CPUState *cpu, Error **errp)
->   {
->       KVMState *s = kvm_state;
-> @@ -531,6 +536,11 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->   
->       trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
->   
-> +    ret = kvm_arch_pre_create_vcpu(cpu, errp);
-> +    if (ret < 0) {
-> +        goto err;
-> +    }
-> +
->       ret = kvm_create_vcpu(cpu);
->       if (ret < 0) {
->           error_setg_errno(errp, -ret,
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index c3a60b28909a..643ca4950543 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -374,6 +374,7 @@ int kvm_arch_get_default_type(MachineState *ms);
->   
->   int kvm_arch_init(MachineState *ms, KVMState *s);
->   
-> +int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp);
->   int kvm_arch_init_vcpu(CPUState *cpu);
->   int kvm_arch_destroy_vcpu(CPUState *cpu);
->   
+arm_smmu_dev_enable_feature
+case IOMMU_DEV_FEAT_SVA:
+arm_smmu_master_enable_sva(master)
+iopf_queue_add_device(master->smmu->evtq.iopf, dev);
 
+Thanks
 
