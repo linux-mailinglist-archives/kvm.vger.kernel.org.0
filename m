@@ -1,176 +1,235 @@
-Return-Path: <kvm+bounces-31711-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31712-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4429E9C6847
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 05:57:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD6A9C6912
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 07:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEFDC2851AD
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 04:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AE0C1F255FB
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 06:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CDA170A1C;
-	Wed, 13 Nov 2024 04:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CAB8178384;
+	Wed, 13 Nov 2024 06:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZT7wqmL2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lJPd9wbU"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B00D1632D6
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 04:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731473857; cv=none; b=WHWBEfJUHC1195s4X5QLBWvQidHXgs/z28w1ks7C2kqyZBNTXPT2Ip6qSJB8NZDpnyoV/qQuBIC4aLhnG/2KkDBoSSv5LdhVcbeXpz5BD2U9GQQXiZTjzlT6Xp/6PHDvC/4HB8VAW/tpHhksQiNFqnrQUg0ntbPTrsrQ6PWhywE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731473857; c=relaxed/simple;
-	bh=b72XHTpU2wmHlD8dOIC9NiqW6uRGz6C9BEqfSXwQ+xA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LjqjaqSncop27Js7QFRh2FqL3IPO9Hk4LWZMhvCMiD+CGdhVUCGMln97ZCbJOb7W1gQNM08uU1I6adWQ5/Nf3vYG9So/4PpwDsGbtHW4dKXFF99+x7Wi1tbkv+IfcVM3OJ0XjGy/sc43LkTCXd/IpKSVQMotqbsz9Vo5bcxk2k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZT7wqmL2; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=j1HJo1ufOOxZgsH2EGvRK6a4aBfxJMGSr5VDtSY9Rgs=; b=ZT7wqmL2VOXcAirGj0kjVCjCvh
-	4z2BhaS4iVOQ43YLyNmGY43VklL1/Z2O7Ma1NK4RzLuUHfFiUzS2WjkOYB5oKPoFJda3Bx7rTagGw
-	jOZn1nnDPQGPUnhJMJHFu4kXX+w8FgWC1U4gfDubH4vy8aK6Mf6LRX/CMPitatQjucVjfC+qTKfkV
-	JrRVjk2/BoA8zXvfKHLDICQwWNltHNpqfMqSmAxHbBBbPZSd6hJRwc1k5YwiM7C5ZPiZMducbEvnl
-	VIh1yDHuoLwWUumcMyn/Y5kUfjO/K1qrgEniRYXqOBLcIrJyY+T6jb+nbxTL70sAmPUGrDVo22mWO
-	vPHnMYtA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tB5RY-0000000Fj5A-3sOC;
-	Wed, 13 Nov 2024 04:57:29 +0000
-Date: Wed, 13 Nov 2024 04:57:28 +0000
-From: Matthew Wilcox <willy@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD8815F40B
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 06:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731477979; cv=fail; b=T9PkLZBbR3XjjzMy7dIq+kYmedwjNPJfXTZa2SQZehQK0UYFm/6G09gzBAeDXET/Zj8hSrt/kpYTwjhgeuIlfdzpps0U6cUhrP0agxeGc9veo6qy6fuqX6epr1awguvmz7hCibXAtzPTe81+OK6HotDAKfCH7a2+toCKjFoXB7E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731477979; c=relaxed/simple;
+	bh=ACxyAb1Jlll9hgxi11OxqAJaoraMqPCGBaabKGd/0nU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=QqmIMxJgHRewk6AD5z9U5fJyObw9csLznCN3j/ARHpvdYGnyiZ09o+QWyXcpYehNjziW0Dss+cJksc22bLNUFG/PMG3vr7VmgmbcQ4E/DJ1mrTsSy8uQnxJ9Ed16ahP2nqlTd31XuopbfVETAciTMIyimfdMbbLSHvhQzuBnBJk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lJPd9wbU; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731477977; x=1763013977;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ACxyAb1Jlll9hgxi11OxqAJaoraMqPCGBaabKGd/0nU=;
+  b=lJPd9wbUdD7pLLQLnmXJ59CGnU/wYBk1yNYfBRSZ+wEZXHZYpLsuWL0y
+   x/TPgowhBl0ENXuzdNW6tQMNBYYQ/8NrDp3eYnzUScVmdnt3wqLg0JMrN
+   r3K4J0+sryoqfrGKoIKEesuigiaC4ltvJU9w7I+f48GNleAbRWM75FwLD
+   vL8eoGUC3L8o60rLlTgYJUZIlhs+9Tz2xCnOLeKznbO8djMQl8jMSO5hW
+   3q/AIklM0/hgITrCpmNi0vx7trATpKjhqbzLF+pGNvWChZTnLeo7fktJY
+   azO9tCWqX1MnEnSgv3/OB5UV7cL/DA9dNCWysJ7vcZB7Oaf4MGSX5tIu4
+   g==;
+X-CSE-ConnectionGUID: 1YCOUQIqTtub+1lud/pxrQ==
+X-CSE-MsgGUID: eGO45nzqR/6MgDjDg0M3cQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="42738990"
+X-IronPort-AV: E=Sophos;i="6.12,150,1728975600"; 
+   d="scan'208";a="42738990"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 22:06:16 -0800
+X-CSE-ConnectionGUID: m3Kjg8a5R0CUdPRJ8LUOCA==
+X-CSE-MsgGUID: VcXuD3YcTuaGL3jpqfCLKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,150,1728975600"; 
+   d="scan'208";a="92836224"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Nov 2024 22:06:17 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 12 Nov 2024 22:06:16 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 12 Nov 2024 22:06:16 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 12 Nov 2024 22:06:15 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JUrr6DSorwqzOJt13IHhBMKZ+2PEDLedgdHU8BH3rxGfxWJjIh4bJp/HyvN1q25GMo/r82wxBzc88cCj3lh4OnvGvqnaIKdgX7oLwbj1yZVuB5Y8OxEsRgDRP7UJj9MUKSjy14K56S4KHYojVsykCXwECDJ53+QQGj6hP2NVdE/U5ZKmpd7fgn0NElEBO3XAyWEOC7IbvTSGYEPpiiUj1U5UBuH9ealkTG5/q+wVIxhJgyMcCW3oEkcyMR2ZllBNW3d+pfME2Uq7ysTiThNPj7YYr7warmcW6aEZEZ/g+i8/loKUYq9McfX8PeHCS0QrTNTjhgg6krHdb24WDxkTCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ACxyAb1Jlll9hgxi11OxqAJaoraMqPCGBaabKGd/0nU=;
+ b=mpSHL1TPQJSTsgHcj4ZdMeymApSdI3L2LX2JIQlWog4qyHwUT1ubVmld9h0302NwsZrUEXDAK9gaL8L6NBYxsZDncU7ZvXJPlfE5bd9sqCzcBSRzNJZP/nchjBYNGRoBflIwM76bwNzv3PAGHy5cUUuqIL08pxFO9/PSNIWpFQliFkb6D83QD7kDmW7qpijhr20eO49cbcU2vygxNjhXu/Hzr2f6s/ej+HCsCC1TqePekoAO1khRVuUTg079LrZRqVbEMxXGN1dPdWTZAc0KVBYjc6C0+I96cK0eL82Rh192DyVWfjmzSC10TcVsTxCHJmRKP15aX7rKmiTQ3OsmdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by PH7PR11MB8121.namprd11.prod.outlook.com (2603:10b6:510:234::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Wed, 13 Nov
+ 2024 06:06:13 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%3]) with mapi id 15.20.8158.013; Wed, 13 Nov 2024
+ 06:06:12 +0000
+Date: Wed, 13 Nov 2024 14:06:04 +0800
+From: Chao Gao <chao.gao@intel.com>
 To: David Hildenbrand <david@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Fuad Tabba <tabba@google.com>,
-	linux-mm@kvack.org, kvm@vger.kernel.org,
-	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	rppt@kernel.org, jglisse@redhat.com, akpm@linux-foundation.org,
-	muchun.song@linux.dev, simona@ffwll.ch, airlied@gmail.com,
-	pbonzini@redhat.com, seanjc@google.com, jhubbard@nvidia.com,
-	ackerleytng@google.com, vannapurve@google.com,
-	mail@maciej.szmigiero.name, kirill.shutemov@linux.intel.com,
-	quic_eberman@quicinc.com, maz@kernel.org, will@kernel.org,
-	qperret@google.com, keirf@google.com, roypat@amazon.co.uk
-Subject: Re: [RFC PATCH v1 00/10] mm: Introduce and use folio_owner_ops
-Message-ID: <ZzQxuAiJLbqm5xGO@casper.infradead.org>
-References: <20241108162040.159038-1-tabba@google.com>
- <20241108170501.GI539304@nvidia.com>
- <9dc212ac-c4c3-40f2-9feb-a8bcf71a1246@redhat.com>
- <CA+EHjTy3kNdg7pfN9HufgibE7qY1S+WdMZfRFRiF5sHtMzo64w@mail.gmail.com>
- <ZzLnFh1_4yYao_Yz@casper.infradead.org>
- <e82d7a46-8749-429c-82fa-0c996c858f4a@redhat.com>
- <20241112135348.GA28228@nvidia.com>
- <430b6a38-facf-4127-b1ef-5cfe7c495d63@redhat.com>
+CC: <linux-coco@lists.linux.dev>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	KVM <kvm@vger.kernel.org>
+Subject: Re: [Invitation] bi-weekly guest_memfd upstream call on 2024-11-14
+Message-ID: <ZzRBzGJJJoezCge8@intel.com>
+References: <6f2bfac2-d9e7-4e4a-9298-7accded16b4f@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6f2bfac2-d9e7-4e4a-9298-7accded16b4f@redhat.com>
+X-ClientProxiedBy: SI2PR02CA0019.apcprd02.prod.outlook.com
+ (2603:1096:4:195::13) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <430b6a38-facf-4127-b1ef-5cfe7c495d63@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH7PR11MB8121:EE_
+X-MS-Office365-Filtering-Correlation-Id: 764e8b08-1247-4621-46a3-08dd03a9469f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?cA4WTUvl3MUL/b88giMzuaY+0S27Ek95TA0cKJ7p8EYmeKl5AaKT/BooYEk6?=
+ =?us-ascii?Q?DvhN7y8E1fGb4nUyRgrBVvQVjKXPX0HvoGDlcWxXSarHpzqkdCv6jaZZOovA?=
+ =?us-ascii?Q?QT+OXwjcSNH2oPdKqyidLZ5f4ShskYxAmNPxBnZj5wkq0a4doKOSyb6ZwCxt?=
+ =?us-ascii?Q?JyVDqyXkRkhVW9EkkInvGL4XIAM7kCETzpGXAdbZ52eoGLubs1DRa1FFo1st?=
+ =?us-ascii?Q?+aiuSpx1FAS5kUt+8+sXVQ+ZgNJuGsrQJp1+aO7nU6fEEGiQiZiq60qpG3Hs?=
+ =?us-ascii?Q?mBFbcdYKexCQ2S0ulfShc+PJAz4iKgcxlPM+6UUzNOkn/J3ticY3Q090aXZU?=
+ =?us-ascii?Q?Gs5FzAdxN9WhJE/WbHm7Wvj48sSawRdmekTqQ2Sx3GeRyrqEB38ZYor87T00?=
+ =?us-ascii?Q?32Fidl7Ub9s+W7OJ1xgIstGLwWrVS5lGlHOwXEZG2wGS2CcyDvl0j0O/kv0F?=
+ =?us-ascii?Q?IdzM59cbKX39ZAIf0aAa+zBaq4mVGymueDPwKcG5B3BWukoru2dbxMJbwx/O?=
+ =?us-ascii?Q?sWHEqnCRfFAVsncy+Gvc/nNVruY2K7eGdgx6ZThCtA7zX7oelTuzxmMVtYBx?=
+ =?us-ascii?Q?6/1Py75BXDHjvZLdlGRd9peL9xjEVYLPtj558llFdaPFf+DnOJzZk+MQQ9N4?=
+ =?us-ascii?Q?Vndvm5L3Nfhzkli6yOrIbjIRn0RwCajh9njdjVWSEJu7Gv7pUbqn74MyeEKG?=
+ =?us-ascii?Q?eX4CiEqCAZFNy+YjVgxck8stIhEJwTwPfylmKHO8uvwpvcCbwQ+Us61/RN+z?=
+ =?us-ascii?Q?bydca4mvAQSGi8elMDXexT6rLeKBM3HRnKVixiNRB5HehxSn1oxgZXHZMQnf?=
+ =?us-ascii?Q?aLmiBbYqt5xKpQwFLkQMKsFYjtMehk83gwLEaOGQFrawFoTB+yW7zHCQ7pKl?=
+ =?us-ascii?Q?0yFXJ+MuZXiT6T3yDTtv37Og/DB1QoY79r9arXAsJjm005+jPppFXLixB3qH?=
+ =?us-ascii?Q?N3WbLHUChV1L4nWre3a/+OEUDvB9kqKyqsKcFwzMa0CnAh1Xtf8RYCUShHNI?=
+ =?us-ascii?Q?sYzadSGLRRPsnIV8xtIVoafHFW0peSXJuJUHIqKuzmVEwJMNiolmnaPTJUs/?=
+ =?us-ascii?Q?UmgfCgUW710kv2hbzDmpma9JH72EFO6LDqxH/MzjANTZyRHq2kkdaz6h94K9?=
+ =?us-ascii?Q?977k+lzFqGvULbdSyHW9H5FXB23+Gpv0jxVzr9Z6bE09jAQgNFwUYdrQf9MU?=
+ =?us-ascii?Q?vR2YMt46BynlQ8Sb04o7UolToWiB7uXKM7+6HRGsRMDVpBkGXdVCaKkGE7rJ?=
+ =?us-ascii?Q?0aO+g/tiq574BmTpTvSbL8uhB5LsDVUfWnkBFEWGSsdktoZ270NDpzPwe8gl?=
+ =?us-ascii?Q?9O/1rwAqHDEnbwptnwkum2cB?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FoBFcWRS9wPQL1Jag2rVCIFBmKwXpXJEljrTiwAJ6QXjp4ernrj8maUl6KrZ?=
+ =?us-ascii?Q?jFYnFjYFGHDnkD7Jm8W/gPwfSJkGw+bHxpf9C8jnHgJ52bUjHtpm9gyylCvz?=
+ =?us-ascii?Q?DCxuzOkhZOoHPe4AKXke4wuby/cmMWs8dgFe7wZ2uAguCcHDKYt1qHx9WrHo?=
+ =?us-ascii?Q?8F1LR4Z+Q37i3qJB0D6kMOkkX6Z4vamF3QzvNJUnC7WPOK8l1p6kT4LGyZDQ?=
+ =?us-ascii?Q?n9UNrOEorXdz/pKM5CrvTFVaQnWoFFvAXOjD8TxKMIkYTthE7Q/HV8HQQ89R?=
+ =?us-ascii?Q?G7n+X2ymScA0P42So9NAIEohCiPNGfeY5+K0XG87T3s53Dk8OUe6KocU1F67?=
+ =?us-ascii?Q?vF88A+R/Z5B1wPay1AqbageE8+msCG5CEvA4nLXBzZDFSD+72PcGxY5DPif2?=
+ =?us-ascii?Q?8aPoKa4+7yiuN1lkPPR2PzKXHku9KLVx8432mf6MY4dtZz32bWeygYfnhRfB?=
+ =?us-ascii?Q?fUOm5zSmXl+nvp3WKt6vo1/8lcKo64OMF4DLsn2nER20jVNNMYu6+sFSJZ+C?=
+ =?us-ascii?Q?69oq9GlqAhjsubLA/mBzx3/GT8ajPPK5otsWmT9Sj1cWmfX9CodheuyAAvWI?=
+ =?us-ascii?Q?+LxQBST8yb7eAudW6RI+YIBa0k9wfMikWRZ0AX947MWW3ZAHpKwbgxZrk8B/?=
+ =?us-ascii?Q?8B81UxPtOzuNi/eGzT4iahbv0oWn02qfcI+herAFGVTJDCxASYETdCmUpXAz?=
+ =?us-ascii?Q?sYJn/SXuhCf+yVEjTepItycgwwoxkLZz8TkdcO8RxCyIfbR4v0GSsqOh07CJ?=
+ =?us-ascii?Q?MoM0GFTi1VvkPQbh2t+xUWBiEbki/fQ1iKOxbwq4oxl56zGF+56v5Wk0L4SU?=
+ =?us-ascii?Q?fQr/uY0q/cD131PSV3n3BoxIpbmgL6fiK6k8iuLh77tIoC2W17YewDWrXkn/?=
+ =?us-ascii?Q?hJ38UDqFDX+7HQRXDCrjhDDudEy7Ak2lxfXJDYOCmJhNfC+vYVVesfIEMqwA?=
+ =?us-ascii?Q?u/bu5fhwwDI3WLC3y8fpOH2OVvcJugjs7r5q3uOpAulrp5OQ8D8U9JOyrnv0?=
+ =?us-ascii?Q?NDAJrSkUpOnOVNva+MOimhXLJi0IuenratKV4a8Gp4vmoN16O+Lak+WeTcJp?=
+ =?us-ascii?Q?JMI+ywcBRT7AMU/1AG2LkIwz6W0hH7tkOeD49Ar//HE6256yebB0jYRRFuLV?=
+ =?us-ascii?Q?GcOnkCYk2/OcVk+e7rRWgy5hC+Qw7dXdGMvk+DBWwk/YLXHV1ga+/yWcFNZ8?=
+ =?us-ascii?Q?zjrpTcLchf05DGrHmpN8MyuAhyzhRGRrWNVeMvUY3W3PIHwh8luXakSEM4vP?=
+ =?us-ascii?Q?c0gpwOXJDt8q/8tegWdHHjPSugwyrw1SNXNXiX3PktRH0S+p4fM7ua6ZCiJR?=
+ =?us-ascii?Q?TeZZJ810f77H7siPApAtFSSMn9B3qtJpokpal0Z9cl7GtJ57RhhALDkoFbbX?=
+ =?us-ascii?Q?vIZ3OF7WGdjAx0qFH8jMP/qywP18IZzSjWewDNikdPZeOLphKtCUvTlc71LY?=
+ =?us-ascii?Q?iiz5cqTg5XxKf/07D6KBCXu5IIKb9s+aYfqK0zn3tFTyTnK/SV8dzOjuWFv/?=
+ =?us-ascii?Q?A0tWXDGViKz/nDlLt+EzWIVQbf9n3mlYhBfkEjevtP4Fdjgvnen5sb9kUZiT?=
+ =?us-ascii?Q?Q1caM2gJR8hwTjwRttnfUsYaEpPdqylXPBrSuxht?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 764e8b08-1247-4621-46a3-08dd03a9469f
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 06:06:12.7070
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ls79K8OoFJe/6PiWES+9B7kLM4X8nFqP8w5prlA2VAJKsYy5Ln5e7YP8q4WBk9NIdzApgGkswpoLe3db/u5Lgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8121
+X-OriginatorOrg: intel.com
 
-On Tue, Nov 12, 2024 at 03:22:46PM +0100, David Hildenbrand wrote:
-> On 12.11.24 14:53, Jason Gunthorpe wrote:
-> > On Tue, Nov 12, 2024 at 10:10:06AM +0100, David Hildenbrand wrote:
-> > > On 12.11.24 06:26, Matthew Wilcox wrote:
-> > > > I don't want you to respin.  I think this is a bad idea.
-> > > 
-> > > I'm hoping you'll find some more time to explain what exactly you don't
-> > > like, because this series only refactors what we already have.
-> > > 
-> > > I enjoy seeing the special casing (especially hugetlb) gone from mm/swap.c.
+On Tue, Nov 12, 2024 at 01:30:06PM +0100, David Hildenbrand wrote:
+>Hi,
+>
+>the next guest_memfd upstream call will happen this Thursday, 2024-11-14
+>at at 9:00 - 10:00am (GMT-08:00) Pacific Time - Vancouver.
+>
+>We'll be using the following Google meet:
+>http://meet.google.com/wxp-wtju-jzw
+>
+>The meeting notes are linked from the google calendar invitation. If you
+>want an invitation that also covers all future meetings, just write me a
+>mail.
+>
+>In this meeting we'll discuss:
+>* fbind() and NUMA mempolicy for guest_memfd
+>* Persisting guest_memfd across reboot / guest_memfs
+>* guest_memfd use cases for a PFN range allocator
+>
+>And we'll continue our discussion on:
+>* Challenges with supporting huge pages
+>* Challenges with shared vs. private conversion
+>* guest_memfd as a "library"
+>
+>To put something to discuss onto the agenda, reply to this mail or add
+>them to the "Topics/questions for next meeting(s)" section in the
+>meeting notes as a comment.
 
-I don't.  The list of 'if's is better than the indirect function call.
-That's terribly expensive, and the way we reuse the lru.next field
-is fragile.  Not to mention that it introduces a new thing for the
-hardening people to fret over.
+Hi David,
 
-> > And, IMHO, seems like overkill. We have only a handful of cases -
-> > maybe we shouldn't be trying to get to full generality but just handle
-> > a couple of cases directly? I don't really think it is such a bad
-> > thing to have an if ladder on the free path if we have only a couple
-> > things. Certainly it looks good instead of doing overlaying tricks.
-> 
-> I'd really like to abstract hugetlb handling if possible. The way it stands
-> it's just very odd.
+We would like to discuss how to adapt the proposal for shared device assignment
+[1] to recent guest_memfd changes, such as the support of in-place conversion.
 
-There might be ways to make that better.  I haven't really been looking
-too hard at making that special handling go away.
+With in-place conversion, QEMU can map shared memory and supply the virtual
+address to VFIO to set up DMA mappings. From this perspective, in-place
+conversion doesn't change or require any changes to the way QEMU interacts
+with VFIO. So, the key for device assignment remains updating DMA mappings
+accordingly during shared/private conversions. It seems that whether in-place
+conversion is in use (i.e., whether shared memory is managed by guest_memfd or
+not) doesn't require big changes to that proposal. Not sure if anyone thinks
+otherwise. We want to align with you on the direction for device assignment
+support for guest_memfd.
+(I set aside the idea of letting KVM manage the IOMMU page table in the above
+ analysis because we probably won't get that support in the near future)
 
-> We'll need some reliable way to identify these folios that need care.
-> guest_memfd will be using folio->mapcount for now, so for now we couldn't
-> set a page type like hugetlb does.
+Could you please add this topic to the agenda?
 
-If hugetlb can set lru.next at a certain point, then guestmemfd could
-set a page type at a similar point, no?
+btw, the current time slot is not very convenient for us. If possible, could we
+schedule the meeting one hour earlier, if this works for others? Two hours
+earlier would be even better
 
-> > Also how does this translate to Matthew's memdesc world?
-
-In a memdesc world, pages no longer have a refcount.  We might still
-have put_page() which will now be a very complicated (and out-of-line)
-function that looks up what kind of memdesc it is and operates on the
-memdesc's refcount ... if it has one.  I don't know if it'll be exported
-to modules; I can see uses in the mm code, but I'm not sure if modules
-will have a need.
-
-Each memdesc type will have its own function to call to free the memdesc.
-So we'll still have folio_put().  But slab does not have, need nor want
-a refcount, so it'll just slab_free().  I expect us to keep around a
-list of recently-freed memdescs of a particular type with their pages
-still attached so that we can allocate them again quickly (or reclaim
-them under memory pressure).  Once that freelist overflows, we'll free
-a batch of them to the buddy allocator (for the pages) and the slab
-allocator (for the memdesc itself).
-
-> guest_memfd and hugetlb would be operating on folios (at least for now),
-> which contain the refcount,lru,private, ... so nothing special there.
-> 
-> Once we actually decoupled "struct folio" from "struct page", we *might*
-> have to play less tricks, because we could just have a callback pointer
-> there. But well, maybe we also want to save some space in there.
-> 
-> Do we want dedicated memdescs for hugetlb/guest_memfd that extend folios in
-> the future? I don't know, maybe.
-
-I've certainly considered going so far as a per-fs folio.  So we'd
-have an ext4_folio, an btrfs_folio, an iomap_folio, etc.  That'd let us
-get rid of folio->private, but I'm not sure that C's type system can
-really handle this nicely.  Maybe in a Rust world ;-)
-
-What I'm thinking about is that I'd really like to be able to declare
-that all the functions in ext4_aops only accept pointers to ext4_folio,
-so ext4_dirty_folio() can't be called with pointers to _any_ folio,
-but specifically folios which were previously allocated for ext4.
-
-I don't know if Rust lets you do something like that.
-
-> I'm currently wondering if we can use folio->private for the time being.
-> Either
-> 
-> (a) If folio->private is still set once the refcount drops to 0, it
-> indicates that there is a freeing callback/owner_ops. We'll have to make
-> hugetlb not use folio->private and convert others to clear folio->private
-> before freeing.
-> 
-> (b) Use bitX of folio->private to indicate that this has "owner_ops"
-> meaning. We'll have to make hugetlb not use folio->private and make others
-> not use bitX. Might be harder and overkill, because right now we only really
-> need the callback when refcount==0.
-> 
-> (c) Use some other indication that folio->private contains folio_ops.
-
-I really don't want to use folio_ops / folio_owner_ops.  I read
-https://lore.kernel.org/all/CAGtprH_JP2w-4rq02h_Ugvq5KuHX7TUvegOS7xUs_iy5hriE7g@mail.gmail.com/
-and I still don't understand what you're trying to do.
-
-Would it work to use aops->free_folio() to notify you when the folio is
-being removed from the address space?
+[1]: https://lore.kernel.org/all/20240725072118.358923-1-chenyi.qiang@intel.com/
 
