@@ -1,206 +1,157 @@
-Return-Path: <kvm+bounces-31788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FFF9C7ACB
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:14:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EEAD9C7AFA
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 453E828B2D0
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 18:14:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D5D285F6B
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 18:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3101204953;
-	Wed, 13 Nov 2024 18:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09E92038AA;
+	Wed, 13 Nov 2024 18:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sw/FLJlX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WCxJqXdi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7000720124C
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 18:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7016233997
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 18:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731521483; cv=none; b=P98kBrkzqMlv+Z1reR5poCKIcQxxwCUn2J1zhdZs8grlBvV5CrTNMl8mofvEy8Bl6bq9wFz8FLdBbcsVQa5rLP3sCi2JGVme7ulmZpVmuzae8lZNqpCE2sAbUJmHE4bh4LVRFLcxx+dJJa3A42+WkEOvh8adtufc3KXqD9YqFfw=
+	t=1731522162; cv=none; b=nIfUDhcClVnQnxCGKJ+YpQAYkelk7gglLpyDcH3ZOlqsPigueN5PbYZj3n21TRpXXlgFrNmNluWx8RGyAijY8wFSIs7MoWjnvWJMywMhQz36ovemXZRtz25spqgqogrltPuFUedv/nJoPxG8GAuTdvz6CY6kI4I49DZ5qE/02JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731521483; c=relaxed/simple;
-	bh=nFomwVWpL1apqmVcqtYyIf35yAUOULx4wV+j+EqR/TQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bcc/ectcZbFm0rEjz8kvkXZfV4p2eE2gOXwRkwqscfU7HSmlnI9uGOrKlyC5jJXHj76symTb0cQ/Ixf8xqz55kB5H6zmOJ5EtH1aaMx5aJfN/kODq04Fp1c4NuDNkDb57hvwLAnKBpBWDEwJuGBZ/DxkUNsyuqzUUPqAIot1Yic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sw/FLJlX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731521480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0YxfwgFTLzupDkk+ne1gwmOE+mfnRoLpiNTNWB7//10=;
-	b=Sw/FLJlXk1XMim1QDdC1j4Sy+V0sYA2qfqO4LWnVnonWLzWbe1lc0S6z7AC3OQ1HO8rbWy
-	au6zLYwyNNGMTnweZ+/MrYd5odXWAnSnD1cVY4p4kJ30G1vlI34k/djY1lBWOx7fzPVbJz
-	XNqHA8oHWjQzwykoTz6ZWHLqseXdswg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-4XDSmX9XO8yyFXw7qaqe7g-1; Wed, 13 Nov 2024 13:11:19 -0500
-X-MC-Unique: 4XDSmX9XO8yyFXw7qaqe7g-1
-X-Mimecast-MFC-AGG-ID: 4XDSmX9XO8yyFXw7qaqe7g
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43152cd2843so47298025e9.3
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 10:11:19 -0800 (PST)
+	s=arc-20240116; t=1731522162; c=relaxed/simple;
+	bh=owvgf1xfhUwmXeGNbhlBFgN1MNaRZnrXUUz7/mLOXlg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=stlbwE7H0PKDDGdIQiZa2rokgh/bnf7v5IU41NuO+fyevouPMV7evv10ihuaCC9a7dS8WBlZJR/hy6xCnawqucS+J3M3hglCaZMU7KQwUWpIpfoVDimIoJrLJZqk/rXFv2x0CppsDVCDcsuxUjIW5pZFQtADCB1GFabLMbdTJrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WCxJqXdi; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e380e058823so194179276.0
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 10:22:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731522160; x=1732126960; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=foXo4SwpQ6+tkfr9q/YAIXSpHlhXaZLsZbO7fGNTKRc=;
+        b=WCxJqXdiIwuH8lp32Lfn9jYuU/jdCYSoYo/vLp5lXGNgeHZCy5nBBtbuDHJdy+Z3OA
+         mufb1hY1dm7cHrGGAWyTIyZaPOd8zxhYsZY5TnHmMq8ABVt/n6RODH2tqhd7pmJVdgN0
+         fvXuNC0sgNx7XIzmhVTGHLRK3dlS6V5bifVI1gWYLPrsRETl/4BAU3p6Pg90KI2Hx4dK
+         r7GxvFPmOQDMRMZ7f4/YvZpSNm08BlFeHJLVRD9LNTZhod2efiI3iiiR247LUieJ9y49
+         rIOBSMztZEKGQNyvEa7AweSFJNsR9+YGQF2vVx5y9yISUrZ+4EtHf3QcnjX6pmhFPBMR
+         LrPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731521478; x=1732126278;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0YxfwgFTLzupDkk+ne1gwmOE+mfnRoLpiNTNWB7//10=;
-        b=GNS4GXbqgSpE5ULL2Rk1+4YStDkKSMgTMmSSaa+iPK7FuOZwRDeUrvVUXx+hCs3OnX
-         oQnrS6ZRgsPA8xmBE5jO7KgcNzpeVh8jnLhVURPZT/dYLsM5ZEu+jNCPjB+g24VKn6kj
-         aZIHRtPeCDCeNJrgq3Kq0oOm0wfqhNMsQRKSrxICnReSIwr2dfFDH+iokFZSUYGntqO4
-         F1JiY+nnXnIb9owW992Do96f+VbrjJCRWlMlnA3R5a0Q4l9mIDr92jlVNxq9ZczveVFe
-         KWuUsQIKad7bqodSmYwXmbRhSBy22XKpSK6NiFFy96vTNg+X1uDtvXbJ0ogtRbT1Sliv
-         /isQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVswg+p0rBoeymSEX2p9tvhdppST+bSFEWuawjjJ0kfd+zayO92s1dpp6lmi1bxmRlYpzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ8scJdTxJ7jrQnQJZKjtH16mPF8snS+mwQE02wOQgtWppSafG
-	/J51X4xx7zkUnzPHGTzqgISWmswPCuPvj1U4Rs3gWudQjYCT8rLd5LY90I95U+qAXseTtM7XxiB
-	+lpIZfmqIloENMpN7dL8myBPUHNwjQuijF0hI7rMdTvrs0QDhvw==
-X-Received: by 2002:a05:6000:470f:b0:382:6d2:2aa9 with SMTP id ffacd0b85a97d-3820833ab47mr5676233f8f.37.1731521478003;
-        Wed, 13 Nov 2024 10:11:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG/tazobe7GwAJVavzhuXfFhy7pRxGJgNBF0T2pVOsD0Pp4IqH4neTWDhou5gY9cocs+igfKw==
-X-Received: by 2002:a05:6000:470f:b0:382:6d2:2aa9 with SMTP id ffacd0b85a97d-3820833ab47mr5676215f8f.37.1731521477623;
-        Wed, 13 Nov 2024 10:11:17 -0800 (PST)
-Received: from [192.168.10.47] ([151.49.84.243])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-381ed9ea587sm19302499f8f.78.2024.11.13.10.11.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2024 10:11:17 -0800 (PST)
-Message-ID: <b772f6e7-e506-4f87-98d1-5cbe59402b2b@redhat.com>
-Date: Wed, 13 Nov 2024 19:11:16 +0100
+        d=1e100.net; s=20230601; t=1731522160; x=1732126960;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=foXo4SwpQ6+tkfr9q/YAIXSpHlhXaZLsZbO7fGNTKRc=;
+        b=dDZWYQNdjt/AcrYs28v2Js0RAKIUH+41sZswhfSVbOw5nkSWn3Fdoa8/OawnJPXVsQ
+         g7e2HBK/O4FtIrJ2/r6VnFH/cfydB5QwJTsMOMkS8lBV1iescF3WrU1lHb8gEfPSJA/L
+         YbKWnDbm33Q8SkO/k4QuPYiWrsDh8f0qhPG2AxyEmvm38UL617dSyahfk18JunOB1V8e
+         gWCh5y55m4urZLnW1tZ3E/sBv+nEeJqYshYTtRrQFWYo+ohFo3TaUfHEq31cUrgW0spb
+         V4CWCg3RWujqaKurEEkvHiBlGh0L7Lu2cstEYu9hhNDCV+9TR2B5+l0kMtZzFLJDEtaw
+         YuHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNv+sGXIJ0p5gFHuOraFDSmcBbi8bJ/YQd5Bjsroz/IOzSzz+6mGGhKWeRjHOlgX1uMoY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJ35onNw1jU1oj2hcnTbyIsytMuSOpmfiPxsGJHP5aMbAfHq43
+	ReUOmvbkHV8DB98dZa2/1uZNLqxeLX6Ecgrvrmf44uDuTDgfbs08+ENErnqa8xSEs6we9pXze7B
+	Jhw==
+X-Google-Smtp-Source: AGHT+IFDlulUlqQJ4uSoLm5pSTu7Qe8PBX29jVHGo6PIKHEOxVPRJED4+2XYHeYgGpbn2As2bUG/FqkmGqI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:6888:0:b0:e29:9c5:5fcb with SMTP id
+ 3f1490d57ef6-e380e241492mr3384276.4.1731522160502; Wed, 13 Nov 2024 10:22:40
+ -0800 (PST)
+Date: Wed, 13 Nov 2024 10:22:38 -0800
+In-Reply-To: <308f26c5-d47c-df63-19eb-59ebbf1e16dd@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i386/kvm: Fix kvm_enable_x2apic link error in non-KVM
- builds
-To: Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, mtosatti@redhat.com
-Cc: santosh.shukla@amd.com, suravee.suthikulpanit@amd.com
-References: <20241113144923.41225-1-phil@philjordan.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20241113144923.41225-1-phil@philjordan.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241107232457.4059785-1-dionnaglaze@google.com>
+ <20241107232457.4059785-10-dionnaglaze@google.com> <43be0a16-0a06-d7fb-3925-4337fb38e9e9@amd.com>
+ <CAAH4kHasdYwboG+zgR=MaTRBKyNmwpvBQ-ChRY18=EiBBSdFXQ@mail.gmail.com> <308f26c5-d47c-df63-19eb-59ebbf1e16dd@amd.com>
+Message-ID: <ZzTubiWtfmNTPlLK@google.com>
+Subject: Re: [PATCH v5 09/10] KVM: SVM: Use new ccp GCTX API
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Dionna Amalie Glaze <dionnaglaze@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-coco@lists.linux.dev, 
+	Ashish Kalra <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 11/13/24 15:49, Phil Dennis-Jordan wrote:
-> It appears that existing call sites for the kvm_enable_x2apic()
-> function rely on the compiler eliding the calls during optimisation
-> when building with KVM disabled, or on platforms other than Linux,
-> where that function is declared but not defined.
+On Tue, Nov 12, 2024, Tom Lendacky wrote:
+> On 11/12/24 13:33, Dionna Amalie Glaze wrote:
+> >>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> >>> index cea41b8cdabe4..d7cef84750b33 100644
+> >>> --- a/arch/x86/kvm/svm/sev.c
+> >>> +++ b/arch/x86/kvm/svm/sev.c
+> >>> @@ -89,7 +89,7 @@ static unsigned int nr_asids;
+> >>>  static unsigned long *sev_asid_bitmap;
+> >>>  static unsigned long *sev_reclaim_asid_bitmap;
+> >>>
+> >>> -static int snp_decommission_context(struct kvm *kvm);
+> >>> +static int kvm_decommission_snp_context(struct kvm *kvm);
+> >>
+> >> Why the name change? It seems like it just makes the patch a bit harder
+> >> to follow since there are two things going on.
+> >>
+> > 
+> > KVM and ccp both seem to like to name their functions starting with
+> > sev_ or snp_, and it's particularly hard to determine provenance.
+> > 
+> > snp_decommision_context and sev_snp_guest_decommission... which is
+> > from where? It's weird to me.
 > 
-> This fragile reliance recently broke down when commit b12cb38 added
-> a new call site which apparently failed to be optimised away when
-> building QEMU on macOS with clang, resulting in a link error.
-> 
-> This change moves the function declaration into the existing
-> #if CONFIG_KVM
-> block in the same header file, while the corresponding
-> #else
-> block now #defines the symbol as 0, same as for various other
-> KVM-specific query functions.
-> 
-> Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+> I guess I don't see the problem, a quick git grep -w of the name will
+> show you where each is. Its a static function in the file, so if
+> anything just changing/shortening the name to decommission_snp_context()
 
-Nevermind, this actually rung a bell and seems to be the same as
-this commit from last year:
+Eh, that creates just as many problems as it solves, because it mucks up the
+namespace and leads to discontinuity between the decommission helper and things
+like snp_launch_update_vmsa() and snp_launch_finish().
 
-commit c04cfb4596ad5032a9869a8f77fe9114ca8af9e0
-Author: Daniel Hoffman <dhoff749@gmail.com>
-Date:   Sun Nov 19 12:31:16 2023 -0800
+I agree that there isn't a strong need to fixup static symbols.  That said, I do
+think drivers/crypto/ccp/sev-dev.c in particular needs a different namespace, and
+needs to use it consistently, to make it somewhat obvious that it's (almost) all
+about the PSP/ASP.
 
-     hw/i386: fix short-circuit logic with non-optimizing builds
-     
-     `kvm_enabled()` is compiled down to `0` and short-circuit logic is
-     used to remove references to undefined symbols at the compile stage.
-     Some build configurations with some compilers don't attempt to
-     simplify this logic down in some cases (the pattern appears to be
-     that the literal false must be the first term) and this was causing
-     some builds to emit references to undefined symbols.
-     
-     An example of such a configuration is clang 16.0.6 with the following
-     configure: ./configure --enable-debug --without-default-features
-     --target-list=x86_64-softmmu --enable-tcg-interpreter
-     
-     Signed-off-by: Daniel Hoffman <dhoff749@gmail.com>
-     Message-Id: <20231119203116.3027230-1-dhoff749@gmail.com>
-     Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+But IMO, an even bigger mess in that area is the lack of consistency in the APIs
+themselves.  E.g. this code where KVM uses sev_do_cmd() directly for SNP, but
+bounces through a wrapper for !SNP.  Eww.
 
-So, this should work:
+	wbinvd_on_all_cpus();
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 13af7211e11..af0f4da1f69 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1657,9 +1657,11 @@ static void amdvi_sysbus_realize(DeviceState *dev, Error **errp)
-          error_report("AMD IOMMU with x2APIC confguration requires xtsup=on");
-          exit(EXIT_FAILURE);
-      }
--    if (s->xtsup && kvm_irqchip_is_split() && !kvm_enable_x2apic()) {
--        error_report("AMD IOMMU xtsup=on requires support on the KVM side");
--        exit(EXIT_FAILURE);
-+    if (s->xtsup) {
-+        if (kvm_irqchip_is_split() && !kvm_enable_x2apic()) {
-+            error_report("AMD IOMMU xtsup=on requires support on the KVM side");
-+            exit(EXIT_FAILURE);
-+        }
-      }
-  
-      pci_setup_iommu(bus, &amdvi_iommu_ops, s);
+	if (sev_snp_enabled)
+		ret = sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, &error);
+	else
+		ret = sev_guest_df_flush(&error);
+
+	up_write(&sev_deactivate_lock);
 
 
-It's admittedly a bit brittle, but it's already done in the neighboring
-hw/i386/intel_iommu.c so I guess it's okay.
+And then KVM has snp_page_reclaim(), but the PSP/ASP driver has snp_reclaim_pages().
 
-Paolo
+So if we want to start renaming things, I vote to go a step further and clean up
+the APIs, e.g. with a goal of eliminating sev_do_cmd(), and possibly of making
+the majority of the PSP-defined structures in include/linux/psp-sev.h "private"
+to the PSP/ASP driver.
 
+> would be better (especially since nothing in the svm directory should
+> have a name that starts with kvm_).
+
++1 to not using "kvm_".  KVM often uses "kvm_" to differentiate globally visible
+symbols from local (static) symbols.  I.e. prepending "kvm_" just trades one
+confusing name for another.
 
