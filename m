@@ -1,403 +1,201 @@
-Return-Path: <kvm+bounces-31763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25C4C9C735C
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 15:19:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B4BF9C74D4
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 15:53:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDE82B376A1
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 14:16:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1DF8B3AB16
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 14:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C08D201036;
-	Wed, 13 Nov 2024 14:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932B97E575;
+	Wed, 13 Nov 2024 14:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Ys0X/1I1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p8S+zRJf"
 X-Original-To: kvm@vger.kernel.org
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8320E282ED
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 14:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731507360; cv=none; b=X4E7+cQVYpELwZGV7ko6rF/Ols3WFMOqmPNVuLuMlggX2bR9CVM/W7ndrD2RCJMzHV2lfTNLu26xhWSGB6QGKotXfYFbxY6fCGC/zTG6jvWfTBRWlQA4G2iINODFBI8RS36dEfue89jkOgGhXI/sV6oK53KdA1jcfSODpPIX4rw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731507360; c=relaxed/simple;
-	bh=BhUVQTaxLsAJyNyqUeTjebjHTvgal8Qlf+/AL5Kf4eI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SwH6C2f2ib4Gp2NnCOqxm/69RU23WSRAHrYp8MmEQ+XsQpT3UaeRDRZ6qF8/xOHFqlpAWRJDLZxQfgyKv7r1msFyy4SLc+Esj1pjFesHq29uxSVGAGrAFe2PR1n4m7pjhopzEQB6ufse1nUnB/lA05Ul9s13/mNzxwZm0ZBEuzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=Ys0X/1I1; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-68.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-68.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:3f48:0:640:7695:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 7A2D460C69;
-	Wed, 13 Nov 2024 17:15:42 +0300 (MSK)
-Received: from [IPV6:2a02:6bf:8011:701:66e1:20a5:ba04:640b] (unknown [2a02:6bf:8011:701:66e1:20a5:ba04:640b])
-	by mail-nwsmtp-smtp-corp-main-68.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id eFMhLi43WeA0-o7dHQnkG;
-	Wed, 13 Nov 2024 17:15:41 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1731507341;
-	bh=iBWa/wjom9iHI5eiPfgN++JO1f2akO7Rl9FK3yRoHdA=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=Ys0X/1I13TkGM3xmGNKIXZpQF4kGXejVLB6JqWv3LtSOsPsNiQQhuyAkSmzRtPDD9
-	 QBKDhqWr5/BA0UHv7iLEIAB5AN82ChpCdeiU37Vc0d/cv+jgmrbwoT8eUOb6qAZ4+T
-	 NjVr6gRkeC1t2Z/RDgNLhyU4FxbL/mGhLF0fnqHE=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-68.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Message-ID: <7a42f98f-610d-43b2-8e31-9b28fc674191@yandex-team.ru>
-Date: Wed, 13 Nov 2024 17:15:40 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4241B70805;
+	Wed, 13 Nov 2024 14:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731508456; cv=fail; b=aQVPJa7DaESmbonQloQLxsAy3f1XtqZ04vPHoII7rC+h50R9Nw2WQZ2fkLopbF/6dIX5O95RD2uLHBBdWAf8QuJsvTaPUf7gDrqLpoCnaPjS7cpaj1nYaEf99FmyHD+dlarXLqLRHAUwko6LELEBKY8hWIBLShFwMoLhEwoPkGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731508456; c=relaxed/simple;
+	bh=aAnCI+VlPN2GHKZ+x7fXFiJ3JOKpHY9lEJMzoOrSVsg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=nyrOoPz0fP/G0u2an6B4nlcHMMVI7+0Z80dVtLGaJTMQIYMVHumOeLrze3Ev8tIe8widS+p8FuOGn4+7FsQFqvJ+IHLszjvuShnxuocchDtT85oGLk/GZW33Aouyo1XVAFmkm6+PNyCFX7y2VJaTU8gmd49BSDnnXHo9imfmIIE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p8S+zRJf; arc=fail smtp.client-ip=40.107.243.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=l3TqGQFX9XZxe9x07H+Wb6dfC7DuUNEJW/X2TsFBKbRXH0GUrtHNM9fJ0dRhCYgYKvT2niodeeTdGT9HJbqaVG6iX6d/SN7mxUogX52Sxuta19yHThKtjqKSq8S3UoeME0unn+lD9eeRL5FgncxXVY+o3Hgg9UK8tLo4U/1be7cj5ywRt+yO3TcgV67qEBsWwTOQxcZHflDomNmXGPUSUGNQfIjlqr23tpCRHbshFFmXTo2mOdf07d5yCSzHi9onmWeyOYqgp4LVhyLSUTV6U8nCtyfbsw8l/vAW4KzDfYcyYpFA6ij1+ZCoEfFH4aG8VnUiFehugBxmCKd3/S8sDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GsinAHFUM3CmmXE8qQYBchXD3XkKmzkYdOmpF/NPjrU=;
+ b=noq26le7/jke12JnXwM2zmoVPdmags6MXZEA0Tco+DSIqKAhVfhi5+ip3StYBdcS219ZyhJVr8xznUnvs5Vvm45SVdX04fJt0VYtP3vdU3dbsTuANVZzEFPYh/eMNWSC6Eu/vYo1mnAXoQ/ckd1qW4zh+nCgCbLhOazMs3jcUjiYBoeUDiL8joaNCb5nhPhWmH/9YKkuVh1Q3mOlkbho9PG6uiOSTLMXNnyu0+u4aA/fJbiD/VUNzPdD5WFje2OeQ53YzLkolKzVlsglfxcvWFDXUn3ThfS2KPgqmNoSSX+yGXy3opKjrxAWpekOelBuxon6SikKtAIhaZGoEKEuxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GsinAHFUM3CmmXE8qQYBchXD3XkKmzkYdOmpF/NPjrU=;
+ b=p8S+zRJf1+54JEjSj5N5yxKk8+uebbVRLF9yZcRRr9vtO3OlkfnT8ZL290vYhzjlNpfUAiOqItp5FF390w9S2gRXYKdMQUStL9VCOJqcfH5zAeVUOXcoKT92Zou8/2iyH6AN6xLzSDfIPXAhourfixk0t2vz91SG1Qa5PFMib/h+NJwJK5L2xfVCqmY6uUXETx1bUUu+nSVaSD5RB0OmYQUS4cuNDORyrs7wYK6AOpy+DXlaFonL2DxbDB9F76eof1LqBongwrorDmc25iIl0qRio4n26gZRQpzRKLRsPTS/8VaeHhj4hTP/xD77pkdmuDVFekzYlb1JgpnRS8BR5w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+ by LV3PR12MB9187.namprd12.prod.outlook.com (2603:10b6:408:194::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Wed, 13 Nov
+ 2024 14:34:11 +0000
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.8158.017; Wed, 13 Nov 2024
+ 14:34:11 +0000
+Message-ID: <195f8d81-36d8-4730-9911-5797f41c58ad@nvidia.com>
+Date: Wed, 13 Nov 2024 15:33:35 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vhost 2/2] vdpa/mlx5: Fix suboptimal range on iotlb
+ iteration
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
+ Jason Wang <jasowang@redhat.com>, Eugenio Perez Martin
+ <eperezma@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Parav Pandit <parav@nvidia.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20241021134040.975221-1-dtatulea@nvidia.com>
+ <20241021134040.975221-3-dtatulea@nvidia.com>
+ <20241113013149-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <20241113013149-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0341.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ea::16) To DS0PR12MB9038.namprd12.prod.outlook.com
+ (2603:10b6:8:f2::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 7/7] target/i386: Add EPYC-Genoa model to support Zen 4
- processor series
-To: babu.moger@amd.com
-Cc: weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
- paul@xen.org, joao.m.martins@oracle.com, qemu-devel@nongnu.org,
- mtosatti@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
- marcel.apfelbaum@gmail.com, yang.zhong@intel.com, jing2.liu@intel.com,
- vkuznets@redhat.com, michael.roth@amd.com, wei.huang2@amd.com,
- berrange@redhat.com, bdas@redhat.com, pbonzini@redhat.com,
- richard.henderson@linaro.org
-References: <20230504205313.225073-1-babu.moger@amd.com>
- <20230504205313.225073-8-babu.moger@amd.com>
- <e8e0bc10-07ea-4678-a319-fc8d6938d9bd@yandex-team.ru>
- <4b38c071-ecb0-112b-f4c4-d1d68e5db63d@amd.com>
- <24462567-e486-4b7f-b869-a1fab48d739c@yandex-team.ru>
- <7f7bf82f-c550-48c8-af38-e0992829f57d@amd.com>
-Content-Language: en-US
-From: Maksim Davydov <davydov-max@yandex-team.ru>
-In-Reply-To: <7f7bf82f-c550-48c8-af38-e0992829f57d@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|LV3PR12MB9187:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ef6f81c-a584-4133-2f47-08dd03f02a9d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cDFwQTU3bmxNSDQ0NFlQRVg3ckQ1TmNsN01GcEZWbWpYekFpbXpNN05ONVQ4?=
+ =?utf-8?B?Vm9nZmRSMHFLZ01pbWo4R2wvLzB4dlJvYmtXYVlpYlluZDBTQjEyRXJMaEg0?=
+ =?utf-8?B?VTdoN2M5SzV4R281WWhXRmI2dTZjMUlpTjR5ZTB6Ymt0dVZBWWpEZ2lIaHRu?=
+ =?utf-8?B?UTd6bG53ZHNjUHlMMVgyN1BUQWJVNTQrNmRlK3BPb1IwRDdzV1F1c2VZT21L?=
+ =?utf-8?B?d1BQUVBzZTVFRjcxNHJXL3c2TEFpdWR1OUx2eDg0YXk1Q2VWUHNhaW9tdncv?=
+ =?utf-8?B?RHZ5UmduOGpyWmlsT0ZzUE5jZkZkYUJzcVdPOCtQQjgwSm8wb0F3OGhCcGdQ?=
+ =?utf-8?B?Wm1mNUlGaGpNWjhsVTR5WGs5YUovdGtRMEdrVnJxMFQ3Qzd6SU1oWDhlUzZS?=
+ =?utf-8?B?MHlBYndsYjBkaXRtdnlHTVUwVVJiYzVKSi93ckpBN252SDJmd29mSCtrRzJw?=
+ =?utf-8?B?R1dNYmNhM3JYZzRMbUZaUGZYOGdhWE14YS9FbndFSVNtZUFjWE1NRVIzbVNl?=
+ =?utf-8?B?V0JkQ053MUhXRmpuNlc1THZOd3VZOUV5eERBS3MrUjdHcEwwaldVZm5BWVdO?=
+ =?utf-8?B?RklldHNwZWFySlB3OXlBSUN0SE9NYzc1bHBMVXFROUpNcUQ0MWxmMWc4YWZY?=
+ =?utf-8?B?bmdhaktOYUdQcHErYmgvdmR5WDQ1VlF0cHZtSHZIbWdiMWdYSXJnclN0RjAy?=
+ =?utf-8?B?a3JvOGNuTUNVNmJOZVAyYzFEUlI4U2JVWXpjaFljdjliV0xsMXo2b3pzQSti?=
+ =?utf-8?B?a1VOTi9VeUdKa3BkSnVCUHMrZUkyK2VtK0p4RXI2bS9WK1lZS1d2cHVySWJ0?=
+ =?utf-8?B?WGM3eWt6MzNNaXhhY3hCeGJMblNqWUoyL25zMXE2Z29HS29OaHFxS0pYazdJ?=
+ =?utf-8?B?Yy80blhUY0RvTndRak1TR3Z6OG1LOFZRRzZSYmJJTWRSVzd3TndiMzIyeW4z?=
+ =?utf-8?B?VXp1c1dHckFDNnBhOURCUEFaZzRtVkNIbzM5VEZLY01ENE1sOHBDNkJha0lv?=
+ =?utf-8?B?MHZRZmJ5N3FKRUpBeU94VXhtSUJDRzB3WVJscGo4ei8vemJPMHliSytCQjNq?=
+ =?utf-8?B?cGsyWFNHTTZaQlFnR2NyaE0wdGZnbkZTbldFR1R5ZXcwUTBrMmkzL2pXbzdq?=
+ =?utf-8?B?N3NnYjZZdnlmbVc0RGhvdDEvd3RDV3M5c01TM25ScEhUcmxOd0ROZ1krUXQx?=
+ =?utf-8?B?YjIxVURSRjRUZUppcFZObzNQN3h0UU5iTlF4Y3ovaE5rYXo5Y0FEOS9xMmVG?=
+ =?utf-8?B?WGZjbmJFWngwV2xNZFY4RTNCR240dFBsNHF4clB1WEkvOFJ4VHhnZHJkb3Y0?=
+ =?utf-8?B?aW5WeDNxclVsQTlTcENEWjJicDlqcWNCT25ML0xrSzltM3hyWFBYTWs5UXNk?=
+ =?utf-8?B?SmVsbVhBNklXREtaQXVDK0V4VUd1WDAxeEVHQmlLZ2ZrQlhCc2hXU2VlNnpD?=
+ =?utf-8?B?NFFWSkxKaURQNzRKWXpONkpTUGVjYlZBbHdnWHkvWXp1VEhPVFM5YWhjdWRv?=
+ =?utf-8?B?YlVjL3hxdFV1R2dHekdWVnNVb2ZqQ2lUMVVyVkp2eEFxNXBTdzV6dG5Pc3Ba?=
+ =?utf-8?B?aDVPUngvYkxlNE9HNG1jVjZvb0p5OHRxblU2eExxNGs1ZnEvWHdOM2R5OEZy?=
+ =?utf-8?B?bFZGc0VrN3h5YzhvUW5lL3ovN2gwcjE1SklnRGJWeFk4cURMNDdnblVuM0Fv?=
+ =?utf-8?B?WFpaaVRiUXhqTXB4WnpScEVzcTlMS1VNdjNBOCtoU0JXK2Jyb3MrZHp1alk3?=
+ =?utf-8?Q?lIpd3zQGZMQ+YznbGQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RWJaQm5hYy9xa0lEMVFzTWZEYjdJR3N6dGU2T3YxMU9yTzZoQ24xZkRtb1VM?=
+ =?utf-8?B?RmFXTU50c2hmYkplWldnRnR4b3pKMXJoRzFLL1AzcEJTT01nWmFJdkpNVy9h?=
+ =?utf-8?B?QzJLcVRVbGx0RzZZaEJqNG55UEV0dVl2c2lReEtETkdsVkRpb0JWRUMrc1pq?=
+ =?utf-8?B?d0RYazVBNHBmQlVMVlhDUnVEYTdWK3FWZ3p6eTdhQkFVWGh6R1JDZmhvMzNQ?=
+ =?utf-8?B?MFY0U0tVeEs0aUF0L0xOSVFiYXN5am5uZlNKNHpMNUtidmswWmlxd1hiSmZy?=
+ =?utf-8?B?d2l3M0Y4SnZFMjdSTzdzaXd4ZGdZZ2EydU9QUFE3bDRJSjF6YlpvSTRjanRi?=
+ =?utf-8?B?Y0FkT3FwNUl3bHJPSk95Y3hTR3BNWTJod0VzV0ZOTmVEYWdlYk5Ja3ovbjYz?=
+ =?utf-8?B?aVpwcGF4eFhrRWUrQUpocHJtLzNMeXY3L1FKUGdTQVBpanRNWTdVS2REdTZV?=
+ =?utf-8?B?bjRKa1RZNWxleFBPd2N5NEthaEdpV2thUlFwdmorQVEvYk9UTFZQdzc2Z3Vj?=
+ =?utf-8?B?Z0wvZUhXVmY3dWFYZUxYcEtsRCswZCtHTDRHTDhlVVE1UFN6Uk5ESDIwajAv?=
+ =?utf-8?B?bmJuOHAvYmRSY1dTUVloT3p0ZjJTaXcrTDlwaWFyMmcwc3M5VEhQcmQrMEMy?=
+ =?utf-8?B?TGFNS2JPelJkdzYvbmF1RlI3bytKVlk0NnVSKytYQUZyY21YK2dmY1A3RWNY?=
+ =?utf-8?B?Qy82Z1QxSjlSc2lJVnNDMG1BdXZaZXBzSWFkOHBNWGNmb0liRnRTTm83WHhP?=
+ =?utf-8?B?MGJaM1NaMlF2QTNyY3dYRmxGeGx2aFo3dHhZZ0haYlNDVHJWU0xDUEw0RWk2?=
+ =?utf-8?B?ZCsvY3FWTWxxZmdVYXNkbkFFazdYSW5yaFpKOUdGYng4QjVtUlY5V2xwYUlh?=
+ =?utf-8?B?bE5WT1hYKy8zSnVoRDB5bXE2Mk5CNkxIa3hiMDhyRVhRRiszVDZWb0tSZkgy?=
+ =?utf-8?B?dlRsVjRaK2JBUlFraVBGN3FRSjNZNFNrUURKM2hoS3lpZGFweGtUMXVsN1h5?=
+ =?utf-8?B?Nkg2bmNnb2tlVS9HODFWZ3pOS3BGc2pDZTR1N1l5T21rcnF2WG5LTzV6alNU?=
+ =?utf-8?B?REpPZGw5SGI0UG0wSldLaHBBNGEwM2ZENkJCMGhXeXpENEcxZDJZSmJOemtN?=
+ =?utf-8?B?QW5ycll6dTVPRFZCUSt6RmlpZllTeElzaUJaaUZRY0gvNUhLdHozNFg5UlZl?=
+ =?utf-8?B?WlhiOXJySklvZGF5aHdJdXpzbDNyWXMwYnJ2aXQxZ0VYWlVTMEkrTGp5d0Er?=
+ =?utf-8?B?WlROQTZoZDhEZFFxTDdFNnVQcC9pZTVJcjlvSVJUMmNXZitxcVBtcENETTk3?=
+ =?utf-8?B?anVDSkpKTjF6bXVEU3BaVWRVUjNDZVRTdzgzWHJFK2RQZk9ua1lUUzBrd3pC?=
+ =?utf-8?B?SHM5YUJTbTZzNkxlOUZHWkxuT3IzQmdMamNEYUcxdEJiNWtMSjJXRW9wNjdI?=
+ =?utf-8?B?UE9vem9ZQWpXUGl1NkJqSzRMckdzVFdMMlZ2ZFZaTXgyMWltMHpwa0laNk5R?=
+ =?utf-8?B?OS9uT3Nndjk4NHJtZkVuU3hoYUhiQitpckFnbjNiWENRSDNtVWpVL1VWUnF5?=
+ =?utf-8?B?dXdEMnoralJGUDZkQ3N6WGVGRElXejNoVlZDay9wYVFtRW85TG1lWDFDc3lU?=
+ =?utf-8?B?YjBZVkRtYUdkOUw4U3Blb1R2TDRKdTRydVU1Rk9WOEF5RDNpckJQTmVLOWdD?=
+ =?utf-8?B?T1NPTzA3OTg4ZnpqS0l5OFJrMUZIczhOTHB5RUVzZTlFV0RGQjdpam1Jck9Z?=
+ =?utf-8?B?a3VvTTVzN1hvVXVBMWpwRld3c2xFanZiWS9lQnVBUEZhQyt6RzNYTlFicEZE?=
+ =?utf-8?B?MzE1UjlCM3U3YTFKU1NEdmJyTWFETmZKMVE0RnVwT2c2N3A4SGd4U0NtY0JT?=
+ =?utf-8?B?dUN4MkhpVDhaUm92OGtlUFNoU1ZiNE52RW1OYklpYlBsV1RSZ1AxdEFpOFox?=
+ =?utf-8?B?ODh6L0pMa3RJVGFrRmx2S2tIZDB0SHZmU2dyL1BuWjNBaS8wbk9oVDRPdUZ4?=
+ =?utf-8?B?VTdFY1Q1Ky9mbUcvbGc0VHJSKzJwdThSMFRIMzVGaXpTeU4vc2pqSHMrN1lV?=
+ =?utf-8?B?aWM5R2hLWHVocTJCZVJ5YU55djZ5d0RiMHhJblRCQ1hDSkRXaE9GQys0TWds?=
+ =?utf-8?Q?N4m3wNai5lx/dUEgJSahuaRxm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ef6f81c-a584-4133-2f47-08dd03f02a9d
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB9038.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 14:33:41.1765
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tkT5PrLmjh7DBBWg86Raf8etR8JOuqZcT8unM24gRorLbmEmdjIsa2VU9+4jPyn92JJ7mDLZrb5SRA2ogA3kBQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9187
 
-Hi!
-Thank you very much!
-I'm looking forward to your Genoa/Turin series.
 
-And I've sent patch series to KVM:
-https://lore.kernel.org/lkml/20241113133042.702340-1-davydov-max@yandex-team.ru/
 
-On 11/12/24 19:23, Moger, Babu wrote:
-> Hi Maksim,
-> 
-> On 11/12/24 04:09, Maksim Davydov wrote:
+On 13.11.24 07:32, Michael S. Tsirkin wrote:
+> On Mon, Oct 21, 2024 at 04:40:40PM +0300, Dragos Tatulea wrote:
+>> From: Si-Wei Liu <si-wei.liu@oracle.com>
 >>
+>> The starting iova address to iterate iotlb map entry within a range
+>> was set to an irrelevant value when passing to the itree_next()
+>> iterator, although luckily it doesn't affect the outcome of finding
+>> out the granule of the smallest iotlb map size. Fix the code to make
+>> it consistent with the following for-loop.
 >>
->> On 11/8/24 23:56, Moger, Babu wrote:
->>> Hi Maxim,
->>>
->>> Thanks for looking into this. I will fix the bits I mentioned below in
->>> upcoming Genoa/Turin model update.
->>>
->>> I have few comments below.
->>>
->>> On 11/8/2024 12:15 PM, Maksim Davydov wrote:
->>>> Hi!
->>>> I compared EPYC-Genoa CPU model with CPUID output from real EPYC Genoa
->>>> host. I found some mismatches that confused me. Could you help me to
->>>> understand them?
->>>>
->>>> On 5/4/23 23:53, Babu Moger wrote:
->>>>> Adds the support for AMD EPYC Genoa generation processors. The model
->>>>> display for the new processor will be EPYC-Genoa.
->>>>>
->>>>> Adds the following new feature bits on top of the feature bits from
->>>>> the previous generation EPYC models.
->>>>>
->>>>> avx512f         : AVX-512 Foundation instruction
->>>>> avx512dq        : AVX-512 Doubleword & Quadword Instruction
->>>>> avx512ifma      : AVX-512 Integer Fused Multiply Add instruction
->>>>> avx512cd        : AVX-512 Conflict Detection instruction
->>>>> avx512bw        : AVX-512 Byte and Word Instructions
->>>>> avx512vl        : AVX-512 Vector Length Extension Instructions
->>>>> avx512vbmi      : AVX-512 Vector Byte Manipulation Instruction
->>>>> avx512_vbmi2    : AVX-512 Additional Vector Byte Manipulation Instruction
->>>>> gfni            : AVX-512 Galois Field New Instructions
->>>>> avx512_vnni     : AVX-512 Vector Neural Network Instructions
->>>>> avx512_bitalg   : AVX-512 Bit Algorithms, add bit algorithms Instructions
->>>>> avx512_vpopcntdq: AVX-512 AVX-512 Vector Population Count Doubleword and
->>>>>                     Quadword Instructions
->>>>> avx512_bf16    : AVX-512 BFLOAT16 instructions
->>>>> la57            : 57-bit virtual address support (5-level Page Tables)
->>>>> vnmi            : Virtual NMI (VNMI) allows the hypervisor to inject
->>>>> the NMI
->>>>>                     into the guest without using Event Injection mechanism
->>>>>                     meaning not required to track the guest NMI and
->>>>> intercepting
->>>>>                     the IRET.
->>>>> auto-ibrs       : The AMD Zen4 core supports a new feature called
->>>>> Automatic IBRS.
->>>>>                     It is a "set-and-forget" feature that means that,
->>>>> unlike e.g.,
->>>>>                     s/w-toggled SPEC_CTRL.IBRS, h/w manages its IBRS
->>>>> mitigation
->>>>>                     resources automatically across CPL transitions.
->>>>>
->>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
->>>>> ---
->>>>>    target/i386/cpu.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++
->>>>>    1 file changed, 122 insertions(+)
->>>>>
->>>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>>>> index d50ace84bf..71fe1e02ee 100644
->>>>> --- a/target/i386/cpu.c
->>>>> +++ b/target/i386/cpu.c
->>>>> @@ -1973,6 +1973,56 @@ static const CPUCaches epyc_milan_v2_cache_info
->>>>> = {
->>>>>        },
->>>>>    };
->>>>> +static const CPUCaches epyc_genoa_cache_info = {
->>>>> +    .l1d_cache = &(CPUCacheInfo) {
->>>>> +        .type = DATA_CACHE,
->>>>> +        .level = 1,
->>>>> +        .size = 32 * KiB,
->>>>> +        .line_size = 64,
->>>>> +        .associativity = 8,
->>>>> +        .partitions = 1,
->>>>> +        .sets = 64,
->>>>> +        .lines_per_tag = 1,
->>>>> +        .self_init = 1,
->>>>> +        .no_invd_sharing = true,
->>>>> +    },
->>>>> +    .l1i_cache = &(CPUCacheInfo) {
->>>>> +        .type = INSTRUCTION_CACHE,
->>>>> +        .level = 1,
->>>>> +        .size = 32 * KiB,
->>>>> +        .line_size = 64,
->>>>> +        .associativity = 8,
->>>>> +        .partitions = 1,
->>>>> +        .sets = 64,
->>>>> +        .lines_per_tag = 1,
->>>>> +        .self_init = 1,
->>>>> +        .no_invd_sharing = true,
->>>>> +    },
->>>>> +    .l2_cache = &(CPUCacheInfo) {
->>>>> +        .type = UNIFIED_CACHE,
->>>>> +        .level = 2,
->>>>> +        .size = 1 * MiB,
->>>>> +        .line_size = 64,
->>>>> +        .associativity = 8,
->>>>> +        .partitions = 1,
->>>>> +        .sets = 2048,
->>>>> +        .lines_per_tag = 1,
->>>>
->>>> 1. Why L2 cache is not shown as inclusive and self-initializing?
->>>>
->>>> PPR for AMD Family 19h Model 11 says for L2 (0x8000001d):
->>>> * cache inclusive. Read-only. Reset: Fixed,1.
->>>> * cache is self-initializing. Read-only. Reset: Fixed,1.
->>>
->>> Yes. That is correct. This needs to be fixed. I Will fix it.
->>>>
->>>>> +    },
->>>>> +    .l3_cache = &(CPUCacheInfo) {
->>>>> +        .type = UNIFIED_CACHE,
->>>>> +        .level = 3,
->>>>> +        .size = 32 * MiB,
->>>>> +        .line_size = 64,
->>>>> +        .associativity = 16,
->>>>> +        .partitions = 1,
->>>>> +        .sets = 32768,
->>>>> +        .lines_per_tag = 1,
->>>>> +        .self_init = true,
->>>>> +        .inclusive = true,
->>>>> +        .complex_indexing = false,
->>>>
->>>> 2. Why L3 cache is shown as inclusive? Why is it not shown in L3 that
->>>> the WBINVD/INVD instruction is not guaranteed to invalidate all lower
->>>> level caches (0 bit)?
->>>>
->>>> PPR for AMD Family 19h Model 11 says for L2 (0x8000001d):
->>>> * cache inclusive. Read-only. Reset: Fixed,0.
->>>> * Write-Back Invalidate/Invalidate. Read-only. Reset: Fixed,1.
->>>>
->>>
->>> Yes. Both of this needs to be fixed. I Will fix it.
->>>
->>>>
->>>>
->>>> 3. Why the default stub is used for TLB, but not real values as for
->>>> other caches?
->>>
->>> Can you please eloberate on this?
->>>
->>
->> For L1i, L1d, L2 and L3 cache we provide the correct information about
->> characteristics. In contrast, for L1i TLB, L1d TLB, L2i TLB and L2d TLB
->> (0x80000005 and 0x80000006) we use the same value for all CPU models.
->> Sometimes it seems strange. For instance, the current default value in
->> QEMU for L2 TLB associativity for 4 KB pages is 4. But 4 is a reserved
->> value for Genoa (as PPR for Family 19h Model 11h says)
+>> Fixes: 94abbccdf291 ("vdpa/mlx5: Add shared memory registration code")
 > 
-> Yes. I see that. We may need to address this sometime in the future.
 > 
->>
->>>>
->>>>> +    },
->>>>> +};
->>>>> +
->>>>>    /* The following VMX features are not supported by KVM and are left
->>>>> out in the
->>>>>     * CPU definitions:
->>>>>     *
->>>>> @@ -4472,6 +4522,78 @@ static const X86CPUDefinition
->>>>> builtin_x86_defs[] = {
->>>>>                { /* end of list */ }
->>>>>            }
->>>>>        },
->>>>> +    {
->>>>> +        .name = "EPYC-Genoa",
->>>>> +        .level = 0xd,
->>>>> +        .vendor = CPUID_VENDOR_AMD,
->>>>> +        .family = 25,
->>>>> +        .model = 17,
->>>>> +        .stepping = 0,
->>>>> +        .features[FEAT_1_EDX] =
->>>>> +            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
->>>>> CPUID_CLFLUSH |
->>>>> +            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
->>>>> CPUID_PGE |
->>>>> +            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
->>>>> CPUID_MCE |
->>>>> +            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
->>>>> +            CPUID_VME | CPUID_FP87,
->>>>> +        .features[FEAT_1_ECX] =
->>>>> +            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
->>>>> +            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
->>>>> +            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
->>>>> +            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA |
->>>>> +            CPUID_EXT_SSSE3 | CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ |
->>>>> +            CPUID_EXT_SSE3,
->>>>> +        .features[FEAT_8000_0001_EDX] =
->>>>> +            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
->>>>> +            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
->>>>> +            CPUID_EXT2_SYSCALL,
->>>>> +        .features[FEAT_8000_0001_ECX] =
->>>>> +            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
->>>>> +            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
->>>>> +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
->>>>> +            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
->>>>> +        .features[FEAT_8000_0008_EBX] =
->>>>> +            CPUID_8000_0008_EBX_CLZERO |
->>>>> CPUID_8000_0008_EBX_XSAVEERPTR |
->>>>> +            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
->>>>> +            CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
->>>>> +            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
->>>>> +            CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
->>>>
->>>> 4. Why 0x80000008_EBX features related to speculation vulnerabilities
->>>> (BTC_NO, IBPB_RET, IbrsPreferred, INT_WBINVD) are not set?
->>>
->>> KVM does not expose these bits to the guests yet.
->>>
->>> I normally check using the ioctl KVM_GET_SUPPORTED_CPUID.
->>>
->>
->> I'm not sure, but at least the first two of these features seem to be
->> helpful to choose the appropriate mitigation. Do you think that we should
->> add them to KVM?
-> 
-> Yes. Sure.
-> 
->>
->>>
->>>>
->>>>> +        .features[FEAT_8000_0021_EAX] =
->>>>> +            CPUID_8000_0021_EAX_No_NESTED_DATA_BP |
->>>>> +            CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
->>>>> +            CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE |
->>>>> +            CPUID_8000_0021_EAX_AUTO_IBRS,
->>>>
->>>> 5. Why some 0x80000021_EAX features are not set?
->>>> (FsGsKernelGsBaseNonSerializing, FSRC and FSRS)
->>>
->>> KVM does not expose FSRC and FSRS bits to the guests yet.
->>
->> But KVM exposes the same features (0x7 ecx=1, bits 10 and 11) for Intel
->> CPU models. Do we have to add these bits for AMD to KVM?
-> 
-> Yes. Sure.
->>
->>>
->>> The KVM reports the bit FsGsKernelGsBaseNonSerializing. I will check if
->>> we can add this bit to the Genoa and Turin.
-> 
-> Will add this in my qemu series.
-> 
->>>
->>>>
->>>>> +        .features[FEAT_7_0_EBX] =
->>>>> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
->>>>> CPUID_7_0_EBX_AVX2 |
->>>>> +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
->>>>> CPUID_7_0_EBX_ERMS |
->>>>> +            CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_AVX512F |
->>>>> +            CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_RDSEED |
->>>>> CPUID_7_0_EBX_ADX |
->>>>> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
->>>>> +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
->>>>> +            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
->>>>> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
->>>>> +        .features[FEAT_7_0_ECX] =
->>>>> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP |
->>>>> CPUID_7_0_ECX_PKU |
->>>>> +            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
->>>>> +            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->>>>> +            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
->>>>> +            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
->>>>> +            CPUID_7_0_ECX_RDPID,
->>>>> +        .features[FEAT_7_0_EDX] =
->>>>> +            CPUID_7_0_EDX_FSRM,
->>>>
->>>> 6. Why L1D_FLUSH is not set? Because only vulnerable MMIO stale data
->>>> processors have to use it, am I right?
->>>
->>> KVM does not expose L1D_FLUSH to the guests. Not sure why. Need to
->>> investigate.
->>>
->>
->> It seems that KVM has exposed L1D_FLUSH since da3db168fb67
-> 
-> Sure. Will update my patch series.
-> 
->>
->>>
->>>>
->>>>> +        .features[FEAT_7_1_EAX] =
->>>>> +            CPUID_7_1_EAX_AVX512_BF16,
->>>>> +        .features[FEAT_XSAVE] =
->>>>> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
->>>>> +            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
->>>>> +        .features[FEAT_6_EAX] =
->>>>> +            CPUID_6_EAX_ARAT,
->>>>> +        .features[FEAT_SVM] =
->>>>> +            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_VNMI |
->>>>> +            CPUID_SVM_SVME_ADDR_CHK,
->>>>> +        .xlevel = 0x80000022,
->>>>> +        .model_id = "AMD EPYC-Genoa Processor",
->>>>> +        .cache_info = &epyc_genoa_cache_info,
->>>>> +    },
->>>>>    };
->>>>>    /*
->>>>
->>>
->>
->> So, If you don't mind, I will send a patch to KVM within a few hours. I
->> will add bits for FSRC, FSRS and some bits from 0x80000008_EBX
->>
-> 
-> FSRC and FSRS are not used anywhere in the kernel. It is mostly FYI kind
-> of information. It does not hurt to add.  Please go ahead.
-> 
+> But the cover letter says "that's why it does not have a fixes tag".
+> Confused.
+Sorry about that. Patch is fine with fixes tag, I forgot to drop that
+part of the sentence from the cover letter.
 
--- 
-Best regards,
-Maksim Davydov
+Let me know if I need to resend something.
+
+Thanks,
+Dragos
 
