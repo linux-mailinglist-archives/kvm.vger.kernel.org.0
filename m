@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-31800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1BB9C7BE2
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 20:04:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 421D19C7C16
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 20:21:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED62F283A0A
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:04:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE16DB3928F
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2024 19:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1131115ADA4;
-	Wed, 13 Nov 2024 19:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A2320FAA0;
+	Wed, 13 Nov 2024 19:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m3IpI1PA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PZyEkekn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25022076B3
-	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 19:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C037D20ADC7
+	for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 19:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731524529; cv=none; b=VB1mIJfiAV71IKQqePLB7KecAUkOMEMrCG9pUIA7n5+ODjtEp/HEWzeuJBylUEQutwY2rrxKklB+TifuV2NP4TqjykMtt5a2Z4HLP7iuk74XUpm2pAB7LzsRETMwu5Oo7v35r8KOB42GIvtEuiabgOV9tUwrdP6UOi0P1p1XMpY=
+	t=1731524530; cv=none; b=eqIETb4zImNxGslpZvfVqkk6+Jxb+neYL9qYrvLMMjseOyHg81UvQz4HL76UXDFejeyupBXhLKtG7Jqu/uDvwmf58AruBoQOwGqtIU29GaJkIXQ4OWV/Ad/m+f9Yy2vMjEZOHIngGgYMwWCaEHRdz9QQCNla/nykKbwvzrBhOEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731524529; c=relaxed/simple;
-	bh=OMb3jG971jmx2YJYYmtMd1jdhDZJTQd5uT/KvMEr7uE=;
+	s=arc-20240116; t=1731524530; c=relaxed/simple;
+	bh=ZbI2dCQ2t6UVu8Y0vsUSVYF43fUxjINBxE2hDpD/UJY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F3vcrhHCf+0MsAGE5LyUZy+7uDL3YtFx5vA+jQCfLqGv8OePElQNkTvZ00CuNPgd4th36aeQbgId+nA44B4vE5RYkUkQE4kf7FWayKSWXw/JCqCpPfSm/uPSJ/7WXfSB+GuGhIsNJDxeFkmr8iIyMO+Fv8yNdJhetq+PUqfVnxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m3IpI1PA; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=egkh2gYENCJJJCao1mE7Lpz6++yAPDiZciQlqPsaVZw/VxwrjgF32veEv61N1jQFn9eXUzvo7uCS8zDUbosz0HchEWfiMFKKCF6BEzX47vKJu89CWz8XI8KE/PCYehDJHeDwKxpTSET0au2QEd0OxmTQMTgQwA3kwHOFbJyEP9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PZyEkekn; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6eae6aba72fso93178137b3.2
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 11:02:06 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e32ff6f578eso1365999276.1
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2024 11:02:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731524526; x=1732129326; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731524528; x=1732129328; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QQFdXgHR/yBinKM9akC7F2JFw2+gnKw6F8HpNI5yy4Y=;
-        b=m3IpI1PADZT6WgPrnDe9Y91wSa2CzCyf0S/y/ipIPCtVcmuEdrPYNRFO5EjT5A8AzG
-         5UeaKw9PM5d6wFa3SXcVmraXfaRtBGRQeqHptwV2IrArvTxo7QCb9WxiiHv9QoAKZJ/5
-         YKOAjEyRgZoKJ68IpYA+jfK5ypDw+2k+l8RcwXKs+b/h5beo4/q1v1H8t78ignlgzPrd
-         SCHRx0XNWFc1FmCZio/p0x3BbqnGQGjoe9+vnq5IYliAuVB/Ic+F3lHoDZOcc3bkBrnN
-         hS8SRSCK/r8fvI9OMSQDP1he6eQ2DUz73AoZRWRuH0L+vYQnsjUNoUOQfCYLrEb6W4Vg
-         X/qQ==
+        bh=W3z9O4Nh1QIYeHjkTYeY8Uz2tjDm/EBln1nfLrKHjVI=;
+        b=PZyEkeknSVZoJ2yXDEv+i+eTXxSxrKhwRCmye57m1lE0j6GmuOtsWSbtaIZJ1/lMgR
+         g+6W72kCaul5Dvb1/sWrfTaRVML4jg5WRKMu02aRyI8A5JBk7Mvd3I1EQ9ELWew3KJsT
+         5wBjlvC4vwaJB+dpLAmE/c3jncPIxd/JxqyMClNsmy6ej9EHzpeNAhTurLjUKUPjxiHP
+         pdsufNYk0DMyBTXSJllyMOB7z8GKYqCILlTXJhFttlKylLPdyfqDFR6szGOtqbpX3sE9
+         mWrofMZlX5pZxZekvYNviIDiyrTw+GcduWqZoX9AqFMyhhgj7cDY+JuaEkDODpyhEG6V
+         JzTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731524526; x=1732129326;
+        d=1e100.net; s=20230601; t=1731524528; x=1732129328;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QQFdXgHR/yBinKM9akC7F2JFw2+gnKw6F8HpNI5yy4Y=;
-        b=RJrh3T6h0tBx3mKWYqogYmiSZ10j15UZqoYb9Zwslgu/s9MS5yhii46i7kqKMrCsy9
-         jbAjsA9k9HDDahhJ+7UGn200ahK2gVYlyL1R0Vq7bXGSfdDnu2LtjRZeXCpIbu9SnbyL
-         T21l0rk+1fA/qJAsKTyP363Q+l2new+kgCPZHcpx6qn9f8sW8OBk1ZBGsvU70igJIy2U
-         gy1kRSacXrbLvW3f3R9jeoT/cD/DnVqcEW5CuhTHFUgBI7L0+81wnWUazCEZp6m8mLAd
-         qpC5CVvhLG8M8sHOBcWzGnf7uCCYwAA9XLJjSetXsoV7MHr5UqwD8G6dr+mN33hayEZB
-         rf8g==
-X-Gm-Message-State: AOJu0YyOU8Dyai5mj23ImvBJSJSLfxIyRdrCPJ6Y0XFCwyyvC2RV/M61
-	JYHuN+7If4Fg4HGGtcFVc4lrTPJKJTiDJaSz66zkSpwwnuD2XeXedber9TuoN+2PsZs0vCeQgRG
-	B6X6CUPnHdvXPWwe+7kvcjmAfBSwt6LfE0AAjNYc3WfClh6Jcs9efzFx+NOOi6yj/KODZqGi6bf
-	iu5eMixwVYE5zavWHTkgGVwRy8EHse/O3p0sQZyqgNEJeRQxtL+6ei4Bc=
-X-Google-Smtp-Source: AGHT+IFhulDvoY0sGq7EYnbunXmF/EqPCQ3tEG2uX7XcBCI6dgYlk8NlhbbJtWap3voWbgrqyi9w6iV13kRImFawvA==
+        bh=W3z9O4Nh1QIYeHjkTYeY8Uz2tjDm/EBln1nfLrKHjVI=;
+        b=B8sLQGN38U4rflA3yu9krMamL+Ur6q4Dq0CPoJKSwMbnjaZDT2Q8LxEqQYLBGfLgb/
+         gee/PYajnC5Xkgb1RGIlzn6bLJeSkju436iu1CeXnzCnniql8XXpaEn9l2l84wubjc1W
+         jjlmA/hebQrCoeZKWAkMOLP+FvOP/G/bBrRKGYTMBhHYtnS7z8laUXkZ49w+MnNaVOa7
+         zh7FmhmaGzjs0h93UxJTcOdSj5wWgY8qfw3n3T3AlvQwEV2O94n7kSaqcmCnjtpU99iy
+         M3sS5l4x/G4yYjTqqJJ60Y+5PmQOkYwaZf6AJ17Jnz1wCALhkb/G83TcBvzd4H2vlI+6
+         2LxA==
+X-Gm-Message-State: AOJu0YwrKU7K7VhLmoPQBRxXuTvvUgs0ePz2WhFp18cGsAKIi4GD2zlf
+	k5UFv0JZm3/HSOrrTA1KIvAmpm6LRg4KCeTex+wwsuihkojExF+MsaRAwTn+QxaJrmZMyswHH0S
+	+rhR3EaKYXe7hkkHe3QmGJHsFZsI3s/XunX7tKFYGO0ZQXth+xttPxSKNqCBNZ6fadONqhWHD5Y
+	R4SUesRpngIecim+AW8HronaDhBUgKVFNj3sXHEpqfNMnswKImP964yEg=
+X-Google-Smtp-Source: AGHT+IH+p6Jkhv80JbftlyPSva2V+XD4uDlfcpENEqpQ5lUMycdgk8CZBg1V5KJjBNXlSVJn+OptimsRTZOrtvSBNQ==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
- (user=coltonlewis job=sendgmr) by 2002:a81:8a44:0:b0:6ea:e011:f122 with SMTP
- id 00721157ae682-6eae011fd7cmr1805147b3.5.1731524525438; Wed, 13 Nov 2024
- 11:02:05 -0800 (PST)
-Date: Wed, 13 Nov 2024 19:01:54 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a25:ab07:0:b0:e26:3788:9ea2 with SMTP
+ id 3f1490d57ef6-e380df137cemr10752276.0.1731524527798; Wed, 13 Nov 2024
+ 11:02:07 -0800 (PST)
+Date: Wed, 13 Nov 2024 19:01:55 +0000
 In-Reply-To: <20241113190156.2145593-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241113190156.2145593-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241113190156.2145593-5-coltonlewis@google.com>
-Subject: [PATCH v8 4/5] x86: perf: Refactor misc flag assignments
+Message-ID: <20241113190156.2145593-6-coltonlewis@google.com>
+Subject: [PATCH v8 5/5] perf: Correct perf sampling with guest VMs
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
@@ -98,33 +98,70 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.co
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Break the assignment logic for misc flags into their own respective
-functions to reduce the complexity of the nested logic.
+Previously any PMU overflow interrupt that fired while a VCPU was
+loaded was recorded as a guest event whether it truly was or not. This
+resulted in nonsense perf recordings that did not honor
+perf_event_attr.exclude_guest and recorded guest IPs where it should
+have recorded host IPs.
+
+Rework the sampling logic to only record guest samples for events with
+exclude_guest = 0. This way any host-only events with exclude_guest
+set will never see unexpected guest samples. The behaviour of events
+with exclude_guest = 0 is unchanged.
+
+Note that events configured to sample both host and guest may still
+misattribute a PMI that arrived in the host as a guest event depending
+on KVM arch and vendor behavior.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 Acked-by: Kan Liang <kan.liang@linux.intel.com>
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/x86/events/core.c            | 59 ++++++++++++++++++++++---------
- arch/x86/include/asm/perf_event.h |  2 ++
- 2 files changed, 44 insertions(+), 17 deletions(-)
+ arch/arm64/include/asm/perf_event.h |  4 ----
+ arch/arm64/kernel/perf_callchain.c  | 28 ----------------------------
+ arch/x86/events/core.c              |  3 ---
+ include/linux/perf_event.h          | 21 +++++++++++++++++++--
+ kernel/events/core.c                | 21 +++++++++++++++++----
+ 5 files changed, 36 insertions(+), 41 deletions(-)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index d19e939f39983..bfc0a35fe3993 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -3011,27 +3011,52 @@ unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
- 	return regs->ip + code_segment_base(regs);
- }
+diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+index 31a5584ed4232..ee45b4e773470 100644
+--- a/arch/arm64/include/asm/perf_event.h
++++ b/arch/arm64/include/asm/perf_event.h
+@@ -10,10 +10,6 @@
+ #include <asm/ptrace.h>
  
+ #ifdef CONFIG_PERF_EVENTS
+-struct pt_regs;
+-extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
+-extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
+-#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
+ #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
+ #endif
+ 
+diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
+index 01a9d08fc0090..9b7f26b128b51 100644
+--- a/arch/arm64/kernel/perf_callchain.c
++++ b/arch/arm64/kernel/perf_callchain.c
+@@ -38,31 +38,3 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 
+ 	arch_stack_walk(callchain_trace, entry, current, regs);
+ }
+-
+-unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+-{
+-	if (perf_guest_state())
+-		return perf_guest_get_ip();
+-
+-	return instruction_pointer(regs);
+-}
+-
 -unsigned long perf_arch_misc_flags(struct pt_regs *regs)
-+static unsigned long common_misc_flags(struct pt_regs *regs)
- {
+-{
 -	unsigned int guest_state = perf_guest_state();
 -	int misc = 0;
-+	if (regs->flags & PERF_EFLAGS_EXACT)
-+		return PERF_RECORD_MISC_EXACT_IP;
- 
+-
 -	if (guest_state) {
 -		if (guest_state & PERF_GUEST_USER)
 -			misc |= PERF_RECORD_MISC_GUEST_USER;
@@ -136,12 +173,45 @@ index d19e939f39983..bfc0a35fe3993 100644
 -		else
 -			misc |= PERF_RECORD_MISC_KERNEL;
 -	}
-+	return 0;
-+}
+-
+-	return misc;
+-}
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index bfc0a35fe3993..c75c482d4c52f 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -3005,9 +3005,6 @@ static unsigned long code_segment_base(struct pt_regs *regs)
  
--	if (regs->flags & PERF_EFLAGS_EXACT)
--		misc |= PERF_RECORD_MISC_EXACT_IP;
-+static unsigned long guest_misc_flags(struct pt_regs *regs)
+ unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+ {
+-	if (perf_guest_state())
+-		return perf_guest_get_ip();
+-
+ 	return regs->ip + code_segment_base(regs);
+ }
+ 
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 772ad352856b6..368ea0e9577c7 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1655,8 +1655,9 @@ extern void perf_tp_event(u16 event_type, u64 count, void *record,
+ 			  struct task_struct *task);
+ extern void perf_bp_event(struct perf_event *event, void *data);
+ 
+-extern unsigned long perf_misc_flags(struct pt_regs *regs);
+-extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
++extern unsigned long perf_misc_flags(struct perf_event *event, struct pt_regs *regs);
++extern unsigned long perf_instruction_pointer(struct perf_event *event,
++					      struct pt_regs *regs);
+ 
+ #ifndef perf_arch_misc_flags
+ # define perf_arch_misc_flags(regs) \
+@@ -1667,6 +1668,22 @@ extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+ # define perf_arch_bpf_user_pt_regs(regs) regs
+ #endif
+ 
++#ifndef perf_arch_guest_misc_flags
++static inline unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
 +{
 +	unsigned long guest_state = perf_guest_state();
 +
@@ -152,51 +222,64 @@ index d19e939f39983..bfc0a35fe3993 100644
 +		return PERF_RECORD_MISC_GUEST_USER;
 +	else
 +		return PERF_RECORD_MISC_GUEST_KERNEL;
-+
 +}
++# define perf_arch_guest_misc_flags(regs)	perf_arch_guest_misc_flags(regs)
++#endif
 +
-+static unsigned long host_misc_flags(struct pt_regs *regs)
-+{
-+	if (user_mode(regs))
-+		return PERF_RECORD_MISC_USER;
-+	else
-+		return PERF_RECORD_MISC_KERNEL;
-+}
-+
-+unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-+{
-+	unsigned long flags = common_misc_flags(regs);
-+
-+	flags |= guest_misc_flags(regs);
-+
-+	return flags;
-+}
-+
-+unsigned long perf_arch_misc_flags(struct pt_regs *regs)
-+{
-+	unsigned long flags = common_misc_flags(regs);
-+
-+	flags |= host_misc_flags(regs);
+ static inline bool has_branch_stack(struct perf_event *event)
+ {
+ 	return event->attr.sample_type & PERF_SAMPLE_BRANCH_STACK;
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 2c44ffd6f4d80..c62164a2ff23a 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -7022,13 +7022,26 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+ EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
+ #endif
  
--	return misc;
-+	return flags;
+-unsigned long perf_misc_flags(struct pt_regs *regs)
++static bool should_sample_guest(struct perf_event *event)
+ {
++	return !event->attr.exclude_guest && perf_guest_state();
++}
++
++unsigned long perf_misc_flags(struct perf_event *event,
++			      struct pt_regs *regs)
++{
++	if (should_sample_guest(event))
++		return perf_arch_guest_misc_flags(regs);
++
+ 	return perf_arch_misc_flags(regs);
  }
  
- void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index feb87bf3d2e9c..d95f902acc521 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -538,7 +538,9 @@ struct x86_perf_regs {
+-unsigned long perf_instruction_pointer(struct pt_regs *regs)
++unsigned long perf_instruction_pointer(struct perf_event *event,
++				       struct pt_regs *regs)
+ {
++	if (should_sample_guest(event))
++		return perf_guest_get_ip();
++
+ 	return perf_arch_instruction_pointer(regs);
+ }
  
- extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
- extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-+extern unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs);
- #define perf_arch_misc_flags(regs)	perf_arch_misc_flags(regs)
-+#define perf_arch_guest_misc_flags(regs)	perf_arch_guest_misc_flags(regs)
+@@ -7849,7 +7862,7 @@ void perf_prepare_sample(struct perf_sample_data *data,
+ 	__perf_event_header__init_id(data, event, filtered_sample_type);
  
- #include <asm/stacktrace.h>
+ 	if (filtered_sample_type & PERF_SAMPLE_IP) {
+-		data->ip = perf_instruction_pointer(regs);
++		data->ip = perf_instruction_pointer(event, regs);
+ 		data->sample_flags |= PERF_SAMPLE_IP;
+ 	}
  
+@@ -8013,7 +8026,7 @@ void perf_prepare_header(struct perf_event_header *header,
+ {
+ 	header->type = PERF_RECORD_SAMPLE;
+ 	header->size = perf_sample_data_size(data, event);
+-	header->misc = perf_misc_flags(regs);
++	header->misc = perf_misc_flags(event, regs);
+ 
+ 	/*
+ 	 * If you're adding more sample types here, you likely need to do
 -- 
 2.47.0.338.g60cca15819-goog
 
