@@ -1,145 +1,179 @@
-Return-Path: <kvm+bounces-31841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59D49C8474
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 09:01:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B52E89C85A9
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 10:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E2D01F23A9B
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 08:01:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61DC1B2ADE8
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 09:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F141F666B;
-	Thu, 14 Nov 2024 08:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE441DFD89;
+	Thu, 14 Nov 2024 09:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I8iepwEM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsiOO7if"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0746B1EBFF2;
-	Thu, 14 Nov 2024 08:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81E21DCB2D
+	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 09:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731571282; cv=none; b=q8n1Hn3EXYe55cjXPJI8Ao2JDqFf3ur1oM6T8DmLg0PP4+VGrtD5fHMbe97oHmApXM6IPPJ1Ub5e0FkU8ctSPFlpODJDH2OoWm/VCWZ/SmelZkeeOzx+2n3sP5gLVPatM5FsCYOkWaEwCl+wBNpyhPjkCPcbUbv8zEgPD4A2+S8=
+	t=1731575122; cv=none; b=kFjpZz/4dwardrGsihkhxhiDHa8UWTG5WYq7GV/9rMf1fq7GK1MkIjjMpLyNVtbiN0m6zP/bCEJVf7Fg80M1mwvYK+lZFXOrS9vnRPaws3pJqk02YcbS9Ey8QVwpfJl5L8DdMB2lsAfPQsz5EMFRTCzWZ9AKHEThwXaY7Le2c4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731571282; c=relaxed/simple;
-	bh=9rI4sdRn+Ppp70uZBrM1rPa1ZmMTrZpqNCDttih3ltY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g7vSIxl6jzHFJR7t9EBydPjGYbcp4w0/DR7DHfkppRtn5qGiva5/AnRZK8y0JNwwicHWuuEhA1ojNR2uR1ccVZ6MI6ugf4LwXbnFQHT19nA5/ZQgo5DKZQnYj3FANJNhXdFPBkUOW9rIlZgS6cP5BGHwodUMrViIvXMRmebs2ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I8iepwEM; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731571282; x=1763107282;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9rI4sdRn+Ppp70uZBrM1rPa1ZmMTrZpqNCDttih3ltY=;
-  b=I8iepwEMyBES4ssTYI8bvhZDHZcQcp3rIIp/c5D1VUgWtvrjhnzIbvYh
-   4Dv6k9raIHeTN82Bt/tQHYL/suWBDFIq9XdD7Q9/ExGeEenrILrfBYFo3
-   iCuHErs/hPB175sg2HlC5MoNQZSLt+y/EXd/pDZVPLWR3rvkfIgGXmzyq
-   l7Te3N9BfktFrNtdMXDcyiebKGBnP9uRJvVziRw0nMM0bomtkZn7GMIE7
-   EpVlJ3+MIaddrdLzttsr624jBSNE5QWvLOzbIaV6O5ghsrpHIyhM6Shc9
-   Z6nqtSJVVDohStx3cUzIYYulZOvs3QM+hhrpvOhe/XXSiKye4rc6KZT07
-   g==;
-X-CSE-ConnectionGUID: bVmjvFdISHGTpWYrJow5Fg==
-X-CSE-MsgGUID: DIo60f5eQFauMXfRt2Oh9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="54035678"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="54035678"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 00:01:17 -0800
-X-CSE-ConnectionGUID: QfC/dlgRTdSOre6kYgo2gQ==
-X-CSE-MsgGUID: t/azFh5WTbWggIEy4Yu3wA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
-   d="scan'208";a="92176869"
-Received: from beginmax-mobl.amr.corp.intel.com (HELO desk) ([10.125.147.24])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 00:01:15 -0800
-Date: Thu, 14 Nov 2024 00:01:16 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Amit Shah <amit@kernel.org>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-	linux-doc@vger.kernel.org, amit.shah@amd.com,
-	thomas.lendacky@amd.com, bp@alien8.de, tglx@linutronix.de,
-	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
-	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com, sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
-	david.kaplan@amd.com, dwmw@amazon.co.uk
-Subject: Re: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for
- AMD
-Message-ID: <20241114075403.7wxou7g5udaljprv@desk>
-References: <20241111163913.36139-1-amit@kernel.org>
- <20241111163913.36139-2-amit@kernel.org>
- <20241111193304.fjysuttl6lypb6ng@jpoimboe>
- <564a19e6-963d-4cd5-9144-2323bdb4f4e8@citrix.com>
- <20241112014644.3p2a6te3sbh5x55c@jpoimboe>
- <20241112214241.fzqq6sqszqd454ei@desk>
- <20241113202105.py5imjdy7pctccqi@jpoimboe>
- <20241114015505.6kghgq33i4m6jrm4@desk>
- <20241114023141.n4n3zl7622gzsf75@jpoimboe>
+	s=arc-20240116; t=1731575122; c=relaxed/simple;
+	bh=kF95GC+iUY1Dm9Qv60S9X5a5C7Gjugcat/GIm+/tUc4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=P4XKh9/wyonWUIYkQYAlCEJ4G5n/To6uKogyGcYGF7orY3MYu1ADJqlfB7WELIXGRxZBhKg8deI8BIZfwBtDsT7leVxWmhIkpU5C2YmSBnjY2h90CoYM77FTuUDfvYb48t+7cf/Thjs5BDmYGmon5Zqx7B9UroEZ98mSKdLgzs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GsiOO7if; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731575119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kF95GC+iUY1Dm9Qv60S9X5a5C7Gjugcat/GIm+/tUc4=;
+	b=GsiOO7ifx1YCaMFAgQm31YEU0WUwTtW6TGcA8d6VFV+DBqip5wofcMl/rKT8i31+xi47fa
+	fLAO0thBoPn4PGJZQ8cDOl52EIPRCXiyaZT23uPDHflLaZ2AaG80SWtC9bTJExmIUPSfDH
+	c38pj3dgyzwT9jZPmDT2CjnqI+CR3y4=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-P-kQw7WjPhaYyZcgmvOkBg-1; Thu, 14 Nov 2024 04:05:17 -0500
+X-MC-Unique: P-kQw7WjPhaYyZcgmvOkBg-1
+X-Mimecast-MFC-AGG-ID: P-kQw7WjPhaYyZcgmvOkBg
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-539e7dc83ecso218841e87.2
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 01:05:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731575115; x=1732179915;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kF95GC+iUY1Dm9Qv60S9X5a5C7Gjugcat/GIm+/tUc4=;
+        b=hbkD8iApF6XGoUUeJ5xPixMP9MKo1k1HeBMSFsScIZ3yJp64eD93d6SkorRdPMv4qP
+         hAIpxsv/Xt6H1dclsNPTwgmSsPkmkldOsgvNAw/Z1jOZCgw2PNOFKNwq+jwDvZjprMNH
+         VR9XhZxjshpBufLEVroh7vm/QiOGPCbol77xIx8nCM60k2mzXi4VBOlPIL992nwhDMYh
+         q1HjpDJxf8QLXwo0zVhiL2m4kZ/VY948pRfduHQ7uasGrBTUDwfSi7OKfZ7r/LBqVuJM
+         j9EGMyLBZ2mQQo9stxhfLjkp+JhWMNxI0IzhPQ99unccw3nq9g6EVwFv/o5Xj5bFfgKv
+         KSGw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+/Hf8Z8Bqg3Mo/fj3tRcrG4Sc1/Pp1rYowhk0ivdj4C5kvF1WUbmKy8mCgH10aKg1oCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq9172bEhZnZ5dcmmfIq4myqVGv4TtPWT6PXK1kqmOPanimT0b
+	6O8Wr3caSRin8QFK55ylkk3qPSqvnmOrdlnxx5HBxE1sk/4qxVyE4iL4vUnbtfodaEu8fwNp3OI
+	hoz7ciiABjnqHKL9VDaqmKUplRld21wxZMWcwqcqp0hsIVoql2g==
+X-Received: by 2002:a05:6512:1191:b0:539:f67b:b849 with SMTP id 2adb3069b0e04-53d862f33b4mr10003036e87.49.1731575115342;
+        Thu, 14 Nov 2024 01:05:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHN0Hy6qiNEuUsypmH2/i/ZX6h1LZFagvmv3lYpze64dRxm0m4HLn6U0lfPme4RmJ7ieJ/jJA==
+X-Received: by 2002:a05:6512:1191:b0:539:f67b:b849 with SMTP id 2adb3069b0e04-53d862f33b4mr10002974e87.49.1731575114801;
+        Thu, 14 Nov 2024 01:05:14 -0800 (PST)
+Received: from ?IPv6:2001:16b8:3dc0:7e00:9ea7:2841:8d4a:6aac? ([2001:16b8:3dc0:7e00:9ea7:2841:8d4a:6aac])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab788e1sm13078295e9.15.2024.11.14.01.05.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 01:05:14 -0800 (PST)
+Message-ID: <49bb6fc9ebff3cae844da0465ceadeef8d3217c7.camel@redhat.com>
+Subject: Re: [PATCH v2 11/11] Remove devres from pci_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Damien Le Moal
+ <dlemoal@kernel.org>,  Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>,  Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
+ S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Mario Limonciello
+ <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>, Ricky Wu
+ <ricky_wu@realtek.com>,  Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
+ <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
+ <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
+ <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
+ Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-input@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Date: Thu, 14 Nov 2024 10:05:12 +0100
+In-Reply-To: <87msi3ksru.ffs@tglx>
+References: <20241113124158.22863-2-pstanner@redhat.com>
+	 <20241113124158.22863-13-pstanner@redhat.com> <87msi3ksru.ffs@tglx>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114023141.n4n3zl7622gzsf75@jpoimboe>
 
-On Wed, Nov 13, 2024 at 06:31:41PM -0800, Josh Poimboeuf wrote:
-> On Wed, Nov 13, 2024 at 05:55:05PM -0800, Pawan Gupta wrote:
-> > > > user->user SpectreRSB is also mitigated by IBPB, so RSB filling is
-> > > > unnecessary when IBPB is issued. Also, when an appication does not opted-in
-> > > > for IBPB at context switch, spectre-v2 for that app is not mitigated,
-> > > > filling RSB is only a half measure in that case.
-> > > > 
-> > > > Is RSB filling really serving any purpose for userspace?
-> > > 
-> > > Indeed...
-> > > 
-> > > If we don't need to flush RSB for user->user, we'd only need to worry
-> > > about protecting the kernel.  Something like so?
-> > > 
-> > >   - eIBRS+!PBRSB:	no flush
-> > >   - eIBRS+PBRSB:	lite flush
-> > 
-> > Yes for VMexit, but not at kernel entry. PBRSB requires an unbalanced RET,
-> > and it is only a problem until the first retired CALL. At VMexit we do have
-> > unbalanced RET but not at kernel entry.
-> > 
-> > >   - everything else:	full flush
-> > 
-> > > i.e., same logic as spectre_v2_determine_rsb_fill_type_at_vmexit(), but
-> > > also for context switches.
-> > 
-> > Yes, assuming you mean user->kernel switch, and not process context switch.
-> 
-> Actually I did mean context switch.  AFAIK we don't need to flush RSB at
-> kernel entry.
-> 
-> If user->user RSB is already mitigated by IBPB, then at context switch
-> we only have to worry about user->kernel.  e.g., if 'next' has more (in
-> kernel) RETs then 'prev' had (in kernel) CALLs, the user could trigger
-> RSB underflow or corruption inside the kernel after the context switch.
+T24gV2VkLCAyMDI0LTExLTEzIGF0IDE3OjIyICswMTAwLCBUaG9tYXMgR2xlaXhuZXIgd3JvdGU6
+Cj4gT24gV2VkLCBOb3YgMTMgMjAyNCBhdCAxMzo0MSwgUGhpbGlwcCBTdGFubmVyIHdyb3RlOgo+
+ID4gcGNpX2ludHgoKSBpcyBhIGh5YnJpZCBmdW5jdGlvbiB3aGljaCBjYW4gc29tZXRpbWVzIGJl
+IG1hbmFnZWQKPiA+IHRocm91Z2gKPiA+IGRldnJlcy4gVGhpcyBoeWJyaWQgbmF0dXJlIGlzIHVu
+ZGVzaXJhYmxlLgo+ID4gCj4gPiBTaW5jZSBhbGwgdXNlcnMgb2YgcGNpX2ludHgoKSBoYXZlIGJ5
+IG5vdyBiZWVuIHBvcnRlZCBlaXRoZXIgdG8KPiA+IGFsd2F5cy1tYW5hZ2VkIHBjaW1faW50eCgp
+IG9yIG5ldmVyLW1hbmFnZWQgcGNpX2ludHhfdW5tYW5hZ2VkKCksCj4gPiB0aGUKPiA+IGRldnJl
+cyBmdW5jdGlvbmFsaXR5IGNhbiBiZSByZW1vdmVkIGZyb20gcGNpX2ludHgoKS4KPiA+IAo+ID4g
+Q29uc2VxdWVudGx5LCBwY2lfaW50eF91bm1hbmFnZWQoKSBpcyBub3cgcmVkdW5kYW50LCBiZWNh
+dXNlCj4gPiBwY2lfaW50eCgpCj4gPiBpdHNlbGYgaXMgbm93IHVubWFuYWdlZC4KPiA+IAo+ID4g
+UmVtb3ZlIHRoZSBkZXZyZXMgZnVuY3Rpb25hbGl0eSBmcm9tIHBjaV9pbnR4KCkuIEhhdmUgYWxs
+IHVzZXJzIG9mCj4gPiBwY2lfaW50eF91bm1hbmFnZWQoKSBjYWxsIHBjaV9pbnR4KCkuIFJlbW92
+ZSBwY2lfaW50eF91bm1hbmFnZWQoKS4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogUGhpbGlwcCBT
+dGFubmVyIDxwc3Rhbm5lckByZWRoYXQuY29tPgo+ID4gLS0tCj4gPiDCoGRyaXZlcnMvbWlzYy9j
+YXJkcmVhZGVyL3J0c3hfcGNyLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAyICstCj4gPiDC
+oGRyaXZlcnMvbWlzYy90aWZtXzd4eDEuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCB8wqAgNiArLS0KPiA+IMKgLi4uL25ldC9ldGhlcm5ldC9icm9hZGNvbS9ibngy
+eC9ibngyeF9tYWluLmPCoCB8wqAgMiArLQo+ID4gwqBkcml2ZXJzL25ldC9ldGhlcm5ldC9icm9j
+YWRlL2JuYS9ibmFkLmPCoMKgwqDCoMKgwqAgfMKgIDIgKy0KPiA+IMKgZHJpdmVycy9udGIvaHcv
+YW1kL250Yl9od19hbWQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDQgKy0KPiA+
+IMKgZHJpdmVycy9udGIvaHcvaW50ZWwvbnRiX2h3X2dlbjEuY8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgfMKgIDIgKy0KPiA+IMKgZHJpdmVycy9wY2kvZGV2cmVzLmPCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNCArLQo+ID4gwqBkcml2ZXJzL3Bj
+aS9tc2kvYXBpLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgfMKgIDIgKy0KPiA+IMKgZHJpdmVycy9wY2kvbXNpL21zaS5jwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAyICstCj4gPiDCoGRyaXZlcnMvcGNp
+L3BjaS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfCA0MyArLS0tLS0tLS0tLS0tLS0KPiA+IC0tLS0KPiA+IMKgZHJpdmVycy92ZmlvL3Bj
+aS92ZmlvX3BjaV9jb3JlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArLQo+ID4g
+wqBkcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2ludHJzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgfCAxMCArKy0tLQo+ID4gwqBkcml2ZXJzL3hlbi94ZW4tcGNpYmFjay9jb25mX3NwYWNlX2hl
+YWRlci5jwqDCoCB8wqAgMiArLQo+ID4gwqBpbmNsdWRlL2xpbnV4L3BjaS5owqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMSAtCj4gPiDCoDE0
+IGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDYyIGRlbGV0aW9ucygtKQo+IAo+IE5v
+dyBJJ20gdXR0ZXJseSBjb25mdXNlZC4gVGhpcyB1bmRvZXMgdGhlIHBjaV9pbnR4X3VubWFuYWdl
+ZCgpIGNodXJuCj4gd2hpY2ggeW91IGNhcmVmdWxseSBzcGxpdCBpbnRvIHNldmVyYWwgcGF0Y2hl
+cyBmaXJzdC4KCkhhdmUgeW91IHJlYWQgdGhlIGVtYWlsIEkgaGF2ZSBsaW5rZWQ/CgpUaGVyZSBp
+cyBhbHNvIHRoZSBjb3Zlci1sZXR0ZXIgKGRvZXMgYW55b25lIGluIHRoZSBjb21tdW5pdHkgZXZl
+ciByZWFkCnRob3NlPykgd2hpY2ggZXhwbGljaXRseSBzdGF0ZXM6CgoiUGF0Y2ggIlJlbW92ZSBk
+ZXZyZXMgZnJvbSBwY2lfaW50eCgpIiBvYnZpb3VzbHkgcmV2ZXJ0cyB0aGUgcHJldmlvdXMKcGF0
+Y2hlcyB0aGF0IG1hZGUgZHJpdmVycyB1c2UgcGNpX2ludHhfdW5tYW5hZ2VkKCkuIEJ1dCB0aGlz
+IHdheSBpdCdzCmVhc2llciB0byByZXZpZXcgYW5kIGFwcHJvdmUuIEl0IGFsc28gbWFrZXMgc3Vy
+ZSB0aGF0IGVhY2ggY2hlY2tlZCBvdXQKY29tbWl0IHNob3VsZCBwcm92aWRlIGNvcnJlY3QgYmVo
+YXZpb3IsIG5vdCBqdXN0IHRoZSBlbnRpcmUgc2VyaWVzIGFzIGEKd2hvbGUuIgpQLgoKCgo+IAo+
+IFNvIHRoZSBuZXQgY2hhbmdlIGlzIHRoYXQ6Cj4gCj4gwqDCoCAxKSBwY2lfaW50eCgpIGlzIG5v
+dyBhbHdheXMgdW5tYW5hZ2VkCj4gCj4gwqDCoCAyKSBhIGNvdXBsZSBvZiBkcml2ZXJzIHVzZSBw
+Y2ltX2ludHgoKSBub3cgaW5zdGVhZCBvZiBwY2lfaW50eCgpCj4gCj4gVGhlIG9idmlvdXMgb3Jk
+ZXJpbmcgaXM6Cj4gCj4gwqDCoCAxKSBDb252ZXJ0IHRoZSBkcml2ZXJzIHdoaWNoIG5lZWQgdGhl
+IG1hbmFnZWQgdmVyc2lvbiB0byB1c2UKPiDCoMKgwqDCoMKgIHBjaW1faW50eCgpCj4gCj4gwqDC
+oCAyKSBSZW1vdmUgdGhlIG1hbmFnZWQgd2FybmluZyBpbiBwY2lfaW50eCgpIGFuZCBjbGVhbiB1
+cCB0aGUKPiBjb21tZW50Cj4gCj4gwqDCoCAzKSBSZW1vdmUgX19wY2ltX2ludHgoKSBhbmQgaW52
+b2tlIHBjaV9pbnR4KCkgaW4gdGhlIGRldnJlcyBjb2RlLgo+IAo+IE5vPwo+IAo+IFRoYW5rcywK
+PiAKPiDCoMKgwqDCoMKgwqDCoCB0Z2x4Cj4gCgoK
 
-Yes, this condition can cause RSB underflow, but that is not enough. More
-importantly an attacker also needs to control the target of RET.
-
-> Doesn't eIBRS already protect against that?
-
-Yes, eIBRS does protect against that, because the alternate predictor (TA)
-is isolated by eIBRS from user influence.
-
-> For PBRSB, I guess we don't need to worry about that since there would
-> be at least one kernel CALL before context switch.
-
-Right. So the case where we need RSB filling at context switch is
-retpoline+CDT mitigation.
 
