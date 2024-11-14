@@ -1,103 +1,111 @@
-Return-Path: <kvm+bounces-31891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E0D9C9499
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 22:36:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566B89C954B
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 23:39:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A821F2353C
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 21:36:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED2F1B262A2
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 22:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B521B0F17;
-	Thu, 14 Nov 2024 21:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9317C1B140D;
+	Thu, 14 Nov 2024 22:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NQqKMwIs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jWldz69k"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C95487BF;
-	Thu, 14 Nov 2024 21:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291701AF0B8;
+	Thu, 14 Nov 2024 22:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731620157; cv=none; b=RmWVdMeNE4TzbsaeHpf9ys35T+VGDg4M9JaCGMS822AVIMXFO4XuK1vX/b6JkGAwiq8r8CK5bNz4aSa+f8/xJzERIQCBwmS2EyvB8eBx0Cv45MaoO9Vuul8t+iHu3lC+e3yDt57Qqsbbgxb/6MIBBWsYR4GiuqoeJBG6YvDovl8=
+	t=1731623923; cv=none; b=vFDLkso/BsENPjeK9T43wKPYDjHxINxL8/B1l69vtw88AV3IwIMLe4Ihj9itMM0PsN1WKam8g3tiaeZyVdZ+8Z5+MiZR7ugZ0DLi9sIq89zlvgkKJ4ZwtcKqS+mZNDfcIWpgbRMGvT+cn+uis5RoFSjj0D5n7gH+KwIKoS7jFZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731620157; c=relaxed/simple;
-	bh=+e79qdIDhXLlZ9c+P2Dc6YG0KRyU6RDSSxMlbTgd9g8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=RjE5n90Q7nyTRSUNa4U0F7khJpCD4QMVdv0DjTHUmfebcftd/2VKQTMv7krcvCThBtqYgQu02dmioc9D7QwCmseFjBO9BjasI2Za7lS6LL991L2oWRbLm/MzRwC4y6rP5SOUsrNrXCt5rMszVYYeFP/xFuz4tRe5S0KYPocAcFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NQqKMwIs; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
-	by linux.microsoft.com (Postfix) with ESMTPSA id B9C9C20C8BA9;
-	Thu, 14 Nov 2024 13:35:54 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B9C9C20C8BA9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1731620155;
-	bh=XPm0EAc1K/nvytn2cDBsP3xI8cBGOIMbd0Cl3IWdsjU=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=NQqKMwIsblJDQplTM3wYIQkHUxgOW2n632p2zFLlvECKHoCZPlToMzD5erEwPYfpe
-	 0xAcZl2lQraCLw3r4lLsocd3IgabK8u3iSBdob3SxKEh55p874cPox288sd/GyuZhW
-	 Ar0G9QMjSax+jhKvh5SSd5YXIokLKru/kSANZoeY=
-Message-ID: <4743445a-09c4-4f14-b6a7-2e6509077680@linux.microsoft.com>
-Date: Thu, 14 Nov 2024 13:35:53 -0800
+	s=arc-20240116; t=1731623923; c=relaxed/simple;
+	bh=jfwKPCpopufFWD9Ev3ygbtRCRNmWNcPHigANsmnFEJo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f02jWzA6se8avC/Mcio1k/WvbSjyTqfmwdMvJ102rqQfVncp+RJVVxheygDDMT4Qcml34iVWFkRtyoWmQXCMSPPblF0pS3USoAHQJL0s+NQwqkQiFTJhDDtA7MZ+lmiEcdLTbS0rICX9ulf+ETDCVvtdYiSTilnhPtaawgaRtGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jWldz69k; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c9454f3bfaso1568397a12.2;
+        Thu, 14 Nov 2024 14:38:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731623920; x=1732228720; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ewOjEm+zXLMRvqgvZxyNTNKpEsApVZXLnwUj0o7UGzQ=;
+        b=jWldz69kawWEpHf8mwTCr7qdmEEVL7zn+l0IRrt8DX3wbtTXu/t99X5WTiqoZ4Eo0Z
+         1cqwzJWEPrnJGrjbcfzMqSN1V8aEdHW/bEZETMvT813wJ/GEbwf/MgPlSxwZe/gKyey2
+         PFRZUgDyUdLui+Imjdl9zTu5P1RHn2aTf9xCfg1BMexY+WNbkFpq3V22TpmHH9/bWeYS
+         +Rnnwtp/Idgzq+UazbiRp/zyiwj8Hh4O9sS4e6BV3WzUEAcTcX+9wudxDqmNJVWYKdCF
+         KJVXJjpeETXfo0aDRN9WGfpdd7IXtO6EqrAOtbVzLuKm9rO3c/X20Iz0e/mTCezdkIKp
+         z9sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731623920; x=1732228720;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ewOjEm+zXLMRvqgvZxyNTNKpEsApVZXLnwUj0o7UGzQ=;
+        b=YHLot95AqF8fvEnlIsbhcu3HO9llpIjY4Uewb1ub4UnoojVis6aZ4xlVu9yXo1bTaI
+         T+raajHToqtsvaDQ4AScWcDe0kt/hWiaL1J8yiulXmD+0wPNNwvYUOgQpgXmQRM5JGWv
+         srdUEKrubzQXFtY+zaQhIjVw/r0ELGIMBRnc5qIzREyeY6zJ2stqMLZNgh2WDEMIk/Ca
+         tF2mPq/UiIYcU8Q8Ot5R09sQcswKCB2tf6to9poRxLuoiWEPeKOwp4ARY2MaNrN8kP2b
+         4bJSCNRT0MiJ49Xj2Mt4N2yYEhtJ4Pkvp7hLi+a/MDjO6wk5jaa5K1Ibg1OqMlcrPgLJ
+         BKow==
+X-Forwarded-Encrypted: i=1; AJvYcCVnZPjrzC7CN/WRNuh0/mXa6qg5SPtjAF+eF0ZMUe/n8m8X3EhtDKaNab67CacICg98hPnizUTqv1w=@vger.kernel.org, AJvYcCVypzyaWDA52sCoA458HXcmq76leFw0sJu69Ge2LPvbLqpgToXi8z+lvMrTxA+XZPduFRv4Yu4gWLkDV6ml@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRTmRiCREtTJtVk2EfoQnDRVwxK4JKELnuJFm72FYplL2etCbB
+	vwnAfpV/SB0r7KVtHrkzo/MgfiFSxmUmO3/dNZg9QT3qWYMJyFYd
+X-Google-Smtp-Source: AGHT+IHFp8ClbEAINV6q1F57vi2kkXRAdo4AFZETAWImh3SRNRycGOhRYHL11/0OHbjk1OBVKlcmnQ==
+X-Received: by 2002:a50:9346:0:b0:5ce:fa13:2668 with SMTP id 4fb4d7f45d1cf-5cf8fcfbf47mr172321a12.27.1731623920093;
+        Thu, 14 Nov 2024 14:38:40 -0800 (PST)
+Received: from gi4n-KLVL-WXX9.. ([2a01:e11:5400:7400:513e:a5ce:5482:f40e])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79ba0997sm955320a12.35.2024.11.14.14.38.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 14:38:39 -0800 (PST)
+From: Gianfranco Trad <gianf.trad@gmail.com>
+To: corbet@lwn.net,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gianfranco Trad <gianf.trad@gmail.com>
+Subject: [PATCH] Documentation: kvm: fix tipo in api.rst
+Date: Thu, 14 Nov 2024 23:37:40 +0100
+Message-ID: <20241114223738.290924-3-gianf.trad@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, mhklinux@outlook.com, decui@microsoft.com,
- catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
- daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
- bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
- jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
- skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com,
- vkuznets@redhat.com, ssengar@linux.microsoft.com, apais@linux.microsoft.com
-Subject: Re: [PATCH v2 4/4] hyperv: Switch from hyperv-tlfs.h to
- hyperv/hvhdk.h
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
- linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev
-References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
-Content-Language: en-US
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-In-Reply-To: <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/7/2024 2:32 PM, Nuno Das Neves wrote:
-> Switch to using hvhdk.h everywhere in the kernel. This header includes
-> all the new Hyper-V headers in include/hyperv, which form a superset of
-> the definitions found in hyperv-tlfs.h.
-> 
-> This makes it easier to add new Hyper-V interfaces without being
-> restricted to those in the TLFS doc (reflected in hyperv-tlfs.h).
-> 
-> To be more consistent with the original Hyper-V code, the names of some
-> definitions are changed slightly. Update those where needed.
-> 
-> hyperv-tlfs.h is no longer included anywhere - hvhdk.h can serve
-> the same role, but with an easier path for adding new definitions.
+Fix minor typo in api.rst where the word physical was misspelled
+as physcial.
 
-Michael already mentioned this, I'd also agree that it's better to
-remove hyperv-tlfs.h entirely since it's been superseded.
+Signed-off-by: Gianfranco Trad <gianf.trad@gmail.com>
+---
+ Documentation/virt/kvm/api.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This looks good to me, I'll wait for v3 addressing the other comments to
-take a look again.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index edc070c6e19b..4ed8f222478a 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5574,7 +5574,7 @@ KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA
+   in guest physical address space. This attribute should be used in
+   preference to KVM_XEN_ATTR_TYPE_SHARED_INFO as it avoids
+   unnecessary invalidation of an internal cache when the page is
+-  re-mapped in guest physcial address space.
++  re-mapped in guest physical address space.
+ 
+   Setting the hva to zero will disable the shared_info page.
+ 
+-- 
+2.43.0
 
-- Easwar
-
-<...>
 
