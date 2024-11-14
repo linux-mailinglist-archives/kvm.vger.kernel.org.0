@@ -1,323 +1,157 @@
-Return-Path: <kvm+bounces-31855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE18C9C8EC0
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 16:53:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC409C8F91
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E3882880B2
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 15:53:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 904E0B38510
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 076061953B0;
-	Thu, 14 Nov 2024 15:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FF4cVJKH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD47418EFCB;
+	Thu, 14 Nov 2024 15:35:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E57190073
-	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 15:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5A5149C53;
+	Thu, 14 Nov 2024 15:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731599146; cv=none; b=EDg7xvcZO4Rs2dphlp/nYxR3rBKMaVpXHUEHWUWwmdRG/O/SnGSA+spCeRnnSCu9C3Pl0NRoVElXdZN/oHdd2UqLVXuclsHItsaR0sl5ULNgQTb4OQgSgXZ8JqUVFSX59eTQmk7NIUpugAN/uE6hjqIfP6mJwq/0luWRNlMa2Qw=
+	t=1731598532; cv=none; b=IuQAwOFVbdCe9v0rfrLzNbVdw7k5rOf5WnVauphGZJ0Rn/Npb0XkDoRYsVOY5fScHBIz+iJjMQGyG0WnFw2Tf8WHmkZQg72uvBQMj+a+AcnmQGtDqsamCwveRYgTHYixzDWnLfF49hbkLFoPeUtaU+jR7CGvdc6LPgVuxdlcfWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731599146; c=relaxed/simple;
-	bh=C+NJkcPv7s9qGuiJ2I1jqbMGVje+MrpjNFUlGrq1fv4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nLa0hsNHPbWp1HimlR7ctyCC6r3UNVCxyMfMoVuNqvT0LJon6UAposY6cWqhHRH0iVpiqYSbxnGJQqaBQKaa00uwq/mKbBDCv2mJv73ZB8tBF1lleEVy3EvdiUtM3LW0lwSKAmFMgQvgFYuUMgvRAhBdgHl58NEnoUqpD6ZMcFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FF4cVJKH; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a99f3a5a44cso102503266b.3
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 07:45:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731599141; x=1732203941; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nKhWvCprXhPOjYwjhQw1HJAKTwxj5xU1ykGVF5JlDIo=;
-        b=FF4cVJKH0Pu+jY9+EOPBcL9wipK1GLPEgtedQ6nN/edCQKJTRH8Dd8yAygDgSYCFru
-         NL65jOYPy+5eDTcM8d6qfyNO2b+5AZDaucpHb/tS5OAUaQz/Xee+fKasIXOVsSVtgPyD
-         ejFdpDPZ63wwLxU1+20hiJD8pCF0nkFtZM18M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731599141; x=1732203941;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nKhWvCprXhPOjYwjhQw1HJAKTwxj5xU1ykGVF5JlDIo=;
-        b=Oqhw+jZA9vRnt0XvHrzWnnUe/MS09nCAORLfn+sb2VpZhmDYozFga+hgq2UN3noCn+
-         af/a4jVESjWuOiOrEXmft+w6SwnkzTorkoaJy12149aRc5jFeNWkbqWzYaSeQC2LEUMh
-         ujQUZWRFMdx++Wfif+cLQlxeatcRDUt8JG/r88OpT4NuxyIJ1ChgbEmcWfaz8yEq/6g1
-         VZKbk9lYyWpgEnm8DtF38y/9MpruEvgpe4YzD69oXbxKKChCoi5xHnsxYY21Tlb4uLvM
-         cxfOcP9ypjffhMsdPU7hPJthoKvhjqMK+u07ZFNfD8isyXeB28sLvVUuvKaaIZ+VvNUL
-         SYLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMmj0Dx87mwQhroVNa/uLLoF9kgkOhPIjIl8/kdH6Dfd21dWPPwEC0LdQUK0N7S6SnJGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsV6h/fSlxqaJyfhl7zIgI5wclrPpUxWK2nPzEX8wLFNdW0/RS
-	sVskZGMgymRNQsUhKKC5xkJER0gnNmHy2OigQW697JZEqarm1SXQajPC73QReVeFuS9caeK4ooL
-	ZjUVCaIVCVCTYkl5Vml4eENs7HEKKjlzrPR6ZT9VlS0IbXhsxRO6kGqB+Oc6gEehw0jY3laDAol
-	E/shJjgn0qVomxtw==
-X-Google-Smtp-Source: AGHT+IGd29LWPGgR9UGCBpZLeV1KN1xw7zia+tlGYRvOw3VgRosrdVlpnWlGMcVf2f8cgT32vDKorJyyGy8zpUnCyzE=
-X-Received: by 2002:a17:907:6ea5:b0:a8d:4631:83b0 with SMTP id
- a640c23a62f3a-a9eefe9bb4fmr2392506366b.5.1731599141117; Thu, 14 Nov 2024
- 07:45:41 -0800 (PST)
+	s=arc-20240116; t=1731598532; c=relaxed/simple;
+	bh=IT4Y74OkXGP7crFm1QoLu/BRJuwnmPvZBB2U0jdzxGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FRrQL58tAFKo/QceAetQXFIBILtPyrYT3n/l4M2Jxc0VgNtkbCx05kfZcZFyYbUT5lU41aKhC99xA9fFZbH26lknv7XSHhW5Mhb1LAmQ4Qxb38ifV1ErMkwJU6FoVWm/6yorx77njehVgKqLvfXMzBm7/fySbLgHcetM9Zzg4hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6827B169E;
+	Thu, 14 Nov 2024 07:35:57 -0800 (PST)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A1FB3F59E;
+	Thu, 14 Nov 2024 07:35:16 -0800 (PST)
+Message-ID: <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
+Date: Thu, 14 Nov 2024 15:35:15 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030033514.1728937-1-zack.rusin@broadcom.com>
- <20241030033514.1728937-3-zack.rusin@broadcom.com> <CABgObfaRP6zKNhrO8_atGDLcHs=uvE0aT8cPKnt_vNHHM+8Nxg@mail.gmail.com>
- <CABQX2QMR=Nsn23zojFdhemR7tvGUz6_UM8Rgf6WLsxwDqoFtxg@mail.gmail.com>
- <Zy0__5YB9F5d0eZn@google.com> <CABQX2QNxFDhH1frsGpSQjSs3AWSdTibkxPrjq1QC7FGZC8Go-Q@mail.gmail.com>
- <e3f943a7-a40a-45cb-b0d9-e3ed58344d8b@redhat.com> <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
- <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com> <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
- <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
- <CADH9ctA_C1dAOus1K+wOH_SOKTb=-X1sVawt5R=dkH1iGt8QUg@mail.gmail.com>
- <CABgObfZrTyft-3vqMz5w0ZiAhp-v6c32brgftynZGJO8OafrdA@mail.gmail.com>
- <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com> <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com>
-In-Reply-To: <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com>
-From: Doug Covelli <doug.covelli@broadcom.com>
-Date: Thu, 14 Nov 2024 10:45:30 -0500
-Message-ID: <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Zack Rusin <zack.rusin@broadcom.com>, Sean Christopherson <seanjc@google.com>, 
-	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, 
-	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, 
-	linux-kselftest <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address
+ for each MSI vector
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Jason Gunthorpe <jgg@nvidia.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, tglx@linutronix.de, maz@kernel.org,
+ bhelgaas@google.com, leonro@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org,
+ kevin.tian@intel.com, smostafa@google.com,
+ andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com,
+ eric.auger@redhat.com, ddutile@redhat.com, yebin10@huawei.com,
+ brauner@kernel.org, apatel@ventanamicro.com,
+ shivamurthy.shastri@linutronix.de, anna-maria@linutronix.de,
+ nipun.gupta@amd.com, marek.vasut+renesas@mailbox.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1731130093.git.nicolinc@nvidia.com>
+ <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
+ <ZzPOsrbkmztWZ4U/@Asurada-Nvidia> <20241113013430.GC35230@nvidia.com>
+ <20241113141122.2518c55a.alex.williamson@redhat.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20241113141122.2518c55a.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 13, 2024 at 12:59=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
->
-> On 11/13/24 17:24, Doug Covelli wrote:
-> >> No worries, you're not hijacking :) The only reason is that it would
-> >> be more code for a seldom used feature and anyway with worse performan=
-ce.
-> >> (To be clear, CR8 based accesses are allowed, but stores cause an exit
-> >> in order to check the new TPR against IRR. That's because KVM's API
-> >> does not have an equivalent of the TPR threshold as you point out belo=
-w).
-> >
-> > I have not really looked at the code but it seems like it could also
-> > simplify things as CR8 would be handled more uniformly regardless of
-> > who is virtualizing the local APIC.
->
-> Not much because CR8 basically does not exist at all (it's just a byte
-> in memory) with userspace APIC.  So it's not easy to make it simpler, eve=
-n
-> though it's less uniform.
->
-> That said, there is an optimization: you only get KVM_EXIT_SET_TPR if
-> CR8 decreases.
->
-> >>> Also I could not find these documented anywhere but with MSFT's APIC =
-our monitor
-> >>> relies on extensions for trapping certain events such as INIT/SIPI pl=
-us LINT0
-> >>> and SVR writes:
-> >>>
-> >>> UINT64 X64ApicInitSipiExitTrap    : 1; // WHvRunVpExitReasonX64ApicIn=
-itSipiTrap
-> >>> UINT64 X64ApicWriteLint0ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWr=
-iteTrap
-> >>> UINT64 X64ApicWriteLint1ExitTrap  : 1; // WHvRunVpExitReasonX64ApicWr=
-iteTrap
-> >>> UINT64 X64ApicWriteSvrExitTrap    : 1; // WHvRunVpExitReasonX64ApicWr=
-iteTrap
-> >>
-> >> There's no need for this in KVM's in-kernel APIC model. INIT and
-> >> SIPI are handled in the hypervisor and you can get the current
-> >> state of APs via KVM_GET_MPSTATE. LINT0 and LINT1 are injected
-> >> with KVM_INTERRUPT and KVM_NMI respectively, and they obey IF/PPR
-> >> and NMI blocking respectively, plus the interrupt shadow; so
-> >> there's no need for userspace to know when LINT0/LINT1 themselves
-> >> change. The spurious interrupt vector register is also handled
-> >> completely in kernel.
-> >
-> > I realize that KVM can handle LINT0/SVR updates themselves but our
-> > interrupt subsystem relies on knowing the current values of these
-> > registers even when not virtualizing the local APIC.  I suppose we
-> > could use KVM_GET_LAPIC to sync things up on demand but that seems
-> > like it might nor be great from a performance point of view.
->
-> Ah no, you're right---you want to track the CPU that has ExtINT enabled
-> and send KVM_INTERRUPT to that one, I guess?  And you need the spurious
-> vector registers because writes can set the mask bit in LINTx, but
-> essentially you want to trap LINT0 changes.
->
-> Something like this (missing the KVM_ENABLE_CAP and KVM_CHECK_EXTENSION
-> code) is good, feel free to include it in your v2 (Co-developed-by
-> and Signed-off-by me):
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 5fb29ca3263b..b7dd89c99613 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -122,6 +122,7 @@
->   #define KVM_REQ_HV_TLB_FLUSH \
->         KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->   #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE  KVM_ARCH_REQ(34)
-> +#define KVM_REQ_REPORT_LINT0_ACCESS    KVM_ARCH_REQ(35)
->
->   #define CR0_RESERVED_BITS                                              =
- \
->         (~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_=
-TS \
-> @@ -775,6 +776,7 @@ struct kvm_vcpu_arch {
->         u64 smi_count;
->         bool at_instruction_boundary;
->         bool tpr_access_reporting;
-> +       bool lint0_access_reporting;
->         bool xfd_no_write_intercept;
->         u64 ia32_xss;
->         u64 microcode_version;
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 88dc43660d23..0e070f447aa2 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1561,6 +1561,21 @@ static u32 apic_get_tmcct(struct kvm_lapic *apic)
->                               apic->divide_count));
->   }
->
-> +static void __report_lint0_access(struct kvm_lapic *apic, u32 value)
-> +{
-> +       struct kvm_vcpu *vcpu =3D apic->vcpu;
-> +       struct kvm_run *run =3D vcpu->run;
-> +
-> +       kvm_make_request(KVM_REQ_REPORT_LINT0_ACCESS, vcpu);
-> +       run->lint0_access.value =3D value;
-> +}
-> +
-> +static inline void report_lint0_access(struct kvm_lapic *apic, u32 value=
-)
-> +{
-> +       if (apic->vcpu->arch.lint0_access_reporting)
-> +               __report_lint0_access(apic, value);
-> +}
-> +
->   static void __report_tpr_access(struct kvm_lapic *apic, bool write)
->   {
->         struct kvm_vcpu *vcpu =3D apic->vcpu;
-> @@ -2312,8 +2327,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *a=
-pic, u32 reg, u32 val)
->                         int i;
->
->                         for (i =3D 0; i < apic->nr_lvt_entries; i++) {
-> -                               kvm_lapic_set_reg(apic, APIC_LVTx(i),
-> -                                       kvm_lapic_get_reg(apic, APIC_LVTx=
-(i)) | APIC_LVT_MASKED);
-> +                               u32 old =3D kvm_lapic_get_reg(apic, APIC_=
-LVTx(i));
-> +                               kvm_lapic_set_reg(apic, APIC_LVTx(i), old=
- | APIC_LVT_MASKED);
-> +                               if (i =3D=3D 0 && !(old & APIC_LVT_MASKED=
-))
-> +                                       report_lint0_access(apic, old | A=
-PIC_LVT_MASKED);
->                         }
->                         apic_update_lvtt(apic);
->                         atomic_set(&apic->lapic_timer.pending, 0);
-> @@ -2352,6 +2369,8 @@ static int kvm_lapic_reg_write(struct kvm_lapic *ap=
-ic, u32 reg, u32 val)
->                 if (!kvm_apic_sw_enabled(apic))
->                         val |=3D APIC_LVT_MASKED;
->                 val &=3D apic_lvt_mask[index];
-> +               if (index =3D=3D 0 && val !=3D kvm_lapic_get_reg(apic, re=
-g))
-> +                       report_lint0_access(apic, val);
->                 kvm_lapic_set_reg(apic, reg, val);
->                 break;
->         }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d0d3dc3b7ef6..2b039b372c3f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10879,6 +10879,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcp=
-u)
->                         kvm_vcpu_flush_tlb_guest(vcpu);
->   #endif
->
-> +               if (kvm_check_request(KVM_REQ_REPORT_LINT0_ACCESS, vcpu))=
- {
-> +                       vcpu->run->exit_reason =3D KVM_EXIT_LINT0_ACCESS;
-> +                       r =3D 0;
-> +                       goto out;
-> +               }
->                 if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
->                         vcpu->run->exit_reason =3D KVM_EXIT_TPR_ACCESS;
->                         r =3D 0;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 637efc055145..ec97727f9de4 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -178,6 +178,7 @@ struct kvm_xen_exit {
->   #define KVM_EXIT_NOTIFY           37
->   #define KVM_EXIT_LOONGARCH_IOCSR  38
->   #define KVM_EXIT_MEMORY_FAULT     39
-> +#define KVM_EXIT_LINT0_ACCESS     40
->
->   /* For KVM_EXIT_INTERNAL_ERROR */
->   /* Emulate instruction failed. */
-> @@ -283,6 +284,10 @@ struct kvm_run {
->                                 __u64 flags;
->                         };
->                 } hypercall;
-> +               /* KVM_EXIT_LINT0_ACCESS */
-> +               struct {
-> +                       __u32 value;
-> +               } lint0_access;
->                 /* KVM_EXIT_TPR_ACCESS */
->                 struct {
->                         __u64 rip;
->
->
-> For LINT1, it should be less performance critical; if it's possible
-> to just go through all vCPUs, and do KVM_GET_LAPIC to check who you
-> should send a KVM_NMI to, then I'd do that.  I'd also accept a patch
-> that adds a VM-wide KVM_NMI ioctl that does the same in the hypervisor
-> if it's useful for you.
+On 13/11/2024 9:11 pm, Alex Williamson wrote:
+> On Tue, 12 Nov 2024 21:34:30 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+>> On Tue, Nov 12, 2024 at 01:54:58PM -0800, Nicolin Chen wrote:
+>>> On Mon, Nov 11, 2024 at 01:09:20PM +0000, Robin Murphy wrote:
+>>>> On 2024-11-09 5:48 am, Nicolin Chen wrote:
+>>>>> To solve this problem the VMM should capture the MSI IOVA allocated by the
+>>>>> guest kernel and relay it to the GIC driver in the host kernel, to program
+>>>>> the correct MSI IOVA. And this requires a new ioctl via VFIO.
+>>>>
+>>>> Once VFIO has that information from userspace, though, do we really need
+>>>> the whole complicated dance to push it right down into the irqchip layer
+>>>> just so it can be passed back up again? AFAICS
+>>>> vfio_msi_set_vector_signal() via VFIO_DEVICE_SET_IRQS already explicitly
+>>>> rewrites MSI-X vectors, so it seems like it should be pretty
+>>>> straightforward to override the message address in general at that
+>>>> level, without the lower layers having to be aware at all, no?
+>>>
+>>> Didn't see that clearly!! It works with a simple following override:
+>>> --------------------------------------------------------------------
+>>> @@ -497,6 +497,10 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+>>>                  struct msi_msg msg;
+>>>
+>>>                  get_cached_msi_msg(irq, &msg);
+>>> +               if (vdev->msi_iovas) {
+>>> +                       msg.address_lo = lower_32_bits(vdev->msi_iovas[vector]);
+>>> +                       msg.address_hi = upper_32_bits(vdev->msi_iovas[vector]);
+>>> +               }
+>>>                  pci_write_msi_msg(irq, &msg);
+>>>          }
+>>>   
+>>> --------------------------------------------------------------------
+>>>
+>>> With that, I think we only need one VFIO change for this part :)
+>>
+>> Wow, is that really OK from a layering perspective? The comment is
+>> pretty clear on the intention that this is to resync the irq layer
+>> view of the device with the physical HW.
+>>
+>> Editing the msi_msg while doing that resync smells bad.
+>>
+>> Also, this is only doing MSI-X, we should include normal MSI as
+>> well. (it probably should have a resync too?)
+> 
+> This was added for a specific IBM HBA that clears the vector table
+> during a built-in self test, so it's possible the MSI table being in
+> config space never had the same issue, or we just haven't encountered
+> it.  I don't expect anything else actually requires this.
 
-Thanks for the patch - I'll get it a try but it might not be right away.
+Yeah, I wasn't really suggesting to literally hook into this exact case; 
+it was more just a general observation that if VFIO already has one 
+justification for tinkering with pci_write_msi_msg() directly without 
+going through the msi_domain layer, then adding another (wherever it 
+fits best) can't be *entirely* unreasonable.
 
-> And since I've been proven wrong already, what do you need INIT/SIPI for?
+At the end of the day, the semantic here is that VFIO does know more 
+than the IRQ layer, and does need to program the endpoint differently 
+from what the irqchip assumes, so I don't see much benefit in dressing 
+that up more than functionally necessary.
 
-I don't think this one is as critical.  I believe the reason it was
-added was so that we can synchronize startup of the APs with execution
-of the BSP for guests that do not do a good job of that (Windows).
+>> I'd want Thomas/Marc/Alex to agree.. (please read the cover letter for
+>> context)
+> 
+> It seems suspect to me too.  In a sense it is still just synchronizing
+> the MSI address, but to a different address space.
+> 
+> Is it possible to do this with the existing write_msi_msg callback on
+> the msi descriptor?  For instance we could simply translate the msg
+> address and call pci_write_msi_msg() (while avoiding an infinite
+> recursion).  Or maybe there should be an xlate_msi_msg callback we can
+> register.  Or I suppose there might be a way to insert an irqchip that
+> does the translation on write.  Thanks,
 
-Doug
+I'm far from keen on the idea, but if there really is an appetite for 
+more indirection, then I guess the least-worst option would be yet 
+another type of iommu_dma_cookie to work via the existing 
+iommu_dma_compose_msi_msg() flow, with some interface for VFIO to update 
+per-device addresses directly. But then it's still going to need some 
+kind of "layering violation" for VFIO to poke the IRQ layer into 
+re-composing and re-writing a message whenever userspace feels like 
+changing an address, because we're fundamentally stepping outside the 
+established lifecycle of a kernel-managed IRQ around which said layering 
+was designed...
 
-> Paolo
->
-
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+Thanks,
+Robin.
 
