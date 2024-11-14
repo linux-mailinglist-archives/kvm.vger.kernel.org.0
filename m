@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-31878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5709C906D
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 18:03:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872CA9C90B5
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 18:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B34C1F2175A
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E4F41F239F1
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFDC18A930;
-	Thu, 14 Nov 2024 17:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B1D262A3;
+	Thu, 14 Nov 2024 17:22:18 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118E7126C03;
-	Thu, 14 Nov 2024 17:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08F4189F2A;
+	Thu, 14 Nov 2024 17:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731603774; cv=none; b=l4GlxCOB0X8dzK6SiBc+myppYKIp1VTn7jhuGDmAUBPbvZvvWMwh1OaYS/Ma0FrUQxk6EIxPA1vx4eRJN2BpEUSAE2wjhU8dLt2FQFOxhPrJluZrRA/eh+lxAeEBi358u5bYbhAvIUaMjd//0MSh/xiBF1gbugIGqPBhGfgC0ic=
+	t=1731604938; cv=none; b=JkFtFEyXqmvDaE+nh2iMYNzvqCklauyjQ7t1q8nSJItUCJyvOtly7TtS7WVQ8wALEKsAXE9/bE/e+01QS4HVcwmZZwIvQ8SRd8MIjV3ozim/jK538pd2ElrQWO7r0n06SCYGNdjAyJ1QERepQQZiixHXETLp4MuqZuJ8SCDNRiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731603774; c=relaxed/simple;
-	bh=36OSqPoAQyVIULHWPhuhVBJ+iSHV5/kk5o+So/6AzXs=;
+	s=arc-20240116; t=1731604938; c=relaxed/simple;
+	bh=t9ajE/VeX04xVGpQR7Zfzq53U0A1RsxE/6M4zIt9zZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jOEKx1njhCp0EuP66mEtEnZH17Wj2uaQEjaZDeITbB6fJjgO/3trOVgjb/mREhysx9tNIoVj+Ep0DvWnIvsEiyiPjWt0dsR4g5zabiEYmDrHTLgb7DQwpcApsoGWD8TWSYc/Q2CGWL0Dc+YZY6k/GfCddR1baEkSoxQ+aws9Hzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 51BBB68C7B; Thu, 14 Nov 2024 18:02:47 +0100 (CET)
-Date: Thu, 14 Nov 2024 18:02:47 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
-	Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, ill Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241114170247.GA5813@lst.de>
-References: <cover.1731244445.git.leon@kernel.org> <20241112072040.GG71181@unreal> <20241114133011.GA606631@unreal> <20241114163622.GA3121@lst.de> <20241114164823.GB606631@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o/TYcmU03YyeJ0q8i2KYBbdbsgLOUZQhL5FD+LewcNBWZmjLQSrXdUNvwrPKo6VXtQMAmcpqNR19e6+9HAnrd2ZMudfBNSX72sD9Ahc7/ivSRYl8a1h27ZmmwB1WY3bKNqKBZX3gg91uXFQ57C40t4HZkx7XTF7WTDFzDubEado=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD68F1474;
+	Thu, 14 Nov 2024 09:22:44 -0800 (PST)
+Received: from arm.com (RQ4T19M611.cambridge.arm.com [10.1.37.73])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBA8D3F6A8;
+	Thu, 14 Nov 2024 09:22:09 -0800 (PST)
+Date: Thu, 14 Nov 2024 17:22:07 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: "Christoph Lameter (Ampere)" <cl@gentwo.org>
+Cc: Ankur Arora <ankur.a.arora@oracle.com>, linux-pm@vger.kernel.org,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	will@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	pbonzini@redhat.com, vkuznets@redhat.com, rafael@kernel.org,
+	daniel.lezcano@linaro.org, peterz@infradead.org, arnd@arndb.de,
+	lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com,
+	mtosatti@redhat.com, sudeep.holla@arm.com, maz@kernel.org,
+	misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
+	zhenglifeng1@huawei.com, joao.m.martins@oracle.com,
+	boris.ostrovsky@oracle.com, konrad.wilk@oracle.com
+Subject: Re: [PATCH v9 01/15] asm-generic: add barrier
+ smp_cond_load_relaxed_timeout()
+Message-ID: <ZzYxv2RfDwegDMEf@arm.com>
+References: <20241107190818.522639-1-ankur.a.arora@oracle.com>
+ <20241107190818.522639-2-ankur.a.arora@oracle.com>
+ <9cecd8a5-82e5-69ef-502b-45219a45006b@gentwo.org>
+ <87v7wy2mbi.fsf@oracle.com>
+ <88b3b176-97c7-201e-0f89-c77f1802ffd9@gentwo.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,26 +64,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241114164823.GB606631@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <88b3b176-97c7-201e-0f89-c77f1802ffd9@gentwo.org>
 
-On Thu, Nov 14, 2024 at 06:48:23PM +0200, Leon Romanovsky wrote:
-> It is fine, but as a bare minimum, I would expect some sort of response,
-> so I won't sit and wait for unknown date when this API will be acknowledged/NACKed.
+On Fri, Nov 08, 2024 at 11:41:08AM -0800, Christoph Lameter (Ampere) wrote:
+> On Thu, 7 Nov 2024, Ankur Arora wrote:
+> > > Calling the clock retrieval function repeatedly should be fine and is
+> > > typically done in user space as well as in kernel space for functions that
+> > > need to wait short time periods.
+> >
+> > The problem is that you might have multiple CPUs polling in idle
+> > for prolonged periods of time. And, so you want to minimize
+> > your power/thermal envelope.
 > 
-> I would like to start to work on next step, e.g removing SG from RDMA,
-> and I need to know if this foundation is stable to do so.
-> 
-> > 
-> > No changs to dma-iommu.c are going to get merged without an explicit
-> > ACK from Robin, and while there is no 100% for the core dma-mapping
-> > code I will also not merge anything that hasn't been resolved with
-> > my most trusted reviewer first, not even code I wrote myself.
-> 
-> And do you know what is not resolved here? I don't.
-> All technical questions/issues were handled.
+> On ARM that maps to YIELD which does not do anything for the power
+> envelope AFAICT. It switches to the other hyperthread.
 
-Let's just wait a little bit, we're all overworked can't instantly
-context switch.
+The issue is not necessarily arm64 but poll_idle() on other
+architectures like x86 where, at the end of this series, they still call
+cpu_relax() in a loop and check local_clock() every 200 times or so
+iterations. So I wouldn't want to revert the improvement in 4dc2375c1a4e
+("cpuidle: poll_state: Avoid invoking local_clock() too often").
 
+I agree that the 200 iterations here it's pretty random and it was
+something made up for poll_idle() specifically and it could increase the
+wait period in other situations (or other architectures).
+
+OTOH, I'm not sure we want to make this API too complex if the only
+user for a while would be poll_idle(). We could add a comment that the
+timeout granularity can be pretty coarse and architecture dependent (200
+cpu_relax() calls in one deployment, 100us on arm64 with WFE).
+
+-- 
+Catalin
 
