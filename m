@@ -1,177 +1,204 @@
-Return-Path: <kvm+bounces-31873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0538D9C8FC7
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F819C8FD7
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA7EA282507
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 16:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F30022830F9
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 16:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE7319259E;
-	Thu, 14 Nov 2024 16:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9AE218D637;
+	Thu, 14 Nov 2024 16:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="q4Ib3g2Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PtFsIjDT"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8569F14A09A
-	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 16:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731601705; cv=fail; b=cJk7k2anviE80IqRYF/EshoOOOURLL2VtiI54k3nKl8oUlp3ttRwM2DGRD1w/6GLujVhJCp3EK1d70uUFEOkrr3ZpAsJ8g7wL6+qhxf9XNBOnnHIeef2k5Kx40bP4rZ2+nosxEPjc/0cx9Jl5sIT+eZI1tq7BFhTiLDly2WPEEs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731601705; c=relaxed/simple;
-	bh=O3L+rWmMfr+marYeMQ3ns/7TwEAY16l1QYUKvtFlj4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JDv7bGTw18VrXjYB/xOCWsANE/6+KkqEdIY5n2ZKz/V6/uPwyFW0eo8LCBjvMu7yFSaLM+EUMlJmqVHi7m860sm8hX12uzMkESLkJ81wS1ZuMJ+yEHPH3N4lfXwL+hI8LX2HigjW09kjFeAJGjA7BY04TQYKMIJIv86YSsWAr/I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=q4Ib3g2Y; arc=fail smtp.client-ip=40.107.93.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UAtcOaDoQYZ61MTPzT4vc20M3RjGz9un6aRleEiAPhO0MkBruegMyhcbMqqP/zi/W/ZNUiteNtfWkxC1oCD5yuBTphVeaSQ6+LSvT00abQNfnYt3/XyjnkIJbdcPrtCphzT7agK3JxTR/Rv3yldq5TTx3g/2C12rBU6Kbyt0d2QgASeRqnDPo5JDj1VhUIOLO+BS1kHTAnpZnDTNTJzmp4yvyT2d10Ppw3nC0sU+Qu9Cev4aaj7zub7IEBjpH6OUXVzGNxuFDxQdT1AgzE6Iyp238vBQvAo0R97SA64Wie+t3GbTT7oPecMcPRPepysvwou8jevtgWeAJ5tXrSWnQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3POW8gE6ImDhLT2o/xG41zenhqY3jKOm3FWT0R6EMvA=;
- b=d0c7ATNiJB+TNtEBhMez+bDIANYNQZZRxNQwF+6Sb6xIsujrpC9Dq8DU3ymNl7rJCuPtvY0t0Jtwx0eY4NkIXeO8OySFGXq7CZRJDGw5NjI0JgRG2zgQvcJrOzYKOn9T097rQNQuzdCKQkMhjwyFqUe1o7Spq05E96uA8JE4AHk5IUuoLuPud17lNWtI+/CAbzzhU7zSjKLykHGUM6GVt6MY61G+vRd0KAAs6nz1gX5L9BQ7t4Y8G7durirH05Ua7ipkgSg6ItcD+3YsHpHulcTykmg1Xy9DR1XSy4eZ3zjoe9XkogKlLpzEA7i0xN8IoNUw8a6Cbd9kDKoWT/V6DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3POW8gE6ImDhLT2o/xG41zenhqY3jKOm3FWT0R6EMvA=;
- b=q4Ib3g2YqxlfSrhV/phYJlqeU1CTPmnRv4g/IBu22Fi0GIGk7LxJ5ai/8zPnW7obqi3rOFefQuC66RlO24RHJgbr2R8DmfZedAZ0hcHEZzQqNpHOoE0fnh0ugjdYtfKWtRYZ7HrfDPrbx2W5sQAuV61WntX62TCVjHMTaiKf7UitOTtOQGeVHYls6be9rEyyOqLOYkmA6TjIHrsAtehcPq+jqOAbuv5m50LtHEJcbTXT0kHV4sFIqLmqi+nyMDolChe4djjyjfiCecxsr/T5RlfR4DP1g/rdV6w4xHfDFdD5lZkPUbhgsFSUDhXYvgiOMNq1hSvjCUnWYB8rl6INwQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by IA1PR12MB8538.namprd12.prod.outlook.com (2603:10b6:208:455::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Thu, 14 Nov
- 2024 16:28:17 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8137.027; Thu, 14 Nov 2024
- 16:28:17 +0000
-Date: Thu, 14 Nov 2024 12:28:16 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: alex.williamson@redhat.com, kvm@vger.kernel.org, kevin.tian@intel.com,
-	joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 2/2] vfio/mlx5: Fix unwind flows in
- mlx5vf_pci_save/resume_device_data()
-Message-ID: <20241114162816.GR35230@nvidia.com>
-References: <20241114095318.16556-1-yishaih@nvidia.com>
- <20241114095318.16556-3-yishaih@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114095318.16556-3-yishaih@nvidia.com>
-X-ClientProxiedBy: MN2PR07CA0012.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::22) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD7118BC06
+	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 16:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731601787; cv=none; b=nv5WYyg/cMW4W3g1wFSIy7Rg1OXKyieyMVd06WyjTiyCI+F/Q6HEvDJ3+7QNtVYqt7FvAhiPhTLSM3nGtWQFCKI9jKXvjmFDm8pEkEjo/S9QDC77USKcxgBv7+E6ZIlQEvJsGWYiXHVuEFpu6wUYiOo+U6Lb3dbfIP4B0oaWsQQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731601787; c=relaxed/simple;
+	bh=y6nzprvn/q25Jsk8S9OzbKMDmmnqu+R2m005n9v55UY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fSirQeyvg7pT0js0THWbXMCiAFVLu5f8QF1DqMD/mb65VbcZaa2D5TtGTCqz5CzMCJ4qYoZwNO34qjh047uQoa2bAqTv4nq8yUPdte+HYYwwxpOmnx20mFiEo2O0rFQ7MNyl6DaGsKAoENwFqQpRz6QG2cfxbIt69ZF2/yFtyQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PtFsIjDT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731601784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PadUTfYfFxI6C6uoL4ucMl4kuWW45NqxULqNhu7tszE=;
+	b=PtFsIjDTL2/WLgtm76SU9MZ5QUGt1mQYRnUJ0pUqXqonWvuJyc6u5an0E/M5IDwSUY5yx1
+	Wsjk4XUitfcDKPlNUfm65D7dxmIN0a3xA0KT1Wb8tNrZAy1UKMk7kuAluxl3sblFj/wC88
+	Ry192fnfW6XaYMB7Vgc+kw8pGOEHZGg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-318-ypG45NnpNpmBCToW2AlC6g-1; Thu, 14 Nov 2024 11:29:40 -0500
+X-MC-Unique: ypG45NnpNpmBCToW2AlC6g-1
+X-Mimecast-MFC-AGG-ID: ypG45NnpNpmBCToW2AlC6g
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d95264eb4so503810f8f.2
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 08:29:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731601779; x=1732206579;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PadUTfYfFxI6C6uoL4ucMl4kuWW45NqxULqNhu7tszE=;
+        b=wetlKoYIMyNBcCmE9sf3DxcqIVaG2/X6FDMaA0w+8dZINEbPrviAWinPUCFmNTmzf2
+         bXJCmm/dbqSDDqFFsEl2zfPSLXF+E4b3NKJjBVckoQt7MA6ZQTtEjGO6bGj03OV/twys
+         R+YWlczU1JS5uMCJzev5velIMYouvZCBhzTfCByYCDtsqV8WiE3ednM837odpDuBmmZR
+         nhsP5ZgebAziiEppPhg8l6ZARA4rWnv5moei1NgVEefJwDMnTr3PNqzNPElAr3ozzk4w
+         RJBt7/lqgqGA6Tz7z0D9WqqHIbej8kltktYWDPyGTzJrVoY+Xur4Di61aW8YpJgeQE+x
+         bNpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfsGbmq8/Gy//jvBW0Ul3oAV5lqI+LJDyuEDBtb/sdf/gMvEgCcsK1lV4ttynsO0u6P/4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+FOzDHCLvLO27SsZSU0GLn8Pa2DyEcN9PpVTE/XyiFS8XcKWe
+	Xx/D+RmwlI2aKeIcv+Im5RwGI506SRkCeV61D0uf53ePgeQ5fQ/Xi1gEbRd4OQ8WF1eAonkQTp/
+	7MfQ6mcWn5+tmXFlrhzoqsUWa4HjDOpqcY63YMN8jtyix10y/1w==
+X-Received: by 2002:a05:6000:1445:b0:381:f443:21cc with SMTP id ffacd0b85a97d-3820dee298emr5849434f8f.0.1731601779241;
+        Thu, 14 Nov 2024 08:29:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFbEbVn2QODyfwYmc1GMH2dD+JlJSB7TOy9Z2fTCWx/pYzb8nRICqQrURO4y74MgD4LgtSVKw==
+X-Received: by 2002:a05:6000:1445:b0:381:f443:21cc with SMTP id ffacd0b85a97d-3820dee298emr5849413f8f.0.1731601778876;
+        Thu, 14 Nov 2024 08:29:38 -0800 (PST)
+Received: from ?IPV6:2003:cb:c715:6600:a077:c7da:3362:6896? (p200300cbc7156600a077c7da33626896.dip0.t-ipconnect.de. [2003:cb:c715:6600:a077:c7da:3362:6896])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821ae16108sm1890712f8f.66.2024.11.14.08.29.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 08:29:37 -0800 (PST)
+Message-ID: <723479f3-83d5-4d5e-bebb-ec9dbf273eb6@redhat.com>
+Date: Thu, 14 Nov 2024 17:29:36 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|IA1PR12MB8538:EE_
-X-MS-Office365-Filtering-Correlation-Id: d9095ce6-d428-4234-81d8-08dd04c9588d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/5Dvjgwlv2vQoaxE8aGRd0meMBi6qlLpQRPJlkO/8+Y9pcvG+M6JyWPirSsZ?=
- =?us-ascii?Q?dLumNzDWK5s04ZFyqH9sTpArFrPUAM2ygRFdWy4AR57DbjWYNklbI1Zm8h8j?=
- =?us-ascii?Q?fGxU9olOKAlDYW75G5yS0bNWHQTwrLnryNBHhI72u1aygw9N24uTStQ3UfEm?=
- =?us-ascii?Q?al52CyIfgKcuPlP9uOSuLFKp49d3OgSkJ/DdYUgKte6b4bwp3E84mjlpBO10?=
- =?us-ascii?Q?cRNR8v4stlv2MljwC2EYC8f57eXVIlOg40vr8ydZ8XKC0EkJCo7Oz9anxxEs?=
- =?us-ascii?Q?TNzQfOKYSSo88kEoEKUUsYMVZzHkyu9EIo8zCkU6+bAzA7vTh0hMlVK2VWiE?=
- =?us-ascii?Q?pAyzp8mwyGUN0/IHr2e7XbBACgoZEa0xSG/GYY4WO/Pbo03WppimHCng1bjP?=
- =?us-ascii?Q?CEoweCRXheUnG3J1md3635VlJkw+vNJIDdDvoCxktac8gLGzdms1VGFtMhU9?=
- =?us-ascii?Q?VM3MIWC/Vx1qHF6xeu90z1fOUdEOicOJxcnVYDypjAIEmTYVT5T9jZDk+rp5?=
- =?us-ascii?Q?Pe2zlWMNshkWjFCyOm7i2DqhrnwKxGYYJHpoXyAfK2Y4u/y/2Ii0zJd1K5CM?=
- =?us-ascii?Q?tQIhiMGP1viH9nHFepZPwNa4X2YIm4Rqv1Qhb5T7JpRnjv0YMm1pLsT974eM?=
- =?us-ascii?Q?cy0yzvhhu8OE6O0xWE/olsza2EsPjNKUJqGtVxQczH1Ik8VuHJcMhyOSMUK4?=
- =?us-ascii?Q?qVpE4/yYn+8Lx24cGXytzCSwAk0ilnHz1wL9ueNi7kMnQq27Q4aE/fmulqrh?=
- =?us-ascii?Q?O9HfWfpwqYM6Jn3izYP3LCUV2ka2gscuPLPCLqa4lQZHV9x0dChz1B4hi9gn?=
- =?us-ascii?Q?Qj78inYOaKHzC2Fqo0OycvETFGugWbfc5d7Llu/uOK3KVn9K5MG4BvYUCdm5?=
- =?us-ascii?Q?XcmKMxEuMxO5nTaQgL+yHt8IWe6Dd3Jjk4KRhUn3aFSyKm19AWSt2tUzEEly?=
- =?us-ascii?Q?7FCbizce7mYBQvOx1o+cf63OEvq0K/KxDvA3zbf0fbmXSM9l9bjKFeNnpMUg?=
- =?us-ascii?Q?DO9E/peYqa8y5+qk5Bc2O5k/RvOYlUsJHBGRNiXWI9kDJr4FOGnmCQutCuQK?=
- =?us-ascii?Q?ErEEQvxAHIQUwtL2xfd2A0nBYr8GFtDNoRgE/d1h/3nclHhovbFuqtuzv+tC?=
- =?us-ascii?Q?I8Tw/5VLDLZKqPKupQ5W6/teUGyMPEixeLu9eaApiv7QpP1Tq6BaaGkSJG0c?=
- =?us-ascii?Q?ftO4snxB5UVYNA7qXuof6CK+1sGSirg5GOL5iJb87n0qiV4frxbDCpAH0Lui?=
- =?us-ascii?Q?1blgpKZNFSJfuWAcBJtQS9njQ22dm58RDEExzkpZZrTjtR7ktEO5uicyIRQR?=
- =?us-ascii?Q?fXI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?44t4OjwJVVB7Z3rayPDl36I+3kSw06J9eHpMYmE7bRPT1GDU/+2X0JdeMgfT?=
- =?us-ascii?Q?f9KsMacwCR/7qJlpvV3YezTqfCwSHt2YlCWh2hmRK+ebQyWEFNxSrX4CvUER?=
- =?us-ascii?Q?4uJ7h+TWgvcCOpN5eO1yOEY8YjlxzlM8gvJKuGS7mbZ8lxbn18yjntP6NN99?=
- =?us-ascii?Q?aiq3SBanmic3crvMAYlUo8+Gq+yN1N3jtqGdX+IJkbUqnA6AxbN+nZX3EMNx?=
- =?us-ascii?Q?C5WWB6pIUvYtMsrVfBXUnwj2DWdZRVvwLgiyW0WElGhiRSIqM/0XZajtygm2?=
- =?us-ascii?Q?EPKnyeMPgXju8ClxpqTfS0cLERnjV9GV5AHDd1wX4jCnTWQ92Vc6nZRcDrte?=
- =?us-ascii?Q?Jq0r7qG2JaX4Adz6con+1tvKk6a7BlLTAchSbMq/5t//g+o/kBz2CZVUUUsB?=
- =?us-ascii?Q?afjRZQDVzgNvGJ0wqYXBeldvpwhu++3OXs0xEzQh/pQU/jiRL0srl2A8Giav?=
- =?us-ascii?Q?1ZTma1BwIH1nMHxsVkVlOmaxM15r5rGEIBiJgKmtoA5OSTl8/S6dsZ7svvTP?=
- =?us-ascii?Q?uVwuoHkYRhBKu3byZXJuk8jYbysvuY3xWWsspM1mdnTuAkz6YbmlQ9dfDNm2?=
- =?us-ascii?Q?i2nrTtrdJF/SWAFUOTQC3+55dQWloYx2pSZcdKGFCIAI+o7FffPWKs71qN0v?=
- =?us-ascii?Q?fSRV6yT0te+GkY80TsK4IC9UNtq4AHFXxBFYuNhu4lmy9O9XlifUQ67LHJaQ?=
- =?us-ascii?Q?+PlVPPbVEwlNv5FOWCv8Tkgk9Xis0MDvJ3t6LKSsW1EeXLWLlNkb1jXyHheF?=
- =?us-ascii?Q?vj9YCzPiYbJx8HfPLWcoLdSi3kQ2uA6wWBvDhc5PaTjrauLDoeXdpDLm8z4D?=
- =?us-ascii?Q?8j1BlbMrDnYmEYtdanvuS2bsm2/qxOBY7skmHysFnZkh4Brtk3JGJXepMl35?=
- =?us-ascii?Q?1EiWF1sK6ZvSrovkLQYXZCnqmGbkSpehNE585TuMQrLCMIelhdIzj0LC7qd8?=
- =?us-ascii?Q?naaN4VjrJqb425u+xvYo6EgYRq16NFvg3E6UCUakj7HAeOIlfroyYru+ltRF?=
- =?us-ascii?Q?bLbjh1mY5eoRlrl1uRIfNuz0zTsCcR/7lPG0FWLw3/V7NewpLR2+nEh7RXHi?=
- =?us-ascii?Q?7IPy1bYQIGSbZ0fz4hNDYvrIjEID1fRLsFIpV4Ns+LixvBBGW8VdxNyfPv8B?=
- =?us-ascii?Q?oAnjWuDBKVAjDf87h6VPurxZtfYww07NSU+EDXXApW6E58bnurYZFSbjD8V3?=
- =?us-ascii?Q?1MDDkUQcCLI52IqZsMDjtmVO2P/1RryBLaGLyKwKsA4cJRS2v7eZPG5r8Kmr?=
- =?us-ascii?Q?IINK4NNhG2ixzVJ+0jaOlGHE3C2iuSNFz/FN+U7hLee9xAApbfCpkb2x9uuC?=
- =?us-ascii?Q?8dN1Igica8zUbvWUub4+tZ9YXKkXRZseiA9cG4bhp2VrOx3Nde5QSDItVM4P?=
- =?us-ascii?Q?9THrjkXMxPXlL/wcdYgbe3TdO9m9rt0Xl68SkuHi9I29e/8WTcLtS8Pea9ju?=
- =?us-ascii?Q?hls7gR/5LCMSiR/xPEjHB2SCSBzQqyipaJ+UdJuS6rfyNKwXNwUZ8mRQKKjE?=
- =?us-ascii?Q?Mn4AY0Nvy9DiuUr7ZSF2p53eSCPOkicsyDa9Wtm2FePO7XzqIXQrHYEYCAf7?=
- =?us-ascii?Q?Hctr6nrQfhKnnXUsISFPKvn19whe4cE4xCSOmc/9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9095ce6-d428-4234-81d8-08dd04c9588d
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2024 16:28:17.8548
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l+B37tJ70OPBqd+cuJUEpBGew3lWX0ENvwYY0ey18cWwPDcK5B1tBDM3UbMGfn3P
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8538
+User-Agent: Mozilla Thunderbird
+Subject: Re: Proposal: bi-weekly guest_memfd upstream call
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <diqzmsieybwf.fsf@ackerleytng-ctop-specialist.c.googlers.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <diqzmsieybwf.fsf@ackerleytng-ctop-specialist.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 14, 2024 at 11:53:18AM +0200, Yishai Hadas wrote:
-> Fix unwind flows in mlx5vf_pci_save_device_data() and
-> mlx5vf_pci_resume_device_data() to avoid freeing the migf pointer at the
-> 'end' label, as this will be handled by fput(migf->filp) through
-> mlx5vf_release_file().
+On 04.11.24 21:36, Ackerley Tng wrote:
+> David Hildenbrand <david@redhat.com> writes:
 > 
-> To ensure mlx5vf_release_file() functions correctly, move the
-> initialization of migf fields (such as migf->lock) to occur before any
-> potential unwind flow, as these fields may be accessed within
-> mlx5vf_release_file().
+>> Ahoihoi,
+>>
+>> while talking to a bunch of folks at LPC about guest_memfd, it was
+>> raised that there isn't really a place for people to discuss the
+>> development of guest_memfd on a regular basis.
+>>
+>> There is a KVM upstream call, but guest_memfd is on its way of not being
+>> guest_memfd specific ("library") and there is the bi-weekly MM alignment
+>> call, but we're not going to hijack that meeting completely + a lot of
+>> guest_memfd stuff doesn't need all the MM experts ;)
+>>
+>> So my proposal would be to have a bi-weekly meeting, to discuss ongoing
+>> development of guest_memfd, in particular:
+>>
+>> (1) Organize development: (do we need 3 different implementation
+>>       of mmap() support ? ;) )
+>> (2) Discuss current progress and challenges
+>> (3) Cover future ideas and directions
+>> (4) Whatever else makes sense
+>>
+>> Topic-wise it's relatively clear: guest_memfd extensions were one of the
+>> hot topics at LPC ;)
+>>
+>> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7),
+>> starting Thursday next week (2024-10-17).
+>>
+>> We would be using Google Meet.
+>>
+>>
+>> Thoughts?
 > 
-> Fixes: 9945a67ea4b3 ("vfio/mlx5: Refactor PD usage")
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/pci/mlx5/main.c | 35 +++++++++++++++++------------------
->  1 file changed, 17 insertions(+), 18 deletions(-)
+> We've been taking recordings of these meetings with attendees'
+> permission and the recordings are kind of stuck in a Google drive
+> now.
+> 
+> People interested in watching the recordings need to request access to
+> the meetings.
+> 
+> I would like to make these recordings more public and lower
+> administrative overheads of requesting/giving access by hosting the
+> videos somewhere.
+> 
+> Does anyone have any suggestions/preferences on a video hosting service?
+> 
+> Otherwise I'll default to using YouTube since that's also where LPC and
+> LSF/MM videos are hosted.
 
-Tricky
+Makes sense to me, but I would like for them to only be detectable via 
+link, not via the youtube search.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+We could add links to the gdoc notes.
 
-Jason
+Let's discuss that today in the call real quick.
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
