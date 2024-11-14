@@ -1,157 +1,167 @@
-Return-Path: <kvm+bounces-31853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC409C8F91
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:21:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 311199C908F
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 18:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 904E0B38510
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 15:42:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57038B37B4B
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 16:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD47418EFCB;
-	Thu, 14 Nov 2024 15:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC3F187347;
+	Thu, 14 Nov 2024 16:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="cNKTYuXK"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5A5149C53;
-	Thu, 14 Nov 2024 15:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD5C14F104
+	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 16:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731598532; cv=none; b=IuQAwOFVbdCe9v0rfrLzNbVdw7k5rOf5WnVauphGZJ0Rn/Npb0XkDoRYsVOY5fScHBIz+iJjMQGyG0WnFw2Tf8WHmkZQg72uvBQMj+a+AcnmQGtDqsamCwveRYgTHYixzDWnLfF49hbkLFoPeUtaU+jR7CGvdc6LPgVuxdlcfWE=
+	t=1731601132; cv=none; b=cqlry0iX8aldRcdGxzeLvVOKriVCW6CHJ3T05iprLPD1a/hM1Ap+2Ya5sKpwhvVF+1JmII6bFlJyExqqHJPc4HeB3V7xWr3E6GCZ779B7MDR/yOiwUo2c2y9/OuBcE/Y7U9Ur/y6yPATiFWvWpSntSnxjNp7+iFgQ0Ll6gg/fM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731598532; c=relaxed/simple;
-	bh=IT4Y74OkXGP7crFm1QoLu/BRJuwnmPvZBB2U0jdzxGs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FRrQL58tAFKo/QceAetQXFIBILtPyrYT3n/l4M2Jxc0VgNtkbCx05kfZcZFyYbUT5lU41aKhC99xA9fFZbH26lknv7XSHhW5Mhb1LAmQ4Qxb38ifV1ErMkwJU6FoVWm/6yorx77njehVgKqLvfXMzBm7/fySbLgHcetM9Zzg4hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6827B169E;
-	Thu, 14 Nov 2024 07:35:57 -0800 (PST)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A1FB3F59E;
-	Thu, 14 Nov 2024 07:35:16 -0800 (PST)
-Message-ID: <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
-Date: Thu, 14 Nov 2024 15:35:15 +0000
+	s=arc-20240116; t=1731601132; c=relaxed/simple;
+	bh=lyZC4By9Ar4lY6HLPHxQpNiCLgIv0jeWjlSxPE9suGg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TQJqdcfYYaGqGx7S8LU06as1MejlEC+5kf5TgVT/5BAva+b27gQz+LElDzaDv/Tym4HEZ/dndURVlb89NjcMTSHRprjau8RF0v9V0BKE2Th+YCfskWCa2niIuBZX7+GtGqap6znfeii7W1JTTWonLmShGi2fb22P9HKdjp21nSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=cNKTYuXK; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4314b316495so7192015e9.2
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 08:18:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1731601127; x=1732205927; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c7BJqdeVq7UVKuF/HMX90zKjA2XSvBJJooO0qYOgVYo=;
+        b=cNKTYuXKtXFcjOBPRnJIe5JEdaB8nMTdu2gcZu4Z89SKXsd3VhtZobgrFLZ649oWsK
+         d6zo/GDvvxvpnkgsyBcraFTMogz3K9QctpIzhElYC9G2Ln+IdCvwCfDQfS4A7r53BO6s
+         32zL54xRan91QAkTppZjOLyk1os5NSG1ISqykLjnHy/DrYlnckf2icQQQw/gE3ntfJZ+
+         W4FcHVMzo8PXw4PwoKzgrLuPeVgbO/UANpi4naPB49BJHE09s99hUw5dF/ZLRWdZz7i7
+         Jx8zEh5SP/qkN7h4U0/7X/LOLmC7yryzJTRmBVq3PYuIPLSxIJWVoTE1SrFQHLOaXEmS
+         zhAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731601127; x=1732205927;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c7BJqdeVq7UVKuF/HMX90zKjA2XSvBJJooO0qYOgVYo=;
+        b=obKLDCSQMzKm6q5QPDRCIrUVzXztfjc3Wrq8s7AyWi9xMN/PScbtt3/F9iVBTo64rB
+         FjNX2aeo4GqLlcsdg3sbYlYBQsK3stbCnxsodHIzZnVAqvWxMNRYstnJi1Od+Ds2beHq
+         IpPn/Evq2xYHtkV0DegicIROrgiZ7zKnhux9q9ib+nUS6CSXGO2OvY3bUdwf9mlIKGxx
+         yy2rFLr0H09VtsyMBbgKFgiR4z3hhLc9H3NfALw9RnNSfiv8CT4hVaQFBtdaVPvx5EMl
+         ZfWaBhgJuGtJo6iZ7O8OOINHjl6gnYa+qWpMRAjGIWMBijJfnL+6+7YgipgoB1cusCHf
+         qFLA==
+X-Forwarded-Encrypted: i=1; AJvYcCX42UUASyHgEi7gfs5/sq5joyo2XK4r2yhtdG76nIRAT98bHklUnFwGym6ZBNEpg1CjPVA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAgIgocSF4rcnRanFoUjLn+bc4yDMmVrXLNhhrhju0JiHWIcal
+	4IRU1nvpbTx3iJxBJwd/SsWqC4yW1xrDFd9731RY0b/6M3W7pRPDYs1tobLfPQI=
+X-Google-Smtp-Source: AGHT+IGmsJWy6Z+mGpYkwKc89nKAhzRkstEPPTX+iWcGxi/SAriHdno919nTAwdEP/fS42LcKsW+QA==
+X-Received: by 2002:a05:600c:1d88:b0:431:5a27:839c with SMTP id 5b1f17b1804b1-432d4a98364mr70171705e9.5.1731601126807;
+        Thu, 14 Nov 2024 08:18:46 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da265f28sm28998355e9.17.2024.11.14.08.18.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 08:18:46 -0800 (PST)
+From: Andrew Jones <ajones@ventanamicro.com>
+To: iommu@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: tjeznach@rivosinc.com,
+	zong.li@sifive.com,
+	joro@8bytes.org,
+	will@kernel.org,
+	robin.murphy@arm.com,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	tglx@linutronix.de,
+	alex.williamson@redhat.com,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu
+Subject: [RFC PATCH 00/15] iommu/riscv: Add irqbypass support
+Date: Thu, 14 Nov 2024 17:18:45 +0100
+Message-ID: <20241114161845.502027-17-ajones@ventanamicro.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address
- for each MSI vector
-To: Alex Williamson <alex.williamson@redhat.com>,
- Jason Gunthorpe <jgg@nvidia.com>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, tglx@linutronix.de, maz@kernel.org,
- bhelgaas@google.com, leonro@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org,
- kevin.tian@intel.com, smostafa@google.com,
- andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com,
- eric.auger@redhat.com, ddutile@redhat.com, yebin10@huawei.com,
- brauner@kernel.org, apatel@ventanamicro.com,
- shivamurthy.shastri@linutronix.de, anna-maria@linutronix.de,
- nipun.gupta@amd.com, marek.vasut+renesas@mailbox.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1731130093.git.nicolinc@nvidia.com>
- <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
- <ZzPOsrbkmztWZ4U/@Asurada-Nvidia> <20241113013430.GC35230@nvidia.com>
- <20241113141122.2518c55a.alex.williamson@redhat.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241113141122.2518c55a.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 13/11/2024 9:11 pm, Alex Williamson wrote:
-> On Tue, 12 Nov 2024 21:34:30 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
->> On Tue, Nov 12, 2024 at 01:54:58PM -0800, Nicolin Chen wrote:
->>> On Mon, Nov 11, 2024 at 01:09:20PM +0000, Robin Murphy wrote:
->>>> On 2024-11-09 5:48 am, Nicolin Chen wrote:
->>>>> To solve this problem the VMM should capture the MSI IOVA allocated by the
->>>>> guest kernel and relay it to the GIC driver in the host kernel, to program
->>>>> the correct MSI IOVA. And this requires a new ioctl via VFIO.
->>>>
->>>> Once VFIO has that information from userspace, though, do we really need
->>>> the whole complicated dance to push it right down into the irqchip layer
->>>> just so it can be passed back up again? AFAICS
->>>> vfio_msi_set_vector_signal() via VFIO_DEVICE_SET_IRQS already explicitly
->>>> rewrites MSI-X vectors, so it seems like it should be pretty
->>>> straightforward to override the message address in general at that
->>>> level, without the lower layers having to be aware at all, no?
->>>
->>> Didn't see that clearly!! It works with a simple following override:
->>> --------------------------------------------------------------------
->>> @@ -497,6 +497,10 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
->>>                  struct msi_msg msg;
->>>
->>>                  get_cached_msi_msg(irq, &msg);
->>> +               if (vdev->msi_iovas) {
->>> +                       msg.address_lo = lower_32_bits(vdev->msi_iovas[vector]);
->>> +                       msg.address_hi = upper_32_bits(vdev->msi_iovas[vector]);
->>> +               }
->>>                  pci_write_msi_msg(irq, &msg);
->>>          }
->>>   
->>> --------------------------------------------------------------------
->>>
->>> With that, I think we only need one VFIO change for this part :)
->>
->> Wow, is that really OK from a layering perspective? The comment is
->> pretty clear on the intention that this is to resync the irq layer
->> view of the device with the physical HW.
->>
->> Editing the msi_msg while doing that resync smells bad.
->>
->> Also, this is only doing MSI-X, we should include normal MSI as
->> well. (it probably should have a resync too?)
-> 
-> This was added for a specific IBM HBA that clears the vector table
-> during a built-in self test, so it's possible the MSI table being in
-> config space never had the same issue, or we just haven't encountered
-> it.  I don't expect anything else actually requires this.
+Platforms with implementations of the RISC-V IOMMU and AIA support
+directly delivering MSIs of devices assigned to guests to the VCPUs.
+VFIO and KVM have a framework to enable such support, which is called
+irqbypass. This series enables irqbypass for devices assigned to KVM
+guests when all VCPUs are allocated guest interrupt files. The RISC-V
+IOMMU and AIA also support MRIFs (memory-resident interrupt files),
+but support for those will be posted as a follow-on to this series.
 
-Yeah, I wasn't really suggesting to literally hook into this exact case; 
-it was more just a general observation that if VFIO already has one 
-justification for tinkering with pci_write_msi_msg() directly without 
-going through the msi_domain layer, then adding another (wherever it 
-fits best) can't be *entirely* unreasonable.
+The patches are organized as follows:
+  1-3:  Prepare to create an MSI remapping irqdomain parented by the IMSIC
+  4-6:  Prepare the IOMMU driver for VFIO domains which will use a single
+        stage of translation, but G-stage instead of the first stage
+  7-8:  Add support to the IOMMU driver for creating irqdomains
+  9-10: Prepare KVM to enable irqbypass
+ 11-13: Add irqbypass support to the IOMMU driver and KVM
+ 14-15: Enable VFIO by default
 
-At the end of the day, the semantic here is that VFIO does know more 
-than the IRQ layer, and does need to program the endpoint differently 
-from what the irqchip assumes, so I don't see much benefit in dressing 
-that up more than functionally necessary.
+This series is also available here [1] and may be tested with QEMU recent
+enough to have the IOMMU model.
 
->> I'd want Thomas/Marc/Alex to agree.. (please read the cover letter for
->> context)
-> 
-> It seems suspect to me too.  In a sense it is still just synchronizing
-> the MSI address, but to a different address space.
-> 
-> Is it possible to do this with the existing write_msi_msg callback on
-> the msi descriptor?  For instance we could simply translate the msg
-> address and call pci_write_msi_msg() (while avoiding an infinite
-> recursion).  Or maybe there should be an xlate_msi_msg callback we can
-> register.  Or I suppose there might be a way to insert an irqchip that
-> does the translation on write.  Thanks,
+Based on linux-next commit 28955f4fa282 ("Add linux-next specific files for 20241112")
 
-I'm far from keen on the idea, but if there really is an appetite for 
-more indirection, then I guess the least-worst option would be yet 
-another type of iommu_dma_cookie to work via the existing 
-iommu_dma_compose_msi_msg() flow, with some interface for VFIO to update 
-per-device addresses directly. But then it's still going to need some 
-kind of "layering violation" for VFIO to poke the IRQ layer into 
-re-composing and re-writing a message whenever userspace feels like 
-changing an address, because we're fundamentally stepping outside the 
-established lifecycle of a kernel-managed IRQ around which said layering 
-was designed...
+[1] https://github.com/jones-drew/linux/commits/riscv/iommu-irqbypass-rfc-v1/
 
 Thanks,
-Robin.
+drew
+
+
+Andrew Jones (10):
+  irqchip/riscv-imsic: Use hierarchy to reach irq_set_affinity
+  genirq/msi: Provide DOMAIN_BUS_MSI_REMAP
+  irqchip/riscv-imsic: Add support for DOMAIN_BUS_MSI_REMAP
+  iommu/riscv: Move definitions to iommu.h
+  iommu/riscv: Add IRQ domain for interrupt remapping
+  RISC-V: KVM: Add irqbypass skeleton
+  RISC-V: Define irqbypass vcpu_info
+  iommu/riscv: Add guest file irqbypass support
+  RISC-V: KVM: Add guest file irqbypass support
+  RISC-V: defconfig: Add VFIO modules
+
+Tomasz Jeznach (3):
+  iommu/riscv: report iommu capabilities
+  RISC-V: KVM: Enable KVM_VFIO interfaces on RISC-V arch
+  vfio: enable IOMMU_TYPE1 for RISC-V
+
+Zong Li (2):
+  iommu/riscv: use data structure instead of individual values
+  iommu/riscv: support GSCID and GVMA invalidation command
+
+ arch/riscv/configs/defconfig               |   2 +
+ arch/riscv/include/asm/irq.h               |   9 +
+ arch/riscv/include/asm/kvm_host.h          |   3 +
+ arch/riscv/kvm/Kconfig                     |   3 +
+ arch/riscv/kvm/aia_imsic.c                 | 136 +++++++-
+ arch/riscv/kvm/vm.c                        |  60 ++++
+ drivers/iommu/riscv/Makefile               |   2 +-
+ drivers/iommu/riscv/iommu-bits.h           |  11 +
+ drivers/iommu/riscv/iommu-ir.c             | 360 +++++++++++++++++++++
+ drivers/iommu/riscv/iommu.c                | 183 ++++++-----
+ drivers/iommu/riscv/iommu.h                |  78 +++++
+ drivers/irqchip/irq-riscv-imsic-platform.c |  18 +-
+ drivers/vfio/Kconfig                       |   2 +-
+ include/linux/irqdomain_defs.h             |   1 +
+ 14 files changed, 776 insertions(+), 92 deletions(-)
+ create mode 100644 drivers/iommu/riscv/iommu-ir.c
+
+-- 
+2.47.0
+
 
