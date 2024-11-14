@@ -1,99 +1,154 @@
-Return-Path: <kvm+bounces-31879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872CA9C90B5
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 18:22:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432BD9C9101
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 18:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E4F41F239F1
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:22:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00675284913
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 17:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B1D262A3;
-	Thu, 14 Nov 2024 17:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CA918C930;
+	Thu, 14 Nov 2024 17:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lcJ4Ks3v"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08F4189F2A;
-	Thu, 14 Nov 2024 17:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8594118C010
+	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 17:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731604938; cv=none; b=JkFtFEyXqmvDaE+nh2iMYNzvqCklauyjQ7t1q8nSJItUCJyvOtly7TtS7WVQ8wALEKsAXE9/bE/e+01QS4HVcwmZZwIvQ8SRd8MIjV3ozim/jK538pd2ElrQWO7r0n06SCYGNdjAyJ1QERepQQZiixHXETLp4MuqZuJ8SCDNRiY=
+	t=1731606157; cv=none; b=WFZGhdQA+JEfysoNBtvA99unEoNWmG+0LgRYyKDQ6/Ms3IoYikDP/+N2npIxnu9VqWIcckzSEz0ZDbaHRzlg+ddC4SrW0yiQHsB/TF8CHM7KJso4GYWO7sZmboritJmyfAHOlmd/XUm8AZxaBXdm53J9Y/0kCxR90/1R988roXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731604938; c=relaxed/simple;
-	bh=t9ajE/VeX04xVGpQR7Zfzq53U0A1RsxE/6M4zIt9zZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/TYcmU03YyeJ0q8i2KYBbdbsgLOUZQhL5FD+LewcNBWZmjLQSrXdUNvwrPKo6VXtQMAmcpqNR19e6+9HAnrd2ZMudfBNSX72sD9Ahc7/ivSRYl8a1h27ZmmwB1WY3bKNqKBZX3gg91uXFQ57C40t4HZkx7XTF7WTDFzDubEado=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD68F1474;
-	Thu, 14 Nov 2024 09:22:44 -0800 (PST)
-Received: from arm.com (RQ4T19M611.cambridge.arm.com [10.1.37.73])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBA8D3F6A8;
-	Thu, 14 Nov 2024 09:22:09 -0800 (PST)
-Date: Thu, 14 Nov 2024 17:22:07 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Christoph Lameter (Ampere)" <cl@gentwo.org>
-Cc: Ankur Arora <ankur.a.arora@oracle.com>, linux-pm@vger.kernel.org,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	will@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	pbonzini@redhat.com, vkuznets@redhat.com, rafael@kernel.org,
-	daniel.lezcano@linaro.org, peterz@infradead.org, arnd@arndb.de,
-	lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com,
-	mtosatti@redhat.com, sudeep.holla@arm.com, maz@kernel.org,
-	misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
-	zhenglifeng1@huawei.com, joao.m.martins@oracle.com,
-	boris.ostrovsky@oracle.com, konrad.wilk@oracle.com
-Subject: Re: [PATCH v9 01/15] asm-generic: add barrier
- smp_cond_load_relaxed_timeout()
-Message-ID: <ZzYxv2RfDwegDMEf@arm.com>
-References: <20241107190818.522639-1-ankur.a.arora@oracle.com>
- <20241107190818.522639-2-ankur.a.arora@oracle.com>
- <9cecd8a5-82e5-69ef-502b-45219a45006b@gentwo.org>
- <87v7wy2mbi.fsf@oracle.com>
- <88b3b176-97c7-201e-0f89-c77f1802ffd9@gentwo.org>
+	s=arc-20240116; t=1731606157; c=relaxed/simple;
+	bh=5uog7s88Vdjn9LrHFqVJ7H6JRAqfaj//EHJnHT0pKe0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=C1ekhy4qT6TxSb1xk1RBB2WJmOHh9CIBIgEzTPW25MmtDAd8qsexZ9aBBMop6mVbE1pqL4NAr2V0siZUt4JeKV/3qHb9HTpyHuJDuCUIcE5TLPgY6h3a8nFfIkxoMqaFtkIpdO9nLPDoS/eDHMhGIMvQ3AiTl2m4utd1I86YHDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lcJ4Ks3v; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e55c9d23cso676171b3a.0
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 09:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731606155; x=1732210955; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
+        b=lcJ4Ks3vn57vagENL6KpLY4KdsY++5na8cw55/Zio+ZJr8oan+SLexf3L1Ne3RBsyW
+         1nZThlqcXnVgX8fjplY6z6Rnu7LFJ8lCRh+0onL1pn5vRIf5kPCZ9ts+oqqNtjVMwLti
+         HpldyLb7upKYSz6DlxLyVsGirooKMr2ahZNyPAm/AJRFneAi/JbLr2dDNmTV7dIiVOv4
+         pHq8Bt4aTA+hWVCSvhqMASpXzEKPmIaBxjbMH2w6GTZOtiMUCtDfsPCD9e2CDuPgegmY
+         9bwSR0P6JIKxpahsbWE5LeHjve3oq+8UBWMujf0HUdCDYtc0WfSk3IJS1SGbFMfb8HzW
+         +SRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731606155; x=1732210955;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
+        b=pAkKyoWCcEk24RXmfrgxC99Pj8CGm30TyjL85PcunOb680ILo0dUEpaUWpTzYFzhGo
+         ilrspXJxYMXsB3jSeeUDNQJymON27k4dfe8gDfLV465OfQuL9PF6R1MCR10ih5VE7W/H
+         gEnt39RBVKMNE8tX/Lx07+bBUdWbdzmYxLiGtlAGqh4A7hMv5OhWF8ocFPWhSkml6jUi
+         K8hBL8f8gEdO9XvXIpEo2YfvjPBK/3QGvlr/DRQ1arh7ZJH+b4Ly6oqlpa9pn2MWcZgJ
+         26aP2Sz4EhNXbA/aksufg05oiu2Axu2/ke9fZkQXj9Iw7VFiVhjSQQy7aLnsuEAeIC90
+         wzwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMglfUTb9ZCaGWFBOUKI9egWuqlcMNgZB9ME/smk+Ignot2GOm2TEodJuRLR+2PTE6b74=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7qnHT0e9S2Klzg/68CUiJSptCtTQfCrl4KOJtQEZZFOU7V78L
+	XT4/8MXBV+eEpWGzlcweurv+Mbch0szr7t+ecPY6SDxfzti2KiluCzP82VZl+SsO0cXh8N2q0W2
+	emw==
+X-Google-Smtp-Source: AGHT+IE2t7/BQUDGvQdq1WU4OfDCD4pafvlstYkabCEfeZEIVCwo/4m39wonrcrGj/V1SHEHETmIrMp08OA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2167:b0:724:67d7:17b2 with SMTP id
+ d2e1a72fcca58-72467d71a19mr35667b3a.0.1731606154070; Thu, 14 Nov 2024
+ 09:42:34 -0800 (PST)
+Date: Thu, 14 Nov 2024 09:42:32 -0800
+In-Reply-To: <20241108-eaacad12f1eef31481cf0c6c@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88b3b176-97c7-201e-0f89-c77f1802ffd9@gentwo.org>
+Mime-Version: 1.0
+References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+ <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+ <ZyuiH_CVQqJUoSB-@google.com> <20241108-eaacad12f1eef31481cf0c6c@orel>
+Message-ID: <ZzY2iAqNfeiiIGys@google.com>
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Anup Patel <anup@brainfault.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Nov 08, 2024 at 11:41:08AM -0800, Christoph Lameter (Ampere) wrote:
-> On Thu, 7 Nov 2024, Ankur Arora wrote:
-> > > Calling the clock retrieval function repeatedly should be fine and is
-> > > typically done in user space as well as in kernel space for functions that
-> > > need to wait short time periods.
-> >
-> > The problem is that you might have multiple CPUs polling in idle
-> > for prolonged periods of time. And, so you want to minimize
-> > your power/thermal envelope.
+On Fri, Nov 08, 2024, Andrew Jones wrote:
+> On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
+> > On Fri, Nov 01, 2024, Vipin Sharma wrote:
+> > > Phase 3: Provide collection of interesting configurations
+> > > 
+> > > Specific individual constructs can be combined in a meaningful way to
+> > > provide interesting configurations to run on a platform. For example,
+> > > user doesn't need to specify each individual configuration instead,
+> > > some prebuilt configurations can be exposed like
+> > > --stress_test_shadow_mmu, --test_basic_nested
+> > 
+> > IMO, this shouldn't be baked into the runner, i.e. should not surface as dedicated
+> > command line options.  Users shouldn't need to modify the runner just to bring
+> > their own configuration.  I also think configurations should be discoverable,
+> > e.g. not hardcoded like KUT's unittest.cfg.  A very real problem with KUT's
+> > approach is that testing different combinations is frustratingly difficult,
+> > because running a testcase with different configuration requires modifying a file
+> > that is tracked by git.
 > 
-> On ARM that maps to YIELD which does not do anything for the power
-> envelope AFAICT. It switches to the other hyperthread.
+> We have support in KUT for environment variables (which are stored in an
+> initrd). The feature hasn't been used too much, but x86 applies it to
+> configuration parameters needed to execute tests from grub, arm uses it
+> for an errata framework allowing tests to run on kernels which may not
+> include fixes to host-crashing bugs, and riscv is using them quite a bit
+> for providing test parameters and test expected results in order to allow
+> SBI tests to be run on a variety of SBI implementations. The environment
+> variables are provided in a text file which is not tracked by git. kvm
+> selftests can obviously also use environment variables by simply sourcing
+> them first in wrapper scripts for the tests.
 
-The issue is not necessarily arm64 but poll_idle() on other
-architectures like x86 where, at the end of this series, they still call
-cpu_relax() in a loop and check local_clock() every 200 times or so
-iterations. So I wouldn't want to revert the improvement in 4dc2375c1a4e
-("cpuidle: poll_state: Avoid invoking local_clock() too often").
+Oh hell no! :-)
 
-I agree that the 200 iterations here it's pretty random and it was
-something made up for poll_idle() specifically and it could increase the
-wait period in other situations (or other architectures).
+For reproducibility, transparency, determinism, environment variables are pure
+evil.  I don't want to discover that I wasn't actually testing what I thought I
+was testing because I forgot to set/purge an environment variable.  Ditto for
+trying to reproduce a failure reported by someone.
 
-OTOH, I'm not sure we want to make this API too complex if the only
-user for a while would be poll_idle(). We could add a comment that the
-timeout granularity can be pretty coarse and architecture dependent (200
-cpu_relax() calls in one deployment, 100us on arm64 with WFE).
+KUT's usage to adjust to the *system* environment is somewhat understandable
+But for KVM selftests, there should be absolutely zero reason to need to fall
+back to environment variables.  Unlike KUT, which can run in a fairly large variety
+of environments, e.g. bare metal vs. virtual, different VMMs, different firmware,
+etc., KVM selftests effectively support exactly one environment.
 
--- 
-Catalin
+And unlike KUT, KVM selftests are tightly coupled to the kernel.  Yes, it's very
+possible to run selftests against different kernels, but I don't think we should
+go out of our way to support such usage.  And if an environment needs to skip a
+test, it should be super easy to do so if we decouple the test configuration
+inputs from the test runner.
+
+> > There are underlying issues with KUT that essentially necessitate that approach,
+> > e.g. x86 has several testcases that fail if run without the exact right config.
+> > But that's just another reason to NOT follow KUT's pattern, e.g. to force us to
+> > write robust tests.
+> > 
+> > E.g. instead of per-config command line options, let the user specify a file,
+> > and/or a directory (using a well known filename pattern to detect configs).
+> 
+> Could also use an environment variable to specify a file which contains
+> a config in a test-specific format if parsing environment variables is
+> insufficient or awkward for configuring a test.
+
+There's no reason to use a environment variable for this.  If we want to support
+"advanced" setup via a test configuration, then that can simply go in configuration
+file that's passed to the runner.
 
