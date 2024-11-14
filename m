@@ -1,203 +1,306 @@
-Return-Path: <kvm+bounces-31837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2CE9C81B5
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 05:03:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C19399C8415
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 08:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1B061F25071
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 04:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E5F51F2297A
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2024 07:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DA91E8835;
-	Thu, 14 Nov 2024 04:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E7C1F4FD0;
+	Thu, 14 Nov 2024 07:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DbVqV53c"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Imlaw8zr"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2089.outbound.protection.outlook.com [40.107.94.89])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D251E3DFE
-	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 04:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731556964; cv=fail; b=X3QKb3DLuXdLQzUX63UMLR5TFBu5XHwYNKdG1TM5yaMrq8WXsWSCbgfqB54QmG8b4F8mN3yW4PWz2VuwLsPl9gDLe+S6P0/t/SIHfgmBqTGL+8ezOK8SzbvfViSNynQTytLKRTmR8xDuQdBqEt5jZOeeB2LfkjnN2NR6nu89ubg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731556964; c=relaxed/simple;
-	bh=IxHGxx+1wT71JvO3X3VV2hL2PA19z3Ykec74vFLtBRY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VPKmBz3olHq/3hanSklM95Ad0XiXil08DfoXcYXzeIftDl2EMJZVk/C6PySgvTpTUxXhkIkloqzKzcuTzuEwoHS6WIGTa0gZoRFo4gLvqX3DJ+5Imsc3OS8s8ZA97Le18OehfgeoxDaGNQFQ4b3Utmn7xg+p2OQqCcrI1s1oEBI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DbVqV53c; arc=fail smtp.client-ip=40.107.94.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SzELsCBsm1/kHUc3OHowBK6dn8klbsKO0eCTRkpMiA1AK8VttCVuFvGteGsHCvbamf4So3y7f+CVGNu4Ky0laJr1iqpmdjzbJ0GOyHxBbAh2wQa4MKdIkYcLlrR33E/nnKCydr/v21ac0HxiU06iR23LjF1CDEwZlt0EcUAH3e+biMxUpYJ+ySdfLq1QVLD2/IcYTayPnRjw+/Tor+difccfattyDchYVBs992LkfxyFXAxpCR1ZTXEpAQjsxjJPnSKavoYDdmBurHTlmey/vLzbDwrtWRiIAezDgNLjOX6HC3p37EEMJH/aOJDeIlyxXoRchOO4INglP6g3DD1qcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1pJWoCvygYR6bKzG7W2ZTlcUVdE9vB+lWCQmINAp1IA=;
- b=ixhAj/QEE4bXz7/Sit0VV/UfwelJ7cZHaeD3nf1SSJ8gQJmy6iVELfrvrsp2Di6h/RcMQEkN2CKc8ZlNsNdkLC2ngX39FScZnOmD6LPhMrJ5vnxBXxOTYaGrr1zJLZca/jJqMC+6XjnXiRA3Cd/54Q5Xs/jFNSZIXS+yWyKD4E0jcB6DEgXl+72DUhC7SpHBfrvM4ZKQvNkIhCz/BsdDiheO58TJZNeBjek7V19YbDAAnnlmFfe3bxtPGWL86Bo2te2isc8EwadEXqwPIO2MO8wWUTcprDitJx19lRX+cw84kFzBXhKIwoGNH4if+ZmCGgajemUX7eQh5IJBRyMryw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1pJWoCvygYR6bKzG7W2ZTlcUVdE9vB+lWCQmINAp1IA=;
- b=DbVqV53caJS/kYClFTT/2uSC5Wfl3x4tpByRWa5K5fU3KWsyto1iGuj4n2QHPJl9yYb1geVtpgLw3YBgwXDhQSFRkVbisE9kmL2mFlBRFps9w/VUzCFW/qiJhcwnimMwD6AGOCqGh+ATEfV3ZSAjoYLTA2XJoh/HzTMWSvQai71tgcMhLDGSC67WG4coTT3WPnFIhFI57mzxygacakFzJMxfPiosQ1fwj5f2JY05gFtOirMvhJvQcz5zfHxWcO2zthTO0B0iqrlIKnIrR+pwDoiKFr40q5AG35Z5bnyAJUEzy5Tk7WPCLwrUJF3XiOKgbWc+HEv1FrlYpj1rwltPOg==
-Received: from BL0PR0102CA0025.prod.exchangelabs.com (2603:10b6:207:18::38) by
- IA0PR12MB7651.namprd12.prod.outlook.com (2603:10b6:208:435::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.28; Thu, 14 Nov 2024 04:02:39 +0000
-Received: from BN3PEPF0000B370.namprd21.prod.outlook.com
- (2603:10b6:207:18:cafe::66) by BL0PR0102CA0025.outlook.office365.com
- (2603:10b6:207:18::38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.22 via Frontend
- Transport; Thu, 14 Nov 2024 04:02:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN3PEPF0000B370.mail.protection.outlook.com (10.167.243.167) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8182.1 via Frontend Transport; Thu, 14 Nov 2024 04:02:38 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
- 2024 20:02:22 -0800
-Received: from [10.110.48.28] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
- 2024 20:02:21 -0800
-Message-ID: <0124e8c9-20c5-4177-b8b1-a4f94220f86f@nvidia.com>
-Date: Wed, 13 Nov 2024 20:02:20 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099E91EBFF6
+	for <kvm@vger.kernel.org>; Thu, 14 Nov 2024 07:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731569919; cv=none; b=Vqr3mbHONBMsExHFdZuboND5mdCbGlYX+kanAFDo9SDjraYijEkM42hQ3dhWc9hTEkdMwfPn9gwhQb//Zf4VNltNFj6b6G3KM8jSiyOCsty2Fy/QQiz85TURlUklnJkOkGXEJNwMZhcQRfpPMoo0EfkNSJyKP2giX77kWfLldNY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731569919; c=relaxed/simple;
+	bh=iF3I8wem+QM4TRibsqXcg20i1fGoza1q9NZe1LY+scs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VT2zcFIw+/axlg7779jdXowC9yapMcAA5WXztVQBGa1rPvktZXUhbWjeWSeCDJFXuFDHCo+Q8fwXTZVnd561EApaMQokAn5vVwZ6/yTGkxp8DmIUR6qpIQJy3WEiORkE2CW3jK3U65Bx7BLS0cipuXrDjpl7auBwOfUUK4V3+ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Imlaw8zr; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 13 Nov 2024 23:38:23 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731569914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=uajpu78lDZfKmTEAGZloofJ5jaXiVrS+GhV/b4AjkEU=;
+	b=Imlaw8zrRlqAd/nVp3l00DV2FCVswZQ2ShzkdldV2tG0lcQE7p9abEAqIZxHml+PVwZIS8
+	aRt/I2AQ6hnL/U6FZ2zaIbkSJeQQ/Xng2uywTtYtSVg70o5itRF0FvCi8+jmoYI61bw4TW
+	zvOijqki5sdwxJwAsI3ccXPRtxGVmyY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, Fuad Tabba <tabba@google.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: [GIT PULL] KVM/arm64 changes for 6.13
+Message-ID: <ZzWo7_GSUNXe7Ip_@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 00/10] mm: Introduce and use folio_owner_ops
-To: Matthew Wilcox <willy@infradead.org>, David Hildenbrand <david@redhat.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>, Fuad Tabba <tabba@google.com>,
-	<linux-mm@kvack.org>, <kvm@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
-	<dri-devel@lists.freedesktop.org>, <rppt@kernel.org>, <jglisse@redhat.com>,
-	<akpm@linux-foundation.org>, <muchun.song@linux.dev>, <simona@ffwll.ch>,
-	<airlied@gmail.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<ackerleytng@google.com>, <vannapurve@google.com>,
-	<mail@maciej.szmigiero.name>, <kirill.shutemov@linux.intel.com>,
-	<quic_eberman@quicinc.com>, <maz@kernel.org>, <will@kernel.org>,
-	<qperret@google.com>, <keirf@google.com>, <roypat@amazon.co.uk>
-References: <20241108162040.159038-1-tabba@google.com>
- <20241108170501.GI539304@nvidia.com>
- <9dc212ac-c4c3-40f2-9feb-a8bcf71a1246@redhat.com>
- <CA+EHjTy3kNdg7pfN9HufgibE7qY1S+WdMZfRFRiF5sHtMzo64w@mail.gmail.com>
- <ZzLnFh1_4yYao_Yz@casper.infradead.org>
- <e82d7a46-8749-429c-82fa-0c996c858f4a@redhat.com>
- <20241112135348.GA28228@nvidia.com>
- <430b6a38-facf-4127-b1ef-5cfe7c495d63@redhat.com>
- <ZzQxuAiJLbqm5xGO@casper.infradead.org>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <ZzQxuAiJLbqm5xGO@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B370:EE_|IA0PR12MB7651:EE_
-X-MS-Office365-Filtering-Correlation-Id: d0f02474-3c43-4e17-0078-08dd04612e2d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|7416014|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZEc4NTNUK2ZQc1ZVb0dxb0tVQm5odEErb3hLUWdkVDNRSk5ZbFdjNCtDZDA0?=
- =?utf-8?B?amM4YVQ2SVhSdmkyQ0U1TW1kRWd4Q0g4cFJuL1RiczVQaWxlYjZxZlFQZnh6?=
- =?utf-8?B?N0JPZlY0aEwyaWJSM2FJTGxqVXZZcDR1NHZCUXY2V1hLK3RIR0JyL1VicUx6?=
- =?utf-8?B?T3g5VXpCVDRUbTZ0MFVkd3k3cEFVS3B2TlNmNkUrNEZOU2JZOThON1RvTllk?=
- =?utf-8?B?THBWdUtMRzRXeVdaWVpiODhYd2hiUm9Kay9DOHBET1BGd1dWYWh3N0dJOGow?=
- =?utf-8?B?eDVxaytQNndIeEtHeWxQZm5EOWRFbEpETmtrYnNHQXFDU3JWdThzNmh2N0Fu?=
- =?utf-8?B?cHpKME9BcVlQcSsvQ2xURXluYlQ5U1Y0VzlmaDZHSFdMYnFmcDNDaHRlOGtw?=
- =?utf-8?B?UUs5UHhVM21HejBYd0lzK2dQVnliTHY2YnVYVWJ6eHhFa3JWWkhGem5OR1VP?=
- =?utf-8?B?RDR1MHI4TEJoTUJBb0ppemFaeFZSY2FDbzdvbDB1WFJGdWdzZXBHUUwxQmVk?=
- =?utf-8?B?NUp0VEdoSk4yYkl5bVE2L20vVDF4bkVBWE1SZFNkU2wwaVIvK0Erd0tsL21x?=
- =?utf-8?B?QkIrc0pTK3k4eWZrWVRkT2RTVzFFM2FUS1BOc0NJWEhuOXQ2ditRODhESDVB?=
- =?utf-8?B?R2dpTXVFc3pWQlh1Z2kzT2xsWlFEcENtZkxBT1VPTkQ2REwwNitRTmk3Mlk1?=
- =?utf-8?B?VFR5b1FLbWhPUExGRENQT1dpNmtiQXBjUlRlaG1xZE00MVIvVlZOZ3UzVFNm?=
- =?utf-8?B?WVcrbWhIMklEeDZEbUlEQ0tqMVU3QmJZcisrUm1aYklhenVGU1BxOVQzajIz?=
- =?utf-8?B?OUxXZ1YrWHF0b0tPY2VCQlpaRUp5d1hOb2M1NFVGaGYrbU15bFllWUUxQ1kv?=
- =?utf-8?B?ODNSU1NETnhHRjM1U2VwdEFtendSVWpLUzRaaVcwSHhmeHNDeFB5cnFvZ2VX?=
- =?utf-8?B?eUVlUG1MUGFnUnJZMmdCTExiSGlQempQTUpwUkdVRTFWUzl5TVY0d1FWeHI0?=
- =?utf-8?B?YnBXVEorcmpXWC85K1V4VzYyaE1xTFlRMk4wRnQ4QUFTeG54RFFtdHFmQUNG?=
- =?utf-8?B?L3JpQjJiODhaT1ZtbTJqcFJqWFhSaWEyRjRjVW9FS0daZ1ROK0FhejlXNjhI?=
- =?utf-8?B?aHlHc0NpbHEzSS9lSmdkQVhNQ0xIQjhObGtpTzhzZHFTR29EYnVTa1F1WnN2?=
- =?utf-8?B?N0pBNS80U2tGMmdDSWNGbVN1Y1U4VUFmc3NIYk9IbGt2WjQ5L0c3RTc3dHo3?=
- =?utf-8?B?L21YbXhjMXZpYjNabUI3NzJSVHQ3dzhnZ0dMeHd6UFZVbXdVeWI3Yk9LVHdW?=
- =?utf-8?B?bzMwVjdoNmtNY3gzaGJsbm9QbjR1QlA4VmpxTlJDZVJBZEc4TXhiZEoxK0Jm?=
- =?utf-8?B?S1VRUVdUaStEZGpaTFN0dDg0Y2lvM0E1U0pKalRHd3RXUE1ONTVRTVQ0bmZ3?=
- =?utf-8?B?c1RaZzFiTmZDdXYwaEJCeHRpTXF2RiswWi8yOGo1QTFJQlVZOWpDTGFyc1gr?=
- =?utf-8?B?blYzTmZON3F1NWxKTHgvZkc1SzhOdFJwSlYrTVNCUGR6eXpvT0MvVmdVV0Fj?=
- =?utf-8?B?NzJzTVVrTVBGUWl6dFpNZTI1dTFlS0k1UWx5aS9wcWlTN0RpTExCZnZERVFt?=
- =?utf-8?B?cGp5UkxqaWs4T3BWZGQwKzYwUE5tQlNTaGhSNncwcWFsbFZzZldpNk01RWFj?=
- =?utf-8?B?eEFYdzZhcnV2eE5sZGM0cnlub1FkQ2Y2Wnl4S3g4VzJSdkREdDVWais1cmZm?=
- =?utf-8?B?dndXTnBiaW9zVFQ0UGY5cmRKdW1HYlBKUmdIaE45NE9GWDMvNU1Mb1VydnRq?=
- =?utf-8?B?SWNXZXErTnRnZGkvWThadStaSC9aeEIwc2lpOWFDTHJyNVpQcG9xRzZ3aDc3?=
- =?utf-8?B?NlF2ZjRDQXhxWnlZVm0xaDNaSVErY0Y3Qll5WENRVnVYU2c9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2024 04:02:38.5924
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0f02474-3c43-4e17-0078-08dd04612e2d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B370.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7651
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
 
-On 11/12/24 8:57 PM, Matthew Wilcox wrote:
-> On Tue, Nov 12, 2024 at 03:22:46PM +0100, David Hildenbrand wrote:
->> On 12.11.24 14:53, Jason Gunthorpe wrote:
->>> On Tue, Nov 12, 2024 at 10:10:06AM +0100, David Hildenbrand wrote:
->>>> On 12.11.24 06:26, Matthew Wilcox wrote:
-...
-> I've certainly considered going so far as a per-fs folio.  So we'd
-> have an ext4_folio, an btrfs_folio, an iomap_folio, etc.  That'd let us
-> get rid of folio->private, but I'm not sure that C's type system can
-> really handle this nicely.  Maybe in a Rust world ;-)
-> 
-> What I'm thinking about is that I'd really like to be able to declare
-> that all the functions in ext4_aops only accept pointers to ext4_folio,
-> so ext4_dirty_folio() can't be called with pointers to _any_ folio,
-> but specifically folios which were previously allocated for ext4.
-> 
-> I don't know if Rust lets you do something like that.
-> 
+Hi Paolo,
 
-As Rust-for-Linux student, I can answer that one: "yes".
+Here's the main pile of changes for 6.13. The march towards implementing
+nested continues on, this time with the PMU and MMU getting attention.
 
-Some combination of "newtypes" and Traits will provide exactly what you
-need here. newtypes provide a zero-overhead type safe way of specifying
-a type, and Traits can be used to require that only types that support
-specific operations are accepted in foo().
+Note I've taken David's patch to use SYSTEM_OFF2 in the PSCI driver to
+hibernate, which was part of his combined series. There is also an
+extremely trivial conflict between this and the arm64 tree, both adding
+the same field enumeration to the sysreg table.
 
-(Rust at the language level looks a lot more like a replacement for C++,
-than a replacement for C, imho. By which I mean, it has lots of goodies
-for expressing things, built right into the language.)
+Details found in the tag, please pull.
 
-
-thanks,
 -- 
-John Hubbard
+Thanks,
+Oliver
 
+The following changes since commit 81983758430957d9a5cb3333fe324fd70cf63e7e:
+
+  Linux 6.12-rc5 (2024-10-27 12:52:02 -1000)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-6.13
+
+for you to fetch changes up to 60ad25e14ab5a4e56c8bf7f7d6846eacb9cd53df:
+
+  KVM: arm64: Pass on SVE mapping failures (2024-11-12 11:04:39 -0800)
+
+----------------------------------------------------------------
+KVM/arm64 changes for 6.13, part #1
+
+ - Support for stage-1 permission indirection (FEAT_S1PIE) and
+   permission overlays (FEAT_S1POE), including nested virt + the
+   emulated page table walker
+
+ - Introduce PSCI SYSTEM_OFF2 support to KVM + client driver. This call
+   was introduced in PSCIv1.3 as a mechanism to request hibernation,
+   similar to the S4 state in ACPI
+
+ - Explicitly trap + hide FEAT_MPAM (QoS controls) from KVM guests. As
+   part of it, introduce trivial initialization of the host's MPAM
+   context so KVM can use the corresponding traps
+
+ - PMU support under nested virtualization, honoring the guest
+   hypervisor's trap configuration and event filtering when running a
+   nested guest
+
+ - Fixes to vgic ITS serialization where stale device/interrupt table
+   entries are not zeroed when the mapping is invalidated by the VM
+
+ - Avoid emulated MMIO completion if userspace has requested synchronous
+   external abort injection
+
+ - Various fixes and cleanups affecting pKVM, vCPU initialization, and
+   selftests
+
+----------------------------------------------------------------
+David Woodhouse (6):
+      firmware/psci: Add definitions for PSCI v1.3 specification
+      KVM: arm64: Add PSCI v1.3 SYSTEM_OFF2 function for hibernation
+      KVM: arm64: Add support for PSCI v1.2 and v1.3
+      KVM: selftests: Add test for PSCI SYSTEM_OFF2
+      KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
+      arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+
+Fuad Tabba (4):
+      KVM: arm64: Move pkvm_vcpu_init_traps() to init_pkvm_hyp_vcpu()
+      KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
+      KVM: arm64: Initialize the hypervisor's VM state at EL2
+      KVM: arm64: Initialize trap register values in hyp in pKVM
+
+James Clark (1):
+      KVM: arm64: Pass on SVE mapping failures
+
+James Morse (7):
+      arm64/sysreg: Convert existing MPAM sysregs and add the remaining entries
+      arm64: head.S: Initialise MPAM EL2 registers and disable traps
+      arm64: cpufeature: discover CPU support for MPAM
+      KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+      KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+      KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+      KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
+
+Jing Zhang (1):
+      KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+
+Kunkun Jiang (2):
+      KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
+      KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
+
+Marc Zyngier (33):
+      arm64: Drop SKL0/SKL1 from TCR2_EL2
+      arm64: Remove VNCR definition for PIRE0_EL2
+      arm64: Add encoding for PIRE0_EL2
+      KVM: arm64: Drop useless struct s2_mmu in __kvm_at_s1e2()
+      KVM: arm64: nv: Add missing EL2->EL1 mappings in get_el2_to_el1_mapping()
+      KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+      arm64: Define ID_AA64MMFR1_EL1.HAFDBS advertising FEAT_HAFT
+      KVM: arm64: Add TCR2_EL2 to the sysreg arrays
+      KVM: arm64: nv: Save/Restore vEL2 sysregs
+      KVM: arm64: Sanitise TCR2_EL2
+      KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
+      KVM: arm64: Add save/restore for TCR2_EL2
+      KVM: arm64: Extend masking facility to arbitrary registers
+      KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
+      KVM: arm64: Add save/restore for PIR{,E0}_EL2
+      KVM: arm64: Handle PIR{,E0}_EL2 traps
+      KVM: arm64: Add AT fast-path support for S1PIE
+      KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
+      KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
+      KVM: arm64: Implement AT S1PIE support
+      KVM: arm64: Add a composite EL2 visibility helper
+      KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
+      arm64: Add encoding for POR_EL2
+      KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
+      KVM: arm64: Subject S1PIE/S1POE registers to HCR_EL2.{TVM,TRVM}
+      KVM: arm64: Add kvm_has_s1poe() helper
+      KVM: arm64: Add basic support for POR_EL2
+      KVM: arm64: Add save/restore support for POR_EL2
+      KVM: arm64: Add POE save/restore for AT emulation fast-path
+      KVM: arm64: Disable hierarchical permissions when POE is enabled
+      KVM: arm64: Make PAN conditions part of the S1 walk context
+      KVM: arm64: Handle stage-1 permission overlays
+      KVM: arm64: Handle WXN attribute
+
+Mark Brown (3):
+      KVM: arm64: Define helper for EL2 registers with custom visibility
+      KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
+      KVM: arm64: Hide S1PIE registers from userspace when disabled for guests
+
+Oliver Upton (28):
+      KVM: arm64: Don't retire aborted MMIO instruction
+      tools: arm64: Grab a copy of esr.h from kernel
+      KVM: arm64: selftests: Convert to kernel's ESR terminology
+      KVM: arm64: selftests: Add tests for MMIO external abort injection
+      arm64: sysreg: Describe ID_AA64DFR2_EL1 fields
+      arm64: sysreg: Migrate MDCR_EL2 definition to table
+      arm64: sysreg: Add new definitions for ID_AA64DFR0_EL1
+      KVM: arm64: Describe RES0/RES1 bits of MDCR_EL2
+      KVM: arm64: nv: Allow coarse-grained trap combos to use complex traps
+      KVM: arm64: nv: Rename BEHAVE_FORWARD_ANY
+      KVM: arm64: nv: Reinject traps that take effect in Host EL0
+      KVM: arm64: nv: Honor MDCR_EL2.{TPM, TPMCR} in Host EL0
+      KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
+      KVM: arm64: nv: Advertise support for FEAT_HPMN0
+      KVM: arm64: Rename kvm_pmu_valid_counter_mask()
+      KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
+      KVM: arm64: Add helpers to determine if PMC counts at a given EL
+      KVM: arm64: nv: Honor MDCR_EL2.HPME
+      KVM: arm64: nv: Honor MDCR_EL2.HLP
+      KVM: arm64: nv: Apply EL2 event filtering when in hyp context
+      KVM: arm64: nv: Reprogram PMU events affected by nested transition
+      Merge branch kvm-arm64/nv-s1pie-s1poe into kvmarm/next
+      Merge branch kvm-arm64/psci-1.3 into kvmarm/next
+      Merge branch kvm-arm64/mpam-ni into kvmarm/next
+      Merge branch kvm-arm64/misc into kvmarm/next
+      Merge branch kvm-arm64/mmio-sea into kvmarm/next
+      Merge branch kvm-arm64/nv-pmu into kvmarm/next
+      Merge branch kvm-arm64/vgic-its-fixes into kvmarm/next
+
+Raghavendra Rao Ananta (1):
+      KVM: arm64: Get rid of userspace_irqchip_in_use
+
+Sean Christopherson (1):
+      KVM: selftests: Don't bother deleting memslots in KVM when freeing VMs
+
+Shameer Kolothum (1):
+      KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
+
+Will Deacon (2):
+      KVM: arm64: Just advertise SEIS as 0 when emulating ICC_CTLR_EL1
+      KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM
+
+ Documentation/arch/arm64/cpu-feature-registers.rst |   2 +
+ Documentation/virt/kvm/api.rst                     |  10 +
+ arch/arm64/include/asm/cpu.h                       |   1 +
+ arch/arm64/include/asm/cpucaps.h                   |   5 +
+ arch/arm64/include/asm/cpufeature.h                |  17 +
+ arch/arm64/include/asm/el2_setup.h                 |  14 +
+ arch/arm64/include/asm/kvm_arm.h                   |  30 +-
+ arch/arm64/include/asm/kvm_asm.h                   |   1 -
+ arch/arm64/include/asm/kvm_emulate.h               |   9 +
+ arch/arm64/include/asm/kvm_host.h                  |  44 +-
+ arch/arm64/include/asm/sysreg.h                    |  12 -
+ arch/arm64/include/asm/vncr_mapping.h              |   1 -
+ arch/arm64/include/uapi/asm/kvm.h                  |   6 +
+ arch/arm64/kernel/cpufeature.c                     |  96 +++++
+ arch/arm64/kernel/cpuinfo.c                        |   3 +
+ arch/arm64/kvm/arch_timer.c                        |   3 +-
+ arch/arm64/kvm/arm.c                               |  26 +-
+ arch/arm64/kvm/at.c                                | 470 ++++++++++++++++++---
+ arch/arm64/kvm/emulate-nested.c                    | 301 +++++++------
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  31 ++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  11 +-
+ arch/arm64/kvm/hyp/include/nvhe/trap_handler.h     |   2 -
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  12 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                     | 116 ++++-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c               |   2 +
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |  20 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c                |   2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c                    |   3 -
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 | 160 ++++++-
+ arch/arm64/kvm/hypercalls.c                        |   2 +
+ arch/arm64/kvm/mmio.c                              |  32 +-
+ arch/arm64/kvm/nested.c                            |  82 +++-
+ arch/arm64/kvm/pmu-emul.c                          | 143 ++++++-
+ arch/arm64/kvm/psci.c                              |  44 +-
+ arch/arm64/kvm/reset.c                             |   5 -
+ arch/arm64/kvm/sys_regs.c                          | 309 +++++++++++---
+ arch/arm64/kvm/vgic/vgic-its.c                     |  32 +-
+ arch/arm64/kvm/vgic/vgic.h                         |  23 +
+ arch/arm64/tools/cpucaps                           |   2 +
+ arch/arm64/tools/sysreg                            | 249 ++++++++++-
+ drivers/firmware/psci/psci.c                       |  45 ++
+ include/kvm/arm_arch_timer.h                       |   3 +
+ include/kvm/arm_pmu.h                              |  18 +-
+ include/kvm/arm_psci.h                             |   4 +-
+ include/uapi/linux/psci.h                          |   5 +
+ kernel/power/hibernate.c                           |   5 +-
+ tools/arch/arm64/include/asm/brk-imm.h             |  42 ++
+ tools/arch/arm64/include/asm/esr.h                 | 455 ++++++++++++++++++++
+ tools/testing/selftests/kvm/Makefile               |   1 +
+ .../selftests/kvm/aarch64/debug-exceptions.c       |  10 +-
+ tools/testing/selftests/kvm/aarch64/mmio_abort.c   | 159 +++++++
+ tools/testing/selftests/kvm/aarch64/no-vgic-v3.c   |   2 +-
+ .../selftests/kvm/aarch64/page_fault_test.c        |   4 +-
+ tools/testing/selftests/kvm/aarch64/psci_test.c    |  92 ++++
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c  |  99 ++++-
+ .../selftests/kvm/aarch64/vpmu_counter_access.c    |  12 +-
+ .../selftests/kvm/include/aarch64/processor.h      |  15 +-
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   6 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  10 +-
+ 59 files changed, 2859 insertions(+), 461 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/brk-imm.h
+ create mode 100644 tools/arch/arm64/include/asm/esr.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/mmio_abort.c
 
