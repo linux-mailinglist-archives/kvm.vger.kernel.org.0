@@ -1,131 +1,170 @@
-Return-Path: <kvm+bounces-31945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31946-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8C19CF2DC
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 18:27:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FFB9CF246
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 18:00:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F27F7B35007
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 16:59:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8804C285425
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 17:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31211D5AC9;
-	Fri, 15 Nov 2024 16:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7049A1D618E;
+	Fri, 15 Nov 2024 16:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ASBh0v9U"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="laRjnFn2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A212847C
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 16:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6552E1D54EE;
+	Fri, 15 Nov 2024 16:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731689953; cv=none; b=GeicHy/3j4HM3+2PRUKTb0ZL13vkeetOhl9J4C1VF2NF3MxpVZO8rIYZyiNYlJyd9iI9HfFzVc7q896vVomZ/J02aqguzFvYxITCpfFQ6fJ4dWnwqAokTrwiMaSQEd8sOMuSlHbZnyrq67prp+j41g3yfKus9GURK7/ed0NcKZY=
+	t=1731689976; cv=none; b=c3f0dQSiDuYCLIRhIEpI2UQaMUr2w5ruYy/GF5Ixx3pyg2WePPzB1AFGpeKWj0QnXL0iT7aVfkmUXj9GeYfzDG4KRhuhmAfxZ7b1GkrREdYlEfsRMU1CDJCGWu1AT14MyAfury46J0Vej2MfSyNPF0oBSl99yK4lcaYITwzxQUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731689953; c=relaxed/simple;
-	bh=yHOMbE84YtfH5uC+q9caQcOf+DY/ybChcSTqNATeIQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YycABBCchOhrmSQgrv5EWn6jCXhia6qlzr9du7Mll9e5MkO5mAAD1mRoIj9/FVaZsghI504nYH5bh27jUgjNElkyKUdK/1iZd+GupkLhpWDUhq7X/mjxr1um5zeWKB0Yy0DKMSjUPDPqPy0Pxa7tfQiWsZabwQ4TydWUy46xVNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ASBh0v9U; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb59652cb9so9052341fa.3
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 08:59:10 -0800 (PST)
+	s=arc-20240116; t=1731689976; c=relaxed/simple;
+	bh=rCAZGrHxyMi8ZWuiy4vrVoFB/o2px9eAtNm57vvTsD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SsDVMS2flgMqeIz2wCnZ98Otmpkiqlk5pfhOtbdGTSda9DgmkTH2UkU6L6u5bW/jLq6EJwM6XYFj4d2ly7fheOcHwtNlO2v7RlusuH3y2WTFXmekCCh5ffG1ANCZgyBNMRI5xYUozWp2YYaJr7yM44OC4ZARA+tFfKi4FstE22w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=laRjnFn2; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1731689949; x=1732294749; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTgs6TZBBW/K4G459g2+GAIO1jZq9pvrwSvsxsKJTe4=;
-        b=ASBh0v9UWDqMVQxXlFERHecAM7vBX+dj3m5xV58SP2fio8ApBsoJR8WD9qb9hAxKhU
-         AUfagJ/11h6GUQgFPobS7gAk9QKSwmhTQ6PtjW17x8+2VPpamFRqAFxAYW500ROCbzIQ
-         L00v+34jw8PBjga9d2H7fvo0FgPs3pZBBCxNWwlZOPwLAeyAtbSV2gllGF/ZhJWGNsuB
-         fJDC4+XF54btSV3paPrwgRRF3fu7Rtps0fwg7sZ+E8dHS+5nP0rzaT1m90+Kde1wFqlv
-         6MCOBmCRadI3EcGy5vQpC2iHHVG5jMNwMyPNh9KBrzkamLRsOiRq2eqfDP3QNu/YIusm
-         OUNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731689949; x=1732294749;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aTgs6TZBBW/K4G459g2+GAIO1jZq9pvrwSvsxsKJTe4=;
-        b=HtkiLW9NNhiVupeAYnaqegsSnHrIRiEBPeY+IosDI37IenpK44kjA9v3iuk9/ilP50
-         7H/5d3+Dx6tos+fWI5aQUZ+EyQn0HP+x8f0jjrPgYYLWgktWofJDEKBOeKR/np3uVenI
-         34eqQfSsj3/PS4tdnEylbdZeraYgc0mZGH3xSNq3+J10byqtWy/70hpbYkZ9oMkjcMMp
-         ZJtOnX7quOaXJaTCTfgqjEscG1g9O5IbcUJjZ05xKDYnEJoKBFyX1H90dZPJca8t/CG4
-         rTiSYutaSu2HYD0/oEYWIYZ4O85TDLLgTBnOEYmelvZv4TxNBSIEB/Xe42ULUSof8vo2
-         H1AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgT64OMxPS9h4w2cdkda7O5T6wPBwu6IP4xPM34Siq+KNDZ+I7QaNc8i1qHFr2O2krW/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV/FjunUrgkw5H4KUPFkVi1BvLkhGDmhhcpNv4kAsmA07ZQtKw
-	B+snmuDx2kmbmD9IayTNFYw12oV4vINmirEKMs6WLg/J1c/bjtxg3aeiMxedPBc=
-X-Google-Smtp-Source: AGHT+IGtHvkZQxyNHW5vvtvrdH78obaDRIKxfmQKkuiMNoCQMJrT7GFgCHyX+vc9p/jfB9gLvRH6IA==
-X-Received: by 2002:a05:651c:90b:b0:2fe:e44d:6162 with SMTP id 38308e7fff4ca-2ff6070e052mr22040961fa.26.1731689949282;
-        Fri, 15 Nov 2024 08:59:09 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da298a41sm63691485e9.38.2024.11.15.08.59.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 08:59:08 -0800 (PST)
-Date: Fri, 15 Nov 2024 17:59:07 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, Luca Boccassi <bluca@debian.org>
-Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-Message-ID: <rl5s5eykuzs4dgp23vpbagb4lntyl3uptwh54jzjjgfydynqvx@6xbbcjvb7zpn>
-References: <20241108130737.126567-1-pbonzini@redhat.com>
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1731689975; x=1763225975;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r+ZYPqHoQHDHwa2VIgKNI6m+YZlhrBPHGnCuiE8lbJI=;
+  b=laRjnFn27m05OXCz4NDYoKnyJotVUhNXpiqr37/6cIAgT7qM9EXC1TSv
+   YSeSukdPhRyZZADPPTv+vDu8nWQZI9Lav4tQYJdQmZCbdgN2J3X3eMCT+
+   LncSUJOoIm2prNnxDsLQgVpj8DkNV529UDntfc8qj6f07T+aWkTXvMyHb
+   o=;
+X-IronPort-AV: E=Sophos;i="6.12,157,1728950400"; 
+   d="scan'208";a="41628339"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 16:59:29 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:9599]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.54:2525] with esmtp (Farcaster)
+ id 2d14af0a-2929-4c9e-8d1e-34cbf239d5b8; Fri, 15 Nov 2024 16:59:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 2d14af0a-2929-4c9e-8d1e-34cbf239d5b8
+Received: from EX19D003UWB004.ant.amazon.com (10.13.138.24) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 15 Nov 2024 16:59:20 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D003UWB004.ant.amazon.com (10.13.138.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 15 Nov 2024 16:59:20 +0000
+Received: from email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Fri, 15 Nov 2024 16:59:19 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com (Postfix) with ESMTPS id 3F35B404E4;
+	Fri, 15 Nov 2024 16:59:14 +0000 (UTC)
+Message-ID: <f1f34ac0-d505-4982-aad9-86a0db9f4a35@amazon.co.uk>
+Date: Fri, 15 Nov 2024 16:59:13 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="d2tiinorxtz5cpzu"
-Content-Disposition: inline
-In-Reply-To: <20241108130737.126567-1-pbonzini@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
+To: David Hildenbrand <david@redhat.com>, <tabba@google.com>,
+	<quic_eberman@quicinc.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<jthoughton@google.com>, <ackerleytng@google.com>, <vannapurve@google.com>,
+	<rppt@kernel.org>
+CC: <graf@amazon.com>, <jgowans@amazon.com>, <derekmn@amazon.com>,
+	<kalyazin@amazon.com>, <xmarcalx@amazon.com>, <linux-mm@kvack.org>,
+	<corbet@lwn.net>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<chenhuacai@kernel.org>, <kernel@xen0n.name>, <paul.walmsley@sifive.com>,
+	<palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <hca@linux.ibm.com>,
+	<gor@linux.ibm.com>, <agordeev@linux.ibm.com>, <borntraeger@linux.ibm.com>,
+	<svens@linux.ibm.com>, <gerald.schaefer@linux.ibm.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <luto@kernel.org>, <peterz@infradead.org>,
+	<rostedt@goodmis.org>, <mhiramat@kernel.org>,
+	<mathieu.desnoyers@efficios.com>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <loongarch@lists.linux.dev>,
+	<linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<faresx@amazon.com>
+References: <20241030134912.515725-1-roypat@amazon.co.uk>
+ <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
+ <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
+ <d1a69eb7-85d5-4ffa-88e2-f4841713c1d7@redhat.com>
+ <90c9d8c0-814e-4c86-86ef-439cb5552cb6@amazon.co.uk>
+ <10e4d078-3cdb-4d1c-a1a3-80e91b247217@redhat.com>
+ <02f77d32-e2a1-431b-bb67-33d36c06acd3@amazon.co.uk>
+ <f4c5d0a6-a582-44e3-8949-c199cc0bfba7@redhat.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <f4c5d0a6-a582-44e3-8949-c199cc0bfba7@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
 
---d2tiinorxtz5cpzu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Fri, Nov 08, 2024 at 08:07:37AM GMT, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> Since the worker kthread is tied to a user process, it's better if
-> it behaves similarly to user tasks as much as possible, including
-> being able to send SIGSTOP and SIGCONT.
+On Tue, 2024-11-12 at 14:52 +0000, David Hildenbrand wrote:
+> On 12.11.24 15:40, Patrick Roy wrote:
+>> I remember talking to someone at some point about whether we could reuse
+>> the proc-local stuff for guest memory, but I cannot remember the outcome
+>> of that discussion... (or maybe I just wanted to have a discussion about
+>> it, but forgot to follow up on that thought?).  I guess we wouldn't use
+>> proc-local _allocations_, but rather just set up proc-local mappings of
+>> the gmem allocations that have been removed from the direct map.
+> 
+> Yes. And likely only for memory we really access / try access, if possible.
 
-Do you mean s/send/receive/?
+Well, if we start on-demand mm-local mapping the things we want to
+access, we're back in TLB flush hell, no? And we can't know
+ahead-of-time what needs to be mapped, so everything would need to be
+mapped (unless we do something like mm-local mapping a page on first
+access, and then just never unmapping it again, under the assumption
+that establishing the mapping won't be expensive)
 
-Consequently, it's OK if a (possibly unprivileged) user stops this
-thread forever (they only harm themselves, not the rest of the system),
-correct?
+>>
+>> I'm wondering, where exactly would be the differences to Sean's idea
+>> about messing with the CR3 register inside KVM to temporarily install
+>> page tables that contain all the gmem stuff, conceptually? Wouldn't we
+>> run into the same interrupt problems that Sean foresaw for the CR3
+>> stuff? (which, admittedly, I still don't quite follow what these are :(
+>> ).
+> 
+> I'd need some more details on that. If anything would rely on the direct
+> mapping (from IRQ context?) than ... we obviously cannot remove the
+> direct mapping :)
 
+I've talked to Fares internally, and it seems that generally doing
+mm-local mappings of guest memory would work for us. We also figured out
+what the "interrupt problem" is, namely that if we receive an interrupt
+while executing in a context that has mm-local mappings available, those
+mappings will continue to be available while the interrupt is being
+handled. I'm talking to my security folks to see how much of a concern
+this is for the speculation hardening we're trying to achieve. Will keep
+you in the loop there :)
 
-> In fact, vhost_task is all that kvm_vm_create_worker_thread() wanted
-> to be and more: not only it inherits the userspace process's cgroups,
-> it has other niceties like being parented properly in the process
-> tree.  Use it instead of the homegrown alternative.
+> -- 
+> Cheers,
+> 
+> David / dhildenb
+> 
 
-It is nice indeed.
-I think the bugs we saw are not so serious to warrant
-Fixes: c57c80467f90e ("kvm: Add helper function for creating VM worker threads")
-.
-(But I'm posting it here so that I can find the reference later.)
-
-Thanks,
-Michal
-
---d2tiinorxtz5cpzu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZzd92AAKCRAt3Wney77B
-SWFPAP9dPqCzcXL6RlNlluM/CfPHLz5sv1Jmpn502SqVOAetLwEAlNXghQXLJed+
-v8hEXumZRnfpYF2VtL9rRKeMOx60Tw0=
-=UK3X
------END PGP SIGNATURE-----
-
---d2tiinorxtz5cpzu--
+Best, 
+Patrick
 
