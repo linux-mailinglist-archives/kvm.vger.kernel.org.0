@@ -1,213 +1,225 @@
-Return-Path: <kvm+bounces-31916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DBF9CDAF6
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:55:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A489CDB63
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:20:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA27A28186B
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 08:55:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59794B24A44
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB7418E023;
-	Fri, 15 Nov 2024 08:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603D218F2FC;
+	Fri, 15 Nov 2024 09:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1O7ussh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QrFa1D/n"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E287C188A3A
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 08:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731660917; cv=none; b=oP/h9WJl+B9P5chAMdVKTLCQn+z43mhU+X1/kuiq7FTXu2Vv12ZKQkqEbBcaGBhOV7fRt5seGnNgc+2bGTSzzj+tjtxbhmhLpiU9PdBEG0vwiWx5i5peJS9vqBvpmrO8KQ7YbiTumPy7Y3HqYs6lne9gr2Yl1wH4eCFLizhzVqQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731660917; c=relaxed/simple;
-	bh=KZaTCwl5/7/xBzUr+GvViHdVkA0LFzfo4lirVKWO8GA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GGVSGXKV15Y+xcGN/eVdmdeOLY5TTQzSQ52/4vjwvSLlKeGoGGl9kT4VIODAbn0rOh60ggRCaTNeCTYe7AdvgAJy9JWTs3/kEBks4rhGiBMImT6YGMkk2rL5qmZvdwKUcxFfZ+K0wolcJ79+njlJBv/odBWCXUO8jWEOX8y0jm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1O7ussh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731660914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hAIAA7M9wulpOH1pcCM6SAcrhfMPokr2Di+1gDkf/AU=;
-	b=e1O7usshGdWDjtlezWby4OSjZ2ih8y7yvHo8eAzEXXNWN6z43125VMzcipopddU4g8ECm6
-	4gT/Cta4YXzpDA677hkNq+MP99MrTRUm3Pkdpu/bUp2OcegYbCE569XT/2SgwcBtWGyRez
-	1nJauyrAwtXLlaCyY3Sus5xrjL3QbN8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-301-Qu9hyVPVPruNB-5x-D0fjA-1; Fri, 15 Nov 2024 03:55:13 -0500
-X-MC-Unique: Qu9hyVPVPruNB-5x-D0fjA-1
-X-Mimecast-MFC-AGG-ID: Qu9hyVPVPruNB-5x-D0fjA
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43159603c92so10893545e9.2
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 00:55:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731660912; x=1732265712;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hAIAA7M9wulpOH1pcCM6SAcrhfMPokr2Di+1gDkf/AU=;
-        b=tDnjHuMWzLb9Sj3pmZywzoR3AjMWkKDIGs/P3zomHtzaSsm7ODrOvdVc8cfTMtajVK
-         Hbp5QCcgpccefnV/YGmyDS8roCk4pm+RHOa4XAfh8NSbDYo2e5VaQbIe8QK5wGrY58sb
-         ffkyKNEqKpgXUjlOoD50j5etE/XmCArBb/xnlztnMP4A5K3C1AgHc4F27TErmoYfB/U+
-         OY0Y+sfX+qQXtL4/4pyXavHo4NdhhFmVB9vAZO+9Mp9TjDIkbcYIsNf68j0PsFxMAg7W
-         qtCXAIIOVfPMI3PhoH0Cm47clsNkPObHW1sqvE6o/o6ityns3YH7W22pdMjQQihkGJxx
-         r1+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXYO2Btm5UosMGKCBQI8d09xUJw5A/QI/vUNRzfyacAlj4qSNPuaLaOJdAKljVwIg9Kb44=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWsNv7XjDMbS9oETI9X1YbV5ELvQ6pvoCj/5ZWtX4SfNL5D/ys
-	kKRvtZE1Gb1jqOgdmD4couE0HpWQWWIYK+Y27ITFqAFV56IA6/6GWWY8QhO66xX6iTO46vEeEHM
-	G5z4N/PSdzPcl11CqyJa3ebhP65lagwakGi215aGnUGpnifFbEg==
-X-Received: by 2002:a05:600c:3d86:b0:431:6083:cd38 with SMTP id 5b1f17b1804b1-432df7203aemr13958955e9.6.1731660912062;
-        Fri, 15 Nov 2024 00:55:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEvUGx7iWk3PQvRCc1l6MRIL8JhbxHCh72nhh8kJajEsnmwrLEeB/CeCx/cWKXViuHaYcVO8A==
-X-Received: by 2002:a05:600c:3d86:b0:431:6083:cd38 with SMTP id 5b1f17b1804b1-432df7203aemr13958655e9.6.1731660911667;
-        Fri, 15 Nov 2024 00:55:11 -0800 (PST)
-Received: from [192.168.3.141] (p5b0c694e.dip0.t-ipconnect.de. [91.12.105.78])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da265e16sm50538415e9.12.2024.11.15.00.55.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 00:55:10 -0800 (PST)
-Message-ID: <d7353fde-f560-4925-8ef8-0fe10654e87f@redhat.com>
-Date: Fri, 15 Nov 2024 09:55:08 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C839318F2DB
+	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 09:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731662379; cv=fail; b=j6QAafsrE7QuEvCBLaUo1ne+xMPGzj8J1cYDidB5Xf/jsIJoP2Eqcbg2f74LZnVq8bPdNe4Dx185YGNLnrj8b7aHYvZOoNpnBrcufTBCapd5U6BW2iklYdBBTB/sTc04NqTM7jdqlRxUOhdXkf5w4/0vS7jAsO5kinPQHzNPgr4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731662379; c=relaxed/simple;
+	bh=pSNNO+FugzkB2ASUj8foWwG5Giw5GcwMxcHLMYi3A+s=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=J5Ujt6MEYRqovXtHPhXi8BwAStoDPhM937Qlx1vfWTMaPpxURa+rcolDENkW8bn1TXY8cTcGpNg28lNZEauopD2J0KWrztwEiaoYrFkhTZmx62L8vSeJyJ0rFyITJdudFwT9VkvAptwP/KlzXjBOuLle+cvfKLOiQvKU66D4WsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QrFa1D/n; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731662377; x=1763198377;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pSNNO+FugzkB2ASUj8foWwG5Giw5GcwMxcHLMYi3A+s=;
+  b=QrFa1D/nE9YQaYzfawGe1yjzsfvKjNTDmIeiHARDVSwbHQe8dbW+4ctS
+   JUr8pD6OyftsCCyGQd17DBCLslKkL/ZPt11OxPcm19uAsa55w2okMioz3
+   D7H6RkOnxcPHwIAL6rxwf9vjtZMTCJDVsDuVgSea0XpEJGN7/Ghk3p36v
+   7HSFnbc2RwgshCCWZcHaQR0oLLuaaAiyKlG6fKuJR2OVLbcc+BgMIRssv
+   lFKx7YILbj1o89JBLlpMwMBRu+OMjNSZhxPdmfYpdaMJE5NwnKW+kgdpX
+   TNsEe06PBgClxM4mQYr+zohakF6xa88FFsepoQnm2QwlLE6jn9Sf1k+xM
+   g==;
+X-CSE-ConnectionGUID: W+/e+noMSSCVRdkS6XTxzg==
+X-CSE-MsgGUID: pfAX2DvvQiq+urLSBu8Gtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="31815781"
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="31815781"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 01:19:37 -0800
+X-CSE-ConnectionGUID: SDL/pC68Tpmg0HgjovzB3Q==
+X-CSE-MsgGUID: G7V8QqxZSVyYibhEhrVE0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="88920553"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Nov 2024 01:19:36 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 15 Nov 2024 01:19:36 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 15 Nov 2024 01:19:36 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 15 Nov 2024 01:19:33 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fmlw8NEHuRtyq4BsP3cJSViWVY4MrSSNg56O/lw1u7GB5uJAR7uFI5z2AM/YRr4nntsNOjUhsK6ADeUJtef01bDASkJR91TGYqqEJSSfqQF17H4DE6DMwo2hNKfUtnxgn/TLV8aias4H8d8f8xEKTr5nuk3L8Z8Zz1S0uO0dzsljePYXfSN2pImw0xm9bTl8DdcL5v5wzzHDxDc2lYVfl/sDYSf9HYnxW/H3gLBtIgmZP/ZVfl6nlvZt7PDx/9ggDELiAOSbTvonpIZ/7uH2OaX1mFdfnIMDZ55YXlPdWJkl8X8q1pX9Rr673ejkBwJwhwmSBwhMcH0ZFTuayXBkVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aiVegDwNryXmKpmIUMFGVaBSVy4uzZOBQV+6W8BpzRs=;
+ b=LFfPGp6yC0bqasspF309kctbSdZxfOjWM4DDLE/YoFq6ltD9j1qIBdjpzrHqz59F1Oub19J+0J/gdusLDUhCnOx//6WBi3BX6fcB4X1e91zq/GILiyJn+X05gv0sRzR78yN5Zy9+TYuVIULkrKePhyaHYCdxZM9DC6XCPftkd31Iwhd+vvQVPm0bI/Pk/r5n8Q0vbHnXdaatulMRXRlwBjGaMo/eoxN3gGfjdvunV8rizNUd0U8jdXTVTkJv49N4CJXVH5aBfykVsOXjy3e7nbdKslks9jS3c7w9DZWKIaTh5fIYzlJWfitQlMXGXAXMWvnnTnpYsUfgjeTVPcVK4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH7PR11MB7550.namprd11.prod.outlook.com (2603:10b6:510:27d::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Fri, 15 Nov
+ 2024 09:19:31 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%5]) with mapi id 15.20.8158.013; Fri, 15 Nov 2024
+ 09:19:31 +0000
+Message-ID: <0659858c-68fd-4214-9b76-6a31e91ba5ea@intel.com>
+Date: Fri, 15 Nov 2024 17:24:09 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 00/12] iommufd support pasid attach/replace
+From: Yi Liu <yi.l.liu@intel.com>
+To: Baolu Lu <baolu.lu@linux.intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: <joro@8bytes.org>, <kevin.tian@intel.com>, <alex.williamson@redhat.com>,
+	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+	<chao.p.peng@linux.intel.com>, <iommu@lists.linux.dev>,
+	<zhenzhong.duan@intel.com>, <vasant.hegde@amd.com>
+References: <20241104132513.15890-1-yi.l.liu@intel.com>
+ <20241113013748.GD35230@nvidia.com>
+ <4d0173f0-2739-47aa-a9f0-429bf3173c0c@linux.intel.com>
+ <745904ae-f9d9-4437-88a0-7d4cb5d19053@intel.com>
+ <ab2bdbe3-d21a-400c-8a63-ed515b4fab72@intel.com>
+Content-Language: en-US
+In-Reply-To: <ab2bdbe3-d21a-400c-8a63-ed515b4fab72@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2P153CA0012.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::15) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/11] fs/proc/vmcore: kdump support for virtio-mem on
- s390
-To: Baoquan He <bhe@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Farman
- <farman@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <20241025151134.1275575-1-david@redhat.com>
- <ZzcKY8hap3OMqTjC@MiWiFi-R3L-srv>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZzcKY8hap3OMqTjC@MiWiFi-R3L-srv>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|PH7PR11MB7550:EE_
+X-MS-Office365-Filtering-Correlation-Id: f3655e84-d5d3-4d1e-a4be-08dd05569cbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bzkrRlV1d3NOY2UvbndFcTNnZ1NwSFVvdVV3QTJmYzhBdFVGbEU3aDlKNHBG?=
+ =?utf-8?B?YmVJSUxLa0o1OHA1eUo0UHlVS2RoYVJmdWFRZGV3ZG14ZFdzUGNnWVJLV1ZM?=
+ =?utf-8?B?MTVxejdQL2NxWmFSVjlqSUJ6c2RMQ0NqdVpZMU9zc2pvbXBxZ3F0SEtvQ0hZ?=
+ =?utf-8?B?TS8yYXdHVXB1TE5QSHVuSm1DWWQ0d21lTk9UdVdFT3ExL0lmRFJPY2lTNGtw?=
+ =?utf-8?B?dWxkUHMyWjJ5U0YyUzVQV3hFSnRCM3UvaHJoaGVnLzNUbVUrdGF5THJ5T3Vv?=
+ =?utf-8?B?Y1UzT1d3bHNlY1NiQ3RweVduSkdBeStxbWtiZXM1K0RQYjl1YURLVUNDZ0U2?=
+ =?utf-8?B?bm1JakozNVplcElscmJUYXVSeW52VW85M0V3dGIvV2Zvc1RnN2dCRXJJSStK?=
+ =?utf-8?B?K1JBSzdaUnJzZ3R0cDQyYW5HSWo5eTk2K0dJeGtIVjJyMkJ5bFVoUCtWK3dx?=
+ =?utf-8?B?NUx6ckFCT0I1ZFN0TVNDTFNobENWNXN5eHd0SGEzVkhJT2N3a3hrdkI3SGZn?=
+ =?utf-8?B?dkhIZUdPcXduTW9hQnhQakFKaUg5U1o3b1VNLzVRbkpGK3ZRRzJMNW1qTVRi?=
+ =?utf-8?B?NENXK0Q0NUlQVHg2S1FzNXNETlV4Qzk3T0pENlRTNko2TThTa3QxMEtLUGFL?=
+ =?utf-8?B?VW9hK2ZxbkRCNXBweXlOT1FCVm5tcnRWQ1JOL2d6UHZiM05VWlJCWnVETFp2?=
+ =?utf-8?B?dE40TG9HNDVGN2ZZMzhWWnlmK01BMHQ0T0g1c1VkRngrTWFaL3BwTEJGM2p0?=
+ =?utf-8?B?b0I1cGVWa3pTQ3ZSMkRKNDRxdDBKWGp1bUNJYTRNSFVCSVFNKzF4bUpBK1Y1?=
+ =?utf-8?B?Nkw3NkxKYzBYU0NnZWJzRXBkejdQckU0R1ZHSnI3SDJ4VGp0cUtDZW82Q1Jn?=
+ =?utf-8?B?NWo1UDN2MVlvN3ZGWlpPb1dYUTlBbTVnenZVUkxOT3QrMWVycWI0YUhJR1lQ?=
+ =?utf-8?B?VUVCWG5iWmhSQVRaTlBicWpmck5JNTQyQjV2T094Z1Z3MURJZEZHSDNwT1g1?=
+ =?utf-8?B?UlVNcGFtaURlMStiRUxIS0l6eVY1YWhpa0ZEdmZUMENod1BaL2pmbGp0Y2c2?=
+ =?utf-8?B?SG1kUU1IZXRBajlrRUk4bmdnT2llTWF6Yk9YM2dFY1RoN3dvYVo3OEZMeVJZ?=
+ =?utf-8?B?SUlVRnoxbFhiWFFKcWNjQWVSMTVUVEFaZkFOTGJqV1RaamlmSVhabmlyYU8x?=
+ =?utf-8?B?WjNPbkFDL2FhcVlFYlBoRk4xYnhTY0JZd1JaaXNwWEZUYUpLNzlkdGRJbFBS?=
+ =?utf-8?B?bDMzaDFoN2dMSmNkTEExMktFU3d5YUVzdXdzQ09jbWtTc1F6K3BsNml1aS9s?=
+ =?utf-8?B?Nm5Ma1I4N2tUaXBoUmc0c1VlYU50VUI2eUxhMis3bC82R2RiUXRKdnVJOVlu?=
+ =?utf-8?B?MUM4bVB5NVIwYnRGUzRiZlp5Y2tJWDBPRm96WUxpenZmbWQ4UmRJQ1YvN2tn?=
+ =?utf-8?B?eXFMMDl5MXVhVVpNdDRpa2ZaWHJaWUtJdi9XOTROZ2QzR1dqMExoVVBGTjRM?=
+ =?utf-8?B?SUx5R2xndkhEZzIzK1VaK1h6UU56TnVnTzFxMTNiMERkY1hvWjYrK0JiNWE1?=
+ =?utf-8?B?RnRHaUNTbzJid3UrMEpwWmUvSHBPZE43bU9rTFN3c1dCVHRQR1c0Nmg1TGhO?=
+ =?utf-8?B?cEIzMDR1K0hlckV5cVp6bytlUTNBblhzMm9jRCtWYllqL0hOVytCR2tidExy?=
+ =?utf-8?B?NDJIcjFSbjJmdDU5UHN0STYxaUg3dDhsMVZITnFXSitwaTZDVEJlMkNHaVFX?=
+ =?utf-8?Q?uDSL28it07NFU7jjUvai6a81tbq5yycXVNwFnrk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aStINUR6UW9tcE9XRzg2b3JaenhrUVpkeS9wNEkreFpSWkROU2U3Rk9OczJP?=
+ =?utf-8?B?OWQzT01TUVhJMjZQOEsxYnYwNWQ1enpFZVRxNWxPMFAwcldjR1A5dExPQWdh?=
+ =?utf-8?B?SkczUG9CeGNBRXRJTDlnRmxrZUZ0WnY2Nm9oUUFmQytiWW1uWFEvSXFLV3lB?=
+ =?utf-8?B?Uy82TTVEN1dkd2h0S1VxVjV1bno5c1d5V3hBSjEvOXhSV0RDakY1MkRKcFgx?=
+ =?utf-8?B?MEovT0NLOEprQ2d6VTJTTHZycnZLMzljTG9hMFdhOWlzMGtsWFg1ZUxqYUpw?=
+ =?utf-8?B?OVdUcTJuZ3Y0RW9DdVh0cFFxWUF2YllEbDBrVDJSK1hJNTVRcEZvQjFPNENJ?=
+ =?utf-8?B?YTJxWFlNaTRSNzNxWmRwRHlhRkxrcGluVmpuQTZzSGtWSXhaQ0UySDRzcFQ2?=
+ =?utf-8?B?Qjk4bXdoY1lFRzVZNUpEejhTbThsZldzM2hOQnpUQmVlOHJUaUd5YUpGaWx5?=
+ =?utf-8?B?YldXMWpMWTU4SUhoZ1UyWWZaYko0WnlqSzdtZHI2UVpPOE5nNFVNVEpyS3NX?=
+ =?utf-8?B?OWZNQ3BSS0ZmYTcwcmtwTXRnRkY1RFNHanBWdXJJZUFEZU93b1c0bUN1OFla?=
+ =?utf-8?B?cEpzVU5xU082U21ZaG1VV3c4L3JkUjdQTkIxZ3h1NWgyZXhJU3dwZUd4YnI1?=
+ =?utf-8?B?SndzU1JFVTNXTnVlejlSSVNFdFltQjNaWnF0ZHhBWDZBRzMwbXNUODhpOEFt?=
+ =?utf-8?B?cHhHNnhNYkhCbVpUVTM4UnFiY2xHeEp1b2JwT1ljb2lWK242K2NvUllPTzBz?=
+ =?utf-8?B?bkR0bmtOcXN5c0hYR1gzVmYxM2dSYkdjQUVQeEM2akVSWVpoMzZ3cE50WHIz?=
+ =?utf-8?B?T09GZzJmMGZOK2wzUlhNYytHNDBmYkFOeU5yZGNwbUkrTHp5WVpyVTNCMGxH?=
+ =?utf-8?B?OVpCVFF4L2dOQ2JTYk9RTXZTLzMzQkVTYkpJTmZwdTUwQkJONFdUdzgxUmd4?=
+ =?utf-8?B?bGs0YVpQQzRRUzM3b0srMzB2cnVTc3VRWG1POGNodm1saUJ5QTlsSDNIbVFG?=
+ =?utf-8?B?ekZORmQydXFFSjNhZ1I0R2FwK0dMZXhBUjdCU0x4N3RwMDRwMEJXS09samFW?=
+ =?utf-8?B?WG1Fcml4am9RcVdnVDdPY3FkZTFjaXNkay9COWRNSVZzNnp4eWVOTGJzcjJY?=
+ =?utf-8?B?cFdjb1BlKyt0M3NNamVOZlFaZ3p0enBQZmNNWkdEVVd0Y295QXZzQ1pPcFFn?=
+ =?utf-8?B?US9JTFJza0hWK0ROU0xoV3BhNGtVbmJ6dDcyQ3VoaHRYZFhQNys0dVBRemNE?=
+ =?utf-8?B?QjNUWG94MytUU1NTTFJOOTJiTUNQM1NRZnVBS2JVYnZIU3JNb1lvTERTZ0h1?=
+ =?utf-8?B?SGJQZ1pZSXR2cSt5WDF2SGwwVnhoejlNaGpGSTVYQXE3VkJQbmd3YTVjd1Z1?=
+ =?utf-8?B?Q0Z0elN4OW5FVlBuZStkOVRyTmpQWUY2MEZsMEl0VGVpSHpTRVBZQjJDNi95?=
+ =?utf-8?B?Z0ROU1NGQ05MNFpoSUhJTElrN0dQd0tFYlBkZm9NSkVHNjVRUVM5NStianNv?=
+ =?utf-8?B?QkIzNEt4MnpzQWQwWWhrTUZ6VFhmOEhiaTVSOTlnbTFTdUE3bHo1SnRXejJ5?=
+ =?utf-8?B?enNZQjAyd3FKK1l3NmQyWFJIV3pUSjJQd0JwcloxNHNSS3RPanU0U2F3WG5i?=
+ =?utf-8?B?NWsvUWQwTkdFQmdhVWxJZ2IzYks3bm5sRnRVdTRsVzM5dzRJQkVIai9lQjlY?=
+ =?utf-8?B?Q2p6d2xDK2ZLZ0FXT3ZWT2xTSFQzL0V6YnNvVzFLV1ZYMDg1R2krNGNxMW9V?=
+ =?utf-8?B?djcxRk8yY1FUa0JYelE0RlIrTUJBZHNJWWxpbkJqais1aHZMbkdUR0psbU1w?=
+ =?utf-8?B?clpSQnJ4NEZDcjE1MGRrOWh0L3Q3ajl5NElEZGhIZU1NcDFjaHRpWmxpbTRF?=
+ =?utf-8?B?ejB1NkFxc2tUb0JacFN4WkhZeWU0MGlQRmRDdjJkYnNXY1h5YnM5T0diUE9y?=
+ =?utf-8?B?aGVENmppZWVCVlFLZHVkZVhac1N4ZlFLY0hZK0NSNGNLa0IraWdadzVydXgr?=
+ =?utf-8?B?eTJlcCsvOENFdWs4NUtKdEI5V2sycnFJcDFIN1dTcVNtYWxUZWNXZGhxVi9H?=
+ =?utf-8?B?ZFJEUmxSbmpsL3YzSnJIL3ppUzJ2SkhGV3BJKzFXNThVUko1V1FQQzBwVm5I?=
+ =?utf-8?Q?7nHFyS3deWMXyevcZJmj68gUi?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3655e84-d5d3-4d1e-a4be-08dd05569cbc
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 09:19:31.4574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PkRXXaQ1/UVJQBt+pUFWqfORqy6E/jCWGh5JE4BVk0pP0GNsJtiEP9+1/qgPGqQ/2DZ8b6VPJBwTBaWXZA9aDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7550
+X-OriginatorOrg: intel.com
 
-On 15.11.24 09:46, Baoquan He wrote:
-> On 10/25/24 at 05:11pm, David Hildenbrand wrote:
->> This is based on "[PATCH v3 0/7] virtio-mem: s390 support" [1], which adds
->> virtio-mem support on s390.
->>
->> The only "different than everything else" thing about virtio-mem on s390
->> is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
->> during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
->> crash kernel must detect memory ranges of the crashed/panicked kernel to
->> include via PT_LOAD in the vmcore.
->>
->> On other architectures, all RAM regions (boot + hotplugged) can easily be
->> observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
->> the elfcore hdr.
->>
->> On s390, information about "ordinary" memory (heh, "storage") can be
->> obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
->> that information is stored early during boot in the "physmem" memblock
->> data structure.
->>
->> But virtio-mem memory is always detected by as device driver, which is
->> usually build as a module. So in the crash kernel, this memory can only be
->                                         ~~~~~~~~~~~
->                                         Is it 1st kernel or 2nd kernel?
-> Usually we call the 1st kernel as panicked kernel, crashed kernel, the
-> 2nd kernel as kdump kernel.
+On 2024/11/13 11:26, Yi Liu wrote:
+> On 2024/11/13 11:24, Yi Liu wrote:
+>> On 2024/11/13 11:01, Baolu Lu wrote:
+>>> On 11/13/24 09:37, Jason Gunthorpe wrote:
+>>>> On Mon, Nov 04, 2024 at 05:25:01AM -0800, Yi Liu wrote:
+>>>>
+>>>>> This series is based on the preparation series [1] [2], it first adds a
+>>>>> missing iommu API to replace the domain for a pasid.
+>>>> Let's try hard to get some of these dependencies merged this cycle..
 
-It should have been called "kdump (2nd) kernel" here indeed.
+The second dependency has a new version in the below.
 
->> properly detected once the virtio-mem driver started up.
->>
->> The virtio-mem driver already supports the "kdump mode", where it won't
->> hotplug any memory but instead queries the device to implement the
->> pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
->> the vmcore.
->>
->> With this series, if the virtio-mem driver is included in the kdump
->> initrd -- which dracut already takes care of under Fedora/RHEL -- it will
->> now detect the device RAM ranges on s390 once it probes the devices, to add
->> them to the vmcore using the same callback mechanism we already have for
->> pfn_is_ram().
-> 
-> Do you mean on s390 virtio-mem memory region will be detected and added
-> to vmcore in kdump kernel when virtio-mem driver is initialized? Not
-> sure if I understand it correctly.
-
-Yes exactly. In the kdump kernel, the driver gets probed and registers 
-the vmcore callbacks. From there, we detect and add the device regions.
-
-Thanks!
+https://lore.kernel.org/linux-iommu/20241113134613.7173-1-yi.l.liu@intel.com/
 
 -- 
-Cheers,
-
-David / dhildenb
-
+Regards,
+Yi Liu
 
