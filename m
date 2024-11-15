@@ -1,247 +1,279 @@
-Return-Path: <kvm+bounces-31933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F1E9CDD20
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 11:59:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9FC49CDDF1
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 13:00:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C6621F22BC0
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:59:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C822B25B34
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 12:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37451B6CF3;
-	Fri, 15 Nov 2024 10:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22161BD004;
+	Fri, 15 Nov 2024 11:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ai7N5Vyk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXjFn/7i"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853961B652B
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 10:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3345E1B6D04
+	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 11:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731668347; cv=none; b=M0uMCGtwwDu9vjeUaOH4b8fxpVdDgdIHN5VU8oGpUY9HQ76Rv0tHgQsklgr3GBUjnAR6h3NktmneE53u+YfufVCqBRul1oGoDW/BoGD3cRCoa/AwAeGr2XpiXYPJ/WAnMhg7hFkf8rBsPnBxXXieZYc8rxOI3iUuiwXgffdDgHA=
+	t=1731671963; cv=none; b=KhKCwcTmWYapmuld8rpd3U3EZBQwa9VijZaf+ztmASKVowIRfMuUmOaODbruacvw3UmoXNHvgbg6CGRRq7z1fBkHvgkJH7UNGxx2pk3TxNHd7AEqyYRfge2FaGT9imQsdd9SDpyetqgSLK5fUkCRYtqwbzlTfL7JSrDfBlgWOn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731668347; c=relaxed/simple;
-	bh=xk5IraDmxNndGfJynhHEOWE4Z0wHW2Kmk6du6iWp3R4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Yw7G3juQfahf9OI4cpZtI7zmB26ojVHoylWelxXnIMgd/ZgTGQOMmG2tI8TsUkAkY70Xaof4ulscb6xIFkxvmp7SJjJ2F8jrD93x4O2EHG+jnlg6WIImSe90bZ6ldPWTVPCkDUhZs/cwirO4xJiEMf0bV6eBB0fR+zXvoBc9r5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ai7N5Vyk; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1731671963; c=relaxed/simple;
+	bh=2pulDDreteiHjL9r4qUGqKDhpqeb1HMkFOW42Xg7+Go=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kL+Gn7+blUGz8boPC2n6N/PvisTJyOs1exE7LCkiNeI47HRmHVnP9dk4aEEnUTZH/bFMfwwY7dZdXjghgXt5qVowGaDolZt+pXpsiHwqHG17nmc72wsfFjVtHjzby5hsCOUCEuD1BaJn9hUzULlONwp1m8Kl0u2OX6W92zRx874=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MXjFn/7i; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731668344;
+	s=mimecast20190719; t=1731671961;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=LZA42ddjo8PCNzqC2RzA/0ngU7rvGCooWJ2X5VJm9io=;
-	b=Ai7N5Vyk6eAaCuoy2L+Yxq6kvqZ2KHUowXhtwman9+kfHtjGEPu/I75LddWk5vdOOvgjln
-	c7GwNUsaogxBmJpL/7fdXWWrXF+YsFxRDJRAEttFYoVa0/psGTBlo7/e65hsHC6EVfhppH
-	YeN1eDFLH83IeY2DSf2fphL6+TnCY2I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
+	b=MXjFn/7i1azQkZ6wejSG7h0LktZ7Xd0c4hZlJpJVtMBSNKfnhcZJaa0qxlb2LGaJUCyTC7
+	m4SQSqqk6WqasxRCD82r9OfZNFsuab/ewt0rr82AK3ocm0X8fxrffT/llKsFgQkv/JkBQh
+	OpqJLXiioLH+uEtsc73sMPeirsdZKF0=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-7df5pknZNiG0TG2vGiZUUA-1; Fri, 15 Nov 2024 05:59:02 -0500
-X-MC-Unique: 7df5pknZNiG0TG2vGiZUUA-1
-X-Mimecast-MFC-AGG-ID: 7df5pknZNiG0TG2vGiZUUA
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315f48bd70so4106985e9.2
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 02:59:02 -0800 (PST)
+ us-mta-313-z5YwSy8XOeGK1_yVXJ0WDQ-1; Fri, 15 Nov 2024 06:59:19 -0500
+X-MC-Unique: z5YwSy8XOeGK1_yVXJ0WDQ-1
+X-Mimecast-MFC-AGG-ID: z5YwSy8XOeGK1_yVXJ0WDQ
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b141ea40dcso199351385a.2
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 03:59:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731668342; x=1732273142;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LZA42ddjo8PCNzqC2RzA/0ngU7rvGCooWJ2X5VJm9io=;
-        b=beNhLW6+hPv+iVbxWFJfw56SdbsouKh9BjX8nhcmhPS11SnU7smtlYvNP+LAULwMjX
-         kGud6MJ/mMKiCKGXBrJGflmuWJvvvTTKrnxk6L726Rp3gJ3EQ3JUlecFni10I3ljHf7K
-         M2at5AhF4fKw2lo7z70bW4wWvhO3reawjwRACHnZACfNxStaOqU9lSiFGrWl+BwvrJrv
-         QLHykvLbILl299UuBE6hvmQBD+sBMV46FPTwB5b51TmWyU26EaZv3GGTWJBUy/HfUax2
-         e6PqaAwPxXwJFrCtQuFvLjVhSIvrAjtsLWlccU2Pn23t48S/pufQoVKy4ATV9qfd5voU
-         qMdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWA5WGlWugmkyiPt0NXwj+fALbxTCRujpagFHpfprImUMUDrB6ihA/jrLlzVHcNaFcY/Hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzoJbEcK+I+VAWCuAIevXKHSJw/5aRBq+gSx1ByoiUk5EllMxt
-	4XyL/oJoIb3RFr+HaqDCYvncxnW5vVF8ESFj6CoGgvePwvZk4jzlgZDNuhTVWmQ/ylIN+bBLPSo
-	i/OnqD01+h6csiKcx/Bj3YYS1NDaqSTw6VLkqh0S3xcSxKR05rA==
-X-Received: by 2002:a05:600c:1548:b0:431:6060:8b16 with SMTP id 5b1f17b1804b1-432df792d1fmr19751635e9.30.1731668341627;
-        Fri, 15 Nov 2024 02:59:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHEV+H1DNqNgOXQeADtTDfnSZodbTJi6jL/FAZvevlXL9pc+wfCJzI7z7EhCdXSHK1J85QtjQ==
-X-Received: by 2002:a05:600c:1548:b0:431:6060:8b16 with SMTP id 5b1f17b1804b1-432df792d1fmr19751485e9.30.1731668341187;
-        Fri, 15 Nov 2024 02:59:01 -0800 (PST)
-Received: from ?IPV6:2003:cb:c721:8100:177e:1983:5478:64ec? (p200300cbc7218100177e1983547864ec.dip0.t-ipconnect.de. [2003:cb:c721:8100:177e:1983:5478:64ec])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d48baa42sm66969915e9.1.2024.11.15.02.59.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 02:59:00 -0800 (PST)
-Message-ID: <d2147b7c-bb2e-4434-aa10-40cacac43d4f@redhat.com>
-Date: Fri, 15 Nov 2024 11:58:59 +0100
+        d=1e100.net; s=20230601; t=1731671959; x=1732276759;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
+        b=sCiqNCijvhwntXW++btSeNTNHzpsYKNgw2XS+vgLnRMW5m/32p+G/2vxARTvqSzJXs
+         GGFfTZU0OhFrf6Uc00D7gIspHKaTs081PGwjKO9Ps4fuCGFv8HanuinNy+lUeH/ca76+
+         20kLc9TuLok7ieztZfjPY+S+xTwC+dAzBHOss0U9jsUNhKJjTDG3QRLmoq+I5vX6mrmU
+         Pc/yxibDoUS6pW2d6CC7T+v+fahGou6TnVvkTL0oNVRUvayUrI6PnPU/qVIhGHvZTAQp
+         lBOnc2x48/NgWIn1+2Jav9EIgj44BzhBuZhC0pupWnQhyqLRgU+cjOOGMWBplZEEh1P9
+         DUBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUx466wX0ynEhFG4o9cH0dslQfasLaay1ISnMwtKINsHS91Hx/fvztnQJm1E0+e7tp82HA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCrdKlMaIxFpMPGutF3rO2PDGuHcCJOaaA1nhCQdHap+MbV2G0
+	JOw+steAsgKWZ5XoUfItS1kt/R+/R6RwcnnC1KJe2wacqmMqEjNqwanZ+DCvjkCCZeOdXZjXASM
+	ETfSeqK1eIl0r1/yA++iIgGOT/Q/HvnbpMF2kvtQe2NLyEAMe0o2b0EW4tFTB
+X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr263999785a.27.1731671958882;
+        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEfVKO66Y6rgNt/itCv3b+8Dv2NvBLsA25nUYuxO9qTqEw2uRmmntwxkoCY3pA5nCghXARiwg==
+X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr263998485a.27.1731671958500;
+        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
+Received: from sgarzare-redhat ([79.46.200.129])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35c984691sm151968885a.2.2024.11.15.03.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 03:59:17 -0800 (PST)
+Date: Fri, 15 Nov 2024 12:59:07 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, Asias He <asias@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] vsock/virtio: Remove queued_replies pushback logic
+Message-ID: <yjhfe5bsnfpqbnibxl2urrnuowzitxnrbodlihz4y5csig7e7p@drgxxxxgokfo>
+References: <20241115103016.86461-1-graf@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 1/2] KVM: guest_memfd: Convert .free_folio() to
- .release_folio()
-From: David Hildenbrand <david@redhat.com>
-To: Elliot Berman <quic_eberman@quicinc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Mike Rapoport <rppt@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Matthew Wilcox <willy@infradead.org>
-Cc: James Gowans <jgowans@amazon.com>, linux-fsdevel@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com>
- <20241113-guestmem-library-v3-1-71fdee85676b@quicinc.com>
- <c650066d-18c8-4711-ae22-3c6c660c713e@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <c650066d-18c8-4711-ae22-3c6c660c713e@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241115103016.86461-1-graf@amazon.com>
 
-On 15.11.24 11:58, David Hildenbrand wrote:
-> On 13.11.24 23:34, Elliot Berman wrote:
->> When guest_memfd becomes a library, a callback will need to be made to
->> the owner (KVM SEV) to transition pages back to hypervisor-owned/shared
->> state. This is currently being done as part of .free_folio() address
->> space op, but this callback shouldn't assume that the mapping still
->> exists. guest_memfd library will need the mapping to still exist to look
->> up its operations table.
-> 
-> I assume you mean, that the mapping is no longer set for the folio (it
-> sure still exists, because we are getting a callback from it :) )?
-> 
-> Staring at filemap_remove_folio(), this is exactly what happens:
-> 
-> We remember folio->mapping, call __filemap_remove_folio(), and then call
-> filemap_free_folio() where we zap folio->mapping via page_cache_delete().
-> 
-> Maybe it's easier+cleaner to also forward the mapping to the
-> free_folio() callback, just like we do with filemap_free_folio()? Would
-> that help?
-> 
-> CCing Willy if that would be reasonable extension of the free_folio
-> callback.
-> 
+On Fri, Nov 15, 2024 at 10:30:16AM +0000, Alexander Graf wrote:
+>Ever since the introduction of the virtio vsock driver, it included
+>pushback logic that blocks it from taking any new RX packets until the
+>TX queue backlog becomes shallower than the virtqueue size.
+>
+>This logic works fine when you connect a user space application on the
+>hypervisor with a virtio-vsock target, because the guest will stop
+>receiving data until the host pulled all outstanding data from the VM.
 
-Now really CCing him. :)
+So, why not skipping this only when talking with a sibling VM?
 
-> 
->>
->> .release_folio() and .invalidate_folio() address space ops can serve the
->> same purpose here. The key difference between release_folio() and
->> free_folio() is whether the mapping is still valid at time of the
->> callback. This approach was discussed in the link in the footer, but not
->> taken because free_folio() was easier to implement.
->>
->> Link: https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
->> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
->> ---
->>    virt/kvm/guest_memfd.c | 19 ++++++++++++++++---
->>    1 file changed, 16 insertions(+), 3 deletions(-)
->>
->> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> index 47a9f68f7b247f4cba0c958b4c7cd9458e7c46b4..13f83ad8a4c26ba82aca4f2684f22044abb4bc19 100644
->> --- a/virt/kvm/guest_memfd.c
->> +++ b/virt/kvm/guest_memfd.c
->> @@ -358,22 +358,35 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
->>    }
->>    
->>    #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
->> -static void kvm_gmem_free_folio(struct folio *folio)
->> +static bool kvm_gmem_release_folio(struct folio *folio, gfp_t gfp)
->>    {
->>    	struct page *page = folio_page(folio, 0);
->>    	kvm_pfn_t pfn = page_to_pfn(page);
->>    	int order = folio_order(folio);
->>    
->>    	kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
->> +
->> +	return true;
->> +}
->> +
->> +static void kvm_gmem_invalidate_folio(struct folio *folio, size_t offset,
->> +				      size_t len)
->> +{
->> +	WARN_ON_ONCE(offset != 0);
->> +	WARN_ON_ONCE(len != folio_size(folio));
->> +
->> +	if (offset == 0 && len == folio_size(folio))
->> +		filemap_release_folio(folio, 0);
->>    }
->>    #endif
->>    
->>    static const struct address_space_operations kvm_gmem_aops = {
->>    	.dirty_folio = noop_dirty_folio,
->> -	.migrate_folio	= kvm_gmem_migrate_folio,
->> +	.migrate_folio = kvm_gmem_migrate_folio,
->>    	.error_remove_folio = kvm_gmem_error_folio,
->>    #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
->> -	.free_folio = kvm_gmem_free_folio,
->> +	.release_folio = kvm_gmem_release_folio,
->> +	.invalidate_folio = kvm_gmem_invalidate_folio,
->>    #endif
->>    };
->>    
->>
-> 
-> 
+>
+>With Nitro Enclaves however, we connect 2 VMs directly via vsock:
+>
+>  Parent      Enclave
+>
+>    RX -------- TX
+>    TX -------- RX
+>
+>This means we now have 2 virtio-vsock backends that both have the pushback
+>logic. If the parent's TX queue runs full at the same time as the
+>Enclave's, both virtio-vsock drivers fall into the pushback path and
+>no longer accept RX traffic. However, that RX traffic is TX traffic on
+>the other side which blocks that driver from making any forward
+>progress. We're not in a deadlock.
+>
+>To resolve this, let's remove that pushback logic altogether and rely on
+>higher levels (like credits) to ensure we do not consume unbounded
+>memory.
 
+I spoke quickly with Stefan who has been following the development from
+the beginning and actually pointed out that there might be problems
+with the control packets, since credits only covers data packets, so
+it doesn't seem like a good idea remove this mechanism completely.
 
--- 
-Cheers,
+>
+>Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
 
-David / dhildenb
+I'm not sure we should add this Fixes tag, this seems very risky
+backporting on stable branches IMHO.
+
+If we cannot find a better mechanism to replace this with something
+that works both guest <-> host and guest <-> guest, I would prefer
+to do this just for guest <-> guest communication.
+Because removing this completely seems too risky for me, at least
+without a proof that control packets are fine.
+
+Thanks,
+Stefano
+
+>Signed-off-by: Alexander Graf <graf@amazon.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
+> 1 file changed, 2 insertions(+), 49 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 64a07acfef12..53e79779886c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -44,8 +44,6 @@ struct virtio_vsock {
+> 	struct work_struct send_pkt_work;
+> 	struct sk_buff_head send_pkt_queue;
+>
+>-	atomic_t queued_replies;
+>-
+> 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
+> 	 * must be accessed with rx_lock held.
+> 	 */
+>@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>
+> 		virtio_transport_deliver_tap_pkt(skb);
+>
+>-		if (reply) {
+>-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-			int val;
+>-
+>-			val = atomic_dec_return(&vsock->queued_replies);
+>-
+>-			/* Do we now have resources to resume rx processing? */
+>-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
+>-				restart_rx = true;
+>-		}
+>-
+> 		added = true;
+> 	}
+>
+>@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+> 		goto out_rcu;
+> 	}
+>
+>-	if (virtio_vsock_skb_reply(skb))
+>-		atomic_inc(&vsock->queued_replies);
+>-
+> 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+> 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+>
+>@@ -233,7 +217,7 @@ static int
+> virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> {
+> 	struct virtio_vsock *vsock;
+>-	int cnt = 0, ret;
+>+	int ret;
+>
+> 	rcu_read_lock();
+> 	vsock = rcu_dereference(the_virtio_vsock);
+>@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> 		goto out_rcu;
+> 	}
+>
+>-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>-
+>-	if (cnt) {
+>-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-		int new_cnt;
+>-
+>-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
+>-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
+>-		    new_cnt < virtqueue_get_vring_size(rx_vq))
+>-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>-	}
+>+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>
+> 	ret = 0;
+>
+>@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
+> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> }
+>
+>-/* Is there space left for replies to rx packets? */
+>-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
+>-{
+>-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
+>-	int val;
+>-
+>-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
+>-	val = atomic_read(&vsock->queued_replies);
+>-
+>-	return val < virtqueue_get_vring_size(vq);
+>-}
+>-
+> /* event_lock must be held */
+> static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+> 				       struct virtio_vsock_event *event)
+>@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 			struct sk_buff *skb;
+> 			unsigned int len;
+>
+>-			if (!virtio_transport_more_replies(vsock)) {
+>-				/* Stop rx until the device processes already
+>-				 * pending replies.  Leave rx virtqueue
+>-				 * callbacks disabled.
+>-				 */
+>-				goto out;
+>-			}
+>-
+> 			skb = virtqueue_get_buf(vq, &len);
+> 			if (!skb)
+> 				break;
+>@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>
+> 	vsock->rx_buf_nr = 0;
+> 	vsock->rx_buf_max_nr = 0;
+>-	atomic_set(&vsock->queued_replies, 0);
+>
+> 	mutex_init(&vsock->tx_lock);
+> 	mutex_init(&vsock->rx_lock);
+>-- 
+>2.40.1
+>
+>
+>
+>
+>Amazon Web Services Development Center Germany GmbH
+>Krausenstr. 38
+>10117 Berlin
+>Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+>Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+>Sitz: Berlin
+>Ust-ID: DE 365 538 597
+>
+>
 
 
