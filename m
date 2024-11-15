@@ -1,149 +1,134 @@
-Return-Path: <kvm+bounces-31921-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31922-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDD689CDBD3
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:49:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D5159CDBDF
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 631881F2361F
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:49:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE916B22F30
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2DC190068;
-	Fri, 15 Nov 2024 09:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3BC193091;
+	Fri, 15 Nov 2024 09:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GboblNsl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NWbZM0Hr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3812F18C039
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 09:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4B51922DD;
+	Fri, 15 Nov 2024 09:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731664149; cv=none; b=HckitD1mCIXbrQxNPg2Rwr1PkLYEJyCnbLNdhLFysCenVaMUaKJDc2IvWhnfJv83HuGjlHeETEDOL+2JRS61IPUZ7Yt7URReg9WGsncBaieoUdhXfKJpzUxS8HLXdw7SOL1/fNxlQwWcZYHLOtEgLnJUfyRZMmcoWHPs5i++dkI=
+	t=1731664375; cv=none; b=qe+KPtToyRaYOaLoqRnWt9PKkHDxkgi/g2sydGVeQX/GOaGUBZ+UGjLrZ9O5nu0S1maqC/Be6gZEX+C6EIHBXkAfLUd2cN7TJSqljTkU/w4k71APeoF2uM5jXF+4L5CxnZxQryU/Yg5geceW+6wy8hZpWkez4niRAMKqA9fef4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731664149; c=relaxed/simple;
-	bh=5JV+Q8/uDzvNYDwkc+mCN1HUPeABFq9Hs2oXi52V+FA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TOoDize/gCWlG1qKUzE2oGHaNYS1o5pbZXz1ov6wOMhRUiO7h2Dya1JF2u9B5B8qZ2toU6bodo0bMaOAVMgJf5AbbvD6QWi63u1tckUf3NinYjKlbsOS74B0usgCBKqEUDet5UXWMuGZ25rLy5yv3rMtVZ18PDASGt28G6R2G0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GboblNsl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731664147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e5/Gv1K21sheGKIrlLPLsT5HVFSu0SIwMyx7mgZQnuI=;
-	b=GboblNslEO9AJtSq4jN//JCSaiCO6lHIOmgGANpzVQz13xa+fL8NuTeEzFPjQ5xeakAmEi
-	vfLm7yhCgQ9mTznl+JOFc19QpjGLwsG0XUpY8ozW1ZVlupk1F0Y2pMLqYTpWFNWw06JaCl
-	ppiqsS6vL5JkKNQGVuLIU+ANGi0FA9E=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-348-YdO3XG1bNzqs4Bb4j1wJcg-1; Fri,
- 15 Nov 2024 04:49:02 -0500
-X-MC-Unique: YdO3XG1bNzqs4Bb4j1wJcg-1
-X-Mimecast-MFC-AGG-ID: YdO3XG1bNzqs4Bb4j1wJcg
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE9CB1955E92;
-	Fri, 15 Nov 2024 09:48:59 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3935D3003B71;
-	Fri, 15 Nov 2024 09:48:58 +0000 (UTC)
-Date: Fri, 15 Nov 2024 17:48:53 +0800
-From: Baoquan He <bhe@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v1 00/11] fs/proc/vmcore: kdump support for virtio-mem on
- s390
-Message-ID: <ZzcZBU0USDP/CHcv@MiWiFi-R3L-srv>
-References: <20241025151134.1275575-1-david@redhat.com>
- <ZzcKY8hap3OMqTjC@MiWiFi-R3L-srv>
- <d7353fde-f560-4925-8ef8-0fe10654e87f@redhat.com>
+	s=arc-20240116; t=1731664375; c=relaxed/simple;
+	bh=7ypu5yuMidhfBNvxf1zazpCItsdfIxjQvFiIK+i7tCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p9atXXrZL+0AxZUXK8oo0YatqXrJ0j2avgAW0URsFNIM2hlwgeZWsXfAuW6I6vWjWEOVj53WcSoEYvEV9cdCGBBQlLJUTUb1Hhymqgo1nHlzMlDy0OvRiHYPXWmoWdV9XHLHGkz8JIrXH5MMXROkIJcjDGCPvtYH6Wr9cblUuxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NWbZM0Hr; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731664373; x=1763200373;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7ypu5yuMidhfBNvxf1zazpCItsdfIxjQvFiIK+i7tCs=;
+  b=NWbZM0HrqgB/oqOnmstIX3WJXmMMcVOimeeB8WWdc7QSf2Xew2ToEbV/
+   XsExBSUGXsnW1LNhEMVIWo3/IKeHhdPD/7kCCWBNCQz4vDS+No+nBT9jf
+   zvPX0LbQ8pd0xYqW//tVu2+BCk3xhFiHYj0Z5r8PVLAufoNtSLWUaVxoQ
+   /Lb3loVVMvyvUVWfrxo803ybeZKBQGJcMyzjNb9q/+Yy/oQ+kRzKufvxE
+   QQ0IwfNNxjGoFTv2hi4i5JUPGOLqRUxNJ8h/27PTYS73/fmbwyjy2BFq9
+   y9EaN6pKBBCxtNh/wUW6bWW04AuYD8PXiSGS30YPTP3GjT7UBz3itrpE7
+   g==;
+X-CSE-ConnectionGUID: e6PhLl3iQj6bd3K9YLfjhA==
+X-CSE-MsgGUID: iJadlhSiRSGi61Z7Z3zI0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="31584831"
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="31584831"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 01:52:53 -0800
+X-CSE-ConnectionGUID: Op9abnZSRNaWGW70azLpLg==
+X-CSE-MsgGUID: /H631+coRmuJHiXDYSCCCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="93584303"
+Received: from kinlongk-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.221.135])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 01:52:50 -0800
+From: Kai Huang <kai.huang@intel.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com
+Cc: kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com,
+	isaku.yamahata@intel.com,
+	reinette.chatre@intel.com,
+	binbin.wu@linux.intel.com,
+	xiaoyao.li@intel.com,
+	yan.y.zhao@intel.com,
+	adrian.hunter@intel.com,
+	tony.lindgren@intel.com,
+	kristen@linux.intel.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] KVM: VMX: Initialize TDX when loading KVM module
+Date: Fri, 15 Nov 2024 22:52:38 +1300
+Message-ID: <cover.1731664295.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7353fde-f560-4925-8ef8-0fe10654e87f@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-On 11/15/24 at 09:55am, David Hildenbrand wrote:
-> On 15.11.24 09:46, Baoquan He wrote:
-> > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-> > > This is based on "[PATCH v3 0/7] virtio-mem: s390 support" [1], which adds
-> > > virtio-mem support on s390.
-> > > 
-> > > The only "different than everything else" thing about virtio-mem on s390
-> > > is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
-> > > during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
-> > > crash kernel must detect memory ranges of the crashed/panicked kernel to
-> > > include via PT_LOAD in the vmcore.
-> > > 
-> > > On other architectures, all RAM regions (boot + hotplugged) can easily be
-> > > observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
-> > > the elfcore hdr.
-> > > 
-> > > On s390, information about "ordinary" memory (heh, "storage") can be
-> > > obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
-> > > that information is stored early during boot in the "physmem" memblock
-> > > data structure.
-> > > 
-> > > But virtio-mem memory is always detected by as device driver, which is
-> > > usually build as a module. So in the crash kernel, this memory can only be
-> >                                         ~~~~~~~~~~~
-> >                                         Is it 1st kernel or 2nd kernel?
-> > Usually we call the 1st kernel as panicked kernel, crashed kernel, the
-> > 2nd kernel as kdump kernel.
-> 
-> It should have been called "kdump (2nd) kernel" here indeed.
-> 
-> > > properly detected once the virtio-mem driver started up.
-> > > 
-> > > The virtio-mem driver already supports the "kdump mode", where it won't
-> > > hotplug any memory but instead queries the device to implement the
-> > > pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
-> > > the vmcore.
-> > > 
-> > > With this series, if the virtio-mem driver is included in the kdump
-> > > initrd -- which dracut already takes care of under Fedora/RHEL -- it will
-> > > now detect the device RAM ranges on s390 once it probes the devices, to add
-> > > them to the vmcore using the same callback mechanism we already have for
-> > > pfn_is_ram().
-> > 
-> > Do you mean on s390 virtio-mem memory region will be detected and added
-> > to vmcore in kdump kernel when virtio-mem driver is initialized? Not
-> > sure if I understand it correctly.
-> 
-> Yes exactly. In the kdump kernel, the driver gets probed and registers the
-> vmcore callbacks. From there, we detect and add the device regions.
+Hi Paolo/Sean,
 
-I see now, thanks for your confirmation.
+This series contains patches to initialize TDX when loading KVM module.
+The main purpose of sending this out is to have a review and for the
+integration to kvm-coco-queue, but this series can also be applied to
+kvm/queue cleanly.
+
+v1 -> v2:
+ - Add KVM_INTEL_TDX to guide KVM TDX code. (Sean)
+ - Distinguish "TDX cannot be supported" vs "TDX fail to enable due to
+   unexpected failure", and handle them differently. (Sean)
+ - Update changelog accordingly
+ - Remove useless comments around tdx_enable() and tdx_cpu_enable()
+   (Sean).
+ - Add SPDX-License-Identifier tag to vmx/tdx.h
+
+Btw:
+
+I kept the name tdx_bringup(), tdx_cleanup() but didn't change them to
+tdx_module_init() and tdx_module_exit() cause I feel KVM does more than
+"module" init/exit.  We can change that if needed.
+
+v1: https://lore.kernel.org/kvm/cover.1730120881.git.kai.huang@intel.com/T/
+
+
+Kai Huang (3):
+  KVM: VMX: Refactor VMX module init/exit functions
+  KVM: Export hardware virtualization enabling/disabling functions
+  KVM: VMX: Initialize TDX during KVM module load
+
+ arch/x86/kvm/Kconfig     |  10 +++
+ arch/x86/kvm/Makefile    |   1 +
+ arch/x86/kvm/vmx/main.c  |  41 +++++++++++
+ arch/x86/kvm/vmx/tdx.c   | 153 +++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h   |  13 ++++
+ arch/x86/kvm/vmx/vmx.c   |  23 +-----
+ arch/x86/kvm/vmx/vmx.h   |   3 +
+ include/linux/kvm_host.h |   8 ++
+ virt/kvm/kvm_main.c      |  18 +----
+ 9 files changed, 235 insertions(+), 35 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
+ create mode 100644 arch/x86/kvm/vmx/tdx.h
+
+
+base-commit: b1e0320c5a9fe875f56039ea43e183c59974d38a
+-- 
+2.46.2
 
 
