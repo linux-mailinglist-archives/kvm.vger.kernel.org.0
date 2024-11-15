@@ -1,116 +1,119 @@
-Return-Path: <kvm+bounces-31941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 974179CEE5F
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 16:21:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892DB9CF066
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 16:41:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51D222842FA
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 15:21:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 364831F232F3
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 15:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1E51D47C7;
-	Fri, 15 Nov 2024 15:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C03D1D9339;
+	Fri, 15 Nov 2024 15:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IBWtp97m";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HbOShzA2"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A129B16F282;
-	Fri, 15 Nov 2024 15:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD421D517F;
+	Fri, 15 Nov 2024 15:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731684058; cv=none; b=tqIteR/ayanlukIY2mmaIPNzrXlRiJcsSJHnqnVX6gLF1waGhCfLlKyucgezFH7bIn7wrafP7sqTcLKsrPuITW7jFd7nI7LdxGVLxEugpBsVBXHeSCVE+cQv+fEoHQs0a94fotSvcL7W7Y0njOMUM/EzE/dMrorJRdDN1cn8iVI=
+	t=1731684918; cv=none; b=Ftax4Q2T9PYjlXkJEF3wh1xgjcXdToKQrHoMFNOBmhIF1JJ8V2MtkbO5F2HapsYS91eehWJ49wSS/6Rbn7PM4PlHtP2PrmWEllFvcfGhmeGZBXx5RYAB13Me4iE5r9mIuXU+EVYnzpNbsKn8htgD0PzxLjvo39/FasXWDUzDva8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731684058; c=relaxed/simple;
-	bh=JbWDWW5tcxAeACyNg24Ej49B8z9HdbzJKyezVhofJkw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FWBAJQxS+ntfQ6pyOar1zcNc9HFOUnBCNAMmba7ZL5aou6WZ8ydX0w74DI3diWg+53+snRkYk68vP+hpEtvXXHNNQGBCnYNKVyv3wwn19LqrdDGpRsq6ov9lzt9Nrw//C81+CloxZU+pOYYXBjOXuH8cRBGAH3Vhr04ouPFm8Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA1C01424;
-	Fri, 15 Nov 2024 07:21:18 -0800 (PST)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9488D3F6A8;
-	Fri, 15 Nov 2024 07:20:38 -0800 (PST)
-Message-ID: <ddd40bc3-7f2a-43c2-8918-a10c63bd05ba@arm.com>
-Date: Fri, 15 Nov 2024 15:20:36 +0000
+	s=arc-20240116; t=1731684918; c=relaxed/simple;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=m/pI1vZAQ9gxkkrLO4Ck9+wP9LbxWHNLTrhIlgyWxvHYEzuYsWqKH43sexoA3BbGj7kQl9pEwxtFlUBhKoXMYEr3MPsrKTXACWNVH2K83g8VfSZbA+QAphVFxiaJU71bVjVC2mmG1w6Z5DxdTlmomxVVMcXRL/fQCj5cluVl7lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=IBWtp97m; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HbOShzA2; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731684913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	b=IBWtp97mInpsavyNlaW7Wa7P9t1WIhdFZFGtmkYainZ6bfXDspevPRYpFW4pLoFiUdTJD4
+	U5VvdoT1K3yOQRre+DBq0sQWHdk4rIynAWjUT2zmNpIj2n43BIKL0t0/Vf6l/rtvSO0Fi+
+	gDrBIw99IdYG1uqRK3qErn9uAAGZz664d/tZZ8KcSi+2Phfl0Sz1omrERQ/lrAOES/7JlS
+	yRewNvz7aEuvd8A4q0Bq1FSIlOgXPmu0k2lEr6yoDeEt0bajmGyelDX+RQ8ypFICvCudhA
+	M17FF+uzSWHmHhP49+FBOqW8qbOWE/x/12QiHel/8b+KvHi6yusfYdMgsiBxnw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731684913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	b=HbOShzA2dgF/rf/JxxHpay75yREzH698PUJ7XWVcQ8L3AwP4KqCVbfvEjEUE+BssSSuAzH
+	UAxm3b5R+xtq6JDw==
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam
+ Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave
+ Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Juergen Gross <jgross@suse.com>, Stefano
+ Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Philipp Stanner <pstanner@redhat.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni
+ <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Mostafa Saleh <smostafa@google.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
+ <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
+ <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
+ Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 07/11] PCI: MSI: Use never-managed version of pci_intx()
+In-Reply-To: <20241113124158.22863-9-pstanner@redhat.com>
+References: <20241113124158.22863-2-pstanner@redhat.com>
+ <20241113124158.22863-9-pstanner@redhat.com>
+Date: Fri, 15 Nov 2024 16:35:22 +0100
+Message-ID: <87y11kzf0l.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 04/15] iommu/riscv: report iommu capabilities
-To: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org,
- will@kernel.org, anup@brainfault.org, atishp@atishpatra.org,
- tglx@linutronix.de, alex.williamson@redhat.com, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-21-ajones@ventanamicro.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241114161845.502027-21-ajones@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 14/11/2024 4:18 pm, Andrew Jones wrote:
-> From: Tomasz Jeznach <tjeznach@rivosinc.com>
-> 
-> Report RISC-V IOMMU capabilities required by VFIO subsystem
-> to enable PCIe device assignment.
+On Wed, Nov 13 2024 at 13:41, Philipp Stanner wrote:
+> pci_intx() is a hybrid function which can sometimes be managed through
+> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> port users to either an always-managed or a never-managed version.
+>
+> MSI sets up its own separate devres callback implicitly in
+> pcim_setup_msi_release(). This callback ultimately uses pci_intx(),
+> which is problematic since the callback of course runs on driver-detach.
+>
+> That problem has last been described here:
+> https://lore.kernel.org/all/ee44ea7ac760e73edad3f20b30b4d2fff66c1a85.camel@redhat.com/
+>
+> Replace the call to pci_intx() with one to the never-managed version
+> pci_intx_unmanaged().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-IOMMU_CAP_DEFERRED_FLUSH has nothing at all to do with VFIO. As far as I 
-can tell from what's queued, riscv_iommu_unmap_pages() isn't really 
-implementing the full optimisation to get the most out of it either.
-
-I guess IOMMU_CAP_CACHE_COHERENCY falls out of the assumption of a 
-coherent IOMMU and lack of PBMT support making everything implicitly 
-IOMMU_CACHE all the time whether you want it or not, but clarifying that 
-might be nice (especially since there's some chance that something will 
-eventually come along to break it...)
-
-Thanks,
-Robin.
-
-> Signed-off-by: Tomasz Jeznach <tjeznach@rivosinc.com>
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->   drivers/iommu/riscv/iommu.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/iommu/riscv/iommu.c b/drivers/iommu/riscv/iommu.c
-> index 8a05def774bd..3fe4ceba8dd3 100644
-> --- a/drivers/iommu/riscv/iommu.c
-> +++ b/drivers/iommu/riscv/iommu.c
-> @@ -1462,6 +1462,17 @@ static struct iommu_group *riscv_iommu_device_group(struct device *dev)
->   	return generic_device_group(dev);
->   }
->   
-> +static bool riscv_iommu_capable(struct device *dev, enum iommu_cap cap)
-> +{
-> +	switch (cap) {
-> +	case IOMMU_CAP_CACHE_COHERENCY:
-> +	case IOMMU_CAP_DEFERRED_FLUSH:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
->   static int riscv_iommu_of_xlate(struct device *dev, const struct of_phandle_args *args)
->   {
->   	return iommu_fwspec_add_ids(dev, args->args, 1);
-> @@ -1526,6 +1537,7 @@ static void riscv_iommu_release_device(struct device *dev)
->   static const struct iommu_ops riscv_iommu_ops = {
->   	.pgsize_bitmap = SZ_4K,
->   	.of_xlate = riscv_iommu_of_xlate,
-> +	.capable = riscv_iommu_capable,
->   	.identity_domain = &riscv_iommu_identity_domain,
->   	.blocked_domain = &riscv_iommu_blocking_domain,
->   	.release_domain = &riscv_iommu_blocking_domain,
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
