@@ -1,236 +1,273 @@
-Return-Path: <kvm+bounces-31948-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29329CF3DD
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 19:24:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027919CF348
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 18:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39BCBB38CCF
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 17:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6901288B38
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 17:51:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A081D618E;
-	Fri, 15 Nov 2024 17:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E18A1D63FE;
+	Fri, 15 Nov 2024 17:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdYT92Go"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lHzpx8F+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FB21D54E2
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 17:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C066F1D5ABF;
+	Fri, 15 Nov 2024 17:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731690643; cv=none; b=Y+UFIAfYOfwew90563eACDump5hQbgSOlNlV61O+6P8//xhvmEATVjL9yq7UcfBOWpv/rfNcpf2A/65GtKL4Jz9Yc9wOX+bivz46FvllZRaWSaEKsExnAyE6TIGCXBCZw8up0NXVYJMmTNgar16N9CzCch1ozOvvUIAfHYRFUQA=
+	t=1731693062; cv=none; b=cFCmabh5cOirWszsD1vhJ5iTeLmgILkeLnxxoBH6Ae4/t0kwUsaU9IcUGOQIMpRpbweRbssPcVRbLTt/yzQJnDBtxExC492iEs2E6mfhdzfGxoszoZig3U0/SlmWUAnkpudUN3Ws8pPBBLxDDbQhbrN/7beNSOhQdeKV09FipTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731690643; c=relaxed/simple;
-	bh=VFsz53rKK1c3y7SHDdK7nkd3SLfBSUfMhdGyM3Cgze8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VK3QJuBbIYXaPGLULSCiI5otEMqAmnfsKxlxY3xqcvXDAQeYioqueiSrsTgThbkWPtJtjKPlX9qFEFPLZMb+RXQL5EnPeWZQgjqE1ac3m4NiFUSPdG/xbdhKtOId01jXsoBZFxOWvnySx0nmKJEur/C11KyUWpuQYQU3xDfrr5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OdYT92Go; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731690640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=48OliLDzjGOtoC4m2e/3Cn/tIGUFMAeqWxw8T4GQ1zM=;
-	b=OdYT92GoFPTGA37LSlDbTHKE5nAb3kcSFpxgegaT+8xhjqQhyKWdlBszejHUyf7Mrcu7su
-	LKWrqma7a5Q2V+aAu12OdK+a/rmd/tYnknbSG/ml/FgHR9tMEmprDzHqHvEuPc8dbnFbam
-	Z76qWcijnVdyoz23YcEbQkX0D96ng2o=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-X7gsZEd8NvWPXin8MgSYfA-1; Fri, 15 Nov 2024 12:10:39 -0500
-X-MC-Unique: X7gsZEd8NvWPXin8MgSYfA-1
-X-Mimecast-MFC-AGG-ID: X7gsZEd8NvWPXin8MgSYfA
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-53da2737de5so1306419e87.0
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 09:10:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731690637; x=1732295437;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=48OliLDzjGOtoC4m2e/3Cn/tIGUFMAeqWxw8T4GQ1zM=;
-        b=d70eiWpaeufggFAosMrcfj8C4ZDn/XXJx3SBpmL+/sOor0SwKkKptyWJeMJAdZlJZi
-         Ah4yUEKNGXENT+FWrxN3iHstfpZtufO47HNtBPJqQaF8hJoe55ECPpZPxyTRtFQKUl3W
-         2pHV3NXwAellmD+r5kpb+7Vi9EaNBLuGsioRsAmjKFaT9IMnwregug/JpPRteopd8nbL
-         6sT5C0dWyMlA2LGPs6Z32VxxqXEZpC3OiCJWXspVbttWOApZ52l2Mv5sunPSYRoTBGLG
-         /JP5CWM5mXhLfvCNwSS+aL3K9WeBg3H3fAbbL6YRLVM0uhq0OVqSAnqc0gLxOtoZvQx2
-         AoAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrfcJA8UWLxaes/TBvtfaLMBWHKqqh+n5BZ2P9OUBBocAtq6OjXYhNbl88oKt8C9gG87Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvBb+Hbx6k9ugOmfVM6Ja5+SuBZmAw7U5vnYx1qN9NHJe64KT1
-	ec4armO6RUkw+ObPjlNlmX20ZQK8OfDwUE6qQO9VLFsXv92rNjqsBeAWV7BQUqH5I1i02gH1jKc
-	sS9p/p41av+wTlDk3L+7qQv1Hj8QpwKyGpmNIJfxkkxnTxEQZAA==
-X-Received: by 2002:a05:6512:39c6:b0:539:f13c:e5d1 with SMTP id 2adb3069b0e04-53dab3b0648mr1791124e87.38.1731690637358;
-        Fri, 15 Nov 2024 09:10:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFq5FUuRRyR5Vm7BO6UHaxJzl2kq52Rh+JW8BLqfChE5k/Qq35g8v4m3WQZHC3kxF7OpNDRyQ==
-X-Received: by 2002:a05:6512:39c6:b0:539:f13c:e5d1 with SMTP id 2adb3069b0e04-53dab3b0648mr1791114e87.38.1731690636916;
-        Fri, 15 Nov 2024 09:10:36 -0800 (PST)
-Received: from ?IPV6:2003:cb:c721:8100:177e:1983:5478:64ec? (p200300cbc7218100177e1983547864ec.dip0.t-ipconnect.de. [2003:cb:c721:8100:177e:1983:5478:64ec])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab721d7sm61558775e9.9.2024.11.15.09.10.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 09:10:36 -0800 (PST)
-Message-ID: <dcdce8e1-51da-42da-a892-59c6ccd9de23@redhat.com>
-Date: Fri, 15 Nov 2024 18:10:33 +0100
+	s=arc-20240116; t=1731693062; c=relaxed/simple;
+	bh=eOClkgrOVtMDm45l3c+YNZVXOx9yYAT8GkXLpLBSVLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XwXfsiU9KRg0OHN6txgZ8h3DeijFI0ebkeyL6dz5stxdscyQ6AH7eEBaaKd4xajnXrilgcoYg3DUZWmp8z7FtpnsCVteTR92vx8ANzfjVjuIWTs9QgD6b5/LNgoW5X0pv9YBGigDGrGZyBeY24n4c05RNE0Q1BsNc+9l6Jfk5/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lHzpx8F+; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731693061; x=1763229061;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eOClkgrOVtMDm45l3c+YNZVXOx9yYAT8GkXLpLBSVLk=;
+  b=lHzpx8F+nIml8OxrDKnd/kRvm7MR6lax+XpWrVyQ2d5Byf06klZHWOdQ
+   U+IgTdyPKYPhWpm1ZapKNBbAdAD7seOWtpmo7MAo4asQcKidYe4Hk5jAB
+   S4eplyZLVqf6TpoA7vdB/ukx+wMIcrnW2qDjbOmHPmkNUQgtN9Q6Z+KiQ
+   oyCqglXV48F70KGM4Qzi27hKZk7mvnkIgTSXOFoZnDUcJIAK2YKwM3Yzz
+   32QeQJfad6i90o1EFHyO2z/qLsaSWE7LbVOGyKDZ9NT6KinD0vyELZMzn
+   7llkPuOInnyObSk1JXXkLp0mCBQdZQ08gaeBmmo1MthWDtYo18auMxO0M
+   w==;
+X-CSE-ConnectionGUID: fT3isI6dT9C2KXelWCsUNA==
+X-CSE-MsgGUID: 8+Fyc/vlQXKKjX7plPlPPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11257"; a="31552189"
+X-IronPort-AV: E=Sophos;i="6.12,157,1728975600"; 
+   d="scan'208";a="31552189"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 09:51:00 -0800
+X-CSE-ConnectionGUID: /PICrEOzSBOkM4HFyehSMw==
+X-CSE-MsgGUID: s1Pp92IeQPyEIC0WsvzYXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,157,1728975600"; 
+   d="scan'208";a="88386465"
+Received: from howardworkpc.ccr.corp.intel.com (HELO desk) ([10.125.145.119])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 09:50:58 -0800
+Date: Fri, 15 Nov 2024 09:50:47 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Amit Shah <amit@kernel.org>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+	linux-doc@vger.kernel.org, amit.shah@amd.com,
+	thomas.lendacky@amd.com, bp@alien8.de, tglx@linutronix.de,
+	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
+	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
+	kai.huang@intel.com, sandipan.das@amd.com,
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
+	david.kaplan@amd.com, dwmw@amazon.co.uk
+Subject: Re: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for
+ AMD
+Message-ID: <20241115175047.bszpeakeodajczav@desk>
+References: <20241111163913.36139-2-amit@kernel.org>
+ <20241111193304.fjysuttl6lypb6ng@jpoimboe>
+ <564a19e6-963d-4cd5-9144-2323bdb4f4e8@citrix.com>
+ <20241112014644.3p2a6te3sbh5x55c@jpoimboe>
+ <20241112214241.fzqq6sqszqd454ei@desk>
+ <20241113202105.py5imjdy7pctccqi@jpoimboe>
+ <20241114015505.6kghgq33i4m6jrm4@desk>
+ <20241114023141.n4n3zl7622gzsf75@jpoimboe>
+ <20241114075403.7wxou7g5udaljprv@desk>
+ <20241115054836.oubgh4jbyvjum4tk@jpoimboe>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 0/6] Direct Map Removal for guest_memfd
-To: Patrick Roy <roypat@amazon.co.uk>, tabba@google.com,
- quic_eberman@quicinc.com, seanjc@google.com, pbonzini@redhat.com,
- jthoughton@google.com, ackerleytng@google.com, vannapurve@google.com,
- rppt@kernel.org
-Cc: graf@amazon.com, jgowans@amazon.com, derekmn@amazon.com,
- kalyazin@amazon.com, xmarcalx@amazon.com, linux-mm@kvack.org,
- corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
- chenhuacai@kernel.org, kernel@xen0n.name, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, luto@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
- mhiramat@kernel.org, mathieu.desnoyers@efficios.com, shuah@kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, faresx@amazon.com
-References: <20241030134912.515725-1-roypat@amazon.co.uk>
- <4aa0ccf4-ebbe-4244-bc85-8bc8dcd14e74@redhat.com>
- <27646c08-f724-49f7-9f45-d03bad500219@amazon.co.uk>
- <d1a69eb7-85d5-4ffa-88e2-f4841713c1d7@redhat.com>
- <90c9d8c0-814e-4c86-86ef-439cb5552cb6@amazon.co.uk>
- <10e4d078-3cdb-4d1c-a1a3-80e91b247217@redhat.com>
- <02f77d32-e2a1-431b-bb67-33d36c06acd3@amazon.co.uk>
- <f4c5d0a6-a582-44e3-8949-c199cc0bfba7@redhat.com>
- <f1f34ac0-d505-4982-aad9-86a0db9f4a35@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <f1f34ac0-d505-4982-aad9-86a0db9f4a35@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241115054836.oubgh4jbyvjum4tk@jpoimboe>
 
-On 15.11.24 17:59, Patrick Roy wrote:
+On Thu, Nov 14, 2024 at 09:48:36PM -0800, Josh Poimboeuf wrote:
+> According to the docs, classic IBRS also needs RSB filling at context
+> switch to protect against corrupt RSB entries (as opposed to RSB
+> underflow).
+
+Correct.
+
+> Something like so...
 > 
 > 
-> On Tue, 2024-11-12 at 14:52 +0000, David Hildenbrand wrote:
->> On 12.11.24 15:40, Patrick Roy wrote:
->>> I remember talking to someone at some point about whether we could reuse
->>> the proc-local stuff for guest memory, but I cannot remember the outcome
->>> of that discussion... (or maybe I just wanted to have a discussion about
->>> it, but forgot to follow up on that thought?).  I guess we wouldn't use
->>> proc-local _allocations_, but rather just set up proc-local mappings of
->>> the gmem allocations that have been removed from the direct map.
->>
->> Yes. And likely only for memory we really access / try access, if possible.
-> 
-> Well, if we start on-demand mm-local mapping the things we want to
-> access, we're back in TLB flush hell, no?
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 47a01d4028f6..7b9c0a21e478 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -1579,27 +1579,44 @@ static void __init spec_ctrl_disable_kernel_rrsba(void)
+>  	rrsba_disabled = true;
+>  }
+>  
+> -static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_mitigation mode)
+> +static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
+>  {
+>  	/*
+> -	 * Similar to context switches, there are two types of RSB attacks
+> -	 * after VM exit:
+> +	 * In general there are two types of RSB attacks:
+>  	 *
+> -	 * 1) RSB underflow
+> +	 * 1) RSB underflow ("Intel Retbleed")
+> +	 *
+> +	 *    Some Intel parts have "bottomless RSB".  When the RSB is empty,
+> +	 *    speculated return targets may come from the branch predictor,
+> +	 *    which could have a user-poisoned BTB or BHB entry.
+> +	 *
+> +	 *    user->user attacks are mitigated by IBPB on context switch.
+> +	 *
+> +	 *    user->kernel attacks via context switch are mitigated by IBRS,
+> +	 *    eIBRS, or RSB filling.
+> +	 *
+> +	 *    user->kernel attacks via kernel entry are mitigated by IBRS,
+> +	 *    eIBRS, or call depth tracking.
+> +	 *
+> +	 *    On VMEXIT, guest->host attacks are mitigated by IBRS, eIBRS, or
+> +	 *    RSB filling.
+>  	 *
+>  	 * 2) Poisoned RSB entry
+>  	 *
+> -	 * When retpoline is enabled, both are mitigated by filling/clearing
+> -	 * the RSB.
+> +	 *    On a context switch, the previous task can poison RSB entries
+> +	 *    used by the next task, controlling its speculative return
+> +	 *    targets.  Poisoned RSB entries can also be created by "AMD
+> +	 *    Retbleed" or SRSO.
+>  	 *
+> -	 * When IBRS is enabled, while #1 would be mitigated by the IBRS branch
+> -	 * prediction isolation protections, RSB still needs to be cleared
+> -	 * because of #2.  Note that SMEP provides no protection here, unlike
+> -	 * user-space-poisoned RSB entries.
+> +	 *    user->user attacks are mitigated by IBPB on context switch.
+>  	 *
+> -	 * eIBRS should protect against RSB poisoning, but if the EIBRS_PBRSB
+> -	 * bug is present then a LITE version of RSB protection is required,
+> -	 * just a single call needs to retire before a RET is executed.
+> +	 *    user->kernel attacks via context switch are prevented by
+> +	 *    SMEP+eIBRS+SRSO mitigations, or RSB clearing.
+> +	 *
+> +	 *    guest->host attacks are mitigated by eIBRS or RSB clearing on
+> +	 *    VMEXIT.  eIBRS implementations with X86_BUG_EIBRS_PBRSB still
+> +	 *    need "lite" RSB filling which retires a CALL before the first
+> +	 *    RET.
+>  	 */
+>  	switch (mode) {
+>  	case SPECTRE_V2_NONE:
+> @@ -1608,8 +1625,8 @@ static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_
+>  	case SPECTRE_V2_EIBRS_LFENCE:
+>  	case SPECTRE_V2_EIBRS:
+>  		if (boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB)) {
+> -			setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT_LITE);
+>  			pr_info("Spectre v2 / PBRSB-eIBRS: Retire a single CALL on VMEXIT\n");
+> +			setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT_LITE);
+>  		}
+>  		return;
+>  
+> @@ -1617,12 +1634,13 @@ static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_
+>  	case SPECTRE_V2_RETPOLINE:
+>  	case SPECTRE_V2_LFENCE:
+>  	case SPECTRE_V2_IBRS:
+> +		pr_info("Spectre v2 / SpectreRSB : Filling RSB on context switch and VMEXIT\n");
+> +		setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+>  		setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT);
+> -		pr_info("Spectre v2 / SpectreRSB : Filling RSB on VMEXIT\n");
+>  		return;
+>  	}
+>  
+> -	pr_warn_once("Unknown Spectre v2 mode, disabling RSB mitigation at VM exit");
+> +	pr_warn_once("Unknown Spectre v2 mode, disabling RSB mitigation\n");
+>  	dump_stack();
+>  }
+>  
+> @@ -1817,48 +1835,7 @@ static void __init spectre_v2_select_mitigation(void)
+>  	spectre_v2_enabled = mode;
+>  	pr_info("%s\n", spectre_v2_strings[mode]);
+>  
+> -	/*
+> -	 * If Spectre v2 protection has been enabled, fill the RSB during a
+> -	 * context switch.  In general there are two types of RSB attacks
+> -	 * across context switches, for which the CALLs/RETs may be unbalanced.
+> -	 *
+> -	 * 1) RSB underflow
+> -	 *
+> -	 *    Some Intel parts have "bottomless RSB".  When the RSB is empty,
+> -	 *    speculated return targets may come from the branch predictor,
+> -	 *    which could have a user-poisoned BTB or BHB entry.
+> -	 *
+> -	 *    AMD has it even worse: *all* returns are speculated from the BTB,
+> -	 *    regardless of the state of the RSB.
+> -	 *
+> -	 *    When IBRS or eIBRS is enabled, the "user -> kernel" attack
+> -	 *    scenario is mitigated by the IBRS branch prediction isolation
+> -	 *    properties, so the RSB buffer filling wouldn't be necessary to
+> -	 *    protect against this type of attack.
+> -	 *
+> -	 *    The "user -> user" attack scenario is mitigated by RSB filling.
+> -	 *
+> -	 * 2) Poisoned RSB entry
+> -	 *
+> -	 *    If the 'next' in-kernel return stack is shorter than 'prev',
+> -	 *    'next' could be tricked into speculating with a user-poisoned RSB
+> -	 *    entry.
+> -	 *
+> -	 *    The "user -> kernel" attack scenario is mitigated by SMEP and
+> -	 *    eIBRS.
+> -	 *
+> -	 *    The "user -> user" scenario, also known as SpectreBHB, requires
+> -	 *    RSB clearing.
+> -	 *
+> -	 * So to mitigate all cases, unconditionally fill RSB on context
+> -	 * switches.
+> -	 *
+> -	 * FIXME: Is this pointless for retbleed-affected AMD?
+> -	 */
+> -	setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+> -	pr_info("Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\n");
+> -
+> -	spectre_v2_determine_rsb_fill_type_at_vmexit(mode);
+> +	spectre_v2_mitigate_rsb(mode);
+>  
+>  	/*
+>  	 * Retpoline protects the kernel, but doesn't protect firmware.  IBRS
 
-At least the on-demand mapping shouldn't require a TLB flush? Only 
-"unmapping" if we want to restrict the size of a "mapped pool" of 
-restricted size.
+This LGTM.
 
-Anyhow, this would be a pure optimization, to avoid the expense of 
-mapping everything, when in practice you'd like not access most of it.
+I think SPECTRE_V2_EIBRS_RETPOLINE is placed in the wrong leg, it
+doesn't need RSB filling on context switch, and only needs VMEXIT_LITE.
+Does below change on top of your patch look okay?
 
-(my theory, happy to be told I'm wrong :) )
-
-> And we can't know
-> ahead-of-time what needs to be mapped, so everything would need to be
-> mapped (unless we do something like mm-local mapping a page on first
-> access, and then just never unmapping it again, under the assumption
-> that establishing the mapping won't be expensive)
-
-Right, the whole problem is that we don't know that upfront.
-
-> 
->>>
->>> I'm wondering, where exactly would be the differences to Sean's idea
->>> about messing with the CR3 register inside KVM to temporarily install
->>> page tables that contain all the gmem stuff, conceptually? Wouldn't we
->>> run into the same interrupt problems that Sean foresaw for the CR3
->>> stuff? (which, admittedly, I still don't quite follow what these are :(
->>> ).
->>
->> I'd need some more details on that. If anything would rely on the direct
->> mapping (from IRQ context?) than ... we obviously cannot remove the
->> direct mapping :)
-> 
-> I've talked to Fares internally, and it seems that generally doing
-> mm-local mappings of guest memory would work for us. We also figured out
-> what the "interrupt problem" is, namely that if we receive an interrupt
-> while executing in a context that has mm-local mappings available, those
-> mappings will continue to be available while the interrupt is being
-> handled.
-
-Isn't that likely also the case with secretmem where we removed the 
-directmap, but have an effective per-mm mapping in the (user-space 
-portion) of the page table?
-
-> I'm talking to my security folks to see how much of a concern
-> this is for the speculation hardening we're trying to achieve. Will keep
-> you in the loop there :)
-
-Thanks!
-
--- 
-Cheers,
-
-David / dhildenb
-
+---
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 7b9c0a21e478..d3b9a0d7a2b5 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -1622,6 +1622,7 @@ static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
+ 	case SPECTRE_V2_NONE:
+ 		return;
+ 
++	case SPECTRE_V2_EIBRS_RETPOLINE:
+ 	case SPECTRE_V2_EIBRS_LFENCE:
+ 	case SPECTRE_V2_EIBRS:
+ 		if (boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB)) {
+@@ -1630,7 +1631,6 @@ static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
+ 		}
+ 		return;
+ 
+-	case SPECTRE_V2_EIBRS_RETPOLINE:
+ 	case SPECTRE_V2_RETPOLINE:
+ 	case SPECTRE_V2_LFENCE:
+ 	case SPECTRE_V2_IBRS:
 
