@@ -1,72 +1,44 @@
-Return-Path: <kvm+bounces-31953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 787729CF3B4
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 19:14:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EDEC9CF4A2
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 20:14:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D9CB34751
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 18:10:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D345B3D638
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 18:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDEF1D90C8;
-	Fri, 15 Nov 2024 18:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k38b0/Zm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC2A1DD0C7;
+	Fri, 15 Nov 2024 18:38:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219021D63D8;
-	Fri, 15 Nov 2024 18:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701C3185B58;
+	Fri, 15 Nov 2024 18:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731694208; cv=none; b=OpK7qxw3N99en9vqHbxCC41YtagbHPz2SQYXxVx4v0kZ7Rk+mEOHjt1aoVZ5NevWTZ+YN8HdiCMg41w/iLTV9a4LVFJ9PH2Ihru7zcTL0h7zPdT7H2hXGOnbTooHcx3lSPYVwWFsAULEuwnVQG4pipETU6M//haJ1DQzRzQ1XnI=
+	t=1731695910; cv=none; b=S2QsLVu3E+f1HFn20qAhg5IsMv4LUpPGwKwyJUH/xHZ+hpGnIV4i6N/YFJU9HNngYhaztlADsfac9a+eIYN3oV8ygOYXjOHc/ORb7FKfJoG4nQBuNxKfZrmQj0K9jc5Lr/dsXnR+3k+rmh77vBsndlyqenLkkOZ+dH4wj5aWU+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731694208; c=relaxed/simple;
-	bh=YgDWh7MuRJtreRCSinehYy17Xkaqrqv27zLpvuYPGZY=;
+	s=arc-20240116; t=1731695910; c=relaxed/simple;
+	bh=52OCNaGNpSXj6THnhmxwmGZ3xzy9AHo5k80qQqIBILE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RACB35NUwrdfQ1EVOtP8AwpgQAjOsx0+5x3sCGRJx0tOZaROu8UXU2uMnkhBS24l4htEYmKQ2iAw4PV5loPxb6Km9SRO+or1f4gFU7c8Zsglt8BuVRSGRAw3savC9AB2ZAin3xPYZ6cj9Jz6md+HCKvlFGbmCiw7CAQ5wYQWmwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k38b0/Zm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0880C4CECF;
-	Fri, 15 Nov 2024 18:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731694207;
-	bh=YgDWh7MuRJtreRCSinehYy17Xkaqrqv27zLpvuYPGZY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k38b0/ZmWxERO66g5HXAEdXIc+zOPIaOdzsFdis2xGnymjnKpTPKTyJRtcAREAG/r
-	 p7J69wCgMMtYlC5G/Wz2CffKTn9W0wPpcNOhxvZxATbwqy4Y/bB3Xydzk1YIfN6klJ
-	 rV3Faa8hurhsSfFL++/to3cukwlNiP/ZM4jyJHB7ybS0xnTpERsGGOcCQC5KRWvC4v
-	 hIWUxV+3YrrIdQKqAUeIQCHB0+ge7kEvFpWqckqpDre+3hVdR8/SiaTzuZcBmLgjBc
-	 pLOXrzJFQTiBmm0nmaV5CWbSKyeslozweQFlQM8KUGmDhwiMwxUfcPLjONCFVQDbCc
-	 4M9mBMhDDeedg==
-Date: Fri, 15 Nov 2024 10:10:05 -0800
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>, Amit Shah <amit@kernel.org>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-	linux-doc@vger.kernel.org, amit.shah@amd.com,
-	thomas.lendacky@amd.com, bp@alien8.de, tglx@linutronix.de,
-	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
-	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com, sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
-	david.kaplan@amd.com, dwmw@amazon.co.uk
-Subject: Re: [RFC PATCH v2 1/3] x86: cpu/bugs: update SpectreRSB comments for
- AMD
-Message-ID: <20241115181005.xxlebbykksmimgqj@jpoimboe>
-References: <20241111193304.fjysuttl6lypb6ng@jpoimboe>
- <564a19e6-963d-4cd5-9144-2323bdb4f4e8@citrix.com>
- <20241112014644.3p2a6te3sbh5x55c@jpoimboe>
- <20241112214241.fzqq6sqszqd454ei@desk>
- <20241113202105.py5imjdy7pctccqi@jpoimboe>
- <20241114015505.6kghgq33i4m6jrm4@desk>
- <20241114023141.n4n3zl7622gzsf75@jpoimboe>
- <20241114075403.7wxou7g5udaljprv@desk>
- <20241115054836.oubgh4jbyvjum4tk@jpoimboe>
- <20241115175047.bszpeakeodajczav@desk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hIUniGGsGcm83Accl0BpAZtGyNohBOOv4XsjZPYIeN39wuENMnz2VLGs3GDbDkMr8rxjuAn1Ptg9bQi5h6JYELzsNIWeEdfN1DyxdcmAwsbxN2FueN46Q4nxdKQNProyukZAVAMm954liP6094ZBPi9B+9zzz2ojRETv8uFTrdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3BF3C4CECF;
+	Fri, 15 Nov 2024 18:38:29 +0000 (UTC)
+Date: Fri, 15 Nov 2024 10:38:28 -0800
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+	jthoughton@google.com
+Subject: Re: [PATCH v2 01/12] objtool: Generic annotation infrastructure
+Message-ID: <20241115183828.6cs64mpbp5cqtce4@jpoimboe>
+References: <20241111115935.796797988@infradead.org>
+ <20241111125218.113053713@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,40 +47,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241115175047.bszpeakeodajczav@desk>
+In-Reply-To: <20241111125218.113053713@infradead.org>
 
-On Fri, Nov 15, 2024 at 09:50:47AM -0800, Pawan Gupta wrote:
-> This LGTM.
-> 
-> I think SPECTRE_V2_EIBRS_RETPOLINE is placed in the wrong leg, it
-> doesn't need RSB filling on context switch, and only needs VMEXIT_LITE.
-> Does below change on top of your patch look okay?
+On Mon, Nov 11, 2024 at 12:59:36PM +0100, Peter Zijlstra wrote:
+> +#define ASM_ANNOTATE(x)						\
+> +	"911:\n\t"						\
+> +	".pushsection .discard.annotate,\"M\",@progbits,8\n\t"	\
+> +	".long 911b - .\n\t"					\
+> +	".long " __stringify(x) "\n\t"				\
+> +	".popsection\n\t"
 
-Yeah, I was wondering about that too.  Since it changes existing
-VMEXIT_LITE behavior I'll make it a separate patch.  And I'll probably
-do the comment changes in a separate patch as well.
+Why mergeable and progbits?
 
-> ---
-> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> index 7b9c0a21e478..d3b9a0d7a2b5 100644
-> --- a/arch/x86/kernel/cpu/bugs.c
-> +++ b/arch/x86/kernel/cpu/bugs.c
-> @@ -1622,6 +1622,7 @@ static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
->  	case SPECTRE_V2_NONE:
->  		return;
+> +static int read_annotate(struct objtool_file *file, void (*func)(int type, struct instruction *insn))
+> +{
+> +	struct section *rsec, *sec;
+> +	struct instruction *insn;
+> +	struct reloc *reloc;
+> +	int type;
+> +
+> +	rsec = find_section_by_name(file->elf, ".rela.discard.annotate");
+> +	if (!rsec)
+> +		return 0;
+> +
+> +	sec = find_section_by_name(file->elf, ".discard.annotate");
+> +	if (!sec)
+> +		return 0;
+
+Instead of looking for .rela.discard.annotate you can just get it from
+sec->rsec.
+
+
+> +
+> +	if (sec->sh.sh_entsize != 8) {
+> +		static bool warn = false;
+
+"warned" ?
+
+> +		if (!warn) {
+> +			WARN("%s: dodgy linker, sh_entsize != 8", sec->name);
+> +			warn = true;
+> +		}
+
+Any reason not to make this a fatal error?
+
+> +		sec->sh.sh_entsize = 8;
+> +	}
+> +
+> +	for_each_reloc(rsec, reloc) {
+> +		insn = find_insn(file, reloc->sym->sec,
+> +				 reloc->sym->offset + reloc_addend(reloc));
+> +		if (!insn) {
+> +			WARN("bad .discard.annotate entry: %d", reloc_idx(reloc));
+> +			return -1;
+> +		}
+
+Would be nice to print the type here as well.
+
+> @@ -2670,6 +2714,8 @@ static int decode_sections(struct objtoo
+>  	if (ret)
+>  		return ret;
 >  
-> +	case SPECTRE_V2_EIBRS_RETPOLINE:
->  	case SPECTRE_V2_EIBRS_LFENCE:
->  	case SPECTRE_V2_EIBRS:
->  		if (boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB)) {
-> @@ -1630,7 +1631,6 @@ static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
->  		}
->  		return;
->  
-> -	case SPECTRE_V2_EIBRS_RETPOLINE:
->  	case SPECTRE_V2_RETPOLINE:
->  	case SPECTRE_V2_LFENCE:
->  	case SPECTRE_V2_IBRS:
+> +	ret = read_annotate(file, __annotate_nop);
+> +
+
+'ret' is ignored here (not that it matters much as this goes away in the
+next patch)
 
 -- 
 Josh
