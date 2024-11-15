@@ -1,175 +1,239 @@
-Return-Path: <kvm+bounces-31929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F1D49CDC21
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 11:05:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA519CDC90
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 11:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FBD7283E14
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:05:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952C71F22800
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFA01B6CE8;
-	Fri, 15 Nov 2024 10:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F731B4F09;
+	Fri, 15 Nov 2024 10:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Go9HeyQD"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lDPVSNrB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9711B3952
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 10:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A55818950A;
+	Fri, 15 Nov 2024 10:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731665108; cv=none; b=i6r/9/gmXm9IN6NRWZjDqjCdNbcjY1+Vgtgg5i1FxDmTImEJIzH/5l7oLlDr5tOoDLQygwyVF5BzzliqasA6ruFK8ckx0HeMUI5gWioPa6BDL3n/VuRDoUErrR42JUCg7KKCKJEXUvqfjZ9w4kqJYmvIw80qjnDNrhoiR7lSg5M=
+	t=1731666625; cv=none; b=h8/rewGa8A3qBPihJGuChtyF8SBlnURpQTzc7NR8LvncvPQ57t047dor1DBNJ9zlPotTvhtGGlHnGNoyoVMYpBRTDfPfcGpHh8/nyNxoaYfGOkp4Zoqns9hrZfRirJGxIcwIhPc1dRUIimpAbtLtqmXzwc3YP1s6deLnuXAdE+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731665108; c=relaxed/simple;
-	bh=UxggTA5vLInAIjYh1n0ydwNp3BO1gkE6PaUWMpgjedk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HLZMei2GTTM3D7qKcBLi2RChGbfnXcoqU+8DIlFCrPnoxeGdYEkkqzFuPA4BaI8gyJ539vKNFIYNwNCz5zLa+qtclm0td73BtRT0iqR4Qmwi195w6R/UTKq3E9N4q8OrT/q4Ua7fOZ6KgVbGOryR1FYi0vse5HVkBxxPowYqwG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Go9HeyQD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731665106;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=g1kAKAvwdmdjiltkVd6qbqhCfl7VUxLedhiq8NASCwc=;
-	b=Go9HeyQDaeeUacwm2Xhgg8YTmpyNJVvU7/Zzjmbt2SAXARQcOu37GJRpjJAVWyR0KWU6M3
-	N0jtvQm0XAb0vXdGO33b2BANCcJi+/7a9MxGUReHwBwS0cDtpTfCozLcfNuNid6o0GBsKi
-	ru5R494tunnWuhlEKF3b5OxgaDhYGxg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-47--tPdGOrBN2Gf8D-lWJpNGQ-1; Fri, 15 Nov 2024 05:05:02 -0500
-X-MC-Unique: -tPdGOrBN2Gf8D-lWJpNGQ-1
-X-Mimecast-MFC-AGG-ID: -tPdGOrBN2Gf8D-lWJpNGQ
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4314c6ca114so3813085e9.1
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 02:05:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731665101; x=1732269901;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=g1kAKAvwdmdjiltkVd6qbqhCfl7VUxLedhiq8NASCwc=;
-        b=WSQIQXz+4pTXAypgTXksMIvHp1eMo92kGhZoE5GNkgcinOjLT45VsTGKRGrLkvy2sN
-         qTwr8jFpL8ZCa/N5gCvV6C/GeWdNpalFAfTFAODAmfDaJGLwXbASfsBIkBL2szb3dmc3
-         8oA9qo39/zB24n1aBmbyYnXnBPU964D9oHFUIyym76oM+R3M0A0GGF2s48pnKYX0pkfY
-         MPZUIfxczD5pVKrxuQomUNLr9bPijqbBmg7vN2B3TtiJeOX1MYjEhpDkLJaKG1ST6///
-         9dOLYdu4HH1CdZM6I61z76wZTtK+fy+3cim9GZD4gL6alLZQBfQxfo0UhsX/xpSHNgeZ
-         fs+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXdVBXdBVbav/B7VK6k6oqwxD64YYBmL5eQmwMiQ2hf4Zb7iWBl/iVU/eCgB80DMlbyCQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGn23h2z8+kbySJYihngCrmVls9DKCmmUM0vAz/oSWAyGJfjAW
-	UqQRjf3Obe8dtPwFmNqXns8fw41+d3HLyvS5toSJAR3ICjvRnU4Pn5NphHuYDxdQWWiyx6qnUhf
-	6ADjTHSI2IFO2Y/2PEpyE4m9eC5MOG+4drjjtEwgcf+CejkRqig==
-X-Received: by 2002:a05:600c:3b2a:b0:431:6153:a246 with SMTP id 5b1f17b1804b1-432df726227mr16479655e9.13.1731665101486;
-        Fri, 15 Nov 2024 02:05:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEz5+u3ZRZYo78oPclwnT1nZIiEdnYHBaxqmzIQBER+J7j/3O0koftmeu3voXxmbcw6vb7sQ==
-X-Received: by 2002:a05:600c:3b2a:b0:431:6153:a246 with SMTP id 5b1f17b1804b1-432df726227mr16479215e9.13.1731665101094;
-        Fri, 15 Nov 2024 02:05:01 -0800 (PST)
-Received: from ?IPV6:2003:cb:c721:8100:177e:1983:5478:64ec? (p200300cbc7218100177e1983547864ec.dip0.t-ipconnect.de. [2003:cb:c721:8100:177e:1983:5478:64ec])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da2444e7sm53797785e9.4.2024.11.15.02.04.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 02:04:59 -0800 (PST)
-Message-ID: <9160c6b4-f8a0-431d-8a21-ead510a887a1@redhat.com>
-Date: Fri, 15 Nov 2024 11:04:57 +0100
+	s=arc-20240116; t=1731666625; c=relaxed/simple;
+	bh=4vNgn+SsJajunpKXuBkZ//5pvqR9w+o+EcfCWsemrGQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o+4H83ducNF5wmlIvDgT3Pgibbh8TtyO5Y4OHaDtmF5AwH+sxnjdrP3uSpWUZ5OkWyLWjavneV/Hh06d1lFIBcd+Za9dSEUGgzurCgNsjRRO79WZnxnF1sY+mhn21KFEvYWVPGw82OC5la0bd7WjXDLVyEPcyq2qCa3eWMydtIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lDPVSNrB; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731666622; x=1763202622;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Nj6S1uQvHPGOTiJGqSfDYPUjpMdCEBMRTMmFsqU5FDo=;
+  b=lDPVSNrBXdMuOD1p54HCK/AYRlgHaF7Oezqy2DNnhMTSxiZuMD0FnUaw
+   rVyfctIZ76Jykt06ElF9ED+z4FFwpfxQV3RrFAHxK5gd4Gt6gGGRjUNEp
+   odLAH+L7nvZ64WE2qd63Ch7iCtPoekF6/yOv5u+0EXpegGdQvPHv1XeFX
+   M=;
+X-IronPort-AV: E=Sophos;i="6.12,156,1728950400"; 
+   d="scan'208";a="147826196"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 10:30:20 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:15220]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
+ id e0f35240-8bc2-40ae-9f40-746d1c98b040; Fri, 15 Nov 2024 10:30:20 +0000 (UTC)
+X-Farcaster-Flow-ID: e0f35240-8bc2-40ae-9f40-746d1c98b040
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 15 Nov 2024 10:30:20 +0000
+Received: from ip-10-253-83-51.amazon.com (10.253.83.51) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 15 Nov 2024 10:30:18 +0000
+From: Alexander Graf <graf@amazon.com>
+To: <netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<kvm@vger.kernel.org>, Asias He <asias@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Stefano Garzarella <sgarzare@redhat.com>, "Stefan
+ Hajnoczi" <stefanha@redhat.com>
+Subject: [PATCH] vsock/virtio: Remove queued_replies pushback logic
+Date: Fri, 15 Nov 2024 10:30:16 +0000
+Message-ID: <20241115103016.86461-1-graf@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 02/11] fs/proc/vmcore: replace vmcoredd_mutex by
- vmcore_mutex
-To: Baoquan He <bhe@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Farman
- <farman@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <20241025151134.1275575-1-david@redhat.com>
- <20241025151134.1275575-3-david@redhat.com> <ZzcVGrUcgNMXPkqw@MiWiFi-R3L-srv>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZzcVGrUcgNMXPkqw@MiWiFi-R3L-srv>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-On 15.11.24 10:32, Baoquan He wrote:
-> On 10/25/24 at 05:11pm, David Hildenbrand wrote:
->> Let's use our new mutex instead.
-> 
-> Is there reason vmcoredd_mutex need be replaced and integrated with the
-> vmcore_mutex? Is it the reason the concurrent opening of vmcore could
-> happen with the old vmcoredd_mutex?
+Ever since the introduction of the virtio vsock driver, it included
+pushback logic that blocks it from taking any new RX packets until the
+TX queue backlog becomes shallower than the virtqueue size.
 
-Yes, see the next patch in this series. But I consider this valuable on 
-its own: there is no need to have two mutexes.
+This logic works fine when you connect a user space application on the
+hypervisor with a virtio-vsock target, because the guest will stop
+receiving data until the host pulled all outstanding data from the VM.
 
-I can make that clearer in the patch description.
+With Nitro Enclaves however, we connect 2 VMs directly via vsock:
 
+  Parent      Enclave
+
+    RX -------- TX
+    TX -------- RX
+
+This means we now have 2 virtio-vsock backends that both have the pushback
+logic. If the parent's TX queue runs full at the same time as the
+Enclave's, both virtio-vsock drivers fall into the pushback path and
+no longer accept RX traffic. However, that RX traffic is TX traffic on
+the other side which blocks that driver from making any forward
+progress. We're not in a deadlock.
+
+To resolve this, let's remove that pushback logic altogether and rely on
+higher levels (like credits) to ensure we do not consume unbounded
+memory.
+
+Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+Signed-off-by: Alexander Graf <graf@amazon.com>
+---
+ net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
+ 1 file changed, 2 insertions(+), 49 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 64a07acfef12..53e79779886c 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -44,8 +44,6 @@ struct virtio_vsock {
+ 	struct work_struct send_pkt_work;
+ 	struct sk_buff_head send_pkt_queue;
+ 
+-	atomic_t queued_replies;
+-
+ 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
+ 	 * must be accessed with rx_lock held.
+ 	 */
+@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+ 
+ 		virtio_transport_deliver_tap_pkt(skb);
+ 
+-		if (reply) {
+-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+-			int val;
+-
+-			val = atomic_dec_return(&vsock->queued_replies);
+-
+-			/* Do we now have resources to resume rx processing? */
+-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
+-				restart_rx = true;
+-		}
+-
+ 		added = true;
+ 	}
+ 
+@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+ 		goto out_rcu;
+ 	}
+ 
+-	if (virtio_vsock_skb_reply(skb))
+-		atomic_inc(&vsock->queued_replies);
+-
+ 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+ 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+ 
+@@ -233,7 +217,7 @@ static int
+ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+ {
+ 	struct virtio_vsock *vsock;
+-	int cnt = 0, ret;
++	int ret;
+ 
+ 	rcu_read_lock();
+ 	vsock = rcu_dereference(the_virtio_vsock);
+@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+ 		goto out_rcu;
+ 	}
+ 
+-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+-
+-	if (cnt) {
+-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+-		int new_cnt;
+-
+-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
+-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
+-		    new_cnt < virtqueue_get_vring_size(rx_vq))
+-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+-	}
++	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+ 
+ 	ret = 0;
+ 
+@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
+ 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+ }
+ 
+-/* Is there space left for replies to rx packets? */
+-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
+-{
+-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
+-	int val;
+-
+-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
+-	val = atomic_read(&vsock->queued_replies);
+-
+-	return val < virtqueue_get_vring_size(vq);
+-}
+-
+ /* event_lock must be held */
+ static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+ 				       struct virtio_vsock_event *event)
+@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
+ 			struct sk_buff *skb;
+ 			unsigned int len;
+ 
+-			if (!virtio_transport_more_replies(vsock)) {
+-				/* Stop rx until the device processes already
+-				 * pending replies.  Leave rx virtqueue
+-				 * callbacks disabled.
+-				 */
+-				goto out;
+-			}
+-
+ 			skb = virtqueue_get_buf(vq, &len);
+ 			if (!skb)
+ 				break;
+@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 
+ 	vsock->rx_buf_nr = 0;
+ 	vsock->rx_buf_max_nr = 0;
+-	atomic_set(&vsock->queued_replies, 0);
+ 
+ 	mutex_init(&vsock->tx_lock);
+ 	mutex_init(&vsock->rx_lock);
 -- 
-Cheers,
+2.40.1
 
-David / dhildenb
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
