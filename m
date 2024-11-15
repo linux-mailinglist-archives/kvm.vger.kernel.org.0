@@ -1,240 +1,212 @@
-Return-Path: <kvm+bounces-31915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 392639CDAE2
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:51:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B8D9CDACF
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:46:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0642839B5
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 08:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C739C1F221C0
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 08:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4D518C933;
-	Fri, 15 Nov 2024 08:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EF0188CA9;
+	Fri, 15 Nov 2024 08:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dZzcuylc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DNvcV98o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15EA18BC36;
-	Fri, 15 Nov 2024 08:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2067346D
+	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 08:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731660649; cv=none; b=cuHVSZvJbRe3CL45p3oN9ZOcgd7KMaxRpEronFKHgwOH/k7hFzMcvgSuLZue5lpwJnEEcRrwdgjcgPg2hVc/LbaQ9EaaTGln7PAEnY5Ccpa3kGap2eQLpiRdOAxSzL/Sm28JfwdSBebylzLlOcIGzbvKmK7d0yd5k7Lrr/dn7WQ=
+	t=1731660404; cv=none; b=JHTeZ23xM8RLok0ytBkVckIaxrHdcUcMVqqXtrEJIGiGs4HuerBBnn3gG71ljjBYjHKeLSIF3tZXSguDiC4bBLE0sSVUMqKiZTIIU0iI1ih7NBJw/ZzRU/C0AI6qLPXoRJvJV5C905YgAgT2m1s+ro1cECbYOR5eZaGDTS4N0EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731660649; c=relaxed/simple;
-	bh=GbtQXzGHgA75ePofMM0C4+LapiDpYgDO8Cc069qpd64=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ptDocFu+ErxEX+5Aj1MgMbS+mJm6vidV0Dd1CuRN5Zpdaue3eP6sLyh8PkNXFdHBJ0FucGZ9fpZiAyE/gicYUqlgX0B3vd8icv3vyAMGeYU5UBcOacee1mbHn1eMoRsNAbPAjkepeieI8cvjF8sL6zUsN6zW65TL8B9dDRcVP70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dZzcuylc; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731660647; x=1763196647;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GbtQXzGHgA75ePofMM0C4+LapiDpYgDO8Cc069qpd64=;
-  b=dZzcuylcCjhg59Zeyymjdv3oTPfidtvv5ddTqYVQP+Z/U4Y1kh7Bmfdw
-   MDXBHRAi7Wxt6QZmC7IlwwWmSLwmvik/g1+NYSUVzfs+5APntdwlg1n+a
-   j1ZA6HVTw4Co1s7cI74+e83Kvd/ToOYkEZqZWQkWXXUQAyvAyU7QpI2WR
-   95GY9BL8+fixHUi4QkXhD8UXhlWJEFQogeuM6pj8IENTwXimcrHmMJhf6
-   uS/WooX3h/dyR9KZOLd2tIKsLJ8EXz9yCmp63HgGFmbkEw8DTrcXa6UU8
-   limiIRbzapjtP2J6NRgCCbPwWWi/EQ9Xmsd6bAhPeFHsg39dLy7ByQ9GU
-   g==;
-X-CSE-ConnectionGUID: yNcJmzOWRiGoGTujEF4jkQ==
-X-CSE-MsgGUID: I1GstPkQSvK0yvl5cr9CQA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="42191076"
-X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
-   d="scan'208";a="42191076"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 00:50:47 -0800
-X-CSE-ConnectionGUID: R/BFWuzLR+aQeH/OKvvqcQ==
-X-CSE-MsgGUID: HMXu7m7bRva2LbINOpQXWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
-   d="scan'208";a="88913039"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 00:50:45 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: rick.p.edgecombe@intel.com,
-	binbin.wu@linux.intel.com,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] KVM: x86/mmu: Only zap valid non-mirror roots in kvm_zap_gfn_range()
-Date: Fri, 15 Nov 2024 16:45:59 +0800
-Message-ID: <20241115084600.12174-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1731660404; c=relaxed/simple;
+	bh=Y+MsEKnzmc/83yMVSNfuCtSeI6/WxsCKwrXXNhZ5XLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zj/NNDZob9h3tsYGoqyu2u3m+dOYLbUOEGzJ5k26t5Typh39mhi9gvveGCHlQcIoo2VaMd0TimzKKhVdsjOeXbJG+B+CgnlX47pKLCQBWdFvD7mYArQlPhRwS2vx4idc/vL/FssOgML+z4d397zQ7eII4rZqx+XfkA4F09gFaYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DNvcV98o; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731660401;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iU3AwiO23RxdWGWn7Yp7jp33a5YtE5yN//tDV9uC5Ss=;
+	b=DNvcV98o95278eYdFS1fxbZWTBdd+ftk0xI+ACyvgbNcnHigC5VNIp/BQj+DbiSpjs97pZ
+	RBw+hdC9CWy/jjyjbZUHjnzAReCYclgkEARqjWH8fR9ECuwgO/Ed1xjfOauoNW/fA47oGh
+	P/76ZS8viMMPgjyUTGpfIZ7KWfDFmMw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-Ae3uHm1KMM642lvste8crA-1; Fri,
+ 15 Nov 2024 03:46:37 -0500
+X-MC-Unique: Ae3uHm1KMM642lvste8crA-1
+X-Mimecast-MFC-AGG-ID: Ae3uHm1KMM642lvste8crA
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C2E31955F41;
+	Fri, 15 Nov 2024 08:46:35 +0000 (UTC)
+Received: from localhost (unknown [10.72.113.10])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A99EE1956054;
+	Fri, 15 Nov 2024 08:46:32 +0000 (UTC)
+Date: Fri, 15 Nov 2024 16:46:27 +0800
+From: Baoquan He <bhe@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v1 00/11] fs/proc/vmcore: kdump support for virtio-mem on
+ s390
+Message-ID: <ZzcKY8hap3OMqTjC@MiWiFi-R3L-srv>
+References: <20241025151134.1275575-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241025151134.1275575-1-david@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Only zap valid, non-mirror roots in kvm_zap_gfn_range().
+On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+> This is based on "[PATCH v3 0/7] virtio-mem: s390 support" [1], which adds
+> virtio-mem support on s390.
+> 
+> The only "different than everything else" thing about virtio-mem on s390
+> is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
+> during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
+> crash kernel must detect memory ranges of the crashed/panicked kernel to
+> include via PT_LOAD in the vmcore.
+> 
+> On other architectures, all RAM regions (boot + hotplugged) can easily be
+> observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
+> the elfcore hdr.
+> 
+> On s390, information about "ordinary" memory (heh, "storage") can be
+> obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
+> that information is stored early during boot in the "physmem" memblock
+> data structure.
+> 
+> But virtio-mem memory is always detected by as device driver, which is
+> usually build as a module. So in the crash kernel, this memory can only be
+                                       ~~~~~~~~~~~
+                                       Is it 1st kernel or 2nd kernel?
+Usually we call the 1st kernel as panicked kernel, crashed kernel, the
+2nd kernel as kdump kernel. 
+> properly detected once the virtio-mem driver started up.
+> 
+> The virtio-mem driver already supports the "kdump mode", where it won't
+> hotplug any memory but instead queries the device to implement the
+> pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
+> the vmcore.
+> 
+> With this series, if the virtio-mem driver is included in the kdump
+> initrd -- which dracut already takes care of under Fedora/RHEL -- it will
+> now detect the device RAM ranges on s390 once it probes the devices, to add
+> them to the vmcore using the same callback mechanism we already have for
+> pfn_is_ram().
 
-There are 3 callers to kvm_zap_gfn_range() in KVM.
-(1) in __kvm_set_or_clear_apicv_inhibit().
-(2) in sev_handle_rmp_fault().
-(3) in kvm_noncoherent_dma_assignment_start_or_stop().
+Do you mean on s390 virtio-mem memory region will be detected and added
+to vmcore in kdump kernel when virtio-mem driver is initialized? Not
+sure if I understand it correctly.
 
-TDX inhibits apicv as soon as TD initialization occurs. Mirror roots do not
-apply for SEV. So, kvm_zap_gfn_range() does no need to zap mirror roots in
-cases (1) and (2).
-
-Currently, TDX does not support the assignment of noncoherent DMA devices,
-even to shared memory (there's no corresponding WBINVD emulation). Even if
-TDX supports noncoherent DMA devices assignment in the future, the private
-EPT (underlying the mirror roots) in TDX always forces the EPT memory types
-to WB. Thus, kvm_zap_gfn_range() does not need to zap mirror roots in case
-(3). Zapping only valid, non-mirror roots in kvm_zap_gfn_range() allows TDX
-to avoid depending on the self-snoop feature when reusing VMX's op
-get_mt_mask for TDX shared EPT.
-
-Introduce a static helper kvm_zap_gfn_range_filtered() and have
-kvm_zap_gfn_range() invoke it with the filter KVM_FILTER_SHARED.
-
-Opportunistically, move EXPORT_SYMBOL_GPL of kvm_zap_gfn_range() closer to
-the function itself.
-
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
-The code base is kvm-coco-queue.
-
-Previously Paolo suggested dropping TDX's specific implmentation of the op
-get_mt_mask and having TDX reuse VMX's implementation. [1]
-
-Sean also suggested making the self-snoop feature a hard dependency for
-enabling TDX [2].
-
-That is because
-- TDX shared EPT is able to reuse the memory type specified in VMX's code
-  as long as guest MTRRs are not referenced.
-- KVM does not call kvm_zap_gfn_range() when attaching/detaching
-  non-coherent DMA devices when the CPU have feature self-snoop. [3]
-
-However, [3] cannot be guaranteed after commit 9d70f3fec144 ("Revert "KVM:
-VMX: Always honor guest PAT on CPUs that support self-snoop"), which was
-due to a regression with the bochsdrm driver.
-
-Although [3] may be added back in the future, rather than relying on or
-waiting for that, a better approach would be to avoid zapping the private
-EPT in kvm_zap_gfn_range().
-
-[1] https://lore.kernel.org/kvm/b791a3f6-a5ab-4f7e-bb2a-d277b26ec2c4@redhat.com/
-[2] https://lore.kernel.org/kvm/ZuBSNS33_ck-w6-9@google.com
-[3] https://lore.kernel.org/all/20240309010929.1403984-6-seanjc@google.com
----
- arch/x86/kvm/mmu/mmu.c     | 20 ++++++++++++++++----
- arch/x86/kvm/mmu/tdp_mmu.c | 11 ++++++++---
- arch/x86/kvm/mmu/tdp_mmu.h |  3 ++-
- 3 files changed, 26 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8fc943824015..c2e4a4dcbfac 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6629,9 +6629,10 @@ static bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_e
- 
- /*
-  * Invalidate (zap) SPTEs that cover GFNs from gfn_start and up to gfn_end
-- * (not including it)
-+ * (not including it) for VALID roots specified with attr_filter
-  */
--void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-+static void kvm_zap_gfn_range_filtered(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end,
-+				       enum kvm_gfn_range_filter attr_filter)
- {
- 	bool flush;
- 
-@@ -6647,7 +6648,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
- 
- 	if (tdp_mmu_enabled)
--		flush = kvm_tdp_mmu_zap_leafs(kvm, gfn_start, gfn_end, flush);
-+		flush = kvm_tdp_mmu_zap_leafs(kvm, gfn_start, gfn_end,
-+					      attr_filter, flush);
- 
- 	if (flush)
- 		kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end - gfn_start);
-@@ -6657,6 +6659,17 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	write_unlock(&kvm->mmu_lock);
- }
- 
-+/*
-+ * Invalidate (zap) SPTEs that cover GFNs from gfn_start and up to gfn_end
-+ * (not including it) for all *VALID* non-mirror roots.
-+ */
-+void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-+{
-+	kvm_zap_gfn_range_filtered(kvm, gfn_start, gfn_end,
-+				   KVM_FILTER_SHARED);
-+}
-+EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
-+
- static bool slot_rmap_write_protect(struct kvm *kvm,
- 				    struct kvm_rmap_head *rmap_head,
- 				    const struct kvm_memory_slot *slot)
-@@ -6998,7 +7011,6 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 
- 	return need_tlb_flush;
- }
--EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
- 
- static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
- 					   const struct kvm_memory_slot *slot)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b0e1c4cb3004..5482f0d5d262 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1016,16 +1016,21 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- }
- 
- /*
-- * Zap leaf SPTEs for the range of gfns, [start, end), for all *VALID** roots.
-+ * Zap leaf SPTEs for the range of gfns, [start, end), for *VALID** roots
-+ * specified with attr_filter.
-  * Returns true if a TLB flush is needed before releasing the MMU lock, i.e. if
-  * one or more SPTEs were zapped since the MMU lock was last acquired.
-  */
--bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush)
-+bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end,
-+			   enum kvm_gfn_range_filter attr_filter, bool flush)
- {
-+	enum kvm_tdp_mmu_root_types types;
- 	struct kvm_mmu_page *root;
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
--	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, -1)
-+
-+	types = kvm_gfn_range_filter_to_root_types(kvm, attr_filter);
-+	__for_each_tdp_mmu_root_yield_safe(kvm, root, -1, types)
- 		flush = tdp_mmu_zap_leafs(kvm, root, start, end, true, flush);
- 
- 	return flush;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 7927fa4a96e0..6e17d4d151b9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -63,7 +63,8 @@ static inline struct kvm_mmu_page *tdp_mmu_get_root(struct kvm_vcpu *vcpu,
- 	return root_to_sp(vcpu->arch.mmu->root.hpa);
- }
- 
--bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush);
-+bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end,
-+			   enum kvm_gfn_range_filter attr_filter, bool flush);
- bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
- void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm,
-
-base-commit: 2893e1e10283b33c1412b83949ea346aa75eaf18
--- 
-2.43.2
+> 
+> To add these device RAM ranges to the vmcore ("patch the vmcore"), we will
+> add new PT_LOAD entries that describe these memory ranges, and update
+> all offsets vmcore size so it is all consistent.
+> 
+> Note that makedumfile is shaky with v6.12-rcX, I made the "obvious" things
+> (e.g., free page detection) work again while testing as documented in [2].
+> 
+> Creating the dumps using makedumpfile seems to work fine, and the
+> dump regions (PT_LOAD) are as expected. I yet have to check in more detail
+> if the created dumps are good (IOW, the right memory was dumped, but it
+> looks like makedumpfile reads the right memory when interpreting the
+> kernel data structures, which is promising).
+> 
+> Patch #1 -- #6 are vmcore preparations and cleanups
+> Patch #7 adds the infrastructure for drivers to report device RAM
+> Patch #8 + #9 are virtio-mem preparations
+> Patch #10 implements virtio-mem support to report device RAM
+> Patch #11 activates it for s390, implementing a new function to fill
+>           PT_LOAD entry for device RAM
+> 
+> [1] https://lkml.kernel.org/r/20241025141453.1210600-1-david@redhat.com
+> [2] https://github.com/makedumpfile/makedumpfile/issues/16
+> 
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Cc: "Eugenio Pérez" <eperezma@redhat.com>
+> Cc: Baoquan He <bhe@redhat.com>
+> Cc: Vivek Goyal <vgoyal@redhat.com>
+> Cc: Dave Young <dyoung@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Eric Farman <farman@linux.ibm.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> 
+> David Hildenbrand (11):
+>   fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex
+>   fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex
+>   fs/proc/vmcore: disallow vmcore modifications after the vmcore was
+>     opened
+>   fs/proc/vmcore: move vmcore definitions from kcore.h to crash_dump.h
+>   fs/proc/vmcore: factor out allocating a vmcore memory node
+>   fs/proc/vmcore: factor out freeing a list of vmcore ranges
+>   fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM
+>     ranges in 2nd kernel
+>   virtio-mem: mark device ready before registering callbacks in kdump
+>     mode
+>   virtio-mem: remember usable region size
+>   virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM
+>   s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
+> 
+>  arch/s390/Kconfig             |   1 +
+>  arch/s390/kernel/crash_dump.c |  39 +++--
+>  drivers/virtio/Kconfig        |   1 +
+>  drivers/virtio/virtio_mem.c   | 103 +++++++++++++-
+>  fs/proc/Kconfig               |  25 ++++
+>  fs/proc/vmcore.c              | 258 +++++++++++++++++++++++++---------
+>  include/linux/crash_dump.h    |  47 +++++++
+>  include/linux/kcore.h         |  13 --
+>  8 files changed, 396 insertions(+), 91 deletions(-)
+> 
+> -- 
+> 2.46.1
+> 
 
 
