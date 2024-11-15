@@ -1,351 +1,519 @@
-Return-Path: <kvm+bounces-31972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E9639CF68D
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 22:04:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDCFE9CF6E0
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 22:15:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31180285854
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 21:04:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4344B281BD4
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 21:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BCD31E1A34;
-	Fri, 15 Nov 2024 21:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F4B1E377D;
+	Fri, 15 Nov 2024 21:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZlRUDnDt";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Q2g3ndU3"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Vx946PRA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F44A12F585
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 21:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731704673; cv=fail; b=Yjy6mGmot0eFDgTjPWTcjn59jcERb45Sqsgdg0iusylPPqMNEIsrkCDxdYuxffIaVJKXt935PQMqPHKUu4M5djln7VdGUuqApij0S4WXoY4WDbYy53mDI5N/vuncc6MMO8WlbsYxXwk4JvjYlUxGwwFu3/iO1KpAolNSaRpQPps=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731704673; c=relaxed/simple;
-	bh=HZhrgF7jeXzAhJSYcl8Xa/mMcMIWIz5yEOkQeRO/jww=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=i2Gf4t5sULxs68KgAMGkj29jz+KIMD/w0y2tPdwoqzYz2vDxHiuvlR/60VdgSggyaUzIIBAUDfGxkVWrolClZ1gvL2QBW8b4NL5pdVLAYkZdDPOwdNyCRYisLQMV61phS8CPmVO2euYlBmOyr+ARBP6fQK0hmSQW4JBgpNwSGnA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ZlRUDnDt; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Q2g3ndU3; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AFKMgul027018;
-	Fri, 15 Nov 2024 21:03:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=lxd7PbXuBa2CBiklUB8QMYyv9koAREe/ZrlBf4Z94fE=; b=
-	ZlRUDnDt81sCMmTgEC30cvpQdjf4sX84zE0lh6vWbn8aZUSu+HB9AJfTz+ngrhfN
-	516sfztP6eQ6WkLe8skIRYayWC4bcsbH2Ub4UUWgMq6LPfMxxAyR6EDXkoBJp4RR
-	fVI7QJ7emroNuHVbAd6u6tt7vOCUiFqsOTvSDFq0Aadk9FaFw0tAyB644sGr2xMb
-	LpwDJukvw5xaIWOuhGBJAJAIvdMWI5966TsMbfVhlATuYeP9g2vDqwrp3gkJMTGu
-	14GgVV05Azgx8DGOV7x3BC9p4YwnolASXX1sMi2vGYWpZilQF5zd5/R6P0CWYz8z
-	eXDupf005oQpahiarMQxpA==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42t0k5m3n9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Nov 2024 21:03:49 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4AFKJ1O5022776;
-	Fri, 15 Nov 2024 21:03:48 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2172.outbound.protection.outlook.com [104.47.57.172])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42vuw361eb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Nov 2024 21:03:48 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NJGUtQIEhjQ3Pies7KDV6iRPUWrGC4krBMJ6loXq6Q8QxjYABg1R59/CXjaE+zhV1rrCe0bnegURm+zpLfmqeJz5HHA7qo25jgIhR6VfZztgEpgM8YqdT2iIoTMieVLJnG5na6WNMuC+c547WOroo0T7dpNfsSslN72NrXqKbjsQdOYjB/lUax/PHp9LcQ+eVhX+ypUUudRn0jcDM3ao+ojJx5J2djzv5HEjamPqs9rXmFd31Y9QEa8fMU9J8u480KgAB6CMG85c0do6QUPUFrEWvIGImLwdHNFk/rE0jo+fF+VFh8Tbs05gVamGfgYeb1oJPKkMFsRBHo7a+txahQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lxd7PbXuBa2CBiklUB8QMYyv9koAREe/ZrlBf4Z94fE=;
- b=xu5YfgLUDNgTopaSq10c+GX7OhjgxUtjcS7tcX453+T/famuKbadG7vBxhFPVrjQOrpbzZ4X5DbOS2YT+nUpWX4EUdykhgE+3Xm3fb2HmpG+t3pS0i7RkAo5h4NS6MUp0TU0cXxkax0pnjuwaZ8C9y7rUEV9PxMD/i9ZXR8QPRaNvK4xn4iJXsk/yMeH5F520kcGkF3Bulzt2BiMWEbwb9NDX2qqLMkOiEdq1uKR4z/YYxplnUJG8sXnAotDgOP7ITP5IuL1A6S3d826ruhcVblkSD1bUzW9wKDPDEiuMf/cUp5sMnmPSxci8HhXYqKu6D56wt//cOS8JFmPbR8zpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lxd7PbXuBa2CBiklUB8QMYyv9koAREe/ZrlBf4Z94fE=;
- b=Q2g3ndU3atsOT1nEVz66oYeIR73CDgeBQgfJo2QXfiFOI49WNU0FFdJyPZXB6iEJsn6gPE1+dqFjpVBT24pnOfotGmV/lU/enHm7kiRPdXEkGkDl8uJjByOO8s3u2Y018OBuxsb4TV5mJUTyd+ljIcNJbwiG97VxySsbVXhcO2Q=
-Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
- by PH0PR10MB5796.namprd10.prod.outlook.com (2603:10b6:510:da::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Fri, 15 Nov
- 2024 21:03:39 +0000
-Received: from CH3PR10MB7329.namprd10.prod.outlook.com
- ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
- ([fe80::f238:6143:104c:da23%3]) with mapi id 15.20.8158.017; Fri, 15 Nov 2024
- 21:03:39 +0000
-Message-ID: <386af93d-5a61-4a90-9af0-1f33fa04b0bd@oracle.com>
-Date: Fri, 15 Nov 2024 22:03:34 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] accel/kvm: Report the loss of a large memory page
-To: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
-        philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
-        imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
-        wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
-References: <e2ac7ad0-aa26-4af2-8bb3-825cba4ffca0@redhat.com>
- <20241107102126.2183152-1-william.roche@oracle.com>
- <20241107102126.2183152-4-william.roche@oracle.com>
- <f5b43126-acbd-4e3f-8ec4-3a5c20957445@redhat.com>
- <08e03987-3c9a-49b2-adf5-fd40e7ede0c0@oracle.com>
- <e5d6bae8-a3bd-4225-b38f-65de6b1a2b54@redhat.com>
-Content-Language: en-US, fr
-From: William Roche <william.roche@oracle.com>
-In-Reply-To: <e5d6bae8-a3bd-4225-b38f-65de6b1a2b54@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM8P190CA0006.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:219::11) To CH3PR10MB7329.namprd10.prod.outlook.com
- (2603:10b6:610:12c::16)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309381D5ADD;
+	Fri, 15 Nov 2024 21:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731705303; cv=none; b=ibBEVthDbxi8BjSaYaQY6CqaXs3FcF82R7+uPVLfwA/cpjC/nLhmIj3voAClT6LZ/u4QGhuFn5RrMT9qWBBPSzSflsj/skF6ud0k0b5RbD1EPNvFO6HmeIkxRcfFxmjW4ROfueHfeYOTxheF+vbFM6qIoIb8jPpoM62Ma+lH1oQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731705303; c=relaxed/simple;
+	bh=hmZyID0xTDejqUdHbnNnIfCcRfkvqbnrZ7rK8Oz9WJk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=br/Ais40koezOOPn+jEb7ln5YqKYcjbqGzAlwvtq/K2Cw129IUYX5G6YqfLeMcnGlvX2v+Vq78NbODNRgibP6uHBKcB+1sbdgUopq+/CbldGbfGZ/7ntRiUnvWjSTBwdz9pPVfxcWBIPs2vhLSlTFpWNWG+UTIMnP7Ik/YlqLFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Vx946PRA; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 6AE7820BEBD0;
+	Fri, 15 Nov 2024 13:14:53 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6AE7820BEBD0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731705294;
+	bh=IOtJqBKEB6hW5aqrE09EdKHehH+hQljR82pxvDiFOrU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Vx946PRAHZaunNzhrBN6r6Eunx0XJSwCvezU7p34uq8bmwkx0jTPCzMuPBGb2qBPT
+	 A8LE/xwEbQJ+NzGbNgrWZCTjrkQQVzzzg2vG5xZdBjRK88CM1qYOR49k0z4NdpInur
+	 6MRDszJnBx80i9qdoXbBprb9zFmFTUmTZOmbumlQ=
+Message-ID: <e832dd94-04f3-413a-a1a9-870849b4bc53@linux.microsoft.com>
+Date: Fri, 15 Nov 2024 13:14:52 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|PH0PR10MB5796:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78bb8d40-5531-403f-4172-08dd05b8fa46
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eFVnUFZ3dGE5WWlTQWZXLytWUkRjZlpJVGJacmY4d3VVKzFrOW9RSlc2U2c4?=
- =?utf-8?B?K084bkNlcWlCeFlRTytNMzdydEtoc2xsU00rTFM3eEl2TzNmVUZQQ1cvYjcy?=
- =?utf-8?B?MW1LcmpCL0ZjeXpwYzZ0bjRGN29uT3hCaWF2bFJKaC9QcDIyYU5lOTEvb3JH?=
- =?utf-8?B?ZVFQUURubFpMTHpDK29NSEQ0Z1dRM3NEL2FnWmZ5cXBuKzhtTWFuNXNMNTcw?=
- =?utf-8?B?Vm9SeEpwMFRsOVVldEw3dDRXeDdvV3o0ZWJKUVBtMWtEMldvV0Ewa0NFcjJ0?=
- =?utf-8?B?NUdpeGRXd3VDaUNLSDJMK3VGSU5XdXk5N0NrU0JYMzhEcUtaQnNUUkJRYm44?=
- =?utf-8?B?a3R0Q213MGFBL0U0OTRLdlNuU1VCR2lYYVdIK0dlTVFSOW0yR0g0UXRzOFox?=
- =?utf-8?B?SUtQcnV5VUhRUnNUbXIwbVBDb0tyeHQxYXpMdFM2cHExaVdUR1FUbHJGeVZV?=
- =?utf-8?B?N3VqWHpQUmN6OWlySlk3Wk9oYktZR0ZJRlRIeWhkaEFpbmwyWjFmeE1nK29Z?=
- =?utf-8?B?bGFhUUxaQ09qWkJHR1VoeWVhZzloUCtMbG9USEpLMTZaMFNOaTV1TnltaUhz?=
- =?utf-8?B?L2lQZ3ZKMHpxU2huMGFaUGdwZlhTcS9OaHpFZnZ6Nk5qTGFQY3cwN3ZMeEFS?=
- =?utf-8?B?MU9sMWtFNEdZclJtd3BEckUrQzJNclN5Tk1XTVlkK293bmczWEhoRWdWZFFo?=
- =?utf-8?B?M1NyZzZqLzVEUXFPWTlwVnhHeVdyN1dQeE5JZmRpaWsvSFZlVlorZ1YwSVhO?=
- =?utf-8?B?RnF6dE15UFE5L2Z5KzFtMVplNnBySjgyNktqaHJldzJTZW52RGlCY3ZaWDJz?=
- =?utf-8?B?UXIyRHQ2NGZNUzd1TmlsK3VLak9kU2hkb1lmd1FLRU5wR2Y2d3crZjNHcVMy?=
- =?utf-8?B?a3VWS25TQU1vOXJ6UHRSN2hHYk5KYUFzcGt5dXVSSXZTZ3pSaHN3RUV5QllW?=
- =?utf-8?B?NDVLamFoMjJtM3VMR2FwVnVUZWdNMGdXdHhLL2tLQ1BtYitFaTR6T2hWWW9H?=
- =?utf-8?B?OUU3UFlqb2UyZys1bzJmNVJYUG1TSEZtV1FwR1ovODlueEV1K09tQ2JIOTNq?=
- =?utf-8?B?Z3ZNc0wxcEpkbGNOTzZjNkJ3RXhpOXZJQU1lVi9CV3VoOW5aMlI5TlMrV21y?=
- =?utf-8?B?V0pCd0FtMmNJcHd6bGNCTllEODEva1ZYeUUyVTN2azhNcXVyZGhpdGZ5Qksx?=
- =?utf-8?B?SjBmUFpqVEhORVd2eURJMkw4WTZ3ZEk2bDhUQzNGSVZqQWZ1dW9tenVUOWFS?=
- =?utf-8?B?aUxpWDNLa0dEVFBwMTI1QVVFaDNLVWErQmFENmxrY2J5cFhZcGtkRk93Sjh0?=
- =?utf-8?B?YWNib1puOExHYzl2Z2tDQXI2T1hHdThpMWxsQmJPMGM4M3UyYW1aVkQzSUFo?=
- =?utf-8?B?T1VFMVlrSDV0N3ZLTVNDQlBRbDlrNnRkelBoV29EbzlCTFFXRDE1Sy9ET1N3?=
- =?utf-8?B?Z25Nd1E4OE5OMldXNEhJY3crNlo2THVvU1AyblhVbzRkSVIxTmRwbk9laE5K?=
- =?utf-8?B?STNlRjVuc1QrTDVsUHJ1Rmt1bUJrdld3ZHg2UU9FaVRkZEVWcmpMNjBFakZw?=
- =?utf-8?B?dWpyUDdWV05FTDludEE4S3pncHFiT2tDWDZKaFNLUnpYNEN5Qm0vaWlMNm5r?=
- =?utf-8?B?SzBZaEVKOElUb3R1ZllBMlBWUEVlcFEycTdURjZhZ1h3V2hmZVJjTjBDUkRW?=
- =?utf-8?Q?JN6mdLX5EjESy4OUrWYs?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NEpQTStBazI0S2dUeFhLM3hRWkZ2VllKeDlLcG1WY1VQTVc5dDhlOXBDckxD?=
- =?utf-8?B?em81SjlWQWR4NlpOdUZRMGZCOTM3RlFrd0ZaZVk0V0lGa1dZV3lTZzF5MWhv?=
- =?utf-8?B?SHg2K3djcnZhNWNWbGpqcmZwREpFT05jQ20vQ2t0WEcwczZqRVZkOUR1NVU3?=
- =?utf-8?B?R2gwMWxRWENNS0RCeXlMVHR4R0pWYXpyMW5OdWhHTVRzbi9sMUN3MmdxcUVT?=
- =?utf-8?B?VXRyMTQzSVJSeVE1Qjd4RkxvZksvaGoycXdBNHNKTmxSMkhVay9ZeGZSaVFw?=
- =?utf-8?B?TXdBYlVOaDlDWDFIUlNQYmNjRXJRcisrUU4wcFFpSS9kWFlqdkNMOUQ0VTBt?=
- =?utf-8?B?TWJQUGdBbVNnZ3pQVjE2eGRLU09JWE1mS3ZjMXdlZm5nemNmR3ZmZUc4TWJW?=
- =?utf-8?B?amZZR1Znak5SVVB1eGxtYWJWZ2cvVHd6elhwMXJSV3JOMSthWEZBSXhyVlk4?=
- =?utf-8?B?cFhtMzE4SzRtNUVtSE8vYXV3SENjRmMvYTIyN25Bb0ZuZkIrdTBkdlk4ekcz?=
- =?utf-8?B?a0xNTnk4YzdxVUtzbmoybVBBajlEdFc0Y0s4dFdjdURVVEh2WkpmUUhCb2ln?=
- =?utf-8?B?MldTNk5zRFlKMkk5ZUhGRHV2VFJuWFMvaExwZWpJL2JlMEdzR1kxTk5Jd0FK?=
- =?utf-8?B?Zy9PaTVtUXJQcmVnY0VLM3o5TVMvSXAxRGtpUzZHTXE0R2x6RXgxMTFCWFdI?=
- =?utf-8?B?Smowb0RYaDhkaElHYWJsdS8rdXJZNk9jaDdORVdhakpuMHg5b01vNS9PenNZ?=
- =?utf-8?B?MmlCaVYrOWlENG44eGhjZGdVRzhTRGsyc2RINURwMVVlQ0h1MGdRSmVwSUVN?=
- =?utf-8?B?ODEwSmEzYWtUeXRiUExSSDRYTlY4VENJRy83NHBiWVJ6NWUxemFxUjROU2dU?=
- =?utf-8?B?V0xzcmxtM3B4MXh6elBEZVo0UVZHWFIwV0E4U1REK3JNVWk5aisxNmV2dm1y?=
- =?utf-8?B?UlhZaUZ1NHFqREx5SGtVdGxnOFVXZHpJUEMyZFlSZjYxbmFCSFpqRDMwNDF4?=
- =?utf-8?B?L0hnQkVldFVRQ2x3TEJSdWtOS1lEV05xa2ljV3A4VjV5NzR6R0xBRnJxRlNu?=
- =?utf-8?B?M3ZwSXV1Yko0dTZSZUNOZHQvVytCTXRWaXJ2UzdBUmVTS0h1eGhpRlJCd2h6?=
- =?utf-8?B?OStYQnlnMFRZb0JrR0x6QS90bjZMRFBFb0VZRUhTVnZBdnVlS3NUK0xUU0VS?=
- =?utf-8?B?dlpHaC9kY1pjWUNxcVFpYzQreXNLVlJzR0xjV2Y3Z1R6Zk9aei9sQjBFV3dP?=
- =?utf-8?B?b1lpOGxlYmR0UDdNaUY3OXdHeXJ6QkpHeWcvSlpNbTFPUTNnWjJydWNmS2Ru?=
- =?utf-8?B?RXBtdUlVU2tReUhsbVZNelhmeGxIK05kWldRV2hyaUUyUThkaDk4WFVOM2VN?=
- =?utf-8?B?Qmh1TjdGanhNVTgwM0VEZmYrYUJsSCs3cW9ocmpMdzVhZWxxbDgwbXk4SG9u?=
- =?utf-8?B?dWJZbTZmUEgxMXdvd3owQWdSSDdVbHY0cVJKdmx2RGV6cWEzSDN6dWt0QTAw?=
- =?utf-8?B?azg0b1JTVjk5NUJieVZPeS9hU3RvNTl2bVpJYVVBVnI4Kzc2NXFVSlM4UHhC?=
- =?utf-8?B?SWJDaWNxWUNOaWdteTlRU1hvMkdvTmpkWnVzMGNCWnRvK0xUWnV5Sm16Q08x?=
- =?utf-8?B?cFYwSjltSHcydTJ2Qms2NW53MUROVlJ5N0pjVEh4eWlvZXdOZHNEMnRhSFFR?=
- =?utf-8?B?MUdqU3JXYVhBOVcvblNFNnA2VkhvVnMvNkxGdytsNkl1K3dnNkl5VXM1Vit4?=
- =?utf-8?B?VDNDQUpaRG90R1FGNWV5YjdWNjkrWk84NkFkRm5xTjVGWGdWcTV3YkZ4aVpH?=
- =?utf-8?B?ajFzYUlvM1U0c09CMjd5VWsvK2IzbmhCOHErVVdJZHZxNzJ5Z0F1Q0tVK3dF?=
- =?utf-8?B?dDJWSXFiYWthSTFzUlVUcHdlTHhET25OV2NvbVFLUS9KanlkdkxrTWFOL0Qw?=
- =?utf-8?B?cWVWY05JVE9LNjJGQ1REcERDQ0c1SzFhdXBXeDh4VlRrMHhLdmVLOXZuMjky?=
- =?utf-8?B?M09wZys5MFF6NE1qeGVVVGMzTnd5eVV2elZjempHZEp1eStHL3hEL05JM2Nm?=
- =?utf-8?B?b0l6OFFKRTZzY21zYlNrSC96TWxvNHhSSEtJSVNBTUZiTzBMNlhmQnNUUTJH?=
- =?utf-8?B?VXlJZkk1RElBU2k2SUwvMnR1NzJnS1BjSkV5TUZObm80NFBJdXJnaUtiMmxQ?=
- =?utf-8?B?UWc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MVHn8kOcKkvvlYmSQ2tvAU/BnoIGdZRtFQ3gefpoEsfLZupOvlTMqLLLUf2qMeUFGp/OdE0HM/L6gMtVlYeEhYfDf0ZPWbMCdeSW5jDmxTDUjluTMmINq5Bf2FUq3I0Xcm70uDN0YzN20ola3KlyddVyaVCg+jBv4tlfz+qZxk/x36j2jAZeNE6G3OzqSzjo/dnxcfY0+H2vWjJMcPWCOWNL9I8YdtcszuEI/jft/jsXj+78zBO0qysIHdH6e4KYWSWbpHv+xOMv4ArsC+nJ8RROiE/zDYaneiTKFpnocqmpn+QH8jdQ4+WPzS/vaQhBaqJMOjZG3E7W0SFzK/KdrcChPHqFcIZ+RsvphQP4XIxCHV00JlnmT3HQi2TpYGK7iFzhtGlZVH7GWSnZeos3X88+ZfDRjdJUL2JDCCdZ24bA6Oc19zd1LgC/xwWFDLDtm3h3/xwR5qRM2DaRG3CpYBM13PnogP9qcFBqApUHdvQaj20z6/LvFWI9Isv3fIsVgkRkKLvYF75MlWaDkzkG4gQjxJwtj6AqsJ4o1vw5MhmKbp5rUqPfCDRNdxqnBbeYR1/qrsQNeaCdrekNOe/NandWN4+jsXN7JpV2XutLAl8=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78bb8d40-5531-403f-4172-08dd05b8fa46
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 21:03:39.0368
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wrMrHBlFbkMtunv6U9l/1mONBuppWibZThTAUPAu8tj7WkULVAwABPi1Uy8vejuunVM20T0nITITt5QBoEDKblhQPYRl5cskJ16nnTQIgMg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5796
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-15_08,2024-11-14_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2411150177
-X-Proofpoint-ORIG-GUID: dOPcH0dCQciLHuyALVrUWOC263LgTYFy
-X-Proofpoint-GUID: dOPcH0dCQciLHuyALVrUWOC263LgTYFy
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/4] hyperv: Switch from hyperv-tlfs.h to
+ hyperv/hvhdk.h
+To: Michael Kelley <mhklinux@outlook.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
+ "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
+ <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
+ "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
+ "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
+ "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "apais@linux.microsoft.com" <apais@linux.microsoft.com>
+References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
+ <BN7PR02MB4148513F8ABA50392E11C616D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <BN7PR02MB4148513F8ABA50392E11C616D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for the feedback on the patches, I'll send a new version in the 
-coming week.
-
-But I just wanted to answer now the questions you asked on this specific 
-one as they are related to the importance of fixing the large page 
-failures handling.
-
-On 11/12/24 23:22, David Hildenbrand wrote:
-> On 12.11.24 19:17, William Roche wrote:
->> On 11/12/24 12:13, David Hildenbrand wrote:
->>> On 07.11.24 11:21, “William Roche wrote:
->>>> From: William Roche <william.roche@oracle.com>
->>>>
->>>> When an entire large page is impacted by an error (hugetlbfs case),
->>>> report better the size and location of this large memory hole, so
->>>> give a warning message when this page is first hit:
->>>> Memory error: Loosing a large page (size: X) at QEMU addr Y and GUEST
->>>> addr Z
->>>>
->>>
->>> Hm, I wonder if we really want to special-case hugetlb here.
->>>
->>> Why not make the warning independent of the underlying page size?
+On 11/10/2024 8:13 PM, Michael Kelley wrote:
+> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday, November 7, 2024 2:32 PM
 >>
->> We already have a warning provided by Qemu (in 
->> kvm_arch_on_sigbus_vcpu()):
+>> Switch to using hvhdk.h everywhere in the kernel. This header includes
+>> all the new Hyper-V headers in include/hyperv, which form a superset of
+>> the definitions found in hyperv-tlfs.h.
 >>
->> Guest MCE Memory Error at QEMU addr Y and GUEST addr Z of type
->> BUS_MCEERR_AR/_AO injected
+>> This makes it easier to add new Hyper-V interfaces without being
+>> restricted to those in the TLFS doc (reflected in hyperv-tlfs.h).
 >>
->> The one I suggest is an additional message provided before the above
->> message.
+>> To be more consistent with the original Hyper-V code, the names of some
+>> definitions are changed slightly. Update those where needed.
 >>
->> Here is an example:
->> qemu-system-x86_64: warning: Memory error: Loosing a large page (size:
->> 2097152) at QEMU addr 0x7fdd7d400000 and GUEST addr 0x11600000
->> qemu-system-x86_64: warning: Guest MCE Memory Error at QEMU addr
->> 0x7fdd7d400000 and GUEST addr 0x11600000 of type BUS_MCEERR_AO injected
+>> hyperv-tlfs.h is no longer included anywhere - hvhdk.h can serve
+>> the same role, but with an easier path for adding new definitions.
+> 
+> Is hyperv-tlfs.h and friends being deleted? If not, the risk is that
+> someone adds a new #include of it without realizing that it has been
+> superseded by hvhdk.h.
+> 
+
+I was hesitant to delete it because I thought someone may still have
+a use for a header file that (mostly) reflects the TLFS document and
+nothing more.
+
+But in practical terms, this patchset makes it much more difficult to
+use because all the helper code (i.e. mshyperv.h) now uses hvhdk.h.
+So, maybe there is no point keeping it.
+
+> Note also that this patch does not apply cleanly to 6.12 rc's, or to
+> current linux-next trees. There's an unrelated #include added to
+> arch/x86/include/asm/kvm_host.h that causes a merge failure
+> in that file.
+> 
+
+I've been developing this series based on hyperv-next. Should I be
+basing it on linux-next?
+
+> Michael
+> 
 >>
-> 
-> Hm, I think we should definitely be including the size in the existing 
-> one. That code was written without huge pages in mind.
-
-Yes we can do that, and get the page size at this level to pass as a 
-'page_sise' argument to kvm_hwpoison_page_add().
-
-It would make the message longer as we will have the extra information 
-about the large page on all messages when an error impacts a large page.
-We could change the messages only when we are dealing with a large page, 
-so that the standard (4k) case isn't modified.
-
-
-> 
-> We should similarly warn in the arm implementation (where I don't see a 
-> similar message yet).
-
-Ok, I'll also add a message for the ARM platform.
-
+>> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+>> ---
+>>  arch/arm64/hyperv/hv_core.c        |  2 +-
+>>  arch/arm64/hyperv/mshyperv.c       |  4 ++--
+>>  arch/arm64/include/asm/mshyperv.h  |  2 +-
+>>  arch/x86/hyperv/hv_init.c          | 20 ++++++++++----------
+>>  arch/x86/hyperv/hv_proc.c          |  2 +-
+>>  arch/x86/hyperv/nested.c           |  2 +-
+>>  arch/x86/include/asm/kvm_host.h    |  2 +-
+>>  arch/x86/include/asm/mshyperv.h    |  2 +-
+>>  arch/x86/include/asm/svm.h         |  2 +-
+>>  arch/x86/kernel/cpu/mshyperv.c     |  2 +-
+>>  arch/x86/kvm/vmx/hyperv_evmcs.h    |  2 +-
+>>  arch/x86/kvm/vmx/vmx_onhyperv.h    |  2 +-
+>>  drivers/clocksource/hyperv_timer.c |  2 +-
+>>  drivers/hv/hv_balloon.c            |  4 ++--
+>>  drivers/hv/hv_common.c             |  2 +-
+>>  drivers/hv/hv_kvp.c                |  2 +-
+>>  drivers/hv/hv_snapshot.c           |  2 +-
+>>  drivers/hv/hyperv_vmbus.h          |  2 +-
+>>  include/asm-generic/mshyperv.h     |  2 +-
+>>  include/clocksource/hyperv_timer.h |  2 +-
+>>  include/linux/hyperv.h             |  2 +-
+>>  net/vmw_vsock/hyperv_transport.c   |  2 +-
+>>  22 files changed, 33 insertions(+), 33 deletions(-)
 >>
->> According to me, this large page case additional message will help to
->> better understand the probable sudden proliferation of memory errors
->> that can be reported by Qemu on the impacted range.
->> Not only will the machine administrator identify better that a single
->> memory error had this large impact, it can also help us to better
->> measure the impact of fixing the large page memory error support in the
->> field (in the future).
-> 
-> What about extending the existing one to something like
-> 
-> warning: Guest MCE Memory Error at QEMU addr $ADDR and GUEST $PADDR of 
-> type BUS_MCEERR_AO and size $SIZE (large page) injected
-> 
-> 
-> With the "large page" hint you can highlight that this is special.
-
-Right, we can do it that way. It also gives the impression that we 
-somehow inject errors on a large range of the memory. Which is not the 
-case. I'll send a proposal with a different formulation, so that you can 
-choose.
-
-
-
-> On a related note ...I think we have a problem. Assume we got a SIGBUS 
-> on a huge page (e.g., somewhere in a 1 GiB page).
-> 
-> We will call kvm_mce_inject(cpu, paddr, code) / 
-> acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)
-> 
-> But where is the size information? :// Won't the VM simply assume that 
-> there was a MCE on a single 4k page starting at paddr?
-
-This is absolutely right !
-It's exactly what happens: The VM kernel received the information and 
-considers that only the impacted page has to be poisoned.
-
-That's also the reason why Qemu repeats the error injections every time 
-the poisoned large page is accessed (for all other touched 4k pages 
-located on this "memory hole").
-
-> 
-> I'm not sure if we can inject ranges, or if we would have to issue one 
-> MCE per page ... hm, what's your take on this?
-
-I don't know of any size information about a memory error reported by 
-the hardware. The kernel doesn't seem to expect any such information.
-It explains why there is no impact/blast size information provided when 
-an error is relayed to the VM.
-
-We could take the "memory hole" size into account in Qemu, but repeating 
-error injections is not going to help a lot either: We'd need to give 
-the VM some time to deal with an error injection before producing a new 
-error for the next page etc... in the case (x86 only) where an 
-asynchronous error is relayed with BUS_MCEERR_AO, we would also have to 
-repeat the error for all the 4k pages located on the lost large page too.
-
-We can see that the Linux kernel has some mechanisms to deal with a 
-seldom 4k page loss, but a larger blast is very likely to crash the VM 
-(which is fine). And as a significant part of the memory is no longer 
-accessible, dealing with the error itself can be impaired and we 
-increase the risk of loosing data, even though most of the memory on the 
-large page could still be used.
-
-Now if we can recover the 'still valid' memory of the impacted large 
-page, we can significantly reduce this blast and give a much better 
-chance to the VM to survive the incident or crash more gracefully.
-
-I've looked at the project you indicated me, which is not ready to be 
-adopted:
-https://lore.kernel.org/linux-mm/20240924043924.3562257-2-jiaqiyan@google.com/T/
-
-But we see that, this large page enhancement is needed, sometimes just 
-to give a chance to the VM to survive a little longer before being 
-terminated or moved.
-Injecting multiple MCEs or ACPI error records doesn't help, according to me.
-
-William.
+>> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
+>> index 7a746a5a6b42..69004f619c57 100644
+>> --- a/arch/arm64/hyperv/hv_core.c
+>> +++ b/arch/arm64/hyperv/hv_core.c
+>> @@ -14,7 +14,7 @@
+>>  #include <linux/arm-smccc.h>
+>>  #include <linux/module.h>
+>>  #include <asm-generic/bug.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>
+>>  /*
+>> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
+>> index b1a4de4eee29..fc49949b7df6 100644
+>> --- a/arch/arm64/hyperv/mshyperv.c
+>> +++ b/arch/arm64/hyperv/mshyperv.c
+>> @@ -49,12 +49,12 @@ static int __init hyperv_init(void)
+>>  	hv_set_vpreg(HV_REGISTER_GUEST_OS_ID, guest_id);
+>>
+>>  	/* Get the features and hints from Hyper-V */
+>> -	hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
+>> +	hv_get_vpreg_128(HV_REGISTER_PRIVILEGES_AND_FEATURES_INFO, &result);
+>>  	ms_hyperv.features = result.as32.a;
+>>  	ms_hyperv.priv_high = result.as32.b;
+>>  	ms_hyperv.misc_features = result.as32.c;
+>>
+>> -	hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
+>> +	hv_get_vpreg_128(HV_REGISTER_FEATURES_INFO, &result);
+>>  	ms_hyperv.hints = result.as32.a;
+>>
+>>  	pr_info("Hyper-V: privilege flags low 0x%x, high 0x%x, hints 0x%x, misc
+>> 0x%x\n",
+>> diff --git a/arch/arm64/include/asm/mshyperv.h
+>> b/arch/arm64/include/asm/mshyperv.h
+>> index a975e1a689dd..7595fb35fae6 100644
+>> --- a/arch/arm64/include/asm/mshyperv.h
+>> +++ b/arch/arm64/include/asm/mshyperv.h
+>> @@ -20,7 +20,7 @@
+>>
+>>  #include <linux/types.h>
+>>  #include <linux/arm-smccc.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  /*
+>>   * Declare calls to get and set Hyper-V VP register values on ARM64, which
+>> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+>> index 1a6354b3e582..3f9aef157c88 100644
+>> --- a/arch/x86/hyperv/hv_init.c
+>> +++ b/arch/x86/hyperv/hv_init.c
+>> @@ -19,7 +19,7 @@
+>>  #include <asm/sev.h>
+>>  #include <asm/ibt.h>
+>>  #include <asm/hypervisor.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>  #include <asm/idtentry.h>
+>>  #include <asm/set_memory.h>
+>> @@ -416,24 +416,24 @@ static void __init hv_get_partition_id(void)
+>>  static u8 __init get_vtl(void)
+>>  {
+>>  	u64 control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_REGISTERS;
+>> -	struct hv_get_vp_registers_input *input;
+>> -	struct hv_get_vp_registers_output *output;
+>> +	struct hv_input_get_vp_registers *input;
+>> +	struct hv_register_assoc *output;
+>>  	unsigned long flags;
+>>  	u64 ret;
+>>
+>>  	local_irq_save(flags);
+>>  	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
+>> -	output = (struct hv_get_vp_registers_output *)input;
+>> +	output = (struct hv_register_assoc *)input;
+>>
+>> -	memset(input, 0, struct_size(input, element, 1));
+>> -	input->header.partitionid = HV_PARTITION_ID_SELF;
+>> -	input->header.vpindex = HV_VP_INDEX_SELF;
+>> -	input->header.inputvtl = 0;
+>> -	input->element[0].name0 = HV_X64_REGISTER_VSM_VP_STATUS;
+>> +	memset(input, 0, struct_size(input, names, 1));
+>> +	input->partition_id = HV_PARTITION_ID_SELF;
+>> +	input->vp_index = HV_VP_INDEX_SELF;
+>> +	input->input_vtl.as_uint8 = 0;
+>> +	input->names[0] = HV_X64_REGISTER_VSM_VP_STATUS;
+>>
+>>  	ret = hv_do_hypercall(control, input, output);
+>>  	if (hv_result_success(ret)) {
+>> -		ret = output->as64.low & HV_X64_VTL_MASK;
+>> +		ret = output->value.reg8 & HV_X64_VTL_MASK;
+>>  	} else {
+>>  		pr_err("Failed to get VTL(error: %lld) exiting...\n", ret);
+>>  		BUG();
+>> diff --git a/arch/x86/hyperv/hv_proc.c b/arch/x86/hyperv/hv_proc.c
+>> index b74c06c04ff1..ac4c834d4435 100644
+>> --- a/arch/x86/hyperv/hv_proc.c
+>> +++ b/arch/x86/hyperv/hv_proc.c
+>> @@ -176,7 +176,7 @@ int hv_call_create_vp(int node, u64 partition_id, u32 vp_index,
+>> u32 flags)
+>>  		input->partition_id = partition_id;
+>>  		input->vp_index = vp_index;
+>>  		input->flags = flags;
+>> -		input->subnode_type = HvSubnodeAny;
+>> +		input->subnode_type = HV_SUBNODE_ANY;
+>>  		input->proximity_domain_info = hv_numa_node_to_pxm_info(node);
+>>  		status = hv_do_hypercall(HVCALL_CREATE_VP, input, NULL);
+>>  		local_irq_restore(irq_flags);
+>> diff --git a/arch/x86/hyperv/nested.c b/arch/x86/hyperv/nested.c
+>> index 9dc259fa322e..1083dc8646f9 100644
+>> --- a/arch/x86/hyperv/nested.c
+>> +++ b/arch/x86/hyperv/nested.c
+>> @@ -11,7 +11,7 @@
+>>
+>>
+>>  #include <linux/types.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>  #include <asm/tlbflush.h>
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 3627eab994a3..38cd609f37c7 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -34,7 +34,7 @@
+>>  #include <asm/asm.h>
+>>  #include <asm/kvm_page_track.h>
+>>  #include <asm/kvm_vcpu_regs.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>>
+>> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+>> index 47ca48062547..f0564e599b7f 100644
+>> --- a/arch/x86/include/asm/mshyperv.h
+>> +++ b/arch/x86/include/asm/mshyperv.h
+>> @@ -6,9 +6,9 @@
+>>  #include <linux/nmi.h>
+>>  #include <linux/msi.h>
+>>  #include <linux/io.h>
+>> -#include <asm/hyperv-tlfs.h>
+>>  #include <asm/nospec-branch.h>
+>>  #include <asm/paravirt.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  /*
+>>   * Hyper-V always provides a single IO-APIC at this MMIO address.
+>> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+>> index f0dea3750ca9..913af68ad660 100644
+>> --- a/arch/x86/include/asm/svm.h
+>> +++ b/arch/x86/include/asm/svm.h
+>> @@ -5,7 +5,7 @@
+>>  #include <uapi/asm/svm.h>
+>>  #include <uapi/asm/kvm.h>
+>>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  /*
+>>   * 32-bit intercept words in the VMCB Control Area, starting
+>> diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
+>> index e0fd57a8ba84..be0d1f4491d9 100644
+>> --- a/arch/x86/kernel/cpu/mshyperv.c
+>> +++ b/arch/x86/kernel/cpu/mshyperv.c
+>> @@ -20,7 +20,7 @@
+>>  #include <linux/random.h>
+>>  #include <asm/processor.h>
+>>  #include <asm/hypervisor.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>  #include <asm/desc.h>
+>>  #include <asm/idtentry.h>
+>> diff --git a/arch/x86/kvm/vmx/hyperv_evmcs.h b/arch/x86/kvm/vmx/hyperv_evmcs.h
+>> index a543fccfc574..6536290f4274 100644
+>> --- a/arch/x86/kvm/vmx/hyperv_evmcs.h
+>> +++ b/arch/x86/kvm/vmx/hyperv_evmcs.h
+>> @@ -6,7 +6,7 @@
+>>  #ifndef __KVM_X86_VMX_HYPERV_EVMCS_H
+>>  #define __KVM_X86_VMX_HYPERV_EVMCS_H
+>>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #include "capabilities.h"
+>>  #include "vmcs12.h"
+>> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> index eb48153bfd73..2b94ff301712 100644
+>> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> @@ -3,7 +3,7 @@
+>>  #ifndef __ARCH_X86_KVM_VMX_ONHYPERV_H__
+>>  #define __ARCH_X86_KVM_VMX_ONHYPERV_H__
+>>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>
+>>  #include <linux/jump_label.h>
+>> diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
+>> index b2a080647e41..c1cc96a168c7 100644
+>> --- a/drivers/clocksource/hyperv_timer.c
+>> +++ b/drivers/clocksource/hyperv_timer.c
+>> @@ -23,7 +23,7 @@
+>>  #include <linux/acpi.h>
+>>  #include <linux/hyperv.h>
+>>  #include <clocksource/hyperv_timer.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>
+>>  static struct clock_event_device __percpu *hv_clock_event;
+>> diff --git a/drivers/hv/hv_balloon.c b/drivers/hv/hv_balloon.c
+>> index c38dcdfcb914..d792df113962 100644
+>> --- a/drivers/hv/hv_balloon.c
+>> +++ b/drivers/hv/hv_balloon.c
+>> @@ -28,7 +28,7 @@
+>>  #include <linux/sizes.h>
+>>
+>>  #include <linux/hyperv.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #include <asm/mshyperv.h>
+>>
+>> @@ -1585,7 +1585,7 @@ static int hv_free_page_report(struct
+>> page_reporting_dev_info *pr_dev_info,
+>>  		return -ENOSPC;
+>>  	}
+>>
+>> -	hint->type = HV_EXT_MEMORY_HEAT_HINT_TYPE_COLD_DISCARD;
+>> +	hint->heat_type = HV_EXTMEM_HEAT_HINT_COLD_DISCARD;
+>>  	hint->reserved = 0;
+>>  	for_each_sg(sgl, sg, nents, i) {
+>>  		union hv_gpa_page_range *range;
+>> diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+>> index 9c452bfbd571..9ea05cbbf50d 100644
+>> --- a/drivers/hv/hv_common.c
+>> +++ b/drivers/hv/hv_common.c
+>> @@ -28,7 +28,7 @@
+>>  #include <linux/slab.h>
+>>  #include <linux/dma-map-ops.h>
+>>  #include <linux/set_memory.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>  #include <asm/mshyperv.h>
+>>
+>>  /*
+>> diff --git a/drivers/hv/hv_kvp.c b/drivers/hv/hv_kvp.c
+>> index d35b60c06114..bfb7a518b4ed 100644
+>> --- a/drivers/hv/hv_kvp.c
+>> +++ b/drivers/hv/hv_kvp.c
+>> @@ -27,7 +27,7 @@
+>>  #include <linux/connector.h>
+>>  #include <linux/workqueue.h>
+>>  #include <linux/hyperv.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #include "hyperv_vmbus.h"
+>>  #include "hv_utils_transport.h"
+>> diff --git a/drivers/hv/hv_snapshot.c b/drivers/hv/hv_snapshot.c
+>> index 0d2184be1691..097ebd58f14e 100644
+>> --- a/drivers/hv/hv_snapshot.c
+>> +++ b/drivers/hv/hv_snapshot.c
+>> @@ -12,7 +12,7 @@
+>>  #include <linux/connector.h>
+>>  #include <linux/workqueue.h>
+>>  #include <linux/hyperv.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #include "hyperv_vmbus.h"
+>>  #include "hv_utils_transport.h"
+>> diff --git a/drivers/hv/hyperv_vmbus.h b/drivers/hv/hyperv_vmbus.h
+>> index 76ac5185a01a..2bea654858e3 100644
+>> --- a/drivers/hv/hyperv_vmbus.h
+>> +++ b/drivers/hv/hyperv_vmbus.h
+>> @@ -15,10 +15,10 @@
+>>  #include <linux/list.h>
+>>  #include <linux/bitops.h>
+>>  #include <asm/sync_bitops.h>
+>> -#include <asm/hyperv-tlfs.h>
+>>  #include <linux/atomic.h>
+>>  #include <linux/hyperv.h>
+>>  #include <linux/interrupt.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #include "hv_trace.h"
+>>
+>> diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
+>> index 8fe7aaab2599..138e416a0f9c 100644
+>> --- a/include/asm-generic/mshyperv.h
+>> +++ b/include/asm-generic/mshyperv.h
+>> @@ -25,7 +25,7 @@
+>>  #include <linux/cpumask.h>
+>>  #include <linux/nmi.h>
+>>  #include <asm/ptrace.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #define VTPM_BASE_ADDRESS 0xfed40000
+>>
+>> diff --git a/include/clocksource/hyperv_timer.h b/include/clocksource/hyperv_timer.h
+>> index 6cdc873ac907..a4c81a60f53d 100644
+>> --- a/include/clocksource/hyperv_timer.h
+>> +++ b/include/clocksource/hyperv_timer.h
+>> @@ -15,7 +15,7 @@
+>>
+>>  #include <linux/clocksource.h>
+>>  #include <linux/math64.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #define HV_MAX_MAX_DELTA_TICKS 0xffffffff
+>>  #define HV_MIN_DELTA_TICKS 1
+>> diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
+>> index d0893ec488ae..ed65b20defea 100644
+>> --- a/include/linux/hyperv.h
+>> +++ b/include/linux/hyperv.h
+>> @@ -24,7 +24,7 @@
+>>  #include <linux/mod_devicetable.h>
+>>  #include <linux/interrupt.h>
+>>  #include <linux/reciprocal_div.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  #define MAX_PAGE_BUFFER_COUNT				32
+>>  #define MAX_MULTIPAGE_BUFFER_COUNT			32 /* 128K */
+>> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>> index e2157e387217..152b6ed8877d 100644
+>> --- a/net/vmw_vsock/hyperv_transport.c
+>> +++ b/net/vmw_vsock/hyperv_transport.c
+>> @@ -13,7 +13,7 @@
+>>  #include <linux/hyperv.h>
+>>  #include <net/sock.h>
+>>  #include <net/af_vsock.h>
+>> -#include <asm/hyperv-tlfs.h>
+>> +#include <hyperv/hvhdk.h>
+>>
+>>  /* Older (VMBUS version 'VERSION_WIN10' or before) Windows hosts have some
+>>   * stricter requirements on the hv_sock ring buffer size of six 4K pages.
+>> --
+>> 2.34.1
 
 
