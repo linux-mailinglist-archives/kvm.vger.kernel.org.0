@@ -1,52 +1,88 @@
-Return-Path: <kvm+bounces-31926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87EF89CDBE8
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:54:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DDD689CDBD3
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 10:49:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349091F229BE
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:54:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 631881F2361F
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2024 09:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7520A1AF0D7;
-	Fri, 15 Nov 2024 09:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2DC190068;
+	Fri, 15 Nov 2024 09:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GboblNsl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mediconcil.de (mail.mediconcil.de [91.107.198.72])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EF91AC428
-	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 09:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.107.198.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3812F18C039
+	for <kvm@vger.kernel.org>; Fri, 15 Nov 2024 09:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731664393; cv=none; b=CPE+rCZV4JyBXnvezWDeIgalp5Z+2a40hkb/FrIm41LWukNt1sRwxvUCrqsEjmrRh2A9VTCa7YPPUN43GCq3zc5jnKOoOTBeXybonqc8ZP6pCAymqWb6P4mW3yhiIWdBwUkIYDgnFyWh+Zmicv/PI+p/j4SY+6k8F9KVYJd3MkU=
+	t=1731664149; cv=none; b=HckitD1mCIXbrQxNPg2Rwr1PkLYEJyCnbLNdhLFysCenVaMUaKJDc2IvWhnfJv83HuGjlHeETEDOL+2JRS61IPUZ7Yt7URReg9WGsncBaieoUdhXfKJpzUxS8HLXdw7SOL1/fNxlQwWcZYHLOtEgLnJUfyRZMmcoWHPs5i++dkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731664393; c=relaxed/simple;
-	bh=xoBXg6UDKS4/KB1/cETrK/4sAKvKPuYKl2oyR/CE+ZM=;
+	s=arc-20240116; t=1731664149; c=relaxed/simple;
+	bh=5JV+Q8/uDzvNYDwkc+mCN1HUPeABFq9Hs2oXi52V+FA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bc6dyFUZNegLusaEDqZQYoEVukq3018eMut2iMOX9PpCnBiTWLKUdSwveMJQUg/zdtEcHZfZk29TJ7ksLRwVy/GeIVrWBHkQNE+cgiTX7LzU1/zNwjJK818yG3cOPIhuazkgENolySPVYgxUW2IqtpT7afrRiD4yjtdGAId8Lfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io; spf=none smtp.mailfrom=mias.mediconcil.de; arc=none smtp.client-ip=91.107.198.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mias.mediconcil.de
-Received: from bernie by mediconcil.de with local (Exim 4.96)
-	(envelope-from <bernie@mias.mediconcil.de>)
-	id 1tBsN0-00COIx-1P;
-	Fri, 15 Nov 2024 10:12:02 +0100
-Date: Fri, 15 Nov 2024 10:12:02 +0100
-From: Bernhard Kauer <bk@alpico.io>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Alexander Graf <graf@amazon.de>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: drop the kvm_has_noapic_vcpu optimization
-Message-ID: <ZzcQYoExgpAzItdp@mias.mediconcil.de>
-References: <20241018100919.33814-1-bk@alpico.io>
- <Zxfhy9uifey4wShq@google.com>
- <Zxf4FeRtA3xzdZG3@mias.mediconcil.de>
- <ZyOvPYHrpgPbxUtX@google.com>
- <ZyPjwW55n0JHg0pu@mias.mediconcil.de>
- <ZyQS8AhrBFS6nZuq@google.com>
- <ZySXgqcYKoHJ3jcf@mias.mediconcil.de>
- <ZyTqZk88JbE3EcTk@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TOoDize/gCWlG1qKUzE2oGHaNYS1o5pbZXz1ov6wOMhRUiO7h2Dya1JF2u9B5B8qZ2toU6bodo0bMaOAVMgJf5AbbvD6QWi63u1tckUf3NinYjKlbsOS74B0usgCBKqEUDet5UXWMuGZ25rLy5yv3rMtVZ18PDASGt28G6R2G0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GboblNsl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731664147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e5/Gv1K21sheGKIrlLPLsT5HVFSu0SIwMyx7mgZQnuI=;
+	b=GboblNslEO9AJtSq4jN//JCSaiCO6lHIOmgGANpzVQz13xa+fL8NuTeEzFPjQ5xeakAmEi
+	vfLm7yhCgQ9mTznl+JOFc19QpjGLwsG0XUpY8ozW1ZVlupk1F0Y2pMLqYTpWFNWw06JaCl
+	ppiqsS6vL5JkKNQGVuLIU+ANGi0FA9E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-348-YdO3XG1bNzqs4Bb4j1wJcg-1; Fri,
+ 15 Nov 2024 04:49:02 -0500
+X-MC-Unique: YdO3XG1bNzqs4Bb4j1wJcg-1
+X-Mimecast-MFC-AGG-ID: YdO3XG1bNzqs4Bb4j1wJcg
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE9CB1955E92;
+	Fri, 15 Nov 2024 09:48:59 +0000 (UTC)
+Received: from localhost (unknown [10.72.113.10])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3935D3003B71;
+	Fri, 15 Nov 2024 09:48:58 +0000 (UTC)
+Date: Fri, 15 Nov 2024 17:48:53 +0800
+From: Baoquan He <bhe@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v1 00/11] fs/proc/vmcore: kdump support for virtio-mem on
+ s390
+Message-ID: <ZzcZBU0USDP/CHcv@MiWiFi-R3L-srv>
+References: <20241025151134.1275575-1-david@redhat.com>
+ <ZzcKY8hap3OMqTjC@MiWiFi-R3L-srv>
+ <d7353fde-f560-4925-8ef8-0fe10654e87f@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,40 +91,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZyTqZk88JbE3EcTk@google.com>
+In-Reply-To: <d7353fde-f560-4925-8ef8-0fe10654e87f@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Nov 01, 2024 at 07:49:10AM -0700, Sean Christopherson wrote:
-> On Fri, Nov 01, 2024, Bernhard Kauer wrote:
-> > On Thu, Oct 31, 2024 at 04:29:52PM -0700, Sean Christopherson wrote:
-> > > With a userspace APIC, the roundtrip to userspace to emulate the EOI is measured
-> > > in tens of thousands of cycles.  IIRC, last I played around with userspace exits
-> > > the average turnaround time was ~50k cycles.
-> > 
-> > 
-> > That sound a lot so I did some quick benchmarking.  An exit is around 1400
-> > TSC cycles on my AMD laptop, instruction emulation takes 1200 and going
-> > to user-level needs at least 6200.  Not terribly slow but still room for
-> > optimizations.
+On 11/15/24 at 09:55am, David Hildenbrand wrote:
+> On 15.11.24 09:46, Baoquan He wrote:
+> > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+> > > This is based on "[PATCH v3 0/7] virtio-mem: s390 support" [1], which adds
+> > > virtio-mem support on s390.
+> > > 
+> > > The only "different than everything else" thing about virtio-mem on s390
+> > > is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
+> > > during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
+> > > crash kernel must detect memory ranges of the crashed/panicked kernel to
+> > > include via PT_LOAD in the vmcore.
+> > > 
+> > > On other architectures, all RAM regions (boot + hotplugged) can easily be
+> > > observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
+> > > the elfcore hdr.
+> > > 
+> > > On s390, information about "ordinary" memory (heh, "storage") can be
+> > > obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
+> > > that information is stored early during boot in the "physmem" memblock
+> > > data structure.
+> > > 
+> > > But virtio-mem memory is always detected by as device driver, which is
+> > > usually build as a module. So in the crash kernel, this memory can only be
+> >                                         ~~~~~~~~~~~
+> >                                         Is it 1st kernel or 2nd kernel?
+> > Usually we call the 1st kernel as panicked kernel, crashed kernel, the
+> > 2nd kernel as kdump kernel.
 > 
-> Ah, I suspect my recollection of ~50k cycles is from measuring all exits to
-> userspace, i.e. included the reaaaaly slow paths.
+> It should have been called "kdump (2nd) kernel" here indeed.
+> 
+> > > properly detected once the virtio-mem driver started up.
+> > > 
+> > > The virtio-mem driver already supports the "kdump mode", where it won't
+> > > hotplug any memory but instead queries the device to implement the
+> > > pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
+> > > the vmcore.
+> > > 
+> > > With this series, if the virtio-mem driver is included in the kdump
+> > > initrd -- which dracut already takes care of under Fedora/RHEL -- it will
+> > > now detect the device RAM ranges on s390 once it probes the devices, to add
+> > > them to the vmcore using the same callback mechanism we already have for
+> > > pfn_is_ram().
+> > 
+> > Do you mean on s390 virtio-mem memory region will be detected and added
+> > to vmcore in kdump kernel when virtio-mem driver is initialized? Not
+> > sure if I understand it correctly.
+> 
+> Yes exactly. In the kdump kernel, the driver gets probed and registers the
+> vmcore callbacks. From there, we detect and add the device regions.
 
-I finally found the reason for the slow user-level roundtrip on my Zen3+
-machine.
-
-Disabling SRSO with spec_rstack_overflow=off improves the user-level part
-by 3x.  The exit as well as the instruction emulation overhead is down by 40%.
-
-Thus without SRSO a roundtrip to user-level needs roughly 2000 cycles.
-
-
-                        SRSO=off        default         factor
-INSTR   CPUID           1008            1394            1.4x
-        RDMSR           1072            1550            1.4x
-MMIO    APIC            1666            2609            1.6x
-        IOAPIC          1783            2800            1.6x
-        HPET            3626            9426            2.6x
-PIO     PIC             1250            1804            1.4x
-        UART            2837            8011            2.8x
+I see now, thanks for your confirmation.
 
 
