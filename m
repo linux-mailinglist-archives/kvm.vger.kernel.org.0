@@ -1,90 +1,98 @@
-Return-Path: <kvm+bounces-31988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20E29CFEB8
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 13:03:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C19EB9CFEBA
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 13:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78C1B288250
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 12:03:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771391F239CD
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 12:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A74192B85;
-	Sat, 16 Nov 2024 12:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2477192B85;
+	Sat, 16 Nov 2024 12:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="CVJsLSh7"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="d6aaOxeJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01819161;
-	Sat, 16 Nov 2024 12:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9812D12C470;
+	Sat, 16 Nov 2024 12:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731758575; cv=none; b=OVhBxGrYyZyrxIZk2WI06hW70JKyJwIOAxJXA4mk1cKE9qLyH/8nkspvtWCv2uSuJKFhcPum5ML1Vea2omZ63uAQ47IHAYyUUJu3x9Y9jPnv1iAcJNOPFSKOBR0+1Ny8UI5feNQgMuiaf4VUzdVgNp2QF/MfptMd9ruGHzKZDzw=
+	t=1731759082; cv=none; b=RlmoJCg0XVHGpZhqnxxCYGzVPiULb0qQocgxV9bagykzBb2q7vAvZ3+3EIxt0djf3CGsYilZF9APjgAD4KRXA3cvQ1nmcHCAsoHXBoFo948e4HPdcIXTj1EDTsUHbvZETBnXrriJxWePIAGgl0clOXTt+9Y7nQP1ggfuV/1HPho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731758575; c=relaxed/simple;
-	bh=+6BwE+j7SFSJBdNyvj9o//BTS/JqF77TAt/XJWkTcQM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ILJuvlFuaIuQulzL7qF/YrjhcfR+rQVmvoUNqlznhNhdZlKmXZm85QLaeqEins3uvanVPIApvErkHQPRX19K4Cm8c4wEJAoUAUKzEgUhmKg20oS8amyUpe3zt7Q12aUSvcZpKLA7EDfDyOIYOowQt9qpXEXbEPUaz5Pim+gQRek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=CVJsLSh7; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:4fa4:0:640:dbe3:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 1264F60B90;
-	Sat, 16 Nov 2024 15:02:49 +0300 (MSK)
-Received: from [IPV6:2a02:6b8:b081:31::1:15] (unknown [2a02:6b8:b081:31::1:15])
-	by mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id l2N6KV0IfW20-Gtqliq6K;
-	Sat, 16 Nov 2024 15:02:48 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1731758568;
-	bh=CbLqFp8H8sKI46dz9m1uDWAKRsbldfMKqdxquVnHhKk=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=CVJsLSh7jF4f4rdWP7xa//jccFzMgvmz/fXtVoHa1oDseHrYMgE47jsqm/K8BkbKb
-	 613qj+FOFRmCvG3BTJRZ/iBgqZFoRHbTzLcjujwfqKLk/KQFD5UQ/WTspOYsEqawre
-	 +QOYHEP9C/7u86LuOwq+j+n93yhTnEcUBu0drcjE=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Message-ID: <4d58d221-5327-4090-926e-a9c21c334ed4@yandex-team.ru>
-Date: Sat, 16 Nov 2024 15:02:47 +0300
+	s=arc-20240116; t=1731759082; c=relaxed/simple;
+	bh=egQwIpjuW/D5jhfmjl0METYf/VduR4/1nUQkptqc3fU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d00lqP7d2Sg6UqSD3Lto3uCYvSgFIGr+Psaio0yXhOPjRHS50p7ZWn7k4uNzhLM+Pdsy93DOfJyAm2K222nKz8zK7RqVVmyXZg6jdlVdkEXAe8DMRKITJTLiCF28QiGY77rl0Yw8mr/3rGFZ5pkh6VLcfPgUSxfrowmQ5JiDYfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=d6aaOxeJ; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1376C40E0220;
+	Sat, 16 Nov 2024 12:11:17 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id zYrIag-FvatP; Sat, 16 Nov 2024 12:11:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1731759071; bh=/FV3qTwRs7dOV8QYsBXwilOpUzqkxkccQB0xUkgyk+Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d6aaOxeJ+AkFzCwKstKs79CbRsYgYzl+zA0X2N1q2TB+XfBD/5kKefHLu5nSD49Rf
+	 urATdBC45fsgPFC3piBIZccSDEs39uobqebQ4XN1v+SN3WS8r09LqQIS/lyBfl1kbC
+	 TD7C8vfP1sngqU8WyHeoOe6vLtglmdLGdF8J2f7TRqUCe/BTvJ6OEt7lzf/WeA67f7
+	 9nJPufr5BH1U35qOhhqb3FE/CPrzVbMH8xE76mk6f2fUs7VGVYHbLCqutoRAntRHMd
+	 HUqpsA0xBmUQD67SLylTT3ZedL4jJqvOEAw1bI9g79OofF2+CBPiPpSOfFKs2WWEfP
+	 5HNnQKwMA+ea5DECtTUz0fbckHmIS8Z9Jtv4vLm9xUoUedZ26pOPB6soJMoeGdYbs1
+	 FzW7ZriQj1SBm/PFnJHFeAmvG6Jl/B8JbF9JOeZcueI79KQ7c0uO7gsyDZr/E7uGJK
+	 O6K+4e+jrFQyNcgmtyhll4JmvI0/N0j6bhtjrI6LWr1IiUcW7H86oEwj65Wcy2wcJ/
+	 /tYLeHThYiZJQcDO98PKKd7M3Rn4aWgACLHflo+rk7t5bV1tfPFs91dbpudbXYWBCV
+	 WiRu8P/R/f4dwCDEqMzC6va7pvQNbEVzzrbas9JJ4w2gJYUHULV+eNb0+WcnQLBv4c
+	 tYQU3OfLLACdcO4zOAkGe3MU=
+Received: from zn.tnic (p200300ea9736a13e329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a13e:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E8A8240E0208;
+	Sat, 16 Nov 2024 12:10:58 +0000 (UTC)
+Date: Sat, 16 Nov 2024 13:10:53 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Maksim Davydov <davydov-max@yandex-team.ru>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, babu.moger@amd.com,
+	x86@kernel.org, seanjc@google.com, sandipan.das@amd.com,
+	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+	hpa@zytor.com, pbonzini@redhat.com
+Subject: Re: [PATCH 0/2] x86: KVM: Add missing AMD features
+Message-ID: <20241116121053.GBZziLzfKuQ7lyTrdX@fat_crate.local>
+References: <20241113133042.702340-1-davydov-max@yandex-team.ru>
+ <20241116114754.GAZziGausNsHqPnr3j@fat_crate.local>
+ <4d58d221-5327-4090-926e-a9c21c334ed4@yandex-team.ru>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] x86: KVM: Add missing AMD features
-To: Borislav Petkov <bp@alien8.de>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, babu.moger@amd.com,
- x86@kernel.org, seanjc@google.com, sandipan.das@amd.com, mingo@redhat.com,
- tglx@linutronix.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- pbonzini@redhat.com
-References: <20241113133042.702340-1-davydov-max@yandex-team.ru>
- <20241116114754.GAZziGausNsHqPnr3j@fat_crate.local>
-Content-Language: en-US
-From: Maksim Davydov <davydov-max@yandex-team.ru>
-In-Reply-To: <20241116114754.GAZziGausNsHqPnr3j@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4d58d221-5327-4090-926e-a9c21c334ed4@yandex-team.ru>
 
+On Sat, Nov 16, 2024 at 03:02:47PM +0300, Maksim Davydov wrote:
+> Yes, BTC_NO and AMD_IBPB_RET are used by guests while choosing mitigations.
 
-Hi!
+How?
 
-On 11/16/24 14:47, Borislav Petkov wrote:
-> On Wed, Nov 13, 2024 at 04:30:40PM +0300, Maksim Davydov wrote:
->> This series adds definition of some missing AMD features in
->> 0x80000008_EBX and 0x80000021_EAX functions. It also gives an opportunity
->> to expose these features to userspace.
-> 
-> Any particular, concrete use for them in luserspace or this is a just-for-fun
-> exercise?
-> 
-
-Yes, BTC_NO and AMD_IBPB_RET are used by guests while choosing mitigations.
+Basically what the current code does to do retbleed or IBPB on entry? Where
+latter means the HV allows writes to MSR_IA32_PRED_CMD...?
 
 -- 
-Best regards,
-Maksim Davydov
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
