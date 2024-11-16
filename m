@@ -1,98 +1,91 @@
-Return-Path: <kvm+bounces-31989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19EB9CFEBA
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 13:11:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319119CFFC1
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 17:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771391F239CD
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 12:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC40D285B07
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2024 16:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2477192B85;
-	Sat, 16 Nov 2024 12:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D0D18052;
+	Sat, 16 Nov 2024 16:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="d6aaOxeJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nreeZij/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9812D12C470;
-	Sat, 16 Nov 2024 12:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA751372
+	for <kvm@vger.kernel.org>; Sat, 16 Nov 2024 16:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731759082; cv=none; b=RlmoJCg0XVHGpZhqnxxCYGzVPiULb0qQocgxV9bagykzBb2q7vAvZ3+3EIxt0djf3CGsYilZF9APjgAD4KRXA3cvQ1nmcHCAsoHXBoFo948e4HPdcIXTj1EDTsUHbvZETBnXrriJxWePIAGgl0clOXTt+9Y7nQP1ggfuV/1HPho=
+	t=1731772989; cv=none; b=JPsoT+6xtmhNONoQvuA+cLwtiYMNngBpZvZgtuzlpmNT5Ms+Q0vZaSFeWnmwuh/1nBrKt3eq2ZuVDT2zMHScXohJEoO8KHB8oQetEwkP364MbF+N1c9Q/NPVctY0db1KysuUfT/gmqsk8OBwWGc8Fe6CHzjWPkumKTAJL/bYZM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731759082; c=relaxed/simple;
-	bh=egQwIpjuW/D5jhfmjl0METYf/VduR4/1nUQkptqc3fU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d00lqP7d2Sg6UqSD3Lto3uCYvSgFIGr+Psaio0yXhOPjRHS50p7ZWn7k4uNzhLM+Pdsy93DOfJyAm2K222nKz8zK7RqVVmyXZg6jdlVdkEXAe8DMRKITJTLiCF28QiGY77rl0Yw8mr/3rGFZ5pkh6VLcfPgUSxfrowmQ5JiDYfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=d6aaOxeJ; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1376C40E0220;
-	Sat, 16 Nov 2024 12:11:17 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id zYrIag-FvatP; Sat, 16 Nov 2024 12:11:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1731759071; bh=/FV3qTwRs7dOV8QYsBXwilOpUzqkxkccQB0xUkgyk+Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d6aaOxeJ+AkFzCwKstKs79CbRsYgYzl+zA0X2N1q2TB+XfBD/5kKefHLu5nSD49Rf
-	 urATdBC45fsgPFC3piBIZccSDEs39uobqebQ4XN1v+SN3WS8r09LqQIS/lyBfl1kbC
-	 TD7C8vfP1sngqU8WyHeoOe6vLtglmdLGdF8J2f7TRqUCe/BTvJ6OEt7lzf/WeA67f7
-	 9nJPufr5BH1U35qOhhqb3FE/CPrzVbMH8xE76mk6f2fUs7VGVYHbLCqutoRAntRHMd
-	 HUqpsA0xBmUQD67SLylTT3ZedL4jJqvOEAw1bI9g79OofF2+CBPiPpSOfFKs2WWEfP
-	 5HNnQKwMA+ea5DECtTUz0fbckHmIS8Z9Jtv4vLm9xUoUedZ26pOPB6soJMoeGdYbs1
-	 FzW7ZriQj1SBm/PFnJHFeAmvG6Jl/B8JbF9JOeZcueI79KQ7c0uO7gsyDZr/E7uGJK
-	 O6K+4e+jrFQyNcgmtyhll4JmvI0/N0j6bhtjrI6LWr1IiUcW7H86oEwj65Wcy2wcJ/
-	 /tYLeHThYiZJQcDO98PKKd7M3Rn4aWgACLHflo+rk7t5bV1tfPFs91dbpudbXYWBCV
-	 WiRu8P/R/f4dwCDEqMzC6va7pvQNbEVzzrbas9JJ4w2gJYUHULV+eNb0+WcnQLBv4c
-	 tYQU3OfLLACdcO4zOAkGe3MU=
-Received: from zn.tnic (p200300ea9736a13e329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a13e:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E8A8240E0208;
-	Sat, 16 Nov 2024 12:10:58 +0000 (UTC)
-Date: Sat, 16 Nov 2024 13:10:53 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Maksim Davydov <davydov-max@yandex-team.ru>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, babu.moger@amd.com,
-	x86@kernel.org, seanjc@google.com, sandipan.das@amd.com,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	hpa@zytor.com, pbonzini@redhat.com
-Subject: Re: [PATCH 0/2] x86: KVM: Add missing AMD features
-Message-ID: <20241116121053.GBZziLzfKuQ7lyTrdX@fat_crate.local>
-References: <20241113133042.702340-1-davydov-max@yandex-team.ru>
- <20241116114754.GAZziGausNsHqPnr3j@fat_crate.local>
- <4d58d221-5327-4090-926e-a9c21c334ed4@yandex-team.ru>
+	s=arc-20240116; t=1731772989; c=relaxed/simple;
+	bh=Wd+7kLQISUZlzyPvYmSUTVOb8NV4Vyd3OpsFXw6X7a0=;
+	h=From:Message-ID:To:Subject:Date:MIME-Version:Content-Type; b=ao70tl905B9vI5ZYjspmrQn9IdLtQ5q/NYtlWYNyGmcm+CI7ZejgO0kUBtK7W3UPpI78BIHMHfIt2YG1or7++FfhMpHClyjVR7x31iOJJvQC0H5uS3SpH0muKWi9APIlKj1b0JzA9s6HDarBrtzJ5oBLuZ8nTLQJ6NLoHFoXJLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nreeZij/; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ea4c5b8fbcso85084a91.0
+        for <kvm@vger.kernel.org>; Sat, 16 Nov 2024 08:03:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731772987; x=1732377787; darn=vger.kernel.org;
+        h=mime-version:date:subject:to:reply-to:message-id:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XHEOkgJ64rwJ+cv0sVIqPUmbc8l+iTifR7HzGzNced0=;
+        b=nreeZij/C/rmhsbayrinV7vEam6iDwmO/S7ciTJvU9gEyma9ytmfKwxGuPfcVTvyP3
+         EiZ28mqkm/XAIxzJ9wDCFSTqoJnDOg3tc7M3NBbtHmbZmScizcLmbzwc0OXVLSr/wSxP
+         9+NbF05CwtX23YctBpggt8PJ3TsjmlrEIs0Frn1PkprBsO9U9Nr9VpAbggOtHVXwP47O
+         h0UdwVn5e46W+/HImZifh4Rd8DLX/CgPs+hU2T09rJi7asFMGdP4nts3ScnuosN3Kdr2
+         2q5SlcfyDvqDAfGZpzTFW57ej/lwLZyz2dU19SHF8TwmtrWNxLml7Q3yHuOVXmjxHpl5
+         Jktg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731772987; x=1732377787;
+        h=mime-version:date:subject:to:reply-to:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XHEOkgJ64rwJ+cv0sVIqPUmbc8l+iTifR7HzGzNced0=;
+        b=LsTnptsQY8V0yUEGuhTD8YJ7AB2DfYvUB50HNZhoPQW9RarY+0i3peg1mZdlr40dgs
+         QjjBtUdi3X/ZmEQDLW3zZxwUyxYRANbxRvLX4DIhMaeuCP+VrKevvVwrZ2WZl4hHwbJO
+         5UHq+nE0fK2SDEN3hAdfpSPBXYm5YN9hQ3ws26fzOBTWAeyzyIUeUMLUhT71WujKb5ho
+         jHAJ8IY1Uo3TupbUcIfERP1W+pxT5ekqqAqumuAfzeV99T2nIwUdus0d1XfM+qMoT5Zo
+         oHL0XjKxXlzJbFowCdsvXDPF64JEcSkdQ/Uafw3+alH1ZAH1IYGfv54TcMKbeN3l/DIr
+         WZhQ==
+X-Gm-Message-State: AOJu0YzzLMIiffw7S54QpneZ42ne9HNYSeBlGWJey6Z6iLNng3FLKa1a
+	1uE0gbtnYmphuMOgQv+49K0JACKcWbLieGWdiQWV/ryYDkoksCms0wpH2w==
+X-Google-Smtp-Source: AGHT+IG7CeF90hYUTft72WGQsgbjjg6NNJ7CJPzhTsxQDGqSbinSrm/lIDIVobPA0U8nVOnFX93eBg==
+X-Received: by 2002:a17:90b:3145:b0:2e2:878a:fc6 with SMTP id 98e67ed59e1d1-2e9fe6b7bbemr16440486a91.18.1731772986820;
+        Sat, 16 Nov 2024 08:03:06 -0800 (PST)
+Received: from [103.67.163.162] ([103.67.163.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea06f9c643sm4553150a91.41.2024.11.16.08.03.05
+        for <kvm@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 16 Nov 2024 08:03:06 -0800 (PST)
+From: "Van. HR" <spartangh300@gmail.com>
+X-Google-Original-From: "Van. HR" <helpdesk@information.com>
+Message-ID: <0e14c51d251f93bf898b151823ee53dd768b999b11caf0d512e4a929e11fd8df@mx.google.com>
+Reply-To: dirofdptvancollin@gmail.com
+To: kvm@vger.kernel.org
+Subject: Nov:16:24
+Date: Sat, 16 Nov 2024 11:03:03 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4d58d221-5327-4090-926e-a9c21c334ed4@yandex-team.ru>
+Content-Type: text/plain; charset=us-ascii
 
-On Sat, Nov 16, 2024 at 03:02:47PM +0300, Maksim Davydov wrote:
-> Yes, BTC_NO and AMD_IBPB_RET are used by guests while choosing mitigations.
+Hello,
+I am a private investment consultant representing the interest of a multinational  conglomerate that wishes to place funds into a trust management portfolio.
 
-How?
+Please indicate your interest for additional information.
 
-Basically what the current code does to do retbleed or IBPB on entry? Where
-latter means the HV allows writes to MSR_IA32_PRED_CMD...?
+Regards,
 
--- 
-Regards/Gruss,
-    Boris.
+Van Collin.
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
