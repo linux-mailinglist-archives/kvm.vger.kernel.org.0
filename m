@@ -1,90 +1,50 @@
-Return-Path: <kvm+bounces-32029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A075D9D18A6
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 20:06:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D379D18F5
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 20:32:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65EAB2829DB
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:06:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3FE61F2223A
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0075F1E5005;
-	Mon, 18 Nov 2024 19:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nre2bIKL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9899A1E4937;
+	Mon, 18 Nov 2024 19:32:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9E11A08BC;
-	Mon, 18 Nov 2024 19:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A44117BBF;
+	Mon, 18 Nov 2024 19:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731956756; cv=none; b=GsbFMQRSMKIgAVJU9oW1qF/LyQaKiXEZcqyczptZ/rC4S+lkU12Rn5dgVLtKF2roMT6V2XgAQQz0p2uNZVR90/tRv262a78hZyc6DnV5HCBSLr2YqITLi9G/R629LeKPoR+RYLU4OB/WEOn3bS2tAgkyPa6XJ0APxiuF42cOAbw=
+	t=1731958363; cv=none; b=QVPYv+BEjVOJ6EjoItbhwEx3UNFhj1F1drp85iIgSnCZwL6C/zDZ5ukxoSNIi7ZpXLyWd/qYwyJCa+WpXuQPOYmGZH+RHL4Wi4UQcpU5g9eLZGDfgpMHLWvp9L+EC7y83yKZsOlQxkwu9VXBhHGb6Oa/6wDBD4BwvMha4GHoR98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731956756; c=relaxed/simple;
-	bh=zAg0FED4ncJuY+Q8VOMutwGkYeDVtRLM6e/epe7noEA=;
+	s=arc-20240116; t=1731958363; c=relaxed/simple;
+	bh=jwf9mr6ZqGV+aRwYqQV3XDJze1+KZMmOLGtdZOcQrx8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hhPXDd/wHu7EmC9qXVZED2/Dl+OTeMQ4tdnzXFPQRoEY/UePzPL9oHpASxVtLkwDXPwqKHmn9zceuLXp4khatbMrlDTzIhdlCr8tmuC1zD2DavizI7sHkT2AINTey2ORdhhgTwAv7MXhe4h+8PpOHm/ZbthuveQ1QhNj5fHrOE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nre2bIKL; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIDIIPo014043;
-	Mon, 18 Nov 2024 19:05:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=GJGl4O
-	QQ+YxHIWJ46wHkioKho5/6+Hy0SHgLLI7iMXY=; b=nre2bIKLPj9twUM2gDNJTx
-	CRBcHSl6E0PwA6LtMSRKzkC6Ior/23Ae+ZU3oj7SyPuLKhADFjz/PM/YXUXwOT2r
-	oYF+cGFs1XlSzy+5WYrTCzSHONEZ2B9LDMdSXbj7aDZ8UhgnrGWV5iyamFPU6t1i
-	ZlZFyeU0yMne4XRuQKP9nfBZgTymchamIfI6TigCZiKzUe4LTzjIwnJzVFB27Gt4
-	UlXQr1hBlnV+crbKBmBd88SZMr25zuodYWlQzCSiabdrF+kyloxpRG8VKZ04yinf
-	2o0at2I+kq7Awe4vyvjiWb4ITwruZaLZCY6YnSIOGN+G6+icks3RtQOdnF+bqnJw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xyu1hkya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 19:05:53 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AII51tZ030975;
-	Mon, 18 Nov 2024 19:05:52 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y63y7gac-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 19:05:52 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AIJ5mWl19399146
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Nov 2024 19:05:48 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64BEB20043;
-	Mon, 18 Nov 2024 19:05:48 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C72920040;
-	Mon, 18 Nov 2024 19:05:47 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.80.125])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon, 18 Nov 2024 19:05:47 +0000 (GMT)
-Date: Mon, 18 Nov 2024 20:05:46 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, akrowiak@linux.ibm.com,
-        jjherne@linux.ibm.com, freude@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@de.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, seiden@linux.ibm.com,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v1 1/1] s390/vfio-ap: remove gmap_convert_to_secure from
- vfio_ap_ops
-Message-ID: <20241118200546.7bf584f4.pasic@linux.ibm.com>
-In-Reply-To: <20241115135611.87836-1-imbrenda@linux.ibm.com>
-References: <20241115135611.87836-1-imbrenda@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	 MIME-Version:Content-Type; b=sB3S0aOb0HSjhpLhzoYTB7Z8dYTpbthAwRoh+FArCWPvOEDzTa3dp0o3uFnrV3gvZh+ON2Rm/Ta5LUkDgZE6+JHBBW5n3f6cpQ+CNqXr3IJJMvRb4/LZ8APCClpPHnJl2FawJ+7G8OyYjfZueMTdza3V8I/BpUREehvwRFFtUzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4572C4CECC;
+	Mon, 18 Nov 2024 19:32:40 +0000 (UTC)
+Date: Mon, 18 Nov 2024 14:33:11 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Suleiman Souhlal <suleiman@google.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Valentin
+ Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ seanjc@google.com, Srikar Dronamraju <srikar@linux.ibm.com>, David
+ Woodhouse <dwmw2@infradead.org>, joelaf@google.com, vineethrp@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, ssouhlal@freebsd.org
+Subject: Re: [PATCH v3] sched: Don't try to catch up excess steal time.
+Message-ID: <20241118143311.3ca94405@gandalf.local.home>
+In-Reply-To: <20241118043745.1857272-1-suleiman@google.com>
+References: <20241118043745.1857272-1-suleiman@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,33 +52,91 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zdgl8H0DvE4fzFd7gC1x6KipHTYaOqKf
-X-Proofpoint-ORIG-GUID: zdgl8H0DvE4fzFd7gC1x6KipHTYaOqKf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- bulkscore=0 spamscore=0 mlxlogscore=942 adultscore=0 mlxscore=0
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411180152
+Content-Transfer-Encoding: 7bit
 
-On Fri, 15 Nov 2024 14:56:11 +0100
-Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+On Mon, 18 Nov 2024 13:37:45 +0900
+Suleiman Souhlal <suleiman@google.com> wrote:
 
-> If the page has been exported, do not re-import it. Imports should
-> only be triggered by the guest. The guest will import the page
-> automatically when it will need it again, there is no advantage in
-> importing it manually.
+> When steal time exceeds the measured delta when updating clock_task, we
+> currently try to catch up the excess in future updates.
+> However, this results in inaccurate run times for the future things using
+> clock_task, in some situations, as they end up getting additional steal
+> time that did not actually happen.
+> This is because there is a window between reading the elapsed time in
+> update_rq_clock() and sampling the steal time in update_rq_clock_task().
+> If the VCPU gets preempted between those two points, any additional
+> steal time is accounted to the outgoing task even though the calculated
+> delta did not actually contain any of that "stolen" time.
+> When this race happens, we can end up with steal time that exceeds the
+> calculated delta, and the previous code would try to catch up that excess
+> steal time in future clock updates, which is given to the next,
+> incoming task, even though it did not actually have any time stolen.
 > 
-> Moreover, vfio_pin_pages() will take an extra reference on the page and
-> thus will cause the import to always fail. The extra reference would be
-> dropped only after pointlessly trying to import the page.
+> This behavior is particularly bad when steal time can be very long,
+> which we've seen when trying to extend steal time to contain the duration
+> that the host was suspended [0]. When this happens, clock_task stays
+> frozen, during which the running task stays running for the whole
+> duration, since its run time doesn't increase.
+> However the race can happen even under normal operation.
 > 
-> Fixes: f88fb1335733 ("s390/vfio-ap: make sure nib is shared")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Ideally we would read the elapsed cpu time and the steal time atomically,
+> to prevent this race from happening in the first place, but doing so
+> is non-trivial.
+> 
+> Since the time between those two points isn't otherwise accounted anywhere,
+> neither to the outgoing task nor the incoming task (because the "end of
+> outgoing task" and "start of incoming task" timestamps are the same),
+> I would argue that the right thing to do is to simply drop any excess steal
+> time, in order to prevent these issues.
+> 
+> [0] https://lore.kernel.org/kvm/20240820043543.837914-1-suleiman@google.com/
+> 
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> ---
+> v3:
+> - Reword commit message.
+> - Revert back to v1 code, since it's more understandable.
+> 
+> v2: https://lore.kernel.org/lkml/20240911111522.1110074-1-suleiman@google.com
+> - Slightly changed to simply moving one line up instead of adding
+>   new variable.
+> 
+> v1: https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com
+> ---
+>  kernel/sched/core.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index a1c353a62c56..13f70316ef39 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -766,13 +766,15 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
+>  #endif
+>  #ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
+>  	if (static_key_false((&paravirt_steal_rq_enabled))) {
+> -		steal = paravirt_steal_clock(cpu_of(rq));
+> +		u64 prev_steal;
+> +
+> +		steal = prev_steal = paravirt_steal_clock(cpu_of(rq));
+>  		steal -= rq->prev_steal_time_rq;
+>  
+>  		if (unlikely(steal > delta))
+>  			steal = delta;
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+So is the problem just the above if statement? That is, delta is already
+calculated, but if we get interrupted by the host before steal is
+calculated and the time then becomes greater than delta, the time
+difference between delta and steal gets pushed off to the next task, right?
+
+-- Steve
+
+
+
+>  
+> -		rq->prev_steal_time_rq += steal;
+> +		rq->prev_steal_time_rq = prev_steal;
+>  		delta -= steal;
+>  	}
+>  #endif
+
 
