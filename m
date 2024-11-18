@@ -1,127 +1,177 @@
-Return-Path: <kvm+bounces-32010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F449D10D2
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 13:44:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A9399D1166
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 14:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E8A8B26676
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 12:43:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1EA2843C1
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 13:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C12C19AD90;
-	Mon, 18 Nov 2024 12:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63BF1BBBCA;
+	Mon, 18 Nov 2024 13:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYawFjZ2"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bZECRhYC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D866199FAC
-	for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 12:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D201B85F0;
+	Mon, 18 Nov 2024 13:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731933765; cv=none; b=f4yrMy4JIYFQJDpXOtO2ZxRnDfVSJUV1lXWhBA7ZlU7IO+YYdiLZLrb3Q2MBQ0PJPok0c+nfaWB36qxaimnuhnKgE6BX9f/xxV+mEHXL8UA9CSlyhFfT7UNcyAgiM626v7YPmjqBSQFhZklmFEtFfOzSx27O19a1/e5QoME5TdU=
+	t=1731935078; cv=none; b=MEvXS4vyGRLDObFnovJkbemdFH25PUMklfVyPJIapLYCJrvA4NxQPN2fk7ix8KvOTB+aL+kykFPCfehYc+d5zKE3FePO8MaVmbXlyPzvsEmTAdPBJi+nYsftjeiiGuXtC7jaKp2BSk5iflPnH/my/4/4X1P41EiCGjQ/sP1SRqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731933765; c=relaxed/simple;
-	bh=FCpTZ+OXty+6I/LwhoSAfoMCBQPfYWa97QmGJQZD/Es=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WpSlnRuRqmPeo0a2cHmKYCiElIq+Pet0leucpU4bKoT/7IQpLJKArHOJvWhdojRdI8m9ZpvwG1rJPYCHbAO1Rv1O8mC/bAJXQvLMFA6UzVXhSP5pE3CouGH82DwfCcds22jzgHtrTy77v8QBeCJCEJPmj/GmDC5dO+CMZvCvFGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IYawFjZ2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731933762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T7Sl+0ry/66y5Ln6cucWmrZ7ZUf6a8KZ/clf2OlUzn8=;
-	b=IYawFjZ20nZt0S5Ddm0CE5sdrL58EKOPoM2NuebnKQdrUNWL5ueCFiMSFo7hXaq6oivQQr
-	INnRSHwWt/tNRJPrgnlU+Twd7n2oknRyxVtKVPvfrQRxPdu8c4CrWCfh1WfSPT6pncvGf1
-	6zVo1EZJDqIgKYMuEEW+xxo1PTg9f9I=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-381-nMzGDO53NiORKLQgHGfVpA-1; Mon, 18 Nov 2024 07:42:41 -0500
-X-MC-Unique: nMzGDO53NiORKLQgHGfVpA-1
-X-Mimecast-MFC-AGG-ID: nMzGDO53NiORKLQgHGfVpA
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3823d2f712fso823027f8f.2
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 04:42:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731933759; x=1732538559;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T7Sl+0ry/66y5Ln6cucWmrZ7ZUf6a8KZ/clf2OlUzn8=;
-        b=XwjOJmmWOkWLyHCGqI2L3mgn/1ZzVR5Gi3O4pAEo8o899xDPt6miY4j5bgX77K9h8N
-         coNg+SCaRJMLvJJSXicvtWXVtqGmHAEQ6xpI6gGpUnjwWnJjOdk6in6kTsONDuq+mmG6
-         u/U/jDceSo6U12WdM8JaAXfg8Vx9dPxONDSp7FPA7N6Z2dJpo+0BTYH/6Shn9b9lyKKi
-         wOjY6C+i8HwRtAA+wT1LqrljT5IydvHfyNaHotuRWDYrmjyJwqz7SggtRm8hA7ZLfDsG
-         7HjK9zVXBZmcjQuJ+lZzMh+GvL+zLgM5cjpE336t/92gE3OZUc0oWfQBt/mr6n50Ymtm
-         LPcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuT5Eum1VnORvCz+QQKLIWC9i6WQeAK7DKQAgrWnnKwwLrf/RlDnoJhPGq8fTcWucVHEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+G7DHt0ZtA+2fMfm7E8b0QWw1B8LZLry3HOinp5yCVkkKzKFh
-	eap7EMDh/Odkd99pupMbqBTmshSlN1H06/n02y9ubXNHk4Y45jh1t94xSYqKsxn9VbUgrEyK8gX
-	LJV5+t6xdklkA0Pf8jww2WCnyH4B2K+H3oQMsVx+SbRJBoN79kNgAz9f8O1zXZ07IJW6n8gRQKa
-	wX3CHCfsVQm3vaw4JOnf/f8iytd59UXOLR
-X-Received: by 2002:a5d:5888:0:b0:382:4a69:ae11 with SMTP id ffacd0b85a97d-3824a69b1aamr1300429f8f.42.1731933759340;
-        Mon, 18 Nov 2024 04:42:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1eUySvRKvHgaDBZuHDcttwQpLs5scn4ecD2wAoOE+UAhHhEQ3Kutp85qvyoc832LHDNr+gBR8RNIX+d3RGu0=
-X-Received: by 2002:a5d:5888:0:b0:382:4a69:ae11 with SMTP id
- ffacd0b85a97d-3824a69b1aamr1300414f8f.42.1731933759009; Mon, 18 Nov 2024
- 04:42:39 -0800 (PST)
+	s=arc-20240116; t=1731935078; c=relaxed/simple;
+	bh=n13NhvqjiFneogKbi1C94dKpbD7dUVi7WjsM+NBvQlQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o/aInRorCXHLPkDpDiqt/nR9DdbFd5ZxbipqftV0j+0J03y+mEO3+Lr5i3Dlw0iC948UPZjEL3FVYuMZO6RVXEmVgjBgvtzBb+wI8kIMYkt6oIMr6GIxzqgf+m6t1B9SGvYB1iWq0UozkHHhbIfQuaTTV+sDYeosrZKVk+2ZLAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bZECRhYC; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731935076; x=1763471076;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gOEkMewe8WJbkBBs7uFzinPK2/JG25Gq0vZUtD9UmC8=;
+  b=bZECRhYCIlxW1PV+JL6322jFwS2ApAc5Vg8QOlgUDwM8h3RvhAYT9qgm
+   6mOs3EWAirmq+cyD14azuTVmCVFVOcNxe9H8A+czLt2X/pjFvdYACvRHM
+   dp+c5HrxlglkKVdBAP2/CE3xgJIN5NSs1MMBk6k+X+6TF1H8To72eRaAe
+   k=;
+X-IronPort-AV: E=Sophos;i="6.12,164,1728950400"; 
+   d="scan'208";a="440827820"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 13:04:08 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:6012]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
+ id 0c5aaa77-bd99-4459-b7f4-c9a75c06344d; Mon, 18 Nov 2024 13:04:07 +0000 (UTC)
+X-Farcaster-Flow-ID: 0c5aaa77-bd99-4459-b7f4-c9a75c06344d
+Received: from EX19D020UWA003.ant.amazon.com (10.13.138.254) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 18 Nov 2024 13:04:07 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D020UWA003.ant.amazon.com (10.13.138.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 18 Nov 2024 13:04:06 +0000
+Received: from email-imr-corp-prod-pdx-all-2b-dbd438cc.us-west-2.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Mon, 18 Nov 2024 13:04:06 +0000
+Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
+	by email-imr-corp-prod-pdx-all-2b-dbd438cc.us-west-2.amazon.com (Postfix) with ESMTPS id 2B499A065B;
+	Mon, 18 Nov 2024 13:04:04 +0000 (UTC)
+From: Nikita Kalyazin <kalyazin@amazon.com>
+To: <pbonzini@redhat.com>, <seanjc@google.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <david@redhat.com>, <peterx@redhat.com>, <oleg@redhat.com>,
+	<vkuznets@redhat.com>, <gshan@redhat.com>, <graf@amazon.de>,
+	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
+	<nsaenz@amazon.es>, <xmarcalx@amazon.com>, <kalyazin@amazon.com>
+Subject: [PATCH] KVM: x86: async_pf: check earlier if can deliver async pf
+Date: Mon, 18 Nov 2024 13:04:03 +0000
+Message-ID: <20241118130403.23184-1-kalyazin@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241108130737.126567-1-pbonzini@redhat.com> <rl5s5eykuzs4dgp23vpbagb4lntyl3uptwh54jzjjgfydynqvx@6xbbcjvb7zpn>
-In-Reply-To: <rl5s5eykuzs4dgp23vpbagb4lntyl3uptwh54jzjjgfydynqvx@6xbbcjvb7zpn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 18 Nov 2024 13:42:27 +0100
-Message-ID: <CABgObfbUzKswAjPuq_+KL9jyQegXgjSRQmc6uSm1cAXifNo_Xw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, 
-	Luca Boccassi <bluca@debian.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Fri, Nov 15, 2024 at 5:59=E2=80=AFPM Michal Koutn=C3=BD <mkoutny@suse.co=
-m> wrote:
->
-> On Fri, Nov 08, 2024 at 08:07:37AM GMT, Paolo Bonzini <pbonzini@redhat.co=
-m> wrote:
-> > Since the worker kthread is tied to a user process, it's better if
-> > it behaves similarly to user tasks as much as possible, including
-> > being able to send SIGSTOP and SIGCONT.
->
-> Do you mean s/send/receive/?
+On x86, async pagefault events can only be delivered if the page fault
+was triggered by guest userspace, not kernel.  This is because
+the guest may be in non-sleepable context and will not be able
+to reschedule.
 
-I mean being able to send it to the threads with an effect.
+However existing implementation pays the following overhead even for the
+kernel-originated faults, even though it is known in advance that they
+cannot be processed asynchronously:
+ - allocate async PF token
+ - create and schedule an async work
 
-> Consequently, it's OK if a (possibly unprivileged) user stops this
-> thread forever (they only harm themselves, not the rest of the system),
-> correct?
+This patch avoids the overhead above in case of kernel-originated faults
+by moving the `kvm_can_deliver_async_pf` check from
+`kvm_arch_async_page_not_present` to `__kvm_faultin_pfn`.
 
-Yes, they will run with fewer huge pages and worse TLB performance.
+Note that the existing check `kvm_can_do_async_pf` already calls
+`kvm_can_deliver_async_pf` internally, however it only does that if the
+`kvm_hlt_in_guest` check is true, ie userspace requested KVM not to exit
+on guest halts via `KVM_CAP_X86_DISABLE_EXITS`.  In that case the code
+proceeds with the async fault processing with the following
+justification in 1dfdb45ec510ba27e366878f97484e9c9e728902 ("KVM: x86:
+clean up conditions for asynchronous page fault handling"):
 
-Paolo
+"Even when asynchronous page fault is disabled, KVM does not want to pause
+the host if a guest triggers a page fault; instead it will put it into
+an artificial HLT state that allows running other host processes while
+allowing interrupt delivery into the guest."
 
-> > In fact, vhost_task is all that kvm_vm_create_worker_thread() wanted
-> > to be and more: not only it inherits the userspace process's cgroups,
-> > it has other niceties like being parented properly in the process
-> > tree.  Use it instead of the homegrown alternative.
->
-> It is nice indeed.
-> I think the bugs we saw are not so serious to warrant
-> Fixes: c57c80467f90e ("kvm: Add helper function for creating VM worker th=
-reads")
-> .
-> (But I'm posting it here so that I can find the reference later.)
+Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 3 ++-
+ arch/x86/kvm/x86.c     | 5 ++---
+ arch/x86/kvm/x86.h     | 2 ++
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 22e7ad235123..11d29d15b6cd 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4369,7 +4369,8 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+ 			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
+ 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+ 			return RET_PF_RETRY;
+-		} else if (kvm_arch_setup_async_pf(vcpu, fault)) {
++		} else if (kvm_can_deliver_async_pf(vcpu) &&
++			kvm_arch_setup_async_pf(vcpu, fault)) {
+ 			return RET_PF_RETRY;
+ 		}
+ 	}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2e713480933a..8edae75b39f7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13355,7 +13355,7 @@ static inline bool apf_pageready_slot_free(struct kvm_vcpu *vcpu)
+ 	return !val;
+ }
+ 
+-static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
++bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
+ {
+ 
+ 	if (!kvm_pv_async_pf_enabled(vcpu))
+@@ -13406,8 +13406,7 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 	trace_kvm_async_pf_not_present(work->arch.token, work->cr2_or_gpa);
+ 	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
+ 
+-	if (kvm_can_deliver_async_pf(vcpu) &&
+-	    !apf_put_user_notpresent(vcpu)) {
++	if (!apf_put_user_notpresent(vcpu)) {
+ 		fault.vector = PF_VECTOR;
+ 		fault.error_code_valid = true;
+ 		fault.error_code = 0;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index ec623d23d13d..9647f41e5c49 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -387,6 +387,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
+ fastpath_t handle_fastpath_hlt(struct kvm_vcpu *vcpu);
+ 
++bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu);
++
+ extern struct kvm_caps kvm_caps;
+ extern struct kvm_host_values kvm_host;
+ 
+
+base-commit: d96c77bd4eeba469bddbbb14323d2191684da82a
+-- 
+2.40.1
 
 
