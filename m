@@ -1,90 +1,73 @@
-Return-Path: <kvm+bounces-32027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273DB9D1861
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:45:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0BB9D1897
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC31D283857
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 18:45:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8DA41F259C2
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 18:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6670B1E8827;
-	Mon, 18 Nov 2024 18:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA4B1E4926;
+	Mon, 18 Nov 2024 18:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mrp5yqsZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P67NkgKp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911201E8823
-	for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 18:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642CD3BBF2;
+	Mon, 18 Nov 2024 18:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731955420; cv=none; b=Rds9iItmyN/M222X9Y4AW7xUdyZCQ7qY+k5QBvN3CZ+0MYj6mTWTa45Hw0hVtXgn32BYVDMx4QV2lwSzzJtQHh2ZCy5QPBp3NFMT4w7MUZlbiG9Q3RXsVuYHI2UBpHaZ6tNRhiGwyaRAu5CrENlbw8hQ7G4NJuONJV4lxj34gJg=
+	t=1731956139; cv=none; b=Rt0hyiJsRkxLgocbJoJD14VQ08GhqPTBymMtZE4krnyvqJbXcq0pDHjwtvCCrXSxxANjePgPx2xpVMj+zA8cajIm/FwQ1UYwFQ+WIenusoGvkfqtQPTh6RxX9qmXHoQnmhGA2UXjMWZVjALw7Oqf6lPIfBi3Wi5ax19V3nngYSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731955420; c=relaxed/simple;
-	bh=2Ct+B8awPnldFMpopuvJ0mHQdWAvzuiku4XskzT+NJc=;
+	s=arc-20240116; t=1731956139; c=relaxed/simple;
+	bh=/gmHJa/TBxEDstIIvnX3KmYFWImvFtyFP0gjXaeuHFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mntvzj3azrL1qDNIoKF68vZSziDLbuXDsoR17HpHyTFc9zecXnJBY0UkhP1xx+2AXFH9LxSPUYkeFa9AHQpUnrjqvGmLDcKLUm19KJI0Gl+3XHRK/sqNR3RvKmkyB9Si6kjkDXdFSbEGHfsVDdwM3buUDZzirg2C2MvOmw2x0ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mrp5yqsZ; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b15d7b7a32so5690485a.1
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 10:43:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1731955417; x=1732560217; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aiGoxS9y5bO8WAr6g5LjnG9Zf3/IZMgtxFJaSmFRzL8=;
-        b=mrp5yqsZUyKB3RmYzXDGCMCtmElakMdYMyz9M3J2edCUEGQEKrfyDzELl9FK0bAAGO
-         DLmm6gf/xc8BVOXQwF5gnspaItZo80KOyml7WFS1iRIFTPayOSOg5RAIDh2NUbUndgRG
-         iOhEkFz2fLensRKMw0HQKuyKsv79z/LO9UCQnDcxLTfv3kPee/tK9iok7Fw3cAAKYCF9
-         mYZJy+9lQzVM5mVyw0l4aNtqqbmVquoq0Z4T9N8wp5LAf9xl5RD625702hcelCtCUUz4
-         AADXssppvrYS7GrNdBDxku5EQjI5DiBI4EZhJ3Gx/UhVxL01M4BdqeXfM4XYeipBBYX/
-         m/PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731955417; x=1732560217;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiGoxS9y5bO8WAr6g5LjnG9Zf3/IZMgtxFJaSmFRzL8=;
-        b=eLHA8oQcnTqRsc0Ku5wbNY8W1dC0ny/aMjNqOkzIYF6fqiP8rHGa85x8tlxwiJmgAA
-         itxCd6yv7dL2r9ylKtI/xAG143ROMxu09mm+3tTv7fmVB2aLBfptjvlWEsyWryEg0kSL
-         d+TYX+TDrok87dHelqsJAQ2csKp9xuOtMBTDcVhJ4LALJIF9f5Y3780UcRFXfHwrsJkX
-         vYbFXwBYqXtFCeVtwf3sj/7tztJfXVmTLtuamSJ2evgsqvOhraXx2K674RMmnzq17Qez
-         5ZuJ1vndYyQEwHW6xN/1fJnGA7AmLRPLHxjXC6e3PyXDuUldZ5fns12p4seTKHkVTDml
-         7Pzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYZHXIB3P8eQoZvDum0JbiRi6fEQdoJcxIEY4eLvX2Clwqg05JH87l+UF6LfRO7S+4ylk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsgJXgiA++jIQijlEJRkoxuJm6sVRBBWMfMZuZw3v2zZ1HWOh4
-	LZx3/7IXSnC3NPsW7X+UzDWEvn6bkAeid+n4vDPSE1VdHzSbCkRcAp8sW5skNrE=
-X-Google-Smtp-Source: AGHT+IGAvD7jve9I99GoT/BKI80P6y8fMglPCbeBoUgHhPAkZfkRJUQQV//W1VAPjwl3J6cuHo9G2g==
-X-Received: by 2002:ad4:5cef:0:b0:6d4:12c:c6cc with SMTP id 6a1803df08f44-6d4012ccda3mr213242956d6.25.1731955417599;
-        Mon, 18 Nov 2024 10:43:37 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc41b4fsm38829916d6.59.2024.11.18.10.43.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 10:43:36 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tD6im-000000037qC-1a8F;
-	Mon, 18 Nov 2024 14:43:36 -0400
-Date: Mon, 18 Nov 2024 14:43:36 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, tjeznach@rivosinc.com,
-	zong.li@sifive.com, joro@8bytes.org, will@kernel.org,
-	robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org,
-	tglx@linutronix.de, alex.williamson@redhat.com,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 08/15] iommu/riscv: Add IRQ domain for interrupt
- remapping
-Message-ID: <20241118184336.GB559636@ziepe.ca>
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-25-ajones@ventanamicro.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=os4d5qnBaJPvYWbQvRegf5IevZMGsSTIqJVhZ8Igx44DJK/yk7+/aHpM1+6sO5pJ8Scn6hpcRIRJ4wAgI5oiPmn6mtq9E8w4knq07m7W5aXf02WYzMDajYfZN5EX/PUywlLsGtLgIvbEmPtaqd52olRU2isnfsrJ6MfvuhjBK4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P67NkgKp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45CA9C4CECC;
+	Mon, 18 Nov 2024 18:55:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731956138;
+	bh=/gmHJa/TBxEDstIIvnX3KmYFWImvFtyFP0gjXaeuHFM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P67NkgKpagD5QPwkoLn48IDjtjZ7XiI7hB74ktXAOzTjzFx25SdPGIQTsJPn3c/+1
+	 7mKXhe/08HVsqBRSEOx0tOKdadCpjOBrUyOGIzap4a8CF3tcQQzVYOpA4KCKlbL9eG
+	 FZDNA127wqunzK1pyu+ixL9pn3cpHGQTiZ/HklwS4zlyqRfWpfZR7WpwvZo4s6XE1b
+	 33uAWW/5I0UcpudrKi/56u1/L85PdWYLjkcUUGZXni1xcq/PN0bKJ29dpyNBUK3NkQ
+	 hg7XGXtOx8q1P8cuRCDFQtSWlcXwLibDCDFZaRJ8t0FlQaoTBba1d1kPOW8eXaQxfI
+	 AghFYrjiJkifw==
+Date: Mon, 18 Nov 2024 20:55:33 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 07/17] dma-mapping: Implement link/unlink ranges API
+Message-ID: <20241118185533.GA24154@unreal>
+References: <cover.1731244445.git.leon@kernel.org>
+ <f8c7f160c9ae97fef4ccd355f9979727552c7374.1731244445.git.leon@kernel.org>
+ <20241118145929.GB27795@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,50 +76,84 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241114161845.502027-25-ajones@ventanamicro.com>
+In-Reply-To: <20241118145929.GB27795@willie-the-truck>
 
-On Thu, Nov 14, 2024 at 05:18:53PM +0100, Andrew Jones wrote:
-> @@ -1276,10 +1279,30 @@ static int riscv_iommu_attach_paging_domain(struct iommu_domain *iommu_domain,
->  	struct riscv_iommu_device *iommu = dev_to_iommu(dev);
->  	struct riscv_iommu_info *info = dev_iommu_priv_get(dev);
->  	struct riscv_iommu_dc dc = {0};
-> +	int ret;
->  
->  	if (!riscv_iommu_pt_supported(iommu, domain->pgd_mode))
->  		return -ENODEV;
->  
-> +	if (riscv_iommu_bond_link(domain, dev))
-> +		return -ENOMEM;
-> +
-> +	if (iommu_domain->type == IOMMU_DOMAIN_UNMANAGED) {
+On Mon, Nov 18, 2024 at 02:59:30PM +0000, Will Deacon wrote:
+> On Sun, Nov 10, 2024 at 03:46:54PM +0200, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Introduce new DMA APIs to perform DMA linkage of buffers
+> > in layers higher than DMA.
+> > 
+> > In proposed API, the callers will perform the following steps.
+> > In map path:
+> > 	if (dma_can_use_iova(...))
+> > 	    dma_iova_alloc()
+> > 	    for (page in range)
+> > 	       dma_iova_link_next(...)
+> > 	    dma_iova_sync(...)
+> > 	else
+> > 	     /* Fallback to legacy map pages */
+> >              for (all pages)
+> > 	       dma_map_page(...)
+> > 
+> > In unmap path:
+> > 	if (dma_can_use_iova(...))
+> > 	     dma_iova_destroy()
+> > 	else
+> > 	     for (all pages)
+> > 		dma_unmap_page(...)
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/iommu/dma-iommu.c   | 259 ++++++++++++++++++++++++++++++++++++
+> >  include/linux/dma-mapping.h |  32 +++++
+> >  2 files changed, 291 insertions(+)
+> 
 
-Drivers should not be making tests like this.
+<...>
 
-> +		domain->gscid = ida_alloc_range(&riscv_iommu_gscids, 1,
-> +						RISCV_IOMMU_MAX_GSCID, GFP_KERNEL);
-> +		if (domain->gscid < 0) {
-> +			riscv_iommu_bond_unlink(domain, dev);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		ret = riscv_iommu_irq_domain_create(domain, dev);
-> +		if (ret) {
-> +			riscv_iommu_bond_unlink(domain, dev);
-> +			ida_free(&riscv_iommu_gscids, domain->gscid);
-> +			return ret;
-> +		}
-> +	}
+> > +static void __iommu_dma_iova_unlink(struct device *dev,
+> > +		struct dma_iova_state *state, size_t offset, size_t size,
+> > +		enum dma_data_direction dir, unsigned long attrs,
+> > +		bool free_iova)
+> > +{
+> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> > +	struct iova_domain *iovad = &cookie->iovad;
+> > +	dma_addr_t addr = state->addr + offset;
+> > +	size_t iova_start_pad = iova_offset(iovad, addr);
+> > +	struct iommu_iotlb_gather iotlb_gather;
+> > +	size_t unmapped;
+> > +
+> > +	if ((state->__size & DMA_IOVA_USE_SWIOTLB) ||
+> > +	    (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)))
+> > +		iommu_dma_iova_unlink_range_slow(dev, addr, size, dir, attrs);
+> > +
+> > +	iommu_iotlb_gather_init(&iotlb_gather);
+> > +	iotlb_gather.queued = free_iova && READ_ONCE(cookie->fq_domain);
+> > +
+> > +	size = iova_align(iovad, size + iova_start_pad);
+> > +	addr -= iova_start_pad;
+> > +	unmapped = iommu_unmap_fast(domain, addr, size, &iotlb_gather);
+> > +	WARN_ON(unmapped != size);
+> 
+> Does the new API require that the 'size' passed to dma_iova_unlink()
+> exactly match the 'size' passed to the corresponding call to
+> dma_iova_link()? I ask because the IOMMU page-table code is built around
+> the assumption that partial unmap() operations never occur (i.e.
+> operations which could require splitting a huge mapping). We just
+> removed [1] that code from the Arm IO page-table implementations, so it
+> would be good to avoid adding it back for this.
 
-What are you trying to do? Make something behave different for VFIO?
-That isn't OK, we are trying to remove all the hacky VFIO special
-cases in drivers.
+dma_iova_link/dma_iova_unlink() don't have any assumptions in addition
+to already existing for dma_map_sg/dma_unmap_sg(). In reality, it means
+that all calls to unlink will have same size as for link.
 
-What is the HW issue here? It is very very strange (and probably not
-going to work right) that the irq domains change when domain
-attachment changes.
+Thanks
 
-The IRQ setup should really be fixed before any device drivers probe
-onto the device.
-
-Jason
+> 
+> Will
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/iommu/linux.git/commit/?h=arm/smmu&id=33729a5fc0caf7a97d20507acbeee6b012e7e519
 
