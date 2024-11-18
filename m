@@ -1,127 +1,142 @@
-Return-Path: <kvm+bounces-32026-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32027-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF109D1781
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:00:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273DB9D1861
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18052B2508B
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 18:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC31D283857
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 18:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E861F1D0E28;
-	Mon, 18 Nov 2024 18:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6670B1E8827;
+	Mon, 18 Nov 2024 18:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGH+4lbx"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mrp5yqsZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A4D1D0E11;
-	Mon, 18 Nov 2024 18:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911201E8823
+	for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 18:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731952849; cv=none; b=SD6N5RbMc2CtZPWsZy+acIqSxOqwflAopp2aSGYBR6cdtiu+70x/doM6j+r13cSicijBmh9XS8W8IIeRMqXire4fox2RLszPpKL2FLPXBqzBbsb4SVh97Rz6BqrhE7v5oj77q4iATYWOl4AZwz+De/kzwW3+ZTbJ9oV3YurMKYM=
+	t=1731955420; cv=none; b=Rds9iItmyN/M222X9Y4AW7xUdyZCQ7qY+k5QBvN3CZ+0MYj6mTWTa45Hw0hVtXgn32BYVDMx4QV2lwSzzJtQHh2ZCy5QPBp3NFMT4w7MUZlbiG9Q3RXsVuYHI2UBpHaZ6tNRhiGwyaRAu5CrENlbw8hQ7G4NJuONJV4lxj34gJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731952849; c=relaxed/simple;
-	bh=9Sv8G9r52JNkf1syADECEpjGLTAjt6/932P/i13XHBY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=g+SKjiVNAWQmG55LcRpUasTTafJ7BgywykEqw6wOZQysUQ3aEkMbqYvOYFl5gxLiOhx6JTtCprQ0S6Y3JOzMREKzyY3hFdufm67zVlo8CyCkHG0Z2OtTgLeJjlqpzbPyZJVH3WzXgW9mPB7EP/Vl4Rz/IhmWkS/NgGm9IDG4+d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGH+4lbx; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so31067811fa.1;
-        Mon, 18 Nov 2024 10:00:47 -0800 (PST)
+	s=arc-20240116; t=1731955420; c=relaxed/simple;
+	bh=2Ct+B8awPnldFMpopuvJ0mHQdWAvzuiku4XskzT+NJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mntvzj3azrL1qDNIoKF68vZSziDLbuXDsoR17HpHyTFc9zecXnJBY0UkhP1xx+2AXFH9LxSPUYkeFa9AHQpUnrjqvGmLDcKLUm19KJI0Gl+3XHRK/sqNR3RvKmkyB9Si6kjkDXdFSbEGHfsVDdwM3buUDZzirg2C2MvOmw2x0ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mrp5yqsZ; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b15d7b7a32so5690485a.1
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 10:43:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731952845; x=1732557645; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DaFxbALhld5UZUpLSSfak/ozdMC8pLVVrDQJkwsEPqs=;
-        b=NGH+4lbxMLcLy7vCxZD0NnIgWUBk3SR0RdfOnaNfddNl6EticVb1t7MN1jHoW/63d0
-         +KVWFKuIVhm73v7fyOCe6/MKWD2SGjWJ94+KZvaHOtjhONacv5/c67jX87QLiHXnC0nF
-         myCpe/vGpF/Qwg7pnfuTbtY4nXgEYvo6c/M34VuewVMOgeZBXmga4LbBL2t6Li0m7H9V
-         IKds+SxVg9TxssZbXaDbIXyCyT1aF2DQPk5P2LjA0oO/l4uiodmctUEdohRE+sdwNq13
-         H1oEs9FVlb1R3aEPSaJPCguYMCfvY4Nc8acM/v0OCEnYC+DjH/MITWFvuTF93BeZzfn6
-         KSqg==
+        d=ziepe.ca; s=google; t=1731955417; x=1732560217; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aiGoxS9y5bO8WAr6g5LjnG9Zf3/IZMgtxFJaSmFRzL8=;
+        b=mrp5yqsZUyKB3RmYzXDGCMCtmElakMdYMyz9M3J2edCUEGQEKrfyDzELl9FK0bAAGO
+         DLmm6gf/xc8BVOXQwF5gnspaItZo80KOyml7WFS1iRIFTPayOSOg5RAIDh2NUbUndgRG
+         iOhEkFz2fLensRKMw0HQKuyKsv79z/LO9UCQnDcxLTfv3kPee/tK9iok7Fw3cAAKYCF9
+         mYZJy+9lQzVM5mVyw0l4aNtqqbmVquoq0Z4T9N8wp5LAf9xl5RD625702hcelCtCUUz4
+         AADXssppvrYS7GrNdBDxku5EQjI5DiBI4EZhJ3Gx/UhVxL01M4BdqeXfM4XYeipBBYX/
+         m/PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731952845; x=1732557645;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DaFxbALhld5UZUpLSSfak/ozdMC8pLVVrDQJkwsEPqs=;
-        b=gmCO1nBf0VpAJpX4kCuXm6I3DrKHgNwOs4TUwmAu/LHFavOKXQYZ+7DL8BZxgvkkfr
-         DzHiHs5OgHRjtTy4LxzMSUzMbBUMa7jeX1E+mB4+J0MmHo3BAIkcfFIXWGL7VscK6T/V
-         z9E7VgH6UET2EUikqUs4BAEL5Jh6s9yQo0l9FC9DE/iqeg3gvnSSavCpPeg5g+d2BaiN
-         SLFsteaF1naQ4iw/+zykZHtpEy3SxSwAaIXFWInJLQhwtH0M4sSnF/qosoM30IQYoTpV
-         0qaINvjpABYmBK+9hfMn01mPUK69f2/1mr/vfWfhsPdAQxTafo97pnRMdihRwuR2NRTj
-         PyrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfK9WhzEBMAHP/r4EZg4JPFfwfKtLCf/hD5CHxaWPTGf0oyCrkfEqizWTKiMevgiNEB2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdbwIx6caKOlJnDXbH4MVsGFOn5A1kd7lT2duTBB5Y1PD6CWxy
-	5GPWez9g+oCvO6MleT5GUkvTImcNV9ST81mrRqSDutNO7Ox1OtqpoNYlPGm0PQd7mejMicsvS7W
-	cVgTCuVskgB6yfSodlv+/VWA4ROvXKw==
-X-Google-Smtp-Source: AGHT+IERD+l6Qr6J2S5605UuPiCiMcftraa9jRU70etne+wWJmsgybVfSfST3MV8N0dT1RzxzjB3D97djZCg9uFGd0I=
-X-Received: by 2002:a2e:b88a:0:b0:2ff:55a0:91ff with SMTP id
- 38308e7fff4ca-2ff6064e115mr51444081fa.3.1731952843968; Mon, 18 Nov 2024
- 10:00:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731955417; x=1732560217;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aiGoxS9y5bO8WAr6g5LjnG9Zf3/IZMgtxFJaSmFRzL8=;
+        b=eLHA8oQcnTqRsc0Ku5wbNY8W1dC0ny/aMjNqOkzIYF6fqiP8rHGa85x8tlxwiJmgAA
+         itxCd6yv7dL2r9ylKtI/xAG143ROMxu09mm+3tTv7fmVB2aLBfptjvlWEsyWryEg0kSL
+         d+TYX+TDrok87dHelqsJAQ2csKp9xuOtMBTDcVhJ4LALJIF9f5Y3780UcRFXfHwrsJkX
+         vYbFXwBYqXtFCeVtwf3sj/7tztJfXVmTLtuamSJ2evgsqvOhraXx2K674RMmnzq17Qez
+         5ZuJ1vndYyQEwHW6xN/1fJnGA7AmLRPLHxjXC6e3PyXDuUldZ5fns12p4seTKHkVTDml
+         7Pzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYZHXIB3P8eQoZvDum0JbiRi6fEQdoJcxIEY4eLvX2Clwqg05JH87l+UF6LfRO7S+4ylk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsgJXgiA++jIQijlEJRkoxuJm6sVRBBWMfMZuZw3v2zZ1HWOh4
+	LZx3/7IXSnC3NPsW7X+UzDWEvn6bkAeid+n4vDPSE1VdHzSbCkRcAp8sW5skNrE=
+X-Google-Smtp-Source: AGHT+IGAvD7jve9I99GoT/BKI80P6y8fMglPCbeBoUgHhPAkZfkRJUQQV//W1VAPjwl3J6cuHo9G2g==
+X-Received: by 2002:ad4:5cef:0:b0:6d4:12c:c6cc with SMTP id 6a1803df08f44-6d4012ccda3mr213242956d6.25.1731955417599;
+        Mon, 18 Nov 2024 10:43:37 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc41b4fsm38829916d6.59.2024.11.18.10.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 10:43:36 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tD6im-000000037qC-1a8F;
+	Mon, 18 Nov 2024 14:43:36 -0400
+Date: Mon, 18 Nov 2024 14:43:36 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, tjeznach@rivosinc.com,
+	zong.li@sifive.com, joro@8bytes.org, will@kernel.org,
+	robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org,
+	tglx@linutronix.de, alex.williamson@redhat.com,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
+Subject: Re: [RFC PATCH 08/15] iommu/riscv: Add IRQ domain for interrupt
+ remapping
+Message-ID: <20241118184336.GB559636@ziepe.ca>
+References: <20241114161845.502027-17-ajones@ventanamicro.com>
+ <20241114161845.502027-25-ajones@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Mon, 18 Nov 2024 23:30:32 +0530
-Message-ID: <CAHP4M8VxL3GJx0Ofhk4_AToD-J0X+_20QmfZpq06DuN4CKc15w@mail.gmail.com>
-Subject: Queries regarding consolidated picture of virtualization and SPT/EPT/IOMMU/DMAR/PT
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org, 
-	kvm@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241114161845.502027-25-ajones@ventanamicro.com>
 
-Hi everyone.
+On Thu, Nov 14, 2024 at 05:18:53PM +0100, Andrew Jones wrote:
+> @@ -1276,10 +1279,30 @@ static int riscv_iommu_attach_paging_domain(struct iommu_domain *iommu_domain,
+>  	struct riscv_iommu_device *iommu = dev_to_iommu(dev);
+>  	struct riscv_iommu_info *info = dev_iommu_priv_get(dev);
+>  	struct riscv_iommu_dc dc = {0};
+> +	int ret;
+>  
+>  	if (!riscv_iommu_pt_supported(iommu, domain->pgd_mode))
+>  		return -ENODEV;
+>  
+> +	if (riscv_iommu_bond_link(domain, dev))
+> +		return -ENOMEM;
+> +
+> +	if (iommu_domain->type == IOMMU_DOMAIN_UNMANAGED) {
 
-I understand in a para-virtualization environment, VMM maintains a
-shadow-page-table (SPT) per process per guest, for GVA => HPA
-translation. The hardware/MMU is passed a single pointer to this
-shadow-page-table. The guest is aware that it is running in a
-virtualization environment, and communicates with VMM to help maintain
-the shadow-page-table.
+Drivers should not be making tests like this.
 
-In full-virtualization/HVM virtualization, the guest is unaware that
-it is running in a virtualized environment, and all GVA => GPA are
-private. The VMM is obviously aware of all HVA => HPA mappings; plus
-GPA => HVA is trivial as it's only an offset difference (Extended Page
-Table, EPT). The hardware/MMU is passed three things :
+> +		domain->gscid = ida_alloc_range(&riscv_iommu_gscids, 1,
+> +						RISCV_IOMMU_MAX_GSCID, GFP_KERNEL);
+> +		if (domain->gscid < 0) {
+> +			riscv_iommu_bond_unlink(domain, dev);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		ret = riscv_iommu_irq_domain_create(domain, dev);
+> +		if (ret) {
+> +			riscv_iommu_bond_unlink(domain, dev);
+> +			ida_free(&riscv_iommu_gscids, domain->gscid);
+> +			return ret;
+> +		}
+> +	}
 
-        * Pointer to guest page-table, for GVA => GPA.
-        * Offset, for GPA => HVA.
-        * Pointer to host page-table, for HVA => HPA.
+What are you trying to do? Make something behave different for VFIO?
+That isn't OK, we are trying to remove all the hacky VFIO special
+cases in drivers.
 
-In both the above cases, DMA is a challenge (without IOMMU), as
-device-addresses would need to be physically-contiguous. This would in
-turn mean that all of  GPA needs to be physically-contiguous, which in
-turn means that the host would need to spawn guest-process with all of
-memory (HVA) which is physically-contiguous - very hard to meet
-generally.
+What is the HW issue here? It is very very strange (and probably not
+going to work right) that the irq domains change when domain
+attachment changes.
 
-*_Kindly correct me if I have made a mistake so far at conceptual level._*
+The IRQ setup should really be fixed before any device drivers probe
+onto the device.
 
-
-Now, enters IOMMU, providing the ability to DMA with non-contiguous
-device-addresses.
-Now, my queries are simple :
-
-*
-Is IOMMU DMA-Remapping mode (DMAR) analogous to a para-virtualization
-environment (as per previous brief context)?
-
-*
-Is IOMMU Pass-through (PT) mode analogous to a HVM environment (as per
-previous brief context)?
-
-
-Many thanks in advance for your time; hopefully I have not been a
-complete idiot ..
-
-
-Thanks and Regards,
-Ajay
+Jason
 
