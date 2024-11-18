@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-31999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75CA79D0BEE
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 10:38:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A2F9D0C1E
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 10:46:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35CD7284ED0
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 09:38:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A9E91F221BC
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 09:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC8D19259F;
-	Mon, 18 Nov 2024 09:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8201B19340C;
+	Mon, 18 Nov 2024 09:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UCsI67N+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzkCECui"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543BE186E46
-	for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 09:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E900017C98
+	for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 09:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731922717; cv=none; b=CjSpzDASk7dHv/86XDQXfYBvOntV0geC1aCLF6PPx9Bk2+vPB+eDyGUmd8TiuvR1Mv5OQBOvQs8QKCchjC89eYZQ4n7814tXgDpInylicCA9keWMmIgRCXgrGQ1T/GTtpTlSQukDWmEKJvsLvXERoto+/THdmOjdmK6hoIWxlK0=
+	t=1731923133; cv=none; b=uIK0w1l7+hE85/8fOUYEHfICd5mYkFPttt/JZviA2z+GB2JgcpOy1QTL6X5KMUR21MdJrgXvpobYzoEScGFLp9x1sjp+s7bMDpxVKOHZPH1ex62via3aCqdZQl8XvpsEfgi8wizOM9W4VYlJAsIJZ+5de7NX+HSHPgmk2EFLnuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731922717; c=relaxed/simple;
-	bh=RCNvydKraMeZR7MoDtc89kltmwQsGZj67/ZYMQ/bOJQ=;
+	s=arc-20240116; t=1731923133; c=relaxed/simple;
+	bh=SMLxEDPQPEQtWXfr6Ghg8QMoCBFQUOJOPZUxCX+cPFI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eBJ+YtqbIvW6fKF8lB5auqGP51RF2xVC2yVOGbzZiyq5OAUNBDX9u8vOYUkkqtPLRDcIspN+qU91OQVxvSNJNW3iYXbuC09y5lQ6JlBNUllVD29MB30JryrmaK3rWIJ4iwqFcWcALDal56sGSPIKT/EU95FrqVEVj+f+4+Q+8Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UCsI67N+; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PQ/bqIvMl8WhOZxRRBpdTh4K/Fa8CY4zqXCcZ0ELXQ9TlbC8sqciS0fJdJjB3bHcQYJdnEacXCtfZzhmbGBqHPBXtru9WMvdhrMZq+UN3DKNPxQQdMf1QR3a8j+uaPB9REun1SypS8CzFWzuJlpziD6aYKObX6SJphg9995MgGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HzkCECui; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731922714;
+	s=mimecast20190719; t=1731923130;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+NTRjdfPcUO1aXo5xK1hvXQ8mkL4rX7RTb4WBxeB6gE=;
-	b=UCsI67N+eRm5e0rgmbrGmfxMmZ8bzD773l/E7Ktq0WWUKgNmQlD2++j/aMXZjZKmgDzLms
-	ULTLmXJG5LsFzl+vF8wmvArA4U5SFb42RBwHg81olEwgShT/cyexJaAekcc9Eu8xIaNu4m
-	/pfF7OfnhMunmr+gEbK1koQNDHpEKPA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cwJ8uSoV1kHu/a8TCuNxsNaBsx3fE7CkO6alNVgX5X0=;
+	b=HzkCECuiY8a4y14RafilFUAZ6NRxmbjzzWLqJfqP29IR4gKf/Hudg8ktYiFrQfvYUPL9i5
+	UwffyLvsWP3NXdcksB/cWmiEohR499DJgsDOj5yM4yBr70Jk0ETEzkC0JZooX7C/0lGMvx
+	4Vs1J0JPgA1YcSdNklH5eMJ6eLYloR4=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-20-hBNQV5E_N2GBhewtLu7Gpg-1; Mon, 18 Nov 2024 04:38:32 -0500
-X-MC-Unique: hBNQV5E_N2GBhewtLu7Gpg-1
-X-Mimecast-MFC-AGG-ID: hBNQV5E_N2GBhewtLu7Gpg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315d98a75fso31892375e9.2
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 01:38:32 -0800 (PST)
+ us-mta-99-uX6RqUOMNkiNXnvAxpEXcw-1; Mon, 18 Nov 2024 04:45:29 -0500
+X-MC-Unique: uX6RqUOMNkiNXnvAxpEXcw-1
+X-Mimecast-MFC-AGG-ID: uX6RqUOMNkiNXnvAxpEXcw
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ff550d390aso23176061fa.2
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2024 01:45:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731922711; x=1732527511;
+        d=1e100.net; s=20230601; t=1731923127; x=1732527927;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=+NTRjdfPcUO1aXo5xK1hvXQ8mkL4rX7RTb4WBxeB6gE=;
-        b=r8EMeOxr4dKAQfbNMrvk5C15RVg/uZSQIRvUkPY7LVkfMLG/d2q5XrH7Iu2X75nmpz
-         k58FYRU97PbVqM14cRt11ArdQMLUBIiEAi2G19KhNn5MNxbYQPdGs6yAt4QIgxDMOG50
-         ytMeaLfCf8/LEIakBk439I5CHjuLMCTqeWJBH98IdYZ77hz22QOsgN6MuXgQPGhFedYo
-         Cl+DK3ocJjPCdMGfHMi9PNSMUzAbHDrL1be4kisku/zcxhaPVq6NWsGFUHryqMyvXKmm
-         Why7vLPp465ZCfG1oqy9sBQTNtt4o+GIDM3HG6iL+MWHB6Sfvv3qwnIBVfr1/9R8VOhu
-         IxrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2vS/njKFpGDTdkRJ9F4+ZDjiYsORcvIF+TLJttyK8wnYnSxtdD9ZYvxKeyG91BOofaBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxpGD8Pf+wVBeplVnjEVu8oNKWqXMLABzrYP9vKltgbKtQ9Ntt
-	80ZMdZ+Flpk61WUrYUbe/Ju86fu1oEgbzcTNKe230DWOR0nBkaWIA+2Qd49Ry1nXclvOu0Cp0tz
-	70/B88RnUycW7gpghh3xj9HvBRaep0jMZ8NyYd1rpgN6AZdHM2Q==
-X-Received: by 2002:a05:600c:4595:b0:431:b42a:2978 with SMTP id 5b1f17b1804b1-432df7411f8mr96600545e9.9.1731922711665;
-        Mon, 18 Nov 2024 01:38:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNdX08kgrhCDdSpGLAntBtOpOc15TdOtLfjCc8MQDp2SzDpZ/XtyXBKhpLLWnL6Ein1okH4A==
-X-Received: by 2002:a05:600c:4595:b0:431:b42a:2978 with SMTP id 5b1f17b1804b1-432df7411f8mr96600255e9.9.1731922711303;
-        Mon, 18 Nov 2024 01:38:31 -0800 (PST)
+        bh=cwJ8uSoV1kHu/a8TCuNxsNaBsx3fE7CkO6alNVgX5X0=;
+        b=hKwIocX/MLqVSh/GdDndKMM66RPRoqhDvsv6rMM3P6p78GSUOfmvNoY1zFzN7nEUib
+         j6p0gTXRHjoFfE6iwMHCglqDfAfXSHqaiQOB4yk6r8HobnHvWhNx2oj0ic6EWmPP89XA
+         OxxBA8XrHrLQCXA+CeiV7prkk3fPIrhIZQPbCsJLntgIWwl60mxrhiq6K5z/Ls2Ib8VP
+         HiwH63nBbyDmNmUrLCUGZYW57Y/WFmpaozwBf0GQ1Npv9+4LtP5CK24UgechQLv4ryQT
+         M1x7ws5BJOxzLaeZUYhBDNKOI5g08E0JUCqVsRmvS/s08KdE6NuBvkyOpGyMfVTNjAq5
+         O0+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWpV1L8IEhp7K3Xg/OCVHIHzaQjCTTCmFdJ31cJ1vmxZrLqUT9zMqjb1Qw5TFJY/b1imos=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyppWc7dsMmZGp3w6rMk5jxrqRnqOT0bLJBq0xcRJTtFIbIHlK3
+	lw6EJL5eFxRkDjtJaApmY+RycmAgA41UMHx7GSYkfXp+dx1nAxRmH/1wSB+8dP9XWnyIMkjk4ep
+	2zCrXaU1RrKkaEb/nwDTevAknauDZGey+Mr9ifl+Q29Vt/vxpVA==
+X-Received: by 2002:ac2:4e14:0:b0:539:e58a:9704 with SMTP id 2adb3069b0e04-53dab2a9517mr4701750e87.33.1731923127371;
+        Mon, 18 Nov 2024 01:45:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEA8FS7rY5tWZSAezskr6Y4KTNRqCPcgI2GRmvTYZlxH68ufQY2j7mWrLw82jHfzpD1wa7R7Q==
+X-Received: by 2002:ac2:4e14:0:b0:539:e58a:9704 with SMTP id 2adb3069b0e04-53dab2a9517mr4701734e87.33.1731923126973;
+        Mon, 18 Nov 2024 01:45:26 -0800 (PST)
 Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da2800absm151820395e9.25.2024.11.18.01.38.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38243e09ff9sm3702928f8f.68.2024.11.18.01.45.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Nov 2024 01:38:30 -0800 (PST)
-Message-ID: <15f665b4-2d33-41ca-ac50-fafe24ade32f@redhat.com>
-Date: Mon, 18 Nov 2024 10:38:29 +0100
+        Mon, 18 Nov 2024 01:45:26 -0800 (PST)
+Message-ID: <439e280e-bc82-4a79-b325-d18fcf65feec@redhat.com>
+Date: Mon, 18 Nov 2024 10:45:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,23 +84,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 1/2] KVM: guest_memfd: Convert .free_folio() to
- .release_folio()
-To: Elliot Berman <quic_eberman@quicinc.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Mike Rapoport <rppt@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Matthew Wilcox <willy@infradead.org>,
- James Gowans <jgowans@amazon.com>, linux-fsdevel@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com>
- <20241113-guestmem-library-v3-1-71fdee85676b@quicinc.com>
- <c650066d-18c8-4711-ae22-3c6c660c713e@redhat.com>
- <d2147b7c-bb2e-4434-aa10-40cacac43d4f@redhat.com>
- <20241115121119110-0800.eberman@hu-eberman-lv.qualcomm.com>
+Subject: Re: [PATCH v2 3/7] accel/kvm: Report the loss of a large memory page
+To: William Roche <william.roche@oracle.com>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
+ philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
+ imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
+ wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
+References: <e2ac7ad0-aa26-4af2-8bb3-825cba4ffca0@redhat.com>
+ <20241107102126.2183152-1-william.roche@oracle.com>
+ <20241107102126.2183152-4-william.roche@oracle.com>
+ <f5b43126-acbd-4e3f-8ec4-3a5c20957445@redhat.com>
+ <08e03987-3c9a-49b2-adf5-fd40e7ede0c0@oracle.com>
+ <e5d6bae8-a3bd-4225-b38f-65de6b1a2b54@redhat.com>
+ <386af93d-5a61-4a90-9af0-1f33fa04b0bd@oracle.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -148,177 +145,117 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241115121119110-0800.eberman@hu-eberman-lv.qualcomm.com>
+In-Reply-To: <386af93d-5a61-4a90-9af0-1f33fa04b0bd@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 15.11.24 21:13, Elliot Berman wrote:
-> On Fri, Nov 15, 2024 at 11:58:59AM +0100, David Hildenbrand wrote:
->> On 15.11.24 11:58, David Hildenbrand wrote:
->>> On 13.11.24 23:34, Elliot Berman wrote:
->>>> When guest_memfd becomes a library, a callback will need to be made to
->>>> the owner (KVM SEV) to transition pages back to hypervisor-owned/shared
->>>> state. This is currently being done as part of .free_folio() address
->>>> space op, but this callback shouldn't assume that the mapping still
->>>> exists. guest_memfd library will need the mapping to still exist to look
->>>> up its operations table.
->>>
->>> I assume you mean, that the mapping is no longer set for the folio (it
->>> sure still exists, because we are getting a callback from it :) )?
->>>
->>> Staring at filemap_remove_folio(), this is exactly what happens:
->>>
->>> We remember folio->mapping, call __filemap_remove_folio(), and then call
->>> filemap_free_folio() where we zap folio->mapping via page_cache_delete().
->>>
->>> Maybe it's easier+cleaner to also forward the mapping to the
->>> free_folio() callback, just like we do with filemap_free_folio()? Would
->>> that help?
->>>
->>> CCing Willy if that would be reasonable extension of the free_folio
->>> callback.
->>>
+>> Hm, I think we should definitely be including the size in the existing
+>> one. That code was written without huge pages in mind.
 > 
-> I like this approach too. It would avoid the checks we have to do in the
-> invalidate_folio() callback and is cleaner.
+> Yes we can do that, and get the page size at this level to pass as a
+> 'page_sise' argument to kvm_hwpoison_page_add().
+> 
+> It would make the message longer as we will have the extra information
+> about the large page on all messages when an error impacts a large page.
+> We could change the messages only when we are dealing with a large page,
+> so that the standard (4k) case isn't modified.
 
-It really should be fairly simple
+Right. And likely we should call it "huge page" instead, which is the 
+Linux term for anything larger than a single page.
+
+[...]
+
+>>
+>> With the "large page" hint you can highlight that this is special.
+> 
+> Right, we can do it that way. It also gives the impression that we
+> somehow inject errors on a large range of the memory. Which is not the
+> case. I'll send a proposal with a different formulation, so that you can
+> choose.
+> 
+
+Make sense.
+
+> 
+> 
+>> On a related note ...I think we have a problem. Assume we got a SIGBUS
+>> on a huge page (e.g., somewhere in a 1 GiB page).
+>>
+>> We will call kvm_mce_inject(cpu, paddr, code) /
+>> acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)
+>>
+>> But where is the size information? :// Won't the VM simply assume that
+>> there was a MCE on a single 4k page starting at paddr?
+> 
+> This is absolutely right !
+> It's exactly what happens: The VM kernel received the information and
+> considers that only the impacted page has to be poisoned.
+ > > That's also the reason why Qemu repeats the error injections every time
+> the poisoned large page is accessed (for all other touched 4k pages
+> located on this "memory hole").
+
+:/
+
+So we always get from Linux the full 1Gig range and always report the 
+first 4k page essentially, on any such access, right?
 
 
-  Documentation/filesystems/locking.rst | 2 +-
-  fs/nfs/dir.c                          | 9 +++++----
-  fs/orangefs/inode.c                   | 3 ++-
-  include/linux/fs.h                    | 2 +-
-  mm/filemap.c                          | 2 +-
-  mm/secretmem.c                        | 3 ++-
-  virt/kvm/guest_memfd.c                | 3 ++-
-  7 files changed, 14 insertions(+), 10 deletions(-)
+BTW, should we handle duplicates in our poison list?
 
-diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
-index f5e3676db954b..f1a20ad5edbee 100644
---- a/Documentation/filesystems/locking.rst
-+++ b/Documentation/filesystems/locking.rst
-@@ -258,7 +258,7 @@ prototypes::
-  	sector_t (*bmap)(struct address_space *, sector_t);
-  	void (*invalidate_folio) (struct folio *, size_t start, size_t len);
-  	bool (*release_folio)(struct folio *, gfp_t);
--	void (*free_folio)(struct folio *);
-+	void (*free_folio)(struct address_space *, struct folio *);
-  	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
-  	int (*migrate_folio)(struct address_space *, struct folio *dst,
-  			struct folio *src, enum migrate_mode);
-diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-index 492cffd9d3d84..f7da6d7496b06 100644
---- a/fs/nfs/dir.c
-+++ b/fs/nfs/dir.c
-@@ -218,7 +218,8 @@ static void nfs_readdir_folio_init_array(struct folio *folio, u64 last_cookie,
-  /*
-   * we are freeing strings created by nfs_add_to_readdir_array()
-   */
--static void nfs_readdir_clear_array(struct folio *folio)
-+static void nfs_readdir_clear_array(struct address_space *mapping,
-+		struct folio *folio)
-  {
-  	struct nfs_cache_array *array;
-  	unsigned int i;
-@@ -233,7 +234,7 @@ static void nfs_readdir_clear_array(struct folio *folio)
-  static void nfs_readdir_folio_reinit_array(struct folio *folio, u64 last_cookie,
-  					   u64 change_attr)
-  {
--	nfs_readdir_clear_array(folio);
-+	nfs_readdir_clear_array(folio->mapping, folio);
-  	nfs_readdir_folio_init_array(folio, last_cookie, change_attr);
-  }
-  
-@@ -249,7 +250,7 @@ nfs_readdir_folio_array_alloc(u64 last_cookie, gfp_t gfp_flags)
-  static void nfs_readdir_folio_array_free(struct folio *folio)
-  {
-  	if (folio) {
--		nfs_readdir_clear_array(folio);
-+		nfs_readdir_clear_array(folio->mapping, folio);
-  		folio_put(folio);
-  	}
-  }
-@@ -391,7 +392,7 @@ static void nfs_readdir_folio_init_and_validate(struct folio *folio, u64 cookie,
-  	if (folio_test_uptodate(folio)) {
-  		if (nfs_readdir_folio_validate(folio, cookie, change_attr))
-  			return;
--		nfs_readdir_clear_array(folio);
-+		nfs_readdir_clear_array(folio->mapping, folio);
-  	}
-  	nfs_readdir_folio_init_array(folio, cookie, change_attr);
-  	folio_mark_uptodate(folio);
-diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
-index aae6d2b8767df..d936694b8e91f 100644
---- a/fs/orangefs/inode.c
-+++ b/fs/orangefs/inode.c
-@@ -470,7 +470,8 @@ static bool orangefs_release_folio(struct folio *folio, gfp_t foo)
-  	return !folio_test_private(folio);
-  }
-  
--static void orangefs_free_folio(struct folio *folio)
-+static void orangefs_free_folio(struct address_space *mapping,
-+		struct folio *folio)
-  {
-  	kfree(folio_detach_private(folio));
-  }
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 3559446279c15..4dd4013541c1b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -417,7 +417,7 @@ struct address_space_operations {
-  	sector_t (*bmap)(struct address_space *, sector_t);
-  	void (*invalidate_folio) (struct folio *, size_t offset, size_t len);
-  	bool (*release_folio)(struct folio *, gfp_t);
--	void (*free_folio)(struct folio *folio);
-+	void (*free_folio)(struct address_space *, struct folio *folio);
-  	ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
-  	/*
-  	 * migrate the contents of a folio to the specified target. If
-diff --git a/mm/filemap.c b/mm/filemap.c
-index e582a1545d2ae..86f975ba80746 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -239,7 +239,7 @@ void filemap_free_folio(struct address_space *mapping, struct folio *folio)
-  
-  	free_folio = mapping->a_ops->free_folio;
-  	if (free_folio)
--		free_folio(folio);
-+		free_folio(mapping, folio);
-  
-  	if (folio_test_large(folio))
-  		refs = folio_nr_pages(folio);
-diff --git a/mm/secretmem.c b/mm/secretmem.c
-index 399552814fd0f..1d2ed3391734d 100644
---- a/mm/secretmem.c
-+++ b/mm/secretmem.c
-@@ -152,7 +152,8 @@ static int secretmem_migrate_folio(struct address_space *mapping,
-  	return -EBUSY;
-  }
-  
--static void secretmem_free_folio(struct folio *folio)
-+static void secretmem_free_folio(struct address_space *mapping,
-+		struct folio *folio)
-  {
-  	set_direct_map_default_noflush(&folio->page);
-  	folio_zero_segment(folio, 0, folio_size(folio));
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 8f079a61a56db..573946c4fff51 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -353,7 +353,8 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
-  }
-  
-  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
--static void kvm_gmem_free_folio(struct folio *folio)
-+static void kvm_gmem_free_folio(struct address_space *mapping,
-+		struct folio *folio)
-  {
-  	struct page *page = folio_page(folio, 0);
-  	kvm_pfn_t pfn = page_to_pfn(page);
--- 
-2.47.0
+> 
+>>
+>> I'm not sure if we can inject ranges, or if we would have to issue one
+>> MCE per page ... hm, what's your take on this?
+> 
+> I don't know of any size information about a memory error reported by
+> the hardware. The kernel doesn't seem to expect any such information.
+> It explains why there is no impact/blast size information provided when
+> an error is relayed to the VM.
+> 
+> We could take the "memory hole" size into account in Qemu, but repeating
+> error injections is not going to help a lot either: We'd need to give
+> the VM some time to deal with an error injection before producing a new
+> error for the next page etc... in the case (x86 only) where an
 
+I had the same thoughts.
+
+> asynchronous error is relayed with BUS_MCEERR_AO, we would also have to
+> repeat the error for all the 4k pages located on the lost large page too.
+> 
+> We can see that the Linux kernel has some mechanisms to deal with a
+> seldom 4k page loss, but a larger blast is very likely to crash the VM
+> (which is fine).
+
+Right, and that will inevitably happen when we get a MVE on a 1GiG 
+hugetlb page, correct? The whole thing will be inaccessible.
+
+> And as a significant part of the memory is no longer
+> accessible, dealing with the error itself can be impaired and we
+> increase the risk of loosing data, even though most of the memory on the
+> large page could still be used.
+> 
+> Now if we can recover the 'still valid' memory of the impacted large
+> page, we can significantly reduce this blast and give a much better
+> chance to the VM to survive the incident or crash more gracefully.
+
+Right. That cannot be sorted out in user space alone, unfortunately.
+
+> 
+> I've looked at the project you indicated me, which is not ready to be
+> adopted:
+> https://lore.kernel.org/linux-mm/20240924043924.3562257-2-jiaqiyan@google.com/T/
+> 
+
+Yes, that goes into a better direction, though.
+
+> But we see that, this large page enhancement is needed, sometimes just
+> to give a chance to the VM to survive a little longer before being
+> terminated or moved.
+> Injecting multiple MCEs or ACPI error records doesn't help, according to me.
+
+I suspect that in most cases, when we get an MCE on a 1Gig page in the 
+hypervisor, our running Linux guest will soon crash, because it really 
+lost 1 Gig of contiguous memory. :(
 
 -- 
 Cheers,
