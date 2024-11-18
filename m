@@ -1,142 +1,201 @@
-Return-Path: <kvm+bounces-32030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D379D18F5
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 20:32:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F269D1AC5
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 22:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3FE61F2223A
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 19:32:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE924281918
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 21:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9899A1E4937;
-	Mon, 18 Nov 2024 19:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332FF1E7C16;
+	Mon, 18 Nov 2024 21:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oaMOXl+d"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A44117BBF;
-	Mon, 18 Nov 2024 19:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731958363; cv=none; b=QVPYv+BEjVOJ6EjoItbhwEx3UNFhj1F1drp85iIgSnCZwL6C/zDZ5ukxoSNIi7ZpXLyWd/qYwyJCa+WpXuQPOYmGZH+RHL4Wi4UQcpU5g9eLZGDfgpMHLWvp9L+EC7y83yKZsOlQxkwu9VXBhHGb6Oa/6wDBD4BwvMha4GHoR98=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731958363; c=relaxed/simple;
-	bh=jwf9mr6ZqGV+aRwYqQV3XDJze1+KZMmOLGtdZOcQrx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sB3S0aOb0HSjhpLhzoYTB7Z8dYTpbthAwRoh+FArCWPvOEDzTa3dp0o3uFnrV3gvZh+ON2Rm/Ta5LUkDgZE6+JHBBW5n3f6cpQ+CNqXr3IJJMvRb4/LZ8APCClpPHnJl2FawJ+7G8OyYjfZueMTdza3V8I/BpUREehvwRFFtUzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4572C4CECC;
-	Mon, 18 Nov 2024 19:32:40 +0000 (UTC)
-Date: Mon, 18 Nov 2024 14:33:11 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Suleiman Souhlal <suleiman@google.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Valentin
- Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- seanjc@google.com, Srikar Dronamraju <srikar@linux.ibm.com>, David
- Woodhouse <dwmw2@infradead.org>, joelaf@google.com, vineethrp@google.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, ssouhlal@freebsd.org
-Subject: Re: [PATCH v3] sched: Don't try to catch up excess steal time.
-Message-ID: <20241118143311.3ca94405@gandalf.local.home>
-In-Reply-To: <20241118043745.1857272-1-suleiman@google.com>
-References: <20241118043745.1857272-1-suleiman@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF35199252;
+	Mon, 18 Nov 2024 21:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731966330; cv=fail; b=k1l/1aXYlX0J+UckrnAgCDQbIie0Jx8uQVUmT7QEPqEPVULhIC/16EG0o3OLmQs/lD93G73ONNXSzaT3iXBgjWqpWxTALVy+WCcz2yKnE+kDGg5gO76Evu8dhMOWJ2zX1gyxZA+wzq4OYycEIUgpUkk2zlBQtKZAo4MqhJtMDgY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731966330; c=relaxed/simple;
+	bh=q1Dlb6+XXj3LB33TEXVJurkt1IKwHSO90rYGdXkWmfc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mSbO/uCdUQFesI2oGnC4H7SJpqDybiJSLaKTZlDH/r9MByrFgpnkIV6UXf6ez3GppChu9ilzaf7PrcJFRKv1Fs8DN/xQyFXV8JaK9v+6UZMeZbGY8Fbi1Acdcmsd3wv0ip32VW7FRpTaXucld3IxEE9x6mcmz278PpmDUeTW8Cw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oaMOXl+d; arc=fail smtp.client-ip=40.107.236.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V/vf1fmgBdjeP4mYk2OVqYizePp15VQm8Wjp7jxs2kE+jA+TSAhJb7gt1zpiFhPoTlmLWW0aC95vbHrjZwd8DsSb3gGdO6n4HlTHq7P9lbDIDBA+CrVSzexViwdAzTFLh1VUtmoTYRoz+PkzkdIZ9HU4JAqqIJMAJ1liSiysDt+DE03aw10hutzdhiHeoNN3dlgtIF+oYLJImvXJZ7AOHswMSoVjSwtdYi3SrdvdxlvtGkuzZ2LJbbPFwECPnmKcjNAAK4h8dlglreCGpEMbAQ+pDT/5v7avfwxqNPhdBhS6Ey1eLaiWU9clMK3+U1z+SQPtuV2O0hKuwjyU/ZAE0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/XRQRDzpyBqrqYbQHd+pxl2/MgWlb/nLzuJ0LXKv1uo=;
+ b=VVQ9SQUvYldPgmdWIgfcJdGjM59mhV6H4jgyuyY8nOQ5Czxscx/wGDOFeUxQyJv5eL+pgndeqzWIpoyG4NFL1XvJvtIaVPCBeBdQJnBE6ahU1KyjDEQeGuXbuFbIJZBhjwB6ODsnfEdD6+o+GEjoGTSVkmjtLANolkH9MhZXBdFtgvJtSCdxe0p58OBaExOzAosZvHY+xfAjoM5sS76r3WWw9KRiEtjiEjpcqe6Sgx3+pmrSvs6r45VP0juyPT7hAtQuSbmLeSVIK0egNc3EPoqS2LuOAVT1dsP0QvTgptl3kYHx726HHmBt2txg9NeQYLUhHfz8CoAla3dXW+xBYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.12) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/XRQRDzpyBqrqYbQHd+pxl2/MgWlb/nLzuJ0LXKv1uo=;
+ b=oaMOXl+dgXaDGWWmp+6W9uVIVDXb5sSGtMxLZSLWOFwpi8AIg4gY7TbpDZy3pZhpLz338NvT02uBd877bcvSL3dHYwD3eG7ePn6M5sVMzicuONlTFC3ez9p7W/ObHwG7rTQQwmkg1kr9Md2RTDvVzO82ViAYYiOWXPJOoIb1SxE=
+Received: from BL1P222CA0019.NAMP222.PROD.OUTLOOK.COM (2603:10b6:208:2c7::24)
+ by LV2PR12MB5728.namprd12.prod.outlook.com (2603:10b6:408:17c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.21; Mon, 18 Nov
+ 2024 21:45:22 +0000
+Received: from BL6PEPF0001AB53.namprd02.prod.outlook.com
+ (2603:10b6:208:2c7:cafe::4f) by BL1P222CA0019.outlook.office365.com
+ (2603:10b6:208:2c7::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23 via Frontend
+ Transport; Mon, 18 Nov 2024 21:45:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.12)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.12 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.12; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.12) by
+ BL6PEPF0001AB53.mail.protection.outlook.com (10.167.241.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8158.14 via Frontend Transport; Mon, 18 Nov 2024 21:45:22 +0000
+Received: from [10.23.197.56] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 18 Nov
+ 2024 15:45:20 -0600
+Message-ID: <6f6c1a11-40bd-48dc-8e11-4a1f67eaa43b@amd.com>
+Date: Mon, 18 Nov 2024 13:45:13 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, <linux-kernel@vger.kernel.org>
+CC: <tglx@linutronix.de>, <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
+	<Thomas.Lendacky@amd.com>, <nikunj@amd.com>, <Santosh.Shukla@amd.com>,
+	<Vasant.Hegde@amd.com>, <Suravee.Suthikulpanit@amd.com>, <bp@alien8.de>,
+	<David.Kaplan@amd.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<peterz@infradead.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<kvm@vger.kernel.org>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
+Content-Language: en-US
+From: "Melody (Huibo) Wang" <huibo.wang@amd.com>
+In-Reply-To: <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|LV2PR12MB5728:EE_
+X-MS-Office365-Filtering-Correlation-Id: fb19c698-8ddb-4832-d93d-08dd081a4dd0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RlZsZ0JYMXZaajJnTWVSaVpVUmM3VlhOenI5UW5tTm9YQTR0bTBHb3Vzb3Uz?=
+ =?utf-8?B?T0FCalJqN1RpQkpaL3EvZDR5VXhpM0NLTWhaYTE3S0RTb3dNdldCSDNlZFdN?=
+ =?utf-8?B?cFdWTC9HamU3UzQ3QVhRaVg3OG9JUlBEbUdRZmkvcXM0cW5sRmYvYVIya1BG?=
+ =?utf-8?B?RXg0S25LOVhRYld1SVVDWjFsWkxvS3I0a2x5eGVwaExxTHVwY1haaDdYaU41?=
+ =?utf-8?B?cW5GU0Z6cEZicjlaYkZGaGIySk9kZngyTFltV2lyR0xhUjQ0eURVZW1UMDZQ?=
+ =?utf-8?B?aldHOEY0NHVjYTV3MTROYXJCekdOR2RITmJZTU1sdWtOVXJwSjlZRi9NQzFh?=
+ =?utf-8?B?NWt1bWhSbzNzN2pXNUJybm43U3hacE1KNnVwUjk2a3ovcUZaY0VEbFk4Tnpy?=
+ =?utf-8?B?QWYvdVAvcnZ4bEQ4M3VJU09RUXhGMXpJeWU2SkJhYVlNcnA2Tnpaai9XSzRu?=
+ =?utf-8?B?Y2l5RytwN1NyOUlocThmSUorSVhjMHIyVlRCd1d6UmxNZG80UlRHV1E5NENB?=
+ =?utf-8?B?K0FKUjVCdWNDcGRCcUIySmdJaDJFQUNaSlZyNEwyZXorR0JJRTZYU1JzRGF1?=
+ =?utf-8?B?YjZzZCtsbXRkYk1YUGdOdmdRSmVPaDNjQTBsc0xmWkxyQmJOK3NlNHFLemdC?=
+ =?utf-8?B?anRHLzd5QW1nZUZlWDBtSklRNEVJUWJ2R0FJSlc1TFdXVTVmSCtaOFo4ZldD?=
+ =?utf-8?B?bGkyQ2F6MmVZK0xFOFZEVVVWbE9pMG5QbjdlMWQ1UUhPdEZqTWhtK1BRb3p1?=
+ =?utf-8?B?NUxhOW9lQXBTZGRxeEx1NkFOYXlVRjkyY2ZqU2VqbzZoZFJibXl4QzFSQ0JB?=
+ =?utf-8?B?bHdrUGcrWnZ6U0lVdE8zcU9ybnBtQlY1anYzRFlRUGJBSUlhY09JQ1RVSmpU?=
+ =?utf-8?B?eVhQN1o2WWw2ZFVCTnU5OVlQRjZObGJDZzJ6cHNQd1lTMVVMTEYvdHlTOWt4?=
+ =?utf-8?B?YzZFRTFvUTNFSG41ekpFTDFteXEzenFHaTVvV3NOV3R4R1JEN09IamdjWHR4?=
+ =?utf-8?B?V2hPTzc4bWp3YTd3ZDI5MnJGRWMvL0xjVzQyVmlBZytMQXFhMklLWmplRjZk?=
+ =?utf-8?B?WDRweXRMc0l4SEZUeE9rZVZtQWk4RmtLZnRTcG9aQzh0Q0xiM2YvNElGbnow?=
+ =?utf-8?B?dU5zcC9JUzdpbEgyRlZJeUVqV1FKNk05aVZrT2tKVXlGNGdvVW5hcWlLZi9V?=
+ =?utf-8?B?K3hvUDlBRVhTb1UrbVptbnJ5U29CbjVmTUNOaHFPcnZqK0JlTW9zTnlDcE9z?=
+ =?utf-8?B?ZjBmbnBYYXVHamFUZTV0Y3p6SDBXNWc0eGxjOGx2dDVoTWJQS2ZiNURtaUgw?=
+ =?utf-8?B?UDlSb1V5djc1N0c4dGtSTTdRaDVJLytPd1c4ZGYyOEYyNC9PZ1FKa1RJb1Vi?=
+ =?utf-8?B?MnlDWHBNZ1ZhRXZWRlFiZ1hCbGxkQ3pjclBxNm5RVlFBZ1plZlY4RWxxTFpx?=
+ =?utf-8?B?MGVMc2ROSFlVMElpZm8zT3ZPbWRtcDJva2pVRjQ2cG5CSmhZclFYSFBSemp6?=
+ =?utf-8?B?MWZ2UHpvOE0xck9uSVNHdTJrWFhGNko0MEVXSDdzYy9BanZITkFrQm1UNEN1?=
+ =?utf-8?B?UHZ4WVNoc1R5aDlZNS9kV2JFMml0Z3AvYzRVaXNWemtzOGtyZlpkYVVYUWdS?=
+ =?utf-8?B?NnozLzZFY0I5NnhJeXlKVjVicFRYdjJFb2VEMlNCUXFodUVmZ0JpYkYwVDlZ?=
+ =?utf-8?B?MENrbXovb29rOXBrd2IvaGMvOTB6ZVRqUmhUVFBwSUJRY25OSExTZXdTUGl4?=
+ =?utf-8?B?bURURnErMTRsNURGeFhldlJQRHQ2QVk1a2l0S3hEVXF0NDVMRWhqZVRJQWQ1?=
+ =?utf-8?B?MGRKVjZHdE5IbExJNHhrdEJuek1KOWdabnZjRXdETGNOMVhXaVJsbHJVOGxX?=
+ =?utf-8?B?ZFFtZ1gzZjlmdGRnbURtRzdJTHBadzJMREgraGx2bTYxaEE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.12;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:atlvpn-bp.amd.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 21:45:22.3558
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb19c698-8ddb-4832-d93d-08dd081a4dd0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.12];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB53.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5728
 
-On Mon, 18 Nov 2024 13:37:45 +0900
-Suleiman Souhlal <suleiman@google.com> wrote:
+Hi Neeraj,
 
-> When steal time exceeds the measured delta when updating clock_task, we
-> currently try to catch up the excess in future updates.
-> However, this results in inaccurate run times for the future things using
-> clock_task, in some situations, as they end up getting additional steal
-> time that did not actually happen.
-> This is because there is a window between reading the elapsed time in
-> update_rq_clock() and sampling the steal time in update_rq_clock_task().
-> If the VCPU gets preempted between those two points, any additional
-> steal time is accounted to the outgoing task even though the calculated
-> delta did not actually contain any of that "stolen" time.
-> When this race happens, we can end up with steal time that exceeds the
-> calculated delta, and the previous code would try to catch up that excess
-> steal time in future clock updates, which is given to the next,
-> incoming task, even though it did not actually have any time stolen.
+On 9/13/2024 4:36 AM, Neeraj Upadhyay wrote:
+> From: Kishon Vijay Abraham I <kvijayab@amd.com>
 > 
-> This behavior is particularly bad when steal time can be very long,
-> which we've seen when trying to extend steal time to contain the duration
-> that the host was suspended [0]. When this happens, clock_task stays
-> frozen, during which the running task stays running for the whole
-> duration, since its run time doesn't increase.
-> However the race can happen even under normal operation.
+> The Secure AVIC feature provides SEV-SNP guests hardware acceleration
+> for performance sensitive APIC accesses while securely managing the
+> guest-owned APIC state through the use of a private APIC backing page.
+> This helps prevent malicious hypervisor from generating unexpected
+> interrupts for a vCPU or otherwise violate architectural assumptions
+> around APIC behavior.
 > 
-> Ideally we would read the elapsed cpu time and the steal time atomically,
-> to prevent this race from happening in the first place, but doing so
-> is non-trivial.
+> Add a new x2APIC driver that will serve as the base of the Secure AVIC
+> support. It is initially the same as the x2APIC phys driver, but will be
+> modified as features of Secure AVIC are implemented.
 > 
-> Since the time between those two points isn't otherwise accounted anywhere,
-> neither to the outgoing task nor the incoming task (because the "end of
-> outgoing task" and "start of incoming task" timestamps are the same),
-> I would argue that the right thing to do is to simply drop any excess steal
-> time, in order to prevent these issues.
-> 
-> [0] https://lore.kernel.org/kvm/20240820043543.837914-1-suleiman@google.com/
-> 
-> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
+> Co-developed-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 > ---
-> v3:
-> - Reword commit message.
-> - Revert back to v1 code, since it's more understandable.
+>  arch/x86/Kconfig                    |  12 +++
+>  arch/x86/boot/compressed/sev.c      |   1 +
+>  arch/x86/coco/core.c                |   3 +
+>  arch/x86/include/asm/msr-index.h    |   4 +-
+>  arch/x86/kernel/apic/Makefile       |   1 +
+>  arch/x86/kernel/apic/x2apic_savic.c | 112 ++++++++++++++++++++++++++++
+>  include/linux/cc_platform.h         |   8 ++
+>  7 files changed, 140 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/x86/kernel/apic/x2apic_savic.c
 > 
-> v2: https://lore.kernel.org/lkml/20240911111522.1110074-1-suleiman@google.com
-> - Slightly changed to simply moving one line up instead of adding
->   new variable.
-> 
-> v1: https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com
-> ---
->  kernel/sched/core.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index a1c353a62c56..13f70316ef39 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -766,13 +766,15 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
->  #endif
->  #ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
->  	if (static_key_false((&paravirt_steal_rq_enabled))) {
-> -		steal = paravirt_steal_clock(cpu_of(rq));
-> +		u64 prev_steal;
-> +
-> +		steal = prev_steal = paravirt_steal_clock(cpu_of(rq));
->  		steal -= rq->prev_steal_time_rq;
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 007bab9f2a0e..b05b4e9d2e49 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -469,6 +469,18 @@ config X86_X2APIC
 >  
->  		if (unlikely(steal > delta))
->  			steal = delta;
-
-So is the problem just the above if statement? That is, delta is already
-calculated, but if we get interrupted by the host before steal is
-calculated and the time then becomes greater than delta, the time
-difference between delta and steal gets pushed off to the next task, right?
-
--- Steve
-
-
-
+>  	  If you don't know what to do here, say N.
 >  
-> -		rq->prev_steal_time_rq += steal;
-> +		rq->prev_steal_time_rq = prev_steal;
->  		delta -= steal;
->  	}
->  #endif
+> +config AMD_SECURE_AVIC
+> +	bool "AMD Secure AVIC"
+> +	depends on X86_X2APIC && AMD_MEM_ENCRYPT
+
+If we remove the dependency on X2APIC, there are only 3 X2APIC functions which you call from this driver. Can we just expose them in the header, and then simply remove the dependency on X2APIC? 
+
+Thanks
+Melody
 
 
