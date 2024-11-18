@@ -1,81 +1,85 @@
-Return-Path: <kvm+bounces-31994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-31995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EC19D037B
-	for <lists+kvm@lfdr.de>; Sun, 17 Nov 2024 13:08:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA6099D0822
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 04:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 584AFB23B8B
-	for <lists+kvm@lfdr.de>; Sun, 17 Nov 2024 12:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D351F21E89
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2024 03:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8490A187FE0;
-	Sun, 17 Nov 2024 12:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="Vyj/UwD4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9EB6E2BE;
+	Mon, 18 Nov 2024 03:15:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADE2A937;
-	Sun, 17 Nov 2024 12:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from cmccmta1.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1452C81E;
+	Mon, 18 Nov 2024 03:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731845321; cv=none; b=lpmW7z8Q+NqOdOJTVjrppUeN9D2JTtpUekaOkbrblPPxxVbiVwMhW6nOXPiSFddtFGcUXY/6cNrXuu3g1Y4N/WkmNCaM/lSSTv9Uvtanr6g6tJYis11RAsUt8T6LyLBLxrfW1qLgPEnPbB4WeTTfohD08KFvJz65NmNG9gWovgo=
+	t=1731899735; cv=none; b=tN5sQlbQ5InE0mjjzuz8Kn8YQEZg5sPJdidHZ8XpYooWV2pyANw+SWRx0Imr89VaDSPKdnZDn+LfonfiJ9Nb3GyQg4734dg0HqCEytZUE84JzScrTMerB5RcwVS+Ieuvb+mHRp+EyvD/wj809kK8I1piIXFeXPRMeST0emOZJJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731845321; c=relaxed/simple;
-	bh=TZY7uqQ/eVQa9YrKLF5xjKxP9nj6MjDMxq0OBwvNoHI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=eeD0U4mbztU3XJUvrPHpfWVDEhdFMXgV4waH+eH/uBFSp8OlXMAaM+nFLNuQbtbDnguo56svDFuNl7TqAb881uCZgqGM54U34E11/sOO96jkmcdDR1Fvk631bbLhk3TO7KtUjXcBHOM378T3ykVZ9lWBYHi9pbfKvOaW7xzpRaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=Vyj/UwD4; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1731845315;
-	bh=ZxjmofktqP+h19RoqLD80A6n6Rgg6iMYO3CZ43bpgOQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Vyj/UwD4q1XzhdVaQ8hX5LCKvemZxst/sv3OhOht9p714Z5/TOM8+D+tSCMdfxLN1
-	 DN4QDmA0TPqEbdq9Qa7ZKFwittBMlYOyVBDif+o7U39XGOiwpnkDxZddLeOAlBuZth
-	 LFElXNFkRMXig/XecEFxqnEdjlpcThQkYVXqXMyi+MHAn+/O1IrNzzWiM+J+4s7Srv
-	 0dG1GEGBEqaHVg961dBhgWS9XCnr4oD1B/G9u/7C98Sz8s+wxw6RdUaCHaVknrUNaM
-	 dpiyYrXU4G+KeovwuWDpkxepWRC8qiIDfU0906OAr1JULUYyqqQh6E2tEIC3pdWcB9
-	 YwlpLtf4KKmvQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XrqKb4j4cz4wbr;
-	Sun, 17 Nov 2024 23:08:35 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Gautam Menghani <gautam@linux.ibm.com>, npiggin@gmail.com,
- christophe.leroy@csgroup.eu, naveen@kernel.org, maddy@linux.ibm.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: PPC: Book3S HV: Mask off LPCR_MER for a vCPU
- before running it to avoid spurious interrupts
-In-Reply-To: <20241028090411.34625-1-gautam@linux.ibm.com>
-References: <20241028090411.34625-1-gautam@linux.ibm.com>
-Date: Sun, 17 Nov 2024 23:08:38 +1100
-Message-ID: <87jzd2xdtl.fsf@mpe.ellerman.id.au>
+	s=arc-20240116; t=1731899735; c=relaxed/simple;
+	bh=w1qxhsXl8XNFjekIRAAEivDUwiyXVGbnjK+lzNbasi8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D2+nuEpjbcjbc+R4LzuWz1zGrju1/YZh6j9MTG+/+L4H2315/XnVGWApKSLaITD75GFT3ymbu/NoFQE0W3pbwQM4icaRIq9psQtt918WB+ZV4pd/tVHxpmdZ42qS+QizxLr8DZtlkY6UQpG2saPl+YyF3F5Dc7hEK2ZYUncQMIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee4673ab14ad20-0d629;
+	Mon, 18 Nov 2024 11:15:22 +0800 (CST)
+X-RM-TRANSID:2ee4673ab14ad20-0d629
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain (unknown[223.108.79.101])
+	by rmsmtp-syy-appsvr03-12003 (RichMail) with SMTP id 2ee3673ab13cc84-ad126;
+	Mon, 18 Nov 2024 11:15:22 +0800 (CST)
+X-RM-TRANSID:2ee3673ab13cc84-ad126
+From: Ba Jing <bajing@cmss.chinamobile.com>
+To: pbonzini@redhat.com
+Cc: shuah@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ba Jing <bajing@cmss.chinamobile.com>
+Subject: [PATCH] kvm: hardware_disable_test: remove unused macro
+Date: Mon, 18 Nov 2024 11:15:02 +0800
+Message-Id: <20241118031502.2102-1-bajing@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Gautam Menghani <gautam@linux.ibm.com> writes:
-> Running a L2 vCPU (see [1] for terminology) with LPCR_MER bit set and no
-> pending interrupts results in that L2 vCPU getting an infinite flood of
-> spurious interrupts. The 'if check' in kvmhv_run_single_vcpu() sets the
-> LPCR_MER bit if there are pending interrupts.
+After reviewing the code, it was found that the macro GUEST_CODE_PIO_PORT
+is never referenced in the code. Just remove it.
 
-Applied to powerpc/fixes.
+Signed-off-by: Ba Jing <bajing@cmss.chinamobile.com>
+---
+ tools/testing/selftests/kvm/hardware_disable_test.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-[1/1] KVM: PPC: Book3S HV: Mask off LPCR_MER for a vCPU before running it to avoid spurious interrupts
-      https://git.kernel.org/powerpc/c/a373830f96db288a3eb43a8692b6bcd0bd88dfe1
+diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+index bce73bcb973c..94bd6ed24cf3 100644
+--- a/tools/testing/selftests/kvm/hardware_disable_test.c
++++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+@@ -20,7 +20,6 @@
+ #define SLEEPING_THREAD_NUM (1 << 4)
+ #define FORK_NUM (1ULL << 9)
+ #define DELAY_US_MAX 2000
+-#define GUEST_CODE_PIO_PORT 4
+ 
+ sem_t *sem;
+ 
+-- 
+2.33.0
 
-cheers
+
+
 
