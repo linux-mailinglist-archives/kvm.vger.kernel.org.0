@@ -1,121 +1,113 @@
-Return-Path: <kvm+bounces-32102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8547B9D2FB3
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 21:45:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA549D2FD7
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 21:59:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87EF9B29D8C
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 20:39:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AEBA1F23667
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 20:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B095D1D61A2;
-	Tue, 19 Nov 2024 20:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0442C1D4177;
+	Tue, 19 Nov 2024 20:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBH85DfC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l9xt6i1Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF17F1D2F55;
-	Tue, 19 Nov 2024 20:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429DA1D097F
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 20:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732048704; cv=none; b=d6k4ysVExK5UsNmKpykzoXQNcV3XFQNoTV/VJFHyB5OdUZ8BQuPbYqSjUmQUqSsFZ2SuZ2vYsEb3ibJex/A9xMgVglr7GSYYwP8JhxaWYWX7KFcHhBCEUDQ3OWQiyRds/WPmgBm2vCqHpUu88fi6qzkDwLzIusMFA2q4sE5XhtM=
+	t=1732049928; cv=none; b=sIOOsgLN0rqzO0fRNKoS64NXRTaX+vyQ6vM8gf6O778eD2g2FR41+ff8Uj/cOm71D8cZTIbtnJUv1qhTO5kgFrksGOGSveIMh5vGdlVulii+aP9Nj45lOFeAwFWTHdBre1tkUbbRmA8Gh36hLG5NMfofgP+d4NwE42tDzgbm4qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732048704; c=relaxed/simple;
-	bh=rjVoJmCLBKMrTjoTUUEHxVM/UnztlbpL+xP7QMoxqk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hbWNDKYKd38gcnKFmjy8hWpJA2V/YlZpaOJKJIqI7VA6690ctd9SxHr0m4XOLZ3m6+ZQwIQ9Wka5e19uug5mJk7Fzz+/uYOiQCIb6Ql7ZOHWqCKuy7zqLCeGf8QE96uZbsus3LM741bQNTLVl9/gnWEQaZHCR4ANsoCSpag6ZDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBH85DfC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 550B2C4CECF;
-	Tue, 19 Nov 2024 20:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732048704;
-	bh=rjVoJmCLBKMrTjoTUUEHxVM/UnztlbpL+xP7QMoxqk8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lBH85DfCt45DGJhgnvfqpnLBhuEmAbdXxVtRC4qCWKCE4/NOOJbE1ypM5DQdkwOmM
-	 OiYCtISGvaIiyUrpNoYfW0v6OoTILYEzgRea68LrXJ9qtXMdRbrfHGMNwH6V8hYFKY
-	 iGz2sVElFA9ax5AijVcILvMsNVmqyRYc9BOntRaV+NowA1bxnCD5qeToakwDt6CIMz
-	 2DGPzxjWkE5Kft2S+fWW07TNO+BHEOy2GjnOZEXB+x9aXsX/xU9KTuEtVLNJ4irUGB
-	 dbjVidBmUIpK0uOjUM/alv26mDhcIby6ExBaO5xrXY7QXaJvVTWoE3/tfzgW6TWDMH
-	 mReOEyOZHsjWg==
-Date: Tue, 19 Nov 2024 12:38:20 -0800
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
-	x86@kernel.org, rcu@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Lorenzo Stoakes <lstoakes@gmail.com>,
-	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Juerg Haefliger <juerg.haefliger@canonical.com>,
-	Nicolas Saenz Julienne <nsaenz@kernel.org>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
-	Chuang Wang <nashuiliang@gmail.com>,
-	Yang Jihong <yangjihong1@huawei.com>,
-	Petr Mladek <pmladek@suse.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-	Julian Pidancet <julian.pidancet@oracle.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>,
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Yair Podemsky <ypodemsk@redhat.com>,
-	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 02/15] objtool: Flesh out warning related to
- pv_ops[] calls
-Message-ID: <20241119203820.kz4p7isbolwjmpl6@jpoimboe>
-References: <20241119153502.41361-1-vschneid@redhat.com>
- <20241119153502.41361-3-vschneid@redhat.com>
+	s=arc-20240116; t=1732049928; c=relaxed/simple;
+	bh=8WEdVpyGErxs99Yh1r9MEMQl5LIFDjaIDidlxrekh0s=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=e9eO4wf/VL6p50XdCdYp/UTsORdswRNmRYHnPyv/a3zOkc04hdNTrmIRA8QXTWEuSO+4gbPwyDaa+Yb3SEfDmKiq8gymzap1qtg35nKD0nmfiYiH3YFJ+Orfcr3uROb1PiuAmAlID6u711urv+BAnr+ebbpPiKwVWM3utwpJ+s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l9xt6i1Y; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e389ef22432so4313348276.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 12:58:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732049924; x=1732654724; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=r6S4rOH3+OQSdJMr5U+1w/fQ9eAelD/5+HuDvTmNypE=;
+        b=l9xt6i1YuApNUB+9iRAFkk7IVe7G35NBDB2dwpPST1RF8TF+kQi62HDn550kYaGVa6
+         VklbDet7iwzBtASf2YjvEL23sGE8VBuMd7GB4uX+Vi4NKR46bMpKACy7erbjCHZERhXj
+         GF1WtnURGMpWbzhyQxXGYwL16384acnbOxD07CyYY/oRaT9FO12Wns48waGCoBZBLSqh
+         IBiqIZY73BN3W20+5bMYHxoukYYi2O+WOFECfGr/wxWGY8p9qQfI3+rYw2UI38lqRboc
+         ZtKF20ImsnimunplMJEPi+ayzEW7jjT4hiN+uwT9fu4mYYUxDDRLt452IjgPgQUxY3w5
+         Xqvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732049924; x=1732654724;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r6S4rOH3+OQSdJMr5U+1w/fQ9eAelD/5+HuDvTmNypE=;
+        b=J0vDAyu8+D4uMHNluCjSEC+eNAZ9X/cGUZPQQJ+drH7BpxcDs/HvttTYZgDGX9ja0H
+         f3bE8uUh2g5HsVAEIT97ei1oAcbgXdAoOKfUGP8m71JzbtU9LbcjRChGl4O/VlZzVvZF
+         iyf+vxbZ1ObeH753In+gTz3c+4a1guKQxN861jR0TVOmG0YtTx/mjRE0hBIUDYPMTetT
+         UjH2Y3SobU6NnGqAtQQr3fMKx267Q7ECHFdO7KkLFObqSqsOaWPLMxtMyGdoReNwRu+o
+         +J5H64Zl2E7nvR8jsWKuqbacDNhVCygmE389T/p8FUXyIetE5/5cVbp+Naxp5uz2vXcP
+         9+Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCUPNSkbCWcYype7Sz9IdYx/B4Vy4XLMf3PeMJLYmGGgHG8u+ARyC7D3rCats07gwe21yBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL8okuhC3CyoFCO2vzskXNHe7Q1trRPECjyy0VuShkOkA9tFIm
+	C5a0Dsj2f3denHkExzgyIW4SascRthhfsjE1962vpvhM/cH1KhzZ+68L7PccirtSPheh+ne2/Yx
+	7Ur8XXQ==
+X-Google-Smtp-Source: AGHT+IHpK5pQqyJ2pkrSLDCOOUklWO2InSnJR1eVoVoMwnsqp16+77q4Yb5PQps1c7yCQOY0bhbxQaG15qmS
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fac1])
+ (user=rananta job=sendgmr) by 2002:a25:2d0b:0:b0:e38:c40b:a0a9 with SMTP id
+ 3f1490d57ef6-e38cb60bac3mr38276.5.1732049924316; Tue, 19 Nov 2024 12:58:44
+ -0800 (PST)
+Date: Tue, 19 Nov 2024 20:58:41 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241119153502.41361-3-vschneid@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241119205841.268247-1-rananta@google.com>
+Subject: [PATCH] KVM: arm64: Ignore PMCNTENSET_EL0 while checking for overflow status
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 19, 2024 at 04:34:49PM +0100, Valentin Schneider wrote:
-> I had to look into objtool itself to understand what this warning was
-> about; make it more explicit.
-> 
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+kvm_pmu_overflow_status() currently checks if the PMCs are enabled for
+evaluating the PMU overflow condition. However, ARM ARM D13.1.1 states
+that a global enable control (PMCR.E), PMOVSSET<n>, and PMINTENSET<n>
+are sufficent to consider that the overflow condition is met. Hence,
+ignore the check for PMCNTENSET<n>.
 
-Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+The bug was discovered while running the SBSA PMU test, which only sets
+PMCR.E, PMOVSSET<0>, PMINTENSET<0>, and expects an overflow interrupt.
 
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ arch/arm64/kvm/pmu-emul.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index ac36c438b8c1..3940fe893783 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -342,7 +342,6 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+ 
+ 	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
+ 		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+-		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+ 		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+ 	}
+ 
+
+base-commit: adc218676eef25575469234709c2d87185ca223a
 -- 
-Josh
+2.47.0.338.g60cca15819-goog
+
 
