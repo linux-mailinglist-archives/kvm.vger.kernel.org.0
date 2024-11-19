@@ -1,194 +1,287 @@
-Return-Path: <kvm+bounces-32057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130309D278E
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:01:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FE69D282F
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7C05283701
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:01:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C0ED1F21A98
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6477C1CDA36;
-	Tue, 19 Nov 2024 14:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7B21CEE91;
+	Tue, 19 Nov 2024 14:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="l2kGqu0e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ThYW/AZd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67365197552
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 14:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2081CC177
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 14:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732024853; cv=none; b=m94vkZEf+Ce+X9yAmV8Sp9AtwjeQY8zrqz3uszINMkt+S/22FlM41MheAOorVP76FePrX42X0p+w2ii5pEV/7ohtFoTR7xcaNNMpmR+tGGVE4lBn4GP3yIvFjj5l066Qard6BR/O4IrmBduOLWuH0IYiPtTexah6eBTnTpq3qlg=
+	t=1732026628; cv=none; b=NQLuXRARjiWXwLXawF4waY2vWHa7BLkAUfJceckOuWNa9R56SBS5jmDzSgzvSlfrAHbrrw7NAUq0AGFKyIr5/nPkimg8dF8rHNXdnGshkGuhuUG/v86PfZ2o51rxXAuuWL7OV9SBlggWzS6tDWxuVrtJWYa6Rg0Nx2J4dF4hvWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732024853; c=relaxed/simple;
-	bh=kf3Z6I24SKWn5bdSsa1E0NrkCUFicEWYJkJii1hPtGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lCdbr9JbtPQExBP1E0wSOzQxrwVhcR+fkEQ+QG+6jJuwDa6Ibp2jpdYcCEkMYpzAQHeqibKo/Jo53AelOsoYFAH4DhHIZV4my+sOpWQwFQqzH5CyyDB1BCxgMPeJAyjxsLA1A7H4ifZIL5g4MC4ZBHTFAtnDw0ZLSrnrtIoxE2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=l2kGqu0e; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-460b16d4534so5638991cf.3
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 06:00:50 -0800 (PST)
+	s=arc-20240116; t=1732026628; c=relaxed/simple;
+	bh=cBj12CA8mrU4sApMYhK3MpH1+4gVXA2iaiLQX195AbY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mW2U//lMzVDFpJVDP5fiT3t5VdfcpuibvSPE5bQfCr6x55Q14bVXf8jgcLmwg7RPWYEBxUILWW+JXmYz7k35ZP57fDFKXi5QSXc+NnTyY275yt9uVWlCzC98d7jDKWcTjIwFVGdQaz85JdR+tRGa7Vb4MLRjpAUGtL50zUdbMKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ThYW/AZd; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e6ee02225so3257208b3a.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 06:30:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1732024849; x=1732629649; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=utcZjeJ4axtWtuvENXsYE5WdR2pTF/ksB5rq4r17jag=;
-        b=l2kGqu0ew9kLEZ8WGxTHKkWAMn5ZBZ6u+ww4hTH3xTRQ9LmXuNgCScfQtOvI983Bxk
-         PjaIuvkfWom5B0zB5i67cOCOTHag01vtqntwZ/lxxqjSyvCzj7gwtCHtVk/TSicgHhFW
-         7G0QbALTLC/Bx//oG9yPOIdpQzDX2lPneRc5+bSL83R1mYLM7bElAWhT3gEgCuNRJx2x
-         ZAggA7jqm8RYdhpPovQdoeb1KhvqH0wgCarQYoVIpS2v1YtQw1MrKVFjJVqqviPsCvMn
-         pfgtHvfiCTSudTpF8E17a46YzBK+SBlsGoPeH71oTMmAnwNk2KvKDIRMDuCgnmCgtjq0
-         jJoQ==
+        d=google.com; s=20230601; t=1732026625; x=1732631425; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eBmU3ogPN1nxwBPSih6RQ5kXht81z5LpAS8pZkFAwGM=;
+        b=ThYW/AZd7pZNBeR91yL3x8keDOLKgEF9Ovq3A0vK3wbFEhFaOX6Zq1Zbn3ZBEqUTzS
+         YQIw4Jvnc0ln0yqY88tUTtDon7opfNBccIEXCw9hsbXWbq6F5yYz8c33uhUv3ZcnIVR6
+         HuB2CmP5zeZZD46HmiPOZRNzoGhg/JCYMh4VeYaX3BixOgTVWAkfTpyxFSI4hR+kzB0D
+         zvpRv+kYYBb6m7+srrLw8x/KDB330v69zT1f10wtX9CJ0yLjYedfTRl/oLVe8eslfwIg
+         pURKpJcTXNSpUthJlvBadXBDUxyhr9zsB4F65Bl7r+2yol4yW7H7PeRId49rh6aoKlGm
+         JPBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732024849; x=1732629649;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=utcZjeJ4axtWtuvENXsYE5WdR2pTF/ksB5rq4r17jag=;
-        b=OGOQVh44Xm520I0rhyDT0VJ17b2z19og4JtqT6o1hXiU+0eNk+WtbU6h8+IPOU/JEc
-         xMcLskiA48s5RwILaGTsLzCuMwv0odGD3NHQCVQG7QYanA+/UNeybeDOOE0AOHbCBIxK
-         +dfRBEh8tewHL4c1sCal/pkumCv4vxWzza5AFp8Tqek7X3Flrh0syB58vh09QzGBdNd8
-         uHjEgXwxW+lYXoD95UI19RcWbhCWGCryERrBKrR07pRt2BITgs7HXn7u1HARDxe5LdXx
-         C8Hht5P5A3QCN3jYLO8gj/r70HWB3Zg0XCwz2O7KL0zEnq2OsLaRGQnsYtMu/l8o1Bp8
-         bfrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyXg36R+ik6GUzUWfJcrOKuCHta+WWCyDOZL+509IiJF1/h/m2N3KEBaQ7xsoUvnVQelo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGkOlPnFtHnR2ZNg6U3JCppkJq9hHeFxccHqaoONlcxPlgk8wz
-	hkvifRuB3fSF3TxhRnhJWyu8Hcex8kfwl+EXA+UaUijNLYmpfQuQndSbIwqNolQ=
-X-Google-Smtp-Source: AGHT+IHKbzbz2zzGHIA7vNzQrKdrVbH22etzYZttFKms0g8ZJKuTulmGaSp4Zqq0m5k19nTsP7U0iw==
-X-Received: by 2002:a05:622a:10f:b0:45f:788:b1b1 with SMTP id d75a77b69052e-46363e2f7d2mr196949061cf.25.1732024849064;
-        Tue, 19 Nov 2024 06:00:49 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46392c3c22fsm11239771cf.86.2024.11.19.06.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 06:00:48 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tDOmd-00000003DsE-272U;
-	Tue, 19 Nov 2024 10:00:47 -0400
-Date: Tue, 19 Nov 2024 10:00:47 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, tjeznach@rivosinc.com,
-	zong.li@sifive.com, joro@8bytes.org, will@kernel.org,
-	robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org,
-	tglx@linutronix.de, alex.williamson@redhat.com,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 08/15] iommu/riscv: Add IRQ domain for interrupt
- remapping
-Message-ID: <20241119140047.GC559636@ziepe.ca>
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-25-ajones@ventanamicro.com>
- <20241118184336.GB559636@ziepe.ca>
- <20241119-62ff49fc1eedba051838dba2@orel>
+        d=1e100.net; s=20230601; t=1732026625; x=1732631425;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eBmU3ogPN1nxwBPSih6RQ5kXht81z5LpAS8pZkFAwGM=;
+        b=wYR0Qv5MY4fdQrEvz8mrECjYIUZbm32xEqKOevhybp9eebDjfngjGC7IOmfJNd0FpO
+         Pul9I4KeksERgPrmHmQvnpbb6jPyo9fihX/8pykpjElITlxGznV09Qwl69IfzL5GJxEV
+         5lQHHTs7rhEMPb7ncKkSGcnQc0ChkBCq9Yl8cI+P5l7ivlefHXrfts9WQabyC7LcuqWD
+         FyFyNdUN8Q+KkcKIaoCfL0Xxko+8fDU4EuYW419zs/O+Bzwi8yggtykliIRQk1mn2ZYp
+         yLw1rWgLh2zWgz9c02XKR1WmYn33zBHYD1RFVkJmCV+qAK/A73yajqK8SZcowbsYI/VU
+         4K4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWAl9iv1rVmr55mRwcDqc6tVQOPDXfs2j7uAFRBg7PEH8GO2yviVB7kwmzhHtvERGj0Kok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTiz0xDDYRBkDbSkFoj1864Lw8aMQNu+8jh6ZJdTKUzXRn1WBz
+	KEJNAr8UbtovLaXg8uKBgaODeFBQO4rkDUAsFL8wOGno82GkYU1jCxidq0JV56K6lX1iLda4lZz
+	Log==
+X-Google-Smtp-Source: AGHT+IHT3kKjacRiRpiv3CWULp/80BF6XEK8gCyH5cMjMZy/c+E3fRI2E1HVKQbbygUtQ/31heyObakmVxs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:aa7:88c9:0:b0:71e:5e50:755e with SMTP id
+ d2e1a72fcca58-72477110770mr80679b3a.6.1732026625375; Tue, 19 Nov 2024
+ 06:30:25 -0800 (PST)
+Date: Tue, 19 Nov 2024 06:30:23 -0800
+In-Reply-To: <20240801045907.4010984-19-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119-62ff49fc1eedba051838dba2@orel>
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-19-mizhang@google.com>
+Message-ID: <Zzyg_0ACKwHGLC7w@google.com>
+Subject: Re: [RFC PATCH v3 18/58] KVM: x86/pmu: Introduce enable_passthrough_pmu
+ module parameter
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 19, 2024 at 08:49:37AM +0100, Andrew Jones wrote:
-> On Mon, Nov 18, 2024 at 02:43:36PM -0400, Jason Gunthorpe wrote:
-> > On Thu, Nov 14, 2024 at 05:18:53PM +0100, Andrew Jones wrote:
-> > > @@ -1276,10 +1279,30 @@ static int riscv_iommu_attach_paging_domain(struct iommu_domain *iommu_domain,
-> > >  	struct riscv_iommu_device *iommu = dev_to_iommu(dev);
-> > >  	struct riscv_iommu_info *info = dev_iommu_priv_get(dev);
-> > >  	struct riscv_iommu_dc dc = {0};
-> > > +	int ret;
-> > >  
-> > >  	if (!riscv_iommu_pt_supported(iommu, domain->pgd_mode))
-> > >  		return -ENODEV;
-> > >  
-> > > +	if (riscv_iommu_bond_link(domain, dev))
-> > > +		return -ENOMEM;
-> > > +
-> > > +	if (iommu_domain->type == IOMMU_DOMAIN_UNMANAGED) {
-> > 
-> > Drivers should not be making tests like this.
-> > 
-> > > +		domain->gscid = ida_alloc_range(&riscv_iommu_gscids, 1,
-> > > +						RISCV_IOMMU_MAX_GSCID, GFP_KERNEL);
-> > > +		if (domain->gscid < 0) {
-> > > +			riscv_iommu_bond_unlink(domain, dev);
-> > > +			return -ENOMEM;
-> > > +		}
-> > > +
-> > > +		ret = riscv_iommu_irq_domain_create(domain, dev);
-> > > +		if (ret) {
-> > > +			riscv_iommu_bond_unlink(domain, dev);
-> > > +			ida_free(&riscv_iommu_gscids, domain->gscid);
-> > > +			return ret;
-> > > +		}
-> > > +	}
-> > 
-> > What are you trying to do? Make something behave different for VFIO?
-> > That isn't OK, we are trying to remove all the hacky VFIO special
-> > cases in drivers.
-> > 
-> > What is the HW issue here? It is very very strange (and probably not
-> > going to work right) that the irq domains change when domain
-> > attachment changes.
-> > 
-> > The IRQ setup should really be fixed before any device drivers probe
-> > onto the device.
+As per my feedback in the initial RFC[*]:
+
+ 2. The module param absolutely must not be exposed to userspace until all patches
+    are in place.  The easiest way to do that without creating dependency hell is
+    to simply not create the module param.
+
+[*] https://lore.kernel.org/all/ZhhQBHQ6V7Zcb8Ve@google.com
+
+On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> Introduce enable_passthrough_pmu as a RO KVM kernel module parameter. This
+> variable is true only when the following conditions satisfies:
+>  - set to true when module loaded.
+>  - enable_pmu is true.
+>  - is running on Intel CPU.
+>  - supports PerfMon v4.
+>  - host PMU supports passthrough mode.
 > 
-> I can't disagree with the statement that this looks hacky, but considering
-> a VFIO domain needs to use the g-stage for its single-stage translation
-> and a paging domain for the host would use s-stage, then it seems we need
-> to identify the VFIO domains for their special treatment.
+> The value is always read-only because passthrough PMU currently does not
+> support features like LBR and PEBS, while emualted PMU does. This will end
+> up with two different values for kvm_cap.supported_perf_cap, which is
+> initialized at module load time. Maintaining two different perf
+> capabilities will add complexity. Further, there is not enough motivation
+> to support running two types of PMU implementations at the same time,
+> although it is possible/feasible in reality.
+> 
+> Finally, always propagate enable_passthrough_pmu and perf_capabilities into
+> kvm->arch for each KVM instance.
+> 
+> Co-developed-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/pmu.h              | 14 ++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c          |  7 +++++--
+>  arch/x86/kvm/x86.c              |  8 ++++++++
+>  arch/x86/kvm/x86.h              |  1 +
+>  5 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f8ca74e7678f..a15c783f20b9 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1406,6 +1406,7 @@ struct kvm_arch {
+>  
+>  	bool bus_lock_detection_enabled;
+>  	bool enable_pmu;
+> +	bool enable_passthrough_pmu;
 
-This is the wrong thinking entirely. There is no such thing as a "VFIO
-domain".
+Again, as I suggested/requested in the initial RFC[*], drop the per-VM flag as well
+as kvm_pmu.passthrough.  There is zero reason to cache the module param.  KVM
+should always query kvm->arch.enable_pmu prior to checking if the mediated PMU
+is enabled, so I doubt we even need a helper to check both.
 
-Default VFIO created domains should act excatly the same as a DMA API
-domain.
+[*] https://lore.kernel.org/all/ZhhOEDAl6k-NzOkM@google.com
 
-If you want your system to have irq remapping, then it should be on by
-default and DMA API gets remapping too. There would need to be a very
-strong reason not to do that in order to make something special for
-riscv. If so you'd need to add some kind of flag to select it.
+>  
+>  	u32 notify_window;
+>  	u32 notify_vmexit_flags;
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 4d52b0b539ba..cf93be5e7359 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -208,6 +208,20 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+>  			enable_pmu = false;
+>  	}
+>  
+> +	/* Pass-through vPMU is only supported in Intel CPUs. */
+> +	if (!is_intel)
+> +		enable_passthrough_pmu = false;
+> +
+> +	/*
+> +	 * Pass-through vPMU requires at least PerfMon version 4 because the
+> +	 * implementation requires the usage of MSR_CORE_PERF_GLOBAL_STATUS_SET
+> +	 * for counter emulation as well as PMU context switch.  In addition, it
+> +	 * requires host PMU support on passthrough mode. Disable pass-through
+> +	 * vPMU if any condition fails.
+> +	 */
+> +	if (!enable_pmu || kvm_pmu_cap.version < 4 || !kvm_pmu_cap.passthrough)
 
-Until you reach nested translation there is no "need" for VFIO to use
-any particular stage. The design is that default VFIO uses the same
-stage as the DMA API because it is doing the same basic default
-translation function.
+As is quite obvious by the end of the series, the v4 requirement is specific to
+Intel.
 
-Nested translation has a control to select the stage, and you can
-then force the g-stage for VFIO users at that point.
+	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
+	    (is_intel && kvm_pmu_cap.version < 4) ||
+	    (is_amd && kvm_pmu_cap.version < 2))
+		enable_passthrough_pmu = false;
 
-Regardless, you must not use UNMANAGED as some indication of VFIO,
-that is not what it means, that is not what it is for.
+Furthermore, there is zero reason to explicitly and manually check the vendor,
+kvm_init_pmu_capability() takes kvm_pmu_ops.  Adding a callback is somewhat
+undesirable as it would lead to duplicate code, but we can still provide separation
+of concerns by adding const variables to kvm_pmu_ops, a la MAX_NR_GP_COUNTERS.
 
-> Is there an example of converting VFIO special casing in other
-> drivers to something cleaner that you can point me at?
+E.g.
 
-Nobody has had an issue where they want interrupt remapping on/off
-depending on VFIO. I think that is inherently wrong.
+	if (enable_pmu) {
+		perf_get_x86_pmu_capability(&kvm_pmu_cap);
 
-> The IRQ domain will only be useful for device assignment, as that's when
-> an MSI translation will be needed. I can't think of any problems that
-> could arise from only creating the IRQ domain when probing assigned
-> devices, but I could certainly be missing something. Do you have some
-> potential problems in mind?
+		/*
+		 * WARN if perf did NOT disable hardware PMU if the number of
+		 * architecturally required GP counters aren't present, i.e. if
+		 * there are a non-zero number of counters, but fewer than what
+		 * is architecturally required.
+		 */
+		if (!kvm_pmu_cap.num_counters_gp ||
+		    WARN_ON_ONCE(kvm_pmu_cap.num_counters_gp < min_nr_gp_ctrs))
+			enable_pmu = false;
+		else if (pmu_ops->MIN_PMU_VERSION > kvm_pmu_cap.version)
+			enable_pmu = false;
+	}
 
-I'm not an expert in the interrupt subsystem, but my understanding was
-we expect the interrupt domains/etc to be static once a device driver
-is probed. Changing things during iommu domain attach is after drivers
-are probed. I don't really expect it to work correctly in all corner
-cases.
+	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
+	    pmu_ops->MIN_MEDIATED_PMU_VERSION > kvm_pmu_cap.version)
+		enable_mediated_pmu = false;
 
-VFIO is allowed to change the translation as it operates and we expect
-that interrupts are not disturbed.
+> +		enable_passthrough_pmu = false;
+> +
+>  	if (!enable_pmu) {
+>  		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+>  		return;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ad465881b043..2ad122995f11 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -146,6 +146,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
+>  extern bool __read_mostly allow_smaller_maxphyaddr;
+>  module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
+>  
+> +module_param(enable_passthrough_pmu, bool, 0444);
 
-Jason
+Hmm, we either need to put this param in kvm.ko, or move enable_pmu to vendor
+modules (or duplicate it there if we need to for backwards compatibility?).
+
+There are advantages to putting params in vendor modules, when it's safe to do so,
+e.g. it allows toggling the param when (re)loading a vendor module, so I think I'm
+supportive of having the param live in vendor code.  I just don't want to split
+the two PMU knobs.
+
+>  #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
+>  #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
+>  #define KVM_VM_CR0_ALWAYS_ON				\
+> @@ -7924,7 +7926,8 @@ static __init u64 vmx_get_perf_capabilities(void)
+>  	if (boot_cpu_has(X86_FEATURE_PDCM))
+>  		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
+>  
+> -	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
+> +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
+> +	    !enable_passthrough_pmu) {
+>  		x86_perf_get_lbr(&vmx_lbr_caps);
+>  
+>  		/*
+> @@ -7938,7 +7941,7 @@ static __init u64 vmx_get_perf_capabilities(void)
+>  			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+>  	}
+>  
+> -	if (vmx_pebs_supported()) {
+> +	if (vmx_pebs_supported() && !enable_passthrough_pmu) {
+
+Checking enable_mediated_pmu belongs in vmx_pebs_supported(), not in here,
+otherwise KVM will incorrectly advertise support to userspace:
+
+	if (vmx_pebs_supported()) {
+		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
+		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
+	}
+
+>  		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+>  		/*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f1d589c07068..0c40f551130e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -187,6 +187,10 @@ bool __read_mostly enable_pmu = true;
+>  EXPORT_SYMBOL_GPL(enable_pmu);
+>  module_param(enable_pmu, bool, 0444);
+>  
+> +/* Enable/disable mediated passthrough PMU virtualization */
+> +bool __read_mostly enable_passthrough_pmu;
+> +EXPORT_SYMBOL_GPL(enable_passthrough_pmu);
+> +
+>  bool __read_mostly eager_page_split = true;
+>  module_param(eager_page_split, bool, 0644);
+>  
+> @@ -6682,6 +6686,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		mutex_lock(&kvm->lock);
+>  		if (!kvm->created_vcpus) {
+>  			kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
+> +			/* Disable passthrough PMU if enable_pmu is false. */
+> +			if (!kvm->arch.enable_pmu)
+> +				kvm->arch.enable_passthrough_pmu = false;
+
+And this code obviously goes away if the per-VM snapshot is removed.
 
