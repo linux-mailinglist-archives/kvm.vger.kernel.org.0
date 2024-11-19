@@ -1,131 +1,152 @@
-Return-Path: <kvm+bounces-32055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3DE9D277E
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:58:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCBC9D278C
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66EE01F230E7
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 13:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7A652836D7
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7921CDFD1;
-	Tue, 19 Nov 2024 13:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8907D1CDA0D;
+	Tue, 19 Nov 2024 14:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NTVyHgZ4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LN+rsl3Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B631CCECF;
-	Tue, 19 Nov 2024 13:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F46D1CCB58
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 14:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732024669; cv=none; b=AH27tVkqeJ1VAerJWPQywZfx32Fwlh9kAAqOP7jIXw9J8lW97hPQGrw6qBsTrDR0QyGx4IGIKNMTep507GQdiamVT8DqW1QhctEcC5r9mUIlTP06XbxJhjiaTef+EuqL0/bJJipgB2NzBgsqqfP+o4B61nlZYfn13FVomvdHViA=
+	t=1732024817; cv=none; b=A980Qj2ZqQyRRA6S4dGjYnM7bQHpStUQlwef5CePqFUqkhOLsDBtgpqqApMS0rK+tzNCJKFvOCl1kxxcPN+AhyOIENIMVpVdi5SB9NkyuPKl5FWEc6iqxRxuCPR2apw6v1yCBtshMLEesviw0BXeS8e83YcHlPP6C3Ry9nTvnMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732024669; c=relaxed/simple;
-	bh=LfF6XQBNPDMNIzDjgyfdmHqe1KOsZVJ/usNbXi+DM20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INCnUhOoeJGP8VRSqannAiyoWA2PxWwAyXZ+qJRhu5PP77YbyTXdE1fB5yYNBBcdsKVkPKSzd28MgA3mkbD22n8X8+nxXNsg2kxSL70Ri7XMOS5IAEmvf8n9/IBNP1SGG6p4EREv6vXtUnI74PfZq28eiufN2YVp93YQeS1ZOrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NTVyHgZ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 395C1C4CECF;
-	Tue, 19 Nov 2024 13:57:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732024669;
-	bh=LfF6XQBNPDMNIzDjgyfdmHqe1KOsZVJ/usNbXi+DM20=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NTVyHgZ4ej/NoJRr2JYj7UKyQlfR6XGQRr9FmbaNFpYfeUFtD11fXLEeAHp2m4iJL
-	 TNBAN5sK8DRrQUrWgPkGrR7fMZ604apkzfT0Ic36gzChdKeAZmYnGvkEl8XWKptUmb
-	 cLNb9TKDfRrzmWFzzONZlNZr6dNP6NYg1CTXXFug9/xBgWGnhtkEiSLfQ+groFJnlH
-	 IRXJu2sO9iXH53SOKFBbAfQm1E6weEIh2HjM5VaJai843ASOTzrBAJDXWvm4Uzu+Xr
-	 v5J5aK66FsIFRyYUnNEIC8pzYfvUFR8Dga4EbAxrFRpgLvgeBvpo3V834wCS/2Gb/X
-	 XeQoV828mjx1w==
-Date: Tue, 19 Nov 2024 15:57:43 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 07/17] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20241119135743.GB26101@unreal>
-References: <cover.1731244445.git.leon@kernel.org>
- <f8c7f160c9ae97fef4ccd355f9979727552c7374.1731244445.git.leon@kernel.org>
- <20241118145929.GB27795@willie-the-truck>
- <20241118185533.GA24154@unreal>
- <20241119090507.GB28466@willie-the-truck>
+	s=arc-20240116; t=1732024817; c=relaxed/simple;
+	bh=NNmtEzPeJrsLehi1WhmNqlBFpj9Ip1FKTLN9uY9VKy8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Dt3mdjq0hCVRNAHaSed48C+yYe4GNYTuFvkynCV1WedfNkf1ilSMkH+Zd2kxbrSPFN6PHltxdGVBBgQYZfbqkVYZsnMtogGpsujjyyZjF7PPQYemTymakbPds+2bdhAtPm+CPH+pGu7bTm0yPYQ4lKo5fzFvCuXCtAnZcrwX3hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LN+rsl3Y; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ee3fc5a13fso50001017b3.1
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 06:00:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732024815; x=1732629615; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AOXHJiJ+SXG98Hij2HNzlC3M3lEHF7DmQUkB5bHSfGg=;
+        b=LN+rsl3YfrD7jub0g9i8zCtO75raMuZ8fZoJ65yh01Z8d+Us5eC+GK0qJ2npCXhp0W
+         TSsQkReELxkRagA9kf0f3mKz+dcHXsT4EsjhfkpUa3BnuAisaCaSEu/F5Mgxqd2i29+3
+         nNt4TFvlcBQL0ZEDnrs+onSFhWR0mFP/fyQNUYdSxE9+MYdCATa0jxkob4gIe6LC/umD
+         +0v+06800fnvUpLONY603olu6U7d8asCOaPRV2ltYmwmR0oecZ1sC9WXTSDtio4kwyn4
+         ZN+WJ6gDh4giqmR1Rmyq7xs2gDhP+nyr5QuuveoMdqIHgswRgr1k5O+EtPw1xEUIFnxn
+         DjGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732024815; x=1732629615;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AOXHJiJ+SXG98Hij2HNzlC3M3lEHF7DmQUkB5bHSfGg=;
+        b=H0Qtv0ZeK68qPdQj5ajsIDB7QXKPa9pH+IaDHTOGreQngu072IuQfK+kekHHYF7MNU
+         C5uYg9vVn845aWFgF+aIS2ZiI5qPqQGg/BmnkOwivCBhjC007x5HVAMfHdD+drW88sBS
+         HjrrKN5j8EBSwKfNjQavK3JaCXzWk1aNNsnDRrr1BzQjOKeET9wclLWZUVtolJpKYvax
+         5ljVsUJftdUoyF1gcC32syGC/nyH+YUPspA+TDD85YolRX3pkLJjdDd8cJJQlz0kWowJ
+         JQTPryvPKjkzlwKA+fzdt/N9k2/bp5UMFr7sz40WkibqrWj277EdLt60Y6yV8T305InM
+         uUNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZ6B7m8oXQUplfdA6oImnHUMYoBJA/ldabLMP5IbUqGZV8i8vAkGvyMHKCWS3dS/Yb4D8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBQtVt5nMs6Cut71NCViKWfOKJExRNFeiSWBgYIKDHJr6NEpxQ
+	h9xGkCMrBiFwMNqVTkkQIQn4KfQ1CkxL8meaug6vc8beEaMcCwDd2fnYWyxQXzRqLx8RDnLTzBf
+	o8g==
+X-Google-Smtp-Source: AGHT+IF84+tXqMFcYD1nE5UAQFaK7SulZziKQGYlSvVLsWe37f0ou2CMMA7A5s+Ie0wwJEMH08XgyMK5H9I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:4512:b0:620:32ea:e1d4 with SMTP id
+ 00721157ae682-6eeaa0028f4mr1943287b3.0.1732024814819; Tue, 19 Nov 2024
+ 06:00:14 -0800 (PST)
+Date: Tue, 19 Nov 2024 06:00:13 -0800
+In-Reply-To: <20240801045907.4010984-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119090507.GB28466@willie-the-truck>
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com>
+Message-ID: <ZzyZ7U9C3EZyudz7@google.com>
+Subject: Re: [RFC PATCH v3 00/58] Mediated Passthrough vPMU 3.0 for x86
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 19, 2024 at 09:05:08AM +0000, Will Deacon wrote:
-> On Mon, Nov 18, 2024 at 08:55:33PM +0200, Leon Romanovsky wrote:
-> > On Mon, Nov 18, 2024 at 02:59:30PM +0000, Will Deacon wrote:
-> > > On Sun, Nov 10, 2024 at 03:46:54PM +0200, Leon Romanovsky wrote:
-> > > > +static void __iommu_dma_iova_unlink(struct device *dev,
-> > > > +		struct dma_iova_state *state, size_t offset, size_t size,
-> > > > +		enum dma_data_direction dir, unsigned long attrs,
-> > > > +		bool free_iova)
-> > > > +{
-> > > > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > > > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-> > > > +	struct iova_domain *iovad = &cookie->iovad;
-> > > > +	dma_addr_t addr = state->addr + offset;
-> > > > +	size_t iova_start_pad = iova_offset(iovad, addr);
-> > > > +	struct iommu_iotlb_gather iotlb_gather;
-> > > > +	size_t unmapped;
-> > > > +
-> > > > +	if ((state->__size & DMA_IOVA_USE_SWIOTLB) ||
-> > > > +	    (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)))
-> > > > +		iommu_dma_iova_unlink_range_slow(dev, addr, size, dir, attrs);
-> > > > +
-> > > > +	iommu_iotlb_gather_init(&iotlb_gather);
-> > > > +	iotlb_gather.queued = free_iova && READ_ONCE(cookie->fq_domain);
-> > > > +
-> > > > +	size = iova_align(iovad, size + iova_start_pad);
-> > > > +	addr -= iova_start_pad;
-> > > > +	unmapped = iommu_unmap_fast(domain, addr, size, &iotlb_gather);
-> > > > +	WARN_ON(unmapped != size);
-> > > 
-> > > Does the new API require that the 'size' passed to dma_iova_unlink()
-> > > exactly match the 'size' passed to the corresponding call to
-> > > dma_iova_link()? I ask because the IOMMU page-table code is built around
-> > > the assumption that partial unmap() operations never occur (i.e.
-> > > operations which could require splitting a huge mapping). We just
-> > > removed [1] that code from the Arm IO page-table implementations, so it
-> > > would be good to avoid adding it back for this.
-> > 
-> > dma_iova_link/dma_iova_unlink() don't have any assumptions in addition
-> > to already existing for dma_map_sg/dma_unmap_sg(). In reality, it means
-> > that all calls to unlink will have same size as for link.
+On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> This series contains perf interface improvements to address Peter's
+> comments. In addition, fix several bugs for v2. This version is based on
+> 6.10-rc4. The main changes are:
 > 
-> Ok, great. Any chance you could call that out in the documentation patch,
-> please?
+>  - Use atomics to replace refcounts to track the nr_mediated_pmu_vms.
+>  - Use the generic ctx_sched_{in,out}() to switch PMU resources when a
+>    guest is entering and exiting.
+>  - Add a new EVENT_GUEST flag to indicate the context switch case of
+>    entering and exiting a guest. Updates the generic ctx_sched_{in,out}
+>    to specifically handle this case, especially for time management.
+>  - Switch PMI vector in perf_guest_{enter,exit}() as well. Add a new
+>    driver-specific interface to facilitate the switch.
+>  - Remove the PMU_FL_PASSTHROUGH flag and uses the PASSTHROUGH pmu
+>    capability instead.
+>  - Adjust commit sequence in PERF and KVM PMI interrupt functions.
+>  - Use pmc_is_globally_enabled() check in emulated counter increment [1]
+>  - Fix PMU context switch [2] by using rdpmc() instead of rdmsr().
+> 
+> AMD fixes:
+>  - Add support for legacy PMU MSRs in MSR interception.
+>  - Make MSR usage consistent if PerfMonV2 is available.
+>  - Avoid enabling passthrough vPMU when local APIC is not in kernel.
+>  - increment counters in emulation mode.
+> 
+> This series is organized in the following order:
+> 
+> Patches 1-3:
+>  - Immediate bug fixes that can be applied to Linux tip.
+>  - Note: will put immediate fixes ahead in the future. These patches
+>    might be duplicated with existing posts.
+>  - Note: patches 1-2 are needed for AMD when host kernel enables
+>    preemption. Otherwise, guest will suffer from softlockup.
+> 
+> Patches 4-17:
+>  - Perf side changes, infra changes in core pmu with API for KVM.
+> 
+> Patches 18-48:
+>  - KVM mediated passthrough vPMU framework + Intel CPU implementation.
+> 
+> Patches 49-58:
+>  - AMD CPU implementation for vPMU.
 
-Can you suggest what should I add there, as it is not specific to new
-API, but general note applicable to all __iommu_unmap() callers?
+Please rename everything in KVM to drop "passthrough" and simply use "mediated"
+for the overall concept.  This is not a passthrough setup by any stretch of the
+word.  I realize it's a ton of renaming, but calling this "passthrough" is very
+misleading and actively harmful for unsuspecting readers.
 
-Thanks
+For helpers and/or comments that deal with intercepting (or not) MSRs, use
+"intercept" and appropriate variations.  E.g. intel_pmu_update_msr_intercepts().
+
+And for RDPMC, maybe kvm_rdpmc_in_guest() to follow kvm_{hlt,mwait,pause,cstate_in_guest()?
+I don't love the terminology, but there's a lot of value in being consistent
+throughout KVM.
+
+I am not willing to budge on this, at all.
+
+I'm ok with the perf side of things using "passthrough" if "mediated" feels weird
+in that context and we can't come up with a better option, but for the KVM side,
+"passthrough" is simply wrong.
 
