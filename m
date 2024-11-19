@@ -1,283 +1,353 @@
-Return-Path: <kvm+bounces-32050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691F89D2731
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:44:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E30889D2766
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 14:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDDF1284599
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 13:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A411B2850D7
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 13:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D831CC8A7;
-	Tue, 19 Nov 2024 13:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653931CF293;
+	Tue, 19 Nov 2024 13:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mmiKvVhn"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t/eLNeo4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1DC1C57B2
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 13:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732023853; cv=none; b=PGPJ0zqj75X/PsTCP8ffBBMD5kWorB8Mr9nSnWi28V2G3HjKUwS9mmTrEBfkl5Xj+Qb+lkG8HZDzIynPovD/nc0l0O4Lx847qrXQVRnKy/w6giIIRevbMV/dapxFFCJMdco/L5XN5woSADDJj+DBO6hfJYNWKnvdgoGpl1hzXO0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732023853; c=relaxed/simple;
-	bh=u06XGTZbxb3oXJKlyll3G+tbzotpOuuYrSpxrl9DZQw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gX64tr/4yC4Yg/Kpy0GpnrqbxbOVbY4Wn0XgU1JahiLyha6uN/9AA2O+YqvBISuZrd/E1BP+amxNYucXM2si94aKXFDSEAgRPttyINhathspf7uIu+E5QdD5D/tDugsm0VDj4BNfduhzQVAoeV71rPJWjFCZtDej6wEZCbImkXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mmiKvVhn; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e388c4bd92bso4236915276.1
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 05:44:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732023851; x=1732628651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5CkBUuaeP2+eh+1nuZsk4/gpv7iDku/8q2+t4vG3IRg=;
-        b=mmiKvVhnRI4CxfmNEtrqVRcBSBgcVXP76T4PDrwP5YQfhBkhsCdKtLcd+zjsr/NWVj
-         Vx93AJQ9SQldUOHGh0EQzYcIX3e7pade7FRZYktTXz6lFTaE9Dg4qGh+u9YyWnEtT/0C
-         i6oQQOV/kolR016B9Q/ilPqFARLr7P105LPgl5l4+aj76hLVAMPQ1CDrjIBNu/z4ZlE+
-         UFtKsyzTYFKmwjcwNo0+IvDmuHmv/5kZ4/S0jhQ9Z6Af4Ie2/ZwVDfVVhJ2A3OYqbFM+
-         8jpsYJLEhd3ytZtIPQe0A27Pw7T7wUMQKNMOwv6WRhbRyp46SzQzxgb/tDbtkZgZIuPN
-         9i5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732023851; x=1732628651;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5CkBUuaeP2+eh+1nuZsk4/gpv7iDku/8q2+t4vG3IRg=;
-        b=LwSo3xqSBixsNM5RHcLG3urhL0DiEUAhob7GUSz8g8MkHtfZxnCBXnmpZh3kH9EboG
-         nEomMaJHhtAkpHxRngq4umoJ79gCJXjb/l0S97dP3ru8EqEhftoKNthXSOWC6/9dTdjQ
-         f9GCuD47rDauZNtS+Bsz3+oF/1BPA96sDJeZ5IwoelTyx2k8WEXm4+9VdgjRneBojF1U
-         jCODMyTrjup/V4GTkA0Gn3yZTZOXs9oDS3w5Ft6URgcsfC1DbxfC+SFyMDNlbYQbA8Fz
-         BN5fXC2Efy62q+T3RscWk7U4BNAvQqzfIubKqoRWu5a9sAdREJWolqAiv2RZIgJWk2lO
-         6moA==
-X-Forwarded-Encrypted: i=1; AJvYcCVa5ld6T8RnrgapORZKSp4aUCUL2a0zYk1Xkg+WlGZ0zx67QAv9J9aHvrfNRNPPU6H2gSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzkq6wJH7FzLG8gM42673y4oEEYd8QQlDliTvwkc9yhmNM+Wp/H
-	w9nkxTE7HU+wtMGgwhtpnEPptW10cHTAjIBy8zLYNaVRcuqO9u0jmBjcisvt/ZOCfhkWXPT7xHr
-	JOg==
-X-Google-Smtp-Source: AGHT+IHpDGRiUSA5RDravQEdPZmbfx93BH1B54BaMEZPvlDiKyKrhIp1+KFD17MAnezPh1tiOHFxtBw3iEM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:c5c3:0:b0:e25:5cb1:77cd with SMTP id
- 3f1490d57ef6-e3826612092mr243804276.10.1732023850425; Tue, 19 Nov 2024
- 05:44:10 -0800 (PST)
-Date: Tue, 19 Nov 2024 05:44:09 -0800
-In-Reply-To: <67013550-9739-4943-812f-4ba6f01e4fb4@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55D51CEE98;
+	Tue, 19 Nov 2024 13:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732024428; cv=fail; b=AXFnV6Xt7ORNfytUHZGoy9ijzv9V8eYeLn+Pee/aQPWh9fZs5V7h8Mqg7nR+n4lBSLT1y9uh0bizS53PKrsEXE3n3tT1xjYnwmt2KEuG7OKQYW0x/5DDtvQFOVcffrYNFenwi5aTpQgCTBlW26ZB27fvpgqF1RdnWhtDx4PNGDk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732024428; c=relaxed/simple;
+	bh=iP8OKtRc39mSnV1/1Wwz5GD/V3w9G+5aPRPOXnnCvm0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FO9NnUpU1y8ipDbxypRjazp097sb8PcVQ9I3YHxE40ICOouOap0+mkgKq8XA2zQr1Xjw9+KYctlRLqc/POkrn9iPY0cRv8MKnidOh+pBXvVIGb8rxaMdORX05uxiEV22SHFoCKo8XMO9TMcIYh0/mPoUHIHMdqma+AR1F8PFaWo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t/eLNeo4 reason="signature verification failed"; arc=fail smtp.client-ip=40.107.243.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IajSXINg+4VMKsSxXzloWvBi68shDpjAmNd7IzHFy5L1CeqpUbfLtb4PYbUgv7ic8gd8eeMjPOqMWe8A/IMYYKMeY92hOifXBTfzIUFWJMyqb5Vs01NC1VjjqMfst5koVshZodSFK7Zy4WnDQOlJSQH+ADwkXWrsIVeFoKFM/kFlOwbizaFOsjicx4spnaodZKoyaI4ZC35o27maF/po/qmpFD5wT7LCRvDigt85tk/yCOeutA7ifNjD6o5EKJ5wtuxI1QLH4IcTRbaGG8M+R/sbXzo6Vh6G8zR/K1oIFvMBSWsD2bPUeG2vqmhR2S/KLXEivTM8j/7yOJF4/6eYQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=igXXYeas+lOO9eFyp4njR0bGYI+wpFyq+W3+q+n0tCo=;
+ b=C1O3NaVDT+K7SrI4E6i6iiRZ5nwWe6zig0jx0Hs1cOyQtjcktRMHZ8USq4qTM1Xrzl/u+EVsIvbwubHaMgN2f7JBokqUly0otcYRWCxq7/UK6XkWPXODSvbYncuoXX79TrHQ9HXUgwZggNwbWc49rEKdDMXz5Cc2AbZ/pEntYyGh/TEFynLFWwlwq7+CClm+bV+FMsyi0gJrkOKt3jCpOOkhzszhpKR4agDc1dK5pmD8y6DGqI7IwYZcOI29yKm1Ss9ZStTMevEqbtLvTYeEgWOM4nYtf98eJx73hqpT5i55myctYziDpKmBwpfM7omzYcRuV/Pt2WLZXbeULskmDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.12) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=igXXYeas+lOO9eFyp4njR0bGYI+wpFyq+W3+q+n0tCo=;
+ b=t/eLNeo4G+eZRe+WAwLwch2BHhCOPMgGRq/yg2AqJN73WilmQv8bWr/JSVa3XbxQNo5l+TGrNNpe2YZjMo4uFLbdYMlunLq2CKOLc1cg71RevfrqGXEzux8PyH6U8W1GEpEG+24kdVsiOPt57tx9Rw+vRdxNeGT3S9SFx10BaL4=
+Received: from CH5PR02CA0005.namprd02.prod.outlook.com (2603:10b6:610:1ed::7)
+ by BN5PR12MB9464.namprd12.prod.outlook.com (2603:10b6:408:2ab::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Tue, 19 Nov
+ 2024 13:53:43 +0000
+Received: from CH1PEPF0000AD7B.namprd04.prod.outlook.com
+ (2603:10b6:610:1ed:cafe::25) by CH5PR02CA0005.outlook.office365.com
+ (2603:10b6:610:1ed::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.25 via Frontend
+ Transport; Tue, 19 Nov 2024 13:53:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.12)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.12 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.12; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.12) by
+ CH1PEPF0000AD7B.mail.protection.outlook.com (10.167.244.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8158.14 via Frontend Transport; Tue, 19 Nov 2024 13:53:42 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 19 Nov
+ 2024 07:53:42 -0600
+Date: Tue, 19 Nov 2024 07:53:27 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+CC: Sean Christopherson <seanjc@google.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<x86@kernel.org>, <pbonzini@redhat.com>, <jroedel@suse.de>,
+	<thomas.lendacky@amd.com>, <pgonda@google.com>, <ashish.kalra@amd.com>,
+	<bp@alien8.de>, <pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, "Rick
+ Edgecombe" <rick.p.edgecombe@intel.com>, Reinette Chatre
+	<reinette.chatre@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Peng, Chao P" <chao.p.peng@intel.com>
+Subject: Re: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
+Message-ID: <20241119135327.zjxlczjbli3wdo5o@amd.com>
+References: <20240621134041.3170480-1-michael.roth@amd.com>
+ <20240621134041.3170480-5-michael.roth@amd.com>
+ <ZnwkMyy1kgu0dFdv@google.com>
+ <r3tffokfww4yaytdfunj5kfy2aqqcsxp7sm3ga7wdytgyb3vnz@pfmstnvtuyg2>
+ <Zn8YM-s0TRUk-6T-@google.com>
+ <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
+ <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-38-mizhang@google.com>
- <5309ec1b-edc6-4e59-af88-b223dbf2a455@intel.com> <c21d02a3-4315-41f4-b873-bf28041a0d82@linux.intel.com>
- <Zzvt_fNw0U34I9bJ@google.com> <67013550-9739-4943-812f-4ba6f01e4fb4@linux.intel.com>
-Message-ID: <ZzyWKTMdNi5YjvEM@google.com>
-Subject: Re: [RFC PATCH v3 37/58] KVM: x86/pmu: Switch IA32_PERF_GLOBAL_CTRL
- at VM boundary
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Zide Chen <zide.chen@intel.com>, Mingwei Zhang <mizhang@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
-	Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>, 
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
-	gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>, 
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7B:EE_|BN5PR12MB9464:EE_
+X-MS-Office365-Filtering-Correlation-Id: 066a9780-1648-45ea-d133-08dd08a19456
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?iso-8859-1?Q?qRO4ZJfkcomnrYnsx/fCPt1mM97o8oI7y91DhQepcMIUXMSEBmIeZNnWpS?=
+ =?iso-8859-1?Q?gxwZA545vIHHFl4LUdN1ZGdUuQiqPbxBabGLaBeG2tLmrSjKTiXwLhqyyx?=
+ =?iso-8859-1?Q?uCpMQv0NS8Ff27RhX0atmcI1H6pEs7PJBRiT0G0DJC6jMjHb5bMZP66SdF?=
+ =?iso-8859-1?Q?okj8UFN65vLjR1xDQEBI8s1UDNd9+WRsrdj6y+Mm51NG95hMkPa4EGn0/Y?=
+ =?iso-8859-1?Q?FR3cta9pBaJNt8CK+ssp3+8CZeEXEDustCQBCaNoccviZDdkg4eZJ1+TZ4?=
+ =?iso-8859-1?Q?7DYVwMexGFx3TtxS3hm/D5sbQHKm+p515TgDpwFNXk7PYV8M0AlR66LHnk?=
+ =?iso-8859-1?Q?IV0pRjOYAxNzsxsnsRN6aRs7GCJQBmEHv2Wb5i0UqguNs+C5aOMQb4oNmy?=
+ =?iso-8859-1?Q?JUeEvUAFxP96P5RJZco5TPH84YYzsSA0DlHvpLh/PDUI/4p03rEgv8HDpH?=
+ =?iso-8859-1?Q?nWEMh0kmd0dU8fX8cEZEVhvPaCH6OUvBfygz62MrbFMGZ1GPoeU2X23prA?=
+ =?iso-8859-1?Q?BI7tvrVTuSRjAdlxmN5uk0tfMPIhmFYGlDMuy+8Q9IHr3wDUuTBp8BIbbm?=
+ =?iso-8859-1?Q?3XyJ3kaU65diP6YLop/lS3FAWztrwwrpw09BVH7JKWMWz2db2isQqRZanu?=
+ =?iso-8859-1?Q?Pj4H4c8SmeSdq8kh0y5qcY+fuDudMRowSnX8xrfTsv1bxVk85aYkevcPuT?=
+ =?iso-8859-1?Q?LXJlJVdgU9BynYRvbb4nduQRljTPZafjhvngtqP1hY2BQwFoG0XR8tb5B4?=
+ =?iso-8859-1?Q?CEC4leHyn6xth4QAnQVSXuAoH0/gPum2Z6pEAvZ5SZUDVjGe/99v4nYFxV?=
+ =?iso-8859-1?Q?ZUDld81qikQHZDWHbZmaKz85PW6Z047i6OUMT/2nf+fxTEETiP5p2U0ps0?=
+ =?iso-8859-1?Q?dq9Hwt8R0tAtI4t5U9/3WPVxjb/2XSmQ3qv3uoByhBLRHzeYg2lPOsMEgR?=
+ =?iso-8859-1?Q?xSXOPgcsnuGBc42sPFNNQH4B8egEoifeZVDwX0ILT4dXy1GN+9r3kR+lou?=
+ =?iso-8859-1?Q?Bm+722dia8MU5rDHLLZJPP8uZgvwM0NjdVg9GcFbxkc1ZkRerEBMsk7h6W?=
+ =?iso-8859-1?Q?4qeyQRyQSgJtwohIPwktNjSs79kCWExWTjRfcoGYjfDTqwHXTdgyqsVBVj?=
+ =?iso-8859-1?Q?GYpewk6xyYFYQY/zbHw5shGDgDg+jVPoPCMLf4GkSPh2TarhtX5MO5/hND?=
+ =?iso-8859-1?Q?VXqWfCGk1N0Qs2FonCcsvFG1ZBGnTk3HlFbP6QbHvlk9i6hdekfOZca7M8?=
+ =?iso-8859-1?Q?b776awj9822AzLBBAu8ijH/8bQ7SMYaCTo4aHrbyjFnYzG12916p021FXZ?=
+ =?iso-8859-1?Q?nXm2jC0cZ3QfP8t9gxZxrh8XZHDqF3ZPn0SxcPNOhZaKUonDL848HAeojK?=
+ =?iso-8859-1?Q?dWh/auSkA8jelPoEvX2tKtCTPEbQCMUEtXqHb0udjjuPpJmlVEvLlE3SIq?=
+ =?iso-8859-1?Q?drsF2UWLn779HXC7NszpA51307vPPHs1sUUZpc7g7VU6+e0+2Z4ZwUhdOx?=
+ =?iso-8859-1?Q?M=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.12;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:atlvpn-bp.amd.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2024 13:53:42.7015
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 066a9780-1648-45ea-d133-08dd08a19456
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.12];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD7B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9464
 
-On Tue, Nov 19, 2024, Dapeng Mi wrote:
->=20
-> On 11/19/2024 9:46 AM, Sean Christopherson wrote:
-> > On Fri, Oct 25, 2024, Dapeng Mi wrote:
-> >> On 10/25/2024 4:26 AM, Chen, Zide wrote:
-> >>> On 7/31/2024 9:58 PM, Mingwei Zhang wrote:
-> >>>
-> >>>> @@ -7295,6 +7299,46 @@ static void atomic_switch_perf_msrs(struct vc=
-pu_vmx *vmx)
-> >>>>  					msrs[i].host, false);
-> >>>>  }
-> >>>> =20
-> >>>> +static void save_perf_global_ctrl_in_passthrough_pmu(struct vcpu_vm=
-x *vmx)
-> >>>> +{
-> >>>> +	struct kvm_pmu *pmu =3D vcpu_to_pmu(&vmx->vcpu);
-> >>>> +	int i;
-> >>>> +
-> >>>> +	if (vm_exit_controls_get(vmx) & VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL=
-) {
-> >>>> +		pmu->global_ctrl =3D vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
-> >>> As commented in patch 26, compared with MSR auto save/store area
-> >>> approach, the exec control way needs one relatively expensive VMCS re=
-ad
-> >>> on every VM exit.
-> >> Anyway, let us have a evaluation and data speaks.
-> > No, drop the unconditional VMREAD and VMWRITE, one way or another.  No =
-benchmark
-> > will notice ~50 extra cycles, but if we write poor code for every featu=
-re, those
-> > 50 cycles per feature add up.
-> >
-> > Furthermore, checking to see if the CPU supports the load/save VMCS con=
-trols at
-> > runtime beyond ridiculous.  The mediated PMU requires ***VERSION 4***; =
-if a CPU
-> > supports PMU version 4 and doesn't support the VMCS controls, KVM shoul=
-d yell and
-> > disable the passthrough PMU.  The amount of complexity added here to su=
-pport a
-> > CPU that should never exist is silly.
-> >
-> >>>> +static void load_perf_global_ctrl_in_passthrough_pmu(struct vcpu_vm=
-x *vmx)
-> >>>> +{
-> >>>> +	struct kvm_pmu *pmu =3D vcpu_to_pmu(&vmx->vcpu);
-> >>>> +	u64 global_ctrl =3D pmu->global_ctrl;
-> >>>> +	int i;
-> >>>> +
-> >>>> +	if (vm_entry_controls_get(vmx) & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CT=
-RL) {
-> >>>> +		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, global_ctrl);
-> >>> ditto.
-> >>>
-> >>> We may optimize it by introducing a new flag pmu->global_ctrl_dirty a=
-nd
-> >>> update GUEST_IA32_PERF_GLOBAL_CTRL only when it's needed.  But this
-> >>> makes the code even more complicated.
-> > I haven't looked at surrounding code too much, but I guarantee there's =
-_zero_
-> > reason to eat a VMWRITE+VMREAD on every transition.  If, emphasis on *i=
-f*, KVM
-> > accesses PERF_GLOBAL_CTRL frequently, e.g. on most exits, then add a VC=
-PU_EXREG_XXX
-> > and let KVM's caching infrastructure do the heavy lifting.  Don't reinv=
-ent the
-> > wheel.  But first, convince the world that KVM actually accesses the MS=
-R somewhat
-> > frequently.
->=20
-> Sean, let me give more background here.
->=20
-> VMX supports two ways to save/restore PERF_GLOBAL_CTRL MSR, one is to
-> leverage VMCS_EXIT_CTRL/VMCS_ENTRY_CTRL to save/restore guest
-> PERF_GLOBAL_CTRL value to/from VMCS guest state. The other is to use the
-> VMCS MSR auto-load/restore bitmap to save/restore guest PERF_GLOBAL_CTRL.=
-=C2=A0
+On Fri, Jul 26, 2024 at 03:15:01PM +0800, Binbin Wu wrote:
+> 
+> 
+> On 6/29/2024 8:36 AM, Michael Roth wrote:
+> > On Fri, Jun 28, 2024 at 01:08:19PM -0700, Sean Christopherson wrote:
+> > > On Wed, Jun 26, 2024, Michael Roth wrote:
+> > > > On Wed, Jun 26, 2024 at 07:22:43AM -0700, Sean Christopherson wrote:
+> > > > > On Fri, Jun 21, 2024, Michael Roth wrote:
+> > > > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > > > > index ecfa25b505e7..2eea9828d9aa 100644
+> > > > > > --- a/Documentation/virt/kvm/api.rst
+> > > > > > +++ b/Documentation/virt/kvm/api.rst
+> > > > > > @@ -7122,6 +7122,97 @@ Please note that the kernel is allowed to use the kvm_run structure as the
+> > > > > >   primary storage for certain register types. Therefore, the kernel may use the
+> > > > > >   values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+> > > > > > +::
+> > > > > > +
+> > > > > > +		/* KVM_EXIT_COCO */
+> > > > > > +		struct kvm_exit_coco {
+> > > > > > +		#define KVM_EXIT_COCO_REQ_CERTS			0
+> > > > > > +		#define KVM_EXIT_COCO_MAX			1
+> > > > > > +			__u8 nr;
+> > > > > > +			__u8 pad0[7];
+> > > > > > +			union {
+> > > > > > +				struct {
+> > > > > > +					__u64 gfn;
+> > > > > > +					__u32 npages;
+> > > > > > +		#define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN		1
+> > > > > > +		#define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC		(1 << 31)
+> > > > > Unless I'm mistaken, these error codes are defined by the GHCB, which means the
+> > > > > values matter, i.e. aren't arbitrary KVM-defined values.
+> > > > They do happen to coincide with the GHCB-defined values:
+> > > > 
+> > > >    /*
+> > > >     * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but define
+> > > >     * a GENERIC error code such that it won't ever conflict with GHCB-defined
+> > > >     * errors if any get added in the future.
+> > > >     */
+> > > >    #define SNP_GUEST_VMM_ERR_INVALID_LEN   1
+> > > >    #define SNP_GUEST_VMM_ERR_BUSY          2
+> > > >    #define SNP_GUEST_VMM_ERR_GENERIC       BIT(31)
+> > > > 
+> > > > and not totally by accident. But the KVM_EXIT_COCO_REQ_CERTS_ERR_* are
+> > > > defined/documented without any reliance on the GHCB spec and are purely
+> > > > KVM-defined. I just didn't really see any reason to pick different
+> > > > numerical values since it seems like purposely obfuscating things for
+> > > For SNP.  For other vendors, the numbers look bizarre, e.g. why bit 31?  And the
+> > > fact that it appears to be a mask is even more odd.
+> > That's fair. Values 1 and 2 made sense so just re-use, but that results
+> > in a awkward value for _GENERIC that's not really necessary for the KVM
+> > side.
+> > 
+> > > > no real reason. But the code itself doesn't rely on them being the same
+> > > > as the spec defines, so we are free to define these however we'd like as
+> > > > far as the KVM API goes.
+> > > > > I forget exactly what we discussed in PUCK, but for the error codes, I think KVM
+> > > > > should either define it's own values that are completely disconnected from any
+> > > > > "harware" spec, or KVM should very explicitly #define all hardware values and have
+> > > > I'd gotten the impression that option 1) is what we were sort of leaning
+> > > > toward, and that's the approach taken here.
+> > > > And if we expose things selectively to keep the ABI small, it's a bit
+> > > > awkward too. For instance, KVM_EXIT_COCO_REQ_CERTS_ERR_* basically needs
+> > > > a way to indicate success/fail/ENOMEM. Which we have with
+> > > > (assuming 0==success):
+> > > > 
+> > > >    #define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN         1
+> > > >    #define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC             (1 << 31)
+> > > > 
+> > > > But the GHCB also defines other values like:
+> > > > 
+> > > >    #define SNP_GUEST_VMM_ERR_BUSY          2
+> > > > 
+> > > > which don't make much sense to handle on the userspace side and doesn't
+> > > Why not?  If userspace is waiting on a cert update for whatever reason, why can't
+> > > it signal "busy" to the guest?
+> > My thinking was that userspace is free to take it's time and doesn't need
+> > to report delays back to KVM. But it would reduce the potential for
+> > soft-lockups in the guest, so it might make sense to work that into the
+> > API.
+> > 
+> > But more to original point, there could be something added in the future
+> > that really has nothing to do with anything involving KVM<->userspace
+> > interaction and so would make no sense to expose to userspace.
+> > Unfortunately I picked a bad example. :)
+> > 
+> > > > really have anything to do with the KVM_EXIT_COCO_REQ_CERTS KVM event,
+> > > > which is a separate/self-contained thing from the general guest request
+> > > > protocol. So would we expose that as ABI or not? If not then we end up
+> > > > with this weird splitting of code. And if yes, then we have to sort of
+> > > > give userspace a way to discover whenever new error codes are added to
+> > > > the GHCB spec, because KVM needs to understand these value too and
+> > > Not necessarily.  So long as KVM doesn't need to manipulate guest state, e.g. to
+> > > set RBX (or whatever reg it is) for ERR_INVALID_LEN, then KVM doesn't need to
+> > > care/know about the error codes.  E.g. userspace could signal VMM_BUSY and KVM
+> > > would happily pass that to the guest.
+> > But given we already have an exception to that where KVM does need to
+> > intervene for certain errors codes like ERR_INVALID_LEN that require
+> > modifying guest state, it doesn't seem like a good starting position
+> > to have to hope that it doesn't happen again.
+> > 
+> > It just doesn't seem necessary to put ourselves in a situation where
+> > we'd need to be concerned by that at all. If the KVM API is a separate
+> > and fairly self-contained thing then these decisions are set in stone
+> > until we want to change it and not dictated/modified by changes to
+> > anything external without our explicit consideration.
+> > 
+> > I know the certs things is GHCB-specific atm, but when the certs used
+> > to live inside the kernel the KVM_EXIT_* wasn't needed at all, so
+> > that's why I see this as more of a KVM interface thing rather than
+> > a GHCB one. And maybe eventually some other CoCo implementation also
+> > needs some interface for fetching certificates/blobs from userspace
+> > and is able to re-use it still because it's not too SNP-specific
+> > and the behavior isn't dictated by the GHCB spec (e.g.
+> > ERR_INVALID_LEN might result in some other state needing to be
+> > modified in their case rather than what the GHCB dictates.)
+> 
+> TDX GHCI does have a similar PV interface for TDX guest to get quota, i.e.,
+> TDG.VP.VMCALL<GetQuote>.  This GetQuote PV interface is designed to invoke
+> a request to generate a TD-Quote signing by a service hosting TD-Quoting
+> Enclave operating in the host environment for a TD Report passed as a
+> parameter by the TD.
+> And the request will be forwarded to userspace for handling.
+> 
+> So like GHCB, TDX needs to pass a shared buffer to userspace, which is
+> specified by GPA and size (4K aligned) and get the error code from
+> userspace and forward the error code to guest.
+> 
+> But there are some differences from GHCB interface.
+> 1. TDG.VP.VMCALL<GetQuote> is a a doorbell-like interface used to queue a
+>    request. I.e., it is an asynchronous request.  The error code represents
+>    the status of request queuing, *not* the status of TD Quote generation..
+> 2. Besides the error code returned by userspace for GetQuote interface, the
+>    GHCI spec defines a "Status Code" field in the header of the shared
+> buffer.
+>    The "Status Code" field is also updated by VMM during the real handling
+> of
+>    getting quote (after TDG.VP.VMCALL<GetQuote> returned to guest).
+>    After the TDG.VP.VMCALL<GetQuote> returned and back to TD guest, the TD
+>    guest can poll the "Status Code" field to check if the processing is
+>    in-flight, succeeded or failed.
+>    Since the real handling of getting quota is happening in userspace, and
+>    it will interact directly with guest, for TDX, it has to expose TDX
+>    specific error code to userspace to update the result of quote
+> generation.
+> 
+> Currently, TDX is about to add a new TDX specific KVM exit reason, i.e.,
+> KVM_EXIT_TDX_GET_QUOTE and its related data structure based on a previous
+> discussion. https://lore.kernel.org/kvm/Zg18ul8Q4PGQMWam@google.com/
+> For the error code returned by userspace, KVM simply forward the error code
+> to guest without further translation or handling.
+> 
+> I am neutral to have a common KVM exit reason to handle both GHCB for
+> REQ_CERTS and GHCI for GET_QUOTE.  But for the error code, can we uses
+> vendor
+> specific error codes if KVM cares about the error code returned by userspace
+> in vendor specific complete_userspace_io callback?
 
-I know.
+A few weeks back we discussed during the PUCK call on whether it makes
+sense for use a common exit type for REQ_CERTS and TDX_GET_QUOTE, and
+due to the asynchronous/polling nature of TDX_GET_QUOTE, and the
+somewhat-particular file-locking requirements that need to be built into
+the REQ_CERTS handling, we'd decided that it's probably more trouble
+than it's worth to try to merge the 2.
 
-> Currently we prefer to use the former way to save/restore guest
-> PERF_GLOBAL_CTRL as long as HW supports it. There is a limitation on the
-> MSR auto-load/restore feature. When there are multiple MSRs, the MSRs are
-> saved/restored in the order of MSR index. As the suggestion of SDM,
-> PERF_GLOBAL_CTRL should always be written at last after all other PMU MSR=
-s
-> are manipulated. So if there are some PMU MSRs whose index is larger than
-> PERF_GLOBAL_CTRL (It would be true in archPerfmon v6+, all PMU MSRs in th=
-e
-> new MSR range have larger index than PERF_GLOBAL_CTRL),
+However, I'm still hoping that KVM_EXIT_COCO might still provide some
+useful infrastructure for introducing something like
+KVM_EXIT_COCO_GET_QUOTE that implements the TDX-specific requirements
+more directly.
 
-No, the entries in the load/store lists are processed in sequential order a=
-s they
-appear in the lists.  Ordering them based on their MSR index would be insan=
-e and
-would make the lists useless.
+I've just submitted v2 of KVM_EXIT_COCO where the userspace-provided
+error codes are reworked to be less dependent on specific spec-defined
+values but instead relies on standard error codes that KVM can provide
+special handling for internally when needed:
 
-  VM entries may load MSRs from the VM-entry MSR-load area (see Section 25.=
-8.2).
-  Specifically each entry in that area (up to the number specified in the V=
-M-entry
-  MSR-load count) is processed in order by loading the MSR indexed by bits =
-31:0
-  with the contents of bits 127:64 as they would be written by WRMSR.1
+  https://lore.kernel.org/kvm/20241119133513.3612633-1-michael.roth@amd.com/
 
-> these PMU MSRs would be restored after PERF_GLOBAL_CTRL. That would break=
- the
-> rule. Of course, it's good to save/restore PERF_GLOBAL_CTRL right now wit=
-h
-> the VMCS VMCS MSR auto-load/restore bitmap feature since only one PMU MSR
-> PERF_GLOBAL_CTRL is saved/restored in current implementation.
+But I suppose in your case userspace would just return "SUCCESS"/0 and
+then all the vendor-specific values are mainly in relation to the
+"Status Code" field so it likely doesn't make a huge difference as far
+as what userspace passes back to KVM.
 
-No, it's never good to use the load/store lists.  They're slow as mud, beca=
-use
-they're essentially just wrappers to the standard WRMSR/RDMSR ucode.  Where=
-as
-dedicated VMCS fields have dedicated, streamlined ucode to make loads and s=
-tores
-as fast as possible.
+Thanks,
 
-I haven't measured PERF_GLOBAL_CTRL specifically, at least not in recent me=
-mory,
-but generally speaking using a load/store entry is 100+ cycles, whereas usi=
-ng a
-dedicated VMCS field is <20 cyles (often far less).
+Mike
 
-So what I am saying is that the mediated PMU should _require_ support for l=
-oading
-and saving PERF_GLOBAL_CTRL via dedicated fields, and WARN if a CPU with a =
-v4+
-PMU doesn't support said fields.  E.g.
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a4b2b0b69a68..cab8305e7bf0 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8620,6 +8620,15 @@ __init int vmx_hardware_setup(void)
-                enable_sgx =3D false;
- #endif
-=20
-+       /*
-+        * All CPUs that support a mediated PMU are expected to support loa=
-ding
-+        * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
-+        */
-+       if (enable_passthrough_pmu &&
-+           (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
-+                         !cpu_has_save_perf_global_ctrl())))
-+               enable_passthrough_pmu =3D false;
-+
-        /*
-         * set_apic_access_page_addr() is used to reload apic access
-         * page upon invalidation.  No need to do anything if not
-
-That will provide better, more consistent performance, and will eliminate a=
- big
-pile of non-trivial code.
-
-> PERF_GLOBAL_CTRL MSR could be frequently accessed by perf/pmu driver, e.g=
-.
-> on each task switch, so PERF_GLOBAL_CTRL MSR is configured to passthrough
-> to reduce the performance impact in mediated vPMU proposal if guest own a=
-ll
-> PMU HW resource. But if guest only owns part of PMU HW resource,
-> PERF_GLOBAL_CTRL would be set to interception mode.
-
-Again, I know.  What I am saying is that propagating PERF_GLOBAL_CTRL to/fr=
-om the
-VMCS on every entry and exit is extremely wasteful and completely unnecessa=
-ry.
-
-> I suppose KVM doesn't need access PERF_GLOBAL_CTRL in passthrough mode.
-> This piece of code is intently just for PERF_GLOBAL_CTRL interception mod=
-e,
-
-No, it's even more useless if PERF_GLOBAL_CTRL is intercepted, because in t=
-hat
-case the _only_ time KVM needs move the guest's value to/from the VMCS is w=
-hen
-the guest (or host userspace) is explicitly accessing the field.
-
-> but think twice it looks unnecessary to save/restore PERF_GLOBAL_CTRL via
-> VMCS as KVM would always maintain the guest=C2=A0PERF_GLOBAL_CTRL value? =
-Anyway,
-> this part of code can be optimized.
+> 
+> BTW, here is the plan of 4 hypercalls needing to exit to userspace for
+> TDX basic support series:
+> TDG.VP.VMCALL<SetupEventNotifyInterrupt>
+> - Add a new KVM exit reason KVM_EXIT_TDX_SETUP_EVENT_NOTIFY
+> TDG.VP.VMCALL<GetQuote>
+> - Add a new KVM exit reason KVM_EXIT_TDX_GET_QUOTE
+> TDG.VP.VMCALL<MapGPA>
+> - Reuse KVM_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
+> TDG.VP.VMCALL<ReportFatalError>
+> - Reuse KVM_EXIT_SYSTEM_EVENT but add a new type
+>   KVM_SYSTEM_EVENT_TDX_FATAL_ERROR
+> 
+> 
 
