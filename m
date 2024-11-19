@@ -1,129 +1,143 @@
-Return-Path: <kvm+bounces-32084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9CD89D2C09
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:04:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842BA9D2CAC
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B067028B281
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 17:04:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D40F1F22A9B
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 17:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1571D0438;
-	Tue, 19 Nov 2024 17:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499181D1732;
+	Tue, 19 Nov 2024 17:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fR0q9DjD"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="FvkC43Ya"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EBE211C
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 17:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF611D2202
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 17:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732035843; cv=none; b=Up+KEI4SN9kVb4Dg5lgbamsu9PZR7Cp1qrCi5GtILnoRTmRVbN6tNrOmGwP/TGAj9XOeRXogob3ueq7UuVI5ZRlmrJf8jEGDrYY4Ef6GK7o7JrGmPbCVHw+owdOEA50SatseM0Yl27qpNBaijA8N/d3my710OWqQj0ghDQ4GFvc=
+	t=1732037409; cv=none; b=hAICEYGnEBYN27qyouTMlM1NUYxIJC7XGPwV+9+bVNBGRFd7TEFFoH6FWMokzrvDgJvr6H1ImgfroE+EQsxp8PKbi6kKmaSmFkdv8E5idkPd9CKgjkBkV1WoHDgzGTch5CynhS5NFeMHQLRSuY8nHRb6pPjoyiCAX8trrVD3oMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732035843; c=relaxed/simple;
-	bh=U54ia5oSk8AQ9Q9yAoVWnEJ65wAHZPeLYyLnyOV2sZo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MagFUUu0FJ7A/TcQc5+bHT/nsnr390iQbQqqrjjH93/J/q1FxptQ2diSLMDowCKxh9YpANxexQvz1eUHjS+teytHXtNGqF6ly+V32dKWr8IhTOT64MV7TdGn1umSXZWj3xgXgVcJI+MnTIC6LzbXPt2vDyECQKPTIk3if4Qkqd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fR0q9DjD; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e38aae1bdb8so2822812276.0
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 09:04:01 -0800 (PST)
+	s=arc-20240116; t=1732037409; c=relaxed/simple;
+	bh=iJAspBGFRcgVzY4bKp3lb6zrw26/GFw5AyKc0Z0Pg6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LP93c4aTrYNf3WoVNQfk704fTF1Hn9zGPPU9Eisfwo7bzBGMprp0XYPa46YqsCFRZHk5kie0sM3kNYKSn1AbL88dh5Y7RnD62R4EQc67qDdW4gQ/i6WOxHuhk32OvhGcJqZvypI7X6qVt1EDB68K+rH8p2Rahwxu9NpkvA7Hym4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=FvkC43Ya; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b14443a71eso302474785a.1
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 09:30:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732035840; x=1732640640; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pvxmItvmiUYh43bZlZBFfMUnWthWQF/PcFodKRvz7CA=;
-        b=fR0q9DjDNT6EB3KPKf8MeuFfpp2IWIOhw17EbeNH5vkavP16eEBL4E6W/nu25z77e9
-         l977Q1znOv8oKt35y8RvgABsTh3wakyn8DeCLYn5YELR8IooXOwrLgUgur/iMxWk51E9
-         nSAZ2SAmPRXxvbC6G952dtWCTzRAmkKKAewuqXl8izuMZawkbagdHYs8inBIqkb37NxL
-         alyM9aNH7KtKpnyodsiiPDhGgBiY96C85YuKSjV34eWSIyMlNY5xlpq1Tfe6i3kIl3Oe
-         byebziRx4goBPbUnQZGRl3OntT+hEj+C4SvGs3aOmW8W26wtLXRkGwpS1w0dCMdDr8O2
-         38vg==
+        d=ziepe.ca; s=google; t=1732037406; x=1732642206; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P2RZbmw8j/hv2SNzaAYY1BO4WuVS0Sj8NBeQ9Pxkopo=;
+        b=FvkC43YaD8+d6wNMNRd0+xw8SRuKxj9GtQEGGF9P4KwpEodRvUMCA1HZXIoQL8VmPk
+         y/A4iJxrqhwVDiMjkrWRyeqHbxv+/THdnXD9cfmcG6BF976poH2j9CJdt0H9yXd/8Rb8
+         FvPe0yIRumaJnmPcKRf5m7PVS1x3I9hZCfNlTBiWmXGE5QXlMdUqxD5egVFA7vjSBIr0
+         Ifu0kR7lYX8bJgRBspWaUZxC+qfs97R8LkA8AqtGzK6Q4a7rew6zcyR1Fn1No8IMZ40q
+         CHs07ac33zopJjrM/fp8vmfldfQscuxNJIjOLwSuoXpWCexhcNQWuSK+GTy9X9jYUsQN
+         0K4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732035840; x=1732640640;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pvxmItvmiUYh43bZlZBFfMUnWthWQF/PcFodKRvz7CA=;
-        b=HX3l09nEW7/ytjp6H/O5lxnOaaMXRPSilpbJMi1v3AT3mKK9d7yvQliNsNCBDGj5pb
-         cRY6rGOydC9GNdnemFgtkVN9x2sSRWNZT3KLdoH642KrwTGG7Sr2btqvUlihyQuKROP4
-         D/YrypjzLc5xGhjhm6BY/uov5kjTBqU0bT/2pLREXk12tLUpKSJztmDXkKH/T2GX/mTt
-         nLB8bgEOUJP08f1iSGcxyIrYJFzvquFDk8Obx+zdVv+kjqaiysTgNw7tr3g2Qgw/UALN
-         lZH4djGruqGDYVo107y4KbC2hPVoPP1AS1qkydzFecpml/kbZdFeKClg5eWI4QY3L3My
-         X/mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyrUR2U4iPRQf2QNNALcuvbqXF45rkMqQT6LTVZoxPTFXjQpD1UepBo99bL9JDBYBcxp8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1cNG9bUQDT26tS4mgxcbP8hWX78KGA8I/grtQDcowy+wuJO5U
-	95Pxb9elsJYhVJgHt6bnSq7Xq8UTZGR8DAreNTncTiVQGIrCUE1FPjZrEKodRyc0XuLb3n8WMed
-	Zug==
-X-Google-Smtp-Source: AGHT+IFr9FloVnBcyn0OfNahrmO7SUDeVY3cuyo62UFJEZZiaYhD1FzNdug9Chl6LRH66ZqPEafnvLNQGos=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:ab90:0:b0:e38:c40:380f with SMTP id
- 3f1490d57ef6-e3826125c12mr328138276.3.1732035840694; Tue, 19 Nov 2024
- 09:04:00 -0800 (PST)
-Date: Tue, 19 Nov 2024 09:03:59 -0800
-In-Reply-To: <20240801045907.4010984-25-mizhang@google.com>
+        d=1e100.net; s=20230601; t=1732037406; x=1732642206;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P2RZbmw8j/hv2SNzaAYY1BO4WuVS0Sj8NBeQ9Pxkopo=;
+        b=VbhyJqvUc2DJnO8e9XG5g7Ai5awGn5+XUxWckYgTgV2+oQ+bWNnDwqJ9nMeSQNYSJ+
+         yAawX5a0RNxCMC1iIENgqXxz6gZqybznFg0jKppkyRlvn7dnTjFiJMmOKFXzkxNzVPYX
+         v/CTrM12ydbAFzlwIVXkVNuTZVWk7IUVyD3f0bPayfWK3wLMlOR7bWPi33QQ2JrEHxwa
+         GfCeJ4zICpLLmmXIWJwgerZZlv3vyiEDNXJHJd9KwkOn8sbRAagLaddWQR9TI0OgXQS7
+         +Dr9psGF1TZC8uBlvDsDv73dDy+As+WOvJDMOI4X5l4RRJEMbpkfHXMczfiFxkZ7B1Uz
+         Ka4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUgIcTDF7FZ1uZCgofYkFoBuSzySbuLax+DcFU/w44HuqnHpZhbeDqkJVTfb7erqF8gNkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZyHNZn8ws4lehkRCcbdFwPZirG29mErrBZDDGkzPiNPlOCOce
+	7NGG0eNQvTjxYDzL8u6BbsJQ7lNURM1Kg9swcIULdxofTRi4AziZZGBdLeAQ8pQ=
+X-Google-Smtp-Source: AGHT+IEw2hhta4tF97+ZTqDEn97k4/qPKPWIxcDYewixCIGPDLkcCaqZGpK5GII/9x88g1PJnE+WXg==
+X-Received: by 2002:a05:620a:1992:b0:7b1:4330:634f with SMTP id af79cd13be357-7b362384ee1mr2344165985a.61.1732037405973;
+        Tue, 19 Nov 2024 09:30:05 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a866319sm113013385a.69.2024.11.19.09.30.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2024 09:30:04 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tDS3A-00000003GSP-14at;
+	Tue, 19 Nov 2024 13:30:04 -0400
+Date: Tue, 19 Nov 2024 13:30:04 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 07/17] dma-mapping: Implement link/unlink ranges API
+Message-ID: <20241119173004.GA773835@ziepe.ca>
+References: <cover.1731244445.git.leon@kernel.org>
+ <f8c7f160c9ae97fef4ccd355f9979727552c7374.1731244445.git.leon@kernel.org>
+ <20241118145929.GB27795@willie-the-truck>
+ <20241118185533.GA24154@unreal>
+ <20241119090507.GB28466@willie-the-truck>
+ <20241119135743.GB26101@unreal>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-25-mizhang@google.com>
-Message-ID: <ZzzE_z5x7D_trxnq@google.com>
-Subject: Re: [RFC PATCH v3 24/58] KVM: x86/pmu: Introduce macro PMU_CAP_PERF_METRICS
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
-	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
-	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241119135743.GB26101@unreal>
 
-On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> 
-> Define macro PMU_CAP_PERF_METRICS to represent bit[15] of
-> MSR_IA32_PERF_CAPABILITIES MSR. This bit is used to represent whether
-> perf metrics feature is enabled.
-> 
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/vmx/capabilities.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 41a4533f9989..d8317552b634 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -22,6 +22,7 @@ extern int __read_mostly pt_mode;
->  #define PT_MODE_HOST_GUEST	1
->  
->  #define PMU_CAP_FW_WRITES	(1ULL << 13)
-> +#define PMU_CAP_PERF_METRICS	BIT_ULL(15)
+On Tue, Nov 19, 2024 at 03:57:43PM +0200, Leon Romanovsky wrote:
 
-BIT() should suffice.  The 1ULL used for FW_WRITES is unnecessary.  Speaking of
-which, can you update the other #defines while you're at it?  The mix of styles
-annoys me :-)
-
-#define PMU_CAP_FW_WRITES	BIT(13)
-#define PMU_CAP_PERF_METRICS	BIT(15)
-#define PMU_CAP_LBR_FMT		GENMASK(5, 0)
-
->  #define PMU_CAP_LBR_FMT		0x3f
->  
->  struct nested_vmx_msrs {
-> -- 
-> 2.46.0.rc1.232.g9752f9e123-goog
+> > > dma_iova_link/dma_iova_unlink() don't have any assumptions in addition
+> > > to already existing for dma_map_sg/dma_unmap_sg(). In reality, it means
+> > > that all calls to unlink will have same size as for link.
+> > 
+> > Ok, great. Any chance you could call that out in the documentation patch,
+> > please?
 > 
+> Can you suggest what should I add there, as it is not specific to new
+> API, but general note applicable to all __iommu_unmap() callers?
+
+This is what I wrote:
+
++/**
++ * iommu_unmap() - Remove mappings from a range of IOVA
++ * @domain: Domain to manipulate
++ * @iova: IO virtual address to start
++ * @size: Length of the range starting from @iova
++ *
++ * iommu_unmap() will remove a translation created by iommu_map(). It cannot
++ * subdivide a mapping created by iommu_map(), so it should be called with IOVA
++ * ranges that match what was passed to iommu_map(). The range can aggregate
++ * contiguous iommu_map() calls so long as no individual range is split.
++ *
++ * Returns: Number of bytes of IOVA unmapped. iova + res will be the point
++ * unmapping stopped.
++ */
+
+Jason
 
