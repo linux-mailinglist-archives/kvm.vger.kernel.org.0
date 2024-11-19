@@ -1,100 +1,129 @@
-Return-Path: <kvm+bounces-32083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F0A9D2C4F
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:17:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9CD89D2C09
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:04:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9AECB2D658
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:51:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B067028B281
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 17:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5098D1D5ADE;
-	Tue, 19 Nov 2024 16:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1571D0438;
+	Tue, 19 Nov 2024 17:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fR0q9DjD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A382C1D4328;
-	Tue, 19 Nov 2024 16:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EBE211C
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 17:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732034729; cv=none; b=jgPerMrPqzESNSsWPP4GYCky722UDvuSO6ikFI2EHU8sC7tpzXBEUDotdeuPvNVOqtRYRTzJFfUmRahgZUxOnWkFMUCL1QsDL+EqhH6pY8dDAhvBUdD/CNXWlNJs6uCsaE97IX2u3S2+1e9meMuRAf09sJpYKbOI7PG12JdN/ko=
+	t=1732035843; cv=none; b=Up+KEI4SN9kVb4Dg5lgbamsu9PZR7Cp1qrCi5GtILnoRTmRVbN6tNrOmGwP/TGAj9XOeRXogob3ueq7UuVI5ZRlmrJf8jEGDrYY4Ef6GK7o7JrGmPbCVHw+owdOEA50SatseM0Yl27qpNBaijA8N/d3my710OWqQj0ghDQ4GFvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732034729; c=relaxed/simple;
-	bh=Q/BSK4ar/SbHR2TxWlzS2iHmY3WRpuywNmlNZgy7vbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IcqRZOK+P/TpqxctruE+3Fw0/FXm+T7NJuwbctP1RfbVIsz8hdktUKN9+dbGLjB6v2TWiVMgF3IbjvuGOD7lirUjJxs+fzWGo8TsjCPtOKtexirGSo/XqrvnXdDC15TnnxGyS00f4ByBkLbFr/4hFMDY5j309FfKSoGZKVP1n6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3A1C4CECF;
-	Tue, 19 Nov 2024 16:45:22 +0000 (UTC)
-Date: Tue, 19 Nov 2024 11:45:56 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
- x86@kernel.org, rcu@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Masami Hiramatsu <mhiramat@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney"
- <paulmck@kernel.org>, Neeraj Upadhyay <quic_neeraju@quicinc.com>, Joel
- Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>,
- Boqun Feng <boqun.feng@gmail.com>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- Zqiang <qiang.zhang1211@gmail.com>, Andrew Morton
- <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Lorenzo Stoakes <lstoakes@gmail.com>, Josh
- Poimboeuf <jpoimboe@kernel.org>, Jason Baron <jbaron@akamai.com>, Kees Cook
- <keescook@chromium.org>, Sami Tolvanen <samitolvanen@google.com>, Ard
- Biesheuvel <ardb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Juerg
- Haefliger <juerg.haefliger@canonical.com>, Nicolas Saenz Julienne
- <nsaenz@kernel.org>, "Kirill A. Shutemov"
- <kirill.shutemov@linux.intel.com>, Nadav Amit <namit@vmware.com>, Dan
- Carpenter <error27@gmail.com>, Chuang Wang <nashuiliang@gmail.com>, Yang
- Jihong <yangjihong1@huawei.com>, Petr Mladek <pmladek@suse.com>, "Jason A.
- Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>, Julian Pidancet
- <julian.pidancet@oracle.com>, Tom Lendacky <thomas.lendacky@amd.com>,
- Dionna Glaze <dionnaglaze@google.com>, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
- <linux@weissschuh.net>, Juri Lelli <juri.lelli@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, Daniel Wagner
- <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 00/15] context_tracking,x86: Defer some IPIs
- until a user->kernel transition
-Message-ID: <20241119114556.0949b562@gandalf.local.home>
-In-Reply-To: <20241119153502.41361-1-vschneid@redhat.com>
-References: <20241119153502.41361-1-vschneid@redhat.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732035843; c=relaxed/simple;
+	bh=U54ia5oSk8AQ9Q9yAoVWnEJ65wAHZPeLYyLnyOV2sZo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MagFUUu0FJ7A/TcQc5+bHT/nsnr390iQbQqqrjjH93/J/q1FxptQ2diSLMDowCKxh9YpANxexQvz1eUHjS+teytHXtNGqF6ly+V32dKWr8IhTOT64MV7TdGn1umSXZWj3xgXgVcJI+MnTIC6LzbXPt2vDyECQKPTIk3if4Qkqd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fR0q9DjD; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e38aae1bdb8so2822812276.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 09:04:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732035840; x=1732640640; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pvxmItvmiUYh43bZlZBFfMUnWthWQF/PcFodKRvz7CA=;
+        b=fR0q9DjDNT6EB3KPKf8MeuFfpp2IWIOhw17EbeNH5vkavP16eEBL4E6W/nu25z77e9
+         l977Q1znOv8oKt35y8RvgABsTh3wakyn8DeCLYn5YELR8IooXOwrLgUgur/iMxWk51E9
+         nSAZ2SAmPRXxvbC6G952dtWCTzRAmkKKAewuqXl8izuMZawkbagdHYs8inBIqkb37NxL
+         alyM9aNH7KtKpnyodsiiPDhGgBiY96C85YuKSjV34eWSIyMlNY5xlpq1Tfe6i3kIl3Oe
+         byebziRx4goBPbUnQZGRl3OntT+hEj+C4SvGs3aOmW8W26wtLXRkGwpS1w0dCMdDr8O2
+         38vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732035840; x=1732640640;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pvxmItvmiUYh43bZlZBFfMUnWthWQF/PcFodKRvz7CA=;
+        b=HX3l09nEW7/ytjp6H/O5lxnOaaMXRPSilpbJMi1v3AT3mKK9d7yvQliNsNCBDGj5pb
+         cRY6rGOydC9GNdnemFgtkVN9x2sSRWNZT3KLdoH642KrwTGG7Sr2btqvUlihyQuKROP4
+         D/YrypjzLc5xGhjhm6BY/uov5kjTBqU0bT/2pLREXk12tLUpKSJztmDXkKH/T2GX/mTt
+         nLB8bgEOUJP08f1iSGcxyIrYJFzvquFDk8Obx+zdVv+kjqaiysTgNw7tr3g2Qgw/UALN
+         lZH4djGruqGDYVo107y4KbC2hPVoPP1AS1qkydzFecpml/kbZdFeKClg5eWI4QY3L3My
+         X/mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyrUR2U4iPRQf2QNNALcuvbqXF45rkMqQT6LTVZoxPTFXjQpD1UepBo99bL9JDBYBcxp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1cNG9bUQDT26tS4mgxcbP8hWX78KGA8I/grtQDcowy+wuJO5U
+	95Pxb9elsJYhVJgHt6bnSq7Xq8UTZGR8DAreNTncTiVQGIrCUE1FPjZrEKodRyc0XuLb3n8WMed
+	Zug==
+X-Google-Smtp-Source: AGHT+IFr9FloVnBcyn0OfNahrmO7SUDeVY3cuyo62UFJEZZiaYhD1FzNdug9Chl6LRH66ZqPEafnvLNQGos=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:ab90:0:b0:e38:c40:380f with SMTP id
+ 3f1490d57ef6-e3826125c12mr328138276.3.1732035840694; Tue, 19 Nov 2024
+ 09:04:00 -0800 (PST)
+Date: Tue, 19 Nov 2024 09:03:59 -0800
+In-Reply-To: <20240801045907.4010984-25-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-25-mizhang@google.com>
+Message-ID: <ZzzE_z5x7D_trxnq@google.com>
+Subject: Re: [RFC PATCH v3 24/58] KVM: x86/pmu: Introduce macro PMU_CAP_PERF_METRICS
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 19 Nov 2024 16:34:47 +0100
-Valentin Schneider <vschneid@redhat.com> wrote:
-
-> Context
-> =======
+On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > 
-> We've observed within Red Hat that isolated, NOHZ_FULL CPUs running a
-> pure-userspace application get regularly interrupted by IPIs sent from
-> housekeeping CPUs. Those IPIs are caused by activity on the housekeeping CPUs
-> leading to various on_each_cpu() calls, e.g.:
+> Define macro PMU_CAP_PERF_METRICS to represent bit[15] of
+> MSR_IA32_PERF_CAPABILITIES MSR. This bit is used to represent whether
+> perf metrics feature is enabled.
+> 
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/vmx/capabilities.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 41a4533f9989..d8317552b634 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -22,6 +22,7 @@ extern int __read_mostly pt_mode;
+>  #define PT_MODE_HOST_GUEST	1
+>  
+>  #define PMU_CAP_FW_WRITES	(1ULL << 13)
+> +#define PMU_CAP_PERF_METRICS	BIT_ULL(15)
 
-FYI,
+BIT() should suffice.  The 1ULL used for FW_WRITES is unnecessary.  Speaking of
+which, can you update the other #defines while you're at it?  The mix of styles
+annoys me :-)
 
-Sending a patch series at the start of the merge window is likely going to
-get ignored.
+#define PMU_CAP_FW_WRITES	BIT(13)
+#define PMU_CAP_PERF_METRICS	BIT(15)
+#define PMU_CAP_LBR_FMT		GENMASK(5, 0)
 
-Care to resend after rc1 is released? Or at least ping about it.
-
--- Steve
+>  #define PMU_CAP_LBR_FMT		0x3f
+>  
+>  struct nested_vmx_msrs {
+> -- 
+> 2.46.0.rc1.232.g9752f9e123-goog
+> 
 
