@@ -1,201 +1,160 @@
-Return-Path: <kvm+bounces-32063-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E20949D2A20
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:50:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A31A9D29E1
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DCAFB2C614
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:37:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3C931F21DE0
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604781D0E07;
-	Tue, 19 Nov 2024 15:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18D11D0E1F;
+	Tue, 19 Nov 2024 15:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="T3NsXSOy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pqaDuSKN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A041D0BA6
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667051CC161
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732030586; cv=none; b=RLKOh6qlyv0w2Vr5PcFRhBlh4/XfI4kRrmh8YAMP0m+oLarSOPJugRgvED9Nhsw4dsrNFHDQurS+JPRdTPHm1AT5f6ha9KVp2CskJwekBcPX3Jp8pVPmOGrkMP4Ozup23dy9jsfVTjyKkauWOcr7UW6XvbvLRqGxtY0ikcHj09U=
+	t=1732030681; cv=none; b=MGa5w/qWxoYQJgMebhp1oc1EWpiDiNKRvrq/cRehFY8Y3gfwDyH7k+HGql+XJM2tPM4cyOC+Bnq2nesOMvPuCHStk+gh1fR1l6GwLGURi6pRqsp3EpDhPm6lAG7lIrKIEYl+uZ5sEX9Es3gtVlWW3FV/M5b0uDgyvsTmvjKTTPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732030586; c=relaxed/simple;
-	bh=JCkAA68ZY+WP8IwqIAvaFpW2nHxEvQxCVSX6gB3J6/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iToHpHVOsEKKT6GOFq0Np8v8u68Ym6K6T0CTzTt10N/geIVjewsPRTAgPY0YAV3PPyC4VxyRGlsgKBwNvKuvesUtJ6ADwvNR4NjMhRZdhZD0cxUAH5Qcq2OsGS+m48UsvS90Ea3QpVyaOBscnU8CIC6Qxsp12VmBpoJzGFsUMhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=T3NsXSOy; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b147a2ff04so243940985a.3
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 07:36:24 -0800 (PST)
+	s=arc-20240116; t=1732030681; c=relaxed/simple;
+	bh=cTwjzGqKUpqGH8nA7SsQ+OktimoPQfVv87Z1DfG8K7c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ExYPvyZW/Ss/fb5/dW0vwnSXOQIw7YEP7JZs59la0FjzogaNJa+ZuSscQ/+/cbxFHZ9cXAG3GhEar1OTm58+EieKoi4WRJykRlR2X9qJt0iOZQUx9W9PIjZe1YQfZBHqb+WWaF7mE186cQIefTzsuIbLa9+fGL53jaiIY3GIO2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pqaDuSKN; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ea21082c99so3813400a91.3
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 07:37:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1732030583; x=1732635383; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3mHQxzFmFKlA+b0zYZcHoo+aU2zGMKGJLF0Y2reUtOA=;
-        b=T3NsXSOyMLdfLOCR728lLFI50OgM5D4QCcPSo+WrvZxlr4t+ssTCeX0So65UJ9kBAe
-         GcpmKzUEnNFhux0pocscBsMU9wHSDGyRy2+H96Sv0AoUJZ89BQBmoGsfCJ2Ep4eoUiEo
-         n4vSkskJpV34AwrQJuUE5FZF3Kpw8ybT9OaG8gax4kLXk5hzpEv1++kbj17dPWLAjljb
-         tzjEDl+gvGGSgDlY+ZGFE4eAAjtU41bzX7rtJgS4cBQPbuHEqFSBkYsBmUwmQh/OlWxR
-         YmOkC4V8/yom40fTMlO5TsnwZIS5O6/Pl1TrgKMi5A4+ybEbRK2VQtVSGiaxC7yujxfy
-         BN3g==
+        d=google.com; s=20230601; t=1732030679; x=1732635479; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fPN8/Su0I+qo2YHY6QxpzBdT5jWaWm8vD60kZIe4g6A=;
+        b=pqaDuSKN/2LOomFpubFz5IR5F12zaNa+Xn69+SH2CXi97ITGCzXakkZHX3zxJHC6d1
+         zSD3t6KGhFJnT6cHMd85Gk3p0+Z4pdu//3/pg8RoiPUuF0Ps0G92cSkjrO1T4n64hO0l
+         Hqzv39baIouKwPOmx0H/vPfo+jBfvJgFI8JfWtBmveaxFFE1PyHIpuoqkH0eb3K2omyF
+         KhU9oyRW1isyGNemA/t/Q0OqLkVeIIjZ3w+vG08N6pvBSceqNuXr6M/asvFBiDPQcQat
+         qQfs8hcs7uE9NWE4jV+f0WPFPesURikRbsoLvu65dDoRoR6+zVpAnLQbILd0o0mCck8p
+         N0ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732030583; x=1732635383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3mHQxzFmFKlA+b0zYZcHoo+aU2zGMKGJLF0Y2reUtOA=;
-        b=d5sEd93l17I9c6ZyMEzzRKLfuwsYM6Pav9pWkhwBBM3frnfhtq2ni/6rReNioW7QBn
-         u7GGkPj67/X3qFQHr5irVze9WgBkBjYXT6pm4kFf+1sCU1zdQ6ZV82/j4T1ZYXqbtNTp
-         aJWu8Kvkt+nsSqWsBEm3mxIwIs+v2+zOPZXIXcmJWaQRucoq0ELAt3iNq3V2fx0xRpbW
-         FKwy3ZJSXMVXVnQ5wZ2Pa0ZlhFz+5205IfuX0Ktktwt8RRqK2EmbEr6ynn4y9zZMgm71
-         o2yfqA1HXEz+MyIkKtG1TZbOmKba1xeuEMBCJ2kr9SOznU+QYQeUalV6eOLkIJO18XyX
-         8S0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhsrY39LFKviwgBiG+1HW70q4MGrjP+tbRRT9CiYYSTpJfQ8r045X4UPyzhliZpr8G+qM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzE1nlMfh24IsOuH1DZR3K23Wm5mcz8cT8GeWxL3eAleNe2MZAv
-	9NsrZ+MoSHw7MlKzpQT3M/YhUgaIXXfMHqAZgOfOWdl25Kq3qkfrcEG0XtnRctc=
-X-Google-Smtp-Source: AGHT+IH4/mgl4haITeaqcVAP0uJ0PicTb/W5vrOpJN7LD+UFoRrLptgSOiQTXdZYlGY+OxnTFThNlg==
-X-Received: by 2002:a05:620a:28d1:b0:7ac:b04e:34c6 with SMTP id af79cd13be357-7b362363c62mr1842987085a.50.1732030583616;
-        Tue, 19 Nov 2024 07:36:23 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a89fc13sm102554185a.109.2024.11.19.07.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 07:36:22 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tDQH8-00000003ErC-0NkI;
-	Tue, 19 Nov 2024 11:36:22 -0400
-Date: Tue, 19 Nov 2024 11:36:22 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, tjeznach@rivosinc.com,
-	zong.li@sifive.com, joro@8bytes.org, will@kernel.org,
-	robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org,
-	tglx@linutronix.de, alex.williamson@redhat.com,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 08/15] iommu/riscv: Add IRQ domain for interrupt
- remapping
-Message-ID: <20241119153622.GD559636@ziepe.ca>
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-25-ajones@ventanamicro.com>
- <20241118184336.GB559636@ziepe.ca>
- <20241119-62ff49fc1eedba051838dba2@orel>
- <20241119140047.GC559636@ziepe.ca>
- <DE13E1DF-7C68-461D-ADCD-8141B1ACEA5E@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1732030679; x=1732635479;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fPN8/Su0I+qo2YHY6QxpzBdT5jWaWm8vD60kZIe4g6A=;
+        b=CxQCxQJSdvk+l19i402AlzjvFU5b3Ib4XnqFcScgGRUtDdI2jzPEHc8+tUmxCBgjkE
+         X5hhxU5SoOMNL5YLm9T7KSjByYDjL91CvCxFMHHlnJRhNHkQqdLeAfgAJaYamghhjVt7
+         opEWZbpb/Jo6n8F8cpld/oWqBS9zENeBsdL2XhnioFZd0vYn+WSGDOnEEZvX1VUrMyHi
+         Er5ORoI5C/fXVuZSFUp0oAXTcarq+DDgWcaaQZVTv89djc8855f5eipSg0QvVKxHk8Z0
+         ziqVa7U+yJ2UQB0o6XIH5gohg4DPcbM0PthvuJzn/UMrYX/HbQGFCjgEstnTQ8Z8V8gV
+         gAyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVhbLRTHlOMZFzRZeG1jsNgX2gBpa7/NxTZJiqti8gho/GawcJVDAkzzwCtJ4e9Ab+9H7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw63qMw+FER3KBy7hNEqR0TtsZ7oU1ICmD1rF8VDYin2HF44a18
+	N+AxN+vNRNJKg6rpcyR7fJo66Kwjh1P7t2/hO1Alewo200FT9GdN1NlxQ8QMBTWywJ0GszJ1oT4
+	WUg==
+X-Google-Smtp-Source: AGHT+IEtTpRNnYoRrw3+3gI3YR2Wbbv0fwFuzSmYLC46Hb5WA9M4JELz/5AzVoE3pfqrSuz8dF5FBhgy5Dg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:8d0a:b0:2ea:31f3:d646 with SMTP id
+ 98e67ed59e1d1-2ea31f3d76amr20660a91.7.1732030678733; Tue, 19 Nov 2024
+ 07:37:58 -0800 (PST)
+Date: Tue, 19 Nov 2024 07:37:57 -0800
+In-Reply-To: <20240801045907.4010984-21-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DE13E1DF-7C68-461D-ADCD-8141B1ACEA5E@ventanamicro.com>
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-21-mizhang@google.com>
+Message-ID: <Zzyw1UyapXDNpc-c@google.com>
+Subject: Re: [RFC PATCH v3 20/58] KVM: x86/pmu: Always set global enable bits
+ in passthrough mode
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 19, 2024 at 04:03:05PM +0100, Andrew Jones wrote:
-
-> >This is the wrong thinking entirely. There is no such thing as a "VFIO
-> >domain".
-> >
-> >Default VFIO created domains should act excatly the same as a DMA API
-> >domain.
-> >
-> >If you want your system to have irq remapping, then it should be on by
-> >default and DMA API gets remapping too. There would need to be a very
-> >strong reason not to do that in order to make something special for
-> >riscv. If so you'd need to add some kind of flag to select it.
-> >
-> >Until you reach nested translation there is no "need" for VFIO to use
-> >any particular stage. The design is that default VFIO uses the same
-> >stage as the DMA API because it is doing the same basic default
-> >translation function.
+On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> From: Sandipan Das <sandipan.das@amd.com>
 > 
-> The RISC-V IOMMU needs to use g-stage for device assignment, if we
-> also want to enable irqbypass, because the IOMMU is specified to
-> only look at the MSI table when g-stage is in use. This is actually
-> another reason the irq domain only makes sense for device
-> assignment.
-
-Most HW has enablable interrupt remapping and typically Linux just
-turns it always on.
-
-Is there a reason the DMA API shouldn't use this translation mode too?
-That seems to be the main issue here, you are trying to avoid
-interrupt remapping for DMA API and use it only for VFIO, and haven't
-explained why we need such complexity. Just use it always?
-
-> >Nested translation has a control to select the stage, and you can
-> >then force the g-stage for VFIO users at that point.
+> Currently, the global control bits for a vcpu are restored to the reset
+> state only if the guest PMU version is less than 2. This works for
+> emulated PMU as the MSRs are intercepted and backing events are created
+> for and managed by the host PMU [1].
 > 
-> We could force riscv device assignment to always be nested, and when
-> not providing an iommu to the guest, it will still be single-stage,
-> but g-stage, but I don't think that's currently possible with VFIO,
-> is it?
-
-That isn't what I mean, I mean you should not be forcing the kind of
-domain being created until you get to special cases like nested.
-
-Default VFIO should work the same as the DMA API.
-
-> >> The IRQ domain will only be useful for device assignment, as that's when
-> >> an MSI translation will be needed. I can't think of any problems that
-> >> could arise from only creating the IRQ domain when probing assigned
-> >> devices, but I could certainly be missing something. Do you have some
-> >> potential problems in mind?
-> >
-> >I'm not an expert in the interrupt subsystem, but my understanding was
-> >we expect the interrupt domains/etc to be static once a device driver
-> >is probed. Changing things during iommu domain attach is after drivers
-> >are probed. I don't really expect it to work correctly in all corner
-> >cases.
+> If such a guest in run with passthrough PMU, the counters no longer work
+> because the global enable bits are cleared. Hence, set the global enable
+> bits to their reset state if passthrough PMU is used.
 > 
-> With VFIO the iommu domain attach comes after an unbind/bind, so the
-> new driver is probed.
-
-That's the opposite of what I mean. The irq domain should be setup
-*before* VFIO binds to the driver.
-
-Changing the active irq_domain while VFIO is already probed to the
-device is highly unlikely to work right in all cases.
-
-> I think that's a safe time. However, if there
-> could be cases where the attach does not follow an unbind/bind, then
-> I agree that wouldn't be safe.
-
-These cases exist.
-
-> I'll consider always creating an IRQ
-> domain, even if it won't provide any additional functionality unless
-> the device is assigned.
-
-That isn't ideal, the translation under the IRQs shouldn't really be
-changing as the translation under the IOMMU changes.
-
-Further, VFIO assumes iommu_group_has_isolated_msi(), ie
-IRQ_DOMAIN_FLAG_ISOLATED_MSI, is fixed while it is is bound. Will that
-be true if the iommu is flapping all about? What will you do when VFIO
-has it attached to a blocked domain?
-
-It just doesn't make sense to change something so fundamental as the
-interrupt path on an iommu domain attachement. :\
-
-> >VFIO is allowed to change the translation as it operates and we expect
-> >that interrupts are not disturbed.
+> A passthrough-capable host may not necessarily support PMU version 2 and
+> it can choose to restore or save the global control state from struct
+> kvm_pmu in the PMU context save and restore helpers depending on the
+> availability of the global control register.
 > 
-> The IRQ domain stays the same during operation, the only changes are
-> the mappings from what the guest believes are its s-mode interrupt
-> files to the hypervisor selected guest interrupt files, and these
-> changes are made possible by the IRQ domain's vcpu-affinity support.
+> [1] 7b46b733bdb4 ("KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at "RESET"");
+> 
+> Reported-by: Mingwei Zhang <mizhang@google.com>
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+> [removed the fixes tag]
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 5768ea2935e9..e656f72fdace 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -787,7 +787,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	 * in the global controls).  Emulate that behavior when refreshing the
+>  	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
+>  	 */
+> -	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
+> +	if ((pmu->passthrough || kvm_pmu_has_perf_global_ctrl(pmu)) && pmu->nr_arch_gp_counters)
+>  		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
 
-That is only the case when talking about kvm, this all still has to
-work fully for non-kvm VFIO uses cases too.
+This is wrong and confusing.  From the guest's perspective, and therefore from
+host userspace's perspective, PERF_GLOBAL_CTRL does not exist.  Therefore, the
+value that is tracked for the guest must be '0'.
 
-Jason
+I see that intel_passthrough_pmu_msrs() and amd_passthrough_pmu_msrs() intercept
+accesses to PERF_GLOBAL_CTRL if "pmu->version > 1" (which, by the by, needs to be
+kvm_pmu_has_perf_global_ctrl()), so there's no weirdness with the guest being able
+to access MSRs that shouldn't exist.
+
+But KVM shouldn't stuff pmu->global_ctrl, and doing so is a symptom of another
+flaw.  Unless I'm missing something, KVM stuffs pmu->global_ctrl so that the
+correct value is loaded on VM-Enter, but loading and saving PERF_GLOBAL_CTRL on
+entry/exit is unnecessary and confusing, as is loading the associated MSRs when
+restoring (loading) the guest context.
+
+For PERF_GLOBAL_CTRL on Intel, KVM needs to ensure all GP counters are enabled in
+VMCS.GUEST_IA32_PERF_GLOBAL_CTRL, but that's a "set once and forget" operation,
+not something that needs to be done on every entry and exit.  Of course, loading
+and saving PERF_GLOBAL_CTRL on every entry/exit is unnecessary for other reasons,
+but that's largely orthogonal.
+
+On AMD, amd_restore_pmu_context()[*] needs to enable a maximal value for
+PERF_GLOBAL_CTRL, but I don't think there's any need to load the other MSRs,
+and the maximal value should come from the above logic, not pmu->global_ctrl.
+
+[*] Side topic, in case I forget later, that API should be "load", not "restore".
+    There is no assumption or guarantee that KVM is exactly restoring anything,
+    e.g. if PERF_GLOBAL_CTRL doesn't exist in the guest PMU and on the first load.
 
