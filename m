@@ -1,248 +1,292 @@
-Return-Path: <kvm+bounces-32087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749D79D2D79
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 19:03:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D619D2E6F
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 19:59:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08F891F2662C
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:03:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 730CFB39BD4
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 18:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919171D27B3;
-	Tue, 19 Nov 2024 18:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C30E1D3593;
+	Tue, 19 Nov 2024 18:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JFgq9lP2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WmEwY0uU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD0213B780;
-	Tue, 19 Nov 2024 18:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B40B1D14FD
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 18:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732039279; cv=none; b=eA7O6dde0r12w2CG8z9gE+uVQpMuwAk1h3ZAbq0h3aHGU7eoO8rMPJdAZD1XqMctto/yQA2TmYBAURNkwBv9BualnOOTZQVkC8VUQwCZnuFanEI7ZMOZzuqWOoEENTyuLFp+XdCmbYGdrH/+94z5aquRAG+JLpPuWovV34BqreI=
+	t=1732040203; cv=none; b=cigZLRf7HmhiVRsiBOU3NymXuyTXfbBbNib/a0eFC6Hw3Mik3SVrBCTpuebLi6yxAm6s87hBjMytKTpwdphGBS+E2Q3eIRjeMqvTE69ikwmxdvgO5nFY72BmEaIL/wA8oGHbM9mw+oNvNF2QyNs2eWRVXzophM8dy7zqhN+3fRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732039279; c=relaxed/simple;
-	bh=jaS++F2xsrYM/FY+QIngLzh3/Zr6ROQc1dgT4Ot/vi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tonh9iGgtWPz/pYiX+xvLBUSAW8Rw3eA2ArdqgNOsymXn9Sc2nxIpTOyFONG8ltlEzUxrrqSsQ0V+vj2xiLLp1NG5VtAu2rBMdym0ile6a2hhEvc8Utcz8wQDo245plnkiuJUppRHI9sBWaczDbC8TmWY3W1NiDY1IICRK+MjYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JFgq9lP2; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AJG8Mon022084;
-	Tue, 19 Nov 2024 18:01:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=IKGoqi
-	EuUfCjlGEYsOTA5LPUwOxMpi+cljnvwNMNLFQ=; b=JFgq9lP2lYD8aF1SF24nxk
-	nd9gfBX7T2HsXuuo10YB5Gsq+LA/iHWQgsVuJWqPeIl99ggxIhUNoiM5dT4k0yBU
-	9OmwYB11K9ztDhOha503MuiaTdcuuj1HTr6m/u7rDVBFC/RSC0qMpILNEEYMw6ZS
-	mxktEq8qhYscKmGYKRhz3WU5Q+KIvSSJfRmEjMTep9teypiK8wsSwh987mYNwzPU
-	diAouypOdDuCLtX0kwj2uqjtZZFsCnTMVHrisOsxjrlfv5zoBiJrwRKin4VJcxXr
-	KBUO6cB2y61blyT3/K6LzcUZiOFmiDMvQeyJDhavkHyZl50zefU3SHqsiGU6oyOw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xk2w1nuu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 18:01:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AJAeGZ5030582;
-	Tue, 19 Nov 2024 18:01:13 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 42y5qsd42u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 18:01:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AJI17kS57672106
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Nov 2024 18:01:07 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 660982004D;
-	Tue, 19 Nov 2024 18:01:07 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1FA032004B;
-	Tue, 19 Nov 2024 18:01:07 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 19 Nov 2024 18:01:07 +0000 (GMT)
-Date: Tue, 19 Nov 2024 19:01:05 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <nrb@linux.ibm.com>, <frankja@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <thuth@redhat.com>, <david@redhat.com>,
-        <linux-s390@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: pv: Add test for large
- host pages backing
-Message-ID: <20241119190105.02804b2a@p-imbrenda>
-In-Reply-To: <D5Q9UYK621SX.3N31BCUZK3RBZ@linux.ibm.com>
-References: <20241111121529.30153-1-imbrenda@linux.ibm.com>
-	<D5Q9UYK621SX.3N31BCUZK3RBZ@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1732040203; c=relaxed/simple;
+	bh=S6qePynJfvFNjGTiJCMXdcd4gjx5A5flHSQM0Yu8a90=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iDXhlUlF0gcGxnW7qze4drqOzltfyHBbEGGQRCSdWDD4C3ORo7PKkVFyQ3BsvYXlMK286RcbpsluBI6zMyFMy5YPDj0dlDy7AsoiQafSdmevFsoyIjQf0aJ9kKCUoUdKG8PgyfumWVXCQa4UXtAoNfVU3oWr92eusoWVd22JVYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WmEwY0uU; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ee6e1f2d25so61674797b3.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 10:16:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732040200; x=1732645000; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=idomr3Hl2BFFWSsWPJ0RzB0j8mo/mnxNDTGRrypBjvI=;
+        b=WmEwY0uU4XI9qAA9KlpIeyZSCJF7mwzpmPMOxC7lOjrJ8ypA4VikJC8DX4g/QCwErK
+         hf1A0Riq6Ktsj9hBn3ddLWTsSN5DAtM5JNO0Mkxbi51XlXcSd/eXjCmsumQQFOEmQfyf
+         oph/YLIWpgtFu0UgWm1wkqR8puS4GVd9XokCUiZ6OliJdacIyQ6NZgcqjrZgVs8LAJqx
+         JbDD8lkS9vCVFCpFDT8rQmOgN6+JWp/P1xXcTx1Jzk8/h9aK0AlEgzd3ULvjH+Py83Oa
+         UFZAbpDNeHs+SNqF15KUBQShSGEFY/SBav76SRjcD5TlHnNapsFgcJh9tTJo4zMCtIsQ
+         q3HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732040200; x=1732645000;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=idomr3Hl2BFFWSsWPJ0RzB0j8mo/mnxNDTGRrypBjvI=;
+        b=Ahhn99gp/OZiYfevNI7w1ZtS6CYfHzjnHPWC9jOV3+oVMY9Y7X5lx0BYhJmb/1bTnh
+         y90kN7eLhNRN61sL4xg3dmvfteQC3rdvaVWrn5WCRnOAEc4YuGtU2wCy5vIaNn76SkRj
+         a1h81f4jnikHL64AdJ1/CjEZTkcPIGA3+y+1ra1EMvELEwpZjRiOkWRGGC81PSLY/VoK
+         ps52lzpODRh0vui/uGelXOD9kByZnlgqCAQQkeRDoh34Vxx70ThdoUKLMkjH06Ytu2vq
+         ZHnIfb2uKQQnqgUAAplJbEf/Eph+W4eV09NggMsogVTz3klLY3ruEYEFSQnyF4El1YVi
+         eJvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUp4Ka5l+HE+1r3TD2nGMktKjkJkegKVFgIljidE/XBHsiCuO03szungmm7bx60/nzR9z0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm4RPx+VzBe6oK8Ia/7Ii/Rb+p9xzVT4sI3NIxnwRzR5WxXXLi
+	sveA0eqLAbouTSl7kOq+2HoN6RBq93o1/0JD2ZQ9zPsHo8Z0ImcgF1i0clbzjwmO6x6cdxCSeKy
+	bXQ==
+X-Google-Smtp-Source: AGHT+IFSmG4m0oHH/q7gNwHuQzmdwSVvXHtPSlKJsyH+VTHZK8FkxYqujncC6c7x+AQQzhLIhNCFQZtFCrU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3102:b0:6ea:1f5b:1f5e with SMTP id
+ 00721157ae682-6ee55c95b39mr983367b3.4.1732040200274; Tue, 19 Nov 2024
+ 10:16:40 -0800 (PST)
+Date: Tue, 19 Nov 2024 10:16:38 -0800
+In-Reply-To: <20240801045907.4010984-27-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: UctvG-TKvOuMsx9FGp3PpU55nYE58MFP
-X-Proofpoint-GUID: UctvG-TKvOuMsx9FGp3PpU55nYE58MFP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 phishscore=0 clxscore=1015 suspectscore=0 spamscore=0
- impostorscore=0 bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411190134
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-27-mizhang@google.com>
+Message-ID: <ZzzWBoCg-2B5p9bN@google.com>
+Subject: Re: [RFC PATCH v3 26/58] KVM: x86/pmu: Manage MSR interception for IA32_PERF_GLOBAL_CTRL
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 19 Nov 2024 16:48:37 +0100
-"Christoph Schlameuss" <schlameuss@linux.ibm.com> wrote:
+On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> ---
+>  arch/x86/include/asm/vmx.h |   1 +
+>  arch/x86/kvm/vmx/vmx.c     | 117 +++++++++++++++++++++++++++++++------
+>  arch/x86/kvm/vmx/vmx.h     |   3 +-
+>  3 files changed, 103 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index d77a31039f24..5ed89a099533 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -106,6 +106,7 @@
+>  #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
+>  #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
+>  #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
+> +#define VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL      0x40000000
 
-> Sorry for not seeing this on the first review, but there still is something.
-> 
-> On Mon Nov 11, 2024 at 1:15 PM CET, Claudio Imbrenda wrote:
-> > Add a new test to check that the host can use 1M large pages to back
-> > protected guests when the corresponding feature is present.
-> >
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >  s390x/Makefile               |   2 +
-> >  lib/s390x/asm/arch_def.h     |   1 +
-> >  lib/s390x/asm/uv.h           |  18 ++
-> >  s390x/pv-edat1.c             | 463 +++++++++++++++++++++++++++++++++++
-> >  s390x/snippets/c/pv-memhog.c |  59 +++++
-> >  5 files changed, 543 insertions(+)
-> >  create mode 100644 s390x/pv-edat1.c
-> >  create mode 100644 s390x/snippets/c/pv-memhog.c  
-> 
-> [...]
-> 
-> > +static void timings(void)
-> > +{
-> > +	const uint64_t seqs[] = { 0, 1, 3, 7, 17, 27, 63, 127};  
-> 
-> Missing space in the end
+Please add a helper in capabilities.h:
 
-will fix
+static inline bool cpu_has_save_perf_global_ctrl(void)
+{
+	return vmcs_config.vmexit_ctrl & VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
+}
 
-> [...]
-> 
-> > +static void test_one_export(struct vm *vm, int pre1m, bool exportfirst, int page, bool post1m)
-> > +{
-> > +	uint64_t addr = SZ_1M + page * PAGE_SIZE;
-> > +	int expected = FIRST;
-> > +
-> > +	report_prefix_pushf("page %d", page);
-> > +
-> > +	map_identity_all(vm, pre1m == 1);
-> > +	init_snippet(vm);
-> > +	import_all(vm);
-> > +	merge_all(vm);
-> > +
-> > +	if (pre1m != -1) {
-> > +		sie(vm);
-> > +		assert_diag500_val(vm, expected);
-> > +		vm->save_area.guest.grs[2] = PARAM(4, 256 + 42);
-> > +		expected = SECOND;
-> > +	}
-> > +
-> > +	if (exportfirst) {
-> > +		export_range(vm, addr, addr + PAGE_SIZE);
-> > +		if (pre1m != 1)
-> > +			map_identity_all(vm, true);
-> > +	} else {
-> > +		if (pre1m != 1)
-> > +			map_identity_all(vm, true);
-> > +		export_range(vm, addr, addr + PAGE_SIZE);
-> > +	}  
-> 
-> The tree checks here "pre1m == 1" and "pre1m != 1" do not quite add up. pre1m
-> is only ever called with pre1m = -1 and pre1m = 0.
-> With this the first of the three map_identity_all calls here will always map
-> normal pages and the next two calls will never happen.
 
-yeah, because the loop used to go to 1, and I don't remember why I
-changed it... maybe it should actually go all the way to 1 again...
+>  #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 339742350b7a..34a420fa98c5 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4394,6 +4394,97 @@ static u32 vmx_pin_based_exec_ctrl(struct vcpu_vmx *vmx)
+>  	return pin_based_exec_ctrl;
+>  }
+>  
+> +static void vmx_set_perf_global_ctrl(struct vcpu_vmx *vmx)
 
-> 
-> > +	expect_pgm_int();
-> > +	sie(vm);
-> > +	assert(pgm_3c_addr_is(vm, MAGIC_ADDRESS));
-> > +
-> > +	import_range(vm, addr, addr + PAGE_SIZE);
-> > +	if (post1m) {
-> > +		merge_range(vm, SZ_1M, 2 * SZ_1M);
-> > +	} else {
-> > +		map_identity_all(vm, false);
-> > +	}
-> > +	sie(vm);
-> > +	assert_diag500_val(vm, expected);
-> > +	report_pass("Successful");
-> > +
-> > +	uv_destroy_guest(vm);
-> > +	report_prefix_pop();
-> > +}
-> > +
-> > +static void test_export(void)
-> > +{
-> > +	int pre1m, post1m, exportfirst;
-> > +
-> > +	report_prefix_push("export");
-> > +
-> > +	for (pre1m = -1; pre1m < 1; pre1m++) {
-> > +		for (post1m = 0; post1m < 2; post1m++) {
-> > +			for (exportfirst = 0; exportfirst < 2; exportfirst++) {
-> > +				report_prefix_pushf("%s pre-run, %s post-run, export %s remap",
-> > +						    STR3(pre1m), STR(post1m), exportfirst ? "before" : "after");
-> > +
-> > +				test_one_export(&vm, pre1m, exportfirst, 0, post1m);
-> > +				test_one_export(&vm, pre1m, exportfirst, 1, post1m);
-> > +				test_one_export(&vm, pre1m, exportfirst, 42, post1m);
-> > +				test_one_export(&vm, pre1m, exportfirst, 128, post1m);
-> > +				test_one_export(&vm, pre1m, exportfirst, 254, post1m);
-> > +				test_one_export(&vm, pre1m, exportfirst, 255, post1m);
-> > +
-> > +				report_prefix_pop();
-> > +			}
-> > +		}
-> > +	}
-> > +
-> > +	report_prefix_pop();
-> > +}
-> > +
-> > +static bool check_facilities(void)
-> > +{
-> > +	if (!uv_host_requirement_checks())
-> > +		return false;
-> > +	if (!test_facility(8) || !test_facility(78)) {
-> > +		report_skip("EDAT1 and EDAT2 not available in the host.");  
-> 
-> s/and/or/
+This is a misleading and inaccurate name.  It does far more than "set" PERF_GLOBAL_CTRL,
+it arguably doesn't ever "set" the MSR, and it gets the VMWRITE for the guest field
+wrong too.
 
-will fix differently
+> +{
+> +	u32 vmentry_ctrl = vm_entry_controls_get(vmx);
+> +	u32 vmexit_ctrl = vm_exit_controls_get(vmx);
+> +	struct vmx_msrs *m;
+> +	int i;
+> +
+> +	if (cpu_has_perf_global_ctrl_bug() ||
 
-> 
-> > +		return false;
-> > +	}
-> > +	if (!uv_query_test_call(BIT_UVC_CMD_VERIFY_LARGE_FRAME)) {
-> > +		report_skip("Verify Large Frame UVC not supported.");
-> > +		return false;
-> > +	}
-> > +	if (!uv_query_test_feature(BIT_UV_1M_BACKING)) {
-> > +		report_skip("Large frames not supported for Secure Execution.");
-> > +		return false;
-> > +	}
-> > +	return true;
-> > +}  
-> 
-> [...]
-> 
+Note, cpu_has_perf_global_ctrl_bug() broken and needs to be purged:
+https://lore.kernel.org/all/20241119011433.1797921-1-seanjc@google.com
 
+Note #2, as mentioned earlier, the mediated PMU should take a hard depenency on
+the load/save controls.
+
+On to this code, it fails to enable the load/save controls, e.g. if userspace
+does KVM_SET_CPUID2 without a PMU, then KVM_SET_CPUID2 with a PMU.  In that case,
+KVM will fail to set the control bits, and will fallback to the slow MSR load/save
+lists.
+
+With all of the above and other ideas combined, something like so:
+
+	bool set = enable_mediated_pmu && kvm_pmu_has_perf_global_ctrl();
+
+	vm_entry_controls_changebit(vmx, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL, set);
+	vm_exit_controls_changebit(vmx,
+				   VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+				   VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL, set);
+
+
+And I vote to put this in intel_pmu_refresh(); that avoids needing to figure out
+a name for the helper, while giving more flexibililty on the local variable name.
+
+Oh!  Definitely put it in intel_pmu_refresh(), because the RDPMC and MSR
+interception logic needs to be there.  E.g. toggling CPU_BASED_RDPMC_EXITING
+based solely on CPUID won't do the right thing if KVM ends up making the behavior
+depend on PERF_CAPABILITIES.
+
+Ditto for MSRs.  Though until my patch/series that drops kvm_pmu_refresh() from
+kvm_pmu_init() lands[*], trying to update MSR intercepts during refresh() will hit
+a NULL pointer deref as it's currently called before vmcs01 is allocated :-/
+
+I expect to land that series before mediated PMU, but I don't think it makes sense
+to take an explicit dependency for this series.  To fudge around the issue, maybe
+do this for the next version?
+
+static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+{
+	__intel_pmu_refresh(vcpu);
+
+	/*
+	 * FIXME: Drop the MSR bitmap check if/when kvm_pmu_init() no longer
+	 *        calls kvm_pmu_refresh(), i.e. when KVM refreshes the PMU only
+	 *        after vmcs01 is allocated.
+	 */
+	if (to_vmx(vcpu)->vmcs01.msr_bitmap)
+		intel_update_msr_intercepts(vcpu);
+
+	vm_entry_controls_changebit(vmx, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
+				    enable_mediated_pmu && kvm_pmu_has_perf_global_ctrl());
+
+	vm_exit_controls_changebit(vmx,
+				   VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+				   VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
+				   enable_mediated_pmu && kvm_pmu_has_perf_global_ctrl());
+}
+
+or with a local variable for "enable_mediated_pmu && kvm_pmu_has_perf_global_ctrl()".
+I can't come up with a decent name. :-)
+
+[*] https://lore.kernel.org/all/20240517173926.965351-10-seanjc@google.com
+
+> +	    !is_passthrough_pmu_enabled(&vmx->vcpu)) {
+> +		vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +		vmexit_ctrl &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +		vmexit_ctrl &= ~VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
+> +	}
+> +
+> +	if (is_passthrough_pmu_enabled(&vmx->vcpu)) {
+> +		/*
+> +		 * Setup auto restore guest PERF_GLOBAL_CTRL MSR at vm entry.
+> +		 */
+> +		if (vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) {
+> +			vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, 0);
+
+This incorrectly clobbers the guest's value.  A simple way to handle this is to
+always propagate writes to PERF_GLOBAL_CTRL to the VMCS, if the write is allowed
+and enable_mediated_pmu.  I.e. ensure GUEST_IA32_PERF_GLOBAL_CTRL is up-to-date
+regardless of whether or not it's configured to be loaded.  Then there's no need
+to write it here.
+
+> +		} else {
+> +			m = &vmx->msr_autoload.guest;
+> +			i = vmx_find_loadstore_msr_slot(m, MSR_CORE_PERF_GLOBAL_CTRL);
+> +			if (i < 0) {
+> +				i = m->nr++;
+> +				vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->nr);
+> +			}
+> +			m->val[i].index = MSR_CORE_PERF_GLOBAL_CTRL;
+> +			m->val[i].value = 0;
+> +		}
+> +		/*
+> +		 * Setup auto clear host PERF_GLOBAL_CTRL msr at vm exit.
+> +		 */
+> +		if (vmexit_ctrl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) {
+> +			vmcs_write64(HOST_IA32_PERF_GLOBAL_CTRL, 0);
+
+This should be unnecessary.  KVM should clear HOST_IA32_PERF_GLOBAL_CTRL in
+vmx_set_constant_host_state() if enable_mediated_pmu is true.  Arguably, it might
+make sense to clear it unconditionally, but with a comment explaining that it's
+only actually constant for the mediated PMU.
+
+And if the mediated PMU requires the VMCS knobs, then all of the load/store list
+complexity goes away.
+
+>  static u32 vmx_vmentry_ctrl(void)
+>  {
+>  	u32 vmentry_ctrl = vmcs_config.vmentry_ctrl;
+> @@ -4401,17 +4492,10 @@ static u32 vmx_vmentry_ctrl(void)
+>  	if (vmx_pt_mode_is_system())
+>  		vmentry_ctrl &= ~(VM_ENTRY_PT_CONCEAL_PIP |
+>  				  VM_ENTRY_LOAD_IA32_RTIT_CTL);
+> -	/*
+> -	 * IA32e mode, and loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically.
+> -	 */
+> -	vmentry_ctrl &= ~(VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+> -			  VM_ENTRY_LOAD_IA32_EFER |
+> -			  VM_ENTRY_IA32E_MODE);
+> -
+> -	if (cpu_has_perf_global_ctrl_bug())
+> -		vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> -
+> -	return vmentry_ctrl;
+> +	 /*
+> +	  * IA32e mode, and loading of EFER is toggled dynamically.
+> +	  */
+> +	return vmentry_ctrl &= ~(VM_ENTRY_LOAD_IA32_EFER | VM_ENTRY_IA32E_MODE);
+
+With my above suggestion, these changes are unnecessary.  If enable_mediated_pmu
+is false, or the vCPU doesn't have a PMU, clearing the controls is correct.  And
+when the vCPU is gifted a PMU, KVM will explicitly enabled the controls.
+
+To discourage incorrect usage of these helpers maybe rename them to
+vmx_get_initial_{vmentry,vmexit}_ctrl()?
+
+>  }
+>  
+>  static u32 vmx_vmexit_ctrl(void)
+> @@ -4429,12 +4513,8 @@ static u32 vmx_vmexit_ctrl(void)
+>  		vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
+>  				 VM_EXIT_CLEAR_IA32_RTIT_CTL);
+>  
+> -	if (cpu_has_perf_global_ctrl_bug())
+> -		vmexit_ctrl &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> -
+> -	/* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
+> -	return vmexit_ctrl &
+> -		~(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VM_EXIT_LOAD_IA32_EFER);
+
+But this code needs to *add* clearing of VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL.
 
