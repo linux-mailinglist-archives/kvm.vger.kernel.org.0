@@ -1,220 +1,401 @@
-Return-Path: <kvm+bounces-32060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E81789D292F
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:09:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7BF09D29BB
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A885A282139
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:09:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D2D01F23150
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCB41CF5F9;
-	Tue, 19 Nov 2024 15:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E86B1D07B0;
+	Tue, 19 Nov 2024 15:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="gbQGxuqu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnDu7LvV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8031D0488
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B151CF7DE
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732028592; cv=none; b=PW+0ti/99xsN9KFrpLvFsz81/vvpOU4CKc5VRawQYDrcDTzuyJwlD77aDGSL6nvi0EkZmMCmoxHY0/60Xg61By7Kp0A+NqWRdJKrTPUS+/2zS/tTQHkrvnJeTAAPY4VINoMl9xxnM+MrGUjyYoq8ilW0t1KCEmxaZwpgzx+5aDg=
+	t=1732030566; cv=none; b=Jh66lCFhnrYGzfY3pzakGFNF27BmI7b/IVV4BmIDadX/jO8BrGkKwL3xIek5V6/HItRiSKs4KrrQhPyuZL8L89/X+qvOtzsS+aid0x1u9++TMtNRHmYl2VA/uqHjNFZ7FtCehPwuU/W05d5kmHqkzo13ALvfJR/T00QiXY6f+SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732028592; c=relaxed/simple;
-	bh=XvwcDJBml62yKn4itDkBswOJHcySD6NBqEbnj9WBXCA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Z7N9izcLb4eelluHfi7sHlaLIOI2qmcS8+5z2zMifXJVRk2/dVSvEEzL5APFKyCfBvkZO9Yu+6qISbSK5TM3ZdI2Yq68Zaf2+cfvWadqHk1BDASL+j85L6KJMP5wmebTEO6EfoyJNjPEcGcY8K06gz9BH1tB7UGDUHjw5p35a/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=gbQGxuqu; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38231e9d518so2637786f8f.0
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 07:03:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732028588; x=1732633388; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dwuBbcUvdsJsNlAmA8kNK2a4zz8OYZ18Ka20Jiz0Pm0=;
-        b=gbQGxuqut63p5EeX/513O7hfgsouqJ700G1npYlaGa8kCNNc2PQD7C8Qs041O69/5U
-         oifX2tKDSRexCLw0igiXs0HoAImGlCAE/+mW2Ex8yJCyePnvEjsPXj9792PZrLUSgwc1
-         CXupiK/hknPEsxHk8WZhhjXdVhc8K1M9wfKIRPpNXfZNAAtokcFUqnu77j14TOHqBVPk
-         J6aRR85M4E1gnMJVZg4CThbUHcz+5W8tzJC6Qhlhn11DpXkkRdBp9jxwGDPDPMhpR137
-         1nDGWRKkstFnQseJiBPuQDgNhOo75g1TohqK2KIXh9KdQGfPanhPga6lHRzwzopU1Aq9
-         SLmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732028588; x=1732633388;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dwuBbcUvdsJsNlAmA8kNK2a4zz8OYZ18Ka20Jiz0Pm0=;
-        b=VXdq6Sr9fp3SYWZF7MAq45PenFb0njN2kA2a2vsKb957NVIIqQ0+kniO9AdZijAvBc
-         w9D/5Q6PLl74vK8bJfHNhqDsg3b7KoCUzgl5p9QLDXWET7ZCxIjyRU/Z7tz6sLuOZDP9
-         s85PC4kP7sc9Wd3Ep8vUl1mMqRVK3DAlzP6bMM1FMVS3jL/DX29uQpYfY3g2Md3yze71
-         H1ErQB6f0kKosCGNCWthAmiqf8lTQSjVdaDkLCeJ6acDYev2eFDduaprOeL/nTG6Rwfp
-         kW26u6EY0651nWaHAlgjgXpkXwrJt2tIgaPc4QsgINFr9/dothsXg/Pjrexy7eU4HrqU
-         sQIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwBwYO2LmWkhR+bFO+fHjSURC7CPym+0wGh+Qs0b212BXgOXhP1UkAw/VjDqTeUvKVd28=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLIByZiRj87yUuFXvsp52Z48Ct1cegc6ek3wLfD8R3tsg/OvBI
-	+31g7HWGmJinRq1I8DZ2kjN0ePaC2I8Hd7ae0pdeExwqS28V23X6ZKEchTcRnrQC+zqzu6BnB/q
-	k9zo=
-X-Google-Smtp-Source: AGHT+IFvFX7MJ8Tu28i9oH50avvlnQXkr7wiV44jnwVsLQSm9Sm8I2ZZy94Fp/+zJ+w9zxPk7qMCZA==
-X-Received: by 2002:a05:6000:178d:b0:382:5137:30eb with SMTP id ffacd0b85a97d-382513734fdmr780854f8f.8.1732028585939;
-        Tue, 19 Nov 2024 07:03:05 -0800 (PST)
-Received: from [127.0.0.1] (78-80-61-208.customers.tmcz.cz. [78.80.61.208])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da28bc11sm197286915e9.31.2024.11.19.07.03.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 07:03:05 -0800 (PST)
-Date: Tue, 19 Nov 2024 16:03:05 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org, will@kernel.org,
- robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org,
- tglx@linutronix.de, alex.williamson@redhat.com, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: =?US-ASCII?Q?Re=3A_=5BRFC_PATCH_08/15=5D_iommu/riscv=3A_A?=
- =?US-ASCII?Q?dd_IRQ_domain_for_interrupt_remapping?=
-In-Reply-To: <20241119140047.GC559636@ziepe.ca>
-References: <20241114161845.502027-17-ajones@ventanamicro.com> <20241114161845.502027-25-ajones@ventanamicro.com> <20241118184336.GB559636@ziepe.ca> <20241119-62ff49fc1eedba051838dba2@orel> <20241119140047.GC559636@ziepe.ca>
-Message-ID: <DE13E1DF-7C68-461D-ADCD-8141B1ACEA5E@ventanamicro.com>
+	s=arc-20240116; t=1732030566; c=relaxed/simple;
+	bh=D1rofV3oRhZOTQ+T7fGzUEs+cN2/IbQ6kETzo+bifK4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uqpc95CuYbEj+fv48WMk3t1ilCamz7FMYyhEC52IqELsoQytwPscEb3z5aUWMY/HyNqZo1pPOAVwN9sMlLSjTICgb5afK7zK2GnCWws6Nj2XSIUPj3jy6sPXAg1/e1Grako3uMJLNjA+3wJwf5ionE5cwWc++5YYiYTsPsHt7+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TnDu7LvV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732030563;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zH2CMwOdooVj+NeQcv1HMbkRUyiK2yzOQDjTUDSA8M0=;
+	b=TnDu7LvV/Mt8gJniZXepENPq9QmPczugHYHN2mh6r5ohs7Psu4cBoFXEGws2ijfifMEzrd
+	qMf6abzLn+TrbUOo9BX+Kx2nuMusqdzHhAGSjxbxyNYo3IVpdAEmWUKeu2lOhU7R6L7C/Y
+	tAzKU59eNT0OG0qFNXiamCsaQ+U2GYk=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-pDtHmMNBNmO7bfsG9lq97w-1; Tue,
+ 19 Nov 2024 10:35:59 -0500
+X-MC-Unique: pDtHmMNBNmO7bfsG9lq97w-1
+X-Mimecast-MFC-AGG-ID: pDtHmMNBNmO7bfsG9lq97w
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F3AC11944DEF;
+	Tue, 19 Nov 2024 15:35:50 +0000 (UTC)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.194.94])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1797730001A0;
+	Tue, 19 Nov 2024 15:35:33 +0000 (UTC)
+From: Valentin Schneider <vschneid@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	bpf@vger.kernel.org,
+	x86@kernel.org,
+	rcu@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Lorenzo Stoakes <lstoakes@gmail.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Jason Baron <jbaron@akamai.com>,
+	Kees Cook <keescook@chromium.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Juerg Haefliger <juerg.haefliger@canonical.com>,
+	Nicolas Saenz Julienne <nsaenz@kernel.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Nadav Amit <namit@vmware.com>,
+	Dan Carpenter <error27@gmail.com>,
+	Chuang Wang <nashuiliang@gmail.com>,
+	Yang Jihong <yangjihong1@huawei.com>,
+	Petr Mladek <pmladek@suse.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Song Liu <song@kernel.org>,
+	Julian Pidancet <julian.pidancet@oracle.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Dionna Glaze <dionnaglaze@google.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	Petr Tesarik <ptesarik@suse.com>
+Subject: [RFC PATCH v3 00/15] context_tracking,x86: Defer some IPIs until a user->kernel transition
+Date: Tue, 19 Nov 2024 16:34:47 +0100
+Message-ID: <20241119153502.41361-1-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On November 19, 2024 3:00:47 PM GMT+01:00, Jason Gunthorpe <jgg@ziepe=2Eca>=
- wrote:
->On Tue, Nov 19, 2024 at 08:49:37AM +0100, Andrew Jones wrote:
->> On Mon, Nov 18, 2024 at 02:43:36PM -0400, Jason Gunthorpe wrote:
->> > On Thu, Nov 14, 2024 at 05:18:53PM +0100, Andrew Jones wrote:
->> > > @@ -1276,10 +1279,30 @@ static int riscv_iommu_attach_paging_domain=
-(struct iommu_domain *iommu_domain,
->> > >  	struct riscv_iommu_device *iommu =3D dev_to_iommu(dev);
->> > >  	struct riscv_iommu_info *info =3D dev_iommu_priv_get(dev);
->> > >  	struct riscv_iommu_dc dc =3D {0};
->> > > +	int ret;
->> > > =20
->> > >  	if (!riscv_iommu_pt_supported(iommu, domain->pgd_mode))
->> > >  		return -ENODEV;
->> > > =20
->> > > +	if (riscv_iommu_bond_link(domain, dev))
->> > > +		return -ENOMEM;
->> > > +
->> > > +	if (iommu_domain->type =3D=3D IOMMU_DOMAIN_UNMANAGED) {
->> >=20
->> > Drivers should not be making tests like this=2E
->> >=20
->> > > +		domain->gscid =3D ida_alloc_range(&riscv_iommu_gscids, 1,
->> > > +						RISCV_IOMMU_MAX_GSCID, GFP_KERNEL);
->> > > +		if (domain->gscid < 0) {
->> > > +			riscv_iommu_bond_unlink(domain, dev);
->> > > +			return -ENOMEM;
->> > > +		}
->> > > +
->> > > +		ret =3D riscv_iommu_irq_domain_create(domain, dev);
->> > > +		if (ret) {
->> > > +			riscv_iommu_bond_unlink(domain, dev);
->> > > +			ida_free(&riscv_iommu_gscids, domain->gscid);
->> > > +			return ret;
->> > > +		}
->> > > +	}
->> >=20
->> > What are you trying to do? Make something behave different for VFIO?
->> > That isn't OK, we are trying to remove all the hacky VFIO special
->> > cases in drivers=2E
->> >=20
->> > What is the HW issue here? It is very very strange (and probably not
->> > going to work right) that the irq domains change when domain
->> > attachment changes=2E
->> >=20
->> > The IRQ setup should really be fixed before any device drivers probe
->> > onto the device=2E
->>=20
->> I can't disagree with the statement that this looks hacky, but consider=
-ing
->> a VFIO domain needs to use the g-stage for its single-stage translation
->> and a paging domain for the host would use s-stage, then it seems we ne=
-ed
->> to identify the VFIO domains for their special treatment=2E
->
->This is the wrong thinking entirely=2E There is no such thing as a "VFIO
->domain"=2E
->
->Default VFIO created domains should act excatly the same as a DMA API
->domain=2E
->
->If you want your system to have irq remapping, then it should be on by
->default and DMA API gets remapping too=2E There would need to be a very
->strong reason not to do that in order to make something special for
->riscv=2E If so you'd need to add some kind of flag to select it=2E
->
->Until you reach nested translation there is no "need" for VFIO to use
->any particular stage=2E The design is that default VFIO uses the same
->stage as the DMA API because it is doing the same basic default
->translation function=2E
+Context
+=======
 
-The RISC-V IOMMU needs to use g-stage for device assignment, if we also wa=
-nt to enable irqbypass, because the IOMMU is specified to only look at the =
-MSI table when g-stage is in use=2E This is actually another reason the irq=
- domain only makes sense for device assignment=2E
+We've observed within Red Hat that isolated, NOHZ_FULL CPUs running a
+pure-userspace application get regularly interrupted by IPIs sent from
+housekeeping CPUs. Those IPIs are caused by activity on the housekeeping CPUs
+leading to various on_each_cpu() calls, e.g.:
 
->
->Nested translation has a control to select the stage, and you can
->then force the g-stage for VFIO users at that point=2E
+  64359.052209596    NetworkManager       0    1405     smp_call_function_many_cond (cpu=0, func=do_kernel_range_flush)
+    smp_call_function_many_cond+0x1
+    smp_call_function+0x39
+    on_each_cpu+0x2a
+    flush_tlb_kernel_range+0x7b
+    __purge_vmap_area_lazy+0x70
+    _vm_unmap_aliases.part.42+0xdf
+    change_page_attr_set_clr+0x16a
+    set_memory_ro+0x26
+    bpf_int_jit_compile+0x2f9
+    bpf_prog_select_runtime+0xc6
+    bpf_prepare_filter+0x523
+    sk_attach_filter+0x13
+    sock_setsockopt+0x92c
+    __sys_setsockopt+0x16a
+    __x64_sys_setsockopt+0x20
+    do_syscall_64+0x87
+    entry_SYSCALL_64_after_hwframe+0x65
 
-We could force riscv device assignment to always be nested, and when not p=
-roviding an iommu to the guest, it will still be single-stage, but g-stage,=
- but I don't think that's currently possible with VFIO, is it?
+The heart of this series is the thought that while we cannot remove NOHZ_FULL
+CPUs from the list of CPUs targeted by these IPIs, they may not have to execute
+the callbacks immediately. Anything that only affects kernelspace can wait
+until the next user->kernel transition, providing it can be executed "early
+enough" in the entry code.
 
->
->Regardless, you must not use UNMANAGED as some indication of VFIO,
->that is not what it means, that is not what it is for=2E
->
->> Is there an example of converting VFIO special casing in other
->> drivers to something cleaner that you can point me at?
->
->Nobody has had an issue where they want interrupt remapping on/off
->depending on VFIO=2E I think that is inherently wrong=2E
->
->> The IRQ domain will only be useful for device assignment, as that's whe=
-n
->> an MSI translation will be needed=2E I can't think of any problems that
->> could arise from only creating the IRQ domain when probing assigned
->> devices, but I could certainly be missing something=2E Do you have some
->> potential problems in mind?
->
->I'm not an expert in the interrupt subsystem, but my understanding was
->we expect the interrupt domains/etc to be static once a device driver
->is probed=2E Changing things during iommu domain attach is after drivers
->are probed=2E I don't really expect it to work correctly in all corner
->cases=2E
+The original implementation is from Peter [1]. Nicolas then added kernel TLB
+invalidation deferral to that [2], and I picked it up from there.
 
-With VFIO the iommu domain attach comes after an unbind/bind, so the new d=
-river is probed=2E I think that's a safe time=2E However, if there could be=
- cases where the attach does not follow an unbind/bind, then I agree that w=
-ouldn't be safe=2E I'll consider always creating an IRQ domain, even if it =
-won't provide any additional functionality unless the device is assigned=2E
+Deferral approach
+=================
 
->
->VFIO is allowed to change the translation as it operates and we expect
->that interrupts are not disturbed=2E
->
+Storing each and every callback, like a secondary call_single_queue turned out
+to be a no-go: the whole point of deferral is to keep NOHZ_FULL CPUs in
+userspace for as long as possible - no signal of any form would be sent when
+deferring an IPI. This means that any form of queuing for deferred callbacks
+would end up as a convoluted memory leak.
 
-The IRQ domain stays the same during operation, the only changes are the m=
-appings from what the guest believes are its s-mode interrupt files to the =
-hypervisor selected guest interrupt files, and these changes are made possi=
-ble by the IRQ domain's vcpu-affinity support=2E
+Deferred IPIs must thus be coalesced, which this series achieves by assigning
+IPIs a "type" and having a mapping of IPI type to callback, leveraged upon
+kernel entry.
 
-Thanks,
-drew
+What about IPIs whose callback take a parameter, you may ask?
+
+Peter suggested during OSPM23 [3] that since on_each_cpu() targets
+housekeeping CPUs *and* isolated CPUs, isolated CPUs can access either global or
+housekeeping-CPU-local state to "reconstruct" the data that would have been sent
+via the IPI.
+
+This series does not affect any IPI callback that requires an argument, but the
+approach would remain the same (one coalescable callback executed on kernel
+entry).
+
+Kernel entry vs execution of the deferred operation
+===================================================
+
+This is what I've referred to as the "Danger Zone" during my LPC24 talk [4].
+
+There is a non-zero length of code that is executed upon kernel entry before the
+deferred operation can be itself executed (i.e. before we start getting into
+context_tracking.c proper), i.e.:
+
+  idtentry_func_foo()                <--- we're in the kernel
+    irqentry_enter()
+      enter_from_user_mode()
+	__ct_user_exit()
+	    ct_kernel_enter_state()
+	      ct_work_flush()        <--- deferred operation is executed here
+
+This means one must take extra care to what can happen in the early entry code,
+and that <bad things> cannot happen. For instance, we really don't want to hit
+instructions that have been modified by a remote text_poke() while we're on our
+way to execute a deferred sync_core(). Patches doing the actual deferral have
+more detail on this.
+
+Patches
+=======
+
+o Patches 1-3 are standalone cleanups.
+o Patches 4-5 add an RCU testing feature.
+
+o Patches 6-8 add a new type of jump label for static keys that will not have
+  their IPI be deferred.
+o Patch 9 adds objtool verification of static keys vs their text_poke IPI
+  deferral
+o Patches 10-14 add the actual IPI deferrals
+
+o Patch 15 is a freebie to enable the deferral feature for NO_HZ_IDLE
+
+Patches are also available at:
+https://gitlab.com/vschneid/linux.git -b redhat/isolirq/defer/v3
+
+RFC status
+==========
+
+Things I'd like to get comments on and/or that are a bit WIPish; they're called
+out in the individual changelogs:
+
+o "forceful" jump label naming which I don't particularly like
+
+o objtool usage of 'offset_of(static_key.type)' and JUMP_TYPE_FORCEFUL. I've
+  hardcoded them but it could do with being shoved in a kernel header objtool
+  can include directly
+
+o The noinstr variant of __flush_tlb_all() doesn't have a paravirt variant, does
+  it need one?
+
+  
+
+Testing
+=======
+
+Xeon E5-2699 system with SMToff, NOHZ_FULL, isolated CPUs.
+RHEL9 userspace.
+
+Workload is using rteval (kernel compilation + hackbench) on housekeeping CPUs
+and a dummy stay-in-userspace loop on the isolated CPUs. The main invocation is:
+
+$ trace-cmd record -e "csd_queue_cpu" -f "cpu & CPUS{$ISOL_CPUS}" \
+ 	           -e "ipi_send_cpumask" -f "cpumask & CPUS{$ISOL_CPUS}" \
+	           -e "ipi_send_cpu"     -f "cpu & CPUS{$ISOL_CPUS}" \
+		   rteval --onlyload --loads-cpulist=$HK_CPUS \
+		   --hackbench-runlowmem=True --duration=$DURATION
+
+This only records IPIs sent to isolated CPUs, so any event there is interference
+(with a bit of fuzz at the start/end of the workload when spawning the
+processes). All tests were done with a duration of 1hr.
+
+v6.12-rc4
+# This is the actual IPI count
+$ trace-cmd report trace-base.dat | grep callback | awk '{ print $(NF) }' | sort | uniq -c | sort -nr
+   1782 callback=generic_smp_call_function_single_interrupt+0x0
+     73 callback=0x0
+
+# These are the different CSD's that caused IPIs    
+$ trace-cmd report | grep csd_queue | awk '{ print $(NF-1) }' | sort | uniq -c | sort -nr
+  22048 func=tlb_remove_table_smp_sync
+  16536 func=do_sync_core
+   2262 func=do_flush_tlb_all
+    182 func=do_kernel_range_flush
+    144 func=rcu_exp_handler
+     60 func=sched_ttwu_pending
+
+v6.12-rc4 + patches:
+# This is the actual IPI count
+$ trace-cmd report | grep callback | awk '{ print $(NF) }' | sort | uniq -c | sort -nr
+   1168 callback=generic_smp_call_function_single_interrupt+0x0
+     74 callback=0x0
+
+# These are the different CSD's that caused IPIs          
+$ trace-cmd report | grep csd_queue | awk '{ print $(NF-1) }' | sort | uniq -c | sort -nr
+  23686 func=tlb_remove_table_smp_sync
+    192 func=rcu_exp_handler
+     65 func=sched_ttwu_pending
+
+Interestingly tlb_remove_table_smp_sync() started showing up on this machine,
+while it didn't during testing for v2 and it's the same machine. Yair had a
+series adressing this [5] which per these results would be worth revisiting.
+
+Acknowledgements
+================
+
+Special thanks to:
+o Clark Williams for listening to my ramblings about this and throwing ideas my way
+o Josh Poimboeuf for his guidance regarding objtool and hinting at the
+  .data..ro_after_init section.
+o All of the folks who attended various talks about this and provided precious
+  feedback.  
+
+Links
+=====
+
+[1]: https://lore.kernel.org/all/20210929151723.162004989@infradead.org/
+[2]: https://github.com/vianpl/linux.git -b ct-work-defer-wip
+[3]: https://youtu.be/0vjE6fjoVVE
+[4]: https://lpc.events/event/18/contributions/1889/
+[5]: https://lore.kernel.org/lkml/20230620144618.125703-1-ypodemsk@redhat.com/
+
+Revisions
+=========
+
+RFCv2 -> RFCv3
++++++++++++
+
+o Rebased onto v6.12-rc7
+
+o Added objtool documentation for the new warning (Josh)
+o Added low-size RCU watching counter to TREE04 torture scenario (Paul)
+o Added FORCEFUL jump label and static key types
+o Added noinstr-compliant helpers for tlb flush deferral
+
+o Overall changelog & comments cleanup
+
+
+RFCv1 -> RFCv2
+++++++++++++++
+
+o Rebased onto v6.5-rc1
+
+o Updated the trace filter patches (Steven)
+
+o Fixed __ro_after_init keys used in modules (Peter)
+o Dropped the extra context_tracking atomic, squashed the new bits in the
+  existing .state field (Peter, Frederic)
+  
+o Added an RCU_EXPERT config for the RCU dynticks counter size, and added an
+  rcutorture case for a low-size counter (Paul) 
+
+o Fixed flush_tlb_kernel_range_deferrable() definition
+
+Valentin Schneider (15):
+  objtool: Make validate_call() recognize indirect calls to pv_ops[]
+  objtool: Flesh out warning related to pv_ops[] calls
+  sched/clock: Make sched_clock_running __ro_after_init
+  rcu: Add a small-width RCU watching counter debug option
+  rcutorture: Make TREE04 use CONFIG_RCU_DYNTICKS_TORTURE
+  jump_label: Add forceful jump label type
+  x86/speculation/mds: Make mds_idle_clear forceful
+  sched/clock, x86: Make __sched_clock_stable forceful
+  objtool: Warn about non __ro_after_init static key usage in .noinstr
+  x86/alternatives: Record text_poke's of JUMP_TYPE_FORCEFUL labels
+  context-tracking: Introduce work deferral infrastructure
+  context_tracking,x86: Defer kernel text patching IPIs
+  context_tracking,x86: Add infrastructure to defer kernel TLBI
+  x86/mm, mm/vmalloc: Defer flush_tlb_kernel_range() targeting NOHZ_FULL
+    CPUs
+  context-tracking: Add a Kconfig to enable IPI deferral for NO_HZ_IDLE
+
+ arch/Kconfig                                  |  9 +++
+ arch/x86/Kconfig                              |  1 +
+ arch/x86/include/asm/context_tracking_work.h  | 20 +++++++
+ arch/x86/include/asm/special_insns.h          |  1 +
+ arch/x86/include/asm/text-patching.h          | 13 ++++-
+ arch/x86/include/asm/tlbflush.h               | 17 +++++-
+ arch/x86/kernel/alternative.c                 | 49 ++++++++++++----
+ arch/x86/kernel/cpu/bugs.c                    |  2 +-
+ arch/x86/kernel/cpu/common.c                  |  6 +-
+ arch/x86/kernel/jump_label.c                  |  7 ++-
+ arch/x86/kernel/kprobes/core.c                |  4 +-
+ arch/x86/kernel/kprobes/opt.c                 |  4 +-
+ arch/x86/kernel/module.c                      |  2 +-
+ arch/x86/mm/tlb.c                             | 49 ++++++++++++++--
+ include/linux/context_tracking.h              | 21 +++++++
+ include/linux/context_tracking_state.h        | 54 ++++++++++++++---
+ include/linux/context_tracking_work.h         | 28 +++++++++
+ include/linux/jump_label.h                    | 26 ++++++---
+ kernel/context_tracking.c                     | 46 ++++++++++++++-
+ kernel/rcu/Kconfig.debug                      | 14 +++++
+ kernel/sched/clock.c                          |  4 +-
+ kernel/time/Kconfig                           | 19 ++++++
+ mm/vmalloc.c                                  | 35 +++++++++--
+ tools/objtool/Documentation/objtool.txt       | 13 +++++
+ tools/objtool/check.c                         | 58 ++++++++++++++++---
+ tools/objtool/include/objtool/check.h         |  1 +
+ tools/objtool/include/objtool/special.h       |  2 +
+ tools/objtool/special.c                       |  3 +
+ .../selftests/rcutorture/configs/rcu/TREE04   |  1 +
+ 29 files changed, 450 insertions(+), 59 deletions(-)
+ create mode 100644 arch/x86/include/asm/context_tracking_work.h
+ create mode 100644 include/linux/context_tracking_work.h
+
+--
+2.43.0
+
 
