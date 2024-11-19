@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-32071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD269D2A87
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 17:10:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E1E09D29E8
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 16:42:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 060D3B344B8
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:42:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4483B2820F9
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2024 15:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6541D0F50;
-	Tue, 19 Nov 2024 15:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673521D12E6;
+	Tue, 19 Nov 2024 15:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ksdh/qUf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Piap1QZd"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D2E1D0F51
-	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5D11CCEDF
+	for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 15:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732030690; cv=none; b=bFW5K7BcL5S2dAZEza1sfzmHxvPiT7DNULLqEfwj62cwwG4AYd4LVuW5tWdsTda5JDYBy2PdPUk52xYkmqRDRvkptURrzqOc6/JPznJuWkF/PePYMwbBjaMBE8nqh5HK8z5NKYmLAk47tydhUvNIGY+reSr97TNrCw78JH+OUp8=
+	t=1732030709; cv=none; b=Sd0EuKUAYw7j8cJ9AN2/CDXPQIjA30uPoBzVXkAD/6YAs5npQBqfNUtpuucUwg/QYZIeSTKSj8EMbCoCo91gj+LZSMi39H3wHPaJqPyK1P27o7CCRwmRPnzBt7blfee5e/SACYiaxnpPSpZ11d5iIe2ThIEp2dFePlOhwnqckpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732030690; c=relaxed/simple;
-	bh=WcoRXmH8EHSSUkrYncG38ywpgNOrSaCBNAPretltWvc=;
+	s=arc-20240116; t=1732030709; c=relaxed/simple;
+	bh=HfgzzhQB9Z8CbP30UBBQFA/8juWm49GyqBubPeAUIoY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BIAp+9bxbQbG3j1E9dq0+va/roGvt4pCBm8SuNFHJlitreMAargO8fOGEYGg1roeYQ+mtx+0hdvnkh005ZaZ1ro8Ig3c3AYos2MCpbSF+xHilnxrPJdUvOtY8taASqKXxVIe8WosCkmIck2kBFjWqFSEbslvOEglYhedFi5Epqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ksdh/qUf; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=GkGbZ+rbb/NpvZ5smpHsoeo6HDdQdX5r5f43vVn28zxcTSZQnXejHpTptedrHSLrWeSPnHRt6Xj69SvbAF7XPrED5Mbkph8+0SUw1Az4cmik6luQkxfYIC8VWxIWn1Imkw3KnftAyrRxTW0E0mSJM4bLgoICEdproT19joobT7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Piap1QZd; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732030688;
+	s=mimecast20190719; t=1732030707;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lpSGcS2OHkivSptNEqV1yoUV7L+1Tpt77Idg0XadxAw=;
-	b=Ksdh/qUfMGAu3JF60FBMQQA8j5wcLeTDikdgTdcG/3VfJ7rqNBrEJ3w6b83/WBkylTaf9p
-	GJrpI8XeDKN4Qci7qUdjy2EHfJycO42eIA1roL9NZsOV6FOnAKmEdbSABiOKL/AFzDT5yF
-	EgBcphIs5Mu7KHFkPluWl44QWo8zcnk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=bbbl+TXDo+t5kIfzQ14qJGOWt1RDAARb2PWsvxSVw1o=;
+	b=Piap1QZd5jIiEORBIbGNTK9NLlHM+iO/r7rfCfPYmUrnS5q/iIUqSNekaAeetErXSBrrLI
+	TZrOPmYympBWfD/D3NZhF3oM5bw7V7sIozSvXcJBCXZ1+U6yvd6O/t0KkDbN0hwfgF6Zu0
+	mACt5BPRwg4B9n2MlG805viGa6LWmLo=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-209-w8WZReDNPhuTuNl53MRXLw-1; Tue,
- 19 Nov 2024 10:38:05 -0500
-X-MC-Unique: w8WZReDNPhuTuNl53MRXLw-1
-X-Mimecast-MFC-AGG-ID: w8WZReDNPhuTuNl53MRXLw
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-1WZ3p9jrPQW6G0U5yxmRQQ-1; Tue,
+ 19 Nov 2024 10:38:24 -0500
+X-MC-Unique: 1WZ3p9jrPQW6G0U5yxmRQQ-1
+X-Mimecast-MFC-AGG-ID: 1WZ3p9jrPQW6G0U5yxmRQQ
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F25E1955F41;
-	Tue, 19 Nov 2024 15:37:59 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E53F01952D05;
+	Tue, 19 Nov 2024 15:38:14 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.194.94])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59F3B30001A2;
-	Tue, 19 Nov 2024 15:37:44 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DDE233003B71;
+	Tue, 19 Nov 2024 15:37:59 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	linux-doc@vger.kernel.org,
@@ -66,7 +66,8 @@ To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	rcu@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Cc: Steven Rostedt <rostedt@goodmis.org>,
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Thomas Gleixner <tglx@linutronix.de>,
@@ -117,9 +118,9 @@ Cc: Steven Rostedt <rostedt@goodmis.org>,
 	Yair Podemsky <ypodemsk@redhat.com>,
 	Daniel Wagner <dwagner@suse.de>,
 	Petr Tesarik <ptesarik@suse.com>
-Subject: [RFC PATCH v3 08/15] sched/clock, x86: Make __sched_clock_stable forceful
-Date: Tue, 19 Nov 2024 16:34:55 +0100
-Message-ID: <20241119153502.41361-9-vschneid@redhat.com>
+Subject: [RFC PATCH v3 09/15] objtool: Warn about non __ro_after_init static key usage in .noinstr
+Date: Tue, 19 Nov 2024 16:34:56 +0100
+Message-ID: <20241119153502.41361-10-vschneid@redhat.com>
 In-Reply-To: <20241119153502.41361-1-vschneid@redhat.com>
 References: <20241119153502.41361-1-vschneid@redhat.com>
 Precedence: bulk
@@ -131,36 +132,157 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Later commits will cause objtool to warn about non __ro_after_init static
-keys being used in .noinstr sections in order to safely defer instruction
-patching IPIs targeted at NOHZ_FULL CPUs.
+Later commits will disallow runtime-mutable text in .noinstr sections in
+order to safely defer instruction patching IPIs.
 
-__sched_clock_stable is used in .noinstr code, and can be modified at
-runtime (e.g. KVM module loading). Suppressing the text_poke_sync() IPI has
-little benefits for this key, as NOHZ_FULL is incompatible with an unstable
-TSC anyway.
+All static keys used in .noinstr sections have now been checked as being
+either flagged as __ro_after_init, or as forceful static keys. Any
+occurrence of this new warning would be the result of a code change that
+will need looking at.
 
-Mark it as forceful to let the kernel know to always send the
-text_poke_sync() IPI for it, and to let objtool know not to warn about it.
-
+Suggested-by: Josh Poimboeuf <jpoimboe@redhat.com>
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 ---
- kernel/sched/clock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+offset_of(static_key.type) and JUMP_TYPE_FORCEFUL would need to be shoved
+into a somewhat standalone header file that could be included by objtool
+itself.
+---
+ tools/objtool/Documentation/objtool.txt | 13 ++++++++
+ tools/objtool/check.c                   | 41 +++++++++++++++++++++++++
+ tools/objtool/include/objtool/check.h   |  1 +
+ tools/objtool/include/objtool/special.h |  2 ++
+ tools/objtool/special.c                 |  3 ++
+ 5 files changed, 60 insertions(+)
 
-diff --git a/kernel/sched/clock.c b/kernel/sched/clock.c
-index 200e5568b9894..dc94b3717f5ce 100644
---- a/kernel/sched/clock.c
-+++ b/kernel/sched/clock.c
-@@ -76,7 +76,7 @@ static DEFINE_STATIC_KEY_FALSE_RO(sched_clock_running);
-  * Similarly we start with __sched_clock_stable_early, thereby assuming we
-  * will become stable, such that there's only a single 1 -> 0 transition.
-  */
--static DEFINE_STATIC_KEY_FALSE(__sched_clock_stable);
-+static DEFINE_STATIC_KEY_FALSE_FORCE(__sched_clock_stable);
- static int __sched_clock_stable_early = 1;
+diff --git a/tools/objtool/Documentation/objtool.txt b/tools/objtool/Documentation/objtool.txt
+index 7c3ee959b63c7..06fa285873387 100644
+--- a/tools/objtool/Documentation/objtool.txt
++++ b/tools/objtool/Documentation/objtool.txt
+@@ -447,6 +447,19 @@ the objtool maintainers.
+    names and does not use module_init() / module_exit() macros to create
+    them.
  
- /*
++13. file.o: warning: func()+0x2a: non __ro_after_init static key "key" in .noinstr section
++
++  This means that the noinstr function func() uses a static key that can be
++  modified at runtime. This is not allowed as noinstr functions rely on
++  containing stable instructions after init.
++
++  Check whether the static key in question can really be modified at runtime,
++  and if it is only enabled during init then mark it as __ro_after_init. If it
++  genuinely needs to be modified at runtime:
++
++  1) Directly rely on the underlying atomic count of they key in the noinstr
++     functions.
++  2) Mark the static key as forceful.
+ 
+ If the error doesn't seem to make sense, it could be a bug in objtool.
+ Feel free to ask the objtool maintainer for help.
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 00e25492f5065..c1fb02c326839 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -2056,6 +2056,9 @@ static int add_special_section_alts(struct objtool_file *file)
+ 		alt->next = orig_insn->alts;
+ 		orig_insn->alts = alt;
+ 
++		if (special_alt->key_sym)
++			orig_insn->key_sym = special_alt->key_sym;
++
+ 		list_del(&special_alt->list);
+ 		free(special_alt);
+ 	}
+@@ -3605,6 +3608,41 @@ static int validate_return(struct symbol *func, struct instruction *insn, struct
+ 	return 0;
+ }
+ 
++static bool static_key_is_forceful(struct symbol *key)
++{
++	if (!strcmp(key->sec->name, ".data")) {
++		unsigned long data_offset = key->sec->data->d_off;
++		unsigned long key_offset = key->sym.st_value;
++		char* data = key->sec->data->d_buf;
++
++		/*
++		 * offset_of(static_key.type)
++		 *                        v
++		 *                        v            JUMP_TYPE_FORCEFUL
++		 *                        v                    v
++		 */
++		return data[(key_offset + 8) - data_offset] & 0x4;
++	}
++
++	return false;
++}
++
++static int validate_static_key(struct instruction *insn, struct insn_state *state)
++{
++	if (state->noinstr && state->instr <= 0) {
++		if (static_key_is_forceful(insn->key_sym))
++			return 0;
++
++		if ((strcmp(insn->key_sym->sec->name, ".data..ro_after_init"))) {
++			WARN_INSN(insn, "non __ro_after_init static key \"%s\" in .noinstr section",
++				  insn->key_sym->name);
++			return 1;
++		}
++	}
++
++	return 0;
++}
++
+ static struct instruction *next_insn_to_validate(struct objtool_file *file,
+ 						 struct instruction *insn)
+ {
+@@ -3766,6 +3804,9 @@ static int validate_branch(struct objtool_file *file, struct symbol *func,
+ 		if (handle_insn_ops(insn, next_insn, &state))
+ 			return 1;
+ 
++		if (insn->key_sym)
++			validate_static_key(insn, &state);
++
+ 		switch (insn->type) {
+ 
+ 		case INSN_RETURN:
+diff --git a/tools/objtool/include/objtool/check.h b/tools/objtool/include/objtool/check.h
+index daa46f1f0965a..35dd21f8f41e1 100644
+--- a/tools/objtool/include/objtool/check.h
++++ b/tools/objtool/include/objtool/check.h
+@@ -77,6 +77,7 @@ struct instruction {
+ 	struct symbol *sym;
+ 	struct stack_op *stack_ops;
+ 	struct cfi_state *cfi;
++	struct symbol *key_sym;
+ };
+ 
+ static inline struct symbol *insn_func(struct instruction *insn)
+diff --git a/tools/objtool/include/objtool/special.h b/tools/objtool/include/objtool/special.h
+index 86d4af9c5aa9d..0e61f34fe3a28 100644
+--- a/tools/objtool/include/objtool/special.h
++++ b/tools/objtool/include/objtool/special.h
+@@ -27,6 +27,8 @@ struct special_alt {
+ 	struct section *new_sec;
+ 	unsigned long new_off;
+ 
++	struct symbol *key_sym;
++
+ 	unsigned int orig_len, new_len; /* group only */
+ };
+ 
+diff --git a/tools/objtool/special.c b/tools/objtool/special.c
+index 097a69db82a0e..fefab2b471bf8 100644
+--- a/tools/objtool/special.c
++++ b/tools/objtool/special.c
+@@ -127,6 +127,9 @@ static int get_alt_entry(struct elf *elf, const struct special_entry *entry,
+ 			return -1;
+ 		}
+ 		alt->key_addend = reloc_addend(key_reloc);
++
++		reloc_to_sec_off(key_reloc, &sec, &offset);
++		alt->key_sym = find_symbol_by_offset(sec, offset & ~3);
+ 	}
+ 
+ 	return 0;
 -- 
 2.43.0
 
