@@ -1,154 +1,127 @@
-Return-Path: <kvm+bounces-32186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C138A9D406D
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:46:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B19A09D4147
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8147C281F9D
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:46:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2CC5B29CFD
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD5F1A0BDC;
-	Wed, 20 Nov 2024 16:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944BC156C70;
+	Wed, 20 Nov 2024 16:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gTY9dj5s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbZmQLWm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9280150994
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 16:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F95F150994;
+	Wed, 20 Nov 2024 16:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732121133; cv=none; b=NSCu/1OFC5ip9chJtXxFskKPYaa2M4T9wke8nXoXuS2sg01DOaAmHLUOR+x0C4dUIYUHZvhcYrj28RacOTnA3s6KcJ9XMR+ndY4YX0QdbmO+ABLGzMgxqDrXIxzni47wQ8vDkHer8dekAawhRI/wdLKAGo3Grl3BgvP8nwmxIWc=
+	t=1732121719; cv=none; b=VBfKs1uzWSUKnRc4mDUdamgMEOIdLF4ju87iwYyVgC4dM9oVaIrQOHpz+ZhbUOBPa6A0eQLERRIDdFdnIqHC4llpb9xI8NlqMWq2S6SF5XM2inA/kZz/2ofCyBLEsROaye1smi/1NaZBLLioY0IiAn/PXssnzmajy50RyUg7axM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732121133; c=relaxed/simple;
-	bh=atBL+bq6+6djW/2Iaq1n5OzAjtgj/78bksKGJWYuQ1I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hxbemg0WKLFNAJfxQZrrNmt0X19M+yDv6nCLMQTwisJ1YCmQuzCFUioIJpxWwqCrhkfoW7EFlmeplN+3JvN0z1df5oACWT5hoE2Q//SR92R2ct7C36m6QJYszxG+oD7D0jIeIfDpvqV0jta1lEpiSCM4/dvkaBrhltASwq5jRyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gTY9dj5s; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e38aae1bdb8so5167170276.0
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 08:45:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732121130; x=1732725930; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tygqKFbg+ArMhOWF5Yig1w6NXblyM3/JZLFP5+5GacQ=;
-        b=gTY9dj5skMgeeJ+GFfKi94Z4ifJMyKjexzIQ9GFMT0KBUP+UkVcLTeQWg+7Wh3AunE
-         AO6lEMQz2SKurfERzp60DNXmb9GMTSGALMlRV7YvJ++gWt7uO3sgbGACC6xETR6vyBVr
-         vUC1Kj1Vdc6RUDBWUCv8/j8VSfgQobBJdmY/96lpkyBNDPpwO2rFNyqsbolzFS+Tt60w
-         Idi/fk1JHqlzwY5ohQ4CHAQKO+NDmfZyqpFaRT3pGItbwr9kSCLIOLDjk/2Ovegrf/29
-         /J8WWZrr9RoA1edo7iB9gHa/reTRvJy0X6l7m7/N/wBHMw45rcTETOIhC8MW3CZI5u8d
-         hHFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732121130; x=1732725930;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tygqKFbg+ArMhOWF5Yig1w6NXblyM3/JZLFP5+5GacQ=;
-        b=nj9DpXs3NNpvyYyDg7DKjqqMWfU7z/MfIeaF2rrKDRN+tm6mZYdSKknpzsiYXGDAML
-         OiL47V3dhp3lH2g0wwkneHeUnnr6/NESO7+B6cUs7aVYllDsGk1HzlkIxlyXipknFoTg
-         hMuumuVutKueeQNuKfe1Hz01vCbT6GaTztDXbZG9DML2t0679lyz01xsMpGYm7zW8JQc
-         lZ3sofqgRoRdFM5osuS46zaWOPC33UXuJgtxqSW9zJYcLi7/PObmLcVzGCv1jMgkkIim
-         wLIz7YX8nEnxpXJRzGlAy9yNkF7o7DqSQLWOdCloM8hoMF0GG6lCG5/RK59lamk5vkvU
-         zRCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTDNKSNRuy1EpCetPT1yr9REHrpRxb/iAAtwmc9dHCVUS2KDvJUXMjRViw/3k4v54kBPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOPtwU0zppWAYu9MRhDZph1pbDWsRf0sK8tcswgZb142TL7Jzt
-	renvV4WQDH52RZHXc5gDpzmwsm3Igk5yN9gD7qbEgJJIH4QpSo3NPXaOfWhfFNk1sXzzJpWg1Gm
-	1bQ==
-X-Google-Smtp-Source: AGHT+IFYE+jm3yiya0/yDKPXKQmXpVzHcYjlo1U85vuIz90XeZaFiWv84vDiWNxcprGDNlPAvHLOb3hc2Zw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:698a:0:b0:e38:bf01:4df9 with SMTP id
- 3f1490d57ef6-e38cb718fa0mr10347276.9.1732121130735; Wed, 20 Nov 2024 08:45:30
- -0800 (PST)
-Date: Wed, 20 Nov 2024 08:45:29 -0800
-In-Reply-To: <2ec98cd1-e96e-4f17-a615-a5eac54a7004@linux.intel.com>
+	s=arc-20240116; t=1732121719; c=relaxed/simple;
+	bh=hmI5ldVmxI65EUniu7IXHlhGVAjmlmRhEepVsBj3yHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HC54dsjqgnXEeX5N+w1tdKcE0BNRPGh+HHtZEppFu65csJS74d13CdAAf9jDDE7szacKsgslL+uv625ulX8qUq92okSKDH1ng6xVngsdRNweRTUtfE3vB//2VCCHqEwONalUB4GtNJNFAB+/UOhXuPLtwlzI/2RXtmQkPAWFf4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbZmQLWm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13F11C4CECD;
+	Wed, 20 Nov 2024 16:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732121719;
+	bh=hmI5ldVmxI65EUniu7IXHlhGVAjmlmRhEepVsBj3yHs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VbZmQLWmmmhDFqloOrHNd4yk7zq1dsIkllT9SF5uvvll0QwATG2pV1ycjrppEHw5P
+	 sZMIojJZMgd8G5VEWG1M0j6a41cDR/IuouRcbUEMms2HwFIqzPp/reboy6M9n0vvuK
+	 V6mJNRXXet8swxaCH11Fx/Pv2yUn7fUuZT82hObC+atTl6QPJ3XZlINEVMvAa2bsFo
+	 7HMtT4+usHwkxflPaBIzCClgHSBDsVV8tdWdJ3U8eKB480Sl1VsFL0DJeFcMKkST9M
+	 MkYTY2gpnxWCH+uxLkWrkyquIPO429sA2Mz+/bt6VGSde9kz8OkJWvEUD9xYatR8Z2
+	 FEPKOJmD/ITAg==
+Date: Wed, 20 Nov 2024 08:55:15 -0800
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Valentin Schneider <vschneid@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Lorenzo Stoakes <lstoakes@gmail.com>,
+	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Juerg Haefliger <juerg.haefliger@canonical.com>,
+	Nicolas Saenz Julienne <nsaenz@kernel.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
+	Chuang Wang <nashuiliang@gmail.com>,
+	Yang Jihong <yangjihong1@huawei.com>,
+	Petr Mladek <pmladek@suse.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+	Julian Pidancet <julian.pidancet@oracle.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Dionna Glaze <dionnaglaze@google.com>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+Subject: Re: [RFC PATCH v3 06/15] jump_label: Add forceful jump label type
+Message-ID: <20241120165515.qx4qyenlb5guvmfe@jpoimboe>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-7-vschneid@redhat.com>
+ <20241119233902.kierxzg2aywpevqx@jpoimboe>
+ <20241120145649.GJ19989@noisy.programming.kicks-ass.net>
+ <20241120145746.GL38972@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-20-mizhang@google.com>
- <ZzymmUKlPk7gHtup@google.com> <2ec98cd1-e96e-4f17-a615-a5eac54a7004@linux.intel.com>
-Message-ID: <Zz4K0VhK5_6N307s@google.com>
-Subject: Re: [RFC PATCH v3 19/58] KVM: x86/pmu: Plumb through pass-through PMU
- to vcpu for Intel CPUs
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>, 
-	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
-	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241120145746.GL38972@noisy.programming.kicks-ass.net>
 
-On Wed, Nov 20, 2024, Dapeng Mi wrote:
+On Wed, Nov 20, 2024 at 03:57:46PM +0100, Peter Zijlstra wrote:
+> On Wed, Nov 20, 2024 at 03:56:49PM +0100, Peter Zijlstra wrote:
 > 
-> On 11/19/2024 10:54 PM, Sean Christopherson wrote:
-> > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> >> Plumb through pass-through PMU setting from kvm->arch into kvm_pmu on each
-> >> vcpu created. Note that enabling PMU is decided by VMM when it sets the
-> >> CPUID bits exposed to guest VM. So plumb through the enabling for each pmu
-> >> in intel_pmu_refresh().
-> > Why?  As with the per-VM snapshot, I see zero reason for this to exist, it's
-> > simply:
-> >
-> >   kvm->arch.enable_pmu && enable_mediated_pmu && pmu->version;
-> >
-> > And in literally every correct usage of pmu->passthrough, kvm->arch.enable_pmu
-> > and pmu->version have been checked (though implicitly), i.e. KVM can check
-> > enable_mediated_pmu and nothing else.
+> > But I think we can make the fall-back safer, we can simply force the IPI
+> > when we poke at noinstr code -- then NOHZ_FULL gets to keep the pieces,
+> > but at least we don't violate any correctness constraints.
 > 
-> Ok, too many passthrough_pmu flags indeed confuse readers. Besides these
-> dependencies, mediated vPMU also depends on lapic_in_kernel(). We need to
-> set enable_mediated_pmu to false as well if lapic_in_kernel() returns false.
+> I should have read more; that's what is being proposed.
 
-No, just kill the entire vPMU.
+Hm, now I'm wondering what you read, as I only see the text poke IPIs
+being forced when the caller sets force_ipi, rather than the text poke
+code itself detecting a write to .noinstr.
 
-Also, the need for an in-kernel APIC isn't unique to the mediated PMU.  KVM simply
-drops PMIs if there's no APIC.
-
-If we're feeling lucky, we could try a breaking change like so:
-
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index fcd188cc389a..bb08155f6198 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -817,7 +817,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
-        pmu->pebs_data_cfg_mask = ~0ull;
-        bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
- 
--       if (!vcpu->kvm->arch.enable_pmu)
-+       if (!vcpu->kvm->arch.enable_pmu || !lapic_in_kernel(vcpu))
-                return;
- 
-        static_call(kvm_x86_pmu_refresh)(vcpu);
-
-
-If we don't want to risk breaking weird setups, we could restrict the behavior
-to the mediated PMU being enabled:
-
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index fcd188cc389a..bc9673190574 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -817,7 +817,8 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
-        pmu->pebs_data_cfg_mask = ~0ull;
-        bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
- 
--       if (!vcpu->kvm->arch.enable_pmu)
-+       if (!vcpu->kvm->arch.enable_pmu ||
-+           (!lapic_in_kernel(vcpu) && enable_mediated_pmu))
-                return;
- 
-        static_call(kvm_x86_pmu_refresh)(vcpu);
+-- 
+Josh
 
