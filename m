@@ -1,83 +1,82 @@
-Return-Path: <kvm+bounces-32149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F7A9D3C73
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:18:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88EC39D3CB7
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FAF4B23F3E
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 13:18:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E6CE1F238B6
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 13:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B417E1A9B37;
-	Wed, 20 Nov 2024 13:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5481A76C6;
+	Wed, 20 Nov 2024 13:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J45koYJ1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdExN8HH"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20D81A0AE1
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 13:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370E1A2C0E
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 13:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732108678; cv=none; b=UO2/JaXizuU4TwFIuIYoxJQB7orkb1r8CTxbsJ0ZwNOU9YFvXl5HSC8jIvCwcSpiLVi6lkixc6ShW22r5wcSlNrbxXnNzVhivWB+SuwsgiK9E/rQNXo0Mf/KkxEAiaqpJWGSXufa5VLlT9dp1kUZ6i9EPdZkb2roCnByh9Egn7c=
+	t=1732110378; cv=none; b=fO8bIDEU5gr+uvnT/ZHd+4lYtViRaxTTJZtj3iIOVquHl1tRwBDizHij1C5pxC4zaVKJuP6EuCQU3zYqVj2PWvx4cg4HGMba7jJl/npoI2TTN+EAH/az4cVdpSeLKytkRxlnMcfLJPda4VXDeQ/JR8qo4t5Ho1vvskzHQ9nIySU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732108678; c=relaxed/simple;
-	bh=7pYmcfAOVL4lH7Ez8B+rVq5uAfANeVBdvrYZSZINoWw=;
+	s=arc-20240116; t=1732110378; c=relaxed/simple;
+	bh=4vqg4VuazgJsGpOh72wwxCJ9PCnIDe9vWowNOrd/uX0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jp3reW8Ob14WPcGnOWxNmWqoHw/IpBDfeXU/C2sc8KicZKW3X2G0ggXZe6B2v9ITNXiQENbDczULrAqClqWykD9L3uRTl2BqvfZfcgKX2yZzqntY84hjOn9SJJ7D/5k8SOaC23NunlF5zHnLUYN0jTCnECdchGnqic4+EAm06j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J45koYJ1; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=OhwQkpDC8Nvi82wJMuhkjteVOQK9fADpHSYoZ8hm6s5QwDyGC4pAXRqJJmww5ZXlCLEcc78WgTHWGk598nJnNKEM+zZcg6cs7zA8PbGKAGuBeJZwKzu04TG8CAZO9TpwQ5WzK68JMC4rFA+B2WNBvFTD8/kvmx+vFbE2OcVATfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TdExN8HH; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732108674;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=mimecast20190719; t=1732110375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7pYmcfAOVL4lH7Ez8B+rVq5uAfANeVBdvrYZSZINoWw=;
-	b=J45koYJ1PeRy3gxXljhYBc8JoEpVWN2xzgHF+2ZdPjVuRdkLXfB8QR+w6p5rWXAQFFN0ql
-	P6YS7Q+qJmAdZomUNMlk7o1SbBOpE7CL9kqls3u27ZIfeK7SCiPTbqiw3msbYjvn/DsLD8
-	+c4xHd/b9EvV/1mSRuL9v48T+C28+vY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=1Ri4tZOAJYW8pxNO/lLGuZP6CvXZw9/dNjDLAj8UJrY=;
+	b=TdExN8HHro5k4uoyMjM9Z7duE/dDCgcSLBmlvhHceDRGIwBV4Cx2akNB8uaWMMbyNYxQpi
+	7bT1mjssX2BtoBn9QgvOTF9Ywoxdc0Q9FgptmOXzzVAVVZYhABQNJK5/IzcupWBHOr6FsD
+	sd+y2UWSIGe+v5qL+f42EU6jqGnZhI0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-lpPTaa_xPXmLcFpQjFa5Sg-1; Wed, 20 Nov 2024 08:17:53 -0500
-X-MC-Unique: lpPTaa_xPXmLcFpQjFa5Sg-1
-X-Mimecast-MFC-AGG-ID: lpPTaa_xPXmLcFpQjFa5Sg
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6d415a50c7bso73428416d6.0
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 05:17:53 -0800 (PST)
+ us-mta-594-PH6hsiNdOvmcZYKfra_E5Q-1; Wed, 20 Nov 2024 08:46:14 -0500
+X-MC-Unique: PH6hsiNdOvmcZYKfra_E5Q-1
+X-Mimecast-MFC-AGG-ID: PH6hsiNdOvmcZYKfra_E5Q
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315c1b5befso16077235e9.1
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 05:46:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732108673; x=1732713473;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7pYmcfAOVL4lH7Ez8B+rVq5uAfANeVBdvrYZSZINoWw=;
-        b=Z8lLlXTh5STdnknoHR2/N2207R3znOCnQZ3oeED2N6Xr7SJ0G72F3+1obdPAMX5thT
-         8K1z/DrMqZnv1BJU4DMjCD3LMV2QUaIDAaWne76HtNh+koJ2QqeQlR6+5xgszN5cTd0H
-         0FyiDfUgB0cFMK5LJsnNX/b2cln6RyQr7sNgt7aeq7ofkKXS3pgPzVMpiRgUhoKZul5e
-         xx6j2lujvak5f94nhf2JKrqjEYVUFNhJh0BPzIB/JtYBEZVgZlvJGqMfM5hqjz0o46WU
-         KdDksmQ8YCH5xZP2dpFf/d10uHNiLxnEd1aWHXQ82B4D8muiehVqP9uL4QiMZwsXZM/F
-         rUyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOfuf8TkXuXc3eJmnLNqhgEXqU3muRamfcxgxVlx5QM5vycuKUbb2GOAyF6cBs4w41qoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybGCG3aUOet5alPCycPLo6QubAEUXK68YDKZlgvoQXQ8xzvtAt
-	ToOKDN/SPihaiHNtOHhTvomfHrbg8/lh8lLA5ENYFPyGFVn2eOjl37Ojhxrj8a3VTOdDohFTUbt
-	sn83aGKrlz7zS5TNFqzOkeyEVFBGKM76Ezs9u65W0bXGOHznaDg==
-X-Received: by 2002:a05:6214:21a9:b0:6d4:10b0:c242 with SMTP id 6a1803df08f44-6d43782650cmr36004776d6.26.1732108673333;
-        Wed, 20 Nov 2024 05:17:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEoyaTxmYX8UT3QHHo+4fHJkXgTEZWD6Y5LfaFiT6Th8SIw6Ey1ch5deEOkok5XrGrNJJGMpw==
-X-Received: by 2002:a05:6214:21a9:b0:6d4:10b0:c242 with SMTP id 6a1803df08f44-6d43782650cmr36004416d6.26.1732108673005;
-        Wed, 20 Nov 2024 05:17:53 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d43812ab1csm10435266d6.93.2024.11.20.05.17.48
+        d=1e100.net; s=20230601; t=1732110373; x=1732715173;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1Ri4tZOAJYW8pxNO/lLGuZP6CvXZw9/dNjDLAj8UJrY=;
+        b=H+Si1MUxv0yywzmzR0893PnTQjYp7IeeO1zDcLtB48ney9vhoo36jVncYw4ENCdW60
+         apAmiyIpreTGYaBTzw6zjmXmWkcH42uyVcqJpYSwerCA/DNPKRRhTuhgBkfZy7NQdLf1
+         arVQ+hnr5KsgahTYFcieRLmGSyL/A71rdTR+A6Yno+WgK9x8/syNiwbUX2GJMoivK5U4
+         TriFKmZtMnPJ/yemxfmC8gyJOT5A+Y3lfzTo2okQO1RUvAwvagZP05QqbAA5SH+O+6KP
+         6tAyh460uVRKHXMrfmdIySpw5w4Q4XxwdkyttOqkfLsZ7Z9UXPZP12qL17Le2/iK6eiW
+         Cbbw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyrdPfo8c7DZKTRzoMKB5Peb8MQvSSe5DidOUwKMiXdZ3yiFdZDmLsudKaNkt8JgUyj80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqQ6EsCWep4r6bZqrMKNI3yZKCea5n2/IZ+99pVYIB9R2Hi8P5
+	9vauNNKOOOyNi16O6uF9ISqZgrSlztyeHQwIjyfQNG23xCluYrk9xBUxDa7JrBB7/sBduexWPXl
+	V5tUcl8KQoDEKeuH1oc4iUUtdyBqg2kY1+VQzT0q/fZHcMGv7Dw==
+X-Received: by 2002:a05:600c:3acf:b0:428:ec2a:8c94 with SMTP id 5b1f17b1804b1-433489b3175mr28483135e9.10.1732110373437;
+        Wed, 20 Nov 2024 05:46:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHL5FpbLSyV/3P5T72T2TQsBaP3zsjUQ/jI6Vn8ySj88Akn5ETssrgK561qvkmcpcXgwTclhA==
+X-Received: by 2002:a05:600c:3acf:b0:428:ec2a:8c94 with SMTP id 5b1f17b1804b1-433489b3175mr28482955e9.10.1732110373061;
+        Wed, 20 Nov 2024 05:46:13 -0800 (PST)
+Received: from ?IPV6:2003:cb:c705:4200:ce79:acf6:d832:60df? (p200300cbc7054200ce79acf6d83260df.dip0.t-ipconnect.de. [2003:cb:c705:4200:ce79:acf6:d832:60df])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b46426d7sm19481465e9.36.2024.11.20.05.46.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Nov 2024 05:17:52 -0800 (PST)
-Message-ID: <66977090-d707-4585-b0c5-8b48f663827e@redhat.com>
-Date: Wed, 20 Nov 2024 14:17:46 +0100
+        Wed, 20 Nov 2024 05:46:11 -0800 (PST)
+Message-ID: <01b0a528-bec0-41d7-80f6-8afe213bd56b@redhat.com>
+Date: Wed, 20 Nov 2024 14:46:09 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,142 +84,158 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address
- for each MSI vector
+Subject: Re: [RFC PATCH 0/4] KVM: ioctl for populating guest_memfd
+To: kalyazin@amazon.com, pbonzini@redhat.com, corbet@lwn.net,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: jthoughton@google.com, brijesh.singh@amd.com, michael.roth@amd.com,
+ graf@amazon.de, jgowans@amazon.com, roypat@amazon.co.uk, derekmn@amazon.com,
+ nsaenz@amazon.es, xmarcalx@amazon.com,
+ Sean Christopherson <seanjc@google.com>, linux-mm@kvack.org
+References: <20241024095429.54052-1-kalyazin@amazon.com>
+ <08aeaf6e-dc89-413a-86a6-b9772c9b2faf@amazon.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-To: Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jason Gunthorpe <jgg@nvidia.com>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, tglx@linutronix.de, maz@kernel.org,
- bhelgaas@google.com, leonro@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org,
- kevin.tian@intel.com, smostafa@google.com,
- andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com,
- ddutile@redhat.com, yebin10@huawei.com, brauner@kernel.org,
- apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de,
- anna-maria@linutronix.de, nipun.gupta@amd.com,
- marek.vasut+renesas@mailbox.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1731130093.git.nicolinc@nvidia.com>
- <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
- <ZzPOsrbkmztWZ4U/@Asurada-Nvidia> <20241113013430.GC35230@nvidia.com>
- <20241113141122.2518c55a.alex.williamson@redhat.com>
- <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <08aeaf6e-dc89-413a-86a6-b9772c9b2faf@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 20.11.24 13:09, Nikita Kalyazin wrote:
+> On 24/10/2024 10:54, Nikita Kalyazin wrote:
+>> [2] proposes an alternative to
+>> UserfaultFD for intercepting stage-2 faults, while this series
+>> conceptually compliments it with the ability to populate guest memory
+>> backed by guest_memfd for `KVM_X86_SW_PROTECTED_VM` VMs.
+> 
+> +David
+> +Sean
+> +mm
 
+Hi!
 
-On 11/14/24 16:35, Robin Murphy wrote:
-> On 13/11/2024 9:11 pm, Alex Williamson wrote:
->> On Tue, 12 Nov 2024 21:34:30 -0400
->> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>
->>> On Tue, Nov 12, 2024 at 01:54:58PM -0800, Nicolin Chen wrote:
->>>> On Mon, Nov 11, 2024 at 01:09:20PM +0000, Robin Murphy wrote:
->>>>> On 2024-11-09 5:48 am, Nicolin Chen wrote:
->>>>>> To solve this problem the VMM should capture the MSI IOVA
->>>>>> allocated by the
->>>>>> guest kernel and relay it to the GIC driver in the host kernel,
->>>>>> to program
->>>>>> the correct MSI IOVA. And this requires a new ioctl via VFIO.
->>>>>
->>>>> Once VFIO has that information from userspace, though, do we
->>>>> really need
->>>>> the whole complicated dance to push it right down into the irqchip
->>>>> layer
->>>>> just so it can be passed back up again? AFAICS
->>>>> vfio_msi_set_vector_signal() via VFIO_DEVICE_SET_IRQS already
->>>>> explicitly
->>>>> rewrites MSI-X vectors, so it seems like it should be pretty
->>>>> straightforward to override the message address in general at that
->>>>> level, without the lower layers having to be aware at all, no?
->>>>
->>>> Didn't see that clearly!! It works with a simple following override:
->>>> --------------------------------------------------------------------
->>>> @@ -497,6 +497,10 @@ static int vfio_msi_set_vector_signal(struct
->>>> vfio_pci_core_device *vdev,
->>>>                  struct msi_msg msg;
->>>>
->>>>                  get_cached_msi_msg(irq, &msg);
->>>> +               if (vdev->msi_iovas) {
->>>> +                       msg.address_lo =
->>>> lower_32_bits(vdev->msi_iovas[vector]);
->>>> +                       msg.address_hi =
->>>> upper_32_bits(vdev->msi_iovas[vector]);
->>>> +               }
->>>>                  pci_write_msi_msg(irq, &msg);
->>>>          }
->>>>   --------------------------------------------------------------------
->>>>
->>>> With that, I think we only need one VFIO change for this part :)
->>>
->>> Wow, is that really OK from a layering perspective? The comment is
->>> pretty clear on the intention that this is to resync the irq layer
->>> view of the device with the physical HW.
->>>
->>> Editing the msi_msg while doing that resync smells bad.
->>>
->>> Also, this is only doing MSI-X, we should include normal MSI as
->>> well. (it probably should have a resync too?)
->>
->> This was added for a specific IBM HBA that clears the vector table
->> during a built-in self test, so it's possible the MSI table being in
->> config space never had the same issue, or we just haven't encountered
->> it.  I don't expect anything else actually requires this.
->
-> Yeah, I wasn't really suggesting to literally hook into this exact
-> case; it was more just a general observation that if VFIO already has
-> one justification for tinkering with pci_write_msi_msg() directly
-> without going through the msi_domain layer, then adding another
-> (wherever it fits best) can't be *entirely* unreasonable.
->
-> At the end of the day, the semantic here is that VFIO does know more
-> than the IRQ layer, and does need to program the endpoint differently
-> from what the irqchip assumes, so I don't see much benefit in dressing
-> that up more than functionally necessary.
->
->>> I'd want Thomas/Marc/Alex to agree.. (please read the cover letter for
->>> context)
->>
->> It seems suspect to me too.  In a sense it is still just synchronizing
->> the MSI address, but to a different address space.
->>
->> Is it possible to do this with the existing write_msi_msg callback on
->> the msi descriptor?  For instance we could simply translate the msg
->> address and call pci_write_msi_msg() (while avoiding an infinite
->> recursion).  Or maybe there should be an xlate_msi_msg callback we can
->> register.  Or I suppose there might be a way to insert an irqchip that
->> does the translation on write.  Thanks,
->
-> I'm far from keen on the idea, but if there really is an appetite for
-> more indirection, then I guess the least-worst option would be yet
-> another type of iommu_dma_cookie to work via the existing
-> iommu_dma_compose_msi_msg() flow, with some interface for VFIO to
-> update per-device addresses direcitly. But then it's still going to
-> need some kind of "layering violation" for VFIO to poke the IRQ layer
-> into re-composing and re-writing a message whenever userspace feels
-> like changing an address, because we're fundamentally stepping outside
-> the established lifecycle of a kernel-managed IRQ around which said
-> layering was designed...
+> 
+> While measuring memory population performance of guest_memfd using this
+> series, I noticed that guest_memfd population takes longer than my
+> baseline, which is filling anonymous private memory via UFFDIO_COPY.
+> 
+> I am using x86_64 for my measurements and 3 GiB memory region:
+>    - anon/private UFFDIO_COPY:  940 ms
+>    - guest_memfd:              1371 ms (+46%)
+> 
+> It turns out that the effect is observable not only for guest_memfd, but
+> also for any type of shared memory, eg memfd or anonymous memory mapped
+> as shared.
+ > Below are measurements of a plain mmap(MAP_POPULATE) operation:>
+> mmap(NULL, 3ll * (1 << 30), PROT_READ | PROT_WRITE, MAP_PRIVATE |
+> MAP_ANONYMOUS | MAP_POPULATE, -1, 0);
+>    vs
+> mmap(NULL, 3ll * (1 << 30), PROT_READ | PROT_WRITE, MAP_SHARED |
+> MAP_ANONYMOUS | MAP_POPULATE, -1, 0);
+> 
+> Results:
+>    - MAP_PRIVATE: 968 ms
+>    - MAP_SHARED: 1646 ms
 
-for the record, the first integration was based on such distinct
-iommu_dma_cookie
+At least here it is expected to some degree: as soon as the page cache 
+is involved map/unmap gets slower, because we are effectively 
+maintaining two datastructures (page tables + page cache) instead of 
+only a single one (page cache)
 
-[PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part) <https://lore.kernel.org/all/20210411111228.14386-1-eric.auger@redhat.com/#r>, patches 8 - 11
+Can you make sure that THP/large folios don't interfere in your 
+experiments (e.g., madvise(MADV_NOHUGEPAGE))?
 
-Thanks
+> 
+> I am seeing this effect on a range of kernels. The oldest I used was
+> 5.10, the newest is the current kvm-next (for-linus-2590-gd96c77bd4eeb).
+> 
+> When profiling with perf, I observe the following hottest operations
+> (kvm-next). Attaching full distributions at the end of the email.
+> 
+> MAP_PRIVATE:
+> - 19.72% clear_page_erms, rep stos %al,%es:(%rdi)
+> 
+> MAP_SHARED:
+> - 43.94% shmem_get_folio_gfp, lock orb $0x8,(%rdi), which is atomic
+> setting of the PG_uptodate bit
+> - 10.98% clear_page_erms, rep stos %al,%es:(%rdi)
 
-Eric
+Interesting.
+> 
+> Note that MAP_PRIVATE/do_anonymous_page calls __folio_mark_uptodate that
+> sets the PG_uptodate bit regularly.
+> , while MAP_SHARED/shmem_get_folio_gfp calls folio_mark_uptodate that
+> sets the PG_uptodate bit atomically.
+> 
+> While this logic is intuitive, its performance effect is more
+> significant that I would expect.
 
+Yes. How much of the performance difference would remain if you hack out 
+the atomic op just to play with it? I suspect there will still be some 
+difference.
 
+> 
+> The questions are:
+>    - Is this a well-known behaviour?
+>    - Is there a way to mitigate that, ie make shared memory (including
+> guest_memfd) population faster/comparable to private memory?
 
->
-> Thanks,
-> Robin.
->
+Likely. But your experiment measures above something different than what 
+guest_memfd vs. anon does: guest_memfd doesn't update page tables, so I 
+would assume guest_memfd will be faster than MAP_POPULATE.
+
+How do you end up allocating memory for guest_memfd? Using simple 
+fallocate()?
+
+Note that we might improve allocation times with guest_memfd when 
+allocating larger folios.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
