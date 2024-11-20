@@ -1,141 +1,124 @@
-Return-Path: <kvm+bounces-32180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD2A9D4041
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:40:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B029D3FEF
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:21:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35334B36211
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:21:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 192D21F23500
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7031531C0;
-	Wed, 20 Nov 2024 16:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D101A145335;
+	Wed, 20 Nov 2024 16:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wl+GD1L5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ViG1yl9X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F67714A630;
-	Wed, 20 Nov 2024 16:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED53B1537C3;
+	Wed, 20 Nov 2024 16:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732119640; cv=none; b=KIjpzg7IPxaNykhTp9CtaCrZW/NBNuAgKBBVU68OTJrD8d8RQop7xl/8A33h4MUTGHm1ESbnR6bZJpo8QPWwQ/vaxEuVX5g1KRAJMdhMaZO5txhKaR2DSGU50f9Dhossmijljmm6h68W0ThdqGlAVpvvwlB36zNa18C5aBEQUGE=
+	t=1732119683; cv=none; b=S0gkpmb1Nn2XY40xL/ob8Pyd6yTLCGIYJw1vs5s/kchfyouVu5OwKejvVC/MFFnaDOys0hnj/SnrXyULasr1lqGfOEyR1LJ1vkagD8YkvDKRleuQhWOP+OPZqrW/FO7qwdIJombtcnRC88BI0fAmC/fySJQgJIPOixa7W+zCfXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732119640; c=relaxed/simple;
-	bh=NkMlPuo43fHO0TgD1QYD9cIO7PO1KxGZkQheI8cp+JM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=btbG3fPqqcvdbLeOd1dO3uyx12SO/a+4acwkBfq4mIgZ5ppVHwgzwqP4bvZxQ/BBK79H3R+Ml5b9C09381HZXwM0TV3s5sed7KldSFi7Xgw6myg25d458wyH+0H27FohlbfwuARO6xcytI67JvvYAg5apHrMEzfabQrbUVOZgwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wl+GD1L5; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb56cb61baso45553101fa.1;
-        Wed, 20 Nov 2024 08:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732119636; x=1732724436; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ImSW+JuDhb3RgJw1o2hGS9mRoFnCl9ZYkL7+gfakSyM=;
-        b=Wl+GD1L5nOaXU3W61R6cdsPrlTXAfMnNR2915tNug1wKKLsxUreHBQc1xYoK8LE7YK
-         uvmAkGOe06QPB+oclB7lgJgFXUWHm52ez5IWCn8IEQK/XLfov7kd+7UK32f513x/BjOY
-         SDpZwY+YqFqGYvNckGrFSSiCp274JF5V3H2AlVL1bIy6JdsNnnEkIi456HkcZiCEoeTW
-         gCHZfTt8ghV0IZu9rYEOfZH3jZY19aFsXA6VEUIyeKmGC7bKdD0ew9Nm+PcDsfynX2yt
-         0QumsBxIxcV+nmWKFffS2WhjAH3UwchpJN742FBiwARQzSNiqTO/KCfPVfrsDCXUSbyA
-         crzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732119636; x=1732724436;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ImSW+JuDhb3RgJw1o2hGS9mRoFnCl9ZYkL7+gfakSyM=;
-        b=lAXfRbZhdtyn1q9yj7UxlxmOdKO7uv0P8rPAGTa6lRPkqXpADmAOA86qoPLXrOdopL
-         eXRppi027TirornubM/Ud7DVyglV6ZxVguz5ea0uGo4NFgGUwcnJs0NZF2c8MO8wNgrY
-         F2LcKj6NCqjsdB4xw97litutR/mugGC2J3tFaDegUcqpazW2FvEso0glqeuCCKjgcswW
-         PEL1DF/1naC8YKOOWLhv72UxZMwwrtSsdFyzBeNP0X4R/C62x9bL+sdaHNswkH8of48b
-         eTEKGxcGNh/ZRTQ5O/npl8Id7jOPAuXItDJGGDpdCjm4w0ZjQmH137gS5j4FnegGWM2I
-         9VlA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMzUxwJhHAyRXHKPeVvukS1qIJIOmQE9YSLQIR0R94A1xzES9FSE7X0tUtbOvCVONGK+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz90156GAW9waZDBceAZap1i36QR8LX1LRiFBsmPUQWzZa08p9N
-	ohDDrXe42pKCPcD+GZSTdEy683NOmzt/kcLjwLpAswuWz95aaBS43Tl+M/M5ugyPP/DRSflgnPM
-	z/4DDBI7ahaIIi+Wjj0MiXyKjb/gKXQ==
-X-Google-Smtp-Source: AGHT+IHNRQW/uxvLO+ngyUCL/BIFpVe/+hHdEEcutNrMQSMyWScoaAXP0lL3BqY9nHe93PE2jdPKH7UlnQJM0kusp+A=
-X-Received: by 2002:a2e:a541:0:b0:2fb:5688:55c0 with SMTP id
- 38308e7fff4ca-2ff8dcdcb27mr21196231fa.38.1732119635474; Wed, 20 Nov 2024
- 08:20:35 -0800 (PST)
+	s=arc-20240116; t=1732119683; c=relaxed/simple;
+	bh=8V0tVZLTAmcmPHYhysLCyCFUh8prNiIRw2JMFafb1N0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aB+qMNWwiULN5O5Xv+BL7lWmVehUQJjq7IT8BF5bRowJTIwfG4ynMEQtECX658jjFQ0tFwa1RfQnSjzRBshav0FIspSOdwqqkoQpC66Sk1ArE7WJzn5hLH5e/idsdGNUubI1MLXDLTF3SgzbnKfijsdj2qPJ97vgmxNNChI2UmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ViG1yl9X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FE99C4CECD;
+	Wed, 20 Nov 2024 16:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732119682;
+	bh=8V0tVZLTAmcmPHYhysLCyCFUh8prNiIRw2JMFafb1N0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ViG1yl9Xwx5EhE7iVka9N+4LNcIz5LoK60+wC9sjB8zm2yNFzF745MnIp6UTkciix
+	 3bEgjb9ibT3PGPFlnYRoV0LKXNe2UosjoMJbc1N4e+ApzEBGQJ8n1Vqc8d8im/RYzA
+	 MaCRVPsUuFH/CeqZLgIon/9FtmDTn9a5yBDAfCYlcs8AKw+opK+mWOkln9JOIgWMPg
+	 +2Mk2s6pVjWszU5vxA9QzjLu/QZShqUcVbWzxvHlPbzwrNDuPu/SixH+yVTg9K5/wn
+	 aMLtv3rDImDQIdGtTuxunIE9x4CI7q2Hxz6f6yH2o0309351UxuvBR4ESiJVpJpFtH
+	 SotSZ5bxps8rg==
+Date: Wed, 20 Nov 2024 08:21:20 -0800
+From: "jpoimboe@kernel.org" <jpoimboe@kernel.org>
+To: "Shah, Amit" <Amit.Shah@amd.com>
+Cc: "Phillips, Kim" <kim.phillips@amd.com>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
+	"kai.huang@intel.com" <kai.huang@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+	"daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"Moger, Babu" <Babu.Moger@amd.com>,
+	"Das1, Sandipan" <Sandipan.Das@amd.com>,
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>,
+	"amit@kernel.org" <amit@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"bp@alien8.de" <bp@alien8.de>,
+	"Kaplan, David" <David.Kaplan@amd.com>
+Subject: Re: [PATCH 2/2] x86/bugs: Don't fill RSB on context switch with eIBRS
+Message-ID: <20241120162120.z6zteeespf4cir4s@jpoimboe>
+References: <cover.1732087270.git.jpoimboe@kernel.org>
+ <9792424a4fe23ccc1f7ebbef121bfdd31e696d5d.1732087270.git.jpoimboe@kernel.org>
+ <b2c639694a390208807999873c8b42a674d1ffa2.camel@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHP4M8VxL3GJx0Ofhk4_AToD-J0X+_20QmfZpq06DuN4CKc15w@mail.gmail.com>
-In-Reply-To: <CAHP4M8VxL3GJx0Ofhk4_AToD-J0X+_20QmfZpq06DuN4CKc15w@mail.gmail.com>
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Wed, 20 Nov 2024 21:50:18 +0530
-Message-ID: <CAHP4M8WMELcT8G1p7o5khEn5B9X+0UBkEMiScu9eD89qdpUbrw@mail.gmail.com>
-Subject: Re: Queries regarding consolidated picture of virtualization and SPT/EPT/IOMMU/DMAR/PT
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org, 
-	kvm@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b2c639694a390208807999873c8b42a674d1ffa2.camel@amd.com>
 
-Hi everyone.
+On Wed, Nov 20, 2024 at 10:27:42AM +0000, Shah, Amit wrote:
+> On Tue, 2024-11-19 at 23:27 -0800, Josh Poimboeuf wrote:
+> > User->user Spectre v2 attacks (including RSB) across context switches
+> > are already mitigated by IBPB in cond_mitigation(), if enabled
+> > globally
+> > or if at least one of the tasks has opted in to protection.  RSB
+> > filling
+> > without IBPB serves no purpose for protecting user space, as indirect
+> > branches are still vulnerable.
+> > 
+> > User->kernel RSB attacks are mitigated by eIBRS.  In which case the
+> > RSB
+> > filling on context switch isn't needed.  Fix that.
+> > 
+> > While at it, update and coalesce the comments describing the various
+> > RSB
+> > mitigations.
+> 
+> Looks good from first impressions - but there's something that needs
+> some deeper analysis: AMD's Automatic IBRS piggybacks on eIBRS, and has
+> some special cases.  Adding Kim to CC to check and confirm if
+> everything's still as expected.
 
-Will be grateful for some insight if I am on the right path :)
+FWIW, so "Technical Guidance for Mitigating Branch Type Confusion" has
+the following:
 
-On Mon, Nov 18, 2024 at 11:30=E2=80=AFPM Ajay Garg <ajaygargnsit@gmail.com>=
- wrote:
->
-> Hi everyone.
->
-> I understand in a para-virtualization environment, VMM maintains a
-> shadow-page-table (SPT) per process per guest, for GVA =3D> HPA
-> translation. The hardware/MMU is passed a single pointer to this
-> shadow-page-table. The guest is aware that it is running in a
-> virtualization environment, and communicates with VMM to help maintain
-> the shadow-page-table.
->
-> In full-virtualization/HVM virtualization, the guest is unaware that
-> it is running in a virtualized environment, and all GVA =3D> GPA are
-> private. The VMM is obviously aware of all HVA =3D> HPA mappings; plus
-> GPA =3D> HVA is trivial as it's only an offset difference (Extended Page
-> Table, EPT). The hardware/MMU is passed three things :
->
->         * Pointer to guest page-table, for GVA =3D> GPA.
->         * Offset, for GPA =3D> HVA.
->         * Pointer to host page-table, for HVA =3D> HPA.
->
-> In both the above cases, DMA is a challenge (without IOMMU), as
-> device-addresses would need to be physically-contiguous. This would in
-> turn mean that all of  GPA needs to be physically-contiguous, which in
-> turn means that the host would need to spawn guest-process with all of
-> memory (HVA) which is physically-contiguous - very hard to meet
-> generally.
->
-> *_Kindly correct me if I have made a mistake so far at conceptual level._=
-*
->
->
-> Now, enters IOMMU, providing the ability to DMA with non-contiguous
-> device-addresses.
-> Now, my queries are simple :
->
-> *
-> Is IOMMU DMA-Remapping mode (DMAR) analogous to a para-virtualization
-> environment (as per previous brief context)?
->
-> *
-> Is IOMMU Pass-through (PT) mode analogous to a HVM environment (as per
-> previous brief context)?
->
->
-> Many thanks in advance for your time; hopefully I have not been a
-> complete idiot ..
->
->
-> Thanks and Regards,
-> Ajay
+  Finally, branches that are predicted as ‘ret’ instructions get their
+  predicted targets from the Return Address Predictor (RAP). AMD
+  recommends software use a RAP stuffing sequence (mitigation V2-3 in
+  [2]) and/or Supervisor Mode Execution Protection (SMEP) to ensure that
+  the addresses in the RAP are safe for speculation. Collectively, we
+  refer to these mitigations as “RAP Protection”.
+
+So it sounds like user->kernel RAP poisoning is mitigated by SMEP on AMD.
+
+-- 
+Josh
 
