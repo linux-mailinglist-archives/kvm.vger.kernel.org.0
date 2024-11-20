@@ -1,91 +1,150 @@
-Return-Path: <kvm+bounces-32177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EEF9D3FAD
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:05:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F649D4024
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:34:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87892284177
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:05:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B116B2B8BE
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AFA1BC9FC;
-	Wed, 20 Nov 2024 16:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527771527B1;
+	Wed, 20 Nov 2024 16:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fsf083JN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0694B76410;
-	Wed, 20 Nov 2024 16:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEF71474A7
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 16:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732118606; cv=none; b=AHugSvuqOzLPqEiHdAcKyPhfvmPO6a82ViWfmz2swrRf4ya9eXEVF91NNMOSjHSc0kvnG3t4gI+mKCxEgC5ycWLq+apsICRHe/7+8FCSdSyOdk0jTfUYIZVLplP4B+w83yadhMOblQQw7oGQStE0nuJI6viXRBSs/gYiInzw6nc=
+	t=1732119329; cv=none; b=hDjJVJDWhxNFeYiuwJ3ZWuMEMOcmVls17XVj6lKms+0XCfXKNY3lbJULzHPedzA+H/dO/AzJnLZleFHQbyL/tUgzeJ8ClSj2eCAmd1uGnVrpB5PHRuYKVugL+jQy0GfgsY2FtZjC004HJLCNHHYXpCvGrgGvNOqGT7GkJwaew98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732118606; c=relaxed/simple;
-	bh=TEUWZrUoX6uasL1Bpxaa9/CiDPe7nP1K92D0DOxZdrw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iA+HO1L8Gb83HqO1ACI6XEoNv2gbPAOftSxe9rUbbkTOrqJNJiST5e2bV4HPyr01XA1gNbY/sVm51YlWeSukN1m4es4PMEcno6SHPbfMCInh7WzIIhZHnUB9SmnZYtepOvFlwfEMipeUCjKu3Dj6N340w70aeBtmx9VTJt52zXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99426C4AF09;
-	Wed, 20 Nov 2024 16:03:25 +0000 (UTC)
-Date: Wed, 20 Nov 2024 08:03:24 -0800
-From: Josh Poimboeuf <jpoimboe@redhat.com>
+	s=arc-20240116; t=1732119329; c=relaxed/simple;
+	bh=VNWYPyllDhn6wyHA8vHCBZcrdTpypW9KdBxrUGgTSiU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lRmKzLrnBt2joHvZBh8nxhaqv3map3k403QCyp2jUYgbWjHaOIY74Pv+mgM5eOY55V4ShvFoZNZqBok/7pI255iKYxQZInk/6t2RC0bzqiVkazS9f6goPfRUBsz8QIYnRK7wiIieFWFXCWF7AwgfN3mzN8aqvalUYC0CL9AESkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fsf083JN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732119327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s9neiNV5Ecw1Rm63FFkLc6Zp+LPvspTbTCjcardEBqA=;
+	b=Fsf083JNsS9wwCI0HmA2S9Xn2NrHwnCRh05e9UpS49I47v3ZJqDPly9WbuhZk+Ocnc1Qa2
+	g37lh1RL/CrlVht8/QkAzN9/QRQJwdcaQKpMEbBcNAZovArHwEhyml48lEYeU/Bprkgt74
+	GaBJqnn5EBVLoAHWHNnbUn0t+KecXbI=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-I04FG-OxNka4v0T94TEl0A-1; Wed, 20 Nov 2024 11:15:24 -0500
+X-MC-Unique: I04FG-OxNka4v0T94TEl0A-1
+X-Mimecast-MFC-AGG-ID: I04FG-OxNka4v0T94TEl0A
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6d4173d329fso33903216d6.2
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 08:15:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732119324; x=1732724124;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s9neiNV5Ecw1Rm63FFkLc6Zp+LPvspTbTCjcardEBqA=;
+        b=pjj5N/qIzrIvvLVtjh5w537sr/Lygv4jhFnan8UkclOMEBOp4b4dWje3ErWwMwFh+I
+         HbnygnnNTrY8uA4iBPvvrfORKpDHwZHqBjQXTtgHGY9c8XIpqSezrbYKzT7TsIA2tAco
+         9skNiU7JRtLY6QX6VaS9jCXhR/nibok0woaxWiFu509nhfK4tyyQd7hMzlIiGnseLr7w
+         QJMoH12GBh5PLF4PYBYj2Fd1w5k7KlDxsqQGRWaXlU+30g36uyIh9wAisNsvIWP5BI63
+         3L+u8O4sLslKgsJkm0+KdMBSyZg+eMn+Cdhg7Y0mOxlc+AlzmFIdcjJUSsaEJFAWODs1
+         DoNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBGuIPgcH3fTOI37JnunF/bMm4WZCz0HmF6uylYazMQIT9nqw98TWIdfCWjEPlOyVEDd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS8lBUOAN15vjowCI7arsz5h4HB0TPPnYdVVnPGEIe/uyH3g22
+	xv+mvDufx6rulwGkGbLFGhE5PdzsDHZnlwSpEWPgs/BgvY+DwZ/ByJFKHIp95O73ZNda2s+WJGd
+	jajZGLK6AECfrbEACGqG3oE0nEa2YObevnlImA7C09ffIdLwfwg==
+X-Gm-Gg: ASbGnctiJ890u7c0TPUOq6Shm/FNCdtTJBfRyxSomTGqCWNFGsOQhc2Rzk5ZTGAPyWO
+	3jOCezuV9EURPB2AvceFs3lDl1IkxYyxi/DU4FUejru6jUCYGg+KtYzXec/G+VfDv01SUiFrQ/K
+	roSphDkoPzKyM+IYBf3YE83HXBKEmGGmHfoUmABNUpHGi0YSm/8TdCKZ0XgfI9YxZPfT+bIsQM7
+	aWgK6F1pdasyxESO/nJ9ZraLwqzbnrBPeYUiPengc3SqyZiOP1krYL9FSuabVAdaj+7UBhLzVDt
+	TT/+EDodkbPpz5qFU+3ytKCzd6Tcssc/LBQ=
+X-Received: by 2002:a05:6214:2aa7:b0:6d4:1f86:b1f2 with SMTP id 6a1803df08f44-6d4377bd8bcmr43340696d6.11.1732119324074;
+        Wed, 20 Nov 2024 08:15:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IErytLY/ydBtG/c68cV9sB/Rs0q2MHssCkf2mLl/ZoHSY4DaUVm1Hfo6p7yhhfkcknSTmK2WQ==
+X-Received: by 2002:a05:6214:2aa7:b0:6d4:1f86:b1f2 with SMTP id 6a1803df08f44-6d4377bd8bcmr43339716d6.11.1732119323729;
+        Wed, 20 Nov 2024 08:15:23 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d43812ab67sm12352206d6.88.2024.11.20.08.15.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2024 08:15:22 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
 To: Peter Zijlstra <peterz@infradead.org>
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-	jthoughton@google.com
-Subject: Re: [PATCH v2 01/12] objtool: Generic annotation infrastructure
-Message-ID: <20241120160324.ihoku7dopaju6nec@jpoimboe>
-References: <20241111115935.796797988@infradead.org>
- <20241111125218.113053713@infradead.org>
- <20241115183828.6cs64mpbp5cqtce4@jpoimboe>
- <20241116093331.GG22801@noisy.programming.kicks-ass.net>
- <20241120003123.rhb57tk7mljeyusl@jpoimboe>
- <20241120010424.thsbdwfwz2e7elza@jpoimboe>
- <20241120085254.GD19989@noisy.programming.kicks-ass.net>
- <20241120160308.o24km3zwrpbqn7m4@jpoimboe>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
+ x86@kernel.org, rcu@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "Paul E . McKenney" <paulmck@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Jonathan
+ Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, Vitaly
+ Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay
+ <quic_neeraju@quicinc.com>, Joel Fernandes <joel@joelfernandes.org>, Josh
+ Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan
+ <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, Andrew
+ Morton <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>,
+ Christoph Hellwig <hch@infradead.org>, Lorenzo Stoakes
+ <lstoakes@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jason Baron
+ <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>, Sami Tolvanen
+ <samitolvanen@google.com>, Ard Biesheuvel <ardb@kernel.org>, Nicholas
+ Piggin <npiggin@gmail.com>, Juerg Haefliger
+ <juerg.haefliger@canonical.com>, Nicolas Saenz Julienne
+ <nsaenz@kernel.org>, "Kirill A. Shutemov"
+ <kirill.shutemov@linux.intel.com>, Nadav Amit <namit@vmware.com>, Dan
+ Carpenter <error27@gmail.com>, Chuang Wang <nashuiliang@gmail.com>, Yang
+ Jihong <yangjihong1@huawei.com>, Petr Mladek <pmladek@suse.com>, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>, Julian Pidancet
+ <julian.pidancet@oracle.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Dionna Glaze <dionnaglaze@google.com>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Juri Lelli <juri.lelli@redhat.com>, Marcelo
+ Tosatti <mtosatti@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, Daniel
+ Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+Subject: Re: [RFC PATCH v3 04/15] rcu: Add a small-width RCU watching
+ counter debug option
+In-Reply-To: <20241120145049.GI19989@noisy.programming.kicks-ass.net>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-5-vschneid@redhat.com>
+ <20241120145049.GI19989@noisy.programming.kicks-ass.net>
+Date: Wed, 20 Nov 2024 17:15:14 +0100
+Message-ID: <xhsmh1pz5j2zx.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241120160308.o24km3zwrpbqn7m4@jpoimboe>
+Content-Type: text/plain
 
-On Wed, Nov 20, 2024 at 08:03:10AM -0800, Josh Poimboeuf wrote:
-> On Wed, Nov 20, 2024 at 09:52:54AM +0100, Peter Zijlstra wrote:
-> > On Tue, Nov 19, 2024 at 05:04:24PM -0800, Josh Poimboeuf wrote:
-> > > On Tue, Nov 19, 2024 at 04:31:25PM -0800, Josh Poimboeuf wrote:
-> > > > On Sat, Nov 16, 2024 at 10:33:31AM +0100, Peter Zijlstra wrote:
-> > > > > On Fri, Nov 15, 2024 at 10:38:28AM -0800, Josh Poimboeuf wrote:
-> > > > > > On Mon, Nov 11, 2024 at 12:59:36PM +0100, Peter Zijlstra wrote:
-> > > > > > > +#define ASM_ANNOTATE(x)						\
-> > > > > > > +	"911:\n\t"						\
-> > > > > > > +	".pushsection .discard.annotate,\"M\",@progbits,8\n\t"	\
-> > > > > > > +	".long 911b - .\n\t"					\
-> > > > > > > +	".long " __stringify(x) "\n\t"				\
-> > > > > > > +	".popsection\n\t"
-> > > > > > 
-> > > > > > Why mergeable and progbits?
-> > > > > 
-> > > > > In order to get sh_entsize ?
-> > > > 
-> > > > Is that a guess?  If so, it's not very convincing as I don't see what
-> > > > entsize would have to do with it.
-> > > 
-> > > Oh, nevermind... I see it's a gas syntax issue.
-> > 
-> > Not a guess, only mergable gets entsize, and progbits is a required
-> > argument per the syntax in order to specify entsize.
-> 
-> If you look at "readelf -WS vmlinux" there are plenty of non-mergeable
-> sections with entsize.
+On 20/11/24 15:50, Peter Zijlstra wrote:
+> On Tue, Nov 19, 2024 at 04:34:51PM +0100, Valentin Schneider wrote:
+>> A later commit will reduce the size of the RCU watching counter to free up
+>> some bits for another purpose. Paul suggested adding a config option to
+>> test the extreme case where the counter is reduced to its minimum usable
+>> width for rcutorture to poke at, so do that.
+>> 
+>> Make it only configurable under RCU_EXPERT. While at it, add a comment to
+>> explain the layout of context_tracking->state.
+>
+> Note that this means it will get selected by allyesconfig and the like,
+> is that desired?
+>
 
-Er, vmlinux.o
+I would say no
 
--- 
-Josh
+> If no, depends on !COMPILE_TEST can help here.
+
+Noted, thank you!
+
 
