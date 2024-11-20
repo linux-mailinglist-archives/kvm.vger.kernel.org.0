@@ -1,213 +1,189 @@
-Return-Path: <kvm+bounces-32139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9949D380C
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 11:12:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 710909D3832
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 11:19:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2494E1F21F7A
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 10:12:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2D54B293C5
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 10:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B785E19D89B;
-	Wed, 20 Nov 2024 10:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E4919E980;
+	Wed, 20 Nov 2024 10:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HzHTM30m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0mWPH6H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A941990C0;
-	Wed, 20 Nov 2024 10:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EA619C561
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 10:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732097549; cv=none; b=SX7rEoZ7tb5fX3QCDKJSF9JeoauudNK9LFXFIoocf1YT9hm/QGC5wrZczAwIWkcO4UNXT2wM3RfqittnC8RriQGsnBNKGnGH1ZfWKaBmxwUSrftvmaFk481TGMJBDat/L52sRCV7lngOCNMUMjZdCP/DDxP+EpYvBWMaBhYJIns=
+	t=1732097658; cv=none; b=QcCWYVCXfZyUyGRs7/1iGiS/oCFX8uSWefo/97F3aAJB6dNMyyEBqJUaYRiqiSrBRsS6JOrFKIP1elEDAc947YnyE7DCrZAfl1pMxsmR6dryRP2D6bvCOEhP7PiS1W53Qxuic9HsaS5KIyqWaFvrmm0uC4HQ2Zegu3TDTfDI5nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732097549; c=relaxed/simple;
-	bh=1iq5LwZDW/dQe89CPqcHPntXsHFqWx0E8SZYJTsVF9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GSDLAta4Rohc3oZzknLMHLA1qTkxDlooBg6EEz65dWZeQkEW7Nt/rAXK8gyvDokLQZqpI3vVT85B2ieHDXU4BgF9RjCIQNfC7hS7RHq4rYMSKmM6ortEdKLuxvHelawOTqQHAJwiEYbfq//tADOW9G2niGfxb9ta0Y3EB4Vkm5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HzHTM30m; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732097548; x=1763633548;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1iq5LwZDW/dQe89CPqcHPntXsHFqWx0E8SZYJTsVF9g=;
-  b=HzHTM30mpi2nkbDkn7YT0+gKe1ySPH0hGDtzzlCODhUh58uhadfKo7+8
-   CIb2vs63ySxkj9VUJbBYJIeikrEH40ZZoqVVS6noWz+ZdUSOAsfAODdq+
-   T4lPWelawHTP5UdzDHbWu2YQrPJNjobhD5tVbcc/pzL9D1Fo+4vVtLhC5
-   RuurR4qHLH8mmCKYI7aLjdoYnqsUUyLz2JiaZAWr+SGm5SESXj9XPbtjr
-   8xiSnFcJFgbB9JvTcnXb/L6hoPzNG1EnoPSRWhd7ExnYH9FkCrl2BISEf
-   QIkETxb2YbewoEMaXqs41HZRwn1upd4FVMYBVGSokiIqEv78p9c2O0Tvt
-   Q==;
-X-CSE-ConnectionGUID: w/qfTOd9T06u7emJyuYTvw==
-X-CSE-MsgGUID: ryADAcHMQZurXRY1jwdndw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="32205819"
-X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
-   d="scan'208";a="32205819"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:12:26 -0800
-X-CSE-ConnectionGUID: l0GEebiuQESySZnmbSKkNw==
-X-CSE-MsgGUID: sum2nflCQ0mC0ZhxUsEOgw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
-   d="scan'208";a="120803198"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:12:22 -0800
-Message-ID: <787182e1-75af-43dc-b7dd-179664022170@linux.intel.com>
-Date: Wed, 20 Nov 2024 18:12:18 +0800
+	s=arc-20240116; t=1732097658; c=relaxed/simple;
+	bh=zQgyQ6rNld1w2hnJ6qmdnxM16RiQKDlHkw2A9ntziQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=axkxJ+YXRVhARMqH+ukHPt5/vcs9oRW1Dswq5Q+btF0Dc8LbzaHqssyQqkjHsz5ycfMFp35trGmLXZIvXybqCdfnrYrLpzMlEmJyb7nEejIxCM+hUFjTTS+9ypBdmB5wT4pv3llQTDwhmUBnCiLu7s1A7O7ZHIBl0BJXpLj6Mys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0mWPH6H; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732097654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=av9p20SWAfgWwb8vDSscvDluM5JyD7bnVlvqWBtouv0=;
+	b=B0mWPH6H10Q+YYmXpGdpuNjO+/T0R3YQqVZmXG2JnHFvJdgtKkLfEcOx/B78esYlIUfz+P
+	2mcmE4pVGlZ/etWXpSMcgiV0u8monM0nDseHYwrbG1xcA0TmJFVjUURjPKuf6bedbStB0O
+	d3Rj63ob6tO19u0T/7Zbebp/qT3g8f8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-112-2gTn_xmFMWW1-mAo5do5Ig-1; Wed,
+ 20 Nov 2024 05:14:09 -0500
+X-MC-Unique: 2gTn_xmFMWW1-mAo5do5Ig-1
+X-Mimecast-MFC-AGG-ID: 2gTn_xmFMWW1-mAo5do5Ig
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29FB91955D62;
+	Wed, 20 Nov 2024 10:14:07 +0000 (UTC)
+Received: from localhost (unknown [10.72.113.10])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51DC019560A3;
+	Wed, 20 Nov 2024 10:14:04 +0000 (UTC)
+Date: Wed, 20 Nov 2024 18:13:58 +0800
+From: Baoquan He <bhe@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce
+ PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
+Message-ID: <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
+References: <20241025151134.1275575-1-david@redhat.com>
+ <20241025151134.1275575-8-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 28/58] KVM: x86/pmu: Add
- intel_passthrough_pmu_msrs() to pass-through PMU MSRs
-To: Sean Christopherson <seanjc@google.com>,
- Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
- <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
- <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
- Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-29-mizhang@google.com> <ZzzX0g0LtF_qHggI@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZzzX0g0LtF_qHggI@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025151134.1275575-8-david@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+> s390 allocates+prepares the elfcore hdr in the dump (2nd) kernel, not in
+> the crashed kernel.
+> 
+> RAM provided by memory devices such as virtio-mem can only be detected
+> using the device driver; when vmcore_init() is called, these device
+> drivers are usually not loaded yet, or the devices did not get probed
+> yet. Consequently, on s390 these RAM ranges will not be included in
+> the crash dump, which makes the dump partially corrupt and is
+> unfortunate.
+> 
+> Instead of deferring the vmcore_init() call, to an (unclear?) later point,
+> let's reuse the vmcore_cb infrastructure to obtain device RAM ranges as
+> the device drivers probe the device and get access to this information.
+> 
+> Then, we'll add these ranges to the vmcore, adding more PT_LOAD
+> entries and updating the offsets+vmcore size.
+> 
+> Use Kconfig tricks to include this code automatically only if (a) there is
+> a device driver compiled that implements the callback
+> (PROVIDE_PROC_VMCORE_DEVICE_RAM) and; (b) the architecture actually needs
+> this information (NEED_PROC_VMCORE_DEVICE_RAM).
+> 
+> The current target use case is s390, which only creates an elf64
+> elfcore, so focusing on elf64 is sufficient.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  fs/proc/Kconfig            |  25 ++++++
+>  fs/proc/vmcore.c           | 156 +++++++++++++++++++++++++++++++++++++
+>  include/linux/crash_dump.h |   9 +++
+>  3 files changed, 190 insertions(+)
+> 
+> diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
+> index d80a1431ef7b..1e11de5f9380 100644
+> --- a/fs/proc/Kconfig
+> +++ b/fs/proc/Kconfig
+> @@ -61,6 +61,31 @@ config PROC_VMCORE_DEVICE_DUMP
+>  	  as ELF notes to /proc/vmcore. You can still disable device
+>  	  dump using the kernel command line option 'novmcoredd'.
+>  
+> +config PROVIDE_PROC_VMCORE_DEVICE_RAM
+> +	def_bool n
+> +
+> +config NEED_PROC_VMCORE_DEVICE_RAM
+> +	def_bool n
+> +
+> +config PROC_VMCORE_DEVICE_RAM
+> +	def_bool y
+> +	depends on PROC_VMCORE
+> +	depends on NEED_PROC_VMCORE_DEVICE_RAM
+> +	depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+
+Kconfig item is always a thing I need learn to master. When I checked
+this part, I have to write them down to deliberate. I am wondering if 
+below 'simple version' works too and more understandable. Please help
+point out what I have missed.
+
+===========simple version======
+config PROC_VMCORE_DEVICE_RAM
+        def_bool y
+        depends on PROC_VMCORE && VIRTIO_MEM
+        depends on NEED_PROC_VMCORE_DEVICE_RAM
+
+config S390
+        select NEED_PROC_VMCORE_DEVICE_RAM
+============
 
 
-On 11/20/2024 2:24 AM, Sean Christopherson wrote:
-> On Thu, Aug 01, 2024, Mingwei Zhang wrote:
->> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->> index 02c9019c6f85..737de5bf1eee 100644
->> --- a/arch/x86/kvm/vmx/pmu_intel.c
->> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->> @@ -740,6 +740,52 @@ static bool intel_is_rdpmc_passthru_allowed(struct kvm_vcpu *vcpu)
->>  	return true;
->>  }
->>  
->> +/*
->> + * Setup PMU MSR interception for both mediated passthrough vPMU and legacy
->> + * emulated vPMU. Note that this function is called after each time userspace
->> + * set CPUID.
->> + */
->> +static void intel_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
-> Function verb is misleading.  This doesn't always "passthrough" MSRs, it's also
-> responsible for enabling interception as needed.  intel_pmu_update_msr_intercepts()?
+======= config items extracted from this patchset====
+config PROVIDE_PROC_VMCORE_DEVICE_RAM
+        def_bool n
 
-Yes, it's better. Thanks.
+config NEED_PROC_VMCORE_DEVICE_RAM
+        def_bool n
 
+config PROC_VMCORE_DEVICE_RAM
+        def_bool y
+        depends on PROC_VMCORE
+        depends on NEED_PROC_VMCORE_DEVICE_RAM
+        depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
 
->
->> +{
->> +	bool msr_intercept = !is_passthrough_pmu_enabled(vcpu);
->> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->> +	int i;
->> +
->> +	/*
->> +	 * Unexposed PMU MSRs are intercepted by default. However,
->> +	 * KVM_SET_CPUID{,2} may be invoked multiple times. To ensure MSR
->> +	 * interception is correct after each call of setting CPUID, explicitly
->> +	 * touch msr bitmap for each PMU MSR.
->> +	 */
->> +	for (i = 0; i < kvm_pmu_cap.num_counters_gp; i++) {
->> +		if (i >= pmu->nr_arch_gp_counters)
->> +			msr_intercept = true;
-> Hmm, I like the idea and that y'all remembered to intercept unsupported MSRs, but
-> it's way, way too easy to clobber msr_intercept and fail to re-initialize across
-> for-loops.
->
-> Rather than update the variable mid-loop, how about this?
->
-> 	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
-> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, intercept);
-> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW,
-> 					  intercept || !fw_writes_is_enabled(vcpu));
-> 	}
-> 	for ( ; i < kvm_pmu_cap.num_counters_gp; i++) {
-> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, true);
-> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, true);
-> 	}
->
-> 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-> 		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, intercept);
-> 	for ( ; i < kvm_pmu_cap.num_counters_fixed; i++)
-> 		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, true);
+config VIRTIO_MEM
+	depends on X86_64 || ARM64 || RISCV
+         ~~~~~ I don't get why VIRTIO_MEM dones't depend on S390 if
+               s390 need PROC_VMCORE_DEVICE_RAM. 
+        ......
+        select PROVIDE_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
 
-Yeah, it's indeed better.
+config S390
+        select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+=================================================
 
-
->
->
->> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, msr_intercept);
->> +		if (fw_writes_is_enabled(vcpu))
->> +			vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, msr_intercept);
->> +		else
->> +			vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, true);
->> +	}
->> +
->> +	msr_intercept = !is_passthrough_pmu_enabled(vcpu);
->> +	for (i = 0; i < kvm_pmu_cap.num_counters_fixed; i++) {
->> +		if (i >= pmu->nr_arch_fixed_counters)
->> +			msr_intercept = true;
->> +		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, msr_intercept);
->> +	}
->> +
->> +	if (pmu->version > 1 && is_passthrough_pmu_enabled(vcpu) &&
-> Don't open code kvm_pmu_has_perf_global_ctrl().
-
-Oh, yes.
-
-
->
->> +	    pmu->nr_arch_gp_counters == kvm_pmu_cap.num_counters_gp &&
->> +	    pmu->nr_arch_fixed_counters == kvm_pmu_cap.num_counters_fixed)
->> +		msr_intercept = false;
->> +	else
->> +		msr_intercept = true;
-> This reinforces that checking PERF_CAPABILITIES for PERF_METRICS is likely doomed
-> to fail, because doesn't PERF_GLOBAL_CTRL need to be intercepted, strictly speaking,
-> to prevent setting EN_PERF_METRICS?
-
-Sean, do you mean we need to check if guest supports PERF_METRICS here? If
-not, we need to set global MSRs to interception and then avoid guest tries
-to enable guest PERF_METRICS, right?
-
-
-
->
->> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_STATUS, MSR_TYPE_RW, msr_intercept);
->> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL, MSR_TYPE_RW, msr_intercept);
->> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, MSR_TYPE_RW, msr_intercept);
->> +}
->> +
->>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
->>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
->>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
->> @@ -752,6 +798,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
->>  	.deliver_pmi = intel_pmu_deliver_pmi,
->>  	.cleanup = intel_pmu_cleanup,
->>  	.is_rdpmc_passthru_allowed = intel_is_rdpmc_passthru_allowed,
->> +	.passthrough_pmu_msrs = intel_passthrough_pmu_msrs,
->>  	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
->>  	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
->>  	.MIN_NR_GP_COUNTERS = 1,
->> -- 
->> 2.46.0.rc1.232.g9752f9e123-goog
->>
 
