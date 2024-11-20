@@ -1,136 +1,142 @@
-Return-Path: <kvm+bounces-32219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0155E9D439F
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 22:39:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D57F9D43A7
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 22:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADEBE1F2264A
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 21:39:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2D51F22A29
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 21:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D501BBBC5;
-	Wed, 20 Nov 2024 21:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE911C07F9;
+	Wed, 20 Nov 2024 21:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q8QgZP5t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nR6Tdwwc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79EF487A7
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 21:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1455B16130B
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 21:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732138772; cv=none; b=OmmRY8ZpLyl3TpCFzax1kl+BWONbqAoAPGmHFOM+n7eTOV1AjvvwvDUjF9bz1gUnmeWErOsZErM8aZpBl34RFBcz1alN7VO6iG1ysVdZhpFVAG96S9ZlNHGGyJIeI7l6WUwVQsTnAWIRHniAadwbDpU9ULACW1hLL3bfuHXuXtg=
+	t=1732139626; cv=none; b=SMh9zefUOBOkEmNUaRJSe4oec0gd95ThepA2nzUfg3LMZykDOzyxYTlIS9m/L4K9mTjwR5039ZyxiQJToGMS++huQkdLjDnPSVe5XrWB7gnTs3/J4X4+w0S7177INshC8Q+vUAsu4WPNYIjsfigCKfvKlxQGEvBNZ4VGcycDHGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732138772; c=relaxed/simple;
-	bh=/BQe4Gbb+uFT+ujNwYhSJw/aS998Q0OG/ciGQw1NrNA=;
+	s=arc-20240116; t=1732139626; c=relaxed/simple;
+	bh=r/VcHayKG4EaOZI8wo3ko4simcXIJKTk2WkBMfnIa5g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Oc+jFWwoQVl4cbfQBZ1Py/JZz78lWd/LIRZE/MntSgu/Pr3G2EPApZsVInd8iv1O2Q1RPAuCfkxu/EHFBoWgJo+Yoz5T9foy9kLIxpm+DTKitXF/BOi/qcRaRLvbV5cHSx+zN368iiviw71vCKtg6YqGm1JNi3P9sb94xYOaq3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q8QgZP5t; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=Q9c97e/RAcx/FIsxup6xXwfvXlOrRlveF1qTjgRq2kbaq679zWMOWZcaL4xCrlHUOc/PmvYFeC4pSbyLqCISZ0++Cs+QECWjEy1zWt9ufOKakkLMO8nDyaTK6x0UCNZY/3FtYxfUenVnBVsPxw5cc9FhlgBQ3A89a2GriQ1/ePg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nR6Tdwwc; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7eb07db7812so152480a12.0
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 13:39:30 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e388f173db4so356188276.3
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 13:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732138770; x=1732743570; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732139624; x=1732744424; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gj0xnR+YihGSrOOdkMHXu8Ean1HEzyg0u0w41evgapo=;
-        b=q8QgZP5tgWw/BTYORJMBbSnpnAhvLI3oBXhF244HP34+iQ+BO0ZHHYH2ohDJkOKyvz
-         SDuTLuNlpPrpeI4oXUuG/BSYDZpWJOPvEUVYXfUZM4AFeh24GnqudDm7U/x+7CfKJ1LX
-         2H+lyeTAVLMBn8vUyLcnEs/du9ltOqxPCgArAGgSXqie2WDKzV8Molm3JNoot66KD8qH
-         3Mki1ritvbF+u86v1+2YPf+4WRxHIg6lPmubUwtz9bQwNQgyef6wDJEzY7Cb8xarrB7C
-         0dS3YndkdjBxhfVtDIexLgUtWV6zzuphlqNOs3iA18ZC8vE/kuu8uDm4I9e78ebfJu5m
-         4Wrw==
+        bh=tZP9uLmhESgaddk7OpYGm45ZV5lLwiTS6B5XdgU7dFY=;
+        b=nR6TdwwcVlNYiN+XzdHpJcYmiXEvN7vVrlvIRK09BUPxQlwCB4Bs4Z6UDvotL+ohNE
+         w6QQftMa1TVqQK1cTCTQFkhbkLOgrgy1MLYDxCnk57y3sMtLg1QcYcIzsWzItWneEA/s
+         RjJg7rS1kToT51iZPH1CkHLDeFxbMPJCxRXtZDzYWi8dri2JdixXJSLHgRJqhbokrNBO
+         qa3qqIikYrRBgxepZEF1mvbPegJ4hTlCppIrBZSr1wwC9sSQHLZJWQw9p2/5sQ8A/Q7q
+         TrwpNDc5ce5dKKij1RaAw1Y9lyPEmuDcZsMFmEGR33FwX3wUp+RCFRRJTpyCJSl4Prxg
+         WZow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732138770; x=1732743570;
+        d=1e100.net; s=20230601; t=1732139624; x=1732744424;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gj0xnR+YihGSrOOdkMHXu8Ean1HEzyg0u0w41evgapo=;
-        b=W9YTna/t5SrvuBfHJ+Bv4mc3ddXHo8SSXjZC37BabMBwl1QEOvoluqc7wM3PIV9khY
-         IozIHVM8C1JMbPR70bKV0qa4hQ/b/ZwDVqMu56XZ6v4PIBCWMxUvQusvPp8cUIHRTNDw
-         WmPrnsAroMdm84ByZNr53KirU2dIc3DoqUYxhOZOxk5M71IkUWysdk1ECdWN7ZfgAwar
-         7EiDFLsVCbwaU78KpAG0un+hm74Z825+gP9krbgxWFR1pp4l8YS8IqFl0VTewjGSVPdw
-         +bqbeC4xfMiic/LL85/ovYfSM5FwUGf/c61GGcsM2EWC73Ap0BzqI5N7gEUwfvRPvwQG
-         aBsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVamZgQDiftZr5gM2bo2y25/zgGvEIggHYjONUuZREgYeN1l4A5/s0Kr4sKK20CxMt0mwE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiO1VxjsZTHUmJbAeiA6xrD9nVAovWbQZUai8JSFOZI82d6P3Y
-	v9NVWjnR9UyaZ1qTN8xP4rwIaSmAVfmLT4pk+9475CF65q6dX+EN6ovpqCrZSNepR3Ydc8tF4Ri
-	0SA==
-X-Google-Smtp-Source: AGHT+IFwgpeCsF7E/mW3H6upLySUXX0/rHDdngq/k4/nA2K9Ab8EASBovRUGrgle1qVrbu3iHARQK/Uppmw=
+        bh=tZP9uLmhESgaddk7OpYGm45ZV5lLwiTS6B5XdgU7dFY=;
+        b=XkB78yIUUdbxfkqKd577632UJhlB71kxXUGlZfUs84lZLDuH3Lw/pRKdu3cVcW/kP9
+         ceHJwYWxpvP4YsTE7YYSVFoSogszRcoUXBkyOWnLMq9+e+0Avtot2PoRn8bOy91bFvyr
+         KXbEszIkzdXCV1qsxqLSe3Oj//c934sOfWTPZk3ofv7Y+0ZDVasGLDzdTEQloK45KWxV
+         3CdHRTCxXkXLY4v71SkcwsDGW840b2XuFMGdMlaYjQrf17RWSffr3+Fb6ikPkFdE5bOo
+         ZKLKL8PaPdlc+8DHSqSCpjcLV6b+qsyLYMh7hCUadayP6sk+NIHHk2l29kqU7ZPKalgz
+         aeCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXaatwbcPMRqf2N8oR5iQXtbjHVtH7Pvwmv5eDic6xK/+u8I/U8PRIc3a8eGQLO5F2zaaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yylng/eTXdOaS3/Vb1bOtlfLYWZa4R47HcNdFRUm+qXx3KyCaux
+	61tFccQSK4fxAE1+6+n18E9qfuzCQi87DJg960HAur41GVy7zkvSUfk4CvOmIGxo8DzQKyHkx1I
+	liQ==
+X-Google-Smtp-Source: AGHT+IGffkcftOgF2KIRVjjRpawSwB9GtSSiFJjON/BGaimJ3oaflhdxoE6c2aPgB0fEGghARktE6MhGvsI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:7e57:0:b0:7a1:6a6b:4a5b with SMTP id
- 41be03b00d2f7-7fbb44c2dfbmr540a12.2.1732138769987; Wed, 20 Nov 2024 13:39:29
+ (user=seanjc job=sendgmr) by 2002:a25:d601:0:b0:e30:d445:a7c with SMTP id
+ 3f1490d57ef6-e38cb5470c0mr1664276.1.1732139623994; Wed, 20 Nov 2024 13:53:43
  -0800 (PST)
-Date: Wed, 20 Nov 2024 13:39:28 -0800
-In-Reply-To: <20240801045907.4010984-57-mizhang@google.com>
+Date: Wed, 20 Nov 2024 13:53:42 -0800
+In-Reply-To: <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-57-mizhang@google.com>
-Message-ID: <Zz5XEDX8NqnrHhj3@google.com>
-Subject: Re: [RFC PATCH v3 56/58] KVM: x86/pmu/svm: Wire up PMU filtering
- functionality for passthrough PMU
+References: <cover.1726602374.git.ashish.kalra@amd.com> <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
+ <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
+ <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com> <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com>
+Message-ID: <Zz5aZlDbKBr6oTMY@google.com>
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
 From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
-	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
-	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com, 
+	davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> From: Manali Shukla <manali.shukla@amd.com>
+On Tue, Nov 19, 2024, Ashish Kalra wrote:
+> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
+> > On Wed, Oct 02, 2024, Ashish Kalra wrote:
+> >> Yes, but there is going to be a separate set of patches to move all ASID
+> >> handling code to CCP module.
+> >>
+> >> This refactoring won't be part of the SNP ciphertext hiding support patches.
+> > 
+> > It should, because that's not a "refactoring", that's a change of roles and
+> > responsibilities.  And this series does the same; even worse, this series leaves
+> > things in a half-baked state, where the CCP and KVM have a weird shared ownership
+> > of ASID management.
 > 
-> With the Passthrough PMU enabled, the PERF_CTLx MSRs (event selectors) are
-> always intercepted and the event filter checking can be directly done
-> inside amd_pmu_set_msr().
+> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
+> patches got posted in the meanwhile and that had additional considerations of
+> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
+> into this discussion about splitting ASID management across KVM and PSP
+> driver and as you pointed out on those patches that there is zero reason that
+> the PSP driver needs to care about ASIDs. 
 > 
-> Add a check to allow writing to event selector for GP counters if and only
-> if the event is allowed in filter.
+> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
+> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
+> and once CTH feature is enabled, the SEV-ES ASID space is split across
+> SEV-SNP and SEV-ES VMs. 
 
-This belongs in the patch that adds AMD support for setting pmc->eventsel_hw.
-E.g. reverting just this patch would leave KVM in a very broken state.  And it's
-unnecessarily difficult to review.
+Right, but that's just a case where KVM needs to react to the setup done by the
+PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
+only that "firmware" happens to be a kernel driver.
 
-> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/svm/pmu.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> With reference to SNP GCTX pages, we are looking at some possibilities to
+> push the requirement to update SNP GCTX pages to SNP firmware and remove that
+> requirement from the kernel/KVM side.
+
+Heh, that'd work too.
+
+> Considering that, I will still like to keep ASID management in KVM, there are
+> issues with locking, for example, sev_deactivate_lock is used to protect SNP
+> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
+> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
+> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
+> complexity of adding this synchronization between different kernel modules or
+> handling locking in two different kernel modules, to guard ASID allocation in
+> PSP driver with VM destruction in KVM module.
 > 
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 86818da66bbe..9f3e910ee453 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -166,6 +166,15 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (data != pmc->eventsel) {
->  			pmc->eventsel = data;
->  			if (is_passthrough_pmu_enabled(vcpu)) {
-> +				if (!check_pmu_event_filter(pmc)) {
-> +					/*
-> +					 * When guest request an invalid event,
-> +					 * stop the counter by clearing the
-> +					 * event selector MSR.
-> +					 */
-> +					pmc->eventsel_hw = 0;
-> +					return 0;
-> +				}
->  				data &= ~AMD64_EVENTSEL_HOSTONLY;
->  				pmc->eventsel_hw = data | AMD64_EVENTSEL_GUESTONLY;
->  			} else {
-> -- 
-> 2.46.0.rc1.232.g9752f9e123-goog
+> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
+> which gets referenced during the ASID free code path in KVM. It just makes it
+> simpler to keep ASID management stuff in KVM. 
 > 
+> So probably we can add an API interface exported by the PSP driver something
+> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
+
+What about adding a cc_attr_flags entry?
 
