@@ -1,281 +1,282 @@
-Return-Path: <kvm+bounces-32163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C8719D3DB9
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:39:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081DB9D3DBC
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50FF3284A09
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:39:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85AD11F2272E
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB321AB6CD;
-	Wed, 20 Nov 2024 14:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84DD1B0105;
+	Wed, 20 Nov 2024 14:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="I/myns9o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fra+lEI8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080E719F424
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 14:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732113538; cv=fail; b=rh/x0tKNMGBCC1Rphaan6fhnPNouKWpPHW+bMdjTo+BrLWdUkZ3i3iPS8pPdlV9eVBS/kWGDTSVGGnVvVPqsa7y29TvIEu/54T9fXo0WrYt6RwafOL/p8mSRIVJ6bfBuaXXKM5scCBjz+A9aF+d0NzwC5I9V13/8CFDon8g6Iy4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732113538; c=relaxed/simple;
-	bh=8SNau7ZjhgIuiVbeUdGQ7P80hiE2e1NFH8cqdUEwGj8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=a9z8gEY0GggNcOoBj3YTVtd1yN6rND0xLiUnBTEeRvODm6F46+cQdH6N2+SV9eMG6djxYfKL+5LgY1jf44Jq2XMQZT5dT5AyctHa4IgzO4yjOpztr5KAgU7M3dmTwdDHhndVwayrrEc1ufAREQ3iTRS1DMhLiGNA59V140KoQTo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=I/myns9o; arc=fail smtp.client-ip=40.107.237.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dJLlKq/mdLes4dc+JwJelEFXzSCndTs7TC7BzfJBr/O9ZW9VMuN1LGO2nwhwHkfmyjIUZljxKsehww7vEcK1EEvFGmqYbesSMZF81EI8w28WvaOlqkgZZKGoosZ/SVhD1JoCKBsZnIvZTtKgcvEaqfwdBjWTKYRLpg5V0cqnMktzIbSOQI4BF9YCkPRLzqxK6xDKmfv7LaBzENV/NTdsMXt7xJy7xkmeFTs1jtEOMizchCuy7euvOpxmH+hRYD9uDQVZTBQn4Kupeexy3Wbe3hBj2bG7RU4pLVFMUFCO9lYOgavflk8x2Bx3rlG6rKGW2M7e+5ORK1BJJ24/KzGLuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZanLZJSg1vNTakdUDyazLicG7MncEb2+IfUVNaZFIKs=;
- b=SbnaRg8Y6gU7Ks+nWUlI8Ej3oVVbPdo6SdxPGKGC1nrH7I2dskWL2YSWbFzEDj16glimcw+uD3X7/kJedmgyV+F5g64CrkzjF5HfjdU1jTul5sHwbztXpwXXRFFHrKFBJmErDdvtdPwuHq+5Lmn0Dr3+Rmj5CLcexVsArS2MfSrmtnp8/SWJmTlbX/w6EkNLWLsEosH2/125TiuZaw7oFeGYsYyX7gxnS/VGQeRwpcN2TJ13Qugzy8XGfFrZbzfSR4abQ2PcdDwPtpXwN/4St+yleFjjXIAU1B64lji8OU3h/0BR4gzC0mpknc2Ankwighc14DPR7W9DKbOj/9d7xQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZanLZJSg1vNTakdUDyazLicG7MncEb2+IfUVNaZFIKs=;
- b=I/myns9o5fyDHzbvZfeRrfWKtDdWkXgseMYWfXQDyP9b1dONgiTFYUIHYACVgy2nem1mT3izk3zNg70FVxtwyKRFUx2CHtthFFDFByLjju4G7PMBCCcDF+ggTvTCJG7cEWBKs2ULJORgoky2TzOJLfNfGUAYcuiJ28iN/SKENP4vef438DDbv3peIp9b3hWCsp26VIpAJr1Q+TcpOW5UupyuPQEXjE9UP4VkF7NV3H7o4xirL8qZZK8/SIYeDM/DHpvWwEVi9PFdXHlsIFTHbW0gSsjLT6aCjXVuKoK0woPPFy78fHU2xD0Exm7OPS9h6OzAmbcakdeWTfVv/Bmptg==
-Received: from SJ0PR03CA0165.namprd03.prod.outlook.com (2603:10b6:a03:338::20)
- by DM6PR12MB4267.namprd12.prod.outlook.com (2603:10b6:5:21e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.15; Wed, 20 Nov
- 2024 14:38:50 +0000
-Received: from CO1PEPF000042AE.namprd03.prod.outlook.com
- (2603:10b6:a03:338:cafe::87) by SJ0PR03CA0165.outlook.office365.com
- (2603:10b6:a03:338::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.24 via Frontend
- Transport; Wed, 20 Nov 2024 14:38:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000042AE.mail.protection.outlook.com (10.167.243.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8182.16 via Frontend Transport; Wed, 20 Nov 2024 14:38:49 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 20 Nov
- 2024 06:38:28 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 20 Nov
- 2024 06:38:28 -0800
-Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 20 Nov
- 2024 06:38:26 -0800
-From: Avihai Horon <avihaih@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <kvm@vger.kernel.org>, Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe
-	<jgg@nvidia.com>, Maor Gottlieb <maorg@nvidia.com>, Avihai Horon
-	<avihaih@nvidia.com>
-Subject: [PATCH] vfio/pci: Properly hide first-in-list PCIe extended capability
-Date: Wed, 20 Nov 2024 16:38:26 +0200
-Message-ID: <20241120143826.17856-1-avihaih@nvidia.com>
-X-Mailer: git-send-email 2.21.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A2219D8A0
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 14:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732113575; cv=none; b=nMCfU6BH65vacWUymbuMt9a4coxJZD7Lvsc3CncuDCzwXPg0xgt6ZSiiUxZJrC+W9Le8ZipM+/JQdRsJNkgejGJpImK9FzwCTR9rzyA9pIpTTHm78NYIW3UnyODPuM4qkzmpawO9fGZ0vjfHCw8ne2652nzGec1VeOb5qp9qrlg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732113575; c=relaxed/simple;
+	bh=btSNVYwlC8RJUtn0GBIme5+bVVj7TfwEc6LV82NkhM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SryjtIhx7FV6myVsgETzC0FcgN6xzlMyMfQExcLsAk0D+SKNGdB8y41sYhqrxgpWvlfOrxDEkCoiZIzW6+Ve0enI5hayzYErjLFQ/LfFyUG577zoBSjT5JJFSMQkwYq4LRsITPljnzja8hyL8CDOHYBVkr9x0TWlekOIvuR+b/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fra+lEI8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732113573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=h3VNC3b6pyuHC0GRlERPYXF58+ZikMBaiQzrtXGN3kc=;
+	b=fra+lEI86i0iAislvCJZ6jMe46dqRCAYdd8eG03t0CXmO49Dv0zmUeSYKQQFZRRjCKWSvz
+	SedOVB1o5V1dJXfU4M6mc/PfgbWEGUeHXh8ib/QbeAKO0nsgRDQoYk8FpjsYyrAIdNU9y+
+	hDVXqacJnpyGip5KhafEeWbgguFjlXU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-LV4Z-ucHNzaHlYQukFX6Mw-1; Wed, 20 Nov 2024 09:39:31 -0500
+X-MC-Unique: LV4Z-ucHNzaHlYQukFX6Mw-1
+X-Mimecast-MFC-AGG-ID: LV4Z-ucHNzaHlYQukFX6Mw
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38236ca50d5so1946624f8f.0
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 06:39:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732113570; x=1732718370;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=h3VNC3b6pyuHC0GRlERPYXF58+ZikMBaiQzrtXGN3kc=;
+        b=diykh2g8h7CeulcNU7HD91BTTzJ7CwTSTyKBH1Sc+Q1+rsiyTSlQU2GraRpHpYlSmG
+         tQtH2ipFCzcAO52LSVM3vAxjwJL9zGnxgK9U//86PtzD8gMdF8Y56zUecXBAdI28mpmE
+         4VgsmE7x5lhT3B3Ls+itmOix8JB7r96lThPERPQSPkxZnKS5VU5BhnRbq55tUtVWStc4
+         oWtvD2WB+elJBRVwVtBZ15us1c1Tt5++TqnImg24BmjpF8ym0V/QqgBeVBVOwDevXU/j
+         tUUiOrQIuot/osk+qjleAE+BIyZAhOEz+guHzvsD+gL62AS9n7QA/rwmxSBG5eAvUPn8
+         EQeg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdWkT24jQYbOMXH6m+IctEUZIZY8EJt8tyU/VJE8ewE04UMkLCIhj1twvKWni4Kml0ohE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ2HfSuWEzWFYpESs/5t4YI5dG3Yx9gS+09jwaWhS5UVQ5a3O4
+	7j5TwO+AZIUvNuV5bwwoNUlRBrb5m8L+2yprAfpsKyWkHXtFypW59JYVi6pLDpo7zOYmxAriwWY
+	Mba7aTJIlmdhOcNTypZe2GLlhN/GnzEhr/ENAQwuhPZbih17nRA==
+X-Received: by 2002:a05:6000:2d01:b0:382:5284:995 with SMTP id ffacd0b85a97d-38254af52edmr1741465f8f.16.1732113570638;
+        Wed, 20 Nov 2024 06:39:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF3PCfqnU0zEBWkF3nAGnG0ftAq5fWrullBMMZxuX6xEoDVnbaIbozVyZf2Yd0u6zKlmX8E6w==
+X-Received: by 2002:a05:6000:2d01:b0:382:5284:995 with SMTP id ffacd0b85a97d-38254af52edmr1741442f8f.16.1732113570280;
+        Wed, 20 Nov 2024 06:39:30 -0800 (PST)
+Received: from ?IPV6:2003:cb:c705:4200:ce79:acf6:d832:60df? (p200300cbc7054200ce79acf6d83260df.dip0.t-ipconnect.de. [2003:cb:c705:4200:ce79:acf6:d832:60df])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b45d4c68sm21058255e9.22.2024.11.20.06.39.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Nov 2024 06:39:29 -0800 (PST)
+Message-ID: <3ed18ba1-e4b1-461e-a3a7-5de2df59ca60@redhat.com>
+Date: Wed, 20 Nov 2024 15:39:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AE:EE_|DM6PR12MB4267:EE_
-X-MS-Office365-Filtering-Correlation-Id: 032195fb-9cab-4522-d053-08dd09710c3a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FPbR0SJEJwNl61MJ9hwwYKy17FwY2ZPOkp72xN0BPKiwFATC8pFpbYBhk0Q6?=
- =?us-ascii?Q?DeUo60W/0qaxMHwqWgY8am6FFk4mKw9nrkpQS9EPxlc8tjiL66jppoHefM5u?=
- =?us-ascii?Q?hjWxMP1Afss+NNH5dStreOUhMIdpDiC5Bdiu7Q2UEbfJ7+NjVZkC3/D3ThFw?=
- =?us-ascii?Q?yR6HDN+X+Rcf1BWkrUyLwN6D6j/OArKNBwDPCLTPbxLsG/SLdw0A19vWVf+V?=
- =?us-ascii?Q?o6y0QZr2Svqp++MGQwq/85k9qyeVAD4K/Skw2Ku6w5rI4HO/UHHUY3JfsInW?=
- =?us-ascii?Q?ZAellKvwQP/vUvXkFRV2PZKZDPx3nQ0PQyGtiI3J2CtjEEcHhEXN0DFRz0en?=
- =?us-ascii?Q?mHTnwStKaiWJZ05DKOJvMtn/N4GEVCRgqsqIbUGpNOG2v1W9y5i82AZTApkC?=
- =?us-ascii?Q?SBuuGEN2HJLH4k+PqqFIheRkKeT3rrR8VRGiJpvXsryDwSM8fyg11xFaRmD6?=
- =?us-ascii?Q?HGpiDI4XZkVO94Awej4GDfbxpIK/BAdUcdXX+hUwOL+IuPK8bvq/1NtxRcHW?=
- =?us-ascii?Q?LZLidztiSnrQifPl0f78zhAVbH35jeI3Qr8P52pd+A3YtPh+8Hd4LHTWkZrm?=
- =?us-ascii?Q?5aVHwLQFcF6dG0iolBkGDI9zfdX9+ZDdpXlMX0kyBOWwIuINYrJarYOTCIhh?=
- =?us-ascii?Q?52jzbkxS5jKxSo7F08y7gkAA+V2/of9eBg2T9XoCp5tHSkOOpIKUw5nSUKAB?=
- =?us-ascii?Q?UlT4HsBLQxk+WE2V5S4M1qWiip0Zb/EbWVcOe1kctSZKZgsihY2HtfVcHhtv?=
- =?us-ascii?Q?bfUOgcNR9F3C+aa0UurCzgUoum5D8RoO25eLx7UUxSlKsSCUgHPZ8ZT1fE/m?=
- =?us-ascii?Q?X3+Xkk8D/kLJxdWXUPzioGfk67dyafCZFW3WhhPqX3QBLDW2gskIGbJH62qg?=
- =?us-ascii?Q?nUgwAuh/Cgd+7zgPGbf3P0/PCM25FkzonV8uSoOPkaGkqx4qi8jRs4hFPW2Y?=
- =?us-ascii?Q?CoGGd4Uhrs5E+eYYvBi9N2lPw+zkvXWK5US6FOM98iyvyYYmj1RC/baKEo88?=
- =?us-ascii?Q?s0cQW6V0HbCMP7u8H3cXN1Tnu0IoQf5WgkO3LCLQq+IIPNwD3v2/RammU3Y1?=
- =?us-ascii?Q?j1N390IToM0JF+KK5EQErXCc/ir5Tq+1WwqwzUKHdcosNDAkwKhiqZYw47CT?=
- =?us-ascii?Q?/0GeM/V1+DrXM6l4PWZDlIjHj/Uz0vm4x1BPABovN6qdU8sk1+8J/4LhAEuz?=
- =?us-ascii?Q?r83zZLZNb4THIpwUxkwFkozLKoiTkRuvgrzl2twYzmlFyDO2omwuffOxcmUv?=
- =?us-ascii?Q?43B5+flw1AqZsxggAy3/R69s2HHD40FQzyDe0XPsCpmQBBog636r603dCQ09?=
- =?us-ascii?Q?XHtwQmH/zQKrGO8BifBzhtFMi5oZ01HYeBkWo+8/a7g+dfDPAGtKjPiCoGSx?=
- =?us-ascii?Q?M1MuApT2J4WAjDpBVfRG8+sb65bOViMssVjDtBSqdxL1HWjauw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2024 14:38:49.6207
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 032195fb-9cab-4522-d053-08dd09710c3a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042AE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4267
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM
+ to detect device RAM ranges in 2nd kernel
+To: Baoquan He <bhe@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Farman
+ <farman@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>
+References: <20241025151134.1275575-1-david@redhat.com>
+ <20241025151134.1275575-8-david@redhat.com> <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
+ <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
+ <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There are cases where a PCIe extended capability should be hidden from
-the user. For example, an unknown capability (i.e., capability with ID
-greater than PCI_EXT_CAP_ID_MAX) or a capability that is intentionally
-chosen to be hidden from the user.
+On 20.11.24 15:05, Baoquan He wrote:
+> On 11/20/24 at 11:48am, David Hildenbrand wrote:
+>> On 20.11.24 11:13, Baoquan He wrote:
+>>> On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+>>>> s390 allocates+prepares the elfcore hdr in the dump (2nd) kernel, not in
+>>>> the crashed kernel.
+>>>>
+>>>> RAM provided by memory devices such as virtio-mem can only be detected
+>>>> using the device driver; when vmcore_init() is called, these device
+>>>> drivers are usually not loaded yet, or the devices did not get probed
+>>>> yet. Consequently, on s390 these RAM ranges will not be included in
+>>>> the crash dump, which makes the dump partially corrupt and is
+>>>> unfortunate.
+>>>>
+>>>> Instead of deferring the vmcore_init() call, to an (unclear?) later point,
+>>>> let's reuse the vmcore_cb infrastructure to obtain device RAM ranges as
+>>>> the device drivers probe the device and get access to this information.
+>>>>
+>>>> Then, we'll add these ranges to the vmcore, adding more PT_LOAD
+>>>> entries and updating the offsets+vmcore size.
+>>>>
+>>>> Use Kconfig tricks to include this code automatically only if (a) there is
+>>>> a device driver compiled that implements the callback
+>>>> (PROVIDE_PROC_VMCORE_DEVICE_RAM) and; (b) the architecture actually needs
+>>>> this information (NEED_PROC_VMCORE_DEVICE_RAM).
+>>>>
+>>>> The current target use case is s390, which only creates an elf64
+>>>> elfcore, so focusing on elf64 is sufficient.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>    fs/proc/Kconfig            |  25 ++++++
+>>>>    fs/proc/vmcore.c           | 156 +++++++++++++++++++++++++++++++++++++
+>>>>    include/linux/crash_dump.h |   9 +++
+>>>>    3 files changed, 190 insertions(+)
+>>>>
+>>>> diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
+>>>> index d80a1431ef7b..1e11de5f9380 100644
+>>>> --- a/fs/proc/Kconfig
+>>>> +++ b/fs/proc/Kconfig
+>>>> @@ -61,6 +61,31 @@ config PROC_VMCORE_DEVICE_DUMP
+>>>>    	  as ELF notes to /proc/vmcore. You can still disable device
+>>>>    	  dump using the kernel command line option 'novmcoredd'.
+>>>> +config PROVIDE_PROC_VMCORE_DEVICE_RAM
+>>>> +	def_bool n
+>>>> +
+>>>> +config NEED_PROC_VMCORE_DEVICE_RAM
+>>>> +	def_bool n
+>>>> +
+>>>> +config PROC_VMCORE_DEVICE_RAM
+>>>> +	def_bool y
+>>>> +	depends on PROC_VMCORE
+>>>> +	depends on NEED_PROC_VMCORE_DEVICE_RAM
+>>>> +	depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+>>>
+>>> Kconfig item is always a thing I need learn to master.
+>>
+>> Yes, it's usually a struggle to get it right. It took me a couple of
+>> iterations to get to this point :)
+>>
+>>> When I checked
+>>> this part, I have to write them down to deliberate. I am wondering if
+>>> below 'simple version' works too and more understandable. Please help
+>>> point out what I have missed.
+>>>
+>>> ===========simple version======
+>>> config PROC_VMCORE_DEVICE_RAM
+>>>           def_bool y
+>>>           depends on PROC_VMCORE && VIRTIO_MEM
+>>>           depends on NEED_PROC_VMCORE_DEVICE_RAM
+>>>
+>>> config S390
+>>>           select NEED_PROC_VMCORE_DEVICE_RAM
+>>> ============
+> 
+> Sorry, things written down didn't correctly reflect them in my mind.
+> 
+> ===========simple version======
+> fs/proc/Kconfig:
+> config PROC_VMCORE_DEVICE_RAM
+>          def_bool y
+>          depends on PROC_VMCORE && VIRTIO_MEM
+>          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> 
+> arch/s390/Kconfig:
+> config NEED_PROC_VMCORE_DEVICE_RAM
+>          def y
+> ==================================
 
-Hiding a capability is done by virtualizing and modifying the 'Next
-Capability Offset' field of the previous capability so it points to the
-capability after the one that should be hidden.
+That would work, but I don't completely like it.
 
-The special case where the first capability in the list should be hidden
-is handled differently because there is no previous capability that can
-be modified. In this case, the capability ID and version are zeroed
-while leaving the next pointer intact. This hides the capability and
-leaves an anchor for the rest of the capability list.
+(a) I want s390x to select NEED_PROC_VMCORE_DEVICE_RAM instead. Staring 
+at a bunch of similar cases (git grep "config NEED" | grep Kconfig, git 
+grep "config ARCH_WANTS" | grep Kconfig), "select" is the common way to 
+do it.
 
-However, today, hiding the first capability in the list is not done
-properly, as struct vfio_pci_core_device->pci_config_map is still set to
-the capability ID. If the first capability in the list is unknown, the
-following warning [1] is triggered and an out-of-bounds access to
-ecap_perms array occurs when vfio_config_do_rw() later uses
-pci_config_map to pick the right permissions.
+So unless there is a pretty good reason, I'll keep 
+NEED_PROC_VMCORE_DEVICE_RAM as is.
 
-Fix it by defining a new special capability PCI_CAP_ID_FIRST_HIDDEN,
-that represents a hidden extended capability that is located first in
-the extended capability list, and set pci_config_map to it in the above
-case.
 
-[1]
+(b) In the context of this patch, "depends on VIRTIO_MEM" does not make 
+sense. We could have an intermediate:
 
-WARNING: CPU: 118 PID: 5329 at drivers/vfio/pci/vfio_pci_config.c:1900 vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
-CPU: 118 UID: 0 PID: 5329 Comm: simx-qemu-syste Not tainted 6.12.0+ #1
-(snip)
-Call Trace:
- <TASK>
- ? show_regs+0x69/0x80
- ? __warn+0x8d/0x140
- ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
- ? report_bug+0x18f/0x1a0
- ? handle_bug+0x63/0xa0
- ? exc_invalid_op+0x19/0x70
- ? asm_exc_invalid_op+0x1b/0x20
- ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
- ? vfio_pci_config_rw+0x244/0x430 [vfio_pci_core]
- vfio_pci_rw+0x101/0x1b0 [vfio_pci_core]
- vfio_pci_core_read+0x1d/0x30 [vfio_pci_core]
- vfio_device_fops_read+0x27/0x40 [vfio]
- vfs_read+0xbd/0x340
- ? vfio_device_fops_unl_ioctl+0xbb/0x740 [vfio]
- ? __rseq_handle_notify_resume+0xa4/0x4b0
- __x64_sys_pread64+0x96/0xc0
- x64_sys_call+0x1c3d/0x20d0
- do_syscall_64+0x4d/0x120
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+config PROC_VMCORE_DEVICE_RAM
+          def_bool n
+          depends on PROC_VMCORE
+          depends on NEED_PROC_VMCORE_DEVICE_RAM
 
-Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-Signed-off-by: Avihai Horon <avihaih@nvidia.com>
----
- drivers/vfio/pci/vfio_pci_priv.h   |  1 +
- drivers/vfio/pci/vfio_pci_config.c | 18 +++++++++++++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+And change that with VIRTIO_MEM support in the relevant patch.
 
-diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
-index 5e4fa69aee16..4728b8069c52 100644
---- a/drivers/vfio/pci/vfio_pci_priv.h
-+++ b/drivers/vfio/pci/vfio_pci_priv.h
-@@ -7,6 +7,7 @@
- /* Special capability IDs predefined access */
- #define PCI_CAP_ID_INVALID		0xFF	/* default raw access */
- #define PCI_CAP_ID_INVALID_VIRT		0xFE	/* default virt access */
-+#define PCI_CAP_ID_FIRST_HIDDEN		0xFD	/* default direct access */
- 
- /* Cap maximum number of ioeventfds per device (arbitrary) */
- #define VFIO_PCI_IOEVENTFD_MAX		1000
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 97422aafaa7b..95f8a6a10166 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -320,6 +320,10 @@ static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
- static struct perm_bits ecap_perms[PCI_EXT_CAP_ID_MAX + 1] = {
- 	[0 ... PCI_EXT_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
- };
-+/* Perms for a first-in-list hidden extended capability */
-+static struct perm_bits hidden_ecap_perm = {
-+	.readfn = vfio_direct_config_read,
-+};
- /*
-  * Default unassigned regions to raw read-write access.  Some devices
-  * require this to function as they hide registers between the gaps in
-@@ -1582,7 +1586,7 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
- 				 __func__, pos + i, map[pos + i], cap);
- 		}
- 
--		BUILD_BUG_ON(PCI_CAP_ID_MAX >= PCI_CAP_ID_INVALID_VIRT);
-+		BUILD_BUG_ON(PCI_CAP_ID_MAX >= PCI_CAP_ID_FIRST_HIDDEN);
- 
- 		memset(map + pos, cap, len);
- 		ret = vfio_fill_vconfig_bytes(vdev, pos, len);
-@@ -1673,9 +1677,9 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
- 		/*
- 		 * Even though ecap is 2 bytes, we're currently a long way
- 		 * from exceeding 1 byte capabilities.  If we ever make it
--		 * up to 0xFE we'll need to up this to a two-byte, byte map.
-+		 * up to 0xFD we'll need to up this to a two-byte, byte map.
- 		 */
--		BUILD_BUG_ON(PCI_EXT_CAP_ID_MAX >= PCI_CAP_ID_INVALID_VIRT);
-+		BUILD_BUG_ON(PCI_EXT_CAP_ID_MAX >= PCI_CAP_ID_FIRST_HIDDEN);
- 
- 		memset(map + epos, ecap, len);
- 		ret = vfio_fill_vconfig_bytes(vdev, epos, len);
-@@ -1688,10 +1692,11 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
- 		 * indicates to use cap id = 0, version = 0, next = 0 if
- 		 * ecaps are absent, hope users check all the way to next.
- 		 */
--		if (hidden)
-+		if (hidden) {
- 			*(__le32 *)&vdev->vconfig[epos] &=
- 				cpu_to_le32((0xffcU << 20));
--		else
-+			memset(map + epos, PCI_CAP_ID_FIRST_HIDDEN, len);
-+		} else
- 			ecaps++;
- 
- 		prev = (__le32 *)&vdev->vconfig[epos];
-@@ -1895,6 +1900,9 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
- 	} else if (cap_id == PCI_CAP_ID_INVALID_VIRT) {
- 		perm = &virt_perms;
- 		cap_start = *ppos;
-+	} else if (cap_id == PCI_CAP_ID_FIRST_HIDDEN) {
-+		perm = &hidden_ecap_perm;
-+		cap_start = PCI_CFG_SPACE_SIZE;
- 	} else {
- 		if (*ppos >= PCI_CFG_SPACE_SIZE) {
- 			WARN_ON(cap_id > PCI_EXT_CAP_ID_MAX);
+
+I faintly remember that we try avoiding such dependencies and prefer 
+selecting Kconfigs instead. Just look at the SPLIT_PTE_PTLOCKS mess we 
+still have to clean up. But as we don't expect that many providers for 
+now, I don't care.
+
+Thanks!
+
 -- 
-2.40.1
+Cheers,
+
+David / dhildenb
 
 
