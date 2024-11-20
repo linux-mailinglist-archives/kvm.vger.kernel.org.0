@@ -1,89 +1,66 @@
-Return-Path: <kvm+bounces-32133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB9C9D3531
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 09:17:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C1B9D35F3
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 09:53:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6088D283297
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 08:17:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B4A2B23C62
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 08:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA264170822;
-	Wed, 20 Nov 2024 08:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBC81865E5;
+	Wed, 20 Nov 2024 08:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcqAYNOG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gzqe1rXw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649F054728
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 08:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBD250276;
+	Wed, 20 Nov 2024 08:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732090623; cv=none; b=M3/wF1vjRrjArtfNci6i/wDWeCTTtPe4FR7Ma/9cp9RnRxAfaoIwtftBgIfNMT8oS6aNhhybZzIxG1Lpfi/tlL1fx67+xsu4f2Cw89G34n1PhmN4TxiD2afq4tX5SU0vWJOdfvZAwL8F5GTHdZjmPJ+lAwE0FJ+9j3p5+r+LNDg=
+	t=1732092779; cv=none; b=AlgfT7bFWU/LIN2QK2URNn1d6FM1eEZalwxspSp+NvGmzff+Mo8mUrpscjKlU5U4ndLIe2Aan1a6GsnMkCfnUEqhItLlgF1AqarvK8dosCNUMhnEjxswUak2vL6CFjdPIXKDgu3aldgf2uua39sc0zli//QNn4H/tXIUdp1sQvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732090623; c=relaxed/simple;
-	bh=J2TsdtPCgP5LRufY3ErUZof4EWazxz3/al0T57jgMx4=;
+	s=arc-20240116; t=1732092779; c=relaxed/simple;
+	bh=jqzSeCffgKwl2e+YsJwV22juE1J7GGkkNSKBdv2GvYQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ny1ZpnDDF0oLpfFzS4rYsaA2K/gI0GOEuKCGY/ZI+9uWRHn8E6Xj8LeVrDTsDOrE6UPxfYesVoM7IufMIS9lXZM+Pjklpn48FANFFq2E1mLL8bpVerr06YKUm6WpX2XAwv1//ehtSN7g08cni4iEef8nczv00yjGIkx0l5Bsk/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YcqAYNOG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732090621;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gLoIyx3MwjYje1cCzOJ5zph/jdarSH9KY05cS8kqUro=;
-	b=YcqAYNOG81H1DcDRMtZMLyD2U75DQ9FwVrBEg9/LaplUh8B0jV3m1rdlejw35CvyMQfB0E
-	erpvfkGAAHe1jjq17BqjHUeHwXGk7eCr4D3rgiIF8I9FGnDwkhWL8/QBIThWbw23ROnoEl
-	Vls/U4VI66YnnmLasF0of9HeDBZgydA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-xwZYZB6JPMep3tIsEwHwCg-1; Wed,
- 20 Nov 2024 03:16:58 -0500
-X-MC-Unique: xwZYZB6JPMep3tIsEwHwCg-1
-X-Mimecast-MFC-AGG-ID: xwZYZB6JPMep3tIsEwHwCg
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5768E19560A1;
-	Wed, 20 Nov 2024 08:16:55 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 790CA1955F43;
-	Wed, 20 Nov 2024 08:16:53 +0000 (UTC)
-Date: Wed, 20 Nov 2024 16:16:38 +0800
-From: Baoquan He <bhe@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v1 01/11] fs/proc/vmcore: convert vmcore_cb_lock into
- vmcore_mutex
-Message-ID: <Zz2a5gZq81ZVdFOx@MiWiFi-R3L-srv>
-References: <20241025151134.1275575-1-david@redhat.com>
- <20241025151134.1275575-2-david@redhat.com>
- <ZzcUpoDJ2xPc3FzF@MiWiFi-R3L-srv>
- <2b5c2b71-d31b-406d-abc5-d9a0a67712f5@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mAmq81C80g4HZxE78Q6A57oeGfLzvjougSb2VysVdcQJv03tWQH9qgGnWoQD1xV9rhh3vfa06+D3usldyeOgnng0TTJlfhILfNdHHyKOelkZFcXtrXzlKZ7cftG0a76g4LPq5ivJFJ55roWcm2thdO/i/4X0IftMiSb4nGguRMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Gzqe1rXw; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=jduJ178qgdK5BAmuRB8bUI3Uay+hyDu+MXXtJ5Xz4wY=; b=Gzqe1rXwcqU62Zz8HPkWOQrYLm
+	WDwHOXSf8sN6k2Zmqj6EWOT/22aEn8EBPDRUqJAxYVQyD7suFu79yKIcGL+tT+IkyZCLLpcBZ5OJ0
+	hi9JiRAoguReGgvxwwsGiBY1P7gyHls8fH7kEJEEvO67j9yMqYtORGmZUOw4QtRjOCS7vcSiAp5hL
+	QZbxXdz/iN2hAKqmO4eJqcYwC4A23EKDv6wXtkhg08WwX0YKQi9xEcgF7F7jUR8mLjT22nx+aEtCS
+	lGP2m6UmLSauunqXGGt0/De04SrlzrqkGTNfZjcrjuSo62Pma9/+L+GYzZtbhLy0fplK/inlrucyG
+	1ylFkNdQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tDgSD-000000052wP-39Li;
+	Wed, 20 Nov 2024 08:52:55 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A336B3006AB; Wed, 20 Nov 2024 09:52:54 +0100 (CET)
+Date: Wed, 20 Nov 2024 09:52:54 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+	linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+	jthoughton@google.com
+Subject: Re: [PATCH v2 01/12] objtool: Generic annotation infrastructure
+Message-ID: <20241120085254.GD19989@noisy.programming.kicks-ass.net>
+References: <20241111115935.796797988@infradead.org>
+ <20241111125218.113053713@infradead.org>
+ <20241115183828.6cs64mpbp5cqtce4@jpoimboe>
+ <20241116093331.GG22801@noisy.programming.kicks-ass.net>
+ <20241120003123.rhb57tk7mljeyusl@jpoimboe>
+ <20241120010424.thsbdwfwz2e7elza@jpoimboe>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,50 +69,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2b5c2b71-d31b-406d-abc5-d9a0a67712f5@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <20241120010424.thsbdwfwz2e7elza@jpoimboe>
 
-On 11/15/24 at 11:03am, David Hildenbrand wrote:
-> On 15.11.24 10:30, Baoquan He wrote:
-> > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-> > > We want to protect vmcore modifications from concurrent opening of
-> > > the vmcore, and also serialize vmcore modiciations. Let's convert the
+On Tue, Nov 19, 2024 at 05:04:24PM -0800, Josh Poimboeuf wrote:
+> On Tue, Nov 19, 2024 at 04:31:25PM -0800, Josh Poimboeuf wrote:
+> > On Sat, Nov 16, 2024 at 10:33:31AM +0100, Peter Zijlstra wrote:
+> > > On Fri, Nov 15, 2024 at 10:38:28AM -0800, Josh Poimboeuf wrote:
+> > > > On Mon, Nov 11, 2024 at 12:59:36PM +0100, Peter Zijlstra wrote:
+> > > > > +#define ASM_ANNOTATE(x)						\
+> > > > > +	"911:\n\t"						\
+> > > > > +	".pushsection .discard.annotate,\"M\",@progbits,8\n\t"	\
+> > > > > +	".long 911b - .\n\t"					\
+> > > > > +	".long " __stringify(x) "\n\t"				\
+> > > > > +	".popsection\n\t"
+> > > > 
+> > > > Why mergeable and progbits?
+> > > 
+> > > In order to get sh_entsize ?
 > > 
-> > 
-> > > spinlock into a mutex, because some of the operations we'll be
-> > > protecting might sleep (e.g., memory allocations) and might take a bit
-> > > longer.
-> > 
-> > Could you elaborate this a little further. E.g the concurrent opening of
-> > vmcore is spot before this patchset or have been seen, and in which place
-> > the memory allocation is spot. Asking this becasue I'd like to learn and
-> > make clear if this is a existing issue and need be back ported into our
-> > old RHEL distros. Thanks in advance.
+> > Is that a guess?  If so, it's not very convincing as I don't see what
+> > entsize would have to do with it.
 > 
-> It's a preparation for the other patches, that do what is described here:
-> 
-> a) We can currently modify the vmcore after it was opened. This can happen
-> if the vmcoredd is added after the vmcore was loaded. Similar things will
-> happen with the PROC_VMCORE_DEVICE_RAM extension.
-> 
-> b) To handle it cleanly we need to protect the modifications against
-> concurrent opening. And the modifcations end up allocating memory and cannot
-> easily take the spinlock.
-> 
-> So far a spinlock was sufficient, now a mutex is required.
+> Oh, nevermind... I see it's a gas syntax issue.
 
-I see, as we talked in patch 2 sub-thread, these information are very
-valuable to help people get the background information when they read
-code. Let's put it in patch log. Thanks.
-
-> 
-> Maybe we'd want to backport 1,2,3, but not sure if we consider this critical
-> enough.
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
-
+Not a guess, only mergable gets entsize, and progbits is a required
+argument per the syntax in order to specify entsize.
 
