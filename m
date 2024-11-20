@@ -1,140 +1,121 @@
-Return-Path: <kvm+bounces-32118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 012F69D32DD
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 05:04:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0199D3304
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 05:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFC6F1F23936
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 04:04:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4920B22CE2
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 04:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4085157495;
-	Wed, 20 Nov 2024 04:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2A5158858;
+	Wed, 20 Nov 2024 04:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QOjHkX1l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vRRieKB9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FC373176;
-	Wed, 20 Nov 2024 04:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C3315098B
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 04:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732075440; cv=none; b=RkSmbe5yXU1HWGR6eKd/c+PJbFu5i4H5GrC38kUY4HDi61exFDLgrMDQTMlmHKPewlOQEh8pTRmLid8aPB5tbb+imy3C2xDMLzZcsl1SlBAqcGUX1x+sJYymcPZ2PCx1hp/GJfM1AUra/nRjJ/EM1SG2KCyFp0cq2FLw628TKz0=
+	t=1732078466; cv=none; b=ISJAI8OfZT3BDIqPb0+XflvnDoMQzRZaII7+J1pTFG8/IuJ791lyMN0FeN/WWh1eZGFRDjyJMdAztrx2mdZACWFSdIOYroSYGy7rLGT0CvPKIlErbu0F260KwuNbN8UOwurIyRZ6nsnE9QoecvG0HIDwXOsUUDK86mZ0C5gIgQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732075440; c=relaxed/simple;
-	bh=r41Eb+fJ3uIywp8te8U4WHM8WHp7sJWz+VL8aPrV7nA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XmeJ/ZZSI9N2VMgzeJeI4JsS/46iH9H1vCubjHvAp7pncPz1EuywxHFzC/tA2hZHwagAF6BEJbRWLHsYodCEkOI4cq3HGEclogGffetgkAxs3fkAfWYQI4QiczG1jJ+T+neey3+l2i61lShJiE9oTE8HYOqhK0wTUJU/94JSjLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QOjHkX1l; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732075438; x=1763611438;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=r41Eb+fJ3uIywp8te8U4WHM8WHp7sJWz+VL8aPrV7nA=;
-  b=QOjHkX1lcMKxu0beETiggI9lEI9di234F+9PZMpvNG+rjzAOXoUowxkH
-   iZKSQ3qRt+RZKgKGKTPzVFA4bOSzE5fjGYkwCTDtrLKoUnvVbYai5K8yM
-   7eQyphlh6WkrYODsPDxJfDKnZD4KxL3/tJYBYZ/g0JdFX+e+pJvHLY7yK
-   HtfLnhexOdm5Gw+TvJKUCSzxYe5Z8m0caVHD7ht9ZARKSMabQ0UkOmP5h
-   xVaeA5cPFHFXu1dPyTIxQUP70ptBaZHP9BiDWIHaXX58xNfkSq0ZhM6qk
-   kSaVg/2pAPBBf6jPiUKU+LtX/fLbjeUg+WpIcs98QBRhM6Jp2A4IFlB30
-   A==;
-X-CSE-ConnectionGUID: rahOZsykToeqMGuthCgDfQ==
-X-CSE-MsgGUID: nsl/syGFSK6YfHrBC7Cy2g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="36024545"
-X-IronPort-AV: E=Sophos;i="6.12,168,1728975600"; 
-   d="scan'208";a="36024545"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 20:03:57 -0800
-X-CSE-ConnectionGUID: sXZrxEyUSTSoSVppd524cg==
-X-CSE-MsgGUID: QFNulvvjSR6eI60JKfRu9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,168,1728975600"; 
-   d="scan'208";a="94243691"
-Received: from shiningy-mobl1.ccr.corp.intel.com (HELO [10.124.227.33]) ([10.124.227.33])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 20:03:51 -0800
-Message-ID: <6fc71b3c-fbc1-4fb8-9692-f85d3166a68f@linux.intel.com>
-Date: Wed, 20 Nov 2024 12:03:49 +0800
+	s=arc-20240116; t=1732078466; c=relaxed/simple;
+	bh=Ljz1BrQoWBFpeQ9m1RBteXaIKOeLwRVMaB6NrIwZjxI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fDYk+q7SQL/n3GEIcIbyUg9zaQr5pH1KBqjRn2nL0x33bGS6qLT4rLb+BC2mJBhBLTN1n15lzUC4tXUa92FTkxtUZRt/7cZY2efYAyXolMOI/WY9pstbj45T6aYKcL6xOxjLn3aiEtDxUoMsGygznKMHsvORnGx5xfY6OM9uYJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vRRieKB9; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5cef772621eso8123074a12.3
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 20:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732078463; x=1732683263; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+w9doJ3O9i/6/XMKrJrXKq0re8dFhV90KwO8YySlAAY=;
+        b=vRRieKB9DbTTdn4Y4mOziFJYknrUcAuHHohR0+GX3NXcUbvihp0/WmNqw+ZmwA8Iur
+         4dY5fLgK5u/T42phMTQPZXdgVlKrxAwbdfhkR+hS1FQ8iJ5Zo+kPVCOnVps41tUWHd6e
+         ye77gfyy+AAI3TtfDo5pR7O26dcAMQOsi8PL5epADePgU5jeAHMTgDKQEydpTbIWljaT
+         UxxJqXDtHGC0oNBt4HnZuQrAhYmsPoFBlA3PuLdTe883QIrT+fdVtwB+ENepxAb0pyyT
+         msZ7noNtk2ZMFdTxW5O0tpRoRjVCvKx9XxG2cSc+2kfOh4VhOqScT+C3H43YR22ich0A
+         fj7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732078463; x=1732683263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+w9doJ3O9i/6/XMKrJrXKq0re8dFhV90KwO8YySlAAY=;
+        b=VNZ3+bl1l3S4z/6kIVuUDQHwr5XXoKooDVi8ymn4ZCXle3aTULk7W100/0o9e4OHCg
+         PECkO+v6oJODNQavVOQdcEN9l6YZcz3f+Er3GzcEPdv19D5GlWYD21qtl5fKbK7o29tJ
+         gPYGdKrjkZK9kAAp7qF7dBgQGmJUo0Layjaz37HpP3NlZjloDfwOa78TeY/j+4dit1eB
+         rUMdkzpxN4cdC8FBv0aAVIs7gQsfvH0VIMsrzxAj7oOtUbrwJcG+OiwMJ3gvyJbCgIH5
+         GuDg0n4UI1VFa3b5PB7SKPQxw4yzdrv8icskpj/PaLpyMtu92SqtezXV+J7YItvpiIuV
+         dHJQ==
+X-Gm-Message-State: AOJu0YykLj355Ye4Orkzs4ilVBDU1FdrAcQj33+DBFd7yj4Mo+vBtjaV
+	MVYZK5qkaBPwGnIcn1vxL0VnU9fuqxL+7WIH6IOaaUO+iKqcWyUQ/QwwrU0MsP+5ttA/zJhqF5G
+	wB209zFmpP77dSIFOtsAmNCO1L2Cyg5VPdDRM
+X-Google-Smtp-Source: AGHT+IEos66313b6UbkDPdhPCR7c7Rdq6Wz6ePwqCzAV+nNb/KnIiVj6Io9mpvbYz+26LP7GyAuEAEv8qrF03Msz1Og=
+X-Received: by 2002:a17:906:dacc:b0:aa4:9ab1:196a with SMTP id
+ a640c23a62f3a-aa4dd551c83mr107508966b.21.1732078463132; Tue, 19 Nov 2024
+ 20:54:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
+References: <20241119133513.3612633-1-michael.roth@amd.com> <20241119133513.3612633-2-michael.roth@amd.com>
+In-Reply-To: <20241119133513.3612633-2-michael.roth@amd.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Tue, 19 Nov 2024 20:54:12 -0800
+Message-ID: <CAAH4kHZ_A7-dNyMiyrZ2p46te=Xi7SRosS_kSjYvG6sJTcmb7A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: Introduce KVM_EXIT_COCO exit type
 To: Michael Roth <michael.roth@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org,
- pbonzini@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com,
- pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com,
- liam.merwick@oracle.com, Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Peng, Chao P" <chao.p.peng@intel.com>
-References: <20240621134041.3170480-1-michael.roth@amd.com>
- <20240621134041.3170480-5-michael.roth@amd.com> <ZnwkMyy1kgu0dFdv@google.com>
- <r3tffokfww4yaytdfunj5kfy2aqqcsxp7sm3ga7wdytgyb3vnz@pfmstnvtuyg2>
- <Zn8YM-s0TRUk-6T-@google.com>
- <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
- <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com>
- <20241119135327.zjxlczjbli3wdo5o@amd.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20241119135327.zjxlczjbli3wdo5o@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
+	seanjc@google.com, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com, 
+	liam.merwick@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Nov 19, 2024 at 5:51=E2=80=AFAM Michael Roth <michael.roth@amd.com>=
+ wrote:
+>
+> +struct kvm_exit_coco {
+> +#define KVM_EXIT_COCO_REQ_CERTS                0
+> +#define KVM_EXIT_COCO_MAX              1
+> +       __u8 nr;
+> +       __u8 pad0[7];
+> +       __u32 ret;
+> +       __u32 pad1;
+> +       union {
+> +               struct {
+> +                       __u64 gfn;
+> +                       __u32 npages;
 
+Should this not also include a vmm_err code to report to the guest? We
+need some way for user space to indicate that KVM should write the
+vmm_err to the upper 32 bits of exit_info_2.
+I don't think we have a snapshot of the GHCB accessible to userspace.
 
+I'm still not quite able to get a good test of this patch series
+ready. Making the certificate file accessible to the VMM process has
+been unfortunately challenging due to how we manage chroots and VMM
+upgrades.
+Still, I'm stuck in the VMM implementation of grabbing the file lock
+for the certificates and asking myself "how do I tell KVM to write
+exit_info_2 =3D (2 << 32) | (exit_info_2 & ((1 << 32)-1) before entering
+the guest?"
+A __u32 vmm_err field of this struct would nicely make its size 64-bit alig=
+ned..
 
-On 11/19/2024 9:53 PM, Michael Roth wrote:
-[...]
-> A few weeks back we discussed during the PUCK call on whether it makes
-> sense for use a common exit type for REQ_CERTS and TDX_GET_QUOTE, and
-> due to the asynchronous/polling nature of TDX_GET_QUOTE, and the
-> somewhat-particular file-locking requirements that need to be built into
-> the REQ_CERTS handling, we'd decided that it's probably more trouble
-> than it's worth to try to merge the 2.
->
-> However, I'm still hoping that KVM_EXIT_COCO might still provide some
-> useful infrastructure for introducing something like
-> KVM_EXIT_COCO_GET_QUOTE that implements the TDX-specific requirements
-> more directly.
-I am not sure it benefits much.
-Since the handling codes of REQ_CERTS and  TDX_GET_QUOTE in userspace are
-quite different, i.e., there will be little common code to reuse, but it
-requires KVM to convert the error code from the KVM_EXIT_COCO version to
-vendor specific versions.
-
-
->
-> I've just submitted v2 of KVM_EXIT_COCO where the userspace-provided
-> error codes are reworked to be less dependent on specific spec-defined
-> values but instead relies on standard error codes that KVM can provide
-> special handling for internally when needed:
->
->    https://lore.kernel.org/kvm/20241119133513.3612633-1-michael.roth@amd.com/
->
-> But I suppose in your case userspace would just return "SUCCESS"/0 and
-According to GHCI spec, besides "TDG.VP.VMCALL_SUCCESS", there are two more
-error codes "TDG.VP.VMCALL_RETRY" and "TDG.VP.VMCALL_INVALID_OPERAND".
-"TDG.VP.VMCALL_RETRY" could cover EAGAIN.
-"TDG.VP.VMCALL_INVALID_OPERAND" could be used to cover the other errors
-returned, i.e., EIO and ENOSPC according to your proposal in v2.
-
-> then all the vendor-specific values are mainly in relation to the
-> "Status Code" field so it likely doesn't make a huge difference as far
-> as what userspace passes back to KVM.
->
-> Thanks,
->
-> Mike
->
-[...]
+--=20
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
 
