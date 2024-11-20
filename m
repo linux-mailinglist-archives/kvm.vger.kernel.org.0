@@ -1,137 +1,133 @@
-Return-Path: <kvm+bounces-32192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D22CB9D416D
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:48:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 905979D410C
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:21:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45E91B2E90B
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:21:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 497A51F21A44
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502C215AD9C;
-	Wed, 20 Nov 2024 17:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469A61A9B57;
+	Wed, 20 Nov 2024 17:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OegT9nIc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="imE9zBIP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAB81474B8
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 17:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CE614831E;
+	Wed, 20 Nov 2024 17:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732123291; cv=none; b=ECOi9LsRqwrO/J/8wXaXiEKEYJ60s8lszLSkxkayO82bJUmJ3yrkgaR9bey12gjHSYreegQV8f7+2ky7WCsIvkyMSI1dnPlWobTe9zqm4A+XEdonz+yUbqwMgxYs6QfLWuxqX7kjYnHThhq0cbuKiuQP7zqaVrcQcxt2t7GYKVw=
+	t=1732123306; cv=none; b=PTL2m9+RIb6je55SDrUwKAX5aVexXl8GWXDY2qgMJ62Pc36uF05sxx6v8YgatFYQHNa+pB/iT6vf7ZHSPGNgcw8+yHZvVbqiVLxAm1HkI/Aqtk8gDA5Pk0H8Fut7LaWTCiokDM2MsrIzrdXfoiXRE+yCKqgc1zoJciT7tnUo8kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732123291; c=relaxed/simple;
-	bh=CJop96nqHatEPlDl540FRcn9W9BaV0zzMn5/xJ3Vb7Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Way2ls1VKgJcy2VScygMIGwh9Hqo54/jONdY/7al22sq+Ume9/39Y/0tpuPDluvY7HQhkxHXvI1oD7qU14pimrihmdbRobL/uOpZ0jHGRo8LlJIHCXsOrf870bvWX0NDoxxfQCVfmBAenkpPTRblYntpanTSky/dgZjwBIm+f9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OegT9nIc; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea4c541b61so41054a91.0
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 09:21:29 -0800 (PST)
+	s=arc-20240116; t=1732123306; c=relaxed/simple;
+	bh=NTciS5uR2bAcpu7nQc7zBidMJaiWZix4ilhuKQ1/pP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Jfd0kQU14X0eN/dKkGZatSHuHQeFYU+G+XdtUiOjjY+w7DbpCeWLAOU5U2EvS8QJ6rJhwoYfrVOy+S9S33O3uj1vuR0oXPJUzykGTn2N0J3/L0xTWY4suExzIxkSnsdxlygT4Hne0/hwFjd0xA3drsvmCZAYyTJcKDl2upjVeD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=imE9zBIP; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732123289; x=1732728089; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QYm1+/DifmKIs47tY/E+e2Kkbg+hWFuHiR3gJIBG9So=;
-        b=OegT9nIcel8NzVP/VKHkc/8AV49Kk8Av7ctR3ZkpilhArlZAoEO9Lve7q2nqx+aPcW
-         w82P6NC6Z2yMDNPfQvpvHu24MsY8wEwbnuAIa9gBnL5lIAJxVkCJDjk+rPWUcNHbrf2X
-         PJVYUuwE/PXI/Ik6F6c8wcSIRGEW1PW6HIvA2hsBf2cCsmEPIQDsWMChcpLes+W8Zamb
-         VprLo+vV9sZW4YDPLfnE9NN9wlMCfcwSCjG2UEJmcI9HT+97p/cUIU0yqA49Zq4ILxq2
-         b+nwGvgwGPT0od6vMzJHOUndHC/GuIoIYacE3kBaFmujR5UVnvrId3bhDxbyZSCCLNtX
-         i3rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732123289; x=1732728089;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QYm1+/DifmKIs47tY/E+e2Kkbg+hWFuHiR3gJIBG9So=;
-        b=AFwhhTInKkbepU17I10FR2aiI8Dfw8haXrM4hYhzUbrFHYxcqdQoPs8FqzIz3E8gWZ
-         WDZgBgtEFetqTE+zFT2SjU/HCnSi1g7xVrP0pnYDPPd2OdsNtpN6sqpXcOZBxIPIhA09
-         InS1ufssgNcDk++KL1rA92oemg1kOQASfmdfvz/CdPgbY5Pu2cJi1N8/GCbftIYlSZsC
-         xnbB2H4tYjgGLrfURpVsgC72nptU4uyU5s29D8XuSM1dRkEnGZtZRdfquIfgXZCrW/HX
-         pbv12ZgK2XjLxiDE2pYkhfHEvKN57elxzXfkqHpAXu4RyjdCEGZ1lG3lYNmTjgFZ4EOy
-         y0GA==
-X-Forwarded-Encrypted: i=1; AJvYcCU14/LgLD2n4T6KlvUzcveNYhrXTjTnpJLL3DhlKqH11vFBtmAO3awQvvhEhvFo1rCE8fo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQepj2IxmLkIN5VNQoylSDMnHwQF6PGCzyQF98CCBx62S5d4YR
-	5lHoOuLbu2oYlf/MYAHzCvhBYEZSsLiS3J95ZIXmduN+h2fn0/4q002FUtl7f0mq3+oO5w6x8Am
-	l2g==
-X-Google-Smtp-Source: AGHT+IFjM0AHV5w/pbVAw/W0N+Azm1Wcmv5XEOjBbMHF+D0N9N9UFx2xjFQJDpvv+DaYVc55A5nUDXwA2wg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90b:2389:b0:2ea:9ae0:6374 with SMTP id
- 98e67ed59e1d1-2eaca7db47fmr1930a91.6.1732123288237; Wed, 20 Nov 2024 09:21:28
- -0800 (PST)
-Date: Wed, 20 Nov 2024 09:21:26 -0800
-In-Reply-To: <e0e402d8-de8b-40fa-9d1f-270d8033d33c@linux.intel.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732123304; x=1763659304;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=3/fY0iM7juE2IxcKaSuL8G4jyBXYD27Dqt66/gwlyWk=;
+  b=imE9zBIPFC/1fqFeuRonDRUTShDe5OvvLrzOG2VDEZ3qaqK9vM1J9Z3k
+   p7DQqDwkUgUaFKoil60ELSxIs0MM4hkyWFBsWRveSqNp/tF+kMODMU4Qq
+   CInbnE9fHmA/p8Vz828xvcJf/7uPJ21al5ISi5kadkTmasxRSymO0qvEs
+   o=;
+X-IronPort-AV: E=Sophos;i="6.12,170,1728950400"; 
+   d="scan'208";a="696763459"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 17:21:39 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:22431]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.34.163:2525] with esmtp (Farcaster)
+ id fa3a87a2-973e-4cfe-b2e3-5253ed2bf86d; Wed, 20 Nov 2024 17:21:38 +0000 (UTC)
+X-Farcaster-Flow-ID: fa3a87a2-973e-4cfe-b2e3-5253ed2bf86d
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 20 Nov 2024 17:21:38 +0000
+Received: from [192.168.4.239] (10.106.82.23) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 20 Nov 2024
+ 17:21:37 +0000
+Message-ID: <03a12598-74aa-4202-a79a-668b45dbcc47@amazon.com>
+Date: Wed, 20 Nov 2024 17:21:36 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-25-mizhang@google.com>
- <ZzzE_z5x7D_trxnq@google.com> <e0e402d8-de8b-40fa-9d1f-270d8033d33c@linux.intel.com>
-Message-ID: <Zz4alrnDbQhqtkGl@google.com>
-Subject: Re: [RFC PATCH v3 24/58] KVM: x86/pmu: Introduce macro PMU_CAP_PERF_METRICS
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>, 
-	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
-	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/4] KVM: ioctl for populating guest_memfd
+To: David Hildenbrand <david@redhat.com>, <pbonzini@redhat.com>,
+	<corbet@lwn.net>, <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
+	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
+	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>, "Sean
+ Christopherson" <seanjc@google.com>, <linux-mm@kvack.org>
+References: <20241024095429.54052-1-kalyazin@amazon.com>
+ <08aeaf6e-dc89-413a-86a6-b9772c9b2faf@amazon.com>
+ <01b0a528-bec0-41d7-80f6-8afe213bd56b@redhat.com>
+ <efe6acf5-8e08-46cd-88e4-ad85d3af2688@redhat.com>
+ <55b6b3ec-eaa8-494b-9bc7-741fe0c3bc63@amazon.com>
+ <9286da7a-9923-4a3b-a769-590e8824fa10@redhat.com>
+ <f55d56d7-0ab9-495f-96bf-9bf642a9762d@redhat.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <f55d56d7-0ab9-495f-96bf-9bf642a9762d@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D005EUB002.ant.amazon.com (10.252.51.103) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Wed, Nov 20, 2024, Dapeng Mi wrote:
->=20
-> On 11/20/2024 1:03 AM, Sean Christopherson wrote:
-> > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> >> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> >>
-> >> Define macro PMU_CAP_PERF_METRICS to represent bit[15] of
-> >> MSR_IA32_PERF_CAPABILITIES MSR. This bit is used to represent whether
-> >> perf metrics feature is enabled.
-> >>
-> >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> >> ---
-> >>  arch/x86/kvm/vmx/capabilities.h | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabi=
-lities.h
-> >> index 41a4533f9989..d8317552b634 100644
-> >> --- a/arch/x86/kvm/vmx/capabilities.h
-> >> +++ b/arch/x86/kvm/vmx/capabilities.h
-> >> @@ -22,6 +22,7 @@ extern int __read_mostly pt_mode;
-> >>  #define PT_MODE_HOST_GUEST	1
-> >> =20
-> >>  #define PMU_CAP_FW_WRITES	(1ULL << 13)
-> >> +#define PMU_CAP_PERF_METRICS	BIT_ULL(15)
-> > BIT() should suffice.  The 1ULL used for FW_WRITES is unnecessary.  Spe=
-aking of
-> > which, can you update the other #defines while you're at it?  The mix o=
-f styles
-> > annoys me :-)
-> >
-> > #define PMU_CAP_FW_WRITES	BIT(13)
-> > #define PMU_CAP_PERF_METRICS	BIT(15)
-> > #define PMU_CAP_LBR_FMT		GENMASK(5, 0)
->=20
-> Sure.=C2=A0 Could we further move all these=C2=A0 PERF_CAPBILITIES macros=
- into
-> arch/x86/include/asm/msr-index.h?
 
-Yes, definitely.  I didn't even realize this was KVM code.
+
+On 20/11/2024 16:44, David Hildenbrand wrote:
+>> If the problem is the "pagecache" overhead, then yes, it will be a
+>> harder nut to crack. But maybe there are some low-hanging fruits to
+>> optimize? Finding the main cause for the added overhead would be
+>> interesting.
+
+Agreed, knowing the exact root cause would be really nice.
+
+> Can you compare uffdio_copy() when using anonymous memory vs. shmem?
+> That's likely the best we could currently achieve with guest_memfd.
+
+Yeah, I was doing that too. It was about ~28% slower in my setup, while 
+with guest_memfd it was ~34% slower.  The variance of the data was quite 
+high so the difference may well be just noise.  In other words, I'd be 
+much happier if we could bring guest_memfd (or even shmem) performance 
+closer to the anon/private than if we just equalised guest_memfd with 
+shmem (which are probably already pretty close).
+
+> There is the tools/testing/selftests/mm/uffd-stress benchmark, not sure
+> if that is of any help; it SEGFAULTS for me right now with a (likely)
+> division by 0.
+
+Thanks for the pointer, will take a look!
+
+> Cheers,
+> 
+> David / dhildenb
+> 
+
 
