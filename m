@@ -1,133 +1,172 @@
-Return-Path: <kvm+bounces-32120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A0189D3306
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 05:56:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F75D9D3318
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 06:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0A51F23613
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 04:56:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAD1E284350
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 05:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCEC157484;
-	Wed, 20 Nov 2024 04:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612B3156C71;
+	Wed, 20 Nov 2024 05:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2KHWw+QX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gA9q/N/B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB34742AAB
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 04:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FF92E3FE;
+	Wed, 20 Nov 2024 05:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732078555; cv=none; b=NRHN+mkQJUTEIXxJUuZWQ3A37LPU+dfHdBDJ2wccqxKEz1VyWaBhwGng40bvmxqo/K2XQmllQEx2SxEW++WEMlH7LGURWi2CsRKyuYm1WpMx2kHnJR9zz6LSwXRj+zlnnGiV97Kiww0vm4KstspGdOmRf/7GYmUcn15k5qV+4Nw=
+	t=1732080000; cv=none; b=TYuwHXpsdyg68iQxHgfo8pscpO4rUGGAjeP1fYXwio1UI0H8NkN6O81X8X+whu3dgzKC2k0I6U7QjzdfVph44ybN8kz5a46zhcDe5nNEYS395UdEOgC6MmfQ4sI8fb5Yv7pQbI1GI/adc4yf8Y6r/RDdPIA1lDkW1zfwJGOwK5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732078555; c=relaxed/simple;
-	bh=qidyDdoPMSrLqOEPcAD7Fm10v61MJZnJnKYjl/6vk68=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oxBoUeDFHBCAl5ahJB2ufcTDzqFAOczUAg5tn+8lKClfngaV/8ZS64nPmcR/CyPqbZIdM6W0p9i7t1+6MWYpPqSLDzewOpcgV5ixjyBFjRliA047/lbprHOTyJuA5+aBXiJEtbMnLDqyXFmkglY2Qap11Fi8B8YvmpDPhJiujk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2KHWw+QX; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa20c733e92so704417966b.0
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2024 20:55:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732078552; x=1732683352; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rLsyLORpZtZ6b2mAwzZkeZQ6i4pKu4Ce89IT06ouUsE=;
-        b=2KHWw+QXDv6nUb3d+NKqaevr/+grlnuz8jQjJ+j+FMPgBK/cVUJyNDSFRA6IyeQWhm
-         mDOucjhkUXSm2J1z6IQyKqaLsFNfmywSyjUmIyqkMb19nK2Il9vkqB7SSBw4ACi/WnZK
-         URrFbgj36nbc7fOOoXJdParYew5Xd9df8/J/cagsyIDFALwo05rjFUpoMp4wj9JgaLTG
-         nTcE/Qks39+gYiaLkrUDnOIFeyWTER1OEsgyYTzzZDlmWUqaPrsyPm/8eCsFVWKYD7pT
-         xQuuZzR0Q1/zHC/lEbrY+WAPAwEFNn6nYRD4CZJW/7aSkj5sXnzBc3jP0wGCrZlTTh1y
-         KMbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732078552; x=1732683352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLsyLORpZtZ6b2mAwzZkeZQ6i4pKu4Ce89IT06ouUsE=;
-        b=rUuGkkQ2dXPkHds4WFiK7aelVX2PBsUXOddK+1fRnqRBuzY/xt9Tj0qQLJbzPwNehy
-         TgvLG2qZFPIa2NmHBwe8Z5jjQXInuiWeQRpQdacmsQsad6nbULr32Kgh4xF3qs7ChcHz
-         jqlUNYc6Nt2xlhHEOIEoDQw2kvL/7EBMSzhxdveqkCTJA/+4hS/lEsjOPVpRjYYz53PA
-         Ghgk+5UENJjpw4u09h11FoWNWFKoJZ4gyvcB1BxkLB9KzjeyxRqofwHPyFdPQPDcqnWZ
-         Aqx+HNjJWNPJKgXeDG5hORyw/WiMSSfEGO/KXSgNwpPiM2xeeWkKWo8Fh9+Scuxni9zZ
-         EYYw==
-X-Gm-Message-State: AOJu0YxAaH8b2QVmY7q5WTN/y/yO9IfAwQxdCeb7e9kn2PO8iP0rhvp2
-	72SHDsHA0dKdgX7F4T4x9ZQaYtZWu2+13JQSKchq36yLoGkrQCY4oS9jizxFEuk1+bFn4HNWxBB
-	3NKACBNLD+9Rx8i8QYEqspZW5gvyRMZ0P9Qph
-X-Google-Smtp-Source: AGHT+IGineP2bUXtNwD1Ct4msCtFonm9FZ5ffyQckr3P3Efc8YypLgUph8KTFI3sRkQXjSxM5eevi7MkccDQbnEgqmo=
-X-Received: by 2002:a17:907:961e:b0:aa4:777d:7394 with SMTP id
- a640c23a62f3a-aa4dd52feabmr116533166b.11.1732078552227; Tue, 19 Nov 2024
- 20:55:52 -0800 (PST)
+	s=arc-20240116; t=1732080000; c=relaxed/simple;
+	bh=kHE5nqDH54rjOiMZFwRETDYCWKtnt4xOaXoWAO3K3Lc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sZGmzyu0ny8QxENzazqiwVjkf4JnWGURJXSH7CG/0zJSzCnwVQnP5UfltoHphF2eRwBbXWWjI1FXToRE7isGrQDNi7HfAho/nAteYPQyxzowWx4o8HF78dRzDQizCcvAfYJKlNu+dafcPgO137Z58b7EDVWR/VEvMYPfmuUWYhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gA9q/N/B; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732080000; x=1763616000;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kHE5nqDH54rjOiMZFwRETDYCWKtnt4xOaXoWAO3K3Lc=;
+  b=gA9q/N/B3e593m2ItZRTd9rbz4M5a5NSWXSIJQGl7q9aqw+SQvFetPBD
+   PqH8lz7+7kOpBWf3CGbT3RlXF/xJB3tSnJVGIbBpOiK8hD/qKTBrPIATK
+   Rh2zDgGOf/ZdtNoANLjE4VHL6gVKFekX9jyolrzQVWmpCZGfgFBRjoJYN
+   AGiD5AdN7Wqeda3eZGa8zfNLmct/SZp8eQlFIGzrKshAKYqm7uwxaCo8i
+   iRRrn1mhTwmjDyE9mO0V5sOI7LVlINMzzbWzi8AH7xrXSSSTYXgDYCGWL
+   +Mb6nQAVOo8uHIs501AKn28109QwrIXt027wWE+lWrQT7/CXo33ziWERN
+   A==;
+X-CSE-ConnectionGUID: G8YpKnYQRuyIY3X/rfkdug==
+X-CSE-MsgGUID: IFLFE1p9TRWeW70QIMbebw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="54620107"
+X-IronPort-AV: E=Sophos;i="6.12,168,1728975600"; 
+   d="scan'208";a="54620107"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 21:19:59 -0800
+X-CSE-ConnectionGUID: 5sXEIbUTS4mKQAqmID8f1g==
+X-CSE-MsgGUID: XbRSkJgnR7CkpmGWGiKVIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,168,1728975600"; 
+   d="scan'208";a="94869413"
+Received: from unknown (HELO [10.238.2.170]) ([10.238.2.170])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 21:19:54 -0800
+Message-ID: <b08075d5-1190-44f7-bccc-04f3273c13f3@linux.intel.com>
+Date: Wed, 20 Nov 2024 13:19:51 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241119133513.3612633-1-michael.roth@amd.com>
- <20241119133513.3612633-2-michael.roth@amd.com> <CAAH4kHZ_A7-dNyMiyrZ2p46te=Xi7SRosS_kSjYvG6sJTcmb7A@mail.gmail.com>
-In-Reply-To: <CAAH4kHZ_A7-dNyMiyrZ2p46te=Xi7SRosS_kSjYvG6sJTcmb7A@mail.gmail.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Tue, 19 Nov 2024 20:55:40 -0800
-Message-ID: <CAAH4kHYncFsa=5NZVX35jk3jicx1fnYTHsLwapHmJ03+TNKa9w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: Introduce KVM_EXIT_COCO exit type
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
-	seanjc@google.com, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com, 
-	liam.merwick@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 20/58] KVM: x86/pmu: Always set global enable bits
+ in passthrough mode
+To: Sean Christopherson <seanjc@google.com>,
+ Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
+ <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
+ <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
+ Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-21-mizhang@google.com> <Zzyw1UyapXDNpc-c@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <Zzyw1UyapXDNpc-c@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 19, 2024 at 8:54=E2=80=AFPM Dionna Amalie Glaze
-<dionnaglaze@google.com> wrote:
+
+On 11/19/2024 11:37 PM, Sean Christopherson wrote:
+> On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+>> From: Sandipan Das <sandipan.das@amd.com>
+>>
+>> Currently, the global control bits for a vcpu are restored to the reset
+>> state only if the guest PMU version is less than 2. This works for
+>> emulated PMU as the MSRs are intercepted and backing events are created
+>> for and managed by the host PMU [1].
+>>
+>> If such a guest in run with passthrough PMU, the counters no longer work
+>> because the global enable bits are cleared. Hence, set the global enable
+>> bits to their reset state if passthrough PMU is used.
+>>
+>> A passthrough-capable host may not necessarily support PMU version 2 and
+>> it can choose to restore or save the global control state from struct
+>> kvm_pmu in the PMU context save and restore helpers depending on the
+>> availability of the global control register.
+>>
+>> [1] 7b46b733bdb4 ("KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at "RESET"");
+>>
+>> Reported-by: Mingwei Zhang <mizhang@google.com>
+>> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+>> [removed the fixes tag]
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>  arch/x86/kvm/pmu.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index 5768ea2935e9..e656f72fdace 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -787,7 +787,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>>  	 * in the global controls).  Emulate that behavior when refreshing the
+>>  	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
+>>  	 */
+>> -	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
+>> +	if ((pmu->passthrough || kvm_pmu_has_perf_global_ctrl(pmu)) && pmu->nr_arch_gp_counters)
+>>  		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
+> This is wrong and confusing.  From the guest's perspective, and therefore from
+> host userspace's perspective, PERF_GLOBAL_CTRL does not exist.  Therefore, the
+> value that is tracked for the guest must be '0'.
 >
-> On Tue, Nov 19, 2024 at 5:51=E2=80=AFAM Michael Roth <michael.roth@amd.co=
-m> wrote:
-> >
-> > +struct kvm_exit_coco {
-> > +#define KVM_EXIT_COCO_REQ_CERTS                0
-> > +#define KVM_EXIT_COCO_MAX              1
-> > +       __u8 nr;
-> > +       __u8 pad0[7];
-> > +       __u32 ret;
-> > +       __u32 pad1;
-> > +       union {
-> > +               struct {
-> > +                       __u64 gfn;
-> > +                       __u32 npages;
+> I see that intel_passthrough_pmu_msrs() and amd_passthrough_pmu_msrs() intercept
+> accesses to PERF_GLOBAL_CTRL if "pmu->version > 1" (which, by the by, needs to be
+> kvm_pmu_has_perf_global_ctrl()), so there's no weirdness with the guest being able
+> to access MSRs that shouldn't exist.
 >
-> Should this not also include a vmm_err code to report to the guest? We
-> need some way for user space to indicate that KVM should write the
-> vmm_err to the upper 32 bits of exit_info_2.
-> I don't think we have a snapshot of the GHCB accessible to userspace.
+> But KVM shouldn't stuff pmu->global_ctrl, and doing so is a symptom of another
+> flaw.  Unless I'm missing something, KVM stuffs pmu->global_ctrl so that the
+> correct value is loaded on VM-Enter, but loading and saving PERF_GLOBAL_CTRL on
+> entry/exit is unnecessary and confusing, as is loading the associated MSRs when
+> restoring (loading) the guest context.
 >
-> I'm still not quite able to get a good test of this patch series
-> ready. Making the certificate file accessible to the VMM process has
-> been unfortunately challenging due to how we manage chroots and VMM
-> upgrades.
-> Still, I'm stuck in the VMM implementation of grabbing the file lock
-> for the certificates and asking myself "how do I tell KVM to write
-> exit_info_2 =3D (2 << 32) | (exit_info_2 & ((1 << 32)-1) before entering
-> the guest?"
-> A __u32 vmm_err field of this struct would nicely make its size 64-bit al=
-igned..
-
-retracted. I needed to look 2 lines lower. I need to stop working this late=
-.
+> For PERF_GLOBAL_CTRL on Intel, KVM needs to ensure all GP counters are enabled in
+> VMCS.GUEST_IA32_PERF_GLOBAL_CTRL, but that's a "set once and forget" operation,
+> not something that needs to be done on every entry and exit.  Of course, loading
+> and saving PERF_GLOBAL_CTRL on every entry/exit is unnecessary for other reasons,
+> but that's largely orthogonal.
 >
-> --
-> -Dionna Glaze, PhD, CISSP, CCSP (she/her)
+> On AMD, amd_restore_pmu_context()[*] needs to enable a maximal value for
+> PERF_GLOBAL_CTRL, but I don't think there's any need to load the other MSRs,
+> and the maximal value should come from the above logic, not pmu->global_ctrl.
+
+Sean, just double confirm, you are suggesting to do one-shot initialization
+for guest PERF_GLOBAL_CTRL (VMCS.GUEST_IA32_PERF_GLOBAL_CTRL for Intel)
+after vCPU resets, right?
 
 
 
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
+>
+> [*] Side topic, in case I forget later, that API should be "load", not "restore".
+>     There is no assumption or guarantee that KVM is exactly restoring anything,
+>     e.g. if PERF_GLOBAL_CTRL doesn't exist in the guest PMU and on the first load.
+
+Sure.
+
+
 
