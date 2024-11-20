@@ -1,253 +1,262 @@
-Return-Path: <kvm+bounces-32155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EDC9D3CF9
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:04:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B869D3CFE
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 759601F2356B
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:04:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEBC3B22173
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07C51A7265;
-	Wed, 20 Nov 2024 14:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F3B1AA7A4;
+	Wed, 20 Nov 2024 14:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OCwOXAVJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrMlR0i6"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2042.outbound.protection.outlook.com [40.107.100.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAC0AD27;
-	Wed, 20 Nov 2024 14:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732111427; cv=fail; b=uvcv+BTd7/9/1ya4OgnLBoQGKqENJOEeDc+NFvFDMZTQfupZDASAjUfH5GAHPAWIRoco/oRYUD5m1/VCFkhCDR7XJAx4/xlS40u1kv+idhDF2/dBcEp2NoWnrQt9hlhlIfVfq2rjKq0yvW7iU0VJGR3kh5sOdfiHYZyCWvthVD0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732111427; c=relaxed/simple;
-	bh=XYkEKYKu8mZU01Ovdpm5cg003XwIb7M5x9ZwcEXzy4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YeyPPQMMZEV9nqyxBctFm7kyJMYrZN0TMOIZEaDAg9FnGfDv3LS+n6OetDRKWWVNzKenPfNr3ZoEK/zOIJOoX/Du3IT1rlQqGTFsFsQeuB0wVqlzihLry0jQuIQut4a8aIkmXkV/9ZQrBhlQnTb+mr6Ny3/2xVEOg56cMyY1G2U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OCwOXAVJ; arc=fail smtp.client-ip=40.107.100.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PSbHuYeKPW1050oC8T/PM6LG7CgdKcwjPV6hLZN8i4nYZb4RvmMMeRHUtYFNo67LalDYQjCrSJE2qjGIsebISBVS2SsCnLOF9C1PCtCE+fRSg50bDlBeYeh6geWjAWvbYVoOjMMfbJfNAOczoDE8NvExfPKC5K6x3vhnB2LkHaNt3/tR5DbO3GEnM3SeMPbqBlBXutLI8c/gjFoRZjtfjMwbFPXqFqqSHQCvfGhq6H76Ph6AvFZoegZ371Q9d5CUlgqc/y/fArHvHAUtRVsXp9Ny0mQZiF2AbvBeIIM1XzHcHK0tximm0Orl027Px/klrv2TcpR/4+KxcIL8Gt6FdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vabg5oqHXpEI6VZNY6D2sJLldk0DehvIfS/E4IwKRBM=;
- b=gLJiDamGNSaqEKQOxMaOeLQph1/yEDmv3Xc2m9YSP28jPhOFfyv4aoKo1UbpPe1JtUL4xG6F5/QHsK+co1L5JzJAR1noRYNXEoj3LQKdUUZJxrO0Fv0x8NadU9hRTmJPeXDnabdCcJoalVZqUpxXRXVZtg3Kq2DZj7m7s3+H/RKK1dqImMZp+yjlPE/SWKNHa+LL1ymHtq8Ped2HjDozBqM51zZAScAKB66FFChEA0EG841fH8QOeZkeKOi02tugZ2grsUPZG8dNexSwB5SbmjB5Gtg8GvHuiNj1mJvAL3ukB9nPv5PwSZiiICTH01idZbV8oiqMjZ0JjDaMwsQNfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vabg5oqHXpEI6VZNY6D2sJLldk0DehvIfS/E4IwKRBM=;
- b=OCwOXAVJMVf4RhT+YmcXIvaS7SLV4bh/ugdPbYoS0aldzREsvb+8jRu1r6gXCxGm7VwIHjqlOGHMydr0GxCXhpN0l/vIQFZExfjTEu/2wm6Ng5NyMLQtXbmLKCYpRZ5aw/AyH0HDcOtZjrz5sC6SLhnDCZhkifCDHbNX7G+5QGFWLE168Xo9QawLPHKfHs5sGWRM/jo5jNvbOIElnKragUqfLdV8c9aBdVNKZHQjDOF4PQ0bd/2egcQuMvLlyB9MSkfOpSKXaV6NbIQuaOgIVu93/U1xA2GXvbB0RjLnu6smKkgLjBmYVxUohg8wMJ6zljjdP0qt5h8u4m6RuAPg9Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DM4PR12MB6278.namprd12.prod.outlook.com (2603:10b6:8:a4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.14; Wed, 20 Nov
- 2024 14:03:39 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8158.019; Wed, 20 Nov 2024
- 14:03:38 +0000
-Date: Wed, 20 Nov 2024 10:03:37 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, tglx@linutronix.de,
-	maz@kernel.org, bhelgaas@google.com, leonro@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org,
-	kevin.tian@intel.com, smostafa@google.com,
-	andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com,
-	ddutile@redhat.com, yebin10@huawei.com, brauner@kernel.org,
-	apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de,
-	anna-maria@linutronix.de, nipun.gupta@amd.com,
-	marek.vasut+renesas@mailbox.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address
- for each MSI vector
-Message-ID: <20241120140337.GA772273@nvidia.com>
-References: <cover.1731130093.git.nicolinc@nvidia.com>
- <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
- <ZzPOsrbkmztWZ4U/@Asurada-Nvidia>
- <20241113013430.GC35230@nvidia.com>
- <20241113141122.2518c55a.alex.williamson@redhat.com>
- <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
- <66977090-d707-4585-b0c5-8b48f663827e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <66977090-d707-4585-b0c5-8b48f663827e@redhat.com>
-X-ClientProxiedBy: MN2PR18CA0013.namprd18.prod.outlook.com
- (2603:10b6:208:23c::18) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627B814A60C
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 14:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732111535; cv=none; b=fPrPoZgTjJkcZkGGeOdMbX5e3RUPDSbeBAIVCLcoNe4AjRuHNoaHEpi+px5GhB9T1k62DZm5WJE/F4UcdZiNzrlDXk54WdQ4YPmh1OMRi919LQ605qEsMAgxkunTnhg8Kj78PEixiqZaLMpY3JfO6zsDcM26U0z+/bU2Uze6FXA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732111535; c=relaxed/simple;
+	bh=ZG2agr9YKv9vY6LK3VsO2Cz9sA6qKnnMQJv1p7D1KC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iwwGpK43Y5zITI9Uhr8CCdu3gdDcjFQmimRqbcPGei/fkRJvTEc656fS7calt0iBrNMVEnUDm3ghvuI5w6Peka5et/6hmYnFjqu2ovqEOeJb7SZH5LCNygdu60JeOWV1KjZsD3qa4uz6OBDShxGMhXuV93v5dIs69c6vDSds3r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UrMlR0i6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732111532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lZ8zkxd9i0HO8zyxRsaMmA5VwckXIWnTVoItJwHtzes=;
+	b=UrMlR0i62GILMhlqTz3jes8+jeEyDgfKqj3DNnAmmCg0aieFqhsoWQ729MCyeDJcLPlIn9
+	3raQVkgN+K6EwBcTa3uDMcrO3seI3kegRq8d31qQaKCvu90q+WEThrZnnGuL7G7TeFgvwP
+	zhVc8VI6oyxtuC9/bSiDECdCLycvYyI=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-fEP9m0A0NhyClwF0cvKrGQ-1; Wed,
+ 20 Nov 2024 09:05:28 -0500
+X-MC-Unique: fEP9m0A0NhyClwF0cvKrGQ-1
+X-Mimecast-MFC-AGG-ID: fEP9m0A0NhyClwF0cvKrGQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 307F91953944;
+	Wed, 20 Nov 2024 14:05:25 +0000 (UTC)
+Received: from localhost (unknown [10.72.113.10])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFA9230001A0;
+	Wed, 20 Nov 2024 14:05:22 +0000 (UTC)
+Date: Wed, 20 Nov 2024 22:05:15 +0800
+From: Baoquan He <bhe@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce
+ PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
+Message-ID: <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
+References: <20241025151134.1275575-1-david@redhat.com>
+ <20241025151134.1275575-8-david@redhat.com>
+ <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
+ <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM4PR12MB6278:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9929d772-3c64-46ea-0470-08dd096c21dc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?emdUUGM1c09KeWQySlRwS3BDczVIeDdHUzM1TmU4N1NueFI1czN5L1VYMndJ?=
- =?utf-8?B?TFZLUTVzZWthQlQwemY3MFNTVEowR0NiNmx5R1BSeDlWWlFwWG8rUGkxN2c1?=
- =?utf-8?B?bWgrcVAxbWZqci82TXNENUdSRDRYTG9Qa29ON2EyZ2d1Qi9zMFNvMGt6SXhK?=
- =?utf-8?B?bGpBZHo4c1dXOVFDRW5qbmRmWXU3OG81RzNqaDNDdGZWY1hYdXZLQ2JVTXMw?=
- =?utf-8?B?N2NIK2ZJUG1lZ1BRdWhESkpka2d6N21TZUVxcWdiK1pyVzRJZlNzT2tiZEg0?=
- =?utf-8?B?ZEdzd1NTQ3BlZVlON0JDcUc0MUhUcDVkKzI2ZHk4aDVXRTVScE80RXVGOFRV?=
- =?utf-8?B?NmpxUmJrM1JicUdFOW1makkzMTNGMHpjeHVER3JBSk5IWWFKeURyemRNbHlh?=
- =?utf-8?B?M0cwL2xLakpXT0tSWXVoL0Z5bmI3U0JtalhqbHZHYkxVYm5TOGlqaGQ0by9I?=
- =?utf-8?B?RzZ5SEtPVm5ET05EdnZKWWRGcTdIUUlRVTRoMXFTVmhnK3VVZUxqUW5tS2Vz?=
- =?utf-8?B?bnVubnJwTWowRXh4T2N5Zm9OUmllKzRYVjZjRUg3alNRMW1KZUxldEk1ZlR4?=
- =?utf-8?B?RFhoSm1mc0dvK3E3NDlqMFdsSTBhbHh2REs3bWdxczB4Q3kzdklaaG5wMm5U?=
- =?utf-8?B?VFdVaFhZU0p3TXI3aFFDYmZrdUM0UkFMM2hUOGcrcHVLczBlbDEzU2xKc0ZP?=
- =?utf-8?B?eUVqWmxQNTRZdDBZN3ZBWkk2azZGUWJ0S2N2UytYOHpLd0pkS1pNMHFUSjNq?=
- =?utf-8?B?RC9VZHZta1lMVFo0OFZyaG5DaEdZN0FVZHE0NEVuZDNFSUhWVnl1N1VHZHhv?=
- =?utf-8?B?M0IwTDNDb1RiRlRYM3ZZOG4zUFZ3bVJweEViNENldmpESnNMUlJnNEJySWNB?=
- =?utf-8?B?UUUxOHVmQUVLWTRDeStpbS9xb1FqalJHRTZFNTAvVmhaSFdjU1NsTlppWW1o?=
- =?utf-8?B?RUV1dHI4cUU2d1d5bytBSzhpZmRGUWJ4UlZNNU45RGl4OGNmQkFFZnk3MjZP?=
- =?utf-8?B?ckkzODN2aFNIWFhUVk5PcXRJYk9EeHRIVDZFL0pUbkcyaGNOVG5tNzZ6QTFV?=
- =?utf-8?B?cjBVQmJab0tibXZEbWJuUklTU0t1S3A2bE1kd1lOQ254dVFGNWtvNVlKWEho?=
- =?utf-8?B?eGpWZlg3SU9oVjhtaEp2M3VMV0hRQzVKeHQweTZMNjVudFJGVVFQdW5CbGZH?=
- =?utf-8?B?TTZqQXdGbUVJUnFlZU5GWERHd1QxdjZGbkZJSTU2dFlpeFc3Z3l6YnlBa0dC?=
- =?utf-8?B?ejhiRTRlem1RWHhPQ2t3U0RGemtEbm1jcDVLaXJBTGIrdzJUUjErQXRhdGM1?=
- =?utf-8?B?Rk9XL1dYWDdqOTJjcFZWL0llTG1HZWZESHVhU1dOTWtyTDlnNUg0YzRPbWY3?=
- =?utf-8?B?Y1Bja0kvMmttVEJydEp0ZG1ONEowY1FJRlVLamMrQ05sREpIdGdwcjZyNWho?=
- =?utf-8?B?dUdock54QXdNVWVPc2RqYVRBb1pvMmtiNndQSWRZNTVnVERkSTFBYU91bk9M?=
- =?utf-8?B?ZmZWMVkxczFvaGNqQVQ0OW5CY2xEUlNCbWNkYzl2QmlqNTMrcUd1TVN5eG1z?=
- =?utf-8?B?Rnd3K0s4bEFvNWIraGM1MGZJWGorc09rWVdnblNoSkFVelVhdzhJaGNmN0U3?=
- =?utf-8?B?dHFNaGtxZzNYT05zSVNFV0Y3UWh6Y2lYY0RSa2RSa245dmlBNFNGSFIwWmpu?=
- =?utf-8?B?dWJ4T2paU1NlRmQ1bS9ERG1xa2lRS0kvMDZiYXJ5M1ZuYkRuVTdreFVTTGdt?=
- =?utf-8?Q?tpX9bh6IzEpP0sHcbgAAGlMMM1CiVIQS2ztLAER?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZFpxcDVVKzROdHRtZEx4WStVRC9EZkpVdXJZck84eWtkMU5KRDV6NWpVd3hO?=
- =?utf-8?B?eCt4MHNnWlAzL011aGxmWG5FQ2FZMStTZXprc0lzK1Z4UE1ja0dycW9rTkto?=
- =?utf-8?B?WWlmNWcvYi9tRTV6YTBBaWdWTysrcEdYb3FTT3cwL1licWtvL2gvTDJkSUlN?=
- =?utf-8?B?eVpWQUI1ak42OG82Ym9aM0hFcThnU09UVDgySkFFb1pvelo1ZjZUSnI3ajRZ?=
- =?utf-8?B?RGdVbzhydDdlSytta3JwNGVSTzZzUjNlMHVVRXM3R1RKbW9MV3R4Y2RwMkZD?=
- =?utf-8?B?a1hUMXNxSW9NZHZyRlZGcmpkSFM4cm1qVHZWWWE5S0s0VzF3ME5PWEQycW81?=
- =?utf-8?B?cDh0clFGeGMxQUFTRXBNQjFDWUZEUFlXTnVPUC9MWTlqcml1Y0xweVdQZkha?=
- =?utf-8?B?RFJaSGd4VkVQTFNPZi9IOFltM2xkRFJvcTVCNElwTTMyT3RjZlM4dTBDdkRH?=
- =?utf-8?B?eG8vMmlsWDc2Mk9kbzgvWUZTTlU2VWhUaGhFWXJRQ3dOU1RHcjczOXVQWmwx?=
- =?utf-8?B?MVFvVThoL0RGbytzTDlEUEV6RUJwRWJRR0JMRnZ6TzFQSlk4TmJiQ2VVVXJQ?=
- =?utf-8?B?dFI4dU1qaUJNZXlWakVGa3U2WjdJMzNDdjZLL0pLY3k4RjRCVlFXb0hiUmVl?=
- =?utf-8?B?L2JNZ3RlRXNpV0Q1US9BK3ZJd2NnK0FSTU9UQURMVWlOaEhRVTh6UFMvWEpX?=
- =?utf-8?B?ZTBQREUwTWdDaUh3a3QzTW52Vk5NaGdtNkx6QXAyVFlTYjFSUFlBZCtWTmRs?=
- =?utf-8?B?L0dhempOTTlDM21MM0dCZ0E2bFNPS2JRTDBwR2NEVmpWQ3czd3JHVXpRcWJC?=
- =?utf-8?B?TlZnWlZCcjd6eE5FNnpGeU5kdVJKdUlmUS9XYTVlR0tYL1FZQjkwc2lMbGpJ?=
- =?utf-8?B?U1ZmT1pJeGpaQllsOFA5eVVQanBVbXRtZmtoZ0xpb0krVmU0Y0JwcHluV05Z?=
- =?utf-8?B?N2RxdWIyR2l0a2FrQVc2czc4Y0I2eEZOTVNERzRSdGVJbXF2SWxwbzQ5OE1R?=
- =?utf-8?B?ejM3Y2VUck9ZeFZMZFV5UXZOc1NSRjllemQrVDRXVUNRd01XZFBlKzN1L0p1?=
- =?utf-8?B?V05jZnVhQWtVckt4M0p1bmx5UzVOdmNMZlNCTGEyVmM2YmN0K0h1VFdrS1pK?=
- =?utf-8?B?SXRmR3ZiTzU2bElEM1FmNmx6M2JGRG91ZmZXOWRaZDhIa1p0eHhhYi8yUHVX?=
- =?utf-8?B?VVNqbzVFL2l5eWZmZEZ4MElwRTV6M29lUFdJMldNbGpCSVA5RzY5TkI1MUNU?=
- =?utf-8?B?WWVCcFN3eFNBMXRGaSt0UUJtb1BWUmZLVmZ4c1J4ZjlGWXFZckNnWm91UWV1?=
- =?utf-8?B?Y0crWldzRk5UVDF5V0NETjBtL0FLVnJTc1JpSkd1WCs0OWNLMjJGY1ZkNlEz?=
- =?utf-8?B?WS9KdXVMVERBTVJ2NXB1OGVSdDN0OWtTNm9TbXVuSnpzVmMremp0MTNURTJP?=
- =?utf-8?B?ZWZxNEh1a2ZmZjNYdFlwanVzdzRwbi90M201d0Y5RnhwVzQ5cW96cXJyYjd2?=
- =?utf-8?B?MGV5d3drQWE0OEZZaDBGdUc4aTc4d0MrUnhXcTg3bmlWU0RWdzMzbjJISlov?=
- =?utf-8?B?MXA4c1pjOTdYMGd6Q0pCWE5vbHhnRDdnM1dPRnVKOVB4RCsvV3dYSWtNNGdQ?=
- =?utf-8?B?NmZuR2Y3WEY4a2lGUGNWcUo2Nk1xNm5yS2twRUUzNHczOWVFU0hiTVdZcGZL?=
- =?utf-8?B?MldiTkZEWkZtMHo5bFNZUnBFaEUzOVpWbEVpaE9tM2ZkeWxMbjljbGNrOTgr?=
- =?utf-8?B?Z2pBMUJXVzNUZndJUm53aDBHZVdKdTVVQTk5cnBnQjV0ays0MnBhTGI1SEtH?=
- =?utf-8?B?S2J3bFB1bSsvMHdJQTY3aEUrc2RXcDNRTDlyTkFMaGJBMWZmMEhjSmt4czRD?=
- =?utf-8?B?NC9xYit6Rm9UZmpBUTlMeUMwQW5tYXlVSFhzU25Yai9QVUJWb3dBa2tySGtR?=
- =?utf-8?B?WFFvSExhZlJYWnNFczBsZTFJNVFuKytNUW5CRkV5Y3hMSThrM1BCaElSNGJo?=
- =?utf-8?B?NExlSUVIcEtLTnFDc25xTzdoWUVHbEFUN1hqSXBaSnJ6QlpUVFZHQ21EcGRj?=
- =?utf-8?B?UmZJdjVTVWEzRkI5Q0F5UHJBeGFvTnpJUlVGeUtVZGxPbUx2ZDBsQlNWaXZ6?=
- =?utf-8?Q?FBlU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9929d772-3c64-46ea-0470-08dd096c21dc
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2024 14:03:38.8100
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9LIwgDG2NQEZ1LpyzHC5m3Mjbk5MlxeFgD3xZhZu39Q0ItjlesuUR28ID1q7wrCe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6278
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Nov 20, 2024 at 02:17:46PM +0100, Eric Auger wrote:
-> > Yeah, I wasn't really suggesting to literally hook into this exact
-> > case; it was more just a general observation that if VFIO already has
-> > one justification for tinkering with pci_write_msi_msg() directly
-> > without going through the msi_domain layer, then adding another
-> > (wherever it fits best) can't be *entirely* unreasonable.
-
-I'm not sure that we can assume VFIO is the only thing touching the
-interrupt programming.
-
-I think there is a KVM path, and also the /proc/ path that will change
-the MSI affinity on the fly for a VFIO created IRQ. If the platform
-requires a MSI update to do this (ie encoding affinity in the
-add/data, not using IRQ remapping HW) then we still need to ensure the
-correct MSI address is hooked in.
-
-> >> Is it possible to do this with the existing write_msi_msg callback on
-> >> the msi descriptor?  For instance we could simply translate the msg
-> >> address and call pci_write_msi_msg() (while avoiding an infinite
-> >> recursion).  Or maybe there should be an xlate_msi_msg callback we can
-> >> register.  Or I suppose there might be a way to insert an irqchip that
-> >> does the translation on write.  Thanks,
-> >
-> > I'm far from keen on the idea, but if there really is an appetite for
-> > more indirection, then I guess the least-worst option would be yet
-> > another type of iommu_dma_cookie to work via the existing
-> > iommu_dma_compose_msi_msg() flow, 
-
-For this direction I think I would turn iommu_dma_compose_msi_msg()
-into a function pointer stored in the iommu_domain and have
-vfio/iommufd provide its own implementation. The thing that is in
-control of the domain's translation should be providing the msi_msg.
-
-> > update per-device addresses direcitly. But then it's still going to
-> > need some kind of "layering violation" for VFIO to poke the IRQ layer
-> > into re-composing and re-writing a message whenever userspace feels
-> > like changing an address
-
-I think we'd need to get into the affinity update path and force a MSI
-write as well, even if the platform isn't changing the MSI for
-affinity. Processing a vMSI entry update would be two steps where we
-update the MSI addr in VFIO and then set the affinity.
-
-> for the record, the first integration was based on such distinct
-> iommu_dma_cookie
+On 11/20/24 at 11:48am, David Hildenbrand wrote:
+> On 20.11.24 11:13, Baoquan He wrote:
+> > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+> > > s390 allocates+prepares the elfcore hdr in the dump (2nd) kernel, not in
+> > > the crashed kernel.
+> > > 
+> > > RAM provided by memory devices such as virtio-mem can only be detected
+> > > using the device driver; when vmcore_init() is called, these device
+> > > drivers are usually not loaded yet, or the devices did not get probed
+> > > yet. Consequently, on s390 these RAM ranges will not be included in
+> > > the crash dump, which makes the dump partially corrupt and is
+> > > unfortunate.
+> > > 
+> > > Instead of deferring the vmcore_init() call, to an (unclear?) later point,
+> > > let's reuse the vmcore_cb infrastructure to obtain device RAM ranges as
+> > > the device drivers probe the device and get access to this information.
+> > > 
+> > > Then, we'll add these ranges to the vmcore, adding more PT_LOAD
+> > > entries and updating the offsets+vmcore size.
+> > > 
+> > > Use Kconfig tricks to include this code automatically only if (a) there is
+> > > a device driver compiled that implements the callback
+> > > (PROVIDE_PROC_VMCORE_DEVICE_RAM) and; (b) the architecture actually needs
+> > > this information (NEED_PROC_VMCORE_DEVICE_RAM).
+> > > 
+> > > The current target use case is s390, which only creates an elf64
+> > > elfcore, so focusing on elf64 is sufficient.
+> > > 
+> > > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > > ---
+> > >   fs/proc/Kconfig            |  25 ++++++
+> > >   fs/proc/vmcore.c           | 156 +++++++++++++++++++++++++++++++++++++
+> > >   include/linux/crash_dump.h |   9 +++
+> > >   3 files changed, 190 insertions(+)
+> > > 
+> > > diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
+> > > index d80a1431ef7b..1e11de5f9380 100644
+> > > --- a/fs/proc/Kconfig
+> > > +++ b/fs/proc/Kconfig
+> > > @@ -61,6 +61,31 @@ config PROC_VMCORE_DEVICE_DUMP
+> > >   	  as ELF notes to /proc/vmcore. You can still disable device
+> > >   	  dump using the kernel command line option 'novmcoredd'.
+> > > +config PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > > +	def_bool n
+> > > +
+> > > +config NEED_PROC_VMCORE_DEVICE_RAM
+> > > +	def_bool n
+> > > +
+> > > +config PROC_VMCORE_DEVICE_RAM
+> > > +	def_bool y
+> > > +	depends on PROC_VMCORE
+> > > +	depends on NEED_PROC_VMCORE_DEVICE_RAM
+> > > +	depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > 
+> > Kconfig item is always a thing I need learn to master.
 > 
-> [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part) <https://lore.kernel.org/all/20210411111228.14386-1-eric.auger@redhat.com/#r>, patches 8 - 11
+> Yes, it's usually a struggle to get it right. It took me a couple of
+> iterations to get to this point :)
+> 
+> > When I checked
+> > this part, I have to write them down to deliberate. I am wondering if
+> > below 'simple version' works too and more understandable. Please help
+> > point out what I have missed.
+> > 
+> > ===========simple version======
+> > config PROC_VMCORE_DEVICE_RAM
+> >          def_bool y
+> >          depends on PROC_VMCORE && VIRTIO_MEM
+> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> > 
+> > config S390
+> >          select NEED_PROC_VMCORE_DEVICE_RAM
+> > ============
 
-There are some significant differences from that series with this idea:
+Sorry, things written down didn't correctly reflect them in my mind. 
 
- - We want to maintain a per-MSI-index/per-device lookup table. It
-   is not just a simple cookie, the msi_desc->dev &&
-   msi_desc->msi_index have to be matched against what userspace
-   provides in the per-vMSI IOCTL
+===========simple version======
+fs/proc/Kconfig:
+config PROC_VMCORE_DEVICE_RAM
+        def_bool y
+        depends on PROC_VMCORE && VIRTIO_MEM
+        depends on NEED_PROC_VMCORE_DEVICE_RAM
 
- - There would be no implicit progamming of the stage 2, this will be
-   done directly in userspace by creating an IOAS area for the ITS page
+arch/s390/Kconfig:
+config NEED_PROC_VMCORE_DEVICE_RAM
+        def y
+==================================
 
- - It shouldn't have any sort of dynamic allocation behavior. It is an
-   error for the kernel to ask for an msi_desc that userspace hasn't
-   provided a mapping for
- 
- - It should work well with nested and non-nested domains
 
-Jason
+> 
+> So the three changes you did are
+> 
+> (a) Remove the config option but select/depend on them.
+> 
+> (b) Remove the "depends on PROC_VMCORE" from PROC_VMCORE_DEVICE_RAM,
+>     and the "if PROC_VMCORE" from s390.
+> 
+> (c) Remove the PROVIDE_PROC_VMCORE_DEVICE_RAM
+> 
+> 
+> Regarding (a), that doesn't work. If you select a config option that doesn't
+> exist, it is silently dropped. It's always treated as if it wouldn't be set.
+> 
+> Regarding (b), I think that's an anti-pattern (having config options enabled
+> that are completely ineffective) and I don't see a benefit dropping them.
+> 
+> Regarding (c), it would mean that s390x unconditionally includes that code
+> even if virtio-mem is not configured in.
+> 
+> So while we could drop PROVIDE_PROC_VMCORE_DEVICE_RAM -- (c), it would that
+> we end up including code in configurations that don't possibly need it.
+> That's why I included that part.
+> 
+> > 
+> > 
+> > ======= config items extracted from this patchset====
+> > config PROVIDE_PROC_VMCORE_DEVICE_RAM
+> >          def_bool n
+> > 
+> > config NEED_PROC_VMCORE_DEVICE_RAM
+> >          def_bool n
+> > 
+> > config PROC_VMCORE_DEVICE_RAM
+> >          def_bool y
+> >          depends on PROC_VMCORE
+> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> >          depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > 
+> > config VIRTIO_MEM
+> > 	depends on X86_64 || ARM64 || RISCV
+> >           ~~~~~ I don't get why VIRTIO_MEM dones't depend on S390 if
+> >                 s390 need PROC_VMCORE_DEVICE_RAM.
+> 
+> This series depends on s390 support for virtio-mem, which just went
+> upstream.
+
+Got It, I just applied this series on top of the latest mainline's
+master branch. Thanks for telling.
+
+> 
+> 
+> commit 38968bcdcc1d46f2fdcd3a72599d5193bf8baf84
+> Author: David Hildenbrand <david@redhat.com>
+> Date:   Fri Oct 25 16:14:49 2024 +0200
+> 
+>     virtio-mem: s390 support
+> 
+> 
+> >          ......
+> >          select PROVIDE_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+> > 
+> > config S390
+> >          select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+> > =================================================
+> > 
+> 
+> Thanks for having a look!
+> 
+> -- 
+> Cheers,
+> 
+> David / dhildenb
+> 
+
 
