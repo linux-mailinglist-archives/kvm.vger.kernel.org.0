@@ -1,162 +1,195 @@
-Return-Path: <kvm+bounces-32195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489759D4127
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:30:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB289D41A9
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C331F1F22754
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:30:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A0ADB2BD56
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C586A1AB523;
-	Wed, 20 Nov 2024 17:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2D91AB523;
+	Wed, 20 Nov 2024 17:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kf3Dyd2C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="peEDogQw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBE9487BE;
-	Wed, 20 Nov 2024 17:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834D3487BE
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 17:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732123821; cv=none; b=kSMpxYOH1zh+7Y3NgAM+M6pOU8ng3FPz1EaO1VV8IXcL763pdnljRpFO/W8LJFC6Q3i8Q3+jA536WYJkz6qsTOSWCdnXrbmjty1KdOdqTRDF9BWxKuCtRun93JtsUlMWWI+hEW5hQuoTLgCHTPw/dBFwmGSxltpbQ+F09kmCKhU=
+	t=1732123838; cv=none; b=YZb6tBEFpgOQVTwAADPTocPHJ1rXLzIBT9eYl0gXRz5FhyaQqcm1fZiTLVCWM8ZtsoAG4cSthm1B488mxwJJ/cyajPmRDeryu1aYyAyI+TTpRrt4y/GtCauE+4ugN5MGdvGMR8Ty/4E/TBi9oZprXrXDs6FjONeAaB0bLED6iZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732123821; c=relaxed/simple;
-	bh=PFA7J969PABg1BMHj5bUVkB7wuVSRSb1IQcjJeE4WLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gcwn+hQQKNGRbLZdO8uCz1fFesc5gsFP4cOShAsrom6ApGjhp4syIdVNNIpRSuVOwyqo3xqnBhfYAm5z44oWMLCVk2nv+V35CsnmBXElzUPry/N4nDipBjHT5pACImX2fTYBpRG5ScLit8gZEJWwMyuVR/eXiuRUCL1T1LV85bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kf3Dyd2C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD605C4CECD;
-	Wed, 20 Nov 2024 17:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732123820;
-	bh=PFA7J969PABg1BMHj5bUVkB7wuVSRSb1IQcjJeE4WLw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kf3Dyd2CKUZa3tMlA5c9d+2ELCZPrv6chpFxvCS+UiOnBey7DGXhhzWANw/Gp+cVf
-	 9ekUEtoHku9jwPT9QXn/R2VMK+633Zwv3F8SW/w65Og7YAa79XArf9PDSYf46Yny/f
-	 CrYCCnTD0bWSCkL5fF9NGkrNb77XNSWjrPupERZ/bTBF5I2Jc5S3xRmc9IDdaoFlod
-	 GylypmxLKgFB8l61QEhIJKuBcBziS7S2je/uwRmgBZtYP0rWwBCTQiHaso7+9c9Aeo
-	 QatfyLQ2wrkudg0oAe0ccQENxnmONZH9eFt1AMIDeWXdmNfFX87/aC3WxZnfDlQGNL
-	 8lnRD6NSI6heA==
-Date: Wed, 20 Nov 2024 18:30:17 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
-	x86@kernel.org, rcu@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Lorenzo Stoakes <lstoakes@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Juerg Haefliger <juerg.haefliger@canonical.com>,
-	Nicolas Saenz Julienne <nsaenz@kernel.org>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
-	Chuang Wang <nashuiliang@gmail.com>,
-	Yang Jihong <yangjihong1@huawei.com>,
-	Petr Mladek <pmladek@suse.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-	Julian Pidancet <julian.pidancet@oracle.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Yair Podemsky <ypodemsk@redhat.com>,
-	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 11/15] context-tracking: Introduce work deferral
- infrastructure
-Message-ID: <Zz4cqfVfyb1enxql@localhost.localdomain>
-References: <20241119153502.41361-1-vschneid@redhat.com>
- <20241119153502.41361-12-vschneid@redhat.com>
- <Zz2_7MbxvfjKsz08@pavilion.home>
- <Zz3w0o_3wZDgJn0K@localhost.localdomain>
- <xhsmho729hlv0.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1732123838; c=relaxed/simple;
+	bh=TG0dlCFUSN4cnij7g01n4dBy7QEzuUOjv1gkitQFLnc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Fk6kbPNvCNwDRdVoo5g7UPMEH4+8Hnam42+bjiJJ5FZYwn3WGNrp47V+VTnGK3fu9JsgnEAzK7wXnuQXk+6uxcqOgVUhybsTwmNx52NRI8TrU57EOvxzUxdWfWcVX8Q95DlZ6sU7r1bVSzLrb+Fbi9aaOEQhEdTlGh5W0exXnnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=peEDogQw; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6eec923c760so6495427b3.1
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 09:30:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732123835; x=1732728635; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rKWW5QzZwmE/Mi4Elyfcq3cgERVzaGEbfYDFGjWzMI8=;
+        b=peEDogQwcXUAP+m34K5livHmhFiAA/iKXngd+5cBOmVhQ74QK6xtsgQkY1Ao2MUyax
+         pXN+Qp4XJvdSqDvil/rSpja7g8b61RVakhrxwYbi/knVac1qOMHLds5ilAQLLPnU079A
+         VcV9L3IPtuFwxKpRL03tcfSP3Vth4jBZsOJyZonFX3teNeyoAEYFW0XwZNSUyQEQ7tcw
+         OtKXr5g/TyJ+aPhJXezEtF0v7kHXzn6l4koUvWEQeijXZQI95g3xQlKOlH9fGhLJSfQt
+         uSFa9L8MsBSVmPJwF4xuTHXo8y6zXXb+PL0KkgN95IRz+CKswjaHb/6AIwd5LEaKK7yQ
+         BY2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732123835; x=1732728635;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rKWW5QzZwmE/Mi4Elyfcq3cgERVzaGEbfYDFGjWzMI8=;
+        b=iu5xASzo5sGlxS6fhEsYCkhsadgAmkfA5+KpnHFSZyhPwfQhWEuTECWYPU1EthnWZs
+         cnQC2ZZPIHsItPMKrsq+UQBEKTkJHf4zun3pI4bfc9fIlU+CD5LILsryFRNNI1AMyjkk
+         0YZY1I75SuTnEmENJtuoed/cUaxk0KWCQKk1m//v8mYWkUDCanpteGiG8HQFehkiQToH
+         HyFqK9eVrM3nT75PmQ3GcahzGN2fVzu/uutObI1BHl5RCdSYoz7A6+J+gzwaVo+l5J6Q
+         jcEVcIaFl7ytRUIxTVWsEQhhBE/eap7d50vSFZ0AZWp2SftUJvg4HZiNtX0YdzYkyW+a
+         lsOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURrDGzRno6tow8xd9w8wAiFIoMgqZWSOPCEkb/VppCvtTVcuDVLEpMz/optSo/JEwLsfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCkjkj9P3PsUzF/AspO99QeheenM0d9/yUXvTrJ+DNIaoOZUDX
+	vn/tdfXHNjK3hXQ5Jmpl/+bGGNBZV64IcKBy16TpRnthjpMnA7CkZY4lfXI9czq01iUpoiSsFiE
+	gqA==
+X-Google-Smtp-Source: AGHT+IFQrscPnIPzw9XKs9NYl+H6VDRxDA+r6yWqcphM0I3a+4bD6VZIBrqslhYOxvzvI3Hd4UFJ1+s3X6A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:ae8f:0:b0:e30:cee4:1922 with SMTP id
+ 3f1490d57ef6-e38cb5f8c07mr4899276.7.1732123834965; Wed, 20 Nov 2024 09:30:34
+ -0800 (PST)
+Date: Wed, 20 Nov 2024 09:30:33 -0800
+In-Reply-To: <01b6dc80-8cb6-4b13-9d0f-db3a07672532@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <xhsmho729hlv0.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+Mime-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-32-mizhang@google.com>
+ <ZzzfwXefHP7SG-Vy@google.com> <01b6dc80-8cb6-4b13-9d0f-db3a07672532@linux.intel.com>
+Message-ID: <Zz4cuXfFtXzRAWvC@google.com>
+Subject: Re: [RFC PATCH v3 31/58] KVM: x86/pmu: Add counter MSR and selector
+ MSR index into struct kvm_pmc
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Xiong Zhang <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
+	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
+	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Le Wed, Nov 20, 2024 at 06:10:43PM +0100, Valentin Schneider a écrit :
-> On 20/11/24 15:23, Frederic Weisbecker wrote:
+On Wed, Nov 20, 2024, Dapeng Mi wrote:
 > 
-> > Ah but there is CT_STATE_GUEST and I see the last patch also applies that to
-> > CT_STATE_IDLE.
-> >
-> > So that could be:
-> >
-> > bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
-> > {
-> > 	struct context_tracking *ct = per_cpu_ptr(&context_tracking, cpu);
-> > 	unsigned int old;
-> > 	bool ret = false;
-> >
-> > 	preempt_disable();
-> >
-> > 	old = atomic_read(&ct->state);
-> >
-> > 	/* CT_STATE_IDLE can be added to last patch here */
-> > 	if (!(old & (CT_STATE_USER | CT_STATE_GUEST))) {
-> > 		old &= ~CT_STATE_MASK;
-> > 		old |= CT_STATE_USER;
-> > 	}
+> On 11/20/2024 2:58 AM, Sean Christopherson wrote:
+> > Please squash this with the patch that does the actual save/load.  Hmm, maybe it
+> > should be put/load, now that I think about it more?  That's more consitent with
+> > existing KVM terminology.
 > 
-> Hmph, so that lets us leverage the cmpxchg for a !CT_STATE_KERNEL check,
-> but we get an extra loop if the target CPU exits kernelspace not to
-> userspace (e.g. vcpu or idle) in the meantime - not great, not terrible.
+> Sure. I ever noticed that this in-consistence, but "put" seem not so
+> intuitionistic as "save", so didn't change it.
 
-The thing is, what you read with atomic_read() should be close to reality.
-If it already is != CT_STATE_KERNEL then you're good (minus racy changes).
-If it is CT_STATE_KERNEL then you still must do a failing cmpxchg() in any case,
-at least to make sure you didn't miss a context tracking change. So the best
-you can do is a bet.
+Yeah, "put" isn't perfect, but neither is "save", because the save/put path also
+purges hardware state.
 
+> >> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> >> index 4b3ce6194bdb..603727312f9c 100644
+> >> --- a/arch/x86/include/asm/kvm_host.h
+> >> +++ b/arch/x86/include/asm/kvm_host.h
+> >> @@ -522,6 +522,8 @@ struct kvm_pmc {
+> >>  	 */
+> >>  	u64 emulated_counter;
+> >>  	u64 eventsel;
+> >> +	u64 msr_counter;
+> >> +	u64 msr_eventsel;
+> > There's no need to track these per PMC, the tracking can be per PMU, e.g.
+> >
+> > 	u64 gp_eventsel_base;
+> > 	u64 gp_counter_base;
+> > 	u64 gp_shift;
+> > 	u64 fixed_base;
+> >
+> > Actually, there's no need for a per-PMU fixed base, as that can be shoved into
+> > kvm_pmu_ops.  LOL, and the upcoming patch hardcodes INTEL_PMC_FIXED_RDPMC_BASE.
+> > Naughty, naughty ;-)
+> >
+> > It's not pretty, but 16 bytes per PMC isn't trivial. 
+> >
+> > Hmm, actually, scratch all that.  A better alternative would be to provide a
+> > helper to put/load counter/selector MSRs, and call that from vendor code.  Ooh,
+> > I think there's a bug here.  On AMD, the guest event selector MSRs need to be
+> > loaded _before_ PERF_GLOBAL_CTRL, no?  I.e. enable the guest's counters only
+> > after all selectors have been switched AMD64_EVENTSEL_GUESTONLY.  Otherwise there
+> > would be a brief window where KVM could incorrectly enable counters in the host.
+> > And the reverse that for put().
+> >
+> > But Intel has the opposite ordering, because MSR_CORE_PERF_GLOBAL_CTRL needs to
+> > be cleared before changing event selectors.
 > 
-> At the cost of one extra bit for the CT_STATE area, with CT_STATE_KERNEL=1
-> we could do: 
+> Not quite sure about AMD platforms, but it seems both Intel and AMD
+> platforms follow below sequence to manipulated PMU MSRs.
 > 
->   old = atomic_read(&ct->state);
->   old &= ~CT_STATE_KERNEL;
+> disable PERF_GLOBAL_CTRL MSR
+> 
+> manipulate counter-level PMU MSR
+> 
+> enable PERF_GLOBAL_CTRL MSR
 
-And perhaps also old |= CT_STATE_IDLE (I'm seeing the last patch now),
-so you at least get a chance of making it right (only ~CT_STATE_KERNEL
-will always fail) and CPUs usually spend most of their time idle.
+Nope.  kvm_pmu_restore_pmu_context() does:
 
-Thanks.
+	static_call_cond(kvm_x86_pmu_restore_pmu_context)(vcpu);
+
+
+	/*
+	 * No need to zero out unexposed GP/fixed counters/selectors since RDPMC
+	 * in this case will be intercepted. Accessing to these counters and
+	 * selectors will cause #GP in the guest.
+	 */
+	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+		pmc = &pmu->gp_counters[i];
+		wrmsrl(pmc->msr_counter, pmc->counter);
+		wrmsrl(pmc->msr_eventsel, pmu->gp_counters[i].eventsel_hw);
+	}
+
+	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+		pmc = &pmu->fixed_counters[i];
+		wrmsrl(pmc->msr_counter, pmc->counter);
+	}
+
+And amd_restore_pmu_context() does:
+
+	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+	rdmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, global_status);
+
+	/* Clear host global_status MSR if non-zero. */
+	if (global_status)
+		wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, global_status);
+
+	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_SET, pmu->global_status);
+
+	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, pmu->global_ctrl);
+
+So the sequence on AMD is currently:
+
+  disable PERF_GLOBAL_CTRL
+
+  save host PERF_GLOBAL_STATUS 
+
+  load guest PERF_GLOBAL_STATUS (clear+set)
+
+  load guest PERF_GLOBAL_CTRL
+
+  load guest per-counter MSRs
 
