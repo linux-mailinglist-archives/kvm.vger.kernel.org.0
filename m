@@ -1,139 +1,196 @@
-Return-Path: <kvm+bounces-32198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFB269D4150
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:41:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE3179D41E8
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 19:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CC1A1F22976
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 17:41:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E2E61F23135
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DDE1AB6F8;
-	Wed, 20 Nov 2024 17:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40251BC9E2;
+	Wed, 20 Nov 2024 18:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="si/5NTgs"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lFiAVJA/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5688146593;
-	Wed, 20 Nov 2024 17:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425F31E515;
+	Wed, 20 Nov 2024 18:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732124500; cv=none; b=MrVNvWh1nr155BZcO7tNyaW2bbrdr38CeVSlAuGGkRcKsTZsoDAmx0Ap7o0OimaZB+A2VibKkLJj7YVKN5S21kQyjfQGaDU7Wc8BuYC7E6J6Yg7a5co1FLmekjSITuSE2ZSphLN3diGWBUCAgGbKWFkb2P8Eu2j0UVRzSGhSurE=
+	t=1732126364; cv=none; b=rBntKq8+JdrBC7LnLyuTbVOTVTiJsAi53RB/K7gQDS72NSVcbPn/x2Q1e/I/DzE+E4WDtVlBwAPovsNsziCKZxT9w9ERqawMwo5vG9L4ca+SaUCq0DEMcYhBuCfmSP9Kj4lGN45VwFjNUErz+TGo+p4RSc9cQC9mU7xyY+3toe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732124500; c=relaxed/simple;
-	bh=77l5BUdA3wUh+Ds92rI4XZsS4TQVkqTZf3ifB+JsiZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JSH+UBx8ijlsYDb6y7YMUBDJ0+Iu8PxWrROZrYiy8jJm0o1mRI53kRBUQAmGt1bQ8m+GcqMLFM+0Agm1xSc2AwT9IKe5EFaRu5gLp263Uves7IqXrwdLKdK1x0HteUdAefzK8LeiisinCEwUFJYg9+Ml5CmQqiMUl2hhmSDErpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=si/5NTgs; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732124499; x=1763660499;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=dMxU76y/coq4MPw428ZOn69UQJ/3wc1UFFgfd5jLDwU=;
-  b=si/5NTgs7XV7aY21yqdGmgLYq4FVJuQNyE81zKwp2/1F/SvamY2cLBhg
-   pcR6qJn7M2797HxaGMHikbFvEyMQlcfj7uWuSnaiHJT/NVF4XuncIIwfc
-   qWx6sXtW5wNb2P/Uc+desJJq8PRfgYal10aHU2kR/VAm/6rR1n1g63vnp
-   k=;
-X-IronPort-AV: E=Sophos;i="6.12,170,1728950400"; 
-   d="scan'208";a="675210391"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 17:41:36 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:29938]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.84:2525] with esmtp (Farcaster)
- id afdc4bc4-bba2-498f-afae-82f05c096ff1; Wed, 20 Nov 2024 17:41:34 +0000 (UTC)
-X-Farcaster-Flow-ID: afdc4bc4-bba2-498f-afae-82f05c096ff1
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 20 Nov 2024 17:41:34 +0000
-Received: from [192.168.4.239] (10.106.82.23) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 20 Nov 2024
- 17:41:33 +0000
-Message-ID: <acdfa273-5da0-48dd-b506-e1064eea2726@amazon.com>
-Date: Wed, 20 Nov 2024 17:41:31 +0000
+	s=arc-20240116; t=1732126364; c=relaxed/simple;
+	bh=+GIAMTVbJ1ixJStHsEbMHlliDpePtNm2e3H3BFBrBvg=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=BuBSytoEYYHrYO3fRfb8D8YZal6q9fIDOzf+LHY+2I6ewvAGseGfUokJwkQYI1bggVPPgpo0AvJbktfdp4QspT+VgFMDo7HK3oTYWrHuEfZq3eFvtZtmKADey0MHOig36lOK3BB3JH4qqV5x878+0YymFLDlUw/LQyxhdYGiWDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lFiAVJA/; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AK9GWxj025929;
+	Wed, 20 Nov 2024 18:12:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=EhNaM1mzvIH9f+QEUvvyQ1
+	l0k56DBuV7rXs6Bl8yZT4=; b=lFiAVJA/Rqalps64p2UfO3u40nM1FzbsFDrJ1D
+	THUltmdgjEBUEcKlBvuxBT2L8RhqW72MgoEeiz98N0J6C8mPYg8cR6IJf0+f5a1E
+	tn5mRsV5pKw/Bh3OUJMieLY5YCiKa/a5ncxVEE55gFxUjhDWgXayN3LR4jWourMR
+	NOrvqJV5nOCv8tx1a1G1Hyz7dVFc1p2B6uHYR0W+dcbkNKEaN+lXs278Ps71Leps
+	93blNZDTZU8rDEECrj3D+MQXgIZYzyG1UKLcCs4FCuIWrWKFtk2uEvj88dHGcWNs
+	vy9XkecfWSUdp49K2mX+KB1yhH6RzQ6rXArt9iwmDgJk8Q6Q==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 431byjhkpj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 18:12:15 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AKICEkM001246
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 18:12:14 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 20 Nov 2024 10:12:13 -0800
+From: Elliot Berman <quic_eberman@quicinc.com>
+Subject: [PATCH v4 0/2] mm: Refactor KVM guest_memfd to introduce guestmem
+ library
+Date: Wed, 20 Nov 2024 10:12:06 -0800
+Message-ID: <20241120-guestmem-library-v4-0-0c597f733909@quicinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [RFC PATCH 0/4] KVM: ioctl for populating guest_memfd
-To: Paolo Bonzini <pbonzini@redhat.com>, <corbet@lwn.net>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
-	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
-	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>
-References: <20241024095429.54052-1-kalyazin@amazon.com>
- <86811253-a310-4474-8d0a-dad453630a2d@redhat.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
- ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
- abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
-In-Reply-To: <86811253-a310-4474-8d0a-dad453630a2d@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D005EUA002.ant.amazon.com (10.252.50.11) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHcmPmcC/2WNwQ6CMBAFf4Xs2RraYqme/A/DgZYFNrGALTQSw
+ r9bSTx5nEnevA0CesIAt2wDj5ECjUOC4pSB7euhQ0ZNYhC5KDjngnULhtmhY08yvvYrU1oqaY2
+ 4cq0gzSaPLb2P5KNK3FOYR78eD1F+7S8m/2NRspyVvG0Q9UWVytxfC1ka7NmODqp93z+32UyVs
+ gAAAA==
+X-Change-ID: 20241112-guestmem-library-68363cb29186
+To: Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton
+	<akpm@linux-foundation.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "Fuad
+ Tabba" <tabba@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        "Mike
+ Rapoport" <rppt@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        "H. Peter
+ Anvin" <hpa@zytor.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>, Trond Myklebust <trondmy@kernel.org>,
+        "Anna
+ Schumaker" <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        "Martin
+ Brandenburg" <martin@omnibond.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+CC: James Gowans <jgowans@amazon.com>, Mike Day <michael.day@amd.com>,
+        <linux-fsdevel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-doc@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <devel@lists.orangefs.org>, <linux-arm-kernel@lists.infradead.org>,
+        "Elliot
+ Berman" <quic_eberman@quicinc.com>
+X-Mailer: b4 0.14.2
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: nd43uozb7EZ_SXIRUmbmgsxDVz64o2Pc
+X-Proofpoint-ORIG-GUID: nd43uozb7EZ_SXIRUmbmgsxDVz64o2Pc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxlogscore=954
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411200125
 
+In preparation for adding more features to KVM's guest_memfd, refactor
+and introduce a library which abtracts some of the core-mm decisions
+about managing folios associated with guest memory. The goal of the
+refactor serves two purposes:
 
+1. Provide an easier way to reason about memory in guest_memfd. KVM
+   needs to support multiple confidentiality models (TDX, SEV, pKVM, Arm
+   CCA). These models support different semantics for when the host
+   can(not) access guest memory. An abstraction for the allocator and
+   managing the state of pages will make it eaiser to reason about the
+   state of folios within the guest_memfd.
 
-On 20/11/2024 13:55, Paolo Bonzini wrote:
->> Patch 4 allows to call the ioctl from a separate (non-VMM) process.  It
->> has been prohibited by [3], but I have not been able to locate the exact
->> justification for the requirement.
-> 
-> The justification is that the "struct kvm" has a long-lived tie to a
-> host process's address space.
-> 
-> Invoking ioctls like KVM_SET_USER_MEMORY_REGION and KVM_RUN from
-> different processes would make things very messy, because it is not
-> clear which mm you are working with: the MMU notifier is registered for
-> kvm->mm, but some functions such as get_user_pages do not take an mm for
-> example and always operate on current->mm.
+2. Provide a common implementation for other users such as Gunyah [1] and
+   guestmemfs [2].
 
-That's fair, thanks for the explanation.
+In this initial series, I'm seeking comments for the line I'm drawing
+between library and user (KVM). I've not introduced new functionality in
+this series; the first new feature will probably be Fuad's mappability
+patches [3].
 
-> In your case, it should be enough to add a ioctl on the guestmemfd
-> instead?
+I've decided to only bring out the address_space from guest_memfd as it
+seemed the simplest approach. In the current iteration, KVM "attaches"
+the guestmem to the inode. I expect we'll want to provide some helpers
+for inode, file, and vm operations when it's relevant to
+mappability/accessiblity/faultability.
 
-That's right. That would be sufficient indeed.  Is that something that 
-could be considered?  Would that be some non-KVM API, with guest_memfd 
-moving to an mm library?
+I'd appreciate any feedback, especially on how much we should pull into
+the guestmem library.
 
- > But the real question is, what are you using
- > KVM_X86_SW_PROTECTED_VM for?
+[1]: https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
+[2]: https://lore.kernel.org/all/20240805093245.889357-1-jgowans@amazon.com/
+[3]: https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
 
-The concrete use case is VM restoration from a snapshot in Firecracker 
-[1].  In the current setup, the VMM registers a UFFD against the guest 
-memory and sends the UFFD handle to an external process that knows how 
-to obtain the snapshotted memory.  We would like to preserve the 
-semantics, but also remove the guest memory from the direct map [2]. 
-Mimicing this with guest_memfd would be sending some form of a 
-guest_memfd handle to that process that would be using it to populate 
-guest_memfd.
+Changes in v4:
+- Update folio_free() to add address_space mapping instead of
+  invalidate_folio/free_folio path.
+- Link to v3: https://lore.kernel.org/r/20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com
 
-[1]: 
-https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md#userfaultfd
-[2]: 
-https://lore.kernel.org/kvm/20241030134912.515725-1-roypat@amazon.co.uk/T/
+Changes in v3:
+ - Refactor/extract only the address_space
+ - Link to v2: https://lore.kernel.org/all/20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com/
 
-> Paolo
+Changes in v2:
+- Significantly reworked to introduce "accessible" and "safe" reference
+  counters
+- Link to v1: https://lore.kernel.org/r/20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com
+
+Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+---
+Elliot Berman (2):
+      filemap: Pass address_space mapping to ->free_folio()
+      mm: guestmem: Convert address_space operations to guestmem library
+
+ Documentation/filesystems/locking.rst |   2 +-
+ MAINTAINERS                           |   2 +
+ fs/nfs/dir.c                          |  11 +-
+ fs/orangefs/inode.c                   |   3 +-
+ include/linux/fs.h                    |   2 +-
+ include/linux/guestmem.h              |  33 ++++++
+ mm/Kconfig                            |   3 +
+ mm/Makefile                           |   1 +
+ mm/filemap.c                          |   9 +-
+ mm/guestmem.c                         | 196 ++++++++++++++++++++++++++++++++++
+ mm/secretmem.c                        |   3 +-
+ mm/vmscan.c                           |   4 +-
+ virt/kvm/Kconfig                      |   1 +
+ virt/kvm/guest_memfd.c                |  97 +++++------------
+ 14 files changed, 283 insertions(+), 84 deletions(-)
+---
+base-commit: 5cb1659f412041e4780f2e8ee49b2e03728a2ba6
+change-id: 20241112-guestmem-library-68363cb29186
+
+Best regards,
+-- 
+Elliot Berman <quic_eberman@quicinc.com>
+
 
