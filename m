@@ -1,157 +1,213 @@
-Return-Path: <kvm+bounces-32138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717AE9D375E
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 10:49:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9949D380C
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 11:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55739B284B7
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 09:47:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2494E1F21F7A
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 10:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3120019D894;
-	Wed, 20 Nov 2024 09:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B785E19D89B;
+	Wed, 20 Nov 2024 10:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fxj+9SR4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HzHTM30m"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B07015C15F
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 09:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A941990C0;
+	Wed, 20 Nov 2024 10:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732096030; cv=none; b=aPnovftZk/y+6gFR2fGa09VyUkz1UGVY4biE/VIrRR6Eo92yluA0rW7EHv3E8988HCd7kDoe820IpxMwcce0tUWxxwWf0wjtlt+PswemjqVNgl6HF1S9v5whqfsq8jPl2fFMoUQ6gs1jtRUlNJ1x8FTt8DMb+aVwe1tfUSbtsk4=
+	t=1732097549; cv=none; b=SX7rEoZ7tb5fX3QCDKJSF9JeoauudNK9LFXFIoocf1YT9hm/QGC5wrZczAwIWkcO4UNXT2wM3RfqittnC8RriQGsnBNKGnGH1ZfWKaBmxwUSrftvmaFk481TGMJBDat/L52sRCV7lngOCNMUMjZdCP/DDxP+EpYvBWMaBhYJIns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732096030; c=relaxed/simple;
-	bh=BeB0I5N9lmAH1/USVhzS2jrTuW+JT107L4SWdR0WNKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qoTmaMJSm7EZzs7TsKFMpukGVwTKDh0fNcO6PQszh78X0eGeVh9+6esztighN02V38GTRjiO9xdhD3NW2v9sv1EnHz5U0N8agRm0yI/JvkiKtNQgjFYbzJPa82cwNwG/1E5QjivOUMRvQh9yIEmNNVUamaZQJd60Q3WcAj98jwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fxj+9SR4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732096027;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RQ/EL0J6kjGmTeoQldkQB/yJmR9CyO2pv3yRZbq8j84=;
-	b=fxj+9SR4kWRFT4/nelYaba4R+NGH6c+6LWqHvsO3XuEH/jhwdOWZG3n9gTenyvRfMYjPZA
-	7FSClvE6GDERYLgV6go3PKlyKBoQpAxbSz5wV7vQT50h6n+mvPNvW6KpLbRObqwV8VE8NT
-	ztyBftS8fRfkzdr6MR3XRqM9tEZ+tVU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-425-Humkb_9bOb-2SPRao4GIRw-1; Wed,
- 20 Nov 2024 04:47:03 -0500
-X-MC-Unique: Humkb_9bOb-2SPRao4GIRw-1
-X-Mimecast-MFC-AGG-ID: Humkb_9bOb-2SPRao4GIRw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 770D91955BCF;
-	Wed, 20 Nov 2024 09:47:01 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE26530000DF;
-	Wed, 20 Nov 2024 09:46:58 +0000 (UTC)
-Date: Wed, 20 Nov 2024 17:46:54 +0800
-From: Baoquan He <bhe@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v1 06/11] fs/proc/vmcore: factor out freeing a list of
- vmcore ranges
-Message-ID: <Zz2wDu9XskX1dgN7@MiWiFi-R3L-srv>
-References: <20241025151134.1275575-1-david@redhat.com>
- <20241025151134.1275575-7-david@redhat.com>
+	s=arc-20240116; t=1732097549; c=relaxed/simple;
+	bh=1iq5LwZDW/dQe89CPqcHPntXsHFqWx0E8SZYJTsVF9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GSDLAta4Rohc3oZzknLMHLA1qTkxDlooBg6EEz65dWZeQkEW7Nt/rAXK8gyvDokLQZqpI3vVT85B2ieHDXU4BgF9RjCIQNfC7hS7RHq4rYMSKmM6ortEdKLuxvHelawOTqQHAJwiEYbfq//tADOW9G2niGfxb9ta0Y3EB4Vkm5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HzHTM30m; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732097548; x=1763633548;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=1iq5LwZDW/dQe89CPqcHPntXsHFqWx0E8SZYJTsVF9g=;
+  b=HzHTM30mpi2nkbDkn7YT0+gKe1ySPH0hGDtzzlCODhUh58uhadfKo7+8
+   CIb2vs63ySxkj9VUJbBYJIeikrEH40ZZoqVVS6noWz+ZdUSOAsfAODdq+
+   T4lPWelawHTP5UdzDHbWu2YQrPJNjobhD5tVbcc/pzL9D1Fo+4vVtLhC5
+   RuurR4qHLH8mmCKYI7aLjdoYnqsUUyLz2JiaZAWr+SGm5SESXj9XPbtjr
+   8xiSnFcJFgbB9JvTcnXb/L6hoPzNG1EnoPSRWhd7ExnYH9FkCrl2BISEf
+   QIkETxb2YbewoEMaXqs41HZRwn1upd4FVMYBVGSokiIqEv78p9c2O0Tvt
+   Q==;
+X-CSE-ConnectionGUID: w/qfTOd9T06u7emJyuYTvw==
+X-CSE-MsgGUID: ryADAcHMQZurXRY1jwdndw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="32205819"
+X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
+   d="scan'208";a="32205819"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:12:26 -0800
+X-CSE-ConnectionGUID: l0GEebiuQESySZnmbSKkNw==
+X-CSE-MsgGUID: sum2nflCQ0mC0ZhxUsEOgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
+   d="scan'208";a="120803198"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:12:22 -0800
+Message-ID: <787182e1-75af-43dc-b7dd-179664022170@linux.intel.com>
+Date: Wed, 20 Nov 2024 18:12:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025151134.1275575-7-david@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 28/58] KVM: x86/pmu: Add
+ intel_passthrough_pmu_msrs() to pass-through PMU MSRs
+To: Sean Christopherson <seanjc@google.com>,
+ Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
+ <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
+ <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
+ Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-29-mizhang@google.com> <ZzzX0g0LtF_qHggI@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <ZzzX0g0LtF_qHggI@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-> Let's factor it out into include/linux/crash_dump.h, from where we can
-> use it also outside of vmcore.c later.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  fs/proc/vmcore.c           |  9 +--------
->  include/linux/crash_dump.h | 11 +++++++++++
->  2 files changed, 12 insertions(+), 8 deletions(-)
 
-LGTM,
+On 11/20/2024 2:24 AM, Sean Christopherson wrote:
+> On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 02c9019c6f85..737de5bf1eee 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -740,6 +740,52 @@ static bool intel_is_rdpmc_passthru_allowed(struct kvm_vcpu *vcpu)
+>>  	return true;
+>>  }
+>>  
+>> +/*
+>> + * Setup PMU MSR interception for both mediated passthrough vPMU and legacy
+>> + * emulated vPMU. Note that this function is called after each time userspace
+>> + * set CPUID.
+>> + */
+>> +static void intel_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
+> Function verb is misleading.  This doesn't always "passthrough" MSRs, it's also
+> responsible for enabling interception as needed.  intel_pmu_update_msr_intercepts()?
 
-Acked-by: Baoquan He <bhe@redhat.com>
+Yes, it's better. Thanks.
 
-> 
-> diff --git a/fs/proc/vmcore.c b/fs/proc/vmcore.c
-> index 76fdc3fb8c0e..3e90416ee54e 100644
-> --- a/fs/proc/vmcore.c
-> +++ b/fs/proc/vmcore.c
-> @@ -1568,14 +1568,7 @@ void vmcore_cleanup(void)
->  		proc_vmcore = NULL;
->  	}
->  
-> -	/* clear the vmcore list. */
-> -	while (!list_empty(&vmcore_list)) {
-> -		struct vmcore_mem_node *m;
-> -
-> -		m = list_first_entry(&vmcore_list, struct vmcore_mem_node, list);
-> -		list_del(&m->list);
-> -		kfree(m);
-> -	}
-> +	vmcore_free_mem_nodes(&vmcore_list);
->  	free_elfcorebuf();
->  
->  	/* clear vmcore device dump list */
-> diff --git a/include/linux/crash_dump.h b/include/linux/crash_dump.h
-> index ae77049fc023..722dbcff7371 100644
-> --- a/include/linux/crash_dump.h
-> +++ b/include/linux/crash_dump.h
-> @@ -135,6 +135,17 @@ static inline int vmcore_alloc_add_mem_node(struct list_head *list,
->  	return 0;
->  }
->  
-> +/* Free a list of vmcore memory nodes. */
-> +static inline void vmcore_free_mem_nodes(struct list_head *list)
-> +{
-> +	struct vmcore_mem_node *m, *tmp;
-> +
-> +	list_for_each_entry_safe(m, tmp, list, list) {
-> +		list_del(&m->list);
-> +		kfree(m);
-> +	}
-> +}
-> +
->  #else /* !CONFIG_CRASH_DUMP */
->  static inline bool is_kdump_kernel(void) { return false; }
->  #endif /* CONFIG_CRASH_DUMP */
-> -- 
-> 2.46.1
-> 
 
+>
+>> +{
+>> +	bool msr_intercept = !is_passthrough_pmu_enabled(vcpu);
+>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>> +	int i;
+>> +
+>> +	/*
+>> +	 * Unexposed PMU MSRs are intercepted by default. However,
+>> +	 * KVM_SET_CPUID{,2} may be invoked multiple times. To ensure MSR
+>> +	 * interception is correct after each call of setting CPUID, explicitly
+>> +	 * touch msr bitmap for each PMU MSR.
+>> +	 */
+>> +	for (i = 0; i < kvm_pmu_cap.num_counters_gp; i++) {
+>> +		if (i >= pmu->nr_arch_gp_counters)
+>> +			msr_intercept = true;
+> Hmm, I like the idea and that y'all remembered to intercept unsupported MSRs, but
+> it's way, way too easy to clobber msr_intercept and fail to re-initialize across
+> for-loops.
+>
+> Rather than update the variable mid-loop, how about this?
+>
+> 	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, intercept);
+> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW,
+> 					  intercept || !fw_writes_is_enabled(vcpu));
+> 	}
+> 	for ( ; i < kvm_pmu_cap.num_counters_gp; i++) {
+> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, true);
+> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, true);
+> 	}
+>
+> 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+> 		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, intercept);
+> 	for ( ; i < kvm_pmu_cap.num_counters_fixed; i++)
+> 		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, true);
+
+Yeah, it's indeed better.
+
+
+>
+>
+>> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, msr_intercept);
+>> +		if (fw_writes_is_enabled(vcpu))
+>> +			vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, msr_intercept);
+>> +		else
+>> +			vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, true);
+>> +	}
+>> +
+>> +	msr_intercept = !is_passthrough_pmu_enabled(vcpu);
+>> +	for (i = 0; i < kvm_pmu_cap.num_counters_fixed; i++) {
+>> +		if (i >= pmu->nr_arch_fixed_counters)
+>> +			msr_intercept = true;
+>> +		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, msr_intercept);
+>> +	}
+>> +
+>> +	if (pmu->version > 1 && is_passthrough_pmu_enabled(vcpu) &&
+> Don't open code kvm_pmu_has_perf_global_ctrl().
+
+Oh, yes.
+
+
+>
+>> +	    pmu->nr_arch_gp_counters == kvm_pmu_cap.num_counters_gp &&
+>> +	    pmu->nr_arch_fixed_counters == kvm_pmu_cap.num_counters_fixed)
+>> +		msr_intercept = false;
+>> +	else
+>> +		msr_intercept = true;
+> This reinforces that checking PERF_CAPABILITIES for PERF_METRICS is likely doomed
+> to fail, because doesn't PERF_GLOBAL_CTRL need to be intercepted, strictly speaking,
+> to prevent setting EN_PERF_METRICS?
+
+Sean, do you mean we need to check if guest supports PERF_METRICS here? If
+not, we need to set global MSRs to interception and then avoid guest tries
+to enable guest PERF_METRICS, right?
+
+
+
+>
+>> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_STATUS, MSR_TYPE_RW, msr_intercept);
+>> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL, MSR_TYPE_RW, msr_intercept);
+>> +	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, MSR_TYPE_RW, msr_intercept);
+>> +}
+>> +
+>>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
+>>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
+>> @@ -752,6 +798,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>>  	.deliver_pmi = intel_pmu_deliver_pmi,
+>>  	.cleanup = intel_pmu_cleanup,
+>>  	.is_rdpmc_passthru_allowed = intel_is_rdpmc_passthru_allowed,
+>> +	.passthrough_pmu_msrs = intel_passthrough_pmu_msrs,
+>>  	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+>>  	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
+>>  	.MIN_NR_GP_COUNTERS = 1,
+>> -- 
+>> 2.46.0.rc1.232.g9752f9e123-goog
+>>
 
