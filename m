@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-32167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A527C9D3E92
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:09:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D07729D3E9A
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 16:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 545D31F27259
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:09:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A8361F2459C
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510771DF241;
-	Wed, 20 Nov 2024 14:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428FC1D90D9;
+	Wed, 20 Nov 2024 14:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BC/hsR3w"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q91erEAQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BB41DEFCD;
-	Wed, 20 Nov 2024 14:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6E1C57A5;
+	Wed, 20 Nov 2024 14:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732114614; cv=none; b=Qiw24Gs8Sq3xLNqOovw6jp+mEKy0MgbOK002LYsCfk+3M+fpQL9h28qd7C0cfhec2kJVWc8THKt9XX4597JMdzhgDVJVwrdD9OkmD9+tJE5urM6fIW7TazwF15NiC4BSxChQlO8NOOpLdYmg/DP1ySz+bGjs6tKDA8MUjfuXeM8=
+	t=1732114670; cv=none; b=M+StwRJDayqefBJ2MsYgjsaQr7Pwg1pxE0aFm9DCxf/H9cSf/K86zxmbQ04j4oFotKHwhVkduNzIr3QjnBoIopGVKQ2zrz9RNVahkNTZbf9X2r/6KSSpCeqHSCeCUpv4RgJ3TC89tAlXkJ89QalM8ta64T9wekeSFdUsYuAzQn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732114614; c=relaxed/simple;
-	bh=N/+L+LKAnHPIPI0TGsIUJQK3Ce8pA3wx2Y/f3NNH7LA=;
+	s=arc-20240116; t=1732114670; c=relaxed/simple;
+	bh=w4RwPLlFWRfw71b5zlZiK0uQ/mhhhRbkndbVxlkKVxE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qmkCt7Nn269FBkNnLqkyOCJjZJCS6XUnJjmn6bbgJMDtqxSf/El+9YdWJ6HF/v27SsHoCqhsk8sdkyoF6NVpgYTqZiC0vJuthaw4oO4XS27RWnpW8AbYULWRtgfgBp4T5nHlJaU8HuVk9B3Z+X1BWi8yyAi0+7bmnH1LldoZx7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BC/hsR3w; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:Content-Disposition:In-Reply-To; b=jmjXmv8ofnjMIxyvIq7GJ9oY7A9oV9pHTF8I2GErlTsYuchZvrmTs7bb5WV92zhzOZSc5ljel/HATvL96VPRAwwMxR4M6aoPoLI9zrkNIxddLebzajKL0GFeaG8UCfzhvewbXwbLELhL0sDy5ndh8roysBC0Pa+GYzuELL5uIwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q91erEAQ; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Eo+mDdywb8Jf9eP+Chc4FGyJoIBcp+h8PHa9Dul2QYs=; b=BC/hsR3wyB2ZVLg1n35MzPJWh0
-	4ps2oGfQYoJBpzhj0PBPmzHXL1dcC+FXsSuK40XAV7swkJ1+hSfVSMNbv7rqU2Zw8+b9o4e8p95IE
-	xbdNUF88st90u4d+1wyg8keMt7R6EmNsIttlBfqCiK5B1rpDq2ONMAxC/D8EgzPczP9OwQp30UftS
-	7kTIxpKMfkhE+i9EqYkJgAjMWQib0FtxVk9+4/SucfHB25kKa1Yrluxp0RS4xALoGHVgIE5W2krjW
-	Gc63APPVT3AqaJZ3WYeAl2cE9iUcmdx2bNH2/1nxzf0SKfZ1MCGa9OBiARYb807zR76xMX5uypCTB
-	YqmNA7Qw==;
+	bh=w4RwPLlFWRfw71b5zlZiK0uQ/mhhhRbkndbVxlkKVxE=; b=q91erEAQYnhO6SfqnSd5192dsu
+	TqmUxmxU42V0DCFscJVyv7suDTDbuCguDIG4UHdvpu6y2+t82htk8umoOsHCgIuShf63PZRJ4n/DL
+	m5OI36m7dcMC4WYTvPhcUsXymjngJuHK8rzEE4/hnL68pXrGHFdexCyA2HaKm3Ue2oM/yXBW9fSBb
+	RoI48xNyA/c2G5AoPjyKbD1fgE/Q6donR5arZSuCXM7ldb+3RN1xSrK6T37B24YTKEomu2ldBFIhj
+	vgDoNYHII0bMtq6zSccJvlvraP++zCqREJM3vLTgblrxAkrFSqxssrc85DQ4DiI5zYMvOrfamAd4S
+	uvjrPf8Q==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tDm8O-00000005Mu8-2FSC;
-	Wed, 20 Nov 2024 14:56:49 +0000
+	id 1tDm9J-00000005Mwt-2JtI;
+	Wed, 20 Nov 2024 14:57:46 +0000
 Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 69FC230023F; Wed, 20 Nov 2024 15:56:49 +0100 (CET)
-Date: Wed, 20 Nov 2024 15:56:49 +0100
+	id 722643006AB; Wed, 20 Nov 2024 15:57:46 +0100 (CET)
+Date: Wed, 20 Nov 2024 15:57:46 +0100
 From: Peter Zijlstra <peterz@infradead.org>
 To: Josh Poimboeuf <jpoimboe@kernel.org>
 Cc: Valentin Schneider <vschneid@redhat.com>, linux-kernel@vger.kernel.org,
@@ -99,10 +99,11 @@ Cc: Valentin Schneider <vschneid@redhat.com>, linux-kernel@vger.kernel.org,
 	Yair Podemsky <ypodemsk@redhat.com>,
 	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
 Subject: Re: [RFC PATCH v3 06/15] jump_label: Add forceful jump label type
-Message-ID: <20241120145649.GJ19989@noisy.programming.kicks-ass.net>
+Message-ID: <20241120145746.GL38972@noisy.programming.kicks-ass.net>
 References: <20241119153502.41361-1-vschneid@redhat.com>
  <20241119153502.41361-7-vschneid@redhat.com>
  <20241119233902.kierxzg2aywpevqx@jpoimboe>
+ <20241120145649.GJ19989@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -111,31 +112,13 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241119233902.kierxzg2aywpevqx@jpoimboe>
+In-Reply-To: <20241120145649.GJ19989@noisy.programming.kicks-ass.net>
 
-On Tue, Nov 19, 2024 at 03:39:02PM -0800, Josh Poimboeuf wrote:
-> On Tue, Nov 19, 2024 at 04:34:53PM +0100, Valentin Schneider wrote:
-> > Later commits will cause objtool to warn about non __ro_after_init static
-> > keys being used in .noinstr sections in order to safely defer instruction
-> > patching IPIs targeted at NOHZ_FULL CPUs.
-> 
-> Don't we need similar checking for static calls?
-> 
-> > Two such keys currently exist: mds_idle_clear and __sched_clock_stable,
-> > which can both be modified at runtime.
-> 
-> Not sure if feasible, but it sure would be a lot simpler to just make
-> "no noinstr patching" a hard rule and then convert the above keys (or at
-> least their noinstr-specific usage) to regular branches.
+On Wed, Nov 20, 2024 at 03:56:49PM +0100, Peter Zijlstra wrote:
 
-That'll be a bit of a mess. Also, then we're adding overhead/cost for
-all people for the benefit of this fringe case (NOHZ_FULL). Not a
-desirable trade-off IMO.
+> But I think we can make the fall-back safer, we can simply force the IPI
+> when we poke at noinstr code -- then NOHZ_FULL gets to keep the pieces,
+> but at least we don't violate any correctness constraints.
 
-So I do think the proposed solution (+- naming, I like your naming
-proposal better) is the better one.
-
-But I think we can make the fall-back safer, we can simply force the IPI
-when we poke at noinstr code -- then NOHZ_FULL gets to keep the pieces,
-but at least we don't violate any correctness constraints.
+I should have read more; that's what is being proposed.
 
