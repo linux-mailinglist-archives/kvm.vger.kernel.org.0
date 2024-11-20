@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-32207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D687A9D4228
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 19:43:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38E59D422B
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 19:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F470B274FD
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3AB282502
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813CB1B5337;
-	Wed, 20 Nov 2024 18:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A0D1BBBC1;
+	Wed, 20 Nov 2024 18:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p8PNpB1Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DYHtIMoZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554D316DEB5
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 18:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5B514D70E
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 18:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732128180; cv=none; b=tp6nHKI6IfaLGsRczuiYmc6L79zhFYJUUK5jIdO3qKfkgYhPwvB98f6juLdQeNXhZp23pQHcToh8lyN0m2Al5QBnfKHzzFZAWbdvdQaTKik6cGYfoClxL6s4sqYOVgZ7etupytsSQR7WfyLeSKv/0vyiaRphlUW76DYPYsb/oxs=
+	t=1732128394; cv=none; b=dDwxZoaOy9JZvfc7SkQWjNRaaZ7cGgBLKypH+nfH6mT0K6IymC+gsbElAk+zn8QUqPhWtuONp9ew72PvaQHF1j19jNpWxoZwlmbA9VlWxAdhD6m+K8Z7r2IYgYBRDrUDX4g/ews2lZ6dC8bSzDmxyHX/DU1uVWctJ34gSDiKuNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732128180; c=relaxed/simple;
-	bh=FAG7Osn8XZtmnlVb+3K/AwNFN0PNCGVxYL/QhmR548c=;
+	s=arc-20240116; t=1732128394; c=relaxed/simple;
+	bh=bz7OpvOpy6atS7GrkuQ8mLzLRHkVDfHP67FoEXcJdv8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IKQDhSI46QxoFbjmELopE1lR3mTM4XJySIlQJUJ5MPCCT6HmIVZvye9BzkHUlfpQXmGV1vpU7LhvyCG005zT3sybEU3toHCzy1cNkGFefs3lizLS9Fi13X92ZzkKEK7oM0xPhGdK1dry0WMPdKCQtXpBMsiXkXp0wVOOFbn/+hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p8PNpB1Z; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=lXH2kT1HEdRdNBvPucuIUfuv64K1GPmeqBkhXx2/0UzEhcfBePsPl0zGAxSLMb5yckdHnzZMQLNUVzclsgN43eB2F+gKVhJQcs42caAdCCAaZhSrYKCRtcfHdgwjPcSRkJwMUTyatDqQVyJhna+u5ie0u80hzu1w6sfdkeZrmrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DYHtIMoZ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-722531f7806so155191b3a.0
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 10:42:59 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-211fcbf699fso48325ad.2
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 10:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732128178; x=1732732978; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732128392; x=1732733192; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/oFKIZPyQ33M3QhxMDJu1vhmcBP8Nem+7EbpdGy4/cY=;
-        b=p8PNpB1ZIX88MKlQtYHFcU3AeHjaCBNNjF83RPpI1sbKBGNdr+6q3jrlTkd2Dr2YG7
-         VucLJBAJa0sLfsHK1opSi/kS7CW0PnLRWb6sduwIONKV1WfzRA/4LdFTd7tnX8bRLbWw
-         7woadS9WNUIOrCd0aEBONFgZ2QEMrDp904XRXfFecz3AEogA2hyODydX73d/00oKVHjw
-         NjzLUSMDATc+g+EKxcjZ81HjEchT7AFMRFAjtY8N8QIKlUN1diPM5Z1hsTVsk9T+C4R8
-         t3CMcWe5vQEXyBfTfsdLxtxq/J4DbFQ2NqH0wO9cSniK3nXYCilbjvKxGEw+fpcXA722
-         7W9w==
+        bh=1Os80MhRhGqXp5ke/1Vxt/rcMZ16KsE7OPEZ8dzr9R8=;
+        b=DYHtIMoZN4xFoWpRvwXz7GJ85mr5Irs9xkyVitPxt7/taPMZLHSpRek3MbQuHrdFPw
+         /LhdCDCdqUyS80xhA+cbPVe5BAkpyCJxBkyLiuTDHVcxQzXUK6b/i6c0Q8fhvmHJdFJR
+         fRe9SRxskFzP8uBNceeT4IBjkpluqvh4E7cJUieOEqgaZKGuEwaHBOn6BruI4CvjzRtB
+         3L/nQbTzrtMy798AJIVxQ46QO637PQuzLoI9jl0IzOUo/+KDXJEVBrUMNUzwUW32DW9w
+         RQ732V5HzTkl1XB2x29ni92xC7hMWj0v6YrDXACJx578nNXZ47knYN8DIu43W1hUXPw7
+         dzzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732128178; x=1732732978;
+        d=1e100.net; s=20230601; t=1732128392; x=1732733192;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/oFKIZPyQ33M3QhxMDJu1vhmcBP8Nem+7EbpdGy4/cY=;
-        b=UXkuvOb2LILXI5G0saNZTMzdwEXOZX/9g+RZGfdFGxjfmB5Y5lLYItLGHcPmw2eHir
-         +CfIwuy8Xbrky8KccvmkiBqakH5mSAe/Inesjk5efM4EBZeQBhQ7xUuPVG9pROx+gW6E
-         yiDDeQ3Kw5y3sGWPeMBcaGCmIY0SBCLtGwJwbJuAfYHJ/qsxPROnyciuiM0L0Rm03XOW
-         kg/ZGhsHWAdqVe1JTPpDyLDCOmGNdTHBtchmuBKJWmPX1+gA5akGEInVN/1AHuHESsVc
-         A4YSqky9TKCdTtSOLhregsysX5wLFYgBIgCQnzGZFPGs3CO8LplJ3o238/ZLHHwmHqiP
-         Qw0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXa3JlAIEkosNI5fj6VMw/VsCoJ0MP5BHekCnXlhSiMq1iFiKIdKqphewU4WKnG41z8ff0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrUzMaRaZM0w+0FG3KlDejMvIXn7Re4VQ1Keo3Pya32E/jS1HS
-	MCUNL7u8M97pz4zzzYUDH9V4ZbbyATy9GG8GXsBwaV3+SI+SAdRBIyoS+bHT6cXlRkW2SfiHHQB
-	7eg==
-X-Google-Smtp-Source: AGHT+IG//LxhiDF25kx95vY3LI5DvKRwadXHFwR8biNKmYDVJfG7r01Rwr82tJGTaq5OB4nI4z5SpF/eY2A=
+        bh=1Os80MhRhGqXp5ke/1Vxt/rcMZ16KsE7OPEZ8dzr9R8=;
+        b=ZvPoP07+RN/4xzeGcwhZ2TFnOLDRWCYdHsgIGnHIzpjaS8CLZn6VxCsb/3gBVGze7i
+         1F3vcd09aEnoRKPlgLE26dSIkVOFanURoY8/bdlE47SpAwcadSAIh7AjMMa0Ua6/7hGh
+         zm2m6Pbmaiyw24VitQtBxoG5rRXfL5YeL2MA83WAj29SKjFz4uRUpTfXtOKyhsLevogW
+         Dn4a+48mLm9Tc4x4DSpSnOAcSjs4hQQDF0hk24040QGpHxlPU1fMoe0uW9iijzEzBg1i
+         bNt+cqLDXdv4rhuvXqqWO1QUSOYsGwD8mwQ60C459C//GmoUSwym0CLGWKXuDLQg8z5a
+         WErQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4f1ATPqup8vK2JBoSukxpT/BE4myzCzPY3dt7M6BxY8f3eFkVAauztM4huGT2jU6MqGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHi3l0+6Zje7YOj+d1MdzSiT9Q7+M1OOmQJ6EXnEa5h8D96A45
+	83DaBBXjKN8O73iT9Qu8EvlczAks7w1m9iLYdsRdQsvb0PlFmjpGxyxkK+H9OooAd4hI9OhqR0v
+	HdA==
+X-Google-Smtp-Source: AGHT+IFJzrweiSMHDQwuusG00tZ0L3OBUwopKy6Nr208yDx/fXeQeozBoXUMG6gBsgZPojGUxMGBmM72sP8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:902:c3d5:b0:20c:da66:3884 with SMTP id
- d9443c01a7336-2126a44d20dmr19555ad.9.1732128178593; Wed, 20 Nov 2024 10:42:58
+ (user=seanjc job=sendgmr) by 2002:a17:903:788:b0:212:f64:de11 with SMTP id
+ d9443c01a7336-2126a336564mr12995ad.2.1732128391948; Wed, 20 Nov 2024 10:46:31
  -0800 (PST)
-Date: Wed, 20 Nov 2024 10:42:57 -0800
-In-Reply-To: <20240801045907.4010984-39-mizhang@google.com>
+Date: Wed, 20 Nov 2024 10:46:30 -0800
+In-Reply-To: <20240801045907.4010984-41-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-39-mizhang@google.com>
-Message-ID: <Zz4tsayQblkJUOtG@google.com>
-Subject: Re: [RFC PATCH v3 38/58] KVM: x86/pmu: Exclude existing vLBR logic
- from the passthrough PMU
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-41-mizhang@google.com>
+Message-ID: <Zz4uhmuPcZl9vJVr@google.com>
+Subject: Re: [RFC PATCH v3 40/58] KVM: x86/pmu: Grab x86 core PMU for
+ passthrough PMU VM
 From: Sean Christopherson <seanjc@google.com>
 To: Mingwei Zhang <mizhang@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
@@ -91,20 +91,19 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> Excluding existing vLBR logic from the passthrough PMU because the it does
-> not support LBR related MSRs. So to avoid any side effect, do not call
-> vLBR related code in both vcpu_enter_guest() and pmi injection function.
+> From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> 
+> When passthrough PMU is enabled by kvm and perf, KVM call
+> perf_get_mediated_pmu() to exclusive own x86 core PMU at VM creation, KVM
+> call perf_put_mediated_pmu() to return x86 core PMU to host perf at VM
+> destroy.
+> 
+> When perf_get_mediated_pmu() fail, the host has system wide perf events
+> without exclude_guest = 1 which must be disabled to enable VM with
+> passthrough PMU.
 
-This is unnecessary.  PMU_CAP_LBR_FMT will be cleared in kvm_caps.supported_perf_cap
-when the mediated PMU is enabled, which will prevent relevant bits from being set
-in the vCPU's PERF_CAPABILITIES, and that in turn will ensure the number of LBR
-records is always zero.
+I still much prefer my idea of making the mediated PMU opt-in.  I haven't seen
+any argument against that approach.
 
-If we wanted a sanity check, then it should go in intel_pmu_refresh().  But I don't
-think that's justified.  E.g. legacy LBRs are incompatible with arch LBRs.  At some
-point we have to rely on us not screwing up.
-
-A selftest for this though, that's a different story, but we already have coverage
-thanks to vmx_pmu_caps_test.c.  If we wanted to be paranoid, that test could be
-extended to assert that LBRs are unsupported if the mediated PMU is enabled.
+https://lore.kernel.org/all/ZiFGRFb45oZrmqnJ@google.com
 
