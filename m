@@ -1,262 +1,176 @@
-Return-Path: <kvm+bounces-32156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B869D3CFE
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:05:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03D49D3D4E
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 15:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEBC3B22173
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:05:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71810281B51
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 14:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F3B1AA7A4;
-	Wed, 20 Nov 2024 14:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFF91C7281;
+	Wed, 20 Nov 2024 14:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrMlR0i6"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="K8RygJNl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627B814A60C
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 14:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CBD1AC447
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 14:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732111535; cv=none; b=fPrPoZgTjJkcZkGGeOdMbX5e3RUPDSbeBAIVCLcoNe4AjRuHNoaHEpi+px5GhB9T1k62DZm5WJE/F4UcdZiNzrlDXk54WdQ4YPmh1OMRi919LQ605qEsMAgxkunTnhg8Kj78PEixiqZaLMpY3JfO6zsDcM26U0z+/bU2Uze6FXA=
+	t=1732111787; cv=none; b=oRmYwczSbyCW8vkS/IK7tUjZ7eFTbptp4NxDvXD8M/57x9YvA8xj/9MpMYAZdjafe+hF4/z7tGmIlD2mEQ4KBGkpvuabGI2pG0FNfpq+Zct/Zne/5FF3V+QDxcGIQY+PxNaIWMOl1ZobEnetcb1iuZ+ocNiT+EIKblQROLYLWP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732111535; c=relaxed/simple;
-	bh=ZG2agr9YKv9vY6LK3VsO2Cz9sA6qKnnMQJv1p7D1KC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iwwGpK43Y5zITI9Uhr8CCdu3gdDcjFQmimRqbcPGei/fkRJvTEc656fS7calt0iBrNMVEnUDm3ghvuI5w6Peka5et/6hmYnFjqu2ovqEOeJb7SZH5LCNygdu60JeOWV1KjZsD3qa4uz6OBDShxGMhXuV93v5dIs69c6vDSds3r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UrMlR0i6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732111532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lZ8zkxd9i0HO8zyxRsaMmA5VwckXIWnTVoItJwHtzes=;
-	b=UrMlR0i62GILMhlqTz3jes8+jeEyDgfKqj3DNnAmmCg0aieFqhsoWQ729MCyeDJcLPlIn9
-	3raQVkgN+K6EwBcTa3uDMcrO3seI3kegRq8d31qQaKCvu90q+WEThrZnnGuL7G7TeFgvwP
-	zhVc8VI6oyxtuC9/bSiDECdCLycvYyI=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-fEP9m0A0NhyClwF0cvKrGQ-1; Wed,
- 20 Nov 2024 09:05:28 -0500
-X-MC-Unique: fEP9m0A0NhyClwF0cvKrGQ-1
-X-Mimecast-MFC-AGG-ID: fEP9m0A0NhyClwF0cvKrGQ
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 307F91953944;
-	Wed, 20 Nov 2024 14:05:25 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFA9230001A0;
-	Wed, 20 Nov 2024 14:05:22 +0000 (UTC)
-Date: Wed, 20 Nov 2024 22:05:15 +0800
-From: Baoquan He <bhe@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce
- PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
-Message-ID: <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
-References: <20241025151134.1275575-1-david@redhat.com>
- <20241025151134.1275575-8-david@redhat.com>
- <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
- <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
+	s=arc-20240116; t=1732111787; c=relaxed/simple;
+	bh=ju5iaCTTGnlC8cKNSV/WW1suH3P3ww9XIffkT2cxxRo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UKAZJ+pQctAs1d1Pm4kY+m/xnYbB2V9pxs9x+mCan5H+y2+PiVhM6RY5JRdn4pQIV29xl+NjKEHMOcEo+5HD8sWn527HPs8TdOkJ9blSDvb7FI+krxT2MLOF4gl2Mz4IRwC7d2LtR0S/7lz2yfH5x+CIXayCqDDMqZcMy1+ctUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=K8RygJNl; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-20c805a0753so21440985ad.0
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 06:09:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1732111785; x=1732716585; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cxrAHqhmG1JlcR3HvdHEoqSUwYkPTE5MTo5NUdeAECY=;
+        b=K8RygJNlhsqvtRxMj60MGZUwW32Wb52IUFpZ9lHxfUG/GWm7jSqrPv2Z4fqx3xH3IU
+         ZJmTaSHVQa3Xs9d6EM7AwbRxvjiByv9dZu+XtZlAef7pdMp+9YdAAqWGSX8DSBlU4ro6
+         TuLOWU8aIUkrUqPhAdrYA2L73qRMVo5e8NhHBpgmIevV1KxIh8XgDJSM5ysh18tjU9Pp
+         lS/CmKixArN63B0SwbOCG/IIpN7diA6nj8zuuLk6li94UwjA92vr0rTARCnNMipT3CUV
+         bAkIcVAqOMi+x1WgeF29rqr2XqbRwAV5Mj21Oo7nfNKS4LrPycN9X4Cdrvv9r64cs7/V
+         ljiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732111785; x=1732716585;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cxrAHqhmG1JlcR3HvdHEoqSUwYkPTE5MTo5NUdeAECY=;
+        b=Y8DYNCbI7fnwMC00WtZPb16b20NcrM6jdwvJebk6nLXEaikmGgHlsKdQs4N5p1Qcgn
+         3PdSjHl9hPDHy3Io2DqglbkXZ09qW+HZ0L/MV46LcuRbhDghyJ9ifQ6sFboO74MLWSgb
+         vH5s1SobOaytz3hZUxFJCBRQYm4RuKTi+jmAcWx1Fyyd9jQjwZ+4w6QhGJhaycE9gDiE
+         A4YRGrLDLsFra0vsHB0fnZ/5zd7QhFzmkHl9HYFxVC+AgUKAvIPMbBFyV3c4PIuT03w6
+         Vj6K6RLWkr11Vkb8rODI3PdvENif6HQM4dUuq90uodG8uv/Ebla/DbR8Krj+hrDIxMkc
+         AD0A==
+X-Forwarded-Encrypted: i=1; AJvYcCV6yNQBvymVw/00lqTaWXC8dDVJRuBT/kcD+t1oZhxRqgFU2XSoRPQQ/0rZVGj58TlcYXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynqWYCFvHOUiP59uW4SepM35Ts8S+yACqfcwLen4w3lfkDdkbw
+	ChVk8MrY9BZJvWBVK0rhtHC2w67GtK+r2N6iup8Qz1wKQWAyZRMgnR04AIbZ82c=
+X-Gm-Gg: ASbGnculv9RT+EXtC89xb+mfsQjuRFFh8Ex4v/mpDqJOSH3FupruxovuleQ+TwuwbHm
+	b7uCMukVl9ITWAf/hgqBGmYuktjpWeWupTqEy68p4Oz2qcaUXMzfiJNJvTWTH7qLQWR/ZWxZnbh
+	TvMiU5SL3ZplEEKFQR4gsoZp04KpOtKv5JI7Zare0qv8l6Yjv3q0eTP/C45vbAoXdhDNzp65DWL
+	AGWIt2EDFAn9SgTFkEo9pzAorHkaDNilX4Ssha3BgdO1+ArUOO4ycxs/t30ZsyDl7iWZXhLnUEW
+	BZf5Qw==
+X-Google-Smtp-Source: AGHT+IGUKS5hjt2wBeHFpNbOFGt9aCFT4yqBOEuCP8j8uWcxGmZ/D/8LQlPLEi80dxUfa7W2k1rhVQ==
+X-Received: by 2002:a17:902:e80f:b0:20c:cd23:449d with SMTP id d9443c01a7336-2126a456615mr36184435ad.46.1732111783883;
+        Wed, 20 Nov 2024 06:09:43 -0800 (PST)
+Received: from [127.0.1.1] (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f474fcsm92502505ad.213.2024.11.20.06.09.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2024 06:09:43 -0800 (PST)
+From: Max Hsu <max.hsu@sifive.com>
+Subject: [PATCH RFC v3 0/3] riscv: add Svukte extension
+Date: Wed, 20 Nov 2024 22:09:31 +0800
+Message-Id: <20241120-dev-maxh-svukte-v3-v3-0-1e533d41ae15@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJztPWcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyjHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDQ0NT3ZTUMt3cxIoM3eKy0uySVN0yY93ENBOzFDNTg8RkgyQloMaCotS
+ 0zAqwodFKQW7OSrG1tQCbJCqIaQAAAA==
+X-Change-ID: 20241115-dev-maxh-svukte-v3-af46d650ac0b
+To: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>
+Cc: Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+ Max Hsu <max.hsu@sifive.com>, Samuel Holland <samuel.holland@sifive.com>, 
+ Deepak Gupta <debug@rivosinc.com>, Alexandre Ghiti <alexghiti@rivosinc.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2572; i=max.hsu@sifive.com;
+ h=from:subject:message-id; bh=ju5iaCTTGnlC8cKNSV/WW1suH3P3ww9XIffkT2cxxRo=;
+ b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBnPe2kHNOLtJ3Nh25+lGk83izF/rgv0VNEkT6pu
+ REZcT4K5Y6JAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZz3tpAAKCRDSA/2dB3lA
+ vZfUC/sHvSkPEeYcaLuBEqUc3AcV2qThswESzWxUw4n7HTrnZVEWEif4jcdPYpXLMtrBY5zGlVk
+ FO4VpUrnYPxMYbz2NSMEqp5JeIOdWY8rBQqKYcV17s7v4XA3BfCXC9q/hXupXM2dEdLOYUGtpqq
+ LWyPTw5fuqFEShidGJktJK740GSqg0Rh8ybvwadf6/aP0bIGEYMflZbMn2JDo9Mc3b925/WaPgH
+ vgEPgPWoTC/c9MX6Pb+nPxvK6lE/98LSbKCLLSCJDJuo5Z5l+Li4RqRt/SvL8YeqvwOmlKVbtGk
+ cHz0q4XRKXyCSAg68Z/n/2rX410Nw9L8j0FxDjrmINiu6yge0/J/TiS2t5YRIoxmPYye0Yiz9A9
+ s2goi0wDboUE1uIlMD1AHbmBSqnfSJsCEmE2TnLsnlarYRY3a3WmBh6mNNqh4vpbUOTCI0tpz1F
+ 7zC6DVzOqR6FJ4zULNN7B0rlWhzSWStDMay5CJOKM2awK0czHIHoaHuStTJywSon057N8=
+X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
+ fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
 
-On 11/20/24 at 11:48am, David Hildenbrand wrote:
-> On 20.11.24 11:13, Baoquan He wrote:
-> > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-> > > s390 allocates+prepares the elfcore hdr in the dump (2nd) kernel, not in
-> > > the crashed kernel.
-> > > 
-> > > RAM provided by memory devices such as virtio-mem can only be detected
-> > > using the device driver; when vmcore_init() is called, these device
-> > > drivers are usually not loaded yet, or the devices did not get probed
-> > > yet. Consequently, on s390 these RAM ranges will not be included in
-> > > the crash dump, which makes the dump partially corrupt and is
-> > > unfortunate.
-> > > 
-> > > Instead of deferring the vmcore_init() call, to an (unclear?) later point,
-> > > let's reuse the vmcore_cb infrastructure to obtain device RAM ranges as
-> > > the device drivers probe the device and get access to this information.
-> > > 
-> > > Then, we'll add these ranges to the vmcore, adding more PT_LOAD
-> > > entries and updating the offsets+vmcore size.
-> > > 
-> > > Use Kconfig tricks to include this code automatically only if (a) there is
-> > > a device driver compiled that implements the callback
-> > > (PROVIDE_PROC_VMCORE_DEVICE_RAM) and; (b) the architecture actually needs
-> > > this information (NEED_PROC_VMCORE_DEVICE_RAM).
-> > > 
-> > > The current target use case is s390, which only creates an elf64
-> > > elfcore, so focusing on elf64 is sufficient.
-> > > 
-> > > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > > ---
-> > >   fs/proc/Kconfig            |  25 ++++++
-> > >   fs/proc/vmcore.c           | 156 +++++++++++++++++++++++++++++++++++++
-> > >   include/linux/crash_dump.h |   9 +++
-> > >   3 files changed, 190 insertions(+)
-> > > 
-> > > diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
-> > > index d80a1431ef7b..1e11de5f9380 100644
-> > > --- a/fs/proc/Kconfig
-> > > +++ b/fs/proc/Kconfig
-> > > @@ -61,6 +61,31 @@ config PROC_VMCORE_DEVICE_DUMP
-> > >   	  as ELF notes to /proc/vmcore. You can still disable device
-> > >   	  dump using the kernel command line option 'novmcoredd'.
-> > > +config PROVIDE_PROC_VMCORE_DEVICE_RAM
-> > > +	def_bool n
-> > > +
-> > > +config NEED_PROC_VMCORE_DEVICE_RAM
-> > > +	def_bool n
-> > > +
-> > > +config PROC_VMCORE_DEVICE_RAM
-> > > +	def_bool y
-> > > +	depends on PROC_VMCORE
-> > > +	depends on NEED_PROC_VMCORE_DEVICE_RAM
-> > > +	depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
-> > 
-> > Kconfig item is always a thing I need learn to master.
-> 
-> Yes, it's usually a struggle to get it right. It took me a couple of
-> iterations to get to this point :)
-> 
-> > When I checked
-> > this part, I have to write them down to deliberate. I am wondering if
-> > below 'simple version' works too and more understandable. Please help
-> > point out what I have missed.
-> > 
-> > ===========simple version======
-> > config PROC_VMCORE_DEVICE_RAM
-> >          def_bool y
-> >          depends on PROC_VMCORE && VIRTIO_MEM
-> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
-> > 
-> > config S390
-> >          select NEED_PROC_VMCORE_DEVICE_RAM
-> > ============
+RISC-V privileged spec will be added with Svukte extension [1]
 
-Sorry, things written down didn't correctly reflect them in my mind. 
+Svukte introduce senvcfg.UKTE and hstatus.HUKTE bitfield.
+which makes user-mode access to supervisor memory raise page faults
+in constant time, mitigating attacks that attempt to discover the
+supervisor software's address-space layout.
 
-===========simple version======
-fs/proc/Kconfig:
-config PROC_VMCORE_DEVICE_RAM
-        def_bool y
-        depends on PROC_VMCORE && VIRTIO_MEM
-        depends on NEED_PROC_VMCORE_DEVICE_RAM
+In the Linux kernel, since the hstatus.HU bit is not enabled,
+the following patches only enable the use of senvcfg.UKTE.
 
-arch/s390/Kconfig:
-config NEED_PROC_VMCORE_DEVICE_RAM
-        def y
-==================================
+For Guest environments, because a Guest OS (not limited to Linux)
+may hold mappings from GVA to GPA, the Guest OS should decide
+whether to enable the protection provided by the Svukte extension.
+Therefore, the functions kvm_riscv_vcpu_isa_(enable|disable)_allowed
+can use default case (which will return true) in the switch-case.
 
+If the Guest environment wants to change senvcfg.UKTE, KVM already
+provides the senvcfg CSR swap support via
+kvm_riscv_vcpu_swap_in_(host|guest)_state.
+Thus, there is no concern about the Guest OS affecting the Host OS.
 
-> 
-> So the three changes you did are
-> 
-> (a) Remove the config option but select/depend on them.
-> 
-> (b) Remove the "depends on PROC_VMCORE" from PROC_VMCORE_DEVICE_RAM,
->     and the "if PROC_VMCORE" from s390.
-> 
-> (c) Remove the PROVIDE_PROC_VMCORE_DEVICE_RAM
-> 
-> 
-> Regarding (a), that doesn't work. If you select a config option that doesn't
-> exist, it is silently dropped. It's always treated as if it wouldn't be set.
-> 
-> Regarding (b), I think that's an anti-pattern (having config options enabled
-> that are completely ineffective) and I don't see a benefit dropping them.
-> 
-> Regarding (c), it would mean that s390x unconditionally includes that code
-> even if virtio-mem is not configured in.
-> 
-> So while we could drop PROVIDE_PROC_VMCORE_DEVICE_RAM -- (c), it would that
-> we end up including code in configurations that don't possibly need it.
-> That's why I included that part.
-> 
-> > 
-> > 
-> > ======= config items extracted from this patchset====
-> > config PROVIDE_PROC_VMCORE_DEVICE_RAM
-> >          def_bool n
-> > 
-> > config NEED_PROC_VMCORE_DEVICE_RAM
-> >          def_bool n
-> > 
-> > config PROC_VMCORE_DEVICE_RAM
-> >          def_bool y
-> >          depends on PROC_VMCORE
-> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
-> >          depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
-> > 
-> > config VIRTIO_MEM
-> > 	depends on X86_64 || ARM64 || RISCV
-> >           ~~~~~ I don't get why VIRTIO_MEM dones't depend on S390 if
-> >                 s390 need PROC_VMCORE_DEVICE_RAM.
-> 
-> This series depends on s390 support for virtio-mem, which just went
-> upstream.
+The following patches add
+- dt-binding of Svukte ISA string
+- CSR bit definition, ISA detection, senvcfg.UKTE enablement in kernel
+- KVM ISA support for Svukte extension
 
-Got It, I just applied this series on top of the latest mainline's
-master branch. Thanks for telling.
+Changes in v3:
+- rebase on riscv/for-next
+- fixed typo in the dt-binding for the Svukte ISA string
+- updated the commit message for KVM support for the Svukte extension
+- Link to v2: https://lore.kernel.org/all/20240927-dev-maxh-svukte-rebase-2-v2-0-9afe57c33aee@sifive.com/
 
-> 
-> 
-> commit 38968bcdcc1d46f2fdcd3a72599d5193bf8baf84
-> Author: David Hildenbrand <david@redhat.com>
-> Date:   Fri Oct 25 16:14:49 2024 +0200
-> 
->     virtio-mem: s390 support
-> 
-> 
-> >          ......
-> >          select PROVIDE_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
-> > 
-> > config S390
-> >          select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
-> > =================================================
-> > 
-> 
-> Thanks for having a look!
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+Changes in v2:
+- rebase on riscv/for-next (riscv-for-linus-6.12-mw1)
+- modify the description of dt-binding on Svukte ISA string
+- Link to v1: https://lore.kernel.org/all/20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com/
+
+Link: https://github.com/riscv/riscv-isa-manual/pull/1564 [1]
+
+Signed-off-by: Max Hsu <max.hsu@sifive.com>
+
+---
+Max Hsu (3):
+      dt-bindings: riscv: Add Svukte entry
+      riscv: Add Svukte extension support
+      riscv: KVM: Add Svukte extension support for Guest/VM
+
+ Documentation/devicetree/bindings/riscv/extensions.yaml | 9 +++++++++
+ arch/riscv/include/asm/csr.h                            | 2 ++
+ arch/riscv/include/asm/hwcap.h                          | 1 +
+ arch/riscv/include/uapi/asm/kvm.h                       | 1 +
+ arch/riscv/kernel/cpufeature.c                          | 5 +++++
+ arch/riscv/kvm/vcpu_onereg.c                            | 1 +
+ 6 files changed, 19 insertions(+)
+---
+base-commit: 0eb512779d642b21ced83778287a0f7a3ca8f2a1
+change-id: 20241115-dev-maxh-svukte-v3-af46d650ac0b
+
+Best regards,
+-- 
+Max Hsu <max.hsu@sifive.com>
 
 
