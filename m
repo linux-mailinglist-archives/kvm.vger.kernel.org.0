@@ -1,101 +1,109 @@
-Return-Path: <kvm+bounces-32205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32206-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED159D4214
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 19:34:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10DD9D4227
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 19:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35211282734
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:34:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5BA4284051
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 18:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DB81BC068;
-	Wed, 20 Nov 2024 18:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C661AC420;
+	Wed, 20 Nov 2024 18:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JksuflpP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hscs2gSg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB81156879
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 18:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A177520B22;
+	Wed, 20 Nov 2024 18:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732127662; cv=none; b=mj5UZD12oXsG5/V+jveLgEys/UdCJtD/n3DungCX42FBkkyKFOi5zisnPB0esL7rASlKntcD4zZPwHFPE27Ri+BkDztCZ/oJUJoB4ngUNeVG/A9KV9zIbehi1OvldG2PDk6iRc3oMpLtTKJ+jxsQhxEQZ/GxbxAMM1ztURVYwb4=
+	t=1732128169; cv=none; b=tbrb1YUB325yjyGNn2WRECjZ++8RrqDIoIL6Zt/qucVYktW3MrjRFvb5myI2IIPObYskIBvgMps3QSDuZa4WYxeb5xGCcjaFJRPlXNkeoW/fh1LF8QPLclGZFIUtVZkrc0we2FkTVXB7qU3n3fcv2d4/mfPLZW/galRdQXHwImw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732127662; c=relaxed/simple;
-	bh=0hdYlPl5kdxITeyO/ldXg8jFICnnm/O/reo7eK65D30=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aMCeQL5NiFKFceYqRmprQMTF//0SIm6XXk4CkrGlNa8Rscmq8YAv2GfOXUy8OqxIryZ5vd+uHO5tOowCwFsjOrsPrttbQDoztfrVuClyNc67ierEddTTmXzqjnAuIyW6UxxJNFT+15IQT9eBkGYA0qkgAN9IUGyIZF6N0IGVnN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JksuflpP; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e9d6636498so95253067b3.2
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 10:34:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732127660; x=1732732460; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Shk5YfZWIn8Bu2YoYX+m4i77URe0OKtBvNQtklX8oko=;
-        b=JksuflpP0X520U2xNrsEdKRpXdC3HAvI5jr3UKcQUK5iWNPHS3LYdhEBlA13/bSqru
-         Sx6CzVxU3s3TA0xIQ00s/wB2gH30t7IhyEI3G4XwxmzgzsTU/7w7RzgBYvyo1+HJIjB5
-         gsITyt3hwJwKRJK2qBzEgYLYk+493y3cSRnPsRJ1HsMML3BDZevJXwPJLcL4ObI59/wI
-         8XwFT4D7jiqcc0JjZFUVcLgzi1uAMEtWSnT7TS9031+D5bu8fGwoNpXilAcXh2Hw+Ebs
-         yaX93zjlIoIhUhEOhECjzwFTIXTNyTVDZtLSup1m72AJaRYw3Ap00MBwBdXC2h/vDBMw
-         3Uig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732127660; x=1732732460;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Shk5YfZWIn8Bu2YoYX+m4i77URe0OKtBvNQtklX8oko=;
-        b=I0HEaLswsz6EFwSEdc0ZpW6666dx7mRvJ23xI9s5zykMHEGAXAkdVRsq1vU5mK91Bk
-         ib41r5WXG0FW0bldtbiq89gwPZRJLVh+AcV+YnimM5VF5VMpEKzrT51lbrmG5ukNY8py
-         bQ16aTJwb2JGubPUT76WvZ1/7FaXj4upQK7+yJwxBK97GxzUKamxU9jju9MykbHDklDN
-         5CHyHhePyrvxI8gxaik5JE9O3r1h7KzQI18ED0vg7LEJ47SNlNaly43JEbtOQ87JRseQ
-         Rkw6RqTiTKABPQNJG3ijE00i2v23iST4dwUJD+zLLcv6i/nBKaKnKHSPXhQCnRlnKARO
-         7ejw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuuwrJ2wmzX5M8S48hBKMRb/8igXPluGVKFDtQB/1NeXnumfmp53SWqU+zLcajZfH/t6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydAgBJ/m6JGgHl9cxmZ9GHZZecBBAEfAkI13BBz1j3QMT7ZAf6
-	eMwr/FjX5Eqg+8Jsop0eI/YGtxPfinyCcKhApCqeKMnFPY/LXaVGfmpPrN6+mpd1WUpcvuU9+/T
-	hvw==
-X-Google-Smtp-Source: AGHT+IGFsJ+zg5lKx6s1J17TzwGaH5HlpDBXYOqJF08NC3M/54KnNON9WXJ42ZjtHdvxB0LAWQzYddinkOg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2f85:b0:6e2:1713:bdb5 with SMTP id
- 00721157ae682-6eebd275a61mr17917b3.5.1732127660016; Wed, 20 Nov 2024 10:34:20
- -0800 (PST)
-Date: Wed, 20 Nov 2024 10:34:18 -0800
-In-Reply-To: <d99691ff-906d-4209-9636-4b18915e1afc@linux.intel.com>
+	s=arc-20240116; t=1732128169; c=relaxed/simple;
+	bh=28aQ2kyC3/EvsIU5pfY5flRbQcMW+sg4mGXUH29bVEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dr2XJVGbeu7+NJ8dnDFVGSdK6KcYRoPhQWVsnkAmT9ghJZ/jjYKuVGTUlf8DLaClyyvtCVtocnTaZFkZBAhYXfcYQIZoSVFSVaQskPVll8gDVdrr8BIbGFv0+M/VQ818TFhpB5IuzpybV4akr03dDrsc7B7n6jzBsJ6LyP58Jxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hscs2gSg; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732128168; x=1763664168;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=28aQ2kyC3/EvsIU5pfY5flRbQcMW+sg4mGXUH29bVEQ=;
+  b=Hscs2gSg6b7yTKaWLkg0HZ9iZpECOax0/8z4hgjPUuDr5Pv6gKx3S3SD
+   TnDvqIc7LxUWA7aF9RiAf4c0pEKQ3uDTDOevOOEU8rD6HxLgJP/qnMSPz
+   Gr2tXACP2HGO1UmiaMz6wgMg0ZhQTcLymhOmG2JYbBtXsUpS5yUb7kTRv
+   yLjT9RiTAwn9NRQLesSj4eF84I1TZ6MEg8R26bJl0UyciQFOcLCETKsyy
+   0d/vm4xHr66dIdatVXump4fsRrpTzCP0Q/H7+xkas02rTe0RMup3tGauD
+   Wgtt+Mm0twlcqmhnMRkLZl1sKO23/mmAhJmavgDm2BkaKWd06tlA5AaWQ
+   w==;
+X-CSE-ConnectionGUID: mTqKa04iTSq2TMnw1hjxyg==
+X-CSE-MsgGUID: YHm6r2XGTFy2WtqtFTi8vQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="54706886"
+X-IronPort-AV: E=Sophos;i="6.12,170,1728975600"; 
+   d="scan'208";a="54706886"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 10:42:45 -0800
+X-CSE-ConnectionGUID: jHmHFH6yRECOpsI+vzoUOA==
+X-CSE-MsgGUID: h9QtWv1DRU6eJCH5nCRmwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,170,1728975600"; 
+   d="scan'208";a="95071096"
+Received: from abkail-mobl.amr.corp.intel.com (HELO desk) ([10.125.145.31])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 10:42:44 -0800
+Date: Wed, 20 Nov 2024 10:42:38 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, amit@kernel.org,
+	kvm@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com,
+	bp@alien8.de, tglx@linutronix.de, peterz@infradead.org,
+	corbet@lwn.net, mingo@redhat.com, dave.hansen@linux.intel.com,
+	hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+	daniel.sneddon@linux.intel.com, kai.huang@intel.com,
+	sandipan.das@amd.com, boris.ostrovsky@oracle.com,
+	Babu.Moger@amd.com, david.kaplan@amd.com, dwmw@amazon.co.uk,
+	andrew.cooper3@citrix.com
+Subject: Re: [PATCH 2/2] x86/bugs: Don't fill RSB on context switch with eIBRS
+Message-ID: <20241120184238.rddzpb7fhbhtqphr@desk>
+References: <cover.1732087270.git.jpoimboe@kernel.org>
+ <9792424a4fe23ccc1f7ebbef121bfdd31e696d5d.1732087270.git.jpoimboe@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <d99691ff-906d-4209-9636-4b18915e1afc@linux.intel.com>
-Message-ID: <Zz4rqqexdOkmHHAX@google.com>
-Subject: Re: [RFC PATCH v3 00/58] Mediated Passthrough vPMU 3.0 for x86
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>, 
-	Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla <manali.shukla@amd.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Jim Mattson <jmattson@google.com>, 
-	Stephane Eranian <eranian@google.com>, Ian Rogers <irogers@google.com>, 
-	Namhyung Kim <namhyung@kernel.org>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9792424a4fe23ccc1f7ebbef121bfdd31e696d5d.1732087270.git.jpoimboe@kernel.org>
 
-On Wed, Nov 20, 2024, Dapeng Mi wrote:
-> Hi Sean,
+On Tue, Nov 19, 2024 at 11:27:51PM -0800, Josh Poimboeuf wrote:
+> User->user Spectre v2 attacks (including RSB) across context switches
+> are already mitigated by IBPB in cond_mitigation(), if enabled globally
+> or if at least one of the tasks has opted in to protection.  RSB filling
+
+Is below less ambiguous?
+
+s/if at least one of the tasks/if previous or the next task/
+
+> without IBPB serves no purpose for protecting user space, as indirect
+> branches are still vulnerable.
 > 
-> Do you think we can remove the "RFC" tag in next version patchset? You and
-> Peter have reviewed the proposal thoroughly (Thanks for your reviewing
-> efforts) and it seems there are no hard obstacles besides the
-> implementation details? Thanks.
+> User->kernel RSB attacks are mitigated by eIBRS.  In which case the RSB
+> filling on context switch isn't needed.  Fix that.
+> 
+> While at it, update and coalesce the comments describing the various RSB
+> mitigations.
+> 
+> Suggested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 
-No objection on my end.
+Reviewed-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
