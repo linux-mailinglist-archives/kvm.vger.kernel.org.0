@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-32214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43BD9D42EE
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 21:19:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB7C9D4336
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 21:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E5B91F23108
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 20:19:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8198C284DD0
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2024 20:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812231BD03C;
-	Wed, 20 Nov 2024 20:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DC91BC9F9;
+	Wed, 20 Nov 2024 20:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mC5lihYU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izbO6wlV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BFC13BAF1
-	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 20:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF9C136E3F
+	for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 20:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732133958; cv=none; b=N4WonzPjqvqOeDbdeGtt3hvc6rxQKMTsOLyu95AWgzH2L8TPAhjnfwH/hdLz0Z+wfYJxPP4YjYuennoe5jRWwwmejIY4vvVRn+XNDYQabm/hTRgTJenCPDtbbpcNFWyGU1Uk3YTKIMWUzaLavSyz9CgolZGE+IY2B5PfyTmrJdo=
+	t=1732135263; cv=none; b=klrl2EaizZp3v5/fhSG7gaC/LiV9vshi/G25rGj36m1hcnHGQMJ1k+OYuxfkfyeWCjV9EGGSBOJlkL6Z7FJAIh9IiC4czUXhSljB8BMd2vEplqFD/x13hpF30Cp9GXPh3cCHd4aZnTUnzf32RmiMT/DDFvSlz5QQdrwV/IcKi0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732133958; c=relaxed/simple;
-	bh=RW6cRbNEdrg0SPftGP8wi2ade4Dg3TNXphUodG0Bzac=;
+	s=arc-20240116; t=1732135263; c=relaxed/simple;
+	bh=FekYk366P+ax6p+AWMnai2VmXkm3SJ34xhn7IDQjVg4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DtKNnlRHf2K8uEhpCp62g3C/HcVchDiIiw2iOPLv4r2H9FMA7J5qiZ8NCt7bQJ25p2CHFEr7ZKpFsO8LxKLDMKxsHAMtjTzL5AKq4sAIrhk8a9zmuVz/cmnj8+lqnCvArp1dM3vFlOsvI+hDmpJqmB9AbmXNtFpUB4cfcTVNpPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mC5lihYU; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Di7po3c/+4XXsMdhazusfOK7seiU5NBQS7iaf+mAIU23vqdCUqcJceulY3Zf1tcpyuE5o5le6NRerUNsc+Bfng5aw03HY4Sj1btWyXIrL2nrDLyioOPNXqNamQwzBURMFSXC32voMZowtyHN47eMfgZhiB6EFbJXH+PTsmsJceQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=izbO6wlV; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6eeb5ee73f0so1170197b3.3
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 12:19:17 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e389bce2713so196401276.2
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2024 12:41:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732133956; x=1732738756; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732135261; x=1732740061; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRn8aW/pTC4u7+ActWI6S+WTDz59CmhJuTqm5/JelFE=;
-        b=mC5lihYUxTf/egafzLXNL2KfAZNiM1nswa68GVDcAEHKiGSpHRZVPQoUMeBOzuKKrR
-         9PKXy4vFzjIMltXr2yz/mI1roRQsOZFlAlDyovWQx1K7q5DDjquhpjwQb8QHSGpVBVVO
-         iI8eY/51DvMqNsYsakKfB96BFnzeZV0nxcQS5sPyeFaonLhZ9yxJH1I2VaEpNaLU1RPq
-         N4T2ehHc8vu0qzCABoNR7ybF71bKgcnpSaEM88v08WY3DZGmHlPNuXkROAV9ZGvKl+X+
-         almd/xtK85ZREMNetO1ppD8QCFMu28oca+Vf703JT+IuEHipTp4KcuOHpJbgDNX/bw8h
-         A3+g==
+        bh=mqgL25CUvMLSEM2lw1UXMqf9Sdbdhpgd87dTtkToLJY=;
+        b=izbO6wlVj40OCqR+fFyrdfXI6RWNoJaubE0PCIF/68JtCJIzTN9fy7JZhyLH8B9I6L
+         MFDb8DX2HLMIGbT/G5KZrQEthjjeWtdsHjpwwVlDJ/6uu/9+utSyR9wf3Jhk0405NEuU
+         rocAxnxigFlSPRQcZqCfqwLyo630sHg2BIx85efSZFhh00Qt4ron4FoScHX+Nix0X+fk
+         QBByzHOpkOTkrkPLIOGrgYj4EMg/YdpUB5/KcrhUW60vlSsuSMD5Ps4PIZX5CYpJSbY2
+         C5/p+irOySoaV6DJICqUwUKPszDE7D/NKLobTo3Ov2GjNrrdn3a3MAofL2tlmqmbzLXW
+         frRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732133956; x=1732738756;
+        d=1e100.net; s=20230601; t=1732135261; x=1732740061;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRn8aW/pTC4u7+ActWI6S+WTDz59CmhJuTqm5/JelFE=;
-        b=GQvTnhLWYTkRHpI4Bzfk3nbXI3HXWudspoqCuqi7t6r01d3WlmrMX0tAihpAGDgCdF
-         mfwKewA+obO7CuDsTrU1SYjj0FYWlnv5fPRn3a19ugIxzXBC9vGGx05KmhIb+zcoQ0lo
-         uvF6EQwEaqzpjdQY6DSpauXLhKz9/ZUTFAJqxFVslcShwWqjf8FDAl2qakVf45iL8TZe
-         hUn6Kc0mZP4Ae6guThmpznaT2x5TgdGMfnsa+7tIWmCcKPAtKDikjPM7hZnIVCPP0aoH
-         TGjcdASbjWwclvdofLB8b/RCZX7heOiu/XBYrD81k4UHmzho0secDLqAR3LHTNZo8ehM
-         eXng==
-X-Forwarded-Encrypted: i=1; AJvYcCVRoFNSvJN+yyXxSh32Zk0EXQpemhEu94W/7sBt5kluAhi7wVTwbogHrjwvEl+JbgZ2JKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy9wtBrfCe2hX7aIZgbgGTZz43AERJNUFjeZHbAaxzXjS007DE
-	6TdLXpyZtIaN7wJrFrHASGiwdfARsWL1uCi6mKWdE6FJo6E8JrLttxdIEqcgpp3J9OFx8OoVEVC
-	uxg==
-X-Google-Smtp-Source: AGHT+IHyKkDsOH289g9JEPjioa6sUrtiikUvwZ1LdN0K0CGPqNd+A2Wh1qIRG8fRkcn8LZbVXSQr+1cpfNI=
+        bh=mqgL25CUvMLSEM2lw1UXMqf9Sdbdhpgd87dTtkToLJY=;
+        b=aUia/Wi8jA5ehW3fHRLHzjUfDI1WvBBgkos7+SzSyQASgxB2k1eWrDk+dG/Xo6FL5A
+         RK0AsCFaMr0D1c04AuNsaUFxdgBk2dNmxJ9eYGDhoARSBlgJoxC1p0WUMMk/jk5Bb7h1
+         m3iwUTZcX2MGD2sv3qr96O0l7kAFrKjxZPPiVCXi74qIPjoZ1QCHBQmtXVGhyyV2cBJn
+         kAPHTGIqj/Ok4LgCk20tzxQBz6J8qbtjwwcO+UbXw9P5dvmaaXSwhLkIxKJMMgWEsaYB
+         RneCm/+1diMKN9LBSrnRh6j9xAkHyTh3nelFBMXm6rV89W5fSGe38kbQBQzSnRYmD+iK
+         Ps9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWudDNRj51/syRufThr1ETgSclbGDpgihbjrkPfnNk8en1ToPC8p5PVXZoVNi6ckC3tsdE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ7vQuJctfBdX8AameXee5E6KldINaV586oUxoU0tCaz49gRds
+	dpE3pXwawQgCJDrCF9aK0494PC4no7yz9v8VdgtUktqNPqrMVlUYJ4SOdVJxRxb5mXtIdLPz6q8
+	YyA==
+X-Google-Smtp-Source: AGHT+IH7F4h6lNCm7/g0kpauweOjyktR0gYjOGEqScoxPC7VLdyH4oaNeASBzAs0j7QsC31w5fKpiMsRptg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2a82:b0:6e9:f188:8638 with SMTP id
- 00721157ae682-6eebd2f4943mr19377b3.7.1732133956383; Wed, 20 Nov 2024 12:19:16
+ (user=seanjc job=sendgmr) by 2002:a25:2e4b:0:b0:e25:cea9:b0e with SMTP id
+ 3f1490d57ef6-e38cb73f509mr1532276.9.1732135260780; Wed, 20 Nov 2024 12:41:00
  -0800 (PST)
-Date: Wed, 20 Nov 2024 12:19:14 -0800
-In-Reply-To: <20240801045907.4010984-46-mizhang@google.com>
+Date: Wed, 20 Nov 2024 12:40:59 -0800
+In-Reply-To: <20240801045907.4010984-47-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-46-mizhang@google.com>
-Message-ID: <Zz5EQt16V7z-1xCZ@google.com>
-Subject: Re: [RFC PATCH v3 45/58] KVM: x86/pmu: Update pmc_{read,write}_counter()
- to disconnect perf API
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-47-mizhang@google.com>
+Message-ID: <Zz5JW-LGL4tvB2r8@google.com>
+Subject: Re: [RFC PATCH v3 46/58] KVM: x86/pmu: Disconnect counter reprogram
+ logic from passthrough PMU
 From: Sean Christopherson <seanjc@google.com>
 To: Mingwei Zhang <mizhang@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
@@ -91,63 +91,88 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> Update pmc_{read,write}_counter() to disconnect perf API because
-> passthrough PMU does not use host PMU on backend. Because of that
-> pmc->counter contains directly the actual value of the guest VM when set by
-> the host (VMM) side.
+> Disconnect counter reprogram logic because passthrough PMU never use host
+> PMU nor does it use perf API to do anything. Instead, when passthrough PMU
+> is enabled, touching anywhere around counter reprogram part should be an
+> error.
 > 
 > Signed-off-by: Mingwei Zhang <mizhang@google.com>
 > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > ---
->  arch/x86/kvm/pmu.c | 5 +++++
->  arch/x86/kvm/pmu.h | 4 ++++
->  2 files changed, 9 insertions(+)
+>  arch/x86/kvm/pmu.c | 3 +++
+>  arch/x86/kvm/pmu.h | 8 ++++++++
+>  2 files changed, 11 insertions(+)
 > 
 > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 41057d0122bd..3604cf467b34 100644
+> index 3604cf467b34..fcd188cc389a 100644
 > --- a/arch/x86/kvm/pmu.c
 > +++ b/arch/x86/kvm/pmu.c
-> @@ -322,6 +322,11 @@ static void pmc_update_sample_period(struct kvm_pmc *pmc)
+> @@ -478,6 +478,9 @@ static int reprogram_counter(struct kvm_pmc *pmc)
+>  	bool emulate_overflow;
+>  	u8 fixed_ctr_ctrl;
 >  
->  void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
->  {
-> +	if (pmc_to_pmu(pmc)->passthrough) {
-> +		pmc->counter = val;
+> +	if (WARN_ONCE(pmu->passthrough, "Passthrough PMU never reprogram counter\n"))
 
-This needs to mask the value with pmc_bitmask(pmc), otherwise emulated events
-will operate on a bad value, and loading the PMU state into hardware will #GP
-if the PMC is written through the sign-extended MSRs, i.e. if val = -1 and the
-CPU supports full-width writes.
+Eh, a WARN_ON_ONCE() is enough.
 
-> +		return;
-> +	}
+That said, this isn't entirely correct.  The mediated PMU needs to "reprogram"
+event selectors if the event filter is changed. KVM currently handles this by
+setting  all __reprogram_pmi bits and blasting KVM_REQ_PMU.
+
+LOL, and there's even a reprogram_fixed_counters_in_passthrough_pmu(), so the
+above message is a lie.
+
+There is also far too much duplicate code in things like reprogram_fixed_counters()
+versus reprogram_fixed_counters_in_passthrough_pmu().
+
+Reprogramming on each write is also technically suboptimal, as _very_ theoretically
+KVM could emulate multiple WRMSRs without re-entering the guest.
+
+So, I think the mediated PMU should use the reprogramming infrastructure, and
+handle the bulk of the different behavior in reprogram_counter(), not in a half
+dozen different paths.
+
+> +		return 0;
 > +
->  	/*
->  	 * Drop any unconsumed accumulated counts, the WRMSR is a write, not a
->  	 * read-modify-write.  Adjust the counter value so that its value is
+>  	emulate_overflow = pmc_pause_counter(pmc);
+>  
+>  	if (!pmc_event_is_allowed(pmc))
 > diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 78a7f0c5f3ba..7e006cb61296 100644
+> index 7e006cb61296..10553bc1ae1d 100644
 > --- a/arch/x86/kvm/pmu.h
 > +++ b/arch/x86/kvm/pmu.h
-> @@ -116,6 +116,10 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
->  {
->  	u64 counter, enabled, running;
+> @@ -256,6 +256,10 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
 >  
-> +	counter = pmc->counter;
-
-Using a local variable is pointless, the perf-based path immediately clobbers it.
-
+>  static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
+>  {
+> +	/* Passthrough PMU never reprogram counters via KVM_REQ_PMU. */
 > +	if (pmc_to_pmu(pmc)->passthrough)
-> +		return counter & pmc_bitmask(pmc);
+> +		return;
+> +
+>  	set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
+>  	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+>  }
+> @@ -264,6 +268,10 @@ static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
+>  {
+>  	int bit;
+>  
+> +	/* Passthrough PMU never reprogram counters via KVM_REQ_PMU. */
+> +	if (pmu->passthrough)
+> +		return;
 
-And then this can simply return pmc->counter.  We _could_ add a WARN on pmc->counter
-overlapping with pmc_bitmask(), but IMO that's unnecessary.  If anything, WARN and
-mask pmc->counter when loading state into hardware.
+Make up your mind :-)  Either handle the mediated PMU here, or handle it in the
+callers.  Don't do both.
+
+I vote to handle it here, i.e. drop the check in kvm_pmu_set_msr() when handling
+MSR_CORE_PERF_GLOBAL_CTRL, and then add a comment that reprogramming GP counters
+doesn't need to happen on control updates because KVM enforces the event filters
+when emulating writes to event selectors (and because the guest can write
+PERF_GLOBAL_CTRL directly).
 
 > +
->  	counter = pmc->counter + pmc->emulated_counter;
+>  	if (!diff)
+>  		return;
 >  
->  	if (pmc->perf_event && !pmc->is_paused)
 > -- 
 > 2.46.0.rc1.232.g9752f9e123-goog
 > 
