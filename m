@@ -1,236 +1,185 @@
-Return-Path: <kvm+bounces-32270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517CC9D4F5B
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 16:03:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A496C9D4F77
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 16:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE581F23946
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:03:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0310AB27585
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86D01DBB0C;
-	Thu, 21 Nov 2024 15:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D041DC198;
+	Thu, 21 Nov 2024 15:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D73kYvtk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8041D63DC
-	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 15:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40521D47A3;
+	Thu, 21 Nov 2024 15:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732201407; cv=none; b=ahCJVtX3PUr8iPZydcl2yplifoNFJs/oPRdTBE3OHe1FS88Pdp0q/DYxgdLhW+QmeDyv7QjQAGWxArHtseEn0QYaOCOXpLwg2PYXKLXeAp73W1vylSopBQbYot7Gfy7mIgtADkMPihFHkmj5OOiGb0tI7vUMLArZM9fO1zuHL7s=
+	t=1732201672; cv=none; b=Ao1HWQtUiMHjedRgYAGClkhOCAfFQcy8KXwKCuUlhiM9BWk9eTz5nNbzwZuVXug2qCRBn7KcwzBqWvkCW7brZGv/s+zuuchN3gHixZGB/ZXTApAQK98KSmS3zbckkiPHBmYgPbxrrEW5UPO8Q0tJnCzLhMr/b3pRy5FPmd4Njd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732201407; c=relaxed/simple;
-	bh=n8JMPzBy5biQgHgSNPwGSUix++KBUT5PDaBB7sFLVAk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=D/6Crf7YGnBJYylR+DrhCPAbfkrm7OOBL6Evmfc22N6bYy++AB3fLZwPynFxe71vealJb8S/oBiGkGpCJVowsUwPNCOPYTuXTPgQvFrEIidqdo4JjS13fIZMUiIAv++hdBAahVBlL9nIA2ao8kaAyDnrTfPk6p6l53cdn0HXGNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83dff8bc954so100465639f.1
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 07:03:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732201404; x=1732806204;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GEHQBx3R5MVs+IGTTjeVS5dq/RGKc660S5q/ISPuTqE=;
-        b=gO6YPyeGEbxMvsmTJJcjWBZxVaHvWbhuqE0UmexG7FUkLxPHOY6Y0J2RGXend//8qk
-         mZMRPH1Ctw6xjNoaV318iosDtm12yjYIwCMXUXwUf1veUN2hR7YjxShnREQHbX4GrUOj
-         L0oiqkdnT4i9kSWOsmuXU6jfb3wNGoORb3CgtxjOzpFFnTO/oTtZCfOBH5VLSQtIavOS
-         RIOQTNjTU1NavgVF16XsojsjEt4xmd+XX85WUfNsKB76t5BJRlYL1am7ls3FhEvH5ZY7
-         fP7grwrgaKtt78CmqOKskGyyJFGiB0MRdTRXHEvHttWnHooD0uXLRhHUCfLDr2PlpkES
-         PZ+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXdSF8197aYV1gfbIAvjwTjAB85Hb9DmdNXUzH9rTWHyWn7Ct8rDgFx1AYe0Oz/wudLgqQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhHmnbdfyxpH3zQFu1MgniRzq8Gy4ewxbLOZWdUhamYf2Hyfxs
-	NRVs2dT0feJHkBSJbWlSiaAVyCInoa0YqjevgzFZ0ASw5leUtpEK4T35iu0HmkCUQC8Akp6mcGa
-	c6Ydyqw8KWhN/RaLD6UXArshsgoo9WCLpU9POjXC+7csO06KPcu4TaVs=
-X-Google-Smtp-Source: AGHT+IFjdrLE5PgdR17FT+Rs7y3X5+wDvgL+ROtk4b883hLiSo6EDDtDYBUiKi3N+jUck/PdC8rfzemHac8TJ8l2T21prD0J/++1
+	s=arc-20240116; t=1732201672; c=relaxed/simple;
+	bh=G7fHsSCn6nvijQfIxss66aGWrcoAEc4hnIHW/t/+QvM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mfJ0iigCjfDWoSoznyXZF7ZfhqXWXhga5lC9IP0mY/7h6fMdKXuc6bLCdmA1XjLnwzSh3PjKiVIyKgqSy0LehdiMWEhOWGqpHGUWjfeskvsjB3Zz1ZFGY/i9DWvm2ZvO/9WRWH+SNpCkvIpLTPpLhPcSzfpUKCfQSw3zy7q2hEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D73kYvtk; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732201671; x=1763737671;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=G7fHsSCn6nvijQfIxss66aGWrcoAEc4hnIHW/t/+QvM=;
+  b=D73kYvtkWOrmasZ0cHLXECa3KgloLAAxU2V5ZrHbmWeQgI23VaajODRk
+   +Hk1hAPg1ZrAxZKIm0x9E8mWnJYHAYKB2BSBddIblmR+1LbrfvJonFeHy
+   zPjzZv2FUqxrdrRxoV8+x2OWKtfXYhfFsLUFgSGULQrNlb+/6+s8E+p2e
+   vSZLgCC57smSXGGzFdiCbFjaaZ/a7l40ePEnV8tUOCxXmUtdp5KVyJoMk
+   iDQREJQG2oEXRHtnNmWzVPlsVeN+YQF4Loi7xKYeyuYC0L5D11MEXXJUG
+   1m+Y9GuP8Ski3rKMR+0JdggHXy21SD/jfqOj4fEfwyej4+jbf/w+z0OHg
+   Q==;
+X-CSE-ConnectionGUID: tHNvrWX0S1GcI2PGkGpspw==
+X-CSE-MsgGUID: 1aZZbOjyRU+QhxEDTb6ahg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="57716453"
+X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
+   d="scan'208";a="57716453"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 07:07:49 -0800
+X-CSE-ConnectionGUID: RqARAqDlQkCUSCLelj6P9g==
+X-CSE-MsgGUID: Y+aAd0LDT2meQIj/VioIzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="95338688"
+Received: from bjrankin-mobl3.amr.corp.intel.com (HELO [10.124.223.230]) ([10.124.223.230])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 07:07:46 -0800
+Message-ID: <4b562cd0-7500-4b3a-8f5c-e6acfea2896e@intel.com>
+Date: Thu, 21 Nov 2024 07:07:44 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d0f:b0:3a7:9082:9be8 with SMTP id
- e9e14a558f8ab-3a790829e21mr44879085ab.1.1732201404354; Thu, 21 Nov 2024
- 07:03:24 -0800 (PST)
-Date: Thu, 21 Nov 2024 07:03:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673f4bbc.050a0220.3c9d61.0174.GAE@google.com>
-Subject: [syzbot] [kvm?] WARNING: locking bug in kvm_xen_set_evtchn_fast
-From: syzbot <syzbot+919877893c9d28162dc2@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, dwmw2@infradead.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mingo@redhat.com, paul@xen.org, pbonzini@redhat.com, seanjc@google.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 13/15] context_tracking,x86: Add infrastructure to
+ defer kernel TLBI
+To: Peter Zijlstra <peterz@infradead.org>,
+ Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
+ x86@kernel.org, rcu@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Andy Lutomirski <luto@kernel.org>, Frederic Weisbecker
+ <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+ Joel Fernandes <joel@joelfernandes.org>,
+ Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Uladzislau Rezki <urezki@gmail.com>, Christoph Hellwig <hch@infradead.org>,
+ Lorenzo Stoakes <lstoakes@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Juerg Haefliger <juerg.haefliger@canonical.com>,
+ Nicolas Saenz Julienne <nsaenz@kernel.org>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
+ Chuang Wang <nashuiliang@gmail.com>, Yang Jihong <yangjihong1@huawei.com>,
+ Petr Mladek <pmladek@suse.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Song Liu <song@kernel.org>, Julian Pidancet <julian.pidancet@oracle.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Dionna Glaze
+ <dionnaglaze@google.com>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Juri Lelli <juri.lelli@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>,
+ Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-14-vschneid@redhat.com>
+ <20241120152216.GM19989@noisy.programming.kicks-ass.net>
+ <20241120153221.GM38972@noisy.programming.kicks-ass.net>
+ <xhsmhldxdhl7b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <20241121111221.GE24774@noisy.programming.kicks-ass.net>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20241121111221.GE24774@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 11/21/24 03:12, Peter Zijlstra wrote:
+>> I see e.g. ds_clear_cea() clears PTEs that can have the _PAGE_GLOBAL flag,
+>> and it correctly uses the non-deferrable flush_tlb_kernel_range().
+> 
+> I always forget what we use global pages for, dhansen might know, but
+> let me try and have a look.
+> 
+> I *think* we only have GLOBAL on kernel text, and that only sometimes.
 
-syzbot found the following issue on:
+I think you're remembering how _PAGE_GLOBAL gets used when KPTI is in play.
 
-HEAD commit:    8f7c8b88bda4 Merge tag 'sched_ext-for-6.13' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=103d275f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8b2ddebc25a60ddb
-dashboard link: https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Ignoring KPTI for a sec... We use _PAGE_GLOBAL for all kernel mappings.
+Before PCIDs, global mappings let the kernel TLB entries live across CR3
+writes. When PCIDs are in play, global mappings let two different ASIDs
+share TLB entries.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-8f7c8b88.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a91bdc4cdb5d/vmlinux-8f7c8b88.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/35264fa8c070/bzImage-8f7c8b88.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+919877893c9d28162dc2@syzkaller.appspotmail.com
-
-=============================
-[ BUG: Invalid wait context ]
-6.12.0-syzkaller-01892-g8f7c8b88bda4 #0 Not tainted
------------------------------
-kworker/u32:4/73 is trying to lock:
-ffffc90003a90460 (&gpc->lock){....}-{3:3}, at: kvm_xen_set_evtchn_fast+0x248/0xe00 arch/x86/kvm/xen.c:1755
-other info that might help us debug this:
-context-{2:2}
-7 locks held by kworker/u32:4/73:
- #0: ffff88810628e948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
- #1: ffffc90000fbfd80 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work+0x921/0x1ba0 kernel/workqueue.c:3205
- #2: ffffffff8feec868 (rtnl_mutex){+.+.}-{4:4}, at: addrconf_dad_work+0xcf/0x14d0 net/ipv6/addrconf.c:4196
- #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: ndisc_send_skb+0x864/0x1c30 net/ipv6/ndisc.c:507
- #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: ip6_finish_output2+0x3da/0x1a50 net/ipv6/ip6_output.c:126
- #5: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: local_lock_release include/linux/local_lock_internal.h:38 [inline]
- #5: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: process_backlog+0x3f1/0x15f0 net/core/dev.c:6113
- #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: srcu_lock_acquire include/linux/srcu.h:158 [inline]
- #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: srcu_read_lock include/linux/srcu.h:249 [inline]
- #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: kvm_xen_set_evtchn_fast+0x22e/0xe00 arch/x86/kvm/xen.c:1753
-stack backtrace:
-CPU: 1 UID: 0 PID: 73 Comm: kworker/u32:4 Not tainted 6.12.0-syzkaller-01892-g8f7c8b88bda4 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
- check_wait_context kernel/locking/lockdep.c:4898 [inline]
- __lock_acquire+0x878/0x3c40 kernel/locking/lockdep.c:5176
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
- __raw_read_lock_irqsave include/linux/rwlock_api_smp.h:160 [inline]
- _raw_read_lock_irqsave+0x46/0x90 kernel/locking/spinlock.c:236
- kvm_xen_set_evtchn_fast+0x248/0xe00 arch/x86/kvm/xen.c:1755
- xen_timer_callback+0x1dd/0x2a0 arch/x86/kvm/xen.c:140
- __run_hrtimer kernel/time/hrtimer.c:1739 [inline]
- __hrtimer_run_queues+0x5fb/0xae0 kernel/time/hrtimer.c:1803
- hrtimer_interrupt+0x392/0x8e0 kernel/time/hrtimer.c:1865
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1038 [inline]
- __sysvec_apic_timer_interrupt+0x10f/0x400 arch/x86/kernel/apic/apic.c:1055
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1049
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:194
-Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 26 dc 41 f6 48 89 df e8 9e 5b 42 f6 f7 c5 00 02 00 00 75 23 9c 58 f6 c4 02 75 37 <bf> 01 00 00 00 e8 35 52 33 f6 65 8b 05 36 f8 da 74 85 c0 74 16 5b
-RSP: 0018:ffffc900008b0758 EFLAGS: 00000246
-RAX: 0000000000000012 RBX: ffffffff9a9e1520 RCX: 1ffffffff2dc9676
-RDX: 0000000000000000 RSI: ffffffff8b6cd740 RDI: ffffffff8bd1db00
-RBP: 0000000000000286 R08: 0000000000000001 R09: fffffbfff2dc8999
-R10: ffffffff96e44ccf R11: 0000000000000006 R12: ffffffff9a9e1518
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff88801eec3040
- __debug_check_no_obj_freed lib/debugobjects.c:1108 [inline]
- debug_check_no_obj_freed+0x327/0x600 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2273 [inline]
- slab_free mm/slub.c:4579 [inline]
- kmem_cache_free+0x29c/0x4b0 mm/slub.c:4681
- kfree_skbmem+0x1a4/0x1f0 net/core/skbuff.c:1148
- __kfree_skb net/core/skbuff.c:1205 [inline]
- sk_skb_reason_drop+0x136/0x1a0 net/core/skbuff.c:1242
- kfree_skb_reason include/linux/skbuff.h:1262 [inline]
- __netif_receive_skb_core.constprop.0+0x592/0x4330 net/core/dev.c:5644
- __netif_receive_skb_one_core+0xb1/0x1e0 net/core/dev.c:5668
- __netif_receive_skb+0x1d/0x160 net/core/dev.c:5783
- process_backlog+0x443/0x15f0 net/core/dev.c:6115
- __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6779
- napi_poll net/core/dev.c:6848 [inline]
- net_rx_action+0xa92/0x1010 net/core/dev.c:6970
- handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
- do_softirq kernel/softirq.c:455 [inline]
- do_softirq+0xb2/0xf0 kernel/softirq.c:442
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
- __dev_queue_xmit+0x887/0x4350 net/core/dev.c:4459
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- neigh_connected_output+0x45c/0x630 net/core/neighbour.c:1594
- neigh_output include/net/neighbour.h:542 [inline]
- ip6_finish_output2+0x6a7/0x1a50 net/ipv6/ip6_output.c:141
- __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
- ip6_finish_output+0x3f9/0x1300 net/ipv6/ip6_output.c:226
- NF_HOOK_COND include/linux/netfilter.h:303 [inline]
- ip6_output+0x1f8/0x540 net/ipv6/ip6_output.c:247
- dst_output include/net/dst.h:450 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ndisc_send_skb+0xa2d/0x1c30 net/ipv6/ndisc.c:511
- ndisc_send_ns+0xc7/0x150 net/ipv6/ndisc.c:669
- addrconf_dad_work+0xc80/0x14d0 net/ipv6/addrconf.c:4284
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	f5                   	cmc
-   1:	53                   	push   %rbx
-   2:	48 8b 74 24 10       	mov    0x10(%rsp),%rsi
-   7:	48 89 fb             	mov    %rdi,%rbx
-   a:	48 83 c7 18          	add    $0x18,%rdi
-   e:	e8 26 dc 41 f6       	call   0xf641dc39
-  13:	48 89 df             	mov    %rbx,%rdi
-  16:	e8 9e 5b 42 f6       	call   0xf6425bb9
-  1b:	f7 c5 00 02 00 00    	test   $0x200,%ebp
-  21:	75 23                	jne    0x46
-  23:	9c                   	pushf
-  24:	58                   	pop    %rax
-  25:	f6 c4 02             	test   $0x2,%ah
-  28:	75 37                	jne    0x61
-* 2a:	bf 01 00 00 00       	mov    $0x1,%edi <-- trapping instruction
-  2f:	e8 35 52 33 f6       	call   0xf6335269
-  34:	65 8b 05 36 f8 da 74 	mov    %gs:0x74daf836(%rip),%eax        # 0x74daf871
-  3b:	85 c0                	test   %eax,%eax
-  3d:	74 16                	je     0x55
-  3f:	5b                   	pop    %rbx
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+When KPTI is around, the kernel writes CR3 at user/kernel switches to
+make sure secrets are unmapped and can't be leaked by Meltdown. But
+unmapping those secrets doesn't do squat if they were mapped globally
+since they'll still be in the TLB and quite usable. There, we're more
+judicious and only mark performance-sensitive things that are not secret
+to be global, like kernel text.
 
