@@ -1,294 +1,103 @@
-Return-Path: <kvm+bounces-32247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E584F9D4A71
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:07:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76259D4B1B
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45001B21C76
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 10:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4F02817F6
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 10:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1DDF1D0490;
-	Thu, 21 Nov 2024 10:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502D71CF29D;
+	Thu, 21 Nov 2024 10:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJaEDOs0"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kQYvPwbg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA5B1CDFD2
-	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 10:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4714BF87;
+	Thu, 21 Nov 2024 10:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732183607; cv=none; b=BI8j242XKOgxODOoXrjQY9ZG7o+DTe8fFRHjkxK228wHVhc16RQHRjo7FlUWyt0yOPB+2pXdCJhURfZ0RIdrFCd8GnJvZMtg+H6igys4lNyLROWMaGE4ssGa6cU9ZfFyhIm/aIzBrcsBc7psgdXBv3BBLq3R0mQL2bBmZPQRDJE=
+	t=1732186472; cv=none; b=mTsOW8Z6f/3WLvxhH6wDVFaZEtx5d0wR2C5MtmPw39X/tz7rtl48WXPnGohY6GIWBPCtzdl8dIgN1bATEVBpSTD4+JrcRR84BgKSLAaxU9b/gjFK4+yW9HxvAodm33f6Nt6OLC+QHJAqASMMRa/I/NGyThwOiKLzC82wdmp8S7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732183607; c=relaxed/simple;
-	bh=K8HZ/likPSgJ80y1w8nAet2hlf7QHqom9zLT17bwNJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ocwZKdfpz0Np0qih/COMwtnoWFftdWiNBxG5LJjtO3Iym+x1M2AMgR3IT4DOxwfX5ledDmo8WCP3rbJV33mZW2MfMYFJbL1ZE9Q4KYlTqo65PZVO3r4RmdtWdsUj7dQZFdTAKQSIZHv+XY5F2l8nTzRgMEmsKSjaQfcU3vis40w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJaEDOs0; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732183606; x=1763719606;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=K8HZ/likPSgJ80y1w8nAet2hlf7QHqom9zLT17bwNJc=;
-  b=gJaEDOs0HNxpDYMkgzrd3JCT0SOuqGmO0clb2g1o/uJGfIuOy5GAeo2a
-   7e08hEmvMAfrrpGIXTUZnpWVL6bsRJSsfRWm2mg1aDW1dTLEobpYjubLf
-   bLJmAS8Rlc2SnbX1xgZgrgzT16eUOhJltdxsKQ7Uz56nNDRACbK0ahHXu
-   ato2SEWwnsd38YXt7nz0qQ51oJJDIU8EzNeTz8a0CsA76dP/BfxbCJj3k
-   CJ7rNPpL31Pn5G6LLIJU5rEm/NNwe3ZwCK/o6HBmz0SYnGlMSFe9Rix4m
-   xf6ZjqEsQpJLByb2fwMKkd5TCds41rssWoe1B/LedcPEJyLdr7R5bORuH
-   g==;
-X-CSE-ConnectionGUID: 7+EGCy8iTM+FYsWAhg5j3Q==
-X-CSE-MsgGUID: 0DMOm6GyQIePqCwrX7qsXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="42926544"
-X-IronPort-AV: E=Sophos;i="6.12,172,1728975600"; 
-   d="scan'208";a="42926544"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 02:06:45 -0800
-X-CSE-ConnectionGUID: 9dPM6YS0RiqQzXTN4p8mcg==
-X-CSE-MsgGUID: Ab9HL6J4S9WLXDw1H9RlkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,172,1728975600"; 
-   d="scan'208";a="121066621"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 02:06:41 -0800
-Message-ID: <f4a2f801-9f82-424e-aee4-8b18add34aa6@linux.intel.com>
-Date: Thu, 21 Nov 2024 18:06:38 +0800
+	s=arc-20240116; t=1732186472; c=relaxed/simple;
+	bh=fB5OcF75MtK6hPDV2GWDTP/gWRQawJ+U4HsHrmF/awk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hjgb+307/wPjObxzEf3pSEwVl0SrwAjwfH/keIgyxp/AZtdByKlMJfznjlNp3se3zi6MNFhH+HQpYBcRfaPfAuqaJpM0Ibrfm4WVmeYdPRVGZCrNpOcxADKlvZQZ0MzMPF2OEJvsEqRZRv5xfd2soqxHKhMoLC7JuPH8fwZBU6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kQYvPwbg; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0191A40E01D6;
+	Thu, 21 Nov 2024 10:54:20 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id rZ5d5XYprrqK; Thu, 21 Nov 2024 10:54:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1732186452; bh=QJ7XSOZv9ivJWYqHnhDDw2JQ05ATG/24E/OppcpjgAU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kQYvPwbgWfldoRIYm079SHcVHS1jcbohh5K90CTKH/SaM0cXS9+ucgpRlaXnWlQ8J
+	 QsoAEVk6XgL7JgYQHtZ4DKgV/RiBvLbuAcJTMx+XaWVJ6/vI3YKl4AhpYrWIDzmszH
+	 AcEljEaGmZ4oH4XKZraWtZ200PkzsC6VMDC3dmzuIYcQ5G7r8+bb78MsSVjo/Tn4kD
+	 bO1PbtDMIzVuy+QoHzrd2CIyVS4zrHzaUxJPvtRanzZLlLyWCw0UCXW0TSo7FtSiCG
+	 E2U2vnBWr8jfnDrwLi0J0UT9WUGawIJTKRrfDqfKOj8lrBKl3FhKfK0hRSRqWqUNuo
+	 OpPjhsUJCI4nnvgPkJyWTQ6HzpQ8F9bdZ61fM2MOL2f9iuXAB7MJG+PAP8ofpw1RM8
+	 UXo7qFhy6EtkXdbO1VvTmEvy1Sv1eCFYIOb1PoSewwUfhv38lAjiQseuU1kXKBkQyq
+	 jN4R6WMCHySDW+CqwDCiFCslNK6nsAMaiTtoxazmmPgIG3Iff+fCG1fe0QT4d7MM15
+	 MuOQma7s+gsqEZZwPOSgV91cswKTdCpQxC9PgsLw8HmK3VYcmLXWOs1D0R+37QFaIR
+	 f4V8jcHcvvOmanONCV8P0V5CRSLzgPMx0ozVqNBN4XKTVFMy3t5981WdWvaDr4M+AD
+	 S9NXZyc3An9XCABtVMdy4/O8=
+Received: from zn.tnic (p200300ea9736a1a8329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a1a8:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 45CEA40E0275;
+	Thu, 21 Nov 2024 10:53:54 +0000 (UTC)
+Date: Thu, 21 Nov 2024 11:53:44 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: "Melody (Huibo) Wang" <huibo.wang@amd.com>,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
+Message-ID: <20241121105344.GBZz8ROFlE8Qx2JuLB@fat_crate.local>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
+ <6f6c1a11-40bd-48dc-8e11-4a1f67eaa43b@amd.com>
+ <4f0769a6-ef77-46f8-ba78-38d82995aa26@amd.com>
+ <20241121054116.GAZz7H_Cub_ziNiBQN@fat_crate.local>
+ <6b2d9a59-cfca-4d6c-915b-ca36826ce96b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] target/i386/kvm: introduce 'pmu-cap-disabled' to set
- KVM_PMU_CAP_DISABLE
-To: dongli.zhang@oracle.com, Zhao Liu <zhao1.liu@intel.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
- mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
- likexu@tencent.com, like.xu.linux@gmail.com, zhenyuw@linux.intel.com,
- groug@kaod.org, lyan@digitalocean.com, khorenko@virtuozzo.com,
- alexander.ivanov@virtuozzo.com, den@virtuozzo.com, joe.jin@oracle.com,
- davydov-max@yandex-team.ru, zide.chen@intel.com
-References: <20241104094119.4131-1-dongli.zhang@oracle.com>
- <20241104094119.4131-3-dongli.zhang@oracle.com> <ZyxxygVaufOntpZJ@intel.com>
- <57b4b74d-67d2-4fcf-aa59-c788afc93619@oracle.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <57b4b74d-67d2-4fcf-aa59-c788afc93619@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6b2d9a59-cfca-4d6c-915b-ca36826ce96b@amd.com>
 
+On Thu, Nov 21, 2024 at 01:33:29PM +0530, Neeraj Upadhyay wrote:
+> As SAVIC's guest APIC register accesses match x2avic (which uses x2APIC MSR
+> interface in guest), the x2apic common flow need to be executed in the
+> guest.
 
-On 11/8/2024 7:44 AM, dongli.zhang@oracle.com wrote:
-> Hi Zhao,
->
->
-> On 11/6/24 11:52 PM, Zhao Liu wrote:
->> (+Dapang & Zide)
->>
->> Hi Dongli,
->>
->> On Mon, Nov 04, 2024 at 01:40:17AM -0800, Dongli Zhang wrote:
->>> Date: Mon,  4 Nov 2024 01:40:17 -0800
->>> From: Dongli Zhang <dongli.zhang@oracle.com>
->>> Subject: [PATCH 2/7] target/i386/kvm: introduce 'pmu-cap-disabled' to set
->>>  KVM_PMU_CAP_DISABLE
->>> X-Mailer: git-send-email 2.43.5
->>>
->>> The AMD PMU virtualization is not disabled when configuring
->>> "-cpu host,-pmu" in the QEMU command line on an AMD server. Neither
->>> "-cpu host,-pmu" nor "-cpu EPYC" effectively disables AMD PMU
->>> virtualization in such an environment.
->>>
->>> As a result, VM logs typically show:
->>>
->>> [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
->>>
->>> whereas the expected logs should be:
->>>
->>> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
->>> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
->>>
->>> This discrepancy occurs because AMD PMU does not use CPUID to determine
->>> whether PMU virtualization is supported.
->> Intel platform doesn't have this issue since Linux kernel fails to check
->> the CPU family & model when "-cpu *,-pmu" option clears PMU version.
->>
->> The difference between Intel and AMD platforms, however, is that it seems
->> Intel hardly ever reaches the “...due virtualization” message, but
->> instead reports an error because it recognizes a mismatched family/model.
->>
->> This may be a drawback of the PMU driver's print message, but the result
->> is the same, it prevents the PMU driver from enabling.
->>
->> So, please mention that KVM_PMU_CAP_DISABLE doesn't change the PMU
->> behavior on Intel platform because current "pmu" property works as
->> expected.
-> Sure. I will mention this in v2.
->
->>> To address this, we introduce a new property, 'pmu-cap-disabled', for KVM
->>> acceleration. This property sets KVM_PMU_CAP_DISABLE if
->>> KVM_CAP_PMU_CAPABILITY is supported. Note that this feature currently
->>> supports only x86 hosts, as KVM_CAP_PMU_CAPABILITY is used exclusively for
->>> x86 systems.
->>>
->>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
->>> ---
->>> Another previous solution to re-use '-cpu host,-pmu':
->>> https://urldefense.com/v3/__https://lore.kernel.org/all/20221119122901.2469-1-dongli.zhang@oracle.com/__;!!ACWV5N9M2RV99hQ!Nm8Db-mwBoMIwKkRqzC9kgNi5uZ7SCIf43zUBn92Ar_NEbLXq-ZkrDDvpvDQ4cnS2i4VyKAp6CRVE12bRkMF$ 
->> IMO, I prefer the previous version. This VM-level KVM property is
->> difficult to integrate with the existing CPU properties. Pls refer later
->> comments for reasons.
->>
->>>  accel/kvm/kvm-all.c        |  1 +
->>>  include/sysemu/kvm_int.h   |  1 +
->>>  qemu-options.hx            |  9 ++++++-
->>>  target/i386/cpu.c          |  2 +-
->>>  target/i386/kvm/kvm.c      | 52 ++++++++++++++++++++++++++++++++++++++
->>>  target/i386/kvm/kvm_i386.h |  2 ++
->>>  6 files changed, 65 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>> index 801cff16a5..8b5ba45cf7 100644
->>> --- a/accel/kvm/kvm-all.c
->>> +++ b/accel/kvm/kvm-all.c
->>> @@ -3933,6 +3933,7 @@ static void kvm_accel_instance_init(Object *obj)
->>>      s->xen_evtchn_max_pirq = 256;
->>>      s->device = NULL;
->>>      s->msr_energy.enable = false;
->>> +    s->pmu_cap_disabled = false;
->>>  }
->> The CPU property "pmu" also defaults to "false"...but:
->>
->>  * max CPU would override this and try to enable PMU by default in
->>    max_x86_cpu_initfn().
->>
->>  * Other named CPU models keep the default setting to avoid affecting
->>    the migration.
->>
->> The pmu_cap_disabled and “pmu” property look unbound and unassociated,
->> so this can cause the conflict when they are not synchronized. For
->> example,
->>
->> -cpu host -accel kvm,pmu-cap-disabled=on
->>
->> The above options will fail to launch a VM (on Intel platform).
->>
->> Ideally, the “pmu” property and pmu-cap-disabled should be bound to each
->> other and be consistent. But it's not easy because:
->>  - There is no proper way to have pmu_cap_disabled set different default
->>    values (e.g., "false" for max CPU and "true" for named CPU models)
->>    based on different CPU models.
->>  - And, no proper place to check the consistency of pmu_cap_disabled and
->>    enable_pmu.
->>
->> Therefore, I prefer your previous approach, to reuse current CPU "pmu"
->> property.
-> Thank you very much for the suggestion and reasons.
->
-> I am going to follow your suggestion to switch back to the previous solution in v2.
+How much of that "common flow" is actually needed by SAVIC?
 
-+1.
+-- 
+Regards/Gruss,
+    Boris.
 
- I also prefer to leverage current exist "+/-pmu" option instead of adding
-a new option. More options, more complexity. When they are not
-inconsistent, which has higher priority? all these are issues.
-
-Although KVM_CAP_PMU_CAPABILITY is a VM-level PMU capability, but all CPUs
-in a same VM should always share same PMU configuration (Don't consider
-hybrid platforms which have many issues need to be handled specifically).
-
-
->
->> Further, considering that this is currently the only case that needs to
->> to set the VM level's capability in the CPU context, there is no need to
->> introduce a new kvm interface (in your previous patch), which can instead
->> be set in kvm_cpu_realizefn(), like:
->>
->>
->> diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
->> index 99d1941cf51c..05e9c9a1a0cf 100644
->> --- a/target/i386/kvm/kvm-cpu.c
->> +++ b/target/i386/kvm/kvm-cpu.c
->> @@ -42,6 +42,8 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
->>  {
->>      X86CPU *cpu = X86_CPU(cs);
->>      CPUX86State *env = &cpu->env;
->> +    KVMState *s = kvm_state;
->> +    static bool first = true;
->>      bool ret;
->>
->>      /*
->> @@ -63,6 +65,29 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
->>       *   check/update ucode_rev, phys_bits, guest_phys_bits, mwait
->>       *   cpu_common_realizefn() (via xcc->parent_realize)
->>       */
->> +
->> +    if (first) {
->> +        first = false;
->> +
->> +        /*
->> +         * Since Linux v5.18, KVM provides a VM-level capability to easily
->> +         * disable PMUs; however, QEMU has been providing PMU property per
->> +         * CPU since v1.6. In order to accommodate both, have to configure
->> +         * the VM-level capability here.
->> +         */
->> +        if (!cpu->enable_pmu &&
->> +            kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY)) {
->> +            int r = kvm_vm_enable_cap(s, KVM_CAP_PMU_CAPABILITY, 0,
->> +                                      KVM_PMU_CAP_DISABLE);
->> +
->> +            if (r < 0) {
->> +                error_setg(errp, "kvm: Failed to disable pmu cap: %s",
->> +                           strerror(-r));
->> +                return false;
->> +            }
->> +        }
-
-It seems KVM_CAP_PMU_CAPABILITY is called to only disable PMU here. From
-point view of logic completeness,  KVM_CAP_PMU_CAPABILITY should be called
-to enabled PMU as well when user wants to enable PMU.
-
-I know currently we only need to disable PMU, but we may need to enable PMU
-via KVM_CAP_PMU_CAPABILITY soon.
-
-We are working on the new KVM mediated vPMU framework, Sean suggest to
-leverage KVM_CAP_PMU_CAPABILITY to enable mediated vPMU dynamically
-(https://lore.kernel.org/all/Zz4uhmuPcZl9vJVr@google.com/). So It would be
-better if the enable logic can be added here as well.
-
-Thanks.
-
-
->> +    }
->> +
->>      if (cpu->max_features) {
->>          if (enable_cpu_pm) {
->>              if (kvm_has_waitpkg()) {
->> ---
-> Sure. I will limit the change within only x86 + KVM.
->
->> In addition, if PMU is disabled, why not mask the perf related bits in
->> 8000_0001_ECX? :)
->>
-> My fault. I have masked only 0x80000022, and I forgot 0x80000001 for AMD.
->
-> Thank you very much for the reminder.
->
->
-> I will wait for a day or maybe the weekend. I am going to switch to the previous
-> solution in v2 if there isn't any further objection with a more valid reason.
->
-> Thank you very much for the feedback!
->
-> Dongli Zhang
->
->
+https://people.kernel.org/tglx/notes-about-netiquette
 
