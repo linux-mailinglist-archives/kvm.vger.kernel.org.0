@@ -1,141 +1,282 @@
-Return-Path: <kvm+bounces-32238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E589D463F
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 04:29:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E369D46C9
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 05:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37CB51F22396
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 03:29:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B5A280D0B
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 04:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3E01C7299;
-	Thu, 21 Nov 2024 03:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC8C14C59C;
+	Thu, 21 Nov 2024 04:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TSGGDCrR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bWMXOu1U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EBF1C1F3A;
-	Thu, 21 Nov 2024 03:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F88F5234
+	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 04:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732159770; cv=none; b=H8IyZRk4CgCMC+SfaorM1FW274+h2/MVNv3K3XRGio6Rj0juMvIg313UvrEoCEsXXYMG8877kaFQbl0hL4U774HMWrJqEBynwblcje+VDtH9pH6kxnJjQz3BPiLLajcxokfDf7PXmPZgOmJwDxaXkwJWXEihQN1s2uiYPUneU/A=
+	t=1732163448; cv=none; b=RfQZMIGGs9bfLFc/wXEG1COj6E1k3liRh2+Mwks1xAHJaQl7+0GKvuYhaYz8cMsqqrPpUnUx5Uo1f6wYUfUseCnBJgOkLRsaZseSfY9+jyFsQHMNGr4NHY0xUTtAmoGcVFEAX3FNfYEWRQywStJd4XasZZMe3ugKWX+e2e/l2tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732159770; c=relaxed/simple;
-	bh=RHoVzwWXjt4caPv+g3UeTiU+/R+dvmY/yBmiV0cWZE8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZuyX5TTs7ftH9qxFDxmQXGFE5xJbBBFysritwKsGU2BlCC+FTS19SzSi8Z8SN4twZDYyq10uXM+EgqsgpDzjedzYtuxRakn012JoxBfaGo/pOVdt/pJJrTeALOEw5y32J/WLBUXUt+ZExQ1Mw9LWazUVmfUbNHXorlCXAFslucA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TSGGDCrR; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732159769; x=1763695769;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RHoVzwWXjt4caPv+g3UeTiU+/R+dvmY/yBmiV0cWZE8=;
-  b=TSGGDCrRKOqbnKeAo/badN0sl2Say10q6YRj4hOZnpHJOxw3NzTBJc0+
-   gx3VPKFNcpLy2ZoRzJSBzfpa585oRswkzzt6sAalyKNtzjCD4Atw3Q/O4
-   G8PqC9UK0rhk/yX/qM5x38aIks9d9G1kSaoe38wmnCNgLJHaHKue19SxO
-   h2ZXtbd5vs2T8gqcPSHkzmIng3pxDN1+Y8ch3huK/gOt/1+m23yhJNguP
-   cSzaPEscdE7XLfLsB6DUfz3i7VIZ2EB55M7dhptNKc+jhLf+JHAFIoCTj
-   REQiJCKI6DD03sVngLIcdrRvQQr2Vif946P0eUYbo1yqA95D1EmqUXzIu
-   Q==;
-X-CSE-ConnectionGUID: hkDmgSuYTmacLSgULGc8cA==
-X-CSE-MsgGUID: w7qdJ+JvTfmEEp9ZNvVRlw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="31616603"
-X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="31616603"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:29:27 -0800
-X-CSE-ConnectionGUID: hDd+q5yrSAKHs8G2FW7PIw==
-X-CSE-MsgGUID: Kcrmj1ABRBWlJGGQ//X+oA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="90516447"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:29:23 -0800
-Message-ID: <5eac39c5-4e53-457e-b6b1-4101135595ce@linux.intel.com>
-Date: Thu, 21 Nov 2024 11:29:18 +0800
+	s=arc-20240116; t=1732163448; c=relaxed/simple;
+	bh=jWBs3NnSTOjK3J8EnQyfYA9dgj0lOTaKtfBS7xEb0Zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GjCF0Num4PGVNMOngr4Emn3J1yn0kcKA/qRtW79Nv1yGpUba6HG2yynfxy+Z4nYCt8Qql06FIL0FE2rC4tbVJrhbUaoCsBU/csBBeHGWK8bZ1bdWVk7cLrA3v40NFnUjFKCo+ijR64ZLbZsWYkOAdzVNBZwWP3e2O3a+gAe5Xkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bWMXOu1U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732163445;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1oRBVeUrG/30shRvr2+oS14u3aaQZd0tcZcIHNfuOZU=;
+	b=bWMXOu1UTZtpS4/7Qw/+IKsuW7LK783G8Qx7ymRWWo3X/RuF6XUBrsLf2ywydVyEhiwCrM
+	JmHU+cCTfpGBGH4QPumTJxlxibDOG/0x17sUFW7os1FHt92HT61c2K7vXCbcuSJyb6RAwW
+	5C83iukmo+tMGImYyNc8Ifj11Ut38ec=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-vNatiTkcPDWezXWdS3a--g-1; Wed,
+ 20 Nov 2024 23:30:42 -0500
+X-MC-Unique: vNatiTkcPDWezXWdS3a--g-1
+X-Mimecast-MFC-AGG-ID: vNatiTkcPDWezXWdS3a--g
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 89EE219560B1;
+	Thu, 21 Nov 2024 04:30:39 +0000 (UTC)
+Received: from localhost (unknown [10.72.113.10])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 361E81956086;
+	Thu, 21 Nov 2024 04:30:36 +0000 (UTC)
+Date: Thu, 21 Nov 2024 12:30:32 +0800
+From: Baoquan He <bhe@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce
+ PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
+Message-ID: <Zz63aGL7NcrONk+p@MiWiFi-R3L-srv>
+References: <20241025151134.1275575-1-david@redhat.com>
+ <20241025151134.1275575-8-david@redhat.com>
+ <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
+ <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
+ <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
+ <3ed18ba1-e4b1-461e-a3a7-5de2df59ca60@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 56/58] KVM: x86/pmu/svm: Wire up PMU filtering
- functionality for passthrough PMU
-To: Sean Christopherson <seanjc@google.com>,
- Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
- <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
- <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
- Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-57-mizhang@google.com> <Zz5XEDX8NqnrHhj3@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Zz5XEDX8NqnrHhj3@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3ed18ba1-e4b1-461e-a3a7-5de2df59ca60@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
+On 11/20/24 at 03:39pm, David Hildenbrand wrote:
+> On 20.11.24 15:05, Baoquan He wrote:
+> > On 11/20/24 at 11:48am, David Hildenbrand wrote:
+> > > On 20.11.24 11:13, Baoquan He wrote:
+> > > > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
+> > > > > s390 allocates+prepares the elfcore hdr in the dump (2nd) kernel, not in
+> > > > > the crashed kernel.
+> > > > > 
+> > > > > RAM provided by memory devices such as virtio-mem can only be detected
+> > > > > using the device driver; when vmcore_init() is called, these device
+> > > > > drivers are usually not loaded yet, or the devices did not get probed
+> > > > > yet. Consequently, on s390 these RAM ranges will not be included in
+> > > > > the crash dump, which makes the dump partially corrupt and is
+> > > > > unfortunate.
+> > > > > 
+> > > > > Instead of deferring the vmcore_init() call, to an (unclear?) later point,
+> > > > > let's reuse the vmcore_cb infrastructure to obtain device RAM ranges as
+> > > > > the device drivers probe the device and get access to this information.
+> > > > > 
+> > > > > Then, we'll add these ranges to the vmcore, adding more PT_LOAD
+> > > > > entries and updating the offsets+vmcore size.
+> > > > > 
+> > > > > Use Kconfig tricks to include this code automatically only if (a) there is
+> > > > > a device driver compiled that implements the callback
+> > > > > (PROVIDE_PROC_VMCORE_DEVICE_RAM) and; (b) the architecture actually needs
+> > > > > this information (NEED_PROC_VMCORE_DEVICE_RAM).
+> > > > > 
+> > > > > The current target use case is s390, which only creates an elf64
+> > > > > elfcore, so focusing on elf64 is sufficient.
+> > > > > 
+> > > > > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > > > > ---
+> > > > >    fs/proc/Kconfig            |  25 ++++++
+> > > > >    fs/proc/vmcore.c           | 156 +++++++++++++++++++++++++++++++++++++
+> > > > >    include/linux/crash_dump.h |   9 +++
+> > > > >    3 files changed, 190 insertions(+)
+> > > > > 
+> > > > > diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
+> > > > > index d80a1431ef7b..1e11de5f9380 100644
+> > > > > --- a/fs/proc/Kconfig
+> > > > > +++ b/fs/proc/Kconfig
+> > > > > @@ -61,6 +61,31 @@ config PROC_VMCORE_DEVICE_DUMP
+> > > > >    	  as ELF notes to /proc/vmcore. You can still disable device
+> > > > >    	  dump using the kernel command line option 'novmcoredd'.
+> > > > > +config PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > > > > +	def_bool n
+> > > > > +
+> > > > > +config NEED_PROC_VMCORE_DEVICE_RAM
+> > > > > +	def_bool n
+> > > > > +
+> > > > > +config PROC_VMCORE_DEVICE_RAM
+> > > > > +	def_bool y
+> > > > > +	depends on PROC_VMCORE
+> > > > > +	depends on NEED_PROC_VMCORE_DEVICE_RAM
+> > > > > +	depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > > > 
+> > > > Kconfig item is always a thing I need learn to master.
+> > > 
+> > > Yes, it's usually a struggle to get it right. It took me a couple of
+> > > iterations to get to this point :)
+> > > 
+> > > > When I checked
+> > > > this part, I have to write them down to deliberate. I am wondering if
+> > > > below 'simple version' works too and more understandable. Please help
+> > > > point out what I have missed.
+> > > > 
+> > > > ===========simple version======
+> > > > config PROC_VMCORE_DEVICE_RAM
+> > > >           def_bool y
+> > > >           depends on PROC_VMCORE && VIRTIO_MEM
+> > > >           depends on NEED_PROC_VMCORE_DEVICE_RAM
+> > > > 
+> > > > config S390
+> > > >           select NEED_PROC_VMCORE_DEVICE_RAM
+> > > > ============
+> > 
+> > Sorry, things written down didn't correctly reflect them in my mind.
+> > 
+> > ===========simple version======
+> > fs/proc/Kconfig:
+> > config PROC_VMCORE_DEVICE_RAM
+> >          def_bool y
+> >          depends on PROC_VMCORE && VIRTIO_MEM
+> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> > config NEED_PROC_VMCORE_DEVICE_RAM
+> >          def y
+> > 
+> > arch/s390/Kconfig:
+> > config NEED_PROC_VMCORE_DEVICE_RAM
+> >          def y
+> > ==================================
+> 
+> That would work, but I don't completely like it.
+> 
+> (a) I want s390x to select NEED_PROC_VMCORE_DEVICE_RAM instead. Staring at a
+> bunch of similar cases (git grep "config NEED" | grep Kconfig, git grep
+> "config ARCH_WANTS" | grep Kconfig), "select" is the common way to do it.
+> 
+> So unless there is a pretty good reason, I'll keep
+> NEED_PROC_VMCORE_DEVICE_RAM as is.
 
-On 11/21/2024 5:39 AM, Sean Christopherson wrote:
-> On Thu, Aug 01, 2024, Mingwei Zhang wrote:
->> From: Manali Shukla <manali.shukla@amd.com>
->>
->> With the Passthrough PMU enabled, the PERF_CTLx MSRs (event selectors) are
->> always intercepted and the event filter checking can be directly done
->> inside amd_pmu_set_msr().
->>
->> Add a check to allow writing to event selector for GP counters if and only
->> if the event is allowed in filter.
-> This belongs in the patch that adds AMD support for setting pmc->eventsel_hw.
-> E.g. reverting just this patch would leave KVM in a very broken state.  And it's
-> unnecessarily difficult to review.
+That's easy to satify, see below:
 
-Sure. would merge them into one.
+============simple version=====
+fs/proc/Kconfig:
+config NEED_PROC_VMCORE_DEVICE_RAM
+        def n
 
+config PROC_VMCORE_DEVICE_RAM
+        def_bool y
+        depends on PROC_VMCORE && VIRTIO_MEM
+        depends on NEED_PROC_VMCORE_DEVICE_RAM
 
->
->> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
->> Signed-off-by: Mingwei Zhang <mizhang@google.com>
->> ---
->>  arch/x86/kvm/svm/pmu.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->> index 86818da66bbe..9f3e910ee453 100644
->> --- a/arch/x86/kvm/svm/pmu.c
->> +++ b/arch/x86/kvm/svm/pmu.c
->> @@ -166,6 +166,15 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>  		if (data != pmc->eventsel) {
->>  			pmc->eventsel = data;
->>  			if (is_passthrough_pmu_enabled(vcpu)) {
->> +				if (!check_pmu_event_filter(pmc)) {
->> +					/*
->> +					 * When guest request an invalid event,
->> +					 * stop the counter by clearing the
->> +					 * event selector MSR.
->> +					 */
->> +					pmc->eventsel_hw = 0;
->> +					return 0;
->> +				}
->>  				data &= ~AMD64_EVENTSEL_HOSTONLY;
->>  				pmc->eventsel_hw = data | AMD64_EVENTSEL_GUESTONLY;
->>  			} else {
->> -- 
->> 2.46.0.rc1.232.g9752f9e123-goog
->>
+arch/s390/Kconfig:
+config S390
+        select NEED_PROC_VMCORE_DEVICE_RAM
+==============================
+
+> 
+> (b) In the context of this patch, "depends on VIRTIO_MEM" does not make
+> sense. We could have an intermediate:
+> 
+> config PROC_VMCORE_DEVICE_RAM
+>          def_bool n
+>          depends on PROC_VMCORE
+>          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> 
+> And change that with VIRTIO_MEM support in the relevant patch.
+
+Oh, it's not comment for this patch, I made the simple version based on
+the whole patchset. When I had a glance at this patch, I also took
+several iterations to get it after I applied the whole patchset and
+tried to understand the whole code.
+
+> 
+> 
+> I faintly remember that we try avoiding such dependencies and prefer
+> selecting Kconfigs instead. Just look at the SPLIT_PTE_PTLOCKS mess we still
+> have to clean up. But as we don't expect that many providers for now, I
+> don't care.
+
+With the simple version, Kconfig learner as me can easily understand what
+they are doing. If it took you a couple of iterations to make them as
+you had mentioned earlier, and it took me several iterations to
+understand them, I believe there must be room to improve the presented
+ones in this patchset. These are only my humble opinion, and I am not
+aware of virtio-mem at all, I'll leave this to you and other virtio-mem
+dev to decide what should be taken. Thanks for your patience and
+provided information, I learned a lot from this discussion.
+
+===================
+fs/proc/Kconfig:
+config PROVIDE_PROC_VMCORE_DEVICE_RAM
+        def_bool n
+
+config NEED_PROC_VMCORE_DEVICE_RAM
+        def_bool n
+
+config PROC_VMCORE_DEVICE_RAM
+        def_bool y
+        depends on PROC_VMCORE
+        depends on NEED_PROC_VMCORE_DEVICE_RAM
+        depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+
+drivers/virtio/Kconfig:
+config VIRTIO_MEM
+        select PROVIDE_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+                                              ~~~~~~~~~~~~~~
+
+arch/s390/Kconfig:
+config S390
+        select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+                                           ~~~~~~~~~~~~~~
+========================
+
+One last thing I haven't got well, If PROC_VMCORE_DEVICE_RAM has had
+dependency on PROC_VMCORE, can we take off the ' if PROC_VMCORE' when
+select PROVIDE_PROC_VMCORE_DEVICE_RAM and NEED_PROC_VMCORE_DEVICE_RAM?
+
+Thanks
+Baoquan
+
 
