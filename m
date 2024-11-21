@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-32237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1DC09D463C
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 04:26:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86E589D463F
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 04:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64CF1281685
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 03:26:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37CB51F22396
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 03:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B98A1B5325;
-	Thu, 21 Nov 2024 03:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3E01C7299;
+	Thu, 21 Nov 2024 03:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fAtoUlWI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TSGGDCrR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A23D13C81B;
-	Thu, 21 Nov 2024 03:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EBF1C1F3A;
+	Thu, 21 Nov 2024 03:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732159589; cv=none; b=R34cXc1U0VYykxrkMh/s5DuuKxqIdTtp0zk5bCQPEYGp0pZ+efOwaD0Xwlu1anxWfUPITPW+B+hUHNfRpZAKPaslxaaM3VAXAnHtZnA3/zuyRpYhYUrWvDQ85aOZeim6SYL7bW8j7H6IM3dxt9sJSV+bwZ46Yhp2alLjHTrDjdU=
+	t=1732159770; cv=none; b=H8IyZRk4CgCMC+SfaorM1FW274+h2/MVNv3K3XRGio6Rj0juMvIg313UvrEoCEsXXYMG8877kaFQbl0hL4U774HMWrJqEBynwblcje+VDtH9pH6kxnJjQz3BPiLLajcxokfDf7PXmPZgOmJwDxaXkwJWXEihQN1s2uiYPUneU/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732159589; c=relaxed/simple;
-	bh=WHPaEuyDttt0Nc221x4V3sdLjlAdVv8Jizfbsnw3LH0=;
+	s=arc-20240116; t=1732159770; c=relaxed/simple;
+	bh=RHoVzwWXjt4caPv+g3UeTiU+/R+dvmY/yBmiV0cWZE8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U33PeUv6zeFupoHkdRsjD4ZVeQJBoGmWEsmuoUp+dMDVdWOFL4LecNjCIEwKq2id5mZLmYE2dFLzYIFn6KO+A3vjpnG68hHO70DeoHeCd8qBJ4PfpNpA5GYv9KC20eEyWik0R0ywQ3i9n5JsdH5VEII1LKPU3CBMRvMmhSv8OLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fAtoUlWI; arc=none smtp.client-ip=198.175.65.11
+	 In-Reply-To:Content-Type; b=ZuyX5TTs7ftH9qxFDxmQXGFE5xJbBBFysritwKsGU2BlCC+FTS19SzSi8Z8SN4twZDYyq10uXM+EgqsgpDzjedzYtuxRakn012JoxBfaGo/pOVdt/pJJrTeALOEw5y32J/WLBUXUt+ZExQ1Mw9LWazUVmfUbNHXorlCXAFslucA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TSGGDCrR; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732159589; x=1763695589;
+  t=1732159769; x=1763695769;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=WHPaEuyDttt0Nc221x4V3sdLjlAdVv8Jizfbsnw3LH0=;
-  b=fAtoUlWIURTxR7YwT0dHvW5Jthw+mmnlEXMg9EkNLTOAzSFr+xRofCwf
-   bjtvSc7rJb3RGH6VmC/ypeQFz8taU9gW6LVucvf9CBmHfxaKvmymQxXk/
-   qgzVZXxUvUGksglT13gtxjJ8R03G3u/vqbHtONT0h4kvCZtYyMyBvFUMM
-   cdIDO1PYbcV5d6zs4as4770moVDqqjJJgcrb8lSFtiNj8UcW9vlTtQZJ2
-   e8VVjceUh/aorzuXvFSU9eF3igqEwzOkaphf0/6pesBsFHrC+2n4pUeRs
-   KfdModD8ecH02E//JroQ3s5X/wTHvQxoAhuCAVGxEz+Qj/Qs0MAVHWbGh
-   w==;
-X-CSE-ConnectionGUID: PXltJssXS+63G2UNqjnx7Q==
-X-CSE-MsgGUID: XE8DKrQCRDKDOKZPZ2qqmQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="42759471"
+  bh=RHoVzwWXjt4caPv+g3UeTiU+/R+dvmY/yBmiV0cWZE8=;
+  b=TSGGDCrRKOqbnKeAo/badN0sl2Say10q6YRj4hOZnpHJOxw3NzTBJc0+
+   gx3VPKFNcpLy2ZoRzJSBzfpa585oRswkzzt6sAalyKNtzjCD4Atw3Q/O4
+   G8PqC9UK0rhk/yX/qM5x38aIks9d9G1kSaoe38wmnCNgLJHaHKue19SxO
+   h2ZXtbd5vs2T8gqcPSHkzmIng3pxDN1+Y8ch3huK/gOt/1+m23yhJNguP
+   cSzaPEscdE7XLfLsB6DUfz3i7VIZ2EB55M7dhptNKc+jhLf+JHAFIoCTj
+   REQiJCKI6DD03sVngLIcdrRvQQr2Vif946P0eUYbo1yqA95D1EmqUXzIu
+   Q==;
+X-CSE-ConnectionGUID: hkDmgSuYTmacLSgULGc8cA==
+X-CSE-MsgGUID: w7qdJ+JvTfmEEp9ZNvVRlw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="31616603"
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="42759471"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:26:28 -0800
-X-CSE-ConnectionGUID: 7lcOi7P4SzGqHGgURyGiIg==
-X-CSE-MsgGUID: PUMzpbVeRbOqk07eQ/OW7g==
+   d="scan'208";a="31616603"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:29:27 -0800
+X-CSE-ConnectionGUID: hDd+q5yrSAKHs8G2FW7PIw==
+X-CSE-MsgGUID: Kcrmj1ABRBWlJGGQ//X+oA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="90518147"
+   d="scan'208";a="90516447"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:26:23 -0800
-Message-ID: <88516542-9362-462c-a28d-bcf100da970a@linux.intel.com>
-Date: Thu, 21 Nov 2024 11:26:20 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 19:29:23 -0800
+Message-ID: <5eac39c5-4e53-457e-b6b1-4101135595ce@linux.intel.com>
+Date: Thu, 21 Nov 2024 11:29:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 53/58] KVM: x86/pmu/svm: Set GuestOnly bit and
- clear HostOnly bit when guest write to event selectors
+Subject: Re: [RFC PATCH v3 56/58] KVM: x86/pmu/svm: Wire up PMU filtering
+ functionality for passthrough PMU
 To: Sean Christopherson <seanjc@google.com>,
  Mingwei Zhang <mizhang@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
@@ -83,65 +83,58 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
  Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
  linux-perf-users@vger.kernel.org
 References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-54-mizhang@google.com> <Zz5WuqMBdDtZfJBq@google.com>
+ <20240801045907.4010984-57-mizhang@google.com> <Zz5XEDX8NqnrHhj3@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Zz5WuqMBdDtZfJBq@google.com>
+In-Reply-To: <Zz5XEDX8NqnrHhj3@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
-On 11/21/2024 5:38 AM, Sean Christopherson wrote:
+On 11/21/2024 5:39 AM, Sean Christopherson wrote:
 > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
->> From: Sandipan Das <sandipan.das@amd.com>
+>> From: Manali Shukla <manali.shukla@amd.com>
 >>
->> On AMD platforms, there is no way to restore PerfCntrGlobalCtl at
->> VM-Entry or clear it at VM-Exit. Since the register states will be
->> restored before entering and saved after exiting guest context, the
->> counters can keep ticking and even overflow leading to chaos while
->> still in host context.
+>> With the Passthrough PMU enabled, the PERF_CTLx MSRs (event selectors) are
+>> always intercepted and the event filter checking can be directly done
+>> inside amd_pmu_set_msr().
 >>
->> To avoid this, the PERF_CTLx MSRs (event selectors) are always
->> intercepted. KVM will always set the GuestOnly bit and clear the
->> HostOnly bit so that the counters run only in guest context even if
->> their enable bits are set. Intercepting these MSRs is also necessary
->> for guest event filtering.
->>
->> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+>> Add a check to allow writing to event selector for GP counters if and only
+>> if the event is allowed in filter.
+> This belongs in the patch that adds AMD support for setting pmc->eventsel_hw.
+> E.g. reverting just this patch would leave KVM in a very broken state.  And it's
+> unnecessarily difficult to review.
+
+Sure. would merge them into one.
+
+
+>
+>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
 >> ---
->>  arch/x86/kvm/svm/pmu.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>  arch/x86/kvm/svm/pmu.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
 >>
 >> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
->> index cc03c3e9941f..2b7cc7616162 100644
+>> index 86818da66bbe..9f3e910ee453 100644
 >> --- a/arch/x86/kvm/svm/pmu.c
 >> +++ b/arch/x86/kvm/svm/pmu.c
->> @@ -165,7 +165,12 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>  		data &= ~pmu->reserved_bits;
+>> @@ -166,6 +166,15 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 >>  		if (data != pmc->eventsel) {
 >>  			pmc->eventsel = data;
->> -			kvm_pmu_request_counter_reprogram(pmc);
->> +			if (is_passthrough_pmu_enabled(vcpu)) {
->> +				data &= ~AMD64_EVENTSEL_HOSTONLY;
->> +				pmc->eventsel_hw = data | AMD64_EVENTSEL_GUESTONLY;
-> Do both in a single statment, i.e.
->
-> 				pmc->eventsel_hw = (data & ~AMD64_EVENTSEL_HOSTONLY) |
-> 						   AMD64_EVENTSEL_GUESTONLY;
->
-> Though per my earlier comments, this likely needs to end up in reprogram_counter().
-
-It looks we need to add a PMU callback and call it from reprogram_counter().
-
-
->
->> +			} else {
->> +				kvm_pmu_request_counter_reprogram(pmc);
->> +			}
->>  		}
->>  		return 0;
->>  	}
+>>  			if (is_passthrough_pmu_enabled(vcpu)) {
+>> +				if (!check_pmu_event_filter(pmc)) {
+>> +					/*
+>> +					 * When guest request an invalid event,
+>> +					 * stop the counter by clearing the
+>> +					 * event selector MSR.
+>> +					 */
+>> +					pmc->eventsel_hw = 0;
+>> +					return 0;
+>> +				}
+>>  				data &= ~AMD64_EVENTSEL_HOSTONLY;
+>>  				pmc->eventsel_hw = data | AMD64_EVENTSEL_GUESTONLY;
+>>  			} else {
 >> -- 
 >> 2.46.0.rc1.232.g9752f9e123-goog
 >>
