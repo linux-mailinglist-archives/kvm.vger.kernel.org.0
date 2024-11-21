@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-32251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C9C9D4B34
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:03:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6BE19D4B52
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 363F8B24022
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76E3F1F2364D
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE911D14E0;
-	Thu, 21 Nov 2024 11:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D4F1D2B04;
+	Thu, 21 Nov 2024 11:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XPKb8Vow"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZnnDDvKB"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE41C9B95;
-	Thu, 21 Nov 2024 11:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09F11D12F9;
+	Thu, 21 Nov 2024 11:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732186967; cv=none; b=HWQxonSkSvcCTNeEKydw6C7YKftxOsb+VOsQF2ivGc7sYbNuTiZ6mGonqoMtDltoQGEl6qmIkOu4au2j/+4nBn9pSyHUV1O+XcL0xH/OMsftOJ1QK7lbapbYiGcVozfJcp5uLFhdSSwfKAUN7++ktsviWorccCMjX6CDi1xrnZc=
+	t=1732187545; cv=none; b=fy6YIfi87JWiwPnbY4Ausizuw5mb/9iTbVpm8LXfeP+I756jVyJg/U+PU54SHV5yxSJamSRuR5Fsie3lG3bkreIMRtHm026b74iVpngQXbxDBcVqNo+PjvqJn4zDqcYfxI91wWEpN4km9m8CCoJLM5PqoTakbgEgYIXZg7nA+Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732186967; c=relaxed/simple;
-	bh=28IJcyn5WF2tiP+O72CcHDbeluIq7DCiPoYbU4oOZgo=;
+	s=arc-20240116; t=1732187545; c=relaxed/simple;
+	bh=46rZ8pT6LBDo++XU0X4+ubvk4/TsYvCXkojRMgrCm2I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BT1aZkByWJmiuBYO8GkwOo+Q41AmK7z1BztPbk7im5nvd1CGY1lnFkvQ6eRdZaIR5LR717TlG37fFFy7KmHkyUIjZeM8qCLjyPWxOJSra9Cq8mktRfFB2IwkcottMPb9QsCnFoPHPtej1tlmyMzWeYP+eg8gbIzM9RVwGIFltTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XPKb8Vow; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:Content-Disposition:In-Reply-To; b=FURfCPbmDZFgieMSS7iDo1dmSjHpuAfrLPC7iH8YTI3SOVlspiwFOmZj/z8Xoq4XmuavEo143DHWsQjJtFnnA5NXO/3fKUFevl9GaAJ1TDwD8jjpbLgFY7MOZBWFsZBOHIUJej9Jj9+6vUu65CnjgyAXp7G1UAZULLBL7PYGKyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZnnDDvKB; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zNXZoyeqqFWas/9jC0n8iQIDDwWz6V7tiZVs/eKT/uQ=; b=XPKb8Vow8F3xBJs12GZw/rt+Ow
-	VF/GyUTUxJh9qI63kQJho8d0o5b4u5E8hDxO9ShcsfeRFVp/4rkAW3WVDH3KYv4FBUs5QeL3bDFNr
-	M2aCUSxGPm77wao4+XcolTgelx3/vUfJRC9ZTa1qpwqLhckqrIoLQCwPBFII/z+3NvmeOaejchepE
-	O9kLSIfVQIw8d8FkRpeeViXPOameNIBniXeZmlVNv54ia4JTaw8U/tDSVrqpUmahogiKcjW06qsaB
-	7ZnXXj6OLHYDFY3PL0Ifx3GW+EpiJvB3xWocbtKENr0hYiPfi1fSS6O/0nTMqHDkVAYuqiGmwuOiS
-	qgVENELw==;
+	bh=7u6hZNi/XuzFou5ujdfwghsus0DK9jsxshgCxjL09s4=; b=ZnnDDvKBvItXFztIL1wgf8XTMK
+	ewcwZjNRWSYrjZH+rZT6o49FOe/kRo9OZGytGd+voz+HNGUcuH+PP2GaYPZHs4m/S9nn234JQU+s0
+	jcVN8NhToLe9FCA+qM5KpNzoUaPZLKtrF3vHdq2UtRbclGSqWbGDeyTL/5pPoGHMpsaTGnJ6Ar+wJ
+	2CDFUxa1pB5WeOoE/5nHHErJ8ykxvkEDM06/dAOiCtOt+bGYezuZWGNQI8o2HOKhnZqVGCA34MRgT
+	P2M6Z3Vn21k+nDAjOFXWjNQOUddBYU3AChzpcJxfmgAg0CxIN4kwolN9vrfeY3nk6x7i3pwoH4jPE
+	4WMvU03g==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tE4xN-00000006IWH-3lMe;
-	Thu, 21 Nov 2024 11:02:43 +0000
+	id 1tE56i-00000006J1a-2zVQ;
+	Thu, 21 Nov 2024 11:12:22 +0000
 Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id B8FEF30068B; Thu, 21 Nov 2024 12:02:42 +0100 (CET)
-Date: Thu, 21 Nov 2024 12:02:42 +0100
+	id 8D85C30068B; Thu, 21 Nov 2024 12:12:21 +0100 (CET)
+Date: Thu, 21 Nov 2024 12:12:21 +0100
 From: Peter Zijlstra <peterz@infradead.org>
 To: Valentin Schneider <vschneid@redhat.com>
 Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -98,14 +98,16 @@ Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
 	Juri Lelli <juri.lelli@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Yair Podemsky <ypodemsk@redhat.com>,
-	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 08/15] sched/clock, x86: Make __sched_clock_stable
- forceful
-Message-ID: <20241121110242.GD24774@noisy.programming.kicks-ass.net>
+	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>,
+	Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [RFC PATCH v3 13/15] context_tracking,x86: Add infrastructure to
+ defer kernel TLBI
+Message-ID: <20241121111221.GE24774@noisy.programming.kicks-ass.net>
 References: <20241119153502.41361-1-vschneid@redhat.com>
- <20241119153502.41361-9-vschneid@redhat.com>
- <20241120145904.GK19989@noisy.programming.kicks-ass.net>
- <xhsmhv7whhnjb.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <20241119153502.41361-14-vschneid@redhat.com>
+ <20241120152216.GM19989@noisy.programming.kicks-ass.net>
+ <20241120153221.GM38972@noisy.programming.kicks-ass.net>
+ <xhsmhldxdhl7b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -114,30 +116,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <xhsmhv7whhnjb.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+In-Reply-To: <xhsmhldxdhl7b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-On Wed, Nov 20, 2024 at 05:34:32PM +0100, Valentin Schneider wrote:
-> On 20/11/24 15:59, Peter Zijlstra wrote:
-> > On Tue, Nov 19, 2024 at 04:34:55PM +0100, Valentin Schneider wrote:
-> >> Later commits will cause objtool to warn about non __ro_after_init static
-> >> keys being used in .noinstr sections in order to safely defer instruction
-> >> patching IPIs targeted at NOHZ_FULL CPUs.
-> >> 
-> >> __sched_clock_stable is used in .noinstr code, and can be modified at
-> >> runtime (e.g. KVM module loading). Suppressing the text_poke_sync() IPI has
-> >
-> > Wait, what !? loading KVM causes the TSC to be marked unstable?
-> 
+On Wed, Nov 20, 2024 at 06:24:56PM +0100, Valentin Schneider wrote:
 
-> There is however this:
+> > Oh gawd, just having looked at xen_write_cr3() this might not be
+> > entirely trivial to mark noinstr :/
 > 
->   kvm_arch_vcpu_load()
->   `\
->     mark_tsc_unstable()
+> ... I hadn't even seen that.
 > 
-> So plugging a VCPU might do that.
+> AIUI the CR3 RMW is not "enough" if we have PGE enabled, because then
+> global pages aren't flushed.
+> 
+> The question becomes: what is held in global pages and do we care about
+> that when it comes to vmalloc()? I'm starting to think no, but this is x86,
+> I don't know what surprises are waiting for me.
+> 
+> I see e.g. ds_clear_cea() clears PTEs that can have the _PAGE_GLOBAL flag,
+> and it correctly uses the non-deferrable flush_tlb_kernel_range().
 
-Right, but that only happens if it observes the TSC doing dodgy, so
-that's deserved and shouldn't happen on hardware from this decade, and
-possibly the one before that.
+
+I always forget what we use global pages for, dhansen might know, but
+let me try and have a look.
+
+I *think* we only have GLOBAL on kernel text, and that only sometimes.
 
