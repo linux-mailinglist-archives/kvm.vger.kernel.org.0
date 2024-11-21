@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-32229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F3C9D4533
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 02:13:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E91339D45A6
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 03:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9CD1F22629
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 01:13:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9F19282B08
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 02:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D081F5E6;
-	Thu, 21 Nov 2024 01:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DE461FCE;
+	Thu, 21 Nov 2024 02:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWC/INAu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kS7eZ2bu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310162FB6;
-	Thu, 21 Nov 2024 01:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C436C23099B;
+	Thu, 21 Nov 2024 02:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732151613; cv=none; b=MljUdhYOw2ZjQMxkvTSZ6itXzuWRyZmN/+0qq99eSc7Iz9Wz6pBndBjQBATcxbzDfVolfm7SZR7h11JPlp2JB3oXO4pySFrRmxkABoKd+Oz0tW6lNeWsZm36x8hW6kwuT6o5kLjoaHt9vCu769KXDGgoP2USSCrC6pZZEB2Bo+M=
+	t=1732154658; cv=none; b=i0JJNw10awClmbCbty0+pBnLMgouTUQgt052es2aM+AroWxwjStfBd+Q90W9ilO3g6D2iwK/EMkDs0ohPuFm6XFnFC06kB2rQQvakrhheZVnavacPIplpeYjuEQRULuQ753GSyU5V5cqwE3PVNYp4eeEHdq2WiEXBjgmL/JvzRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732151613; c=relaxed/simple;
-	bh=ICG+FxvrX5yibq/Mxg/BZXiLCG8EnXKd7MctmBYvpBE=;
+	s=arc-20240116; t=1732154658; c=relaxed/simple;
+	bh=gaY+7MMaStKxAc7LQysU+I6URZtFT90Q+c0EkfrlZtY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QT8yMalh2cyfb/m9I+L9NDg3YulqsHOovs+zymf8a4/Hi6p1KOvMdTedXe4Y1RTnw5dU4s/54SEFokiccR3hxMpdTT9DKDu698S4WUE+Ln7VJ1kFcgSLfvtGIFGgL3UmOIhuhgqAktN4dc+iOsDV5G2gR48kiQawABykKLuWr3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWC/INAu; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=ac5hbIZISs/cqwWj1PDvkGLNfVIeRHfbbi4BD9HgrV+sduUxluKQDhhgPhLA5QJbxTmalK3M9jeix5BSzu4Duz5S3jcb8qBmSQRhGgUmHa4p0O8F/wRf2gcRb+tJbvKuIt4X0suU2PPC2ctzkKUGwmquZY7qyo4udaPqaNiMhiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kS7eZ2bu; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732151612; x=1763687612;
+  t=1732154657; x=1763690657;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ICG+FxvrX5yibq/Mxg/BZXiLCG8EnXKd7MctmBYvpBE=;
-  b=CWC/INAuca+bZ5JdValLzghQxxnxH8ZisNkA9WyvwLNB8Fkz+kThhX5f
-   wqGE4nGvxYPiDlPsvFgbcVQdduVORWtN7On9UdWpDRLt52xG8avxzOz0u
-   XzMbcBIVzwVoll9/YGE2oM9kr4dPcnL+Uic0eiJ5ZytKLg8IGD67tvvUz
-   pVpAbBnbR+hr/eOSk2iFnIZ/X1J1nyKYE5U0mEkznmU8Bt5Cg8/ykYERy
-   VEFEqauLUFh8ibUvyJ3JQcR/ubcNwBOXS5fsVOYmMPfzlo9hU1QtUVMRQ
-   kYDV/d0S8CokAyl3gQPu6oTFJjsDUtyiPFBd+1z888OYT0TQlF0nf3jHA
+  bh=gaY+7MMaStKxAc7LQysU+I6URZtFT90Q+c0EkfrlZtY=;
+  b=kS7eZ2bujgnTvJHuI1LRCNGJ1iled1Zm1pL+oE/H/kbb8KGMgpwkPraQ
+   b3jZjGq6tAYigxaEfVq2oRA2RDUl0+5yreM9K0N1sEszQyVO0wexNIdJi
+   xa4dVrrdXk1r5ZDBW0VW3EqtnlisHedhgv5XdCNbSCBhImwY2xBj1v/xl
+   Tu2ntWIeg1yyLwd8w7GOPWST4hnWe278IaK3TeCnqno1OoaSBQ3t65X+Z
+   1QIf4THypG7BTz3TMO4oe/wPKcPTvP2ZggmVszuVkThVwTdT/TEciBPjL
+   hzmaab0OcFmDsZ79Ph23Ssp/cEjZM6oQhjTexszS9K22LjFRu9L5SyGdt
    g==;
-X-CSE-ConnectionGUID: 7WrkrIPVSsaJ+9qdzKBr6w==
-X-CSE-MsgGUID: VZ9p8UYsQX+IWt7ecItSZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="35100576"
+X-CSE-ConnectionGUID: FoNE+hWyRDeweYmQGHcu/Q==
+X-CSE-MsgGUID: 0SfD2k+9SHOpKoUmGxRo2w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="32300328"
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="35100576"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 17:13:32 -0800
-X-CSE-ConnectionGUID: oANH9ESQRCSHjPLW3W87gA==
-X-CSE-MsgGUID: VW2equZkQ7iEMjuFOuK5Ew==
+   d="scan'208";a="32300328"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:04:17 -0800
+X-CSE-ConnectionGUID: ZJqjdDMURyeYuNkMdDuQ1g==
+X-CSE-MsgGUID: rVjyDnkCS82O1uZHlahx0w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="95035102"
+   d="scan'208";a="90902823"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 17:13:27 -0800
-Message-ID: <43a93ac5-3503-444a-8b29-41996faf42df@linux.intel.com>
-Date: Thu, 21 Nov 2024 09:13:23 +0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:04:11 -0800
+Message-ID: <e5a6692c-9219-4cfb-961c-eb2209bc9ec9@linux.intel.com>
+Date: Thu, 21 Nov 2024 10:04:09 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 38/58] KVM: x86/pmu: Exclude existing vLBR logic
- from the passthrough PMU
+Subject: Re: [RFC PATCH v3 40/58] KVM: x86/pmu: Grab x86 core PMU for
+ passthrough PMU VM
 To: Sean Christopherson <seanjc@google.com>,
  Mingwei Zhang <mizhang@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
@@ -83,40 +83,44 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang
  Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
  linux-perf-users@vger.kernel.org
 References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-39-mizhang@google.com> <Zz4tsayQblkJUOtG@google.com>
+ <20240801045907.4010984-41-mizhang@google.com> <Zz4uhmuPcZl9vJVr@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Zz4tsayQblkJUOtG@google.com>
+In-Reply-To: <Zz4uhmuPcZl9vJVr@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
-On 11/21/2024 2:42 AM, Sean Christopherson wrote:
+On 11/21/2024 2:46 AM, Sean Christopherson wrote:
 > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
->> Excluding existing vLBR logic from the passthrough PMU because the it does
->> not support LBR related MSRs. So to avoid any side effect, do not call
->> vLBR related code in both vcpu_enter_guest() and pmi injection function.
-> This is unnecessary.  PMU_CAP_LBR_FMT will be cleared in kvm_caps.supported_perf_cap
-> when the mediated PMU is enabled, which will prevent relevant bits from being set
-> in the vCPU's PERF_CAPABILITIES, and that in turn will ensure the number of LBR
-> records is always zero.
-Yes, that's true.
-
+>> From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+>>
+>> When passthrough PMU is enabled by kvm and perf, KVM call
+>> perf_get_mediated_pmu() to exclusive own x86 core PMU at VM creation, KVM
+>> call perf_put_mediated_pmu() to return x86 core PMU to host perf at VM
+>> destroy.
+>>
+>> When perf_get_mediated_pmu() fail, the host has system wide perf events
+>> without exclude_guest = 1 which must be disabled to enable VM with
+>> passthrough PMU.
+> I still much prefer my idea of making the mediated PMU opt-in.  I haven't seen
+> any argument against that approach.
 >
-> If we wanted a sanity check, then it should go in intel_pmu_refresh().  But I don't
-> think that's justified.  E.g. legacy LBRs are incompatible with arch LBRs.  At some
-> point we have to rely on us not screwing up.
->
-> A selftest for this though, that's a different story, but we already have coverage
-> thanks to vmx_pmu_caps_test.c.  If we wanted to be paranoid, that test could be
-> extended to assert that LBRs are unsupported if the mediated PMU is enabled.
+> https://lore.kernel.org/all/ZiFGRFb45oZrmqnJ@google.com
 
-we have already supported arch-LBR feature internally (still not sent to
-upstream since the dependency) base on this mediated vPMU framework and we
-would add a arch-LBR selftest.  It looks unnecessary to add temporary test
-case and then remove it soon.
+Yeah, I agree this look a more flexible method and it gives the VMM right
+to control if the mediated vPMU should be enabled instead of static enabling.
 
-would drop this patch.
+The original issue is that this requires VMM to be involved and not all VMM
+call the ioctl KVM_CAP_PMU_CAPABILITY, like qemu.
+
+But I see there is already a patch
+(https://lore.kernel.org/qemu-devel/20241104094119.4131-3-dongli.zhang@oracle.com/)
+which tries to add KVM_CAP_PMU_CAPABILITY support in Qemu although it's not
+complete (only disable, but no enable)
+
+Yeah, we would follow this suggestion and make the mediated vPMU opt-in. If
+need, we would add corresponding changes for Qemu as well.
 
 
 
