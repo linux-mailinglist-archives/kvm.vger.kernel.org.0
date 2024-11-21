@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-32227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C69D44F5
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 01:38:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191539D452A
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 01:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DCF2B21416
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 00:37:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7456283661
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 00:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75C87080D;
-	Thu, 21 Nov 2024 00:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B227639FCE;
+	Thu, 21 Nov 2024 00:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z44iOJYq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i/sVbyAd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5307A5695;
-	Thu, 21 Nov 2024 00:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181EE230985;
+	Thu, 21 Nov 2024 00:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732149452; cv=none; b=dB+cVFNAlUO9Zzuzt0FD0mB+MExyjYp4QWe/M6Mvc3XexHKt20Vdq4wWa9ILEVr0MAcNIq7vyyij+6jI9rF6Yv+z+L3bG/IWCr5w2MAwVZ67aFmGQwQEMl6dpmoKXVwxpXqoz0dGV/L2xtVL+AlAsEdAuHS4d+l9ZI6ixjPLoDY=
+	t=1732150573; cv=none; b=s7Kuv6dSj5moEW3ETY/LTLvULaXITKLWaJ2NeSdqb0FLaxZCELDq1xpqfOVlJAtExn3fwU4uAn9CX9PaGOxdmW9zHxDjcGAesSGQCb1vtsAzowpCLpjsQqXzs54T6WKBR/oN0ZC215qJrStU3rLiIZuETErVJuizrF07jkrYqmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732149452; c=relaxed/simple;
-	bh=C2zlLAlJ+VEIVk1W1QZj6tkfITBwAi6nLVdxcLHmMw4=;
+	s=arc-20240116; t=1732150573; c=relaxed/simple;
+	bh=wp8y51ikTxFILk/YOttk603dlAU0m7y9CC1/E9YA9jI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W506rt+01HyiQK0mG53l/sk0mPeaVbthFW6JtgoKNUaePtS2+b8+VKeN3bzOliidNG/MJ0BSD8pUZHHwTmJjyAIgVfeG1D9+5sAJ6pwJh/e9Tw4hGevxbUlXwez5NCIo2zZdh31CuKfU//g67LWcY0A7BOBd2au8B1vv1/Srd9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z44iOJYq; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=P4Kzy4I0f3MoIEf+/BWgd/NMkZr+yhNAfrDNufR9dH9NNsDtbYXgmSX+R6co0mxqBMq1nd4tPVaDV/5Hto3+sRilipg3cukqbzc++Tkpl1OQCToiiE1c1yOPnuFKpaDXcqx7oikplKz/wKfw4urQVaKqbfiOfnYn3GMlPQ1MNRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i/sVbyAd; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732149451; x=1763685451;
+  t=1732150572; x=1763686572;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=C2zlLAlJ+VEIVk1W1QZj6tkfITBwAi6nLVdxcLHmMw4=;
-  b=Z44iOJYqIUIEdirTlliLDJTZeK4EfQwK0c445YGCPxB6D55OnELHC7DG
-   pQzZKtXlVmDSuISGX5emJS2Y3CobS1KOMjGXqREvFoOxv6bszTNXMbE6A
-   vj8GAaTQvCP5Ig1DxTRmscoskxDmZTWvKRfiquNRR1F9KdjS2TpyqUMHY
-   mEt9FjPnMLEEVpE3KXNm8v4xRQFMB6bTV9/oO6vjry16Psx7HriXqRxLL
-   0BL92RXwGm1lOXFsPlL8U/g3B/yC1yQC9SBhSUOckbqYbIYg7m5kE9zoy
-   8GLcvnt7lGqF1BVT1jQAhF7Hnkd4cKI77KJfgJD1a1fuvo9LQTUgIflpq
-   A==;
-X-CSE-ConnectionGUID: sXX5Jp6QTqepchg9My8+gw==
-X-CSE-MsgGUID: KGehntXdTBaA9SDCK4GBtg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="32390265"
+  bh=wp8y51ikTxFILk/YOttk603dlAU0m7y9CC1/E9YA9jI=;
+  b=i/sVbyAdgPt7UvVyN2x6StcDIWt39A8CyRhGIw5nhsfJaxKI6L44cbUj
+   6DfOb8N6PBBdZDm3R7eDAkKAZK8tu3AViEwtmSkmTnRADFyJl3B5Xq6k8
+   2w9PDv9Dn+KhvAoKHM/4iupQlKkGTv2lAHSt1V6FhTyb09IzhzUOknEw/
+   DMD2cjn0ee2avku71KRKlTAjLj2RstAkIIZOuF2kzSsfl/YE2LeafGmRJ
+   HSTDq/+M39gNlmqoaAQL0vnPLk+BXolC4tjcwArjUOLqqPiS0zQug2Msk
+   0l2BY3VXtCqNVpf7epYyzQ9bMBIHZrfXt2I4eqO5d64O5+RR19oxhhTSc
+   w==;
+X-CSE-ConnectionGUID: x8IYlS9qQ3ukpnd+8DFZZw==
+X-CSE-MsgGUID: MRMHUUqqSVurwQlgSMbCKg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="32487998"
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="32390265"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 16:37:31 -0800
-X-CSE-ConnectionGUID: 2zykJIYVSom+eqYFU6vSug==
-X-CSE-MsgGUID: sFkCgBEKT3CpOYfIQ5Elqw==
+   d="scan'208";a="32487998"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 16:56:11 -0800
+X-CSE-ConnectionGUID: yk3P3JtZQ+6j7uQP+Kvp5Q==
+X-CSE-MsgGUID: kiVniXDaR2iln6k6ZuM8nA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="90070326"
+   d="scan'208";a="90486051"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 16:37:26 -0800
-Message-ID: <655f1869-2769-429d-8952-01ad04e74f2e@linux.intel.com>
-Date: Thu, 21 Nov 2024 08:37:23 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 16:56:03 -0800
+Message-ID: <ac97cd9e-9ddf-4796-ae40-3d50791548e9@linux.intel.com>
+Date: Thu, 21 Nov 2024 08:56:00 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 20/58] KVM: x86/pmu: Always set global enable bits
- in passthrough mode
+Subject: Re: [RFC PATCH v3 31/58] KVM: x86/pmu: Add counter MSR and selector
+ MSR index into struct kvm_pmc
 To: Sean Christopherson <seanjc@google.com>
 Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Xiong Zhang <xiong.y.zhang@intel.com>, Kan Liang <kan.liang@intel.com>,
@@ -82,63 +82,118 @@ Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
  linux-perf-users@vger.kernel.org
 References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-21-mizhang@google.com> <Zzyw1UyapXDNpc-c@google.com>
- <b08075d5-1190-44f7-bccc-04f3273c13f3@linux.intel.com>
- <Zz4XsR6v2PKb-yvX@google.com>
+ <20240801045907.4010984-32-mizhang@google.com> <ZzzfwXefHP7SG-Vy@google.com>
+ <01b6dc80-8cb6-4b13-9d0f-db3a07672532@linux.intel.com>
+ <Zz4cuXfFtXzRAWvC@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Zz4XsR6v2PKb-yvX@google.com>
+In-Reply-To: <Zz4cuXfFtXzRAWvC@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
-On 11/21/2024 1:09 AM, Sean Christopherson wrote:
+On 11/21/2024 1:30 AM, Sean Christopherson wrote:
 > On Wed, Nov 20, 2024, Dapeng Mi wrote:
->> On 11/19/2024 11:37 PM, Sean Christopherson wrote:
->>>> ---
->>>>  arch/x86/kvm/pmu.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>>> index 5768ea2935e9..e656f72fdace 100644
->>>> --- a/arch/x86/kvm/pmu.c
->>>> +++ b/arch/x86/kvm/pmu.c
->>>> @@ -787,7 +787,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>  	 * in the global controls).  Emulate that behavior when refreshing the
->>>>  	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
->>>>  	 */
->>>> -	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
->>>> +	if ((pmu->passthrough || kvm_pmu_has_perf_global_ctrl(pmu)) && pmu->nr_arch_gp_counters)
->>>>  		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
->>> This is wrong and confusing.  From the guest's perspective, and therefore from
->>> host userspace's perspective, PERF_GLOBAL_CTRL does not exist.  Therefore, the
->>> value that is tracked for the guest must be '0'.
->>>
->>> I see that intel_passthrough_pmu_msrs() and amd_passthrough_pmu_msrs() intercept
->>> accesses to PERF_GLOBAL_CTRL if "pmu->version > 1" (which, by the by, needs to be
->>> kvm_pmu_has_perf_global_ctrl()), so there's no weirdness with the guest being able
->>> to access MSRs that shouldn't exist.
->>>
->>> But KVM shouldn't stuff pmu->global_ctrl, and doing so is a symptom of another
->>> flaw.  Unless I'm missing something, KVM stuffs pmu->global_ctrl so that the
->>> correct value is loaded on VM-Enter, but loading and saving PERF_GLOBAL_CTRL on
->>> entry/exit is unnecessary and confusing, as is loading the associated MSRs when
->>> restoring (loading) the guest context.
->>>
->>> For PERF_GLOBAL_CTRL on Intel, KVM needs to ensure all GP counters are enabled in
->>> VMCS.GUEST_IA32_PERF_GLOBAL_CTRL, but that's a "set once and forget" operation,
->>> not something that needs to be done on every entry and exit.  Of course, loading
->>> and saving PERF_GLOBAL_CTRL on every entry/exit is unnecessary for other reasons,
->>> but that's largely orthogonal.
->>>
->>> On AMD, amd_restore_pmu_context()[*] needs to enable a maximal value for
->>> PERF_GLOBAL_CTRL, but I don't think there's any need to load the other MSRs,
->>> and the maximal value should come from the above logic, not pmu->global_ctrl.
->> Sean, just double confirm, you are suggesting to do one-shot initialization
->> for guest PERF_GLOBAL_CTRL (VMCS.GUEST_IA32_PERF_GLOBAL_CTRL for Intel)
->> after vCPU resets, right?
-> No, it would need to be written during refresh().  VMCS.GUEST_IA32_PERF_GLOBAL_CTRL
-> is only static (because it's unreachable) if the guest does NOT have version > 1.
-oh, yeah, refresh() instead of reset() to be exact.
+>> On 11/20/2024 2:58 AM, Sean Christopherson wrote:
+>>> Please squash this with the patch that does the actual save/load.  Hmm, maybe it
+>>> should be put/load, now that I think about it more?  That's more consitent with
+>>> existing KVM terminology.
+>> Sure. I ever noticed that this in-consistence, but "put" seem not so
+>> intuitionistic as "save", so didn't change it.
+> Yeah, "put" isn't perfect, but neither is "save", because the save/put path also
+> purges hardware state.
 >
+>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>>>> index 4b3ce6194bdb..603727312f9c 100644
+>>>> --- a/arch/x86/include/asm/kvm_host.h
+>>>> +++ b/arch/x86/include/asm/kvm_host.h
+>>>> @@ -522,6 +522,8 @@ struct kvm_pmc {
+>>>>  	 */
+>>>>  	u64 emulated_counter;
+>>>>  	u64 eventsel;
+>>>> +	u64 msr_counter;
+>>>> +	u64 msr_eventsel;
+>>> There's no need to track these per PMC, the tracking can be per PMU, e.g.
+>>>
+>>> 	u64 gp_eventsel_base;
+>>> 	u64 gp_counter_base;
+>>> 	u64 gp_shift;
+>>> 	u64 fixed_base;
+>>>
+>>> Actually, there's no need for a per-PMU fixed base, as that can be shoved into
+>>> kvm_pmu_ops.  LOL, and the upcoming patch hardcodes INTEL_PMC_FIXED_RDPMC_BASE.
+>>> Naughty, naughty ;-)
+>>>
+>>> It's not pretty, but 16 bytes per PMC isn't trivial. 
+>>>
+>>> Hmm, actually, scratch all that.  A better alternative would be to provide a
+>>> helper to put/load counter/selector MSRs, and call that from vendor code.  Ooh,
+>>> I think there's a bug here.  On AMD, the guest event selector MSRs need to be
+>>> loaded _before_ PERF_GLOBAL_CTRL, no?  I.e. enable the guest's counters only
+>>> after all selectors have been switched AMD64_EVENTSEL_GUESTONLY.  Otherwise there
+>>> would be a brief window where KVM could incorrectly enable counters in the host.
+>>> And the reverse that for put().
+>>>
+>>> But Intel has the opposite ordering, because MSR_CORE_PERF_GLOBAL_CTRL needs to
+>>> be cleared before changing event selectors.
+>> Not quite sure about AMD platforms, but it seems both Intel and AMD
+>> platforms follow below sequence to manipulated PMU MSRs.
+>>
+>> disable PERF_GLOBAL_CTRL MSR
+>>
+>> manipulate counter-level PMU MSR
+>>
+>> enable PERF_GLOBAL_CTRL MSR
+> Nope.  kvm_pmu_restore_pmu_context() does:
+>
+> 	static_call_cond(kvm_x86_pmu_restore_pmu_context)(vcpu);
+>
+>
+> 	/*
+> 	 * No need to zero out unexposed GP/fixed counters/selectors since RDPMC
+> 	 * in this case will be intercepted. Accessing to these counters and
+> 	 * selectors will cause #GP in the guest.
+> 	 */
+> 	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+> 		pmc = &pmu->gp_counters[i];
+> 		wrmsrl(pmc->msr_counter, pmc->counter);
+> 		wrmsrl(pmc->msr_eventsel, pmu->gp_counters[i].eventsel_hw);
+> 	}
+>
+> 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+> 		pmc = &pmu->fixed_counters[i];
+> 		wrmsrl(pmc->msr_counter, pmc->counter);
+> 	}
+>
+> And amd_restore_pmu_context() does:
+>
+> 	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+> 	rdmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, global_status);
+>
+> 	/* Clear host global_status MSR if non-zero. */
+> 	if (global_status)
+> 		wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, global_status);
+>
+> 	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_SET, pmu->global_status);
+>
+> 	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, pmu->global_ctrl);
+>
+> So the sequence on AMD is currently:
+>
+>   disable PERF_GLOBAL_CTRL
+>
+>   save host PERF_GLOBAL_STATUS 
+>
+>   load guest PERF_GLOBAL_STATUS (clear+set)
+>
+>   load guest PERF_GLOBAL_CTRL
+>
+>   load guest per-counter MSRs
+
+Checked again, yes, indeed. So the better way to handle this is to define a
+common helper to manipulate counters MSR in the common code, but call this
+common helper in the vendor specific callback.
+
+
+
 
