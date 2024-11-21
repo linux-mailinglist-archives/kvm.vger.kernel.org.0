@@ -1,111 +1,143 @@
-Return-Path: <kvm+bounces-32250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2466D9D4B2E
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:01:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C9C9D4B34
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 982D4B23AF5
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:01:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 363F8B24022
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474DB1CACE9;
-	Thu, 21 Nov 2024 11:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE911D14E0;
+	Thu, 21 Nov 2024 11:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqLZCtlG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XPKb8Vow"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3C71D042A
-	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 11:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE41C9B95;
+	Thu, 21 Nov 2024 11:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732186885; cv=none; b=QhAJ09fAXBnVHWHXahZWuXFi6KSzMjOW3YGXc9IE2uP4pvXxurPIfgciJZPQKeu5vhuZvtXK2mwPnowsMeP0akhzxhti2UG4KM8IrQSqJpJfoph8EQTMrOyE2AFp0H3gA/03uXcF1fSVRgt+ausqjZjF9QwhrNZOfeZ0UPbSe88=
+	t=1732186967; cv=none; b=HWQxonSkSvcCTNeEKydw6C7YKftxOsb+VOsQF2ivGc7sYbNuTiZ6mGonqoMtDltoQGEl6qmIkOu4au2j/+4nBn9pSyHUV1O+XcL0xH/OMsftOJ1QK7lbapbYiGcVozfJcp5uLFhdSSwfKAUN7++ktsviWorccCMjX6CDi1xrnZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732186885; c=relaxed/simple;
-	bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N1GqGTZxKiYKyU84PbahiUMGYa7IabM12Q9IxjS4K4VSzif86g4DYpD9F6tUzRJGhLyDB1SCBSFVTxa41MC2eNfLQ7rQIfGDpVPm2E+W+qRnhJZRRc1wdc33uVBi3XV33IgIbWVrDtAaWiX8QXg6+g7tVvJcmWO/86TGQMffSoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OqLZCtlG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732186882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
-	b=OqLZCtlGtN21zIZyFY7WmUqqIWExPmz2+jaQGzPFUUz6FYn9s2P/Yu9mvCwixsrH0b53/v
-	3/xDp+2lC8CUDE9qLlpQhgo6EQ1tssjB2lgCnwAYCAKf15h3ZRDWQAnEYfhSphiI5sE6lT
-	SzBGvUY8JvjKq8H4C4fwdIUOyWo5MB4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-JMtSO_eJPu2MN0CftcjUbQ-1; Thu, 21 Nov 2024 06:01:21 -0500
-X-MC-Unique: JMtSO_eJPu2MN0CftcjUbQ-1
-X-Mimecast-MFC-AGG-ID: JMtSO_eJPu2MN0CftcjUbQ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43163a40ee0so5243945e9.0
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 03:01:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732186880; x=1732791680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
-        b=kOadEfbhEeqJLdiXPnufGbQe5N0liD0EoKfwINHsmuoiw7zAMnQkdgGCSO+d9m78Ad
-         jqSgeXXGb1WdEjYjJJQnFb6PeQ45v7oGi74k3o2RjypMjIaITXp7QMF7VHg1s9A1zJmS
-         tcY/gVaCZngvn27fQKVqHZtbNavsKHhms1h51uKFihdwcZ9pzUCnby00FmSyQU4/JG2u
-         MNXISGrmSLKfDu0YC3lPtKg/reNUlhlDL49ypj8uDUCJRsWE/lq2X3D1iOz0MwK66/Rk
-         z29i5cUIbnvkx3Rj82O72jy2hwOFEnUfddDkMJej1rCMikjvb8hIy1ZP3X3gtWoqfmB1
-         Bj7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWdytOI4vCbc7yAShdZUWiE+ecBXt3dogPy3aJ4xNQtFAiJ1xNhyTGqCQF6/4xjIYCjZeE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7Ldtb4WX56pTfFitgAdAH0WdH1nfNlNKWTIqNIwKZxNTAIpBP
-	6WFahmf2XtxE3gZhKUTV7htM8AffK6aNJ4uL6PkAVNwmXHh2KO5xS0CNA81waZXZdJwGktgnglo
-	19jVAsOc8r0XKw3ZuHY2ultgTly13V0mlbhQsp8wUODsrb5/ctwkosiHacJ5FjocU820za2TMc6
-	HKNwj082s6ZiPfGEjPDSFTgoRU
-X-Gm-Gg: ASbGnctBCRhpLIOmAmPGhLrYlQ0Gc/QPB1WiJsT+/ZRqGVxVErs7L8xa5+HqZVjXzoN
-	5X3FXb/IxNrlRK01V2k0yXHFmTWoIW6I=
-X-Received: by 2002:a5d:59a6:0:b0:382:4fa4:e539 with SMTP id ffacd0b85a97d-38254ade561mr5527273f8f.2.1732186880486;
-        Thu, 21 Nov 2024 03:01:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHPsNju8DqEAsbUoBlH5FG7SPCdj1FPMazPqm9+bABcWR+xzSkUZWtpG5IoVakcOu1MFrAUc96srC1chIe7PMs=
-X-Received: by 2002:a5d:59a6:0:b0:382:4fa4:e539 with SMTP id
- ffacd0b85a97d-38254ade561mr5527245f8f.2.1732186880092; Thu, 21 Nov 2024
- 03:01:20 -0800 (PST)
+	s=arc-20240116; t=1732186967; c=relaxed/simple;
+	bh=28IJcyn5WF2tiP+O72CcHDbeluIq7DCiPoYbU4oOZgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BT1aZkByWJmiuBYO8GkwOo+Q41AmK7z1BztPbk7im5nvd1CGY1lnFkvQ6eRdZaIR5LR717TlG37fFFy7KmHkyUIjZeM8qCLjyPWxOJSra9Cq8mktRfFB2IwkcottMPb9QsCnFoPHPtej1tlmyMzWeYP+eg8gbIzM9RVwGIFltTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XPKb8Vow; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=zNXZoyeqqFWas/9jC0n8iQIDDwWz6V7tiZVs/eKT/uQ=; b=XPKb8Vow8F3xBJs12GZw/rt+Ow
+	VF/GyUTUxJh9qI63kQJho8d0o5b4u5E8hDxO9ShcsfeRFVp/4rkAW3WVDH3KYv4FBUs5QeL3bDFNr
+	M2aCUSxGPm77wao4+XcolTgelx3/vUfJRC9ZTa1qpwqLhckqrIoLQCwPBFII/z+3NvmeOaejchepE
+	O9kLSIfVQIw8d8FkRpeeViXPOameNIBniXeZmlVNv54ia4JTaw8U/tDSVrqpUmahogiKcjW06qsaB
+	7ZnXXj6OLHYDFY3PL0Ifx3GW+EpiJvB3xWocbtKENr0hYiPfi1fSS6O/0nTMqHDkVAYuqiGmwuOiS
+	qgVENELw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tE4xN-00000006IWH-3lMe;
+	Thu, 21 Nov 2024 11:02:43 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B8FEF30068B; Thu, 21 Nov 2024 12:02:42 +0100 (CET)
+Date: Thu, 21 Nov 2024 12:02:42 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
+	x86@kernel.org, rcu@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Lorenzo Stoakes <lstoakes@gmail.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Juerg Haefliger <juerg.haefliger@canonical.com>,
+	Nicolas Saenz Julienne <nsaenz@kernel.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
+	Chuang Wang <nashuiliang@gmail.com>,
+	Yang Jihong <yangjihong1@huawei.com>,
+	Petr Mladek <pmladek@suse.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+	Julian Pidancet <julian.pidancet@oracle.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Dionna Glaze <dionnaglaze@google.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+Subject: Re: [RFC PATCH v3 08/15] sched/clock, x86: Make __sched_clock_stable
+ forceful
+Message-ID: <20241121110242.GD24774@noisy.programming.kicks-ass.net>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-9-vschneid@redhat.com>
+ <20241120145904.GK19989@noisy.programming.kicks-ass.net>
+ <xhsmhv7whhnjb.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zz7vLEbLFXuRSPeo@linux.dev>
-In-Reply-To: <Zz7vLEbLFXuRSPeo@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 21 Nov 2024 12:01:08 +0100
-Message-ID: <CABgObfb+P7xaLqiPBzshMQTfSRg8B7LSYswzipNTk6bzWkbuXA@mail.gmail.com>
-Subject: Re: [GIT PULL] First batch of KVM/arm64 fixes for 6.13
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Anup Patel <anup@brainfault.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xhsmhv7whhnjb.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-On Thu, Nov 21, 2024 at 9:28=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Paolo,
->
-> Had a surprising amount of fixes turn up over the past few days so it is
-> probably best to send the first batch your way. The LPI invalidation and
-> compilation fix are particularly concerning, rest of the details found in
-> the tag.
+On Wed, Nov 20, 2024 at 05:34:32PM +0100, Valentin Schneider wrote:
+> On 20/11/24 15:59, Peter Zijlstra wrote:
+> > On Tue, Nov 19, 2024 at 04:34:55PM +0100, Valentin Schneider wrote:
+> >> Later commits will cause objtool to warn about non __ro_after_init static
+> >> keys being used in .noinstr sections in order to safely defer instruction
+> >> patching IPIs targeted at NOHZ_FULL CPUs.
+> >> 
+> >> __sched_clock_stable is used in .noinstr code, and can be modified at
+> >> runtime (e.g. KVM module loading). Suppressing the text_poke_sync() IPI has
+> >
+> > Wait, what !? loading KVM causes the TSC to be marked unstable?
+> 
 
-Sure. Anup, if your second PR is ready please send it already.
+> There is however this:
+> 
+>   kvm_arch_vcpu_load()
+>   `\
+>     mark_tsc_unstable()
+> 
+> So plugging a VCPU might do that.
 
-Paolo
-
+Right, but that only happens if it observes the TSC doing dodgy, so
+that's deserved and shouldn't happen on hardware from this decade, and
+possibly the one before that.
 
