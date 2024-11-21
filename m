@@ -1,88 +1,95 @@
-Return-Path: <kvm+bounces-32281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DFB9D51B0
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 18:24:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEEBE9D51F0
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 18:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE2291F21D94
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 17:24:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA496B28984
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 17:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBA31AB534;
-	Thu, 21 Nov 2024 17:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5EF1BC068;
+	Thu, 21 Nov 2024 17:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2fReSfaM"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0pXH3IpD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2050.outbound.protection.outlook.com [40.107.212.50])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2083.outbound.protection.outlook.com [40.107.95.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC5C10A3E;
-	Thu, 21 Nov 2024 17:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC84C14A0AA;
+	Thu, 21 Nov 2024 17:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.83
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732209882; cv=fail; b=lQa2tMNCZjrDRLQVo7LItjn7o+COmlYhKoVH2UlzVloNCgJzNMsWSjJEoWtiKCqWQF/mmuCaPyysiCsgOM2t+Mq9ync48et1xbqQPwy4DxWRo5it0Z1fVoNP1pyvTfkxpirBzhyg5a3dje2tKJKeEqcYMhMPnmQjGHvLsHNVi8A=
+	t=1732210872; cv=fail; b=UmQQ5IZ59Szkp4y4qnP0OdAT6z4GMtEijUyq7u+ajrLqGyVsyF/J87yS8pkS30CeKXjeRfnRxR3dEIek4aWq1Hz4XN+Vkt6nKu4lxQYliqqU1Me+F+E5q7YvSyl2+JQNrPg5gNhQvTEIGrsQHu9B96BbR+VlPk02aRLMe/7y5A8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732209882; c=relaxed/simple;
-	bh=ieJRvJlcnBInjWyU+VPG4n8aY7jGgXBUEzXFOMaxfb0=;
+	s=arc-20240116; t=1732210872; c=relaxed/simple;
+	bh=hgHYMGzqlVOL6b5SE2Ngt5G8SulbSU9A9XbTBATlyLI=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XZRH8bcczM7Ryt0/iUr+5bQt3RvL7OMbjhmrZZPWxwpNcowgjcrglPCaLIzXIH8lLhUW9B58l5D/Mv/DV1iiI7keL9ahrCR8T71kRCO/qO0w48XCufarNeR4IXyMsEOlEM1edCuuldJq08AUGbQRAzf5Vbe3/K/as8RamHnQLYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2fReSfaM; arc=fail smtp.client-ip=40.107.212.50
+	 Content-Type:MIME-Version; b=Mazp2ls6lJup5S/C2YpZmfQHNkmot9nJ1NLDsuEpe8iS2xbaD2D729kGn9n2OUxCAtlze8feTJoS8vaNZRByAWR2+OuOlk1LzQixaMAfrpBWC5X1Y3Ij24Fcw5th6KbDlbcdMU+bp3m2PqZksvak77OcqUzs7+uqhE1VkX52NnI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0pXH3IpD; arc=fail smtp.client-ip=40.107.95.83
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G8OKMZ0MRtqp7sYaYUmXydJlWcDrHxR+WGKa83GPqofFvANpqiptRzMDq0hemf08hsJExhWqZwOmV8+Lg4D5pE8xLSkAYrMzmnLeiFy8veNTvPbdeil1ww7KOzpendd7eMry662GCSjGxrbVB2NyYhERMA5Pr+fyt2ud7CgtfxXsxmq1DUwXhHgb2y+GCS9RdhTNnWIGuOnnzYML49vCSG7WPYgHZdUHvMVgIJ+uNvxDoGgC34ITB6CxT4EPHP1xXUnjD59o5Gji/DkxtW+nDIhq/JAvvgtntFsPdxQsGwDmBcb92DtQnhUidExivuGX7AKvnGbmGbipAvftvEm9MQ==
+ b=wJ1SeCbIOQTVrqS9D/Kkqb7lqAERgcs4as3a01+JkjusKYGSiqVCZNr6EgFo9kVDyeDHXOU3nG7a+B2rS+Z5z4mUB4MFAOOaPs0e/NweAJr30pTYvxjvxhjDx0NNK0vufezDyY/1CnwOE16rJ056fNYI06CLOOe6RxIyvuZvM2VTiYoHNC3dFicohjRo4H3zD7cAg8vO6OYkFmbXdZ/vpRuWGb08cFuDSkMDMI4lTBICXrvDaIzBspG+vbVaZ/DDndUjgQxRaFqWTihgO02DV0F9q4oJj7eshy5q/Ol/ireO9uCOVs/AdvPuI8N42T3fZDQk6ULt5EkU08sB9VelJw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qHidBKhmMOV6VGvsCe9KhYdnfC7+XUXGl8MZkVVOjB8=;
- b=DlGG42dfBUazidb2sejTR09cVSAXHp/lwZxiMG8xDcLztNen9a4jRn+vjrhxOoRZAQ+bhfhHYblqQjXYwmcM7E/jH/ZRfBZ0ACZiS+n+1nLeXXCPPz5PbofnjZ0RKjze9ctsiVciKmu7ab3vzUAGGaUWBqWGOga6/HsSWBJRH0uaKQN1/HFGrHnVKVw/SDr/PLhWUEPb8+ty1X8mEm19/bg/1ueXBnoLK3N4Jd9UjNvImmnEewHqlAcZ6i3z5Az/IlKM11l2L5gKLBXgu70iqIlTNJ8GpCFMUDozatYTImvgoP8Qxy7Qt6U73+onYA4F1R514ydwMByHGaNCOfq5Fw==
+ bh=9KYKNqy7E/KjLUfL3f4YWBhR9uhHzR+m5sV5BOlIds8=;
+ b=kDccM2rbj/+sNmYmh2rmtTWC6DMi6Z0jjes7fwGlLIIX14R0xoYw2KA1LYpyYvHfmKE2gJIdNFzeKy0WohG9AnxWlaQaDpthjkoZgKDWz+wPSjFXLX3PeqX7UJ8JLH2D3SXHOEzbwucokk5BQPKsuNoW/Jp4Su11k5rlwWJewu7BrBUYDDVUttHR0o0ZxAzjHeUgT+6BLUHpJBvEeAgOkjEZv6ilL5ezZZSiyf6PpDjv24dhFFTO7tBTOqXpUc6jjtnMe3Gh0H/bdERDuNWvkULHJ3iHXhsOzgz6F20YEeCwJF4b/KcHY9ABNADmRHIN/71iHCa9iiwzYAyOzbzb0w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qHidBKhmMOV6VGvsCe9KhYdnfC7+XUXGl8MZkVVOjB8=;
- b=2fReSfaMkYRe/XLwJoUFHqtfnkkStrKD1Q0VUuUk83xnRAiXq/afkwHS9Us8uFH8O5iFvfd8XywSkhhsH7BZAvXHV0o7l7DTq70WZJIUGZBuvIfu3VkICLYqBRmsf4XtruQpWTeyBZLx6Uw8aJHC1X08k51V4vbodBWgMdNY0QQ=
+ bh=9KYKNqy7E/KjLUfL3f4YWBhR9uhHzR+m5sV5BOlIds8=;
+ b=0pXH3IpDGxXymef6a+/+uBzDb9AfVMDKhmsRaThdOqwX5ayjXWpwNRgNonlKfSgDLv9n/PIGduT+tVn8hNG11qVVU4eipPsktF5oCEXMUCW5SuhqrhcFvOlQTkIPtNWTO3AUpJRb21+KPhUcaWKZ38jCuXyd0QVT8jeOGRLXoMM=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5062.namprd12.prod.outlook.com (2603:10b6:208:313::6)
- by DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22) with
+Received: from PH7PR12MB5688.namprd12.prod.outlook.com (2603:10b6:510:130::9)
+ by DS0PR12MB6438.namprd12.prod.outlook.com (2603:10b6:8:ca::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.27; Thu, 21 Nov
- 2024 17:24:37 +0000
-Received: from BL1PR12MB5062.namprd12.prod.outlook.com
- ([fe80::fe03:ef1f:3fee:9d4a]) by BL1PR12MB5062.namprd12.prod.outlook.com
- ([fe80::fe03:ef1f:3fee:9d4a%7]) with mapi id 15.20.8182.016; Thu, 21 Nov 2024
- 17:24:37 +0000
-Message-ID: <cb62940c-b2f7-0f3e-1710-61b92cc375e5@amd.com>
-Date: Thu, 21 Nov 2024 11:24:31 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Thu, 21 Nov
+ 2024 17:41:05 +0000
+Received: from PH7PR12MB5688.namprd12.prod.outlook.com
+ ([fe80::b26b:9164:45e2:22d5]) by PH7PR12MB5688.namprd12.prod.outlook.com
+ ([fe80::b26b:9164:45e2:22d5%4]) with mapi id 15.20.8158.019; Thu, 21 Nov 2024
+ 17:41:05 +0000
+Message-ID: <3349f838-2c73-4ef0-aa30-a21e41fb39e5@amd.com>
+Date: Thu, 21 Nov 2024 11:40:59 -0600
+User-Agent: Mozilla Thunderbird
+Reply-To: michael.day@amd.com
+Subject: Re: [PATCH v4 2/2] mm: guestmem: Convert address_space operations to
+ guestmem library
+To: Elliot Berman <quic_eberman@quicinc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Mike Rapoport <rppt@kernel.org>,
+ David Hildenbrand <david@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jonathan Corbet <corbet@lwn.net>, Trond Myklebust <trondmy@kernel.org>,
+ Anna Schumaker <anna@kernel.org>, Mike Marshall <hubcap@omnibond.com>,
+ Martin Brandenburg <martin@omnibond.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+Cc: James Gowans <jgowans@amazon.com>, linux-fsdevel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-doc@vger.kernel.org, linux-nfs@vger.kernel.org,
+ devel@lists.orangefs.org, linux-arm-kernel@lists.infradead.org
+References: <20241120-guestmem-library-v4-0-0c597f733909@quicinc.com>
+ <20241120-guestmem-library-v4-2-0c597f733909@quicinc.com>
+ <20241120145527130-0800.eberman@hu-eberman-lv.qualcomm.com>
+From: Mike Day <michael.day@amd.com>
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Ashish Kalra <ashish.kalra@amd.com>
-Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com,
- davem@davemloft.net, michael.roth@amd.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <cover.1726602374.git.ashish.kalra@amd.com>
- <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
- <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
- <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
- <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
- <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
- <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com> <Zz9mIBdNpJUFpkXv@google.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <Zz9mIBdNpJUFpkXv@google.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20241120145527130-0800.eberman@hu-eberman-lv.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0187.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c4::14) To BL1PR12MB5062.namprd12.prod.outlook.com
- (2603:10b6:208:313::6)
+X-ClientProxiedBy: SN7PR04CA0202.namprd04.prod.outlook.com
+ (2603:10b6:806:126::27) To PH7PR12MB5688.namprd12.prod.outlook.com
+ (2603:10b6:510:130::9)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,517 +97,518 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5062:EE_|DM6PR12MB4202:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed046633-774b-4229-e4b4-08dd0a515f32
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5688:EE_|DS0PR12MB6438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74d24925-1af3-4fce-28be-08dd0a53aca4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|366016|376014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Vk0xOW41ZjVqdTJFUkRHS1FFamtJYm00SVdOdE85dUFlMGhDcmRzTW5uSWQ5?=
- =?utf-8?B?cGpBNTlmY1lWRHAxV0pEWGtlMHM3QXVySndSNnNuTUp6eW5PM2gyc1gxbWd1?=
- =?utf-8?B?SEpXc2dKb25uTG82anBuTS8yU092ZXd6MHA3cEs2cEQ0aGI5cUVMWUJ6VGl4?=
- =?utf-8?B?c094Q2tDbHJSeC9WcXViUXlMY1VtQ21EU01oNFU0R1RmZjZyMkFOY2xCcWl5?=
- =?utf-8?B?SGk1Zm93aGFJS1FoRVNhdVE4ekIxZG9seG1aRDdrdDZmdC8waVBqaDlYN3I4?=
- =?utf-8?B?bksydXJCaVI5b09ZbGsrMnRzcElTdXZRMUtMQWNLbXN5bzAvbUhBNU9JNjJP?=
- =?utf-8?B?WmlEOUdGZ1kyWm9EQXRBWHh3MmY4VVM0NStoVkU4TFltbXdHb0plRGFrUlFy?=
- =?utf-8?B?cXgvdS9waTNRMERhd0x5MlREN3BHa1p6NXQ0UFpCeWJRVkdQY1lQZFFUK1RU?=
- =?utf-8?B?R1lBdWRnYzlZV2wzdHcrTmpGMUhiSjNBc1JldjArMXFKd08rb1BsZTVIblhw?=
- =?utf-8?B?U0ovbHJBaTYvRkQyTXBLdHBsTkRQRXQydWp3eGVDbVBkejZKQWVWSy9WUzB2?=
- =?utf-8?B?Vk5JMFVWTktKQ3NIMm9BQm16M0t6dUcrUUlEcllWNlI1V3FNMnBUYlJyZjVY?=
- =?utf-8?B?T0ozeUhPeU9jd0NMSmFCRytxeVZCenVvSUYza2ZjWENBNlg3SGhlV2RzWWU4?=
- =?utf-8?B?TmtlUVcyNy9OQkp3dXoyNjVhK0N0LzNDTEp1RXJIUEo5M0xRcnIvWDZNLzBk?=
- =?utf-8?B?MThobjVkTXdqckVTT1ZXRTVtVndPQ1lKanl3WVVpYmxWZk1IVzBHb1lmdllX?=
- =?utf-8?B?bjNER1U0WXhNejJoUzJ5Qi84Qi9YK010L0hSVVlEc3h4bzNOdk9JUHhOblZy?=
- =?utf-8?B?eDlheHBoOVBxTWo3QjBqbEI5bk03SHNucVorSGR4dk5KeTVEU0g4cC9idEFV?=
- =?utf-8?B?Qkp4aGRVemVCRnZ3ODhPdXIxbENJQlB4UFVrSjRlSVpFekJIcDNJbVpTQVlw?=
- =?utf-8?B?ZVlGQk9VdFRCSjV1ZU12d0hvT3Y4TUNSR000WmM1V3NjT0ZkVXBMa2x0UTNF?=
- =?utf-8?B?WXZHcGNrRWk0dmNDUjV1RUNmSnl1T0dUd1YwR1AzNjNxRWpWbTFsRE9POGVs?=
- =?utf-8?B?VnlONk00cVBNNnJTbzRYZjE2UWdoTjI0YnpwRkFVVWM5U1FqMHNOcUVMaXZ1?=
- =?utf-8?B?MVNTc1ZGUm44bDk1cjNVOFN0SHROVFdVdmlBb2ZqNFJqUVVpSTE4dXFoSGlU?=
- =?utf-8?B?M0VwNnA2KzFLcG9oTWxMTmd6aTdxd0NUOUpaalFMa0FPMFdoaWsyY2hMRS9Y?=
- =?utf-8?B?dmYweGJ6MDltVG9uSTFPa09pOVZQaERacGlwWHhob0U5bDVSTkpvM2dHOTFq?=
- =?utf-8?B?SWd5ZkZ1ajA3SjRWNE84eDc1bzZyRmVmNk41bW9vZEZ6UFQwK2tBUHZ1Njli?=
- =?utf-8?B?V0hXbS8xUWQvdmIvTUVtTHRNOWhkZUZtOXd1cDFIMXJrc0FyY3Uyd3F6UXVv?=
- =?utf-8?B?Uzdkc0hRUVJUMDZIamVaQStyRUpPdk16UnJmR1JsZFBxd09mYktBaDRWU1E2?=
- =?utf-8?B?UXF0ZDYwQUorYkI1Q3R3c0haQUhzNmNxQmdSNFVIYzlkQS9KZGNxUTRTcWxR?=
- =?utf-8?B?WDZBNkZiTjVjUGl3aG1GaEhacUs3WXJzcFhqYUR5RHpyZ0dtTWNmNHN0dkNU?=
- =?utf-8?B?ckszVEtIUGRrc09aSGptNnh6TmFGWlVaZ0pzdjJTd2toTEgybGZrRENZUE9r?=
- =?utf-8?Q?KIfUplb3WXhLK5cdM2vsjYOtzCSev1pgsVDk1v6?=
+	=?utf-8?B?aE1CaE9XR08vS2o0YXROeTNiNWM2aGJpeTNRbHhLTndPbGtyQWZEcXd4Tk05?=
+ =?utf-8?B?eUZTOE1qcXBVaFR3eVY4dkJtQXRwVnNpUWc0YzFlZEgwNDJGZHdKVDUwTzU2?=
+ =?utf-8?B?RUFwWTdScmd3dnJNczAzNi9RQldDM3Z6SUQ4SEZLSlpXdUdzMzYvR09FUWc5?=
+ =?utf-8?B?SGh2QlNrNVQrdWRvVGdvejEvY3dWNTQ1ZnlZYkJkOUlhTWNuN3ExcjJJTlVN?=
+ =?utf-8?B?TmdNalJuVnk2cXdiL2I5RTAzN2ZkOTNCckF1TlVRa1dabEJOTDhzdGN1Uk9Y?=
+ =?utf-8?B?ZEE3a0I0V3FVMkFzYnQ2UkplOHlkNjg1SUk2aW5CaDJXbEpSbzJIZ3htQjM2?=
+ =?utf-8?B?TnhXUmRJT28xNVA0U2IvT1JaTVYrcnBSbTB4emN6UWFhbzhhYWdqak44aW52?=
+ =?utf-8?B?YTFwTWhacDRsS3c4Y0VUS0ordjFUTnUzd2N2VXM4ODNJakN5alhSeTBoNUVo?=
+ =?utf-8?B?UFRZTUxkVnQ3NlZnTFdLT0N1WXJIdWRxNmZlaEw0bkU3N3pUeEF2N1JRSWFX?=
+ =?utf-8?B?K1UzLzZuOGdoWHkrb29Eenhtelo1NzZJS3h4aWdrNFN6b1BHa2RwQ3V4OENJ?=
+ =?utf-8?B?MkpkTC9KbUw5aTBGd3l2QVg5QTVTckp0cDcyN1lVdUQrNzVteTJRNUxqS2Ri?=
+ =?utf-8?B?VC9SczRpYkNMeXh4SFd4MnF6K3AvOU9WbEE0cEVOQ0J0c3VENTNSQXpIMVhX?=
+ =?utf-8?B?Uzd5cjZ2aUdNLzI1a1VZRk5kQzVzSVJ6T0JxOFQzelFaNzN3R1AvWEh0bGdr?=
+ =?utf-8?B?eSsxWnNFa3ZkK2h1TVdYeG9IV0dORGlGb1FxVDJTVHYreDNob1FIci9pYS9r?=
+ =?utf-8?B?VDkyS2pXVGl1a1NST3pjV0RISFlDZVlwcVBjV1cxVW50ODBXWHoxTjBHK0Jp?=
+ =?utf-8?B?bDc4YU5KTUZDbnFQakZaL3haWlE0SUdJLytweFZLdUhKbHk2SUYrQmhSbUJs?=
+ =?utf-8?B?N0lsWE1iaTVoUkNvWHUxcVdkK3pUUGx5ZS9OaE9lTG5RM3F0MCtPd1ZRU3dj?=
+ =?utf-8?B?a2tPSHJXU3dXd0JtUktnblRrbUtlYVlLQ2sxM0RtbEZrcFBMWlZ1c2Qwdldp?=
+ =?utf-8?B?YWRrblQ3dGxmRWFyT3JvcXc2eW9CZnpTY0xicy9BMjc1U0xoaElLVlNBN3NO?=
+ =?utf-8?B?VGxBdDhGL0pray9tcld0K0xwSitQMGFZYmNZUzYrdEhmN2dESTlJRDZMNldD?=
+ =?utf-8?B?V1MvZ25TdWY1dDFNOUt2M0N5L1QvOFJ1c0pnZndiMFlXRlNyRWRndFdDQzBm?=
+ =?utf-8?B?disrVWhuaS85SThMTXVBQzE3LzRhS1BBMmxtejg2bUdsNS9EeEtXcWFKZEZD?=
+ =?utf-8?B?ZnVNdXVPSFdjN1ZabklNVHl5Mm5UUVdlTzRCdTNPZ2Uvai9UWHVack93dVYz?=
+ =?utf-8?B?MXhpTTN0bUNFOC80d281UkRtZ3VXaHJmL29KaXFqV01oT1BVQ0dPVURpdnNh?=
+ =?utf-8?B?c0Z4c05XeStPZjBlbGVMS2Vjc1M1NnFZenF2amN6S04velRpNDJ5WWFQTXhn?=
+ =?utf-8?B?bTdPTnpsOEQ5RHo0MFZmSTJ6Z0Vja2U4UEpoQjRYSXFqZ2dRdmVteTBPNUd0?=
+ =?utf-8?B?WEt3aFZldU8rTGJiVEpDcTZjdHpqaWdLdVVxUXdNcGx2aGV2bmpydmxXd3R5?=
+ =?utf-8?B?Nkh0dFdrZUlBalhKcGZuZWI2TU8xdjV6TytpVVgvTVREck93cUVna1FrUU5z?=
+ =?utf-8?B?WkdnNnBuUlExSUhEaVhyYVpSc0xDaGowK1dlTXdlSWJEQ2dtVkRwcUFPYzJq?=
+ =?utf-8?B?QnVYQWk1ckpLZ0Q5UkxzNURqRTI3b1BabTRpeGlMWWhXV0lWaXRJR3NvM3JR?=
+ =?utf-8?Q?QWDTUos/OPIRU75kj3ZcZPLrb4cFSoLGeoQFw=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5062.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5688.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YksxcVVzTEcvMFNGTnl4UTduWEdLMlFleXVTV2hhY3g5bHVDUU5RRlB0UHRM?=
- =?utf-8?B?TEpIaUFqS1QyVy9hc0VQL1cvVkh2N0F2RC9INGFydEw4blpWbWlPWi8rQ2Iv?=
- =?utf-8?B?ZGY3MWNVcFNQcDFCRVY2bEx2Q2dSQkZ1dTRoNXhoRnkxZ3VIRUdwMHEzSGo1?=
- =?utf-8?B?aitSbysrV1JFdzJXY1BQNzk2bllGejdyL041MjZ0M0Z1Snc5MFBRVDh2WEZE?=
- =?utf-8?B?RlFicUQ5UnpFRXM4a1FsYnRiU0xLUWNBL1hRMzlaM1lyNC9mOCtua3lCdUo5?=
- =?utf-8?B?OTBsYm91Q2Y2bTFyQUFGYkxIVVJTWEFrNlBJdW41SGVFTTFRcHV4VFMxVkM0?=
- =?utf-8?B?dDZGamxZT1NER1ZrSnQ1c0czcmpLTWcvd1B2ZXJsY2RmQXhpeXZtcHlYWGRn?=
- =?utf-8?B?ZVFJTFB2WFlJRXlYOWFJZGk0NkZmQW14ZndPck1RZVMxemNucmVaanNlRVc0?=
- =?utf-8?B?b1JHWkFucXlnSGFzSktvNUczZkNRZ01Oa0wwVytaU01pSmhiT0czZTNNVWRj?=
- =?utf-8?B?ZmVaelpvdFRsVk15KzN0SGg0bm55T1VPZUFyOVlSWFpzYlliYkoyNXZWMmFq?=
- =?utf-8?B?TnJwdkh0ODF1dUdNSzZLc1Z2MXpQMFhpaEk1WGNKWVFrcWE0RzFmRTJZMks2?=
- =?utf-8?B?cUVmOTVwcWJZNGRUV09GRG9kaVN3NXNYRTQ5SFNFazZIZy9PekVBbTVpOVQ3?=
- =?utf-8?B?ZW1wV1ZxMWFHa0NPSGl3MjhiT1YwMi9LdGV1S0FoaEVWY1ViS2FybnhGZkxI?=
- =?utf-8?B?dUF5V21lNXRNVFNPTFBNOWlhMGRHbW5KTHUyQmxYVTg2S1M5YjhLOVVybk9D?=
- =?utf-8?B?N0F6bXlHUGZ3dDZJNUhjUEROditPRklJeDhrNFhGRHcvUTJRQk93SWdvRVpl?=
- =?utf-8?B?WXhVZG4rNDNLSWJoaWRORlhpNmlOTTNucDlsZUp5dXExUktKM1lqSjBiNnp6?=
- =?utf-8?B?blZQTG1uUDFDUEZaRmZ5Tzl1Wk5pa1VCT0ZVblIyak45cGh1cGEwSE5MOWVW?=
- =?utf-8?B?b3FneHA2b0NSWFBBaklNbmVHaU9OY0s3aFNna3hVUXBYeVRBOHgzUDhIOXMx?=
- =?utf-8?B?V05ITkgrOTBPbkorbGNJL2pGYUVTZExQMjRweXZ5MytvUHh2bC80Y09RWVMr?=
- =?utf-8?B?QkRZZlZ1c1BaSkNBUS9RbEQwUDFaemJvNHBJZERXcnNncExmb0ozeEZMT21U?=
- =?utf-8?B?VFpFTEl5c3B6ZXlIZnJwWlRyM0I5SmNwb3g0ZGRiMCsxY294dnBTM0syVFZY?=
- =?utf-8?B?V2J5c1BSaGkyZ0ZCakFpUzllbjlCa2RDY3dVL2dvdjcwMnZ4VEw2NVBhOXpQ?=
- =?utf-8?B?dTROSmNIdXBVOVRCWXlOT1lFdVpIV1MwYkdxWXZaVFE5d0VtOHdzaERwZkJs?=
- =?utf-8?B?L1lCa3lzc3JkK2J6T0F4emIzcGlYZW5oNGZLYTJXUk9hbDJxL2NaZG1vd2pH?=
- =?utf-8?B?anc1MThHaUJMam1tUU9vS0NCZTY4RnlFcjltU2p6M0ZvL1ArUEl0UlFRbDRu?=
- =?utf-8?B?czBjbHVNUVdIMGoxVVkyRThEMVArTTFRMzZ0NGdkNzVqNVR1dDBGcHRPdGZj?=
- =?utf-8?B?YUlIYUZjRmZ1MW8xQ1dEN1Z2R214RGg0RWxKcXRmdTc2V1RHNmk2aFRTVnFR?=
- =?utf-8?B?aldUdUFOOUMrSkcrYjVuM0pUdHdoUm45Tm1ObkxJeFR1SjRPNlF0YXJuNVdF?=
- =?utf-8?B?bFYvS3RrVE5FZm1ZbEVkTTB4clJINFVpaWZVaUtoMzl6d2ZSdXNtMDZwdm1w?=
- =?utf-8?B?NjJseW1QVjVFZTNTYWYxZ0xmUFhIbThZVXI4QkRkZ0lxbEJIVUliMFNqSXJG?=
- =?utf-8?B?bTRVanBYejlTNitCN3ZZTlNYazhzRGYySm9RUG5ETTAxaTFZMGcvRmpJanYz?=
- =?utf-8?B?WmRRVmFtL0s5eHhYZ1J5Mk9YR1NqZGc2a3RHUFBrR3JFYUFUd1BaZnBIUjBX?=
- =?utf-8?B?bldVanVGem5EQjB2elVJZ0JNcXVxcnJhTEhyWXBpaGgzRm1KS05kUWN3N3Vq?=
- =?utf-8?B?a2NUdlVXdW51SFpCKzFETlcwTjduejdUalg2Tk1XdFFRVVJNMzQ1RXgveDFv?=
- =?utf-8?B?WTcvU1RDQ0ZVOWlnekRWTUIxalZpaWZ3cWNQc3VremRLNWtPVnRPdVFkOEV5?=
- =?utf-8?Q?S/LygAc+/tARmeblMuIFdgVmY?=
+	=?utf-8?B?Q0wzaVVzcDBXMU1SUUhvQXNIeHlUQkYxTjI4VXIzZUkzL2ZiZmxzdFBMa0NS?=
+ =?utf-8?B?ODNTaC9YeEdVQ2xFZmNUbkY3azlBZ250dEluT2d6Y2dsMlQ2eVFxWEZrT3Iy?=
+ =?utf-8?B?eHN1OXN5aGZGWkNJWVR1T2xCd2NCN0N6cVNyTUs5WTkyYTBlQmN5MStKeHBk?=
+ =?utf-8?B?T1FGT3IwSDFjRThWRUdLQzlOM3pya1I5bkJnWlFzVHNKK016bXduYytSTExT?=
+ =?utf-8?B?YjdZVEdJK0Q4bU1ZZnNicnIxc3MyOTZlQUFjR2hJVTIxMW9zUUt6UmdYYWM2?=
+ =?utf-8?B?Y3hrdDZRS3NKVXBVeWhobWZnMzhpaXRKRmM4b1EvUFRMT1Rkb3M3U1d4bnVB?=
+ =?utf-8?B?TW9MQWU1WmhqT3BCVjN4UkJLYzhuTzIvcS9tVDdCTEMwU2NUYWxTSXhlQ1ov?=
+ =?utf-8?B?TXdsK09HRmJqQThLcWQzWjhEL1hwOUNFVi9VVnltTGtHWWtFTWJGcGliR0tZ?=
+ =?utf-8?B?Y3NsWDU5R28zbWxtUGFWbktkT0NXSXZnYjdiNkkrS0lpT2k2RVJzekJwNTBP?=
+ =?utf-8?B?czY2WXpSVzZ6MTg5ZVViSEg5RFpaT0xiNVlIOE5pd3NpdXpaRkFxV3dsZ0x2?=
+ =?utf-8?B?dFVQQ2I4S2hjbkcra2RzSWc2cTFkTWFTVlp1dm9oMm05eTgxZGxaMmxINnI0?=
+ =?utf-8?B?Z0R3bVhUSEw0aERrbVNwZms4VVh3YkRRQWJBb1YxWVRqTXZCZmhJNHRNRU5C?=
+ =?utf-8?B?dFZuc3JTUytpMHdscVdQZEI1RlRyUzRNN1NaTFl0WlNOWUFqMnNSajllQzIy?=
+ =?utf-8?B?V0F3R05RM04rZGtoZVlYZ1FyeVlhV2ZYeTdDVDJtYmdnZUpnRDE0bG1ucG9H?=
+ =?utf-8?B?WTlVNGtqQUlESFpSV2pVM2NpRVFhTnQ4OTB0a29jWloreVNMdW5DVjN6ckZC?=
+ =?utf-8?B?UVdrU3JRSVJBc1V5T3dGOXFMOWpMMFliRDFVc3RpNG5zMmV5UFFXZDExc2FL?=
+ =?utf-8?B?SFIycHZ5YS9ia0pCVzlDd3RGNlNxQzFMZWJ2ai9CYVlKSWtJMldQNmQ5NS9r?=
+ =?utf-8?B?ZTVNeUNhVFUrWmVFY1AvanpyL2ZBdWhQOVRzdE4wRm1ydVU4eWNvTXR3VEI2?=
+ =?utf-8?B?RC9RSmZpOVdSSjkrSmsveEZqSXV6ZGZSVSt5MFl4ZUpmVEQzM3kxRW5EMDJl?=
+ =?utf-8?B?VUIrb2pMSlJDOEVWd2dnT0h6T1BPMmlqQlpRaDI3UDl4SVlkSzR6MC8vRWF3?=
+ =?utf-8?B?QUsxTGJ2WWdPY1NwOWlBSXJDYVBBQkYwUFgwWHlnWnQzTDVOSG1xV3paWFhD?=
+ =?utf-8?B?SGJ3YnJmRkkvSUlvWGp2eUtoQW05NWp2Q0NvTGYwYS9GaTVPek0vcm9NSUx5?=
+ =?utf-8?B?cDYxdGxHNm4ya0M5MEhBeWptcTU1ZmtPSGNzT2xxdjJXaGVsNkpTb1VFV2hJ?=
+ =?utf-8?B?dWdzWEk5bXFKc0g3b0dwYjlHLzR1Q05mVVp4WnRDVTJkbmxqTlhDYW9kZEpp?=
+ =?utf-8?B?QlE1SFNHckdCQXZCZ2k1UG01RFA2SEFqTzIzL0ZoR2x2L3AyWWJHUkVyazc3?=
+ =?utf-8?B?Z0NrVDZQWDBkZTZvVnJudG1nT0RSSlg1ZXhoQ3VVNEdBYkdCQ2hEZVArbjFu?=
+ =?utf-8?B?YVV4bFl4YjJLV2Z1ZDgwT3JYUHFRT1QrLzR3TWptTjQweGhBQWk2bE1NcG1t?=
+ =?utf-8?B?ZHU3dEhPSEpmNlpwMzdQMjVCaWZsZG5KMHovT2NUaHMzamQyTE5zeWw5ZE1t?=
+ =?utf-8?B?elRPQVo4aG43MldQM0tiN0NVMDZ6NG9YcVBheDlLbWxJbXltblBOZzBRdGVW?=
+ =?utf-8?B?eVozdWZFNVhpZ0hWalNVQVlVQUZFU2hTMnNyck9MUU1ucmxBbWlKUnVRZFAz?=
+ =?utf-8?B?OUhITjQwUjBqV0lTWmRxWUI5MFdmaXdtaWdjTjB0Tlp6V2ZTeTFIVE9rdDZ2?=
+ =?utf-8?B?MDlDSG0rc1dsVFpCM0xSU0dpaEk5WVZUamN1NThvaGFteWNTRmhOeUR5K1RK?=
+ =?utf-8?B?bjJaOW1BUk1WZEV5bFFTa2ZZSWorSGZLb3lEZXZuSGZKTWp1MXpBRi9NUWhS?=
+ =?utf-8?B?Rzd1MkdpU1hxdDNxMS9OTGZHdENBOTdMekxGWGliQ051aEZ6QmpuNS9yTm45?=
+ =?utf-8?B?YVdPY29HUWp0YmRwZy94UmVlRDBraDJwd3hiRzVYanNCcHczQXJPaXJZbUxw?=
+ =?utf-8?Q?TdRhmKLjlR09J6VYy1qb/qJPU?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed046633-774b-4229-e4b4-08dd0a515f32
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5062.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74d24925-1af3-4fce-28be-08dd0a53aca4
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5688.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 17:24:36.9147
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 17:41:05.3150
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ixg6Mb/zYjr3vrKuO1BZ9HM37OPLliAtS5nEXnBOgXE1+qxCWs8v1jsgBX/RpgewXR/OFYZIbS0qUbmiNbw1Kw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4202
+X-MS-Exchange-CrossTenant-UserPrincipalName: BjmtJeAEzUR4+YVuEiNIHvG+QftzPuFGv4cBjTJxmormRISgzElmVJC0/+DvMWlRanA9f0UizPbetDv8PNR4mA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6438
 
-On 11/21/24 10:56, Sean Christopherson wrote:
-> On Thu, Nov 21, 2024, Ashish Kalra wrote:
->> On 11/20/2024 5:43 PM, Kalra, Ashish wrote:
->>>
->>> On 11/20/2024 3:53 PM, Sean Christopherson wrote:
->>>> On Tue, Nov 19, 2024, Ashish Kalra wrote:
->>>>> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
->>>>>> On Wed, Oct 02, 2024, Ashish Kalra wrote:
->>>>>>> Yes, but there is going to be a separate set of patches to move all ASID
->>>>>>> handling code to CCP module.
->>>>>>>
->>>>>>> This refactoring won't be part of the SNP ciphertext hiding support patches.
->>>>>>
->>>>>> It should, because that's not a "refactoring", that's a change of roles and
->>>>>> responsibilities.  And this series does the same; even worse, this series leaves
->>>>>> things in a half-baked state, where the CCP and KVM have a weird shared ownership
->>>>>> of ASID management.
->>>>>
->>>>> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
->>>>> patches got posted in the meanwhile and that had additional considerations of
->>>>> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
->>>>> into this discussion about splitting ASID management across KVM and PSP
->>>>> driver and as you pointed out on those patches that there is zero reason that
->>>>> the PSP driver needs to care about ASIDs. 
->>>>>
->>>>> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
->>>>> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
->>>>> and once CTH feature is enabled, the SEV-ES ASID space is split across
->>>>> SEV-SNP and SEV-ES VMs. 
->>>>
->>>> Right, but that's just a case where KVM needs to react to the setup done by the
->>>> PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
->>>> only that "firmware" happens to be a kernel driver.
->>>
->>> Yes that is true.
->>>
->>>>
->>>>> With reference to SNP GCTX pages, we are looking at some possibilities to
->>>>> push the requirement to update SNP GCTX pages to SNP firmware and remove that
->>>>> requirement from the kernel/KVM side.
->>>>
->>>> Heh, that'd work too.
->>>>
->>>>> Considering that, I will still like to keep ASID management in KVM, there are
->>>>> issues with locking, for example, sev_deactivate_lock is used to protect SNP
->>>>> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
->>>>> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
->>>>> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
->>>>> complexity of adding this synchronization between different kernel modules or
->>>>> handling locking in two different kernel modules, to guard ASID allocation in
->>>>> PSP driver with VM destruction in KVM module.
->>>>>
->>>>> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
->>>>> which gets referenced during the ASID free code path in KVM. It just makes it
->>>>> simpler to keep ASID management stuff in KVM. 
->>>>>
->>>>> So probably we can add an API interface exported by the PSP driver something
->>>>> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
->>>>
->>>> What about adding a cc_attr_flags entry?
->>>
->>> Yes, that is a possibility i will look into. 
->>>
->>> But, along with an additional cc_attr_flags entry, max_snp_asid (which is a
->>> PSP driver module parameter) also needs to be propagated to KVM, that's
->>> what i was considering passing as parameter to the above API interface.
+
+
+On 11/21/24 10:43, Elliot Berman wrote:
+> On Wed, Nov 20, 2024 at 10:12:08AM -0800, Elliot Berman wrote:
+>> diff --git a/mm/guestmem.c b/mm/guestmem.c
+>> new file mode 100644
+>> index 0000000000000000000000000000000000000000..19dd7e5d498f07577ec5cec5b52055f7435980f4
+>> --- /dev/null
+>> +++ b/mm/guestmem.c
+>> @@ -0,0 +1,196 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * guestmem library
+>> + *
+>> + * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+>> + */
+>> +
+>> +#include <linux/fs.h>
+>> +#include <linux/guestmem.h>
+>> +#include <linux/mm.h>
+>> +#include <linux/pagemap.h>
+>> +
+>> +struct guestmem {
+>> +	const struct guestmem_ops *ops;
+>> +};
+>> +
+>> +static inline struct guestmem *folio_to_guestmem(struct folio *folio)
+>> +{
+>> +	struct address_space *mapping = folio->mapping;
+>> +
+>> +	return mapping->i_private_data;
+>> +}
+>> +
+>> +static inline bool __guestmem_release_folio(struct address_space *mapping,
+>> +					    struct folio *folio)
+>> +{
+>> +	struct guestmem *gmem = mapping->i_private_data;
+>> +	struct list_head *entry;
+>> +
+>> +	if (gmem->ops->release_folio) {
+>> +		list_for_each(entry, &mapping->i_private_list) {
+>> +			if (!gmem->ops->release_folio(entry, folio))
+>> +				return false;
+>> +		}
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +static inline int
+>> +__guestmem_invalidate_begin(struct address_space *const mapping, pgoff_t start,
+>> +			    pgoff_t end)
+>> +{
+>> +	struct guestmem *gmem = mapping->i_private_data;
+>> +	struct list_head *entry;
+>> +	int ret = 0;
+>> +
+>> +	list_for_each(entry, &mapping->i_private_list) {
+>> +		ret = gmem->ops->invalidate_begin(entry, start, end);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static inline void
+>> +__guestmem_invalidate_end(struct address_space *const mapping, pgoff_t start,
+>> +			  pgoff_t end)
+>> +{
+>> +	struct guestmem *gmem = mapping->i_private_data;
+>> +	struct list_head *entry;
+>> +
+>> +	if (gmem->ops->invalidate_end) {
+>> +		list_for_each(entry, &mapping->i_private_list)
+>> +			gmem->ops->invalidate_end(entry, start, end);
+>> +	}
+>> +}
+>> +
+>> +static void guestmem_free_folio(struct address_space *mapping,
+>> +				struct folio *folio)
+>> +{
+>> +	WARN_ON_ONCE(!__guestmem_release_folio(mapping, folio));
+>> +}
+>> +
+>> +static int guestmem_error_folio(struct address_space *mapping,
+>> +				struct folio *folio)
+>> +{
+>> +	pgoff_t start, end;
+>> +	int ret;
+>> +
+>> +	filemap_invalidate_lock_shared(mapping);
+>> +
+>> +	start = folio->index;
+>> +	end = start + folio_nr_pages(folio);
+>> +
+>> +	ret = __guestmem_invalidate_begin(mapping, start, end);
+>> +	if (ret)
+>> +		goto out;
+>> +
+>> +	/*
+>> +	 * Do not truncate the range, what action is taken in response to the
+>> +	 * error is userspace's decision (assuming the architecture supports
+>> +	 * gracefully handling memory errors).  If/when the guest attempts to
+>> +	 * access a poisoned page, kvm_gmem_get_pfn() will return -EHWPOISON,
+>> +	 * at which point KVM can either terminate the VM or propagate the
+>> +	 * error to userspace.
+>> +	 */
+>> +
+>> +	__guestmem_invalidate_end(mapping, start, end);
+>> +
+>> +out:
+>> +	filemap_invalidate_unlock_shared(mapping);
+>> +	return ret ? MF_DELAYED : MF_FAILED;
+>> +}
+>> +
+>> +static int guestmem_migrate_folio(struct address_space *mapping,
+>> +				  struct folio *dst, struct folio *src,
+>> +				  enum migrate_mode mode)
+>> +{
+>> +	WARN_ON_ONCE(1);
+>> +	return -EINVAL;
+>> +}
+>> +
+>> +static const struct address_space_operations guestmem_aops = {
+>> +	.dirty_folio = noop_dirty_folio,
+>> +	.free_folio = guestmem_free_folio,
+>> +	.error_remove_folio = guestmem_error_folio,
+>> +	.migrate_folio = guestmem_migrate_folio,
+>> +};
+>> +
+>> +int guestmem_attach_mapping(struct address_space *mapping,
+>> +			    const struct guestmem_ops *const ops,
+>> +			    struct list_head *data)
+>> +{
+>> +	struct guestmem *gmem;
+>> +
+>> +	if (mapping->a_ops == &guestmem_aops) {
+>> +		gmem = mapping->i_private_data;
+>> +		if (gmem->ops != ops)
+>> +			return -EINVAL;
+>> +
+>> +		goto add;
+>> +	}
+>> +
+>> +	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
+>> +	if (!gmem)
+>> +		return -ENOMEM;
+>> +
+>> +	gmem->ops = ops;
+>> +
+>> +	mapping->a_ops = &guestmem_aops;
+>> +	mapping->i_private_data = gmem;
+>> +
+>> +	mapping_set_gfp_mask(mapping, GFP_HIGHUSER);
+>> +	mapping_set_inaccessible(mapping);
+>> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
+>> +	WARN_ON_ONCE(!mapping_unevictable(mapping));
+>> +
+>> +add:
+>> +	list_add(data, &mapping->i_private_list);
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(guestmem_attach_mapping);
+>> +
+>> +void guestmem_detach_mapping(struct address_space *mapping,
+>> +			     struct list_head *data)
+>> +{
+>> +	list_del(data);
+>> +
+>> +	if (list_empty(&mapping->i_private_list)) {
+>> +		kfree(mapping->i_private_data);
 > 
-> Doh, right, I managed to forget about those module params.
+> Mike was helping me test this out for SEV-SNP. They helped find a bug
+> here. Right now, when the file closes, KVM calls
+> guestmem_detach_mapping() which will uninstall the ops. When that
+> happens, it's not necessary that all of the folios aren't removed from
+> the filemap yet and so our free_folio() callback isn't invoked. This
+> means that we skip updating the RMP entry back to shared/KVM-owned.
 > 
->> Adding a new cc_attr_flags entry indicating CTH support is enabled.
+> There are a few approaches I could take:
+> 
+> 1. Create a guestmem superblock so I can register guestmem-specific
+>     destroy_inode() to do the kfree() above. This requires a lot of
+>     boilerplate code, and I think it's not preferred approach.
+> 2. Update how KVM tracks the memory so it is back in "shared" state when
+>     the file closes. This requires some significant rework about the page
+>     state compared to current guest_memfd. That rework might be useful
+>     for the shared/private state machine.
+> 3. Call truncate_inode_pages(mapping, 0) to force pages to be freed
+>     here. It's might be possible that a page is allocated after this
+>     point. In order for that to be a problem, KVM would need to update
+>     RMP entry as guest-owned, and I don't believe that's possible after
+>     the last guestmem_detach_mapping().
+> 
+> My preference is to go with #3 as it was the most easy thing to do.
+
+#3 is my preference as well. The semantics are that the guest is "closing" the gmem
+object, which means all the memory is being released from the guest.
+
+Mike
+> 
+>> +		mapping->i_private_data = NULL;
+>> +		mapping->a_ops = &empty_aops;
+>> +	}
+>> +}
+>> +EXPORT_SYMBOL_GPL(guestmem_detach_mapping);
+>> +
+>> +struct folio *guestmem_grab_folio(struct address_space *mapping, pgoff_t index)
+>> +{
+>> +	/* TODO: Support huge pages. */
+>> +	return filemap_grab_folio(mapping, index);
+>> +}
+>> +EXPORT_SYMBOL_GPL(guestmem_grab_folio);
+>> +
+>> +int guestmem_punch_hole(struct address_space *mapping, loff_t offset,
+>> +			loff_t len)
+>> +{
+>> +	pgoff_t start = offset >> PAGE_SHIFT;
+>> +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
+>> +	int ret;
+>> +
+>> +	filemap_invalidate_lock(mapping);
+>> +	ret = __guestmem_invalidate_begin(mapping, start, end);
+>> +	if (ret)
+>> +		goto out;
+>> +
+>> +	truncate_inode_pages_range(mapping, offset, offset + len - 1);
+>> +
+>> +	__guestmem_invalidate_end(mapping, start, end);
+>> +
+>> +out:
+>> +	filemap_invalidate_unlock(mapping);
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(guestmem_punch_hole);
+>> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+>> index fd6a3010afa833e077623065b80bdbb5b1012250..1339098795d2e859b2ee0ef419b29045aedc8487 100644
+>> --- a/virt/kvm/Kconfig
+>> +++ b/virt/kvm/Kconfig
+>> @@ -106,6 +106,7 @@ config KVM_GENERIC_MEMORY_ATTRIBUTES
+>>   
+>>   config KVM_PRIVATE_MEM
+>>          select XARRAY_MULTI
+>> +       select GUESTMEM
+>>          bool
+>>   
+>>   config KVM_GENERIC_PRIVATE_MEM
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 24dcbad0cb76e353509cf4718837a1999f093414..edf57d5662cb8634bbd9ca3118b293c4f7ca229a 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -1,6 +1,7 @@
+>>   // SPDX-License-Identifier: GPL-2.0
+>>   #include <linux/backing-dev.h>
+>>   #include <linux/falloc.h>
+>> +#include <linux/guestmem.h>
+>>   #include <linux/kvm_host.h>
+>>   #include <linux/pagemap.h>
+>>   #include <linux/anon_inodes.h>
+>> @@ -98,8 +99,7 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>    */
+>>   static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>>   {
+>> -	/* TODO: Support huge pages. */
+>> -	return filemap_grab_folio(inode->i_mapping, index);
+>> +	return guestmem_grab_folio(inode->i_mapping, index);
+>>   }
+>>   
+>>   static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>> @@ -151,28 +151,7 @@ static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+>>   
+>>   static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>>   {
+>> -	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+>> -	pgoff_t start = offset >> PAGE_SHIFT;
+>> -	pgoff_t end = (offset + len) >> PAGE_SHIFT;
+>> -	struct kvm_gmem *gmem;
+>> -
+>> -	/*
+>> -	 * Bindings must be stable across invalidation to ensure the start+end
+>> -	 * are balanced.
+>> -	 */
+>> -	filemap_invalidate_lock(inode->i_mapping);
+>> -
+>> -	list_for_each_entry(gmem, gmem_list, entry)
+>> -		kvm_gmem_invalidate_begin(gmem, start, end);
+>> -
+>> -	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
+>> -
+>> -	list_for_each_entry(gmem, gmem_list, entry)
+>> -		kvm_gmem_invalidate_end(gmem, start, end);
+>> -
+>> -	filemap_invalidate_unlock(inode->i_mapping);
+>> -
+>> -	return 0;
+>> +	return guestmem_punch_hole(inode->i_mapping, offset, len);
+>>   }
+>>   
+>>   static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
+>> @@ -277,7 +256,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
+>>   	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
+>>   	kvm_gmem_invalidate_end(gmem, 0, -1ul);
+>>   
+>> -	list_del(&gmem->entry);
+>> +	guestmem_detach_mapping(inode->i_mapping, &gmem->entry);
+>>   
+>>   	filemap_invalidate_unlock(inode->i_mapping);
+>>   
+>> @@ -318,63 +297,42 @@ void kvm_gmem_init(struct module *module)
+>>   	kvm_gmem_fops.owner = module;
+>>   }
+>>   
+>> -static int kvm_gmem_migrate_folio(struct address_space *mapping,
+>> -				  struct folio *dst, struct folio *src,
+>> -				  enum migrate_mode mode)
+>> +static int kvm_guestmem_invalidate_begin(struct list_head *entry, pgoff_t start,
+>> +					 pgoff_t end)
+>>   {
+>> -	WARN_ON_ONCE(1);
+>> -	return -EINVAL;
+>> -}
+>> +	struct kvm_gmem *gmem = container_of(entry, struct kvm_gmem, entry);
+>>   
+>> -static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *folio)
+>> -{
+>> -	struct list_head *gmem_list = &mapping->i_private_list;
+>> -	struct kvm_gmem *gmem;
+>> -	pgoff_t start, end;
+>> -
+>> -	filemap_invalidate_lock_shared(mapping);
+>> -
+>> -	start = folio->index;
+>> -	end = start + folio_nr_pages(folio);
+>> -
+>> -	list_for_each_entry(gmem, gmem_list, entry)
+>> -		kvm_gmem_invalidate_begin(gmem, start, end);
+>> -
+>> -	/*
+>> -	 * Do not truncate the range, what action is taken in response to the
+>> -	 * error is userspace's decision (assuming the architecture supports
+>> -	 * gracefully handling memory errors).  If/when the guest attempts to
+>> -	 * access a poisoned page, kvm_gmem_get_pfn() will return -EHWPOISON,
+>> -	 * at which point KVM can either terminate the VM or propagate the
+>> -	 * error to userspace.
+>> -	 */
+>> +	kvm_gmem_invalidate_begin(gmem, start, end);
+>>   
+>> -	list_for_each_entry(gmem, gmem_list, entry)
+>> -		kvm_gmem_invalidate_end(gmem, start, end);
+>> +	return 0;
+>> +}
+>>   
+>> -	filemap_invalidate_unlock_shared(mapping);
+>> +static void kvm_guestmem_invalidate_end(struct list_head *entry, pgoff_t start,
+>> +					pgoff_t end)
+>> +{
+>> +	struct kvm_gmem *gmem = container_of(entry, struct kvm_gmem, entry);
+>>   
+>> -	return MF_DELAYED;
+>> +	kvm_gmem_invalidate_end(gmem, start, end);
+>>   }
+>>   
+>>   #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
+>> -static void kvm_gmem_free_folio(struct address_space *mapping,
+>> -				struct folio *folio)
+>> +static bool kvm_gmem_release_folio(struct list_head *entry, struct folio *folio)
+>>   {
+>>   	struct page *page = folio_page(folio, 0);
+>>   	kvm_pfn_t pfn = page_to_pfn(page);
+>>   	int order = folio_order(folio);
+>>   
+>>   	kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
+>> +
+>> +	return true;
+>>   }
+>>   #endif
+>>   
+>> -static const struct address_space_operations kvm_gmem_aops = {
+>> -	.dirty_folio = noop_dirty_folio,
+>> -	.migrate_folio	= kvm_gmem_migrate_folio,
+>> -	.error_remove_folio = kvm_gmem_error_folio,
+>> +static const struct guestmem_ops kvm_guestmem_ops = {
+>> +	.invalidate_begin = kvm_guestmem_invalidate_begin,
+>> +	.invalidate_end = kvm_guestmem_invalidate_end,
+>>   #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
+>> -	.free_folio = kvm_gmem_free_folio,
+>> +	.release_folio = kvm_gmem_release_folio,
+>>   #endif
+>>   };
+>>   
+>> @@ -430,22 +388,22 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>>   
+>>   	inode->i_private = (void *)(unsigned long)flags;
+>>   	inode->i_op = &kvm_gmem_iops;
+>> -	inode->i_mapping->a_ops = &kvm_gmem_aops;
+>>   	inode->i_mode |= S_IFREG;
+>>   	inode->i_size = size;
+>> -	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+>> -	mapping_set_inaccessible(inode->i_mapping);
+>> -	/* Unmovable mappings are supposed to be marked unevictable as well. */
+>> -	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>> +	err = guestmem_attach_mapping(inode->i_mapping, &kvm_guestmem_ops,
+>> +				      &gmem->entry);
+>> +	if (err)
+>> +		goto err_putfile;
+>>   
+>>   	kvm_get_kvm(kvm);
+>>   	gmem->kvm = kvm;
+>>   	xa_init(&gmem->bindings);
+>> -	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
+>>   
+>>   	fd_install(fd, file);
+>>   	return fd;
+>>   
+>> +err_putfile:
+>> +	fput(file);
+>>   err_gmem:
+>>   	kfree(gmem);
+>>   err_fd:
 >>
->> And as discussed with Boris, using the cc_platform_set() to add a new attr
->> like max_asid and adding a getter interface on top to return the
->> max_snp_asid.
-> 
-> Actually, IMO, the behavior of _sev_platform_init_locked() and pretty much all of
-> the APIs that invoke it are flawed, and make all of this way more confusing and
-> convoluted than it needs to be.
-> 
-> IIUC, SNP initialization is forced during probe purely because SNP can't be
-> initialized if VMs are running.  But the only in-tree user of SEV-XXX functionality
-> is KVM, and KVM depends on whatever this driver is called.  So forcing SNP
-> initialization because a hypervisor could be running legacy VMs make no sense.
-> Just require KVM to initialize SEV functionality if KVM wants to use SEV+.
-
-When we say legacy VMs, that also means non-SEV VMs. So you can't have any
-VM running within a VMRUN instruction.
-
-Or...
-
-> 
-> 	/*
-> 	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
-> 	 * so perform SEV-SNP initialization at probe time.
-> 	 */
-> 	rc = __sev_snp_init_locked(&args->error); 
-> 
-> Rather than automatically init SEV+ functionality, can we instead do something
-> like the (half-baked pseudo-patch) below?  I.e. delete all paths that implicitly
-> init the PSP, and force KVM to explicitly initialize the PSP if KVM wants to use
-> SEV+.  Then we can put the CipherText and SNP ASID params in KVM.
-
-... do you mean at module load time (based on the module parameters)? Or
-when the first SEV VM is run? I would think the latter, as the parameters
-are all true by default. If the latter, that would present a problem of
-having to ensure no VMs are active while performing the SNP_INIT.
-
-> 
-> That would also allow (a) registering the SNP panic notifier if and only if SNP
-> is actually initailized and (b) shutting down SEV+ in the PSP when KVM is unloaded.
-> Arguably, the PSP should be shutdown when KVM is unloaded, irrespective of the
-> CipherText and SNP ASID knobs.  But with those knobs, it becomes even more desirable,
-> because it would allow userspace to reload *KVM* in order to change the CipherText
-> and SNP ASID module params.  I.e. doesn't require unloading the entire CCP driver.
-> 
-> If dropping the implicit initialization in some of the ioctls would break existing
-> userspace, then maybe we could add a module param (or Kconfig?) to preserve that
-> behavior?  I'm not familiar with what actually uses /dev/sev.
-> 
-> Side topic #1, sev_pci_init() is buggy.  It should destroy SEV if getting the
-> API version fails after a firmware update.
-
-True, we'll look at doing a fix for that.
-
-> 
-> Side topic #2, the version check is broken, as it returns "success" when
-> initialization quite obviously failed.
-
-That is ok because you can still initialize SEV / SEV-ES support.
-
-Thanks,
-Tom
-
-> 
-> 	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
-> 		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
-> 			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
-> 		return 0;
-> 	}
-> 
-> ---
->  drivers/crypto/ccp/sev-dev.c | 102 +++++++++--------------------------
->  include/linux/psp-sev.h      |  19 ++-----
->  2 files changed, 28 insertions(+), 93 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index af018afd9cd7..563cc235b095 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -69,10 +69,6 @@ static char *init_ex_path;
->  module_param(init_ex_path, charp, 0444);
->  MODULE_PARM_DESC(init_ex_path, " Path for INIT_EX data; if set try INIT_EX");
->  
-> -static bool psp_init_on_probe = true;
-> -module_param(psp_init_on_probe, bool, 0444);
-> -MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
-> -
->  MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
->  MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
->  MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
-> @@ -1306,11 +1302,13 @@ static int __sev_platform_init_locked(int *error)
->  	return 0;
->  }
->  
-> -static int _sev_platform_init_locked(struct sev_platform_init_args *args)
-> +int sev_platform_init(int *error)
->  {
->  	struct sev_device *sev;
->  	int rc;
->  
-> +	guard(mutex)(&sev_cmd_mutex)
-> +
->  	if (!psp_master || !psp_master->sev_data)
->  		return -ENODEV;
->  
-> @@ -1319,36 +1317,17 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
->  	if (sev->state == SEV_STATE_INIT)
->  		return 0;
->  
-> -	/*
-> -	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
-> -	 * so perform SEV-SNP initialization at probe time.
-> -	 */
-> -	rc = __sev_snp_init_locked(&args->error);
-> +	rc = __sev_snp_init_locked(error);
->  	if (rc && rc != -ENODEV) {
->  		/*
->  		 * Don't abort the probe if SNP INIT failed,
->  		 * continue to initialize the legacy SEV firmware.
->  		 */
->  		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
-> -			rc, args->error);
-> +			rc, *error);
->  	}
->  
-> -	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
-> -	if (args->probe && !psp_init_on_probe)
-> -		return 0;
-> -
-> -	return __sev_platform_init_locked(&args->error);
-> -}
-> -
-> -int sev_platform_init(struct sev_platform_init_args *args)
-> -{
-> -	int rc;
-> -
-> -	mutex_lock(&sev_cmd_mutex);
-> -	rc = _sev_platform_init_locked(args);
-> -	mutex_unlock(&sev_cmd_mutex);
-> -
-> -	return rc;
-> +	return __sev_platform_init_locked(error);
->  }
->  EXPORT_SYMBOL_GPL(sev_platform_init);
->  
-> @@ -1441,16 +1420,12 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
->  static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> -	int rc;
->  
->  	if (!writable)
->  		return -EPERM;
->  
-> -	if (sev->state == SEV_STATE_UNINIT) {
-> -		rc = __sev_platform_init_locked(&argp->error);
-> -		if (rc)
-> -			return rc;
-> -	}
-> +	if (sev->state == SEV_STATE_UNINIT)
-> +		return -ENOTTY;
->  
->  	return __sev_do_cmd_locked(cmd, NULL, &argp->error);
->  }
-> @@ -1467,6 +1442,9 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
->  	if (!writable)
->  		return -EPERM;
->  
-> +	if (sev->state == SEV_STATE_UNINIT)
-> +		return -ENOTTY;
-> +
->  	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
->  		return -EFAULT;
->  
-> @@ -1489,12 +1467,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
->  	data.len = input.length;
->  
->  cmd:
-> -	if (sev->state == SEV_STATE_UNINIT) {
-> -		ret = __sev_platform_init_locked(&argp->error);
-> -		if (ret)
-> -			goto e_free_blob;
-> -	}
-> -
->  	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
->  
->  	 /* If we query the CSR length, FW responded with expected data. */
-> @@ -1584,7 +1556,6 @@ static int sev_get_firmware(struct device *dev,
->  	return -ENOENT;
->  }
->  
-> -/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
->  static int sev_update_firmware(struct device *dev)
->  {
->  	struct sev_data_download_firmware *data;
-> @@ -1732,6 +1703,9 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
->  	if (!writable)
->  		return -EPERM;
->  
-> +	if (sev->state == SEV_STATE_UNINIT)
-> +		return -ENOTTY;
-> +
->  	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
->  		return -EFAULT;
->  
-> @@ -1754,16 +1728,8 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
->  	data.oca_cert_address = __psp_pa(oca_blob);
->  	data.oca_cert_len = input.oca_cert_len;
->  
-> -	/* If platform is not in INIT state then transition it to INIT */
-> -	if (sev->state != SEV_STATE_INIT) {
-> -		ret = __sev_platform_init_locked(&argp->error);
-> -		if (ret)
-> -			goto e_free_oca;
-> -	}
-> -
->  	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
->  
-> -e_free_oca:
->  	kfree(oca_blob);
->  e_free_pek:
->  	kfree(pek_blob);
-> @@ -1882,15 +1848,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	void __user *input_pdh_cert_address;
->  	int ret;
->  
-> -	/* If platform is not in INIT state then transition it to INIT. */
-> -	if (sev->state != SEV_STATE_INIT) {
-> -		if (!writable)
-> -			return -EPERM;
-> -
-> -		ret = __sev_platform_init_locked(&argp->error);
-> -		if (ret)
-> -			return ret;
-> -	}
-> +	if (sev->state != SEV_STATE_INIT)
-> +		return -ENOTTY;
->  
->  	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
->  		return -EFAULT;
-> @@ -2296,6 +2255,9 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
->  {
->  	int error;
->  
-> +	atomic_notifier_chain_unregister(&panic_notifier_list,
-> +					 &snp_panic_notifier);
-> +
->  	__sev_platform_shutdown_locked(NULL);
->  
->  	if (sev_es_tmr) {
-> @@ -2390,9 +2352,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
->  void sev_pci_init(void)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> -	struct sev_platform_init_args args = {0};
->  	u8 api_major, api_minor, build;
-> -	int rc;
->  
->  	if (!sev)
->  		return;
-> @@ -2406,27 +2366,18 @@ void sev_pci_init(void)
->  	api_minor = sev->api_minor;
->  	build     = sev->build;
->  
-> -	if (sev_update_firmware(sev->dev) == 0)
-> -		sev_get_api_version();
-> +	/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW. */
-> +	if (sev_update_firmware(sev->dev))
-> +		return;
-> +
-> +	if (sev_get_api_version())
-> +		goto err;
->  
->  	if (api_major != sev->api_major || api_minor != sev->api_minor ||
->  	    build != sev->build)
->  		dev_info(sev->dev, "SEV firmware updated from %d.%d.%d to %d.%d.%d\n",
->  			 api_major, api_minor, build,
->  			 sev->api_major, sev->api_minor, sev->build);
-> -
-> -	/* Initialize the platform */
-> -	args.probe = true;
-> -	rc = sev_platform_init(&args);
-> -	if (rc)
-> -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
-> -			args.error, rc);
-> -
-> -	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
-> -		"-SNP" : "", sev->api_major, sev->api_minor, sev->build);
-> -
-> -	atomic_notifier_chain_register(&panic_notifier_list,
-> -				       &snp_panic_notifier);
->  	return;
->  
->  err:
-> @@ -2443,7 +2394,4 @@ void sev_pci_exit(void)
->  		return;
->  
->  	sev_firmware_shutdown(sev);
-> -
-> -	atomic_notifier_chain_unregister(&panic_notifier_list,
-> -					 &snp_panic_notifier);
->  }
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 903ddfea8585..def40f7ea01d 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -790,19 +790,6 @@ struct sev_data_snp_shutdown_ex {
->  	u32 rsvd1:31;
->  } __packed;
->  
-> -/**
-> - * struct sev_platform_init_args
-> - *
-> - * @error: SEV firmware error code
-> - * @probe: True if this is being called as part of CCP module probe, which
-> - *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until needed
-> - *  unless psp_init_on_probe module param is set
-> - */
-> -struct sev_platform_init_args {
-> -	int error;
-> -	bool probe;
-> -};
-> -
->  /**
->   * struct sev_data_snp_commit - SNP_COMMIT structure
->   *
-> @@ -817,7 +804,7 @@ struct sev_data_snp_commit {
->  /**
->   * sev_platform_init - perform SEV INIT command
->   *
-> - * @args: struct sev_platform_init_args to pass in arguments
-> + * @error: SEV firmware error code
->   *
->   * Returns:
->   * 0 if the SEV successfully processed the command
-> @@ -826,7 +813,7 @@ struct sev_data_snp_commit {
->   * -%ETIMEDOUT if the SEV command timed out
->   * -%EIO       if the SEV returned a non-zero return code
->   */
-> -int sev_platform_init(struct sev_platform_init_args *args);
-> +int sev_platform_init(int *error);
->  
->  /**
->   * sev_platform_status - perform SEV PLATFORM_STATUS command
-> @@ -951,7 +938,7 @@ void snp_free_firmware_page(void *addr);
->  static inline int
->  sev_platform_status(struct sev_user_data_status *status, int *error) { return -ENODEV; }
->  
-> -static inline int sev_platform_init(struct sev_platform_init_args *args) { return -ENODEV; }
-> +static inline int sev_platform_init(int *error) { return -ENODEV; }
->  
->  static inline int
->  sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENODEV; }
-> 
-> base-commit: 43fb83c17ba2d63dfb798f0be7453ed55ca3f9c2
+>> -- 
+>> 2.34.1
+>>
 
