@@ -1,254 +1,236 @@
-Return-Path: <kvm+bounces-32269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84EEF9D4F4A
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:58:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517CC9D4F5B
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 16:03:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16E701F22CD5
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 14:58:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE581F23946
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A811D88DB;
-	Thu, 21 Nov 2024 14:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xFw8cujT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86D01DBB0C;
+	Thu, 21 Nov 2024 15:03:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2041.outbound.protection.outlook.com [40.107.101.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3351D0143;
-	Thu, 21 Nov 2024 14:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732201085; cv=fail; b=NxtQRwwz356j8d1ah8B61+LXXmq9PVtkYEfH8faumgrs6jAT0jNPRmmKENDcsb1Rd1Ht7AY+Ig1L5DeBDG5wH0XjYWIxElKRkYxQpC/kgmVzhmQTFZxBAuH+yg7+cYvklCgJ2ZZPR+DL2p8bBNE24fJaxmW+C5w6zRX49FzDqrs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732201085; c=relaxed/simple;
-	bh=J0mtpUSj+03M5yaL5DOkaTCgBxVAtrGPHzj8pG1XlOs=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kVj/iDw8ozyYp/04YndWpyuTR2rdygyNCXNsNCTG2avZ0H8fAkkvAZlqhtzh23jCpb7RvZKJSPrcromD6kpOiUtTbgd5Iwfeb4nOq+495LYlEAhATQFv2ENc1gIE3YRWqlOaWax/DfAEIHl+ap7hK0Ak/9vXaFbT/lkC43hqHRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xFw8cujT; arc=fail smtp.client-ip=40.107.101.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vRQnoOBcXGCCWaiLWUVT4nwj6BLWbX3krCS/+dMLwNVQoSsx6Jwi9pCk6jlWS9xVyuv+VmupG33Kd2mENUKqBXPLFFAOIACLOnTo5yxuzI95MXtxW9LVmY9bPHDM4xaCuYizPBanbVwlqRK4aRJs69NCq/eT6EtLLOneP5Ld0BgLjSgDXH6meAy0ybI1Wf1oipmPQolKucE+zS2bJKzdio9+NjGjQeUV6vcJTEfCAccBZAOB49tt/NgXflwbbJee3QDD2LVWT3ZAI9fRnawcZLNk0pU/ajgqHeNjkf2FduLJWXu/S2ds6d3kuHoRCrKFIiPOhk98n5VJYVBzmeLBIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BQy+racQXlI7SXhjWMVDnTimUowxc6ln0T2PRhxiVuU=;
- b=PLUA57Zxsyw/fPN4ImMy7lT4DYkvn6S6yiyP7VtMz7yrKi6oaKEgPFYnDopbnWL+ZTygdCDsJBpu1hYav+IKWBitVlTQkj/OgVwBYq9LCXhv/OegKVG+TwPGpC9Q7VRKeoRCPWBN3uhI/ZNhcdAu2G4SMFfRcrJN8huUyAsJwUY9onTQeQn+webpLI7m4TW2gtqzKCm/PM03yV+ad4fujnvjHBFHatilSHRF71h755SCulOUZLKEuRCRxz355t4d/iHZrjKXhddWdmsj+L8LfzpE1CekxqZx/UD31IlCG+uZKy5vbwOU0yhbezcBnYWUQdZDf5A8zVqYutecnBHPEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BQy+racQXlI7SXhjWMVDnTimUowxc6ln0T2PRhxiVuU=;
- b=xFw8cujTNkiq7OYrpTif436+gZ0JJ3c9geclTUlNtoSMOVzywULNwfAbrM/j5J9xjF368UIMmMU0L2vWmf5XhzmKBab+wxD9PJ3X04OLmXIpH28IZd3MUmc83XiloB5qPIp/TL3I8/mm0e34iagmguXK/35M20M6W0QRdTAUDn0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by DM3PR12MB9434.namprd12.prod.outlook.com (2603:10b6:0:4b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.14; Thu, 21 Nov
- 2024 14:57:58 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%4]) with mapi id 15.20.8158.023; Thu, 21 Nov 2024
- 14:57:58 +0000
-Message-ID: <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
-Date: Thu, 21 Nov 2024 08:57:54 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com,
- davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1726602374.git.ashish.kalra@amd.com>
- <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
- <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
- <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
- <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
- <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
-Content-Language: en-US
-In-Reply-To: <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0173.namprd04.prod.outlook.com
- (2603:10b6:806:125::28) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8041D63DC
+	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 15:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732201407; cv=none; b=ahCJVtX3PUr8iPZydcl2yplifoNFJs/oPRdTBE3OHe1FS88Pdp0q/DYxgdLhW+QmeDyv7QjQAGWxArHtseEn0QYaOCOXpLwg2PYXKLXeAp73W1vylSopBQbYot7Gfy7mIgtADkMPihFHkmj5OOiGb0tI7vUMLArZM9fO1zuHL7s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732201407; c=relaxed/simple;
+	bh=n8JMPzBy5biQgHgSNPwGSUix++KBUT5PDaBB7sFLVAk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=D/6Crf7YGnBJYylR+DrhCPAbfkrm7OOBL6Evmfc22N6bYy++AB3fLZwPynFxe71vealJb8S/oBiGkGpCJVowsUwPNCOPYTuXTPgQvFrEIidqdo4JjS13fIZMUiIAv++hdBAahVBlL9nIA2ao8kaAyDnrTfPk6p6l53cdn0HXGNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83dff8bc954so100465639f.1
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 07:03:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732201404; x=1732806204;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GEHQBx3R5MVs+IGTTjeVS5dq/RGKc660S5q/ISPuTqE=;
+        b=gO6YPyeGEbxMvsmTJJcjWBZxVaHvWbhuqE0UmexG7FUkLxPHOY6Y0J2RGXend//8qk
+         mZMRPH1Ctw6xjNoaV318iosDtm12yjYIwCMXUXwUf1veUN2hR7YjxShnREQHbX4GrUOj
+         L0oiqkdnT4i9kSWOsmuXU6jfb3wNGoORb3CgtxjOzpFFnTO/oTtZCfOBH5VLSQtIavOS
+         RIOQTNjTU1NavgVF16XsojsjEt4xmd+XX85WUfNsKB76t5BJRlYL1am7ls3FhEvH5ZY7
+         fP7grwrgaKtt78CmqOKskGyyJFGiB0MRdTRXHEvHttWnHooD0uXLRhHUCfLDr2PlpkES
+         PZ+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXdSF8197aYV1gfbIAvjwTjAB85Hb9DmdNXUzH9rTWHyWn7Ct8rDgFx1AYe0Oz/wudLgqQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhHmnbdfyxpH3zQFu1MgniRzq8Gy4ewxbLOZWdUhamYf2Hyfxs
+	NRVs2dT0feJHkBSJbWlSiaAVyCInoa0YqjevgzFZ0ASw5leUtpEK4T35iu0HmkCUQC8Akp6mcGa
+	c6Ydyqw8KWhN/RaLD6UXArshsgoo9WCLpU9POjXC+7csO06KPcu4TaVs=
+X-Google-Smtp-Source: AGHT+IFjdrLE5PgdR17FT+Rs7y3X5+wDvgL+ROtk4b883hLiSo6EDDtDYBUiKi3N+jUck/PdC8rfzemHac8TJ8l2T21prD0J/++1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DM3PR12MB9434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07ebe7dc-30ac-411b-3fa8-08dd0a3ce307
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dklrcExEZC9MQk5YSUxIQlpGQXJKcnAzaThVS1JCcHhaMGtZbDYxZlkxeStY?=
- =?utf-8?B?bjA5dDBIcXoxRFQzU2I5NTlxV2x3L1lKTjU0dHozL1JESFd0QXAzd3ZMT3RB?=
- =?utf-8?B?bzlHRzI3UnRlTkxpcUk3VXNqOWpyTlV4U1BzSkdVbGFSVDRjZ1Y1QXBJSUkv?=
- =?utf-8?B?MkZGS1ZHcithMENKWmoyM0lTaGxqMnBINXBCWlZXMjZaUEFCZFRZdExTWkxW?=
- =?utf-8?B?SjJlVjkzci83UFZ1L3RTNHl3a3p0VDFLQUEyUVovV0pPcU10WXVLcFpJTURN?=
- =?utf-8?B?UmdCUjZsVHVNNjYvY2VNWjVKY1RzeW5SUG9OYTJjYVJDcm1seEdHbTZhbjRV?=
- =?utf-8?B?YUppN0hxMDAzY1NDeGU4ZTBLN0MvK2F3Rmt4TGQ3Q3N0T2NNVTdtTHh3Tmsz?=
- =?utf-8?B?MkNLVTRyMFNBekxEUkEzUXoxdDdOUTQ4ckJkNE1JcjZMOUdNbmhrVUlzNktX?=
- =?utf-8?B?ODRZYjMrREdaSHlMTXErUEZwT2hScUh5SFpzQk4yV1ZCNDlDa3NMSTdMVStI?=
- =?utf-8?B?RlBmN1phMXVXczdQMXRJcFZRRXJGUnZpdXNHbEMxemRzaEs1VGR6T1o0bmtp?=
- =?utf-8?B?bFJUNUpTNnFMbUtDL1JybElwbnFLZ0s0dkJUMjVjUHJFZWwzQ3FhWU1tU1cz?=
- =?utf-8?B?YkpzOGovWjdHYmhTUzYxMG9qdkRmKzBoTEM4a0hWSXl5RjNib1JWMnQxcUk1?=
- =?utf-8?B?TGl4VUh4UllXV2QwZFVpT0VMZ0dJeXJqTVJpSEVTMHpFTVRVeW83OWMxbjdX?=
- =?utf-8?B?cjlVd29WZWcvR3JVb3kwY2I1YzJjNitXNW0zQXU3ZUkwT3FFMm5zYTZtUkR4?=
- =?utf-8?B?Y3R3c0tjSTRGVU0xR2ViWXhIRUI0cytOekVDaVF3dG10Z2hYNlZMQ3J5T1lH?=
- =?utf-8?B?RDRFMGVydUVDT2VsV0FmeHIya25FaW5rekNKV2UvNlNZenRDblFJMlpHNzBG?=
- =?utf-8?B?cTNINWRxdzM0NTROMkVBc1NXWThrS0VmaVhDNk9SQnE2SG05OGhuTW8vTDVZ?=
- =?utf-8?B?bk5SUHhhclNNd3YxM2dMcitqR25SRGlaYi9MR3VTR3RCUFY2OUZ4OGJVYXQw?=
- =?utf-8?B?UGQ2M2NEUzJBUVNFTUVFNjRkcDVvanhrMk1VWWNBNGRQcVdWa2R2TmtUWXQ2?=
- =?utf-8?B?NDJwYitDQ1VPRGhGSlNqSzVTSGR0SzhDVmZPL0hBclB4Sm1qNmxrYm9zWGdh?=
- =?utf-8?B?aHNTMzExSGlkMEdoRnlhTE5pTUNXdXdVTjlLV2loTWN1RDBLUU5qZldjVU4r?=
- =?utf-8?B?bGpBRUdyUC9PUHJ3Yk1QckdHUkJ6L3A5YUppVnMzSzVkL2RHWW5nUUFQWC9o?=
- =?utf-8?B?cm5RanhqQXZMN2hHblBZaEJ3UklWVzVUYS9DMVJkTWpsZm5LRVkrYlFHMzdT?=
- =?utf-8?B?NG9uTVg2eTFReUpsVEVhdjg0VDVMMmlQYWNvUnRSOWFhT2gwWHUrTkdXOWgv?=
- =?utf-8?B?ell6S2NqY2wwM2pzVlJzMjVUUk5DT0dvRVhQaUI1S2JJRGlMcTlHMjZMOUh3?=
- =?utf-8?B?RUw3YzRibDdocURhelJudTBuOUpVbVJRNHZ6enk0MTNHM2oxK09GRS9nMndp?=
- =?utf-8?B?MERsVTE2K3MwY3JQOW1iRDk2UmFybzRwd0lUTFlkWjgyQTVWK1FpVWlpeitO?=
- =?utf-8?B?UTBqZE9pbHAzVU85V3ZKdEw5Rk5OTy9YcnlURHp2dC8wVTZ5MVBjQ2h1bzFS?=
- =?utf-8?B?UTZxL2JKblczaXNhTmxYVm5EVG42R3RUaVZUQ1EyM2lxazM4a0djV09QbzE3?=
- =?utf-8?Q?zbd45n7tooc2U5AvWcLhBgpWZB+vnh44pyxWN8a?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cldMUzg5ZFNKbzhNejFLYVFNVjE4TU9ON3I1eEZmV1ovRUlqRnlwNVJBY2p3?=
- =?utf-8?B?dW9HZDczSXNSRVcwbWJLYURpL1BOaVJEdndiZncrQUR3cld3eGxGNTFsVVlH?=
- =?utf-8?B?bUtUd3dXay92WFdjVW1zQUZCZ2FwL2wwUzNCOFh0NFRQSkRkOThkSURKbnBL?=
- =?utf-8?B?WU5reHg1VmNYUS9mR1hFSWZTUjBzQjc3V3NFZFNCQW4xTHdlOUNicDZBL212?=
- =?utf-8?B?WEdxVnQzVUtvMXNuS2o4NUFyc2YvK1NXQmkzbnU2VWt1SG0zUXpRaUIwUlZ2?=
- =?utf-8?B?Z0w1RVpPck9VV1BROVVKRTNFSFlyUk80R1J2Vmd1R3h6RXRyNzBKQ01hZHU2?=
- =?utf-8?B?RGYzNmhiUDQ5WUZDd3NzT1BlcEtyM3E4T05EWXFTQXlYQVBpTWFiWlZESmRQ?=
- =?utf-8?B?VzNHai81QllRSkNUMVBNTk01bG5OVTlMclVCbVI0N1JRaWNvT0QraGo4U0tl?=
- =?utf-8?B?ZEVaZzJqTXFNUHNmb0xaNXg0T3pQVEdaUmpGZkt0NmpNeThPWmRQQU1EMG53?=
- =?utf-8?B?TnlTNUxWZEdmaGttNTV1d3lCVVJzOUdacCtqNForRlRHK3M5UjJJK1ZWVHlN?=
- =?utf-8?B?YVY0VVNhRTcwc1Bmb3hLNVZMejRlbU1reFJtM3B3SjJtY2JVMXVqb1lzNFI3?=
- =?utf-8?B?eXcxNm1sd204WWNqUFNJTkZ0eWk4U2Q3d0hZYS8vTHV1cEtmeXpOckFxbVNz?=
- =?utf-8?B?QWEyb2JCOGlmWk9XUlIrZ1JwVWVJdkFVbnkzTG5hVWlFTnAzTG1Jak1laXRK?=
- =?utf-8?B?b1V6anc5TG9lWW1oTkg1aUtYWnVISHE1VXBiY3c3ZnlTOFFqNDRMK0dNbXlR?=
- =?utf-8?B?YUNOdHBjMzdSQWMvUXdJVlp1SWlmSnZnM3FKNkV2OTFCelBib0NyZ2Q3UXhE?=
- =?utf-8?B?dmZPWEZvSjU4OUhFMmllRCtrQnNTdERJekRXZlQ4SzRJSTV1ZU1jY2R5VjhX?=
- =?utf-8?B?bWkwWnhzSzJrbEswekRwNWc3NFhrTElpUlNRZ2ZUSk8yNWNQRUxtY1c5Nmlz?=
- =?utf-8?B?K0wrMHRFQU9vdUptVTFxOTV0S0dUdUVVdTRJMkk3VzVCZFBpVVVFeWI2RTZr?=
- =?utf-8?B?cUtadml5cVNFRmc0Uzh1b0YydUdqTzdTdlQ0NlZmK1RrdDNraGF1elJ5Rys5?=
- =?utf-8?B?eldNOG5NeEljTXhIZ1llYXo1QUtkWlMyYTVQUXJ0ZTB6cUdPZkVueHFSVDcr?=
- =?utf-8?B?Nk8zU0VGcW5CSVRFT0NXS3dBL2hsazFnQnk0R0ZudTYwVzJsRlF1TzFEUlpr?=
- =?utf-8?B?cVRtVkZxZ3ROQnRGdklMS3Bzb0ovRjRyaHk5aFM0KzlVZ2JXQlF2eDhWQXh0?=
- =?utf-8?B?T3lrTnVrSmU2OVRQNzErdXZCOUhVMmEzamdSOU1uMXJ1K053MGtsSzJITDRZ?=
- =?utf-8?B?a0tnNVhtbThNK05rbFpoVVNPd0E0eGxNN1VENHhYNlYyT1R4RlZFNGNGcnFB?=
- =?utf-8?B?cm9pOVVRZEo5YW5MbGhWWnNPNUNDZDdOdEk1TFRJWkJ4Rm1pVXB2R3d3M1h6?=
- =?utf-8?B?QkJzK3doVVJqRGFRVWJCbG92R21paW9hSFZUSVh0MkN1NnVaaThKQ2x3VDhl?=
- =?utf-8?B?L2U1TnNIcmsyaGVtRVBWanRsQk9GMzdWWW9JeDlISmh2bFNtSkxLbVZLUFpW?=
- =?utf-8?B?OEZyUzViL202bDZha3VTSWtBTFpQSzRleTFlc3lzRmg2cWFlbVoxWkRGeEt0?=
- =?utf-8?B?YXRiek1HVGNCclgyd2NrQVhPTDRaMngyaVFJOGh2eTlZazFNeXZ5QmhOdnFi?=
- =?utf-8?B?VEFhNmQxcHQ3bHhmOUlkL2ZjcmYvUVpoN21nTTZ1aUN4TW5NaHZqYlVDZjAy?=
- =?utf-8?B?Vy9TUnNmQS9xQzh4WlhnWSs0aTlBUHBkb2ZNd054Vm5FbmhFcU5GaTlIZ29O?=
- =?utf-8?B?bHh1emVFWE1qREhYTVNUVUxiQ1BvMlhqZDRUdEd2eW4wSzh5bVk3N2o1cXM5?=
- =?utf-8?B?eUJVdGZhaEhVTzh5NHhacXQwUDFyUWJCY1NFUUliMTVEQUdaTENoOGxaL0Y2?=
- =?utf-8?B?WW5RTVErLzEzWHhlM2pHZ1NlUjFCZGRZZStQZk5QbTFtMlhXTlZoZm5Lb29v?=
- =?utf-8?B?MDRQbVBCTThGRDhvMElMcGg2NWh4ZmVtUXlRclluY3pydTh4RDY0eUpvcmZQ?=
- =?utf-8?Q?ygWsGp0GM++19vBGOEmfUP3eq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07ebe7dc-30ac-411b-3fa8-08dd0a3ce307
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 14:57:58.1401
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JJljeQB8CgHndiTC36SDQIGXHFtroh680/1eteFcH8H5Cw+A2Ous0lBxdOF0PD+B3d8lXNqQDGirLAQfuu52uQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9434
+X-Received: by 2002:a05:6e02:1d0f:b0:3a7:9082:9be8 with SMTP id
+ e9e14a558f8ab-3a790829e21mr44879085ab.1.1732201404354; Thu, 21 Nov 2024
+ 07:03:24 -0800 (PST)
+Date: Thu, 21 Nov 2024 07:03:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <673f4bbc.050a0220.3c9d61.0174.GAE@google.com>
+Subject: [syzbot] [kvm?] WARNING: locking bug in kvm_xen_set_evtchn_fast
+From: syzbot <syzbot+919877893c9d28162dc2@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, dwmw2@infradead.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mingo@redhat.com, paul@xen.org, pbonzini@redhat.com, seanjc@google.com, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    8f7c8b88bda4 Merge tag 'sched_ext-for-6.13' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=103d275f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8b2ddebc25a60ddb
+dashboard link: https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-8f7c8b88.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a91bdc4cdb5d/vmlinux-8f7c8b88.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/35264fa8c070/bzImage-8f7c8b88.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+919877893c9d28162dc2@syzkaller.appspotmail.com
+
+=============================
+[ BUG: Invalid wait context ]
+6.12.0-syzkaller-01892-g8f7c8b88bda4 #0 Not tainted
+-----------------------------
+kworker/u32:4/73 is trying to lock:
+ffffc90003a90460 (&gpc->lock){....}-{3:3}, at: kvm_xen_set_evtchn_fast+0x248/0xe00 arch/x86/kvm/xen.c:1755
+other info that might help us debug this:
+context-{2:2}
+7 locks held by kworker/u32:4/73:
+ #0: ffff88810628e948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
+ #1: ffffc90000fbfd80 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work+0x921/0x1ba0 kernel/workqueue.c:3205
+ #2: ffffffff8feec868 (rtnl_mutex){+.+.}-{4:4}, at: addrconf_dad_work+0xcf/0x14d0 net/ipv6/addrconf.c:4196
+ #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #3: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: ndisc_send_skb+0x864/0x1c30 net/ipv6/ndisc.c:507
+ #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #4: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: ip6_finish_output2+0x3da/0x1a50 net/ipv6/ip6_output.c:126
+ #5: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: local_lock_release include/linux/local_lock_internal.h:38 [inline]
+ #5: ffffffff8e1bb1c0 (rcu_read_lock){....}-{1:3}, at: process_backlog+0x3f1/0x15f0 net/core/dev.c:6113
+ #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: srcu_lock_acquire include/linux/srcu.h:158 [inline]
+ #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: srcu_read_lock include/linux/srcu.h:249 [inline]
+ #6: ffffc90003a908c8 (&kvm->srcu){.?.?}-{0:0}, at: kvm_xen_set_evtchn_fast+0x22e/0xe00 arch/x86/kvm/xen.c:1753
+stack backtrace:
+CPU: 1 UID: 0 PID: 73 Comm: kworker/u32:4 Not tainted 6.12.0-syzkaller-01892-g8f7c8b88bda4 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: ipv6_addrconf addrconf_dad_work
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
+ check_wait_context kernel/locking/lockdep.c:4898 [inline]
+ __lock_acquire+0x878/0x3c40 kernel/locking/lockdep.c:5176
+ lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
+ __raw_read_lock_irqsave include/linux/rwlock_api_smp.h:160 [inline]
+ _raw_read_lock_irqsave+0x46/0x90 kernel/locking/spinlock.c:236
+ kvm_xen_set_evtchn_fast+0x248/0xe00 arch/x86/kvm/xen.c:1755
+ xen_timer_callback+0x1dd/0x2a0 arch/x86/kvm/xen.c:140
+ __run_hrtimer kernel/time/hrtimer.c:1739 [inline]
+ __hrtimer_run_queues+0x5fb/0xae0 kernel/time/hrtimer.c:1803
+ hrtimer_interrupt+0x392/0x8e0 kernel/time/hrtimer.c:1865
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1038 [inline]
+ __sysvec_apic_timer_interrupt+0x10f/0x400 arch/x86/kernel/apic/apic.c:1055
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1049
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:194
+Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 26 dc 41 f6 48 89 df e8 9e 5b 42 f6 f7 c5 00 02 00 00 75 23 9c 58 f6 c4 02 75 37 <bf> 01 00 00 00 e8 35 52 33 f6 65 8b 05 36 f8 da 74 85 c0 74 16 5b
+RSP: 0018:ffffc900008b0758 EFLAGS: 00000246
+RAX: 0000000000000012 RBX: ffffffff9a9e1520 RCX: 1ffffffff2dc9676
+RDX: 0000000000000000 RSI: ffffffff8b6cd740 RDI: ffffffff8bd1db00
+RBP: 0000000000000286 R08: 0000000000000001 R09: fffffbfff2dc8999
+R10: ffffffff96e44ccf R11: 0000000000000006 R12: ffffffff9a9e1518
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88801eec3040
+ __debug_check_no_obj_freed lib/debugobjects.c:1108 [inline]
+ debug_check_no_obj_freed+0x327/0x600 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2273 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kmem_cache_free+0x29c/0x4b0 mm/slub.c:4681
+ kfree_skbmem+0x1a4/0x1f0 net/core/skbuff.c:1148
+ __kfree_skb net/core/skbuff.c:1205 [inline]
+ sk_skb_reason_drop+0x136/0x1a0 net/core/skbuff.c:1242
+ kfree_skb_reason include/linux/skbuff.h:1262 [inline]
+ __netif_receive_skb_core.constprop.0+0x592/0x4330 net/core/dev.c:5644
+ __netif_receive_skb_one_core+0xb1/0x1e0 net/core/dev.c:5668
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:5783
+ process_backlog+0x443/0x15f0 net/core/dev.c:6115
+ __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6779
+ napi_poll net/core/dev.c:6848 [inline]
+ net_rx_action+0xa92/0x1010 net/core/dev.c:6970
+ handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
+ do_softirq kernel/softirq.c:455 [inline]
+ do_softirq+0xb2/0xf0 kernel/softirq.c:442
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+ __dev_queue_xmit+0x887/0x4350 net/core/dev.c:4459
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ neigh_connected_output+0x45c/0x630 net/core/neighbour.c:1594
+ neigh_output include/net/neighbour.h:542 [inline]
+ ip6_finish_output2+0x6a7/0x1a50 net/ipv6/ip6_output.c:141
+ __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
+ ip6_finish_output+0x3f9/0x1300 net/ipv6/ip6_output.c:226
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip6_output+0x1f8/0x540 net/ipv6/ip6_output.c:247
+ dst_output include/net/dst.h:450 [inline]
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ndisc_send_skb+0xa2d/0x1c30 net/ipv6/ndisc.c:511
+ ndisc_send_ns+0xc7/0x150 net/ipv6/ndisc.c:669
+ addrconf_dad_work+0xc80/0x14d0 net/ipv6/addrconf.c:4284
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	f5                   	cmc
+   1:	53                   	push   %rbx
+   2:	48 8b 74 24 10       	mov    0x10(%rsp),%rsi
+   7:	48 89 fb             	mov    %rdi,%rbx
+   a:	48 83 c7 18          	add    $0x18,%rdi
+   e:	e8 26 dc 41 f6       	call   0xf641dc39
+  13:	48 89 df             	mov    %rbx,%rdi
+  16:	e8 9e 5b 42 f6       	call   0xf6425bb9
+  1b:	f7 c5 00 02 00 00    	test   $0x200,%ebp
+  21:	75 23                	jne    0x46
+  23:	9c                   	pushf
+  24:	58                   	pop    %rax
+  25:	f6 c4 02             	test   $0x2,%ah
+  28:	75 37                	jne    0x61
+* 2a:	bf 01 00 00 00       	mov    $0x1,%edi <-- trapping instruction
+  2f:	e8 35 52 33 f6       	call   0xf6335269
+  34:	65 8b 05 36 f8 da 74 	mov    %gs:0x74daf836(%rip),%eax        # 0x74daf871
+  3b:	85 c0                	test   %eax,%eax
+  3d:	74 16                	je     0x55
+  3f:	5b                   	pop    %rbx
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 11/20/2024 5:43 PM, Kalra, Ashish wrote:
-> 
-> On 11/20/2024 3:53 PM, Sean Christopherson wrote:
->> On Tue, Nov 19, 2024, Ashish Kalra wrote:
->>> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
->>>> On Wed, Oct 02, 2024, Ashish Kalra wrote:
->>>>> Yes, but there is going to be a separate set of patches to move all ASID
->>>>> handling code to CCP module.
->>>>>
->>>>> This refactoring won't be part of the SNP ciphertext hiding support patches.
->>>>
->>>> It should, because that's not a "refactoring", that's a change of roles and
->>>> responsibilities.  And this series does the same; even worse, this series leaves
->>>> things in a half-baked state, where the CCP and KVM have a weird shared ownership
->>>> of ASID management.
->>>
->>> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
->>> patches got posted in the meanwhile and that had additional considerations of
->>> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
->>> into this discussion about splitting ASID management across KVM and PSP
->>> driver and as you pointed out on those patches that there is zero reason that
->>> the PSP driver needs to care about ASIDs. 
->>>
->>> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
->>> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
->>> and once CTH feature is enabled, the SEV-ES ASID space is split across
->>> SEV-SNP and SEV-ES VMs. 
->>
->> Right, but that's just a case where KVM needs to react to the setup done by the
->> PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
->> only that "firmware" happens to be a kernel driver.
-> 
-> Yes that is true.
-> 
->>
->>> With reference to SNP GCTX pages, we are looking at some possibilities to
->>> push the requirement to update SNP GCTX pages to SNP firmware and remove that
->>> requirement from the kernel/KVM side.
->>
->> Heh, that'd work too.
->>
->>> Considering that, I will still like to keep ASID management in KVM, there are
->>> issues with locking, for example, sev_deactivate_lock is used to protect SNP
->>> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
->>> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
->>> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
->>> complexity of adding this synchronization between different kernel modules or
->>> handling locking in two different kernel modules, to guard ASID allocation in
->>> PSP driver with VM destruction in KVM module.
->>>
->>> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
->>> which gets referenced during the ASID free code path in KVM. It just makes it
->>> simpler to keep ASID management stuff in KVM. 
->>>
->>> So probably we can add an API interface exported by the PSP driver something
->>> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
->>
->> What about adding a cc_attr_flags entry?
-> 
-> Yes, that is a possibility i will look into. 
-> 
-> But, along with an additional cc_attr_flags entry, max_snp_asid (which is a PSP driver module parameter) also needs to be propagated to KVM, 
-> that's what i was considering passing as parameter to the above API interface.
-> 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Adding a new cc_attr_flags entry indicating CTH support is enabled.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-And as discussed with Boris, using the cc_platform_set() to add a new attr like max_asid and adding a getter interface on top to return the
-max_snp_asid.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Thanks,
-Ashish
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
