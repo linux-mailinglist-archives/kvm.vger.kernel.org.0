@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-32316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB9A9D53C3
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 21:15:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F6A9D53C6
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 21:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C29C3B226B9
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 20:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7DB228213A
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 20:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BC61DA103;
-	Thu, 21 Nov 2024 20:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8611DC185;
+	Thu, 21 Nov 2024 20:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jPdGFKPI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yt2ArKe6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225221D86C0;
-	Thu, 21 Nov 2024 20:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1ED51D86C0;
+	Thu, 21 Nov 2024 20:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732220116; cv=none; b=BjjLkiUbOuSnwC6tToMaUhlqncB6Ylwfpt7OC2NRiOAkQsaStVimNunIioLZ43LzbmcYhHrGg1OF7RPmXdMziWnaazPCfgTiqWvXpK50YNZhQ37xK0pYTcfIBunI5g/IoIMK9FZ8LIFcIlkLXsXW+GHPAxe5AwJlPfBCZhBt8fI=
+	t=1732220122; cv=none; b=Z4X1ECzbfYlt3j1yQG1Nf4WIRbM+AhSpAZW6AQ3KaYz8pHmFac5y3Qj7fjQ9isWGaDDGxpYOQ8BdrtpZMlrNdYlhDrB5Pqh0qEd8Oz0/pa2HsrXpJGDU08bVQzq3wYN9neUBv4Iqls9/7L+9xE0ZQRVwcp+ygDpg/KxHlG87zLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732220116; c=relaxed/simple;
-	bh=yVO/Q8HE9TkANyC1SW60CkbycsVMbxMuXRRZMb4m8EI=;
+	s=arc-20240116; t=1732220122; c=relaxed/simple;
+	bh=6Z2tqqJknLmPPYg3OvT5e1jxsbO4U3HdMYacAGMDPs0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=diGyU++2/LmIWYwT2zIPEGTk009bMMWu62r4oKd+IGZq7ooMN8WJtg3APW7Trn19Opzd6ydiNuMYu/0PCq3hSdnWwTux55FpjyUEZ5I5tyYiLzK2LieUmttmxmsfzCNdaxymeHjCpHoS/PsdWq3WDVYh+LzMmx60yvAz7Gr1ljk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jPdGFKPI; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=WUKrKf3n5CTJv0wZg3vAccFKKS5QtLDhP4Jp0AyZchafiACwAZJTEphm2EM+Vk0tcSVRls8n6ZtsEzg/8GPM3alQbPwNWQ0q8XAwRE14der3d2Zjei8s65Ys8D1HSbQHSQfLxCaWDt0i9Rx1wkC0XeBaX2ByRWWJxN4CheiOqWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yt2ArKe6; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732220115; x=1763756115;
+  t=1732220121; x=1763756121;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yVO/Q8HE9TkANyC1SW60CkbycsVMbxMuXRRZMb4m8EI=;
-  b=jPdGFKPIpsBeKteUMfCclAofpdjVgIBA/i7Qk4RRKWjmcSQBCWh3zNnY
-   t+eYmok9ewTmXt9e/W+iVJLk639Vh5Kg/5txQYmvx0ppgg64RSiYVv8Sy
-   jKhYPF+x4cwKnEq4IR+5+ctAXLiCB7XbFKeNK4feCiQsuGxyGHQxj12Uh
-   EIpNvHW3ETgsOA9OwsmaJrfiY564NYp65Tb6IsejblGJ6vWlNjEGEllQa
-   CvPwoj9aL2oggg9fKKGYZXWThne5GUfKjZrIrV2anaZFY7kueJQX8Pl/r
-   cY0ydNhuCyU2RSGJWGt+paR9MA6k71Ka6//r5Y7sfKwXxcGwHYqV8rWLT
-   g==;
-X-CSE-ConnectionGUID: D3HCVfPkQG+ZBFqxbONvdA==
-X-CSE-MsgGUID: qVavSsY9QiixPVi/VKvI0w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="31715841"
+  bh=6Z2tqqJknLmPPYg3OvT5e1jxsbO4U3HdMYacAGMDPs0=;
+  b=Yt2ArKe6viuDc1mT4r8jtLUGZWqqeogt/a26TY1w6AIJNa9sXQWdURC3
+   /6fxu2LIPZ7OpCRXG/lnbBVIcmbXflYuYw+E3PFH+UlP4RR+AtmYD1bop
+   AhfNodPfTrrrvHZoed56PIVHN7tnyWVXYEUbd4B2w4idywookXhEgQXqN
+   Yw7eXr3EiN7nU+h5JyUbU9fie1klE7vZYm2VpZuxPmccBKe6cDoDhxl52
+   FpkWGmiU1MIBifKdWWYyMGlts3lK/xYhWllmDXcsmRUyMnLYXjhlySsyJ
+   jGs+Z92UUBKRs+upa4KPgMe1sHQASLTWJqThSViuN8VTSwGOmSPeRausf
+   w==;
+X-CSE-ConnectionGUID: zjLOa4yNQ8uGwGY1VgOzPw==
+X-CSE-MsgGUID: O1qCgw9cTTKU0EtpRyt4pQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="31715852"
 X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="31715841"
+   d="scan'208";a="31715852"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:15 -0800
-X-CSE-ConnectionGUID: YBAt5CoIToC2VREsAa1AkA==
-X-CSE-MsgGUID: F2bUpwlHQ2GOGAklmiOurQ==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:21 -0800
+X-CSE-ConnectionGUID: /Fpq6F0RRC+9at4DeVHQxw==
+X-CSE-MsgGUID: mjDuX3d3Q/uOHAU1CLsSKg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="90161079"
+   d="scan'208";a="90161090"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.ger.corp.intel.com) ([10.246.16.81])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:09 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:15 -0800
 From: Adrian Hunter <adrian.hunter@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -78,9 +78,9 @@ Cc: rick.p.edgecombe@intel.com,
 	yan.y.zhao@intel.com,
 	chao.gao@intel.com,
 	weijiang.yang@intel.com
-Subject: [PATCH RFC 1/7] x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX guest
-Date: Thu, 21 Nov 2024 22:14:40 +0200
-Message-ID: <20241121201448.36170-2-adrian.hunter@intel.com>
+Subject: [PATCH 2/7] KVM: TDX: Implement TDX vcpu enter/exit path
+Date: Thu, 21 Nov 2024 22:14:41 +0200
+Message-ID: <20241121201448.36170-3-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241121201448.36170-1-adrian.hunter@intel.com>
 References: <20241121201448.36170-1-adrian.hunter@intel.com>
@@ -93,104 +93,217 @@ MIME-Version: 1.0
 Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
 
-From: Kai Huang <kai.huang@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Intel TDX protects guest VM's from malicious host and certain physical
-attacks.  TDX introduces a new operation mode, Secure Arbitration Mode
-(SEAM) to isolate and protect guest VM's.  A TDX guest VM runs in SEAM and,
-unlike VMX, direct control and interaction with the guest by the host VMM
-is not possible.  Instead, Intel TDX Module, which also runs in SEAM,
-provides a SEAMCALL API.
+This patch implements running TDX vcpu.  Once vcpu runs on the logical
+processor (LP), the TDX vcpu is associated with it.  When the TDX vcpu
+moves to another LP, the TDX vcpu needs to flush its status on the LP.
+When destroying TDX vcpu, it needs to complete flush, and flush cpu memory
+cache.  Track which LP the TDX vcpu run and flush it as necessary.
 
-The SEAMCALL that provides the ability to enter a guest is TDH.VP.ENTER.
-The TDX Module processes TDH.VP.ENTER, and enters the guest via VMX
-VMLAUNCH/VMRESUME instructions.  When a guest VM-exit requires host VMM
-interaction, the TDH.VP.ENTER SEAMCALL returns to the host VMM (KVM).
+Compared to VMX, do nothing on sched_in event as TDX doesn't support pause
+loop.
 
-Add tdh_vp_enter() to wrap the SEAMCALL invocation of TDH.VP.ENTER.
-
-TDH.VP.ENTER is different from other SEAMCALLS in several ways:
- - it may take some time to return as the guest executes
- - it uses more arguments
- - after it returns some host state may need to be restored
-
-TDH.VP.ENTER arguments are passed through General Purpose Registers (GPRs).
-For the special case of the TD guest invoking TDG.VP.VMCALL, nearly any GPR
-can be used, as well as XMM0 to XMM15. Notably, RBP is not used, and Linux
-mandates the TDX Module feature NO_RBP_MOD, which is enforced elsewhere.
-Additionally, XMM registers are not required for the existing Guest
-Hypervisor Communication Interface and are handled by existing KVM code
-should they be modified by the guest.
-
-There are 2 input formats and 5 output formats for TDH.VP.ENTER arguments.
-Input #1 : Initial entry or following a previous async. TD Exit
-Input #2 : Following a previous TDCALL(TDG.VP.VMCALL)
-Output #1 : On Error (No TD Entry)
-Output #2 : Async. Exits with a VMX Architectural Exit Reason
-Output #3 : Async. Exits with a non-VMX TD Exit Status
-Output #4 : Async. Exits with Cross-TD Exit Details
-Output #5 : On TDCALL(TDG.VP.VMCALL)
-
-Currently, to keep things simple, the wrapper function does not attempt
-to support different formats, and just passes all the GPRs that could be
-used.  The GPR values are held by KVM in the area set aside for guest
-GPRs.  KVM code uses the guest GPR area (vcpu->arch.regs[]) to set up for
-or process results of tdh_vp_enter().
-
-Therefore changing tdh_vp_enter() to use more complex argument formats
-would also alter the way KVM code interacts with tdh_vp_enter().
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- arch/x86/include/asm/tdx.h  | 1 +
- arch/x86/virt/vmx/tdx/tdx.c | 8 ++++++++
- arch/x86/virt/vmx/tdx/tdx.h | 1 +
- 3 files changed, 10 insertions(+)
+TD vcpu enter/exit v1:
+- Make argument of tdx_vcpu_enter_exit() struct kvm_vcpu.
+- Update for the wrapper functions for SEAMCALLs. (Sean)
+- Remove noinstr (Sean)
+- Add a missing comma, clarify sched_in part, and update changelog to
+  match code by dropping the PMU related paragraph (Binbin)
+  https://lore.kernel.org/lkml/c0029d4d-3dee-4f11-a929-d64d2651bfb3@linux.intel.com/
+- Remove the union tdx_exit_reason. (Sean)
+  https://lore.kernel.org/kvm/ZfSExlemFMKjBtZb@google.com/
+- Remove the code of special handling of vcpu->kvm->vm_bugged (Rick)
+  https://lore.kernel.org/kvm/20240318234010.GD1645738@ls.amr.corp.intel.com/
+- For !tdx->initialized case, set tdx->vp_enter_ret to TDX_SW_ERROR to avoid
+  collision with EXIT_REASON_EXCEPTION_NMI.
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index fdc81799171e..77477b905dca 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -123,6 +123,7 @@ int tdx_guest_keyid_alloc(void);
- void tdx_guest_keyid_free(unsigned int keyid);
- 
- /* SEAMCALL wrappers for creating/destroying/running TDX guests */
-+u64 tdh_vp_enter(u64 tdvpr, struct tdx_module_args *args);
- u64 tdh_mng_addcx(u64 tdr, u64 tdcs);
- u64 tdh_mem_page_add(u64 tdr, u64 gpa, u64 hpa, u64 source, u64 *rcx, u64 *rdx);
- u64 tdh_mem_sept_add(u64 tdr, u64 gpa, u64 level, u64 hpa, u64 *rcx, u64 *rdx);
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 04cb2f1d6deb..2a8997eb1ef1 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1600,6 +1600,14 @@ static inline u64 tdx_seamcall_sept(u64 op, struct tdx_module_args *in)
- 	return ret;
+v19:
+- Removed export_symbol_gpl(host_xcr0) to the patch that uses it
+
+Changes v15 -> v16:
+- use __seamcall_saved_ret()
+- As struct tdx_module_args doesn't match with vcpu.arch.regs, copy regs
+  before/after calling __seamcall_saved_ret().
+---
+ arch/x86/kvm/vmx/main.c    | 21 ++++++++++-
+ arch/x86/kvm/vmx/tdx.c     | 76 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h     |  2 +
+ arch/x86/kvm/vmx/x86_ops.h |  5 +++
+ 4 files changed, 102 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index bfed421e6fbb..44ec6005a448 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -129,6 +129,23 @@ static void vt_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	vmx_vcpu_load(vcpu, cpu);
  }
  
-+u64 tdh_vp_enter(u64 tdvpr, struct tdx_module_args *args)
++static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
 +{
-+	args->rcx = tdvpr;
++	if (is_td_vcpu(vcpu))
++		/* Unconditionally continue to vcpu_run(). */
++		return 1;
 +
-+	return __seamcall_saved_ret(TDH_VP_ENTER, args);
++	return vmx_vcpu_pre_run(vcpu);
 +}
-+EXPORT_SYMBOL_GPL(tdh_vp_enter);
 +
- u64 tdh_mng_addcx(u64 tdr, u64 tdcs)
++static fastpath_t vt_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_vcpu_run(vcpu, force_immediate_exit);
++
++	return vmx_vcpu_run(vcpu, force_immediate_exit);
++}
++
+ static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
  {
- 	struct tdx_module_args args = {
-diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 4919d00025c9..58d5754dcb4d 100644
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -17,6 +17,7 @@
- /*
-  * TDX module SEAMCALL leaf functions
-  */
-+#define TDH_VP_ENTER			0
- #define TDH_MNG_ADDCX			1
- #define TDH_MEM_PAGE_ADD		2
- #define TDH_MEM_SEPT_ADD		3
+ 	if (is_td_vcpu(vcpu)) {
+@@ -267,8 +284,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.flush_tlb_gva = vt_flush_tlb_gva,
+ 	.flush_tlb_guest = vt_flush_tlb_guest,
+ 
+-	.vcpu_pre_run = vmx_vcpu_pre_run,
+-	.vcpu_run = vmx_vcpu_run,
++	.vcpu_pre_run = vt_vcpu_pre_run,
++	.vcpu_run = vt_vcpu_run,
+ 	.handle_exit = vmx_handle_exit,
+ 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
+ 	.update_emulated_instruction = vmx_update_emulated_instruction,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index dc6c5f40608e..5fa5b65b9588 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -10,6 +10,9 @@
+ #include "mmu/spte.h"
+ #include "common.h"
+ 
++#include <trace/events/kvm.h>
++#include "trace.h"
++
+ #undef pr_fmt
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+@@ -662,6 +665,79 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+ }
+ 
+ 
++static void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++	struct tdx_module_args args;
++
++	guest_state_enter_irqoff();
++
++	/*
++	 * TODO: optimization:
++	 * - Eliminate copy between args and vcpu->arch.regs.
++	 * - copyin/copyout registers only if (tdx->tdvmvall.regs_mask != 0)
++	 *   which means TDG.VP.VMCALL.
++	 */
++	args = (struct tdx_module_args) {
++		.rcx = tdx->tdvpr_pa,
++#define REG(reg, REG)	.reg = vcpu->arch.regs[VCPU_REGS_ ## REG]
++		REG(rdx, RDX),
++		REG(r8,  R8),
++		REG(r9,  R9),
++		REG(r10, R10),
++		REG(r11, R11),
++		REG(r12, R12),
++		REG(r13, R13),
++		REG(r14, R14),
++		REG(r15, R15),
++		REG(rbx, RBX),
++		REG(rdi, RDI),
++		REG(rsi, RSI),
++#undef REG
++	};
++
++	tdx->vp_enter_ret = tdh_vp_enter(tdx->tdvpr_pa, &args);
++
++#define REG(reg, REG)	vcpu->arch.regs[VCPU_REGS_ ## REG] = args.reg
++	REG(rcx, RCX);
++	REG(rdx, RDX);
++	REG(r8,  R8);
++	REG(r9,  R9);
++	REG(r10, R10);
++	REG(r11, R11);
++	REG(r12, R12);
++	REG(r13, R13);
++	REG(r14, R14);
++	REG(r15, R15);
++	REG(rbx, RBX);
++	REG(rdi, RDI);
++	REG(rsi, RSI);
++#undef REG
++
++	guest_state_exit_irqoff();
++}
++
++fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++
++	/* TDX exit handle takes care of this error case. */
++	if (unlikely(tdx->state != VCPU_TD_STATE_INITIALIZED)) {
++		/* Set to avoid collision with EXIT_REASON_EXCEPTION_NMI. */
++		tdx->vp_enter_ret = TDX_SW_ERROR;
++		return EXIT_FASTPATH_NONE;
++	}
++
++	trace_kvm_entry(vcpu, force_immediate_exit);
++
++	tdx_vcpu_enter_exit(vcpu);
++
++	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
++	trace_kvm_exit(vcpu, KVM_ISA_VMX);
++
++	return EXIT_FASTPATH_NONE;
++}
++
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+ {
+ 	u64 shared_bit = (pgd_level == 5) ? TDX_SHARED_BIT_PWL_5 :
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 899654519df6..ebee1049b08b 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -51,6 +51,8 @@ struct vcpu_tdx {
+ 
+ 	struct list_head cpu_list;
+ 
++	u64 vp_enter_ret;
++
+ 	enum vcpu_tdx_state state;
+ };
+ 
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 06583b1afa4f..3d292a677b92 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -129,6 +129,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
++fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit);
+ 
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 
+@@ -156,6 +157,10 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
+ static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+ static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
++static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
++{
++	return EXIT_FASTPATH_NONE;
++}
+ 
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ 
 -- 
 2.43.0
 
