@@ -1,112 +1,95 @@
-Return-Path: <kvm+bounces-32262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32263-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECDD9D4D46
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 13:57:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9688F9D4DBD
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 14:26:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1F4DB23C94
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:57:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E2421F2223D
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 13:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6F01D7E46;
-	Thu, 21 Nov 2024 12:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2161D88CA;
+	Thu, 21 Nov 2024 13:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="FQjlsSis"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmqbELAe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C551D319B
-	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 12:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F59D1369B4;
+	Thu, 21 Nov 2024 13:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732193862; cv=none; b=svQY0jPaNDba9WWOLyRHvtcFrZUD4wTPbFtJYe/8Q1Fgix9oJ4vQnJDqhWgDrhuhmpBppF4heOqe/VS+0Im8Oscf0iBzrIB5CgM41kntBqPylbzrJsKtzj9Lo7wzk7LPNpnupKNvkzWXeBj3B+gxVL3Rs7PlIl089+G6IVTfD/g=
+	t=1732195570; cv=none; b=cELZ+DBBDVP9brifHrQCiH2BPRfR76cExFvKaoSGTVEYxLEXwgmsGRdUXPwKrGVj6sU9XgQedClEwrdFvyErQvo4ZBrV8hTOoLnFLzSiWFwTzJxDpNZjr5+XpvjS8f2AYmSKt8HdlnUOdmsdoDQHT3VXIsuwzcQMCvJpFdB10P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732193862; c=relaxed/simple;
-	bh=YP1Gez/zNXfB+57snXSpA5XGWf0MQvllHzjOVmfuYNY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SEILKM7fPIv1r3wFf3cq7xjwh7vxqRIIsXhp1eS98WppVVZc6liSts3mhPDz2t0pNvq8ao34btzzgMlDlLujAsrWsm2tidzeq2IqlT4y17pVx8BkY9tsSaI4Bz8bPtcTvdDUDXkAfd9yA7EW/GERlqQ1ev4KSi1NwGYtOpBbUH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=FQjlsSis; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-83abe7fc77eso33628639f.0
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 04:57:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1732193860; x=1732798660; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YP1Gez/zNXfB+57snXSpA5XGWf0MQvllHzjOVmfuYNY=;
-        b=FQjlsSisg/tLxGwtWbBNDzs0eNj4YGDhoXym8n45IOefG+5+dO9o6j5eLZpfyq5e52
-         X/P/WVPcXe9IJGBHUjbNv+lPhygDLT6kP+UrOG2BJBkjd0y/pszR2x7AWWabMeVm+jrq
-         HSEkzKsMd8S94pDjSNOj9ldvd00EObeX/+TMpPa9KLSmoqV1Q31YTOI7B18hKcKFe4hy
-         5PcvwOc+9T2BH/xXfd44/+tZ1IcKXZHUbgi10JdWi8lT2ZJWG+MW3beWHzv1S8fE9k3F
-         1+qZiFWFZGnBGfOl5+UFkQsi7ghjMOhUbnmX5dcA4A7Nrg5KFtlgYBzZwu3UJ6Osi5TM
-         2zig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732193860; x=1732798660;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YP1Gez/zNXfB+57snXSpA5XGWf0MQvllHzjOVmfuYNY=;
-        b=PP4k9eOyIuFC+Gjbk1ioDdWP6SLxT8RJs398AARCe8vDxETLCHEXcXHbadfQazw3PX
-         10ryI5eKslAvFkH49woPC2reda9BYwPf5GZIfacM1za7ZCKhusn8QXXAMGFOZe9Bi4yC
-         DDChM4cuUCbxXIcSJScS8hx1kd79FAKv9CG/HmJg6jy3ZFjU+I8bCOvRI1cCzgYLRgo2
-         23UEtyATuV/O+JGDCz4JwfgyJgaQWzvZRP6llq45exNsNirXV4fUiqT/9ZKkbyySLbj7
-         FhcdcUWTYsSivxonAf+5vSGaelNXUr5RhIlkBcNouwgsHCH4Ld1lsInTJtgOeyh1QN9M
-         x+mw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVI3EQH4DorFQMPt2GjY+KLJftKD0FAdcX5z9ORimQ+BipAjBWIyjjsEtnD5UQFx6s6YU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLcyXt8f4qm6slC5X0Bf1KgIpyUfDGZN5DAkMKzPocmGK8nxyP
-	Ctyam0AJ48KuBHBca+JrfrTctxpmVlQvJolpSmbdU9f60KVqW8febUJBkU3eN10f3l6SP4TyKUe
-	s0kgJFU6YpkamFxrMoGh+KBTTN1PxGVug3ikRlQ==
-X-Gm-Gg: ASbGncu7bokuIdqDrL28okUuhu8YPoOsEZtEMGo//1Z4N1UwcUjZqI8ayaumU47jjuE
-	b8o4ysZN0nEiv1ibj5DgaWE5Ogdr+LVdy
-X-Google-Smtp-Source: AGHT+IEuMAfheTfDdr4+8Y1kED12kvt+khaXLolzlsHEkGdCT5FWGNrCEZ8eDC0cqfJZJ30dpcXdBsCszFTBAkK5hm8=
-X-Received: by 2002:a05:6602:1646:b0:83a:f443:875 with SMTP id
- ca18e2360f4ac-83eb60dc727mr748423239f.15.1732193860201; Thu, 21 Nov 2024
- 04:57:40 -0800 (PST)
+	s=arc-20240116; t=1732195570; c=relaxed/simple;
+	bh=hZb9UF78W9QUZ1OdfaHRv3ywLUoZJy5o2aNmapCr66w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mGXR+ENu9YLv3G5kGeICGwtJsn68S9kBpMeaxC4EVNCaH2UlR8p7cYLRsPH5MMU52mYRc7kTbpc+LGYpuTjflq3Fg2cYGv7lN+x8KPYVc3cJzwmSh39EFuoZ249XC9odN8qWMpf7hPIvp6PURVPs9+/Ugl52DSKxgjYqAMiHgKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmqbELAe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7541C4CECC;
+	Thu, 21 Nov 2024 13:26:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732195570;
+	bh=hZb9UF78W9QUZ1OdfaHRv3ywLUoZJy5o2aNmapCr66w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JmqbELAeXzlIr62DDCRG8m/onu4eOrBFah0pJVjvY1R8AxxUsWrUk0e1eCvgtFd7x
+	 CmaYrZ7bFC+D/onUo1O7KTNY/qZ+OJ3sKDXhB0/BakZHT1tWIMuI9w38HHqsFuNo9G
+	 dD23+BkdYETu9JLQdS2zh8yLkqukuRqG+ly1yYPQ6kcPCUPywdkjC7eCgAQ4rn2Kvs
+	 6rHaEMzXrKK67mJVuTPCjuxwXTPRdW5E9zOdYlKW2/U6ZydZYO7VErHDbHcFIu4NLf
+	 CCzckaMl6z3rUdaDLkh2ZnX4JF//Ek/G4xux39mIFsRe2At/cMTzaAEyRIIW94ypLI
+	 xndc2NHY21wgQ==
+Date: Thu, 21 Nov 2024 06:26:08 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, torvalds@linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 6.13 merge window
+Message-ID: <20241121132608.GA4113699@thelio-3990X>
+References: <20241120135842.79625-1-pbonzini@redhat.com>
+ <Zz8t95SNFqOjFEHe@sashalap>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zz7vLEbLFXuRSPeo@linux.dev> <CABgObfb+P7xaLqiPBzshMQTfSRg8B7LSYswzipNTk6bzWkbuXA@mail.gmail.com>
-In-Reply-To: <CABgObfb+P7xaLqiPBzshMQTfSRg8B7LSYswzipNTk6bzWkbuXA@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 21 Nov 2024 18:27:29 +0530
-Message-ID: <CAAhSdy0fwv+0NFM5H3UYFhJf9fwrTTKe1UupHj9me=OhHXfDyw@mail.gmail.com>
-Subject: Re: [GIT PULL] First batch of KVM/arm64 fixes for 6.13
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zz8t95SNFqOjFEHe@sashalap>
 
-On Thu, Nov 21, 2024 at 4:31=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On Thu, Nov 21, 2024 at 9:28=E2=80=AFAM Oliver Upton <oliver.upton@linux.=
-dev> wrote:
-> >
-> > Hi Paolo,
-> >
-> > Had a surprising amount of fixes turn up over the past few days so it i=
-s
-> > probably best to send the first batch your way. The LPI invalidation an=
-d
-> > compilation fix are particularly concerning, rest of the details found =
-in
-> > the tag.
->
-> Sure. Anup, if your second PR is ready please send it already.
+On Thu, Nov 21, 2024 at 07:56:23AM -0500, Sasha Levin wrote:
+> Hi Paolo,
+> 
+> On Wed, Nov 20, 2024 at 08:58:42AM -0500, Paolo Bonzini wrote:
+> >      riscv: perf: add guest vs host distinction
+> 
+> When merging this PR into linus-next, I've started seeing build errors:
+> 
+> In file included from /builds/linux/arch/riscv/kernel/asm-offsets.c:12:
+> In file included from /builds/linux/arch/riscv/include/asm/kvm_host.h:23:
+> In file included from /builds/linux/arch/riscv/include/asm/kvm_vcpu_pmu.h:12:
+> In file included from /builds/linux/include/linux/perf/riscv_pmu.h:12:
+> /builds/linux/include/linux/perf_event.h:1679:64: error: too many arguments provided to function-like macro invocation
+>  1679 | extern unsigned long perf_misc_flags(struct perf_event *event, struct pt_regs *regs);
+>       |                                                                ^
+> /builds/linux/arch/riscv/include/asm/perf_event.h:15:9: note: macro 'perf_misc_flags' defined here
+>    15 | #define perf_misc_flags(regs) perf_misc_flags(regs)
+>       |         ^
+> 
+> Looks like this is due to 2c47e7a74f44 ("perf/core: Correct perf
+> sampling with guest VMs") which went in couple of days ago through
+> Ingo's perf tree and changed the number of parameters for
+> perf_misc_flags().
 
-Done.
+There is a patch out to fix this but it seems like it needs to be
+applied during this merge?
 
-Thanks,
-Anup
+https://lore.kernel.org/20241116160506.5324-1-prabhakar.mahadev-lad.rj@bp.renesas.com/
+https://lore.kernel.org/ZzxDvLKGz1ouWzgX@gmail.com/
+
+Cheers,
+Nathan
 
