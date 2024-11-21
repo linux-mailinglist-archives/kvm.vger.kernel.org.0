@@ -1,103 +1,150 @@
-Return-Path: <kvm+bounces-32248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76259D4B1B
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:54:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026B79D4B2A
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4F02817F6
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 10:54:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7470DB232A1
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 11:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502D71CF29D;
-	Thu, 21 Nov 2024 10:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0071D1303;
+	Thu, 21 Nov 2024 11:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kQYvPwbg"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aGfumQ4J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4714BF87;
-	Thu, 21 Nov 2024 10:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C793A1CC88D;
+	Thu, 21 Nov 2024 11:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732186472; cv=none; b=mTsOW8Z6f/3WLvxhH6wDVFaZEtx5d0wR2C5MtmPw39X/tz7rtl48WXPnGohY6GIWBPCtzdl8dIgN1bATEVBpSTD4+JrcRR84BgKSLAaxU9b/gjFK4+yW9HxvAodm33f6Nt6OLC+QHJAqASMMRa/I/NGyThwOiKLzC82wdmp8S7o=
+	t=1732186832; cv=none; b=AQC8XXosU6910MXuQCuC5BQbrgypl4u40amRPeZxbO7IPcxh8MUZzh/ZeWbwDzSgEESUt1A6saJfe4Hi1Y5JB7FTrh+I51puby2h0tX5MABRXenMtVmv3bV/QVYoQMqGB9acYRuzW1MwIcxFohLO0RBUclwB1SDzaHcRLkC8uKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732186472; c=relaxed/simple;
-	bh=fB5OcF75MtK6hPDV2GWDTP/gWRQawJ+U4HsHrmF/awk=;
+	s=arc-20240116; t=1732186832; c=relaxed/simple;
+	bh=9gfsOjXUGyFwnFr59dC+u4M0J91DcAOQbqnLQalZcxU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hjgb+307/wPjObxzEf3pSEwVl0SrwAjwfH/keIgyxp/AZtdByKlMJfznjlNp3se3zi6MNFhH+HQpYBcRfaPfAuqaJpM0Ibrfm4WVmeYdPRVGZCrNpOcxADKlvZQZ0MzMPF2OEJvsEqRZRv5xfd2soqxHKhMoLC7JuPH8fwZBU6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kQYvPwbg; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0191A40E01D6;
-	Thu, 21 Nov 2024 10:54:20 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id rZ5d5XYprrqK; Thu, 21 Nov 2024 10:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1732186452; bh=QJ7XSOZv9ivJWYqHnhDDw2JQ05ATG/24E/OppcpjgAU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kQYvPwbgWfldoRIYm079SHcVHS1jcbohh5K90CTKH/SaM0cXS9+ucgpRlaXnWlQ8J
-	 QsoAEVk6XgL7JgYQHtZ4DKgV/RiBvLbuAcJTMx+XaWVJ6/vI3YKl4AhpYrWIDzmszH
-	 AcEljEaGmZ4oH4XKZraWtZ200PkzsC6VMDC3dmzuIYcQ5G7r8+bb78MsSVjo/Tn4kD
-	 bO1PbtDMIzVuy+QoHzrd2CIyVS4zrHzaUxJPvtRanzZLlLyWCw0UCXW0TSo7FtSiCG
-	 E2U2vnBWr8jfnDrwLi0J0UT9WUGawIJTKRrfDqfKOj8lrBKl3FhKfK0hRSRqWqUNuo
-	 OpPjhsUJCI4nnvgPkJyWTQ6HzpQ8F9bdZ61fM2MOL2f9iuXAB7MJG+PAP8ofpw1RM8
-	 UXo7qFhy6EtkXdbO1VvTmEvy1Sv1eCFYIOb1PoSewwUfhv38lAjiQseuU1kXKBkQyq
-	 jN4R6WMCHySDW+CqwDCiFCslNK6nsAMaiTtoxazmmPgIG3Iff+fCG1fe0QT4d7MM15
-	 MuOQma7s+gsqEZZwPOSgV91cswKTdCpQxC9PgsLw8HmK3VYcmLXWOs1D0R+37QFaIR
-	 f4V8jcHcvvOmanONCV8P0V5CRSLzgPMx0ozVqNBN4XKTVFMy3t5981WdWvaDr4M+AD
-	 S9NXZyc3An9XCABtVMdy4/O8=
-Received: from zn.tnic (p200300ea9736a1a8329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a1a8:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 45CEA40E0275;
-	Thu, 21 Nov 2024 10:53:54 +0000 (UTC)
-Date: Thu, 21 Nov 2024 11:53:44 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: "Melody (Huibo) Wang" <huibo.wang@amd.com>,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
-	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
-Message-ID: <20241121105344.GBZz8ROFlE8Qx2JuLB@fat_crate.local>
-References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
- <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
- <6f6c1a11-40bd-48dc-8e11-4a1f67eaa43b@amd.com>
- <4f0769a6-ef77-46f8-ba78-38d82995aa26@amd.com>
- <20241121054116.GAZz7H_Cub_ziNiBQN@fat_crate.local>
- <6b2d9a59-cfca-4d6c-915b-ca36826ce96b@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A00AQ33AVVtRyYGqhJML98gNYFCLGtxbWaLqi+Ip2DCYAT+0iSKiq5hHicx5oaE9Y+HaaZzD8BjgijBTSxf7mLRgXqXo0q9V7w/Ikk4CTdFv1bJlDNHs1fr8kp/Ziw+8iLAlAqPI0V614DvgaXCM0v+cs4x93ugENccqMMbOGV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aGfumQ4J; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/4UY6ooFSZbuurvbSSxwnqyBmiXRU+RN7sWd/ZeHliw=; b=aGfumQ4JkaRWnYeAD+H/67VZah
+	vYz0LMQIP45v3VwBZKvVWDMqLirOmn6oWsQjYIgwz13/QVVo4P7x6kVsqdCp2NSs/LWBA3X+Hzgbe
+	uGH6g5kKTrVQ2NKdOtNQZvDqva01ydSWpXjvNPB+1zgOPTYAIevJFZIMJZYYFNPFL1Ifbv3PKnJZv
+	OrwEY2eJ4EsvDdm0qUegKwZMVis4ARGSOAgFYvCfKVXYZcaxuES3LHkjrjuAr/MHrhw/5FzBU9PlF
+	5qrPQbLKjpWsCQb1aYz5GmVU03v13aN65v2SlUcMnIeL21n/K2hMk8I4crChD6KYZLtY4/0wo5Ris
+	TqUAjfTw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tE4v7-00000000ZU8-1far;
+	Thu, 21 Nov 2024 11:00:21 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 0365F30068B; Thu, 21 Nov 2024 12:00:21 +0100 (CET)
+Date: Thu, 21 Nov 2024 12:00:20 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Valentin Schneider <vschneid@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Lorenzo Stoakes <lstoakes@gmail.com>,
+	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Juerg Haefliger <juerg.haefliger@canonical.com>,
+	Nicolas Saenz Julienne <nsaenz@kernel.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
+	Chuang Wang <nashuiliang@gmail.com>,
+	Yang Jihong <yangjihong1@huawei.com>,
+	Petr Mladek <pmladek@suse.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+	Julian Pidancet <julian.pidancet@oracle.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Dionna Glaze <dionnaglaze@google.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+Subject: Re: [RFC PATCH v3 06/15] jump_label: Add forceful jump label type
+Message-ID: <20241121110020.GC24774@noisy.programming.kicks-ass.net>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-7-vschneid@redhat.com>
+ <20241119233902.kierxzg2aywpevqx@jpoimboe>
+ <20241120145649.GJ19989@noisy.programming.kicks-ass.net>
+ <20241120145746.GL38972@noisy.programming.kicks-ass.net>
+ <20241120165515.qx4qyenlb5guvmfe@jpoimboe>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6b2d9a59-cfca-4d6c-915b-ca36826ce96b@amd.com>
+In-Reply-To: <20241120165515.qx4qyenlb5guvmfe@jpoimboe>
 
-On Thu, Nov 21, 2024 at 01:33:29PM +0530, Neeraj Upadhyay wrote:
-> As SAVIC's guest APIC register accesses match x2avic (which uses x2APIC MSR
-> interface in guest), the x2apic common flow need to be executed in the
-> guest.
+On Wed, Nov 20, 2024 at 08:55:15AM -0800, Josh Poimboeuf wrote:
+> On Wed, Nov 20, 2024 at 03:57:46PM +0100, Peter Zijlstra wrote:
+> > On Wed, Nov 20, 2024 at 03:56:49PM +0100, Peter Zijlstra wrote:
+> > 
+> > > But I think we can make the fall-back safer, we can simply force the IPI
+> > > when we poke at noinstr code -- then NOHZ_FULL gets to keep the pieces,
+> > > but at least we don't violate any correctness constraints.
+> > 
+> > I should have read more; that's what is being proposed.
+> 
+> Hm, now I'm wondering what you read, as I only see the text poke IPIs
+> being forced when the caller sets force_ipi, rather than the text poke
+> code itself detecting a write to .noinstr.
 
-How much of that "common flow" is actually needed by SAVIC?
+Right, so I had much confusion and my initial thought was that it would
+do something dangerous. Then upon reading more I see it forces the IPI
+for these special keys -- with that force_ipi thing.
 
--- 
-Regards/Gruss,
-    Boris.
+Now, there's only two keys marked special, and both have a noinstr
+presence -- the entire reason they get marked.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+So effectively we force the IPI when patching noinstr, no?
+
+But yeah, this is not quite the same as not marking anything and simply
+forcing the IPI when the target address is noinstr.
+
+And having written all that; perhaps that is the better solution, it
+sticks the logic in text_poke and ensure it automagically work for all
+its users, obviating the need for special marking.
+
+Is that what you were thinking?
 
