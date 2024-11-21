@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-32319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CAE9D53CB
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 21:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D03E39D53CD
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 21:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0111F2262D
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 20:16:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 885661F229EE
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 20:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2710D1C5799;
-	Thu, 21 Nov 2024 20:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDED91DE2BD;
+	Thu, 21 Nov 2024 20:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K30g/Dsf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AmVOsVPr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B153F1DDC29;
-	Thu, 21 Nov 2024 20:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480B31DE2B5;
+	Thu, 21 Nov 2024 20:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732220133; cv=none; b=bixJOYAUtOq8rJW/S3pgL4Ts9zqHk+D3f+1dy+lHP1BrkL93h2/E5/upUhEW6KSXuWxQdWoz9YKxjDXdVb8xGrj63iVuSdua6SK5R2lQxJo3iRqUOIILuY2+9EboZGnKl8I1ORrc6OIBppPxKt1xH0X9sYrMNv8CJXbnb0biqC8=
+	t=1732220139; cv=none; b=jkDezVvEmUMFPsbaCzkrCPsJDvpDENKZkDBCnDN/vsgWdecEu7B/Jh8AbwQ+X0Etz+HIKzZZPsmzM/qzaVmWaQU5lLJxoFbi3/iFjruhv8JDqWsStX6I4BXlaemGFCOVvJxq8ta8VverNmlNTHXmxwX4kwUqkcRcNcLOgXrtF4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732220133; c=relaxed/simple;
-	bh=+lyKQromjlZ1o8mi9dmy7hdTdeQ50uC0f5mCP8Awlyg=;
+	s=arc-20240116; t=1732220139; c=relaxed/simple;
+	bh=PatvNqUnDEkJGUkiPz9VCdWdENsRWsvrlvB8gF01Pcw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pck3G6QdAVBPKFt3dB3Az01rZPXMc1WNFbsFLgpi8Cb851EyjR/+7HpKhZgg+BfB8hMOiw71VPOClg4e8O5GE88j/SSnurR3daYYMjKHhC8BMyMjh/h4gZi6eqUWkaUXcOGbZgiFdXoaU9p9oJEF7qT5fxw0oEoqfp4h98xBtb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K30g/Dsf; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=TYdN4mAmBTPQNxyQf7qlQspBgyU5x1juSLtGSJwZpF5Ui7b/IXdcG0rVv7z7yTdsmFHjhu79xLpvU2XJZgnV89EhrZ8wPHGvi7LN7R3/qRRDhRhTNrewsNSiBO7JDBgxHmxjbqd4MPZXp/jAuMpRa82gc78XLn1vgqpEOOtD+24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AmVOsVPr; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732220132; x=1763756132;
+  t=1732220138; x=1763756138;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+lyKQromjlZ1o8mi9dmy7hdTdeQ50uC0f5mCP8Awlyg=;
-  b=K30g/DsfnGMVxPffCyhJRXraz6/he3cKt+HK7w1Z+xrESSMzb5d2vAx7
-   QILgvJa/qV26KB8OLiajGFi0tfg5beNFJf6nPhwIO8+tdaKntPMkDJequ
-   lFT54h/ty1zVA80aJS2e7osW1BiohQtcCYEtmuw/3DpT/VwWQoFcAP/V9
-   5cGvCLWgWXNToRoHS4mybO16XU47Zxykbov0wb1st43KFZhcf0mFTPh2x
-   W9bTbYzVEFewrrUyqxspT9L2vO8J4BJ0m3Pc2G5ewW0s+QFa7/tHz0cWU
-   X/yW7K339YoPRf8lIRb8b9Ivi3WK0NmFVOmhkVyYOx8XpqIuRqcvJ96XT
+  bh=PatvNqUnDEkJGUkiPz9VCdWdENsRWsvrlvB8gF01Pcw=;
+  b=AmVOsVPr+syPu8VjcYW5UaoJ7iDbWpTj8v3b7yXN2pEiEY/voQFOnn0B
+   CHBGaOE/2TfBCX791bqUa5TBbWVUgDj8my0P0LSDOzBLEU0DnR7bQ8Qp9
+   HtaI7Sn1VVnuYHRJV0msnxnIgfluYtYl48yfLVH7dwfNg64Ezc+t3/9WZ
+   3pNnYoNfZp5/FLOxnAFMNQI3OtOIebooZzFW2BjGTsKM33o1ixEgig49P
+   9I3UZGomNeo1V8ab63GRQQUR6o1wHuqb5RN4d0Xxgs6VB7oCRkDSSbUiR
+   UeMwQfpIlWaF85WaSjsGNpwEjhbJC2pUIqFAGy+6uxE6kk2F4XqPAlzbr
    w==;
-X-CSE-ConnectionGUID: DfSiJJMQQgWFhQjCqUEDDQ==
-X-CSE-MsgGUID: It6uzUE0QTm5MtXSVjNzjQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="31715892"
+X-CSE-ConnectionGUID: t0VPECI5Q82VIVpsRf90rQ==
+X-CSE-MsgGUID: 1zQNSqMtRO6/YvC32bkA9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="31715906"
 X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="31715892"
+   d="scan'208";a="31715906"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:32 -0800
-X-CSE-ConnectionGUID: LreYr/DVTqaEMJcxQ97JVg==
-X-CSE-MsgGUID: BFuFuoiUR+Gp96mAw8oivQ==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:37 -0800
+X-CSE-ConnectionGUID: ODRuC8OMSWCSmdLpsnA7Xg==
+X-CSE-MsgGUID: pXrabNxUTyOCY/RWC8eHVw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="90161114"
+   d="scan'208";a="90161118"
 Received: from ahunter6-mobl1.ger.corp.intel.com (HELO ahunter-VirtualBox.ger.corp.intel.com) ([10.246.16.81])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:26 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 12:15:31 -0800
 From: Adrian Hunter <adrian.hunter@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -78,9 +78,9 @@ Cc: rick.p.edgecombe@intel.com,
 	yan.y.zhao@intel.com,
 	chao.gao@intel.com,
 	weijiang.yang@intel.com
-Subject: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the guest TD
-Date: Thu, 21 Nov 2024 22:14:43 +0200
-Message-ID: <20241121201448.36170-5-adrian.hunter@intel.com>
+Subject: [PATCH 5/7] KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o wrmsr
+Date: Thu, 21 Nov 2024 22:14:44 +0200
+Message-ID: <20241121201448.36170-6-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241121201448.36170-1-adrian.hunter@intel.com>
 References: <20241121201448.36170-1-adrian.hunter@intel.com>
@@ -93,73 +93,93 @@ MIME-Version: 1.0
 Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Chao Gao <chao.gao@intel.com>
 
-On exiting from the guest TD, xsave state is clobbered.  Restore xsave
-state on TD exit.
+Several MSRs are constant and only used in userspace(ring 3).  But VMs may
+have different values.  KVM uses kvm_set_user_return_msr() to switch to
+guest's values and leverages user return notifier to restore them when the
+kernel is to return to userspace.  To eliminate unnecessary wrmsr, KVM also
+caches the value it wrote to an MSR last time.
 
+TDX module unconditionally resets some of these MSRs to architectural INIT
+state on TD exit.  It makes the cached values in kvm_user_return_msrs are
+inconsistent with values in hardware.  This inconsistency needs to be
+fixed.  Otherwise, it may mislead kvm_on_user_return() to skip restoring
+some MSRs to the host's values.  kvm_set_user_return_msr() can help correct
+this case, but it is not optimal as it always does a wrmsr.  So, introduce
+a variation of kvm_set_user_return_msr() to update cached values and skip
+that wrmsr.
+
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
 TD vcpu enter/exit v1:
-- Remove noinstr on tdx_vcpu_enter_exit() (Sean)
-- Switch to kvm_host struct for xcr0 and xss
-
-v19:
-- Add EXPORT_SYMBOL_GPL(host_xcr0)
-
-v15 -> v16:
-- Added CET flag mask
+ - Rename functions and remove useless comment (Binbin)
 ---
- arch/x86/kvm/vmx/tdx.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 24 +++++++++++++++++++-----
+ 2 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 6e4ea2d420bc..00fdd2932205 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2,6 +2,8 @@
- #include <linux/cleanup.h>
- #include <linux/cpu.h>
- #include <linux/mmu_context.h>
-+
-+#include <asm/fpu/xcr.h>
- #include <asm/tdx.h>
- #include "capabilities.h"
- #include "mmu.h"
-@@ -709,6 +711,24 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index dfa89a5d15ef..e51a95aba824 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2303,6 +2303,7 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ int kvm_add_user_return_msr(u32 msr);
+ int kvm_find_user_return_msr(u32 msr);
+ int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
++void kvm_user_return_msr_update_cache(unsigned int index, u64 val);
+ 
+ static inline bool kvm_is_supported_user_return_msr(u32 msr)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 92de7ebf2cee..2b5b0ae3dd7e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -637,6 +637,15 @@ static void kvm_user_return_msr_cpu_online(void)
+ 	}
  }
  
- 
-+static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
++static void kvm_user_return_register_notifier(struct kvm_user_return_msrs *msrs)
 +{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+
-+	if (static_cpu_has(X86_FEATURE_XSAVE) &&
-+	    kvm_host.xcr0 != (kvm_tdx->xfam & kvm_caps.supported_xcr0))
-+		xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
-+	if (static_cpu_has(X86_FEATURE_XSAVES) &&
-+	    /* PT can be exposed to TD guest regardless of KVM's XSS support */
-+	    kvm_host.xss != (kvm_tdx->xfam &
-+			 (kvm_caps.supported_xss | XFEATURE_MASK_PT |
-+			  XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)))
-+		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
-+	if (static_cpu_has(X86_FEATURE_PKU) &&
-+	    (kvm_tdx->xfam & XFEATURE_MASK_PKRU))
-+		write_pkru(vcpu->arch.host_pkru);
++	if (!msrs->registered) {
++		msrs->urn.on_user_return = kvm_on_user_return;
++		user_return_notifier_register(&msrs->urn);
++		msrs->registered = true;
++	}
 +}
 +
- static void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
  {
- 	struct vcpu_tdx *tdx = to_tdx(vcpu);
-@@ -776,6 +796,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+ 	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+@@ -650,15 +659,20 @@ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+ 		return 1;
  
- 	tdx_vcpu_enter_exit(vcpu);
+ 	msrs->values[slot].curr = value;
+-	if (!msrs->registered) {
+-		msrs->urn.on_user_return = kvm_on_user_return;
+-		user_return_notifier_register(&msrs->urn);
+-		msrs->registered = true;
+-	}
++	kvm_user_return_register_notifier(msrs);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
  
-+	tdx_restore_host_xsave_state(vcpu);
- 	tdx->host_state_need_restore = true;
- 
- 	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
++void kvm_user_return_msr_update_cache(unsigned int slot, u64 value)
++{
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
++
++	msrs->values[slot].curr = value;
++	kvm_user_return_register_notifier(msrs);
++}
++EXPORT_SYMBOL_GPL(kvm_user_return_msr_update_cache);
++
+ static void drop_user_return_notifiers(void)
+ {
+ 	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
 -- 
 2.43.0
 
