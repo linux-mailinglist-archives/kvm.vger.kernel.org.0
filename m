@@ -1,257 +1,236 @@
-Return-Path: <kvm+bounces-32266-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32267-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B81239D4E37
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:01:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718A19D4E49
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 15:07:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78130280D59
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 14:01:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8A96B23D8A
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 14:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4D81D86CB;
-	Thu, 21 Nov 2024 14:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE841D9587;
+	Thu, 21 Nov 2024 14:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LcYN2/fY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ecn6E2ar"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2053.outbound.protection.outlook.com [40.107.101.53])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0C64C66
-	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 14:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732197678; cv=fail; b=EflFjYqEaQjtaLEvCezb4OgIns45gMMR/ek8yV/qut6JitSeZ7iaccDoEOreau+Ks3oyWkej3TR0sUYiuir91CW4THtyGtZetm3sIU6IBZ0VFU/feRhWMNdWq1lpPUVAriY8UzZoejxB+S0pbrrmZBukKh4GBbZPgd/I87S/AaM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732197678; c=relaxed/simple;
-	bh=QdjUCG5rJI+E0Wckd78pjdJe1Thtn5bAXfSCLN/EJfM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mm1JKIQk+mS4lAHLuZzcM55fJWXqOa/YrXt89V7BPVgc/9lrE8+7MLyiSV2y7cdu4RWeii6PBf2e1fPZK4/mQ0OAVE88kvsUnh6z+Tu+8WE8y46jVYUURQ3wCEDmL3Bh599A9Hj+cfMHSLpGK3lPIXFeLAxC6POefi7EBoj9qkw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LcYN2/fY; arc=fail smtp.client-ip=40.107.101.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WdXXUEx1elgXNdK60RgDqCsaEy+eGA/L/1lNw8vHiCR5eZdyNoLyrRKOrw8+AMeGEl/jT2q/um6C6YnQL0t09zxMsBV/EKoK+jNhTLAZv3jXXnWpF6mSIB8LWY6BPe4gM/Az5jO/pDM6Tg2JyilGiGCgBQefEP6pfKjfosGZHFSEPUeM8EiVY72aXhyLqajsRNBKGlRLTXdnE5zwRJddl/BW4/lD1r7MhCQr4D9/KT4e8kSs7ORuUBzzE3k5+Xwk+r+hqq0BCygpcAkTmkPK+qe397SJ3aAokWeHf6ZK52Jnjv849kwB8WHDR1R2NriY0TpSwC6519As0zxFxUY+0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wEyndTrUulFF3bs0T4nJlL75rAczFrTPAZl5rVyBnuk=;
- b=Q2u7BtGNVradbPgS8BwS2+iONU6O38bY2sYBhrYcSdqWMJlnqwO0ex9oyA16zPqlNEVl7ZH1xLNBTnabZM4vZV5HJLu29xiB+LwRf1QpQSza+R9a8a9gi01/JSperedNBHS6GdA4K9gzaU0XIV55J1Eu/uaCH47iyJGVlHtEUOuvEgYOpEtItFur9oElAr/qe66tTDou1uqHgBJIftETo0dnsz+CE9zMcUhEfE7eWlWSixMFmrUo80Gt4AvWvxixupwbrc0vJBlHT6l78VEQY+sOXjZoQD6I7mNuGi1B7Ft1KOAduOJvw70rayxWGo0YIh5USznvKLCm7sgBsSTl4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wEyndTrUulFF3bs0T4nJlL75rAczFrTPAZl5rVyBnuk=;
- b=LcYN2/fY42PZ4ep0KSzZWrSK3pi74zIn76HhzxdUSdDdxKUAGVN//J89z3pqrlIBkInmeaRH+7PPkTI7BaLCruaTLCa6o/FPQ96cr15t+onI+0Bs+FZtTV0EiWmmOvsxFlRjMKoW0EfkD6EZZLLSxAWGtX8zkMkmxOMv5SUNRYd5Z+LiEMeOPco82OPoJjfW9CyoB5+Ws+gbJaRzECl5oDDEV/MTeuTGo0NxW/kfdXmhla0orkr8A3xHbmsps1cNyyTM/hSmlydA3H6wi4LhfIPE50VSnAooOVpkwdKT2GeGCR+eFPIN5n5Q4FKRzgHbwz0UPUzQrZSiB/SQvP/YHA==
-Received: from CH2PR10CA0018.namprd10.prod.outlook.com (2603:10b6:610:4c::28)
- by DS7PR12MB8083.namprd12.prod.outlook.com (2603:10b6:8:e4::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Thu, 21 Nov
- 2024 14:01:12 +0000
-Received: from CH3PEPF0000000F.namprd04.prod.outlook.com
- (2603:10b6:610:4c:cafe::bd) by CH2PR10CA0018.outlook.office365.com
- (2603:10b6:610:4c::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.15 via Frontend
- Transport; Thu, 21 Nov 2024 14:01:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH3PEPF0000000F.mail.protection.outlook.com (10.167.244.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8182.16 via Frontend Transport; Thu, 21 Nov 2024 14:01:11 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 21 Nov
- 2024 06:01:00 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 21 Nov
- 2024 06:01:00 -0800
-Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 21 Nov
- 2024 06:00:58 -0800
-From: Avihai Horon <avihaih@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <kvm@vger.kernel.org>, Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe
-	<jgg@nvidia.com>, Maor Gottlieb <maorg@nvidia.com>, Avihai Horon
-	<avihaih@nvidia.com>
-Subject: [PATCH v2] vfio/pci: Properly hide first-in-list PCIe extended capability
-Date: Thu, 21 Nov 2024 16:00:57 +0200
-Message-ID: <20241121140057.25157-1-avihaih@nvidia.com>
-X-Mailer: git-send-email 2.21.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975EE1D86C3
+	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 14:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732198031; cv=none; b=rebweHCjBoPjfy5sIHGMEXG/493sWabOhxZOZKko+WfQCB7ZyNtULseGb+tF3R1wIJ3P6xFcQ6fKQnZFeyaRiPOAS0/+LaMQNo+9hFGoLTLODOiaj+DqQDvzspZTL9NA+nUIEeKusFUxbufdItSKUAtLmVMm5ZKZOkJgGjR26k8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732198031; c=relaxed/simple;
+	bh=9uW5Dudj+swqaGbCjUsjteU63w49eLJj7HUQPfq++9Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dNkJg1IIRNjX45yt38WVpyttQhl3Mk0hJOwnYumDiXaWgVDvtNDLIbwUFfFCmL/w/dsq34H/kjEsklUj7DdFKef1RGCEfrz2JiaXe/0WCNjag/V9AXzFDY2wh3JigWaTMhs3v67jlgmSxp1RVEWp5mTD9iwjnZ1+21CpwRUnGAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ecn6E2ar; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732198028;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=C7tRH6nT8tzUEIZ5n33ADSmY1zfI1f6F5ul499NjvQI=;
+	b=Ecn6E2arKsjyCBjrEZKI2sw6RVeNMx+DMgn6+Xz6lOQsiy/1cLtx37Q+kgG/Gbm+Vs8XU7
+	nePNOIFlwxg9YDOyijVwDkGfP7fv8SD7TB6K0Oud5RK0rXTiU5S/Pgtuwp7hExwqscjtqa
+	uy8T1a883A/6ka1DFkCUraETq9MBIlU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-253-QrT5ZkkyPGm3LTofFfd9fw-1; Thu, 21 Nov 2024 09:07:06 -0500
+X-MC-Unique: QrT5ZkkyPGm3LTofFfd9fw-1
+X-Mimecast-MFC-AGG-ID: QrT5ZkkyPGm3LTofFfd9fw
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315eaa3189so8410855e9.1
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 06:07:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732198025; x=1732802825;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C7tRH6nT8tzUEIZ5n33ADSmY1zfI1f6F5ul499NjvQI=;
+        b=kZVucpMgtMHnh3iDONZImekN6M0mnsYOAMkMlaq0jeXbz1vUjKiAtgvuITZwqEoLii
+         1o2S49cz+PuzbRwtu4KNWNMyjQ1v89kRatDRrwmObTSYnQGji+UUVLOU1oXVJ1oxe5S5
+         eGDsUNNzfGIT1BVw23ZhNhWkVUVBeknwa25TmN4Bxn5QdHVarnfLP+lNJ9lFMxgjIM89
+         5mi7HnF53AfLTfKC2SF3IgS8n4e3vQvkLZkZn61AG/WJvMqzY80KdEOSaI3yR7b+TBh9
+         gahj+kdJIgGOEknM155HzYIFybO2k8D9Ul2ISI9WCqELK4NVrIA6DlTcSl8fT+mkaggt
+         yfVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4MvhcOzAsre2gWk1vIkr17Aw/19DjaX7ZECNFH/qC3aetsmz4BVjHFBoDakGr4PtQlOg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFhSjbhNRvJDnCc10+pCqMBYNe13CLph+M6fPqRGXYPPcHWrgF
+	YN0BTicVtj1Mt1R+DQh1B6wcJCARoyQ7VlSYjih7QbNVyUmKmyi2nafCWj6YkEeSTBcuhtv158I
+	b0hH5QlkJxT01NV3pTBqDKShz6Egxrlm8nr36M2WNRfGwwvF0Cg==
+X-Gm-Gg: ASbGncvpCAeAnuphG0CJ34vbOIGpk2SmAuRR15Mf4vec6xZsc+GVD7ce9uzUAHGQTh7
+	cNtS/dTvaluw4L6YQGmDvdR+pm6p+Lg3JvcvzzbsoHDdihHlUaD06wFat1YTMNE3JdGUfV24Uy/
+	gxH7sbJot8482ewVbEPg0u8mRe4maulvaTxfZD8lGjd/rw5iptGL/WZe0SjyDg7rnl+QGIA+3ls
+	PkPOiCAwkKtbV4c5ECggVY6tnrmkD0sBnL6aXwZ5GFS3C6uTJ4B
+X-Received: by 2002:a05:600c:a01:b0:431:59b2:f0c4 with SMTP id 5b1f17b1804b1-433489a02f2mr70066525e9.8.1732198025404;
+        Thu, 21 Nov 2024 06:07:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGErVlXnz0iTStRiT3lm2XztCeR4j5PanjVYk+18Bw5BOFsvkHxWCMSfhXHKVKZNlEzY/r/6w==
+X-Received: by 2002:a05:600c:a01:b0:431:59b2:f0c4 with SMTP id 5b1f17b1804b1-433489a02f2mr70065855e9.8.1732198024879;
+        Thu, 21 Nov 2024 06:07:04 -0800 (PST)
+Received: from [192.168.10.3] ([151.49.91.173])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432f642f15esm85373565e9.0.2024.11.21.06.07.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2024 06:07:04 -0800 (PST)
+Message-ID: <901c7d58-9ca2-491b-8884-c78c8fb75b37@redhat.com>
+Date: Thu, 21 Nov 2024 15:07:03 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF0000000F:EE_|DS7PR12MB8083:EE_
-X-MS-Office365-Filtering-Correlation-Id: 843b7e1a-7598-4173-827e-08dd0a34f4f6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KU5FmCWWvQ+XYWgdXzRQXy3+V1Eo7ubi3wWwfdYAv9xLpcTKGYCabdLd4hpP?=
- =?us-ascii?Q?3yRsZC4AuD6z32Cvo8HncWMrMtqVcoJHLFk3urrvOHHIwh5l6Dy/exuKEYLV?=
- =?us-ascii?Q?2zgedw3//r9u9VBveYRdMm/501amzjWwHo81nOcuxW0Adqvqgu2T2kdTajhk?=
- =?us-ascii?Q?k/aphMS89drRSXDor/mIkV54PKTVzSq4ALpVEfPzKsPRja8WzzTLow+qaGTN?=
- =?us-ascii?Q?I41cC447VsiKDsPpQl2G6WWB7HMCPoBk6Sai8mYu2E9IvoWtqFw1UAHuiIuS?=
- =?us-ascii?Q?ii1MaTPEy5N6NQSW7U90RKFp0ORSoeFTixrMAFmJfU4/rkpfgm2SAfwCPUFU?=
- =?us-ascii?Q?L+hBE2lSdlQxTtu6WEK1Fa2SKIW+2zLjOmKXlPZeOi4r9I0a0QtD7n9h9uIg?=
- =?us-ascii?Q?o/WqaVl6Nn8s/6OWWTdKbx/5eyW1t/khGePYVZ0JO3O+zXaLmlEXSGuvL9Bc?=
- =?us-ascii?Q?BhwZ5kdrCq6XD4zHVh9DBh3UajpFqGa1TVF7qZzsLo3P2TBB2VVA5HQB76jk?=
- =?us-ascii?Q?TctJb3nVl5sIbaGMu7/V1bc7XcSvcq8WAfj4bSisCPHrDn2MAFho6xWxGYnv?=
- =?us-ascii?Q?WVhnub/f1JL880jrMGNlHW0AgqxLhZHcQe6EYIlmInnuE4nojXCBX4GGIK67?=
- =?us-ascii?Q?xXoatll6aHRg9xIYrSUcQcq/ylLqDWTBxmsPO2a/FDh4nKpEmMRtsf4vYJNT?=
- =?us-ascii?Q?Kb3BIlQRDwW54IjKF6EHjIXK+KYMQOENADE14fXKT6IkJLQhXgkhQUnJWOeB?=
- =?us-ascii?Q?GjCkL+V9v7Ieo3S8SnAa3ahlY8rWCk1oZL/mlTS5z57mDgUZj2E1xAUyuS0c?=
- =?us-ascii?Q?Hpkfou4e3zmdgOqAZX3qereglco5QJZP5E/JExZgfl1io2SZJVUAY5BTAadp?=
- =?us-ascii?Q?QNo6cJjSQ33tKKUzNhpMaQO+frZ7+EHI1qwiOodYXCRJcQd7WCxF+OAtuMWa?=
- =?us-ascii?Q?y7URCRSlTewlHwpO48Mt+APg0DlvMNCUoN3rXjGTxqrvgID+b7bllw1u6D2Z?=
- =?us-ascii?Q?/nmIKIAjMzQeWfNsyC1JHhKRC1BYr/uUAQeBD+qWVVdsGNUnm1irnAwsGe/+?=
- =?us-ascii?Q?z6NZhKda4opTCjuAZKzLlJCMrrAtFwzpYW5R8v3eMVb6rmt9+R8DYX7isgid?=
- =?us-ascii?Q?Yk9aoPKQrYa2haLdW8DN62Thftcp1WKwMwUvWS/iQibDXG60A16EST95tVg1?=
- =?us-ascii?Q?311v+Wu9boE/D+PsiDUML0FyfxVTpJR11mnVj6KVoaL2jruLHrhlJSiLmUzT?=
- =?us-ascii?Q?Er8J4YKNHV9XoxGkjbXuPK0JDf4/6iQYiSkMZiQBLWYdbZYBCw/4bgGW08wb?=
- =?us-ascii?Q?NpKjUDuCD5mTyCU3YAr0ZEEVBOsdF43T5RZnJxGqM9xA1Lq3LKaqZw6+W0IR?=
- =?us-ascii?Q?wZ5PCTdXd+jznC0ZcWvQLLZNi05UmzL2oGC0zTw+AyXylOU47A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 14:01:11.6945
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 843b7e1a-7598-4173-827e-08dd0a34f4f6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF0000000F.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8083
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 6.13 merge window
+To: Nathan Chancellor <nathan@kernel.org>, Sasha Levin <sashal@kernel.org>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20241120135842.79625-1-pbonzini@redhat.com>
+ <Zz8t95SNFqOjFEHe@sashalap> <20241121132608.GA4113699@thelio-3990X>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20241121132608.GA4113699@thelio-3990X>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There are cases where a PCIe extended capability should be hidden from
-the user. For example, an unknown capability (i.e., capability with ID
-greater than PCI_EXT_CAP_ID_MAX) or a capability that is intentionally
-chosen to be hidden from the user.
+On 11/21/24 14:26, Nathan Chancellor wrote:
+> On Thu, Nov 21, 2024 at 07:56:23AM -0500, Sasha Levin wrote:
+>> Hi Paolo,
+>>
+>> On Wed, Nov 20, 2024 at 08:58:42AM -0500, Paolo Bonzini wrote:
+>>>       riscv: perf: add guest vs host distinction
+>>
+>> When merging this PR into linus-next, I've started seeing build errors:
+>>
+>> Looks like this is due to 2c47e7a74f44 ("perf/core: Correct perf
+>> sampling with guest VMs") which went in couple of days ago through
+>> Ingo's perf tree and changed the number of parameters for
+>> perf_misc_flags().
 
-Hiding a capability is done by virtualizing and modifying the 'Next
-Capability Offset' field of the previous capability so it points to the
-capability after the one that should be hidden.
+Thanks Sasha. :(  Looks like Stephen does not build for risc-v.
 
-The special case where the first capability in the list should be hidden
-is handled differently because there is no previous capability that can
-be modified. In this case, the capability ID and version are zeroed
-while leaving the next pointer intact. This hides the capability and
-leaves an anchor for the rest of the capability list.
+> There is a patch out to fix this but it seems like it needs to be
+> applied during this merge?
+> 
+> https://lore.kernel.org/20241116160506.5324-1-prabhakar.mahadev-lad.rj@bp.renesas.com/
 
-However, today, hiding the first capability in the list is not done
-properly if the capability is unknown, as struct
-vfio_pci_core_device->pci_config_map is set to the capability ID during
-initialization but the capability ID is not properly checked later when
-used in vfio_config_do_rw(). This leads to the following warning [1] and
-to an out-of-bounds access to ecap_perms array.
+Yes, this works.  To test it after the merge I did it.
 
-Fix it by checking cap_id in vfio_config_do_rw(), and if it is greater
-than PCI_EXT_CAP_ID_MAX, use an alternative struct perm_bits for direct
-read only access instead of the ecap_perms array.
+   curl https://lore.kernel.org/linux-riscv/20241116160506.5324-1-prabhakar.mahadev-lad.rj@bp.renesas.com/raw | patch -p1
+   git add -p
+   git commit --amend
 
-Note that this is safe since the above is the only case where cap_id can
-exceed PCI_EXT_CAP_ID_MAX (except for the special capabilities, which
-are already checked before).
 
-[1]
+This should have been handled with a topic branch, and there is another
+nontrivial conflict with Catalin's tree that should have been handled
+with a topic branch.  (I knew about that one, but his topic branch also
+had a conflict with something else; so I un-pulled it and then forgot
+about it).
 
-WARNING: CPU: 118 PID: 5329 at drivers/vfio/pci/vfio_pci_config.c:1900 vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
-CPU: 118 UID: 0 PID: 5329 Comm: simx-qemu-syste Not tainted 6.12.0+ #1
-(snip)
-Call Trace:
- <TASK>
- ? show_regs+0x69/0x80
- ? __warn+0x8d/0x140
- ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
- ? report_bug+0x18f/0x1a0
- ? handle_bug+0x63/0xa0
- ? exc_invalid_op+0x19/0x70
- ? asm_exc_invalid_op+0x1b/0x20
- ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
- ? vfio_pci_config_rw+0x244/0x430 [vfio_pci_core]
- vfio_pci_rw+0x101/0x1b0 [vfio_pci_core]
- vfio_pci_core_read+0x1d/0x30 [vfio_pci_core]
- vfio_device_fops_read+0x27/0x40 [vfio]
- vfs_read+0xbd/0x340
- ? vfio_device_fops_unl_ioctl+0xbb/0x740 [vfio]
- ? __rseq_handle_notify_resume+0xa4/0x4b0
- __x64_sys_pread64+0x96/0xc0
- x64_sys_call+0x1c3d/0x20d0
- do_syscall_64+0x4d/0x120
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-Signed-off-by: Avihai Horon <avihaih@nvidia.com>
----
-Changes from v1:
-* Use Alex's suggestion to fix the bug and adapt the commit message.
----
- drivers/vfio/pci/vfio_pci_config.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+Linus,
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 97422aafaa7b..b2a1ba66e5f1 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -313,12 +313,16 @@ static int vfio_virt_config_read(struct vfio_pci_core_device *vdev, int pos,
- 	return count;
- }
- 
-+static const struct perm_bits direct_ro_perms = {
-+	.readfn = vfio_direct_config_read,
-+};
+if you prefer to get a reviewed pull request with the topic branches
+included, then the changes since commit 2c47e7a74f445426d156278e339b7abb259e50de:
+
+   perf/core: Correct perf sampling with guest VMs (2024-11-14 10:40:01 +0100)
+
+are available in the Git repository at:
+
+   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-with-topic-branches-6.13
+
+for you to fetch changes up to bde387a8d81735a93c115ee4f1bd99718e5d30b0:
+
+   Merge branch 'for-next/mte' of git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux into HEAD (2024-11-21 08:53:23 -0500)
+
+
+Alternatively,
+
+the best way to get the RISC-V fix is the curl invocation above, and after
+my signature is the conflict resolution for Catalin's tree.
+
+
+Thanks,
+
+Paolo
+
+
+diff --cc arch/arm64/kvm/guest.c
+index 4cd7ffa76794,e738a353b20e..12dad841f2a5
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@@ -1051,11 -1051,13 +1051,12 @@@ int kvm_vm_ioctl_mte_copy_tags(struct k
+   	}
+   
+   	while (length > 0) {
+  -		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
+  +		struct page *page = __gfn_to_page(kvm, gfn, write);
+   		void *maddr;
+   		unsigned long num_tags;
+  -		struct page *page;
++ 		struct folio *folio;
+   
+  -		if (is_error_noslot_pfn(pfn)) {
+  +		if (!page) {
+   			ret = -EFAULT;
+   			goto out;
+   		}
+@@@ -1090,8 -1099,12 +1097,12 @@@
+   			/* uaccess failed, don't leave stale tags */
+   			if (num_tags != MTE_GRANULES_PER_PAGE)
+   				mte_clear_page_tags(maddr);
+- 			set_page_mte_tagged(page);
++ 			if (folio_test_hugetlb(folio))
++ 				folio_set_hugetlb_mte_tagged(folio);
++ 			else
++ 				set_page_mte_tagged(page);
 +
- /* Default capability regions to read-only, no-virtualization */
- static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
--	[0 ... PCI_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
-+	[0 ... PCI_CAP_ID_MAX] = direct_ro_perms
- };
- static struct perm_bits ecap_perms[PCI_EXT_CAP_ID_MAX + 1] = {
--	[0 ... PCI_EXT_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
-+	[0 ... PCI_EXT_CAP_ID_MAX] = direct_ro_perms
- };
- /*
-  * Default unassigned regions to raw read-write access.  Some devices
-@@ -1897,9 +1901,17 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
- 		cap_start = *ppos;
- 	} else {
- 		if (*ppos >= PCI_CFG_SPACE_SIZE) {
--			WARN_ON(cap_id > PCI_EXT_CAP_ID_MAX);
-+			/*
-+			 * We can get a cap_id that exceeds PCI_EXT_CAP_ID_MAX
-+			 * if we're hiding an unknown capability at the start
-+			 * of the extended capability list.  Use default, ro
-+			 * access, which will virtualize the id and next values.
-+			 */
-+			if (cap_id > PCI_EXT_CAP_ID_MAX)
-+				perm = (struct perm_bits *)&direct_ro_perms;
-+			else
-+				perm = &ecap_perms[cap_id];
- 
--			perm = &ecap_perms[cap_id];
- 			cap_start = vfio_find_cap_start(vdev, *ppos);
- 		} else {
- 			WARN_ON(cap_id > PCI_CAP_ID_MAX);
--- 
-2.40.1
+  -			kvm_release_pfn_dirty(pfn);
+  +			kvm_release_page_dirty(page);
+   		}
+   
+   		if (num_tags != MTE_GRANULES_PER_PAGE) {
 
 
