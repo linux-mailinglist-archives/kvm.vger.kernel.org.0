@@ -1,206 +1,276 @@
-Return-Path: <kvm+bounces-32257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DEC9D4C7E
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 13:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1C29D4CA0
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 13:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 901E6B289CC
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:00:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A8A6B2158C
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2024 12:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45AD1D63FD;
-	Thu, 21 Nov 2024 11:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A107D1D07B2;
+	Thu, 21 Nov 2024 12:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GCOteERi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGK0vBmU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE89E1D2B13;
-	Thu, 21 Nov 2024 11:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8543179
+	for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 12:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732190382; cv=none; b=dCtaEe0egEXsLy7r11A/RXZPTWb8DOYKjFVH2t1rViaWUFQR4s4Raj+goSMOc1Cd6/MmCi8v7Vow9n0PMHrhxNmulAFThN6/J3ZiTXgSHIIqZj8+vOU6+IrmLNynMnsDKc92lCKmDv+G9Z1OAu2hN1B2kUv0UhWtJydP6FZvUNw=
+	t=1732191328; cv=none; b=YFoye5kZnHmDQkkQb833yDczRMXsmQ1NvPrbRs3VgXexGyiUpYWcKYnoX0LkdfBB5/BdV9CWG+3f2P5AFS5m5DXKFhBZjxO6fWjsUDXZj8Ex9u1kMVYBFhm8uV9+YDVblyZqCCm80akjtNx+ndkoCqWFH9IB+uZlN7pQ18D+73E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732190382; c=relaxed/simple;
-	bh=5kBYzGS748MhlX9s7PCCnBu6ZsoqdrDORvYFy2xenI8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P3vNFOZvvT/wWVswbt3cQLRrXpz5hsZA+24exAN6eM/+kiZAakqVjafw/5wVN9eNc08lcncKL6/HNCRf7I52C6Cd0paARHJsp2dJJdDoUxfD2knPQdTbeVqGsKYzBmKS91P2LC+MAvPCipUPb1pyS9dfZaSv/ZWJFjUKqgefGYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GCOteERi; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732190381; x=1763726381;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5kBYzGS748MhlX9s7PCCnBu6ZsoqdrDORvYFy2xenI8=;
-  b=GCOteERiDEB3YO/+Wsr+R+I5Zg9e0Do4WIuyTpSF8c+1BLw419/0XIp8
-   XdiyhxA6i/SbU31J16qwpNdfaloOVG48xiHGs4q+aVN9l0kr0/YhWoRh7
-   MlRs4YraELM0tOKfFdUux9QCl0TN2ptD6JvXiloL7lQfL0+BU3sKqnDVR
-   dQt1tpWqL0dyCZgBZYtMed65KWZTWbNQiyKLe5tOZ69X83NHtq4fgA+G5
-   DVeKg9taxOqmxDJpW5LThsZ/doVn+6qCxydrao1KYlfIR7rYXyeDb6Spo
-   B1Ke+pBS2ndIEIF1d3ulYLi6uhbDVnqLAmEQ7nYc31H8sSdD2cpUhtLF3
-   A==;
-X-CSE-ConnectionGUID: sEYwAnhzTsepN4XriEofkg==
-X-CSE-MsgGUID: UBFczQvRQ4CqTxKUbrpH+g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="42940726"
-X-IronPort-AV: E=Sophos;i="6.12,172,1728975600"; 
-   d="scan'208";a="42940726"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 03:59:40 -0800
-X-CSE-ConnectionGUID: rWfNUW8lTry9FZZJvCmqXg==
-X-CSE-MsgGUID: 6zeHSrmDQ0CVQUgTFQoYlQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,172,1728975600"; 
-   d="scan'208";a="90398304"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 03:59:36 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: dave.hansen@linux.intel.com,
-	rick.p.edgecombe@intel.com,
-	kai.huang@intel.com,
-	adrian.hunter@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@intel.com,
-	binbin.wu@linux.intel.com,
-	dmatlack@google.com,
-	isaku.yamahata@intel.com,
-	isaku.yamahata@gmail.com,
-	nik.borisov@suse.com,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 2/2] KVM: TDX: Kick off vCPUs when SEAMCALL is busy during TD page removal
-Date: Thu, 21 Nov 2024 19:57:03 +0800
-Message-ID: <20241121115703.26381-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20241121115139.26338-1-yan.y.zhao@intel.com>
-References: <20241121115139.26338-1-yan.y.zhao@intel.com>
+	s=arc-20240116; t=1732191328; c=relaxed/simple;
+	bh=bFtWSnyszr1WL+XBp+VI0x8AlLLXfFSA63R2QL+Z/ZU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=nmJlD9kOw9udNFnFSbShEHxlKlQqe6wqFyCButf3sKA62Ro+mtAXZ8zoQnkC2gx8QrZwLpXl3rtHj8xUs9RqYzce/U5PChANR7JZwMTAGBlKk1eZbq/XysexBIt5n2KwHE+WE+CF7e9mMN6kVNCzKVimTDD4DqJmlG+iSv/+g1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGK0vBmU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732191325;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6QJPf/QXzHw/XfmlRsdzm6NkegP6JwGL9mVJti62D7U=;
+	b=TGK0vBmU6PEyLOBxlU89ffozCtmQ5EczaYXQKxIM9QsS5X6r1S6FYSs9ZMpj9eGLTt/4p9
+	ibPgX292mMj8vMd5WkqSjSNkYDAcCW5gltQcvtU/wscbLHJGVatjZ6fGNeJgDxydOhn/t4
+	0MkvR5xTS+gIxHl6iocSi6D1hRPwep8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-222-FhnyF17OPd-Ql_fxv4xfAg-1; Thu, 21 Nov 2024 07:15:24 -0500
+X-MC-Unique: FhnyF17OPd-Ql_fxv4xfAg-1
+X-Mimecast-MFC-AGG-ID: FhnyF17OPd-Ql_fxv4xfAg
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3823d2f712fso409473f8f.2
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 04:15:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732191323; x=1732796123;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6QJPf/QXzHw/XfmlRsdzm6NkegP6JwGL9mVJti62D7U=;
+        b=R2o+rqkvG6C4xl57E1at3NhcrTIpjtyY4tD9JxSQW44kJ7caoIMphqj7D9GARYaJOB
+         9ziX9LZrxcRjdFGMqGnLPPMu2mnq1JQgfG2uG25NxYDmTlpd+2701bCkc8fzjOrl8rZM
+         3hYU9ipWdveb5mPSO8v6OQrz9qGCqdgL5Uy0nIOmLInRNGv7paZ8vzZFJBg1xGsxGal0
+         otbUnaXVM3gjwPcSbp3xUQgObmClRk+EDBrJ5S3wiDa/yqSwllUV30Rza98mXUF1keeO
+         fTJG1m1MDBJXiO+Q+p7OVBJ7DtrtPW+ZMxf/lJOXzoATEk1gwm1S0s4q7cruv0kr41kq
+         biWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVRLoiGQhYZE40l99auREXL6dS60gxLGGz4Qubo/6AjJ12OyjnC/vPI9JgCCqPvrkIpqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq7rOkGn8qdzLhnP1LElS9Ru4SYPH0HyJfKMtm23yodZuJygy9
+	9MQybp6rTe3DOwtQFGsDWB8l/s98AF3GQl7l+zWl+x/Na6lyTi2ChSxvaULGNhuwLzAqdmJdk82
+	ouyIyvFEtyX2Vrjsnwlk9R84VRdZgtSR7ZmiRa/TM9HYHyT3+6A==
+X-Gm-Gg: ASbGncsKUHfUstZFpLlx1CSy8PjL2uVSGGZ8zu87jPD8NypjMpF7Ww8wooD6jZxkHWi
+	rAu3oS4Qs2X13yY2NWlDhtbAXl1wdsf+fC98cm1V5MWFMk1NC/LDFpZtnsepqrsiITFE5VM4p09
+	DpvgI1p7Fh16pS3l1RrRNjJbrLD5cTra9l9hZe+1fjcgz1mPBsE13lxLiOzVF83ThInAcUCx9W6
+	N1ChbYWYvgIl3T6+1GmLkV25GyqPdmeSSPwROUPswY6TaoMiB/OkKwgK6g1y0sbb6MF9LbBHOaA
+	YYOEugUqW4WzwibAQWvEvFBKh9Qi98szoIHTzWNm70D0pc+QrMKaQyr4k4whfBwnJlDVm2ft39I
+	=
+X-Received: by 2002:a5d:6dae:0:b0:382:5010:c8c0 with SMTP id ffacd0b85a97d-38254b1629fmr4738671f8f.39.1732191323113;
+        Thu, 21 Nov 2024 04:15:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGf+JeO8PlWSGqxi8WzLLx0/13BvnWEOSX9j/uGWQ2jCJhjWZQ5v7kj7e8JRuJ55NvMjP3HrQ==
+X-Received: by 2002:a5d:6dae:0:b0:382:5010:c8c0 with SMTP id ffacd0b85a97d-38254b1629fmr4738643f8f.39.1732191322698;
+        Thu, 21 Nov 2024 04:15:22 -0800 (PST)
+Received: from ?IPV6:2003:cb:c70c:de00:1200:8636:b63b:f43? (p200300cbc70cde0012008636b63b0f43.dip0.t-ipconnect.de. [2003:cb:c70c:de00:1200:8636:b63b:f43])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825493ee59sm4842152f8f.103.2024.11.21.04.15.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2024 04:15:22 -0800 (PST)
+Message-ID: <fbb59ba8-7d8c-4d64-ab46-d4950c073018@redhat.com>
+Date: Thu, 21 Nov 2024 13:15:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ISSUE] split_folio() and dirty IOMAP folios
+From: David Hildenbrand <david@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ kvm@vger.kernel.org, Zi Yan <ziy@nvidia.com>,
+ Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
+ <djwong@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+References: <4febc035-a4ff-4afe-a9a0-d127826852a9@redhat.com>
+ <ZyzmUW7rKrkIbQ0X@casper.infradead.org>
+ <ada851da-70c2-424e-b396-6153cecf7179@redhat.com>
+ <Zy0g8DdnuZxQly3b@casper.infradead.org>
+ <6099e202-ef0a-4d21-958c-2c42db43a5bb@redhat.com>
+ <d3600a33-a481-4c4c-bda6-a446f1c965c6@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <d3600a33-a481-4c4c-bda6-a446f1c965c6@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-For tdh_mem_range_block(), tdh_mem_track(), tdh_mem_page_remove(),
+On 11.11.24 16:19, David Hildenbrand wrote:
+> On 08.11.24 10:11, David Hildenbrand wrote:
+>> On 07.11.24 21:20, Matthew Wilcox wrote:
+>>> On Thu, Nov 07, 2024 at 05:34:40PM +0100, David Hildenbrand wrote:
+>>>> On 07.11.24 17:09, Matthew Wilcox wrote:
+>>>>> On Thu, Nov 07, 2024 at 04:07:08PM +0100, David Hildenbrand wrote:
+>>>>>> I'm debugging an interesting problem: split_folio() will fail on dirty
+>>>>>> folios on XFS, and I am not sure who will trigger the writeback in a timely
+>>>>>> manner so code relying on the split to work at some point (in sane setups
+>>>>>> where page pinning is not applicable) can make progress.
+>>>>>
+>>>>> You could call something like filemap_write_and_wait_range()?
+>>>>
+>>>> Thanks, have to look into some details of that.
+>>>>
+>>>> Looks like the folio_clear_dirty_for_io() is buried in
+>>>> folio_prepare_writeback(), so that part is taken care of.
+>>>>
+>>>> Guess I have to fo from folio to "mapping,lstart,lend" such that
+>>>> __filemap_fdatawrite_range() would look up the folio again. Sounds doable.
+>>>>
+>>>> (I assume I have to drop the folio lock+reference before calling that)
+>>>
+>>> I was thinking you'd do it higher in the callchain than
+>>> gmap_make_secure().  Presumably userspace says "I want to make this
+>>> 256MB range secure" and we can start by writing back that entire
+>>> 256MB chunk of address space.
+>>>
+>>> That doesn't prevent anybody from dirtying it in-between, of course,
+>>> so you can still get -EBUSY and have to loop round again.
+>>
+>> I'm afraid that won't really work.
+>>
+>> On the one hand, we might be allocating these pages (+disk blocks)
+>> during the unpack operation -- where we essentially trigger page faults
+>> first using gmap_fault() -- so the pages might not even exist before the
+>> gmap_make_secure() during unpack. One work around would be to
+>> preallocate+writeback from user space, but it doesn't sound quite right.
+>>
+>> But the bigger problem I see is that the initial "unpack" operation is
+>> not the only case where we trigger this conversion to "secure" state.
+>> Once the VM is running, we can see calls on arbitrary guest memory even
+>> during page faults, when gmap_make_secure() is called via
+>> gmap_convert_to_secure().
+>>
+>>
+>> I'm still not sure why we see essentially no progress being made, even
+>> though we temporarily drop the PTL, mmap lock, folio lock, folio ref ...
+>> maybe related to us triggering a write fault that somehow ends up
+>> setting the folio dirty :/ Or because writeback is simply too slow /
+>> backs off.
+>>
+>> I'll play with handling -EBUSY from split_folio() differently: if the
+>> folio is under writeback, wait on that. If the folio is dirty, trigger
+>> writeback. And I'll look into whether we really need a writable PTE, I
+>> suspect not, because we are not actually "modifying" page content.
+> 
+> The following hack makes it fly:
+> 
+>           case -E2BIG:
+>                   folio_lock(folio);
+>                   rc = split_folio(folio);
+> +               if (rc == -EBUSY) {
+> +                       if (folio_test_dirty(folio) && !folio_test_anon(folio) &&
+> +                           folio->mapping) {
+> +                               struct address_space *mapping = folio->mapping;
+> +                               loff_t lstart = folio_pos(folio);
+> +                               loff_t lend = lstart + folio_size(folio);
+> +
+> +                               folio_unlock(folio);
+> +                               /* Mapping can go away ... */
+> +                               filemap_write_and_wait_range(mapping, lstart, lend);
+> +                       } else {
+> +                               folio_unlock(folio);
+> +                       }
+> +                       folio_wait_writeback(folio);
+> +                       folio_lock(folio);
+> +                       split_folio(folio);
+> +                       folio_unlock(folio);
+> +                       folio_put(folio);
+> +                       return -EAGAIN;
+> +               }
+>                   folio_unlock(folio);
+>                   folio_put(folio);
+> 
+> 
+> I think the reason why we don't make any progress on s390x is that the writeback will
+> mark the folio clean and turn the folio read-only in the page tables as well. So when we
+> lookup the folio again in the page table, we see that the PTE is not writable and
+> trigger a write fault ...
+> 
+> ... the write fault will mark the folio dirty again, so the split will never succeed.
+> 
+> In above diff, we really must try the split_folio() a second time after waiting, otherwise we
+> run into the same endless loop.
+> 
+> 
+> I'm still not 100% sure if we need a writable PTE; after all we are not modifying page content.
+> But that's just a side effect of not being able to wait for the split_folio() to make progress
+> in the writeback case so we can retry the split again.
 
-- Upon detection of TDX_OPERAND_BUSY, retry each SEAMCALL only once.
-- During the retry, kick off all vCPUs and prevent any vCPU from entering
-  to avoid potential contentions.
+After discussing this with Darrick and Willy yesterday, I think the 
+reason we need a writable PTE is because we *might* modify page content:
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/vmx/tdx.c          | 49 +++++++++++++++++++++++++--------
- 2 files changed, 40 insertions(+), 11 deletions(-)
+"Requests the Ultravisor to make a page accessible to a guest. If it's 
+brought in the first time, it will be cleared. If it has been exported 
+before, it will be decrypted and integrity checked."
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 521c7cf725bc..bb7592110337 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -123,6 +123,8 @@
- #define KVM_REQ_HV_TLB_FLUSH \
- 	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(34)
-+#define KVM_REQ_NO_VCPU_ENTER_INPROGRESS \
-+	KVM_ARCH_REQ_FLAGS(33, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 60d9e9d050ad..ed6b41bbcec6 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -311,6 +311,20 @@ static void tdx_clear_page(unsigned long page_pa)
- 	__mb();
- }
- 
-+static void tdx_no_vcpus_enter_start(struct kvm *kvm)
-+{
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_NO_VCPU_ENTER_INPROGRESS);
-+}
-+
-+static void tdx_no_vcpus_enter_stop(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		kvm_clear_request(KVM_REQ_NO_VCPU_ENTER_INPROGRESS, vcpu);
-+}
-+
- /* TDH.PHYMEM.PAGE.RECLAIM is allowed only when destroying the TD. */
- static int __tdx_reclaim_page(hpa_t pa)
- {
-@@ -1648,15 +1662,20 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm))
- 		return -EINVAL;
- 
--	do {
--		/*
--		 * When zapping private page, write lock is held. So no race
--		 * condition with other vcpu sept operation.  Race only with
--		 * TDH.VP.ENTER.
--		 */
-+	/*
-+	 * When zapping private page, write lock is held. So no race
-+	 * condition with other vcpu sept operation.  Race only with
-+	 * TDH.VP.ENTER.
-+	 */
-+	err = tdh_mem_page_remove(kvm_tdx->tdr_pa, gpa, tdx_level, &entry,
-+				  &level_state);
-+	if ((err & TDX_OPERAND_BUSY)) {
-+		/* After no vCPUs enter, the second retry is expected to succeed */
-+		tdx_no_vcpus_enter_start(kvm);
- 		err = tdh_mem_page_remove(kvm_tdx->tdr_pa, gpa, tdx_level, &entry,
- 					  &level_state);
--	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-+		tdx_no_vcpus_enter_stop(kvm);
-+	}
- 
- 	if (unlikely(kvm_tdx->state != TD_STATE_RUNNABLE &&
- 		     err == (TDX_EPT_WALK_FAILED | TDX_OPERAND_ID_RCX))) {
-@@ -1728,8 +1747,12 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 	WARN_ON_ONCE(level != PG_LEVEL_4K);
- 
- 	err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &entry, &level_state);
--	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
--		return -EAGAIN;
-+	if (unlikely(err & TDX_OPERAND_BUSY)) {
-+		/* After no vCPUs enter, the second retry is expected to succeed */
-+		tdx_no_vcpus_enter_start(kvm);
-+		err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &entry, &level_state);
-+		tdx_no_vcpus_enter_stop(kvm);
-+	}
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
- 		return -EIO;
-@@ -1772,9 +1795,13 @@ static void tdx_track(struct kvm *kvm)
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
--	do {
-+	err = tdh_mem_track(kvm_tdx->tdr_pa);
-+	if ((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY) {
-+		/* After no vCPUs enter, the second retry is expected to succeed */
-+		tdx_no_vcpus_enter_start(kvm);
- 		err = tdh_mem_track(kvm_tdx->tdr_pa);
--	} while (unlikely((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY));
-+		tdx_no_vcpus_enter_stop(kvm);
-+	}
- 
- 	if (KVM_BUG_ON(err, kvm))
- 		pr_tdx_error(TDH_MEM_TRACK, err);
+So we'll be effectively modifying the page content we will read when the 
+(now secure) page is in the unprotected/exported state.
+
+That makes things more complicated, unfortunately :)
+
 -- 
-2.43.2
+Cheers,
+
+David / dhildenb
 
 
