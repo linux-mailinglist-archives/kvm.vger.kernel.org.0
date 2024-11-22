@@ -1,135 +1,201 @@
-Return-Path: <kvm+bounces-32364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A70FC9D6054
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 15:33:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857889D60F7
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 15:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D5232828C2
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 14:33:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC5DB22218
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 14:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A655483A14;
-	Fri, 22 Nov 2024 14:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A571531C4;
+	Fri, 22 Nov 2024 14:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ix+QncUW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDAgDFlG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2FE2AF12;
-	Fri, 22 Nov 2024 14:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329FE2D05E
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 14:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732286023; cv=none; b=DoeY5spGuGNRQbYKD0ElD3/c1KIswqPVv2J7Su1AQUrn0MQasZJnSuFJ9gNRDUJ1XLh/ZMnTWKWLOWf5Synk9YbcVRmroKI7lHxtNvposuV+Fgn92RB2K4gcJyHJoSSEXaV1cn9CIeF5lykdKDNX/Dg0OhD+512iYh3Foned2LA=
+	t=1732287433; cv=none; b=BNyIvnn8GudH50D+cA+05bW78dGRB09msvixW8M1X4IYjvnkPqqRJa4JxnTJc5+OnKATf7iISn2QNn9SwwSvgHOWODbAkLHbh+i40p79ShsEbWSa9XCBYJQ5Uj96uXe/xVL21BMy8qljoHFw2c97H8ZmwNE4bPEhs7ZpPIAkw3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732286023; c=relaxed/simple;
-	bh=36CxdThi0cT/QJPnfG6dSFlpyNfVpP3+IY6l53EPypA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YQjkKBhldPrsg/JhUPvCP8GUszKtiMAlW4BZEkz3yCSOL8BXq7mwOlOD8KbVDQUJXVVIXEyisUHEABJMdDGVQ89BjXGWZkmRpnODoy7d6RvIiGQhsvCDn00/K2sWdxkaYwMqP7wqCElA+fKAiPPbXp705K2cYdogyMUryOOSBwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ix+QncUW; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732286021; x=1763822021;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=36CxdThi0cT/QJPnfG6dSFlpyNfVpP3+IY6l53EPypA=;
-  b=ix+QncUWemUTwYDWKh4g2JpmKRsh1pAwcTJyKkMUy+zBEjihLZs8/itd
-   jvLPk8JHb5sZADGrgAjUwoyqpLX8YJebJSOXKkH/Piy8pf3Ud589t8lxE
-   pwvbkE5Ve/oelapnEZA7q02s2dDFz8yWwU6nIBg4Oh6Zpg7NyzO3DAV+p
-   quMbb+070fBJfT18nQ8avzclcivTfAbErUZSaxKCBIz5y6NaKSjZ4P1Ug
-   d5e4QluqsXz7FgGW7VIpc4EUkHI3wZpdmsIUqAq8gs9nP4t7rRE/IN/Jy
-   pSlgJfigVu77CaG/lX+qW7oth4R2RXiA/aSs36ZJ7RPoM8wVTpOhnf3MK
-   Q==;
-X-CSE-ConnectionGUID: oXkKMafqQE64t8DuG2wecA==
-X-CSE-MsgGUID: VbCpvwD2RvuhniRctBSU+Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11264"; a="57845028"
-X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
-   d="scan'208";a="57845028"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 06:33:41 -0800
-X-CSE-ConnectionGUID: w80cp0sjRk+6MMoskNonKQ==
-X-CSE-MsgGUID: FN4WnogZSYWs57cJaVDkKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
-   d="scan'208";a="91005889"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 06:33:36 -0800
-Message-ID: <837bbbc7-e7f3-4362-a745-310fe369f43d@intel.com>
-Date: Fri, 22 Nov 2024 16:33:27 +0200
+	s=arc-20240116; t=1732287433; c=relaxed/simple;
+	bh=tqqa48xgvR9pXkWvcyLzXe0k1qdpgquZatajbiXvd10=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=O1x+88Q5qgt+ZvYANvmapiMrls9buVMTziCvLBcXBShJ2IF+STd6FXIgI8DrQEK1hQFGZMluPZbQPtUuq+SHFEJX2Up0vyojKBHETBw9Lq1Jcjav75+SwdpLYI6UU9ii8c2JS4Ue4uH1jm6nIHKsqaHM0mJWzVJd4iaVhuFjxPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UDAgDFlG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732287431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sptth2+J7xYYlvrpOuYTMVo9n+vm/HkHIiB9PfWHJ6k=;
+	b=UDAgDFlG8XED7/CIpXsjVmEqeunIT4eXDsw31icDRspjRg3A11iQwsvIpuAOxtoL29DUwL
+	eT/DwuAgXRLT+KTr0P+lwaE3cS7GnSAAZP3UwmtcpkN75aRXZD4Hmm5XiHAWoewCkFpq5R
+	EUCb9iKMcoJFJ/01SZ1vSlSlNStYTe8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-50-I01YhmUlMUq8urTTzS9oeQ-1; Fri, 22 Nov 2024 09:57:10 -0500
+X-MC-Unique: I01YhmUlMUq8urTTzS9oeQ-1
+X-Mimecast-MFC-AGG-ID: I01YhmUlMUq8urTTzS9oeQ
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b15d3cd6dcso282815585a.0
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 06:57:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732287429; x=1732892229;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sptth2+J7xYYlvrpOuYTMVo9n+vm/HkHIiB9PfWHJ6k=;
+        b=YI7jmew6M8DyATU5Pp2MOBFXQ3LsWjzwSzu01OqzbNIN/v81wmaqdk9P9grjPpoet0
+         XkXhcNppoukvY+QI6vJDazx9Vu/B9AoEToZ83y2pqIArpUOtrSgh0CNGOCGOUv4WIM+K
+         0nGh5J1zNnZEjtOoJ7UaEMSU0//emr8syF5fspy8EmjG9oR4EHDCrgBln+DqaZ6hj7Ds
+         x0HkmqG040bh45Uk1RKAugN4s47UXmn++u1/XVJHEFzh4+SpgYu2VzD9J9clkGNKVObq
+         5p2rdFYvjetsqfBxGT9DKDUYj39BODl6mHgnS0C3MbvDeGkE/WNfQJGODwulp+dCb/Yg
+         9p6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWBLMvYn023yEVb0Er4X+yoaIslSN5Oe2AMCh84mXnX6SVvbpGzQmFsl3jRT2PZhhzUXZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLEvPfNwog48KMLaWC4plIZoFBd/PECj7wANR9i6AiQfah6PqO
+	tjQuaaCQSLoGi8+qWN0LLmMDnm5OxOUsM1iIqCuf+RJPvsK0Rqeb8JfxI8XpcQC37LrsTwZXaTV
+	l9jTB5dOUH6PwLMWxuAEbur2N0Fcl0MIoCLN9DLVnF8UvYVcCVg==
+X-Gm-Gg: ASbGncsps+hrWGgm625h4LhgbPfLNX4hMbx017tLxEFn+Vc5xyLPgj+RBfvBVvGbLmV
+	VBJ1dH2ufLO+Z3kNCJpbHSD6RkzaLhzAVMVEo7lzwAAg+zTsbbOioIpgxWVkKB8VogEgG8F+EbV
+	Vpj+PWc/F6q2Trltiu+H7ChmUMD69si2lXeybfAZfW+38J3KBCrJCt+fhRxRKYOBSkwyFF+lzxu
+	Tig44ToVP5mtJ+6P3xcnfxb5FtxAzDnvWnBwptrrukNbVinWY4v4p0CRnCUXVpA/pdLxmMCx6nv
+	ztVj9tDL2prWzUTAxxFCPWKmrz26PSUEKg0=
+X-Received: by 2002:a05:620a:4551:b0:7b1:522a:b05 with SMTP id af79cd13be357-7b514488166mr373600985a.7.1732287429584;
+        Fri, 22 Nov 2024 06:57:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHo66xOB/q1z1C9fiLdA8QOFwiL4+kiR9reyJMdimFadi7v3LEk57578pB7zv1XQEy4GyU/yA==
+X-Received: by 2002:a05:620a:4551:b0:7b1:522a:b05 with SMTP id af79cd13be357-7b514488166mr373597785a.7.1732287429065;
+        Fri, 22 Nov 2024 06:57:09 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b513faf57dsm93769985a.48.2024.11.22.06.57.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 06:57:08 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
+ x86@kernel.org, rcu@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Nicolas Saenz Julienne <nsaenzju@redhat.com>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Jonathan
+ Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, Vitaly
+ Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <quic_neeraju@quicinc.com>, Joel Fernandes
+ <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, Boqun
+ Feng <boqun.feng@gmail.com>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
+ Zqiang <qiang.zhang1211@gmail.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>,
+ Christoph Hellwig <hch@infradead.org>, Lorenzo Stoakes
+ <lstoakes@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jason Baron
+ <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>, Sami Tolvanen
+ <samitolvanen@google.com>, Ard Biesheuvel <ardb@kernel.org>, Nicholas
+ Piggin <npiggin@gmail.com>, Juerg Haefliger
+ <juerg.haefliger@canonical.com>, Nicolas Saenz Julienne
+ <nsaenz@kernel.org>, "Kirill A. Shutemov"
+ <kirill.shutemov@linux.intel.com>, Nadav Amit <namit@vmware.com>, Dan
+ Carpenter <error27@gmail.com>, Chuang Wang <nashuiliang@gmail.com>, Yang
+ Jihong <yangjihong1@huawei.com>, Petr Mladek <pmladek@suse.com>, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>, Julian Pidancet
+ <julian.pidancet@oracle.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Dionna Glaze <dionnaglaze@google.com>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Juri Lelli <juri.lelli@redhat.com>, Marcelo
+ Tosatti <mtosatti@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, Daniel
+ Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
+Subject: Re: [RFC PATCH v3 11/15] context-tracking: Introduce work deferral
+ infrastructure
+In-Reply-To: <Zz4cqfVfyb1enxql@localhost.localdomain>
+References: <20241119153502.41361-1-vschneid@redhat.com>
+ <20241119153502.41361-12-vschneid@redhat.com>
+ <Zz2_7MbxvfjKsz08@pavilion.home> <Zz3w0o_3wZDgJn0K@localhost.localdomain>
+ <xhsmho729hlv0.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Zz4cqfVfyb1enxql@localhost.localdomain>
+Date: Fri, 22 Nov 2024 15:56:59 +0100
+Message-ID: <xhsmh1pz39v0k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] KVM: TDX: Implement TDX vcpu enter/exit path
-To: Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
- reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
- chao.gao@intel.com, weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-3-adrian.hunter@intel.com>
- <2f22aeeb-7109-4d3f-bcb7-58ef7f8e0d4c@intel.com>
- <91eccab3-2740-4bb7-ac3f-35dea506a0de@linux.intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <91eccab3-2740-4bb7-ac3f-35dea506a0de@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 22/11/24 07:56, Binbin Wu wrote:
-> 
-> 
-> 
-> On 11/22/2024 1:23 PM, Xiaoyao Li wrote:
-> [...]
->>> +
->>> +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>> +{
->>> +    struct vcpu_tdx *tdx = to_tdx(vcpu);
->>> +
->>> +    /* TDX exit handle takes care of this error case. */
->>> +    if (unlikely(tdx->state != VCPU_TD_STATE_INITIALIZED)) {
->>> +        /* Set to avoid collision with EXIT_REASON_EXCEPTION_NMI. */
+On 20/11/24 18:30, Frederic Weisbecker wrote:
+> Le Wed, Nov 20, 2024 at 06:10:43PM +0100, Valentin Schneider a =C3=A9crit=
+ :
+>> On 20/11/24 15:23, Frederic Weisbecker wrote:
 >>
->> It seems the check fits better in tdx_vcpu_pre_run().
-> 
-> Indeed, it's cleaner to move the check to vcpu_pre_run.
-> Then no need to set the value to vp_enter_ret, and the comments are not
-> needed.
+>> > Ah but there is CT_STATE_GUEST and I see the last patch also applies t=
+hat to
+>> > CT_STATE_IDLE.
+>> >
+>> > So that could be:
+>> >
+>> > bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
+>> > {
+>> >    struct context_tracking *ct =3D per_cpu_ptr(&context_tracking, cpu);
+>> >    unsigned int old;
+>> >    bool ret =3D false;
+>> >
+>> >    preempt_disable();
+>> >
+>> >    old =3D atomic_read(&ct->state);
+>> >
+>> >    /* CT_STATE_IDLE can be added to last patch here */
+>> >    if (!(old & (CT_STATE_USER | CT_STATE_GUEST))) {
+>> >            old &=3D ~CT_STATE_MASK;
+>> >            old |=3D CT_STATE_USER;
+>> >    }
+>>
+>> Hmph, so that lets us leverage the cmpxchg for a !CT_STATE_KERNEL check,
+>> but we get an extra loop if the target CPU exits kernelspace not to
+>> userspace (e.g. vcpu or idle) in the meantime - not great, not terrible.
+>
+> The thing is, what you read with atomic_read() should be close to reality.
+> If it already is !=3D CT_STATE_KERNEL then you're good (minus racy change=
+s).
+> If it is CT_STATE_KERNEL then you still must do a failing cmpxchg() in an=
+y case,
+> at least to make sure you didn't miss a context tracking change. So the b=
+est
+> you can do is a bet.
+>
+>>
+>> At the cost of one extra bit for the CT_STATE area, with CT_STATE_KERNEL=
+=3D1
+>> we could do:
+>>
+>>   old =3D atomic_read(&ct->state);
+>>   old &=3D ~CT_STATE_KERNEL;
+>
+> And perhaps also old |=3D CT_STATE_IDLE (I'm seeing the last patch now),
+> so you at least get a chance of making it right (only ~CT_STATE_KERNEL
+> will always fail) and CPUs usually spend most of their time idle.
+>
 
-And we can take out the same check in tdx_handle_exit()
-because it won't get there if ->vcpu_pre_run() fails.
+I'm thinking with:
 
-> 
->>
->> And without the patch of how TDX handles Exit (i.e., how deal with vp_enter_ret), it's hard to review this comment.
->>
->>> +        tdx->vp_enter_ret = TDX_SW_ERROR;
->>> +        return EXIT_FASTPATH_NONE;
->>> +    }
->>> +
->>> +    trace_kvm_entry(vcpu, force_immediate_exit);
->>> +
->>> +    tdx_vcpu_enter_exit(vcpu);
->>> +
->>> +    vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
->>> +    trace_kvm_exit(vcpu, KVM_ISA_VMX);
->>> +
->>> +    return EXIT_FASTPATH_NONE;
->>> +}
->>> +
-> [...]
+        CT_STATE_IDLE		=3D 0,
+        CT_STATE_USER		=3D 1,
+        CT_STATE_GUEST		=3D 2,
+        CT_STATE_KERNEL		=3D 4, /* Keep that as a standalone bit */
+
+we can stick with old &=3D ~CT_STATE_KERNEL; and that'll let the cmpxchg
+succeed for any of IDLE/USER/GUEST.
+
+> Thanks.
 
 
