@@ -1,323 +1,210 @@
-Return-Path: <kvm+bounces-32373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D2B9D6287
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:48:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 632029D62A2
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:54:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E111281D3B
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 16:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 919A5160E5D
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 16:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4363513B797;
-	Fri, 22 Nov 2024 16:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2071632C8;
+	Fri, 22 Nov 2024 16:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGY5ji+W"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="qaOvtTx9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CY4PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11020095.outbound.protection.outlook.com [40.93.198.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FD460890
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 16:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732294119; cv=none; b=uowdGYYDuTtA3sx1fn8xF5SAcmEzKoxieoL0xyk60lK2cufPqZjXLXHcqG0dX1f21OJMbakJg74J7OoQpO1ujnDm0nXP2+RwSmFy2t6unXaRhIzHFMP7ycw8HmkVJCM7hcE3fxZ30I5Yg0PYpZXEkpDzgXqD08f6S46PeqpDMcI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732294119; c=relaxed/simple;
-	bh=D0ZoNb4AGm2sVITtfXgH8IoHdKx0Ian+mInrIdUUVIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ssHTu/KLoEkognxVIoekOi+AGID/Y+BVstHsgz/nRJtxdjcjme1FV3mTtej//6N6IznM1etZ9SE9aKlVoh4oDGGoKEaJYnqgzFm+XTH6RKLUZTIr0ip8VQX8pUQ9KLvnufv4ktQQ2tmwqjGltnhQ08L8ITLOU/ut55qh3L8LhYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fGY5ji+W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732294116;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zVCDFXaNMsuGWcQ78ZTx+x+51IuTZpYbcUeipG7O7qM=;
-	b=fGY5ji+WfV8a+d3wEKPVW0jQCVuuVZJL9ufF2NJKwj6SunJ0CsaEOnCiPZn+Cmkpm2kcZE
-	oqXX0j6KLcJkiucCT32FnVdherUH15qX6ncz3Dv/gcUZRDmpKzT9/Go8+BqU88gKRovtJE
-	T6Fy43DVGEPvtM2ixPO+CAf7ThIPveg=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-ekAiCqf8MEqiViVFWDG_KA-1; Fri, 22 Nov 2024 11:48:35 -0500
-X-MC-Unique: ekAiCqf8MEqiViVFWDG_KA-1
-X-Mimecast-MFC-AGG-ID: ekAiCqf8MEqiViVFWDG_KA
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7180d9a3693so214353a34.1
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 08:48:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732294114; x=1732898914;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zVCDFXaNMsuGWcQ78ZTx+x+51IuTZpYbcUeipG7O7qM=;
-        b=nlRfOT8SvIlXzTFDYafIreLF3aKeQ2vAEBohe7Mu9kwNqhR3yZonPSXq7d4hcc4zsi
-         3PthTXwoBJi4ruaI48Okk0EMtLntfpXB9oHreYRgK14m//vHc/zD8X1ikDdggzGHtgzO
-         FDgOkyWY+UKftPNLOuKDPIXyHHmr2TMQIWVkY4zwAXUx4Focm3/8p9HBCUK2p3CC6a6E
-         Gz/ywMUxX0GAffGByhCdElqA9xg9X/bBCk+LVokmJ/EypuLLgu85eYs/McqNGlcpAC/I
-         Vb3i9uvfVwokiSTQ7jFYBMaVDxmm11KqoXm+Ul2iKNHBIFP++RgJZLzsAls4kRWT+6sS
-         ladA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4HiSFpJa/0nCL+20c+wghdCSjAqHINMAHJX+zl6CRfGMD0ULRDdzZo5O2QRDEWjXd2IU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3W1rIZ264znRUjP5tC8nPImRnUbqTlTalR1v1SC4QF2KbuuKk
-	97Qx2pGdhxRv5bnAE0AOPABdi2FLGLRZpzFKeu3OlYUNb1Vn+y4qKahEAuS4g4SJ8w8d3in1JSl
-	bdNaTvCyEqKJbnZgJf3L2ZK+bwfg7btvK2y4Czc2AFu9Us8qKCg==
-X-Gm-Gg: ASbGnctsMNiiZJLvE4wIUTmlvor+yKBgVQq8RPLDUPzrx6vtPJmWswcrhOnTON14ac8
-	qq6HaVwLmSdORR+6160E/FGXKw6lfeheBvh5Kc8laqzEbFT03cWDB5zyUGXSo6vIQVnVGyNWJzP
-	fwQJCMctGd53LX7Js9PuwInpYO31cYtngJBFXvZQCkIxk7VnS/6kzO0MRn8ZnkDlSSJt0zE2hQ1
-	3QmNenAkfi/VTq/bZP1w0G6q4NxRCR8Lg77kwDli9wZNNVlCyTA0g==
-X-Received: by 2002:a05:6808:1688:b0:3e6:3c95:833a with SMTP id 5614622812f47-3e915a5650fmr1089797b6e.5.1732294114189;
-        Fri, 22 Nov 2024 08:48:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG3Av3rPnef7b1nFePTLpQ+b74HDm9lqwrf1VG8fxLrQwWOnILmiDQGIDJbxt3KQ+3cCmahtQ==
-X-Received: by 2002:a05:6808:1688:b0:3e6:3c95:833a with SMTP id 5614622812f47-3e915a5650fmr1089737b6e.5.1732294112356;
-        Fri, 22 Nov 2024 08:48:32 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71c03772b01sm481000a34.20.2024.11.22.08.48.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 08:48:30 -0800 (PST)
-Date: Fri, 22 Nov 2024 09:48:26 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: Avihai Horon <avihaih@nvidia.com>, <kvm@vger.kernel.org>, Yishai Hadas
- <yishaih@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Maor Gottlieb
- <maorg@nvidia.com>
-Subject: Re: [PATCH v2] vfio/pci: Properly hide first-in-list PCIe extended
- capability
-Message-ID: <20241122094826.142a5d54.alex.williamson@redhat.com>
-In-Reply-To: <14709dcf-d7fe-4579-81b9-28065ce15f3e@intel.com>
-References: <20241121140057.25157-1-avihaih@nvidia.com>
-	<14709dcf-d7fe-4579-81b9-28065ce15f3e@intel.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C2022339
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 16:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.95
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732294470; cv=fail; b=h+SNq9+2M7Tqfcd8xy5BkJsKHHyqG8Hfbkb3yi77CxkdlnA1TpJCLqjdrktIZ4c1+A2I0AvA//Rh0VNp8e53mJqt20+jlQxRHd6gzQK5kxdevQ8PPXGH7THzoym4GnWd6KZsqBdkeMAn13e0xn9dvC+lAj8JB5LYYNMsigufSjo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732294470; c=relaxed/simple;
+	bh=VoIiFBJ2PLTI2UC36AulXrqK9t5dh7D8iGMet8Ru0fo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ccy5Ju2u7VNLOtD1/HWkR6wsWmVT6XzSW+axnMbgMcXmg8LRbrf54rAgzxCD6CDdDlHpk/lmKiGxyhssFYOYo+ef/uAAuG/iZESBUT5aoS4gsAL4L2C5VwydqIbATVY8+V6s26Vtqh/QwaTbHIDY1WsoIg5uomOuLR3Qssr+acQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=qaOvtTx9; arc=fail smtp.client-ip=40.93.198.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=T9htRAO59D3B7/kIBArElSIiXcXKJPQuaIXD2HTHilPLvz3REuvG4PSUdg3c1UxFDzFEN3sadCujcbT9Uhdzqtn41i9ikzLZULb32TcJn5RXcuMLh5hVvhoX+42KBKZqUJll3HssUCCEJy5mpJ5GinUb21YSwOunf9zqrFzislSOFp45+Kl0t142I0TdHRezq7BVtRG0uPks8gBSYq/oW2F8lnViPbtG8uTXQD/1CnRyvuxLcvZSZf7wdZSkabJEAJHCcqDOkHrfvitzbko5C1hhheRBvtZc6xHQ4/lwVDiTzTzgakx4szMJPccp95Rxy4YhWyJvwO6mrqCnKxOppg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9wKXcMOZNlieIf0QHOHIVf6q8EkgDfQ94UzxS21nNV0=;
+ b=ij4H0bTdrwBkhhgXfnz397C/KvT6v3u+gTh5xlQ2bPY2/+o4xy61Ki+5y/xvKOueO2SZAIii98yBvjZY99TVSnRg9nWcBewXIhNMarPCyHExHau3BNW8FYoBSS4cip4LuJyTg4wZ3MAwgm/P2QiskxDIqKWXQ4gSD9oFoMLZPxfWkFnsN8qKh/2epgTPgSsP9QSa1UV+3i8I7NC27c2HxMO1LJunF9+ex8KsQditgIT2Vf+VSPrWD0+3Bk4plL3KU1sy9TY7lhFkso6NNAEcLX0tO18SjbaznvQXyavWFn/wR4ymbMii3zflwNjWh2z0kqkxD9yeGeRa1p4zw0rxtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9wKXcMOZNlieIf0QHOHIVf6q8EkgDfQ94UzxS21nNV0=;
+ b=qaOvtTx9aS1h6pypMk5PKnVzw15pQaS9VxqwuHkefF+UDa4c2ZujK2t7SzHT3ziBfU+rKk3a9skmXPtc6n0DaxTgRHnI7im95Rve05sadh0vdcxYDtOobqX2oJbsA4BiDUMN+2CUANj52fisKIz4g4iKUak+W1C2lt1RL2QfRJ8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from PH0PR01MB8094.prod.exchangelabs.com (2603:10b6:510:298::15) by
+ SA3PR01MB8546.prod.exchangelabs.com (2603:10b6:806:3a1::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.18; Fri, 22 Nov 2024 16:54:24 +0000
+Received: from PH0PR01MB8094.prod.exchangelabs.com
+ ([fe80::33f6:85c:db7c:d9af]) by PH0PR01MB8094.prod.exchangelabs.com
+ ([fe80::33f6:85c:db7c:d9af%7]) with mapi id 15.20.8182.011; Fri, 22 Nov 2024
+ 16:54:23 +0000
+Message-ID: <38339ef8-6e69-43b5-8d16-b7fd66775c93@os.amperecomputing.com>
+Date: Fri, 22 Nov 2024 22:24:16 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table
+ handling
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ James Morse <james.morse@arm.com>, Joey Gouly <joey.gouly@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20240614144552.2773592-1-maz@kernel.org>
+ <171878647493.242213.9111337124987897859.b4-ty@linux.dev>
+ <46bea470-3a3b-4dcc-b4a8-a74830c66774@os.amperecomputing.com>
+ <86plmov8n3.wl-maz@kernel.org>
+Content-Language: en-US
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <86plmov8n3.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR04CA0202.apcprd04.prod.outlook.com
+ (2603:1096:4:187::20) To PH0PR01MB8094.prod.exchangelabs.com
+ (2603:10b6:510:298::15)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR01MB8094:EE_|SA3PR01MB8546:EE_
+X-MS-Office365-Filtering-Correlation-Id: c124e6e8-c82c-453d-eecf-08dd0b16513e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R0YzVE1xd1hscXNROHIwdUdwVlh4ZktIdnpmOHlkNURZRDVZdHhUN3lqYkdV?=
+ =?utf-8?B?cVJpbUc4UUhCUUlsSmJuM3JXYnQ0NGkvM0Q1eS9wOUdhMEdHbEVYV1BNQy9B?=
+ =?utf-8?B?VytkM1RVK2U4emxiQ3ErdU9MNHRPSXJkUW5udUhSUk5IZzg4SVJBVXRXRHE1?=
+ =?utf-8?B?YzRHUzNaUk1oU25pdzFMVzBtbkxGV2xGQTZQM3pVL1ZTYlZNcHRSMEF0dHB2?=
+ =?utf-8?B?QjhpMTZnMUhRVE4wa1VNNkZ3Y0hBM2xjNE9YZWphQitrZFR4eThZc3hOeU0x?=
+ =?utf-8?B?M09GM21CY29SQk13ZFpzbGlGWU5iZXFjQXdNbzEwNG52aFRacUlaVGdhSkJV?=
+ =?utf-8?B?c2I2OFpOOGpra1NwTVZmeEF3QTZCUTBmMndlN3ltMVZvaEh0TCs2WFFydnZO?=
+ =?utf-8?B?V3RicDhkNnRicTYrYmw1UkxNbGdRaWhjSG9wZ2VyMDBMMWoySXJiWVd0Y1Bw?=
+ =?utf-8?B?eGRQVXc1c2NZMTV6WGRHQlNUQXkycERYbzJVMEZobU1zOGNKYm5xUU93VURC?=
+ =?utf-8?B?U1NrV3oyalVBVTkyVWZadlA0UEJRUjBHajN2amVlbnJFdmM2aTdmRlkxVVho?=
+ =?utf-8?B?Mkluam8xSHROTTZ6Z003dmpvYnFOT2xmTWlPa05qY05yeGJjY2xTalEzQ0tW?=
+ =?utf-8?B?Y3JDZHMyNUJpSUtaNVNGanlETWJ4cnZVc1dNL3VKWG1VWGZkUzY3TVF4eEQw?=
+ =?utf-8?B?NmVMVHRiOE5TQk85bi9TZzdqZTZtTURzcWY5TFJ6TjJnU1UxU1R4RGlOOWE2?=
+ =?utf-8?B?VlN6aDRxM2hrVm1CaWpVdDZURGxWbjd4ZnJjSnRYYjJWTWRXT1lLUTdiOE95?=
+ =?utf-8?B?d1c3SndZb2xUcXluajhPNzNnS2RXUUxqbVA4R3Q4TGpXenFsb29EVWRQWnlk?=
+ =?utf-8?B?bEV3bU9BNGRQOFF4bVk1UVVLNHFzWTVhMXovOVloT2VVUERubzk5WVVzTlM4?=
+ =?utf-8?B?MG9CYysxNFRSTWIzNGFaME9ud3FIcm1QN1lyRDlONjQxV0lkd1VObjlyRUY2?=
+ =?utf-8?B?eDl5TTZ0eFBGWS91MHpBUjYyYnVmZThjblBGSFBWRnU0ZGxLWnJZbWhEUkg1?=
+ =?utf-8?B?Rjh0cGlYOGFFS2FTdndyMTBmZEFrOUtYbktSc1lnd2JqbC9rbmN4NGI5QnFI?=
+ =?utf-8?B?NFNkQW1zMlgzS1hlSGJjY0wzdXEzcEFBWDM1RDAyd0Z0eTlOaVExenNHRzFD?=
+ =?utf-8?B?aktrY3hDeE9KSzMwdkY3QWpBRVE2NGNjelRoK09TVHhSUS9nNk0zVlB0VW9L?=
+ =?utf-8?B?My9RdGQ2dkVFV1dHbFZ2eEprUkNkVnowZ01FdHQ0Sm5RK0tmWWJpV1E2MEV1?=
+ =?utf-8?B?aHhQUlYvV2NYRDl5UHUvajJuNzNYZ1pXYWRCME1XRXFEc2dzNEpxSExscFIr?=
+ =?utf-8?B?Uzl5Sm9HRXpxMUJPdXF5bTl1dHBmZEtETjJPTDAxVXo2S2pNR2s4dE90K2ZF?=
+ =?utf-8?B?dnpPT0VjdExkYVRvOUJHNEV1cGd1cmo2c1ZpaEhzRmEyaHpCd2g2YVlFd002?=
+ =?utf-8?B?bnlFd0g3TWxWTDNxQjJ6S0FuZ3hkcXJZbGV4dGVid05xSHZacEVrQUo5NVpI?=
+ =?utf-8?B?WGJjTTI1UTN3YVgwZStDZ0szM3lrK0NxSmdUYVRjRENCbDVhbE1wd2s3TUI5?=
+ =?utf-8?B?S09vMGR1YWplbDJVaDFZQ0doaHp2SzVYUmEvM3Z5NlR0WHhmZFpGSFNQVExI?=
+ =?utf-8?B?a1FGelNjMExxMlp5aDVvczl3NWFQYVluQTZ0dSswYXozc3dBdHNxdmc5WlEr?=
+ =?utf-8?B?NE9pcVRCVUNBcWUxRUFwMzVBcDA3Qnd6QkhXT0VYSUMwa2k5a3F3YTBtdG5a?=
+ =?utf-8?B?Wk5oalYveDczZE5HRzVQUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB8094.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QW1BeTRpRmJYazdjNEk1b1p5VjBMZmlNbVdFZTZHZnk4eFoxUEdwbld3UVdm?=
+ =?utf-8?B?VE90cFFtaUEvQUNIbENQS3Q0M01rWU0ya0czalVlRWJRU0ZKZ1hMU1E0a202?=
+ =?utf-8?B?WUpRSzBxVjJpVjM3aTVVdmRIMVd1eWdZVVNBR1JRTWQwb2FHS2paNThFSEVt?=
+ =?utf-8?B?b2J5UUkzWTRBb2FTNXhLQk9nWWYrKzBIQU1tc2liT0R2S0JLenkvcGFpWFNH?=
+ =?utf-8?B?Q1Voc0FvVFV3dFBGSEtsRFdIUjFLTWFLRCtaWFd3b2lNM1dlU3pTRjhUMnha?=
+ =?utf-8?B?WnBjdS9mMG14cVA5b3VnVTF3VjVxWEgvcWZSWWVNZXNOdjJhTnJRK2FGa1ZH?=
+ =?utf-8?B?QU1EY1grVTZha0xmNTdqVGd1M3IzaGJGVEFsZE5BdW1PUmUzWE82eGFUMlNY?=
+ =?utf-8?B?aTFYeG5aeUhLSUltS2J0MmRnR1R5ckJJMlF2RXo0anVYdTZrVFJQQlNwYlpq?=
+ =?utf-8?B?dkxRbEtKVkRXcnBCUFZkbUtHSTcrSCs4UjdnVUhTbFpwWlNHZGpnalB4RUZa?=
+ =?utf-8?B?eXppS3NZZGQxdzFVYlNaT3g3MU9iSHpleDFFcmVNdkdacEVpanBtR2Iza285?=
+ =?utf-8?B?T1R4TzR5RTdlNW1JdXdSZEs1eDgrUngvUlhDYnF6VkRGWEVJaGZEQ0lrekdt?=
+ =?utf-8?B?ekoyam05TTBtSWhXMzRLbTlXdzBPM1k4eCtNcFZLcFpuQ2p0TzNLWWV1TFVu?=
+ =?utf-8?B?QURhSUU0TTZuRHViMnBLZ0dlTjVYLzBnQkNFanNjNSsxc2R6Uy9mT2hzS1FD?=
+ =?utf-8?B?VEVYb3JHbkI5dllnbGxsWXBDelg0aVRhMGxid0xQUkcxSGpCUVdHcUVVY2x5?=
+ =?utf-8?B?RGNqZnYzV3ZtSmdlTmlxQkl6M0dnQ3dSTUdvWGNsNWhFbzZ3L0JOa3RmRzRP?=
+ =?utf-8?B?bWRrakgvNGZSbmp4cEgvbG9Ud0s1U1RJNDdUQllyNFQ2VjBWV2lWNzE4ekM3?=
+ =?utf-8?B?ZXV5am1CNFhzOU1jdDgrb3dBVG1TMU0zMUxNaW9uZDM4eG9UQzl4aEZlc0pT?=
+ =?utf-8?B?UmM2K3ZRY3VpMzVieUhGbU42M2Ivbk00V1dONUNoSmtTWEYxdHBLQmZMZDlS?=
+ =?utf-8?B?Tk8wZjFjTmQrTVZRUnl6dXQxWHd3em1VQVh6ei9yWVJaT3l2VEswQTYrNFVS?=
+ =?utf-8?B?cGcvRnpRZ2NOaGdmRmlMenRORTFRbkt4YzlFNjU3WTB6NXY5bHRtait0SGRp?=
+ =?utf-8?B?eXBOd3RaY2lZcmRRYlJlc1J3T2l4YWJMSFAxUGFDQXNzekVnRnJFZWNEU2tG?=
+ =?utf-8?B?a0x2aUM4b2JuVlpyeTg0ZW8vS09tcnRNWklZUVRqNjcyM0JTNW5TSVhOV2kr?=
+ =?utf-8?B?VHlyWUtQMVJTbXI2NXpRMWdxMzczV0w3ZVErUVY1SkVNU1BlN1RVL3lZUWJs?=
+ =?utf-8?B?bXZObmxscjdxOVZTZzhyNGN6RFhQRkNyVWk4bVo3MXZJc2ZpTmdUNDJ5ZHpV?=
+ =?utf-8?B?eGlzb0x5TUhPdFJ6cDgxM2RYTGhlamgzY0NwRHlQbVA1ZXZkNXNmK3pScmlm?=
+ =?utf-8?B?aVFxaFgvR1ZJSTZMTlVWVVV3NEZlTEdKREdPWDJTQnFzV2tmM0hXYm9SMnpx?=
+ =?utf-8?B?T240Q1AvSkh1TWN0djFTbGxtcVYyVkpiTTY0b0c5aHVnbEliL0ZYdjBFamVH?=
+ =?utf-8?B?aDBidXlxanY3WjE1d0VVTm1pa0VpN2R6SDFlOStyNzd1QW16YXB4MkJYcUU2?=
+ =?utf-8?B?bGkzWkUxa0srUGJZRlVIRmFEdFFlVWVWd2tjSnY5bnFydjZiemFrOHFCMk5M?=
+ =?utf-8?B?bkZmTko0dFdTUlpISDhxS3hndXNzdjM0djlvdExmaWZocUJxL1dmWGd3UkQx?=
+ =?utf-8?B?NTNXMHBSSW1VS0Q5QWp1UTJNMHF2WmY2ZXdBbGxhMHFPZ05EK0RQYnB0VjJS?=
+ =?utf-8?B?amdONmJsSkxGN1VySWYrdVJpcU8zS3RpWThkeFlwc2VTcThIVVVnVGx1YWcy?=
+ =?utf-8?B?cmg1VDVhMk5qNlVuK2JmSWEyYTJ6R1hwMTdZcVpMSnpKZHA1UmcrUzJBOGZB?=
+ =?utf-8?B?UWROVjlXZmhpakxFclQ1T1ZGVE9mTFhBam8wa0VuWWx5WFFYL0pvYUpWZmV4?=
+ =?utf-8?B?bXdsd3RDek1adnpLNmNRME9Bd0RKcjFmcWlUeENGdTIwUTZ1SXkyVGpMeHVa?=
+ =?utf-8?B?YnhPelBrQjhNbjd2NmZwUTNVejdYb2Zwbmk0NFprTENJUWVZaHV1WFkvYVZK?=
+ =?utf-8?Q?xXX7zBjaG2J/bqg72cPF8/0=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c124e6e8-c82c-453d-eecf-08dd0b16513e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB8094.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2024 16:54:23.8175
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5AYNMgCzLMmRAsA4/XSsPdhI0gjXa7g61eZ3srhXnTryveVXyREjOWj9eVfd4j9fwIEN+tt9zBrMycCMK2ujWrxB3KK24AxJoJW5Qt1cd1hYQs/q8npyUcHvecUnx05b
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR01MB8546
 
-On Fri, 22 Nov 2024 20:45:08 +0800
-Yi Liu <yi.l.liu@intel.com> wrote:
 
-> On 2024/11/21 22:00, Avihai Horon wrote:
-> > There are cases where a PCIe extended capability should be hidden from
-> > the user. For example, an unknown capability (i.e., capability with ID
-> > greater than PCI_EXT_CAP_ID_MAX) or a capability that is intentionally
-> > chosen to be hidden from the user.
-> > 
-> > Hiding a capability is done by virtualizing and modifying the 'Next
-> > Capability Offset' field of the previous capability so it points to the
-> > capability after the one that should be hidden.
-> > 
-> > The special case where the first capability in the list should be hidden
-> > is handled differently because there is no previous capability that can
-> > be modified. In this case, the capability ID and version are zeroed
-> > while leaving the next pointer intact. This hides the capability and
-> > leaves an anchor for the rest of the capability list.
-> > 
-> > However, today, hiding the first capability in the list is not done
-> > properly if the capability is unknown, as struct
-> > vfio_pci_core_device->pci_config_map is set to the capability ID during
-> > initialization but the capability ID is not properly checked later when
-> > used in vfio_config_do_rw(). This leads to the following warning [1] and
-> > to an out-of-bounds access to ecap_perms array.
-> > 
-> > Fix it by checking cap_id in vfio_config_do_rw(), and if it is greater
-> > than PCI_EXT_CAP_ID_MAX, use an alternative struct perm_bits for direct
-> > read only access instead of the ecap_perms array.
-> > 
-> > Note that this is safe since the above is the only case where cap_id can
-> > exceed PCI_EXT_CAP_ID_MAX (except for the special capabilities, which
-> > are already checked before).
-> > 
-> > [1]
-> > 
-> > WARNING: CPU: 118 PID: 5329 at drivers/vfio/pci/vfio_pci_config.c:1900 vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]  
-> 
-> strange, it is not in the vfio_config_do_rw(). But never mind.
-> 
-> > CPU: 118 UID: 0 PID: 5329 Comm: simx-qemu-syste Not tainted 6.12.0+ #1
-> > (snip)
-> > Call Trace:
-> >   <TASK>
-> >   ? show_regs+0x69/0x80
-> >   ? __warn+0x8d/0x140
-> >   ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
-> >   ? report_bug+0x18f/0x1a0
-> >   ? handle_bug+0x63/0xa0
-> >   ? exc_invalid_op+0x19/0x70
-> >   ? asm_exc_invalid_op+0x1b/0x20
-> >   ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
-> >   ? vfio_pci_config_rw+0x244/0x430 [vfio_pci_core]
-> >   vfio_pci_rw+0x101/0x1b0 [vfio_pci_core]
-> >   vfio_pci_core_read+0x1d/0x30 [vfio_pci_core]
-> >   vfio_device_fops_read+0x27/0x40 [vfio]
-> >   vfs_read+0xbd/0x340
-> >   ? vfio_device_fops_unl_ioctl+0xbb/0x740 [vfio]
-> >   ? __rseq_handle_notify_resume+0xa4/0x4b0
-> >   __x64_sys_pread64+0x96/0xc0
-> >   x64_sys_call+0x1c3d/0x20d0
-> >   do_syscall_64+0x4d/0x120
-> >   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > 
-> > Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-> > Signed-off-by: Avihai Horon <avihaih@nvidia.com>
-> > ---
-> > Changes from v1:
-> > * Use Alex's suggestion to fix the bug and adapt the commit message.
-> > ---
-> >   drivers/vfio/pci/vfio_pci_config.c | 20 ++++++++++++++++----
-> >   1 file changed, 16 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > index 97422aafaa7b..b2a1ba66e5f1 100644
-> > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > @@ -313,12 +313,16 @@ static int vfio_virt_config_read(struct vfio_pci_core_device *vdev, int pos,
-> >   	return count;
-> >   }
-> >   
-> > +static const struct perm_bits direct_ro_perms = {
-> > +	.readfn = vfio_direct_config_read,
-> > +};
-> > +
-> >   /* Default capability regions to read-only, no-virtualization */
-> >   static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
-> > -	[0 ... PCI_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
-> > +	[0 ... PCI_CAP_ID_MAX] = direct_ro_perms
-> >   };
-> >   static struct perm_bits ecap_perms[PCI_EXT_CAP_ID_MAX + 1] = {
-> > -	[0 ... PCI_EXT_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
-> > +	[0 ... PCI_EXT_CAP_ID_MAX] = direct_ro_perms
-> >   };
-> >   /*
-> >    * Default unassigned regions to raw read-write access.  Some devices
-> > @@ -1897,9 +1901,17 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
-> >   		cap_start = *ppos;
-> >   	} else {
-> >   		if (*ppos >= PCI_CFG_SPACE_SIZE) {
-> > -			WARN_ON(cap_id > PCI_EXT_CAP_ID_MAX);
-> > +			/*
-> > +			 * We can get a cap_id that exceeds PCI_EXT_CAP_ID_MAX
-> > +			 * if we're hiding an unknown capability at the start
-> > +			 * of the extended capability list.  Use default, ro
-> > +			 * access, which will virtualize the id and next values.
-> > +			 */
-> > +			if (cap_id > PCI_EXT_CAP_ID_MAX)
-> > +				perm = (struct perm_bits *)&direct_ro_perms;
-> > +			else
-> > +				perm = &ecap_perms[cap_id];
-> >   
-> > -			perm = &ecap_perms[cap_id];
-> >   			cap_start = vfio_find_cap_start(vdev, *ppos);
-> >   		} else {
-> >   			WARN_ON(cap_id > PCI_CAP_ID_MAX);  
-> 
-> Looks good to me. :) I'm able to trigger this warning by hide the first 
-> ecap on my system with the below hack.
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c 
-> b/drivers/vfio/pci/vfio_pci_config.c
-> index b2a1ba66e5f1..db91e19a48b3 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -1617,6 +1617,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device 
-> *vdev)
->   	u16 epos;
->   	__le32 *prev = NULL;
->   	int loops, ret, ecaps = 0;
-> +	int iii =0;
-> 
->   	if (!vdev->extended_caps)
->   		return 0;
-> @@ -1635,7 +1636,11 @@ static int vfio_ecap_init(struct 
-> vfio_pci_core_device *vdev)
->   		if (ret)
->   			return ret;
-> 
-> -		ecap = PCI_EXT_CAP_ID(header);
-> +		if (iii == 0) {
-> +			ecap = 0x61;
-> +			iii++;
-> +		} else
-> +			ecap = PCI_EXT_CAP_ID(header);
-> 
->   		if (ecap <= PCI_EXT_CAP_ID_MAX) {
->   			len = pci_ext_cap_length[ecap];
-> @@ -1664,6 +1669,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device 
-> *vdev)
->   			 */
->   			len = PCI_CAP_SIZEOF;
->   			hidden = true;
-> +			printk("%s set hide\n", __func__);
->   		}
-> 
->   		for (i = 0; i < len; i++) {
-> @@ -1893,6 +1899,7 @@ static ssize_t vfio_config_do_rw(struct 
-> vfio_pci_core_device *vdev, char __user
-> 
->   	cap_id = vdev->pci_config_map[*ppos];
-> 
-> +	printk("%s cap_id: %x\n", __func__, cap_id);
->   	if (cap_id == PCI_CAP_ID_INVALID) {
->   		perm = &unassigned_perms;
->   		cap_start = *ppos;
-> 
-> And then this warning is gone after applying this patch. Hence,
-> 
-> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
-> Tested-by: Yi Liu <yi.l.liu@intel.com>
 
-Thanks, good testing!
- 
-> But I can still see a valid next pointer. Like the below log, I hide
-> the first ecap at offset 0x100, its ID is zeroed. The second ecap locates
-> at offset==0x150, its cap_id is 0x0018. I can see the next pointer in the
-> guest. Is it expected?
-
-This is what makes hiding the first ecap unique, the ecap chain always
-starts at 0x100, the next pointer must be valid for the rest of the
-chain to remain.  For standard capabilities we can change the register
-pointing at the head of the list.  This therefore looks like expected
-behavior, unless I'm missing something more subtle in your example.
- 
-> Guest:
-> 100: 00 00 00 15 00 00 00 00 00 00 10 00 00 00 04 00
-> 110: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 120: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 130: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 140: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 150: 18 00 01 16 00 00 00 00 00 00 00 00 00 00 00 00
-> 160: 17 00 01 17 05 02 01 00 00 00 00 00 00 00 00 00
+On 21-11-2024 10:14 pm, Marc Zyngier wrote:
+> On Thu, 21 Nov 2024 08:11:00 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Host:
-> 100: 01 00 02 15 00 00 00 00 00 00 10 00 00 00 04 00
-> 110: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 120: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 130: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 140: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 150: 18 00 01 16 00 00 00 00 00 00 00 00 00 00 00 00
-> 160: 17 00 01 17 05 02 01 00 00 00 00 00 00 00 00 00
+> Hi Ganapatrao,
 > 
+>> IIRC, Most of the patches that are specific to NV have been merged
+>> upstream. However I do see that, some of the vGIC and Timer related
+>> patches are still in your private NV repository. Can these patches be
+>> prioritized to upstream, so that we can have have the first working
+>> version of NV on mainline.
 > 
-> BTW. If the first PCI cap is a unknown cap, will it have a problem? The
-> vfio_pci_core_device->pci_config_map is kept to be PCI_CAP_ID_INVALID,
-> hence it would use the unassigned_perms. But it makes more sense to use the
-> direct_ro_perms introduced here. is it?
+> Who is *we*?
+> 
+> Things get upstreamed when we (people doing the actual work) decide
+> they are ready. At the moment, they are not.
+> 
+> Also, while I enjoy working on NV, this isn't *my* priority.
 
-Once we've masked the capability ID, if the guest driver is still
-touching the remaining body of the capability, we're really in the
-space of undefined behavior, imo.  We've already taken the stance that
-inter-capability space is accessible as a necessity for certain
-devices.  It's certainly been suggested that we might want to take a
-more guarded approach, even so far as readjusting the capability layout
-for compatibility.  We might head in that direction but I don't think
-we should start with this bug fix.  Thanks,
+Sure, I understand that it's not your priority right now.  I'm happy to 
+spend some time on it, please do let us know in what areas/patches needs 
+attention before the code would be ready to merge?
 
-Alex
-
+-- 
+Thanks,
+Ganapat/GK
 
