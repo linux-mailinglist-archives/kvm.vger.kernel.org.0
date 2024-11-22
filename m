@@ -1,164 +1,140 @@
-Return-Path: <kvm+bounces-32388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B849D6674
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 00:55:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D789D668C
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 01:00:34 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 747AC16121A
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 00:00:31 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E441D151F;
+	Fri, 22 Nov 2024 23:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTUsTqgm"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D6028220B
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 23:55:25 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4B81C8FCE;
-	Fri, 22 Nov 2024 23:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nE9586F9"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B9818A951
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 23:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEAC1CB53D;
+	Fri, 22 Nov 2024 23:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732319718; cv=none; b=UalfCOrjtv5K5+dSd6JIDlQdnZc7MFOVuz++stwrExhmUMvtEz9M+fmT0BYUKTMd7XaxWPhH6x94Set+byCCI2zplE1MpBIzPm+cGQfPAoPHNmTnvXZcODP+cwtTxFLoNZ+hb9eSFNDauCW06/mT03ckF7laZackgpEPWlqTTjo=
+	t=1732319974; cv=none; b=nGkUQtNb5Go2ol22P5E0LdRG3IEdSKZ30Covjcfjhi/MyNdpvehw6zoGkL+wazM0aJWA4QabiXYLHQDV7ZPUTGLqbWnxw99K9mXvaoq4whaxkVjiQcHzMFkegNPzyZ1aXXxPj6Nm2U8I3qsZ940Rmt6fAiRiEIqsGWgqi68GQ8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732319718; c=relaxed/simple;
-	bh=pw3x9hAD0WOo8HOdzrqXesKQo4X2cv674KdS2DipRYY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OhwBV8Pk+XRq1II5ft4jk65VhPoi7mXqpfDhAndcZrj1DS11rpO8q2BcbI952LEkaz/4l2vV87taD+88uylFFT3m44bIrXCxHm2jpsDPsDkA4aEDXGANMAaOlm5MeMQ+KybQ5J4iJ/Tcwp1Vf4oxlxoKOHpOw1NOYlFkrkH3H+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nE9586F9; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7ee07d0f395so2661605a12.3
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 15:55:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732319716; x=1732924516; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0XJL5sSAhrBfkMi6De35B2rgA/UViYzgkz5Ikuv0m9M=;
-        b=nE9586F9U0scqT13I+rkRbtuweIyjhoitfqBagO3Ly4Y8OsfwPFuiwVc94KAjjsVor
-         t0nDFYqucJYnIxjUlaixn4/NaI7IebeflVUJCpvG3iUMgygcziehcSOECcbw+aN4NylQ
-         4lyG1F1QRubj0pBvJagR4/r2kHJhqLMoixpXbdA/NpFxD7Z9EpvwnkMnTSZoFUsZAaZc
-         3jVXHSP74MWbGSD1NQhyA0Vqd4HJU3Zt8dMuUSMGpWM20Fmsegx15o7egMY6BZskE5tZ
-         QuT2GW54EX3mWuJi4bb+pqraXPaFag1dLL5rDDPC5Aiw/ueTiXXjM+WuxifgxiGa2KWu
-         zMpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732319716; x=1732924516;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0XJL5sSAhrBfkMi6De35B2rgA/UViYzgkz5Ikuv0m9M=;
-        b=CXAgUOT0kEqkWOoWI/E4tAGFPjdWOMPl1OE5TFpDstWfOoWQS2tcJ/MgBivybHzepg
-         Dp6aOeuySITnRA2AdeFoKodcyGuFmCyYA09u6pHrt2bWT11DVnroTiNqXeqDWXuQpS71
-         Ey9G++UMLPf0qe3437/KIiZ0+RCFQ0SFCAwH4xdk8FhL6wQar6hGsx33gA6MqZwlJYS1
-         X4opT2eVAJgK5JSRgPll3Ct9e0QQiA1wtNMR2MnIEDdOOk4Opla2zvIceWciwlNn7V+m
-         VgOOSNZO+s7svWXkI95LKrWO4Ayt6A172vAVmQQ06Vc5NcfU7R4P9oQCsSBsdi8mco/+
-         nH+A==
-X-Forwarded-Encrypted: i=1; AJvYcCU6g1s9rU96Wl44Sx0UFSIvuC+0mXldzgZEsJcchluLjvfvAFzs3YZcejyDs8kl56qjqOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR07SiADRh+V2aHXZMLYCnu9UtbuK3hVXXcvhQuQBn2YaZVIID
-	yqljtlH4wYAE1nlSLNCMB+XiJLYiGfRL6Co5ayU7+Xm440qUp0KF0N5y/d/DcZqUNMzrwei0Bsk
-	UMA==
-X-Google-Smtp-Source: AGHT+IELmYFHxYVfYrq5YGLn/0N+oWNvd8W1zdiwji+uYYwHfaPfGMVNHe2y7x4hk8WK544QZR9KmfZ8+YE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a65:568b:0:b0:7ea:68ab:6465 with SMTP id
- 41be03b00d2f7-7fbcccf5e73mr2487a12.9.1732319715941; Fri, 22 Nov 2024 15:55:15
- -0800 (PST)
-Date: Fri, 22 Nov 2024 15:55:14 -0800
-In-Reply-To: <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
+	s=arc-20240116; t=1732319974; c=relaxed/simple;
+	bh=zQ8oPOHE0A9rVjfuxBCRvmoFRvSn/3zXeYk8im7ZIQY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dw3DvRPWwD57Xh/nhrc39Z3Q175qtjPc1DzmKYOgEMolwMTTs/0kZ5U1pxrusFcq/ckgSid1vhPetZ3D9rd8cj9SPzqr+0yjxDETo39QzfWU6AAoL1ehiDKpy50hJK6imEOCbEUgUVJu3HqAAJ9WX9EQeZBtijLLZxueTls9dqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kTUsTqgm; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732319974; x=1763855974;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zQ8oPOHE0A9rVjfuxBCRvmoFRvSn/3zXeYk8im7ZIQY=;
+  b=kTUsTqgmNoEGHcURrEqe1lkB2g6+95CB/W8TdBzktAefDrG3On3oS683
+   +u2HQBwrEb3c00JJmnNv/g4O06d7TpZdWqC1p2jN//xRVKM24jtGT/HCx
+   dYQjRd51YKm3J7C843pNBewWzCqKouXh/McCJlFP/xEn55XVqI+Hj6S96
+   ARImJd69QNVqI1AwbeVOX8qBat12DQqiyH25qfK8SPRUQFOLRBr/exwaT
+   PZUIVT5ei5RztLwa9LYeS6nAcTeI3E+N6Rv/7xHhJDlGRtAiyf8EN7n3A
+   kRsvfITjNpPisK67dKTMiIJixCEgNotGJBCWLG3mRz5BDgJsm/9wwskJ1
+   w==;
+X-CSE-ConnectionGUID: BPfwG2YXS3WUskbc0w89OA==
+X-CSE-MsgGUID: zS8pWwa/S9OR4FZgJkTzVA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11264"; a="35346207"
+X-IronPort-AV: E=Sophos;i="6.12,177,1728975600"; 
+   d="scan'208";a="35346207"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:59:33 -0800
+X-CSE-ConnectionGUID: EmqQOnq3RDmIeIk8EbeJlA==
+X-CSE-MsgGUID: XolqvH29RsiWrDHLFhliMA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,177,1728975600"; 
+   d="scan'208";a="113995047"
+Received: from bjrankin-mobl3.amr.corp.intel.com (HELO [10.124.220.110]) ([10.124.220.110])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:59:32 -0800
+Message-ID: <bbf78f64-62c7-4a82-b85b-d5227d65e5d0@intel.com>
+Date: Fri, 22 Nov 2024 15:59:31 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID
+ management
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
+ pbonzini@redhat.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
+ linux-kernel@vger.kernel.org, tony.lindgren@linux.intel.com,
+ xiaoyao.li@intel.com, yan.y.zhao@intel.com, x86@kernel.org,
+ adrian.hunter@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
 References: <20241115202028.1585487-1-rick.p.edgecombe@intel.com>
- <20241115202028.1585487-2-rick.p.edgecombe@intel.com> <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
-Message-ID: <Z0EZ4gt2J8hVJz4x@google.com>
-Subject: Re: [RFC PATCH 1/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID management
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	isaku.yamahata@gmail.com, kai.huang@intel.com, linux-kernel@vger.kernel.org, 
-	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	x86@kernel.org, adrian.hunter@intel.com, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Yuan Yao <yuan.yao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+ <20241115202028.1585487-2-rick.p.edgecombe@intel.com>
+ <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
+ <Z0EZ4gt2J8hVJz4x@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <Z0EZ4gt2J8hVJz4x@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 22, 2024, Dave Hansen wrote:
-> On 11/15/24 12:20, Rick Edgecombe wrote:
-> > +struct tdx_td {
-> > +	hpa_t tdr;
-> > +	hpa_t *tdcs;
-> > +};
-> 
-> This is a step in the right direction because it gives the wrappers some
-> more type safety.
-> 
-> But an hpa_t is _barely_ better than a u64.  If the 'tdr' is a page,
-> then it needs to be _stored_ as a page:
-> 
-> 	struct page *tdr_page;
-> 
-> Also, please don't forget to spell these things out:
-> 
-> 	/* TD root structure: */
-> 	struct page *tdr_page;
-> 
-> And the tdcs is an array of pages, right?  So it should be:
-> 
-> 	struct page **tdcs_pages;
-> 
-> Or heck, I _think_ it can theoretically be defined as a variable-length
-> array:
-> 
-> 	struct page *tdcs_pages[];
-> 
-> and use the helpers that we have for that.
-> 
-> Putting it all together, you would have this:
-> 
-> struct tdx_td {
-> 	/* TD root structure: */
-> 	struct page *tdr_page;
-> 
-> 	int tdcs_nr_pages;
-> 	/* TD control structure: */
-> 	struct page *tdcs_pages[];
-> };
-> 
-> That's *MUCH* harder to misuse.  It's 100% obvious that you have a
-> single page, plus a variable-length array of pages.  This is all from
-> just looking at the structure definition.
+On 11/22/24 15:55, Sean Christopherson wrote:
+>> You know that 'tdr' is not just some random physical address.  It's a
+>> whole physical page.  It's page-aligned.  It was allocated, from the
+>> allocator.  It doesn't point to special memory.
+> Oh, but it does point to special memory. 
 
-I don't know the full context, but working with "struct page" is a pain when every
-user just wants the physical address.  KVM SVM had a few cases where pointers were
-tracked as "struct page", and it was generally unpleasant to read and work with.
-
-I also don't like conflating the kernel's "struct page" with the architecture's
-definition of a 4KiB page.
-
-> You know that 'tdr' is not just some random physical address.  It's a
-> whole physical page.  It's page-aligned.  It was allocated, from the
-> allocator.  It doesn't point to special memory.
-
-Oh, but it does point to special memory.  If it *didn't* point at special memory
-that is completely opaque and untouchable, then KVM could use a struct overlay,
-which would give contextual information and some amount of type safety.  E.g.
-an equivalent without TDX is "struct vmcs *".
-
-Rather than "struct page", what if we add an address_space (in the Sparse sense),
-and a typedef for a TDX pages?  Maybe __firmware?  E.g.
-
-  # define __firmware	__attribute__((noderef, address_space(__firmware)))
-
-  typedef u64 __firmware *tdx_page_t;
-
-That doesn't give as much compile-time safety, but in some ways it provides more
-type safety since KVM (or whatever else cares) would need to make an explicit and
-ugly cast to misuse the pointer.
-
-> Ditto for "hpa_t *tdcs".  It's not obvious from the data structure that
-> it's an array or if it's an array how it got allocated or how large it is.
+In this specific case I meant "special memory" as not RAM and not
+managed by the kernel.
 
