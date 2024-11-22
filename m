@@ -1,181 +1,200 @@
-Return-Path: <kvm+bounces-32375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32378-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522509D62BD
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 18:08:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCFE9D6327
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 18:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB56FB25C33
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:08:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D33B3B235AC
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0877B1DF964;
-	Fri, 22 Nov 2024 17:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4B41DFE2F;
+	Fri, 22 Nov 2024 17:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="HjuZNr/w"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J6u/19z1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BE41DEFC8
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 17:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531841DF971;
+	Fri, 22 Nov 2024 17:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732295288; cv=none; b=CZr5eeK+aynEy7hapo780ESOk68jbY5gNoKO9m+VVxB9f+S9VNbRgB4iW0J8BWfbL5jEZaGhJUisTd7Jzq3OC0exf1zB38/WzbhfG6w16hGVgsxFNcJ9wD3Sb4hLIRZu+tqFMhv2Ix6ohTvQ4XNve2Ulx/6yw0ksG+WgYshLbRI=
+	t=1732296619; cv=none; b=KhjGXYKzI2x5qwQUUTnZMVc2ATJlQ6Bit7lJVaXpyyGDJdCfFqlPjm5lft+ofdouPNnbrvQUimcOCDMhsuhjHPsQXf506Rja9ljV7poMO37/3WvMraaqDaAtv1eIfES8waMsyrXtd9eqq8TbbVs7HUGzAL+8e0nlWoAiQDQCDik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732295288; c=relaxed/simple;
-	bh=65Td0TnTUIzwe/pt9Jcl3ypj6q4zhZfthV5rP5mHkJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LBz3MR5poeZmCLo08XDgR9s4ANsFCecbmzdbKZulgGmj7Fp/Ot2ZsA9pDcgAhcY84D0j6N04XGby7O85HF3xp7RZ/hdsC58rPGV3JdUZ0fSPLvnZ94PGrwa1Q5A7Nb21u6LuQAH65pWCUgAc9XbnX+HNq3iuso94dPsLqihb868=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=HjuZNr/w; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d01db666ceso1381819a12.0
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 09:08:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732295284; x=1732900084; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y0DOX93bw5phi/WY0MT30BO5hYdUtb3juzdM+PG5dKU=;
-        b=HjuZNr/w7GwLLQw3JTN1SRPr2ObOq8hPJ1nkhYgMRHOCGcaFfM5X/A2bw+Tgtv6HxA
-         1j9uoglZuOkEdMcsbHpSZ52R5qSWxrJN9VCMhfYtCNeJUcf7pMt/R2ERwgTk1OVSbiWA
-         r8gQG9haIP8ztX6n7cnZgJksqhp5xZ57Ya5VrpUIdg6Mo5VWGuskgaqPa1XPgzwUmHiV
-         MG0zSS9MbOzyR9rz9cY7cwiYDTLTAExO7Gg0RkDzAX5GLIeqJDnZ73mRoT4XgW6h9NCa
-         2oZjBpWmU6ytEguPTXJF43/Fg7a3oAeJW3HxJwjdM0T+VtYfStl1yuTMGMKhbL7ThHa9
-         OIsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732295284; x=1732900084;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y0DOX93bw5phi/WY0MT30BO5hYdUtb3juzdM+PG5dKU=;
-        b=ZYz8d1XAcGLH7DgI5DQn4oWplqk8tQ+5kf/tFn+ljh8CHW1vTADop1XcNNUF/DYIzA
-         AlEG7gyH7spzNTduP0aHjV0W0L98c/58RFTdc9R1V1RXSGLai2ZmlK4+rG5QlIiqVKej
-         sF7tJu3h46imuKxXhKg+hujhIZ7EfYe5OSbCSkga76acRYFRs79HiM5gGBGHf0B1BHfS
-         hijJYqvvFbXsBWacuh2LfyOxqy1HmHBn/AUYV8BRyqLdqmgBYroTxpEY0Nzlfon4J7tf
-         eWn6iK6h1wR+T9D9cUFP+mEtej//E+TuexR+foY28Iuso7rdqPefwKan5eobAwJ8vTei
-         plEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUR7FZz6hOZ5ymM5Y8DRT74wW4tLiie01gYKv6s6Zxy44ZSm/4Psroj0aB0IXJT726V8l4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSJ2BqfSKFWgn9olSHiLs72B6HxICkdu2CWNY2AW8G9bXcdkdj
-	t8UViFSkxrmTJFlid1KXrDJ+zzSRBe3yOmeKAeLXqgO2XfpNfIMD5cJSPJzsV58=
-X-Gm-Gg: ASbGncvDNA4oWYTcUZ4cMU585aqiSfpcqZtrDNevHj3GJpzDyiEN6QTGN4tZyoTHwHT
-	Ariyp77H0phTJVf+CRP+DnS446ybpn0hZ0qoYuXqHDavzYBWjyFCY8QGlrpEM8h+DpUi1XPg2Hj
-	X9trFslSjtpdcq3+rQlSI4P3CT1wS8vGwy9+Tjky3FJcX2SiTu5pqN9bBT6DU6IvlWsl21LWuBV
-	9IWox7RaEEx2ukzTfV6koXGtRdtWh+mIhyNkZuIWcPw1rSKsDYSRxlFs/aT4X5Bl1WV02x+xYLR
-	YgcKbBuzc1T2JNWM4+1XwFU5Z+8qXzuaUJo=
-X-Google-Smtp-Source: AGHT+IGtSa/c759tcXKL36hfS9NeLmo4AZHZNWZDIockuCHHkNSeQM+NVau/IABnZYXKpy1e8IALBA==
-X-Received: by 2002:a05:6402:510c:b0:5cf:9a8:2bca with SMTP id 4fb4d7f45d1cf-5d0207b9aedmr2507880a12.31.1732295282728;
-        Fri, 22 Nov 2024 09:08:02 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d01d3b032esm1100517a12.19.2024.11.22.09.08.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 09:08:01 -0800 (PST)
-Date: Fri, 22 Nov 2024 18:07:59 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org, will@kernel.org, 
-	robin.murphy@arm.com, anup@brainfault.org, atishp@atishpatra.org, tglx@linutronix.de, 
-	alex.williamson@redhat.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 08/15] iommu/riscv: Add IRQ domain for interrupt
- remapping
-Message-ID: <20241122-8c00551e2383787346c5249f@orel>
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-25-ajones@ventanamicro.com>
- <20241118184336.GB559636@ziepe.ca>
- <20241119-62ff49fc1eedba051838dba2@orel>
- <20241119140047.GC559636@ziepe.ca>
- <DE13E1DF-7C68-461D-ADCD-8141B1ACEA5E@ventanamicro.com>
- <20241119153622.GD559636@ziepe.ca>
- <20241121-4e637c492d554280dec3b077@orel>
- <20241122153340.GC773835@ziepe.ca>
+	s=arc-20240116; t=1732296619; c=relaxed/simple;
+	bh=NP4UwV7v0F5OWwafmKBxrz1ZvzT7sYQGx0nqCDPo+1s=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=eRkJYEXK3f7M4lTzkzbNOcSSFeaFQd6HQbPP5sue817mJ8y4FnzlwMgq8WBTHjTp43Ea8GzXty0UXX1Uq06gEDk/MoSshbJqmN2+gLmAo0L6ptqcXRHqY0bDoJ3+k70hR+eQdO2s7AjIjMKWxZFPmklh5OciJb6i12Q6HcGoJ0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J6u/19z1; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMAMOeZ020697;
+	Fri, 22 Nov 2024 17:29:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=XQD1PU6ptvKeI0fuFGCRRH
+	zhvac3i1byGnmnm5ZKMNQ=; b=J6u/19z19r8pbkyVFouVXseewIRW9lf/XXr5OY
+	xMtAMdYaR3wbGrkPjNxVCsc/cdxs5Esu1wm8TydJwBef+M0BvxaSF9jfDpYnYmlX
+	+NYxvkagKjvymiPGHp3V36XefLFtIiHUGHY/Ys1DKRbfZxyNxOWRWrkkGjOmYut3
+	5juU7WFtSNtEhTnw2VmGVr6wOmeH4/e9RpCHAfnaZm6yKReEWAjAZdBKokIgW70C
+	g0OKLCxgXEDYM5RhHvopGMf1BeBSEU3vCTaL6UwIS4NzDhtoXiTichlvFIgPmhfo
+	vzmP+fYvX1Dvf3M28vvcC3EXX+mxASbVbFC4QPokrTRSClSw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 431sv2nwj4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 17:29:43 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AMHTgut021006
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 17:29:42 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 22 Nov 2024 09:29:41 -0800
+From: Elliot Berman <quic_eberman@quicinc.com>
+Subject: [PATCH v5 0/2] mm: Refactor KVM guest_memfd to introduce guestmem
+ library
+Date: Fri, 22 Nov 2024 09:29:37 -0800
+Message-ID: <20241122-guestmem-library-v5-0-450e92951a15@quicinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241122153340.GC773835@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIG/QGcC/23NTQ6CMBCG4auQrq3pD7TUlfcwLqAMMImAttBIC
+ He3kJhodPl+yTyzEA8OwZNTshAHAT0OfYzskBDbFn0DFKvYRDCRcs4FbSbwYwcdvWHpCjdTlUs
+ lbSkMzxWJZ3cHNT538nKN3aIfBzfvH4Lc1jcmf7EgKaOa1xVAnimtyvNjQou9PdqhIxsX0g9Cs
+ D9EGglmM6NrLaVh5ptY1/UFy5Xc0vUAAAA=
+X-Change-ID: 20241112-guestmem-library-68363cb29186
+To: Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton
+	<akpm@linux-foundation.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "Fuad
+ Tabba" <tabba@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        "Mike
+ Rapoport" <rppt@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        "H. Peter
+ Anvin" <hpa@zytor.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>, Trond Myklebust <trondmy@kernel.org>,
+        "Anna
+ Schumaker" <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        "Martin
+ Brandenburg" <martin@omnibond.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+CC: James Gowans <jgowans@amazon.com>, Mike Day <michael.day@amd.com>,
+        <linux-fsdevel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-doc@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <devel@lists.orangefs.org>, <linux-arm-kernel@lists.infradead.org>,
+        "Elliot
+ Berman" <quic_eberman@quicinc.com>
+X-Mailer: b4 0.14.2
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: F6Lm3BVFcc9UAbluTuBt_BvMDPNh2TaM
+X-Proofpoint-ORIG-GUID: F6Lm3BVFcc9UAbluTuBt_BvMDPNh2TaM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 bulkscore=0 adultscore=0 suspectscore=0
+ spamscore=0 malwarescore=0 mlxscore=0 mlxlogscore=984 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411220147
 
-On Fri, Nov 22, 2024 at 11:33:40AM -0400, Jason Gunthorpe wrote:
-> On Fri, Nov 22, 2024 at 04:11:36PM +0100, Andrew Jones wrote:
-> 
-> > The reason is that the RISC-V IOMMU only checks the MSI table, i.e.
-> > enables its support for MSI remapping, when the g-stage (second-stage)
-> > page table is in use. However, the expected virtual memory scheme for an
-> > OS to use for DMA would be to have s-stage (first-stage) in use and the
-> > g-stage set to 'Bare' (not in use). 
-> 
-> That isn't really a technical reason.
-> 
-> > OIOW, it doesn't appear the spec authors expected MSI remapping to
-> > be enabled for the host DMA use case.  That does make some sense,
-> > since it's actually not necessary. For the host DMA use case,
-> > providing mappings for each s-mode interrupt file which the device
-> > is allowed to write to in the s-stage page table sufficiently
-> > enables MSIs to be delivered.
-> 
-> Well, that seems to be the main problem here. You are grappling with a
-> spec design that doesn't match the SW expecations. Since it has
-> deviated from what everyone else has done you now have extra
-> challenges to resolve in some way.
-> 
-> Just always using interrupt remapping if the HW is capable of
-> interrupt remapping and ignoring the spec "expectation" is a nice a
-> simple way to make things work with existing Linux.
-> 
-> > If "default VFIO" means VFIO without irqbypass, then it would work the
-> > same as the DMA API, assuming all mappings for all necessary s-mode
-> > interrupt files are created (something the DMA API needs as well).
-> > However, VFIO would also need 'vfio_iommu_type1.allow_unsafe_interrupts=1'
-> > to be set for this no-irqbypass configuration.
-> 
-> Which isn't what anyone wants, you need to make the DMA API domain be
-> fully functional so that VFIO works.
-> 
-> > > That isn't ideal, the translation under the IRQs shouldn't really be
-> > > changing as the translation under the IOMMU changes.
-> > 
-> > Unless the device is assigned to a guest, then the IRQ domain wouldn't
-> > do anything at all (it'd just sit between the device and the device's
-> > old MSI parent domain), but it also wouldn't come and go, risking issues
-> > with anything sensitive to changes in the IRQ domain hierarchy.
-> 
-> VFIO isn't restricted to such a simple use model. You have to support
-> all the generality, which includes fully supporting changing the iommu
-> translation on the fly.
-> 
-> > > Further, VFIO assumes iommu_group_has_isolated_msi(), ie
-> > > IRQ_DOMAIN_FLAG_ISOLATED_MSI, is fixed while it is is bound. Will that
-> > > be true if the iommu is flapping all about? What will you do when VFIO
-> > > has it attached to a blocked domain?
-> > > 
-> > > It just doesn't make sense to change something so fundamental as the
-> > > interrupt path on an iommu domain attachement. :\
-> > 
-> > Yes, it does appear I should be doing this at iommu device probe time
-> > instead. It won't provide any additional functionality to use cases which
-> > aren't assigning devices to guests, but it also won't hurt, and it should
-> > avoid the risks you point out.
-> 
-> Even if you statically create the domain you can't change the value of
-> IRQ_DOMAIN_FLAG_ISOLATED_MSI depending on what is currently attached
-> to the IOMMU.
-> 
-> What you are trying to do is not supported by the software stack right
-> now. You need to make much bigger, more intrusive changes, if you
-> really want to make interrupt remapping dynamic.
->
+In preparation for adding more features to KVM's guest_memfd, refactor
+and introduce a library which abtracts some of the core-mm decisions
+about managing folios associated with guest memory. The goal of the
+refactor serves two purposes:
 
-Let the fun begin. I'll look into this more. It also looks like I need to
-collect some test cases to ensure I can support all use cases with
-whatever I propose next. Pointers for those would be welcome.
+1. Provide an easier way to reason about memory in guest_memfd. KVM
+   needs to support multiple confidentiality models (TDX, SEV, pKVM, Arm
+   CCA). These models support different semantics for when the host
+   can(not) access guest memory. An abstraction for the allocator and
+   managing the state of pages will make it eaiser to reason about the
+   state of folios within the guest_memfd.
 
-Thanks,
-drew
+2. Provide a common implementation for other users such as Gunyah [1] and
+   guestmemfs [2].
+
+In this initial series, I'm seeking comments for the line I'm drawing
+between library and user (KVM). I've not introduced new functionality in
+this series; the first new feature will probably be Fuad's mappability
+patches [3].
+
+I've decided to only bring out the address_space from guest_memfd as it
+seemed the simplest approach. In the current iteration, KVM "attaches"
+the guestmem to the inode. I expect we'll want to provide some helpers
+for inode, file, and vm operations when it's relevant to
+mappability/accessiblity/faultability.
+
+I'd appreciate any feedback, especially on how much we should pull into
+the guestmem library.
+
+[1]: https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
+[2]: https://lore.kernel.org/all/20240805093245.889357-1-jgowans@amazon.com/
+[3]: https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
+
+Changes in v5:
+- Free all folios when the owner removes detaches the guestmem
+- Link to v4: https://lore.kernel.org/r/20241120-guestmem-library-v4-0-0c597f733909@quicinc.com
+
+Changes in v4:
+- Update folio_free() to add address_space mapping instead of
+  invalidate_folio/free_folio path.
+- Link to v3: https://lore.kernel.org/r/20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com
+
+Changes in v3:
+ - Refactor/extract only the address_space
+ - Link to v2: https://lore.kernel.org/all/20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com/
+
+Changes in v2:
+- Significantly reworked to introduce "accessible" and "safe" reference
+  counters
+- Link to v1: https://lore.kernel.org/r/20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com
+
+Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+---
+Elliot Berman (2):
+      filemap: Pass address_space mapping to ->free_folio()
+      mm: guestmem: Convert address_space operations to guestmem library
+
+ Documentation/filesystems/locking.rst |   2 +-
+ MAINTAINERS                           |   2 +
+ fs/nfs/dir.c                          |  11 +-
+ fs/orangefs/inode.c                   |   3 +-
+ include/linux/fs.h                    |   2 +-
+ include/linux/guestmem.h              |  34 ++++++
+ mm/Kconfig                            |   3 +
+ mm/Makefile                           |   1 +
+ mm/filemap.c                          |   9 +-
+ mm/guestmem.c                         | 201 ++++++++++++++++++++++++++++++++++
+ mm/secretmem.c                        |   3 +-
+ mm/vmscan.c                           |   4 +-
+ virt/kvm/Kconfig                      |   1 +
+ virt/kvm/guest_memfd.c                |  98 +++++------------
+ 14 files changed, 290 insertions(+), 84 deletions(-)
+---
+base-commit: 5cb1659f412041e4780f2e8ee49b2e03728a2ba6
+change-id: 20241112-guestmem-library-68363cb29186
+
+Best regards,
+-- 
+Elliot Berman <quic_eberman@quicinc.com>
+
 
