@@ -1,1158 +1,323 @@
-Return-Path: <kvm+bounces-32372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093869D6258
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:34:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D2B9D6287
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 17:48:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD50928295A
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 16:34:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E111281D3B
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 16:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5720D15E5B5;
-	Fri, 22 Nov 2024 16:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4363513B797;
+	Fri, 22 Nov 2024 16:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="csVfm8o5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGY5ji+W"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFCA6F30C
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 16:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FD460890
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 16:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732293288; cv=none; b=ZFqqdMBKZAHG0keZRgm0K/p+AqSr2diU1uZI/FDjzP/XzbF0DtpV46Z6YPPrZR5Zm+er6VE6Guz/dzdaM1Ov+kzzzEOpLKSLXM7abhAb+uR3k2dKNHpxwSKi4yxpDQJo03iAREK66P0bN5htlN9El1QlxKF7MkMWT3mJqjzrGmY=
+	t=1732294119; cv=none; b=uowdGYYDuTtA3sx1fn8xF5SAcmEzKoxieoL0xyk60lK2cufPqZjXLXHcqG0dX1f21OJMbakJg74J7OoQpO1ujnDm0nXP2+RwSmFy2t6unXaRhIzHFMP7ycw8HmkVJCM7hcE3fxZ30I5Yg0PYpZXEkpDzgXqD08f6S46PeqpDMcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732293288; c=relaxed/simple;
-	bh=QbbBTFbGZ/5eYvi6MKn5hX/O9b0FsMihYaW40gg9Uzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TvGVJiOZpWTMSA4o2ixps64e+brzAKa0Su2OEeoWT07Mg+KeAlRx8sJDLfmY/Jz6UaMPB8JvwmLJzqCSeejdezOHihOpf90MbLQyjOIO5xsnB2bvJ0bWy/oIqB9C4o9IZyjElkKdqTkl6Rco3H97Bcwwn3T2KvJbtIjRgRmBs8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=csVfm8o5; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 22 Nov 2024 17:34:34 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732293282;
+	s=arc-20240116; t=1732294119; c=relaxed/simple;
+	bh=D0ZoNb4AGm2sVITtfXgH8IoHdKx0Ian+mInrIdUUVIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ssHTu/KLoEkognxVIoekOi+AGID/Y+BVstHsgz/nRJtxdjcjme1FV3mTtej//6N6IznM1etZ9SE9aKlVoh4oDGGoKEaJYnqgzFm+XTH6RKLUZTIr0ip8VQX8pUQ9KLvnufv4ktQQ2tmwqjGltnhQ08L8ITLOU/ut55qh3L8LhYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fGY5ji+W; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732294116;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yKCqUDqvfHVCI/jVvppD9KmPpzcFCONyr/Zfr6Yl8lI=;
-	b=csVfm8o5hstaN5oTa6n8BLDUHlAiM+rVsndSWfhqtLa9rWTKuDnKTBCW1OpREefv6xKSVi
-	DBrwDVZHNRNSQqBGPjvGxVhIzZIq+3ABz+2GmjkAXmg8XshVB+l3EYOmNmS7JwBOdFor3S
-	U4frCyXsXRnKJ0lXnIzb/J1Z32UK11U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] riscv: sbi: Add SSE extension tests
-Message-ID: <20241122-5e3fefbf68ba10f193470d6a@orel>
-References: <20241122140459.566306-1-cleger@rivosinc.com>
- <20241122140459.566306-4-cleger@rivosinc.com>
+	bh=zVCDFXaNMsuGWcQ78ZTx+x+51IuTZpYbcUeipG7O7qM=;
+	b=fGY5ji+WfV8a+d3wEKPVW0jQCVuuVZJL9ufF2NJKwj6SunJ0CsaEOnCiPZn+Cmkpm2kcZE
+	oqXX0j6KLcJkiucCT32FnVdherUH15qX6ncz3Dv/gcUZRDmpKzT9/Go8+BqU88gKRovtJE
+	T6Fy43DVGEPvtM2ixPO+CAf7ThIPveg=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-402-ekAiCqf8MEqiViVFWDG_KA-1; Fri, 22 Nov 2024 11:48:35 -0500
+X-MC-Unique: ekAiCqf8MEqiViVFWDG_KA-1
+X-Mimecast-MFC-AGG-ID: ekAiCqf8MEqiViVFWDG_KA
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7180d9a3693so214353a34.1
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 08:48:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732294114; x=1732898914;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zVCDFXaNMsuGWcQ78ZTx+x+51IuTZpYbcUeipG7O7qM=;
+        b=nlRfOT8SvIlXzTFDYafIreLF3aKeQ2vAEBohe7Mu9kwNqhR3yZonPSXq7d4hcc4zsi
+         3PthTXwoBJi4ruaI48Okk0EMtLntfpXB9oHreYRgK14m//vHc/zD8X1ikDdggzGHtgzO
+         FDgOkyWY+UKftPNLOuKDPIXyHHmr2TMQIWVkY4zwAXUx4Focm3/8p9HBCUK2p3CC6a6E
+         Gz/ywMUxX0GAffGByhCdElqA9xg9X/bBCk+LVokmJ/EypuLLgu85eYs/McqNGlcpAC/I
+         Vb3i9uvfVwokiSTQ7jFYBMaVDxmm11KqoXm+Ul2iKNHBIFP++RgJZLzsAls4kRWT+6sS
+         ladA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4HiSFpJa/0nCL+20c+wghdCSjAqHINMAHJX+zl6CRfGMD0ULRDdzZo5O2QRDEWjXd2IU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3W1rIZ264znRUjP5tC8nPImRnUbqTlTalR1v1SC4QF2KbuuKk
+	97Qx2pGdhxRv5bnAE0AOPABdi2FLGLRZpzFKeu3OlYUNb1Vn+y4qKahEAuS4g4SJ8w8d3in1JSl
+	bdNaTvCyEqKJbnZgJf3L2ZK+bwfg7btvK2y4Czc2AFu9Us8qKCg==
+X-Gm-Gg: ASbGnctsMNiiZJLvE4wIUTmlvor+yKBgVQq8RPLDUPzrx6vtPJmWswcrhOnTON14ac8
+	qq6HaVwLmSdORR+6160E/FGXKw6lfeheBvh5Kc8laqzEbFT03cWDB5zyUGXSo6vIQVnVGyNWJzP
+	fwQJCMctGd53LX7Js9PuwInpYO31cYtngJBFXvZQCkIxk7VnS/6kzO0MRn8ZnkDlSSJt0zE2hQ1
+	3QmNenAkfi/VTq/bZP1w0G6q4NxRCR8Lg77kwDli9wZNNVlCyTA0g==
+X-Received: by 2002:a05:6808:1688:b0:3e6:3c95:833a with SMTP id 5614622812f47-3e915a5650fmr1089797b6e.5.1732294114189;
+        Fri, 22 Nov 2024 08:48:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG3Av3rPnef7b1nFePTLpQ+b74HDm9lqwrf1VG8fxLrQwWOnILmiDQGIDJbxt3KQ+3cCmahtQ==
+X-Received: by 2002:a05:6808:1688:b0:3e6:3c95:833a with SMTP id 5614622812f47-3e915a5650fmr1089737b6e.5.1732294112356;
+        Fri, 22 Nov 2024 08:48:32 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71c03772b01sm481000a34.20.2024.11.22.08.48.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 08:48:30 -0800 (PST)
+Date: Fri, 22 Nov 2024 09:48:26 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: Avihai Horon <avihaih@nvidia.com>, <kvm@vger.kernel.org>, Yishai Hadas
+ <yishaih@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Maor Gottlieb
+ <maorg@nvidia.com>
+Subject: Re: [PATCH v2] vfio/pci: Properly hide first-in-list PCIe extended
+ capability
+Message-ID: <20241122094826.142a5d54.alex.williamson@redhat.com>
+In-Reply-To: <14709dcf-d7fe-4579-81b9-28065ce15f3e@intel.com>
+References: <20241121140057.25157-1-avihaih@nvidia.com>
+	<14709dcf-d7fe-4579-81b9-28065ce15f3e@intel.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241122140459.566306-4-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 22, 2024 at 03:04:57PM +0100, Clément Léger wrote:
-> Add SBI SSE extension tests for the following features:
-> - Test attributes errors (invalid values, RO, etc)
-> - Registration errors
-> - Simple events (register, enable, inject)
-> - Events with different priorities
-> - Global events dispatch on different harts
-> - Local events on all harts
+On Fri, 22 Nov 2024 20:45:08 +0800
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> On 2024/11/21 22:00, Avihai Horon wrote:
+> > There are cases where a PCIe extended capability should be hidden from
+> > the user. For example, an unknown capability (i.e., capability with ID
+> > greater than PCI_EXT_CAP_ID_MAX) or a capability that is intentionally
+> > chosen to be hidden from the user.
+> > 
+> > Hiding a capability is done by virtualizing and modifying the 'Next
+> > Capability Offset' field of the previous capability so it points to the
+> > capability after the one that should be hidden.
+> > 
+> > The special case where the first capability in the list should be hidden
+> > is handled differently because there is no previous capability that can
+> > be modified. In this case, the capability ID and version are zeroed
+> > while leaving the next pointer intact. This hides the capability and
+> > leaves an anchor for the rest of the capability list.
+> > 
+> > However, today, hiding the first capability in the list is not done
+> > properly if the capability is unknown, as struct
+> > vfio_pci_core_device->pci_config_map is set to the capability ID during
+> > initialization but the capability ID is not properly checked later when
+> > used in vfio_config_do_rw(). This leads to the following warning [1] and
+> > to an out-of-bounds access to ecap_perms array.
+> > 
+> > Fix it by checking cap_id in vfio_config_do_rw(), and if it is greater
+> > than PCI_EXT_CAP_ID_MAX, use an alternative struct perm_bits for direct
+> > read only access instead of the ecap_perms array.
+> > 
+> > Note that this is safe since the above is the only case where cap_id can
+> > exceed PCI_EXT_CAP_ID_MAX (except for the special capabilities, which
+> > are already checked before).
+> > 
+> > [1]
+> > 
+> > WARNING: CPU: 118 PID: 5329 at drivers/vfio/pci/vfio_pci_config.c:1900 vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]  
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  riscv/Makefile      |   1 +
->  lib/riscv/asm/csr.h |   2 +
->  riscv/sbi-tests.h   |   4 +
->  riscv/sbi-sse.c     | 981 ++++++++++++++++++++++++++++++++++++++++++++
->  riscv/sbi.c         |   1 +
->  riscv/unittests.cfg |   4 +
->  6 files changed, 993 insertions(+)
->  create mode 100644 riscv/sbi-sse.c
+> strange, it is not in the vfio_config_do_rw(). But never mind.
 > 
-> diff --git a/riscv/Makefile b/riscv/Makefile
-> index e50621ad..768e1c25 100644
-> --- a/riscv/Makefile
-> +++ b/riscv/Makefile
-> @@ -46,6 +46,7 @@ ifeq ($(ARCH),riscv32)
->  cflatobjs += lib/ldiv32.o
->  endif
->  cflatobjs += riscv/sbi-asm.o
-> +cflatobjs += riscv/sbi-sse.o
+> > CPU: 118 UID: 0 PID: 5329 Comm: simx-qemu-syste Not tainted 6.12.0+ #1
+> > (snip)
+> > Call Trace:
+> >   <TASK>
+> >   ? show_regs+0x69/0x80
+> >   ? __warn+0x8d/0x140
+> >   ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
+> >   ? report_bug+0x18f/0x1a0
+> >   ? handle_bug+0x63/0xa0
+> >   ? exc_invalid_op+0x19/0x70
+> >   ? asm_exc_invalid_op+0x1b/0x20
+> >   ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
+> >   ? vfio_pci_config_rw+0x244/0x430 [vfio_pci_core]
+> >   vfio_pci_rw+0x101/0x1b0 [vfio_pci_core]
+> >   vfio_pci_core_read+0x1d/0x30 [vfio_pci_core]
+> >   vfio_device_fops_read+0x27/0x40 [vfio]
+> >   vfs_read+0xbd/0x340
+> >   ? vfio_device_fops_unl_ioctl+0xbb/0x740 [vfio]
+> >   ? __rseq_handle_notify_resume+0xa4/0x4b0
+> >   __x64_sys_pread64+0x96/0xc0
+> >   x64_sys_call+0x1c3d/0x20d0
+> >   do_syscall_64+0x4d/0x120
+> >   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > 
+> > Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> > Signed-off-by: Avihai Horon <avihaih@nvidia.com>
+> > ---
+> > Changes from v1:
+> > * Use Alex's suggestion to fix the bug and adapt the commit message.
+> > ---
+> >   drivers/vfio/pci/vfio_pci_config.c | 20 ++++++++++++++++----
+> >   1 file changed, 16 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> > index 97422aafaa7b..b2a1ba66e5f1 100644
+> > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > @@ -313,12 +313,16 @@ static int vfio_virt_config_read(struct vfio_pci_core_device *vdev, int pos,
+> >   	return count;
+> >   }
+> >   
+> > +static const struct perm_bits direct_ro_perms = {
+> > +	.readfn = vfio_direct_config_read,
+> > +};
+> > +
+> >   /* Default capability regions to read-only, no-virtualization */
+> >   static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
+> > -	[0 ... PCI_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
+> > +	[0 ... PCI_CAP_ID_MAX] = direct_ro_perms
+> >   };
+> >   static struct perm_bits ecap_perms[PCI_EXT_CAP_ID_MAX + 1] = {
+> > -	[0 ... PCI_EXT_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
+> > +	[0 ... PCI_EXT_CAP_ID_MAX] = direct_ro_perms
+> >   };
+> >   /*
+> >    * Default unassigned regions to raw read-write access.  Some devices
+> > @@ -1897,9 +1901,17 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
+> >   		cap_start = *ppos;
+> >   	} else {
+> >   		if (*ppos >= PCI_CFG_SPACE_SIZE) {
+> > -			WARN_ON(cap_id > PCI_EXT_CAP_ID_MAX);
+> > +			/*
+> > +			 * We can get a cap_id that exceeds PCI_EXT_CAP_ID_MAX
+> > +			 * if we're hiding an unknown capability at the start
+> > +			 * of the extended capability list.  Use default, ro
+> > +			 * access, which will virtualize the id and next values.
+> > +			 */
+> > +			if (cap_id > PCI_EXT_CAP_ID_MAX)
+> > +				perm = (struct perm_bits *)&direct_ro_perms;
+> > +			else
+> > +				perm = &ecap_perms[cap_id];
+> >   
+> > -			perm = &ecap_perms[cap_id];
+> >   			cap_start = vfio_find_cap_start(vdev, *ppos);
+> >   		} else {
+> >   			WARN_ON(cap_id > PCI_CAP_ID_MAX);  
+> 
+> Looks good to me. :) I'm able to trigger this warning by hide the first 
+> ecap on my system with the below hack.
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c 
+> b/drivers/vfio/pci/vfio_pci_config.c
+> index b2a1ba66e5f1..db91e19a48b3 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1617,6 +1617,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device 
+> *vdev)
+>   	u16 epos;
+>   	__le32 *prev = NULL;
+>   	int loops, ret, ecaps = 0;
+> +	int iii =0;
+> 
+>   	if (!vdev->extended_caps)
+>   		return 0;
+> @@ -1635,7 +1636,11 @@ static int vfio_ecap_init(struct 
+> vfio_pci_core_device *vdev)
+>   		if (ret)
+>   			return ret;
+> 
+> -		ecap = PCI_EXT_CAP_ID(header);
+> +		if (iii == 0) {
+> +			ecap = 0x61;
+> +			iii++;
+> +		} else
+> +			ecap = PCI_EXT_CAP_ID(header);
+> 
+>   		if (ecap <= PCI_EXT_CAP_ID_MAX) {
+>   			len = pci_ext_cap_length[ecap];
+> @@ -1664,6 +1669,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device 
+> *vdev)
+>   			 */
+>   			len = PCI_CAP_SIZEOF;
+>   			hidden = true;
+> +			printk("%s set hide\n", __func__);
+>   		}
+> 
+>   		for (i = 0; i < len; i++) {
+> @@ -1893,6 +1899,7 @@ static ssize_t vfio_config_do_rw(struct 
+> vfio_pci_core_device *vdev, char __user
+> 
+>   	cap_id = vdev->pci_config_map[*ppos];
+> 
+> +	printk("%s cap_id: %x\n", __func__, cap_id);
+>   	if (cap_id == PCI_CAP_ID_INVALID) {
+>   		perm = &unassigned_perms;
+>   		cap_start = *ppos;
+> 
+> And then this warning is gone after applying this patch. Hence,
+> 
+> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+> Tested-by: Yi Liu <yi.l.liu@intel.com>
 
-We should figure out how to only link these files into
-riscv/sbi.{flat,efi}
+Thanks, good testing!
+ 
+> But I can still see a valid next pointer. Like the below log, I hide
+> the first ecap at offset 0x100, its ID is zeroed. The second ecap locates
+> at offset==0x150, its cap_id is 0x0018. I can see the next pointer in the
+> guest. Is it expected?
 
->  
->  ########################################
->  
-> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-> index 16f5ddd7..06831380 100644
-> --- a/lib/riscv/asm/csr.h
-> +++ b/lib/riscv/asm/csr.h
-> @@ -21,6 +21,8 @@
->  /* Exception cause high bit - is an interrupt if set */
->  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
->  
-> +#define SSTATUS_SPP		_AC(0x00000100, UL) /* Previously Supervisor */
-> +
->  /* Exception causes */
->  #define EXC_INST_MISALIGNED	0
->  #define EXC_INST_ACCESS		1
-> diff --git a/riscv/sbi-tests.h b/riscv/sbi-tests.h
-> index ce129968..2115acc6 100644
-> --- a/riscv/sbi-tests.h
-> +++ b/riscv/sbi-tests.h
-> @@ -33,4 +33,8 @@
->  #define SBI_SUSP_TEST_HARTID	(1 << 2)
->  #define SBI_SUSP_TEST_MASK	7
->  
-> +#ifndef __ASSEMBLY__
-> +void check_sse(void);
+This is what makes hiding the first ecap unique, the ecap chain always
+starts at 0x100, the next pointer must be valid for the rest of the
+chain to remain.  For standard capabilities we can change the register
+pointing at the head of the list.  This therefore looks like expected
+behavior, unless I'm missing something more subtle in your example.
+ 
+> Guest:
+> 100: 00 00 00 15 00 00 00 00 00 00 10 00 00 00 04 00
+> 110: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 120: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 130: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 140: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 150: 18 00 01 16 00 00 00 00 00 00 00 00 00 00 00 00
+> 160: 17 00 01 17 05 02 01 00 00 00 00 00 00 00 00 00
+> 
+> Host:
+> 100: 01 00 02 15 00 00 00 00 00 00 10 00 00 00 04 00
+> 110: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 120: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 130: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 140: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 150: 18 00 01 16 00 00 00 00 00 00 00 00 00 00 00 00
+> 160: 17 00 01 17 05 02 01 00 00 00 00 00 00 00 00 00
+> 
+> 
+> BTW. If the first PCI cap is a unknown cap, will it have a problem? The
+> vfio_pci_core_device->pci_config_map is kept to be PCI_CAP_ID_INVALID,
+> hence it would use the unassigned_perms. But it makes more sense to use the
+> direct_ro_perms introduced here. is it?
 
-We can just put this in riscv/sbi.c
+Once we've masked the capability ID, if the guest driver is still
+touching the remaining body of the capability, we're really in the
+space of undefined behavior, imo.  We've already taken the stance that
+inter-capability space is accessible as a necessity for certain
+devices.  It's certainly been suggested that we might want to take a
+more guarded approach, even so far as readjusting the capability layout
+for compatibility.  We might head in that direction but I don't think
+we should start with this bug fix.  Thanks,
 
-> +#endif /* !__ASSEMBLY__ */
-> +
->  #endif /* _RISCV_SBI_TESTS_H_ */
-> diff --git a/riscv/sbi-sse.c b/riscv/sbi-sse.c
-> new file mode 100644
-> index 00000000..16eb0575
-> --- /dev/null
-> +++ b/riscv/sbi-sse.c
-> @@ -0,0 +1,981 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * SBI SSE testsuite
-> + *
-> + * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
-> + */
-> +#include <libcflat.h>
-> +#include <alloc_page.h>
-> +#include <bitops.h>
-> +#include <cpumask.h>
-> +#include <libcflat.h>
+Alex
 
-libcflat.h is repeated and let's alphabetize all these
-
-> +#include <on-cpus.h>
-> +#include <alloc.h>
-> +
-> +#include <asm/barrier.h>
-> +#include <asm/page.h>
-> +#include <asm/processor.h>
-> +#include <asm/sbi.h>
-> +#include <asm/setup.h>
-> +#include <asm/sse.h>
-> +
-> +#include "sbi-tests.h"
-> +
-> +#define SSE_STACK_SIZE	PAGE_SIZE
-> +
-> +struct sse_event_info {
-> +	unsigned long event_id;
-> +	const char *name;
-> +	bool can_inject;
-> +};
-> +
-> +static struct sse_event_info sse_event_infos[] = {
-> +	{
-> +		.event_id = SBI_SSE_EVENT_LOCAL_RAS,
-> +		.name = "local_ras",
-> +	},
-> +	{
-> +		.event_id = SBI_SSE_EVENT_GLOBAL_RAS,
-> +		.name = "global_ras",
-> +	},
-> +	{
-> +		.event_id = SBI_SSE_EVENT_LOCAL_PMU,
-> +		.name = "local_pmu",
-> +	},
-> +	{
-> +		.event_id = SBI_SSE_EVENT_LOCAL_SOFTWARE,
-> +		.name = "local_software",
-> +	},
-> +	{
-> +		.event_id = SBI_SSE_EVENT_GLOBAL_SOFTWARE,
-> +		.name = "global_software",
-> +	},
-> +};
-> +
-> +static const char *const attr_names[] = {
-> +	[SBI_SSE_ATTR_STATUS] = "status",
-> +	[SBI_SSE_ATTR_PRIO] = "prio",
-> +	[SBI_SSE_ATTR_CONFIG] = "config",
-> +	[SBI_SSE_ATTR_PREFERRED_HART] = "preferred_hart",
-> +	[SBI_SSE_ATTR_ENTRY_PC] = "entry_pc",
-> +	[SBI_SSE_ATTR_ENTRY_ARG] = "entry_arg",
-> +	[SBI_SSE_ATTR_INTERRUPTED_SEPC] = "interrupted_pc",
-> +	[SBI_SSE_ATTR_INTERRUPTED_FLAGS] = "interrupted_flags",
-> +	[SBI_SSE_ATTR_INTERRUPTED_A6] = "interrupted_a6",
-> +	[SBI_SSE_ATTR_INTERRUPTED_A7] = "interrupted_a7",
-> +};
-> +
-> +static const unsigned long ro_attrs[] = {
-> +	SBI_SSE_ATTR_STATUS,
-> +	SBI_SSE_ATTR_ENTRY_PC,
-> +	SBI_SSE_ATTR_ENTRY_ARG,
-> +};
-> +
-> +static const unsigned long interrupted_attrs[] = {
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS,
-> +	SBI_SSE_ATTR_INTERRUPTED_SEPC,
-> +	SBI_SSE_ATTR_INTERRUPTED_A6,
-> +	SBI_SSE_ATTR_INTERRUPTED_A7,
-> +};
-> +
-> +static const unsigned long interrupted_flags[] = {
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS_STATUS_SPP,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS_STATUS_SPIE,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP,
-> +};
-> +
-> +static struct sse_event_info *sse_evt_get_infos(unsigned long event_id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
-> +		if (sse_event_infos[i].event_id == event_id)
-> +			return &sse_event_infos[i];
-> +	}
-> +
-> +	assert_msg(false, "Invalid event id: %ld", event_id);
-> +}
-> +
-> +static const char *sse_evt_name(unsigned long event_id)
-> +{
-> +	struct sse_event_info *infos = sse_evt_get_infos(event_id);
-> +
-> +	return infos->name;
-> +}
-> +
-> +static bool sse_evt_can_inject(unsigned long event_id)
-> +{
-> +	struct sse_event_info *infos = sse_evt_get_infos(event_id);
-> +
-> +	return infos->can_inject;
-> +}
-> +
-> +static bool sse_event_is_global(unsigned long event_id)
-> +{
-> +	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
-> +}
-> +
-> +static struct sbiret sse_event_get_attr_raw(unsigned long event_id,
-> +					    unsigned long base_attr_id,
-> +					    unsigned long attr_count,
-> +					    unsigned long phys_lo,
-> +					    unsigned long phys_hi)
-> +{
-> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTR, event_id,
-> +			base_attr_id, attr_count, phys_lo, phys_hi, 0);
-> +}
-> +
-> +static unsigned long sse_event_get_attrs(unsigned long event_id, unsigned long attr_id,
-> +					 unsigned long *values, unsigned int attr_count)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sse_event_get_attr_raw(event_id, attr_id, attr_count, (unsigned long)values, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_get_attr(unsigned long event_id, unsigned long attr_id,
-> +					unsigned long *value)
-> +{
-> +	return sse_event_get_attrs(event_id, attr_id, value, 1);
-> +}
-> +
-> +static struct sbiret sse_event_set_attr_raw(unsigned long event_id, unsigned long base_attr_id,
-> +					    unsigned long attr_count, unsigned long phys_lo,
-> +					    unsigned long phys_hi)
-> +{
-> +	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTR, event_id, base_attr_id, attr_count,
-> +			 phys_lo, phys_hi, 0);
-> +}
-> +
-> +static unsigned long sse_event_set_attr(unsigned long event_id, unsigned long attr_id,
-> +					unsigned long value)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sse_event_set_attr_raw(event_id, attr_id, 1, (unsigned long)&value, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_register_raw(unsigned long event_id, void *entry_pc, void *entry_arg)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, (unsigned long)entry_pc,
-> +			(unsigned long)entry_arg, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_register(unsigned long event_id, struct sse_handler_arg *arg)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, (unsigned long)sse_entry,
-> +			(unsigned long)arg, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_unregister(unsigned long event_id)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_enable(unsigned long event_id)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_inject(unsigned long event_id, unsigned long hart_id)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +static unsigned long sse_event_disable(unsigned long event_id)
-> +{
-> +	struct sbiret ret;
-> +
-> +	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-> +
-> +
-> +static int sse_get_state(unsigned long event_id, enum sbi_sse_state *state)
-> +{
-> +	int ret;
-> +	unsigned long status;
-> +
-> +	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-> +	if (ret) {
-> +		report_fail("Failed to get SSE event status");
-> +		return -1;
-> +	}
-> +
-> +	*state = status & SBI_SSE_ATTR_STATUS_STATE_MASK;
-> +
-> +	return 0;
-> +}
-> +
-> +static void sse_global_event_set_current_hart(unsigned long event_id)
-> +{
-> +	int ret;
-> +
-> +	if (!sse_event_is_global(event_id))
-> +		return;
-> +
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-> +				 current_thread_info()->hartid);
-> +	if (ret)
-> +		report_abort("set preferred hart failure");
-> +}
-> +
-> +static int sse_check_state(unsigned long event_id, unsigned long expected_state)
-> +{
-> +	int ret;
-> +	enum sbi_sse_state state;
-> +
-> +	ret = sse_get_state(event_id, &state);
-> +	if (ret)
-> +		return 1;
-> +	report(state == expected_state, "SSE event status == %ld", expected_state);
-> +
-> +	return state != expected_state;
-> +}
-> +
-> +static bool sse_event_pending(unsigned long event_id)
-> +{
-> +	int ret;
-> +	unsigned long status;
-> +
-> +	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-> +	if (ret) {
-> +		report_fail("Failed to get SSE event status");
-> +		return false;
-> +	}
-> +
-> +	return !!(status & BIT(SBI_SSE_ATTR_STATUS_PENDING_OFFSET));
-> +}
-> +
-> +static void *sse_alloc_stack(void)
-> +{
-> +	return (alloc_page() + PAGE_SIZE);
-> +}
-> +
-> +static void sse_free_stack(void *stack)
-> +{
-> +	free_page(stack - PAGE_SIZE);
-> +}
-
-I guess this should be SSE_STACK_SIZE, otherwise that define can be
-removed
-
-> +
-> +static void sse_test_attr(unsigned long event_id)
-> +{
-> +	unsigned long ret, value = 0;
-> +	unsigned long values[ARRAY_SIZE(ro_attrs)];
-> +	struct sbiret sret;
-> +	unsigned int i;
-> +
-> +	report_prefix_push("attrs");
-> +
-> +	for (i = 0; i < ARRAY_SIZE(ro_attrs); i++) {
-> +		ret = sse_event_set_attr(event_id, ro_attrs[i], value);
-> +		report(ret == SBI_ERR_BAD_RANGE, "RO attribute %s not writable",
-> +		       attr_names[ro_attrs[i]]);
-> +	}
-> +
-> +	for (i = SBI_SSE_ATTR_STATUS; i <= SBI_SSE_ATTR_INTERRUPTED_A7; i++) {
-> +		ret = sse_event_get_attr(event_id, i, &value);
-> +		report(ret == SBI_SUCCESS, "Read single attribute %s", attr_names[i]);
-> +		/* Preferred Hart reset value is defined by SBI vendor and status injectable bit
-> +		 * also depends on the SBI implementation
-> +		 */
-> +		if (i != SBI_SSE_ATTR_STATUS && i != SBI_SSE_ATTR_PREFERRED_HART)
-> +			report(value == 0, "Attribute %s reset value is 0", attr_names[i]);
-> +	}
-> +
-> +	ret = sse_event_get_attrs(event_id, SBI_SSE_ATTR_STATUS, values,
-> +				  SBI_SSE_ATTR_INTERRUPTED_A7 - SBI_SSE_ATTR_STATUS);
-> +	report(ret == SBI_SUCCESS, "Read multiple attributes");
-> +
-> +#if __riscv_xlen > 32
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIO, 0xFFFFFFFFUL + 1UL);
-> +	report(ret == SBI_ERR_INVALID_PARAM, "Write prio > 0xFFFFFFFF error");
-> +#endif
-> +
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, ~SBI_SSE_ATTR_CONFIG_ONESHOT);
-> +	report(ret == SBI_ERR_INVALID_PARAM, "Write invalid config error");
-> +
-> +	if (sse_event_is_global(event_id)) {
-> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART, 0xFFFFFFFFUL);
-> +		report(ret == SBI_ERR_INVALID_PARAM, "Set invalid hart id error");
-> +	} else {
-> +		/* Set Hart on local event -> RO */
-> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-> +					 current_thread_info()->hartid);
-> +		report(ret == SBI_ERR_BAD_RANGE, "Set hart id on local event error");
-> +	}
-> +
-> +	/* Set/get flags, sepc, a6, a7 */
-> +	for (i = 0; i < ARRAY_SIZE(interrupted_attrs); i++) {
-> +		ret = sse_event_get_attr(event_id, interrupted_attrs[i], &value);
-> +		report(ret == 0, "Get interrupted %s no error", attr_names[interrupted_attrs[i]]);
-> +
-> +		/* 0x1 is a valid value for all the interrupted attributes */
-> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 0x1);
-> +		report(ret == SBI_ERR_INVALID_STATE, "Set interrupted flags invalid state error");
-> +	}
-> +
-> +	/* Attr_count == 0 */
-> +	sret = sse_event_get_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 0, (unsigned long) &value, 0);
-> +	report(sret.error == SBI_ERR_INVALID_PARAM, "Read attribute attr_count == 0 error");
-> +
-> +	sret = sse_event_set_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 0, (unsigned long) &value, 0);
-> +	report(sret.error == SBI_ERR_INVALID_PARAM, "Write attribute attr_count == 0 error");
-> +
-> +	/* Invalid attribute id */
-> +	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_A7 + 1, &value);
-> +	report(ret == SBI_ERR_BAD_RANGE, "Read invalid attribute error");
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_A7 + 1, value);
-> +	report(ret == SBI_ERR_BAD_RANGE, "Write invalid attribute error");
-> +
-> +	/* Misaligned phys address */
-> +	sret = sse_event_get_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 1,
-> +				      ((unsigned long) &value | 0x1), 0);
-> +	report(sret.error == SBI_ERR_INVALID_ADDRESS, "Read attribute with invalid address error");
-> +	sret = sse_event_set_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 1,
-> +				      ((unsigned long) &value | 0x1), 0);
-> +	report(sret.error == SBI_ERR_INVALID_ADDRESS, "Write attribute with invalid address error");
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void sse_test_register_error(unsigned long event_id)
-> +{
-> +	unsigned long ret;
-> +
-> +	report_prefix_push("register");
-> +
-> +	ret = sse_event_unregister(event_id);
-> +	report(ret == SBI_ERR_INVALID_STATE, "SSE unregister non registered event");
-> +
-> +	ret = sse_event_register_raw(event_id, (void *) 0x1, NULL);
-> +	report(ret == SBI_ERR_INVALID_PARAM, "SSE register misaligned entry");
-> +
-> +	ret = sse_event_register_raw(event_id, (void *) sse_entry, NULL);
-> +	report(ret == SBI_SUCCESS, "SSE register ok");
-> +	if (ret)
-> +		goto done;
-> +
-> +	ret = sse_event_register_raw(event_id, (void *) sse_entry, NULL);
-> +	report(ret == SBI_ERR_INVALID_STATE, "SSE register twice failure");
-> +	if (!ret)
-> +		goto done;
-> +
-> +	ret = sse_event_unregister(event_id);
-> +	report(ret == SBI_SUCCESS, "SSE unregister ok");
-> +
-> +done:
-> +	report_prefix_pop();
-> +}
-> +
-> +struct sse_simple_test_arg {
-> +	bool done;
-> +	unsigned long event_id;
-> +};
-> +
-> +static void sse_simple_handler(void *data, struct pt_regs *regs, unsigned int hartid)
-> +{
-> +	volatile struct sse_simple_test_arg *arg = data;
-> +	int ret, i;
-> +	const char *attr_name;
-> +	unsigned long event_id = arg->event_id, value, prev_value, flags, attr;
-> +	const unsigned long regs_len = (SBI_SSE_ATTR_INTERRUPTED_A7 - SBI_SSE_ATTR_INTERRUPTED_A6) +
-> +				       1;
-> +	unsigned long interrupted_state[regs_len];
-> +
-> +	if ((regs->status & SSTATUS_SPP) == 0)
-> +		report_fail("Interrupted S-mode");
-> +
-> +	if (hartid != current_thread_info()->hartid)
-> +		report_fail("Hartid correctly passed");
-> +
-> +	sse_check_state(event_id, SBI_SSE_STATE_RUNNING);
-> +	if (sse_event_pending(event_id))
-> +		report_fail("Event is not pending");
-> +
-> +	/* Set a6, a7, sepc, flags while running */
-> +	for (i = 0; i < ARRAY_SIZE(interrupted_attrs); i++) {
-> +		attr = interrupted_attrs[i];
-> +		attr_name = attr_names[attr];
-> +
-> +		ret = sse_event_get_attr(event_id, attr, &prev_value);
-> +		report(ret == 0, "Get attr %s no error", attr_name);
-> +
-> +		/* We test SBI_SSE_ATTR_INTERRUPTED_FLAGS below with specific flag values */
-> +		if (attr == SBI_SSE_ATTR_INTERRUPTED_FLAGS)
-> +			continue;
-> +
-> +		ret = sse_event_set_attr(event_id, attr, 0xDEADBEEF + i);
-> +		report(ret == 0, "Set attr %s invalid state no error", attr_name);
-> +
-> +		ret = sse_event_get_attr(event_id, attr, &value);
-> +		report(ret == 0, "Get attr %s modified value no error", attr_name);
-> +		report(value == 0xDEADBEEF + i, "Get attr %s modified value ok", attr_name);
-> +
-> +		ret = sse_event_set_attr(event_id, attr, prev_value);
-> +		report(ret == 0, "Restore attr %s value no error", attr_name);
-> +	}
-> +
-> +	/* Test all flags allowed for SBI_SSE_ATTR_INTERRUPTED_FLAGS*/
-> +	attr = SBI_SSE_ATTR_INTERRUPTED_FLAGS;
-> +	attr_name = attr_names[attr];
-> +	ret = sse_event_get_attr(event_id, attr, &prev_value);
-> +	report(ret == 0, "Get attr %s no error", attr_name);
-> +
-> +	for (i = 0; i < ARRAY_SIZE(interrupted_flags); i++) {
-> +		flags = interrupted_flags[i];
-> +		ret = sse_event_set_attr(event_id, attr, flags);
-> +		report(ret == 0, "Set interrupted %s value no error", attr_name);
-> +		ret = sse_event_get_attr(event_id, attr, &value);
-> +		report(value == flags, "Get attr %s modified value ok", attr_name);
-> +	}
-> +
-> +	ret = sse_event_set_attr(event_id, attr, prev_value);
-> +		report(ret == 0, "Restore attr %s value no error", attr_name);
-> +
-> +	/* Try to change HARTID/Priority while running */
-> +	if (sse_event_is_global(event_id)) {
-> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-> +					 current_thread_info()->hartid);
-> +		report(ret == SBI_ERR_INVALID_STATE, "Set hart id while running error");
-> +	}
-> +
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIO, 0);
-> +	report(ret == SBI_ERR_INVALID_STATE, "Set priority while running error");
-> +
-> +	ret = sse_event_get_attrs(event_id, SBI_SSE_ATTR_INTERRUPTED_A6, interrupted_state,
-> +				  regs_len);
-> +	report(ret == SBI_SUCCESS, "Read interrupted context from SSE handler ok");
-> +	if (interrupted_state[0] != SBI_EXT_SSE_INJECT)
-> +		report_fail("Interrupted state a6 check ok");
-> +	if (interrupted_state[1] != SBI_EXT_SSE)
-> +		report_fail("Interrupted state a7 check ok");
-> +
-> +	arg->done = true;
-> +}
-> +
-> +static void sse_test_inject_simple(unsigned long event_id)
-> +{
-> +	unsigned long ret;
-> +	struct sse_handler_arg args;
-> +	volatile struct sse_simple_test_arg test_arg = {.event_id = event_id};
-> +
-> +	args.handler = sse_simple_handler;
-> +	args.handler_data = (void *) &test_arg;
-> +	args.stack = sse_alloc_stack();
-> +
-> +	report_prefix_push("simple");
-> +
-> +	ret = sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
-> +	if (ret)
-> +		goto done;
-> +
-> +	ret = sse_event_register(event_id, &args);
-> +	report(ret == SBI_SUCCESS, "SSE register no error");
-> +	if (ret)
-> +		goto done;
-> +
-> +	ret = sse_check_state(event_id, SBI_SSE_STATE_REGISTERED);
-> +	if (ret)
-> +		goto done;
-> +
-> +	/* Be sure global events are targeting the current hart */
-> +	sse_global_event_set_current_hart(event_id);
-> +
-> +	ret = sse_event_enable(event_id);
-> +	report(ret == SBI_SUCCESS, "SSE enable no error");
-> +	if (ret)
-> +		goto done;
-> +
-> +	ret = sse_check_state(event_id, SBI_SSE_STATE_ENABLED);
-> +	if (ret)
-> +		goto done;
-> +
-> +	ret = sse_event_inject(event_id, current_thread_info()->hartid);
-> +	report(ret == SBI_SUCCESS, "SSE injection no error");
-> +	if (ret)
-> +		goto done;
-> +
-> +	barrier();
-> +	report(test_arg.done == 1, "SSE event handled ok");
-> +	test_arg.done = 0;
-> +
-> +	/* Set as oneshot and verify it is disabled */
-> +	ret = sse_event_disable(event_id);
-> +	report(ret == 0, "Disable event ok");
-> +	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, SBI_SSE_ATTR_CONFIG_ONESHOT);
-> +	report(ret == 0, "Set event attribute as ONESHOT");
-> +	ret = sse_event_enable(event_id);
-> +	report(ret == 0, "Enable event ok");
-> +
-> +	ret = sse_event_inject(event_id, current_thread_info()->hartid);
-> +	report(ret == SBI_SUCCESS, "SSE injection 2 no error");
-> +	if (ret)
-> +		goto done;
-> +
-> +	barrier();
-> +	report(test_arg.done == 1, "SSE event handled ok");
-> +	test_arg.done = 0;
-> +
-> +	ret = sse_check_state(event_id, SBI_SSE_STATE_REGISTERED);
-> +	if (ret)
-> +		goto done;
-> +
-> +	/* Clear ONESHOT FLAG */
-> +	sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, 0);
-> +
-> +	ret = sse_event_unregister(event_id);
-> +	report(ret == SBI_SUCCESS, "SSE unregister no error");
-> +	if (ret)
-> +		goto done;
-> +
-> +	sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
-> +
-> +done:
-> +	sse_free_stack(args.stack);
-> +	report_prefix_pop();
-> +}
-> +
-> +struct sse_foreign_cpu_test_arg {
-> +	bool done;
-> +	unsigned int expected_cpu;
-> +	unsigned long event_id;
-> +};
-> +
-> +static void sse_foreign_cpu_handler(void *data, struct pt_regs *regs, unsigned int hartid)
-> +{
-> +	volatile struct sse_foreign_cpu_test_arg *arg = data;
-> +
-> +	/* For arg content to be visible */
-> +	smp_rmb();
-> +	if (arg->expected_cpu != current_thread_info()->cpu)
-> +		report_fail("Received event on CPU (%d), expected CPU (%d)",
-> +			    current_thread_info()->cpu, arg->expected_cpu);
-> +
-> +	arg->done = true;
-> +	/* For arg update to be visible for other CPUs */
-> +	smp_wmb();
-> +}
-> +
-> +struct sse_local_per_cpu {
-> +	struct sse_handler_arg args;
-> +	unsigned long ret;
-> +};
-> +
-> +struct sse_local_data {
-> +	unsigned long event_id;
-> +	struct sse_local_per_cpu *cpu_args[NR_CPUS];
-> +};
-> +
-> +static void sse_register_enable_local(void *data)
-> +{
-> +	struct sse_local_data *local_data = data;
-> +	struct sse_local_per_cpu *cpu_arg = local_data->cpu_args[current_thread_info()->cpu];
-> +
-> +	cpu_arg->ret = sse_event_register(local_data->event_id, &cpu_arg->args);
-> +	if (cpu_arg->ret)
-> +		return;
-> +
-> +	cpu_arg->ret = sse_event_enable(local_data->event_id);
-> +}
-> +
-> +static void sse_disable_unregister_local(void *data)
-> +{
-> +	struct sse_local_data *local_data = data;
-> +	struct sse_local_per_cpu *cpu_arg = local_data->cpu_args[current_thread_info()->cpu];
-> +
-> +	cpu_arg->ret = sse_event_disable(local_data->event_id);
-> +	if (cpu_arg->ret)
-> +		return;
-> +
-> +	cpu_arg->ret = sse_event_unregister(local_data->event_id);
-> +}
-> +
-> +static void sse_test_inject_local(unsigned long event_id)
-> +{
-> +	int cpu;
-> +	unsigned long ret;
-> +	struct sse_local_data local_data;
-> +	struct sse_local_per_cpu *cpu_arg;
-> +	volatile struct sse_foreign_cpu_test_arg test_arg = {.event_id = event_id};
-> +
-> +	report_prefix_push("local_dispatch");
-> +	local_data.event_id = event_id;
-> +
-> +	for_each_online_cpu(cpu) {
-> +		cpu_arg = calloc(1, sizeof(struct sse_handler_arg));
-> +
-> +		cpu_arg->args.stack = sse_alloc_stack();
-> +		cpu_arg->args.handler = sse_foreign_cpu_handler;
-> +		cpu_arg->args.handler_data = (void *)&test_arg;
-> +		local_data.cpu_args[cpu] = cpu_arg;
-> +	}
-> +
-> +	on_cpus(sse_register_enable_local, &local_data);
-> +	for_each_online_cpu(cpu) {
-> +		if (local_data.cpu_args[cpu]->ret)
-> +			report_abort("CPU failed to register/enable SSE event");
-> +
-> +		test_arg.expected_cpu = cpu;
-> +		/* For test_arg content to be visible for other CPUs */
-> +		smp_wmb();
-> +		ret = sse_event_inject(event_id, cpus[cpu].hartid);
-> +		if (ret)
-> +			report_abort("CPU failed to register/enable SSE event");
-> +
-> +		while (!test_arg.done) {
-> +			/* For test_arg update to be visible */
-> +			smp_rmb();
-> +		}
-> +
-> +		test_arg.done = false;
-> +	}
-> +
-> +	on_cpus(sse_disable_unregister_local, &local_data);
-> +	for_each_online_cpu(cpu) {
-> +		if (local_data.cpu_args[cpu]->ret)
-> +			report_abort("CPU failed to disable/unregister SSE event");
-> +	}
-> +
-> +	for_each_online_cpu(cpu) {
-> +		cpu_arg = local_data.cpu_args[cpu];
-> +
-> +		sse_free_stack(cpu_arg->args.stack);
-> +	}
-> +
-> +	report_pass("local event dispatch on all CPUs");
-> +	report_prefix_pop();
-> +
-> +}
-> +
-> +static void sse_test_inject_global(unsigned long event_id)
-> +{
-> +	unsigned long ret;
-> +	unsigned int cpu;
-> +	struct sse_handler_arg args;
-> +	volatile struct sse_foreign_cpu_test_arg test_arg = {.event_id = event_id};
-> +	enum sbi_sse_state state;
-> +
-> +	args.handler = sse_foreign_cpu_handler;
-> +	args.handler_data = (void *)&test_arg;
-> +	args.stack = sse_alloc_stack();
-> +
-> +	report_prefix_push("global_dispatch");
-> +
-> +	ret = sse_event_register(event_id, &args);
-> +	if (ret)
-> +		goto done;
-> +
-> +	for_each_online_cpu(cpu) {
-> +		test_arg.expected_cpu = cpu;
-> +		/* For test_arg content to be visible for other CPUs */
-> +		smp_wmb();
-> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART, cpu);
-> +		if (ret) {
-> +			report_fail("Failed to set preferred hart");
-> +			goto done;
-> +		}
-> +
-> +		ret = sse_event_enable(event_id);
-> +		if (ret) {
-> +			report_fail("Failed to enable SSE event");
-> +			goto done;
-> +		}
-> +
-> +		ret = sse_event_inject(event_id, cpu);
-> +		if (ret) {
-> +			report_fail("Failed to inject event");
-> +			goto done;
-> +		}
-> +
-> +		while (!test_arg.done) {
-> +			/* For shared test_arg structure */
-> +			smp_rmb();
-> +		}
-> +
-> +		test_arg.done = false;
-> +
-> +		/* Wait for event to be in ENABLED state */
-> +		do {
-> +			ret = sse_get_state(event_id, &state);
-> +			if (ret) {
-> +				report_fail("Failed to get event state");
-> +				goto done;
-> +			}
-> +		} while (state != SBI_SSE_STATE_ENABLED);
-> +
-> +		ret = sse_event_disable(event_id);
-> +		if (ret) {
-> +			report_fail("Failed to disable SSE event");
-> +			goto done;
-> +		}
-> +
-> +		report_pass("Global event on CPU %d", cpu);
-> +	}
-> +
-> +done:
-> +	ret = sse_event_unregister(event_id);
-> +	if (ret)
-> +		report_fail("Failed to unregister event");
-> +
-> +	sse_free_stack(args.stack);
-> +	report_prefix_pop();
-> +}
-> +
-> +struct priority_test_arg {
-> +	unsigned long evt;
-> +	bool called;
-> +	u32 prio;
-> +	struct priority_test_arg *next_evt_arg;
-> +	void (*check_func)(struct priority_test_arg *arg);
-> +};
-> +
-> +static void sse_hi_priority_test_handler(void *arg, struct pt_regs *regs,
-> +					 unsigned int hartid)
-> +{
-> +	struct priority_test_arg *targ = arg;
-> +	struct priority_test_arg *next = targ->next_evt_arg;
-> +
-> +	targ->called = 1;
-> +	if (next) {
-> +		sse_event_inject(next->evt, current_thread_info()->hartid);
-> +		if (sse_event_pending(next->evt))
-> +			report_fail("Higher priority event is pending");
-> +		if (!next->called)
-> +			report_fail("Higher priority event was not handled");
-> +	}
-> +}
-> +
-> +static void sse_low_priority_test_handler(void *arg, struct pt_regs *regs,
-> +					  unsigned int hartid)
-> +{
-> +	struct priority_test_arg *targ = arg;
-> +	struct priority_test_arg *next = targ->next_evt_arg;
-> +
-> +	targ->called = 1;
-> +
-> +	if (next) {
-> +		sse_event_inject(next->evt, current_thread_info()->hartid);
-> +
-> +		if (!sse_event_pending(next->evt))
-> +			report_fail("Lower priority event is pending");
-> +
-> +		if (next->called)
-> +			report_fail("Lower priority event %s was handle before %s",
-> +			      sse_evt_name(next->evt), sse_evt_name(targ->evt));
-> +	}
-> +}
-> +
-> +static void sse_test_injection_priority_arg(struct priority_test_arg *in_args,
-> +					    unsigned int in_args_size,
-> +					    sse_handler_fn handler,
-> +					    const char *test_name)
-> +{
-> +	unsigned int i;
-> +	int ret;
-> +	unsigned long event_id;
-> +	struct priority_test_arg *arg;
-> +	unsigned int args_size = 0;
-> +	struct sse_handler_arg event_args[in_args_size];
-> +	struct priority_test_arg *args[in_args_size];
-> +	void *stack;
-> +	struct sse_handler_arg *event_arg;
-> +
-> +	report_prefix_push(test_name);
-> +
-> +	for (i = 0; i < in_args_size; i++) {
-> +		arg = &in_args[i];
-> +		event_id = arg->evt;
-> +		if (!sse_evt_can_inject(event_id))
-> +			continue;
-> +
-> +		args[args_size] = arg;
-> +		args_size++;
-> +	}
-> +
-> +	if (!args_size) {
-> +		report_skip("No event injectable");
-> +		report_prefix_pop();
-> +		goto skip;
-> +	}
-> +
-> +	for (i = 0; i < args_size; i++) {
-> +		arg = args[i];
-> +		event_id = arg->evt;
-> +		stack = sse_alloc_stack();
-> +
-> +		event_arg = &event_args[i];
-> +		event_arg->handler = handler;
-> +		event_arg->handler_data = (void *)arg;
-> +		event_arg->stack = stack;
-> +
-> +		if (i < (args_size - 1))
-> +			arg->next_evt_arg = args[i + 1];
-> +		else
-> +			arg->next_evt_arg = NULL;
-> +
-> +		/* Be sure global events are targeting the current hart */
-> +		sse_global_event_set_current_hart(event_id);
-> +
-> +		sse_event_register(event_id, event_arg);
-> +		sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIO, arg->prio);
-> +		sse_event_enable(event_id);
-> +	}
-> +
-> +	/* Inject first event */
-> +	ret = sse_event_inject(args[0]->evt, current_thread_info()->hartid);
-> +	report(ret == SBI_SUCCESS, "SSE injection no error");
-> +
-> +	for (i = 0; i < args_size; i++) {
-> +		arg = args[i];
-> +		event_id = arg->evt;
-> +
-> +		if (!arg->called)
-> +			report_fail("Event %s handler called", sse_evt_name(arg->evt));
-> +
-> +		sse_event_disable(event_id);
-> +		sse_event_unregister(event_id);
-> +
-> +		event_arg = &event_args[i];
-> +		sse_free_stack(event_arg->stack);
-> +	}
-> +
-> +skip:
-> +	report_prefix_pop();
-> +}
-> +
-> +static struct priority_test_arg hi_prio_args[] = {
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS},
-> +};
-> +
-> +static struct priority_test_arg low_prio_args[] = {
-> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
-> +};
-> +
-> +static struct priority_test_arg prio_args[] = {
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 5},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU, .prio = 15},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS, .prio = 20},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS, .prio = 25},
-> +};
-> +
-> +static struct priority_test_arg same_prio_args[] = {
-> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU, .prio = 0},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS, .prio = 10},
-> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 10},
-> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS, .prio = 20},
-> +};
-> +
-> +static void sse_test_injection_priority(void)
-> +{
-> +	report_prefix_push("prio");
-> +
-> +	sse_test_injection_priority_arg(hi_prio_args, ARRAY_SIZE(hi_prio_args),
-> +					sse_hi_priority_test_handler, "high");
-> +
-> +	sse_test_injection_priority_arg(low_prio_args, ARRAY_SIZE(low_prio_args),
-> +					sse_low_priority_test_handler, "low");
-> +
-> +	sse_test_injection_priority_arg(prio_args, ARRAY_SIZE(prio_args),
-> +					sse_low_priority_test_handler, "changed");
-> +
-> +	sse_test_injection_priority_arg(same_prio_args, ARRAY_SIZE(same_prio_args),
-> +					sse_low_priority_test_handler, "same_prio_args");
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static bool sse_can_inject(unsigned long event_id)
-> +{
-> +	int ret;
-> +	unsigned long status;
-> +
-> +	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-> +	report(ret == 0, "SSE get attr status no error");
-> +	if (ret)
-> +		return 0;
-> +
-> +	return !!(status & BIT(SBI_SSE_ATTR_STATUS_INJECT_OFFSET));
-> +}
-> +
-> +static void boot_secondary(void *data)
-> +{
-> +}
-> +
-> +void check_sse(void)
-> +{
-> +	unsigned long i, event;
-> +
-> +	/*
-> +	 * Dummy wakeup of all processors since some of them will be targeted
-> +	 * by global events without going through the wakeup call.
-> +	 */
-> +	on_cpus(boot_secondary, NULL);
-> +	report_prefix_push("sse");
-> +
-> +	if (!sbi_probe(SBI_EXT_SSE)) {
-> +		report_skip("SSE extension not available");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
-> +		event = sse_event_infos[i].event_id;
-> +		report_prefix_push(sse_event_infos[i].name);
-> +		if (!sse_can_inject(event)) {
-> +			report_skip("Event does not support injection");
-> +			report_prefix_pop();
-> +			continue;
-> +		} else {
-> +			sse_event_infos[i].can_inject = true;
-> +		}
-> +		sse_test_attr(event);
-> +		sse_test_register_error(event);
-> +		sse_test_inject_simple(event);
-> +		if (sse_event_is_global(event))
-> +			sse_test_inject_global(event);
-> +		else
-> +			sse_test_inject_local(event);
-> +
-> +		report_prefix_pop();
-> +	}
-> +
-> +	sse_test_injection_priority();
-> +
-> +	report_prefix_pop();
-> +}
-> diff --git a/riscv/sbi.c b/riscv/sbi.c
-> index 6f4ddaf1..96dfb2ca 100644
-> --- a/riscv/sbi.c
-> +++ b/riscv/sbi.c
-> @@ -1451,6 +1451,7 @@ int main(int argc, char **argv)
->  	check_hsm();
->  	check_dbcn();
->  	check_susp();
-> +	check_sse();
->  
->  	return report_summary();
->  }
-> diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
-> index 2eb760ec..ddd05de7 100644
-> --- a/riscv/unittests.cfg
-> +++ b/riscv/unittests.cfg
-> @@ -18,3 +18,7 @@ groups = selftest
->  file = sbi.flat
->  smp = $MAX_SMP
->  groups = sbi
-> +
-> +[sbi_sse]
-> +file = sbi_sse.flat
-> +groups = sbi
-> -- 
-> 2.45.2
->
-
-I only had time for quick skim, but it looks pretty good.
-
-Thanks,
-drew
 
