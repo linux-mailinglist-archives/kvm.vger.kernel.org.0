@@ -1,106 +1,99 @@
-Return-Path: <kvm+bounces-32336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9599E9D588F
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 04:28:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556D19D5894
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 04:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E4851F23679
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 03:28:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7B611F2358B
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 03:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7AD1509B6;
-	Fri, 22 Nov 2024 03:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9C11531D8;
+	Fri, 22 Nov 2024 03:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxzrlFXJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xi8f0IJt"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4905F70838
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 03:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492BC23098B
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 03:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732246113; cv=none; b=VE5OhYzmnMj7dN+wugsLZtSGfm3sCCcP9opHH3HCOKz9T9QgEbIROOwmSe6McxQg+sJgnh7RRYo4Mc8uMTcm5FKr4TKuZ09tOiJoo5iCnMBGQjlTIe4tmm7yVxHQvX62X+4k5rTSR5Vx6Mk+BlELKpBRVqCKLVYL34ccMNHQ9UY=
+	t=1732246474; cv=none; b=IpNveWn5D89ZktCVVm7LO2goS77wq5ySC2gOhYdU9IqbV3KQAgTT4RWas55KbH2PdL0HT2isPjRGPjWYEBB22ScBQS4RYn9NYGGZ/0F/wo5NM6VAoGlMN4ZeJYFff3kcD9U6sfVXxwgQy9yCko0JM6H4fU5m8+NNRBxhLy2IEFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732246113; c=relaxed/simple;
-	bh=VoZ3XbDcUjiDA6+KfP8pTMVWN0li18P2qwtVRE6AK5A=;
+	s=arc-20240116; t=1732246474; c=relaxed/simple;
+	bh=9kkSHX5C/Rzcba5jDJqEPRSjF0ZyIB/tw8lBGgd3K04=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=B05TKYzIjZ5Jh2FIjgePBuvXBnGA0LNDcBR44mDtdtnlE1cmgbTzY0K1s/+/q+axYAOJOu/kVBP/ivQSuWrmNVBEhTLAzO8dSY9FuRsNsbgRdBJyLBTYVYzfCAJzHJVzdNBh+bCKInIBDhDeCYjpaiivMC1WXoZcJpBGP7m1WKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxzrlFXJ; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=oRySQ8PMH4mLVvwPaMj1QWLWHWLALYt9H1lfqS/IlUYuFB5XT23XZlwLo7KoeK2Xb9WFI+SuJN4oYfStfAA6WJrSKEmja24rf4PFPMEcTjLbndgIyF7QWxAFNn2AQsxeQTPBmLgWh+UzUOtu+TdpP7JowxRoTtG0/Z1xG5z6ppo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xi8f0IJt; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732246110;
+	s=mimecast20190719; t=1732246471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9NDRt3UW8rxHwZI0hypnIESBBnJNuw4yVb/N9fJds3E=;
-	b=VxzrlFXJASlMsfPZRSqDnBWVZI5mssttCRZn46NBy9UWJRqhYJO18OBSufDrlBfaPStgR5
-	kn5B8Q8z8P6PWRFFnrsTNSNviQ6rRjry++EHDWJ7rln64od19yRMBMtuaxaFE/y0fgfRyH
-	saNvDQdbILIQnhX6lhxNbNOaUfsnKtY=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5owPybl2A6mPLtXeb0GF8SzCVpIuIgw+HHvE5+2/5T0=;
+	b=Xi8f0IJtgVDl+ICcmKwQX34egzpGfa7UnlZlxqUdHoY8rieABKR9cAJ1wAPfXxd9SDyrfY
+	TjCSbykiY1tFZ+ebrucvL12Y8S2Tv/shIUoCsDpxJiGP9+zVpAYysn8+g5mWdj01GZEd/I
+	T6TI/NZwjRx6b3FlkoWinhSOiRX9vY8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-gxpwVHdsMtmHq_YwjJ2eZw-1; Thu, 21 Nov 2024 22:28:28 -0500
-X-MC-Unique: gxpwVHdsMtmHq_YwjJ2eZw-1
-X-Mimecast-MFC-AGG-ID: gxpwVHdsMtmHq_YwjJ2eZw
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-856e9e7e2b4so779626241.1
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 19:28:28 -0800 (PST)
+ us-mta-300-3kLMekoNNr6oHyw9s8iRFQ-1; Thu, 21 Nov 2024 22:34:30 -0500
+X-MC-Unique: 3kLMekoNNr6oHyw9s8iRFQ-1
+X-Mimecast-MFC-AGG-ID: 3kLMekoNNr6oHyw9s8iRFQ
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b15499a04eso314871885a.1
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2024 19:34:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732246108; x=1732850908;
+        d=1e100.net; s=20230601; t=1732246469; x=1732851269;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9NDRt3UW8rxHwZI0hypnIESBBnJNuw4yVb/N9fJds3E=;
-        b=OBG6/an3V32i8F89UAfGi9PH4XVHQkI/T8qTGfrgSL/ZlCwuDZsFflAJ6cl6bLpEzK
-         Bbxqd+EGenWQXRLRBOc6JZOhuLqLwzOwloruj2H3Mip7FdajvGiwAfrNFRSxWt067Ran
-         5XiP6YfQbzuGCicU6XRsS0vzf9hWyOo2sQbsZsvkeLrhVU3xOBCwqmUzVNTIxD1UZ49R
-         IJwgB/DcFAAFC7B4T/MXUcP1A0FgaoukXEyzXO/bZNVMjR6bwmMx79jsFCwLSBTAysC9
-         4n/j4/oXHxuQcaWftwwHLqNE+9L8ofxsMwAboERt2x76VTcVFYgONKHznYAyWNtEj1xy
-         jlag==
-X-Forwarded-Encrypted: i=1; AJvYcCWajAtt+s8hf4VVRgoFdv+lFdLhNpfJsypvz16gQtfP681wx9WyAIJH6dW/Nk5PW/qtLGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2E7eV39YRaVNE0dczFTdzdxl4K2967e1Ak2ejtJIHdtxUq9X2
-	2bFJINePk/BuhxRQLJUmvcxtYz3yP2683ds140+zaae1hmCgTINcYxyZGyUntwre3dUrxgXAda6
-	YAXUrE5vXJXiNpDnqs5LBKGD9Ibl/14dl18GVAERY5CSEzJonxA==
-X-Gm-Gg: ASbGnctN/f0+vGSQFn7dVWaw2XhHOWTPBmF6N/XdnyEXlpnZC3GOb7JrMKn6ObRKsTm
-	JEc1mm6VQhKXblPm+cvOuuJKbR7PIQS79enH/oBS3unQuDINlyfHh6ImKM1ku07NErAmQAaO1gS
-	9//9fKRDiiUZc+q0I4KuICI59J5WtPANzGTVL2mDqqOu4ijKBNL7AZ57F4JXJFXnIcAaZVNXBlH
-	mLlwTc3/EL/zN7Yx+LNeaiAEJR87lhUl8/O3ot/qXFTYsbCow==
-X-Received: by 2002:a05:6102:f13:b0:4a9:15c:ef8 with SMTP id ada2fe7eead31-4addceb83fdmr1823905137.24.1732246108230;
-        Thu, 21 Nov 2024 19:28:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPFL3IRj+5/xjls62/Fb+f+DaU2BI42u0JjGGMC6cm0o5iDXF3giEmCmA9QGQAGJdwBkVjlw==
-X-Received: by 2002:a05:6102:f13:b0:4a9:15c:ef8 with SMTP id ada2fe7eead31-4addceb83fdmr1823894137.24.1732246107902;
-        Thu, 21 Nov 2024 19:28:27 -0800 (PST)
+        bh=5owPybl2A6mPLtXeb0GF8SzCVpIuIgw+HHvE5+2/5T0=;
+        b=dS+uuLk7vLMCDwUnKhk4viILbm5TpcPugz0pNwMl+MY3OpDg2Ivf84pe6QylDCQQj3
+         jkc7U6ch9qXeAjihUroWe2umn7i9WkKc7eEtvAkp7+WrYIo8nE/bcDQ+O9QLj86o3wkl
+         Kxpyx/MgY9AqwRGWTVDOCKxWXQoL+o+YyQU9CLlZPxLPUv7U5MH0t4llIU6j9xx3Hypk
+         MzTs/7535RNtttkeoh0Qx9Dhrw8OjtnLoQ3nwrLBoKUA0wZJsIRBRudkVq2TwgAxTd+I
+         WwO8HjyqYEWsrwG/zPEL0JP+SPhxImoLE3iktSApHat5Fh/9OQcV7MpLHUl9CdnB3P8n
+         hALw==
+X-Gm-Message-State: AOJu0YzdLML/ssRpqsF9P5FHHtU0YMUR9WNbx8e7A6yUVYO+gZivS6GP
+	VmVpXnkKUPlE/1v03HMfWyTKHBovqdgV1JsUBBHrGrpmQKUFeluQT0evaJ9PsWB7/Dnxuc9Fcgf
+	uRdRmzNt8q7xsG8whL5fT+LqTICV2er9DVKJ7+1nxI7OTWcAG7Ad0gPoUC5El
+X-Gm-Gg: ASbGncsEQopKq1U5C6FKD2E9OtkqJ0dWkbR2fxwIz5ni7ynVkxaNaiYlZSPEYaFkBQX
+	RLMnmTL3IQZY6MqpKIHq4knt1ow3UtnyFYh+xtezCc2Ren4PCk5mCKz/SboduVAo8Ui0tMjVb9J
+	dk6HUG8B3qDvQO3hbrlA6aNWszBiBK5MasT6oJ1A29X3YKOxcLKk/gNNpfZaxEDgGAlo+IOlUva
+	1v5nI1a1zmoPrPByZDRrwrsTMg6FAqWIaSYFNvcOVZrSTiOFw==
+X-Received: by 2002:a05:620a:601c:b0:7b1:21c9:d1ad with SMTP id af79cd13be357-7b50c1bbea5mr922168885a.23.1732246469286;
+        Thu, 21 Nov 2024 19:34:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF40kkpOkNoCUj7UXHDVNMT6f685l0ht7e59S+qcPkVWqYBRtbkkFc+AKlw7dYgnr5xBZD8Ig==
+X-Received: by 2002:a05:620a:601c:b0:7b1:21c9:d1ad with SMTP id af79cd13be357-7b50c1bbea5mr922166285a.23.1732246468905;
+        Thu, 21 Nov 2024 19:34:28 -0800 (PST)
 Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451b4a59esm4727586d6.105.2024.11.21.19.28.26
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a837bbsm4922046d6.23.2024.11.21.19.34.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 19:28:27 -0800 (PST)
-Message-ID: <0e41ed2117c5cf5c97e2052aab65e39a5fef06f7.camel@redhat.com>
-Subject: Re: [PATCH v2 26/49] KVM: x86: Add a macro to init CPUID features
- that KVM emulates in software
+        Thu, 21 Nov 2024 19:34:28 -0800 (PST)
+Message-ID: <8d7e0d0391df4efc7cb28557297eb2ec9904f1e5.camel@redhat.com>
+Subject: Re: [PATCH v3 0/4] Allow AVIC's IPI virtualization to be optional
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
- <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
- Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
- <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
- Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Thu, 21 Nov 2024 22:28:26 -0500
-In-Reply-To: <ZuG_V9k8fbh8bKc5@google.com>
-References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-27-seanjc@google.com>
-	 <2e0f3fb63c810dd924907bccf9256f6f193b02ec.camel@redhat.com>
-	 <ZoxooTvO5vIEnS5V@google.com>
-	 <2e531204c32c05c96e852748d490424a6f69a018.camel@redhat.com>
-	 <ZqQ6DWUou8hvu0qE@google.com>
-	 <2d77b69729354b016eb76537523c9e32e7c011c5.camel@redhat.com>
-	 <ZrEvCc6yYdT-cHxD@google.com>
-	 <96b32724ad1ce9ac88abb209d196b01116536a61.camel@redhat.com>
-	 <ZuG_V9k8fbh8bKc5@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, 
+ linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, Ingo Molnar
+ <mingo@redhat.com>,  "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
+ <suravee.suthikulpanit@amd.com>,  Robin Murphy <robin.murphy@arm.com>,
+ iommu@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 21 Nov 2024 22:34:27 -0500
+In-Reply-To: <Zxf2ZK7HS7jL7TQk@google.com>
+References: <20231002115723.175344-1-mlevitsk@redhat.com>
+	 <ZRsYNnYEEaY1gMo5@google.com>
+	 <1d6044e0d71cd95c477e319d7e47819eee61a8fc.camel@redhat.com>
+	 <Zxb4D_JCC-L7OQDT@google.com> <Zxf2ZK7HS7jL7TQk@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -111,171 +104,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-09-11 at 09:03 -0700, Sean Christopherson wrote:
-> On Tue, Sep 10, 2024, Maxim Levitsky wrote:
-> > On Mon, 2024-08-05 at 12:59 -0700, Sean Christopherson wrote:
-> > > > And now we have:
-> > > > 
-> > > > kvm_cpu_cap_init_begin(CPUID_12_EAX);
-> > > >  feature_scattered(SGX1);
-> > > >  feature_scattered(SGX2);
-> > > >  feature_scattered(SGX_EDECCSSA);
-> > > > kvm_cpu_cap_init_end();
-> > > 
-> > > I don't love the syntax (mainly the need for a begin()+end()), but I'm a-ok
-> > > getting rid of the @mask param/input.
-> > > 
-> > > What about making kvm_cpu_cap_init() a variadic macro, with the relevant features
-> > > "unpacked" in the context of the macro?  That would avoid the need for a trailing
-> > > macro, and would provide a clear indication of when/where the set of features is
-> > > "initialized".
-> > > 
-> > > The biggest downside I see is that the last entry can't have a trailing comma,
-> > > i.e. adding a new feature would require updating the previous feature too.
-> > > 
-> > > #define kvm_cpu_cap_init(leaf, init_features...)			\
-> > > do {									\
-> > > 	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);	\
-> > > 	const u32 __maybe_unused kvm_cpu_cap_init_in_progress = leaf;	\
-> > > 	u32 kvm_cpu_cap_virtualized= 0;					\
-> > > 	u32 kvm_cpu_cap_emulated = 0;					\
-> > > 	u32 kvm_cpu_cap_synthesized = 0;				\
-> > > 									\
-> > > 	init_features;							\
-> > > 									\
-> > > 	kvm_cpu_caps[leaf] = kvm_cpu_cap_virtualized;			\
-> > > 	kvm_cpu_caps[leaf] &= (raw_cpuid_get(cpuid) |			\
-> > > 			       kvm_cpu_cap_synthesized);		\
-> > > 	kvm_cpu_caps[leaf] |= kvm_cpu_cap_emulated;			\
-> > > } while (0)
-> > > 
-> > > 	kvm_cpu_cap_init(CPUID_1_ECX,
-> > > 		VIRTUALIZED_F(XMM3),
-> > > 		VIRTUALIZED_F(PCLMULQDQ),
-> > > 		VIRTUALIZED_F(SSSE3),
-> > > 		VIRTUALIZED_F(FMA),
-> > > 		VIRTUALIZED_F(CX16),
-> > > 		VIRTUALIZED_F(PDCM),
-> > > 		VIRTUALIZED_F(PCID),
-> > > 		VIRTUALIZED_F(XMM4_1),
-> > > 		VIRTUALIZED_F(XMM4_2),
-> > > 		EMULATED_F(X2APIC),
-> > > 		VIRTUALIZED_F(MOVBE),
-> > > 		VIRTUALIZED_F(POPCNT),
-> > > 		EMULATED_F(TSC_DEADLINE_TIMER),
-> > > 		VIRTUALIZED_F(AES),
-> > > 		VIRTUALIZED_F(XSAVE),
-> > > 		// DYNAMIC_F(OSXSAVE),
-> > > 		VIRTUALIZED_F(AVX),
-> > > 		VIRTUALIZED_F(F16C),
-> > > 		VIRTUALIZED_F(RDRAND),
-> > > 		EMULATED_F(HYPERVISOR)
-> > > 	);
+On Tue, 2024-10-22 at 12:00 -0700, Sean Christopherson wrote:
+> On Mon, Oct 21, 2024, Sean Christopherson wrote:
+> > On Wed, Oct 04, 2023, Maxim Levitsky wrote:
+> > > About the added 'vcpu->loaded' variable, I added it also because it is
+> > > something that is long overdue to be added, I remember that in IPIv code
+> > > there was also a need for this, and probalby more places in KVM can be
+> > > refactored to take advantage of it, instead of various hacks.
 > > 
-> > Hi,
+> > I don't view using the information from the Physical ID table as a hack.  It very
+> > explicitly uses the ir_list_lock to ensure that the pCPU that's programmed into
+> > the IRTE is the pCPU on which the vCPU is loaded, and provides rather strict
+> > ordering between task migration and device assignment.  It's not a super hot path,
+> > so I don't think lockless programming is justified.
+
+If you strongly prefer this I won't argue. KVM does read back its SPTE entries,
+which is also something I can't say that I like that much.
+
 > > 
-> > This is no doubt better than using '|'.
+> > I also think we should keep IsRunning=1 when the vCPU is unloaded.  That approach
+> > won't run afoul of your concern with signaling the wrong pCPU, because KVM can
+> > still keep the ID up-to-date, e.g. if the task is migrated when a pCPU is being
+> > offlined.
 > > 
-> > I still strongly prefer my version, because I don't really like the fact that
-> > _F macros have side effects, and yet passed as parameters to the
-> > kvm_cpu_cap_init function/macro.
-> > 
-> > Basically an unwritten rule, which I consider very important and because of which
-> > I raised my concerns over this patch series is that if a function has side effects,
-> > it should not be used as a parameter to another function, instead, it should be 
-> > called explicitly on its own.
+> > The motiviation for keeping IsRunning=1 is to avoid unnecessary VM-Exits and GA
+> > log IRQs.  E.g. if a vCPU exits to userspace, there's zero reason to force IPI
+> > senders to exit, because KVM can't/won't notify userspace, and the pending virtual
+> > interrupt will be processed on the next VMRUN.
 > 
-> Splitting hairs to some degree, but the above suggestion is distinctly different
-> than passing the _result_ of a function call as a parameter to another function.
-> The actual "call" happens within the body of kvm_cpu_cap_init().
+> My only hesitation to keeping IsRunning=1 is that there could, in theory, be a
+> noisy neighbor problem.  E.g. if there is meaningful overhead when the CPU responds
+> to the doorbell. 
 
-You are technically right but you use a wrong point of view: You know the implementation,
-and I pretend that I don't know it, and try to look at this from the point of view
-of someone who just looks a the code for the first time, e.g. to fix some bugs.
+I once measured this by bombarding a regular CPU, which is not running any guests,
+with AVIC doorbells. It was like 60% reduction of its performance if I remember correctly.
 
-Someone who doesn't know anything about this, won't know if these are macros, cleverly
-passed to another variadric macro (which is itself a feature that is not often used)
+So physical id table entries of a VM can't point to a CPU which doesn't run the VM's vCPU thread, because
+only in this case this doesn't pose a DOS risk.
 
-I just state the fact: a function or what looks like a function, result of which
-is evaluated in expression or passed to another function (within a single statement)
-should not have side effects. 
-Only top level function/procedure calls allowed to have side effects - 
-otherwise this is just confusing.
-
-Let me explain this again with code:
-
-When I see for the first time this:
-
-result = foo(x) | bar(x);
-
-I strongly expect both foo and bar to be pure functions with no side effects.
-
-Or if I see this for the first time:
-
-err = somefunc(foo(x), bar(x));
-
-I also expect that foo and bar are pure functions,
-but 'somefunc' might not be because it only returns an error code,
-and it is a top level statement.
-
-And I don't care if this is implemented with functions or macros, because it
-looks the same.
-
-This is just how my common sense works.
-
-I won't argue though more about this, I don't want to bikeshed this and block this patch series.
-If you insist, let it be, but please at least use the variadic macro.
-
-
-> 
-> This is effectively the same as passing a function pointer to a helper, and that
-> function pointer implementation having side effects, which is quite common in the
-> kernel and KVM, e.g. msr_access_t, rmap_handler_t, tdp_handler_t, gfn_handler_t,
-> on_lock_fn_t, etc.
-> 
-> I 100% agree that it's unusual and subtle to essentially have a variable number
-> of function pointers, but I don't see it as being an inherently bad pattern,
-> especially since it is practically impossible to misuse _because_ the macro
-> unpacks the "calls" at compile time.
-> 
-> IMO, the part that is most gross is the macros operating on local variables, but
-> that behavior exists in all ideas we've discussed, probably because I'm pretty
-> sure it's unavoidable unless we do something even worse (way, waaaaay worse).
-> 
-> E.g. we could add 32 versions of kvm_cpu_cap_init() that invoke pairs of parameters
-> and pass in the variables
-> 
->   fn1(f1, virtualized, emulated, synthesized)
->   fn2(f2, virtualized, emulated, synthesized)
->   fn3(f3, virtualized, emulated, synthesized)
->   ...
->   fnN(fN, virtualized, emulated, synthesized)
-> 
-> and
-> 
->   kvm_cpu_cap_init19(CPUID_1_ECX,
-> 	F, XMM3,
-> 	F, PCLMULQDQ,
-> 	F, SSE3,
-> 	...
-> 	EMULATED_F, HYPERVISOR
->   );
-
-I don't think that this change is worth it, but this is still better in some sense,
-because at least the user won't be able to make any assumptions about the above,
-and instead will have to read the code and figure out what was done here.
-It won't be easy though.
-
-> 
-> But that's beyond horrific :-)
-> 
-> > If you strongly prefer the variadic macro over my begin/end API, I can live with
-> > that though, it is still better than '|'ing a mask with functions that have side
-> > effects.
-
+Same with IOMMU (malicious guest can in theory make an assigned device generate an interrupt
+storm, and then this storm can get redirected to a doorbell of a CPU which doesn't belong to a VM).
 
 
 Best regards,
 	Maxim Levitsky
+
+
+
+>  Hrm, and if another vCPU is scheduled in on the same pCPU, that
+> vCPU could end up processing a virtual interrupt in response to a doorbell intended
+> for a different vCPU.
+> 
+> The counter-argument to both concerns is that APICv Posted Interrupts have had a
+> _worse_ version of that behavior for years, and no one has complained.  KVM sets
+> PID.SN only when a vCPU is _preempted_, and so devices (and now virtual IPIs) will
+> send notification IRQs to pCPUs that aren't actively running the vCPU, or are
+> running a different vCPU.
+> 
+> The counter-counter-argument is that (a) IPI virtualization is a recent addition,
+> and device posted interrupts are unlikely to be used in a CPU oversubscribed setup,
+> and (b) Posted Interrupts are effectively rate-limited to a single "spurious"
+> notification per vCPU, as notification IRQs are sent if and only if PID.ON=0.
+> 
+> That said, while I'm somewhat less confident that keeping IsRunning=1 is desirable
+> for all use cases than I was yesterday, I still think we should avoid tightly
+> coupling it to whether or not the vCPU is loaded, because there are undoubtedly
+> setups where it _is_ desirable, e.g. if vCPUs are pinned 1:1 to pCPUs.
+> 
+
 
 
