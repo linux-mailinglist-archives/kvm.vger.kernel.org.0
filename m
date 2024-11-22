@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-32343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA9B9D5A03
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 08:32:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 060CF9D5A68
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 08:52:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21DB281D89
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 07:31:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82A61F22CC5
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 07:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01285175D51;
-	Fri, 22 Nov 2024 07:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE9A1862AE;
+	Fri, 22 Nov 2024 07:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkPwEQWg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wiheg3Yi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624FA1632F5
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 07:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC8A17B4E9
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 07:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732260695; cv=none; b=HwyWogJ05i3ELiB04w1axoOx28+ZLDctakLivCUAFORYc/Ea8hzHAjmk8eazTwE2/3r0yHeuZ2uP+jWgwrfBeAB7RKneCOUj7OjDNgAbsQtzaHTSpxGD8Q3Rsa8D6+45edDegaK7DG7Hqmimx03dY9kV+crqe6T+hknJ2pRG9gw=
+	t=1732261931; cv=none; b=iBYLn8fgf67vILWYteh3Jpb1Kuj7Cs6dBFYSQeYMA6BFQUUYsugWEHwry5bfnp3ATZBOnH4apYXLlxvoI4RfB3EpnR1+bGwu3nARjH19m+mpolGHcp7/tThbuiP1ItYMSeQfw6HuTgf0m6NqHu4rdzNP9xeHKkBMuPwg1oqQzmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732260695; c=relaxed/simple;
-	bh=HQvBfxRd8qJug47oyF/nl4DbLd5Lm22tQlEI+j4EkI8=;
+	s=arc-20240116; t=1732261931; c=relaxed/simple;
+	bh=14gNrbZwr4FwtDxhLh5ypoXNB6/niQbMSNKxqDfxcFI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lL2/ol89GzbxE8NKKddTbwTiRWIP7zV0ocrPwdhNVV/VHsB0wi2sgA/nyhGh3D6EccOGkWW7zeeqiiSQcsOlS57LNnOIMJr29QudVt665TG7IMuERA+j6dtwc1SdfEeejUNpAHzcJZ+q9Yw/OpRCIioy1QNH8LiZBHI/z6C/h/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AkPwEQWg; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=S4fhfjWjpE8fl04LHkuA05onvgZmP6tOq+cRhdSTfur+LNCZIiGCNbvSHZBWhYYks3KzIyCChP/sffybhgqFNFwbdI7AFgq2kWq7866iXMPatYQKyVgiyasJ2K+2L7dHD4MlJNNXHubjIU+s3OSbmK+y1S3+8l7YhDuY8kyTxWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wiheg3Yi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732260692;
+	s=mimecast20190719; t=1732261928;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PXq9Wjiti00hPsb6uBFVS+EGZ67OZCcyDnwcfoAoCsg=;
-	b=AkPwEQWgE1Gc47A6LPtAo5wfyS0KepUiebRHVc8DNqn/T4OKGiumZXynWBinlAOj6oW7gT
-	GzHc+eGjHc8JDyHevv7cvzmWg4CYb8eZzAf05/7Hs6F5ihk9+9zWLCWtQ6ksYy0gyOe5Ym
-	indGUavS97a0SsEnDufX0HXR6GaXwUk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=D9p/amWDuKtYCK1WkCl/Fua58/N/1s7xV60ca3EpfR4=;
+	b=Wiheg3YiY59olp9GKjJlscHrxjYnBBWbPMk4DtspywipdtpULhGHGCPY5udWzsfN0iMF5m
+	y/24NH7BjmYRzMctp3QP7o32k6kwZR8QUFL5XcwEsIEBLAmc/lkEKFXp1yYhn+cdPOBBss
+	bJkMMTsvNKU/wHRq/xejZwDl4USy4b8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-sLMKtwRkP9C3ZZ084QJlQw-1; Fri,
- 22 Nov 2024 02:31:28 -0500
-X-MC-Unique: sLMKtwRkP9C3ZZ084QJlQw-1
-X-Mimecast-MFC-AGG-ID: sLMKtwRkP9C3ZZ084QJlQw
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-100-HBEew0p3NECkehH9sfpIIQ-1; Fri,
+ 22 Nov 2024 02:52:04 -0500
+X-MC-Unique: HBEew0p3NECkehH9sfpIIQ-1
+X-Mimecast-MFC-AGG-ID: HBEew0p3NECkehH9sfpIIQ
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8D46195608A;
-	Fri, 22 Nov 2024 07:31:25 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53B6E1955F3D;
+	Fri, 22 Nov 2024 07:52:01 +0000 (UTC)
 Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA2AF19560A3;
-	Fri, 22 Nov 2024 07:31:23 +0000 (UTC)
-Date: Fri, 22 Nov 2024 15:31:19 +0800
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B9441955F43;
+	Fri, 22 Nov 2024 07:51:59 +0000 (UTC)
+Date: Fri, 22 Nov 2024 15:51:54 +0800
 From: Baoquan He <bhe@redhat.com>
 To: David Hildenbrand <david@redhat.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -79,9 +79,15 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [PATCH v1 07/11] fs/proc/vmcore: introduce
  PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
-Message-ID: <Z0AzR2Yhl527wkbP@MiWiFi-R3L-srv>
+Message-ID: <Z0A4Gl1dUINrTTUX@MiWiFi-R3L-srv>
 References: <20241025151134.1275575-1-david@redhat.com>
  <20241025151134.1275575-8-david@redhat.com>
+ <Zz22ZidsMqkafYeg@MiWiFi-R3L-srv>
+ <4b07a3eb-aad6-4436-9591-289c6504bb92@redhat.com>
+ <Zz3sm+BhCrTO3bId@MiWiFi-R3L-srv>
+ <3ed18ba1-e4b1-461e-a3a7-5de2df59ca60@redhat.com>
+ <Zz63aGL7NcrONk+p@MiWiFi-R3L-srv>
+ <c353466b-6860-4ca2-a4fa-490648246ddc@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,101 +96,84 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241025151134.1275575-8-david@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <c353466b-6860-4ca2-a4fa-490648246ddc@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-......snip...
-> diff --git a/fs/proc/vmcore.c b/fs/proc/vmcore.c
-> index 3e90416ee54e..c332a9a4920b 100644
-> --- a/fs/proc/vmcore.c
-> +++ b/fs/proc/vmcore.c
-> @@ -69,6 +69,8 @@ static LIST_HEAD(vmcore_cb_list);
->  /* Whether the vmcore has been opened once. */
->  static bool vmcore_opened;
->  
-> +static void vmcore_process_device_ram(struct vmcore_cb *cb);
-> +
->  void register_vmcore_cb(struct vmcore_cb *cb)
->  {
->  	INIT_LIST_HEAD(&cb->next);
-> @@ -80,6 +82,8 @@ void register_vmcore_cb(struct vmcore_cb *cb)
->  	 */
->  	if (vmcore_opened)
->  		pr_warn_once("Unexpected vmcore callback registration\n");
-> +	else if (cb->get_device_ram)
-> +		vmcore_process_device_ram(cb);
+On 11/21/24 at 08:47pm, David Hildenbrand wrote:
+> > > 
+> > > That would work, but I don't completely like it.
+> > > 
+> > > (a) I want s390x to select NEED_PROC_VMCORE_DEVICE_RAM instead. Staring at a
+> > > bunch of similar cases (git grep "config NEED" | grep Kconfig, git grep
+> > > "config ARCH_WANTS" | grep Kconfig), "select" is the common way to do it.
+> > > 
+> > > So unless there is a pretty good reason, I'll keep
+> > > NEED_PROC_VMCORE_DEVICE_RAM as is.
+> > 
+> > That's easy to satify, see below:
+> 
+> Yes, this is mostly what I have right now, except
+> 
+> > 
+> > ============simple version=====
+> > fs/proc/Kconfig:
+> > config NEED_PROC_VMCORE_DEVICE_RAM
+> >          def n
+> 
+> using "bool" here like other code. (I assume you meant "def_bool n", "bool"
+> seems to achieve the same thing)
 
-Global variable 'vmcore_opened' is used to indicate if /proc/vmcore is
-opened. With &vmcore_mutex, we don't need to worry about concurrent
-opening and modification. However, if people just open /proc/vmcore and
-close it after checking, then s390 will miss the vmcore dumping, is it
-acceptable?
+Yes, you are right. I didn't check it carefully.
 
->  	mutex_unlock(&vmcore_mutex);
->  }
->  EXPORT_SYMBOL_GPL(register_vmcore_cb);
-> @@ -1511,6 +1515,158 @@ int vmcore_add_device_dump(struct vmcoredd_data *data)
-......
-> +
-> +static void vmcore_process_device_ram(struct vmcore_cb *cb)
-> +{
-> +	unsigned char *e_ident = (unsigned char *)elfcorebuf;
-> +	struct vmcore_mem_node *first, *m;
-> +	LIST_HEAD(list);
-> +	int count;
-> +
-> +	if (cb->get_device_ram(cb, &list)) {
-> +		pr_err("Kdump: obtaining device ram ranges failed\n");
-> +		return;
-> +	}
-> +	count = list_count_nodes(&list);
-> +	if (!count)
-> +		return;
-> +
-> +	/* We only support Elf64 dumps for now. */
-> +	if (WARN_ON_ONCE(e_ident[EI_CLASS] != ELFCLASS64)) {
-> +		pr_err("Kdump: device ram ranges only support Elf64\n");
-> +		goto out_free;
-> +	}
+> 
+> > 
+...... 
+> > ===================
+> > fs/proc/Kconfig:
+> > config PROVIDE_PROC_VMCORE_DEVICE_RAM
+> >          def_bool n
+> > 
+> > config NEED_PROC_VMCORE_DEVICE_RAM
+> >          def_bool n
+> > 
+> > config PROC_VMCORE_DEVICE_RAM
+> >          def_bool y
+> >          depends on PROC_VMCORE
+> >          depends on NEED_PROC_VMCORE_DEVICE_RAM
+> >          depends on PROVIDE_PROC_VMCORE_DEVICE_RAM
+> > 
+> > drivers/virtio/Kconfig:
+> > config VIRTIO_MEM
+> >          select PROVIDE_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+> >                                                ~~~~~~~~~~~~~~
+> > 
+> > arch/s390/Kconfig:
+> > config S390
+> >          select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
+> >                                             ~~~~~~~~~~~~~~
+> > ========================
+> > 
+> > One last thing I haven't got well, If PROC_VMCORE_DEVICE_RAM has had
+> > dependency on PROC_VMCORE, can we take off the ' if PROC_VMCORE' when
+> > select PROVIDE_PROC_VMCORE_DEVICE_RAM and NEED_PROC_VMCORE_DEVICE_RAM?
+> 
+> We could; it would mean that in a .config file you would end up with
+> "NEED_PROC_VMCORE_DEVICE_RAM=y" with "#PROC_VMCORE" and no notion of
+> "PROC_VMCORE_DEVICE_RAM".
 
-Only supporting Elf64 dumps seems to be a basic checking, do we need
-to put it at the beginning of function? Otherwise, we spend efforts to
-call cb->get_device_ram(), then fail.
+Fair enough. I didn't think of this. Then keeping it is obvisouly
+better. Thanks.
 
-> +
-> +	/*
-> +	 * For some reason these ranges are already know? Might happen
-> +	 * with unusual register->unregister->register sequences; we'll simply
-> +	 * sanity check using the first range.
-> +	 */
-> +	first = list_first_entry(&list, struct vmcore_mem_node, list);
-> +	list_for_each_entry(m, &vmcore_list, list) {
-> +		unsigned long long m_end = m->paddr + m->size;
-> +		unsigned long long first_end = first->paddr + first->size;
-> +
-> +		if (first->paddr < m_end && m->paddr < first_end)
-> +			goto out_free;
-> +	}
-> +
-> +	/* If adding the mem nodes succeeds, they must not be freed. */
-> +	if (!vmcore_add_device_ram_elf64(&list, count))
-> +		return;
-> +out_free:
-> +	vmcore_free_mem_nodes(&list);
-> +}
-> +#else /* !CONFIG_PROC_VMCORE_DEVICE_RAM */
-> +static void vmcore_process_device_ram(struct vmcore_cb *cb)
-> +{
-> +}
-> +#endif /* CONFIG_PROC_VMCORE_DEVICE_RAM */
-> +
->  /* Free all dumps in vmcore device dump list */
->  static void vmcore_free_device_dumps(void)
->  {
-> diff --git a/include/linux/crash_dump.h b/include/linux/crash_dump.h
-> index 722dbcff7371..8e581a053d7f 100644
-> --- a/include/linux/crash_dump.h
-> +++ b/include/linux/crash_dump.h
+> 
+> I don't particularly like that -- needing something that apparently does not
+> exist. Not sure if there is a best practice here, staring at some examples I
+> don't seem to find a consistent rule. I can just drop it, not the end of the
+> world.
+> 
+> 
+> Did you get to look at the other code changes in this patch set? Your
+> feedback would be highly appreciated!
+
+Will try. While I may not have valuable input about virtio-mem code.
 
 
