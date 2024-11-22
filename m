@@ -1,148 +1,285 @@
-Return-Path: <kvm+bounces-32386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22D59D6584
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 23:02:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D09DA9D65D6
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 23:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEF30B229C8
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 22:02:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89CE1281BB4
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2024 22:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1490618BC0D;
-	Fri, 22 Nov 2024 22:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A495B18E04C;
+	Fri, 22 Nov 2024 22:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCfDTT7b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/I+0VL3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7595B187344
-	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 22:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447C71898E8
+	for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 22:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732312952; cv=none; b=QuwMOX/M8w3nq2W3EMYqaswCZ3pbC1JEJlDeKS/J9/IvEh32/rRjOCrJCdK1DlIjSZl4Vsu2ZyPhlCubwDrtzr+FncTo7ItCoKyX7HJlJ8c2f7gSb/dt4kbFlyek2ejFfw1/8+NeDDmbQAAYrFtNj5hoxPv5GuoS7MmWli7G+hE=
+	t=1732315083; cv=none; b=AEVphTNGGYv6Vak+m1hspyH0jW/C9H3Ecx/wR6tAaXUeNhI4V8FtXHLuyeheXibYNknleeNpYyymxgsa3Ss15sYEMrUsGdvdeQ40Nqtaz3B6RSVsPp/bWylQGPo//K8QdjzMfTw81zXGtqYct8yoS0IQbIQ6mZ9E/f4o4FRi3Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732312952; c=relaxed/simple;
-	bh=ykKAo7sEnG6ogfqSoVM5ICIKtWGlLhAzzJdQhZ59ppk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EvaceAaO6R+ogST3BXbapRQaJ699s8xIeZRvEeT4Ywi1RnEkR2whfSP23lJdta5lAdJobm33/qIxJPVaiPmNR6WD9pqXW0e/NVymtyR2h6+E4Fi6JXOdgZNs3kFdAve/ExQQs18wm289dUR+WwsYOnlsBOiWEWpKW6mrSeDofOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aCfDTT7b; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732312949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D2rLE49z94TB7gVF24gYVB/BYnqK4CzBdI3lSpjsVG8=;
-	b=aCfDTT7bEfUdncfx9QSZwlLejxsWhFyCehE+d8Rodze1xu2VwAuukEil+/a9/zNoKwxGAW
-	sQcRmfwuPUhgIe0o86anAlaugbXYXxtQXnf2M9u+kjNJax19ngjLqKD6c94KCr8gzeoGJh
-	/NRd0CUjRyMTJApRnc7/TRWjVR1ntgg=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-o_Q2umBJOSiR4eeRzLj1rw-1; Fri, 22 Nov 2024 17:02:28 -0500
-X-MC-Unique: o_Q2umBJOSiR4eeRzLj1rw-1
-X-Mimecast-MFC-AGG-ID: o_Q2umBJOSiR4eeRzLj1rw
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83aa8c7edb7so42444339f.3
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 14:02:28 -0800 (PST)
+	s=arc-20240116; t=1732315083; c=relaxed/simple;
+	bh=6GLmjpPY6EOrT6vmph0MIzerN19LbhQl4PfcSl2fDic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tM7JyD3PsuInSHCwik5CoAD9X7sKGaRXI1iTshzKXTnzAejA5nK07JxP0tEmUHxBYqcj3pVMvaIBo2Hohx+qTBt5mvNzQKf+VXzBPzGxCAsYhLIbK76+k7NDs64F7O9w8g0C8KXMfXKzajf094ujQ8M90QbPZPXc+pY8ORArOJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a/I+0VL3; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21238b669c5so13895ad.0
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2024 14:38:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732315081; x=1732919881; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5kr5xL10rVafwH2QwXNIB2NX51MpVtbUlFWYreKeG40=;
+        b=a/I+0VL3LxFdYiNRFKss8cXJcBDrh5XqUBOytoHO3nFZBVAgYrYdXVg8AB7YytYDi7
+         Wi1AFloi060YQt7hi9FT8Gxod/0Ci3ztwnDP11radAneAB8iWr8csAH+qcNT0w433Tt3
+         2QvH7lPJFz8/VyyIbKVgMgcFykrtKU4lJkKqMoTAJUH396tSAgeBRmhqNBKjB3d8hqLi
+         7NI0RqoBJsN5aKyoKD5dYNsKUfV4emZ0COUEeLONOTsG4FDNWq3Ecy2WyHmD9sF1XG4J
+         lbFWSPgpeB/LV25Mhe1Y6kV4QXoPaFOLN1mykPy9rW9fM1vQw+njbJEq3ZcccixRyG/y
+         JRtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732312947; x=1732917747;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D2rLE49z94TB7gVF24gYVB/BYnqK4CzBdI3lSpjsVG8=;
-        b=RdVddsj7AzoyJrxxfxlEMe5VaW6YHKiKPyPv0qPmzPjanow7VJ9IM9EKXJB9eygurK
-         R12QuDue9I8oq/6B0SHjuoX4rO/PpCInDUykbdRqA8+7g60nBskp0bEnOcsndCPVma7I
-         tw5xsRQdFffW8CGEn+P0d9i7Tq+fnT57/kY7f3iZIOWfRq4K2suH0RsCjZN9SNCmEkY1
-         4QXvjJ33EwyC1jd9I0xbek7jCX/wPiYJAI907zoZyEQm6Mcrwo7BclpWtsTNxfDmDyqC
-         xufhZ9WUaXQn8tgFRMi/FK9fxI6hFKjQ3M1w0eIfxSldKw3y6qHSFlKN425NcjMB2hdM
-         Ccog==
-X-Forwarded-Encrypted: i=1; AJvYcCV3SoTl/X2NDWsLRWwZv6j5sAIXjZ4Bjye74aKPbKbVJd2mQzZdV0Wi5wwzvsYPEBJUa3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTlRF+WT+3Gj24/XHBdYLboBZ1HSQBoGf9/aVdedDUKSCiNsvg
-	g84KdTOVUqZasT9pGsZUAcuQdJ6whI8qdIpJ/XeO3jxNPLa6f9/ZYe4RddZNWcim7eNru1N1sIK
-	N+sOu7viO7Z5bhS5/vW+Hunf5y1UhTbPYBcZPo6zRFVVJfp8Cow==
-X-Gm-Gg: ASbGnctN7BgSjID1Gmr1t6jIoDiCWFIhBtfqNcgdOrEDFcZ01IMHZu0R/uPLjuCktJh
-	TI+LhjEP8xehCDepxHoBIek2WcmwOZUFF16v/lIiacjS8mSNb8Kntqm2na6abW1tn63qazfE7v5
-	LDXPStnatNY9Bqhh/GPnKGXhjbygOg5Gper1pnpx+xYMkcOMqtz655pt4Ozp4JSq67g+yZbK3YT
-	1MuPv+glBql60HwK9L+/6afSMlPFjaVYDBAlF7U1B7L6XDsKbJEiw==
-X-Received: by 2002:a05:6e02:1a08:b0:3a6:c8cf:9d5e with SMTP id e9e14a558f8ab-3a79b02befamr12879095ab.6.1732312947527;
-        Fri, 22 Nov 2024 14:02:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGN9GQ8p7p1EhkinN390sEetXzPMQLlVGkf1ufMAmQ34s/L5hM95PseqaFylZwSu7zEjU2HsQ==
-X-Received: by 2002:a05:6e02:1a08:b0:3a6:c8cf:9d5e with SMTP id e9e14a558f8ab-3a79b02befamr12878975ab.6.1732312947196;
-        Fri, 22 Nov 2024 14:02:27 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e1cff116ddsm829785173.112.2024.11.22.14.02.26
+        d=1e100.net; s=20230601; t=1732315081; x=1732919881;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5kr5xL10rVafwH2QwXNIB2NX51MpVtbUlFWYreKeG40=;
+        b=gkDuFczWE9GmVrWlNTxPYODWiYS3zZeJpCZjbKUcpSSw4ujpNYzS0FNivb1zPS3iME
+         8dhe65XwnVWgSo9YrnEksF0QCsCVQaY2IFPNWu5WfZaUAGWQ5RNrmGck7l0MqSFGb6Xm
+         NPxrhncEXw3efASRcG5ndt1N57kgiD2l40P9CzMEPZUIN1tX29+Kd6Xr+H/8Z0VgBxC4
+         8FN11ymW4qXaCLlryFgeMRbKwshKIOiz/Rr92Al2sk0tdrQSRZqei/CsPD1rZVO51fiW
+         HBHKtdrNicsJu+dHgNsUCx87ZwY2zN/DbkOgI5faTcG0PwFdqh614IGtequwF7fEAVcx
+         0bAA==
+X-Forwarded-Encrypted: i=1; AJvYcCU609MCleUMCEKh64ZZUq/k+STj/NY2TyEAC/EF+h7n1sOLhzp3m5CwRNeRtjeEu4vprKk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy94XNCxgK8Kk7QwP2CaZZ1NZYnEOh37QUExwOs6FpLc6BLmRwW
+	ouDVnO2tRK7+UNWJFM1FinNVlQ7Cwdu3m7ovTb0iQ6dVfTNj61QSQk9FHk2dzg==
+X-Gm-Gg: ASbGnctODNWnSwwmugS3TXX7ysrceson5aub0q57mxH/fNqol6onSaGOTEy/MuPZ10W
+	NaOOFLsXX/KX+rXrd1OOUw0terlxPeIOqjRYnWNyoP9Sp0Y7dBpnqJVSRz2yWvWFt1hjygZWHiD
+	A9T+2NyrXOSIJZGwfsmHm/kYllH7tBycuFz7Ca8djAJOCeXFGq2tygKOC4KBXqFsue1NxM9XTLU
+	Vq2HvTSJqTUNFQzvjXCRo37FxuG9Bs9VVcXiG3xGfadNFG8gOL9SgVSGNj5sAU7TDEBM/3/rt5m
+	Mv9DEVGD
+X-Google-Smtp-Source: AGHT+IH7FcOLwqCX5Pk18qMpoAhw/6OPuccEjBkX6SjRRnRTGj+6abQWL8biM94lLtA5xkrz6/Cx9w==
+X-Received: by 2002:a17:902:d550:b0:20c:5cb1:de07 with SMTP id d9443c01a7336-2149e0a53c8mr239615ad.11.1732315081192;
+        Fri, 22 Nov 2024 14:38:01 -0800 (PST)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcbfc0960sm1890512a12.11.2024.11.22.14.37.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 14:02:26 -0800 (PST)
-Date: Fri, 22 Nov 2024 15:02:25 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Avihai Horon <avihaih@nvidia.com>
-Cc: kernel test robot <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
- kvm@vger.kernel.org, Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe
- <jgg@nvidia.com>, Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH v2] vfio/pci: Properly hide first-in-list PCIe extended
- capability
-Message-ID: <20241122150225.40029654.alex.williamson@redhat.com>
-In-Reply-To: <202411230727.abAsDI8W-lkp@intel.com>
-References: <20241121140057.25157-1-avihaih@nvidia.com>
-	<202411230727.abAsDI8W-lkp@intel.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        Fri, 22 Nov 2024 14:38:00 -0800 (PST)
+Date: Fri, 22 Nov 2024 14:37:56 -0800
+From: Vipin Sharma <vipinsh@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Anup Patel <anup@brainfault.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just
+ default
+Message-ID: <20241122223756.GA2112434.vipinsh@google.com>
+References: <20240821223012.3757828-1-vipinsh@google.com>
+ <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+ <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+ <ZyuiH_CVQqJUoSB-@google.com>
+ <20241108-eaacad12f1eef31481cf0c6c@orel>
+ <ZzY2iAqNfeiiIGys@google.com>
+ <20241115211523.GB599524.vipinsh@google.com>
+ <Zz5-3A36cckhYu9K@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zz5-3A36cckhYu9K@google.com>
 
-On Sat, 23 Nov 2024 05:33:10 +0800
-kernel test robot <lkp@intel.com> wrote:
+On 2024-11-20 16:29:16, Sean Christopherson wrote:
+> On Fri, Nov 15, 2024, Vipin Sharma wrote:
+> > On 2024-11-14 09:42:32, Sean Christopherson wrote:
+> > > On Fri, Nov 08, 2024, Andrew Jones wrote:
+> > > > On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
+> > > > > On Fri, Nov 01, 2024, Vipin Sharma wrote:
+> As discussed off-list, I think having one testcase per file is the way to go.
+> 
+>   - Very discoverable (literally files)
+>   - The user (or a shell script) can use regexes, globbing, etc., to select which
+>     tests to run
+>   - Creating "suites" is similarly easy, e.g. by having a list of files/testscase,
+>     or maybe by directory layout
+> 
+> Keeping track of testcases (and their content), e.g. to avoid duplicates, might
+> be an issue, but I think we can mitigate that by establishing and following
+> guidelines for naming, e.g. so that the name of a testcase gives the user a
+> decent idea of what it does.
+> 
+> > > > Could also use an environment variable to specify a file which contains
+> > > > a config in a test-specific format if parsing environment variables is
+> > > > insufficient or awkward for configuring a test.
+> > > 
+> > > There's no reason to use a environment variable for this.  If we want to support
+> > > "advanced" setup via a test configuration, then that can simply go in configuration
+> > > file that's passed to the runner.
+> > 
+> > Can you guys specify What does this test configuration file/directory
+> > will look like? Also, is it gonna be a one file for one test? This might
+> > become ugly soon.
+> 
+> As above, I like the idea of one file per testcase.  I'm not anticipating thousands
+> of tests.  Regardless of how we organize things, mentally keeping track of that
+> many tests would be extremely difficult.  E.g. testcases would likely bitrot and/or
+> we'd end up with a lot of overlap.  And if we do get anywhere near that number of
+> testcases, they'll need to be organzied in some way.
+> 
+> One idea would be create a directory per KVM selftest, and then put testcases for
+> that test in said directory.  We could even do something clever like fail the
+> build if a test doesn't have a corresponding directory (and a default testcase?).
+> 
+> E.g. tools/testing/selftests/kvm/testcases, with sub-directories following the
+> tests themsleves and separated by architecture as appropriate.
+> 
+> That us decent organization.  If each test has a testcase directory, it's easy to
+> get a list of testcases.  At that point, the name of the testcase can be used to
+> organize and describe, e.g. by tying the name to the (most interesting) parameters.
 
-> Hi Avihai,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on awilliam-vfio/next]
-> [also build test ERROR on linus/master awilliam-vfio/for-linus v6.12 next-20241122]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Avihai-Horon/vfio-pci-Properly-hide-first-in-list-PCIe-extended-capability/20241121-220249
-> base:   https://github.com/awilliam/linux-vfio.git next
-> patch link:    https://lore.kernel.org/r/20241121140057.25157-1-avihaih%40nvidia.com
-> patch subject: [PATCH v2] vfio/pci: Properly hide first-in-list PCIe extended capability
-> config: s390-randconfig-r053-20241122 (https://download.01.org/0day-ci/archive/20241123/202411230727.abAsDI8W-lkp@intel.com/config)
-> compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241123/202411230727.abAsDI8W-lkp@intel.com/reproduce)
+Sounds good. Extending your example for testcases given below this what
+I am imagining ordering will be:
 
-...
-> >> drivers/vfio/pci/vfio_pci_config.c:322:27: error: initializer element is not a compile-time constant  
->            [0 ... PCI_CAP_ID_MAX] = direct_ro_perms
->                                     ^~~~~~~~~~~~~~~
->    drivers/vfio/pci/vfio_pci_config.c:325:31: error: initializer element is not a compile-time constant
->            [0 ... PCI_EXT_CAP_ID_MAX] = direct_ro_perms
->                                         ^~~~~~~~~~~~~~~
->    12 warnings and 2 errors generated.
-> 
-> 
-> vim +322 drivers/vfio/pci/vfio_pci_config.c
-> 
->    319	
->    320	/* Default capability regions to read-only, no-virtualization */
->    321	static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
->  > 322		[0 ... PCI_CAP_ID_MAX] = direct_ro_perms  
->    323	};
+testcases/
+├── aarch64
+│   └── arch_timer
+│       └── default
+├── memslot_modification_stress_test
+│   ├── 128gib.allvcpus.partitioned_memory_access
+│   ├── default
+│   └── x86_64
+│       └── disable_slot_zap_quirk
+├── riscv
+│   └── arch_timer
+│       └── default
+├── s390x
+├── steal_time
+│   └── default
+└── x86_64
+    ├── amx_test
+    │   └── default
+    └── private_mem_conversions_test
+        ├── 2vcpu.2memslots
+        └── default
 
-I thought declaring direct_ro_perms as const was enough to resolve
-this, it is with gcc but I didn't test clang.  Feel free to leave the
-existing declarations alone if there's not an obvious fix.  Thanks,
+1. Testcases will follow directory structure of the test source files.
+2. "default" will have just path of the test relative to
+   tools/testing/selftests/kvm directory and no arguments provided in it.
+3. Extra tests can be provided as separate files with meaningful names.
+4. Some tests (memslot_modification_stress_test) have arch specific
+   options. Those testcases will be under arch specific directory of
+   that specific testcase directory.
+5. Runner will be provided with a directory path and it will run all
+   files in that and their subdirectories recursively.
+6. Runner will also filter out testcases based on filepath. For example
+   if running on ARM platform it will ignore all filepaths which have
+   x86_64, s390, and riscv in their path anywhere.
+7. If user wants to save output of runner, then output dump will follow
+   the same directory structure.
 
-Alex
+> 
+> Hmm, and for collections of multiple testscases, what if we added a separate
+> "testsuites" directory, with different syntax?  E.g. one file per testuite, which
+> is basically a list of testcases.  Maybe with some magic to allow testsuites to
+> "include" arch specific info?
+> 
+> E.g. something like this
+> 
+> $ tree test*
+> testcases
+> └── max_guest_memory_test
+>     └── 128gib.allvcpus.test
+> testsuites
+> └── mmu.suite
+> 
+> 3 directories, 2 files
+> $ cat testsuites/mmu.suite 
+> $ARCH/mmu.suite
+> max_guest_memory_test/128gib.allvcpus.test
 
+This can be one option. For now lets table testsuites discussion. We will
+revisit if after Phase1 is completed.
+
+> 
+> > This brings the question on how to handle the test execution when we are using
+> > different command line parameters for individual tests which need some
+> > specific environmnet?
+> > 
+> > Some parameters will need a very specific module or sysfs setting which
+> > might conflict with other tests. This is why I had "test_suite" in my
+> > json, which can provide some module, sysfs, or other host settings. But
+> > this also added cost of duplicating tests for each/few suites.
+> 
+> IMO, this should be handled by user, or their CI environment, not by the upstream
+> runner.  Reconfiguring module params or sysfs knobs is inherently environment
+> specific.  E.g. not all KVM module params are writable post-load, and so changing
+> a param might require stopping all VMs on the system, or even a full kernel reboot
+> if KVM is built-in.  There may also be knobs that require root access, that are
+> dependent on hardware and/or kernel config, etc.
+> 
+> I really don't want to build all that into the upstream test runner, certainly not
+> in the first few phases.  I 100% think the runner should be constructed in such a
+> way that people/organizations/CI pipeines can build infrastructure on top, I just
+> don't think it's a big need or a good fit for upstream.
+
+For phase 2 discussion, you responded:
+	> Phase 2: Environment setup via runner
+	>
+	> Current patch, allows to write "setup" commands at test suite and test
+	> level in the json config file to setup the environment needed by a
+	> test to run. This might not be ideal as some settings are exposed
+	> differently on different platforms.
+	>
+	> For example,
+	> To enable TDP:
+	> - Intel needs npt=Y
+	> - AMD needs ept=Y
+	> - ARM always on.
+	>
+	> To enable APIC virtualization
+	> - Intel needs enable_apicv=Y
+	> - AMD needs avic=Y
+	>
+	> To enable/disable nested, they both have the same file name "nested"
+	> in their module params directory which should be changed.
+	>
+	> These kinds of settings become more verbose and unnecessary on other
+	> platforms. Instead, runners should have some programming constructs
+	> (API, command line options, default) to enable these options in a
+	> generic way. For example, enable/disable nested can be exposed as a
+	> command line --enable_nested, then based on the platform, runner can
+	> update corresponding module param or ignore.
+	>
+	> This will easily extend to providing sane configuration on the
+	> corresponding platforms without lots of hardcoding in JSON. These
+	> individual constructs will provide a generic view/option to run a KVM
+	> feature, and under the hood will do things differently based on the
+	> platform it is running on like arm, x86-intel, x86-amd, s390, etc.
+
+	My main input on this front is that the runner needs to configure module params
+	(and other environment settings) _on behalf of the user_, i.e. in response to a
+	command line option (to the runner), not in response to per-test configurations.
+
+Should we still write code in runner for setting parameters which are
+writable/modifiable or just leave it? Our current plan is to provide
+some command line options to set those things but it is true that we
+might not be able to set everything via runner.
 
