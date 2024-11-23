@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-32389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D789D668C
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 01:00:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 747AC16121A
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 00:00:31 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E441D151F;
-	Fri, 22 Nov 2024 23:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTUsTqgm"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E6A9D669A
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 01:08:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEAC1CB53D;
-	Fri, 22 Nov 2024 23:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFAC3B2203B
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2024 00:08:46 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B639F2F5A;
+	Sat, 23 Nov 2024 00:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YdBLM1ey"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5240E817;
+	Sat, 23 Nov 2024 00:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732319974; cv=none; b=nGkUQtNb5Go2ol22P5E0LdRG3IEdSKZ30Covjcfjhi/MyNdpvehw6zoGkL+wazM0aJWA4QabiXYLHQDV7ZPUTGLqbWnxw99K9mXvaoq4whaxkVjiQcHzMFkegNPzyZ1aXXxPj6Nm2U8I3qsZ940Rmt6fAiRiEIqsGWgqi68GQ8o=
+	t=1732320517; cv=none; b=Ux8H5X0s9/yUCt1tL7JI/zWk9GvfH7uitzq/jbOVkxqGffvEOLCECi+HydUoAqFe6y3lXV46ByVix5M7DH1isDi9pH+OG7oSODH6efGeKN8CmKixtOJpJXGzDYjec9YrdusnkGBoqVoiJ2AXY4oYReAjNIug23e7Sx6mhQ/rAkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732319974; c=relaxed/simple;
-	bh=zQ8oPOHE0A9rVjfuxBCRvmoFRvSn/3zXeYk8im7ZIQY=;
+	s=arc-20240116; t=1732320517; c=relaxed/simple;
+	bh=APVj4q25ZayGfJKZ9Lm/pwT5JHS27FOdlBrt2jGCVQM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dw3DvRPWwD57Xh/nhrc39Z3Q175qtjPc1DzmKYOgEMolwMTTs/0kZ5U1pxrusFcq/ckgSid1vhPetZ3D9rd8cj9SPzqr+0yjxDETo39QzfWU6AAoL1ehiDKpy50hJK6imEOCbEUgUVJu3HqAAJ9WX9EQeZBtijLLZxueTls9dqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kTUsTqgm; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=J1uz+mLtggKQFUTBEeASO+ExMHyhy/q2WMkU06I78+p/e27Twrj4UkNguV3QhuVtLSnVeHXVTo1Rm9xMCfUozW8MswETFbMCoDMvuhdM9fk9c7pfbjjw1zuvtoFy8DoxuMjFoIIlUuXd/mr1bpUsqz3xdcXOcaX3SilAmZs6Kfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YdBLM1ey; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732319974; x=1763855974;
+  t=1732320516; x=1763856516;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=zQ8oPOHE0A9rVjfuxBCRvmoFRvSn/3zXeYk8im7ZIQY=;
-  b=kTUsTqgmNoEGHcURrEqe1lkB2g6+95CB/W8TdBzktAefDrG3On3oS683
-   +u2HQBwrEb3c00JJmnNv/g4O06d7TpZdWqC1p2jN//xRVKM24jtGT/HCx
-   dYQjRd51YKm3J7C843pNBewWzCqKouXh/McCJlFP/xEn55XVqI+Hj6S96
-   ARImJd69QNVqI1AwbeVOX8qBat12DQqiyH25qfK8SPRUQFOLRBr/exwaT
-   PZUIVT5ei5RztLwa9LYeS6nAcTeI3E+N6Rv/7xHhJDlGRtAiyf8EN7n3A
-   kRsvfITjNpPisK67dKTMiIJixCEgNotGJBCWLG3mRz5BDgJsm/9wwskJ1
-   w==;
-X-CSE-ConnectionGUID: BPfwG2YXS3WUskbc0w89OA==
-X-CSE-MsgGUID: zS8pWwa/S9OR4FZgJkTzVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11264"; a="35346207"
+  bh=APVj4q25ZayGfJKZ9Lm/pwT5JHS27FOdlBrt2jGCVQM=;
+  b=YdBLM1ey76FZuW1ymThGLhsTQAy2NgkNS75n/pXdr1uHlCB5IwKgJ1Qn
+   7FkGselpdw8la7wBTzJEcUoMyrfe+VN7k7SkA1lrjaplFsHEx3gyikQ6V
+   fIPrDuuGKnhNyKF2sWNteN1Jn8128q1sBAiFhPFvTCVzRw13FS8mLzuJU
+   5JOYEcIIhsyr7VrwvWqpbfRiTwczJFPP1ZqiLuX5CowS5b/QSU/irWDa0
+   gRl9f+DZR7+vm2LH/NyJb5W8A9eQubnluGJIBIPUktA+XK9iswyWpY1tN
+   B8O+f7Ur6Iu+75zPxagG6M+nyFqXez3rdP6JOVduN6R9P1rP2rw7+2Zzu
+   g==;
+X-CSE-ConnectionGUID: BLcnPmM+TVmFq7SfrDbfwA==
+X-CSE-MsgGUID: hGQdiSC2R8afukgOFNL5dQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11264"; a="20078715"
 X-IronPort-AV: E=Sophos;i="6.12,177,1728975600"; 
-   d="scan'208";a="35346207"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:59:33 -0800
-X-CSE-ConnectionGUID: EmqQOnq3RDmIeIk8EbeJlA==
-X-CSE-MsgGUID: XolqvH29RsiWrDHLFhliMA==
+   d="scan'208";a="20078715"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 16:08:36 -0800
+X-CSE-ConnectionGUID: PJ0fQCx4S72wuaV7268a7Q==
+X-CSE-MsgGUID: p1nuRMkJRauskh1buPU2KA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,177,1728975600"; 
-   d="scan'208";a="113995047"
+   d="scan'208";a="95794788"
 Received: from bjrankin-mobl3.amr.corp.intel.com (HELO [10.124.220.110]) ([10.124.220.110])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:59:32 -0800
-Message-ID: <bbf78f64-62c7-4a82-b85b-d5227d65e5d0@intel.com>
-Date: Fri, 22 Nov 2024 15:59:31 -0800
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 16:08:35 -0800
+Message-ID: <6903d890-c591-4986-8c88-a4b069309033@intel.com>
+Date: Fri, 22 Nov 2024 16:08:34 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -130,11 +130,52 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 11/22/24 15:55, Sean Christopherson wrote:
+> On Fri, Nov 22, 2024, Dave Hansen wrote:
+> I don't know the full context, but working with "struct page" is a pain when every
+> user just wants the physical address.  KVM SVM had a few cases where pointers were
+> tracked as "struct page", and it was generally unpleasant to read and work with.
+
+I'm not super convinced. page_to_phys(foo) is all it takes
+
+> I also don't like conflating the kernel's "struct page" with the architecture's
+> definition of a 4KiB page.
+
+That's fair, although it's pervasively conflated across our entire
+codebase. But 'struct page' is substantially better than a hpa_t,
+phys_addr_t or u64 that can store a full 64-bits of address. Those
+conflate a physical address with a physical page, which is *FAR* worse.
+
 >> You know that 'tdr' is not just some random physical address.  It's a
 >> whole physical page.  It's page-aligned.  It was allocated, from the
 >> allocator.  It doesn't point to special memory.
-> Oh, but it does point to special memory. 
+> 
+> Oh, but it does point to special memory.  If it *didn't* point at special memory
+> that is completely opaque and untouchable, then KVM could use a struct overlay,
+> which would give contextual information and some amount of type safety.  E.g.
+> an equivalent without TDX is "struct vmcs *".
+> 
+> Rather than "struct page", what if we add an address_space (in the Sparse sense),
+> and a typedef for a TDX pages?  Maybe __firmware?  E.g.
+> 
+>   # define __firmware	__attribute__((noderef, address_space(__firmware)))
+> 
+>   typedef u64 __firmware *tdx_page_t;
+> 
+> That doesn't give as much compile-time safety, but in some ways it provides more
+> type safety since KVM (or whatever else cares) would need to make an explicit and
+> ugly cast to misuse the pointer.
 
-In this specific case I meant "special memory" as not RAM and not
-managed by the kernel.
+It's better than nothing. But I still vastly prefer to have a type that
+tells you that something is physically-allocated out of the buddy, RAM,
+and page-aligned.
+
+I'd be better to have:
+
+struct tdx_page {
+	u64 page_phys_addr;
+};
+
+than depend on sparse, IMNHO.
+
+Do you run sparse every time you compile the kernel, btw? ;)
 
