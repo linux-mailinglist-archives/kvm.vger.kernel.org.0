@@ -1,152 +1,141 @@
-Return-Path: <kvm+bounces-32458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382329D8996
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 16:44:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1619D8AB4
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 17:55:42 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFC31169490
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 15:44:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87EEFB428A5
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 15:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFD11B412D;
-	Mon, 25 Nov 2024 15:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD1A1B3920;
+	Mon, 25 Nov 2024 15:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qM8nhMu9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JUu2zD7w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C55A1B3958
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 15:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77034944E;
+	Mon, 25 Nov 2024 15:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732549478; cv=none; b=kbS8aGb0ehwEwD1cQywvsXrA9fhawoQfmQfZaiaEnMMjYR1VV546RtwyDJQ1TAqkWSGS4tmnwAHeyVT+COXjeurbiGvIo7hBC0snuw817zOGBTfB6m+2NIBg+gDe+Gw0wmf5DfE0wpA34E0vhLkQUo6n7Hb4BVzWakI7xDI9IHY=
+	t=1732549619; cv=none; b=f4onD7Fe26Aiw8KVofnm0XS1tAUUElPGtqImkoJkSqAflQjx6RR3e2KsjHXrqTxkxZC39bALvOxbsBWb8T9Inv5ezIhsFzb+cXcJjZYuW0F3qTJ1i8aSgAyP5YuFCKTMfDK6dsawYSLbgZeWlab7sySYNcQPZyixZ7uw1u0APrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732549478; c=relaxed/simple;
-	bh=k0J7cdgG8ks0yKGQsm7oyOmsZLIKOC2JOO6K0l0qCvQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X3RvulXExNawfjoGj5MS92TDbUezwxQ1KYgEu1rg8XAsrAvzBZv6u/P93l+Mwj9sAjMn0GYHMM8AFFU55stavDVByjQCqM2ctVSZnH3pmhJPqMYCGkYxfd68sOScvb3fAiHoQnJRrl79J3Fb8PoLc3zCqNgYyqcCeuJwTCa2rYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qM8nhMu9; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-72501c1609dso1506424b3a.2
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 07:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732549477; x=1733154277; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s49siFswnYJqise7IBA67ylLigPWlT1O8x62ECi7gWY=;
-        b=qM8nhMu9DwVwkr/jZrjmx9sMPOindmqvxUqrdNqX+bGyi65Rjx70CyXy6HojPkhsye
-         dr0C8x8zq5H1U2V5gyQSlv8CiVbsi1h9kb43KeYTymrVg4WOPPIbuocWPj8wlY3Ehc5s
-         4x/lP320GYCsmgJJlZUW5pY4yfhs31K7dftoI7PBExevV1kZ84zhIpmphjCH7HD87LJG
-         qmJhr5crNdxlzTqGqnNeY8IHVc+uUIlk8TCo8tzF4/gVkXVS127V/u2ifkCW14pChFOz
-         7v0mZT+Npj7V8a8QwD7L5q+tWnnw+O9We124j1LVs11mKlL/qOwc2TwOKEN/GwF7nHwG
-         r6kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732549477; x=1733154277;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s49siFswnYJqise7IBA67ylLigPWlT1O8x62ECi7gWY=;
-        b=TMD+RjgUUYLJ/wmIYr5SL5PZ4dRsxLeWy4Bc7cSswIb7PsoriAEKE073Q05WevU3xl
-         WjWBIHoiUa5YHgjwQeCzAy9wBbgAbqXN7JqW8qYF7p2NaCK21h0Pyswsx4EvEWlmOCRT
-         IUjpb7HxLSLx+3Kh4rW+f+bhPeiWKKpQduICJoagHthWxgzxWernoNGgpacT3wa33MWT
-         ve7ocCbqkwEmpj0+SNfdyG3RYtj3q74p1uIj5OgtpX1wxl9WoRrnZdsDtGMvLS1Trpd3
-         bG/sh81Bc2wpJqj0PbWNMS+6qDmH0WcgzBqlX/FN7t5amJPczjVJrhlLjdFijqnRg3nH
-         vZ+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWs2K0wEz5/uG2F6qUZZHzlRz3Ob4lf+oacJ5BgyO6smTTpK3fqMMQHfBtq34YGflwId6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvdT+uvsVS3ErmrfRg3vPipaP+XqOk97XS6r73PmJshUyRi9uQ
-	GQL9fGbJLGwXk0M/dFze5+3Ap0Nwfkg/3ZQvjDP4sPqW5BBbCLW3pMXuhUIpX/8+UqE1fNcIMMH
-	7+w==
-X-Google-Smtp-Source: AGHT+IFhBxq93qQHLR1eb3eUOxjNGlaFOEGalzPBmpyOIfTBB2kKogtVIU5S2oVaZxk5JZeZRsg/VdkBF/Q=
-X-Received: from ploh14.prod.google.com ([2002:a17:902:f70e:b0:206:fee5:fffa])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2288:b0:20c:98f8:e0fa
- with SMTP id d9443c01a7336-2129f21a154mr204435955ad.11.1732549476840; Mon, 25
- Nov 2024 07:44:36 -0800 (PST)
-Date: Mon, 25 Nov 2024 07:44:35 -0800
-In-Reply-To: <6903d890-c591-4986-8c88-a4b069309033@intel.com>
+	s=arc-20240116; t=1732549619; c=relaxed/simple;
+	bh=BU4hqbxVQvG33GzUNH/r/+W/nOZsnuMmzpnLX3pNqa0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PrdKGgwPoKVFJlk3zifdh98OD8ayB6Yedw1Am5zh5q7OJcyy2f4Cv+XSJyxpoDcDXwi4xhHLLLwgq2fS45V7OQhcn+qU4iXDHD36WpsOPqTUwdMJqspI9yENCvuqRY97e/pENbxJphbFnDrrTRt7iL1X2PP2kprIp2TZ3/VHGFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JUu2zD7w; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732549617; x=1764085617;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=BU4hqbxVQvG33GzUNH/r/+W/nOZsnuMmzpnLX3pNqa0=;
+  b=JUu2zD7w/iWMjaPDaQ61+zZdcBR/8HRlqJaw+o+IYQMOprIU2qNvgUOI
+   ka6eVMr0FXucidGhmMG0m8tHG5R2qtq3H2p72ZMoZLRUI5oZ2ayfCcS2F
+   92ED2G2u2+ItU5Ei/jZqtwDm4vqvNHApfA4Y7tZmj0UxzdgROGtyrEiG7
+   DNG+QOCHf7jbZlyvf2H3qxex3ZmdlwwBHDfWaDHp8gwcpP11Xd8P9tEiU
+   fg8dKr1KNld28ijYgt7P4MkR+nNtxnr+Y7WakYes6T/OWBY9vRxpM03/k
+   0CWxwc4bjNIWtN3vVX098sYqyucL/519mN0j77z+G7J1cO7yFOSu4Xepg
+   w==;
+X-CSE-ConnectionGUID: MZZVQ+HWRKqB21T317kAKg==
+X-CSE-MsgGUID: tTUrMby/QzCXTo3KBGL7BQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="32037215"
+X-IronPort-AV: E=Sophos;i="6.12,183,1728975600"; 
+   d="scan'208";a="32037215"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 07:46:56 -0800
+X-CSE-ConnectionGUID: ClMquX3WSmqgnqTL9YXAsw==
+X-CSE-MsgGUID: pEKHdCY2T6OyOJ/tfS/O+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,183,1728975600"; 
+   d="scan'208";a="95404837"
+Received: from jdoman-desk1.amr.corp.intel.com (HELO [10.124.220.239]) ([10.124.220.239])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 07:46:56 -0800
+Message-ID: <d92e5301-9ca4-469a-8ae5-b36426e67356@intel.com>
+Date: Mon, 25 Nov 2024 07:46:55 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID
+ management
+To: Sean Christopherson <seanjc@google.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
+ pbonzini@redhat.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
+ linux-kernel@vger.kernel.org, tony.lindgren@linux.intel.com,
+ xiaoyao.li@intel.com, yan.y.zhao@intel.com, x86@kernel.org,
+ adrian.hunter@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
 References: <20241115202028.1585487-1-rick.p.edgecombe@intel.com>
- <20241115202028.1585487-2-rick.p.edgecombe@intel.com> <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
- <Z0EZ4gt2J8hVJz4x@google.com> <6903d890-c591-4986-8c88-a4b069309033@intel.com>
-Message-ID: <Z0SbYzr20UQjptgC@google.com>
-Subject: Re: [RFC PATCH 1/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID management
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	isaku.yamahata@gmail.com, kai.huang@intel.com, linux-kernel@vger.kernel.org, 
-	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	x86@kernel.org, adrian.hunter@intel.com, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Yuan Yao <yuan.yao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+ <20241115202028.1585487-2-rick.p.edgecombe@intel.com>
+ <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
+ <Z0EZ4gt2J8hVJz4x@google.com>
+ <6903d890-c591-4986-8c88-a4b069309033@intel.com>
+ <Z0SbYzr20UQjptgC@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <Z0SbYzr20UQjptgC@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 22, 2024, Dave Hansen wrote:
-> On 11/22/24 15:55, Sean Christopherson wrote:
-> > On Fri, Nov 22, 2024, Dave Hansen wrote:
-> > I don't know the full context, but working with "struct page" is a pain when every
-> > user just wants the physical address.  KVM SVM had a few cases where pointers were
-> > tracked as "struct page", and it was generally unpleasant to read and work with.
-> 
-> I'm not super convinced. page_to_phys(foo) is all it takes
-
-I looked again at the KVM code that bugs me, and my complaints are with code that
-needs both the physical address and the virtual address, i.e. that could/should
-use a meaningful pointer to describe the underlying data structure since KVM does
-directly access the memory.
-
-But for TDX pages, that obviously doesn't apply, so I withdraw my objection about
-using struct page.
-
-> > I also don't like conflating the kernel's "struct page" with the architecture's
-> > definition of a 4KiB page.
-> 
-> That's fair, although it's pervasively conflated across our entire
-> codebase. But 'struct page' is substantially better than a hpa_t,
-> phys_addr_t or u64 that can store a full 64-bits of address. Those
-> conflate a physical address with a physical page, which is *FAR* worse.
-> 
-> >> You know that 'tdr' is not just some random physical address.  It's a
-> >> whole physical page.  It's page-aligned.  It was allocated, from the
-> >> allocator.  It doesn't point to special memory.
-> > 
-> > Oh, but it does point to special memory.  If it *didn't* point at special memory
-> > that is completely opaque and untouchable, then KVM could use a struct overlay,
-> > which would give contextual information and some amount of type safety.  E.g.
-> > an equivalent without TDX is "struct vmcs *".
-> > 
-> > Rather than "struct page", what if we add an address_space (in the Sparse sense),
-> > and a typedef for a TDX pages?  Maybe __firmware?  E.g.
-> > 
-> >   # define __firmware	__attribute__((noderef, address_space(__firmware)))
-> > 
-> >   typedef u64 __firmware *tdx_page_t;
-> > 
-> > That doesn't give as much compile-time safety, but in some ways it provides more
-> > type safety since KVM (or whatever else cares) would need to make an explicit and
-> > ugly cast to misuse the pointer.
-> 
-> It's better than nothing. But I still vastly prefer to have a type that
-> tells you that something is physically-allocated out of the buddy, RAM,
-> and page-aligned.
-> 
-> I'd be better to have:
-> 
-> struct tdx_page {
-> 	u64 page_phys_addr;
-> };
-> 
-> than depend on sparse, IMNHO.
-> 
-> Do you run sparse every time you compile the kernel, btw? ;)
-
-Nah, but the 0-day both does such a good job of detecting and reporting new warnings
-that I'm generally comfortable relying on sparse for something like this.  Though
-as above, I'm ok with using "struct page" for the TDX pages.
+On 11/25/24 07:44, Sean Christopherson wrote:
+> Nah, but the 0-day both does such a good job of detecting and
+> reporting new warnings that I'm generally comfortable relying on
+> sparse for something like this.  Though as above, I'm ok with using
+> "struct page" for the TDX pages.
+Cool beans. Thanks for double-checking that KVM code you were concerned
+about. It's much appreciated!
 
