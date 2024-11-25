@@ -1,197 +1,114 @@
-Return-Path: <kvm+bounces-32398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A61E9D7865
-	for <lists+kvm@lfdr.de>; Sun, 24 Nov 2024 22:46:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045B39D794D
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 01:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E528528208C
-	for <lists+kvm@lfdr.de>; Sun, 24 Nov 2024 21:46:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E56FB22E03
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 00:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3241917BB1A;
-	Sun, 24 Nov 2024 21:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2357E63C;
+	Mon, 25 Nov 2024 00:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNg7MJ2I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JXthyxvC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F112500BB;
-	Sun, 24 Nov 2024 21:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3B536D
+	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 00:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732484764; cv=none; b=kYM5bQmZSVHSvWuWczJfOe8dMwF44gWf0nTxk8htqeliEQsZ1hcQyT/hCsldQh9O85i0fraFcex97vJ6iawOMiGEhxzC5g6KHqU+f1OYRitWdCyu4v9DDxPxVDeFst7XF54Jh1uDD742RAOFvrJb9o0FqvIWRkWMk5hCuQwLfXY=
+	t=1732493489; cv=none; b=C29ywr/grX4XXGgupqjnD7DF71yua/RTOs3LNlExqK64ysAE24fnh8OUtgMbBbM6x7jnzMZCBTAtt7DNht9M23Dz4ZqX05j8Zp7z+VvJ/uvapOzC576t7/CvOi4VjjB3RDfu2qHVDTWzypLB3rpsPP636sC0bf/8MZSLaFBZC9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732484764; c=relaxed/simple;
-	bh=/qhmFmtGTN/yG2NensqYHITpZ/haNfld1Woay8hK220=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nVpy1P9Z6baVEDcUdk8nWBa/qcNsdWfLH92XwRiQ5WKSSLHpFqlfrMnT1Nl3v/FvklT9OHJPp29+yAotpBYrJaCq0Z9sKJWsWQZMUC+fjkPEs3E3U9hTWIRWnAKOa0eAKZ0PFTonQ8tlXZtheAJDWz8t0l7FuRpWRnISz5Ovvh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNg7MJ2I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EE06C4CECC;
-	Sun, 24 Nov 2024 21:46:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732484763;
-	bh=/qhmFmtGTN/yG2NensqYHITpZ/haNfld1Woay8hK220=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZNg7MJ2IIU3CeTaHZ48HzrmcZZAw0SYc+qCR/IKYfojob4+a9LbntBCi696q0OjUN
-	 3nQvd8ihsO2okerTSi3qXbeP7+LNX7rk2RZTot29gYFw3eku4E/jStldwicIm8jQSq
-	 Jpvge98weBKXSdbt5FHI9opC+dsG48zcJQqC4EpSMqFwt5BAyZtTlcIZ8F1rOycM8t
-	 gBXJmsYnFDfxgSh+rxCGS5FXmXw2NvRkPX7hznrkisrgC//vxx85ldSGSXAXmR7YTU
-	 3LHIuIqDGcPS9H2ByV200QW0+2+eVwzg+CINe8g2Q9xl4+OtQ3aiK5W+MZpdqpHY8C
-	 k9ocOhptHnk2g==
-Date: Sun, 24 Nov 2024 22:46:01 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
-	x86@kernel.org, rcu@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Lorenzo Stoakes <lstoakes@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Juerg Haefliger <juerg.haefliger@canonical.com>,
-	Nicolas Saenz Julienne <nsaenz@kernel.org>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
-	Chuang Wang <nashuiliang@gmail.com>,
-	Yang Jihong <yangjihong1@huawei.com>,
-	Petr Mladek <pmladek@suse.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-	Julian Pidancet <julian.pidancet@oracle.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Yair Podemsky <ypodemsk@redhat.com>,
-	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 11/15] context-tracking: Introduce work deferral
- infrastructure
-Message-ID: <Z0Oeme2yhxF_ArX0@pavilion.home>
-References: <20241119153502.41361-1-vschneid@redhat.com>
- <20241119153502.41361-12-vschneid@redhat.com>
- <Zz2_7MbxvfjKsz08@pavilion.home>
- <Zz3w0o_3wZDgJn0K@localhost.localdomain>
- <xhsmho729hlv0.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <Zz4cqfVfyb1enxql@localhost.localdomain>
- <xhsmh1pz39v0k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1732493489; c=relaxed/simple;
+	bh=ad6f9CwVWflFTWSWFu9D0x+z6Mr+mnycrcXtlHZDzfA=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=J/kqyDh5HmZKUTezTnaMMi5eaLtxT3W+mDhqlstDhIOGQnoPYs34WT/QGR58v6ZYREhUzVMkeL2bEVHjb1027U5lfazkp7ImPrNRN2VdbMp4UyF7cIjzPvRP2Kko1+6Tiz0d3o26Zk3p2GzFNM1uW1fpl9Z22QI4zWbdgouXiMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JXthyxvC; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7f43259d220so2780205a12.3
+        for <kvm@vger.kernel.org>; Sun, 24 Nov 2024 16:11:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732493486; x=1733098286; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:msip_labels:content-language
+         :accept-language:message-id:date:thread-index:thread-topic:subject
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ad6f9CwVWflFTWSWFu9D0x+z6Mr+mnycrcXtlHZDzfA=;
+        b=JXthyxvCBXdJTH84PAQacC0aAxuZSBLeZvpSE9LczwHpEQdk9YCwzLUyC7EL0GdyRx
+         vp5J7LhdxfefOwR9CCwwgTwMpz9lS5KJQ5E18RJcdGcx+V/ccdrStT+0gWK2bBbg/B+y
+         BFH5QGvjiTBjI5iS/K10AhKFstAVMAyjBmCsCkyJuOdEoM6f7X0h3e9C8GOADb3C7XDl
+         SLC7TCtNZK3scHZ23Zaf0OnqSv1FbtEvlw3bvQ+yFSgZbTDfNesUCCPkYMn064k26Km3
+         hlMn7BNkpOQXSotjqAKNguHfHB0KbsvXjB7eJTDzy+92MxxbRNTcfFzHJifJNim6+iM1
+         GrNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732493486; x=1733098286;
+        h=mime-version:content-transfer-encoding:msip_labels:content-language
+         :accept-language:message-id:date:thread-index:thread-topic:subject
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ad6f9CwVWflFTWSWFu9D0x+z6Mr+mnycrcXtlHZDzfA=;
+        b=u+g8RTw9xYCumNHAl1HTQGGYmKatuMbfPXI98ISL48K2P8CFRrM+J9jq6CBX3riVCk
+         T9rV93cxwxLo47+vJg3V+34OjtgzoXLEoTXBjlHxL99j2fIfdtfnrLc/Hi305Q3F1kv2
+         C6M36smYPIYuXL8Xu0JlZ+295/kZtwiJVtYCbzUGfyJguEJfvAXCN2mGJtN2MNN5fQDr
+         Gr7dvC4N9n7ksKt2QdIrlCIpN/dEsxcgj1MqE4Cd3No8k2cP0FRR3CpKkpdZ8NJvhx/Z
+         j3AAtytkGW8XPHd0D/8OVjIiquPLnSKrVHQAWhExeW14zfLgXoIqOCHC2DL9oivwNDF1
+         NnoQ==
+X-Gm-Message-State: AOJu0YzqCpVtqqx2Z5ohsB+cRGoc19SOUxkKvISGxUwVvQ10YBeckZts
+	OKzUuUUOB6lPJkU111Q2kDEAtwQzF62ePORachZrbg2x1VLXnwVCHy/dA9Qg
+X-Gm-Gg: ASbGncvmhrsKIVzT/+3tnm/H+yfI6up+uXjtsiW5atdRTIMRhALaeI3D2CLf7Mk6H6L
+	jyq509p9GWv4i3u7Wa4dFn4cdnH/270RtrNUc0uE4v9rfKSW9s0KV/HHdcSasjmhdT7TH/xRpC6
+	fH8sEZf/a4C3Khd/6fA3Yw6P10G2GtbAlY4vShR55aWrAPzrxbXXHEaqxyeZxd9Lz8q12EPJSe/
+	y7wctQaPDoUZf8hup2hifMKLzhBImiDqH+hmwD5dXBUfHFgXSrbANC3Gahe8Iu0yAdgotXWOgbs
+	ROwbpB12Gw8YyYzyCtgk2J3xs0VjLya6G8lAcA==
+X-Google-Smtp-Source: AGHT+IEAiDjPep8gUgdaI30G7MKRU5mTk+P2c+WwYgpFjfWtBPIQKntCK1uf+ektP/flnDpJTVmB6g==
+X-Received: by 2002:a17:90b:4a09:b0:2ea:61ac:a51b with SMTP id 98e67ed59e1d1-2eb0e887f32mr12122533a91.34.1732493485732;
+        Sun, 24 Nov 2024 16:11:25 -0800 (PST)
+Received: from SEZPR01MB4825.apcprd01.prod.exchangelabs.com ([2603:1046:101:65::5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eb0d060bcdsm5374209a91.45.2024.11.24.16.11.24
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Nov 2024 16:11:25 -0800 (PST)
+From: =?gb2312?B?wLXW6rfm?= <csumushu@gmail.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Using the ldp instruction to access the I/O address space in KVM mode
+ causes an exception
+Thread-Topic: Using the ldp instruction to access the I/O address space in KVM
+ mode causes an exception
+Thread-Index: AQHbPs59bej3itDjoEm02FTI/QBOow==
+X-MS-Exchange-MessageSentRepresentingType: 1
+Date: Mon, 25 Nov 2024 00:11:22 +0000
+Message-ID:
+	<SEZPR01MB4825C8FFB2994CC67225DB74A32E2@SEZPR01MB4825.apcprd01.prod.exchangelabs.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-Exchange-Organization-SCL: -1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+msip_labels:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <xhsmh1pz39v0k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-Le Fri, Nov 22, 2024 at 03:56:59PM +0100, Valentin Schneider a écrit :
-> On 20/11/24 18:30, Frederic Weisbecker wrote:
-> > Le Wed, Nov 20, 2024 at 06:10:43PM +0100, Valentin Schneider a écrit :
-> >> On 20/11/24 15:23, Frederic Weisbecker wrote:
-> >>
-> >> > Ah but there is CT_STATE_GUEST and I see the last patch also applies that to
-> >> > CT_STATE_IDLE.
-> >> >
-> >> > So that could be:
-> >> >
-> >> > bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
-> >> > {
-> >> >    struct context_tracking *ct = per_cpu_ptr(&context_tracking, cpu);
-> >> >    unsigned int old;
-> >> >    bool ret = false;
-> >> >
-> >> >    preempt_disable();
-> >> >
-> >> >    old = atomic_read(&ct->state);
-> >> >
-> >> >    /* CT_STATE_IDLE can be added to last patch here */
-> >> >    if (!(old & (CT_STATE_USER | CT_STATE_GUEST))) {
-> >> >            old &= ~CT_STATE_MASK;
-> >> >            old |= CT_STATE_USER;
-> >> >    }
-> >>
-> >> Hmph, so that lets us leverage the cmpxchg for a !CT_STATE_KERNEL check,
-> >> but we get an extra loop if the target CPU exits kernelspace not to
-> >> userspace (e.g. vcpu or idle) in the meantime - not great, not terrible.
-> >
-> > The thing is, what you read with atomic_read() should be close to reality.
-> > If it already is != CT_STATE_KERNEL then you're good (minus racy changes).
-> > If it is CT_STATE_KERNEL then you still must do a failing cmpxchg() in any case,
-> > at least to make sure you didn't miss a context tracking change. So the best
-> > you can do is a bet.
-> >
-> >>
-> >> At the cost of one extra bit for the CT_STATE area, with CT_STATE_KERNEL=1
-> >> we could do:
-> >>
-> >>   old = atomic_read(&ct->state);
-> >>   old &= ~CT_STATE_KERNEL;
-> >
-> > And perhaps also old |= CT_STATE_IDLE (I'm seeing the last patch now),
-> > so you at least get a chance of making it right (only ~CT_STATE_KERNEL
-> > will always fail) and CPUs usually spend most of their time idle.
-> >
-> 
-> I'm thinking with:
-> 
->         CT_STATE_IDLE		= 0,
->         CT_STATE_USER		= 1,
->         CT_STATE_GUEST		= 2,
->         CT_STATE_KERNEL		= 4, /* Keep that as a standalone bit */
-
-Right!
-
-> 
-> we can stick with old &= ~CT_STATE_KERNEL; and that'll let the cmpxchg
-> succeed for any of IDLE/USER/GUEST.
-
-Sure but if (old & CT_STATE_KERNEL), cmpxchg() will consistently fail.
-But you can make a bet that it has switched to CT_STATE_IDLE between
-the atomic_read() and the first atomic_cmpxchg(). This way you still have
-a tiny chance to succeed.
-
-That is:
-
-   old = atomic_read(&ct->state);
-   if (old & CT_STATE_KERNEl)
-      old |= CT_STATE_IDLE;
-   old &= ~CT_STATE_KERNEL;
-
-
-   do {
-      atomic_try_cmpxchg(...)
-
-Hmm?
-
+SSBhbSBydW5uaW5nIEFSTTY0IGVtdWxhdGlvbiB1c2luZyBRRU1Voa9zIEtWTSBtb2RlIG9uIGFu
+IEFSTTY0IGRldmljZSwgYnV0IEkgZW5jb3VudGVyZWQgdGhlIGZvbGxvd2luZyBleGNlcHRpb24g
+d2hlbiBib290aW5nIHRoZSBndWVzdCBMaW51eCBrZXJuZWwuCmVycm9yOiBrdm0gcnVuIGZhaWxl
+ZCBGdW5jdGlvbiBub3QgaW1wbGVtZW50ZWQKUEM9ZmZmZjgwMDAwOGUyMDFlMCBYMDA9ZmZmZjAw
+MjA4YTYzYjAwMCBYMDE9MDAwMDAwMDAwMDAwMDAwMApBbmQgdGhlIGluc3RydWN0aW9uIHBvaW50
+ZWQgdG8gYnkgdGhlIFBDIHJlZ2lzdGVyIGlzIDB4ZmZmZjgwMDAwOGUyMDFlMDogbGRwIHExMSwg
+cTEyLCBbeDIyXSwgd2hlcmUgdGhlIGFkZHJlc3MgaGVsZCBieSB0aGUgeDIyIHJlZ2lzdGVyIGJl
+bG9uZ3MgdG8gdGhlIGFkZHJlc3Mgc3BhY2Ugb2YgdGhlIG5pYy4KQWZ0ZXIgdGVzdGluZywgaXQg
+d2FzIGZvdW5kIHRoYXQgdXNpbmcgdGhlIGxkcCBpbnN0cnVjdGlvbiB0byBhY2Nlc3MgcGVyaXBo
+ZXJhbCBhZGRyZXNzIHNwYWNlcyBjYXVzZXMgaXNzdWVzLCBidXQgYWNjZXNzaW5nIFJBTSB3b3Jr
+cyBub3JtYWxseS4gV2hhdCBjb3VsZCBiZSB0aGUgY2F1c2Ugb2YgdGhpcyBpc3N1ZSwgYW5kIGFy
+ZSB0aGVyZSBhbnkgc29sdXRpb25zIHRvIHJlc29sdmUgdGhpcyBwcm9ibGVtPw==
 
