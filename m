@@ -1,136 +1,139 @@
-Return-Path: <kvm+bounces-32419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B28D9D84C9
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:49:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D628E9D84D2
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:50:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB3528A445
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:49:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76AFC16AF0C
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7D19D886;
-	Mon, 25 Nov 2024 11:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F3719CC37;
+	Mon, 25 Nov 2024 11:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NNmzjnNl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KJDksxwh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3899199EA8;
-	Mon, 25 Nov 2024 11:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400FF376E0;
+	Mon, 25 Nov 2024 11:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732535209; cv=none; b=Faa2CycDtHw6r9/Zvy5h0u2wur/4aMJ/9CG2+2ymOflrJ90Ug4+k4uSaDEOOPLlvbBOrueuWbmA8GJTSgTGZHTfhtJsR/CRb5FUnQi9k7xjw6XJs8jlaTORZZcGeaE1mEKiuhjQ05PihS/gNjAm4Aw0wt3jYUbsLO9Rk+nxqL0g=
+	t=1732535447; cv=none; b=V5T6LU91k1EM0cKKs+YdXkNFELvfaOFOim/Y6GZSeaHO5PDoZCCzrxodOtIjWky3hcvNBUKpHFI88ML0BMXleaWay7uifH4d4WO+xeJovT+dd37xw/mIs02+/wJ96h9UtaJG2Kkkla4SYrrCs3n8I+ICGK7KKpa9kbX674q0BqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732535209; c=relaxed/simple;
-	bh=FHKaVj40hVdUie0T9IjlT4qkPmKzDnnfQy/AYHnP1aU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GGvKDhAJHaW4M4IEow67q+zegbkMKvZO0/U8Oprrsm33mYihXkYj1bm34Li+yzTRipFRvNAlfnAqjogl4PQYWYigCd7ADZ3F2E/Ffi1RHqwNhyCmL70Lq+GFH0W8Khi9Op0Xh+f4aGC8tOVwHNukWCawgPt/CZ6rKEUPkIJB5W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NNmzjnNl; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732535208; x=1764071208;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=0p7Ckz6iXzDpwC1O2xBQwIygdPDI7wUUkWYzZKFW0BE=;
-  b=NNmzjnNlZlnD+gJWf51Uu2am4QYnK4kfAJ67MiV2xgsCNZtTMsJ32x/b
-   COuUuJeXiu0phSVrjAZx6UEgIp1jj4PG94baPwCTYEJxs/q2+e+uANonb
-   ws+OeUufxK6jkA28Wq35yhca/PeJe26YKO7X9DO5SiMZksGgFyY7CawR8
-   4=;
-X-IronPort-AV: E=Sophos;i="6.12,182,1728950400"; 
-   d="scan'208";a="698062018"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 11:46:44 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:63339]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.206:2525] with esmtp (Farcaster)
- id 40ec0b3e-9f12-4258-be54-cdb388d9fb84; Mon, 25 Nov 2024 11:46:43 +0000 (UTC)
-X-Farcaster-Flow-ID: 40ec0b3e-9f12-4258-be54-cdb388d9fb84
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 25 Nov 2024 11:46:41 +0000
-Received: from [192.168.8.103] (10.106.83.30) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 25 Nov 2024
- 11:46:40 +0000
-Message-ID: <a8d78402-6f8d-4ebf-ae8b-1a8f03d33647@amazon.com>
-Date: Mon, 25 Nov 2024 11:46:40 +0000
+	s=arc-20240116; t=1732535447; c=relaxed/simple;
+	bh=sdha4UFbzAj/IT3/+mxW7xRcKh1JUJ9MHdzxrrQtAhw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q9ffHKUooFQ9g20AWj+bGiIq1q70yxZBKhqWDvPnuLwfhpX7lLXmK80E53yiF236J9RZ/BY5Hel8GoZQjBb88nesBN94+ZS0xgcyLwL75lvao/Lmo5Kv0FBE9fjlHYmJA7kMey8j2g+/reQHF+k2Qsjg4CX8SZOMo3gREwt7nLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KJDksxwh; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4APBiAx2028800;
+	Mon, 25 Nov 2024 11:50:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=tW1SiColR96hkspMdkCnUsugwI9bUJxDV15p475UL
+	Q8=; b=KJDksxwhxEt1wsF5iydiLk6+3lmv0R06uSQLWBNqiLAZw/uQAyChL2nel
+	QrC+X74B81XK9gfPEA45vMzbDDa5qAtG9kp4AdK58QanXKPVX2/ewta6OZ5V0m3e
+	6Wx9JVq5pHe1Rmv+xqlMQkDkYTjJ+R+f82jPr+dQKJzhcboTqu1RHslCsLk8n8NI
+	bBwTuPgfffdH82syYEPxxTQTOgPel4jOZuwJxFnvf8YsYU3y+pbHNj53PnG4d+uW
+	kTVDiH0x9+kibf8HtiT6YUNhO+zB9RsZFEzAvM0UlxatCN0JTKJ7DhzCsdwH+xU3
+	5aHkHFQMNsVvaXPjjhNoCddIfA/IQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4338a77x2h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 11:50:43 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AP5ePqC026351;
+	Mon, 25 Nov 2024 11:50:43 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 433v30ta4y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 11:50:43 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4APBodAW20840912
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Nov 2024 11:50:39 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B280A2004B;
+	Mon, 25 Nov 2024 11:50:39 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F42720043;
+	Mon, 25 Nov 2024 11:50:39 +0000 (GMT)
+Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Nov 2024 11:50:39 +0000 (GMT)
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: s390: Couple of small cmpxchg() optimizations
+Date: Mon, 25 Nov 2024 12:50:36 +0100
+Message-ID: <20241125115039.1809353-1-hca@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH 1/4] KVM: guest_memfd: add generic post_populate callback
-To: <michael.day@amd.com>, <pbonzini@redhat.com>, <corbet@lwn.net>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
-	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
-	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>
-References: <20241024095429.54052-1-kalyazin@amazon.com>
- <20241024095429.54052-2-kalyazin@amazon.com>
- <589ccb59-ae79-49db-8017-f6d28d7f6982@amd.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
- ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
- abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
-In-Reply-To: <589ccb59-ae79-49db-8017-f6d28d7f6982@amd.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D005EUA002.ant.amazon.com (10.252.50.11) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: v7yQPefRjDtoGXpXvX1ze3UzwQYTBj3f
+X-Proofpoint-ORIG-GUID: v7yQPefRjDtoGXpXvX1ze3UzwQYTBj3f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 mlxlogscore=721 malwarescore=0
+ adultscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411250098
 
-On 22/11/2024 18:40, Mike Day wrote:
-> On 10/24/24 04:54, Nikita Kalyazin wrote:
->> This adds a generic implementation of the `post_populate` callback for
->> the `kvm_gmem_populate`.  The only thing it does is populates the pages
->> with data provided by userspace if the user pointer is not NULL,
->> otherwise it clears the pages.
->> This is supposed to be used by KVM_X86_SW_PROTECTED_VM VMs.
->>
->> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
->> ---
->>   virt/kvm/guest_memfd.c | 21 +++++++++++++++++++++
->>   1 file changed, 21 insertions(+)
->>
->> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> index 8f079a61a56d..954312fac462 100644
->> --- a/virt/kvm/guest_memfd.c
->> +++ b/virt/kvm/guest_memfd.c
->> @@ -620,6 +620,27 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct 
->> kvm_memory_slot *slot,
->>   EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
->>
->>   #ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
-> 
-> KVM_AMD_SEV can select KVM_GENERIC_PRIVATE_MEM, so to guarantee this is 
-> only for
-> software protection it might be good to use:
-> 
-> #if defined CONFIG_KVM_GENERIC_PRIVATE_MEM && !defined CONFIG_KVM_AMD_SEV
-> 
-> That could end up too verbose so there should probably be some more 
-> concise mechanism
-> to guarantee this generic callback isn't used for a hardware-protected 
-> guest.
+Use try_cmpxchg() instead of cmpxchg() so compilers with flag output
+operand support (gcc 14 and newer) can generate slightly better code.
 
-Thanks, will make a note for myself for the next iteration.
+Also get rid of two cmpxchg() usages on one/two byte memory areas
+which generates inefficient code.
 
-> 
-> Mike
+bloat-o-meter statistics of the kvm module:
+
+add/remove: 0/0 grow/shrink: 0/11 up/down: 0/-318 (-318)
+Function                                     old     new   delta
+kvm_s390_handle_wait                         886     880      -6
+kvm_s390_gisa_destroy                        226     220      -6
+kvm_s390_gisa_clear                           96      90      -6
+ipte_unlock                                  380     372      -8
+kvm_s390_gisc_unregister                     270     260     -10
+kvm_s390_gisc_register                       290     280     -10
+gisa_vcpu_kicker                             200     190     -10
+account_mem                                  250     232     -18
+ipte_lock                                    416     368     -48
+kvm_s390_update_topology_change_report       174     122     -52
+kvm_s390_clear_local_irqs                    420     276    -144
+Total: Before=316521, After=316203, chg -0.10%
+
+Heiko Carstens (3):
+  KVM: s390: Use try_cmpxchg() instead of cmpxchg() loops
+  KVM: s390: Remove one byte cmpxchg() usage
+  KVM: s390: Increase size of union sca_utility to four bytes
+
+ arch/s390/include/asm/kvm_host.h | 10 +++++-----
+ arch/s390/kvm/gaccess.c          | 16 ++++++++--------
+ arch/s390/kvm/interrupt.c        | 25 ++++++++-----------------
+ arch/s390/kvm/kvm-s390.c         |  4 ++--
+ arch/s390/kvm/pci.c              |  5 ++---
+ 5 files changed, 25 insertions(+), 35 deletions(-)
+
+
+base-commit: 9f16d5e6f220661f73b36a4be1b21575651d8833
+-- 
+2.45.2
 
 
