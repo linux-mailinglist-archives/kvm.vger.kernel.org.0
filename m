@@ -1,194 +1,124 @@
-Return-Path: <kvm+bounces-32435-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32436-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BA09D85B1
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 13:56:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 546799D869C
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 14:38:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BE5F289E3C
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:56:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A48928B363
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 13:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8991A7060;
-	Mon, 25 Nov 2024 12:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0461AF0A4;
+	Mon, 25 Nov 2024 13:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VCoh3TlD"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ojX6Tomq"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2727C1714AC
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 12:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70721A7275;
+	Mon, 25 Nov 2024 13:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732539358; cv=none; b=c6SNZ+DDXjKN3deNavzhFuBmovRLXnGLXZDQq8H0n8lVtu2oD8Lb/rD2bZSFwBI9ldQq/gxtSbjqmfBUVNDHdWxDHSb29yLQz67rLqMIz0XvTf6bqw7ibZXE5AWQZv83pyIafQPCUv7/sanFzuxH4L3vvs+8W0mP+NsKbJcnleI=
+	t=1732541886; cv=none; b=S2n5xpVU++ZAVr0zvejM/1MZSC5PbqHVE3ZwKxV02lrCvcfkzD7YjA83LfRu/mbrblmRYC8M4TgvgBXUxUkleavfmaKfUTVLFS1IIIaETg2gsSEEyqPvvOLS9h7HjHF4wVBZj6uL/1SrclsHjnCCR3WKHVA9LeMdFg2Vn5cwu88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732539358; c=relaxed/simple;
-	bh=H9uJuzWBKxkujHB+bWBGAA+4Qx38yeHWZZU3Werv6jA=;
+	s=arc-20240116; t=1732541886; c=relaxed/simple;
+	bh=UNc4TCLY1t3suxw3+Bgtvo1JMK8tsT9LQtmXTBpyIew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nxK7tp6qS4DIN65tPMYTlT/2YjApUFGTHyk0xPyxRdVpf6MDkPZhwqNU06OkIcfSqXDNZGicTgeh+hZeqXfVKHc63UpxtY0ogzrCvS3IWop1em/tCBAJCvbowMIOsnJ2RIiZ63I4lBSw/FHu/NDTqkO4fZ33FJWlRfle2jBLcyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VCoh3TlD; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 25 Nov 2024 13:55:51 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732539354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2mKzCRMitBFDXr2GLM3ChCasW/6X9tcwnLQEyG4tD3k=;
-	b=VCoh3TlD9mQd4efg25BSoCUF1i1e6EWL9OJI5k1DZIrlZmxMd5cC7qn5rRUokFKonLfbKC
-	uwl4oxj/HdZHuqMOKQBkrTN3BXJF1CVzzt+VOwtjp3E3pBKm3ZGgTDq9AAS0DsmlppNnD3
-	KWNfh/FwkQu3JNoEDhTq0tVFIgS7Os0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v3 2/4] riscv: lib: Add SBI SSE extension
- definitions
-Message-ID: <20241125-0453a5f28f22c185bbabb1dd@orel>
-References: <20241125115452.1255745-1-cleger@rivosinc.com>
- <20241125115452.1255745-3-cleger@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jURZRoMmk63MFAjInohdk6g4Xvu9sqrJxlsrQuamBx8jUdemgPBAYKenLopPxorBRilpkBHWD1GpvT++P7ddFM4XbhVxOBMxAU570ETZ5kqG2fHGjJGNxO+3ikibZME6NZhCoiwmwUQO/TvhTAWIgWcgFEUi+csK0mgLzuvhUEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ojX6Tomq; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4APCZFM1021731;
+	Mon, 25 Nov 2024 13:38:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=LEsQ1C6OjR6pPGI2zXW5XqwepzfHfL
+	RTb5loFVC9Ofc=; b=ojX6Tomq6gh79Kzq2saHlb7jRyv6MV6u+OI2wuSBtanyez
+	Xm9aN1fFLoNRVizDtdo9//6T8Zgp0i3DPfNdaWcD+EDgt1wF4c3486ZxhqzmMMzH
+	shadvZxvf6Iw4wDIWvCMBKaf+RzR1ZNXdZZiQtdqQZqTFxsLehGcC42EdOCVwpyR
+	/ikMJTTSejdlSisZ1gBerZCoIF9NdLjJGgu+Hkzss44C7bRLndlqVSNK1ky4509f
+	tPnofjkFUVOFD0ygdpo3zj6VsKvDY2u91NQdGaATp/icibLkAyDww4Gf3N9J7aog
+	nSovWd4uF0lAzKrxqqgW0rFlHKTYzL8RzPvTbdXw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43386jrc7v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 13:38:02 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AP5HH1Q002627;
+	Mon, 25 Nov 2024 13:38:01 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 433tcmajt4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 13:38:01 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4APDbvXV61866484
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Nov 2024 13:37:57 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 932E120043;
+	Mon, 25 Nov 2024 13:37:57 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3251520040;
+	Mon, 25 Nov 2024 13:37:57 +0000 (GMT)
+Received: from osiris (unknown [9.179.25.253])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 25 Nov 2024 13:37:57 +0000 (GMT)
+Date: Mon, 25 Nov 2024 14:37:55 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: s390: Remove one byte cmpxchg() usage
+Message-ID: <20241125133755.14417-D-hca@linux.ibm.com>
+References: <20241125115039.1809353-1-hca@linux.ibm.com>
+ <20241125115039.1809353-3-hca@linux.ibm.com>
+ <20241125131617.13be742d@p-imbrenda>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241125115452.1255745-3-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20241125131617.13be742d@p-imbrenda>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sgq_zrl2iWWgqKfKqzJZimk0kaIAOyH-
+X-Proofpoint-GUID: sgq_zrl2iWWgqKfKqzJZimk0kaIAOyH-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ mlxlogscore=851 spamscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411250115
 
-On Mon, Nov 25, 2024 at 12:54:46PM +0100, Clément Léger wrote:
-> Add SBI SSE extension definitions in sbi.h
+On Mon, Nov 25, 2024 at 01:16:17PM +0100, Claudio Imbrenda wrote:
+> On Mon, 25 Nov 2024 12:50:38 +0100
+> Heiko Carstens <hca@linux.ibm.com> wrote:
+> > @@ -128,23 +126,16 @@ static void sca_clear_ext_call(struct kvm_vcpu *vcpu)
+> >  		struct esca_block *sca = vcpu->kvm->arch.sca;
+> >  		union esca_sigp_ctrl *sigp_ctrl =
+> >  			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> > -		union esca_sigp_ctrl old;
+> >  
+> > -		old = READ_ONCE(*sigp_ctrl);
+> > -		expect = old.value;
+> > -		rc = cmpxchg(&sigp_ctrl->value, old.value, 0);
+> > +		WRITE_ONCE(sigp_ctrl->value, 9);
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  lib/riscv/asm/sbi.h | 83 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 83 insertions(+)
-> 
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index 98a9b097..f2494a50 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -11,6 +11,11 @@
->  #define SBI_ERR_ALREADY_AVAILABLE	-6
->  #define SBI_ERR_ALREADY_STARTED		-7
->  #define SBI_ERR_ALREADY_STOPPED		-8
-> +#define SBI_ERR_NO_SHMEM		-9
-> +#define SBI_ERR_INVALID_STATE		-10
-> +#define SBI_ERR_BAD_RANGE		-11
-> +#define SBI_ERR_TIMEOUT			-12
-> +#define SBI_ERR_IO			-13
->  
->  #ifndef __ASSEMBLY__
->  #include <cpumask.h>
-> @@ -23,6 +28,7 @@ enum sbi_ext_id {
->  	SBI_EXT_SRST = 0x53525354,
->  	SBI_EXT_DBCN = 0x4442434E,
->  	SBI_EXT_SUSP = 0x53555350,
-> +	SBI_EXT_SSE = 0x535345,
->  };
->  
->  enum sbi_ext_base_fid {
-> @@ -71,6 +77,83 @@ enum sbi_ext_dbcn_fid {
->  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
->  };
->  
-> +enum sbi_ext_ss_fid {
-                ^ sse
+> that's supposed to be a 0, right?
 
-> +	SBI_EXT_SSE_READ_ATTRS = 0,
-> +	SBI_EXT_SSE_WRITE_ATTRS,
-> +	SBI_EXT_SSE_REGISTER,
-> +	SBI_EXT_SSE_UNREGISTER,
-> +	SBI_EXT_SSE_ENABLE,
-> +	SBI_EXT_SSE_DISABLE,
-> +	SBI_EXT_SSE_COMPLETE,
-> +	SBI_EXT_SSE_INJECT,
-> +	SBI_EXT_SSE_HART_UNMASK,
-> +	SBI_EXT_SSE_HART_MASK,
-> +};
-> +
-> +/* SBI SSE Event Attributes. */
-> +enum sbi_sse_attr_id {
-> +	SBI_SSE_ATTR_STATUS		= 0x00000000,
-> +	SBI_SSE_ATTR_PRIORITY		= 0x00000001,
-> +	SBI_SSE_ATTR_CONFIG		= 0x00000002,
-> +	SBI_SSE_ATTR_PREFERRED_HART	= 0x00000003,
-> +	SBI_SSE_ATTR_ENTRY_PC		= 0x00000004,
-> +	SBI_SSE_ATTR_ENTRY_ARG		= 0x00000005,
-> +	SBI_SSE_ATTR_INTERRUPTED_SEPC	= 0x00000006,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS	= 0x00000007,
-> +	SBI_SSE_ATTR_INTERRUPTED_A6	= 0x00000008,
-> +	SBI_SSE_ATTR_INTERRUPTED_A7	= 0x00000009,
-> +};
-> +
-> +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET	0
-> +#define SBI_SSE_ATTR_STATUS_STATE_MASK		0x3
-> +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET	2
-> +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET	3
-> +
-> +#define SBI_SSE_ATTR_CONFIG_ONESHOT	(1 << 0)
-> +
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP	BIT(0)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE	BIT(1)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV	BIT(2)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP	BIT(3)
-> +
-> +enum sbi_sse_state {
-> +	SBI_SSE_STATE_UNUSED		= 0,
-> +	SBI_SSE_STATE_REGISTERED	= 1,
-> +	SBI_SSE_STATE_ENABLED		= 2,
-> +	SBI_SSE_STATE_RUNNING		= 3,
-> +};
-> +
-> +/* SBI SSE Event IDs. */
-> +#define SBI_SSE_EVENT_LOCAL_RAS			0x00000000
-> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP		0x00000001
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START	0x00004000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END		0x00007fff
-> +
-> +#define SBI_SSE_EVENT_GLOBAL_RAS		0x00008000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START	0x0000c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END		0x0000ffff
-> +
-> +#define SBI_SSE_EVENT_LOCAL_PMU			0x00010000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START	0x00014000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END		0x00017fff
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START	0x0001c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END		0x0001ffff
-> +
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START	0x00024000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END		0x00027fff
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START	0x0002c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END		0x0002ffff
-> +
-> +#define SBI_SSE_EVENT_LOCAL_SOFTWARE		0xffff0000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START	0xffff4000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END		0xffff7fff
-> +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE		0xffff8000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START	0xffffc000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END		0xffffffff
-> +
-> +#define SBI_SSE_EVENT_PLATFORM_BIT		(1 << 14)
-> +#define SBI_SSE_EVENT_GLOBAL_BIT		(1 << 15)
-> +
->  struct sbiret {
->  	long error;
->  	long value;
-> -- 
-> 2.45.2
->
+Duh... yes, of course. I added the "9" to better find the corresponding
+code in assembly, and obviously forgot to replace it with 0 again.
+Thanks for pointing this out!
 
-Otherwise looks good.
-
-Thanks,
-drew
+Strange enough this still worked. Hmm.
 
