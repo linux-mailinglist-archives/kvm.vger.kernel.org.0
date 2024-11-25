@@ -1,65 +1,64 @@
-Return-Path: <kvm+bounces-32459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1619D8AB4
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 17:55:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8BA9D89AF
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 16:50:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87EEFB428A5
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 15:47:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4997F164481
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 15:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD1A1B3920;
-	Mon, 25 Nov 2024 15:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632551B4126;
+	Mon, 25 Nov 2024 15:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JUu2zD7w"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JFw/6E+3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77034944E;
-	Mon, 25 Nov 2024 15:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4E129415;
+	Mon, 25 Nov 2024 15:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732549619; cv=none; b=f4onD7Fe26Aiw8KVofnm0XS1tAUUElPGtqImkoJkSqAflQjx6RR3e2KsjHXrqTxkxZC39bALvOxbsBWb8T9Inv5ezIhsFzb+cXcJjZYuW0F3qTJ1i8aSgAyP5YuFCKTMfDK6dsawYSLbgZeWlab7sySYNcQPZyixZ7uw1u0APrc=
+	t=1732549819; cv=none; b=VBrNz8u44yosQK/70qnQ1y7F7g2QLU2c8o0qxpAXyGvsEkQCok1Bq+uHWlnwxnIh6C5pkpc9ksIS+H4QVCZk2SAYopNbreALKYhKUjsysrq5zxsO/q41/YZKZ+OB3qfhdIxnsjQLrft6uBWMh5PjppXNcVDyYRJVSXrZ3juD90M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732549619; c=relaxed/simple;
-	bh=BU4hqbxVQvG33GzUNH/r/+W/nOZsnuMmzpnLX3pNqa0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PrdKGgwPoKVFJlk3zifdh98OD8ayB6Yedw1Am5zh5q7OJcyy2f4Cv+XSJyxpoDcDXwi4xhHLLLwgq2fS45V7OQhcn+qU4iXDHD36WpsOPqTUwdMJqspI9yENCvuqRY97e/pENbxJphbFnDrrTRt7iL1X2PP2kprIp2TZ3/VHGFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JUu2zD7w; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732549617; x=1764085617;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BU4hqbxVQvG33GzUNH/r/+W/nOZsnuMmzpnLX3pNqa0=;
-  b=JUu2zD7w/iWMjaPDaQ61+zZdcBR/8HRlqJaw+o+IYQMOprIU2qNvgUOI
-   ka6eVMr0FXucidGhmMG0m8tHG5R2qtq3H2p72ZMoZLRUI5oZ2ayfCcS2F
-   92ED2G2u2+ItU5Ei/jZqtwDm4vqvNHApfA4Y7tZmj0UxzdgROGtyrEiG7
-   DNG+QOCHf7jbZlyvf2H3qxex3ZmdlwwBHDfWaDHp8gwcpP11Xd8P9tEiU
-   fg8dKr1KNld28ijYgt7P4MkR+nNtxnr+Y7WakYes6T/OWBY9vRxpM03/k
-   0CWxwc4bjNIWtN3vVX098sYqyucL/519mN0j77z+G7J1cO7yFOSu4Xepg
-   w==;
-X-CSE-ConnectionGUID: MZZVQ+HWRKqB21T317kAKg==
-X-CSE-MsgGUID: tTUrMby/QzCXTo3KBGL7BQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="32037215"
-X-IronPort-AV: E=Sophos;i="6.12,183,1728975600"; 
-   d="scan'208";a="32037215"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 07:46:56 -0800
-X-CSE-ConnectionGUID: ClMquX3WSmqgnqTL9YXAsw==
-X-CSE-MsgGUID: pEKHdCY2T6OyOJ/tfS/O+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,183,1728975600"; 
-   d="scan'208";a="95404837"
-Received: from jdoman-desk1.amr.corp.intel.com (HELO [10.124.220.239]) ([10.124.220.239])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 07:46:56 -0800
-Message-ID: <d92e5301-9ca4-469a-8ae5-b36426e67356@intel.com>
-Date: Mon, 25 Nov 2024 07:46:55 -0800
+	s=arc-20240116; t=1732549819; c=relaxed/simple;
+	bh=RTrfYid/b24KKBOpAo7FxUgkZvgHSjtF2kSDoXzXJz4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Mo7J6eK452ou5cWRcnyc55d3Gczy+YLEFLxahX+CwBkksS1FlLwWhTVvgSgfQ8RwbxTMecZTKI5dXAlrR+q1+63ju2FxC2ScdLHi7qy4okWPhWIsgAUWQ1STH/VnkheV7upaVHXDl+Q9xpgB3ay0ZKkqhvYzGmWVbgQwpYdHIL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JFw/6E+3; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732549819; x=1764085819;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=sXgiGKvS1hQRKUZ0yjvRKDtBqyZi73E4t8r0EfZt0Gg=;
+  b=JFw/6E+379hBdoY4Ev8/5Ad/C9wUTSYErfcMIQj0fblmkPrFfuIhuMTk
+   wnr5RtInq3vL5Rb3QmA3SPau+HTizag77Q9SkPBsN/rvFgbTvgR1GGoe+
+   +NVpUo2+w6xwvL6Drky8USHzsklooHAKLnqSmuKdho+FLpinYRl0SFNbU
+   M=;
+X-IronPort-AV: E=Sophos;i="6.12,183,1728950400"; 
+   d="scan'208";a="778502928"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 15:50:11 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:51692]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.10.207:2525] with esmtp (Farcaster)
+ id ae3596c7-1096-484a-ac2c-d15d58a165af; Mon, 25 Nov 2024 15:50:09 +0000 (UTC)
+X-Farcaster-Flow-ID: ae3596c7-1096-484a-ac2c-d15d58a165af
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 25 Nov 2024 15:50:08 +0000
+Received: from [192.168.8.103] (10.106.83.30) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 25 Nov 2024
+ 15:50:07 +0000
+Message-ID: <b7d21cce-720f-4db3-bbb4-0be17e33cd09@amazon.com>
+Date: Mon, 25 Nov 2024 15:50:05 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,75 +66,137 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX KeyID
- management
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH] KVM: x86: async_pf: check earlier if can deliver async pf
 To: Sean Christopherson <seanjc@google.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
- pbonzini@redhat.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
- linux-kernel@vger.kernel.org, tony.lindgren@linux.intel.com,
- xiaoyao.li@intel.com, yan.y.zhao@intel.com, x86@kernel.org,
- adrian.hunter@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
-References: <20241115202028.1585487-1-rick.p.edgecombe@intel.com>
- <20241115202028.1585487-2-rick.p.edgecombe@intel.com>
- <30d0cef5-82d5-4325-b149-0e99833b8785@intel.com>
- <Z0EZ4gt2J8hVJz4x@google.com>
- <6903d890-c591-4986-8c88-a4b069309033@intel.com>
- <Z0SbYzr20UQjptgC@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
+CC: <pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <david@redhat.com>,
+	<peterx@redhat.com>, <oleg@redhat.com>, <vkuznets@redhat.com>,
+	<gshan@redhat.com>, <graf@amazon.de>, <jgowans@amazon.com>,
+	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
+	<xmarcalx@amazon.com>
+References: <20241118130403.23184-1-kalyazin@amazon.com>
+ <ZzyRcQmxA3SiEHXT@google.com>
+ <b6d32f47-9594-41b1-8024-a92cad07004e@amazon.com>
+ <Zz-gmpMvNm_292BC@google.com>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <Z0SbYzr20UQjptgC@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <Zz-gmpMvNm_292BC@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D004EUA004.ant.amazon.com (10.252.50.183) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On 11/25/24 07:44, Sean Christopherson wrote:
-> Nah, but the 0-day both does such a good job of detecting and
-> reporting new warnings that I'm generally comfortable relying on
-> sparse for something like this.  Though as above, I'm ok with using
-> "struct page" for the TDX pages.
-Cool beans. Thanks for double-checking that KVM code you were concerned
-about. It's much appreciated!
+
+
+On 21/11/2024 21:05, Sean Christopherson wrote:
+> On Thu, Nov 21, 2024, Nikita Kalyazin wrote:
+>> On 19/11/2024 13:24, Sean Christopherson wrote:
+>>> None of this justifies breaking host-side, non-paravirt async page faults.  If a
+>>> vCPU hits a missing page, KVM can schedule out the vCPU and let something else
+>>> run on the pCPU, or enter idle and let the SMT sibling get more cycles, or maybe
+>>> even enter a low enough sleep state to let other cores turbo a wee bit.
+>>>
+>>> I have no objection to disabling host async page faults, e.g. it's probably a net
+>>> negative for 1:1 vCPU:pCPU pinned setups, but such disabling needs an opt-in from
+>>> userspace.
+>>
+>> That's a good point, I didn't think about it.  The async work would still
+>> need to execute somewhere in that case (or sleep in GUP until the page is
+>> available).
+> 
+> The "async work" is often an I/O operation, e.g. to pull in the page from disk,
+> or over the network from the source.  The *CPU* doesn't need to actively do
+> anything for those operations.  The I/O is initiated, so the CPU can do something
+> else, or go idle if there's no other work to be done.
+> 
+>> If processing the fault synchronously, the vCPU thread can also sleep in the
+>> same way freeing the pCPU for something else,
+> 
+> If and only if the vCPU can handle a PV async #PF.  E.g. if the guest kernel flat
+> out doesn't support PV async #PF, or the fault happened while the guest was in an
+> incompatible mode, etc.
+> 
+> If KVM doesn't do async #PFs of any kind, the vCPU will spin on the fault until
+> the I/O completes and the page is ready.
+
+I ran a little experiment to see that by backing guest memory by a file 
+on FUSE and delaying response to one of the read operations to emulate a 
+delay in fault processing.
+
+1. Original (the patch isn't applied)
+
+vCPU thread (disk-sleeping):
+
+[<0>] kvm_vcpu_block+0x62/0xe0
+[<0>] kvm_arch_vcpu_ioctl_run+0x240/0x1e30
+[<0>] kvm_vcpu_ioctl+0x2f1/0x860
+[<0>] __x64_sys_ioctl+0x87/0xc0
+[<0>] do_syscall_64+0x47/0x110
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Async task (disk-sleeping):
+
+[<0>] folio_wait_bit_common+0x116/0x2e0
+[<0>] filemap_fault+0xe5/0xcd0
+[<0>] __do_fault+0x30/0xc0
+[<0>] do_fault+0x9a/0x580
+[<0>] __handle_mm_fault+0x684/0x8a0
+[<0>] handle_mm_fault+0xc9/0x220
+[<0>] __get_user_pages+0x248/0x12c0
+[<0>] get_user_pages_remote+0xef/0x470
+[<0>] async_pf_execute+0x99/0x1c0
+[<0>] process_one_work+0x145/0x360
+[<0>] worker_thread+0x294/0x3b0
+[<0>] kthread+0xdb/0x110
+[<0>] ret_from_fork+0x2d/0x50
+[<0>] ret_from_fork_asm+0x1a/0x30
+
+2. With the patch applied (no async task)
+
+vCPU thread (disk-sleeping):
+
+[<0>] folio_wait_bit_common+0x116/0x2e0
+[<0>] filemap_fault+0xe5/0xcd0
+[<0>] __do_fault+0x30/0xc0
+[<0>] do_fault+0x36f/0x580
+[<0>] __handle_mm_fault+0x684/0x8a0
+[<0>] handle_mm_fault+0xc9/0x220
+[<0>] __get_user_pages+0x248/0x12c0
+[<0>] get_user_pages_unlocked+0xf7/0x380
+[<0>] hva_to_pfn+0x2a2/0x440
+[<0>] __kvm_faultin_pfn+0x5e/0x90
+[<0>] kvm_mmu_faultin_pfn+0x1ec/0x690
+[<0>] kvm_tdp_page_fault+0xba/0x160
+[<0>] kvm_mmu_do_page_fault+0x1cc/0x210
+[<0>] kvm_mmu_page_fault+0x8e/0x600
+[<0>] vmx_handle_exit+0x14c/0x6c0
+[<0>] kvm_arch_vcpu_ioctl_run+0xeb1/0x1e30
+[<0>] kvm_vcpu_ioctl+0x2f1/0x860
+[<0>] __x64_sys_ioctl+0x87/0xc0
+[<0>] do_syscall_64+0x47/0x110
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+In both cases the fault handling code is blocked and the pCPU is free 
+for other tasks.  I can't see the vCPU spinning on the IO to get 
+completed if the async task isn't created.  I tried that with and 
+without async PF enabled by the guest (MSR_KVM_ASYNC_PF_EN).
+
+What am I missing?
+
+>> so the amount of work to be done looks equivalent (please correct me
+>> otherwise).  What's the net gain of moving that to an async work in the host
+>> async fault case? "while allowing interrupt delivery into the guest." -- is
+>> this the main advantage?
+
 
