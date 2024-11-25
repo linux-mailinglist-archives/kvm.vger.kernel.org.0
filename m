@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-32469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7609D8B30
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 18:19:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F52C9D8B6A
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 18:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 501C4B2A2C4
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 17:16:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C08CAB2C5F7
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 17:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC071B6D0F;
-	Mon, 25 Nov 2024 17:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86CA1B652B;
+	Mon, 25 Nov 2024 17:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L6IHlJge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJHG6ec7"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447571AAE0B;
-	Mon, 25 Nov 2024 17:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6E718C322
+	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 17:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732554976; cv=none; b=jHMOh6tn1EuJZO4kDPP9sTE0O//pRWv3D9EWYWcE9S/r6Fau16cJfRZmi7bDcR3Rf9msO5SvlAMxR5zyIfVF0NcAQuCaDOP6r29purnSM2wkg2wZD9FhIDu+WyJHchf/vz3Y6AfOETL9R0YVJxsRHgAMWET89vOxV/5o54ob9Go=
+	t=1732555896; cv=none; b=QTn8c860BC4/Gq57ScITpDdC+2x1IrYZ7rmkD78jmrT2QQva6N8mQWifq0uRedvbSuiU0txRC5oIeBcu61UpNWqi0WOLYJViWKBSxjSXUQwNYJ1zzpCKDogkPhO/s623PRAUSJG/yNNS2xthgoXYrE8Sm8W1frq2FLGNbx07eOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732554976; c=relaxed/simple;
-	bh=xEF3uS740G2GZrrPT8qy4B7itCM1u7DlKJzqEyDF684=;
+	s=arc-20240116; t=1732555896; c=relaxed/simple;
+	bh=NSPn1hzGa9OZb8JLDuKChwPi0UyS1W7DAaEpqlsDjBg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IrX4kk883uSdaAnIZFCQYZiT/yfJgbPdO8kvOrWAnCWdRP1zyO5wnJLhk/Imc9UMZA9eEOfvzZ5CjYRSHyuBeQn/sDHznNSsDoGRlY+ADMEAiHSKyhwWv/qu1inqUkQtv5P64nNhjAzbrtwobePj7BQBvNKipC/v/ZXFXFP+lPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L6IHlJge; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F8FC4CECE;
-	Mon, 25 Nov 2024 17:16:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KijywsDmZ6pCrX4pf6VX6YvdlsjCuWtZjnKLo4YfQlxHS6phBjcpgcKG70a8kFoeEDHTYML5bZ0t8CW3+x5LTcldOW7A7AARbAacl9zUgozl+w87ZHvmxb7SuPGstWOx5hLkggjHenNRWyJQeid6WhaLJgGk9AasL3WTQvL9eJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJHG6ec7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E600C4CECE;
+	Mon, 25 Nov 2024 17:31:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732554975;
-	bh=xEF3uS740G2GZrrPT8qy4B7itCM1u7DlKJzqEyDF684=;
+	s=k20201202; t=1732555894;
+	bh=NSPn1hzGa9OZb8JLDuKChwPi0UyS1W7DAaEpqlsDjBg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L6IHlJge+qR0tE1Ih1IIN0gLnNGS5gSpqYFoa6CIBUwonfS0fz8C0f0wT6dzXRn3i
-	 yl9D/NpY8uytP7JnHK6T4RggrKhuR5XFSd1zhhtG/1uW3JUUJ+VFX8M503G4WUXXO0
-	 ViyVczXf/8upMYvFrK51Q2aoJmWE6SgC0JmZexeQfID4lEw3cL3cguSQwaFNDZBMMl
-	 dmK6B4tH136w7lESym9fIUTngKS1l5EghsXUN+qnjrX+bEzrBADtajHcheo1zPKjnH
-	 /LYNfD7Szee90FiBXU8apaU3cm2CD5XdvYu3/I0IPtm+CY9dCq9SbRIeTdMPDdl1V2
-	 b5vW1DLdwYK5w==
+	b=QJHG6ec7AF9DCiXjLBYqTUfHKYH2UrcTAHst9bXw3m4M6CcTMM5L+d5x5thzq46H7
+	 9z7e9c6rgYQZj/AcvsR1mKwEE8kGFguoh6RIMyfg24vaXs2+VDJrqGrp2JtlyCcdye
+	 yhVIxqxeAyJjQEjYUOeYTuyp+dBi/xeJZwCqAgmZnU5BZEKZiLOXxGLOhiUteMy2Ma
+	 2BazTJlyIi+c0vKvYKObhPbzDPMN+FAXCZ3jXSbYNseBoRwk1Eurv87O2/QpOD25jg
+	 +vXSVY4LXJXiscU1MAVhwDpR7x8wQZBvgEUoMSPn5/Xk0/6KOm2EegkC0nA4+pn3ZB
+	 M9mmPUt1LkTxw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tFch3-00FlnF-It;
-	Mon, 25 Nov 2024 17:16:13 +0000
-Date: Mon, 25 Nov 2024 17:16:13 +0000
-Message-ID: <86iksbutcy.wl-maz@kernel.org>
+	id 1tFcvs-00Flzb-Hk;
+	Mon, 25 Nov 2024 17:31:32 +0000
+Date: Mon, 25 Nov 2024 17:31:32 +0000
+Message-ID: <86h67vusnf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?B?6LWW5qCq6ZSL?= <csumushu@gmail.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-    kvmarm <kvmarm@lists.linux.dev>
-Subject: Re: Using the ldp instruction to access the I/O address space in KVM mode causes an exception
-In-Reply-To: <SEZPR01MB4825C8FFB2994CC67225DB74A32E2@SEZPR01MB4825.apcprd01.prod.exchangelabs.com>
-References: <SEZPR01MB4825C8FFB2994CC67225DB74A32E2@SEZPR01MB4825.apcprd01.prod.exchangelabs.com>
+To: Bernhard Kauer <bk@alpico.io>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: make uevents configurable
+In-Reply-To: <20241122095806.4034415-1-bk@alpico.io>
+References: <20241122095806.4034415-1-bk@alpico.io>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,48 +65,67 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: csumushu@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: bk@alpico.io, pbonzini@redhat.com, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-+ kvmarm
+On Fri, 22 Nov 2024 09:58:02 +0000,
+Bernhard Kauer <bk@alpico.io> wrote:
+> 
+> Handling of uevents in userlevel is a bottleneck for tiny VMs.
+> 
+> Running 10_000 VMs keeps one and a half cores busy for 5.4 seconds to let
+> systemd-udevd handle all messages.  That is roughly 27x longer than
+> the 0.2 seconds needed for running the VMs without them.
+> 
+> We choose a read-only module parameter here due to its simplicity and
+> ease of maintenance.
+> 
+> Signed-off-by: Bernhard Kauer <bk@alpico.io>
+> ---
+>  virt/kvm/kvm_main.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 609e0bd68e8e..6139cd67a96a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -97,6 +97,9 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
+>  bool debugfs_per_vm = true;
+>  module_param(debugfs_per_vm, bool, 0644);
+>  
+> +bool disable_uevent_notify;
+> +module_param(disable_uevent_notify, bool, 0444);
+> +
+>  /*
+>   * Ordering of locks:
+>   *
+> @@ -6276,7 +6279,7 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+>  	struct kobj_uevent_env *env;
+>  	unsigned long long created, active;
+>  
+> -	if (!kvm_dev.this_device || !kvm)
+> +	if (!kvm_dev.this_device || !kvm || disable_uevent_notify)
+>  		return;
+>  
+>  	mutex_lock(&kvm_lock);
 
-On Mon, 25 Nov 2024 00:11:22 +0000,
-=E8=B5=96=E6=A0=AA=E9=94=8B <csumushu@gmail.com> wrote:
->=20
-> I am running ARM64 emulation using QEMU=E2=80=99s KVM mode on an ARM64 de=
-vice, but I encountered the following exception when booting the guest Linu=
-x kernel.
-> error: kvm run failed Function not implemented
-> PC=3Dffff800008e201e0 X00=3Dffff00208a63b000 X01=3D0000000000000000
-> And the instruction pointed to by the PC register is
-> 0xffff800008e201e0: ldp q11, q12, [x22], where the address held by
-> the x22 register belongs to the address space of the nic.
-> After testing, it was found that using the ldp instruction to access
-> peripheral address spaces causes issues, but accessing RAM works
-> normally. What could be the cause of this issue, and are there any
-> solutions to resolve this problem?
+Thanks for this. It was on my list of things to investigate, as this
+is a bottleneck when running a lot of concurrent syzkaller tests which
+create and destroy VMs repeatedly.
 
-The cause of the issue is that such an instruction is not emulatable,
-because it uses more than a single register. In your case, it is even
-worse, as you are using FP registers to access emulated MMIO,
-something that is unlikely to work correctly on real HW (depending on
-the alignment of the address in x22).
+I'm not overly keen on the command-line flag though, as this is the
+sort of things you'd like to be able to control more finely. Or at
+least without having to trigger a reboot.
 
-What QEMU *could* do is to implement enough instruction emulation (by
-reading the offending instruction from guest memory), and emulating it
-(see how KVM_CAP_ARM_NISV_TO_USER can be used for this purpose).
-
-But frankly, you are asking for trouble here, and you really should
-fix your code.
+How about something such as a sysctl? with the kvm namespace?
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
 
