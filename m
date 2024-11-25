@@ -1,138 +1,176 @@
-Return-Path: <kvm+bounces-32409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EB819D7FA5
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 10:01:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7419D82AA
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 10:40:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5CF516385C
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 09:01:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EBAA163D17
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 09:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B0318F2DF;
-	Mon, 25 Nov 2024 09:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EB819066D;
+	Mon, 25 Nov 2024 09:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="MKdrU5oo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CCvYEqj6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A6945003
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 09:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9B7190662
+	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 09:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732525266; cv=none; b=XVhtDPhiIsRDcvBAKz/qSnToKlNsUErU9jY0lE7X6f3D4ZrJEkQ8pFunuHLl3duv/5FMKDcsb4nbn11tIfsEgEUa6hoXH8ama7gtx2aYRoNzZ5tO1U2lluyH7RLvO4Il9VF44iMvYdLDiA3LZOjVHwkRcJayFimoXp8FpJLsEPY=
+	t=1732527533; cv=none; b=i1JnQ48ymaaOgDkBXo5GYQy7IU2fR49pMUUolJWAvsBx0v/tC1jwHx7eweYTHAWACqnpWyhPqKcF4WIZahWid1hlYm8EDYHPaozXb9H5lPLtYqD30GAdiAgu/i2C8Eh5ruu5nRAAx8yQk+2kyyMwEIYE0z/RcUqCYk/yL2swbLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732525266; c=relaxed/simple;
-	bh=xCD8RvClGzAMSnnHYQv40YACwVqG7KUnjAVXvpGmtF4=;
+	s=arc-20240116; t=1732527533; c=relaxed/simple;
+	bh=WfRsctaaQalyj7442BSlx17Q4rE3RCMKY7t5toNFFQE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jokc/Gk/KDlH52RbEpgDOicUoteq4ckfQsjTAG4GLWDJDtV2cvuGEwdFuC7C57M23JV+TL0s9dw5hNVVjRCeJfNLyOzw0cDOSn6TMlIDXHqiZ+bhvGMu5IOwCY7R/fsj3zSkPToDvz8Iu5i+NecXiqV0FKDT0xOFJQi3HhEKCHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=MKdrU5oo; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43155abaf0bso38722025e9.0
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 01:01:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1732525263; x=1733130063; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCD8RvClGzAMSnnHYQv40YACwVqG7KUnjAVXvpGmtF4=;
-        b=MKdrU5ooq4c513v8bCyU6pBn0Zo/Rcd2cSuavl+YhsqfHK57AIaiTFnAJj6ZnYwVN8
-         p7Iw9zJpfDqu7+gld8aAEsjmxQiXCWm2Q91mQG/Gw2U9cveuVLj1JwG4cw0xVpjuGdYW
-         vSjpVwa6+x2zOBxV+qvyGfKuBzt4sMNttnPC225MR7p3W3wCNGO4UpzPnWasT/BBRn0W
-         NvYusyIWKRVtVSDKgd3MsbznngVZQgiLpdzGg0x49Onpi2HSROZgYKCza7E1CM6viaeM
-         QNF8TEPmpiiio23O152Ydxoylajb4x/D9dgQtEXIfqlLHis1jKhykMCoTdoj2nRVseSe
-         uhjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732525263; x=1733130063;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xCD8RvClGzAMSnnHYQv40YACwVqG7KUnjAVXvpGmtF4=;
-        b=v4W+mzNkmzY54gaTs3/5U+rh6MQfdsYWZkx6OQC0Tf2m6tNIV+flmsf6HDsIVaaprR
-         al+dGZDHtuzu2EXYYvY/Ybsllx2PIw5frWjHYCMA9g7Ypye7NY8UP0Suz8yn10qnSrtr
-         qNpl5QWeV6YKAU3mI01fJGQYxyqG+OFwAszFppNrTH29+EIcF/q+DWecqXWf8tIvxHNY
-         QQpgiuJ37eOiJ1nWbcdDmApMhhG0BAgoKA9nnxDKSn83F5tqy+CjmGvvGwiTxi24lRn7
-         K4+Pf5/fYvu2acarSssZa8FKsqFlrlAAG8TuoghFHpYNLzqBeahNu11Z9h0yLTwZnfqi
-         kc5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWzzlLrcxKkjDm+M6OZhOWp76VPuUoEzU5afBTkpkQv6qPgK/uPLfXFUaVyKmImdHt6W4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzST6j0AEX6PpxGAYAOWgihY++mJhxE45X9SQtmb9nHsdVwvQES
-	tcGFTKXVcVaQfVhPlROMX/yEZi4hGFNQwbTriPHXii+JECJBXWq9ybBf5SP4H9k=
-X-Gm-Gg: ASbGnctxkc5kPsou+QxNP+U/kV4OeicPm4MKBs1Ykyq5+rcUrCPCuW+LvxdFpaUA3P3
-	tn2MI+8TzZZWX2Ft4j9sJjrd0KoLL/4R9FgkCeQl6fqN/2gve9GDxoh4IE3PrOHzrj+Dn1gs+wX
-	sIYsvGoOX8HIzqJ21KJB8iuYrVyhE+eqWNhXkmPPdFmAkSX9eXWIwirmFGp7PB+DsZymxPISTY+
-	CDjAHcusm771/eHkJWRulfUYaaV8++vqy46xtWWW6pjzLvxq0/o
-X-Google-Smtp-Source: AGHT+IE+5w5COF+F5rYltE9rBlsjm8wSrfXzUTXMOPeyu62rRfNwF3h9/qxhoIjiGq3wwkGbGBFEPQ==
-X-Received: by 2002:a05:600c:1c08:b0:434:a1e7:27da with SMTP id 5b1f17b1804b1-434a1e729c3mr2768025e9.25.1732525263461;
-        Mon, 25 Nov 2024 01:01:03 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fbf2b29sm9735891f8f.107.2024.11.25.01.01.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 01:01:03 -0800 (PST)
-Date: Mon, 25 Nov 2024 10:01:01 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, Luca Boccassi <bluca@debian.org>
-Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-Message-ID: <hbv5uf7b2auiwyjkekmtfpu26ht7ulvapnszx7rdgwoowqdcna@pwuuodkenwgr>
-References: <20241108130737.126567-1-pbonzini@redhat.com>
- <rl5s5eykuzs4dgp23vpbagb4lntyl3uptwh54jzjjgfydynqvx@6xbbcjvb7zpn>
- <CABgObfbUzKswAjPuq_+KL9jyQegXgjSRQmc6uSm1cAXifNo_Xw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fN+vsxK//D9uCiU57Yz+TjdLTByW6YN6DcgdG22ZULc3hJJ4XDlpbgF6u77JZZk2LngF5n1o/yGuc6i0GMc4fNmd5OTkN8YQhijH5X4bqXe309mMos8PqNs4mosMUQ0ZM2uieeZ0oDVi9Htg6mlo8bOl0QZVT1FdOis+CVeMsgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CCvYEqj6; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 25 Nov 2024 10:38:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732527527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GY4uIFRpPt94aAuY8Pt80T57OfFW3WMI5D+NOYj9t5U=;
+	b=CCvYEqj6k0VQvdeuMieerbEb79PLy+dua/gkW2JVI6lCgrh9PCa2eESQCyt1nybcEvnVk2
+	WQlsyMrY3zS5+AwxoY38oqVNdgVRFBwJKN1Ccs9QYQZv3OFvivmyvIJJ4mmtZOSRyoIcjR
+	2a+U0mVM/RUq+FPUrXui1scU+CdP1RY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] riscv: lib: Add SSE assembly entry
+ handling
+Message-ID: <20241125-a56b5a8b8a80cdd2e9598fee@orel>
+References: <20241122140459.566306-1-cleger@rivosinc.com>
+ <20241122140459.566306-3-cleger@rivosinc.com>
+ <20241122-a7e54373559727e1e296b8c4@orel>
+ <90b8e2d2-1fc6-4166-a3bf-3cd8af3b5b8d@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qqb3ia4ee5ip4zwe"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CABgObfbUzKswAjPuq_+KL9jyQegXgjSRQmc6uSm1cAXifNo_Xw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <90b8e2d2-1fc6-4166-a3bf-3cd8af3b5b8d@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
+On Mon, Nov 25, 2024 at 09:46:48AM +0100, Clément Léger wrote:
+> 
+> 
+> On 22/11/2024 17:20, Andrew Jones wrote:
+> > On Fri, Nov 22, 2024 at 03:04:56PM +0100, Clément Léger wrote:
+> >> Add a SSE entry assembly code to handle SSE events. Events should be
+> >> registered with a struct sse_handler_arg containing a correct stack and
+> >> handler function.
+> >>
+> >> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> >> ---
+> >>  riscv/Makefile          |   1 +
+> >>  lib/riscv/asm/sse.h     |  16 +++++++
+> >>  lib/riscv/sse-entry.S   | 100 ++++++++++++++++++++++++++++++++++++++++
+> > 
+> > Let's just add the entry function to riscv/sbi-asm.S and the
+> > sse_handler_arg struct definition to riscv/sbi-tests.h
+> 
+> Hi drew,
+> 
+> I need to have some offset generated using asm-offsets.c which is in
+> lib/riscv. If I move the sse_handler_arg in riscv/sbi-tests.h, that will
+> be really off to include that file in the lib/riscv/asm-offsets.c.
 
---qqb3ia4ee5ip4zwe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That's true, but it's also not great to put a test-specific definition of
+an arg structure in lib code. It seems like we'll eventually want a neater
+solution to this, though, since using asm-offsets for test-specific
+structures makes sense. However, we could put it off for now, since each
+member of the structure that SSE tests need is the same size,
+sizeof(long), so we can do the same thing that HSM and SUSP do, which is
+to define some indices and access with ASMARR().
 
-On Mon, Nov 18, 2024 at 01:42:27PM GMT, Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
-> I mean being able to send it to the threads with an effect.
+> Except if you have some other solution.
 
-Understood now.
+ASMARR(), even though I'm not a huge fan of that approach either...
 
-> > Consequently, it's OK if a (possibly unprivileged) user stops this
-> > thread forever (they only harm themselves, not the rest of the system),
-> > correct?
->=20
-> Yes, they will run with fewer huge pages and worse TLB performance.
+> 
+> > 
+> >>  lib/riscv/asm-offsets.c |   9 ++++
+> >>  4 files changed, 126 insertions(+)
+> >>  create mode 100644 lib/riscv/asm/sse.h
+> >>  create mode 100644 lib/riscv/sse-entry.S
+> >>
+> >> diff --git a/riscv/Makefile b/riscv/Makefile
+> >> index 28b04156..e50621ad 100644
+> >> --- a/riscv/Makefile
+> >> +++ b/riscv/Makefile
+> >> @@ -39,6 +39,7 @@ cflatobjs += lib/riscv/sbi.o
+> >>  cflatobjs += lib/riscv/setjmp.o
+> >>  cflatobjs += lib/riscv/setup.o
+> >>  cflatobjs += lib/riscv/smp.o
+> >> +cflatobjs += lib/riscv/sse-entry.o
+> >>  cflatobjs += lib/riscv/stack.o
+> >>  cflatobjs += lib/riscv/timer.o
+> >>  ifeq ($(ARCH),riscv32)
+> >> diff --git a/lib/riscv/asm/sse.h b/lib/riscv/asm/sse.h
+> >> new file mode 100644
+> >> index 00000000..557f6680
+> >> --- /dev/null
+> >> +++ b/lib/riscv/asm/sse.h
+> >> @@ -0,0 +1,16 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0-only */
+> >> +#ifndef _ASMRISCV_SSE_H_
+> >> +#define _ASMRISCV_SSE_H_
+> >> +
+> >> +typedef void (*sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
+> >> +
+> >> +struct sse_handler_arg {
+> >> +	unsigned long reg_tmp;
+> >> +	sse_handler_fn handler;
+> >> +	void *handler_data;
+> >> +	void *stack;
+> >> +};
+> >> +
+> >> +extern void sse_entry(void);
+> >> +
+> >> +#endif /* _ASMRISCV_SSE_H_ */
+> >> diff --git a/lib/riscv/sse-entry.S b/lib/riscv/sse-entry.S
+> >> new file mode 100644
+> >> index 00000000..bedc47e9
+> >> --- /dev/null
+> >> +++ b/lib/riscv/sse-entry.S
+> >> @@ -0,0 +1,100 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0-only */
+> >> +/*
+> >> + * SBI SSE entry code
+> >> + *
+> >> + * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+> >> + */
+> >> +#include <asm/asm.h>
+> >> +#include <asm/asm-offsets.h>
+> >> +#include <asm/csr.h>
+> >> +
+> >> +.global sse_entry
+> >> +sse_entry:
+> >> +	/* Save stack temporarily */
+> >> +	REG_S sp, SSE_REG_TMP(a6)
 
-Alright.
+While thinking about the asm-offsets issue, I took a closer look at this
+and noticed that this should be a7, since ENTRY_ARG is specified to be
+set to A7. It looks like we have A6 (hartid) and A7 (arg) swapped. The
+opensbi implementation also has them swapped, allowing this test to pass.
+Both need to be fixed.
 
 Thanks,
-Michal
-
-> > It is nice indeed.
-> > I think the bugs we saw are not so serious to warrant
-> > Fixes: c57c80467f90e ("kvm: Add helper function for creating VM worker =
-threads")
-
-I'm mainly posting this because there are some people surprised this
-didn't get to 6.12. Hence I wonder if Cc: stable would be helpful here.
-
-
---qqb3ia4ee5ip4zwe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ0Q8xQAKCRAt3Wney77B
-SfgSAPwP3u+ZalijELn3qaKxgwpOHg5xL05CI2GSCnjTPDyL7gD6AwoGjfAJWwG/
-N8U5cOSctHBjzIagsgUKSPmc+aCA1wM=
-=M4XR
------END PGP SIGNATURE-----
-
---qqb3ia4ee5ip4zwe--
+drew
 
