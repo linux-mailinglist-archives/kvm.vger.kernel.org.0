@@ -1,196 +1,271 @@
-Return-Path: <kvm+bounces-32474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7095D9D8EAD
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 23:47:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4220F9D8EBA
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 23:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C6E9284C27
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 22:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1902286B56
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 22:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7D81CDA1E;
-	Mon, 25 Nov 2024 22:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5BB1BBBD4;
+	Mon, 25 Nov 2024 22:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="RaKQKYJ0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PvPW+LUn"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD73C18C33C
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 22:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457831B85C2
+	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 22:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732574812; cv=none; b=BOKMCjI1HmfZNZkmDddrYpESctttjlDMwIrBcdijmx4D37eICzpt+Xtr7kDiYTvwM6934Inn5aCaXDYxJBkVerpdZYe9QypxdIIlrd9yDj2SgEXhAjunUlSRaGE6jZHJxzaMMz4qtFm6aVgh5k96Hg2uEd5j0N+lylTpaGzKUrU=
+	t=1732575117; cv=none; b=NOE0u3c9mEnfCsnkr/RBU18o+9/KwSICnJGzILETWhZSrkoQ4QhpWgurSA7xh8UBz8almcwdCsJFb/yA6vApyqsrPU06v7g2rVOrbkaZLuH8Rm7uxr0HNvC9XeDoubHTVc3+8UtT4QgS4/1mJrJDfSKDJ6Ct38hbBxaM/8/VZBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732574812; c=relaxed/simple;
-	bh=OubevgRiMWB/iwt325cGbtu9oU9hZnkDkZtn6akmH4o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=QXngyd0rmaE2qkmaWLKcy9LetE3o4j9Eme6gXRrWugcY75tT6zl4b5T4EQuNDhP92UzXQlKuqzArzxFfeY7j7WkAZDY3v5gZa6ZEYCWuLP8u/kNKeMJ7iTaF1aDSOZAY8G7N9IoKXDitsAv12Iizs4EREoaPWf5ecX8mhyPTNwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=RaKQKYJ0; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 3AAA6402C7
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 22:46:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1732574801;
-	bh=OubevgRiMWB/iwt325cGbtu9oU9hZnkDkZtn6akmH4o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type;
-	b=RaKQKYJ0jLc2s13bRy/egIAE2ZzMB83h+qfZfIiHMU7y/4/mCAyR5zTje6v8VVB2j
-	 JPDZfhSu55OlBaKKCT0Oazq+sT5pJQX4EyOaVfhJi6esawTPrvyFzugJI9Sb7F4jdq
-	 lpaiYlmLlvohHCMbo2UkkSuwQycCz13frELhfUtJW+FvsGd3Y88gufjK3f3MywWR6F
-	 Y2qimeXXku2X8pCek87FKRIwvu/9hHCbYnfsArJfSSbvlhXnwhnfsKAOKEL2joZn7E
-	 vN8Hcvpc+32BWt1hMyIeWSf76+Hb53Tad9y70acFuMRDQj/4blBnu1BqhM6jKTE/5e
-	 rRKmnbbxRb63w==
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5cfcc48b20bso3136424a12.1
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 14:46:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732574801; x=1733179601;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+	s=arc-20240116; t=1732575117; c=relaxed/simple;
+	bh=+344/y+fqLzIptJF3tZsdyu4JrVxxXoe1f/Gvryhw/U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JMMo9EHTzTnivZZG/fuAIAE/aikmhfd0Y+nRSGxKTMaU5sLJTp71Kx5Ox1dk/l8YSBPDr0SlJIHCc+kqezIbctG/ewyTsSIvVfC55HCkf0h56YVst9+fQR+k0pPWGGF1eiUcwGy0GATDZHTK1NVz0sq9JdA8SVXDOH5bU2UFAQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PvPW+LUn; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea3c9178f6so4892176a91.1
+        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 14:51:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732575113; x=1733179913; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OubevgRiMWB/iwt325cGbtu9oU9hZnkDkZtn6akmH4o=;
-        b=g/etlbte6s0nLhqo8veZzoLDlO8UWY6Xoqgjg4qFnHDc6OfpFdWMRm93sR+Suf7DuQ
-         QDB9+RLFch1a0dbDbqvKs313Z1WXpltzB/y+Bew+2GXafcWKT8bTcfrJlpdYjk7+Szo2
-         R5955p1inlUrbKY/0mvs6X3oXIFSW8MdWV0EtvER8QwNObU2p37AfLNMP6DkXkO1tVxD
-         wZn4/JT/mXrGDPSqi7VsI0PGhCR/7eNFjXQXONr8Jk21n3cs8JvigvcJV0ItHr5Jib0e
-         8oufhe+aGLEdxTM8AHHRnKlFgQkE7bmOqeni3VmQAqzr/2PWnaB/KYXE6NE+eIOWbFn5
-         OREw==
-X-Forwarded-Encrypted: i=1; AJvYcCXki9SvWQ+izS9EKjhtZsOmWkIsqzDjwvIAniCP2r4UZQ07724eeB9V5BPH771mNVjvm8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1uBn4aPGgiwRvZ8LGhkpEFQpbyc7azP4KY6UOUSbV2sXPQ0dB
-	lhkSOcMy/ATbq0nwyYz3cJRJmmgKLRxgcoCWXROqnUylSy3FRc58fI/f3xlFd2XBgjIF039UTfs
-	yf8DbtuuRN7uWD2dl2L/KSUEm/HjXPUcjH2OkbjfVJCGvgWbRXa8NtIAiD3HOFw/CxUiXCV7yij
-	j3/wruLQQjSykJgaU4PJ8iHsRDDXU6JzJ5k9lpBMWQ
-X-Gm-Gg: ASbGncvjumwPLijdLlB63t/iBc53EU++gmD6LaGCz4u9xgC9R3JjXuseT7RPkqUslD/
-	YzwAR9WOHvaIjU1g6mz0iz+h6U8JLww==
-X-Received: by 2002:a05:6402:502:b0:5d0:214b:9343 with SMTP id 4fb4d7f45d1cf-5d0214b962amr10779534a12.4.1732574800706;
-        Mon, 25 Nov 2024 14:46:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE1yz3LUTxqiGF6oosTIiTaCvDanaBSSbzg0RwyfHzWNbPl+WWAElMeYEwToOrnqD6mDl5R4tkbomWwHnEclno=
-X-Received: by 2002:a05:6402:502:b0:5d0:214b:9343 with SMTP id
- 4fb4d7f45d1cf-5d0214b962amr10779521a12.4.1732574800317; Mon, 25 Nov 2024
- 14:46:40 -0800 (PST)
+        bh=j+K9zzd9fyT3ev3udb3SozcJ58KmXrRPHl4/ugcSkmM=;
+        b=PvPW+LUnk6VOz2oX0gpAd7vksTMjDS0JIscdFUI/ABBMDE7gBvhGWbQjaAfvxDCJjT
+         AphrwIEENfdqVo7QDOytS688oUz1AcAzePSSGs3FNVKe0CsLozVbYVpk1bzHLEk18vUB
+         hsl558bjFqqKOS2mkGjiYwDJmmHrG+1XrPuz5syu2kb30ECGJyNftWfW5hfGwq/S3adD
+         4ZwvA7Vu8+cI4Ndy9015aADGltZf8yZs4d6Asc3Zd3SFaZkQvSHC7Bppmk0JPB2TjvMq
+         xe7nTgHLwF7p1fyAQUQClQrbhfh1QceoFTy5lHs/cxE4cBcoJSzHtQ/EIYNJb85sMZ/D
+         aUtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732575113; x=1733179913;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=j+K9zzd9fyT3ev3udb3SozcJ58KmXrRPHl4/ugcSkmM=;
+        b=nl0IQJaUfGPBJfZW4EvQKWF3kaynuemmW0Wv3+5XQ4lQtzP4xsax3lTqOgOxg107OS
+         FyZC8x2zv/bZUJYm1Hl3bxuBHzDhtf9Z/Azo+x9I1oCsqMk2yc0BKPub4w8nhDW58WWT
+         TEDY77o5Lc3o6y69E0GgeokyEDmZdoSE9AeIS/PLSSSLYQdkhIHxYY496kSvnqNLQcHt
+         mA4QdrIASz1A499RjVdFBqLP3/WpJ7o0nyn2gaf1zVFh4bcTrRnH7etljlR9h/wnLBgG
+         lU/80cIpZAOOWSpoND7SqkkaZxW+8N7mvZurjgXrpIWC2wx8wRtEbSYWOnTXPFz93h5/
+         78tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDPiSOcXFPGSkm4DkPtE1dcsKNjRpgHlBS1KuUTjs3H4wmfgM1VnLeiUhVxTAWdvznQKg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6QIVUmw28w2sf6SqNQTcFLE7FUveGuv7ptN3I0aNxhuAIBURO
+	00EOKuhB7IizhHOw1lg5UT5xV/nDDXWYxjdubXVtNNUNCL1I72GATKfG8Z9rAr/5f3BziUmtxjh
+	xeA==
+X-Google-Smtp-Source: AGHT+IGDn5rzsTqyT8Eu5D17HvR4yd+YGvsgthjfrw3EM/0fR9oVBtUfrK9/cVdHEmQS3AeJOEBBn8Ywepg=
+X-Received: from pjbhl7.prod.google.com ([2002:a17:90b:1347:b0:2ea:7d73:294e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c4b:b0:2ea:59e3:2d2e
+ with SMTP id 98e67ed59e1d1-2eb0e2330c2mr18331895a91.10.1732575113537; Mon, 25
+ Nov 2024 14:51:53 -0800 (PST)
+Date: Mon, 25 Nov 2024 14:51:52 -0800
+In-Reply-To: <735d3a560046e4a7a9f223dc5688dcf1730280c5.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Mitchell Augustin <mitchell.augustin@canonical.com>
-Date: Mon, 25 Nov 2024 16:46:29 -0600
-Message-ID: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
-Subject: drivers/pci: (and/or KVM): Slow PCI initialization during VM boot
- with passthrough of large BAR Nvidia GPUs on DGX H100
-To: linux-pci@vger.kernel.org, kvm@vger.kernel.org, 
-	Alex Williamson <alex.williamson@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <86d71f0c-6859-477a-88a2-416e46847f2f@linux.intel.com> <Z0SVf8bqGej_-7Sj@google.com>
+ <735d3a560046e4a7a9f223dc5688dcf1730280c5.camel@intel.com>
+Message-ID: <Z0T_iPdmtpjrc14q@google.com>
+Subject: Re: [PATCH 0/7] KVM: TDX: TD vcpu enter/exit
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Weijiang Yang <weijiang.yang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"nik.borisov@suse.com" <nik.borisov@suse.com>, 
+	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Nov 25, 2024, Kai Huang wrote:
+> On Mon, 2024-11-25 at 07:19 -0800, Sean Christopherson wrote:
+> > On Mon, Nov 25, 2024, Binbin Wu wrote:
+> > > On 11/22/2024 4:14 AM, Adrian Hunter wrote:
+> > > [...]
+> > > >    - tdx_vcpu_enter_exit() calls guest_state_enter_irqoff()
+> > > >      and guest_state_exit_irqoff() which comments say should be
+> > > >      called from non-instrumentable code but noinst was removed
+> > > >      at Sean's suggestion:
+> > > >    	https://lore.kernel.org/all/Zg8tJspL9uBmMZFO@google.com/
+> > > >      noinstr is also needed to retain NMI-blocking by avoiding
+> > > >      instrumented code that leads to an IRET which unblocks NMIs.
+> > > >      A later patch set will deal with NMI VM-exits.
+> > > >=20
+> > > In https://lore.kernel.org/all/Zg8tJspL9uBmMZFO@google.com, Sean ment=
+ioned:
+> > > "The reason the VM-Enter flows for VMX and SVM need to be noinstr is =
+they do things
+> > > like load the guest's CR2, and handle NMI VM-Exits with NMIs blocks.=
+=C2=A0 None of
+> > > that applies to TDX.=C2=A0 Either that, or there are some massive bug=
+s lurking due to
+> > > missing code."
+> > >=20
+> > > I don't understand why handle NMI VM-Exits with NMIs blocks doesn't a=
+pply to
+> > > TDX.=C2=A0 IIUIC, similar to VMX, TDX also needs to handle the NMI VM=
+-exit in the
+> > > noinstr section to avoid the unblock of NMIs due to instrumentation-i=
+nduced
+> > > fault.
+> >=20
+> > With TDX, SEAMCALL is mechnically a VM-Exit.  KVM is the "guest" runnin=
+g in VMX
+> > root mode, and the TDX-Module is the "host", running in SEAM root mode.
+> >=20
+> > And for TDH.VP.ENTER, if a hardware NMI arrives with the TDX guest is a=
+ctive,
+> > the initial NMI VM-Exit, which consumes the NMI and blocks further NMIs=
+, goes
+> > from SEAM non-root to SEAM root.  The SEAMRET from SEAM root to VMX roo=
+t (KVM)
+> > is effectively a VM-Enter, and does NOT block NMIs in VMX root (at leas=
+t, AFAIK).
+> >=20
+> > So trying to handle the NMI "exit" in a noinstr section is pointless be=
+cause NMIs
+> > are never blocked.
+>=20
+> I thought NMI remains being blocked after SEAMRET?
 
-I've been working on a bug regarding slow PCI initialization and BAR
-assignment times for Nvidia GPUs passed-through to VMs on our DGX H100
-that I originally believed to be an issue in OVMF, but upon further
-investigation, I'm now suspecting that it may be an issue somewhere in
-the kernel. (Here is the original edk2 mailing list thread, with extra
-context: https://edk2.groups.io/g/devel/topic/109651206) [0]
+No, because NMIs weren't blocked at SEAMCALL.
+
+> The TDX CPU architecture extension spec says:
+>=20
+> "
+> On transition to SEAM VMX root operation, the processor can inhibit NMI a=
+nd SMI.
+> While inhibited, if these events occur, then they are tailored to stay pe=
+nding
+> and be delivered when the inhibit state is removed. NMI and external inte=
+rrupts
+> can be uninhibited in SEAM VMX-root operation. In SEAM VMX-root operation=
+,
+> MSR_INTR_PENDING can be read to help determine status of any pending even=
+ts.
+>=20
+> On transition to SEAM VMX non-root operation using a VM entry, NMI and IN=
+TR
+> inhibit states are, by design, updated based on the configuration of the =
+TD VMCS
+> used to perform the VM entry.
+>=20
+> ...
+>=20
+> On transition to legacy VMX root operation using SEAMRET, the NMI and SMI
+> inhibit state can be restored to the inhibit state at the time of the pre=
+vious
+> SEAMCALL and any pending NMI/SMI would be delivered if not inhibited.
+> "
+>=20
+> Here NMI is inhibited in SEAM VMX root, but is never inhibited in VMX roo=
+t. =C2=A0
+
+Yep.
+
+> And the last paragraph does say "any pending NMI would be delivered if no=
+t
+> inhibited". =C2=A0
+
+That's referring to the scenario where an NMI becomes pending while the CPU=
+ is in
+SEAM, i.e. has NMIs blocked.
+
+> But I thought this applies to the case when "NMI happens in SEAM VMX root=
+", but
+> not "NMI happens in SEAM VMX non-root"?  I thought the NMI is already
+> "delivered" when CPU is in "SEAM VMX non-root", but I guess I was wrong h=
+ere..
+
+When an NMI happens in non-root, the NMI is acknowledged by the CPU prior t=
+o
+performing VM-Exit.  In regular VMX, NMIs are blocked after such VM-Exits. =
+ With
+TDX, that blocking happens for SEAM root, but the SEAMRET back to VMX root =
+will
+load interruptibility from the SEAMCALL VMCS, and I don't see any code in t=
+he
+TDX-Module that propagates that blocking to SEAMCALL VMCS.
+
+Hmm, actually, this means that TDX has a causality inversion, which may bec=
+ome
+visible with FRED's NMI source reporting.  E.g. NMI X arrives in SEAM non-r=
+oot
+and triggers a VM-Exit.  NMI X+1 becomes pending while SEAM root is active.
+TDX-Module SEAMRETs to VMX root, NMIs are unblocked, and so NMI X+1 is deli=
+vered
+and handled before NMI X.
+
+So the TDX-Module needs something like this:
+
+diff --git a/src/td_transitions/td_exit.c b/src/td_transitions/td_exit.c
+index eecfb2e..b5c17c3 100644
+--- a/src/td_transitions/td_exit.c
++++ b/src/td_transitions/td_exit.c
+@@ -527,6 +527,11 @@ void td_vmexit_to_vmm(uint8_t vcpu_state, uint8_t last=
+_td_exit, uint64_t scrub_m
+         load_xmms_by_mask(tdvps_ptr, xmm_select);
+     }
+=20
++    if (<is NMI VM-Exit =3D> SEAMRET)
++    {
++        set_guest_inter_blocking_by_nmi();
++    }
++
+     // 7.   Run the common SEAMRET routine.
+     tdx_vmm_post_dispatching();
 
 
-When running the 6.12 kernel on a DGX H100 host with 4 GPUs passed
-through using CPU passthrough and this virt-install command[1], VMs
-using the latest OVMF version will take around 2 minutes for the guest
-kernel to boot and initialize PCI devices/BARs for the GPUs.
-Originally, I was investigating this as an issue in OVMF, because GPU
-initialization takes much less time when our host is running an OVMF
-version with this patch[2] removed (which only calculates the MMIO
-window size differently). Without that patch, the guest kernel does
-boot quickly, but we can only use the Nvidia GPUs within the guest if
-`pci=3Dnocrs pci=3Drealloc` are set in the guest (evidently since the MMIO
-windows advertised by OVMF to the kernel without this patch are
-incorrect). So, the OVMF patch being present does evidently result in
-correct MMIO windows and prevent us from needing those kernel options,
-but the VM boot time is much slower.
+and then KVM should indeed handle NMI exits prior to leaving the noinstr se=
+ction.
+=20
+> > TDX is also different because KVM isn't responsible for context switchi=
+ng guest
+> > state.  Specifically, CR2 is managed by the TDX Module, and so there is=
+ no window
+> > where KVM runs with guest CR2, and thus there is no risk of clobbering =
+guest CR2
+> > with a host value, e.g. due to take a #PF due instrumentation triggerin=
+g something.
+> >=20
+> > All that said, I did forget that code that runs between guest_state_ent=
+er_irqoff()
+> > and guest_state_exit_irqoff() can't be instrumeneted.  And at least as =
+of patch 2
+> > in this series, the simplest way to make that happen is to tag tdx_vcpu=
+_enter_exit()
+> > as noinstr.  Just please make sure nothing else is added in the noinstr=
+ section
+> > unless it absolutely needs to be there.
+>=20
+> If NMI is not a concern, is below also an option?
 
+No, because instrumentation needs to be prohibited for the entire time betw=
+een
+guest_state_enter_irqoff() and guest_state_exit_irqoff().
 
-In discussing this, another contributor reported slow PCIe/BAR
-initialization times for large BAR Nvidia GPUs in Linux when using VMs
-with SeaBIOS as well. This, combined with me not seeing any slowness
-when these GPUs are initialized on the host, and the fact that this
-slowness only happens when CPU passthrough is used, are leading me to
-suspect that this may actually be a problem somewhere in the KVM or
-vfio-pci stack. I did also attempt manually setting different MMIO
-window sizes using the X-PciMmio64Mb OVMF/QEMU knob, and it seems that
-any MMIO window size large enough to accommodate all GPU memory
-regions does result in this slower initialization time (but also a
-valid mapping).
-
-
-I did some profiling of the guest kernel during boot, and I've
-identified that it seems like the most time is spent in this
-pci_write_config_word() call in __pci_read_base() of
-drivers/pci/probe.c.[3] Each of those pci_write_config_word() calls
-takes about 2 seconds, but it adds up to a significant chunk of the
-initialization time since __pci_read_base() is executed somewhere
-between 20-40 times in my VM boot.
-
-
-As a point of comparison, I measured the time it took to hot-unplug
-and re-plug these GPUs after the VM booted, and observed much more
-reasonable times (under 5s for each GPU to re-initialize its memory
-regions). I've also been trying to get this hotplugging working in VMs
-where the GPUs aren't initially attached at boot, but in any such
-configuration, the memory regions for the PCI slots that the GPUs get
-attached to during hotplug are too small for the full 128GB these GPUs
-require (and I have yet to figure out a way to fix that. More details
-on that in [0]).
-
-
-I'm wondering if any other users of Nvidia GPUs or other large BAR
-GPUs in VMs with GPU and CPU passthrough have reported similar
-slowness during boot, and if anyone has any insight. If you also
-suspect this might be a kernel issue, and if there is anything I can
-provide to help identify the root causes in that case, please let me
-know.
-
-[0] https://edk2.groups.io/g/devel/topic/109651206
-
-[1]
-virt-install --name 4gpu-vm-2 --vcpus vcpus=3D16,maxvcpus=3D16 --memory
-943616 --numatune 0,mode=3Dstrict --iothreads
-1,iothreadids.iothread0.id=3D1 --cputune
-emulatorpin.cpuset=3D55,167,iothreadpin0.iothread=3D1,iothreadpin0.cpuset=
-=3D54,166,vcpupin0.vcpu=3D0,vcpupin0.cpuset=3D16,vcpupin1.vcpu=3D1,vcpupin1=
-.cpuset=3D128,vcpupin2.vcpu=3D2,vcpupin2.cpuset=3D17,vcpupin3.vcpu=3D3,vcpu=
-pin3.cpuset=3D129,vcpupin4.vcpu=3D4,vcpupin4.cpuset=3D18,vcpupin5.vcpu=3D5,=
-vcpupin5.cpuset=3D130,vcpupin6.vcpu=3D6,vcpupin6.cpuset=3D19,vcpupin7.vcpu=
-=3D7,vcpupin7.cpuset=3D131,vcpupin8.vcpu=3D8,vcpupin8.cpuset=3D20,vcpupin9.=
-vcpu=3D9,vcpupin9.cpuset=3D132,vcpupin10.vcpu=3D10,vcpupin10.cpuset=3D21,vc=
-pupin11.vcpu=3D11,vcpupin11.cpuset=3D133,vcpupin12.vcpu=3D12,vcpupin12.cpus=
-et=3D22,vcpupin13.vcpu=3D13,vcpupin13.cpuset=3D134,vcpupin14.vcpu=3D14,vcpu=
-pin14.cpuset=3D23,vcpupin15.vcpu=3D15,vcpupin15.cpuset=3D135
---os-variant ubuntu22.04 --graphics none --noautoconsole --boot
-loader=3D/usr/share/OVMF/OVMF_CODE_4M.fd,loader_ro=3Dyes,loader_type=3Dpfla=
-sh
---console pty,target_type=3Dserial --network network:default --network
-network:private-net --import --disk
-path=3D/var/lib/libvirt/images/4gpu-vm-2.qcow2,format=3Dqcow2,driver.queues=
-=3D16,driver.iothread=3D1
---host-device 1b:00.0,address.type=3Dpci --host-device
-61:00.0,address.type=3Dpci --host-device c3:00.0,address.type=3Dpci
---host-device df:00.0,address.type=3Dpci
-
-[2] https://github.com/tianocore/edk2/commit/ecb778d0ac62560aa172786ba19521=
-f27bc3f650
-
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
-/drivers/pci/probe.c?h=3Dv6.12#n251
-
-Thanks,
---=20
-Mitchell Augustin
-Software Engineer - Ubuntu Partner Engineering
+> 	guest_state_enter_irqoff();
+>=20
+> 	instructmentation_begin();
+> 	tdh_vp_enter();
+> 	instructmentation_end();
+>=20
+> 	guest_state_exit_irqoff();
+>=20
 
