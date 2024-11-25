@@ -1,79 +1,65 @@
-Return-Path: <kvm+bounces-32413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EEB9D835A
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:29:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B196A9D84D5
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:51:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86BF4162D4E
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 10:29:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1AD9B33436
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6B4192580;
-	Mon, 25 Nov 2024 10:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29928196C7B;
+	Mon, 25 Nov 2024 11:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="gu6UOIhR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XhAOqtb9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8A61922D8
-	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 10:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A2D192589;
+	Mon, 25 Nov 2024 11:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732530583; cv=none; b=qNKBiiv4qncS//u9a/KufE6GGdg4EvU9UiA22Koz0+v3pOGALBHIrms1vsnksj40IxHCPUo0hVcnjFjg3142FaiowHKkK4m8GONjDEcWV4N4tPUBdumuvq+uZqdWgS44osAsm3xrjic2GzrPfVLOSHUJSSuMuI66j5tdNJehgNo=
+	t=1732533050; cv=none; b=NBNA6iqD1/2QxoPQujQRC8er0aQAkAkDEchgZZLDfczv4zrhWKnsJSo7SzAv7d+99DrzaEta09MAu3a1JHu8M3rAtS0UvvVPcZsbe+IuZi1/30+lEYZlfGYqw2V6GkG9X0fLSdwbTtK6qZAYHV+D6ayq+LxUq2RfmEUtiLbZzIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732530583; c=relaxed/simple;
-	bh=4QebM7wDpO/ZzGIZmaMvzH5LwLGao59GjeHtLMWBgyc=;
+	s=arc-20240116; t=1732533050; c=relaxed/simple;
+	bh=mzdUoYSo8U5mMFN+HnRKNXhF4nTnOARWiNB1Z+Bwclg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lEOw3zRBKEiKCNvB8jGoGs6jZ1ZcPKp3cv3r+fVNtf99xxpUr5IZ/ZRUavGC4v0L6UD0Zk95Tl4HCQaEsE/he+JLN9LiNH8+V7zRUtLQOpPLNZpssu7Oc/INunGztmY8O+HWuL9ntiwmI5ltPeXv+UBjCwruG40WIQMCEb7R7sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=gu6UOIhR; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38232cebb0cso3308705f8f.1
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 02:29:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1732530579; x=1733135379; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Et8bfP7f+d7et6IdLZNPrHhGEwHHDGt66EmqTI7LK6I=;
-        b=gu6UOIhRZ74fMpciRvD8v8muRIOLRGT+GZC6lsABfDTOC/OuO5Z2qI2Q9mtw/mJPSj
-         ZA4g2V1ZsmeBwZFk5F+K9Znks/bD26ACY0wxhFjtdL0grofghVMzNCged/oxv3JNs1wZ
-         YwDkLvtAKIoi/+r8GF6/0e96qA49KWp3tqlN0l+Ghf2CetfP/PAzzCY1UJ2LyIbfCZbv
-         2XKVFmHIdVrE9hf29+DbIVhv/40hadUbC824RSjTffED/EtBKeJA1xchnkeeU2FNGNXK
-         Lbml2UiSc1dAdPUW359CYlDjwxNf0YApUGSoD+GjQpIOtwMoRLEYmNujxhq8aktB8neS
-         UhBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732530579; x=1733135379;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Et8bfP7f+d7et6IdLZNPrHhGEwHHDGt66EmqTI7LK6I=;
-        b=aD9D3LBwU43xBN+tAfI9+pKuBk+aQpaQitYGgm/VGYGoDFIqBJaoetNnkmdOsGNsGj
-         mM/N3ulE3n5rb6ON+2p1Se3mVGz6qQ5zytdHgbzWtayv3LENKaQXuNqqej1bO55eTQZn
-         kaYPM3a9/MeMPg6CZ8xqas+1hgmcaraAefQt7jlxu3GW8Jq0CuvXXV/gLVNDw1ikhNjL
-         z2YjwzhTrJcuvqF3wOXcTO2GpfZwYLKCok/rC7N6V1s1d1EQbsjEo7RR4RcD4b43mNGk
-         9PkR4gBvKnvWApEMoPaDDaof8UQy1fg2kjnf+3zpw2k9nTgim9Q3HKuxfIPdQy/fD1GB
-         S5qw==
-X-Gm-Message-State: AOJu0YyhnVkstm/IW3+l0+1RX/ONEaaDzMP4Ey6bO2L2xDcsgTU3Tqin
-	hxewO5cSc0EO0ORQGmG5i/YBBnJnvB6w1hdzYyZLqzE2GaBiF1q/l1/63eVcYtG3KaAttyjXyn9
-	B
-X-Gm-Gg: ASbGncvg3lspgeI4LFBpFfiy43+typaTfYm8uKsj69Ca1P/Oa3kupYS12T03t9V80a3
-	oBOiI/56U1vyeHsvw0OBZ/XPk2tlktdSGv5wUFoG8KBYoJvh9CNgMJmgvwUx/x7kOWLJWyQxNK7
-	i9RsSfNj8DI+uGvTXMzCWTgtSYv7JautcgbZSQdYKBCc4jBYVw2vJiLOfLyE8hdrjCGhSTU+gLy
-	I9o9lt4+1re+Q/gYKTLuBfCX4GHYtocmFToOzKGWOj1DItll0UhjaqLAY3IVmRTfmda15j/Qdfk
-	RVfewiuLxBiHS5vSuYk=
-X-Google-Smtp-Source: AGHT+IENdgMgO0gxX+6kYoLAr72gS29wcRWhFhIn33d6/0uIwcwOpu7I3hqWA9vC9CrOfETEA/VC2g==
-X-Received: by 2002:a5d:588c:0:b0:382:495c:deca with SMTP id ffacd0b85a97d-38260bc93famr11161040f8f.39.1732530578976;
-        Mon, 25 Nov 2024 02:29:38 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fbc3531sm10180147f8f.80.2024.11.25.02.29.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Nov 2024 02:29:38 -0800 (PST)
-Message-ID: <c174b3bb-5839-4396-9c5e-68b56fbd1bce@rivosinc.com>
-Date: Mon, 25 Nov 2024 11:29:38 +0100
+	 In-Reply-To:Content-Type; b=rDFbrrmhKL17hkmjONXSFhAvwuk8WU0EJUANaA1/ygxxUcIfH5mjF+7Wxh5jncB0KFU7jaalTsu9iaq55BhqXgcEf1tzRl3FSIziI9f4unxrd6deLeMnmUDPtQlaqpbf02ZHhTYx15mVgXLAR1M7lc+IZSa3pHIUenb9opZl5E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XhAOqtb9; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732533049; x=1764069049;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=mzdUoYSo8U5mMFN+HnRKNXhF4nTnOARWiNB1Z+Bwclg=;
+  b=XhAOqtb9J+ge8GPX+YYb4Ci7h2uDu+LJ17UwVguu2DLuqLzsSvfv5gGC
+   CU0Jwc0WitE6vIh5vfWnl3wRe/79lGLgHvDvyPPAcDZrHWrFVMXMWTCTk
+   aDi0LXLB/V+J8ey4SfEw2YV+wj6wWlWI34/VrqE9//f6trVt/kPaAnhwF
+   KBt1TbUznG0/WHPLsdDxRC5Z2+RpA6aaNdD54xdYz0kyY49306Fhi9DD3
+   rQXXRdEclptBpqFiFrvERYpsiy6A+PcOiV4zYQVMv0oNeTaYSehHcZz/h
+   bW1zpGYe4mXg+OHd8FTailpmJkUA3welaqFQYdPsNkAwU3XRB/SW07kwE
+   A==;
+X-CSE-ConnectionGUID: iGWZyahvTAGEOFUApXDCHQ==
+X-CSE-MsgGUID: 84OHOioBQdGB4EEiBirS+w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11266"; a="32884689"
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="32884689"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 03:10:48 -0800
+X-CSE-ConnectionGUID: MfymY+8zRSqny8Xy6KGkmg==
+X-CSE-MsgGUID: h2Ger/bZScCM52AfSgpu4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="91361137"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 03:10:43 -0800
+Message-ID: <a42183ab-a25a-423e-9ef3-947abec20561@intel.com>
+Date: Mon, 25 Nov 2024 13:10:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,141 +67,112 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] riscv: lib: Add SSE assembly entry
- handling
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20241122140459.566306-1-cleger@rivosinc.com>
- <20241122140459.566306-3-cleger@rivosinc.com>
- <20241122-a7e54373559727e1e296b8c4@orel>
- <90b8e2d2-1fc6-4166-a3bf-3cd8af3b5b8d@rivosinc.com>
- <20241125-a56b5a8b8a80cdd2e9598fee@orel>
+Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
+ guest TD
+To: Chao Gao <chao.gao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com,
+ kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
+ linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
+ weijiang.yang@intel.com
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
 Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20241125-a56b5a8b8a80cdd2e9598fee@orel>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <Z0AbZWd/avwcMoyX@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-
-
-On 25/11/2024 10:38, Andrew Jones wrote:
-> On Mon, Nov 25, 2024 at 09:46:48AM +0100, Clément Léger wrote:
->>
->>
->> On 22/11/2024 17:20, Andrew Jones wrote:
->>> On Fri, Nov 22, 2024 at 03:04:56PM +0100, Clément Léger wrote:
->>>> Add a SSE entry assembly code to handle SSE events. Events should be
->>>> registered with a struct sse_handler_arg containing a correct stack and
->>>> handler function.
->>>>
->>>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->>>> ---
->>>>  riscv/Makefile          |   1 +
->>>>  lib/riscv/asm/sse.h     |  16 +++++++
->>>>  lib/riscv/sse-entry.S   | 100 ++++++++++++++++++++++++++++++++++++++++
->>>
->>> Let's just add the entry function to riscv/sbi-asm.S and the
->>> sse_handler_arg struct definition to riscv/sbi-tests.h
->>
->> Hi drew,
->>
->> I need to have some offset generated using asm-offsets.c which is in
->> lib/riscv. If I move the sse_handler_arg in riscv/sbi-tests.h, that will
->> be really off to include that file in the lib/riscv/asm-offsets.c.
+On 22/11/24 07:49, Chao Gao wrote:
+>> +static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>> +
+>> +	if (static_cpu_has(X86_FEATURE_XSAVE) &&
+>> +	    kvm_host.xcr0 != (kvm_tdx->xfam & kvm_caps.supported_xcr0))
+>> +		xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
+>> +	if (static_cpu_has(X86_FEATURE_XSAVES) &&
+>> +	    /* PT can be exposed to TD guest regardless of KVM's XSS support */
+>> +	    kvm_host.xss != (kvm_tdx->xfam &
+>> +			 (kvm_caps.supported_xss | XFEATURE_MASK_PT |
+>> +			  XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)))
 > 
-> That's true, but it's also not great to put a test-specific definition of
-> an arg structure in lib code. It seems like we'll eventually want a neater
-> solution to this, though, since using asm-offsets for test-specific
-> structures makes sense. However, we could put it off for now, since each
-> member of the structure that SSE tests need is the same size,
-> sizeof(long), so we can do the same thing that HSM and SUSP do, which is
-> to define some indices and access with ASMARR().
+> Should we drop CET/PT from this series? I think they are worth a new
+> patch/series.
 
-The struct sse_handler_arg isn't actually test-specific as well as the
-assembly code. Test data are actually specified in the handler and
-handler_data field of the sse_handler_arg. But maybe the part that uses
-the sse_handler data should actually be hidden from the test layer. I
-can add some function to wrap that.
+This is not really about CET/PT
 
-> 
->> Except if you have some other solution.
-> 
-> ASMARR(), even though I'm not a huge fan of that approach either...
-> 
->>
->>>
->>>>  lib/riscv/asm-offsets.c |   9 ++++
->>>>  4 files changed, 126 insertions(+)
->>>>  create mode 100644 lib/riscv/asm/sse.h
->>>>  create mode 100644 lib/riscv/sse-entry.S
->>>>
->>>> diff --git a/riscv/Makefile b/riscv/Makefile
->>>> index 28b04156..e50621ad 100644
->>>> --- a/riscv/Makefile
->>>> +++ b/riscv/Makefile
->>>> @@ -39,6 +39,7 @@ cflatobjs += lib/riscv/sbi.o
->>>>  cflatobjs += lib/riscv/setjmp.o
->>>>  cflatobjs += lib/riscv/setup.o
->>>>  cflatobjs += lib/riscv/smp.o
->>>> +cflatobjs += lib/riscv/sse-entry.o
->>>>  cflatobjs += lib/riscv/stack.o
->>>>  cflatobjs += lib/riscv/timer.o
->>>>  ifeq ($(ARCH),riscv32)
->>>> diff --git a/lib/riscv/asm/sse.h b/lib/riscv/asm/sse.h
->>>> new file mode 100644
->>>> index 00000000..557f6680
->>>> --- /dev/null
->>>> +++ b/lib/riscv/asm/sse.h
->>>> @@ -0,0 +1,16 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +#ifndef _ASMRISCV_SSE_H_
->>>> +#define _ASMRISCV_SSE_H_
->>>> +
->>>> +typedef void (*sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
->>>> +
->>>> +struct sse_handler_arg {
->>>> +	unsigned long reg_tmp;
->>>> +	sse_handler_fn handler;
->>>> +	void *handler_data;
->>>> +	void *stack;
->>>> +};
->>>> +
->>>> +extern void sse_entry(void);
->>>> +
->>>> +#endif /* _ASMRISCV_SSE_H_ */
->>>> diff --git a/lib/riscv/sse-entry.S b/lib/riscv/sse-entry.S
->>>> new file mode 100644
->>>> index 00000000..bedc47e9
->>>> --- /dev/null
->>>> +++ b/lib/riscv/sse-entry.S
->>>> @@ -0,0 +1,100 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * SBI SSE entry code
->>>> + *
->>>> + * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->>>> + */
->>>> +#include <asm/asm.h>
->>>> +#include <asm/asm-offsets.h>
->>>> +#include <asm/csr.h>
->>>> +
->>>> +.global sse_entry
->>>> +sse_entry:
->>>> +	/* Save stack temporarily */
->>>> +	REG_S sp, SSE_REG_TMP(a6)
-> 
-> While thinking about the asm-offsets issue, I took a closer look at this
-> and noticed that this should be a7, since ENTRY_ARG is specified to be
-> set to A7. It looks like we have A6 (hartid) and A7 (arg) swapped. The
-> opensbi implementation also has them swapped, allowing this test to pass.
-> Both need to be fixed.
+What is happening here is that we are calculating the current
+MSR_IA32_XSS value based on the TDX Module spec which says the
+TDX Module sets MSR_IA32_XSS to the XSS bits from XFAM.  The
+TDX Module does that literally, from TDX Module source code:
 
-Ouch, nice catch, I'll fix that up.
+	#define XCR0_SUPERVISOR_BIT_MASK            0x0001FD00
+and
+	ia32_wrmsr(IA32_XSS_MSR_ADDR, xfam & XCR0_SUPERVISOR_BIT_MASK);
+
+For KVM, rather than:
+
+			kvm_tdx->xfam &
+			 (kvm_caps.supported_xss | XFEATURE_MASK_PT |
+			  XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)
+
+it would be more direct to define the bits and enforce them
+via tdx_get_supported_xfam() e.g.
+
+/* 
+ * Before returning from TDH.VP.ENTER, the TDX Module assigns:
+ *   XCR0 to the TD’s user-mode feature bits of XFAM (bits 7:0, 9)
+ *   IA32_XSS to the TD's supervisor-mode feature bits of XFAM (bits 8, 16:10)
+ */
+#define TDX_XFAM_XCR0_MASK	(GENMASK(7, 0) | BIT(9))
+#define TDX_XFAM_XSS_MASK	(GENMASK(16, 10) | BIT(8))
+#define TDX_XFAM_MASK		(TDX_XFAM_XCR0_MASK | TDX_XFAM_XSS_MASK)
+
+static u64 tdx_get_supported_xfam(const struct tdx_sys_info_td_conf *td_conf)
+{
+	u64 val = kvm_caps.supported_xcr0 | kvm_caps.supported_xss;
+
+	/* Ensure features are in the masks */
+	val &= TDX_XFAM_MASK;
+
+	if ((val & td_conf->xfam_fixed1) != td_conf->xfam_fixed1)
+		return 0;
+
+	val &= td_conf->xfam_fixed0;
+
+	return val;
+}
+
+and then:
+
+	if (static_cpu_has(X86_FEATURE_XSAVE) &&
+	    kvm_host.xcr0 != (kvm_tdx->xfam & TDX_XFAM_XCR0_MASK))
+		xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
+	if (static_cpu_has(X86_FEATURE_XSAVES) &&
+	    kvm_host.xss != (kvm_tdx->xfam & TDX_XFAM_XSS_MASK))
+		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
 
 > 
-> Thanks,
-> drew
+>> +		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
+>> +	if (static_cpu_has(X86_FEATURE_PKU) &&
+> 
+> How about using cpu_feature_enabled()? It is used in kvm_load_host_xsave_state()
+> It handles the case where CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS is not
+> enabled.
+> 
+>> +	    (kvm_tdx->xfam & XFEATURE_MASK_PKRU))
+>> +		write_pkru(vcpu->arch.host_pkru);
+> 
+> If host_pkru happens to match the hardware value after TD-exits, the write can
+> be omitted, similar to what is done above for xss and xcr0.
+
+True.  It might be better to make restoring PKRU a separate
+patch so that the commit message can explain why it needs to
+be done here.
 
 
