@@ -1,271 +1,219 @@
-Return-Path: <kvm+bounces-32471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0C29D8BEE
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 19:07:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A5149D8CC3
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 20:19:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1669AB2AF61
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 18:06:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2474168A19
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 19:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0891B87D8;
-	Mon, 25 Nov 2024 18:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0A61BB6B3;
+	Mon, 25 Nov 2024 19:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ozbsb9xx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWjwq1AG"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BD017548;
-	Mon, 25 Nov 2024 18:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732557963; cv=fail; b=mCKFdWnWrCEcQX39NSmxgQ2FhW7c50eEPkroeaybeWKmV7rHZYgtjdNU9YL26yJ+RQ7/0hdPN/T7oZdI/hYUGOPIKQiiD0J3/yjCM7q/mUsH61vKF91be/rKRqo8+nG2OWXRfwI16RE6XHp8mZq76ynNtZTGuD2FZP2z/AyiYm8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732557963; c=relaxed/simple;
-	bh=XtbyKUwrl8NvJK3xgmzVgo4A9fSyRd38U/eQ9iqgw0A=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=i248gOErf6YqHRxzEt4NZy1hRSBwPSqnVsBvflu9WpVrP36kaYeghfEG+0eRrh+DtjmZvxwdIK3YMLM5OEQ59cndReNJpsvCnMbOFsHi7yIueaUQ4y7Yo3yjn0/DzCalk3NEnmvKU9zJbC/p6RVA8qF4bQvkhOg+oZiMHRKftNs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ozbsb9xx; arc=fail smtp.client-ip=40.107.220.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=q/V7jnfJvDUILE8vb6pf97Sxw+PSl2kIZfEr5Yr2CEARryy+pa9QptAYEMsGx78iQLaSJuqNJLEP77bLCdXZUXn/kXg+yxH6IsH+WR3q1DvZE640wbAT2n22gFORWLaHj3iLlnU1s3EZvXDbRhbynmeNCrNBcT8IhXIchSeM+V8rctfWKrWTOV2EWDOhn96VX2aZRNie8PCYbTXdQfoIU2ffZ9bNuRg0GAgTvCCQlEdPgYrRhqTk2N/SK+tuVD9nOyhXYFOxjNjjQsNDUvbQYjCiBYCs8mqGHmbHx1s0KXu2CjuvVeiUziyPydZap6lhiEJocI0ZJIcd22IP6829oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=of9arVcuY+Zk+7tAmxzqXYiMi9sUwQS+Ff29qCbKqOs=;
- b=qNmRnoBBGahbX8cNTaq0JTmzShrZC3v9QQuM8XzNIt6Uuk0svbFzV+3DNVQw9EdasUOabGMnnsbbXD5+2vDbT3qD0nNArh4zPKts0CdZGLe03VX60L7MZFooFevDhZDRPZHEENmrEmr2DCR03pMIR0q6mvjbVljboaYeIQit9BGUZ8W6yjhwYw8Usq3tu2iOEw5KxQVEtrlrFgMivu3gd5hJuO/+X3oU8okpEVahJctIL+KXMWJiGIp/GHjaSd/zJyFuxZMOkS/k+h3tM94XYJF4421LjSTunW564+qyI1FIqbakQ8bBWsinnJOSK37Zexq9K1voGnGJnZr0xbsZ1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=of9arVcuY+Zk+7tAmxzqXYiMi9sUwQS+Ff29qCbKqOs=;
- b=Ozbsb9xxjC7QjGvxdDstV1hhXZXPLnnSxu0YeevjgZnBZ5iinSIkhVLSkkOI/cgoDbBrACqBhZKy4kEKYAOjsEE6p35yX7urZnUFUoQ+1fPg212nkj/DbQ3zgITK7F/Bt14ZNm4NzQi4iy492foyHt9PYoBn+97Xjb1+2BMCWyU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5688.namprd12.prod.outlook.com (2603:10b6:510:130::9)
- by IA1PR12MB6020.namprd12.prod.outlook.com (2603:10b6:208:3d4::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.20; Mon, 25 Nov
- 2024 18:05:59 +0000
-Received: from PH7PR12MB5688.namprd12.prod.outlook.com
- ([fe80::b26b:9164:45e2:22d5]) by PH7PR12MB5688.namprd12.prod.outlook.com
- ([fe80::b26b:9164:45e2:22d5%4]) with mapi id 15.20.8182.019; Mon, 25 Nov 2024
- 18:05:59 +0000
-Message-ID: <573fc7db-f6c8-4a0d-b709-d113dc479652@amd.com>
-Date: Mon, 25 Nov 2024 12:04:21 -0600
-User-Agent: Mozilla Thunderbird
-Reply-To: michael.day@amd.com
-Subject: Re: [PATCH v5 0/2] mm: Refactor KVM guest_memfd to introduce guestmem
- library
-To: Elliot Berman <quic_eberman@quicinc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Mike Rapoport <rppt@kernel.org>,
- David Hildenbrand <david@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Jonathan Corbet <corbet@lwn.net>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Mike Marshall <hubcap@omnibond.com>,
- Martin Brandenburg <martin@omnibond.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: James Gowans <jgowans@amazon.com>, linux-fsdevel@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-doc@vger.kernel.org, linux-nfs@vger.kernel.org,
- devel@lists.orangefs.org, linux-arm-kernel@lists.infradead.org
-References: <20241122-guestmem-library-v5-0-450e92951a15@quicinc.com>
-From: Mike Day <michael.day@amd.com>
-Content-Language: en-US
-In-Reply-To: <20241122-guestmem-library-v5-0-450e92951a15@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CY8PR12CA0008.namprd12.prod.outlook.com
- (2603:10b6:930:4e::12) To PH7PR12MB5688.namprd12.prod.outlook.com
- (2603:10b6:510:130::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9340A38DE1
+	for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 19:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732562344; cv=none; b=qJAb3vbECtNEMKPtofeVCCFedj291jmYzxtXq+CCQOchAxnbDpMh4bgIfg3Tb6OPGtEciMC/OMwoWxlSmmWRUBdZpB+8aPYz8laWfFvWGzI//jEhzoJn2c7LHJ7VPVbhlmRzHnqhi+47iUTLJyQ+a7QfWqeDtb9cAb8VdlHm08s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732562344; c=relaxed/simple;
+	bh=k6hX2fYHng9cUwMlbGSrHAakemgtuwHC4CafAJRJZ0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u+tV3GiCRVf0lIl8LWDULXgV2gsHkeTcObxVeAxmPMrfOfSoHKmuJ+BTPBUpAu3Gm4kN4krEmtzQ50A4xM5p0K/jLA5p61gfwMhxhC1Fm6DqKxWu5oQX1RkFQEqLnbsj967fN7+Nl0zgV2EAsf/4n05UQb8Pfj3q1OW2foKgQJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWjwq1AG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732562341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0zri8sqtaJlRzMrRbu+onT3jDhAvSEGLiciJui4Cv6s=;
+	b=ZWjwq1AG+g9Foq+VPD4PMN2RfzJ1vm/otsTI6F985hDW/njgbTemXCGSnqbnrSciIdYWCc
+	myuCWNKHHa1S3PezpvAXz3f52LvnwcSRa5ys5sL1THQe21YexJSW1NYCcf55urX5EOvNmB
+	fNRsF89N9CSe6meXYJF1Pl3pxnN8pJM=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-453-l7THSgwNP8OFPNGdVgVx5g-1; Mon, 25 Nov 2024 14:18:59 -0500
+X-MC-Unique: l7THSgwNP8OFPNGdVgVx5g-1
+X-Mimecast-MFC-AGG-ID: l7THSgwNP8OFPNGdVgVx5g
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-5f1e36800f9so125893eaf.1
+        for <kvm@vger.kernel.org>; Mon, 25 Nov 2024 11:18:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732562338; x=1733167138;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0zri8sqtaJlRzMrRbu+onT3jDhAvSEGLiciJui4Cv6s=;
+        b=t3FogAvjbnd8y902mvueHCcV1ZxnWikYO1Ht7benBfl69ujYj1P8Hq/A4tjAg3IfIv
+         YczvEsUNYH7aYmZDK1IFVKErig62opT0dNj3/whpqeed7MQzSd9fXYGDKJ+zDiqMZE6z
+         h5BRa6+1vf47wnqY4EObIsBx5hIIg1rvWoZ8sxPeIMoXSzP5lnowb5aO4jbHLRfWrv+C
+         3KJdZpFCnODPmsh+3dbwkQat2nPKNBcyn0ksVw9cXT2WxLEFc4m1glbsdLzaz77yYn85
+         b8BKaXydcQQOt9mGB7i5Jma7P7L8x8y7Ka9VK1fzwlmApShZc15pDPvWWjsFcx/Ef2//
+         1tOw==
+X-Gm-Message-State: AOJu0YxLGcMVs31O3+i4R6mdmrbj4DzmJX8WwGEzmsGx6DdmeZHA9VsB
+	erquKJ79HlWDmV4bxnfkfoiBFcmnc/hb1uzKfBhZg01JUO2UUCD2tXQ+tPodnNqc1G5MjtXrHD2
+	RdW7zvTELwAGHMDrzManHylrODz1yWEi2mAvkk53+E0Y3NHIeig==
+X-Gm-Gg: ASbGncukHsR7aID4efX/FQV15PaiEQRANFD4uGHvW4pSA2jV/a2Rdc2GabOD0qzFwb0
+	HwImqHJ2lbaKOIgwBrb/L3LFJuQUo/NKMSAWN7STF0ADix8D2mFgG+tQk41BkEKDAfk2Jwafb9X
+	2tEY85WoIGeZ8+pR71xUuvXf5nKWSHySLEAOJvetJqQXTRaG+s4iHT3wtskeUCdT8q+6v8iUpbp
+	VUPoWLeWiTK1dt4igPaL1LmAMXOw7wMI58Cw3IolZGpJd4KSMuyOQ==
+X-Received: by 2002:a05:6830:6e07:b0:717:fd59:8981 with SMTP id 46e09a7af769-71d595e0fdemr423497a34.3.1732562338640;
+        Mon, 25 Nov 2024 11:18:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFz0oZtFfg3w8DhURqFJFME0yQlilbewXvlfKlUvQBYwyHfnmCXGMPiKQKJOcUq75ogOqTkIA==
+X-Received: by 2002:a05:6830:6e07:b0:717:fd59:8981 with SMTP id 46e09a7af769-71d595e0fdemr423492a34.3.1732562338270;
+        Mon, 25 Nov 2024 11:18:58 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71d4ea51317sm913102a34.8.2024.11.25.11.18.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2024 11:18:57 -0800 (PST)
+Date: Mon, 25 Nov 2024 12:18:56 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Avihai Horon <avihaih@nvidia.com>
+Cc: <kvm@vger.kernel.org>, Yi Liu <yi.l.liu@intel.com>, Yishai Hadas
+ <yishaih@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Maor Gottlieb
+ <maorg@nvidia.com>
+Subject: Re: [PATCH v3] vfio/pci: Properly hide first-in-list PCIe extended
+ capability
+Message-ID: <20241125121856.56ee7fde.alex.williamson@redhat.com>
+In-Reply-To: <20241124142739.21698-1-avihaih@nvidia.com>
+References: <20241124142739.21698-1-avihaih@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5688:EE_|IA1PR12MB6020:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0bf7946c-e7fa-4200-a489-08dd0d7bd08c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TGxTdGJLcDFuSmR3OHNmZEhadHpCM1BLMVVYQUxSWTVjYkJLcm9hUXFmWXkv?=
- =?utf-8?B?MEFXMytTckl1bVRtc2JhaVVmV0wwUkFaNnNlZkFsdzhzemthYUlSdWtlTjRR?=
- =?utf-8?B?V2VFVC9yOWdmTWwvUU5HMTltYXZ0OEJWck1sNGRkNWFmR0JpRkFRTU05VVFj?=
- =?utf-8?B?bHRBZzJSZG5OdDBjTkJiRXN6TXNXKy9mb2FwNldCM0RhV1ZHUFBOMzJ0b1NR?=
- =?utf-8?B?MHNUQzVDM04zYWtRdStra0RDSEc1TjBEL3ZleFVVWC84Q0pkYVExQ0NCNlpB?=
- =?utf-8?B?WUR0WGhxMmIwQjVBbzh3RmtpaWdpajU1TlhORlBmUThkVy9OWkVScHV2bHU4?=
- =?utf-8?B?cVFjVlF0M3h2VEpzaFBUQzduLzhnL1dkS1BvWmRiOVg1TklJSUdtcTJtRHEx?=
- =?utf-8?B?MGZUM3J3R05JSjFOMUJhZHdsS1NSSjVacTByT1FOSlo4ellWWGpRUC94cGww?=
- =?utf-8?B?NmJ3NHJZNHVrS2dMb0ZWZUJHMVJGSitleS9COGVnKzNSKzB1ejRCcFZRZThX?=
- =?utf-8?B?UEJhbDE0RUtDSDBQNG5SN0RqZXZpM1ZMbitRRTFKZEIzWTUvT3poMEVSdTBY?=
- =?utf-8?B?cFcvbFlUcnJBbU9leDdGTkZBMlJGWDBRVlNETGNIUU5WdDRrckxKUUNsajBu?=
- =?utf-8?B?USthSloraHhvNi9ua2J4MVpFTk5XS05qY2JzNVNTcXpURVNhQXJ4M1RUb3R0?=
- =?utf-8?B?WTBiOHh4WTdQYlNEMzZ6alppMzBSWGZYeWVtdUlOeEY3NEwyZmVkNzVHRUIz?=
- =?utf-8?B?WjhJb1FSQXlTNXpvWk0wUENZMURQTFdBVXJYenlaZkpjQXNETzJnMTZZOFM0?=
- =?utf-8?B?dTYzMk1lSmhieU16UVNIYU42N01pSHo5TEtNd1JIbTJ6TVU0MHd4SjBwdmgr?=
- =?utf-8?B?K0RuK3daNGFobEFOU2l4TGY2R3VBZ2lMS05EMDNWejhIMFVwV0tHNUlZMXBm?=
- =?utf-8?B?bXV3VmkydXBLUHFlb2VNdXgrL3hmb1FtY2dwTE1aY2lkNEE0OGdGeWRJSFRY?=
- =?utf-8?B?RlN1YlAyQVppcGZJTGxSMS9uYkRKbXFHek5oeHpXenFubzZzTTN6MkdSckVu?=
- =?utf-8?B?NnZkWkFyWjc3ZXJ6dlhpQnk0NzU0QnNTV1BSdndjVEpXaXBzTlNuNXY0OHlu?=
- =?utf-8?B?RWV2cjY5N1BRUW96bWFNVzhBRnNHWWRNeUYyYmhjREtRdFFFMktmQjUxTHBO?=
- =?utf-8?B?RkZFS2NzdXkvQ2NKRXF3aDlIajdhV2hrMXh3b1JJN1dtRC9mYy9qdWxqMzEw?=
- =?utf-8?B?WXVBaHBEUU15SDMrSFhSV0J4azlycjg2cjRtK2o1VENZU09EYmE5RjZzVXFi?=
- =?utf-8?B?aStLZ2pVVWNOUU1pSkpQWnV5eDVZZFd3S0hXaHM2aU8wSEc4TkRCSElHby9U?=
- =?utf-8?B?THRNU0d0Y0JycnJ5OVo0aHEzRzQ4MGtqVm9IaWlmcXp4RmxLYkE0UndVWDVK?=
- =?utf-8?B?VUROU1c3c3gzeDhxa2lkcG9iWHJZd2NIMDYrVnNRZHJIbVFmaStpdzZMdDZi?=
- =?utf-8?B?NEQyNldsTGhVQVZkL1BsUlExK3lXU1A5cklvdG50aWFsa1NBdi80NHpqU3Ax?=
- =?utf-8?B?OGx4ektRMnNqemRtenF4VWE1OU5HRWRFbGdhNEQzNTd0ZnptRFRwOGZ4MW9r?=
- =?utf-8?B?WEIwY2M3Y1Q5L0hhdEFaQlZESm9ueDFVYzRveVZWZi9ET1dvT2RZczRwUmFH?=
- =?utf-8?B?WmdvWXZIVy9Sb2xvTlVVOE92ZWdlak8yWG1OL1dSMVhVcnpaR0EzRG1WM1Ev?=
- =?utf-8?B?UHJZdlQ3NExvNENzcmFCSnkwNC9vTURZS2JoSElnL3F0THBLc0N0MzZiZ2JX?=
- =?utf-8?Q?J4zLJhs8OYRlFN1Zk6HAAU8da4m00F+fQSPNU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5688.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?REFJekdQTXZYMUxoSGZPMFl2blJuT3NYYXdaQ1B6TGt5aGZ3cnZZLzd1MEY3?=
- =?utf-8?B?UE9kUFowdUZqUElPb3hmL1FFRlhpR09zTjN6aXRMU2RERENMbDJjRzNtRTBI?=
- =?utf-8?B?c3dkeWJ5ckZLOXB6VlhtZHlmNXlzL3lDTzltYTgyck4zTWJXcE8yNFFxcWlo?=
- =?utf-8?B?QS82OGxrMjhoNTZ5UVRlVVFKUGE5RXNxUy9EMkNRVDU4VnFEeTBqRlAzQVVn?=
- =?utf-8?B?VWswVEpqMFJzbTc1enVjOU9zS2hyUlVsOTY4MjVUajJxY2xJazBpNnphYXZw?=
- =?utf-8?B?SHEvdUJRdURNU3d3OGNKcjJaU3lWQTlCSWFNK3hZUUtTSzB1Rk9WRkc0UUtk?=
- =?utf-8?B?ZmRmOUJKdnZyL2dGSisrSWFTZFZBWWFwZU8wa3ZVN2VDRENET1dDQ2dMS3M1?=
- =?utf-8?B?K0pIQjBPSFE0WU1iTk1RazFINitDNDNmREFvVC9rQlJCZW15Ly9GamNvRTVG?=
- =?utf-8?B?TFBMcW5BMlVwaXpCUCtscnlHNllaSmdKME4wV1Y1aGFrRXdOWXc2OFBaVlRU?=
- =?utf-8?B?WlFXQ3lTYnVhb0NIdnFYcTdNa2FNRUxyMWJTWDBIMm0wUkVhMGI4UHpCK1FK?=
- =?utf-8?B?Z0huOElOR2VCNmI3bCtrVmpWMGJPUmdJRFdVa015aU9RN3hRMjNTQjhmSjIw?=
- =?utf-8?B?d3RiR3ZIdHJ3NldXcEZJa2JHVjNZVk4xenRleVUvc1dhUDlWVW1tVUtkYThs?=
- =?utf-8?B?OU85ZXdncDRFRXJCSzhtZk81WGZpc1A2NzJDdC9sTWFoNk1xSi81eSswU1pC?=
- =?utf-8?B?dzc1dktYVXgyU0FBK0d4c2c5KzgwN3ROckpvL3ZBNGwxWlBGMno3U1AzNzUy?=
- =?utf-8?B?aTRPR3JHS003UFAxUmxVbTl0eDh3Z2lIclJLck9kYnVxMTc2aVlDY3B3UDdD?=
- =?utf-8?B?MUN1TXdkQTJkTlJvbDQzd3dmRllXYk9vMVlHRG9jOHg1SFI5QzJrWmcvMzhQ?=
- =?utf-8?B?anc5ZDdnK2UzOW9CQU8zVHV0ODNVWVhpZWFjZXpkTUtxaDVHeTJIVDgrSERM?=
- =?utf-8?B?MXkxMldJZ3AvMDhMM3A3NHB2L3p1K3UrYjBpV0RmazFBZEVWQW16WTAvZDBu?=
- =?utf-8?B?eWR2U1BoVGNmUzlCRW5tTGk2aVBNUURGKzN0R0xFclllY2ZHakdPVnZvbUwv?=
- =?utf-8?B?SHFhRXpaVW9uT2tlVkIvcG05c1E3bzVSTTc2Z2ZmVFQrTy9xOU5iRCt6NHZv?=
- =?utf-8?B?MUtWNE90d1ErN1BKM3Q4enNGM2ZXRFc5dngvajZuK3IxeVVrZ1dyZFd1cWNJ?=
- =?utf-8?B?aU9LdlJJSjJ4YmFlQnVhdFE4c3ZMaExWQUhWbDFVcUU1eUxmZXA2STZCaExF?=
- =?utf-8?B?NmhvcVVlcTJkeFhzZjRhQmRnT1ZmQVZXdkRkeUh1Zkp5ZUxDS2VwY0xub1h0?=
- =?utf-8?B?eER6SjA2alBFS0kwUlg0REQ3Q0ZMMExGbXpFWWFHS3BOYUs4K0dFa1ZJZXBQ?=
- =?utf-8?B?b2dJVjBuSEJQMzRqQkJmSDN0YWEra3Y0Q1VzRS9EdGJJSUJJWkpxNVJwQXMy?=
- =?utf-8?B?aUJZZ200M0dTY0NpT1FjTnNJTVpnbjNkVDZrNmhDQk1kd2JTcmtIY3pkSGVh?=
- =?utf-8?B?MDFuL0FLWUdHb2FjaGU3bnYxdUlmWll4S0h6NmVXREMyVnF4dDNFbzNqTFha?=
- =?utf-8?B?V2pIbEJKRHkwbXdqSm52WmNRU01nLytEa0NGb1FwSlpwWVBIUXppVGNaTzNI?=
- =?utf-8?B?bkxlUnZ5OHBXeWN5bjVaS0taSFJITGxnTjd4cFhTSmpnamF0bmIweDkzWUJK?=
- =?utf-8?B?S2Rnd0JBakkzZUQwUjhKeU1EUEhJZm1FUVRFK2hLRE85VkswZVlDWnNHN3cx?=
- =?utf-8?B?UXF1RjJ3d29EUTg1UTc0bC9SN2RFV2E1cm5uZzlzdkdSOXNaMlVDWkdaeWo3?=
- =?utf-8?B?YU1jeEhQbE1YMGxyQkNvVnI2aTFCTCtCKzgyU1ZTQ3FGQWpmdXpMaGFPNDJN?=
- =?utf-8?B?Z3lFT0VFZVBKVFJod1R1R1FmZ3pBRkxScVdSTDNoTjBzVkVCbk1OOHl2dkc1?=
- =?utf-8?B?SmM1dXVmbzhLUlAwQUtGYkxKQnJ3UHdPV3VsbHZFSHlqN3ZTSUR5eFNPWDBX?=
- =?utf-8?B?SU0yNW14bVg3bzhFRi9XcFdHUTdSN1pzVjF6VWZpbXpSSHBCTGExSzJmb1Uy?=
- =?utf-8?Q?fRQiD7cZbULbYaKWBqhEpuH21?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bf7946c-e7fa-4200-a489-08dd0d7bd08c
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5688.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2024 18:05:58.9093
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fIl9Swjn6fgZq33yxWtZQVTAaScxr/VET+NSgrf9LP8MZn+f8Tsgc+K4IjE6FC9O17pPTFlx5TrJ4BuEGEEL/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6020
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Sun, 24 Nov 2024 16:27:39 +0200
+Avihai Horon <avihaih@nvidia.com> wrote:
 
-
-On 11/22/24 11:29, Elliot Berman wrote:
-> In preparation for adding more features to KVM's guest_memfd, refactor
-> and introduce a library which abtracts some of the core-mm decisions
-> about managing folios associated with guest memory. The goal of the
-> refactor serves two purposes:
+> There are cases where a PCIe extended capability should be hidden from
+> the user. For example, an unknown capability (i.e., capability with ID
+> greater than PCI_EXT_CAP_ID_MAX) or a capability that is intentionally
+> chosen to be hidden from the user.
 > 
-> 1. Provide an easier way to reason about memory in guest_memfd. KVM
->     needs to support multiple confidentiality models (TDX, SEV, pKVM, Arm
->     CCA). These models support different semantics for when the host
->     can(not) access guest memory. An abstraction for the allocator and
->     managing the state of pages will make it eaiser to reason about the
->     state of folios within the guest_memfd.
+> Hiding a capability is done by virtualizing and modifying the 'Next
+> Capability Offset' field of the previous capability so it points to the
+> capability after the one that should be hidden.
 > 
-> 2. Provide a common implementation for other users such as Gunyah [1] and
->     guestmemfs [2].
+> The special case where the first capability in the list should be hidden
+> is handled differently because there is no previous capability that can
+> be modified. In this case, the capability ID and version are zeroed
+> while leaving the next pointer intact. This hides the capability and
+> leaves an anchor for the rest of the capability list.
 > 
-> In this initial series, I'm seeking comments for the line I'm drawing
-> between library and user (KVM). I've not introduced new functionality in
-> this series; the first new feature will probably be Fuad's mappability
-> patches [3].
+> However, today, hiding the first capability in the list is not done
+> properly if the capability is unknown, as struct
+> vfio_pci_core_device->pci_config_map is set to the capability ID during
+> initialization but the capability ID is not properly checked later when
+> used in vfio_config_do_rw(). This leads to the following warning [1] and
+> to an out-of-bounds access to ecap_perms array.
 > 
-> I've decided to only bring out the address_space from guest_memfd as it
-> seemed the simplest approach. In the current iteration, KVM "attaches"
-> the guestmem to the inode. I expect we'll want to provide some helpers
-> for inode, file, and vm operations when it's relevant to
-> mappability/accessiblity/faultability.
+> Fix it by checking cap_id in vfio_config_do_rw(), and if it is greater
+> than PCI_EXT_CAP_ID_MAX, use an alternative struct perm_bits for direct
+> read only access instead of the ecap_perms array.
 > 
-> I'd appreciate any feedback, especially on how much we should pull into
-> the guestmem library.
+> Note that this is safe since the above is the only case where cap_id can
+> exceed PCI_EXT_CAP_ID_MAX (except for the special capabilities, which
+> are already checked before).
 > 
-> [1]: https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
-> [2]: https://lore.kernel.org/all/20240805093245.889357-1-jgowans@amazon.com/
-> [3]: https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
+> [1]
 > 
-> Changes in v5:
-> - Free all folios when the owner removes detaches the guestmem
-> - Link to v4: https://lore.kernel.org/r/20241120-guestmem-library-v4-0-0c597f733909@quicinc.com
+> WARNING: CPU: 118 PID: 5329 at drivers/vfio/pci/vfio_pci_config.c:1900 vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
+> CPU: 118 UID: 0 PID: 5329 Comm: simx-qemu-syste Not tainted 6.12.0+ #1
+> (snip)
+> Call Trace:
+>  <TASK>
+>  ? show_regs+0x69/0x80
+>  ? __warn+0x8d/0x140
+>  ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
+>  ? report_bug+0x18f/0x1a0
+>  ? handle_bug+0x63/0xa0
+>  ? exc_invalid_op+0x19/0x70
+>  ? asm_exc_invalid_op+0x1b/0x20
+>  ? vfio_pci_config_rw+0x395/0x430 [vfio_pci_core]
+>  ? vfio_pci_config_rw+0x244/0x430 [vfio_pci_core]
+>  vfio_pci_rw+0x101/0x1b0 [vfio_pci_core]
+>  vfio_pci_core_read+0x1d/0x30 [vfio_pci_core]
+>  vfio_device_fops_read+0x27/0x40 [vfio]
+>  vfs_read+0xbd/0x340
+>  ? vfio_device_fops_unl_ioctl+0xbb/0x740 [vfio]
+>  ? __rseq_handle_notify_resume+0xa4/0x4b0
+>  __x64_sys_pread64+0x96/0xc0
+>  x64_sys_call+0x1c3d/0x20d0
+>  do_syscall_64+0x4d/0x120
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 > 
-> Changes in v4:
-> - Update folio_free() to add address_space mapping instead of
->    invalidate_folio/free_folio path.
-> - Link to v3: https://lore.kernel.org/r/20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com
-> 
-> Changes in v3:
->   - Refactor/extract only the address_space
->   - Link to v2: https://lore.kernel.org/all/20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com/
-> 
-> Changes in v2:
-> - Significantly reworked to introduce "accessible" and "safe" reference
->    counters
-> - Link to v1: https://lore.kernel.org/r/20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com
-> 
-> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-
-Tested-by: Mike Day <michael.day@amd.com>
-
+> Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> Signed-off-by: Avihai Horon <avihaih@nvidia.com>
+> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+> Tested-by: Yi Liu <yi.l.liu@intel.com>
 > ---
-> Elliot Berman (2):
->        filemap: Pass address_space mapping to ->free_folio()
->        mm: guestmem: Convert address_space operations to guestmem library
-> 
->   Documentation/filesystems/locking.rst |   2 +-
->   MAINTAINERS                           |   2 +
->   fs/nfs/dir.c                          |  11 +-
->   fs/orangefs/inode.c                   |   3 +-
->   include/linux/fs.h                    |   2 +-
->   include/linux/guestmem.h              |  34 ++++++
->   mm/Kconfig                            |   3 +
->   mm/Makefile                           |   1 +
->   mm/filemap.c                          |   9 +-
->   mm/guestmem.c                         | 201 ++++++++++++++++++++++++++++++++++
->   mm/secretmem.c                        |   3 +-
->   mm/vmscan.c                           |   4 +-
->   virt/kvm/Kconfig                      |   1 +
->   virt/kvm/guest_memfd.c                |  98 +++++------------
->   14 files changed, 290 insertions(+), 84 deletions(-)
+> Changes from v2:
+> * Fix clang compilation error reported by kernel test robot.
+> * Drop const qualifier of direct_ro_perms to avoid casting in
+>   vfio_config_do_rw and to be aligned with other perms declaration.
+> * Add Yi's R-b/T-b tags.
+
+Applied to vfio next branch for v6.13.  Thanks,
+
+Alex
+
+
+> Changes from v1:
+> * Use Alex's suggestion to fix the bug and adapt the commit message.
 > ---
-> base-commit: 5cb1659f412041e4780f2e8ee49b2e03728a2ba6
-> change-id: 20241112-guestmem-library-68363cb29186
+>  drivers/vfio/pci/vfio_pci_config.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
 > 
-> Best regards,
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 97422aafaa7b..ea2745c1ac5e 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -313,6 +313,10 @@ static int vfio_virt_config_read(struct vfio_pci_core_device *vdev, int pos,
+>  	return count;
+>  }
+>  
+> +static struct perm_bits direct_ro_perms = {
+> +	.readfn = vfio_direct_config_read,
+> +};
+> +
+>  /* Default capability regions to read-only, no-virtualization */
+>  static struct perm_bits cap_perms[PCI_CAP_ID_MAX + 1] = {
+>  	[0 ... PCI_CAP_ID_MAX] = { .readfn = vfio_direct_config_read }
+> @@ -1897,9 +1901,17 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
+>  		cap_start = *ppos;
+>  	} else {
+>  		if (*ppos >= PCI_CFG_SPACE_SIZE) {
+> -			WARN_ON(cap_id > PCI_EXT_CAP_ID_MAX);
+> +			/*
+> +			 * We can get a cap_id that exceeds PCI_EXT_CAP_ID_MAX
+> +			 * if we're hiding an unknown capability at the start
+> +			 * of the extended capability list.  Use default, ro
+> +			 * access, which will virtualize the id and next values.
+> +			 */
+> +			if (cap_id > PCI_EXT_CAP_ID_MAX)
+> +				perm = &direct_ro_perms;
+> +			else
+> +				perm = &ecap_perms[cap_id];
+>  
+> -			perm = &ecap_perms[cap_id];
+>  			cap_start = vfio_find_cap_start(vdev, *ppos);
+>  		} else {
+>  			WARN_ON(cap_id > PCI_CAP_ID_MAX);
+
 
