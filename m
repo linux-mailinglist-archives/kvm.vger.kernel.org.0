@@ -1,65 +1,64 @@
-Return-Path: <kvm+bounces-32418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4D29D848E
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:35:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B28D9D84C9
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 12:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFBFE284AB9
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:35:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB3528A445
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2024 11:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BA319645D;
-	Mon, 25 Nov 2024 11:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7D19D886;
+	Mon, 25 Nov 2024 11:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QTikfHGb"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NNmzjnNl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176C3A35;
-	Mon, 25 Nov 2024 11:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3899199EA8;
+	Mon, 25 Nov 2024 11:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732534501; cv=none; b=BL3g12YdMklSq1HcXs6WG9++Q45+Zt+bZfCQh1a7E3wAEWqVcqYWLTBCazYjzqw9UiZNul5fAFRfFm0i3MIV7ExbMsDPVtsNA4yD89J5c6re40aKXZs1ASglW50XL1J4BqpzfRriWWBtPsTp1Wc8tMhczddtH5lIzHzFNyu69jI=
+	t=1732535209; cv=none; b=Faa2CycDtHw6r9/Zvy5h0u2wur/4aMJ/9CG2+2ymOflrJ90Ug4+k4uSaDEOOPLlvbBOrueuWbmA8GJTSgTGZHTfhtJsR/CRb5FUnQi9k7xjw6XJs8jlaTORZZcGeaE1mEKiuhjQ05PihS/gNjAm4Aw0wt3jYUbsLO9Rk+nxqL0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732534501; c=relaxed/simple;
-	bh=nE25ptCziZyt2rMRHylAZKkIrgFhXXYeTgMji1bGAKg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LzZfTOIkNGc4/vwg8yJQ0Zima5EhAfv806hVAJDAdim/vb2qyLONRge+hVcY6+o4z3eXqYDs//MVwJsOJUYpZDpiwDkD85WY20D49pdPKOdznYnbGNBXe2h8ttDyZKkPN368Y05h6IXalifq+/UsYI6QOms1nruxKr7HIrg3xBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QTikfHGb; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732534499; x=1764070499;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nE25ptCziZyt2rMRHylAZKkIrgFhXXYeTgMji1bGAKg=;
-  b=QTikfHGbb0C1mgvnGXy+IoXPPEkGF4xVlsM+CmIt32JV/paUe6EKPCVi
-   PCpzjRv3oypgpCJG54gXTkx+8wxV4s0WqoA8HkXBAQEsTaw3q4bo1ADdK
-   OanAY9Mvq55p/FjNGe++xTBbuixIWdC55nYJyB71CSbv8lXLDGvNIh771
-   6O2vORU3v80MAxesgW9R0xnfl83zFV+SlMjDWe2K3DgFbTtmOmrb00Fz6
-   h7D2N3lVWiCzPyiqBab7x1rws1ZJRIigCTpactW5SlByM31jyE3bxqUMl
-   EunZ1oQLMmMNB/jF4cLTdgLa9VdnyYh+foYnXnf5U4dpbkgAbYfQ4NDnv
-   Q==;
-X-CSE-ConnectionGUID: Y5vE7nf5QjmoGAHOgiIoEg==
-X-CSE-MsgGUID: NKzm5fOATGKhEvTe1XDM8Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11266"; a="50045451"
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="50045451"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 03:34:58 -0800
-X-CSE-ConnectionGUID: 0BxQcY3oQbKrYL87XFVbnw==
-X-CSE-MsgGUID: haB6bASuTg2S/4F5fGHPoQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="122077147"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 03:34:53 -0800
-Message-ID: <87125f6d-8912-41ad-b01f-f6e68f8a6a89@intel.com>
-Date: Mon, 25 Nov 2024 13:34:48 +0200
+	s=arc-20240116; t=1732535209; c=relaxed/simple;
+	bh=FHKaVj40hVdUie0T9IjlT4qkPmKzDnnfQy/AYHnP1aU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GGvKDhAJHaW4M4IEow67q+zegbkMKvZO0/U8Oprrsm33mYihXkYj1bm34Li+yzTRipFRvNAlfnAqjogl4PQYWYigCd7ADZ3F2E/Ffi1RHqwNhyCmL70Lq+GFH0W8Khi9Op0Xh+f4aGC8tOVwHNukWCawgPt/CZ6rKEUPkIJB5W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NNmzjnNl; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732535208; x=1764071208;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=0p7Ckz6iXzDpwC1O2xBQwIygdPDI7wUUkWYzZKFW0BE=;
+  b=NNmzjnNlZlnD+gJWf51Uu2am4QYnK4kfAJ67MiV2xgsCNZtTMsJ32x/b
+   COuUuJeXiu0phSVrjAZx6UEgIp1jj4PG94baPwCTYEJxs/q2+e+uANonb
+   ws+OeUufxK6jkA28Wq35yhca/PeJe26YKO7X9DO5SiMZksGgFyY7CawR8
+   4=;
+X-IronPort-AV: E=Sophos;i="6.12,182,1728950400"; 
+   d="scan'208";a="698062018"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 11:46:44 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:63339]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.206:2525] with esmtp (Farcaster)
+ id 40ec0b3e-9f12-4258-be54-cdb388d9fb84; Mon, 25 Nov 2024 11:46:43 +0000 (UTC)
+X-Farcaster-Flow-ID: 40ec0b3e-9f12-4258-be54-cdb388d9fb84
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 25 Nov 2024 11:46:41 +0000
+Received: from [192.168.8.103] (10.106.83.30) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 25 Nov 2024
+ 11:46:40 +0000
+Message-ID: <a8d78402-6f8d-4ebf-ae8b-1a8f03d33647@amazon.com>
+Date: Mon, 25 Nov 2024 11:46:40 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,59 +66,71 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
- guest TD
-To: Chao Gao <chao.gao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
- weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH 1/4] KVM: guest_memfd: add generic post_populate callback
+To: <michael.day@amd.com>, <pbonzini@redhat.com>, <corbet@lwn.net>,
+	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <jthoughton@google.com>, <brijesh.singh@amd.com>, <michael.roth@amd.com>,
+	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
+	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>
+References: <20241024095429.54052-1-kalyazin@amazon.com>
+ <20241024095429.54052-2-kalyazin@amazon.com>
+ <589ccb59-ae79-49db-8017-f6d28d7f6982@amd.com>
 Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <Z0AbZWd/avwcMoyX@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <589ccb59-ae79-49db-8017-f6d28d7f6982@amd.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D005EUA002.ant.amazon.com (10.252.50.11) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On 22/11/24 07:49, Chao Gao wrote:
->> +static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
->> +
->> +	if (static_cpu_has(X86_FEATURE_XSAVE) &&
->> +	    kvm_host.xcr0 != (kvm_tdx->xfam & kvm_caps.supported_xcr0))
->> +		xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
->> +	if (static_cpu_has(X86_FEATURE_XSAVES) &&
->> +	    /* PT can be exposed to TD guest regardless of KVM's XSS support */
->> +	    kvm_host.xss != (kvm_tdx->xfam &
->> +			 (kvm_caps.supported_xss | XFEATURE_MASK_PT |
->> +			  XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)))
+On 22/11/2024 18:40, Mike Day wrote:
+> On 10/24/24 04:54, Nikita Kalyazin wrote:
+>> This adds a generic implementation of the `post_populate` callback for
+>> the `kvm_gmem_populate`.  The only thing it does is populates the pages
+>> with data provided by userspace if the user pointer is not NULL,
+>> otherwise it clears the pages.
+>> This is supposed to be used by KVM_X86_SW_PROTECTED_VM VMs.
+>>
+>> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+>> ---
+>>   virt/kvm/guest_memfd.c | 21 +++++++++++++++++++++
+>>   1 file changed, 21 insertions(+)
+>>
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 8f079a61a56d..954312fac462 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -620,6 +620,27 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct 
+>> kvm_memory_slot *slot,
+>>   EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
+>>
+>>   #ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
 > 
-> Should we drop CET/PT from this series? I think they are worth a new
-> patch/series.
+> KVM_AMD_SEV can select KVM_GENERIC_PRIVATE_MEM, so to guarantee this is 
+> only for
+> software protection it might be good to use:
 > 
->> +		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
->> +	if (static_cpu_has(X86_FEATURE_PKU) &&
+> #if defined CONFIG_KVM_GENERIC_PRIVATE_MEM && !defined CONFIG_KVM_AMD_SEV
 > 
-> How about using cpu_feature_enabled()? It is used in kvm_load_host_xsave_state()
-> It handles the case where CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS is not
-> enabled.
+> That could end up too verbose so there should probably be some more 
+> concise mechanism
+> to guarantee this generic callback isn't used for a hardware-protected 
+> guest.
 
-Seems reasonable
+Thanks, will make a note for myself for the next iteration.
 
 > 
->> +	    (kvm_tdx->xfam & XFEATURE_MASK_PKRU))
->> +		write_pkru(vcpu->arch.host_pkru);
-> 
-> If host_pkru happens to match the hardware value after TD-exits, the write can
-> be omitted, similar to what is done above for xss and xcr0.
-> 
->> +}
+> Mike
 
 
