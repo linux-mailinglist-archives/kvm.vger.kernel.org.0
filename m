@@ -1,326 +1,193 @@
-Return-Path: <kvm+bounces-32532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D9C9D9B27
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 17:15:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C149D9BAE
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 17:42:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02088283897
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 16:15:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ACF1B32046
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 16:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2601D86ED;
-	Tue, 26 Nov 2024 16:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491FA1D8DE8;
+	Tue, 26 Nov 2024 16:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="md8ezxIP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUxsmg9w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186421CEE97;
-	Tue, 26 Nov 2024 16:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC811D88BF
+	for <kvm@vger.kernel.org>; Tue, 26 Nov 2024 16:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732637744; cv=none; b=Czd65gm9q3gAy34ZOaI0zX6Thh4e6o35dZ/NPxdDf+kWXC4FLNniipkOzogaeOl9GuDqYfK+JyM9miPzih7L7A4q4fEr/MXgee3GhNwarfpBUpl8gWkViGOeuoVKFcpQ7XreB3IhnAkG7S+aeh4n97mqn3fJxUBKIYj9O3XZTs4=
+	t=1732638212; cv=none; b=IdeFBffwMyrKRo+fvpgWJ/CFh89FxzCHbYgi1JdfH9wiJzDol4GtAn9W5BLjflTT9R5gzRV+j9TN2q3pjkEiGayrsBgPMOb0J5/0CS5IQOitt9F8EOxin3FSiO7TqVja2J8L241p4iO+RVEXIMdP4bI6BAJmyMs+7+2c8bBdE9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732637744; c=relaxed/simple;
-	bh=Q8+hLtay609WgkxG3vjfhTRZ0BgS11x/Zs/Jc4NviAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oWZWy9TckAVOsT5q/byf8hAPwAS8YGMJwn4kvy3MtvSc6HMggZ3LGvONR703h4rFgiCe242OmpQba9w3y1XWrgdrnKOBV7H5X4/XlKXxIlbaQjIhimb0C18E83VbfheQD1rGYcyJl0Y/HFWYLJ71toijJxPN2sDN2QsgHyfuhWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=md8ezxIP; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732637741; x=1764173741;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Q8+hLtay609WgkxG3vjfhTRZ0BgS11x/Zs/Jc4NviAU=;
-  b=md8ezxIPGMwLuR3nJoMNC1q82Rvrf433zsN58agtPS6FW7XkjEWfZpE3
-   wZmq3yOIc8WrxcA7ym5ej4xrl5AjpdkJgHjxyC2/mm2l3rKxEHcr2tYaq
-   ATQksLYxTiqc+S9Cwvi+/aXdnF3AeA6MhU0Iy6ZSzsE8KqBhocqaebpm+
-   wrDlCnp2lkq6Le2eHXTT8zgw8AMpducGxRC4xbIVME89uxSizGRLdqOVM
-   Q67ACM66upPBDjpoAJ76vN8H7icRg5gPseFuhBeg/AonUQxJfvd6q4hw4
-   eeH0PqkRmNDHCEWpoi25/NYTex/FE+WMxuGfCiyLueiyTb8JCZ6ijSakd
-   w==;
-X-CSE-ConnectionGUID: RY58rTYGR3O8uLNjn8fBEw==
-X-CSE-MsgGUID: R8JJ1w7uQYSTmAcO0fKAHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11268"; a="44197604"
-X-IronPort-AV: E=Sophos;i="6.12,186,1728975600"; 
-   d="scan'208";a="44197604"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 08:15:40 -0800
-X-CSE-ConnectionGUID: ol9POM1YRhiZjB+nBN1sVQ==
-X-CSE-MsgGUID: 7SLcTtLsRnCcgmJVF5QX9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="96719465"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.81])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 08:15:35 -0800
-Message-ID: <dfa5fd77-09e2-4133-a757-8c407593c6c9@intel.com>
-Date: Tue, 26 Nov 2024 18:15:28 +0200
+	s=arc-20240116; t=1732638212; c=relaxed/simple;
+	bh=dAU0be43lUtaN2A6L3grtUSCSgEAAAvX8KUUVSXRwjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=f6wqofrkKokeSIT3quysVgA8L4hqp8qTMivjrBpt6t95P+0D3Nt79X8FBP5Fu0/57xYw+RkaW6rHaU9YqTHYBHMyGHawV4V1FZRJtqdvRr5T5d70sXLxtVb2qy8FnvGqPhb0hetvqA1pTHCekm2nJw0mdKn1OSR71LcTT6noBR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HUxsmg9w; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732638209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ivxt8DJ1dWfy2xx2RTjyQoRe9uivu7z8Zk3l+EfcnXw=;
+	b=HUxsmg9w2VT+2K9kd2FrJ428wWHHYQBjt8r2P1u7+ZrPjNpQmjo6OqXW9VRtc62rH+NpRT
+	AA0hT0oZ7z5OXT0bib3ERBPLHty7T0rvkOScAmm31yTDcnCoALc928tBiifu6QF4MmDBBu
+	sGsvm8h2xGot4Em/G3vLpQ6dMQNxSQ8=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-dtNLlxrNP4GCHLi9KyrHpw-1; Tue, 26 Nov 2024 11:23:28 -0500
+X-MC-Unique: dtNLlxrNP4GCHLi9KyrHpw-1
+X-Mimecast-MFC-AGG-ID: dtNLlxrNP4GCHLi9KyrHpw
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a78fc19e2aso7813165ab.3
+        for <kvm@vger.kernel.org>; Tue, 26 Nov 2024 08:23:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732638207; x=1733243007;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ivxt8DJ1dWfy2xx2RTjyQoRe9uivu7z8Zk3l+EfcnXw=;
+        b=mimPGvWv18q/cOPK/VnLNyHos3zb6qBH/C2S9jVb3UR+e6+yZOFqVQ1cwNmTGLdS8B
+         yrbFSMWU57JQeuRc4FfNY0pzOcMY3pUOR0qrwzvdpTjwa7PCXO5qVv3OWw9KUe9W7fyC
+         jumgvAVcTsveqiOslWoKbw8Bcw6nrS32MgbyH35HRC1Q6m5ClYYWK0WBD32g/FxgTrtE
+         ggo9bKMPMjMyQHOErdNmfursQ1bdIp5GtqwMtBr4tI+BQSVD+C8PpbPbMkN9x96jZzEx
+         6JVjkdd+2xjC7rxR14EXblZhvOgc0lvVTIFsIhJ5tlmUNHo4y7Wta61ipn7ZoEjT/seY
+         TwWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDnyLnrqKPPaXKt4xzCdknY29P7hc18xAa4U8Qge5DMcMBdL7bdZ+SM78t5jBguJDRnEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxH6vhzZQ7AKsi9hpfQ68/iCXHIY/OE4eI2qXtmCdGuLHWyxIlx
+	r4yswx4x2ujkskjmSfR1v7kJacT9+aQJtvEtSA6fiv5BRwS65NGNRa8Q3PHM7jWGdTgrEhF9JYM
+	JM0Av52XTjMmOzlf8ORd4s+Z9n+hez/MS7gp/DFBpTYSBoRwOZhBg9afcYQ==
+X-Gm-Gg: ASbGncuU/r6UNpJVA4Gr8idVgIDvdsuvAnvtW/msywPBUyUnY6K8PXXHCQavisl02to
+	ivx9LPsmxggp+fML1fTGvnxixbio0daIspqiEfy3I0mZt7hxCL7qU3HvlhY9TIh0utZTxZW6MEJ
+	m+WLBUHSlN3CwoHa8Ds6LFkhvEY2XS6lZtJAVAUzXxkDTOEhCBk7/jEzM//kdZb9pGTivIOjINZ
+	y8ld1Lo1aBow55hGqIUr+Fso1sZ2MC93NpIKEFqGty6e3pMLeDvjA==
+X-Received: by 2002:a05:6602:3422:b0:83a:9c22:23b3 with SMTP id ca18e2360f4ac-842a9dfbbf0mr161475639f.4.1732638207178;
+        Tue, 26 Nov 2024 08:23:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7yBcF8QGmX0RFK+b0OweHjpaMg/80iAkfPiQX0P06wmNUXD4tI5AyuiJKVGmOlGB9GDEfHg==
+X-Received: by 2002:a05:6602:3422:b0:83a:9c22:23b3 with SMTP id ca18e2360f4ac-842a9dfbbf0mr161474939f.4.1732638206805;
+        Tue, 26 Nov 2024 08:23:26 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e20e45c0e7sm728566173.119.2024.11.26.08.23.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2024 08:23:26 -0800 (PST)
+Date: Tue, 26 Nov 2024 09:23:24 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v6.13-rc1
+Message-ID: <20241126092324.272debec.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/7] KVM: TDX: vcpu_run: save/restore host state(host
- kernel gs)
-To: Nikolay Borisov <nik.borisov@suse.com>, pbonzini@redhat.com,
- seanjc@google.com, kvm@vger.kernel.org, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
- reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
- x86@kernel.org, yan.y.zhao@intel.com, chao.gao@intel.com,
- weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-4-adrian.hunter@intel.com>
- <657c5837-2b65-4f56-afa3-3fad2cd47c5e@suse.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <657c5837-2b65-4f56-afa3-3fad2cd47c5e@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 25/11/24 16:12, Nikolay Borisov wrote:
-> 
-> 
-> On 21.11.24 г. 22:14 ч., Adrian Hunter wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> On entering/exiting TDX vcpu, preserved or clobbered CPU state is different
->> from the VMX case. Add TDX hooks to save/restore host/guest CPU state.
->> Save/restore kernel GS base MSR.
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> TD vcpu enter/exit v1:
->>   - Clarify comment (Binbin)
->>   - Use lower case preserved and add the for VMX in log (Tony)
->>   - Fix bisectability issue with includes (Kai)
->> ---
->>   arch/x86/kvm/vmx/main.c    | 24 ++++++++++++++++++--
->>   arch/x86/kvm/vmx/tdx.c     | 46 ++++++++++++++++++++++++++++++++++++++
->>   arch/x86/kvm/vmx/tdx.h     |  4 ++++
->>   arch/x86/kvm/vmx/x86_ops.h |  4 ++++
->>   4 files changed, 76 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
->> index 44ec6005a448..3a8ffc199be2 100644
->> --- a/arch/x86/kvm/vmx/main.c
->> +++ b/arch/x86/kvm/vmx/main.c
->> @@ -129,6 +129,26 @@ static void vt_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>       vmx_vcpu_load(vcpu, cpu);
->>   }
->>   +static void vt_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->> +{
->> +    if (is_td_vcpu(vcpu)) {
->> +        tdx_prepare_switch_to_guest(vcpu);
->> +        return;
->> +    }
->> +
->> +    vmx_prepare_switch_to_guest(vcpu);
->> +}
->> +
->> +static void vt_vcpu_put(struct kvm_vcpu *vcpu)
->> +{
->> +    if (is_td_vcpu(vcpu)) {
->> +        tdx_vcpu_put(vcpu);
->> +        return;
->> +    }
->> +
->> +    vmx_vcpu_put(vcpu);
->> +}
->> +
->>   static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
->>   {
->>       if (is_td_vcpu(vcpu))
->> @@ -250,9 +270,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->>       .vcpu_free = vt_vcpu_free,
->>       .vcpu_reset = vt_vcpu_reset,
->>   -    .prepare_switch_to_guest = vmx_prepare_switch_to_guest,
->> +    .prepare_switch_to_guest = vt_prepare_switch_to_guest,
->>       .vcpu_load = vt_vcpu_load,
->> -    .vcpu_put = vmx_vcpu_put,
->> +    .vcpu_put = vt_vcpu_put,
->>         .update_exception_bitmap = vmx_update_exception_bitmap,
->>       .get_feature_msr = vmx_get_feature_msr,
->> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->> index 5fa5b65b9588..6e4ea2d420bc 100644
->> --- a/arch/x86/kvm/vmx/tdx.c
->> +++ b/arch/x86/kvm/vmx/tdx.c
->> @@ -1,6 +1,7 @@
->>   // SPDX-License-Identifier: GPL-2.0
->>   #include <linux/cleanup.h>
->>   #include <linux/cpu.h>
->> +#include <linux/mmu_context.h>
->>   #include <asm/tdx.h>
->>   #include "capabilities.h"
->>   #include "mmu.h"
->> @@ -9,6 +10,7 @@
->>   #include "vmx.h"
->>   #include "mmu/spte.h"
->>   #include "common.h"
->> +#include "posted_intr.h"
->>     #include <trace/events/kvm.h>
->>   #include "trace.h"
->> @@ -605,6 +607,9 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->>       if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
->>           vcpu->arch.xfd_no_write_intercept = true;
->>   +    tdx->host_state_need_save = true;
->> +    tdx->host_state_need_restore = false;
-> 
-> nit: Rather than have 2 separate values which actually work in tandem, why not define a u8 or even u32 and have a mask of the valid flags.
-> 
-> So you can have something like:
-> 
-> #define SAVE_HOST BIT(0)
-> #define RESTORE_HOST BIT(1)
-> 
-> tdx->state_flags = SAVE_HOST
-> 
-> I don't know what are the plans for the future but there might be cases where you can have more complex flags composed of more simple ones.
-> 
+Hi Linus,
 
-There are really only 3 possibilities:
+The following changes since commit 81983758430957d9a5cb3333fe324fd70cf63e7e:
 
-	initial state (or after tdx_prepare_switch_to_host())
-		tdx->host_state_need_save = true;
-		tdx->host_state_need_restore = false;
-	After save (i.e. after tdx_prepare_switch_to_guest())
-		tdx->host_state_need_save = false
-		tdx->host_state_need_restore = false;
-	After enter/exit (i.e. after tdx_vcpu_enter_exit())
-		tdx->host_state_need_save = false
-		tdx->host_state_need_restore = true;
+  Linux 6.12-rc5 (2024-10-27 12:52:02 -1000)
 
-I can't think of good names, perhaps:
+are available in the Git repository at:
 
-enum tdx_prepare_switch_state {
-	TDX_PREP_UNSAVED,
-	TDX_PREP_SAVED,
-	TDX_PREP_UNRESTORED,
-};
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.13-rc1
 
->>       tdx->state = VCPU_TD_STATE_UNINITIALIZED;
->>         return 0;
->> @@ -631,6 +636,45 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>       local_irq_enable();
->>   }
->>   +/*
->> + * Compared to vmx_prepare_switch_to_guest(), there is not much to do
->> + * as SEAMCALL/SEAMRET calls take care of most of save and restore.
->> + */
->> +void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->> +{
->> +    struct vcpu_tdx *tdx = to_tdx(vcpu);
->> +
->> +    if (!tdx->host_state_need_save)
-> if (!(tdx->state_flags & SAVE_HOST))
+for you to fetch changes up to fe4bf8d0b6716a423b16495d55b35d3fe515905d:
 
-	if (tdx->prep_switch_state != TDX_PREP_UNSAVED)
+  vfio/pci: Properly hide first-in-list PCIe extended capability (2024-11-25 08:34:22 -0700)
 
->> +        return;
->> +
->> +    if (likely(is_64bit_mm(current->mm)))
->> +        tdx->msr_host_kernel_gs_base = current->thread.gsbase;
->> +    else
->> +        tdx->msr_host_kernel_gs_base = read_msr(MSR_KERNEL_GS_BASE);
->> +
->> +    tdx->host_state_need_save = false;
-> 
-> tdx->state &= ~SAVE_HOST
+----------------------------------------------------------------
+VFIO updates for v6.13
 
-	tdx->prep_switch_state = TDX_PREP_SAVED;
+ - Constify an unmodified structure used in linking vfio and kvm.
+   (Christophe JAILLET)
 
->> +}
->> +
->> +static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
->> +{
->> +    struct vcpu_tdx *tdx = to_tdx(vcpu);
->> +
->> +    tdx->host_state_need_save = true;
->> +    if (!tdx->host_state_need_restore)
-> if (!(tdx->state_flags & RESTORE_HOST)
+ - Add ID for an additional hardware SKU supported by the nvgrace-gpu
+   vfio-pci variant driver. (Ankit Agrawal)
 
-	if (tdx->prep_switch_state != TDX_PREP_UNRESTORED)
+ - Fix incorrect signed cast in QAT vfio-pci variant driver, negating
+   test in check_add_overflow(), though still caught by later tests.
+   (Giovanni Cabiddu)
 
-> 
->> +        return;
->> +
->> +    ++vcpu->stat.host_state_reload;
->> +
->> +    wrmsrl(MSR_KERNEL_GS_BASE, tdx->msr_host_kernel_gs_base);
->> +    tdx->host_state_need_restore = false;
+ - Additional debugfs attributes exposed in hisi_acc vfio-pci variant
+   driver for migration debugging. (Longfang Liu)
 
-	tdx->prep_switch_state = TDX_PREP_UNSAVED;
+ - Migration support is added to the virtio vfio-pci variant driver,
+   becoming the primary feature of the driver while retaining emulation
+   of virtio legacy support as a secondary option. (Yishai Hadas)
 
->> +}
->> +
->> +void tdx_vcpu_put(struct kvm_vcpu *vcpu)
->> +{
->> +    vmx_vcpu_pi_put(vcpu);
->> +    tdx_prepare_switch_to_host(vcpu);
->> +}
->> +
->>   void tdx_vcpu_free(struct kvm_vcpu *vcpu)
->>   {
->>       struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
->> @@ -732,6 +776,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>         tdx_vcpu_enter_exit(vcpu);
->>   +    tdx->host_state_need_restore = true;
-> 
-> tdx->state_flags |= RESTORE_HOST
+ - Fixes to a few unwind flows in the mlx5 vfio-pci driver discovered
+   through reviews of the virtio variant driver. (Yishai Hadas)
 
-	tdx->prep_switch_state = TDX_PREP_UNRESTORED;
+ - Fix an unlikely issue where a PCI device exposed to userspace with
+   an unknown capability at the base of the extended capability chain
+   can overflow an array index. (Avihai Horon)
 
-> 
->> +
->>       vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
->>       trace_kvm_exit(vcpu, KVM_ISA_VMX);
->>   diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
->> index ebee1049b08b..48cf0a1abfcc 100644
->> --- a/arch/x86/kvm/vmx/tdx.h
->> +++ b/arch/x86/kvm/vmx/tdx.h
->> @@ -54,6 +54,10 @@ struct vcpu_tdx {
->>       u64 vp_enter_ret;
->>         enum vcpu_tdx_state state;
->> +
->> +    bool host_state_need_save;
->> +    bool host_state_need_restore;
-> 
-> this would save having a discrete member for those boolean checks.
-> 
->> +    u64 msr_host_kernel_gs_base;
->>   };
->>     void tdh_vp_rd_failed(struct vcpu_tdx *tdx, char *uclass, u32 field, u64 err);
->> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
->> index 3d292a677b92..5bd45a720007 100644
->> --- a/arch/x86/kvm/vmx/x86_ops.h
->> +++ b/arch/x86/kvm/vmx/x86_ops.h
->> @@ -130,6 +130,8 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu);
->>   void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->>   void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->>   fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit);
->> +void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
->> +void tdx_vcpu_put(struct kvm_vcpu *vcpu);
->>     int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
->>   @@ -161,6 +163,8 @@ static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediat
->>   {
->>       return EXIT_FASTPATH_NONE;
->>   }
->> +static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
->> +static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
->>     static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
->>   
-> 
+----------------------------------------------------------------
+Ankit Agrawal (1):
+      vfio/nvgrace-gpu: Add a new GH200 SKU to the devid table
+
+Avihai Horon (1):
+      vfio/pci: Properly hide first-in-list PCIe extended capability
+
+Christophe JAILLET (1):
+      kvm/vfio: Constify struct kvm_device_ops
+
+Giovanni Cabiddu (1):
+      vfio/qat: fix overflow check in qat_vf_resume_write()
+
+Longfang Liu (4):
+      hisi_acc_vfio_pci: extract public functions for container_of
+      hisi_acc_vfio_pci: create subfunction for data reading
+      hisi_acc_vfio_pci: register debugfs for hisilicon migration driver
+      Documentation: add debugfs description for hisi migration
+
+Yishai Hadas (9):
+      virtio_pci: Introduce device parts access commands
+      virtio: Extend the admin command to include the result size
+      virtio: Manage device and driver capabilities via the admin commands
+      virtio-pci: Introduce APIs to execute device parts admin commands
+      vfio/virtio: Add support for the basic live migration functionality
+      vfio/virtio: Add PRE_COPY support for live migration
+      vfio/virtio: Enable live migration once VIRTIO_PCI was configured
+      vfio/mlx5: Fix an unwind issue in mlx5vf_add_migration_pages()
+      vfio/mlx5: Fix unwind flows in mlx5vf_pci_save/resume_device_data()
+
+ Documentation/ABI/testing/debugfs-hisi-migration |   25 +
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c   |  266 ++++-
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h   |   19 +
+ drivers/vfio/pci/mlx5/cmd.c                      |    6 +-
+ drivers/vfio/pci/mlx5/main.c                     |   35 +-
+ drivers/vfio/pci/nvgrace-gpu/main.c              |    2 +
+ drivers/vfio/pci/qat/main.c                      |    2 +-
+ drivers/vfio/pci/vfio_pci_config.c               |   16 +-
+ drivers/vfio/pci/virtio/Kconfig                  |   42 +-
+ drivers/vfio/pci/virtio/Makefile                 |    3 +-
+ drivers/vfio/pci/virtio/common.h                 |  127 ++
+ drivers/vfio/pci/virtio/legacy_io.c              |  418 +++++++
+ drivers/vfio/pci/virtio/main.c                   |  476 ++------
+ drivers/vfio/pci/virtio/migrate.c                | 1337 ++++++++++++++++++++++
+ drivers/virtio/virtio_pci_common.h               |   19 +-
+ drivers/virtio/virtio_pci_modern.c               |  457 +++++++-
+ include/linux/virtio.h                           |    1 +
+ include/linux/virtio_pci_admin.h                 |   11 +
+ include/uapi/linux/virtio_pci.h                  |  131 +++
+ virt/kvm/vfio.c                                  |    2 +-
+ 20 files changed, 2920 insertions(+), 475 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
+ create mode 100644 drivers/vfio/pci/virtio/common.h
+ create mode 100644 drivers/vfio/pci/virtio/legacy_io.c
+ create mode 100644 drivers/vfio/pci/virtio/migrate.c
 
 
