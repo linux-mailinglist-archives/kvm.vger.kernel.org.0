@@ -1,86 +1,88 @@
-Return-Path: <kvm+bounces-32522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CAB09D9713
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 13:13:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0236E9D9732
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 13:22:12 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2415DB2A391
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 12:12:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1791651A0
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 12:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8DC1D1F4B;
-	Tue, 26 Nov 2024 12:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FBA1D12E0;
+	Tue, 26 Nov 2024 12:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JOj/lRRc"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CgCV91id"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5935483A17;
-	Tue, 26 Nov 2024 12:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D521CF5EC;
+	Tue, 26 Nov 2024 12:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732623115; cv=none; b=bztPd98aKfeuLadrP6i9/Nnt6B3W0c4Pvz3BGO7wMm2VybEWozF5y32atbwMOD36jrnURFagK332untuxooY1mIxlN3FKgHkCplQeoe2Tnz1NRt7Cgr9oYumaZYLLGMPQN1cM13agpAHKS75HAycms8MrjEL1d+qZoVQ67qjlVs=
+	t=1732623722; cv=none; b=GHeA0+XT1NZaCE4LB9Io8KoNzQ+Qy/gFF7zXGb6luv0NzGjxPi7C6Z+PkuIncLCS0UnnaOwFWqcy7rqxcN1mEtlceTlWrs4tIYwOe5DX4ynOkhKo4+V5RkkrpwmtKKFKyPyT5X/ZuFPg2e1spnU1DLkItpDf6qBLJeubmemJQRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732623115; c=relaxed/simple;
-	bh=oK74cs31TwNFDwrGbGtC0jLLF04cMI4xgHDEe49zBEE=;
+	s=arc-20240116; t=1732623722; c=relaxed/simple;
+	bh=Lb5b7gjijv5h+7cZ9uoPLYZB+/voErDLAPOz7AAgPJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O3wZdlg6OaS8AHziIiLwOA9j2lpIb4wUbPG5z6tIkhxGYKwGE+J6Y1M+3c57jeHa0tYW/nKVES1uRCIpgY/fYIONWDBHW488omv94I/Ml8GJdIZ56I2NYAAZehqN1/0o3Sbb+jJ+0flTYZDD/shuvEYlO2EAATNn3Y1X6+aUelE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JOj/lRRc; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version:Content-Type; b=arkTqshvDImqSz1nU+48kqbD4l0yz2XkTg4MlKsClDdUdwJokjk11QW2OieHRH3E8yPhm4R3q9B0+Ks/whFcp6KML5nFbog7SHbeyvv/BzZz0wVevf+SNDfJ67fdKqOMvnYPDIIeqo4zPCoqnE+E82DNzGGeKnqPmUjRPLLsDas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CgCV91id; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQA7JTi026552;
-	Tue, 26 Nov 2024 12:11:51 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQ5p1AB010886;
+	Tue, 26 Nov 2024 12:21:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=z1IU+0
-	x4b4dxL2eBll1QY/bWdljyFYdCzH0R4nmZI34=; b=JOj/lRRchtBEDZwelC/v5S
-	u0aWib7fqfXU2t0El3Gt4Yd/i4PuKQydHZY+OHK3mjTmbvHwHE/10vmf373IbOtA
-	gNsR+MreMCOSZxOu75YwTzEn2EJWM5WGywRDWz2+W2wRjoS1Yz7o3D6fmjHg8aBV
-	yE+ur/81fRvkL3N2yu5/DpWi62kZez6snXYT3maAPJ+1xr6BiMKwnvHcOAWvhz1d
-	AGhFrAZfo/3doQPBXXwxLDMHCrJAbZjZk4mef3K9nfemzCRl3izU10PHX8Y1jfvM
-	vKyrzInCaNQ6qoI+1CtA9tfUk/XS0ptbVv21U1Si6js3CdMyWoqZU32PwDjoFKIA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=HBPyy+
+	o8mzVbP3YoSjpj+Fhyb6Py7hZ+KR1ucAo9+Hs=; b=CgCV91id1Y9hCAvnPjcX+l
+	8m9GISkR9wFnH6CdKY0cw5mWLWAq6jvIlPxliuOhO45tNs71ptn757mLuvKYbanT
+	YZZWq8LYfeSCs8W+Ne/Winlls5YRMelSW0n6aTYm8wBLzZa4mw7mnWyuUxlBYcGb
+	MSz/1HUWK8AZhFQsPn7MNQ3EdoOMQP7d0NJWTsbYWgUuf3WnQ6VFbWCV/MUdourW
+	0f1Z35BiGIJD6Ne8CIjRAD41YjvXsUS1cXS2ayvNN7Hpeob8kSEok/1iOndww12W
+	YtKN9/Vn6TEoKlLzVleA/1LjmWe15bB+1cJN0vrNR69O99vr84YsRe4hu8mqGkdg
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4350rhk7m0-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43386jwftd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Nov 2024 12:11:51 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQ3xdB7027470;
-	Tue, 26 Nov 2024 12:11:50 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 433ukj4aw8-1
+	Tue, 26 Nov 2024 12:21:58 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQ45loe003114;
+	Tue, 26 Nov 2024 12:21:57 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 433tcmcdpr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Nov 2024 12:11:50 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AQCBke955771500
+	Tue, 26 Nov 2024 12:21:57 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AQCLrWB20251042
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Nov 2024 12:11:46 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBECF20043;
-	Tue, 26 Nov 2024 12:11:46 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 89F2820040;
-	Tue, 26 Nov 2024 12:11:46 +0000 (GMT)
+	Tue, 26 Nov 2024 12:21:53 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B7CAE20049;
+	Tue, 26 Nov 2024 12:21:53 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9385420040;
+	Tue, 26 Nov 2024 12:21:53 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 Nov 2024 12:11:46 +0000 (GMT)
-Date: Tue, 26 Nov 2024 13:11:44 +0100
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 26 Nov 2024 12:21:53 +0000 (GMT)
+Date: Tue, 26 Nov 2024 13:21:52 +0100
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank
- <frankja@linux.ibm.com>,
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] KVM: s390: Couple of small cmpxchg()
- optimizations
-Message-ID: <20241126131144.0a076101@p-imbrenda>
-In-Reply-To: <20241126102515.3178914-1-hca@linux.ibm.com>
+Subject: Re: [PATCH v2 3/3] KVM: s390: Increase size of union sca_utility to
+ four bytes
+Message-ID: <20241126132152.3dc746e7@p-imbrenda>
+In-Reply-To: <2d3862ea-4112-4a03-9e4b-ac4e8e23a7f4@linux.ibm.com>
 References: <20241126102515.3178914-1-hca@linux.ibm.com>
+	<20241126102515.3178914-4-hca@linux.ibm.com>
+	<2d3862ea-4112-4a03-9e4b-ac4e8e23a7f4@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -92,63 +94,62 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IZ6z6AJwRAl1qDa--NiJF6Vnq671tAeO
-X-Proofpoint-ORIG-GUID: IZ6z6AJwRAl1qDa--NiJF6Vnq671tAeO
+X-Proofpoint-ORIG-GUID: hJCDb6B0ISbIclv93TnTg2qWuEg1w0PO
+X-Proofpoint-GUID: hJCDb6B0ISbIclv93TnTg2qWuEg1w0PO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 mlxlogscore=767 bulkscore=0
- spamscore=0 impostorscore=0 mlxscore=0 suspectscore=0 malwarescore=0
- adultscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ mlxlogscore=878 spamscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2409260000 definitions=main-2411260097
 
-On Tue, 26 Nov 2024 11:25:12 +0100
-Heiko Carstens <hca@linux.ibm.com> wrote:
+On Tue, 26 Nov 2024 13:09:56 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-looks good, and it's a follow-up of your cmpxchg series, so I think it
-should go through the s390 kernel tree
+> On 11/26/24 11:25 AM, Heiko Carstens wrote:
+> [...]
+> >   union sca_utility {  
+> 
+> Would you mind adding a comment?
+> 
+> 
+> ""Utility is defined as 2 bytes but having it 4 bytes wide generates 
+> more efficient code. Since the following bytes are reserved this makes 
+> no functional difference.""
 
-(but please try to add the comment in patch 3)
+looks good, thanks!
 
-> v2:
-> - Replace broken WRITE_ONCE(..., 9) with intended WRITE_ONCE(..., 0).
 > 
-> v1:
-> Use try_cmpxchg() instead of cmpxchg() so compilers with flag output
-> operand support (gcc 14 and newer) can generate slightly better code.
-> 
-> Also get rid of two cmpxchg() usages on one/two byte memory areas
-> which generates inefficient code.
-> 
-> bloat-o-meter statistics of the kvm module:
-> 
-> add/remove: 0/0 grow/shrink: 0/11 up/down: 0/-318 (-318)
-> Function                                     old     new   delta
-> kvm_s390_handle_wait                         886     880      -6
-> kvm_s390_gisa_destroy                        226     220      -6
-> kvm_s390_gisa_clear                           96      90      -6
-> ipte_unlock                                  380     372      -8
-> kvm_s390_gisc_unregister                     270     260     -10
-> kvm_s390_gisc_register                       290     280     -10
-> gisa_vcpu_kicker                             200     190     -10
-> account_mem                                  250     232     -18
-> ipte_lock                                    416     368     -48
-> kvm_s390_update_topology_change_report       174     122     -52
-> kvm_s390_clear_local_irqs                    420     276    -144
-> Total: Before=316521, After=316203, chg -0.10%
-> 
-> Heiko Carstens (3):
->   KVM: s390: Use try_cmpxchg() instead of cmpxchg() loops
->   KVM: s390: Remove one byte cmpxchg() usage
->   KVM: s390: Increase size of union sca_utility to four bytes
-> 
->  arch/s390/include/asm/kvm_host.h | 10 +++++-----
->  arch/s390/kvm/gaccess.c          | 16 ++++++++--------
->  arch/s390/kvm/interrupt.c        | 25 ++++++++-----------------
->  arch/s390/kvm/kvm-s390.c         |  4 ++--
->  arch/s390/kvm/pci.c              |  5 ++---
->  5 files changed, 25 insertions(+), 35 deletions(-)
+> > -	__u16 val;
+> > +	__u32 val;
+> >   	struct {
+> > -		__u16 mtcr : 1;
+> > -		__u16 reserved : 15;
+> > +		__u32 mtcr : 1;
+> > +		__u32	   : 31;
+> >   	};
+> >   };
+> >   
+> > @@ -107,7 +107,7 @@ struct bsca_block {
+> >   	__u64	reserved[5];
+> >   	__u64	mcn;
+> >   	union sca_utility utility;
+> > -	__u8	reserved2[6];
+> > +	__u8	reserved2[4];
+> >   	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
+> >   };
+> >   
+> > @@ -115,7 +115,7 @@ struct esca_block {
+> >   	union ipte_control ipte_control;
+> >   	__u64   reserved1[6];
+> >   	union sca_utility utility;
+> > -	__u8	reserved2[6];
+> > +	__u8	reserved2[4];
+> >   	__u64   mcn[4];
+> >   	__u64   reserved3[20];
+> >   	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];  
 > 
 
 
