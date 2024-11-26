@@ -1,197 +1,119 @@
-Return-Path: <kvm+bounces-32538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADC99D9CAA
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 18:37:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D0669D9D13
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 19:03:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 863ABB25C4C
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 17:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAD7281B6E
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2024 18:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744771DB95E;
-	Tue, 26 Nov 2024 17:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6919A1DD88E;
+	Tue, 26 Nov 2024 18:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcW+Xt6s"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Zidi2ytE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33CC1DB37A
-	for <kvm@vger.kernel.org>; Tue, 26 Nov 2024 17:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53B2BA3F;
+	Tue, 26 Nov 2024 18:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732642476; cv=none; b=X5CO83nN+J34/OyVPIgB9KyHlTVft4Ot8QhMdmiqZbfmD+68RPblwZAMmrxQWv0kkbT68oXMJ5B5Ar+aGzjB2LhD0YlIF1990IwHtZry8TKcFtggWQ4ZbkYT4WrsdipBZi+yefWi8HqcgGkTuSJOHEQlArClzNkkaHNZRNQByNA=
+	t=1732644205; cv=none; b=DbilFGQsX9kmu70Nv1avLhVkLadldexoBKmSV33uGtIREOp+RK3VhFdAAyimojTcEK9ob9W+UrJJdYpfvEMao1O+s56YXKWCaLLDRuOdvhZpOS9HgrCAnX31XMXuV5J8HloNM3O3iz8kJ+eRNpgxRRSAbZy+2TWfttLSSMIPfYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732642476; c=relaxed/simple;
-	bh=q0ByMNEhaDTQ+lVxcgSDW/TcfhsWETINpjBWwEnqHpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZRRLkCgV75S+ZIhU3MdjM/AbaIis2BV1e+nsXubd5In16Ju/wlM2J9/C7BcjNeH3gXwN9Mu2D5ZV+ElYHKHD1DWBp/47EnVdFcAAP3ssuKGSWihIN0PHHwK97hjYG0Y31TP+PHYRtyAqoGTlWN41eg/RbSZVGYgD4LScToqVUFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gcW+Xt6s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732642473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EUxCmRnLlbMlBvYmauG+9LwobFkOeocCMONjDJD4aRM=;
-	b=gcW+Xt6sirbkynGRHpaNF6Xn1Z4eylbkX71l4lseiO+0iQwdBl14ev64iXqCuz7QF9dFBH
-	5IhsIGXB1nFAZX+4e/xheB5BcejYr7da/3rJnsonV1Hk1+cg+A7A9dMemMDa7WTQQT161p
-	BSZSNaRBKAMl1+r06h5FfTsVxx5Gv7M=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-5UfzMG0VPESB7Kg_TXnv3Q-1; Tue, 26 Nov 2024 12:34:32 -0500
-X-MC-Unique: 5UfzMG0VPESB7Kg_TXnv3Q-1
-X-Mimecast-MFC-AGG-ID: 5UfzMG0VPESB7Kg_TXnv3Q
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-841953497e2so6575939f.1
-        for <kvm@vger.kernel.org>; Tue, 26 Nov 2024 09:34:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732642472; x=1733247272;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EUxCmRnLlbMlBvYmauG+9LwobFkOeocCMONjDJD4aRM=;
-        b=ebkHiTVnfyjIiyNoClAOGypdjjaGRDu79DgRbwx0MBBTYAD58G135eCZt5PEVpBaDg
-         1Aj8/mVRidUWT27Tjp2+iJqIuersKkn5VxCDdYkMwOqOrHD0Odn9dQwDMUJKFJqAiLBc
-         9YT7mmYE9rKwLftGM/y+tYdJv8T4+1oKYxBcRJxCxDVVeY2xKKaJ2811Obsyqfoup3XV
-         4/D1upyse9VinSKEKofT7TgEl0tbxc0x/XquoJw7eOuauWlLsLAewC6fBB92u1kCFLS8
-         otxZCNHM0mYBqPNGuLDHKhLtfjhjNI2fcLcozw25xLCJRn+LFgAjSLV6H5xWj+0M+eMU
-         9ezw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5vNsmUTApZgAnp/l0WlmnvpO6AaZHLLrrpeShbLw5C7KGd/zLPihJpAon9mQhKN5d6jI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxEyAL7QD667m+Ad0fJ1u9x2oYcJf9lC/blk0u74DtTrkVVQe4
-	9RqhQ22itKVPOesG5tQLKWQunivGbG/eXhEQf3fpykaD2m80jFf3TNmAkemS8bZlBKrd3zwBs3A
-	Vf1mTtnLIFnnAJCBEJstPL/Kr4Dg98qlB26uQN6Dr+JTf/FwKLQ==
-X-Gm-Gg: ASbGncs3lftGqz4R9S3Bf63T6mzDnkP9whGsm/Sgd/Wfl4KQeHougOCSNqvTyYK2AcH
-	tSWkCS9JTzJOnYcnWbBvSc6x6AeeNST4SY5PbZvLArKcy+EbyyA/BiLBASFfSrM8kOiqJFdyeG7
-	0CPuVW5bEmcqtWy7qcym4PTJlYRMYB7CqeI37r14kLfl3mOs96CZSJOPAv3giox0cGKUmHXnFxc
-	qlXJE8gu51d3LCox6cCV/aWD0v7tBAigo21FxR/sRlqT6l1er0uPQ==
-X-Received: by 2002:a92:cda4:0:b0:3a7:bc95:bbd6 with SMTP id e9e14a558f8ab-3a7bc95bcb8mr10966955ab.6.1732642471735;
-        Tue, 26 Nov 2024 09:34:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHlDEOpooeRabFqJWdYwePFt6/rb7FbwwqP2DVATOmqA2U8r9tTin22BuAaFzu1Ts7X6p4YgQ==
-X-Received: by 2002:a92:cda4:0:b0:3a7:bc95:bbd6 with SMTP id e9e14a558f8ab-3a7bc95bcb8mr10966885ab.6.1732642471290;
-        Tue, 26 Nov 2024 09:34:31 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a79ab86c77sm22706925ab.4.2024.11.26.09.34.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 09:34:30 -0800 (PST)
-Date: Tue, 26 Nov 2024 10:34:27 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Mitchell Augustin <mitchell.augustin@canonical.com>
-Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, Bjorn Helgaas
- <bhelgaas@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: drivers/pci: (and/or KVM): Slow PCI initialization during VM
- boot with passthrough of large BAR Nvidia GPUs on DGX H100
-Message-ID: <20241126103427.42d21193.alex.williamson@redhat.com>
-In-Reply-To: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
-References: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1732644205; c=relaxed/simple;
+	bh=pdTTYo9kWZLupUThwzWLuDxQW1iSfan8aDIdO59wlHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Emp2do7jzZt3Zm1E5EN2pJOkooo//OJ1n7Kg7Gp9I4QmzMV3cQEIqYre59xwq03t/E7eEsjr4oMGi+vQU0Fq138rFJH/D2qLGLUur9itukJS84bNmytTn3w9boD8D3YB0VabsMTHeAbatRpsK9s4qKASUF3G6TD3dcKXao7utYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Zidi2ytE; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0D33440E021C;
+	Tue, 26 Nov 2024 18:03:20 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id f21JIecHF2Fy; Tue, 26 Nov 2024 18:03:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1732644195; bh=Bsaddr8mpxbj3IJtqOhkqhnOoXM0E17G8MEuaDojGgE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zidi2ytEhPpWQcHKUSX8k4v//KDnDq+1A7lILhnoHDD82yxmurlw3wsUwKCKvGadX
+	 BJHnNhX9vjnnL2lXTavQ2A9GkxXUChuQ+tUMMof0JnL/tGKvnPHi5dxEB+o7vZYH/2
+	 hM101JTChjbT7fvWRckcwj1c0NM1ZLrkwuedb3gYQ4WtN7ZD/WEALcRsZGb4k5ifcp
+	 3uBk9lYqd9H9ZFZq7x3Vj97IbhfLa6I6NYkHw5zR8wM4AX7NQ5aAb4d1XZvKjjKviy
+	 X0H5RP4h2tvDoXxgH8lkdWY+ezJSExpEm2d8KH0joDt+Qhhud6IkcT9phY/scZABG8
+	 4+dOWfwJnNhWztZ+iC2cDLBKoOAiCzzdgUAPIugzUQMj6qN335cVlF/7Hzb9cluRY/
+	 kmORErgng+wwhs6iBn+vpPg5Pyu2iiCN1k0NiKsncyQSJ5zWYL6y9PHymUsLHZrpAc
+	 EOhc4VRzep6tHukAX3OZaYzd4ogPcEXyecInHuUIauPGTaisd8mYeWtlb1saX68DRJ
+	 b3wGKvUgrDUSV2Cz7gQmx3UI67K3bhF1Hcxs7DcquXJgpzWzMS5DtHsR7TH1wzDKnL
+	 fz07IlPkpJPw0dKDNISrwdh88526n64ur20yV79VFXG7AleySGeO8L56NPncC/LKM3
+	 0bRAmvpTyg+vELArFUkKhNJY=
+Received: from zn.tnic (pd9530b86.dip0.t-ipconnect.de [217.83.11.134])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C0C1740E01A8;
+	Tue, 26 Nov 2024 18:02:59 +0000 (UTC)
+Date: Tue, 26 Nov 2024 19:02:53 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com
+Subject: Re: [PATCH v3 09/27] KVM: VMX: Do not use
+ MAX_POSSIBLE_PASSTHROUGH_MSRS in array definition
+Message-ID: <20241126180253.GAZ0YNTdXH1UGeqsu6@fat_crate.local>
+References: <20241001050110.3643764-1-xin@zytor.com>
+ <20241001050110.3643764-10-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241001050110.3643764-10-xin@zytor.com>
 
-On Mon, 25 Nov 2024 16:46:29 -0600
-Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
-
-> Hello,
+On Mon, Sep 30, 2024 at 10:00:52PM -0700, Xin Li (Intel) wrote:
+> No need to use MAX_POSSIBLE_PASSTHROUGH_MSRS in the definition of array
+> vmx_possible_passthrough_msrs, as the macro name indicates the _possible_
+> maximum size of passthrough MSRs.
 > 
-> I've been working on a bug regarding slow PCI initialization and BAR
-> assignment times for Nvidia GPUs passed-through to VMs on our DGX H100
-> that I originally believed to be an issue in OVMF, but upon further
-> investigation, I'm now suspecting that it may be an issue somewhere in
-> the kernel. (Here is the original edk2 mailing list thread, with extra
-> context: https://edk2.groups.io/g/devel/topic/109651206) [0]
-> 
-> 
-> When running the 6.12 kernel on a DGX H100 host with 4 GPUs passed
-> through using CPU passthrough and this virt-install command[1], VMs
-> using the latest OVMF version will take around 2 minutes for the guest
-> kernel to boot and initialize PCI devices/BARs for the GPUs.
-> Originally, I was investigating this as an issue in OVMF, because GPU
-> initialization takes much less time when our host is running an OVMF
-> version with this patch[2] removed (which only calculates the MMIO
-> window size differently). Without that patch, the guest kernel does
-> boot quickly, but we can only use the Nvidia GPUs within the guest if
-> `pci=nocrs pci=realloc` are set in the guest (evidently since the MMIO
-> windows advertised by OVMF to the kernel without this patch are
-> incorrect). So, the OVMF patch being present does evidently result in
-> correct MMIO windows and prevent us from needing those kernel options,
-> but the VM boot time is much slower.
-> 
-> 
-> In discussing this, another contributor reported slow PCIe/BAR
-> initialization times for large BAR Nvidia GPUs in Linux when using VMs
-> with SeaBIOS as well. This, combined with me not seeing any slowness
-> when these GPUs are initialized on the host, and the fact that this
-> slowness only happens when CPU passthrough is used, are leading me to
-> suspect that this may actually be a problem somewhere in the KVM or
-> vfio-pci stack. I did also attempt manually setting different MMIO
-> window sizes using the X-PciMmio64Mb OVMF/QEMU knob, and it seems that
-> any MMIO window size large enough to accommodate all GPU memory
-> regions does result in this slower initialization time (but also a
-> valid mapping).
+> Use ARRAY_SIZE instead of MAX_POSSIBLE_PASSTHROUGH_MSRS when the size of
+> the array is needed and add a BUILD_BUG_ON to make sure the actual array
+> size does not exceed the possible maximum size of passthrough MSRs.
 
-The VM needs to be given enough 64-bit MMIO space for the devices, at
-which point the BIOS should be able to fully assign the BARs and then
-pci=nocrs,realloc should not be necessary. 
- 
-> I did some profiling of the guest kernel during boot, and I've
-> identified that it seems like the most time is spent in this
-> pci_write_config_word() call in __pci_read_base() of
-> drivers/pci/probe.c.[3] Each of those pci_write_config_word() calls
-> takes about 2 seconds, but it adds up to a significant chunk of the
-> initialization time since __pci_read_base() is executed somewhere
-> between 20-40 times in my VM boot.
+This commit message needs to talk about the why - not the what. Latter should
+be visible from the diff itself.
 
-A lot happens in the VMM when the memory enable bit is set in the
-command register.  This is when the MMIO BARs of the device enter the
-AddressSpace in QEMU and are caught by the MemoryListener to create DMA
-mappings though the IOMMU.  The BAR space is walked, faulted, and
-mapped.  I'm sure you're at least experiencing scaling issues of that
-with 128GB BARs.
+What you're not talking about is the sneaked increase of
+MAX_POSSIBLE_PASSTHROUGH_MSRS to 64. Something you *should* mention because
+the array is full and blablabla...
 
-Are you seeing __pci_read_base() called 20-40 times repeatedly for a
-given device or in total for the VM boot.  Minimally it needs to be
-called once for every PCI device, so it's not clear to me if you're
-reporting something excessive based on using pci=realloc or there are
-just enough devices to justify this many calls.
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index e0d76d2460ef..e7409f8f28b1 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -356,7 +356,7 @@ struct vcpu_vmx {
+>  	struct lbr_desc lbr_desc;
+>  
+>  	/* Save desired MSR intercept (read: pass-through) state */
+> -#define MAX_POSSIBLE_PASSTHROUGH_MSRS	16
+> +#define MAX_POSSIBLE_PASSTHROUGH_MSRS	64
+						^^^
 
-> As a point of comparison, I measured the time it took to hot-unplug
-> and re-plug these GPUs after the VM booted, and observed much more
-> reasonable times (under 5s for each GPU to re-initialize its memory
-> regions). I've also been trying to get this hotplugging working in VMs
-> where the GPUs aren't initially attached at boot, but in any such
-> configuration, the memory regions for the PCI slots that the GPUs get
-> attached to during hotplug are too small for the full 128GB these GPUs
-> require (and I have yet to figure out a way to fix that. More details
-> on that in [0]).
+-- 
+Regards/Gruss,
+    Boris.
 
-If 5s is the measure of enabling one GPU, the VM BIOS will need to do
-that at least once and the guest OS will need to do that at least once,
-we're up to 4 GPUs * 5s * 2 times = 40s.  If the guest OS toggles
-memory enable more than once, your 2 minute boot time isn't sounding
-too far off.  Then there's also the fact that the VM appears to be
-given 900+GB of RAM, which also needs to be pinned and mapped for DMA
-and there's no indication I can find in virt-install command of using
-hugepages.
-
-There are essentially two things in play here, how long does it take to
-map that BAR into the VM address space, and how many times is it done.
-I know there's room to improve the former.  We just recently added
-kernel support for pgd and pmd large page mapping for pfnmap regions
-and QEMU 9.2-rc includes alignment of vfio-pci BARs to try to optimize
-that towards pgd where possible.  We're still trying to pin individual
-pages though, so percolating the mapping sizes up through the vfio
-IOMMU backend could help.  Thanks,
-
-Alex
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
