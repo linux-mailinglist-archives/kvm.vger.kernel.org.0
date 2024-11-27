@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-32578-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32579-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22C49DAC66
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 18:27:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0188F9DAC6B
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 18:27:59 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8800281FE4
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 17:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 787F61672F0
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 17:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06B920102E;
-	Wed, 27 Nov 2024 17:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83862010FA;
+	Wed, 27 Nov 2024 17:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WGcRtgGn"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j+tKH0gN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1BC201015;
-	Wed, 27 Nov 2024 17:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387D620102E;
+	Wed, 27 Nov 2024 17:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732728439; cv=none; b=C9y7ptXB45qHgcsllwD1iLdQ1KdzKyLZeT3TW0foUwCDlCKnpjkbktVHzcSpPFrv6KgeB9GqkSmHFviu97eUkbzgJ5TexubdzlqrEkFch9oSy5mlxeM+inhNbJ8+8gHwRS/Hxxv0QODBXmF2rJltqGZ/Zr9VLbe4YZIbcdIL15c=
+	t=1732728457; cv=none; b=ohHFhKlAJe8Ja9xZgrzKhTs1oilQO1ZfSxjYlNuUf9pa0LpKZauPW9v2WPm/6vID8r8WlkmU8fPW5ZLVJtHKA2NqZfVafYvkrMwtWYChdaGrr/olE+uv39hqluuViSMo66zxc3HEE6B9ce9f3cFDoF5heMDpgw5iO5B2l51UTns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732728439; c=relaxed/simple;
-	bh=nJBntq5uO6X48ySks1M3TZ3OxhXfIp8sEhnATvW7FYU=;
+	s=arc-20240116; t=1732728457; c=relaxed/simple;
+	bh=hpGMpZFbtZ71ct3nhU4Xj4uf3o+AADoog6oLOcrRNao=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F/VC4lNZ2fTlCiK9tx6DcVnopCSqV4/5yNtsqNUCD7r5T5THcrXM0JqmyU0zLnQM9UhltaL55Zr1OQoneDgJk6YR2xVbJBP/pk8i0v7V0vaOCpkNrGGdxN/CMNOjXRAkA4sZrnD2rOrd2uiAVO/ieFkA6RQJy9Vpm42M8wYqRRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WGcRtgGn; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=reljkdAQoUhGV3ty1WFFQX1a2CdBWXk/UZCtBeVIdsos9wTcDHeYqbND1dL6PXBIxG1rlCgAFKDHSyv60acThet+pqfOorPyT5Vq2ETMr3TvzjKlFkW9N2RocQZwrTjYmvyQKN4SYmHa3dV2fI8gP5Xv6pHF1Ph70+CN7GKTCeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=j+tKH0gN; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732728437; x=1764264437;
+  t=1732728455; x=1764264455;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bOmd4E3lsFVdBvT0oW0OPxVe248CAFYzDYI42KC0ZKg=;
-  b=WGcRtgGn5S3pAXNqlyuzQCIpova0uet8Jd+6PgNKTc5y6KSnk/yBj+Fb
-   xYRz4y2NLvb0gKuLxYjD7I+pnL8/FwnJ5XSC2YzQizC8nCRO/sptoU8jr
-   Xjpbz5jwyYLP1KNoI2MIttw3/kR99yx+zdFYNtDYJeF2xouLcn1ceQ5ER
-   0=;
+  bh=JQ0H5XNdJiVRjtzDcrMcUYqg20cYD9pREmap3E/g000=;
+  b=j+tKH0gNfauzoSvQXD8nnlhAHBR21ADG+7NO3BJEwBf0nBuKw4SWgqut
+   qaQgXYlz/lfnNErY4E9ndwP/uV23tkcts/JGPaOYHvT5ox73mGHiXWC7P
+   k0sLJEn2TNaXZxrhx4w689/V4xrBM9xIWwL9NODJrGWMGk2hbFx2b45yZ
+   U=;
 X-IronPort-AV: E=Sophos;i="6.12,189,1728950400"; 
-   d="scan'208";a="250657947"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.124.125.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2024 17:27:14 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:62956]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.11.83:2525] with esmtp (Farcaster)
- id 6824311c-4883-4800-8acf-dd639e9bec52; Wed, 27 Nov 2024 17:27:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 6824311c-4883-4800-8acf-dd639e9bec52
-Received: from EX19D030EUC001.ant.amazon.com (10.252.61.228) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+   d="scan'208";a="44975132"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2024 17:27:31 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:9102]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.13:2525] with esmtp (Farcaster)
+ id 919d0f07-8187-4c71-9a0c-3fee9f6d1d00; Wed, 27 Nov 2024 17:27:29 +0000 (UTC)
+X-Farcaster-Flow-ID: 919d0f07-8187-4c71-9a0c-3fee9f6d1d00
+Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 27 Nov 2024 17:27:12 +0000
-Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
- EX19D030EUC001.ant.amazon.com (10.252.61.228) with Microsoft SMTP Server
+ Wed, 27 Nov 2024 17:27:26 +0000
+Received: from EX19MTAUEA002.ant.amazon.com (10.252.134.9) by
+ EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 27 Nov 2024 17:27:12 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com
- (10.124.125.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Wed, 27 Nov 2024 17:27:25 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com
+ (10.124.125.2) by mail-relay.amazon.com (10.252.134.34) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Wed, 27 Nov 2024 17:27:12 +0000
+ 15.2.1258.34 via Frontend Transport; Wed, 27 Nov 2024 17:27:25 +0000
 Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
-	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTPS id 572FB40314;
-	Wed, 27 Nov 2024 17:27:09 +0000 (UTC)
+	by email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com (Postfix) with ESMTPS id BD6B6A056C;
+	Wed, 27 Nov 2024 17:27:22 +0000 (UTC)
 From: Nikita Kalyazin <kalyazin@amazon.com>
 To: <pbonzini@redhat.com>, <corbet@lwn.net>, <seanjc@google.com>,
 	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
@@ -71,9 +71,9 @@ To: <pbonzini@redhat.com>, <corbet@lwn.net>, <seanjc@google.com>,
 	<vkuznets@redhat.com>, <xiaoyao.li@intel.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
 CC: <roypat@amazon.co.uk>, <xmarcalx@amazon.com>, <kalyazin@amazon.com>
-Subject: [PATCH 1/2] KVM: x86: async_pf: remove support for KVM_ASYNC_PF_SEND_ALWAYS
-Date: Wed, 27 Nov 2024 17:26:53 +0000
-Message-ID: <20241127172654.1024-2-kalyazin@amazon.com>
+Subject: [PATCH 2/2] KVM: x86: async_pf: determine x86 user as cpl == 3
+Date: Wed, 27 Nov 2024 17:26:54 +0000
+Message-ID: <20241127172654.1024-3-kalyazin@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20241127172654.1024-1-kalyazin@amazon.com>
 References: <20241127172654.1024-1-kalyazin@amazon.com>
@@ -86,86 +86,22 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9 ("x86/kvm: Restrict
-ASYNC_PF to user space") stopped setting KVM_ASYNC_PF_SEND_ALWAYS in
-Linux guests.  While the flag can still be used by legacy guests, the
-mechanism is best effort so KVM is not obliged to use it.
-
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 ---
- Documentation/virt/kvm/x86/msr.rst   | 11 +++++------
- arch/x86/include/asm/kvm_host.h      |  1 -
- arch/x86/include/uapi/asm/kvm_para.h |  2 +-
- arch/x86/kvm/x86.c                   |  4 +---
- 4 files changed, 7 insertions(+), 11 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/x86/msr.rst b/Documentation/virt/kvm/x86/msr.rst
-index 3aecf2a70e7b..b3bbc12b5d03 100644
---- a/Documentation/virt/kvm/x86/msr.rst
-+++ b/Documentation/virt/kvm/x86/msr.rst
-@@ -208,12 +208,11 @@ data:
- 
- 	Bits 5-4 of the MSR are reserved and should be zero. Bit 0 is set to 1
- 	when asynchronous page faults are enabled on the vcpu, 0 when disabled.
--	Bit 1 is 1 if asynchronous page faults can be injected when vcpu is in
--	cpl == 0. Bit 2 is 1 if asynchronous page faults are delivered to L1 as
--	#PF vmexits.  Bit 2 can be set only if KVM_FEATURE_ASYNC_PF_VMEXIT is
--	present in CPUID. Bit 3 enables interrupt based delivery of 'page ready'
--	events. Bit 3 can only be set if KVM_FEATURE_ASYNC_PF_INT is present in
--	CPUID.
-+	Bit 1 is reserved and should be zero. Bit 2 is 1 if asynchronous page
-+	faults are delivered to L1 as #PF vmexits.  Bit 2 can be set only if
-+	KVM_FEATURE_ASYNC_PF_VMEXIT is present in CPUID. Bit 3 enables
-+	interrupt based delivery of 'page ready' events. Bit 3 can only be set
-+	if KVM_FEATURE_ASYNC_PF_INT is present in CPUID.
- 
- 	'Page not present' events are currently always delivered as synthetic
- 	#PF exception. During delivery of these events APF CR2 register contains
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e159e44a6a1b..8ce00b17316f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -975,7 +975,6 @@ struct kvm_vcpu_arch {
- 		u64 msr_int_val; /* MSR_KVM_ASYNC_PF_INT */
- 		u16 vec;
- 		u32 id;
--		bool send_user_only;
- 		u32 host_apf_flags;
- 		bool delivery_as_pf_vmexit;
- 		bool pageready_pending;
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index a1efa7907a0b..5558a1ec3dc9 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -87,7 +87,7 @@ struct kvm_clock_pairing {
- #define KVM_MAX_MMU_OP_BATCH           32
- 
- #define KVM_ASYNC_PF_ENABLED			(1 << 0)
--#define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
-+#define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1) /* deprecated */
- #define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
- #define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
- 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2e713480933a..8f784f07d423 100644
+index 8f784f07d423..168dcf1d4625 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3558,7 +3558,6 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
- 					sizeof(u64)))
- 		return 1;
- 
--	vcpu->arch.apf.send_user_only = !(data & KVM_ASYNC_PF_SEND_ALWAYS);
- 	vcpu->arch.apf.delivery_as_pf_vmexit = data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
- 
- 	kvm_async_pf_wakeup_all(vcpu);
-@@ -13361,8 +13360,7 @@ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
+@@ -13360,7 +13360,7 @@ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
  	if (!kvm_pv_async_pf_enabled(vcpu))
  		return false;
  
--	if (vcpu->arch.apf.send_user_only &&
--	    kvm_x86_call(get_cpl)(vcpu) == 0)
-+	if (kvm_x86_call(get_cpl)(vcpu) == 0)
+-	if (kvm_x86_call(get_cpl)(vcpu) == 0)
++	if (kvm_x86_call(get_cpl)(vcpu) != 3)
  		return false;
  
  	if (is_guest_mode(vcpu)) {
