@@ -1,81 +1,111 @@
-Return-Path: <kvm+bounces-32562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1959DA40C
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 09:39:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B4A9DA471
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 10:05:10 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 114E8283FAE
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 08:39:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0D2166A1A
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 09:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA93189919;
-	Wed, 27 Nov 2024 08:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE5A1922F8;
+	Wed, 27 Nov 2024 09:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sn2pezW0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mediconcil.de (mail.mediconcil.de [91.107.198.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE081114
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 08:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.107.198.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CFF1917C2
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 09:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732696757; cv=none; b=nzWodpVYZZDLOy9wTu7ehsERHetsZp0KwSgh4delOsvK2fo96eU/vbEPSK1yDuEHj/Bsi4LL7HRsHFfh+zNv4LWdYw9OKw8k4Pe5+2bGCiQeSZbOPlXFyeGORO9MNO12n8zh7gF70gC0VzSWylP64rI6zC0dEYQT95G2pmEYXuk=
+	t=1732698299; cv=none; b=haVSACtPE2oPDHDxSZ82xL3toqv1j7/Rr9lfTpaBHuka7oq8Cj9tUR3e8lI1nZwfaXtds6V+8zQvpOw7UQd6oSJObvdb6zDWCQiWFwQLGyyTkuheohjbZuDH4w9x4aAH3EnZUKjxUNNNlVKDiZ/naHiONazHuhSlTR0qsazSrJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732696757; c=relaxed/simple;
-	bh=pKj2gbzhJIvORCFG+atX8uFQZ3fQPLBvZosjinODXRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=erSXSCeO2z8qu29IWuY7ykKmBQcRIoJweQd8fTU+JURhhbWOhHpGqlZ0FCRMoAng580RxhD8QT14CYU2WFfftn5V0WJ0z0N18/q3k8x10YZ+jYrN4wN4/nNEPJhZfUEZdHWzCB1VncCiOb1NyrpgzuKzAhkpGeZH1wUak5Bekds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io; spf=pass smtp.mailfrom=mias.mediconcil.de; arc=none smtp.client-ip=91.107.198.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mias.mediconcil.de
-Received: from bernie by mediconcil.de with local (Exim 4.96)
-	(envelope-from <bernie@mias.mediconcil.de>)
-	id 1tGDZb-008K4B-1C;
-	Wed, 27 Nov 2024 09:38:59 +0100
-Date: Wed, 27 Nov 2024 09:38:59 +0100
-From: Bernhard Kauer <bk@alpico.io>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Bernhard Kauer <bk@alpico.io>, Paolo Bonzini <pbonzini@redhat.com>,
+	s=arc-20240116; t=1732698299; c=relaxed/simple;
+	bh=WkPvhthsAuPWzNVYbj0HobwE43UwtUljTpGfvwmj1bY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PUy4VD0QB9fJWU6cozJFZYYnlzJicFIAeeP9SIx8XaM2FqXcmKlRwbcHJ3Q93gOwh2cCcVzDC3bV/Rx/06i8PeltTTYnjWWAQJDv2iNxxHSZ9XKdrvuSUXoznmLYUCH1K3/7hEgAGgMhTzKNx+S7ZkIcxVeE0zLtoHnHg+xaNjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sn2pezW0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67ECAC4CECC;
+	Wed, 27 Nov 2024 09:04:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732698298;
+	bh=WkPvhthsAuPWzNVYbj0HobwE43UwtUljTpGfvwmj1bY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Sn2pezW0LfJmBJRUQiqXEFHajmYOPyhW8+G4gaq4c1j6bLINa9N9OK9rqoFfM+A8h
+	 8YEtjKOffdlpaMG2By74IsE+zDrdEQWU+rEtNVksXLGfez1xhHg+MBOZgpKNyKmFws
+	 0cKaP9qfVlkTYrKtcQfYSjra7Wx6HmMgAusENL0wwCRJktyenEzuZcxLgeZYPu6KLr
+	 9JqroPVARpKl8/AXRRmo7leUkyfH4IdbJmflSaIu1ZO8I3HshrkkT8fyZm3tlBYc6m
+	 jpBgk1uGwvab6wVabO5Jb5z+rRDeSLdMLJaSnSsMm/xSolrCrMCCHSBH+EcmH7VDcA
+	 /bg+2DerItJdw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tGDyi-00GDPe-8a;
+	Wed, 27 Nov 2024 09:04:56 +0000
+Date: Wed, 27 Nov 2024 09:04:55 +0000
+Message-ID: <86bjy1ujwo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Bernhard Kauer <bk@alpico.io>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org
 Subject: Re: [PATCH] KVM: make uevents configurable
-Message-ID: <Z0bao0moyeDgqBDU@mias.mediconcil.de>
+In-Reply-To: <Z0bao0moyeDgqBDU@mias.mediconcil.de>
 References: <20241122095806.4034415-1-bk@alpico.io>
- <86h67vusnf.wl-maz@kernel.org>
- <Z0Wg0jQLRuAQrl0j@mias.mediconcil.de>
- <86frneutlt.wl-maz@kernel.org>
+	<86h67vusnf.wl-maz@kernel.org>
+	<Z0Wg0jQLRuAQrl0j@mias.mediconcil.de>
+	<86frneutlt.wl-maz@kernel.org>
+	<Z0bao0moyeDgqBDU@mias.mediconcil.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86frneutlt.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: bk@alpico.io, pbonzini@redhat.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 26, 2024 at 11:23:10AM +0000, Marc Zyngier wrote:
-> > > I'm not overly keen on the command-line flag though, as this is the
-> > > sort of things you'd like to be able to control more finely. Or at
-> > > least without having to trigger a reboot.
+On Wed, 27 Nov 2024 08:38:59 +0000,
+Bernhard Kauer <bk@alpico.io> wrote:
+> 
+> On Tue, Nov 26, 2024 at 11:23:10AM +0000, Marc Zyngier wrote:
+> > > > I'm not overly keen on the command-line flag though, as this is the
+> > > > sort of things you'd like to be able to control more finely. Or at
+> > > > least without having to trigger a reboot.
+> > > 
+> > > I compile KVM as module, so I can reload it with different parameters
+> > > easily.
 > > 
-> > I compile KVM as module, so I can reload it with different parameters
-> > easily.
+> > arm64 doesn't (and cannot) build KVM as a module. 
 > 
-> arm64 doesn't (and cannot) build KVM as a module. 
+> Ah, I didn't realize it.  But being able to patch EL2 from EL1 is probably
+> more complicated than what is gained with it.
 
-Ah, I didn't realize it.  But being able to patch EL2 from EL1 is probably
-more complicated than what is gained with it.
+It is mostly pulling the rug from under your feet if you do that on
+non-VHE systems, and make absolutely for things like pKVM.
 
-
-> > But I can make the module parameter read-write so that it is modifiable
-> > during runtime via /sys/module/kvm/parameters/ even when KVM is compiled
-> > into the kernel.
+> > > But I can make the module parameter read-write so that it is modifiable
+> > > during runtime via /sys/module/kvm/parameters/ even when KVM is compiled
+> > > into the kernel.
+> > 
+> > I guess that'd be the next best thing.
 > 
-> I guess that'd be the next best thing.
+> Ok, I will do that in v2 of the patch to be sent next week.
 
-Ok, I will do that in v2 of the patch to be sent next week.
+Thanks.
 
+	M.
 
-	Bernhard
+-- 
+Without deviation from the norm, progress is not possible.
 
