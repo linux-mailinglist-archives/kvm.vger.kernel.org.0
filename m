@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-32621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 017BA9DAFF5
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 00:53:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A8DE9DB020
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 00:56:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8431BB21735
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 23:53:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E444B21616
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 23:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2BF199391;
-	Wed, 27 Nov 2024 23:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE0D1991C8;
+	Wed, 27 Nov 2024 23:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UVu59g6Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A3VrN+Pr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DA615E5CA
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 23:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2421515E5CA
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 23:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732751596; cv=none; b=eisMuC5zITLNIZ/NGywDyRAPg0B+R5YQSgAl4faFgbwqP7XSRnl9VZc7UVgaZxT8tXO3+N+OhAMb2UvN/6sC1/KWS/WO1UMUBDZfBRZfpZDgcl3KufzQfVu4WaUL7u5Npr6S6aiFZ1UlS9TKBred30vAWa+5fTjwbWDVzBJ3LaM=
+	t=1732751791; cv=none; b=Y0+LbumOhavTE+XPeRCI6oKj364fBG2hO/La8ptsWCfop3Ie/A1OYK9e7C1bitydEsnSrP9m9jGFrqKbq6FD/r14xpZ3tUkFmczfmUlc7C/3rj7l/CnoZjfmcEie33ocjs4aZuopj7hpuZVWFUk6X2vfjJVqWam56uKJ26hZUyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732751596; c=relaxed/simple;
-	bh=B+guaGM8zNDjHAblKR3rNrz7k+exZxvr6Z32NHXfp78=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=W9YLKF/s5kmpoEOHLc5KczIe9uISfZqhrtWRhHK5q2s+AQjyxwg+hZbgxk8sZ5uGnKnvN9GMNShcH8PvnD+bCn3AgA/yQ9qTTBF7ibzC4q0mkz7kTEvGixHMS7Jy5FK5ZaqS/Zc9tshWUf4aLaW6+Rq3cvu3ugzlMYRTRvMMT+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UVu59g6Z; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1732751791; c=relaxed/simple;
+	bh=5w3tXEfpo9pqP3sWqwOJwR1PqviyBGAGGYvcFK/szxE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hW5tR7NOou+uoExLEcLtXHMnop/UYBzAsKvnU0EtxLfpuHj9L28ripb8bgyF4DdmHmRgPbdMxiFeUBf+QsOAscnOF+8lYW5J5FwUfP6UmoDQcawJ0yMWLGmM77JhbKIpGxumoeveYlpyb84BIZmZMGK3O/ZukhEJj6BnFko/Gi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A3VrN+Pr; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea4291c177so228577a91.2
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 15:53:15 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea396ba511so306076a91.3
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 15:56:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732751595; x=1733356395; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732751789; x=1733356589; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jNdPCBLD98K20zOO6Bao1YI0NO02p0JCW7gr9Ds1ueM=;
-        b=UVu59g6ZBOjQvWmBnPSDdqfB/5FbEBFQ+3yX5SJ+uNsP2Dh0zYhmJQySHJzHNfMeXD
-         DMAr2Ewx0cShCHFdbn/Sl5aZaa6P/hr2zHc0ZJZI0+xuAuCaaMy1m2jk8kwl7bpeju4v
-         q5E+aofuyJWb1xlQ/j7aqW7NjRmWiVZvXYMPuUN6vaIYuU0LqBJGDWmYZ3+AtdjgoIhW
-         9XRBsvSZZu7D0FY7aTIXms2+68IHv+VcA+4Bogof1q91Y/gBdqI1l8gPYMUtwhHxJ36l
-         1CpkwFv8qyPreRbPPjNoOeebrvDMowkTNTzmSXMzyXfyBp0AE9mCDTDxrK1hyCftGrrZ
-         /szA==
+        bh=IUjYtrXQYviAFJPlV6rDA0QXqWM4eRKUdwjyydmGs50=;
+        b=A3VrN+Prtv2entPxOOLjGgD+/nVX6cNAT8Co3jFFausk0SMMzIf/Sx86BooTT+3Uc5
+         fdvTwkWrNJdEFPMsRxakaGF3Kb1gDxrjmuyfYuuZh+xQPiBG0rEY+M8fIPjLgBDpTexc
+         9azBcwyEodzEh2e2jsuN/zQ6KudPzwCrHW/drP0RuEVmkoQD5SnySX+zg7dZ6etrut/T
+         5XLasV3DBRi54iiELUKYIKsMEouT6+yLWd+2KMIGvhaZt1X0Hz722JaOAXTC7cZecOZO
+         SE1y1S6o9Won3yXrRgOls72+G52AFmuLVfSUDgN38TsdCN6SDJ76OxIsJZQbW+UVcm5J
+         i/oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732751595; x=1733356395;
+        d=1e100.net; s=20230601; t=1732751789; x=1733356589;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNdPCBLD98K20zOO6Bao1YI0NO02p0JCW7gr9Ds1ueM=;
-        b=VE2yUcxo5DXPN5R3WJ7QljtAAp8YuXZ/ZtzrjYXdU1gpopKgWQmHMVA+tdvbcRhR7c
-         iXqhCp5KQm6K1192Q2eD1Fz0Kjjd9YzPOjfx/ESsgvrKr1nzFdzX/04JyTAPV5NrJGhS
-         0pKIuk/SnWKSdrkHtnmPt5qs6STcpcFsb1mDuCm7VpsydjyAr6bvkS28X0SZ+VC6hqDI
-         3VNudPBEKqJKApXL5gDni3T87ynkD/888Our2R+KujGZ3lhQbxAEHq16R9Forqp4gPJJ
-         1f69jfQcIoVgQxVa9fQbBinn1apbqbogRxhaFRKVQgLjLW7uoE5x+TuigPlJP9fkFTJ7
-         RLlg==
-X-Gm-Message-State: AOJu0Yx3E4CX8NpS7U9M2IiUaktH/PgjuJqZWAtTweTyGijJEgmDuHBz
-	nFbO5zlGTt6kBKLzYH37dFTfC0yaf+LKKYz4iQnCDcrOkFB6q+W+wln+uAm85sOi+skQU6jd2C3
-	nFg==
-X-Google-Smtp-Source: AGHT+IHR7A/TQXvzV6P238Oe4bPKg8Edeq87kZfXAl9SSGx/sR0jXBPGRSpiDg11scozZoz1hS5NEDgHQmo=
-X-Received: from pjtd6.prod.google.com ([2002:a17:90b:46:b0:2ea:c64d:fccb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b51:b0:2ea:5054:6c44
- with SMTP id 98e67ed59e1d1-2ee097e51b4mr6538986a91.31.1732751594839; Wed, 27
- Nov 2024 15:53:14 -0800 (PST)
+        bh=IUjYtrXQYviAFJPlV6rDA0QXqWM4eRKUdwjyydmGs50=;
+        b=XXGu0z1V7BUaI/JDv7o72fXwhKZsVx/g5p8TD0pT/ctO1A4dvYEhb0bOOybqybLROI
+         5cKMfrnyPSKlgzyAtxaz9EyJ9khHNt5cDJ0O1Z9wxlhRJt4FPhRXvf5J7DNZj0v0O/+f
+         v1n0HONPgcAo9+C5ocVTnZLPC6cfjI+2jZN7c6FUwggXP6DbiO6uw6hISgoE+7mVv9rp
+         fPSg+Xd+J2gjhTQ2LndurCqgiBauXnvF3XJ4dEazC1ZsYl9HnjvZQPIj74/0GENmJSZE
+         pXFhF/5dOG6ONcIPFfa6qUuiCfwBKh0JTF91X1H3kv9G2kC4V53rww2HL2vsGlL8o7zR
+         U8Xw==
+X-Gm-Message-State: AOJu0YwCLYQ4eBuVv++7xjES6CLWnG21N6r1ZpjFlQ51VoPjV2KSDe0Y
+	4A+/xrtZQTzf0L85itXCuhUPu1rF3753CzaaByTz0/wQlcyMBs7DzZ2CirZNT+3xrTHMUyT5N7a
+	fGw==
+X-Google-Smtp-Source: AGHT+IHPTR3iWge3xhiU4XEekgqj03rdjRMWQnKnjuG0mueDT2UvjYmNwZ5lFL1tB4Ijj6JiY1HtjbZkmH0=
+X-Received: from pjbsj2.prod.google.com ([2002:a17:90b:2d82:b0:2da:ac73:93e0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b8e:b0:2ea:696d:732f
+ with SMTP id 98e67ed59e1d1-2ee094caf27mr6418337a91.29.1732751789406; Wed, 27
+ Nov 2024 15:56:29 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 15:53:12 -0800
+Date: Wed, 27 Nov 2024 15:56:27 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,55 +71,81 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241127235312.4048445-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Remove redundant TLB flush on guest CR4.PGE change
+Message-ID: <20241127235627.4049619-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Use data load to trigger LLC
+ references/misses in Intel PMU
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop SVM's direct TLB flush when CR4.PGE is toggled and NPT is enabled, as
-KVM already guarantees TLBs are flushed appropriately.
+In the PMU counters test, add a data load in the measured loop and target
+the data with CLFLUSH{OPT} in order to (try to) guarantee the loop
+generates LLC misses and fills.  Per the SDM, some hardware prefetchers
+are allowed to omit relevant PMU events, and Emerald Rapids (and possibly
+Sapphire Rapids) appears to have gained an instruction prefetcher that
+bypasses event counts.  E.g. the test will consistently fail on EMR CPUs,
+but then pass with seemingly benign changes to the code.
 
-For the call from cr_trap(), kvm_post_set_cr4() requests TLB_FLUSH_GUEST
-(which is a superset of TLB_FLUSH_CURRENT) when CR4.PGE is toggled,
-regardless of whether or not KVM is using TDP.
+  The event count includes speculation and cache line fills due to the
+  first-level cache hardware prefetcher, but may exclude cache line fills
+  due to other hardware-prefetchers.
 
-The calls from nested_vmcb02_prepare_save() and nested_svm_vmexit() are
-checking guest (L2) vs. host (L1) CR4, and so a flush is unnecessary as L2
-is defined to use a different ASID (from L1's perspective).
+Generate a data load as a last ditch effort to preserve the (minimal) test
+coverage for LLC references and misses.
 
-Lastly, the call from svm_set_cr0() passes in the current CR4 value, i.e.
-can't toggle PGE.
-
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 5 -----
- 1 file changed, 5 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635655..f39724bf26be 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -284,8 +284,6 @@ u32 svm_msrpm_offset(u32 msr)
- 	return MSR_INVALID;
- }
+As alluded to in the changelog, if the test continues to be flaky after this,
+I'm inclined to remove the checks for LLC references/misses.
+
+ tools/testing/selftests/kvm/x86_64/pmu_counters_test.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+index 698cb36989db..b05e262f9011 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+@@ -17,7 +17,7 @@
+  * Number of instructions in each loop. 1 CLFLUSH/CLFLUSHOPT/NOP, 1 MFENCE,
+  * 1 LOOP.
+  */
+-#define NUM_INSNS_PER_LOOP		3
++#define NUM_INSNS_PER_LOOP		4
  
--static void svm_flush_tlb_current(struct kvm_vcpu *vcpu);
--
- static int get_npt_level(void)
- {
- #ifdef CONFIG_X86_64
-@@ -1921,9 +1919,6 @@ void svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 	unsigned long host_cr4_mce = cr4_read_shadow() & X86_CR4_MCE;
- 	unsigned long old_cr4 = vcpu->arch.cr4;
+ /*
+  * Number of "extra" instructions that will be counted, i.e. the number of
+@@ -162,13 +162,14 @@ do {										\
+ 			     "1:\n\t"						\
+ 			     clflush "\n\t"					\
+ 			     "mfence\n\t"					\
++			     "mov %[m], %%eax\n\t"				\
+ 			     FEP "loop 1b\n\t"					\
+ 			     FEP "mov %%edi, %%ecx\n\t"				\
+ 			     FEP "xor %%eax, %%eax\n\t"				\
+ 			     FEP "xor %%edx, %%edx\n\t"				\
+ 			     "wrmsr\n\t"					\
+ 			     :: "a"((uint32_t)_value), "d"(_value >> 32),	\
+-				"c"(_msr), "D"(_msr)				\
++				"c"(_msr), "D"(_msr), [m]"m"(kvm_pmu_version)	\
+ 	);									\
+ } while (0)
  
--	if (npt_enabled && ((old_cr4 ^ cr4) & X86_CR4_PGE))
--		svm_flush_tlb_current(vcpu);
--
- 	vcpu->arch.cr4 = cr4;
- 	if (!npt_enabled) {
- 		cr4 |= X86_CR4_PAE;
+@@ -177,9 +178,9 @@ do {										\
+ 	wrmsr(pmc_msr, 0);							\
+ 										\
+ 	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
+-		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
++		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt %[m]", FEP);	\
+ 	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
+-		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush .", FEP);	\
++		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush  %[m]", FEP);	\
+ 	else									\
+ 		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
+ 										\
 
 base-commit: 4d911c7abee56771b0219a9fbf0120d06bdc9c14
 -- 
