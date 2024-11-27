@@ -1,83 +1,83 @@
-Return-Path: <kvm+bounces-32555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0869DA28D
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 07:58:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90ADF9DA290
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 07:58:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF84D283F8C
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 06:58:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EA1516778F
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 06:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0796B14D29D;
-	Wed, 27 Nov 2024 06:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34939149E13;
+	Wed, 27 Nov 2024 06:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fImu+9dv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kB6uw8U9"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2073.outbound.protection.outlook.com [40.107.212.73])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2087.outbound.protection.outlook.com [40.107.100.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A86113BAE4;
-	Wed, 27 Nov 2024 06:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35AD13BAE4;
+	Wed, 27 Nov 2024 06:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732690686; cv=fail; b=QUptMcUwoBt+QHS7HkGYPEe88y/ksVkkPY85HcEH/ybj7B4ZuwxpUzKHe6DCKFOo+bOlmv3GrdXlgNy6PxIdlV/54zCabQoNITc7KpmsqI9AL3JCWdxLXoE+Y758Qo3QDnhFmTv2ONEd5jmT4dcMLFPYP2IEdm1PFp5dhll+64o=
+	t=1732690692; cv=fail; b=oI3eERab0OVVitOE7qxd2wGllPzFEEQ9gYpIBo997qm8SEHmhG0mSBo2dTlTFR14lQ0iuxQOh782jcxWMgUtXvbAhMTg1tbTzptBLtdEAVdynGjGrl/yZ5pX9hClzmD/lhLFCV11Q4/xQ6UE0fDCvLRGD09VGqnetj2cDRXTIEw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732690686; c=relaxed/simple;
-	bh=0XD9fSoEWhmkLOwR6rSvI47HgmnZ8TlZr7F59uViifo=;
+	s=arc-20240116; t=1732690692; c=relaxed/simple;
+	bh=wzxZDe+zI465W2fzP3+4FzGureVXw3fXylzPc55FzjA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DrAmTmH4MJ7yxUB/uYxkLy7ksXfn0NpfOh4HT0an4pr6amiNYAXCVblo5HXobmlss9DUqZE/UYa3cu7ULodjUwm/aXC3jnYth9QLZVf/4B2g05lzOAKXQBZybVKiTkVkNzkT4BjXR11a91s53ik9QGCSXDmqV4WmewPIPjAgbXw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fImu+9dv; arc=fail smtp.client-ip=40.107.212.73
+	 MIME-Version:Content-Type; b=JGOSdSDWaag5SrPM7P5vdu9au1229G9m14+Ajr609R9YEg/d1JDbQO8DJjXVq+cC9TpWrgB+fBm+SP7d+sIaQiSuzgvvEj1UmC2FaA3Djtn6hun5968VKT0+j2d4MWvgiO4Hnx8sbmj7FDZlsWlXOQwHwoFekSAzysX484JLZgc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kB6uw8U9; arc=fail smtp.client-ip=40.107.100.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ndrXf3qzU20BW3zVE8IYXu8J74daUqagmDI+BRmqIHjHiZctVVv/rFcqUSXFX3F72bvWXTYuAjFPlxX0vgtg930xKGJEq90dlyd1hMHWyPELWo223PdfccmQcKbY1RMgHUJcAqO7TH880KRozJ8U5vkzcbZQPPhUW/7UuMKaBnJwxK/coPpRDjcGhAjwb30yQJRzgSyQ9ayLiI0v47yxzAuLh3LGxFUy6GhJ3em0S1/ujbhiCE70DRB1bdfQ4ePO9ed0/S5afqiCYoACyGFCmeUSmhWt7G5PZLKowphrwAgJJS3Hdo3YaVNcxWwa35Lw71iAoIMwwBqV9F1aLKT31w==
+ b=FgivVYK7Bq1iN8yHY6iWFZ82WyhyutA9C/20wA+SjUZhjDzLueA1RQxke6isdhWd69WjZaSX2WGPupUHPSIjNZyUmHgOpU9xQqPRlJ41aiQXEFTwBrk8gn46sLAfXtua1twEmRFA/oUIX85NSAJ7SCxikT4FhJdHtryMtn9fqQLxdMWpe/w8xJagy3V1zngjP1k6308vSR7eH6UbgVnmAi6zTPjRZjQ+Zh/pyxnNrnSR1/vMW8GZF+T78G6goEMN7d+SA+xWd81r3P/yh6/fkL1cVtajTeZ7Ul3pM/v9JdjZynCe/0bNrjP/YIGHfDpa4Q1Lg6f6FtlFI3BaxEe1Lg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N17WcDkXClINEUAKYrPIhP6US1kNLDb/pt2+l/yYNao=;
- b=wawJvkZn5WVeStqXE9RmVqn+clVyOM0o89uaUTD23chN6PpuzfIvb0/LJRkGVGrHEQvK/MOqA6wpWHGrjlSmnBj4WnuJom+F90SpWUjffrzYHmXwFp8bHeZxG2vizDaTefOTuWrLqUL/Y1swZFlwLRZMIvz3Xjui0LQSiMEgFqNgXiuxqIRD6r7pyzynsnPH7M4jH6fCebzU1JGYWebwugN3qksp463udCQlaWccse0jfIMOHSU+RZpiYax9IFOGpSo3eLRff78NKNyUsPOZ4RZaYX/AIHC1UCO2VFb7BGpBg3BWd/E3ETUUA7PK6HHhZZg+2jY9krXWurKiubbRFw==
+ bh=q7dQWmQOjRujgZ7Au6bkJ/LChGdiBPSJIi+snuzt+KA=;
+ b=K32oQuOM5RHQbeqIB65PckJzBC5CpQlCdcLmlAy7YPPEFDlhUkiKX7zTcYzsfi3LRvCxj7ActylIMgJW6Zg/8WWfjKvmFyHdbACD3X4y7HwIqcQQW0ClTsz1rONw2s6kHHggD1mCE68K/54fdkAayH5Jwco7BslhMYHbHV6/pvL4ew7A8FgLkks6L9f5BITSMKhxGquKz3ebYpyVVzD/pDOwJgAGCw8t2EBhBrahkCTGdQJG/RX6FP1t0aSLVVS11b00HrfUMU0iVg0hezR0+uzUaxB5diJQB6tEEE1LKfEqtTicxgFDRiSb0FxW7zFiK6csOONgJl5Ey99KVr2E/A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N17WcDkXClINEUAKYrPIhP6US1kNLDb/pt2+l/yYNao=;
- b=fImu+9dvM+ajFmyoFQxDVGsdCkwcr4K8r7oo+5WdPX8XhsaWz7oBaS3naZp3O2fQNWdbJTJZjuTtW2sU8fi48OyWAtj7iUkMOko4d0PFTaSg2o29vTMSQEyUBvDXr0Oq82NVgwvMfmFQVZZl7nM0e7DFqHjb0QWTRKAvtKaGVzlk80pjsbvG3e4XQlIhf7tDuWsOOlUdHb3cDmllHshR7tnIZSpZlFtZWLmeF3kuFZCeaaUEcgML98fgbD9WoM0E6lkb4iJ6+MMhew/5W3MLyOHu2VoRY+rZP7h7voehGLZ0/nl47lfDt1EgwRvwbli2nq6sGbjJ+kjsrxLZmic2nw==
-Received: from PH7P222CA0009.NAMP222.PROD.OUTLOOK.COM (2603:10b6:510:33a::23)
- by SJ0PR12MB7007.namprd12.prod.outlook.com (2603:10b6:a03:486::8) with
+ bh=q7dQWmQOjRujgZ7Au6bkJ/LChGdiBPSJIi+snuzt+KA=;
+ b=kB6uw8U95m6zOcmER5V0X3jCvxhwaUyL+dGBbs5/BNE1F8ivZ/d3eWcO/NG9/l0J+dpCrdMEKTmKVNWp4x1/K9+VGl9KSQZJxphKd4BYItxTYa+PhjOwMmU6ngxnMlqlsUWFiL+MKcBT4ip+yffmdSne6FyjyqUQ++LB00PdPlr2r2fELk1ltBtFfJv8RFTPoQIGop/y8wvr6bSjIVJa7u4FBpodqXNg2hpCY6HUU0c0OzPLLdwmjS8whQvQ+icwz0Spx937QKn27ws3FIjlR9iea4oLliOd7jnMUoizLbGqsVN4BG+wUS1gcw9347R3E+BvJnGLL1E7ePIq3BRZaQ==
+Received: from CH2PR19CA0016.namprd19.prod.outlook.com (2603:10b6:610:4d::26)
+ by MN2PR12MB4224.namprd12.prod.outlook.com (2603:10b6:208:1dd::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.13; Wed, 27 Nov
- 2024 06:57:59 +0000
-Received: from CY4PEPF0000FCBF.namprd03.prod.outlook.com
- (2603:10b6:510:33a::4) by PH7P222CA0009.outlook.office365.com
- (2603:10b6:510:33a::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.13 via Frontend Transport; Wed,
- 27 Nov 2024 06:57:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2024 06:58:02 +0000
+Received: from CH2PEPF0000014A.namprd02.prod.outlook.com
+ (2603:10b6:610:4d:cafe::8f) by CH2PR19CA0016.outlook.office365.com
+ (2603:10b6:610:4d::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.12 via Frontend Transport; Wed,
+ 27 Nov 2024 06:58:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000FCBF.mail.protection.outlook.com (10.167.242.101) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF0000014A.mail.protection.outlook.com (10.167.244.107) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8207.12 via Frontend Transport; Wed, 27 Nov 2024 06:57:59 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8207.12 via Frontend Transport; Wed, 27 Nov 2024 06:58:02 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 26 Nov
- 2024 22:57:41 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 22:57:44 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 26 Nov
- 2024 22:57:41 -0800
+ 2024 22:57:44 -0800
 Received: from rsws30.mtr.labs.mlnx (10.127.8.12) by mail.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 26 Nov 2024 22:57:38 -0800
+ Transport; Tue, 26 Nov 2024 22:57:41 -0800
 From: Israel Rukshin <israelr@nvidia.com>
 To: Max Gurtovoy <mgurtovoy@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
 	Parav Pandit <parav@nvidia.com>, <stefanha@redhat.com>,
@@ -85,9 +85,9 @@ To: Max Gurtovoy <mgurtovoy@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
 	<linux-block@vger.kernel.org>
 CC: Nitzan Carmi <nitzanc@nvidia.com>, <kvm@vger.kernel.org>, Israel Rukshin
 	<israelr@nvidia.com>
-Subject: [PATCH 1/2] virtio_pci: Add support for PCIe Function Level Reset
-Date: Wed, 27 Nov 2024 08:57:31 +0200
-Message-ID: <1732690652-3065-2-git-send-email-israelr@nvidia.com>
+Subject: [PATCH 2/2] virtio_blk: Add support for transport error recovery
+Date: Wed, 27 Nov 2024 08:57:32 +0200
+Message-ID: <1732690652-3065-3-git-send-email-israelr@nvidia.com>
 X-Mailer: git-send-email 1.8.4.3
 In-Reply-To: <1732690652-3065-1-git-send-email-israelr@nvidia.com>
 References: <1732690652-3065-1-git-send-email-israelr@nvidia.com>
@@ -101,286 +101,135 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCBF:EE_|SJ0PR12MB7007:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1be4f5f0-9d1a-49e5-36c4-08dd0eb0d445
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|MN2PR12MB4224:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4c87cf3-cd60-4a36-cfee-08dd0eb0d614
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SDuMRWF+kAl2WsFTXxfUIQXbj3UOY3hU/nA/u41x7zDYRnJwdMz+L9UMPf9h?=
- =?us-ascii?Q?7XKxXgWlO3xJvPlMoSg0WEC81fSsdDa7OzpoHzsC2ToJW72X8rLyvWCbVamh?=
- =?us-ascii?Q?PZB5ehIOR3g8N5cND5FKCBhcWkHqfV5tV4C2cdtSJ1WPggDznM9wwRPF2l65?=
- =?us-ascii?Q?P7LiYaAK2tEKgMXNrSN8/P6hYf5/3POAS0T3H6iz5OBjzq3HuEU6/qlgM3kf?=
- =?us-ascii?Q?ytvd/xj6OCpbTAhA5PkDGdXsMoaCZXEEzNkGg70fL4ydSc2ZTOKc2hexxsne?=
- =?us-ascii?Q?aujZucgQCjVNqZ7FITXc71GCMIS/PMSWkvqaocR3F5eCqcQbjh6Br7P8C97i?=
- =?us-ascii?Q?xS4wZZcHdt17kZKhlEe4wTjCST/8PIFNQ77aePRog5mLL8h5VICHnkuEQlBO?=
- =?us-ascii?Q?5m8uX9nGOSe62d7zkqdSKPMCpN5LwZpgU/4sxAu5zOjKZ5S5BJy3yl42zucP?=
- =?us-ascii?Q?0NHTsL2dJHJk3Jrcm4cMH0FRTbdfj/h+fOJKFR37n6lEyXxxzoRx+tQP7wCi?=
- =?us-ascii?Q?2Y6hek1wgUN1M5LoSk23kw53XU0jmRL9dGufG1HmZaNKSM87bOy+K+yWIQ1j?=
- =?us-ascii?Q?AgmkKQ5T/NhTn8nEgVhP49NaUC5v3aCtuIC6dX8pnM2A7FIqQg2Lzf5jxhHj?=
- =?us-ascii?Q?jqHSXinwfExlPgHIpDzQIBsdMI6iCVuHoJPtiMDyIK7ESBnYiFOLOawAyAW5?=
- =?us-ascii?Q?GFqd2hK598Yd3nlVQKHlsYeH1BPdLYW89RY9mtCP1hztGuxBv2bEWtZC+a72?=
- =?us-ascii?Q?NUrHBZzMs5kZzF6VYOMOgAXZci9P7Tx4v2bHFZ5025dHvPAB2si+CJPEaiiE?=
- =?us-ascii?Q?iMVMBeURcWSNljx13f0EhiMSmBXJlQkHfL0zRtNYaX04PU+lSy1SJiwvJ+iT?=
- =?us-ascii?Q?UGI9PRHYgdeJh1FajxqndauhEZzwTHds+OzUMKwzDCGL61Kt8Gf0gFIrlI1V?=
- =?us-ascii?Q?hqL6f7iscJCiJiiDOpbwviaYQoVUEvGkxb/P0SvFdzgv6P2mwolbt4YHOdIA?=
- =?us-ascii?Q?ow/YWLuW6vlkzgQnX+VFjgWLo4Im5/VPhufZd03D9l99Er3cSnQxBMAb+uhW?=
- =?us-ascii?Q?5m0OFLMPSS5dths0nT0u7pd5UQB7Aak66co3/HhQlmoKWb5gd22bHPwh7gI9?=
- =?us-ascii?Q?mRBeG7YurU7ETxRhcYV9egJ3LoQPrPYi1VVWIx7S4J3lucJG8HdPkPiZrO61?=
- =?us-ascii?Q?OYRnt6TuX4uNsdeUK/J2FwOp0jTMAUQzVUTDMrUHxVvAU8D7fuk4BaIUyBQ/?=
- =?us-ascii?Q?vhG0HaZauKIZWXFOR4SDJkmSTNkYUXlJyBaZF1rGmLavm8X8eOlKBWNoutb4?=
- =?us-ascii?Q?GKbT3JNoSmBEiZ54hklbitJ805OdPqIDnyMT36x9XagzB6q+FIN/nw+MubxN?=
- =?us-ascii?Q?v9CYezsrPl5+C5TPgzFg4HE1X2bwCErKmWeFMVr5lCs59kYXsZAHGBzY1xc3?=
- =?us-ascii?Q?gapTEV41KkYhNy1SDkhmCyy46ynG6vIs?=
+	=?us-ascii?Q?r2HgcPyy97tdytraFNWpwqgA2fc4jqOelrLIWzOzSxOtEDQz4U+gpvlMDUAH?=
+ =?us-ascii?Q?xJdQQj+slMhbZ2hqmDRb0vvAUz2z6P9+srceT4XlB5HlGk2T+WqHkdmxXXkC?=
+ =?us-ascii?Q?fruq/ovmdp4b+pezD2XayL2gpkY7PRLZGfZkqsyepu947wLy2M2cVlzyMedW?=
+ =?us-ascii?Q?YjOAuJcpW8p/FrJtGleN6tUSMgVMIGms9l9issQ85fuJmvvHhI7wbDai94XK?=
+ =?us-ascii?Q?bJ3zeVbQSAFFnBPFZgx3+LI3L+jfrzdtDFkKAcrJfnAM32hR9aCSQHWl5oBw?=
+ =?us-ascii?Q?N9M2agCPe3ImX9/dCQaEm6+LVQYvMM5TIQ1n8QvOvrdURaLkeJtBvUBWRfI7?=
+ =?us-ascii?Q?Q+WNQAo9EkrkgJTYX6/YAPwQthyJsnDNFE4HRKtVqGLBS8kLgSbU+XzrK/bs?=
+ =?us-ascii?Q?KsOPN/UMVxPKhvUwEjerv8a3hhKVMcWjo7j4wHv1QUvd8JnXtJGfmJr1knVh?=
+ =?us-ascii?Q?UAGUTiP6iQZniu/Ttq6WCu6JSrgdkpWWhtiTQZ++TKnL7qL9s59BHaSQQSAP?=
+ =?us-ascii?Q?YYhely5xH+D0SiQWQJf0qTYczjGPXY7Sw1oa9C3L396h5wEFZiwIU3axg4Tg?=
+ =?us-ascii?Q?i6qogdAyYeuBWcN/xV7wi9bZTi+Fcnqi68QhCWCYpCiudsWrNSrYvYT9xovs?=
+ =?us-ascii?Q?+ErwvYtHe/NuKSohHrdJVxUrMN3lPWbjARqyW3uh3irLLJ73ju+ntS1mmEVP?=
+ =?us-ascii?Q?XRoWmHG0JNw2n+Q9Bp5mxawH7pG6zv1TwKunVQmWZTW3zWsyLvetfCfE/ScM?=
+ =?us-ascii?Q?H9zurnj5+kg7bUKD4OtrWKEyEkS2dXJAuzU+5+VfrMVOO3ELl1BTqPUNWm/q?=
+ =?us-ascii?Q?DD+Gtpdh/dGQFw6j9jnpghRn6p+Ah+i9cJddrnZxsUsqUsYGhZgGuddFXWTO?=
+ =?us-ascii?Q?aezwf3V2kqlWdXakEzt1p/I1hRwC5ETZPOI/vboqnuo/olZdT9U8hchzXUKC?=
+ =?us-ascii?Q?nmPfNl2/UqkkspDFpGn2d/uEFnnIi28JMPqAAxzLHLrdSv5AwEIoEZpNCvNM?=
+ =?us-ascii?Q?vgUgYFfH5cTeUIj2AtIQ//qm2YDkdgUTmTeiC8lKssXzPwK+LRAgreJt2iVO?=
+ =?us-ascii?Q?cK2kprDBdPnydVFVlmmt07hwZExK4As78XxRhVBrlBGkeWchIavnQRLPNPws?=
+ =?us-ascii?Q?1LSCSRslBjagm+yDo5JUARy3V5fV/zeF5kpriKu5xhvliFbfwg0FKqX5RWec?=
+ =?us-ascii?Q?Hv58Aq/G4FDuVO1BLefU0QERuybiQxeqwx2p2N6MW+ZO5d2Z31hQPOSmG6b5?=
+ =?us-ascii?Q?TovtXHKvek4VzJ7m1VnRKMNe6vOULwqvobugYuJDgyUwNxdT3LXFzpv8lLY2?=
+ =?us-ascii?Q?NsYB8xk7kCN0nWJwWYn/RkHrzFzu+1vPJHEpvdo5SUw+oF0EsRy9Hyd/RvRx?=
+ =?us-ascii?Q?JkfQWftQSiXT+G2CnDPHNqf8V+ZeRfEsaaup+BvwftHIsJUBV05G2/z36acZ?=
+ =?us-ascii?Q?4UMuodk77Y4jYCVTwMh35FdvYO5vHjwy?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2024 06:57:59.3879
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2024 06:58:02.3637
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1be4f5f0-9d1a-49e5-36c4-08dd0eb0d445
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4c87cf3-cd60-4a36-cfee-08dd0eb0d614
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCBF.namprd03.prod.outlook.com
+	CH2PEPF0000014A.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7007
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4224
 
-Implement support for Function Level Reset (FLR) in virtio_pci devices.
-This change adds reset_prepare and reset_done callbacks, allowing
-drivers to properly handle FLR operations.
+Add support for proper cleanup and re-initialization of virtio-blk devices
+during transport reset error recovery flow.
+This enhancement includes:
+- Pre-reset handler (reset_prepare) to perform device-specific cleanup
+- Post-reset handler (reset_done) to re-initialize the device
 
-Without this patch, performing and recovering from an FLR is not possible
-for virtio_pci devices. This implementation ensures proper FLR handling
-and recovery for both physical and virtual functions.
+These changes allow the device to recover from various reset scenarios,
+ensuring proper functionality after a reset event occurs.
+Without this implementation, the device cannot properly recover from
+resets, potentially leading to undefined behavior or device malfunction.
 
-The device reset can be triggered in case of error or manually via
-sysfs:
-echo 1 > /sys/bus/pci/devices/$PCI_ADDR/reset
+This feature has been tested using PCI transport with Function Level
+Reset (FLR) as an example reset mechanism. The reset can be triggered
+manually via sysfs (echo 1 > /sys/bus/pci/devices/$PCI_ADDR/reset).
 
 Signed-off-by: Israel Rukshin <israelr@nvidia.com>
 Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 ---
- drivers/virtio/virtio.c            | 94 ++++++++++++++++++++++--------
- drivers/virtio/virtio_pci_common.c | 41 +++++++++++++
- include/linux/virtio.h             |  8 +++
- 3 files changed, 118 insertions(+), 25 deletions(-)
+ drivers/block/virtio_blk.c | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index b9095751e43b..c1cc1157b380 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -527,29 +527,7 @@ void unregister_virtio_device(struct virtio_device *dev)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c0cdba71f436..e1ab97251275 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1582,8 +1582,7 @@ static void virtblk_remove(struct virtio_device *vdev)
+ 	put_disk(vblk->disk);
  }
- EXPORT_SYMBOL_GPL(unregister_virtio_device);
  
 -#ifdef CONFIG_PM_SLEEP
--int virtio_device_freeze(struct virtio_device *dev)
--{
--	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
--	int ret;
--
--	virtio_config_core_disable(dev);
--
--	dev->failed = dev->config->get_status(dev) & VIRTIO_CONFIG_S_FAILED;
--
--	if (drv && drv->freeze) {
--		ret = drv->freeze(dev);
--		if (ret) {
--			virtio_config_core_enable(dev);
--			return ret;
--		}
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(virtio_device_freeze);
--
--int virtio_device_restore(struct virtio_device *dev)
-+static int virtio_device_restore_priv(struct virtio_device *dev, bool restore)
+-static int virtblk_freeze(struct virtio_device *vdev)
++static int virtblk_freeze_priv(struct virtio_device *vdev)
  {
- 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
- 	int ret;
-@@ -580,8 +558,14 @@ int virtio_device_restore(struct virtio_device *dev)
- 	if (ret)
- 		goto err;
+ 	struct virtio_blk *vblk = vdev->priv;
  
--	if (drv->restore) {
--		ret = drv->restore(dev);
-+	if (restore) {
-+		if (drv->restore) {
-+			ret = drv->restore(dev);
-+			if (ret)
-+				goto err;
-+		}
-+	} else {
-+		ret = drv->reset_done(dev);
- 		if (ret)
- 			goto err;
- 	}
-@@ -598,9 +582,69 @@ int virtio_device_restore(struct virtio_device *dev)
- 	virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
- 	return ret;
+@@ -1602,7 +1601,7 @@ static int virtblk_freeze(struct virtio_device *vdev)
+ 	return 0;
+ }
+ 
+-static int virtblk_restore(struct virtio_device *vdev)
++static int virtblk_restore_priv(struct virtio_device *vdev)
+ {
+ 	struct virtio_blk *vblk = vdev->priv;
+ 	int ret;
+@@ -1616,8 +1615,29 @@ static int virtblk_restore(struct virtio_device *vdev)
+ 	blk_mq_unfreeze_queue(vblk->disk->queue);
+ 	return 0;
  }
 +
 +#ifdef CONFIG_PM_SLEEP
-+int virtio_device_freeze(struct virtio_device *dev)
++static int virtblk_freeze(struct virtio_device *vdev)
 +{
-+	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
-+	int ret;
-+
-+	virtio_config_core_disable(dev);
-+
-+	dev->failed = dev->config->get_status(dev) & VIRTIO_CONFIG_S_FAILED;
-+
-+	if (drv && drv->freeze) {
-+		ret = drv->freeze(dev);
-+		if (ret) {
-+			virtio_config_core_enable(dev);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
++	return virtblk_freeze_priv(vdev);
 +}
-+EXPORT_SYMBOL_GPL(virtio_device_freeze);
 +
-+int virtio_device_restore(struct virtio_device *dev)
++static int virtblk_restore(struct virtio_device *vdev)
 +{
-+	return virtio_device_restore_priv(dev, true);
++	return virtblk_restore_priv(vdev);
 +}
- EXPORT_SYMBOL_GPL(virtio_device_restore);
  #endif
  
-+int virtio_device_reset_prepare(struct virtio_device *dev)
++static int virtblk_reset_prepare(struct virtio_device *vdev)
 +{
-+	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
-+	int ret;
-+
-+	if (!drv || !drv->reset_prepare)
-+		return -EOPNOTSUPP;
-+
-+	virtio_config_core_disable(dev);
-+
-+	dev->failed = dev->config->get_status(dev) & VIRTIO_CONFIG_S_FAILED;
-+
-+	ret = drv->reset_prepare(dev);
-+	if (ret) {
-+		virtio_config_core_enable(dev);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(virtio_device_reset_prepare);
-+
-+int virtio_device_reset_done(struct virtio_device *dev)
-+{
-+	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
-+
-+	if (!drv || !drv->reset_done)
-+		return -EOPNOTSUPP;
-+
-+	return virtio_device_restore_priv(dev, false);
-+}
-+EXPORT_SYMBOL_GPL(virtio_device_reset_done);
-+
- static int virtio_init(void)
- {
- 	if (bus_register(&virtio_bus) != 0)
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index 88074451dd61..d6d79af44569 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -794,6 +794,46 @@ static int virtio_pci_sriov_configure(struct pci_dev *pci_dev, int num_vfs)
- 	return num_vfs;
- }
- 
-+static void virtio_pci_reset_prepare(struct pci_dev *pci_dev)
-+{
-+	struct virtio_pci_device *vp_dev = pci_get_drvdata(pci_dev);
-+	int ret = 0;
-+
-+	ret = virtio_device_reset_prepare(&vp_dev->vdev);
-+	if (ret) {
-+		if (ret != -EOPNOTSUPP)
-+			dev_warn(&pci_dev->dev, "Reset prepare failure: %d",
-+				 ret);
-+		return;
-+	}
-+
-+	if (pci_is_enabled(pci_dev))
-+		pci_disable_device(pci_dev);
++	return virtblk_freeze_priv(vdev);
 +}
 +
-+static void virtio_pci_reset_done(struct pci_dev *pci_dev)
++static int virtblk_reset_done(struct virtio_device *vdev)
 +{
-+	struct virtio_pci_device *vp_dev = pci_get_drvdata(pci_dev);
-+	int ret;
-+
-+	if (pci_is_enabled(pci_dev))
-+		return;
-+
-+	ret = pci_enable_device(pci_dev);
-+	if (!ret) {
-+		pci_set_master(pci_dev);
-+		ret = virtio_device_reset_done(&vp_dev->vdev);
-+	}
-+
-+	if (ret && ret != -EOPNOTSUPP)
-+		dev_warn(&pci_dev->dev, "Reset done failure: %d", ret);
++	return virtblk_restore_priv(vdev);
 +}
 +
-+static const struct pci_error_handlers virtio_pci_err_handler = {
-+	.reset_prepare  = virtio_pci_reset_prepare,
-+	.reset_done     = virtio_pci_reset_done,
-+};
-+
- static struct pci_driver virtio_pci_driver = {
- 	.name		= "virtio-pci",
- 	.id_table	= virtio_pci_id_table,
-@@ -803,6 +843,7 @@ static struct pci_driver virtio_pci_driver = {
- 	.driver.pm	= &virtio_pci_pm_ops,
+ static const struct virtio_device_id id_table[] = {
+ 	{ VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID },
+ 	{ 0 },
+@@ -1653,6 +1673,8 @@ static struct virtio_driver virtio_blk = {
+ 	.freeze				= virtblk_freeze,
+ 	.restore			= virtblk_restore,
  #endif
- 	.sriov_configure = virtio_pci_sriov_configure,
-+	.err_handler	= &virtio_pci_err_handler,
++	.reset_prepare			= virtblk_reset_prepare,
++	.reset_done			= virtblk_reset_done,
  };
  
- struct virtio_device *virtio_pci_vf_get_pf_dev(struct pci_dev *pdev)
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 338e0f5efb4b..9cb0a427b7d5 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -187,6 +187,8 @@ int virtio_device_freeze(struct virtio_device *dev);
- int virtio_device_restore(struct virtio_device *dev);
- #endif
- void virtio_reset_device(struct virtio_device *dev);
-+int virtio_device_reset_prepare(struct virtio_device *dev);
-+int virtio_device_reset_done(struct virtio_device *dev);
- 
- size_t virtio_max_dma_size(const struct virtio_device *vdev);
- 
-@@ -211,6 +213,10 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
-  *    changes; may be called in interrupt context.
-  * @freeze: optional function to call during suspend/hibernation.
-  * @restore: optional function to call on resume.
-+ * @reset_prepare: optional function to call when a transport specific reset
-+ *    occurs.
-+ * @reset_done: optional function to call after transport specific reset
-+ *    operation has finished.
-  */
- struct virtio_driver {
- 	struct device_driver driver;
-@@ -226,6 +232,8 @@ struct virtio_driver {
- 	void (*config_changed)(struct virtio_device *dev);
- 	int (*freeze)(struct virtio_device *dev);
- 	int (*restore)(struct virtio_device *dev);
-+	int (*reset_prepare)(struct virtio_device *dev);
-+	int (*reset_done)(struct virtio_device *dev);
- };
- 
- #define drv_to_virtio(__drv)	container_of_const(__drv, struct virtio_driver, driver)
+ static int __init virtio_blk_init(void)
 -- 
 2.34.1
 
