@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-32596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31889DAE77
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:20:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9987C9DAE78
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93C6416702A
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA1016713E
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073EA2036ED;
-	Wed, 27 Nov 2024 20:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D2C202F95;
+	Wed, 27 Nov 2024 20:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jNn14hiI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rb00Mci4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D328C2036E7
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EBB203714
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732738806; cv=none; b=Oy4BpkuO4UqS7VNjvHaLAfVC7UFJMlIdy6e5Y9RKkmtNKnrd/emIoRBJsrLx5iZbJx4Sk1D6CyN1JYMjyxG4a/7v//Z3/Vkgj9gYddDutnTGymnF4660DE0K8H9zL/uv09cKpkBfb3QPw054KkmpyveP9qSDzGm2tNRYqrl0oyw=
+	t=1732738808; cv=none; b=QgjcaA1u3DBs4/Rpfvwn9MJWeexsKrquCsVdttrVuKX0yWBQzI6Wm+OvnH46UcnX2h+o7fXmAtP4pOGN3WEiN39I7kjJ8hUySOaN1JPP7zQM/B21hGDW7o1vkyXQ3YoHdtGQNoxoEA26aidnWrC9IknPU+PcIBtZRDuwuk7DiUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732738806; c=relaxed/simple;
-	bh=a6Y640EiqlGM+gu5ctvPf0mXrN55ztAszHO3hlhnOcA=;
+	s=arc-20240116; t=1732738808; c=relaxed/simple;
+	bh=sgFjzIy4og3iSZFWVYtstA7CQqck6vD0BgX7j5xnkdE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pHoXNJn0VFCpS2yHQHJT/H3vdY+fqmfM8vZqt7aRfeCUzX3iBp4hb0YIN9DdEdZ4/IXlN14Sz1Mcb9182uNsMa23PtF7U/tDaeEYbjLtdhIRaaET3nGcdo6KGtI5kfEIb8tHmZSLpFkdhW24/TOReEh1hPMZkBYV3FCh1DJGUag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jNn14hiI; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=n/k/Qf2sSBtdhzJ88R1OnfwnpwwCpBBmSAL+lSPJuMmbWxVaHykSMNGchty3v3b9tPZwTHzl3uXrve37qa8cJ13HiAAs3m+Oui+VgTvt5hHSIMnVsf6OhclhLBZpve9jkGoxU/8ZRuE3Bal0uUe5RVQ5h7nIwvqdbRH76ozgDiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rb00Mci4; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21267df35a5so803055ad.1
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 12:20:04 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea396ba511so145082a91.3
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 12:20:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732738804; x=1733343604; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732738806; x=1733343606; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j7YT08yMb1KEjpOIy5QpMxABflHuEvjlRxoqxNPECDo=;
-        b=jNn14hiIjnnPuGZjmoAcuvL3SPJJK6YKi57VVspLraijRMy+3Y5z4+7Sg7kSH8N29C
-         N792/g5tOs3Re8nXZaX1RCUQjA8cIXLesUYl51+MQ3J61TIFKfxzBhG6rXLKXxSu2EdG
-         aSHsZ7ovEW3CIi1UIRe7c/ml5z3szoJGoauyvB0QufaCRXgoKSCHssscQ649srYqy0oE
-         w0on/SeGPecOaBMNXtOtAYq/+qDwR1n1UGL93gLfOdjviWeTJQ/8SkezrGf/SF6jlXxr
-         6R1xSfpgdnvzCdAXouEf6U6SrP7aXmlsHsEhEmxAlHrykrdvf044jZqKTsUvMozePKVp
-         EvkQ==
+        bh=nEtZF4sU5IT1Lhy8Yz5CiCGBeJE0iqSK+FBKQHZElUE=;
+        b=Rb00Mci46mSo3subkEqreMqeHJRHEiYizbQwa7HGTGsHHpNqZn6oL40wrUwLw8QP4t
+         Bch9QNZeeVa+ze1G3HLXL0vrgWOJDKnWVFqS9Jow7brWud7PDx07jFDzUfFAOaZNFgyw
+         w5jMTmZTelJ8taDknaVAHBgwZSawUBEKCPhhDPGRyqEtr3QgbpC04Czx6OchTgl4d4y4
+         k4QbudvIu2RltBLcF/96Dl8AwBHChdfla/Jrp6H/z415PljtESrB5/bpPNTm+VkT8RL1
+         YnV/0XnkgbtMTVgpqU9awFJEHotK3DsiPX95wlwmRnVyAeOxqYP+JplN8ubEo4+vpAtQ
+         pcPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732738804; x=1733343604;
+        d=1e100.net; s=20230601; t=1732738806; x=1733343606;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j7YT08yMb1KEjpOIy5QpMxABflHuEvjlRxoqxNPECDo=;
-        b=YmfFC3z5c3IyzMZZ6X6Z/t04m4IYq95otwgJqDI5M0wgZIQE0tyMQGXq+ee/3QCT6g
-         goMPg2lzEorJ96hWD068Ob9YUap2Y8ZcqgIAkbwjT+6lhA9lUCWIZmUYzRb3D3SbaScp
-         EFRRfnS8PnMiqBtKfzaEXMTBrxK/R60rYZT8Te0p5x+OwKVQUqP/ieI+/f/HdDHYKb4J
-         Ob1oU16kwTNGyCMP+ogscrRSBJ0xxV81lJWycZv6bTedN522x+e2mEwq58FFx8YRMxLw
-         KLPvNm5cz1bmq5jVXVJWFz+WI8O8gSNyhx1tBBA7LLkI6c6Dm/ZR2GmWPx/wxCqeMZWn
-         6IEA==
-X-Gm-Message-State: AOJu0YzeBrc/0Z75L2JmEUbePjY/3XxC728yLWs2BGEcy8h7fJcVWrjg
-	k2yN6DYw13yd4PhvlUAssfQuNzJOVWxq8fofKuyN8G5cRSG3HWF7wv+gVbboCfZ2Aj+SfzigaB2
-	3Dn1DSqqCezH+PYpxEUOS0SckhCfFYAY5WDeONcmxwdn4f/czKBePayKOTFWTMnhl5VOiA4DuRb
-	UNKzghqoODTFdC2L2vL0lOtD4WUC7lffEZCRpovstSl9Z1I8Qdlw==
-X-Google-Smtp-Source: AGHT+IFk53l85DXU/wNl2IRSe84ryY6aNfayfG+8hfq9Pk37i2y2PizUu7aOAE+ZyVNMUyFa+mA63HRfuhYKlqJe
-X-Received: from pfbct13.prod.google.com ([2002:a05:6a00:f8d:b0:725:22dd:a775])
+        bh=nEtZF4sU5IT1Lhy8Yz5CiCGBeJE0iqSK+FBKQHZElUE=;
+        b=FJvLWAbnmxbQaeuFUxFDE98Gz98EYqbb+EUlyyN1664odfiqcIleqBmVtnJ0t3Tp9L
+         A6JhcqL8sBg4BnwgxfSQB95epAxGP7fTwky+Whbs8sLEd1gqOI6VXrMKC1P0G8uRzNdo
+         vVtMlac9LTbB9zLlHs9lBQpBgJjhPHrZYBRVqX7HuckTRb58aS8wdz9Lb6FwQH43lHeY
+         EyGduzfjNyMR5i6zk+j+zm9wY43FWsui06rtI4DgoiuVrkUpXpHifYs8yk+MTtl0bPB+
+         MNnJSFTsn5zeqro3ViQ8U6Rs4yOpz3UHfMdd1QFLaHKLCAeoqDSyuP/lg5Vbhdfb4OVP
+         qm3g==
+X-Gm-Message-State: AOJu0YzPW3rvownRFNPCsuutYU71AuqGdJLGcY4lVQY6x65qsPCP1jFI
+	efk/wsuh1sz+7p/a16PpoBVLUsumHi6cMSNTgv/N3DNvUmtYIsR/mXN8zo2YmTaS4NKwZJv1atu
+	89zXGftuYgAlJz9ThwQOHbwhSi5x68xkc52KxHsioKzsrOOsedxD135u+MxwLOBGVz5SM1aPlMt
+	4kMms6lIxenwwnz8u+3e1MXmJ5OFO3pRrPMIOCmYq9IkkFQkt4lA==
+X-Google-Smtp-Source: AGHT+IHi5kqbT6hdRXLkmGjsSge8edKwoRfFkYEpfqLDEbV1y6lR+p9ohljvlMdI+LJjPEsgiDHjjuNuewakgtyV
+X-Received: from pjbli10.prod.google.com ([2002:a17:90b:48ca:b0:2e1:8750:2b46])
  (user=aaronlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:d50e:b0:212:20c2:5fcd with SMTP id d9443c01a7336-21501385212mr46107605ad.26.1732738804123;
- Wed, 27 Nov 2024 12:20:04 -0800 (PST)
-Date: Wed, 27 Nov 2024 20:19:24 +0000
+ 2002:a17:90b:3910:b0:2ea:838c:7f20 with SMTP id 98e67ed59e1d1-2ee097c59fbmr5794280a91.35.1732738806236;
+ Wed, 27 Nov 2024 12:20:06 -0800 (PST)
+Date: Wed, 27 Nov 2024 20:19:25 +0000
 In-Reply-To: <20241127201929.4005605-1-aaronlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,78 +74,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241127201929.4005605-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241127201929.4005605-11-aaronlewis@google.com>
-Subject: [PATCH 10/15] KVM: SVM: Don't "NULL terminate" the list of possible
- passthrough MSRs
+Message-ID: <20241127201929.4005605-12-aaronlewis@google.com>
+Subject: [PATCH 11/15] KVM: VMX: Make list of possible passthrough MSRs "const"
 From: Aaron Lewis <aaronlewis@google.com>
 To: kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, jmattson@google.com, seanjc@google.com, 
-	Aaron Lewis <aaronlewis@google.com>
+Cc: pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Aaron Lewis <aaronlewis@google.com>
----
- arch/x86/kvm/svm/svm.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+From: Sean Christopherson <seanjc@google.com>
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3813258497e49..4e30efe90c541 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -81,7 +81,7 @@ static DEFINE_PER_CPU(u64, current_tsc_ratio);
- 
- #define X2APIC_MSR(x)	(APIC_BASE_MSR + (x >> 4))
- 
--static const u32 direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
-+static const u32 direct_access_msrs[] = {
- 	MSR_STAR,
- 	MSR_IA32_SYSENTER_CS,
- 	MSR_IA32_SYSENTER_EIP,
-@@ -139,7 +139,6 @@ static const u32 direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
- 	X2APIC_MSR(APIC_TMICT),
- 	X2APIC_MSR(APIC_TMCCT),
- 	X2APIC_MSR(APIC_TDCR),
--	MSR_INVALID,
- };
- 
- /*
-@@ -760,7 +759,7 @@ static int direct_access_msr_slot(u32 msr)
- {
- 	u32 i;
- 
--	for (i = 0; direct_access_msrs[i] != MSR_INVALID; i++) {
-+	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
- 		if (direct_access_msrs[i] == msr)
- 			return i;
- 	}
-@@ -934,7 +933,7 @@ void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
- 	if (!x2avic_enabled)
- 		return;
- 
--	for (i = 0; i < MAX_DIRECT_ACCESS_MSRS; i++) {
-+	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
- 		int index = direct_access_msrs[i];
- 
- 		if ((index < APIC_BASE_MSR) ||
-@@ -965,7 +964,7 @@ static void svm_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	 * refreshed since KVM is going to intercept them regardless of what
- 	 * userspace wants.
- 	 */
--	for (i = 0; direct_access_msrs[i] != MSR_INVALID; i++) {
-+	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
- 		u32 msr = direct_access_msrs[i];
- 
- 		if (!test_bit(i, svm->shadow_msr_intercept.read))
-@@ -1009,7 +1008,7 @@ static void init_msrpm_offsets(void)
- 
- 	memset(msrpm_offsets, 0xff, sizeof(msrpm_offsets));
- 
--	for (i = 0; direct_access_msrs[i] != MSR_INVALID; i++) {
-+	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
- 		u32 offset;
- 
- 		offset = svm_msrpm_offset(direct_access_msrs[i]);
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0577a7961b9f0..bc64e7cc02704 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -167,7 +167,7 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
+  * List of MSRs that can be directly passed to the guest.
+  * In addition to these x2apic, PT and LBR MSRs are handled specially.
+  */
+-static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
++static const u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
+ 	MSR_IA32_SPEC_CTRL,
+ 	MSR_IA32_PRED_CMD,
+ 	MSR_IA32_FLUSH_CMD,
 -- 
 2.47.0.338.g60cca15819-goog
 
