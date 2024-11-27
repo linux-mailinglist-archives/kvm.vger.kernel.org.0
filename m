@@ -1,315 +1,164 @@
-Return-Path: <kvm+bounces-32569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD659DABD4
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 17:30:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE7729DABE5
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 17:38:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F8316285A
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 16:38:23 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D63200BAD;
+	Wed, 27 Nov 2024 16:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KLqoA6A8"
+X-Original-To: kvm@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DBB72810A0
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 16:30:51 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA591FF61F;
-	Wed, 27 Nov 2024 16:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OmHTS6kZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pG7tCZNt";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OmHTS6kZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pG7tCZNt"
-X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F4528370
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 16:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6984C200132
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 16:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732725024; cv=none; b=l+8sm+w8lcBbmYXFVikC3L8e+5SpYy0wGDlOeg3qSre5WoLDgITYvlFOSCSgP83VP4Gp4uYc3JStlF23ttyKzqCRlj9uymoSjdmfOxo0GMGnPk7f/GFyaOsup/ZhW+v4RRZyMx4URgs8Y2p74rRCFbW+h60oajxzr+HDEdWuDfg=
+	t=1732725500; cv=none; b=Ab1RpzuV/lkBi57OUJjqOMap8SXMIFGHVDNnM+4jJePW5wONjhtEtCNBpnckx+tq6hhWEKNqcj1q0LBKmmMSgd+MeTISBFRvrIIPaOD3jZjsZiCFnj4YtG+eLZUZllyOhIWEAaWVW9CdFkFBtYVZFqstmQQ0rXCZ7mD6+GC6sqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732725024; c=relaxed/simple;
-	bh=FcwkYtLRMYBRrFcxCgWo0YgegLGHfGEsFW7K/VBUQ1E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a5eMK9yQZj5or7SVXrE158pUTwN0cnEH7syf0gUt0B6XzAn7yCWNHwL7t0Lv5EFRQiQaIYnPa3ENtW6OvxbAtrDK19cASVcsWa6R5NnoMEpT5P+YflKeO6gdHnL8ximI4+cKtczF5kqGtoDL214Z/hEz9bTdgu39j5cBu9jLeBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OmHTS6kZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pG7tCZNt; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OmHTS6kZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pG7tCZNt; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 53D1F21180;
-	Wed, 27 Nov 2024 16:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732725020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1732725500; c=relaxed/simple;
+	bh=S2GzSPCwTpA5llzuw8j7tLntJvPoggKyl9/JhGqLNKg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U1SWXdHzjF4CXcMyr2XUnTITTAbmNxFGgZYpQnOQacifLJFelfIhVtYEg9nNmGLIEfeaefyDsPtt/6PNWleDRhgTdE/sfQjvFO7vFjzghOdmqXiD4DHudYgm7hKXsLXp4jaov7txALmy2auTUEVQ/PEDwkQ5tU1eHgYoMj9YY+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KLqoA6A8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732725497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MR/CEsKT6+KX3t/laZSyu5DCHcUSKv+4bmcdhnY+aXU=;
-	b=OmHTS6kZ6yFjvjqdJE7HhH/26/LXjSk+FgCDPYGz5l2t7/exjUTUQtZs4U++Zzxtj74Fxg
-	X3hZtFuUs6mCQBehtPjafETQbfPe/WkiCSY6rE8Vonp4QCyZirAmcVaAIR/Kwj3djSpoqV
-	fStRxuUUPynaH519qcbSpaCgMcyXdhM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732725020;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MR/CEsKT6+KX3t/laZSyu5DCHcUSKv+4bmcdhnY+aXU=;
-	b=pG7tCZNt9TG74kRObJj1yc6bOtX1GnQM3Gc36S4HH6wTboCCK8SJ2f6WyULjmkNYiYlZS0
-	yQxJ4+ozvEYqWuAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OmHTS6kZ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=pG7tCZNt
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732725020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MR/CEsKT6+KX3t/laZSyu5DCHcUSKv+4bmcdhnY+aXU=;
-	b=OmHTS6kZ6yFjvjqdJE7HhH/26/LXjSk+FgCDPYGz5l2t7/exjUTUQtZs4U++Zzxtj74Fxg
-	X3hZtFuUs6mCQBehtPjafETQbfPe/WkiCSY6rE8Vonp4QCyZirAmcVaAIR/Kwj3djSpoqV
-	fStRxuUUPynaH519qcbSpaCgMcyXdhM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732725020;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MR/CEsKT6+KX3t/laZSyu5DCHcUSKv+4bmcdhnY+aXU=;
-	b=pG7tCZNt9TG74kRObJj1yc6bOtX1GnQM3Gc36S4HH6wTboCCK8SJ2f6WyULjmkNYiYlZS0
-	yQxJ4+ozvEYqWuAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7BBD139AA;
-	Wed, 27 Nov 2024 16:30:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yX63NRtJR2fbQAAAD6G6ig
-	(envelope-from <cfontana@suse.de>); Wed, 27 Nov 2024 16:30:19 +0000
-Message-ID: <634dd49d-94cb-4892-856d-15e83c44c805@suse.de>
-Date: Wed, 27 Nov 2024 17:30:15 +0100
+	bh=afE31lUK+/6tVm+DJ+Y3g8/UJ0QVmsOY1tXmRc3zdA8=;
+	b=KLqoA6A8uMJODJ6m39jMRntyECzdM3C2iOExcqKommV2RYwyNPq0s5L5NEjB4jGzUIdqre
+	c9DQralRFh+XC+dqnlDDZXRFQtMFPOernDy2+FtTaAK4nnLqLvUZI4+jkq7dzFPxPVkAb7
+	H39kUh1EQbRK/rP2z2Jb4Yvn2sbArZM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-VWbqufleOr-68kBe3uanOg-1; Wed, 27 Nov 2024 11:38:16 -0500
+X-MC-Unique: VWbqufleOr-68kBe3uanOg-1
+X-Mimecast-MFC-AGG-ID: VWbqufleOr-68kBe3uanOg
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-382299520fdso4521552f8f.3
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 08:38:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732725495; x=1733330295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=afE31lUK+/6tVm+DJ+Y3g8/UJ0QVmsOY1tXmRc3zdA8=;
+        b=CiaoW1tCzaNqLBLbKqC7YYPoyTq29lv0mmT6fjFmQ/FhDFJfapam8shaJa9QSc/5+U
+         jdldB6AEU/vLs2sJAmL8xut3pGzDM6Q0j1/Sa3kw0QIVhmuPIWhTl1eNyh1U8314tLt9
+         JWQDefTtL2BWdj0UKhi3Xg8pWTjXtG/tZUjmVEjXtbF96g7ufc61mVawg50h8rGXL/sT
+         4tW10wKJj+qsO3NUMFx27P1hyWriLrernxi0e1+9aqKZ4Y7Bm/pk6W8N+cq2q4doumvh
+         VcyKiE/UM4svwUBZgrxAUn8qEpi91S2hac7YnHmND6BRebfz9SZKCyk+l7KTv19vV9KH
+         nOjA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9AvWndComTLFN1VL4pZLXLV0JF6/IHWRKx3coqB2OJPwPOu9f5bIpe23HVSjxA75M6eY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytq4KvKA/vHvxvafRtG1o2Zo0sDT6p+Wn8WIh+DIGaHCa/ZADd
+	Nf89rhrq1nMjRJCb7wwM+Z/CEtxBIxKX3IPp79ufaoaYn+ySlZsEEfFdf7AcTq3OUUAPNy097Uj
+	ueB6tgkWbqqf571wkFJu6MRDuJKGQKvvYaET4OR2Sw0nUgpHWen5DOyqedv+ZKigYBL1Y28v7dA
+	VPity3Op8RjHzzI6ujuq5t9T1C
+X-Gm-Gg: ASbGnct/vSV+B88DDgqzf2vFWTsAMyvfpVZU/A98keJtHQp72LTiKKNKXQNAE6IMgJw
+	70eQBXVI+aoevHZ8AKAPeyTWp52Ng/Tqf
+X-Received: by 2002:a5d:5f53:0:b0:381:cffc:d40b with SMTP id ffacd0b85a97d-385c6eddb83mr3051310f8f.39.1732725494807;
+        Wed, 27 Nov 2024 08:38:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE8a3nxjTefB5MHFfWxupT+6qo4a3qig88kkXoZUYfsMcqJnap4vBza1hw0BxDwUCN1o7X13TJ6FB5P8J+GDIQ=
+X-Received: by 2002:a5d:5f53:0:b0:381:cffc:d40b with SMTP id
+ ffacd0b85a97d-385c6eddb83mr3051286f8f.39.1732725494457; Wed, 27 Nov 2024
+ 08:38:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tools/kvm_stat: fix termination behavior when not on a
- terminal
-To: Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Dario Faggioli <dfaggioli@suse.com>, Fabiano Rosas <farosas@suse.de>
-References: <20240807172334.1006-1-cfontana@suse.de>
- <e6461e14-ca65-4322-a818-88b66b58c5c1@suse.com>
-Content-Language: en-US
-From: Claudio Fontana <cfontana@suse.de>
-In-Reply-To: <e6461e14-ca65-4322-a818-88b66b58c5c1@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 53D1F21180
-X-Spam-Score: -1.83
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.83 / 50.00];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	BAYES_HAM(-0.32)[75.62%];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <CAAhSdy2mLBzE63wpQrOaHtOV0rwqkaxTUMBA9oMZsk68o0EHMg@mail.gmail.com>
+In-Reply-To: <CAAhSdy2mLBzE63wpQrOaHtOV0rwqkaxTUMBA9oMZsk68o0EHMg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 27 Nov 2024 17:38:01 +0100
+Message-ID: <CABgObfacuB-8KN1+Czt5DaXQbaiw9=jP5zYGatw6CGooLnz9Sg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.13, part #2
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi, according to MAINTAINERS file:
+On Thu, Nov 21, 2024 at 1:55=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
+ote:
+>
+> Hi Paolo,
+>
+> As mentioned in the last PR, here are the remaining KVM RISC-V
+> changes for 6.13 which mainly consists of Svade/Svadu extension
+> support for Host and Guest/VM.
+>
+> Please note that Palmer has not yet sent the RISC-V PR for 6.13
+> so these patches will conflict with the RISC-V tree.
 
-M:  Paolo Bonzini <pbonzini@redhat.com>
-L:  kvm@vger.kernel.org
-F:  tools/kvm/
+The RISC-V PR has not been merged yet (has it been sent?) and I am not
+sure what's happening here. If these are merged first, presumably
+Linus will bump the arch/riscv/include/asm/hwcap.h constants --
+leaving SVADE/SVADU at 87 and 88 and adjusting the others. Should I do
+that or is it delayed to 6.14 at this point?
 
-Paolo, is kvm_stat something you still care about, or should it be set to unmaintained?
-In this case I think someone at SUSE could pick it up.
+Paolo
 
-Ciao,
-
-Claudio
-
-
-On 10/21/24 15:26, Juergen Gross wrote:
-> Any reason not to commit this patch? It has got a Reviewed-by: tag from
-> Stefan more than 2 months ago...
-> 
-> On 07.08.24 19:23, Claudio Fontana wrote:
->> For the -l and -L options (logging mode), replace the use of the
->> KeyboardInterrupt exception to gracefully terminate in favor
->> of handling the SIGINT and SIGTERM signals.
->>
->> This allows the program to be run from scripts and still be
->> signaled to gracefully terminate without an interactive terminal.
->>
->> Before this change, something like this script:
->>
->> kvm_stat -p 85896 -d -t -s 1 -c -L kvm_stat_85896.csv &
->> sleep 10
->> pkill -TERM -P $$
->>
->> would yield an empty log:
->> -rw-r--r-- 1 root root     0 Aug  7 16:17 kvm_stat_85896.csv
->>
->> after this commit:
->> -rw-r--r-- 1 root root 13466 Aug  7 16:57 kvm_stat_85896.csv
->>
->> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->> Cc: Dario Faggioli <dfaggioli@suse.com>
->> Cc: Fabiano Rosas <farosas@suse.de>
->> ---
->>   tools/kvm/kvm_stat/kvm_stat     | 64 ++++++++++++++++-----------------
->>   tools/kvm/kvm_stat/kvm_stat.txt | 12 +++++++
->>   2 files changed, 44 insertions(+), 32 deletions(-)
->>
->> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
->> index 15bf00e79e3f..2cf2da3ed002 100755
->> --- a/tools/kvm/kvm_stat/kvm_stat
->> +++ b/tools/kvm/kvm_stat/kvm_stat
->> @@ -297,8 +297,6 @@ IOCTL_NUMBERS = {
->>       'RESET':       0x00002403,
->>   }
->>   
->> -signal_received = False
->> -
->>   ENCODING = locale.getpreferredencoding(False)
->>   TRACE_FILTER = re.compile(r'^[^\(]*$')
->>   
->> @@ -1598,7 +1596,19 @@ class CSVFormat(object):
->>   
->>   def log(stats, opts, frmt, keys):
->>       """Prints statistics as reiterating key block, multiple value blocks."""
->> -    global signal_received
->> +    signal_received = defaultdict(bool)
->> +
->> +    def handle_signal(sig, frame):
->> +        nonlocal signal_received
->> +        signal_received[sig] = True
->> +        return
->> +
->> +
->> +    signal.signal(signal.SIGINT, handle_signal)
->> +    signal.signal(signal.SIGTERM, handle_signal)
->> +    if opts.log_to_file:
->> +        signal.signal(signal.SIGHUP, handle_signal)
->> +
->>       line = 0
->>       banner_repeat = 20
->>       f = None
->> @@ -1624,39 +1634,31 @@ def log(stats, opts, frmt, keys):
->>       do_banner(opts)
->>       banner_printed = True
->>       while True:
->> -        try:
->> -            time.sleep(opts.set_delay)
->> -            if signal_received:
->> -                banner_printed = True
->> -                line = 0
->> -                f.close()
->> -                do_banner(opts)
->> -                signal_received = False
->> -            if (line % banner_repeat == 0 and not banner_printed and
->> -                not (opts.log_to_file and isinstance(frmt, CSVFormat))):
->> -                do_banner(opts)
->> -                banner_printed = True
->> -            values = stats.get()
->> -            if (not opts.skip_zero_records or
->> -                any(values[k].delta != 0 for k in keys)):
->> -                do_statline(opts, values)
->> -                line += 1
->> -                banner_printed = False
->> -        except KeyboardInterrupt:
->> +        time.sleep(opts.set_delay)
->> +        # Do not use the KeyboardInterrupt exception, because we may be running without a terminal
->> +        if (signal_received[signal.SIGINT] or signal_received[signal.SIGTERM]):
->>               break
->> +        if signal_received[signal.SIGHUP]:
->> +            banner_printed = True
->> +            line = 0
->> +            f.close()
->> +            do_banner(opts)
->> +            signal_received[signal.SIGHUP] = False
->> +        if (line % banner_repeat == 0 and not banner_printed and
->> +            not (opts.log_to_file and isinstance(frmt, CSVFormat))):
->> +            do_banner(opts)
->> +            banner_printed = True
->> +        values = stats.get()
->> +        if (not opts.skip_zero_records or
->> +            any(values[k].delta != 0 for k in keys)):
->> +            do_statline(opts, values)
->> +            line += 1
->> +            banner_printed = False
->>   
->>       if opts.log_to_file:
->>           f.close()
->>   
->>   
->> -def handle_signal(sig, frame):
->> -    global signal_received
->> -
->> -    signal_received = True
->> -
->> -    return
->> -
->> -
->>   def is_delay_valid(delay):
->>       """Verify delay is in valid value range."""
->>       msg = None
->> @@ -1869,8 +1871,6 @@ def main():
->>           sys.exit(0)
->>   
->>       if options.log or options.log_to_file:
->> -        if options.log_to_file:
->> -            signal.signal(signal.SIGHUP, handle_signal)
->>           keys = sorted(stats.get().keys())
->>           if options.csv:
->>               frmt = CSVFormat(keys)
->> diff --git a/tools/kvm/kvm_stat/kvm_stat.txt b/tools/kvm/kvm_stat/kvm_stat.txt
->> index 3a9f2037bd23..4a99a111a93c 100644
->> --- a/tools/kvm/kvm_stat/kvm_stat.txt
->> +++ b/tools/kvm/kvm_stat/kvm_stat.txt
->> @@ -115,6 +115,18 @@ OPTIONS
->>   --skip-zero-records::
->>           omit records with all zeros in logging mode
->>   
->> +
->> +SIGNALS
->> +-------
->> +when kvm_stat is running in logging mode (either with -l or with -L),
->> +it handles the following signals:
->> +
->> +SIGHUP - closes and reopens the log file (-L only), then continues.
->> +
->> +SIGINT - closes the log file and terminates.
->> +SIGTERM - closes the log file and terminates.
->> +
->> +
->>   SEE ALSO
->>   --------
->>   'perf'(1), 'trace-cmd'(1)
-> 
+> Please pull.
+>
+> Regards,
+> Anup
+>
+> The following changes since commit 332fa4a802b16ccb727199da685294f85f9880=
+cb:
+>
+>   riscv: kvm: Fix out-of-bounds array access (2024-11-05 13:27:32 +0530)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.13-2
+>
+> for you to fetch changes up to c74bfe4ffe8c1ca94e3d60ec7af06cf679e23583:
+>
+>   KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-list
+> test (2024-11-21 17:40:16 +0530)
+>
+> ----------------------------------------------------------------
+> KVM/riscv changes for 6.13 part #2
+>
+> - Svade and Svadu extension support for Host and Guest/VM
+>
+> ----------------------------------------------------------------
+> Yong-Xuan Wang (4):
+>       RISC-V: Add Svade and Svadu Extensions Support
+>       dt-bindings: riscv: Add Svade and Svadu Entries
+>       RISC-V: KVM: Add Svade and Svadu Extensions Support for Guest/VM
+>       KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-lis=
+t test
+>
+>  .../devicetree/bindings/riscv/extensions.yaml      | 28 ++++++++++++++++=
+++++++
+>  arch/riscv/Kconfig                                 |  1 +
+>  arch/riscv/include/asm/csr.h                       |  1 +
+>  arch/riscv/include/asm/hwcap.h                     |  2 ++
+>  arch/riscv/include/asm/pgtable.h                   | 13 +++++++++-
+>  arch/riscv/include/uapi/asm/kvm.h                  |  2 ++
+>  arch/riscv/kernel/cpufeature.c                     | 12 ++++++++++
+>  arch/riscv/kvm/vcpu.c                              |  4 ++++
+>  arch/riscv/kvm/vcpu_onereg.c                       | 15 ++++++++++++
+>  tools/testing/selftests/kvm/riscv/get-reg-list.c   |  8 +++++++
+>  10 files changed, 85 insertions(+), 1 deletion(-)
+>
 
 
