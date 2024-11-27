@@ -1,152 +1,203 @@
-Return-Path: <kvm+bounces-32566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E4C9DA986
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 15:01:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B099DA9FD
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 15:39:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6695B21C50
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 14:01:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B43164D86
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 14:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD5B1FCFE5;
-	Wed, 27 Nov 2024 14:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660CF1FF7BB;
+	Wed, 27 Nov 2024 14:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zEyvsi9o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oHjNr/E7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F231FBE84
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 14:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016921FF7B5
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 14:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732716056; cv=none; b=EXQUThEQ7C3WGjGENzyB/fgd2ANeyyochk/84nJdYRVLtawNZUPNusoQ7D22bIcyhvNn2qE5ss76PSL44zcMc5czo3McrvwjL1UT0B9XOnMUgmi1HxikhbITHfUORuI52wTBqtRND1Io5svgCD9mI9TACPSHx1igaCD1DJwN0VY=
+	t=1732718324; cv=none; b=EZId/lxnQ/trzb/ktRQtn4km/btOjS4Hfcze5Nkupgl8DbLo+blOM2Ww0Dm5lC+/NaP5HNfc7eGPTZVf0MtMimlJCf2C++s+r2D2ujTnzAeIylIkN/pOH+nAj1ya53sxJJ3cG5s8juy26/5W0B4Fdqeaes44kQhq5Ho+KCICJIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732716056; c=relaxed/simple;
-	bh=W1DxBS8fDYv3TRxGQaecFUft0N2XtDvc2T/7HVuJ2y0=;
+	s=arc-20240116; t=1732718324; c=relaxed/simple;
+	bh=xT97KYgdluN7ebir3nQvf+4Hgac1dq5jbrG4z+OLnsc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=McSegAx1zjAieq6KIgjhxQL17uMZg00YvVz8TGuAH1kV5IF4K9o1hNiDwzyogOcnO0q0vGtuCzJdgDVLMR4xP9NRNAKKggr7RvnTAkK6hVi7Q1fUN3inN5TsTop94wBqcuV7c4PpT7+JOSGI93/URa7hTMnYtdWUQ6SxTwuSV3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zEyvsi9o; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=knGISypSdwQedYACVM5HeFNDcZW7qBfALRz2b4BUJz59SEXOdNEakZpXAwbTW9qfA9lvojcXRB9EhX9iHvWJf+AYSoLnYP52ut+8t3Z2dE/2WNE1CL/KDddqaqKommJzAgtqWfcvlcbbD0ht079cbJD0kcuNzORSx/gSrPygwQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oHjNr/E7; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ea2bf5b5fbso6462020a91.2
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 06:00:55 -0800 (PST)
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3a7776959fdso74046385ab.1
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 06:38:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732716054; x=1733320854; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732718322; x=1733323122; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EdwWS10u7VCBrGSuDVmxmJIAY/501oDBhCB/j2Uherc=;
-        b=zEyvsi9oxc1WkLQF3ylJM7iMhdnLKRmx1eIs9LYCH5cm6VFS4MAJYghSX4+ayLqQgX
-         F97xH2Cp2qfV9vNOVVG++SNj/CShrYHnINJeeJ4rhXAjHCBDJnrj/9NQQcu5YIigXGcW
-         MTobQMEVT+ZgXPEv50pr05kfuVadLjDVcbFK4Ib7Vb1eTW8NMjpx16xd9j02tZ3/TXdu
-         Q2bYbrn0+oxQGfciUlui+vnrqw/F9HPaeMJvP7wcM7AuQbmAx5nPhCAAYO017jtAspGb
-         +Foq4EApTQ1NPoXx5XARYTC1YAWNIQMcROuKbLXYpEGoHyqc/glarh82UdJ70k6zzpOw
-         PdBA==
+        bh=RcW151oQ5hondKtplla/DkVWCP6XFqg+OnT+IGOy13o=;
+        b=oHjNr/E7Gqu5IU/mx96kzhrk3/6fzB+qcYaWvWCcpANsuzVAfDCK2vKdlVmG1ei+/q
+         KYWM9uzyjkOJOiXoNiHz86igzgp69psGE2Sxm+QjpB4Y51iyqyiyxojxIfQU28EkaEpT
+         3CdXjCDxvjsRneJcfDf95BeEyb79g9kVThMFaAfGbIKsedXLwCANS1WVfJPQP+cNekDU
+         f36aNtSxyXGNq296Lze/ihooLmE75K5OMmL5ISIDi0VQ43GkwE5/f5F2F+hVekV3jS3F
+         5wABWAkIoTSjrwocQAE6EeKMHmPtOV6eFl8O6EbFZYF80agVTXizR78vXR9D1z5saZ85
+         /asQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732716054; x=1733320854;
+        d=1e100.net; s=20230601; t=1732718322; x=1733323122;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EdwWS10u7VCBrGSuDVmxmJIAY/501oDBhCB/j2Uherc=;
-        b=ZD4q/00YuZW7WXMEGg9+LYqQbk17aP9bwfoU/2igFbM70TlrOa58V2v0sCD0eA/b8Z
-         OJ2MWi+OdEVS98DlbUNFpiMPrTwDKM7pFacfUM+41mq3Pl5oFaAogES+xAGq6lAwOAhg
-         0VPTWldsr+apHE39nQo3qlW68QjarFEn8hxYNT+jEfQQ26XCDQEIzx4K+wwICZSHXbY9
-         gnl2I4dBvPpfiZW46c+tJ+A33RNqMA6kKZjNyzIiHDVtaY9vC14il0YFCbr+ezUmfwmG
-         Fn18Il4fZAMef5A0AEADD8K4VwN+LnyA/jFVJAbYFbXrQrESYTIkf6nxKtmPfYaiwdUc
-         v+wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUutzCjr9+CVTxxuQu60l/jeylQbGQTefKouKEj0GTjN4W5rucOoXjFOS1qNiXvf+bELZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxtDPXoZxzeo3AbJTtdjur9sI+/ISILLc7yd4naheAOVzJ7+5Q
-	G/zjeG6VacVPkG0B5gmAEO2eaiT/EIv30eku8dvvAKIEyzNlrJK2nbGWHavg1aS3VWiNw0uhQyb
-	6zA==
-X-Google-Smtp-Source: AGHT+IEceWTnc4XBuGV61B8FQtJMJ4GYGuGv/V6MFcmhcEEziILmmaudgMsDr7JH5R7liBwxVt0pxc+caLk=
-X-Received: from pjbph7.prod.google.com ([2002:a17:90b:3bc7:b0:2c7:b802:270a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2245:b0:2ea:61de:3900
- with SMTP id 98e67ed59e1d1-2ee097e3427mr3408431a91.32.1732716054604; Wed, 27
- Nov 2024 06:00:54 -0800 (PST)
-Date: Wed, 27 Nov 2024 06:00:49 -0800
-In-Reply-To: <Zz/6NBmZIcRUFvLQ@intel.com>
+        bh=RcW151oQ5hondKtplla/DkVWCP6XFqg+OnT+IGOy13o=;
+        b=gTTnD/Nbn/cbDH1D3dcjPIAaBM63fTh9TqOpGZmifOT5B7sNcRNvIihZVpeYGOlwHc
+         flTMr1Pimi3fBlhhp7GrHSNNSQHlCyllOc1Cye7TxritD8QRQMdt0KKTctJDR0nmb+ZZ
+         emLBRsqjYy92BC5jVxFTTtw9Yg65LpeMdupBDEDIK9gOo5r7Im4m9za2Uo3pZimkx2fE
+         TIM9M9csNMiMFwk2V979Cvlk0h3i4HFpthaK5BIO8FTokRosSgWgGYnOfFFrWm47e8QZ
+         17T3t+10SwzGnZYZSm9p3HXLjOGqOxlBveOvctUDHj7dBYQ52fUdIk7qIU3odO8pcA4h
+         tXaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUG7uPe/lMwHMIcJaf+Ok/IV35qVD1FcxIVzTtLhgaCqMCKABMTyofBLHdzLox5gy/WnGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqG+v6AI/cXDh97gw8nCZz9byBf5OeIFhiLO9V8FuUCrMuA0XR
+	fxcXS6U6oHe1m+1oIfnJj0eitP1hWszyndFvFk8oYCFGNjJrN6utdqgjROqTZWmcZuZxr/akSDy
+	jyw==
+X-Google-Smtp-Source: AGHT+IG7Clebz5+ikhZk/p3e2lBnUMggo0Vrm0EMc7kyDhz6gWIVGZ5y2tr41LsMOLzWgPahBG28XOb331w=
+X-Received: from pgg13.prod.google.com ([2002:a05:6a02:4d8d:b0:7fb:db54:f065])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6e02:1e01:b0:3a7:7ee3:108d
+ with SMTP id e9e14a558f8ab-3a7c55f2783mr35486615ab.23.1732718322166; Wed, 27
+ Nov 2024 06:38:42 -0800 (PST)
+Date: Wed, 27 Nov 2024 06:38:41 -0800
+In-Reply-To: <cbcb80ee5be13d78390ff6f4a1a3c58fc849e311.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-8-adrian.hunter@intel.com> <Zz/6NBmZIcRUFvLQ@intel.com>
-Message-ID: <Z0cmEd5ehnYT8uc-@google.com>
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
+References: <20240517173926.965351-23-seanjc@google.com> <43ef06aca700528d956c8f51101715df86f32a91.camel@redhat.com>
+ <ZoxVa55MIbAz-WnM@google.com> <3da2be9507058a15578b5f736bc179dc3b5e970f.camel@redhat.com>
+ <ZqKb_JJlUED5JUHP@google.com> <8f35b524cda53aff29a9389c79742fc14f77ec68.camel@redhat.com>
+ <ZrFLlxvUs86nqDqG@google.com> <44e7f9cba483bda99f8ddc0a2ad41d69687e1dbe.camel@redhat.com>
+ <ZuG5ULBjfQ3hv_Jb@google.com> <cbcb80ee5be13d78390ff6f4a1a3c58fc849e311.camel@redhat.com>
+Message-ID: <Z0cu8aLX7VkwmtSk@google.com>
+Subject: Re: [PATCH v2 22/49] KVM: x86: Add a macro to precisely handle
+ aliased 0x1.EDX CPUID features
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, yan.y.zhao@intel.com, weijiang.yang@intel.com
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Nov 22, 2024, Chao Gao wrote:
-> >+static bool tdparams_tsx_supported(struct kvm_cpuid2 *cpuid)
-> >+{
-> >+	const struct kvm_cpuid_entry2 *entry;
-> >+	u64 mask;
-> >+	u32 ebx;
-> >+
-> >+	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x7, 0);
-> >+	if (entry)
-> >+		ebx = entry->ebx;
-> >+	else
-> >+		ebx = 0;
-> >+
-> >+	mask = __feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM);
-> >+	return ebx & mask;
-> >+}
-> >+
-> > static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
-> > 			struct kvm_tdx_init_vm *init_vm)
-> > {
-> >@@ -1299,6 +1322,7 @@ static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
-> > 	MEMCPY_SAME_SIZE(td_params->mrowner, init_vm->mrowner);
-> > 	MEMCPY_SAME_SIZE(td_params->mrownerconfig, init_vm->mrownerconfig);
+On Thu, Nov 21, 2024, Maxim Levitsky wrote:
+> On Wed, 2024-09-11 at 08:37 -0700, Sean Christopherson wrote:
+> > On Tue, Sep 10, 2024, Maxim Levitsky wrote:
+> > > On Mon, 2024-08-05 at 15:00 -0700, Sean Christopherson wrote:
+> > > > At that point, I'm ok with defining each alias, though I honestly still don't
+> > > > understand the motivation for defining single-use macros.
+> > > > 
+> > > 
+> > > The idea is that nobody will need to look at these macros
+> > > (e.g__X86_FEATURE_8000_0001_ALIAS() and its usages), because it's clear what
+> > > they do, they just define few extra CPUID features that nobody really cares
+> > > about.
+> > > 
+> > > ALIASED_F() on the other hand is yet another _F macro() and we will need,
+> > > once again and again to figure out why it is there, what it does, etc.
 > > 
-> >+	to_kvm_tdx(kvm)->tsx_supported = tdparams_tsx_supported(cpuid);
-> > 	return 0;
-> > }
+> > That seems easily solved by naming the macro ALIASED_8000_0001_F().  I don't see
+> > how that's any less clear than __X86_FEATURE_8000_0001_ALIAS(), and as above,
+> > there are several advantages to defining the alias in the context of the leaf
+> > builder.
 > > 
-> >@@ -2272,6 +2296,11 @@ static int __init __tdx_bringup(void)
-> > 			return -EIO;
-> > 		}
-> > 	}
-> >+	tdx_uret_tsx_ctrl_slot = kvm_find_user_return_msr(MSR_IA32_TSX_CTRL);
-> >+	if (tdx_uret_tsx_ctrl_slot == -1 && boot_cpu_has(X86_FEATURE_MSR_TSX_CTRL)) {
-> >+		pr_err("MSR_IA32_TSX_CTRL isn't included by kvm_find_user_return_msr\n");
-> >+		return -EIO;
-> >+	}
-> > 
-> > 	/*
-> > 	 * Enabling TDX requires enabling hardware virtualization first,
-> >diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> >index 48cf0a1abfcc..815ff6bdbc7e 100644
-> >--- a/arch/x86/kvm/vmx/tdx.h
-> >+++ b/arch/x86/kvm/vmx/tdx.h
-> >@@ -29,6 +29,14 @@ struct kvm_tdx {
-> > 	u8 nr_tdcs_pages;
-> > 	u8 nr_vcpu_tdcx_pages;
-> > 
-> >+	/*
-> >+	 * Used on each TD-exit, see tdx_user_return_msr_update_cache().
-> >+	 * TSX_CTRL value on TD exit
-> >+	 * - set 0     if guest TSX enabled
-> >+	 * - preserved if guest TSX disabled
-> >+	 */
-> >+	bool tsx_supported;
 > 
-> Is it possible to drop this boolean and tdparams_tsx_supported()? I think we
-> can use the guest_can_use() framework instead.
+> Hi!
+> 
+> I am stating my point again: Treating 8000_0001 leaf aliases as regular CPUID
+> features means that we don't need common code to deal with this, and thus
+> when someone reads the common code (and this is the thing I care about the
+> most) that someone won't need to dig up the info about what these aliases
+> are. 
 
-Yeah, though that optimized handling will soon come for free[*], and I plan on
-landing that sooner than TDX, so don't fret too much over this.
+Ah, this is where we disagree, I think.  I feel quite strongly that oddities such
+as aliased/duplicate CPUID feature bits need to be made as visible as possible,
+and well documented.  Hiding architectural quirks might save some readers a few
+seconds of their time, but it can also confuse others, and more importantly, makes
+it more difficult for new readers/developers to learn about the quirks.
 
-[*] https://lore.kernel.org/all/20240517173926.965351-1-seanjc@google.com
+This code _looks_ wrong, as there's no indication that CPUID_8000_0001_EDX is
+unique.  I too wasn't aware of the aliases until this series, and I was very
+confused by KVM's code.  The only clue that I was given was the "Don't duplicate
+feature flags which are redundant with Intel!" comment in cpufeatures.h; I still
+ended up digging through the APM to understand what was going on.
+
+	kvm_cpu_cap_mask(CPUID_1_EDX,
+		F(FPU) | F(VME) | F(DE) | F(PSE) |
+		F(TSC) | F(MSR) | F(PAE) | F(MCE) |
+		F(CX8) | F(APIC) | 0 /* Reserved */ | F(SEP) |
+		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+		F(PAT) | F(PSE36) | 0 /* PSN */ | F(CLFLUSH) |
+		0 /* Reserved, DS, ACPI */ | F(MMX) |
+		F(FXSR) | F(XMM) | F(XMM2) | F(SELFSNOOP) |
+		0 /* HTT, TM, Reserved, PBE */
+	);
+
+	kvm_cpu_cap_mask(CPUID_8000_0001_EDX,
+		F(FPU) | F(VME) | F(DE) | F(PSE) |
+		F(TSC) | F(MSR) | F(PAE) | F(MCE) |
+		F(CX8) | F(APIC) | 0 /* Reserved */ | F(SYSCALL) |
+		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+		F(PAT) | F(PSE36) | 0 /* Reserved */ |
+		F(NX) | 0 /* Reserved */ | F(MMXEXT) | F(MMX) |
+		F(FXSR) | F(FXSR_OPT) | f_gbpages | F(RDTSCP) |
+		0 /* Reserved */ | f_lm | F(3DNOWEXT) | F(3DNOW)
+	);
+
+Versus this code, which hopefully elicits a "huh!?" and prompts curious readers
+to go look at the definition of ALIASED_1_EDX_F() to understand why KVM is being
+weird.  And if readers can't figure things out purely from ALIASED_1_EDX_F()'s
+comment, then that's effectively a KVM documentation issue and should be fixed.
+
+In other words, I want to make things like this stick out so that more developers
+are aware of such quirks, i.e. to to minimize the probability of such knowledge
+being lost.  I don't want the next generation of KVM developers to have to
+re-discover things that can be solved by a moderately verbose comment.
+
+	kvm_cpu_cap_init(CPUID_1_EDX,
+		F(FPU),
+		F(VME),
+		F(DE),
+		F(PSE),
+		F(TSC),
+		F(MSR),
+		F(PAE),
+		F(MCE),
+		F(CX8),
+		F(APIC),
+		...
+	);
+
+	kvm_cpu_cap_init(CPUID_8000_0001_EDX,
+		ALIASED_1_EDX_F(FPU),
+		ALIASED_1_EDX_F(VME),
+		ALIASED_1_EDX_F(DE),
+		ALIASED_1_EDX_F(PSE),
+		ALIASED_1_EDX_F(TSC),
+		ALIASED_1_EDX_F(MSR),
+		ALIASED_1_EDX_F(PAE),
+		ALIASED_1_EDX_F(MCE),
+		ALIASED_1_EDX_F(CX8),
+		ALIASED_1_EDX_F(APIC),
+		...
+	);
+
+> I for example didn't knew about them because these aliases are basically a
+> result of AMD redoing some things in the spec their way when they just
+> released first 64-bit extensions.  I didn't follow the x86 ISA closely back
+> then (I only had 32 bit systems to play with).
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
 
