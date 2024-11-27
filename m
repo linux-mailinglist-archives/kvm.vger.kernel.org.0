@@ -1,111 +1,154 @@
-Return-Path: <kvm+bounces-32563-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32564-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B4A9DA471
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 10:05:10 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0D2166A1A
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 09:05:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE5A1922F8;
-	Wed, 27 Nov 2024 09:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sn2pezW0"
-X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218AB9DA5E3
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 11:35:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CFF1917C2
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 09:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D35E6282B04
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 10:35:37 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F47198850;
+	Wed, 27 Nov 2024 10:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m4w5T8gG"
+X-Original-To: kvm@vger.kernel.org
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1F9195FEC;
+	Wed, 27 Nov 2024 10:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732698299; cv=none; b=haVSACtPE2oPDHDxSZ82xL3toqv1j7/Rr9lfTpaBHuka7oq8Cj9tUR3e8lI1nZwfaXtds6V+8zQvpOw7UQd6oSJObvdb6zDWCQiWFwQLGyyTkuheohjbZuDH4w9x4aAH3EnZUKjxUNNNlVKDiZ/naHiONazHuhSlTR0qsazSrJo=
+	t=1732703729; cv=none; b=LNzLDsGiVNkMwtfCwsGAT8yO25DVnKaXsUgZ6mMb7AoiU5A1zWW5gt4pWTabWe8sijiHOks9O82q/QEEO9gLwgrVenyQXkcOzkym0V74Qlt69amdHS7qy6mGyhevFfpbAoI1MkygWnEBAb1yusZVv1Sfcy1+vFtx4EkX59gRTLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732698299; c=relaxed/simple;
-	bh=WkPvhthsAuPWzNVYbj0HobwE43UwtUljTpGfvwmj1bY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PUy4VD0QB9fJWU6cozJFZYYnlzJicFIAeeP9SIx8XaM2FqXcmKlRwbcHJ3Q93gOwh2cCcVzDC3bV/Rx/06i8PeltTTYnjWWAQJDv2iNxxHSZ9XKdrvuSUXoznmLYUCH1K3/7hEgAGgMhTzKNx+S7ZkIcxVeE0zLtoHnHg+xaNjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sn2pezW0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67ECAC4CECC;
-	Wed, 27 Nov 2024 09:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732698298;
-	bh=WkPvhthsAuPWzNVYbj0HobwE43UwtUljTpGfvwmj1bY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sn2pezW0LfJmBJRUQiqXEFHajmYOPyhW8+G4gaq4c1j6bLINa9N9OK9rqoFfM+A8h
-	 8YEtjKOffdlpaMG2By74IsE+zDrdEQWU+rEtNVksXLGfez1xhHg+MBOZgpKNyKmFws
-	 0cKaP9qfVlkTYrKtcQfYSjra7Wx6HmMgAusENL0wwCRJktyenEzuZcxLgeZYPu6KLr
-	 9JqroPVARpKl8/AXRRmo7leUkyfH4IdbJmflSaIu1ZO8I3HshrkkT8fyZm3tlBYc6m
-	 jpBgk1uGwvab6wVabO5Jb5z+rRDeSLdMLJaSnSsMm/xSolrCrMCCHSBH+EcmH7VDcA
-	 /bg+2DerItJdw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tGDyi-00GDPe-8a;
-	Wed, 27 Nov 2024 09:04:56 +0000
-Date: Wed, 27 Nov 2024 09:04:55 +0000
-Message-ID: <86bjy1ujwo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Bernhard Kauer <bk@alpico.io>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: make uevents configurable
-In-Reply-To: <Z0bao0moyeDgqBDU@mias.mediconcil.de>
-References: <20241122095806.4034415-1-bk@alpico.io>
-	<86h67vusnf.wl-maz@kernel.org>
-	<Z0Wg0jQLRuAQrl0j@mias.mediconcil.de>
-	<86frneutlt.wl-maz@kernel.org>
-	<Z0bao0moyeDgqBDU@mias.mediconcil.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1732703729; c=relaxed/simple;
+	bh=hwhPC+nngxGhlzp3O6yweDudyD4FEfXUMNg9mM21JjE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EIEKRUq2oYlZKEKeK7u8GuUIy4+Wl1K4PBL7bJidAESPN8d5hkwfe0f5g3J40aIQJTU8Y0DY05izpExh/CQJS29VEGxSCVTuZ6QYQ5IvmQD+m31LmYblWkrglBCXaDftvrY4dCIN3Ui5xD6N9QkvXQBGWSMkzJ4S2vfyjjQ4CPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m4w5T8gG; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732703728; x=1764239728;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=dANRT1QysBfh684irsoEIYvJESbzRAKP8LynwcGDE+4=;
+  b=m4w5T8gGeYoATlymSj8BG48iNg2P97X1ROp+nzMy2qd5YWuoullg6iXy
+   TMYyRIiOS+pySLSUfsNHAhYqT7jyfMXKkqIWfxxOKPZMzaFbTPfBHYf4l
+   /bawtVp+4AnaHDunlf49Ar4W1AFRMHLMwyfkRfkC+G8rpBOqP4x7YInYy
+   w=;
+X-IronPort-AV: E=Sophos;i="6.12,189,1728950400"; 
+   d="scan'208";a="356119897"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2024 10:35:24 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:44523]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.62:2525] with esmtp (Farcaster)
+ id e57ab266-76c7-474b-a839-3465549ca324; Wed, 27 Nov 2024 10:35:23 +0000 (UTC)
+X-Farcaster-Flow-ID: e57ab266-76c7-474b-a839-3465549ca324
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 27 Nov 2024 10:35:21 +0000
+Received: from [192.168.3.246] (10.106.82.33) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 27 Nov 2024
+ 10:35:19 +0000
+Message-ID: <522cb8d6-63fa-4450-a786-86da64f8ecc3@amazon.com>
+Date: Wed, 27 Nov 2024 10:35:17 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: bk@alpico.io, pbonzini@redhat.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH] KVM: x86: async_pf: check earlier if can deliver async pf
+To: Sean Christopherson <seanjc@google.com>
+CC: <pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <david@redhat.com>,
+	<peterx@redhat.com>, <oleg@redhat.com>, <vkuznets@redhat.com>,
+	<gshan@redhat.com>, <graf@amazon.de>, <jgowans@amazon.com>,
+	<roypat@amazon.co.uk>, <derekmn@amazon.com>, <nsaenz@amazon.es>,
+	<xmarcalx@amazon.com>
+References: <20241118130403.23184-1-kalyazin@amazon.com>
+ <ZzyRcQmxA3SiEHXT@google.com>
+ <b6d32f47-9594-41b1-8024-a92cad07004e@amazon.com>
+ <Zz-gmpMvNm_292BC@google.com>
+ <b7d21cce-720f-4db3-bbb4-0be17e33cd09@amazon.com>
+ <Z0URHBoqSgSr_X5-@google.com>
+ <e12ef1ad-7576-4874-8cc2-d48b6619fa95@amazon.com>
+ <Z0ZHSHxpagw_HXDQ@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <Z0ZHSHxpagw_HXDQ@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D013EUB003.ant.amazon.com (10.252.51.65) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Wed, 27 Nov 2024 08:38:59 +0000,
-Bernhard Kauer <bk@alpico.io> wrote:
+
+
+On 26/11/2024 22:10, Sean Christopherson wrote:
+> On Tue, Nov 26, 2024, Nikita Kalyazin wrote:
+>> On 26/11/2024 00:06, Sean Christopherson wrote:
+>>> On Mon, Nov 25, 2024, Nikita Kalyazin wrote:
+>>>> In both cases the fault handling code is blocked and the pCPU is free for
+>>>> other tasks.  I can't see the vCPU spinning on the IO to get completed if
+>>>> the async task isn't created.  I tried that with and without async PF
+>>>> enabled by the guest (MSR_KVM_ASYNC_PF_EN).
+>>>>
+>>>> What am I missing?
+>>>
+>>> Ah, I was wrong about the vCPU spinning.
+>>>
+>>> The goal is specifically to schedule() from KVM context, i.e. from kvm_vcpu_block(),
+>>> so that if a virtual interrupt arrives for the guest, KVM can wake the vCPU and
+>>> deliver the IRQ, e.g. to reduce latency for interrupt delivery, and possible even
+>>> to let the guest schedule in a different task if the IRQ is the guest's tick.
+>>>
+>>> Letting mm/ or fs/ do schedule() means the only wake event even for the vCPU task
+>>> is the completion of the I/O (or whatever the fault is waiting on).
+>>
+>> Ok, great, then that's how I understood it last time.  The only thing that
+>> is not entirely clear to me is like Vitaly says, KVM_ASYNC_PF_SEND_ALWAYS is
+>> no longer set, because we don't want to inject IRQs into the guest when it's
+>> in kernel mode, but the "host async PF" case would still allow IRQs (eg
+>> ticks like you said).  Why is it safe to deliver them?
 > 
-> On Tue, Nov 26, 2024 at 11:23:10AM +0000, Marc Zyngier wrote:
-> > > > I'm not overly keen on the command-line flag though, as this is the
-> > > > sort of things you'd like to be able to control more finely. Or at
-> > > > least without having to trigger a reboot.
-> > > 
-> > > I compile KVM as module, so I can reload it with different parameters
-> > > easily.
-> > 
-> > arm64 doesn't (and cannot) build KVM as a module. 
+> IRQs are fine, the problem with PV async #PF is that it directly injects a #PF,
+> which the kernel may not be prepared to handle.
+
+You're right indeed, I was overfocused on IRQs for some reason.
+
+>>>>>>> I have no objection to disabling host async page faults,
+>>>>>>> e.g. it's probably a net>>>>> negative for 1:1 vCPU:pCPU pinned setups, but such disabling
+>>>>>>> needs an opt-in from>>>>> userspace.
+>> Back to this, I couldn't see a significant effect of this optimisation with
+>> the original async PF so happy to give it up, but it does make a difference
+>> when applied to async PF user [2] in my setup.  Would a new cap be a good
+>> way for users to express their opt-in for it?
 > 
-> Ah, I didn't realize it.  But being able to patch EL2 from EL1 is probably
-> more complicated than what is gained with it.
+> This probably needs to be handled in the context of the async #PF user series.
+> If that series never lands, adding a new cap is likely a waste.  And I suspect
+> that even then, a capability may not be warranted (truly don't know, haven't
+> looked at your other series).
 
-It is mostly pulling the rug from under your feet if you do that on
-non-VHE systems, and make absolutely for things like pKVM.
-
-> > > But I can make the module parameter read-write so that it is modifiable
-> > > during runtime via /sys/module/kvm/parameters/ even when KVM is compiled
-> > > into the kernel.
-> > 
-> > I guess that'd be the next best thing.
-> 
-> Ok, I will do that in v2 of the patch to be sent next week.
-
-Thanks.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Yes, I meant that to be included in the async #PF user series (if 
+required), not this one.  Just wanted to bring it up here, because the 
+thread already had the relevant context.  Thanks.
 
