@@ -1,452 +1,126 @@
-Return-Path: <kvm+bounces-32584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092A89DAE5A
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:11:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C76F016602E
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:11:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A36220409F;
-	Wed, 27 Nov 2024 20:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nj9pXLfn"
-X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2BCE9DAE6D
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:19:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EF12036E6
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732738229; cv=none; b=Qe7RQfWfl0x9N3wCUQcaeIf25c24AbubYHAYMz72FWz8Ruvd9ZCc3jEPNsmoUIhTmzbW7vDaziQF9JUpJpPSzzJ2tMlfs95H4U7w0ThYmMReQS6GaluHGNdHxLUCUDTB50RqWm25ZEQoQDbqEsamvj/K+oli8+dYuLiNFlWv2Qg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732738229; c=relaxed/simple;
-	bh=GjTTqn2whow5AQGXruMUfYhh0oUV4AeJJk0c33RICus=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O74ntZLr0r0+wPpSIK2Y6xvLZfEwaI+P7tzV7X1ItxkD7io/4/srs+PN0es2xDI+zmjYLI2p6L0FaBNIxsXMTUle0t/kCzlKVDm2ZMNzdBfYH8ifRGIWeLC8s0aUlW6gDJ1+vX8X4e4B77gj6CdrHiWWi+o4D3qwgH9aMuSkOJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nj9pXLfn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732738225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vSsdGrzP8QTWyIieNbBesE4v5M+34faZuSvZl5ZTcvI=;
-	b=Nj9pXLfne1K8jqK7dUZgON5r2NqvrA+YsuQpjMuRyWbd1+QYBsR0dSB7QRkqP1d27RnpYd
-	RX4XJCnzugiTXA4oODXAnrFfiDJYeC3tQcnAdtfzc1+zfBcj2X8nzs48v7tFlG3UXQ0ut0
-	SQf4XqDf1l2Bovk0TLRY1d0fVR+nHj0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-113-u85DGN12OKCSNcmV8A27Tw-1; Wed,
- 27 Nov 2024 15:10:24 -0500
-X-MC-Unique: u85DGN12OKCSNcmV8A27Tw-1
-X-Mimecast-MFC-AGG-ID: u85DGN12OKCSNcmV8A27Tw
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98FBB281AA7
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:19:46 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35107202F87;
+	Wed, 27 Nov 2024 20:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="whpORLD3"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 412101955DC4;
-	Wed, 27 Nov 2024 20:10:23 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A0D1C19560A3;
-	Wed, 27 Nov 2024 20:10:22 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: kai.huang@intel.com
-Subject: [PATCH 3/3] KVM: VMX: Initialize TDX during KVM module load
-Date: Wed, 27 Nov 2024 15:10:19 -0500
-Message-ID: <20241127201019.136086-4-pbonzini@redhat.com>
-In-Reply-To: <20241127201019.136086-1-pbonzini@redhat.com>
-References: <20241127201019.136086-1-pbonzini@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A3F2CCC0
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732738782; cv=none; b=lHy3LC4/vBJHExpFT9rodKN9U+q7x41Sn6gxBKZuW6W9RlJl7pBvEkJ0WeW7E7sgcKiQDig0Tnq28vj3bH2HB+m6PNsIaOYN/k0RjHjzGvZNRTREnlUImmmmoCj0BtX5GtaU0RIZWWgUj1DOCO6G2EtxcCrr4weuRogcEhj4eX8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732738782; c=relaxed/simple;
+	bh=cZIr0NX9dk9LuRpx9zaviH35JYPFTsqln4N8+nEEr48=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SyTtasYRONMTqsQtyt4zmvYiOsTViA9VGS7W8wVcTjs3K7P9VhnWvyTcLB2AnnVKZl8IfbQgqJMZUNg5CuooXS4oGbMdqhpYnvW5IT9HYpnat3Py7XvFjETKvwikJbfBke9m2eOz4e2B0+IlbJs73m0p9KVyBHusMEYJ6C4iZAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=whpORLD3; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2edeef8a994so142330a91.2
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 12:19:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732738780; x=1733343580; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rT4zjpukNMrZ59TBU0pFDQFdJ4yGdJlRWZyR3xY1kfk=;
+        b=whpORLD31XahUIV8t+jqg/KrPjwbfVw0mBQ+qayCcZBwnwt5eHS+G6NElT3f1p6uOd
+         7qEZLNeWojpLc53zqhtgWCi2XzbAjnNfV/DH2CeWPfTsz84/gMuzdQupfl+cNU7fowRy
+         3H/LkiPjX5eKudl+2nJBmiUbvH0FXkAcO3h4gRJ7097EuKIPWWi5ivZiPqJX8uuTm+YS
+         r/ZVC2I7VGJ3sk8M1nPEyFQPIsniopxEo2ajZSUFF/rDfC7cPIBl7WBxfk9ezCXq3spD
+         yTD1WjZQdjJSd7AR0pJGvIiHQ7quPstFInycfLD76yw1k/fvz6dBjF2eIdnsGls3hnmH
+         vOfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732738780; x=1733343580;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rT4zjpukNMrZ59TBU0pFDQFdJ4yGdJlRWZyR3xY1kfk=;
+        b=RKnMuOyarH1xUxr0stHuVa+4ZWdNyeWuKsuKOt9KpIZJExiy4KtlloHLhvf2B7tjYr
+         3RDS0ifK5c+LYzkT38ClIEQx73pA5QVoOwbti9Qn6ypjNMrHrxlw6DzEDBGD6MeNYaxO
+         spbjne58IKDD64XHtcmqQC4jffdnUFruPqEBPzSxQiVWAICGCurpoH8L1quACVz429gW
+         DC3Gnl+w+RbqALdTkGKscpOs6Pfn9+W0gnwWCviW8tJ2LgxIORnTE9DftbNFo2HiHsk+
+         TVNQLym+VDACfqvFQ7i2bXlvkKNXLDz1fmnFNZsEZvVy14Wqr/REeJnKo7Xz8D1EvDmJ
+         KVIg==
+X-Gm-Message-State: AOJu0YyIrp7nnjpJOxUKJV0uj4/zBCtmBOvOXcTqF61/RHcMjI6+bWVh
+	iqchoiCJFNM/OTstrK99SISpBMXuGsV8yx8k0/kutjQVOtkVxzikpfhI0sKtCSVwviq2j9GBhv1
+	moRWjupS0guNDOZkpqG/TtG0XcIYDjMaJclZ+DgMBZZSHzRXIqYrFFcLy0pa9gaMg6c1c/7sNUt
+	QnZ7QpjNeSxPtw+Z7PLxMRUtNVturdHlcRnnx0Lwo3QueAxeMVpg==
+X-Google-Smtp-Source: AGHT+IFF9SISsQin2cXQYuvoKGPLVcSzWy4x+OmruqK1X9Zi30JH+zqeb4eAp9OwVYA5R2/bkKasEdnuhztwPWNZ
+X-Received: from pjbsw6.prod.google.com ([2002:a17:90b:2c86:b0:2ea:39f4:8c56])
+ (user=aaronlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1850:b0:2ea:3ab5:cb9d with SMTP id 98e67ed59e1d1-2ee08e9928amr5782768a91.8.1732738780231;
+ Wed, 27 Nov 2024 12:19:40 -0800 (PST)
+Date: Wed, 27 Nov 2024 20:19:14 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241127201929.4005605-1-aaronlewis@google.com>
+Subject: [PATCH 00/15] Unify MSR intercepts in x86
+From: Aaron Lewis <aaronlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, jmattson@google.com, seanjc@google.com, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Kai Huang <kai.huang@intel.com>
+The goal of this series is to unify MSR intercepts into common code between
+VMX and SVM.
 
-Before KVM can use TDX to create and run TDX guests, TDX needs to be
-initialized from two perspectives: 1) TDX module must be initialized
-properly to a working state; 2) A per-cpu TDX initialization, a.k.a the
-TDH.SYS.LP.INIT SEAMCALL must be done on any logical cpu before it can
-run any other TDX SEAMCALLs.
+The high level structure of this series is to:
+ 1. Modify SVM MSR intercepts to adopt how VMX does it.
+ 2. Hoist the newly updated SVM MSR intercept implementation to common x86 code.
+ 3. Hoist the VMX MSR intercept implementation to common x86 code.
 
-The TDX host core-kernel provides two functions to do the above two
-respectively: tdx_enable() and tdx_cpu_enable().
+Aaron Lewis (8):
+  KVM: SVM: Invert the polarity of the "shadow" MSR interception bitmaps
+  KVM: SVM: Track MSRPM as "unsigned long", not "u32"
+  KVM: x86: SVM: Adopt VMX style MSR intercepts in SVM
+  KVM: SVM: Don't "NULL terminate" the list of possible passthrough MSRs
+  KVM: x86: Track possible passthrough MSRs in kvm_x86_ops
+  KVM: x86: Move ownership of passthrough MSR "shadow" to common x86
+  KVM: x86: Hoist SVM MSR intercepts to common x86 code
+  KVM: x86: Hoist VMX MSR intercepts to common x86 code
 
-There are two options in terms of when to initialize TDX: initialize TDX
-at KVM module loading time, or when creating the first TDX guest.
+Anish Ghulati (2):
+  KVM: SVM: Disable intercepts for all direct access MSRs on MSR filter changes
+  KVM: SVM: Delete old SVM MSR management code
 
-Choose to initialize TDX during KVM module loading time:
+Sean Christopherson (5):
+  KVM: x86: Use non-atomic bit ops to manipulate "shadow" MSR intercepts
+  KVM: SVM: Use non-atomic bit ops to manipulate MSR interception bitmaps
+  KVM: SVM: Pass through GHCB MSR if and only if VM is SEV-ES
+  KVM: SVM: Drop "always" flag from list of possible passthrough MSRs
+  KVM: VMX: Make list of possible passthrough MSRs "const"
 
-Initializing TDX module is both memory and CPU time consuming: 1) the
-kernel needs to allocate a non-trivial size(~1/256) of system memory
-as metadata used by TDX module to track each TDX-usable memory page's
-status; 2) the TDX module needs to initialize this metadata, one entry
-for each TDX-usable memory page.
+ arch/x86/include/asm/kvm-x86-ops.h |   5 +-
+ arch/x86/include/asm/kvm_host.h    |  18 ++
+ arch/x86/kvm/svm/sev.c             |  11 +-
+ arch/x86/kvm/svm/svm.c             | 300 ++++++++++++-----------------
+ arch/x86/kvm/svm/svm.h             |  30 +--
+ arch/x86/kvm/vmx/main.c            |  30 +++
+ arch/x86/kvm/vmx/vmx.c             | 144 +++-----------
+ arch/x86/kvm/vmx/vmx.h             |  11 +-
+ arch/x86/kvm/x86.c                 | 129 ++++++++++++-
+ arch/x86/kvm/x86.h                 |   3 +
+ 10 files changed, 358 insertions(+), 323 deletions(-)
 
-Also, the kernel uses alloc_contig_pages() to allocate those metadata
-chunks, because they are large and need to be physically contiguous.
-alloc_contig_pages() can fail.  If initializing TDX when creating the
-first TDX guest, then there's chance that KVM won't be able to run any
-TDX guests albeit KVM _declares_ to be able to support TDX.
-
-This isn't good for the user.
-
-On the other hand, initializing TDX at KVM module loading time can make
-sure KVM is providing a consistent view of whether KVM can support TDX
-to the user.
-
-Always only try to initialize TDX after VMX has been initialized.  TDX
-is based on VMX, and if VMX fails to initialize then TDX is likely to be
-broken anyway.  Also, in practice, supporting TDX will require part of
-VMX and common x86 infrastructure in working order, so TDX cannot be
-enabled alone w/o VMX support.
-
-There are two cases that can result in failure to initialize TDX: 1) TDX
-cannot be supported (e.g., because of TDX is not supported or enabled by
-hardware, or module is not loaded, or missing some dependency in KVM's
-configuration); 2) Any unexpected error during TDX bring-up.  For the
-first case only mark TDX is disabled but still allow KVM module to be
-loaded.  For the second case just fail to load the KVM module so that
-the user can be aware.
-
-Because TDX costs additional memory, don't enable TDX by default.  Add a
-new module parameter 'enable_tdx' to allow the user to opt-in.
-
-Note, the name tdx_init() has already been taken by the early boot code.
-Use tdx_bringup() for initializing TDX (and tdx_cleanup() since KVM
-doesn't actually teardown TDX).  They don't match vt_init()/vt_exit(),
-vmx_init()/vmx_exit() etc but it's not end of the world.
-
-Also, once initialized, the TDX module cannot be disabled and enabled
-again w/o the TDX module runtime update, which isn't supported by the
-kernel.  After TDX is enabled, nothing needs to be done when KVM
-disables hardware virtualization, e.g., when offlining CPU, or during
-suspend/resume.  TDX host core-kernel code internally tracks TDX status
-and can handle "multiple enabling" scenario.
-
-Similar to KVM_AMD_SEV, add a new KVM_INTEL_TDX Kconfig to guide KVM TDX
-code.  Make it depend on INTEL_TDX_HOST but not replace INTEL_TDX_HOST
-because in the longer term there's a use case that requires making
-SEAMCALLs w/o KVM as mentioned by Dan [1].
-
-Link: https://lore.kernel.org/6723fc2070a96_60c3294dc@dwillia2-mobl3.amr.corp.intel.com.notmuch/ [1]
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Message-ID: <162f9dee05c729203b9ad6688db1ca2960b4b502.1731664295.git.kai.huang@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/Kconfig     |  10 +++
- arch/x86/kvm/Makefile    |   1 +
- arch/x86/kvm/vmx/main.c  |   9 +++
- arch/x86/kvm/vmx/tdx.c   | 160 +++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h   |  13 ++++
- include/linux/kvm_host.h |   1 +
- virt/kvm/kvm_main.c      |   3 +-
- 7 files changed, 196 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
- create mode 100644 arch/x86/kvm/vmx/tdx.h
-
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ea2c4f21c1ca..fe8cbee6f614 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -128,6 +128,16 @@ config X86_SGX_KVM
- 
- 	  If unsure, say N.
- 
-+config KVM_INTEL_TDX
-+	bool "Intel Trust Domain Extensions (TDX) support"
-+	default y
-+	depends on INTEL_TDX_HOST
-+	help
-+	  Provides support for launching Intel Trust Domain Extensions (TDX)
-+	  confidential VMs on Intel processors.
-+
-+	  If unsure, say N.
-+
- config KVM_AMD
- 	tristate "KVM for AMD processors support"
- 	depends on KVM && (CPU_SUP_AMD || CPU_SUP_HYGON)
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index f9dddb8cb466..a5d362c7b504 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -20,6 +20,7 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
- kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
-+kvm-intel-$(CONFIG_KVM_INTEL_TDX)	+= vmx/tdx.o
- 
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o
- 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 6772e560ac7b..bc690c63e511 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -6,6 +6,7 @@
- #include "nested.h"
- #include "pmu.h"
- #include "posted_intr.h"
-+#include "tdx.h"
- 
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
-@@ -171,6 +172,7 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
- static void vt_exit(void)
- {
- 	kvm_exit();
-+	tdx_cleanup();
- 	vmx_exit();
- }
- module_exit(vt_exit);
-@@ -183,6 +185,11 @@ static int __init vt_init(void)
- 	if (r)
- 		return r;
- 
-+	/* tdx_init() has been taken */
-+	r = tdx_bringup();
-+	if (r)
-+		goto err_tdx_bringup;
-+
- 	/*
- 	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
- 	 * exposed to userspace!
-@@ -195,6 +202,8 @@ static int __init vt_init(void)
- 	return 0;
- 
- err_kvm_init:
-+	tdx_cleanup();
-+err_tdx_bringup:
- 	vmx_exit();
- 	return r;
- }
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..0666dfbe0bc0
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,160 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/cpu.h>
-+#include <asm/cpufeature.h>
-+#include <asm/tdx.h>
-+#include "capabilities.h"
-+#include "tdx.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+static bool enable_tdx __ro_after_init;
-+module_param_named(tdx, enable_tdx, bool, 0444);
-+
-+static enum cpuhp_state tdx_cpuhp_state;
-+
-+static int tdx_online_cpu(unsigned int cpu)
-+{
-+	unsigned long flags;
-+	int r;
-+
-+	/* Sanity check CPU is already in post-VMXON */
-+	WARN_ON_ONCE(!(cr4_read_shadow() & X86_CR4_VMXE));
-+
-+	local_irq_save(flags);
-+	r = tdx_cpu_enable();
-+	local_irq_restore(flags);
-+
-+	return r;
-+}
-+
-+static void __do_tdx_cleanup(void)
-+{
-+	/*
-+	 * Once TDX module is initialized, it cannot be disabled and
-+	 * re-initialized again w/o runtime update (which isn't
-+	 * supported by kernel).  Only need to remove the cpuhp here.
-+	 * The TDX host core code tracks TDX status and can handle
-+	 * 'multiple enabling' scenario.
-+	 */
-+	WARN_ON_ONCE(!tdx_cpuhp_state);
-+	cpuhp_remove_state_nocalls(tdx_cpuhp_state);
-+	tdx_cpuhp_state = 0;
-+}
-+
-+static int __init __do_tdx_bringup(void)
-+{
-+	int r;
-+
-+	/*
-+	 * TDX-specific cpuhp callback to call tdx_cpu_enable() on all
-+	 * online CPUs before calling tdx_enable(), and on any new
-+	 * going-online CPU to make sure it is ready for TDX guest.
-+	 */
-+	r = cpuhp_setup_state_cpuslocked(CPUHP_AP_ONLINE_DYN,
-+					 "kvm/cpu/tdx:online",
-+					 tdx_online_cpu, NULL);
-+	if (r < 0)
-+		return r;
-+
-+	tdx_cpuhp_state = r;
-+
-+	r = tdx_enable();
-+	if (r)
-+		__do_tdx_cleanup();
-+
-+	return r;
-+}
-+
-+static bool __init kvm_can_support_tdx(void)
-+{
-+	return cpu_feature_enabled(X86_FEATURE_TDX_HOST_PLATFORM);
-+}
-+
-+static int __init __tdx_bringup(void)
-+{
-+	int r;
-+
-+	/*
-+	 * Enabling TDX requires enabling hardware virtualization first,
-+	 * as making SEAMCALLs requires CPU being in post-VMXON state.
-+	 */
-+	r = kvm_enable_virtualization();
-+	if (r)
-+		return r;
-+
-+	cpus_read_lock();
-+	r = __do_tdx_bringup();
-+	cpus_read_unlock();
-+
-+	if (r)
-+		goto tdx_bringup_err;
-+
-+	/*
-+	 * Leave hardware virtualization enabled after TDX is enabled
-+	 * successfully.  TDX CPU hotplug depends on this.
-+	 */
-+	return 0;
-+tdx_bringup_err:
-+	kvm_disable_virtualization();
-+	return r;
-+}
-+
-+void tdx_cleanup(void)
-+{
-+	if (enable_tdx) {
-+		__do_tdx_cleanup();
-+		kvm_disable_virtualization();
-+	}
-+}
-+
-+int __init tdx_bringup(void)
-+{
-+	int r;
-+
-+	if (!enable_tdx)
-+		return 0;
-+
-+	if (!kvm_can_support_tdx()) {
-+		pr_err("tdx: no TDX private KeyIDs available\n");
-+		goto success_disable_tdx;
-+	}
-+
-+	if (!enable_virt_at_load) {
-+		pr_err("tdx: tdx requires kvm.enable_virt_at_load=1\n");
-+		goto success_disable_tdx;
-+	}
-+
-+	/*
-+	 * Ideally KVM should probe whether TDX module has been loaded
-+	 * first and then try to bring it up.  But TDX needs to use SEAMCALL
-+	 * to probe whether the module is loaded (there is no CPUID or MSR
-+	 * for that), and making SEAMCALL requires enabling virtualization
-+	 * first, just like the rest steps of bringing up TDX module.
-+	 *
-+	 * So, for simplicity do everything in __tdx_bringup(); the first
-+	 * SEAMCALL will return -ENODEV when the module is not loaded.  The
-+	 * only complication is having to make sure that initialization
-+	 * SEAMCALLs don't return TDX_SEAMCALL_VMFAILINVALID in other
-+	 * cases.
-+	 */
-+	r = __tdx_bringup();
-+	if (r) {
-+		/*
-+		 * Disable TDX only but don't fail to load module if
-+		 * the TDX module could not be loaded.  No need to print
-+		 * message saying "module is not loaded" because it was
-+		 * printed when the first SEAMCALL failed.
-+		 */
-+		if (r == -ENODEV)
-+			goto success_disable_tdx;
-+
-+		enable_tdx = 0;
-+	}
-+
-+	return r;
-+
-+success_disable_tdx:
-+	enable_tdx = 0;
-+	return 0;
-+}
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-new file mode 100644
-index 000000000000..8aee938a968f
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_X86_VMX_TDX_H
-+#define __KVM_X86_VMX_TDX_H
-+
-+#ifdef CONFIG_INTEL_TDX_HOST
-+int tdx_bringup(void);
-+void tdx_cleanup(void);
-+#else
-+static inline int tdx_bringup(void) { return 0; }
-+static inline void tdx_cleanup(void) {}
-+#endif
-+
-+#endif
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3fcee4209120..0a141685872d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2272,6 +2272,7 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
- }
- 
- #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
-+extern bool enable_virt_at_load;
- extern bool kvm_rebooting;
- #endif
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8214efa76a6f..265b687fc5d6 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5440,8 +5440,9 @@ static struct miscdevice kvm_dev = {
- };
- 
- #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
--static bool enable_virt_at_load = true;
-+bool enable_virt_at_load = true;
- module_param(enable_virt_at_load, bool, 0444);
-+EXPORT_SYMBOL_GPL(enable_virt_at_load);
- 
- __visible bool kvm_rebooting;
- EXPORT_SYMBOL_GPL(kvm_rebooting);
 -- 
-2.43.5
+2.47.0.338.g60cca15819-goog
 
 
