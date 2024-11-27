@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-32592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB1F9DAE73
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:20:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03E399DAE74
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 21:20:22 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FE4C1670FA
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:20:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 346A0B229B3
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2024 20:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DBD2036F8;
-	Wed, 27 Nov 2024 20:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47542036E2;
+	Wed, 27 Nov 2024 20:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I/j3Sm2S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JQXbZd4K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D372202F9B
-	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52FB2036F7
+	for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 20:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732738797; cv=none; b=XOrpaCX6Th+8d7QsrLKfOUDfyeGDn1lkMaVsaJMKKwgaM4PDnTkDm/4pKEliDiQr3tQ6eX6gtPJ/j4joDau+yRlqsbOY8ia5vPXVoxAqrnzbMZQGdssu9bn5qNd2Nhb975KuRo2/gCe9EfZPd0624dc0IyFRl1VNvVAMajrBa7w=
+	t=1732738800; cv=none; b=S7h7nEfoiMbAwt5eWxQ/Ij6sNo6sjJN136rs+96TSCd4qOwFCVToy7hNEiT8Bi37zIYYwKd6pQkBcckrUXN6UrMrE96u2kdWfujIHldPM1OQU9xrEPvHI5c4Vqws95ZGEMgcimzz+QEM1NHtbGHduLRzDfl+5cZQDOLe1Xo3QcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732738797; c=relaxed/simple;
-	bh=0Sb4Q+0n13lKQuICURh4UVrldcFpp4dmMu8bBqYa5Z4=;
+	s=arc-20240116; t=1732738800; c=relaxed/simple;
+	bh=y2FN9r7ugbV5qha0nZVbYrWu0Zt8xbdSyx6wL3Pf/V8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lGWtLMdObl4C+4aDX3IXnA5+ICx1NiqRASjlzybUWn2YKLR5fJXhi58x/eSlRKDiaTGWXi3GGZTCrGSlfLjZRg4vwhytbxkIZSBYGKwhm9YFvyfvcQT51TGMHhI9kLmPSrqsBzCYcG17AsFHln4srfUUKzSS9D5xAFrr+vMMgGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I/j3Sm2S; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=DTKiL386EbpnMnZ7hSHb+dInCMI2GAaBOSZB3mAQBnwubbZXvcSD+CQ37j2EBqF6k+spam4Ke3B2wP3dsbB9aP6rLuaFheXBAOnubj2UmXbr9NxI3f8H42LZA7ruFrNOjbb+8Weqrc4y/KFC8/SedBrC1FxvNxSahJCg5si6YoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JQXbZd4K; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7fc4206332bso65583a12.1
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 12:19:56 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ea46465ce4so146492a91.2
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 12:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732738796; x=1733343596; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732738798; x=1733343598; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEFFHShPWvrfysOCPzjkFHhU3REAM0/B502rfsrxTK4=;
-        b=I/j3Sm2S/l2SJn6JNgGr4uD8cbZv/T7jj8fDTlAaNTyxjiiYbGJLAZ1CerVgfokmAK
-         e/zpV+3bpnPRWaFnslZuWL+N3kbru3qKxWdfiIh2lDjOiWHo+kK59EI8p51m2hkDXqC2
-         02PX+915Tf6BKumeQtIInp1cELb7rbvCaSfuzxHrLpDCrvH14/ZPrniXcPKVuD/3O37F
-         QwF+67wXgCIziQpUu8fieTyHEyXDQu0WsQxRrNcPvep7hb1NJ5lImTzsfXFGlEO1B5yE
-         xuZrciJUiEre9Tf9UaoBzqSvwOhJ87xbVeC1db3tsdJgrAS1hUi9bHcTNQVzRNQevAGa
-         bWZA==
+        bh=Ay83d91yLBygZMe29qkA3QWrnm4hDElp535HS+RqI+g=;
+        b=JQXbZd4KO9ibvbluLxM1iRSHMuG3EVTY2OV0dpbAm2H/pHftOpREkCIFTAavvF12ED
+         zvg0MH2lUyP0FiGbGGWLy7PFMSv76bWoHyYbKfpnYW4yAoQ27a99leIx1iB61diZ8nwo
+         5PiMBhrjaZD995dTIFCiqHxOebJR3cYU3CPp/nSHjt+1MPxIGkREm6qEeOKzbVOFz89A
+         x4jKPByGW607BS7gNGePoTKqXHCB6PjP2khmtgrrJdsaDAlKS9WSkYhEF1kBjTsC+n4H
+         U6V2ic50ivlRddGvmZSDI3W5v3GIlytoj4LHnX8D22DWmd1xljMwr3l9KKMmjn7vfyu2
+         yWCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732738796; x=1733343596;
+        d=1e100.net; s=20230601; t=1732738798; x=1733343598;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEFFHShPWvrfysOCPzjkFHhU3REAM0/B502rfsrxTK4=;
-        b=Ww9h7smC4SEdiGB3jqBr7H9GIIshObvnPAUCE6U2d67YxE0Xss8YRwzHk4Dq9F3V/2
-         ePcWgwxJk3GKT5ZVQ8buhvKknTgbij5V5+XT71Guc75x/1rCoE7regqNX0YzNGa4KlTS
-         G08I+TB7AfHzuFEYrZJ4wvEAEiN1WuKjuN7if1bD/4c3ucjr9CjcbRsxCly1o/fSsmXX
-         Im8/KmPfCoI90ip2lq+tnOIdKME3Vh2d01SuTUoowqLKx2JULH0ut2UWqxpdtjoNz/bH
-         whX/U5X4InOLe7vqzmAf1/77Fs/qtS4ezzJJWYvMiLwGrBAytL7NZmyM1/l4jg5CniDf
-         qdQw==
-X-Gm-Message-State: AOJu0YzUUwbcmnsRpWIpgzgklEJV8hQ9iSpMfGtVxY7KDDewwzibd//c
-	lOGtdHvtpaQEgikdRIqNU/VX6beti4psJbM1/7PEbC/GyxGzpL4ejN3eKT5ffeftpPZIlmuPc27
-	XBPg31iwKi5GGgabjiGFeI+Tg74QaHGjolh7gexBarrkmfrDikf3zQfsQ33oO8yJP8YCMna2+p8
-	B5M1X8YHV1/48iK+/4eYOw5c40GTzIX/X+1nS+ycFswdulPJb1yA==
-X-Google-Smtp-Source: AGHT+IFDnJrNl2EwKhUTk9mpKqbvcRkEfQGkw2j40sPx4IsQJwryXEWkoVafi8xo4q2JWSCxTCJdnQ/xIXLI1Siy
-X-Received: from pgbdl1.prod.google.com ([2002:a05:6a02:d01:b0:7fb:d719:ed47])
+        bh=Ay83d91yLBygZMe29qkA3QWrnm4hDElp535HS+RqI+g=;
+        b=e1XjsychswNYZMiEFv9vEPoSiHmHnzywlEctTF/EYFJ6ErUY1Y3TIKKUq6GG4GyW8G
+         lq/b95uyJCqN2RDpEn+GrTxKF6EVEcm+N5nfpFn5L1hVai2gHQPzPpr2RGELDg03SZjW
+         1cm3pa+lIg/fFs6bqrr5hA8Q2Rr7nYfbYJsIEPhChSP9gDDM+SsKKuGEf9AU78ns24j2
+         uSMCHd5jzr7ON2EtakPSp89YfDhAI0THxTr47pN9TW1Hi5qQvoV4rus0fWs7175c7ROy
+         aJ5fA0ROGWi2t9LmzW+I+HHTE7uu4GT5KMHtpGGWIKyTI8FMHWMFoQGuXzF3C44c7FcM
+         NOTg==
+X-Gm-Message-State: AOJu0Yz5a5ASPjRQ6pQ1Tlj6ZlAV/uC1HGiPNxjX3aL7FU0ozezjvet3
+	ZTk97Ktm5M3ROL053bPJ4L4GA3BZqbJIiWHJ2bqmQ0cTbchDBlsyY2iBGdGs1Tq9gNJx1H3gfMk
+	rIPjzZbgTfM8EP5ggFulNjZ7cbcoFvLzHk1bzbrkqQfcIMeQMPgzjW2eKezla4F7OI9ntUFWbJG
+	+ffGjvwRCp/IO9oTAyO8RFHbgOyMXItu3IfnQAHsm8W/UeK6UTOg==
+X-Google-Smtp-Source: AGHT+IFtRlDulV0vltu4nNvYU/EjvZzV9Huxgq+br6DUuYALoGcXW5/lsXwGyuScv9Xt170kV4+LwwwNX1E7I2vm
+X-Received: from pjuj11.prod.google.com ([2002:a17:90a:d00b:b0:2ea:7d73:294e])
  (user=aaronlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:2451:b0:1dc:bdbd:9017 with SMTP id adf61e73a8af0-1e0e0b6c85amr7559366637.40.1732738795671;
- Wed, 27 Nov 2024 12:19:55 -0800 (PST)
-Date: Wed, 27 Nov 2024 20:19:20 +0000
+ 2002:a17:90b:1d01:b0:2ea:7bb3:ea47 with SMTP id 98e67ed59e1d1-2ee094cb157mr4671706a91.28.1732738797907;
+ Wed, 27 Nov 2024 12:19:57 -0800 (PST)
+Date: Wed, 27 Nov 2024 20:19:21 +0000
 In-Reply-To: <20241127201929.4005605-1-aaronlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,66 +74,132 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241127201929.4005605-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241127201929.4005605-7-aaronlewis@google.com>
-Subject: [PATCH 06/15] KVM: SVM: Disable intercepts for all direct access MSRs
- on MSR filter changes
+Message-ID: <20241127201929.4005605-8-aaronlewis@google.com>
+Subject: [PATCH 07/15] KVM: SVM: Delete old SVM MSR management code
 From: Aaron Lewis <aaronlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, jmattson@google.com, seanjc@google.com, 
-	Anish Ghulati <aghulati@google.com>, Aaron Lewis <aaronlewis@google.com>
+	Anish Ghulati <aghulati@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
 From: Anish Ghulati <aghulati@google.com>
 
-For all direct access MSRs, disable the MSR interception explicitly.
-svm_disable_intercept_for_msr() checks the new MSR filter and ensures that
-KVM enables interception if userspace wants to filter the MSR.
+Delete the old SVM code to manage MSR interception. There are no more
+calls to these functions:
 
-This change is similar to the VMX change:
-  d895f28ed6da ("KVM: VMX: Skip filter updates for MSRs that KVM is already intercepting")
-
-Adopting in SVM to align the implementations.
+  set_msr_interception_bitmap()
+  set_msr_interception()
+  set_shadow_msr_intercept()
+  valid_msr_intercept()
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Aaron Lewis <aaronlewis@google.com>
 Signed-off-by: Anish Ghulati <aghulati@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ arch/x86/kvm/svm/svm.c | 70 ------------------------------------------
+ arch/x86/kvm/svm/svm.h |  2 --
+ 2 files changed, 72 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b982729ef7638..37b8683849ed2 100644
+index 37b8683849ed2..2380059727168 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1025,17 +1025,21 @@ static void svm_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	u32 i;
- 
- 	/*
--	 * Set intercept permissions for all direct access MSRs again. They
--	 * will automatically get filtered through the MSR filter, so we are
--	 * back in sync after this.
-+	 * Redo intercept permissions for MSRs that KVM is passing through to
-+	 * the guest.  Disabling interception will check the new MSR filter and
-+	 * ensure that KVM enables interception if usersepace wants to filter
-+	 * the MSR.  MSRs that KVM is already intercepting don't need to be
-+	 * refreshed since KVM is going to intercept them regardless of what
-+	 * userspace wants.
- 	 */
- 	for (i = 0; direct_access_msrs[i].index != MSR_INVALID; i++) {
- 		u32 msr = direct_access_msrs[i].index;
--		u32 read = !test_bit(i, svm->shadow_msr_intercept.read);
--		u32 write = !test_bit(i, svm->shadow_msr_intercept.write);
- 
--		/* FIXME: Align the polarity of the bitmaps and params. */
--		set_msr_interception_bitmap(vcpu, svm->msrpm, msr, read, write);
-+		if (!test_bit(i, svm->shadow_msr_intercept.read))
-+			svm_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_R);
-+
-+		if (!test_bit(i, svm->shadow_msr_intercept.write))
-+			svm_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_W);
- 	}
+@@ -770,32 +770,6 @@ static int direct_access_msr_slot(u32 msr)
+ 	return -ENOENT;
  }
  
+-static void set_shadow_msr_intercept(struct kvm_vcpu *vcpu, u32 msr, int read,
+-				     int write)
+-{
+-	struct vcpu_svm *svm = to_svm(vcpu);
+-	int slot = direct_access_msr_slot(msr);
+-
+-	if (slot == -ENOENT)
+-		return;
+-
+-	/* Set the shadow bitmaps to the desired intercept states */
+-	if (read)
+-		__clear_bit(slot, svm->shadow_msr_intercept.read);
+-	else
+-		__set_bit(slot, svm->shadow_msr_intercept.read);
+-
+-	if (write)
+-		__clear_bit(slot, svm->shadow_msr_intercept.write);
+-	else
+-		__set_bit(slot, svm->shadow_msr_intercept.write);
+-}
+-
+-static bool valid_msr_intercept(u32 index)
+-{
+-	return direct_access_msr_slot(index) != -ENOENT;
+-}
+-
+ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
+ {
+ 	u8 bit_write;
+@@ -824,50 +798,6 @@ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
+ 	return test_bit(bit_write, &tmp);
+ }
+ 
+-static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, unsigned long *msrpm,
+-					u32 msr, int read, int write)
+-{
+-	struct vcpu_svm *svm = to_svm(vcpu);
+-	u8 bit_read, bit_write;
+-	unsigned long tmp;
+-	u32 offset;
+-
+-	/*
+-	 * If this warning triggers extend the direct_access_msrs list at the
+-	 * beginning of the file
+-	 */
+-	WARN_ON(!valid_msr_intercept(msr));
+-
+-	/* Enforce non allowed MSRs to trap */
+-	if (read && !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
+-		read = 0;
+-
+-	if (write && !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
+-		write = 0;
+-
+-	offset    = svm_msrpm_offset(msr);
+-	bit_read  = 2 * (msr & 0x0f);
+-	bit_write = 2 * (msr & 0x0f) + 1;
+-	tmp       = msrpm[offset];
+-
+-	BUG_ON(offset == MSR_INVALID);
+-
+-	read  ? __clear_bit(bit_read,  &tmp) : __set_bit(bit_read,  &tmp);
+-	write ? __clear_bit(bit_write, &tmp) : __set_bit(bit_write, &tmp);
+-
+-	msrpm[offset] = tmp;
+-
+-	svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
+-	svm->nested.force_msr_bitmap_recalc = true;
+-}
+-
+-void set_msr_interception(struct kvm_vcpu *vcpu, unsigned long *msrpm, u32 msr,
+-			  int read, int write)
+-{
+-	set_shadow_msr_intercept(vcpu, msr, read, write);
+-	set_msr_interception_bitmap(vcpu, msrpm, msr, read, write);
+-}
+-
+ static void svm_get_msr_bitmap_entries(struct kvm_vcpu *vcpu, u32 msr,
+ 				       unsigned long **read_map, u8 *read_bit,
+ 				       unsigned long **write_map, u8 *write_bit)
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index b008c190188a2..2513990c5b6e6 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -612,8 +612,6 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu);
+ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu);
+ void svm_set_gif(struct vcpu_svm *svm, bool value);
+ int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code);
+-void set_msr_interception(struct kvm_vcpu *vcpu, unsigned long *msrpm, u32 msr,
+-			  int read, int write);
+ void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable);
+ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+ 				     int trig_mode, int vec);
 -- 
 2.47.0.338.g60cca15819-goog
 
