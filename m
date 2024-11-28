@@ -1,104 +1,114 @@
-Return-Path: <kvm+bounces-32760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86EE39DBB7A
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 17:46:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77CCD9DBB7B
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 17:46:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2015DB2253E
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04C916369F
 	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 16:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA711BD9FB;
-	Thu, 28 Nov 2024 16:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CAC1C07C2;
+	Thu, 28 Nov 2024 16:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GJyF8A+o"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykJcfLtV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988D317993
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 16:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CAA19923C
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 16:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732812404; cv=none; b=rJyJ7vP/jhigTuw3MPQb0yK2BY/p5MXavQgIwuKpeuSZG+ASJwEkXWEruKV2AImTfYIEYYiJ/AaiKP2yh4Egh1sjLr0NV1V6c+puqVMc7SgGw+84AcR6YzEWA9/gpMrQ442++Q5zO2R65q84bjpzI2edpmqAI6h1Rgmtpao3uxA=
+	t=1732812406; cv=none; b=sGGyQ4S51Ht41GjuheeiW+ZFQaIjhaofnMSvsvl3gG1s16g9mmaDptslEW9jX/aUcvr5lv00Mu0d4p/q+WzHJESWjE3Ynf26ire7mFnCJ69k+w7tO8Z3J/2pxqsrJ0zUIFa5GuWzElIjyXZ6l8GxwuzMP8hD067du6wBPJUDWAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732812404; c=relaxed/simple;
-	bh=aSOh3A0l7EtflvEdF8vU8Q0Lw+zvLKHtu9k1Fm3RM6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aXdzF0jgsWkZzm/1IbHc0woY+SrdtsywYpav0lPM2H3J5MvbArnujReN2e/ZVUL8vJKza8kRZb+lXhkMo6ETu3jsHP/yVVkVZ81ymcOHQLuxul6QmMytTewPpvnNUymJULFoXblVmtkiEXmkwMLFrlZUQeSpW5VVqvz7381D1SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GJyF8A+o; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6C12140E015E;
-	Thu, 28 Nov 2024 16:46:39 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id QrYJmTi9r4M2; Thu, 28 Nov 2024 16:46:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1732812392; bh=KHBMWyOOFqGmtZziLrDCtujxKI1bdHlIUELfefYP8NU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GJyF8A+o3nrqIlPq79GfLd0VZguHPf+9Jjjn/VcIr9TWtxrq84KG/ED83yC/CrNvY
-	 IC/Qf/oMGD/NNBtFsFdo2XdTxaDxtAK9ffIADqhmR31w4d298wOsTd6xb8DsUMhajY
-	 qLg41KLCnN0lyDN5c/waSKZAM/dpPVB4Ub/K4XCNbLcEqnUfaDAcqaJmPRWsnhT9Q2
-	 uLeONSm5ILuJkf70mPDgtH6CA5BTWaGSXl8qTsRG6CFnBCzKwtwcUq/qcDcHmbeHGd
-	 QRlaZgk+D/LeO5XOSDWDSeoKsTM+oki63TBuVSlz1JIIE666EtX8y7p21++9x7XJVc
-	 Ky2m0EbYnFqItPLQc6CKdIelExgXaKZwp8z7kyRT+6rVLWZxVbd0RAUdifPH5pTPJS
-	 P+90H2Q5ySlYBWjDd0JDRtwHycyb565EvAVr9y8FnZRj5FuH8Lp64n2203al3TARQ7
-	 K1k3JB5mFg6LAGIfHmbigICEWx0U2Dwun+avaH7AyNExQbnyqLTM13EDwWvWsZWB8E
-	 aiMXGZDFkNHXzNvn4HfTgrXifa9/VO+JFYD7KvL73lTg/9mb6fEY67g+DMMz285LeY
-	 BpgOzKo45I+kh+u43arF0NQzTwJhDoyRGljnZqVwt8d5nSf9Rs7IS/D4ksfPx4D3R8
-	 F9+u9RF1WqD5NGFiUF9yNetI=
-Received: from zn.tnic (p200300ea9736a177329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a177:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7A27D40E01D6;
-	Thu, 28 Nov 2024 16:46:25 +0000 (UTC)
-Date: Thu, 28 Nov 2024 17:46:24 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-	pbonzini@redhat.com, jmattson@google.com, Xin Li <xin@zytor.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: Re: [PATCH 12/15] KVM: x86: Track possible passthrough MSRs in
- kvm_x86_ops
-Message-ID: <20241128164624.GDZ0ieYPnoB4u39rBT@fat_crate.local>
-References: <20241127201929.4005605-1-aaronlewis@google.com>
- <20241127201929.4005605-13-aaronlewis@google.com>
- <Z0eV4puJ39N8wOf9@google.com>
+	s=arc-20240116; t=1732812406; c=relaxed/simple;
+	bh=RXkW1eXCZoRuNy2mf+5XWhlYINLnNYmK3mLKXZvfaBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dRfVg5lf33c5VyTmfhM+BW6L0j3agXgpLFt9oIPF9X+WKeVD2h4bnkuIDL99uHlgIfUm584gwUFW8npxMWAlXSjeN8qMAYYk+YVrBBHCKC2jhjTLkz7GHrviSIlHpMZOcVcTAw79IhsZ3uAF5SgFYV0rGmwbcL8vyfhx8J6ZcA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ykJcfLtV; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-382588b7a5cso736872f8f.3
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 08:46:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1732812402; x=1733417202; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EwOKRV1c0unBwmZqya/i1H+QUXgqDtyYNKtve5ADmRI=;
+        b=ykJcfLtVgjtzkQyxT68hRAg+ow5mkl3+7kiKo7iV+sV2KpbOQBVLkKyowihkku6wWu
+         4dxIRdfRJiq0ufS7pGYNO72K2mtw3Fl6Lu2BhuFhLBb8Vp2Z8hp4zpG63ZOY5JWdup2N
+         6bGIDTjtVlXNQKJvSSpBvkb6cgZ5Vyu16W6TVPrM2GmL8RaRF6SebjOZrGRKTe35GmX9
+         ZWS7/cZaqqw+Nmw7tE5EAeS6lfXwz9VdgmOquLnU3RsbJuRxqIlczDQdMU/ahVwSTvMH
+         RQQzyHwevtykBPYjTVz1OcpyhGabE/FyeP/nTNJtLXY0jNJ7UzZuRFdidDrxzHkTu6w/
+         Ashw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732812402; x=1733417202;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EwOKRV1c0unBwmZqya/i1H+QUXgqDtyYNKtve5ADmRI=;
+        b=trf6VMqrCqQ9CDR6rpb1mKvvXTUs3OlcCzvxMCvb8ZHcGzBrRw7W7fbguUaYg28lcU
+         J78NcV82Vd4KKEzjWwlv8ePDiimEObDW/kz7iZ/ujVycVnPwBXFw5t2gv/bBqLm6Al4l
+         03FYSR5/f/S4MJ1wcr9imuoCo7ZSUfsgPDsB+Vg1iKVq0KFU5grg5FVoKJZTUniebe2z
+         Lr07Rq60Vpvd9zyjU4wdb7QMB35pbAaovZWaV/+D4BNc4C1Y29suF8EzOfpq4/+UrIh5
+         ZQlcGed0dH9g2z42RsG6hlcJXPdB6T62dnYcn2/MltR3MSF8bWpS3nP82YoMDTKq13OV
+         lnGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwYX+xjmEHHG5O5/YSq+0Dv658HE2LSgDVa3tpXHRM9cYffHmNfnsGILBHfm9SGRIbtUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSn4GHQj7VwIybUwmdbb3T4/CWpKAnyjflXMCvKyff42XPq3VW
+	UjlQjOWFswIfLZCGYNK3Qw+XdrF0HqUzPuKXgkLb0hrmUweXoAUshaXd1+T8ZMo=
+X-Gm-Gg: ASbGncsvOhU3eIUzy9+O2+SqOKQdkk/qH+dgnadXW++kSJZOyOC7XcxqIVCnoWGOqO/
+	ZqKosfEUJxQxB/RwKfVaZvJCqXALqenkNlxc2FNdW4sMwujFlFaUWTS69JD6wQNidjEGTJs1xDB
+	9mp2810+PiG2Y7t2TYulc7dje3pxt8g3LSQuT6lrgFC0yNszU8afVIQ7bW/cjk4cgptG3MiMCgv
+	X89bgMNVUInmrMjLaeLxLoFJckMlFb33WxgUBmEN54FGAgvizF7OLGP0dvOCPyFoLATH6QRkseF
+	pNwmAulNguA5ItP3iYso
+X-Google-Smtp-Source: AGHT+IHQzULr5uvxakNF1ITghpVAkvYqmnyNnA2TLjE8aWFEUy8+tmGTkTj7tFxUquqyIBQi9rd5TQ==
+X-Received: by 2002:a5d:6d08:0:b0:382:4b40:becc with SMTP id ffacd0b85a97d-385c6eb7f82mr6333988f8f.3.1732812402514;
+        Thu, 28 Nov 2024 08:46:42 -0800 (PST)
+Received: from [192.168.1.74] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd2e940sm2041864f8f.15.2024.11.28.08.46.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Nov 2024 08:46:41 -0800 (PST)
+Message-ID: <e9404dd2-56d2-4c6d-81f2-76060c4b4067@linaro.org>
+Date: Thu, 28 Nov 2024 17:46:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z0eV4puJ39N8wOf9@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] i386/kvm: Fix kvm_enable_x2apic link error in non-KVM
+ builds
+To: Phil Dennis-Jordan <lists@philjordan.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Shukla, Santosh" <santosh.shukla@amd.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, mtosatti@redhat.com, suravee.suthikulpanit@amd.com
+References: <20241113144923.41225-1-phil@philjordan.eu>
+ <b772f6e7-e506-4f87-98d1-5cbe59402b2b@redhat.com>
+ <ed2246ca-3ede-918c-d18d-f47cf8758d8c@amd.com>
+ <CABgObfYhQDmjh4MJOaqeAv0=cFUR=iaoLeSoGYh9iMnjDKM2aA@mail.gmail.com>
+ <CAGCz3vtTgo6YdgBxO+5b-W04m3k1WhdiaqH1_ojgj_ywjZmV7A@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <CAGCz3vtTgo6YdgBxO+5b-W04m3k1WhdiaqH1_ojgj_ywjZmV7A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 27, 2024 at 01:57:54PM -0800, Sean Christopherson wrote:
-> The attached patch is compile-tested only (the nested interactions in particular
-> need a bit of scrutiny) and needs to be chunked into multiple patches, but I don't
-> see any obvious blockers, and the diffstats speak volumes:
+On 28/11/24 17:38, Phil Dennis-Jordan wrote:
+> Paolo, could we please apply either Sairaj and Santosh's fix at
+> https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/ 
+> <https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/>
+> or mine to fix this link error? As neither patch has so far been merged, 
+> 9.2.0-rc2 still fails to build on macOS, at least on my local systems. 
+> I'm not sure why CI builds aren't jumping up and down about this, but 
+> neither the Xcode 15.2 nor 16.1 toolchains are happy on macOS 14.7/arm64.
 
-I'd like to apply this and take a closer look but I don't know what it goes
-against. Btw, you could point me to some documentation explaining which
-branches in the kvm tree people should use to base off work ontop.
+Just curious, is your build configured with --enable-hvf --enable-tcg?
 
-In any case, the overall idea makes sense to me - SVM and VMX both know which
-MSRs should be intercepted and so on.
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
