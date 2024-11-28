@@ -1,230 +1,265 @@
-Return-Path: <kvm+bounces-32650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD479DB09A
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:07:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E36F9DB0C2
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:34:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74DA0B228A4
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:07:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69D0163F94
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6CBF18E25;
-	Thu, 28 Nov 2024 01:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786D23BBE5;
+	Thu, 28 Nov 2024 01:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W39sAl1j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1pXNPVi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C002C847B;
-	Thu, 28 Nov 2024 01:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732756023; cv=fail; b=mcg0exZZq5SMeCFbnT19g5qLKy5Fmklxp7IkuZc+YVh2A7iN6qiLYM7nbC5bbrcHNr9Om/mix/eYUlypL2cf6KWtK9Q56je15MvHK64m9T1vSZCw7ooY/AqwZi6oN1ZEg9yELeTkmnTxIj+9Yx8CiKmZpby93kJVPgTXIxkI6DA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732756023; c=relaxed/simple;
-	bh=ugEztsEu43434Bm6UUOEWRCQRvtsDEMiYGmmrkdK3NA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iijTNl/in6Ma2AiQGKmpQFt+Lbu5qEJwmOYiyg8LJSsUZSxJOEc5Hj2EWN/OR3OSRCqmmNiIDUrdwClsgul13Gy5+1jMLjJUGv75POSDCrXo9seLzToyhxJOUR5Qlefg3/7Yz7JoLsaZeCNb0w6PcCSRGpvPIeuROfpTNKjW4uM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W39sAl1j; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732756021; x=1764292021;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ugEztsEu43434Bm6UUOEWRCQRvtsDEMiYGmmrkdK3NA=;
-  b=W39sAl1je94Ru8RQFBb804r07aiYFtEpbgtdm2xVn5EcMIIRfOQvS8rc
-   tEgnqtFZcx28vBKalmZj7z0KWTW2xhOHZKx7YGBQGdq9QJog0HAvY1ot6
-   Oy1WrNaha+PCtLsSbRQrNi4Q9yN/sWHqiVXu00DLtlpa1MwV/H6yaBHsb
-   RjXuiM+AImh31akGW23cIJh4HO7E3reE/yh3QJP1ZcTj44APvenDvWuOy
-   +q0Aa+PWypQXr+BSE3KtNwZ7bC9WPqMc2YoMeQ9HCVLqIWFJxG5tbtxNP
-   OHBJ+tlnVzpZ3sV3tPz0ot3H0kmZnkmMBBXB2gE4/A6hyERYf7vnk2no7
-   A==;
-X-CSE-ConnectionGUID: Mvezbiy9RVuLkGGX2BHcQA==
-X-CSE-MsgGUID: 8M6+fJcwSkiLrai942whtg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11269"; a="33123766"
-X-IronPort-AV: E=Sophos;i="6.12,190,1728975600"; 
-   d="scan'208";a="33123766"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2024 17:07:01 -0800
-X-CSE-ConnectionGUID: 6grxH3k+TwWDSjHHEPuXzQ==
-X-CSE-MsgGUID: SXZshIMuSAWCHpEB954kRg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,190,1728975600"; 
-   d="scan'208";a="92416049"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2024 17:07:00 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 27 Nov 2024 17:06:59 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 27 Nov 2024 17:06:59 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 27 Nov 2024 17:06:59 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=scXqFtOyUpE9LaS/eEaJpsSjbIiCSB01b/9VD7l2F/UnKyGwpsvULOTQSEVHWMbHr7h19Z8x7l0gLF5zkF+Ky/1CGSg7SRPbqcDS2FU+hQ5fHylw5JHYJoDY3j0ADyWd0mpbmY4ar2tPksO9wsPkvL9IQ5ir6fkcyduvfe7evmHoRcy8YKQx2v7hzf5uJelVUuC6QJSG72kSTgI15604ejjckARueC5sps5MMS1F9Atb9byMbEzm3BWa8KF7zoERWq6DyQWSThssTbrG//Izfp5shw7YIzNDQ8su4FMm7vkqlHraDfeG3IBWjR2uk54Rih5mzlHJVfNGLLNIe9muaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ugEztsEu43434Bm6UUOEWRCQRvtsDEMiYGmmrkdK3NA=;
- b=R+JEmuTSLehpoZAbaNlToYBdmNWWsqX4x3M0kZKchbBIYxRTvGWVtLeVxFkTHqVj6FmYjzluamuNVSchBqh93iRTX7t3XPW0os2AYgM2q6sYhXFILh/wxCaiK8+8L37cygVVWYjGOKhVQaJfPt6n1nw4i/REZJkOqzJpY+59rCs51ODlajVga1KKVKQnpP372+i90XpphtJOkHzy8ogoNa6q2b7BWGdg+SmZOxZBGrZhhxIdp8WrFWexbstbyZs+Ayix4aPEEKJr18Ms3KEGhmu2Cplt6juCkGzGQDiMIzjKTz4+Z9SxFgi1rApAPGcWY5pwCPK21PRpgc6Kdm+sOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by CO1PR11MB5121.namprd11.prod.outlook.com (2603:10b6:303:98::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Thu, 28 Nov
- 2024 01:06:56 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.8182.018; Thu, 28 Nov 2024
- 01:06:56 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>
-Subject: Re: [PATCH v4 0/6] KVM: x86: Prep KVM hypercall handling for TDX
-Thread-Topic: [PATCH v4 0/6] KVM: x86: Prep KVM hypercall handling for TDX
-Thread-Index: AQHbQS6ZiBJbljzi7U66FqEJbZHzRrLL4T+A
-Date: Thu, 28 Nov 2024 01:06:56 +0000
-Message-ID: <9fc1bc289254af9953e1a65ea7573facd0b54ac6.camel@intel.com>
-References: <20241128004344.4072099-1-seanjc@google.com>
-In-Reply-To: <20241128004344.4072099-1-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.54.1 (3.54.1-1.fc41) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CO1PR11MB5121:EE_
-x-ms-office365-filtering-correlation-id: 13dc30ad-9ba0-4094-af76-08dd0f48f404
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?WFpqZnVpZTVzTWFMRVpidUtVb251djkyVkhoN0JwSjRBaHlVSkhJVW5SY1kx?=
- =?utf-8?B?NHFaY28zYjQvWHdTczlwNzhHVlU1VlZnMWE5VWVEemtmb1RWemsyVW1BbFJC?=
- =?utf-8?B?SnIwNVFTLzNzeDVpcFVaRnNpenA3NE4rUEs3T3Z4MGRRVUc2amh3TEV6Tm93?=
- =?utf-8?B?Mk84R043dWFXWVMzYzJZOWRqVzBtb0F0TFgvOXV0NlJCNWR0Y2tnN3JZV0tD?=
- =?utf-8?B?KzQ0bS83RzJESWl1dTZtalBHVXZPc1FzQ2M4ZmprSWtNWnU5eU9NOHk3YTZ4?=
- =?utf-8?B?UG5CbnpzNWoyTDd6Q1J1akxnWkpaL3NTTnFKanZWNFZWYTR2TkxhWFluNzlM?=
- =?utf-8?B?RWRhb3RrTzBySGtBVTczQ1hGWGp2NmJjS2JBUVNYb3FJMFBKdytrOEY0NDls?=
- =?utf-8?B?MzZVVmJFRkZ2ak1WYnhnWDBCOVBobzR0STA4dFZEL25Sa2JxcXl4WFczNFFL?=
- =?utf-8?B?aXJINlROblNaL0FGZkZzZThtN2EvTGJpbkdOVzlyS2RRZElweGU2MnZZdVcy?=
- =?utf-8?B?KzB0YzJkN09ZTFg0YnVFYktHak5FTjl3Y1ZUWDExTW5jRVBKV29TeUhuaFdu?=
- =?utf-8?B?Y2t0Q3F0UzBLQlBGSzlTN1pEaE9McHhrRU9kV2dwWGYwaFZ1eDhLRHk5bFZF?=
- =?utf-8?B?cVhla1JlaVZ5ZGQ1aEV0N3JxaUduS0Q0c1B2azdwWVlPd1hjNXM0YlFzZ1ZH?=
- =?utf-8?B?UlRmVVJuS2RLbDFkS2FYT3JxSXYzRitjQnJaWUUvNWVGakE2d09UNDlTVlha?=
- =?utf-8?B?SHp3V3pKb1JEL1RqaUI4TW5nQXRmTUdWaVVMUXFQQW1HS3BCQytJaGpVSHhh?=
- =?utf-8?B?MVMyQ1lZR1JKakNyaUwrVkJ3SGVDK1FTRGhodGg0YlQ5OTZnKy82Y2RnbTE0?=
- =?utf-8?B?bFQwUExvUEdHVHd4NC8vbExCNXFmQ2FQNU9pYnFnN2lnaHBSaWgrUU0rMmNr?=
- =?utf-8?B?VzdQdmFDNjRIcC9uRXUzN3hkZjF5RFZlMk8zY3N5QWJ4Z0U5Mm84ak1CcjAy?=
- =?utf-8?B?ZjN6bHdNV3Q2VFpJV2FNdTN3MGlaNWhWTXdtWWJXbjRHMytkNE02ZXpkamlx?=
- =?utf-8?B?bnZnckgxdFp0WDYwTXZtRkthK25NbEN3YWY1WWlPanBQeXdRMEtPYmZIR3lP?=
- =?utf-8?B?VVRjQUthc2pCVkxOUmJ3czg4US9lL2puSlZJeVd5dVNOT0pHeitSTVJ6KzFl?=
- =?utf-8?B?a3FXMzErc2JuUG9UQWFONE82ZmZnS29WRUwxZDhPYjZSVDdUU2ZkMWovWEF5?=
- =?utf-8?B?V00wdFVqRUk5dno4WG9Nd0Q1MWtFRFk5UEY1QlY1Nm9vZ0NQbXMzT0ZJMHEz?=
- =?utf-8?B?Q0NkTHRhWlhlK1hHOXVUV05mdmJoVjlRL2ljeHpPQyt4U0dDdFNIOVFINlZJ?=
- =?utf-8?B?RVFlK3lOK1hWbzNhOTVYRC9VYmRER3BOWFNVcTNxTXhmMm05R0RaMU5yMVNJ?=
- =?utf-8?B?TjBCL1JGNmh5c1NDWFVWWWNhY1pjeHZFalNVQzNDWU5XbSs5YmFteFA3RVh4?=
- =?utf-8?B?OTRlZXZQNkFnTFlpSlpKNTFlMGwyVnhWWXIzckg5dkp6WmxYUktTeklEcGti?=
- =?utf-8?B?N1JPM2R1dGVOaXhVQlNzUkkvTHZPSUFmQ1RzOFdFeWR3UENET2NoVG5lcFhl?=
- =?utf-8?B?OTQ3cG04ek9OKzNLcW5TVGNnYzdza21UQStxY2t1TVFQbHpleGpGRTdZMFlv?=
- =?utf-8?B?dlVoamFycnhERHVQWmFDRDBTTE1lazVmZ3FndFp0K1Uzdy91UXFjOFVLUElp?=
- =?utf-8?B?RzMzOXRidkhBY3dpcnM4WVVZOHdKS0M4dGplRDYzQSszK1I1SGlwd1E3WW5q?=
- =?utf-8?B?cVVTaFRFMDhOMFRmRTc2c01yVHB3K29OenI2ai83YXlSVXJhSjZoVFBSa0tC?=
- =?utf-8?B?UFg2ZitwYWpORU9GTjFENHNGTmlNNTIzeStMa3RkWG1LNnc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Y0N1Y3UwNVY0VDcvbnNlQWVVT2VJa0tTT3U4V1NUbjJwVm43QkV0cmtFb3Bz?=
- =?utf-8?B?ZXFKMWZhaGI0ZzFKenFXalllWmVQeWRZN2IvOWZ1MmpHdmdqOU1welV1b1dz?=
- =?utf-8?B?aWRDb3AxUUVQNlNSSk0zTTFwN0RGV3FjL0ZBVmlDVUx3b00vbGFhVDNkRWcy?=
- =?utf-8?B?TVV3aU9YUEVmQ3ZzMEVKaFVzM1gwNVgvT3c2bVpoYlArSXErc2lzRS8rUWR3?=
- =?utf-8?B?YytJUzRrVHFyalVmY0MyUzJjT3hrVEdQMVM3cm9pa1NEZzVKMTFTZm8wRHM4?=
- =?utf-8?B?cmNnQ2hoTjY3YUZRQStMNVJoUkovak8yWDl0cmhZRTc5NGZxaVF3Wkl6SFhE?=
- =?utf-8?B?eFFQSnZUS2N5TU1JSmYxSWs3WnRpKzRhQ1hKbHBYMXdJT0lLWFkzUXMzbHJu?=
- =?utf-8?B?aitKeHJyd2t5MkdUdVJzbTc4WG9mQlNLUVVnZ2pma01kdVRYNWxYWXBTTDhl?=
- =?utf-8?B?RWZyZGFjaWEydENDcmtJUDcvTk9nS2wycFphaExJZzd4Z0VZNWJSbEwvd2dv?=
- =?utf-8?B?WkZzdFZUa2pMUVRCZVRSTGNTekZZM2lBOHN3dUI5NHUvNlllVFp3UDFRSi8v?=
- =?utf-8?B?V1hYZkRBdUdWWjBHcHU4UmFhOWd6RlI1MXFVaDdwNDV2TEtmbEVSNURsLzQ4?=
- =?utf-8?B?QnBXbVJwZXllNzcrWnpsZkdyNEVQVlJCdzNra2h2cHJEWEMxZmRxVEQ0L3NK?=
- =?utf-8?B?M3UxRjdHcjJaWDFuNTJCZGpmalVaV1lKY0RVSWMwMkhtZkhpRFlJYVJWdjdN?=
- =?utf-8?B?cTAwSm9uUUd0M0x3TFlPU2xMTkF2T0xtcVJDamdPU3FUZWhuZy9ybXRDa044?=
- =?utf-8?B?elEyaHpaUDZJZ2tuVkswZVU2R2Nyakh5NGhyZmgvYklta3RoUUpPWmxabm15?=
- =?utf-8?B?cWtEM1pFaDRRWWtQVmhXVHhyU29vQXFkTVlJbGF4a0pxdDN2bmV6elU3akYy?=
- =?utf-8?B?UkNXT3dqSnpISzZlUFpMY3Z3aUQvZGZybXUwa0xYdURJUXBMaFFOZXdTZkx1?=
- =?utf-8?B?YW9ldFdLKzB3Z1VGWTJ5SXB4YlFxemtSZi9MejNPYlFIcU4zbU9TUHBxVVRN?=
- =?utf-8?B?Q3NvRHk3YlkvMHVqSXVwM0FtVnl6NkpQQWZyUGZ4Y2J0d1p4b1NXUWwvM0xk?=
- =?utf-8?B?c0J0bHhrMmpIckF3TWFxOEtyUXk5RUl2ZEQrU3o2ek5WaHJiNTBmWnVocjFR?=
- =?utf-8?B?c2Q3Z3hMVEkrNHhlUGgrK3FqdmVZL0NhSU0vZWoyZ2hGeHpOQkhTSzNXRnB3?=
- =?utf-8?B?OWRma0dHZzlBYUFYdkFkSE1wbHpDQmsvanlKN1VtV0FQU2NrSnprczRjRXVq?=
- =?utf-8?B?dTJKSE5HNUVXajFMQWtkQUJwUTR6TmsvZDBXZ0R3QkZuZlp4UU9XMG1XdGRI?=
- =?utf-8?B?dmRleGlYVXU4K245T3kzZlBDbkh3UlVvSXpBMVpXM01uY21KKzBTYzFueVpL?=
- =?utf-8?B?aTM3R1FsZlE0emtPcDNNYkxLMytuNUVMakVHZXAxbHZnMVJ4bWl5OUhvZDBD?=
- =?utf-8?B?ZDNmRW5MRnM5QXBJcmpvTzhQQUNyWEVOdlh5OFhzbnlYdGE4b3E4Z1phSk1Y?=
- =?utf-8?B?ZUpVSTJCSWdaKzZ1b1UweEFjODNyazdKaTFaUnU0SEttMDZSTngxMFZtNElm?=
- =?utf-8?B?bUZIN3hMMzI1Q3lVRzhhcmE3SUN5Vkhac2FaZmdXS1RhNFBmZDZMdmR2MXdK?=
- =?utf-8?B?WkQveEZRaG45TjNWMWxUMEZOSTRCTXlHd2pZS1M4dnluOFJTdnhkc05DY2xi?=
- =?utf-8?B?STdvYkFCUVBMcSs0TG1pZnNoZ1UrYzYyUUQ3cDN2N2RSd3NCenNmNGRITHhz?=
- =?utf-8?B?ckJFNlBZb1FKSG1zZnhTVDZ3aXROdVA1ZTFTN094bDVHc2ROOXBlakVRUVo1?=
- =?utf-8?B?NjFZWlRNanA2Mm44MVlGZG82bkxNUXloYUpNQ3lieUdiZk9Udjl3eHVYOEtG?=
- =?utf-8?B?eEFwbExhYWNwTC8rM2dacWErWnNyUWRiVC9EcTNhTFVNUjB5L01uaHNQRnpL?=
- =?utf-8?B?VTFNYVFaS0dua2JKcVRiZUR2cTBpNmtFbHdmV2JoNExhNXlUN2FyMjVON2Vl?=
- =?utf-8?B?QkJYSnJrUW11dlk1VlVYeGlHa1VBRDRNMElwRGIyVDgyNUVDOWJnVGdreHV4?=
- =?utf-8?Q?gJtKTUBmN7rKm1ETatTaB2lGQ?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3768EBA48E067545A0A2C87C4B986F90@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF99A17BD5
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732757674; cv=none; b=dM3iui+dfGWdzUhLMPCVDYzjG8SHoXar5UUHrvpwBuCYuSQMFAgTC3WhwwAwhIbMNwf0IJlYt0Ct8mWfLP7XTkXxycSnP3FAKQJ6JoZs8Wuclk/XbQLdW8gqcEoHZVTNMiGylfa5hZmZ6DL6itvE+OeeTK+OA1lcX0Yyvo8D1ZA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732757674; c=relaxed/simple;
+	bh=zaQrYUFSoVVj5jkWe13qQb89eZrH1OPx1fUQQisOQ7I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZTkA8fvqMr6rX6NvpufqQMqJASjkiyJ1USdav4PcFJGH3QL0xFvjhKL7Ezi35mVEIpqvV3nBSfZhEu5cpZG57ORm9kQK4BpC5VTzN7cEBLQAp3legvniInw8qqh97uvaKA2IvCwHaQxRRRJaVawzjohp9OqkxBsDJsj/ZPgiXrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1pXNPVi; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea65508e51so463983a91.0
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:34:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732757672; x=1733362472; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9RTQ1RXShdFrDsr7LeePShhmaFBmV2+IpZyR+7AtfGA=;
+        b=N1pXNPVi+yr5qs0PbR9j1h88srwElWuKQxT/4hs3psGjTnzMCJ1q6Pj5NYPHfq20/z
+         ZIp3Bonf2FRZTFRwYsuHRq69F9Q4pZnYdSE3E79tqMLyN+OMIphgndXYC4wfle1fGxRN
+         4OfXXTMvU/E/ON3crHGLDy/Uv/5StCzudq6SNfqpFV3jj4PMaF8gG93rBjvz4xUV8B/t
+         4Z6P0k5J03RkTaRzoA317nuniGbxP1Og6fZ3QXSSSeFFQSil5u4U8IE2nfy9peJuFmeZ
+         IdbVDouaP+SQ3IJ2cqRnb9iT/nEfLtDfxGf8JLMsTWM+vOqfPEkZpiE36WJsuMkLPfPN
+         8Nlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732757672; x=1733362472;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9RTQ1RXShdFrDsr7LeePShhmaFBmV2+IpZyR+7AtfGA=;
+        b=IyDf9fV/1+RyDIxpZbF6ZBMRr8r1z9dltMIcaoCkqwtItZrMhs7u6kbdiWJ5DzpRbO
+         PA9M5W/smLKdFBIi0TL6bX9P+1ZgdjzkQL16b5CvI5Vjvn/3P9C+P35H32q9o19Vqklr
+         1RxDMaEz3F8MgogxQL8onRXWgAK1D6H95oBLM/SAETRbssiA9XJmVmBI+T7zCFKYWKUs
+         Xs8JzN7+y0YXVi2DKpUxKwWZz/WteXJwlQIAbllq3k6wzpRYmTgncRTyUvhQuZT4neCd
+         vBmPczPgM943xpjlccENAfXGnc5Ys0BGDS4nrkC+75QwoQc7dBWRcLea7sDDNz7BAMVh
+         OCOw==
+X-Gm-Message-State: AOJu0YyCYKVjVCA8POd96iBFciKljs105MGuySD5Nmg22SrCuUE60r3B
+	770gYmsSRNaxpy618eVgrJnci0+Ba6e+znp0X+EOkrSbMm76xVUo9jUkPWzKkuIvDDbIrYf22XW
+	C6Q==
+X-Google-Smtp-Source: AGHT+IHrLvTXZ5LEsjAuC6TpUvILdjM6MK9BvKWntm8r0KpUVhamk0VaSj7+SaxYGY+dhbrvo7j8zHyBUR4=
+X-Received: from pjbsx16.prod.google.com ([2002:a17:90b:2cd0:b0:2e9:29d3:c920])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3947:b0:2ea:9309:75b3
+ with SMTP id 98e67ed59e1d1-2ee08e9d29amr6252973a91.2.1732757672288; Wed, 27
+ Nov 2024 17:34:32 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Nov 2024 17:33:27 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13dc30ad-9ba0-4094-af76-08dd0f48f404
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2024 01:06:56.1866
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 97+tGz2BPzDZHtyyukvaz4OYs4O77zK9Wv7U3RRqLIZ02oRARSn0Vg8bfTM9MS1H5NPeaPUCTa6Yn36uAIzCfQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5121
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241128013424.4096668-1-seanjc@google.com>
+Subject: [PATCH v3 00/57] KVM: x86: CPUID overhaul, fixes, and caching
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>
+Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Hou Wenlong <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-T24gV2VkLCAyMDI0LTExLTI3IGF0IDE2OjQzIC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBFZmZlY3RpdmVseSB2NCBvZiBCaW5iaW4ncyBzZXJpZXMgdG8gaGFuZGxlIGh5cGVy
-Y2FsbCBleGl0cyB0byB1c2Vyc3BhY2UgaW4NCj4gYSBnZW5lcmljIG1hbm5lciwgc28gdGhhdCBU
-RFgNCj4gDQo+IEJpbmJpbiBhbmQgS2FpLCB0aGlzIGlzIGZhaXJseSBkaWZmZXJlbnQgdGhhdCB3
-aGF0IHdlIGxhc3QgZGlzY3Vzc2VkLiAgV2hpbGUNCj4gc29ydGluZyB0aHJvdWdoIEJpbmJpbidz
-IGxhdGVzdCBwYXRjaCwgSSBzdHVtYmxlZCBvbiB3aGF0IEkgdGhpbmsvaG9wZSBpcyBhbg0KPiBh
-cHByb2FjaCB0aGF0IHdpbGwgbWFrZSBsaWZlIGVhc2llciBmb3IgVERYLiAgUmF0aGVyIHRoYW4g
-aGF2ZSBjb21tb24gY29kZQ0KPiBzZXQgdGhlIHJldHVybiB2YWx1ZSwgX2FuZF8gaGF2ZSBURFgg
-aW1wbGVtZW50IGEgY2FsbGJhY2sgdG8gZG8gdGhlIHNhbWUgZm9yDQo+IHVzZXIgcmV0dXJuIE1T
-UnMsIGp1c3QgdXNlIHRoZSBjYWxsYmFjayBmb3IgYWxsIHBhdGhzLg0KPiANCj4gQXMgZm9yIGFi
-dXNpbmcgdmNwdS0+cnVuLT5oeXBlcmNhbGwucmV0Li4uIEl0J3Mgb2J2aW91c2x5IGEgYml0IGdy
-b3NzLCBidXQNCj4gSSB0aGluayBpdCdzIGEgbGVzc2VyIGV2aWwgdGhhbiBoYXZpbmcgbXVsdGlw
-bGUgYSBvbmUtbGluZSB3cmFwcGVycyBqdXN0IHRvDQo+IHRyYW1wb2xpbmUgaW4gdGhlIHJldHVy
-biBjb2RlLg0KDQpEb2Vzbid0IHNlZW0gdG8gYmUgImdyb3NzIiB0byBtZSwgYW5kIEFGQUlDVCBu
-b3cgZm9yIFREWCB3ZSBqdXN0IG5lZWQgdG8gcGxheQ0Kd2l0aCBfX2t2bV9lbXVsYXRlX2h5cGVy
-Y2FsbCgpIHdpdGggYSBURFgtc3BlY2lmaWMgY29tcGxldGlvbiBjYWxsYmFjay4NCg0KV2hpY2gg
-aXMgbmljZS4gIFRoYW5rcyENCg0KRm9yIHRoaXMgc2VyaWVzOg0KDQpSZXZpZXdlZC1ieTogS2Fp
-IEh1YW5nIDxrYWkuaHVhbmdAaW50ZWwuY29tPg0K
+The super short TL;DR: snapshot all X86_FEATURE_* flags that KVM cares
+about so that all queries against guest capabilities are "fast", e.g. don't
+require manual enabling or judgment calls as to where a feature needs to be
+fast.
+
+The guest_cpu_cap_* nomenclature follows the existing kvm_cpu_cap_*
+except for a few (maybe just one?) cases where guest cpu_caps need APIs
+that kvm_cpu_caps don't.  In theory, the similar names will make this
+approach more intuitive.
+
+This series also adds more hardening, e.g. to assert at compile-time if a
+feature flag is passed to the wrong word.  It also sets the stage for even
+more hardening in the future, as tracking all KVM-supported features allows
+shoving known vs. used features into arrays at compile time, which can then
+be checked for consistency irrespective of hardware support.  E.g. allows
+detecting if KVM is checking a feature without advertising it to userspace.
+This extra hardening is future work; I have it mostly working, but it's ugly
+and requires a runtime check to process the generated arrays.
+
+There are *multiple* potentially breaking changes in this series (in for a
+penny, in for a pound).  However, I don't expect any fallout for real world
+VMMs because the ABI changes either disallow things that couldn't possibly
+have worked in the first place, or are following in the footsteps of other
+behaviors, e.g. KVM advertises x2APIC, which is 100% dependent on an in-kernel
+local APIC.
+
+ * Disallow stuffing CPUID-dependent guest CR4 features before setting guest
+   CPUID.
+ * Disallow KVM_CAP_X86_DISABLE_EXITS after vCPU creation
+ * Reject disabling of MWAIT/HLT interception when not allowed
+ * Advertise TSC_DEADLINE_TIMER in KVM_GET_SUPPORTED_CPUID.
+ * Advertise HYPERVISOR in KVM_GET_SUPPORTED_CPUID
+
+Validated the flag rework by comparing the output of KVM_GET_SUPPORTED_CPUID
+(and the emulated version) at the beginning and end of the series, on AMD
+and Intel hosts that should support almost every feature known to KVM.
+
+Maxim, I did my best to incorporate all of your feedback, and when we
+disagreed, I tried to find an approach that I we can hopefully both live
+with, at least until someone comes up with a better idea.
+
+I _think_ the only suggestion that I "rejected" entirely is the existence
+of ALIASED_1_EDX_F.  I responded to the previous thread, definitely feel
+free to continue the conversation there (or here).
+
+If I missed something you care strongly about, please holler!
+
+v3:
+ - Collect more reviews.
+ - Too many to list.
+ 
+v2:
+ - Collect a few reviews (though I dropped several due to the patches changing
+   significantly).
+ - Incorporate KVM's support into the vCPU's cpu_caps. [Maxim]
+ - A massive pile of new patches.
+
+Sean Christopherson (57):
+  KVM: x86: Use feature_bit() to clear CONSTANT_TSC when emulating CPUID
+  KVM: x86: Limit use of F() and SF() to
+    kvm_cpu_cap_{mask,init_kvm_defined}()
+  KVM: x86: Do all post-set CPUID processing during vCPU creation
+  KVM: x86: Explicitly do runtime CPUID updates "after" initial setup
+  KVM: x86: Account for KVM-reserved CR4 bits when passing through CR4
+    on VMX
+  KVM: selftests: Update x86's set_sregs_test to match KVM's CPUID
+    enforcement
+  KVM: selftests: Assert that vcpu->cpuid is non-NULL when getting CPUID
+    entries
+  KVM: selftests: Refresh vCPU CPUID cache in __vcpu_get_cpuid_entry()
+  KVM: selftests: Verify KVM stuffs runtime CPUID OS bits on CR4 writes
+  KVM: x86: Move __kvm_is_valid_cr4() definition to x86.h
+  KVM: x86/pmu: Drop now-redundant refresh() during init()
+  KVM: x86: Drop now-redundant MAXPHYADDR and GPA rsvd bits from vCPU
+    creation
+  KVM: x86: Disallow KVM_CAP_X86_DISABLE_EXITS after vCPU creation
+  KVM: x86: Reject disabling of MWAIT/HLT interception when not allowed
+  KVM: x86: Drop the now unused KVM_X86_DISABLE_VALID_EXITS
+  KVM: selftests: Fix a bad TEST_REQUIRE() in x86's KVM PV test
+  KVM: selftests: Update x86's KVM PV test to match KVM's disabling
+    exits behavior
+  KVM: x86: Zero out PV features cache when the CPUID leaf is not
+    present
+  KVM: x86: Don't update PV features caches when enabling enforcement
+    capability
+  KVM: x86: Do reverse CPUID sanity checks in __feature_leaf()
+  KVM: x86: Account for max supported CPUID leaf when getting raw host
+    CPUID
+  KVM: x86: Unpack F() CPUID feature flag macros to one flag per line of
+    code
+  KVM: x86: Rename kvm_cpu_cap_mask() to kvm_cpu_cap_init()
+  KVM: x86: Add a macro to init CPUID features that are 64-bit only
+  KVM: x86: Add a macro to precisely handle aliased 0x1.EDX CPUID
+    features
+  KVM: x86: Handle kernel- and KVM-defined CPUID words in a single
+    helper
+  KVM: x86: #undef SPEC_CTRL_SSBD in cpuid.c to avoid macro collisions
+  KVM: x86: Harden CPU capabilities processing against out-of-scope
+    features
+  KVM: x86: Add a macro to init CPUID features that ignore host kernel
+    support
+  KVM: x86: Add a macro to init CPUID features that KVM emulates in
+    software
+  KVM: x86: Swap incoming guest CPUID into vCPU before massaging in
+    KVM_SET_CPUID2
+  KVM: x86: Clear PV_UNHALT for !HLT-exiting only when userspace sets
+    CPUID
+  KVM: x86: Remove unnecessary caching of KVM's PV CPUID base
+  KVM: x86: Always operate on kvm_vcpu data in cpuid_entry2_find()
+  KVM: x86: Move kvm_find_cpuid_entry{,_index}() up near
+    cpuid_entry2_find()
+  KVM: x86: Remove all direct usage of cpuid_entry2_find()
+  KVM: x86: Advertise TSC_DEADLINE_TIMER in KVM_GET_SUPPORTED_CPUID
+  KVM: x86: Advertise HYPERVISOR in KVM_GET_SUPPORTED_CPUID
+  KVM: x86: Rename "governed features" helpers to use "guest_cpu_cap"
+  KVM: x86: Replace guts of "governed" features with comprehensive
+    cpu_caps
+  KVM: x86: Initialize guest cpu_caps based on guest CPUID
+  KVM: x86: Extract code for generating per-entry emulated CPUID
+    information
+  KVM: x86: Treat MONTIOR/MWAIT as a "partially emulated" feature
+  KVM: x86: Initialize guest cpu_caps based on KVM support
+  KVM: x86: Avoid double CPUID lookup when updating MWAIT at runtime
+  KVM: x86: Drop unnecessary check that cpuid_entry2_find() returns
+    right leaf
+  KVM: x86: Update OS{XSAVE,PKE} bits in guest CPUID irrespective of
+    host support
+  KVM: x86: Update guest cpu_caps at runtime for dynamic CPUID-based
+    features
+  KVM: x86: Shuffle code to prepare for dropping guest_cpuid_has()
+  KVM: x86: Replace (almost) all guest CPUID feature queries with
+    cpu_caps
+  KVM: x86: Drop superfluous host XSAVE check when adjusting guest
+    XSAVES caps
+  KVM: x86: Add a macro for features that are synthesized into
+    boot_cpu_data
+  KVM: x86: Pull CPUID capabilities from boot_cpu_data only as needed
+  KVM: x86: Rename "SF" macro to "SCATTERED_F"
+  KVM: x86: Explicitly track feature flags that require vendor enabling
+  KVM: x86: Explicitly track feature flags that are enabled at runtime
+  KVM: x86: Use only local variables (no bitmask) to init kvm_cpu_caps
+
+ Documentation/virt/kvm/api.rst                |  10 +-
+ arch/x86/include/asm/kvm_host.h               |  47 +-
+ arch/x86/kvm/cpuid.c                          | 967 ++++++++++++------
+ arch/x86/kvm/cpuid.h                          | 128 +--
+ arch/x86/kvm/governed_features.h              |  22 -
+ arch/x86/kvm/hyperv.c                         |   2 +-
+ arch/x86/kvm/lapic.c                          |   4 +-
+ arch/x86/kvm/mmu.h                            |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |   4 +-
+ arch/x86/kvm/pmu.c                            |   1 -
+ arch/x86/kvm/reverse_cpuid.h                  |  23 +-
+ arch/x86/kvm/smm.c                            |  10 +-
+ arch/x86/kvm/svm/nested.c                     |  22 +-
+ arch/x86/kvm/svm/pmu.c                        |   8 +-
+ arch/x86/kvm/svm/sev.c                        |  21 +-
+ arch/x86/kvm/svm/svm.c                        |  46 +-
+ arch/x86/kvm/svm/svm.h                        |   4 +-
+ arch/x86/kvm/vmx/hyperv.h                     |   2 +-
+ arch/x86/kvm/vmx/nested.c                     |  18 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |   4 +-
+ arch/x86/kvm/vmx/sgx.c                        |  14 +-
+ arch/x86/kvm/vmx/vmx.c                        |  61 +-
+ arch/x86/kvm/x86.c                            | 153 ++-
+ arch/x86/kvm/x86.h                            |   6 +-
+ include/uapi/linux/kvm.h                      |   4 -
+ .../selftests/kvm/include/x86_64/processor.h  |  18 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |  38 +-
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  63 +-
+ 28 files changed, 1017 insertions(+), 685 deletions(-)
+ delete mode 100644 arch/x86/kvm/governed_features.h
+
+
+base-commit: 4d911c7abee56771b0219a9fbf0120d06bdc9c14
+-- 
+2.47.0.338.g60cca15819-goog
+
 
