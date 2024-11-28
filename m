@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-32693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97539DB11B
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:45:45 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171E89DB11D
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:46:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B496163D5E
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9846B243F7
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814821C7B75;
-	Thu, 28 Nov 2024 01:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E0D1CACD9;
+	Thu, 28 Nov 2024 01:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bYU/UifD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NyqeEdNx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E565413AD22
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0AC1C68B2
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732757747; cv=none; b=flrwaXEP5mumus4lmoKfLgkF587p8d+G7mkFDV59wUKcGyWFnsYqiOd4Vnian8BrKqAHYPP9LltXiYgmupATy0fb2d2/4uFHEr8G1EOZYKG2f2uFB3s2PzXereL4SHUs+zNdSjFa7S9dp3LWuboHz8EEEmzxSDsaY9kSYABuJTo=
+	t=1732757748; cv=none; b=JL0yb1hbQTGpkuflNviWgcx7r5Ow9tiYVl20omh/nM89ZLpQYi+qy+xFxQ1gFvglmtgdXuk1ZUrGB/aC6STvMI5R1ySUcCUj3sxcgTL3rA7k/T8aci7XYv57DtcZsIeJPjelrWGK06e55eOsu27DoBc5WoQMZl/vxD3UbhYzf0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732757747; c=relaxed/simple;
-	bh=N0jpzgpDVGDVdYSAga/+/UOxB/D8WpjPpvJqspM+rEM=;
+	s=arc-20240116; t=1732757748; c=relaxed/simple;
+	bh=TB2Njr8V9gci+zAwKAzdTpYDyYSzzQCUHvTbCzkV3Hg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tBI6O7hXy5x/0fQo6/PaCDmTlyuOqWHTto/exoJ3B+ADRibiMbB6vpm0PZxnCQMvIeMjwMD1fU077nPi7nG8cWA/Ve0PFBMRGmS/4/36Y1mJYBFRlMvOy+On6WEE7dsZPC+H2aKZRos8RgLEkFOiCcCt8FoaEQ1m+tGce5Tb5VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bYU/UifD; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=rh0O2RzVHFVrq8T9/TpiS/2iSe/4f16jtl0qciPLiBM1pv2N9mtkL7Riz1AXibllgPaU8ZaJFBKGEBMgNbFkiJIxAD953om47tqsWRzfaADffinnQ3a641KnOuFOcq6TTIHEeHYLTGxIFrqa8AATfSwy2OWFkXy94uwPk7IYzLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NyqeEdNx; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea3c9178f6so360512a91.1
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:45 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7fc99b41679so279317a12.3
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732757745; x=1733362545; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732757747; x=1733362547; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=LQdNVoeKSGGjB98KPAh0ULz3SFWlc3gHAqK/jbG3+GY=;
-        b=bYU/UifDwTvGWIc9DqcScSCbI5jH+S+5vz261dSr6Y1MkBY5jSB4NZ9E52gtwhfD34
-         ySI25sh1jJMk95UZal+4/Q2oJojJQJXOczToSeSQcJEsnyt2qwxeQtNWGQOZGCCD+6Zl
-         gi/8bdq6qFS8/85thoNUDHcJoUuIT+UHaCHfgYbjzCsKgBOJW836peJJOdm/EshApZXl
-         R3tmiA6iVJJrMhXkm4Oj/6J68SvP2H6ZkTH2Ec6T7HSHgJlfjdbypCCujsepjNTktMjd
-         PIkMEeDY7AyCUpvm+5+g1FruOjMrHOyxfCvZUVASq2xH7RRqPFRU+rYRv32z0uDWWoWS
-         LGnA==
+        bh=Es0q4g30GZYN60Cs+30x4ZdeXkrOyT6BVfqdCAMrxSg=;
+        b=NyqeEdNxr62JIS4wKhBkEYQfrYQNbJnMxePdve7093p+f5phOK5wxR2WWz0NnQZzJb
+         qom2eTfHfVsuE8CIRxYc9XKVbWnFgttiyGWGVBNAz2m90wNJpfbTyi7agny9r55TLG94
+         LNBVpOxjGuRL1+gqbmmXIKNHSRSWkwnERuJg5SPvOfymQ5BX8TaDXm0DB+wp+ryS1/J1
+         A72lxqM7gCYQCtMEEBN8/SwumKyAtPMSyJR8hbX6ZLtnJ91AMMW6eGiOfsPo3XyqJgKg
+         3V17z3ykuf8QoJ7remgNyYz45fkeI8WTwm+GLzvCcUiHJh48MnQzLqRuTaLvL06vHmls
+         6wSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732757745; x=1733362545;
+        d=1e100.net; s=20230601; t=1732757747; x=1733362547;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LQdNVoeKSGGjB98KPAh0ULz3SFWlc3gHAqK/jbG3+GY=;
-        b=D210y9L08QjYUonHuYyVB7nKB+Q0Ml6kRrDu0VCNBvM8wJnOlYoH/SWEdS12HDVtke
-         lpx7nqQgXLZ9jtK7ooICD9wjxgCMY6d2cJ3amqO05uF2eKss2k9H1p8RM+mUl+36JmlU
-         qP6l0HTW9R4ZwJr18kVzOGS5xRpDGlf0dS10YF5ZlSKkPyirHuI9INRMIdg7Vkc83JFC
-         6qhI+DvBKuF9561+C+AuWy18k1gFAFTju6l/xQIHeiplX6cotjDUNUxALWyO25Cl2ZSX
-         yDtvtjRm4T7l8Xrz7qVwRJXXLYnS2tM3OtcnsPSVpEXcioS2aRDZlFSaQHGzdCjzZCuf
-         vsmA==
-X-Gm-Message-State: AOJu0YxMKZFqR5BpgrVEy0BKCySnXMo40idoYoVEY+dSNp2G6eoLpffL
-	BGplTH6q+FLIw3LI35zMGs25WcMu2HWQQv8IhcbKqeaMsvtA7n3HfDaBbFYwtlSqeURq0cEfpPt
-	R1g==
-X-Google-Smtp-Source: AGHT+IFlkq9MMdFSKUul4GQoN1KnM44hUUTz4mhw5LrBQTyUE/VFwuZ91Pk4S+UJWRbkromXKR6FuSHOEpY=
-X-Received: from pjbsc12.prod.google.com ([2002:a17:90b:510c:b0:2ea:479a:6016])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b47:b0:2ea:49a8:917b
- with SMTP id 98e67ed59e1d1-2ee08dab307mr7739102a91.0.1732757745355; Wed, 27
- Nov 2024 17:35:45 -0800 (PST)
+        bh=Es0q4g30GZYN60Cs+30x4ZdeXkrOyT6BVfqdCAMrxSg=;
+        b=ZgRgkYogq0klhNHnmW0AQ0eFwhVt9sHI18zIPs/2Qj6k+KquwplrlQPIWpl2huMD5P
+         PoMn13r9EJ+FA2cP3tGGLuu51hLHkgP+OulCaXGmnjb/JjBoPCISM+i0prAbZmzM9K3k
+         F6DwQhWn09OMaS93RzbIAR6Fwk151ljdIAU3+JliC5RiYm2f5DS3JVWPY/xPsE47IsUE
+         GjTBpA7YerVHLnOG/Gbd17uN32hqy2EFP+PpbLCeJ7ZAozwwNoT8SuqEs5s+yLWoSfzR
+         bb7O4Q6BgQkK/OrlwdR3qSwQ3PtYGjCBxfsX5Eq/J3UYUIWeGA0wTzMitmGuO7l5TIfo
+         r79A==
+X-Gm-Message-State: AOJu0YxagnKDhG+Dmvw+cPWquUjbZg7/Ik4rZNpXMeW2jEgtHw9MIw0O
+	Y236CE5YH5g+OUnqEc/ppvvMhqae6eUmCSQ8YQ1DSmjJfWHHb1u+86ywx3R/ljLX8rvhk6wXqVP
+	/rA==
+X-Google-Smtp-Source: AGHT+IEw6weSthxvIraAPD0rAOQgIGwIWRbZouQyB9Vwv1JsmLlIKy5a1yr3A2u3ZRRwqrGTZTdXmZekq60=
+X-Received: from pjbpd3.prod.google.com ([2002:a17:90b:1dc3:b0:2ea:543f:9b80])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:734a:b0:1e0:d1f7:9437
+ with SMTP id adf61e73a8af0-1e0e0b80369mr6780795637.38.1732757746942; Wed, 27
+ Nov 2024 17:35:46 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 17:34:09 -0800
+Date: Wed, 27 Nov 2024 17:34:10 -0800
 In-Reply-To: <20241128013424.4096668-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128013424.4096668-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128013424.4096668-43-seanjc@google.com>
-Subject: [PATCH v3 42/57] KVM: x86: Extract code for generating per-entry
- emulated CPUID information
+Message-ID: <20241128013424.4096668-44-seanjc@google.com>
+Subject: [PATCH v3 43/57] KVM: x86: Treat MONTIOR/MWAIT as a "partially
+ emulated" feature
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>
@@ -89,73 +89,63 @@ Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Extract the meat of __do_cpuid_func_emulated() into a separate helper,
-cpuid_func_emulated(), so that cpuid_func_emulated() can be used with a
-single CPUID entry.  This will allow marking emulated features as fully
-supported in the guest cpu_caps without needing to hardcode the set of
-emulated features in multiple locations.
+Enumerate MWAIT in cpuid_func_emulated(), but only if the caller wants to
+include "partially emulated" features, i.e. features that KVM kinda sorta
+emulates, but with major caveats.  This will allow initializing the guest
+cpu_caps based on the set of features that KVM virtualizes and/or emulates,
+without needing to handle things like MONITOR/MWAIT as one-off exceptions.
 
-No functional change intended.
+Adding one-off handling for individual features is quite painful,
+especially when considering future hardening.  It's very doable to verify,
+at compile time, that every CPUID-based feature that KVM queries when
+emulating guest behavior is actually known to KVM, e.g. to prevent KVM
+bugs where KVM emulates some feature but fails to advertise support to
+userspace.  In other words, any features that are special cased, i.e. not
+handled generically in the CPUID framework, would also need to be special
+cased for any hardening efforts that build on said framework.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ arch/x86/kvm/cpuid.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 803d89577e6f..153c4378b987 100644
+index 153c4378b987..0c63492f119d 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -1192,14 +1192,10 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+@@ -1192,7 +1192,8 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
  	return entry;
  }
  
--static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-+static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func)
+-static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func)
++static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func,
++			       bool include_partially_emulated)
  {
--	struct kvm_cpuid_entry2 *entry;
-+	memset(entry, 0, sizeof(*entry));
+ 	memset(entry, 0, sizeof(*entry));
  
--	if (array->nent >= array->maxnent)
--		return -E2BIG;
--
--	entry = &array->entries[array->nent];
- 	entry->function = func;
- 	entry->index = 0;
- 	entry->flags = 0;
-@@ -1207,23 +1203,27 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
- 	switch (func) {
- 	case 0:
- 		entry->eax = 7;
--		++array->nent;
--		break;
-+		return 1;
+@@ -1206,6 +1207,16 @@ static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func)
+ 		return 1;
  	case 1:
  		entry->ecx = feature_bit(MOVBE);
--		++array->nent;
--		break;
-+		return 1;
++		/*
++		 * KVM allows userspace to enumerate MONITOR+MWAIT support to
++		 * the guest, but the MWAIT feature flag is never advertised
++		 * to userspace because MONITOR+MWAIT aren't virtualized by
++		 * hardware, can't be faithfully emulated in software (KVM
++		 * emulates them as NOPs), and allowing the guest to execute
++		 * them natively requires enabling a per-VM capability.
++		 */
++		if (include_partially_emulated)
++			entry->ecx |= feature_bit(MWAIT);
+ 		return 1;
  	case 7:
  		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 		entry->eax = 0;
- 		if (kvm_cpu_cap_has(X86_FEATURE_RDTSCP))
- 			entry->ecx = feature_bit(RDPID);
--		++array->nent;
--		break;
-+		return 1;
- 	default:
--		break;
-+		return 0;
- 	}
-+}
+@@ -1223,7 +1234,7 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+ 	if (array->nent >= array->maxnent)
+ 		return -E2BIG;
  
-+static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-+{
-+	if (array->nent >= array->maxnent)
-+		return -E2BIG;
-+
-+	array->nent += cpuid_func_emulated(&array->entries[array->nent], func);
+-	array->nent += cpuid_func_emulated(&array->entries[array->nent], func);
++	array->nent += cpuid_func_emulated(&array->entries[array->nent], func, false);
  	return 0;
  }
  
