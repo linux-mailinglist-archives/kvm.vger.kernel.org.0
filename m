@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-32700-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32701-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5DD9DB128
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:47:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FFDD9DB12A
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4587A281E98
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B1B92815BC
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314CA1CDFC0;
-	Thu, 28 Nov 2024 01:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AF21CCED5;
+	Thu, 28 Nov 2024 01:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uZUD05qj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v6kq6Z6g"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9107A1CCEDF
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139731CDA24
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732757760; cv=none; b=Wqaq6G0VupEcHbiNHHIlFxcvy62PdorqrTtWQ1CeKOHXu3qna+6gga+YAe5+jH1VqXaOcUiJjw7sJWnSHcylMesD4WMAWSDFxPKzOjh/kTf67f91lMJCrtAMipSqYtLqmVVWoUZs2pVRGlsl3cjR5I7aSwsTOJbIoNYWEh+x7I0=
+	t=1732757762; cv=none; b=jEMezAQ6OXP1v/nvQuU5he8PnqRVOb+lGQ4Vx9cR9IXVE7QBlJ6vs4bWv3ejP9ssbBNyIOvhGKTmAc//XKnNvir001mD4scvqo30Iy+YP3bYuHHxbz/qjoB9LhC3ppaRjQckBYSV8yf7TXnJsEK4WLEXe1WFhifFln2viHsD0sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732757760; c=relaxed/simple;
-	bh=X1KFY9JDaWm435e/48kpMrX7/Px0BLMN53pN+9kw0zE=;
+	s=arc-20240116; t=1732757762; c=relaxed/simple;
+	bh=Jhx7pM/VQK2f2ulPA1ip8KCk6xDGYv1qJ/+whmM2KDA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ppgDO0OA77bOY3pUGIkV5gnd/dTUaufHBIu2tPXE6GvbW6e5ZOulAMfCbWDUNglYcXDauKiTIsHXcIp8SnZUUkiTm376bd37GGDzZX0AX3OaWEjRumTpg4W7DzJvq5Q9jK9+x+5Kgyzsk0bCNHdmskYuCE4UhhSn/w7zLwuiRAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uZUD05qj; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=DKGYSTfOSDash++TRr4yyQXIMCh43crOiZA3QsxDk9uL7PdcGY0130ywUPXnDqhgfkeW4S5PhX+sTGWkDyS/ls2kmDuzcQ818qNyEjujlKsCGbCakETZnxDpBhgnHcBKC4MPudCDfIF/Ru18Q0IVDF0WebtiO1BXv2xng/WMQys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v6kq6Z6g; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ea4c541b61so399086a91.0
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:58 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e95713327eso395030a91.1
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:36:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732757758; x=1733362558; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732757759; x=1733362559; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=T/azVSgkTWzv8BfKxc6pAx4oV5kx86H9lfQ2pUatGZc=;
-        b=uZUD05qjXCwzPlHFpelfZO9kyiNKkERzx5/4XBuwQ8B7uznlBJI/speX1P5RFoh9O9
-         2iLGrkMq+jzwhnJdUvBqggNIvEHZPE2rjEpb+HfGlhCF6IMVzkbW7SwTTpPJLi8s9oLX
-         o80TZiXxFDBzUhM3j30JgYA9AnlsMMiBCF6oNlHgww5eDPMePIsowZXi7GJwAyobJIJy
-         M7CpxeZc8TgCPXVmrKKFASOkd08lH8JVvjEkc29Cb5D9Nhm1eVi6Pirrb5zlF70t5WeS
-         W0f0+CNxqDe51z5gWRxz/fq1qmRIsK7TjFa3D9P+EEjOQZSbQe/ONFTjdHm1oJvxwuo5
-         P5dA==
+        bh=xoLCpQV02u+vffNlVzw+q+WJT/W/UNuHGkdpoH9HecE=;
+        b=v6kq6Z6glUTTG1SHNEDUbpCKBi0E7+R9aUYphQysgqw6xAGzJokIIvIyshOSizlPeH
+         DB+FgkyGzke3/vJdsCEs8/TiAIyeHYoGZYZum5/KW5eklcXaPKIXQuVO/kZAUgnRMLpG
+         n2m/yTalYh0/yHgv873r62ne9FEox0tqRQybx5iu+DMacha0Pu6AHFshNBP8amxQP3YM
+         Opy4H/i/ewBX9xN/59t/PJrOGoe3QgVNAbPgnQ4RTIYrNz0clVIhd/8KdrHzimuUM/C5
+         Mh/WZSnO49XM4ysQ8DZ3ly6p6sz/++Gp3fU/XzbzYc6NEAb9p+41xfeg/hLhVBSJlQkQ
+         00xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732757758; x=1733362558;
+        d=1e100.net; s=20230601; t=1732757759; x=1733362559;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=T/azVSgkTWzv8BfKxc6pAx4oV5kx86H9lfQ2pUatGZc=;
-        b=R2TpG6LRCFRxaj00++kuNnZ933wRQVA9XeIAZ0MKv/14lmm3T9ZTOUQrHZcl+A8QRO
-         Y7nObSiLDzhUNsPslxGrfETDTQB0LHSI0KgRHZ11i0ubm/GrqrnfajpqkkRJugnu3NL1
-         C7HqAVpAAhLjG39GWY+2dOdlJbm6TSWp3jJf610EQ2tAYOVk//30p83azAWZmCn3DF75
-         6QF8IhJBy2wZDOqxfO4kxaaNR7J2x+SsvY6xZFTqF7sE+0leHaZPfkjmZzedoPxQRQBZ
-         F/XY2ErpTWPi7AW/fgiuQR61398nF+/DtXYfgyggqEpuENyMqSum2mLRm+gPlOTLwcp5
-         3rOw==
-X-Gm-Message-State: AOJu0Yx05WnQ6UxbPPG+DpoOGknjRPyR+aI2nFB2jeAteT0Q9mR0xZsC
-	W4z4gYmas7hOh3kC2y06XxXHjHxvR1jWWWyF5nHJ2sTH4aLJasVE/QxcydeM1HxPyHuHigPD2Ui
-	Cow==
-X-Google-Smtp-Source: AGHT+IFdhHXXQ+hWXIP9ZWM5zz75noCfQ39mgDA87KnR6usRc7BuJxpaKOJmZEA1ozX7y4nqiAuKb26SQu4=
-X-Received: from pjuj3.prod.google.com ([2002:a17:90a:d003:b0:2e0:9fee:4b86])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2252:b0:2ea:8b06:ffcb
- with SMTP id 98e67ed59e1d1-2ee08eb2b91mr6591707a91.14.1732757757742; Wed, 27
- Nov 2024 17:35:57 -0800 (PST)
+        bh=xoLCpQV02u+vffNlVzw+q+WJT/W/UNuHGkdpoH9HecE=;
+        b=IncsNZkREaMu1zgFO+KfjjSZbLnWRA5khoQQBzNjccdw1tOu/W1Aj5CrKtj/oEPX4B
+         BqtNwYQUau1bYBbygzeBooufuBGzv7dVJlp87YMTEc3HajUwRF05LRgCt4Vox9DJS9gB
+         b2l9Xt9Zzr3V0/jT3ZsASCePQCMUltQMPYqUhgSliDEVDNYGVUmaimDYCuZaYlb74luT
+         DhOscxH6gdaHWv0oMO1iK7sKY4yrmTGkyFR960h8ltWBj9eUtOx8E2csWLQAUS+BSMBQ
+         iz0eAV7Xe1y6DNdOzkbTlezIQhUuuywjehJgqfQXTPXi84woI9WIg9aPwEQi/aEmtghD
+         r0ew==
+X-Gm-Message-State: AOJu0Yzw4A0kJGCnUtQQMqEHM4ZCo6E4/PuIb1XgxZSjNpiHosxzzvS2
+	ttj5A0+oEyMIoJQJQhfFFH8JR5xsaAawiPGeMVbQzUggGSMZ81uUuzPOls9rKMl5ZP9Wb3/f8Xx
+	0Hg==
+X-Google-Smtp-Source: AGHT+IHsoRPDrcCP0kiR+VNR/YP5/pOhKOLGfzBxuzip5ngB3T7rnVQ0j4rdf1C4/qmpT3tQQuGTPxQ9tLA=
+X-Received: from pjboh4.prod.google.com ([2002:a17:90b:3a44:b0:2e7:6ea5:ab67])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1bd2:b0:2ea:4150:3f82
+ with SMTP id 98e67ed59e1d1-2ee08ecd374mr6068679a91.22.1732757759583; Wed, 27
+ Nov 2024 17:35:59 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 17:34:16 -0800
+Date: Wed, 27 Nov 2024 17:34:17 -0800
 In-Reply-To: <20241128013424.4096668-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128013424.4096668-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128013424.4096668-50-seanjc@google.com>
-Subject: [PATCH v3 49/57] KVM: x86: Shuffle code to prepare for dropping guest_cpuid_has()
+Message-ID: <20241128013424.4096668-51-seanjc@google.com>
+Subject: [PATCH v3 50/57] KVM: x86: Replace (almost) all guest CPUID feature
+ queries with cpu_caps
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>
@@ -88,64 +89,1008 @@ Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the implementations of guest_has_{spec_ctrl,pred_cmd}_msr() down
-below guest_cpu_cap_has() so that their use of guest_cpuid_has() can be
-replaced with calls to guest_cpu_cap_has().
+Switch all queries (except XSAVES) of guest features from guest CPUID to
+guest capabilities, i.e. replace all calls to guest_cpuid_has() with calls
+to guest_cpu_cap_has().
 
-No functional change intended.
+Keep guest_cpuid_has() around for XSAVES, but subsume its helper
+guest_cpuid_get_register() and add a compile-time assertion to prevent
+using guest_cpuid_has() for any other feature.  Add yet another comment
+for XSAVE to explain why KVM is allowed to query its raw guest CPUID.
+
+Opportunistically drop the unused guest_cpuid_clear(), as there should be
+no circumstance in which KVM needs to _clear_ a guest CPUID feature now
+that everything is tracked via cpu_caps.  E.g. KVM may need to _change_
+a feature to emulate dynamic CPUID flags, but KVM should never need to
+clear a feature in guest CPUID to prevent it from being used by the guest.
+
+Delete the last remnants of the governed features framework, as the lone
+holdout was vmx_adjust_secondary_exec_control()'s divergent behavior for
+governed vs. ungoverned features.
+
+Note, replacing guest_cpuid_has() checks with guest_cpu_cap_has() when
+computing reserved CR4 bits is a nop when viewed as a whole, as KVM's
+capabilities are already incorporated into the calculation, i.e. if a
+feature is present in guest CPUID but unsupported by KVM, its CR4 bit
+was already being marked as reserved, checking guest_cpu_cap_has() simply
+double-stamps that it's a reserved bit.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.h | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ arch/x86/kvm/cpuid.c             |  4 +-
+ arch/x86/kvm/cpuid.h             | 76 ++++++++++++--------------------
+ arch/x86/kvm/governed_features.h | 22 ---------
+ arch/x86/kvm/hyperv.c            |  2 +-
+ arch/x86/kvm/lapic.c             |  4 +-
+ arch/x86/kvm/smm.c               | 10 ++---
+ arch/x86/kvm/svm/pmu.c           |  8 ++--
+ arch/x86/kvm/svm/sev.c           |  4 +-
+ arch/x86/kvm/svm/svm.c           | 20 ++++-----
+ arch/x86/kvm/vmx/hyperv.h        |  2 +-
+ arch/x86/kvm/vmx/nested.c        | 12 ++---
+ arch/x86/kvm/vmx/pmu_intel.c     |  4 +-
+ arch/x86/kvm/vmx/sgx.c           | 14 +++---
+ arch/x86/kvm/vmx/vmx.c           | 47 +++++++++-----------
+ arch/x86/kvm/x86.c               | 66 +++++++++++++--------------
+ 15 files changed, 124 insertions(+), 171 deletions(-)
+ delete mode 100644 arch/x86/kvm/governed_features.h
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d3c3e1327ca1..8d088a888a0d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -416,7 +416,7 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	 * and can install smaller shadow pages if the host lacks 1GiB support.
+ 	 */
+ 	allow_gbpages = tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
+-				      guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
++				      guest_cpu_cap_has(vcpu, X86_FEATURE_GBPAGES);
+ 	guest_cpu_cap_change(vcpu, X86_FEATURE_GBPAGES, allow_gbpages);
+ 
+ 	best = kvm_find_cpuid_entry(vcpu, 1);
+@@ -441,7 +441,7 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 
+ #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+ 	vcpu->arch.cr4_guest_rsvd_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_) |
+-					 __cr4_reserved_bits(guest_cpuid_has, vcpu);
++					 __cr4_reserved_bits(guest_cpu_cap_has, vcpu);
+ #undef __kvm_cpu_cap_has
+ 
+ 	kvm_hv_set_cpuid(vcpu, kvm_cpuid_has_hyperv(vcpu));
 diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 27da0964355c..4901145ba2dc 100644
+index 4901145ba2dc..3d69a0ef8268 100644
 --- a/arch/x86/kvm/cpuid.h
 +++ b/arch/x86/kvm/cpuid.h
-@@ -149,21 +149,6 @@ static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
- 	return x86_stepping(best->eax);
+@@ -66,41 +66,40 @@ static __always_inline void cpuid_entry_override(struct kvm_cpuid_entry2 *entry,
+ 	*reg = kvm_cpu_caps[leaf];
  }
  
--static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
+-static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu,
+-						     unsigned int x86_feature)
++static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu,
++					    unsigned int x86_feature)
+ {
+ 	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
+ 	struct kvm_cpuid_entry2 *entry;
++	u32 *reg;
++
++	/*
++	 * XSAVES is a special snowflake.  Due to lack of a dedicated intercept
++	 * on SVM, KVM must assume that XSAVES (and thus XRSTORS) is usable by
++	 * the guest if the host supports XSAVES and *XSAVE* is exposed to the
++	 * guest.  Because the guest can execute XSAVES and XRSTORS, i.e. can
++	 * indirectly consume XSS, KVM must ensure XSS is zeroed when running
++	 * the guest, i.e. must set XSAVES in vCPU capabilities.  But to reject
++	 * direct XSS reads and writes (to minimize the virtualization hole and
++	 * honor userspace's CPUID), KVM needs to check the raw guest CPUID,
++	 * not KVM's view of guest capabilities.
++	 *
++	 * For all other features, guest capabilities are accurate.  Expand
++	 * this allowlist with extreme vigilance.
++	 */
++	BUILD_BUG_ON(x86_feature != X86_FEATURE_XSAVES);
+ 
+ 	entry = kvm_find_cpuid_entry_index(vcpu, cpuid.function, cpuid.index);
+ 	if (!entry)
+ 		return NULL;
+ 
+-	return __cpuid_entry_get_reg(entry, cpuid.reg);
+-}
+-
+-static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu,
+-					    unsigned int x86_feature)
 -{
+-	u32 *reg;
+-
+-	reg = guest_cpuid_get_register(vcpu, x86_feature);
++	reg = __cpuid_entry_get_reg(entry, cpuid.reg);
+ 	if (!reg)
+ 		return false;
+ 
+ 	return *reg & __feature_bit(x86_feature);
+ }
+ 
+-static __always_inline void guest_cpuid_clear(struct kvm_vcpu *vcpu,
+-					      unsigned int x86_feature)
+-{
+-	u32 *reg;
+-
+-	reg = guest_cpuid_get_register(vcpu, x86_feature);
+-	if (reg)
+-		*reg &= ~__feature_bit(x86_feature);
+-}
+-
+ static inline bool guest_cpuid_is_amd_compatible(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.is_amd_compatible;
+@@ -201,27 +200,6 @@ static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
+ 	return vcpu->arch.pv_cpuid.features & (1u << kvm_feature);
+ }
+ 
+-enum kvm_governed_features {
+-#define KVM_GOVERNED_FEATURE(x) KVM_GOVERNED_##x,
+-#include "governed_features.h"
+-	KVM_NR_GOVERNED_FEATURES
+-};
+-
+-static __always_inline int kvm_governed_feature_index(unsigned int x86_feature)
+-{
+-	switch (x86_feature) {
+-#define KVM_GOVERNED_FEATURE(x) case x: return KVM_GOVERNED_##x;
+-#include "governed_features.h"
+-	default:
+-		return -1;
+-	}
+-}
+-
+-static __always_inline bool kvm_is_governed_feature(unsigned int x86_feature)
+-{
+-	return kvm_governed_feature_index(x86_feature) >= 0;
+-}
+-
+ static __always_inline void guest_cpu_cap_set(struct kvm_vcpu *vcpu,
+ 					      unsigned int x86_feature)
+ {
+@@ -266,17 +244,17 @@ static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr
+ 
+ static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
+ {
 -	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
 -		guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) ||
 -		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) ||
 -		guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD));
--}
--
--static inline bool guest_has_pred_cmd_msr(struct kvm_vcpu *vcpu)
--{
++	return (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
++		guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_STIBP) ||
++		guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_IBRS) ||
++		guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_SSBD));
+ }
+ 
+ static inline bool guest_has_pred_cmd_msr(struct kvm_vcpu *vcpu)
+ {
 -	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
 -		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBPB) ||
 -		guest_cpuid_has(vcpu, X86_FEATURE_SBPB));
--}
--
- static inline bool supports_cpuid_fault(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.msr_platform_info & MSR_PLATFORM_INFO_CPUID_FAULT;
-@@ -279,4 +264,19 @@ static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr
- 	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
++	return (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
++		guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_IBPB) ||
++		guest_cpu_cap_has(vcpu, X86_FEATURE_SBPB));
  }
  
-+static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
-+{
-+	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
-+		guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) ||
-+		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) ||
-+		guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD));
-+}
-+
-+static inline bool guest_has_pred_cmd_msr(struct kvm_vcpu *vcpu)
-+{
-+	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
-+		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBPB) ||
-+		guest_cpuid_has(vcpu, X86_FEATURE_SBPB));
-+}
-+
  #endif
+diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+deleted file mode 100644
+index ad463b1ed4e4..000000000000
+--- a/arch/x86/kvm/governed_features.h
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#if !defined(KVM_GOVERNED_FEATURE) || defined(KVM_GOVERNED_X86_FEATURE)
+-BUILD_BUG()
+-#endif
+-
+-#define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
+-
+-KVM_GOVERNED_X86_FEATURE(GBPAGES)
+-KVM_GOVERNED_X86_FEATURE(XSAVES)
+-KVM_GOVERNED_X86_FEATURE(VMX)
+-KVM_GOVERNED_X86_FEATURE(NRIPS)
+-KVM_GOVERNED_X86_FEATURE(TSCRATEMSR)
+-KVM_GOVERNED_X86_FEATURE(V_VMSAVE_VMLOAD)
+-KVM_GOVERNED_X86_FEATURE(LBRV)
+-KVM_GOVERNED_X86_FEATURE(PAUSEFILTER)
+-KVM_GOVERNED_X86_FEATURE(PFTHRESHOLD)
+-KVM_GOVERNED_X86_FEATURE(VGIF)
+-KVM_GOVERNED_X86_FEATURE(VNMI)
+-KVM_GOVERNED_X86_FEATURE(LAM)
+-
+-#undef KVM_GOVERNED_X86_FEATURE
+-#undef KVM_GOVERNED_FEATURE
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 4f0a94346d00..6a6dd5a84f22 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1352,7 +1352,7 @@ static void __kvm_hv_xsaves_xsavec_maybe_warn(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	if (guest_cpuid_has(vcpu, X86_FEATURE_XSAVES) ||
+-	    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVEC))
++	    !guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVEC))
+ 		return;
+ 
+ 	pr_notice_ratelimited("Booting SMP Windows KVM VM with !XSAVES && XSAVEC. "
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3c83951c619e..ae81ae27d534 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -598,7 +598,7 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+ 	 * version first and level-triggered interrupts never get EOIed in
+ 	 * IOAPIC.
+ 	 */
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) &&
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_X2APIC) &&
+ 	    !ioapic_in_kernel(vcpu->kvm))
+ 		v |= APIC_LVR_DIRECTED_EOI;
+ 	kvm_lapic_set_reg(apic, APIC_LVR, v);
+@@ -2634,7 +2634,7 @@ int kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value, bool host_initiated)
+ 		return 0;
+ 
+ 	u64 reserved_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu) | 0x2ff |
+-		(guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) ? 0 : X2APIC_ENABLE);
++		(guest_cpu_cap_has(vcpu, X86_FEATURE_X2APIC) ? 0 : X2APIC_ENABLE);
+ 
+ 	if ((value & reserved_bits) != 0 || new_mode == LAPIC_MODE_INVALID)
+ 		return 1;
+diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+index 85241c0c7f56..e0ab7df27b66 100644
+--- a/arch/x86/kvm/smm.c
++++ b/arch/x86/kvm/smm.c
+@@ -283,7 +283,7 @@ void enter_smm(struct kvm_vcpu *vcpu)
+ 	memset(smram.bytes, 0, sizeof(smram.bytes));
+ 
+ #ifdef CONFIG_X86_64
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		enter_smm_save_state_64(vcpu, &smram.smram64);
+ 	else
+ #endif
+@@ -353,7 +353,7 @@ void enter_smm(struct kvm_vcpu *vcpu)
+ 	kvm_set_segment(vcpu, &ds, VCPU_SREG_SS);
+ 
+ #ifdef CONFIG_X86_64
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		if (kvm_x86_call(set_efer)(vcpu, 0))
+ 			goto error;
+ #endif
+@@ -586,7 +586,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+ 	 * supports long mode.
+ 	 */
+ #ifdef CONFIG_X86_64
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_LM)) {
+ 		struct kvm_segment cs_desc;
+ 		unsigned long cr4;
+ 
+@@ -609,7 +609,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+ 		kvm_set_cr0(vcpu, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
+ 
+ #ifdef CONFIG_X86_64
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_LM)) {
+ 		unsigned long cr4, efer;
+ 
+ 		/* Clear CR4.PAE before clearing EFER.LME. */
+@@ -634,7 +634,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+ 		return X86EMUL_UNHANDLEABLE;
+ 
+ #ifdef CONFIG_X86_64
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		ret = rsm_load_state_64(ctxt, &smram.smram64);
+ 	else
+ #endif
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index 22d5a65b410c..288f7f2a46f2 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -46,7 +46,7 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+ 
+ 	switch (msr) {
+ 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+ 			return NULL;
+ 		/*
+ 		 * Each PMU counter has a pair of CTL and CTR MSRs. CTLn
+@@ -109,7 +109,7 @@ static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	case MSR_K7_EVNTSEL0 ... MSR_K7_PERFCTR3:
+ 		return pmu->version > 0;
+ 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+-		return guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE);
++		return guest_cpu_cap_has(vcpu, X86_FEATURE_PERFCTR_CORE);
+ 	case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
+ 	case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
+ 	case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
+@@ -179,7 +179,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	union cpuid_0x80000022_ebx ebx;
+ 
+ 	pmu->version = 1;
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFMON_V2)) {
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_PERFMON_V2)) {
+ 		pmu->version = 2;
+ 		/*
+ 		 * Note, PERFMON_V2 is also in 0x80000022.0x0, i.e. the guest
+@@ -189,7 +189,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+ 			     x86_feature_cpuid(X86_FEATURE_PERFMON_V2).index);
+ 		ebx.full = kvm_find_cpuid_entry_index(vcpu, 0x80000022, 0)->ebx;
+ 		pmu->nr_arch_gp_counters = ebx.split.num_core_pmc;
+-	} else if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
++	} else if (guest_cpu_cap_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
+ 		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
+ 	} else {
+ 		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 4e5aba3f86cd..09be12a44288 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4448,8 +4448,8 @@ static void sev_es_vcpu_after_set_cpuid(struct vcpu_svm *svm)
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+ 	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX)) {
+-		bool v_tsc_aux = guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
+-				 guest_cpuid_has(vcpu, X86_FEATURE_RDPID);
++		bool v_tsc_aux = guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) ||
++				 guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID);
+ 
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, v_tsc_aux, v_tsc_aux);
+ 	}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 0045fe474023..734b3ca40311 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1187,14 +1187,14 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (kvm_cpu_cap_has(X86_FEATURE_INVPCID)) {
+ 		if (!npt_enabled ||
+-		    !guest_cpuid_has(&svm->vcpu, X86_FEATURE_INVPCID))
++		    !guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_INVPCID))
+ 			svm_set_intercept(svm, INTERCEPT_INVPCID);
+ 		else
+ 			svm_clr_intercept(svm, INTERCEPT_INVPCID);
+ 	}
+ 
+ 	if (kvm_cpu_cap_has(X86_FEATURE_RDTSCP)) {
+-		if (guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP))
+ 			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
+ 		else
+ 			svm_set_intercept(svm, INTERCEPT_RDTSCP);
+@@ -2940,7 +2940,7 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_AMD64_VIRT_SPEC_CTRL:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_VIRT_SSBD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_VIRT_SSBD))
+ 			return 1;
+ 
+ 		msr_info->data = svm->virt_spec_ctrl;
+@@ -3091,7 +3091,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		break;
+ 	case MSR_AMD64_VIRT_SPEC_CTRL:
+ 		if (!msr->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_VIRT_SSBD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_VIRT_SSBD))
+ 			return 1;
+ 
+ 		if (data & ~SPEC_CTRL_SSBD)
+@@ -3272,7 +3272,7 @@ static int invpcid_interception(struct kvm_vcpu *vcpu)
+ 	unsigned long type;
+ 	gva_t gva;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_INVPCID)) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 		return 1;
+ 	}
+@@ -4404,7 +4404,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	guest_cpu_cap_change(vcpu, X86_FEATURE_XSAVES,
+ 			     boot_cpu_has(X86_FEATURE_XSAVE) &&
+ 			     boot_cpu_has(X86_FEATURE_XSAVES) &&
+-			     guest_cpuid_has(vcpu, X86_FEATURE_XSAVE));
++			     guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE));
+ 
+ 	/*
+ 	 * Intercept VMLOAD if the vCPU model is Intel in order to emulate that
+@@ -4422,7 +4422,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 
+ 	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_FLUSH_CMD, 0,
+-				     !!guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
++				     !!guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
+ 
+ 	if (sev_guest(vcpu->kvm))
+ 		sev_vcpu_after_set_cpuid(svm);
+@@ -4673,7 +4673,7 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
+ 	 * responsible for ensuring nested SVM and SMIs are mutually exclusive.
+ 	 */
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		return 1;
+ 
+ 	smram->smram64.svm_guest_flag = 1;
+@@ -4720,14 +4720,14 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+ 
+ 	const struct kvm_smram_state_64 *smram64 = &smram->smram64;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		return 0;
+ 
+ 	/* Non-zero if SMI arrived while vCPU was in guest mode. */
+ 	if (!smram64->svm_guest_flag)
+ 		return 0;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_SVM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SVM))
+ 		return 1;
+ 
+ 	if (!(smram64->efer & EFER_SVME))
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index a87407412615..11a339009781 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -42,7 +42,7 @@ static inline struct hv_enlightened_vmcs *nested_vmx_evmcs(struct vcpu_vmx *vmx)
+ 	return vmx->nested.hv_evmcs;
+ }
+ 
+-static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
++static inline bool guest_cpu_cap_has_evmcs(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+ 	 * eVMCS is exposed to the guest if Hyper-V is enabled in CPUID and
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 9aaa703f5f98..af2a8b021d0f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -257,7 +257,7 @@ static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
+ 	 * state. It is possible that the area will stay mapped as
+ 	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
+ 	 */
+-	if (!guest_cpuid_has_evmcs(vcpu) ||
++	if (!guest_cpu_cap_has_evmcs(vcpu) ||
+ 	    !evmptr_is_valid(nested_get_evmptr(vcpu)))
+ 		return false;
+ 
+@@ -2089,7 +2089,7 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 	bool evmcs_gpa_changed = false;
+ 	u64 evmcs_gpa;
+ 
+-	if (likely(!guest_cpuid_has_evmcs(vcpu)))
++	if (likely(!guest_cpu_cap_has_evmcs(vcpu)))
+ 		return EVMPTRLD_DISABLED;
+ 
+ 	evmcs_gpa = nested_get_evmptr(vcpu);
+@@ -2992,7 +2992,7 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 
+ #ifdef CONFIG_KVM_HYPERV
+-	if (guest_cpuid_has_evmcs(vcpu))
++	if (guest_cpu_cap_has_evmcs(vcpu))
+ 		return nested_evmcs_check_controls(vmcs12);
+ #endif
+ 
+@@ -3287,7 +3287,7 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ 	 * L2 was running), map it here to make sure vmcs12 changes are
+ 	 * properly reflected.
+ 	 */
+-	if (guest_cpuid_has_evmcs(vcpu) &&
++	if (guest_cpu_cap_has_evmcs(vcpu) &&
+ 	    vmx->nested.hv_evmcs_vmptr == EVMPTR_MAP_PENDING) {
+ 		enum nested_evmptrld_status evmptrld_status =
+ 			nested_vmx_handle_enlightened_vmptrld(vcpu, false);
+@@ -5015,7 +5015,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 	 * doesn't isolate different VMCSs, i.e. in this case, doesn't provide
+ 	 * separate modes for L2 vs L1.
+ 	 */
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL))
+ 		indirect_branch_prediction_barrier();
+ 
+ 	/* Update any VMCS fields that might have changed while L2 ran */
+@@ -6279,7 +6279,7 @@ static bool nested_vmx_exit_handled_encls(struct kvm_vcpu *vcpu,
+ {
+ 	u32 encls_leaf;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_SGX) ||
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SGX) ||
+ 	    !nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING))
+ 		return false;
+ 
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 9c9d4a336166..77012b2eca0e 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -110,7 +110,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+ 
+ static inline u64 vcpu_get_perf_capabilities(struct kvm_vcpu *vcpu)
+ {
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_PDCM))
+ 		return 0;
+ 
+ 	return vcpu->arch.perf_capabilities;
+@@ -160,7 +160,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 		ret = vcpu_get_perf_capabilities(vcpu) & PERF_CAP_PEBS_FORMAT;
+ 		break;
+ 	case MSR_IA32_DS_AREA:
+-		ret = guest_cpuid_has(vcpu, X86_FEATURE_DS);
++		ret = guest_cpu_cap_has(vcpu, X86_FEATURE_DS);
+ 		break;
+ 	case MSR_PEBS_DATA_CFG:
+ 		perf_capabilities = vcpu_get_perf_capabilities(vcpu);
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+index b352a3ba7354..9961e07cf071 100644
+--- a/arch/x86/kvm/vmx/sgx.c
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -122,7 +122,7 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
+ 	 * likely than a bad userspace address.
+ 	 */
+ 	if ((trapnr == PF_VECTOR || !boot_cpu_has(X86_FEATURE_SGX2)) &&
+-	    guest_cpuid_has(vcpu, X86_FEATURE_SGX2)) {
++	    guest_cpu_cap_has(vcpu, X86_FEATURE_SGX2)) {
+ 		memset(&ex, 0, sizeof(ex));
+ 		ex.vector = PF_VECTOR;
+ 		ex.error_code = PFERR_PRESENT_MASK | PFERR_WRITE_MASK |
+@@ -365,7 +365,7 @@ static inline bool encls_leaf_enabled_in_guest(struct kvm_vcpu *vcpu, u32 leaf)
+ 		return true;
+ 
+ 	if (leaf >= EAUG && leaf <= EMODT)
+-		return guest_cpuid_has(vcpu, X86_FEATURE_SGX2);
++		return guest_cpu_cap_has(vcpu, X86_FEATURE_SGX2);
+ 
+ 	return false;
+ }
+@@ -381,8 +381,8 @@ int handle_encls(struct kvm_vcpu *vcpu)
+ {
+ 	u32 leaf = (u32)kvm_rax_read(vcpu);
+ 
+-	if (!enable_sgx || !guest_cpuid_has(vcpu, X86_FEATURE_SGX) ||
+-	    !guest_cpuid_has(vcpu, X86_FEATURE_SGX1)) {
++	if (!enable_sgx || !guest_cpu_cap_has(vcpu, X86_FEATURE_SGX) ||
++	    !guest_cpu_cap_has(vcpu, X86_FEATURE_SGX1)) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 	} else if (!encls_leaf_enabled_in_guest(vcpu, leaf) ||
+ 		   !sgx_enabled_in_guest_bios(vcpu) || !is_paging(vcpu)) {
+@@ -479,15 +479,15 @@ void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 	if (!cpu_has_vmx_encls_vmexit())
+ 		return;
+ 
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX) &&
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX) &&
+ 	    sgx_enabled_in_guest_bios(vcpu)) {
+-		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX1)) {
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX1)) {
+ 			bitmap &= ~GENMASK_ULL(ETRACK, ECREATE);
+ 			if (sgx_intercept_encls_ecreate(vcpu))
+ 				bitmap |= (1 << ECREATE);
+ 		}
+ 
+-		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX2))
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX2))
+ 			bitmap &= ~GENMASK_ULL(EMODT, EAUG);
+ 
+ 		/*
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index a7c2c36f2a4f..6e5edaa2ba3a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1908,8 +1908,8 @@ static void vmx_setup_uret_msrs(struct vcpu_vmx *vmx)
+ 	vmx_setup_uret_msr(vmx, MSR_EFER, update_transition_efer(vmx));
+ 
+ 	vmx_setup_uret_msr(vmx, MSR_TSC_AUX,
+-			   guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP) ||
+-			   guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID));
++			   guest_cpu_cap_has(&vmx->vcpu, X86_FEATURE_RDTSCP) ||
++			   guest_cpu_cap_has(&vmx->vcpu, X86_FEATURE_RDPID));
+ 
+ 	/*
+ 	 * hle=0, rtm=0, tsx_ctrl=1 can be found with some combinations of new
+@@ -2062,7 +2062,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_BNDCFGS:
+ 		if (!kvm_mpx_supported() ||
+ 		    (!msr_info->host_initiated &&
+-		     !guest_cpuid_has(vcpu, X86_FEATURE_MPX)))
++		     !guest_cpu_cap_has(vcpu, X86_FEATURE_MPX)))
+ 			return 1;
+ 		msr_info->data = vmcs_read64(GUEST_BNDCFGS);
+ 		break;
+@@ -2078,7 +2078,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_SGX_LC))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_SGX_LC))
+ 			return 1;
+ 		msr_info->data = to_vmx(vcpu)->msr_ia32_sgxlepubkeyhash
+ 			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
+@@ -2097,7 +2097,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		 * sanity checking and refuse to boot. Filter all unsupported
+ 		 * features out.
+ 		 */
+-		if (!msr_info->host_initiated && guest_cpuid_has_evmcs(vcpu))
++		if (!msr_info->host_initiated && guest_cpu_cap_has_evmcs(vcpu))
+ 			nested_evmcs_filter_control_msr(vcpu, msr_info->index,
+ 							&msr_info->data);
+ #endif
+@@ -2167,7 +2167,7 @@ static u64 nested_vmx_truncate_sysenter_addr(struct kvm_vcpu *vcpu,
+ 						    u64 data)
+ {
+ #ifdef CONFIG_X86_64
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		return (u32)data;
+ #endif
+ 	return (unsigned long)data;
+@@ -2178,7 +2178,7 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+ 	u64 debugctl = 0;
+ 
+ 	if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT) &&
+-	    (host_initiated || guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT)))
++	    (host_initiated || guest_cpu_cap_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT)))
+ 		debugctl |= DEBUGCTLMSR_BUS_LOCK_DETECT;
+ 
+ 	if ((kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT) &&
+@@ -2282,7 +2282,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_BNDCFGS:
+ 		if (!kvm_mpx_supported() ||
+ 		    (!msr_info->host_initiated &&
+-		     !guest_cpuid_has(vcpu, X86_FEATURE_MPX)))
++		     !guest_cpu_cap_has(vcpu, X86_FEATURE_MPX)))
+ 			return 1;
+ 		if (is_noncanonical_msr_address(data & PAGE_MASK, vcpu) ||
+ 		    (data & MSR_IA32_BNDCFGS_RSVD))
+@@ -2384,7 +2384,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		 * behavior, but it's close enough.
+ 		 */
+ 		if (!msr_info->host_initiated &&
+-		    (!guest_cpuid_has(vcpu, X86_FEATURE_SGX_LC) ||
++		    (!guest_cpu_cap_has(vcpu, X86_FEATURE_SGX_LC) ||
+ 		    ((vmx->msr_ia32_feature_control & FEAT_CTL_LOCKED) &&
+ 		    !(vmx->msr_ia32_feature_control & FEAT_CTL_SGX_LC_ENABLED))))
+ 			return 1;
+@@ -2468,9 +2468,9 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if ((data & PERF_CAP_PEBS_MASK) !=
+ 			    (kvm_caps.supported_perf_cap & PERF_CAP_PEBS_MASK))
+ 				return 1;
+-			if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_DS))
+ 				return 1;
+-			if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_DTES64))
+ 				return 1;
+ 			if (!cpuid_model_is_consistent(vcpu))
+ 				return 1;
+@@ -4590,10 +4590,7 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
+ 	bool __enabled;										\
+ 												\
+ 	if (cpu_has_vmx_##name()) {								\
+-		if (kvm_is_governed_feature(X86_FEATURE_##feat_name))				\
+-			__enabled = guest_cpu_cap_has(__vcpu, X86_FEATURE_##feat_name);		\
+-		else										\
+-			__enabled = guest_cpuid_has(__vcpu, X86_FEATURE_##feat_name);		\
++		__enabled = guest_cpu_cap_has(__vcpu, X86_FEATURE_##feat_name);			\
+ 		vmx_adjust_secondary_exec_control(vmx, exec_control, SECONDARY_EXEC_##ctrl_name,\
+ 						  __enabled, exiting);				\
+ 	}											\
+@@ -4669,8 +4666,8 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	 */
+ 	if (cpu_has_vmx_rdtscp()) {
+ 		bool rdpid_or_rdtscp_enabled =
+-			guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
+-			guest_cpuid_has(vcpu, X86_FEATURE_RDPID);
++			guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) ||
++			guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID);
+ 
+ 		vmx_adjust_secondary_exec_control(vmx, &exec_control,
+ 						  SECONDARY_EXEC_ENABLE_RDTSCP,
+@@ -5959,7 +5956,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+ 	} operand;
+ 	int gpr_index;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_INVPCID)) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 		return 1;
+ 	}
+@@ -7829,7 +7826,7 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	 * set if and only if XSAVE is supported.
+ 	 */
+ 	if (!boot_cpu_has(X86_FEATURE_XSAVE) ||
+-	    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
++	    !guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
+ 		guest_cpu_cap_clear(vcpu, X86_FEATURE_XSAVES);
+ 
+ 	vmx_setup_uret_msrs(vmx);
+@@ -7851,21 +7848,21 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		nested_vmx_cr_fixed1_bits_update(vcpu);
+ 
+ 	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
+-			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
++			guest_cpu_cap_has(vcpu, X86_FEATURE_INTEL_PT))
+ 		update_intel_pt_cfg(vcpu);
+ 
+ 	if (boot_cpu_has(X86_FEATURE_RTM)) {
+ 		struct vmx_uret_msr *msr;
+ 		msr = vmx_find_uret_msr(vmx, MSR_IA32_TSX_CTRL);
+ 		if (msr) {
+-			bool enabled = guest_cpuid_has(vcpu, X86_FEATURE_RTM);
++			bool enabled = guest_cpu_cap_has(vcpu, X86_FEATURE_RTM);
+ 			vmx_set_guest_uret_msr(vmx, msr, enabled ? 0 : TSX_CTRL_RTM_DISABLE);
+ 		}
+ 	}
+ 
+ 	if (kvm_cpu_cap_has(X86_FEATURE_XFD))
+ 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_XFD_ERR, MSR_TYPE_R,
+-					  !guest_cpuid_has(vcpu, X86_FEATURE_XFD));
++					  !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD));
+ 
+ 	if (boot_cpu_has(X86_FEATURE_IBPB))
+ 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W,
+@@ -7873,17 +7870,17 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 
+ 	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
+ 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
+-					  !guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
++					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
+ 
+ 	set_cr4_guest_host_mask(vmx);
+ 
+ 	vmx_write_encls_bitmap(vcpu, NULL);
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX))
+ 		vmx->msr_ia32_feature_control_valid_bits |= FEAT_CTL_SGX_ENABLED;
+ 	else
+ 		vmx->msr_ia32_feature_control_valid_bits &= ~FEAT_CTL_SGX_ENABLED;
+ 
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX_LC))
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX_LC))
+ 		vmx->msr_ia32_feature_control_valid_bits |=
+ 			FEAT_CTL_SGX_LC_ENABLED;
+ 	else
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1ee955cdb109..cc4563fb07d1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1502,10 +1502,10 @@ static u64 kvm_dr6_fixed(struct kvm_vcpu *vcpu)
+ {
+ 	u64 fixed = DR6_FIXED_1;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_RTM))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_RTM))
+ 		fixed |= DR6_RTM;
+ 
+-	if (!guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
+ 		fixed |= DR6_BUS_LOCK;
+ 	return fixed;
+ }
+@@ -1681,20 +1681,20 @@ static int do_get_feature_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+ 
+ static bool __kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
+ {
+-	if (efer & EFER_AUTOIBRS && !guest_cpuid_has(vcpu, X86_FEATURE_AUTOIBRS))
++	if (efer & EFER_AUTOIBRS && !guest_cpu_cap_has(vcpu, X86_FEATURE_AUTOIBRS))
+ 		return false;
+ 
+-	if (efer & EFER_FFXSR && !guest_cpuid_has(vcpu, X86_FEATURE_FXSR_OPT))
++	if (efer & EFER_FFXSR && !guest_cpu_cap_has(vcpu, X86_FEATURE_FXSR_OPT))
+ 		return false;
+ 
+-	if (efer & EFER_SVME && !guest_cpuid_has(vcpu, X86_FEATURE_SVM))
++	if (efer & EFER_SVME && !guest_cpu_cap_has(vcpu, X86_FEATURE_SVM))
+ 		return false;
+ 
+ 	if (efer & (EFER_LME | EFER_LMA) &&
+-	    !guest_cpuid_has(vcpu, X86_FEATURE_LM))
++	    !guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
+ 		return false;
+ 
+-	if (efer & EFER_NX && !guest_cpuid_has(vcpu, X86_FEATURE_NX))
++	if (efer & EFER_NX && !guest_cpu_cap_has(vcpu, X86_FEATURE_NX))
+ 		return false;
+ 
+ 	return true;
+@@ -1836,8 +1836,8 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+ 			return 1;
+ 
+ 		if (!host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) &&
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID))
+ 			return 1;
+ 
+ 		/*
+@@ -1894,8 +1894,8 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+ 			return 1;
+ 
+ 		if (!host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP) &&
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID))
+ 			return 1;
+ 		break;
+ 	}
+@@ -2081,7 +2081,7 @@ EXPORT_SYMBOL_GPL(kvm_handle_invalid_op);
+ static int kvm_emulate_monitor_mwait(struct kvm_vcpu *vcpu, const char *insn)
+ {
+ 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS) &&
+-	    !guest_cpuid_has(vcpu, X86_FEATURE_MWAIT))
++	    !guest_cpu_cap_has(vcpu, X86_FEATURE_MWAIT))
+ 		return kvm_handle_invalid_op(vcpu);
+ 
+ 	pr_warn_once("%s instruction emulated as NOP!\n", insn);
+@@ -3753,13 +3753,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+ 		if (!msr_info->host_initiated ||
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
+ 			return KVM_MSR_RET_UNSUPPORTED;
+ 		vcpu->arch.arch_capabilities = data;
+ 		break;
+ 	case MSR_IA32_PERF_CAPABILITIES:
+ 		if (!msr_info->host_initiated ||
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_PDCM))
+ 			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		if (data & ~kvm_caps.supported_perf_cap)
+@@ -3783,11 +3783,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if ((!guest_has_pred_cmd_msr(vcpu)))
+ 				return 1;
+ 
+-			if (!guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
+-			    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBPB))
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
++			    !guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_IBPB))
+ 				reserved_bits |= PRED_CMD_IBPB;
+ 
+-			if (!guest_cpuid_has(vcpu, X86_FEATURE_SBPB))
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SBPB))
+ 				reserved_bits |= PRED_CMD_SBPB;
+ 		}
+ 
+@@ -3808,7 +3808,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	}
+ 	case MSR_IA32_FLUSH_CMD:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D))
+ 			return 1;
+ 
+ 		if (!boot_cpu_has(X86_FEATURE_FLUSH_L1D) || (data & ~L1D_FLUSH))
+@@ -3859,7 +3859,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		kvm_set_lapic_tscdeadline_msr(vcpu, data);
+ 		break;
+ 	case MSR_IA32_TSC_ADJUST:
+-		if (guest_cpuid_has(vcpu, X86_FEATURE_TSC_ADJUST)) {
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_TSC_ADJUST)) {
+ 			if (!msr_info->host_initiated) {
+ 				s64 adj = data - vcpu->arch.ia32_tsc_adjust_msr;
+ 				adjust_tsc_offset_guest(vcpu, adj);
+@@ -3886,7 +3886,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 
+ 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+ 		    ((old_val ^ data)  & MSR_IA32_MISC_ENABLE_MWAIT)) {
+-			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_XMM3))
+ 				return 1;
+ 			vcpu->arch.ia32_misc_enable_msr = data;
+ 			kvm_update_cpuid_runtime(vcpu);
+@@ -4063,12 +4063,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+ 		break;
+ 	case MSR_AMD64_OSVW_ID_LENGTH:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+ 			return 1;
+ 		vcpu->arch.osvw.length = data;
+ 		break;
+ 	case MSR_AMD64_OSVW_STATUS:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+ 			return 1;
+ 		vcpu->arch.osvw.status = data;
+ 		break;
+@@ -4087,7 +4087,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ #ifdef CONFIG_X86_64
+ 	case MSR_IA32_XFD:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD))
+ 			return 1;
+ 
+ 		if (data & ~kvm_guest_supported_xfd(vcpu))
+@@ -4097,7 +4097,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_XFD_ERR:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD))
+ 			return 1;
+ 
+ 		if (data & ~kvm_guest_supported_xfd(vcpu))
+@@ -4212,12 +4212,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = vcpu->arch.microcode_version;
+ 		break;
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
+ 			return KVM_MSR_RET_UNSUPPORTED;
+ 		msr_info->data = vcpu->arch.arch_capabilities;
+ 		break;
+ 	case MSR_IA32_PERF_CAPABILITIES:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_PDCM))
+ 			return KVM_MSR_RET_UNSUPPORTED;
+ 		msr_info->data = vcpu->arch.perf_capabilities;
+ 		break;
+@@ -4418,12 +4418,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = 0xbe702111;
+ 		break;
+ 	case MSR_AMD64_OSVW_ID_LENGTH:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+ 			return 1;
+ 		msr_info->data = vcpu->arch.osvw.length;
+ 		break;
+ 	case MSR_AMD64_OSVW_STATUS:
+-		if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+ 			return 1;
+ 		msr_info->data = vcpu->arch.osvw.status;
+ 		break;
+@@ -4442,14 +4442,14 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ #ifdef CONFIG_X86_64
+ 	case MSR_IA32_XFD:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD))
+ 			return 1;
+ 
+ 		msr_info->data = vcpu->arch.guest_fpu.fpstate->xfd;
+ 		break;
+ 	case MSR_IA32_XFD_ERR:
+ 		if (!msr_info->host_initiated &&
+-		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD))
+ 			return 1;
+ 
+ 		msr_info->data = vcpu->arch.guest_fpu.xfd_err;
+@@ -8502,17 +8502,17 @@ static bool emulator_get_cpuid(struct x86_emulate_ctxt *ctxt,
+ 
+ static bool emulator_guest_has_movbe(struct x86_emulate_ctxt *ctxt)
+ {
+-	return guest_cpuid_has(emul_to_vcpu(ctxt), X86_FEATURE_MOVBE);
++	return guest_cpu_cap_has(emul_to_vcpu(ctxt), X86_FEATURE_MOVBE);
+ }
+ 
+ static bool emulator_guest_has_fxsr(struct x86_emulate_ctxt *ctxt)
+ {
+-	return guest_cpuid_has(emul_to_vcpu(ctxt), X86_FEATURE_FXSR);
++	return guest_cpu_cap_has(emul_to_vcpu(ctxt), X86_FEATURE_FXSR);
+ }
+ 
+ static bool emulator_guest_has_rdpid(struct x86_emulate_ctxt *ctxt)
+ {
+-	return guest_cpuid_has(emul_to_vcpu(ctxt), X86_FEATURE_RDPID);
++	return guest_cpu_cap_has(emul_to_vcpu(ctxt), X86_FEATURE_RDPID);
+ }
+ 
+ static bool emulator_guest_cpuid_is_intel_compatible(struct x86_emulate_ctxt *ctxt)
 -- 
 2.47.0.338.g60cca15819-goog
 
