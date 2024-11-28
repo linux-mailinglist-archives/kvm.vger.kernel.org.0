@@ -1,197 +1,153 @@
-Return-Path: <kvm+bounces-32740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE129DB655
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 12:13:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 457039DB658
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 12:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 093F1280FC1
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 11:13:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C1EE281644
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 11:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0047197A8E;
-	Thu, 28 Nov 2024 11:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE371198822;
+	Thu, 28 Nov 2024 11:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HBVmfXoq"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="p1sHVd2n";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CYR8n5Xj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E92C1946C8;
-	Thu, 28 Nov 2024 11:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7684E1C;
+	Thu, 28 Nov 2024 11:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732792407; cv=none; b=ms7RgsXIo+gQeiM1FIyapHR9WW51ixaUvmhRYYISMdb7/5hvXOIZGaD+NrbVKieeFrCYRmopFoWv/sg7qBnr6a2JwtCWMJUvU4cz45N4Tut8lEMcR/xadkzQp1yiW5klPX5thUSA1SEZOg88uMiGUxuBMgbJqAmRUR75pmpFbV4=
+	t=1732792524; cv=none; b=pb5AyF5ogPk5pfSq84337yuC+7VT08W2ULOx9/Dc4Z3bxu9GbofynXkOAoNy/wtg2zdLfEalrK3xcPKcEB40UCRLXmC+C/QpMP+Pm9Oic/vjDoaPIMc8NesuHGh+xKd4jFfwxP8o7wwwUT3Mjg7FWyxxHHcLW7duV4GmyMCMyGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732792407; c=relaxed/simple;
-	bh=ivR3uh/oFQ81c6TBZDo1ukH/mLGSo3kuk7jrelkjKSg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dN8z5QigxZsL+DPU/v/0hgVe8Q11ByLIT7lVb3hwwrxzH0JJ8WV7MEJsgGs/naNmfFCQ38dUdEEvP1iUQLy/xB4c5bcyXvRKenwQ5KPPDU4+Z4Yf/dGPRSKDqYTDfzGwfrNFlaZY6tZMj1UlvW+yLKfGRyEzIDr5KNUd2gFJIsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HBVmfXoq; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732792406; x=1764328406;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=ivR3uh/oFQ81c6TBZDo1ukH/mLGSo3kuk7jrelkjKSg=;
-  b=HBVmfXoqUYqiCZyjjvVwAePS+f9JqlQjYfiWTlKDFpwHn+7jftQ6gX13
-   Q8pu/hhW0koTW/xdvKyZ8+8afrnLTottmcFF3F6ubL0yrvcsf1cawCN4I
-   /6EpBAGTvkrzzwU/skiCVEVfqqELmLM+cXQ1BkVAzn84uDHYzjEBo1q3z
-   FXmAvq0SaKIOplpUwX+1IbG5jv4rwr+8gCpANs+BuODwiIQlW61aqig7n
-   J5TvgrD/i5432SBXX2bBnxl9K5duLEHNwIWP7X6j5K4ix4p3hxwn/64fE
-   tSiY95mGQ9Smy+hWjJyAS6gmtYlomzntq9PLFtfHi5Nj47JZfGhD0GK1h
-   A==;
-X-CSE-ConnectionGUID: LUArCCShSy2R5zU4WEC1Pg==
-X-CSE-MsgGUID: znjdMegtQhy3iT/NAe8dJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11269"; a="32390356"
-X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
-   d="scan'208";a="32390356"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 03:13:25 -0800
-X-CSE-ConnectionGUID: lUrviTJCRQypdDFPLbFCSA==
-X-CSE-MsgGUID: I8VCk0EJT6uU2d6giKjWgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
-   d="scan'208";a="97170931"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 03:13:20 -0800
-Message-ID: <d1952eb7-8eb0-441b-85fc-3075c7b11cb9@intel.com>
-Date: Thu, 28 Nov 2024 13:13:11 +0200
+	s=arc-20240116; t=1732792524; c=relaxed/simple;
+	bh=hc2eW85zH30ycpF7jG93e4JqdOgrxxqEdvi+gUlfo6k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pmC3aU6BMzEnw4nwdeoRBfXd3fJg6u8/0UoqaOlkeuSHHuEif/K+dirCn0WcI5vW9Zq34xSyMwYTbskxiAis6+zo8s5lfHUzF5M+wPMGjiCS9Ko2DZdgBX/+1ri8HlxU07/H1gxwNQTCi3wO8gxMNVlO1Ir92q8rusWyrv8JlBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=p1sHVd2n; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CYR8n5Xj; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1732792520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BepIv+zsVxwnGd+vRGJKobT/i3K2E0sdG4yWASd1NkE=;
+	b=p1sHVd2nF4+Wcf895ouKTQQoSekm/Z0/pHKLqMXZfyVoZtPx8ito7bNXqvpFFTTrgsBGir
+	z2WPrTjtm0R+7d4vtevK5z8bJb/Ic16GEiXqO0c2ssuAqKxgxC/+nTMGgX5EGx8eHVvEoQ
+	1JnFUDIuFcG4BarV6+JuDFjT+9lmHDBA3++qPXTgD3L+zDK62nsydQfuF+FA0CM16Pob+S
+	g6WljcbwJljkAvWZHAjAPwTnytNkqNEDAxaLlcGiAkNbZDS/dZMPL1RxbR7KBCAGBhPWJ2
+	ZNZAHvN4yWTGwIlyiyYK1p26sLaYMeM/YRaoszgZLqIR4lg0ozZLDS0ZsIabAA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1732792520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BepIv+zsVxwnGd+vRGJKobT/i3K2E0sdG4yWASd1NkE=;
+	b=CYR8n5Xj31ApiPOAIzYejnuG5cbHitE/iV/uP91bN59JLrhalJuYwg4IpOGHOFgzhEcEJu
+	BIP3cMUELs1sUDDg==
+To: Jason Gunthorpe <jgg@nvidia.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Nicolin Chen <nicolinc@nvidia.com>,
+ maz@kernel.org, bhelgaas@google.com, leonro@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, dlemoal@kernel.org,
+ kevin.tian@intel.com, smostafa@google.com,
+ andriy.shevchenko@linux.intel.com, reinette.chatre@intel.com,
+ ddutile@redhat.com, yebin10@huawei.com, brauner@kernel.org,
+ apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de,
+ anna-maria@linutronix.de, nipun.gupta@amd.com,
+ marek.vasut+renesas@mailbox.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ kvm@vger.kernel.org
+Subject: Re: [PATCH RFCv1 0/7] vfio: Allow userspace to specify the address
+ for each MSI vector
+In-Reply-To: <20241120140337.GA772273@nvidia.com>
+References: <cover.1731130093.git.nicolinc@nvidia.com>
+ <a63e7c3b-ce96-47a5-b462-d5de3a2edb56@arm.com>
+ <ZzPOsrbkmztWZ4U/@Asurada-Nvidia> <20241113013430.GC35230@nvidia.com>
+ <20241113141122.2518c55a.alex.williamson@redhat.com>
+ <2621385c-6fcf-4035-a5a0-5427a08045c8@arm.com>
+ <66977090-d707-4585-b0c5-8b48f663827e@redhat.com>
+ <20241120140337.GA772273@nvidia.com>
+Date: Thu, 28 Nov 2024 12:15:20 +0100
+Message-ID: <87frnby5h3.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 1/7] x86/virt/tdx: Add SEAMCALL wrapper to enter/exit
- TDX guest
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
- seanjc@google.com, kvm@vger.kernel.org, dave.hansen@linux.intel.com
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
- reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
- chao.gao@intel.com, weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-2-adrian.hunter@intel.com>
- <fa817f29-e3ba-4c54-8600-e28cf6ab1953@intel.com>
- <0226840c-a975-42a5-9ddf-a54da7ef8746@intel.com>
- <56db8257-6da2-400d-8306-6e21d9af81f8@intel.com>
-Content-Language: en-US
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <56db8257-6da2-400d-8306-6e21d9af81f8@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 25/11/24 15:40, Adrian Hunter wrote:
-> On 22/11/24 18:33, Dave Hansen wrote:
->> On 11/22/24 03:10, Adrian Hunter wrote:
->>> +struct tdh_vp_enter_tdcall {
->>> +	u64	reg_mask	: 32,
->>> +		vm_idx		:  2,
->>> +		reserved_0	: 30;
->>> +	u64	data[TDX_ERR_DATA_PART_2];
->>> +	u64	fn;	/* Non-zero for hypercalls, zero otherwise */
->>> +	u64	subfn;
->>> +	union {
->>> +		struct tdh_vp_enter_vmcall 		vmcall;
->>> +		struct tdh_vp_enter_gettdvmcallinfo	gettdvmcallinfo;
->>> +		struct tdh_vp_enter_mapgpa		mapgpa;
->>> +		struct tdh_vp_enter_getquote		getquote;
->>> +		struct tdh_vp_enter_reportfatalerror	reportfatalerror;
->>> +		struct tdh_vp_enter_cpuid		cpuid;
->>> +		struct tdh_vp_enter_mmio		mmio;
->>> +		struct tdh_vp_enter_hlt			hlt;
->>> +		struct tdh_vp_enter_io			io;
->>> +		struct tdh_vp_enter_rd			rd;
->>> +		struct tdh_vp_enter_wr			wr;
->>> +	};
->>> +};
->>
->> Let's say someone declares this:
->>
->> struct tdh_vp_enter_mmio {
->> 	u64	size;
->> 	u64	mmio_addr;
->> 	u64	direction;
->> 	u64	value;
->> };
->>
->> How long is that going to take you to debug?
-> 
-> When adding a new hardware definition, it would be sensible
-> to check the hardware definition first before checking anything
-> else.
-> 
-> However, to stop existing members being accidentally moved,
-> could add:
-> 
-> #define CHECK_OFFSETS_EQ(reg, member) \
-> 	BUILD_BUG_ON(offsetof(struct tdx_module_args, reg) != offsetof(union tdh_vp_enter_args, member));
-> 
-> 	CHECK_OFFSETS_EQ(r12, tdcall.mmio.size);
-> 	CHECK_OFFSETS_EQ(r13, tdcall.mmio.direction);
-> 	CHECK_OFFSETS_EQ(r14, tdcall.mmio.mmio_addr);
-> 	CHECK_OFFSETS_EQ(r15, tdcall.mmio.value);
-> 
+On Wed, Nov 20 2024 at 10:03, Jason Gunthorpe wrote:
+> On Wed, Nov 20, 2024 at 02:17:46PM +0100, Eric Auger wrote:
+>> > Yeah, I wasn't really suggesting to literally hook into this exact
+>> > case; it was more just a general observation that if VFIO already has
+>> > one justification for tinkering with pci_write_msi_msg() directly
+>> > without going through the msi_domain layer, then adding another
+>> > (wherever it fits best) can't be *entirely* unreasonable.
+>
+> I'm not sure that we can assume VFIO is the only thing touching the
+> interrupt programming.
 
-Note, struct tdh_vp_enter_tdcall is an output format.  The tdcall
-arguments come directly from the guest with no validation by the
-TDX Module.  It could be rubbish, or even malicious rubbish.  The
-exit handlers validate the values before using them.
+Correct.
 
-WRT the TDCALL input format (response by the host VMM), 'ret_code'
-and 'failed_gpa' could use types other than 'u64', but the other
-members are really 'u64'.
+> I think there is a KVM path, and also the /proc/ path that will change
+> the MSI affinity on the fly for a VFIO created IRQ. If the platform
+> requires a MSI update to do this (ie encoding affinity in the
+> add/data, not using IRQ remapping HW) then we still need to ensure the
+> correct MSI address is hooked in.
 
-/* TDH.VP.ENTER Input Format #2 : Following a previous TDCALL(TDG.VP.VMCALL) */
-struct tdh_vp_enter_in {
-	u64	__vcpu_handle_and_flags; /* Don't use. tdh_vp_enter() will take care of it */
-	u64	unused[3];
-	u64	ret_code;
-	union {
-		u64 gettdvmcallinfo[4];
-		struct {
-			u64	failed_gpa;
-		} mapgpa;
-		struct {
-			u64	unused;
-			u64	eax;
-			u64	ebx;
-			u64	ecx;
-			u64	edx;
-		} cpuid;
-		/* Value read for IO, MMIO or RDMSR */
-		struct {
-			u64	value;
-		} read;
-	};
-};
+Yes.
 
-Another different alternative could be to use an opaque structure,
-not visible to KVM, and then all accesses to it become helper
-functions like:
+>> >> Is it possible to do this with the existing write_msi_msg callback on
+>> >> the msi descriptor?=C2=A0 For instance we could simply translate the =
+msg
+>> >> address and call pci_write_msi_msg() (while avoiding an infinite
+>> >> recursion).=C2=A0 Or maybe there should be an xlate_msi_msg callback =
+we can
+>> >> register.=C2=A0 Or I suppose there might be a way to insert an irqchi=
+p that
+>> >> does the translation on write.=C2=A0 Thanks,
+>> >
+>> > I'm far from keen on the idea, but if there really is an appetite for
+>> > more indirection, then I guess the least-worst option would be yet
+>> > another type of iommu_dma_cookie to work via the existing
+>> > iommu_dma_compose_msi_msg() flow,=20
+>
+> For this direction I think I would turn iommu_dma_compose_msi_msg()
+> into a function pointer stored in the iommu_domain and have
+> vfio/iommufd provide its own implementation. The thing that is in
+> control of the domain's translation should be providing the msi_msg.
 
-struct tdx_args;
+Yes. The resulting cached message should be writeable as is.
 
-int tdx_args_get_mmio(struct tdx_args *args,
-		      enum tdx_access_size *size,
-		      enum tdx_access_dir *direction,
-		      gpa_t *addr,
-		      u64 *value);
+>> > update per-device addresses direcitly. But then it's still going to
+>> > need some kind of "layering violation" for VFIO to poke the IRQ layer
+>> > into re-composing and re-writing a message whenever userspace feels
+>> > like changing an address
+>
+> I think we'd need to get into the affinity update path and force a MSI
+> write as well, even if the platform isn't changing the MSI for
+> affinity. Processing a vMSI entry update would be two steps where we
+> update the MSI addr in VFIO and then set the affinity.
 
-void tdx_args_set_failed_gpa(struct tdx_args *args, gpa_t gpa);
-void tdx_args_set_ret_code(struct tdx_args *args, enum tdx_ret_code ret_code);
-etc
+The affinity callback of the domain/chip can return IRQ_SET_MASK_OK_DONE
+which prevents recomposing and writing the message.
 
-For the 'get' functions, that would tend to imply the helpers
-would do some validation.
+So you want a explicit update/write of the message similar to what
+msi_domain_activate() does.
 
+Thanks,
+
+        tglx
 
