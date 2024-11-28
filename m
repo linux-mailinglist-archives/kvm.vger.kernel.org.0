@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-32675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9199DB0F6
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:41:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F2819DB0F8
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C636B24E94
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:41:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4C21B22A2E
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0E31A0BC0;
-	Thu, 28 Nov 2024 01:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB951A9B41;
+	Thu, 28 Nov 2024 01:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fZTT3Jpc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tipgPEUP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8188884A5E
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2370319D88F
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732757716; cv=none; b=ua9D4mCDVtKtV35ttrxYjDIviVsJzU4HryjcYaRV+yT3BnSruHog7Ziqv1zFy2K2tppPisJtnndWueSnmUAEtCAoYY5Y7lxYG94CtvbeBURLRsnHZodMFjId91ucBrAM9e0+EP4jstVxQjAtQFLWbOOR5Y5hBWwUA/wVf3jWH8E=
+	t=1732757718; cv=none; b=U3saef2hSDtWPcPAJlA/4sYA1r/HYo2GaiD1Qm3D44KcmU0hqdgPtBBQSTt2+s767nC7xQR2IBgdtkZW28aLK+U1HOK9J/FmbohTzv41RX6W0zTjZn/c25d4rw4IuGFP1WxlvwtebwzQs7TX631gFNaDuidxcVWpcRf2+R5dSm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732757716; c=relaxed/simple;
-	bh=jTHw6WzG1L2ET0+uLOjxe98U/NZComyDwuqnLDwUK7Q=;
+	s=arc-20240116; t=1732757718; c=relaxed/simple;
+	bh=Wq5LM6NqLa3bJHEUV5BTVIFsmH63BQ1SZbZwRoHeBQQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CLWpykKeNjdkUDWaf+qbVhCiPGi46U5jvmjxPVYDvkDMqn16PE6fAsjInaLaSJ1mkHKE0XSJuqQf8lq2RcmwnuRNFJ6ZXBlW1Fh7Qmv0Pe8EUcx6zkaeAOo8Cp90lTAOj2iSYEimEKB3PL/UT9DWWQTRXVfI5zSuAg+as1wnxJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fZTT3Jpc; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=LHw2XfYiIBwKfWyoYrarfZYH2NnkQo9OKzkJOznAl+bXjoRhANTHM201VUP3aY+vBua6f4Y95fpKOm1u8xuvQgBdyTu2zNPQOxJ0rO9lL35JCbzUlruTGkp5qJ0iclP7wO0b0S9EAZug8h9uxxKH2zAHTkbMSaSVQ+/wqCR6/qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tipgPEUP; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ea2b6b08e4so368196a91.0
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:14 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea33ae82efso362258a91.3
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732757714; x=1733362514; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732757715; x=1733362515; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcqSghdFCh/ZctdAGuZ6xZDRZT1voItvL/TUvcMElMw=;
-        b=fZTT3Jpc6K2+TuR6tKqAEsWBtp9uD4CCGK2XSmInd4hpiU2Pr0z20O76XfJHvYHz9i
-         L31VLgnVZULe04zQqMePbmzx2Hsh5VnTcIz9o7+Hjux5gcv/iQ1j9epbv0LTwyO4eLRG
-         BfSCxPYYfTH2fhlC1Ynkg/S82w5bM0tSVto51vPewH2dsr/hrXImPWY7/PzXzFksFoui
-         VWWQ8Kcd6yRWe0JJFSi7zKH/urV29LuvDR1biDHFKhdcWn2+69E18D81R9Z3yEAv1rdt
-         GqQQlAPiM7g3mjj3Y10aCYPXCnPMQ8rlobYiiBXqT4XPdAwvOcmpAgtJi1kxZURrC1g1
-         cYmg==
+        bh=4bBB0NQOkuxY/fMRl1/Z0GmdB3PHk1lvBMv7RHKM/5o=;
+        b=tipgPEUPv4NrBSsd4AiteBFW7P/aWwAQiT29+mxuNuPntDECpNmfPud5HhL7Wrq02U
+         IOsvzbNVO/S17IpniAieMucecdTM3o+mLIL50KxTXwFG+LdyqEkq2PqJTNFwk2bl6O/U
+         92fAm8ZLyoYWvI7AbHrhqaY1MZYCnsoqIwMeYiL0dorp86UJ8m+Q9ngTpsH/ugQH8arr
+         b1g9GwUP/g3kvxB+9SihjBsPbcSQL7Q6uGLOhXzyfpg2UKdNLAyj6bVQ41epuW/Sp9Tr
+         QFv24mVo+J1N8zk9IkP9kSFg3nRix6N4vARTZRYhb7kSvV0IcwSsttCx12TMii46goeD
+         473w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732757714; x=1733362514;
+        d=1e100.net; s=20230601; t=1732757715; x=1733362515;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pcqSghdFCh/ZctdAGuZ6xZDRZT1voItvL/TUvcMElMw=;
-        b=kvM9CNn5si4n5pyXyVFqC/2JT8tQw1sEhxE8EIYg0A/L1aPHlHcc8F9temiCyAGZ0y
-         86maUsciAM8xzBw1oSZ9UgA5QwP8ouUeKCPvG3RGtiu+QEcUAipZHIMHZ4tvubQIx1bs
-         igzbzHiRy2NClj74Ok02YPSXH2K801r9D2cnCD2TVyotoN19pnG/w9CVIva3Kg3q8ys8
-         bej/qjiGBGGXChMCtLhVR6T65Ixoxg88xSRJyg6aUahkwgr+30/AV0XLwt4IJ4+nQ9od
-         j5/tCXb6pU0n2DGaLAT+9TRC5AHlgcD2RbqSpRw6xXktS1Hy+XMCupwUfFB4d64Pj7j4
-         M9ug==
-X-Gm-Message-State: AOJu0YwP6zNYxbosFeVsjjMtEAfkfd75Btu2XA0Tp2Mhix7GDwiK0l4r
-	U1UoqTIFYxLLktx49axmIbXjO2qHEThJ2OqUhX65uc2+3PK/WzrHklc4Hw0lQotuNsHhr6rDYsK
-	dGg==
-X-Google-Smtp-Source: AGHT+IGUQlMTSKfuvU5bVfNlJaMTNUCCVb/DTfETxPEeuTtM1qtJCGgOOyXt1nJBI+ToBILywzlFBuJrkjk=
-X-Received: from pjbsj16.prod.google.com ([2002:a17:90b:2d90:b0:2ea:29de:af10])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164d:b0:2ea:77c5:e877
- with SMTP id 98e67ed59e1d1-2ee097bf31fmr7054546a91.24.1732757714077; Wed, 27
- Nov 2024 17:35:14 -0800 (PST)
+        bh=4bBB0NQOkuxY/fMRl1/Z0GmdB3PHk1lvBMv7RHKM/5o=;
+        b=qPyPGOOFSXPt2lJwmg2ULmGgnrhw/tYLzUwICL43cZWHbXatnIeWB9CEmIZbf7WKdu
+         FogIgaBu3748A8/dtUV/RSxlAkHsj8ofKLr7q3SRJV87OSpMtRI1pcKVk4PETseFeYkC
+         S5RtM+O1o5nNVikLDpzZJt6ZjMyX7gV0HsfSOVk3gVzDpXczWA84ljjE8TCCyeqpZIQP
+         wqK/7ONPXVUcR1JbDuXTm4h3eTV6jnCH4MdYqGWoE2ujD4aHu+9Labxl8qWqteowHGzd
+         UwJq753yCWfTKJ3Nb21FxccvnrqkS1X117O0iTOdyABz9fQJqSw0Y13vt/euTSvTQZxI
+         6ysA==
+X-Gm-Message-State: AOJu0Yx4z4icUXjr9aeZtBou6iTK4bUWDd0gXJX674OVC6nmzxuQgWod
+	0377q6Fx/9hY0hg315YG8swJ5SgN9KZg3qyf3vQr/BhKlT3RZCR7i2Mh3ZVcs83/2n0bqXmISrM
+	GdQ==
+X-Google-Smtp-Source: AGHT+IGwrEfLn6hBewUj/il+Vfs6v5UsNGJgiFF2RXZQmzZ8b1U9q7mlrLEDaSRSfx3tH3diTdGghP34XRs=
+X-Received: from pjbqn7.prod.google.com ([2002:a17:90b:3d47:b0:2e0:a50e:a55e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c46:b0:2ea:aa69:1067
+ with SMTP id 98e67ed59e1d1-2ee08e5e389mr6492735a91.3.1732757715563; Wed, 27
+ Nov 2024 17:35:15 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 17:33:51 -0800
+Date: Wed, 27 Nov 2024 17:33:52 -0800
 In-Reply-To: <20241128013424.4096668-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128013424.4096668-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128013424.4096668-25-seanjc@google.com>
-Subject: [PATCH v3 24/57] KVM: x86: Add a macro to init CPUID features that
- are 64-bit only
+Message-ID: <20241128013424.4096668-26-seanjc@google.com>
+Subject: [PATCH v3 25/57] KVM: x86: Add a macro to precisely handle aliased
+ 0x1.EDX CPUID features
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>
@@ -89,76 +89,97 @@ Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a macro to mask-in feature flags that are supported only on 64-bit
-kernels/KVM.  In addition to reducing overall #ifdeffery, using a macro
-will allow hardening the kvm_cpu_cap initialization sequences to assert
-that the features being advertised are indeed included in the word being
-initialized.  And arguably using *F() macros through is more readable.
+Add a macro to precisely handle CPUID features that AMD duplicated from
+CPUID.0x1.EDX into CPUID.0x8000_0001.EDX.  This will allow adding an
+assert that all features passed to kvm_cpu_cap_init() match the word being
+processed, e.g. to prevent passing a feature from CPUID 0x7 to CPUID 0x1.
+
+Because the kernel simply reuses the X86_FEATURE_* definitions from
+CPUID.0x1.EDX, KVM's use of the aliased features would result in false
+positives from such an assert.
 
 No functional change intended.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ arch/x86/kvm/cpuid.c | 47 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 9bd8bac3cd52..9219e164c810 100644
+index 9219e164c810..ddff0c7c78b9 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -642,17 +642,14 @@ static __always_inline void kvm_cpu_cap_init(enum cpuid_leafs leaf, u32 mask)
- 	(boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0);	\
+@@ -648,6 +648,16 @@ static __always_inline void kvm_cpu_cap_init(enum cpuid_leafs leaf, u32 mask)
+ 	(IS_ENABLED(CONFIG_X86_64) ? F(name) : 0);		\
  })
  
-+/* Features that KVM supports only on 64-bit kernels. */
-+#define X86_64_F(name)						\
-+({								\
-+	(IS_ENABLED(CONFIG_X86_64) ? F(name) : 0);		\
++/*
++ * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
++ * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
++ */
++#define ALIASED_1_EDX_F(name)							\
++({										\
++	BUILD_BUG_ON(__feature_leaf(X86_FEATURE_##name) != CPUID_1_EDX);	\
++	feature_bit(name);							\
 +})
 +
  void kvm_set_cpu_caps(void)
  {
--#ifdef CONFIG_X86_64
--	unsigned int f_gbpages = F(GBPAGES);
--	unsigned int f_lm = F(LM);
--	unsigned int f_xfd = F(XFD);
--#else
--	unsigned int f_gbpages = 0;
--	unsigned int f_lm = 0;
--	unsigned int f_xfd = 0;
--#endif
  	memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
- 
- 	BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
-@@ -859,7 +856,7 @@ void kvm_set_cpu_caps(void)
- 		F(XSAVEC) |
- 		F(XGETBV1) |
- 		F(XSAVES) |
--		f_xfd
-+		X86_64_F(XFD)
+@@ -892,30 +902,30 @@ void kvm_set_cpu_caps(void)
  	);
  
- 	kvm_cpu_cap_init_kvm_defined(CPUID_12_EAX,
-@@ -920,10 +917,10 @@ void kvm_set_cpu_caps(void)
- 		F(MMX) |
- 		F(FXSR) |
- 		F(FXSR_OPT) |
--		f_gbpages |
-+		X86_64_F(GBPAGES) |
- 		F(RDTSCP) |
+ 	kvm_cpu_cap_init(CPUID_8000_0001_EDX,
+-		F(FPU) |
+-		F(VME) |
+-		F(DE) |
+-		F(PSE) |
+-		F(TSC) |
+-		F(MSR) |
+-		F(PAE) |
+-		F(MCE) |
+-		F(CX8) |
+-		F(APIC) |
++		ALIASED_1_EDX_F(FPU) |
++		ALIASED_1_EDX_F(VME) |
++		ALIASED_1_EDX_F(DE) |
++		ALIASED_1_EDX_F(PSE) |
++		ALIASED_1_EDX_F(TSC) |
++		ALIASED_1_EDX_F(MSR) |
++		ALIASED_1_EDX_F(PAE) |
++		ALIASED_1_EDX_F(MCE) |
++		ALIASED_1_EDX_F(CX8) |
++		ALIASED_1_EDX_F(APIC) |
  		0 /* Reserved */ |
--		f_lm |
-+		X86_64_F(LM) |
- 		F(3DNOWEXT) |
- 		F(3DNOW)
- 	);
-@@ -1057,6 +1054,7 @@ EXPORT_SYMBOL_GPL(kvm_set_cpu_caps);
- 
+ 		F(SYSCALL) |
+-		F(MTRR) |
+-		F(PGE) |
+-		F(MCA) |
+-		F(CMOV) |
+-		F(PAT) |
+-		F(PSE36) |
++		ALIASED_1_EDX_F(MTRR) |
++		ALIASED_1_EDX_F(PGE) |
++		ALIASED_1_EDX_F(MCA) |
++		ALIASED_1_EDX_F(CMOV) |
++		ALIASED_1_EDX_F(PAT) |
++		ALIASED_1_EDX_F(PSE36) |
+ 		0 /* Reserved */ |
+ 		F(NX) |
+ 		0 /* Reserved */ |
+ 		F(MMXEXT) |
+-		F(MMX) |
+-		F(FXSR) |
++		ALIASED_1_EDX_F(MMX) |
++		ALIASED_1_EDX_F(FXSR) |
+ 		F(FXSR_OPT) |
+ 		X86_64_F(GBPAGES) |
+ 		F(RDTSCP) |
+@@ -1055,6 +1065,7 @@ EXPORT_SYMBOL_GPL(kvm_set_cpu_caps);
  #undef F
  #undef SF
-+#undef X86_64_F
+ #undef X86_64_F
++#undef ALIASED_1_EDX_F
  
  struct kvm_cpuid_array {
  	struct kvm_cpuid_entry2 *entries;
