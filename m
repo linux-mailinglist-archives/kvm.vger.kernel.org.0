@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-32734-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32735-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DFC9DB3F6
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 09:42:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277CF9DB3F7
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 09:43:20 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81ADDB212F2
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 08:42:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D087016659B
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 08:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8C9150981;
-	Thu, 28 Nov 2024 08:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3608F1509BF;
+	Thu, 28 Nov 2024 08:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ObczU05z"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="gpTO9RCM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C94D14C59B
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 08:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A3B14C5A1
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 08:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732783366; cv=none; b=XNdMrTmitjj3S/3e8tW0yBwkMYlx1lYdv/+2T9i8+Nr/ujTUJ46ZytISaDy6tGMyFCoNYJwNi6NpHtenLRF3WB3VVMOP3ub8E96dwcmswVxp+rZOBTjmdOrYDxbTcasioMfyxqd8zkrzQbkwBRk5/rAfcnCqh5j84R2jzLT7WgE=
+	t=1732783392; cv=none; b=fxD5Fw0R3j3nFcJA+mP2rTLfj690bBxxVAt1BGjEv5SIyzLCm/Uu48U5gk6iLpks0YtGVrwHKQqZcPYVvLPBAOiEDHj1q019SMvYtl1r3LFfmsFmZ+VqRhSupLsgxwGGOJvGHEyG9m6Y6M8+WXjLATn4nRxf9hyU6xYa7DfnM8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732783366; c=relaxed/simple;
-	bh=7ZZDaAfSE8cvMEwpoEXTL1xwZPoGe7nBEVbFQ7QIRF8=;
+	s=arc-20240116; t=1732783392; c=relaxed/simple;
+	bh=eD0BKTile3avGYgb6esO7NcB7LFOjudhnPBYvOtuu6U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TclxctX5SsXBAjMDBr8HmNPaiM8dbX7DE7NY0pH45oIq92ELXbxMEGxjJ7CWnIAMvoWmYr9rcxb0feHhnHbSGoHboF53dvXRkG8La1ezkhobIoXtgQVw7b8P9hUAy3PncN6elU+f5BDqBTXHGQns0F6m/QXZUycnj+js0uOyLfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ObczU05z; arc=none smtp.client-ip=209.85.208.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=T/63Lo42EfmI9AWhVjOFmx38mC+mrvUkgSz/mB3+3VwrRheRHjXPF0rB9b2whGNArVYVmEhyu+qW6Q6IobLuUUFGYgXBHb0ZUO/EmM1VRc9msR+DSuQ3GI7Odht2nQT55KCLmgp/nB7iq1HlY0tAuORFjRjPcKQO7mLZ9JuULuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=gpTO9RCM; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5cfddb70965so679129a12.0
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 00:42:44 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5cf7aa91733so252254a12.2
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 00:43:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732783363; x=1733388163; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1732783389; x=1733388189; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pqNO4mcpLsB6nl6y5oYnZ+p9PNe/HBxDvPKQfTS22pA=;
-        b=ObczU05zGngT5t+FjOc73Zp0ghg4R1SfPxV+AgBL7wfjC7qjSF0W75ecXrurP6MPAf
-         mDT0bGbJCXWwL0ii0Nl9FvaPv/bguLBOqxygXjrN0Y9Z23Y7BMXeEjtPKI8iAhdBkIdu
-         hw938N7rXHnektH8rRjiLZ8pQuAJ8h6PQMU26mk5IeL9jd0LfAUu1Lf3xhBlJvTlWZa1
-         IrLbL5n+NYkcabUxSyO7qTdTK+Rqx0eizBCMD+1hAne8YNxROQMkq4OQQIqO4ZRWpxke
-         OwPw7gQUK0AYTHIbx14DIG6TcIu2qqlzpCRGD0wiIoiXTdkr33pFXHMUe/vUciqoaaqO
-         nfcQ==
+        bh=tMHb2Kr+9Gyds+XTGzQnx6NFjRgDvoBkrYDD0zxb/+k=;
+        b=gpTO9RCM87lRTmvEUOFaWOz57bO62fWTAqgf0Bw4ZEXrYqHHa34J3LKUURTedXEeh5
+         GAnrAmMAjn3lvlqVjXNOVZCkY4O8YIlalLkNu7frgvpOMPp+8NoG0xYnTQz9bMyNN7IJ
+         Oo2aVsrnft/1cMgoelpO+U4Zu0IlicHtNlQq+P5E+uLLED/aQaYPEldmxeYuhUSQbobQ
+         eTFYASwZBDCLrBPHUXuRUU4hAr0xZ1qqk+d+YSDEBVD4rzsWU2p2u17Ys9qMDfsdsckn
+         2Y2RlOHHdMuJHG2t/1UIjC4OTldpTq4qQPbcRjC5dFqVI1/YnBKotwBhaQi/JCt2XMnp
+         gNjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732783363; x=1733388163;
+        d=1e100.net; s=20230601; t=1732783389; x=1733388189;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pqNO4mcpLsB6nl6y5oYnZ+p9PNe/HBxDvPKQfTS22pA=;
-        b=lcIoEYllPtkX/giPOABRsGyTmifvMm/7HASEyx2RUrHdNIOEL3zY1plOyHw7YrjNI4
-         iJVDoCAdmDolGjwUOhpOpJGttp+S3lHeSzYGyCYSfcVftNx5loaGK1aupTn/ddmHsYHK
-         dGZyGjqRkSWDMb2s1remZzVef4m1pwI0oczGwLA8YYkdCUnJTrHJ7vzPBydvfcs21bSR
-         wlW04Xmxqj/kEbft9y0uvUlBQw9tU3HwqwDtTq3ySYjsPS6QO6Qpocuq0EnKvYRGQ9Lc
-         6Y1ARj/iKyA/6qU15PcrFv4FoktU+q77jVYY5jv47zdWKBtw01amNfngayKFYH2DzV6V
-         V7LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU//5x+VmKSdAcikeOCf2TG+i4pQfGn5INm+4yRbSU0ESfMRuMY62KS/hR2hZJMsJFuldc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeeMC9UnKh3oVPSZzY6Qkf9lJ6FQGM4nRzIG5KSgj9XmMUtFoD
-	9dLK4uVHhIe15lPYH4jYo5ewNt4vWKJdC4q1J3BurNtccsSKKCZaSiKBypnr2H8=
-X-Gm-Gg: ASbGncuTGI6/DgNmVlv+2dYHLB8gcaW4/U86qPaoZlUwwM+9MR+bWn208fABe/8u1dJ
-	Ko7055DIibvut9y3Iz5XAoxvAiAuk7Nskz6BN/FrnyEDIWuJuMy+pGcmJOPx03SssAx6S20oflg
-	qy3PNsrrOwr56qpxKUXJsUOAm+8cRFl96xRy54PRSoO0y4nCc+CfvMzNfNIMdBhPxhlm+eU5ZX1
-	0GgwGR1bK6F9ouE2j8Dx6GgmtKctg4KTBT0Dvjd3a2AP4GpMADKuGlPHBMAdGnVyqC6AMjmRyAc
-	zKRs0BQKqC/aS/tAKpHKL3xJVbRdu72i0hc=
-X-Google-Smtp-Source: AGHT+IEtMpQZWj4endJlLK3Ilr+mbQxtLK9EL+/Wn1Pn2YYjrHxtBwEvTjmbyjJN4oWe/ENTW6ynRg==
-X-Received: by 2002:a17:907:688f:b0:aa5:d1c:3dac with SMTP id a640c23a62f3a-aa580fdd57emr475064966b.36.1732783362949;
-        Thu, 28 Nov 2024 00:42:42 -0800 (PST)
+        bh=tMHb2Kr+9Gyds+XTGzQnx6NFjRgDvoBkrYDD0zxb/+k=;
+        b=BwlwWBzZfSpHrkMwDzy85gKsX/F/41Tyy9DhGCrv5zU90sjlwGpRKISK2CTfMEsAvN
+         7Tb6jyhVDd3ld65ohH0gD5mQoeJIomA5WbB/67qpdcjZa7XLxyZvtr1kFVdsqawNGw07
+         GidmJCRvlYxKzFvHDfO9aXaCL2AiANPUkMGwNnLDW9bgN9ykB6PNGfNl5szL4nHYcgDc
+         9DGOSERW9OYtXGCFuMNlSjf73sFmMZA66siBaXbC01OEz4HCGhYB4OjEcWHEPHsS53W/
+         wu+xw8LMJqiza6hVYAbvx038KsOJPHDmFhzvVVu1mxSomrDU7+fbrRkLSUljsUu+ehob
+         +NVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtLtSc0mjXODT6TQMzuYPpVZBitC2SelMZ/pgih5sVQBDu3jUZge/qy3SVUjiS6nMoUZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKDE+Em+RMRSQB4NWcqOGg70EejljNAnUmfyU16ZtWLVKTUcli
+	Fdc7HlYHtjc5QzXNkj/iTEkjLo1dkGJW9NFywoS1oJ3keWnzboHUYtt93cLMAV0=
+X-Gm-Gg: ASbGnct+E9r5Q5BauUNZzicJkMxy4BWUndhu9NUKT+AGFMrXcmx6eit8skPBzhVrw/h
+	bJj5gAJiyfd/2aWbjZv3oiYvasJjy8CbDjH74IoJe2qXbYQPZxw0CT7kWXvFGMU3driWBfpc0uZ
+	G+k3A0noquUGq8Wk4DI3GBYNOl8jiFApoJEJPQP9LGIttgquK2WafFmHUONvxUwt2Jjp8JzloDW
+	GyzrFWdIgM4JKDc3LJ29rUs9Z8KURNxq71PF+vmyGJX81rZpxWI1aZkMt+AKFEmUGJzqqcHb7TJ
+	fVpttTA6UmMgKQ+osPwE3XBUPJK8IQ5uSm4=
+X-Google-Smtp-Source: AGHT+IE91WdNXINf1ttfiGq0DeG9vnUXdI7yQdKbewyZQW5Jp/++7K5EDj28/C2AmS8X01ObB7bPuA==
+X-Received: by 2002:aa7:cfd4:0:b0:5d0:8225:aa19 with SMTP id 4fb4d7f45d1cf-5d08225aa9cmr4768526a12.2.1732783388739;
+        Thu, 28 Nov 2024 00:43:08 -0800 (PST)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5997ffc1bsm41610466b.83.2024.11.28.00.42.42
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d097e8f649sm493828a12.59.2024.11.28.00.43.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 00:42:42 -0800 (PST)
-Date: Thu, 28 Nov 2024 09:42:41 +0100
+        Thu, 28 Nov 2024 00:43:07 -0800 (PST)
+Date: Thu, 28 Nov 2024 09:43:06 +0100
 From: Andrew Jones <ajones@ventanamicro.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -82,11 +82,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	James Houghton <jthoughton@google.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>
-Subject: Re: [PATCH v4 14/16] KVM: selftests: Provide empty 'all' and 'clean'
- targets for unsupported ARCHs
-Message-ID: <20241128-24a975e227dd4b86393f21ed@orel>
+Subject: Re: [PATCH v4 15/16] KVM: selftests: Use canonical $(ARCH) paths for
+ KVM selftests directories
+Message-ID: <20241128-d7a5061ce8160000cd5260bd@orel>
 References: <20241128005547.4077116-1-seanjc@google.com>
- <20241128005547.4077116-15-seanjc@google.com>
+ <20241128005547.4077116-16-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,28 +95,24 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241128005547.4077116-15-seanjc@google.com>
+In-Reply-To: <20241128005547.4077116-16-seanjc@google.com>
 
-On Wed, Nov 27, 2024 at 04:55:45PM -0800, Sean Christopherson wrote:
-> Provide empty targets for KVM selftests if the target architecture is
-> unsupported to make it obvious which architectures are supported, and so
-> that various side effects don't fail and/or do weird things, e.g. as is,
-> "mkdir -p $(sort $(dir $(TEST_GEN_PROGS)))" fails due to a missing operand,
-> and conversely, "$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH_DIR) ..." will
-> create an empty, useless directory for the unsupported architecture.
+On Wed, Nov 27, 2024 at 04:55:46PM -0800, Sean Christopherson wrote:
+> Use the kernel's canonical $(ARCH) paths instead of the raw target triple
+> for KVM selftests directories.  KVM selftests are quite nearly the only
+> place in the entire kernel that using the target triple for directories,
+> tools/testing/selftests/drivers/s390x being the lone holdout.
 > 
-> Move the guts of the Makefile to Makefile.kvm so that it's easier to see
-> that the if-statement effectively guards all of KVM selftests.
+> Using the kernel's preferred nomenclature eliminates the minor, but
+> annoying, friction of having to translate to KVM's selftests directories,
+> e.g. for pattern matching, opening files, running selftests, etc.
 > 
-> Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Opportunsitically delete file comments that reference the full path of the
+> file, as they are obviously prone to becoming stale, and serve no known
+> purpose.
+> 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  tools/testing/selftests/kvm/.gitignore   |   1 +
->  tools/testing/selftests/kvm/Makefile     | 336 +----------------------
->  tools/testing/selftests/kvm/Makefile.kvm | 334 ++++++++++++++++++++++
->  3 files changed, 340 insertions(+), 331 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/Makefile.kvm
->
 
 Acked-by: Andrew Jones <ajones@ventanamicro.com>
 
