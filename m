@@ -1,199 +1,238 @@
-Return-Path: <kvm+bounces-32758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1288C9DBB01
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 17:06:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE8F9DBB04
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 17:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2114016125A
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 16:06:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9F916087D
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 16:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C561BD9EE;
-	Thu, 28 Nov 2024 16:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DBC1BD9FF;
+	Thu, 28 Nov 2024 16:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="MsentwNN"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ZHiQsPrE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719421BD9DB
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 16:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39CD1BD9CB;
+	Thu, 28 Nov 2024 16:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732809996; cv=none; b=GSRlO0a1u0efsSS2Sbme1UUcON3zf/rqdc7CuIyK5iiuSYZd7bCCp21fKf2XduFTHE6BMGoQM7mUr8BGwqNFFopaIBO6wwPhIx1qu3d7wGmPKb+RhqBcvuGU/x6RNYF31rlQ50lsGr29X7DnDbcD8Hkyjvf692SHVQTQ27YFwKM=
+	t=1732810093; cv=none; b=uA0Le7xl2GWpHeDY55hlbnZed3ZCicE+Hf2IxzQdyLnt6zzJxhGWKovcL5l+Xq2BydHwEXDCKVjGMVIbRFGVqlL4w0lMTLBddsymauAryC+s/Xe+hD8WtFAwXyi6mkF/l2ZU6CI3ofU3u5/cWXSGAU0yNLu4oZG4I5Ih4ngFLQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732809996; c=relaxed/simple;
-	bh=Ir3JTo7TVjNjbRH3Tk0vjrvyaT/4J1kJDtTnrFc4Z/I=;
+	s=arc-20240116; t=1732810093; c=relaxed/simple;
+	bh=EXr/Xa4IzkrMZ/1Uwppwz8/I/eKNWK/N7JTkg3JjU0M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOihd7cwXXlD/Nnb09ne1TejWtqCgGJwb2Dmuv5EVKWz/W0Th8xsAN3caYnlmN3gtQf2LQjQsNDrsnXIDw2Ru6NyUbAKVYDZbSWkGnupP5EaUzW5tfvKFyVnvzRTMAABEPIWL+3rfoAnJIIRI6VapqGpSf4zeWmP+t5U6o6Y72o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=MsentwNN; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38231e9d518so697325f8f.0
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 08:06:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732809992; x=1733414792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SE3hqx8PlRH6oR2vsIt6C8nLef92GwCrM14lVm2xh9k=;
-        b=MsentwNNH4ftGr6YQq3psXFmQIsaNK1yH2PHa9gdNBXQ8o6EEsAzb/0+6Y7Sl2r4b4
-         rMU2Xcwo/pPLuNHPXVv53GrzdRltg62xYufWqP11vrJmaQ/mB8QhrlOBSV5sAEPuGqhm
-         hywiuEdOPIh7dHy+A0U+9UbD3zjFjeE2kjGQSepxtZ3/HhIDa8fIUCBlv9I4TXY2iTsG
-         Ly3t3MAmRKrwLCliUf4yTBz/PJk5SrDvxTPurkOg6VenJ+xYxdS9uL5bz3h6cTA5L96Y
-         xuHuBhVOm3QAADS1eJEIA+54lpYSxBUAcX5qUsFN49VobG62+4cgD+EuGPdOlM8+mTEq
-         aL6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732809992; x=1733414792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SE3hqx8PlRH6oR2vsIt6C8nLef92GwCrM14lVm2xh9k=;
-        b=P3hOF7vlPITP7v7OlX1ZOrCx6Dypdbd29mylVMce7zNWJTDjWOyTuQdx7YxpwQ8889
-         h1HsrQIPu44inMEKbYb69sBGuZIOWgltqR/vIbFJtHzMW7kO/XySPu5dc6ZVHd8EhoEd
-         84Z9aluCX5IlVAZwSS8c++buFzB32SF2Kyc36qLiyourUc7K77ThtoI1Z8ICKV6cF53l
-         SdZ2piA9e4N8svrSOh1N+MnQMmL1NHZpqotmjajkMEZIymuCVaDqkzJv4G96Erk6K3KN
-         vPIv40LIgxw9TLLZektWLpzZCZJcU++H5e/uQV5yIXV3jylu6bTyXeTN56i8Xdg6MmZG
-         dXsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcfldzjtG/HusRqLZd4qbkXmOtZ4oKAKpzcdjjOcSceYIk/lcQVSdnCSeVh6wOpBD0c/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1ts5SIGf3lo4/ZGv9a9GlbkkKZGV9LhRUIeDE9dkpM04dZWvw
-	uVfHXY8TEJnfZsOvy1SC/6XVvYHNNlfgHUSx8YRoXmGm/j1EBhnZWjLut0MLu0A=
-X-Gm-Gg: ASbGnctP+zM+rUgegVWxqAJMVhfOpUJkSIzu0G/2F5VuQCYEsYWXpL9wIfurc0eaRdJ
-	y0w7+RbuM/inXSsob6KLI9VGJAvpEMHbYoZW+euAH/k0MnZW8s7tS4Mxz5WHtUk0rrj/UC39WCm
-	DIP9kAvT+D3QDGVbBRUU+2At2xYS69NvfXiWhO7hBqm6g9nqn58EcwC7riuGmWZdHDrqAannwYN
-	pVxKf9ZgBISfAONQEKBuO782pHuZAa/lud0Ey7t06haXGhec2XS86IRuLjWTbCtewb9v/yRqWjy
-	8S2zXqAiwG68BsSIzxWlymcuBoQRsyp2Yg8=
-X-Google-Smtp-Source: AGHT+IFG7K7Tcmhw/SgqiyfLkjWGDpN72liep7NaizvY+BomgXIHH7qnDKDhB0LbxLbY9up/D3Z4OQ==
-X-Received: by 2002:a05:6000:42ca:b0:382:503f:a323 with SMTP id ffacd0b85a97d-385c6ebaa70mr4267236f8f.19.1732809992314;
-        Thu, 28 Nov 2024 08:06:32 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd2dad8sm1975016f8f.18.2024.11.28.08.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 08:06:31 -0800 (PST)
-Date: Thu, 28 Nov 2024 17:06:31 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
-	apatel@ventanamicro.com, andre.przywara@arm.com, suzuki.poulose@arm.com, 
-	s.abdollahi22@imperial.ac.uk
-Subject: Re: [PATCH kvmtool 2/4] arm: Check return value for
- host_to_guest_flat()
-Message-ID: <20241128-7f4e0ab75188ff4684785d2b@orel>
-References: <20241128151246.10858-1-alexandru.elisei@arm.com>
- <20241128151246.10858-3-alexandru.elisei@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pYXw6Xia9GVCqGkj0Ap7BX6sqsrexeGIv1737DdKTpFoHb77MYbpr0IRrgo/XFfWRlqizuJF+EzqdoBepJYF1++8zQ4eJ01KNBOoqYWEWuk6jbLZVWZ5HPfed1Q8M1S2Ts+0qOOiXZKsocN8+NN9wreXyWfuQAAn0VIMdG/vRX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ZHiQsPrE; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1F7AD40E015E;
+	Thu, 28 Nov 2024 16:08:08 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id JEf4IJx5ofLC; Thu, 28 Nov 2024 16:08:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1732810083; bh=tBvIZsR8D+2ZYbu6rMifmZidC/N+3RXk90l43tBthoU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZHiQsPrEmGchPW6AX34zhC0DXJifHmYraIbuw2eGIlUSIBdvs2x0Txyzcllihy0le
+	 O/ZcEuRB2/1I3BfoMe2Z6UDamwe+oRMBylPyoKQV+nZcUULKtfPjdVh0yY86ATetYf
+	 num6/FfOS7BwPqxtdAEQZS8ttdL+eXiIn0G+WaU25rUy/85kZR1tu4Lm3F9h9DUmlf
+	 VVvqIgON5qAq1899eUJKEDSEX2Sc3d3Tq1vH9ufEDLP2BwLwUhUsHHPA4/xWMJy/Qs
+	 VTbR7Soxca7BCmUQFtu9oSHkeoWC6XR3KXUqjqIx7wevdtdjBQunv3pLfmh/vqpdDE
+	 mU22AlQb8USSUWRFbbH15ZsbAe79YudL81DRhScjyLZCxG4dh0ML8PRZ2MPmH1u3Mq
+	 nW6ZdlRNN1C7V30cFMkOhYIclVZnQulD7rVFZgQ2M3rMTlS2nADnJK6NZUgIQ/Yu4u
+	 7bneZKZnezhTjAp+cTf93wlPE7iJVh4FoXkG4c8yrHWQo1Dei8r4TPfw2ESX4HqvB8
+	 LtcwNCbrCZs3B+U/8R2wvge5ZavvVuMNwe9Wrj3n3LEm+ewNz2nF4pB+8YbxDk7/z6
+	 xDUApg/qq3yO+lsH0B38ZLLhsBOwOsJ6eWh7J/cMlIJ5jos9vYNM7e4EuzS59tNKVO
+	 iQWU8ByhfllLt/Cj7lBQs/RE=
+Received: from zn.tnic (p200300ea9736A177329C23fffea6A903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a177:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A0AC240E0274;
+	Thu, 28 Nov 2024 16:07:49 +0000 (UTC)
+Date: Thu, 28 Nov 2024 17:07:42 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-coco@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Michael Roth <michael.roth@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <jroedel@suse.de>,
+	Roy Hopkins <roy.hopkins@suse.com>
+Subject: Re: [RFC PATCH 1/7] KVM: SVM: Implement GET_AP_APIC_IDS NAE event
+Message-ID: <20241128160742.GAZ0iVTp1thcQA5jFM@fat_crate.local>
+References: <cover.1724795970.git.thomas.lendacky@amd.com>
+ <e60f352abde6bfa9c989d63213d4fb04c3721c11.1724795971.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241128151246.10858-3-alexandru.elisei@arm.com>
+In-Reply-To: <e60f352abde6bfa9c989d63213d4fb04c3721c11.1724795971.git.thomas.lendacky@amd.com>
 
-On Thu, Nov 28, 2024 at 03:12:44PM +0000, Alexandru Elisei wrote:
-> kvmtool, on arm and arm64, puts the kernel, DTB and initrd (if present) in
-> a 256MB memory region that starts at the bottom of RAM.
-> kvm__arch_load_kernel_image() copies the kernel at the start of RAM, the
-> DTB is placed at the top of the region, and immediately below it the
-> initrd.
-> 
-> When the initrd is specified by the user, kvmtool checks that it doesn't
-> overlap with the kernel by computing the start address in the host's
-> address space:
-> 
-> 	fstat(fd_initrd, &sb);
-> 	pos = pos - (sb.st_size + INITRD_ALIGN);
-> 	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN); (a)
-> 	pos = guest_flat_to_host(kvm, guest_addr); (b)
-> 
-> If the initrd is large enough to completely overwrite the kernel and start
-> below the guest RAM (pos < kvm->ram_start), then kvmtool will omit the
-> following errors:
-> 
->   Warning: unable to translate host address 0xfffe849ffffc to guest (1)
->   Warning: unable to translate guest address 0x0 to host (2)
->   Fatal: initrd overlaps with kernel image. (3)
-> 
-> (1) is because (a) calls host_to_guest_flat(kvm, pos) with a 'pos'
-> outside any of the memslots.
-> 
-> (2) is because guest_flat_to_host() is called at (b) with guest_addr=0,
-> which is what host_to_guest_flat() returns if the supplied address is not
-> found in any of the memslots. This warning is eliminated by this patch.
-> 
-> And finally, (3) is the most useful message, because it tells the user what
-> the error is.
-> 
-> The issue is a more general pattern in kvm__arch_load_kernel_image():
-> kvmtool doesn't check if host_to_guest_flat() returns 0, which means that
-> the host address is not within any of the memslots. Add a check for that,
-> which will at the very least remove the second warning.
-> 
-> This also fixes the following edge cases:
-> 
-> 1. The same warnings being emitted in a similar scenario with the DTB, when
-> the RAM is smaller than FDT_MAX_SIZE + FDT_ALIGN.
-> 
-> 2. When copying the kernel, if the RAM size is smaller than the kernel
-> offset, the start of the kernel (represented by the variable 'pos') will be
-> outside the VA space allocated for the guest RAM.  limit - pos will wrap
-> around, because gcc 14.1.1 wraps the pointers (void pointer arithmetic is
-> undefined in C99). Then read_file()->..->read() will return -EFAULT because
-> the destination address is unallocated (as per man 2 read, also reproduced
-> during testing).
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/kvm.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index da0430c40c36..4beae69e1fb3 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -113,6 +113,8 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+On Tue, Aug 27, 2024 at 04:59:25PM -0500, Tom Lendacky wrote:
+> @@ -4124,6 +4130,77 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
+>  	return 1; /* resume guest */
+>  }
 >  
->  	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, fd_kernel);
->  	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
-> +	if (!kvm->arch.kern_guest_start)
-> +			die("guest memory too small to contain the kernel");
+> +struct sev_apic_id_desc {
+> +	u32	num_entries;
 
-Just doing a quick drive-by and noticed this indentation issue.
+"count" - like in the spec. :-P
 
-Thanks,
-drew
+> +	u32	apic_ids[];
+> +};
+> +
+> +static void sev_get_apic_ids(struct vcpu_svm *svm)
+> +{
+> +	struct ghcb *ghcb = svm->sev_es.ghcb;
+> +	struct kvm_vcpu *vcpu = &svm->vcpu, *loop_vcpu;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned int id_desc_size;
+> +	struct sev_apic_id_desc *desc;
+> +	kvm_pfn_t pfn;
+> +	gpa_t gpa;
+> +	u64 pages;
+> +	unsigned long i;
+> +	int n;
+> +
+> +	pages = vcpu->arch.regs[VCPU_REGS_RAX];
 
->  	file_size = read_file(fd_kernel, pos, limit - pos);
->  	if (file_size < 0) {
->  		if (errno == ENOMEM)
-> @@ -131,7 +133,10 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  	 */
->  	pos = limit;
->  	pos -= (FDT_MAX_SIZE + FDT_ALIGN);
-> -	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
-> +	guest_addr = host_to_guest_flat(kvm, pos);
-> +	if (!guest_addr)
-> +		die("fdt too big to contain in guest memory");
-> +	guest_addr = ALIGN(guest_addr, FDT_ALIGN);
->  	pos = guest_flat_to_host(kvm, guest_addr);
->  	if (pos < kernel_end)
->  		die("fdt overlaps with kernel image.");
-> @@ -151,7 +156,10 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  			die_perror("fstat");
->  
->  		pos -= (sb.st_size + INITRD_ALIGN);
-> -		guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
-> +		guest_addr = host_to_guest_flat(kvm, pos);
-> +		if (!guest_addr)
-> +			die("initrd too big to fit in the payload memory region");
-> +		guest_addr = ALIGN(guest_addr, INITRD_ALIGN);
->  		pos = guest_flat_to_host(kvm, guest_addr);
->  		if (pos < kernel_end)
->  			die("initrd overlaps with kernel image.");
-> -- 
-> 2.47.0
-> 
+Probably should be "num_pages" and a comment should explain what it is:
+
+"State to Hypervisor: is the
+number of guest contiguous pages
+provided to hold the list of APIC
+IDs"
+
+Makes it much easier to follow the code.
+
+> +	/* Each APIC ID is 32-bits in size, so make sure there is room */
+> +	n = atomic_read(&kvm->online_vcpus);
+> +	/*TODO: is this possible? */
+> +	if (n < 0)
+> +		return;
+
+It doesn't look like it but if you wanna be real paranoid you can slap
+a WARN_ONCE() here or so to scream loudly.
+
+> +	id_desc_size = sizeof(*desc);
+> +	id_desc_size += n * sizeof(desc->apic_ids[0]);
+> +	if (id_desc_size > (pages * PAGE_SIZE)) {
+> +		vcpu->arch.regs[VCPU_REGS_RAX] = PFN_UP(id_desc_size);
+> +		return;
+> +	}
+> +
+> +	gpa = svm->vmcb->control.exit_info_1;
+> +
+> +	ghcb_set_sw_exit_info_1(ghcb, 2);
+> +	ghcb_set_sw_exit_info_2(ghcb, 5);
+
+Uuh, more magic numbers. I guess we need this:
+
+https://lore.kernel.org/r/20241113204425.889854-1-huibo.wang@amd.com
+
+and more.
+
+And can we write those only once at the end of the function?
+
+> +	if (!page_address_valid(vcpu, gpa))
+> +		return;
+> +
+> +	pfn = gfn_to_pfn(kvm, gpa_to_gfn(gpa));
+
+Looking at the tree, that gfn_to_pfn() thing is gone now and we're supposed to
+it this way.  Not tested ofc:
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5af227ba15a3..47e1f72a574d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4134,7 +4134,7 @@ static void sev_get_apic_ids(struct vcpu_svm *svm)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	unsigned int id_desc_size;
+ 	struct sev_apic_id_desc *desc;
+-	kvm_pfn_t pfn;
++	struct page *page;
+ 	gpa_t gpa;
+ 	u64 pages;
+ 	unsigned long i;
+@@ -4163,8 +4163,8 @@ static void sev_get_apic_ids(struct vcpu_svm *svm)
+ 	if (!page_address_valid(vcpu, gpa))
+ 		return;
+ 
+-	pfn = gfn_to_pfn(kvm, gpa_to_gfn(gpa));
+-	if (is_error_noslot_pfn(pfn))
++	page = gfn_to_page(kvm, gpa_to_gfn(gpa));
++	if (!page)
+ 		return;
+ 
+ 	if (!pages)
+
+> +	if (is_error_noslot_pfn(pfn))
+> +		return;
+> +
+> +	if (!pages)
+> +		return;
+
+That test needs to go right under the assignment of "pages".
+
+> +	/* Allocate a buffer to hold the APIC IDs */
+> +	desc = kvzalloc(id_desc_size, GFP_KERNEL_ACCOUNT);
+> +	if (!desc)
+> +		return;
+> +
+> +	desc->num_entries = n;
+> +	kvm_for_each_vcpu(i, loop_vcpu, kvm) {
+> +		/*TODO: is this possible? */
+
+Well:
+
+#define kvm_for_each_vcpu(idx, vcpup, kvm)                 \
+        xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, \
+                          (atomic_read(&kvm->online_vcpus) - 1))
+			   ^^^^^^^^^^^^^^
+
+but, what's stopping kvm_vm_ioctl_create_vcpu() from incrementing it?
+
+I'm guessing this would happen when you start the guest only but I haz no
+idea.
+
+> +		if (i > n)
+> +			break;
+> +
+> +		desc->apic_ids[i] = loop_vcpu->vcpu_id;
+> +	}
+> +
+> +	if (!kvm_write_guest(kvm, gpa, desc, id_desc_size)) {
+> +		/* IDs were successfully written */
+> +		ghcb_set_sw_exit_info_1(ghcb, 0);
+> +		ghcb_set_sw_exit_info_2(ghcb, 0);
+> +	}
+> +
+> +	kvfree(desc);
+> +}
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
