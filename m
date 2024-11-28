@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-32641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75339DB07B
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:58:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722C19DB07C
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D34128191E
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 00:58:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1299FB235A2
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 00:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F55D13DB9F;
-	Thu, 28 Nov 2024 00:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CDAD14658D;
+	Thu, 28 Nov 2024 00:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ren8luT0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2QCVFgUT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC0F13A865
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 00:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F0413DBA0
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 00:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732755366; cv=none; b=ETfqQqmEihzGV7auxHDzjwqsd5W8s3zdv/g4QleaFDrffH8KQtUI+IfiTjaSRYDe/002Kx1SKPYKL4xfJeVazwH/ckzkXmJpR71QMY8Hkw7htSx77Ia1+EYlfWXMCTOQo5gjAJyoBlWOlZF5HfUxqkvOdzn0c7E3bq3R8NFQk5o=
+	t=1732755367; cv=none; b=S3s6K6xNA6YgtLZc7n3X5+U3eOl0aMBuasJ/q98eJ++1vTQcX5pgLDxT6JpGmSGEhW42LNOM4F2GKDeYyOI5QhydwKy3NWl5p/LJNIlcW9JZaEYHUhBbXSuEkxb9mE3VzgU+Aq0d+CIyX9+4odTsA+sW29sc+acgowkrNoqNyxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732755366; c=relaxed/simple;
-	bh=UOHD8P5jAo/tu9DZeP+a1DmnkO+B67XGDTnvDmQDwR8=;
+	s=arc-20240116; t=1732755367; c=relaxed/simple;
+	bh=aNYWrhV3+Hlqkeo6/DSEk9PQ+DunnQgH+0LyxQ37ZvY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KvoIaypvmZa7+5a8YSgAtOA3092UVp+SBfj9K0rU3g2CjTE2uBxGWV7g1Yul4wS2BwRVe2CR/TCAA7TUcxEaZf+kxAYW2olIUiSV9Kz9dj7MhohJZ7bapYQtG9tiCS5UidEC4YPBXPAoJkjO8SsdlL2HAQ6uadg5Q2Amc7DY5KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ren8luT0; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=I542vN0UtMJkOv4mM/TNiOF8vFOe2zFUhZ1TT0U7yFVniwk5Vfg9/53rokiGykd1H5KimIqWUrbIpzDteQ5nVlwPMzy+JRLXpQAswhZjyvtd8Qoqn1AAR+3Y5D4gBoEr9Y0apFtoMAU0U3jqv/gLtP/2AyU62XZ0Tri5jhVlcfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2QCVFgUT; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-212120f90e8so2633655ad.2
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 16:56:04 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea5447561bso309259a91.1
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 16:56:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732755364; x=1733360164; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732755365; x=1733360165; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ysvaIdmMpR/VmHKwcGzTb4HtexOKJ4Ghx7ZOeauEtvk=;
-        b=ren8luT097x+yMTLNnr2h+Aq0eFfU7344rbVXAxh6GR3/wR6SgbXCv8upO3F9dd6Tn
-         1sCZD9r2wNP8gIZAspKoycsfW/GHdjyJJkK9AhQJbbKLtP75E/fQVg83mJWFu1nMMBeS
-         l1y8rzWk5az2kpjv80rv+vJl6NfdnPxIMoDSotd+PT9nozU6BvRqcPitkCFq+1IwpMGc
-         2wHVLwlRmogTC6JCW0txzc/l/MLio6yiK0cp2g+xFB5mGatB5thgp9ggu2b0TgdQbuhw
-         cWF/nba4JMvwdtK2BtqVwKDBroj9Xx5ZrTCEgbCVMu1D6j5/m2xAIOzF0r9014YToNrg
-         eobg==
+        bh=m3N0I2xWsrfV4i9nnr3KT1Cpmm4B4GrEhZX0cF+2Gqk=;
+        b=2QCVFgUTqg42jrqoJJlSe69N1DGudTAzLkpZgLaDN+H94GlnnaSOsVn9F/mUxiqxnf
+         QhbECdSFLTqECkq6YppyZZ2bkUE9YTy37KWlPEYXxzqSIwVnfghbQ9NfoZ56EPFscgQU
+         /KUaYX7n9unHO40bBmYhF+I+ANnLCUSb9Wjfm4r15/RXgjLuJkhgyrCorrPElKj7RFFw
+         TzpaLecjBqY5Wxd6g6iCyowrWMK57SLaIcNJ1Es0Xd16bp7VzhMQajMp75+RJfhbBgp5
+         EA0ohdTE49Zkn9bobsd3FVcQma3YZhlsM40rSs2kqHIyMqSzqzjLwQoUKE4NO9zsNdKl
+         yxgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732755364; x=1733360164;
+        d=1e100.net; s=20230601; t=1732755365; x=1733360165;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ysvaIdmMpR/VmHKwcGzTb4HtexOKJ4Ghx7ZOeauEtvk=;
-        b=YOHCHN4bw0wI3hcArAaFlk56g6g33gBBxNTV/JdvZMGfL/Z6F/gQaBxP5T7FlXR41i
-         LGbRRnNmn7RCUfETuJXJKjBEJX9/crXSynKx4ZrQJhIorg08/y/EL9mO7rJMSZftY2Kx
-         u8zdkztinctJPTxis+iPJlvf/TwiMHYl7zj+WPaUg14rIzFt3hT3zbdvbrkarQKc8/lF
-         CVJjX2z7IUjk6SoAQL79cDwlvr/ZNN5gMqMPb4ofUi8vsd0UpGzI6iskOF7zpERome3/
-         pUELOpqTZYk+TfOWgiJupxjwEJaO8DzBa4yKDvOgvapjARSoCQiB/eEolVvRnBw5UQfz
-         EFKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVoLcc9NnSgPduzfy6F3WWHSumkMVY6AzRkpB/SNDutqIV6RXmt+6ZTslFv6wnwRsX7bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2N8hfGOD32MyPobv9CHA9w/+Q0c2lDPS0hZA5NdE5nb6ZGf+6
-	wRvDF+Yk0JOdvAtaNWUxysY6BNUV2dZAo4+LQ87ALj2l97ZOJBVxD8kSKpTusybPOALTe5SEp4u
-	HwQ==
-X-Google-Smtp-Source: AGHT+IE+ChL1KLorT8CIkfmIr19XCryd//IzNWr5z8aQi0CF/Qf3ZQTw4qD7deHM4fsaQ6e/45gZiVf87tA=
-X-Received: from plbmb7.prod.google.com ([2002:a17:903:987:b0:211:b7e:ba7d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e84f:b0:212:618a:461f
- with SMTP id d9443c01a7336-21501b5aed2mr63134555ad.41.1732755363732; Wed, 27
- Nov 2024 16:56:03 -0800 (PST)
+        bh=m3N0I2xWsrfV4i9nnr3KT1Cpmm4B4GrEhZX0cF+2Gqk=;
+        b=OMI/LGc0t1TD36WLm3lTJk3mlD0zJXqyGBkW94IiApvADWdBnQR5PtB4XDau3+OBjZ
+         eJMP9iPRfMnN2d8Gy1BXToPz/PLydWaPAJnJodgZUzejVEIUFG4HLRPviT2nQe5wud3p
+         PagNQzjpbylTJZvAkY1QOP11gxULwz/5uYYgthymiyF6Sdciif6ZgOGhP7P2FUhNtY9D
+         TpulDnoakgS57X/cXi2Ds5iW3mTRFFQsWsAQZ0NIrQ5Jo06uHThVUQNWmd6ikqLV22iF
+         jGzuG0MweBVkSnJ0EBB3CgGIDSlxj8kPoWghZrgqNIyLRIQxNuNsQGUl0ODkFGiVX1wJ
+         3T2w==
+X-Forwarded-Encrypted: i=1; AJvYcCW9SALMMf7htmzaTdPp89NbvBJ2ShJM4H0gP757UV16XcJAaNPXRLRNbYUzAQ6UoIOQxnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb1xOIeyVoi6y/lUa0+ASyZJEHmpPSMB+5KQZoI1a9OZH/r2jx
+	8TJ3YDcYT/dgkHEbVOgkPZ4ZXtqlxClj2SJPKm9YJ9s4wq6W2l/0ZYIfZtMCRPYlQSzuq22MoM7
+	7CA==
+X-Google-Smtp-Source: AGHT+IE4OA2YWpjZt4cUyGKEolrSn+wbKfMl6eazhCePp/W8mIleK1HW5p9Pm9svs3J06p9qg41Q+800XRI=
+X-Received: from pjbsn5.prod.google.com ([2002:a17:90b:2e85:b0:2da:5868:311c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:28c6:b0:2ea:6f96:6504
+ with SMTP id 98e67ed59e1d1-2ee08e9c7a3mr6508990a91.1.1732755365479; Wed, 27
+ Nov 2024 16:56:05 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 16:55:39 -0800
+Date: Wed, 27 Nov 2024 16:55:40 -0800
 In-Reply-To: <20241128005547.4077116-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128005547.4077116-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128005547.4077116-9-seanjc@google.com>
-Subject: [PATCH v4 08/16] KVM: sefltests: Explicitly include ucall_common.h in mmu_stress_test.c
+Message-ID: <20241128005547.4077116-10-seanjc@google.com>
+Subject: [PATCH v4 09/16] KVM: selftests: Enable mmu_stress_test on arm64
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -92,28 +92,32 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Muhammad Usama Anjum <usama.anjum@collabora.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Explicitly include ucall_common.h in the MMU stress test, as unlike arm64
-and x86-64, RISC-V doesn't include ucall_common.h in its processor.h, i.e.
-this will allow enabling the test on RISC-V.
+Enable the mmu_stress_test on arm64.  The intent was to enable the test
+across all architectures when it was first added, but a few goofs made it
+unrunnable on !x86.  Now that those goofs are fixed, at least for arm64,
+enable the test.
 
-Reported-by: Andrew Jones <ajones@ventanamicro.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
+Reviewed-by: James Houghton <jthoughton@google.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/mmu_stress_test.c | 1 +
+ tools/testing/selftests/kvm/Makefile | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 5467b12f5903..fbb693428a82 100644
---- a/tools/testing/selftests/kvm/mmu_stress_test.c
-+++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -15,6 +15,7 @@
- #include "test_util.h"
- #include "guest_modes.h"
- #include "processor.h"
-+#include "ucall_common.h"
- 
- static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
- {
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 4384e5f45c36..c59a337cd4da 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -180,6 +180,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+ TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+ TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
+ TEST_GEN_PROGS_aarch64 += memslot_perf_test
++TEST_GEN_PROGS_aarch64 += mmu_stress_test
+ TEST_GEN_PROGS_aarch64 += rseq_test
+ TEST_GEN_PROGS_aarch64 += set_memory_region_test
+ TEST_GEN_PROGS_aarch64 += steal_time
 -- 
 2.47.0.338.g60cca15819-goog
 
