@@ -1,208 +1,197 @@
-Return-Path: <kvm+bounces-32739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 854BD9DB469
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 10:00:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE129DB655
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 12:13:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F243A1647EF
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 09:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 093F1280FC1
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 11:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3705E15746F;
-	Thu, 28 Nov 2024 09:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0047197A8E;
+	Thu, 28 Nov 2024 11:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="P/Vh/rdh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HBVmfXoq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CB2156641
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 09:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E92C1946C8;
+	Thu, 28 Nov 2024 11:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732784407; cv=none; b=B6rFDHr4xgn31E30sBDMKbux3CRpZqFfU8O97KI3NVFHjp5L1QXd7IJRTpmRUETokJVVU5pOnS9taWf3UJyw4aMTSWM/pN2GBIQiJ3qMx1ej8JINIHdgIVpvgurKNmceSyOHOwzFfshtm8/kzreazj21SWmDWMpOVDfCFSCV5IM=
+	t=1732792407; cv=none; b=ms7RgsXIo+gQeiM1FIyapHR9WW51ixaUvmhRYYISMdb7/5hvXOIZGaD+NrbVKieeFrCYRmopFoWv/sg7qBnr6a2JwtCWMJUvU4cz45N4Tut8lEMcR/xadkzQp1yiW5klPX5thUSA1SEZOg88uMiGUxuBMgbJqAmRUR75pmpFbV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732784407; c=relaxed/simple;
-	bh=SZ1cAPREi8YkOAUu8EjRiSHv6wYYsHvKKWtDYq672/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E3s7szx9ADGNieteNhgV3CrX6PxOeQ3y8Nc69uWmm5GPld0N23ApsdOouV60GzHDdgbjZjhJxv4tVIGkY0JYl4DIpYkO6YsS1A5tf/zR7ZOKQLC01tlOxffLI9iURa9cNJ4XgrQb3mGUZp9OPk3z4vMbw7Gudf21CyQy7Mo0RN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=P/Vh/rdh; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53de79c2be4so560045e87.2
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:00:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732784404; x=1733389204; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oRwUYsVAjpoLFct6AU+sl41M7ai7g8VdSrVmZPLTLdY=;
-        b=P/Vh/rdhvdeRnFtyPcruTtnocJYm/rJAnnd0ATniNMqkgLu0hYV0Der6hR6wikWmgS
-         bhDmjHtGs3NIrzL6srPGjRzZbjkX5z7Gaqs0N8fajoSa/Eax/75EB5ZuH+Kwcr7CV/99
-         YshDhWJWIAT1vsFzp9/I7FYgScVNvXH0Qghd1VgqX0U0qQmqGID1lGNw1JQzsXc0XbbL
-         TBQOfjo/iQ97k9CWC7BhmLLSmyuJe5AgRGl7Ci2dYsoCxKtzKrnDNKSqt19pNyb4SRCv
-         JhZctPxC71X/OZHWM9kkhwPvRTXsugCE+aPWebNEyA2wcxNkXx2Oe/qWtBVs42eRMyh0
-         yenQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732784404; x=1733389204;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oRwUYsVAjpoLFct6AU+sl41M7ai7g8VdSrVmZPLTLdY=;
-        b=Z9N/lMWEaVARq4f83l9KXT7Qwb51oBLDyaJAoBOhROFaOJYMftLnNn/eRyGs5QF6np
-         9/xbr4noW8G/jq665gQxTHJ2GzIwuLGRdtNaAfkhhK/sAV7BXOA1Lgn81A9FEFFeCBRv
-         KCiDYsjz4d0oybFoJwqnMXeYCt6nnvdZdVGbGoAy9mbK1dcIJwBnB9IgpkYF5INwv/rj
-         PlV6kR0cjSPmSH53dby4/ZuDsSSbTT0dY2rI13Crr5xzfeWLLSNH4v6Xmw+qF6RdHiW+
-         wblj1mq2SKFMbJRjd4bjhM6rDMYmgg3LRuQG4g71srVesHnBzH8fET0bg5iSn2dojnU0
-         2Cfg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZQG5ToneCzg6lGcEgC9vnk83GH+g9InqXURNz5lq4wgB6j0CrWqcBRIjLnGiFqzy0BqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCBDlKyVlJRWnZt4OeSPxBCPUq5CJK/16eqZ8Wq4m3rfTgQpN0
-	glXgIF1PbY3EpcG9hd8bhHmu/dvKZl3CoFL6/IeIifmK5gVCd3G7mK4829RXEEM=
-X-Gm-Gg: ASbGncv8Cx9q5vI76VxQjyeetqKEhJV1KGHLhSjvMI0h5rOG2eJY++nyKOVjcJpTJHP
-	UQFc7Ww5iZF+0nD70UT7Oy5YBTPAIq0oEmHRwpk1fpdV8XoG1jBlkSGd7zNMUhn7vTi6iDnu/pm
-	dMd3FcS7a8k8rEELPQKsIb9di51gFtOzfyn8VbLVp7kzsSn+sFIEP3/nH35/dOy8T9eKX8lJUOu
-	TKtWcUQZsRNHkGsQySHaiiH9tzu0zluQeziqksFplSn1OBXGTR9cVTMH+PBezTUWaSYpm2qAQib
-	KeTaexLCGda3pEP5j+y9EIN5kpdH+Rl/gpg=
-X-Google-Smtp-Source: AGHT+IFvUjDbauPTmEibS/pMaTmIPzKett7QupGp+AywDNDr/16hkqdHs/Gybk1MALYq8E3o2q+udg==
-X-Received: by 2002:a05:6512:3b25:b0:53d:d12c:2f02 with SMTP id 2adb3069b0e04-53df00d1b38mr3726286e87.18.1732784403699;
-        Thu, 28 Nov 2024 01:00:03 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0dbf95fsm15201885e9.15.2024.11.28.01.00.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 01:00:03 -0800 (PST)
-Date: Thu, 28 Nov 2024 10:00:02 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: zhouquan@iscas.ac.cn
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 4/4] KVM: riscv: selftests: Add Svvptc/Zabha/Ziccrse exts
- to get-reg-list test
-Message-ID: <20241128-846f2b5fdfda9e1aa9e373ee@orel>
-References: <cover.1732762121.git.zhouquan@iscas.ac.cn>
- <21d3a5314a9cd6ac5b3aa445060ae2679a44c792.1732762121.git.zhouquan@iscas.ac.cn>
+	s=arc-20240116; t=1732792407; c=relaxed/simple;
+	bh=ivR3uh/oFQ81c6TBZDo1ukH/mLGSo3kuk7jrelkjKSg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dN8z5QigxZsL+DPU/v/0hgVe8Q11ByLIT7lVb3hwwrxzH0JJ8WV7MEJsgGs/naNmfFCQ38dUdEEvP1iUQLy/xB4c5bcyXvRKenwQ5KPPDU4+Z4Yf/dGPRSKDqYTDfzGwfrNFlaZY6tZMj1UlvW+yLKfGRyEzIDr5KNUd2gFJIsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HBVmfXoq; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732792406; x=1764328406;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=ivR3uh/oFQ81c6TBZDo1ukH/mLGSo3kuk7jrelkjKSg=;
+  b=HBVmfXoqUYqiCZyjjvVwAePS+f9JqlQjYfiWTlKDFpwHn+7jftQ6gX13
+   Q8pu/hhW0koTW/xdvKyZ8+8afrnLTottmcFF3F6ubL0yrvcsf1cawCN4I
+   /6EpBAGTvkrzzwU/skiCVEVfqqELmLM+cXQ1BkVAzn84uDHYzjEBo1q3z
+   FXmAvq0SaKIOplpUwX+1IbG5jv4rwr+8gCpANs+BuODwiIQlW61aqig7n
+   J5TvgrD/i5432SBXX2bBnxl9K5duLEHNwIWP7X6j5K4ix4p3hxwn/64fE
+   tSiY95mGQ9Smy+hWjJyAS6gmtYlomzntq9PLFtfHi5Nj47JZfGhD0GK1h
+   A==;
+X-CSE-ConnectionGUID: LUArCCShSy2R5zU4WEC1Pg==
+X-CSE-MsgGUID: znjdMegtQhy3iT/NAe8dJQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11269"; a="32390356"
+X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
+   d="scan'208";a="32390356"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 03:13:25 -0800
+X-CSE-ConnectionGUID: lUrviTJCRQypdDFPLbFCSA==
+X-CSE-MsgGUID: I8VCk0EJT6uU2d6giKjWgQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
+   d="scan'208";a="97170931"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 03:13:20 -0800
+Message-ID: <d1952eb7-8eb0-441b-85fc-3075c7b11cb9@intel.com>
+Date: Thu, 28 Nov 2024 13:13:11 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21d3a5314a9cd6ac5b3aa445060ae2679a44c792.1732762121.git.zhouquan@iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/7] x86/virt/tdx: Add SEAMCALL wrapper to enter/exit
+ TDX guest
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
+ seanjc@google.com, kvm@vger.kernel.org, dave.hansen@linux.intel.com
+Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
+ linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
+ chao.gao@intel.com, weijiang.yang@intel.com
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <20241121201448.36170-2-adrian.hunter@intel.com>
+ <fa817f29-e3ba-4c54-8600-e28cf6ab1953@intel.com>
+ <0226840c-a975-42a5-9ddf-a54da7ef8746@intel.com>
+ <56db8257-6da2-400d-8306-6e21d9af81f8@intel.com>
+Content-Language: en-US
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <56db8257-6da2-400d-8306-6e21d9af81f8@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 28, 2024 at 11:22:14AM +0800, zhouquan@iscas.ac.cn wrote:
-> From: Quan Zhou <zhouquan@iscas.ac.cn>
+On 25/11/24 15:40, Adrian Hunter wrote:
+> On 22/11/24 18:33, Dave Hansen wrote:
+>> On 11/22/24 03:10, Adrian Hunter wrote:
+>>> +struct tdh_vp_enter_tdcall {
+>>> +	u64	reg_mask	: 32,
+>>> +		vm_idx		:  2,
+>>> +		reserved_0	: 30;
+>>> +	u64	data[TDX_ERR_DATA_PART_2];
+>>> +	u64	fn;	/* Non-zero for hypercalls, zero otherwise */
+>>> +	u64	subfn;
+>>> +	union {
+>>> +		struct tdh_vp_enter_vmcall 		vmcall;
+>>> +		struct tdh_vp_enter_gettdvmcallinfo	gettdvmcallinfo;
+>>> +		struct tdh_vp_enter_mapgpa		mapgpa;
+>>> +		struct tdh_vp_enter_getquote		getquote;
+>>> +		struct tdh_vp_enter_reportfatalerror	reportfatalerror;
+>>> +		struct tdh_vp_enter_cpuid		cpuid;
+>>> +		struct tdh_vp_enter_mmio		mmio;
+>>> +		struct tdh_vp_enter_hlt			hlt;
+>>> +		struct tdh_vp_enter_io			io;
+>>> +		struct tdh_vp_enter_rd			rd;
+>>> +		struct tdh_vp_enter_wr			wr;
+>>> +	};
+>>> +};
+>>
+>> Let's say someone declares this:
+>>
+>> struct tdh_vp_enter_mmio {
+>> 	u64	size;
+>> 	u64	mmio_addr;
+>> 	u64	direction;
+>> 	u64	value;
+>> };
+>>
+>> How long is that going to take you to debug?
 > 
-> The KVM RISC-V allows Svvptc/Zabha/Ziccrse extensions for Guest/VM
-> so add them to get-reg-list test.
+> When adding a new hardware definition, it would be sensible
+> to check the hardware definition first before checking anything
+> else.
 > 
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> However, to stop existing members being accidentally moved,
+> could add:
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index 54ab484d0000..a697db1ff411 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -48,8 +48,10 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSNPM:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSTC:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVINVAL:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVVPTC:
-
-Alphabetic order, please.
-
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVNAPOT:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVPBMT:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZABHA:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZACAS:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZAWRS:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZBA:
-> @@ -69,6 +71,7 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFHMIN:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICBOM:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICBOZ:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICCRSE:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICNTR:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICOND:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZICSR:
-> @@ -423,8 +426,10 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
->  		KVM_ISA_EXT_ARR(SSNPM),
->  		KVM_ISA_EXT_ARR(SSTC),
->  		KVM_ISA_EXT_ARR(SVINVAL),
-> +		KVM_ISA_EXT_ARR(SVVPTC),
-
-Same comment as above.
-
->  		KVM_ISA_EXT_ARR(SVNAPOT),
->  		KVM_ISA_EXT_ARR(SVPBMT),
-> +		KVM_ISA_EXT_ARR(ZABHA),
->  		KVM_ISA_EXT_ARR(ZACAS),
->  		KVM_ISA_EXT_ARR(ZAWRS),
->  		KVM_ISA_EXT_ARR(ZBA),
-> @@ -444,6 +449,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
->  		KVM_ISA_EXT_ARR(ZFHMIN),
->  		KVM_ISA_EXT_ARR(ZICBOM),
->  		KVM_ISA_EXT_ARR(ZICBOZ),
-> +		KVM_ISA_EXT_ARR(ZICCRSE),
->  		KVM_ISA_EXT_ARR(ZICNTR),
->  		KVM_ISA_EXT_ARR(ZICOND),
->  		KVM_ISA_EXT_ARR(ZICSR),
-> @@ -956,8 +962,10 @@ KVM_ISA_EXT_SIMPLE_CONFIG(sscofpmf, SSCOFPMF);
->  KVM_ISA_EXT_SIMPLE_CONFIG(ssnpm, SSNPM);
->  KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
->  KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(svvptc, SVVPTC);
-
-Same comment as above.
-
->  KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
->  KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zabha, ZABHA);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zacas, ZACAS);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zawrs, ZAWRS);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
-> @@ -977,6 +985,7 @@ KVM_ISA_EXT_SIMPLE_CONFIG(zfh, ZFH);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zfhmin, ZFHMIN);
->  KVM_ISA_EXT_SUBLIST_CONFIG(zicbom, ZICBOM);
->  KVM_ISA_EXT_SUBLIST_CONFIG(zicboz, ZICBOZ);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(ziccrse, ZICCRSE);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zicntr, ZICNTR);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zicond, ZICOND);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zicsr, ZICSR);
-> @@ -1021,8 +1030,10 @@ struct vcpu_reg_list *vcpu_configs[] = {
->  	&config_ssnpm,
->  	&config_sstc,
->  	&config_svinval,
-> +	&config_svvptc,
-
-Same comment as above.
-
->  	&config_svnapot,
->  	&config_svpbmt,
-> +	&config_zabha,
->  	&config_zacas,
->  	&config_zawrs,
->  	&config_zba,
-> @@ -1042,6 +1053,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
->  	&config_zfhmin,
->  	&config_zicbom,
->  	&config_zicboz,
-> +	&config_ziccrse,
->  	&config_zicntr,
->  	&config_zicond,
->  	&config_zicsr,
-> -- 
-> 2.34.1
+> #define CHECK_OFFSETS_EQ(reg, member) \
+> 	BUILD_BUG_ON(offsetof(struct tdx_module_args, reg) != offsetof(union tdh_vp_enter_args, member));
+> 
+> 	CHECK_OFFSETS_EQ(r12, tdcall.mmio.size);
+> 	CHECK_OFFSETS_EQ(r13, tdcall.mmio.direction);
+> 	CHECK_OFFSETS_EQ(r14, tdcall.mmio.mmio_addr);
+> 	CHECK_OFFSETS_EQ(r15, tdcall.mmio.value);
 > 
 
-Otherwise,
+Note, struct tdh_vp_enter_tdcall is an output format.  The tdcall
+arguments come directly from the guest with no validation by the
+TDX Module.  It could be rubbish, or even malicious rubbish.  The
+exit handlers validate the values before using them.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+WRT the TDCALL input format (response by the host VMM), 'ret_code'
+and 'failed_gpa' could use types other than 'u64', but the other
+members are really 'u64'.
 
-Thanks,
-drew
+/* TDH.VP.ENTER Input Format #2 : Following a previous TDCALL(TDG.VP.VMCALL) */
+struct tdh_vp_enter_in {
+	u64	__vcpu_handle_and_flags; /* Don't use. tdh_vp_enter() will take care of it */
+	u64	unused[3];
+	u64	ret_code;
+	union {
+		u64 gettdvmcallinfo[4];
+		struct {
+			u64	failed_gpa;
+		} mapgpa;
+		struct {
+			u64	unused;
+			u64	eax;
+			u64	ebx;
+			u64	ecx;
+			u64	edx;
+		} cpuid;
+		/* Value read for IO, MMIO or RDMSR */
+		struct {
+			u64	value;
+		} read;
+	};
+};
+
+Another different alternative could be to use an opaque structure,
+not visible to KVM, and then all accesses to it become helper
+functions like:
+
+struct tdx_args;
+
+int tdx_args_get_mmio(struct tdx_args *args,
+		      enum tdx_access_size *size,
+		      enum tdx_access_dir *direction,
+		      gpa_t *addr,
+		      u64 *value);
+
+void tdx_args_set_failed_gpa(struct tdx_args *args, gpa_t gpa);
+void tdx_args_set_ret_code(struct tdx_args *args, enum tdx_ret_code ret_code);
+etc
+
+For the 'get' functions, that would tend to imply the helpers
+would do some validation.
+
 
