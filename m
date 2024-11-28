@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-32684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843E49DB107
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:43:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035479DB109
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 02:43:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4518F281578
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7BFB281918
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 01:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE690136349;
-	Thu, 28 Nov 2024 01:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E6E136357;
+	Thu, 28 Nov 2024 01:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Bl9grH4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IezYaAlY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012301BC065
-	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A16C1BBBFE
+	for <kvm@vger.kernel.org>; Thu, 28 Nov 2024 01:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732757732; cv=none; b=RZmGS5mrVL3GMqM01KYXXbqB4gqwNt3hQ8/qQM5ivXk9Ontez+s9Fy/Aiz6cjLsDVuwWeC7ZDiNR3bkDMHMLaWcQvrpXYcRfgKySMM1abDPT3LVYrDBRFL9zaqx/Ndf4ZJxjFeqdcTgkQsKstt3IioVKu64aBKgu50wsiA+TbmM=
+	t=1732757733; cv=none; b=EBnTii/BpzKpMmGYBOZ96GbCa0bqg03LrOkSxwapzm059qfV+ssNqQQnH6yTiyHf9/+Tb8qy31A1HP9+5PdBjwiwpb12BvNO58yYeplKuEF32jMB5qm8PI629uV0jjUC32ToULaO2P1cISjytjgWAKWqXBOe/wiw7UMfE9CPwSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732757732; c=relaxed/simple;
-	bh=BOHi8A/5hb/uwqJQxiyLaa5+Aw1vNkUaQHewXa+IN4g=;
+	s=arc-20240116; t=1732757733; c=relaxed/simple;
+	bh=9eO98SZn2mDFLD1a3Lz5wd31zTEPCDCMMncDFhOl7eI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mWh1ii0fiHMQu355Bmj/F3koND1bkDYOCrXEa49LChZtLsqTZPIePjJz36JUp+5+jnW+10AHtPBNOv1Uabaj2HCSzQjT/6Q2tyHeYo0V949CQHQzb/Id0qcCPLGokU1f3EZ2BwGE3tVhrkRKuN7z1d2mIumTcBu+AiNIREychfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Bl9grH4; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=iNMrNshUOyYYKGeJxl9zqr2CQty0YwdmflnX/s/Bwll1Hq8lMQXlW0bJ7/0UTdEIIlLzLuqdwrFeHm1L3Zu8Fl2jlwnfqIrnwbLTES+oIk9Y3VDM/dwY/SXyhVOgPlM4fBWh0UFZBMDQyF8upxNuQAIvwiygmV8ZDd50VxdF0i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IezYaAlY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ea41a5bfe7so382320a91.2
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:29 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2122b6cadb1so2445485ad.1
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2024 17:35:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732757729; x=1733362529; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732757731; x=1733362531; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=e4Pxe3blf9Y2K2ZdQ0svEc3rVQZBDN07Z0zGnrD9RNo=;
-        b=0Bl9grH4YNcLs/dya1GuMGZrqv8AhOWUGUNIx73ybvuiRodJ/bi1DETbVHYogZf3fI
-         MA9crns+zRWkCxng/Fn911ujByfjPhjpSmqVQNO5QhHRnChCqp1EsgqxEPGEG3BUWMDS
-         3rcVDL8J3gC/VjUIK3kmlNxxpmSbG8umiLSU7XSQe6vNrcU6UVYWhtvE6Q0RhsbvPvWn
-         eWsyWNgBLSXfCLd9anDS78tUSA+HCJ2jWqa7IOoGwxtCdEWBqvuH23rPWKpLF6cub2h+
-         R+OY8vSyQOthbA+jBwsWmkDhTtXkDhkb5ZafelqYtYogc7PfxA+kFauRM4+YRqq0mpqe
-         Kcdw==
+        bh=OqeKjXj1sUTvQY70HXizSZvJm3WZ8z59TPWcZBFHU5k=;
+        b=IezYaAlYnPIadFBByKkmzDcKk2oBBtACofkVtDBLBWuZMKKLIYr6Cfqig9KCmRr8JR
+         rCPq7DUuhS2PEN6Zw9kEgb+UU5MXB934P659L/HXQkmkLn3x4BP0AmDCR9GfX9NG1dMK
+         HcE4IA8IWUPLf/6U443XZAPDJyQTGeWoM6z3Rxd6DA79tA5l2I2bOd4JYvXLRXtOQwa6
+         eusEnbvZU/IRkh8e9tEIfkY4eaM82lNEzD5OYPsf//heZFTiaiRhdgf2ZL03p1XyEKlZ
+         aD2rSLIRXZfPF1Jx5SfkNI4LZa5s6zN3uNj4jJf3FIeHRH95sMO+MsABo76EIYkT/IY5
+         jjNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732757729; x=1733362529;
+        d=1e100.net; s=20230601; t=1732757731; x=1733362531;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=e4Pxe3blf9Y2K2ZdQ0svEc3rVQZBDN07Z0zGnrD9RNo=;
-        b=UuzPVfPV6vV1T2DePqnlIraVtM3jBmR2XK6RPFK1RT+VqQj+htFIb/6w/9aS+HRiE2
-         v5vOso7Qach2bSxbzozGi1M25yqZ7+8WkAJnidh7t43736gEdBzlIgzwCAkx2igxWtjm
-         W9WjpvBi12+a4PyEFujk1lKiEfF5GuDu3/98ZpkCSFvmzwwTNyx2725/8xo+p20L0MjB
-         1Xmf38BRi8U+63UvaYtLVJYI2/FA7EF7L1syhaLQgSkTF1udNw2cUVLAfUHL8u/gaWUj
-         BgFPwr1EwGEBr/dvr3V0BFS6czylBsGDeu/9n16MaMZkB1F7aJohlBWeUWDS6V3oHtOp
-         +Lmw==
-X-Gm-Message-State: AOJu0Yy0wskvSU7hrYO4tBAa0g+ZHu6ssfpRptn6vqSlYAQMMI/Zrbuu
-	uXM7PMGkks00fdtjkeWt8T7SLSUDJ5XiSaKIPStnkZy3MDzvmbs6/GXvtcABZgEwdu/Ms30G+UR
-	0Cw==
-X-Google-Smtp-Source: AGHT+IEnvoM381gdCbGWtUi0oTubctHex7MPrIE2lhUB8O05uWg05gWZ4NuG6KJ+kdgPCwTpqiqPkelQPuw=
-X-Received: from pjbee11.prod.google.com ([2002:a17:90a:fc4b:b0:2da:ac73:93dd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b51:b0:2ea:88d4:a0cb
- with SMTP id 98e67ed59e1d1-2ee08eb2f50mr7301304a91.16.1732757729231; Wed, 27
- Nov 2024 17:35:29 -0800 (PST)
+        bh=OqeKjXj1sUTvQY70HXizSZvJm3WZ8z59TPWcZBFHU5k=;
+        b=WvTjFI+HcjrkmzePrIeHbGwhP5+zWvsnNB0Yt738VFv2HBtjmJbbcDOGV9dzs1wlps
+         Qq3uLnzFHfveB7Jwv8MaBCrzJSF4R7NW3JETDPD3M+Q3KY/CE/mLb5e0WFzQKjgBn3a7
+         f+IZ6L5MzOb1C60zUrcIuyvRA/aRBk7FTdYfTLV61VIcPkKRe/Hdp5D3JfgnMyzILTZM
+         6R/sl/mzxtqOPKmLUJ4N9t5eUA2wjU28TMmT+7ufzXgXFBy+nn0v57RFevkCJroD9JXl
+         5Lqhfi2JOjPyBTRu9yo3UIzd175xONXaMWa3xk2mJgRFfgF1XtySCmZ652N3JjSNElQx
+         Qn5g==
+X-Gm-Message-State: AOJu0YxDkzAJdu7hJZDUlev58J8lkze7hU/7rSa/jmh78hqtz5cBZJE3
+	+pK+9sje0AkHVHQyFsAUwqa/eADRm/LINZXMs4UwR8a9tWTcc0DinHXYp5ONgjWZjvlFqMrezOb
+	fqA==
+X-Google-Smtp-Source: AGHT+IEPTOpAoWzmwmNnAQ0v/L+7xK9RC0l6auKMFc9n+NhMbuz72rWokNPQIE61N4EBAXYYWy5nTfKjJIY=
+X-Received: from pfwz6.prod.google.com ([2002:a05:6a00:1d86:b0:725:301d:d8b3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:990:b0:20c:a19b:8ddd
+ with SMTP id d9443c01a7336-21501e68df9mr69619085ad.51.1732757731031; Wed, 27
+ Nov 2024 17:35:31 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 17:34:00 -0800
+Date: Wed, 27 Nov 2024 17:34:01 -0800
 In-Reply-To: <20241128013424.4096668-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128013424.4096668-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128013424.4096668-34-seanjc@google.com>
-Subject: [PATCH v3 33/57] KVM: x86: Remove unnecessary caching of KVM's PV
- CPUID base
+Message-ID: <20241128013424.4096668-35-seanjc@google.com>
+Subject: [PATCH v3 34/57] KVM: x86: Always operate on kvm_vcpu data in cpuid_entry2_find()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>
@@ -89,97 +88,211 @@ Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM only searches for KVM's PV CPUID base when userspace sets
-guest CPUID, drop the cache and simply do the search every time.
+Now that KVM sets vcpu->arch.cpuid_{entries,nent} before processing the
+incoming CPUID entries during KVM_SET_CPUID{,2}, drop the @entries and
+@nent params from cpuid_entry2_find() and unconditionally operate on the
+vCPU state.
 
-Practically speaking, this is a nop except for situations where userspace
-sets CPUID _after_ running the vCPU, which is anything but a hot path,
-e.g. QEMU does so only when hotplugging a vCPU.  And on the flip side,
-caching guest CPUID information, especially information that is used to
-query/modify _other_ CPUID state, is inherently dangerous as it's all too
-easy to use stale information, i.e. KVM should only cache CPUID state when
-the performance and/or programming benefits justify it.
+No functional change intended.
 
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/cpuid.c            | 34 ++++++++-------------------------
- 2 files changed, 8 insertions(+), 27 deletions(-)
+ arch/x86/kvm/cpuid.c | 62 +++++++++++++++-----------------------------
+ 1 file changed, 21 insertions(+), 41 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e159e44a6a1b..f076df9f18be 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -854,7 +854,6 @@ struct kvm_vcpu_arch {
- 
- 	int cpuid_nent;
- 	struct kvm_cpuid_entry2 *cpuid_entries;
--	struct kvm_hypervisor_cpuid kvm_cpuid;
- 	bool is_amd_compatible;
- 
- 	/*
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 3ba0e6a67823..b402b9f59cbb 100644
+index b402b9f59cbb..af5c66408c78 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -168,12 +168,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
+@@ -70,8 +70,8 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+  */
+ #define KVM_CPUID_INDEX_NOT_SIGNIFICANT -1ull
  
- 	/*
- 	 * Apply runtime CPUID updates to the incoming CPUID entries to avoid
--	 * false positives due mismatches on KVM-owned feature flags.  Note,
--	 * runtime CPUID updates may consume other CPUID-driven vCPU state,
--	 * e.g. KVM or Xen CPUID bases.  Updating runtime state before full
--	 * CPUID processing is functionally correct only because any change in
--	 * CPUID is disallowed, i.e. using stale data is ok because the below
--	 * checks will reject the change.
-+	 * false positives due mismatches on KVM-owned feature flags.
- 	 *
- 	 * Note!  @e2 and @nent track the _old_ CPUID entries!
+-static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+-	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u64 index)
++static struct kvm_cpuid_entry2 *cpuid_entry2_find(struct kvm_vcpu *vcpu,
++						  u32 function, u64 index)
+ {
+ 	struct kvm_cpuid_entry2 *e;
+ 	int i;
+@@ -88,8 +88,8 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
  	 */
-@@ -231,28 +226,16 @@ static struct kvm_hypervisor_cpuid kvm_get_hypervisor_cpuid(struct kvm_vcpu *vcp
- 					  vcpu->arch.cpuid_nent, sig);
+ 	lockdep_assert_irqs_enabled();
+ 
+-	for (i = 0; i < nent; i++) {
+-		e = &entries[i];
++	for (i = 0; i < vcpu->arch.cpuid_nent; i++) {
++		e = &vcpu->arch.cpuid_entries[i];
+ 
+ 		if (e->function != function)
+ 			continue;
+@@ -123,8 +123,6 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 
+ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpuid_entry2 *entries = vcpu->arch.cpuid_entries;
+-	int nent = vcpu->arch.cpuid_nent;
+ 	struct kvm_cpuid_entry2 *best;
+ 	u64 xfeatures;
+ 
+@@ -132,7 +130,7 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
+ 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+ 	 * canonical address checks; exit if it is ever changed.
+ 	 */
+-	best = cpuid_entry2_find(entries, nent, 0x80000008,
++	best = cpuid_entry2_find(vcpu, 0x80000008,
+ 				 KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 	if (best) {
+ 		int vaddr_bits = (best->eax & 0xff00) >> 8;
+@@ -145,7 +143,7 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
+ 	 * Exposing dynamic xfeatures to the guest requires additional
+ 	 * enabling in the FPU, e.g. to expand the guest XSAVE state size.
+ 	 */
+-	best = cpuid_entry2_find(entries, nent, 0xd, 0);
++	best = cpuid_entry2_find(vcpu, 0xd, 0);
+ 	if (!best)
+ 		return 0;
+ 
+@@ -191,15 +189,15 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
+ 	return 0;
  }
  
--static struct kvm_cpuid_entry2 *__kvm_find_kvm_cpuid_features(struct kvm_cpuid_entry2 *entries,
--							      int nent, u32 kvm_cpuid_base)
+-static struct kvm_hypervisor_cpuid __kvm_get_hypervisor_cpuid(struct kvm_cpuid_entry2 *entries,
+-							      int nent, const char *sig)
++static struct kvm_hypervisor_cpuid kvm_get_hypervisor_cpuid(struct kvm_vcpu *vcpu,
++							    const char *sig)
+ {
+ 	struct kvm_hypervisor_cpuid cpuid = {};
+ 	struct kvm_cpuid_entry2 *entry;
+ 	u32 base;
+ 
+ 	for_each_possible_hypervisor_cpuid_base(base) {
+-		entry = cpuid_entry2_find(entries, nent, base, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
++		entry = cpuid_entry2_find(vcpu, base, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 
+ 		if (entry) {
+ 			u32 signature[3];
+@@ -219,13 +217,6 @@ static struct kvm_hypervisor_cpuid __kvm_get_hypervisor_cpuid(struct kvm_cpuid_e
+ 	return cpuid;
+ }
+ 
+-static struct kvm_hypervisor_cpuid kvm_get_hypervisor_cpuid(struct kvm_vcpu *vcpu,
+-							    const char *sig)
 -{
--	return cpuid_entry2_find(entries, nent, kvm_cpuid_base | KVM_CPUID_FEATURES,
--				 KVM_CPUID_INDEX_NOT_SIGNIFICANT);
--}
--
--static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
--{
--	u32 base = vcpu->arch.kvm_cpuid.base;
--
--	if (!base)
--		return NULL;
--
--	return __kvm_find_kvm_cpuid_features(vcpu->arch.cpuid_entries,
--					     vcpu->arch.cpuid_nent, base);
+-	return __kvm_get_hypervisor_cpuid(vcpu->arch.cpuid_entries,
+-					  vcpu->arch.cpuid_nent, sig);
 -}
 -
  static u32 kvm_apply_cpuid_pv_features_quirk(struct kvm_vcpu *vcpu)
  {
--	struct kvm_cpuid_entry2 *best = kvm_find_kvm_cpuid_features(vcpu);
-+	struct kvm_hypervisor_cpuid kvm_cpuid;
-+	struct kvm_cpuid_entry2 *best;
+ 	struct kvm_hypervisor_cpuid kvm_cpuid;
+@@ -249,23 +240,22 @@ static u32 kvm_apply_cpuid_pv_features_quirk(struct kvm_vcpu *vcpu)
+  * Calculate guest's supported XCR0 taking into account guest CPUID data and
+  * KVM's supported XCR0 (comprised of host's XCR0 and KVM_SUPPORTED_XCR0).
+  */
+-static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
++static u64 cpuid_get_supported_xcr0(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *best;
  
-+	kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
-+	if (!kvm_cpuid.base)
-+		return 0;
-+
-+	best = kvm_find_cpuid_entry(vcpu, kvm_cpuid.base | KVM_CPUID_FEATURES);
+-	best = cpuid_entry2_find(entries, nent, 0xd, 0);
++	best = cpuid_entry2_find(vcpu, 0xd, 0);
  	if (!best)
  		return 0;
  
-@@ -483,7 +466,6 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	if (r)
- 		goto err;
+ 	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
+ }
  
--	vcpu->arch.kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
- #ifdef CONFIG_KVM_XEN
- 	vcpu->arch.xen.cpuid = kvm_get_hypervisor_cpuid(vcpu, XEN_SIGNATURE);
- #endif
+-static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
+-				       int nent)
++void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *best;
+ 
+-	best = cpuid_entry2_find(entries, nent, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
++	best = cpuid_entry2_find(vcpu, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 	if (best) {
+ 		/* Update OSXSAVE bit */
+ 		if (boot_cpu_has(X86_FEATURE_XSAVE))
+@@ -276,43 +266,36 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+ 			   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
+ 	}
+ 
+-	best = cpuid_entry2_find(entries, nent, 7, 0);
++	best = cpuid_entry2_find(vcpu, 7, 0);
+ 	if (best && boot_cpu_has(X86_FEATURE_PKU) && best->function == 0x7)
+ 		cpuid_entry_change(best, X86_FEATURE_OSPKE,
+ 				   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
+ 
+-	best = cpuid_entry2_find(entries, nent, 0xD, 0);
++	best = cpuid_entry2_find(vcpu, 0xD, 0);
+ 	if (best)
+ 		best->ebx = xstate_required_size(vcpu->arch.xcr0, false);
+ 
+-	best = cpuid_entry2_find(entries, nent, 0xD, 1);
++	best = cpuid_entry2_find(vcpu, 0xD, 1);
+ 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+ 		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+ 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+ 
+ 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
+-		best = cpuid_entry2_find(entries, nent, 0x1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
++		best = cpuid_entry2_find(vcpu, 0x1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 		if (best)
+ 			cpuid_entry_change(best, X86_FEATURE_MWAIT,
+ 					   vcpu->arch.ia32_misc_enable_msr &
+ 					   MSR_IA32_MISC_ENABLE_MWAIT);
+ 	}
+ }
+-
+-void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+-{
+-	__kvm_update_cpuid_runtime(vcpu, vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
+-}
+ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+ 
+ static bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu)
+ {
+ #ifdef CONFIG_KVM_HYPERV
+-	struct kvm_cpuid_entry2 *entries = vcpu->arch.cpuid_entries;
+-	int nent = vcpu->arch.cpuid_nent;
+ 	struct kvm_cpuid_entry2 *entry;
+ 
+-	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
++	entry = cpuid_entry2_find(vcpu, HYPERV_CPUID_INTERFACE,
+ 				  KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 	return entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX;
+ #else
+@@ -370,8 +353,7 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		kvm_apic_set_version(vcpu);
+ 	}
+ 
+-	vcpu->arch.guest_supported_xcr0 =
+-		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
++	vcpu->arch.guest_supported_xcr0 = cpuid_get_supported_xcr0(vcpu);
+ 
+ 	vcpu->arch.pv_cpuid.features = kvm_apply_cpuid_pv_features_quirk(vcpu);
+ 
+@@ -1756,16 +1738,14 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
+ 						    u32 function, u32 index)
+ {
+-	return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
+-				 function, index);
++	return cpuid_entry2_find(vcpu, function, index);
+ }
+ EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry_index);
+ 
+ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
+ 					      u32 function)
+ {
+-	return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
+-				 function, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
++	return cpuid_entry2_find(vcpu, function, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ }
+ EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
+ 
 -- 
 2.47.0.338.g60cca15819-goog
 
