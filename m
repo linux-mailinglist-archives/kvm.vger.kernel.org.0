@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-32745-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32746-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0FA9DB8A1
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 14:29:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8274A9DB8A5
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 14:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5767284475
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 13:29:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425C028497C
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2024 13:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2D51AA1E2;
-	Thu, 28 Nov 2024 13:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EBA1ADFF9;
+	Thu, 28 Nov 2024 13:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODuhXW8s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIUPHRE7"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC4C158527;
-	Thu, 28 Nov 2024 13:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3201AB533;
+	Thu, 28 Nov 2024 13:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732800534; cv=none; b=swah8mQpLV8thpWqAsmpHIdvaQ/Ek9MMNK3AyGZf7pZPKJplw1eA5558nqhSLtnBVI7nKupnxJkakDmO7zQBS6KAn3Dt2LPveeAs4/bkUhM9hMi+RaucvkqJvRr1TgpYFAMKy1Xd389unfPkKkvaO6IiTEIIIvaIHc6y6SLZNOQ=
+	t=1732800540; cv=none; b=Z5Aj7MMTE3FnQRCfYV2OSBSG5DjLC3q/d1gXVW07r7WFR51O324GTKrHadCY0LyePJwG0wjptbZx1k1ZZ5LYXfoXX/2jKr5Ep0r5XkYxfhMo8fNW2YUqpIFnVvD7D7ZDdj1RmLHTzf0nnYbiJ6U/eQDOPZn9roswm7w7qPlL6Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732800534; c=relaxed/simple;
-	bh=kC5eLhZuyJCGOCJxjU3EcU2Kl6QdCahcb46ZCgO3eGA=;
+	s=arc-20240116; t=1732800540; c=relaxed/simple;
+	bh=I1ID2WIuqHpOcZgLW8clxhoQ8zafa7qAXA+I09IFfNM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NlEuiReWf/k4y0o/86y3jUIb/QtKAB8JbzjgxxS6ZLask5iYhLUyR0uC2OrOXUYeE7nbxdvu3SNT2jZl94MfxixrfZkDY1ruhqbamhI/P8hgrD/vqLgejavVDiZ04SMvJWaK6A0VPbygctrZmq32VO16WqZ+RzAEsSdWju/pl24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODuhXW8s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9238EC4CED2;
-	Thu, 28 Nov 2024 13:28:49 +0000 (UTC)
+	 MIME-Version; b=bwbaImLAvXtTYQbtNbJtNh0AwS1lkwR3IpM26MBgxbKqsqp2saySr2zRmaVn/wGF91SYgHEUawr4NnQi1ZsG47Bbu5GRYnDWjUnn8r312T+1hY538xWSs/Aa0Jb2KPKUsbmFghsorGLPl2MEfWmqEG9qfM8TkpA8dbE4xP6l9Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIUPHRE7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6D1C4CED4;
+	Thu, 28 Nov 2024 13:28:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732800534;
-	bh=kC5eLhZuyJCGOCJxjU3EcU2Kl6QdCahcb46ZCgO3eGA=;
+	s=k20201202; t=1732800539;
+	bh=I1ID2WIuqHpOcZgLW8clxhoQ8zafa7qAXA+I09IFfNM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ODuhXW8su3Y/op7ZHDn5XHKC2c6xFjMTOdBBy0p/DMDsoMI3ae3IY+cwNZ0Rgyuca
-	 BXZjH2KGcAeujLXEGxPGNCWbSRYyAznEMtvr8TKfrQEuvYr8Uxt33Wqrog/p0+oIFX
-	 vTR4Rbk1HfChPqWTKw9bHPxUqVxSec9MNI9Xv3rpHhtSZtBkuAKZMBb7vIE5RK0Yzu
-	 SfmbxDe9OuNxPtQlDAluwn/jx/yQqY4Uvd3Ryq3Z0tHXT8qfOpWWN8/nVuDJGRsbyL
-	 bo0AuRP1gqsXmyEjMwV4Ji78JdeB6aA6FzH1kyIgoEhohHzWLH0FoM7WIhlDp2DB0B
-	 tLHs4TtxCmH0A==
+	b=vIUPHRE7entb9mnNYgvr81LaD3zOMSV5SSkp7vV/fPRp0PTTmMaH+16L4W/m00+f5
+	 oqgtM665qYGS570CrPZF1U7ZGbXv6Gi6as6hHiMQtA9UgI9U5sztXRXaZO4XulmCY8
+	 jPrRU4TeR7YDL8vuzGAsjQ7Yz0qnTz/y7SVk+9/LwesZ/2x6PnRmi5XAyP2C+6NcCX
+	 0vBuxaJeExBXYNB2ZbAdPiS9qmb1e4eTs6Kh99iU2pR+lAdHXRUeP3SFhGP0UJH4jG
+	 V3uehfd6XS9E06iCz27V7bf0yz6hgIBgI/kA+KFDJVzVCK+922v/GIxDTiZXnqErZi
+	 kRdgfJ6DB5VUg==
 From: Amit Shah <amit@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
@@ -67,9 +67,9 @@ Cc: amit.shah@amd.com,
 	david.kaplan@amd.com,
 	dwmw@amazon.co.uk,
 	andrew.cooper3@citrix.com
-Subject: [RFC PATCH v3 1/2] x86: cpu/bugs: add AMD ERAPS support; hardware flushes RSB
-Date: Thu, 28 Nov 2024 14:28:33 +0100
-Message-ID: <20241128132834.15126-2-amit@kernel.org>
+Subject: [RFC PATCH v3 2/2] x86: kvm: svm: advertise ERAPS (larger RSB) support to guests
+Date: Thu, 28 Nov 2024 14:28:34 +0100
+Message-ID: <20241128132834.15126-3-amit@kernel.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241128132834.15126-1-amit@kernel.org>
 References: <cover.1732219175.git.jpoimboe@kernel.org>
@@ -84,87 +84,180 @@ Content-Transfer-Encoding: 8bit
 
 From: Amit Shah <amit.shah@amd.com>
 
-When Automatic IBRS is disabled, Linux flushed the RSB on every context
-switch.  This RSB flush is not necessary in software with the ERAPS
-feature on Zen5+ CPUs that flushes the RSB in hardware on a context
-switch (triggered by mov-to-CR3).
+AMD CPUs with the ERAPS feature (Zen5+) have a larger RSB (aka RAP).
+While the new default RSB size is used on the host without any software
+modification necessary, the RSB size for guests is limited to the older
+value (32 entries) for backwards compatibility.  With this patch, KVM
+enables guest mode to also use the default number of entries by setting
+the new ALLOW_LARGER_RAP bit in the VMCB.
 
-Additionally, the ERAPS feature also tags host and guest addresses in
-the RSB - eliminating the need for software flushing of the RSB on
-VMEXIT.
+The two cases for backward compatibility that need special handling are
+nested guests, and guests using shadow paging (or when NPT is disabled):
 
-Disable all RSB flushing by Linux when the CPU has ERAPS.
+For nested guests: the ERAPS feature adds host/guest tagging to entries
+in the RSB, but does not distinguish between ASIDs.  On a nested exit,
+the L0 hypervisor instructs the hardware (via another new VMCB bit,
+FLUSH_RAP_ON_VMRUN) to flush the RSB on the next VMRUN to prevent RSB
+poisoning attacks from an L2 guest to an L1 guest.  With that in place,
+this feature can be exposed to guests.
 
-Feature mentioned in AMD PPR 57238.  Will be resubmitted once APM is
-public - which I'm told is imminent.
+For shadow paging guests: do not expose this feature to guests; only
+expose if nested paging is enabled, to ensure a context switch within
+a guest triggers a context switch on the CPU -- thereby ensuring guest
+context switches flush guest RSB entries.  For shadow paging, the CPU's
+CR3 is not used for guest processes, and hence cannot benefit from this
+feature.
 
 Signed-off-by: Amit Shah <amit.shah@amd.com>
 ---
- Documentation/admin-guide/hw-vuln/spectre.rst | 5 +++--
- arch/x86/include/asm/cpufeatures.h            | 1 +
- arch/x86/kernel/cpu/bugs.c                    | 6 +++++-
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/svm.h |  6 +++++-
+ arch/x86/kvm/cpuid.c       | 18 ++++++++++++++++--
+ arch/x86/kvm/svm/svm.c     | 29 +++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h     | 15 +++++++++++++++
+ 4 files changed, 65 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/admin-guide/hw-vuln/spectre.rst b/Documentation/admin-guide/hw-vuln/spectre.rst
-index 132e0bc6007e..647c10c0307a 100644
---- a/Documentation/admin-guide/hw-vuln/spectre.rst
-+++ b/Documentation/admin-guide/hw-vuln/spectre.rst
-@@ -417,9 +417,10 @@ The possible values in this file are:
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 2b59b9951c90..f8584a63c859 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -129,7 +129,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	u64 tsc_offset;
+ 	u32 asid;
+ 	u8 tlb_ctl;
+-	u8 reserved_2[3];
++	u8 erap_ctl;
++	u8 reserved_2[2];
+ 	u32 int_ctl;
+ 	u32 int_vector;
+ 	u32 int_state;
+@@ -175,6 +176,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define TLB_CONTROL_FLUSH_ASID 3
+ #define TLB_CONTROL_FLUSH_ASID_LOCAL 7
  
-   - Return stack buffer (RSB) protection status:
- 
--  =============   ===========================================
-+  =============   ========================================================
-   'RSB filling'   Protection of RSB on context switch enabled
--  =============   ===========================================
-+  'ERAPS'         Hardware RSB flush on context switches + guest/host tags
-+  =============   ========================================================
- 
-   - EIBRS Post-barrier Return Stack Buffer (PBRSB) protection status:
- 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 17b6590748c0..79a1373050f7 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -461,6 +461,7 @@
- #define X86_FEATURE_AUTOIBRS		(20*32+ 8) /* Automatic IBRS */
- #define X86_FEATURE_NO_SMM_CTL_MSR	(20*32+ 9) /* SMM_CTL MSR is not present */
- 
-+#define X86_FEATURE_ERAPS		(20*32+24) /* Enhanced RAP / RSB / RAS Security */
- #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barrier */
- #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
- #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index d5102b72f74d..d7af5f811776 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -1634,6 +1634,9 @@ static void __init spectre_v2_mitigate_rsb(enum spectre_v2_mitigation mode)
- 	case SPECTRE_V2_RETPOLINE:
- 	case SPECTRE_V2_LFENCE:
- 	case SPECTRE_V2_IBRS:
-+		if (boot_cpu_has(X86_FEATURE_ERAPS))
-+			break;
++#define ERAP_CONTROL_ALLOW_LARGER_RAP 0
++#define ERAP_CONTROL_FLUSH_RAP 1
 +
- 		pr_info("Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT\n");
- 		setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
- 		setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT);
-@@ -2850,7 +2853,7 @@ static ssize_t spectre_v2_show_state(char *buf)
- 	    spectre_v2_enabled == SPECTRE_V2_EIBRS_LFENCE)
- 		return sysfs_emit(buf, "Vulnerable: eIBRS+LFENCE with unprivileged eBPF and SMT\n");
+ #define V_TPR_MASK 0x0f
  
--	return sysfs_emit(buf, "%s%s%s%s%s%s%s%s\n",
-+	return sysfs_emit(buf, "%s%s%s%s%s%s%s%s%s\n",
- 			  spectre_v2_strings[spectre_v2_enabled],
- 			  ibpb_state(),
- 			  boot_cpu_has(X86_FEATURE_USE_IBRS_FW) ? "; IBRS_FW" : "",
-@@ -2858,6 +2861,7 @@ static ssize_t spectre_v2_show_state(char *buf)
- 			  boot_cpu_has(X86_FEATURE_RSB_CTXSW) ? "; RSB filling" : "",
- 			  pbrsb_eibrs_state(),
- 			  spectre_bhi_state(),
-+			  boot_cpu_has(X86_FEATURE_ERAPS) ? "; ERAPS hardware RSB flush" : "",
- 			  /* this should always be at the end */
- 			  spectre_v2_module_string());
+ #define V_IRQ_SHIFT 8
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 097bdc022d0f..dd589670a716 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -803,6 +803,8 @@ void kvm_set_cpu_caps(void)
+ 		F(WRMSR_XX_BASE_NS)
+ 	);
+ 
++	if (tdp_enabled)
++		kvm_cpu_cap_check_and_set(X86_FEATURE_ERAPS);
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_IBPB_BRTYPE);
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
+@@ -1362,10 +1364,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	case 0x80000020:
+ 		entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+ 		break;
+-	case 0x80000021:
+-		entry->ebx = entry->ecx = entry->edx = 0;
++	case 0x80000021: {
++		unsigned int ebx_mask = 0;
++
++		entry->ecx = entry->edx = 0;
+ 		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
++
++		/*
++		 * Bits 23:16 in EBX indicate the size of the RSB.
++		 * Expose the value in the hardware to the guest.
++		 */
++		if (kvm_cpu_cap_has(X86_FEATURE_ERAPS))
++			ebx_mask |= GENMASK(23, 16);
++
++		entry->ebx &= ebx_mask;
+ 		break;
++	}
+ 	/* AMD Extended Performance Monitoring and Debug */
+ 	case 0x80000022: {
+ 		union cpuid_0x80000022_ebx ebx;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index dd15cc635655..9b055de079cb 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1360,6 +1360,13 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SPEC_CTRL, 1, 1);
+ 
++	/*
++	 * If the hardware has a larger RSB, use it in the guest context as
++	 * well.
++	 */
++	if (cpu_feature_enabled(X86_FEATURE_ERAPS) && npt_enabled)
++		vmcb_set_larger_rap(svm->vmcb);
++
+ 	if (kvm_vcpu_apicv_active(vcpu))
+ 		avic_init_vmcb(svm, vmcb);
+ 
+@@ -3395,6 +3402,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+ 	pr_err("%-20s%016llx\n", "tsc_offset:", control->tsc_offset);
+ 	pr_err("%-20s%d\n", "asid:", control->asid);
+ 	pr_err("%-20s%d\n", "tlb_ctl:", control->tlb_ctl);
++	pr_err("%-20s%d\n", "erap_ctl:", control->erap_ctl);
+ 	pr_err("%-20s%08x\n", "int_ctl:", control->int_ctl);
+ 	pr_err("%-20s%08x\n", "int_vector:", control->int_vector);
+ 	pr_err("%-20s%08x\n", "int_state:", control->int_state);
+@@ -3561,6 +3569,27 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 
+ 		trace_kvm_nested_vmexit(vcpu, KVM_ISA_SVM);
+ 
++		if (boot_cpu_has(X86_FEATURE_ERAPS)
++		    && vmcb_is_larger_rap(svm->vmcb01.ptr)) {
++			/*
++			 * XXX a few further optimizations can be made:
++			 *
++			 * 1. In pre_svm_run() we can reset this bit when a hw
++			 * TLB flush has happened - any context switch on a
++			 * CPU (which causes a TLB flush) auto-flushes the RSB
++			 * - eg when this vCPU is scheduled on a different
++			 * pCPU.
++			 *
++			 * 2. This is also not needed in the case where the
++			 * vCPU is being scheduled on the same pCPU, but there
++			 * was a context switch between the #VMEXIT and VMRUN.
++			 *
++			 * 3. If the guest returns to L2 again after this
++			 * #VMEXIT, there's no need to flush the RSB.
++			 */
++			vmcb_set_flush_rap(svm->vmcb01.ptr);
++		}
++
+ 		vmexit = nested_svm_exit_special(svm);
+ 
+ 		if (vmexit == NESTED_EXIT_CONTINUE)
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 43fa6a16eb19..8a7877f46dc5 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -500,6 +500,21 @@ static inline bool svm_is_intercept(struct vcpu_svm *svm, int bit)
+ 	return vmcb_is_intercept(&svm->vmcb->control, bit);
  }
+ 
++static inline void vmcb_set_flush_rap(struct vmcb *vmcb)
++{
++	__set_bit(ERAP_CONTROL_FLUSH_RAP, (unsigned long *)&vmcb->control.erap_ctl);
++}
++
++static inline void vmcb_set_larger_rap(struct vmcb *vmcb)
++{
++	__set_bit(ERAP_CONTROL_ALLOW_LARGER_RAP, (unsigned long *)&vmcb->control.erap_ctl);
++}
++
++static inline bool vmcb_is_larger_rap(struct vmcb *vmcb)
++{
++	return test_bit(ERAP_CONTROL_ALLOW_LARGER_RAP, (unsigned long *)&vmcb->control.erap_ctl);
++}
++
+ static inline bool nested_vgif_enabled(struct vcpu_svm *svm)
+ {
+ 	return guest_can_use(&svm->vcpu, X86_FEATURE_VGIF) &&
 -- 
 2.47.0
 
