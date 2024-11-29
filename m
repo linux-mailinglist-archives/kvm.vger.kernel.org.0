@@ -1,79 +1,65 @@
-Return-Path: <kvm+bounces-32769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA4D9DC273
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 12:00:05 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0699DC2F3
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 12:39:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC7C164B68
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 11:00:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F66281C08
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 11:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEF11990C5;
-	Fri, 29 Nov 2024 10:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9830C19A281;
+	Fri, 29 Nov 2024 11:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AnDLIa5F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bO43w9D5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170BF1990AE
-	for <kvm@vger.kernel.org>; Fri, 29 Nov 2024 10:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3219E17ADF7;
+	Fri, 29 Nov 2024 11:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732877995; cv=none; b=mY0WZNhTFO3a949uqHlteaHabAGdYE8QBYB1gRIeu/CVcDAgan2qUE88yxTkZUL8F7OSsQh+7oHLWOgjJv9XMp58UyfcYY1bGYO8ISdNc9k8Mn9JAgXWCHVi3rA1YxIKUr7Xhki92l+C6IgEj2/n2Qj8o+eQFr1AQVa0oylVfn8=
+	t=1732880387; cv=none; b=Cw+6v5N4kRdv1agrcrZefMMvarSQiF8D0YtirvU2E86uRZhXFCL/2G32jbaEAFbIvKVbMSaH9CFINBjl5+6v9GPfv6ugKIfe/8lkGQdjRiRUZNdpBhKgdCbu42akaak6XfuFIR8WfimQWGn0CH4N9OwZv6Dcg1PDz5o9663rBnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732877995; c=relaxed/simple;
-	bh=SNwRW3SjXKY1ZFWnJjDyfaG1goB/a/ehfVChjwT+XJ0=;
+	s=arc-20240116; t=1732880387; c=relaxed/simple;
+	bh=ARvAC3U7Sz2sw+G4OdBfXDegCVZu5eOVnOgNxlHAWPA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K7Dc1FlgDIPH+kcmuTrPCDMIYQWq43xcXlPgONMIVUoZjQgGORpimb5jw2xy/2gv1Vo7UQm8tIz+VOn/yXdlRp3a/Vk7FgLc0YG9iG8+o8U7ERJisOqxiaDJUM/g/vKKqGJv5FOC4D09HuTCBFxIw0Yu8Fimr7jt32iBLZhpudM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AnDLIa5F; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434aafd68e9so15903005e9.0
-        for <kvm@vger.kernel.org>; Fri, 29 Nov 2024 02:59:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1732877990; x=1733482790; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SJf5XdQbXEL1Sgw2WOEw0Ahz9e21x47iqJyxEyLC4FA=;
-        b=AnDLIa5Fooi3uexGRAK0msF0cH9vRegMjJizxo44RUXjyb6ZJphOMDRukwrlpXzaYh
-         HcbqysTx+u9Bw55bGPxKxTOXa5ybVnIPoWfM8Flu+Jv1tEa7KypnNkUHLLPNqwB5gqxZ
-         zm25mdkGnKGO6ao5OF4Nu8VtLK+xT2qiJWFWK+OJEW413YVxER1Tc3TH5bjldGmS4wLY
-         WOHL77xXL+FqYvNW8H6IuZtECnrt5imgfy3caqUmIwP7BEp7c8z4dP8/A4tolq3Fg8my
-         dR8rqVlObvaCDkMUzregrucYxRb1Ndo9pU7SiVYVEUftOoQyg7lwVxQbwXJOY/2ac8tu
-         Cgfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732877990; x=1733482790;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJf5XdQbXEL1Sgw2WOEw0Ahz9e21x47iqJyxEyLC4FA=;
-        b=MxI7jIYcrRCKyE4f/VyUaMYSMemewEU45wuJ9Oo0jUSHFM4Q9BXu8lKNVh4rzBWTEP
-         mxTefA7qvd4pWKRCFkKpEszNmad+YMfhUXO1gxY/sL1Ty/87b3WqBVoIKkxAOaEHIufW
-         EbVZUsrB2AlwutmTJt17SY0PruhPcJ6ZxWM3WQG2lEXqSaSnwgurb6oCzZc85ETGsL0v
-         hUer7PKOOxB2LjNqMsTjeDWNOmYJuMqVxWtGT5Hu6iQUl8A62wPREgdbo1lHuVHwv0ID
-         ERzVVTAgIMKIf3Swc0wINcZg/NOPeTgS+WaVYi0dGsa/P8cbxLPWTaYftjKM/Be2H5sv
-         1Auw==
-X-Forwarded-Encrypted: i=1; AJvYcCWnjfU8SynOLUoLvVXOhRO0ZGD6WTwnTihlFws/gIX4FkeQXqthTV/A5dLr9PIZYUrnaII=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGIJ4ed9alvj2TsbC1Cy8SKsra6gpIKOdvy2Ohf4NWqmGDX6r4
-	qPuUIHtWQBxGJz6CYX9O7Stz0vuiEICZq5AwwyB0zuUheKsWbKiDt6zxkwtM308=
-X-Gm-Gg: ASbGncvZs1Si6GaKqgbrnAfRUIvUJiRp6BaADSqLyROFCkOtKEp0OdFiCJ2i1EmPXc3
-	nt31NwdGZ3I4AVpr01+k7/moaUP9pjYHEeQ/qYcb2L8sX3YG/PpBLuxsHofFracyIW49cBaMf3N
-	CaabCYu/AvGQnSBt/NnIe1mIfdngRhGj+xrBqKPrNlwqsxp2BdUE65mruxnv/A42/bz48TxX3S4
-	mQ6i9n63MLBue3iYefLH9Mf6cFBlRiVyUACxWKNlp/WFlGWzcjtBBVjLqIiQvJMxhrWSm2NBv3p
-	BiAH1OFxmmgvWBELhWBi
-X-Google-Smtp-Source: AGHT+IEFvlBaAGrXmQ1f53t1gNO9ZXDjgXJ7+Z1T1Y6D6ANh0a3wVCJfUlsp51urZAZYyjm84XXQSg==
-X-Received: by 2002:a05:600c:1988:b0:434:9f78:17d2 with SMTP id 5b1f17b1804b1-434a9df09bfmr91315735e9.29.1732877990325;
-        Fri, 29 Nov 2024 02:59:50 -0800 (PST)
-Received: from [192.168.1.74] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa74f18bsm83023605e9.4.2024.11.29.02.59.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Nov 2024 02:59:49 -0800 (PST)
-Message-ID: <b89c0b9c-e12a-4915-b657-16d9ba297a86@linaro.org>
-Date: Fri, 29 Nov 2024 11:59:48 +0100
+	 In-Reply-To:Content-Type; b=E994v1AzlyFhQENEF/QfTgBZhrZou/XzHXdoTPXPOwa3MRP1vJ5CxjmDfDyq0WA5plflfNfckx9asRJ+j97RMdfxk5fPzze7P8UPPM2CYEMvAQP1/So/HsuoLukfS/Zez1DDlvpfrsxweYMlIdrYhd7xzmp2W/8AcAMJC1nRrYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bO43w9D5; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732880387; x=1764416387;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ARvAC3U7Sz2sw+G4OdBfXDegCVZu5eOVnOgNxlHAWPA=;
+  b=bO43w9D5XwxjMwe7jHNIV2PdaW/36pDg+FwOzRsFHnNAvtiB3Q4KuKzk
+   34WUikAIBiX/y3c871vc+ieu+zlFRZdp7KWd2z02it76+EvpUr+VBAkZ/
+   Q0cDgekKWCD4TfTaTJ+9UiE7r47Tdz/zN7VpXhRYjX0TCkRIQQDNaUSyX
+   05hZEGVL/m9WHKTbTSWU3quoIoTbseCuuRu0Kn7gJ0/IsEzUsh2sY1uU4
+   nZ4AN1ox4qQsD3suTDzGsn6QKafipKBwm7sFb2q+UmLb2i9VE6MO4XQCS
+   ywaxu26br0Yw7OdwYhQJBU55139UBCNcumhVl6DYlmb+DZBDVC9lmnrlV
+   Q==;
+X-CSE-ConnectionGUID: u3XFPhftSOKW31XkEw2T0A==
+X-CSE-MsgGUID: EqhomqcART6P3yvY+x6Dcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11270"; a="44489568"
+X-IronPort-AV: E=Sophos;i="6.12,195,1728975600"; 
+   d="scan'208";a="44489568"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 03:39:46 -0800
+X-CSE-ConnectionGUID: 85tpzxxPRfmE86pedbEXiw==
+X-CSE-MsgGUID: Rv8iy6csQdefett5thzfoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,195,1728975600"; 
+   d="scan'208";a="92648836"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 03:39:40 -0800
+Message-ID: <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
+Date: Fri, 29 Nov 2024 13:39:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,98 +67,92 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i386/kvm: Fix kvm_enable_x2apic link error in non-KVM
- builds
-To: Phil Dennis-Jordan <lists@philjordan.eu>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Shukla, Santosh" <santosh.shukla@amd.com>,
- Phil Dennis-Jordan <phil@philjordan.eu>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, mtosatti@redhat.com, suravee.suthikulpanit@amd.com
-References: <20241113144923.41225-1-phil@philjordan.eu>
- <b772f6e7-e506-4f87-98d1-5cbe59402b2b@redhat.com>
- <ed2246ca-3ede-918c-d18d-f47cf8758d8c@amd.com>
- <CABgObfYhQDmjh4MJOaqeAv0=cFUR=iaoLeSoGYh9iMnjDKM2aA@mail.gmail.com>
- <CAGCz3vtTgo6YdgBxO+5b-W04m3k1WhdiaqH1_ojgj_ywjZmV7A@mail.gmail.com>
- <e9404dd2-56d2-4c6d-81f2-76060c4b4067@linaro.org>
- <CAGCz3vtxjKH0H8BL4ES_phNK8=Dy4Jzg3d7dLyNxuBQaSjTPQA@mail.gmail.com>
+Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, dave.hansen@linux.intel.com,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, reinette.chatre@intel.com,
+ xiaoyao.li@intel.com, tony.lindgren@linux.intel.com,
+ binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ nik.borisov@suse.com, linux-kernel@vger.kernel.org, x86@kernel.org,
+ yan.y.zhao@intel.com, weijiang.yang@intel.com
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <20241121201448.36170-8-adrian.hunter@intel.com> <Zz/6NBmZIcRUFvLQ@intel.com>
+ <Z0cmEd5ehnYT8uc-@google.com>
 Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <CAGCz3vtxjKH0H8BL4ES_phNK8=Dy4Jzg3d7dLyNxuBQaSjTPQA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <Z0cmEd5ehnYT8uc-@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 28/11/24 20:06, Phil Dennis-Jordan wrote:
-> On Thu, 28 Nov 2024 at 17:46, Philippe Mathieu-Daudé <philmd@linaro.org 
-> <mailto:philmd@linaro.org>> wrote:
+On 27/11/24 16:00, Sean Christopherson wrote:
+> On Fri, Nov 22, 2024, Chao Gao wrote:
+>>> +static bool tdparams_tsx_supported(struct kvm_cpuid2 *cpuid)
+>>> +{
+>>> +	const struct kvm_cpuid_entry2 *entry;
+>>> +	u64 mask;
+>>> +	u32 ebx;
+>>> +
+>>> +	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x7, 0);
+>>> +	if (entry)
+>>> +		ebx = entry->ebx;
+>>> +	else
+>>> +		ebx = 0;
+>>> +
+>>> +	mask = __feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM);
+>>> +	return ebx & mask;
+>>> +}
+>>> +
+>>> static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
+>>> 			struct kvm_tdx_init_vm *init_vm)
+>>> {
+>>> @@ -1299,6 +1322,7 @@ static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
+>>> 	MEMCPY_SAME_SIZE(td_params->mrowner, init_vm->mrowner);
+>>> 	MEMCPY_SAME_SIZE(td_params->mrownerconfig, init_vm->mrownerconfig);
+>>>
+>>> +	to_kvm_tdx(kvm)->tsx_supported = tdparams_tsx_supported(cpuid);
+>>> 	return 0;
+>>> }
+>>>
+>>> @@ -2272,6 +2296,11 @@ static int __init __tdx_bringup(void)
+>>> 			return -EIO;
+>>> 		}
+>>> 	}
+>>> +	tdx_uret_tsx_ctrl_slot = kvm_find_user_return_msr(MSR_IA32_TSX_CTRL);
+>>> +	if (tdx_uret_tsx_ctrl_slot == -1 && boot_cpu_has(X86_FEATURE_MSR_TSX_CTRL)) {
+>>> +		pr_err("MSR_IA32_TSX_CTRL isn't included by kvm_find_user_return_msr\n");
+>>> +		return -EIO;
+>>> +	}
+>>>
+>>> 	/*
+>>> 	 * Enabling TDX requires enabling hardware virtualization first,
+>>> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+>>> index 48cf0a1abfcc..815ff6bdbc7e 100644
+>>> --- a/arch/x86/kvm/vmx/tdx.h
+>>> +++ b/arch/x86/kvm/vmx/tdx.h
+>>> @@ -29,6 +29,14 @@ struct kvm_tdx {
+>>> 	u8 nr_tdcs_pages;
+>>> 	u8 nr_vcpu_tdcx_pages;
+>>>
+>>> +	/*
+>>> +	 * Used on each TD-exit, see tdx_user_return_msr_update_cache().
+>>> +	 * TSX_CTRL value on TD exit
+>>> +	 * - set 0     if guest TSX enabled
+>>> +	 * - preserved if guest TSX disabled
+>>> +	 */
+>>> +	bool tsx_supported;
+>>
+>> Is it possible to drop this boolean and tdparams_tsx_supported()? I think we
+>> can use the guest_can_use() framework instead.
 > 
->     On 28/11/24 17:38, Phil Dennis-Jordan wrote:
->      > Paolo, could we please apply either Sairaj and Santosh's fix at
->      > https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/
->     <https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/>
->      >
->     <https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/
->     <https://patchew.org/QEMU/20241114114509.15350-1-sarunkod@amd.com/>>
->      > or mine to fix this link error? As neither patch has so far been
->     merged,
->      > 9.2.0-rc2 still fails to build on macOS, at least on my local
->     systems.
->      > I'm not sure why CI builds aren't jumping up and down about this,
->     but
->      > neither the Xcode 15.2 nor 16.1 toolchains are happy on macOS
->     14.7/arm64.
+> Yeah, though that optimized handling will soon come for free[*], and I plan on
+> landing that sooner than TDX, so don't fret too much over this.
 > 
->     Just curious, is your build configured with --enable-hvf --enable-tcg?
-> 
-> 
-> It's my understanding that both HVF and TCG are enabled by default when 
-> building on macOS - they both show up as "YES" in the ./configure 
-> output, and the relevant -accel works; at any rate, specifying them 
-> explicitly made no difference with regard to this link error. Your 
-> question did however prompt me to dig a little deeper and check which of 
-> my test configurations was affected.
-> 
-> It looks like the critical setting is --enable-debug. I think that 
-> changes the exact optimisation level (not -O0 but less aggressive than 
-> the default), so it's not unreasonable that this would change the 
-> compiler pass(es) for eliminating constant conditional branches.
-> 
-> So yeah, when I build latest master/staging with --enable-debug on macOS 
-> and my --target-list includes x86_64, QEMU fails to link with an 
-> undefined symbol error for _kvm_enable_x2apic. This happens on both 
-> arm64 and x86-64 hosts, and with various Xcode 15.x and 16.y toolchains.
+> [*] https://lore.kernel.org/all/20240517173926.965351-1-seanjc@google.com
 
-Indeed:
-
-C compiler for the host machine: clang (clang 16.0.0 "Apple clang 
-version 16.0.0 (clang-1600.0.26.4)")
-C linker for the host machine: clang ld64 1115.7.3
-Host machine cpu family: aarch64
-Host machine cpu: aarch64
-   Compilation
-     host CPU                        : aarch64
-     host endianness                 : little
-     C compiler                      : clang
-     Host C compiler                 : clang
-     C++ compiler                    : NO
-     Objective-C compiler            : clang
-     Rust support                    : NO
-     CFLAGS                          : -g -O0
-   User defined options
-     optimization                    : 0
-
-Undefined symbols for architecture arm64:
-   "_kvm_enable_x2apic", referenced from:
-       _amdvi_sysbus_realize in hw_i386_amd_iommu.c.o
-ld: symbol(s) not found for architecture arm64
-
-
-> I have to admit I'm personally not a big fan of relying on the optimiser 
-> for removing references to these symbols, but restructuring the 
-> conditional expression like in Sairaj and Santosh's patch seems to allow 
-> even the optimisation level used for debug builds to do it, so I guess I 
-> can't argue with the result. :-)
-
-See related commit 9926cf34de5 ("target/i386: Allow elision of 
-kvm_enable_x2apic()").
+guest_can_use() is per-vcpu whereas we are currently using the
+CPUID from TD_PARAMS (as per spec) before there are any VCPU's.
+It is a bit of a disconnect so let's keep tsx_supported for now.
 
 
