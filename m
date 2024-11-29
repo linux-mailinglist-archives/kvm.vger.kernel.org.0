@@ -1,211 +1,150 @@
-Return-Path: <kvm+bounces-32780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CFB9DED3C
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 23:20:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 289E5163981
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 22:20:04 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDE31A706F;
-	Fri, 29 Nov 2024 22:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5p0Hl5t"
-X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 592D69DED85
+	for <lists+kvm@lfdr.de>; Sat, 30 Nov 2024 00:19:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3B454279;
-	Fri, 29 Nov 2024 22:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F3332821E9
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2024 23:19:07 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A681A7046;
+	Fri, 29 Nov 2024 23:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EipbF1br"
+X-Original-To: kvm@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D37E158DD1
+	for <kvm@vger.kernel.org>; Fri, 29 Nov 2024 23:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732918794; cv=none; b=ElKjYT6ihijsR7xeFMNgBKlX6N+4LnxQ7V463x0N21dtiag40lu2YUTnMC0cZd0kp82lgjocDhfqlv/lpAUt7Cyt2PJ63H/FKeCCv5dEjE8xClywL1AQcpyE24NIfB4064JaYiaW8vWVPYW9M+KXRHRx5+JOXdjy94Zk/iCWLYc=
+	t=1732922335; cv=none; b=nddqcLUfms3AGwzgNK5lGVQo0Fnjb7l4dfjzHruxeMeVDOun1ZpH9DXUnXJ1hwakWcMLMIMHOIRRN6Sessoq2X8WY0SN7OTWkXBzF6jzyp8mMA8CtbHkAobcYW2QzpX9iXIMjUUCZv2GqC/89asZVyA7pePZFtwOyk2zhCPbqgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732918794; c=relaxed/simple;
-	bh=OJvU5bLoYGZXh8qACQ/T6IEV8oDjNatqYL+CeW3HsJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i6J+y4trG6gaP981SbMfKlABk0A+efDzgh2pSzsX4f2H5OVWBI+A+eLx/O0G9lnsKR0kdOK4WeFSIDRs5Iy7DE32Hy3TwL9zQxTf6mmSqqtklFQRdGDL7weOpHUjJzfdf5YN9hI+7nEYJ7PLJV4SkVAOHiijyaZUHriuaHgpkrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5p0Hl5t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C894C4CECF;
-	Fri, 29 Nov 2024 22:19:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732918794;
-	bh=OJvU5bLoYGZXh8qACQ/T6IEV8oDjNatqYL+CeW3HsJg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o5p0Hl5t68sOGrNrYENKMovE5NztdhOpEAFABibzPZGUoqz1AXXaCH53QUmqJu9yj
-	 4Ymv5lTSZbEsDt+NPkbGOI0BMOSI/hhFnrmJFW+/qqVN7darYuDK67nomYfyn1WTZW
-	 BFRJMR/Fl9FeauFwTeTH3phw520rl/KLfJopadlpHQUp+IZrgAicwA5DrSA19U8kSy
-	 DpTFETeRTKi33P/1gcVkoaLTCtVby2dZtM0i0fCZSI8+UVXXGJuKWkaLG6dG9bq/8l
-	 w9ueF6Q3rudD7ZWIlpxFt0GwISNHkjcxLh8drdyWqw8+a9ohium7+Z6XshqrmZWZxx
-	 DWCgNchAqIpvQ==
-Date: Fri, 29 Nov 2024 23:19:51 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
-	x86@kernel.org, rcu@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Lorenzo Stoakes <lstoakes@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jason Baron <jbaron@akamai.com>, Kees Cook <keescook@chromium.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Juerg Haefliger <juerg.haefliger@canonical.com>,
-	Nicolas Saenz Julienne <nsaenz@kernel.org>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Nadav Amit <namit@vmware.com>, Dan Carpenter <error27@gmail.com>,
-	Chuang Wang <nashuiliang@gmail.com>,
-	Yang Jihong <yangjihong1@huawei.com>,
-	Petr Mladek <pmladek@suse.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-	Julian Pidancet <julian.pidancet@oracle.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Yair Podemsky <ypodemsk@redhat.com>,
-	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>
-Subject: Re: [RFC PATCH v3 11/15] context-tracking: Introduce work deferral
- infrastructure
-Message-ID: <Z0o-B1ONq4wL1RHc@pavilion.home>
-References: <20241119153502.41361-1-vschneid@redhat.com>
- <20241119153502.41361-12-vschneid@redhat.com>
- <Zz2_7MbxvfjKsz08@pavilion.home>
- <Zz3w0o_3wZDgJn0K@localhost.localdomain>
- <xhsmho729hlv0.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <Zz4cqfVfyb1enxql@localhost.localdomain>
- <xhsmh1pz39v0k.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <Z0Oeme2yhxF_ArX0@pavilion.home>
- <xhsmhttbqm1s2.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1732922335; c=relaxed/simple;
+	bh=6goSQOe/s3OVc7KgWqBRRYDI+YPt/IyKKnh3wVVk6a4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DDHNRnZyS0jFwtiZL3yFGWcTgU55Ov5v2SvAx6pQJzVolxZ96rBtLDiIMwzoYLI6r1w9CIuFM+oHfTPSo+vqBiteSKrJyUPmPrCVp/dB+orRW7Yq9cWKuCUBp+d6mp5eJs9BLvZl6xsEw3+PjCdVOHNj1OoR8RNeosRujFjpQlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EipbF1br; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732922328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CvQZD8BqiH/dggb6iGesxSTTYCQI5/E9WUH3WgYU8lg=;
+	b=EipbF1brZA2v5DcnE0cU+8Hlcosi/eiGau28vrwmWHZyaUnV2PGlVlDkd0beX29LLv7lPA
+	ST1l/z8cgeS56uu88Zk4Q4CUfRoP18O7Q8g2n3ZSeGQDZV5P2pe1nxDXRDyMUuhaaARFyb
+	ykmQJECRpGdgPI5BKdKKvJQ4YU3NFB4=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-361-FutI7yt_MEejaLN9aMGbyQ-1; Fri,
+ 29 Nov 2024 18:18:44 -0500
+X-MC-Unique: FutI7yt_MEejaLN9aMGbyQ-1
+X-Mimecast-MFC-AGG-ID: FutI7yt_MEejaLN9aMGbyQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 394F91954193;
+	Fri, 29 Nov 2024 23:18:43 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8FE09300018D;
+	Fri, 29 Nov 2024 23:18:42 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 6.13
+Date: Fri, 29 Nov 2024 18:18:41 -0500
+Message-ID: <20241129231841.139239-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <xhsmhttbqm1s2.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Le Fri, Nov 29, 2024 at 05:40:29PM +0100, Valentin Schneider a écrit :
-> On 24/11/24 22:46, Frederic Weisbecker wrote:
-> > Le Fri, Nov 22, 2024 at 03:56:59PM +0100, Valentin Schneider a écrit :
-> >> On 20/11/24 18:30, Frederic Weisbecker wrote:
-> >> > Le Wed, Nov 20, 2024 at 06:10:43PM +0100, Valentin Schneider a écrit :
-> >> >> On 20/11/24 15:23, Frederic Weisbecker wrote:
-> >> >>
-> >> >> > Ah but there is CT_STATE_GUEST and I see the last patch also applies that to
-> >> >> > CT_STATE_IDLE.
-> >> >> >
-> >> >> > So that could be:
-> >> >> >
-> >> >> > bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
-> >> >> > {
-> >> >> >    struct context_tracking *ct = per_cpu_ptr(&context_tracking, cpu);
-> >> >> >    unsigned int old;
-> >> >> >    bool ret = false;
-> >> >> >
-> >> >> >    preempt_disable();
-> >> >> >
-> >> >> >    old = atomic_read(&ct->state);
-> >> >> >
-> >> >> >    /* CT_STATE_IDLE can be added to last patch here */
-> >> >> >    if (!(old & (CT_STATE_USER | CT_STATE_GUEST))) {
-> >> >> >            old &= ~CT_STATE_MASK;
-> >> >> >            old |= CT_STATE_USER;
-> >> >> >    }
-> >> >>
-> >> >> Hmph, so that lets us leverage the cmpxchg for a !CT_STATE_KERNEL check,
-> >> >> but we get an extra loop if the target CPU exits kernelspace not to
-> >> >> userspace (e.g. vcpu or idle) in the meantime - not great, not terrible.
-> >> >
-> >> > The thing is, what you read with atomic_read() should be close to reality.
-> >> > If it already is != CT_STATE_KERNEL then you're good (minus racy changes).
-> >> > If it is CT_STATE_KERNEL then you still must do a failing cmpxchg() in any case,
-> >> > at least to make sure you didn't miss a context tracking change. So the best
-> >> > you can do is a bet.
-> >> >
-> >> >>
-> >> >> At the cost of one extra bit for the CT_STATE area, with CT_STATE_KERNEL=1
-> >> >> we could do:
-> >> >>
-> >> >>   old = atomic_read(&ct->state);
-> >> >>   old &= ~CT_STATE_KERNEL;
-> >> >
-> >> > And perhaps also old |= CT_STATE_IDLE (I'm seeing the last patch now),
-> >> > so you at least get a chance of making it right (only ~CT_STATE_KERNEL
-> >> > will always fail) and CPUs usually spend most of their time idle.
-> >> >
-> >> 
-> >> I'm thinking with:
-> >> 
-> >>         CT_STATE_IDLE		= 0,
-> >>         CT_STATE_USER		= 1,
-> >>         CT_STATE_GUEST		= 2,
-> >>         CT_STATE_KERNEL		= 4, /* Keep that as a standalone bit */
-> >
-> > Right!
-> >
-> >> 
-> >> we can stick with old &= ~CT_STATE_KERNEL; and that'll let the cmpxchg
-> >> succeed for any of IDLE/USER/GUEST.
-> >
-> > Sure but if (old & CT_STATE_KERNEL), cmpxchg() will consistently fail.
-> > But you can make a bet that it has switched to CT_STATE_IDLE between
-> > the atomic_read() and the first atomic_cmpxchg(). This way you still have
-> > a tiny chance to succeed.
-> >
-> > That is:
-> >
-> >    old = atomic_read(&ct->state);
-> >    if (old & CT_STATE_KERNEl)
-> >       old |= CT_STATE_IDLE;
-> >    old &= ~CT_STATE_KERNEL;
-> >
-> >
-> >    do {
-> >       atomic_try_cmpxchg(...)
-> >
-> > Hmm?
-> 
-> But it could equally be CT_STATE_{USER, GUEST}, right? That is, if we have
-> all of this enabled them we assume the isolated CPUs spend the least amount
-> of time in the kernel, if they don't we get to blame the user.
+Linus,
 
-Unless CONTEXT_TRACKING_WORK_IDLE=y yes.
+The following changes since commit 8d4f1e05ff821a5d59116ab8c3a30fcae81d8597:
 
-Anyway that's just a detail that can be refined in the future. I'm fine with
-just clearing CT_STATE_KERNEL and go with that.
+  RISC-V: Remove unnecessary include from compat.h (2024-11-26 11:48:53 -0800)
 
-Thanks.
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 4d911c7abee56771b0219a9fbf0120d06bdc9c14:
+
+  Merge tag 'kvm-riscv-6.13-2' of https://github.com/kvm-riscv/linux into HEAD (2024-11-27 12:00:28 -0500)
+
+----------------------------------------------------------------
+ARM:
+
+* Fixes.
+
+RISC-V:
+
+* Svade and Svadu (accessed and dirty bit) extension support for host and
+  guest.  This was acked on the mailing list by the RISC-V maintainer, see
+  https://patchew.org/linux/20240726084931.28924-1-yongxuan.wang@sifive.com/.
+
+----------------------------------------------------------------
+Marc Zyngier (5):
+      KVM: arm64: vgic-v3: Sanitise guest writes to GICR_INVLPIR
+      KVM: arm64: vgic: Make vgic_get_irq() more robust
+      KVM: arm64: vgic: Kill VGIC_MAX_PRIVATE definition
+      KVM: arm64: vgic-its: Add stronger type-checking to the ITS entry sizes
+      KVM: arm64: Mark set_sysreg_masks() as inline to avoid build failure
+
+Oliver Upton (1):
+      KVM: arm64: Use MDCR_EL2.HPME to evaluate overflow of hyp counters
+
+Paolo Bonzini (3):
+      Merge tag 'kvmarm-fixes-6.13-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge tag 'riscv-for-linus-6.13-mw1' of git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux into HEAD
+      Merge tag 'kvm-riscv-6.13-2' of https://github.com/kvm-riscv/linux into HEAD
+
+Raghavendra Rao Ananta (1):
+      KVM: arm64: Ignore PMCNTENSET_EL0 while checking for overflow status
+
+Yong-Xuan Wang (4):
+      RISC-V: Add Svade and Svadu Extensions Support
+      dt-bindings: riscv: Add Svade and Svadu Entries
+      RISC-V: KVM: Add Svade and Svadu Extensions Support for Guest/VM
+      KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-list test
+
+ .../devicetree/bindings/riscv/extensions.yaml      | 28 ++++++++
+ arch/arm64/kvm/nested.c                            |  2 +-
+ arch/arm64/kvm/pmu-emul.c                          | 62 ++++++++++++-----
+ arch/arm64/kvm/vgic/vgic-debug.c                   |  5 +-
+ arch/arm64/kvm/vgic/vgic-init.c                    |  2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     | 77 +++++++++++++++-------
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c                 | 12 ++--
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c                 | 13 ++--
+ arch/arm64/kvm/vgic/vgic-mmio.c                    | 38 +++++------
+ arch/arm64/kvm/vgic/vgic-v2.c                      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                      |  4 +-
+ arch/arm64/kvm/vgic/vgic.c                         | 43 +++++++-----
+ arch/arm64/kvm/vgic/vgic.h                         | 27 +-------
+ arch/riscv/Kconfig                                 |  1 +
+ arch/riscv/include/asm/csr.h                       |  1 +
+ arch/riscv/include/asm/hwcap.h                     |  2 +
+ arch/riscv/include/asm/pgtable.h                   | 13 +++-
+ arch/riscv/include/uapi/asm/kvm.h                  |  2 +
+ arch/riscv/kernel/cpufeature.c                     | 12 ++++
+ arch/riscv/kvm/vcpu.c                              |  4 ++
+ arch/riscv/kvm/vcpu_onereg.c                       | 15 +++++
+ include/kvm/arm_vgic.h                             |  1 -
+ tools/testing/selftests/kvm/riscv/get-reg-list.c   |  8 +++
+ 24 files changed, 257 insertions(+), 119 deletions(-)
+
 
