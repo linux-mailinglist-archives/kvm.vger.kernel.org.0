@@ -1,315 +1,193 @@
-Return-Path: <kvm+bounces-32797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B8789DF49C
-	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2024 04:54:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE129DF6D9
+	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2024 18:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87C48B227D9
-	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2024 03:53:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B76AB22E14
+	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2024 17:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A455C15531B;
-	Sun,  1 Dec 2024 03:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B50D1D86C7;
+	Sun,  1 Dec 2024 17:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UMceMb5w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxYV8dg3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E4714A4F7;
-	Sun,  1 Dec 2024 03:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B778D1BC094
+	for <kvm@vger.kernel.org>; Sun,  1 Dec 2024 17:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733025144; cv=none; b=j911RVWQUKgmDT5Bph3GVRf0hN3J6zrl9ugDq+iOvsnER4/Sikurq73fsj3KoxlJKfv9wTfvfscmflRVEaPJaEOJ9MYvy3S0yFOWzvRFvFPQFkwgLDi8ZhA+V8FiR7N4qhk2XQi3EBEj6d9dlGP4YGjeGZpkvvVGYXIjMetDCoY=
+	t=1733075746; cv=none; b=WXUcnsKFca57pG0EXMRdvCI67avJ/+3xuEK1qRCX+6hX+WQHvin5c6qBLUeyGG9G6L4h4pqDQm+YhVHdQ8SfQ0hbsMeBzDibO7ZOr8JrPX3SKHMWdCeq4IbtfOafRQpCdxnmVx9jD06m6kzIg05hH1nk6iUGyT37MWS2E0OyTZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733025144; c=relaxed/simple;
-	bh=yf44A6rzGuTuDWAveUzXPHC/R2LKy+bxmXhtN5uqMNo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SS6N7KN9durPXgVdBJm9esnhbfN/XKzlfqjXeuhBAC5a2TDRimpkCjTuhUJ8JE+KU3QVvjqB0DauG92wVlzOZLi2T/MYwhfZbl+rryO9Gsd+taRxKpqEnmEMgyPv4ck6uRp54p0wCXhTiTRbSvmlAS5YxrB9y+PtIV70jWBquYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UMceMb5w; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733025143; x=1764561143;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yf44A6rzGuTuDWAveUzXPHC/R2LKy+bxmXhtN5uqMNo=;
-  b=UMceMb5wwn84BGoIWWxQhv5KOir0lJ3DDY9YNnWPt9tORAC2Qzuc1ImB
-   CulWxDKXMCT3v/JjsCIAxk9b0SiiKx0MZihljf/j0nqqo4d+DCMUbKdD7
-   /rbbs5LVNzVp3i1UEZSXuHvoeG2FDwo3FnrUDrQ7VStyb0CyoSb1HsXHc
-   2oxmlcQu0ChOvkaf3OA2zplW/iec2ZjuyieaD8sMbhx9PFN8pDutQeVV5
-   YKmjWUh5unEsx+EhCagWx13rA8VXOF3JP4nVWIaGXtwDY9Fb+9P2VHE1Q
-   FLOGncTTCVNphtJnNSR20g+CD9+GemK///AfrlOBek+FgxrOe0R5Nr38Y
-   w==;
-X-CSE-ConnectionGUID: g0URkc8SRCeIgQbwYmjKqw==
-X-CSE-MsgGUID: lsKbN4KgRsySC9z7MJ3pXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11272"; a="50725125"
-X-IronPort-AV: E=Sophos;i="6.12,199,1728975600"; 
-   d="scan'208";a="50725125"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2024 19:52:22 -0800
-X-CSE-ConnectionGUID: YNRCVP2bSNSSLuSGTyocDg==
-X-CSE-MsgGUID: Sj3gc2scQwWhpPyfCJyN2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,199,1728975600"; 
-   d="scan'208";a="93257538"
-Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2024 19:52:19 -0800
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: rick.p.edgecombe@intel.com,
-	kai.huang@intel.com,
-	adrian.hunter@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com,
-	isaku.yamahata@intel.com,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com,
-	michael.roth@amd.com,
-	linux-kernel@vger.kernel.org,
-	binbin.wu@linux.intel.com
-Subject: [PATCH 7/7] KVM: TDX: Handle TDX PV MMIO hypercall
-Date: Sun,  1 Dec 2024 11:53:56 +0800
-Message-ID: <20241201035358.2193078-8-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
-References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+	s=arc-20240116; t=1733075746; c=relaxed/simple;
+	bh=pDh3sxIXjSiOmi/2YmBJfp6Dv4l2bH2RMTYOFvdjOCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SkJ7s1ZXE7yPauXfpy73n9qAgaCyqlRAzscjlSgHD67ujDMobjvm7lX2byAP18stEOlwXy15ZPhvYdyWIRoKgMgz7gwXvU2wIUynl+WIP+Ak+etC+BY38palFgNWhqZSMQPVcG5fsCsKpsTwE0KYKp6XShmJKrNzovSdYoPiduA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XxYV8dg3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733075743;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bj/FRfspWv/DskWdu4ezgBxsZYrptmYDnGDs7cuKhHc=;
+	b=XxYV8dg3yjgCkLiuu/0iTorsX3EAXWBI6ufO6OEhhqnH8bWsZ1N4nIF2/B8XJ02lkfdjoC
+	NVbbK8mKV24xaCqpvfwCawdC9KuTjFvZNFhXXeuq+KAy2D1DcRDOv7ipFIkQrpSRocE/Ag
+	1LyTadmgxFoF0SgdG003DV7jCyFbgKY=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-67-_9RH2G3RMyCAelbW6keKEQ-1; Sun, 01 Dec 2024 12:55:42 -0500
+X-MC-Unique: _9RH2G3RMyCAelbW6keKEQ-1
+X-Mimecast-MFC-AGG-ID: _9RH2G3RMyCAelbW6keKEQ
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-84181157edbso262519039f.2
+        for <kvm@vger.kernel.org>; Sun, 01 Dec 2024 09:55:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733075742; x=1733680542;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bj/FRfspWv/DskWdu4ezgBxsZYrptmYDnGDs7cuKhHc=;
+        b=hoJmkdJu2DIYP2mpQGMb3PwlcHoIlQ7BSxuOtrJQQHWQDCcsutm/UCkSGba7gVCx8/
+         Gys5T8eYoP3l7S/C6iRu23+/X7HffKeL2woGIhiZIkUpNiNiTepl/ymUh4RNqkLDsWmg
+         jTP9IBb7ARbb2o45Dathw40aSbrg4vOTTin7nGI0zDU42HSaUOPASF3VUae5diGcXza3
+         VMrB5Bt2S6kUsRK/f1uZ1aQbkDzkE3Ny/S+ng2hu0RYNITq/xuXlC0aAkmOr3OTWz9tK
+         /CZ1Z1CnaSIdjl9GvbCKwQVDAUm/FQtyRPW8NdV99QhpPcNMslaEuWfH66KBguQi4KBG
+         BFIg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvgirsz0dvzQzkY3p02+RlsWapJ+QwIe34eLJWmTITRZ2j7mGeizXv42pr7qFSWjx6iQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/YyBEf47v986/mh6sclX7QLbxW20O9tW1QZ4t6XfOU4lpmvtb
+	d84J3rZ3eYjWbWpJjbNXx/4m7K4QvNHe4wsdBKIP8nE4ShSanc/rVOo2vZXF3iBZavXKbgug7x/
+	n2OUBF7KH9/7OWVNPS3r9SFTq7CpoHXEO94UOnoW4C5DW68gkBg==
+X-Gm-Gg: ASbGncvsdK4sDqGiwn4lN20oAjirzKt9QLdvwdpoFTTWjpOQ1r7Ti9Pu/btNTSAPl+g
+	krcr0nR24VQVf5aHqFKG3q6Z1IhOz6mpBfqts9c5WM2Wc3WLN/lgEYOYJqxUpN97kuQx9Tv8BM5
+	HHAI0MxOiNEtjv5tdealhUg1mFiHXKoZ780bDcXbCKtWt2p3IacodrnGrNsSS1oYkwP5rvpFVmj
+	zztfyN4bGd3RFApQiqojgqkzwjEgNIys6iacGRssUJ1UwAWEeWssI1VlozKICuiwy7jXZ5QSrHd
+	W0vNVLkTMmY=
+X-Received: by 2002:a05:6602:1485:b0:83a:bd82:78e with SMTP id ca18e2360f4ac-843ed0d5db1mr1823655239f.13.1733075741834;
+        Sun, 01 Dec 2024 09:55:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE/C29sEt8k4hWcQ9UZmsHjRNvozdtx0q9RcLM88/BVqTagSmnFuAl4NtUM6pK3J/5zeSzg2A==
+X-Received: by 2002:a05:6602:1485:b0:83a:bd82:78e with SMTP id ca18e2360f4ac-843ed0d5db1mr1823651239f.13.1733075741502;
+        Sun, 01 Dec 2024 09:55:41 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-84405faf14fsm171115139f.42.2024.12.01.09.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Dec 2024 09:55:40 -0800 (PST)
+Date: Sun, 1 Dec 2024 12:55:36 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com,
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
+	mike.kravetz@oracle.com, erdemaktas@google.com,
+	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com,
+	willy@infradead.org, shuah@kernel.org, brauner@kernel.org,
+	bfoster@redhat.com, kent.overstreet@linux.dev, pvorel@suse.cz,
+	rppt@kernel.org, richard.weiyang@gmail.com, anup@brainfault.org,
+	haibo1.xu@intel.com, ajones@ventanamicro.com, vkuznets@redhat.com,
+	maciej.wieczor-retman@intel.com, pgonda@google.com,
+	oliver.upton@linux.dev, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
+Subject: Re: [RFC PATCH 15/39] KVM: guest_memfd: hugetlb: allocate and
+ truncate from hugetlb
+Message-ID: <Z0yjGA25b8TfLMnd@x1n>
+References: <cover.1726009989.git.ackerleytng@google.com>
+ <768488c67540aa18c200d7ee16e75a3a087022d4.1726009989.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <768488c67540aa18c200d7ee16e75a3a087022d4.1726009989.git.ackerleytng@google.com>
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+On Tue, Sep 10, 2024 at 11:43:46PM +0000, Ackerley Tng wrote:
+> +static struct folio *kvm_gmem_hugetlb_alloc_folio(struct hstate *h,
+> +						  struct hugepage_subpool *spool)
+> +{
+> +	bool memcg_charge_was_prepared;
+> +	struct mem_cgroup *memcg;
+> +	struct mempolicy *mpol;
+> +	nodemask_t *nodemask;
+> +	struct folio *folio;
+> +	gfp_t gfp_mask;
+> +	int ret;
+> +	int nid;
+> +
+> +	gfp_mask = htlb_alloc_mask(h);
+> +
+> +	memcg = get_mem_cgroup_from_current();
+> +	ret = mem_cgroup_hugetlb_try_charge(memcg,
+> +					    gfp_mask | __GFP_RETRY_MAYFAIL,
+> +					    pages_per_huge_page(h));
+> +	if (ret == -ENOMEM)
+> +		goto err;
+> +
+> +	memcg_charge_was_prepared = ret != -EOPNOTSUPP;
+> +
+> +	/* Pages are only to be taken from guest_memfd subpool and nowhere else. */
+> +	if (hugepage_subpool_get_pages(spool, 1))
+> +		goto err_cancel_charge;
+> +
+> +	nid = kvm_gmem_get_mpol_node_nodemask(htlb_alloc_mask(h), &mpol,
+> +					      &nodemask);
+> +	/*
+> +	 * charge_cgroup_reservation is false because we didn't make any cgroup
+> +	 * reservations when creating the guest_memfd subpool.
 
-Handle TDX PV MMIO hypercall when TDX guest calls TDVMCALL with the
-leaf #VE.RequestMMIO (same value as EXIT_REASON_EPT_VIOLATION) according
-to TDX Guest Host Communication Interface (GHCI) spec.
+Hmm.. isn't this the exact reason to set charge_cgroup_reservation==true
+instead?
 
-For TDX, VMM is not allowed to access vCPU registers or TD's private
-memory, where all executed instruction are.  So MMIO emulation implemented
-for non-TDX VMs is not possible for TDX guest.
+IIUC gmem hugetlb pages should participate in the hugetlb cgroup resv
+charge as well.  It is already involved in the rest cgroup charges, and I
+wonder whether it's intended that the patch treated the resv accounting
+specially.
 
-In TDX the MMIO regions are instead configured by VMM to trigger a #VE
-exception in the guest.  The #VE handling is supposed to emulate the MMIO
-instruction inside the guest and convert it into a TDVMCALL with the
-leaf #VE.RequestMMIO, which equals to EXIT_REASON_EPT_VIOLATION.
+Thanks,
 
-The requested MMIO address must be in shared GPA space.  The shared bit
-is stripped after check because the existing code for MMIO emulation is
-not aware of the shared bit.
+> +	 *
+> +	 * use_hstate_resv is true because we reserved from global hstate when
+> +	 * creating the guest_memfd subpool.
+> +	 */
+> +	folio = hugetlb_alloc_folio(h, mpol, nid, nodemask, false, true);
+> +	mpol_cond_put(mpol);
+> +
+> +	if (!folio)
+> +		goto err_put_pages;
+> +
+> +	hugetlb_set_folio_subpool(folio, spool);
+> +
+> +	if (memcg_charge_was_prepared)
+> +		mem_cgroup_commit_charge(folio, memcg);
+> +
+> +out:
+> +	mem_cgroup_put(memcg);
+> +
+> +	return folio;
+> +
+> +err_put_pages:
+> +	hugepage_subpool_put_pages(spool, 1);
+> +
+> +err_cancel_charge:
+> +	if (memcg_charge_was_prepared)
+> +		mem_cgroup_cancel_charge(memcg, pages_per_huge_page(h));
+> +
+> +err:
+> +	folio = ERR_PTR(-ENOMEM);
+> +	goto out;
+> +}
 
-The MMIO GPA shouldn't have a valid memslot, also the attribute of the GPA
-should be shared.  KVM could do the checks before exiting to userspace,
-however, even if KVM does the check, there still will be race conditions
-between the check in KVM and the emulation of MMIO access in userspace due
-to a memslot hotplug, or a memory attribute conversion.  If userspace
-doesn't check the attribute of the GPA and the attribute happens to be
-private, it will not pose a security risk or cause an MCE, but it can lead
-to another issue. E.g., in QEMU, treating a GPA with private attribute as
-shared when it falls within RAM's range can result in extra memory
-consumption during the emulation to the access to the HVA of the GPA.
-There are two options: 1) Do the check both in KVM and userspace.  2) Do
-the check only in QEMU.  This patch chooses option 2, i.e. KVM omits the
-memslot and attribute checks, and expects userspace to do the checks.
-
-Similar to normal MMIO emulation, try to handle the MMIO in kernel first,
-if kernel can't support it, forward the request to userspace.  Export
-needed symbols used for MMIO handling.
-
-Fragments handling is not needed for TDX PV MMIO because GPA is provided,
-if a MMIO access crosses page boundary, it should be continuous in GPA.
-Also, the size is limited to 1, 2, 4, 8 bytes.  No further split needed.
-Allow cross page access because no extra handling needed after checking
-both start and end GPA are shared GPAs.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
-Hypercalls exit to userspace breakout:
-- Update the changelog.
-- Remove the check of memslot for GPA.
-- Allow MMIO access crossing page boundary.
-- Move the tracepoint for KVM_TRACE_MMIO_WRITE earlier so the tracepoint handles
-  the cases both for kernel and userspace. (Isaku)
-- Set TDVMCALL return code when back from userspace, which is missing in v19.
-- Move fast MMIO write into tdx_mmio_write()
-- Check GPA is shared GPA. (Binbin)
-- Remove extra check for size > 8u. (Binbin)
-- Removed KVM_BUG_ON() in tdx_complete_mmio() and tdx_emulate_mmio()
-- Removed vcpu->mmio_needed code since it's not used after removing
-  KVM_BUG_ON().
-- Use TDVMCALL_STATUS prefix for TDX call status codes (Binbin)
-- Use vt_is_tdx_private_gpa()
----
- arch/x86/kvm/vmx/tdx.c | 109 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c     |   1 +
- virt/kvm/kvm_main.c    |   1 +
- 3 files changed, 111 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 495991407a95..50cfc795f01f 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1205,6 +1205,113 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
-+static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long val = 0;
-+	gpa_t gpa;
-+	int size;
-+
-+	if (!vcpu->mmio_is_write) {
-+		gpa = vcpu->mmio_fragments[0].gpa;
-+		size = vcpu->mmio_fragments[0].len;
-+
-+		memcpy(&val, vcpu->run->mmio.data, size);
-+		tdvmcall_set_return_val(vcpu, val);
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-+	}
-+
-+	tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
-+	return 1;
-+}
-+
-+static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
-+				 unsigned long val)
-+{
-+	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-+		trace_kvm_fast_mmio(gpa);
-+		return 0;
-+	}
-+
-+	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-+	if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-+	    kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
-+{
-+	unsigned long val;
-+
-+	if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-+	    kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	tdvmcall_set_return_val(vcpu, val);
-+	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-+	return 0;
-+}
-+
-+static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-+{
-+	int size, write, r;
-+	unsigned long val;
-+	gpa_t gpa;
-+
-+	size = tdvmcall_a0_read(vcpu);
-+	write = tdvmcall_a1_read(vcpu);
-+	gpa = tdvmcall_a2_read(vcpu);
-+	val = write ? tdvmcall_a3_read(vcpu) : 0;
-+
-+	if (size != 1 && size != 2 && size != 4 && size != 8)
-+		goto error;
-+	if (write != 0 && write != 1)
-+		goto error;
-+
-+	/*
-+	 * TDG.VP.VMCALL<MMIO> allows only shared GPA, it makes no sense to
-+	 * do MMIO emulation for private GPA.
-+	 */
-+	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa) ||
-+	    vt_is_tdx_private_gpa(vcpu->kvm, gpa + size - 1))
-+		goto error;
-+
-+	gpa = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-+
-+	if (write)
-+		r = tdx_mmio_write(vcpu, gpa, size, val);
-+	else
-+		r = tdx_mmio_read(vcpu, gpa, size);
-+	if (!r) {
-+		/* Kernel completed device emulation. */
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
-+		return 1;
-+	}
-+
-+	/* Request the device emulation to userspace device model. */
-+	vcpu->mmio_is_write = write;
-+	vcpu->arch.complete_userspace_io = tdx_complete_mmio;
-+
-+	vcpu->run->mmio.phys_addr = gpa;
-+	vcpu->run->mmio.len = size;
-+	vcpu->run->mmio.is_write = write;
-+	vcpu->run->exit_reason = KVM_EXIT_MMIO;
-+
-+	if (write) {
-+		memcpy(vcpu->run->mmio.data, &val, size);
-+	} else {
-+		vcpu->mmio_fragments[0].gpa = gpa;
-+		vcpu->mmio_fragments[0].len = size;
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-+	}
-+	return 0;
-+
-+error:
-+	tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+	return 1;
-+}
-+
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- {
- 	if (tdvmcall_exit_type(vcpu))
-@@ -1217,6 +1324,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_report_fatal_error(vcpu);
- 	case EXIT_REASON_IO_INSTRUCTION:
- 		return tdx_emulate_io(vcpu);
-+	case EXIT_REASON_EPT_VIOLATION:
-+		return tdx_emulate_mmio(vcpu);
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2eb660fed754..e155ae90e9fa 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13987,6 +13987,7 @@ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5901d03e372c..dc735d7b511b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5803,6 +5803,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 	r = __kvm_io_bus_read(vcpu, bus, &range, val);
- 	return r < 0 ? r : 0;
- }
-+EXPORT_SYMBOL_GPL(kvm_io_bus_read);
- 
- int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev)
 -- 
-2.46.0
+Peter Xu
 
 
