@@ -1,69 +1,68 @@
-Return-Path: <kvm+bounces-32853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A3E9E0D0A
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 21:33:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBC49E0E3D
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 22:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED67C282697
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 20:33:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE8A2B29E5B
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 20:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67051DEFC0;
-	Mon,  2 Dec 2024 20:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6721DF245;
+	Mon,  2 Dec 2024 20:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OJuv6X/o"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="m7QFMEMU"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2061.outbound.protection.outlook.com [40.107.102.61])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663C91DED67;
-	Mon,  2 Dec 2024 20:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2738619BBA;
+	Mon,  2 Dec 2024 20:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733171614; cv=fail; b=tumRIoBQfXaaOSxyASoe1f6C5bM+j8QXkSxQBHCugcXlP2qtNl7ggqBDC3HWoBxInln0fzr0l6/0J3j5ixRF4/WqelwSHtQSRqmRoEREYhuhAq2rOJQhjA2+BN5KiYmUsmvGdsYOObXj1tPmNyPj+eSoctiAcjlkD8zNMakCeXk=
+	t=1733173046; cv=fail; b=KC/WZEB+3YXwq0A4pfxRPKaWZdTvncxNKDhk3g7dCNJY5BruVQgw6xtgc1gPAkaTo4P42xuW15zmYWuPMRt+9Cdu2CLKRh6JS9XWVCyGenFe0I82inELhRWxduB9ZPic9EuXRac0xzgEQFYR7YZlo13u7xWGnCVh8flKJHU5iNY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733171614; c=relaxed/simple;
-	bh=NGu9kPZyt/idMyfQvqWms1b8E6srHLRNQjMZ0ihP1+s=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XcrSWux/KZA0rwNZ/ntKwiqI70MCrfLtSFYD5Ds9m4H11YCZybuSImc9mvhOAiFkfP2sBcWgGqSCsmufrICNlX9621aokWlX/bKP6JM2X1X/6kKlNppRPmkhFjUuGCTXrfLjiYR/sH16U85qxIatqpfrjNcpVLlVNdF+sDdidb4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OJuv6X/o; arc=fail smtp.client-ip=40.107.102.61
+	s=arc-20240116; t=1733173046; c=relaxed/simple;
+	bh=UAi2hgLlEDUQGo3oXiSuqyWx11liyb30FKtp70wGXFg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UO1DDygjRC43NaPJIlcnJ6loKV0GNOvwT95dwT7yVGXl6NMQ1D6/Nte0mAAvV2ZqY+Mx8P0JolvU8iFV1Jt6WSTs8rnhkOFAAde1TikKHIv52CvV7XYMcF5J2NBAPyOgu6Dvm2E1aNF5+PPfj5GIAQINtlHU7e1Jn4uee/FTWdY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=m7QFMEMU; arc=fail smtp.client-ip=40.107.237.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cksTO/FjM+S55pUqutWBak2tsX8PGnAYSoWaxidA/KZM5oo5SIujkZfXVOBGEyTVJFX+2qZKDb2dq7a7fPSz2Oh/s6o8pKUlf79W43vz71Jo9mOqQyFzdQPPKqgfc0mQdl3DUX/5HeZ1JfguQupKuJq3JlWyoHGpykPRmNeYnzFHHkCoHLbDoV3sUGTfXa9R8+x4mEwRvtDquS/J0AaJym+y4U47KK8/e2lvqc9p2Wz0uUt/3rlJ2I25gsgJTvu2uFzD/zx9vq7YEQ3R44wFPmyyDCsTqWm6pwNOI5K+GCZFQE0yknpKfiRAsX+UYuSBkkgsIhu7QSC6bbk02bKj4A==
+ b=l/ULhJoUK3qu8Gbv7GV5su9AaDVM/NolNHJTMJ8PCuooWXgLGCkp8FfhViRQc0H/oTyrmYe5P7WQw5PvuX4YixfcEK+xri2ofm0lgy0/KeH0qGS8Xo793XuIkRmCftGREoXCs665mSHEwXAG9sJ5zr2+b+3QjmoI/u9RWBd+KRIvol2zUWn6WmJ7EozMM7JyLyJ5+UC2qMVh1qEtvx+fyQ/gYwHSZte2a72LjpuISGj/LYxowVDYlZ4508WiWZpoe+DbnxG2mnW7JcdHtpvhSxqJRdMN6KwXCqDXojEl19HS/VAUTUYufaJ4gZgt5rlHaa05QuYjv1t7dV5Y/lSfZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8BtwvjzA/ewb1RvVVeypUNi4drx7gyhMBScDEsFhNjM=;
- b=h3+TVC9H4hllIwwQxEXLa73Hrf9BKNqQBFRo+uFeFbEDbq9i3ts2/CkBl8+r65GP1VL30DNv/tHrXGhu87uJuiW9xT+H+LcwAnePQ/YU0/YvTaLKThVM/cya+ASd1nTYXbqOEaEmZz4mgGt3X1bXgJ0XSxkdvIY2ydZEnYVhXbqN49Cyd4Rnd28N/oGACAQsLhHWjkCMWBa7dHP+xMOyuMpCnIDDn7ebxFZqihPL+XUyrk20CMwzcYuksqiEYERnitCERRu1w9YMGuYMM2cANzAU/uRtLAMEChNZcEzhegzYlb4vn4Mp1i3QyR1TwlYgdT2DAzl/hktqExtRYtnx+w==
+ bh=HR6U/LGgELyvgRoAYaZPBzzCcHOXKVqE3k19mTTHQqU=;
+ b=tX8cnFSVU2xsfU+oa/2FNr+GO5agRo820Cr7/bFo+OSvpJq86NpUHi3EC2JHibjMAgKkDxVru7lWs5LbeDv2mmGaUpvzqaE0QYMHLpOH7d9UUfiHKEZrqRyqjyuTyRQN4PwfV5eC5fQKAAVT7CoAhPkr2q7kqvJa03iuFmTS9tn310Uh3qjyw9YEZL2xDwChqwBhgh6Tied6q5wURYlfRtrU3UHgm0NB0gqctYgpYzIJFppd8Jp71yVy8QX9rgKQRjLdrg95gFLBarLBrEfEk3F8odylChwilpwmc0BmpcVK2vp6bH3mLqkcvrxxMzWO78rt8LfiVQ47DwHKSLBtKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8BtwvjzA/ewb1RvVVeypUNi4drx7gyhMBScDEsFhNjM=;
- b=OJuv6X/okNxuYBhvw94KT+YR9rvfyUdo2BhvlshMKfWqueHmVN4rwy8M5QUxgEsUbJRZx9m6PznQdJjPs+DW4qDIC0I318pEliuaD9xdrxCeKG0aMa0V4YbcbkGWfv/bV3ZWhDzoFQOudiyDUmbNxwaZl2JNgo0D4tELXTRcUoA=
+ bh=HR6U/LGgELyvgRoAYaZPBzzCcHOXKVqE3k19mTTHQqU=;
+ b=m7QFMEMUQqDEjLfc46SuMKfgRfnqH/jWJwpV5p5uoYQAbNFi0jzFOQVId/dXgftVDvdCPKDdWTlYiU/3V2HkWDMivUM5CLYSD6bOFUH3ErNo3VtWRHlTWk0DxMR3PB2yyCjCp4bE1vXY8CXhyKjmXO2i5+5aEW/MgPEjYMNs1p8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by MN6PR12MB8543.namprd12.prod.outlook.com (2603:10b6:208:47b::5) with
+ by DS7PR12MB6213.namprd12.prod.outlook.com (2603:10b6:8:97::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Mon, 2 Dec
- 2024 20:33:30 +0000
+ 2024 20:57:15 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8207.017; Mon, 2 Dec 2024
- 20:33:29 +0000
-Message-ID: <b5d7cb70-a373-22aa-3e1b-1018799f9293@amd.com>
-Date: Mon, 2 Dec 2024 14:33:21 -0600
+ 20:57:15 +0000
+Message-ID: <6f4aabdb-5971-1d07-c581-0cd9471eff88@amd.com>
+Date: Mon, 2 Dec 2024 14:57:13 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH v4 4/6] KVM: x86: Bump hypercall stat prior to fully
- completing hypercall
+Subject: Re: [PATCH v4 5/6] KVM: x86: Always complete hypercall via function
+ callback
 Content-Language: en-US
-From: Tom Lendacky <thomas.lendacky@amd.com>
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -71,13 +70,13 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Isaku Yamahata <isaku.yamahata@intel.com>, Kai Huang <kai.huang@intel.com>,
  Xiaoyao Li <xiaoyao.li@intel.com>
 References: <20241128004344.4072099-1-seanjc@google.com>
- <20241128004344.4072099-5-seanjc@google.com>
- <30aa4461-b5bb-a5e2-4a1d-c02d88a2c916@amd.com>
-In-Reply-To: <30aa4461-b5bb-a5e2-4a1d-c02d88a2c916@amd.com>
+ <20241128004344.4072099-6-seanjc@google.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20241128004344.4072099-6-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR10CA0022.namprd10.prod.outlook.com
- (2603:10b6:806:a7::27) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN7PR04CA0032.namprd04.prod.outlook.com
+ (2603:10b6:806:120::7) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -86,160 +85,214 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|MN6PR12MB8543:EE_
-X-MS-Office365-Filtering-Correlation-Id: 564ee94a-20e3-4185-a417-08dd131094dd
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|DS7PR12MB6213:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfbfb791-e2f8-43b3-2f0b-08dd1313e673
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SUprU2FDalZqN1JQc2ZJTWh3anZiaTZpUWMxeWtpRU1VTSt2SllzQWtZN2pn?=
- =?utf-8?B?ODh5K056TEE2SnBlSUhRSzdUdXdINzBUVW9BNTRJR3IzUjRDN2k0ajlwVWJH?=
- =?utf-8?B?N0xISzE5V2NWTUp2ditEcG90ZjVwbjQyWk1iVEFTRnhHMEVKaTBNNDVMWWhW?=
- =?utf-8?B?eEZGQk1MbkZlSmIwMDVCYVY0dldlais3c3pabXcrWHdIM2pjQmZKWU96d05G?=
- =?utf-8?B?VmhWblYyeUw1NmVoSjN2NmRuWXEwa2JqbldwSFg3U3hiOVVOT1lENXpaV1pB?=
- =?utf-8?B?bHZ6bFFUeDYvZGJKM1FhMm9Qa3daNlhyQUQ4c1M2RC91cFUyR29jcTJIMGpQ?=
- =?utf-8?B?b2RTeS9PeTJ3ckJkUHFFL3F4TGF5UlBOcWVXeTBJUWFCZ1dZWGd4K21RUkFL?=
- =?utf-8?B?RFI4bHB3bXNmMmNNY2haWWl1RHJ3TmxOSkxJUmFDK3ZUbUVMMkxBZUpJSTlV?=
- =?utf-8?B?L3JzSkJDem4rNVZOdE9KMDVaRmNGRStkeEh4SFBNSGRxSW5GVHZJQnJ5K08y?=
- =?utf-8?B?YnBFYmg4OUtZNE1vRnA1bC8wR2hRSzBXeTdQMTc3MTdJRmZIWU4zVWJKSWp2?=
- =?utf-8?B?ZldTRmtCTDlLc2NiVHpETGhyRGhJbTBmT3pOdXRJR1BScmMvZnYwMDliV203?=
- =?utf-8?B?ejB1ZDhMckxzcThycGJYM3g0anl5dG96QTU5NnFlTTM4NmQ3byswZEt4NWJk?=
- =?utf-8?B?LzQzQndBaC9qbFMrRmtkTTNJWU1ic2tlZElxTFdRdzFzRHVQVktON0FFMkVW?=
- =?utf-8?B?QUFvc3QzbGFveVRKdDVjQS9DaTFDUU9VbVNpRkFUTG9IclZQQkRxUkROcWlG?=
- =?utf-8?B?YXgvYVBRWmJxRHovU0JWMXRlaWc2N1ZxODRRU1VVUS91UHYyME5Mb3k4aUtp?=
- =?utf-8?B?dWRSR0I3aVlWVjcwRXVybnQ2angwTVVVRFdzRU55ZHNkR1JGT2RNSENjemVx?=
- =?utf-8?B?VFRCZXRpdmUxZVE5YlJPTGVESEtaUUxEUVdIRVRWNWZMa2xoTTdnTU8waGla?=
- =?utf-8?B?S3FsbXZPR3B3SDZmUmduN05DM0xqdDBqSFM3bStXSkF2QStMM01ibWlJWnJ5?=
- =?utf-8?B?ajU2SVMwd2J4N1hLRm5wN3IydzVlZXhSVGsxNk9kMzZWSW9oU3pKY2V4Nlh1?=
- =?utf-8?B?QVpBcm1qUDl3clJpMUpOQkh3NGc4dWNsMXFaaHVoc3VKRVZXbXRkRmRzVEZa?=
- =?utf-8?B?ZG1sZFR1V0R4end5dXV2Z1dLcDNqY0FoUzNrMHh5NjBDb2Nwa3piWTA2NG1k?=
- =?utf-8?B?Z0QyWm9GQlhCY2JZNUpLVm90cUJzcnYyYlJjOFRQR3hmZ0Q0VXgzdTg5RzZm?=
- =?utf-8?B?WE9nYnM1YW9NK05YTk5GQjBucDJFZHRnQ3BodHhOUmNOSW4zdDltZFJmUW1y?=
- =?utf-8?B?cXhYVlNUU2xzZ25UZGh2aGE3Vi8rMEN2ZFVkLysxUkZPaXdyMkkyMlVzUGhx?=
- =?utf-8?B?QmZKcGUwbUNpQy84a1puR05LMW9pSUs2VlZCQy8valZzL0FoZm40Vm52NGo2?=
- =?utf-8?B?SGtSVEJPL0FBSCtEdEM4bllUcG9QOVhFSlYvR01maXMwSXE2V3Nud1lLMWI0?=
- =?utf-8?B?WmtzM0g1cFJMbDcvMFhUUXBhelEwK3JmTjN0TGY2eTlyaW5oVkE5TnpkUllq?=
- =?utf-8?B?eHVSZHBaVGhYOGRDNXYzRnFEZTFnOVlJOU5ZdytDbXdKY1d0OWFUUVdFb1Mz?=
- =?utf-8?B?cGFVYVJaUFRCZUF6NTdneXJ0QmR4dUgzd05aRm9kSE53OXlVR2hGT0syTlRR?=
- =?utf-8?B?ZFpKL2dOdVZoOE5hZFByZFUzb09sNkVaelVFNE1BV3BtRTQwbDVxTzJYUllz?=
- =?utf-8?B?QzlyZ0RKZk9TN216SWFWdz09?=
+	=?utf-8?B?MDZmSDBHQnc3dHgrK0hDaWRUNTd5TXR1UmxhaDB3bzAzMTFRaXZ5anVBcXgv?=
+ =?utf-8?B?T2FnRXFITC9MTjZHMG8vM3FWVXRZc0xZYkt4TmtLT1RSVWswWURrbUFCUmRU?=
+ =?utf-8?B?WGwzdFdsMUpvTkNvMEw3Y0xQSGo4QU9rUGRJNWNTTUpXN01TYjcwTEROMGxr?=
+ =?utf-8?B?NXZUSzVqUk80di9NYnlWV3pyOTZxRkw4RFQrZnl3bEJPSXhiRS9OT1BDSzlS?=
+ =?utf-8?B?clpROGNjLy9OQ2ZFaTdtSHZRZEhxVDlEc2cxM2tnSU5OWlRnWFA3cmtWSFpD?=
+ =?utf-8?B?dGVUcFM1TU4wYW1qblRvL3VEaTByemdEdlJpUXJDeU1QdW1tV29mcXpuMTB5?=
+ =?utf-8?B?WEV1L3VkZE5PZ3pzR01LMWVYQ2dTaWxrQXhaeldZRXFpMHkzbU9WTEpQRlgr?=
+ =?utf-8?B?VWNHVEZOTXlmb1FXbUZYcTltcVNvL2RVNldlWFhZTHIydzVDelVCMUp4Zkdn?=
+ =?utf-8?B?Mk1VNVBzOXpUZVpZTVV0V0xmWlFlQ0JLSGhzbFZNeWFtT2wyeFdENkw4TTJK?=
+ =?utf-8?B?QTAzWi8zWFVpOFVRN1hkQ1NYYmFyRFc4Mml3NFUxZm40RVBvek56YTZUL2dr?=
+ =?utf-8?B?YlIvd2Ezd2xnVkJ3U2JrK3c5Y2lLRVRTY2ZZbks0aFpZQUNwWE0zYlNMVDgx?=
+ =?utf-8?B?SlNiQlIzcFZDMEVqakhqNVY0SG1xZDUwT3JXdVVQd2E3SDlnOEtIcjRYZDNp?=
+ =?utf-8?B?aXpsaDVmcms2d3dDdU5Bb0RsS3VORnhTNWFndE92ellPMU0yOWFQalpOM3lR?=
+ =?utf-8?B?d0tLUS9Ua1A5a0NrcFI2a1QxazdKMVI2T3ozNjBBcDNsdEN4NUlncVU1bUhq?=
+ =?utf-8?B?UklLVjlodjV2M00vdHF2QWk3VXhYV0VkU1RVdnpwWkxtZ2JUMWZ2N0ZvbjRs?=
+ =?utf-8?B?bmFVT0h3bG5QaGE2UmpoM05iSzQwc3Zld0Mrc0xTVzQ5MHpvdm16WFVLNzB1?=
+ =?utf-8?B?YUZqeitoMlhhZkVHZ2ZDaUtJaXgxU3pmV21MQWdPOXFqYTN6U0xZWlA5Qjdi?=
+ =?utf-8?B?SVdySmRKbjB5ZEtZbXdxVjBNYWViYmtEcXJuUC9xNEpVS3FJR0Iwa1psNHlY?=
+ =?utf-8?B?WE5QYnJCdGlOMWdkdndRL1lSZEM0T0pCNERrWGtPUnlHRWRrMUc4cm9HVHAw?=
+ =?utf-8?B?emdqbW1pdEd3TUZnOTF6bkpOWXpIR1lWRTJvM0NML1RkamE4Z1M0dlhkTHpw?=
+ =?utf-8?B?RUNkcTdkRXdkWlNDVkJGWUg1Rm4zSUdIS3ZZZTBBYVNTQUVMTjBwanVYUi9w?=
+ =?utf-8?B?cWhoUXVTSk01SllVNVRlQjdsakQ4eERXUVNsNGZUM3NQbEZFTkNzVXM4VWtM?=
+ =?utf-8?B?by9pSmpFK2loVW85QnVnaGxQRG1LWnBLOGdzdVFyOEtiUS93K0kxRzZLWGZk?=
+ =?utf-8?B?cXVnVWxiQ3J5UW95WXF0cWpjdkcyTFFUaElEQ21lTGVNK3NYSGNmd3kva25y?=
+ =?utf-8?B?cjh2QVNoWEtBWGdYNkJHMkVzcWdYRDZKOTNtdHhpTFo3cHN3eHFCdDVwMHFo?=
+ =?utf-8?B?dmh0b1FXWmxPelNJYysvV3BWQjQ2WDZlNUNGbGpkWTc2UEJqS0w3dWxaMlJO?=
+ =?utf-8?B?dGdLa21yL3BNMTd4RnRPQzV4Y0FaN0RlQVMxUlNVZWhLZklwd0ZmL1JPZFV2?=
+ =?utf-8?B?SWhib1JFR05jRko5YXYvZWJlSEFOL3RIejJDY0NLYXFuajVJOFh3TkV6Szla?=
+ =?utf-8?B?NWJjVkhZYjFyMkswRVAvblNpRmI3cnBGRVZPb3dpbFFnQ2FsY1B5bVNZb2Rp?=
+ =?utf-8?B?LzVDNUpaQzEvdHYwbG8yaDZRVS9uT0d4OWlWaG1BdHFHSFc3ZWR3MVZVNjJq?=
+ =?utf-8?B?cEJ0eVFUYnBFV0xsV3JKdz09?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WWV4aEYzajFXUGRORGtCUTdwSENlN0xJdi9BM1VRc1dzeG0yVFZ5L2JCc3ZG?=
- =?utf-8?B?ZDJYT3UrOFZSM0xMU1NMQXdoLzlFN2ZxM0dQNk5mV1A5dDVCdWRvWjAySTJq?=
- =?utf-8?B?U0VMMEtYRWNSc256cDVzWGhsYTcrOWtDak04TXE3aXFwTElSUkZIWTdOMXdE?=
- =?utf-8?B?TnhZU2VtcnpyYVZXWEt4R0EvaytjYjI2SEJ2c2piODlpQUc2Z3dkeVFKYStj?=
- =?utf-8?B?Q25uN2FnTWNLZnFoQ0ZYaG9TcTRaT3YvS042d2J3dzFWbzZzaWRvYk8raEp4?=
- =?utf-8?B?d2lHcVZXa0lrQVIrbWRCOFhaOHl3TEFGT2dCMFA4SWJ3U2JZZE9CakplV0xh?=
- =?utf-8?B?dHNUKzkxTTNoMzRaa1hIZWozamtZdldkWGJBVzduR0tyY0Fib1BaN2xwKzRJ?=
- =?utf-8?B?T3kvelBpZDJOSGRxSDExdm1MeHpoeVRod0F0NFQ5TlVYd3R5bjA1K3N3QS8w?=
- =?utf-8?B?R25lR01nRjhHblFrZ09OWG5IdHdGSDFZbE1mOUlkVWtEekVBVVFwWGF6a0FG?=
- =?utf-8?B?bmk5MGpqeVpLcll5czBHL3E5cHFudEVuS05jd2F1eXFlMTVkTXUrc21xWkdN?=
- =?utf-8?B?d2doQnVZaTRDS2ExckhJelZwcTNkMFBPYzdHeHNnQ1RuUnBPZ05nMlZnNEty?=
- =?utf-8?B?eTR3TzdSaDU0c2l2Wm4zaXR5cjBEbktqN056VVlzL0ZMbitEUnV4d0Fjdk85?=
- =?utf-8?B?Y3QxVHdvWGFDRDNsWkNWU2pEclljWldSYUFpT0cvK3dYdFBlOXhtWXJkZ3lv?=
- =?utf-8?B?Y0NoV1lacWVodVJrQ2YrQVNUVHRpbDErc0NRZzIzT0p0SEQ2NXI3V2RQYXRE?=
- =?utf-8?B?ZHN0SjgreldBRTFlNEpVUDVKUlhac2VWMFYwc1Z1cjVaWXJIK0dMZUVOYm04?=
- =?utf-8?B?ZDR1UTZrVkdSM285bmc3NEtMZWNBOStPeW1Xb2xpeEhYL0lLcE1BTnAzWmc0?=
- =?utf-8?B?YnU2cmlhOVJZV0tTTnRzeFZKbTcwaTJFMEYxTzdxQThpM2NkckNoU2tkbkta?=
- =?utf-8?B?SlU0bVVnNUtrbFN4MDh0elNIZzBDNHBTYnZ4TnBWN3doejJnVlVueW5UTDJz?=
- =?utf-8?B?UTM3R21PYWNkOGxTWldjSXoyMUhCekVNU2RYeklNM2EvYU9BSzBBSnc1NGh6?=
- =?utf-8?B?RGhLL3RxeFZiazRMMjI2bjVjVUVlNUZrY21HdFUwNEJSSFZzc1RoMEk0OGhW?=
- =?utf-8?B?ZlFXMW1jcTRUZTBrOFllZXFTVFRnMDRGYlpQRFZqM3FoTU8wd0ZFSXJZY01C?=
- =?utf-8?B?S3RGZ2k4SGU5emRjMUo4OFJCMVI2S1JLa25jOHhxSmUrcXZubUtONU9BaVl6?=
- =?utf-8?B?ZjI5U1oyVTd6a2dnQ0NKbTFqQ3VjZW80cWVrSTlrZmJSaS9VeGdPQ2lydXVx?=
- =?utf-8?B?YkZ5aXl2NklBbVdNNjJadStURUNlTVpjL0ttZnlOa1lHTTQ4TGhwWCtadTFI?=
- =?utf-8?B?Y1hMNWRtMUJlVUhIY2NVWjIrTXhuYjdXaGJQVTdXSDdReWhxcFkwbC9ScC9O?=
- =?utf-8?B?S3RnWmtBc1dPRzlVT1VZbFU4Ri9XNU1GbUMvL1ZuQ21FV0tUcWs3R0FQaWVq?=
- =?utf-8?B?cUhnWkxoRE1OaWJTWkhiY0JMdEZYb216Y2Y5bmxaei9CQjk3Rms4dVRzKytI?=
- =?utf-8?B?dnNVdjRXK1RPQXRScC9JQXNrR2Yva2VIampFVlVXMnhtSW1TYjdiWDdtOVhS?=
- =?utf-8?B?SnowcHY3MTFNdm5Xd1doU1lUOC80RmlVMjF3NGhWLzN5THNVTDFoTE9NWXA0?=
- =?utf-8?B?K0oxSFVVbE1pdXpTbXVQOTcxb0F4NlFzQVpJU29lVlpPT0MwZC8zSWw2K3Bi?=
- =?utf-8?B?V3JnT2Z4T3I3bExHbk5UK3RwQlZDNk95SEcxYjdlclduVzBkT25YamIwWXBU?=
- =?utf-8?B?a0R4bG5sZ0J6SDVEN0ZBcGJsellvWks1NU52S1hLMTRPeFFsSjNBdkZTSWVm?=
- =?utf-8?B?Q3BiZk90UzkvTlNOaHovd3dEb2lCdzlsbGdLbU5QdzRKa3N3TE1GRFMrNDRV?=
- =?utf-8?B?RDhFd0hXWm1tTU5zaUJHVHdHY3Z1UnJwSkFsNm4zQ1phWGVUd1Jwak5PeWdo?=
- =?utf-8?B?blJFZGxYQThQM2lpdjh0RGlodnhlTlNpb0RmdVhVNVdRMW5UNG5MdkwrcU1s?=
- =?utf-8?Q?tfnid2JnE9KghagSKbyC3SNiy?=
+	=?utf-8?B?ZWZVWEZwUE41aUNmaDVhSlhHRFFpR2ViVU54T3BKZjB1L2prMmFuSWovVW1T?=
+ =?utf-8?B?NFZPWDBXMkhwL3JkenpHNHF0N2U5RXdkbUZwSlJzTWlyWDd0cTIrWFUzdTh3?=
+ =?utf-8?B?VlEwTlNNbk9MeVFpSjZ1OVpNdjZyTnhVZStLME8waCsvQUltTWEzRGVzb0VI?=
+ =?utf-8?B?N2ViZWZIMnh4ekk4c3hTWnFZVlhUY2UxUHZMdllkOFlxOTRDTDVyNHZOQjQ2?=
+ =?utf-8?B?c1psM21kMnR3M3crcUdxMjE0YW9CampWRllZV05jTUs4b0lSOHNNS1VFRFlU?=
+ =?utf-8?B?aFdNaUdNWEpFbll2a0puTExsWDBjd2JDTEdkL1QwbFR4Lzg5WGtTdUx5ZWFI?=
+ =?utf-8?B?VDdpZHVqbmY0blJoL0w2OXpGdUxWRHljcEoybkFiaStHMEpqYWNHOEx1bWU1?=
+ =?utf-8?B?RVNycTVURE51S0hEWUF2QXQvTyt1alBkcWJzN3Y5bVRBYWtRb1NXUDhFREdw?=
+ =?utf-8?B?R0xPd2ErMW9QT2ZZbk82NlY0bFZSdU13SUxLZTY5KzdVQ1EvQzZnRTNZenBD?=
+ =?utf-8?B?RmVrMk1yWXNBZFdlVGhZZ1lsTnJTemVYdE5ubnY4eElKK0tvNFExT2hpZEFR?=
+ =?utf-8?B?Z2RyMnJMNVltS24xb3k4TFVyeXV5aWlWZlJvWFlkYlZpTVlSb2gvMzZkeTR6?=
+ =?utf-8?B?OThHbFpjaTV1dGE2TzlSaEFtbm9TWjhZeTRZT3U2R2RtMHkveDlQVTcySWMy?=
+ =?utf-8?B?bTdQaW5Vc2xlV0JweTF1NDBFRWMrU1BEemI4TFJ4UU11bktUSkRrR3dFay9z?=
+ =?utf-8?B?cXExTFlFTDFCKy9qY2o1WEIzOHVLSHNNUjQvZ0VJc2piWEh1Wkl3OGR2VjB4?=
+ =?utf-8?B?QXVjelhWY2Jwa2JWaTI1V3JVdzB3Z1dwdkhVQkRnWWtNalQ5akxvZUdqa3F3?=
+ =?utf-8?B?Q0V3K1hpU2JqTUlDLzBhckFHbXRTVFNHd2xjcTVsL2V0WUdJQkZqYzhkVUdQ?=
+ =?utf-8?B?bXZoZnVLZUYwbXhxR0VHUkVua2JkR1N3RGZzSmNobmRicUcvd1V6RHdiNFlS?=
+ =?utf-8?B?WnN3ZjBEdWNKM2lDMHpHak1BbVZBdGJ1M2tZckcwRFlUS0hoc0ZCcnhKVjcy?=
+ =?utf-8?B?ZzBzKy9aeHBETEo0OERYTFZFTnhyZmtFMllmUUQwaUttcGtzRHdXSS8wNUlh?=
+ =?utf-8?B?RFNzaFFHaUliRU5tOXlBcDJUT29uR2VkN3Z6WTZMSi96a2xvUFlzcnhmSjN1?=
+ =?utf-8?B?c0VTQXFRTFZDaDg0SFNkYW1FZ1I5VHNicEd6NE1TM0lDRlNyeFoxUzIvYzdK?=
+ =?utf-8?B?WTR1alppZjdoaFRINEhSYjI5Mms4dkd0ZmlJTUptV1VtMHdOdXZsdDczQWJT?=
+ =?utf-8?B?L0tuUXdsMnp0NnFkUkc5MEpDK252L04vQlRoRjMzT0d3QlIwdXVudnl3Tllq?=
+ =?utf-8?B?dDQ4QnFaTUZSNDZtbnlaVjF5MkNsUS9xaGRNRlQrL3Yrcko3b2pEUU4wemQx?=
+ =?utf-8?B?OVo5bkJXTkV3N3gxUm1zSndodUNvUTgwQi9LU2pnNys5a0xkVXZGdlo3Tk5i?=
+ =?utf-8?B?WEt6NGdkRG8xa2NPTHpQOFhCbWovbTl5Qnc0elFXOG9LbmpQL1ZmRDd4VkQr?=
+ =?utf-8?B?NC8vUU55YXVaaTM1aDBwRGdoa2Y5YzVpbzhvUXRjSjVsTDJyUUlHMDZJbHFP?=
+ =?utf-8?B?KzlnNmRXb0pPd2xCM2VWeHZZQmdJeERSSkZubXB3WUNWWWlBSndWbXJHdy8y?=
+ =?utf-8?B?OTd4V0gxVHBYN3h3OXZ3OTBuSmNEMXFmRllsUWFFYUROdHV5WXFla2ZJaURo?=
+ =?utf-8?B?NTJVQ05ONnA5YWQrakFZenVhMzR4OHlsT1ZrcCswQnUweHM5MnlOb1lEbFNX?=
+ =?utf-8?B?K211R1UzWW9mY0ZIU2VKL2pxcXpycE91Vk0zQ1JsNFV6YzVHUStJWk5Tb1pk?=
+ =?utf-8?B?RnY1dWVDS3pHT2RCUkZ5a1ViZ1RqZjEvcmNYbUJjUWlsbnd4WTJXbEhUVTJh?=
+ =?utf-8?B?N2xReS94aGZLTWVrWmFNVUZkWk83QWdiOXJuNDgrOFNxU3kxVVdMMU4rUDhV?=
+ =?utf-8?B?bXZ3UUN2aHBlM28zM0ZRM1JBYUxGZWE2Q25pWUJsVS90Ym1qMzZCaCtWTTZM?=
+ =?utf-8?B?SU9POGVsTXFNMmE2a3o5QlNXMHV4OEtURENxWjErVXBRcWRMc21aTnY1cUV0?=
+ =?utf-8?Q?cmZd2Jl+pIukR3XARkdqnFSgd?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 564ee94a-20e3-4185-a417-08dd131094dd
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfbfb791-e2f8-43b3-2f0b-08dd1313e673
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 20:33:29.8432
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 20:57:15.1277
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l+griThCWa5316dTZPALdnbqJSSMpjY01YNrxRfGbKysIcrPFAnmWjSJkMvf5c7+Tjhr0xGn+1Sqfq3A9F70eg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8543
+X-MS-Exchange-CrossTenant-UserPrincipalName: k4+lutXCxCugvK4PJW2Daf6R2zbNEILI8v2kxi79xYpRnRPtf1s1l3VQ3mba1QhpQIlMCzsySB8n0PM3VIRRqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6213
 
-On 12/2/24 14:13, Tom Lendacky wrote:
-> On 11/27/24 18:43, Sean Christopherson wrote:
->> Increment the "hypercalls" stat for KVM hypercalls as soon as KVM knows
->> it will skip the guest instruction, i.e. once KVM is committed to emulating
->> the hypercall.  Waiting until completion adds no known value, and creates a
->> discrepancy where the stat will be bumped if KVM exits to userspace as a
->> result of trying to skip the instruction, but not if the hypercall itself
->> exits.
->>
->> Handling the stat in common code will also avoid the need for another
->> helper to dedup code when TDX comes along (TDX needs a separate completion
->> path due to GPR usage differences).
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 11/27/24 18:43, Sean Christopherson wrote:
+> Finish "emulation" of KVM hypercalls by function callback, even when the
+> hypercall is handled entirely within KVM, i.e. doesn't require an exit to
+> userspace, and refactor __kvm_emulate_hypercall()'s return value to *only*
+> communicate whether or not KVM should exit to userspace or resume the
+> guest.
 > 
-> There's a comment in the KVM_HC_MAP_GPA_RANGE case that reads:
+> (Ab)Use vcpu->run->hypercall.ret to propagate the return value to the
+> callback, purely to avoid having to add a trampoline for every completion
+> callback.
 > 
-> 	/* stat is incremented on completion. */
+> Using the function return value for KVM's control flow eliminates the
+> multiplexed return value, where '0' for KVM_HC_MAP_GPA_RANGE (and only
+> that hypercall) means "exit to userspace".
 > 
-> that should probably be deleted, but otherwise:
+> Note, the unnecessary extra indirect call and thus potential retpoline
+> will be eliminated in the near future by converting the intermediate layer
+> to a macro.
 > 
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Suggested-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Suggested-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 29 ++++++++++++-----------------
+>  arch/x86/kvm/x86.h | 10 ++++++----
+>  2 files changed, 18 insertions(+), 21 deletions(-)
 > 
-> Also, if you want, you could get rid of the 'out' label, too, by doing:
-> 
-> 	if (cpl)
-> 		return -KVM_EPERM;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 11434752b467..39be2a891ab4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9982,10 +9982,11 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>  	return kvm_skip_emulated_instruction(vcpu);
+>  }
+>  
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl)
+> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			    unsigned long a0, unsigned long a1,
+> +			    unsigned long a2, unsigned long a3,
+> +			    int op_64_bit, int cpl,
+> +			    int (*complete_hypercall)(struct kvm_vcpu *))
+>  {
+>  	unsigned long ret;
+>  
+> @@ -10061,7 +10062,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>  			vcpu->run->hypercall.flags |= KVM_EXIT_HYPERCALL_LONG_MODE;
+>  
+>  		WARN_ON_ONCE(vcpu->run->hypercall.flags & KVM_EXIT_HYPERCALL_MBZ);
+> -		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+> +		vcpu->arch.complete_userspace_io = complete_hypercall;
+>  		/* stat is incremented on completion. */
+>  		return 0;
+>  	}
+> @@ -10071,13 +10072,15 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>  	}
+>  
+>  out:
+> -	return ret;
+> +	vcpu->run->hypercall.ret = ret;
+> +	complete_hypercall(vcpu);
+> +	return 1;
 
-Until I saw the next patch...  nevermind.
+Should this do return complete_hypercall(vcpu) so that you get the
+return code from kvm_skip_emulated_instruction()?
 
 Thanks,
 Tom
 
-> 
->> ---
->>  arch/x86/kvm/x86.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 13fe5d6eb8f3..11434752b467 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -9979,7 +9979,6 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
->>  	if (!is_64_bit_hypercall(vcpu))
->>  		ret = (u32)ret;
->>  	kvm_rax_write(vcpu, ret);
->> -	++vcpu->stat.hypercalls;
->>  	return kvm_skip_emulated_instruction(vcpu);
->>  }
->>  
->> @@ -9990,6 +9989,8 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->>  {
->>  	unsigned long ret;
->>  
->> +	++vcpu->stat.hypercalls;
->> +
->>  	trace_kvm_hypercall(nr, a0, a1, a2, a3);
->>  
->>  	if (!op_64_bit) {
->> @@ -10070,7 +10071,6 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
->>  	}
->>  
->>  out:
->> -	++vcpu->stat.hypercalls;
->>  	return ret;
->>  }
->>  EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
+>  }
+>  EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
+>  
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  {
+> -	unsigned long nr, a0, a1, a2, a3, ret;
+> +	unsigned long nr, a0, a1, a2, a3;
+>  	int op_64_bit;
+>  	int cpl;
+>  
+> @@ -10095,16 +10098,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  	op_64_bit = is_64_bit_hypercall(vcpu);
+>  	cpl = kvm_x86_call(get_cpl)(vcpu);
+>  
+> -	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+> -		/* MAP_GPA tosses the request to the user space. */
+> -		return 0;
+> -
+> -	if (!op_64_bit)
+> -		ret = (u32)ret;
+> -	kvm_rax_write(vcpu, ret);
+> -
+> -	return kvm_skip_emulated_instruction(vcpu);
+> +	return __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl,
+> +				       complete_hypercall_exit);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+>  
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 6db13b696468..28adc8ea04bf 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -617,10 +617,12 @@ static inline bool user_exit_on_hypercall(struct kvm *kvm, unsigned long hc_nr)
+>  	return kvm->arch.hypercall_exit_enabled & BIT(hc_nr);
+>  }
+>  
+> -unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> -				      unsigned long a0, unsigned long a1,
+> -				      unsigned long a2, unsigned long a3,
+> -				      int op_64_bit, int cpl);
+> +int __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +			    unsigned long a0, unsigned long a1,
+> +			    unsigned long a2, unsigned long a3,
+> +			    int op_64_bit, int cpl,
+> +			    int (*complete_hypercall)(struct kvm_vcpu *));
+> +
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>  
+>  #endif
 
