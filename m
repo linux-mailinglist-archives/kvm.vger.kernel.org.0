@@ -1,246 +1,188 @@
-Return-Path: <kvm+bounces-32856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2539E0E1C
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 22:48:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC009E0EF7
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 23:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 946DCB2AA76
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 21:41:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F368C28338F
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 22:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1231DF729;
-	Mon,  2 Dec 2024 21:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4241DF98C;
+	Mon,  2 Dec 2024 22:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gi2bthN7"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="J4LbFVo+"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2047.outbound.protection.outlook.com [40.107.101.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D2F2EAF7;
-	Mon,  2 Dec 2024 21:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733175653; cv=fail; b=qSLINVmtv6S+vkNoZ5ICtPjYRVKTRv21fGMLXZsFklBJI3WuZeWdiIZ8koAQ3kNHHZm7YSkrJYq6QMh3gII6iym6upoORkm1N2nQC9T/2TLnT9v7Slq5Zeq4OQ0Ki/hrubZD+xE8d+/8rqjylmP5Do0T+oL98MpScSQD8Hbb+tI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733175653; c=relaxed/simple;
-	bh=vQa66D7bUfk37c5mxxUvvBqN705xKoSQPNu6RdVMpIo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZAWOBnkPUCniC79XjIWcJRHZYyyw0+qEudLjB4Fwv71YRxCNFlP6nsPL01yjD+KTBFWUcgzwkPSxiTXDIR6pm3jsaOc5uW2IMRIe+wnsPPZ2MNWgA+LU9mQkKTtqHwAMO69YsSolxkb/fOl1zfioiUHrf3NpO7CujQ6D/Le8l5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gi2bthN7; arc=fail smtp.client-ip=40.107.101.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V7I54FGNzKbRhWiJbPNyHKRvdLww/aWOWxcDI+eT+VRiDlIldkYrxBVLT3BNcxANYPyeU3kpIf9LFsc1WWJ5rEEbSpR6j2C7KOHczYzYOQgVPN3ipPNzcv55EbvlOBChjRFuFFwM72L8m9C6DCyHNlfgsBjQs5IWDRi9oXglofFqrJDp1QztK6fC1vabx3/thMBRcC3MSEXgJrbf2+APjOfOlwjt9GWwHKQCBCC9JX0+rQUAV6GCAMA9SY3/HLDw/VhPx9xFqZsLmqTW/JZLEfgTeKBZFtBjatZQNu3pjbNvsmlb2Kxltq0CYl76kn2bf9q8fTJmxrsP/VBrfkCMnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O5+Tj+ZbiZQgeJDfsW93QeR/0JwYc5inVWMpP/0CzNU=;
- b=kUrKcqzLxkx3rxjt2dzCE2vvdTl1QQjJ0bw9Ep6zjQIpwGvu2vFFj6d/pJ82z9PW4gsvaTV9ZZzoHLLaQhfZRfvqINco0+3DfXqPOoy72zz6FH5RRqLtjIOH2CejTtcFrXIdnTs6TsyWGoyVun0q0iWBAcgyCK+DWq5n2ehyv7/oDV5wXlIy/lRcNkUIATxRp7gogFfvTrKHr965ywPtNPUPzram4bBtipvRhr0sV11JgXSMvhUVwMqFF8EC2PJNsGurDJ2f8FI3T2tk5PrScAat6dfVHX2/PT0qr0nC2+yweoUC/5i+Q7R+WWNaqTGRDhfTI784w7PO5Z0vjimYvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5+Tj+ZbiZQgeJDfsW93QeR/0JwYc5inVWMpP/0CzNU=;
- b=gi2bthN7bsv/IP28+mcAMQOnFpLxooWnNF6JlXXoUO2I+VR0uDxOM8fEWjNefSAFgCeqbG3coKZQtKFkS2U/BkKpRjKUtUE+voGR8lQYg8E2EuObummRcQVQ4PS2CzYvoA8mnHtvbRXHo6UM6Tjjpibk4iLQxYSkQtbMBfWKoYA=
-Received: from CH0P221CA0010.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11c::15)
- by DS0PR12MB9057.namprd12.prod.outlook.com (2603:10b6:8:c7::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.17; Mon, 2 Dec
- 2024 21:40:47 +0000
-Received: from CH1PEPF0000A349.namprd04.prod.outlook.com
- (2603:10b6:610:11c:cafe::c8) by CH0P221CA0010.outlook.office365.com
- (2603:10b6:610:11c::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.18 via Frontend Transport; Mon,
- 2 Dec 2024 21:40:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000A349.mail.protection.outlook.com (10.167.244.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8230.7 via Frontend Transport; Mon, 2 Dec 2024 21:40:47 +0000
-Received: from ruby-9130host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Dec
- 2024 15:40:46 -0600
-From: Melody Wang <huibo.wang@amd.com>
-To: LKML <linux-kernel@vger.kernel.org>
-CC: X86 ML <x86@kernel.org>, Sean Christopherson <seanjc@google.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, KVM
-	<kvm@vger.kernel.org>, Melody Wang <huibo.wang@amd.com>, Pavan Kumar Paluri
-	<papaluri@amd.com>
-Subject: [PATCH v2] KVM: SVM: Convert plain error code numbers to defines
-Date: Mon, 2 Dec 2024 21:40:32 +0000
-Message-ID: <20241202214032.350109-1-huibo.wang@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258AC1DDC29
+	for <kvm@vger.kernel.org>; Mon,  2 Dec 2024 22:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733179061; cv=none; b=d6uzcoMNyTdlnUvyBaXoBT7GG2gEd3AwG8wR3HzHe0BRWKogiKZlUS0oXeJklx69TSh0BJ0d4sUtUbum9rXhzfnEpwWFY9NXVEFfH5Lvk2cdl6aNPxWT4r/vu7mmFoJla+cCTv5CwMdks6CohokNhPdhPAiWAgg8i6spAs+EAIU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733179061; c=relaxed/simple;
+	bh=/hF7KILTyziyFP++Iik8VVjKhXLy5rq4mvxg4BbxrxA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=URHvmfdgLSgJiFHLBnEhqj8wiQXe0Jy7NUp/Xi1wOc4z3M2A1p+OrCt2Z3kcNVazwRnhr9o1QZyY4W9CsnDsJYUVufcDuJHozgGlkQZ4cDdJb7u9HvrGOX5nU6O8CsyxQ25HnPvE9Powk1JT0B3a2C6wJZW3tmD81wLWKkFnPoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=J4LbFVo+; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a77562332aso17377895ab.3
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 14:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1733179059; x=1733783859; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PMzTzllEKVWPpxhY4qjTST2+tDlHfK8mSjvLBCDTSBA=;
+        b=J4LbFVo+wTDIZFR23o/sUdKsspX80Uz2ajjn3WD0XwKMM93edIiHoxNjUV1KnUaSlK
+         ivjTUtYk+iEG5M83+79KGxaj/lZKixdLZDTPXV91WISishJuFMXcd1/lsZLD+6Ps8ydt
+         N1t2V/+C1mdhz2/X4ziPKD0YeIuyt+Tg+uh7hL9BXwoFcdHxFgjeXnTXjSv7PFC3IZKf
+         /ufNRAL0PxKpP891+0Nq4nLfWnl2n8B8L1fZvstu31tXZHg/cQaYnfxTkP+UbXD8Pa07
+         HuzYmE6V5r/LgUEzygAVwzRsef/R8Gp+fIIOYsLzkl1GWeRZVvN/jddd+bMK/1dU7Qc3
+         uvvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733179059; x=1733783859;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PMzTzllEKVWPpxhY4qjTST2+tDlHfK8mSjvLBCDTSBA=;
+        b=w+TV7nALkZorbrBs2r/I9q81nBkbZc9FJdreLuuXtAniZnj8o9LdxowNIkK6aH03sc
+         KdZzw13fPSPflT3Eh5UVkcQ56ULxl0GKEFhYvoAeDIjDaywOdjW0NBqte//DufWB4+Ta
+         7v4sHA3pWr5Mvq2i+Tb5Yxl0hzSCTu2DNM0042G+1+GU+qFmXLF1S8nNlrdXWJULL93F
+         lv9qdDta6oMnN/2ftl7jJ8qzuRUSFGS/6DEvi9Lp8cEbj4erT59KRBgCqkg8m1u+qjQ9
+         BzyWd8bisp0Inb7glINPsbbt537wcryXIRCM8Qrru49m/UnuINSeFXm9uStk6Dsr3kMP
+         hIwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyIVc4BmM70bhtsQXeFMSgWgJ/awk29tDm4ZdUl8Np1B0qEbTNwMXP2DrpSASBgu2zPKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuB3KwYbZjZZTGEvdbPD8f+z0z4hnDxXMTcW3oSdf/TdqgKBEZ
+	xv7r1tgo7BXk1PKZd/AwaJ6Urx0SAXg1Dbvc5am9NvIbsiQXgkLx+ARLKq6tMDM=
+X-Gm-Gg: ASbGnct+xIgvs9KUnqihIzPQ+bwEMcicv8KFGsuCoUQ0gqyyvUTxNwscAsUedoz7y2d
+	G0PxNxft3mR6ZUENlUWzpC7vBMIGp3irNrAQJwQ9sPj7+cbB4rwzO2KDU/VBBQNuekJ6+ZXwjJ9
+	Eh/xCRwX4AG80LT7oP6cgUhNeiJZYv/Bdz/wXQOFkl/WN5n7/CYIAA4Emvkv0Kl2KjgxnWtLprW
+	cOAiBnidZHfbDrR6VxEcnLs4Tlph1+AYkx6BTa4TmR5wumkRzLCOE8THvWZD4p9e4hNpTxtul0=
+X-Google-Smtp-Source: AGHT+IHn6Lx4GjIuR+MSzoOaterYaBTQwRP1DNSP58qngN6mgKfAI1QR+jafEOWkEaXAab45plCQgQ==
+X-Received: by 2002:a05:6e02:1a03:b0:3a7:e286:a56b with SMTP id e9e14a558f8ab-3a7f9a2fad6mr2575485ab.5.1733179059220;
+        Mon, 02 Dec 2024 14:37:39 -0800 (PST)
+Received: from [100.64.0.1] ([147.124.94.167])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a7ccc0dde5sm24963835ab.43.2024.12.02.14.37.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 14:37:38 -0800 (PST)
+Message-ID: <e124c532-7a08-4788-843d-345827e35f5f@sifive.com>
+Date: Mon, 2 Dec 2024 16:37:36 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A349:EE_|DS0PR12MB9057:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2739d6c0-e634-445e-ec3b-08dd1319fba8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LEuG/yI1eDQ05phorhLxq5qYf9gPkx77xTaxUx2moOYy8iJ57j3Hsf3a+Lsn?=
- =?us-ascii?Q?lwQm/u9ypbXvbTXu/05tZKndtFaP3GGmGCe7ePOUTTLHNTUeKjtUAQKd0LX1?=
- =?us-ascii?Q?9eItqV1rMLeSv9YcTS+66k7IFRxpNM2TshU003svy+VV2ap0EP7EEDtWxtRO?=
- =?us-ascii?Q?kw7aQ/bm6GdjOYyK5ojM1p7/sblugvv17IEzJlsJEnsnC4hy6Pr7Xu/cIcb9?=
- =?us-ascii?Q?BCCdrzmt+wIo4mRjoQwISlJ8hxqRbUupnuAU0mOU90+zVsj883wh43btv/3A?=
- =?us-ascii?Q?NXBzfC9xwuVyCXDVhc4HLwCHYZEmw3JTouMuuyiD/x/ZOmjC0FGjAGp5NEWa?=
- =?us-ascii?Q?fYzuS8aFzPk96eOxYtujssh4T7rq9Pg/7yjKGd25zAvzPO49BFSBWf019dbd?=
- =?us-ascii?Q?2luJV/P8CMM9bib00oyY1OKj8Fn1T8q9xqxyADabot/9ekR1Ff2gTE0OFmzy?=
- =?us-ascii?Q?es37Qu1qGIPsX/oX48kTznVy2xveB4hGwSPdxFoY6UoH5Ez/VpyOq5SjG+CT?=
- =?us-ascii?Q?ULwJAzqRjq4O71wkimfaQegiy6IBtd3NNxaM6T33FYBTKoKFqDeksze6lc8I?=
- =?us-ascii?Q?JIYeTuCH/5vdGaO08hFOqBmZUP4NaU/lE315TQR4asg6PwVGl9nVP2TQ/opV?=
- =?us-ascii?Q?/o68Q8sSixT4uQjdCJPVqnyBdIpLcdNkHdqY6OPpI21zTic7QiTVNWzyWvUt?=
- =?us-ascii?Q?/E4PYexiRdydzCZ5x3nidRV4IRGIJyVoEp9y09qxFSSdmaqTxk4rj340s52s?=
- =?us-ascii?Q?PKT+kJw5VFEXWuyNg2QlTRKENC5na+j/vgs7ZBpBZX7PnF7dI7g5hOzOhF54?=
- =?us-ascii?Q?4mTOkwBuVc8N5/7+J++xGneiEdJv9TmRk9TurND6PkhgPkr+HZCXta0yjZyd?=
- =?us-ascii?Q?NlNZYsubVvzOXsBzd769xT8huXgAt/TqtFLpKPfP2hjMAf9VynbTFNY8TwW9?=
- =?us-ascii?Q?kUYRkNTfbrkeOtS2QOPvUbruVzpSwsWEvxUz5BRhWYHcBeMEDpOuHPI4Rwhp?=
- =?us-ascii?Q?Cf9ETT7atr6u/6jSRS6q+vVXbuq+7pXlyTsdzR/5ECGb6seGCHlYwH1CqEh+?=
- =?us-ascii?Q?sEpHOLtiOMxhl+xky5RmjiPeHnuUm+6MCYhejtR4zyNS5jM1FWAL7lTQtYy9?=
- =?us-ascii?Q?XEJ8mLGyDfwjikeS54znOfQNl/uDl37BUMSypiR09pcBJJL3QVjvy/HLYp7j?=
- =?us-ascii?Q?C2Phz7TSjiATKWdnF6ZyTxRq8ePhVQ8EjdjWEmxJPUkI3L1Vbx8fDuy3Ds1r?=
- =?us-ascii?Q?2S+WXYF2azMGMASGsVkF4fnemjQdSKTy3NlWy3PzJErHtHcs8WGTY85cmjPk?=
- =?us-ascii?Q?Nbn7P12Rtc/1J70auKYkWRfDQHHNibkjlN4ZOfpdM17v3taXxFRjiSvSIMHo?=
- =?us-ascii?Q?Vgfmb186O3iLckziFuG0PSoJWfXSqXjlnvoYgKZV5MiX/o8TC8pygA0/BNVi?=
- =?us-ascii?Q?1bhh2PoBn+O8EUNQ1pmyKnc3m4Fbyiz4?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 21:40:47.2646
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2739d6c0-e634-445e-ec3b-08dd1319fba8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A349.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9057
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/8] drivers/perf: riscv: Add raw event v2 support
+To: Atish Patra <atishp@rivosinc.com>, Anup Patel <anup@brainfault.org>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>
+Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+References: <20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com>
+ <20241119-pmu_event_info-v1-3-a4f9691421f8@rivosinc.com>
+From: Samuel Holland <samuel.holland@sifive.com>
+Content-Language: en-US
+In-Reply-To: <20241119-pmu_event_info-v1-3-a4f9691421f8@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Convert VMGEXIT SW_EXITINFO1 codes from plain numbers to proper defines.
+Hi Atish,
 
-No functionality changed.
+On 2024-11-19 2:29 PM, Atish Patra wrote:
+> SBI v3.0 introduced a new raw event type that allows wider
+> mhpmeventX width to be programmed via CFG_MATCH.
+> 
+> Use the raw event v2 if SBI v3.0 is available.
+> 
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/sbi.h |  4 ++++
+>  drivers/perf/riscv_pmu_sbi.c | 18 ++++++++++++------
+>  2 files changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+> index 9be38b05f4ad..3ee9bfa5e77c 100644
+> --- a/arch/riscv/include/asm/sbi.h
+> +++ b/arch/riscv/include/asm/sbi.h
+> @@ -159,7 +159,10 @@ struct riscv_pmu_snapshot_data {
+>  
+>  #define RISCV_PMU_RAW_EVENT_MASK GENMASK_ULL(47, 0)
+>  #define RISCV_PMU_PLAT_FW_EVENT_MASK GENMASK_ULL(61, 0)
+> +/* SBI v3.0 allows extended hpmeventX width value */
+> +#define RISCV_PMU_RAW_EVENT_V2_MASK GENMASK_ULL(55, 0)
+>  #define RISCV_PMU_RAW_EVENT_IDX 0x20000
+> +#define RISCV_PMU_RAW_EVENT_V2_IDX 0x30000
+>  #define RISCV_PLAT_FW_EVENT	0xFFFF
+>  
+>  /** General pmu event codes specified in SBI PMU extension */
+> @@ -217,6 +220,7 @@ enum sbi_pmu_event_type {
+>  	SBI_PMU_EVENT_TYPE_HW = 0x0,
+>  	SBI_PMU_EVENT_TYPE_CACHE = 0x1,
+>  	SBI_PMU_EVENT_TYPE_RAW = 0x2,
+> +	SBI_PMU_EVENT_TYPE_RAW_V2 = 0x3,
+>  	SBI_PMU_EVENT_TYPE_FW = 0xf,
+>  };
+>  
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index 50cbdbf66bb7..f0e845ff6b79 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -59,7 +59,7 @@ asm volatile(ALTERNATIVE(						\
+>  #define PERF_EVENT_FLAG_USER_ACCESS	BIT(SYSCTL_USER_ACCESS)
+>  #define PERF_EVENT_FLAG_LEGACY		BIT(SYSCTL_LEGACY)
+>  
+> -PMU_FORMAT_ATTR(event, "config:0-47");
+> +PMU_FORMAT_ATTR(event, "config:0-55");
+>  PMU_FORMAT_ATTR(firmware, "config:62-63");
+>  
+>  static bool sbi_v2_available;
+> @@ -527,18 +527,24 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
+>  		break;
+>  	case PERF_TYPE_RAW:
+>  		/*
+> -		 * As per SBI specification, the upper 16 bits must be unused
+> -		 * for a hardware raw event.
+> +		 * As per SBI v0.3 specification,
+> +		 *  -- the upper 16 bits must be unused for a hardware raw event.
+> +		 * As per SBI v3.0 specification,
+> +		 *  -- the upper 8 bits must be unused for a hardware raw event.
+>  		 * Bits 63:62 are used to distinguish between raw events
+>  		 * 00 - Hardware raw event
+>  		 * 10 - SBI firmware events
+>  		 * 11 - Risc-V platform specific firmware event
+>  		 */
+> -
+>  		switch (config >> 62) {
+>  		case 0:
+> -			ret = RISCV_PMU_RAW_EVENT_IDX;
+> -			*econfig = config & RISCV_PMU_RAW_EVENT_MASK;
+> +			if (sbi_v3_available) {
+> +				*econfig = config & RISCV_PMU_RAW_EVENT_V2_MASK;
+> +				ret = RISCV_PMU_RAW_EVENT_V2_IDX;
+> +			} else {
+> +				*econfig = config & RISCV_PMU_RAW_EVENT_MASK;
+> +				ret = RISCV_PMU_RAW_EVENT_IDX;
 
-Signed-off-by: Melody Wang <huibo.wang@amd.com>
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-Reviewed-by: Pavan Kumar Paluri <papaluri@amd.com>
----
- arch/x86/include/asm/sev-common.h |  8 ++++++++
- arch/x86/kvm/svm/sev.c            | 12 ++++++------
- arch/x86/kvm/svm/svm.c            |  2 +-
- 3 files changed, 15 insertions(+), 7 deletions(-)
+Shouldn't we check to see if any of bits 48-55 are set and return an error,
+instead of silently requesting the wrong event?
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 98726c2b04f8..01d4744e880a 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -209,6 +209,14 @@ struct snp_psc_desc {
- 
- #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
- 
-+/*
-+ * Error codes of the GHCB SW_EXITINFO1 related to GHCB input that can be
-+ * communicated back to the guest
-+ */
-+#define GHCB_HV_RESP_SUCCESS		0
-+#define GHCB_HV_RESP_ISSUE_EXCEPTION	1
-+#define GHCB_HV_RESP_MALFORMED_INPUT	2
-+
- /*
-  * Error codes related to GHCB input that can be communicated back to the guest
-  * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 72674b8825c4..e7db7a5703b7 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3433,7 +3433,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 		dump_ghcb(svm);
- 	}
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
- 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, reason);
- 
- 	/* Resume the guest to "return" the error code. */
-@@ -3577,7 +3577,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 	return 0;
- 
- e_scratch:
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
- 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
- 
- 	return 1;
-@@ -4124,7 +4124,7 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
- 	return snp_handle_guest_req(svm, req_gpa, resp_gpa);
- 
- request_invalid:
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
- 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
- 	return 1; /* resume guest */
- }
-@@ -4317,7 +4317,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 0);
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_SUCCESS);
- 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 0);
- 
- 	exit_code = kvm_ghcb_get_sw_exit_code(control);
-@@ -4367,7 +4367,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		default:
- 			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
- 			       control->exit_info_1);
--			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
- 			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
- 		}
- 
-@@ -4397,7 +4397,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	case SVM_VMGEXIT_AP_CREATION:
- 		ret = sev_snp_ap_creation(svm);
- 		if (ret) {
--			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
- 			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
- 		}
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635655..58bce5f1ab0c 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2977,7 +2977,7 @@ static int svm_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
- 	if (!err || !sev_es_guest(vcpu->kvm) || WARN_ON_ONCE(!svm->sev_es.ghcb))
- 		return kvm_complete_insn_gp(vcpu, err);
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 1);
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_ISSUE_EXCEPTION);
- 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
- 				X86_TRAP_GP |
- 				SVM_EVTINJ_TYPE_EXEPT |
--- 
-2.34.1
+Regards,
+Samuel
+
+> +			}
+>  			break;
+>  		case 2:
+>  			ret = (config & 0xFFFF) | (SBI_PMU_EVENT_TYPE_FW << 16);
+> 
 
 
