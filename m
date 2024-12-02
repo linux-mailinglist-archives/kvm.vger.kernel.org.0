@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-32837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1979E09C1
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 18:23:22 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B14479E09BE
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 18:23:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AACD0162C09
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 17:23:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7034D2827C4
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 17:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDE91DE3A2;
-	Mon,  2 Dec 2024 17:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BCE1DE2A7;
+	Mon,  2 Dec 2024 17:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kf0VHJ8i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJQvALwK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6815B1DDC0C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6081D1DB55C;
 	Mon,  2 Dec 2024 17:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733160140; cv=none; b=I3up9angp/aCIfQC6x+VmN4CTmHTaL57SP6x1Uy/XuoWhgIfGWgkhlJM0l+MczzqsMgVxh/RdCe0C2R8mrR8J7g7iy3U45GSTJx/8O2gIY7Ia4vjsTI1yyx8ANy2PXjyN6B+35AEv4ffNAy9b0sg908UYtZWWz7DgeYtUP4jXnc=
+	t=1733160139; cv=none; b=GSLzDUUbZEyosl/RwrJEAFHX4ETI8yiwL55oxYthG0mjTUNolxxYKOUnXJPPdR8m07pudMZwXSnSnL9Tp0mJSNpCZbH4/iBDKdYwo/sb6FXaCDreF9Y49Rfi+XyLzP3QjZzG5pfZFyeNAaNV5U6U1AL3UFbAs1XK6bzyO0gQjQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733160140; c=relaxed/simple;
-	bh=HmEk0RAxHAj5K5OGiepCVArlYvZ8T1KHJ8vERxPf9yQ=;
+	s=arc-20240116; t=1733160139; c=relaxed/simple;
+	bh=qUpHIbiQuhU1+4N8+i0jJ8LE2+QbS+HIXdOvz3fZ3rY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pv0pahL9o46xU/HTbpUQ4fay9ao9O5eaJZ3rHEJ7FT7A/LR0SACYPAkoVH5ZQNO7Z8MCtp2U+6rF0g7V8xAWTWCKcGgMd9o5elDJ9Z69gR1pS2M6w9/8hjKetp4m4k4qaIMPNx7Oa18FXI5i2pVF+9lbOBwj0Td9vwphw6mdvhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kf0VHJ8i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2D15C4CEE1;
-	Mon,  2 Dec 2024 17:22:18 +0000 (UTC)
+	 MIME-Version; b=EQeRem7cFDrj7bQ+HTkAn7z5E2gyiE+a9+5Av72UzP3SOdahv48lg9hX6XKiC7AFu3ykhnCrlqyOnJNKswJfZ+Qxz18RcdudYtmeBO4SBeHQmzpCspQfTKN+0COw4I+dr2z0Tv1lvadHFm71Qg86eskt9SLA+e0hqMzARrJVpCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GJQvALwK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41555C4CED2;
+	Mon,  2 Dec 2024 17:22:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1733160139;
-	bh=HmEk0RAxHAj5K5OGiepCVArlYvZ8T1KHJ8vERxPf9yQ=;
+	bh=qUpHIbiQuhU1+4N8+i0jJ8LE2+QbS+HIXdOvz3fZ3rY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kf0VHJ8iDQjtz83w10Wm8bbChUEcKiR4XCQQdhTXoK9kNWIUVGhG65cax0AuXfoqa
-	 LPqOz0uqAAAfQOkjPduyGKu06ycbgXWKIgvPZ54XfuTKrwJCC/h+Xdahpzwmtm0bjT
-	 pD2iBlHQfSLD7raP2j/G8MzXJRyFM2clA0KZEKh+yJ27cCMysjvZNSDnVZgMVv7SJE
-	 L9IRb5ZfPu0HJysaRHgbP50jZyPgtSjq9cZaAxpAmDmLYAYT4e7TYDkde887yac8dI
-	 AUkW3r58XWaAzL5Mhj8cuM+ID/gpidhnzrE8Bs6owSApvXbEA70ht9SH8Da96MwBcv
-	 QpzEBgMPFfo2g==
+	b=GJQvALwKuojaOwApZOvPIEns1+xCORL3IpvdtPpzgCIt1NRrXPSqm40X/u8X5h2qo
+	 YzaIkLkJIN3xkfsyhXA1IWNK+bJn5rsofmeEs//JKBiP3A78ZsZmzxW4KBNkRZoz2J
+	 V4eMOh5PywnxjCf00/vGP6iC6squEZ5u3GY2t7QT3JUtznyCm8hrQfTgEGQ8Vtm4jI
+	 5vsXdFuKgEmuWEIgaK8KZToh4XQnM3otHCFbJjY/BYqDaxuvAlRD9Sf+BO/Ti1d3rO
+	 SbwZ9WMQeMOPzrB3CCthGmuqMxiG1L2c6/VRlW01fbJvFEZ4OrPEp7rgmOTGgv3Dro
+	 ih6X2Pw+5v9LQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tIA7l-00HQcf-5H;
+	id 1tIA7l-00HQcf-BP;
 	Mon, 02 Dec 2024 17:22:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Bjorn Andersson <andersson@kernel.org>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 07/11] KVM: arm64: Handle counter access early in non-HYP context
-Date: Mon,  2 Dec 2024 17:21:30 +0000
-Message-Id: <20241202172134.384923-8-maz@kernel.org>
+Subject: [PATCH 08/11] KVM: arm64: nv: Add trap routing for CNTHCTL_EL2.EL1{NVPCT,NVVCT,TVT,TVCT}
+Date: Mon,  2 Dec 2024 17:21:31 +0000
+Message-Id: <20241202172134.384923-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241202172134.384923-1-maz@kernel.org>
 References: <20241202172134.384923-1-maz@kernel.org>
@@ -75,94 +75,128 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We already deal with CNTPCT_EL0 accesses in non-HYP context.
-Let's add CNTVCT_EL0 as a good measure.
-
-This is also an opportunity to simplify things and make it
-plain that this code is only for non-HYP context handling.
+For completeness, fun, and cerebral meltdown, add the virtualisation
+related traps to the counter and timers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 34 +++++++++++++++----------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 58 +++++++++++++++++++++++++++++++--
+ 1 file changed, 56 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 30e572de28749..719479b42b329 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -506,7 +506,7 @@ static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
- 	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 1ffbfd1c3cf2e..03d21044c41f5 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -89,6 +89,9 @@ enum cgt_group_id {
+ 	CGT_HCRX_EnFPM,
+ 	CGT_HCRX_TCR2En,
+ 
++	CGT_CNTHCTL_EL1TVT,
++	CGT_CNTHCTL_EL1TVCT,
++
+ 	CGT_ICH_HCR_TC,
+ 	CGT_ICH_HCR_TALL0,
+ 	CGT_ICH_HCR_TALL1,
+@@ -124,6 +127,8 @@ enum cgt_group_id {
+ 	__COMPLEX_CONDITIONS__,
+ 	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
+ 	CGT_CNTHCTL_EL1PTEN,
++	CGT_CNTHCTL_EL1NVPCT,
++	CGT_CNTHCTL_EL1NVVCT,
+ 
+ 	CGT_CPTR_TTA,
+ 	CGT_MDCR_HPMN,
+@@ -393,6 +398,18 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= HCRX_EL2_TCR2En,
+ 		.behaviour	= BEHAVE_FORWARD_RW,
+ 	},
++	[CGT_CNTHCTL_EL1TVT] = {
++		.index		= CNTHCTL_EL2,
++		.value		= CNTHCTL_EL1TVT,
++		.mask		= CNTHCTL_EL1TVT,
++		.behaviour	= BEHAVE_FORWARD_RW,
++	},
++	[CGT_CNTHCTL_EL1TVCT] = {
++		.index		= CNTHCTL_EL2,
++		.value		= CNTHCTL_EL1TVCT,
++		.mask		= CNTHCTL_EL1TVCT,
++		.behaviour	= BEHAVE_FORWARD_READ,
++	},
+ 	[CGT_ICH_HCR_TC] = {
+ 		.index		= ICH_HCR_EL2,
+ 		.value		= ICH_HCR_TC,
+@@ -487,6 +504,32 @@ static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
+ 	return BEHAVE_FORWARD_RW;
  }
  
--static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
-+static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
++static bool is_nested_nv2_guest(struct kvm_vcpu *vcpu)
++{
++	u64 val;
++
++	val = __vcpu_sys_reg(vcpu, HCR_EL2);
++	return ((val & (HCR_E2H | HCR_TGE | HCR_NV2 | HCR_NV1 | HCR_NV)) == (HCR_E2H | HCR_NV2 | HCR_NV));
++}
++
++static enum trap_behaviour check_cnthctl_el1nvpct(struct kvm_vcpu *vcpu)
++{
++	if (!is_nested_nv2_guest(vcpu) ||
++	    !(__vcpu_sys_reg(vcpu, CNTHCTL_EL2) & CNTHCTL_EL1NVPCT))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_RW;
++}
++
++static enum trap_behaviour check_cnthctl_el1nvvct(struct kvm_vcpu *vcpu)
++{
++	if (!is_nested_nv2_guest(vcpu) ||
++	    !(__vcpu_sys_reg(vcpu, CNTHCTL_EL2) & CNTHCTL_EL1NVVCT))
++		return BEHAVE_HANDLE_LOCALLY;
++
++	return BEHAVE_FORWARD_RW;
++}
++
+ static enum trap_behaviour check_cptr_tta(struct kvm_vcpu *vcpu)
  {
- 	struct arch_timer_context *ctxt;
- 	u32 sysreg;
-@@ -516,18 +516,19 @@ static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
- 	 * We only get here for 64bit guests, 32bit guests will hit
- 	 * the long and winding road all the way to the standard
- 	 * handling. Yes, it sucks to be irrelevant.
-+	 *
-+	 * Also, we only deal with non-hypervisor context here (either
-+	 * an EL1 guest, or a non-HYP context of an EL2 guest).
- 	 */
-+	if (is_hyp_ctxt(vcpu))
-+		return false;
-+
- 	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
- 
- 	switch (sysreg) {
- 	case SYS_CNTPCT_EL0:
- 	case SYS_CNTPCTSS_EL0:
- 		if (vcpu_has_nv(vcpu)) {
--			if (is_hyp_ctxt(vcpu)) {
--				ctxt = vcpu_hptimer(vcpu);
--				break;
--			}
--
- 			/* Check for guest hypervisor trapping */
- 			val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
- 			if (!vcpu_el2_e2h_is_set(vcpu))
-@@ -539,16 +540,23 @@ static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
- 
- 		ctxt = vcpu_ptimer(vcpu);
- 		break;
-+	case SYS_CNTVCT_EL0:
-+	case SYS_CNTVCTSS_EL0:
-+		if (vcpu_has_nv(vcpu)) {
-+			/* Check for guest hypervisor trapping */
-+			val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
-+
-+			if (val & CNTHCTL_EL1TVCT)
-+				return false;
-+		}
-+
-+		ctxt = vcpu_vtimer(vcpu);
-+		break;
- 	default:
- 		return false;
- 	}
- 
--	val = arch_timer_read_cntpct_el0();
--
--	if (ctxt->offset.vm_offset)
--		val -= *kern_hyp_va(ctxt->offset.vm_offset);
--	if (ctxt->offset.vcpu_offset)
--		val -= *kern_hyp_va(ctxt->offset.vcpu_offset);
-+	val = compute_counter_value(ctxt);
- 
- 	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
- 	__kvm_skip_instr(vcpu);
-@@ -593,7 +601,7 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
- 		return true;
- 
--	if (kvm_hyp_handle_cntpct(vcpu))
-+	if (kvm_handle_cntxct(vcpu))
- 		return true;
- 
- 	return false;
+ 	u64 val = __vcpu_sys_reg(vcpu, CPTR_EL2);
+@@ -534,6 +577,8 @@ static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
+ static const complex_condition_check ccc[] = {
+ 	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
+ 	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
++	CCC(CGT_CNTHCTL_EL1NVPCT, check_cnthctl_el1nvpct),
++	CCC(CGT_CNTHCTL_EL1NVVCT, check_cnthctl_el1nvvct),
+ 	CCC(CGT_CPTR_TTA, check_cptr_tta),
+ 	CCC(CGT_MDCR_HPMN, check_mdcr_hpmn),
+ };
+@@ -850,11 +895,15 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 		      SYS_CNTHP_CVAL_EL2, CGT_HCR_NV),
+ 	SR_RANGE_TRAP(SYS_CNTHV_TVAL_EL2,
+ 		      SYS_CNTHV_CVAL_EL2, CGT_HCR_NV),
+-	/* All _EL02, _EL12 registers */
++	/* All _EL02, _EL12 registers up to CNTKCTL_EL12*/
+ 	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+ 		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+ 	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+-		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
++		      sys_reg(3, 5, 14, 1, 0), CGT_HCR_NV),
++	SR_TRAP(SYS_CNTP_CTL_EL02,	CGT_CNTHCTL_EL1NVPCT),
++	SR_TRAP(SYS_CNTP_CVAL_EL02,	CGT_CNTHCTL_EL1NVPCT),
++	SR_TRAP(SYS_CNTV_CTL_EL02,	CGT_CNTHCTL_EL1NVVCT),
++	SR_TRAP(SYS_CNTV_CVAL_EL02,	CGT_CNTHCTL_EL1NVVCT),
+ 	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
+ 	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
+ 	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
+@@ -1184,6 +1233,11 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
+ 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
+ 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
++	SR_TRAP(SYS_CNTV_TVAL_EL0,	CGT_CNTHCTL_EL1TVT),
++	SR_TRAP(SYS_CNTV_CVAL_EL0,	CGT_CNTHCTL_EL1TVT),
++	SR_TRAP(SYS_CNTV_CTL_EL0,	CGT_CNTHCTL_EL1TVT),
++	SR_TRAP(SYS_CNTVCT_EL0,		CGT_CNTHCTL_EL1TVCT),
++	SR_TRAP(SYS_CNTVCTSS_EL0,	CGT_CNTHCTL_EL1TVCT),
+ 	SR_TRAP(SYS_FPMR,		CGT_HCRX_EnFPM),
+ 	/*
+ 	 * IMPDEF choice:
 -- 
 2.39.2
 
