@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-32828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7B19E09BA
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 18:22:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1E49E09B9
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 18:22:29 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E9D2162E3D
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 17:22:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B0E28290D
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 17:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772B01DBB0C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAD91DACBE;
 	Mon,  2 Dec 2024 17:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2FHhOeZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmTMPJew"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDD51D8DFE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5138618784A;
 	Mon,  2 Dec 2024 17:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733160138; cv=none; b=VzmT7S+7EvIigTqefbI4Ds1/1yrbbOwce6s6SU074ORvzJhhnWGY96a3Ah9cPFRGqKNO5GOoSHTbzpmB5+6/afwks6duprw/kRLjdDwMwWD0ALrDXBfZqXnIZdb0bKBtbADQ44zQB7yCY+Bcicg8jpkOMBct1t4LjEGhgbSkY1g=
+	t=1733160138; cv=none; b=GoaomsrwkAio5Nv4RggY3lFwrkXgBS5ovlYhonEEwpLqNvogDB4cl7J6nbxExW/yl2++ZuqN7MH7zmsvT6ITTjCc0v8OYJlPEaDsGWLNrk4UVg151shXrbOS0yHlN28UUBLExE50f6dGxJI9QQpGitFDGQEIutoUcOHG2eptQ+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733160138; c=relaxed/simple;
-	bh=42QPzG6jqI1WKcHLJXMq8RvCPT15C7DIifzJ6603+4M=;
+	bh=3Ito29at05iywdTT9/dJyK5XayrxgpuuC1UnrIxUqY4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DtQyLNqoM2hQbmanKLcg7sNv2oEhlAsqxgwV73cWVl5RHIXKU+YMaX+dTj4zBpjEVlqBj3UOP/dk8fkfkBeILuZvTazr2qjTI9qR3vhBOXQOrldob9AIsSjRdC+FqR3MSFeQe3yU2YaakEeIpqL8mwxIb+gzGBpSRJML/iSZ9zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2FHhOeZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2E0C4CED6;
+	 MIME-Version; b=iCXRduYazC5GOEOcR2ZhomqFdCxbHVfrJBAt0XEn7n8iRJFO7s1gzll0LfMbkbqA5/nl/XQ2eg42GHghPHytHDOLXs2NfNHUKAqciclDZw5AjqhWxbHO1SPhNUDmLxm+MEQ9ts80u51SbgvgZC9CcgmBbPp8pIeo8bpkvT5GeWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmTMPJew; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 288CBC4CED9;
 	Mon,  2 Dec 2024 17:22:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1733160138;
-	bh=42QPzG6jqI1WKcHLJXMq8RvCPT15C7DIifzJ6603+4M=;
+	bh=3Ito29at05iywdTT9/dJyK5XayrxgpuuC1UnrIxUqY4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z2FHhOeZP2Idsb/L6YCuFU+YVD3F7cmdvreTg4CExRhUMhqMmkuGkvDWUGwxetNYS
-	 a2IVdIiWNL3QT3KGIyBozwQTrCZw0LUX5p1zlwOZbQHobMYj2vvsz7yXzCJRCYiiAS
-	 uJ5aHFrlUHZsjefbwMasLW9ZKTeeOXnUhMLcxJ2mAVw/aqknphUibQ9XDmSq98PylD
-	 ACEk4RGSLraCc2Dc+mVdUW3eMhuV1xkeUpa7eY/PaHzD4K1eHZ+ageHu+4qkjDWeyx
-	 OCFQQgGjVN8VPGIw1dI9vh0BGMOjOnU+Ch98f08WUEkLlMsd95AWrEJSd/Kyc9coIu
-	 emPEwUfhR9lVw==
+	b=pmTMPJewgE+ucZSqtvnR8SyEHiqNXS57YFMHnSKOjKuY3mpsdXlwafYdUDW3tdxsH
+	 RpmCsVRKfEpdnELPJt9Iov4c6RDWcsDYkhMdrLvrTtNZMBHcpY0dXruk0TnPsn6sXj
+	 4xaBDEQMHvnvGP4ymgnK85yZ/cPAbjtPPsycbhhqpkw+53n4wL5wPNI4a3ihGibyjz
+	 G4ZnUX+FdkrRuduQ4mgjalxj9PoORRWbzxXm65ZoKsj6CU5/agW3wa9bBT5nC2EItu
+	 cHqEG7cIIOOncwMUuuEYt6kpzNWdrTf4+egLtqi6/RXQeOLNZukH4Pfqc+v0AAvEoe
+	 AsI1pCd2V9g1g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tIA7j-00HQcf-Tx;
+	id 1tIA7k-00HQcf-4P;
 	Mon, 02 Dec 2024 17:22:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Bjorn Andersson <andersson@kernel.org>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 01/11] KVM: arm64: nv: Add handling of EL2-specific timer registers
-Date: Mon,  2 Dec 2024 17:21:24 +0000
-Message-Id: <20241202172134.384923-2-maz@kernel.org>
+Subject: [PATCH 02/11] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+Date: Mon,  2 Dec 2024 17:21:25 +0000
+Message-Id: <20241202172134.384923-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241202172134.384923-1-maz@kernel.org>
 References: <20241202172134.384923-1-maz@kernel.org>
@@ -75,267 +75,101 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the required handling for EL2 and EL02 registers, as
-well as EL1 registers used in the E2H context. This includes
-handling the virtual timer accesses when CNTHCTL_EL2.EL1TVT
-or CNTHCTL_EL2.EL1TVCT are set.
+Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+can be reconfigured behind our back without the hypervisor even
+noticing. In the VHE case, that's an actual regression in the
+architecture...
 
+Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h      |   4 +
- arch/arm64/kvm/sys_regs.c            | 143 +++++++++++++++++++++++++++
- include/clocksource/arm_arch_timer.h |   2 +
- 3 files changed, 149 insertions(+)
+ arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/arm.c         |  3 +++
+ include/kvm/arm_arch_timer.h |  1 +
+ 3 files changed, 48 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b8303a83c0bff..2ed33737c7a99 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -477,6 +477,7 @@
- #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 1215df5904185..81afafd62059f 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 		kvm_timer_blocking(vcpu);
+ }
  
- #define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
-+#define SYS_CNTVCT_EL0			sys_reg(3, 3, 14, 0, 2)
- #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
- #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * When NV2 is on, guest hypervisors have their EL0 timer register
++	 * accesses redirected to the VNCR page. Any guest action taken on
++	 * the timer is postponed until the next exit, leading to a very
++	 * poor quality of emulation.
++	 */
++	if (!is_hyp_ctxt(vcpu))
++		return;
++
++	if (!vcpu_el2_e2h_is_set(vcpu)) {
++		/*
++		 * A non-VHE guest hypervisor doesn't have any direct access
++		 * to its timers: the EL2 registers trap (and the HW is
++		 * fully emulated), while the EL0 registers access memory
++		 * despite the access being notionally direct. Boo.
++		 *
++		 * We update the hardware timer registers with the
++		 * latest value written by the guest to the VNCR page
++		 * and let the hardware take care of the rest.
++		 */
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
++	} else {
++		/*
++		 * For a VHE guest hypervisor, the EL2 state is directly
++		 * stored in the host EL0 timers, while the emulated EL0
++		 * state is stored in the VNCR page. The latter could have
++		 * been updated behind our back, and we must reset the
++		 * emulation of the timers.
++		 */
++		struct timer_map map;
++		get_timer_map(vcpu, &map);
++
++		soft_timer_cancel(&map.emul_vtimer->hrtimer);
++		soft_timer_cancel(&map.emul_ptimer->hrtimer);
++		timer_emulate(map.emul_vtimer);
++		timer_emulate(map.emul_ptimer);
++	}
++}
++
+ /*
+  * With a userspace irqchip we have to check if the guest de-asserted the
+  * timer and if so, unmask the timer irq signal on the host interrupt
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a102c3aebdbc4..fa3089822f9f3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1228,6 +1228,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 			kvm_timer_sync_user(vcpu);
  
-@@ -484,14 +485,17 @@
- #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
- #define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
++		if (vcpu_has_nv(vcpu))
++			kvm_timer_sync_nested(vcpu);
++
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
  
-+#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
- #define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
- #define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
- 
- #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
- #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
- #define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
-+#define SYS_AARCH32_CNTVCT		sys_reg(0, 1, 0, 14, 0)
- #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
- #define SYS_AARCH32_CNTPCTSS		sys_reg(0, 8, 0, 14, 0)
-+#define SYS_AARCH32_CNTVCTSS		sys_reg(0, 9, 0, 14, 0)
- 
- #define __PMEV_op2(n)			((n) & 0x7)
- #define __CNTR_CRm(n)			(0x8 | (((n) >> 3) & 0x3))
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 83c6b4a07ef56..986e63d4f9faa 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1412,26 +1412,146 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 
- 	switch (reg) {
- 	case SYS_CNTP_TVAL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTV_TVAL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HVTIMER;
-+		else
-+			tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_TVAL:
-+	case SYS_CNTP_TVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_TVAL;
- 		break;
-+
-+	case SYS_CNTV_TVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHP_TVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHV_TVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
- 	case SYS_CNTP_CTL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTV_CTL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HVTIMER;
-+		else
-+			tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CTL:
-+	case SYS_CNTP_CTL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CTL;
- 		break;
-+
-+	case SYS_CNTV_CTL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHP_CTL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHV_CTL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
- 	case SYS_CNTP_CVAL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTV_CVAL_EL0:
-+		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HVTIMER;
-+		else
-+			tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CVAL:
-+	case SYS_CNTP_CVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CVAL;
- 		break;
-+
-+	case SYS_CNTV_CVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHP_CVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHV_CVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_CNTPCT_EL0:
- 	case SYS_CNTPCTSS_EL0:
-+		if (is_hyp_ctxt(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CNT;
-+		break;
-+
- 	case SYS_AARCH32_CNTPCT:
-+	case SYS_AARCH32_CNTPCTSS:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CNT;
- 		break;
-+
-+	case SYS_CNTVCT_EL0:
-+	case SYS_CNTVCTSS_EL0:
-+		if (is_hyp_ctxt(vcpu))
-+			tmr = TIMER_HVTIMER;
-+		else
-+			tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CNT;
-+		break;
-+
-+	case SYS_AARCH32_CNTVCT:
-+	case SYS_AARCH32_CNTVCTSS:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CNT;
-+		break;
-+
- 	default:
- 		print_sys_reg_msg(p, "%s", "Unhandled trapped timer register");
- 		return undef_access(vcpu, p, r);
-@@ -2901,11 +3021,17 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	AMU_AMEVTYPER1_EL0(15),
- 
- 	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTVCT_EL0), access_arch_timer },
- 	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTVCTSS_EL0), access_arch_timer },
- 	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
- 	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
- 	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
- 
-+	{ SYS_DESC(SYS_CNTV_TVAL_EL0), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTV_CTL_EL0), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTV_CVAL_EL0), access_arch_timer },
-+
- 	/* PMEVCNTRn_EL0 */
- 	PMU_PMEVCNTR_EL0(0),
- 	PMU_PMEVCNTR_EL0(1),
-@@ -3057,9 +3183,24 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	EL2_REG_VNCR(CNTVOFF_EL2, reset_val, 0),
- 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
-+	{ SYS_DESC(SYS_CNTHP_TVAL_EL2), access_arch_timer },
-+	EL2_REG(CNTHP_CTL_EL2, access_arch_timer, reset_val, 0),
-+	EL2_REG(CNTHP_CVAL_EL2, access_arch_timer, reset_val, 0),
-+
-+	{ SYS_DESC(SYS_CNTHV_TVAL_EL2), access_arch_timer },
-+	EL2_REG(CNTHV_CTL_EL2, access_arch_timer, reset_val, 0),
-+	EL2_REG(CNTHV_CVAL_EL2, access_arch_timer, reset_val, 0),
- 
- 	{ SYS_DESC(SYS_CNTKCTL_EL12), access_cntkctl_el12 },
- 
-+	{ SYS_DESC(SYS_CNTP_TVAL_EL02), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTP_CTL_EL02), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTP_CVAL_EL02), access_arch_timer },
-+
-+	{ SYS_DESC(SYS_CNTV_TVAL_EL02), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTV_CTL_EL02), access_arch_timer },
-+	{ SYS_DESC(SYS_CNTV_CVAL_EL02), access_arch_timer },
-+
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
- 
-@@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
- 	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
- 	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
-+	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
- 	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
- 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
- 	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
-+	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
- };
- 
- static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index cbbc9a6dc5715..877dcbb2601ae 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -22,6 +22,8 @@
- #define CNTHCTL_EVNTDIR			(1 << 3)
- #define CNTHCTL_EVNTI			(0xF << 4)
- #define CNTHCTL_ECV			(1 << 12)
-+#define CNTHCTL_EL1TVT			(1 << 13)
-+#define CNTHCTL_EL1TVCT			(1 << 14)
- 
- enum arch_timer_reg {
- 	ARCH_TIMER_REG_CTRL,
+ 		/*
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index fd650a8789b91..6e3f6b7ff2b22 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -98,6 +98,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+ void kvm_timer_update_run(struct kvm_vcpu *vcpu);
 -- 
 2.39.2
 
