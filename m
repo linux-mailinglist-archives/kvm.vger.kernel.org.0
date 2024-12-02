@@ -1,236 +1,125 @@
-Return-Path: <kvm+bounces-32859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1EA39E0F33
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 00:03:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7F99E0F59
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 00:35:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D891650B4
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 23:35:36 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891D01DFDA5;
+	Mon,  2 Dec 2024 23:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ETTJ08la"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B7D9B23E76
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 23:02:53 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717B81DFD9F;
-	Mon,  2 Dec 2024 23:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="K0CPNamH"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55DA1DEFC2
-	for <kvm@vger.kernel.org>; Mon,  2 Dec 2024 23:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB63C2C18C;
+	Mon,  2 Dec 2024 23:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733180564; cv=none; b=o1/pCG3WWD14Yl9XOz4Bxt3vTww9zKTdChPypGVifAskEyECjQM16k4vmHE8iBCUZy5C0UZQQjxH/g3fXgY0pf6dw8pQgTWyZscquiwDy6SNeOo/W9N7x66OtZ4XfzmcQKfqv4TIaxvVT2dZcLfyTr2Hmy0nRRg53ct+IOLAQ8o=
+	t=1733182530; cv=none; b=eePv8OaC8fNGtNM13Jqmu0vADXITO2c0BRaVkw1odxtJe5RKlKL4NfvEIEttabdCNqQL2YC6E16AJ/tn7RAgoca7Y7Oet44zrdGzFgDTFgu1Qt7OxbKV+q6+u3bOpPtGfPx+qXxOEZn9LerSvfwcPoxvphdBHe2Fjap6CKnxDaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733180564; c=relaxed/simple;
-	bh=0o/VeYa0bbOGyirOVhNvZLZhLD1xrhRXWY07BbhU40M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e3qRw+NwmoBwVIhGqWaN0pu4nj4AyEV8jjJWvu1wmGvJSw9GnM6MjsVv8G+FosBIPDpz0Quei2/kDhbhNOYkdA6KkF3AZXUHCeTeeaL7Hpd7eyj0LVqE9flz6XJsZ04cRtp9njgbVd74yjfXY009FToaSVP4AY8U3UwtJb0esdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=K0CPNamH; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-71d4ba17cd2so2103514a34.3
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 15:02:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1733180562; x=1733785362; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TBGqkK/v5Iev96wXKEIFiXllPqz6RLCGsNpAQ8PdYPY=;
-        b=K0CPNamHa88OinRjAImF3h9aCeN4UAivsslpkDJTMR7PMFApdxpXtdVlYejqi/wmK1
-         Q3ifTFLhBpvYijEM/8RjmYNzTc1m66BtgvchUlvAje2k1QP72sB4fGZbSUUoQJQXkWQp
-         ZflO4D/DsTH+x2+0dXylOFIoColdiQ63bsvifKcfDJqO36vriv5I1YGJWxOpOwT+1PTS
-         yt2Az4k6s4PQOfJX6zMVEYg/VhMn5ufPE83zsdYI4PUL/ldXyC5yBHGJbnI3dh5qqFTB
-         mdIQbBVsJa+m9ZQM8Lpq3cpiT8uiHN+UCWJ1cHVIDTeEo9F+QCk3RsSkOk5xErxXscNY
-         P9Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733180562; x=1733785362;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TBGqkK/v5Iev96wXKEIFiXllPqz6RLCGsNpAQ8PdYPY=;
-        b=DHNZwcAs00ckddGYlQge11PTL6DW8Ens5HJLke13mVkEWD/4+1BZz+4wdTXgeXGCZO
-         1b6dCwJN1AyZlDV7RtrCKuMGXACt+tgzL4gFyDeW5oEmA3LhaYibzALDDZ8enGJOfwC6
-         vVLl4vbwcfhGaUyid6BuhbXHMQGe5JjlMnPl7rpXNX5EjQGLshJvoujx5PLVCaFayVBR
-         7l5d6a0GD4PEjpKpb1gCkkT3FXXsJ4FDGyjjhE9XBXeQvipl6CkvtolNcw65Pf7GCatJ
-         W9DwHk6PzHMhrURDUQ8RvGZSxIvyQHRybF5lXpccyhctBRGLK9ob6eVAoDq7pA9VOjXG
-         PoSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXsaai3KFCuGMjlO27c6Db9VcnSK2D8coDfv9HCV1J2wBHcax/frszHrQDLeIl6s/WEQD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwROumtf2yKnnysNygS0/zR0cP8/+yV8hNb+pnRp6qz1wp9XcDE
-	/NKRB8FGEAsnuJ/Y7fna3svlncacenwAy9ThLEWinDkZ34pFwbpZXBnfphN4Vn8=
-X-Gm-Gg: ASbGncteGwpJRx10V1xE0AvvMfpRA6KawmRN50uAeBe0LBTawkPPBekQP1KpdP3saRo
-	0vADEhor2I8V9F9klirEIBffj7TUHWeme5IQTfGWIaZPYLrKFRcMPtO0QGNOaXPFqRSyiPnmtew
-	/bGNRmBlDIZeOkxL15lxlQCVXUcO7fhzn4g3CDl1Q+4ZhYB5bDk9OFQ8DmGVvlV0+AIkI7PUA3Y
-	ovQMSfcmckrA/pqL81KtU2wZuUPbYnhAF5ZitW1xh/ljjwKP/LlQJH7CSygofW55ijtzfS4Lik=
-X-Google-Smtp-Source: AGHT+IEv1JBbSaCa71BDRL05MtUtqi8CljIjDPjho0wurIfJyJM/U1viaWwUhmNhZ6XHgApvGm5kLA==
-X-Received: by 2002:a05:6830:25d4:b0:710:fa7e:e002 with SMTP id 46e09a7af769-71dad6015c9mr537077a34.5.1733180561967;
-        Mon, 02 Dec 2024 15:02:41 -0800 (PST)
-Received: from [100.64.0.1] ([147.124.94.167])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e230de08f6sm2269346173.79.2024.12.02.15.02.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 15:02:41 -0800 (PST)
-Message-ID: <8dc7e94c-4bf2-4367-8561-166bec6ec315@sifive.com>
-Date: Mon, 2 Dec 2024 17:02:39 -0600
+	s=arc-20240116; t=1733182530; c=relaxed/simple;
+	bh=GTllTgmBG4SmhlrT+/ywvHTuP/WmsCAwgMp34pJJwSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lJZIrzwF7hjk3ZccjmyPxmLcHUGa2ObOXEsqxVNfpT7sjhtWuFa8scJsbKpZpzrIGfoq/KQCvCnk9QTw+sp4W+FT4qTW9nLT7ySvCJXBv3ypoA0nRGiledzPj42e8wuF4Zbv8penH88rU7qFWBKXti8EkCyL1qKlYXM6VXlz3k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ETTJ08la; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733182529; x=1764718529;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GTllTgmBG4SmhlrT+/ywvHTuP/WmsCAwgMp34pJJwSA=;
+  b=ETTJ08laDUd+a3IUyZoNOHjGF5Wj9jBWrIRy8gxEHCMtalTFBofZqQ+o
+   uHx22ZmOGLcedJtMCe955Gy3KuVpvZ/BFunY4eJdPyUi94tYfxkp6bW0m
+   LC8/Dx/IdsyqePWNEQyTrsL+FPnnAA0deCjCIKKC+4ibmd+g7wBM/yEAa
+   1PHy9mjVVV22ubvPNcNnfuVUTu4SpfCV3ruu0NW+A959E/4j51VEae42O
+   Bgt4S/1XoZompwPi0OitaDyJOvZyRWtHdHmeaXebkBEPabF1ALYVt3Jgg
+   EPdTt4XSqNIqOCm7hpOJecEPUbuFVnTlSMQ2T6/VqJCUdf36HZDlVRd9i
+   w==;
+X-CSE-ConnectionGUID: n0Nj4pb2T9mb2vd2nQVhyA==
+X-CSE-MsgGUID: faVZBMU+QliYxQYKX2TrAw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="33121408"
+X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
+   d="scan'208";a="33121408"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 15:35:28 -0800
+X-CSE-ConnectionGUID: OqgjxLgjSKyBqd0ALVugqw==
+X-CSE-MsgGUID: ktkqe+cgQdCMx1SgAI6j4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="98273206"
+Received: from ddbrudv-mobl.amr.corp.intel.com (HELO desk) ([10.125.145.202])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 15:35:28 -0800
+Date: Mon, 2 Dec 2024 15:35:21 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, amit@kernel.org, kvm@vger.kernel.org,
+	amit.shah@amd.com, thomas.lendacky@amd.com, tglx@linutronix.de,
+	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
+	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
+	kai.huang@intel.com, sandipan.das@amd.com,
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
+	david.kaplan@amd.com, dwmw@amazon.co.uk, andrew.cooper3@citrix.com
+Subject: Re: [PATCH v2 1/2] x86/bugs: Don't fill RSB on VMEXIT with
+ eIBRS+retpoline
+Message-ID: <20241202233521.u2bygrjg5toyziba@desk>
+References: <cover.1732219175.git.jpoimboe@kernel.org>
+ <9bd7809697fc6e53c7c52c6c324697b99a894013.1732219175.git.jpoimboe@kernel.org>
+ <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/8] RISC-V: KVM: Implement get event info function
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Mayuresh Chitale <mchitale@ventanamicro.com>
-References: <20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com>
- <20241119-pmu_event_info-v1-7-a4f9691421f8@rivosinc.com>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <20241119-pmu_event_info-v1-7-a4f9691421f8@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
 
-Hi Atish,
-
-On 2024-11-19 2:29 PM, Atish Patra wrote:
-> The new get_event_info funciton allows the guest to query the presence
-> of multiple events with single SBI call. Currently, the perf driver
-> in linux guest invokes it for all the standard SBI PMU events. Support
-> the SBI function implementation in KVM as well.
+On Sat, Nov 30, 2024 at 04:31:25PM +0100, Borislav Petkov wrote:
+> On Thu, Nov 21, 2024 at 12:07:18PM -0800, Josh Poimboeuf wrote:
+> > eIBRS protects against RSB underflow/poisoning attacks.  Adding
+> > retpoline to the mix doesn't change that.  Retpoline has a balanced
+> > CALL/RET anyway.
 > 
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  arch/riscv/include/asm/kvm_vcpu_pmu.h |  3 ++
->  arch/riscv/kvm/vcpu_pmu.c             | 67 +++++++++++++++++++++++++++++++++++
->  arch/riscv/kvm/vcpu_sbi_pmu.c         |  3 ++
->  3 files changed, 73 insertions(+)
+> This is exactly why I've been wanting for us to document our mitigations for
+> a long time now.
 > 
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> index 1d85b6617508..9a930afc8f57 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> @@ -98,6 +98,9 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
->  int kvm_riscv_vcpu_pmu_snapshot_set_shmem(struct kvm_vcpu *vcpu, unsigned long saddr_low,
->  				      unsigned long saddr_high, unsigned long flags,
->  				      struct kvm_vcpu_sbi_return *retdata);
-> +int kvm_riscv_vcpu_pmu_event_info(struct kvm_vcpu *vcpu, unsigned long saddr_low,
-> +				  unsigned long saddr_high, unsigned long num_events,
-> +				  unsigned long flags, struct kvm_vcpu_sbi_return *retdata);
->  void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
->  void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> index efd66835c2b8..a30f7ec31479 100644
-> --- a/arch/riscv/kvm/vcpu_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_pmu.c
-> @@ -456,6 +456,73 @@ int kvm_riscv_vcpu_pmu_snapshot_set_shmem(struct kvm_vcpu *vcpu, unsigned long s
->  	return 0;
->  }
->  
-> +int kvm_riscv_vcpu_pmu_event_info(struct kvm_vcpu *vcpu, unsigned long saddr_low,
-> +				  unsigned long saddr_high, unsigned long num_events,
-> +				  unsigned long flags, struct kvm_vcpu_sbi_return *retdata)
-> +{
-> +	unsigned long hva;
-> +	struct riscv_pmu_event_info *einfo;
-> +	int shmem_size = num_events * sizeof(*einfo);
-> +	bool writable;
-> +	gpa_t shmem;
-> +	u32 eidx, etype;
-> +	u64 econfig;
-> +	int ret;
-> +
-> +	if (flags != 0 || (saddr_low & (SZ_16 - 1))) {
-> +		ret = SBI_ERR_INVALID_PARAM;
-> +		goto out;
-> +	}
-> +
-> +	shmem = saddr_low;
-> +	if (saddr_high != 0) {
-> +		if (IS_ENABLED(CONFIG_32BIT)) {
-> +			shmem |= ((gpa_t)saddr_high << 32);
-> +		} else {
-> +			ret = SBI_ERR_INVALID_ADDRESS;
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	hva = kvm_vcpu_gfn_to_hva_prot(vcpu, shmem >> PAGE_SHIFT, &writable);
-> +	if (kvm_is_error_hva(hva) || !writable) {
-> +		ret = SBI_ERR_INVALID_ADDRESS;
-
-This only checks the first page if the address crosses a page boundary. Maybe
-that is okay since kvm_vcpu_read_guest()/kvm_vcpu_write_guest() will fail if a
-later page is inaccessible?
-
-> +		goto out;
-> +	}
-> +
-> +	einfo = kzalloc(shmem_size, GFP_KERNEL);
-> +	if (!einfo)
-> +		return -ENOMEM;
-> +
-> +	ret = kvm_vcpu_read_guest(vcpu, shmem, einfo, shmem_size);
-> +	if (ret) {
-> +		ret = SBI_ERR_FAILURE;
-> +		goto free_mem;
-> +	}
-> +
-> +	for (int i = 0; i < num_events; i++) {
-> +		eidx = einfo[i].event_idx;
-> +		etype = kvm_pmu_get_perf_event_type(eidx);
-> +		econfig = kvm_pmu_get_perf_event_config(eidx, einfo[i].event_data);
-> +		ret = riscv_pmu_get_event_info(etype, econfig, NULL);
-> +		if (ret > 0)
-> +			einfo[i].output = 1;
-
-This also needs to write `output` in the else case to indicate that the event is
-not supported; the spec does not require the caller to initialize bit 0 of
-output to zero.
-
-Regards,
-Samuel
-
-> +	}
-> +
-> +	kvm_vcpu_write_guest(vcpu, shmem, einfo, shmem_size);
-> +	if (ret) {
-> +		ret = SBI_ERR_FAILURE;
-> +		goto free_mem;
-> +	}
-> +
-> +free_mem:
-> +	kfree(einfo);
-> +out:
-> +	retdata->err_val = ret;
-> +
-> +	return 0;
-> +}
-> +
->  int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu,
->  				struct kvm_vcpu_sbi_return *retdata)
->  {
-> diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
-> index e4be34e03e83..a020d979d179 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
-> @@ -73,6 +73,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	case SBI_EXT_PMU_SNAPSHOT_SET_SHMEM:
->  		ret = kvm_riscv_vcpu_pmu_snapshot_set_shmem(vcpu, cp->a0, cp->a1, cp->a2, retdata);
->  		break;
-> +	case SBI_EXT_PMU_EVENT_GET_INFO:
-> +		ret = kvm_riscv_vcpu_pmu_event_info(vcpu, cp->a0, cp->a1, cp->a2, cp->a3, retdata);
-> +		break;
->  	default:
->  		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
->  	}
+> A bunch of statements above for which I can only rhyme up they're correct if
+> I search for the vendor docs. On the AMD side I've found:
 > 
+> "When Automatic IBRS is enabled, the internal return address stack used for
+> return address predictions is cleared on VMEXIT."
+> 
+> APM v2, p. 58/119
+> 
+> For the Intel side I'm not that lucky. There's something here:
+> 
+> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
+> 
+> Or is it this one:
+> 
+> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html#inpage-nav-1-3-undefined
+> 
+> Or is this written down explicitly in some other doc?
 
+It is in this doc:
+
+  https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/indirect-branch-restricted-speculation.html
+
+  "Processors with enhanced IBRS still support the usage model where IBRS is
+  set only in the OS/VMM for OSes that enable SMEP. To do this, such
+  processors will ensure that guest behavior cannot control the RSB after a
+  VM exit once IBRS is set, even if IBRS was not set at the time of the VM
+  exit."
 
