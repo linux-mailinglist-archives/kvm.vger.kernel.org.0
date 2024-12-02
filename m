@@ -1,115 +1,100 @@
-Return-Path: <kvm+bounces-32811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556DF9DFC75
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 09:54:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 977BB9DFCC7
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 10:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 180ADB211F1
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 08:54:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25727B216C2
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 09:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96101F9F79;
-	Mon,  2 Dec 2024 08:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62231FA14F;
+	Mon,  2 Dec 2024 09:07:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2BF1D6DD8;
-	Mon,  2 Dec 2024 08:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mediconcil.de (mail.mediconcil.de [91.107.198.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AF11F9ECD
+	for <kvm@vger.kernel.org>; Mon,  2 Dec 2024 09:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.107.198.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733129662; cv=none; b=jwi/syPBeoANXohLcv1OiX22h2ehDwDKUplx1PqXmKULfGpTq9pIandw9mjdo6KV1etmmpa2nDvmtHjc/8IfXPatpBwcJG8rvJbE7e0/iNaLE5GKLQ11YWzjK8qM8KS+H2PkRWCf7eDQtHEnE72gEoiIP3H+3MC1LvcxeXyPQ2U=
+	t=1733130432; cv=none; b=gg92JMLMnhgyKDxWH8JRVoUf9vzsU5k+GTStm90b4Cu+w2M1XUT058rxWWiq4j6d6sbnjAPPePDQTOyfdEgn2yj8A5+NWz5EBDIpaB/HJWO2WXH2GFzLSRoePCLPBdELfRT2KeLD22Q8kXeM/XlMkX3rJie5NqwakZ0Xj5lPgUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733129662; c=relaxed/simple;
-	bh=R6Fv08YSF9tjEaXOB/g1hNUtf8CGUiQoNMyz9uhE03s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VKhJqsdMyGpePeHBzqVr2GVADkfpXj2snkLpHYC79gar+X5uS/HQ3/ivywNjIl3TVVjA/eAooJtmoB0CSdN0nvbawiu9KKP9gsogcgTPbRZemZ/oYa8++qjj0e2zBbkNJrNhzFU+T+N0qESDTkqn9bvnz0aSV5uZewO6dSRz4/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABE041063;
-	Mon,  2 Dec 2024 00:54:46 -0800 (PST)
-Received: from [10.57.90.186] (unknown [10.57.90.186])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A3BA3F71E;
-	Mon,  2 Dec 2024 00:54:13 -0800 (PST)
-Message-ID: <01205247-ffcd-439f-b00f-d8e70720d049@arm.com>
-Date: Mon, 2 Dec 2024 08:54:11 +0000
+	s=arc-20240116; t=1733130432; c=relaxed/simple;
+	bh=FMEO83NTZBlOJZlZZ4Dl1lPei+wUOgh/kkpVG5fuvTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NolH4ISIq8SA/gEcYkdEeytUt4Zj8jk1T1PUAbLLVF5LObpBqljd7AbKPpF3G/3YtREJNJosz23FJx7D9PZUn7bv26eCEWpXmlBozGx2CsVErsmOzCOz6G9nKsVHzHnqCnix74ugWJk25CO8298u2pgO6BKOksnG5TLApf2mj6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io; spf=none smtp.mailfrom=silver.spittel.net; arc=none smtp.client-ip=91.107.198.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpico.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=silver.spittel.net
+Received: from [10.42.0.1] (helo=silver)
+	by mediconcil.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <kauer@silver.spittel.net>)
+	id 1tI2OO-00DwlN-0s;
+	Mon, 02 Dec 2024 10:06:56 +0100
+Received: from kauer by silver with local (Exim 4.98)
+	(envelope-from <kauer@silver.spittel.net>)
+	id 1tI2ON-00000000Hfe-3X0n;
+	Mon, 02 Dec 2024 10:06:55 +0100
+From: Bernhard Kauer <bk@alpico.io>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org,
+	Bernhard Kauer <bk@alpico.io>
+Subject: [PATCH v2] KVM: make uevents configurable
+Date: Mon,  2 Dec 2024 10:06:28 +0100
+Message-ID: <20241202090628.67919-1-bk@alpico.io>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/43] arm64: Support for Arm CCA in KVM
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <Z01BYOgsLXV5yULk@vm3>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <Z01BYOgsLXV5yULk@vm3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Itaru,
+Handling of uevents in userlevel is a bottleneck for tiny VMs.
 
-On 02/12/2024 05:10, Itaru Kitayama wrote:
-> On Fri, Oct 04, 2024 at 04:27:21PM +0100, Steven Price wrote:
->> This series adds support for running protected VMs using KVM under the
->> Arm Confidential Compute Architecture (CCA).
-...
-> 
-> On FVP, the v5+v7 kernel is unable to execute virt-manager:
-> 
-> Starting install...
-> Allocating 'test9.qcow2'                                    |    0 B  00:00 ...
-> Removing disk 'test9.qcow2'                                 |    0 B  00:00
-> ERROR    internal error: process exited while connecting to monitor: 2024-12-04T18:56:11.646168Z qemu-system-aarch64: -accel kvm: ioctl(KVM_CREATE_VM) failed: Invalid argument
-> 2024-12-04T18:56:11.646520Z qemu-system-aarch64: -accel kvm: failed to initialize kvm: Invalid argument
-> Domain installation does not appear to have been successful.
+Running 10_000 VMs keeps one and a half cores busy for 5.4 seconds to let
+systemd-udevd handle all messages.  That is roughly 27x longer than
+the 0.2 seconds needed for running the VMs without them.
 
-Can you check that the kernel has detected the RMM being available, you
-should have a message like below when the host kernel is booting:
+We choose a module parameter here due to its simplicity and ease of
+maintenance.
 
-kvm [1]: RMI ABI version 1.0
+v1->v2:  make the parameter read-write to avoid reboots on ARM
 
-My guess is that you've got mismatched versions of the RMM and TF-A. The
-interface between those two components isn't stable and there were
-breaking changes fairly recently. And obviously if the RMM hasn't
-initialised successfully then confidential VMs won't be available.
+Signed-off-by: Bernhard Kauer <bk@alpico.io>
+---
+ virt/kvm/kvm_main.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> Below is my virt-manager options:
-> 
-> virt-install --machine=virt --arch=aarch64 --name=test9 --memory=2048 --vcpu=1 --nographic --check all=off --features acpi=off --virt-type kvm --boot kernel=Image-cca,initrd=rootfs.cpio,kernel_args='earlycon console=ttyAMA0 rdinit=/sbin/init rw root=/dev/vda acpi=off' --qemu-commandline='-M virt,confidential-guest-support=rme0,gic-version=3 -cpu host -object rme-guest,id=rme0 -nodefaults' --disk size=4 --import --osinfo detect=on,require=off
-> 
-> Userland is Ubuntu 24.10, the VMM is Linaro's cca/2024-11-20:
-> 
-> https://git.codelinaro.org/linaro/dcap/qemu/-/tree/cca/2024-11-20?ref_type=heads
-
-I don't think this is the latest QEMU tree, Jean-Philippe posted an
-update last week:
-
-https://lore.kernel.org/qemu-devel/20241125195626.856992-2-jean-philippe@linaro.org/
-
-I'm not sure if there were any important updates there, but there are
-detailed instructions that might help.
-
-Regards,
-Steve
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 38620c16739b..9e714cf45617 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -97,6 +97,9 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
+ bool debugfs_per_vm = true;
+ module_param(debugfs_per_vm, bool, 0644);
+ 
++bool disable_uevent_notify;
++module_param(disable_uevent_notify, bool, 0644);
++
+ /*
+  * Allow direct access (from KVM or the CPU) without MMU notifier protection
+  * to unpinned pages.
+@@ -6141,7 +6144,7 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+ 	struct kobj_uevent_env *env;
+ 	unsigned long long created, active;
+ 
+-	if (!kvm_dev.this_device || !kvm)
++	if (!kvm_dev.this_device || !kvm || disable_uevent_notify)
+ 		return;
+ 
+ 	mutex_lock(&kvm_lock);
+-- 
+2.45.2
 
 
