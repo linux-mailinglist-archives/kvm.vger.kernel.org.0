@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-32819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32820-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60E59E024B
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 13:35:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025859E01CF
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 13:15:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A481B32307
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 12:12:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07E51690E8
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 12:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A592F203706;
-	Mon,  2 Dec 2024 12:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD53220C494;
+	Mon,  2 Dec 2024 12:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JarQvoen"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqwL1oN+"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67F6202F95;
-	Mon,  2 Dec 2024 12:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D78204087;
+	Mon,  2 Dec 2024 12:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733141063; cv=none; b=M0l7eF56b/gzIz4t+acz3FdfTm/b5n1ItGqsUpSm/9S/b2BiYIOHlc7rIAvdqvYJd141r8iv4PKHtnTDgovoEsNfQdrl5ayxDDKYT+zqC/4lXNn9Feovk+22PLrjmvLtdQ1ff7oSA1danOL4puaE19d4at+eby/pbvL8SPcTKik=
+	t=1733141065; cv=none; b=SCRWlqSjZqTIJbFymmxEYZmUBZGaMwxdVr+gW8Ju7IcRtejPWzL+EosLavQgYNFKFRswFeN4dWRTB+Bi9qLQrtadNJ1VyVh2iokurYBg+4Yv83+UMx6gQz0T+ejd1qo4X7EPOGg29Fho3K0V72MmYLacRaybSe5sOre24sLhbyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733141063; c=relaxed/simple;
-	bh=+81R2yhEI3xCcGHia9rOeaSyJc2c3Vsh3iF1V5uCdXg=;
+	s=arc-20240116; t=1733141065; c=relaxed/simple;
+	bh=iG+FWqfHcVRBreJM9nURrF5EK7KuHNIEuynzkO4KzW0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kRaNVPAunLYNWJtNcbAGn0Kxm42fTAmGd55ujA9NNXki+TTviSi3KOQEHNz1O/UH8Td5TFEnZhqANd60yOLOdCp5E4mJ0YL9J47ZkCQO+Yw0oCLWy6Sna91Ep7gJM3wr/jT4gRBpb/K5qPJHXYDTgQl3zS0isH1g6vdYTaZ+jZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JarQvoen; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86061C4CED2;
-	Mon,  2 Dec 2024 12:04:21 +0000 (UTC)
+	 MIME-Version; b=F8Vff4vCN3Kre90/K5AKTdZi7lM/8mJzOotVnb+shrFb9KjY8bJ34RnWYSBHtwALA4rM2fIMOXnDvmt6GmklqncYEFnD1xjVi6kQh6yGJ5m5GfKGL/mvdoaUcz5Vzr0jQKrzkOXoL9TMw1aGjkwjkWjLCV7WHlH4zIN6yqmHW/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqwL1oN+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A97E8C4CED1;
+	Mon,  2 Dec 2024 12:04:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733141063;
-	bh=+81R2yhEI3xCcGHia9rOeaSyJc2c3Vsh3iF1V5uCdXg=;
+	s=k20201202; t=1733141065;
+	bh=iG+FWqfHcVRBreJM9nURrF5EK7KuHNIEuynzkO4KzW0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JarQvoen9Ub9hp5ehA5M+u2t8upPDtHrdR+Fj8HYtKuiUJizrG0pg4tqcV/D2yaCV
-	 StgtnjWJGdV7Zwsu2hQGFgZhQQLlkUfliIi8wa9IPAbOYquOqQK7Ajn6yQBhmMV4Mc
-	 K+dOespHYS5qtPZdYynjvR2u4cj9eLjj0bV1xgM/pvzO8nff8ZvwUI9niI17QI6bXw
-	 ccssd689TW9BfufbIMCkprXolbbYPbL1NSdyv6rU1pSN46Sdz9qky4p4xeZOnnDmqY
-	 PS+bULIroogjiuXrgGHYprzaymivuhInveUPBqSnzunNLhTQFZNl1NjPnF+RbelJFk
-	 m/NzZYUIh5fbw==
+	b=MqwL1oN+WwLYc0Dzmegjn47dyKTIs8ssi0Ib6fI0zcNYcutByMV/OBU/Vj88/VxRE
+	 AtIpPNRRaAh01VK1eJHT+PsDSYaKTcaB0Db0uE/SUmcP25hPRhrekgsug1GOAGcHaC
+	 rPd2Ec/+1Aghb7UgOjVfCI+YXdl+/VS7lAR9qZhgV9xSwkqzN+xJKWvdPu9sUf54Ji
+	 3qYbkxlEEJIbqZVmVxKOpHHpztVVg2l8Td/G91D28jw2MlKX0sp4AIJ8Y+2Va3gG1d
+	 v7I/ZSIx6p2gSIhzLwjNLpU+sZnJatKPy3uXrGR1XPMUi9JSt0KHWzuvyk7fcs/IaP
+	 qW/gSoenXOMQA==
 From: Borislav Petkov <bp@kernel.org>
 To: Sean Christopherson <seanjc@google.com>,
 	X86 ML <x86@kernel.org>
@@ -50,9 +50,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	KVM <kvm@vger.kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>,
 	"Borislav Petkov (AMD)" <bp@alien8.de>
-Subject: [PATCH v2 1/4] x86/bugs: Add SRSO_USER_KERNEL_NO support
-Date: Mon,  2 Dec 2024 13:04:13 +0100
-Message-ID: <20241202120416.6054-2-bp@kernel.org>
+Subject: [PATCH v2 2/4] KVM: x86: Advertise SRSO_USER_KERNEL_NO to userspace
+Date: Mon,  2 Dec 2024 13:04:14 +0100
+Message-ID: <20241202120416.6054-3-bp@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241202120416.6054-1-bp@kernel.org>
 References: <20241202120416.6054-1-bp@kernel.org>
@@ -66,73 +66,27 @@ Content-Transfer-Encoding: 8bit
 
 From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-If the machine has:
-
-  CPUID Fn8000_0021_EAX[30] (SRSO_USER_KERNEL_NO) -- If this bit is 1,
-  it indicates the CPU is not subject to the SRSO vulnerability across
-  user/kernel boundaries.
-
-have it fall back to IBPB on VMEXIT only, in the case it is going to run
-VMs:
-
-  Speculative Return Stack Overflow: CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT
-  Speculative Return Stack Overflow: Mitigation: IBPB on VMEXIT only
+SRSO_USER_KERNEL_NO denotes whether the CPU is affected by SRSO across
+user/kernel boundaries. Advertise it to guest userspace.
 
 Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 ---
- arch/x86/include/asm/cpufeatures.h | 1 +
- arch/x86/kernel/cpu/bugs.c         | 6 ++++++
- arch/x86/kernel/cpu/common.c       | 1 +
- 3 files changed, 8 insertions(+)
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 17b6590748c0..2787227a8b42 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -464,6 +464,7 @@
- #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barrier */
- #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
- #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
-+#define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 097bdc022d0f..7cf5fa77e399 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -800,7 +800,7 @@ void kvm_set_cpu_caps(void)
+ 	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
+ 		F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
+ 		F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */ |
+-		F(WRMSR_XX_BASE_NS)
++		F(WRMSR_XX_BASE_NS) | F(SRSO_USER_KERNEL_NO)
+ 	);
  
- /*
-  * Extended auxiliary flags: Linux defined - for features scattered in various
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 47a01d4028f6..8854d9bce2a5 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2615,6 +2615,11 @@ static void __init srso_select_mitigation(void)
- 		break;
- 
- 	case SRSO_CMD_SAFE_RET:
-+		if (boot_cpu_has(X86_FEATURE_SRSO_USER_KERNEL_NO)) {
-+			pr_notice("CPU user/kernel transitions protected, falling back to IBPB-on-VMEXIT\n");
-+			goto ibpb_on_vmexit;
-+		}
-+
- 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
- 			/*
- 			 * Enable the return thunk for generated code
-@@ -2658,6 +2663,7 @@ static void __init srso_select_mitigation(void)
- 		}
- 		break;
- 
-+ibpb_on_vmexit:
- 	case SRSO_CMD_IBPB_ON_VMEXIT:
- 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
- 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index a5c28975c608..954f9c727f11 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1270,6 +1270,7 @@ static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
- 	VULNBL_AMD(0x17, RETBLEED | SMT_RSB | SRSO),
- 	VULNBL_HYGON(0x18, RETBLEED | SMT_RSB | SRSO),
- 	VULNBL_AMD(0x19, SRSO),
-+	VULNBL_AMD(0x1a, SRSO),
- 	{}
- };
- 
+ 	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
 -- 
 2.43.0
 
