@@ -1,181 +1,145 @@
-Return-Path: <kvm+bounces-32961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1909E2E60
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 22:46:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC529E2F5C
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 23:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA11164A29
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 21:46:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69CB163BDB
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 22:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F4520898C;
-	Tue,  3 Dec 2024 21:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26BF20A5F5;
+	Tue,  3 Dec 2024 22:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SN0A0j7i"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uUpHwAst";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="c+FJ40Es"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2065.outbound.protection.outlook.com [40.107.243.65])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056C317ADE1;
-	Tue,  3 Dec 2024 21:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733262409; cv=fail; b=brYspvLwr0BQwiYPfDP9OX2U785NyFXtzV6Stfct2Tl4gAo6J58IJVKLsvO93WS/NHplJGYbqGJp3107/pLmDwjFO7ArjA5rBqtUsq83AXbat6UnI6NlE13cFMAqtrzhw4bzy8JdAcZwPvhBbf0ZAk82unWPe6jhEhE1KCI3vrA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733262409; c=relaxed/simple;
-	bh=gPWWF56n/hgtrWPF7kDDP0YlC8p5NXDq6BF/w/ZO3qc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fM1O/ALfSnU/tGn/VCMOnVbKQnbpaNIDO0CiNDofjIWMuTw3+KmxcDLp8XDZCD8TQ9kXNEAygv7UYuTeDJhvbxIIJIwzEJfUNKJUCcZRXdgG/ofKM2S2dOTiepOPyTEfXOD505BfsrHoRrqONIkFdn3TQBE7zWYQpIXWIi+Fgug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SN0A0j7i; arc=fail smtp.client-ip=40.107.243.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DpbVuwcX7FvZKrulWqGWctal8Ais3GA+URPrQ/s0x/UCyWj6rfvKW6e/mTehHQpww0R/zda5+A4wnqtHrmk+XLtkjIBhqyrmWewHtzVCc55aGDWtIQb3pve5XgVef8f6dsquU64pE+ItWNRhnyyyofFfRl0VKovx1fbciXKPOceuTs4+eLNZs/ZnaFqUBOA9iAFXng9z9g0E/9vWtWLz1QkpiLRPUT7BDkPGwqM49Xbu4o34LH3vTk1taR938OpQKzVojcLFzyQghmTT9XV3miCy+Um0SbUDOBvNNc0lh0fV8O/MS82F2rBxjQkr0LSvDHiExMcTfiEjtS1FZatQog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=snmwSH0bVGsJ19kIjdDwEwLPlFgd6KfZt49K+Wf9ii4=;
- b=B1uoYCvVPIOZ3CdqVN1CtuYsltK1nhPh0b0EFU7D2rqAoA6MgUADaY7DmngEGgBvQAHn2GQ2nHZvCrJypI3oG9k4NSqWMPC97lBwaCVZ5tLDlw6JHduTEF9A6lGXfIiO186ddyqh53KyBMOMYhJ0z5GeYEtrO86fxtITdm7qZFM7l6hZQMEPl25xrY8a98+t2ChjO7TXoTDBfx0/nFjtLg8uCNaeNNgR0Gr3+kGfZS29up5LXZOsXdqVQOCyUiVZ/EhpiZh10+xv9grTJHmfkxrBqN64BgZIb3TjtrxlAMNiFv1Y5Tt7/X1/dRsQU4bcp7evXB7HE27OqUKd6Cj5gA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=snmwSH0bVGsJ19kIjdDwEwLPlFgd6KfZt49K+Wf9ii4=;
- b=SN0A0j7iS2Os/Yja1ACRmfvrjS/ijniiKKcDbhyBVB6lLZ67lOiq3PJBqLvIinCo8dAnK1Zf7pYiaYo4UZUARpCT6jLy8zsO3QM5Ry67uTdBPTs8i0+JtRZx4OYcuVBWVpi1YROhKBE4qaM795K0mJx5rCA2Z1LLzaZ1xkuqwDE=
-Received: from CH2PR05CA0013.namprd05.prod.outlook.com (2603:10b6:610::26) by
- SJ2PR12MB8925.namprd12.prod.outlook.com (2603:10b6:a03:542::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8207.18; Tue, 3 Dec 2024 21:46:44 +0000
-Received: from CH3PEPF00000011.namprd21.prod.outlook.com
- (2603:10b6:610:0:cafe::4) by CH2PR05CA0013.outlook.office365.com
- (2603:10b6:610::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.9 via Frontend Transport; Tue, 3
- Dec 2024 21:46:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH3PEPF00000011.mail.protection.outlook.com (10.167.244.116) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8251.1 via Frontend Transport; Tue, 3 Dec 2024 21:46:43 +0000
-Received: from [10.23.192.43] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 3 Dec
- 2024 15:46:42 -0600
-Message-ID: <c09a99e8-913f-4a86-ba0b-c64d5cdcfb2e@amd.com>
-Date: Tue, 3 Dec 2024 13:46:36 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155901E2009;
+	Tue,  3 Dec 2024 22:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733266761; cv=none; b=ZRx0C/o7oQ8GMlCKeUtX8sECejFZ/YiA719jPu9SKNZ+Q5JHFqt9GuK5qGcGZFyGrSwkEoka4RmARMyJNPcgKYS+z7lRAjY8MxHOhN5B9s2yjZvW6CHpI/Li2Tu/Ai9iV4fiiMABbitMVf0eodMHEvq57afxRmLFOWcYuvQIs+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733266761; c=relaxed/simple;
+	bh=Ts5twGI5WLXGCgWxTjs5dJLKgs4RCUcQq24XWrHPHPg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=oJrvl76CmSe4J9z06UtVmJKCRMIJuyGqRJC8+yx0KU9dEaFF71GbBzLju9DHhw4Zq4pDUPifvKZBBjaYobOvClplEO7t3GRFTblWlTxUMr2l6PNkJkxb0ph+m1Sjy3XXDW6NdwObfqPOT5xnGMhyhE3NDihUTf+iqLas3q4Ps5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uUpHwAst; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=c+FJ40Es; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1733266758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/xkyLKWpUVdm6mfEZQQyS1yp6VoP0OWawZ5KoEQBw98=;
+	b=uUpHwAstAvPIPqurwVOkG4Z+xsuHUFtZ1THMwPD1xXJxmU3itDeHHaJi+jhl8lLBJ7eZ/4
+	rikeyL9y6/r0ZR071XOgksOdUYZ/PQCe+hGK2BvzyddYsmst8WpxFVe+UJVJzQGrdhxgcV
+	HLNq7f9LeqLepzH7RGzXJqq5B5jJnr9J9t79clawHMUjQb2mmGKapYpb+SK2DhA2lakxq8
+	iBadArbE9YJ0ZSq/71hfYpbAAi3BpT0+6GSmKjPazSH/yyLgWTtVB1F0ADpZ6/xF9oAxLK
+	SGrYIEc+XE/odY9cufIHKNqH/CkVZlI3It65iNeu/FplcxvHLpJdwfka9aOq7Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1733266758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/xkyLKWpUVdm6mfEZQQyS1yp6VoP0OWawZ5KoEQBw98=;
+	b=c+FJ40EsursGL5c6ZmSdluV0Hszl6xqc8ugVFc+JqAg5TyAq0eyEU7V2yrjQR13ZoVbsYq
+	CKD1ARZ8ojo9HDCA==
+To: Anup Patel <anup@brainfault.org>
+Cc: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org,
+ will@kernel.org, robin.murphy@arm.com, atishp@atishpatra.org,
+ alex.williamson@redhat.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu
+Subject: Re: [RFC PATCH 01/15] irqchip/riscv-imsic: Use hierarchy to reach
+ irq_set_affinity
+In-Reply-To: <874j3ktrjv.ffs@tglx>
+References: <20241114161845.502027-17-ajones@ventanamicro.com>
+ <20241114161845.502027-18-ajones@ventanamicro.com> <87mshcub2u.ffs@tglx>
+ <CAAhSdy08gi998HsTkGpaV+bTWczVSL6D8c7EmuTQqovo63oXDw@mail.gmail.com>
+ <874j3ktrjv.ffs@tglx>
+Date: Tue, 03 Dec 2024 23:59:17 +0100
+Message-ID: <87ser4s796.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: SVM: Convert plain error code numbers to defines
-To: Sean Christopherson <seanjc@google.com>
-CC: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, KVM
-	<kvm@vger.kernel.org>, Pavan Kumar Paluri <papaluri@amd.com>
-References: <20241202214032.350109-1-huibo.wang@amd.com>
- <Z05MrWbtZQXOY2qk@google.com>
-Content-Language: en-US
-From: "Melody (Huibo) Wang" <huibo.wang@amd.com>
-In-Reply-To: <Z05MrWbtZQXOY2qk@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000011:EE_|SJ2PR12MB8925:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9558454f-db6b-4d72-aeaa-08dd13e3fa87
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a2E1ODcwaTRpVzFNcDBzMisramlnN0FZODhaYjVBb1RIQmhFdk11ZDVWREcr?=
- =?utf-8?B?ejZnRS9ndXhVcG5yYnVjeWVWTDkzMFNmNlpBZzVFRUkxLzkvUnhObjdOWTJS?=
- =?utf-8?B?SnBVeVVaSG5QVks2bFh3ZTE3bkR0MXFsL1FmOFRMbk84ellLRXhVa0sza01V?=
- =?utf-8?B?VGQ0VUp6RitiaFQ3TkpoRStuNFJISEFtMnZUcjAyQ2czMnVWRWhReHV2YTh0?=
- =?utf-8?B?M2NzcjdRWVlzczdZQzNkVUt1THpMZ1FTYlB5REM3V0pjQk8yNERIdXUvaTZD?=
- =?utf-8?B?bkdsM1VoektKWFVFWUhsZXI5bUh1SmZNQk9oakphN1B0UkYvQnVEVnpXMXVU?=
- =?utf-8?B?TTd5UTBvVm52a25GaG55a1ZzSDlkRnJIdEExeWFYNW13Y3R2R0grRU01REd4?=
- =?utf-8?B?MnpSUGZVY3hWM0N5elNJdTVaNTBpR1VWU1BwZ1NLVDkvYlpOeG91bUtBT1U2?=
- =?utf-8?B?QWxRcEN6QmhXTzlCOVNmdEJuL2lCMDQwZnZ3Q0V1S1VEYWdpUVlOSEo4cVVR?=
- =?utf-8?B?cHhFemNZVk5EV0RTc3NKQzcrV2V5TGQyNjRPbDZqV0VCalBSVms2RjBYajd5?=
- =?utf-8?B?QUZmekpNU05xQ3QzdTYrc096RkZaQmoxYWFsTnJISEFKVXB4YndKbDc3QnlS?=
- =?utf-8?B?UVlZbDJjTlFmdUdZUG0xZlFaM0JjeHE4VmE0TE5RZmtpZjEraUlKVDA2RzRt?=
- =?utf-8?B?Q0o0Y3F0WktSdS9rdTRqMTAwVXEybEdiQVNTNFErN2svcHJUUVVTdk5IWG5m?=
- =?utf-8?B?WkxqTkhtaFpVN2RTcUtmbjZEazJETHFWWWdHR1pUTFRCTjgzNU9QZlJlR1B3?=
- =?utf-8?B?YUxVSll3L2hWcGg2b3A1UFVXZVZzRTFpZVVQODUwQS8wdm1Bc0pGSllYZWxS?=
- =?utf-8?B?bEVOcXNHeWxydStqVUk2T0JvSG42RmRuSS9FNUNaQ0N5MmVJa1V2K0FHVGx1?=
- =?utf-8?B?S0EyaDBDK1Voald4ZmpFSEdCYk5oSTRhVzFzdUV0azlmM1ZmajRIaUd1cEVR?=
- =?utf-8?B?eTl6WWxmZUdWdjNBRjY0bktFYzJyZGw2S0lNNWpQODJPbkZNdlhKYTljQ1Vt?=
- =?utf-8?B?N1R5NVdzNUFLOHp6RGJUYmtEaERPOGpnUm9pQjZqbUNEdVpCalE1TGNsMDhs?=
- =?utf-8?B?aVR1TGxZTTZ0dHRWYzlxZVZPN0REU1RneG9lbVdXeXBuUlhIcXdsbFhkQ2w5?=
- =?utf-8?B?ZTAzUFBwbXl1RUJJVkp1bDVmVkhOaWRQRytHblp4MnUxeUd6UHlKaG1jVXJ0?=
- =?utf-8?B?UEE4MmFtOFRhdDlLSitMVlhzZDhhaHlxMlBSbU5iaXRjTVBscE1VV2lWdGR0?=
- =?utf-8?B?L3JIYmhDd1M1bS82WFd6cUpXL2l0U0tMYTFROVZTM1htc0IzNlFjSVNnWmhX?=
- =?utf-8?B?TEhLOUVVRlNpVmpHYk8waGFCUFJ4VXRPUXN0QTlNMm9sblVublhsdUhZWWtX?=
- =?utf-8?B?ZFV2RWtHVVlnZU5tcVo3NUdQRm5lZEZXSjkveFlrNnRxWkx2UjNHVzhOcEJE?=
- =?utf-8?B?VS8wSlFpaHcxdW5wUVlSdms3S280TUd0aEdxRWphRjlIWGhKaVoxVXcxWFA2?=
- =?utf-8?B?ejVEVjZzbGZEQlBEM0JINzkxb1d1Wm5QWEVEYWR0Q3kxTG9POHpOblpGOXZO?=
- =?utf-8?B?M0tRTzZ1UXJDbmVibjcxR25NOEgvUUNQUXNBVUtMTndwcWdCUUUvRUY0WGZP?=
- =?utf-8?B?czY4SGZOcUtXWHNtTjdzTlFKdmZOVEh0c2FhOTFIaks4MTdLT0l4dnNUck1W?=
- =?utf-8?B?UThrTEUvSWJETUgvM3RJcmw3dHdHUFhvK1BnMTU4amU0QVpFTHlDNE4rOG1k?=
- =?utf-8?B?UUMyZFdhVDZKOWN3RWVVOFllSzRjMHQ2aVdGUWxObHlPM1p6S0lTeEtydGtS?=
- =?utf-8?B?RFZsVGlqK25ySmxQblFaQlYzdTZHblhmZWVWQy9WS1RHTXlPelY0WGJVQ3Fq?=
- =?utf-8?Q?fghmatOohupwPvdIi8Q/Qfh4FL+5Keaj?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 21:46:43.7240
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9558454f-db6b-4d72-aeaa-08dd13e3fa87
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000011.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8925
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sean,
+On Tue, Dec 03 2024 at 21:55, Thomas Gleixner wrote:
+> On Tue, Dec 03 2024 at 22:07, Anup Patel wrote:
+>> On Tue, Dec 3, 2024 at 7:23=E2=80=AFPM Thomas Gleixner <tglx@linutronix.=
+de> wrote:
+>>> Sorry, I missed that when reviewing the original IMSIC MSI support.
+>>>
+>>> The whole IMSIC MSI support can be moved over to MSI LIB which makes all
+>>> of this indirection go away and your intermediate domain will just fit
+>>> in.
+>>>
+>>> Uncompiled patch below. If that works, it needs to be split up properly.
+>>>
+>>> Note, this removes the setup of the irq_retrigger callback, but that's
+>>> fine because on hierarchical domains irq_chip_retrigger_hierarchy() is
+>>> invoked anyway. See try_retrigger().
+>>
+>> The IMSIC driver was merged one kernel release before common
+>> MSI LIB was merged.
+>
+> Ah indeed.
+>
+>> We should definitely update the IMSIC driver to use MSI LIB, I will
+>> try your suggested changes (below) and post a separate series.
+>
+> Pick up the delta patch I gave Andrew...
 
-On 12/2/2024 4:11 PM, Sean Christopherson wrote:
+As I was looking at something else MSI related I had a look at
+imsic_irq_set_affinity() again.
 
-> 
-> E.g. something like this?  Definitely feel free to suggest better names.
-> 
-> static inline void svm_vmgexit_set_return_code(struct vcpu_svm *svm,
-> 					       u64 response, u64 data)
-> {
-> 	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, response);
-> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, data);
-> }
-> 
-If I make this function more generic where the exit info is set for both KVM and the guest, then maybe I can write something like this:
+It's actually required to have the message write in that function and
+not afterwards as you invoke imsic_vector_move() from that function.
 
-void ghcb_set_exit_info(struct ghcb *ghcb,
-                      u64 info1, u64 info2)
-{
-	ghcb_set_sw_exit_info_1(ghcb, info1);
-	ghcb_set_sw_exit_info_2(ghcb, info2);
+That's obviously not true for the remap case as that will not change the
+message address/data pair because the remap table entry is immutable -
+at least I assume so for my mental sanity sake :)
 
-}
-This way we can address every possible case that sets the exit info - not only KVM. 
+But that brings me to a related question. How is this supposed to work
+with non-atomic message updates? PCI/MSI does not necessarily provide
+masking, and the write of the address/data pair is done in bits and
+pieces. So you can end up with an intermediate state seen by the device
+which ends up somewhere in interrupt nirvana space.
 
-And I am not sure about the wrappers for each specific case because we will have too many, too specific small functions, but if you want them I can add them.
+See the dance in msi_set_affinity() and commit 6f1a4891a592
+("x86/apic/msi: Plug non-maskable MSI affinity race") for further
+explanation.
+
+The way how the IMSIC driver works seems to be pretty much the same as
+the x86 APIC mess:
+
+        @address is the physical address of the per CPU MSI target
+        address and @data is the vector ID on that CPU.
+
+So the non-atomic update in case of non-maskable MSI suffers from the
+same problem. It works most of the time, but if it doesn't you might
+stare at the occasionally lost interrupt and the stale device in
+disbelief for quite a while :)
+
+I might be missing something which magically prevent that though :)
 
 Thanks,
-Melody
 
+        tglx
 
