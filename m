@@ -1,125 +1,169 @@
-Return-Path: <kvm+bounces-32860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7F99E0F59
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 00:35:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D891650B4
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2024 23:35:36 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891D01DFDA5;
-	Mon,  2 Dec 2024 23:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ETTJ08la"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A70EC9E0F81
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 01:11:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB63C2C18C;
-	Mon,  2 Dec 2024 23:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B2CD282FF1
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 00:11:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8E8A59;
+	Tue,  3 Dec 2024 00:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CRSqb8Fz"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AA0173
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 00:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733182530; cv=none; b=eePv8OaC8fNGtNM13Jqmu0vADXITO2c0BRaVkw1odxtJe5RKlKL4NfvEIEttabdCNqQL2YC6E16AJ/tn7RAgoca7Y7Oet44zrdGzFgDTFgu1Qt7OxbKV+q6+u3bOpPtGfPx+qXxOEZn9LerSvfwcPoxvphdBHe2Fjap6CKnxDaQ=
+	t=1733184689; cv=none; b=hw9+436YCGCUftpnZmIQmxxTMlTHvVT8pyWGp4TAfyib3tMxPrc/FwYO10sHYaJsRZcmRJtUKIho7+5V26eJmeUmBjDI49Eun+POMDKyep53pzPkgps6TGnkP+/lnrevf+TKnr9VG0YEVHfC8jsD81Uu8ugKN4ITIA/zg5ET0kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733182530; c=relaxed/simple;
-	bh=GTllTgmBG4SmhlrT+/ywvHTuP/WmsCAwgMp34pJJwSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lJZIrzwF7hjk3ZccjmyPxmLcHUGa2ObOXEsqxVNfpT7sjhtWuFa8scJsbKpZpzrIGfoq/KQCvCnk9QTw+sp4W+FT4qTW9nLT7ySvCJXBv3ypoA0nRGiledzPj42e8wuF4Zbv8penH88rU7qFWBKXti8EkCyL1qKlYXM6VXlz3k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ETTJ08la; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733182529; x=1764718529;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GTllTgmBG4SmhlrT+/ywvHTuP/WmsCAwgMp34pJJwSA=;
-  b=ETTJ08laDUd+a3IUyZoNOHjGF5Wj9jBWrIRy8gxEHCMtalTFBofZqQ+o
-   uHx22ZmOGLcedJtMCe955Gy3KuVpvZ/BFunY4eJdPyUi94tYfxkp6bW0m
-   LC8/Dx/IdsyqePWNEQyTrsL+FPnnAA0deCjCIKKC+4ibmd+g7wBM/yEAa
-   1PHy9mjVVV22ubvPNcNnfuVUTu4SpfCV3ruu0NW+A959E/4j51VEae42O
-   Bgt4S/1XoZompwPi0OitaDyJOvZyRWtHdHmeaXebkBEPabF1ALYVt3Jgg
-   EPdTt4XSqNIqOCm7hpOJecEPUbuFVnTlSMQ2T6/VqJCUdf36HZDlVRd9i
-   w==;
-X-CSE-ConnectionGUID: n0Nj4pb2T9mb2vd2nQVhyA==
-X-CSE-MsgGUID: faVZBMU+QliYxQYKX2TrAw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="33121408"
-X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="33121408"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 15:35:28 -0800
-X-CSE-ConnectionGUID: OqgjxLgjSKyBqd0ALVugqw==
-X-CSE-MsgGUID: ktkqe+cgQdCMx1SgAI6j4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="98273206"
-Received: from ddbrudv-mobl.amr.corp.intel.com (HELO desk) ([10.125.145.202])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 15:35:28 -0800
-Date: Mon, 2 Dec 2024 15:35:21 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, amit@kernel.org, kvm@vger.kernel.org,
-	amit.shah@amd.com, thomas.lendacky@amd.com, tglx@linutronix.de,
-	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
-	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com, sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
-	david.kaplan@amd.com, dwmw@amazon.co.uk, andrew.cooper3@citrix.com
-Subject: Re: [PATCH v2 1/2] x86/bugs: Don't fill RSB on VMEXIT with
- eIBRS+retpoline
-Message-ID: <20241202233521.u2bygrjg5toyziba@desk>
-References: <cover.1732219175.git.jpoimboe@kernel.org>
- <9bd7809697fc6e53c7c52c6c324697b99a894013.1732219175.git.jpoimboe@kernel.org>
- <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
+	s=arc-20240116; t=1733184689; c=relaxed/simple;
+	bh=sXKboPJVhvZm9MRFI/36V/Dw28GUy47CEwhIWBjLPbY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mLKvoAtpbA+6mZTwFvughmUiQZzagM/9DMuasMZODbUtf7IlP9tpcSFtCaTV509rkMnO2oPM5+ybDk71CZfb5+1wveQ8glsu2ZkfF3DR1fxv1fKqajfWPOIHoY4hRc9UYhAVil6lvpWVoHiUq1lhGn525nWKO7bBTQbXb2RjFmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CRSqb8Fz; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee3c572485so5674955a91.2
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 16:11:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733184686; x=1733789486; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HyRCW53Khz052+aBjVdJTpIV/tic2eaOScb3I7IW9MA=;
+        b=CRSqb8FzrmuAWOdscMP3vIQJMM4Rj7LdFaopny6c7dxfliIUhoUbLZE9UcgF9uOcvn
+         Z7RiReBQgMrQIZ8HrXRWt4joLEAtFjeJ+YA+XXHQPb7oRg98ftrNHJVsNUixqBRlmqhb
+         mExBYQg3VKIanfuuankQ2nPKclXuaLWrOc8tlVSVzePKazABlw8VgTIkE3JNpeNifN0+
+         nQLDrQIpkedwMiEpRNxqCtqVzwHLBtY3UQfZaGzV2Q0P11hfAaLW1hazBkueCCEn4QjA
+         Z34l05U0ztwUqkPgC2rHA3RiNAV5U/FIFegWyyUP56f8Ug0NzOInH1AOo5s6TBA3Ps+g
+         dyLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733184686; x=1733789486;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HyRCW53Khz052+aBjVdJTpIV/tic2eaOScb3I7IW9MA=;
+        b=J4YBqe3vdygaMBorTNE87DRu8RfmwYG+8RZIgnmGg/cjuoev09ebKbW1Ol5aqYBr52
+         C+tUGrb/5DVvY1pbHrFKdYTEFKp00X17pu+Oi1YHCCtxBu29xlLGqTTAiqD0kpG6Oa0S
+         dZaOtUMApLYgG4wm2TEoqE+1XZqv1VTVnqV4E0fabpNim35/2YPNZhP7TgfAzuTgAQoO
+         9zzCaUgaLcrfPJriuJCtzRXUayfVSXocSxgCb3SnFBKSrkLJkaygZWjymJZ8DkGSr3KQ
+         OyklzbzReGHtTLaa/8VHlRl7DLyiu611vymzPgCk6FA2slrbgVEjQOwQkJ8WbFggU1Cb
+         N+TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXAPe8ivxEEcKNIp4AwCeL60UHcIe0S6zA2eLNkjz7d963SnntlzDyOsAiYvDmQgtlIGCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZReAm6y9fqgKaAKqCFh2O0UWlXkHqWF9rsxnF3golw5V0Z8AL
+	VC6K1SHq6igfYIrAx0SfMASiaPUcGjxLgcAy4MFYqhN4MRPe/kFK0jGwdVb9XvCERoPPuEyOX+8
+	QZQ==
+X-Google-Smtp-Source: AGHT+IE0tU8DEKdjyyKwq8TT/+CTYk5YYD3SCO3wVYP2c5+AmdEw/3xZ/gG660l3MPLAuKDqsSbFdwWOb9Q=
+X-Received: from pjbsz16.prod.google.com ([2002:a17:90b:2d50:b0:2e2:44f2:9175])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:380c:b0:2ee:ab29:1482
+ with SMTP id 98e67ed59e1d1-2ef011ff673mr894137a91.16.1733184686643; Mon, 02
+ Dec 2024 16:11:26 -0800 (PST)
+Date: Mon, 2 Dec 2024 16:11:25 -0800
+In-Reply-To: <20241202214032.350109-1-huibo.wang@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
+Mime-Version: 1.0
+References: <20241202214032.350109-1-huibo.wang@amd.com>
+Message-ID: <Z05MrWbtZQXOY2qk@google.com>
+Subject: Re: [PATCH v2] KVM: SVM: Convert plain error code numbers to defines
+From: Sean Christopherson <seanjc@google.com>
+To: Melody Wang <huibo.wang@amd.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, KVM <kvm@vger.kernel.org>, 
+	Pavan Kumar Paluri <papaluri@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Nov 30, 2024 at 04:31:25PM +0100, Borislav Petkov wrote:
-> On Thu, Nov 21, 2024 at 12:07:18PM -0800, Josh Poimboeuf wrote:
-> > eIBRS protects against RSB underflow/poisoning attacks.  Adding
-> > retpoline to the mix doesn't change that.  Retpoline has a balanced
-> > CALL/RET anyway.
+On Mon, Dec 02, 2024, Melody Wang wrote:
+> Convert VMGEXIT SW_EXITINFO1 codes from plain numbers to proper defines.
 > 
-> This is exactly why I've been wanting for us to document our mitigations for
-> a long time now.
+> No functionality changed.
 > 
-> A bunch of statements above for which I can only rhyme up they're correct if
-> I search for the vendor docs. On the AMD side I've found:
+> Signed-off-by: Melody Wang <huibo.wang@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Reviewed-by: Pavan Kumar Paluri <papaluri@amd.com>
+> ---
+>  arch/x86/include/asm/sev-common.h |  8 ++++++++
+>  arch/x86/kvm/svm/sev.c            | 12 ++++++------
+>  arch/x86/kvm/svm/svm.c            |  2 +-
+>  3 files changed, 15 insertions(+), 7 deletions(-)
 > 
-> "When Automatic IBRS is enabled, the internal return address stack used for
-> return address predictions is cleared on VMEXIT."
-> 
-> APM v2, p. 58/119
-> 
-> For the Intel side I'm not that lucky. There's something here:
-> 
-> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
-> 
-> Or is it this one:
-> 
-> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html#inpage-nav-1-3-undefined
-> 
-> Or is this written down explicitly in some other doc?
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 98726c2b04f8..01d4744e880a 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -209,6 +209,14 @@ struct snp_psc_desc {
+>  
+>  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+>  
+> +/*
+> + * Error codes of the GHCB SW_EXITINFO1 related to GHCB input that can be
+> + * communicated back to the guest
+> + */
+> +#define GHCB_HV_RESP_SUCCESS		0
+> +#define GHCB_HV_RESP_ISSUE_EXCEPTION	1
+> +#define GHCB_HV_RESP_MALFORMED_INPUT	2
+> +
+>  /*
+>   * Error codes related to GHCB input that can be communicated back to the guest
+>   * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 72674b8825c4..e7db7a5703b7 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3433,7 +3433,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>  		dump_ghcb(svm);
+>  	}
+>  
+> -	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
+> +	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
+>  	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, reason);
 
-It is in this doc:
+Hmm, IMO, open coding literals in multiple locations is a symptom of not providing
+helpers.  From a certain (slightly warped) perspective, setting exit_info_1 vs.
+exit_info_2 is just weird version of an open coded literal.
 
-  https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/indirect-branch-restricted-speculation.html
+Rather than provide macros (or probably in addition to), what if we provide helpers
+to set the error code and the payload?  That would also ensure KVM sets both '1'
+and '2' fields.  E.g. in sev_handle_vmgexit()'s SVM_VMGEXIT_AP_JUMP_TABLE path,
+setting '2' but not '1' is mildly confusing at first glance, because it takes some
+staring to understand that's it's NOT a failure path.  Ditto for
+sev_vcpu_deliver_sipi_vector().
 
-  "Processors with enhanced IBRS still support the usage model where IBRS is
-  set only in the OS/VMM for OSes that enable SMEP. To do this, such
-  processors will ensure that guest behavior cannot control the RSB after a
-  VM exit once IBRS is set, even if IBRS was not set at the time of the VM
-  exit."
+And IMO, not having to parse input parameters to understand success vs. failure
+usually makes code easier to read.
+
+E.g. something like this?  Definitely feel free to suggest better names.
+
+static inline void svm_vmgexit_set_return_code(struct vcpu_svm *svm,
+					       u64 response, u64 data)
+{
+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, response);
+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, data);
+}
+
+static inline void svm_vmgexit_inject_exception(struct vcpu_svm *svm, u8 vector)
+{
+	u64 data = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_EXEPT | vector;
+
+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_ISSUE_EXCEPTION, data);
+}
+
+static inline void svm_vmgexit_bad_input(struct vcpu_svm *svm, u64 suberror)
+{
+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_MALFORMED_INPUT, suberror);
+}
+
+static inline void svm_vmgexit_success(struct vcpu_svm *svm, u64 data)
+{
+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_SUCCESS, data);
+}
 
