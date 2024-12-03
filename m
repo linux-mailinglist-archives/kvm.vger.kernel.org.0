@@ -1,89 +1,146 @@
-Return-Path: <kvm+bounces-32920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230599E1B33
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 12:43:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5CA9E1BD5
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 13:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD101281331
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 11:43:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81ED1B2D730
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 11:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E341E47A8;
-	Tue,  3 Dec 2024 11:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FFE1E47C6;
+	Tue,  3 Dec 2024 11:48:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2331E048B
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 11:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F901E411C;
+	Tue,  3 Dec 2024 11:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733226215; cv=none; b=tcwLeCCODAHSsf0euLGx4r/WOjYLRa/yF4kCeA0hwtbrTTJo9pM72tuOp0Eoojpi9wzVUNWnREmevhmFjYsHsq0Dg7hVYvYzbpjMF4ymhU9XUVaF0spXHe58r2HbJ7XWNK6bRF9nSJpxToB4rTTAPgf+6GkqLd5Yh6Z5gKASE00=
+	t=1733226504; cv=none; b=F5RVyajkqkPq2fdro8r4VtDVIHvX9zeT1YVfMSXO7LtrnovRW06iPIYEzhjCKUcllRIHxkZOWQhhPvdehTODTNQOIrEv9et9frW2P8f8Qgw6Ga2xZVJ7Ay8QIix3ghVgSV1Dve0WUAoxtoA0HMRlgplUXRxV5Aefkf5PB+kWhjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733226215; c=relaxed/simple;
-	bh=y8MozKhBVISsPUQa/JqcZPuhmafdyND+g1bctCn5YqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZd7QKNy0w6Kq0S+k/L5qj9V+G+2OPBfwyA6S8P0Z3aVlMtD2wN2giktMcEzw8yB6nhsJkAWDDNrwjDuHd5kordOps2LXf1YmaZnyKa2GXjTu8XaUol35HGQ9d2wzwEnBgpjzUS7G6E+bmzlIQC8lwZ1le/Limhh4wRagtBnK9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49EA6FEC;
-	Tue,  3 Dec 2024 03:43:59 -0800 (PST)
-Received: from arm.com (e134078.arm.com [10.32.101.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EE263F71E;
-	Tue,  3 Dec 2024 03:43:29 -0800 (PST)
-Date: Tue, 3 Dec 2024 11:43:27 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev, atishp@rivosinc.com, jamestiotio@gmail.com,
-	eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] lib/on-cpus: A couple of fixes
-Message-ID: <Z07lIOfsypu++H8/@arm.com>
-References: <20241031123948.320652-5-andrew.jones@linux.dev>
- <20241111-ef3ba6e132792aaf8ad901f7@orel>
+	s=arc-20240116; t=1733226504; c=relaxed/simple;
+	bh=TqawTQjbMSMJ23s8nCMeSH4mAdv9G2HhO1QDLyCtIGU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aamaKt+tLc7Fadp2t26ofNDVLkv/n4ButyWt2razMley8KjFGpKsmgs8sO7xJMfJrQMyZIGanXzEY9XnNkXGEhUWhtwVUFYUPAQQspCinlnuAXCT61dbjcadY4SK/gZajUu8sovgESgxp0RhRLn5bKMZ5Bl78QWnkg8tYleV/P0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.38])
+	by gateway (Coremail) with SMTP id _____8CxSOH+705n2rJPAA--.23423S3;
+	Tue, 03 Dec 2024 19:48:14 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.68.38])
+	by front1 (Coremail) with SMTP id qMiowMAxmsH3705ne9JzAA--.9972S2;
+	Tue, 03 Dec 2024 19:48:14 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Xuerui Wang <kernel@xen0n.name>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@loongson.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH V2 1/2] LoongArch: KVM: Protect kvm_check_requests() with SRCU
+Date: Tue,  3 Dec 2024 19:47:58 +0800
+Message-ID: <20241203114759.419261-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241111-ef3ba6e132792aaf8ad901f7@orel>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAxmsH3705ne9JzAA--.9972S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZF4UXF1DXFyrWry7tr13GFX_yoW5WF1xpr
+	9xAr4xGr48Xry7Aw1UAF1DAr1UX3yDAF1xJry8Jr18Ar1UZr1DJFyUJrW8Jry5G34rAF17
+	Jr1Utr15tr1UJwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Fb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v2
+	6r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
+	CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF
+	0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIx
+	AIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2
+	KfnxnUUI43ZEXa7IU8CksDUUUUU==
 
-Hi Drew,
+When we enable lockdep we get such a warning:
 
-On Mon, Nov 11, 2024 at 03:36:30PM +0100, Andrew Jones wrote:
-> On Thu, Oct 31, 2024 at 01:39:49PM +0100, Andrew Jones wrote:
-> > While creating riscv SBI HSM tests a couple strange on-cpus behaviors
-> > were observed. Fix 'em.
-> > 
-> > v2:
-> >  - Added patch for barrier after func() [Alex]
-> >  - Improved commit message for patch1 [Alex]
-> > 
-> > Andrew Jones (3):
-> >   lib/on-cpus: Correct and simplify synchronization
-> >   lib/on-cpus: Add barrier after func call
-> >   lib/on-cpus: Fix on_cpumask
-> > 
-> >  lib/cpumask.h | 14 +++++++++++++
-> >  lib/on-cpus.c | 56 ++++++++++++++++++++-------------------------------
-> >  2 files changed, 36 insertions(+), 34 deletions(-)
-> > 
-> > -- 
-> > 2.47.0
-> >
-> 
-> Merged to master through riscv/queue.
+ =============================
+ WARNING: suspicious RCU usage
+ 6.12.0-rc7+ #1891 Tainted: G        W
+ -----------------------------
+ include/linux/kvm_host.h:1043 suspicious rcu_dereference_check() usage!
+ other info that might help us debug this:
+ rcu_scheduler_active = 2, debug_locks = 1
+ 1 lock held by qemu-system-loo/948:
+  #0: 90000001184a00a8 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0xf4/0xe20 [kvm]
+ stack backtrace:
+ CPU: 0 UID: 0 PID: 948 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc7+ #1891
+ Tainted: [W]=WARN
+ Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
+ Stack : 0000000000000089 9000000005a0db9c 90000000071519c8 900000012c578000
+         900000012c57b920 0000000000000000 900000012c57b928 9000000007e53788
+         900000000815bcc8 900000000815bcc0 900000012c57b790 0000000000000001
+         0000000000000001 4b031894b9d6b725 0000000004dec000 90000001003299c0
+         0000000000000414 0000000000000001 000000000000002d 0000000000000003
+         0000000000000030 00000000000003b4 0000000004dec000 90000001184a0000
+         900000000806d000 9000000007e53788 00000000000000b4 0000000000000004
+         0000000000000004 0000000000000000 0000000000000000 9000000107baf600
+         9000000008916000 9000000007e53788 9000000005924778 0000000010000044
+         00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
+         ...
+ Call Trace:
+ [<9000000005924778>] show_stack+0x38/0x180
+ [<90000000071519c4>] dump_stack_lvl+0x94/0xe4
+ [<90000000059eb754>] lockdep_rcu_suspicious+0x194/0x240
+ [<ffff8000022143bc>] kvm_gfn_to_hva_cache_init+0xfc/0x120 [kvm]
+ [<ffff80000222ade4>] kvm_pre_enter_guest+0x3a4/0x520 [kvm]
+ [<ffff80000222b3dc>] kvm_handle_exit+0x23c/0x480 [kvm]
 
-Sorry, I was busy with something else and I didn't have the time to review
-the series until now.
+Fix it by protecting kvm_check_requests() with SRCU.
 
-I had a look and it looks good to me.
+Cc: stable@vger.kernel.org
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+ arch/loongarch/kvm/vcpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-Alex
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index cab1818be68d..d18a4a270415 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -240,7 +240,7 @@ static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
+  */
+ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+ {
+-	int ret;
++	int idx, ret;
+ 
+ 	/*
+ 	 * Check conditions before entering the guest
+@@ -249,7 +249,9 @@ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	ret = kvm_check_requests(vcpu);
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 
+ 	return ret;
+ }
+-- 
+2.43.5
+
 
