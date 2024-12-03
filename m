@@ -1,126 +1,164 @@
-Return-Path: <kvm+bounces-32945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9D79E2D01
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 21:26:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 672869E2BAA
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 20:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9092CB36AD4
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 18:48:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E962840B6
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 19:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE36D1FECC3;
-	Tue,  3 Dec 2024 18:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25363204F62;
+	Tue,  3 Dec 2024 19:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pb9YzMdL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pWv0hY6H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288411F7545;
-	Tue,  3 Dec 2024 18:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFA01FF7CF
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 19:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733251679; cv=none; b=TvHyVtWfTBez2XF9aHFpfH6QcB0JxuZyNdiNTwCQuE8aJKJM/Tb1rG/WBUM9/TA6gcq7G3105VMZiyPWbDw9UKdaKw8Pt8l3sM2lCT1A6WcnwDNNP+o1MnLoXzImcwfBAYrymYVEg0lwYoRdCkqfrFWVOYFyouCTVPTDAZnFF3g=
+	t=1733252871; cv=none; b=fwMnMnqGIUtVxe8vdfQQOPW21mlhxtRQ6M1swsA7ZeDYexz44kZAR8jGBO1TiipxwXP1G4b4QMQwIJaJ8bixhiXWQwwBJ3YRYMeQ8uv5kOEISpDAKFNBbALl9mbz4wQCKG56/t/xHvTzh/GPughwgyUduryZ6NEZYyyDKFWeobg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733251679; c=relaxed/simple;
-	bh=KGE06P5wGdeAx3Y/4+t5a/rj5ZkKtAQ3902PJPsdsog=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uSj5dMgjUaJ5E3HYwZZZNUszmTX56/TIevWX6RbG8JI6u0El/q1t+G06kQl26WJimgfiXDo5Q0vhajSx7ocHH2NoYISydg4S/wDCPVnkVt6lfENKRYnCG3ATsIid5vfxnK7crAI29yxPO53Ej+wOny6kmzIFV/q/lsdxuOdeJ70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pb9YzMdL; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733251678; x=1764787678;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KGE06P5wGdeAx3Y/4+t5a/rj5ZkKtAQ3902PJPsdsog=;
-  b=Pb9YzMdLSUx51/qpaydecMuLsswxSlAeKIFFLlE1r6nbC9KA4EVK1X82
-   5hl2+5ZLIdvO1JAB59WKxLKc0OxL28fIFPITArEiB9gsQtK/Y36ChzrW/
-   l5jsFjtouqE4FurmHVnOGyNjEne2mcWZ+XlmVl0yIyuzAkTBaV/uVay3N
-   2Q1E1EOfs1Q4/yqhZSYeDZE/Zv2PPwROsLcfjYLyWbc+45SNy3IDgBSo9
-   yW0PkmF6pBQNpyW7bY1H6kIRMZ9CRBdR47fFWa80iGQmYf5ffQaE5QdWq
-   cfLTqBfpYOBFM97O+yGJTU/+3r19wlYYLL7l+3ciDnPm6nH1MXvwT5xCA
-   w==;
-X-CSE-ConnectionGUID: 0b8FcaoxRNCi2MurX923Gg==
-X-CSE-MsgGUID: J04FnVW5R2KbwUPn+JAN0Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="37143167"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="37143167"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 10:47:55 -0800
-X-CSE-ConnectionGUID: rEk1kLcETp6SCybnrqNSug==
-X-CSE-MsgGUID: YHyvKJ04Si6l+HfHlWuBeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="93420015"
-Received: from rthomas.sc.intel.com ([172.25.112.51])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 10:47:54 -0800
-From: Ramesh Thomas <ramesh.thomas@intel.com>
-To: alex.williamson@redhat.com,
-	jgg@ziepe.ca,
-	schnelle@linux.ibm.com,
-	gbayer@linux.ibm.com
-Cc: kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	ankita@nvidia.com,
-	yishaih@nvidia.com,
-	pasic@linux.ibm.com,
-	julianr@linux.ibm.com,
-	bpsegal@us.ibm.com,
-	ramesh.thomas@intel.com,
-	kevin.tian@intel.com,
-	cho@microsoft.com
-Subject: [PATCH v2 1/2] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
-Date: Tue,  3 Dec 2024 10:41:57 -0800
-Message-Id: <20241203184158.172492-2-ramesh.thomas@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241203184158.172492-1-ramesh.thomas@intel.com>
-References: <20241203184158.172492-1-ramesh.thomas@intel.com>
+	s=arc-20240116; t=1733252871; c=relaxed/simple;
+	bh=MJR7wMKmDqS5aFmAfPznb4O85+40BOjFkprVenAI+OE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fw1IOuNzMrtw4vfNLBC09dN2VAb3+uUHw4wCTSHZZ8+A5YQ3aw+FhCa0S/fOPi5cs+dX68rmAiqgQ4rweH8K/CgN6kmt8Bi6ZdvVtNUGK1VoHPTSY5zzaNwqRjHpJVCGqDAbKD0FFgDjqkVo3HkBVd+hcXNWpZwVBQavmRaMmio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pWv0hY6H; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee3aa6daaaso4907554a91.3
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 11:07:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733252869; x=1733857669; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PaCdFtyuZCc6AtbaS5uMRjDy7Mq8Hk8zYjV/jOWuGVc=;
+        b=pWv0hY6H1ZbDJXZq8K56SPd9d/5CdYLTRtI5I8rRnhH8VXQWtc6OIeTsO5lYUQeUhk
+         ToQDUxS5JHRFw5tsmgB8GozyH7+ddc2Mmx2UnFLZ+TsaJf4hIAxPHq9LscBjb2ij7ll6
+         z3HO3YY/IEHQcn5q1sCOfe4/LU0RTQmAa00CUrZ6QcT0aUZBVx0xpVNGcYMs9/nhROPW
+         E6u9Uq/2zA4epZaKnYpPT7HUbQZkyIVtKcyWJPyIfO1imtEW0KwKwmdqOQZHSI3sZvta
+         WZOcq9Jq/7Q+LWj0f1tA3heaiJsy2sghzmTfUCWOwL8RAJp2q+Nlna2TzDUkssngaovM
+         Fteg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733252869; x=1733857669;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PaCdFtyuZCc6AtbaS5uMRjDy7Mq8Hk8zYjV/jOWuGVc=;
+        b=kYlhuFB3wGGfW2Mwe0k+C9mCpvZfdwGcNUuve8gl8sjwTVjdC6/JfTmkW+KzMkyE7Q
+         0ePwNWIvxykNPkWY81Qbt+LhMX/8ebozXC0Br3ne7slO/v1HwqESEZqG7+EvsyXrSCi3
+         Vh2HPJGCVYg+NSH1Rfjn8zbNiLeMQmsiIcIEDQWbQfM83DBMwHGZt93N4NscfmmF1LoS
+         Q/VJcoztTQKeAtwqepfG9z7GDmB5uv7lUoBi0oZSo4LDex9Xa+f7fb0svUBhhXRecKlQ
+         DmBPzfLbjCUq7PXiuPJ2l7/QTqdlI8kME6987Qpbbgyd8GlgROXRWrC4+6ZBheP/unY9
+         0d5w==
+X-Forwarded-Encrypted: i=1; AJvYcCWA5xIUrtFZGvE8QKBaWd62g6eoPjdrhw3lMrBi+/QLkDgDxkq08R0mowxCFvifm1Q1Q3g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRH4b7bhJnyiEEaJ8VdKPGfpn4MEsYaw+3cIh0GcPO1ORqhD4V
+	uKrVOjq/IpZ1iDb7WkHzCr8YyMkjL4jQtkH5Z4Ds9SPyV0dhLVjDLwk8fjARiwYJAOBV7qacAKa
+	y5Q==
+X-Google-Smtp-Source: AGHT+IHjoirwBfWtmi9PaYx/CFYut1Vj6FLcEXqUtE33259R8PXsBNLecTER6HtXRPmwtYfrA0AIIAqHdZ4=
+X-Received: from pjbsb14.prod.google.com ([2002:a17:90b:50ce:b0:2ee:3882:175b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c4a:b0:2ee:e18b:c1fa
+ with SMTP id 98e67ed59e1d1-2ef0125b2e5mr4090519a91.28.1733252869223; Tue, 03
+ Dec 2024 11:07:49 -0800 (PST)
+Date: Tue, 3 Dec 2024 11:07:47 -0800
+In-Reply-To: <20241121185315.3416855-7-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20241121185315.3416855-1-mizhang@google.com> <20241121185315.3416855-7-mizhang@google.com>
+Message-ID: <Z09XA-2ao5CbXhV5@google.com>
+Subject: Re: [RFC PATCH 06/22] KVM: x86: INIT may transition from HALTED to RUNNABLE
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Huang Rui <ray.huang@amd.com>, 
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>, Mario Limonciello <mario.limonciello@amd.com>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Definitions of ioread64 and iowrite64 macros in asm/io.h called by vfio
-pci implementations are enclosed inside check for CONFIG_GENERIC_IOMAP.
-They don't get defined if CONFIG_GENERIC_IOMAP is defined. Include
-linux/io-64-nonatomic-lo-hi.h to define iowrite64 and ioread64 macros
-when they are not defined. io-64-nonatomic-lo-hi.h maps the macros to
-generic implementation in lib/iomap.c. The generic implementation does
-64 bit rw if readq/writeq is defined for the architecture, otherwise it
-would do 32 bit back to back rw.
+The shortlog is an observation, not a proper summary of the change.
 
-Note that there are two versions of the generic implementation that
-differs in the order the 32 bit words are written if 64 bit support is
-not present. This is not the little/big endian ordering, which is
-handled separately. This patch uses the lo followed by hi word ordering
-which is consistent with current back to back implementation in the
-vfio/pci code.
+  KVM: x86: Handle side effects of receiving INIT while vCPU is HALTED
 
-Signed-off-by: Ramesh Thomas <ramesh.thomas@intel.com>
----
- drivers/vfio/pci/vfio_pci_rdwr.c | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, Nov 21, 2024, Mingwei Zhang wrote:
+> From: Jim Mattson <jmattson@google.com>
+> 
+> When a halted vCPU is awakened by an INIT signal, it might have been
+> the target of a previous KVM_HC_KICK_CPU hypercall, in which case
+> pv_unhalted would be set. This flag should be cleared before the next
+> HLT instruction, as kvm_vcpu_has_events() would otherwise return true
+> and prevent the vCPU from entering the halt state.
+> 
+> Use kvm_vcpu_make_runnable() to ensure consistent handling of the
+> HALTED to RUNNABLE state transition.
+> 
+> Fixes: 6aef266c6e17 ("kvm hypervisor : Add a hypercall to KVM hypervisor to support pv-ticketlocks")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
 
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 66b72c289284..a0595c745732 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -16,6 +16,7 @@
- #include <linux/io.h>
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- #include "vfio_pci_priv.h"
- 
--- 
-2.34.1
+Mingwei's SoB is missing.
 
+> ---
+>  arch/x86/kvm/lapic.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 95c6beb8ce279..97aa634505306 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -3372,9 +3372,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+>  
+>  	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
+>  		kvm_vcpu_reset(vcpu, true);
+> -		if (kvm_vcpu_is_bsp(apic->vcpu))
+> -			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> -		else
+> +		kvm_vcpu_make_runnable(vcpu);
+
+This is arguably wrong.  APs are never runnable after receiving.  Nothing should
+ever be able to observe the "bad" state, but that doesn't make it any less
+confusing.
+
+This series also fails to address the majority cases where KVM transitions to RUNNABLE:
+
+  __set_sregs_common()
+  __sev_snp_update_protected_guest_state()
+  kvm_arch_vcpu_ioctl_set_mpstate()
+  kvm_xen_schedop_poll()
+  kvm_arch_async_page_present()
+  kvm_arch_vcpu_ioctl_get_mpstate()
+  kvm_apic_accept_events() (SIPI path)
+
+Yeah, some of those don't _need_ to be converted, and the existing behavior of
+pv_unhalted is all kinds of sketchy, but fixing a few select paths just so that
+APERF/MPERF virtualization does what y'all want it to do does not leave KVM in a
+better place.
+
+I also think we should add a generic setter, e.g. kvm_set_mp_state(), and take
+this opportunity to sanitize pv_unhalted.  Specifically, I think pv_unhalted
+should be clear on _any_ state transition, and unconditionally cleared when KVM
+enters the guest.  The PV kick should only wake a vCPU that is currently halted.
+Unfortunately, the cross-vCPU nature means KVM can't easily handle that when
+delivering APIC_DM_REMRD.
+
+Please also send these fixes as a separate series.  My crystal ball says APERF/MPERF
+virtualization isn't going to land in the near future, and I would like to get
+the mp_state handling cleaned up soonish.
+
+> +		if (!kvm_vcpu_is_bsp(apic->vcpu))
+>  			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+>  	}
+>  	if (test_and_clear_bit(KVM_APIC_SIPI, &apic->pending_events)) {
+> -- 
+> 2.47.0.371.ga323438b13-goog
+> 
 
