@@ -1,146 +1,119 @@
-Return-Path: <kvm+bounces-32966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FED09E2FDD
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:31:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68F99E3000
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E9B2833DA
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 23:31:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71EBFB234C1
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 23:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF3520ADC1;
-	Tue,  3 Dec 2024 23:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3035B20A5F7;
+	Tue,  3 Dec 2024 23:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKCdW4ck"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D6GHsOy8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD521E3796
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 23:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E51205AD5
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 23:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733268652; cv=none; b=A9qgF9CEsR7fq1OrijOBoPmPocX4mUcZL9I+5QsRSLy46xQ6p9D2JU425ajQBZ8oS2VYlGWmL08graMQgHn/Z9qLxYOku5UUA33K2VUpG8nDFoOiK/QzXsb4QBBoCp3hHkhHzQ8PJKzGM77z9cPQ0gLj3SYKkVC4rwdUPg6Aoyo=
+	t=1733269387; cv=none; b=rIlOifmIjqjLcGhNIC9IX48TBBuwW5TyobgZN7HG3eL89QDySRQurvDIvgdOm7/yiGqX73kPKd8pUFdfz7SIfiB+/Fmg8CengDGwSBNw5P1GhirY8jhYtzRYJrNqCqLVJNp4zjT6D+r9Ek5pcqYE6DfURC045NWekSJy324dyfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733268652; c=relaxed/simple;
-	bh=PDknFXdpGhwUK2oPlbIEPPI4qbuJekgaWv5QKIrdr5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bM+Te8bBgxPZVkIgC21WK1RJ1H+osRRBt3DJcrNGUWPpq5/+iHlXVkxGzwVvL+ljurVWkfWWhy9b539bKqVh1envPNX40fahfCDSymT2qob39tZF/Ezz4i7jswFtMi9AEvPkKyGDNoGB1jpwucA9VhtOyf2It48JEjEqHIa/BpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MKCdW4ck; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733268650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BAco2OnlW8aDB56vFSNzE6OdCv1iUGJFAjN9JJ7q2Z4=;
-	b=MKCdW4ckUKkTtwdYnyEFID9rpa6t47cbTtxywvBgLuF1hUXId10lRYdwRSzItXPTFzZLFa
-	ppFZgf94pKPnUNxXaR42DN+dK6cL7SqT6s35vUVwu6ucLIjQ9cAK4ejJrtkjKw7GwGjSdv
-	ykrsKuDrZ49AnRYSSYOnYKt2tn53tkc=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-Gpa--dDgMta6WpL0uvV94A-1; Tue, 03 Dec 2024 18:30:49 -0500
-X-MC-Unique: Gpa--dDgMta6WpL0uvV94A-1
-X-Mimecast-MFC-AGG-ID: Gpa--dDgMta6WpL0uvV94A
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-843ea388183so31822539f.2
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 15:30:48 -0800 (PST)
+	s=arc-20240116; t=1733269387; c=relaxed/simple;
+	bh=/CZ2yNFlNF/WOHHJXMK+Nyg+piMw6SzQPGnPsKv0u+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S+xo1ja9ipPD83XB1SJZ3s3h5uwVoL9C9V5Wrn6KlRMB3lSl9Wt5vb4OCqrOYIjuzL8pkenWwNRiFOH0SeMfT9va0yG81hMcHMfB5LGnAfB6k9vxjeh7RXa5KYwTsEVvE/fpoXHGqwMMj6ijH4N/rWDeDHa2FMu1GG5TWsVXCHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D6GHsOy8; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-85ba22d390fso744091241.0
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 15:43:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733269385; x=1733874185; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=efxAKMGIsYtsJH1TfFadrRu53b/jP4XGduoqdQKfUDs=;
+        b=D6GHsOy8YGm1W+pxxz9XTuNI24U+7ECkrmNetaIqMTpybghBkKEp9eLPz6u7fqBR5H
+         Cc+YL05qQjSDB4MAGxv6f+Ozz6rFg71zhsTbmSFO6tRsrfVJEYHEovmc0cKncu62xByO
+         eJpXVMjtLYw0/MxeFSqFOkgft5DyY3Bd+jCFieNcRnScMoI93VAYORD3abwqUYaUBsEZ
+         kMQ8DbLKNmHsvrP+H1/NQ5PfOYUH/3SJEYn35g+JGBYhq1joOfUc+KO7T1UfieTb4ABz
+         9EeslIU+YiGq5nZq3n9JKu3bTXqdwSnU5IPdk8WpzeYxM8UyLtRJ/W6pZr4UXX21ygXM
+         IKCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733268648; x=1733873448;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1733269385; x=1733874185;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BAco2OnlW8aDB56vFSNzE6OdCv1iUGJFAjN9JJ7q2Z4=;
-        b=Drl05EekAIrPmXbA+2lA/v7qfzaeQpciQFi2JfM76mqJCSzNczAVqJXzoQyiYPcc2b
-         oXEUNb+Gdnag3xpnmQHg5l/JVKIWumbchzJ14ugSV6IRfBFvI7e/Ik7o6GUfGJpMOCJ2
-         BHd6h76SY844K78kglpp4+mh47XH0KD7lwUQ/oVxyn4doHGtJQmTJx5F6hZVkf3L7gTP
-         QVbkjABfd0wvRtoA/u03U28ufhxaqrqA6Hp8tzYsYEVLCe+yh1Dh3ux26Y/JH6M+4yuR
-         R9bGzoBkJJuVOa0bBYyWnRrbpLaIDwLnAVGcyjpIjC00Ef+zcS9eP1rsyXgLAABLpiv0
-         I4ew==
-X-Forwarded-Encrypted: i=1; AJvYcCXqdOqIIaPYJRLGoWiTEHrjDnsm/xxgaAys2bidnSbLJw/b3Cybp1F801xsUxYg4gHiZ3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM2qmCJN8hCCg3fIActanMlCLi4qC/DUnb3DqvjT6tJ2ZUsTCI
-	sSazxSOuNEHcLrZ8dZ9oYEwc88yoTplkWe7kJMIV5MM8QeiC8mAxyJcWqm8wp2vXr+E4ZRZnUPC
-	QoX3bOmYIC2qZ+0a3EMC6FMYf7tkZcVWDfi9e78sYmJ+ZuemAHvCcq+d/EA==
-X-Gm-Gg: ASbGncuz+jSCTbHer/j4AvA5H5TvMIi37XRlzk9zXXAyDQZWW904TG2uFOVvuvomEk6
-	9mVC198/u8Dkk4ziQqaAsrFAcJuRcilNL+Eao2l/3IPbmLdTp7w8qeXMjMDfBTFd5UkOQrJukdU
-	cSRFYvasSoB7mTUOHOWaaeHbNb0XpMmM3EtGOOjVJdPVfycqjAoRmIWZzMtegtMVYFtGOYz1c9M
-	rPh26PXozDxgc3q0yrtsMhOGjEnsOu/Do5UIW0GaJxUDHRU0AsYOg==
-X-Received: by 2002:a05:6e02:144c:b0:3a7:bfc6:99 with SMTP id e9e14a558f8ab-3a7f9aafd7cmr13695705ab.5.1733268648079;
-        Tue, 03 Dec 2024 15:30:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE+wpy2rKtQZFbUAdq3aq94BSEljgs8jDST4Q9+2gSut9sQitp+ZDXPOMOy+3t/TK/Xwp0r5g==
-X-Received: by 2002:a05:6e02:144c:b0:3a7:bfc6:99 with SMTP id e9e14a558f8ab-3a7f9aafd7cmr13695605ab.5.1733268647775;
-        Tue, 03 Dec 2024 15:30:47 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a7ccc5ff8bsm28460895ab.53.2024.12.03.15.30.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 15:30:47 -0800 (PST)
-Date: Tue, 3 Dec 2024 16:30:45 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Mitchell Augustin <mitchell.augustin@canonical.com>
-Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, Bjorn Helgaas
- <bhelgaas@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: drivers/pci: (and/or KVM): Slow PCI initialization during VM
- boot with passthrough of large BAR Nvidia GPUs on DGX H100
-Message-ID: <20241203163045.3e068562.alex.williamson@redhat.com>
-In-Reply-To: <CAHTA-uZD5_TAZQkxdJRt48T=aPNAKg+x1tgpadv8aDbX5f14vA@mail.gmail.com>
-References: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
-	<20241126103427.42d21193.alex.williamson@redhat.com>
-	<CAHTA-ubXiDePmfgTdPbg144tHmRZR8=2cNshcL5tMkoMXdyn_Q@mail.gmail.com>
-	<20241126154145.638dba46.alex.williamson@redhat.com>
-	<CAHTA-uZp-bk5HeE7uhsR1frtj9dU+HrXxFZTAVeAwFhPen87wA@mail.gmail.com>
-	<20241126170214.5717003f.alex.williamson@redhat.com>
-	<CAHTA-uY3pyDLH9-hy1RjOqrRR+OU=Ko6hJ4xWmMTyoLwHhgTOQ@mail.gmail.com>
-	<20241127102243.57cddb78.alex.williamson@redhat.com>
-	<CAHTA-uaGZkQ6rEMcRq6JiZn8v9nZPn80NyucuSTEXuPfy+0ccw@mail.gmail.com>
-	<20241203122023.21171712.alex.williamson@redhat.com>
-	<CAHTA-uZWGmoLr0R4L608xzvBAxnr7zQPMDbX0U4MTfN3BAsfTQ@mail.gmail.com>
-	<20241203150620.15431c5c.alex.williamson@redhat.com>
-	<CAHTA-uZD5_TAZQkxdJRt48T=aPNAKg+x1tgpadv8aDbX5f14vA@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        bh=efxAKMGIsYtsJH1TfFadrRu53b/jP4XGduoqdQKfUDs=;
+        b=i/dZvyoByaOEXy9Ovmt6+NTXxE0W3LAi7Pds0Fqrdz76kaN3kjTNIgsa84LD67sKIe
+         ULIvkJGFdV9ELNGO+Y8r9zRQObztIurOzKFKgqCHnhl8fl3oeKNJ+kojoNwEQsRtaevK
+         p6NKNIzc2L5ZaHNcbiPVylYj1/X6iLZZ7Liq6G+u5aahYyL55BHYPxqAf0HiFoFXm3XI
+         t1/xjgRvt6mw3DXHDX7hrpoj0xcgpsmms79eEF6Eok0CmmEEV94+FtkPUqtZT5OV0mz1
+         FMaVZVh+DFSo6xPoJ3tJXqmxof/bT2QqMn9+H72gc0mbTSKm1PBtqrGkCjg5xpUiEtdO
+         /Qkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWWr3rjJqmnQbBKQB1N8FS3sV7gLY919PpMyT4DNKWSesCl3EoQHp0COP1MPDezmmOACdE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyShGs6jiFnwglXuq0jcgSl8WlIOeSJ1Tvit7i1UCHBLdLyF0KF
+	LE6QW/Q+NcIChWxHC0f8q7sqMZzA2rEs3B3VI+wdRe6+sHh28danySW3pjbLUrv8csJnShob+W9
+	VmYUruTc8WFseyLautHjTw5tn8n2llL8LJcEA
+X-Gm-Gg: ASbGncvKAjFjkznmdh+fyeIKQzEjGxxFjpn3nlBgJxOL1rQbrvrnk5ogZfEFIxy553D
+	n8TYIDm2zdGAlpm/EHOiJpFVloBFXjNVbs4NGkhie7j43p997VAzULwaJRHBz
+X-Google-Smtp-Source: AGHT+IFnoxNObCnxOJ19RTHQOfy3IS0mP97qq1D+ZXM9Cr4w6i9KeiYqycIxeXsC6V041VYgYczgtjNRhEyAzhN1RZQ=
+X-Received: by 2002:a05:6102:548e:b0:4af:ab78:f383 with SMTP id
+ ada2fe7eead31-4afab78f4b5mr933855137.24.1733269384628; Tue, 03 Dec 2024
+ 15:43:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241203005921.1119116-1-kevinloughlin@google.com>
+ <20241203005921.1119116-2-kevinloughlin@google.com> <a9560e97-478d-4e03-b936-cf6f663279a4@citrix.com>
+ <CAGdbjmLRA5g+Rgiq-fRbWaNqXK51+naNBi0b3goKxsN-79wpaw@mail.gmail.com>
+ <bc4a4095-d8bd-4d97-a623-be35ef81aad0@zytor.com> <24b80006-dcea-4a76-b5c8-e147d9191ed2@suse.com>
+ <25fa8746-3b36-4d43-86cd-37aadaacdf2e@zytor.com>
+In-Reply-To: <25fa8746-3b36-4d43-86cd-37aadaacdf2e@zytor.com>
+From: Kevin Loughlin <kevinloughlin@google.com>
+Date: Tue, 3 Dec 2024 15:42:53 -0800
+Message-ID: <CAGdbjmKwMrioAq1b1v_UhhOxU6R2xPztZ9Q3ZizC9iMA84s+ag@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] x86, lib, xenpv: Add WBNOINVD helper functions
+To: Xin Li <xin@zytor.com>
+Cc: Juergen Gross <jgross@suse.com>, Andrew Cooper <andrew.cooper3@citrix.com>, 
+	linux-kernel@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	kvm@vger.kernel.org, thomas.lendacky@amd.com, pgonda@google.com, 
+	sidtelang@google.com, mizhang@google.com, virtualization@lists.linux.dev, 
+	xen-devel@lists.xenproject.org, bcm-kernel-feedback-list@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 3 Dec 2024 17:09:07 -0600
-Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
+On Tue, Dec 3, 2024 at 12:11=E2=80=AFAM Xin Li <xin@zytor.com> wrote:
+>
+> On 12/2/2024 10:47 PM, Juergen Gross wrote:
+> > P.S.: As the paravirt maintainer I would have preferred to be Cc-ed in =
+the
+> >        initial patch mail.
+>
+> Looks that Kevin didn't run './scripts/get_maintainer.pl'?
 
-> Thanks for the suggestions!
-> 
-> > The calling convention of __pci_read_base() is already changing if we're having the caller disable decoding  
-> 
-> The way I implemented that in my initial patch draft[0] still allows
-> for __pci_read_base() to be called independently, as it was
-> originally, since (as far as I understand) the encode disable/enable
-> is just a mask - so I didn't need to remove the disable/enable inside
-> __pci_read_base(), and instead just added an extra one in
-> pci_read_bases(), turning the __pci_read_base() disable/enable into a
-> no-op when called from pci_read_bases(). In any case...
-> 
-> > I think maybe another alternative that doesn't hold off the console would be to split the BAR sizing and resource processing into separate steps.  
-> 
-> This seems like a potentially better option, so I'll dig into that approach.
-> 
-> 
-> Providing some additional info you requested last week, just for more context:
-> 
-> > Do you have similar logs from that [hotplug] operation  
-> 
-> Attached [1] is the guest boot output (boot was quick, since no GPUs
-> were attached at boot time)
+Woops, my bad. I somehow ended up with the full maintainer list for
+patch 2/2 from the script but not this one (1/2). Apologies and thanks
+for the heads up.
 
-I think what's happening here is that decode is already disabled on the
-hot-added device (vs enabled by the VM firmware on cold-plug), so in
-practice it's similar to your nested disable solution.  Thanks,
+I saw Juergen's patch [0] ("x86/paravirt: remove the wbinvd hook") to
+remove the WBINVD hook, so I'll do the same for WBNOINVD in the next
+version (meaning I shouldn't need to update xenpv code anymore).
 
-Alex
+[0] https://lore.kernel.org/lkml/20241203071550.26487-1-jgross@suse.com/
 
+Thanks!
+
+Kevin
 
