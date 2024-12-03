@@ -1,180 +1,127 @@
-Return-Path: <kvm+bounces-32864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82AA69E0FC9
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 01:35:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 700879E108D
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 02:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C739FB235BB
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 00:35:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEBC0B21997
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 01:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC84054F81;
-	Tue,  3 Dec 2024 00:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDC22D613;
+	Tue,  3 Dec 2024 01:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyrEkp7z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a1F80d6I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D162500A5
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 00:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE658288DA
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 01:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733186095; cv=none; b=Jy12TksS4z/hFRItqhwkymSMHN73GwjFITkL5xuQHFA9EXnXSwC7OZp4k2VSAOGwLu+nDmvrUg+a/anJs7MDncDpKCyL6xFpTZpHU9VMLVN/xc1oTFAlyeysw02Kp6dbCHgCD+XLJECXOBJZJmy139Fz0yPs+izpCFiHBk1I504=
+	t=1733187609; cv=none; b=hxhM3+WbkVub4ylTHWLevlbGFPVmmYO1KkQFcoLgJ3Cu+3U7Jnss264HvUWQL99jGCzJ/YTZq/KpEsGIXiu9Pf2NUABPVafX1Gnqc2KsHW92LcqwBTLmjRdQLfgrRtZjwr/XxnrMVwsfT6fkfh7bhJBUzZF78JmKW2OVlwmn9rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733186095; c=relaxed/simple;
-	bh=tzCgBEFnS5ANZTBsuBljMs2o6QURCyHjOkzX4GsAvtw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UmH3bsXtq7fvL/xHb/+IqxXdyspSZqiimwr5/hx4gDF61MQOESeIWW05UICz+Lb875K4D5lmAAV7fz8cXqbihVoAea+eh2bSSRSLHY3mj5uocJdRNu1hNuY5EqW9VMxFOBnzIts9HWVjFkTwXsMv/D92yYlpnTrYIfseSPu7KYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyrEkp7z; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1733187609; c=relaxed/simple;
+	bh=tt1n7+zJzjSkuUlJGp2Vz5ZrLaY83PHy98RvVR/1bSU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=D3vaXS5yq3moGkTywB0wJfuzVYhkHKoCqdUuMlmNPHx7Ofr2tHki9yGaSowE/QiKMTvmADRB2Z5pEHREwELWHGM77tbERTC2IHgM7lRkIrqc46cfAPKA2DtuiS3lIPVCLlq82iezUYwbAPuDmpbX9M4zWNEpTs5G2Z7ul08czgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a1F80d6I; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee4f3785f6so3694010a91.2
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 16:34:53 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-843faa97bf9so466279039f.3
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 17:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733186093; x=1733790893; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rYQHLQkIXjnazxVDCOEIm3YxmS353KiSc2+5UE6FFuY=;
-        b=nyrEkp7zN/N9VmjLiCN81P06WoXeNo2s9bCRL0U+o6TIGURhTourr8mLae8TuUc55P
-         xlSm/YtzRS1YvO6JAisNRUkATauXpVAlplx0Y49bhkL0YXWYiCnyOcbdoYN7QXBcfkey
-         VmB30huZUL8wyodCeJqH1zKeqQBaMkKHvA7PtI5ItX8rIJxs8QkQ8ZYJLTRoJEiPQqMZ
-         cGqhUfBy/4WKLdUhkOSgeuQ41OKWjEpBXAK+bOr5Z5m8xY7yMg4Hf8N7pdk+X26jp49R
-         9vbaXPX/JO8qdC5hLXMuoZpQBtwNw+OUP9o/zPc7cSZCjEtJuKaoE3nxMDAxmz2AScPm
-         XUuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733186093; x=1733790893;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20230601; t=1733187607; x=1733792407; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=rYQHLQkIXjnazxVDCOEIm3YxmS353KiSc2+5UE6FFuY=;
-        b=g5rK35yZVgdNpgkMkR6OnvdO0ot/0k8GC5hBNbMRz6JlvKFEFM5buH0VeclHYvOZ9n
-         eDDr8E/ooTbIDct4Yrc+yLlkOK20Rw8vl7OzUHUqU9LULg+v25Rwcl602oTj8El4IOh3
-         x8xZnFpZg334yg7ygtEbBGw1CLOJVqtrzAzIxOxNpa5RC4u3990SoAEKcizT4K2gfuFl
-         bxlX9E9I8OgVR8JiFhH2n+5tcPzQJc1zdzizkHrbz1N78Hi7nXp7jIplXYBcoiiWbPJN
-         Nwn6pOXqOgH0LHmjPQvMGOr6brsaQIgwksgKn8H7c7X4JeLjM+w/GnhNdsYVAmjeR7z4
-         X8Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXITH9s0TfeNPKqx3Pi8W0hllW2BneW2qyKj+wFX1Di7Tzlqy1CwxLjs6tcBR92IyhYRMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf+h5y/nv46hSxmSqgH/mvERvAZJJ0EPDlxZcweOvG7XbUAhNE
-	ltWCbLG3Iq4AKboGfXZrS5GX9gpnYzmTbCDdrFXFldMKsJHY9N2Vo0FnEvJRWbqrqzN4gNKm8/4
-	alA==
-X-Google-Smtp-Source: AGHT+IFNouhJApEVgkQp7EUJJUYNmOctJn9w69C+avz7PwMsCikrYJYVRnrwkIpIwxoR7p8CjdmmrhBzopI=
-X-Received: from pjbph8.prod.google.com ([2002:a17:90b:3bc8:b0:2d3:d4ca:5fb0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a8c:b0:2ee:db8a:29d0
- with SMTP id 98e67ed59e1d1-2ef0125b2fdmr792869a91.26.1733186092989; Mon, 02
- Dec 2024 16:34:52 -0800 (PST)
-Date: Mon, 2 Dec 2024 16:34:51 -0800
-In-Reply-To: <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
+        bh=gPDpv/chkg5p0fi43rAQfMRL2kKLevnRZ1FyVaa7akc=;
+        b=a1F80d6IosIzBRDYlQ6UzkJVB/Em3nazPeHGjmLlECodPis5+Muy1lpjUcinbg3jZr
+         YNcRt8BrLaIlBXsE8Im0SpB+gwi/ReiG6jDQEDrFNI0XP32AZlFEspmaFYz0iV8T2mC3
+         6JdBRBI0MvoaaH1qUu97PeFeKev7cUGBJ0tzIvBm82vmpEcKRh3YIyhevEs81nPfdCRA
+         c9yjFsRgclzdsM+/QXd0iJbqPGmQ+Fmk+pKr0K9rtGeEgymGyfqYLxXJyM1Cd1UwnxbW
+         k7532RuXmuxis3sLcSIKtG2sbK3bt9F8m8TjK3fvDGzidZAbaOWHMzvDTixUqafqME4E
+         DRtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733187607; x=1733792407;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gPDpv/chkg5p0fi43rAQfMRL2kKLevnRZ1FyVaa7akc=;
+        b=mMHtq+6NMzD7/YlrTNPfR6TKvGqi0KJM0vXSJe6UGqlNIEnI1nOtYHntomF0LvQOSd
+         CKswfwN3tsz9w4VEmqywHwKbV4Gc3DNLOk3koQNKZ/kx30N4PaE980MSaWWFkaphA6ll
+         UAFZwbEgTF67AhG5IX9GAKWNZSnUYkEM6RsDhcr+prYH9kb00CFwcD9rm7fYOwMaU609
+         84L9lWVNUj1pxb+YQCP6KxERwLnK3vU48kJ2muXnZyRIyp1wg6469cVCudbcHAIMEdyR
+         8ZsTivsdHwuBLxPhzisoXLzj0GyBtvl1dHcrE7uSPsow63Q40zOwfqDEYNfU6dcNPh07
+         vr0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWL3I/mJsa9cAAHNR+eUtmBMLrI/NBhi25z+Q+yiK8RZIlE9hQbA17RgDaRNMAayeydv3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEawhmrlQr1wmk6zo9uwimPsca0N9dNqzeNzJyXKSTsQaF7y1/
+	+BeEHO5Z7j1izxfgD39bRTTJIQJkNr62OS+mY4mKpNAJJWwMgxzQTa4sfPDwtX6OvYlagcRDrIR
+	WLV6puBu7NmwmaBNN/iNrllVBEd6M5A==
+X-Google-Smtp-Source: AGHT+IHqJwhD7dDrPHnnwi0nKSyWpAXx88t8MplXy6qAA9f67EUD1JW80naumNLzsou5U5ZEc/gbCz70e8AwEIt7ij7T
+X-Received: from ioay19.prod.google.com ([2002:a6b:c413:0:b0:841:802b:8e24])
+ (user=kevinloughlin job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6602:1546:b0:82a:2a67:9429 with SMTP id ca18e2360f4ac-8445b554fbbmr110164539f.5.1733187606796;
+ Mon, 02 Dec 2024 17:00:06 -0800 (PST)
+Date: Tue,  3 Dec 2024 00:59:19 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-8-adrian.hunter@intel.com> <Zz/6NBmZIcRUFvLQ@intel.com>
- <Z0cmEd5ehnYT8uc-@google.com> <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
- <Z04Ffd7Lqxr4Wwua@google.com> <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
-Message-ID: <Z05SK2OxASuznmPq@google.com>
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "dmatlack@google.com" <dmatlack@google.com>, 
-	Weijiang Yang <weijiang.yang@intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"nik.borisov@suse.com" <nik.borisov@suse.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chao Gao <chao.gao@intel.com>, 
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241203005921.1119116-1-kevinloughlin@google.com>
+Subject: [RFC PATCH 0/2] KVM: SEV: Prefer WBNOINVD over WBINVD for cache
+ maintenance efficiency
+From: Kevin Loughlin <kevinloughlin@google.com>
+To: linux-kernel@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
+	pgonda@google.com, sidtelang@google.com, mizhang@google.com, 
+	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org, 
+	bcm-kernel-feedback-list@broadcom.com, 
+	Kevin Loughlin <kevinloughlin@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 02, 2024, Rick P Edgecombe wrote:
-> On Mon, 2024-12-02 at 11:07 -0800, Sean Christopherson wrote:
-> > > guest_can_use() is per-vcpu whereas we are currently using the
-> > > CPUID from TD_PARAMS (as per spec) before there are any VCPU's.
-> > > It is a bit of a disconnect so let's keep tsx_supported for now.
-> >=20
-> > No, as was agreed upon[*], KVM needs to ensure consistency between what=
- KVM
-> > sees
+AMD CPUs currently execute WBINVD in the host when unregistering SEV
+guest memory or when deactivating SEV guests. Such cache maintenance is
+performed to prevent data corruption, wherein the encrypted (C=1)
+version of a dirty cache line might otherwise only be written back
+after the memory is written in a different context (ex: C=0), yielding
+corruption. However, WBINVD is performance-costly, especially because
+it invalidates processor caches.
 
-Rick, fix your MUA to not wrap already :-)
+Strictly-speaking, unless the SEV ASID is being recycled (meaning all
+existing cache lines with the recycled ASID must be flushed), the
+cache invalidation triggered by WBINVD is unnecessary; only the
+writeback is needed to prevent data corruption in remaining scenarios.
 
-> > as guest CPUID and what is actually enabled/exposed to the guest.=C2=A0=
- If there
-> > are no vCPUs, then there's zero reason to snapshot the value in kvm_tdx=
-.=C2=A0
-> > And if there are vCPUs, then their CPUID info needs to be consistent wi=
-th
-> > respect to TDPARAMS.
->=20
-> Small point - the last conversation[0] we had on this was to let *userspa=
-ce*
-> ensure consistency between KVM's CPUID (i.e. KVM_SET_CPUID2) and the TDX
-> Module's view.
+To improve performance in these scenarios, use WBNOINVD when available
+instead of WBINVD. WBNOINVD still writes back all dirty lines
+(preventing host data corruption by SEV guests) but does *not*
+invalidate processor caches.
 
-I'm all for that, right up until KVM needs to protect itself again userspac=
-e and
-flawed TDX architecture.  A relevant comment I made in that thread:
+First, provide helper functions to use WBINVD similar to how WBINVD is
+invoked. Second, check for WBNOINVD support and execute WBNOINVD if
+possible in lieu of WBINVD to avoid cache invalidations
 
- : If the upgrade breaks a setup because it confuses _KVM_, then I'll care
+Kevin Loughlin (2):
+  x86, lib, xenpv: Add WBNOINVD helper functions
+  KVM: SEV: Prefer WBNOINVD over WBINVD for cache maintenance efficiency
 
-As it applies here, letting vCPU CPUID and actual guest functionality diver=
-ge for
-features that KVM cares about _will_ cause problems.
+ arch/x86/include/asm/paravirt.h       |  7 ++++++
+ arch/x86/include/asm/paravirt_types.h |  1 +
+ arch/x86/include/asm/smp.h            |  7 ++++++
+ arch/x86/include/asm/special_insns.h  | 12 ++++++++-
+ arch/x86/kernel/paravirt.c            |  6 +++++
+ arch/x86/kvm/svm/sev.c                | 35 +++++++++++++++++----------
+ arch/x86/lib/cache-smp.c              | 12 +++++++++
+ arch/x86/xen/enlighten_pv.c           |  1 +
+ 8 files changed, 67 insertions(+), 14 deletions(-)
 
-This will be less ugly to handle once kvm_vcpu_arch.cpu_caps is a thing.  K=
-VM
-can simply force set/clear bits to match the actual guest functionality tha=
-t's
-hardcoded by the TDX Module or defined by TDPARAMS.
+-- 
+2.47.0.338.g60cca15819-goog
 
-> So the configuration goes:
-> 1. Userspace configures per-VM CPU features
-> 2. Userspace gets TDX Module's final per-vCPU version of CPUID configurat=
-ion via
-> KVM API
-> 3. Userspace calls KVM_SET_CPUID2 with the merge of TDX Module's version,=
- and
-> userspace's desired values for KVM "owned" CPUID leads (pv features, etc)
->=20
-> But KVM's knowledge of CPUID bits still remains per-vcpu for TDX in any c=
-ase.
->=20
-> >=20
-> > =C2=A0- Don't hardcode fixed/required CPUID values in KVM, use availabl=
-e metadata
-> > =C2=A0=C2=A0 from TDX Module to reject "bad" guest CPUID (or let the TD=
-X module reject?).
-> > =C2=A0=C2=A0 I.e. don't let a guest silently run with a CPUID that dive=
-rges from what
-> > =C2=A0=C2=A0 userspace provided.
->=20
-> The latest QEMU patches have this fixed bit data hardcoded in QEMU. Then =
-the
-> long term solution is to make the TDX module return this data. Xiaoyao wi=
-ll post
-> a proposal on how the TDX module should expose this soon.
-
-Punting the "merge" to userspace is fine, but KVM still needs to ensure it =
-doesn't
-have holes where userspace can attack the kernel by lying about what featur=
-es the
-guest has access to.  And that means forcing bits in kvm_vcpu_arch.cpu_caps=
-;
-anything else is just asking for problems.
-
-> > [*] https://lore.kernel.org/all/20240405165844.1018872-1-seanjc@google.=
-com
->=20
->=20
-> [0]https://lore.kernel.org/kvm/CABgObfaobJ=3DG18JO9Jx6-K2mhZ2saVyLY-tHOga=
-b1cJupOe-0Q@mail.gmail.com/
 
