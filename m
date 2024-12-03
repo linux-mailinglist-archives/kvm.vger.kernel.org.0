@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-32910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A8F29E16A2
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 10:05:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EF961643FB
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 09:05:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBFE1DF24E;
-	Tue,  3 Dec 2024 09:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RnRlB27J"
-X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2FFA9E18E2
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 11:10:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728D51DE3C9;
-	Tue,  3 Dec 2024 09:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BC36B357DE
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 09:02:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81A11DFD84;
+	Tue,  3 Dec 2024 09:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="m3o7GOfi"
+X-Original-To: kvm@vger.kernel.org
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2072.outbound.protection.outlook.com [40.107.92.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CF61DED7B;
+	Tue,  3 Dec 2024 09:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.72
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733216519; cv=fail; b=ppeAm20PwImINMyCuVRs/IKhLNFjFENi0yxNPp9exxgP5OwHuvg4fendtDQOsFfmjalxdUG0xTmNf6D58W3XOb506E4GajgyDBBtAItSrk2IlXWV0905wZQeNF0+x4KObnnyq6u2czsq+YX1auBeENWlx2HsJVCLgdqNyfy32k0=
+	t=1733216491; cv=fail; b=mEHmLgoD9NAtFvyq6Hc3cQUYTvAeE5AlOdzxUANvMlLCUItzMn0/REKR1HQnJvTnTLb8G//jpq+JgwPKL2OmL+au2y2hcR6l+2kuzRhEZmYTchPiYNMq+4K4h1sFgLooQUBmYXU+1WQY4j5k13QCAS56eoOcGiX89Ep07P3id+I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733216519; c=relaxed/simple;
-	bh=4a2XzODFuQVyOytOE8rsg5rO3D9l8qwZh8Vb+pmqUpY=;
+	s=arc-20240116; t=1733216491; c=relaxed/simple;
+	bh=IXLNWsV9sKb5nADPd61OXSqhkiGqNvdMP/TJnGan+GQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EoAlkXA92JETobTO7w9LZRsUmnKT3FIe/atJ1dX8lLXrzvPZFwK00UFCMZwB/9uQda5asFwBsy8w0Qu3a9jJ68J50WyelVe7i9x/P3JdaH2XtncW+eoy7es6VrRHgjg3Y3f4033+7Zzln7y38HiCy3DhlN9o2YNG67C/6I6AInE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RnRlB27J; arc=fail smtp.client-ip=40.107.243.59
+	 MIME-Version:Content-Type; b=CbL9qF65IycVlq4gnjPWBtZgiu6cBsfSCWqLXXURal6NlfG/AM07BTVtkl0Q7tvIKCIVA58J+mevsGgtj85+1Lv77uJHaTGMQkloqbMsJ7adgn8vf3CCscb6NGOxWbtfivurmT5GIjbE5gpz0UvWb9uDOCtKvesI7GFmTo7c75k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=m3o7GOfi; arc=fail smtp.client-ip=40.107.92.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xi3FRUz3UDRuuA5F5J4Rqgrq03kRUvmtjZBf+oPDvhI3/oCDxdXFXu7v/EtwAUWy+lI4qKvehkfr+IHkzGjvADc8TQIsVzE7QMKWPDce3zcrDtZ6yLQl/TuSfQW0+v8RwcH25D+x3Kq84FBWO/RqNKqZWuXW4mdh/dPyi8YcTwFtXnxgNXM18CtgbtnjbZsbc0/GsxOwQVpdTJxYj0YlICJsh6k+nTYPOTA0Qnk1/ejXI2a5vt/EpGkHMwW1PkK9QFXXQKfzpDjHx/vyO4+gxw9yDTP3ANu9YdTaWke/aWmHGQvjyU3xVyig8mmierK24aSkL8Fq3XEVxKg7gmxhZA==
+ b=UVhhRgUhFx1NIbdEPiJOVtPOrVCjfF+sKFCUtw6NZUJgWsh5bFORjA5bnzIdxzz8zofTfCpfspLbigPFNfjOyzjnSuWmxBmHNDbewa8ohFD9ow7I1yID4Lje9hCB8Yw2N5WHHBGuOndica1SRu1wIZ3J133nACb9PrzvqyWwEHiT3CmVa8Bl4LCm0CCr0hxCZGGbeGQnsHEOsRLCWLFZ708U/4br6RUjEoBRpHK7tqNNTgCHs/+jhQypsE0+IouM2ZjpeHEKQPXV/T/9ie+jbIptnOb8/eNKsmLUIKeNZ9l5upULKjXfV0dhdb4GB3oJRai8xlEcPd4xDzvooKa1qg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y08IGbt4QaGBoYCCEYQTD2cNqgyyVQ7RxEiJnvhiAcg=;
- b=T1y/8PlnyE1EdnF9cZ92uXnexVdiDzwdQTHp6MF1fUjLmxbK9J2a4Jncgat6DodeK0ZXjn2ID6pUa3WrC17cijsuaqMrEydyzRwGVbicoq9ACsw4qNp4j2qwAHusMQi3dgDVWH7xx9cmvi+fUzGcR5ItNEKAsGevCko62cWdjVHLAQ9VN2JpaporFgsUrnzig3q41G/dVmJtHw2VJ6YczFGMVgH7Or0DNU5pXrPtga0f3BJhEbapWInAbnJxi1WIMitpgconZNzUG/IcHANCm2p6sIqL/HhYHn5hzIYy2cLNNi5uV5IZ+JwQpD5chvLiqzEVIGpoLRu+fNQgCMiEjA==
+ bh=yw9z+VxqVynV0S6nQaMMizVq7s1ywCddudECnIr6VtY=;
+ b=zPfPs61IM//ARTKAdLZL7GMqjNsunNtxF6IR4fvsTah7wZ+frwv1wUcH0TrGvhK+34YQYJBHxxjDvIJB/jD0CSYo7AUQ0Zrh0gwT6kq1LUwIihRhK3q0HAxUnJzBATCpYQoORYPb5128gL7z0r8t6ZY0zVUFke6ArxvkbCDR/kFIWumG4n35ylhH12vdDIKS1ZWhMrOXsCWpBQcLuwe4xfuNRnsDiInZvXd4AQuYe0esH5sdqabYj7oFXKG6clqrFlCjxQ4UoaWvj9IB4YK+Xrd8c/ZlmkeC82jGBaSe0lb0S6fe1kXJI7qWc0QFJjowEw2UKbF/IrlX67omYpjFyQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y08IGbt4QaGBoYCCEYQTD2cNqgyyVQ7RxEiJnvhiAcg=;
- b=RnRlB27JE1riCbcT3R9fr+/CtFZL40Z0jjH8VWSzVzhTKlsrxe0FeiHs+46LltTrJZ6Sb8AJGZLk3bXblVV0dnXeRo8dHxVPlitPwvv4ERQy2VxTelNUgQG0TVpMqK3eAcE+G0RIz2Z3qPU1eQOiO7vUEba3h0laqkyqQbhQ2Kc=
-Received: from CH0PR04CA0033.namprd04.prod.outlook.com (2603:10b6:610:77::8)
- by PH7PR12MB7985.namprd12.prod.outlook.com (2603:10b6:510:27b::5) with
+ bh=yw9z+VxqVynV0S6nQaMMizVq7s1ywCddudECnIr6VtY=;
+ b=m3o7GOfiHu4SD9pns5qfEH6FWzUZidsFqOZNAF2qVJ4bPQt7we9E3RRQTGJQ50CDtDBJ/WPGNv8k/YYBXgpcLWvSXJsJqqjnkJrV40d3yDno16V4kQwUzYL5jm1Q6IFmn87Q3Ue0cHStxViGb0VfWSNwM4rGllAF6r6a+eIv7tE=
+Received: from CH0P221CA0029.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::7)
+ by CY5PR12MB6203.namprd12.prod.outlook.com (2603:10b6:930:24::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Tue, 3 Dec
- 2024 09:01:53 +0000
-Received: from CH1PEPF0000A345.namprd04.prod.outlook.com
- (2603:10b6:610:77:cafe::73) by CH0PR04CA0033.outlook.office365.com
- (2603:10b6:610:77::8) with Microsoft SMTP Server (version=TLS1_3,
+ 2024 09:01:20 +0000
+Received: from CH1PEPF0000A349.namprd04.prod.outlook.com
+ (2603:10b6:610:11d:cafe::40) by CH0P221CA0029.outlook.office365.com
+ (2603:10b6:610:11d::7) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.19 via Frontend Transport; Tue,
- 3 Dec 2024 09:01:53 +0000
+ 3 Dec 2024 09:01:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,22 +63,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000A345.mail.protection.outlook.com (10.167.244.8) with Microsoft
+ CH1PEPF0000A349.mail.protection.outlook.com (10.167.244.9) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 09:01:53 +0000
+ 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 09:01:19 +0000
 Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 3 Dec
- 2024 03:01:49 -0600
+ 2024 03:01:15 -0600
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
 	<x86@kernel.org>, <kvm@vger.kernel.org>
 CC: <mingo@redhat.com>, <tglx@linutronix.de>, <dave.hansen@linux.intel.com>,
 	<pgonda@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
 	<nikunj@amd.com>
-Subject: [PATCH v15 12/13] x86/kvmclock: Abort SecureTSC enabled guest when kvmclock is selected
-Date: Tue, 3 Dec 2024 14:30:44 +0530
-Message-ID: <20241203090045.942078-13-nikunj@amd.com>
+Subject: [PATCH v15 03/13] x86/sev: Add Secure TSC support for SNP guests
+Date: Tue, 3 Dec 2024 14:30:35 +0530
+Message-ID: <20241203090045.942078-4-nikunj@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241203090045.942078-1-nikunj@amd.com>
 References: <20241203090045.942078-1-nikunj@amd.com>
@@ -94,137 +94,349 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A345:EE_|PH7PR12MB7985:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49316b85-5b3b-4bdd-b391-08dd13792196
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A349:EE_|CY5PR12MB6203:EE_
+X-MS-Office365-Filtering-Correlation-Id: fdfc8240-0ca6-4183-99ac-08dd13790db1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oeHuFinbAzP5fd01M5nG6AxjIoiW7m5JjyA6MR0MeMJKiFhnpME/Lsg69By7?=
- =?us-ascii?Q?7gwmggUIBm954pi/lFp8paVo7bolv5gpT5c8SjbCrbQ83SkcSlvQKwPAWjt+?=
- =?us-ascii?Q?OeFHrye2r2PWpLzs87ddAqrg03MZZ/CsHAPC4B1RWtvHUgliUwq5ADEyiw52?=
- =?us-ascii?Q?up09TCPhSfOtP3M5Ekj7QZoJ9zMs18vHqgAuxJH71g6rUahBvyPmTrRqtU8Q?=
- =?us-ascii?Q?Gh9ZeWxtorrmrgaK59U4Ko2optar4YCV6lS8KIttLdYFbmRUJ8riUzaBC2Ti?=
- =?us-ascii?Q?ZToa7XDVoJAyuPCMkacw7ULVDrPsgKI6VBKunoOdI+IIx4qKO/aKBs6377CI?=
- =?us-ascii?Q?FjKVBymQyGu3/s5DhrVwIwDObqWfUYSHvvph+SKL1mVprsUIq+CyAO90FyaO?=
- =?us-ascii?Q?18tMcdMFy4jW9OkT4SouaZJez111P/2NtbUZA1So6u0s0uJCpZNeXN5+wJnj?=
- =?us-ascii?Q?Zohcv0QptRqAoc9oqgY0yxE7d0jT25Ldr4Ucf8s1ov/BMjSCE3lZsqWzs2t1?=
- =?us-ascii?Q?7Y/vEZloOVuWBMbRzOlAs1AQ/qZAF7lrJQr5OKtkRtxRzX9kD8YgE97YYD9G?=
- =?us-ascii?Q?S63bw3ad2k2/PxGbEDIT5hGIUJGllIXqfHuB/6OlRAX48589sKv2gOWVFhYE?=
- =?us-ascii?Q?fG430Jz+gvCbKlC6xN2VZxhg/02tKp2bDhJlu3iMICwnghpAZl36YODdg5w3?=
- =?us-ascii?Q?WC/2HiiK24ijK59aKqWA2FnLt49OAnwesjQFSIIavPAX6X6/73eQG4Jz/Ydj?=
- =?us-ascii?Q?AjqPFUGCFsoMfBE/mSpmTR9seVowM2Mb4iYagrAyBLtsqRYPooyEDegv3XxY?=
- =?us-ascii?Q?pfsfdCv5su73aESkT7ouIBvEFzlxjwRs+O+T8zkGKS8YcsEZr8mv4m29lA3K?=
- =?us-ascii?Q?QQUGgG/HEm1bzgdPuPEDAX4OT7yZjLKC0hf7fwIpn8W9BzqX6S05oUrSmfu1?=
- =?us-ascii?Q?RyH30qWDgDOEUR8qd7TyJndrkXQPxH9ZFSp4w46F/K1mY1vs4oDZMie2Pa7t?=
- =?us-ascii?Q?5+aLs3TeLhJ8uYn9F+EuTy157ZJ6Yuw0CSg7C/pm1HOFMVMT2oEYiEcWvA+F?=
- =?us-ascii?Q?PNIxoDCns2zERmd9oFNf/3zSwbyqn9SFPXH1AUwGkXU45ZKqSDfbb23qb+K6?=
- =?us-ascii?Q?dTCJDWJkLvgW+oA7foHpoTYh5NJFC7/LmRarPdzf2rQh8el0rRolps968Ukz?=
- =?us-ascii?Q?/JZBCK8mVxyf7A6If0P/oTz6hHaAMVdLvC8yM5IC+n83VsnMy/ZjgRCBi86i?=
- =?us-ascii?Q?5uI5f31qkxXrMoxrMs52909jx2LXonWIOMeSHnbr/xERVawkAkJelbg9c9bH?=
- =?us-ascii?Q?FwLdmzg+rJiJQ1Et99ReDjbgtbYG2ACC46UNNgzU+lMp4O/9EaPWqHeA0uu2?=
- =?us-ascii?Q?6wnLYcOUDeV2dv1sfVwIApIqr8sDGAKJjv8lsOi8zCIteZGQMuesJhwly60J?=
- =?us-ascii?Q?zoxsQ6rrvTk31diwtuCmQxCqJkm7y0No?=
+	=?us-ascii?Q?+uIrslOAvpgiKWBPyOPJj40WYLPz0Tpe5VaXBejVvYPDyJawdKktqJtt6V86?=
+ =?us-ascii?Q?VSh1w8IDXg7nvYSUIfD4zegtJZxcxxdo8msO4uROPe4NfVU9XsTOW9zP+MOW?=
+ =?us-ascii?Q?K6F4EAko66R/WzuU6TpCGKChcZlD2lavTH02F78e2L3YrCISf/UTqto53OlF?=
+ =?us-ascii?Q?4TV5HZEjRzuz4NY3qMI2g7q4iF5+c4TPQEfYHXqtwNywrwmulFdx8M4+a2QB?=
+ =?us-ascii?Q?5mjTgOMtRsFxXEmoybEDTVKzMnc1Cnb8m4EXoy3B2bNkHB6wc76izeIjevxf?=
+ =?us-ascii?Q?WWCmqnvPeJJuGXSJZyIEq2TBM+394+11gJDggPzrb93Ut5dM5bV1CViv35S7?=
+ =?us-ascii?Q?LMrxxw9BpRGj4WK9Ke2E/QlprgRnQVuYIs4rzoo0Icq5mHOFRFBALoGFpzX8?=
+ =?us-ascii?Q?FMsGEV0XLpHJpl994cbUOHZx7gy2/SjXNWhf059IWj4eXqauqORLkLNIoWtc?=
+ =?us-ascii?Q?+v/unIxMdM69SThb5yXV6uMT2kqiSQgahlTp2wd+vDs9W2gDuyvYgaNJs/8E?=
+ =?us-ascii?Q?ehhdfkhp/MZux5aPLLfv/nOPzV1pPT0j2eJvwQXjLA239+rFK2b7LZPnYG/X?=
+ =?us-ascii?Q?x5CJQmliREkWuvSr9p7kc7WHXyMX4woi13ciLJSGRx/EQiDskrt4h26OPRFO?=
+ =?us-ascii?Q?fyh+yNcNaP02iQ2Fiy0QU/GsIeyHOaD+vJoW3WF9LggwX+XKGMDj5di4XUPq?=
+ =?us-ascii?Q?rcA96FRIVzSB3MUlcnFxaLsYoMrXwOpFIxsqpT885IG6j+TYqZ4kxIa8XBPt?=
+ =?us-ascii?Q?t1jzigIm4KYGDn/H9KWewD0HVli6AgalAB5rpltstYuViE1jTrup4BWJoyRK?=
+ =?us-ascii?Q?V3EKo7QuYR+dSwcqqE8T5KKEREjzNBXs5UTJrUJgfzg8spF2Pn1BLZf68QRD?=
+ =?us-ascii?Q?jLTF1Xx60xnHxFck3xOxfebnTIzgWdVLpb+CthAEW4HyJT2b11IDlmHK+jwO?=
+ =?us-ascii?Q?IcszT67KMJU8YKPRHciib2kecfLm1fuRYZllvJQlsgKCrCBzyEuKQhIvF/ZG?=
+ =?us-ascii?Q?CgoXiCpC8KBcTCP1hKlvnmqcVw4kIBHJgguF536KU/sZILzRD6GfnCD88Dro?=
+ =?us-ascii?Q?AkUa+2pcTzMJndkCHU4Uui44Sfmp/V0BxqCQ/P3eVr7l5Wf6g30/CQtSuhsj?=
+ =?us-ascii?Q?dHaHwf84J5LKVwtrTeQCDCdYL+zVKqAKILuett5FFvlLH/kCU8K706eSdJNC?=
+ =?us-ascii?Q?/NaXefJDlfn5+le8DpzmxOsUNQ5eGUETE4DSR1Q1ppeatBEltqsCLlc1nxd0?=
+ =?us-ascii?Q?gp4nxXhw13mOxHTZxhKKcN3vdSSc/zWR22so/lDIvg48MTa7SLmiDT5JKNuV?=
+ =?us-ascii?Q?2DjqVpkxl4GukbTdkdH3yWxTKe59lu+jCe/hvaT2XFGfdNKeeKudaHmaxco6?=
+ =?us-ascii?Q?mD+Ap2IXmVaVKHPPql8jBUNfYM2W98HZlPrhnJ2b0A0xbZkJxPWIq8XoCJhV?=
+ =?us-ascii?Q?V5Z1PjdbMJwBIfgE9mxtMJunnB8sEQRQ?=
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 09:01:53.1192
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 09:01:19.7410
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49316b85-5b3b-4bdd-b391-08dd13792196
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdfc8240-0ca6-4183-99ac-08dd13790db1
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A345.namprd04.prod.outlook.com
+	CH1PEPF0000A349.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7985
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6203
 
-SecureTSC enabled guests should use TSC as the only clock source, terminate
-the guest with appropriate code when clock source switches to hypervisor
-controlled kvmclock.
+Add support for Secure TSC in SNP-enabled guests. Secure TSC allows guests
+to securely use RDTSC/RDTSCP instructions, ensuring that the parameters
+used cannot be altered by the hypervisor once the guest is launched.
+
+Secure TSC-enabled guests need to query TSC information from the AMD
+Security Processor. This communication channel is encrypted between the AMD
+Security Processor and the guest, with the hypervisor acting merely as a
+conduit to deliver the guest messages to the AMD Security Processor. Each
+message is protected with AEAD (AES-256 GCM).
 
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+Tested-by: Peter Gonda <pgonda@google.com>
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/sev-common.h | 1 +
- arch/x86/include/asm/sev.h        | 2 ++
- arch/x86/coco/sev/shared.c        | 3 +--
- arch/x86/kernel/kvmclock.c        | 9 +++++++++
- 4 files changed, 13 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/sev-common.h |   1 +
+ arch/x86/include/asm/sev.h        |  22 ++++++
+ arch/x86/include/asm/svm.h        |   6 +-
+ include/linux/cc_platform.h       |   8 +++
+ arch/x86/coco/core.c              |   3 +
+ arch/x86/coco/sev/core.c          | 116 ++++++++++++++++++++++++++++++
+ arch/x86/mm/mem_encrypt.c         |   2 +
+ 7 files changed, 156 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 6ef92432a5ce..ad0743800b0e 100644
+index 50f5666938c0..6ef92432a5ce 100644
 --- a/arch/x86/include/asm/sev-common.h
 +++ b/arch/x86/include/asm/sev-common.h
-@@ -207,6 +207,7 @@ struct snp_psc_desc {
+@@ -206,6 +206,7 @@ struct snp_psc_desc {
+ #define GHCB_TERM_NO_SVSM		7	/* SVSM is not advertised in the secrets page */
  #define GHCB_TERM_SVSM_VMPL0		8	/* SVSM is present but has set VMPL to 0 */
  #define GHCB_TERM_SVSM_CAA		9	/* SVSM is present but CAA is not page aligned */
- #define GHCB_TERM_SECURE_TSC		10	/* Secure TSC initialization failed */
-+#define GHCB_TERM_SECURE_TSC_KVMCLOCK	11	/* KVM clock selected instead of Secure TSC */
++#define GHCB_TERM_SECURE_TSC		10	/* Secure TSC initialization failed */
  
  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
  
 diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index c4dca06b3b01..12b167fd6475 100644
+index 53f3048f484e..9fd02efef08e 100644
 --- a/arch/x86/include/asm/sev.h
 +++ b/arch/x86/include/asm/sev.h
-@@ -494,6 +494,7 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
+@@ -146,6 +146,9 @@ enum msg_type {
+ 	SNP_MSG_VMRK_REQ,
+ 	SNP_MSG_VMRK_RSP,
  
- void __init snp_secure_tsc_prepare(void);
- void __init snp_secure_tsc_init(void);
-+void __noreturn sev_es_terminate(unsigned int set, unsigned int reason);
++	SNP_MSG_TSC_INFO_REQ = 17,
++	SNP_MSG_TSC_INFO_RSP,
++
+ 	SNP_MSG_TYPE_MAX
+ };
  
+@@ -174,6 +177,22 @@ struct snp_guest_msg {
+ 	u8 payload[PAGE_SIZE - sizeof(struct snp_guest_msg_hdr)];
+ } __packed;
+ 
++#define SNP_TSC_INFO_REQ_SZ	128
++#define SNP_TSC_INFO_RESP_SZ	128
++
++struct snp_tsc_info_req {
++	u8 rsvd[SNP_TSC_INFO_REQ_SZ];
++} __packed;
++
++struct snp_tsc_info_resp {
++	u32 status;
++	u32 rsvd1;
++	u64 tsc_scale;
++	u64 tsc_offset;
++	u32 tsc_factor;
++	u8 rsvd2[100];
++} __packed;
++
+ struct snp_guest_req {
+ 	void *req_buf;
+ 	size_t req_sz;
+@@ -473,6 +492,8 @@ void snp_msg_free(struct snp_msg_desc *mdesc);
+ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
+ 			   struct snp_guest_request_ioctl *rio);
+ 
++void __init snp_secure_tsc_prepare(void);
++
  #else	/* !CONFIG_AMD_MEM_ENCRYPT */
  
-@@ -538,6 +539,7 @@ static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_
+ #define snp_vmpl 0
+@@ -514,6 +535,7 @@ static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
+ static inline void snp_msg_free(struct snp_msg_desc *mdesc) { }
+ static inline int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req,
  					 struct snp_guest_request_ioctl *rio) { return -ENODEV; }
- static inline void __init snp_secure_tsc_prepare(void) { }
- static inline void __init snp_secure_tsc_init(void) { }
-+static inline void sev_es_terminate(unsigned int set, unsigned int reason) { }
++static inline void __init snp_secure_tsc_prepare(void) { }
  
  #endif	/* CONFIG_AMD_MEM_ENCRYPT */
  
-diff --git a/arch/x86/coco/sev/shared.c b/arch/x86/coco/sev/shared.c
-index 879ab48b705c..840149556241 100644
---- a/arch/x86/coco/sev/shared.c
-+++ b/arch/x86/coco/sev/shared.c
-@@ -117,8 +117,7 @@ static bool __init sev_es_check_cpu_features(void)
- 	return true;
- }
- 
--static void __head __noreturn
--sev_es_terminate(unsigned int set, unsigned int reason)
-+void __head __noreturn sev_es_terminate(unsigned int set, unsigned int reason)
- {
- 	u64 val = GHCB_MSR_TERM_REQ;
- 
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index 5b2c15214a6b..39dda04b5ba0 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -21,6 +21,7 @@
- #include <asm/hypervisor.h>
- #include <asm/x86_init.h>
- #include <asm/kvmclock.h>
-+#include <asm/sev.h>
- 
- static int kvmclock __initdata = 1;
- static int kvmclock_vsyscall __initdata = 1;
-@@ -150,6 +151,14 @@ bool kvm_check_and_clear_guest_paused(void)
- 
- static int kvm_cs_enable(struct clocksource *cs)
- {
-+	/*
-+	 * For a guest with SecureTSC enabled, the TSC should be the only clock
-+	 * source. Abort the guest when kvmclock is selected as the clock
-+	 * source.
-+	 */
-+	if (WARN_ON(cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC)))
-+		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_SECURE_TSC_KVMCLOCK);
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 2b59b9951c90..92e18798f197 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -417,7 +417,9 @@ struct sev_es_save_area {
+ 	u8 reserved_0x298[80];
+ 	u32 pkru;
+ 	u32 tsc_aux;
+-	u8 reserved_0x2f0[24];
++	u64 tsc_scale;
++	u64 tsc_offset;
++	u8 reserved_0x300[8];
+ 	u64 rcx;
+ 	u64 rdx;
+ 	u64 rbx;
+@@ -564,7 +566,7 @@ static inline void __unused_size_checks(void)
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x1c0);
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x248);
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x298);
+-	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x2f0);
++	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x300);
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x320);
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x380);
+ 	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x3f0);
+diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+index caa4b4430634..cb7103dc124f 100644
+--- a/include/linux/cc_platform.h
++++ b/include/linux/cc_platform.h
+@@ -88,6 +88,14 @@ enum cc_attr {
+ 	 * enabled to run SEV-SNP guests.
+ 	 */
+ 	CC_ATTR_HOST_SEV_SNP,
 +
- 	vclocks_set_used(VDSO_CLOCKMODE_PVCLOCK);
- 	return 0;
++	/**
++	 * @CC_ATTR_GUEST_SNP_SECURE_TSC: SNP Secure TSC is active.
++	 *
++	 * The platform/OS is running as a guest/virtual machine and actively
++	 * using AMD SEV-SNP Secure TSC feature.
++	 */
++	CC_ATTR_GUEST_SNP_SECURE_TSC,
+ };
+ 
+ #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+index 0f81f70aca82..5b9a358a3254 100644
+--- a/arch/x86/coco/core.c
++++ b/arch/x86/coco/core.c
+@@ -100,6 +100,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr)
+ 	case CC_ATTR_HOST_SEV_SNP:
+ 		return cc_flags.host_sev_snp;
+ 
++	case CC_ATTR_GUEST_SNP_SECURE_TSC:
++		return sev_status & MSR_AMD64_SNP_SECURE_TSC;
++
+ 	default:
+ 		return false;
+ 	}
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index a61898c7f114..39683101b526 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -96,6 +96,14 @@ static u64 sev_hv_features __ro_after_init;
+ /* Secrets page physical address from the CC blob */
+ static u64 secrets_pa __ro_after_init;
+ 
++/*
++ * For Secure TSC guests, the BP fetches TSC_INFO using SNP guest messaging and
++ * initializes snp_tsc_scale and snp_tsc_offset. These values are replicated
++ * across the APs VMSA fields (TSC_SCALE and TSC_OFFSET).
++ */
++static u64 snp_tsc_scale __ro_after_init;
++static u64 snp_tsc_offset __ro_after_init;
++
+ /* #VC handler runtime per-CPU data */
+ struct sev_es_runtime_data {
+ 	struct ghcb ghcb_page;
+@@ -1277,6 +1285,12 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip)
+ 	vmsa->vmpl		= snp_vmpl;
+ 	vmsa->sev_features	= sev_status >> 2;
+ 
++	/* Populate AP's TSC scale/offset to get accurate TSC values. */
++	if (cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC)) {
++		vmsa->tsc_scale = snp_tsc_scale;
++		vmsa->tsc_offset = snp_tsc_offset;
++	}
++
+ 	/* Switch the page over to a VMSA page now that it is initialized */
+ 	ret = snp_set_vmsa(vmsa, caa, apic_id, true);
+ 	if (ret) {
+@@ -3127,3 +3141,105 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
  }
+ EXPORT_SYMBOL_GPL(snp_send_guest_request);
+ 
++static int __init snp_get_tsc_info(void)
++{
++	struct snp_guest_request_ioctl *rio;
++	struct snp_tsc_info_resp *tsc_resp;
++	struct snp_tsc_info_req *tsc_req;
++	struct snp_msg_desc *mdesc;
++	struct snp_guest_req *req;
++	unsigned char *buf;
++	int rc = -ENOMEM;
++
++	tsc_req = kzalloc(sizeof(*tsc_req), GFP_KERNEL);
++	if (!tsc_req)
++		return rc;
++
++	tsc_resp = kzalloc(sizeof(*tsc_resp), GFP_KERNEL);
++	if (!tsc_resp)
++		goto e_free_tsc_req;
++
++	req = kzalloc(sizeof(*req), GFP_KERNEL);
++	if (!req)
++		goto e_free_tsc_resp;
++
++	rio = kzalloc(sizeof(*rio), GFP_KERNEL);
++	if (!rio)
++		goto e_free_req;
++
++	/*
++	 * The intermediate response buffer is used while decrypting the
++	 * response payload. Make sure that it has enough space to cover
++	 * the authtag.
++	 */
++	buf = kzalloc(SNP_TSC_INFO_RESP_SZ + AUTHTAG_LEN, GFP_KERNEL);
++	if (!buf)
++		goto e_free_rio;
++
++	mdesc = snp_msg_alloc();
++	if (IS_ERR_OR_NULL(mdesc))
++		goto e_free_buf;
++
++	rc = snp_msg_init(mdesc, snp_vmpl);
++	if (rc)
++		goto e_free_mdesc;
++
++	req->msg_version = MSG_HDR_VER;
++	req->msg_type = SNP_MSG_TSC_INFO_REQ;
++	req->vmpck_id = snp_vmpl;
++	req->req_buf = tsc_req;
++	req->req_sz = sizeof(*tsc_req);
++	req->resp_buf = buf;
++	req->resp_sz = sizeof(*tsc_resp) + AUTHTAG_LEN;
++	req->exit_code = SVM_VMGEXIT_GUEST_REQUEST;
++
++	rc = snp_send_guest_request(mdesc, req, rio);
++	if (rc)
++		goto e_request;
++
++	memcpy(tsc_resp, buf, sizeof(*tsc_resp));
++	pr_debug("%s: response status 0x%x scale 0x%llx offset 0x%llx factor 0x%x\n",
++		 __func__, tsc_resp->status, tsc_resp->tsc_scale, tsc_resp->tsc_offset,
++		 tsc_resp->tsc_factor);
++
++	if (tsc_resp->status == 0) {
++		snp_tsc_scale = tsc_resp->tsc_scale;
++		snp_tsc_offset = tsc_resp->tsc_offset;
++	} else {
++		pr_err("Failed to get TSC info, response status 0x%x\n", tsc_resp->status);
++		rc = -EIO;
++	}
++
++e_request:
++	/* The response buffer contains sensitive data, explicitly clear it. */
++	memzero_explicit(buf, sizeof(buf));
++	memzero_explicit(tsc_resp, sizeof(*tsc_resp));
++e_free_mdesc:
++	snp_msg_free(mdesc);
++e_free_buf:
++	kfree(buf);
++e_free_rio:
++	kfree(rio);
++e_free_req:
++	kfree(req);
++ e_free_tsc_resp:
++	kfree(tsc_resp);
++e_free_tsc_req:
++	kfree(tsc_req);
++
++	return rc;
++}
++
++void __init snp_secure_tsc_prepare(void)
++{
++	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP) ||
++	    !cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
++		return;
++
++	if (snp_get_tsc_info()) {
++		pr_alert("Unable to retrieve Secure TSC info from ASP\n");
++		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_SECURE_TSC);
++	}
++
++	pr_debug("SecureTSC enabled");
++}
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index 0a120d85d7bb..95bae74fdab2 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -94,6 +94,8 @@ void __init mem_encrypt_init(void)
+ 	/* Call into SWIOTLB to update the SWIOTLB DMA buffers */
+ 	swiotlb_update_mem_attributes();
+ 
++	snp_secure_tsc_prepare();
++
+ 	print_mem_encrypt_feature_info();
+ }
+ 
 -- 
 2.34.1
 
