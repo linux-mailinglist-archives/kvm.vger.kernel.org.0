@@ -1,175 +1,118 @@
-Return-Path: <kvm+bounces-32916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568639E1AD1
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 12:24:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C51419E1AC4
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 12:21:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32DA1B628EE
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 10:44:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759A916710F
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 11:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371771E285E;
-	Tue,  3 Dec 2024 10:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0C11E3786;
+	Tue,  3 Dec 2024 11:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H8Sk6ytT"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DUyN4d9x"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF741E2856
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 10:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6342F1E379C;
+	Tue,  3 Dec 2024 11:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733222562; cv=none; b=cSG1TObXbZUA+Mza4aZPrTioSJlmvvf26qMLXF0BdKdrViQDVf/vKUVqaJ09XB7Z8HeIDaAW4HRZ8U4eP9sZQQEinglihwyiLlsysp1QgS9JV1rHsr1PZoLQt+Z6Eb38cl0YFXXov5PtX8c/w4imypwPEsYeprqEBGjbnEToudA=
+	t=1733224863; cv=none; b=pH0D6vDV344LZTCoQq4AO6smspvT313MxKCpR2KnmYCBH/fdXGdluAKvmCVShG3XLUPTAgC78IxWJP0iTlBH9dLqjN8BxMMngeMhd8nc4SHa30p0wlMiaJmJk2tdbWMuIsriIitB1QMtzezdQEdW0cRBSATRDz2M6Vz8vN1wkwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733222562; c=relaxed/simple;
-	bh=GClxry7kOfIsY1EQO6Rm5I2oCXDUT6JUC3Wc7LhTng0=;
+	s=arc-20240116; t=1733224863; c=relaxed/simple;
+	bh=dPN0mOwb0Y/fLKb/1YRJK0Ydqw49XUMXrfGIrQO+Few=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OutJCr/Q+QV0CVHcUcdQBH3WQa8VBPEGqoeqGIkSqa9xiBWkMoVwFy4q+cx5ebHFgSODRQm/4l+5LkMcfPg9BpS4KvPoxaGsiu+0bTsRVCSKmYdRrQ2fr/0MoF9NTo39IwTs9jNvwDBRzu+pbcDq9ZfkC2Ua+HS9/PRpA48TO/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H8Sk6ytT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733222559;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D5AHi0uk+oN+zpkzvh/QNmG2L3UPAKNwXGcHrJAQaZM=;
-	b=H8Sk6ytTS4IFg0JTv0MhJmAEQkXT7h8ytnQqFORdPMTSslAe/OXh6IJ5Xdyde7euLA7Nf8
-	ZnP3fmAigX229yVlp5whxTiDRH1nFTZPa8IgIEbh8G7/Qg2wO7nnDeh8w6MM2eYw/YcTif
-	DgaTJ1L4Yw38IJvm43ZBi634ldGwO1E=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-300-P5838zgdOW6m0hg0rLlvbA-1; Tue,
- 03 Dec 2024 05:42:36 -0500
-X-MC-Unique: P5838zgdOW6m0hg0rLlvbA-1
-X-Mimecast-MFC-AGG-ID: P5838zgdOW6m0hg0rLlvbA
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	 Content-Type:Content-Disposition:In-Reply-To; b=UuxX63TQ6aVvl6yAcw5r56Mxom/21CHfk4Kd5NZlCdSpetOQ7jcyBEXoiuv01MXBIDmTUfQm4XWaL3+gpPxjN02beZYMzMBJcci8nlxnkj8ozktwYc9wd/DM3OPJ5eHbQzzE3nLBD09uuGr5YpyBCQ41OaWVsl53b5Yg4kM5+nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=DUyN4d9x; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C3EFA40E0163;
+	Tue,  3 Dec 2024 11:20:50 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id uMG_m2PsBUlh; Tue,  3 Dec 2024 11:20:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733224846; bh=Akon8FqpbaMPcNlbRM6MS0M3aNDuYE2kNIRRuTA0OXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DUyN4d9x5YaGBirWqfwjWdw30hAamdERt5ajKdoJqgUa93dFIsiBdhOBcjfJGELUh
+	 uJL1qDFGgQ7QrF6v9kokfA4/+bM9Jo02D45XB/7ts7/GsoIliiSdoBvsZetodwrHMZ
+	 ITTdx6RZe83449DC6Qk4/zGcTCJmzsJcQJxEkLPuN0/O+O609Kf7xD28Vfl+GYggU3
+	 pScNT+JfjHNYMINMJL3A5eVaBhSmX2UuCjuwfMYrawYQBzsKP4n7vPM3BvC8lSg/+s
+	 dFnxjxoWmCkYIClGLnb82G+ebiSWa3u6AyCIp40lEupykzOHo2O3CVKlWW+iMHncf+
+	 TqO/UX8gH2gLCvOkSHmTMmcfqcPXpAEV0eCAijE5OPTL0taaaps2aMaLmLmJbrUFbL
+	 JSe6MG1faTht374SQ8veYE49Z7T7ocDUDCde0r2dwh/P8CPcZm2nrHmV5d4V4UdmsG
+	 aH3phwPpfFgXuZ4R4IhhcXekJy0MGWKzJtqxJGBdf75R1qP1Ys7EnW2LH1077mTlkB
+	 /Jmdc62/FEseo3XzsoowWFshlMnTIHerxniTigsZDDHMkSXGXx1KNpjiH4ZQm1a3Jj
+	 6cNQWtRD7pkG/bpe1aR+uAmh6QSub2QGkpRg2+1vbFIVBwg+WNf2y99UQHNVDIGA9Z
+	 pJnamu/GJb6jnw1HFeM9CYec=
+Received: from zn.tnic (pd9530b86.dip0.t-ipconnect.de [217.83.11.134])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE7BF19560BD;
-	Tue,  3 Dec 2024 10:42:32 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A28330000DF;
-	Tue,  3 Dec 2024 10:42:29 +0000 (UTC)
-Date: Tue, 3 Dec 2024 18:42:25 +0800
-From: Baoquan He <bhe@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v1 03/11] fs/proc/vmcore: disallow vmcore modifications
- after the vmcore was opened
-Message-ID: <Z07gkXQDrNfL10hu@MiWiFi-R3L-srv>
-References: <20241025151134.1275575-1-david@redhat.com>
- <20241025151134.1275575-4-david@redhat.com>
- <Z0BL/UopaH5Xg5jS@MiWiFi-R3L-srv>
- <d29d7816-a3e5-4f34-bb0c-dd427931efb4@redhat.com>
- <Z0SMqYX8gMvdiU4T@MiWiFi-R3L-srv>
- <a7ccbd86-2a62-4191-8742-ce45b6e8f73c@redhat.com>
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 67D3640E0269;
+	Tue,  3 Dec 2024 11:20:22 +0000 (UTC)
+Date: Tue, 3 Dec 2024 12:20:15 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, amit@kernel.org, kvm@vger.kernel.org,
+	amit.shah@amd.com, thomas.lendacky@amd.com, tglx@linutronix.de,
+	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
+	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
+	kai.huang@intel.com, sandipan.das@amd.com,
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
+	david.kaplan@amd.com, dwmw@amazon.co.uk, andrew.cooper3@citrix.com
+Subject: Re: [PATCH v2 1/2] x86/bugs: Don't fill RSB on VMEXIT with
+ eIBRS+retpoline
+Message-ID: <20241203112015.GBZ07pb74AGR-TDWt7@fat_crate.local>
+References: <cover.1732219175.git.jpoimboe@kernel.org>
+ <9bd7809697fc6e53c7c52c6c324697b99a894013.1732219175.git.jpoimboe@kernel.org>
+ <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
+ <20241202233521.u2bygrjg5toyziba@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a7ccbd86-2a62-4191-8742-ce45b6e8f73c@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <20241202233521.u2bygrjg5toyziba@desk>
 
-On 11/29/24 at 11:38am, David Hildenbrand wrote:
-> On 25.11.24 15:41, Baoquan He wrote:
-> > On 11/22/24 at 10:30am, David Hildenbrand wrote:
-> > > On 22.11.24 10:16, Baoquan He wrote:
-> > > > On 10/25/24 at 05:11pm, David Hildenbrand wrote:
-> > > > ......snip...
-> > > > > @@ -1482,6 +1470,10 @@ int vmcore_add_device_dump(struct vmcoredd_data *data)
-> > > > >    		return -EINVAL;
-> > > > >    	}
-> > > > > +	/* We'll recheck under lock later. */
-> > > > > +	if (data_race(vmcore_opened))
-> > > > > +		return -EBUSY;
-> > > > 
-> > > 
-> > > Hi,
-> > > 
-> > > > As I commented to patch 7, if vmcore is opened and closed after
-> > > > checking, do we need to give up any chance to add device dumping
-> > > > as below?
-> > > > 
-> > > > fd = open(/proc/vmcore);
-> > > > ...do checking;
-> > > > close(fd);
-> > > > 
-> > > > quit any device dump adding;
-> > > > 
-> > > > run makedumpfile on s390;
-> > > >     ->fd = open(/proc/vmcore);
-> > > >       -> try to dump;
-> > > >     ->close(fd);
-> > > 
-> > > The only reasonable case where this could happen (with virtio_mem) would be
-> > > when you hotplug a virtio-mem device into a VM that is currently in the
-> > > kdump kernel. However, in this case, the device would not provide any memory
-> > > we want to dump:
-> > > 
-> > > (1) The memory was not available to the 1st (crashed) kernel, because
-> > >      the device got hotplugged later.
-> > > (2) Hotplugged virtio-mem devices show up with "no plugged memory",
-> > >      meaning there wouldn't be even something to dump.
-> > > 
-> > > Drivers will be loaded (as part of the kernel or as part of the initrd)
-> > > before any kdump action is happening. Similarly, just imagine your NIC
-> > > driver not being loaded when you start dumping to a network share ...
-> > > 
-> > > This should similarly apply to vmcoredd providers.
-> > > 
-> > > There is another concern I had at some point with changing the effective
-> > > /proc/vmcore size after someone already opened it, and might assume the size
-> > > will stay unmodified (IOW, the file was completely static before vmcoredd
-> > > showed up).
-> > > 
-> > > So unless there is a real use case that requires tracking whether the file
-> > > is no longer open, to support modifying the vmcore afterwards, we should
-> > > keep it simple.
-> > > 
-> > > I am not aware of any such cases, and my experiments with virtio_mem showed
-> > > that the driver get loaded extremely early from the initrd, compared to when
-> > > we actually start messing with /proc/vmcore from user space.
+On Mon, Dec 02, 2024 at 03:35:21PM -0800, Pawan Gupta wrote:
+> It is in this doc:
+> 
+>   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/indirect-branch-restricted-speculation.html
+> 
 
-It's OK, David, I don't have strong opinion about the current
-implementation. I raised this concern because
+I hope those URLs remain more stable than past experience shows.
 
-1) I saw the original vmcoredd only warn when doing register if
-vmcore_opened is true;
+>   "Processors with enhanced IBRS still support the usage model where IBRS is
+>   set only in the OS/VMM for OSes that enable SMEP. To do this, such
+>   processors will ensure that guest behavior cannot control the RSB after a
+>   VM exit once IBRS is set, even if IBRS was not set at the time of the VM
+>   exit."
 
-2) in patch 1, it says vmcore_mutex is introduced to protect vmcore
-modifications from concurrent opening. If we are confident, the old
-vmcoredd_mutex can guarantee it, I could be wrong here.
+ACK, thanks.
 
-Anyway, it's just a tiny concern, I believe it won't cause issue at
-present. So it's up to you. 
+Now, can we pls add those excerpts to Documentation/ and point to them from
+the code so that it is crystal clear why it is ok?
 
-Thanks
+Thx.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
