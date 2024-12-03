@@ -1,256 +1,139 @@
-Return-Path: <kvm+bounces-32890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED019E1391
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 07:51:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E9A9E142B
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 08:30:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25233161C35
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 06:51:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BAF9284A7A
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 07:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1911418A95E;
-	Tue,  3 Dec 2024 06:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C861A01B9;
+	Tue,  3 Dec 2024 07:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M4NJgxHT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392C7189913;
-	Tue,  3 Dec 2024 06:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBF8189F57;
+	Tue,  3 Dec 2024 07:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733208690; cv=none; b=uwfNCJEjCW0WfqkRDXmZmMPW8vdHjxT2XKhl/vyTx4l2eudnSCidR7RDbiEzbX9S4od6gn9HXScuSnB229w/qEQU2s+uvFgIO1CLog5W4/+qT+bBpWg71oKUJ7y9eyu7jijU+9q6rQcUpL1vlm86iE8nV1vyBC60tUwuMzmLFmA=
+	t=1733211007; cv=none; b=kA8ESvTHgLG3VuMgSIh7wry+7+T4r9nTvjZA7uCyBsHYe/6GNp18KiZEXttJwStrnHL7rSM9VsDICnjwi7kAkzMPuKqogRvhwvayYiK8cSM5tmTJLgzmU5GJtDozXWYkHwN4uY5Ycr6hoPTK2KAF7FXN3AHgAeam/fGfi6sThCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733208690; c=relaxed/simple;
-	bh=kx3A+Xq1zGWJHYHWXaF8k+LvrXiSGuyO4HHlfQaGxmo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gU0ZmsTD0Hp4OB007CTRTYB/t4AlchFNng+h9N9839qCPWJsi91l7KWO5bGhHtLC24kKehH7a2RzpHek9GEnfnbcxbbOiyG/Xr0xfTt4c2ZqMq5TEYvnzw+pnUcllktZRUPAEBzaNo9mQDZfU/PfNSe4CsRYVXehIUNng78aRtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.38])
-	by gateway (Coremail) with SMTP id _____8CxMK9pqk5nRHtPAA--.64760S3;
-	Tue, 03 Dec 2024 14:51:21 +0800 (CST)
-Received: from localhost.localdomain (unknown [223.64.68.38])
-	by front1 (Coremail) with SMTP id qMiowMAxL+FZqk5ni3pzAA--.13983S3;
-	Tue, 03 Dec 2024 14:51:19 +0800 (CST)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Xuerui Wang <kernel@xen0n.name>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Huacai Chen <chenhuacai@loongson.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] LoongArch: KVM: Protect kvm_io_bus_{read,write}() with SRCU
-Date: Tue,  3 Dec 2024 14:50:58 +0800
-Message-ID: <20241203065058.4164631-2-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241203065058.4164631-1-chenhuacai@loongson.cn>
-References: <20241203065058.4164631-1-chenhuacai@loongson.cn>
+	s=arc-20240116; t=1733211007; c=relaxed/simple;
+	bh=AAcjS64/ySNekWNYL1T6qkiKHfRkY7zzUXpblKqVvoQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RwIgZreyDgnz1BjS0PsMjSEyA1s78wlOtc2B+YFWtwvS4UOnvqwPD15Dc7GhKGDj9/r+TJVzzbcmR5f5Df9T3KndNFegFwn0UKlm85XockoL9ph5sn9KWJAzifds+5kQpBn5FDKDjFM0CJaTEStGy/1UeW2ZmoHFWvK4T1iSpXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M4NJgxHT; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733211005; x=1764747005;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AAcjS64/ySNekWNYL1T6qkiKHfRkY7zzUXpblKqVvoQ=;
+  b=M4NJgxHTFAVua/R3WjdtvwSBkodGzOrt6IrbLEJFFhBXAFpZHYtH7ekb
+   Y+nnE+afwE+u/08ghUouy188pLyS+ccQ90GE9a5QG0z/3Hsvg3ugBOFu7
+   J2IcmiA9e/URDrMTjBZSdGPxndDAjUdnnog5/TPM5DM+JGucv7VLyLV2m
+   GD40F7xHL0/RptEGPIK02kwWJBBsLHMrmWL478DYes+0TadLeLmNyglDc
+   /D0sHFAzG8i0WqOBgRWi0kNwu+Xr2HAtd8Wyx+j+cy/eLqwqf+uNtoHU2
+   5qqXwakZmBrBOJAUhgauqqHjSNsgTJLXHgsGya1JlEfKdyxqYIX3y1IsF
+   w==;
+X-CSE-ConnectionGUID: gLpa+iBKQmCO7cW9Q4jJHw==
+X-CSE-MsgGUID: fG/mTz+lQN+orLiYWZgT6g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="37182422"
+X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
+   d="scan'208";a="37182422"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 23:30:05 -0800
+X-CSE-ConnectionGUID: PvSlLAjiRK+Bf5ajq71OcQ==
+X-CSE-MsgGUID: 7AOIw34xTg6Yatpa4jJGug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
+   d="scan'208";a="97781954"
+Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 23:30:02 -0800
+Message-ID: <49d0669a-251b-48e2-a705-1c8c6ecea342@linux.intel.com>
+Date: Tue, 3 Dec 2024 15:29:59 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAxL+FZqk5ni3pzAA--.13983S3
-X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Ar1rCFWkCr4rKw4UCw4rJFc_yoWxZw1Upr
-	yrZ393ur4rJr97AwnrAr1Dur1jq3yvkF18JrykJr4fGr1jvrn8JF40yrW7ZFy5K34rCa17
-	ZF1xJr1Ykr1UAwcCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Fb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v2
-	6r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-	CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF
-	0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIx
-	AIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2
-	KfnxnUUI43ZEXa7IU8EeHDUUUUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/6] KVM: x86: Play nice with protected guests in
+ complete_hypercall_exit()
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20241128004344.4072099-1-seanjc@google.com>
+ <20241128004344.4072099-2-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20241128004344.4072099-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When we enable lockdep we get such a warning:
 
- =============================
- WARNING: suspicious RCU usage
- 6.12.0-rc7+ #1891 Tainted: G        W
- -----------------------------
- arch/loongarch/kvm/../../../virt/kvm/kvm_main.c:5945 suspicious rcu_dereference_check() usage!
- other info that might help us debug this:
- rcu_scheduler_active = 2, debug_locks = 1
- 1 lock held by qemu-system-loo/948:
-  #0: 90000001184a00a8 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0xf4/0xe20 [kvm]
- stack backtrace:
- CPU: 2 UID: 0 PID: 948 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc7+ #1891
- Tainted: [W]=WARN
- Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
- Stack : 0000000000000089 9000000005a0db9c 90000000071519c8 900000012c578000
-         900000012c57b940 0000000000000000 900000012c57b948 9000000007e53788
-         900000000815bcc8 900000000815bcc0 900000012c57b7b0 0000000000000001
-         0000000000000001 4b031894b9d6b725 0000000005dec000 9000000100427b00
-         00000000000003d2 0000000000000001 000000000000002d 0000000000000003
-         0000000000000030 00000000000003b4 0000000005dec000 0000000000000000
-         900000000806d000 9000000007e53788 00000000000000b4 0000000000000004
-         0000000000000004 0000000000000000 0000000000000000 9000000107baf600
-         9000000008916000 9000000007e53788 9000000005924778 000000001fe001e5
-         00000000000000b0 0000000000000007 0000000000000000 0000000000071c1d
-         ...
- Call Trace:
- [<9000000005924778>] show_stack+0x38/0x180
- [<90000000071519c4>] dump_stack_lvl+0x94/0xe4
- [<90000000059eb754>] lockdep_rcu_suspicious+0x194/0x240
- [<ffff80000221f47c>] kvm_io_bus_read+0x19c/0x1e0 [kvm]
- [<ffff800002225118>] kvm_emu_mmio_read+0xd8/0x440 [kvm]
- [<ffff8000022254bc>] kvm_handle_read_fault+0x3c/0xe0 [kvm]
- [<ffff80000222b3c8>] kvm_handle_exit+0x228/0x480 [kvm]
 
-Fix it by protecting kvm_io_bus_{read,write}() with SRCU.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
----
- arch/loongarch/kvm/exit.c     | 31 +++++++++++++++++++++----------
- arch/loongarch/kvm/intc/ipi.c |  6 +++++-
- 2 files changed, 26 insertions(+), 11 deletions(-)
+On 11/28/2024 8:43 AM, Sean Christopherson wrote:
+> Use is_64_bit_hypercall() instead of is_64_bit_mode() to detect a 64-bit
+> hypercall when completing said hypercall.  For guests with protected state,
+> e.g. SEV-ES and SEV-SNP, KVM must assume the hypercall was made in 64-bit
+> mode as the vCPU state needed to detect 64-bit mode is unavailable.
+>
+> Hacking the sev_smoke_test selftest to generate a KVM_HC_MAP_GPA_RANGE
+> hypercall via VMGEXIT trips the WARN:
+>
+>    ------------[ cut here ]------------
+>    WARNING: CPU: 273 PID: 326626 at arch/x86/kvm/x86.h:180 complete_hypercall_exit+0x44/0xe0 [kvm]
+>    Modules linked in: kvm_amd kvm ... [last unloaded: kvm]
+>    CPU: 273 UID: 0 PID: 326626 Comm: sev_smoke_test Not tainted 6.12.0-smp--392e932fa0f3-feat #470
+>    Hardware name: Google Astoria/astoria, BIOS 0.20240617.0-0 06/17/2024
+>    RIP: 0010:complete_hypercall_exit+0x44/0xe0 [kvm]
+>    Call Trace:
+>     <TASK>
+>     kvm_arch_vcpu_ioctl_run+0x2400/0x2720 [kvm]
+>     kvm_vcpu_ioctl+0x54f/0x630 [kvm]
+>     __se_sys_ioctl+0x6b/0xc0
+>     do_syscall_64+0x83/0x160
+>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>     </TASK>
+>    ---[ end trace 0000000000000000 ]---
+>
+> Fixes: b5aead0064f3 ("KVM: x86: Assume a 64-bit hypercall for guests with protected state")
+> Cc: stable@vger.kernel.org
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 69f3e3782cc9..a7893bd01e73 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -156,7 +156,7 @@ static int kvm_handle_csr(struct kvm_vcpu *vcpu, larch_inst inst)
- 
- int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- {
--	int ret;
-+	int idx, ret;
- 	unsigned long *val;
- 	u32 addr, rd, rj, opcode;
- 
-@@ -167,7 +167,6 @@ int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- 	rj = inst.reg2_format.rj;
- 	opcode = inst.reg2_format.opcode;
- 	addr = vcpu->arch.gprs[rj];
--	ret = EMULATE_DO_IOCSR;
- 	run->iocsr_io.phys_addr = addr;
- 	run->iocsr_io.is_write = 0;
- 	val = &vcpu->arch.gprs[rd];
-@@ -207,20 +206,28 @@ int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (run->iocsr_io.is_write) {
--		if (!kvm_io_bus_write(vcpu, KVM_IOCSR_BUS, addr, run->iocsr_io.len, val))
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		ret = kvm_io_bus_write(vcpu, KVM_IOCSR_BUS, addr, run->iocsr_io.len, val);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+		if (ret == 0)
- 			ret = EMULATE_DONE;
--		else
-+		else {
-+			ret = EMULATE_DO_IOCSR;
- 			/* Save data and let user space to write it */
- 			memcpy(run->iocsr_io.data, val, run->iocsr_io.len);
--
-+		}
- 		trace_kvm_iocsr(KVM_TRACE_IOCSR_WRITE, run->iocsr_io.len, addr, val);
- 	} else {
--		if (!kvm_io_bus_read(vcpu, KVM_IOCSR_BUS, addr, run->iocsr_io.len, val))
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		ret = kvm_io_bus_read(vcpu, KVM_IOCSR_BUS, addr, run->iocsr_io.len, val);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+		if (ret == 0)
- 			ret = EMULATE_DONE;
--		else
-+		else {
-+			ret = EMULATE_DO_IOCSR;
- 			/* Save register id for iocsr read completion */
- 			vcpu->arch.io_gpr = rd;
--
-+		}
- 		trace_kvm_iocsr(KVM_TRACE_IOCSR_READ, run->iocsr_io.len, addr, NULL);
- 	}
- 
-@@ -359,7 +366,7 @@ static int kvm_handle_gspr(struct kvm_vcpu *vcpu)
- 
- int kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst)
- {
--	int ret;
-+	int idx, ret;
- 	unsigned int op8, opcode, rd;
- 	struct kvm_run *run = vcpu->run;
- 
-@@ -464,8 +471,10 @@ int kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst)
- 		 * it need not return to user space to handle the mmio
- 		 * exception.
- 		 */
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
- 		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, vcpu->arch.badv,
- 				      run->mmio.len, &vcpu->arch.gprs[rd]);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		if (!ret) {
- 			update_pc(&vcpu->arch);
- 			vcpu->mmio_needed = 0;
-@@ -531,7 +540,7 @@ int kvm_complete_mmio_read(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- int kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
- {
--	int ret;
-+	int idx, ret;
- 	unsigned int rd, op8, opcode;
- 	unsigned long curr_pc, rd_val = 0;
- 	struct kvm_run *run = vcpu->run;
-@@ -631,7 +640,9 @@ int kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
- 		 * it need not return to user space to handle the mmio
- 		 * exception.
- 		 */
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
- 		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, vcpu->arch.badv, run->mmio.len, data);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		if (!ret)
- 			return EMULATE_DONE;
- 
-diff --git a/arch/loongarch/kvm/intc/ipi.c b/arch/loongarch/kvm/intc/ipi.c
-index a233a323e295..4b7ff20ed438 100644
---- a/arch/loongarch/kvm/intc/ipi.c
-+++ b/arch/loongarch/kvm/intc/ipi.c
-@@ -98,7 +98,7 @@ static void write_mailbox(struct kvm_vcpu *vcpu, int offset, uint64_t data, int
- 
- static int send_ipi_data(struct kvm_vcpu *vcpu, gpa_t addr, uint64_t data)
- {
--	int i, ret;
-+	int i, idx, ret;
- 	uint32_t val = 0, mask = 0;
- 
- 	/*
-@@ -107,7 +107,9 @@ static int send_ipi_data(struct kvm_vcpu *vcpu, gpa_t addr, uint64_t data)
- 	 */
- 	if ((data >> 27) & 0xf) {
- 		/* Read the old val */
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		ret = kvm_io_bus_read(vcpu, KVM_IOCSR_BUS, addr, sizeof(val), &val);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		if (unlikely(ret)) {
- 			kvm_err("%s: : read date from addr %llx failed\n", __func__, addr);
- 			return ret;
-@@ -121,7 +123,9 @@ static int send_ipi_data(struct kvm_vcpu *vcpu, gpa_t addr, uint64_t data)
- 		val &= mask;
- 	}
- 	val |= ((uint32_t)(data >> 32) & ~mask);
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	ret = kvm_io_bus_write(vcpu, KVM_IOCSR_BUS, addr, sizeof(val), &val);
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	if (unlikely(ret))
- 		kvm_err("%s: : write date to addr %llx failed\n", __func__, addr);
- 
--- 
-2.43.5
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> ---
+>   arch/x86/kvm/x86.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2e713480933a..0b2fe4aa04a2 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9976,7 +9976,7 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>   {
+>   	u64 ret = vcpu->run->hypercall.ret;
+>   
+> -	if (!is_64_bit_mode(vcpu))
+> +	if (!is_64_bit_hypercall(vcpu))
+>   		ret = (u32)ret;
+>   	kvm_rax_write(vcpu, ret);
+>   	++vcpu->stat.hypercalls;
 
 
