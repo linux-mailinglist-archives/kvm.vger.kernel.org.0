@@ -1,110 +1,133 @@
-Return-Path: <kvm+bounces-32940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00CC9E2821
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 17:51:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA1A169363
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 16:51:10 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435501FC115;
-	Tue,  3 Dec 2024 16:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="T9WrCOrx";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7UtLMG0F"
-X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A7A9E295C
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 18:33:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4441FA176;
-	Tue,  3 Dec 2024 16:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC0D2B24099
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 14:50:41 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2791F7544;
+	Tue,  3 Dec 2024 14:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="P2SUz7Vc"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ED41B3942;
+	Tue,  3 Dec 2024 14:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733244617; cv=none; b=b0nFUW8lTPr8RfdszRl2MfsggKrjsZZCSgT/fSwESVQnCHFqOvQmYybocglL35DMwRs8CS3v99567ZHdg1SDUgvM7s1nfDL00vpPoKZiXCXkIOYfB/Hy+cAoWeumbZR00cOIBt+1HYtQpUhliNXolDfQtkyBcR7vcojVYAybz+I=
+	t=1733237434; cv=none; b=CYPHCIKtR2OGuyghhAGPzLheh6+5+lIDUkLpoRT6gCM2xvyiL3dzcIJXxO5Qlkyreb6+ct+vBeCFLdori3OmSCqIZEl43PpVaCR5hjchrrASC+p8+VT2jJqeqW58mGhcW0Cc75jsKMJQbIqQwz77R7lARk2Lmb4khCxsPrgEo2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733244617; c=relaxed/simple;
-	bh=dCLZ/6d9Emqzk6rjNaKFq70Ab/o+bBlDNmnOufWyYvo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tZ3kYYBWM8vFjVcFfDcgsYufJHZhsdzpzaTqCZC930WEaDVnwQDaUz0f2MePbW7E30EGInl1bd3V2oXvj3UOoiiFD0++mQpqcFZfhcuwfE27JLDI7rSr2J0IW/ky50eT5T5N2g49eV7AQaphoqiSurMmMwEzKBg1xg+eUxHGJWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=T9WrCOrx; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7UtLMG0F; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1733244613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ddUgFgPxg+SS7wo0+tjynAsBYR5Mxah4PrQSaFnCmnk=;
-	b=T9WrCOrxKvgOzRX18+gpG03ZanbaXNOW4Q8EJ+AjPslvATRO09l/e/uoFg5o0u3V7mUxIc
-	FKCFbTtx7TWQa10iy/a+u0zHSpl3oM+K6vPIY9QN3aZr19zGDrMJOmgz4vPYA6x3G1/c3M
-	WxUqbqLRsTrv/siOEk3R5LiTzgSo1JgEv+NOVe8nSL0VGMxhIKdtW2JlhhQbsGo42ibEke
-	2lZUHWjzXEzzayRZlFzV90vwPiuaNQ2p8MbtOrPSWndbBJzlUJHotzmppPVkuKRyl+XUKe
-	4OyeIQ55HqBlfvUvBUNtTExzn47SF13chN/bZbI7ZfD22izCmNHBbNZyXaOqwQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1733244613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ddUgFgPxg+SS7wo0+tjynAsBYR5Mxah4PrQSaFnCmnk=;
-	b=7UtLMG0FCrXqstktFxvDODEZS+Zvp0Wod9CVP17RsZNtcP0UOJ6fcJsb5uKaTcWojLI+EE
-	5MXVE3lGdmrbDeBQ==
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: iommu@lists.linux.dev, kvm-riscv@lists.infradead.org,
- kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, tjeznach@rivosinc.com, zong.li@sifive.com,
- joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
- anup@brainfault.org, atishp@atishpatra.org, alex.williamson@redhat.com,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 01/15] irqchip/riscv-imsic: Use hierarchy to reach
- irq_set_affinity
-In-Reply-To: <20241203-1cadc72be6883bc2d77a8050@orel>
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-18-ajones@ventanamicro.com> <87mshcub2u.ffs@tglx>
- <20241203-1cadc72be6883bc2d77a8050@orel>
-Date: Tue, 03 Dec 2024 17:50:13 +0100
-Message-ID: <87a5dcu2wq.ffs@tglx>
+	s=arc-20240116; t=1733237434; c=relaxed/simple;
+	bh=+x0jq6ieLP+RKroyUmslzxJrFDnWtgCBUEcvfZ/mK1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmd/TJWtyyATuqTphtz3nM+bIk5H2IWt5W+++zRq4lYMzyXiV4U3M25NSmCfRjeI/WN+SDZYU9seR90tV2ej6DUrlBmERJzEaT3wu67D80EEBkML9WIrk711z4C5g+c+HHapmal6Rn0p3wVi/IAeNEErFAYdcwxS4KsBQzLAFRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=P2SUz7Vc; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D964740E0269;
+	Tue,  3 Dec 2024 14:50:29 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id e0EPJkvpp4w1; Tue,  3 Dec 2024 14:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733237423; bh=zhzQ5cCwaTn5mU+JsmEkUoNiwtkjIFQELLsG2oG7zec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P2SUz7VcuWwMxzCJcRLy/q/Qg+DAJGSsrS7WBol6qlCpZwDNM7Bjx4tkoMd2/sWjQ
+	 SguQ51/WPACrDxyRSEUV4GmKGJ+S2XRTV5QkDnmn/CAc9/yfSmAPfvqWjNj4YHezeL
+	 7jlcSjYB7X14esXXQqf3S8RnBj/4H9rb1fCJJO5QLIwK2IP5EnDuqVIR7nGFyLN0GM
+	 uiYd6rcc17fxLrK/GwjrsVvtLdMLCsC5SuaHaZFCIrg9mIaxMwf1voclDUg9Q6f+ib
+	 CzQP5W6Iov99Cq3VGBov+Pmrvdmk4lENkmST1+xkt3wYxPN4UGrFWo8vAuqMToQgvu
+	 iaUxMjsQHUrAV0PSck4muS4AK/QeTHwog0bKwiuDOhIfanTf7wLBrRRHFZaFr5G7as
+	 nRXdptX8FMPwm1bVzj2iBPgkzoPc1DV3RDz2x4a2bmRaU+eu7IzOdmxmtJmlmCbiGR
+	 9UFVS70P49g5cD8MQKl2+RREMTrmgM1mLNw2jngS8EQugMIJXFzBNbXYOpyIU6Gobc
+	 v5IsPmHJMYEqR+ELalArd5Fnm1ArlKrO+iUEmOTMDYqHEKPPwQkK6Ovpn0kTmI2qes
+	 uI3umK8lGa4jRl2U3Bigj2MEVBt8Dc2rWNPs5J9HbmopgGEiG7fuh/rWiflHwfm8RD
+	 91xzomb4Yz11ytt5sR7J5eo4=
+Received: from zn.tnic (pd9530b86.dip0.t-ipconnect.de [217.83.11.134])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3592740E0196;
+	Tue,  3 Dec 2024 14:50:12 +0000 (UTC)
+Date: Tue, 3 Dec 2024 15:50:06 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 01/13] x86/sev: Carve out and export SNP guest
+ messaging init routines
+Message-ID: <20241203145006.GGZ08anlXCntr8cjVu@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-2-nikunj@amd.com>
+ <20241203141950.GCZ08ThrMOHmDFeaa2@fat_crate.local>
+ <891f0e65-f2fa-4e0c-a59c-ef97ea00ba3f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <891f0e65-f2fa-4e0c-a59c-ef97ea00ba3f@amd.com>
 
-On Tue, Dec 03 2024 at 17:27, Andrew Jones wrote:
-> On Tue, Dec 03, 2024 at 02:53:45PM +0100, Thomas Gleixner wrote:
->> On Thu, Nov 14 2024 at 17:18, Andrew Jones wrote:
->> The whole IMSIC MSI support can be moved over to MSI LIB which makes all
->> of this indirection go away and your intermediate domain will just fit
->> in.
->> 
->> Uncompiled patch below. If that works, it needs to be split up properly.
->
-> Thanks Thomas. I gave your patch below a go, but we now fail to have an
-> msi domain set up when probing devices which go through aplic_msi_setup(),
-> resulting in an immediate NULL deference in
-> msi_create_device_irq_domain(). I'll look closer tomorrow.
+On Tue, Dec 03, 2024 at 08:05:32PM +0530, Nikunj A. Dadhania wrote:
+> This is what I use with checkpatch, that didnt catch the wrong spelling.
 
-Duh! I forgot to update the .select callback. I don't know how you fixed that
-compile fail up. Delta patch below.
+Not surprised.
 
-Thanks,
+> Do you suggest using something else ?
 
-        tglx
----
---- a/drivers/irqchip/irq-riscv-imsic-platform.c
-+++ b/drivers/irqchip/irq-riscv-imsic-platform.c
-@@ -180,7 +180,7 @@ static void imsic_irq_debug_show(struct
- static const struct irq_domain_ops imsic_base_domain_ops = {
- 	.alloc		= imsic_irq_domain_alloc,
- 	.free		= imsic_irq_domain_free,
--	.select		= imsic_irq_domain_select,
-+	.select		= msi_lib_irq_domain_select,
- #ifdef CONFIG_GENERIC_IRQ_DEBUGFS
- 	.debug_show	= imsic_irq_debug_show,
- #endif
+You can enable spellchecking in your editor with which you write the commit
+messages. For example:
+
+https://www.linux.com/training-tutorials/using-spell-checking-vim/
+
+Or, you can use my tool:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/bp/bp.git/log/?h=vp
+
+You'd need to fish it out of the repo.
+
+It doesn't completely replace checkpatch yet but I am extending it with
+features as I go. But it does spellcheck:
+
+$ ~/dev/vp/.tip/bin/vp.py ~/tmp/review/new
+prepratation for adding Secure TSC guest support, carve out APIs to
+Unknown word [prepratation] in commit message.
+Suggestions: ['preparation', 'preparations', 'reparation', 'perpetration', 'reputation', 'perpetuation', 'peroration', 'presentation', 'repatriation', 'propagation', "preparation's"]
+
+Class patch:
+    original subject: [[PATCH v15 01/13] x86/sev: Carve out and export SNP guest messaging init routines]
+             subject: [x86/sev: Carve out and export SNP guest messaging init routines]
+              sender: [Nikunj A Dadhania <nikunj@amd.com>]
+              author: [Nikunj A Dadhania <nikunj@amd.com>]
+             version: [15]
+              number: [1]
+                name: [x86-sev-carve_out_and_export_snp_guest_messaging_init_routines]
+                date: [Tue, 03 Dec 2024 14:30:33 +0530]
+          message-id: [20241203090045.942078-2-nikunj@amd.com]
+
+I'm sure there are gazillion other ways to automate it, ofc.
+
+HTH.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
