@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-32953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C899E2CD2
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 21:12:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7619E2CD5
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 21:12:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEC37161F00
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 20:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E20A428C9EE
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 20:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70DC1FC7F9;
-	Tue,  3 Dec 2024 20:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209D01FC7F9;
+	Tue,  3 Dec 2024 20:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hM9B/wOt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eMq0pF21"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685391F891C
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 20:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FDC1F75B1
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 20:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733256713; cv=none; b=nL2TC5MLQwnVezJ/d9Pp7m2oem1d4zlBCOu47P2LVU7Rv/GBRmRcqw1cB1orzSapKxoIvpBbbYyfRm8oM/50Z7YvHbryFbtYG3vgmoaFS9849gVE8bri7o5kCynV1HR3NRe9omoGYHqVTMxSz6H1IPzjDD0PwUWsjqj2478G5ak=
+	t=1733256764; cv=none; b=cUIR/2m9KTdbjUmlk4paPQKbuTkPe/mkW38uBm3fydC70uL3N8rGlB/rSo3rQwaAg5DuSeq9NCGly7V+A7nuN054m6d49IJm2CRdoSBedKvRNQAoUQeIThBhp+lIGBHDWe50yXN1S69Dq6KylIqkv1w5SodRP7sI+lUBtd8dp50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733256713; c=relaxed/simple;
-	bh=OCw+9velhnyMnO/hCAIurhRTp2QjVWIiGclsTfUWQXM=;
+	s=arc-20240116; t=1733256764; c=relaxed/simple;
+	bh=ClWWsxMuWtgrpqygwO98QptZuWEbVqaqvyaCA+sfTm8=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=bT2NFqgWcaabR16vaAgZh3ckm3N/Rx1KzZkbJfr9/hHCRZNp9qMdoehMvcCxYm41m4e0YYrHbdh2f0XXVMdOAb85WOVbllUzn9xblxNnQtgRa++BNn4z1ZoQ1kQ0OwzUT1S61G4PFllXv35MNMTp+IA8DAcNwSeT4bTjv1Z33xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hM9B/wOt; arc=none smtp.client-ip=209.85.218.53
+	 In-Reply-To:Content-Type; b=nSYQ5WaSgfoMM4BBIpOo7gkWZGJi3aAJA7dcjn+tcn+KTsGZYsTFqK0Rz+JcHbQtXEQXEypEOU8MjVea294BhNSYIYqY9R146UUJJqPbPDxKZN/GX5ikiXZKqzQq3zx1+rPoPVdUR+UTAfyjsOn9E47oQI8Dp2sHLJEb0Swhw+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eMq0pF21; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9ec267b879so981069166b.2
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 12:11:51 -0800 (PST)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ffdbc0c103so85186771fa.3
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 12:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733256710; x=1733861510; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733256761; x=1733861561; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+VMd3D6C7Fw2ExoTnCaPiTn/InTcHTbzoLli8MPWmjA=;
-        b=hM9B/wOtE/ULouc5KAkNfAgMw3Xe7qg2i6uuO4LPDwZV7pJnBJDnHNqG8vvLFj7Unq
-         5I664ceuOaTWrl2Mb/qHaUnqZvwAcywW6pxlJ7qoOQnEQ64i4CUtqhrWDAUB36OOYQ1z
-         E3eY/GxqRmRQS2hAJsHtcoXG+hcaP5GALnCWhsMQ24p8LdcB6AVzHlKIFfeLhyzFMOr+
-         UszmzQkkbSUiDUW+qHPyxj1N52cW03K+wbMvtmuRL9KVEzamghQEJEz7g5rW2Zyjahzd
-         cR1eW+Q6fRBNiUKdCMT++1cxcQZtqCR9tjDEW0bFptZrI7+UIJC9QTnFmG028D1T1I5w
-         lYmA==
+        bh=m3QgnE+NrxtGJkvm7ubuQYOewBiHG8TTFJvBDsa2YP4=;
+        b=eMq0pF21ZaaoiP4Ejdcsm+zsAABZo0IjQI+E5EBhw6/xBkKarGs/wGxJLbPQtoAl85
+         fQNdp/PsORu7IeI3GyKZXQ1vfH5KjhgD9+T2h9p7g6iOHL6luV6xY5X/GD3uBt7NsDtZ
+         yb3lTlmHb77ISxerkq0s7rh06lcjZ6J3+tk+huBpLmBRtlZaZ7Ug27Rdl3FaRYvao5Z/
+         rQn6kCZCdpZBDmQ18YDt3MLLGOrca4n1cyRVGlgjEsY+Ziqt3Iw74VktO5CWwWtw4WHk
+         M6GK6rbKW0A5qnh3HcSI3jHwzvGH0VdxpCgBBpZTVc/YAiZDWDw+PqTbHg0wuQ7vt46X
+         8Xzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733256710; x=1733861510;
+        d=1e100.net; s=20230601; t=1733256761; x=1733861561;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+VMd3D6C7Fw2ExoTnCaPiTn/InTcHTbzoLli8MPWmjA=;
-        b=ONglPgbn74EzDanjwoptG+6XXTzDTSv01X1CVtGKxF3oWJZNiaTCb1QJtxBWF+jScd
-         OTQwuCJ4bkMktNXwpUgUf7Np6RSCgh4IzqYkXQ6I2Znqnpnu2uFIVsFZAo9Pzm6hX3rV
-         bmhPVwbZkYJ7C1w/vqHRPRlJi70ULT5BJczHtsQw+iHFDvicqCXZ29anR5pqwHTeQJxi
-         2RCBx1rYBhVe25CzXceVG31nDwMoCRxEvq6gnuUg6hmUfmgF2R063FSeVvgtH2g9t88E
-         AuUSCsPw7GXiI4q8amUMQBfMwjR/MBMcf11UmjFCxj4xi7mQ9PKRzfsOVij8pzgf3dL4
-         PQng==
-X-Gm-Message-State: AOJu0Yx6RAxMmIHOQURSLEINXSAWD58unLWGYSvTU7or3sfhecrX5VGu
-	6khEvcd5VrVZjtr7yeTo2c+H/DZqZ8tZZTlgYeMf9SpcCtRlAPBd
-X-Gm-Gg: ASbGncub9+jw2r2sAmmyBRnBa5GQNRFaWmKBw8+J+SiEjwl1Z6wIyK00u7bNJX4QBf2
-	akIuuIGHCAgo20rXHF7KUx389w1g2SZAOUPx9G8MTpQfWf/FyBXCu10MNj/XJn8jfRiMcHxnzrx
-	2AAGatvruKaLJpSWZ/r6I2uLBb/FOnCCnH/jHImS9/z4UHYkBHdG73TxLAphnFuxTud0e5RfRkc
-	ZxGXtq9xGYFnHFB04QsEr247JIQSacVkQj3VqeI93x0eqvyWMMFu8r5kTZabHO/NkdGh+rLk2as
-	l2w4lZgOLFqtiaedgvaK8muet24hIq2UdGBAwpM0i14++lH1ZdkzY8yBgn3/+7nUQrd2mZ2eQvD
-	mrEOZb9TC7BvcjvSH5f/Q8qFN/YRjlUOudspkpVisLw==
-X-Google-Smtp-Source: AGHT+IH3df58eWNkt6/FHpaB3a+zgXY39xt5nviOl1R5xV83S+lLe/OS5bFhnFCo1VSl416m1qHBlA==
-X-Received: by 2002:a17:906:23ea:b0:a99:f887:ec1d with SMTP id a640c23a62f3a-aa5f7f53a6emr341175366b.49.1733256709519;
-        Tue, 03 Dec 2024 12:11:49 -0800 (PST)
+        bh=m3QgnE+NrxtGJkvm7ubuQYOewBiHG8TTFJvBDsa2YP4=;
+        b=eceuYwoaHrfaB2HWt64F/nShI2gFx2npOirnqY0RN7L6ueOCJLKI0HWP8o+R2A127T
+         87E/aDgU+2i6eUJvsQRBm7vdQjrVSaJpX19zw2OwXCxVDj9Sczeyg8N99tLcfZzU9UcJ
+         Km/ZRfkWd7+qxIUYO3Yl4KfMGCF3vFEkihAA/RAUjOj5DUa878MHQ2r0aW+lX9yIPlld
+         +Jar+KZd97+Wpc8lTDLUraMpFRJzu1tasN+/nW6mrorqvhzAYtgz7PKAspxSa4lDqe4s
+         undBaSVVmJ/ta7rofRsGpxsXuT9ZSN/ir+8CxTo81EQ5mj061Eir/2kcHJr6IIFi+4dp
+         tnYg==
+X-Gm-Message-State: AOJu0YyFhHS88h6NUsiYoAE30Bjj1pfRY+yUlP6Rnq9TiUvOrn3KhvDL
+	I6zn5h5KJBKVIQVXs1+yprwtvEpZjmlEd7p8RKsVjMbbm8+ZKncT
+X-Gm-Gg: ASbGncu8WmP00Sl4eQTKYt9wm8lnhOyRCQKhDgXlr/GtyQe1NMzs6PA6DFioDO2XJCe
+	BQpoPQ0IoGvOW+REF5ctSPBK1RMZbyM+N6U9DVFtHTuPV896S35UFm8AYvc6fRoqxu1yUc5hIFp
+	Tah3hS87tT49JyBN+hSGCahw/xB7yqR8A28NYsneYQ0xXuyl6YaCSb0EpLtY6IjiTEjw5qqBEQZ
+	ALNJORHx4zjFdZV6avXp/QTvXEdwhZb/As7H33LlRvBxF3hjHyN3/ObhmjvPp+9Y2ptyitR5nq4
+	uf8yo6WhR+9l0E3Zv40ZaJRpbFqX4vzaCtvPuYsq5RIAv6AnvL3kzhQ95XKHUtdGuTuj41jNlCk
+	arMHemAv+AWRJaeIica+9aMCklHUdVxXQzZXKa3Op5Q==
+X-Google-Smtp-Source: AGHT+IEo//89c6K1Dj+P1dXrfsbN2JeSSQDlen+lEQe3H5+z83ZR0Ngm/BEsbVCUbgkvHRYeuHf96w==
+X-Received: by 2002:a2e:9907:0:b0:300:16c0:9ba with SMTP id 38308e7fff4ca-30016c00c13mr1784581fa.31.1733256760298;
+        Tue, 03 Dec 2024 12:12:40 -0800 (PST)
 Received: from ?IPV6:2a02:3100:9d09:7500:8175:4ab5:e6ba:110b? (dynamic-2a02-3100-9d09-7500-8175-4ab5-e6ba-110b.310.pool.telefonica.de. [2a02:3100:9d09:7500:8175:4ab5:e6ba:110b])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5996db2cdsm650631166b.46.2024.12.03.12.11.48
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5996c19d9sm655672666b.37.2024.12.03.12.12.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 12:11:49 -0800 (PST)
-Message-ID: <0a14a4df-fbb5-4613-837f-f8025dc73380@gmail.com>
-Date: Tue, 3 Dec 2024 21:11:47 +0100
+        Tue, 03 Dec 2024 12:12:39 -0800 (PST)
+Message-ID: <b1fbf549-3f95-4a23-8e17-87db66a1d1e8@gmail.com>
+Date: Tue, 3 Dec 2024 21:12:38 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,7 +82,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH 2/3] vfio/mdev: inline needed class_compat functionality
+Subject: [PATCH 3/3] driver core: class: remove class_compat code
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  "Rafael J. Wysocki" <rafael@kernel.org>,
@@ -138,73 +138,138 @@ In-Reply-To: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-vfio/mdev is the last user of class_compat, and it doesn't use it for
-the intended purpose. See kdoc of class_compat_register():
-Compatibility class are meant as a temporary user-space compatibility
-workaround when converting a family of class devices to a bus devices.
-
-In addition it uses only a part of the class_compat functionality.
-So inline the needed functionality, and afterwards all class_compat
-code can be removed.
-
-No functional change intended. Compile-tested only.
+vfio/mdev as last user of class_compat has inlined the needed
+functionality. So all class_compat code can be removed now.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/vfio/mdev/mdev_core.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/base/class.c         | 87 ------------------------------------
+ include/linux/device/class.h |  7 ---
+ 2 files changed, 94 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index ed4737de4..a22c49804 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -18,7 +18,7 @@
- #define DRIVER_AUTHOR		"NVIDIA Corporation"
- #define DRIVER_DESC		"Mediated device Core Driver"
+diff --git a/drivers/base/class.c b/drivers/base/class.c
+index f812236e2..525512d05 100644
+--- a/drivers/base/class.c
++++ b/drivers/base/class.c
+@@ -551,33 +551,6 @@ ssize_t show_class_attr_string(const struct class *class,
  
--static struct class_compat *mdev_bus_compat_class;
-+static struct kobject *mdev_bus_kobj;
+ EXPORT_SYMBOL_GPL(show_class_attr_string);
  
- static LIST_HEAD(mdev_list);
- static DEFINE_MUTEX(mdev_list_lock);
-@@ -76,7 +76,7 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
- 	if (ret)
- 		return ret;
- 
--	ret = class_compat_create_link(mdev_bus_compat_class, dev, NULL);
-+	ret = sysfs_create_link(mdev_bus_kobj, &dev->kobj, dev_name(dev));
- 	if (ret)
- 		dev_warn(dev, "Failed to create compatibility class link\n");
- 
-@@ -98,7 +98,7 @@ void mdev_unregister_parent(struct mdev_parent *parent)
- 	dev_info(parent->dev, "MDEV: Unregistering\n");
- 
- 	down_write(&parent->unreg_sem);
--	class_compat_remove_link(mdev_bus_compat_class, parent->dev, NULL);
-+	sysfs_remove_link(mdev_bus_kobj, dev_name(parent->dev));
- 	device_for_each_child(parent->dev, NULL, mdev_device_remove_cb);
- 	parent_remove_sysfs_files(parent);
- 	up_write(&parent->unreg_sem);
-@@ -251,8 +251,8 @@ static int __init mdev_init(void)
- 	if (ret)
- 		return ret;
- 
--	mdev_bus_compat_class = class_compat_register("mdev_bus");
--	if (!mdev_bus_compat_class) {
-+	mdev_bus_kobj = class_pseudo_register("mdev_bus");
-+	if (!mdev_bus_kobj) {
- 		bus_unregister(&mdev_bus_type);
- 		return -ENOMEM;
- 	}
-@@ -262,7 +262,7 @@ static int __init mdev_init(void)
- 
- static void __exit mdev_exit(void)
- {
--	class_compat_unregister(mdev_bus_compat_class);
-+	kobject_put(mdev_bus_kobj);
- 	bus_unregister(&mdev_bus_type);
+-struct class_compat {
+-	struct kobject *kobj;
+-};
+-
+-/**
+- * class_compat_register - register a compatibility class
+- * @name: the name of the class
+- *
+- * Compatibility class are meant as a temporary user-space compatibility
+- * workaround when converting a family of class devices to a bus devices.
+- */
+-struct class_compat *class_compat_register(const char *name)
+-{
+-	struct class_compat *cls;
+-
+-	cls = kmalloc(sizeof(struct class_compat), GFP_KERNEL);
+-	if (!cls)
+-		return NULL;
+-	cls->kobj = kobject_create_and_add(name, &class_kset->kobj);
+-	if (!cls->kobj) {
+-		kfree(cls);
+-		return NULL;
+-	}
+-	return cls;
+-}
+-EXPORT_SYMBOL_GPL(class_compat_register);
+-
+ /**
+  * class_pseudo_register - create a pseudo class entry in sysfs
+  * @name: the name of the child
+@@ -592,66 +565,6 @@ struct kobject *class_pseudo_register(const char *name)
  }
+ EXPORT_SYMBOL_GPL(class_pseudo_register);
  
+-/**
+- * class_compat_unregister - unregister a compatibility class
+- * @cls: the class to unregister
+- */
+-void class_compat_unregister(struct class_compat *cls)
+-{
+-	kobject_put(cls->kobj);
+-	kfree(cls);
+-}
+-EXPORT_SYMBOL_GPL(class_compat_unregister);
+-
+-/**
+- * class_compat_create_link - create a compatibility class device link to
+- *			      a bus device
+- * @cls: the compatibility class
+- * @dev: the target bus device
+- * @device_link: an optional device to which a "device" link should be created
+- */
+-int class_compat_create_link(struct class_compat *cls, struct device *dev,
+-			     struct device *device_link)
+-{
+-	int error;
+-
+-	error = sysfs_create_link(cls->kobj, &dev->kobj, dev_name(dev));
+-	if (error)
+-		return error;
+-
+-	/*
+-	 * Optionally add a "device" link (typically to the parent), as a
+-	 * class device would have one and we want to provide as much
+-	 * backwards compatibility as possible.
+-	 */
+-	if (device_link) {
+-		error = sysfs_create_link(&dev->kobj, &device_link->kobj,
+-					  "device");
+-		if (error)
+-			sysfs_remove_link(cls->kobj, dev_name(dev));
+-	}
+-
+-	return error;
+-}
+-EXPORT_SYMBOL_GPL(class_compat_create_link);
+-
+-/**
+- * class_compat_remove_link - remove a compatibility class device link to
+- *			      a bus device
+- * @cls: the compatibility class
+- * @dev: the target bus device
+- * @device_link: an optional device to which a "device" link was previously
+- * 		 created
+- */
+-void class_compat_remove_link(struct class_compat *cls, struct device *dev,
+-			      struct device *device_link)
+-{
+-	if (device_link)
+-		sysfs_remove_link(&dev->kobj, "device");
+-	sysfs_remove_link(cls->kobj, dev_name(dev));
+-}
+-EXPORT_SYMBOL_GPL(class_compat_remove_link);
+-
+ /**
+  * class_is_registered - determine if at this moment in time, a class is
+  *			 registered in the driver core or not.
+diff --git a/include/linux/device/class.h b/include/linux/device/class.h
+index 8b6e890c7..85b036d0a 100644
+--- a/include/linux/device/class.h
++++ b/include/linux/device/class.h
+@@ -79,13 +79,6 @@ int __must_check class_register(const struct class *class);
+ void class_unregister(const struct class *class);
+ bool class_is_registered(const struct class *class);
+ 
+-struct class_compat;
+-struct class_compat *class_compat_register(const char *name);
+-void class_compat_unregister(struct class_compat *cls);
+-int class_compat_create_link(struct class_compat *cls, struct device *dev,
+-			     struct device *device_link);
+-void class_compat_remove_link(struct class_compat *cls, struct device *dev,
+-			      struct device *device_link);
+ struct kobject *class_pseudo_register(const char *name);
+ 
+ void class_dev_iter_init(struct class_dev_iter *iter, const struct class *class,
 -- 
 2.47.1
 
