@@ -1,125 +1,178 @@
-Return-Path: <kvm+bounces-32895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32896-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCAE9E1555
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 09:13:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8ABF161A9C
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 08:12:57 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C3A1BBBD6;
-	Tue,  3 Dec 2024 08:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="NJVWnyoh"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864549E1671
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 09:58:24 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4381AAE28;
-	Tue,  3 Dec 2024 08:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2FE1B2BAC1
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 08:27:27 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7FD1D63EC;
+	Tue,  3 Dec 2024 08:27:17 +0000 (UTC)
+X-Original-To: kvm@vger.kernel.org
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2596C1CDA17;
+	Tue,  3 Dec 2024 08:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733213502; cv=none; b=JoT8bVMh1yGqPYjgF3GpROaorRHiNTNI5cS8Gw9y0fw8SufFn+BsLXsxn+IIcvFF2YuztlCQNNOkaXiufUIHgwv3mTK2IzY545CIrUDERPc9XsstQB1Abb3d/SPAUdbHvGafHxp8aPVuOO7m+L+wbb/b/VgWFPDaDpYax0E7PW4=
+	t=1733214437; cv=none; b=WyJmLEKU4SAOPJ4B2upXrh4CVD8T1m0JfYELeU3AyKH9ZcMcXsamkwJJIHdK/Of8K0TcIIlUS4qlIkpdWytQTM3eCffYB1uKOWJChQkMfIw3K+Z/9Srfu2gZSP/2TeUsBwtMhgOpyCAcHvIEMpbO3YQOOFSI5qD//ShDywdb0RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733213502; c=relaxed/simple;
-	bh=m5GhP1bzWZ9wJC300ZM+pNgqKcYbjarnymd9a0nvJz8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=URkfdUBCb5GiEPhwCD3jZbK6drpj4RS3orFqXegtqx+jf0L/R0RBXcChZBDg2wWec1GEOQ1reaW+Lk2k0bt8ZSlRtBznbKOUe5rLpcmSn6jYtIhHxT4Po600PEfb51emzmXTRWVDCUG0PCcAi1NU8TPeEdPCLZCvMdIks+4fVME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=NJVWnyoh; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.205] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 4B38AqJi322558
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 3 Dec 2024 00:10:52 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 4B38AqJi322558
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024111601; t=1733213454;
-	bh=Gjt29Xyz+OZvO528TtflAd8fuc5YuSz5FuvYYAukkjY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NJVWnyohYxxPHKawzE2PaIJShfBzSYY3l6rvK/K94gmRO32nSvFn5vdb/0lD1IN3W
-	 BLOprK8yii/5+vEloY+ObAHpkivASlubGMQyPO9LWvh/13JJD0BrhrnZeLdIZlE95S
-	 wB3UaFxWOBbWQ9U/7bLejiu7cPyPQ5tM1T+18KuIqrAdGjX+LiR6TJcCWCELXEIkBQ
-	 DN0CYc2ouYU4ThmU5gqBDG41+egL3BpPL8T22pdH3Tal8O0VMKQuFwwKSis8Tdx5mA
-	 zmgeFXrRsTjnWIuF9Jj5o1eVpGEUsAbDnSYWkC/2HqkJaFlpH3lNec8fWHlK/dkep/
-	 ABs6l+vOD/WlQ==
-Message-ID: <25fa8746-3b36-4d43-86cd-37aadaacdf2e@zytor.com>
-Date: Tue, 3 Dec 2024 00:10:46 -0800
+	s=arc-20240116; t=1733214437; c=relaxed/simple;
+	bh=4f87T2wqL6+K9W3EFJhfoZNruTBoDjUHOAJQI/P4PIc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=MwsH7rMSI03hF6lxj3SOWKlRuO69BMuvdkfiweIecRV6EU/XMyLiWIuoI+im1DGqy/XvdsUIB/rX+AA1kRy5BK6G7IEj5xj2wOeM70nWPtgQdj9jastfgpguPzomm9LJR21TpP7SPcSc5PJZ8DUkhwKIxbxHizx/9mtAMK0JFBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8DxG+LewE5n9YtPAA--.23054S3;
+	Tue, 03 Dec 2024 16:27:10 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxvsLawE5nt5lzAA--.65481S3;
+	Tue, 03 Dec 2024 16:27:08 +0800 (CST)
+Subject: Re: [PATCH 1/2] LoongArch: KVM: Protect kvm_check_requests() with
+ SRCU
+To: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini
+ <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, stable@vger.kernel.org
+References: <20241203065058.4164631-1-chenhuacai@loongson.cn>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <e0c59558-09ec-1e51-9b36-86b69f7e8bde@loongson.cn>
+Date: Tue, 3 Dec 2024 16:26:28 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/2] x86, lib, xenpv: Add WBNOINVD helper functions
-To: Juergen Gross <jgross@suse.com>,
-        Kevin Loughlin
- <kevinloughlin@google.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Cc: linux-kernel@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        kvm@vger.kernel.org, thomas.lendacky@amd.com, pgonda@google.com,
-        sidtelang@google.com, mizhang@google.com,
-        virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
-        bcm-kernel-feedback-list@broadcom.com
-References: <20241203005921.1119116-1-kevinloughlin@google.com>
- <20241203005921.1119116-2-kevinloughlin@google.com>
- <a9560e97-478d-4e03-b936-cf6f663279a4@citrix.com>
- <CAGdbjmLRA5g+Rgiq-fRbWaNqXK51+naNBi0b3goKxsN-79wpaw@mail.gmail.com>
- <bc4a4095-d8bd-4d97-a623-be35ef81aad0@zytor.com>
- <24b80006-dcea-4a76-b5c8-e147d9191ed2@suse.com>
+In-Reply-To: <20241203065058.4164631-1-chenhuacai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <24b80006-dcea-4a76-b5c8-e147d9191ed2@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxvsLawE5nt5lzAA--.65481S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCF1DWFWxGr4DJr4kurWUKFX_yoWrJr1rpr
+	Zxur4Igr4rXry7Aw1jyF1DXr1UXw4qkF4xJry8Jr18Cw1jqr1DJFy8GrW8Jry5G34rAa17
+	JF1Utrn8tr1UJwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jepB-UUUUU=
 
-On 12/2/2024 10:47 PM, Juergen Gross wrote:
-> P.S.: As the paravirt maintainer I would have preferred to be Cc-ed in the
->        initial patch mail.
 
-Looks that Kevin didn't run './scripts/get_maintainer.pl'?
 
-Thanks!
-     Xin
+On 2024/12/3 下午2:50, Huacai Chen wrote:
+> When we enable lockdep we get such a warning:
+> 
+>   =============================
+>   WARNING: suspicious RCU usage
+>   6.12.0-rc7+ #1891 Tainted: G        W
+>   -----------------------------
+>   include/linux/kvm_host.h:1043 suspicious rcu_dereference_check() usage!
+>   other info that might help us debug this:
+>   rcu_scheduler_active = 2, debug_locks = 1
+>   1 lock held by qemu-system-loo/948:
+>    #0: 90000001184a00a8 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0xf4/0xe20 [kvm]
+>   stack backtrace:
+>   CPU: 0 UID: 0 PID: 948 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc7+ #1891
+>   Tainted: [W]=WARN
+>   Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
+>   Stack : 0000000000000089 9000000005a0db9c 90000000071519c8 900000012c578000
+>           900000012c57b920 0000000000000000 900000012c57b928 9000000007e53788
+>           900000000815bcc8 900000000815bcc0 900000012c57b790 0000000000000001
+>           0000000000000001 4b031894b9d6b725 0000000004dec000 90000001003299c0
+>           0000000000000414 0000000000000001 000000000000002d 0000000000000003
+>           0000000000000030 00000000000003b4 0000000004dec000 90000001184a0000
+>           900000000806d000 9000000007e53788 00000000000000b4 0000000000000004
+>           0000000000000004 0000000000000000 0000000000000000 9000000107baf600
+>           9000000008916000 9000000007e53788 9000000005924778 0000000010000044
+>           00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
+>           ...
+>   Call Trace:
+>   [<9000000005924778>] show_stack+0x38/0x180
+>   [<90000000071519c4>] dump_stack_lvl+0x94/0xe4
+>   [<90000000059eb754>] lockdep_rcu_suspicious+0x194/0x240
+>   [<ffff8000022143bc>] kvm_gfn_to_hva_cache_init+0xfc/0x120 [kvm]
+>   [<ffff80000222ade4>] kvm_pre_enter_guest+0x3a4/0x520 [kvm]
+>   [<ffff80000222b3dc>] kvm_handle_exit+0x23c/0x480 [kvm]
+> 
+> Fix it by protecting kvm_check_requests() with SRCU.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+>   arch/loongarch/kvm/vcpu.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index cab1818be68d..d18a4a270415 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -240,7 +240,7 @@ static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
+>    */
+>   static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+>   {
+> -	int ret;
+> +	int idx, ret;
+>   
+>   	/*
+>   	 * Check conditions before entering the guest
+> @@ -249,7 +249,9 @@ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+>   	if (ret < 0)
+>   		return ret;
+>   
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+>   	ret = kvm_check_requests(vcpu);
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>   
+>   	return ret;
+>   }
+> 
+How about adding rcu readlock with closest function 
+kvm_update_stolen_time()?
+
+  static int kvm_check_requests(struct kvm_vcpu *vcpu)
+  {
++       int idx;
++
+         if (!kvm_request_pending(vcpu))
+                 return RESUME_GUEST;
+
+@@ -213,8 +215,11 @@ static int kvm_check_requests(struct kvm_vcpu *vcpu)
+         if (kvm_dirty_ring_check_request(vcpu))
+                 return RESUME_HOST;
+
+-       if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
++       if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu)) {
++               idx = srcu_read_lock(&vcpu->kvm->srcu);
+                 kvm_update_stolen_time(vcpu);
++               srcu_read_unlock(&vcpu->kvm->srcu, idx);
++       }
+
+         return RESUME_GUEST;
+  }
+
+Both method look good to me.
+
+Regards
+Bibo Mao
+
 
