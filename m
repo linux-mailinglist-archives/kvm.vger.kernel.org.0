@@ -1,271 +1,400 @@
-Return-Path: <kvm+bounces-32934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC209E2130
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 16:08:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AA69E2269
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 16:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15254286320
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 15:08:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5980FB2C896
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 14:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 959321F75BD;
-	Tue,  3 Dec 2024 15:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDCD1F4717;
+	Tue,  3 Dec 2024 14:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlFz6KbN"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bz//0v3y"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5073E1F75A6
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 15:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1D217BB16;
+	Tue,  3 Dec 2024 14:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733238475; cv=none; b=dmadrCMvVkOIpTp6HgSVnk/VYtpctYKMBGRWyfcfMTvvkHrNsjARQu+A2Ouo/iuWs6ELGTvsdC3uKfS/lKNZwoR2WjXtKNraa8pqPNSCHIilnpjjOKDAwU/Rcwj/g4GkiZP5IpF7QqH3wo4KtpXUIRbSen79pe0Zhf+1A32fryA=
+	t=1733235617; cv=none; b=Wvvxw6YpdOp3eX2rBqUdqqBXTEHB0m2M3x+A470D3/nDFZpiSAL2CpfMjSfclYeZ/E8Mci+lwGnu3nZE5ZtMuK0/o1ECw3YS9364E82u8pyCYWeTmixbL5Z7mcfTduw58M0zLDWHkKZeyd819KBzqm2KxFLmReLKHAUPzZ3QQy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733238475; c=relaxed/simple;
-	bh=dVgKSkGnZXZhsq1kQNLJnniFbw3xKNx16SzezHEG9CQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MdSZj3AYwrqTAFuitE83ZMd6EFMby08EZ5mRRUdRGBpwxzBUpLhtbzcd3jc7DohvP2SROKgIIoQ4qhbNK7jxu7JUHVio0P2+p8o9eIz3om2te5g+NqzqXlt5+iCzBIb06DDTgsSeOhjqXhqHiW8YQQoDgVqpkEtzKsH+6Cuzljo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KlFz6KbN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733238469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hNslBpXHlM7U1V+HxZpEwfEmxtrjgHkdVPnxHVlsPRQ=;
-	b=KlFz6KbN7hy03ib06KF0kFKzJOjx4ImTCzqKoL8kZkpSmkSXVUgDhbjiTbCjzooTKqbYNe
-	fU/X5/fLBHtg7B7XQ8aGJHHsolX4o1PX6tAn/M3d0b3F2fo8nmnwdgFNp5GtFToatiIRtz
-	tX2M1HTSKFtYahEtippNLXqlqmkFakw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-EBYsNGKzNz-T_y4yLdHtdg-1; Tue, 03 Dec 2024 10:07:47 -0500
-X-MC-Unique: EBYsNGKzNz-T_y4yLdHtdg-1
-X-Mimecast-MFC-AGG-ID: EBYsNGKzNz-T_y4yLdHtdg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-434a73651e2so37092965e9.1
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 07:07:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733238466; x=1733843266;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hNslBpXHlM7U1V+HxZpEwfEmxtrjgHkdVPnxHVlsPRQ=;
-        b=f+yLwWWeNAhi7V+Ijfe8CXabmGzQgo34Jebun+Gh+lrebwENVTZQLJVB9KleOTsQ+t
-         +Nl1e2UmvINoe7zioNQatAK/UjPHyI7tyMaplQkYUINqcTTW54F4mVoeK+xI76hJYTSe
-         36EEHv9FoUVkiF4qPu/QfNPSwvI5vAJs+KMD8Bw/7gT51M9XpCtPrgy0s/lk2wjD0h7i
-         UTWRZ2xGc0VTyInI4c7wbiLdGtxL+m8YqBmmiCT/D3qvkqR6p6x18YWBaFMn0W1Kva0s
-         JLlnNVet1UWJSJUItk+h73aTIWBeRIH5RAPsfYQ2nMwnoQr9yo0RUg9T0GTgo1HpQzGv
-         FlRw==
-X-Gm-Message-State: AOJu0Yy6s762IicT6C0jcfzltI7xArlUyvh1sO2L6bnEMSjmFlWSuhLL
-	Plm0Et6UWUt26zC1QCfJAjI+kBlMm4PJvijTg6T+wU8++mZLXAU6F0mKAwmhjrvmQfTlSCQPLNr
-	BqwWMAdBa4WgzYsAiRK1z301XRGDxFP9Mpp2+CwgE1l0aAaab4g==
-X-Gm-Gg: ASbGnctrEakp+LVoKrOnAhMUZBkMfszhhjzf16mSdyfd7x2aItPl+u+izhzhwoAC58n
-	hPni92BAexHn16QVomVSLlkbtENAGCLTlJxLDMkIxHRq6scJwg4g8lR6Q0mZzgxeQLD49X60BOq
-	LwwoR1+wDvK4TyF++9Mq2pNOQleDkN38VzaunPmyEp1WCFhbxOngPWoJ0DhAAAlSCJ9zwEuomkp
-	W7ab5awQobRvEWmgscpVRpj7DKce72FQtHP0xZ8Ole4P+mwD1WcXR/kuvdOHAJHBfEYRqJrhq6+
-	aZkHPhKvEEtB
-X-Received: by 2002:a5d:64c2:0:b0:385:f9db:3c58 with SMTP id ffacd0b85a97d-385fd532aa5mr2468220f8f.49.1733238464741;
-        Tue, 03 Dec 2024 07:07:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGbNdvzdz18eI6yDOtajAvf4AgQhJeHzryoJM5oP+G07WIkdGvshuTLhEDrfpX9ke+32LOl9w==
-X-Received: by 2002:a5d:64c2:0:b0:385:f9db:3c58 with SMTP id ffacd0b85a97d-385fd532aa5mr2468181f8f.49.1733238464301;
-        Tue, 03 Dec 2024 07:07:44 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f32837sm196881385e9.33.2024.12.03.07.07.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 07:07:43 -0800 (PST)
-Message-ID: <c69d6fc7-ab18-48f5-9e23-e0f947f8840e@redhat.com>
-Date: Tue, 3 Dec 2024 16:07:42 +0100
+	s=arc-20240116; t=1733235617; c=relaxed/simple;
+	bh=s2SqqMNG8bkReQAgImrfGF1AvrnPnThhdA7ZNCRj1jE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=em8QtPNrk8sV0z+NIOE7t2J+uW2oBjkES5dY/AOq8WJGqYn58u0tuAq6tYeXLJ5h7yPlzdsrR/p7IzKGLABr+DjrTs7Mm36m36y2FRYq29IIbOYwtfsy34PzTvPtIRjJy+GX2D7SISqToUuGVAGT9oEKczeq2v4yy1QuCmnzKP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bz//0v3y; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id BDF8040E021C;
+	Tue,  3 Dec 2024 14:20:11 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id TdUGDkFbDPTk; Tue,  3 Dec 2024 14:20:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733235607; bh=BZeJ1b95eAqJbQxIv6AsrDch7h30Uxh79jYaoVPQxk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bz//0v3y5+ecRmZTqMCe+UzAJ8Zql5zCw6Kk6qGF7LoqEDos18vkLiP6WTiot6EoZ
+	 0DUOJ7qyGXWr9ILsKJnUAauACWOWxQV/6QHN5zjN/txF8ejD+mBdsznJ6y2wksYWrg
+	 oD7A9c7RCb2diE3DxLq7Z/EftTx+9WwWi3O6bpS1I1NGGDrDMAlkrw/NFNTcCYc5RX
+	 GNAudwMxdMCSKwPSV0ZDZHlTbbWzbqwef5B4j9v4tPebcEdhUA1mdnB7DNgX8j/ptF
+	 sZvzZuSOOvPazqux+lYKu8g+vRh8fGLmQ0WmclorpVJLIFiY5Y8UdA2/BrdbxFvOJk
+	 SY4WRSBiF8OJGgRmC+t2UYw8xN8qYz1yrwFGJwn3xCHyd7dp1q8JHiPnTWOcx5vZsP
+	 MivRQC3lbutkSg/PphVUFyy2tYN2J03ph2/XW16YaJCZWpHi9wzCd/qr74oPsm+lxq
+	 m+MrXo2YWeWE/5qrLN5arXcj/2B083EgLERhniYxYnYQ6Jf48euTTN4dnuZAVsJt0b
+	 krROaXWAdf7MA3t7taUYZ7h5tEPpexveQtAJzMcXWaoh6LgzXcjE11f2RDd4axFhFq
+	 scgT/GPQ4n5PUiYJtWWVmv1Xx/GFBcF9xB8N0Uc7bGCw2zA2RYi5d9zhvdtQVoiKmo
+	 YGDVwXZy0IDU20Ds3UZRGLfU=
+Received: from zn.tnic (pd9530b86.dip0.t-ipconnect.de [217.83.11.134])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 73C3B40E0163;
+	Tue,  3 Dec 2024 14:19:56 +0000 (UTC)
+Date: Tue, 3 Dec 2024 15:19:50 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 01/13] x86/sev: Carve out and export SNP guest
+ messaging init routines
+Message-ID: <20241203141950.GCZ08ThrMOHmDFeaa2@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-2-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vfio/mlx5: Align the page tracking max message size with
- the device capability
-To: Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
- jgg@nvidia.com
-Cc: kvm@vger.kernel.org, kevin.tian@intel.com, joao.m.martins@oracle.com,
- maorg@nvidia.com, galshalom@nvidia.com
-References: <20241125113249.155127-1-yishaih@nvidia.com>
-Content-Language: en-US, fr
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Autocrypt: addr=clg@redhat.com; keydata=
- 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
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20241125113249.155127-1-yishaih@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241203090045.942078-2-nikunj@amd.com>
 
-Hello Yishai,
+On Tue, Dec 03, 2024 at 02:30:33PM +0530, Nikunj A Dadhania wrote:
+> Currently, the sev-guest driver is the only user of SNP guest messaging.
+> All routines for initializing SNP guest messaging are implemented within
+> the sev-guest driver and are not available during early boot. In
+> prepratation for adding Secure TSC guest support, carve out APIs to
 
-On 11/25/24 12:32, Yishai Hadas wrote:
-> Align the page tracking maximum message size with the device's
-> capability instead of relying on PAGE_SIZE.
-> 
-> This adjustment resolves a mismatch on systems where PAGE_SIZE is 64K,
-> but the firmware only supports a maximum message size of 4K.
-> 
-> Now that we rely on the device's capability for max_message_size, we
-> must account for potential future increases in its value.
-> 
-> Key considerations include:
-> - Supporting message sizes that exceed a single system page (e.g., an 8K
->    message on a 4K system).
-> - Ensuring the RQ size is adjusted to accommodate at least 4
->    WQEs/messages, in line with the device specification.
+Unknown word [prepratation] in commit message.
+Suggestions: ['preparation', 'preparations', 'reparation', 'perpetration', 'reputation', 'perpetuation', 'peroration', 'presentation', 'repatriation', 'propagation', "preparation's"]
 
-Perhaps theses changes deserve two separate patches ?
+Please introduce a spellchecker into your patch creation workflow.
 
+> allocate and initialize guest messaging descriptor context and make it part
+> of coco/sev/core.c. As there is no user of sev_guest_platform_data anymore,
+> remove the structure.
 > 
-> The above has been addressed as part of the patch.
-> 
-> Fixes: 79c3cf279926 ("vfio/mlx5: Init QP based resources for dirty tracking")
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->   drivers/vfio/pci/mlx5/cmd.c | 47 +++++++++++++++++++++++++++----------
->   1 file changed, 35 insertions(+), 12 deletions(-)
+>  arch/x86/include/asm/sev.h              |  24 ++-
+>  arch/x86/coco/sev/core.c                | 183 +++++++++++++++++++++-
+>  drivers/virt/coco/sev-guest/sev-guest.c | 197 +++---------------------
+>  arch/x86/Kconfig                        |   1 +
+>  drivers/virt/coco/sev-guest/Kconfig     |   1 -
+>  5 files changed, 220 insertions(+), 186 deletions(-)
 > 
-> diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-> index 7527e277c898..a61d303d9b6a 100644
-> --- a/drivers/vfio/pci/mlx5/cmd.c
-> +++ b/drivers/vfio/pci/mlx5/cmd.c
-> @@ -1517,7 +1517,8 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
->   	struct mlx5_vhca_qp *host_qp;
->   	struct mlx5_vhca_qp *fw_qp;
->   	struct mlx5_core_dev *mdev;
-> -	u32 max_msg_size = PAGE_SIZE;
-> +	u32 log_max_msg_size;
-> +	u32 max_msg_size;
->   	u64 rq_size = SZ_2M;
->   	u32 max_recv_wr;
->   	int err;
-> @@ -1534,6 +1535,12 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
->   	}
->   
->   	mdev = mvdev->mdev;
-> +	log_max_msg_size = MLX5_CAP_ADV_VIRTUALIZATION(mdev, pg_track_log_max_msg_size);
-> +	max_msg_size = (1ULL << log_max_msg_size);
-> +	/* The RQ must hold at least 4 WQEs/messages for successful QP creation */
-> +	if (rq_size < 4 * max_msg_size)
-> +		rq_size = 4 * max_msg_size;
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 91f08af31078..f78c94e29c74 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -14,6 +14,7 @@
+>  #include <asm/insn.h>
+>  #include <asm/sev-common.h>
+>  #include <asm/coco.h>
+> +#include <asm/set_memory.h>
+>  
+>  #define GHCB_PROTOCOL_MIN	1ULL
+>  #define GHCB_PROTOCOL_MAX	2ULL
+> @@ -170,10 +171,6 @@ struct snp_guest_msg {
+>  	u8 payload[PAGE_SIZE - sizeof(struct snp_guest_msg_hdr)];
+>  } __packed;
+>  
+> -struct sev_guest_platform_data {
+> -	u64 secrets_gpa;
+> -};
+> -
+>  struct snp_guest_req {
+>  	void *req_buf;
+>  	size_t req_sz;
+> @@ -253,6 +250,7 @@ struct snp_msg_desc {
+>  
+>  	u32 *os_area_msg_seqno;
+>  	u8 *vmpck;
+> +	int vmpck_id;
+>  };
+>  
+>  /*
+> @@ -458,6 +456,20 @@ void set_pte_enc_mask(pte_t *kpte, unsigned long pfn, pgprot_t new_prot);
+>  void snp_kexec_finish(void);
+>  void snp_kexec_begin(void);
+>  
+> +static inline bool snp_is_vmpck_empty(struct snp_msg_desc *mdesc)
+> +{
+> +	static const char zero_key[VMPCK_KEY_LEN] = {0};
 > +
->   	memset(tracker, 0, sizeof(*tracker));
->   	tracker->uar = mlx5_get_uars_page(mdev);
->   	if (IS_ERR(tracker->uar)) {
-> @@ -1623,25 +1630,41 @@ set_report_output(u32 size, int index, struct mlx5_vhca_qp *qp,
->   {
->   	u32 entry_size = MLX5_ST_SZ_BYTES(page_track_report_entry);
->   	u32 nent = size / entry_size;
-> +	u32 nent_in_page;
-> +	u32 nent_to_set;
->   	struct page *page;
-> +	void *page_start;
+> +	if (mdesc->vmpck)
+> +		return !memcmp(mdesc->vmpck, zero_key, VMPCK_KEY_LEN);
+> +
+> +	return true;
+> +}
 
-A variable name of 'kaddr' would reflect better that this is a mapping.
+This function looks silly in a header with that array allocation.
 
-> +	u32 page_offset;
-> +	u32 page_index;
-> +	u32 buf_offset;
+I think you should simply do:
 
-I would move these declarations below under the 'do {} while' loop
-A part from that, it looks good.
+	if (memchr_inv(mdesc->vmpck, 0, VMPCK_KEY_LEN))
 
-I haven't seen any issues on x86 and I have asked QE to test with
-a 64k kernel on ARM
+at the call sites and not have this helper at all.
 
-Thanks,
-C.
+But please do verify whether what I'm saying actually makes sense and if it
+does, this can be a cleanup pre-patch.
 
 
->   	u64 addr;
->   	u64 *buf;
->   	int i;
->   
-> -	if (WARN_ON(index >= qp->recv_buf.npages ||
-> +	buf_offset = index * qp->max_msg_size;
-> +	if (WARN_ON(buf_offset + size >= qp->recv_buf.npages * PAGE_SIZE ||
->   		    (nent > qp->max_msg_size / entry_size)))
->   		return;
->   
-> -	page = qp->recv_buf.page_list[index];
-> -	buf = kmap_local_page(page);
-> -	for (i = 0; i < nent; i++) {
-> -		addr = MLX5_GET(page_track_report_entry, buf + i,
-> -				dirty_address_low);
-> -		addr |= (u64)MLX5_GET(page_track_report_entry, buf + i,
-> -				      dirty_address_high) << 32;
-> -		iova_bitmap_set(dirty, addr, qp->tracked_page_size);
+> +
+> +int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id);
+> +struct snp_msg_desc *snp_msg_alloc(void);
+> +void snp_msg_free(struct snp_msg_desc *mdesc);
+> +
+>  #else	/* !CONFIG_AMD_MEM_ENCRYPT */
+>  
+>  #define snp_vmpl 0
+> @@ -498,6 +510,10 @@ static inline int prepare_pte_enc(struct pte_enc_desc *d) { return 0; }
+>  static inline void set_pte_enc_mask(pte_t *kpte, unsigned long pfn, pgprot_t new_prot) { }
+>  static inline void snp_kexec_finish(void) { }
+>  static inline void snp_kexec_begin(void) { }
+> +static inline bool snp_is_vmpck_empty(struct snp_msg_desc *mdesc) { return false; }
+> +static inline int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id) { return -1; }
+> +static inline struct snp_msg_desc *snp_msg_alloc(void) { return NULL; }
+> +static inline void snp_msg_free(struct snp_msg_desc *mdesc) { }
+>  
+>  #endif	/* CONFIG_AMD_MEM_ENCRYPT */
+>  
+> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+> index c5b0148b8c0a..3cc741eefd06 100644
+> --- a/arch/x86/coco/sev/core.c
+> +++ b/arch/x86/coco/sev/core.c
+> @@ -25,6 +25,7 @@
+>  #include <linux/psp-sev.h>
+>  #include <linux/dmi.h>
+>  #include <uapi/linux/sev-guest.h>
+> +#include <crypto/gcm.h>
+>  
+>  #include <asm/init.h>
+>  #include <asm/cpu_entry_area.h>
+> @@ -2580,15 +2581,9 @@ static struct platform_device sev_guest_device = {
+>  
+>  static int __init snp_init_platform_device(void)
+>  {
+> -	struct sev_guest_platform_data data;
+> -
+>  	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+>  		return -ENODEV;
+>  
+> -	data.secrets_gpa = secrets_pa;
+> -	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
+> -		return -ENODEV;
+> -
+>  	if (platform_device_register(&sev_guest_device))
+>  		return -ENODEV;
+>  
+> @@ -2667,3 +2662,179 @@ static int __init sev_sysfs_init(void)
+>  }
+>  arch_initcall(sev_sysfs_init);
+>  #endif // CONFIG_SYSFS
+> +
+> +static void free_shared_pages(void *buf, size_t sz)
+> +{
+> +	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!buf)
+> +		return;
+> +
+> +	ret = set_memory_encrypted((unsigned long)buf, npages);
+> +	if (ret) {
+> +		WARN_ONCE(ret, "failed to restore encryption mask (leak it)\n");
+
+Looking at where this lands:
+
+set_memory_encrypted
+|-> __set_memory_enc_dec
+
+and that doing now:
+
+        if (cc_platform_has(CC_ATTR_MEM_ENCRYPT)) {
+                if (!down_read_trylock(&mem_enc_lock))
+                        return -EBUSY;
+
+
+after
+
+859e63b789d6 ("x86/tdx: Convert shared memory back to private on kexec")
+
+we probably should pay attention to this here firing and maybe turning that
+_trylock() into a normal down_read*
+
+Anyway, just something to pay attention to in the future.
+
+> +		return;
+> +	}
+> +
+> +	__free_pages(virt_to_page(buf), get_order(sz));
+> +}
+
+...
+
+> +struct snp_msg_desc *snp_msg_alloc(void)
+> +{
+> +	struct snp_msg_desc *mdesc;
+> +	void __iomem *mem;
+> +
+> +	BUILD_BUG_ON(sizeof(struct snp_guest_msg) > PAGE_SIZE);
+> +
+> +	mdesc = kzalloc(sizeof(struct snp_msg_desc), GFP_KERNEL);
+
+The above ones use GFP_KERNEL_ACCOUNT. What's the difference?
+
+> +	if (!mdesc)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	mem = ioremap_encrypted(secrets_pa, PAGE_SIZE);
+> +	if (!mem)
+> +		goto e_free_mdesc;
+> +
+> +	mdesc->secrets = (__force struct snp_secrets_page *)mem;
+> +
+> +	/* Allocate the shared page used for the request and response message. */
+> +	mdesc->request = alloc_shared_pages(sizeof(struct snp_guest_msg));
+> +	if (!mdesc->request)
+> +		goto e_unmap;
+> +
+> +	mdesc->response = alloc_shared_pages(sizeof(struct snp_guest_msg));
+> +	if (!mdesc->response)
+> +		goto e_free_request;
+> +
+> +	mdesc->certs_data = alloc_shared_pages(SEV_FW_BLOB_MAX_SIZE);
+> +	if (!mdesc->certs_data)
+> +		goto e_free_response;
+> +
+> +	/* initial the input address for guest request */
+> +	mdesc->input.req_gpa = __pa(mdesc->request);
+> +	mdesc->input.resp_gpa = __pa(mdesc->response);
+> +	mdesc->input.data_gpa = __pa(mdesc->certs_data);
+> +
+> +	return mdesc;
+> +
+> +e_free_response:
+> +	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
+> +e_free_request:
+> +	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
+> +e_unmap:
+> +	iounmap(mem);
+> +e_free_mdesc:
+> +	kfree(mdesc);
+> +
+> +	return ERR_PTR(-ENOMEM);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_msg_alloc);
+> +
+> +void snp_msg_free(struct snp_msg_desc *mdesc)
+> +{
+> +	if (!mdesc)
+> +		return;
+> +
+> +	mdesc->vmpck = NULL;
+> +	mdesc->os_area_msg_seqno = NULL;
+
+	memset(mdesc, ...);
+
+at the end instead of those assignments.
+
+> +	kfree(mdesc->ctx);
+> +
+> +	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
+> +	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
+> +	iounmap((__force void __iomem *)mdesc->secrets);
+
+
+> +	kfree(mdesc);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_msg_free);
+> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> index b699771be029..5268511bc9b8 100644
+> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+
+...
+
+> @@ -993,115 +898,57 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>  	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+>  		return -ENODEV;
+>  
+> -	if (!dev->platform_data)
+> -		return -ENODEV;
+> -
+> -	data = (struct sev_guest_platform_data *)dev->platform_data;
+> -	mapping = ioremap_encrypted(data->secrets_gpa, PAGE_SIZE);
+> -	if (!mapping)
+> -		return -ENODEV;
+> -
+> -	secrets = (__force void *)mapping;
+> -
+> -	ret = -ENOMEM;
+>  	snp_dev = devm_kzalloc(&pdev->dev, sizeof(struct snp_guest_dev), GFP_KERNEL);
+>  	if (!snp_dev)
+> -		goto e_unmap;
+> -
+> -	mdesc = devm_kzalloc(&pdev->dev, sizeof(struct snp_msg_desc), GFP_KERNEL);
+> -	if (!mdesc)
+> -		goto e_unmap;
+> -
+> -	/* Adjust the default VMPCK key based on the executing VMPL level */
+> -	if (vmpck_id == -1)
+> -		vmpck_id = snp_vmpl;
+> +		return -ENOMEM;
+>  
+> -	ret = -EINVAL;
+> -	mdesc->vmpck = get_vmpck(vmpck_id, secrets, &mdesc->os_area_msg_seqno);
+> -	if (!mdesc->vmpck) {
+> -		dev_err(dev, "Invalid VMPCK%d communication key\n", vmpck_id);
+> -		goto e_unmap;
 > -	}
-> -	kunmap_local(buf);
-> +	do {
-> +		page_index = buf_offset / PAGE_SIZE;
-> +		page_offset = buf_offset % PAGE_SIZE;
-> +		nent_in_page = (PAGE_SIZE - page_offset) / entry_size;
-> +		page = qp->recv_buf.page_list[page_index];
-> +		page_start = kmap_local_page(page);
-> +		buf = page_start + page_offset;
-> +		nent_to_set = min(nent, nent_in_page);
-> +		for (i = 0; i < nent_to_set; i++) {
-> +			addr = MLX5_GET(page_track_report_entry, buf + i,
-> +					dirty_address_low);
-> +			addr |= (u64)MLX5_GET(page_track_report_entry, buf + i,
-> +					      dirty_address_high) << 32;
-> +			iova_bitmap_set(dirty, addr, qp->tracked_page_size);
-> +		}
-> +		kunmap_local(page_start);
-> +		buf_offset += (nent_to_set * entry_size);
-> +		nent -= nent_to_set;
-> +	} while (nent);
->   }
->   
->   static void
+> +	mdesc = snp_msg_alloc();
+> +	if (IS_ERR_OR_NULL(mdesc))
+> +		return -ENOMEM;
+>  
+> -	/* Verify that VMPCK is not zero. */
+> -	if (is_vmpck_empty(mdesc)) {
+> -		dev_err(dev, "Empty VMPCK%d communication key\n", vmpck_id);
+> -		goto e_unmap;
+> -	}
+> +	ret = snp_msg_init(mdesc, vmpck_id);
+> +	if (ret)
+> +		return -EIO;
 
+You just leaked mdesc here.
+
+Audit all your error paths.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
