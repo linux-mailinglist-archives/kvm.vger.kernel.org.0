@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-32873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F1A9E10A6
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 02:04:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EBE9E10A0
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 02:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEBE5281BC3
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 01:04:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28B5F280718
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 01:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B538217E900;
-	Tue,  3 Dec 2024 01:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B97D127E18;
+	Tue,  3 Dec 2024 01:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aUlKwO1t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SiPdOf6k"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CDE13BC26;
-	Tue,  3 Dec 2024 01:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C88238DDB;
+	Tue,  3 Dec 2024 01:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733187822; cv=none; b=j4WEMgl7XZ/2b6V+RctmGMpnatD8Ofyz19ZvZdw5Y+ph/rFjrfl96s0ahjcyU9bSiWR+BVO6UseQ9hc/Z2ILEj/uAyco5S39vhoanpAtzrIPpqlKdTROEyHzf0BhP2Awcvl1b8ScBnZNmYyaQqgRetrVL0Ry31a8D+05tgk3boA=
+	t=1733187819; cv=none; b=Qzl2pd+xEsuTXdLS8RqK4Bl38USOcE6LkSDCFDXrlAgU5RcgpRAGJlgsrrnWfRxQqyCWODM1B8y7ZRxu00jcDYidA+Mv7lX50hz49LGwtlYUaGXUfWjnUxj7zn7qGxgBmXvZy7m1/ynBoEN+lQhU+oadI3XjEHfiOOmGD/Ydus0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733187822; c=relaxed/simple;
-	bh=XgIw8C4zc2FbMwSPSQQEBwUlwsGZvZvMBluPPlEeKN4=;
+	s=arc-20240116; t=1733187819; c=relaxed/simple;
+	bh=54DU+ONjh4pkPzhTAsMKat9UD+OUecZLuC3YL4VA5Jg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=so+xJgPhSDLPLJbnH5yT/DXq4rrcMNn2rO5cD5aNbun7zZqAwmV80xn7Y6D/Bt80M/lVsUueovN48VUmcfKyWx/IHKrh36h6V7AKADtC4plH1Kw/0//yJ6gYudGvjJEfWza4ae/l6NKueimBp1Q6ZZoH83tC4rqw7/EwHgLxPDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aUlKwO1t; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=mDXrSAwg1O3iuVC0sJvyg2+VEYJj7WRSqwlPUMBPZZV5YTA27KP/5B1ffekx0R6yGoRldrdSpSO+akC7+gGp+73sPCBQQPPnvLaYC/4ecsvZvnypwfe0JfytbpGxPf6/2ugAONvKm3kzYY2L2mBiTzjL19M+p0sjA6rKQEpYTsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SiPdOf6k; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733187821; x=1764723821;
+  t=1733187818; x=1764723818;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XgIw8C4zc2FbMwSPSQQEBwUlwsGZvZvMBluPPlEeKN4=;
-  b=aUlKwO1tzdF8D6v+8QvghUqRpRwm/V5MnO5brnvRSwILijkxB7KZ2S0h
-   9NLk1cSfKASqf8qE78CaUOD+Uijh6flH7CLl4XXIkGzavvrmGj423Uuhk
-   Ok4R+wUKKjNVq8Qm4dGa7ggZNJ0gbUZ0NuBYxj8l7bSHuGh5HGCMz/8xF
-   StfM0YNecFb6aIStOUGNaswAl9lBD4WCdkUyMfUIVbGCJfIpbeSsZsC42
-   OVmSEB2K9MIMNgdJhnOV4BsFxesWfj1Q3xE0ULZ0mHBSRGtzydNFJBhiH
-   YkVMcBBYp52SUwhKYekOKqfarWgNhJyQlWkvx0Zsv1q7rEozYQn7y8tph
-   Q==;
-X-CSE-ConnectionGUID: guNICuOiSBm4nndHwKj1vQ==
-X-CSE-MsgGUID: PheE++vQSNWZoxv9TrzhHw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="36237985"
+  bh=54DU+ONjh4pkPzhTAsMKat9UD+OUecZLuC3YL4VA5Jg=;
+  b=SiPdOf6keHa2RbHiqilztUYmNqiFr1pfnnUrpwuSZhB7vuzQiaKNeueO
+   V5+nPtQkNlTVfXLn4QavPr8gDpxN3ApSNZw8pYoFv8xGrA0WNzRxCcq1e
+   vsGDcYpsx0ZdW0wTZRtQ1FJyQMRpsSFe2u81uEUTBReCgu7Ea0nGXNKlX
+   1scTR1iIU0vNW/IdOSLYDE4JdbP8mE+JBHkZWz34eEc9XGcVe1hZ3F0TV
+   BQXJ7e3OcdABUUn6aZyokfK0Q2+To29nLS3bIbqB2TkI86h3HQpb/l1Hz
+   MyOi1E9202N9JODbw8ApAX5t4oNLZgVPnuSqLTUnxHn3GDjpVPZ7LS4u3
+   A==;
+X-CSE-ConnectionGUID: KZVbm9IzQPOQVfhV3jLPug==
+X-CSE-MsgGUID: V+tf/fnqQ1inTnITZfHazg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="36237964"
 X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="36237985"
+   d="scan'208";a="36237964"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 17:03:35 -0800
-X-CSE-ConnectionGUID: at0paRHoTHyktfHPe+BhHA==
-X-CSE-MsgGUID: uraSvL7rSyWUEXgO90iWgg==
+X-CSE-ConnectionGUID: IpUsdDMERxeA+bnUhyRJtQ==
+X-CSE-MsgGUID: HilZh7QzTLCppxwX9+G2SA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="116535803"
+   d="scan'208";a="116535806"
 Received: from jairdeje-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.223.7])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 17:03:27 -0800
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 17:03:28 -0800
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: kvm@vger.kernel.org,
 	pbonzini@redhat.com,
@@ -75,9 +75,9 @@ Cc: isaku.yamahata@gmail.com,
 	Isaku Yamahata <isaku.yamahata@intel.com>,
 	Binbin Wu <binbin.wu@linux.intel.com>,
 	Yuan Yao <yuan.yao@intel.com>
-Subject: [RFC PATCH v2 5/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX VM/vCPU field access
-Date: Mon,  2 Dec 2024 17:03:15 -0800
-Message-ID: <20241203010317.827803-6-rick.p.edgecombe@intel.com>
+Subject: [RFC PATCH v2 6/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX flush operations
+Date: Mon,  2 Dec 2024 17:03:16 -0800
+Message-ID: <20241203010317.827803-7-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241203010317.827803-1-rick.p.edgecombe@intel.com>
 References: <20241203010317.827803-1-rick.p.edgecombe@intel.com>
@@ -90,19 +90,21 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Intel TDX protects guest VMs from malicious host and certain physical
-attacks. The TDX module has TD scoped and vCPU scoped "metadata fields".
-These fields are a bit like VMCS fields, and stored in data structures
-maintained by the TDX module. Export 3 SEAMCALLs for use in reading and
-writing these fields:
+attacks. The TDX module has the concept of flushing vCPUs. These flushes
+include both a flush of the translation caches and also any other state
+internal to the TDX module. Before freeing a KeyID, this flush operation
+needs to be done. KVM will need to perform the flush on each pCPU
+associated with the TD, and also perform a TD scoped operation that checks
+if the flush has been done on all vCPU's associated with the TD.
 
-Make tdh_mng_rd() use MNG.VP.RD to read the TD scoped metadata.
+Add a tdh_vp_flush() function to be used to call TDH.VP.FLUSH on each pCPU
+associated with the TD during TD teardown. It will also be called when
+disabling TDX and during vCPU migration between pCPUs.
 
-Make tdh_vp_rd()/tdh_vp_wr() use TDH.VP.RD/WR to read/write the vCPU
-scoped metadata.
-
-KVM will use these by creating inline helpers that target various metadata
-sizes. Export the raw SEAMCALL leaf, to avoid exporting the large number
-of various sized helpers.
+Add tdh_mng_vpflushdone() to be used by KVM to call TDH.MNG.VPFLUSHDONE.
+KVM will use this during TD teardown to verify that TDH.VP.FLUSH has been
+called sufficiently, and advance the state machine that will allow for
+reclaiming the TD's KeyID.
 
 Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
@@ -140,119 +142,68 @@ v18:
  - Make tdx_seamcall() use struct tdx_module_args instead of taking
    each inputs.
 ---
- arch/x86/include/asm/tdx.h  |  3 +++
- arch/x86/virt/vmx/tdx/tdx.c | 47 +++++++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h |  3 +++
- 3 files changed, 53 insertions(+)
+ arch/x86/include/asm/tdx.h  |  2 ++
+ arch/x86/virt/vmx/tdx/tdx.c | 20 ++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h |  2 ++
+ 3 files changed, 24 insertions(+)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index f6ab8a9ea46b..9bc3c1160d43 100644
+index 9bc3c1160d43..bbb8f0bae9ba 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -147,9 +147,12 @@ u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page);
- u64 tdh_mng_key_config(struct tdx_td *td);
+@@ -148,6 +148,8 @@ u64 tdh_mng_key_config(struct tdx_td *td);
  u64 tdh_mng_create(struct tdx_td *td, u64 hkid);
  u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp);
-+u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
+ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
++u64 tdh_vp_flush(struct tdx_vp *vp);
++u64 tdh_mng_vpflushdone(struct tdx_td *td);
  u64 tdh_mng_key_freeid(struct tdx_td *td);
  u64 tdh_mng_init(struct tdx_td *td, u64 td_params, u64 *extended_err);
  u64 tdh_vp_init(struct tdx_vp *vp, u64 initial_rcx);
-+u64 tdh_vp_rd(struct tdx_vp *vp, u64 field, u64 *data);
-+u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask);
- u64 tdh_vp_init_apicid(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid);
- u64 tdh_phymem_page_reclaim(struct page *page, u64 *tdx_pt, u64 *tdx_owner, u64 *tdx_size);
- u64 tdh_phymem_cache_wb(bool resume);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index b2a1ed13d0da..6d35ea5b238f 100644
+index 6d35ea5b238f..b30ee1cff22f 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1643,6 +1643,23 @@ u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp)
+@@ -1660,6 +1660,26 @@ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data)
  }
- EXPORT_SYMBOL_GPL(tdh_vp_create);
+ EXPORT_SYMBOL_GPL(tdh_mng_rd);
  
-+u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data)
++u64 tdh_vp_flush(struct tdx_vp *vp)
++{
++	struct tdx_module_args args = {
++		.rcx = tdx_tdvpr_pa(vp),
++	};
++
++	return seamcall(TDH_VP_FLUSH, &args);
++}
++EXPORT_SYMBOL_GPL(tdh_vp_flush);
++
++u64 tdh_mng_vpflushdone(struct tdx_td *td)
 +{
 +	struct tdx_module_args args = {
 +		.rcx = tdx_tdr_pa(td),
-+		.rdx = field,
 +	};
-+	u64 ret;
 +
-+	ret = seamcall_ret(TDH_MNG_RD, &args);
-+
-+	/* R8: Content of the field, or 0 in case of error. */
-+	*data = args.r8;
-+
-+	return ret;
++	return seamcall(TDH_MNG_VPFLUSHDONE, &args);
 +}
-+EXPORT_SYMBOL_GPL(tdh_mng_rd);
++EXPORT_SYMBOL_GPL(tdh_mng_vpflushdone);
 +
  u64 tdh_mng_key_freeid(struct tdx_td *td)
  {
  	struct tdx_module_args args = {
-@@ -1680,6 +1697,36 @@ u64 tdh_vp_init(struct tdx_vp *vp, u64 initial_rcx)
- }
- EXPORT_SYMBOL_GPL(tdh_vp_init);
- 
-+u64 tdh_vp_rd(struct tdx_vp *vp, u64 field, u64 *data)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = tdx_tdvpr_pa(vp),
-+		.rdx = field,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_VP_RD, &args);
-+
-+	/* R8: Content of the field, or 0 in case of error. */
-+	*data = args.r8;
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(tdh_vp_rd);
-+
-+u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = tdx_tdvpr_pa(vp),
-+		.rdx = field,
-+		.r8 = data,
-+		.r9 = mask,
-+	};
-+
-+	return seamcall(TDH_VP_WR, &args);
-+}
-+EXPORT_SYMBOL_GPL(tdh_vp_wr);
-+
- u64 tdh_vp_init_apicid(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid)
- {
- 	struct tdx_module_args args = {
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 191bdd1e571d..5179fc02d109 100644
+index 5179fc02d109..08b01b7fe7c2 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -21,11 +21,13 @@
- #define TDH_VP_ADDCX			4
+@@ -22,6 +22,8 @@
  #define TDH_MNG_KEY_CONFIG		8
  #define TDH_MNG_CREATE			9
-+#define TDH_MNG_RD			11
+ #define TDH_MNG_RD			11
++#define TDH_VP_FLUSH			18
++#define TDH_MNG_VPFLUSHDONE		19
  #define TDH_VP_CREATE			10
  #define TDH_MNG_KEY_FREEID		20
  #define TDH_MNG_INIT			21
- #define TDH_VP_INIT			22
- #define TDH_PHYMEM_PAGE_RDMD		24
-+#define TDH_VP_RD			26
- #define TDH_PHYMEM_PAGE_RECLAIM		28
- #define TDH_SYS_KEY_CONFIG		31
- #define TDH_SYS_INIT			33
-@@ -34,6 +36,7 @@
- #define TDH_SYS_TDMR_INIT		36
- #define TDH_PHYMEM_CACHE_WB		40
- #define TDH_PHYMEM_PAGE_WBINVD		41
-+#define TDH_VP_WR			43
- #define TDH_SYS_CONFIG			45
- 
- /*
 -- 
 2.47.1
 
