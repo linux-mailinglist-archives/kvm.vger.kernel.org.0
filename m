@@ -1,201 +1,184 @@
-Return-Path: <kvm+bounces-32880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BB9C9E116A
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 03:39:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D798F9E1170
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 03:46:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78882B21AEC
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 02:39:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D3B7B22B4E
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 02:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E26153800;
-	Tue,  3 Dec 2024 02:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013231547F0;
+	Tue,  3 Dec 2024 02:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Ah8UhOYM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwFRtTk1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E29A1EA84
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 02:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8ED537E9;
+	Tue,  3 Dec 2024 02:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733193562; cv=none; b=d7jAEBfgiyU75WrDqN6CIWoCWnpLPOc6MBjhd0/CdvFlu2rUUjTY1PUqYNMba8CJuIv/ddSSZQenIfG1ZxK8ptYFNS7uZ4nfEosOsj9/5Eg3HlQ18aI1P+exKjvcw/eeduq/pw3/COxKxP1/oDEi8Fd/OqWjSARf0YyLMvOoDS4=
+	t=1733194007; cv=none; b=RvJlZRExT3VCe2wrC6ozAY6eSsR1yGikiOCwDj8g9zlP52avvJkMR4VH2CrK9ic941SHgQT8jysz5ruonI6+9ogOZCkYyrI2rom6mtn2QGqLuY2Vvs/1ZyK1CmxBQwE5yVo3y2MYzTtZ1Wfse6YKNdIPJZtBSPMgeHnbobwVOYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733193562; c=relaxed/simple;
-	bh=Wciq+UGMrwPpmcpdk2ePzToy1IWXDCRZbJxlRsomWD0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VlUkmDHoh/1uxN5PGGeO4atWAamwi5eDzkkR1aguxOGjEJCyUSFZMZyc/t4P2zfw63frNyGCHrztd/hSMPfpkbhdHv8alydZtgQFUjQQUGdRLHzO/NRXYdKFhlAYG4HaVSFd/kcJG+oxJVctzMMN4A3Kel9ogkMAQe0/L2rNei8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=Ah8UhOYM; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-843e3b49501so156728339f.0
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2024 18:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1733193559; x=1733798359; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=807AMPvhV08hQjY+W9FqkSX3XWvObJEHMlCsMJUuV3g=;
-        b=Ah8UhOYMwiuIRzQF2tHtSzwxS+d9Jok1zbzWwepke8U+ziFp3Go1c8s+6Rl6WkwC1C
-         T21oNTPM7zOvVWaLH5GWE+UGdxvmRPo9znPwW6dmPYND0nX2HGUx9lgWUbSF9SYtyDSd
-         NUENg9p8WlyS6yUQ+nW41J7p6+FBVGBztHTeR0md/5TUPCDRDrl3f5nDXKSNxM5nCHyR
-         3USwdRC3mlC9soKdK/TlqA2zh50R/cvWkYu6JBdNsyP3rtrJNl8XpOjsC7JU5zg5JweG
-         yTfB74+umDZyF5nrHuWA4t1cJfHghCagMp6hNgxtvJMxDYISfcvuuGX9RwlfowyPEVCy
-         FshA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733193559; x=1733798359;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=807AMPvhV08hQjY+W9FqkSX3XWvObJEHMlCsMJUuV3g=;
-        b=SBMLOVRJTCC5eGCnw94kNsJ0PGwt6QKMYy+TtMhEjNhd8789FHIhgIS3ZAoe4mmxxD
-         2Ein5rNf3NBv1bGus4bybFR+af2muaX3GiMVjcSF9l1ewj1hAxKq2daQSyZTwE7JGEan
-         OhmOd0QhAXsvMxd3hb54YYDJjGhUjto/XOvzSNws4hPaB3C+dFupRJ/3+DfyXiOR5NU/
-         C8oJNRaG5v1+8Ww3R0sEx0DSHS00t1yd/X2Z7UFf3i8DkYDNPAwx4ktaf9GwVms9Um7y
-         U9ILofg0kqYLKnDvT4+KByrSdAwBLpQM0Bjt0Uic8MTT8FBiXt3DjxXtwCRzXkOjmUv4
-         GKeg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRhJr78oiQOwJEl6UgcGWNudg978B2JlIfV0bTbPUNJtwUFssGUHUZIWv4K6bmf5E5Xk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmTvfwuwk51a9nMfISzgzNpKJLdsCcm9km4XdKbT10MfoNB+Mg
-	V/fqAZpnrdKg/RZXMKHcDDAS3/2xgredPeupOFk+C9OtZn1L0kQIdXS34I0JLgA=
-X-Gm-Gg: ASbGncstGyB95XspZE7Td58YUUlMY7niVwps7wYicAl85o+0YTWGK7QfDgPN8IX+va5
-	BvUXjKW+0gnUJYgku6QuD+NYqr8uj/MHk6BLeQhW2WfVyTP9MEOThsAWvJlJFjlcEH+Wq7ZQftm
-	DWKZo8CruzwkleJqXvQzbI+UHjfbP60rBRpie4kjDUXuPGd7YFnhyJRlinfqGF9nEGElOfA2Jzc
-	rlkENhAYStzRDQTi6KuSKEeBaBLbsPdzgOumrLkvVblDHDtagamQ1g25EZBXrLs8LxWR2DsPyo=
-X-Google-Smtp-Source: AGHT+IHd7BOnDkCqoWQpQn9axYX9LaHCjBDlODl0yRpMhp5QCmkH+d5KKW0iQf5wP+UEGLbQlYkP4Q==
-X-Received: by 2002:a05:6602:3405:b0:841:a1c0:c058 with SMTP id ca18e2360f4ac-8445b577d49mr152097239f.9.1733193559650;
-        Mon, 02 Dec 2024 18:39:19 -0800 (PST)
-Received: from [100.64.0.1] ([147.124.94.167])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e230da8f03sm2387687173.17.2024.12.02.18.39.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 18:39:18 -0800 (PST)
-Message-ID: <b48c4319-1fbc-4703-88d2-6f495af9c24e@sifive.com>
-Date: Mon, 2 Dec 2024 20:39:17 -0600
+	s=arc-20240116; t=1733194007; c=relaxed/simple;
+	bh=xKVi89L7ac97ndmNAqbzFdCpSOEK1iUEUOiBRblPYRY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kGvow3+1oQGdhRiaMDSnFS6Qqky8O/QaRY1H6bdx/4TzAo110bE4AiM0tRrh75h5TnCGm9gAt5ZSSPyK/0gxxsXHN0B9kDAm7Ea08gB5+hYvRkQeNF23ov0jmHQshT/c/XI8pLYn489eQKD01nbhc02cweOuGQHJEZVbYZu20pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwFRtTk1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C79AEC4CED1;
+	Tue,  3 Dec 2024 02:46:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733194006;
+	bh=xKVi89L7ac97ndmNAqbzFdCpSOEK1iUEUOiBRblPYRY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=HwFRtTk1IoYjYHIbn7+eV/HRil7AKrqIVrAPBhNekz8zvS5/5BXcAEgMMhnx0hCWx
+	 q59YYBmu/ZTHc1lqhGFvRQRsK/F15c2AiAUK4Mjvts2yM3FPBuq3Zz8bCp7LviF810
+	 0vZEL1iIY/Tcmamh62bE1TENsbdwZ4XtJkdpAh0cslyuxZ6VvAyAVnI2S37LAntEHY
+	 dtt96/t10AVYqFWzpWt3/bLLWsTgsoH7VrgHTl/4ZE4vdw3Jm/gOVBUSEBWcuTR9iz
+	 c/Pepc3NHYadFyXme032efVQPzWA1s+C6ZzP/FG16QxIZu829C/N7wcSqNFaDWFR/q
+	 c61t+V7q7z0Ww==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa51b8c5f4dso717391566b.2;
+        Mon, 02 Dec 2024 18:46:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUP+FTmWtSUrYkcHByMvuz9sRwLV5T6c5tePKUCxuwdRhnkaP62sLDKFEiyI+XCIppwXNo=@vger.kernel.org, AJvYcCWtmIkrseG/GDbmHQ2ugcr8elo+RiFuNeYweFl5ixD7wy1sk+uyUmrUU9pz4ZLru43X9FakXnENMxeC/g5w@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcmR62A8xuWlnvRvE4mKWvyZHiy3dsimvsomoVJTMc1qwl3ujr
+	FqDHKZqQYKMvlDj1LDWb0XvgkSSPNMhqtK9zmUTkg9sIxQ0X6VDPSjyDVjla4nE6qCyeB5OBnaB
+	KGvdpyo2ul4W09IuWN7lBQH5XlBo=
+X-Google-Smtp-Source: AGHT+IHfHqhhI01QfIKaZT2stl6foHnCHZqWTf1mI7OIlldIoAaFVcU+D3Ifb02BBONWPt4DcGk65bbdyw9cFwCh+lg=
+X-Received: by 2002:a17:906:4c2:b0:aa5:4672:663b with SMTP id
+ a640c23a62f3a-aa5f7f2ba80mr37338566b.55.1733194005376; Mon, 02 Dec 2024
+ 18:46:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/8] drivers/perf: riscv: Add raw event v2 support
-To: Atish Kumar Patra <atishp@rivosinc.com>
-Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Mayuresh Chitale <mchitale@ventanamicro.com>,
- linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-References: <20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com>
- <20241119-pmu_event_info-v1-3-a4f9691421f8@rivosinc.com>
- <e124c532-7a08-4788-843d-345827e35f5f@sifive.com>
- <CAHBxVyEwkPUcut0L7K9eewcmhOOidU16WnGRiPiP3D7-OS7HvQ@mail.gmail.com>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <CAHBxVyEwkPUcut0L7K9eewcmhOOidU16WnGRiPiP3D7-OS7HvQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241113031727.2815628-1-maobibo@loongson.cn> <20241113031727.2815628-2-maobibo@loongson.cn>
+In-Reply-To: <20241113031727.2815628-2-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 3 Dec 2024 10:46:36 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5PoitK=a_snYA=PjDoZxWT5QcbrJfnMe3DJGXN=J0tZA@mail.gmail.com>
+Message-ID: <CAAhV-H5PoitK=a_snYA=PjDoZxWT5QcbrJfnMe3DJGXN=J0tZA@mail.gmail.com>
+Subject: Re: [RFC 1/5] LoongArch: KVM: Add vmid support for stage2 MMU
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Atish,
+Hi, Bibo,
 
-On 2024-12-02 6:15 PM, Atish Kumar Patra wrote:
-> On Mon, Dec 2, 2024 at 2:37 PM Samuel Holland <samuel.holland@sifive.com> wrote:
->> On 2024-11-19 2:29 PM, Atish Patra wrote:
->>> SBI v3.0 introduced a new raw event type that allows wider
->>> mhpmeventX width to be programmed via CFG_MATCH.
->>>
->>> Use the raw event v2 if SBI v3.0 is available.
->>>
->>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->>> ---
->>>  arch/riscv/include/asm/sbi.h |  4 ++++
->>>  drivers/perf/riscv_pmu_sbi.c | 18 ++++++++++++------
->>>  2 files changed, 16 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
->>> index 9be38b05f4ad..3ee9bfa5e77c 100644
->>> --- a/arch/riscv/include/asm/sbi.h
->>> +++ b/arch/riscv/include/asm/sbi.h
->>> @@ -159,7 +159,10 @@ struct riscv_pmu_snapshot_data {
->>>
->>>  #define RISCV_PMU_RAW_EVENT_MASK GENMASK_ULL(47, 0)
->>>  #define RISCV_PMU_PLAT_FW_EVENT_MASK GENMASK_ULL(61, 0)
->>> +/* SBI v3.0 allows extended hpmeventX width value */
->>> +#define RISCV_PMU_RAW_EVENT_V2_MASK GENMASK_ULL(55, 0)
->>>  #define RISCV_PMU_RAW_EVENT_IDX 0x20000
->>> +#define RISCV_PMU_RAW_EVENT_V2_IDX 0x30000
->>>  #define RISCV_PLAT_FW_EVENT  0xFFFF
->>>
->>>  /** General pmu event codes specified in SBI PMU extension */
->>> @@ -217,6 +220,7 @@ enum sbi_pmu_event_type {
->>>       SBI_PMU_EVENT_TYPE_HW = 0x0,
->>>       SBI_PMU_EVENT_TYPE_CACHE = 0x1,
->>>       SBI_PMU_EVENT_TYPE_RAW = 0x2,
->>> +     SBI_PMU_EVENT_TYPE_RAW_V2 = 0x3,
->>>       SBI_PMU_EVENT_TYPE_FW = 0xf,
->>>  };
->>>
->>> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
->>> index 50cbdbf66bb7..f0e845ff6b79 100644
->>> --- a/drivers/perf/riscv_pmu_sbi.c
->>> +++ b/drivers/perf/riscv_pmu_sbi.c
->>> @@ -59,7 +59,7 @@ asm volatile(ALTERNATIVE(                                           \
->>>  #define PERF_EVENT_FLAG_USER_ACCESS  BIT(SYSCTL_USER_ACCESS)
->>>  #define PERF_EVENT_FLAG_LEGACY               BIT(SYSCTL_LEGACY)
->>>
->>> -PMU_FORMAT_ATTR(event, "config:0-47");
->>> +PMU_FORMAT_ATTR(event, "config:0-55");
->>>  PMU_FORMAT_ATTR(firmware, "config:62-63");
->>>
->>>  static bool sbi_v2_available;
->>> @@ -527,18 +527,24 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
->>>               break;
->>>       case PERF_TYPE_RAW:
->>>               /*
->>> -              * As per SBI specification, the upper 16 bits must be unused
->>> -              * for a hardware raw event.
->>> +              * As per SBI v0.3 specification,
->>> +              *  -- the upper 16 bits must be unused for a hardware raw event.
->>> +              * As per SBI v3.0 specification,
->>> +              *  -- the upper 8 bits must be unused for a hardware raw event.
->>>                * Bits 63:62 are used to distinguish between raw events
->>>                * 00 - Hardware raw event
->>>                * 10 - SBI firmware events
->>>                * 11 - Risc-V platform specific firmware event
->>>                */
->>> -
->>>               switch (config >> 62) {
->>>               case 0:
->>> -                     ret = RISCV_PMU_RAW_EVENT_IDX;
->>> -                     *econfig = config & RISCV_PMU_RAW_EVENT_MASK;
->>> +                     if (sbi_v3_available) {
->>> +                             *econfig = config & RISCV_PMU_RAW_EVENT_V2_MASK;
->>> +                             ret = RISCV_PMU_RAW_EVENT_V2_IDX;
->>> +                     } else {
->>> +                             *econfig = config & RISCV_PMU_RAW_EVENT_MASK;
->>> +                             ret = RISCV_PMU_RAW_EVENT_IDX;
->>
->> Shouldn't we check to see if any of bits 48-55 are set and return an error,
->> instead of silently requesting the wrong event?
->>
-> 
-> We can. I did not add it originally as we can't do much validation for
-> the raw events for anyways.
-> If the encoding is not supported the user will get the error anyways
-> as it can't find a counter.
-> We will just save 1 SBI call if the kernel doesn't allow requesting an
-> event if bits 48-55 are set.
+On Wed, Nov 13, 2024 at 11:17=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
+te:
+>
+> LoongArch KVM hypervisor supports two-level MMU, vpid index is used
+> for stage1 MMU and vmid index is used for stage2 MMU.
+>
+> On 3A5000, vmid must be the same with vpid. On 3A6000 platform vmid
+> may separate from vpid. If vcpu migrate to different physical CPUs,
+> vpid need change however vmid can keep the same with old value. Also
+> vmid index of the while VM machine on physical CPU the same, all vCPUs
+> on the VM can share the same vmid index on one physical CPU.
+>
+> Here vmid index is added and it keeps the same with vpid still.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/kvm_host.h | 3 +++
+>  arch/loongarch/kernel/asm-offsets.c   | 1 +
+>  arch/loongarch/kvm/main.c             | 1 +
+>  arch/loongarch/kvm/switch.S           | 5 ++---
+>  arch/loongarch/kvm/tlb.c              | 5 ++++-
+>  5 files changed, 11 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index d6bb72424027..6151c7c470d5 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -166,6 +166,9 @@ struct kvm_vcpu_arch {
+>         unsigned long host_tp;
+>         unsigned long host_pgd;
+>
+> +       /* vmid info for guest VM */
+> +       unsigned long vmid;
+vmid is a member of kvm_vcpu_arch, no of kvm_arch?
 
-The scenario I'm concerned about is where masking off bits 48-55 results in a
-valid, supported encoding for a different event. For example, in the HPM event
-encoding scheme used by Rocket and inherited by SiFive cores, bits 8-55 are a
-bitmap. So masking off some of those bits will exclude some events, but will not
-create an invalid encoding. This could be very confusing for users.
+> +
+>         /* Host CSRs are used when handling exits from guest */
+>         unsigned long badi;
+>         unsigned long badv;
+> diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/=
+asm-offsets.c
+> index bee9f7a3108f..4e9a9311afd3 100644
+> --- a/arch/loongarch/kernel/asm-offsets.c
+> +++ b/arch/loongarch/kernel/asm-offsets.c
+> @@ -307,6 +307,7 @@ static void __used output_kvm_defines(void)
+>         OFFSET(KVM_ARCH_HSP, kvm_vcpu_arch, host_sp);
+>         OFFSET(KVM_ARCH_HTP, kvm_vcpu_arch, host_tp);
+>         OFFSET(KVM_ARCH_HPGD, kvm_vcpu_arch, host_pgd);
+> +       OFFSET(KVM_ARCH_VMID, kvm_vcpu_arch, vmid);
+>         OFFSET(KVM_ARCH_HANDLE_EXIT, kvm_vcpu_arch, handle_exit);
+>         OFFSET(KVM_ARCH_HEENTRY, kvm_vcpu_arch, host_eentry);
+>         OFFSET(KVM_ARCH_GEENTRY, kvm_vcpu_arch, guest_eentry);
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index 27e9b94c0a0b..8c16bff80053 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -212,6 +212,7 @@ static void kvm_update_vpid(struct kvm_vcpu *vcpu, in=
+t cpu)
+>
+>         context->vpid_cache =3D vpid;
+>         vcpu->arch.vpid =3D vpid;
+I think vpid should also be:
+           vcpu->arch.vpid =3D vpid & vpid_mask;
 
-Regards,
-Samuel
+Huacai
 
+> +       vcpu->arch.vmid =3D vcpu->arch.vpid & vpid_mask;
+>  }
+>
+>  void kvm_check_vpid(struct kvm_vcpu *vcpu)
+> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+> index 0c292f818492..2774343f64d3 100644
+> --- a/arch/loongarch/kvm/switch.S
+> +++ b/arch/loongarch/kvm/switch.S
+> @@ -72,9 +72,8 @@
+>         ldx.d   t0, t1, t0
+>         csrwr   t0, LOONGARCH_CSR_PGDL
+>
+> -       /* Mix GID and RID */
+> -       csrrd           t1, LOONGARCH_CSR_GSTAT
+> -       bstrpick.w      t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SH=
+IFT
+> +       /* Set VMID for gpa --> hpa mapping */
+> +       ld.d            t1, a2, KVM_ARCH_VMID
+>         csrrd           t0, LOONGARCH_CSR_GTLBC
+>         bstrins.w       t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_=
+SHIFT
+>         csrwr           t0, LOONGARCH_CSR_GTLBC
+> diff --git a/arch/loongarch/kvm/tlb.c b/arch/loongarch/kvm/tlb.c
+> index ebdbe9264e9c..38daf936021d 100644
+> --- a/arch/loongarch/kvm/tlb.c
+> +++ b/arch/loongarch/kvm/tlb.c
+> @@ -23,7 +23,10 @@ void kvm_flush_tlb_all(void)
+>
+>  void kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa)
+>  {
+> +       unsigned int vmid;
+> +
+>         lockdep_assert_irqs_disabled();
+>         gpa &=3D (PAGE_MASK << 1);
+> -       invtlb(INVTLB_GID_ADDR, read_csr_gstat() & CSR_GSTAT_GID, gpa);
+> +       vmid =3D (vcpu->arch.vmid << CSR_GSTAT_GID_SHIFT) & CSR_GSTAT_GID=
+;
+> +       invtlb(INVTLB_GID_ADDR, vmid, gpa);
+>  }
+> --
+> 2.39.3
+>
 
