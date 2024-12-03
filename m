@@ -1,125 +1,159 @@
-Return-Path: <kvm+bounces-32950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84FE9E2C4A
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 20:47:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 846819E2CC3
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 21:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8410A282DB0
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 19:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E32E28BE84
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2024 20:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6130202F86;
-	Tue,  3 Dec 2024 19:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA951F891C;
+	Tue,  3 Dec 2024 20:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IANPNmL7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OYfqerp8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8008E4A29
-	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 19:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D33C18CBE1
+	for <kvm@vger.kernel.org>; Tue,  3 Dec 2024 20:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733255256; cv=none; b=Zqe2Z24efNEKqSXwLCem4tGhmhfYxm8gYrUjAsfeEuXZaaJe8lTtPDlmS37mRdXofzq8U23u2qU78pr8fwoNHIMSmJa55zOmlk6AYqLD/oRsbFYDsTVIXlqvqVh5/SFQ3come1C77WCwgrRqya6FRjW/37SOZAjn/3nK0NC80mk=
+	t=1733256541; cv=none; b=hy91gS1b0Pf8DEjWFJVTBJwnqV1F8eYcPW1A+/bk1jOnxLyBSwMfib5wMdOWG1NgHhthQqbqPSH7HLLg+oZ1AUVXaJ6B2gQQnCXCUq6VNGEwNYYkg6RTqyAwAe3AbA+z/BR9cbix3ZflN+DhMdc+FFOrp87y7amcIk360sbgU+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733255256; c=relaxed/simple;
-	bh=9apAbEqd89yCOoToYq3N9kvqwE07Gjr4GwNYWTI+3Kk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cgv5yXf6v16v6MaqlwtjnMTsenCEQ1ffr6F/mngI2rXsvKGHclQMOmcu/5TYoGJNNsk85C03oKb760qIlHsJsTQefyzsM3RikbFs436vX7zfQZkIc45bfYnI0ytmhft0//eH1+3V9+CruMXb/enJr447YhuWp/piYTIwrnknSG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IANPNmL7; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2eea74eb7e6so2987315a91.1
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 11:47:35 -0800 (PST)
+	s=arc-20240116; t=1733256541; c=relaxed/simple;
+	bh=qiRILwbyqDNuyfmT3oAJuWeYTtQvTCA97X3gaWM5CgI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=qZh91Wf+5c7xdLUFv1xZfk/BFg3bCmeW8kzlWpzRQquL/NZehfnmFWqxH4QWYdEzTyw/rshB45ca3BmXhHTVFF5+IyllxfoAR0G8a2hOyUqhbGFQX3WDKtQ+pKKJ/zG4iXBFwQL5LLdpKpIS/Vx/U2oHgidlzLVsC8e6Gn9pGR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OYfqerp8; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aa5ec8d6f64so103951766b.2
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 12:08:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733255255; x=1733860055; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeI9ozHDn46Hz6cYYiawc9Sj++xFx1oN+rWsCLYaKiA=;
-        b=IANPNmL71MO7H9cC0MozA2Yd/JpEOQgr45nKr1LdP890c9HewrgfAaSOSH5rHmVtV5
-         3Wg5DDzZF9b0qjU1cSUF2jBDsOwhG47jejygB2hcyR15IZKFcLr4nh/SlqW+88mhDMm/
-         z8mul8a1BBUt/9SzbNEE7jvedn6Yr5eYcP+xiBmv8aLP/A7BOjAU8GV/6FAF1zdMSAVh
-         PsKFdsPAC2zH6EG2Tq4JhrOAZo1wCr9zYCe3sH2qdk+YkdlrWchtYtmSHWGw6icw3MGt
-         InwoX8wvblpOR35Oxpf3Qz+czdk7gxU5nD7hVbgqhznWPPqvaxoQ0aktZoOf54gLeag4
-         hbbQ==
+        d=gmail.com; s=20230601; t=1733256538; x=1733861338; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OTI69H7btkXCb72dSzaNg+akHgO9K5cjkmX/GOK6tjU=;
+        b=OYfqerp8rWF/I28rdPxcmqu9WMLCWmsN3/bejHNG89mBL3FlPqWcLl/lGa9vR5GTOV
+         /e+O3RjWd6Odtc5u3RawSaXKHMBQLdVBm2kfNekDeoTSaVmke+GnvUEieTFelC7yGIOM
+         zGkUKlFH9IkF37txv4SmmcTNW17dBhh6nOgj5+1vh83+LVO9JWF70thdWIyvHvMPRotf
+         06Z1bCN9bOTB5+G6rU/eCJO6VovwN9aKw1VTho/4FnwKC3d6ilbX/tnCr758tH71Won7
+         qp/1gTkue6mrSd1UZM7vF7Zrjo8t5soUHi9IbQX823pIdoktNcdGKPcnzMU5cDZ7XgwN
+         CdPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733255255; x=1733860055;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeI9ozHDn46Hz6cYYiawc9Sj++xFx1oN+rWsCLYaKiA=;
-        b=b2j39rV4PK5fSKX2sNpjZl0TQ4fszAsxEwk/datt1/M+Ky7K7EfZmtdkiqb4fWd3NO
-         KzoCpU7qTqqiOIlv8cH/KUQREuxcvHbsqPvIgMZGSTxhupfiOTbm8CbuNaRVasdkn4a5
-         hdpxsakRbDmiFIWHkTRdwlbnd7EN4jfQUpe1uIdDNJPCntMrnuajenbZG0tjuViZQzc8
-         +8BcQYNouvo2ju8n+l9ciHN29G2HZrPgC/HmS/ffURBEubr0QtdivYwZ+k5V0YCgXOwA
-         83qvBdSgHjG/dgm8/gLZ+XQdYy2TRzPMdn9AwrcX8lrrfdGxgl1IXgGKcRK2WAa8z7PD
-         wltw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFWrSwLW+xd9Y4UfdFQMjEqSzRUxsOz3qDAkc17ykFnqA2K58ckqqONHo0hPbbexGBPYs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8F0xI77LeNROsPLYKXfJt53dLydBywdxN9vCHT8wqZQPNmYap
-	tNgdd0K49zaFrgvOc/NSokK9sE46INSkvCxsL30mUo9IE6JVEsLNeTW5sO2Q2YpcL5L1dFrZ3WL
-	Ehw==
-X-Google-Smtp-Source: AGHT+IEIxTAowvsQbXBvVmwXg8xC+DTWCcjtZ15UsU+7ONR6EPrixct/B9Rl7jkKhrS6wBVafL8pEjlVIVE=
-X-Received: from pjuw3.prod.google.com ([2002:a17:90a:d603:b0:2e0:52d7:183e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ecb:b0:2ee:44ec:e524
- with SMTP id 98e67ed59e1d1-2ef012701camr5194710a91.35.1733255254820; Tue, 03
- Dec 2024 11:47:34 -0800 (PST)
-Date: Tue, 3 Dec 2024 11:47:33 -0800
-In-Reply-To: <20241128164624.GDZ0ieYPnoB4u39rBT@fat_crate.local>
+        d=1e100.net; s=20230601; t=1733256538; x=1733861338;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OTI69H7btkXCb72dSzaNg+akHgO9K5cjkmX/GOK6tjU=;
+        b=XHvcc3goouTp2dp5yAljoLBNAqcKoDd6277YugqPBXkgzZMB26L6qU85z839HGSCj1
+         ElTegOg3OwrLNT1WmWV+iUMsHLzThxnADNoX6/Lg4+zwz+uST0jsZU4Lw+HT+Af43KqV
+         hB5vBn+FM87NrpP8Hb28DPjQ7eBUmXeHpUtWsURneRuLVm16yAgIvUi8jSsYws25rcEn
+         nN2J0h9cAKpU+1OZoO0OsZaW8wvzygYS+cqArQE4Rbnkpe9Nn30D5hzn8uSYCvbZWM9D
+         DIdMLXytWpWoQAZdLQA6MslR3fEtDmHkyF7qBq5JAkZT0tBu60ea5hX8RCbMzSvrBoC8
+         vcKw==
+X-Gm-Message-State: AOJu0YzfPEM0orFwqCjXIVDvqIXznPFW64ZTlFmFTR5Au8m5K6tPPeuS
+	g3lVb+aRcB8IjCe+HjoLiaZH9Igiwm6HJFqmRbcXNhjpuMcIl1Lj
+X-Gm-Gg: ASbGncv4U/jLdNpTqQ6Wia9LdN31E4jCpzVuuFhua4byC9ZCGBQQN+1/Q7kHPdzMGkU
+	V0VLTtJCmGHj/haeTb1rf7AmAPeaqOFprcowCSNa6EqfJfLw7JFQajScc6C8Cqg5Qp7noZQJK5G
+	eL9wwYUxZB6bAAq3v1gGrodnLgGcap5/mOerL4YXuK0IKQUjsGc5NqFdMGImwwyRQR6H+QhHOro
+	CttiCyOIIdDHEPyWIueam0ilmIuZ3/P+MFl61shjFeFfSYH6Y9VTm7+7nwdMpWBo+e6V1aMN9LQ
+	DMreUXQ371w5MzGtv9nXGk4ePYBRQBfkTOcM2H2JHis6lyTg2e+wpd7v+dbqa8hpwk4u3ZJjpA1
+	yoL4QBPmFa/trnzGiJ3Y/Z5tFuOYgaWJ0MQR4M37Yuw==
+X-Google-Smtp-Source: AGHT+IEYG+487iWmch8Jm8y1uZM3URpIzZ5lpgg89YnGdVCTuDJfBMoFYj4HkVvY8cBoCebKiC+UCw==
+X-Received: by 2002:a05:6402:4499:b0:5d0:bb76:dff2 with SMTP id 4fb4d7f45d1cf-5d10cb8025dmr4198873a12.24.1733256537735;
+        Tue, 03 Dec 2024 12:08:57 -0800 (PST)
+Received: from ?IPV6:2a02:3100:9d09:7500:8175:4ab5:e6ba:110b? (dynamic-2a02-3100-9d09-7500-8175-4ab5-e6ba-110b.310.pool.telefonica.de. [2a02:3100:9d09:7500:8175:4ab5:e6ba:110b])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5996c1383sm650263266b.40.2024.12.03.12.08.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 12:08:56 -0800 (PST)
+Message-ID: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
+Date: Tue, 3 Dec 2024 21:08:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241127201929.4005605-1-aaronlewis@google.com>
- <20241127201929.4005605-13-aaronlewis@google.com> <Z0eV4puJ39N8wOf9@google.com>
- <20241128164624.GDZ0ieYPnoB4u39rBT@fat_crate.local>
-Message-ID: <Z09gVXxfj5YedL7V@google.com>
-Subject: Re: [PATCH 12/15] KVM: x86: Track possible passthrough MSRs in kvm_x86_ops
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	jmattson@google.com, Xin Li <xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH 0/3] driver core: class: remove class_compat code
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 28, 2024, Borislav Petkov wrote:
-> On Wed, Nov 27, 2024 at 01:57:54PM -0800, Sean Christopherson wrote:
-> > The attached patch is compile-tested only (the nested interactions in particular
-> > need a bit of scrutiny) and needs to be chunked into multiple patches, but I don't
-> > see any obvious blockers, and the diffstats speak volumes:
-> 
-> I'd like to apply this and take a closer look but I don't know what it goes
-> against.
+vfio/mdev is the last user of class_compat, and it doesn't use it for
+the intended purpose. See kdoc of class_compat_register():
+Compatibility class are meant as a temporary user-space compatibility
+workaround when converting a family of class devices to a bus devices.
 
-It applies cleanly on my tree (github.com/kvm-x86/linux.git next) or Paolo's
-(git://git.kernel.org/pub/scm/virt/kvm/kvm.git next).
+In addition it uses only a part of the class_compat functionality.
+So inline the needed functionality, and afterwards all class_compat
+code can be removed.
 
-> Btw, you could point me to some documentation explaining which branches in
-> the kvm tree people should use to base off work ontop.
+Heiner Kallweit (3):
+  driver core: class: add class_pseudo_register
+  vfio/mdev: inline needed class_compat functionality
+  driver core: class: remove class_compat code
 
-For KVM x86, from Documentation/process/maintainer-kvm-x86.rst:
+ drivers/base/class.c          | 89 ++++-------------------------------
+ drivers/vfio/mdev/mdev_core.c | 12 ++---
+ include/linux/device/class.h  |  8 +---
+ 3 files changed, 15 insertions(+), 94 deletions(-)
 
-  Base Tree/Branch
-  ~~~~~~~~~~~~~~~~
-  Fixes that target the current release, a.k.a. mainline, should be based on
-  ``git://git.kernel.org/pub/scm/virt/kvm/kvm.git master``.  Note, fixes do not
-  automatically warrant inclusion in the current release.  There is no singular
-  rule, but typically only fixes for bugs that are urgent, critical, and/or were
-  introduced in the current release should target the current release.
-  
-  Everything else should be based on ``kvm-x86/next``, i.e. there is no need to
-  select a specific topic branch as the base.  If there are conflicts and/or
-  dependencies across topic branches, it is the maintainer's job to sort them
-  out.
-  
-  The only exception to using ``kvm-x86/next`` as the base is if a patch/series
-  is a multi-arch series, i.e. has non-trivial modifications to common KVM code
-  and/or has more than superficial changes to other architectures' code.  Multi-
-  arch patch/series should instead be based on a common, stable point in KVM's
-  history, e.g. the release candidate upon which ``kvm-x86 next`` is based.  If
-  you're unsure whether a patch/series is truly multi-arch, err on the side of
-  caution and treat it as multi-arch, i.e. use a common base.
+-- 
+2.47.1
 
-where kvm-x86 is the aforementioned github.com/kvm-x86/linux.git.
 
