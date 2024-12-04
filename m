@@ -1,114 +1,131 @@
-Return-Path: <kvm+bounces-33060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C329E433B
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:22:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F066F9E4338
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:21:53 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07272B63DA9
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:17:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E7BF1667F0
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABB31A8F75;
-	Wed,  4 Dec 2024 18:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194FA1A8F7F;
+	Wed,  4 Dec 2024 18:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HLb725TZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8zJzR0H"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91178156997
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 18:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C99423918A;
+	Wed,  4 Dec 2024 18:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733336227; cv=none; b=AwSnBaDXofErfGtks1J1h5rwhU4hLOT6N8QyhyTeqk3/FsLRKcPAKLtzyMLmXNh2pvjf8NKs4c0pPgwZ5wgbbR6rXUXlVtlt6+q5Xys2958aSlKb7HUqbWBF/e+BviYOVFKB5BpSPr6mxR31vNKfsK6R5z/FmUD+EEtelsdGHbA=
+	t=1733336505; cv=none; b=NZPSMX3ldyKl2pK7xfbNNt/Fwh5S6I5Dirc38930UOFx/7vvF4ZVVu9pf63m2ENRBV3V20ztLidMOcQ2LilVV2kuDlISu9JodrkT8FqrtO9rvL+p1SaS2fllz2y8SVW8trRYF4qBCzahHfOEjl4ZLPcc9OjYTsltAOlviGX7XYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733336227; c=relaxed/simple;
-	bh=w85VI+PNVYvSUtAszjBNpanvGWkNg924XHVLCuI9X90=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jQNKHNSzSHnEijZk8qd+zipn5v9Woq8LuoSb1Z8M2i5kWPyAoZ9tq2pop0cuLp79MIZ0DnuhqLgDw9dAe8/6/TiXgqBmrdpwijBOIhy3ZUhEDf1Sz+mvcZokyl1IrFnuzqhS6Gvn7UINnle9SvILY7os7Ekv00qRkAOvFI2hgRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HLb725TZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A689DC4CECD;
-	Wed,  4 Dec 2024 18:17:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1733336227;
-	bh=w85VI+PNVYvSUtAszjBNpanvGWkNg924XHVLCuI9X90=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HLb725TZ36qyHfj65Klxv4wggmjKBBhFTDI3SHp7H23w7k7qllakkSWvOVFh0417U
-	 pZIk2tiJnZChlgVkSJ3HUPRFxUj4JJc82SZL9+/HS5CVwMEu/BZ6TvvgAEPsaCc23O
-	 fqsgGO2IaClH4FIKMxWWD8qIPKcguqU0qq3qxKl0=
-Date: Wed, 4 Dec 2024 19:17:03 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/3] driver core: class: add class_pseudo_register
-Message-ID: <2024120407-partake-pounce-67be@gregkh>
-References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
- <b8122113-5863-4057-81b5-73f86c9fde4d@gmail.com>
- <2024120435-deserving-elf-c1e1@gregkh>
- <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
+	s=arc-20240116; t=1733336505; c=relaxed/simple;
+	bh=uME13l5HovQ3NZyv34mfUDUdqGg1uJwju50MkEmn3vQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QljQ7eY1nPi6ozBMjLr+WQZRueM9ruim0rwDojIyg6eZi/R+cfwzhcUXlCk3RGIAipBo6rnWPaAhFFJayx/IHBLYpbzhDBsXawW6DHbe6ekoYPcIdfmuPdwzt9dAMf+zWECeCFbgz0+pD6nD/y+/c2K0afbFuSvMNKZC7taPHSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8zJzR0H; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53de8ecb39bso146653e87.2;
+        Wed, 04 Dec 2024 10:21:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733336502; x=1733941302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uME13l5HovQ3NZyv34mfUDUdqGg1uJwju50MkEmn3vQ=;
+        b=P8zJzR0HjnbeGcX1DzZL+RtzGWJiq54pmlkX9DrPWYGyRT77Rf8MfvMXJASJkRYyX9
+         8R9RDma09a25Ufepuoj6RN4WCU5IDqeZdyq0SYeVZJlYq5gjr9XinWnHsMvn/w6iKPno
+         Ddxfu4zpVoV44lhlrtTnadHvQEayvOBMo3F+7Si55hah8BTn/iAsV8CcILaEIYsQJPS0
+         YFnxfJ/++0cn3WnxtHYMJh0v9bGk99bsHLrLzyrcxHQvTV1ClVznrDVMnPvY8UV0JBrs
+         JwZkztVrCSDqa9GVQbGLNgtuGgtrEw7GKoSOGRLHUTZjcHeLdhf7EyyRj0gwS46hHCUh
+         Tf7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733336502; x=1733941302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uME13l5HovQ3NZyv34mfUDUdqGg1uJwju50MkEmn3vQ=;
+        b=dOrOXYKcFwz5HwDMfmzsMiC8Y0jRQYVmOIv3/UfuH5UY5naFnmgyg7jaEjpSaxm8Nd
+         IZZRti4LQBICqLnzxiIdjK6Nq2/0B7CI6f4zmuf3XdQo/Hb+7VHTZUec4nsQswFbsSMQ
+         p8roWVQ0MvGLcYYbWUdn06kUQ5vsYBI5+afoFOlQVC2TvwFjTvA4/zx2UylZxEgD0gUt
+         hNOaKwn2GMr6WB0t8SxKD1hDMp0Vc5gha9DRgv4H5Zu3nz/dn1XWhthcmP305+cxnvhr
+         H7T7Sn7s+l+zfydjANhCg5TAjXYnENjnWdu9Yuek8Sm4sfxIo0YeRIDTSEnVNOu9HkgF
+         EUEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUO/Vu20E9x4r/wDPledn53EtxLLUXFIg5czQbnMGl3yWrsPdYmxeAsgw6ZBNY8aNXVDPo=@vger.kernel.org, AJvYcCVwhLLXwJt1EpAqJnP+S8TkbIlc6VbWR4BZXFw3cXMCUYkpiHbK3qlkhabfhezfspsUI5dMTe5n4YY8+A/i@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzjlZagBfspnHyTt4YHPe6VskBmeKH6Vcv6FnvsKPuzstt0iGo
+	fthpoNY+G/YoUYQ2XYqF0uBrAb2G3GBPpT3uS+rs7ocsJ4bR497tdcnzP2M/9GCYeIXU1eQ5q0k
+	u+jy+oPSj0Y3dm1OYU5isrTMxcmU=
+X-Gm-Gg: ASbGncuJSWdNlaY3xqW7LR824lgir+qQSKkkVE7jCXbYGSVMUb0gAuuVM7vDlcgw9bX
+	+6TczZcY606XeUVoqucpvilv1aokwah8=
+X-Google-Smtp-Source: AGHT+IHqZimxoCyGtBnst+WJ5pzCbapVWH5mhYIjHSkEmNWXMwGSZsnIZshHuLlPBJphjw0Ao4JRV6PYRdpAc2LLuH4=
+X-Received: by 2002:a05:6512:3ca2:b0:53e:1b9d:4a4 with SMTP id
+ 2adb3069b0e04-53e1b9d0560mr3729506e87.3.1733336501332; Wed, 04 Dec 2024
+ 10:21:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
+References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-4-arnd@kernel.org>
+ <87ed2nsi4d.ffs@tglx> <3B214995-70A6-4777-B7E3-F10018F7D71E@zytor.com>
+In-Reply-To: <3B214995-70A6-4777-B7E3-F10018F7D71E@zytor.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 4 Dec 2024 20:21:04 +0200
+Message-ID: <CAHp75VfZW2A1s+QLdVHXnFV16dWhM=T5gtWw97d1gM-Pys+CZw@mail.gmail.com>
+Subject: Re: [PATCH 03/11] x86: Kconfig.cpu: split out 64-bit atom
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Andy Shevchenko <andy@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, Sean Christopherson <seanjc@google.com>, 
+	Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 04, 2024 at 06:04:32PM +0100, Heiner Kallweit wrote:
-> On 04.12.2024 10:33, Greg Kroah-Hartman wrote:
-> > On Tue, Dec 03, 2024 at 09:10:05PM +0100, Heiner Kallweit wrote:
-> >> In preparation of removing class_compat support, add a helper for
-> >> creating a pseudo class in sysfs. This way we can keep class_kset
-> >> private to driver core. This helper will be used by vfio/mdev,
-> >> replacing the call to class_compat_create().
+On Wed, Dec 4, 2024 at 5:55=E2=80=AFPM H. Peter Anvin <hpa@zytor.com> wrote=
+:
+>
+> On December 4, 2024 5:16:50 AM PST, Thomas Gleixner <tglx@linutronix.de> =
+wrote:
+> >On Wed, Dec 04 2024 at 11:30, Arnd Bergmann wrote:
+> >> From: Arnd Bergmann <arnd@arndb.de>
 > >>
-> >> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> >> ---
-> >>  drivers/base/class.c         | 14 ++++++++++++++
-> >>  include/linux/device/class.h |  1 +
-> >>  2 files changed, 15 insertions(+)
+> >> Both 32-bit and 64-bit builds allow optimizing using "-march=3Datom", =
+but
+> >> this is somewhat suboptimal, as gcc and clang use this option to refer
+> >> to the original in-order "Bonnell" microarchitecture used in the early
+> >> "Diamondville" and "Silverthorne" processors that were mostly 32-bit o=
+nly.
 > >>
-> >> diff --git a/drivers/base/class.c b/drivers/base/class.c
-> >> index 582b5a02a..f812236e2 100644
-> >> --- a/drivers/base/class.c
-> >> +++ b/drivers/base/class.c
-> >> @@ -578,6 +578,20 @@ struct class_compat *class_compat_register(const char *name)
-> >>  }
-> >>  EXPORT_SYMBOL_GPL(class_compat_register);
-> >>  
-> >> +/**
-> >> + * class_pseudo_register - create a pseudo class entry in sysfs
-> >> + * @name: the name of the child
-> >> + *
-> >> + * Helper for creating a pseudo class in sysfs, keeps class_kset private
-> >> + *
-> >> + * Returns: the created kobject
-> >> + */
-> >> +struct kobject *class_pseudo_register(const char *name)
-> >> +{
-> >> +	return kobject_create_and_add(name, &class_kset->kobj);
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(class_pseudo_register);
-> > 
-> > I see the goal here, but let's not continue on and create fake kobjects
-> > in places where there should NOT be any kobjects.  Also, you might get
-> > in trouble when removing this kobject as it thinks it is a 'struct
-> > class' but yet it isn't, right?  Did you test that?
-> > 
-> 
-> It's removed using kobject_put(), same as what class_compat_unregister() does.
-> I only compile-tested the changes.
+> >> The later 22nm "Silvermont" architecture saw a significant redesign to
+> >> an out-of-order architecture that is reflected in the -mtune=3Dsilverm=
+ont
+> >> flag in the compilers, and all of these are 64-bit capable.
+> >
+> >In theory. There are quite some crippled variants of silvermont which
+> >are 32-bit only (either fused or at least officially not-supported to
+> >run 64-bit)...
 
-I would not be able to take these unless someone actually runs them as
-the kobject removal here might be getting confused a bit.
+> Yeah. That was a sad story, which I unfortunately am not at liberty to sh=
+are.
 
-thanks,
+Are they available in the wild? What I know with that core are
+Merrifield, Moorefield, and Bay Trail that were distributed in
+millions and are perfectly available, but I never heard about ones
+that are 32-bit only. The Avoton and Rangley I have read about on
+https://en.wikipedia.org/wiki/Silvermont seems specific to the servers
+and routers and most likely are gone from use.
 
-greg k-h
+
+--=20
+With Best Regards,
+Andy Shevchenko
 
