@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-33072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF889E4457
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:16:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE819E4459
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:16:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEDB316697C
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:16:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE9A228804C
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8300206F02;
-	Wed,  4 Dec 2024 19:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE961F03CD;
+	Wed,  4 Dec 2024 19:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLzC5YlO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Va4w2hA+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4696A202C2C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A65C202C4A
 	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 19:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733339665; cv=none; b=levTNTcwAaG5Jjt7e5o9EwUqdddDZtiP5KyJ2B4qKMoV7YNar82rdA0M2mGnNfSpiYv5zc3ykoxz4F0Y9c0ETJwO2nkZ7uOU/q/foIaj/Whtmh6hPc+n7SYe9MPsu7uGQsMDcpua3GOE7NlycDFWNDjaVqRrpmcnic7pxDNM2DY=
+	t=1733339666; cv=none; b=kCkic69HFBSr9HgT5aQ3+w2padqZddooLDepw/pE+YCyc8EzBYIW+Th8gnVuNPqeR8ejd3sJqmlwxMnqcZH63xXa4eVO9hHLk4CDIHqui1uwml1HiiPfq9+tcfXDyg63yzI6V13qlKCtWoh2Zopj8PB9Mq8IpUhhMb+2o9fTvfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733339665; c=relaxed/simple;
-	bh=xFw8gMJXJ08WDMuWWWZTgPnAYLLdNgG37mOiDKQ6GfI=;
+	s=arc-20240116; t=1733339666; c=relaxed/simple;
+	bh=g0rkDGLpu4v+ug31ibm4fJibfbopHH42jmhVi9EOmqs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D+dq1PsvYWDuXjeUz4li8afmS6cWttBsV487svbEihRMkfEkPbAXcxXUjpoHk5s3PfONIYPtR1F9RSMXXVpbqsz72NR77Mg/6xM7S3zxZvJBOWMw6Oqk0y87pn8hc/WC1lgHn35SJWXg8+9RtffMnGShewH4893ugpr6wUE+YDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLzC5YlO; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=YgGlcwRjSG6zm5PjrYXmygKfOnIfOTbXoxNYf72q7AKZuUxklt9tCazusuAKemKyA/t8znB7QvMHFQhUJiaTP/9LsRFhIm34wjLU3MBcgFnJA44o4gLx+/Vco5UV18bwKzqo0NFh3LxPuEyURusSqlYzPD9icqxnRe/QYUasvS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Va4w2hA+; arc=none smtp.client-ip=209.85.161.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-46720a5dde3so1666751cf.1
+Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-5f2033c97cfso118425eaf.3
         for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 11:14:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733339662; x=1733944462; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1733339663; x=1733944463; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D0Bh/8/p57GgUO0KFv6z2qw3B4ssWvPHnpaRRwgHkKo=;
-        b=RLzC5YlOkHSg5BEp9VK3913OpLGrLK4OgYjfdvSzcOVUpnM47LjFNp4MyD4pSxJr28
-         4klhyJ7clyEi2w8gqLffEOKz5UEREENNz3K1l8RWmfYDedVORsdpi5SVKlKP7Ax3mYuS
-         zcD2oltS7NeXcEB+hH+ULoYe8G/AyaiDNJqt1SSAT0O36G+d+0Wc0Bx/n/Z29lcExIDI
-         LVeKySYNhbFhL0e6ra9hxwatT95xCDId4+U/T8DGaHztYdXeijwdNk090H4mtF0zTPrC
-         ohIfq6MXSpwiXUkBjzH2++5Y6Cqf3Ehb+2+9ITgOJoCjdjLrIdT+LpRZEvcMtbp9bBeQ
-         ZOlg==
+        bh=zFzCtU30qR2oi/Is6fdl592GY3fZRLXfeluJtZi8G84=;
+        b=Va4w2hA+uWJh+kB1R8xnR1i0iaMi6BjrdFaDRcbvZyPJGCmNwdYyf7bTwTHdYq0cFi
+         j35iNpYKEftFzvCpL8twNGARFLc8Sm/SZ5SiFJoH6207g4BvSdcGqhpxvk6J/qWfTScn
+         B5TSb/vi3sPD7axxPeHmH2DCtDXQ33kr0XyJOWnnYn0oN2WNt9PlxBDmH0ofuEVWEL5o
+         a2Ji22A9CzQjX3ajlFgf37s0zqJCQo6nQdapFEFMYwdtJNUzkNH3waahXw5H6OPOK//q
+         Z80MAY/imeKmrkb7frsWZtW1b4cXuC1/J6AAyOtkaHjBS1nfdVeIW1IWQKcfLrxvIPnp
+         AviQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733339662; x=1733944462;
+        d=1e100.net; s=20230601; t=1733339663; x=1733944463;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D0Bh/8/p57GgUO0KFv6z2qw3B4ssWvPHnpaRRwgHkKo=;
-        b=G7TUrwlx25sMw0SJNSSd3f7zd/L6Z5KCUsQnTYFXJ6Q31awlMuQbanBG4bXVcfE9Wt
-         YlIDLiuZ7Ut/lMaTp93mfacq6qZn9nxahHekLzz3pPxntGptSEgSQ47MS1vqyZQE2Ykh
-         RMTc2L7W+KUOio5kkoAQOfjIb2e8Sb++4IQ+NY0DM4DBfaZ4RwptEvVZ686od+uJmMW6
-         hmkzWq4MPhdlR2PKQYQE0iTFMnn7zTG0qYIVQoIBYF04u3fdx59kmn2fuGOS/aSnwouk
-         KIH/9tWbDSEWEK0VTyLILuGYYULYBQd1E1hjwm/168bF/iNBTqxPt8NF6Cxpx+dcQFoa
-         vyJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhqk0dqSPoG0RMCF4WwKEZISu4IGqevKfx3WklxW6dA5KScgEAjMsfe8lk5AZ/Sjhfytw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/k5k7pOcmiVM2YuDiay1oqnbX0zZoy+3jRsZ28wXEcYwaXKIg
-	UVi5cTAAjAqaEGe4yz4ZbjpwoBLPXkVhsttO0+ksOI/ClatkicSi4Hr0sjE2qmhnaSp5NsXGaol
-	xoLVtJzhRr7RiQk1QIA==
-X-Google-Smtp-Source: AGHT+IFL6Yzt0JAsezCjVnC1Ege7Dcb8t0Na16LNTuDgarqYjisKQzOlRXRbl7knWaQbVhi5EaZ6me/AizxIjPXb
-X-Received: from qtbcf26.prod.google.com ([2002:a05:622a:401a:b0:466:a2a5:c51f])
+        bh=zFzCtU30qR2oi/Is6fdl592GY3fZRLXfeluJtZi8G84=;
+        b=EUJqv1GgpPSbKYrMMfGdz1yBdY2uifFH52G53ZJuz7NGV454MOlBXayUx66sLXGeS/
+         28O66Z+SDQ8aAFxmkZRIpZ8bZILywZ94hEIY+wuyslvrbjqUUp/964GmgSAyz5gJlMnT
+         qvwv/qQ06VaD9Us369QwMjGKKMpt2h+ZaDlXBHBfaKcZBfSum3jTwzpNEs1X7UXtyEo9
+         5jsgEQ20E/b/C/VAbSHnOvmmk7h8y5lciTDVBkJ97w3wEKEAc1UwAAY6IqNxshlHBpiB
+         oHi78I3hnO37zgdfHAOPsFYp3Marhjq94ctEpk6w8tOSlbORg6mEhYSvqSrc1qo9eHDp
+         wenQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURS+wKRa6DhoFz9fVA7jI81wcRzk3Ki40Q8IZYdSnilOKzj0ueOujHM2TYlRGFpeYpMqM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0H3gp9/vbFccbRUvWnLbHTdrEAFse8l6U/Bz40XIfSnJULnCh
+	Na51l8cpGROGB+RtWOym0FJHxM1HPHnuQm4LvZjjtkOuBAfuVtImE0YnBt6HG36n53idIVR55fX
+	7jmILkCskl+Cl51yRZA==
+X-Google-Smtp-Source: AGHT+IE0Bvu2wb5sZ62wPHnkPebE9DLvFVJFuHpqNaMFqI9+9IIU97LvrniH728q/X5uxBPvfLsjs32/EpieLb++
+X-Received: from uad11.prod.google.com ([2002:a05:6130:800b:b0:855:e8c8:6d6c])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7fc4:0:b0:466:7a01:372b with SMTP id d75a77b69052e-4670c0c1884mr95272281cf.30.1733339662158;
- Wed, 04 Dec 2024 11:14:22 -0800 (PST)
-Date: Wed,  4 Dec 2024 19:13:42 +0000
+ 2002:a05:6218:2812:b0:1bc:45bc:81f0 with SMTP id e5c5f4694b2df-1caeaab608amr694161055d.11.1733339663073;
+ Wed, 04 Dec 2024 11:14:23 -0800 (PST)
+Date: Wed,  4 Dec 2024 19:13:43 +0000
 In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241204191349.1730936-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204191349.1730936-8-jthoughton@google.com>
-Subject: [PATCH v1 07/13] KVM: selftests: Fix vm_mem_region_set_flags docstring
+Message-ID: <20241204191349.1730936-9-jthoughton@google.com>
+Subject: [PATCH v1 08/13] KVM: selftests: Fix prefault_mem logic
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
@@ -87,26 +87,35 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-`flags` is what region->region.flags gets set to.
+The previous logic didn't handle the case where memory was partitioned
+AND we were using a single userfaultfd. It would only prefault the first
+vCPU's memory and not the rest.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/demand_paging_test.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 480e3a40d197..9603f99d3247 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1124,7 +1124,7 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot)
-  *
-  * Input Args:
-  *   vm - Virtual Machine
-- *   flags - Starting guest physical address
-+ *   flags - Flags for the memslot
-  *
-  * Output Args: None
-  *
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 0202b78f8680..315f5c9037b4 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -172,11 +172,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	memset(guest_data_prototype, 0xAB, demand_paging_size);
+ 
+ 	if (p->uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
+-		num_uffds = p->single_uffd ? 1 : nr_vcpus;
+-		for (i = 0; i < num_uffds; i++) {
++		for (i = 0; i < nr_vcpus; i++) {
+ 			vcpu_args = &memstress_args.vcpu_args[i];
+ 			prefault_mem(addr_gpa2alias(vm, vcpu_args->gpa),
+ 				     vcpu_args->pages * memstress_args.guest_page_size);
++			if (!p->partition_vcpu_memory_access)
++				/* We prefaulted everything */
++				break;
+ 		}
+ 	}
+ 
 -- 
 2.47.0.338.g60cca15819-goog
 
