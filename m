@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-33024-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC6A9E3B40
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 14:28:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E959E3AD9
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 14:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE227B37F6F
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:57:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF989B2B471
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E791C07F1;
-	Wed,  4 Dec 2024 12:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC5C1C4A10;
+	Wed,  4 Dec 2024 12:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6nHUCsJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZFomIgrP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64091F7077
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9282203704
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733316910; cv=none; b=QjAppafRdi6tnF93X/KQbqyEbZOj9T/XXXlFUYXX3WfSQW89mJoQyxhmPmQyplG80nzmdsP1jevY4slGBV2E7yb+YQ0jr1l6mB0rV8G5NdgC1k33CepG3HeId9CTe0SgzZlv9Mz7KAfpzFJ9/j4cNnlkp3y0vfULBCp/nHApRTE=
+	t=1733316918; cv=none; b=rbYL9ttc89S/H1AWAAdh8hyTphpl0/+oj93PVCy15nsar40b1O/RF+WfcxSKiVhrSO2X25wsbn31r+bU6MC3/oE7rNXgOEhSK14nz0TAHZ7NDTHwG4durHO/gWcKq5hoKfJVvws2WAFM9S2vCzpU0KOden8P1Gqv3Iu3NPoAEA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733316910; c=relaxed/simple;
-	bh=GU+EylrtNkBl0PCgVUrji2d7nB4cQuMPE/K3NHw4YGM=;
+	s=arc-20240116; t=1733316918; c=relaxed/simple;
+	bh=+kw0hVN/R7EKfAHQdf+parzKCkCR3tVH/e099GIq3Ww=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NMAfUbaE3swduQoiz7um/zkgu0JmHYDNVGZdRg4bZcMr2kXz3TWYo8Wm8DZ7nglZMqYQk4FRctTRxuR6qREPBqbK/SnZk57X91BX1fJAvARecpbQNT2uEIwFpvJSuFQKUOcRYpw5voM0GkJ7J1sz0UzpCvrHHtYOkpub/CegNWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O6nHUCsJ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=us9O66wxvxh+TDjlD2ZoGXm8Iezf1hxewyIgDh4wVHJYuJHKNpFH5h6uXnlr20m6oclDyAkDtZKQxEp3/HfgItHZ6PYEPq/nfyKwR08tQMZkPjg0MZKaVuTXX8yeyRu2+3ECT9NbpG9QG3MATiO7Hut2BINuhLWeQEIinMInoPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZFomIgrP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733316908;
+	s=mimecast20190719; t=1733316916;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3TMBFu0zsYs/BK8mI3BuEemyVvVnFxsrbDwOUtwonV0=;
-	b=O6nHUCsJ7VBy/f4+kT+4tfTdhK/ev61TkwjjZmbff2s2hSLFi7tSIAgK3HtznPqESiFD67
-	3GPit59iFITU0dpq2t2encr920VrsREEynoNQas1dY6Twbx1LmfOX6U7FTd0C2wr16YROs
-	ko1dwVeLZENjU3yZ0sIbtda2Qki/U44=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=na4vd6mThSkzeb6NVT06w3pd7mJ97fz8U44/x2n2hr0=;
+	b=ZFomIgrPWyEqZA16QxQVbj5dj3zEpDpCeIbOYVdI+NAfyp9xYxh3X1AhNtLFyvnkbmEFEG
+	Ex+Ys+DGTrpYQ6Euf8ZYRt2/fYi0lk3/4jzIuFgcQGOHAubOrQFxlxz+Vmm9AyzuVyC0oH
+	Ot1SRxkma+T7Dz9WZpZHjMSYaHBpWzg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-T5LvoyFHP2-im7i1q7l_mw-1; Wed, 04 Dec 2024 07:55:06 -0500
-X-MC-Unique: T5LvoyFHP2-im7i1q7l_mw-1
-X-Mimecast-MFC-AGG-ID: T5LvoyFHP2-im7i1q7l_mw
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385dcae001fso2825618f8f.1
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:55:06 -0800 (PST)
+ us-mta-224-9BvXodZ3N8SXRUFAqMX1kA-1; Wed, 04 Dec 2024 07:55:15 -0500
+X-MC-Unique: 9BvXodZ3N8SXRUFAqMX1kA-1
+X-Mimecast-MFC-AGG-ID: 9BvXodZ3N8SXRUFAqMX1kA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-434a51e44d0so55173055e9.3
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:55:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733316906; x=1733921706;
+        d=1e100.net; s=20230601; t=1733316913; x=1733921713;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3TMBFu0zsYs/BK8mI3BuEemyVvVnFxsrbDwOUtwonV0=;
-        b=qab0Bl7XAsSwY4LKrcS/BIscfbdH5Cf6tQ6YPLe46T7riIZB4//wEXDAEexOQFfjxb
-         ddcLkr3vO5GiHO76OGQUFXdf4d4uJoINGMolgq6wJNLaC960lKvKD5l4qyLboZClXdj1
-         vVmiC38sOvUn3E4K/s3Ko/36CXbHtirGVajjDu5P2kKNIK4N8kgLZDSJyh7tR/yM6eVw
-         jOQpyKX6/bDtAjyBIf79e9XV6qPdvQ6+qr6GDgvUoRSJf6FzhSgn+eKIcHWkHHztJQMk
-         yzUcHhaQEr2YCMtLzJRl6Kqwk6v9BlM1LCnCbCcXT2o9oM8arxOrBuLcds2YLw53/Gdv
-         HHKA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWQ9ZaKE/OtaUGcl4lk7zIKkmKqYlJEEfnEiehqWXNJ6+I85OAX/vxMlT5zugtRkOKBhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOmNMsfCG5M0/AnNBeKQ3boXWMJE89H3vBXU5FvP3ynM7PbZtk
-	hZD0cNusTWBAu7O+l1w4fRkV56U9Zd8OKg/oqggKVKUnoPt2DSeSazyEEDR1aSMrU36k7v/v85A
-	tr7xNl6A/FbsccDOCtkHCXn1+AjetuT/b0eiTeGIQ3xY0GqPoQw==
-X-Gm-Gg: ASbGncuQ0XQCYNRIZ/15zWmWIOG/t/kRjzpxwLYes2D1t9pq/0wT8Uw+CSN/zoiPvo7
-	Q3z86o2hpb30tJ/Kk0mE1ajyD5GSY9VNZG8+Jh6qRttq7RA6qVsp/VX4Q8QxBRZNX2MgoAVsciW
-	E7PUsoOa0OXo6GfDuvRsEwy1LAYhUf1fPZOdJGNMTuCQbZIpohLPJKYp6wb26xRG7of60p4Qp3u
-	AZBqy9glpPnAef5DG9bnixW+6c5y8448cxRr1VXGc1eb9LpGoPmXQIm6AUYeEg0N7XDD183qLiz
-	Bk4de47S3y0lzuQ3xAoWtRgLlGtBB37IzG4=
-X-Received: by 2002:a05:6000:156e:b0:385:fa2e:a33e with SMTP id ffacd0b85a97d-38607c0e1e7mr3561597f8f.43.1733316905753;
-        Wed, 04 Dec 2024 04:55:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3Vs5XvVpD9wVjl4Do+O4dwdUFKsmLeUCgsK0LBk5udBDNdRPox9DV3gXL42llKQONJirIJg==
-X-Received: by 2002:a05:6000:156e:b0:385:fa2e:a33e with SMTP id ffacd0b85a97d-38607c0e1e7mr3561572f8f.43.1733316905408;
-        Wed, 04 Dec 2024 04:55:05 -0800 (PST)
+        bh=na4vd6mThSkzeb6NVT06w3pd7mJ97fz8U44/x2n2hr0=;
+        b=nktXKG7C994JIC2KWhRZFuxpfiE/oqDCXQsuW8XFK66p8bkYXjUpgLB7DkIo/5Bgyx
+         r8xmS6fcUl2LN0vNQokRTCfECWcBY5+/DWyJoV1SR6R/5YRrSd4QHcJ49rKSLPg2GSIv
+         M0r8LT7gaTmkCPP/Cl+wCi6ZHSWAB4BFDSQmftKT2VICzsEuCBZdDrIWB1tcL4JPrbhM
+         o/YTgVvbDG02QIDrm5WyG/T/DWfMOp+ocsENeWFDANF1lBrgEVJROI5ZLZjsaRmwX5x3
+         Ux5JWQ5VbOVAYSbKVvr/uhydmVjAru1WlXRf8V2784/a9l5uo5zeWiTd+kaqJE6U/PO1
+         f2qA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWJu/zBCPBMOEONX6Tbnr3A13fDt+5OQtxnzRij0ll9uaox9qPsNPW88k+cu3cOMnBSaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXV75VAAz5dj68OffWhAE8/MolYlbNzWSkgb4JUguTyDeIWrdA
+	cpICfCH3jIStJv5HPaISUtNAxdaawn0WkVH8vf8S4yn7O2DLzZsHzFdsHwE9JynILBHFhhwQ+zd
+	TMyY20uVo+cM2WCNvSssznb9m5pv5qfoOXuXDwzZnOw6DoGYo+A==
+X-Gm-Gg: ASbGncsQUj/7eeuFpmOxjK9zCwnIy74Zcp6Oid7GreB8KRZgzjIUJUBpFCdcGnvT9xN
+	/ZiGSdRCEyVOixomoqbY4W1/0PVtvTxH6jpEJxgRbYJxNNCgprAT1YSkKijpzt5CJYAroNvJlZ/
+	TU/VC8Sv+hIgiCY9k00dc+p17HLF0DgT2djX5zLZd2BfYf0rPowTccTcZb+UdH+b+wxhl5liKW0
+	5wtGkQtBltf8YjqcOn5TOIUUnINmWvmDJLys/aSrVJuDxnXmSxYUHjIdOUfieO3Y/q5QK2Wl0qU
+	jstm3Zy4/qXl2awG7aHqj4vemhI531ubm/M=
+X-Received: by 2002:a05:600c:3550:b0:434:a781:f5d5 with SMTP id 5b1f17b1804b1-434d0a15047mr62644285e9.30.1733316913739;
+        Wed, 04 Dec 2024 04:55:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdVB6YFjtubaQuZKYqVl7K3swrZVKNM9mWRen9YVYSXicgBrRTJ3zdugRU4fK2CCWYQJl/Fg==
+X-Received: by 2002:a05:600c:3550:b0:434:a781:f5d5 with SMTP id 5b1f17b1804b1-434d0a15047mr62643915e9.30.1733316913375;
+        Wed, 04 Dec 2024 04:55:13 -0800 (PST)
 Received: from localhost (p200300cbc70be10038d68aa111b0a20a.dip0.t-ipconnect.de. [2003:cb:c70b:e100:38d6:8aa1:11b0:a20a])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-385ed8dee66sm10241947f8f.104.2024.12.04.04.55.04
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-385df488559sm15210226f8f.63.2024.12.04.04.55.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 04:55:04 -0800 (PST)
+        Wed, 04 Dec 2024 04:55:12 -0800 (PST)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -106,9 +106,9 @@ Cc: linux-mm@kvack.org,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>,
 	Eric Farman <farman@linux.ibm.com>,
 	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v2 06/12] fs/proc/vmcore: factor out allocating a vmcore range and adding it to a list
-Date: Wed,  4 Dec 2024 13:54:37 +0100
-Message-ID: <20241204125444.1734652-7-david@redhat.com>
+Subject: [PATCH v2 09/12] virtio-mem: mark device ready before registering callbacks in kdump mode
+Date: Wed,  4 Dec 2024 13:54:40 +0100
+Message-ID: <20241204125444.1734652-10-david@redhat.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241204125444.1734652-1-david@redhat.com>
 References: <20241204125444.1734652-1-david@redhat.com>
@@ -120,103 +120,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Let's factor it out into include/linux/crash_dump.h, from where we can
-use it also outside of vmcore.c later.
+After the callbacks are registered we may immediately get a callback. So
+mark the device ready before registering the callbacks.
 
-Acked-by: Baoquan He <bhe@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- fs/proc/vmcore.c           | 21 ++-------------------
- include/linux/crash_dump.h | 14 ++++++++++++++
- 2 files changed, 16 insertions(+), 19 deletions(-)
+ drivers/virtio/virtio_mem.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/proc/vmcore.c b/fs/proc/vmcore.c
-index 8d262017ca11..9b72e255dd03 100644
---- a/fs/proc/vmcore.c
-+++ b/fs/proc/vmcore.c
-@@ -709,11 +709,6 @@ static const struct proc_ops vmcore_proc_ops = {
- 	.proc_mmap	= mmap_vmcore,
- };
+diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
+index b0b871441578..126f1d669bb0 100644
+--- a/drivers/virtio/virtio_mem.c
++++ b/drivers/virtio/virtio_mem.c
+@@ -2648,6 +2648,7 @@ static int virtio_mem_init_hotplug(struct virtio_mem *vm)
+ 	if (rc)
+ 		goto out_unreg_pm;
  
--static struct vmcore_range * __init get_new_element(void)
--{
--	return kzalloc(sizeof(struct vmcore_range), GFP_KERNEL);
--}
++	virtio_device_ready(vm->vdev);
+ 	return 0;
+ out_unreg_pm:
+ 	unregister_pm_notifier(&vm->pm_notifier);
+@@ -2729,6 +2730,8 @@ static bool virtio_mem_vmcore_pfn_is_ram(struct vmcore_cb *cb,
+ 
+ static int virtio_mem_init_kdump(struct virtio_mem *vm)
+ {
++	/* We must be prepared to receive a callback immediately. */
++	virtio_device_ready(vm->vdev);
+ #ifdef CONFIG_PROC_VMCORE
+ 	dev_info(&vm->vdev->dev, "memory hot(un)plug disabled in kdump kernel\n");
+ 	vm->vmcore_cb.pfn_is_ram = virtio_mem_vmcore_pfn_is_ram;
+@@ -2870,8 +2873,6 @@ static int virtio_mem_probe(struct virtio_device *vdev)
+ 	if (rc)
+ 		goto out_del_vq;
+ 
+-	virtio_device_ready(vdev);
 -
- static u64 get_vmcore_size(size_t elfsz, size_t elfnotesegsz,
- 			   struct list_head *vc_list)
- {
-@@ -1116,7 +1111,6 @@ static int __init process_ptload_program_headers_elf64(char *elfptr,
- 						size_t elfnotes_sz,
- 						struct list_head *vc_list)
- {
--	struct vmcore_range *new;
- 	int i;
- 	Elf64_Ehdr *ehdr_ptr;
- 	Elf64_Phdr *phdr_ptr;
-@@ -1139,13 +1133,8 @@ static int __init process_ptload_program_headers_elf64(char *elfptr,
- 		end = roundup(paddr + phdr_ptr->p_memsz, PAGE_SIZE);
- 		size = end - start;
- 
--		/* Add this contiguous chunk of memory to vmcore list.*/
--		new = get_new_element();
--		if (!new)
-+		if (vmcore_alloc_add_range(vc_list, start, size))
- 			return -ENOMEM;
--		new->paddr = start;
--		new->size = size;
--		list_add_tail(&new->list, vc_list);
- 
- 		/* Update the program header offset. */
- 		phdr_ptr->p_offset = vmcore_off + (paddr - start);
-@@ -1159,7 +1148,6 @@ static int __init process_ptload_program_headers_elf32(char *elfptr,
- 						size_t elfnotes_sz,
- 						struct list_head *vc_list)
- {
--	struct vmcore_range *new;
- 	int i;
- 	Elf32_Ehdr *ehdr_ptr;
- 	Elf32_Phdr *phdr_ptr;
-@@ -1182,13 +1170,8 @@ static int __init process_ptload_program_headers_elf32(char *elfptr,
- 		end = roundup(paddr + phdr_ptr->p_memsz, PAGE_SIZE);
- 		size = end - start;
- 
--		/* Add this contiguous chunk of memory to vmcore list.*/
--		new = get_new_element();
--		if (!new)
-+		if (vmcore_alloc_add_range(vc_list, start, size))
- 			return -ENOMEM;
--		new->paddr = start;
--		new->size = size;
--		list_add_tail(&new->list, vc_list);
- 
- 		/* Update the program header offset */
- 		phdr_ptr->p_offset = vmcore_off + (paddr - start);
-diff --git a/include/linux/crash_dump.h b/include/linux/crash_dump.h
-index 788a45061f35..9717912ce4d1 100644
---- a/include/linux/crash_dump.h
-+++ b/include/linux/crash_dump.h
-@@ -121,6 +121,20 @@ struct vmcore_range {
- 	loff_t offset;
- };
- 
-+/* Allocate a vmcore range and add it to the list. */
-+static inline int vmcore_alloc_add_range(struct list_head *list,
-+		unsigned long long paddr, unsigned long long size)
-+{
-+	struct vmcore_range *m = kzalloc(sizeof(*m), GFP_KERNEL);
-+
-+	if (!m)
-+		return -ENOMEM;
-+	m->paddr = paddr;
-+	m->size = size;
-+	list_add_tail(&m->list, list);
-+	return 0;
-+}
-+
- #else /* !CONFIG_CRASH_DUMP */
- static inline bool is_kdump_kernel(void) { return false; }
- #endif /* CONFIG_CRASH_DUMP */
+ 	/* trigger a config update to start processing the requested_size */
+ 	if (!vm->in_kdump) {
+ 		atomic_set(&vm->config_changed, 1);
 -- 
 2.47.1
 
