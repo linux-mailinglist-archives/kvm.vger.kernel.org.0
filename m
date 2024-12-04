@@ -1,172 +1,137 @@
-Return-Path: <kvm+bounces-33084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBEEC9E44F5
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:44:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2769E451C
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:54:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9980A166FFD
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:44:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01F7E168151
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4AD1EF096;
-	Wed,  4 Dec 2024 19:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0674A1F03D5;
+	Wed,  4 Dec 2024 19:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="hwlDPSc0";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s0VFqvmF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YsY5SVEU"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCE618BBB4;
-	Wed,  4 Dec 2024 19:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9986239197;
+	Wed,  4 Dec 2024 19:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733341454; cv=none; b=j3CsKwo8dhCDUb9zW94Ft/Q0TsPdheGs8NTHpiKe9SixGdOk29hMWlFpGggmTDsf8/s/gTI0/DAXFn4gHMFtRF2ctX1Gp/MXpYgaEsEnMqNjZlxxb0bILDbGMOELA3MqN2igDunpkxPwmRKldosvquGc8L14ErZHTc30RJSelp4=
+	t=1733342056; cv=none; b=a0tar6VN68xcufUl4Jdevb1fe/vFgFfCe3RzXub692iESc2JSqeK6JN1VPbhfy31q6JOTacyc4n4X8+Guag1QroNYnoWwaLgGPqVbt4RumL6sSEfcCV3NShluXJzp9yPO8Nu+xYp5pbkij4cdzSp326KzeYAJu2yGWBlYFRaZVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733341454; c=relaxed/simple;
-	bh=9JZlTQUmVyWIc5Juw9KaWD5uEDIQ0ihP6yNvbkiRcrc=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=NITQiv39jbBrfIBYGs4z2s4tKoVKg1JGeUVmMw3Wkq3Oc+RtmocOVL6oCrapMGeMg4oDFADUeBb7C2/Wce3wr6IC09mYsYKLbl+6SKOlztXPurgwDj1uEhEtv6nHa00nSaUA/w8ejdqVWEWdvkgIs7dAvdQPA5DriKWbjkjT4u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=hwlDPSc0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=s0VFqvmF; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id D4C8A2540134;
-	Wed,  4 Dec 2024 14:44:10 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 14:44:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1733341450;
-	 x=1733427850; bh=EEShQR326Q35qKfWScIGB4OH/vhPY1mnipsA5wuW348=; b=
-	hwlDPSc0rvzNpZzrTYWC60TzGbdku3NKzOhXxi5qKbHrzNH1uGfnv56fgc21rdJL
-	y5u2EM55QEPrZcWXqGh1/MCXKh5IWn7syUWl6F5wTxSq3p6DitP5YGI4GwZojONZ
-	f//lPJu53VSpV+VkVA77aiGVXCoMXPcnLYqKcT1TiAnhSKGW2o9XTDVRIEv6iwjp
-	i4SF6muIDU/xCsDLQKw89CO7jgTfgC+t1CoMmyFXUzCnUlTXt4sdwGNTHRHNz5gp
-	wqqQcPbXKA6XkqQdMy9022jMpqkXUDEKzR0WwaWYyyN2sqvWjKmUdxN1pnTSKVS+
-	bwHprqvsl3U4bqbx7sJuFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733341450; x=
-	1733427850; bh=EEShQR326Q35qKfWScIGB4OH/vhPY1mnipsA5wuW348=; b=s
-	0VFqvmFo9z0D1+k7pV4kWTIaDPIec9JqOlFhhRBMWx965EPN7yQTYcRjqvT7g0dB
-	v4MBPz8qrAo15FndMI0Z5TBgzCZCoAXs2fHbqBcQtKZVkTHjKXlWQQ2jmxXDNg2q
-	IufTOeXQQXFBcJ3HHMYUfn8nfTPI8n/7ICNDU8SneNybArJOmwkadZZfHOsN82qJ
-	3rdDoxordPGLOn3emEtM2QkgGEDhcb8+sL5PpvblXy9OWGR1PYvQBErW9yA1QbkX
-	hlORScw8AJkv2oDqC/kL9khp2aKfVKZW5k9OI/Jen+G5160YK/WVZQdZtrUUePBV
-	yF4fKAKLlJWzjNseoCqtA==
-X-ME-Sender: <xms:CbFQZ6S-STxiOch9IRji7jVLfiwi7yrDOQmtVC404LvFxkskODvWaQ>
-    <xme:CbFQZ_yf0ytiW_PtxECETAskHeehuzX1nRquHfYHS36ZcTwfufy19KH3oIsKuZRFJ
-    mDl5pXDhuutC-yX9h0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgdduvdegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdeg
-    jedvfeehtdeggeevheefleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudeh
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprh
-    gtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohepshgv
-    rghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrhgrug
-    gvrggurdhorhhgpdhrtghpthhtoheprghnugihsehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepgiekieeskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhigidruggvpdhrtghp
-    thhtohepthhorhhvrghlughssehlihhnuhigqdhfohhunhgurghtihhonhdrohhrgh
-X-ME-Proxy: <xmx:CbFQZ33eh8ZYfsPql2FP_KP8PxE7kchxDt2_9qO_eDw_HU7IbY8Rog>
-    <xmx:CbFQZ2B13V_ZclRqtDBy2qHQWTH_QB7bI2Qd0BakBm9IE9ene8_3XQ>
-    <xmx:CbFQZzj-gnk_gxccY5q9MQJ73y6CpI1qA56dPCHLr387FjvIXToMyA>
-    <xmx:CbFQZyoqs9lDR5286bu_EP54yVcL4Wemx5rlWoGFT3d88xpE967IpA>
-    <xmx:CrFQZz7UfHW9QtIHtpALIsC7FVq8sbLR9JgoDLIt799Fc5vCnPfFhyTq>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7F7912220072; Wed,  4 Dec 2024 14:44:09 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1733342056; c=relaxed/simple;
+	bh=MrThBKp1pszizV/bGh8gGxL6q+0YQJelMloXtnkjGlc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tWikZUBJxVNB1vioh4CERKXOsnuKq5TYFnpNErcdvHvLQ3we0xKjgtiEaTcLiD1WV4o2PjzfF/Z9zXXxJqVFCQEP/tJmyXSoOiI9IExV/sKvAV1v6QYnthOkJWmkepVhDIKsTPSrNORU9OPJ5RfyIG//Gdnl9tVnLcNkekBAnBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YsY5SVEU; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733342055; x=1764878055;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MrThBKp1pszizV/bGh8gGxL6q+0YQJelMloXtnkjGlc=;
+  b=YsY5SVEU8tb3IaskJeCyjLpNw9Pk6J9FAhMc7IVWEBGmtB7RquIRzTl5
+   wqqjDAL4KcVnidNfSL20ElMX8O3i/nugDlSvAPtaMdXXn8RAR8gMLj8vA
+   pgkjTqVqR/eAFZKgcDFv1PIZiR/AXSL4ETZEf+2iQhRdlEE+zi/EXtx05
+   EnfekE5VkIU5sH2zKM6BvVqRjtaUYLgXJsUon+GTc21gXCaNArlae1BpA
+   dI6KeJ7dNjhJnDMOVSfD2mIgtkvXO4TPX2nobF5Q+Yf+NjkQ9gdLUZ/FZ
+   NyVTnp5nKLQouAlIUzxLFyUF1Uc0LaoH7QaClXhafPos5pV1xNiUD8Wzw
+   g==;
+X-CSE-ConnectionGUID: CPTdJ33ORTeFP30jpu4Zkw==
+X-CSE-MsgGUID: 1QiaCSbtTmCT/RPJFenclw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="37404742"
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="37404742"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 11:54:14 -0800
+X-CSE-ConnectionGUID: TiHJFiqPSgSmTdQWP+aydQ==
+X-CSE-MsgGUID: hl57wZ2EQeCdjp0YeMXBzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="93766985"
+Received: from dgramcko-desk.amr.corp.intel.com (HELO [10.124.223.226]) ([10.124.223.226])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 11:54:12 -0800
+Message-ID: <0070a616-5233-4a8d-8797-eb9f182f074d@intel.com>
+Date: Wed, 4 Dec 2024 11:54:12 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 04 Dec 2024 20:43:35 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, "Andy Shevchenko" <andy@kernel.org>,
- "Matthew Wilcox" <willy@infradead.org>,
- "Sean Christopherson" <seanjc@google.com>,
- "Davide Ciminaghi" <ciminaghi@gnudd.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
-Message-Id: <d189f1a1-40d4-4f19-b96e-8b5dd4b8cefe@app.fastmail.com>
-In-Reply-To: 
- <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-10-arnd@kernel.org>
- <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
-Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 2/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX TD
+ creation
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
+ pbonzini@redhat.com, seanjc@google.com
+Cc: isaku.yamahata@gmail.com, kai.huang@intel.com,
+ linux-kernel@vger.kernel.org, tony.lindgren@linux.intel.com,
+ xiaoyao.li@intel.com, yan.y.zhao@intel.com, x86@kernel.org,
+ adrian.hunter@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
+References: <20241203010317.827803-1-rick.p.edgecombe@intel.com>
+ <20241203010317.827803-3-rick.p.edgecombe@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20241203010317.827803-3-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 4, 2024, at 19:10, Linus Torvalds wrote:
-> "On second thought , let=E2=80=99s not go to x86-64 microarchitectural
-> levels. =E2=80=98Tis a silly place"
+On 12/2/24 17:03, Rick Edgecombe wrote:
+> +u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page)
+> +{
+> +	struct tdx_module_args args = {
+> +		.rcx = page_to_pfn(tdcs_page) << PAGE_SHIFT,
 
-Fair enough. I'll just make it use -march=3Dx86_64 to override
-the compiler default then.
-
-> On Wed, 4 Dec 2024 at 02:31, Arnd Bergmann <arnd@kernel.org> wrote:
->>
->> To allow reliably building a kernel for either the oldest x86-64
->> CPUs or a more recent level, add three separate options for
->> v1, v2 and v3 of the architecture as defined by gcc and clang
->> and make them all turn on CONFIG_GENERIC_CPU.
->
-> The whole "v2", "v3", "v4" etc naming seems to be some crazy glibc
-> artifact and is stupid and needs to die.
->
-> It has no relevance to anything. Please do *not* introduce that
-> mind-fart into the kernel sources.
->
-> I have no idea who came up with the "microarchitecture levels"
-> garbage, but as far as I can tell, it's entirely unofficial, and it's
-> a completely broken model.
-
-I agree that both the name and the concept are broken.
-My idea was based on how distros (Red Hat Enterprise Linux
-at least) already use the same levels for making userspace
-require newer CPUs, so using the same flag for the kernel
-makes some sense.
-
-Making a point about the levels being stupid is a useful
-goal as well.
-
-> There is a very real model for microarchitectural features, and it's
-> the CPUID bits. Trying to linearize those bits is technically wrong,
-> since these things simply aren't some kind of linear progression.
->
-> And worse, it's a "simplification" that literally adds complexity. Now
-> instead of asking "does this CPU support the cmpxchgb16 instruction?",
-> the question instead becomes one of "what the hell does 'v3' mean
-> again?"
-
-I guess the other side of it is that the current selection
-between pentium4/core2/k8/bonnell/generic is not much better,
-given that in practice nobody has any of the
-pentium4/core2/k8/bonnell variants any more.
-
-A more radical solution would be to just drop the entire
-menu for 64-bit kernels and always default to "-march=3Dx86_64
--mtune=3Dgeneric" and 64 byte L1 cachelines.
-
-      Arnd
+This is a nit, but there is a page_to_phys().
 
