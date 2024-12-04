@@ -1,315 +1,98 @@
-Return-Path: <kvm+bounces-32969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4839E3065
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 01:27:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137C59E306D
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 01:32:34 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86CE3164CA3
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:27:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9A5E282F31
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5A32119;
-	Wed,  4 Dec 2024 00:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DCF4A2D;
+	Wed,  4 Dec 2024 00:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zUKgLb7H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SXeiRg7h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75D479F5
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 00:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44612623
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 00:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733272051; cv=none; b=d+R2LPrjJPOiut+GfhEULk1VVDIk/A+e6k2SdcILHUM7uQIccEn6zPp8roQr5cDJcMvXAffkKjpojNxnjU1ih+9iO1umIUGQqeRP0jI6RboxXVE04vbQ4D/9ZIgFuLFfanecvwbERwFREdm5ZBmqQUnvHCZ/APtlWFWnvMCwgXU=
+	t=1733272345; cv=none; b=Kpa6/NdtQBU6co8c8I1uSwPaMy9jYfZGJj/YVXdboRFoM1PYQTi+6RANiVdQchK3sSPEHMK+QSin/MN60fAizEiPaejy4ChL9sryUym0BHeWxxZZSn25oAGlOqzMeEkifXFs9DjQ5g11lstT1jI1KMiDdwKz1qf/MgAIje1bx7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733272051; c=relaxed/simple;
-	bh=mlDxbR0ksxk6SszK/KuDXIohNA2afwaCxT+p8r8vTao=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AX+PErmhxPYnxbVgqgDQzjMZIPNl+LiRB/DBKoP5DNG1cYmqbM6uPAv6x23Y9YvUOBwRc5DDiZm3FTGoDuWp7rU9aTbBMcMrKL7NwlfZhrlQ/MfAh5jbc2sXgsm/R9E6Ic7gzKmnGw47IF8VcPyEnD2yLpv2Xebqcmb+qrNMDSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zUKgLb7H; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1733272345; c=relaxed/simple;
+	bh=DDxKSHEx7Y5/1b2cBgBNTQdkIC0rcPSiN7X0JbUIXRs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EH+LpxNonjSsLPtyuh9oAssQ0Xt6KdBS7ZDuk01yJe3C7rG8aa2Hw8xiI/kMeiu34/Dm1mDHYU1hgbFumbkyq5OlcxaYrLaXQWsFaXZxXoOB2cPF3VQr3+nZX4vpYGRMK7kqHFzjKCNB9goWjb4Ba9og3jOK7wAtnnYFe0oqE0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SXeiRg7h; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee7e379819so328693a91.0
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 16:27:29 -0800 (PST)
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71d4a8ede26so4404985a34.1
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 16:32:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733272049; x=1733876849; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aANPg97Zcm8rcmUO5fgtzXnkk00xvaS+AXzgw4y0hEg=;
-        b=zUKgLb7HwkFWLmuBlOaMMFrfkB+br04yktID50owH7OSp0wGLumRWjg/mZStTLXprj
-         XGYn6v0AGZc/0IDwo8k7xMWIgcD+5hNEzYVXfM11XL9CnuyXecMLwBOAdLuymOcUGjEI
-         fbVb0IkB5Ii1qUOiS8OhcOilRytd9SSY3BYAmCJuieP+ox19gAEfEkURPG8ArnIhnmZy
-         key5S2iDosNPqFocfsMwAxfkeHmPZ5LbOqKk9NyS/TkScd1OERWFGPVQYmFOcpuNapQe
-         KeiLHF7hfCm6T9Cj6BQNbN4jhkqtgSAdABJYlvAQZj0TOlxfDC3vow6gAeZAce63rP69
-         nSBA==
+        d=google.com; s=20230601; t=1733272343; x=1733877143; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HVEYC1nSF+KpKxk0nrXJnLwZchetOwjmEdMmnp1zFto=;
+        b=SXeiRg7h/m8nkBbgca5lPCXrePc9XtchMzYitUKL5cGgvSedMcNV4VKPEu2njLdgUn
+         b2EcD/VLMxWlnHfBEP4quGKmjQzQQrt4QsGZiglw1Y2sZoLR9vDYAPZ87VDeG1Svng1n
+         U3Oet9rSCWa1FizXkUkNPWCljArnJJnpDfWCyLTdrV9nJKXpDGjXa85buWDmCar1cbQg
+         8aIVtfUTxKP4hPZmwSxlPaoq8ISUspC0gOhCJjdSIzeBlQ6pGNh5JFESbK07wv8hg2JP
+         mZLMLUDROGnTqa9C1mlUXuBdZwbDvR8CyRvIv+hfggXNTA2cezfAIqhCuDR9dXIQ3FCM
+         Db9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733272049; x=1733876849;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aANPg97Zcm8rcmUO5fgtzXnkk00xvaS+AXzgw4y0hEg=;
-        b=dsBxYKKUdQtsGPronmObPC2kbA0W2Hv+InVo/I5lquObFCiDY00dNRPnjwXPwp0m5F
-         SvlQ1DAT2fUJYaK/O04a9A6JbUjWof+yY61A2bB+ZF+S8GTD67itd18fzbAm81sXfomM
-         bZ1+ZVslHAa1jhvdPCumpOGPiuEYTTixbhKsl6LvwEa1eVvpFpW+V8oFT0+J0iUZPLBq
-         OUSVfFK/THIpa9pXuS/L6nc81WH85hmF2aflEUXfSMILezG6YFz2tHf4SzOnpjCqKOAM
-         B/2omGi3o7Rqb+xXTHPMsFcO9edklcxStKpVsPWawtMKLQsliJv6nbywTYan7UU/SRot
-         AtKg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4nTFcCyB1itmjhh9hxvH+1+ExjDkCJ9X8an6/yTe2LnoPwzOh9BCKGoJ6GFd/+B6Yeq4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRlIKavZsGGKdEIfV8uOjFfr2gecb05IIiyxyoh8AqvzwaD67+
-	fd/kxPB3xExGtuCiwHC6XWoH/L5sn8599FrABA7dxVc3H7RCgwjqaK0/ZO7voXRU9FmO4s91Yt2
-	N9A==
-X-Google-Smtp-Source: AGHT+IFKDItcOU4QRHI/roOYDniQGqYNuFynA7LgIsa7adtsz0YHsHHtCZfTIl+E0q0a5gCqKm+ESIKI9Jg=
-X-Received: from pjbph8.prod.google.com ([2002:a17:90b:3bc8:b0:2e9:29d3:c920])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1844:b0:2ee:823e:39c4
- with SMTP id 98e67ed59e1d1-2ef025a4403mr7892877a91.7.1733272049143; Tue, 03
- Dec 2024 16:27:29 -0800 (PST)
-Date: Tue, 3 Dec 2024 16:27:27 -0800
-In-Reply-To: <20240411140445.1038319-3-szy0127@sjtu.edu.cn>
+        d=1e100.net; s=20230601; t=1733272343; x=1733877143;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVEYC1nSF+KpKxk0nrXJnLwZchetOwjmEdMmnp1zFto=;
+        b=Vj1yfa1Go1F9LED4YlEYsimGYAJbQhDPzwd7uzf2i+UGIp3avorZPyX21GEuasBkIR
+         hXAVyc99VUzFntFjhDjqcaqNjQmudmYlMg6NpwlVoTxhj29SBXkGJ5GHHduQ8roqE4uu
+         EsTe/+298JzJLZb6OpHzWp/QKRjlF0xqyA6zhRD6pLJRgzcg8gU5QkIM+SZ0Zyfa7zw+
+         JZw0bZOsrSX41L+15D9TabuUSPEikn/iVnU0vnKILsMYxjKLafzArcDBDrBilQ3+ICzu
+         UvDgg1Igo4AjgXhXYwbMjleCu/FYkuln6pd41oagHPwqF6CN3gYfhX4nFd/Dbju5AyJe
+         CLTQ==
+X-Gm-Message-State: AOJu0Yx3fDcN+450z6RXOcaO/qt9K4cepf9CPpOOBNEdAwYl8koCVlSU
+	cdU7EziZs9qXXbrhQjzaYOrDRmRbPqjj6XLYG3Iy54cfo4eqhKP3HlzhblTm/SmpjdnTwixHqT7
+	4PQ==
+X-Google-Smtp-Source: AGHT+IG3G4WlbRtafcXmxVI3VvzpVclTwXmcNS+SNcH+C52y2UYIixbvldZbsL6Jo2VX5UVUh+NaGYov2c0=
+X-Received: from pgbeu13.prod.google.com ([2002:a05:6a02:478d:b0:7fc:f798:21ed])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6830:6e90:b0:718:9a8b:5bd6
+ with SMTP id 46e09a7af769-71dad5f3843mr6139466a34.5.1733272343375; Tue, 03
+ Dec 2024 16:32:23 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue,  3 Dec 2024 16:32:20 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240411140445.1038319-1-szy0127@sjtu.edu.cn> <20240411140445.1038319-3-szy0127@sjtu.edu.cn>
-Message-ID: <Z0-h73xBQgGuAI3H@google.com>
-Subject: Re: [PATCH v4 2/2] KVM: SVM: Flush cache only on CPUs running SEV guest
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241204003220.685302-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.12.04 - CANCELED
 From: Sean Christopherson <seanjc@google.com>
-To: Zheyun Shen <szy0127@sjtu.edu.cn>
-Cc: thomas.lendacky@amd.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kevin Loughlin <kevinloughlin@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-+Kevin
+PUCK is canceled for tomorrow, as I will be unavailable.  Sorry for the late
+notice, I meant to send this out yesterday and forgot.
 
-My apologies for the very slow review.
+Note, PUCK will also be canceled for upcoming US holidays.
 
-On Thu, Apr 11, 2024, Zheyun Shen wrote:
-> On AMD CPUs without ensuring cache consistency, each memory page
-> reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-> thereby affecting the performance of other programs on the host.
-> 
-> Typically, an AMD server may have 128 cores or more, while the SEV guest
-> might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-> to bind these 8 vCPUs to specific physical CPUs.
-> 
-> Therefore, keeping a record of the physical core numbers each time a vCPU
-> runs can help avoid flushing the cache for all CPUs every time.
-> 
-> Since the usage of sev_flush_asids() isn't tied to a single VM, we just
-> replace all wbinvd_on_all_cpus() with sev_do_wbinvd() except for that
-> in sev_flush_asids().
-> 
-> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
-> ---
->  arch/x86/kvm/svm/sev.c | 48 ++++++++++++++++++++++++++++++++++++++----
->  arch/x86/kvm/svm/svm.c |  2 ++
->  arch/x86/kvm/svm/svm.h |  4 ++++
->  3 files changed, 50 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index f760106c3..3a129aa61 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -215,6 +215,42 @@ static void sev_asid_free(struct kvm_sev_info *sev)
->  	sev->misc_cg = NULL;
->  }
->  
-> +static struct cpumask *sev_get_wbinvd_dirty_mask(struct kvm *kvm)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +
-> +	return sev->wbinvd_dirty_mask;
-> +}
-> +
-> +void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	/*
-> +	 * The per-VM wbinvd_dirty_mask should record all physical CPUs
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
 
-Don't hedge with "should", just state KVM's behavior.  E.g.
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
 
-	/*
-	 * To optimize cache flushes when memory is reclaimed from an SEV VM,
-	 * track physical CPUs that enter the guest for SEV VMs and thus can
-	 * have encrypted, dirty data in the cache, and flush caches only for
-	 * CPUs that have entered the guest.
-	 */
-
-
-> +	 * that are running a SEV guest and be used in memory reclamation.
-> +	 *
-> +	 * Migrating vCPUs between pCPUs is tricky. We cannot clear
-> +	 * this mask each time reclamation finishes and record it again
-> +	 * before VMRUN, because we cannot guarantee the pCPU will exit
-> +	 * to VMM before the next reclamation happens.
-
-Migration is easy enough to solve (I think; famous last words).  KVM is already
-forcing an exit to service the IPI, just set the associated pCPU's bit if it has
-a running vCPU loaded.
-
-However, to play nice with multiple flushers, we'd need something like
-kvm_recalculate_apic_map() to ensure subsequent flushers wait for previous
-flushers to finish before reading the cpumask.  Maybe a simple mutex would
-suffice?  Contention should be extremely rare for well-behaved setups.
-
-Kevin, since I believe your use case cares about vCPU migration, is this
-something you'd be interesting in tackling?  It can go on top, i.e. I don't think
-this base series needs to be held up for fancier migration handling, it's a clear
-improvement over blasting WBINVD to all CPUs.
-
-> +	 *
-> +	 * Thus we just keep stale pCPU numbers in the mask if vCPU
-> +	 * migration happens.
-> +	 */
-
-This can be conditioned on vcpu->wants_to_run, so that loading a vCPU outside of
-KVM_RUN doesn't trigger WBINVD.
-
-> +	cpumask_set_cpu(cpu, sev_get_wbinvd_dirty_mask(vcpu->kvm));
-> +}
-> +
-> +static void sev_do_wbinvd(struct kvm *kvm)
-> +{
-> +	struct cpumask *dirty_mask = sev_get_wbinvd_dirty_mask(kvm);
-> +
-> +	/*
-> +	 * Although dirty_mask is not maintained perfectly and may lead
-> +	 * to wbinvd on physical CPUs that are not running a SEV guest,
-> +	 * it's still better than wbinvd_on_all_cpus().
-
-This belongs in the changelog not as a comment.  This would be a good spot to add
-the:
-
-	/*
-	 * TODO: Clear CPUs from the bitmap prior to flushing.  Doing so
-	 * requires serializing multiple calls and having CPUs mark themselves
-	 * "dirty" if they are currently running a vCPU for the VM.
-	 */ 
-
-> +	 */
-> +	wbinvd_on_many_cpus(dirty_mask);
-> +}
-> +
->  static void sev_decommission(unsigned int handle)
->  {
->  	struct sev_data_decommission decommission;
-> @@ -265,6 +301,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  	ret = sev_platform_init(&argp->error);
->  	if (ret)
->  		goto e_free;
-> +	if (!zalloc_cpumask_var(&sev->wbinvd_dirty_mask, GFP_KERNEL_ACCOUNT))
-> +		goto e_free;
-> +
->  
->  	INIT_LIST_HEAD(&sev->regions_list);
->  	INIT_LIST_HEAD(&sev->mirror_vms);
-> @@ -2048,7 +2087,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
->  	 * releasing the pages back to the system for use. CLFLUSH will
->  	 * not do this, so issue a WBINVD.
->  	 */
-> -	wbinvd_on_all_cpus();
-> +	sev_do_wbinvd(kvm);
-
-Hmm, I am not convinced that optimizing sev_mem_enc_unregister_region() is worth
-doing.  Nothing here prevents a vCPU from racing with unregistering the region.
-That said, this path isn't exactly safe as it is, because KVM essentially relies
-on userspace to do the right thing.  And userspace can only corrupt itself,
-because the memory hasn't actually been freed, just unpinned.  If userspace hasn't
-ensured the guest can't access the memory, it's already hosed, so I supposed we
-might as well, because why not.
-
-All the other paths in KVM ensure vCPUs don't have access to the relevent regions,
-*before* doing WBINVD.
-
->  	__unregister_enc_region_locked(kvm, region);
->  
-> @@ -2152,7 +2191,7 @@ void sev_vm_destroy(struct kvm *kvm)
->  	 * releasing the pages back to the system for use. CLFLUSH will
->  	 * not do this, so issue a WBINVD.
->  	 */
-> -	wbinvd_on_all_cpus();
-> +	sev_do_wbinvd(kvm);
-
-I am 99% certain this wbinvd_on_all_cpus() can simply be dropped.  sev_vm_destroy()
-is called after KVM's mmu_notifier has been unregistered, which means it's called
-after kvm_mmu_notifier_release() => kvm_arch_guest_memory_reclaimed().
-
->  	/*
->  	 * if userspace was terminated before unregistering the memory regions
-> @@ -2168,6 +2207,7 @@ void sev_vm_destroy(struct kvm *kvm)
->  
->  	sev_unbind_asid(kvm, sev->handle);
->  	sev_asid_free(sev);
-> +	free_cpumask_var(sev->wbinvd_dirty_mask);
->  }
->  
->  void __init sev_set_cpu_caps(void)
-> @@ -2343,7 +2383,7 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
-
-Similar to sev_vm_destroy(), I'm quite certain sev_flush_encrypted_page() is
-completely superfluous.  It's used only by sev_free_vcpu(), and sev_free_vcpu()
-is called after kvm_mmu_notifier_release().  sev_free_vcpu() is also called when
-vCPU creation fails, but the vCPU can't have entered the guest in that case, not
-to mention its VMSA can't have been encrypted.
-
-So I think we can delete this one too.
-
->  	return;
->  
->  do_wbinvd:
-> -	wbinvd_on_all_cpus();
-> +	sev_do_wbinvd(vcpu->kvm);
->  }
->  
->  void sev_guest_memory_reclaimed(struct kvm *kvm)
-> @@ -2351,7 +2391,7 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
->  	if (!sev_guest(kvm))
->  		return;
->  
-> -	wbinvd_on_all_cpus();
-> +	sev_do_wbinvd(kvm);
->  }
->  
->  void sev_free_vcpu(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e90b429c8..6ec118df3 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1560,6 +1560,8 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	}
->  	if (kvm_vcpu_apicv_active(vcpu))
->  		avic_vcpu_load(vcpu, cpu);
-> +	if (sev_guest(vcpu->kvm))
-> +		sev_vcpu_load(vcpu, cpu);
->  }
->  
->  static void svm_vcpu_put(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 8ef95139c..dfb889c91 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -90,6 +90,9 @@ struct kvm_sev_info {
->  	struct list_head mirror_entry; /* Use as a list entry of mirrors */
->  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
->  	atomic_t migration_in_progress;
-> +
-> +    /* CPUs invoked VMRUN should do wbinvd after guest memory is reclaimed */
-> +	struct cpumask *wbinvd_dirty_mask;
->  };
->  
->  struct kvm_svm {
-> @@ -694,6 +697,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-> +void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->  
->  /* vmenter.S */
->  
-> -- 
-> 2.34.1
-> 
+Future Schedule:
+Dec 11th - No topic
+Dec 18th - No topic
+Dec 25th - Canceled
+Jan 1sth - Canceled
 
