@@ -1,153 +1,146 @@
-Return-Path: <kvm+bounces-33086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F357A9E4530
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:57:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FCB9E45E5
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 21:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADFEE2822CB
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:57:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DB6CB30796
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89841F03DF;
-	Wed,  4 Dec 2024 19:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F81C1F03DF;
+	Wed,  4 Dec 2024 20:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PYrPrXQA"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="K2VUz5Vy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5713C13D246;
-	Wed,  4 Dec 2024 19:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419001531C1;
+	Wed,  4 Dec 2024 20:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733342257; cv=none; b=QuadpHXcgd0ZJjNCQfiKGNDG56LZxXN9nhudooG3qz7PiGyxMg8QHzmBgaUY0PZDsUuTm/UGOANFaTZEuZSiUqwVJJYKuj5BYVGPdw5i1Gb7iZB1inmbEhOKecXkxZfGgB3Z5sx9cPaYe0lckBzoXnhbhLjlmyIBVr4zhJu0Vbg=
+	t=1733342603; cv=none; b=pVWHxQbhQP2i1RIexIyzWEqh4MdVkIqBjjD96/8h3ly26E4rE3XB2DK6FCprbOvK2rjEKTs5oXJ76au/PG64q8K2/CUz3xUbt4DLlADZqZjS5XeRw/M9Y+WHLX84Wbsq0IsvuqND4obKtIZb5hArkY+kkrxPkL4+cRTohLAnTw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733342257; c=relaxed/simple;
-	bh=xIdxTrbHkhTQoVGwvXPYabjjueCAUAJwk6ASmPg/y7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CIq/YkrXkSxvmMVkuBVOcrrKyKMgSAOvaZAkokTX0kyVtIH2abRazdWe8seAPXQ2XLxuRqLM2o1K4wgyOgF+uFvilx6mDFBjB+cpO5nTqUFfFaMYvzNQ94FC6979GiMhJXeFK5jhPzcUpKY2wND5BYmjqEZffc980zxioeqmWgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PYrPrXQA; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733342255; x=1764878255;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xIdxTrbHkhTQoVGwvXPYabjjueCAUAJwk6ASmPg/y7g=;
-  b=PYrPrXQA9WjJKQanY/fP1KolG7xQI6xtMcrV9BkoDvM2fs4dWCduD1Bg
-   DqS+rDbyGyMXQYim8DAav3huq0CAVq9QLt+PAYsi7TdNmMKwDiaYeCvEf
-   GprPfPy1mu9i4s7ZbCFbqMXVCu8doi0GwgG+mO7FoOI7SA7lEWdzW2AHg
-   JyrinxTgV/rEzVWmqbK/9J340scRgjDzVupRLe4d2VKxnPeN2X1mXC1kD
-   wtsmaDz+eH/bCXBKGlYG6Bmk846a636idJx+v821rv7I69RCb9MXVdyLq
-   oC5eRKsIlFPNna/OiJJqtjXPj0WdkWcVD6e0n/VInKmra2VtuYXnd0Ln2
-   w==;
-X-CSE-ConnectionGUID: 3h8RI/VSQl+Rg6UuSY9AuA==
-X-CSE-MsgGUID: 4ilxJ+GtTXePbCLS6aTJ5A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="56109467"
-X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
-   d="scan'208";a="56109467"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 11:57:34 -0800
-X-CSE-ConnectionGUID: 2cHJZCpgQlasYKo8GidWlw==
-X-CSE-MsgGUID: Gj68+C1JR7i2ayiK+C5mHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
-   d="scan'208";a="124684029"
-Received: from dgramcko-desk.amr.corp.intel.com (HELO [10.124.223.226]) ([10.124.223.226])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 11:57:33 -0800
-Message-ID: <0854fbf0-c885-4331-8e9d-30eaa557b266@intel.com>
-Date: Wed, 4 Dec 2024 11:57:31 -0800
+	s=arc-20240116; t=1733342603; c=relaxed/simple;
+	bh=2M7uRz2BBNPKwPDf3dd58a9lU6iILrU8/npc7OhOqnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HaRY6JIAosFT45334RdbnTGU8rqJQTBuaO3U3rywp/7eReEYOyMuSyrfZ1s7VCM0tR+TsAeDEim30jpyAHvoXYkRrYkhC71nw7EAzJEtPpYHeULbyfjOUyKrQN4B0rsAiTYre5dPhte8GBC/k87cCn1gVj6sXv51YleMhQt50yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=K2VUz5Vy; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 984AA40E0286;
+	Wed,  4 Dec 2024 20:03:16 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 0mvLpFChjbae; Wed,  4 Dec 2024 20:03:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733342592; bh=N3RioEMALy81DolBlUwEFWVsjxc+/QqKKebdk5ubV1A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K2VUz5VyE9r7vkrHxoAtB3De7AADB8qn8cWJOo4B2ydvwFfNTtRpxWFNHerxockM7
+	 +MpRDJ+PmtH1FCIV6EFKplXfD1brJIaq3aIP6GCfiej0m6b2xmQkErrRKgwZ7ela1U
+	 4bSOiSCnETBnQWlnXqGhz5Zp5FEEv5NyBC3bveF/3CT60vMShKkr9qMcfvmTwCuzXF
+	 okCYE1IQCncOKmU/MUOb4SsQ0mthO6CFWGC9gaO6x9cYCAPfO/psXREuD6ZXeH7fgw
+	 rKRKjN8C5Fmx9YdREYrPbg2CLKijUs2wqzpnjfigCMpG7OjUQjTSnmqrkRWTG4T7gY
+	 2dU+5goiU8d80R+91PyKsAqj4qgRxsAJO+mAU911Pg8W7VLo+kDJ1+3jGdKEp+QDWU
+	 yMKHQDu0FEAyRgqQC3Gmzazm8KcqWR5774tuTL6I0x7NrCSlvShzI8Q10oWbwzjAcj
+	 0druu8owfGbA1OCHOQUs1m46HufNaY8nU35gIBSuMdTb6gP5vAnJBr9zC6zAsRae0H
+	 +4yrRbD32Tp06PZydldoQmoR0FWnfWDVHUwmRpAtklcXlv99H6TyFBIlXw0dkkzba7
+	 HC1btMa6MJor4sqqJHFIaRlFVw+THEuahqVPHEo91HX5WC92fmX3fvPGEV8e6GBgMR
+	 Sbrf1pPWFM8CuxyRysh21spU=
+Received: from zn.tnic (p200300ea9736a14b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9736:a14b:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A185640E0269;
+	Wed,  4 Dec 2024 20:03:01 +0000 (UTC)
+Date: Wed, 4 Dec 2024 21:02:55 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 01/13] x86/sev: Carve out and export SNP guest
+ messaging init routines
+Message-ID: <20241204200255.GCZ1C1b3krGc_4QOeg@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-2-nikunj@amd.com>
+ <20241203141950.GCZ08ThrMOHmDFeaa2@fat_crate.local>
+ <fef7abe1-29ce-4818-b8b5-988e5e6a2027@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 5/6] x86/virt/tdx: Add SEAMCALL wrappers for TDX
- VM/vCPU field access
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
- pbonzini@redhat.com, seanjc@google.com
-Cc: isaku.yamahata@gmail.com, kai.huang@intel.com,
- linux-kernel@vger.kernel.org, tony.lindgren@linux.intel.com,
- xiaoyao.li@intel.com, yan.y.zhao@intel.com, x86@kernel.org,
- adrian.hunter@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
-References: <20241203010317.827803-1-rick.p.edgecombe@intel.com>
- <20241203010317.827803-6-rick.p.edgecombe@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20241203010317.827803-6-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <fef7abe1-29ce-4818-b8b5-988e5e6a2027@amd.com>
 
-On 12/2/24 17:03, Rick Edgecombe wrote:
-> +u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask)
-> +{
-> +	struct tdx_module_args args = {
-> +		.rcx = tdx_tdvpr_pa(vp),
-> +		.rdx = field,
-> +		.r8 = data,
-> +		.r9 = mask,
-> +	};
-> +
-> +	return seamcall(TDH_VP_WR, &args);
-> +}
-> +EXPORT_SYMBOL_GPL(tdh_vp_wr);
+On Wed, Dec 04, 2024 at 03:30:13PM +0530, Nikunj A. Dadhania wrote:
+> The above ones I have retained old code.
 
-There's a bit more tweaking you could _probably_ do here like giving
-'field' a real type that means something, probably an enum. But that's
-well into nitpicky territory and might not buy anything in practice.
+Right.
 
-Overall this set looks fine to me. The types are much more safe and
-helpers are much more self-explanatory.  So, for the series:
+> GFP_KERNEL_ACCOUNT allocation are accounted in kmemcg and the below note from[1]
+> ----------------------------------------------------------------------------
+> Untrusted allocations triggered from userspace should be a subject of kmem
+> accounting and must have __GFP_ACCOUNT bit set. There is the handy
+> GFP_KERNEL_ACCOUNT shortcut for GFP_KERNEL allocations that should be accounted.
+> ----------------------------------------------------------------------------
 
-Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+Interesting.
 
+> For mdesc, I had kept it similar to snp_dev allocation, that is why it is 
+> having GFP_KERNEL.
+> 
+>         snp_dev = devm_kzalloc(&pdev->dev, sizeof(struct snp_guest_dev), GFP_KERNEL);
+>         if (!snp_dev)
+> -               goto e_unmap;
+> -
+> -       mdesc = devm_kzalloc(&pdev->dev, sizeof(struct snp_msg_desc), GFP_KERNEL);
+> 
+> Let me know if mdesc allocation need to be GFP_KERNEL_ACCOUNT.
+
+Let's audit that thing:
+
+* snp_init_crypto - not really untrusted allocation. It is on the driver probe
+path.
+
+* get_report - I don't think so:
+
+        /*      
+         * The intermediate response buffer is used while decrypting the
+         * response payload. Make sure that it has enough space to cover the
+         * authtag.
+         */
+        resp_len = sizeof(report_resp->data) + mdesc->ctx->authsize;
+        report_resp = kzalloc(resp_len, GFP_KERNEL_ACCOUNT);
+
+That resp_len is limited and that's on the guest_ioctl path which cannot
+happen concurrently?
+
+* get_ext_report - ditto
+
+* alloc_shared_pages - all the allocations are limited but I guess that could
+remain _ACCOUNT as a measure for future robustness.
+
+And that was it.
+
+So AFAICT, only one use case is semi-valid.
+
+So maybe we should convert those remaining ones to boring GFP_KERNEL...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
