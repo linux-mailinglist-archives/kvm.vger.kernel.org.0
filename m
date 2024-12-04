@@ -1,237 +1,205 @@
-Return-Path: <kvm+bounces-32979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32980-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C37A9E3108
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 02:59:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A75F9E3237
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 04:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1732284B26
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 01:59:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAE2B27195
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 03:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E569F282FA;
-	Wed,  4 Dec 2024 01:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFC0156997;
+	Wed,  4 Dec 2024 03:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wsEMoe1I"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="LesNnhwJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D313487BF
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 01:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110DC130A54
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 03:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733277553; cv=none; b=gWHtLKdBxLza/O3NZXx26qROYnx0nynPIS2SnJwMAo02eWhs8oTAMN1DZ2X/bXPUTbGcqkSoSNmAbtmvsd5ris0qR74JPtoN6TmJwn+9KPZZkJGujzMktpQ9fxqnStN86Vxj02Q8X6S0gi7AM9+GYCKCF/367G3JNdjcmcHtCBE=
+	t=1733283819; cv=none; b=g6kqwi/nM0p9pfBMOCF9rE6PrW2bPbk2n6a6mb4SMLyeft2GjqBHyL/khhLtPhmBMQE1QUDxAPj6YlJikwxJP2FaCV0ARnZm/EKvrbFzqdrerhHrYeAnamP3JnM97aVjRB6h8786D2EPPPCsYzEOQrd5Jffz+jTDYDJfMEVJe8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733277553; c=relaxed/simple;
-	bh=gQmwL+28JoOX3uRXxqS/5bngvFoEsI4Svi+cbQQefbM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NQoVrqvuRZ2f3qynkvKULSoRH+iAkJ/OMfyR6nfHzW0alH3vNiH8SjnFuhr0ziSyPvkFvDF7ombsMncc8dz1Ii6pwLsAnSh12jBgBhAhOGLIm57Dz/nX+EHEIvdg8qCHC2KPs1+FfqlvgLcrceqxzVAVu9r8ijmwbyc8O3VUqLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wsEMoe1I; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee36569f4cso5337193a91.2
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 17:59:11 -0800 (PST)
+	s=arc-20240116; t=1733283819; c=relaxed/simple;
+	bh=+kQgx+gnUJbkShBpT4dRk72hfPx4Z/Q1SR5sEmPhons=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y7XWsid5ZS1JBWEjyaOZOiPAlTVLOaK3kmJe4W6nIg+GyScXiW5Y80v8tZpBxu+e2VQnp9mVmeQ8bPBleeycBvOH6ac7uZJTCYRoBndnmdFpp4iutptv4Mnc8Sv58u4FQNfmbXm+3UBP0ETxOf8vl93z5z6Y7MJ/jzb9P0t5lq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=LesNnhwJ; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-843df3c4390so217389639f.3
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 19:43:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733277551; x=1733882351; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CuMOF6fBqUYJuUUew2J1LJLi0r8GH1qnPK4X1uoy7mI=;
-        b=wsEMoe1Irpi9956X2+5ncY1sLyEXCC29Lt2m4bnjq+pd3JIwSMgLoc/OkkjLh3kZRG
-         p9ERS7dGGg2HE9s6WkqB0c6U0k3CAWdu+ng9D/NttRBZc+mzPWkHZVB7UQ3cxq/eQwn3
-         4Odfx9/8fqLSALxv0hWxbd6KtkPgldX8z/GKIXwapwbcrGB5dinTtBisYonB1tZGsajV
-         LKT4pzRggzvliAtAqk/cJcIErTlQ1gEKJquRqtF5YlmOu+i6TUIRd14qZVNUwbj2xDBa
-         pgTU7lRQYLVYH3wYIzqN8po0T5Z86FNwJjQQc4GugEPNXy633Emr4nNe5fGLJXuP7PM2
-         OXWg==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1733283817; x=1733888617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGkT/pl1gB1Evs4ReRwjiJx5mPh/IBj5HFwD48IlujU=;
+        b=LesNnhwJpSy1T9sLWdLo5mrghP+Qf0Kn0rRltwLpT/Wd0N1BGJ7StUZtcbTk+i4mDL
+         zQ0wy6poNVxX4AL2/FdVZH3IGDI7E9FF8JcbihX3v/hOb7bNdKf/yCtQa0GWXMnAKnDJ
+         k78c3nyRAm+noxkY6CGe6iwiz7cIOHPWthlf6kLTNaLs6+GfXgGXUWaaHBJhPYy47C26
+         Pd+UIQ3jLy1fqbB7JB1RTaDQ0rlFMsfvDBVyQQDVPSnh5AbNa3E/0nczvAu5tCEg3H+z
+         GeHEO3fhLzFaD/i5zOfY1uE+EXlj7gZx1DJ6HQHBwfuI/MFtCXlECWQCDVEBW9mKwD5p
+         rsoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733277551; x=1733882351;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CuMOF6fBqUYJuUUew2J1LJLi0r8GH1qnPK4X1uoy7mI=;
-        b=I3ywB/9LYPvJem30+foHuD/AMXP3jTwwgKsBrIVfCeX9dGpNtT/p5cxdsGEmTGO1lt
-         hFjqqXIPa6FLdcAH0fSuJkGOW7IrO6LG1qE5MulI9jpA8o7NzZjJCAM4qIxAQ4rtmwx2
-         us/wFjtrpdfjZKqeXJuc9fYqCWZo93K8uxyLZasCrHtkCjTmg+7fmLodCw+eBNq3KLLE
-         lY2AxIbZzhYTDTQl2GzUaMyK7T43vp679mFbYgly9wn/kVfeFzGyjGKgqOsRR9WOf5vb
-         tGK+PulPFa62OnTvtJQd1CPWaY69XqD1D/2uqAUvzRV0w7acEqbW1g6mcGELJGnK7yYg
-         VQqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1cwB00FdwcqXQX7vBLYznQ6ljHpwTGoOsf/B8xnbfzRUqB+AHCvZMHh7HQGUFCIIPpfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww5c/16COR+FyX7i328r3rIgJGqnL7ZIEQpj0Nyn5vzXGt/4Le
-	WGbjoAb7ktaI0ohYWX2vDtCyn/7klO8rqy5OwM0gLHLuwApTaf7YgsrNjLxQt5bQY4NMXrnnLJ+
-	j5g==
-X-Google-Smtp-Source: AGHT+IHxiQNTqlvGDFnwTGaPH6L5TImxiPZR/b+7S9Y2Q0HqG03dOcOWZldI1AisuR15V4CEpODHuWhqEGY=
-X-Received: from pjur6.prod.google.com ([2002:a17:90a:d406:b0:2e9:ee22:8881])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e81:b0:2ea:2a8d:dd2a
- with SMTP id 98e67ed59e1d1-2ef0124f722mr5869624a91.27.1733277550734; Tue, 03
- Dec 2024 17:59:10 -0800 (PST)
-Date: Tue, 3 Dec 2024 17:59:09 -0800
-In-Reply-To: <CALMp9eTCe1-ZA47kcktTQ4WZ=GUbg8x3HpBd0Rf9Yx_pDFkkNg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1733283817; x=1733888617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vGkT/pl1gB1Evs4ReRwjiJx5mPh/IBj5HFwD48IlujU=;
+        b=WgqX+xWg27OVn+Mxz2GJaFvIsgJvc2N5WEDqU7PtvPawvYgHck8PnFvjp2ecLRdhUV
+         /vjEL7TePfFhyZ7VWReZNHC9xusQGX9F7G9Nt7vsUnlCqdz9QpqD5YjQXopP63If24uE
+         p2GoYlVMyOj61rmYjMh81CXi3iKKj6COli1QMws8uzD30NjEvpldwF1ccPzAZW91M3xq
+         5sXc1Jz50fAcUAnAdwjwyTqIjPboY8xkomdgURgZT3MEjaGl9eRAJfKMpb3sLziOpjmt
+         C3yv8/74zDgPEaMSkCmXRXR18qgpkiO4+J6l6AWaMEmfaKebTFdXHlXg1Q8yAeThV/FI
+         nUDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxabA52bE4+5qz65JLVUQJ+Agg6GIqZ/ipvQbtj01gxoUvjkGCOjbfUWTnpIa4WxQbPPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKTxMr5dPfcSWeZ+KmAwKjpRtspio3KGMK3mT+bzTStlTcPgAg
+	IqNg6rVmGdH+LXojZRI0IVEwq52GUoS+pjtR7+zDH7HMJqdpa9esAwmSMTGoLo4yKaVdeCYiuOA
+	e0vuagA/FX8rydVzf7dSg8TXlh+ohpYDwDqjXKg==
+X-Gm-Gg: ASbGncsVLBWRnbXDSXneHfNki3FXghnz1DerrNkAm5w1alUoqVvG4zXqmKJJTq/7zvF
+	m67F1ExfBe1ZjtULwZRUZc1xSwo+P0SdRQw==
+X-Google-Smtp-Source: AGHT+IGWdFp8FF+1NtOQA0riwNaVCNa+lNq7c5BS40O1U8dW0QvsTp35bk3sIYPxMlaLCPGVX4HHb6tLAmO9iVR0CsU=
+X-Received: by 2002:a05:6602:29c8:b0:807:f0fb:1192 with SMTP id
+ ca18e2360f4ac-8445b5477f8mr665966539f.1.1733283817005; Tue, 03 Dec 2024
+ 19:43:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241121185315.3416855-1-mizhang@google.com> <Z0-R-_GPWu-iVAYM@google.com>
- <CALMp9eTCe1-ZA47kcktTQ4WZ=GUbg8x3HpBd0Rf9Yx_pDFkkNg@mail.gmail.com>
-Message-ID: <Z0-3bc1reu1slCtL@google.com>
-Subject: Re: [RFC PATCH 00/22] KVM: x86: Virtualize IA32_APERF and IA32_MPERF MSRs
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
-	Mario Limonciello <mario.limonciello@amd.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20241114161845.502027-17-ajones@ventanamicro.com>
+ <20241114161845.502027-18-ajones@ventanamicro.com> <87mshcub2u.ffs@tglx>
+ <CAAhSdy08gi998HsTkGpaV+bTWczVSL6D8c7EmuTQqovo63oXDw@mail.gmail.com>
+ <874j3ktrjv.ffs@tglx> <87ser4s796.ffs@tglx>
+In-Reply-To: <87ser4s796.ffs@tglx>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 4 Dec 2024 09:13:24 +0530
+Message-ID: <CAAhSdy27gaVJaXBrx8GB+Xr4ZTvp8hd0Jg8JokzehgC-=5pOmA@mail.gmail.com>
+Subject: Re: [RFC PATCH 01/15] irqchip/riscv-imsic: Use hierarchy to reach irq_set_affinity
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org, will@kernel.org, 
+	robin.murphy@arm.com, atishp@atishpatra.org, alex.williamson@redhat.com, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 03, 2024, Jim Mattson wrote:
-> On Tue, Dec 3, 2024 at 3:19=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Thu, Nov 21, 2024, Mingwei Zhang wrote:
-> > > Linux guests read IA32_APERF and IA32_MPERF on every scheduler tick
-> > > (250 Hz by default) to measure their effective CPU frequency. To avoi=
-d
-> > > the overhead of intercepting these frequent MSR reads, allow the gues=
+On Wed, Dec 4, 2024 at 4:29=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de>=
+ wrote:
+>
+> On Tue, Dec 03 2024 at 21:55, Thomas Gleixner wrote:
+> > On Tue, Dec 03 2024 at 22:07, Anup Patel wrote:
+> >> On Tue, Dec 3, 2024 at 7:23=E2=80=AFPM Thomas Gleixner <tglx@linutroni=
+x.de> wrote:
+> >>> Sorry, I missed that when reviewing the original IMSIC MSI support.
+> >>>
+> >>> The whole IMSIC MSI support can be moved over to MSI LIB which makes =
+all
+> >>> of this indirection go away and your intermediate domain will just fi=
 t
-> > > to read them directly by loading guest values into the hardware MSRs.
-> > >
-> > > These MSRs are continuously running counters whose values must be
-> > > carefully tracked during all vCPU state transitions:
-> > > - Guest IA32_APERF advances only during guest execution
+> >>> in.
+> >>>
+> >>> Uncompiled patch below. If that works, it needs to be split up proper=
+ly.
+> >>>
+> >>> Note, this removes the setup of the irq_retrigger callback, but that'=
+s
+> >>> fine because on hierarchical domains irq_chip_retrigger_hierarchy() i=
+s
+> >>> invoked anyway. See try_retrigger().
+> >>
+> >> The IMSIC driver was merged one kernel release before common
+> >> MSI LIB was merged.
 > >
-> > That's not what this series does though.  Guest APERF advances while th=
-e vCPU is
-> > loaded by KVM_RUN, which is *very* different than letting APERF run fre=
-ely only
-> > while the vCPU is actively executing in the guest.
+> > Ah indeed.
 > >
-> > E.g. a vCPU that is memory oversubscribed via zswap will account a sign=
-ificant
-> > amount of CPU time in APERF when faulting in swapped memory, whereas tr=
-aditional
-> > file-backed swap will not due to the task being scheduled out while wai=
-ting on I/O.
->=20
-> Are you saying that APERF should stop completely outside of VMX
-> non-root operation / guest mode?
-> While that is possible, the overhead would be significantly
-> higher...probably high enough to make it impractical.
-
-No, I'm simply pointing out that the cover letter is misleading/inaccurate.
-
-> > In general, the "why" of this series is missing.  What are the use case=
-s you are
-> > targeting?  What are the exact semantics you want to define?  *Why* did=
- are you
-> > proposed those exact semantics?
->=20
-> I get the impression that the questions above are largely rhetorical, and
-
-Nope, not rhetorical, I genuinely want to know.  I can't tell if ya'll thou=
-ght
-about the side effects of things like swap and emulated I/O, and if you did=
-, what
-made you come to the conclusion that the "best" boundary is on sched_out() =
-and
-return to userspace.
-
-> that you would not be happy with the answers anyway, but if you really ar=
-e
-> inviting a version 2, I will gladly expound upon the why.
-
-No need for a new version at this time, just give me the details.
-
-> > E.g. emulated I/O that is handled in KVM will be accounted to APERF, bu=
-t I/O that
-> > requires userspace exits will not.  It's not necessarily wrong for heav=
-y userspace
-> > I/O to cause observed frequency to drop, but it's not obviously correct=
- either.
+> >> We should definitely update the IMSIC driver to use MSI LIB, I will
+> >> try your suggested changes (below) and post a separate series.
 > >
-> > The use cases matter a lot for APERF/MPERF, because trying to reason ab=
-out what's
-> > desirable for an oversubscribed setup requires a lot more work than def=
-ining
-> > semantics for setups where all vCPUs are hard pinned 1:1 and memory is =
-more or
-> > less just partitioned.  Not to mention the complexity for trying to sup=
-port all
-> > potential use cases is likely quite a bit higher.
-> >
-> > And if the use case is specifically for slice-of-hardware, hard pinned/=
-partitioned
-> > VMs, does it matter if the host's view of APERF/MPERF is not accurately=
- captured
-> > at all times?  Outside of maybe a few CPUs running bookkeeping tasks, t=
-he only
-> > workloads running on CPUs should be vCPUs.  It's not clear to me that o=
-bserving
-> > the guest utilization is outright wrong in that case.
->=20
-> My understanding is that Google Cloud customers have been asking for this
-> feature for all manner of VM families for years, and most of those VM
-> families are not slice-of-hardware, since we just launched our first such
-> offering a few months ago.
+> > Pick up the delta patch I gave Andrew...
+>
+> As I was looking at something else MSI related I had a look at
+> imsic_irq_set_affinity() again.
+>
+> It's actually required to have the message write in that function and
+> not afterwards as you invoke imsic_vector_move() from that function.
+>
+> That's obviously not true for the remap case as that will not change the
+> message address/data pair because the remap table entry is immutable -
+> at least I assume so for my mental sanity sake :)
+>
+> But that brings me to a related question. How is this supposed to work
+> with non-atomic message updates? PCI/MSI does not necessarily provide
+> masking, and the write of the address/data pair is done in bits and
+> pieces. So you can end up with an intermediate state seen by the device
+> which ends up somewhere in interrupt nirvana space.
+>
+> See the dance in msi_set_affinity() and commit 6f1a4891a592
+> ("x86/apic/msi: Plug non-maskable MSI affinity race") for further
+> explanation.
+>
+> The way how the IMSIC driver works seems to be pretty much the same as
+> the x86 APIC mess:
+>
+>         @address is the physical address of the per CPU MSI target
+>         address and @data is the vector ID on that CPU.
+>
+> So the non-atomic update in case of non-maskable MSI suffers from the
+> same problem. It works most of the time, but if it doesn't you might
+> stare at the occasionally lost interrupt and the stale device in
+> disbelief for quite a while :)
 
-But do you actually want to expose APERF/MPERF to those VMs?  With my upstr=
-eam
-hat on, what someone's customers are asking for isn't relevant.  What's rel=
-evant
-is what that someone wants to deliver/enable.
+Yes, we have the same challenges as x86 APIC when changing
+MSI affinity.
 
-> > One idea for supporting APERF/MPERF in KVM would be to add a kernel par=
-am to
-> > disable/hide APERF/MPERF from the host, and then let KVM virtualize/pas=
-sthrough
-> > APERF/MPERF if and only if the feature is supported in hardware, but hi=
-dden from
-> > the kernel.  I.e. let the system admin gift APERF/MPERF to KVM.
->=20
-> Part of our goal has been to enable guest APERF/MPERF without impacting t=
-he
-> use of host APERF/MPERF, since one of the first things our support teams =
-look
-> at in response to a performance complaint is the effective frequencies of=
- the
-> CPUs as reported on the host.
+>
+> I might be missing something which magically prevent that though :)
+>
 
-But is looking at the host's view even useful if (a) the only thing running=
- on
-those CPUs is a single vCPU, and (b) host userspace only sees the effective
-frequencies when _host_ code is running?  Getting the effective frequency f=
-or
-when the userspace VMM is processing emulated I/O probably isn't going to b=
-e all
-that helpful.
+Your understanding is correct. In fact, the IMSIC msi_set_affinity()
+handling is inspired from x86 APIC approach due to similarity in
+the overall MSI controller.
 
-And gifting APERF/MPERF to VMs doesn't have to mean the host can't read the=
- MSRs,
-e.g. via turbostat.  It just means the kernel won't use APERF/MPERF for sch=
-eduling
-decisions or any other behaviors that rely on an accurate host view.
+The high-level idea of imsic_irq_set_affinity() is as follows:
 
-> I can explain all of this in excruciating detail, but I'm not really
-> motivated by your initial response, which honestly seems a bit hostile.
+1) Allocate new_vector (new CPU IMSIC address + new ID on that CPU)
 
-Probably because this series made me a bit grumpy :-)  As presented, this f=
-eels
-way, way too much like KVM's existing PMU "virtualization".  Mostly works i=
-f you
-stare at it just so, but devoid of details on why X was done instead of Y, =
-and
-seemingly ignores multiple edge cases.
+2) Update the MSI address and data programmed in the device
+based on new_vector (see imsic_msi_update_msg())
 
-I'm not saying you and Mingwei haven't thought about edge cases and design
-tradeoffs, but nothing in the cover letter, changelogs, comments (none), or
-testcases (also none) communicates those thoughts to others.
+3) At this point the device points to the new_vector but old_vector
+(old CPU IMSIC address + old ID on that CPU) is still enabled and
+we might have received MSI on old_vector while we were busy
+setting up a new_vector for the device. To address this, we call
+imsic_vector_move().
 
-> At least you looked at the code, which is a far warmer reception than I
-> usually get.
+4) The imsic_vector_move() marks the old_vector as being
+moved and schedules a lazy timer on the old CPU.
+
+5) The lazy timer expires on the old CPU and results in
+__imsic_local_sync() being called on the old CPU.
+
+6) If there was a pending MSI on the old vector then the
+__imsic_local_sync() function injects an MSI to the
+new_vector using an MMIO write.
+
+It is very unlikely that an MSI from device will be dropped
+(unless I am missing something) but the unsolved issue
+is that handling of in-flight MSI received on the old_vector
+during the MSI re-programming is delayed which may have
+side effects on the device driver side.
+
+I believe in the future RISC-V AIA v2.0 (whenever that
+happens) will address the gaps in AIA v1.0 (like this one).
+
+Regards,
+Anup
 
