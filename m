@@ -1,165 +1,161 @@
-Return-Path: <kvm+bounces-33056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 402DF9E45F5
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 21:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5239E45D9
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 21:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A499BE454F
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:04:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B7D9B3B7EB
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14C920B80B;
-	Wed,  4 Dec 2024 17:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859901A8F62;
+	Wed,  4 Dec 2024 18:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="K8TGU9JN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MSNHHMb5"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="miqNfU3/"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F017207E0F;
-	Wed,  4 Dec 2024 17:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D172391B8
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 18:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733334719; cv=none; b=TMEkBO73LgcotxKSUZVyo00nhMLmN1K/w5jU9ys2rINrLbjapQG7+e3lDd31KtDwOBuoNNzOvoBWtAAV29ZBW9LzNvCRGOH/pTYEB46MnbjgTdVB4qxf4RZPvfwXpWwR3MU1QZbULtgH9neCys38UZ7mu6Jjz4rP0oXMp55sH2Q=
+	t=1733336167; cv=none; b=qC0ajiaP9YWtcRqR4nSFA4ePU9Aj8fb/zQee2vhYFl7+1A6I5HqGFcsUyNhvto+47lCQC6bD7/jz9bOSwGZhCnGoGO6t6uQddE9aFMTLFB5DWF+l55NM+D3hR3wXEx6OHyvD9i0aQGd1SU130cTJBGXnW4Fx0filGIygvJPDOdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733334719; c=relaxed/simple;
-	bh=FGCl+JsSEeF80YE0YF+6nZDBFRr+bBmxhB89qH3mjzU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Sd+8HQm/1wKK9JA9gy0iW7HbpEmsSDzaMqwZoodbO2O3eUSXjCHHKm74CCnbabCHRVKFSTfoiwTcOattm1XJcLHoyRNhTqhfWRIoajjPzTzyYwInGWCYNAFMN7JbfqiTTSfwoGwiabrCltbsiePu80J1ciryEQALzeuS9dwKxa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=K8TGU9JN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MSNHHMb5; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id 02FF7114010E;
-	Wed,  4 Dec 2024 12:51:55 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 12:51:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1733334715;
-	 x=1733421115; bh=jJE2L9y+wEwp9MITaMA6HBhlkUzfR3+Jn5SAVrObSeE=; b=
-	K8TGU9JNA/8Eu09oYaCYPJ1x38aLd+5O+m6ONqg8opGJDtCUw4krurwNMDVuM/bS
-	pboxApeIJj0UYM25nVZO6jc/pjz5mxK0p9EthSOuJdLl1Uhb0UR+toFaH4m8DG/6
-	W/elIdbhx/S00iG9P7dr15V4DODFipVo2v6QWXZTyo8Aq80mzPqPys0/6bHd2UJ+
-	XuCB3Bb+VVIjuYNNcmMnYR9zMpMqTLO3aLpkbmfQdOERYkHvlwg5Zd2AzZQcwO0T
-	x/m8zxyf6GZfgrxT5lvMBNyYnZXQ2Vt/ian5bILBmsgbK00KqvtVNMpHtOTtqR/I
-	XovoBeeQyHZvl/nvJET8Qg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733334715; x=
-	1733421115; bh=jJE2L9y+wEwp9MITaMA6HBhlkUzfR3+Jn5SAVrObSeE=; b=M
-	SNHHMb5oo8A+cXXlOyVSMFKIVOj7J9W4uUhqn38tBjghx7HUtOFmB0dA4Bot2KCr
-	bsIj/eMZnypK+WU2JcvLA+i6I4zIsmtbtaActwHdkaM3B+u6mjZnLl7h+xQ16X58
-	ySkMm4qVuVh5AGpEM1GPNEK95ZfueUre0dQ+KySSkN6kd8sDxGjFnJy4xS9eBNzo
-	WobOnWI1DETEojrVO6Ypw923PBqnMGeQnnJX6tyDZE4KpW7ZfofgJ9AT2BCkG7F3
-	pROqSiGJW5QMPfg4sfMSx3rJ+rH5ex1Yi2sos+5lQmz2tV2X+7ZeVcILnRBN810b
-	1Nq/atoJFz3ohv4OtH2HA==
-X-ME-Sender: <xms:upZQZ7SxdGZd1E4gTE9vgnsRIPL-HAhqgcDd1hmkESiEvXA5PB5OxA>
-    <xme:upZQZ8x9PakEhW_RoG4KqmaONf4jQhAkzGLpC9pyY2GZZ5TPrFzFWTVt4TxWMTSS5
-    T2HoUqwP318cky5rbs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgddutddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
-    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudej
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprh
-    gtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohepshgv
-    rghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrhgrug
-    gvrggurdhorhhgpdhrtghpthhtoheprghnugihsehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrthhhrghnsehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopeigkeeisehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
-X-ME-Proxy: <xmx:upZQZw0wpCWbUKnLUXLtGT8mmbRL9TsXw3nPu9bC4_En5MdNJ5RfGQ>
-    <xmx:upZQZ7CP82B3yE7uInYvsCqXQcTBBHy9ntVV60QIO3XIR07DhIG_8w>
-    <xmx:upZQZ0gSUG03GVXljjr0mb4aG_94ObaUSqDU49c-ZOfJ0bU_g5vo-A>
-    <xmx:upZQZ_oUy0aSGB1Jgt9sGP5t1oxswFHJrniQdyqSiB8TlpLTHrO35g>
-    <xmx:u5ZQZ7Sl6Btvw0Z2OCBePmmVUt5xTxYuxO2pOIknyVjTHsv3PkW_6aCY>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C126B2220072; Wed,  4 Dec 2024 12:51:54 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1733336167; c=relaxed/simple;
+	bh=OQ/DTeSHuXcQ3cs9GY6uWtcOsCFC+KsZnoZMd6/m3/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FPWe5s6q8JKS4HwTrkyx01Fx9jVCflyV/p00439Uu1JtCCnCLcTpgtbLzh0kjzdnXkESOKgrUC6UPfCESUGmMkoC8dtAtkdFOMj2ISyu7qs6tv9dheYxeGjhliIqPztnBLvtSkThxVQNjIxuuZifFb9DmoJ0AK8myULlMfXha4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=miqNfU3/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71076C4CECD;
+	Wed,  4 Dec 2024 18:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1733336166;
+	bh=OQ/DTeSHuXcQ3cs9GY6uWtcOsCFC+KsZnoZMd6/m3/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=miqNfU3/uJZvnbHAvw/kPMs3tp5XuuuOMhS5s6ZMeL88xVoXDxG39P9Oe7sDNz1HJ
+	 ev+HESzCtVEdciUA4+WaYwDE04Bq9qFjugFtcpT3h7WPAl0pW7SH7Dv4yBOFHm1xqz
+	 +nebS/kojoNqHfCwvcF4Z1qQ00QFhMbFWOxxxk2M=
+Date: Wed, 4 Dec 2024 19:16:03 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] vfio/mdev: inline needed class_compat functionality
+Message-ID: <2024120410-promoter-blandness-efa1@gregkh>
+References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
+ <0a14a4df-fbb5-4613-837f-f8025dc73380@gmail.com>
+ <2024120430-boneless-wafer-bf0c@gregkh>
+ <fb0fc57d-955f-404e-a222-e3864cce2b14@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 04 Dec 2024 18:51:34 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Tor Vic" <torvic9@mailbox.org>, "Arnd Bergmann" <arnd@kernel.org>,
- linux-kernel@vger.kernel.org, x86@kernel.org
-Cc: "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Andy Shevchenko" <andy@kernel.org>, "Matthew Wilcox" <willy@infradead.org>,
- "Sean Christopherson" <seanjc@google.com>,
- "Davide Ciminaghi" <ciminaghi@gnudd.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org,
- "Nathan Chancellor" <nathan@kernel.org>
-Message-Id: <9dda7e79-3c0f-48b0-824c-40a230b5cc12@app.fastmail.com>
-In-Reply-To: <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-10-arnd@kernel.org>
- <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
-Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fb0fc57d-955f-404e-a222-e3864cce2b14@gmail.com>
 
-On Wed, Dec 4, 2024, at 16:36, Tor Vic wrote:
-> On 12/4/24 11:30, Arnd Bergmann wrote:
-> Similar but not identical changes have been proposed in the past several 
-> times like e.g. in 1, 2 and likely even more often.
->
-> Your solution seems to be much cleaner, I like it.
+On Wed, Dec 04, 2024 at 06:01:36PM +0100, Heiner Kallweit wrote:
+> On 04.12.2024 10:32, Greg Kroah-Hartman wrote:
+> > On Tue, Dec 03, 2024 at 09:11:47PM +0100, Heiner Kallweit wrote:
+> >> vfio/mdev is the last user of class_compat, and it doesn't use it for
+> >> the intended purpose. See kdoc of class_compat_register():
+> >> Compatibility class are meant as a temporary user-space compatibility
+> >> workaround when converting a family of class devices to a bus devices.
+> > 
+> > True, so waht is mdev doing here?
+> > 
+> >> In addition it uses only a part of the class_compat functionality.
+> >> So inline the needed functionality, and afterwards all class_compat
+> >> code can be removed.
+> >>
+> >> No functional change intended. Compile-tested only.
+> >>
+> >> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> >> ---
+> >>  drivers/vfio/mdev/mdev_core.c | 12 ++++++------
+> >>  1 file changed, 6 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> >> index ed4737de4..a22c49804 100644
+> >> --- a/drivers/vfio/mdev/mdev_core.c
+> >> +++ b/drivers/vfio/mdev/mdev_core.c
+> >> @@ -18,7 +18,7 @@
+> >>  #define DRIVER_AUTHOR		"NVIDIA Corporation"
+> >>  #define DRIVER_DESC		"Mediated device Core Driver"
+> >>  
+> >> -static struct class_compat *mdev_bus_compat_class;
+> >> +static struct kobject *mdev_bus_kobj;
+> > 
+> > 
+> > 
+> >>  
+> >>  static LIST_HEAD(mdev_list);
+> >>  static DEFINE_MUTEX(mdev_list_lock);
+> >> @@ -76,7 +76,7 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
+> >>  	if (ret)
+> >>  		return ret;
+> >>  
+> >> -	ret = class_compat_create_link(mdev_bus_compat_class, dev, NULL);
+> >> +	ret = sysfs_create_link(mdev_bus_kobj, &dev->kobj, dev_name(dev));
+> > 
+> > This feels really wrong, why create a link to a random kobject?  Who is
+> > using this kobject link?
+> > 
+> >>  	if (ret)
+> >>  		dev_warn(dev, "Failed to create compatibility class link\n");
+> >>  
+> >> @@ -98,7 +98,7 @@ void mdev_unregister_parent(struct mdev_parent *parent)
+> >>  	dev_info(parent->dev, "MDEV: Unregistering\n");
+> >>  
+> >>  	down_write(&parent->unreg_sem);
+> >> -	class_compat_remove_link(mdev_bus_compat_class, parent->dev, NULL);
+> >> +	sysfs_remove_link(mdev_bus_kobj, dev_name(parent->dev));
+> >>  	device_for_each_child(parent->dev, NULL, mdev_device_remove_cb);
+> >>  	parent_remove_sysfs_files(parent);
+> >>  	up_write(&parent->unreg_sem);
+> >> @@ -251,8 +251,8 @@ static int __init mdev_init(void)
+> >>  	if (ret)
+> >>  		return ret;
+> >>  
+> >> -	mdev_bus_compat_class = class_compat_register("mdev_bus");
+> >> -	if (!mdev_bus_compat_class) {
+> >> +	mdev_bus_kobj = class_pseudo_register("mdev_bus");
+> > 
+> > But this isn't a class, so let's not fake it please.  Let's fix this
+> > properly, odds are all of this code can just be removed entirely, right?
+> > 
+> 
+> After I removed class_compat from i2c core, I asked Alex basically the
+> same thing: whether class_compat support can be removed from vfio/mdev too.
+> 
+> His reply:
+> I'm afraid we have active userspace tools dependent on
+> /sys/class/mdev_bus currently, libvirt for one.  We link mdev parent
+> devices here and I believe it's the only way for userspace to find
+> those parent devices registered for creating mdev devices.  If there's a
+> desire to remove class_compat, we might need to add some mdev
+> infrastructure to register the class ourselves to maintain the parent
+> links.
+> 
+> 
+> It's my understanding that /sys/class/mdev_bus has nothing in common
+> with an actual class, it's just a container for devices which at least
+> partially belong to other classes. And there's user space tools depending
+> on this structure.
 
-Thanks. It looks like the other two did not actually
-address the bug I'm fixing in my version.
+That's odd, when this was added, why was it added this way?  The
+class_compat stuff is for when classes move around, yet this was always
+done in this way?
 
-> That said, on my Skylake platform, there is no difference between 
-> -march=x86-64 and -march=x86-64-v3 in terms of kernel binary size or 
-> performance.
-> I think Boris also said that these settings make no real difference on 
-> code generation.
+And what tools use this symlink today that can't be updated?
 
-As Nathan pointed out, I had a typo in my patch, so the
-options didn't actually do anything at all. I fixed it now
-and did a 'defconfig' test build with all three:
+thanks,
 
-> Other settings might make a small difference (numbers are from 2023):
->    -generic:       85.089.784 bytes
->    -core2:         85.139.932 bytes
->    -march=skylake: 85.017.808 bytes
-
-
-   text	   data	    bss	    dec	    hex	filename
-26664466	10806622	1490948	38962036	2528374	obj-x86/vmlinux-v1
-26664466	10806622	1490948	38962036	2528374	obj-x86/vmlinux-v2
-26662504	10806654	1490948	38960106	2527bea	obj-x86/vmlinux-v3
-
-which is a tiny 2KB saved between v2 and v3. I looked at
-the object code and found that the v3 version takes advantage
-of the BMI extension, which makes perfect sense. Not sure
-if it has any real performance benefits.
-
-Between v1 and v2, there is a chance to turn things like
-system_has_cmpxchg128() into a constant on v2 and higher.
-
-The v4 version is meaningless in practice since it only
-adds AVX512 instructions that are only present in very
-few CPUs and not that useful inside the kernel side from
-specialized crypto and raid helpers.
-
-      Arnd
+greg k-h
 
