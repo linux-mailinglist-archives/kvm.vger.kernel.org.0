@@ -1,135 +1,114 @@
-Return-Path: <kvm+bounces-33058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201719E430E
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:11:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C329E433B
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:22:34 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31813164AA2
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:11:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07272B63DA9
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B5123919F;
-	Wed,  4 Dec 2024 18:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABB31A8F75;
+	Wed,  4 Dec 2024 18:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bQgvKdKt"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HLb725TZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296E5239188
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 18:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91178156997
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 18:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733335878; cv=none; b=IE6ecyffI3+5uG1vSN8KtKPAcdGcWc15aKQiJ/Hnyuq9w8Y/aKIVLMbtICzBRY8Rp1daZmt/O3ZoSkLzQTN6dxxDvQXbzJxEkkIQboLUlVeYq/nbiiEmaVHEDHU+ftPBiXOXQHH/seSMPekW+sJKa88STXvQnOj0KXr4HrKoilo=
+	t=1733336227; cv=none; b=AwSnBaDXofErfGtks1J1h5rwhU4hLOT6N8QyhyTeqk3/FsLRKcPAKLtzyMLmXNh2pvjf8NKs4c0pPgwZ5wgbbR6rXUXlVtlt6+q5Xys2958aSlKb7HUqbWBF/e+BviYOVFKB5BpSPr6mxR31vNKfsK6R5z/FmUD+EEtelsdGHbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733335878; c=relaxed/simple;
-	bh=X6BEDT6fDm7D7Y0nWW+xKECtJAeRFs5IERZbxKQu3YA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=huemsts0zhwiraE/sUH26IOXX++ruYo3OwVNB1B5igmEfTSjinlAD9olO72T2PL2b9O0ImVyOmjxD7Vbws1rNN9Hrt9fHf5DiGdyqCOeUpJA56WcuahKSWV1orNGnJOjkNBfdhlWXYNd/iVyXASHW23FNPWbNKOVTQrV554czsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=bQgvKdKt; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9ec267b879so114152466b.2
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 10:11:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1733335874; x=1733940674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UsHq11mNN/cIeDGdLbelslfoGN88pEnsDmEEyawNX0M=;
-        b=bQgvKdKtmQIh+0ohEA8WTbSZF+b1Byo5G2ZaIHDe25BE/UeVd4MUhqGWoNPz2rxM83
-         4uJm+/QBMFxlYu9hbemGi16ymWc7Q1NYJtGXJmG9XDLMFYd5nUQNqewzVL6h9ROiJmpz
-         TlS5PyQYbEKMMsr1K1yBKxC7cJtyJsgcbzs6s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733335874; x=1733940674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UsHq11mNN/cIeDGdLbelslfoGN88pEnsDmEEyawNX0M=;
-        b=LMgnOKzqW8yPTBGC37G8rgAuq0yGiFehBhBdVQp4/8g0jTq9CuvTxlfxCNifEFkO4e
-         sGezsfxb9WWlhzvZjMKfGsoQLH0sNckNG/ZZqbVJ3x+Zx0Uusts3XjA+PAoRQh4PcbR+
-         ksxEt7etnxkzhf7CMSnkgnOX4h+q2BtL5bbgFNkjTvpdFZW40iLypcgSg2UIL1snfsgK
-         nner/ZEByj2HbEiKMXwuVeMNdMhNrAJoPHeEa7kgjiHJ35tLXGjXvmM39nni5H39Wfro
-         DdEJCz0yuskQ3QSvWEQHuD0BNMUiFR5hZwbos7tIPW+KNR6zoH459pwEr6zZ7tmbtEf1
-         Bi9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVXavCIWT/i/108h1uuZB8O4Z9+eQapaY+tLMuCKfpo6Y1nPm1G4d23BkAymfQKzTROtNk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0bHpVowrNCDVa5SFFYXoHA07uXouvDWP7c6zi5LUITmMEa/Ku
-	t6yNg8saRDpHs7TjiHGxprkDgOUZErhGwztco0QmJRdZs8TIBunL1dTpXPqtHgDu8D7sIrdEF94
-	zfVs=
-X-Gm-Gg: ASbGncvhyfg/HKCgFrL4umArO2hrqTs0bJ2Z0Bcl/lu8YzXNhItXoRGUnclHdJ25RtP
-	oA/jE6RD3AHudgz8kLLWUUTLPTDtsFQlUz0SK/P6nQUy+wZBgwubFpQ6+lkENvHWXJbSyPTWICG
-	6kAX3WgWRoWakSvjaZhzWuoQWie+vU5SOYQgxyO+YgngunaTJzoCzqo9WnWdF6srjqr5ErUsH6M
-	RK4eegAsHsP1KefsHzMf3a3aRpTxfijwxJwVQ0w4OpsRsewZbVv8eCRcNuKNhPXf4MRvCmBjwAM
-	RtrCW9zKd+I/JJDfxZ91JxXh
-X-Google-Smtp-Source: AGHT+IFocnDbO6YHvudDVpw3TyRMqWCpTHkMJ4pVwwYFsfLz6TOU+GiCuw3enVvZ85LfrZi+HtAAlQ==
-X-Received: by 2002:a17:906:23e9:b0:a9a:f82:7712 with SMTP id a640c23a62f3a-aa5f7f57cbfmr721688066b.52.1733335874166;
-        Wed, 04 Dec 2024 10:11:14 -0800 (PST)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa599955e08sm760405766b.194.2024.12.04.10.11.12
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 10:11:12 -0800 (PST)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d0e75dd846so5385910a12.3
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 10:11:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUJUGVOe8z7gFT3b7toRnHXg5UpeAHkqkdLSuXKCUZNGOvO58v91Kmkaxb3FXBPja+Ff7Y=@vger.kernel.org
-X-Received: by 2002:a17:906:3d22:b0:aa5:392a:f5a7 with SMTP id
- a640c23a62f3a-aa5f7f57ccamr725005966b.57.1733335871860; Wed, 04 Dec 2024
- 10:11:11 -0800 (PST)
+	s=arc-20240116; t=1733336227; c=relaxed/simple;
+	bh=w85VI+PNVYvSUtAszjBNpanvGWkNg924XHVLCuI9X90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jQNKHNSzSHnEijZk8qd+zipn5v9Woq8LuoSb1Z8M2i5kWPyAoZ9tq2pop0cuLp79MIZ0DnuhqLgDw9dAe8/6/TiXgqBmrdpwijBOIhy3ZUhEDf1Sz+mvcZokyl1IrFnuzqhS6Gvn7UINnle9SvILY7os7Ekv00qRkAOvFI2hgRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HLb725TZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A689DC4CECD;
+	Wed,  4 Dec 2024 18:17:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1733336227;
+	bh=w85VI+PNVYvSUtAszjBNpanvGWkNg924XHVLCuI9X90=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HLb725TZ36qyHfj65Klxv4wggmjKBBhFTDI3SHp7H23w7k7qllakkSWvOVFh0417U
+	 pZIk2tiJnZChlgVkSJ3HUPRFxUj4JJc82SZL9+/HS5CVwMEu/BZ6TvvgAEPsaCc23O
+	 fqsgGO2IaClH4FIKMxWWD8qIPKcguqU0qq3qxKl0=
+Date: Wed, 4 Dec 2024 19:17:03 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] driver core: class: add class_pseudo_register
+Message-ID: <2024120407-partake-pounce-67be@gregkh>
+References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
+ <b8122113-5863-4057-81b5-73f86c9fde4d@gmail.com>
+ <2024120435-deserving-elf-c1e1@gregkh>
+ <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-10-arnd@kernel.org>
-In-Reply-To: <20241204103042.1904639-10-arnd@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 4 Dec 2024 10:10:55 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
-Message-ID: <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
-Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Shevchenko <andy@kernel.org>, Matthew Wilcox <willy@infradead.org>, 
-	Sean Christopherson <seanjc@google.com>, Davide Ciminaghi <ciminaghi@gnudd.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
 
-  "On second thought , let=E2=80=99s not go to x86-64 microarchitectural
-levels. =E2=80=98Tis a silly place"
+On Wed, Dec 04, 2024 at 06:04:32PM +0100, Heiner Kallweit wrote:
+> On 04.12.2024 10:33, Greg Kroah-Hartman wrote:
+> > On Tue, Dec 03, 2024 at 09:10:05PM +0100, Heiner Kallweit wrote:
+> >> In preparation of removing class_compat support, add a helper for
+> >> creating a pseudo class in sysfs. This way we can keep class_kset
+> >> private to driver core. This helper will be used by vfio/mdev,
+> >> replacing the call to class_compat_create().
+> >>
+> >> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> >> ---
+> >>  drivers/base/class.c         | 14 ++++++++++++++
+> >>  include/linux/device/class.h |  1 +
+> >>  2 files changed, 15 insertions(+)
+> >>
+> >> diff --git a/drivers/base/class.c b/drivers/base/class.c
+> >> index 582b5a02a..f812236e2 100644
+> >> --- a/drivers/base/class.c
+> >> +++ b/drivers/base/class.c
+> >> @@ -578,6 +578,20 @@ struct class_compat *class_compat_register(const char *name)
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(class_compat_register);
+> >>  
+> >> +/**
+> >> + * class_pseudo_register - create a pseudo class entry in sysfs
+> >> + * @name: the name of the child
+> >> + *
+> >> + * Helper for creating a pseudo class in sysfs, keeps class_kset private
+> >> + *
+> >> + * Returns: the created kobject
+> >> + */
+> >> +struct kobject *class_pseudo_register(const char *name)
+> >> +{
+> >> +	return kobject_create_and_add(name, &class_kset->kobj);
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(class_pseudo_register);
+> > 
+> > I see the goal here, but let's not continue on and create fake kobjects
+> > in places where there should NOT be any kobjects.  Also, you might get
+> > in trouble when removing this kobject as it thinks it is a 'struct
+> > class' but yet it isn't, right?  Did you test that?
+> > 
+> 
+> It's removed using kobject_put(), same as what class_compat_unregister() does.
+> I only compile-tested the changes.
 
-On Wed, 4 Dec 2024 at 02:31, Arnd Bergmann <arnd@kernel.org> wrote:
->
-> To allow reliably building a kernel for either the oldest x86-64
-> CPUs or a more recent level, add three separate options for
-> v1, v2 and v3 of the architecture as defined by gcc and clang
-> and make them all turn on CONFIG_GENERIC_CPU.
+I would not be able to take these unless someone actually runs them as
+the kobject removal here might be getting confused a bit.
 
-The whole "v2", "v3", "v4" etc naming seems to be some crazy glibc
-artifact and is stupid and needs to die.
+thanks,
 
-It has no relevance to anything. Please do *not* introduce that
-mind-fart into the kernel sources.
-
-I have no idea who came up with the "microarchitecture levels"
-garbage, but as far as I can tell, it's entirely unofficial, and it's
-a completely broken model.
-
-There is a very real model for microarchitectural features, and it's
-the CPUID bits. Trying to linearize those bits is technically wrong,
-since these things simply aren't some kind of linear progression.
-
-And worse, it's a "simplification" that literally adds complexity. Now
-instead of asking "does this CPU support the cmpxchgb16 instruction?",
-the question instead becomes one of "what the hell does 'v3' mean
-again?"
-
-So no. We are *NOT* introducing that idiocy in the kernel.
-
-                Linus
+greg k-h
 
