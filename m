@@ -1,193 +1,153 @@
-Return-Path: <kvm+bounces-32987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933239E33BF
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 07:57:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7BB19E343E
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 08:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C9E284FEA
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 06:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA99285B19
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 07:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA4118A92C;
-	Wed,  4 Dec 2024 06:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48970190049;
+	Wed,  4 Dec 2024 07:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PdcTnbkt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqvDH7UT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060C94A33;
-	Wed,  4 Dec 2024 06:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B0218E025;
+	Wed,  4 Dec 2024 07:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733295456; cv=none; b=b09+BucWUCc217SgYd7HIQlsSPAtoa8D5fQqPG3EyAMnh6DPPYjsz+zfieymQ2pwZrFAvsv7WA7f3aCFQK62saQt89sW39ukFSvJLwiTXhX3TEhunYp1BCCkP7UaMAQHVNLHt4Rd1zQ2vYJ+MG9REka1XVJkGfjQj66isG5+T1U=
+	t=1733298153; cv=none; b=pRzbvjtDWe8b0MK0bWvvJS5pYnPq51BoavkJ5yBVOerGLlDlVICyK9pf4F3AbZjHtz2QlZ2rJBfuadjWxhO9qxJgDBZVe4NdwW2ECV6Ais+AilWRF3wwZ7tJpjdDK8zzzTnlzjZ8ez8OLscKb6vXapCB7L60iGyoZFBV4tT4O7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733295456; c=relaxed/simple;
-	bh=unW9c3b8w97RuIQaYDhvSoZuXkNfKWuuuAg0Qb1R2ek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lAfTvOOQvQIrlrr/kLYrIC0fIoylUaukpypM8Fxi0KBajBjNSN13vChiARRZT2bDDjcOs94gdHPrzFJhP877EouBzuyTtPRaf7b3V4KECuJqXA8wWW/iAsIQPyH+M4a6etLxfBISP36gMCwJ7f1CoRW2yo5U1nA+ruJ+zGEXAE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PdcTnbkt; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733295455; x=1764831455;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=unW9c3b8w97RuIQaYDhvSoZuXkNfKWuuuAg0Qb1R2ek=;
-  b=PdcTnbkt+bNp3kjesJ3z914Iu4jnRBAaxXGL9+l7nJPWoa/cbgs8gECm
-   MinC14dQ789vGEvAkFfc9y174XE5oIAsHpsF7kt5T7vbf+htPBOLmmu1L
-   7FKIpEoe9aIZpWx30bfsdQgw53Zi7l9FHiVQw/IPlmgphbYoNUez/q5y5
-   VtOEvAAVImTcb6j7a4bRU7RAcimNU9qc29KhV6+D8S4DznMh3ozf5OJfp
-   gfOiumIwncIqrPnrS91WJi6Hd6QiDvW6mTOC3W6FRU+e9VgzcB7O6fsne
-   RxQAXz0aCosNlkyZx2XDHi5MoeehcS95DVojrV+hqXC8HIKOfMM/tMQT4
-   w==;
-X-CSE-ConnectionGUID: TGOiiXt/Rtys4iUviAHwhA==
-X-CSE-MsgGUID: ir+kIgGlRGeI8+1bI+MRWA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="32886469"
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="32886469"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 22:57:33 -0800
-X-CSE-ConnectionGUID: 2TQO+xD8SqS/8izJg33gOQ==
-X-CSE-MsgGUID: vBGKPLjoT+m6BImqRVlR3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="124604473"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 22:57:28 -0800
-Message-ID: <2bcd34eb-0d1f-46c0-933f-fb1d70c70a1e@intel.com>
-Date: Wed, 4 Dec 2024 08:57:23 +0200
+	s=arc-20240116; t=1733298153; c=relaxed/simple;
+	bh=K42FUlB9Nt15dod2oykG+ZKdZDbK5Uic2xMqq2DGkdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kb7UjqGtz7p2Hem7GVyloMb5OjZkes1g30MB5exYAj3dqkXKgtds9YhhxCY4i5GE6HWgVZJsr5jduuZDkTwQMD46pXF7QhIU7mHQ32vc2CEDECwCG/qF8LRUOXGlkxyXafQXA24L852CUoR6LlD0jmKnxy9HP5KQIbMlTlBWZmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LqvDH7UT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1179C4CEE2;
+	Wed,  4 Dec 2024 07:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733298153;
+	bh=K42FUlB9Nt15dod2oykG+ZKdZDbK5Uic2xMqq2DGkdE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LqvDH7UTcropXYAHcM9fkPDByy/hd+aN0GQ4GZ2chTEfCE+ivCxoFhV4ax6MIYzPV
+	 voJrBu+wXtCDPmsHvBRH0lfq7n6OWd6uyQLOSVBKox0Tt/coE5jqDqPxUp6p0Mp4Dn
+	 8x3t+GkDtf7wa0nhV1zRcFTtbViVVHt5bIwxP99stK89A3BNE/AqACLe3vRA9qzV73
+	 m7h+IHOhN29WWAlNH64PHkxQzOhDOiK7SL1wCYzyp+0lTI0N+3ubimlPQP/py1RI6j
+	 66Y5DAEmmwg14Nnqdtkokvsdfacn1txlrvVC2vGEYB1GWHDIaFRy8HHMEkkc4jEnP3
+	 z9Gatb+nnksig==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1tIk1m-00000004Kif-3t7i;
+	Wed, 04 Dec 2024 08:42:30 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Shiju Jose <shiju.jose@huawei.com>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v5 00/16] Prepare GHES driver to support error injection
+Date: Wed,  4 Dec 2024 08:41:08 +0100
+Message-ID: <cover.1733297707.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
-To: Chao Gao <chao.gao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Li, Xiaoyao" <xiaoyao.li@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Yang, Weijiang" <weijiang.yang@intel.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "dmatlack@google.com" <dmatlack@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "x86@kernel.org" <x86@kernel.org>
-References: <Zz/6NBmZIcRUFvLQ@intel.com> <Z0cmEd5ehnYT8uc-@google.com>
- <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
- <Z04Ffd7Lqxr4Wwua@google.com>
- <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
- <Z05SK2OxASuznmPq@google.com>
- <60e2ed472e03834c13a48e774dc9f006eda92bf5.camel@intel.com>
- <9beb9e92-b98c-42a2-a2d3-35c5b681ad03@intel.com> <Z0+vdVRptHNX5LPo@intel.com>
- <0e34f9d0-0927-4ac8-b1cb-ef8500b8d877@intel.com> <Z0/4wsR2WCwWfZyV@intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <Z0/4wsR2WCwWfZyV@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-On 4/12/24 08:37, Chao Gao wrote:
-> On Wed, Dec 04, 2024 at 08:18:32AM +0200, Adrian Hunter wrote:
->> On 4/12/24 03:25, Chao Gao wrote:
->>>> +#define TDX_FEATURE_TSX (__feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM))
->>>> +
->>>> +static bool has_tsx(const struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	return entry->function == 7 && entry->index == 0 &&
->>>> +	       (entry->ebx & TDX_FEATURE_TSX);
->>>> +}
->>>> +
->>>> +static void clear_tsx(struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	entry->ebx &= ~TDX_FEATURE_TSX;
->>>> +}
->>>> +
->>>> +static bool has_waitpkg(const struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	return entry->function == 7 && entry->index == 0 &&
->>>> +	       (entry->ecx & __feature_bit(X86_FEATURE_WAITPKG));
->>>> +}
->>>> +
->>>> +static void clear_waitpkg(struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	entry->ecx &= ~__feature_bit(X86_FEATURE_WAITPKG);
->>>> +}
->>>> +
->>>> +static void tdx_clear_unsupported_cpuid(struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	if (has_tsx(entry))
->>>> +		clear_tsx(entry);
->>>> +
->>>> +	if (has_waitpkg(entry))
->>>> +		clear_waitpkg(entry);
->>>> +}
->>>> +
->>>> +static bool tdx_unsupported_cpuid(const struct kvm_cpuid_entry2 *entry)
->>>> +{
->>>> +	return has_tsx(entry) || has_waitpkg(entry);
->>>> +}
->>>
->>> No need to check TSX/WAITPKG explicitly because setup_tdparams_cpuids() already
->>> ensures that unconfigurable bits are not set by userspace.
->>
->> Aren't they configurable?
-> 
-> They are cleared from the configurable bitmap by tdx_clear_unsupported_cpuid(),
-> so they are not configurable from a userspace perspective. Did I miss anything?
-> KVM should check user inputs against its adjusted configurable bitmap, right?
+During the development of a patch series meant to allow GHESv2 error injections,
+it was requested a change on how CPER offsets are calculated, by adding a new
+BIOS pointer and reworking the GHES logic. See:
 
-Maybe I misunderstand but we rely on the TDX module to reject
-invalid configuration.  We don't check exactly what is configurable
-for the TDX Module.
+https://lore.kernel.org/qemu-devel/cover.1726293808.git.mchehab+huawei@kernel.org/
 
-TSX and WAITPKG are not invalid for the TDX Module, but KVM
-must either support them by restoring their MSRs, or disallow
-them.  This patch disallows them for now.
+Such change ended being a big patch, so several intermediate steps are needed,
+together with several cleanups and renames.
 
-> 
->>
->>>
->>>> +
->>>> #define KVM_TDX_CPUID_NO_SUBLEAF	((__u32)-1)
->>>>
->>>> static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char idx)
->>>> @@ -124,6 +162,8 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
->>>> 	/* Work around missing support on old TDX modules */
->>>> 	if (entry->function == 0x80000008)
->>>> 		entry->eax = tdx_set_guest_phys_addr_bits(entry->eax, 0xff);
->>>> +
->>>> +	tdx_clear_unsupported_cpuid(entry);
->>>> }
->>>>
->>>> static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
->>>> @@ -1235,6 +1275,9 @@ static int setup_tdparams_cpuids(struct kvm_cpuid2 *cpuid,
->>>> 		if (!entry)
->>>> 			continue;
->>>>
->>>> +		if (tdx_unsupported_cpuid(entry))
->>>> +			return -EINVAL;
->>>> +
->>>> 		copy_cnt++;
->>>>
->>>> 		value = &td_params->cpuid_values[i];
->>>> -- 
->>>> 2.43.0
->>>>
->>
+As agreed during v10 review, I'll be splitting the big patch series into separate pull 
+requests, starting with the cleanup series. This is the first patch set, containing
+only such preparation patches.
+
+The next series will contain the shift to use offsets from the location of the
+HEST table, together with a migration logic to make it compatible with 9.1.
+
+---
+
+v5:
+- added a new patch:
+  acpi/ghes: don't check if physical_address is not zero
+- removed a duplicated le64_to_cpu();
+- changed a comment about writing 1 to read ack register.
+
+v4:
+- merged a patch renaming the function which calculate offsets to:
+  get_hw_error_offsets(), to avoid the need of such change at the next
+  patch series;
+- removed a functional change at the logic which makes
+  the GHES record generation more generic;
+- a couple of trivial changes on patch descriptions and line break cleanups.
+
+v3:
+- improved some patch descriptions;
+- some patches got reordered to better reflect the changes;
+- patch v2 08/15: acpi/ghes: Prepare to support multiple sources on ghes
+  was split on two patches. The first one is in this cleanup series:
+      acpi/ghes: Change ghes fill logic to work with only one source
+  contains just the simplification logic. The actual preparation will
+  be moved to this series:
+     https://lore.kernel.org/qemu-devel/cover.1727782588.git.mchehab+huawei@kernel.org/
+
+v2: 
+- some indentation fixes;
+- some description improvements;
+- fixed a badly-solved merge conflict that ended renaming a parameter.
+
+Mauro Carvalho Chehab (16):
+  acpi/ghes: get rid of ACPI_HEST_SRC_ID_RESERVED
+  acpi/ghes: simplify acpi_ghes_record_errors() code
+  acpi/ghes: simplify the per-arch caller to build HEST table
+  acpi/ghes: better handle source_id and notification
+  acpi/ghes: Fix acpi_ghes_record_errors() argument
+  acpi/ghes: Remove a duplicated out of bounds check
+  acpi/ghes: Change the type for source_id
+  acpi/ghes: don't check if physical_address is not zero
+  acpi/ghes: make the GHES record generation more generic
+  acpi/ghes: better name GHES memory error function
+  acpi/ghes: don't crash QEMU if ghes GED is not found
+  acpi/ghes: rename etc/hardware_error file macros
+  acpi/ghes: better name the offset of the hardware error firmware
+  acpi/ghes: move offset calculus to a separate function
+  acpi/ghes: Change ghes fill logic to work with only one source
+  docs: acpi_hest_ghes: fix documentation for CPER size
+
+ docs/specs/acpi_hest_ghes.rst  |   6 +-
+ hw/acpi/generic_event_device.c |   4 +-
+ hw/acpi/ghes-stub.c            |   2 +-
+ hw/acpi/ghes.c                 | 259 +++++++++++++++++++--------------
+ hw/arm/virt-acpi-build.c       |   5 +-
+ include/hw/acpi/ghes.h         |  16 +-
+ target/arm/kvm.c               |   2 +-
+ 7 files changed, 169 insertions(+), 125 deletions(-)
+
+-- 
+2.47.1
+
 
 
