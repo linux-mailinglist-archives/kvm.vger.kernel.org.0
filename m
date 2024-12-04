@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-33012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29619E39F7
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:30:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F3D9E39F8
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:30:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 781092861C3
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8BB81651F0
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FF01C07E7;
-	Wed,  4 Dec 2024 12:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830E51C3F34;
+	Wed,  4 Dec 2024 12:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XS3GFoZE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hXTLHZex"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80CB1B87E5
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E915E1BBBD7
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733315375; cv=none; b=rZKkOPLTcqisMwcQaN3iIPwa7A/vElAaCiQjwzvtQgWcLvpWIdWJfBZoP3CctKlotNPDdhW22s6ol6ZoezU8rqniGZk+MsuZOvLHHs2DCdODgRZdriOO7IrQTvTaTc/zE/DllI/cjACi1/iMcmx/Tcjg8FvDvdaKS12PKpf0dTQ=
+	t=1733315376; cv=none; b=YVCI3wkje5uAP2mIdf+mcWMa48LeROLzCG9TTSVBf8HOWicmXLWLEhf1KxulGzW+kQRI32JLRC0ECzhcE3CJHChSquLpI6xi0c1vtxO5pMR8YJi9bjTKFD2VwOWA6bxX7CD7bgA65vVa0ahX6CZ4ZjjJwG08AxSZMTrf3jowLNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733315375; c=relaxed/simple;
-	bh=MIL5kqFgIT6RtORFgAFpmdic6w+g7VOz6BAcAW7q8lE=;
+	s=arc-20240116; t=1733315376; c=relaxed/simple;
+	bh=SIs5FZktMC7aBVud1qJKzHFNR+gqN79SDzKJmiPNwp8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=b6nt1lMzVlpDTrdZQPVpfGab3aUP4/hjQfoRF+kqC8gYyC65Pr50AV4y42g71mqpQI2p+/6vnItDxl9dpWErQrHs6LCX2vF5a7g54ECdGxTzvK+22D9onj5NNOjHonp+6zMjv7EfH9awKZOvwQNdGxctbS8Y4FQkzkuQ2Om57vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XS3GFoZE; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=EpwaTlA1zpcyfAGorKXeJIgy7C+TLC6RymYqDy9iwG34pK6PXAcYUMCRjAth4rXHj2WJ/qhJYR5Mn95qjfgYavNKDQKm37Or+fQ5ARHQ199bECySviPp5dFB3lvrIgk3c2ugMjn8C36NwUZDHDSSkxJqTer4FE56u+3NEUdPnQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hXTLHZex; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733315374; x=1764851374;
+  t=1733315375; x=1764851375;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MIL5kqFgIT6RtORFgAFpmdic6w+g7VOz6BAcAW7q8lE=;
-  b=XS3GFoZE+cb8IROa94gp67MDTj0Oxd2tV4kBFE+4BBozO0FjDtvKAtAN
-   LXed+plyb1FAGGQkO7Tx5bZ0ws28i350G3DU0sqDlXFC5sCQy4o6Qekhu
-   Qn+o/u2DGNOdEyRkT/9K0xL6PUAyJu9grr67RSSO27O/avPPJQi+JG3sF
-   Fj9RBF1lDmncv32xAP27Xxy4hYHCXXXzbhz9JTFXxEfCN/9+suCHtwECv
-   xvQXGr46WivWPRMXUZ4l5OPsWzlrls4cz5xmD6RnVLx8X6R9JkRXg/oxl
-   a6RVfl0v/503kVk3ORuZS00L8GgMdrYOQNdSSVkQ1TcV12Mo/lMZivfJ4
-   g==;
-X-CSE-ConnectionGUID: gLnoEdi/TRWOKEhAQQfSYw==
-X-CSE-MsgGUID: t3HoG2VqTl2E36zR/frN4w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="32937893"
+  bh=SIs5FZktMC7aBVud1qJKzHFNR+gqN79SDzKJmiPNwp8=;
+  b=hXTLHZexswPIZlFWoAt0IqYAJo/ildAyMJi+tYOP3ga4L1AcgLuzCIYi
+   FYcVebfaktT2Y2xPkK4lFjuyU8XgpMDgiG6CQaTZVoaTy48OeEFCCMCqW
+   RWoCKrtUiU6E4vuPgSx7/lJAiNpByvSYF6rNOpp4ICTGq5ro9jpC4byDO
+   fzUAve1T/ch5IfGSNrpxnNiBdrdP1coTMG6qTBHIcXHFV3MDzzEGVJRUa
+   zK85sl/s9niuUSVS5+Ru/nmk68t4zEvxmafkuw/qJ+Fug5VIVdX77s5JF
+   nttKoBDiqYcjAa5OTJ/i2CBbIbBOBYr5VIy/3+P5k7B5yWEN/M8wnsZjE
+   A==;
+X-CSE-ConnectionGUID: knMv3MEcTcq0zGuEq6vR7Q==
+X-CSE-MsgGUID: 0aXgvpo2TA+LB2oJ+C8E8g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="32937901"
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="32937893"
+   d="scan'208";a="32937901"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 04:29:33 -0800
-X-CSE-ConnectionGUID: GnC8T37dSkag/IlByv1urw==
-X-CSE-MsgGUID: Lx59OPTjTg67hhWYUp/sOw==
+X-CSE-ConnectionGUID: PWI0gzFxReC+/Eo/zYPUMA==
+X-CSE-MsgGUID: O7oytZ3LQjKebXY2TnFp9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="93599072"
+   d="scan'208";a="93599076"
 Received: from unknown (HELO 984fee00a4c6.jf.intel.com) ([10.165.58.231])
   by orviesa010.jf.intel.com with ESMTP; 04 Dec 2024 04:29:33 -0800
 From: Yi Liu <yi.l.liu@intel.com>
@@ -72,9 +72,9 @@ Cc: eric.auger@redhat.com,
 	zhenzhong.duan@intel.com,
 	vasant.hegde@amd.com,
 	will@kernel.org
-Subject: [PATCH v6 3/7] iommu: Detaching pasid by attaching to the blocked_domain
-Date: Wed,  4 Dec 2024 04:29:24 -0800
-Message-Id: <20241204122928.11987-4-yi.l.liu@intel.com>
+Subject: [PATCH v6 4/7] iommu/arm-smmu-v3: Make the blocked domain support PASID
+Date: Wed,  4 Dec 2024 04:29:25 -0800
+Message-Id: <20241204122928.11987-5-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241204122928.11987-1-yi.l.liu@intel.com>
 References: <20241204122928.11987-1-yi.l.liu@intel.com>
@@ -86,56 +86,66 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The iommu drivers are on the way to detach pasid by attaching to the blocked
-domain. However, this cannot be done in one shot. During the transition, iommu
-core would select between the remove_dev_pasid op and the blocked domain.
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-Suggested-by: Kevin Tian <kevin.tian@intel.com>
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+The blocked domain is used to park RID to be blocking DMA state. This
+can be extended to PASID as well. By this, the remove_dev_pasid() op
+of ARM SMMUv3 can be dropped.
+
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommu.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 0331dc30eb64..149ae5300cc4 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -3316,8 +3316,18 @@ static void iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
- 				   struct iommu_domain *domain)
- {
- 	const struct iommu_ops *ops = dev_iommu_ops(dev);
-+	struct iommu_domain *blocked_domain = ops->blocked_domain;
-+	int ret = 1;
- 
--	ops->remove_dev_pasid(dev, pasid, domain);
-+	if (blocked_domain && blocked_domain->ops->set_dev_pasid) {
-+		ret = blocked_domain->ops->set_dev_pasid(blocked_domain,
-+							 dev, pasid, domain);
-+	} else {
-+		ops->remove_dev_pasid(dev, pasid, domain);
-+		ret = 0;
-+	}
-+
-+	WARN_ON(ret);
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index e4ebd9e12ad4..ff1d9bbf6d94 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -3016,13 +3016,12 @@ int arm_smmu_set_pasid(struct arm_smmu_master *master,
+ 	return ret;
  }
  
- static int __iommu_set_group_pasid(struct iommu_domain *domain,
-@@ -3380,7 +3390,9 @@ int iommu_attach_device_pasid(struct iommu_domain *domain,
- 	ops = dev_iommu_ops(dev);
+-static void arm_smmu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
+-				      struct iommu_domain *domain)
++static int arm_smmu_blocking_set_dev_pasid(struct iommu_domain *new_domain,
++					   struct device *dev, ioasid_t pasid,
++					   struct iommu_domain *old_domain)
+ {
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(old_domain);
+ 	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
+-	struct arm_smmu_domain *smmu_domain;
+-
+-	smmu_domain = to_smmu_domain(domain);
  
- 	if (!domain->ops->set_dev_pasid ||
--	    !ops->remove_dev_pasid)
-+	    (!ops->remove_dev_pasid &&
-+	     (!ops->blocked_domain ||
-+	      !ops->blocked_domain->ops->set_dev_pasid)))
- 		return -EOPNOTSUPP;
+ 	mutex_lock(&arm_smmu_asid_lock);
+ 	arm_smmu_clear_cd(master, pasid);
+@@ -3043,6 +3042,7 @@ static void arm_smmu_remove_dev_pasid(struct device *dev, ioasid_t pasid,
+ 		    sid_domain->type == IOMMU_DOMAIN_BLOCKED)
+ 			sid_domain->ops->attach_dev(sid_domain, dev);
+ 	}
++	return 0;
+ }
  
- 	if (ops != domain->owner || pasid == IOMMU_NO_PASID)
+ static void arm_smmu_attach_dev_ste(struct iommu_domain *domain,
+@@ -3124,6 +3124,7 @@ static int arm_smmu_attach_dev_blocked(struct iommu_domain *domain,
+ 
+ static const struct iommu_domain_ops arm_smmu_blocked_ops = {
+ 	.attach_dev = arm_smmu_attach_dev_blocked,
++	.set_dev_pasid = arm_smmu_blocking_set_dev_pasid,
+ };
+ 
+ static struct iommu_domain arm_smmu_blocked_domain = {
+@@ -3551,7 +3552,6 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.device_group		= arm_smmu_device_group,
+ 	.of_xlate		= arm_smmu_of_xlate,
+ 	.get_resv_regions	= arm_smmu_get_resv_regions,
+-	.remove_dev_pasid	= arm_smmu_remove_dev_pasid,
+ 	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+ 	.dev_disable_feat	= arm_smmu_dev_disable_feature,
+ 	.page_response		= arm_smmu_page_response,
 -- 
 2.34.1
 
