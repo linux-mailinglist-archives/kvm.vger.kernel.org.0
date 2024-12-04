@@ -1,144 +1,263 @@
-Return-Path: <kvm+bounces-32981-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32982-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059CF9E3282
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 04:59:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EDFA9E3287
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 05:00:32 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79A29B26297
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 03:59:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734601678AF
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 04:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9033B16EB54;
-	Wed,  4 Dec 2024 03:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E0D10F9;
+	Wed,  4 Dec 2024 04:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ixCdqJLs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2C614D6F9;
-	Wed,  4 Dec 2024 03:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29548374CB
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 04:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733284744; cv=none; b=GP5utRy5ATLg4LXbha43xL5HriLY7l0C5zHgLz7qK6ptiB0uF1rAq+urI4JPosLxG/VYnwoQ+AC1DRscFV2nNh4DO+PPNIyk9oJ/ym/k5/EcT3B8+a+hDF3xgDeQF4apY4YYulb7TyyjdHLHGuKQe0lOcPQEIYDmo2hWIRvrlrM=
+	t=1733284822; cv=none; b=cV97a1vYmF3hExPIjYtNejOPFaT83mXZ2BDsx+L53/8nr4BdGjozuwUhqmpGbwBcHoMBJU2ZhZdtxgcbsbiMec9YznL/u7ajpJaStQqWoLXz44Yqkf2XKe7LeKnOuNSvjTSu9aEdoAQfS48hZlBnOg7/b7fEq7fjxEBiIMGNLRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733284744; c=relaxed/simple;
-	bh=5Zu0i0HD/f0tjB+TrF1WgwVUWI+7cgyj9N9PMr50iWA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=CpmEZvxFQUWVhJegQuuym3yiQKE7+RlmRJ7+tKcU+p2h650TaTTk0n683my8uIeea/i+Q6aZDRAZVjVYr5uGVN7BXndQ7n1fiNwqpITWK9mj+28zR7/HMxwjekKwLW+Lzih5HGFs3JsuETzticWEoFLqro+sXrZDGz65IPiMJ0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxIK+C009nAGRQAA--.1134S3;
-	Wed, 04 Dec 2024 11:58:59 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMBxJMCA009nfAJ1AA--.59317S3;
-	Wed, 04 Dec 2024 11:58:57 +0800 (CST)
-Subject: Re: [RFC 5/5] LoongArch: KVM: Enable separate vmid feature
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20241113031727.2815628-1-maobibo@loongson.cn>
- <20241113031727.2815628-6-maobibo@loongson.cn>
- <CAAhV-H54WbE_6CM8L3q_jRjA_VXLqX_msEmzOmwy2s0dFABCgw@mail.gmail.com>
-From: bibo mao <maobibo@loongson.cn>
-Message-ID: <f0f1f709-9ae0-3b7e-a074-94538e4c3d89@loongson.cn>
-Date: Wed, 4 Dec 2024 11:58:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1733284822; c=relaxed/simple;
+	bh=plu8dRbwA//TIE7V3u7EkRjHASWu+GTYdXd54J9egbw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KwZK0h4icr0K6qp3p4q2wToYZ+CZbpqgPaNeeM+4BH/DJrIXuoNoQPkkBwqOrVpGD0vxrXMs9cy/RACav4wRJzzQQHCnXY3M0OZOUeTCszlkpNxokcCLi+WgJLgtZEQWsQZpVln73u7vLg2PB4P7jHrBMJlxIeKMigb2PH1v5d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ixCdqJLs; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a77ab3ebfaso57385ab.1
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 20:00:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733284820; x=1733889620; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CngGMvpmpyr10C47QW7O8tll8PdmhQ22t96lvuVqUS8=;
+        b=ixCdqJLszwdzQwoUWVJOSX5EVQClSBiYYHB5aqLwFrhOjXghzpGkn3RrUYmtKj3yWD
+         9D60WEl5Iklp1HM0rQBGvr+H8APj+cPBXLMy8E6rxtSOga29kBH1Xqz5RqSCl9+0mj+m
+         /EokJT31NrYeNom6zu2mvTU29BPZ6N5aLWd8gztCzwGQCadcypFxcqYrP2SaKR+WBgKB
+         GutZT37xzMHhVMUbKSbphwQKs1rpo4cuDSfBgQAguw7U/qCHVGYzWdPeHKPvTDWBOPzO
+         3+n7BqGGAkWa2XZTOgSnfoowU0BLICkQx/AMHNZVCRpLavx/4K36puraljq1CEVBLRRZ
+         ib+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733284820; x=1733889620;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CngGMvpmpyr10C47QW7O8tll8PdmhQ22t96lvuVqUS8=;
+        b=bmbR7Wi+TWYA5EHmp4d7mmilhyeeFhgJc4iSXt5uYN9+9ZUG+TI8D/rlZOZ78NCdHB
+         UXVMYh8PLXmr1h92DmugNFce4tHjhI+H4GDFYuTRuCh+sEkATAR08K9m4QPIIoP/bH+U
+         x9OBUFlpf1hwgDveCqvyzgjDRc/uEiBenW7+X8lob5PPW+i5emrxdRp+1WrGbOkxdL9E
+         UDI2UuBmsM/ba+q1WMWikzThlL4dRVRNr0QH/kn0aybAE4oK7Tp3HHWEcfefvuov0eJf
+         U9WQCG2h7f0lUxd1O3/AJwmYqo0fTuqHZxQfGYqW/bx7MXabdKEJV03XWh4b0vlL9ZeE
+         PxKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLFG19WbYdLXe4m96+jo1ZMZYEyEp4PYjkfcL5A1tFD183OAB9zrZtmqq9pGNQyVnuWcQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNEVCs8bDNrhG4RevmriYq6+tVz/JlQkEPxQ7SjpP8UfGLgBWe
+	A3JY25OJQ0KI+hFC4/BXEBJAE/Sm16RCmmMGxzjsoJN26b7qOTSjc9PgsQDpSmV7jyl2dOmcJtW
+	wiCdGAurl2OUMTd9CruP7PZO1qFSiFMcSXSol
+X-Gm-Gg: ASbGncuaWLJoLgPjymK7BfptPMJZ3eCJBoG/Eu+00IONqng0kGzfY1jNsnDkXJoHEsZ
+	dV8AH/4gNqN2Qyhr+j2LBZ6E+jhaLFA==
+X-Google-Smtp-Source: AGHT+IFSAC1wz2QxEeAFRYo7HSv2GzEQcAHLbAsspH6/KMJCC8WlUpKuMmIDvejZ+31FQWIAyUvMlyBEiyGwx5JATfo=
+X-Received: by 2002:a05:6e02:3f8d:b0:3a7:cd21:493f with SMTP id
+ e9e14a558f8ab-3a8001a949dmr1896425ab.26.1733284820117; Tue, 03 Dec 2024
+ 20:00:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H54WbE_6CM8L3q_jRjA_VXLqX_msEmzOmwy2s0dFABCgw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMBxJMCA009nfAJ1AA--.59317S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxZFWktr4fJr1DuryDKr45Arc_yoW5Gr1xpr
-	W7AF98JrWv9r93Gwn0qwnYqr15X342g3W2qFn2qryfursIgFWvyF1kK34DZF1rWw4FyFyv
-	9r1vy39IvFsFyacCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
+References: <20241121185315.3416855-1-mizhang@google.com> <Z0-R-_GPWu-iVAYM@google.com>
+ <CALMp9eTCe1-ZA47kcktTQ4WZ=GUbg8x3HpBd0Rf9Yx_pDFkkNg@mail.gmail.com> <Z0-3bc1reu1slCtL@google.com>
+In-Reply-To: <Z0-3bc1reu1slCtL@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 3 Dec 2024 20:00:09 -0800
+Message-ID: <CALMp9eT9ne4HmwqMED0nGT1aEem7VjTHbehQhb1MPn-Z-Lg9=Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/22] KVM: x86: Virtualize IA32_APERF and IA32_MPERF MSRs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
+	Mario Limonciello <mario.limonciello@amd.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Dec 3, 2024 at 5:59=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, Dec 03, 2024, Jim Mattson wrote:
+> > On Tue, Dec 3, 2024 at 3:19=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > >
+> > > On Thu, Nov 21, 2024, Mingwei Zhang wrote:
+> > > > Linux guests read IA32_APERF and IA32_MPERF on every scheduler tick
+> > > > (250 Hz by default) to measure their effective CPU frequency. To av=
+oid
+> > > > the overhead of intercepting these frequent MSR reads, allow the gu=
+est
+> > > > to read them directly by loading guest values into the hardware MSR=
+s.
+> > > >
+> > > > These MSRs are continuously running counters whose values must be
+> > > > carefully tracked during all vCPU state transitions:
+> > > > - Guest IA32_APERF advances only during guest execution
+> > >
+> > > That's not what this series does though.  Guest APERF advances while =
+the vCPU is
+> > > loaded by KVM_RUN, which is *very* different than letting APERF run f=
+reely only
+> > > while the vCPU is actively executing in the guest.
+> > >
+> > > E.g. a vCPU that is memory oversubscribed via zswap will account a si=
+gnificant
+> > > amount of CPU time in APERF when faulting in swapped memory, whereas =
+traditional
+> > > file-backed swap will not due to the task being scheduled out while w=
+aiting on I/O.
+> >
+> > Are you saying that APERF should stop completely outside of VMX
+> > non-root operation / guest mode?
+> > While that is possible, the overhead would be significantly
+> > higher...probably high enough to make it impractical.
+>
+> No, I'm simply pointing out that the cover letter is misleading/inaccurat=
+e.
+>
+> > > In general, the "why" of this series is missing.  What are the use ca=
+ses you are
+> > > targeting?  What are the exact semantics you want to define?  *Why* d=
+id are you
+> > > proposed those exact semantics?
+> >
+> > I get the impression that the questions above are largely rhetorical, a=
+nd
+>
+> Nope, not rhetorical, I genuinely want to know.  I can't tell if ya'll th=
+ought
+> about the side effects of things like swap and emulated I/O, and if you d=
+id, what
+> made you come to the conclusion that the "best" boundary is on sched_out(=
+) and
+> return to userspace.
+>
+> > that you would not be happy with the answers anyway, but if you really =
+are
+> > inviting a version 2, I will gladly expound upon the why.
+>
+> No need for a new version at this time, just give me the details.
+>
+> > > E.g. emulated I/O that is handled in KVM will be accounted to APERF, =
+but I/O that
+> > > requires userspace exits will not.  It's not necessarily wrong for he=
+avy userspace
+> > > I/O to cause observed frequency to drop, but it's not obviously corre=
+ct either.
+> > >
+> > > The use cases matter a lot for APERF/MPERF, because trying to reason =
+about what's
+> > > desirable for an oversubscribed setup requires a lot more work than d=
+efining
+> > > semantics for setups where all vCPUs are hard pinned 1:1 and memory i=
+s more or
+> > > less just partitioned.  Not to mention the complexity for trying to s=
+upport all
+> > > potential use cases is likely quite a bit higher.
+> > >
+> > > And if the use case is specifically for slice-of-hardware, hard pinne=
+d/partitioned
+> > > VMs, does it matter if the host's view of APERF/MPERF is not accurate=
+ly captured
+> > > at all times?  Outside of maybe a few CPUs running bookkeeping tasks,=
+ the only
+> > > workloads running on CPUs should be vCPUs.  It's not clear to me that=
+ observing
+> > > the guest utilization is outright wrong in that case.
+> >
+> > My understanding is that Google Cloud customers have been asking for th=
+is
+> > feature for all manner of VM families for years, and most of those VM
+> > families are not slice-of-hardware, since we just launched our first su=
+ch
+> > offering a few months ago.
+>
+> But do you actually want to expose APERF/MPERF to those VMs?  With my ups=
+tream
+> hat on, what someone's customers are asking for isn't relevant.  What's r=
+elevant
+> is what that someone wants to deliver/enable.
+>
+> > > One idea for supporting APERF/MPERF in KVM would be to add a kernel p=
+aram to
+> > > disable/hide APERF/MPERF from the host, and then let KVM virtualize/p=
+assthrough
+> > > APERF/MPERF if and only if the feature is supported in hardware, but =
+hidden from
+> > > the kernel.  I.e. let the system admin gift APERF/MPERF to KVM.
+> >
+> > Part of our goal has been to enable guest APERF/MPERF without impacting=
+ the
+> > use of host APERF/MPERF, since one of the first things our support team=
+s look
+> > at in response to a performance complaint is the effective frequencies =
+of the
+> > CPUs as reported on the host.
+>
+> But is looking at the host's view even useful if (a) the only thing runni=
+ng on
+> those CPUs is a single vCPU, and (b) host userspace only sees the effecti=
+ve
+> frequencies when _host_ code is running?  Getting the effective frequency=
+ for
+> when the userspace VMM is processing emulated I/O probably isn't going to=
+ be all
+> that helpful.
 
+(a) is your constraint, not mine, and (b) certainly sounds pointless,
+but that isn't the behavior of this patch set, so I'm not sure why
+you're even going there.
 
-On 2024/12/3 上午10:48, Huacai Chen wrote:
-> Hi, Bibo,
-> 
-> I think you need to probe LOONGARCH_CPU_GUESTID at the end of
-> cpu_probe_common(), otherwise cpu_has_guestid is always false.
-yes, it is always false now.
-Will negotiate with HW guys and add real probe mechanism.
+With this patch set, host APERF/MPERF still reports all cycles
+accumulated on the logical processor, regardless of whether in the
+host or the guest. There will be a small loss every time the MSRs are
+written, but that loss is minimized by writing the MSRs as
+infrequently as possible.
 
-Regards
-Bibo Mao
-> 
-> Huacai
-> 
-> On Wed, Nov 13, 2024 at 11:17 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->> With CSR GTLBC shortname for Guest TLB Control Register, separate vmid
->> feature will be enabled if bit 14 CSR_GTLBC_USEVMID is set. Enable
->> this feature if cpu_has_guestid is true when KVM module is loaded.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> ---
->>   arch/loongarch/include/asm/loongarch.h | 2 ++
->>   arch/loongarch/kvm/main.c              | 4 +++-
->>   2 files changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
->> index 64ad277e096e..5fee5db3bea0 100644
->> --- a/arch/loongarch/include/asm/loongarch.h
->> +++ b/arch/loongarch/include/asm/loongarch.h
->> @@ -326,6 +326,8 @@
->>   #define  CSR_GTLBC_TGID_WIDTH          8
->>   #define  CSR_GTLBC_TGID_SHIFT_END      (CSR_GTLBC_TGID_SHIFT + CSR_GTLBC_TGID_WIDTH - 1)
->>   #define  CSR_GTLBC_TGID                        (_ULCAST_(0xff) << CSR_GTLBC_TGID_SHIFT)
->> +#define  CSR_GTLBC_USEVMID_SHIFT       14
->> +#define  CSR_GTLBC_USEVMID             (_ULCAST_(0x1) << CSR_GTLBC_USEVMID_SHIFT)
->>   #define  CSR_GTLBC_TOTI_SHIFT          13
->>   #define  CSR_GTLBC_TOTI                        (_ULCAST_(0x1) << CSR_GTLBC_TOTI_SHIFT)
->>   #define  CSR_GTLBC_USETGID_SHIFT       12
->> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
->> index f89d1df885d7..50c977d8b414 100644
->> --- a/arch/loongarch/kvm/main.c
->> +++ b/arch/loongarch/kvm/main.c
->> @@ -336,7 +336,7 @@ int kvm_arch_enable_virtualization_cpu(void)
->>          write_csr_gcfg(0);
->>          write_csr_gstat(0);
->>          write_csr_gintc(0);
->> -       clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI);
->> +       clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI | CSR_GTLBC_USEVMID);
->>
->>          /*
->>           * Enable virtualization features granting guest direct control of
->> @@ -359,6 +359,8 @@ int kvm_arch_enable_virtualization_cpu(void)
->>
->>          /* Enable using TGID  */
->>          set_csr_gtlbc(CSR_GTLBC_USETGID);
->> +       if (cpu_has_guestid)
->> +               set_csr_gtlbc(CSR_GTLBC_USEVMID);
->>          kvm_debug("GCFG:%lx GSTAT:%lx GINTC:%lx GTLBC:%lx",
->>                    read_csr_gcfg(), read_csr_gstat(), read_csr_gintc(), read_csr_gtlbc());
->>
->> --
->> 2.39.3
->>
+I get ahead of myself, but I just couldn't let this
+mischaracterization stand uncorrected while I get the rest of my
+response together.
 
+> And gifting APERF/MPERF to VMs doesn't have to mean the host can't read t=
+he MSRs,
+> e.g. via turbostat.  It just means the kernel won't use APERF/MPERF for s=
+cheduling
+> decisions or any other behaviors that rely on an accurate host view.
+>
+> > I can explain all of this in excruciating detail, but I'm not really
+> > motivated by your initial response, which honestly seems a bit hostile.
+>
+> Probably because this series made me a bit grumpy :-)  As presented, this=
+ feels
+> way, way too much like KVM's existing PMU "virtualization".  Mostly works=
+ if you
+> stare at it just so, but devoid of details on why X was done instead of Y=
+, and
+> seemingly ignores multiple edge cases.
+>
+> I'm not saying you and Mingwei haven't thought about edge cases and desig=
+n
+> tradeoffs, but nothing in the cover letter, changelogs, comments (none), =
+or
+> testcases (also none) communicates those thoughts to others.
+>
+> > At least you looked at the code, which is a far warmer reception than I
+> > usually get.
 
