@@ -1,145 +1,135 @@
-Return-Path: <kvm+bounces-33057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D9C9E42D1
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 201719E430E
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E071816A456
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:05:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31813164AA2
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB1420D4E9;
-	Wed,  4 Dec 2024 17:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B5123919F;
+	Wed,  4 Dec 2024 18:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="bBw4sB5f";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ID39xCta"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bQgvKdKt"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E2F2066FB;
-	Wed,  4 Dec 2024 17:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296E5239188
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 18:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733334799; cv=none; b=fx0ghJRY6mDN0PJf4kUISdqxC6Hs01BRCD4M9y2mOcJDhsmXqzC/ib4RA8pTAAFJuGhp1NAgqNFUNU+z96g8RqCQHOwtrHZld8ECcTZ3Hj6DePh5AEBIOrpTw3N4BKxi63DVSm19Gw9Gp3fjcrGSjbmU7L6nLkAx0GPYhUcGdso=
+	t=1733335878; cv=none; b=IE6ecyffI3+5uG1vSN8KtKPAcdGcWc15aKQiJ/Hnyuq9w8Y/aKIVLMbtICzBRY8Rp1daZmt/O3ZoSkLzQTN6dxxDvQXbzJxEkkIQboLUlVeYq/nbiiEmaVHEDHU+ftPBiXOXQHH/seSMPekW+sJKa88STXvQnOj0KXr4HrKoilo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733334799; c=relaxed/simple;
-	bh=ILqcDVf0bHvauQ7XevK6gLD0PM4sliITJZefCfN3d7M=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=curxM9IvTaCaK4ozp0ZjhawVMzZEHDEdrHgIxgeRSSPCkYVpegMVprLAXEpo+eEcV2Zy2fdnPgh5kceVK3viycoB3HRyvu4MI3P4LuoSjtzfBhfuFAzQcyyZnDE0K//Dlpk1YCeCTBlXO8EBwWPnBMaL6RWO0IlP4U6VkAJ6ANY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=bBw4sB5f; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ID39xCta; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id C9FA925401D6;
-	Wed,  4 Dec 2024 12:53:15 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 12:53:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1733334795;
-	 x=1733421195; bh=oWL3XXyWg2R72Xts4Xo78/Yld3x5a5rS9W2B7LxHVzc=; b=
-	bBw4sB5fF1//66xy4theRT4CpQxzw3s5cLBTfffQ9ayMk6ETfJIB3wBiKkxxUKqe
-	eOPV2q/yPqBubHyc4NSR2pRCeOb9AQJQA20ah2na3448PROrVfSN6eYUtp+1uu9m
-	mpX9q8PyOib2MwugiSNQVujN5bfQpQ/LSM5GViT/LP6LTScexhbpFgEa+N3x2Og0
-	vlSLKPHsqf1y08NXBnPRpId99vFOIX3nSlD6PiWmc5qKB42+lSw/+VQNCpg/QLO2
-	AoFtkZsc9j9W0X1xqFvmIKfg5zQfLE+9JgWIw1UJzKhVOx2GDBtBc3+AIA8u+NFg
-	TzZuz1jyXk4HSWhAmw74lg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733334795; x=
-	1733421195; bh=oWL3XXyWg2R72Xts4Xo78/Yld3x5a5rS9W2B7LxHVzc=; b=I
-	D39xCtah2vTTGuhlbA9t/sITxspFcf/KKhVlMnK3+VukJ4TJ1AuwKYwh/FAUZkOu
-	d2VkE3L6efwSZeP7seb1tl/LtiWXUvwFcZbhlZ30ZNqbBsgM9uU6aLMllsjnGgIM
-	T9EzPYUuwME7eOESlyvVbgGRiOukCsU2hqTMm9H0vP82v7jtLezAWBDXlpSfmV+E
-	nfq/qAAjbG3YNNF/qVI3jt1WucWTTZj0KwWEG2aqOHp7IC9GZcU2AMP6Ty8DCs0M
-	xfZ9gQsLZCTqxZgfWz+x6X6xqGu1rKVIZoqXz/Lk8JTLfAdoavqEzS5i90HZR1Nn
-	S1MvhvHgwloabmjWMVtCQ==
-X-ME-Sender: <xms:C5dQZ7nPHPngcKCgjcOIGlze3pxEpCxcmEN_6qTZiurDHkFLW2vwTg>
-    <xme:C5dQZ-3DZii5BE9w9ywrFCCKBWF_WGm005VRbBPH-dQPKHBwmRDNDYZonj5AWo-oo
-    CYkJRqR5sDNwErKYrc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgddutddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
-    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudei
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprh
-    gtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohepshgv
-    rghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrhgrug
-    gvrggurdhorhhgpdhrtghpthhtoheprghnugihsehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrthhhrghnsehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopeigkeeisehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
-X-ME-Proxy: <xmx:C5dQZxqypKMmdn8z1HsclNAJM4CcNiDwc7OEXdDcOqQKq0tMt2nwXA>
-    <xmx:C5dQZzmd_qVhgjr9Ob8Dm71rqAvaHIq9PxQ77iOxilwOLVT3LSiPCg>
-    <xmx:C5dQZ53reQmHWGedkgfzDd-R-cN-eNSsSFbT3Me7oZEV35GdqV3Kmw>
-    <xmx:C5dQZyv8Om79-lMZ_NMhYSMhgNhOIByp_JdbHndnWVSjUmuWEHxrAw>
-    <xmx:C5dQZ43TGv3WJO3SImfzMCignN7m4hlUF9F9BOs4hlb4htKzHPkmFmCu>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 33EC22220072; Wed,  4 Dec 2024 12:53:15 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1733335878; c=relaxed/simple;
+	bh=X6BEDT6fDm7D7Y0nWW+xKECtJAeRFs5IERZbxKQu3YA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=huemsts0zhwiraE/sUH26IOXX++ruYo3OwVNB1B5igmEfTSjinlAD9olO72T2PL2b9O0ImVyOmjxD7Vbws1rNN9Hrt9fHf5DiGdyqCOeUpJA56WcuahKSWV1orNGnJOjkNBfdhlWXYNd/iVyXASHW23FNPWbNKOVTQrV554czsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=bQgvKdKt; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9ec267b879so114152466b.2
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 10:11:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1733335874; x=1733940674; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UsHq11mNN/cIeDGdLbelslfoGN88pEnsDmEEyawNX0M=;
+        b=bQgvKdKtmQIh+0ohEA8WTbSZF+b1Byo5G2ZaIHDe25BE/UeVd4MUhqGWoNPz2rxM83
+         4uJm+/QBMFxlYu9hbemGi16ymWc7Q1NYJtGXJmG9XDLMFYd5nUQNqewzVL6h9ROiJmpz
+         TlS5PyQYbEKMMsr1K1yBKxC7cJtyJsgcbzs6s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733335874; x=1733940674;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UsHq11mNN/cIeDGdLbelslfoGN88pEnsDmEEyawNX0M=;
+        b=LMgnOKzqW8yPTBGC37G8rgAuq0yGiFehBhBdVQp4/8g0jTq9CuvTxlfxCNifEFkO4e
+         sGezsfxb9WWlhzvZjMKfGsoQLH0sNckNG/ZZqbVJ3x+Zx0Uusts3XjA+PAoRQh4PcbR+
+         ksxEt7etnxkzhf7CMSnkgnOX4h+q2BtL5bbgFNkjTvpdFZW40iLypcgSg2UIL1snfsgK
+         nner/ZEByj2HbEiKMXwuVeMNdMhNrAJoPHeEa7kgjiHJ35tLXGjXvmM39nni5H39Wfro
+         DdEJCz0yuskQ3QSvWEQHuD0BNMUiFR5hZwbos7tIPW+KNR6zoH459pwEr6zZ7tmbtEf1
+         Bi9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVXavCIWT/i/108h1uuZB8O4Z9+eQapaY+tLMuCKfpo6Y1nPm1G4d23BkAymfQKzTROtNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0bHpVowrNCDVa5SFFYXoHA07uXouvDWP7c6zi5LUITmMEa/Ku
+	t6yNg8saRDpHs7TjiHGxprkDgOUZErhGwztco0QmJRdZs8TIBunL1dTpXPqtHgDu8D7sIrdEF94
+	zfVs=
+X-Gm-Gg: ASbGncvhyfg/HKCgFrL4umArO2hrqTs0bJ2Z0Bcl/lu8YzXNhItXoRGUnclHdJ25RtP
+	oA/jE6RD3AHudgz8kLLWUUTLPTDtsFQlUz0SK/P6nQUy+wZBgwubFpQ6+lkENvHWXJbSyPTWICG
+	6kAX3WgWRoWakSvjaZhzWuoQWie+vU5SOYQgxyO+YgngunaTJzoCzqo9WnWdF6srjqr5ErUsH6M
+	RK4eegAsHsP1KefsHzMf3a3aRpTxfijwxJwVQ0w4OpsRsewZbVv8eCRcNuKNhPXf4MRvCmBjwAM
+	RtrCW9zKd+I/JJDfxZ91JxXh
+X-Google-Smtp-Source: AGHT+IFocnDbO6YHvudDVpw3TyRMqWCpTHkMJ4pVwwYFsfLz6TOU+GiCuw3enVvZ85LfrZi+HtAAlQ==
+X-Received: by 2002:a17:906:23e9:b0:a9a:f82:7712 with SMTP id a640c23a62f3a-aa5f7f57cbfmr721688066b.52.1733335874166;
+        Wed, 04 Dec 2024 10:11:14 -0800 (PST)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa599955e08sm760405766b.194.2024.12.04.10.11.12
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2024 10:11:12 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d0e75dd846so5385910a12.3
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 10:11:12 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUJUGVOe8z7gFT3b7toRnHXg5UpeAHkqkdLSuXKCUZNGOvO58v91Kmkaxb3FXBPja+Ff7Y=@vger.kernel.org
+X-Received: by 2002:a17:906:3d22:b0:aa5:392a:f5a7 with SMTP id
+ a640c23a62f3a-aa5f7f57ccamr725005966b.57.1733335871860; Wed, 04 Dec 2024
+ 10:11:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 04 Dec 2024 18:52:51 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nathan Chancellor" <nathan@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Andy Shevchenko" <andy@kernel.org>, "Matthew Wilcox" <willy@infradead.org>,
- "Sean Christopherson" <seanjc@google.com>,
- "Davide Ciminaghi" <ciminaghi@gnudd.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
-Message-Id: <4a5898f6-f159-4f3e-b352-3a72c23422a2@app.fastmail.com>
-In-Reply-To: <20241204170935.GB3356373@thelio-3990X>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-10-arnd@kernel.org>
- <20241204170935.GB3356373@thelio-3990X>
+References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-10-arnd@kernel.org>
+In-Reply-To: <20241204103042.1904639-10-arnd@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 4 Dec 2024 10:10:55 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
+Message-ID: <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
 Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Shevchenko <andy@kernel.org>, Matthew Wilcox <willy@infradead.org>, 
+	Sean Christopherson <seanjc@google.com>, Davide Ciminaghi <ciminaghi@gnudd.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024, at 18:09, Nathan Chancellor wrote:
-> Hi Arnd,
+  "On second thought , let=E2=80=99s not go to x86-64 microarchitectural
+levels. =E2=80=98Tis a silly place"
+
+On Wed, 4 Dec 2024 at 02:31, Arnd Bergmann <arnd@kernel.org> wrote:
 >
-> On Wed, Dec 04, 2024 at 11:30:40AM +0100, Arnd Bergmann wrote:
-> ...
->> +++ b/arch/x86/Kconfig.cpu
->> +config X86_64_V1
->> +config X86_64_V2
->> +config X86_64_V3
-> ...
->> +++ b/arch/x86/Makefile
->> +        cflags-$(CONFIG_MX86_64_V1)	+= -march=x86-64
->> +        cflags-$(CONFIG_MX86_64_V2)	+= $(call cc-option,-march=x86-64-v2,-march=x86-64)
->> +        cflags-$(CONFIG_MX86_64_V3)	+= $(call cc-option,-march=x86-64-v3,-march=x86-64)
-> ...
->> +        rustflags-$(CONFIG_MX86_64_V1)	+= -Ctarget-cpu=x86-64
->> +        rustflags-$(CONFIG_MX86_64_V2)	+= -Ctarget-cpu=x86-64-v2
->> +        rustflags-$(CONFIG_MX86_64_V3)	+= -Ctarget-cpu=x86-64-v3
->
-> There appears to be an extra 'M' when using these CONFIGs in Makefile,
-> so I don't think this works as is?
+> To allow reliably building a kernel for either the oldest x86-64
+> CPUs or a more recent level, add three separate options for
+> v1, v2 and v3 of the architecture as defined by gcc and clang
+> and make them all turn on CONFIG_GENERIC_CPU.
 
-Fixed now by adding the 'M' in the Kconfig file, thanks for
-noticing it.
+The whole "v2", "v3", "v4" etc naming seems to be some crazy glibc
+artifact and is stupid and needs to die.
 
-      Arnd
+It has no relevance to anything. Please do *not* introduce that
+mind-fart into the kernel sources.
+
+I have no idea who came up with the "microarchitecture levels"
+garbage, but as far as I can tell, it's entirely unofficial, and it's
+a completely broken model.
+
+There is a very real model for microarchitectural features, and it's
+the CPUID bits. Trying to linearize those bits is technically wrong,
+since these things simply aren't some kind of linear progression.
+
+And worse, it's a "simplification" that literally adds complexity. Now
+instead of asking "does this CPU support the cmpxchgb16 instruction?",
+the question instead becomes one of "what the hell does 'v3' mean
+again?"
+
+So no. We are *NOT* introducing that idiocy in the kernel.
+
+                Linus
 
