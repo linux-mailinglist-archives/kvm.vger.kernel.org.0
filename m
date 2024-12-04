@@ -1,257 +1,306 @@
-Return-Path: <kvm+bounces-33029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5579E3AAD
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:59:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E43CC9E3AD0
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 14:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EF232836A4
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:59:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3C52280F7A
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A217D20ADC3;
-	Wed,  4 Dec 2024 12:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD831B9831;
+	Wed,  4 Dec 2024 13:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyB7qRkf"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wL73UjeX";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qPufNg0a"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B54F20B7E3
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB623746E;
+	Wed,  4 Dec 2024 13:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733316925; cv=none; b=lxuP6aQKuLPKhB/++4iNPLrfwjBc9zFxT+P41Esh407wAf5odwAcIIDxICA0HDzOeH34OuGDiaBfquliHJ+fzxeqt/taGplxxdzcoFfIt3ZxNIKTcHMXLCh8hZEMZCF43jmDyKZiaXKCC5o8r7VGOE1QXN10nNGC8GLrjZO6Kqs=
+	t=1733317533; cv=none; b=CybCbXFp43ptfG/5Zsb3ulyqlRd9zxIb3y/javqtB5u9VwsMDCWE0bHUBMADRBq9eUZ3SNjwdO+NBIO1BktYZ9YPYFwN+EmG1VXIiFMpnyuPSKRPJk64u2HMaCcKVpU34NJZf2IPFLlUJPsGDNDWE5c0jpLWN3Yvxp/Idons5UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733316925; c=relaxed/simple;
-	bh=N+omNMBxmCIiBaT6aoDaJz2BLDTJK2NT8K0YRXJ+Was=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b9KRPzyjKoj4KOysait6NMPlWUDFwAo4HpZKRzKbF3DD9bsWI4Fiq+fLFIkMXvzhlst/ANQSWjrGHspRk5Rv3owlL9zbKoSBjgPJrWEyZaKlHr/FDL0QBmaoeCo3LVxHz2axXE+DHim4i/h/ykZSblY3kj9WQgT0NFKRf0RdzC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RyB7qRkf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733316923;
+	s=arc-20240116; t=1733317533; c=relaxed/simple;
+	bh=XVtkq5iJ4Mj7hRv7CqYFdnVlFpaRegC0V8RTwadfHQk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JX81zvCkiLjglNgOOAL3myYxjYxbujl6bgVlU6ykQU4b4Rlw6J+aSXV54MCb8c0+ru18wWqKuVmXyHP23H3IulaeOBKDDI5P9pRm+2B6jraxANbAJGF6CvxewrTpIpf1ty2+7JC+gLVl/dVVuULkuFCMDz8NMqCdspzlD6PxFng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wL73UjeX; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qPufNg0a; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1733317524;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GxsrWUisM+4YkdsHUV4TP4AYDbO5CJkwL1nd2GKtk5k=;
-	b=RyB7qRkfuvfnA0iiQsCFk/v/gyBHEByviqwCgjKudHCUETNFBZwZ4EUd72DxgQfzmSpxp1
-	HhQlmtqxerY8auna45eouC+ysJMxkar4w7Vt0iwmeR7HwR8bBNEJOnEOw7AJgGZTxU27V5
-	YHgWGapmbfoOblF0WXIwPVgl4HBTpQw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-ZsT-FkP2OEOqLe2-FqadIg-1; Wed, 04 Dec 2024 07:55:21 -0500
-X-MC-Unique: ZsT-FkP2OEOqLe2-FqadIg-1
-X-Mimecast-MFC-AGG-ID: ZsT-FkP2OEOqLe2-FqadIg
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385e03ee802so2252132f8f.1
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:55:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733316921; x=1733921721;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GxsrWUisM+4YkdsHUV4TP4AYDbO5CJkwL1nd2GKtk5k=;
-        b=Qr5YMhe4tnPSuBqOdRfmbKTdFML0j1bLuiLoAB10XvkEzNnCVC3wntn+Xbtm8osdiD
-         Syakn2AP3JAi6BBc0V/l6YHT+nPpXpzWg9erc7x/5GEYvdbF7QUqJEmS3frui9DQOwqj
-         oI0jMnK43qSoZr8KprNBWDx24Y1jTtPGlFTHYEZ6q/H+ntn32cpsaSFVzHVl47ouWeQd
-         5dvejZXit4cBjbWq38xkXLzhlg3+uQOmglhnYHMOY9Z13AXvP9C8CAkwEMuCKgYGdKUQ
-         tvAlJ2Twkz2tDqfjuVEA59vL+Zevwc9tJmD5BEtmwXpHX/lFPij9ep/ayUqNp5Czmxuy
-         KOOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPMaCPByE47dNBnSh18N0uplJeCGEq5a4GzpTKEhfeucwyhXOjzLPjFvsuvU1eBFYlTfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGeB/wEtvzr4WM2s6cWmfmItP8wzf9A4tvUGj7/TtURvKqCY2H
-	TpEzqTNFO4W0escjuyw9NAFZnRsMORbFNaDltLtr84PeOW/ZXbpHqXCYry7WPYQEtUXqkLJSYTw
-	PaM15OBxQW0PLI2FczG2bJksc7bhOEWQeQnOJq7enQTXhXKIHAA==
-X-Gm-Gg: ASbGncuT7w8yBS+m2Dvt5C89znlZxgKIvn4nncOWgYqO5ratpvNv9+c44u1m54kNzh0
-	WarI1VyhFq2PI/aPmFJXCitdCfsOdqAop2Pn08gWffdJ3FBRp6kJeG7di+kge0hEjRoyH0U1CAU
-	/HHUKYkAovoSQeQKx0DGHxMnS3zX9FtrnQ9QcmYMUD2uHuCNZxaprZ08EzEF7/DyCJUVs2E437Y
-	Zob1onPcsbVxqFEmKPa1CUoma8ETmM9KDUduDUk11KpnLPRBxYWOfwAqOC/m1jnU3hzSEN5UL/X
-	jkXPCb2x5GRau73L+luZvFbdjmZLQpPpXLA=
-X-Received: by 2002:a5d:5986:0:b0:382:4115:1ccb with SMTP id ffacd0b85a97d-385fd3cd078mr5363632f8f.7.1733316920736;
-        Wed, 04 Dec 2024 04:55:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVrn7snw7RGTPCk/ImHOMtvIc2Zo//ldD8UcsohYWGwkye1iFqtEVkXPmZASBRCfdSRO6pnw==
-X-Received: by 2002:a5d:5986:0:b0:382:4115:1ccb with SMTP id ffacd0b85a97d-385fd3cd078mr5363620f8f.7.1733316920347;
-        Wed, 04 Dec 2024 04:55:20 -0800 (PST)
-Received: from localhost (p200300cbc70be10038d68aa111b0a20a.dip0.t-ipconnect.de. [2003:cb:c70b:e100:38d6:8aa1:11b0:a20a])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-434d52c0bc7sm23529155e9.35.2024.12.04.04.55.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 04:55:19 -0800 (PST)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-s390@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org,
-	David Hildenbrand <david@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Baoquan He <bhe@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>,
-	Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v2 11/12] virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM
-Date: Wed,  4 Dec 2024 13:54:42 +0100
-Message-ID: <20241204125444.1734652-12-david@redhat.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241204125444.1734652-1-david@redhat.com>
-References: <20241204125444.1734652-1-david@redhat.com>
+	bh=ROH6zlh02KHc87r45BDTv/cN5afbSIuh9toQ2ctg4yk=;
+	b=wL73UjeXWyYQQmB1Pp1remQXdjAmCrtcWFIChE7E9HHlqL9M/l/akN/1PUyWWcio+M4hsd
+	d7PhJzhCnsWkx4s2pdhDctBT82t3yAu7JL5tjJcYh5qKSbFl1hdbxAKNn5Bt1Rnq8D3xyh
+	1W12Torjr4e84kQ605+X6R3Xvphy304E3U+iWFWCCSOPeoenFGFisFQOMcWHZkqvkIm/Yo
+	rqrivG3Lb9g3nGu76ZInJIUVeq0VCHCnHokMrMp17Gv781GoLj6bgF39qb7BhDi4tsMRg6
+	qBrRpQNn0HXqJMPWSPvD3rrF6D76de00gbF5IouDkUgEw4GC/F5dlO0bLlErmA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1733317524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ROH6zlh02KHc87r45BDTv/cN5afbSIuh9toQ2ctg4yk=;
+	b=qPufNg0aO0AVR52BVTeAWUHTNUKlqiQiXfPzDa82iuoktna7Zd4GaEhPSAChG0cycCtYIt
+	oiuHXrVUC/U2oQBQ==
+To: Anup Patel <anup@brainfault.org>
+Cc: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org,
+ will@kernel.org, robin.murphy@arm.com, atishp@atishpatra.org,
+ alex.williamson@redhat.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu
+Subject: Re: [RFC PATCH 01/15] irqchip/riscv-imsic: Use hierarchy to reach
+ irq_set_affinity
+In-Reply-To: <CAAhSdy27gaVJaXBrx8GB+Xr4ZTvp8hd0Jg8JokzehgC-=5pOmA@mail.gmail.com>
+References: <20241114161845.502027-17-ajones@ventanamicro.com>
+ <20241114161845.502027-18-ajones@ventanamicro.com> <87mshcub2u.ffs@tglx>
+ <CAAhSdy08gi998HsTkGpaV+bTWczVSL6D8c7EmuTQqovo63oXDw@mail.gmail.com>
+ <874j3ktrjv.ffs@tglx> <87ser4s796.ffs@tglx>
+ <CAAhSdy27gaVJaXBrx8GB+Xr4ZTvp8hd0Jg8JokzehgC-=5pOmA@mail.gmail.com>
+Date: Wed, 04 Dec 2024 14:05:23 +0100
+Message-ID: <87mshbsing.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Let's implement the get_device_ram() vmcore callback, so
-architectures that select NEED_PROC_VMCORE_NEED_DEVICE_RAM, like s390
-soon, can include that memory in a crash dump.
+On Wed, Dec 04 2024 at 09:13, Anup Patel wrote:
+> On Wed, Dec 4, 2024 at 4:29=E2=80=AFAM Thomas Gleixner <tglx@linutronix.d=
+e> wrote:
+>> As I was looking at something else MSI related I had a look at
+>> imsic_irq_set_affinity() again.
+>>
+>> It's actually required to have the message write in that function and
+>> not afterwards as you invoke imsic_vector_move() from that function.
+>>
+>> That's obviously not true for the remap case as that will not change the
+>> message address/data pair because the remap table entry is immutable -
+>> at least I assume so for my mental sanity sake :)
+>>
+>> But that brings me to a related question. How is this supposed to work
+>> with non-atomic message updates? PCI/MSI does not necessarily provide
+>> masking, and the write of the address/data pair is done in bits and
+>> pieces. So you can end up with an intermediate state seen by the device
+>> which ends up somewhere in interrupt nirvana space.
+>>
+>> See the dance in msi_set_affinity() and commit 6f1a4891a592
+>> ("x86/apic/msi: Plug non-maskable MSI affinity race") for further
+>> explanation.
+>>
+>> The way how the IMSIC driver works seems to be pretty much the same as
+>> the x86 APIC mess:
+>>
+>>         @address is the physical address of the per CPU MSI target
+>>         address and @data is the vector ID on that CPU.
+>>
+>> So the non-atomic update in case of non-maskable MSI suffers from the
+>> same problem. It works most of the time, but if it doesn't you might
+>> stare at the occasionally lost interrupt and the stale device in
+>> disbelief for quite a while :)
+>
+> Yes, we have the same challenges as x86 APIC when changing
+> MSI affinity.
+>>
+>> I might be missing something which magically prevent that though :)
+>>
+> Your understanding is correct. In fact, the IMSIC msi_set_affinity()
+> handling is inspired from x86 APIC approach due to similarity in
+> the overall MSI controller.
+>
+> The high-level idea of imsic_irq_set_affinity() is as follows:
+>
+> 1) Allocate new_vector (new CPU IMSIC address + new ID on that CPU)
+>
+> 2) Update the MSI address and data programmed in the device
+> based on new_vector (see imsic_msi_update_msg())
+>
+> 3) At this point the device points to the new_vector but old_vector
+> (old CPU IMSIC address + old ID on that CPU) is still enabled and
+> we might have received MSI on old_vector while we were busy
+> setting up a new_vector for the device. To address this, we call
+> imsic_vector_move().
+>
+> 4) The imsic_vector_move() marks the old_vector as being
+> moved and schedules a lazy timer on the old CPU.
+>
+> 5) The lazy timer expires on the old CPU and results in
+> __imsic_local_sync() being called on the old CPU.
+>
+> 6) If there was a pending MSI on the old vector then the
+> __imsic_local_sync() function injects an MSI to the
+> new_vector using an MMIO write.
+>
+> It is very unlikely that an MSI from device will be dropped
+> (unless I am missing something) but the unsolved issue
+> is that handling of in-flight MSI received on the old_vector
+> during the MSI re-programming is delayed which may have
+> side effects on the device driver side.
 
-Merge ranges, and process ranges that might contain a mixture of plugged
-and unplugged, to reduce the total number of ranges.
+Interrupt delivery can be delayed for tons of other reasons.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- drivers/virtio/virtio_mem.c | 88 +++++++++++++++++++++++++++++++++++++
- fs/proc/Kconfig             |  1 +
- 2 files changed, 89 insertions(+)
+But yes, you are missing something which is worse than a jiffie delay:
 
-diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-index 73477d5b79cf..8a294b9cbcf6 100644
---- a/drivers/virtio/virtio_mem.c
-+++ b/drivers/virtio/virtio_mem.c
-@@ -2728,6 +2728,91 @@ static bool virtio_mem_vmcore_pfn_is_ram(struct vmcore_cb *cb,
- 	mutex_unlock(&vm->hotplug_mutex);
- 	return is_ram;
- }
-+
-+#ifdef CONFIG_PROC_VMCORE_DEVICE_RAM
-+static int virtio_mem_vmcore_add_device_ram(struct virtio_mem *vm,
-+		struct list_head *list, uint64_t start, uint64_t end)
-+{
-+	int rc;
-+
-+	rc = vmcore_alloc_add_range(list, start, end - start);
-+	if (rc)
-+		dev_err(&vm->vdev->dev,
-+			 "Error adding device RAM range: %d\n", rc);
-+	return rc;
-+}
-+
-+static int virtio_mem_vmcore_get_device_ram(struct vmcore_cb *cb,
-+		struct list_head *list)
-+{
-+	struct virtio_mem *vm = container_of(cb, struct virtio_mem,
-+					     vmcore_cb);
-+	const uint64_t device_start = vm->addr;
-+	const uint64_t device_end = vm->addr + vm->usable_region_size;
-+	uint64_t chunk_size, cur_start, cur_end, plugged_range_start = 0;
-+	LIST_HEAD(tmp_list);
-+	int rc;
-+
-+	if (!vm->plugged_size)
-+		return 0;
-+
-+	/* Process memory sections, unless the device block size is bigger. */
-+	chunk_size = max_t(uint64_t, PFN_PHYS(PAGES_PER_SECTION),
-+			   vm->device_block_size);
-+
-+	mutex_lock(&vm->hotplug_mutex);
-+
-+	/*
-+	 * We process larger chunks and indicate the complete chunk if any
-+	 * block in there is plugged. This reduces the number of pfn_is_ram()
-+	 * callbacks and mimic what is effectively being done when the old
-+	 * kernel would add complete memory sections/blocks to the elfcore hdr.
-+	 */
-+	cur_start = device_start;
-+	for (cur_start = device_start; cur_start < device_end; cur_start = cur_end) {
-+		cur_end = ALIGN_DOWN(cur_start + chunk_size, chunk_size);
-+		cur_end = min_t(uint64_t, cur_end, device_end);
-+
-+		rc = virtio_mem_send_state_request(vm, cur_start,
-+						   cur_end - cur_start);
-+
-+		if (rc < 0) {
-+			dev_err(&vm->vdev->dev,
-+				"Error querying block states: %d\n", rc);
-+			goto out;
-+		} else if (rc != VIRTIO_MEM_STATE_UNPLUGGED) {
-+			/* Merge ranges with plugged memory. */
-+			if (!plugged_range_start)
-+				plugged_range_start = cur_start;
-+			continue;
-+		}
-+
-+		/* Flush any plugged range. */
-+		if (plugged_range_start) {
-+			rc = virtio_mem_vmcore_add_device_ram(vm, &tmp_list,
-+							      plugged_range_start,
-+							      cur_start);
-+			if (rc)
-+				goto out;
-+			plugged_range_start = 0;
-+		}
-+	}
-+
-+	/* Flush any plugged range. */
-+	if (plugged_range_start)
-+		rc = virtio_mem_vmcore_add_device_ram(vm, &tmp_list,
-+						      plugged_range_start,
-+						      cur_start);
-+out:
-+	mutex_unlock(&vm->hotplug_mutex);
-+	if (rc < 0) {
-+		vmcore_free_ranges(&tmp_list);
-+		return rc;
-+	}
-+	list_splice_tail(&tmp_list, list);
-+	return 0;
-+}
-+#endif /* CONFIG_PROC_VMCORE_DEVICE_RAM */
- #endif /* CONFIG_PROC_VMCORE */
- 
- static int virtio_mem_init_kdump(struct virtio_mem *vm)
-@@ -2737,6 +2822,9 @@ static int virtio_mem_init_kdump(struct virtio_mem *vm)
- #ifdef CONFIG_PROC_VMCORE
- 	dev_info(&vm->vdev->dev, "memory hot(un)plug disabled in kdump kernel\n");
- 	vm->vmcore_cb.pfn_is_ram = virtio_mem_vmcore_pfn_is_ram;
-+#ifdef CONFIG_PROC_VMCORE_DEVICE_RAM
-+	vm->vmcore_cb.get_device_ram = virtio_mem_vmcore_get_device_ram;
-+#endif /* CONFIG_PROC_VMCORE_DEVICE_RAM */
- 	register_vmcore_cb(&vm->vmcore_cb);
- 	return 0;
- #else /* CONFIG_PROC_VMCORE */
-diff --git a/fs/proc/Kconfig b/fs/proc/Kconfig
-index 5668620ab34d..6ae966c561e7 100644
---- a/fs/proc/Kconfig
-+++ b/fs/proc/Kconfig
-@@ -67,6 +67,7 @@ config NEED_PROC_VMCORE_DEVICE_RAM
- config PROC_VMCORE_DEVICE_RAM
- 	def_bool y
- 	depends on PROC_VMCORE && NEED_PROC_VMCORE_DEVICE_RAM
-+	depends on VIRTIO_MEM
- 	help
- 	  If the elfcore hdr is allocated and prepared by the dump kernel
- 	  ("2nd kernel") instead of the crashed kernel, RAM provided by memory
--- 
-2.47.1
+CPU                                     Device
+  msi_update_msg()
+     compose()
+     write()
+       write(msg->address_lo); [1]
+       write(msg->address_hi); [2]
+                                        Raises interrupt [3]
+       write(msg->data);       [4]
 
+[2] can be ignored as it should not change (otherwise 32bit only devices
+would not work).
+
+Lets assume that the original message was:
+
+     addr_lo =3D 0x1000, data =3D 0x10    (CPU1, vector 0x10)
+=20=20=20=20=20=20=20
+The new message is
+
+     addr_lo =3D 0x2000, data =3D 0x20    (CPU2, vector 0x20)
+
+After [2] the device sees:
+
+     addr_lo =3D 0x2000, data =3D 0x10    (CPU2, vector 0x10)
+
+The interrupt raised in [3] will end up on CPU2 at vector 0x10 which
+might be not in use or used by some other device. In any case the
+interrupt is not reaching the real device handler and you can't see that
+interrupt as pending in CPU1.
+
+That's why x86 in case of non-remapped interrupts has this for the two
+situations:
+
+  1) old->data =3D=3D new->data
+
+     write_msg(new);=20
+
+     The next interrupt either arrives on the old CPU or on the new CPU
+     depending on timing. There is no intermediate state because the
+     vector (data) is the same on both CPUs.
+
+  2) old->data !=3D new->data
+
+     tmp_msg.addr =3D old_msg.addr
+     tmp_msg.data =3D new_msg.data
+
+     write_msg(tmp_msg);
+
+     So after that write the device might raise the interrupt on CPU1
+     and vector 0x20.
+
+     The next step is
+
+     write_msg(new);=20
+
+     which changes the destination CPU to CPU2.
+
+     So depending what the device has observed the interrupt might end
+     up on
+
+     CPU1 vector 0x10   (old)
+     CPU1 vector 0x20   (tmp)
+     CPU2 vector 0x20   (new)
+
+     CPU1 vector 0x20 (tmp) is then checked in the pending register and
+     the interrupt is retriggered if pending.
+
+That requires to move the interrupt from actual interrupt context on the
+old target CPU. It allows to evaluate the old target CPUs pending
+register with local interrupts disabled, which obviously does not work
+remote.
+
+I don't see a way how that can work remote with the IMSIC either even if
+you can easily access the pending state of the remote CPU:
+
+CPU0                            CPU1                   Device
+set_affinity()
+  write_msg(tmp)
+    write(addr); // CPU1
+    write(data); // vector 0x20
+                                                        raise IRQ
+                                handle vector 0x20
+                                (spurious or other device)
+
+    check_pending(CPU1, 0x20) =3D=3D false -> Interrupt is lost
+
+Remapped interrupts do not have that issue because the table update is
+atomic vs. a concurrently raised interrupt, so that it either ends up on
+the old or on the new destination. The device message does not change as
+it always targets the table entry, which is immutable after setup.
+
+That's why x86 has this special msi affinity setter for the non remapped
+case. For the remapped case it's just using the hierarchy default which
+ends up at the remap domain.
+
+So the hierarchies look like this:
+
+   1) non-remap
+
+      PCI/MSI device domain
+         irq_chip.irq_set_affinity =3D msi_set_affinity;
+      VECTOR domain
+
+   2) remap
+
+      PCI/MSI device domain
+         irq_chip.irq_set_affinity =3D msi_domain_set_affinity;
+      REMAP domain
+         irq_chip.irq_set_affinity =3D remap_set_affinity;
+      VECTOR domain
+
+The special case of msi_set_affinity() is not involved in the remap case
+and solely utilized for the non-remap horrors. The remap case does not
+require the interrupt to be moved in interrupt context either because
+there is no intermediate step and pending register check on the old CPU
+involved.
+
+The vector cleanup of the old CPU always happens when the interrupt
+arrives on the new target for the first time independent of remapping
+mode. That's required for both cases to take care of the case where the
+interrupt is raised on the old vector (cpu1, 0x10) before the write
+happens and is pending in CPU1. So after desc::lock is released and
+interrupts are reenabled the interrupt is handled on CPU1. The next one
+is guaranteed to arrive on CPU2 and that triggers the clean up of the
+CPU1 vector, which releases it for reuse in the matrix allocator.
+
+I think you should model it in a similar way instead of trying to
+artificially reuse imsic_irq_set_affinity() for the remap case,
+especially when you decide to close the non-maskable MSI hole described
+above, which I recommend to do :)
+
+You still can utilize msi-lib and just have your private implementation
+of init_dev_msi_info() as a wrapper around the library similar to
+mbi_init_dev_msi_info() and its_init_dev_msi_info(). That wrapper would
+just handle the non-remap case to set info::chip:irq_set_affinity to the
+magic non-remap function.
+
+Hope that helps.
+
+> I believe in the future RISC-V AIA v2.0 (whenever that
+> happens) will address the gaps in AIA v1.0 (like this one).
+
+If that is strictly translation table based, yes.
+
+Thanks,
+
+        tglx
 
