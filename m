@@ -1,205 +1,144 @@
-Return-Path: <kvm+bounces-32980-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A75F9E3237
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 04:43:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 059CF9E3282
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 04:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAE2B27195
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 03:43:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79A29B26297
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 03:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFC0156997;
-	Wed,  4 Dec 2024 03:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="LesNnhwJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9033B16EB54;
+	Wed,  4 Dec 2024 03:59:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110DC130A54
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 03:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2C614D6F9;
+	Wed,  4 Dec 2024 03:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733283819; cv=none; b=g6kqwi/nM0p9pfBMOCF9rE6PrW2bPbk2n6a6mb4SMLyeft2GjqBHyL/khhLtPhmBMQE1QUDxAPj6YlJikwxJP2FaCV0ARnZm/EKvrbFzqdrerhHrYeAnamP3JnM97aVjRB6h8786D2EPPPCsYzEOQrd5Jffz+jTDYDJfMEVJe8A=
+	t=1733284744; cv=none; b=GP5utRy5ATLg4LXbha43xL5HriLY7l0C5zHgLz7qK6ptiB0uF1rAq+urI4JPosLxG/VYnwoQ+AC1DRscFV2nNh4DO+PPNIyk9oJ/ym/k5/EcT3B8+a+hDF3xgDeQF4apY4YYulb7TyyjdHLHGuKQe0lOcPQEIYDmo2hWIRvrlrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733283819; c=relaxed/simple;
-	bh=+kQgx+gnUJbkShBpT4dRk72hfPx4Z/Q1SR5sEmPhons=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y7XWsid5ZS1JBWEjyaOZOiPAlTVLOaK3kmJe4W6nIg+GyScXiW5Y80v8tZpBxu+e2VQnp9mVmeQ8bPBleeycBvOH6ac7uZJTCYRoBndnmdFpp4iutptv4Mnc8Sv58u4FQNfmbXm+3UBP0ETxOf8vl93z5z6Y7MJ/jzb9P0t5lq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=LesNnhwJ; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-843df3c4390so217389639f.3
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 19:43:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1733283817; x=1733888617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vGkT/pl1gB1Evs4ReRwjiJx5mPh/IBj5HFwD48IlujU=;
-        b=LesNnhwJpSy1T9sLWdLo5mrghP+Qf0Kn0rRltwLpT/Wd0N1BGJ7StUZtcbTk+i4mDL
-         zQ0wy6poNVxX4AL2/FdVZH3IGDI7E9FF8JcbihX3v/hOb7bNdKf/yCtQa0GWXMnAKnDJ
-         k78c3nyRAm+noxkY6CGe6iwiz7cIOHPWthlf6kLTNaLs6+GfXgGXUWaaHBJhPYy47C26
-         Pd+UIQ3jLy1fqbB7JB1RTaDQ0rlFMsfvDBVyQQDVPSnh5AbNa3E/0nczvAu5tCEg3H+z
-         GeHEO3fhLzFaD/i5zOfY1uE+EXlj7gZx1DJ6HQHBwfuI/MFtCXlECWQCDVEBW9mKwD5p
-         rsoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733283817; x=1733888617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vGkT/pl1gB1Evs4ReRwjiJx5mPh/IBj5HFwD48IlujU=;
-        b=WgqX+xWg27OVn+Mxz2GJaFvIsgJvc2N5WEDqU7PtvPawvYgHck8PnFvjp2ecLRdhUV
-         /vjEL7TePfFhyZ7VWReZNHC9xusQGX9F7G9Nt7vsUnlCqdz9QpqD5YjQXopP63If24uE
-         p2GoYlVMyOj61rmYjMh81CXi3iKKj6COli1QMws8uzD30NjEvpldwF1ccPzAZW91M3xq
-         5sXc1Jz50fAcUAnAdwjwyTqIjPboY8xkomdgURgZT3MEjaGl9eRAJfKMpb3sLziOpjmt
-         C3yv8/74zDgPEaMSkCmXRXR18qgpkiO4+J6l6AWaMEmfaKebTFdXHlXg1Q8yAeThV/FI
-         nUDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxabA52bE4+5qz65JLVUQJ+Agg6GIqZ/ipvQbtj01gxoUvjkGCOjbfUWTnpIa4WxQbPPY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKTxMr5dPfcSWeZ+KmAwKjpRtspio3KGMK3mT+bzTStlTcPgAg
-	IqNg6rVmGdH+LXojZRI0IVEwq52GUoS+pjtR7+zDH7HMJqdpa9esAwmSMTGoLo4yKaVdeCYiuOA
-	e0vuagA/FX8rydVzf7dSg8TXlh+ohpYDwDqjXKg==
-X-Gm-Gg: ASbGncsVLBWRnbXDSXneHfNki3FXghnz1DerrNkAm5w1alUoqVvG4zXqmKJJTq/7zvF
-	m67F1ExfBe1ZjtULwZRUZc1xSwo+P0SdRQw==
-X-Google-Smtp-Source: AGHT+IGWdFp8FF+1NtOQA0riwNaVCNa+lNq7c5BS40O1U8dW0QvsTp35bk3sIYPxMlaLCPGVX4HHb6tLAmO9iVR0CsU=
-X-Received: by 2002:a05:6602:29c8:b0:807:f0fb:1192 with SMTP id
- ca18e2360f4ac-8445b5477f8mr665966539f.1.1733283817005; Tue, 03 Dec 2024
- 19:43:37 -0800 (PST)
+	s=arc-20240116; t=1733284744; c=relaxed/simple;
+	bh=5Zu0i0HD/f0tjB+TrF1WgwVUWI+7cgyj9N9PMr50iWA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CpmEZvxFQUWVhJegQuuym3yiQKE7+RlmRJ7+tKcU+p2h650TaTTk0n683my8uIeea/i+Q6aZDRAZVjVYr5uGVN7BXndQ7n1fiNwqpITWK9mj+28zR7/HMxwjekKwLW+Lzih5HGFs3JsuETzticWEoFLqro+sXrZDGz65IPiMJ0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxIK+C009nAGRQAA--.1134S3;
+	Wed, 04 Dec 2024 11:58:59 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMBxJMCA009nfAJ1AA--.59317S3;
+	Wed, 04 Dec 2024 11:58:57 +0800 (CST)
+Subject: Re: [RFC 5/5] LoongArch: KVM: Enable separate vmid feature
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241113031727.2815628-1-maobibo@loongson.cn>
+ <20241113031727.2815628-6-maobibo@loongson.cn>
+ <CAAhV-H54WbE_6CM8L3q_jRjA_VXLqX_msEmzOmwy2s0dFABCgw@mail.gmail.com>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <f0f1f709-9ae0-3b7e-a074-94538e4c3d89@loongson.cn>
+Date: Wed, 4 Dec 2024 11:58:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241114161845.502027-17-ajones@ventanamicro.com>
- <20241114161845.502027-18-ajones@ventanamicro.com> <87mshcub2u.ffs@tglx>
- <CAAhSdy08gi998HsTkGpaV+bTWczVSL6D8c7EmuTQqovo63oXDw@mail.gmail.com>
- <874j3ktrjv.ffs@tglx> <87ser4s796.ffs@tglx>
-In-Reply-To: <87ser4s796.ffs@tglx>
-From: Anup Patel <anup@brainfault.org>
-Date: Wed, 4 Dec 2024 09:13:24 +0530
-Message-ID: <CAAhSdy27gaVJaXBrx8GB+Xr4ZTvp8hd0Jg8JokzehgC-=5pOmA@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/15] irqchip/riscv-imsic: Use hierarchy to reach irq_set_affinity
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	tjeznach@rivosinc.com, zong.li@sifive.com, joro@8bytes.org, will@kernel.org, 
-	robin.murphy@arm.com, atishp@atishpatra.org, alex.williamson@redhat.com, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAhV-H54WbE_6CM8L3q_jRjA_VXLqX_msEmzOmwy2s0dFABCgw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBxJMCA009nfAJ1AA--.59317S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZFWktr4fJr1DuryDKr45Arc_yoW5Gr1xpr
+	W7AF98JrWv9r93Gwn0qwnYqr15X342g3W2qFn2qryfursIgFWvyF1kK34DZF1rWw4FyFyv
+	9r1vy39IvFsFyacCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
 
-On Wed, Dec 4, 2024 at 4:29=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de>=
- wrote:
->
-> On Tue, Dec 03 2024 at 21:55, Thomas Gleixner wrote:
-> > On Tue, Dec 03 2024 at 22:07, Anup Patel wrote:
-> >> On Tue, Dec 3, 2024 at 7:23=E2=80=AFPM Thomas Gleixner <tglx@linutroni=
-x.de> wrote:
-> >>> Sorry, I missed that when reviewing the original IMSIC MSI support.
-> >>>
-> >>> The whole IMSIC MSI support can be moved over to MSI LIB which makes =
-all
-> >>> of this indirection go away and your intermediate domain will just fi=
-t
-> >>> in.
-> >>>
-> >>> Uncompiled patch below. If that works, it needs to be split up proper=
-ly.
-> >>>
-> >>> Note, this removes the setup of the irq_retrigger callback, but that'=
-s
-> >>> fine because on hierarchical domains irq_chip_retrigger_hierarchy() i=
-s
-> >>> invoked anyway. See try_retrigger().
-> >>
-> >> The IMSIC driver was merged one kernel release before common
-> >> MSI LIB was merged.
-> >
-> > Ah indeed.
-> >
-> >> We should definitely update the IMSIC driver to use MSI LIB, I will
-> >> try your suggested changes (below) and post a separate series.
-> >
-> > Pick up the delta patch I gave Andrew...
->
-> As I was looking at something else MSI related I had a look at
-> imsic_irq_set_affinity() again.
->
-> It's actually required to have the message write in that function and
-> not afterwards as you invoke imsic_vector_move() from that function.
->
-> That's obviously not true for the remap case as that will not change the
-> message address/data pair because the remap table entry is immutable -
-> at least I assume so for my mental sanity sake :)
->
-> But that brings me to a related question. How is this supposed to work
-> with non-atomic message updates? PCI/MSI does not necessarily provide
-> masking, and the write of the address/data pair is done in bits and
-> pieces. So you can end up with an intermediate state seen by the device
-> which ends up somewhere in interrupt nirvana space.
->
-> See the dance in msi_set_affinity() and commit 6f1a4891a592
-> ("x86/apic/msi: Plug non-maskable MSI affinity race") for further
-> explanation.
->
-> The way how the IMSIC driver works seems to be pretty much the same as
-> the x86 APIC mess:
->
->         @address is the physical address of the per CPU MSI target
->         address and @data is the vector ID on that CPU.
->
-> So the non-atomic update in case of non-maskable MSI suffers from the
-> same problem. It works most of the time, but if it doesn't you might
-> stare at the occasionally lost interrupt and the stale device in
-> disbelief for quite a while :)
 
-Yes, we have the same challenges as x86 APIC when changing
-MSI affinity.
 
->
-> I might be missing something which magically prevent that though :)
->
+On 2024/12/3 上午10:48, Huacai Chen wrote:
+> Hi, Bibo,
+> 
+> I think you need to probe LOONGARCH_CPU_GUESTID at the end of
+> cpu_probe_common(), otherwise cpu_has_guestid is always false.
+yes, it is always false now.
+Will negotiate with HW guys and add real probe mechanism.
 
-Your understanding is correct. In fact, the IMSIC msi_set_affinity()
-handling is inspired from x86 APIC approach due to similarity in
-the overall MSI controller.
+Regards
+Bibo Mao
+> 
+> Huacai
+> 
+> On Wed, Nov 13, 2024 at 11:17 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> With CSR GTLBC shortname for Guest TLB Control Register, separate vmid
+>> feature will be enabled if bit 14 CSR_GTLBC_USEVMID is set. Enable
+>> this feature if cpu_has_guestid is true when KVM module is loaded.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/loongarch.h | 2 ++
+>>   arch/loongarch/kvm/main.c              | 4 +++-
+>>   2 files changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
+>> index 64ad277e096e..5fee5db3bea0 100644
+>> --- a/arch/loongarch/include/asm/loongarch.h
+>> +++ b/arch/loongarch/include/asm/loongarch.h
+>> @@ -326,6 +326,8 @@
+>>   #define  CSR_GTLBC_TGID_WIDTH          8
+>>   #define  CSR_GTLBC_TGID_SHIFT_END      (CSR_GTLBC_TGID_SHIFT + CSR_GTLBC_TGID_WIDTH - 1)
+>>   #define  CSR_GTLBC_TGID                        (_ULCAST_(0xff) << CSR_GTLBC_TGID_SHIFT)
+>> +#define  CSR_GTLBC_USEVMID_SHIFT       14
+>> +#define  CSR_GTLBC_USEVMID             (_ULCAST_(0x1) << CSR_GTLBC_USEVMID_SHIFT)
+>>   #define  CSR_GTLBC_TOTI_SHIFT          13
+>>   #define  CSR_GTLBC_TOTI                        (_ULCAST_(0x1) << CSR_GTLBC_TOTI_SHIFT)
+>>   #define  CSR_GTLBC_USETGID_SHIFT       12
+>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+>> index f89d1df885d7..50c977d8b414 100644
+>> --- a/arch/loongarch/kvm/main.c
+>> +++ b/arch/loongarch/kvm/main.c
+>> @@ -336,7 +336,7 @@ int kvm_arch_enable_virtualization_cpu(void)
+>>          write_csr_gcfg(0);
+>>          write_csr_gstat(0);
+>>          write_csr_gintc(0);
+>> -       clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI);
+>> +       clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI | CSR_GTLBC_USEVMID);
+>>
+>>          /*
+>>           * Enable virtualization features granting guest direct control of
+>> @@ -359,6 +359,8 @@ int kvm_arch_enable_virtualization_cpu(void)
+>>
+>>          /* Enable using TGID  */
+>>          set_csr_gtlbc(CSR_GTLBC_USETGID);
+>> +       if (cpu_has_guestid)
+>> +               set_csr_gtlbc(CSR_GTLBC_USEVMID);
+>>          kvm_debug("GCFG:%lx GSTAT:%lx GINTC:%lx GTLBC:%lx",
+>>                    read_csr_gcfg(), read_csr_gstat(), read_csr_gintc(), read_csr_gtlbc());
+>>
+>> --
+>> 2.39.3
+>>
 
-The high-level idea of imsic_irq_set_affinity() is as follows:
-
-1) Allocate new_vector (new CPU IMSIC address + new ID on that CPU)
-
-2) Update the MSI address and data programmed in the device
-based on new_vector (see imsic_msi_update_msg())
-
-3) At this point the device points to the new_vector but old_vector
-(old CPU IMSIC address + old ID on that CPU) is still enabled and
-we might have received MSI on old_vector while we were busy
-setting up a new_vector for the device. To address this, we call
-imsic_vector_move().
-
-4) The imsic_vector_move() marks the old_vector as being
-moved and schedules a lazy timer on the old CPU.
-
-5) The lazy timer expires on the old CPU and results in
-__imsic_local_sync() being called on the old CPU.
-
-6) If there was a pending MSI on the old vector then the
-__imsic_local_sync() function injects an MSI to the
-new_vector using an MMIO write.
-
-It is very unlikely that an MSI from device will be dropped
-(unless I am missing something) but the unsolved issue
-is that handling of in-flight MSI received on the old_vector
-during the MSI re-programming is delayed which may have
-side effects on the device driver side.
-
-I believe in the future RISC-V AIA v2.0 (whenever that
-happens) will address the gaps in AIA v1.0 (like this one).
-
-Regards,
-Anup
 
