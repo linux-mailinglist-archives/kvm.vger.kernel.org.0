@@ -1,183 +1,161 @@
-Return-Path: <kvm+bounces-33047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F8F9E4077
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:04:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6FBB9E4033
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 17:57:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 620A0B3190D
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 16:34:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0EA916766A
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 16:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1062C20CCC7;
-	Wed,  4 Dec 2024 16:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A7920CCFC;
+	Wed,  4 Dec 2024 16:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Bgz/rgP/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="i3QZhTqh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3Oyxv/k"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9955C1547C3;
-	Wed,  4 Dec 2024 16:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4763B20CCEB
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 16:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733330062; cv=none; b=dOCgEp4FiTsiEajGNqN4gaOvujcO36PJXWET8Y8Q9/vgdtvVKTief9Hfh27NblUXh9umza7u6Bfn3DO0TBABXNMwdKPQrw4w7Ltff2KQbDb2WpJEg2i5IcX3oftJKvV0qBkccEV4V0UMzP1W32F3Wy32Pdc/+njRXyy6wTUHS6Y=
+	t=1733331460; cv=none; b=FL0KRKTqlGZeCBXD063GEnfyHPIY94EdI3RKI6lLqMgzYjdpwAGoYL+PKzUJ5RJSiQjFNY9pSdaM6vFH8ge+6C3V+yDDHqAphSuZyQyNPpenzSmguV0JeaR5m4WAmvrAAKxeGtXNl4eJXCFxt2w2iBkgczhKIP8bH04gwyg7o68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733330062; c=relaxed/simple;
-	bh=x78ACWAOEZm++OCDsqG7/c0mVwye3P8tzwVfBS2KS84=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=RpTjS67rY0FZGg3yxOTortPjr+5xQ3sPGUYNfP+efvGLbX1op6ZssskoNXJv6A/F3/fcEpbePZJe1xicSUJiTnrOOq8mcVSg+6BfJcLg/P4+YhoZx8bOr5CuUxsU97LII4iJrcF6fpbIYjf71W80KM02kmH9Pvqyrkv6yMDrxSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Bgz/rgP/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=i3QZhTqh; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id 4B62811401D5;
-	Wed,  4 Dec 2024 11:34:18 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 11:34:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1733330058;
-	 x=1733416458; bh=Ah70jlP4CTaxYAWVJ4RDilPcmjlaIxhGSKcMYOP92jw=; b=
-	Bgz/rgP/rbciUaPGqY2T3BoA6Hn2zEV/kByiE1kyZQG+kfS/TkxHGrVjWOlfxDYe
-	8ZH9j2sz2cZ9F2yFj4Of2USSJIFYFI6uDLo7a5j6pqOp3zw1y77xCG9o+s5CouU0
-	NYt4X+V92Zmk1CIlQ8OOSiuA/cGNrJlRw9+tLMELy++7d7CuGE3nXUfSbx5CjpSC
-	cBylWUXFob1xjRec19aW292Kpq6vsRMo+qPZjm64Hah7zdxM7Nf/HQj9PQ8lwfS8
-	BKZyLL8UVf/OYQT9vLXu+EUxyiJ4enKDTkDxWN7OnJSeXaeDxJ0xzlu4muvc3U9t
-	NiGSUq166HdOcv5YrGIpWg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733330058; x=
-	1733416458; bh=Ah70jlP4CTaxYAWVJ4RDilPcmjlaIxhGSKcMYOP92jw=; b=i
-	3QZhTqhBZKJAh64ysePHTOf5V9j0ogPScaaqrkuI/8qEz0S4w9N63NXsrN+bonbS
-	AFxzlYlj10Nn8vT4NRUQUCOzgK81UwvV6a+ceHmTu6TB14eGtUdYJQM+ZNnEH/Zp
-	yIATyZITF9MNZQF64PZK8kIFrq4OeEfa8MkRDqi5ykZlDNXK5yucS/czq2o1ARCv
-	DOqjPaVQz0gX0cf+BE/uEWO+kZOyGMzHqB+reItDcdnh1teFuJ3Eq2Epqtx8xbVu
-	lO7K9H6cJAb4HMZJBiIyTzyXiCMO1jUTmEoPy0FZeUXoMpaIPUvYxDJC2ZALPx9g
-	R01wmE0Do74tWgIsLyRcA==
-X-ME-Sender: <xms:iYRQZ5P4VkR9mZXjSbymRRoy_dVJGGGO2fgNixTyN1iz5o8b1eRt7Q>
-    <xme:iYRQZ78E1iUGLfxfK2V_YNHcB4b8fnvBbhJctOqcnHBkJvbaaKdK9DYZV5G3AuDvV
-    ePwdBmGq2WHT8TH6ew>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgdekiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredttden
-    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdrug
-    gvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffg
-    vedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduhedp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepsghpsegrlhhivghnkedruggvpdhrtg
-    hpthhtoheptghimhhinhgrghhhihesghhnuhguugdrtghomhdprhgtphhtthhopehsvggr
-    nhhjtgesghhoohhglhgvrdgtohhmpdhrtghpthhtohepfihilhhlhiesihhnfhhrrgguvg
-    grugdrohhrghdprhgtphhtthhopegrnhguhieskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheprghrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhopeigkeeisehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvgdprhgtphht
-    thhopehtohhrvhgrlhgusheslhhinhhugidqfhhouhhnuggrthhiohhnrdhorhhg
-X-ME-Proxy: <xmx:iYRQZ4T3112cRzwmCs5KIhZTO7PC40uLVK1f5fb7qcRgieEPEFSXJg>
-    <xmx:iYRQZ1tn6Oe_zSU_P3NsbgNWOppvawQfIK1GXrcVLkiEIBvpl84eLw>
-    <xmx:iYRQZxeI9_hIN2rr4QXf81ZGygsLT6b28nbbmcqx4dYpgXXdY4YgXQ>
-    <xmx:iYRQZx04xE3iirr5QntJttrlCLCtfFrE_z9P1c0P4DvPS10Yw7vZGQ>
-    <xmx:ioRQZ82OD2mhqILmQZxp7mH4r5lmE-yzLCstRa81WHTlxPCYuR9p44RM>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 68E422220072; Wed,  4 Dec 2024 11:34:17 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1733331460; c=relaxed/simple;
+	bh=0HUzdTNj6kvO/sxYp+pg359CCM/bjPbiDVwJpcSLg88=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ryxwyOBcHtxn1NB0YMjh6C/Gf1keF09jyUJakKKAoWa8gecyV00RIFI/o9sri0Bt2jMk3pKJWSvTKpLbiAT+WC3sBViqFfIunuykCW93sOv+UqqIdOtNlzjveJ/2ss4in7ogaRQ/ITmjJt4kU3lA/9FbgTx5feW92OedU8pCjBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3Oyxv/k; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a781e908a7so158905ab.0
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 08:57:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733331458; x=1733936258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sfmZWfaFUyauxIzYDnk1HIum5vCQdB8u8dJVsYfif1M=;
+        b=c3Oyxv/kzmiznaUPrXSJLDY2VK/2Q8b6RHMmOV+84ItJ5kf1coPkvNo4uaCfXX3Hus
+         P2JQFiBFvU1rmXRcv1inBFHLIkVUhsIg6Py7efPMdXMGtzNbqNBrEjLpM3xEsCsjIzch
+         zgW9zKD/BWtYxxt4oqSoaYDzAv2voAYJDIqgOjhdDQktwvuAoZ3Boo4a8OZtJRlwBZww
+         X+64LOK8FaNCz48IZn+ZECmrJlQRfM0lyVjjxanyb9ohtn9O/cxi2LuzTUpw7ahBSPIk
+         Vr7bDC7abhJos4jx880eYCiQZM13O6C5Ro2YqO93PuM14OO4IQnGkvL/NxVTdSOmCt5t
+         HyqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733331458; x=1733936258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sfmZWfaFUyauxIzYDnk1HIum5vCQdB8u8dJVsYfif1M=;
+        b=E24SlsEc+FhDg72WK9fdO1pMmPNqt9hCV/ly3zsvcOEDgUgI2TqlWuc06Fdp2LmcvG
+         FZqT1DJOXeKwNKI76i0msg6LEi3LJ8D+sUPeL1+dRZ4GhgbIDwPTdzfzQ6zCV3VIlhHk
+         ETMq0WB0bNQDgvy4o4ng1Un71BoKZKuWvlBojhY3L8gCKgw4lCFFynfCD1Gr6pLpcEiP
+         HiIDdZ+FxA7K8oHaOLSTdJtuajU3cm2Qap9Szj//C60jSDuvUQfYYG8CL3esOhOCmJOG
+         GOxhyxQT7hGR1PKE2CnVQZoW5jlNc43wmI3XsviFVElUos6E/yt3/E/llpGK3FS/oI0v
+         ysvg==
+X-Gm-Message-State: AOJu0YwJ5Spg4/MwFB+1LDNDZ8n1l1an1w9OABb09jDxsVHXMdFrseEC
+	2K+2+XxTS0+BSrfshpyhqN9nJVP9HudsapirKtTu01SYrW7p0DpwWAJHDku92CdmvcTviBhaP5p
+	QWW5nGbyE500RSsVDbng5UEvIld7sd3v/UsaK
+X-Gm-Gg: ASbGncveR4Ah9AmmJBekGSATUoEzeTAlDWvgZZmOQwmjl7vqro4UkE8+kWRyfGDhKZm
+	oJ3zB89w1Z4JiZ5nwmTYc1rUDnTswaw==
+X-Google-Smtp-Source: AGHT+IGsVjekEc6VwhrFlrIDeAOXUGOndFAXAYVwx/+uQqFZtni53tvqfJXUpqrgjf1M2MWknzQGCI3eZVcZBFQ1W38=
+X-Received: by 2002:a05:6e02:370a:b0:3a7:a468:69df with SMTP id
+ e9e14a558f8ab-3a800ab423fmr3177165ab.3.1733331458201; Wed, 04 Dec 2024
+ 08:57:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 04 Dec 2024 17:33:57 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Sean Christopherson" <seanjc@google.com>,
- "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Andy Shevchenko" <andy@kernel.org>, "Matthew Wilcox" <willy@infradead.org>,
- "Davide Ciminaghi" <ciminaghi@gnudd.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
-Message-Id: <bb9d86e4-4641-4b1b-af9e-7d468dc2e2ee@app.fastmail.com>
-In-Reply-To: <Z1B1phcpbiYWLgCD@google.com>
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-12-arnd@kernel.org> <Z1B1phcpbiYWLgCD@google.com>
-Subject: Re: [PATCH 11/11] x86: drop 32-bit KVM host support
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20241204134345.189041-1-davydov-max@yandex-team.ru> <20241204134345.189041-2-davydov-max@yandex-team.ru>
+In-Reply-To: <20241204134345.189041-2-davydov-max@yandex-team.ru>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 4 Dec 2024 08:57:27 -0800
+Message-ID: <CALMp9eRa3yJ=-azTVtsapHsfCFTo74mTMQXPkguxD3P8upYchg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] x86: KVM: Advertise FSRS and FSRC on AMD to userspace
+To: Maksim Davydov <davydov-max@yandex-team.ru>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	babu.moger@amd.com, seanjc@google.com, mingo@redhat.com, bp@alien8.de, 
+	tglx@linutronix.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024, at 16:30, Sean Christopherson wrote:
-> On Wed, Dec 04, 2024, Arnd Bergmann wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->> 
->> There are very few 32-bit machines that support KVM, the main exceptions
->> are the "Yonah" Generation Xeon-LV and Core Duo from 2006 and the Atom
->> Z5xx "Silverthorne" from 2008 that were all release just before their
->> 64-bit counterparts.
->> 
->> Using KVM as a host on a 64-bit CPU using a 32-bit kernel generally
->> works fine, but is rather pointless since 64-bit kernels are much better
->> supported and deal better with the memory requirements of VM guests.
->> 
->> Drop all the 32-bit-only portions and the "#ifdef CONFIG_X86_64" checks
->> of the x86 KVM code and add a Kconfig dependency to only allow building
->> this on 64-bit kernels.
+On Wed, Dec 4, 2024 at 5:43=E2=80=AFAM Maksim Davydov
+<davydov-max@yandex-team.ru> wrote:
 >
-> While 32-bit KVM doesn't need to be a thing for x86 usage, Paolo 
-> expressed concerns
-> that dropping 32-bit support on x86 would cause general 32-bit KVM 
-> support to
-> bitrot horribly.  32-bit x86 doesn't get much testing, but I do at 
-> least boot VMs
-> with it on a semi-regular basis.  I don't think we can say the same for 
-> other
-> architectures with 32-bit variants.
+> Fast short REP STOSB and fast short CMPSB support on AMD processors are
+> provided in other CPUID function in comparison with Intel processors:
+> * FSRS: 10 bit in 0x80000021_EAX
+> * FSRC: 11 bit in 0x80000021_EAX
 
-I see.
+I have to wonder why these bits aren't documented in the APM. I assume
+you pulled them out of some PPR? I would be hesitant to include CPUID
+bit definitions that may be microarchitecture-specific rather than
+architectural.
 
-> PPC apparently still has 32-bit users[1][2],
+Perhaps someone from AMD should at least ACK this change?
 
-I looked at the links but only see 64-bit users there.
-
-There is KVM support for 32-bit BookE (e500v2, e500mc)
-in the PPC85xx and QorIQ P1/P2/P3/P4, and Crystal mentioned
-that there might be users, but did not point to anyone
-in particular.
-
-The A-EON AmigaOne X5000 and Powerboard Tyche that were
-mentioned in the thread as being actively used are both
-64-bit QorIQ P5/T2 (e5500, e6500) based. These are the
-same platform ("85xx" in Linux, "e500" in qemu), so it's
-easy to confuse. We can probably ask again if anyone
-cares about removing the 32-bit side of this.
-
-> and 32-bit RISC-V is a thing,
-
-There are many 32-bit RISC-V chips, but all RISC-V
-SoCs supported by Linux today are in fact 64-bit.
-
-While there is still talk of adding support for 32-bit
-SoCs, the only usecase for those is really to allow
-machines with smaller amounts of physical RAM, which
-tends to rule out virtualization.
-
-There is one more platform that supports virtualization
-on 32-bit CPUs, which is the MIPS P5600 core in the
-Baikal T1.
-
-I still think it makes sense to just drop KVM support
-for all 32-bit hosts, but I agree that it also
-makes sense to keep x86-32 as the last one of those
-for testing purposes.
-
-    Arnd
+> AMD bit numbers differ from existing definition of FSRC and
+> FSRS. So, the new appropriate values have to be added with new names.
+>
+> It's safe to advertise these features to userspace because they are a par=
+t
+> of CPU model definition and they can't be disabled (as existing Intel
+> features).
+>
+> Fixes: 2a4209d6a9cb ("KVM: x86: Advertise fast REP string features inhere=
+nt to the CPU")
+> Signed-off-by: Maksim Davydov <davydov-max@yandex-team.ru>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 2 ++
+>  arch/x86/kvm/cpuid.c               | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cp=
+ufeatures.h
+> index 17b6590748c0..45f87a026bba 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -460,6 +460,8 @@
+>  #define X86_FEATURE_NULL_SEL_CLR_BASE  (20*32+ 6) /* Null Selector Clear=
+s Base */
+>  #define X86_FEATURE_AUTOIBRS           (20*32+ 8) /* Automatic IBRS */
+>  #define X86_FEATURE_NO_SMM_CTL_MSR     (20*32+ 9) /* SMM_CTL MSR is not =
+present */
+> +#define X86_FEATURE_AMD_FSRS           (20*32+10) /* AMD Fast short REP =
+STOSB supported */
+> +#define X86_FEATURE_AMD_FSRC           (20*32+11) /* AMD Fast short REP =
+CMPSB supported */
+>
+>  #define X86_FEATURE_SBPB               (20*32+27) /* Selective Branch Pr=
+ediction Barrier */
+>  #define X86_FEATURE_IBPB_BRTYPE                (20*32+28) /* MSR_PRED_CM=
+D[IBPB] flushes all branch type predictions */
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 097bdc022d0f..7bc095add8ee 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -799,8 +799,8 @@ void kvm_set_cpu_caps(void)
+>
+>         kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
+>                 F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLoc=
+k */ |
+> -               F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr =
+*/ |
+> -               F(WRMSR_XX_BASE_NS)
+> +               F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | F(AMD_FSRS) |
+> +               F(AMD_FSRC) | 0 /* PrefetchCtlMsr */ | F(WRMSR_XX_BASE_NS=
+)
+>         );
+>
+>         kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
+> --
+> 2.34.1
+>
 
