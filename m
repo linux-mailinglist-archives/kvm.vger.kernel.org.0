@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-33000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712B19E3793
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 11:34:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D519E3796
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 11:35:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D1EA163AAA
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 10:34:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 590BE280E43
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 10:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5061D5174;
-	Wed,  4 Dec 2024 10:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C941F12FF;
+	Wed,  4 Dec 2024 10:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lsoTfQNw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sDoF8VaH"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0850F1AA1EB;
-	Wed,  4 Dec 2024 10:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580C21E3DF7;
+	Wed,  4 Dec 2024 10:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733308285; cv=none; b=g4YQPeMXPVnqzmOH0OJYiSGlzrgQSRFRS4T12Av9F5bjUWfeYyE5fJg0wm8NChccBWJxgpmLt7TAfC1qW4NMC8lnwjR5eMKSu3lG7vOHt88/9AjNB+0cmWAwa9IJZ6mfuLjVuIO2tzrinZuOiMzKssgu8VK8HPernypqGDUi+C0=
+	t=1733308288; cv=none; b=kSmq65Fh47rgF6OsnvYah0/QMUVnOd24rKLojVjXA8to1HY5YSKLKEe2hBsdIgzNSfyppcFGno7oiSgPLfvUq2JNzc2i+kr7naL3H+zqeuWNbqdhJcSkVpWYN4tEWiX3HsP14Xiq36vTJ1G0assNazlN1G0ZPtITCOQlGMsy+38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733308285; c=relaxed/simple;
-	bh=XoKZKhug6sRi6vamG7QA5kHYOwwNVkVd85l9YuV2i3U=;
+	s=arc-20240116; t=1733308288; c=relaxed/simple;
+	bh=NXpil0dDa1CdzIC4Hd6SCr6UtCBY59zoL0p5pdLcUns=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gcQfveDTOMCNHfTeiAWrKRfDK8dXIeEFOX75FpRy3uTyRHYlWuYes1uSfL4CP84YgWo1kjROZHgJMX1EG/8yCxZz1PxpxMG2q57CyMwbeiq0CwCw3Z8kzff3RcdxDaYaElAXxz6yFufQk6u+obS3VIlbo0xNbXenSFdaBpsUHbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lsoTfQNw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 795CDC4CEE1;
-	Wed,  4 Dec 2024 10:31:21 +0000 (UTC)
+	 MIME-Version; b=Zg/ZZpYR27NZQcNwLOxpJ2F0H/8Yy5zik/q0iZwuLMtPXzFdgNrlqjAWUwsAe87SphSNd41nvytevtzrtkdpfFy5szEMiKBs2z1nZyHtRrd80lF011I6TwzmABNejT/CIp7x/uuCoWJJFYmIEMzIka1KthHWn2WsEvzRfgfuBqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sDoF8VaH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A385C4CED6;
+	Wed,  4 Dec 2024 10:31:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733308284;
-	bh=XoKZKhug6sRi6vamG7QA5kHYOwwNVkVd85l9YuV2i3U=;
+	s=k20201202; t=1733308288;
+	bh=NXpil0dDa1CdzIC4Hd6SCr6UtCBY59zoL0p5pdLcUns=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lsoTfQNwTpriaLqLBjfMh2kM3gClxnnPf8d5/Vo703RX/vkrLhG8uM77j69LxkUSm
-	 1Xly6KJlshqQdfVTWcRpWhn0Tf5PXjzk43kL0b5yUg7W6yQg+h6IpN27SuAXE8ynp2
-	 IXqCsaOnZbm0FHLEVBis9aIRINNwJTh4rSqbMHR9eEtJX1JgArRDFsRe1f1kvIokhY
-	 p5EUdKbC+RewTb9z8Y5Lksq2fG2C7CJHQc734Z7TFMHM+kOVhBRSw34Xpt2EJveUji
-	 ++9rT7eiWP33meBXNa9KrOGQhWfdrqvbI3s0bzp6lLrN+WsaBrAl/l9+ELdPKG1a4I
-	 qFQqTLUj3y6BQ==
+	b=sDoF8VaHK0NiKugchsLccWP7WTeYUxReORvD6JHYVVKhEK7MVwm3fTj4jqZ1YRW7M
+	 5LIb8jZ5pVDM25d0eEliFVMzlogchcIzLVgAzlF01kIFSX7SZQ6ZLZ0s8bbmeOL91e
+	 uj1jlmmr6avQ97ljdkyWI/sSL+WZ8zx7jS2LyYaKr1xlnhJIQXCzyjcQJxxv9OvdAc
+	 /yRmYRUtzCoYruvmpyIKUdUL0/sc3gH5UZDFvt/SiZI1MCZaJEQGX4XkXIvDEZsBLg
+	 cyLQS0Nw8FojQdc1GzqcCjBNwHwe6JAJyeQtwu9/wI7M6UaRzzr2dUcB0HIMDkWTUU
+	 5Hc5IYx0Nb8lw==
 From: Arnd Bergmann <arnd@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org
@@ -57,9 +57,9 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	Davide Ciminaghi <ciminaghi@gnudd.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [PATCH 06/11] x86: drop SWIOTLB and PHYS_ADDR_T_64BIT for PAE
-Date: Wed,  4 Dec 2024 11:30:37 +0100
-Message-Id: <20241204103042.1904639-7-arnd@kernel.org>
+Subject: [PATCH 07/11] x86: drop support for CONFIG_HIGHPTE
+Date: Wed,  4 Dec 2024 11:30:38 +0100
+Message-Id: <20241204103042.1904639-8-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241204103042.1904639-1-arnd@kernel.org>
 References: <20241204103042.1904639-1-arnd@kernel.org>
@@ -73,57 +73,123 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-Since kernels with and without CONFIG_X86_PAE are now limited
-to the low 4GB of physical address space, there is no need to
-use either swiotlb or 64-bit phys_addr_t any more, so stop
-selecting these and fix up the build warnings from that.
+With the maximum amount of RAM now 4GB, there is very little point
+to still have PTE pages in highmem. Drop this for simplification.
+
+The only other architecture supporting HIGHPTE is 32-bit arm, and
+once that feature is removed as well, the highpte logic can be
+dropped from common code as well.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/x86/Kconfig      | 2 --
- arch/x86/mm/pgtable.c | 2 +-
- include/linux/mm.h    | 2 +-
- 3 files changed, 2 insertions(+), 4 deletions(-)
+ .../admin-guide/kernel-parameters.txt         |  7 -----
+ arch/x86/Kconfig                              |  9 -------
+ arch/x86/include/asm/pgalloc.h                |  5 ----
+ arch/x86/mm/pgtable.c                         | 27 +------------------
+ 4 files changed, 1 insertion(+), 47 deletions(-)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index eca370e99844..cf25853a5c4a 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -7341,13 +7341,6 @@
+ 				16 - SIGBUS faults
+ 			Example: user_debug=31
+ 
+-	userpte=
+-			[X86,EARLY] Flags controlling user PTE allocations.
+-
+-				nohigh = do not allocate PTE pages in
+-					HIGHMEM regardless of setting
+-					of CONFIG_HIGHPTE.
+-
+ 	vdso=		[X86,SH,SPARC]
+ 			On X86_32, this is an alias for vdso32=.  Otherwise:
+ 
 diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index b373db8a8176..d0d055f6f56e 100644
+index d0d055f6f56e..d8a8bf9ea9b9 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
-@@ -1456,8 +1456,6 @@ config HIGHMEM
- config X86_PAE
- 	bool "PAE (Physical Address Extension) Support"
- 	depends on X86_32 && X86_HAVE_PAE
--	select PHYS_ADDR_T_64BIT
--	select SWIOTLB
+@@ -1621,15 +1621,6 @@ config X86_PMEM_LEGACY
+ 
+ 	  Say Y if unsure.
+ 
+-config HIGHPTE
+-	bool "Allocate 3rd-level pagetables from highmem"
+-	depends on HIGHMEM
+-	help
+-	  The VM uses one page table entry for each page of physical memory.
+-	  For systems with a lot of RAM, this can be wasteful of precious
+-	  low memory.  Setting this option will put user-space page table
+-	  entries in high memory.
+-
+ config X86_CHECK_BIOS_CORRUPTION
+ 	bool "Check for low memory corruption"
  	help
- 	  PAE is required for NX support, and furthermore enables
- 	  larger swapspace support for non-overcommit purposes. It
+diff --git a/arch/x86/include/asm/pgalloc.h b/arch/x86/include/asm/pgalloc.h
+index dcd836b59beb..582cf5b7ec8c 100644
+--- a/arch/x86/include/asm/pgalloc.h
++++ b/arch/x86/include/asm/pgalloc.h
+@@ -29,11 +29,6 @@ static inline void paravirt_release_pud(unsigned long pfn) {}
+ static inline void paravirt_release_p4d(unsigned long pfn) {}
+ #endif
+ 
+-/*
+- * Flags to use when allocating a user page table page.
+- */
+-extern gfp_t __userpte_alloc_gfp;
+-
+ #ifdef CONFIG_MITIGATION_PAGE_TABLE_ISOLATION
+ /*
+  * Instead of one PGD, we acquire two PGDs.  Being order-1, it is
 diff --git a/arch/x86/mm/pgtable.c b/arch/x86/mm/pgtable.c
-index 5745a354a241..bdf63524e30a 100644
+index bdf63524e30a..895d91e879b4 100644
 --- a/arch/x86/mm/pgtable.c
 +++ b/arch/x86/mm/pgtable.c
-@@ -769,7 +769,7 @@ int pmd_set_huge(pmd_t *pmd, phys_addr_t addr, pgprot_t prot)
- 	mtrr_type_lookup(addr, addr + PMD_SIZE, &uniform);
- 	if (!uniform) {
- 		pr_warn_once("%s: Cannot satisfy [mem %#010llx-%#010llx] with a huge-page mapping due to MTRR override.\n",
--			     __func__, addr, addr + PMD_SIZE);
-+			     __func__, (u64)addr, (u64)addr + PMD_SIZE);
- 		return 0;
- 	}
+@@ -12,12 +12,6 @@ phys_addr_t physical_mask __ro_after_init = (1ULL << __PHYSICAL_MASK_SHIFT) - 1;
+ EXPORT_SYMBOL(physical_mask);
+ #endif
  
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index c39c4945946c..7725e9e46e90 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -99,7 +99,7 @@ extern int mmap_rnd_compat_bits __read_mostly;
+-#ifdef CONFIG_HIGHPTE
+-#define PGTABLE_HIGHMEM __GFP_HIGHMEM
+-#else
+-#define PGTABLE_HIGHMEM 0
+-#endif
+-
+ #ifndef CONFIG_PARAVIRT
+ static inline
+ void paravirt_tlb_remove_table(struct mmu_gather *tlb, void *table)
+@@ -26,29 +20,10 @@ void paravirt_tlb_remove_table(struct mmu_gather *tlb, void *table)
+ }
+ #endif
  
- #ifndef DIRECT_MAP_PHYSMEM_END
- # ifdef MAX_PHYSMEM_BITS
--# define DIRECT_MAP_PHYSMEM_END	((1ULL << MAX_PHYSMEM_BITS) - 1)
-+# define DIRECT_MAP_PHYSMEM_END	(phys_addr_t)((1ULL << MAX_PHYSMEM_BITS) - 1)
- # else
- # define DIRECT_MAP_PHYSMEM_END	(((phys_addr_t)-1)&~(1ULL<<63))
- # endif
+-gfp_t __userpte_alloc_gfp = GFP_PGTABLE_USER | PGTABLE_HIGHMEM;
+-
+ pgtable_t pte_alloc_one(struct mm_struct *mm)
+ {
+-	return __pte_alloc_one(mm, __userpte_alloc_gfp);
+-}
+-
+-static int __init setup_userpte(char *arg)
+-{
+-	if (!arg)
+-		return -EINVAL;
+-
+-	/*
+-	 * "userpte=nohigh" disables allocation of user pagetables in
+-	 * high memory.
+-	 */
+-	if (strcmp(arg, "nohigh") == 0)
+-		__userpte_alloc_gfp &= ~__GFP_HIGHMEM;
+-	else
+-		return -EINVAL;
+-	return 0;
++	return __pte_alloc_one(mm, GFP_PGTABLE_USER);
+ }
+-early_param("userpte", setup_userpte);
+ 
+ void ___pte_free_tlb(struct mmu_gather *tlb, struct page *pte)
+ {
 -- 
 2.39.5
 
