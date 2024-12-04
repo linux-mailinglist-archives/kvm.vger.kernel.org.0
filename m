@@ -1,211 +1,165 @@
-Return-Path: <kvm+bounces-33055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB929E457A
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 21:16:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 402DF9E45F5
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 21:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AA02BC5E97
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 17:52:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A499BE454F
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6C0236A31;
-	Wed,  4 Dec 2024 17:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14C920B80B;
+	Wed,  4 Dec 2024 17:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L7INkfw5"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="K8TGU9JN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MSNHHMb5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385FD236A13;
-	Wed,  4 Dec 2024 17:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F017207E0F;
+	Wed,  4 Dec 2024 17:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733332418; cv=none; b=PQNvrCk0sYC/FPirD8rF+2EWB0MtixBg0T8cyq7zANZ3aZOy+sGPgky06uDJ8CC34DVYA1WYyNVFGx/UJeXOH6zIgPJ5VtrT+CJvhZ3XQ5kc7wwH/u67gWnTWAR6KJ9qUxn7s50SmleeMeFj0+nYB5QRyUoL8fxh0dfEEzaJHBQ=
+	t=1733334719; cv=none; b=TMEkBO73LgcotxKSUZVyo00nhMLmN1K/w5jU9ys2rINrLbjapQG7+e3lDd31KtDwOBuoNNzOvoBWtAAV29ZBW9LzNvCRGOH/pTYEB46MnbjgTdVB4qxf4RZPvfwXpWwR3MU1QZbULtgH9neCys38UZ7mu6Jjz4rP0oXMp55sH2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733332418; c=relaxed/simple;
-	bh=MBHALa7qcRyA2Dugatjig+fBPK1x0kGk9BvIXNtwwDg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oT54Nh//5jKYLZeEpZQKZvE04KUmwtVopRZ6fMP8Dvzhmn83CupmAf4YEZ0Onq8LBUa2tp2yvMVShDYSpnM/1DX1NzrDg2TgD1wCnTTlGuBjCGsrWpVuIuiSmPHyuH3ijhYURYwY/xwsRrr6Ks8JGM/vdEqKX4N6j+6/NVvit7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L7INkfw5; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B48GHsw011696;
-	Wed, 4 Dec 2024 17:13:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aTF5Jk
-	sng5UFCd6ZziDLiIk1VBDldXJ8RiL0nfzzpps=; b=L7INkfw5xxtqE07jKzsb2X
-	LVo6ZHh6abYIFTcr0y9GQbS4XcqL1dnURS5Vj5l6JF4+uW+8/lH1CHz+HrD5pom6
-	/J7N91ef5UfJSa6ZtqUOJo1ZW7pshC432Yu1wzoxH+Gd/Oqm4GD/qIJiQE8D5lcE
-	gT4rDxYfNiu3ehqneGdKIPYXJoU95WPi2CFxf3/AUuKf0tG5q9u4EFdu3qIYXtyC
-	kkBrpOzRPkydvfC6iwyqWthUe7pYTM3SHnKH2qo6pbqpTz4aaN8pssKLJuIy7RVA
-	Dw2pEZ6uT0N8VC/YXQOTTHaEZJsgSEa2P7y0GNKqflOtwE0/l28PgWeTKvOKzTKA
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437s4j8u8x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 17:13:23 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B4FLtM5031778;
-	Wed, 4 Dec 2024 17:13:23 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 438ehm1sxk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 17:13:23 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B4HDLDI40698440
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Dec 2024 17:13:21 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7975758055;
-	Wed,  4 Dec 2024 17:13:21 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C92E58043;
-	Wed,  4 Dec 2024 17:13:19 +0000 (GMT)
-Received: from [9.152.212.155] (unknown [9.152.212.155])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  4 Dec 2024 17:13:19 +0000 (GMT)
-Message-ID: <1a746eb006ec63176c03f4daec6dd57ce1ef4bc5.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 1/2] vfio/pci: Enable iowrite64 and ioread64 for vfio
- pci
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Ramesh Thomas <ramesh.thomas@intel.com>, alex.williamson@redhat.com,
-        jgg@ziepe.ca, gbayer@linux.ibm.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, ankita@nvidia.com,
-        yishaih@nvidia.com, pasic@linux.ibm.com, julianr@linux.ibm.com,
-        bpsegal@us.ibm.com, kevin.tian@intel.com, cho@microsoft.com,
-        Michael
- Ellerman <mpe@ellerman.id.au>
-Date: Wed, 04 Dec 2024 18:13:18 +0100
-In-Reply-To: <20241203184158.172492-2-ramesh.thomas@intel.com>
-References: <20241203184158.172492-1-ramesh.thomas@intel.com>
-	 <20241203184158.172492-2-ramesh.thomas@intel.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
- /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
- 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
- 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
- XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
- UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
- w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
- tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
- /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
- dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
- JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
- CYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMH
- UupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaefzslA
- 1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60
- UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP6
- 1lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7
- zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+Egw
- UiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69Sl
- kCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF
- 6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW
- 9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
- GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
- 3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP
- 3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC
- 6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/m
- aUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4cH6HZGKR
- fiXLhPlmmAyW9FiZK9pwDocTLemfgMR6QXOiB0uisdoFnjhXNfp6OHSy7w7LTIHzCsJoHk+vsyvSp
- +fxkjCXgFzGRQaJkoX33QZwQj1mxeWl594QUfR4DIZ2KERRNI0OMYjJVEtB5jQjnD/04qcTrSCpJ5
- ZPtiQ6Umsb1c9tBRIJnL7gIslo/OXBe/4q5yBCtCZOoD6d683XaMPGhi/F6+fnGvzsi6a9qDBgVvt
- arI8ybayhXDuS6/StR8qZKCyzZ/1CUofxGVIdgkseDhts0dZ4AYwRVCUFQULeRtyoT4dKfEot7hPE
- /4wjm9qZf2mDPRvJOqss6jObTNuw1YzGlpe9OvDYtGeEfHgcZqEmHbiMirwfGLaTG2xKDx4g2jd2z
- Ocf83TCERFKJEhvZxB3tRiUQTd3dZ1TIaisv/o+y0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
- aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
- ACy0nUgMKX3Ldyv5D8V6MJgkAUCZZWiiwUJBY/5MwAKCRCv5D8V6MJgkNVuEACo12niyoKhnXLQFt
- NaqxNZ+8p/MGA7g2XcVJ1bYMPoZ2Wh8zwX0sKX/dLlXVHIAeqelL5hIv6GoTykNqQGUN2Kqf0h/z7
- b85o3tHiqMAQV0dAB0y6qdIwdiB69SjpPNK5KKS1+AodLzosdIVKb+LiOyqUFKhLnablni1hiKlqY
- yDeD4k5hePeQdpFixf1YZclGZLFbKlF/A/0Q13USOHuAMYoA/iSgJQDMSUWkuC0mNxdhfVt/gVJnu
- Kq+uKUghcHflhK+yodqezlxmmRxg6HrPVqRG4pZ6YNYO7YXuEWy9JiEH7MmFYcjNdgjn+kxx4IoYU
- O0MJ+DjLpVCV1QP1ZvMy8qQxScyEn7pMpQ0aW6zfJBsvoV3EHCR1emwKYO6rJOfvtu1rElGCTe3sn
- sScV9Z1oXlvo8pVNH5a2SlnsuEBQe0RXNXNJ4RAls8VraGdNSHi4MxcsYEgAVHVaAdTLfJcXZNCIU
- cZejkOE+U2talW2n5sMvx+yURAEVsT/50whYcvomt0y81ImvCgUz4xN1axZ3PCjkgyhNiqLe+vzge
- xq7B2Kx2++hxIBDCKLUTn8JUAtQ1iGBZL9RuDrBy2rR7xbHcU2424iSbP0zmnpav5KUg4F1JVYG12
- vDCi5tq5lORCL28rjOQqE0aLHU1M1D2v51kjkmNuc2pgLDFzpvgLQhTmlrbGFzIFNjaG5lbGxlIDx
- uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
- stJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJAglRAAihbDxiGLOWhJed5cF
- kOwdTZz6MyYgazbr+2sFrfAhX3hxPFoG4ogY/BzsjkN0cevWpSigb2I8Y1sQD7BFWJ2OjpEpVQd0D
- sk5VbJBXEWIVDBQ4VMoACLUKgfrb0xiwMRg9C2h6KlwrPBlfgctfvrWWLBq7+oqx73CgxqTcGpfFy
- tD87R4ovR9W1doZbh7pjsH5Ae9xX5PnQFHruib3y35zC8+tvSgvYWv3Eg/8H4QWlrjLHHy2AfZDVl
- 9F5t5RfGL8NRsiTdVg9VFYg/GDdck9WPEgdO3L/qoq3Iuk0SZccGl+Nj8vtWYPKNlu2UvgYEbB8cl
- UoWhg+SjjYQka7/p6tc+CCPZ8JUpkgkAdt7yXt6370wP1gct2VztS6SEGcmAE1qxtGhi5Kuln4ZJ/
- UO2yxhPHgoW99OuZw3IRHe0+mNR67JbIpSuFWDFNjZ0nckQcU1taSEUi0euWs7i4MEkm0NsOsVhbs
- 4D2vMiC6kO/FqWOPmWZeAjyJw/KRUG4PaJAr5zJUx57nhKWgeTniW712n4DwCUh77D/PHY0nqBTG/
- B+QQCR/FYGpTFkO4DRVfapT8njDrsWyVpP9o64VNZP42S+DuRGWfUKCMAXsM/wPzRiDEVfnZMcUR9
- vwLSHeoV7MiIFC0xIrp5ES9R00t4UFgqtGc36DV71qjR+66Im0=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1733334719; c=relaxed/simple;
+	bh=FGCl+JsSEeF80YE0YF+6nZDBFRr+bBmxhB89qH3mjzU=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Sd+8HQm/1wKK9JA9gy0iW7HbpEmsSDzaMqwZoodbO2O3eUSXjCHHKm74CCnbabCHRVKFSTfoiwTcOattm1XJcLHoyRNhTqhfWRIoajjPzTzyYwInGWCYNAFMN7JbfqiTTSfwoGwiabrCltbsiePu80J1ciryEQALzeuS9dwKxa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=K8TGU9JN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MSNHHMb5; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id 02FF7114010E;
+	Wed,  4 Dec 2024 12:51:55 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 12:51:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1733334715;
+	 x=1733421115; bh=jJE2L9y+wEwp9MITaMA6HBhlkUzfR3+Jn5SAVrObSeE=; b=
+	K8TGU9JNA/8Eu09oYaCYPJ1x38aLd+5O+m6ONqg8opGJDtCUw4krurwNMDVuM/bS
+	pboxApeIJj0UYM25nVZO6jc/pjz5mxK0p9EthSOuJdLl1Uhb0UR+toFaH4m8DG/6
+	W/elIdbhx/S00iG9P7dr15V4DODFipVo2v6QWXZTyo8Aq80mzPqPys0/6bHd2UJ+
+	XuCB3Bb+VVIjuYNNcmMnYR9zMpMqTLO3aLpkbmfQdOERYkHvlwg5Zd2AzZQcwO0T
+	x/m8zxyf6GZfgrxT5lvMBNyYnZXQ2Vt/ian5bILBmsgbK00KqvtVNMpHtOTtqR/I
+	XovoBeeQyHZvl/nvJET8Qg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733334715; x=
+	1733421115; bh=jJE2L9y+wEwp9MITaMA6HBhlkUzfR3+Jn5SAVrObSeE=; b=M
+	SNHHMb5oo8A+cXXlOyVSMFKIVOj7J9W4uUhqn38tBjghx7HUtOFmB0dA4Bot2KCr
+	bsIj/eMZnypK+WU2JcvLA+i6I4zIsmtbtaActwHdkaM3B+u6mjZnLl7h+xQ16X58
+	ySkMm4qVuVh5AGpEM1GPNEK95ZfueUre0dQ+KySSkN6kd8sDxGjFnJy4xS9eBNzo
+	WobOnWI1DETEojrVO6Ypw923PBqnMGeQnnJX6tyDZE4KpW7ZfofgJ9AT2BCkG7F3
+	pROqSiGJW5QMPfg4sfMSx3rJ+rH5ex1Yi2sos+5lQmz2tV2X+7ZeVcILnRBN810b
+	1Nq/atoJFz3ohv4OtH2HA==
+X-ME-Sender: <xms:upZQZ7SxdGZd1E4gTE9vgnsRIPL-HAhqgcDd1hmkESiEvXA5PB5OxA>
+    <xme:upZQZ8x9PakEhW_RoG4KqmaONf4jQhAkzGLpC9pyY2GZZ5TPrFzFWTVt4TxWMTSS5
+    T2HoUqwP318cky5rbs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgddutddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
+    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
+    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
+    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudej
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprh
+    gtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohepshgv
+    rghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrhgrug
+    gvrggurdhorhhgpdhrtghpthhtoheprghnugihsehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrthhhrghnsehkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopeigkeeisehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
+X-ME-Proxy: <xmx:upZQZw0wpCWbUKnLUXLtGT8mmbRL9TsXw3nPu9bC4_En5MdNJ5RfGQ>
+    <xmx:upZQZ7CP82B3yE7uInYvsCqXQcTBBHy9ntVV60QIO3XIR07DhIG_8w>
+    <xmx:upZQZ0gSUG03GVXljjr0mb4aG_94ObaUSqDU49c-ZOfJ0bU_g5vo-A>
+    <xmx:upZQZ_oUy0aSGB1Jgt9sGP5t1oxswFHJrniQdyqSiB8TlpLTHrO35g>
+    <xmx:u5ZQZ7Sl6Btvw0Z2OCBePmmVUt5xTxYuxO2pOIknyVjTHsv3PkW_6aCY>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id C126B2220072; Wed,  4 Dec 2024 12:51:54 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qIqKtS_BmdepBPaMxcfJCPqKoPWc96Kh
-X-Proofpoint-ORIG-GUID: qIqKtS_BmdepBPaMxcfJCPqKoPWc96Kh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- adultscore=0 mlxscore=0 mlxlogscore=917 lowpriorityscore=0 bulkscore=0
- impostorscore=0 phishscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2412040130
+Date: Wed, 04 Dec 2024 18:51:34 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Tor Vic" <torvic9@mailbox.org>, "Arnd Bergmann" <arnd@kernel.org>,
+ linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Linus Torvalds" <torvalds@linux-foundation.org>,
+ "Andy Shevchenko" <andy@kernel.org>, "Matthew Wilcox" <willy@infradead.org>,
+ "Sean Christopherson" <seanjc@google.com>,
+ "Davide Ciminaghi" <ciminaghi@gnudd.com>,
+ "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ "Nathan Chancellor" <nathan@kernel.org>
+Message-Id: <9dda7e79-3c0f-48b0-824c-40a230b5cc12@app.fastmail.com>
+In-Reply-To: <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-10-arnd@kernel.org>
+ <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
+Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-12-03 at 10:41 -0800, Ramesh Thomas wrote:
-> Definitions of ioread64 and iowrite64 macros in asm/io.h called by vfio
-> pci implementations are enclosed inside check for CONFIG_GENERIC_IOMAP.
-> They don't get defined if CONFIG_GENERIC_IOMAP is defined. Include
-> linux/io-64-nonatomic-lo-hi.h to define iowrite64 and ioread64 macros
-> when they are not defined. io-64-nonatomic-lo-hi.h maps the macros to
-> generic implementation in lib/iomap.c. The generic implementation does
-> 64 bit rw if readq/writeq is defined for the architecture, otherwise it
-> would do 32 bit back to back rw.
->=20
-> Note that there are two versions of the generic implementation that
-> differs in the order the 32 bit words are written if 64 bit support is
-> not present. This is not the little/big endian ordering, which is
-> handled separately. This patch uses the lo followed by hi word ordering
-> which is consistent with current back to back implementation in the
-> vfio/pci code.
->=20
-> Signed-off-by: Ramesh Thomas <ramesh.thomas@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci_rdwr.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci=
-_rdwr.c
-> index 66b72c289284..a0595c745732 100644
-> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
-> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> @@ -16,6 +16,7 @@
->  #include <linux/io.h>
->  #include <linux/vfio.h>
->  #include <linux/vgaarb.h>
-> +#include <linux/io-64-nonatomic-lo-hi.h>>
-> =20
->  #include "vfio_pci_priv.h"
-> =20
+On Wed, Dec 4, 2024, at 16:36, Tor Vic wrote:
+> On 12/4/24 11:30, Arnd Bergmann wrote:
+> Similar but not identical changes have been proposed in the past several 
+> times like e.g. in 1, 2 and likely even more often.
+>
+> Your solution seems to be much cleaner, I like it.
 
-Getting from linux/io-64-nonatomic-lo-hi.h to the lib/iomap.c
-implementations is a bit of a wild goose chase but I convinced myself
-that it happens as you describe when GENERIC_IOMAP is set. Also makes
-sense to me to use the linux/io-64-nonatomic-lo-hi.h header for a
-generic fallback where the access order matches what vfio already does.
+Thanks. It looks like the other two did not actually
+address the bug I'm fixing in my version.
 
-I do wonder if this actually improves things for more than just x86. As
-far as I can see powerpc also uses GENERIC_IOMAP with POWERNV which is
-also 64 bit and also has users of vfio-pci. So adding Michael Ellerman
-for awareness.
+> That said, on my Skylake platform, there is no difference between 
+> -march=x86-64 and -march=x86-64-v3 in terms of kernel binary size or 
+> performance.
+> I think Boris also said that these settings make no real difference on 
+> code generation.
 
-Thanks,
-Niklas
+As Nathan pointed out, I had a typo in my patch, so the
+options didn't actually do anything at all. I fixed it now
+and did a 'defconfig' test build with all three:
+
+> Other settings might make a small difference (numbers are from 2023):
+>    -generic:       85.089.784 bytes
+>    -core2:         85.139.932 bytes
+>    -march=skylake: 85.017.808 bytes
+
+
+   text	   data	    bss	    dec	    hex	filename
+26664466	10806622	1490948	38962036	2528374	obj-x86/vmlinux-v1
+26664466	10806622	1490948	38962036	2528374	obj-x86/vmlinux-v2
+26662504	10806654	1490948	38960106	2527bea	obj-x86/vmlinux-v3
+
+which is a tiny 2KB saved between v2 and v3. I looked at
+the object code and found that the v3 version takes advantage
+of the BMI extension, which makes perfect sense. Not sure
+if it has any real performance benefits.
+
+Between v1 and v2, there is a chance to turn things like
+system_has_cmpxchg128() into a constant on v2 and higher.
+
+The v4 version is meaningless in practice since it only
+adds AVX512 instructions that are only present in very
+few CPUs and not that useful inside the kernel side from
+specialized crypto and raid helpers.
+
+      Arnd
 
