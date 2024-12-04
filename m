@@ -1,137 +1,120 @@
-Return-Path: <kvm+bounces-33042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E12B9E3E87
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 16:42:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DBA9E3EB9
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 16:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB9C167D96
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 15:42:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BC2F1657FB
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 15:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6509720C47D;
-	Wed,  4 Dec 2024 15:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ED420C48F;
+	Wed,  4 Dec 2024 15:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="nusfCG3X"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="WhJhohOB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160AA20B816;
-	Wed,  4 Dec 2024 15:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5811FA16B;
+	Wed,  4 Dec 2024 15:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733326933; cv=none; b=MGTupTDWq29vn7th8j/oBEQ4lOpn4TgEjIWRUWoc2aCrzlovVmw2A4FDDAaysz3lsyMjoQIFlyGYwinHFwpohRjnSwv85+mj4b3+uypcF9SVfGdrX7N89oWEaEeKoT3haoRMDYmChhgZbTQ1KcDk3cUnZQbG0K6nh4nG+3X0rnc=
+	t=1733327697; cv=none; b=KLubh+kgC7/vs/z6BL3U8t+0Vt3gcPYi1qHJsjPFms+EpE3jXx0eeYQEGEJxODyJvHo0zEjPsYpS7Vgc4CFYd663Yd2AGb38Dfo8kmqau5ToMmTbKkbD0qI4gOSmm+Df0TbTqXhp1dFwUgxzRhGC4GGktik3D1JX7RnPJSVlXEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733326933; c=relaxed/simple;
-	bh=bnmAm1jUiG8QXJyizFgCwu3PvdmDTJ36Tvtsyi2/MGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=grIueSs33DKRIM19/yhAyopan2NdRf9eJNIHMeJ8MVxLqSisZnmpi7rZzBfF3/W4YutFcME+oxzOaDeu2uYc83ar7PgRIhjKWaHCBI8oQSxXbvyPIUG3OXk8/0cqDF92Qg6RTAYC1tucelVSP69tr8UYzFIjOjptGi0QhkCi++A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=nusfCG3X; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4Y3M7x37nBz9sry;
-	Wed,  4 Dec 2024 16:36:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1733326605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vEbiDca7zp0P6QUlbgj1AObVHCUUIBhvErhOW/G7qOA=;
-	b=nusfCG3XW4GE0jLvDBNVvKMcqFnRfue+dvUhLx5lcON4bL8Zokmj1mbdE6KDijuiKdDbx3
-	arJTxXvnw1TnBh21WwsBQMMzxP569K2EdmHlkTei9/4nEqPNSDNKxkWvsUAVo87wKTiHGS
-	lUrrepgxAfHxKYZ1EicD7s7vyvW1Rq1ANJljZTkaREU53O41DpxUKm9IoNfRYJCrpoCF8k
-	z0He0BtS/HxFZTSwW3rpB/yto9OlPvQNaqByGVLU0/5zdH4QYpjVEDU/E8YxGrLpz5ZtEP
-	31L/qIIumrRwcXe6cGJraVVIJ0Wgq8RnPN2pt1DARerj1v5y6RTUXwsXgdYJ/w==
-Message-ID: <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
-Date: Wed, 4 Dec 2024 16:36:40 +0100
+	s=arc-20240116; t=1733327697; c=relaxed/simple;
+	bh=9Pow6k65nRmJ7jJKQmjfsRvWtHyOg8AZItDZER8eJAU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=i1nq9NTi8ZnXfwBBg7EQr0t82rS3p0mcSLvjJjviXryqUZ4yk2JQx1sP+Xu687L57Occ/uEJGJrSZK5PY1juEJOhC2MZKKIMdfe22r0/A5e+4D8v2Szqgzto78BNqV1kWLTudsQlOGreTUGfQh2OQDYJe0objiG1yJpDbMk0IcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=WhJhohOB; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 4B4FroTQ1093386
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 4 Dec 2024 07:53:51 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 4B4FroTQ1093386
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024111601; t=1733327632;
+	bh=TVvEsO4ehvXFJZo4F/lcbSnfyqO1B3TFGIRqUVjNtsE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=WhJhohOBQ8UXRuprzVrD5Mc3tCkF6QV5Xlw8MN/QbqCO2Rq23xRDtTKpJPe7Exy4s
+	 CtqHOlSxGWkqsOJ3KIY6PK858oT3whXCa36FiDcBmI4sO+q1PM1tjCY1nGca42PJyJ
+	 r5EtkFDE4no6b4OC8IePlVkI0A0oRWUPmJT01nTKb9fD6LAX/LH2+ecaKdBiyzd90k
+	 +/IGRkn77s9U36wVYy4I5q4k/IRv3bi3XvU+oInSmZs2AkTnpQvy10jzUSK+TIKtHr
+	 4TMREUEeXxMy7t/QVRiGZf3v7pOZ3ESwd+922y5bDWbWXJQnFluoOcVXXmLggrgRKe
+	 Ish1swMXtShkw==
+Date: Wed, 04 Dec 2024 07:53:47 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Arnd Bergmann <arnd@arndb.de>, Brian Gerst <brgerst@gmail.com>,
+        Arnd Bergmann <arnd@kernel.org>
+CC: linux-kernel@vger.kernel.org, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Andy Shevchenko <andy@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Davide Ciminaghi <ciminaghi@gnudd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 05/11] x86: remove HIGHMEM64G support
+User-Agent: K-9 Mail for Android
+In-Reply-To: <00e344d7-8d2f-41d3-8c6a-1a828ee95967@app.fastmail.com>
+References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-6-arnd@kernel.org> <CAMzpN2joPcvg887tJLF_4SU4aJt+wTGy2M_xaExrozLS-mvXsw@mail.gmail.com> <00e344d7-8d2f-41d3-8c6a-1a828ee95967@app.fastmail.com>
+Message-ID: <64221AAE-4A99-42D8-A78F-9B1B866CB24A@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
-Content-Language: en-US
-To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
- x86@kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Andy Shevchenko <andy@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Sean Christopherson <seanjc@google.com>,
- Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-10-arnd@kernel.org>
-From: Tor Vic <torvic9@mailbox.org>
-In-Reply-To: <20241204103042.1904639-10-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: 4e9m7dwkykgcxtqczw8zqyhhwrynqgzr
-X-MBO-RS-ID: 2b3f8d057a29b455e8d
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On December 4, 2024 5:43:28 AM PST, Arnd Bergmann <arnd@arndb=2Ede> wrote:
+>On Wed, Dec 4, 2024, at 14:29, Brian Gerst wrote:
+>> On Wed, Dec 4, 2024 at 5:34=E2=80=AFAM Arnd Bergmann <arnd@kernel=2Eorg=
+> wrote:
+>>>
+>>>  - In the early days of x86-64 hardware, there was sometimes the need
+>>>    to run a 32-bit kernel to work around bugs in the hardware drivers,
+>>>    or in the syscall emulation for 32-bit userspace=2E This likely sti=
+ll
+>>>    works but there should never be a need for this any more=2E
+>>>
+>>> Removing this also drops the need for PHYS_ADDR_T_64BIT and SWIOTLB=2E
+>>> PAE mode is still required to get access to the 'NX' bit on Atom
+>>> 'Pentium M' and 'Core Duo' CPUs=2E
+>>
+>> 8GB of memory is still useful for 32-bit guest VMs=2E
+>
+>Can you give some more background on this?
+>
+>It's clear that one can run a virtual machine this way and it
+>currently works, but are you able to construct a case where this
+>is a good idea, compared to running the same userspace with a
+>64-bit kernel?
+>
+>From what I can tell, any practical workload that requires
+>8GB of total RAM will likely run into either the lowmem
+>limits or into virtual addressig limits, in addition to the
+>problems of 32-bit kernels being generally worse than 64-bit
+>ones in terms of performance, features and testing=2E
+>
+>      Arnd
+>
 
-
-On 12/4/24 11:30, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Building an x86-64 kernel with CONFIG_GENERIC_CPU is documented to
-> run on all CPUs, but the Makefile does not actually pass an -march=
-> argument, instead relying on the default that was used to configure
-> the toolchain.
-> 
-> In many cases, gcc will be configured to -march=x86-64 or -march=k8
-> for maximum compatibility, but in other cases a distribution default
-> may be either raised to a more recent ISA, or set to -march=native
-> to build for the CPU used for compilation. This still works in the
-> case of building a custom kernel for the local machine.
-> 
-> The point where it breaks down is building a kernel for another
-> machine that is older the the default target. Changing the default
-> to -march=x86-64 would make it work reliable, but possibly produce
-> worse code on distros that intentionally default to a newer ISA.
-> 
-> To allow reliably building a kernel for either the oldest x86-64
-> CPUs or a more recent level, add three separate options for
-> v1, v2 and v3 of the architecture as defined by gcc and clang
-> and make them all turn on CONFIG_GENERIC_CPU. Based on this it
-> should be possible to change runtime feature detection into
-> build-time detection for things like cmpxchg16b, or possibly
-> gate features that are only available on older architectures.
-> 
-
-Hi Arnd,
-
-Similar but not identical changes have been proposed in the past several 
-times like e.g. in 1, 2 and likely even more often.
-
-Your solution seems to be much cleaner, I like it.
-
-That said, on my Skylake platform, there is no difference between 
--march=x86-64 and -march=x86-64-v3 in terms of kernel binary size or 
-performance.
-I think Boris also said that these settings make no real difference on 
-code generation.
-
-Other settings might make a small difference (numbers are from 2023):
-   -generic:       85.089.784 bytes
-   -core2:         85.139.932 bytes
-   -march=skylake: 85.017.808 bytes
-
-----
-[1] 
-https://lore.kernel.org/all/4_u6ZNYPbaK36xkLt8ApRhiRTyWp_-NExHCH_tTFO_fanDglEmcbfowmiB505heI4md2AuR9hS-VSkf4s90sXb5--AnNTOwvPaTmcgzRYSY=@proton.me/
-
-[2] 
-https://lore.kernel.org/all/20230707105601.133221-1-dimitri.ledkov@canonical.com/
-
+The biggest proven is that without HIGHMEM you put a limit of just under 1=
+ GB (892 MiB if I recall correctly), *not* 4 GB, on 32-bit kernels=2E That =
+is *well* below the amount of RAM present in late-era 32-bit legacy systems=
+, which were put in production as "recently" as 20 years ago and may still =
+be in niche production uses=2E Embedded systems may be significantly more r=
+ecent; I know for a fact that 32-bit systems were put in production in the =
+2010s=2E
 
 
