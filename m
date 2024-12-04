@@ -1,286 +1,248 @@
-Return-Path: <kvm+bounces-33017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33018-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074639E39FF
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:31:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5399E3A73
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:55:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB42D1652A2
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:31:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79909165890
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F330F1B87CE;
-	Wed,  4 Dec 2024 12:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454881C07E7;
+	Wed,  4 Dec 2024 12:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xFOafY8q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQo4ssTx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC871AF0AA
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754721B4130
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733315469; cv=none; b=E3iVFJDcrn8L6RcMnWD6YBkerhTvRxb1vM+cKBEhy4hRbmvirW1RCPG7tpg4ooHbaskjxXesKUvSRA12tGFPrbgPMUUhoJbamNLah2jIg7UoC0tOLy1PsDOxYh/+Lch/pMckEoTTH5AJeflel9ITLeZ+fUwJc8JsONCt2lIjAxQ=
+	t=1733316894; cv=none; b=kODQjOwS0YkckBhMNJtVWt6HilMDfA7p7gbX4Ki7J9A0ese5Pjhd/fXltEqSRvywPaK61ZCa+2heWqI62o4oSX/vAgUuq/V8Evduu8OHdnB7tfeLayF7NKk2kZEiMFgwPm6q+sDVztJ/4jxoOTR/GsT/Mr4jALtS9xJmmLTVsj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733315469; c=relaxed/simple;
-	bh=s3kWsiCRa6B19UIZQkjAzxK3N99JoQbccSVKzVbgCuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nFR+kTmjETfQ7b0/OTEC4wyppW91ngXO9x3+nmPADV1htcJ6ykM7XjsbqqC7KS3y4TaSiDDbH2DyRzNfdtorDWDWHLYXRMyciwAfqu/6NBXOOkgb6i7IiltqYBoeWoxqlPHI3JXBnTlVzgIT9nABfyxbO0i/cqtGjjrd2FTPxVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xFOafY8q; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a7bc2d7608so108115ab.0
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:31:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733315466; x=1733920266; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=s3kWsiCRa6B19UIZQkjAzxK3N99JoQbccSVKzVbgCuE=;
-        b=xFOafY8qhVNYXktOgDQ+lFZlEjLJvkYbQhVhfVxS+LZysk8F42R96vKqy8AfWA11LU
-         kBMjN3cx/lmAjGdFFC57I42zi6PFfxIjaaoW57lczxPQMQqZfl99h/Gz4qcw6dGjtYDM
-         8k+qsDG8RkE8Y3s9Yckdg2SzeMI2DauTPc/K2GvqG+BTS0YKUluYZkyKBlG4/Og87+LU
-         8u5mg369shont6QCH4YfaPz2PBPb5nwTPu80bUMLYCzfuiy19JaFoK+gSUATzM1NysyD
-         Dbw+Ot3PVwCJwtw1RflEB9goZ3DkLQsICksVun5edj8XPcI2mRLVI1BuoPa38SetMa6G
-         tuBg==
+	s=arc-20240116; t=1733316894; c=relaxed/simple;
+	bh=0zbsmpMAssyLsVVURUESxkxvV3Okxt9izdw3A4a2nWs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ye1iZ3jRjRKId1/P0tLkBkmlTLHnPNsWZYBwRMFtmGXXx7fFylRtn4iklzjC3jcxEQCkMG3wPMYhj7SuafL7mIfii5VLOu8GnYCu9rLPeIy9Sqa8r2w8OE01AFi2xrcphUSPsgChpnAPCus2tXIYXsmEAbE1gh2QVk4QN83MEnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQo4ssTx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733316890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MB2MAmGSlUi5YLf0fUp0VNgn+MFysC4aDDm3o00zI78=;
+	b=dQo4ssTxIMyeopv1YcD3KVbQGNNDW3P4KZYdCNxbig923f15xWFwztyquizyZ94zgoSqIa
+	3S+SdmXIZpkbLPOHz27GUV8fnaK36y+NfMpPtyQuHZHl0A6JpD90TzuCx4uQt9L7owuZhY
+	lT68kMjUzHBw4OpyoQo7wQjLBePg3Z8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-tpKj_IwhNT61vysjlTQOJg-1; Wed, 04 Dec 2024 07:54:49 -0500
+X-MC-Unique: tpKj_IwhNT61vysjlTQOJg-1
+X-Mimecast-MFC-AGG-ID: tpKj_IwhNT61vysjlTQOJg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43498af79a6so4979255e9.0
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:54:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733315466; x=1733920266;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1733316888; x=1733921688;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s3kWsiCRa6B19UIZQkjAzxK3N99JoQbccSVKzVbgCuE=;
-        b=A0cElu22gRzRccuFu6oab3nXh6jX1f5bv9Sldw0wxJaFP3c/Wo6o+gfc/ad5jMpqwA
-         9DnCtr1kP4iBwN3Cweu4k8W4dkzCZRPLZ/RFYlDnHhHLwi2MoYtkpW5Krs7S2Lbm/4bu
-         D9NoCR7V05X+2cFLMjD4+y523EVmpIDsT1zDU51QjuEOqhg2ivJRZoDl1Zkm5+qy5SDF
-         GtctewY7pkYUNc/PBR+tdNtnDftjKZ7jEvMbDAhiVULS+5sNCLG6adnMvFAQGlfBX825
-         qgNpPBrrEhbPb5qW9RX3qZkVdEU4GoiZ/awdjxv356uaOn1w/5Gz+UG8NrPr/Nl1S+23
-         qN6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXitlInSGwH3m7XI+6D0FovBKVe4b1IHdCTbZBoyFTnKNqoiy8SE275SceChTKWLJ+l2Hc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+h1auOtPa0W1XLFscWVEfH6UQxOWxS0Q2ltnQlWgvyBN+g+R6
-	Ti+bnTpokMP+wcUUwV5WRCklug/Fi5w1N63KckxhtQJxXlaJev0T1ReAES4n39Tbha979q6gzxE
-	1OqHI0ojLGjG6X+a/YeweFPaJ8unmTX82BjLq
-X-Gm-Gg: ASbGncucG2/HBWIj+C6c/koj/yuccO/nAxd4dR3kG1C3o5Z//1hxP/fpf92TH9yduAa
-	JD42Qnrzp7M5osyRX1bKDmNZJWBVM/w==
-X-Google-Smtp-Source: AGHT+IGpnBMzSCeQfVCtzkYgOrmdOwo2Kfhc16GqhtSBaf/8iCMGMf9zeNwSnSGpHfMqSftYnYb95UZvkSMHlJNTiUI=
-X-Received: by 2002:a05:6e02:3084:b0:3a7:d763:902a with SMTP id
- e9e14a558f8ab-3a800b1364bmr2337715ab.23.1733315465860; Wed, 04 Dec 2024
- 04:31:05 -0800 (PST)
+        bh=MB2MAmGSlUi5YLf0fUp0VNgn+MFysC4aDDm3o00zI78=;
+        b=KYPIsB5FI0L10ozkGOYSh1hcVYxQ2Cxv+VCONrRigDHYGO1xRgk6dHqKFwyR8tAIfG
+         Igae97/E1gk3EAI4DU5Eh6NB4wbHu71ltNYZLvjPY5GLYfWg0KZ07g2osj7uYJVR5RQg
+         lwU450z2QCRY2T3wnI/mGbEnzxfhwxbUSuDpdIbdeqma02xK4On3gwC+36dvqqD+Vj/i
+         NNdPfGReWIKIrkQLVrm4nj3dDbQp8+C9CRhrhuidmst114ApClOnwkyuIZx9/mUHgUo5
+         nwIHUOT7mchorulFwlwsixpHD/0nQ+ScdKClqK49zV0IgsDFXsZKM8uoywBj+XpjzsaH
+         e+ug==
+X-Forwarded-Encrypted: i=1; AJvYcCWUg84rlZzF/297WQZO1A+ImgP/UV8tBOzh8d9DjHP+vn2nJDvy213qvli2xO1tjnY6n4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjDQXfZhkYeFzyBq6fHY002378A2Od1OssDwAPwMTG4zVTW5YM
+	8Bvp52gYYE4t/f/38e0TZzPaU6acjkVpGUb4zdfpOGKp/pOTgc29rEr56CQzokYyoPC87xoSCKZ
+	PVRmF/g/fZrO2fmW29lKUDNZhsSeS5LELKFsGVIAfBOUzLVcE2Q==
+X-Gm-Gg: ASbGncsQWTnR3zwhqdcgpntAWvI24UplvJ77wPAuxcy6V/0BE71IbCax3d/dx6Hg2MS
+	6EW79nKx+smWdqEyyOco4aSFgrX1JGZctm4yISK5Adv90sgDF2eMBAMbsvnKzFcHMJ9glHBOSsK
+	Ov4i3e9XMp9kDQdECGUaAE2W9bu7Ud97LbEk15sAfDvIXU0/3244nOkGcvGuC+WsL7L6ztPWixr
+	AJg6dMBAydYlhEm9dfzXlu9VrUpYAn1+7yGL24WfkcK2iHxjCjTNuOluX9r4vOq+/GdVE25D92D
+	CVIyYHwS5wgtSkEWasz16NumMugWAQPd3Qg=
+X-Received: by 2002:a05:600c:6c8a:b0:434:8e8a:d4ec with SMTP id 5b1f17b1804b1-434afc3b6e1mr245982215e9.13.1733316888163;
+        Wed, 04 Dec 2024 04:54:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHjMr0hScnPOMMpphAyax2V0MFBHZqym1YHIjea01hMzMXczx6opOHdnARaXNIvDZGqHVvbtg==
+X-Received: by 2002:a05:600c:6c8a:b0:434:8e8a:d4ec with SMTP id 5b1f17b1804b1-434afc3b6e1mr245981785e9.13.1733316887744;
+        Wed, 04 Dec 2024 04:54:47 -0800 (PST)
+Received: from localhost (p200300cbc70be10038d68aa111b0a20a.dip0.t-ipconnect.de. [2003:cb:c70b:e100:38d6:8aa1:11b0:a20a])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-434d52c0bc7sm23514855e9.35.2024.12.04.04.54.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2024 04:54:46 -0800 (PST)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org,
+	linux-s390@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org,
+	David Hildenbrand <david@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Baoquan He <bhe@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>,
+	Dave Young <dyoung@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH v2 00/12] fs/proc/vmcore: kdump support for virtio-mem on s390
+Date: Wed,  4 Dec 2024 13:54:31 +0100
+Message-ID: <20241204125444.1734652-1-david@redhat.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121185315.3416855-1-mizhang@google.com> <Z0-R-_GPWu-iVAYM@google.com>
- <CALMp9eTCe1-ZA47kcktTQ4WZ=GUbg8x3HpBd0Rf9Yx_pDFkkNg@mail.gmail.com> <Z0-3bc1reu1slCtL@google.com>
-In-Reply-To: <Z0-3bc1reu1slCtL@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 4 Dec 2024 04:30:54 -0800
-Message-ID: <CALMp9eRqHkiZMMJ2MDXOHPbGx1rE9n5R2aR-F=qkuGo0BPS=og@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/22] KVM: x86: Virtualize IA32_APERF and IA32_MPERF MSRs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
-	Mario Limonciello <mario.limonciello@amd.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Here is the sordid history behind the proposed APERFMPERF implementation.
+The only "different than everything else" thing about virtio-mem on s390
+is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
+during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
+kdump kernel must detect memory ranges of the crashed kernel to
+include via PT_LOAD in the vmcore.
 
-First of all, I have never considered this feature for only
-"slice-of-hardware" VMs, for two reasons:
-(1) The original feature request was first opened in 2015, six months
-before I joined Google, and long before Google Cloud had anything
-remotely resembling a slice-of-hardware offering.
-(2) One could argue that Google Cloud still has no slice-of-hardware
-offering today.
-Hence, an implementation that only works for "slice-of-hardware" is
-essentially a science fair project. We might learn a lot, but there is
-no ROI.
+On other architectures, all RAM regions (boot + hotplugged) can easily be
+observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
+the elfcore hdr.
 
-I dragged my feet on this for a long time, because
-(1) Without actual guest C-state control, it seems essentially
-pointless (though I probably didn't give sufficient weight to the warm
-fuzzy feeling it might give customers).
-(2) It's one of those things that's impossible to virtualize with
-precision, and I can be a real pedant sometimes.
-(3) I didn't want to expose a power side-channel that could be used to
-spy on other tenants.
+On s390, information about "ordinary" memory (heh, "storage") can be
+obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
+that information is stored early during boot in the "physmem" memblock
+data structure.
 
-In 2019, Google Cloud launched the C2 VM family, with MWAIT-exiting
-disabled for whole socket shapes. Though MWAIT hints aren't full
-C-state control, and we still had the 1 MHz host timer tick that would
-probably keep the guest out of deep C-states, my first objection
-started to collapse. As I softened in my old age, the second objection
-seemed indefensible, especially after I finally caved on nested posted
-interrupt processing, which truly is unvirtualizable. But, especially
-after the whole Meltdown/Spectre debacle, I was holding firm to my
-third objection, despite counter-arguments that the same information
-could be obtained without APERFMPERF. I guess I'm still smarting from
-being proven completely wrong about RowHammer.
+But virtio-mem memory is always detected by as device driver, which is
+usually build as a module. So in the crash kernel, this memory can only be
+properly detected once the virtio-mem driver started up.
 
-Finally, in December 2021, I thought I had a reasonable solution. We
-could implement APERFMPERF in userspace, and the low fidelity would
-make me feel comfortable about my third objection. "How would
-userspace get this information," you may ask. Well, Google Cloud has
-been carrying local patches to log guest {APERF, MPERF, TSC} deltas
-since Ben Serebrin added it in 2017. Though the design document only
-stipulated that the MSRs should be sampled at VMRUN entry and exit,
-the original code actually sampled at VM-entry and VM-exit, with a
-limitation of sampling at those additional points only if 500
-microseconds had elapsed since the last samples were taken. Ben
-calculated the effective frequency at each sample point to populate a
-histogram, but that's not really relevant to APERFMPERF
-virtualization. I just mention it to explain why those
-VM-entry/VM-exit sample points were there. This code accounted for
-everything between vcpu_load() and vcpu_put() when accumulating
-"guest" APERF and MPERF, and this data eventually formed the basis of
-our userspace implementation of APERFMPERF virtualization.
+The virtio-mem driver already supports the "kdump mode", where it won't
+hotplug any memory but instead queries the device to implement the
+pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
+the vmcore.
 
-In 2022, Riley Gamson implemented APERFMPERF virtualization in
-userspace, using KVM_X86_SET_MSR_FILTER to intercept guest accesses to
-the MSRs, and using Ben's "turbostat" data to derive the values to be
-returned. The APERF delta could be used as-is, but I was insistent
-that MPERF needed to track guest TSC cycles while the vCPU was not
-halted. My reasoning was this:
-(1) The specification says so. Okay; it actually says that MPERF
-"[i]ncrements at fixed interval (relative to TSC freq.) when the
-logical processor is in C0," but even turbostat makes the
-architecturally prohibited assumption that MPERF and TSC tick at the
-same frequency.
-(2) It would be disingenuous to claim the effective frequency *while
-running* for a duty-cycle limited f1-micro or g2-small VM, or for
-overcommitted VMs that are forced to timeshare with other tenants.
+With this series, if the virtio-mem driver is included in the kdump
+initrd -- which dracut already takes care of under Fedora/RHEL -- it will
+now detect the device RAM ranges on s390 once it probes the devices, to add
+them to the vmcore using the same callback mechanism we already have for
+pfn_is_ram().
 
-APERF is admittedly tricky to virtualize. For instance, how many
-virtual "core clock counts at the coordinated clock frequency" should
-we count while KVM is emulating CPUID? That's unclear. We're certainly
-not trying to *emulate* APERF, so the number of cycles the physical
-CPU takes to execute the instruction isn't relevant. The virtual CPU
-just happens to take a few thousand cycles to execute CPUID. Consider
-it a quirk. Similarly, in the case of zswap, some memory accesses take
-a *really* long time. Or consider KVM time as the equivalent of SMM
-time on physical hardware. SMM cycles are accumulated by APERF. It may
-seem like a memory access just took 60 *milliseconds*, but most of
-that time was spent in SMM. (That's taken from a recent real-world
-example.) As much as I hate SMM, it provides a convenient rug to sweep
-virtualization holes under.
+To add these device RAM ranges to the vmcore ("patch the vmcore"), we will
+add new PT_LOAD entries that describe these memory ranges, and update
+all offsets vmcore size so it is all consistent.
 
-At this point, I should note that Aaron Lewis eliminated the
-rate-limited "turbostat" sampling at VM-entry/VM-exit early this year,
-because it was too expensive. Admittedly, most of the cost was
-attributed to reading MSR_C6_CORE_RESIDENCY, which Drew Schmitt added
-to Ben's sampling in 2018. But this did factor into my thinking
-regarding cost.
+My testing when creating+analyzing crash dumps with hotplugged virtio-mem
+memory (incl. holes) did not reveal any surprises.
 
-The target intercept was the C3 VM family, which is not
-"slice-of-hardware," and, ironically, does not disable MWAIT-exiting
-even for full socket shapes (because we realized after launching C2
-that that was a huge mistake). However, the userspace approach was
-abandoned before C3 launch, because of performance issues. You may
-laugh, but when we advertised APERFMPERF to Linux guests, we were
-surprised to find that every vCPU started sampling these MSRs every
-timer tick. I still haven't looked into why. I'm assuming it has
-something to do with a perception of "fairness" in scheduling, and I
-just hope that it doesn't give power-hungry instruction mixes like
-AVX-512 and AMX an even greater fraction of CPU time because their
-effective frequency is low. In any case, we were seeing 10% to 16%
-performance degradations when APERFMPERF was advertised to Linux
-guests, and that was a non-starter. If that seems excessive, it is. A
-large part of this is due to contention for an unfortunate exclusive
-lock on the legacy PIC that our userspace grabs and releases for each
-KVM_RUN ioctl. That could be fixed with a reader/writer lock, but the
-point is that we were seeing KVM exits at a much higher rate than ever
-before. I accept full responsibility for this debacle. I thought maybe
-these MSRs would get sampled once a second while running turbostat. I
-had no idea that the Linux kernel was so enamored of these MSRs.
+Patch #1 -- #7 are vmcore preparations and cleanups
+Patch #8 adds the infrastructure for drivers to report device RAM
+Patch #9 + #10 are virtio-mem preparations
+Patch #11 implements virtio-mem support to report device RAM
+Patch #12 activates it for s390, implementing a new function to fill
+          PT_LOAD entry for device RAM
 
-Just doing a back-of-the-envelope calculation based on a 250 Hz guest
-tick and 50000 cycles for a KVM exit, this implementation was going to
-cost 1% or more in guest performance. We certainly couldn't enable it
-by default, but maybe we could enable it for the specific customers
-who had been clamoring for the feature. However, when I asked Product
-Management how much performance customers were willing to trade for
-this feature, the answer was "none."
+v1 -> v2:
+* "fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex"
+ -> Extend patch description
+* "fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex"
+ -> Extend patch description
+* "fs/proc/vmcore: disallow vmcore modifications while the vmcore is open"
+ -> Disallow modifications only if it is currently open, but warn if it
+    was already open and got closed again.
+ -> Track vmcore_open vs. vmcore_opened
+ -> Extend patch description
+* "fs/proc/vmcore: prefix all pr_* with "vmcore:""
+ -> Added
+* "fs/proc/vmcore: move vmcore definitions out if kcore.h"
+ -> Call it "vmcore_range"
+ -> Place vmcoredd_node into vmcore.c
+ -> Adjust patch subject + description
+* "fs/proc/vmcore: factor out allocating a vmcore range and adding it to a
+   list"
+ -> Adjust to "vmcore_range"
+* "fs/proc/vmcore: factor out freeing a list of vmcore ranges"
+ -> Adjust to "vmcore_range"
+* "fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM
+   ranges in 2nd kernel"
+ -> Drop PROVIDE_PROC_VMCORE_DEVICE_RAM for now
+ -> Simplify Kconfig a bit
+ -> Drop "Kdump:" from warnings/errors
+ -> Perform Elf64 check first
+ -> Add regions also if the vmcore was opened, but got closed again. But
+    warn in any case, because it is unexpected.
+ -> Adjust patch description
+* "virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM"
+ -> "depends on VIRTIO_MEM" for PROC_VMCORE_DEVICE_RAM
 
-Okay. How do we achieve that? The obvious approach is to intercept
-reads of these MSRs and do some math in KVM. I found that really
-unpalatable, though. For most of our VM families, the dominant source
-of consistent background VM-exits is the host timer tick. The second
-highest source is the guest timer tick. With the host timer tick
-finally going away on the C4 VM family, the guest timer tick now
-dominates. On Intel parts, where we take advantage of hardware EOI
-virtualization, we now have two VM-exits per guest timer tick (one for
-writing the x2APIC initial count MSR, and one for the VMX-preemption
-timer). I couldn't defend doubling that with intercepted reads of
-APERF and MPERF.
 
-Well, what about the simple hack of passing through the host values? I
-had considered this, despite the fact that it would only work for
-slice-of-hardware. I even coerced Josh Don into "fixing" our scheduler
-so that it wouldn't allow two vCPU threads (a virtual hyperthread
-pair) to flip-flop between hyperthreads on their assigned physical
-core. However, I eventually dismissed this as
-(1) too much of a hack
-(2) broken with live migration
-(3) disingenuous when multiple tasks are running on the logical processor.
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Eugenio Pérez" <eperezma@redhat.com>
+Cc: Baoquan He <bhe@redhat.com>
+Cc: Vivek Goyal <vgoyal@redhat.com>
+Cc: Dave Young <dyoung@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
 
-Yes, (3) does happen, even with our C4 VM family. During copyless
-migration, two vCPU threads share a logical processor. During live
-migration, I believe the live migration threads compete with vCPU
-threads. And there is still at least one kworker thread competing for
-cycles.
+David Hildenbrand (12):
+  fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex
+  fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex
+  fs/proc/vmcore: disallow vmcore modifications while the vmcore is open
+  fs/proc/vmcore: prefix all pr_* with "vmcore:"
+  fs/proc/vmcore: move vmcore definitions out of kcore.h
+  fs/proc/vmcore: factor out allocating a vmcore range and adding it to
+    a list
+  fs/proc/vmcore: factor out freeing a list of vmcore ranges
+  fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM
+    ranges in 2nd kernel
+  virtio-mem: mark device ready before registering callbacks in kdump
+    mode
+  virtio-mem: remember usable region size
+  virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM
+  s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
 
-Actually writing the guest values into the MSRs was initially
-abhorrent to me, because of the inherent lossage on every write. But,
-I eventually got over it, and partially assuaged my revulsion by
-writing the MSRs infrequently. I would much have preferred APERF and
-MPERF equivalents of IA32_TSC_ADJUST, but I don't have the patience to
-wait for the CPU vendors. BTW, as an aside, just how is AMD's scaling
-of MPERF by the TSC_RATIO MSR even remotely useful without an offset?
+ arch/s390/Kconfig             |   1 +
+ arch/s390/kernel/crash_dump.c |  39 ++++-
+ drivers/virtio/virtio_mem.c   | 103 ++++++++++++-
+ fs/proc/Kconfig               |  19 +++
+ fs/proc/vmcore.c              | 283 ++++++++++++++++++++++++++--------
+ include/linux/crash_dump.h    |  41 +++++
+ include/linux/kcore.h         |  13 --
+ 7 files changed, 407 insertions(+), 92 deletions(-)
 
-One requirement I refuse to budge on is that host usage of APERFMPERF
-must continue to work exactly as before, modulo some very small loss
-of precision. Most of the damage could be contained within KVM, if
-you're willing to accept the constraint that these MSRs cannot be
-accessed within an NMI handler (on Intel CPUs), but then you have to
-swap the guest and host values every VM-entry/VM-exit. This approach
-increases both the performance overhead (for which our budget is
-"none") and the loss of precision over the current approach. Given the
-amount of whining on this list over writing just one MSR on every
-VM-entry/VM-exit (yes, IA32_SPEC_CTRL, I'm looking at you), I didn't
-think it would be very popular to add two. And, to be honest, I
-remembered that rate-limited *reads* of the "turbostat" MSRs were too
-expensive, but I had forgotten that the real culprit there was the
-egregiously slow MSR_C6_CORE_RESIDENCY.
 
-I do recall the hullabaloo regarding KVM's usurpation of IA32_TSC_AUX,
-an affront that went unnoticed until the advent of RDPID. Honestly,
-that's where I expected pushback on this series. Initially, I tried to
-keep the changes outwith KVM to the minimum possible, replacing only
-explicit reads of APERF or MPERF with the new accessor functions. I
-wasn't going to touch the /dev/cpu/*/msr/* interface. After all, none
-of the other KVM userspace return MSRs do anything special there. But,
-then I discovered that turbostat on the host uses that interface, and
-I really wanted that tool to continue to work as expected. So, the
-rdmsr crosscalls picked up an ugly wart. Frankly, that was the
-specific patch that I expected to unleash vitriol. As an aside, why
-does turbostat have to use that interface for its own independent
-reads of these MSRs, when the kernel is already reading them every
-scheduler tick?!? Sure, for tickless kernels, maybe, but I digress.
+base-commit: feffde684ac29a3b7aec82d2df850fbdbdee55e4
+-- 
+2.47.1
 
-Wherever the context-switching happens, I contend that there is no
-"clean" virtualization of APERF. If it comes down to just a question
-of VM-entry/VM-exit or vcpu_load()/vcpu_put(), we can collect some
-performance numbers and try to come to a consensus, but if you're
-fundamentally opposed to virtualizing APERF, because it's messy, then
-I don't see any point in pursuing this further.
-
-Thanks,
-
---jim
 
