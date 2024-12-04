@@ -1,214 +1,94 @@
-Return-Path: <kvm+bounces-33030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CD89E3ADC
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 14:11:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15D59E3AFF
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 14:17:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA9C7B24765
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 12:59:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E763166D45
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 13:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052D620C031;
-	Wed,  4 Dec 2024 12:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663B51C07C1;
+	Wed,  4 Dec 2024 13:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1MFR3wp"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WTf39HWb";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UtAAFB7I"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CB120B81D
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 12:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3572C1B87E2;
+	Wed,  4 Dec 2024 13:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733316929; cv=none; b=hY6cHNSZbC0f/x38lAP9iGgM1l0NfOSjK9a7G9h0PB74ATZkI9GwhpPp3g0beXip2dIajxzBeIPTpn4O8A2i3ZBXTa+h/L9wdcOtgXkY5iA10aQJyWehSbTvIZXV45ldbhEEFIM7K+Zbssle1Z3HpLtByU4fylHg7adbpt6tXHc=
+	t=1733318214; cv=none; b=B1grxbminUpBBHY8rImEuL+8bpVd0BC4scFx3xQ0Zy5kddGY9swu1fggS/umtg+sbLlFWC2ZLes3QR+IWcvplE077IBsX2m/LHk/6U+Y13CHKN5+yIvHo1ffk6krPVzyhPlvujZCV1mwsqOzudy+12EUBQFBaonvMwDE6LvDLGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733316929; c=relaxed/simple;
-	bh=uRjaOZTjHUvybJWAv9vGsJi33hCxx6hpGz/B8OQ605Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jnTQgitynwSkECW810x4yanGuXvCsnsqF8DY+EB2uQJI4NQHoUILURu54nMCDkegLEf7TVSm4KfUT5ccK4irWpz16Dl7pV9Xe4N5H2ZLUfAS7ldUco3C1zhSZNRO4f2cxrK1x9/LSeZ942j+LQNviqXbmuuuuSbSAw2Kubcj8qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L1MFR3wp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733316926;
+	s=arc-20240116; t=1733318214; c=relaxed/simple;
+	bh=c1OFIdWzHLxtGH4EHRQQjuiUkrmewW70tsRBbBB9sxM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=swuNvihMT41buIYs/P7RG+JiPv+NYnMAhBb1cUQSECNPfrlLzjg/Avrul6IFzQh+EY3ysgDUr7/OGdeqCI/OE0dCXfDtveaTJLMFC+qZreWf0T9G9BFyYrTmEFANsZ4rgA3MsNOgf3uxj9/fkp4fFzPyPKasqUKuD47MRvxxpUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WTf39HWb; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UtAAFB7I; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1733318211;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QMLpjiP43p31BywTFNffjh3NzCBHssnVGTYWU2BwGcs=;
-	b=L1MFR3wpxcV/woNa0Zy01CNEt6DrB3JVd7u4D56T/aeRj8PjUWj/m45fANd7oGkPqMPA8c
-	GMyYHfkRgceZSbK/QHx/4+DRbIwtJGABz3UFZtJCPauuhy3LVbqSXm6BvmmBUpR35tmrQT
-	9UD6KBowp1AdB1+hkupOSSaZcwe73H8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-1ggfWQ9oP26N_mM1-kbgDg-1; Wed, 04 Dec 2024 07:55:25 -0500
-X-MC-Unique: 1ggfWQ9oP26N_mM1-kbgDg-1
-X-Mimecast-MFC-AGG-ID: 1ggfWQ9oP26N_mM1-kbgDg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4349f32c9a6so55271045e9.3
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 04:55:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733316924; x=1733921724;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QMLpjiP43p31BywTFNffjh3NzCBHssnVGTYWU2BwGcs=;
-        b=O5p5XZshZnb7HCIyO9l8HKCrU8QneOmx4vw42673l1P9l4W+0mml4ponns06OQLeUR
-         LLTLZFbABZL/cKu4bDt2Tk5+seLJFMQaVGKMrpTeFodUCA26i5K4EgH1HzvnCQtIEHXB
-         lphA7hwJrd9tg3xn4+SZ1SFDbueryfO/HqAWP6sPVgXzd8X+0NZrTFVjlBVMg1g9DtqA
-         8szmtrIemIWEYHfrHxVpEfRdJj9dKMLxYL9OoT4lofZGQfbH8ygcq5XZ0DpprKoF+eOn
-         F8rOpji52w4WynH1rPETV+j7ECF+beZlzT6dObw85C0Ap5wSvRoUkZCNdLvj1kemaKRb
-         lIrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlrLgmtV37j1Ws8/Eg2CruYE4gaUQ1wpDc6EOTNVWtyQEQbBJ+MV5faiOE+rXv9QQY3Y0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNAE8i8m/UWQww+OQVZmqIFlWlmLciwH02LHnDx2jGkapYC9W7
-	P+A0z4/x8Nw9B3zCpBf82PkpscM1wZ9Jr00oRgjRTv8kctfMr5Jon6oUiC2g7CEq4nK/sYdmA8C
-	9NRF8QerjTMOQ96C5m9GO0Ti/mFTY/r/gOw5SZ9KTFL+9pRUzCA==
-X-Gm-Gg: ASbGncvxCItkuOSbwyV8QQhTEhijTO5B/p7eoU2mg6XsZwmCDSvrF8+N8Te8V/KYALy
-	xIDGyP4nkNDS+NORSp+E1Hd/kWlsoKHyj/BhYohJ3p92sAaEorCUqlS6/2YMjQirjt5A6H5aoR9
-	rsjKBwaBnu48db937bjvcqiPoCZub/OYvsVvXvdCdpaEv0tozJFkBeWqROdYg2rPVp+rhVT2tRr
-	9mwidRXT1hm99DlM2GZ+5+gU8WOFp5w5nyXDYtTajJ1xVE1NEdkxLUENwjO8W1G84IzsrR2LDaX
-	CqDX6FvJeLq08UOPdVStm9JFSAP9vrzToME=
-X-Received: by 2002:a05:600c:1910:b0:434:a962:2aa2 with SMTP id 5b1f17b1804b1-434d0a178d4mr49286605e9.33.1733316924468;
-        Wed, 04 Dec 2024 04:55:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFFzA2SYKI5zve6AhLcTcIqYEQR+M/xeFfejA5VMHPdifDyO5ycBtXVIAK8EC4IQe7u0N0Ewg==
-X-Received: by 2002:a05:600c:1910:b0:434:a962:2aa2 with SMTP id 5b1f17b1804b1-434d0a178d4mr49286335e9.33.1733316924087;
-        Wed, 04 Dec 2024 04:55:24 -0800 (PST)
-Received: from localhost (p200300cbc70be10038d68aa111b0a20a.dip0.t-ipconnect.de. [2003:cb:c70b:e100:38d6:8aa1:11b0:a20a])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-434d52c0bc7sm23531055e9.35.2024.12.04.04.55.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 04:55:22 -0800 (PST)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-s390@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	kexec@lists.infradead.org,
-	David Hildenbrand <david@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Baoquan He <bhe@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>,
-	Dave Young <dyoung@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v2 12/12] s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
-Date: Wed,  4 Dec 2024 13:54:43 +0100
-Message-ID: <20241204125444.1734652-13-david@redhat.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241204125444.1734652-1-david@redhat.com>
-References: <20241204125444.1734652-1-david@redhat.com>
+	bh=c1OFIdWzHLxtGH4EHRQQjuiUkrmewW70tsRBbBB9sxM=;
+	b=WTf39HWbPJFRM1Tx1C48bChXNL3E/zGE+PWZSPqiL8F9GXQA81CnxFB61pJW8sN+OfnD7s
+	kLlUgYSQKuUXbXs+ssmzIaM8lsVi5DBC1K5F9cgSXCobmiwoQeuCMoMdasVfpkENBOjtWL
+	Uk2G9Zq6QKbr6Njgp8K5sb0Q8U/mpzl5NJL/afisTyUp3PsRYjR0o+KKGTk9KQ53m0zgIv
+	4xMtQWBM1IMyBZXPN8gSgJdRs2IW1BwStc8chwJiI7lfc8d+EITFkyjv7K5PrnxfbaOE6A
+	xFiwH0kdtM7I8ke47c8tMmQgQdJIvlTqKO/nwkSkhFXcEzFY/OEOS/Wl94SA4w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1733318211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c1OFIdWzHLxtGH4EHRQQjuiUkrmewW70tsRBbBB9sxM=;
+	b=UtAAFB7IaCZ/Fv2LmIGfarhRvzoLr2BnhwJDKg9Fh5ozlTnnKtCeF0f+3VqaOS09n0Cq6z
+	h9MrkZUW2Qz60HBQ==
+To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
+ x86@kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "H.
+ Peter Anvin" <hpa@zytor.com>, Linus Torvalds
+ <torvalds@linux-foundation.org>, Andy Shevchenko <andy@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Sean Christopherson
+ <seanjc@google.com>, Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 03/11] x86: Kconfig.cpu: split out 64-bit atom
+In-Reply-To: <20241204103042.1904639-4-arnd@kernel.org>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-4-arnd@kernel.org>
+Date: Wed, 04 Dec 2024 14:16:50 +0100
+Message-ID: <87ed2nsi4d.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Let's add support for including virtio-mem device RAM in the crash dump,
-setting NEED_PROC_VMCORE_DEVICE_RAM, and implementing
-elfcorehdr_fill_device_ram_ptload_elf64().
+On Wed, Dec 04 2024 at 11:30, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> Both 32-bit and 64-bit builds allow optimizing using "-march=atom", but
+> this is somewhat suboptimal, as gcc and clang use this option to refer
+> to the original in-order "Bonnell" microarchitecture used in the early
+> "Diamondville" and "Silverthorne" processors that were mostly 32-bit only.
+>
+> The later 22nm "Silvermont" architecture saw a significant redesign to
+> an out-of-order architecture that is reflected in the -mtune=silvermont
+> flag in the compilers, and all of these are 64-bit capable.
 
-To avoid code duplication, factor out the code to fill a PT_LOAD entry.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/Kconfig             |  1 +
- arch/s390/kernel/crash_dump.c | 39 ++++++++++++++++++++++++++++-------
- 2 files changed, 32 insertions(+), 8 deletions(-)
-
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index 0077969170e8..c230bad7f5cc 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -240,6 +240,7 @@ config S390
- 	select MODULES_USE_ELF_RELA
- 	select NEED_DMA_MAP_STATE	if PCI
- 	select NEED_PER_CPU_EMBED_FIRST_CHUNK
-+	select NEED_PROC_VMCORE_DEVICE_RAM if PROC_VMCORE
- 	select NEED_SG_DMA_LENGTH	if PCI
- 	select OLD_SIGACTION
- 	select OLD_SIGSUSPEND3
-diff --git a/arch/s390/kernel/crash_dump.c b/arch/s390/kernel/crash_dump.c
-index cd0c93a8fb8b..f699df2a2b11 100644
---- a/arch/s390/kernel/crash_dump.c
-+++ b/arch/s390/kernel/crash_dump.c
-@@ -508,6 +508,19 @@ static int get_mem_chunk_cnt(void)
- 	return cnt;
- }
- 
-+static void fill_ptload(Elf64_Phdr *phdr, unsigned long paddr,
-+		unsigned long vaddr, unsigned long size)
-+{
-+	phdr->p_type = PT_LOAD;
-+	phdr->p_vaddr = vaddr;
-+	phdr->p_offset = paddr;
-+	phdr->p_paddr = paddr;
-+	phdr->p_filesz = size;
-+	phdr->p_memsz = size;
-+	phdr->p_flags = PF_R | PF_W | PF_X;
-+	phdr->p_align = PAGE_SIZE;
-+}
-+
- /*
-  * Initialize ELF loads (new kernel)
-  */
-@@ -520,14 +533,8 @@ static void loads_init(Elf64_Phdr *phdr, bool os_info_has_vm)
- 	if (os_info_has_vm)
- 		old_identity_base = os_info_old_value(OS_INFO_IDENTITY_BASE);
- 	for_each_physmem_range(idx, &oldmem_type, &start, &end) {
--		phdr->p_type = PT_LOAD;
--		phdr->p_vaddr = old_identity_base + start;
--		phdr->p_offset = start;
--		phdr->p_paddr = start;
--		phdr->p_filesz = end - start;
--		phdr->p_memsz = end - start;
--		phdr->p_flags = PF_R | PF_W | PF_X;
--		phdr->p_align = PAGE_SIZE;
-+		fill_ptload(phdr, start, old_identity_base + start,
-+			    end - start);
- 		phdr++;
- 	}
- }
-@@ -537,6 +544,22 @@ static bool os_info_has_vm(void)
- 	return os_info_old_value(OS_INFO_KASLR_OFFSET);
- }
- 
-+#ifdef CONFIG_PROC_VMCORE_DEVICE_RAM
-+/*
-+ * Fill PT_LOAD for a physical memory range owned by a device and detected by
-+ * its device driver.
-+ */
-+void elfcorehdr_fill_device_ram_ptload_elf64(Elf64_Phdr *phdr,
-+		unsigned long long paddr, unsigned long long size)
-+{
-+	unsigned long old_identity_base = 0;
-+
-+	if (os_info_has_vm())
-+		old_identity_base = os_info_old_value(OS_INFO_IDENTITY_BASE);
-+	fill_ptload(phdr, paddr, old_identity_base + paddr, size);
-+}
-+#endif
-+
- /*
-  * Prepare PT_LOAD type program header for kernel image region
-  */
--- 
-2.47.1
+In theory. There are quite some crippled variants of silvermont which
+are 32-bit only (either fused or at least officially not-supported to
+run 64-bit)...
 
 
