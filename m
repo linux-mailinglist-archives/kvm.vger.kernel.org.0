@@ -1,200 +1,172 @@
-Return-Path: <kvm+bounces-33083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8729E44B4
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:35:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBEEC9E44F5
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:44:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9980A166FFD
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:44:20 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4AD1EF096;
+	Wed,  4 Dec 2024 19:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="hwlDPSc0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s0VFqvmF"
+X-Original-To: kvm@vger.kernel.org
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85CF282442
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:35:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D7D1C3C11;
-	Wed,  4 Dec 2024 19:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtR1wlfn"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC2B1A8F7A
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 19:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCE618BBB4;
+	Wed,  4 Dec 2024 19:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733340950; cv=none; b=gcL2UeGzcCgAR6puKvZn8ZS1H/gQHrdNJQegfQ6S61o5fS8pQ909nLQ/ujgMTnKErxG4uWizxEG/ksBcablhUq2Sek6k0NKkpZPiJIfmxpgsHJpcjiTf+DuY5I0sLyg44y/RfwVDOu34FzX6xWrtuOIVsZc2774hPdiPVlnEJF8=
+	t=1733341454; cv=none; b=j3CsKwo8dhCDUb9zW94Ft/Q0TsPdheGs8NTHpiKe9SixGdOk29hMWlFpGggmTDsf8/s/gTI0/DAXFn4gHMFtRF2ctX1Gp/MXpYgaEsEnMqNjZlxxb0bILDbGMOELA3MqN2igDunpkxPwmRKldosvquGc8L14ErZHTc30RJSelp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733340950; c=relaxed/simple;
-	bh=swx7dw9Mi4sPZEn3BSfdhnirjOSTeS9fYV9smYEUpj8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VxeQSJ45RdF/cQ7NX37zs20AWw9ODmYo4smrbSDGGvOB1C5G7RCxhHQd9XCViuZG7ev4nTfSfZerIHhqZn/u0zAvBcvYs8mYAsaaQE4iO20wPn/0Z6LyJKdkKaiWg+2ZfBjHCItdd5RcHxfSDTkW8q3XF0Lk603GKH+VsIMG/uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtR1wlfn; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa54adcb894so14164666b.0
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 11:35:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733340947; x=1733945747; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZUM51Cc3FSIP4NdjPUlJXI3Yx92uiqjw21kn8V2Mqh4=;
-        b=EtR1wlfn+ycWKPzIDzgvl9/Xmx20IN4TsSPn9mKgUUD5K+xwuMPftMa262EE07TrFL
-         V25Jd04/h2vn3X0KUorGHS5CaPEENPa+icV1nfkpAxJd7UKV2l6IdEP4DW7KdidLAkrS
-         f43QrhlNUIpgRhtzkleYXtSGW9ovH0uhYLQdp+ZxTuPibztGvsn5RatwBsGQscU5ZNsI
-         E/lmUEDgR7p0yYIEheJX6fdwv64NEk6fPJXE9vceFstz2Vjub6aaugpAdGzceiT8LfdG
-         rtwRwBfmVUQkwjGfappr6EEHVmiCbvlQXSdxCK6k4V7+TXghlSvRBzGGeADNke5FUimo
-         2ZVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733340947; x=1733945747;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZUM51Cc3FSIP4NdjPUlJXI3Yx92uiqjw21kn8V2Mqh4=;
-        b=V9pEy8Fp1BrPa/KspNxcAJd+vXWDDv0btSnCEvXyL/v0ZiTf61Q88sG5Wask/PoBDq
-         oWwIYn3cKidJM3ACR/QfD1LPvhERJaQ2ttnEBGrq/f6FltN9JHv24HchAjlIrmK/HjOo
-         UHCxTtLUAhwAdrmJUhH+ThrbZCzBbI7ndfLpAe8n/RGXp0StJSsqg1AhRbP7v0qSTMU8
-         SFZoOZJ0V+MVD2WgSECLOfOkAQmarDV4L7km+g7f/onUJCHZHohRTJMXcw8GA7w3XOkj
-         NHck+EWOx3yUCz3Y7AJfURqydxhbkikm5bBy46UbDcXMR+P7pgBB119t1V5C5DtnJOsJ
-         PD3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXee5EWttbhw8YbehsM+BjUtLmV+8p6wA6C1rCqUtRYWcGpD/gbCEyYcRw4FpiJm1KT6e8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ2OJKQDF9j2cLT1+k8Q/mHu20JYsSZeh0kUz4IxU2N8mv9cBh
-	sZ8lP8FtJxEcnQngL7qCpkjRncCuoEnCljHOcVHCBZQ7PBMBAIsG
-X-Gm-Gg: ASbGnct+Drhi/4RfBVbzG/HPCgPHGccMVIQpcwlNgA2Y7BA33qjXmfmo0YtVLbt7zeE
-	ocM6qbRiJKDl04kqP8sw1xD5NOgyNbEbsyQxpjYU3mtP41QclV3/dQNLvR0Tig03Yx2vkh+AqRY
-	ky4dTaBKLuPZoKoHkl1xn+E2w+A99DwB+LjIq8jFaXrOHbnjCS1leAZNc9jVzyroj5W/5kuq+nv
-	wxt5KEuZLJ6hy+907RtAR8/7Pxp+hYb9KNU8Sly9nATiuhIUmLJMsEnvTMGzRaIEQcdsn/hWPm+
-	JpzTT5cAAH6NWoknvpLvHVpj2MiZP9PTg/f1juhUtC33XlWiDCbjExPgcYgP6Xi9+lRsyXXzm4L
-	djBzCkQxu0OAyrkPy8x+4qK2j1bl7A6L7oLcEY9U=
-X-Google-Smtp-Source: AGHT+IFzUppY5Qa7teyXqXIsMauNf3KGtk82FRzyr69W51ki2M4g5RaEjykYPGX7jwvJX4egtKSktQ==
-X-Received: by 2002:a17:906:314d:b0:aa5:1cde:fef5 with SMTP id a640c23a62f3a-aa5f7cce579mr633215066b.6.1733340946697;
-        Wed, 04 Dec 2024 11:35:46 -0800 (PST)
-Received: from ?IPV6:2a02:3100:b3a6:dc00:4df6:7a00:cfe0:a99? (dynamic-2a02-3100-b3a6-dc00-4df6-7a00-cfe0-0a99.310.pool.telefonica.de. [2a02:3100:b3a6:dc00:4df6:7a00:cfe0:a99])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5998e64f2sm765567166b.115.2024.12.04.11.35.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 11:35:45 -0800 (PST)
-Message-ID: <b36a81b3-c7fa-4fcd-9b97-b41c42daf06b@gmail.com>
-Date: Wed, 4 Dec 2024 20:35:44 +0100
+	s=arc-20240116; t=1733341454; c=relaxed/simple;
+	bh=9JZlTQUmVyWIc5Juw9KaWD5uEDIQ0ihP6yNvbkiRcrc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=NITQiv39jbBrfIBYGs4z2s4tKoVKg1JGeUVmMw3Wkq3Oc+RtmocOVL6oCrapMGeMg4oDFADUeBb7C2/Wce3wr6IC09mYsYKLbl+6SKOlztXPurgwDj1uEhEtv6nHa00nSaUA/w8ejdqVWEWdvkgIs7dAvdQPA5DriKWbjkjT4u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=hwlDPSc0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=s0VFqvmF; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id D4C8A2540134;
+	Wed,  4 Dec 2024 14:44:10 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Wed, 04 Dec 2024 14:44:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1733341450;
+	 x=1733427850; bh=EEShQR326Q35qKfWScIGB4OH/vhPY1mnipsA5wuW348=; b=
+	hwlDPSc0rvzNpZzrTYWC60TzGbdku3NKzOhXxi5qKbHrzNH1uGfnv56fgc21rdJL
+	y5u2EM55QEPrZcWXqGh1/MCXKh5IWn7syUWl6F5wTxSq3p6DitP5YGI4GwZojONZ
+	f//lPJu53VSpV+VkVA77aiGVXCoMXPcnLYqKcT1TiAnhSKGW2o9XTDVRIEv6iwjp
+	i4SF6muIDU/xCsDLQKw89CO7jgTfgC+t1CoMmyFXUzCnUlTXt4sdwGNTHRHNz5gp
+	wqqQcPbXKA6XkqQdMy9022jMpqkXUDEKzR0WwaWYyyN2sqvWjKmUdxN1pnTSKVS+
+	bwHprqvsl3U4bqbx7sJuFA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733341450; x=
+	1733427850; bh=EEShQR326Q35qKfWScIGB4OH/vhPY1mnipsA5wuW348=; b=s
+	0VFqvmFo9z0D1+k7pV4kWTIaDPIec9JqOlFhhRBMWx965EPN7yQTYcRjqvT7g0dB
+	v4MBPz8qrAo15FndMI0Z5TBgzCZCoAXs2fHbqBcQtKZVkTHjKXlWQQ2jmxXDNg2q
+	IufTOeXQQXFBcJ3HHMYUfn8nfTPI8n/7ICNDU8SneNybArJOmwkadZZfHOsN82qJ
+	3rdDoxordPGLOn3emEtM2QkgGEDhcb8+sL5PpvblXy9OWGR1PYvQBErW9yA1QbkX
+	hlORScw8AJkv2oDqC/kL9khp2aKfVKZW5k9OI/Jen+G5160YK/WVZQdZtrUUePBV
+	yF4fKAKLlJWzjNseoCqtA==
+X-ME-Sender: <xms:CbFQZ6S-STxiOch9IRji7jVLfiwi7yrDOQmtVC404LvFxkskODvWaQ>
+    <xme:CbFQZ_yf0ytiW_PtxECETAskHeehuzX1nRquHfYHS36ZcTwfufy19KH3oIsKuZRFJ
+    mDl5pXDhuutC-yX9h0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgdduvdegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
+    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
+    guvgeqnecuggftrfgrthhtvghrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdeg
+    jedvfeehtdeggeevheefleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudeh
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsphesrghlihgvnhekrdguvgdprh
+    gtphhtthhopegtihhmihhnrghghhhisehgnhhuuggurdgtohhmpdhrtghpthhtohepshgv
+    rghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopeifihhllhihsehinhhfrhgrug
+    gvrggurdhorhhgpdhrtghpthhtoheprghnugihsehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepgiekieeskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhigidruggvpdhrtghp
+    thhtohepthhorhhvrghlughssehlihhnuhigqdhfohhunhgurghtihhonhdrohhrgh
+X-ME-Proxy: <xmx:CbFQZ33eh8ZYfsPql2FP_KP8PxE7kchxDt2_9qO_eDw_HU7IbY8Rog>
+    <xmx:CbFQZ2B13V_ZclRqtDBy2qHQWTH_QB7bI2Qd0BakBm9IE9ene8_3XQ>
+    <xmx:CbFQZzj-gnk_gxccY5q9MQJ73y6CpI1qA56dPCHLr387FjvIXToMyA>
+    <xmx:CbFQZyoqs9lDR5286bu_EP54yVcL4Wemx5rlWoGFT3d88xpE967IpA>
+    <xmx:CrFQZz7UfHW9QtIHtpALIsC7FVq8sbLR9JgoDLIt799Fc5vCnPfFhyTq>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7F7912220072; Wed,  4 Dec 2024 14:44:09 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] driver core: class: add class_pseudo_register
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
- <b8122113-5863-4057-81b5-73f86c9fde4d@gmail.com>
- <2024120435-deserving-elf-c1e1@gregkh>
- <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
- <2024120407-partake-pounce-67be@gregkh>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <2024120407-partake-pounce-67be@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Wed, 04 Dec 2024 20:43:35 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Linus Torvalds" <torvalds@linux-foundation.org>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+ "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, "Andy Shevchenko" <andy@kernel.org>,
+ "Matthew Wilcox" <willy@infradead.org>,
+ "Sean Christopherson" <seanjc@google.com>,
+ "Davide Ciminaghi" <ciminaghi@gnudd.com>,
+ "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
+Message-Id: <d189f1a1-40d4-4f19-b96e-8b5dd4b8cefe@app.fastmail.com>
+In-Reply-To: 
+ <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-10-arnd@kernel.org>
+ <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
+Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 04.12.2024 19:17, Greg Kroah-Hartman wrote:
-> On Wed, Dec 04, 2024 at 06:04:32PM +0100, Heiner Kallweit wrote:
->> On 04.12.2024 10:33, Greg Kroah-Hartman wrote:
->>> On Tue, Dec 03, 2024 at 09:10:05PM +0100, Heiner Kallweit wrote:
->>>> In preparation of removing class_compat support, add a helper for
->>>> creating a pseudo class in sysfs. This way we can keep class_kset
->>>> private to driver core. This helper will be used by vfio/mdev,
->>>> replacing the call to class_compat_create().
->>>>
->>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->>>> ---
->>>>  drivers/base/class.c         | 14 ++++++++++++++
->>>>  include/linux/device/class.h |  1 +
->>>>  2 files changed, 15 insertions(+)
->>>>
->>>> diff --git a/drivers/base/class.c b/drivers/base/class.c
->>>> index 582b5a02a..f812236e2 100644
->>>> --- a/drivers/base/class.c
->>>> +++ b/drivers/base/class.c
->>>> @@ -578,6 +578,20 @@ struct class_compat *class_compat_register(const char *name)
->>>>  }
->>>>  EXPORT_SYMBOL_GPL(class_compat_register);
->>>>  
->>>> +/**
->>>> + * class_pseudo_register - create a pseudo class entry in sysfs
->>>> + * @name: the name of the child
->>>> + *
->>>> + * Helper for creating a pseudo class in sysfs, keeps class_kset private
->>>> + *
->>>> + * Returns: the created kobject
->>>> + */
->>>> +struct kobject *class_pseudo_register(const char *name)
->>>> +{
->>>> +	return kobject_create_and_add(name, &class_kset->kobj);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(class_pseudo_register);
->>>
->>> I see the goal here, but let's not continue on and create fake kobjects
->>> in places where there should NOT be any kobjects.  Also, you might get
->>> in trouble when removing this kobject as it thinks it is a 'struct
->>> class' but yet it isn't, right?  Did you test that?
->>>
+On Wed, Dec 4, 2024, at 19:10, Linus Torvalds wrote:
+> "On second thought , let=E2=80=99s not go to x86-64 microarchitectural
+> levels. =E2=80=98Tis a silly place"
+
+Fair enough. I'll just make it use -march=3Dx86_64 to override
+the compiler default then.
+
+> On Wed, 4 Dec 2024 at 02:31, Arnd Bergmann <arnd@kernel.org> wrote:
 >>
->> It's removed using kobject_put(), same as what class_compat_unregister() does.
->> I only compile-tested the changes.
-> 
-> I would not be able to take these unless someone actually runs them as
-> the kobject removal here might be getting confused a bit.
-> 
-Understood. Maybe Alex/Kirti can test.
+>> To allow reliably building a kernel for either the oldest x86-64
+>> CPUs or a more recent level, add three separate options for
+>> v1, v2 and v3 of the architecture as defined by gcc and clang
+>> and make them all turn on CONFIG_GENERIC_CPU.
+>
+> The whole "v2", "v3", "v4" etc naming seems to be some crazy glibc
+> artifact and is stupid and needs to die.
+>
+> It has no relevance to anything. Please do *not* introduce that
+> mind-fart into the kernel sources.
+>
+> I have no idea who came up with the "microarchitecture levels"
+> garbage, but as far as I can tell, it's entirely unofficial, and it's
+> a completely broken model.
 
-> thanks,
-> 
-> greg k-h
+I agree that both the name and the concept are broken.
+My idea was based on how distros (Red Hat Enterprise Linux
+at least) already use the same levels for making userspace
+require newer CPUs, so using the same flag for the kernel
+makes some sense.
 
+Making a point about the levels being stupid is a useful
+goal as well.
+
+> There is a very real model for microarchitectural features, and it's
+> the CPUID bits. Trying to linearize those bits is technically wrong,
+> since these things simply aren't some kind of linear progression.
+>
+> And worse, it's a "simplification" that literally adds complexity. Now
+> instead of asking "does this CPU support the cmpxchgb16 instruction?",
+> the question instead becomes one of "what the hell does 'v3' mean
+> again?"
+
+I guess the other side of it is that the current selection
+between pentium4/core2/k8/bonnell/generic is not much better,
+given that in practice nobody has any of the
+pentium4/core2/k8/bonnell variants any more.
+
+A more radical solution would be to just drop the entire
+menu for 64-bit kernels and always default to "-march=3Dx86_64
+-mtune=3Dgeneric" and 64 byte L1 cachelines.
+
+      Arnd
 
