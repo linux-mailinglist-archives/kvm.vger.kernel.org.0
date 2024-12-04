@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-33062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33064-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE6D9E4372
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:31:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214A19E4395
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:42:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352CD166458
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:31:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5B18280FE6
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 18:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AD21A8F8D;
-	Wed,  4 Dec 2024 18:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBE21A8F90;
+	Wed,  4 Dec 2024 18:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4p+d1v2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edj+LNbg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0402391AC;
-	Wed,  4 Dec 2024 18:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0741A8F78;
+	Wed,  4 Dec 2024 18:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733337102; cv=none; b=IYUi73r7UykvVmBVwepjqt/p03gPtEr3AAUhvOp0Pz3Le+sYhdGdezzBEsUUPd9s7DNvIyQiq+9W/pVJLBveGWROB9nZboPtYfJOFXTiXTHQt9jw3m/3buZXilR8Qncf6V9rg0Qb2VuKRUozblLGj/kjkqCTEON7NvtDaurRiQ4=
+	t=1733337737; cv=none; b=l967cujsmyCwCg3rto+RLFPzvgai69UmapZ1YcMlHbgU29X+oaep0mgk0oIMDe2hGkfhCHQR4c1y4pQ5+QKw0ZvKpeNKSVUHLHjbu7Scyt6Lky/KCeUIxs3adLa9uHHPl4xej8TfAR7/nQ/ApxrEwV8FPaNAfd6hNkFL2CVd3hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733337102; c=relaxed/simple;
-	bh=MSqRuGMFM0xx57KHFYJ68dNlGmd8TmNYplr3P5UZQFg=;
+	s=arc-20240116; t=1733337737; c=relaxed/simple;
+	bh=wiRmPcDPfl447CPd2d06m48S9Tj33PHLmHZm/NeD6WE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F/Jwhsi0ggj8YbEvn2fNlRnRhZTc6VWwM0HludK9gFlxbkNhxsOsT7tjiZPTF5lgtpv0ToEG02+VHEdXV//NRMaTAB/zWGEgAKEPv6rCDsX1/svXj6pzO0BHzFETvIbIEiJ075zgNoVEgaT2w5O03ejnBESy48GHMggnSU/dA88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E4p+d1v2; arc=none smtp.client-ip=209.85.218.50
+	 To:Cc:Content-Type; b=PSnZZjbR0HhvoGT0A7ol0tKzgw8mchtRm+L0gAytr235TOi8kJntkxvQm3Q1e4ntsFEn7vXVzciOHHrxACI2u7LFM571sfLxQ9HgVQuQkITiu4KtsJmFk65LrGCO3bXL4FXK2wNJ/GG76KxRe+3UDdcid7htjgSNswWOAE6w1xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=edj+LNbg; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa549d9dffdso1496266b.2;
-        Wed, 04 Dec 2024 10:31:40 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa53ebdf3caso4403866b.2;
+        Wed, 04 Dec 2024 10:42:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733337099; x=1733941899; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733337733; x=1733942533; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hGj4lyZABGpbptmi5AYYQfdcsOzBKvF8wyh41stUwec=;
-        b=E4p+d1v2KmYdBZN80Lmjq8v2hJsdEBs/85ovD9wZ6LaBktO/4RCR+B8mLCiEoEzjQ9
-         nZRHopJjoRiy6WxfgqgxXkjsvYfFnFEGgQLnBdeT/1n5bjyn0JPKN7x7bp0+XXHaDO6l
-         +TXeFI6GLSvBJhyJswqwPkxxG8UINhNZbZqHu2i0T3ZEE+pIHLh0Bo6ba9tiOwnj7y+B
-         mh+WGe9nvOAuebGiNPri8J0FrmrBjG0OypUzz16oIZzlEeN/cqw/Gmj67CT+CHjYSP+k
-         PDMx60o1FwrFpdue5XDYucrc3m3jOsPa6PyJXvbfUaAt/QSbl2h9KlCwk5MotWXK++oa
-         zuCA==
+        bh=M3C6QThKHzGlWczzeqqYbCy3PuGqDdCeGAsd/QclkMA=;
+        b=edj+LNbgLGF4cj29aej3LPdAt+b3WD+UP+ePezi+m6Ri/jOuodxpip9/ru2gvRsqHc
+         dtfwTjbW2bfWcPMb8TK4EKtIBDKwqgC42pC4Rg4gtZe3gxcduH0LFbqXOuzn6rtjPFhc
+         FjqONeZ8ZD1vdqv27JqUzEue7SqgevFR3TdltlAqxfyPCUR1EfZAUCqJBR8O5edgv7l1
+         RcRqQC/XvZtUWGjaTyrVXHp53zT1XPoHqq0iID43pmZ10Dcv8D+nPCgSGn6ybKOY7DKy
+         oB3KsGwHs+CiuoxBZsydmy7dDNZmW31NCH4Fk1SITNQQ6EdOThzMqSV1EvltQV3P4hN8
+         K7CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733337099; x=1733941899;
+        d=1e100.net; s=20230601; t=1733337733; x=1733942533;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hGj4lyZABGpbptmi5AYYQfdcsOzBKvF8wyh41stUwec=;
-        b=nimWlD5JN/5Hk+epm/3gUtDslHTZsGz3LkR2qcBxZHll+M56eyi1exkxEelrG6dWVi
-         MsZ1CqbHqhZg/omLhHQ1vAeLXS2CShE8my/1vozd7ZcZ5d9UVzm72bcPK95Qj8nPowVq
-         8UL6Bvd9oplCPD4PdUpd2tvO8Qf33s5GNnYYBzw18He4BHA5+OjDEKHLpjcdkrNZGG7e
-         JgKsg6OgfjnU3oUFky03klC/tp5pupAKjiXdQC/Z1eeDYo9MQtUa73r3F6yzmWJILRjJ
-         BySLJSIdYwQrHp97rHwkfd+VprNTV1L6feAGAKZsHOZ33nJCcLbfdiyyQJw6ciEuNu5v
-         R85g==
-X-Forwarded-Encrypted: i=1; AJvYcCXabWrVBbsRBij4JR7k9u09JyNg3N0M+69yz0LOXEeKty8fMgGPfQWb0exthPwzpRGKmLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg6Tq2/d8pXiuYb8zueDM1oR2NOU/kEWTpKYLPYr+23TarIV3m
-	XTTGedZJBfwlptril0O+Z/O3/UzaqPsMh3zk8K1vZleUPwQ1eDzzm29wmQ2gUm178FB1jsG/mDR
-	/HhkPXfLY2JDl5ISeQJVsZaT3SqM=
-X-Gm-Gg: ASbGncsVvbPcj3YdfNErZMy20RO0uV2iQbXBDI8KiBF8VvIfCo4OxUScbIHbZmu4xPG
-	HL4FoAvtVGCbY3F51kxXusMZXK/RLi08=
-X-Google-Smtp-Source: AGHT+IEQeTwmSEzTutR+k2GVtxkmUbI/HF+bbX8DVpLUnXNi6dPM8GqKxdV7NVtvWSsuycrv/pdD9CCfPctxpEJV/28=
-X-Received: by 2002:a17:906:3150:b0:aa4:8186:4e93 with SMTP id
- a640c23a62f3a-aa5f7cabf86mr651766666b.1.1733337098594; Wed, 04 Dec 2024
- 10:31:38 -0800 (PST)
+        bh=M3C6QThKHzGlWczzeqqYbCy3PuGqDdCeGAsd/QclkMA=;
+        b=D2kH0+vl/q42xmc3r0Fh5AlK7sidZZGy6ig5I5EJSM28NmpDIeVprT4nU7Nz+AfYNm
+         BlI4T/keehGgfVRN+dXtD0pXEU0jWI1UbNNNDc2/XJ5WHS65C8spFh9gSbEG78yUi8uW
+         MNmoMeiMXjNOFIp6Vog+FMpDzhxOC5bFkQOzQ0xo6RVje5MUPviHwQuXeS+5eFlOJJqZ
+         hTFwlnGHLb8IkXWeQRIxubLR2i8x+9KBsuCgjdlUYXNhIdtNMrM7gpX/8T4JBo8IvC7u
+         siFMeS8qpwGgUw3TcnoLbgQMQ8rEkck87soMjfryw6Z2IXoGJ5ET4BVXPr92WvfZb2Im
+         U4pg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwwduEXoA+8/LFHM7lV79uaW7++sRo7jkbATdT4pyY7jXqQSGEZ094cZrBFhjwHh8HzI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2r/oEH4ZCnh4IRiR43TNYax4a32+jvrfRnTNU1NszxfDDebPu
+	fVACUvz2Pbqa6ltPF3NSLGoXZTpgV4b6dJgtqrm3ZcC3ipLQYX1lauwyQyyTv/0wudlD1ZfOHc2
+	S4sVOL71fRqH87ePnSRto6PBNFb0=
+X-Gm-Gg: ASbGnctIP8xNzoh1q8QldGFG7kjyIGKOY+aTbSp+Br2cgzF/4hEA1bSyAcQEVyfXC9h
+	KJqXG9K9RjYqn/j0EXcn12mcLSE+Na4E=
+X-Google-Smtp-Source: AGHT+IEa7Gtl4pp7owEvUuHPLflJ+zvC65UMe54y6Ui0RggEQA4RoD4lnAJki0FHTdD9fRU+FHBJ0o7jW75EaSmav7g=
+X-Received: by 2002:a17:906:30ca:b0:aa6:1e9a:e46a with SMTP id
+ a640c23a62f3a-aa61e9ae53emr80364766b.57.1733337733169; Wed, 04 Dec 2024
+ 10:42:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-5-arnd@kernel.org>
-In-Reply-To: <20241204103042.1904639-5-arnd@kernel.org>
+References: <20241204103042.1904639-1-arnd@kernel.org> <20241204103042.1904639-7-arnd@kernel.org>
+In-Reply-To: <20241204103042.1904639-7-arnd@kernel.org>
 From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 4 Dec 2024 20:31:01 +0200
-Message-ID: <CAHp75VcYojM8uYURbaNjquod7n_EJe58Er-57Dw0iaZFc-+i8Q@mail.gmail.com>
-Subject: Re: [PATCH 04/11] x86: split CPU selection into 32-bit and 64-bit
+Date: Wed, 4 Dec 2024 20:41:36 +0200
+Message-ID: <CAHp75VcQcDD3gbfc6UzH3wYgge6EqSBEyWWOQ_dTkz8Eo+XgFw@mail.gmail.com>
+Subject: Re: [PATCH 06/11] x86: drop SWIOTLB and PHYS_ADDR_T_64BIT for PAE
 To: Arnd Bergmann <arnd@kernel.org>
 Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
 	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
@@ -95,49 +95,26 @@ te:
 >
 > From: Arnd Bergmann <arnd@arndb.de>
 >
-> The x86 CPU selection menu is confusing for a number of reasons.
-> One of them is how it's possible to build a 32-bit kernel for
-> a small number of early 64-bit microarchitectures (K8, Core2)
+> Since kernels with and without CONFIG_X86_PAE are now limited
+> to the low 4GB of physical address space, there is no need to
+> use either swiotlb or 64-bit phys_addr_t any more, so stop
+> selecting these and fix up the build warnings from that.
 
-Core 2
+...
 
-It spells with a space starting with a capital letter, some issues of
-the spelling below as well.
+>         mtrr_type_lookup(addr, addr + PMD_SIZE, &uniform);
+>         if (!uniform) {
+>                 pr_warn_once("%s: Cannot satisfy [mem %#010llx-%#010llx] =
+with a huge-page mapping due to MTRR override.\n",
+> -                            __func__, addr, addr + PMD_SIZE);
+> +                            __func__, (u64)addr, (u64)addr + PMD_SIZE);
 
-> but not the regular generic 64-bit target that is the normal
-> default.
->
-> There is no longer a reason to run 32-bit kernels on production
-> 64-bit systems, so simplify the configuration menu by completely
-> splitting the two into 32-bit-only and 64-bit-only machines.
->
-> Testing generic 32-bit kernels on 64-bit hardware remains
-> possible, just not building a 32-bit kernel that requires
-> a 64-bit CPU.
+Instead of castings I would rather:
+1) have addr and size (? does above have off-by-one error?) or end;
+2) use struct resource / range with the respective %p[Rr][a] specifier
+or use %pa.
 
-> +choice
-> +       prompt "x86-64 Processor family"
-> +       depends on X86_64
-> +       default GENERIC_CPU
-> +       help
-> +         This is the processor type of your CPU. This information is
-> +         used for optimizing purposes. In order to compile a kernel
-> +         that can run on all supported x86 CPU types (albeit not
-> +         optimally fast), you can specify "Generic-x86-64" here.
-> +
-> +         Here are the settings recommended for greatest speed:
-> +         - "Opteron/Athlon64/Hammer/K8" for all K8 and newer AMD CPUs.
-> +         - "Intel P4" for the Pentium 4/Netburst microarchitecture.
-> +         - "Core 2/newer Xeon" for all core2 and newer Intel CPUs.
 
-Core 2
-
-> +         - "Intel Atom" for the Atom-microarchitecture CPUs.
-> +         - "Generic-x86-64" for a kernel which runs on any x86-64 CPU.
-> +
-> +         See each option's help text for additional details. If you don'=
-t know
-> +         what to do, choose "Generic-x86-64".
 
 --=20
 With Best Regards,
