@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-33082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BCDB9E44B1
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:35:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8729E44B4
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 20:35:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB001655EC
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:35:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85CF282442
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 19:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB751C3C13;
-	Wed,  4 Dec 2024 19:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D7D1C3C11;
+	Wed,  4 Dec 2024 19:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+KGEU9d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtR1wlfn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7480E13D246
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 19:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC2B1A8F7A
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 19:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733340913; cv=none; b=W0oHvl/0ZX7kgB3iidcUgTf2K7npx7zbjoQ8gBZqB3AVxNVBRVAeChKtP/nDKVDrRhZuwOnIsrxeNT//xt/sYJSQFJtfE8OyuJys4+swnzG0ZA94j3ij+07p9O1gXZ2z2GKi9o6R5bXBgq24ncLJce6POdl4bVIEEMLz6JG4oX8=
+	t=1733340950; cv=none; b=gcL2UeGzcCgAR6puKvZn8ZS1H/gQHrdNJQegfQ6S61o5fS8pQ909nLQ/ujgMTnKErxG4uWizxEG/ksBcablhUq2Sek6k0NKkpZPiJIfmxpgsHJpcjiTf+DuY5I0sLyg44y/RfwVDOu34FzX6xWrtuOIVsZc2774hPdiPVlnEJF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733340913; c=relaxed/simple;
-	bh=yYiyOsqejGt8o4LHv7obH56BDK/q1UVsYKBJuyJwOAI=;
+	s=arc-20240116; t=1733340950; c=relaxed/simple;
+	bh=swx7dw9Mi4sPZEn3BSfdhnirjOSTeS9fYV9smYEUpj8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PGzB12wzSG9u0ceyU6usrYsUD4vY++IzH7Cn+Hcgp1vjozFDjw7Q6s+bYn85V/zIWZezpuYKWfksUpijUl88RzLNlI9AVVY/96oAoH2TJZct6ez9mNBJmAUpTjtAkBLRMlsiy05dFmN//pRGr+P/0M646hXug3Ef9zhmPsLVabQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+KGEU9d; arc=none smtp.client-ip=209.85.218.41
+	 In-Reply-To:Content-Type; b=VxeQSJ45RdF/cQ7NX37zs20AWw9ODmYo4smrbSDGGvOB1C5G7RCxhHQd9XCViuZG7ev4nTfSfZerIHhqZn/u0zAvBcvYs8mYAsaaQE4iO20wPn/0Z6LyJKdkKaiWg+2ZfBjHCItdd5RcHxfSDTkW8q3XF0Lk603GKH+VsIMG/uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtR1wlfn; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aa5325af6a0so10436266b.2
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 11:35:11 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa54adcb894so14164666b.0
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 11:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733340910; x=1733945710; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733340947; x=1733945747; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=M9AOdFldgYAIjGRurHNc/sx0kO7rIlxuapvHn9CwJA0=;
-        b=Q+KGEU9dnCHeW4jCeknevXDBrqgxN+mqcrE2NHoaH41+HT0Iu5OYooqx6h+RQXZVDM
-         KvlgFr9rklzM+CYmNN8S5pqrIGyqD0sgWuQ/40ts13AVCmIF+EQhr20hMY+37/5rryJT
-         3lnMUWqqCkb28RlT0yO9Wuxng5qo72sXzWD7HErrQ/FCNJNqgLv299fmLeFszaF6cuVV
-         BFfIW/tZc8pEmvrfN+PBKF85SldrIzgMhBUlqfoCTtvo/7sF1/fE4GwqrnU/0RTN87AE
-         x1UEZz5QQQp4ca5y88zpZByUuoydxyGEqy+pesyqtzOWbKzoRI63Qk+BCbgYPhElVkPZ
-         gBIw==
+        bh=ZUM51Cc3FSIP4NdjPUlJXI3Yx92uiqjw21kn8V2Mqh4=;
+        b=EtR1wlfn+ycWKPzIDzgvl9/Xmx20IN4TsSPn9mKgUUD5K+xwuMPftMa262EE07TrFL
+         V25Jd04/h2vn3X0KUorGHS5CaPEENPa+icV1nfkpAxJd7UKV2l6IdEP4DW7KdidLAkrS
+         f43QrhlNUIpgRhtzkleYXtSGW9ovH0uhYLQdp+ZxTuPibztGvsn5RatwBsGQscU5ZNsI
+         E/lmUEDgR7p0yYIEheJX6fdwv64NEk6fPJXE9vceFstz2Vjub6aaugpAdGzceiT8LfdG
+         rtwRwBfmVUQkwjGfappr6EEHVmiCbvlQXSdxCK6k4V7+TXghlSvRBzGGeADNke5FUimo
+         2ZVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733340910; x=1733945710;
+        d=1e100.net; s=20230601; t=1733340947; x=1733945747;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M9AOdFldgYAIjGRurHNc/sx0kO7rIlxuapvHn9CwJA0=;
-        b=FlU2swghJi5ys7w/7+9/AYagb6tPbqlT1QfAl9f3GvXAb5Sr2Z4QSDfI4cIrCU1rIQ
-         Lg2UrgogbG6LvEA+cH/oG0oqOik9/GPihO/BVurZFowpjU690HycC5WXX7LJ7Xw3hvTD
-         X/pH8PPZXcG8phJkY80hXvMBeieZSE8bb9+nesK+0Oe1yq+2Hn6LhWILJQ5vIquqstuJ
-         2KVGZkuemPG5hERCmKQ8fSK2ZSph0W7DGeQgECZpEAwMqfifQBei7Sll5pgMQ03LhPYG
-         tgaGXmk4Ts+cc1pEzjrmeMeoC1J3ziSiSILkplTXqx99NEBAt6d+Dy4CwpPPeZ5pxnQ5
-         z1Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMiWLd+9/68KsTglfqAFlzW6hjxOZL+TQlsLlwYXKisPaQP2Z4kuXhtlfvwBINvuSovBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNwzkObw0taRklgexV50zNjXv8FLdxoAAVNT3HipLz9cZWbfs8
-	jd4g9vX2FkBEgASqi7gJL7AjGTPriju5rpI2XLHkDkvHa2t8Zaes
-X-Gm-Gg: ASbGnctpo/+/+dbrOPWLqLHQHhBFw4GWHqEUZT9rsSioexvLY7bSXjnD5MHIsPuXivz
-	WG0iki6ChMiyy3pu8Qq1/P0/GYK3LdA+e3m4DJSlsfOXJ4k1vedS1/rVftmPXyvjMdnqLdwwht1
-	M2L14r3N2VYifiZm8ihN/7IqdInAvmsfS+dJ21f4TgpEtwYXFw2g2mtTBliwlRZxkscIf+4joZO
-	rjzekclKk2+J7br4SrDBDpMeX0m6DxqP9cTLwnOKv1wZYfEEQYNqDcJaheMNrDHynO7T8V3wsaC
-	yhf+FiZc7SaFiJ3EdwyGN4dXfX8AbYLJozzsozaXN1YTeAykwEkyldsBzUJM0PkJf9iIlW7+1ZF
-	uxPzfjT2aKnKyqvIGYbB/Wk2mDbgNnC7siirGQWk=
-X-Google-Smtp-Source: AGHT+IEi7nq0vZmxSepp57BPIk2OvRSnv8PwuTygCTSjouZ0iDmgoQFbvOZtDB9VDLnshr3oSLeUjw==
-X-Received: by 2002:a17:907:da6:b0:aa4:a3be:28dd with SMTP id a640c23a62f3a-aa5f7f2ac81mr814271066b.55.1733340909608;
-        Wed, 04 Dec 2024 11:35:09 -0800 (PST)
+        bh=ZUM51Cc3FSIP4NdjPUlJXI3Yx92uiqjw21kn8V2Mqh4=;
+        b=V9pEy8Fp1BrPa/KspNxcAJd+vXWDDv0btSnCEvXyL/v0ZiTf61Q88sG5Wask/PoBDq
+         oWwIYn3cKidJM3ACR/QfD1LPvhERJaQ2ttnEBGrq/f6FltN9JHv24HchAjlIrmK/HjOo
+         UHCxTtLUAhwAdrmJUhH+ThrbZCzBbI7ndfLpAe8n/RGXp0StJSsqg1AhRbP7v0qSTMU8
+         SFZoOZJ0V+MVD2WgSECLOfOkAQmarDV4L7km+g7f/onUJCHZHohRTJMXcw8GA7w3XOkj
+         NHck+EWOx3yUCz3Y7AJfURqydxhbkikm5bBy46UbDcXMR+P7pgBB119t1V5C5DtnJOsJ
+         PD3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXee5EWttbhw8YbehsM+BjUtLmV+8p6wA6C1rCqUtRYWcGpD/gbCEyYcRw4FpiJm1KT6e8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ2OJKQDF9j2cLT1+k8Q/mHu20JYsSZeh0kUz4IxU2N8mv9cBh
+	sZ8lP8FtJxEcnQngL7qCpkjRncCuoEnCljHOcVHCBZQ7PBMBAIsG
+X-Gm-Gg: ASbGnct+Drhi/4RfBVbzG/HPCgPHGccMVIQpcwlNgA2Y7BA33qjXmfmo0YtVLbt7zeE
+	ocM6qbRiJKDl04kqP8sw1xD5NOgyNbEbsyQxpjYU3mtP41QclV3/dQNLvR0Tig03Yx2vkh+AqRY
+	ky4dTaBKLuPZoKoHkl1xn+E2w+A99DwB+LjIq8jFaXrOHbnjCS1leAZNc9jVzyroj5W/5kuq+nv
+	wxt5KEuZLJ6hy+907RtAR8/7Pxp+hYb9KNU8Sly9nATiuhIUmLJMsEnvTMGzRaIEQcdsn/hWPm+
+	JpzTT5cAAH6NWoknvpLvHVpj2MiZP9PTg/f1juhUtC33XlWiDCbjExPgcYgP6Xi9+lRsyXXzm4L
+	djBzCkQxu0OAyrkPy8x+4qK2j1bl7A6L7oLcEY9U=
+X-Google-Smtp-Source: AGHT+IFzUppY5Qa7teyXqXIsMauNf3KGtk82FRzyr69W51ki2M4g5RaEjykYPGX7jwvJX4egtKSktQ==
+X-Received: by 2002:a17:906:314d:b0:aa5:1cde:fef5 with SMTP id a640c23a62f3a-aa5f7cce579mr633215066b.6.1733340946697;
+        Wed, 04 Dec 2024 11:35:46 -0800 (PST)
 Received: from ?IPV6:2a02:3100:b3a6:dc00:4df6:7a00:cfe0:a99? (dynamic-2a02-3100-b3a6-dc00-4df6-7a00-cfe0-0a99.310.pool.telefonica.de. [2a02:3100:b3a6:dc00:4df6:7a00:cfe0:a99])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5999058fbsm763085166b.143.2024.12.04.11.35.08
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5998e64f2sm765567166b.115.2024.12.04.11.35.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 11:35:09 -0800 (PST)
-Message-ID: <45340112-3184-4be1-89a5-522e932c751e@gmail.com>
-Date: Wed, 4 Dec 2024 20:35:07 +0100
+        Wed, 04 Dec 2024 11:35:45 -0800 (PST)
+Message-ID: <b36a81b3-c7fa-4fcd-9b97-b41c42daf06b@gmail.com>
+Date: Wed, 4 Dec 2024 20:35:44 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,16 +83,16 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] vfio/mdev: inline needed class_compat functionality
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Kirti Wankhede <kwankhede@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] driver core: class: add class_pseudo_register
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
 References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
- <0a14a4df-fbb5-4613-837f-f8025dc73380@gmail.com>
- <2024120430-boneless-wafer-bf0c@gregkh>
- <fb0fc57d-955f-404e-a222-e3864cce2b14@gmail.com>
- <2024120410-promoter-blandness-efa1@gregkh>
+ <b8122113-5863-4057-81b5-73f86c9fde4d@gmail.com>
+ <2024120435-deserving-elf-c1e1@gregkh>
+ <169a836b-2cab-40a1-8c92-4ee4c979dd3b@gmail.com>
+ <2024120407-partake-pounce-67be@gregkh>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -138,113 +138,60 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <2024120410-promoter-blandness-efa1@gregkh>
+In-Reply-To: <2024120407-partake-pounce-67be@gregkh>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04.12.2024 19:16, Greg Kroah-Hartman wrote:
-> On Wed, Dec 04, 2024 at 06:01:36PM +0100, Heiner Kallweit wrote:
->> On 04.12.2024 10:32, Greg Kroah-Hartman wrote:
->>> On Tue, Dec 03, 2024 at 09:11:47PM +0100, Heiner Kallweit wrote:
->>>> vfio/mdev is the last user of class_compat, and it doesn't use it for
->>>> the intended purpose. See kdoc of class_compat_register():
->>>> Compatibility class are meant as a temporary user-space compatibility
->>>> workaround when converting a family of class devices to a bus devices.
->>>
->>> True, so waht is mdev doing here?
->>>
->>>> In addition it uses only a part of the class_compat functionality.
->>>> So inline the needed functionality, and afterwards all class_compat
->>>> code can be removed.
->>>>
->>>> No functional change intended. Compile-tested only.
+On 04.12.2024 19:17, Greg Kroah-Hartman wrote:
+> On Wed, Dec 04, 2024 at 06:04:32PM +0100, Heiner Kallweit wrote:
+>> On 04.12.2024 10:33, Greg Kroah-Hartman wrote:
+>>> On Tue, Dec 03, 2024 at 09:10:05PM +0100, Heiner Kallweit wrote:
+>>>> In preparation of removing class_compat support, add a helper for
+>>>> creating a pseudo class in sysfs. This way we can keep class_kset
+>>>> private to driver core. This helper will be used by vfio/mdev,
+>>>> replacing the call to class_compat_create().
 >>>>
 >>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 >>>> ---
->>>>  drivers/vfio/mdev/mdev_core.c | 12 ++++++------
->>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>>  drivers/base/class.c         | 14 ++++++++++++++
+>>>>  include/linux/device/class.h |  1 +
+>>>>  2 files changed, 15 insertions(+)
 >>>>
->>>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
->>>> index ed4737de4..a22c49804 100644
->>>> --- a/drivers/vfio/mdev/mdev_core.c
->>>> +++ b/drivers/vfio/mdev/mdev_core.c
->>>> @@ -18,7 +18,7 @@
->>>>  #define DRIVER_AUTHOR		"NVIDIA Corporation"
->>>>  #define DRIVER_DESC		"Mediated device Core Driver"
+>>>> diff --git a/drivers/base/class.c b/drivers/base/class.c
+>>>> index 582b5a02a..f812236e2 100644
+>>>> --- a/drivers/base/class.c
+>>>> +++ b/drivers/base/class.c
+>>>> @@ -578,6 +578,20 @@ struct class_compat *class_compat_register(const char *name)
+>>>>  }
+>>>>  EXPORT_SYMBOL_GPL(class_compat_register);
 >>>>  
->>>> -static struct class_compat *mdev_bus_compat_class;
->>>> +static struct kobject *mdev_bus_kobj;
+>>>> +/**
+>>>> + * class_pseudo_register - create a pseudo class entry in sysfs
+>>>> + * @name: the name of the child
+>>>> + *
+>>>> + * Helper for creating a pseudo class in sysfs, keeps class_kset private
+>>>> + *
+>>>> + * Returns: the created kobject
+>>>> + */
+>>>> +struct kobject *class_pseudo_register(const char *name)
+>>>> +{
+>>>> +	return kobject_create_and_add(name, &class_kset->kobj);
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(class_pseudo_register);
 >>>
->>>
->>>
->>>>  
->>>>  static LIST_HEAD(mdev_list);
->>>>  static DEFINE_MUTEX(mdev_list_lock);
->>>> @@ -76,7 +76,7 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
->>>>  	if (ret)
->>>>  		return ret;
->>>>  
->>>> -	ret = class_compat_create_link(mdev_bus_compat_class, dev, NULL);
->>>> +	ret = sysfs_create_link(mdev_bus_kobj, &dev->kobj, dev_name(dev));
->>>
->>> This feels really wrong, why create a link to a random kobject?  Who is
->>> using this kobject link?
->>>
->>>>  	if (ret)
->>>>  		dev_warn(dev, "Failed to create compatibility class link\n");
->>>>  
->>>> @@ -98,7 +98,7 @@ void mdev_unregister_parent(struct mdev_parent *parent)
->>>>  	dev_info(parent->dev, "MDEV: Unregistering\n");
->>>>  
->>>>  	down_write(&parent->unreg_sem);
->>>> -	class_compat_remove_link(mdev_bus_compat_class, parent->dev, NULL);
->>>> +	sysfs_remove_link(mdev_bus_kobj, dev_name(parent->dev));
->>>>  	device_for_each_child(parent->dev, NULL, mdev_device_remove_cb);
->>>>  	parent_remove_sysfs_files(parent);
->>>>  	up_write(&parent->unreg_sem);
->>>> @@ -251,8 +251,8 @@ static int __init mdev_init(void)
->>>>  	if (ret)
->>>>  		return ret;
->>>>  
->>>> -	mdev_bus_compat_class = class_compat_register("mdev_bus");
->>>> -	if (!mdev_bus_compat_class) {
->>>> +	mdev_bus_kobj = class_pseudo_register("mdev_bus");
->>>
->>> But this isn't a class, so let's not fake it please.  Let's fix this
->>> properly, odds are all of this code can just be removed entirely, right?
+>>> I see the goal here, but let's not continue on and create fake kobjects
+>>> in places where there should NOT be any kobjects.  Also, you might get
+>>> in trouble when removing this kobject as it thinks it is a 'struct
+>>> class' but yet it isn't, right?  Did you test that?
 >>>
 >>
->> After I removed class_compat from i2c core, I asked Alex basically the
->> same thing: whether class_compat support can be removed from vfio/mdev too.
->>
->> His reply:
->> I'm afraid we have active userspace tools dependent on
->> /sys/class/mdev_bus currently, libvirt for one.  We link mdev parent
->> devices here and I believe it's the only way for userspace to find
->> those parent devices registered for creating mdev devices.  If there's a
->> desire to remove class_compat, we might need to add some mdev
->> infrastructure to register the class ourselves to maintain the parent
->> links.
->>
->>
->> It's my understanding that /sys/class/mdev_bus has nothing in common
->> with an actual class, it's just a container for devices which at least
->> partially belong to other classes. And there's user space tools depending
->> on this structure.
+>> It's removed using kobject_put(), same as what class_compat_unregister() does.
+>> I only compile-tested the changes.
 > 
-> That's odd, when this was added, why was it added this way?  The
-> class_compat stuff is for when classes move around, yet this was always
-> done in this way?
+> I would not be able to take these unless someone actually runs them as
+> the kobject removal here might be getting confused a bit.
 > 
-I can only answer the when: in 2016, with the initial version of vfio/mdev
-Kirti is the author, maybe she can provide some background.
-
-> And what tools use this symlink today that can't be updated?
->
-According to Alex: libvirt, not clear whether there are more users of the
-                   current sysfs structure
-I'm just the messenger here and can't comment on whether/how/who updating
-user space.
+Understood. Maybe Alex/Kirti can test.
 
 > thanks,
 > 
