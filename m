@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-33003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F399E3797
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 11:35:44 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6AE9E379B
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 11:36:02 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96EA52810A0
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 10:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25229164F2F
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 10:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF331F6663;
-	Wed,  4 Dec 2024 10:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874F81F7074;
+	Wed,  4 Dec 2024 10:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SUi7Ft3i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JfAJYF95"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509D11B0F31;
-	Wed,  4 Dec 2024 10:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AA71B0F31;
+	Wed,  4 Dec 2024 10:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733308292; cv=none; b=W6y/Jt4qL4nVePqc1dUs8reTvfFf26Ww69vJ9+CfJMwGCwnXuT9rIdHALNacM9Kr3CRP8L5ish8F1429wVLRWhXU4kbYixTctIwz1Nckt+J64Mp0nmv7OkDystn5QKkmtsLJKmyzI1/D7AYVeLWrtOtmRmu4zMb9Sjzry9HWkFo=
+	t=1733308296; cv=none; b=QZlS+SdDPy6KcWvUR0AVgVOYum+bN1BtuLozn/Z55LFSU97i7MfSuixtijEq4u2ivOVoG/VD2WMNzDjTgHXJbMtk+W9RVI1mHKwpaFwPHMxQ/2hSpnRq8uYUQ5eHWmy6GgyHRf9e1c79Zw9m/IWKz2aqusm96ybGUkUYugidYmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733308292; c=relaxed/simple;
-	bh=zBl88AZDOvJENYaWyugbt/HQ/28DClmezJYLU2g+1JU=;
+	s=arc-20240116; t=1733308296; c=relaxed/simple;
+	bh=iGckYWv5WGX83KeO9Ck2fdKR0Uj22ymCh4eHvYJ7bb4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OPkUjAjdEHp08qZVVEtMoKJy0U/3tTTj9KkY0KuFlGQDdky14O1QaK33jB6bvlabvTmAWHGCOnAsV+EtHYycxFygo77KJ2JSP5ZyDxW4Utkq4DCemAnv7Shz+KbvRTITqsdZhp2PjaWdU368qaNUBhSQF2X8SJR7DQBqQO7UR8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SUi7Ft3i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC105C4CEE0;
-	Wed,  4 Dec 2024 10:31:28 +0000 (UTC)
+	 MIME-Version; b=IBnnG0sTxFijSht2dPINYxOUSawFsSLMX1Ur3BGWUC9gNOyhF2PAPHq5cEDAnWTAgOwFOIcIS6psSIZ8nSYLHL9InZUxYWwHqfIM5GGZZR/pOWYQkWqIDHphGDFGrclPZ+NsBczRPTT7W8sta6DhuNGTQDKjqsbyYdEanAc0qhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JfAJYF95; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBC1C4CED1;
+	Wed,  4 Dec 2024 10:31:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733308291;
-	bh=zBl88AZDOvJENYaWyugbt/HQ/28DClmezJYLU2g+1JU=;
+	s=k20201202; t=1733308295;
+	bh=iGckYWv5WGX83KeO9Ck2fdKR0Uj22ymCh4eHvYJ7bb4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SUi7Ft3iFb+rKlDZ/4jUGmf/9vVnk08ef8Z0doL58zvUwdmTx2KLhNOYTeOyRIjch
-	 OjCHTrKoQeXkuhZrQ2G+tDhQ0UjqVjV2uBSXEF1pTmfUMRoOpA9ACUHYDHmL8WeEqC
-	 zJCxixXEu+ES8N+aQXdDqUdBn/xfSNicIjOoC6OhwhWOJ6hpOtHgv1sauw/NNEIZ+W
-	 k8HBxpnE1wAn/lbM3vbwrGYZ1tJ0SfMnaOslFaO027UT6EptFLA0QyV9ZhuXz3wE0H
-	 MD1ydXfmLyeU7id+F3idmyS6NIdM/8OabxEvoCsq60bz5EzzBD99aT6eHi69Zx6uck
-	 tt04hTEcpTr/Q==
+	b=JfAJYF952HGq9vwXIGeoQg8YkWVGSm9zVJVLaVHrAD/hOjIaXrfZAMVRKKHFS2cMm
+	 a+u4jnLDEfLKQbRMnCRk54jwPs0GVzjdYKL2CyMTkQN8rM3fWs2rMeE72FeAGKFRHG
+	 CNV9Ig9rweHY9LmTlRkOcVhTvmxyr2G2hbvNazwzitEmbKKuTpiEiyNc4JMaxZzI9J
+	 FVu0P8DiVIN+3dLoxWaUtXXCwGqFC1QdIQJ8WivPajpjn5Gjxk3rAeDP8P7ky1yUiE
+	 WQeTnpRLO06EPAhmBkIyQfCm7ty+wKvkaLtOcz/Ga13eMrUT4k2B4mPwDiNpuFDRDT
+	 N+IPAAPX8d0hw==
 From: Arnd Bergmann <arnd@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org
@@ -57,9 +57,9 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	Davide Ciminaghi <ciminaghi@gnudd.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [PATCH 08/11] x86: document X86_INTEL_MID as 64-bit-only
-Date: Wed,  4 Dec 2024 11:30:39 +0100
-Message-Id: <20241204103042.1904639-9-arnd@kernel.org>
+Subject: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Date: Wed,  4 Dec 2024 11:30:40 +0100
+Message-Id: <20241204103042.1904639-10-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241204103042.1904639-1-arnd@kernel.org>
 References: <20241204103042.1904639-1-arnd@kernel.org>
@@ -73,88 +73,123 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The X86_INTEL_MID code was originally introduced for the
-32-bit Moorestown/Medfield/Clovertrail platform, later the 64-bit
-Merrifield/Moorefield variant got added, but the final
-Morganfield/Broxton 14nm chips were canceled before they hit
-the market.
+Building an x86-64 kernel with CONFIG_GENERIC_CPU is documented to
+run on all CPUs, but the Makefile does not actually pass an -march=
+argument, instead relying on the default that was used to configure
+the toolchain.
 
-To help users understand what the option actually refers to,
-update the help text, and make it a hard dependency on 64-bit
-kernels. While they could theoretically run a 32-bit kernel,
-the devices originally shipped with 64-bit one in 2015, so that
-was proabably never tested.
+In many cases, gcc will be configured to -march=x86-64 or -march=k8
+for maximum compatibility, but in other cases a distribution default
+may be either raised to a more recent ISA, or set to -march=native
+to build for the CPU used for compilation. This still works in the
+case of building a custom kernel for the local machine.
 
+The point where it breaks down is building a kernel for another
+machine that is older the the default target. Changing the default
+to -march=x86-64 would make it work reliable, but possibly produce
+worse code on distros that intentionally default to a newer ISA.
+
+To allow reliably building a kernel for either the oldest x86-64
+CPUs or a more recent level, add three separate options for
+v1, v2 and v3 of the architecture as defined by gcc and clang
+and make them all turn on CONFIG_GENERIC_CPU. Based on this it
+should be possible to change runtime feature detection into
+build-time detection for things like cmpxchg16b, or possibly
+gate features that are only available on older architectures.
+
+Link: https://lists.llvm.org/pipermail/llvm-dev/2020-July/143289.html
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/x86/Kconfig         | 16 ++++++++++------
- arch/x86/kernel/head32.c |  3 ---
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ arch/x86/Kconfig.cpu | 39 ++++++++++++++++++++++++++++++++++-----
+ arch/x86/Makefile    |  6 ++++++
+ 2 files changed, 40 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index d8a8bf9ea9b9..fa6dd9ec4bdf 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -544,12 +544,12 @@ config X86_EXTENDED_PLATFORM
- 		RDC R-321x SoC
- 		SGI 320/540 (Visual Workstation)
- 		STA2X11-based (e.g. Northville)
--		Moorestown MID devices
- 
- 	  64-bit platforms (CONFIG_64BIT=y):
- 		Numascale NumaChip
- 		ScaleMP vSMP
- 		SGI Ultraviolet
-+		Merrifield/Moorefield MID devices
- 
- 	  If you have one of these systems, or if you want to build a
- 	  generic distribution kernel, say Y here - otherwise say N.
-@@ -621,11 +621,11 @@ config X86_INTEL_CE
- 	  boxes and media devices.
- 
- config X86_INTEL_MID
--	bool "Intel MID platform support"
-+	bool "Intel Z34xx/Z35xx MID platform support"
- 	depends on X86_EXTENDED_PLATFORM
- 	depends on X86_PLATFORM_DEVICES
- 	depends on PCI
--	depends on X86_64 || (PCI_GOANY && X86_32)
-+	depends on X86_64
- 	depends on X86_IO_APIC
- 	select I2C
- 	select DW_APB_TIMER
-@@ -633,10 +633,14 @@ config X86_INTEL_MID
+diff --git a/arch/x86/Kconfig.cpu b/arch/x86/Kconfig.cpu
+index 139db904e564..1461a739237b 100644
+--- a/arch/x86/Kconfig.cpu
++++ b/arch/x86/Kconfig.cpu
+@@ -260,7 +260,7 @@ endchoice
+ choice
+ 	prompt "x86-64 Processor family"
+ 	depends on X86_64
+-	default GENERIC_CPU
++	default X86_64_V2
  	help
- 	  Select to build a kernel capable of supporting Intel MID (Mobile
- 	  Internet Device) platform systems which do not have the PCI legacy
--	  interfaces. If you are building for a PC class system say N here.
-+	  interfaces.
+ 	  This is the processor type of your CPU. This information is
+ 	  used for optimizing purposes. In order to compile a kernel
+@@ -314,15 +314,44 @@ config MSILVERMONT
+ 	  early Atom CPUs based on the Bonnell microarchitecture,
+ 	  such as Atom 230/330, D4xx/D5xx, D2xxx, N2xxx or Z2xxx.
+ 
+-config GENERIC_CPU
+-	bool "Generic-x86-64"
++config X86_64_V1
++	bool "Generic x86-64"
+ 	depends on X86_64
+ 	help
+-	  Generic x86-64 CPU.
+-	  Run equally well on all x86-64 CPUs.
++	  Generic x86-64-v1 CPU.
++	  Run equally well on all x86-64 CPUs, including early Pentium-4
++	  variants lacking the sahf and cmpxchg16b instructions as well
++	  as the AMD K8 and Intel Core 2 lacking popcnt.
 +
-+	  The only supported devices are the 22nm Merrified (Z34xx) and
-+	  Moorefield (Z35xx) SoC used in Android devices such as the
-+	  Asus Zenfone 2, Asus FonePad 8 and Dell Venue 7.
++config X86_64_V2
++	bool "Generic x86-64 v2"
++	depends on X86_64
++	help
++	  Generic x86-64-v2 CPU.
++	  Run equally well on all x86-64 CPUs that meet the x86-64-v2
++	  definition as well as those that only miss the optional
++	  SSE3/SSSE3/SSE4.1 portions.
++	  Examples of this include Intel Nehalem and Silvermont,
++	  AMD Bulldozer (K10) and Jaguar as well as VIA Nano that
++	  include popcnt, cmpxchg16b and sahf.
++
++config X86_64_V3
++	bool "Generic x86-64 v3"
++	depends on X86_64
++	help
++	  Generic x86-64-v3 CPU.
++	  Run equally well on all x86-64 CPUs that meet the x86-64-v3
++	  definition as well as those that only miss the optional
++	  AVX/AVX2 portions.
++	  Examples of this include the Intel Haswell and AMD Excavator
++	  microarchitectures that include the bmi1/bmi2, lzncnt, movbe
++	  and xsave instruction set extensions.
  
--	  Intel MID platforms are based on an Intel processor and chipset which
--	  consume less power than most of the x86 derivatives.
-+	  If you are building for a PC class system or non-MID tablet
-+	  SoCs like Bay Trail (Z36xx/Z37xx), say N here.
+ endchoice
  
- config X86_INTEL_QUARK
- 	bool "Intel Quark platform support"
-diff --git a/arch/x86/kernel/head32.c b/arch/x86/kernel/head32.c
-index de001b2146ab..4f69239556e4 100644
---- a/arch/x86/kernel/head32.c
-+++ b/arch/x86/kernel/head32.c
-@@ -65,9 +65,6 @@ asmlinkage __visible void __init __noreturn i386_start_kernel(void)
++config GENERIC_CPU
++	def_bool X86_64_V1 || X86_64_V2 || X86_64_V3
++
+ config X86_GENERIC
+ 	bool "Generic x86 support"
+ 	depends on X86_32
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 05887ae282f5..1fdc3fc6a54e 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -183,6 +183,9 @@ else
+         cflags-$(CONFIG_MPSC)		+= -march=nocona
+         cflags-$(CONFIG_MCORE2)		+= -march=core2
+         cflags-$(CONFIG_MSILVERMONT)	+= -march=silvermont
++        cflags-$(CONFIG_MX86_64_V1)	+= -march=x86-64
++        cflags-$(CONFIG_MX86_64_V2)	+= $(call cc-option,-march=x86-64-v2,-march=x86-64)
++        cflags-$(CONFIG_MX86_64_V3)	+= $(call cc-option,-march=x86-64-v3,-march=x86-64)
+         cflags-$(CONFIG_GENERIC_CPU)	+= -mtune=generic
+         KBUILD_CFLAGS += $(cflags-y)
  
- 	/* Call the subarch specific early setup function */
- 	switch (boot_params.hdr.hardware_subarch) {
--	case X86_SUBARCH_INTEL_MID:
--		x86_intel_mid_early_setup();
--		break;
- 	case X86_SUBARCH_CE4100:
- 		x86_ce4100_early_setup();
- 		break;
+@@ -190,6 +193,9 @@ else
+         rustflags-$(CONFIG_MPSC)	+= -Ctarget-cpu=nocona
+         rustflags-$(CONFIG_MCORE2)	+= -Ctarget-cpu=core2
+         rustflags-$(CONFIG_MSILVERMONT)	+= -Ctarget-cpu=silvermont
++        rustflags-$(CONFIG_MX86_64_V1)	+= -Ctarget-cpu=x86-64
++        rustflags-$(CONFIG_MX86_64_V2)	+= -Ctarget-cpu=x86-64-v2
++        rustflags-$(CONFIG_MX86_64_V3)	+= -Ctarget-cpu=x86-64-v3
+         rustflags-$(CONFIG_GENERIC_CPU)	+= -Ztune-cpu=generic
+         KBUILD_RUSTFLAGS += $(rustflags-y)
+ 
 -- 
 2.39.5
 
