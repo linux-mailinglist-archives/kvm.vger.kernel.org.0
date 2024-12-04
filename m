@@ -1,202 +1,137 @@
-Return-Path: <kvm+bounces-33041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C58B19E3F9F
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 17:27:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E12B9E3E87
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 16:42:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 021CEB3B00B
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 15:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB9C167D96
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 15:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DEA20C02E;
-	Wed,  4 Dec 2024 15:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6509720C47D;
+	Wed,  4 Dec 2024 15:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DDg5xCTH"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="nusfCG3X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF53187561;
-	Wed,  4 Dec 2024 15:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160AA20B816;
+	Wed,  4 Dec 2024 15:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733326409; cv=none; b=VRYdY5uuVkN8cNavJRxyDCbyrsBFqhhpiacSvbxh0onS/yYveh53Ig/TWjd1cztuVaXG5TwnqySmDIh8pqZ+pE3c81TEysqYmQMHfyyImFT2q7rMzT4V0MTrM1sqHo7BUOaJ4WT6YSSg9W0+foflUXjux/W/DVcsY5d3+DV5v6A=
+	t=1733326933; cv=none; b=MGTupTDWq29vn7th8j/oBEQ4lOpn4TgEjIWRUWoc2aCrzlovVmw2A4FDDAaysz3lsyMjoQIFlyGYwinHFwpohRjnSwv85+mj4b3+uypcF9SVfGdrX7N89oWEaEeKoT3haoRMDYmChhgZbTQ1KcDk3cUnZQbG0K6nh4nG+3X0rnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733326409; c=relaxed/simple;
-	bh=sP2tlIplVJ2QVwFXPlzFGcliFejTYrT+QehRMwauIDw=;
+	s=arc-20240116; t=1733326933; c=relaxed/simple;
+	bh=bnmAm1jUiG8QXJyizFgCwu3PvdmDTJ36Tvtsyi2/MGA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n7K9O769izCfo9h9bAXfAhpOihhCWJJQlcqJdTIdszqzJPPhq/UeeETc7Xad8bsC5egD6yfRJggehaYpuJSnRo16j+ZlGcBYpXuMQG8cEAjCa12cXWqOviOpTSD1PASgx/GNsNqV27vRh1a93taCwfazWjYMGZQO6AsTaGdAnX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DDg5xCTH; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733326408; x=1764862408;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=sP2tlIplVJ2QVwFXPlzFGcliFejTYrT+QehRMwauIDw=;
-  b=DDg5xCTHrmXvkKWuViQyfqlGgCIfJ1Zi30kSNP+uabKFt/TTznljFhWF
-   /+z5J0jIGJ2NiZoJa5PHb7D8Fa5isiy6jZSEdsBG6wzrjlSogzD0sAikr
-   ULlzh85rJAa4CVVXilUXKhZRE9/uHjaKC/Yv0dBQmb/cfkhZ5cdfwf3fz
-   8zRCK1VaRDOYic+AHYvVhRlLk6XhUj/MV98BMF+LAKUMmiewbyiRuz9oi
-   DF0FZGzdeGxOMpMoX3QkW1Z/uxTcLt2Lhlwv0mkORJFoY5cXHudwf1ANx
-   hrDfEW2VRuSKq45QCdeE2Sps9zpQW+u5iTmiH1sPBFfuFkTwJEauq39pQ
-   Q==;
-X-CSE-ConnectionGUID: h1tf6xtPSB+U4viaVaTuKw==
-X-CSE-MsgGUID: DGXqXhbWSdq2zeg+QO7vrg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="33846356"
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="33846356"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 07:33:27 -0800
-X-CSE-ConnectionGUID: yD4DljVcRza+lA1wwx98FQ==
-X-CSE-MsgGUID: BKnKBe7VQ9aym5aG7iV7Ng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="93479977"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 07:33:23 -0800
-Message-ID: <a005d50c-6ca8-4572-80ba-5207b95323fb@intel.com>
-Date: Wed, 4 Dec 2024 23:33:20 +0800
+	 In-Reply-To:Content-Type; b=grIueSs33DKRIM19/yhAyopan2NdRf9eJNIHMeJ8MVxLqSisZnmpi7rZzBfF3/W4YutFcME+oxzOaDeu2uYc83ar7PgRIhjKWaHCBI8oQSxXbvyPIUG3OXk8/0cqDF92Qg6RTAYC1tucelVSP69tr8UYzFIjOjptGi0QhkCi++A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=nusfCG3X; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4Y3M7x37nBz9sry;
+	Wed,  4 Dec 2024 16:36:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1733326605;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vEbiDca7zp0P6QUlbgj1AObVHCUUIBhvErhOW/G7qOA=;
+	b=nusfCG3XW4GE0jLvDBNVvKMcqFnRfue+dvUhLx5lcON4bL8Zokmj1mbdE6KDijuiKdDbx3
+	arJTxXvnw1TnBh21WwsBQMMzxP569K2EdmHlkTei9/4nEqPNSDNKxkWvsUAVo87wKTiHGS
+	lUrrepgxAfHxKYZ1EicD7s7vyvW1Rq1ANJljZTkaREU53O41DpxUKm9IoNfRYJCrpoCF8k
+	z0He0BtS/HxFZTSwW3rpB/yto9OlPvQNaqByGVLU0/5zdH4QYpjVEDU/E8YxGrLpz5ZtEP
+	31L/qIIumrRwcXe6cGJraVVIJ0Wgq8RnPN2pt1DARerj1v5y6RTUXwsXgdYJ/w==
+Message-ID: <6c037258-4263-426d-beb2-e6a0697be3ab@mailbox.org>
+Date: Wed, 4 Dec 2024 16:36:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
-To: Adrian Hunter <adrian.hunter@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Huang, Kai"
- <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Yang, Weijiang" <weijiang.yang@intel.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "dmatlack@google.com" <dmatlack@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "x86@kernel.org" <x86@kernel.org>
-References: <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
- <Z04Ffd7Lqxr4Wwua@google.com>
- <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
- <Z05SK2OxASuznmPq@google.com>
- <60e2ed472e03834c13a48e774dc9f006eda92bf5.camel@intel.com>
- <9beb9e92-b98c-42a2-a2d3-35c5b681ad03@intel.com> <Z0+vdVRptHNX5LPo@intel.com>
- <0e34f9d0-0927-4ac8-b1cb-ef8500b8d877@intel.com> <Z0/4wsR2WCwWfZyV@intel.com>
- <2bcd34eb-0d1f-46c0-933f-fb1d70c70a1e@intel.com> <Z1A5QWaTswaQyE3k@intel.com>
- <c9b14955-6e2f-4490-a18c-0537ffdfff30@intel.com>
+Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <c9b14955-6e2f-4490-a18c-0537ffdfff30@intel.com>
+To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
+ x86@kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Andy Shevchenko <andy@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Sean Christopherson <seanjc@google.com>,
+ Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-10-arnd@kernel.org>
+From: Tor Vic <torvic9@mailbox.org>
+In-Reply-To: <20241204103042.1904639-10-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-MBO-RS-META: 4e9m7dwkykgcxtqczw8zqyhhwrynqgzr
+X-MBO-RS-ID: 2b3f8d057a29b455e8d
 
-On 12/4/2024 7:55 PM, Adrian Hunter wrote:
-> On 4/12/24 13:13, Chao Gao wrote:
->> On Wed, Dec 04, 2024 at 08:57:23AM +0200, Adrian Hunter wrote:
->>> On 4/12/24 08:37, Chao Gao wrote:
->>>> On Wed, Dec 04, 2024 at 08:18:32AM +0200, Adrian Hunter wrote:
->>>>> On 4/12/24 03:25, Chao Gao wrote:
->>>>>>> +#define TDX_FEATURE_TSX (__feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM))
->>>>>>> +
->>>>>>> +static bool has_tsx(const struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	return entry->function == 7 && entry->index == 0 &&
->>>>>>> +	       (entry->ebx & TDX_FEATURE_TSX);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void clear_tsx(struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	entry->ebx &= ~TDX_FEATURE_TSX;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static bool has_waitpkg(const struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	return entry->function == 7 && entry->index == 0 &&
->>>>>>> +	       (entry->ecx & __feature_bit(X86_FEATURE_WAITPKG));
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void clear_waitpkg(struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	entry->ecx &= ~__feature_bit(X86_FEATURE_WAITPKG);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void tdx_clear_unsupported_cpuid(struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	if (has_tsx(entry))
->>>>>>> +		clear_tsx(entry);
->>>>>>> +
->>>>>>> +	if (has_waitpkg(entry))
->>>>>>> +		clear_waitpkg(entry);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static bool tdx_unsupported_cpuid(const struct kvm_cpuid_entry2 *entry)
->>>>>>> +{
->>>>>>> +	return has_tsx(entry) || has_waitpkg(entry);
->>>>>>> +}
->>>>>>
->>>>>> No need to check TSX/WAITPKG explicitly because setup_tdparams_cpuids() already
->>>>>> ensures that unconfigurable bits are not set by userspace.
->>>>>
->>>>> Aren't they configurable?
->>>>
->>>> They are cleared from the configurable bitmap by tdx_clear_unsupported_cpuid(),
->>>> so they are not configurable from a userspace perspective. Did I miss anything?
->>>> KVM should check user inputs against its adjusted configurable bitmap, right?
->>>
->>> Maybe I misunderstand but we rely on the TDX module to reject
->>> invalid configuration.  We don't check exactly what is configurable
->>> for the TDX Module.
->>
->> Ok, this is what I missed. I thought KVM validated user input and masked
->> out all unsupported features. sorry for this.
->>
->>>
->>> TSX and WAITPKG are not invalid for the TDX Module, but KVM
->>> must either support them by restoring their MSRs, or disallow
->>> them.  This patch disallows them for now.
->>
->> Yes. I agree. what if a new feature (supported by a future TDX module) also
->> needs KVM to restore some MSRs? current KVM will allow it to be exposed (since
->> only TSX/WAITPKG are checked); then some MSRs may get corrupted. I may think
->> this is not a good design. Current KVM should work with future TDX modules.
+
+
+On 12/4/24 11:30, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> With respect to CPUID, I gather this kind of thing has been
-> discussed, such as here:
+> Building an x86-64 kernel with CONFIG_GENERIC_CPU is documented to
+> run on all CPUs, but the Makefile does not actually pass an -march=
+> argument, instead relying on the default that was used to configure
+> the toolchain.
 > 
-> 	https://lore.kernel.org/all/ZhVsHVqaff7AKagu@google.com/
+> In many cases, gcc will be configured to -march=x86-64 or -march=k8
+> for maximum compatibility, but in other cases a distribution default
+> may be either raised to a more recent ISA, or set to -march=native
+> to build for the CPU used for compilation. This still works in the
+> case of building a custom kernel for the local machine.
 > 
-> and Rick and Xiaoyao are working on something.
+> The point where it breaks down is building a kernel for another
+> machine that is older the the default target. Changing the default
+> to -march=x86-64 would make it work reliable, but possibly produce
+> worse code on distros that intentionally default to a newer ISA.
 > 
-> In general, I would expect a new TDX Module would advertise support for
-> new features, but KVM would have to opt in to use them.
+> To allow reliably building a kernel for either the oldest x86-64
+> CPUs or a more recent level, add three separate options for
+> v1, v2 and v3 of the architecture as defined by gcc and clang
+> and make them all turn on CONFIG_GENERIC_CPU. Based on this it
+> should be possible to change runtime feature detection into
+> build-time detection for things like cmpxchg16b, or possibly
+> gate features that are only available on older architectures.
 > 
 
-There were discussion[1] on whether KVM to gatekeep the 
-configurable/supported CPUIDs for TDX. I stand by Sean that KVM needs to 
-do so.
+Hi Arnd,
 
-Regarding KVM opt in the new feature, KVM gatekeeps the CPUID bit that 
-can be set by userspace is exactly the behavior of opt-in. i.e., for a 
-given KVM, it only allows a CPUID set {S} to be configured by userspace, 
-if new TDX module supports new feature X, it needs KVM to opt-in X by 
-adding X to {S} so that X is allowed to be configured by userspace.
+Similar but not identical changes have been proposed in the past several 
+times like e.g. in 1, 2 and likely even more often.
 
-Besides, I find current interface between KVM and userspace lacks the 
-ability to tell userspace what bits are not supported by KVM. 
-KVM_TDX_CAPABILITIES.cpuid doesn't work because it represents the 
-configurable CPUIDs, not supported CPUIDs (I think we might rename it to 
-configurable_cpuid to better reflect its meaning). So userspace has to 
-hardcode that TSX and WAITPKG is not support itself.
+Your solution seems to be much cleaner, I like it.
 
-[1] https://lore.kernel.org/all/ZuM12EFbOXmpHHVQ@google.com/
+That said, on my Skylake platform, there is no difference between 
+-march=x86-64 and -march=x86-64-v3 in terms of kernel binary size or 
+performance.
+I think Boris also said that these settings make no real difference on 
+code generation.
+
+Other settings might make a small difference (numbers are from 2023):
+   -generic:       85.089.784 bytes
+   -core2:         85.139.932 bytes
+   -march=skylake: 85.017.808 bytes
+
+----
+[1] 
+https://lore.kernel.org/all/4_u6ZNYPbaK36xkLt8ApRhiRTyWp_-NExHCH_tTFO_fanDglEmcbfowmiB505heI4md2AuR9hS-VSkf4s90sXb5--AnNTOwvPaTmcgzRYSY=@proton.me/
+
+[2] 
+https://lore.kernel.org/all/20230707105601.133221-1-dimitri.ledkov@canonical.com/
+
 
 
