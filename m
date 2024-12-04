@@ -1,98 +1,136 @@
-Return-Path: <kvm+bounces-32970-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-32971-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 137C59E306D
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 01:32:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80BC9E3079
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 01:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9A5E282F31
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:32:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C314281FCA
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2024 00:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DCF4A2D;
-	Wed,  4 Dec 2024 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AD25227;
+	Wed,  4 Dec 2024 00:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SXeiRg7h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C5FGDZgo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44612623
-	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 00:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8311FA4
+	for <kvm@vger.kernel.org>; Wed,  4 Dec 2024 00:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733272345; cv=none; b=Kpa6/NdtQBU6co8c8I1uSwPaMy9jYfZGJj/YVXdboRFoM1PYQTi+6RANiVdQchK3sSPEHMK+QSin/MN60fAizEiPaejy4ChL9sryUym0BHeWxxZZSn25oAGlOqzMeEkifXFs9DjQ5g11lstT1jI1KMiDdwKz1qf/MgAIje1bx7Q=
+	t=1733273407; cv=none; b=FGgtos/4Bfnr60R8Wd2eyqWkOqmvBkQExSXuDSvMAXgnsv3GhgABMX+AohMjYyOH38H30xN+QwT2CocViP4RsJcHM8wQrOeWfkIF6DpGmhLQUhY96X1I7LItXOHF+Acia7Vm+Kqws537N+r0I7iyvOEpZNSAj2BRDQjOgZozj2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733272345; c=relaxed/simple;
-	bh=DDxKSHEx7Y5/1b2cBgBNTQdkIC0rcPSiN7X0JbUIXRs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EH+LpxNonjSsLPtyuh9oAssQ0Xt6KdBS7ZDuk01yJe3C7rG8aa2Hw8xiI/kMeiu34/Dm1mDHYU1hgbFumbkyq5OlcxaYrLaXQWsFaXZxXoOB2cPF3VQr3+nZX4vpYGRMK7kqHFzjKCNB9goWjb4Ba9og3jOK7wAtnnYFe0oqE0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SXeiRg7h; arc=none smtp.client-ip=209.85.210.74
+	s=arc-20240116; t=1733273407; c=relaxed/simple;
+	bh=KMybNKJa6HXPkJyY3evuV9cRNIrcl39P7pBoeOSIbE0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WkCBUrT+877h3Ti7y1IvNMsboZ/mCBPiea0aMYpXGSbxMBFbpuLbHKlsbZor3PbH5+ILJcgW7V4ABeCpbw4QOhyDT5SoIBF2nMU0v2oYA+EpmCz/8QJ8EYZe+Hb7B6o0zLDiG7fIPFalu4KoDI6LBuVZsn/Gz638enoyn0xXUpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C5FGDZgo; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71d4a8ede26so4404985a34.1
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 16:32:24 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee5f6fa3feso6176019a91.0
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2024 16:50:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733272343; x=1733877143; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HVEYC1nSF+KpKxk0nrXJnLwZchetOwjmEdMmnp1zFto=;
-        b=SXeiRg7h/m8nkBbgca5lPCXrePc9XtchMzYitUKL5cGgvSedMcNV4VKPEu2njLdgUn
-         b2EcD/VLMxWlnHfBEP4quGKmjQzQQrt4QsGZiglw1Y2sZoLR9vDYAPZ87VDeG1Svng1n
-         U3Oet9rSCWa1FizXkUkNPWCljArnJJnpDfWCyLTdrV9nJKXpDGjXa85buWDmCar1cbQg
-         8aIVtfUTxKP4hPZmwSxlPaoq8ISUspC0gOhCJjdSIzeBlQ6pGNh5JFESbK07wv8hg2JP
-         mZLMLUDROGnTqa9C1mlUXuBdZwbDvR8CyRvIv+hfggXNTA2cezfAIqhCuDR9dXIQ3FCM
-         Db9A==
+        d=google.com; s=20230601; t=1733273405; x=1733878205; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=d/4oU1vpIu322T3uD3MqvxDC01OZZ/wF6FgrljBVKQg=;
+        b=C5FGDZgohOGHHAx9SyFOlFYhjs80esmPHXtsmbn0UMGr29fRvlSyXfFjY2J3AHPHFH
+         CASqqYrAFkS1hbk1HK5uc8wOE4P3iMIcax9TwLJClEMAEF9EJrLpvUuXF0a8lWsnryaN
+         yt+uYmjCAsmP7bTOT7gX3t7zw7z1mrMXqJk/dfYF+tdr5oM2eHBn+o/MfwwDbwqFB/av
+         Y0WGt9vHgnZjcuB6r3hp4s4NjLm0ZrE7sTuJ8w6emfzmaPbANORdC5CfMw3I0q6KTY4Y
+         7Q8UwcnxMbgZZShj/MoJDK/JkZ0GhUbyStXqmSojtmFSUv0qRItwd60P/94bK1/JY8tF
+         XFxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733272343; x=1733877143;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HVEYC1nSF+KpKxk0nrXJnLwZchetOwjmEdMmnp1zFto=;
-        b=Vj1yfa1Go1F9LED4YlEYsimGYAJbQhDPzwd7uzf2i+UGIp3avorZPyX21GEuasBkIR
-         hXAVyc99VUzFntFjhDjqcaqNjQmudmYlMg6NpwlVoTxhj29SBXkGJ5GHHduQ8roqE4uu
-         EsTe/+298JzJLZb6OpHzWp/QKRjlF0xqyA6zhRD6pLJRgzcg8gU5QkIM+SZ0Zyfa7zw+
-         JZw0bZOsrSX41L+15D9TabuUSPEikn/iVnU0vnKILsMYxjKLafzArcDBDrBilQ3+ICzu
-         UvDgg1Igo4AjgXhXYwbMjleCu/FYkuln6pd41oagHPwqF6CN3gYfhX4nFd/Dbju5AyJe
-         CLTQ==
-X-Gm-Message-State: AOJu0Yx3fDcN+450z6RXOcaO/qt9K4cepf9CPpOOBNEdAwYl8koCVlSU
-	cdU7EziZs9qXXbrhQjzaYOrDRmRbPqjj6XLYG3Iy54cfo4eqhKP3HlzhblTm/SmpjdnTwixHqT7
-	4PQ==
-X-Google-Smtp-Source: AGHT+IG3G4WlbRtafcXmxVI3VvzpVclTwXmcNS+SNcH+C52y2UYIixbvldZbsL6Jo2VX5UVUh+NaGYov2c0=
-X-Received: from pgbeu13.prod.google.com ([2002:a05:6a02:478d:b0:7fc:f798:21ed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6830:6e90:b0:718:9a8b:5bd6
- with SMTP id 46e09a7af769-71dad5f3843mr6139466a34.5.1733272343375; Tue, 03
- Dec 2024 16:32:23 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  3 Dec 2024 16:32:20 -0800
+        d=1e100.net; s=20230601; t=1733273405; x=1733878205;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d/4oU1vpIu322T3uD3MqvxDC01OZZ/wF6FgrljBVKQg=;
+        b=im65zywMehFGHJ236JuSE45PzTx1dSUoCHA++im+Q+X/PxVZHRQI33OQkrH3eSchwE
+         JqJIck4NDNVFpdWiULvgZnr9uJ5JGKaa2cOMNmC3VEGXugQHQx73a2ujxoUNVHA4C176
+         6SwJQUZE4EtZKcribLjLS6lLylgMOW0a4mbUFkyI09SBAw3WsVEopsKQBMTvf5fcZIFH
+         M/EGDtOSS/0zlwqlg7hsp7dK1yGDJt82Xk0eVqijj3WlXTLW6OvZV4nJl6KbIxpYfsrQ
+         wyQGCU83H5rIo6bKxMaaXijX+YmhGHJXoCiEpdL7pNIxOZFLu36Akn4dihU6u6x2eTsm
+         tK6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVd7g7HnrOeh3kQ1BbKFiNCidZMUr26VwQ/zEtfLjrsB8FYYOoTTftcKGsU8pKRAuDvS5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxeg3kJXz97PScsr7xnMt7Xz6eYP903OB9Q3iI1pGn0MEo+N9dB
+	YExxGwLaZGp3DjV13OJf4QXiOHMGa2u9lT3AjWc3oWqfrZdYpEpAk33Gcc5HmJQdi7Jrs75MFGp
+	w5g==
+X-Google-Smtp-Source: AGHT+IGetD+k1LiPtdGDtPCALjWPT0cRMYF9pgZzkeaWbjBEos1LRP8RMAbDbrQ+niFK+QYtksQM6BeyJH4=
+X-Received: from pjbsb8.prod.google.com ([2002:a17:90b:50c8:b0:2ea:6b84:3849])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e81:b0:2ee:b26c:10a0
+ with SMTP id 98e67ed59e1d1-2ef0125b0e3mr6902810a91.24.1733273405136; Tue, 03
+ Dec 2024 16:50:05 -0800 (PST)
+Date: Tue, 3 Dec 2024 16:50:03 -0800
+In-Reply-To: <c09a99e8-913f-4a86-ba0b-c64d5cdcfb2e@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204003220.685302-1-seanjc@google.com>
-Subject: [ANNOUNCE] PUCK Agenda - 2024.12.04 - CANCELED
+References: <20241202214032.350109-1-huibo.wang@amd.com> <Z05MrWbtZQXOY2qk@google.com>
+ <c09a99e8-913f-4a86-ba0b-c64d5cdcfb2e@amd.com>
+Message-ID: <Z0-nO-iyICRy_m5S@google.com>
+Subject: Re: [PATCH v2] KVM: SVM: Convert plain error code numbers to defines
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: "Melody (Huibo) Wang" <huibo.wang@amd.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, KVM <kvm@vger.kernel.org>, 
+	Pavan Kumar Paluri <papaluri@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-PUCK is canceled for tomorrow, as I will be unavailable.  Sorry for the late
-notice, I meant to send this out yesterday and forgot.
+On Tue, Dec 03, 2024, Melody (Huibo) Wang wrote:
+> Hi Sean,
+> 
+> On 12/2/2024 4:11 PM, Sean Christopherson wrote:
+> 
+> > 
+> > E.g. something like this?  Definitely feel free to suggest better names.
+> > 
+> > static inline void svm_vmgexit_set_return_code(struct vcpu_svm *svm,
+> > 					       u64 response, u64 data)
+> > {
+> > 	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, response);
+> > 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, data);
+> > }
+> > 
+> If I make this function more generic where the exit info is set for both KVM
+> and the guest, then maybe I can write something like this:
 
-Note, PUCK will also be canceled for upcoming US holidays.
+I like the idea, but I actually think it's better to keep the guest and host code
+separate in the case, because the guest code should actually set a triple, e.g.
 
-Time:     6am PDT
-Video:    https://meet.google.com/vdb-aeqo-knk
-Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+static __always_inline void sev_es_vmgexit_set_exit_info(struct ghcb *ghcb,
+							 u64 exit_code,
+							 u64 exit_info_1,
+							 u64 exit_info_2)
+{
+	ghcb_set_sw_exit_code(ghcb, exit_code);
+	ghcb_set_sw_exit_info_1(ghcb, exit_info_1);
+	ghcb_set_sw_exit_info_2(ghcb, exit_info_2);
+}
 
-Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+I'm not totally opposed to sharing code, but I think it will be counter-productive
+in this specific case.  E.g. the guest version needs to be __always_inline so that
+it can be used in noinstr code.
 
-Future Schedule:
-Dec 11th - No topic
-Dec 18th - No topic
-Dec 25th - Canceled
-Jan 1sth - Canceled
+> void ghcb_set_exit_info(struct ghcb *ghcb,
+>                       u64 info1, u64 info2)
+> {
+> 	ghcb_set_sw_exit_info_1(ghcb, info1);
+> 	ghcb_set_sw_exit_info_2(ghcb, info2);
+> 
+> }
+> This way we can address every possible case that sets the exit info - not only KVM. 
+> 
+> And I am not sure about the wrappers for each specific case because we will
+> have too many, too specific small functions, but if you want them I can add
+> them.
+
+I count three.  We have far, far more wrappers VMX's is_exception_n(), and IMO
+those wrappers make the code significantly more readable.
 
