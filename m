@@ -1,106 +1,156 @@
-Return-Path: <kvm+bounces-33102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBAF9E4B4D
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 01:40:45 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9829E4B66
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 01:45:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC3D1285663
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 00:40:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AF04168DBE
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 00:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9346919BA6;
-	Thu,  5 Dec 2024 00:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vgOUdWhS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B38F3A268;
+	Thu,  5 Dec 2024 00:45:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB92DF4ED
-	for <kvm@vger.kernel.org>; Thu,  5 Dec 2024 00:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D232D19BA6;
+	Thu,  5 Dec 2024 00:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733359235; cv=none; b=oEVg4j2R/WMAqK9b7bPK//vI9HGe1wMZEw04Y/HkcGvyVfKjjGZQ3GMETEvE5B5MYK+l+fWODzU8EQXYUMR8JO72zpy24r64d8HsIq3qkon9d3ILgI/TY/OjzCLAypBejUw4n+6DnrbDOHCuUbV1l6KczAzO5q9S/p0UvfUPIgM=
+	t=1733359503; cv=none; b=RYMq9+Shod+TW2NOiyoJ5QlA0vSFSlxOKCu8HHBnAs9rwtBuXW3DhUMJxMV/JkDgbkc9QYm5Z4aIP1fbXGSBIygh8R1lzdNga1EwwODLtcuJKIaxQIdXGnl11rzXIRetAi7hLUhyjVXFVutV409C6ccBYfy5vZCc2icjegj3oxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733359235; c=relaxed/simple;
-	bh=yaVWmFdP6s62g597K06XDwtA/Md9LOpCv4G/1v6JBQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IJZ4iGuxnrJ01QvOKCrQIvEieg2duOK+lU5/OS7lh5Bbyl/pGPcumFIvqy1v0cQ7au9R72JBKBkjRhyRVXrVguttw8C9XimeI113QpqLysFmXSwkyc8vtkgBHoyGxRyzV695vXKGz4v/svtIhkp5SrOGLxyYSo/O7YtjJpRwsws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vgOUdWhS; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 4 Dec 2024 16:40:27 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733359232;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4U0q3vONwMwpWG5uTnFmXFqnR3IIk2M7iJ9C6Mgww6E=;
-	b=vgOUdWhSQE0eYd15Ox9xMmxkNDh/fO2gcsBrZSUMHOoyAPiKYhiUTHQelWEMEert+Zsi/u
-	TwQcgDFkS3sI6CKURjqwF5X6cNjiDRfFqfVWpWaqFR16CJX1DKyoMdb3LlsrS0+EYdVKfM
-	WSs16XWSEBgEloDqpD6XZsizs3GNodg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 00/11] KVM: arm64: Add NV timer support
-Message-ID: <Z1D2ezLP7nL0TXaf@linux.dev>
-References: <20241202172134.384923-1-maz@kernel.org>
+	s=arc-20240116; t=1733359503; c=relaxed/simple;
+	bh=YRJx6GTz7nk0YkUZck5xNzD7V7zJg0v+JuyDEKpOoBc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WgMIkO5IgBuKEws5zm9OAATLTXtDcVQ6JGt1GSxD1m1El1exfck4sZtaTUoL9NeTIZUJ+aUdgqCzd1o5oGA854OQ8HijWCc7P3tkzT9uWieVo7r24Md97IdKbB79LohqSWqu2UCGkaoL+ruqYfmxqvyyw8OtKC+nWXQHqWUJSW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Ax6+GJ91BnZilRAA--.26365S3;
+	Thu, 05 Dec 2024 08:44:57 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMDx+0aH91BnEEd2AA--.60851S3;
+	Thu, 05 Dec 2024 08:44:56 +0800 (CST)
+Subject: Re: [PATCH V2 1/2] LoongArch: KVM: Protect kvm_check_requests() with
+ SRCU
+To: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini
+ <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, stable@vger.kernel.org
+References: <20241203114759.419261-1-chenhuacai@loongson.cn>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <ae7fd5b2-ee32-7ea2-717b-f899be6dad82@loongson.cn>
+Date: Thu, 5 Dec 2024 08:44:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202172134.384923-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20241203114759.419261-1-chenhuacai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDx+0aH91BnEEd2AA--.60851S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxGrWrXF4DKry3urW3Zw15Jrc_yoW5Cr47pr
+	9xCF4xGr4rXryUAw1UJF1DAr1UXw4DCF1xJry8Jr18Jr1jvr1DJFyUJrW8Jry5G34rAF17
+	Jr1Utr15tr1UJwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jepB-UUUUU=
 
-On Mon, Dec 02, 2024 at 05:21:23PM +0000, Marc Zyngier wrote:
-> Here's another batch of NV-related patches, this time bringing in most
-> of the timer support for EL2 as well as nested guests.
-> 
-> The code is pretty convoluted for a bunch of reasons:
-> 
-> - FEAT_NV2 breaks the timer semantics by redirecting HW controls to
->   memory, meaning that a guest could setup a timer and never see it
->   firing until the next exit
-> 
-> - We go try hard to reflect the timer state in memory, but that's not
->   great.
-> 
-> - With FEAT_ECV, we can finally correctly emulate the virtual timer,
->   but this emulation is pretty costly
-> 
-> - As a way to make things suck less, we handle timer reads as early as
->   possible, and only defer writes to the normal trap handling
-> 
-> - Finally, some implementations are badly broken, and require some
->   hand-holding, irrespective of NV support. So we try and reuse the NV
->   infrastructure to make them usable. This could be further optimised,
->   but I'm running out of patience for this sort of HW.
-> 
-> What this is not implementing is support for CNTPOFF_EL2. It appears
-> that the architecture doesn't let you correctly emulate it, so I guess
-> this will be trap/emulate for the foreseeable future.
-> 
-> This series is on top of v6.13-rc1, and has been tested on my usual M2
-> setup, but also on a Snapdragon X1 Elite devkit. I would like to thank
-> Qualcomm for the free hardware with no strings (nor support) attached!
 
-This series is looking pretty good to me, but I think it'd be good to
-remap "EL0 timer" -> "EL1 timer" throughout this series to match the
-architectural term.
 
--- 
-Thanks,
-Oliver
+On 2024/12/3 下午7:47, Huacai Chen wrote:
+> When we enable lockdep we get such a warning:
+> 
+>   =============================
+>   WARNING: suspicious RCU usage
+>   6.12.0-rc7+ #1891 Tainted: G        W
+>   -----------------------------
+>   include/linux/kvm_host.h:1043 suspicious rcu_dereference_check() usage!
+>   other info that might help us debug this:
+>   rcu_scheduler_active = 2, debug_locks = 1
+>   1 lock held by qemu-system-loo/948:
+>    #0: 90000001184a00a8 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0xf4/0xe20 [kvm]
+>   stack backtrace:
+>   CPU: 0 UID: 0 PID: 948 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc7+ #1891
+>   Tainted: [W]=WARN
+>   Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
+>   Stack : 0000000000000089 9000000005a0db9c 90000000071519c8 900000012c578000
+>           900000012c57b920 0000000000000000 900000012c57b928 9000000007e53788
+>           900000000815bcc8 900000000815bcc0 900000012c57b790 0000000000000001
+>           0000000000000001 4b031894b9d6b725 0000000004dec000 90000001003299c0
+>           0000000000000414 0000000000000001 000000000000002d 0000000000000003
+>           0000000000000030 00000000000003b4 0000000004dec000 90000001184a0000
+>           900000000806d000 9000000007e53788 00000000000000b4 0000000000000004
+>           0000000000000004 0000000000000000 0000000000000000 9000000107baf600
+>           9000000008916000 9000000007e53788 9000000005924778 0000000010000044
+>           00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
+>           ...
+>   Call Trace:
+>   [<9000000005924778>] show_stack+0x38/0x180
+>   [<90000000071519c4>] dump_stack_lvl+0x94/0xe4
+>   [<90000000059eb754>] lockdep_rcu_suspicious+0x194/0x240
+>   [<ffff8000022143bc>] kvm_gfn_to_hva_cache_init+0xfc/0x120 [kvm]
+>   [<ffff80000222ade4>] kvm_pre_enter_guest+0x3a4/0x520 [kvm]
+>   [<ffff80000222b3dc>] kvm_handle_exit+0x23c/0x480 [kvm]
+> 
+> Fix it by protecting kvm_check_requests() with SRCU.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+>   arch/loongarch/kvm/vcpu.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index cab1818be68d..d18a4a270415 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -240,7 +240,7 @@ static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
+>    */
+>   static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+>   {
+> -	int ret;
+> +	int idx, ret;
+>   
+>   	/*
+>   	 * Check conditions before entering the guest
+> @@ -249,7 +249,9 @@ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
+>   	if (ret < 0)
+>   		return ret;
+>   
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+>   	ret = kvm_check_requests(vcpu);
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>   
+>   	return ret;
+>   }
+> 
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+
+Thanks for doing that.
+
+Regards
+Bibo Mao
+
 
