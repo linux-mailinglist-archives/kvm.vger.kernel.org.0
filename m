@@ -1,172 +1,163 @@
-Return-Path: <kvm+bounces-33128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C189E54AC
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 12:55:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB9FD9E54C0
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 12:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED4D1281DC7
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 11:55:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7670B28373C
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 11:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0903D2144D2;
-	Thu,  5 Dec 2024 11:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2B3214A78;
+	Thu,  5 Dec 2024 11:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="RJnDHd7k"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="NHAx49Nf";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UHv46XpB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BFF2144B4;
-	Thu,  5 Dec 2024 11:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470AA214A73;
+	Thu,  5 Dec 2024 11:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733399735; cv=none; b=fMaLUsqGUoAUr52jnQl7wW6Vd02hMTtDr6vqc6U12QJKdzgpncmQJVxM1F5Y2AEVhXt1aJRnI7Qk474pqNwHllfYO51llBnUVJkUqcvsLS1CQxm6zauIcA+S/9xgzeuMHsWmdTtS5dEuUaXlj5epplpLq0R5Prz8Iah1nZPDVg0=
+	t=1733399928; cv=none; b=YHdSHUsA4vcL1gVTc5QiCg+PSfVTvFNr4rSB7VMprNxfTVlVzJPHeLWzqiUZEyRs1GHIdwCzs0U5GRjJglYJ1kJmgLJkUX93fy+gqRH2QXVXjorflm78ty6y9qRYAVwA1NiXNK2WIx7Xx3QYIvT8UGxHoXkiTKZ0d5VJmFp4+/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733399735; c=relaxed/simple;
-	bh=NfsOyPvwo7r/+S4EQ6TEUevE9QLwFJxg+vHXYxcwVuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WSV0hWDIaj0C2mKklSNXoCvPdH5UGQZDl8SU57z9SIeAvYrnlzINJtluZ2gKZIXp3opAmNrXetJIoAymXlMK6g8hdQobaWI4DnobpdvjEpCyvc2lY8PCzLmBmV9h5fC1tMZHivEm01b+TfAZI51+B89I7vkS8qxtkUq0kdlb4L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RJnDHd7k; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B478B40E0287;
-	Thu,  5 Dec 2024 11:55:29 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id o4O7DtP6EmAo; Thu,  5 Dec 2024 11:55:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1733399725; bh=GDBnJl4+Qj2fE0klOae9WTHpDkooZgSl/C7794+jx8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RJnDHd7kUPP2uknLR0P0B0FVFYqIlB/gts8kG5K4n+hq7zZ1HVO9nryS66dvRsT2M
-	 sAdI0c5En6f5m/x+rLs770tnY8SzTLRIR765g2swK2V/OiwXSBFdyRsB16wG5kHMA3
-	 rlSddSNBUMAGyLAAWnJaRMYilHayvVS/QjGKyTCTrCpkXV7skiGqDDedrTyEjx5OQN
-	 kGtE+6FP0zcrPNZl1zC22RO8v3yjAY5QnjqH9XDHOVYP33C3xqzw9fZkPSSdkx0jIM
-	 wGQ2DQjZFZWJZ8uxocRte27Ygy9kMHvkXtoobeNsCgO7+a0hig4pUC+hmJgrIQIxGS
-	 ZIa06LTgpAV4qlFjjJdBj//Ob0rbnuVcevxwEF7AXWyMVEGbhwpVjaCrbRHUxpkxuc
-	 NvfwlNlLK7Od80eVyMA51u0ZdPjSn98YXHed7v8jYY/1+T5FqjNRlzIr4kbqaJDJz/
-	 zQ6VWE5Jzk7hr57x1a57CDbC+KSVt8N2G84LtFYzjkbCk5i4pgI1rRehjqK3trnxfu
-	 jFspHpqOr73UvHv5UA/R0J9gcR4xCygslggUon94N1qH/808nQWCSY0i5qLIVmUId/
-	 UdWz0W3AdfV8Q+fVp0YwG57qBxgixV3p/jOEm+pp0IBUN4MO0HOdBZS/BxMf3bEPpi
-	 h/93V7is35Bckr8laS/rXZ1w=
-Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6EB1A40E015F;
-	Thu,  5 Dec 2024 11:55:14 +0000 (UTC)
-Date: Thu, 5 Dec 2024 12:55:13 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v15 03/13] x86/sev: Add Secure TSC support for SNP guests
-Message-ID: <20241205110455.GCZ1GI1_vv5EIMJwXl@fat_crate.local>
-References: <20241203090045.942078-1-nikunj@amd.com>
- <20241203090045.942078-4-nikunj@amd.com>
+	s=arc-20240116; t=1733399928; c=relaxed/simple;
+	bh=TXxBsh/0Dupz3rwhGOucWdNFXxWHczDayCS9WG0joQg=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=a3i5GG/Muu4K5jXPHj8eJjhqTuZY1kY8v5Mo+zjY/BSAnON1Pp4A6KmXFEBWb1Lw0QVOBjwGW9AVmZvlNWo2eVLT+wANXklROLRNxWL+gK70/yyV/2FRgCr7K0246iR2hcVCBH/x97sLRCb6nAirkOFJIdVMsTAx/8fXcFuEib4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=NHAx49Nf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UHv46XpB; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id EE1C8114018E;
+	Thu,  5 Dec 2024 06:58:43 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Thu, 05 Dec 2024 06:58:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1733399923;
+	 x=1733486323; bh=Tv0o38Q1VlIsg6s/dOh0hDJHiMNuiauv4VLlU8CJQXU=; b=
+	NHAx49NfQKyVGqR1p5crjX1541OJUpvn82ZEseI6Wfol4P11h1KBWtMMPDpZzHib
+	Fp9+p6dQR44e8glWPtTKmvMA9bGe5nxT11mIGPTqtKXSFBBaNg07uP0jp73+J4VS
+	FkfeZG8DD+Lj9tG3cYsePVzkKMl2MvTAyMTLZPhixTTu5/KbMPbA563XIVI/WazT
+	LD1UL3a2ZOhkX5hgvkK6RWgk1mm4IBRs3r/eTpFaImjN56ZtWpIYVWQT0wkNxvLL
+	o0xl+B0H/1y42ce/CT4BLO5SlihY605coj7wMf5aZU4Uc6dfQDoJGIKN+Yz85RDF
+	ZGlibZz5hsYoH5tpsUBnoA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733399923; x=
+	1733486323; bh=Tv0o38Q1VlIsg6s/dOh0hDJHiMNuiauv4VLlU8CJQXU=; b=U
+	Hv46XpBy8/xur5bmR5+r4YLDhvoiHshD2VpjMb5Cu2AQoYEY0f+PoUgf/v24WRrv
+	f1PPKSWog4fBm7w6Gm6jwmucfy6//5FKBhF7LqdVKaSuZ+e5Qd/aGGFD1yYbWKRE
+	5j2CNCl62VqfL6Y/R1EgrduOaWsKqx1QOYf+dx+0vS8EO1v0XEwmYY0ghO0GoVzD
+	WJoRuwv/rt3pCh+vP6jVBFb843MdZJePVTbmrluFazwNbGZh7LDDUovB1tsVPldJ
+	9qwdBeebiZgRsGEXYYodJLEWKqft4wjaEi4ulhs8GOTkIcr05qAmKECqfqDkAT3i
+	MBSgK02NwtvAOT292zCAw==
+X-ME-Sender: <xms:cpVRZ_j_dSzeZKvaB_uTDpKWCPD5XHjZcHkrphGGPvML3yF37P8Pdg>
+    <xme:cpVRZ8DozELlcLQwZB5b9ESr5Bth2jWyek7anHGiXkj9F2hlb7Btq-rOL0Knuj1eI
+    IKQ8rgZu3o4YMpk4Og>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieejgdeffecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredttden
+    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdrug
+    gvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffg
+    vedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduhedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepsghpsegrlhhivghnkedruggvpdhrtg
+    hpthhtoheptghimhhinhgrghhhihesghhnuhguugdrtghomhdprhgtphhtthhopehsvggr
+    nhhjtgesghhoohhglhgvrdgtohhmpdhrtghpthhtohepfihilhhlhiesihhnfhhrrgguvg
+    grugdrohhrghdprhgtphhtthhopegrnhguhieskhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheprghrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhopeigkeeisehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvgdprhgtphht
+    thhopehtohhrvhgrlhgusheslhhinhhugidqfhhouhhnuggrthhiohhnrdhorhhg
+X-ME-Proxy: <xmx:c5VRZ_Hxu5ITd0WSyCdCK_6I14emoPTdPtnN9ILobW4KTeXBk6BJ3A>
+    <xmx:c5VRZ8T1c6L6I2MgXDSqlNUmCnSWUgCGeDqz0tJQB4qlfRPMtMNDKA>
+    <xmx:c5VRZ8yAIR_NWPeKZBrBMrsWTl8auXd9sAJQZpCAj4sfkBeEVKKmEA>
+    <xmx:c5VRZy678X_zr9vLzV7zZK9ZI4McTE8WvyF5dcoltaixYAD68Dr_0w>
+    <xmx:c5VRZxIJDoMhrQU6-YL3vNMyuewhamXkKyrWFXCVDAI1V5ClMgEA6YJp>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id DD43B2220072; Thu,  5 Dec 2024 06:58:42 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241203090045.942078-4-nikunj@amd.com>
+Date: Thu, 05 Dec 2024 12:58:22 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Andy Shevchenko" <andy@kernel.org>
+Cc: "Linus Torvalds" <torvalds@linux-foundation.org>,
+ "Arnd Bergmann" <arnd@kernel.org>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, "Thomas Gleixner" <tglx@linutronix.de>,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, "Matthew Wilcox" <willy@infradead.org>,
+ "Sean Christopherson" <seanjc@google.com>,
+ "Davide Ciminaghi" <ciminaghi@gnudd.com>,
+ "Paolo Bonzini" <pbonzini@redhat.com>, kvm@vger.kernel.org
+Message-Id: <1f2ad273-f3a5-4d16-95a4-b8d960410917@app.fastmail.com>
+In-Reply-To: <Z1GLrISQEaXelzqu@smile.fi.intel.com>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-10-arnd@kernel.org>
+ <CAHk-=wh_b8b1qZF8_obMKpF+xfYnPZ6t38F1+5pK-eXNyCdJ7g@mail.gmail.com>
+ <d189f1a1-40d4-4f19-b96e-8b5dd4b8cefe@app.fastmail.com>
+ <CAHk-=wji1sV93yKbc==Z7OSSHBiDE=LAdG_d5Y-zPBrnSs0k2A@mail.gmail.com>
+ <Z1FgxAWHKgyjOZIU@smile.fi.intel.com>
+ <74e8e9c6-8205-413a-97a4-aae32042c019@app.fastmail.com>
+ <Z1GLrISQEaXelzqu@smile.fi.intel.com>
+Subject: Re: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 03, 2024 at 02:30:35PM +0530, Nikunj A Dadhania wrote:
-> Add support for Secure TSC in SNP-enabled guests. Secure TSC allows guests
-> to securely use RDTSC/RDTSCP instructions, ensuring that the parameters
-> used cannot be altered by the hypervisor once the guest is launched.
-> 
-> Secure TSC-enabled guests need to query TSC information from the AMD
-> Security Processor. This communication channel is encrypted between the AMD
-> Security Processor and the guest, with the hypervisor acting merely as a
-> conduit to deliver the guest messages to the AMD Security Processor. Each
-> message is protected with AEAD (AES-256 GCM).
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Tested-by: Peter Gonda <pgonda@google.com>
+On Thu, Dec 5, 2024, at 12:17, Andy Shevchenko wrote:
+> On Thu, Dec 05, 2024 at 11:09:41AM +0100, Arnd Bergmann wrote:
+>> On Thu, Dec 5, 2024, at 09:13, Andy Shevchenko wrote:
+>> > On Wed, Dec 04, 2024 at 03:33:19PM -0800, Linus Torvalds wrote:
+>> >> On Wed, 4 Dec 2024 at 11:44, Arnd Bergmann <arnd@arndb.de> wrote:
+>>
+>> >> Will that work when you cross-compile? No. Do we care? Also no. It's
+>> >> basically a simple "you want to optimize for your own local machine"
+>> >> switch.
+>> >
+>> > Maybe it's okay for 64-bit machines, but for cross-compiling for 32-bit on
+>> > 64-bit. I dunno what '-march=native -m32' (or equivalent) will give in such
+>> > cases.
+>> 
+>> From the compiler's perspective this is nothing special, it just
+>> builds a 32-bit binary that can use any instruction supported in
+>> 32-bit mode of that 64-bit CPU,
+>
+> But does this affect building, e.g., for Quark on my Skylake desktop?
 
+Not at the moment:
 
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+- the bug I'm fixing in the patch at hand is currently only present
+  when building 64-bit kernels
 
-This patch changed somewhat from last time. When did Peter test it again and
-Tom review it again?
+- For a 64-bit target such as a Pineview Atom, it's only a problem
+  if the toolchain default is -arch=native and you build with
+  CONFIG_GENERIC_CPU
 
-> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-> index a61898c7f114..39683101b526 100644
-> --- a/arch/x86/coco/sev/core.c
-> +++ b/arch/x86/coco/sev/core.c
-> @@ -96,6 +96,14 @@ static u64 sev_hv_features __ro_after_init;
->  /* Secrets page physical address from the CC blob */
->  static u64 secrets_pa __ro_after_init;
->  
-> +/*
-> + * For Secure TSC guests, the BP fetches TSC_INFO using SNP guest messaging and
+- If we add support for configuring -march=native and you build
+  using that option on a Skylake host, that would be equally
+  broken for 32-bit Quark or 64-bit Pineview targets that are
+  lacking some of the instructions present in Skylake.
 
-s/BP/BSP/
+As I said earlier, I don't think we should offer the 'native'
+option for 32-bit targets at all. For 64-bit, we either decide
+it's a user error to enable -march=native, or change it to
+-mtune=native to avoid the problem.
 
-> + * initializes snp_tsc_scale and snp_tsc_offset. These values are replicated
-> + * across the APs VMSA fields (TSC_SCALE and TSC_OFFSET).
-> + */
-> +static u64 snp_tsc_scale __ro_after_init;
-> +static u64 snp_tsc_offset __ro_after_init;
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-
-...
-
-> +	memcpy(tsc_resp, buf, sizeof(*tsc_resp));
-> +	pr_debug("%s: response status 0x%x scale 0x%llx offset 0x%llx factor 0x%x\n",
-> +		 __func__, tsc_resp->status, tsc_resp->tsc_scale, tsc_resp->tsc_offset,
-> +		 tsc_resp->tsc_factor);
-> +
-> +	if (tsc_resp->status == 0) {
-
-Like the last time:
-
-	if (!tsc_resp->status)
-
-> +		snp_tsc_scale = tsc_resp->tsc_scale;
-> +		snp_tsc_offset = tsc_resp->tsc_offset;
-> +	} else {
-> +		pr_err("Failed to get TSC info, response status 0x%x\n", tsc_resp->status);
-> +		rc = -EIO;
-> +	}
-> +
-> +e_request:
-> +	/* The response buffer contains sensitive data, explicitly clear it. */
-> +	memzero_explicit(buf, sizeof(buf));
-> +	memzero_explicit(tsc_resp, sizeof(*tsc_resp));
-> +e_free_mdesc:
-> +	snp_msg_free(mdesc);
-> +e_free_buf:
-> +	kfree(buf);
-> +e_free_rio:
-> +	kfree(rio);
-> +e_free_req:
-> +	kfree(req);
-> + e_free_tsc_resp:
-> +	kfree(tsc_resp);
-> +e_free_tsc_req:
-> +	kfree(tsc_req);
-> +
-> +	return rc;
-> +}
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+     Arnd
 
