@@ -1,199 +1,127 @@
-Return-Path: <kvm+bounces-33105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E339E4C95
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 04:17:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E1B19E4D81
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 07:09:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D905D28543D
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 03:17:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A469168AA9
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 06:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A141865E3;
-	Thu,  5 Dec 2024 03:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC6C1991D9;
+	Thu,  5 Dec 2024 06:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxZjqz+r"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Sb+KBnq8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68C638C
-	for <kvm@vger.kernel.org>; Thu,  5 Dec 2024 03:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D15284A22
+	for <kvm@vger.kernel.org>; Thu,  5 Dec 2024 06:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733368653; cv=none; b=DtQOcMnhpSbtHEs9WMbbzkA0GdwRWDY6d5o9vF6pOeFB3rMJEJorccKXumK8nDGlG1eS6QLt9DNhuj3vmlDposon8eso6TxeUAT9wM4a2YK64UuVxiKmvpyrJ9bIlPs9wN16m9tdwxAzE8IAvZF+Ik1+zzz/bhZJGp5q2eRPZ+I=
+	t=1733378970; cv=none; b=XR2YeQrOQgzWQw0JPSCnWEK4ZgqFpfMvEahIS+KU40oxSUF9uFCps9E7SG8IAflRou3PI4X7BedXyLam5sd+eDrFeurOAOTWc7lqoJNG4x4DvrOzXZuTl7BIL2U3nG7lTdkG56isgDp61E1Qt3Z2/zXf37nX7NnqU9p0rfW0sHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733368653; c=relaxed/simple;
-	bh=susYPnH3Yv1/zHab5Iyy1xQYlrshTdf8WI8O2VXq5MY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BRn8G/gII2RjuP1dA8XVEMcJuGkOAHLPh3zbjOc88Ru3/dtq3kPIsWZi7EwprkHUKLCPKZ4ik8M90+hIo7ZCbiT87BP6iAQz4uAA1L+h2HdZgPuqo71ubbAJBdd/7j8IfhcI42Y+6cMVsbJ3H3VVwwHSMoiH0mPr3HIKwTnbTIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxZjqz+r; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733368650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Bhckxccz4GTrLACIbDzMbWTAT6H/lKna2Su/0DPa8Mk=;
-	b=TxZjqz+ryXhuYOuCGyHpyWp7dX+UwvTGKOE8uYyIgR8Qj/bjjlDtrHl6GIJWjW6MokWRnq
-	EGa1DZTaBJVtFog/KQSD450hjUjAm4UG8eByiJwZdULH2OAV4VdkyTp82/K6v3e8ZL+zI/
-	FfVMEz2zfyDKJauD3xdeRBIuyGb46sE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-497-oygiQAZDMjW9Mjwz4k6zWg-1; Wed,
- 04 Dec 2024 22:17:27 -0500
-X-MC-Unique: oygiQAZDMjW9Mjwz4k6zWg-1
-X-Mimecast-MFC-AGG-ID: oygiQAZDMjW9Mjwz4k6zWg
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4F791954ADC;
-	Thu,  5 Dec 2024 03:17:25 +0000 (UTC)
-Received: from yicui-thinkpadt14sgen2i.raycom.csb (unknown [10.66.93.14])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD31F1956094;
-	Thu,  5 Dec 2024 03:17:20 +0000 (UTC)
-From: Yingshun Cui <yicui@redhat.com>
-To: yishaih@nvidia.com
-Cc: kvm@vger.kernel.org,
-	kevin.tian@intel.com,
-	joao.m.martins@oracle.com,
-	maorg@nvidia.com,
-	galshalom@nvidia.com,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	zhenyzha@redhat.com
-Subject: Fwd: [PATCH] vfio/mlx5: Align the page tracking max message size with the device capability
-Date: Thu,  5 Dec 2024 11:13:15 +0800
-Message-ID: <20241125113249.155127-1-yishaih@nvidia.com>
+	s=arc-20240116; t=1733378970; c=relaxed/simple;
+	bh=ha/tTjNA7iNUNNwAK8VOBu4fR+9xQhqvVimxkSptFaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e7wMwQbS2yeSor8G8f2cSnJ1yZs2XO9xBlw54D2/lkG8vOmC5aUm8p/ujNc8HNYd8v2Fe5lYsv2QT7nky2rBeHARVRiGHAW8ADrnrlaeqRJbMsR1WJBJsdBEJk3HszSmytTdFbUHw4R1FAFQ64pDwddeDuyFmkIdsPpDCoFf2ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Sb+KBnq8; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-8418ecda128so19419339f.2
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2024 22:09:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1733378968; x=1733983768; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aL2ODb59ZMLyvYZNKyPV9w4ocXZc2/Drlrpw4dYUQ6s=;
+        b=Sb+KBnq8jwhs+5mgSiCjTA37EXuTY0c3RjqZCJErupbk1d/GrufM690z3CsEbLSHEi
+         zJzZy9Aa0siYE1ZfxzxRSGi4WzYrCvzEfVOS6MVszmKmrsAonP1arFHXpmPYy8rUmCHy
+         0srtOBCzxDB/z9jmi61BPlvAPElM4VFqjIJQz7rfxer95Tz8ZdCJS3pm357IyOtxNh5y
+         QDmbCWGpywXsqvsX4C/6hNGHPhguNyIpf0WHMvjp7d5pqR9nTko573B13MIL3RCcteqX
+         Pg2+ZB6ipdMEsAiAXMJPbKav5q+cnFEvB17WHV5ofxbmk2ygyLunMRDSBAmgbvBPFjXW
+         685Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733378968; x=1733983768;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aL2ODb59ZMLyvYZNKyPV9w4ocXZc2/Drlrpw4dYUQ6s=;
+        b=eOP7RqVe78p7QkMYy3XRq7H2F3eTq7U3m0IbAsz2iptI4J7qzb4kbm7RfgUwibYxvn
+         XhiSEtA6/8U8Q9wxZo6tM2m73QtjbB7+WjwaePYhEtiRBQYZT71VI9MMBSY98EelYUWp
+         w67Y+hFN7U0LkmwA4OoSgraTNJm0kOYwBZCLLKMm5gpKx5lYdSe1eEu1dJ7sbtkgqeaE
+         vn0KKbBhT4dQDJCbdpuY/WDcHvzGBEjU0hxxIpUsTJz+ADLvyW6PzReuBswJFeZjuHOc
+         XTXOClyH0GW+KDEnCvhv5G/TdMSB3L83XKmBJQ7gsH/ad4zMxMjOW25JAw8b4oLx2Rm1
+         ZCtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXRlZ/B1LAc2a6IOzY8pfuVRBJu0VNcyghxhmEdVoJLdvvb6GsrlJ0ZBCH1UOJMvJLt93I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAo1HoGYsDbtJ4Nx9vLvAs7Rpt+7hAlecdmyUPMIujGWkbmEM2
+	YMzmBz9cRcJkI1QLCinl8WHrNPlwi4fX/w6pedxuv0YXhVpR1pA6KvEsjhN9jbmWa1YpfBPChF+
+	tGOZYh6C527WNv4P6eu50XbvmE8PTFO22+C0etw==
+X-Gm-Gg: ASbGncsVWSEG9Wv1PycS7hLmXXiDw0Naa5mdYCgLBzuEDjidZhZHjGHQ6bF1rr4u5SP
+	TBgRFNPbuL0iQDDiGhgfW2ixbqokstA==
+X-Google-Smtp-Source: AGHT+IEOJFcAi0n4c1mbGRpzcMhoQOlyi+pjiyaxzgnJjkOrtltLnY8I/trZOofEuFvj7Y58FOr5LXqv2HOUgAuNT5U=
+X-Received: by 2002:a05:6602:160b:b0:83a:7a19:1de0 with SMTP id
+ ca18e2360f4ac-8445b5e5949mr1404993539f.14.1733378967761; Wed, 04 Dec 2024
+ 22:09:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <cover.1732854096.git.zhouquan@iscas.ac.cn>
+In-Reply-To: <cover.1732854096.git.zhouquan@iscas.ac.cn>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 5 Dec 2024 11:39:16 +0530
+Message-ID: <CAAhSdy2aPmV6U+GnCnqExXzO3okpDFTbCgwz+Y=dZDVBO0E7Eg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] RISC-V: KVM: Allow Svvptc/Zabha/Ziccrse exts for guests
+To: zhouquan@iscas.ac.cn
+Cc: ajones@ventanamicro.com, atishp@atishpatra.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[PATCH] vfio/mlx5: Align the page tracking max message size with the device capability
+On Mon, Dec 2, 2024 at 8:53=E2=80=AFAM <zhouquan@iscas.ac.cn> wrote:
+>
+> From: Quan Zhou <zhouquan@iscas.ac.cn>
+>
+> Advertise Svvptc/Zabha/Ziccrse extensions to KVM guest
+> when underlying host supports it.
+>
+> ---
+> Change since v1:
+> - Arrange Svvptc in alphabetical order (Andrew)
+> - Add Reviewed-by tags
+>
+> ---
+> v1 link:
+> https://lore.kernel.org/all/cover.1732762121.git.zhouquan@iscas.ac.cn/
+>
+> Quan Zhou (4):
+>   RISC-V: KVM: Allow Svvptc extension for Guest/VM
+>   RISC-V: KVM: Allow Zabha extension for Guest/VM
+>   RISC-V: KVM: Allow Ziccrse extension for Guest/VM
+>   KVM: riscv: selftests: Add Svvptc/Zabha/Ziccrse exts to get-reg-list
+>     test
 
-Test on 4k and 64k basic page size aarch64
-Migrated VM with mlx5_vfio_pci VF with no errors.
-The patch works well on my Grace-hopper host.
-The test results are as expected. 
+Queued this series for 6.14
 
-Tested-by: Yingshun Cui <yicui@redhat.com>
+Thanks,
+Anup
 
-On Mon, Nov 25, 2024 at 13:32=E2=80=AFAM Yishai Hadas <yishaih@nvidia.com> wrote=
 >
->Align the page tracking maximum message size with the device's
->capability instead of relying on PAGE_SIZE.
+>  arch/riscv/include/uapi/asm/kvm.h                |  3 +++
+>  arch/riscv/kvm/vcpu_onereg.c                     |  6 ++++++
+>  tools/testing/selftests/kvm/riscv/get-reg-list.c | 12 ++++++++++++
+>  3 files changed, 21 insertions(+)
 >
->This adjustment resolves a mismatch on systems where PAGE_SIZE is 64K,
->but the firmware only supports a maximum message size of 4K.
+> --
+> 2.34.1
 >
->Now that we rely on the device's capability for max_message_size, we
->must account for potential future increases in its value.
->
->Key considerations include:
->- Supporting message sizes that exceed a single system page (e.g., an 8K
->  message on a 4K system).
->- Ensuring the RQ size is adjusted to accommodate at least 4
->  WQEs/messages, in line with the device specification.
->
->The above has been addressed as part of the patch.
->
->Fixes: 79c3cf279926 ("vfio/mlx5: Init QP based resources for dirty tracking")
->Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->---
-> drivers/vfio/pci/mlx5/cmd.c | 47 +++++++++++++++++++++++++++----------
-> 1 file changed, 35 insertions(+), 12 deletions(-)
->
->diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
->index 7527e277c898..a61d303d9b6a 100644
->--- a/drivers/vfio/pci/mlx5/cmd.c
->+++ b/drivers/vfio/pci/mlx5/cmd.c
->@@ -1517,7 +1517,8 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
-> 	struct mlx5_vhca_qp *host_qp;
-> 	struct mlx5_vhca_qp *fw_qp;
-> 	struct mlx5_core_dev *mdev;
->-	u32 max_msg_size = PAGE_SIZE;
->+	u32 log_max_msg_size;
->+	u32 max_msg_size;
-> 	u64 rq_size = SZ_2M;
-> 	u32 max_recv_wr;
-> 	int err;
->@@ -1534,6 +1535,12 @@ int mlx5vf_start_page_tracker(struct vfio_device *vdev,
-> 	}
-> 
-> 	mdev = mvdev->mdev;
->+	log_max_msg_size = MLX5_CAP_ADV_VIRTUALIZATION(mdev, pg_track_log_max_msg_size);
->+	max_msg_size = (1ULL << log_max_msg_size);
->+	/* The RQ must hold at least 4 WQEs/messages for successful QP creation */
->+	if (rq_size < 4 * max_msg_size)
->+		rq_size = 4 * max_msg_size;
->+
-> 	memset(tracker, 0, sizeof(*tracker));
-> 	tracker->uar = mlx5_get_uars_page(mdev);
-> 	if (IS_ERR(tracker->uar)) {
->@@ -1623,25 +1630,41 @@ set_report_output(u32 size, int index, struct mlx5_vhca_qp *qp,
-> {
-> 	u32 entry_size = MLX5_ST_SZ_BYTES(page_track_report_entry);
-> 	u32 nent = size / entry_size;
->+	u32 nent_in_page;
->+	u32 nent_to_set;
-> 	struct page *page;
->+	void *page_start;
->+	u32 page_offset;
->+	u32 page_index;
->+	u32 buf_offset;
-> 	u64 addr;
-> 	u64 *buf;
-> 	int i;
-> 
->-	if (WARN_ON(index >= qp->recv_buf.npages ||
->+	buf_offset = index * qp->max_msg_size;
->+	if (WARN_ON(buf_offset + size >= qp->recv_buf.npages * PAGE_SIZE ||
-> 		    (nent > qp->max_msg_size / entry_size)))
-> 		return;
-> 
->-	page = qp->recv_buf.page_list[index];
->-	buf = kmap_local_page(page);
->-	for (i = 0; i < nent; i++) {
->-		addr = MLX5_GET(page_track_report_entry, buf + i,
->-				dirty_address_low);
->-		addr |= (u64)MLX5_GET(page_track_report_entry, buf + i,
->-				      dirty_address_high) << 32;
->-		iova_bitmap_set(dirty, addr, qp->tracked_page_size);
->-	}
->-	kunmap_local(buf);
->+	do {
->+		page_index = buf_offset / PAGE_SIZE;
->+		page_offset = buf_offset % PAGE_SIZE;
->+		nent_in_page = (PAGE_SIZE - page_offset) / entry_size;
->+		page = qp->recv_buf.page_list[page_index];
->+		page_start = kmap_local_page(page);
->+		buf = page_start + page_offset;
->+		nent_to_set = min(nent, nent_in_page);
->+		for (i = 0; i < nent_to_set; i++) {
->+			addr = MLX5_GET(page_track_report_entry, buf + i,
->+					dirty_address_low);
->+			addr |= (u64)MLX5_GET(page_track_report_entry, buf + i,
->+					      dirty_address_high) << 32;
->+			iova_bitmap_set(dirty, addr, qp->tracked_page_size);
->+		}
->+		kunmap_local(page_start);
->+		buf_offset += (nent_to_set * entry_size);
->+		nent -= nent_to_set;
->+	} while (nent);
-> }
-> 
-> static void
->-- 
->2.18.1
->
-
 
