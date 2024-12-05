@@ -1,188 +1,147 @@
-Return-Path: <kvm+bounces-33160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6112A9E572B
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 14:32:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF979E57C6
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 14:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 138052866AE
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 13:32:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C4528B0C7
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 13:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2839B218E89;
-	Thu,  5 Dec 2024 13:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264B3218EBE;
+	Thu,  5 Dec 2024 13:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRJ8dFzz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LN1r8WgI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C58D1C3318;
-	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04F81DED77
+	for <kvm@vger.kernel.org>; Thu,  5 Dec 2024 13:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733405480; cv=none; b=rRu8lPrLAnrldDbKjDd8s5BBM7U6ptG3VPjkyO4wrSYsVLI5nAFJPtVmVHkT+FpO7023ZO7AW9vk1fQYSXCTDNXe9Qr+VdyfJx7jL2TGubb2NfWs7PCBts1NbvjEa8sCGgqEISAvPuM67F97S8lTkfNWGbJfFspTNmnT95uraxA=
+	t=1733406527; cv=none; b=JrkYGZvVlxJ17H59U6i4xKH9Uz/Bp3Iz/htsO+CfgfLGtYrWUp2SVa5hr3yLgH794YfcTvulIFdpaJOundWpnA0MK8X0FOdn+vpnV/gbQIokotwmtr0IqykWyKGW0MCWmq8eqQC7sdZ1vVJ77bXl2XSivjG46TX2zmQXQ4mt+eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733405480; c=relaxed/simple;
-	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ccsiz0pUR0wiIqL1FC+/yYMSC06eujJbrNHk1yJZd5GncEAgaxn5XtgH6HvIJ6TUuZE0cu8/1rirgcR9MABnMU/sWRrXFp71C0yA9Pd9GQP/m/NMPBQuWbQ+axBUBmRJCg1I/6+jy5Pe7l60xI5mAHG2ITlRjNGmo7CXEMCHhtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRJ8dFzz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C16C3C4CEDF;
-	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733405479;
-	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pRJ8dFzzpRO31xufNa4qCQ45PJFTsPpJ7gPU+o95Wycw1WnpsDXfGTTzJKfO1EPCm
-	 HHcEj8gr3dSlgZS289ywqeaHWWyl9wN5XsfP1H6Y01NUQ0K+Fpe4gT6R+VMKFpx1E/
-	 N6z5XwNhnjGFPHWPXDS7ab8Cwdt9g2m6WeJwQgWlCRCRz6B19JUZODjYAH1B0y3JSd
-	 HLYAnSq25eyzUKRNnttUim1/hUsAhuLV9nHtCBLndUwi62d8vcz76LoGdmTM1AHsnx
-	 om1U3lOkfGesIZxaQA6el1cgQefqCU7wcaprLIvG5XxqRKdWw5r+FtoDgeJMnTkYuH
-	 9Q/dI3N7NglPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tJBwr-000pIY-GJ;
-	Thu, 05 Dec 2024 13:31:17 +0000
-Date: Thu, 05 Dec 2024 13:31:16 +0000
-Message-ID: <86h67itfx7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 06/11] KVM: arm64: nv: Acceletate EL0 counter accesses from hypervisor context
-In-Reply-To: <20241205120707.GA102570@e124191.cambridge.arm.com>
-References: <20241202172134.384923-1-maz@kernel.org>
-	<20241202172134.384923-7-maz@kernel.org>
-	<20241205120707.GA102570@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1733406527; c=relaxed/simple;
+	bh=iY5P+RCTX6zdy8vi+BSs28/pZLYyZcaPKm7sK512OdE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HEGqin+/jb1FFy6wvN3+V0+pT9pet33AhLbnvUy5sNn2rJUpD8AnYuxI8nVUUjql/19/Fpvr0yVwxs4Rb4xaOWtJPe2C1qjXc9CevPsMp9hWVuSs2CfgKNt+O50HhiHldudo9a0cdgMmzwSPAYT0EXttWqmuGHyq3Oxfkk6ppd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LN1r8WgI; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a7bc2d7608so107685ab.0
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2024 05:48:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733406525; x=1734011325; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CBYTsxurte9zUpJPRPgCb5UYJNyj1cZSr57YSjFaoi4=;
+        b=LN1r8WgIvv+KYxyMlGsToMNpkn1g/zIobzt+sAsLOhg3sFx67zDvz8ByUFu+hWcsGk
+         JzbL0KxVywA5MCRhLcd57Py7WzHMx37IqJiWZm3N0+T1EvdvBTOsI9leWNZ1v8o7VkgS
+         HTNpyP8N+nTUQ1BMs2/jMdL93XrZNUjUOydbYploXSa7SFR0NC3tvIxCuVD7LgYS9R+8
+         tFzd1fAELXQaaPix+02qKJe+zyBAR+1+t72Jo/Ju98gR0VOgoE+zzHNKDJMiEGLtlPSw
+         dwCR9Tg1EfXpmX3pGFGaEPjW/2rQXrI01NZLOUsAcfi4dkgEHiPdCAFZvua6jeOI+J4a
+         gcDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733406525; x=1734011325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CBYTsxurte9zUpJPRPgCb5UYJNyj1cZSr57YSjFaoi4=;
+        b=Ow0D1ofN3ZxxDDWJ+5XtydmOy0oSMK6cNp2dTOag6Pro+dKhwPdUKxseefYJ06dfUL
+         sro06ynscC7gACcFrytu1ai+4D92mmFLVv+EZmQB5dEYaJAF9mPmqOue3uvYJISkr+is
+         +VEB/YvgGA/MMwcgTrOhoia5k23c8/7QgN7entmaaehCS8Tgu8m43Fvp9IkiKHFBWMb1
+         9aLBBUMM+lrP6qf8VGzBnTbuuCD52lYl5L78oqmUTb3rG4If6I0YDpoUI3HJUyl0SVjW
+         OnG14huaHEg5W7mENMHcuJMyJhHUIY20srEgXx/plX9Mufrzanbj6lzRLLfyk2oZCIRd
+         aJKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTQ+Ka101Jg/idXmKyOjY9bJlLK1y+z7BalIPnQmQMdpXXDEKk3M9O0ZxgSvSW7hvo4po=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyKsYR0hEx/dj5uxgVQDtuc6ZjhRtTrd20FFy2UnHGT0Gj2BNN
+	sX8RhtlULSdpy0E9NygJGwPgQyztyVhWzWw6HHZ4VqZ8BLmXxP56pbLAYANZXPFlf3BmNrbVRha
+	dfKM0576l+nTPUwqUMKq1DFc82WumdLX0jVQi
+X-Gm-Gg: ASbGncvLnLkRx8UlI32Ksw/DsJQsyb6dneWMivd/bsXvZvDmjhcd5A/gmUtgQoKelml
+	dxDa66JXDf1aypOjUgiu6BW0pPMQ/FA==
+X-Google-Smtp-Source: AGHT+IHMJ2LYSkIEPnmFAtJ/qhvJXzOnlIJQIcrzt34NRX9egb83JFVidMlWNFcEjFM8/VPM9BvJDc/4F/SK2o7SrC8=
+X-Received: by 2002:a05:6e02:3a85:b0:3a7:5099:8159 with SMTP id
+ e9e14a558f8ab-3a8083ebabfmr3283715ab.16.1733406524798; Thu, 05 Dec 2024
+ 05:48:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241121185315.3416855-1-mizhang@google.com> <465c927c-88f0-45fc-9178-4c6981f82fd9@amd.com>
+In-Reply-To: <465c927c-88f0-45fc-9178-4c6981f82fd9@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 5 Dec 2024 05:48:33 -0800
+Message-ID: <CALMp9eT7zNniaJMWguKKMLYA2hZg_QzkDb0iVrbpXAuT1bDscQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/22] KVM: x86: Virtualize IA32_APERF and IA32_MPERF MSRs
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Huang Rui <ray.huang@amd.com>, 
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>, Mario Limonciello <mario.limonciello@amd.com>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 05 Dec 2024 12:07:07 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Mon, Dec 02, 2024 at 05:21:29PM +0000, Marc Zyngier wrote:
-> > Similarly to handling the physical timer accesses early when FEAT_ECV
-> > causes a trap, we try to handle the physical counter without returning
-> > to the general sysreg handling.
-> > 
-> > More surprisingly, we introduce something similar for the virtual
-> > counter. Although this isn't necessary yet, it will prove useful on
-> > systems that have a broken CNTVOFF_EL2 implementation. Yes, they exist.
-> > 
-> 
-> > Special care is taken to offset reads of the counter with the host's
-> > CNTPOFF_EL2, as we perform this with TGE clear.
-> 
-> Can you explain this part a bit more? I'm assuming it's somehow related to the
-> arch_timer_read_cntpct_el0() call.
-> 
-> However I think we're at EL2 inside kvm_hyp_handle_timer(), so reading
-> CNTPCT_EL0 won't involve CNTPOFF_EL2.
-> 
-> What am I missing/misunderstanding?
+On Thu, Dec 5, 2024 at 1:00=E2=80=AFAM Nikunj A Dadhania <nikunj@amd.com> w=
+rote:
+>
+> On 11/22/2024 12:22 AM, Mingwei Zhang wrote:
+> > Linux guests read IA32_APERF and IA32_MPERF on every scheduler tick
+> > (250 Hz by default) to measure their effective CPU frequency. To avoid
+> > the overhead of intercepting these frequent MSR reads, allow the guest
+> > to read them directly by loading guest values into the hardware MSRs.
+> >
+> > These MSRs are continuously running counters whose values must be
+> > carefully tracked during all vCPU state transitions:
+> > - Guest IA32_APERF advances only during guest execution
+> > - Guest IA32_MPERF advances at the TSC frequency whenever the vCPU is
+> >   in C0 state, even when not actively running
+>
+> Any particular reason to treat APERF and MPERF differently?
 
-I think the wording above is particularly misleading, and leads to
-some bad confusion.
+Core cycles accumulated by the logical processor that do not
+contribute to the execution of the virtual processor should not be
+counted. For example, consider Google Cloud's e2-small VM type, which
+is capped at a 25% duty cycle. Even if the logical processor is
+humming along at an effective frequency of 3.6 GHz, an e2-small vCPU
+task is only resident 25% of the time, so its effective frequency is
+more like 0.9 GHz (over a sufficiently large period of time).
+Similarly, if a logical processor running at 3.6 GHz is shared 50/50
+by two vCPUs, the effective frequency of each is about 1.8 GHz (again,
+over a sufficiently large period of time). Over smaller time periods,
+the effective frequencies in these examples would look like square
+waves, alternating between 3.6 GHz and 0, much like thermal
+throttling. And, much like thermal throttling, MPERF reference cycles
+continue to tick on at the fixed reference frequency, even when APERF
+cycles drop to 0.
 
-Let's go back to basics: we're at host EL2, and handling a trap from
-guest EL2.  Although you are right that CNTPOFF_EL2 doesn't affect a
-direct read of CNTPCT_EL0 from EL2, we are emulating it as if it was
-executed from EL1 (guest EL2 being EL1).
+> AFAIU, APERF and MPERF architecturally will count when the CPU is in C0 s=
+tate.
+> MPERF counting at constant frequency and the APERF counting at a variable
+> frequency. Shouldn't we treat APERF and MPERF equal and keep on counting =
+in C0
+> state and even when "not actively running" ?
+>
+> Can you clarify what do you mean by "not actively running"?
 
-So any offsetting that would be applied if we were not trapping
-CNTPCT_EL0 must still be applied. In the case of a read from
-hypervisor context, this is the VM-wide offset.
+The current implementation considers the vCPU to be actively running
+if the task is in the KVM_RUN ioctl, between vcpu_load() and
+vcpu_put(). This also implies that the task itself is currently
+running on a logical processor, since there is a vcpu_put() on
+sched_out and a vcpu_load() on sched_in. As Sean points out, this is
+only an approximation, since (a) such things as I/O completion in
+userspace are not counted, and (b) such things as uncompressing a
+zswapped page that happen in the vCPU task are counted.
 
-But this makes me realise that...
-
-> 
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++++
-> >  arch/arm64/kvm/hyp/vhe/switch.c         | 13 +++++++++++++
-> >  2 files changed, 18 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 34f53707892df..30e572de28749 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -501,6 +501,11 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
-> >  	return true;
-> >  }
-> >  
-> > +static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
-> > +{
-> > +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
-> > +}
-> > +
-> >  static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct arch_timer_context *ctxt;
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index b014b0b10bf5d..49815a8a4c9bc 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -296,6 +296,13 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-> >  		}
-> >  		break;
-> > +	case SYS_CNTPCT_EL0:
-> > +	case SYS_CNTPCTSS_EL0:
-> > +		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
-> > +		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
-> > +					      vcpu_el2_tge_is_set(vcpu)) ?
-> > +					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
-
-... this should be simplified, because there is no case where we can
-be in HYP context *and* not be using the hptimer() context (everything
-else would be handled by kvm_handle_cntxct()).
-
-I'm minded to change this to:
-
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a8b1a23712329..5a79ed0aac613 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -305,10 +305,7 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
- 		break;
- 	case SYS_CNTPCT_EL0:
- 	case SYS_CNTPCTSS_EL0:
--		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
--		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
--					      vcpu_el2_tge_is_set(vcpu)) ?
--					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
-+		val = compute_counter_value(vcpu_hptimer(vcpu));
- 		break;
- 	case SYS_CNTV_CTL_EL02:
- 		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Regards
+> Nikunj
+>
 
