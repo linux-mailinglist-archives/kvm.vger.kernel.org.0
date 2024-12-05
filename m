@@ -1,156 +1,213 @@
-Return-Path: <kvm+bounces-33172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE299E5DFC
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 19:06:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 142B518856E8
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 18:06:30 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43526226EF5;
-	Thu,  5 Dec 2024 18:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="j437SR17"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0579E5E64
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 19:44:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C1F217F29
-	for <kvm@vger.kernel.org>; Thu,  5 Dec 2024 18:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733421984; cv=none; b=T4m4CMgsX2iBHOOOjJR8XArdGkXOnd7i5u4LBFe4/NFVuzbQ+g2ws3sxB42z+eqrSNpHOxiZSvYMm4M7x80gydQ+7kVy7Bj8Bch6q3wSfdmH2xykZlCIDqjlGNIJXQQTXlLdJdo5YfD24vHNR2MAS9YQBjcLsR9zO2D+2xZPINM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733421984; c=relaxed/simple;
-	bh=7VVbtfLDThTIMEGNmmhgSkVFgY39ZieNAqopuJdypZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LvAPleap27+zJgFvAUsXxhPt2k9cwbku5afhBLgVEFSzmdkxDTepYy2snViSmtTw+2r749rnfJfMUA0fy7H6aAzdbkObD8HMm5T6WTdnOpw6pkdMNUtyPc0wPT9ePKEyU+fjbfPe3bhTILkhzGxHsknRdkho2icEaGbH97giptw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=j437SR17; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D590C40E0266;
-	Thu,  5 Dec 2024 18:06:19 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id YxO2JqUaNSpj; Thu,  5 Dec 2024 18:06:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1733421976; bh=N7Y0QhHqCr16DPB06dfs7uScT4sFuJ+tQLfiCR1AakA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j437SR17Nzg6rvthcHmfdPUYN3qqyQeI0Kl7v6VIMRgOOsgROq7SuX2K5EgQePIBB
-	 IuSb0EkfhNM1qoVQwlyHWdxHYP0FTruaHQxWJij+cQIuxGpJ1IR1g4wqtsKl36oxSh
-	 qZ/2mn3kUZRwAWWkUikmyVeq88Et7i3QWpq21Oz1A3CA9TdZAJdvk6b0YH/eQrJ4ry
-	 76g3fT1D0RanKQQ2tfIAh+NLAStV9fuuT0RQlHHpVjEU/+susQzQvzawMUUla2YFYO
-	 uzMlD9eixuvMB9lisarPRH56D+8dTqDrUBnrovHpTtWcOeQBmBIodjlYXeppYEkMb9
-	 RYnhFZH4tMhZyALRaHQGHbsZ1rholEziZd9nBoRuYFwVbMbgwT/ra0KWi3YoftMVay
-	 SVdiknUf7cS5bATR5bNHbMLl3vEMtzowNBoRyIWh9AhF4KWITiSPGjEwEmAx+uvv8g
-	 oXY6h/uEKH/Q7XulouwKWr7bDptKfzDXyTk7sh9wpO7ZmnbRYeSfeYpsADmT9sTBeU
-	 72Zc3omlC3lk3Ur/Yb6MmGXJ/HbQ5usI3G1ZlTTDz0dYTD+MJXASIncT1YqH34H7Ek
-	 e8646uZrpAljGuoT2mV+Dbswn+xoRtp0iyYI4Bz6ys8SB2fu6DA0j98W7jZAYJXxqN
-	 gHpdhF9GkAbK+vmoP+IwXIFk=
-Received: from zn.tnic (p200300Ea971F93C5329C23FFFeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93c5:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF79B2866E0
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2024 18:44:45 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790D922D4CC;
+	Thu,  5 Dec 2024 18:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mfZMYSyM"
+X-Original-To: kvm@vger.kernel.org
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 50FA340E015F;
-	Thu,  5 Dec 2024 18:06:09 +0000 (UTC)
-Date: Thu, 5 Dec 2024 19:06:08 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-	pbonzini@redhat.com, jmattson@google.com, Xin Li <xin@zytor.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: Re: [PATCH 12/15] KVM: x86: Track possible passthrough MSRs in
- kvm_x86_ops
-Message-ID: <20241205180608.GCZ1HrkLq2NQfpNoy-@fat_crate.local>
-References: <20241127201929.4005605-1-aaronlewis@google.com>
- <20241127201929.4005605-13-aaronlewis@google.com>
- <Z0eV4puJ39N8wOf9@google.com>
- <20241128164624.GDZ0ieYPnoB4u39rBT@fat_crate.local>
- <Z09gVXxfj5YedL7V@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A8522B8A2;
+	Thu,  5 Dec 2024 18:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733424278; cv=fail; b=vCH0F3ExSFOZuZYqYeTxkhI1Ht9kZ/5YcQ2YAv8wrI9aPc1JTrey4ohEOf3xKXeoJNrdYScQ+IwsDOMfiJdzfSA7rVhlCi+qMClWOIX2FDCWHo8rbS5ehrrGHOwVmXx1sq5Fyfz+D/OTH6OG5/AFMmpK6KMF42ifQZflo7QGQ20=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733424278; c=relaxed/simple;
+	bh=xilU2xtgAZgr0JZTji/JrQXnfdNGQyNrzZfvOK8eaEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=Q25+n/fg8PWp5SYuAGjFBTcIl/bkxQBlWiq82iFHorxFsGl41bPGFRXViKivcCxa0swLu0auAzNBDVoOQr4XmNeN+3M71VhDX6K/lbEq9rE6S8B+7CUJWpOwOPuQILIMizCNAGkRJVZqVP3YMuM33x1fq4moXf3zQa81nL8anTc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mfZMYSyM; arc=fail smtp.client-ip=40.107.93.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a574l8knaX2SGBaHSYcbocKHmF7nQb/ehdav/U+nAUIiOnuqgF2zKgqDjVAEkco0o7c/qQioN1TrU7jplUTFnXs/9SrNoH16nUCljMhOrB8d0GiWJbFv2GDtBh+oBohnwk+mCRalbRWVcmjzOxU+t90e1AS4L8QkBaxG7vL3zJkJGa0GPt3mCSGghRS/+86ro5XDIJO4jp4ToEsreHRQxR07fB4t3l1UdiHcdj2E/F+5f3R5UNqg3wEYwVMUqcTM9wcLqJJs3bP751/PbYmE2dZ7e23E2VHXTBdM3EPmq4yf8qfi99tDuDOcFIXe8p0LcweKL/rUPjZYazN8RXtdsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BtSISHw6D94kP/rPIxx1EMX8xArB4VC9IUBXvIIH9+s=;
+ b=Ddk8NnFYlCMrr+NIs4FSR26NPwigqIEsNPS1gfo6v0edvigYmQ0Lh12xqR9VEGj5Jpcb7eQPTvwKI6a+wTmW8H2dn6qWyPTksqAlpUf47/uCzSer/q3LnYO20+JYB1hPNPyU3+x5+u2QOD7cBLcnOIBokRLHzZoez4haFYqM//n17fmD7iqt8WAvD6pen2gaicBOVAlbW/XASEQZ/BIAbvy90XaJkcgtQc4g7jVK+pekLrx0u/msmbjI2bMw0hVPV8kYj9MohRgnABG7xNxfyY4ckmBdCM56fmWxwdXI0q7sr4I+WZnvYvpF+DqZ/8TckiiPAk2AxP/vBMESXHp3sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BtSISHw6D94kP/rPIxx1EMX8xArB4VC9IUBXvIIH9+s=;
+ b=mfZMYSyMnwCmjtNsdBY2M10bG4t4OqcEO/WrJ2zmgIBCteb+gI4TwGVpu9Pyl5tJ4dTqOL62pC7hPaTWP2z6NDNdXaajHpoEoO214blDJjlsMByM1KuSckdTE2MN6ScycoJt1fY56/ucjTGfU0/8ONR8aMa4u7PEOQLp0wHHyYdGnAqeDgDXHkU89lI1GE2ucZsZVlrr9vWNR/HFt3lG25e2XHDZiN1Qa1OQ440I0LKnrXa8P7JDptrrgMot9zfbJRoewUyDGppjrcqGZYU7yZq2CyQYgSIPFlnPqyweVxyKJ2JEqj8FfXwxF4cLS2yH7eF/OOws/XEA49HfZXj1yA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH2PR12MB4278.namprd12.prod.outlook.com (2603:10b6:610:ab::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.13; Thu, 5 Dec
+ 2024 18:44:31 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8230.010; Thu, 5 Dec 2024
+ 18:44:31 +0000
+Date: Thu, 5 Dec 2024 14:44:30 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: iommu@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
+Subject: [GIT PULL] Please pull IOMMUFD subsystem changes
+Message-ID: <20241205184430.GA2110789@nvidia.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="NWhtbCSZBtmsPm2R"
+Content-Disposition: inline
+X-ClientProxiedBy: BL1PR13CA0445.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::30) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH2PR12MB4278:EE_
+X-MS-Office365-Filtering-Correlation-Id: 07c95b2d-3f43-4f1e-e4f7-08dd155cdaf3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?sZPieA1h752pYM8oEe5ttwcjHJ2t3LmL2m4574EOGD3D+2rHRHANIJRMteaz?=
+ =?us-ascii?Q?iePXJBD6v0mpsde+wQGt1GoAFpTJPaxjYkU9ZOj/o4Bp6zag3waUxGFAZaa9?=
+ =?us-ascii?Q?FFkLax55ECWCamHJYv7v/9/LumiXoGmtDtk4EguHbcYZ0IabwvbD1KFTcnHy?=
+ =?us-ascii?Q?gkKCVUiRPQMTugn6EuYteagohgoO79V2FWnbBXoOE/AfQaZMkOQHalt7eTx3?=
+ =?us-ascii?Q?E+l10zKnYFaZyxiVU8cHaoR6JQMRqCVQ5J8qIs/Tu8FQDsjYmOXyqB9j1/NY?=
+ =?us-ascii?Q?hJ69eo1WRM3QzhiEczk763T7YDJQSsPdXUtIfSo5CLChdCUr5a6TM48v8TXR?=
+ =?us-ascii?Q?mqNADE9nUOOmEnq/ekCRDJj+I7dgZoy39vqIo2daGh4fVuRHatdptAX3BZFf?=
+ =?us-ascii?Q?P3vWrc0Vl8AzZQe4l0QpCtRv6oe0Y0/Pnl6u2QZ2UhYQNEatDHsCrnDBLh/t?=
+ =?us-ascii?Q?XhhxQgeSrugFdIfBrmtsQDPji1jis4uZ5MYtEA+dKiYoVyhDokSdwrfMxVzM?=
+ =?us-ascii?Q?y9CRTi/U2ui01D3ZzRJTtUuKpqsT7YOdu+4vN3YIMbVDSXokKBHOdnMZRgsF?=
+ =?us-ascii?Q?lzGEW75a+3sGFP1BNbCVY1rwfRscPUcyOffmgkvFsIL6Ftvn/IJ0MIGwDl1o?=
+ =?us-ascii?Q?LvRRZkipWcNZdrXo+6cXBBQFs1kTnFhrTlEkSfEP5x0hWicxQHInQ1Ak65L9?=
+ =?us-ascii?Q?Hrmi1E1NZ6Y4OHMR7RzlMtwBl9LgMSemxhGkAjI7ux1ochTHUJ/c+yGRdfUG?=
+ =?us-ascii?Q?anMlOlUB6xVvH2Q2E9zx7EO4SdcP/wa8dDsdier2SU6OkkBRC21Ck512OkcV?=
+ =?us-ascii?Q?DnN0CYBf8mf8MjAkmkNVTY3zk0id5mbHMvNV+JqVze9Z2QyEPtrH2p8inGhj?=
+ =?us-ascii?Q?2z4FNjcr/o4+Vb5LP8PV4JssSOU4YIT0zlaJGinBAfesjMI56Idv0UCaIsKX?=
+ =?us-ascii?Q?zx+sLZPUhJbDhbEN0k8YsAwfbs65iKWRm/v9cTclB+bD64piithyAgRJUE1K?=
+ =?us-ascii?Q?shwxEWToQU4+HXd+9BIBPThXYYXXSYNgnupTX9KjyvNovWr7R/9x1pOktKeY?=
+ =?us-ascii?Q?wbnc6erehKbtTZCbZalGNvyRmEKCjZTj0Kt8AoIKAULJNx6Lj+60J8X5zntC?=
+ =?us-ascii?Q?O2nV+DPUS2nDp/i7pyOdsIZ9Y/yLvtcRy5fEp3VnPAQy6Upn5C0cZAYgRnlu?=
+ =?us-ascii?Q?ueMMq9fowsS+zoPUb98kKJbZwIKKdPSkgicBrntl7dVbQULugbpMkFcL4e5d?=
+ =?us-ascii?Q?MbUqqQXISZprsDMgfQMxCGeYQ/sLRbgtNyOll0Y11XINGAomnKeRsWsrMv1l?=
+ =?us-ascii?Q?ZwxDsOLAf8VV74y1J1KYa0mmSn8z5BmzTBxoimjsNoKW3w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bZzRRMOH0uq5hFhIvaSZElMHYIqcp9MoMBWC5CtbIkiv9QFDxok+wgxY8ro6?=
+ =?us-ascii?Q?q2G9i2c8rr2x+RBhH6DMHAGAnWjjBayA71zt4DCoqhAzn1rz9+y3neFSvVWj?=
+ =?us-ascii?Q?1TPuulJlDBNL/BWos6VMQde9RyojhD/SIsS6V2NZ6kuGum5+pvS4EyB3xp8b?=
+ =?us-ascii?Q?XHdOqV3ce7G2s1VO5bcG+nIyAKqQYT7JT6WGN1IMjsH56SQEXdApKFS+UwNM?=
+ =?us-ascii?Q?p6UBx/xh6bP9Lu/saMyqSyPzqDEX0idytqYGihvF78XsRmzV1/3w3EiLISSs?=
+ =?us-ascii?Q?9G1s8kckQIDCBnlt1zpK3GDv0/MdpV/A2QqKH8DW3R1MVAlQ0GuLaZGJxWWy?=
+ =?us-ascii?Q?ggAxDvOLO8E7oMzg7uE4xRiLYhnShpzMMjB0kF5aZDE/6IaheKsJh3prGwsg?=
+ =?us-ascii?Q?fWWd0g7orR5zhdUOrKgFqlC31oeC5vf5kdXwPpQrCPQGZyy6biIZoaoZfAm9?=
+ =?us-ascii?Q?vvEueQjQUUhDzdC76JItIKlQBZmu6x9jlHm9ZnJZWeGfYsUewQlfpnK9GaDc?=
+ =?us-ascii?Q?XEVvNBcJSQCuHo9AJJSfV4+Usmt4TIEjFPhrlv9U/QgrWy61N8bWZ7gG1rVb?=
+ =?us-ascii?Q?KbrmVSA5anQECxVAiK9A9wD5XxLbXA9SMFhocs9giMQc7j0mFl45hKytMug8?=
+ =?us-ascii?Q?JqJE5HqJkASV0F5Eee1yQLGwPi9OZVB6qc5cGe5C6BBcf7Eafc0DZFNULIZ1?=
+ =?us-ascii?Q?+ziHYG9JOnxGRAPEq3YWMnBzEns+L/JXhzXix+uSV/7vCfsTM1my3QHTvKja?=
+ =?us-ascii?Q?iZAfWTnVAgT6swJOX0TEk0Tm7OZIQ0xLNSwxr+WzmA6ByJ2uHsdcldx5tk4C?=
+ =?us-ascii?Q?A9lzrjS4NeTlQxrHSk55fuxYjVnEYU1q/+m0gP4kC7BdjoxURJv4izQjFmbW?=
+ =?us-ascii?Q?xtVjlhFWvaJgj7NgSw5k/SUZuwGd6XFBG0Ap+IDHtirYqIdL819/+mHFVEY4?=
+ =?us-ascii?Q?M5hy1xMqwAmafdTxqnAToawuwagdDBbaB40GTZDW3/Ui3bX2SRZ10Xn2YSwY?=
+ =?us-ascii?Q?UuWyZcDY5zKUB/zF3pin4E2yB4nZXoqGPOpIYIHaUWnjwdKSIbqrpu0p8aDi?=
+ =?us-ascii?Q?djyr0cySot0apdmKESJFohKRNzhl15FZdxZilc6JHZm4jh6iSt/mj6ZpPzcj?=
+ =?us-ascii?Q?WBY4wC/gIFpOtLwaCOuEA3BH5hbWQDusgvgTNHQOfCDW9T9mXlZBv8vhZZi1?=
+ =?us-ascii?Q?6rfNHUGLHzssKxlKB4yvT3gzzSnw66/2U0AyML7rgao4bjj1KpA7pmGjyFHS?=
+ =?us-ascii?Q?4+qER6+b/RnEF0OvBOEp7LDGlgA5rQXh4liY4cRrS7IkKPEGgWFV66RV0KgR?=
+ =?us-ascii?Q?1FqRrt7lVH9VlLlTTRzLFxhAR1w6xya2gUIvEFY6EMTZ6HLFTo/NwKIYGuRx?=
+ =?us-ascii?Q?nR/1v4EO6bswAxxK7ZdI5QVPpu8nA3RoivW1tTMSWGc/9mZ2qxgNiiAe5TfT?=
+ =?us-ascii?Q?9FWQnRhUaU8YHsBkBLt8q+3l42har97I6h1m31gE6EkmeJFYj8QYxMvhyNfm?=
+ =?us-ascii?Q?8vYz99aRKMefIV0l87Y0v0FzCfezFm5CyodCmtn57Qx/Pp25Nj98YUdGj0nT?=
+ =?us-ascii?Q?UyxTdceSYIf4WBkGgb2c9YQR8OSpAlo2V5tkq1Tq?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07c95b2d-3f43-4f1e-e4f7-08dd155cdaf3
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2024 18:44:31.2553
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qXouJBQh/3Iv5xWW/yA6NJLvtFTAtplhRDjj3+3dsEz5Z2YVRsYNS2TZ3AspEINx
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4278
+
+--NWhtbCSZBtmsPm2R
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z09gVXxfj5YedL7V@google.com>
 
-On Tue, Dec 03, 2024 at 11:47:33AM -0800, Sean Christopherson wrote:
-> It applies cleanly on my tree (github.com/kvm-x86/linux.git next)
+Hi Linus,
 
-Could it be that you changed things in the meantime?
+One bug fix and some documentation updates
 
-(Very similar result on Paolo's next branch.)
+Thanks,
+Jason
 
-$ git log -1
-commit c55f6b8a2441b20ef12e4b35d4888a22299ddc90 (HEAD -> refs/heads/kvm-next, tag: refs/tags/kvm-x86-next-2024.11.04, refs/remotes/kvm-x86/next)
-Merge: f29af315c943 bc17fccb37c8
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Tue Nov 5 05:13:01 2024 +0000
+The following changes since commit 40384c840ea1944d7c5a392e8975ed088ecf0b37:
 
-    Merge branch 'vmx'
-    
-    * vmx:
-      KVM: VMX: Remove the unused variable "gpa" in __invept()
+  Linux 6.13-rc1 (2024-12-01 14:28:56 -0800)
 
+are available in the Git repository at:
 
-$ patch -p1 --dry-run -i /tmp/0001-tmp.patch 
-checking file arch/x86/include/asm/kvm-x86-ops.h
-checking file arch/x86/include/asm/kvm_host.h
-Hunk #1 succeeded at 1817 (offset -2 lines).
-checking file arch/x86/kvm/lapic.h
-checking file arch/x86/kvm/svm/svm.c
-Reversed (or previously applied) patch detected!  Assume -R? [n] n
-Apply anyway? [n] y
-Hunk #1 FAILED at 79.
-Hunk #2 FAILED at 756.
-Hunk #3 FAILED at 831.
-Hunk #4 FAILED at 870.
-Hunk #5 FAILED at 907.
-Hunk #6 succeeded at 894 with fuzz 1 (offset -30 lines).
-Hunk #7 FAILED at 1002.
-Hunk #8 FAILED at 1020.
-Hunk #9 FAILED at 1103.
-Hunk #10 FAILED at 1121.
-Hunk #11 FAILED at 1309.
-Hunk #12 FAILED at 1330.
-Hunk #13 FAILED at 1456.
-Hunk #14 succeeded at 1455 (offset -35 lines).
-Hunk #15 succeeded at 1479 (offset -35 lines).
-Hunk #16 FAILED at 1555.
-Hunk #17 succeeded at 3220 (offset -40 lines).
-Hunk #18 FAILED at 4531.
-Hunk #19 succeeded at 5194 (offset -38 lines).
-Hunk #20 succeeded at 5352 (offset -38 lines).
-14 out of 20 hunks FAILED
-checking file arch/x86/kvm/svm/svm.h
-checking file arch/x86/kvm/vmx/main.c
-checking file arch/x86/kvm/vmx/vmx.c
-Hunk #2 succeeded at 642 (offset -2 lines).
-Hunk #3 FAILED at 3943.
-Hunk #4 FAILED at 3985.
-Hunk #5 succeeded at 4086 (offset -1 lines).
-Hunk #6 succeeded at 7532 (offset 6 lines).
-Hunk #7 succeeded at 7812 (offset 6 lines).
-Hunk #8 succeeded at 7827 (offset 6 lines).
-2 out of 8 hunks FAILED
-checking file arch/x86/kvm/vmx/vmx.h
-checking file arch/x86/kvm/vmx/x86_ops.h
-checking file arch/x86/kvm/x86.c
-Hunk #1 succeeded at 10837 (offset -3 lines).
+  git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
 
--- 
-Regards/Gruss,
-    Boris.
+for you to fetch changes up to 2ca704f55e22b7b00cc7025953091af3c82fa5c0:
 
-https://people.kernel.org/tglx/notes-about-netiquette
+  iommu/arm-smmu-v3: Improve uAPI comment for IOMMU_HW_INFO_TYPE_ARM_SMMUV3 (2024-12-03 13:30:31 -0400)
+
+----------------------------------------------------------------
+iommufd 6.13 first rc pull
+
+- Correct typos in comments
+
+- Elaborate a comment about how the uAPI works for
+  IOMMU_HW_INFO_TYPE_ARM_SMMUV3
+
+- Fix a double free on error path and add test coverage for the bug
+
+----------------------------------------------------------------
+Jason Gunthorpe (1):
+      iommu/arm-smmu-v3: Improve uAPI comment for IOMMU_HW_INFO_TYPE_ARM_SMMUV3
+
+Nicolin Chen (2):
+      iommufd: Fix out_fput in iommufd_fault_alloc()
+      iommufd/selftest: Cover IOMMU_FAULT_QUEUE_ALLOC in iommufd_fail_nth
+
+Randy Dunlap (1):
+      iommufd: Fix typos in kernel-doc comments
+
+ drivers/iommu/iommufd/fault.c                    |  2 --
+ include/uapi/linux/iommufd.h                     | 31 +++++++++++++++---------
+ tools/testing/selftests/iommu/iommufd_fail_nth.c | 14 +++++++++++
+ 3 files changed, 34 insertions(+), 13 deletions(-)
+
+--NWhtbCSZBtmsPm2R
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRRRCHOFoQz/8F5bUaFwuHvBreFYQUCZ1H0jAAKCRCFwuHvBreF
+YT/iAQCZ1hCGe5w0mtuFrvv0l1Dxp6f6yTPCjkktp0Z1vq+xeQEAkTvxJ112+eKx
+0isfw7bIXjQTxQlh6GkLMl3oeBU8qwQ=
+=49EO
+-----END PGP SIGNATURE-----
+
+--NWhtbCSZBtmsPm2R--
 
