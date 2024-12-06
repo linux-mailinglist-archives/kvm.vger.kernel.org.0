@@ -1,240 +1,245 @@
-Return-Path: <kvm+bounces-33190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297629E6517
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 04:37:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CAE9E655C
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 05:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A92981884C06
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 03:37:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FBC6162F0C
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 04:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE93191F75;
-	Fri,  6 Dec 2024 03:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44805192B76;
+	Fri,  6 Dec 2024 04:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mmp/o2H7"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2WyvUXZV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEFF13DDDF;
-	Fri,  6 Dec 2024 03:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733456260; cv=none; b=YB8cNnQ2jMhfwnWlT1kERuvvYEt0pqcahDmk8Ry3OEKv+0/hs7PU03C5NjkVS4gyI2ZbKNf1YmAYydCtRfV/QlQjtXUh9MhWyDazTYoIVaiIKhijs5iMX25qtWTvY35eoOs0JvCqPU1t+33b8KoQzLjqr1eJ9hy1zLpOh9hhi1U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733456260; c=relaxed/simple;
-	bh=WrKwAGr9rCPIoNqYi8F9dNIcqs5fsyfUF/2DoTg4HCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ni7mWkfaKc/GtSlZRg2HuhYilEgHgLuNBrYha8mso2IcuUjLR2QB45NwKzMPmJKrt6WozEpEqw4kP8pcUphnz8ri8jSdxPsvqWSwi7pV9bTPWuWlySVsjlXqG5corlbeOA0ZpQGwHFv0fIRBxC14TEHN4cPoagjb/GJ+2SCC8d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mmp/o2H7; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733456258; x=1764992258;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=WrKwAGr9rCPIoNqYi8F9dNIcqs5fsyfUF/2DoTg4HCQ=;
-  b=mmp/o2H7m8bepPnb1BwQMu2lWMxdR8uDStr/2Z+MhOtcfUwqgCZgkKqK
-   T130duaLhPl+ZdyRob8vrVPoVjOtkuYt6BD2E3E5oO3onQbks83Qsaeo3
-   zpM4O3QWU12/fXMZq/yLdGkeZBguhyT4KNbYiIgcvMxruTfpPGA6Jy3VL
-   MzuWXoteh0bhvu5OziUcuPXZSSIasDABEjHfMocNehJCsjT4I0H9V3/3D
-   xlt+79hzt9JEisHwoUllJw0gY2cg0WVScVR3T3f5fmSWW7SCX0duXomtQ
-   XRmqYZzHbV+GKYdpFjcvTxN7doCxmuuUEnMgOqQ48aJtWryAV4CyPy/Aa
-   A==;
-X-CSE-ConnectionGUID: EEoxDbwQRUGm12BkDCo4QA==
-X-CSE-MsgGUID: RwBp05oeRg6BZmzAONgcsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="44269524"
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="44269524"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 19:37:38 -0800
-X-CSE-ConnectionGUID: LzfPS1TfTDmpsAGKGiZd/Q==
-X-CSE-MsgGUID: dbn1X0P1QEODfzWbuDfy3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="94488859"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 19:37:33 -0800
-Message-ID: <3f52c362-ac1b-4435-92c8-81ec97992b02@intel.com>
-Date: Fri, 6 Dec 2024 11:37:30 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9637ECF;
+	Fri,  6 Dec 2024 04:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733458772; cv=fail; b=VLiDcAeekdJ5IpbhBcXnNFjQKkk01JDjmDaxhmWhdG3L9Ka9g4TlmlSB9BlPsxSJ5d5Is/cu5lZmN5W1G9gAi1lolW5UFFNY1t9dwaHPW+aXiYM47ZMHVUoE4Iqh9qj/Cblm2o5r93Hmm1B//eDVa0/+CsoqGN9cSIKjnI0FJ+w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733458772; c=relaxed/simple;
+	bh=qoblRAJPBMWE7b4gftEqR3uro03C73ZLmA4u9LGCgI0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qKO7qrXWed4kWztAhU5r0dLMz2dgo0bHaOpIEyn2Dln2xiAFQECU960cXr8+O8vNy+elYLA9pMSpRtOK9WekI6078GmK+HDqRBvp6dTnwqMYLN6HU44hnvptcVWKd+dYbXkPGKwgLs4kY8GkebnkMS5bvEYIUnCtUxmnPbW2zVg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2WyvUXZV; arc=fail smtp.client-ip=40.107.223.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=syCsFRSLNzuYpP4PdpVHtsjzukMgGpkSFRPT4cXrbuYA+9P29OSL52u99nNiy/Zjxwkx5zzjXkDMnfwo94+HaqzBAZz2RBFoa7uJgdGzZKQ/UlSS/LrkY3RGssH/CNJZQICCySUtd4am53x4JiWhUGI5l2KvEQMgq5YIXjWxuVLi1jV78Up8F48AflmUjzZVaf24vOXuGLYXb4Sn9bZkSd99L/cxSG5z4CApoUwGwHdCmiaL3YqnS2JkYlOvBj+FCSwDjQ3Pvhwte7OW/l6cDEOytVJXxlgPfkKUX4vXLrgRuZIo0ox02FQYdCGDncjkZqPoYQbDkUItTWpWYN+WXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gjmDhmDv9EpKZwXsFevDc5MKUxsK00tEGXC1Rsy6D6c=;
+ b=ifoGXLzWIxgWn8m+B7GOdi/QfyhYwWbJhV9xrvzs47B2iDwhCcLlOIwBC8ycgTnuxmNxWdY3eAKlBBdGvpxfHEph24SyqgQj2xPMaOShETbrIn1XBkgAUjkn9Xpw/SEU1i+TlEbvc1oBy2hf7ZExvdcMJ73xJzluWkSOqa15erheQ8v9OG9Pf78oKotzkS344U/zsE8/xnO6GgAGT0bJ3RlKX/Ek1TewAzbtTHBd+Wv9bjQq8vVridMkimNOr1xmDBe07xDDDgaAE5N3/Sn206Yc+YoDqWZmFBsqnyKKQDeCVWi9WIkETVLBm/vqHdf6NPMoDsYidGbPukth+7z73A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gjmDhmDv9EpKZwXsFevDc5MKUxsK00tEGXC1Rsy6D6c=;
+ b=2WyvUXZVc9W5sCMwKtvU/OXxDcwOI2w0Ix99Mwxec1aVV70ndGGgZbrtfktoa/lZM+lY050dtuXCe9RZ0ZSxOgAhsFOsTDbIm9EaS6ITh3La1NKaIJYx4qy4KuWfdHrkfggYRsCER9pPiJSoexLirE6/hUKY+QlImKWmPhFxR1c=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ MN2PR12MB4438.namprd12.prod.outlook.com (2603:10b6:208:267::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.11; Fri, 6 Dec
+ 2024 04:19:28 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%5]) with mapi id 15.20.8207.020; Fri, 6 Dec 2024
+ 04:19:27 +0000
+Message-ID: <7925f569-f660-420d-abdd-32a3bbcde164@amd.com>
+Date: Fri, 6 Dec 2024 09:49:19 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 03/13] x86/sev: Add Secure TSC support for SNP guests
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+ kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+ pbonzini@redhat.com
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-4-nikunj@amd.com>
+ <20241205110455.GCZ1GI1_vv5EIMJwXl@fat_crate.local>
+Content-Language: en-US
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20241205110455.GCZ1GI1_vv5EIMJwXl@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0045.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:98::8) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
-To: Adrian Hunter <adrian.hunter@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Huang, Kai"
- <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Yang, Weijiang" <weijiang.yang@intel.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "dmatlack@google.com" <dmatlack@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "x86@kernel.org" <x86@kernel.org>
-References: <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
- <Z04Ffd7Lqxr4Wwua@google.com>
- <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
- <Z05SK2OxASuznmPq@google.com>
- <60e2ed472e03834c13a48e774dc9f006eda92bf5.camel@intel.com>
- <9beb9e92-b98c-42a2-a2d3-35c5b681ad03@intel.com> <Z0+vdVRptHNX5LPo@intel.com>
- <0e34f9d0-0927-4ac8-b1cb-ef8500b8d877@intel.com> <Z0/4wsR2WCwWfZyV@intel.com>
- <2bcd34eb-0d1f-46c0-933f-fb1d70c70a1e@intel.com> <Z1A5QWaTswaQyE3k@intel.com>
- <c9b14955-6e2f-4490-a18c-0537ffdfff30@intel.com>
- <a005d50c-6ca8-4572-80ba-5207b95323fb@intel.com>
- <84964644-e53f-4aac-b827-5626393f8c25@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <84964644-e53f-4aac-b827-5626393f8c25@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MN2PR12MB4438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1926bba6-f4e9-4adc-fd62-08dd15ad2c2b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QVAxL0VhcUFnV3NuM3lmaHJUR0QrTHFScmxHWjA1aVd4NkR0VzFmVE03LzY1?=
+ =?utf-8?B?NElZMnJjRWZySG1oSnU0OVRwcEVCb0F6bGR4MjRHZVJJSlpYZE9xQWtlT3Js?=
+ =?utf-8?B?WmFpQnU4MDBBb2FhT2JQY2lrTUwwQXVIT1Z1R0t1S1hkS1V0VnJ5NGxCdng1?=
+ =?utf-8?B?RkpnOWFkSXZSMkM2VndNeHlMNSthTG1FWndDeDRrWlQ2S1hUZlkrVUxibDBP?=
+ =?utf-8?B?VDBTQ3RZMkdVNi8xM0RJdElyaVJxTEtXVyt6cjd0YWdqdmZXNTY4djdVeXQ2?=
+ =?utf-8?B?VmRDWlRSM0loejZYOHBOTmNhUmZHQzBZdVRUWFFkNEU5VWx3cUdtaFExZE0r?=
+ =?utf-8?B?OFRmRmRwYmVnZU9xYmVFY2Vjdm5yRnovT0FHQmlaQnJjaCs1L1Y5a3l4RFJ6?=
+ =?utf-8?B?cXFSdmQxN2pGRHp6dHE2OXhDM1VFaGpBOEFHaHpYMTIvK1h0SGU1bHp0MDRz?=
+ =?utf-8?B?dFNkdFoybGZKRHJCYTVscnp4UERaNmYyN1QwSG9YWVVOWGZiMHdCWDN1VDNU?=
+ =?utf-8?B?QU4rWkZQckNYRkFudFRTUTFhSkhRVlkzeFNSQWc2UXUzTmx1bEUyajlvK29h?=
+ =?utf-8?B?cGJYQWxhdG1RTHdPc2c1cXZjUHI0SWZ6MG9KM2ZHRm16clovcFhoY0pUR2E2?=
+ =?utf-8?B?YW5jSEsrK1RCVDhpb1JmVnRLc0FjbXcxV2lab3A3OXVIS2xsV3hXZ2RnQjdY?=
+ =?utf-8?B?MjRSM1lwUHBqVFFQVlROR1Y5ZVg1ZTgzWm9EUHN2aFBiL3hqZC8zaFlLTURl?=
+ =?utf-8?B?aUQrSHk1aURxdFRzZ0xFU0ZoamlPeS9oRUZ2VHI3dGFTNE85a29PZUx1b3M4?=
+ =?utf-8?B?cDRUZlFtUnlCemtYa1RWbUhvcmZxSVc4Z1JGVjZzK3N6enZMV0xkSnNXam1I?=
+ =?utf-8?B?SWhjVGhvQTVHMnFlVVhKenJYS3I1RmJORmZZaTZlcG51N2FvYU1aTmJURktT?=
+ =?utf-8?B?T0g0NjJXd3RvcHU4cURWdlZVdkVhZmFkS0dhd0tJN2lYakpvSDFUcHp0cHZN?=
+ =?utf-8?B?bDFrUHQvMUlrWDJyL2ZhSjhHS1pqemE4SlFCSVNSak91MnErbG1OUGo4dGM1?=
+ =?utf-8?B?VDhSVHBhTnl3SGsxOEhYVUZZRzE3RTFMNXNDdHhLVXZIVmI0Sm03Ujc5eWRu?=
+ =?utf-8?B?bkFhaGVaY0dhcUJQSGpoRWpUZFU2RE1VSVl2amVVTTI1VXNvcFFMd0h4TW1j?=
+ =?utf-8?B?UXRSRVBtUEF5QjY4c0dyS1FSOHFNL3l3eFR2WHhzaStNc09ZSWhLSUtyS2xq?=
+ =?utf-8?B?Yi9BTWZOWENpYnM0bmhONWNENFNBSk5wRjcvaThTbkN0R01RaUxsYk1jSlhD?=
+ =?utf-8?B?a01Sa2E2SEZRb2VzdEhIUmZCZmpvN3dVYVpKcGo5d1QzSXRPdjRUdE1pbEs3?=
+ =?utf-8?B?d2ZpdFZ3ZUUwZCsvb3dzSTFCd2VkdHpIMG11N2dkc1lxRlp5UitYaWpwT01L?=
+ =?utf-8?B?US9nOG5KbXd3MFYvTDgxYzNlRnZ4ak10ZTUyc0FxK3RmNWM3WkxwL3E4Z0d5?=
+ =?utf-8?B?YnZvMnh4MngxdmIrZDh6WHd4VlB1ekhJY20wVENOTGVDMUgveEd4ZFdESC9O?=
+ =?utf-8?B?K1BLVUR3bTFlSzRGNTJ2eXBoWjZHYmdhblQ1ZFkrZzIwQkRLZzNUTU44VWRF?=
+ =?utf-8?B?THZlVTBiQWxxR3NkOGYrbVV3OForckZFUWR4VTE2YjhwMDhVSjNLdVVjK2d0?=
+ =?utf-8?B?eE5jTDVsK25CQUZub2piN0wxeHRJY3J3bW90dUlmdkMvWmxFczh0bk1iRWhP?=
+ =?utf-8?B?OGNvSm1xZ1RkdjA4QTBKd2grMmgyaFdBUXM5M1NRQkFQN3dqT0hmYmJMakFH?=
+ =?utf-8?B?MzlUeVdqbjlFN1k4UVpwZz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UDI2QXNjbTNWQXI3cllGV0hSK25mOGQ0YWdpN1NFQ1pQZzE4MXZDaXVDNlFP?=
+ =?utf-8?B?NDN0WnduU3ZJb25GeC85SnBKb0VFOW1yVFVGVlFINGlVSHUyUnpqaHpDdEc3?=
+ =?utf-8?B?ZWNFUmZPNVBkelY0dngyb1dTUWNrZTlBbnBralF1NnJUdWpjYWI5ckVUbHBX?=
+ =?utf-8?B?aHlZWjJHTWxDVEZTSjBHNDBNRW5zVkE2WjcwaWpnREZlallNVWR5MnRZbUhp?=
+ =?utf-8?B?L2N3Yk9iNHZiQzhwaVBVZ1pBR3gvb1Juck1TQ2g1NUtJTlR6amRiMlZVMXJB?=
+ =?utf-8?B?OTdUSjFhM21abkF4TUZGeC9sbXI2VjdocFZ0b3NPRG95UitjbkRBYkk5RDlx?=
+ =?utf-8?B?RWJ0T2ZJMDdTUTBiaXIxRHI2M0E5TXI2eXNmRUVKVTAxTU5oSUdJczRCeGxx?=
+ =?utf-8?B?TGRhYXBYU3I3VFQ0UVYrTnNqdWhqTUhkSXcxN3ZKbVc5RDZGbGVjTUNIVjVJ?=
+ =?utf-8?B?U0UvYkUvMDExaXEvV05HR0VSbktWMnplbUtnaHNnb1lqclVMSnJMOWFRZ20y?=
+ =?utf-8?B?ZVNnTWJlTTRNUHZ0RkE3VytTNnZZb0k3bzZkK3lCTUo1K3BLZStLaytIUTBH?=
+ =?utf-8?B?czh6aGZKK2Q0OThhRFE1dVN5TlRRajNheEtRWVhEaGZqSDV2Mm96d0NHdDdi?=
+ =?utf-8?B?MkVZSHZFQ1p5NWY2NnB5SENDam02OTZEcjdkUXZQUEZXaldaRFpFTmlqakc2?=
+ =?utf-8?B?T29Mc1RxKzV4cXJmNlJlUUpvVERhZ1A1WVEydWY5enlTQ0hXbk15eGNKT3NO?=
+ =?utf-8?B?QXFISGtkb01hUGtBcTVoaDNlR210TEFwSVRVSnNPM1BJdEV2RzE0V0VFUWtX?=
+ =?utf-8?B?TFJmaDZGTUVxKzVIcEoycGNyWUhoU2lmWmxpekN3TExibjVCTEdocDBiZlJR?=
+ =?utf-8?B?K1I5TEg0cVZCeVp6UGNSa1RtS3YwOHhTSENUV202VXpzU01VN1htaVJOTzFF?=
+ =?utf-8?B?d1pvZjQySmJJQTBrK3B3SEJLOVljVTg2TUI1KzZaTTUvd0JzcTRncjBDTkJa?=
+ =?utf-8?B?dDc0SnNJeC9PL2psZ25WWGttdUVvTFN3QmU0VHV5blptZUt3MTlqM3c4ay9y?=
+ =?utf-8?B?Zkl1MWJ4QUxWUGJoWXpRTmFLbFZzeWQyL0NteWNPT2xReEtBTkpZRXpwc1lS?=
+ =?utf-8?B?aHhUV1Fic1Q1MDFaRnp4NkVNYVZaNEJ0akdlUXcwRHQ4NXd5WUdHYnVmdVVs?=
+ =?utf-8?B?VHN2aXVteXIwWWthZ1lSTk9aUTVZZ3RxUStDUEZRV0tsTXBDQW1RbWxHRURx?=
+ =?utf-8?B?Tkc2Z2NhcnhqUWtEK25NQXNxSmNYZlNrNFZRTTR1L1BseVphMEJZS2dXa0F6?=
+ =?utf-8?B?NmhJMVJUSEFQd01BL1JFS3BicHZhVlkzcUlkWWUrMEdYUXJROHdzdmF1YXl4?=
+ =?utf-8?B?K2J4N2k3RlRBNnhKVkk2OGNiNE92dzdIbWNKcytab0w4ZVBLcStFU2JLZ2ow?=
+ =?utf-8?B?NXgrZUVzemtIM3ltMlp5eElqajgyRHErd05JREU0WmVQMlFLOUNWMnNtQkZ2?=
+ =?utf-8?B?bmdpbmxML1l4UnZKQlQxYlA5MlZrSWV4bS9FOEk2OUplNER2S09GMGpVcXkw?=
+ =?utf-8?B?SVVqRmFCUlErdDRNeDBmcE44MHJEc2dCdUU5UUFDWFRQVzFlTGo3VUZZc3RM?=
+ =?utf-8?B?cFhlZFExMitpeUN6T2RMTGxXaXY2RndYdmdlRFp0WU81bjZ5UE4yZ0F0WlY3?=
+ =?utf-8?B?SlhOSFRmczZaRkp6VUY2d1BpL0pncTlxSFlJQ3VLTFFJemwwcmRkbW9nTHNU?=
+ =?utf-8?B?QUgwN1I3Vis4Ukk0Ymo2bm1aNkQ4ZWNTM05DTjR6dmdNazExOXhMZmxYQUEw?=
+ =?utf-8?B?TGt4eTJzRU9rQkg4TlVIeCtHNEdSR1RKb3VVbVh5YjBXUm1GK0ZvbzN3bnkz?=
+ =?utf-8?B?WjlBZEpneE9YdzFaczB3aE9kMElGVEY0eDltcVJmQ2cwMysydTVubzhob3I0?=
+ =?utf-8?B?ZnZaUmtycGpPQlI2UjR3NnJKaHJrRHVrYUVHWkJ6Ym5tK1JEbGpRTGhMbjE5?=
+ =?utf-8?B?dWM5Z2pNWGRnUTh4b0IwWTMzd1IvMDJYRUFYV2gzLzB6cVlzOVJwbUUwR0lV?=
+ =?utf-8?B?NWRicDRQS0FTU1ZGWENiaGt6eCtyYnp2YmN6Z2o3dEFabkN5WmNUOXFnckMv?=
+ =?utf-8?Q?Akqn4n5tAL8w0gO8jwnpNRD6I?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1926bba6-f4e9-4adc-fd62-08dd15ad2c2b
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 04:19:27.4532
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uFjjwxevlVL+m1Vqz7cOVaFv0GwzOHCokZLBkmXN+gPGYVo0+a1FzIDt+bsObM5XE1i/QFbzXF8aDYIi72EsPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4438
 
-On 12/6/2024 1:31 AM, Adrian Hunter wrote:
-> On 4/12/24 17:33, Xiaoyao Li wrote:
->> On 12/4/2024 7:55 PM, Adrian Hunter wrote:
->>> On 4/12/24 13:13, Chao Gao wrote:
->>>> On Wed, Dec 04, 2024 at 08:57:23AM +0200, Adrian Hunter wrote:
->>>>> On 4/12/24 08:37, Chao Gao wrote:
->>>>>> On Wed, Dec 04, 2024 at 08:18:32AM +0200, Adrian Hunter wrote:
->>>>>>> On 4/12/24 03:25, Chao Gao wrote:
->>>>>>>>> +#define TDX_FEATURE_TSX (__feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM))
->>>>>>>>> +
->>>>>>>>> +static bool has_tsx(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
->>>>>>>>> +           (entry->ebx & TDX_FEATURE_TSX);
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static void clear_tsx(struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    entry->ebx &= ~TDX_FEATURE_TSX;
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static bool has_waitpkg(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
->>>>>>>>> +           (entry->ecx & __feature_bit(X86_FEATURE_WAITPKG));
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static void clear_waitpkg(struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    entry->ecx &= ~__feature_bit(X86_FEATURE_WAITPKG);
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static void tdx_clear_unsupported_cpuid(struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    if (has_tsx(entry))
->>>>>>>>> +        clear_tsx(entry);
->>>>>>>>> +
->>>>>>>>> +    if (has_waitpkg(entry))
->>>>>>>>> +        clear_waitpkg(entry);
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static bool tdx_unsupported_cpuid(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>> +{
->>>>>>>>> +    return has_tsx(entry) || has_waitpkg(entry);
->>>>>>>>> +}
->>>>>>>>
->>>>>>>> No need to check TSX/WAITPKG explicitly because setup_tdparams_cpuids() already
->>>>>>>> ensures that unconfigurable bits are not set by userspace.
->>>>>>>
->>>>>>> Aren't they configurable?
->>>>>>
->>>>>> They are cleared from the configurable bitmap by tdx_clear_unsupported_cpuid(),
->>>>>> so they are not configurable from a userspace perspective. Did I miss anything?
->>>>>> KVM should check user inputs against its adjusted configurable bitmap, right?
->>>>>
->>>>> Maybe I misunderstand but we rely on the TDX module to reject
->>>>> invalid configuration.  We don't check exactly what is configurable
->>>>> for the TDX Module.
->>>>
->>>> Ok, this is what I missed. I thought KVM validated user input and masked
->>>> out all unsupported features. sorry for this.
->>>>
->>>>>
->>>>> TSX and WAITPKG are not invalid for the TDX Module, but KVM
->>>>> must either support them by restoring their MSRs, or disallow
->>>>> them.  This patch disallows them for now.
->>>>
->>>> Yes. I agree. what if a new feature (supported by a future TDX module) also
->>>> needs KVM to restore some MSRs? current KVM will allow it to be exposed (since
->>>> only TSX/WAITPKG are checked); then some MSRs may get corrupted. I may think
->>>> this is not a good design. Current KVM should work with future TDX modules.
->>>
->>> With respect to CPUID, I gather this kind of thing has been
->>> discussed, such as here:
->>>
->>>      https://lore.kernel.org/all/ZhVsHVqaff7AKagu@google.com/
->>>
->>> and Rick and Xiaoyao are working on something.
->>>
->>> In general, I would expect a new TDX Module would advertise support for
->>> new features, but KVM would have to opt in to use them.
->>>
+
+
+On 12/5/2024 5:25 PM, Borislav Petkov wrote:
+> On Tue, Dec 03, 2024 at 02:30:35PM +0530, Nikunj A Dadhania wrote:
+>> Add support for Secure TSC in SNP-enabled guests. Secure TSC allows guests
+>> to securely use RDTSC/RDTSCP instructions, ensuring that the parameters
+>> used cannot be altered by the hypervisor once the guest is launched.
 >>
->> There were discussion[1] on whether KVM to gatekeep the configurable/supported CPUIDs for TDX. I stand by Sean that KVM needs to do so.
+>> Secure TSC-enabled guests need to query TSC information from the AMD
+>> Security Processor. This communication channel is encrypted between the AMD
+>> Security Processor and the guest, with the hypervisor acting merely as a
+>> conduit to deliver the guest messages to the AMD Security Processor. Each
+>> message is protected with AEAD (AES-256 GCM).
 >>
->> Regarding KVM opt in the new feature, KVM gatekeeps the CPUID bit that can be set by userspace is exactly the behavior of opt-in. i.e., for a given KVM, it only allows a CPUID set {S} to be configured by userspace, if new TDX module supports new feature X, it needs KVM to opt-in X by adding X to {S} so that X is allowed to be configured by userspace.
->>
->> Besides, I find current interface between KVM and userspace lacks the ability to tell userspace what bits are not supported by KVM. KVM_TDX_CAPABILITIES.cpuid doesn't work because it represents the configurable CPUIDs, not supported CPUIDs (I think we might rename it to configurable_cpuid to better reflect its meaning). So userspace has to hardcode that TSX and WAITPKG is not support itself.
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> Tested-by: Peter Gonda <pgonda@google.com>
 > 
-> I don't follow why hardcoding would be necessary.
 > 
-> If the leaf is represented in KVM_TDX_CAPABILITIES.cpuid, and
-> the bits are 0 there, why would userspace try to set them to 1?
-
-Userspace doesn't set the bit to 1 in kvm_tdx_init_vm.cpuid, doesn't 
-mean userspace wants the bit to be 0.
-
-Note, KVM_TDX_CAPABILITIES.cpuid reports the configurable bits. The 
-value 0 of a bit in KVM_TDX_CAPABILITIES.cpuid means the bit is not 
-configurable, not means the bit is unsupported.
-
-For kvm_tdx_init_vm.cpuid,
-  - if the corresponding bit is reported as 1 in 
-KVM_TDX_CAPABILITIES.cpuid, then a value 0 in kvm_tdx_init_vm.cpuid 
-means userspace wants to configure it as 0.
-  - if the corresponding bit is reported as 0 in 
-KVM_TDX_CAPABILITIES.cpuid, then userspace has to pass a value 0 in 
-kvm_tdx_init_vm.cpuid. But it doesn't mean the value of the bit will be 0.
-
-e.g., X2APIC bit is 0 in KVM_TDX_CAPABILITIES.cpuid, and it's also 0 in 
-kvm_tdx_init_vm.cpuid, but TD guest sees a value of 1. In the view of 
-QEMU, it maintains the bit of X2APIC as 1, and QEMU filters X2APIC bit 
-when calling KVM_TDX_INIT_VM because X2APIC is not configurable.
-
-So when it comes to TSX and WAITPKG, QEMU also needs an interface to be 
-informed that they are unsupported. Without the interface of fixed0 bits 
-reported by KVM, QEMU needs to hardcode itself like [1]. The problem of 
-hardcode is that it will conflict when future KVM allows them to be 
-configurable.
-
-In the future, if we have interface from KVM to report the fixed0 and 
-fixed1 bit (on top of the proposal [2]), userspace can drop the 
-hardcoded one it maintains. At that time, KVM can ensure no conflict by 
-removing the bits from fixed0/1 array when allowing them to be 
-configurable.
-
-[1] 
-https://lore.kernel.org/qemu-devel/20241105062408.3533704-49-xiaoyao.li@intel.com/
-[2] 
-https://lore.kernel.org/all/43b26df1-4c27-41ff-a482-e258f872cc31@intel.com/
-
->>
->> [1] https://lore.kernel.org/all/ZuM12EFbOXmpHHVQ@google.com/
->>
+>> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 > 
+> This patch changed somewhat from last time. 
 
+Yes, most of the change was dynamic allocation in snp_get_tsc_info().
+
+> When did Peter test it again and
+> Tom review it again?
+
+It makes sense to drop both.
+
+> 
+>> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+>> index a61898c7f114..39683101b526 100644
+>> --- a/arch/x86/coco/sev/core.c
+>> +++ b/arch/x86/coco/sev/core.c
+>> @@ -96,6 +96,14 @@ static u64 sev_hv_features __ro_after_init;
+>>  /* Secrets page physical address from the CC blob */
+>>  static u64 secrets_pa __ro_after_init;
+>>  
+>> +/*
+>> + * For Secure TSC guests, the BP fetches TSC_INFO using SNP guest messaging and
+> 
+> s/BP/BSP/
+> 
+>> + * initializes snp_tsc_scale and snp_tsc_offset. These values are replicated
+>> + * across the APs VMSA fields (TSC_SCALE and TSC_OFFSET).
+>> + */
+>> +static u64 snp_tsc_scale __ro_after_init;
+>> +static u64 snp_tsc_offset __ro_after_init;
+>> +
+>>  /* #VC handler runtime per-CPU data */
+>>  struct sev_es_runtime_data {
+>>  	struct ghcb ghcb_page;
+> 
+> ...
+> 
+>> +	memcpy(tsc_resp, buf, sizeof(*tsc_resp));
+>> +	pr_debug("%s: response status 0x%x scale 0x%llx offset 0x%llx factor 0x%x\n",
+>> +		 __func__, tsc_resp->status, tsc_resp->tsc_scale, tsc_resp->tsc_offset,
+>> +		 tsc_resp->tsc_factor);
+>> +
+>> +	if (tsc_resp->status == 0) {
+> 
+> Like the last time:
+> 
+> 	if (!tsc_resp->status)
+
+Ack.
+ 
+Regards
+Nikunj
 
