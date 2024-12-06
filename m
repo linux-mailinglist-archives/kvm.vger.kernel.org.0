@@ -1,170 +1,139 @@
-Return-Path: <kvm+bounces-33199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE45A9E6937
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 09:45:16 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115479E6A68
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 10:36:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 879E3280EBF
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 08:45:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 343B4168832
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 09:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F911DFD98;
-	Fri,  6 Dec 2024 08:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4314E1F9EAE;
+	Fri,  6 Dec 2024 09:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UEbZtbJ1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xzl4y1Yr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4861DFE0C;
-	Fri,  6 Dec 2024 08:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F6D1EF097;
+	Fri,  6 Dec 2024 09:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733474709; cv=none; b=LQ7aK8OsLc4sbIqRYoF5+1LAukIY3PE9T0pkqFeAfWBWmSQdYixQcEjOir82ScWMGBrEJDX8SbPpYLdWoMblEJt7h28zCjUmYe774t9N87y1bQ5sgCdg8bkFi14p4+mzAyyeKgSiFLnF4PFu5fXRoGff9h4UHEFVY3tzLciAhD8=
+	t=1733477697; cv=none; b=bajn6mCTeC3LqMbv5NweHxtXmt8IVWL3g4+sqwKrd2jP2UtfqAqGHA+FHRjFV6CD1N+O9oAWNY1P9F37osdVLpzbrCOAdWcXkgTB6981rNYzik8mPbjeKyqWgiXbom9CDvPCRICJtc9//lmcWzvb4s2Obqhw6sl7/6gWesqy9RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733474709; c=relaxed/simple;
-	bh=2KRYR7r62YDp8kPw/O9BarXwLgYk0cdV3dHILNk4rYw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZtL9neFCQjamuYkrPX7uPJweZq4LjouxDbpIhNeONvh1MBYb5K7b+zxzklhocrP232wB2AvHZnc4VYWxserkgxhDm+1p2pfOJ2XUabO1/41xnhrwPtevD26G5yIoNso+SExHsx0v78zKwJ3H1IE+LiTFJ2CT+XR14zRo1QnYg1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UEbZtbJ1; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1733477697; c=relaxed/simple;
+	bh=/i0+YCGdEkqQWh9rUMU2mm58oTj6C06sUI/9CvnFWeo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YWPdSmPl6QgJJAqTHJ9I4HdXTKH35qEPQexaUx3M1eNu+rfkmJUleW9Tf0FkK6pl3xdDp9HKlN/cLel2RGoODinrJzC9MSi/4DFjeKYEMSEPOfzJL1dvXmR5Lf/mvdzZZxvjZQggb5ZBgjRqVsbfmrRiBVPdzh00bO8C4BVF0Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xzl4y1Yr; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733474707; x=1765010707;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2KRYR7r62YDp8kPw/O9BarXwLgYk0cdV3dHILNk4rYw=;
-  b=UEbZtbJ1BscSr6B7Np/uXcVqPmUt4F4lgo1rv6fe3d069AE4CijdLVki
-   dwMw7e5t1JT74KSB1UO6q1kzFzZNG7Ixd74c+G/o+bLuP1ufqjBwZuepO
-   Z7XSHp1328ubCAB/oiw+j1vGqA7bjoDS1mQvRuZJTUT8UR31+E/9uOjw8
-   sZcLtSW9ygOP4w8Uh+RWSV8OG68OdFORQXAoOvEdcG1eRz83MncTmA6OM
-   tDfikXz3V/WPNCvAhwkLnZLiIoL1NYtR4JwqlUvDz3JEtqxxY/B2fHynq
-   IDTe3ky+TaKbLUtzZcwbhZcU8mNma8sSDqCrJy/VwAB2vipaPkantl1IR
-   A==;
-X-CSE-ConnectionGUID: kiW66yQsQi6msULVdjjGMw==
-X-CSE-MsgGUID: Yw5UMCT6Sgu+acHM6iK6bw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="37753758"
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="37753758"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 00:45:07 -0800
-X-CSE-ConnectionGUID: gANrr6HxRKaIUPJzwaZjbg==
-X-CSE-MsgGUID: qHRxZticTUe6bkU52RFLcw==
+  t=1733477696; x=1765013696;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/i0+YCGdEkqQWh9rUMU2mm58oTj6C06sUI/9CvnFWeo=;
+  b=Xzl4y1YrfNhuh9z9mC+p2xqVBqhKNMOSiOAp7T4ATREtrQHq7xHo/xcf
+   sg0lgnoMdFrfuhQgmeBIWo2GpOlB28s7run1mN/RW4IdTKTBKcEa4j+oX
+   F55fJZYT8SMGanAgfhTTDht9qUUNRL2RRTagQplH0EJXRuVAwgkN/tfqV
+   OOg5PTLULNDX0anq238n4mSEXui6TDJyN3VK/ESUY0x9Mbxzbm1Znij+0
+   9lwmZ2IXpI8TIYlMENkny6gDlvvCkd/WHFKrZgPWE5aM1GJro7GulWfHg
+   Op5L512I/Ia7Eyy+JVs00Z5qBSKl1eqRCCp+Isbk9atRFS0s5yp7KYPo7
+   w==;
+X-CSE-ConnectionGUID: XgtgCHCKTOmgmu49EEI1AA==
+X-CSE-MsgGUID: Joh8vJMlRVKCWUEoADDYkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="33953897"
+X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
+   d="scan'208";a="33953897"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 01:34:55 -0800
+X-CSE-ConnectionGUID: rXIgzfzBQ8yRDHJPmvq4+g==
+X-CSE-MsgGUID: YI3MsMMqRHqmywejOfkvhg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="94205858"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 00:45:04 -0800
-Message-ID: <2463ba67-aa8c-4f41-8f13-f1936a4f457a@intel.com>
-Date: Fri, 6 Dec 2024 16:45:01 +0800
+X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
+   d="scan'208";a="99421496"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa004.jf.intel.com with ESMTP; 06 Dec 2024 01:34:51 -0800
+Date: Fri, 6 Dec 2024 17:31:39 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com, kai.huang@intel.com,
+	adrian.hunter@intel.com, reinette.chatre@intel.com,
+	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com,
+	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+	michael.roth@amd.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/7] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+Message-ID: <Z1LEe1VL2YvoCp0A@yilunxu-OptiPlex-7050>
+References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+ <20241201035358.2193078-6-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 16/25] KVM: TDX: Get system-wide info about TDX module
- on initialization
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
- seanjc@google.com
-Cc: yan.y.zhao@intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- tony.lindgren@linux.intel.com, reinette.chatre@intel.com,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
- <20241030190039.77971-17-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20241030190039.77971-17-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241201035358.2193078-6-binbin.wu@linux.intel.com>
 
-On 10/31/2024 3:00 AM, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> TDX KVM needs system-wide information about the TDX module. Generate the
-> data based on tdx_sysinfo td_conf CPUID data.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Co-developed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
-> Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> ---
-> uAPI breakout v2:
->   - Update stale patch description (Binbin)
->   - Add KVM_TDX_CAPABILITIES where it's first used (Binbin)
->   - Drop Drop unused KVM_TDX_CPUID_NO_SUBLEAF (Chao)
->   - Drop mmu.h, it's only needed in later patches (Binbin)
->   - Fold in Xiaoyao's capabilities changes (Tony)
->   - Generate data without struct kvm_tdx_caps (Tony)
->   - Use struct kvm_cpuid_entry2 as suggested (Binbin)
->   - Use helpers for phys_addr_bits (Paolo)
->   - Check TDX and KVM capabilities on _tdx_bringup() (Xiaoyao)
->   - Change code around cpuid_config_value since
->     struct tdx_cpuid_config_value {} is removed (Kai)
-> 
-> uAPI breakout v1:
->   - Mention about hardware_unsetup(). (Binbin)
->   - Added Reviewed-by. (Binbin)
->   - Eliminated tdx_md_read(). (Kai)
->   - Include "x86_ops.h" to tdx.c as the patch to initialize TDX module
->     doesn't include it anymore.
->   - Introduce tdx_vm_ioctl() as the first tdx func in x86_ops.h
-> 
-> v19:
->   - Added features0
->   - Use tdx_sys_metadata_read()
->   - Fix error recovery path by Yuan
-> 
-> Change v18:
->   - Newly Added
-> ---
->   arch/x86/include/uapi/asm/kvm.h |   9 +++
->   arch/x86/kvm/vmx/tdx.c          | 137 ++++++++++++++++++++++++++++++++
->   2 files changed, 146 insertions(+)
-> 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index b6cb87f2b477..0630530af334 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -928,6 +928,8 @@ struct kvm_hyperv_eventfd {
->   
->   /* Trust Domain eXtension sub-ioctl() commands. */
->   enum kvm_tdx_cmd_id {
-> +	KVM_TDX_CAPABILITIES = 0,
+> +static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 reg_mask = kvm_rcx_read(vcpu);
+> +	u64* opt_regs;
 > +
->   	KVM_TDX_CMD_NR_MAX,
->   };
->   
-> @@ -950,4 +952,11 @@ struct kvm_tdx_cmd {
->   	__u64 hw_error;
->   };
->   
-> +struct kvm_tdx_capabilities {
-> +	__u64 supported_attrs;
-> +	__u64 supported_xfam;
-> +	__u64 reserved[254];
-> +	struct kvm_cpuid2 cpuid;
+> +	/*
+> +	 * Skip sanity checks and let userspace decide what to do if sanity
+> +	 * checks fail.
+> +	 */
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX_FATAL;
+> +	vcpu->run->system_event.ndata = 10;
+> +	/* Error codes. */
+> +	vcpu->run->system_event.data[0] = tdvmcall_a0_read(vcpu);
+> +	/* GPA of additional information page. */
+> +	vcpu->run->system_event.data[1] = tdvmcall_a1_read(vcpu);
+> +	/* Information passed via registers (up to 64 bytes). */
+> +	opt_regs = &vcpu->run->system_event.data[2];
+> +
+> +#define COPY_REG(REG, MASK)						\
+> +	do {								\
+> +		if (reg_mask & MASK)					\
+> +			*opt_regs = kvm_ ## REG ## _read(vcpu);		\
+> +		else							\
+> +			*opt_regs = 0;					\
+> +		opt_regs++;						\
+> +	} while (0)
+> +
+> +	/* The order is defined in GHCI. */
+> +	COPY_REG(r14, BIT_ULL(14));
+> +	COPY_REG(r15, BIT_ULL(15));
+> +	COPY_REG(rbx, BIT_ULL(3));
+> +	COPY_REG(rdi, BIT_ULL(7));
+> +	COPY_REG(rsi, BIT_ULL(6));
+> +	COPY_REG(r8, BIT_ULL(8));
+> +	COPY_REG(r9, BIT_ULL(9));
+> +	COPY_REG(rdx, BIT_ULL(2));
 
-Could we rename it to "configurable_cpuid" to call out that it only 
-reports the bits that are allowable for userspace to configure at 0 or 1 
-at will.
+Nit:
 
-If could we can even add a comment of
+#undef COPY_REG
 
-	/*
-          * Bit of value 1 means the bit is free to be configured as
-          * 0/1 by userspace VMM.
-          * The value 0 only means the bit is not configurable, while
-          * the actual value of it depends on TDX module/KVM
-          * implementation.
-          */
+Thanks,
+Yilun
+
+> +
+> +	/*
+> +	 * Set the status code according to GHCI spec, although the vCPU may
+> +	 * not return back to guest.
+> +	 */
+> +	tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
+> +
+> +	/* Forward request to userspace. */
+> +	return 0;
+> +}
 
