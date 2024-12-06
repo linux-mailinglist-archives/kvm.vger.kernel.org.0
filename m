@@ -1,327 +1,185 @@
-Return-Path: <kvm+bounces-33232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFDB9E7B87
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 23:15:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 849BD9E7BD5
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 23:31:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A52C16A569
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 22:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637FF16B00C
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 22:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D3B213E8C;
-	Fri,  6 Dec 2024 22:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23FF22C6F6;
+	Fri,  6 Dec 2024 22:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uKVZCSva"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJCamlNN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54B222C6C0;
-	Fri,  6 Dec 2024 22:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733523238; cv=fail; b=lRhzYqUFNwXWYPhBdLMz2whrwnhS9g89widaKhdrvAOGUWRZ5TnWsPeZRf3NfsnYCa8SHYRaNicPHdIJ7CuJLXKcX/GIDu4cOa2hJHTewKxeNGlu6BUH52gcji/7fZaEjLu8lq26RidmOmrC/pbyng7sXF8xW5FmdRCrKHwVlUg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733523238; c=relaxed/simple;
-	bh=4dtbGJxb9djd9qTLkL+51yl3XDHmb2r2sSyL6u14efY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tjDi8DSvAIuBwF7lh9hZd7mVS+gg0vKIFbwmwMHIWs+PkSgZyaZjRb7iM/pGZjEi42Bjr3j8dUfslZO+z4lX7ed05x7ZT94P12B8YqVt3SuTPO4WXfTA+S8pKeVkZXae++lc+4XeAB8YEcyMQUIfq6kSx1Y3QIv8ch2+kDSbFWI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uKVZCSva; arc=fail smtp.client-ip=40.107.92.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eLpxN5907nIab334NzDMwyHd6PixCG9ibIsOk3MQaKu+grDt4W0ODzCDAsD3pwb/wqBQe9PnTt56bujA0kRUhUuACv9XLiBKinSX3WSwnbmSd3gaBAWDAQY57wa/OFDuWr/uPA3mskvUCDSmjY3W/b/iUmjXcjjOcNDh5CAhY6WPO94fJnfmJ8p5qqDi0uacnphYxg9sXQMhRJ828XicBV1JzG/Lg/WyLof0lwiLPTv64c/g/PHo0euSNvMtyf3RQOfmBtIV+slLM3Cit7+gqZgYTAdQ//pmpWLVFQ5ZeP6BEhX1/UgyY2BV1BIVbHTBoNCtIHnAGe4/jDLbjYvgtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cyL+IE+eCha3dXEYBgkUPhnUi/1gCetOfEXmNAM8Uig=;
- b=haXywSzJ64EVwcZEmoS0cGYp6L9nfoaqBcXNJ+nVHYFSzf9tYp41Wwq+eMS5POWIakF9B89zg11ykbcopbaiBuFXicas96JaolgiyqWJnKqpZVN/pr9BuNjp6YW42XavfAsoSeW1IbSv1VbXQZrzG/PBRrEhj5zcSIizZGQ9m7nypawsOARqrWN7Cnhy1tKaM1iVn5zlud2kNCFEwA/dWg/PzR8v0Z/tG6qnQ+mDhxqg1PqefBzqrJCqPJg9DDgC/WJDcOtwnKS1HcuyrsAPNpaeiTX9/0T2b2Jvqm8ojHs1+zpOF/AQjlANFNm6iNrlFqpRFcnCgmy/NRIvB42lfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cyL+IE+eCha3dXEYBgkUPhnUi/1gCetOfEXmNAM8Uig=;
- b=uKVZCSvagLOwokMh+R0LDTkcxV8y17Qi42g72iqdPIg2DntFRQNJto8YOCbedxVGJQpsORDOigOV2cRonEOpGmcz2LjY3cR7yiAVVCXV55pTd16rNPKW//RNgkIEiLXdt9Uc1R6foPpeMDHQxP4h+62bpiPqc8rcMffyr76oNtQ=
-Received: from BL1PR13CA0146.namprd13.prod.outlook.com (2603:10b6:208:2bb::31)
- by SA1PR12MB6848.namprd12.prod.outlook.com (2603:10b6:806:25f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.22; Fri, 6 Dec
- 2024 22:13:50 +0000
-Received: from BN3PEPF0000B076.namprd04.prod.outlook.com
- (2603:10b6:208:2bb:cafe::c3) by BL1PR13CA0146.outlook.office365.com
- (2603:10b6:208:2bb::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.9 via Frontend Transport; Fri, 6
- Dec 2024 22:13:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B076.mail.protection.outlook.com (10.167.243.121) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8230.7 via Frontend Transport; Fri, 6 Dec 2024 22:13:49 +0000
-Received: from ruby-9130host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 6 Dec
- 2024 16:13:48 -0600
-From: Melody Wang <huibo.wang@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, LKML
-	<linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Dhaval Giani <dhaval.giani@amd.com>, Melody Wang <huibo.wang@amd.com>
-Subject: [PATCH 2/2] KVM: SVM: Provide helpers to set the error code
-Date: Fri, 6 Dec 2024 22:12:57 +0000
-Message-ID: <20241206221257.7167-3-huibo.wang@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241206221257.7167-1-huibo.wang@amd.com>
-References: <20241206221257.7167-1-huibo.wang@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A654F212FB6
+	for <kvm@vger.kernel.org>; Fri,  6 Dec 2024 22:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733524244; cv=none; b=nPaoOC5iWm2TDMHHlbBI/Qv3I3jeIHp/ILpBnseaXQwc21c2cfj7sVvrYFKtp3JRWJQOLkNKqK7qJwT4OeypjuWNifSfAtO73aOaaZdjHw3DyyN6FCbv4vX7TENn3fH06YRBUbMbj5V4stNN4wyiDl1CZITddXXILrmf0RdT2eM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733524244; c=relaxed/simple;
+	bh=SPeVPwKrzLZek5GfDo09DmwTHKr5Y70YVXjOj9s53bc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SjxiZaDSch+XwDPd1GpYVkbnpW6eEG8y1x1J9NiuREAyYhPzoiiq2nILt1zqgDPkrSYy6HZLaFYsuRSz/z+o5DbSAS0Gvv/kUW0Rmm943K8YL4sANBM6VIpAWR7zPrkoXIx4gvveXjrVsaviPh/c1OfA4oh+33+YQJDysnLPUnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mJCamlNN; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef73159d6fso1140047a91.1
+        for <kvm@vger.kernel.org>; Fri, 06 Dec 2024 14:30:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733524242; x=1734129042; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ehs/f+RINRe38P2riAl7HuSD689ga4M8osV1LhPlfjY=;
+        b=mJCamlNNd349GsAanrLFL26GdyDnzJC/24o2sAMJ4a/8tWTc7fJWdVio1vmhEQ++0u
+         TQ8iTgwoNfzMAqAnR6p3o8otf0+ulBAn8URxOmABbYvr85Ha1436oEoPK59RxQYVJXE8
+         ecuvYvYULjvICV9vCILhPDPWCNT8FWFKgOaBVZdPjb0MO1MLoJOXWbsCZQW9i11GJ72S
+         HJa2pfF10QYLODJChkenWZY/FCwourSqRLgJvbS56H+QScgUiprw0HCtVoBuMkSJEEVS
+         hslc3mPIwrd8lQ8AHpJzDVymDJ2gbBEuu2HdnQqfT99WU1f3vJ3SaOiA/73bqsnFTAy7
+         Pz8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733524242; x=1734129042;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ehs/f+RINRe38P2riAl7HuSD689ga4M8osV1LhPlfjY=;
+        b=Bd+uwoVkE6kfQfHC+UL8PvQPmQuIlK+hqkwPtBRBLBadDCgvQTDXEq2wLJ6kv+So/4
+         UsbELa/WXHEGwhThKxt8rU9Lw8AdB8/pwyUID7Lvq+W0WsmXYWITQUUO8bi6A3EVuEyv
+         47e/AGSZkNZCTW/qQH/ELk/eZoSmcox+f4n+oNxT5fOTvv8S+lvZmjmIbbgDbZBeUm+r
+         ToToBTVBjt81VWmK2ZXDi7rZO5jGxEeZWLU0fBj+TTifAc/DqckuUyqGXuqe7WqZKDgg
+         JA+QLsMFpwWHMo8Sg6es6owvQQQAa4TMh9N8LtoYDcaxfoo+UrZlrB9G2vZWFNqsfa5L
+         OO9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWXMADj00lp/y6mFd9jYXFMdEGGC7/uI4ej3+pmLf5TLGPwpsgLWc3V3L8l5RzKu3Aha0E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxbg0lzE417jzxjOdVpJMzV70Su7Ks5dwWe2PBT6qdXe4Xzj/Kv
+	tZZ9m6iuaeLHvQUZfS7jTxAmfUlpsFwt9X4efLBqWn/9xnKzdqy5YgIcQv6SDb5FL7FhS2f51C9
+	4QQ==
+X-Google-Smtp-Source: AGHT+IG7KwTlm9La7VaJupYFQcMsbRhngIakjharI0ZpEaG+VpJ37f7N0AvvnzDB+FaakyJbiNolQI288ZY=
+X-Received: from pjbsd7.prod.google.com ([2002:a17:90b:5147:b0:2ea:5c73:542c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:53c7:b0:2ee:c059:7de3
+ with SMTP id 98e67ed59e1d1-2ef6a6bc29bmr7467563a91.18.1733524242063; Fri, 06
+ Dec 2024 14:30:42 -0800 (PST)
+Date: Fri, 6 Dec 2024 14:30:40 -0800
+In-Reply-To: <7ea2b3e8-56b7-418f-8551-b905bf10fecb@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B076:EE_|SA1PR12MB6848:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2e3cffa-cbce-477d-9a17-08dd164342d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TM9Tp17kDkL4qbBtGCrhAVo/ChyIN6m47jSxZAYu96ZCEj9OukjuEZwcZBGh?=
- =?us-ascii?Q?AP4zad29GN4l/7x0hiAENDqfPMjRiZy9Tj7IMpTbvBoWKmVlMfXY9+pYsZqM?=
- =?us-ascii?Q?NoB/GuLa+nK9BCMEgtaKebA6eoId6Cnejn/vV9Cj24slBjLSAttVLJHTkEzr?=
- =?us-ascii?Q?zzXNzd6/+3AAUtavk9JXZWgp/hr6uAynKtkEbD4iE6XnwBxoiiJYESaQ4+ty?=
- =?us-ascii?Q?+Vfl8Nr9+O36Kvj+oexxcGaZ9eOSHSPcBaC6Vp0kGus0KcTZ/poEkBKlQT5O?=
- =?us-ascii?Q?RURL39XwoDlp55qMbSK4a8PMLld1tpWH3JlkAK1+t2eJUQj1jzn1t7CgBcML?=
- =?us-ascii?Q?ik3N4P+C3syRPmslfdBPx5Mc0qo4aMZdtqG88HvOuAtbnydFtoBwcNRrSJgM?=
- =?us-ascii?Q?EoFa9TbYHqJ+NCY7kFHIptxHfCZbPr0P1wkvgYugs8xK74nE6SfdZlcB5l5u?=
- =?us-ascii?Q?8DN3s5gMSm/REhttOa0IczG40nFb3JhWzacnX31kHCBk7Rv+r9/vjtSk+2+0?=
- =?us-ascii?Q?ZEPk3HVJ7IjlqvOcQwdLgK+ser8GpycS2T0KC0ervPbFjCLOg43FhmcNHpOg?=
- =?us-ascii?Q?hBEsv9+1Y/JfnDx+50hD0nHm2A6uUf53MJ5jcsOVmsOuld6cXHT55flHt9ye?=
- =?us-ascii?Q?xd+oRkfdRsdRAWx/LwMSXeGhDGTB8reN85lC0eJfKRbIOqe46IfJv5QDRfTG?=
- =?us-ascii?Q?4COxUnJ+uf228cVzv0eIgJamEEuJSX7AiPBxYA1iCCrxbD4/30LdAtAs7wqN?=
- =?us-ascii?Q?BrntD6gjy58Iz81b5M3oUp/Oaygtx3Gdidc5hlC58DOqfJysbnwaQoFv8ZX9?=
- =?us-ascii?Q?lCZcoHNnKrN5lRbR+OM9mpjGtWcNDP2rxRCUjCWhq9vedb5M1okLBWzyHqMN?=
- =?us-ascii?Q?QSAQjJJOdcT8jzVFtjbhMmCQaQ458WpfY/2X3mC+0fLqjQ3lONagAN3qBaWL?=
- =?us-ascii?Q?LQsW7JeDS0o1hS24ujC9UGV+cr3gJLzvTIb+U5cJfOxhVM8AtbC/snY/P83U?=
- =?us-ascii?Q?igdBLs6Xe2IxTq8UX59DcXB808zQ60fC5a9+0eMKiC3aPPD7fJmLRWZD9i1D?=
- =?us-ascii?Q?GfMBg6NmCRq2zm6T3lBsyudxjPRSji6KNr3wPM0HTojwCa+zZHObH3ZQ8sr+?=
- =?us-ascii?Q?NpOfbVY+hj0vK6BksH2YpS8guvj55JkT3QI72YMSNECMzb+fP4XU/Kbd4/wL?=
- =?us-ascii?Q?BX2f5zCMC8WTWZDkocjqEcDJkpq8NxI2KlM2/PShHUh974Pwb/tbAHtIFVNa?=
- =?us-ascii?Q?YGbNeqhzq0TDS9eKRUjMVqMyJ3kZjNlwvZz2kA6UApFWx2y56LdjOLfqbkxU?=
- =?us-ascii?Q?XsPOz4G84MtcKqND4EWKlNg1Ybs4I+vEfz3fXGUA/zCdY0s4ItKKuMdps1Im?=
- =?us-ascii?Q?V8XyiAmUV6P3Sf7wvs3+SwDD5Y8TJ/SOjyIBzoECIyafVel1sA0pckOneK6a?=
- =?us-ascii?Q?FNGpYW9P8N6spTeztChEvBpp2Rl3pc39?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 22:13:49.5571
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2e3cffa-cbce-477d-9a17-08dd164342d2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B076.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6848
+Mime-Version: 1.0
+References: <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
+ <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
+ <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com> <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
+ <Zz9mIBdNpJUFpkXv@google.com> <cb62940c-b2f7-0f3e-1710-61b92cc375e5@amd.com>
+ <Zz9w67Ajxb-KQFZZ@google.com> <7ea2b3e8-56b7-418f-8551-b905bf10fecb@amd.com>
+Message-ID: <Z1N7ELGfR6eTuO6D@google.com>
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au, 
+	x86@kernel.org, john.allen@amd.com, davem@davemloft.net, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Provide helpers to set the error code when converting VMGEXIT SW_EXITINFO1 and
-SW_EXITINFO2 codes from plain numbers to proper defines. Add comments for
-better code readability.
+On Thu, Nov 21, 2024, Ashish Kalra wrote:
+> On 11/21/2024 11:42 AM, Sean Christopherson wrote:
+> > On Thu, Nov 21, 2024, Tom Lendacky wrote:
+> >> On 11/21/24 10:56, Sean Christopherson wrote:
+> >>> On Thu, Nov 21, 2024, Ashish Kalra wrote:
+> >>> Actually, IMO, the behavior of _sev_platform_init_locked() and pretty much all of
+> >>> the APIs that invoke it are flawed, and make all of this way more confusing and
+> >>> convoluted than it needs to be.
+> >>>
+> >>> IIUC, SNP initialization is forced during probe purely because SNP can't be
+> >>> initialized if VMs are running.  But the only in-tree user of SEV-XXX functionality
+> >>> is KVM, and KVM depends on whatever this driver is called.  So forcing SNP
+> >>> initialization because a hypervisor could be running legacy VMs make no sense.
+> >>> Just require KVM to initialize SEV functionality if KVM wants to use SEV+.
+> >>
+> >> When we say legacy VMs, that also means non-SEV VMs. So you can't have any
+> >> VM running within a VMRUN instruction.
+> > 
+> > Yeah, I know.  But if KVM initializes the PSP SEV stuff when KVM is loaded, then
+> > KVM can't possibly be running VMs of any kind.
+> > 
+> >> Or...
+> >>
+> >>>
+> >>> 	/*
+> >>> 	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+> >>> 	 * so perform SEV-SNP initialization at probe time.
+> >>> 	 */
+> >>> 	rc = __sev_snp_init_locked(&args->error); 
+> >>>
+> >>> Rather than automatically init SEV+ functionality, can we instead do something
+> >>> like the (half-baked pseudo-patch) below?  I.e. delete all paths that implicitly
+> >>> init the PSP, and force KVM to explicitly initialize the PSP if KVM wants to use
+> >>> SEV+.  Then we can put the CipherText and SNP ASID params in KVM.
+> >>
+> >> ... do you mean at module load time (based on the module parameters)? Or
+> >> when the first SEV VM is run? I would think the latter, as the parameters
+> >> are all true by default. If the latter, that would present a problem of
+> >> having to ensure no VMs are active while performing the SNP_INIT.
+> > 
+> > kvm-amd.ko load time.
+> 
+> Ok, so kvm module load will init SEV+ if indicated by it's module parameters.
+> 
+> But, there are additional concerns here. 
+> 
+> SNP will still have to be initialized first, because SNP_INIT will fail if
+> SEV INIT has been done.
+> 
+> Additionally, to support SEV firmware hotloading (DLFW_EX), SEV can't be
+> initialized. 
+> 
+> So probably, we will have to retain some PSP style SEV+ initialization here,
+> SNP_INIT is always done first and then SEV INIT is skipped if explicitly
+> specified by a module param. This allows SEV firmware hotloading to be
+> supported.
+> 
+> But, then with SEV firmware hotload support how do we do SEV INIT without
+> unloading and reloading KVM module ?
 
-No functionality changed.
+So the above says:
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Melody Wang <huibo.wang@amd.com>
----
- arch/x86/kvm/svm/sev.c | 39 +++++++++++++++++++++------------------
- arch/x86/kvm/svm/svm.c |  6 +-----
- arch/x86/kvm/svm/svm.h | 24 ++++++++++++++++++++++++
- 3 files changed, 46 insertions(+), 23 deletions(-)
+ SEV_CMD_SNP_INIT{_ES} cannot be executed if SEV_CMD_INIT{_EX} has been executed.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index e7db7a5703b7..409f77a6151e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3433,8 +3433,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 		dump_ghcb(svm);
- 	}
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, reason);
-+	svm_vmgexit_bad_input(svm, reason);
- 
- 	/* Resume the guest to "return" the error code. */
- 	return 1;
-@@ -3577,8 +3576,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 	return 0;
- 
- e_scratch:
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
-+	svm_vmgexit_bad_input(svm, GHCB_ERR_INVALID_SCRATCH_AREA);
- 
- 	return 1;
- }
-@@ -3671,7 +3669,11 @@ static void snp_complete_psc(struct vcpu_svm *svm, u64 psc_ret)
- 	svm->sev_es.psc_inflight = 0;
- 	svm->sev_es.psc_idx = 0;
- 	svm->sev_es.psc_2m = false;
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-+	/*
-+	 * psc_ret contains 0 if all entries have been processed successfully
-+	 * or a reason code identifying why the request has not completed.
-+	 */
-+	svm_vmgexit_set_return_code(svm, 0, psc_ret);
- }
- 
- static void __snp_complete_one_psc(struct vcpu_svm *svm)
-@@ -4067,8 +4069,12 @@ static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_
- 		ret = -EIO;
- 		goto out_unlock;
- 	}
--
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(0, fw_err));
-+	/*
-+	 * SNP_GUEST_ERR(0, fw_err): Upper 32-bits (63:32) will contain the
-+	 * return code from the hypervisor. Lower 32-bits (31:0) will contain
-+	 * the return code from the firmware call (0 = success)
-+	 */
-+	svm_vmgexit_set_return_code(svm, 0, SNP_GUEST_ERR(0, fw_err));
- 
- 	ret = 1; /* resume guest */
- 
-@@ -4124,8 +4130,7 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
- 	return snp_handle_guest_req(svm, req_gpa, resp_gpa);
- 
- request_invalid:
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
-+	svm_vmgexit_bad_input(svm, GHCB_ERR_INVALID_INPUT);
- 	return 1; /* resume guest */
- }
- 
-@@ -4317,8 +4322,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_SUCCESS);
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 0);
-+	svm_vmgexit_success(svm, 0);
- 
- 	exit_code = kvm_ghcb_get_sw_exit_code(control);
- 	switch (exit_code) {
-@@ -4362,20 +4366,20 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 			break;
- 		case 1:
- 			/* Get AP jump table address */
--			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, sev->ap_jump_table);
-+			svm_vmgexit_set_return_code(svm, 0, sev->ap_jump_table);
- 			break;
- 		default:
- 			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
- 			       control->exit_info_1);
--			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
--			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
-+			svm_vmgexit_bad_input(svm, GHCB_ERR_INVALID_INPUT);
- 		}
- 
- 		ret = 1;
- 		break;
- 	}
- 	case SVM_VMGEXIT_HV_FEATURES:
--		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_HV_FT_SUPPORTED);
-+		/* Get hypervisor supported features */
-+		svm_vmgexit_success(svm, GHCB_HV_FT_SUPPORTED);
- 
- 		ret = 1;
- 		break;
-@@ -4397,8 +4401,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	case SVM_VMGEXIT_AP_CREATION:
- 		ret = sev_snp_ap_creation(svm);
- 		if (ret) {
--			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_MALFORMED_INPUT);
--			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
-+			svm_vmgexit_bad_input(svm, GHCB_ERR_INVALID_INPUT);
- 		}
- 
- 		ret = 1;
-@@ -4635,7 +4638,7 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 		 * Return from an AP Reset Hold VMGEXIT, where the guest will
- 		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
- 		 */
--		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
-+		svm_vmgexit_success(svm, 1);
- 		break;
- 	case AP_RESET_HOLD_MSR_PROTO:
- 		/*
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 58bce5f1ab0c..104e13d59c8a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2977,11 +2977,7 @@ static int svm_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
- 	if (!err || !sev_es_guest(vcpu->kvm) || WARN_ON_ONCE(!svm->sev_es.ghcb))
- 		return kvm_complete_insn_gp(vcpu, err);
- 
--	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, GHCB_HV_RESP_ISSUE_EXCEPTION);
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
--				X86_TRAP_GP |
--				SVM_EVTINJ_TYPE_EXEPT |
--				SVM_EVTINJ_VALID);
-+	svm_vmgexit_inject_exception(svm, X86_TRAP_GP);
- 	return 1;
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 43fa6a16eb19..baff8237c5c9 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -588,6 +588,30 @@ static inline bool is_vnmi_enabled(struct vcpu_svm *svm)
- 		return false;
- }
- 
-+static inline void svm_vmgexit_set_return_code(struct vcpu_svm *svm,
-+						u64 response, u64 data)
-+{
-+	ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, response);
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, data);
-+}
-+
-+static inline void svm_vmgexit_inject_exception(struct vcpu_svm *svm, u8 vector)
-+{
-+	u64 data = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_EXEPT | vector;
-+
-+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_ISSUE_EXCEPTION, data);
-+}
-+
-+static inline void svm_vmgexit_bad_input(struct vcpu_svm *svm, u64 suberror)
-+{
-+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_MALFORMED_INPUT, suberror);
-+}
-+
-+static inline void svm_vmgexit_success(struct vcpu_svm *svm, u64 data)
-+{
-+	svm_vmgexit_set_return_code(svm, GHCB_HV_RESP_SUCCESS, data);
-+}
-+
- /* svm.c */
- #define MSR_INVALID				0xffffffffU
- 
--- 
-2.34.1
+but the existing comment in _sev_platform_init_locked() says:
 
+	/*
+	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+	 * so perform SEV-SNP initialization at probe time.
+	 */
+
+Which one is correct?  I don't think it matters in the end, just trying to wrap my
+head around everything.
+
+And IIUC, SEV_CMD_SNP_INIT{_EX} can be executed before firmware hotload, but
+SEV_CMD_INIT{_EX} cannot.  Is that correct?  Because if firmware hotload can't
+be done while SEV VMs are _active_, then that's a very different situation.
+
+> This can reuse the current support (in KVM) to do SEV INIT implicitly when
+> the first SEV VM is run: sev_guest_init() -> sev_platform_init() 
+
+I don't love the implicit behavior, but assuming hotloading firmware can't be done
+after SEV_CMD_INIT{_EX}, that does seem like the least awful solution.
+
+To summarize, if the above assumptions hold:
+
+ 1. Initialize SNP when kvm-amd.ko is loaded.
+ 2. Define CipherTextHiding and ASID params kvm-amd.ko.
+ 3. Initialize SEV+ at first use.
+
+Just to triple check: that will allow firmware hotloading even if kvm-amd.ko is
+built-in, correct?  I.e. doesn't requires deferring kvm-amd.ko load until after
+firmware hotloading.
 
