@@ -1,209 +1,224 @@
-Return-Path: <kvm+bounces-33209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C989E6D5C
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 12:26:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41739E6FB2
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 14:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F7942824A7
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 11:26:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F762285151
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 13:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF4E1FF7D4;
-	Fri,  6 Dec 2024 11:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9826020C47C;
+	Fri,  6 Dec 2024 13:57:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mailfilter02-out21.webhostingserver.nl (mailfilter02-out21.webhostingserver.nl [141.138.168.70])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE1D1FA25E
-	for <kvm@vger.kernel.org>; Fri,  6 Dec 2024 11:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=141.138.168.70
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733484300; cv=pass; b=fA4qNNaJxyM0eKcpqHXkYhwL+4pyM1zoCRsm0Rt+0n5KAz5Pe/xmsb9jhFJM4WXj+dXooJkbsWQJfyJPoHaDFQ16YcM08GCzxPx090gDq6nDUKZZqGcLOL8wO0YTUQBG0UFD4igH2FYQFMOw/AtfhDmd/QqoC0Hs4YvUuDcL1NA=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733484300; c=relaxed/simple;
-	bh=MET7W4WnLCq6005qUbj5NtKGeohPo7kN/cQMFHdSAO0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rxT3UeDjfWZApoc8Bc1nmelD+0P0fZYLqYVhdg02yAZ5zqzc67k6MRGKVPiaBXfhmJoR0/44fBwyd9HKDbZtLQLKzPLAqDVUaYANp4Pu2BIPg4fLfmXjMfC2NAMvtH5Ee9vX5xQRjRTtfY4pTAAhbPJn7LdW9hMkdOxfaajrUow=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=141.138.168.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
-ARC-Seal: i=2; a=rsa-sha256; t=1733484229; cv=pass;
-	d=webhostingserver.nl; s=whs1;
-	b=HQuGC/6Igw9VWqt++HV/KbXcWkPA9OPDpHAwnCD5s5iHn2HTtI65UcoB2cQGMKm1+9odkcSPqJGxd
-	 0bqBqRJDKu//a7GHLbCFGTgkQ3KwmeHOMitA4rB3E1HuPb8gzAX4qKednv37tsicChl9/ZDKpHsnxq
-	 DI8PHCp3VZCWM8TKBF/vAhG2Vf72OUowmWOisKOsor1ULKxpTbV3b3RuqA/Aps7ZO3zR6YbuNf7mu2
-	 /Bqn3YXf+ktpN16NafQtXbUvF2eroFdWi7+JvfJtjCN6LCa4PP1IAEWQNvD7KO+xMZBT3YUFbyZGyH
-	 Qjctt4PcFl4p0HYrCj7xSBYO1goPyqw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-	d=webhostingserver.nl; s=whs1;
-	h=content-transfer-encoding:content-type:in-reply-to:from:references:cc:to:
-	 subject:mime-version:date:message-id:from;
-	bh=YtSPVooxyun9+mTGfKS72AWGootShF+nag7v1xcX57s=;
-	b=US60wxwiFvtUpqmlUFZfpH8gn+2bEW6u4BrfO3ytxOo3iHKL8hdrK+soCOCtCialhFBdJYTx9W6ui
-	 7C46xiPWmyKbw3dufd9nfXsQS+i48Qqem4pjRF/Kc3prEskhVLUw9N4FPn+QcDWTmoL+43fOa/8tzH
-	 Q6Cei4apCmUDCRW2qfE6eZjWbixaY1VoWO3m2+eJQk1vP2aKdiFFq2xnEVRXlO879xZr3680YOJ+bN
-	 qmrDemiW/dLX6ME+H7GovnBqk6DtkjKOnLxE2R7qn36qV6VGbHjxjor2xIo3V8oD0af9vV08xtpKNO
-	 hclj6bHb30s+cRv0UGHVRGdL6XL1aYQ==
-ARC-Authentication-Results: i=2; mailfilter02.webhostingserver.nl;
-	spf=softfail smtp.mailfrom=gmail.com smtp.remote-ip=141.138.168.154;
-	dmarc=fail header.from=gmail.com;
-	arc=pass header.oldest-pass=0;
-X-Halon-ID: 8fcc9952-b3c4-11ef-b67a-001a4a4cb922
-Received: from s198.webhostingserver.nl (s198.webhostingserver.nl [141.138.168.154])
-	by mailfilter02.webhostingserver.nl (Halon) with ESMTPSA
-	id 8fcc9952-b3c4-11ef-b67a-001a4a4cb922;
-	Fri, 06 Dec 2024 12:23:47 +0100 (CET)
-ARC-Seal: i=1; cv=none; a=rsa-sha256; d=webhostingserver.nl; s=whs1; t=1733484227;
-	 b=DoyINm4EL+srynz+UTxWDO4LNzIuaAfuA+Agfj9ABM/FETq/F3jMS+0at6Pzm36cyGNHTaoC1j
-	  KDTaDoAydnlgXaFNcI73iYLYdDSJ4hqod9wj6qLwK5C1wZcHqLyW2ItqEdAzt3Xgo0ofolk4Y/
-	  ejNhLVvjPlH19/80avJW2n6WiP/tX3OJWGE88tpUOFBj27y5EPiqHb+NcHL9mzSycdQHrT1NYi
-	  SZzTSX9Y9xknNgo92iYkzXUgqrdqfSO0ceKzlIdKfmW/D0CILh8EZFvOjLmNo0h98Fy95nim6r
-	  rsxExbow2BeRwkrYr9aRRkBEYDbTguxFkluzZCrqGkjB0Q==;
-ARC-Authentication-Results: i=1; webhostingserver.nl; smtp.remote-ip=178.250.146.69;
-	iprev=pass (cust-178-250-146-69.breedbanddelft.nl) smtp.remote-ip=178.250.146.69;
-	auth=pass (PLAIN) smtp.auth=ferry.toth@elsinga.info;
-	spf=softfail smtp.mailfrom=gmail.com;
-	dmarc=skipped header.from=gmail.com;
-	arc=none
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=webhostingserver.nl; s=whs1; t=1733484227;
-	bh=MET7W4WnLCq6005qUbj5NtKGeohPo7kN/cQMFHdSAO0=;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:
-	  Subject:MIME-Version:Date:Message-ID;
-	b=JaRXj+MbQoiXpHrTJu1magZxh5aGkMFbf7bo4of+DJJvOWGg1/kUj/EQMFiCzzpbh2+6PxpHEH
-	  nMYLrrg61GRBTugC2i2FQuf1EhGmhx1uk6J/sKSxoout+zD23Qt6e7H1PcUezlD9Zxc7qhQrWe
-	  JWFP2/ybJPgx5zA7XSYEE+N+JuYDA4tFSP6o9l6P3vb5y468XWnJk1+X9ERgg6BzxUTsDNexW/
-	  w0hj+McIjniXqawi1At/D/H8ulsVHnQsCSopFRbDOm+R5OSYeebKYQVTjkMra5Xh4wmdulnP/j
-	  K1DofIMeZuiyRQjTFPMxWxQLcbd05c8SpIyBrTvTkiknJA==;
-Authentication-Results: webhostingserver.nl;
-	iprev=pass (cust-178-250-146-69.breedbanddelft.nl) smtp.remote-ip=178.250.146.69;
-	auth=pass (PLAIN) smtp.auth=ferry.toth@elsinga.info;
-	spf=softfail smtp.mailfrom=gmail.com;
-	dmarc=skipped header.from=gmail.com;
-	arc=none
-Received: from cust-178-250-146-69.breedbanddelft.nl ([178.250.146.69] helo=smtp)
-	by s198.webhostingserver.nl with esmtpa (Exim 4.98)
-	(envelope-from <fntoth@gmail.com>)
-	id 1tJWR1-00000007jgu-16gg;
-	Fri, 06 Dec 2024 12:23:47 +0100
-Message-ID: <d890eecc-97de-4abf-8e0e-b881d5db5c1d@gmail.com>
-Date: Fri, 6 Dec 2024 12:23:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DA0207DF9
+	for <kvm@vger.kernel.org>; Fri,  6 Dec 2024 13:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733493464; cv=none; b=im1fBajowGvPFzpSp2NiDO152MnmlGjD4wBI5LevNPkEvX9+ISCxQ3Z5dSKyzwP/5VtUJtC2Y2GUFVK5DCOOHyhdEh8LAf130j7gqh5rIImU3xImXK+HoCz5EppZBT5j1v1vl3w2We+Fn6wBdE3BDcFt5J8awER/CI9gE2hVolM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733493464; c=relaxed/simple;
+	bh=BnaE+B3sx+ftJBkruhBvPWxADTb1r6NsNkI4huFjUB8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=HHh2UC9RktwsqZgK6wVI4Kx3Lfs+Q1vr5ewOewYyEcdTsgBv0X34aaS1zA2weFddXdCS5S5ejPJCPuBhvmnMQEA/47ppD+4P27DkNTdkGSDl6s1WZbPHF0TTXF6//dBsibFk+t1JUeHlwkJZydcyI29KBYwT+iqyUHVj56imw9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-167-EZHAcN5-Mh68KJfFcc05EQ-1; Fri, 06 Dec 2024 13:57:39 +0000
+X-MC-Unique: EZHAcN5-Mh68KJfFcc05EQ-1
+X-Mimecast-MFC-AGG-ID: EZHAcN5-Mh68KJfFcc05EQ
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 6 Dec
+ 2024 13:56:53 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 6 Dec 2024 13:56:53 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Arnd Bergmann' <arnd@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>
+CC: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
+ Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, "Linus
+ Torvalds" <torvalds@linux-foundation.org>, Andy Shevchenko <andy@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>, Sean Christopherson
+	<seanjc@google.com>, Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Thread-Topic: [PATCH 09/11] x86: rework CONFIG_GENERIC_CPU compiler flags
+Thread-Index: AQHbRjg+4x576lYtVEaZjwt66lpA/LLZPZ8Q
+Date: Fri, 6 Dec 2024 13:56:53 +0000
+Message-ID: <0163dae8b39b48c2b3ab9e26ed7279bc@AcuMS.aculab.com>
+References: <20241204103042.1904639-1-arnd@kernel.org>
+ <20241204103042.1904639-10-arnd@kernel.org>
+In-Reply-To: <20241204103042.1904639-10-arnd@kernel.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] x86: document X86_INTEL_MID as 64-bit-only
-To: Andy Shevchenko <andy.shevchenko@gmail.com>,
- Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Andy Shevchenko <andy@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Sean Christopherson <seanjc@google.com>,
- Davide Ciminaghi <ciminaghi@gnudd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org
-References: <20241204103042.1904639-1-arnd@kernel.org>
- <20241204103042.1904639-9-arnd@kernel.org>
- <CAHp75VfzHmV2anw6C8iSCiwnJc2YNa+1aLDj6Frf9OZyGjD0MQ@mail.gmail.com>
-Content-Language: en-US, nl
-From: Ferry Toth <fntoth@gmail.com>
-In-Reply-To: <CAHp75VfzHmV2anw6C8iSCiwnJc2YNa+1aLDj6Frf9OZyGjD0MQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ACL-Warn: Sender domain ( gmail.com ) must match your domain name used in authenticated email user ( ferry.toth@elsinga.info ).
-X-ACL-Warn: From-header domain ( gmail.com} ) must match your domain name used in authenticated email user ( ferry.toth@elsinga.info )
-X-Antivirus-Scanner: Clean mail though you should still use an Antivirus
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Oa7AdZk9nyh4auYisHaE24KJUgMFOKGNAPcISJPhI9g_1733493458
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: Arnd Bergmann
+> Sent: 04 December 2024 10:31
+> Building an x86-64 kernel with CONFIG_GENERIC_CPU is documented to
+> run on all CPUs, but the Makefile does not actually pass an -march=3D
+> argument, instead relying on the default that was used to configure
+> the toolchain.
+>=20
+> In many cases, gcc will be configured to -march=3Dx86-64 or -march=3Dk8
+> for maximum compatibility, but in other cases a distribution default
+> may be either raised to a more recent ISA, or set to -march=3Dnative
+> to build for the CPU used for compilation. This still works in the
+> case of building a custom kernel for the local machine.
+>=20
+> The point where it breaks down is building a kernel for another
+> machine that is older the the default target. Changing the default
+> to -march=3Dx86-64 would make it work reliable, but possibly produce
+> worse code on distros that intentionally default to a newer ISA.
+>=20
+> To allow reliably building a kernel for either the oldest x86-64
+> CPUs or a more recent level, add three separate options for
+> v1, v2 and v3 of the architecture as defined by gcc and clang
+> and make them all turn on CONFIG_GENERIC_CPU. Based on this it
+> should be possible to change runtime feature detection into
+> build-time detection for things like cmpxchg16b, or possibly
+> gate features that are only available on older architectures.
+>=20
+> Link: https://lists.llvm.org/pipermail/llvm-dev/2020-July/143289.html
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/x86/Kconfig.cpu | 39 ++++++++++++++++++++++++++++++++++-----
+>  arch/x86/Makefile    |  6 ++++++
+>  2 files changed, 40 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/arch/x86/Kconfig.cpu b/arch/x86/Kconfig.cpu
+> index 139db904e564..1461a739237b 100644
+> --- a/arch/x86/Kconfig.cpu
+> +++ b/arch/x86/Kconfig.cpu
+> @@ -260,7 +260,7 @@ endchoice
+>  choice
+>  =09prompt "x86-64 Processor family"
+>  =09depends on X86_64
+> -=09default GENERIC_CPU
+> +=09default X86_64_V2
+>  =09help
+>  =09  This is the processor type of your CPU. This information is
+>  =09  used for optimizing purposes. In order to compile a kernel
+> @@ -314,15 +314,44 @@ config MSILVERMONT
+>  =09  early Atom CPUs based on the Bonnell microarchitecture,
+>  =09  such as Atom 230/330, D4xx/D5xx, D2xxx, N2xxx or Z2xxx.
+>=20
+> -config GENERIC_CPU
+> -=09bool "Generic-x86-64"
+> +config X86_64_V1
+> +=09bool "Generic x86-64"
+>  =09depends on X86_64
+>  =09help
+> -=09  Generic x86-64 CPU.
+> -=09  Run equally well on all x86-64 CPUs.
+> +=09  Generic x86-64-v1 CPU.
+> +=09  Run equally well on all x86-64 CPUs, including early Pentium-4
+> +=09  variants lacking the sahf and cmpxchg16b instructions as well
+> +=09  as the AMD K8 and Intel Core 2 lacking popcnt.
 
-Op 04-12-2024 om 19:55 schreef Andy Shevchenko:
-> +Cc: Ferry
->
-> On Wed, Dec 4, 2024 at 12:31 PM Arnd Bergmann <arnd@kernel.org> wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->>
->> The X86_INTEL_MID code was originally introduced for the
->> 32-bit Moorestown/Medfield/Clovertrail platform, later the 64-bit
->> Merrifield/Moorefield variant got added, but the final
-> variant got --> variants were
->
->> Morganfield/Broxton 14nm chips were canceled before they hit
->> the market.
-> Inaccurate. "Broxton for Mobile", and not "Broxton" in general.
->
->
->> To help users understand what the option actually refers to,
->> update the help text, and make it a hard dependency on 64-bit
->> kernels. While they could theoretically run a 32-bit kernel,
->> the devices originally shipped with 64-bit one in 2015, so that
->> was proabably never tested.
-> probably
->
-> It's all other way around (from SW point of view). For unknown reasons
-> Intel decided to release only 32-bit SW and it became the only thing
-> that was heavily tested (despite misunderstanding by some developers
-> that pointed finger to the HW without researching the issue that
-> appears to be purely software in a few cases) _that_ time.  Starting
-> ca. 2017 I enabled 64-bit for Merrifield and from then it's being used
-> by both 32- and 64-bit builds.
->
-> I'm totally fine to drop 32-bit defaults for Merrifield/Moorefield,
-> but let's hear Ferry who might/may still have a use case for that.
+The 'equally well' text was clearly always wrong (equally badly?)
+but is now just 'plain wrong'.
+Perhaps:
+=09Runs on all x86-64 CPUs including early cpu that lack the sahf,
+=09cmpxchg16b and popcnt instructions.
 
-Do to the design of SLM if found (and it is also documented in Intel's 
-HW documentation)
+Then for V2 (or whatever it gets called)
+=09Requires support for the sahf, cmpxchg16b and popcnt instructions.
+=09This will not run on AMD K8 or Intel before Sandy bridge.
 
-that there is a penalty introduced when executing certain instructions 
-in 64b mode. The one I found
+I think someone suggested that run-time detect of AVX/AVX2/AVX512
+is fine?
 
-is crc32di, running slower than 2 crc32si in series. Then there are 
-other instructions seem to runs faster in 64b mode.
+=09David
 
-And there is of course the usual limited memory space than could benefit 
-for 32b mode. I never tried the mixed (x86_32?)
+> +
+> +config X86_64_V2
+> +=09bool "Generic x86-64 v2"
+> +=09depends on X86_64
+> +=09help
+> +=09  Generic x86-64-v2 CPU.
+> +=09  Run equally well on all x86-64 CPUs that meet the x86-64-v2
+> +=09  definition as well as those that only miss the optional
+> +=09  SSE3/SSSE3/SSE4.1 portions.
+> +=09  Examples of this include Intel Nehalem and Silvermont,
+> +=09  AMD Bulldozer (K10) and Jaguar as well as VIA Nano that
+> +=09  include popcnt, cmpxchg16b and sahf.
+> +
+> +config X86_64_V3
+> +=09bool "Generic x86-64 v3"
+> +=09depends on X86_64
+> +=09help
+> +=09  Generic x86-64-v3 CPU.
+> +=09  Run equally well on all x86-64 CPUs that meet the x86-64-v3
+> +=09  definition as well as those that only miss the optional
+> +=09  AVX/AVX2 portions.
+> +=09  Examples of this include the Intel Haswell and AMD Excavator
+> +=09  microarchitectures that include the bmi1/bmi2, lzncnt, movbe
+> +=09  and xsave instruction set extensions.
+>=20
+>  endchoice
+>=20
+> +config GENERIC_CPU
+> +=09def_bool X86_64_V1 || X86_64_V2 || X86_64_V3
+> +
+>  config X86_GENERIC
+>  =09bool "Generic x86 support"
+>  =09depends on X86_32
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 05887ae282f5..1fdc3fc6a54e 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -183,6 +183,9 @@ else
+>          cflags-$(CONFIG_MPSC)=09=09+=3D -march=3Dnocona
+>          cflags-$(CONFIG_MCORE2)=09=09+=3D -march=3Dcore2
+>          cflags-$(CONFIG_MSILVERMONT)=09+=3D -march=3Dsilvermont
+> +        cflags-$(CONFIG_MX86_64_V1)=09+=3D -march=3Dx86-64
+> +        cflags-$(CONFIG_MX86_64_V2)=09+=3D $(call cc-option,-march=3Dx86=
+-64-v2,-march=3Dx86-64)
+> +        cflags-$(CONFIG_MX86_64_V3)=09+=3D $(call cc-option,-march=3Dx86=
+-64-v3,-march=3Dx86-64)
+>          cflags-$(CONFIG_GENERIC_CPU)=09+=3D -mtune=3Dgeneric
+>          KBUILD_CFLAGS +=3D $(cflags-y)
+>=20
+> @@ -190,6 +193,9 @@ else
+>          rustflags-$(CONFIG_MPSC)=09+=3D -Ctarget-cpu=3Dnocona
+>          rustflags-$(CONFIG_MCORE2)=09+=3D -Ctarget-cpu=3Dcore2
+>          rustflags-$(CONFIG_MSILVERMONT)=09+=3D -Ctarget-cpu=3Dsilvermont
+> +        rustflags-$(CONFIG_MX86_64_V1)=09+=3D -Ctarget-cpu=3Dx86-64
+> +        rustflags-$(CONFIG_MX86_64_V2)=09+=3D -Ctarget-cpu=3Dx86-64-v2
+> +        rustflags-$(CONFIG_MX86_64_V3)=09+=3D -Ctarget-cpu=3Dx86-64-v3
+>          rustflags-$(CONFIG_GENERIC_CPU)=09+=3D -Ztune-cpu=3Dgeneric
+>          KBUILD_RUSTFLAGS +=3D $(rustflags-y)
+>=20
+> --
+> 2.39.5
+>=20
 
-mode. But I am building and testing both i686 and x86_64 for each Edison 
-image.
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
-I think that should at minimum be useful to catch 32b errors in the 
-kernel in certain areas (shared with other 32b
-
-archs. So, I would prefer 32b support for this platform to continue.
-
-
-> ...
->
->> -               Moorestown MID devices
-> FTR, a year or so ago it was a (weak) interest to revive Medfield, but
-> I think it would require too much work even for the person who is
-> quite familiar with HW, U-Boot, and Linux kernel, so it is most
-> unlikely to happen.
->
-> ...
->
->>            Select to build a kernel capable of supporting Intel MID (Mobile
->>            Internet Device) platform systems which do not have the PCI legacy
->> -         interfaces. If you are building for a PC class system say N here.
->> +         interfaces.
->> +
->> +         The only supported devices are the 22nm Merrified (Z34xx) and
->> +         Moorefield (Z35xx) SoC used in Android devices such as the
->> +         Asus Zenfone 2, Asus FonePad 8 and Dell Venue 7.
-> The list is missing the Intel Edison DIY platform which is probably
-> the main user of Intel MID kernels nowadays.
-Despite the Dell Venue 7 originally running a 32b Android kernel (I 
-think), I got it run linux/Yocto in 64 bits.
-> ...
->
->> -         Intel MID platforms are based on an Intel processor and chipset which
->> -         consume less power than most of the x86 derivatives.
-> Why remove this? AFAIK it states the truth.
->
->
 
