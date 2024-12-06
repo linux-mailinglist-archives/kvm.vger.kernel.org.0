@@ -1,64 +1,65 @@
-Return-Path: <kvm+bounces-33189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7949E6458
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 03:42:29 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297629E6517
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 04:37:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EFB8284A4C
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 02:42:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A92981884C06
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 03:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9938017BEA2;
-	Fri,  6 Dec 2024 02:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE93191F75;
+	Fri,  6 Dec 2024 03:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IJ7v0dzQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mmp/o2H7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8AF16132F
-	for <kvm@vger.kernel.org>; Fri,  6 Dec 2024 02:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEFF13DDDF;
+	Fri,  6 Dec 2024 03:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452944; cv=none; b=QanLtQhUlFKVE9t6MkvB+SYO5zFztuwmNHTcjmcG9JxvGRY2drun32yB02BIiwPLUsjf7D6eS81mjFwLm8j4AaKdyPzbuEboF/UFwRyJVdo9Dr7c2329yIrLa7XK9oLfRYsU3ek3PCyWbimP8UByXqM5n2PqT1YC32ODgUZ0NrQ=
+	t=1733456260; cv=none; b=YB8cNnQ2jMhfwnWlT1kERuvvYEt0pqcahDmk8Ry3OEKv+0/hs7PU03C5NjkVS4gyI2ZbKNf1YmAYydCtRfV/QlQjtXUh9MhWyDazTYoIVaiIKhijs5iMX25qtWTvY35eoOs0JvCqPU1t+33b8KoQzLjqr1eJ9hy1zLpOh9hhi1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452944; c=relaxed/simple;
-	bh=BPAbfXQQYNvBKr+0fe03hKAUFPt0n+OzNTK11uRxPac=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=EZV7qYXKYomIezxvFCdZf9xZWXAxY3+TCAgGvFb60GdXDE5SR6DA20aht+FYn/YvPmXibRhv1enCqwmGN4EHLfNh7gLYAatf6K39CirPCS7dBU6rqNvjyn3WGaFeSlTunH4a28OLEYqFrBtAc0sG2OKRh4bWpqG1hGujekGif0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IJ7v0dzQ; arc=none smtp.client-ip=192.198.163.13
+	s=arc-20240116; t=1733456260; c=relaxed/simple;
+	bh=WrKwAGr9rCPIoNqYi8F9dNIcqs5fsyfUF/2DoTg4HCQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ni7mWkfaKc/GtSlZRg2HuhYilEgHgLuNBrYha8mso2IcuUjLR2QB45NwKzMPmJKrt6WozEpEqw4kP8pcUphnz8ri8jSdxPsvqWSwi7pV9bTPWuWlySVsjlXqG5corlbeOA0ZpQGwHFv0fIRBxC14TEHN4cPoagjb/GJ+2SCC8d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mmp/o2H7; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733452942; x=1764988942;
-  h=message-id:date:mime-version:to:cc:from:subject:
-   content-transfer-encoding;
-  bh=BPAbfXQQYNvBKr+0fe03hKAUFPt0n+OzNTK11uRxPac=;
-  b=IJ7v0dzQHB5VEKjrvDS2nibyPG51G80awcBFo4FF+HfTlWfliAkdO7rn
-   nHVUbM4ezUwqtXiiWB8Kv+SskRkMGYbbSFrEWDYa8NTKCoWKzotUodmCW
-   RTHwVI+lsfUvopiAXc3rj5viHthy+yF1IZZz0rH/bhKUdXK4wPWsfn/CD
-   Xo+TTn3Gq7NONXoM1qV0gYbpA8AX5VhQuLIp85RUZXPLs7F0PQPr0k0M9
-   NfaZYuXo7INlcB7jgW4UbxH8DuHvlQvl5E+cekZU8lkIvetJc5Pz+v1it
-   3NONcpw67N0ZXPKvQctb545Kz23tRLtcCmXON0FlF9tb4fizcTmUjYEgJ
+  t=1733456258; x=1764992258;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WrKwAGr9rCPIoNqYi8F9dNIcqs5fsyfUF/2DoTg4HCQ=;
+  b=mmp/o2H7m8bepPnb1BwQMu2lWMxdR8uDStr/2Z+MhOtcfUwqgCZgkKqK
+   T130duaLhPl+ZdyRob8vrVPoVjOtkuYt6BD2E3E5oO3onQbks83Qsaeo3
+   zpM4O3QWU12/fXMZq/yLdGkeZBguhyT4KNbYiIgcvMxruTfpPGA6Jy3VL
+   MzuWXoteh0bhvu5OziUcuPXZSSIasDABEjHfMocNehJCsjT4I0H9V3/3D
+   xlt+79hzt9JEisHwoUllJw0gY2cg0WVScVR3T3f5fmSWW7SCX0duXomtQ
+   XRmqYZzHbV+GKYdpFjcvTxN7doCxmuuUEnMgOqQ48aJtWryAV4CyPy/Aa
    A==;
-X-CSE-ConnectionGUID: VW9Fk7jMTkiAANolt/hakw==
-X-CSE-MsgGUID: cbbjOYSORoGiUm1LRP4uEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="36630572"
+X-CSE-ConnectionGUID: EEoxDbwQRUGm12BkDCo4QA==
+X-CSE-MsgGUID: RwBp05oeRg6BZmzAONgcsQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="44269524"
 X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="36630572"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 18:42:22 -0800
-X-CSE-ConnectionGUID: sEnyYx90RsOGSQcQ3/QttA==
-X-CSE-MsgGUID: KAie4NgqS9ObFneeGnR/sg==
+   d="scan'208";a="44269524"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 19:37:38 -0800
+X-CSE-ConnectionGUID: LzfPS1TfTDmpsAGKGiZd/Q==
+X-CSE-MsgGUID: dbn1X0P1QEODfzWbuDfy3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="99347225"
+   d="scan'208";a="94488859"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 18:42:18 -0800
-Message-ID: <43b26df1-4c27-41ff-a482-e258f872cc31@intel.com>
-Date: Fri, 6 Dec 2024 10:42:15 +0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 19:37:33 -0800
+Message-ID: <3f52c362-ac1b-4435-92c8-81ec97992b02@intel.com>
+Date: Fri, 6 Dec 2024 11:37:30 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,187 +67,174 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
+To: Adrian Hunter <adrian.hunter@intel.com>, Chao Gao <chao.gao@intel.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Huang, Kai"
+ <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Yang, Weijiang" <weijiang.yang@intel.com>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
+ "dmatlack@google.com" <dmatlack@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
+ "nik.borisov@suse.com" <nik.borisov@suse.com>,
+ "Chatre, Reinette" <reinette.chatre@intel.com>,
+ "x86@kernel.org" <x86@kernel.org>
+References: <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
+ <Z04Ffd7Lqxr4Wwua@google.com>
+ <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
+ <Z05SK2OxASuznmPq@google.com>
+ <60e2ed472e03834c13a48e774dc9f006eda92bf5.camel@intel.com>
+ <9beb9e92-b98c-42a2-a2d3-35c5b681ad03@intel.com> <Z0+vdVRptHNX5LPo@intel.com>
+ <0e34f9d0-0927-4ac8-b1cb-ef8500b8d877@intel.com> <Z0/4wsR2WCwWfZyV@intel.com>
+ <2bcd34eb-0d1f-46c0-933f-fb1d70c70a1e@intel.com> <Z1A5QWaTswaQyE3k@intel.com>
+ <c9b14955-6e2f-4490-a18c-0537ffdfff30@intel.com>
+ <a005d50c-6ca8-4572-80ba-5207b95323fb@intel.com>
+ <84964644-e53f-4aac-b827-5626393f8c25@intel.com>
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm <kvm@vger.kernel.org>, "Huang, Kai" <kai.huang@intel.com>,
- Tony Lindgren <tony.lindgren@linux.intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- Adrian Hunter <adrian.hunter@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>, QEMU <qemu-devel@nongnu.org>
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: (Proposal) New TDX Global Metadata To Report FIXED0 and FIXED1 CPUID
- Bits
+In-Reply-To: <84964644-e53f-4aac-b827-5626393f8c25@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-This is a proposal for a potential future TDX Module feature to assist 
-QEMU/KVM in configuring CPUID leafs for TD guests. It is only in the 
-idea stage and not currently being implemented. We are looking for 
-comments on the suitability for QEMU/KVM.
+On 12/6/2024 1:31 AM, Adrian Hunter wrote:
+> On 4/12/24 17:33, Xiaoyao Li wrote:
+>> On 12/4/2024 7:55 PM, Adrian Hunter wrote:
+>>> On 4/12/24 13:13, Chao Gao wrote:
+>>>> On Wed, Dec 04, 2024 at 08:57:23AM +0200, Adrian Hunter wrote:
+>>>>> On 4/12/24 08:37, Chao Gao wrote:
+>>>>>> On Wed, Dec 04, 2024 at 08:18:32AM +0200, Adrian Hunter wrote:
+>>>>>>> On 4/12/24 03:25, Chao Gao wrote:
+>>>>>>>>> +#define TDX_FEATURE_TSX (__feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM))
+>>>>>>>>> +
+>>>>>>>>> +static bool has_tsx(const struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
+>>>>>>>>> +           (entry->ebx & TDX_FEATURE_TSX);
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>> +static void clear_tsx(struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    entry->ebx &= ~TDX_FEATURE_TSX;
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>> +static bool has_waitpkg(const struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
+>>>>>>>>> +           (entry->ecx & __feature_bit(X86_FEATURE_WAITPKG));
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>> +static void clear_waitpkg(struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    entry->ecx &= ~__feature_bit(X86_FEATURE_WAITPKG);
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>> +static void tdx_clear_unsupported_cpuid(struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    if (has_tsx(entry))
+>>>>>>>>> +        clear_tsx(entry);
+>>>>>>>>> +
+>>>>>>>>> +    if (has_waitpkg(entry))
+>>>>>>>>> +        clear_waitpkg(entry);
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>> +static bool tdx_unsupported_cpuid(const struct kvm_cpuid_entry2 *entry)
+>>>>>>>>> +{
+>>>>>>>>> +    return has_tsx(entry) || has_waitpkg(entry);
+>>>>>>>>> +}
+>>>>>>>>
+>>>>>>>> No need to check TSX/WAITPKG explicitly because setup_tdparams_cpuids() already
+>>>>>>>> ensures that unconfigurable bits are not set by userspace.
+>>>>>>>
+>>>>>>> Aren't they configurable?
+>>>>>>
+>>>>>> They are cleared from the configurable bitmap by tdx_clear_unsupported_cpuid(),
+>>>>>> so they are not configurable from a userspace perspective. Did I miss anything?
+>>>>>> KVM should check user inputs against its adjusted configurable bitmap, right?
+>>>>>
+>>>>> Maybe I misunderstand but we rely on the TDX module to reject
+>>>>> invalid configuration.  We don't check exactly what is configurable
+>>>>> for the TDX Module.
+>>>>
+>>>> Ok, this is what I missed. I thought KVM validated user input and masked
+>>>> out all unsupported features. sorry for this.
+>>>>
+>>>>>
+>>>>> TSX and WAITPKG are not invalid for the TDX Module, but KVM
+>>>>> must either support them by restoring their MSRs, or disallow
+>>>>> them.  This patch disallows them for now.
+>>>>
+>>>> Yes. I agree. what if a new feature (supported by a future TDX module) also
+>>>> needs KVM to restore some MSRs? current KVM will allow it to be exposed (since
+>>>> only TSX/WAITPKG are checked); then some MSRs may get corrupted. I may think
+>>>> this is not a good design. Current KVM should work with future TDX modules.
+>>>
+>>> With respect to CPUID, I gather this kind of thing has been
+>>> discussed, such as here:
+>>>
+>>>      https://lore.kernel.org/all/ZhVsHVqaff7AKagu@google.com/
+>>>
+>>> and Rick and Xiaoyao are working on something.
+>>>
+>>> In general, I would expect a new TDX Module would advertise support for
+>>> new features, but KVM would have to opt in to use them.
+>>>
+>>
+>> There were discussion[1] on whether KVM to gatekeep the configurable/supported CPUIDs for TDX. I stand by Sean that KVM needs to do so.
+>>
+>> Regarding KVM opt in the new feature, KVM gatekeeps the CPUID bit that can be set by userspace is exactly the behavior of opt-in. i.e., for a given KVM, it only allows a CPUID set {S} to be configured by userspace, if new TDX module supports new feature X, it needs KVM to opt-in X by adding X to {S} so that X is allowed to be configured by userspace.
+>>
+>> Besides, I find current interface between KVM and userspace lacks the ability to tell userspace what bits are not supported by KVM. KVM_TDX_CAPABILITIES.cpuid doesn't work because it represents the configurable CPUIDs, not supported CPUIDs (I think we might rename it to configurable_cpuid to better reflect its meaning). So userspace has to hardcode that TSX and WAITPKG is not support itself.
+> 
+> I don't follow why hardcoding would be necessary.
+> 
+> If the leaf is represented in KVM_TDX_CAPABILITIES.cpuid, and
+> the bits are 0 there, why would userspace try to set them to 1?
 
-# Background
+Userspace doesn't set the bit to 1 in kvm_tdx_init_vm.cpuid, doesn't 
+mean userspace wants the bit to be 0.
 
-To correctly virtualize CPUID for TD, the VMM needs to understand the 
-behavior of CPUID configuration for each CPUID bit, including whether 
-the bit can be configured by the VMM and what the allowed value is.
+Note, KVM_TDX_CAPABILITIES.cpuid reports the configurable bits. The 
+value 0 of a bit in KVM_TDX_CAPABILITIES.cpuid means the bit is not 
+configurable, not means the bit is unsupported.
 
-There is an interface to query the CPUID bit information after the TD 
-has been configured. However, this interface does not work before the TD 
-is configured. The TDX module, along with its release, provides a 
-separate JSON format file, cpuid_virtualization.json, for CPUID 
-virtualization information. This file can be used by the VMM even before 
-the TD is configured. The TDX module also provides an interface to query 
-some limited CPUID information, including:
+For kvm_tdx_init_vm.cpuid,
+  - if the corresponding bit is reported as 1 in 
+KVM_TDX_CAPABILITIES.cpuid, then a value 0 in kvm_tdx_init_vm.cpuid 
+means userspace wants to configure it as 0.
+  - if the corresponding bit is reported as 0 in 
+KVM_TDX_CAPABILITIES.cpuid, then userspace has to pass a value 0 in 
+kvm_tdx_init_vm.cpuid. But it doesn't mean the value of the bit will be 0.
 
-  - The configurability of a subset of CPUIDs via global metadata 
-CPUID_CONFIG_VALUES.
+e.g., X2APIC bit is 0 in KVM_TDX_CAPABILITIES.cpuid, and it's also 0 in 
+kvm_tdx_init_vm.cpuid, but TD guest sees a value of 1. In the view of 
+QEMU, it maintains the bit of X2APIC as 1, and QEMU filters X2APIC bit 
+when calling KVM_TDX_INIT_VM because X2APIC is not configurable.
 
-  - The 'fixed0' and 'fixed1' bits of ATTRIBUTES and XFAM via global 
-metadata. The VMM can infer the 'configurable' bits related to 
-ATTRIBUTES/XFAM indirectly (the bits that are neither 'fixed0' nor 
-'fixed1' are 'configurable').
+So when it comes to TSX and WAITPKG, QEMU also needs an interface to be 
+informed that they are unsupported. Without the interface of fixed0 bits 
+reported by KVM, QEMU needs to hardcode itself like [1]. The problem of 
+hardcode is that it will conflict when future KVM allows them to be 
+configurable.
 
-For the remaining CPUID bits not covered by the above two categories, no 
-TDX module query interface exists.
+In the future, if we have interface from KVM to report the fixed0 and 
+fixed1 bit (on top of the proposal [2]), userspace can drop the 
+hardcoded one it maintains. At that time, KVM can ensure no conflict by 
+removing the bits from fixed0/1 array when allowing them to be 
+configurable.
 
-# Problem
+[1] 
+https://lore.kernel.org/qemu-devel/20241105062408.3533704-49-xiaoyao.li@intel.com/
+[2] 
+https://lore.kernel.org/all/43b26df1-4c27-41ff-a482-e258f872cc31@intel.com/
 
-While the VMM can use the JSON format CPUID information and may embed or 
-translate that information into the code, it may face several challenges:
-
-  - The JSON file varies with each TDX module release, which can 
-complicate the VMM code. Additionally, depending on its own needs, the 
-VMM may require more information than what is provided in the JSON file.
-
-  - The JSON format cannot be easily parsed with low-level programming 
-languages like C, which is typically used to write VMMs.
-
-There was objection from KVM community for parsing the JSON and requests 
-for a more friendly interface to query CPUID information for each 
-specific TDX module.[0][1]
-
-# Analysis
-
-There are many virtualization types defined for single bit or bitfields 
-in JSON file, e.g., 12 types in TDX 1.5.06:
-
-   - fixed
-   - configured
-   - configured & native
-   - XFAM & native
-   - XFAM & configured & native
-   - attributes & native
-   - attributes & configured & native
-   - CPUID_enabled & native
-   - attributes & CPUID_enabled & native
-   - attributes & CPUID_enabled & configured & native
-   - calculated
-   - special
-
-And more types are getting added as TDX evolves.
-
-Though so many types defined, for a single bit, it can only be one of three:
-   - fixed0
-   - fixed1
-   - configurable
-
-For example:
-1. For type "configured & native", the bit is “fixed0” bit if the native 
-value is 0, and the “configurable” bit if native value is 1.
-
-2. For type "XFAM & native",
-    a) the CPUID is “fixed0” if the corresponding XFAM bit is reported 
-in XFAM_FIXED0, or the native value is 0;
-
-    b) the CPUID bit is ‘fixed1’ if the corresponding XFAM bit is set in 
-XFAM_FIXED1;
-
-    c) otherwise, the CPUID is ‘configurable’ (indirectly by TD_PRRAMS.XFAM)
-
-# Proposal
-
-Current TDX module provides interface to report the “configurable” bits 
-via global metadata CPUID_CONFIG_VALUES directly or via global metadata 
-ATTRIBUTES/XFAM_fixed0/1 indirectly. But it lacks the interface to 
-report the “fixed0” and “fixed1” bits generally (it only reports the 
-fixed bits for ATTRIBUTES and XFAM).
-
-We propose to add two new global metadata fields, CPUID_FIXED0_BITS and 
-CPUID_FIXED1_BITS, for “fixed0” and “fixed1” bits information respectively.
-
-The encoding of the two fields uses the same format as TDCS field 
-CPUID_VALUES:
-
-   Field code is composed as follows:
-     - Bits 31:17  Reserved, must be 0
-     - Bit  16     Leaf number bit 31
-     - Bits 15:9   Leaf number bit 6:0
-     - Bit 8       Sub-leaf not applicable flag
-     - Bits 7:1    Sub-leaf number bits 6:0
-     - Bit 0       Element index within field
-
-   The same for returned result:
-     - Element 0[31:0]:   EAX
-     - Element 0[63:32]:  EBX
-     - Element 1[31:0]:   ECX
-     - Element 1[63:32]:  EDX
-
-For CPUID_FIXED0_BITS, any bit in E[A,B,C,D]X is 0, means the bit is fixed0.
-For CPUID_FIXED1_BITS, any bit in E[A,B,C,D]X is 1, means the bit is fixed1.
-
-# Interaction with TDX_FEATURES0.VE_REDUCTION
-
-TDX introduces a new feature VE_REDUCTION[2]. From the perspective of 
-host VMM, VE_REDUCTION turns several CPUID bits from fixed1 to 
-configurable, e.g., MTRR, MCA, MCE, etc. However, from the perspective 
-of TD guest, it’s an opt-in feature. The actual value seen by TD guest 
-depends on multiple factors: 1). If TD guest enables REDUCE_VE in 
-TDCS.TD_CTLS, 2) TDCS.FEATURE_PARAVIRT_CTRL, 3) CPUID value configured 
-by host VMM via TD_PARAMS.CPUID_CONFIG[]. (Please refer to latest TDX 
-1.5 spec for more details.)
-
-Since host VMM has no idea on the setting of 1) and 2) when creating the 
-TD. We make the design to treat them as configurable bits and the global 
-metadata interface doesn’t report them as fixed1 bits for simplicity.
-
-Host VMM must be aware itself that the value of these VE_REDUCTION 
-related CPUID bits might not be what it configures. The actual value 
-seen by TD guest also depends on the guest enabling and configuration of 
-VE_REDUCTION.
-
-# POC
-
-We did a POC in QEMU to verify the fixed0/1 data by such an interface is 
-enough for userspace to validate and generate a supported vcpu model for 
-TD guest.[3]
-
-It retrieves the “fixed” type in JSON file and hardcodes them into two 
-arrays, tdx_fixed0_bits and tdx_fixed1_bits. Note, it doesn’t handle the 
-other types than “fixed” because 1) just a few of them falls into fixed0 
-or fixed1 and 2) turning them into fixed0 or fixed0 needs to check 
-various condition which complicates the POC. And in the POC it uses 
-value 1 in tdx_fixed0_bits for fixed0 bits, while the proposed metadata 
-interface uses value 0 to indicate fixed0 bits.
-
-With the hardcoded information, VMM can validate the TD configuration 
-requested from user early by checking whether a feature requested from 
-users is allowed to be enabled and is allowed to be disabled.
-
-When TDX module provides fixed0 and fixed1 via global metadata, QEMU can 
-change to requested them from KVM to replace the hardcoded one.
-
-[0] https://lore.kernel.org/all/ZhVdh4afvTPq5ssx@google.com/
-[1] https://lore.kernel.org/all/ZhVsHVqaff7AKagu@google.com/
-[2] https://cdrdv2.intel.com/v1/dl/getContent/733575
-[3] 
-https://lore.kernel.org/qemu-devel/20241105062408.3533704-49-xiaoyao.li@intel.com/ 
-
-
-
-
+>>
+>> [1] https://lore.kernel.org/all/ZuM12EFbOXmpHHVQ@google.com/
+>>
+> 
 
 
