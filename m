@@ -1,139 +1,85 @@
-Return-Path: <kvm+bounces-33202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 115479E6A68
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 10:36:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E93C9E6A64
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 10:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 343B4168832
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 09:36:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26FF91885158
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2024 09:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4314E1F9EAE;
-	Fri,  6 Dec 2024 09:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xzl4y1Yr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD371F4727;
+	Fri,  6 Dec 2024 09:34:19 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F6D1EF097;
-	Fri,  6 Dec 2024 09:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8D01DFE2B;
+	Fri,  6 Dec 2024 09:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733477697; cv=none; b=bajn6mCTeC3LqMbv5NweHxtXmt8IVWL3g4+sqwKrd2jP2UtfqAqGHA+FHRjFV6CD1N+O9oAWNY1P9F37osdVLpzbrCOAdWcXkgTB6981rNYzik8mPbjeKyqWgiXbom9CDvPCRICJtc9//lmcWzvb4s2Obqhw6sl7/6gWesqy9RA=
+	t=1733477659; cv=none; b=inXEYLQDvjVZSe+NSBqjk1+VeH5Gyt8RX+pGOveE150NiymprmHJ6+hTkcvRHR1ZFFtN3eEkxfR9osmT8FMEYBFaLOKqqyHkXpgq654qD4TmZ76f10mszpE4LU3+ylYTh9c8S5z63RH8d80cIkuuuHk5FwfzeVlaCjcLqZtkQYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733477697; c=relaxed/simple;
-	bh=/i0+YCGdEkqQWh9rUMU2mm58oTj6C06sUI/9CvnFWeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YWPdSmPl6QgJJAqTHJ9I4HdXTKH35qEPQexaUx3M1eNu+rfkmJUleW9Tf0FkK6pl3xdDp9HKlN/cLel2RGoODinrJzC9MSi/4DFjeKYEMSEPOfzJL1dvXmR5Lf/mvdzZZxvjZQggb5ZBgjRqVsbfmrRiBVPdzh00bO8C4BVF0Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xzl4y1Yr; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733477696; x=1765013696;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/i0+YCGdEkqQWh9rUMU2mm58oTj6C06sUI/9CvnFWeo=;
-  b=Xzl4y1YrfNhuh9z9mC+p2xqVBqhKNMOSiOAp7T4ATREtrQHq7xHo/xcf
-   sg0lgnoMdFrfuhQgmeBIWo2GpOlB28s7run1mN/RW4IdTKTBKcEa4j+oX
-   F55fJZYT8SMGanAgfhTTDht9qUUNRL2RRTagQplH0EJXRuVAwgkN/tfqV
-   OOg5PTLULNDX0anq238n4mSEXui6TDJyN3VK/ESUY0x9Mbxzbm1Znij+0
-   9lwmZ2IXpI8TIYlMENkny6gDlvvCkd/WHFKrZgPWE5aM1GJro7GulWfHg
-   Op5L512I/Ia7Eyy+JVs00Z5qBSKl1eqRCCp+Isbk9atRFS0s5yp7KYPo7
-   w==;
-X-CSE-ConnectionGUID: XgtgCHCKTOmgmu49EEI1AA==
-X-CSE-MsgGUID: Joh8vJMlRVKCWUEoADDYkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="33953897"
-X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
-   d="scan'208";a="33953897"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 01:34:55 -0800
-X-CSE-ConnectionGUID: rXIgzfzBQ8yRDHJPmvq4+g==
-X-CSE-MsgGUID: YI3MsMMqRHqmywejOfkvhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
-   d="scan'208";a="99421496"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa004.jf.intel.com with ESMTP; 06 Dec 2024 01:34:51 -0800
-Date: Fri, 6 Dec 2024 17:31:39 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com, kai.huang@intel.com,
-	adrian.hunter@intel.com, reinette.chatre@intel.com,
-	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com,
-	isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
-	michael.roth@amd.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/7] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
-Message-ID: <Z1LEe1VL2YvoCp0A@yilunxu-OptiPlex-7050>
-References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
- <20241201035358.2193078-6-binbin.wu@linux.intel.com>
+	s=arc-20240116; t=1733477659; c=relaxed/simple;
+	bh=yTpGCSU7kiiUg8HFYnZGpCy/vyEkIhSmYv0sTIBVJM0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CKHpIl/3xX9X3GMLSg/viLVmXbjzEZ1CGw31uQwne6ujIb8xZqq6HOo6dRO/MpTlvBlF48wMHwfzL1oF1H2nSdzEmZ2Yu5qFeZ7urUKSYrBIBQ2ybAy3FHUw5enDE+IINZ9KZa5H5BuHRQwwr1iz0GvP0OV74kmPoY2B9cQ2puc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Y4Qxv0qRJz1kvP5;
+	Fri,  6 Dec 2024 17:31:47 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 47AE9180044;
+	Fri,  6 Dec 2024 17:34:06 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 6 Dec 2024 17:34:06 +0800
+Received: from huawei.com (10.50.165.33) by kwepemn100017.china.huawei.com
+ (7.202.194.122) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 6 Dec
+ 2024 17:34:05 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
+Subject: [PATCH 0/5] bugfix some driver issues
+Date: Fri, 6 Dec 2024 17:33:07 +0800
+Message-ID: <20241206093312.57588-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.24.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241201035358.2193078-6-binbin.wu@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-> +static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 reg_mask = kvm_rcx_read(vcpu);
-> +	u64* opt_regs;
-> +
-> +	/*
-> +	 * Skip sanity checks and let userspace decide what to do if sanity
-> +	 * checks fail.
-> +	 */
-> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX_FATAL;
-> +	vcpu->run->system_event.ndata = 10;
-> +	/* Error codes. */
-> +	vcpu->run->system_event.data[0] = tdvmcall_a0_read(vcpu);
-> +	/* GPA of additional information page. */
-> +	vcpu->run->system_event.data[1] = tdvmcall_a1_read(vcpu);
-> +	/* Information passed via registers (up to 64 bytes). */
-> +	opt_regs = &vcpu->run->system_event.data[2];
-> +
-> +#define COPY_REG(REG, MASK)						\
-> +	do {								\
-> +		if (reg_mask & MASK)					\
-> +			*opt_regs = kvm_ ## REG ## _read(vcpu);		\
-> +		else							\
-> +			*opt_regs = 0;					\
-> +		opt_regs++;						\
-> +	} while (0)
-> +
-> +	/* The order is defined in GHCI. */
-> +	COPY_REG(r14, BIT_ULL(14));
-> +	COPY_REG(r15, BIT_ULL(15));
-> +	COPY_REG(rbx, BIT_ULL(3));
-> +	COPY_REG(rdi, BIT_ULL(7));
-> +	COPY_REG(rsi, BIT_ULL(6));
-> +	COPY_REG(r8, BIT_ULL(8));
-> +	COPY_REG(r9, BIT_ULL(9));
-> +	COPY_REG(rdx, BIT_ULL(2));
+As the test scenarios for the live migration function become
+more and more extensive. Some previously undiscovered driver
+issues were found.
+Update and fix through this patchset.
 
-Nit:
+Longfang Liu (5):
+  hisi_acc_vfio_pci: fix XQE dma address error
+  hisi_acc_vfio_pci: add eq and aeq interruption restore
+  hisi_acc_vfio_pci: bugfix cache write-back issue
+  hisi_acc_vfio_pci: bugfix the problem of uninstalling driver
+  hisi_acc_vfio_pci: bugfix live migration function without VF device
+    driver
 
-#undef COPY_REG
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 83 ++++++++++++++++---
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  9 +-
+ 2 files changed, 78 insertions(+), 14 deletions(-)
 
-Thanks,
-Yilun
+-- 
+2.24.0
 
-> +
-> +	/*
-> +	 * Set the status code according to GHCI spec, although the vCPU may
-> +	 * not return back to guest.
-> +	 */
-> +	tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
-> +
-> +	/* Forward request to userspace. */
-> +	return 0;
-> +}
 
