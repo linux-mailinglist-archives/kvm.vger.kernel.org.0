@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-33253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1423C9E8440
-	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 09:40:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1387A9E843C
+	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 09:39:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE9318849F5
-	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 08:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25A5164461
+	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 08:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F81513D276;
-	Sun,  8 Dec 2024 08:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97FFEEB2;
+	Sun,  8 Dec 2024 08:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="XHgnNO7e"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="vJd6GVvv"
 X-Original-To: kvm@vger.kernel.org
 Received: from forwardcorp1a.mail.yandex.net (forwardcorp1a.mail.yandex.net [178.154.239.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE7013E028;
-	Sun,  8 Dec 2024 08:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D49242AA1;
+	Sun,  8 Dec 2024 08:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733647217; cv=none; b=hHRhH4kz6x+Fe/JrxpnObHGXtYYwEFj/upOIeocLlBa2oVN8MfS10gKNHSwA6FkTozGKUIMJ0jUu5j3DJJUrgxe9ueV4ekL5R9ULCS9aKhGmnNzDTZ0AupCVtWNNc44c+0VnBurFWfVo3eW5KS63PTb1TqZmpwaidUxQPQmzs8c=
+	t=1733647188; cv=none; b=RZRvBXq3AiqKj3BS/jtx75JM+G/F0Wy5DEchTmF4B9IQ4FRKNZ5dgTf8aIZCSOYjvE0GC9n8vGOKDOLqU1yDF9Mv5wfVdFcMR5d6X2i1oxDULx5OsO+GIDXTZg+oyBbnx4NU3S6jf8n1LLQAnBDcNhAadtROyK68+kApqVSNWWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733647217; c=relaxed/simple;
-	bh=YDhTqJs7cdVyrsOqWw6VKLHpME/TC6wse3uJLjtYGJE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FBR9WaTEpU3yuEM/rc+QqYaF7sMhWK7jWNUDer45hPL7kek/mIGo8FDaesjlHQuSSuz90emn2TwekLToovxOUa2lrsWuso8D5F2fs4vk0U75IH7MdhrkXpPRG5pU3j36zLY3eYc7jwGAzBTSx0kCylSy90/3d/SiO7hRmtWyz68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=XHgnNO7e; arc=none smtp.client-ip=178.154.239.72
+	s=arc-20240116; t=1733647188; c=relaxed/simple;
+	bh=tT7DJArqKW6MwBceu7Q0vNFLZNQR8atiULSQ4sx8jVE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kqdQ9161d7Vylis4E1UaClr2G/RDKC9cz4V/mwDxepSHDuS1yikUjGzeqkTWBmw+9bciww0WnbcJEl1Jm//dQK3Uqgxt9MwCJc377ylSfOY61QbRjMkIJVChrMvim98c5ei2OjG05+JV9cDuQNFPRXbe6S0jghpzH2dAP4my3Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=vJd6GVvv; arc=none smtp.client-ip=178.154.239.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
 Received: from mail-nwsmtp-smtp-corp-main-69.vla.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-69.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:3b05:0:640:71ba:0])
-	by forwardcorp1a.mail.yandex.net (Yandex) with ESMTPS id A261960B61;
-	Sun,  8 Dec 2024 11:37:59 +0300 (MSK)
+	by forwardcorp1a.mail.yandex.net (Yandex) with ESMTPS id 58FFE60B55;
+	Sun,  8 Dec 2024 11:39:41 +0300 (MSK)
 Received: from kniv-nix.yandex-team.ru (unknown [2a02:6b8:b081:b71b::1:31])
-	by mail-nwsmtp-smtp-corp-main-69.vla.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id kbfFIq1Iga60-lp6MeZLk;
-	Sun, 08 Dec 2024 11:37:59 +0300
+	by mail-nwsmtp-smtp-corp-main-69.vla.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id UdfGLq1Ie4Y0-zDixKZWu;
+	Sun, 08 Dec 2024 11:39:40 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1733647079;
-	bh=rVWwTNiyChLEkKx04wxCVkuEEVv9xSBQtvkQfDjGKS0=;
+	s=default; t=1733647180;
+	bh=rGpELdekKzdiqfxyGNqzin4EZuk4jJlZXxCMADyQvn4=;
 	h=Message-Id:Date:Cc:Subject:To:From;
-	b=XHgnNO7e2lqHMtghLiu9enBKvwagJsgpjRxlxXreYxry4O3vVmNb/U3hk1pFSxTQt
-	 9LnfHv/7DXYkKmlh/PxagquOseWpLT0cMDX1uNLVLoMHlaqgQTR3Q0vgFazNTW2cby
-	 Oy8DRCHlJz5ookOhfuIg9obHGFRqYpSo7+Mg3GqY=
+	b=vJd6GVvvM3f3Ye6nq4OVY6b/tBdYaaPibhKlCJSTntryrfTSv9luPt14rgixpSMZr
+	 lvNTuIdESHQw9OsI2l/tF4gaIAh3WbkfLRE5on0YkUynoW7rdeiysqoVKPXlGkyxxo
+	 r3yWAsarKEViiXX+0VqX0sBXRMvSwHCBR3IFOtsU=
 Authentication-Results: mail-nwsmtp-smtp-corp-main-69.vla.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
 From: Nikolay Kuratov <kniv@yandex-team.ru>
 To: stable@vger.kernel.org
@@ -56,9 +56,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Matthew Wilcox <willy@infradead.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Nikolay Kuratov <kniv@yandex-team.ru>
-Subject: [PATCH v2 6.1] KVM: x86/mmu: Ensure that kvm_release_pfn_clean() takes exact pfn from kvm_faultin_pfn()
-Date: Sun,  8 Dec 2024 11:37:43 +0300
-Message-Id: <20241208083743.77295-1-kniv@yandex-team.ru>
+Subject: [PATCH v2 6.6 6.12] KVM: x86/mmu: Ensure that kvm_release_pfn_clean() takes exact pfn from kvm_faultin_pfn()
+Date: Sun,  8 Dec 2024 11:38:30 +0300
+Message-Id: <20241208083830.77587-1-kniv@yandex-team.ru>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -112,53 +112,79 @@ v1 -> v2:
  as suggested by Sean Christopherson. 
  * Tested patch for 6.1 and 6.12
 
- arch/x86/kvm/mmu/mmu.c         | 5 ++++-
- arch/x86/kvm/mmu/paging_tmpl.h | 5 ++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         | 10 ++++++++--
+ arch/x86/kvm/mmu/paging_tmpl.h |  5 ++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 13134954e24d..d392022dcb89 100644
+index 294775b7383b..ff85526a9d48 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4245,6 +4245,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
+@@ -4363,6 +4363,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
  
- 	unsigned long mmu_seq;
+ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
 +	kvm_pfn_t orig_pfn;
  	int r;
  
- 	fault->gfn = fault->addr >> PAGE_SHIFT;
-@@ -4272,6 +4273,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	/* Dummy roots are used only for shadowing bad guest roots. */
+@@ -4384,6 +4385,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  	if (r != RET_PF_CONTINUE)
  		return r;
  
 +	orig_pfn = fault->pfn;
 +
  	r = RET_PF_RETRY;
+ 	write_lock(&vcpu->kvm->mmu_lock);
  
- 	if (is_tdp_mmu_fault)
-@@ -4296,7 +4299,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		read_unlock(&vcpu->kvm->mmu_lock);
- 	else
- 		write_unlock(&vcpu->kvm->mmu_lock);
+@@ -4398,7 +4401,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
 -	kvm_release_pfn_clean(fault->pfn);
 +	kvm_release_pfn_clean(orig_pfn);
  	return r;
  }
  
+@@ -4447,6 +4450,7 @@ EXPORT_SYMBOL_GPL(kvm_handle_page_fault);
+ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ 				  struct kvm_page_fault *fault)
+ {
++	kvm_pfn_t orig_pfn;
+ 	int r;
+ 
+ 	if (page_fault_handle_page_track(vcpu, fault))
+@@ -4464,6 +4468,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ 	if (r != RET_PF_CONTINUE)
+ 		return r;
+ 
++	orig_pfn = fault->pfn;
++
+ 	r = RET_PF_RETRY;
+ 	read_lock(&vcpu->kvm->mmu_lock);
+ 
+@@ -4474,7 +4480,7 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ 
+ out_unlock:
+ 	read_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	kvm_release_pfn_clean(orig_pfn);
+ 	return r;
+ }
+ #endif
 diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 1f4f5e703f13..685560a45bf6 100644
+index c85255073f67..c6b2c52aceac 100644
 --- a/arch/x86/kvm/mmu/paging_tmpl.h
 +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -790,6 +790,7 @@ FNAME(is_self_change_mapping)(struct kvm_vcpu *vcpu,
+@@ -777,6 +777,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
  static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  {
  	struct guest_walker walker;
 +	kvm_pfn_t orig_pfn;
  	int r;
- 	unsigned long mmu_seq;
- 	bool is_self_change_mapping;
-@@ -868,6 +869,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ 	WARN_ON_ONCE(fault->is_tdp);
+@@ -835,6 +836,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  			walker.pte_access &= ~ACC_EXEC_MASK;
  	}
  
@@ -167,7 +193,7 @@ index 1f4f5e703f13..685560a45bf6 100644
  	r = RET_PF_RETRY;
  	write_lock(&vcpu->kvm->mmu_lock);
  
-@@ -881,7 +884,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+@@ -848,7 +851,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  
  out_unlock:
  	write_unlock(&vcpu->kvm->mmu_lock);
