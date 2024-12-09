@@ -1,146 +1,111 @@
-Return-Path: <kvm+bounces-33327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4C99E9AFD
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 16:57:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CEB9E9DA9
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 18:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C1C11885D7C
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 15:57:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FCCB164965
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 17:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329BC139D05;
-	Mon,  9 Dec 2024 15:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4971BEF63;
+	Mon,  9 Dec 2024 17:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QRs1yS55"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvJavJwA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AB4132C38;
-	Mon,  9 Dec 2024 15:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802071ACECC
+	for <kvm@vger.kernel.org>; Mon,  9 Dec 2024 17:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733759864; cv=none; b=G48ngoKYlWI5SvJDh1ra7xgbg9eeOMsFeYmnAV3Wy1V6P9j+qYTlLi4qcn53y34syZiT9EDxY36USzoUiQCpvKuvgjxxhyeO2ukawJG/RIicD1U7bqQVmdxtvo+yjx010vEXJJSnxIRCI2MTgN2uJeJifHGiCChnv0iYzF02IRE=
+	t=1733767084; cv=none; b=utItx+m7hfVuDK2Rn+gMF/cFR2Y+IdF7OzRwlJ3437eZOJukAVY2c/Gpt0zbchvVeCceZSPUVAt3bBe+EkY94gl+yB6d5QRLoHPt3F+aObq5+PMp3msyGoQaVohnyKZVHFngrGLa7+zcuXJsH10pJb7bW10fEcdLfnVgLlCbtiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733759864; c=relaxed/simple;
-	bh=o8XP06lcYRfWQzEQkKfdzPtBj+LUgBM2Y1u/K1ZzrDU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rdrKsnQKcAKn+Vzyc9kEKK5hId60nQvHLMrMImxokIZkt7Ro0SPsSrvBUmAaPK6EL3hj0jFsygxnbzmiJ4R87WgCsLG6vLUoqfvA5PNBQYOCGAaE+VEblyr8BndhNvbpDtmFQgL/In+jAmVu48Weoa8cBvSLF5Mv5466BnqlGw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QRs1yS55; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 568D940E0288;
-	Mon,  9 Dec 2024 15:57:40 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id uVLnYd3n6KR8; Mon,  9 Dec 2024 15:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1733759856; bh=6wjva+XHkq9WUs9GVSDQBIaFuXyCphV3M7jzddUXB7w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QRs1yS55QCziw5MZ2uTCQFmkttF4+NM8N3gvI686lroGLEj2vFTGAWDzdfVEGSbFd
-	 VNAKUQJUT1SmQedrYmsm4yQ2UiY9FuDpnspn3hMMUT/ywYR58gYYXLQjCCsW3CdE/a
-	 vewklC69c67GbpsICI2DfzJLqEwwfbVgf7I6U0Z640vHY6TAcoZgsr3mp8YKgmd9G0
-	 viZaLaDVb6R/y2K4jr4/faaf3B18YQPIIYLdYnE6X8NBWJm/q4ogjjV3sZz0MZ2Lov
-	 F+wL+4T8uxGWRyCIXG5QzqBFWGN5PBpHWEpANykv9wS9KCmcr7AFVgd1habVjWuXae
-	 YPzVzwwk2wYPhdEE76tgKHDCQ3P+Zuk6XR2QX3qYMVIgmNqbIdF4itdVRb1cWegfE2
-	 7GiQNVhVZeFUnPdCEgewDN6H/Ax5g6QR9kXLxPzrihX3h7cWW4KIsyp/YS+AMSoXBL
-	 VsfuMck4pU6Eswq5ZEX9oniEH4+f72lRx9ZFP/xV3O7SRs+sGBtCTtAlkjfj0DRipA
-	 BE0wCUUeZOXoY2b1IPIVL3MgmuNuBKbYy9MMusQXDdNyTTiSSwUFTbAQJzG3V/iozR
-	 X3KmAAxm+M0Y9sAWtscJQGx78ZmCrVTMtd5UtQ5HFyeZsfcUqpKjB+2ruo11I0dyGH
-	 9mVd9re+n0z/psRCLjrslIcU=
-Received: from zn.tnic (p200300EA971F9307329c23FFFeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9307:329c:23ff:fea6:a903])
+	s=arc-20240116; t=1733767084; c=relaxed/simple;
+	bh=Y0UWrup3k88kt3zxiyLdBAaXUERYXhcmbMd/lY9JbrU=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=dqk6URZMqsCdu5FMPiBJRSQ4FxK5Ms7J7hBt/g2MigaPSYaZR8HKnQWOjkdy1s67KO3ULdG2UYoAfvG7m+45g0cQ43YOd4vVGlycwMN66MjMyZfydbndmGREdf95Ca3bH16pojxO332LDajFUX79ttSYOvpos7Phcu5FGelK2Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EvJavJwA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733767081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QhpxtO/mBMO94vZO3552ZqfP00gjpgAVYCMI7XwChuY=;
+	b=EvJavJwAmj/T2xXPzEVgVarpfe4Cb0dmCAwh6oqxCsLCw5eFZwFXRmFYfKeYbDMMw8bSKY
+	CvH1f2hZHvLXHKJIzLZwhKhzE6KR40wJ5qAZmv9rcIzIgaQ+kHpiI5o3Af1SASFS4HwOTo
+	tqQsjeQJAsIo/QK1tYdE2CIXu+eR72M=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-125-P1HD2u1LMmiYqFjiGeIlYw-1; Mon,
+ 09 Dec 2024 12:57:58 -0500
+X-MC-Unique: P1HD2u1LMmiYqFjiGeIlYw-1
+X-Mimecast-MFC-AGG-ID: P1HD2u1LMmiYqFjiGeIlYw
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7A82740E015F;
-	Mon,  9 Dec 2024 15:57:25 +0000 (UTC)
-Date: Mon, 9 Dec 2024 16:57:18 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v15 04/13] x86/sev: Change TSC MSR behavior for Secure
- TSC enabled guests
-Message-ID: <20241209155718.GBZ1cTXp2XsgtvUzHm@fat_crate.local>
-References: <20241203090045.942078-1-nikunj@amd.com>
- <20241203090045.942078-5-nikunj@amd.com>
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E74691955F43;
+	Mon,  9 Dec 2024 17:57:55 +0000 (UTC)
+Received: from starship.lan (unknown [10.22.82.46])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E99E195605A;
+	Mon,  9 Dec 2024 17:57:51 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	linux-hyperv@vger.kernel.org,
+	Dexuan Cui <decui@microsoft.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Long Li <longli@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 0/2] MANA: Fix few memory leaks in mana_gd_setup_irqs
+Date: Mon,  9 Dec 2024 12:57:49 -0500
+Message-Id: <20241209175751.287738-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241203090045.942078-5-nikunj@amd.com>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, Dec 03, 2024 at 02:30:36PM +0530, Nikunj A Dadhania wrote:
-> Secure TSC enabled guests should not write to MSR_IA32_TSC(10H) register as
-> the subsequent TSC value reads are undefined.
+Fix 2 minor memory leaks in the mana driver,=0D
+introduced by commit=0D
+=0D
+8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (2):=0D
+  net: mana: Fix memory leak in mana_gd_setup_irqs=0D
+  net: mana: Fix irq_contexts memory leak in mana_gd_setup_irqs=0D
+=0D
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 6 ++++--=0D
+ 1 file changed, 4 insertions(+), 2 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-What does that mean exactly?
-
-I'd prefer if we issued a WARN_ONCE() there on the write to catch any
-offenders.
-
-*NO ONE* should be writing the TSC MSR but that's a different story.
-
-IOW, something like this ontop of yours?
-
----
-
-diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-index c22cb2ea4b99..050170eb28e6 100644
---- a/arch/x86/coco/sev/core.c
-+++ b/arch/x86/coco/sev/core.c
-@@ -1443,9 +1443,15 @@ static enum es_result __vc_handle_msr_tsc(struct pt_regs *regs, bool write)
- {
- 	u64 tsc;
- 
--	if (write)
--		return ES_OK;
-+	if (!(sev_status & MSR_AMD64_SNP_SECURE_TSC))
-+		goto read_tsc;
-+
-+	if (write) {
-+		WARN_ONCE(1, "TSC MSR writes are verboten!\n");
-+		return ES_UNSUPPORTED;
-+	}
- 
-+read_tsc:
- 	tsc = rdtsc_ordered();
- 	regs->ax = lower_32_bits(tsc);
- 	regs->dx = upper_32_bits(tsc);
-@@ -1462,11 +1468,14 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	/* Is it a WRMSR? */
- 	write = ctxt->insn.opcode.bytes[1] == 0x30;
- 
--	if (regs->cx == MSR_SVSM_CAA)
-+	switch(regs->cx) {
-+	case MSR_SVSM_CAA:
- 		return __vc_handle_msr_caa(regs, write);
--
--	if (regs->cx == MSR_IA32_TSC && (sev_status & MSR_AMD64_SNP_SECURE_TSC))
-+	case MSR_IA32_TSC:
- 		return __vc_handle_msr_tsc(regs, write);
-+	default:
-+		break;
-+	}
- 
- 	ghcb_set_rcx(ghcb, regs->cx);
- 	if (write) {
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
