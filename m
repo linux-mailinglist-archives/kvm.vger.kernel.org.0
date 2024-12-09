@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-33261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D07C9E88D6
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 02:06:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 806E19E88D7
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 02:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6CD1644E7
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 01:06:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 556121885CDC
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 01:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BB473446;
-	Mon,  9 Dec 2024 01:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DEE21364;
+	Mon,  9 Dec 2024 01:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C5Mffl+k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B7c57Ovj"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2811D481D1;
-	Mon,  9 Dec 2024 01:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6DF78C9C;
+	Mon,  9 Dec 2024 01:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733706345; cv=none; b=uF1pVKXwp8xnDLAlnMi9GuSG6+Pz7R2PRtlPU2ymMP7W3+hBZ576BUlZ+Y6q4egtJGkvbOd7GAJBvGVZnTqS6aRQVxNHSMilSNH34lEJFQJsKwW4zpd+aYbQchHVDgovuKmUVBMnAbaE5RymtUGwN6EvzbY/CNGH4rSnaOMzckE=
+	t=1733706348; cv=none; b=Aty+7Hl59eMtcI2NlpM74SJpW75p/kH0Puxq39t0+t6peVYcMAgwaCTgXFn/N8aMrsBkZjUtW/mRjlxDlWHdAJsdDuO6MOjMfmgtaq81W8mCr8HGVReKt9yAYm9tbvHkjCqbNSHY3qy5+MHleaUrGhYRoH1TCmHoCFNSH76PJD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733706345; c=relaxed/simple;
-	bh=4adhL5u3hUfgPLc4VTabWbBFLG8IN5BleN4J0IbXz1k=;
+	s=arc-20240116; t=1733706348; c=relaxed/simple;
+	bh=FlmjHVF36tMNoRxEdqDyWr2wygz2UcKHXxq3qf5pJo4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z3FgYqFmvRvzzAm8RoctRwfepmpEfa1vCWSyvPf+ULIxBuTW57RsPRirNr5wCBJ1mS5EnPT/MLSFQt707ZuQU0d9WTVZdTsy8pRbnQj2ChhrR8niUS7xp43EEWxHudfBh7xsWYnt1uke94dNBCJKufNlVsD/LF1aALchtshxupo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C5Mffl+k; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=mIp7yyj9V7ljRvitD1q96FB1o/IEejBiPbES24AqOHq/nE/ONAT2WErEDRCsqQOWEHsukOwXjBFLDwWfodGAlA1STHuuNEFna804nV+cJda6/a4PBnvI0M9z+Eo+JYKeuWaeIWzEysWO3LupTYHbyNW7fn6FRcRlGjtG/EldfkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B7c57Ovj; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733706343; x=1765242343;
+  t=1733706347; x=1765242347;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4adhL5u3hUfgPLc4VTabWbBFLG8IN5BleN4J0IbXz1k=;
-  b=C5Mffl+kgqq1nISTIhRJa1pK4Lr/ioZctuvZEi3e8uwlhWOZb8fGU4b7
-   DWgaTdpiR7wECAcGJsQRp1lSyj5/f8Gxfu7Ecy7oAsCn1DsbALenLqPsY
-   4ZyGWucUIUCRN2gTy7f5ybPF8mYEU9a8l1itOP5p4Nsp9EXevQiAb1iHI
-   7KatfRX6geo05wbAu0UUuj3ZhmEUlgMmbCcHxUUk8p2MeKk8fgMrQ41kd
-   V7iM+hSuY0516gC1lCqEg/ZRhv0xoh4Ewbn3jOj3yomnqYHubiK7SfNSc
-   dFDUVRft7ctCsIWHZBuufkc05pRmebzN/UtaaJLr44kkiJ340q4OoBVvn
-   g==;
-X-CSE-ConnectionGUID: egmq0oN/ROCV2YzEZulyYQ==
-X-CSE-MsgGUID: PALQuRNFRKeAHRsJWOy3/A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="36833686"
+  bh=FlmjHVF36tMNoRxEdqDyWr2wygz2UcKHXxq3qf5pJo4=;
+  b=B7c57OvjpOKMAZ0GELRg12ED+JKceX/XiLuGALFFiwiPn+IEowQNn7T5
+   6K504/mk+rWUjF/+ICimFqALZWsN0DgQDc26krUWj1emyA1+cYzeQQxCF
+   WRsu2Co1FX+GLP2NyMvKYoO6RQlpKHFdG/rV/xbBF+waqr8lKdDWcbKU7
+   Yeuh7KajuRcnbB4780hFn+pFEFxSCnHOKs2JRYuXWiTpqjV1zfIR7R6ct
+   qGh3E+/M5RGv9NcRioMNzYvSlMgxnDyXm3tJrWnCEhcZG7uyIJOBo+fVa
+   FbNaooscXLT3koiFXnZqcXAPog32d7++ML/8VCGM/N6kkLzbcbBx7mJvH
+   w==;
+X-CSE-ConnectionGUID: /GiBd0EUSdOoZNS4wi8PhQ==
+X-CSE-MsgGUID: BCfaC8sLSla3XOVgnJ6BWg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="36833692"
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="36833686"
+   d="scan'208";a="36833692"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:05:43 -0800
-X-CSE-ConnectionGUID: VSqs0o3jQwSkgERNq7SKqQ==
-X-CSE-MsgGUID: tKn7eoaXR9KCv+HUwK3ixQ==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:05:46 -0800
+X-CSE-ConnectionGUID: NOPjcuZEQAC2AsNfkMXmbQ==
+X-CSE-MsgGUID: CMv1aqGWRwWiSr0LuU/9IA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="95402407"
+   d="scan'208";a="95402420"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:05:39 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:05:42 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH 02/16] KVM: VMX: Remove use of struct vcpu_vmx from posted_intr.c
-Date: Mon,  9 Dec 2024 09:07:16 +0800
-Message-ID: <20241209010734.3543481-3-binbin.wu@linux.intel.com>
+Subject: [PATCH 03/16] KVM: TDX: Disable PI wakeup for IPIv
+Date: Mon,  9 Dec 2024 09:07:17 +0800
+Message-ID: <20241209010734.3543481-4-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
 References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
@@ -89,229 +89,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Unify the layout for vcpu_vmx and vcpu_tdx at the top of the structure
-with members needed in posted-intr.c, and introduce a struct vcpu_pi to
-have the common part.  Use vcpu_pi instead of vcpu_vmx to enable TDX
-compatibility with posted_intr.c.
+Disable PI wakeup for IPI virtualization (IPIv) case for TDX.
 
-To minimize the diff size, code conversion such as changing vmx->pi_desc
-to vmx->common->pi_desc is avoided.  Instead, compile-time checks are
-added to ensure the layout is as expected.
+When a vCPU is being scheduled out, notification vector is switched and
+pi_wakeup_handler() is enabled when the vCPU has interrupt enabled and
+posted interrupt is used to wake up the vCPU.
+
+For VMX, a blocked vCPU can be the target of posted interrupts when using
+IPIv or VT-d PI.  TDX doesn't support IPIv, disable PI wakeup for IPIv.
+Also, since the guest status of TD vCPU is protected, assume interrupt is
+always enabled for TD. (PV HLT hypercall is not support yet, TDX guest tells
+VMM whether HLT is called with interrupt disabled or not.)
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
+[binbin: split into new patch]
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX interrupts breakout:
-- Renamed from "KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c"
-  to "KVM: VMX: Remove use of struct vcpu_vmx from posted_intr.c".
-- Use vcpu_pi instead vcpu_vmx in pi_wakeup_handler(). (Binbin)
-- Update change log.
-- Remove functional change from the code refactor patch, move into its
-  own separate patch. (Chao)
+- This is split out as a new patch from patch
+  "KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c"
 ---
- arch/x86/kvm/vmx/posted_intr.c | 43 +++++++++++++++++++++++++---------
- arch/x86/kvm/vmx/posted_intr.h | 11 +++++++++
- arch/x86/kvm/vmx/tdx.c         |  1 +
- arch/x86/kvm/vmx/tdx.h         | 11 +++++++++
- arch/x86/kvm/vmx/vmx.h         | 14 ++++++-----
- 5 files changed, 63 insertions(+), 17 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index ec08fa3caf43..8951c773a475 100644
+index 8951c773a475..651ef663845c 100644
 --- a/arch/x86/kvm/vmx/posted_intr.c
 +++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -11,6 +11,7 @@
- #include "posted_intr.h"
- #include "trace.h"
- #include "vmx.h"
-+#include "tdx.h"
- 
- /*
-  * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-@@ -31,9 +32,29 @@ static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-  */
- static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
- 
-+/*
-+ * The layout of the head of struct vcpu_vmx and struct vcpu_tdx must match with
-+ * struct vcpu_pi.
-+ */
-+static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-+	      offsetof(struct vcpu_vmx, pi_desc));
-+static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-+	      offsetof(struct vcpu_vmx, pi_wakeup_list));
-+#ifdef CONFIG_INTEL_TDX_HOST
-+static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-+	      offsetof(struct vcpu_tdx, pi_desc));
-+static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-+	      offsetof(struct vcpu_tdx, pi_wakeup_list));
-+#endif
-+
-+static inline struct vcpu_pi *vcpu_to_pi(struct kvm_vcpu *vcpu)
-+{
-+	return (struct vcpu_pi *)vcpu;
-+}
-+
- static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- {
--	return &(to_vmx(vcpu)->pi_desc);
-+	return &vcpu_to_pi(vcpu)->pi_desc;
- }
- 
- static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
-@@ -52,8 +73,8 @@ static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
- 
- void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- {
--	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-+	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
- 	struct pi_desc old, new;
- 	unsigned long flags;
- 	unsigned int dest;
-@@ -90,7 +111,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+@@ -211,7 +211,8 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
+ 	 * notification vector is switched to the one that calls
+ 	 * back to the pi_wakeup_handler() function.
  	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
- 		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--		list_del(&vmx->pi_wakeup_list);
-+		list_del(&vcpu_pi->pi_wakeup_list);
- 		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 	}
- 
-@@ -145,15 +166,15 @@ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
-  */
- static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- {
--	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-+	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
- 	struct pi_desc old, new;
- 	unsigned long flags;
- 
- 	local_irq_save(flags);
- 
- 	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--	list_add_tail(&vmx->pi_wakeup_list,
-+	list_add_tail(&vcpu_pi->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
- 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 
-@@ -220,13 +241,13 @@ void pi_wakeup_handler(void)
- 	int cpu = smp_processor_id();
- 	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
- 	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
--	struct vcpu_vmx *vmx;
-+	struct vcpu_pi *pi;
- 
- 	raw_spin_lock(spinlock);
--	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
-+	list_for_each_entry(pi, wakeup_list, pi_wakeup_list) {
- 
--		if (pi_test_on(&vmx->pi_desc))
--			kvm_vcpu_wake_up(&vmx->vcpu);
-+		if (pi_test_on(&pi->pi_desc))
-+			kvm_vcpu_wake_up(&pi->vcpu);
- 	}
- 	raw_spin_unlock(spinlock);
+-	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
++	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
++		vmx_can_use_vtd_pi(vcpu->kvm);
  }
-diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-index 1715d2ab07be..e579e8c3ad2e 100644
---- a/arch/x86/kvm/vmx/posted_intr.h
-+++ b/arch/x86/kvm/vmx/posted_intr.h
-@@ -5,6 +5,17 @@
- #include <linux/find.h>
- #include <asm/posted_intr.h>
  
-+struct vcpu_pi {
-+	struct kvm_vcpu	vcpu;
-+
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
-+
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here common layout between vcpu_vmx and vcpu_tdx. */
-+};
-+
- void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu);
- void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu);
- void pi_wakeup_handler(void);
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 877cf9e1fd65..478da0ebd225 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -723,6 +723,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+@@ -221,7 +222,8 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+ 	if (!vmx_needs_pi_wakeup(vcpu))
+ 		return;
  
- 	fpstate_set_confidential(&vcpu->arch.guest_fpu);
- 	vcpu->arch.apic->guest_apic_protected = true;
-+	INIT_LIST_HEAD(&tdx->pi_wakeup_list);
+-	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
++	if (kvm_vcpu_is_blocking(vcpu) &&
++	    (is_td_vcpu(vcpu) || !vmx_interrupt_blocked(vcpu)))
+ 		pi_enable_wakeup_handler(vcpu);
  
- 	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
- 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index a7dd2b0b5dd7..d6a0fc20ecaa 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -17,6 +17,10 @@ enum kvm_tdx_state {
- 	TD_STATE_RUNNABLE,
- };
- 
-+
-+#include "irq.h"
-+#include "posted_intr.h"
-+
- struct kvm_tdx {
- 	struct kvm kvm;
- 
-@@ -52,6 +56,13 @@ enum tdx_prepare_switch_state {
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
- 
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
-+
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here same layout to struct vcpu_pi. */
-+
- 	unsigned long tdvpr_pa;
- 	unsigned long *tdcx_pa;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 37a555c6dfbf..e7f570ca3c19 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -230,6 +230,14 @@ struct nested_vmx {
- 
- struct vcpu_vmx {
- 	struct kvm_vcpu       vcpu;
-+
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
-+
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here same layout to struct vcpu_pi. */
-+
- 	u8                    fail;
- 	u8		      x2apic_msr_bitmap_mode;
- 
-@@ -299,12 +307,6 @@ struct vcpu_vmx {
- 
- 	union vmx_exit_reason exit_reason;
- 
--	/* Posted interrupt descriptor */
--	struct pi_desc pi_desc;
--
--	/* Used if this vCPU is waiting for PI notification wakeup. */
--	struct list_head pi_wakeup_list;
--
- 	/* Support for a guest hypervisor (nested VMX) */
- 	struct nested_vmx nested;
- 
+ 	/*
 -- 
 2.46.0
 
