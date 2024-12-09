@@ -1,123 +1,110 @@
-Return-Path: <kvm+bounces-33337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6873B9EA091
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 21:46:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09E59EA09D
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 21:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E48616518F
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 20:46:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62BFF18865E7
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 20:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A4B19AD8C;
-	Mon,  9 Dec 2024 20:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D15419C553;
+	Mon,  9 Dec 2024 20:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjmsQ877"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j5DOA4e8"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCDF1E515;
-	Mon,  9 Dec 2024 20:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CED0199949
+	for <kvm@vger.kernel.org>; Mon,  9 Dec 2024 20:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733777178; cv=none; b=HFGOhFuK5OXz0Aagxc7cIn4rauYzdBkkhlsyr5vgFzoqRO1QAF2ocKrDCXzeDSz/jp7z9ZKi2R5y4N/vG8UB0FyrE7TglRa6U9qRplk+WumD6RHCtQ9xtOjNbCMRgQUkIk206QXvb7ChK1qP10c6/PBMjhVnaJRsh12beok1NfM=
+	t=1733777667; cv=none; b=mjmoinouNFho0XtmnEIlf2Ngtrbt9ET5m0gUSVq7BfEfMRyBprYdvpF+Mx8ijSPyrUO+ykajQaTkFX2zWWNc4RxXgo7mJ2ACPd3Re7w5VG3yXzhVhuMBYaeC7Q11w53yb4HRj0Y6d1oSMyA/2LBWc6zmWmsmK46ShXx7/XVXjjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733777178; c=relaxed/simple;
-	bh=Sy0df8OMuc4UsW/w9DP2NkGuhHpfQjU4nY1+/BUPqwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LghYGylL5+NbnhLMVFzeew7HdfYV0WEkdis6afDDMPNbUaISHykLRXHNoMwmvdNVON7LFxvBz8J/tOmD75o4j1VvsNE0orCkPNo7DPcEGMqftENgI+06CCDJytPewGT+AU4iibx46IYptfOmbxHigA714u37hYLea1BQy/R8XlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjmsQ877; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A4FC4CED1;
-	Mon,  9 Dec 2024 20:46:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733777178;
-	bh=Sy0df8OMuc4UsW/w9DP2NkGuhHpfQjU4nY1+/BUPqwQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pjmsQ877mVXX7WxC7t98yJX9nWWusdu+4wwmCq1oiM3hPLhepBzELnA2qAbmSSwkJ
-	 cXWNI8GqyTfzi1sf7Gz3E2boPBs8MuoTLoFuxt4qIg6fJ2OmHh5EWbQQtBnBuYRlv8
-	 1b1cD09B6a7wmkmtot/vp0UGhYK8hH23NtZmj/Yf13MkfMMlaS3c4+uoNRhx6hoChQ
-	 E1IqKTFjrVfp/JEpMdZHHh5xJN9BH4/FqAqrotr6KDxZOWI/Pvme8jvqa3XrKE5XXv
-	 8I86ton2hJFzeA87tV2ergcgD+HVpynyex1IMDazsUE9Vze5VmB7hPV/lBz9oFGx1C
-	 SqOmuZYUM/5xw==
-Date: Mon, 9 Dec 2024 12:46:14 -0800
-From: "jpoimboe@kernel.org" <jpoimboe@kernel.org>
-To: "Shah, Amit" <Amit.Shah@amd.com>
-Cc: "x86@kernel.org" <x86@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
-	"kai.huang@intel.com" <kai.huang@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-	"daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"Moger, Babu" <Babu.Moger@amd.com>,
-	"Das1, Sandipan" <Sandipan.Das@amd.com>,
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"Kaplan, David" <David.Kaplan@amd.com>
-Subject: Re: [PATCH v2 2/2] x86/bugs: Don't fill RSB on context switch with
- eIBRS
-Message-ID: <20241209204614.vzmb4dr3sfelcixk@jpoimboe>
-References: <cover.1732219175.git.jpoimboe@kernel.org>
- <d6b0c08000aa96221239ace37dd53e3f1919926c.1732219175.git.jpoimboe@kernel.org>
- <20241205233245.4xaicvusl5tfp2oi@jpoimboe>
- <f1d0197349388c1785eeba356a26553ced29800c.camel@amd.com>
+	s=arc-20240116; t=1733777667; c=relaxed/simple;
+	bh=c10brrxuzg6wg3KudfR7ay5/liXufv4L0mFBI3jOdUg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UWMJozmKB+ajNxm/wjgMU4D2a3z3E0D3XBfJtS4VD4PDWp4CEcgauVtn6jFL0w7sh2UdmF7dgmsJD/IfgC39Mk2qZC5Ib2Wz/nVzrM/6aZ71fUf2iKkU+y6/hQuuNimXGEteak68uR3KY4/Tb+xResTpqPgckwGGMT6Jk6mwLiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j5DOA4e8; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-215ce620278so41069215ad.1
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2024 12:54:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733777665; x=1734382465; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cUtf5/eTNdk+7XVgcYaZXMh2nWeqG1Qcvae0c0hqdJk=;
+        b=j5DOA4e8bAbWRqK25I68cShFL5TK/VAMk+IDG4SvFUgBfdwosX0lA6CfXXTAO5+Auq
+         xaq35Cxk0pKZVhZQWHOucj/beIxkXFmXFr+cLxqzYKW9NUdC/a7f0YzaNtT4r4Bze+zz
+         3T/FtCAY+/HkS/ZKa7/kw5eig9ldngbggzInSF6aagqCtTd9eNNoxdKA33jC2mw7JwT2
+         l2iuu+ERdSImwjjCk7bRcwqQfeUH0jX7mfuTSOVbr8utI2QgJXLSBTtqCATC8Q2vQ9LV
+         Dm+SMTUNjNrOzdQ/6FzUQlNLFJeUfqs0KDYvS9GlFvQlS9U6zq8ZXG+NJw0SzlK0fOh6
+         EboQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733777665; x=1734382465;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cUtf5/eTNdk+7XVgcYaZXMh2nWeqG1Qcvae0c0hqdJk=;
+        b=eeVx4PjkkbuR2JHTERPxQmbQ/R9ksZ5blCfQg3lRL0YLoIoyk4wiZczVBlEP63DL6g
+         rPEqZpMxV1o6m/6tIgA8mAZwvdVy50wX6j/BLrIhIXltHG+XIXVnAFOQkGnnCI2a6u5/
+         kg1iZ4ghF/3Vd2cvP3wv7b4dSX2LNwx4yirNn7crpiQEZwxySFROY3j4pUK9yYK2+IM6
+         71gnnnepCvud8SJke+wB3J4mYe3pD6wi/tfZoZ7wXAmPlEJpTINlXPMWbT5gLJ+yWxI4
+         aC1Hs11hqY6LhvBsgXcBJ1AVyyHU4fDdoM0XLf6pX31YPXt3J79j4ot6xMXSnpi7PxRs
+         /3yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbdyItScyJ+rjUaEHBYrW6iqG7y4IhONTsZLQei6Di8m+NUCQH3Hu587HaUhgreJG5Vpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeVMwXaLLU9sk/FmzXUNJxbjdLRcWtQoRfVBIJBXb7naUG6MWx
+	kH0kNrM14Cvi5T+Vn7bWG6vsn8t6TF5H2lyvhQu9tdcQHktJLroV38/T3Ccvy9Ag8BzJgIURAk+
+	Rdw==
+X-Google-Smtp-Source: AGHT+IEgwWsSdCP86oDj3I6Mk9CKakDYnZWtR3qpDkbrahSuYqYHViSyFLWRs89IfZfnLn4VxGFWpB5oCU4=
+X-Received: from pldt4.prod.google.com ([2002:a17:903:40c4:b0:216:271b:1b41])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:94c:b0:216:51fb:bb28
+ with SMTP id d9443c01a7336-21651fbbd41mr70943585ad.51.1733777665529; Mon, 09
+ Dec 2024 12:54:25 -0800 (PST)
+Date: Mon, 9 Dec 2024 12:54:24 -0800
+In-Reply-To: <20241209204414.psmh3yyllnwbrc4y@jpoimboe>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f1d0197349388c1785eeba356a26553ced29800c.camel@amd.com>
+Mime-Version: 1.0
+References: <20241205220604.GA2054199@thelio-3990X> <Z1MkNofJjt7Oq0G6@google.com>
+ <20241209204414.psmh3yyllnwbrc4y@jpoimboe>
+Message-ID: <Z1dZAD4_kgmm-B-_@google.com>
+Subject: Re: Hitting AUTOIBRS WARN_ON_ONCE() in init_amd() booting 32-bit
+ kernel under KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, 
+	Kim Phillips <kim.phillips@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Dec 06, 2024 at 10:10:31AM +0000, Shah, Amit wrote:
-> On Thu, 2024-12-05 at 15:32 -0800, Josh Poimboeuf wrote:
-> > On Thu, Nov 21, 2024 at 12:07:19PM -0800, Josh Poimboeuf wrote:
-> > > User->user Spectre v2 attacks (including RSB) across context
-> > > switches
-> > > are already mitigated by IBPB in cond_mitigation(), if enabled
-> > > globally
-> > > or if either the prev or the next task has opted in to protection. 
-> > > RSB
-> > > filling without IBPB serves no purpose for protecting user space,
-> > > as
-> > > indirect branches are still vulnerable.
+On Mon, Dec 09, 2024, Josh Poimboeuf wrote:
+> On Fri, Dec 06, 2024 at 08:20:06AM -0800, Sean Christopherson wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > Date: Fri, 6 Dec 2024 08:14:45 -0800
+> > Subject: [PATCH] x86/CPU/AMD: WARN when setting EFER.AUTOIBRS if and only if
+> >  the WRMSR fails
 > > 
-> > Question for Intel/AMD folks: where is it documented that IBPB clears
-> > the RSB?  I thought I'd seen this somewhere but I can't seem to find
-> > it.
+> > When ensuring EFER.AUTOIBRS is set, WARN only on a negative return code
+> > from msr_set_bit(), as '1' is used to indicate the WRMSR was successful
+> > ('0' indicates the MSR bit was already set).
+> > 
+> > Fixes: 8cc68c9c9e92 ("x86/CPU/AMD: Make sure EFER[AIBRSE] is set")
+> > Reported-by: Nathan Chancellor <nathan@kernel.org>
+> > Closes: https://lore.kernel.org/all/20241205220604.GA2054199@thelio-3990X
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
-> "AMD64 TECHNOLOGY INDIRECT BRANCH CONTROL EXTENSION"
-> https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/white-papers/111006-architecture-guidelines-update-amd64-technology-indirect-branch-control-extension.pdf
-> 
-> has:
-> 
-> Indirect branch prediction barrier (IBPB) exists at MSR 0x49 (PRED_CMD)
-> it 0. This is a write only MSR that both GP faults when software reads
-> it or if software tries to write any of the bits in 63:1. When bit zero
-> is written, the processor guarantees that older indirect branches
-> cannot influence predictions of indirect branches in the future. This
-> applies to jmp indirects, call indirects and returns. As this restricts
-> the processor from using all previous indirect branch information, it
-> is  intended to only be used by software when switching from one user
-> context to another user context that requires protection, or from one
-> guest to another guest.
+> LGTM, but please post as a proper patch in its own thread so the -tip
+> maintainers are more likely to see it.
 
-Sounds like that needs to be updated to mention the IBPB_RET bit.
+In Boris I trust :-)
 
--- 
-Josh
+Already in Linus' tree, commit 492077668fb4 ("x86/CPU/AMD: WARN when setting
+EFER.AUTOIBRS if and only if the WRMSR fails").
 
