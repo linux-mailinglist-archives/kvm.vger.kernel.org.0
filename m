@@ -1,80 +1,105 @@
-Return-Path: <kvm+bounces-33256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2EF9E8463
-	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 10:14:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3DE49E88A3
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 01:06:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F28D163DE4
-	for <lists+kvm@lfdr.de>; Sun,  8 Dec 2024 09:14:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6514028143C
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 00:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF6413B7A3;
-	Sun,  8 Dec 2024 09:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0918468;
+	Mon,  9 Dec 2024 00:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpaD61KE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXF9NPn9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415321BC4E
-	for <kvm@vger.kernel.org>; Sun,  8 Dec 2024 09:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEF819A;
+	Mon,  9 Dec 2024 00:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733649264; cv=none; b=OcPsR1hpAnIa9f8QcE2pQ2o7bcIErBU/tRh4CUnWVrEBOZ7Uc//2eB3h/Vj8HlRQ5qzCKzLCStrN6dk/IAXrWs3oWSlVyowe1DKJJEPfY1B8Jf03wCKAe2mpFwVhHmIy+vZLJD+FxE6KpI7jtpdaQrru0fgtXrr0BGGxS2wNvbA=
+	t=1733702759; cv=none; b=kJoSIN6jyKo3rqmpk43AN7pXMXgkUz9ENlC8Q+/QVlLWPnqO6bkQU8NU1UrYwmbo8/wH//uu50vbOkxwzdv2hdrBE9WXh1Ju5qdy2G2w/1nOPfenLEnfUBfC/seKq11IKcgfNvKZYTk6hsSGqxnT5iTc0GEpDq3aRFt26Fa2GgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733649264; c=relaxed/simple;
-	bh=fb4PGjth+/NuIenBGcNzc5T9PQ6WQHpJtalPZHDaX/g=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=A1xMcV20HpNU1bxBG03s5AWsWyKX2rASMdldTnllL4iYTPUKZA1gKQBowQiBkx9snE3ANyt6t/IWntKd0x8EXHzTCMNoOof4RK4ACGRdi8lsMfYvVmzWtK1lSuhIpf0Oe3vAIDk5wqFGgOTr83irH6N/Jd7Kn9Ezww/8TSlgCOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpaD61KE; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21583cf5748so31564695ad.1
-        for <kvm@vger.kernel.org>; Sun, 08 Dec 2024 01:14:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733649262; x=1734254062; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fb4PGjth+/NuIenBGcNzc5T9PQ6WQHpJtalPZHDaX/g=;
-        b=lpaD61KEfwhnmeRHPR0Q6aMlyN20rRlVzF6ri3x9qx2F/FmKfC6yX5i0uZEF6NOcS4
-         HIBjWpTSgDyh5PEwGtmXCnfl5BJwMljxA18Ej7yrVn52AnWhnekWbcM4CAfWiJOTw4VA
-         6ZXU53ydQoklfmilLKTMGGWD5L7vvFhzdemqjeXFqeQaqrY9I4gJ0BxRGiJ+WDjt6FQt
-         heBFMn3gJlSMKnbglOmUGffueDlSzJUpEpfCLYvxye5qWqaSfD1ElRH9AvtRDz7lkuSb
-         T2iPAfj65ENjYD0LVQFcama4RTF04a81IjuGZa8peunnY7aC4mVeJIj+As1JBkcQzav1
-         AU5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733649262; x=1734254062;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fb4PGjth+/NuIenBGcNzc5T9PQ6WQHpJtalPZHDaX/g=;
-        b=vOotl9XosHct2ocp+uQPTn1buuds7D/b37oJnI2+fOeapBs+5vMLACx0C/KZ+t0Zd4
-         2F+APzb4UXI/nRBWA/z8JAaTgDS8w2XFqEjE8LBsju4nTA3Uv/jOysZfBw3bxnF8l5H9
-         SQY1e158DAPhAmdcY1drustuvtM7OORiEgDt1B/IPW+DuuD+2FJSmsGBVfzY3MImmY0/
-         Oc2QMDY8H5XA34c+ub1lEbvWorq2Lud+zhYavVkWbEcl4nj5qUDj2dJrkGg/Kmixkgae
-         z95rqo6btxCOmA8NURQFT9cxEwfna9zmr0gNqhoazWjuSkdC9IWj9QsSmFoMdj33xSwh
-         OZLQ==
-X-Gm-Message-State: AOJu0Yx1rMH68NZd6ZaBFon0w9ZJi9tGjLe15CIKCMxRCSjk7OJM+vEb
-	tXPD0bVkD9CUeEVlxQjiyUgzat/f8ztbt+7L7Gu75mRNQoZ9zSoQUJsg8rulWFRWlIEgnDFFnGr
-	BIuElKzf4/AkXw00jl7/qkrCr2+KU8Tvo+FY=
-X-Gm-Gg: ASbGncsA756gpUgctRdbhc8PsaYtk39w2rzxFEdnEN1pqWJzdZHHa0KLVT2MI/phHom
-	+2qrGV48TFWAub/MFAMsW8nN89RZ9l3a4OA6w
-X-Google-Smtp-Source: AGHT+IESA0oWswF50Qxr24RvfQRF5TkMmhEwEZ6r6pb+QfOtt+j7k8tp5HKmrf5mUhE1C3eIyZP00MRsLsjZW66wfrc=
-X-Received: by 2002:a17:902:e548:b0:215:4665:f7e5 with SMTP id
- d9443c01a7336-21614dd226cmr130910845ad.43.1733649262257; Sun, 08 Dec 2024
- 01:14:22 -0800 (PST)
+	s=arc-20240116; t=1733702759; c=relaxed/simple;
+	bh=KOSE2+0IJQr/pu3UWE4qE1sa7hIxtXcxZxP8jtFM2qk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O44FhUi3NBsGKpbYlXx+pMb/lC4bcqmu2NkHl1E1415n925OZKLKz2PTWEa3q1W4hSb2RRPnfv0+V5w//nM+diDtFXIm4aghEC0NJMP5P66+5sd/OP+SRvSLc0cVtLTc/0IwPYroVlXijaJXbNthQEqpSFPDBWVmRxCoN+pgZLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXF9NPn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F2CC4CED2;
+	Mon,  9 Dec 2024 00:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733702758;
+	bh=KOSE2+0IJQr/pu3UWE4qE1sa7hIxtXcxZxP8jtFM2qk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DXF9NPn9POFP50emVFrAtfIHqq4k8Ait3jzAckDzNP4bGmUk6T8lv6B0EIk7fxs1U
+	 u7pjIv1BdHmbkxLaCyDrqJ4fAw2qD+sefOnHMs79XCU1/ccDaVEsY8F86kazyBJr6M
+	 PjJunvWrVykhl/mhPfkYR2UxjUex+regGgNhtDqxdKH+urlUjGi4XqeldagYnbQSxW
+	 lSxM+nTE2m+KYy1gibCaV6aXWA2i8NfGqXbAcVKwqmjgyBrs7oKccYOETeAQKZYlwH
+	 3qilQ0Q/zFmyj3DBqfn5svbmu/EaZbdsza73DiOz60mE4GWluNMmHLT061A3r4GXK8
+	 TI1wK055FK+iQ==
+Date: Mon, 9 Dec 2024 00:05:56 +0000
+From: Wei Liu <wei.liu@kernel.org>
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, mhklinux@outlook.com,
+	decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
+	luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com,
+	robh@kernel.org, bhelgaas@google.com, arnd@arndb.de,
+	sgarzare@redhat.com, jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com, skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com, vkuznets@redhat.com,
+	ssengar@linux.microsoft.com, apais@linux.microsoft.com,
+	eahariha@linux.microsoft.com, horms@kernel.org
+Subject: Re: [PATCH v3 0/5] Introduce new headers for Hyper-V
+Message-ID: <Z1Y0ZB0J16oeHBbK@liuwe-devbox-debian-v2>
+References: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?B?5p2O56GV?= <shilishuoya@gmail.com>
-Date: Sun, 8 Dec 2024 17:14:11 +0800
-Message-ID: <CADTb_0Pr0Rh63eB1O6jvjH8cngMyDS0D7Khr5THtMBp0GVdciw@mail.gmail.com>
-Subject: i want to learn some recent development process about kvm, not robot
-To: kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
 
-subscribe kvm shilishuoya@gmail.com
+On Mon, Nov 25, 2024 at 03:24:39PM -0800, Nuno Das Neves wrote:
+> To support Linux as root partition[1] on Hyper-V many new definitions
+> are required.
+> 
+> The plan going forward is to directly import definitions from
+> Hyper-V code without waiting for them to land in the TLFS document.
+> This is a quicker and more maintainable way to import definitions,
+> and is a step toward the eventual goal of exporting the headers
+> directly from Hyper-V for use in Linux.
+> 
+> This patch series introduces new headers (hvhdk.h, hvgdk.h, etc,
+> see patch #3) derived directly from Hyper-V code. hyperv-tlfs.h is
+> replaced with hvhdk.h (which includes the other new headers)
+> everywhere.
+> 
+> No functional change is expected.
+> 
+> Summary:
+> Patch 1-2: Minor cleanup patches
+> Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+> Patch 4: Switch to the new headers
+> Patch 5: Delete hyperv-tlfs.h files
+> 
+> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+
+Applied to hyperv-next. Thanks.
 
