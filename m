@@ -1,110 +1,106 @@
-Return-Path: <kvm+bounces-33338-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09E59EA09D
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 21:54:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFB9B9EA0C2
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 21:59:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62BFF18865E7
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 20:54:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDBB28286E
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 20:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D15419C553;
-	Mon,  9 Dec 2024 20:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4DA19C556;
+	Mon,  9 Dec 2024 20:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j5DOA4e8"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Eb/MkI8F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CED0199949
-	for <kvm@vger.kernel.org>; Mon,  9 Dec 2024 20:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6781E515;
+	Mon,  9 Dec 2024 20:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733777667; cv=none; b=mjmoinouNFho0XtmnEIlf2Ngtrbt9ET5m0gUSVq7BfEfMRyBprYdvpF+Mx8ijSPyrUO+ykajQaTkFX2zWWNc4RxXgo7mJ2ACPd3Re7w5VG3yXzhVhuMBYaeC7Q11w53yb4HRj0Y6d1oSMyA/2LBWc6zmWmsmK46ShXx7/XVXjjA=
+	t=1733777985; cv=none; b=q0S+ZESQ+OFTf4fteN0J3BaQSO9CNBk5JYd/+m9m8R04DrhM9JEFpoDOJ13I6xqAat35VmN0RpXKgv4nTevTJT+n3HzPA9wtGgi3OWc2MeoseLqwnhlVVerrzX79WdBohKcjztcEzlm2+QxauiT7tcyzmoeUmtv8d4SW7igKLFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733777667; c=relaxed/simple;
-	bh=c10brrxuzg6wg3KudfR7ay5/liXufv4L0mFBI3jOdUg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UWMJozmKB+ajNxm/wjgMU4D2a3z3E0D3XBfJtS4VD4PDWp4CEcgauVtn6jFL0w7sh2UdmF7dgmsJD/IfgC39Mk2qZC5Ib2Wz/nVzrM/6aZ71fUf2iKkU+y6/hQuuNimXGEteak68uR3KY4/Tb+xResTpqPgckwGGMT6Jk6mwLiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j5DOA4e8; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-215ce620278so41069215ad.1
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2024 12:54:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733777665; x=1734382465; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cUtf5/eTNdk+7XVgcYaZXMh2nWeqG1Qcvae0c0hqdJk=;
-        b=j5DOA4e8bAbWRqK25I68cShFL5TK/VAMk+IDG4SvFUgBfdwosX0lA6CfXXTAO5+Auq
-         xaq35Cxk0pKZVhZQWHOucj/beIxkXFmXFr+cLxqzYKW9NUdC/a7f0YzaNtT4r4Bze+zz
-         3T/FtCAY+/HkS/ZKa7/kw5eig9ldngbggzInSF6aagqCtTd9eNNoxdKA33jC2mw7JwT2
-         l2iuu+ERdSImwjjCk7bRcwqQfeUH0jX7mfuTSOVbr8utI2QgJXLSBTtqCATC8Q2vQ9LV
-         Dm+SMTUNjNrOzdQ/6FzUQlNLFJeUfqs0KDYvS9GlFvQlS9U6zq8ZXG+NJw0SzlK0fOh6
-         EboQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733777665; x=1734382465;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cUtf5/eTNdk+7XVgcYaZXMh2nWeqG1Qcvae0c0hqdJk=;
-        b=eeVx4PjkkbuR2JHTERPxQmbQ/R9ksZ5blCfQg3lRL0YLoIoyk4wiZczVBlEP63DL6g
-         rPEqZpMxV1o6m/6tIgA8mAZwvdVy50wX6j/BLrIhIXltHG+XIXVnAFOQkGnnCI2a6u5/
-         kg1iZ4ghF/3Vd2cvP3wv7b4dSX2LNwx4yirNn7crpiQEZwxySFROY3j4pUK9yYK2+IM6
-         71gnnnepCvud8SJke+wB3J4mYe3pD6wi/tfZoZ7wXAmPlEJpTINlXPMWbT5gLJ+yWxI4
-         aC1Hs11hqY6LhvBsgXcBJ1AVyyHU4fDdoM0XLf6pX31YPXt3J79j4ot6xMXSnpi7PxRs
-         /3yg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbdyItScyJ+rjUaEHBYrW6iqG7y4IhONTsZLQei6Di8m+NUCQH3Hu587HaUhgreJG5Vpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeVMwXaLLU9sk/FmzXUNJxbjdLRcWtQoRfVBIJBXb7naUG6MWx
-	kH0kNrM14Cvi5T+Vn7bWG6vsn8t6TF5H2lyvhQu9tdcQHktJLroV38/T3Ccvy9Ag8BzJgIURAk+
-	Rdw==
-X-Google-Smtp-Source: AGHT+IEgwWsSdCP86oDj3I6Mk9CKakDYnZWtR3qpDkbrahSuYqYHViSyFLWRs89IfZfnLn4VxGFWpB5oCU4=
-X-Received: from pldt4.prod.google.com ([2002:a17:903:40c4:b0:216:271b:1b41])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:94c:b0:216:51fb:bb28
- with SMTP id d9443c01a7336-21651fbbd41mr70943585ad.51.1733777665529; Mon, 09
- Dec 2024 12:54:25 -0800 (PST)
-Date: Mon, 9 Dec 2024 12:54:24 -0800
-In-Reply-To: <20241209204414.psmh3yyllnwbrc4y@jpoimboe>
+	s=arc-20240116; t=1733777985; c=relaxed/simple;
+	bh=6F253q1bP4hFQ4CTX7E3Gj9voPgKJMAgyH5Brvg1QNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fugwuSvHShBUq/EfCFL0iBHjSzSMEnIR9ZUtq6q9VxEFDbnDi0ltHVzMfYaKpP33W5cE+zy+zngQfRFxVr5wxJlOejNb6LkfcTjuPMcR/tm2v083oXVm9SGqEhrksSLTthd+dZ6dRMOY2XUE3G2K7EQ5NDkpJPeSS0TnpNJggD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Eb/MkI8F; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A071440E0163;
+	Mon,  9 Dec 2024 20:59:40 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Q-MttY1gMkCC; Mon,  9 Dec 2024 20:59:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733777977; bh=j34DbBopasUmlYopaVk4hmicBSqH6pZ3N5IXLDb1yhQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Eb/MkI8F483Qp8p/u5ipAyCKcd3iIqkWKkfuy2ffDG5Cexw2tA5+WYplHEzAhUhrR
+	 WLcrQbFg4c6/GynUahfzl9YgXh6IKMjP9VLE9X1GkS4xj7YOO1X8U/uqYuZy7k05Hr
+	 /aiwzzwWSi77cFsMyHW32maU7hHUhZBfGOeoJ/xX6L/jCkP16McADTwuWmV4ChUyjP
+	 HbnWM++hIS1zs3fAGWhsr+UB0dNNsC5TgOCp+pycgMC1EKk7KXdoj/lFj9xQAaOi35
+	 EZSfPhQxyLoKvqftu2qC2baMsam62L3WB4ViHwQJ7WKwzmHdY0bfwje2Usqoqx8wG1
+	 1mEbPDvGwOGhYMg+lsD0yyNtUBJQ6OJrRjhPPIv96ePQJAfaMYH4uT2XattrZxH4ui
+	 XMlx/qu0h0VvAHDXGVFsi2mqXp2A+VQ+mdabkwmiOMNKH6F2p7obegHZJBbiJqmLEm
+	 EcGyWzdrCddKSW6A8uQeRDwn+9b99nIalNpJx2JHGDg8oHp303gqWkBgBXSJTRKVWz
+	 Xkk+MfjF0IKwTzcYcPT38S31HAl+4VUA0+nmh4qoZdlSRmqxUZAvlizozuZWIyxyuH
+	 3Qnimj9eJQxWWqqfAvsS8VzZWKbzG5JSfyyxhP0RvsPMTMju1R309YDdvtz7uk+nJ+
+	 jCzacfw5YOkn9tagyipIiKNo=
+Received: from zn.tnic (p200300EA971F9307329c23FFFeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9307:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8095640E015E;
+	Mon,  9 Dec 2024 20:59:29 +0000 (UTC)
+Date: Mon, 9 Dec 2024 21:59:23 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, x86@kernel.org,
+	Kim Phillips <kim.phillips@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: Hitting AUTOIBRS WARN_ON_ONCE() in init_amd() booting 32-bit
+ kernel under KVM
+Message-ID: <20241209205923.GJZ1daK9ItN2sOp0MK@fat_crate.local>
+References: <20241205220604.GA2054199@thelio-3990X>
+ <Z1MkNofJjt7Oq0G6@google.com>
+ <20241209204414.psmh3yyllnwbrc4y@jpoimboe>
+ <Z1dZAD4_kgmm-B-_@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241205220604.GA2054199@thelio-3990X> <Z1MkNofJjt7Oq0G6@google.com>
- <20241209204414.psmh3yyllnwbrc4y@jpoimboe>
-Message-ID: <Z1dZAD4_kgmm-B-_@google.com>
-Subject: Re: Hitting AUTOIBRS WARN_ON_ONCE() in init_amd() booting 32-bit
- kernel under KVM
-From: Sean Christopherson <seanjc@google.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, 
-	Kim Phillips <kim.phillips@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z1dZAD4_kgmm-B-_@google.com>
 
-On Mon, Dec 09, 2024, Josh Poimboeuf wrote:
-> On Fri, Dec 06, 2024 at 08:20:06AM -0800, Sean Christopherson wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > Date: Fri, 6 Dec 2024 08:14:45 -0800
-> > Subject: [PATCH] x86/CPU/AMD: WARN when setting EFER.AUTOIBRS if and only if
-> >  the WRMSR fails
-> > 
-> > When ensuring EFER.AUTOIBRS is set, WARN only on a negative return code
-> > from msr_set_bit(), as '1' is used to indicate the WRMSR was successful
-> > ('0' indicates the MSR bit was already set).
-> > 
-> > Fixes: 8cc68c9c9e92 ("x86/CPU/AMD: Make sure EFER[AIBRSE] is set")
-> > Reported-by: Nathan Chancellor <nathan@kernel.org>
-> > Closes: https://lore.kernel.org/all/20241205220604.GA2054199@thelio-3990X
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> LGTM, but please post as a proper patch in its own thread so the -tip
-> maintainers are more likely to see it.
+On Mon, Dec 09, 2024 at 12:54:24PM -0800, Sean Christopherson wrote:
+> In Boris I trust :-)
 
-In Boris I trust :-)
+Oh wow. Like I'm on money and stuff. :-P
 
-Already in Linus' tree, commit 492077668fb4 ("x86/CPU/AMD: WARN when setting
-EFER.AUTOIBRS if and only if the WRMSR fails").
+It should actually be
+
+s/Boris/Ingo/
+
+who fished it out.
+
+:-)
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
