@@ -1,343 +1,231 @@
-Return-Path: <kvm+bounces-33302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA229E94AD
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 13:45:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D79F1641D3
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 12:45:54 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C14228C96;
-	Mon,  9 Dec 2024 12:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HnF3Nc2p"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A8F9E95E3
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 14:11:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABFE218592;
-	Mon,  9 Dec 2024 12:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733748323; cv=fail; b=gFi+MJ8XyC9fxaPgE2n3RLxyJ3InZ/e+7kCHC5iwHasTfLg7NvFbnHydNrg+dn1pSGqUick/A18DjgnOESGUm78HdbJ+pHq5Dap6robZluKPVnnf1xh88AI4zm4430uydzkWvqO8G8oL/CYXMn592abFA0qSNw7hlObc7Zek/Vk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733748323; c=relaxed/simple;
-	bh=aWcr/Zb+JsSHLTcTVNw1zen60VtD8YFrXCstoQSc3Ws=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=EdSOip7tRW4dHL6YwQIDPMZJ56kAZedfowPmj3FiPQGy+DCy1rx/B+sDqAcnIRPJz9u44eJqMfHsuuX6XMiJHfdt+742L3TrlUXhP7O5OVZMIA32uJrPAG2StHcyie8v/39Ql8dGDD+4QENRSMPoMI55Lle45rhFRHEIUbU7Iq4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HnF3Nc2p; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733748321; x=1765284321;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=aWcr/Zb+JsSHLTcTVNw1zen60VtD8YFrXCstoQSc3Ws=;
-  b=HnF3Nc2p/xwnAtYQlxgpp7UnbU6RmRfgG9LqYIoPhxwH9z3XJcYgcaFi
-   eEtUXvmE+BTIjxlvGhvfzFKdDBH1S6YsHZ13nyJUVIin/K/G//Uyp2JUi
-   UONw43XZxcbeEI7gDamBvzonOCPKOPCh0gr3Ol2weTlk4iuU7LVvBBut5
-   onGHFFXeeAvX2J9NPnjrJc6zawBCpsb0IyqAeHPwkafpqsaYlc/CesP8K
-   kF8L3zVHSUVox3Pybxrnit2x93xxjCI7MfaZ9eyTFBU6mh3rzWh3FvLqf
-   35Mj+7Eq3jqjcsopdoRp1YkL2hlmABjnxrOVDCAB9kMzwZ+M59OiVE3KY
-   w==;
-X-CSE-ConnectionGUID: oUQ2x051QnSmJNVn+asXCg==
-X-CSE-MsgGUID: +fO1egM1RPiB7TDNsk2Qqg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44509991"
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="44509991"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 04:45:19 -0800
-X-CSE-ConnectionGUID: 7d1JGCZFSJCEPAplIBCVsw==
-X-CSE-MsgGUID: 8cZajdqHSc2+GXIBNE0sXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="99518385"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Dec 2024 04:45:20 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Dec 2024 04:45:18 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 9 Dec 2024 04:45:18 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 9 Dec 2024 04:45:18 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OeaMAA4c+BkJrxFEHN5aEijiRUKqIBW45W3v1XtqaoNOOq9uB7AWuEiAauzoHjx0kJtSbA/F4EXiYqg0W30trKJRr9bPCIIfrqGFzOf8q2gXFIXqkqA/hgL6kG4LEzGOtkdFhNZuVpqbbyPc1fMXMXRNWlItQMFY3YjyOUQoyFc1wGKZE8KMq76zeAcrCfHfUHurs+qjJ2/sG1jaYJIRBOL2ONqK3viDGhHkPKKIwDQH3khBTp/IFGWwSWRjIHHOOS98eBqWgq3g58qqxKAbOZ2UE1l9PpDGMPOuniTM5OsKavS+odhtcb84W1BOcoq011nf+UcfOVWzsBaNutxU9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P7iQeEdDSdIEPWwhEwEWf+gc7WHvh7WFlqNqBCmY1yc=;
- b=IGf23olHsYQ1n8R3NABU0SEWcmeGycSyyPb3tnduyMBbPWMNDeybuaTuZVUfXzAmAlhD8FIqFsjavc63UDqbOcVA1rMGHqHWCjSR3kMUNfawr6ZdaXVG5R6ZuInhfFziBNviJjzaR+XeOSjQBKIoITZoUFqBtSaKzFwLS1BKjAV5202fN70RB7Sy+F9F1Vuy4z5rkDpul1kMDgeXzl3+I82mGkiDpLhSN6hJcdXy7Ddye4tQ9MQX3o4bAbdt+xSEGrK54t/PGueD64Ls+eLnTKYTfmk+Y5qucsId1qRBa2KUdyicltR5up2kjOsniJDuUrzz+7vN4nl7BlJBRtCq8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SN7PR11MB8027.namprd11.prod.outlook.com (2603:10b6:806:2de::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.10; Mon, 9 Dec
- 2024 12:45:16 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%2]) with mapi id 15.20.8230.016; Mon, 9 Dec 2024
- 12:45:15 +0000
-Date: Mon, 9 Dec 2024 20:45:04 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>,
-	<rick.p.edgecombe@intel.com>, <kai.huang@intel.com>,
-	<adrian.hunter@intel.com>, <reinette.chatre@intel.com>,
-	<xiaoyao.li@intel.com>, <tony.lindgren@linux.intel.com>,
-	<isaku.yamahata@intel.com>, <yan.y.zhao@intel.com>, <michael.roth@amd.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 4/7] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-Message-ID: <Z1bmUCEdoZ87wIMn@intel.com>
-References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
- <20241201035358.2193078-5-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241201035358.2193078-5-binbin.wu@linux.intel.com>
-X-ClientProxiedBy: SG2PR04CA0166.apcprd04.prod.outlook.com (2603:1096:4::28)
- To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 596192825DB
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 13:11:09 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB0F22E3F0;
+	Mon,  9 Dec 2024 13:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="duaqKTJT"
+X-Original-To: kvm@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A803594C
+	for <kvm@vger.kernel.org>; Mon,  9 Dec 2024 13:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733749613; cv=none; b=jvE9qdVcnQkvsNv9gTKon1yEFLXLbpqQNzYpnhErjNyh7lLgvEnGR+e49V2S3InXXvd3H4t++DSiB6fWOPAUW9XpGr962t2v2BTeBDIwoCqCAP3FBcHPhSUPezWAzrFRrPWwcfn8C1MWf2WFMjRB2rC2PX4CnHErs9GorwNADFU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733749613; c=relaxed/simple;
+	bh=Uqm9vlD4EuHqqogtqTHA9FO+0cpdFzd1I9e7PeN+AqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ifGVERsOUSY/tIZV0lHxxSew8zKvfMasgggnF8woLLsygucUokM5pYqgN6J+JUHHil/v2d7iOAwlN1EV+cdkuC8mHQmovh83D+/83hcpuJW2xkdb+QjNNb6+T2L4bJGHjqRH/sUIzYs/0xDgoWCbzl88/KxAEp+OKXZc9TNXAIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=duaqKTJT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733749610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ChZary8egFvw+XcfiLo4meSQA+SNlXlrlIPLWf6ynjo=;
+	b=duaqKTJTq2KZd3rJ+JOjrlF8liJ303RxIvq5Db5G8V4TXmGRCdno08ZSMBhCmhbArpG9xj
+	LN5wE+NTV//z7Z98MJbXsTWazdS8eg/3qrs8cux2fN2UUPPD/pelXosPNU9AN2YPvm1y9A
+	Q1wt9YgfmWO+pXrS/04bLPP9x5uDM38=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-108-5gF9YO8-OSWeT1_mNpVWIw-1; Mon, 09 Dec 2024 08:06:47 -0500
+X-MC-Unique: 5gF9YO8-OSWeT1_mNpVWIw-1
+X-Mimecast-MFC-AGG-ID: 5gF9YO8-OSWeT1_mNpVWIw
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385dfa9b758so1722354f8f.0
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2024 05:06:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733749606; x=1734354406;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ChZary8egFvw+XcfiLo4meSQA+SNlXlrlIPLWf6ynjo=;
+        b=W4cTM5kUHjUQO4w9RhqFqWfDjt7RTNmpKlkHM/EyiSux9gnZBb7ZUpL3ycH7e9qunJ
+         5AkB26IjceBxsvrvGR6I1d494dRdVuojTKdqqF5lE37F3IZPr9GTj7NipW2rciwpfApj
+         rndORfQkQyNFLk7aJz3BIzD2Ut+8+6xanBvr8dx3b//2rIXuqdYHyPwMA/7q1u7XWfLh
+         XluWKQfI/TNKHS5k59zNJTfRKe5JOiqQ33vcwHyjis0xjeDJmQeXdnTVl/DV/wM1zYr0
+         AXGPdiclfReQc/z/wQAMaP4l89JqQ9iS3tN5oSTM6x7/2KUJ5PKsLrk/Yyao2jMAx0gL
+         UVcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWyOL7QFKT4s5CfJSLMiHy4S/JaaJC1FptOezos9eLki0BvJ7U0L60JnkykJiUxwceSxIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx/THtAp+xze7Ws+1Sil9LqRikUtCjz1Ooa635g/4UqrDSSham
+	fOeYFaPvaEErXdKKYPnBX9rLgk+5fD4HF75sZI7zqvt1OhV0v9hCcXFZbCvcXw4T66hYoQKFVRl
+	yWEkCpXWTMcQlQgEHLJY07qwgenvE+1snyLgErVmU/L4HWLiJZg==
+X-Gm-Gg: ASbGncthmA6N6cYVLTt6n+71gr1SwVXfnl3/O8Yo5lGTqH0t/yfydTjBEJ+25BT5vME
+	8KoUrp/G/wLAFDXuJ055SVSHcNxLLF/zowDFzkW/YoeFwRv3QFNzElWAaaB/s/RnuB27xfryrnp
+	mPIr8ie5yuv2qEFFoCI3eMImmMZHqjpSb8FuJOQPToyqhGcAgcCX9h3gKo1dMH4MyIszPJupbh1
+	u77zXhcvQtGjm+q1XxtJnZs/EzcMAyjiYkY/q7Jk9epAWTZudia3npugMrRzdZZudwTWcSttVU+
+	/oxEx/lX
+X-Received: by 2002:a5d:5886:0:b0:385:f114:15d6 with SMTP id ffacd0b85a97d-3862b355e4bmr9451297f8f.13.1733749605729;
+        Mon, 09 Dec 2024 05:06:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3aZqcp+qWXyKCP+s6A/eeOG43m5kb4cM7P1FP5MJVsW/bqky4A5d7q1L7C7R7quzo+4CpVg==
+X-Received: by 2002:a5d:5886:0:b0:385:f114:15d6 with SMTP id ffacd0b85a97d-3862b355e4bmr9451253f8f.13.1733749605217;
+        Mon, 09 Dec 2024 05:06:45 -0800 (PST)
+Received: from eisenberg.redhat.com (nat-pool-muc-u.redhat.com. [149.14.88.27])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3862190965asm13200127f8f.82.2024.12.09.05.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 05:06:44 -0800 (PST)
+From: Philipp Stanner <pstanner@redhat.com>
+To: amien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Chen Ni <nichen@iscas.ac.cn>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>,
+	Kunwu Chan <chentao@kylinos.cn>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v3 00/11] Remove implicit devres from pci_intx()
+Date: Mon,  9 Dec 2024 14:06:22 +0100
+Message-ID: <20241209130632.132074-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SN7PR11MB8027:EE_
-X-MS-Office365-Filtering-Correlation-Id: c623c725-46b2-4964-0411-08dd184f544c
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?I4AakZlnjVYxIfhFdSJDO0HsvRhVMxezB7OwyPI0Bhkx2cMgq+mOF2t45NV1?=
- =?us-ascii?Q?dCPWUUq/8t8wnlIMpexJ4jfSu3Umz7vWm9gnNCbwBzQ4SiAmUDI6B+1gKDV1?=
- =?us-ascii?Q?Q8kUwuO8kjEPhpqebVT6HoXQvsfRFTVmbDpx9yJ0RGnrYY0fYjsWxJZdNfVG?=
- =?us-ascii?Q?MG4L+26bC5Km01wsrnl/oUuSFatghyv4FwAwUPpX3aTij/CSYoDM+LPlFsWg?=
- =?us-ascii?Q?cmH3YuuFPnBD0HQ0us3xESjsphxggQV2oybf+FROOyEqjEOJYqlaU1niTZQO?=
- =?us-ascii?Q?RK3xtJV+4VnEkddsiFTdI3AclIKKkkkSodX4Z4PaTKmSIqLy7BAGoBlCdHbO?=
- =?us-ascii?Q?n5MEZvbLHwDeMz3NyqnxWaBrtXl2HQZ4qcOL2DAauU7mj5/CWCb1t4Jt7Tc9?=
- =?us-ascii?Q?+9zAM+AMqxAbkUdp0SDq1uRPqWtduYQA3oCJqBpRSjTVZdHQ3aoaes+aEUf/?=
- =?us-ascii?Q?S+2mSVi262qWpJYQlYX4XeTBPUP9rol48g8ZRhdzJmsbMNRRi51TYwhHuEM9?=
- =?us-ascii?Q?xDpSio8Q5m7TooINEebLcJ7FMt9QednwvxyIDU95yijsNi+mRvT+UB7tTHN8?=
- =?us-ascii?Q?JzsS3gmpZV2ylsOyZWGi60XEFqAQ29f9SU2F4lGlWXPnUuIvRw5EqtA30UbS?=
- =?us-ascii?Q?mBaZRWqep+h+hhEURrsvwUX+OymE1LmNCIHyjXWX2Sd1MMYilCLBLEN6T8fc?=
- =?us-ascii?Q?zzWxXbAc6/LaSyLuXnJV5ltN3lkZkKgBnAyjSQPWFuqaYc77/ErIe9bKxE8n?=
- =?us-ascii?Q?IBGpN8nNdIVm0roe9lD+oA063Y77bOB3sidIt98N+LAVjSYJg6LpVumQmVbM?=
- =?us-ascii?Q?nDf+8xiX31+N7XEyZVFqReEw6cco6dWuX7TU0FMdeiVDMYyR+SUI0wILsnSd?=
- =?us-ascii?Q?iz/SJCZ9KcC/hb43kI+bO8Cw9iNZ0DpAN31UtvtXX9ZQepvCRu/25kgV2UBm?=
- =?us-ascii?Q?XF4DpZHAkqWfLfRRdnHs+tjY8ok2gAuWRxCA97IUKlUlG0wbpqJs+XQxHT4D?=
- =?us-ascii?Q?mnKeNT0zgzuWc/UeH395xaO+kBGfKYxodq/4PrO5Bkg78kMDZdGQbnP8Xphp?=
- =?us-ascii?Q?pRBKhQb2AjimmonPOR5SC7lH8f1SFsbVvYwXtzR8eMC3fjBST0ZQM2k6BIL2?=
- =?us-ascii?Q?SjyI+li1LxZl2Izbzq+dGJxOouVP90GSPVbYzEpMECMlGXzfC3nHqDkMbNnM?=
- =?us-ascii?Q?mt5OJa1k4LXMQ9CW63MeZ7EHvDGUFzxgBbhiqoIEzIACupYry/JIfrRWgiO8?=
- =?us-ascii?Q?FxVzoG9Zz3phZJR3i0D7UFsMHhQu9YVn93iI1gI8SAb7TCI1q81mbwaNjyLA?=
- =?us-ascii?Q?RKh44aMQfLEWG4EIp32dJaz5vTVX1B3ldAhWlVDziwbBlw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qSKgaebLSfo3seK0QfFYeRY9kv6lqkLnvMiPRwp1hq2WLPfsVayzJlhvL/DT?=
- =?us-ascii?Q?zI/jsPsgA4T4no2vNvsW5MhuYr5PnnFL31E3SRuUJ7JajUCdzRsuQ4DqlI6L?=
- =?us-ascii?Q?Pwu5skhia9jZekjtZ53Eb56kwDC+BKaNhV+rZV188MQziBCI9312PpJUpq3f?=
- =?us-ascii?Q?l1Xiac/Flmx6vETeusRWrYjYVJSP/EuFzoXyH6IP7mgedBwEpYY6b/Ka4Rms?=
- =?us-ascii?Q?xYpXCaSPYasYgHVO7+pJJ+beVF+khOSaGALm6PUeSLndX66t35UZSVZkTFjD?=
- =?us-ascii?Q?noAtgE97ZM58FZXbGs7VP1VohZ9erILoZQl/hP7YB4QPLFIk1//+bP9oCLLy?=
- =?us-ascii?Q?TYfQJG2dD4uhe+uoU5lYrWJOk4+/ij2NFG4vo+vdbsCQgIVAiGtY0v//1UYM?=
- =?us-ascii?Q?QaM5mUURTeYyFQhJ/+Fw7iSh2LdiG6Y+va8HQwInKJkBPEYhU8Gpk9J+cob0?=
- =?us-ascii?Q?s8+XGxrVjAzZUQPFFrhUbD2k4/x0fRCh1Rl51YOWHYrRA2eXg8tIlN8YRSG1?=
- =?us-ascii?Q?k5D5JuBD9tuZnwVyO1mbpibEna0NnUk1lJoyL3BWNqCQD0mBs2ES1fMnLVrh?=
- =?us-ascii?Q?BNZUWyHC6F+tfxflRz2iiumanZk7IrWgGdRV55XJv7Iu9tNM+5KbsMUdp8Vx?=
- =?us-ascii?Q?sqNXzMQveRpuMXlcS8DHCYZjRxu+s6M0fs2+Yq4ordNv2BJOipM0vPB9OvDw?=
- =?us-ascii?Q?SAXPMbID1Twl2TSgujMN8a1upqGbkJhGi5R0qKz8293N0aNmQIuolQtIlGJY?=
- =?us-ascii?Q?7xBcWFrdmdxB9kwWYgy3EjzfyaKyrir+gy1xWTphpgxL85HJaCRaFTGYvc71?=
- =?us-ascii?Q?63JOUFMUEKwLyq5dqWi3ge32LGV+WWh5yu0vAIYBQKBzqdNzu1OPVDxh41mw?=
- =?us-ascii?Q?CoF5sCsF17fL+Gw8hGhzAEAj8tOI9/u7NUy6RnZYkvKLgBWAnU/+gEa5ow+9?=
- =?us-ascii?Q?bxFzWO/RA/wJMxb0LmAXkkL7xP3b1g3L/6ZaMQ3B2PuqBqBLmrNuK8zwKozb?=
- =?us-ascii?Q?Axq1fhVTMP4yoLfLJLfOTWLoMprlaqODJpL3bf8Kvg7CIncveHzspSsMGeNC?=
- =?us-ascii?Q?ocSaBY+JlBo6Ex61ZLsLVfFpp/vvDJLQHNK3U5iI7N+QxrKsd8OxnY/zuYHm?=
- =?us-ascii?Q?jFjMwrv6pFicADlcTwWk5oTDL7jvSxyh1wHb8CsaRFru8LcW90JjFVVoE8wg?=
- =?us-ascii?Q?dOBxeVmJCv2/Mf+UwlNIljLkSdr5MVVmhmmkUtDLI620aQIijEO61TSLltl5?=
- =?us-ascii?Q?Ku45RtxIagL1vH9hVzjr6EoLnoWPQO31//4pxc4lP3m1gViMvYbBSIfVIkkA?=
- =?us-ascii?Q?GWYkMUqd/Ec4IibejJelZNi/1+Q4OvQ8J1ba06xdHWY0TqIB+jvkNs3sHcMc?=
- =?us-ascii?Q?pb/bge6LTxwQoJ9YMsd8CES8g/d41HjsZtMnh1Pi1Hm+ShIq3gWu5rAYz+ta?=
- =?us-ascii?Q?0fZH0N+qdOpqmvOLqqTMh2UZqxUSbInF+bCkhpjKHCKwkl1joCwjdZe6IBtb?=
- =?us-ascii?Q?WKY1qfgKlOSFLJFs4CFEroTrYyd7kSHEyqWilM6My++L16ss/rtuRXzyUCpc?=
- =?us-ascii?Q?YlOnHw4XOF6fLL+qN0E7qMPYEES4t0TU3p3+AvgY?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c623c725-46b2-4964-0411-08dd184f544c
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 12:45:15.5932
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 20XctPtSbGcR+O0758DsrBwxRxQhA5V6RD2L/PE66vLt6y+5DEyZoxJFIxof1MfMURXEVmT+0twhssG/xv0MBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8027
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
->+/*
->+ * Split into chunks and check interrupt pending between chunks.  This allows
->+ * for timely injection of interrupts to prevent issues with guest lockup
->+ * detection.
+@Driver-Maintainers: Your driver might be touched by patch "Remove
+devres from pci_intx()". You might want to take a look.
 
-Would it cause any problems if an (intra-host or inter-host) migration happens
-between chunks?
+Changes in v3:
+  - Add Thomas' RB.
 
-My understanding is that KVM would lose track of the progress if
-map_gpa_next/end are not migrated. I'm not sure if KVM should expose the
-state or prevent migration in the middle. Or, we can let the userspace VMM
-cut the range into chunks, making it the userspace VMM's responsibility to
-ensure necessary state is migrated.
+Changes in v2:
+  - Drop pci_intx() deprecation patch.
+  - ata: Add RB from Sergey and Niklas.
+  - wifi: Add AB by Kalle.
+  - Drop INTx deprecation patch
+  - Drop ALSA / hda_intel patch because pci_intx() was removed from
+    there in the meantime.
 
-I am not asking to fix this issue right now. I just want to ensure this issue
-can be solved in a clean way when we start to support migration.
+Changes since the RFC [1]:
+  - Add a patch deprecating pci{m}_intx(). (Heiner, Andy, Me)
+  - Add Acked-by's already given.
+  - Export pcim_intx() as a GPL function. (Alex)
+  - Drop patch for rts5280, since this driver will be removed quite
+    soon. (Philipp Hortmann, Greg)
+  - Use early-return in pci_intx_unmanaged() and pci_intx(). (Andy)
 
->+ */
->+#define TDX_MAP_GPA_MAX_LEN (2 * 1024 * 1024)
->+static void __tdx_map_gpa(struct vcpu_tdx * tdx);
->+
->+static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
->+{
->+	struct vcpu_tdx * tdx = to_tdx(vcpu);
->+
->+	if(vcpu->run->hypercall.ret) {
->+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
->+		kvm_r11_write(vcpu, tdx->map_gpa_next);
+Hi all,
 
-s/kvm_r11_write/tdvmcall_set_return_val
+this series removes a problematic feature from pci_intx(). That function
+sometimes implicitly uses devres for automatic cleanup. We should get
+rid of this implicit behavior.
 
-please fix other call sites in this patch.
+To do so, a pci_intx() version that is always-managed, and one that is
+never-managed are provided. Then, all pci_intx() users are ported to the
+version they need. Afterwards, pci_intx() can be cleaned up and the
+users of the never-managed version be ported back to pci_intx().
 
->+		return 1;
->+	}
->+
->+	tdx->map_gpa_next += TDX_MAP_GPA_MAX_LEN;
->+	if (tdx->map_gpa_next >= tdx->map_gpa_end) {
->+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
->+		return 1;
->+	}
->+
->+	/*
->+	 * Stop processing the remaining part if there is pending interrupt.
->+	 * Skip checking pending virtual interrupt (reflected by
->+	 * TDX_VCPU_STATE_DETAILS_INTR_PENDING bit) to save a seamcall because
->+	 * if guest disabled interrupt, it's OK not returning back to guest
->+	 * due to non-NMI interrupt. Also it's rare to TDVMCALL_MAP_GPA
->+	 * immediately after STI or MOV/POP SS.
->+	 */
->+	if (pi_has_pending_interrupt(vcpu) ||
->+	    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) {
->+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_RETRY);
->+		kvm_r11_write(vcpu, tdx->map_gpa_next);
->+		return 1;
->+	}
->+
->+	__tdx_map_gpa(tdx);
->+	/* Forward request to userspace. */
->+	return 0;
->+}
->+
->+static void __tdx_map_gpa(struct vcpu_tdx * tdx)
->+{
->+	u64 gpa = tdx->map_gpa_next;
->+	u64 size = tdx->map_gpa_end - tdx->map_gpa_next;
->+
->+	if(size > TDX_MAP_GPA_MAX_LEN)
->+		size = TDX_MAP_GPA_MAX_LEN;
->+
->+	tdx->vcpu.run->exit_reason       = KVM_EXIT_HYPERCALL;
->+	tdx->vcpu.run->hypercall.nr      = KVM_HC_MAP_GPA_RANGE;
->+	tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
->+	tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
->+	tdx->vcpu.run->hypercall.args[2] = vt_is_tdx_private_gpa(tdx->vcpu.kvm, gpa) ?
->+					   KVM_MAP_GPA_RANGE_ENCRYPTED :
->+					   KVM_MAP_GPA_RANGE_DECRYPTED;
->+	tdx->vcpu.run->hypercall.flags   = KVM_EXIT_HYPERCALL_LONG_MODE;
->+
->+	tdx->vcpu.arch.complete_userspace_io = tdx_complete_vmcall_map_gpa;
->+}
->+
->+static int tdx_map_gpa(struct kvm_vcpu *vcpu)
->+{
->+	struct vcpu_tdx * tdx = to_tdx(vcpu);
->+	u64 gpa = tdvmcall_a0_read(vcpu);
->+	u64 size = tdvmcall_a1_read(vcpu);
->+	u64 ret;
->+
->+	/*
->+	 * Converting TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE requires
->+	 * userspace to enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
->+	 * bit set.  If not, the error code is not defined in GHCI for TDX, use
->+	 * TDVMCALL_STATUS_INVALID_OPERAND for this case.
->+	 */
->+	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
->+		ret = TDVMCALL_STATUS_INVALID_OPERAND;
->+		goto error;
->+	}
->+
->+	if (gpa + size <= gpa || !kvm_vcpu_is_legal_gpa(vcpu, gpa) ||
->+	    !kvm_vcpu_is_legal_gpa(vcpu, gpa + size -1) ||
->+	    (vt_is_tdx_private_gpa(vcpu->kvm, gpa) !=
->+	     vt_is_tdx_private_gpa(vcpu->kvm, gpa + size -1))) {
->+		ret = TDVMCALL_STATUS_INVALID_OPERAND;
->+		goto error;
->+	}
->+
->+	if (!PAGE_ALIGNED(gpa) || !PAGE_ALIGNED(size)) {
->+		ret = TDVMCALL_STATUS_ALIGN_ERROR;
->+		goto error;
->+	}
->+
->+	tdx->map_gpa_end = gpa + size;
->+	tdx->map_gpa_next = gpa;
->+
->+	__tdx_map_gpa(tdx);
->+	/* Forward request to userspace. */
->+	return 0;
->+
->+error:
->+	tdvmcall_set_return_code(vcpu, ret);
->+	kvm_r11_write(vcpu, gpa);
->+	return 1;
->+}
->+
-> static int handle_tdvmcall(struct kvm_vcpu *vcpu)
-> {
-> 	if (tdvmcall_exit_type(vcpu))
-> 		return tdx_emulate_vmcall(vcpu);
-> 
-> 	switch (tdvmcall_leaf(vcpu)) {
->+	case TDVMCALL_MAP_GPA:
->+		return tdx_map_gpa(vcpu);
-> 	default:
-> 		break;
-> 	}
->diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
->index 1abc94b046a0..bfae70887695 100644
->--- a/arch/x86/kvm/vmx/tdx.h
->+++ b/arch/x86/kvm/vmx/tdx.h
->@@ -71,6 +71,9 @@ struct vcpu_tdx {
-> 
-> 	enum tdx_prepare_switch_state prep_switch_state;
-> 	u64 msr_host_kernel_gs_base;
->+
->+	u64 map_gpa_next;
->+	u64 map_gpa_end;
-> };
-> 
-> void tdh_vp_rd_failed(struct vcpu_tdx *tdx, char *uclass, u32 field, u64 err);
->-- 
->2.46.0
->
+This way we'd get this PCI API consistent again.
+
+Patch "Remove devres from pci_intx()" obviously reverts the previous
+patches that made drivers use pci_intx_unmanaged(). But this way it's
+easier to review and approve. It also makes sure that each checked out
+commit should provide correct behavior, not just the entire series as a
+whole.
+
+Merge plan for this is to enter through the PCI tree.
+
+[1] https://lore.kernel.org/all/20241009083519.10088-1-pstanner@redhat.com/
+
+
+Regards,
+P.
+
+Philipp Stanner (11):
+  PCI: Prepare removing devres from pci_intx()
+  drivers/xen: Use never-managed version of pci_intx()
+  net/ethernet: Use never-managed version of pci_intx()
+  net/ntb: Use never-managed version of pci_intx()
+  misc: Use never-managed version of pci_intx()
+  vfio/pci: Use never-managed version of pci_intx()
+  PCI: MSI: Use never-managed version of pci_intx()
+  ata: Use always-managed version of pci_intx()
+  wifi: qtnfmac: use always-managed version of pcim_intx()
+  HID: amd_sfh: Use always-managed version of pcim_intx()
+  Remove devres from pci_intx()
+
+ drivers/ata/ahci.c                            |  2 +-
+ drivers/ata/ata_piix.c                        |  2 +-
+ drivers/ata/pata_rdc.c                        |  2 +-
+ drivers/ata/sata_sil24.c                      |  2 +-
+ drivers/ata/sata_sis.c                        |  2 +-
+ drivers/ata/sata_uli.c                        |  2 +-
+ drivers/ata/sata_vsc.c                        |  2 +-
+ drivers/hid/amd-sfh-hid/amd_sfh_pcie.c        |  4 ++--
+ drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c |  2 +-
+ .../wireless/quantenna/qtnfmac/pcie/pcie.c    |  2 +-
+ drivers/pci/devres.c                          | 24 +++----------------
+ drivers/pci/pci.c                             | 16 +++----------
+ include/linux/pci.h                           |  1 +
+ 13 files changed, 18 insertions(+), 45 deletions(-)
+
+-- 
+2.47.1
+
 
