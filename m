@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-33270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5839E88ED
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 02:11:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4288B9E88EE
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 02:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B3B21658B9
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 01:08:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB4E31886DB1
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2024 01:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7756A15CD42;
-	Mon,  9 Dec 2024 01:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56611E86E;
+	Mon,  9 Dec 2024 01:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LjMHMbQi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBrzWu2q"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C56156991;
-	Mon,  9 Dec 2024 01:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90049171E76;
+	Mon,  9 Dec 2024 01:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733706375; cv=none; b=DoXfWof/YbEyP+7Cl1We9i6XWygI2Oc7Vgp9TT1D4naTgbBxtuTp3zzvepoNweaHcEQKvK9Q9RxfeU6+fYvrifCSIZZdgxI+LjLYNvC7EdXEdXDNGz0sgLo1Y+ADno7Y0XhZ72oUtsEmQy71gquT3H9qAUJTPWR0Rl+3SYY93P8=
+	t=1733706379; cv=none; b=Zh/lKBZ+LGQVKnDNIRNFjCtioMvK5d6Kb2LUr1BeqPrK87pTuqhqJtsO8hTNZDSH+NCYrkek8rOIwDjnL5nKlgnKSwu8/Ah1XofsSxeGowioAQ8IAllsdDDawuLF8lvw5KsV0h+YEWfCdWG16Z1WPsotxrANZRqZrI+mPxkTMWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733706375; c=relaxed/simple;
-	bh=m/w0JApcq5EEWNqflmSyzjBHGVbFC+llGIy3taAB2PI=;
+	s=arc-20240116; t=1733706379; c=relaxed/simple;
+	bh=AYHBZbrjquH1tFqarRInkGRZET4ShNmSkNhvZUOTuio=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O6byxkI/oGzRa2WcPt1mfpB6r7Fytq/mDaLcw5yEyv5zX9CrZlHjV/9ntcDsHXdoshJuZrjV3esWTYkHxFeleSKsbuQkiIrIksBUXeutpK1Ikgf4SGrNB0AtVfrnE9r5iPKW5Pc5LmTOKtSbOgqaO03LHR4qoVOP6ZnBHXaJLd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LjMHMbQi; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=Bv2R83OOkJ4fxb1Y3vyuNkwP7lgRE6R/xbEZd27xxbLpw3yh2oQXXvOjW3CXVGTi4Hl+qGxvnQ1JElHB72X85Ev1Tiu/OkAgdD5zCupYnzIxlqpaEI5kSTcraeUsnmFKIl9tiMb/xd/5UugfFDtbb1HbrauQvpaLW4oiVg3/IhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBrzWu2q; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733706374; x=1765242374;
+  t=1733706378; x=1765242378;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m/w0JApcq5EEWNqflmSyzjBHGVbFC+llGIy3taAB2PI=;
-  b=LjMHMbQikj7hzzCD8UCErY+pnpTP1Tv1uOzGdO5AymKK4lvJ8d5sArer
-   J0j4XobvJ6kSfJFYoD5/9f+Ybpj10UFZxPJPN/Y/pW2svgW+ZS+4CdR0L
-   Yc0OjQFricw+7hugTRpgZR46K7uKZqozB4lwoVzkqv/v/ZBosXadys8rm
-   96S69d9wsBQGhq6Y7T1wKD0rbumdTEQgjEcRCvQm0V50jwnVsPunitrC1
-   gMK0Yx3WWFHxo1e7YuI62zqcaQnRm9grTD/EIug+TFqWMb4s8fcxZe5fU
-   sK7eRwdngK8a2mRLZhIW4oy4/h1wJr/L+pQBQG1nygk1WjUUxsTgYnmyh
-   Q==;
-X-CSE-ConnectionGUID: L1+m8VoiTy6sOysM75DPbw==
-X-CSE-MsgGUID: /1SjBbTDSaCuUo83p6ErSg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="36833723"
+  bh=AYHBZbrjquH1tFqarRInkGRZET4ShNmSkNhvZUOTuio=;
+  b=fBrzWu2qKucFLRE2NhBibpNZuSI2azpilVfnKojlKgg0Iko/gfMGyVUN
+   v08JC9yHv4pQgG9qzmVaIjqGEDieValcNNkW7cjv4tR5sco4bQW+swfWO
+   n0ZhSvITxKM0T1hC1+JzHuvWVULtJRkbgcbSRMIHmDyMND3yrRR8g8FvT
+   QvQ3xTIL4hmOVINsLScScS5dMBo5lau01hY4CnlLrLb/R1jr4ey0wyPsP
+   gC0bLqOIMF0sQ62Ta3L8oVPGufwTSfsSpjh8EvrdSn9V2PHDdu/36a4pn
+   6kUpIa3P9YDSg5DOFlRNiH+FvMiM3604I8hM2BkPKhMKGl1cClB4kpHSz
+   g==;
+X-CSE-ConnectionGUID: WmWnq7dmS86cvYVlo8r7tg==
+X-CSE-MsgGUID: iAnRB2pqRyKR3Q3agx6+zw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="36833726"
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="36833723"
+   d="scan'208";a="36833726"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:06:14 -0800
-X-CSE-ConnectionGUID: 6yr84rY1TpGYM03NqA6TQg==
-X-CSE-MsgGUID: Uuz3TbaKTP+8sH9LB1u/Lg==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:06:17 -0800
+X-CSE-ConnectionGUID: Z0SnVEeZSUSJEKhx7EtrRw==
+X-CSE-MsgGUID: 08Jd9yCAQLOb29e0CzDqwQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="95402515"
+   d="scan'208";a="95402520"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:06:10 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 17:06:14 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH 11/16] KVM: TDX: Always block INIT/SIPI
-Date: Mon,  9 Dec 2024 09:07:25 +0800
-Message-ID: <20241209010734.3543481-12-binbin.wu@linux.intel.com>
+Subject: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
+Date: Mon,  9 Dec 2024 09:07:26 +0800
+Message-ID: <20241209010734.3543481-13-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
 References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
@@ -89,97 +89,91 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Always block INIT and SIPI events for the TDX guest because the TDX module
-doesn't provide API for VMM to inject INIT IPI or SIPI.
+Inhibit APICv for TDX guest in KVM since TDX doesn't support APICv accesses
+from host VMM.
 
-TDX defines its own vCPU creation and initialization sequence including
-multiple seamcalls.  Also, it's only allowed during TD build time.
-
-Given that TDX guest is para-virtualized to boot BSP/APs, normally there
-shouldn't be any INIT/SIPI event for TDX guest.  If any, three options to
-handle them:
-1. Always block INIT/SIPI request.
-2. (Silently) ignore INIT/SIPI request during delivery.
-3. Return error to guest TDs somehow.
-
-Choose option 1 for simplicity. Since INIT and SIPI are always blocked,
-INIT handling and the OP vcpu_deliver_sipi_vector() won't be called, no
-need to add new interface or helper function for INIT/SIPI delivery.
+Follow how SEV inhibits APICv.  I.e, define a new inhibit reason for TDX, set
+it on TD initialization, and add the flag to kvm_x86_ops.required_apicv_inhibits.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX interrupts breakout:
-- Renamed from "KVM: TDX: Silently ignore INIT/SIPI" to
-  "KVM: TDX: Always block INIT/SIPI".
-- Remove KVM_BUG_ON() in tdx_vcpu_reset(). (Rick)
-- Drop tdx_vcpu_reset() and move the comment to vt_vcpu_reset().
-- Remove unnecessary interface and helpers to delivery INIT/SIPI
-  because INIT/SIPI events are always blocked for TDX. (Binbin)
-- Update changelog.
+- Removed WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm)) in
+  tdx_td_vcpu_init(). (Rick)
+- Change APICV -> APICv in changelog for consistency.
+- Split the changelog to 2 paragraphs.
 ---
- arch/x86/kvm/lapic.c    |  2 +-
- arch/x86/kvm/vmx/main.c | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 12 +++++++++++-
+ arch/x86/kvm/vmx/main.c         |  3 ++-
+ arch/x86/kvm/vmx/tdx.c          |  3 +++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 474e0a7c1069..f93c382344ee 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -3365,7 +3365,7 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 32c7d58a5d68..df535f08e004 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1281,6 +1281,15 @@ enum kvm_apicv_inhibit {
+ 	 */
+ 	APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
  
- 	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
- 		kvm_vcpu_reset(vcpu, true);
--		if (kvm_vcpu_is_bsp(apic->vcpu))
-+		if (kvm_vcpu_is_bsp(vcpu))
- 			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 		else
- 			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
++	/*********************************************************/
++	/* INHIBITs that are relevant only to the Intel's APICv. */
++	/*********************************************************/
++
++	/*
++	 * APICv is disabled because TDX doesn't support it.
++	 */
++	APICV_INHIBIT_REASON_TDX,
++
+ 	NR_APICV_INHIBIT_REASONS,
+ };
+ 
+@@ -1299,7 +1308,8 @@ enum kvm_apicv_inhibit {
+ 	__APICV_INHIBIT_REASON(IRQWIN),			\
+ 	__APICV_INHIBIT_REASON(PIT_REINJ),		\
+ 	__APICV_INHIBIT_REASON(SEV),			\
+-	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
++	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED),	\
++	__APICV_INHIBIT_REASON(TDX)
+ 
+ struct kvm_arch {
+ 	unsigned long n_used_mmu_pages;
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 8ec96646faec..7f933f821188 100644
+index 7f933f821188..13a0ab0a520c 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -115,6 +115,11 @@ static void vt_vcpu_free(struct kvm_vcpu *vcpu)
+@@ -445,7 +445,8 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ 	 BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |			\
+ 	 BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |	\
+ 	 BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |		\
+-	 BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED))
++	 BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |		\
++	 BIT(APICV_INHIBIT_REASON_TDX))
  
- static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- {
-+	/*
-+	 * TDX has its own sequence to do init during TD build time (by
-+	 * KVM_TDX_INIT_VCPU) and it doesn't support INIT event during TD
-+	 * runtime.
-+	 */
- 	if (is_td_vcpu(vcpu))
- 		return;
+ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.name = KBUILD_MODNAME,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index b0f525069ebd..b51d2416acfb 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2143,6 +2143,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 		goto teardown;
+ 	}
  
-@@ -211,6 +216,18 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
- }
- #endif
- 
-+static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * INIT and SIPI are always blocked for TDX, i.e., INIT handling and
-+	 * the OP vcpu_deliver_sipi_vector() won't be called.
-+	 */
-+	if (is_td_vcpu(vcpu))
-+		return true;
++	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_TDX);
 +
-+	return vmx_apic_init_signal_blocked(vcpu);
-+}
-+
- static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-@@ -565,7 +582,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- #endif
+ 	return 0;
  
- 	.check_emulate_instruction = vmx_check_emulate_instruction,
--	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-+	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
- 	.migrate_timers = vmx_migrate_timers,
+ 	/*
+@@ -2528,6 +2530,7 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 		return -EIO;
+ 	}
  
- 	.msr_filter_changed = vmx_msr_filter_changed,
++	vcpu->arch.apic->apicv_active = false;
+ 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+ 
+ 	return 0;
 -- 
 2.46.0
 
