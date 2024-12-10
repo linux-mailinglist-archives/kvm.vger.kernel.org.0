@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-33364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F3F9EA3E0
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 01:52:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E2F9EA3E3
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 01:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69142188A37F
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 00:52:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9201B168B0F
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 00:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E640226164;
-	Tue, 10 Dec 2024 00:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F28B22618B;
+	Tue, 10 Dec 2024 00:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cOH3Rj4e"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NJkb9PGb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049912248B6;
-	Tue, 10 Dec 2024 00:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC561226173;
+	Tue, 10 Dec 2024 00:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733791725; cv=none; b=JEfWQ7pDaNIjfqnI4Yf5SemTmDNQbPlWBtBCXd3B9B/MglZRgWRyu3SyYmYVkqBvnZ8A825uEUH5YSXWTBCtutpzRysbSlCC6FmfUVjKTtSPz6NJYjVZUPWXZVeT9EZOVwZeZYYuHhtiDGxMpURtlu/xi7e2tcxIuquRznfp+eo=
+	t=1733791729; cv=none; b=B9NuWPMWFQxkYljXxAg7GXsEgFed9H5UVmcQjdHsncP1NDFYoZaflnKJ0R2M1d3f7vu2BkV/yi6MM/2ZQ4yo7SRRml5kqvNTACKwN4jKxrwwwg9eXfSWv6ldHpxFpDHDJ8CNMrqAzuLZZvVK3A8feMVuEPo/b4pjrkUZZfpFLyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733791725; c=relaxed/simple;
-	bh=SSrfpZufJZ+LgQYUKOwSmGT0aapFamc5o1VENM+ecPY=;
+	s=arc-20240116; t=1733791729; c=relaxed/simple;
+	bh=30ltR/0kh3Q1IFeb8do8LGhyHFYvpma6JQxut931cHM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cdA35FOgiOm30rQ7kIa9/rDyqfqV/JZPh5FGUpM5+KbOGxXiAyoYyHMv0HafRN+STo8jNYbpfv3dpoHoV+vdj4T4ZzpMA5N58EY6kiB3lvFDik3Cjmx5OlrMTs7ekZj74VLOtQ9D4JzUTS6zRilz9Vnept0f84GpdaL6xLp7CxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cOH3Rj4e; arc=none smtp.client-ip=192.198.163.9
+	 MIME-Version; b=KNP9YrKPrACmbERHqlzl+npK1eGAtXdRGivuYjNDAv241KXqwfImQcKPLJeQuaTyuxIJlca2MjOSQ0r/amo+v+XhIfvImop0OZvkxl+imLwebCyUZ4VebLdLwjkr9VxvH0IQdzmNZ0SiKHmoEd5Xj7b6KZt4kCABUuntP1+ZdzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NJkb9PGb; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733791724; x=1765327724;
+  t=1733791727; x=1765327727;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SSrfpZufJZ+LgQYUKOwSmGT0aapFamc5o1VENM+ecPY=;
-  b=cOH3Rj4ebPYHE/BAB0xvTmyGl9cO2Kod83AWQ/2DGW/pdGJz4i88RFKZ
-   H9qLqX17oBpvrJXcy3pbCAyfzORdXV32b2VKrTN3nrfRcJwfmO7QSs259
-   HuYMu+2D8BQcQXaMheM1tvZadgVJCK+RmeOAw+FLhfghb0/3djIL1bJNd
-   XyWbHwAPrbjI9w/4WAK035qenOujhiZu3NLNSHnxGCTIj6uYX9DfBlifE
-   5USMAHLx+t4ZockwwJvdnJtqFbAvBBaryYsXV3qKlcdkzP+CwnD0ZWZqH
-   QBbHWnNY9HEdH2h/E5PknQBTmKCsaow0STHjg3/mxfpjphvUhUC8tWPZ2
+  bh=30ltR/0kh3Q1IFeb8do8LGhyHFYvpma6JQxut931cHM=;
+  b=NJkb9PGb2z0aADEDEX/N9hDm2+drtQZxnnRAWJT1N6yQqZud2ahaQE6i
+   3EypwwaQoWjdZeN3FCYQbjCopCksLJ6476/z8DiL3CnPkf8T9kvmsPuCS
+   wdebnpL2tX7bVbjXWNkYzAAFcoO033YmmBI9rO+C6NjRqwsNRHaid1bUJ
+   YoRv1SeHFbd19k780V10wPeTsukVqWriLhp0LOCKagQl/PqkRluiAXfLI
+   FO1FLTg40mwvJ/+JxqVQ5wFphphnECru1SN4jNXysMgASTTJqKSonmliD
+   Mh1UDhuLk7qdrmC+ATAZCH36UXOt+a+N1ob4v3xumFDvXxKH0VwkGKMRw
    g==;
-X-CSE-ConnectionGUID: MVJLqqVfREGRvSJnvBN0cQ==
-X-CSE-MsgGUID: x1Bt/tQ5QWGT/AUm/Ati7A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44793780"
+X-CSE-ConnectionGUID: pOqak0gxTSKAPK30oQbGBQ==
+X-CSE-MsgGUID: CKFyqCL0QHykJjZ4Zxbg1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44793790"
 X-IronPort-AV: E=Sophos;i="6.12,220,1728975600"; 
-   d="scan'208";a="44793780"
+   d="scan'208";a="44793790"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:43 -0800
-X-CSE-ConnectionGUID: Bl4QXkcSRySFaOGaszrVXA==
-X-CSE-MsgGUID: bRG8LA2dSjC7wOiWQ8rclQ==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:47 -0800
+X-CSE-ConnectionGUID: /1tLC4jZT/a/fB9zOgZoWA==
+X-CSE-MsgGUID: QOUcOScUS0WS0kCZ7q501w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,220,1728975600"; 
-   d="scan'208";a="96033091"
+   d="scan'208";a="96033103"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:40 -0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:43 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH 15/18] KVM: TDX: Ignore setting up mce
-Date: Tue, 10 Dec 2024 08:49:41 +0800
-Message-ID: <20241210004946.3718496-16-binbin.wu@linux.intel.com>
+Subject: [PATCH 16/18] KVM: TDX: Add a method to ignore hypercall patching
+Date: Tue, 10 Dec 2024 08:49:42 +0800
+Message-ID: <20241210004946.3718496-17-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241210004946.3718496-1-binbin.wu@linux.intel.com>
 References: <20241210004946.3718496-1-binbin.wu@linux.intel.com>
@@ -89,43 +89,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because vmx_set_mce function is VMX specific and it cannot be used for TDX.
-Add vt stub to ignore setting up mce for TDX.
+Because guest TD memory is protected, VMM patching guest binary for
+hypercall instruction isn't possible.  Add a method to ignore hypercall
+patching.  Note: guest TD kernel needs to be modified to use
+TDG.VP.VMCALL for hypercall.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+TDX "the rest" breakout:
+- Renamed from
+  "KVM: TDX: Add a method to ignore for TDX to ignore hypercall patch"
+  to "KVM: TDX: Add a method to ignore hypercall patching".
+- Dropped KVM_BUG_ON() in vt_patch_hypercall(). (Rick)
+- Remove "with a warning" from "Add a method to ignore hypercall
+  patching with a warning." in changelog to reflect code change.
+---
+ arch/x86/kvm/vmx/main.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 81ca5acb9964..01ad3865d54f 100644
+index 01ad3865d54f..81b9d2379a74 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -814,6 +814,14 @@ static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
+@@ -657,6 +657,19 @@ static u32 vt_get_interrupt_shadow(struct kvm_vcpu *vcpu)
+ 	return vmx_get_interrupt_shadow(vcpu);
  }
- #endif
  
-+static void vt_setup_mce(struct kvm_vcpu *vcpu)
++static void vt_patch_hypercall(struct kvm_vcpu *vcpu,
++				  unsigned char *hypercall)
 +{
++	/*
++	 * Because guest memory is protected, guest can't be patched. TD kernel
++	 * is modified to use TDG.VP.VMCALL for hypercall.
++	 */
 +	if (is_td_vcpu(vcpu))
 +		return;
 +
-+	vmx_setup_mce(vcpu);
++	vmx_patch_hypercall(vcpu, hypercall);
 +}
 +
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ static void vt_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
  {
- 	if (!is_td(kvm))
-@@ -973,7 +981,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.cancel_hv_timer = vt_cancel_hv_timer,
- #endif
- 
--	.setup_mce = vmx_setup_mce,
-+	.setup_mce = vt_setup_mce,
- 
- #ifdef CONFIG_KVM_SMM
- 	.smi_allowed = vt_smi_allowed,
+ 	if (is_td_vcpu(vcpu))
+@@ -921,7 +934,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.update_emulated_instruction = vmx_update_emulated_instruction,
+ 	.set_interrupt_shadow = vt_set_interrupt_shadow,
+ 	.get_interrupt_shadow = vt_get_interrupt_shadow,
+-	.patch_hypercall = vmx_patch_hypercall,
++	.patch_hypercall = vt_patch_hypercall,
+ 	.inject_irq = vt_inject_irq,
+ 	.inject_nmi = vt_inject_nmi,
+ 	.inject_exception = vt_inject_exception,
 -- 
 2.46.0
 
