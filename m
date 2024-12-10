@@ -1,182 +1,269 @@
-Return-Path: <kvm+bounces-33372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489149EA472
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 02:40:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29E299EA502
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 03:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11EA91643AC
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 01:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B69168005
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 02:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B970670823;
-	Tue, 10 Dec 2024 01:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7826519E992;
+	Tue, 10 Dec 2024 02:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wQxcykbv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fD+hebdC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F97F17BD9
-	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 01:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9925D477;
+	Tue, 10 Dec 2024 02:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733794851; cv=none; b=dEKDhwhj+hduKIPejp/eDghX62iRn2s2zkGcEzZtDMPcQQ1Vkiz6HY+ejpVnd6SJ4XRt64GRLmYEOW9FQ0q2GewPs4Ed7CiKfc/QvDvLrunLqNML9Xo68y28MNTh99Lohdw843Vy7Y9BLJEZyqw0hyHIOOo4uKJ9dCU7EYuBWiM=
+	t=1733796882; cv=none; b=BJl8juwTXqfTJuQi/TwrQoVi7uWtnuBilnu/v6tM8kYa9TLcmVRQVMoGmynRropVgDaWtwHtWZ0PFfxs8pQaPS1SZQUJuyamQENQYcI70UNnBhrIV/PxoHj/cPohm5Zmiw6PjLYJ4okC5EOIjwuwELSuz1ZcjMxcG+3jgaEXocc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733794851; c=relaxed/simple;
-	bh=XP/k/q0i0lQJ0g5pYg/DpgSgV9EvWoGsrklS8h7J4Qk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RIlAMerlXv+hzaAQNm0Dte9SjhwNGJHqGq5t3bJ9qEl0H68rQ/zPoewjFNaG1NY1p564Bv3D1MeoRgWYXYerzx0T5kK+/yaEAe54MqVdS+CzjzIOZMPPOoOdpUtwDILTsESKtDtVI52XHTTndnphCe/qcKPir/4x/9r2qAUfi5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wQxcykbv; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725e8775611so1510184b3a.1
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2024 17:40:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733794849; x=1734399649; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bErHPnG0cBPr7OTaDgSE9m8Ooeq0/K7I1LubD/D/QQ=;
-        b=wQxcykbvEIxw5rjI6RpxarLQNczAq4oPN6AN9Kpw2B9WAVbu4SarAMr2n41jkauvD4
-         OQklKAkEulaXQW57vr75N1lDUQsPV9ptYIb8msn0Er6e2K2Bb6u1Z02axrmxUVWpizVE
-         4wNghWMYDJQaUAOukK/+EUlE4tBGcJ0iP0FuZwg5V277zrfLE7uYBG/b9RwhAD5gQaK7
-         QFPTaEc1EQJqQtEf7lZvpZac7BPNVQbR+zkgNqMnaygnbt+mBCous5Onsf4UiKyoPlEb
-         0XTOZcBn2UbNA+v8FEM1m9u/PKNksGHQeUQkdnJJdPnBViSW8GX/ESDmRLVKXI94aFPQ
-         XUvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733794849; x=1734399649;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bErHPnG0cBPr7OTaDgSE9m8Ooeq0/K7I1LubD/D/QQ=;
-        b=qzjnjuu10+pAiYYEVguUhOwAfQ7lJucRVyy13ab3XssvS3Em3qaJYyEmZNg+tqmiBJ
-         uD2DafTgNr6hMM5bzrDvG8hLNZtP6e8X06JqoxTXKUQ+sLDo9QwGITsom6fT0EOHFkh6
-         8vhivsJze1hHmDLTZR8I6r0eDG/Nc8sABi2Kax57OyYC7WNhgjVCU/ybc8T45j4dbRLD
-         hldLYFw1BklQSe/15ReTIac5//PRShdtqOAXCR0jSu3P5wZKU/DDNhxCcz39iic/vGa8
-         lffPTyNlNU+GVagdll9Shnem7BcmspJlBtqdrxR0ErzkGX96OJFn1NUJKwltQZIetYi5
-         7MGA==
-X-Gm-Message-State: AOJu0YwMU4Sc2OJn6AfF3AGSO0wEDIWJRY69FRlsY9cis08/dP9PioPY
-	VvrGtobjJBJyJRwqEWyqJ2WBeJWf2shJRU/olZ/qM5SS9E98jEwIfzcO8f2/Jn6YqTmjlaCoWVt
-	jkQ==
-X-Google-Smtp-Source: AGHT+IHW1z/+JqVrrgmSCERALc9rLSyuwidSnvty9L39Mhbl3kmC9YetkXdy8traWBT/taiajplFM+S0g/k=
-X-Received: from pfbbe25.prod.google.com ([2002:a05:6a00:1f19:b0:725:e6a0:55ea])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:22c6:b0:725:9edd:dc30
- with SMTP id d2e1a72fcca58-7273cb1af91mr3890080b3a.12.1733794849659; Mon, 09
- Dec 2024 17:40:49 -0800 (PST)
-Date: Mon, 9 Dec 2024 17:40:48 -0800
-In-Reply-To: <Z1eXyv2VVsFiw_0i@google.com>
+	s=arc-20240116; t=1733796882; c=relaxed/simple;
+	bh=PiXu9l+4qedQacXyzm74QV0ZA9egVrz0r2XH1OaomXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ORq9b1VIG4fMrF9rDSujDKWmA7ahzTMBOXSsQ9rtCLeDy6rxwJ3aeP18e9zUUmMyD6YBnzEt9YRo86U2FF8F2puGGHltYiUvYdpFfJ6eopVTp5uKlbUB+okBaVQEgLHpnLtIuZvADLWPH2warDMXP4DmRbTRd/6dCHWkEUNqjR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fD+hebdC; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733796880; x=1765332880;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PiXu9l+4qedQacXyzm74QV0ZA9egVrz0r2XH1OaomXw=;
+  b=fD+hebdCO6kJPxU1/jQiv7QGAp09MUBs3XSDq0wGSSLGkv0MqbSJWDoR
+   tDpruVJopmZzoaxo9TOhtsD5tZov2n1V+mSo2Ngrkboiy+aWtgNFrHWGB
+   AXaZIrlDF0MCt+YmRphiYHZ0UTF8v0W+1US4ctk7T8YiSTPJbg3gY7EwE
+   2zJ6O0GUODCDr0vi86f/9IynT9XN+DlPx8+DvqBh0BAYUELk+jk6dABNU
+   +ze2+ghkdg+iNduZzaj7F5q+gTDKeqKUWyEcmT7cZ8B9Ka5rdg+aJB1sR
+   XLDVxxW9N9+sC/sVaSt0TVXr/Y362ABrXJVTkX/TsPOKImdz7Awf7uN9i
+   g==;
+X-CSE-ConnectionGUID: ZrzVQi0bTM+H3LA9woRiSA==
+X-CSE-MsgGUID: ALF/jMblRqiOTwrB/tjoBw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44799938"
+X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
+   d="scan'208";a="44799938"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:14:40 -0800
+X-CSE-ConnectionGUID: e0vg3zN3SyeLP0hGKUyj6g==
+X-CSE-MsgGUID: I3c4QdKERra9XRGFCshY2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
+   d="scan'208";a="95709528"
+Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:14:37 -0800
+Message-ID: <747271b4-2d33-476b-8056-b54ce46441d1@linux.intel.com>
+Date: Tue, 10 Dec 2024 10:14:34 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241021102321.665060-1-bk@alpico.io> <Z1eXyv2VVsFiw_0i@google.com>
-Message-ID: <Z1ecILHBlpkiAThl@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Drop the kvm_has_noapic_vcpu optimization
-From: Sean Christopherson <seanjc@google.com>
-To: Bernhard Kauer <bk@alpico.io>
-Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] KVM: TDX: Add a place holder to handle TDX VM exit
+To: Chao Gao <chao.gao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
+ yan.y.zhao@intel.com, michael.roth@amd.com, linux-kernel@vger.kernel.org
+References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+ <20241201035358.2193078-2-binbin.wu@linux.intel.com>
+ <Z1bS0sWkPjsaf33b@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z1bS0sWkPjsaf33b@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-+Paolo, I'm pretty sure he still doesn't subscribe to kvm@ :-)
 
-On Mon, Dec 09, 2024, Sean Christopherson wrote:
-> On Mon, Oct 21, 2024, Bernhard Kauer wrote:
-> > It used a static key to avoid loading the lapic pointer from
-> > the vcpu->arch structure.  However, in the common case the load
-> > is from a hot cacheline and the CPU should be able to perfectly
-> > predict it. Thus there is no upside of this premature optimization.
-> > 
-> > The downside is that code patching including an IPI to all CPUs
-> > is required whenever the first VM without an lapic is created or
-> > the last is destroyed.
-> > 
-> > Signed-off-by: Bernhard Kauer <bk@alpico.io>
-> > ---
-> > 
-> > V1->V2: remove spillover from other patch and fix style
-> > 
-> >  arch/x86/kvm/lapic.c | 10 ++--------
-> >  arch/x86/kvm/lapic.h |  6 +-----
-> >  arch/x86/kvm/x86.c   |  6 ------
-> >  3 files changed, 3 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 2098dc689088..287a43fae041 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -135,8 +135,6 @@ static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
-> >  	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
-> >  }
-> >  
-> > -__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
-> > -EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
-> >  
-> >  __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
-> >  __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_sw_disabled, HZ);
-> 
-> I'm on the fence, slightly leaning towards removing all three of these static keys.
-> 
-> If we remove kvm_has_noapic_vcpu to avoid the text patching, then we should
-> definitely drop apic_sw_disabled, as vCPUs are practically guaranteed to toggle
-> the S/W enable bit, e.g. it starts out '0' at RESET.  And if we drop apic_sw_disabled,
-> then keeping apic_hw_disabled seems rather pointless.
-> 
-> Removing all three keys is measurable, but the impact is so tiny that I have a
-> hard time believing anyone would notice in practice.
-> 
-> To measure, I tweaked KVM to handle CPUID exits in the fastpath and then ran the
-> KVM-Unit-Test CPUID microbenchmark (with some minor modifications).  Handling
-> CPUID in the fastpath makes the kvm_lapic_enabled() call in the innermost run loop
-> stick out (that helpers checks all three keys/conditions).
-> 
-> 	for (;;) {
-> 		/*
-> 		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
-> 		 * update must kick and wait for all vCPUs before toggling the
-> 		 * per-VM state, and responding vCPUs must wait for the update
-> 		 * to complete before servicing KVM_REQ_APICV_UPDATE.
-> 		 */
-> 		WARN_ON_ONCE((kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu)) &&
-> 			     (kvm_get_apic_mode(vcpu) != LAPIC_MODE_DISABLED));
-> 
-> 		exit_fastpath = kvm_x86_call(vcpu_run)(vcpu,
-> 						       req_immediate_exit);
-> 		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
-> 			break;
-> 
-> 		if (kvm_lapic_enabled(vcpu))
-> 			kvm_x86_call(sync_pir_to_irr)(vcpu);
-> 
-> 		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
-> 			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
-> 			break;
-> 		}
-> 
-> 		/* Note, VM-Exits that go down the "slow" path are accounted below. */
-> 		++vcpu->stat.exits;
-> 	}
-> 
-> With a single vCPU pinned to a single pCPU, the average latency for a CPUID exit
-> goes from 1018 => 1027 cycles, plus or minus a few.  With 8 vCPUs, no pinning
-> (mostly laziness), the average latency goes from 1034 => 1053.
-> 
-> Other flows that check multiple vCPUs, e.g. kvm_irq_delivery_to_apic(), might be
-> more affected?  The optimized APIC map should help for common cases, but KVM does
-> still check if APICs are enabled multiple times when delivering interrupts.  And
-> that's really my only hesitation: there are checks *everywhere* in KVM.
-> 
-> On the other hand, we lose gobs and gobs of cycles with far less thought.  E.g.
-> with mitigations on, the latency for a single vCPU jumps all the way to 1600+ cycles.
-> 
-> And while the diff stats are quite nice, the relevant code is low maintenance.
-> 
->  arch/x86/kvm/lapic.c | 41 ++---------------------------------------
->  arch/x86/kvm/lapic.h | 19 +++----------------
->  arch/x86/kvm/x86.c   |  4 +---
->  3 files changed, 6 insertions(+), 58 deletions(-)
-> 
-> Paolo or anyone else... thoughts?
+
+
+On 12/9/2024 7:21 PM, Chao Gao wrote:
+> On Sun, Dec 01, 2024 at 11:53:50AM +0800, Binbin Wu wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>
+>> Introduce the wiring for handling TDX VM exits by implementing the
+>> callbacks .get_exit_info(), and .handle_exit().  Additionally, add
+>> error handling during the TDX VM exit flow, and add a place holder
+>> to handle various exit reasons.  Add helper functions to retrieve
+>> exit information, exit qualifications, and more.
+>>
+>> Contention Handling: The TDH.VP.ENTER operation may contend with TDH.MEM.*
+>> operations for secure EPT or TD EPOCH.  If contention occurs, the return
+>> value will have TDX_OPERAND_BUSY set with operand type, prompting the vCPU
+>> to attempt re-entry into the guest via the fast path.
+>>
+>> Error Handling: The following scenarios will return to userspace with
+>> KVM_EXIT_INTERNAL_ERROR.
+>> - TDX_SW_ERROR: This includes #UD caused by SEAMCALL instruction if the
+>>   CPU isn't in VMX operation, #GP caused by SEAMCALL instruction when TDX
+>>   isn't enabled by the BIOS, and TDX_SEAMCALL_VMFAILINVALID when SEAM
+>>   firmware is not loaded or disabled.
+>> - TDX_ERROR: This indicates some check failed in the TDX module, preventing
+>>   the vCPU from running.
+>> - TDX_NON_RECOVERABLE: Set by the TDX module when the error is
+>>   non-recoverable, indicating that the TDX guest is dead or the vCPU is
+>>   disabled.  This also covers failed_vmentry case, which must have
+>>   TDX_NON_RECOVERABLE set since off-TD debug feature has not been enabled.
+>>   An exception is the triple fault, which also sets TDX_NON_RECOVERABLE
+>>   but exits to userspace with KVM_EXIT_SHUTDOWN, aligning with the VMX
+>>   case.
+>> - Any unhandled VM exit reason will also return to userspace with
+>>   KVM_EXIT_INTERNAL_ERROR.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+>
+> [..]
+>
+>> fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>> {
+>> 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> @@ -837,9 +900,26 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>> 	tdx->prep_switch_state = TDX_PREP_SW_STATE_UNRESTORED;
+>>
+>> 	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+>> +
+>> +	if (unlikely((tdx->vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR))
+>> +		return EXIT_FASTPATH_NONE;
+>> +
+>> +	if (unlikely(tdx_check_exit_reason(vcpu, EXIT_REASON_MCE_DURING_VMENTRY)))
+>> +		kvm_machine_check();
+> I was wandering if EXIT_REASON_MCE_DURING_VMENTRY should be handled in the
+> switch-case in tdx_handle_exit() because I saw there is a dedicated handler
+> for VMX. But looks EXIT_REASON_MCE_DURING_VMENTRY is a kind of VMentry
+> failure. So, it won't reach that switch-case.
+Yes, similar to VMX, for TDX, EXIT_REASON_MCE_DURING_VMENTRY will be captured
+by failed_vmentry, which will have TDX_NON_RECOVERABLE set and handled before
+the switch-case.
+
+
+>   And, VMX's handler for
+> EXIT_REASON_MCE_DURING_VMENTRY is actually dead code and can be removed.
+I think so, for VMX, the exit_reason.failed_vmentry case will return to
+userspace, it won't reach the handler for EXIT_REASON_MCE_DURING_VMENTRY.
+
+
+>
+>> +
+>> 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+>>
+>> -	return EXIT_FASTPATH_NONE;
+>> +	if (unlikely(tdx_has_exit_reason(vcpu) && tdexit_exit_reason(vcpu).failed_vmentry))
+>> +		return EXIT_FASTPATH_NONE;
+>> +
+>> +	return tdx_exit_handlers_fastpath(vcpu);
+>> +}
+>> +
+>> +static int tdx_handle_triple_fault(struct kvm_vcpu *vcpu)
+>> +{
+>> +	vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+>> +	vcpu->mmio_needed = 0;
+>> +	return 0;
+>> }
+>>
+>> void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+>> @@ -1135,6 +1215,88 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+>> 	return tdx_sept_drop_private_spte(kvm, gfn, level, pfn);
+>> }
+>>
+>> +int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>> +{
+>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> +	u64 vp_enter_ret = tdx->vp_enter_ret;
+>> +	union vmx_exit_reason exit_reason;
+>> +
+>> +	if (fastpath != EXIT_FASTPATH_NONE)
+>> +		return 1;
+>> +
+>> +	/*
+>> +	 * Handle TDX SW errors, including TDX_SEAMCALL_UD, TDX_SEAMCALL_GP and
+>> +	 * TDX_SEAMCALL_VMFAILINVALID.
+>> +	 */
+>> +	if (unlikely((vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR)) {
+>> +		KVM_BUG_ON(!kvm_rebooting, vcpu->kvm);
+>> +		goto unhandled_exit;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Without off-TD debug enabled, failed_vmentry case must have
+>> +	 * TDX_NON_RECOVERABLE set.
+>> +	 */
+>> +	if (unlikely(vp_enter_ret & (TDX_ERROR | TDX_NON_RECOVERABLE))) {
+>> +		/* Triple fault is non-recoverable. */
+>> +		if (unlikely(tdx_check_exit_reason(vcpu, EXIT_REASON_TRIPLE_FAULT)))
+>> +			return tdx_handle_triple_fault(vcpu);
+>> +
+>> +		kvm_pr_unimpl("TD vp_enter_ret 0x%llx, hkid 0x%x hkid pa 0x%llx\n",
+>> +			      vp_enter_ret, to_kvm_tdx(vcpu->kvm)->hkid,
+>> +			      set_hkid_to_hpa(0, to_kvm_tdx(vcpu->kvm)->hkid));
+>> +		goto unhandled_exit;
+>> +	}
+>> +
+>> +	/* From now, the seamcall status should be TDX_SUCCESS. */
+>> +	WARN_ON_ONCE((vp_enter_ret & TDX_SEAMCALL_STATUS_MASK) != TDX_SUCCESS);
+>> +	exit_reason = tdexit_exit_reason(vcpu);
+>> +
+>> +	switch (exit_reason.basic) {
+>> +	default:
+>> +		break;
+>> +	}
+>> +
+>> +unhandled_exit:
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+>> +	vcpu->run->internal.ndata = 2;
+>> +	vcpu->run->internal.data[0] = vp_enter_ret;
+>> +	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
+>> +	return 0;
+>> +}
+>> +
+>> +void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+>> +		u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code)
+>> +{
+>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> +
+>> +	if (tdx_has_exit_reason(vcpu)) {
+>> +		/*
+>> +		 * Encode some useful info from the the 64 bit return code
+>> +		 * into the 32 bit exit 'reason'. If the VMX exit reason is
+>> +		 * valid, just set it to those bits.
+>> +		 */
+>> +		*reason = (u32)tdx->vp_enter_ret;
+>> +		*info1 = tdexit_exit_qual(vcpu);
+>> +		*info2 = tdexit_ext_exit_qual(vcpu);
+>> +	} else {
+>> +		/*
+>> +		 * When the VMX exit reason in vp_enter_ret is not valid,
+>> +		 * overload the VMX_EXIT_REASONS_FAILED_VMENTRY bit (31) to
+>> +		 * mean the vmexit code is not valid. Set the other bits to
+>> +		 * try to avoid picking a value that may someday be a valid
+>> +		 * VMX exit code.
+>> +		 */
+>> +		*reason = 0xFFFFFFFF;
+>> +		*info1 = 0;
+>> +		*info2 = 0;
+>> +	}
+>> +
+>> +	*intr_info = tdexit_intr_info(vcpu);
+> If there is no valid exit reason, shouldn't intr_info be set to 0?
+Yes. Will fix it.
+Thanks!
+
+>
+>> +	*error_code = 0;
+>> +}
+>> +
+
 
