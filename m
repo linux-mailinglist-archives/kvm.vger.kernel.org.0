@@ -1,152 +1,114 @@
-Return-Path: <kvm+bounces-33429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CC29EB557
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 16:47:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0199EB568
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 16:51:45 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 649EB1886D44
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 15:47:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0285D2824C9
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 15:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282A622FE04;
-	Tue, 10 Dec 2024 15:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A3D22FE0F;
+	Tue, 10 Dec 2024 15:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ks7eCByW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fN/9fqdO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA63B19D060
-	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 15:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9174D22FDFB
+	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 15:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733845647; cv=none; b=OyWvHisAbFeb5qqcM88yMBY+IfLvIGL48mcAzoYFnokCczZkLwb6r/9yT0KgQ/b+yFayq0mKo5fnzOawfasnY6V9rpNIxCqxg1nBdGMuQRA44GB/x49SmYBHIeYBCqQoHwCaoI2R93tEcgo65ZeDt/vs+I6xe6/lvW5sXwyWaFk=
+	t=1733845894; cv=none; b=VbtKv70iKkrz7d0yE2yYDMHDnqaqsPvksCODXK2AFJjVL+yGA4Zu9snwsWcSs2NSSv/P5CJLPhc64Tkfc4HXhNHLR+OwUIBAif4Pnz/OJMCtI7t6vwYRvBpNJuanR2Wu9a4TtVHnx5piDucKd6mshFqriAciSwkUELteqpdGbco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733845647; c=relaxed/simple;
-	bh=1CUVzWgqlJWWmRwsJh1LsALpOZYBXhS4oaGhAijTERk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F/qoDzsQSKVPPxiBqeX9ICTMcm0VUSRZWl6F09eHZbRTg7yh+kmwYYgMmu1UIWQNMuJkxMN7bSlsPP/yFQYYjuvixxdPMc7aTohNQxLEVR2eDOu8uABA0V0uXklV73oZEPVhm3KSjGE9wZRWsC27B6D/AuJyXmbwvv1f+oAwB24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ks7eCByW; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1733845894; c=relaxed/simple;
+	bh=6OaTMfkTA/OmgikKXTbbHwl/a5xyjcE8zGh1IgbdmZs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ge3Kvhg8a4qrde9po3MhFH5at8kq//gl9ZjqNKG2+vQ4q1wC3wJihQa1Itn2FHpHiZAYq7w0lqdCdfwAUETg7PN6nS/FIGoQDpkdKK+sa5ANhAUyxjj3brKxHczG9MGXlLRw85reqUUwiIQvC1fqjvjZpo7DQ4jzQ9Uw1qvKr88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fN/9fqdO; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-728eb2e190cso121307b3a.3
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 07:47:25 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso3899867a12.0
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 07:51:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733845645; x=1734450445; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KTvSRRTfNZQvoZQzqZSdBQnAG8g17VjNF2nt+7pLczk=;
-        b=Ks7eCByWNdPHBkYEVLy09wezTPij72NUfjt8Kr6HeuBijlk/gGi8gnN1tko6jatETM
-         8icpN42BWiJgLha56Mlo2yvZh2epZZ3MaIGX43wa7N7P38X6G3QwtDdD7AdQ9gcBKlkL
-         o5lWI4Hvt7CeVDGUvCbiGChlKOMRVPhe7FJCn2U3ItWQMxXI3BmVQwMXEgn9dbrLTf8B
-         G4EwkSSGsQ+sQWQlqTLZ0DunmL4Jjbnjpu8VdUb7fFc4f9Z8+4jMgaLkclvLe7nYjX1n
-         zZOI8X6ik1Rk6HE2m0vOIXiPxQ6FgKDU6UV9uWnVJvEOI+hLEQIS9eeyEntF5kb6xCMa
-         ZTXw==
+        d=google.com; s=20230601; t=1733845891; x=1734450691; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zGEWpmLWCQTndHxT5IXaD/UcEthKFp24ucI3TjyxNCE=;
+        b=fN/9fqdOx11sFOJvCKTNttW74qrYlrwD/gvzbQx3wFhncOcoiUNgeytvIqGsHbiIlK
+         ossHvH4lZhZkXQUoStndPpuX93lfl/d6IbiymJ2NwtLnlDRRCCnCdICpLG3TJaeSJ1JV
+         VTHC0KtAYjDIU62VMUed8nXRhqBgjeeUBrhb4d9bDY9BWaHtidhL8mSidXE4eg7QkWW5
+         SOg0bo71U7PgzFGdCeWacVKo+qx6GZvOJ8H06I2KpyQojFXC9V/lJKPzpyXo3UYsf189
+         oTZNG/960+N4NWDoXvkp38rfuzQAjt+T+0gBIdZ9FNXV9W7eB2XAXSSN7TFUCwFjIdZP
+         u5xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733845645; x=1734450445;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KTvSRRTfNZQvoZQzqZSdBQnAG8g17VjNF2nt+7pLczk=;
-        b=fWbngTIVBRbKmabY1nwt8Y7dR8d49e1RmhLuEKYla8lAz0Wt+N23BAc6K+rJQat10r
-         AKMaLY89WwtLAyDqOmqG3QUHO48vdb00xJoa9z7M4msV3+uGdGBmtlQuRM7sIUaA5IEy
-         QLGvYdgOaS8d9UbxHZ5YeVpz29jtFSegHEYhO65EZfZH00/wErAD9PdknbRmgHNLhoeG
-         E1UAH8srfkhS3EvVgsHRUKFGY/nITvXoGRgwfbjycZ1GS9NWv7FGVL0HdAwOBx3QC1c1
-         Yh4eDDV7IwSFProy+sIMOiE+ObsITa4GxXDqRmCheP/8YcEQOun/agEC2ILqdHFZnEHA
-         evfw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcEh89T+DIVcLv7CnkAljTl2Hci+jLHLIEki/tNP1BDLM3Wg4K7BbfoCUvEc85z3Le7BE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZossEp6P4o2X/HlV2rfH/MGJXN2juw8k0dQKsP8PSPoIrA+7V
-	foiddb/+LzWDS60TQQc/yu67+GYnV0m5XQiLvAFleENCHa/moDEFVDYN4j2Kf3eWPxvoC9dkQi0
-	90w==
-X-Google-Smtp-Source: AGHT+IGHIWibTQSvd05WcbKMeMUoU8sV0PDsPWhPYjcWh/orNjkXeSQt6HCj/nEUskeUrNyc9MtmCiSB0kw=
-X-Received: from pfbcp27.prod.google.com ([2002:a05:6a00:349b:b0:725:b203:3555])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:cd4:b0:725:b4f7:378e
- with SMTP id d2e1a72fcca58-7273c7fdbf1mr7689740b3a.0.1733845645355; Tue, 10
- Dec 2024 07:47:25 -0800 (PST)
-Date: Tue, 10 Dec 2024 07:47:23 -0800
-In-Reply-To: <52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org>
+        d=1e100.net; s=20230601; t=1733845891; x=1734450691;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zGEWpmLWCQTndHxT5IXaD/UcEthKFp24ucI3TjyxNCE=;
+        b=CqpHS5ok9pOvAt4U0SNXVyiJ6BsMMC8Qol12otPqpS9UzU7KU29RxogU/kWkByrNtn
+         jCLM0nPNNTz0SEVi7GoRIzGc/ItBcb7vVbnN1veoNC1zTWHmZreVQZZEzqaS9/PVEg+9
+         okmHYwvItYgDpHOwk10DWifxGTHP1m8rq8/EA7S+Nzfpa3v5GvHx24aEy69JOrsv0gt2
+         gBQykW1Cq7cKjJD6XXaWMOIdvzzcy/Au0p5ByICFJRrOOu9icAN5Tci4pyHspnA0USSU
+         dRS21k0oDPklYNAqGZVRfJETJn0gYbYtNR5gG9O/40s9i4yboboUtvA4WLit/sa9ZM25
+         fwxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVRIUX0xMo1ZzaGQjX4bsLBiO5hVVqg5f+jPS5Vzf0yuvpEB0Z+VlKQvJF0Tr49ocrR74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqUbmFVCtACGlj6I5TwSu9RtqJDF72Y8sRTXWxQ44vkmXScMxA
+	9Tr1XXseYtJBH3FnmkyodINfSJw488GgrL4Ja4QAOQrY/FgExMmq5DsolxwtL3GuQsCC8vYnfpm
+	izs48/t0kRQ5/KLDhCBhrBgBI9l5c+M/HYe7k
+X-Gm-Gg: ASbGnctBlMvhs3yUdLc5CVUhLSbY43ETLybQjvqlXeHSrd99ESVeGAExNQVRNHzW4nE
+	LNrWVgUHclGrNt/8cED7Ih90BL43wO6tftbk=
+X-Google-Smtp-Source: AGHT+IFF1pHN9/6GA3MG/iAI7uuToN+v40kN7CYPXNMCf19FEEnJNP06BgAyjhrlHXP7Ud+BFaLU9/3DxddZc+NTX3w=
+X-Received: by 2002:a17:906:3118:b0:aa6:6e41:ea55 with SMTP id
+ a640c23a62f3a-aa66e41ede5mr1256721466b.7.1733845890857; Tue, 10 Dec 2024
+ 07:51:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org>
-Message-ID: <Z1hiiz40nUqN2e5M@google.com>
-Subject: Re: [REGRESSION] from 74a0e79df68a8042fb84fd7207e57b70722cf825: VFIO
- PCI passthrough no longer works
-From: Sean Christopherson <seanjc@google.com>
-To: Simon Pilkington <simonp.git@mailbox.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	regressions@lists.linux.dev, Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <cover.1733785468.git.ashish.kalra@amd.com> <d1658358fa8c55dca2f1869ef8a8475fc303e9c8.1733785468.git.ashish.kalra@amd.com>
+In-Reply-To: <d1658358fa8c55dca2f1869ef8a8475fc303e9c8.1733785468.git.ashish.kalra@amd.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Tue, 10 Dec 2024 07:51:19 -0800
+X-Gm-Features: AZHOrDm8zaFskRC34t7dTi25zxHQFgRiXcLbUT8F8VLJriuZ2gw6c8XA36wtfvo
+Message-ID: <CAAH4kHZCowU0FV4568P5C+pyv6T-9kL92qnMd2RTq+Sf-9j7Bg@mail.gmail.com>
+Subject: Re: [PATCH 1/7] crypto: ccp: Move dev_info/err messages for SEV/SNP initialization
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-+Tom
+>
+>  static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+> @@ -1329,8 +1342,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+>                  * Don't abort the probe if SNP INIT failed,
+>                  * continue to initialize the legacy SEV firmware.
+>                  */
+> -               dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
+> -                       rc, args->error);
+> +               dev_info(sev->dev, "SEV-SNP: failed, continue to INIT SEV firmware\n");
 
-On Tue, Dec 10, 2024, Simon Pilkington wrote:
-> Hi,
-> 
-> With the aforementioned commit I am no longer able to use PCI passthrough to
-> a Windows guest on the X570 chipset with a 5950X CPU.
-> 
-> The minimal reproducer for me is to attach a GPU to the VM and attempt to
-> start Windows setup from an iso image. The VM will apparently livelock at the
-> setup splash screen before the spinner appears as one of my CPU cores goes up
-> to 100% usage until I force off the VM. This could be very machine-specific
-> though.
+You don't necessarily continue to INIT SEV if args->probe &&
+!psp_init_on_probe, so this may be misleading.
 
-Ugh.  Yeah, it's pretty much guaranteed to be CPU specific behavior.
+>         }
+>
+>         /* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+> --
+> 2.34.1
+>
 
-Tom, any idea what the guest might be trying to do?  It probably doesn't matter
-in the end, it's not like KVM does anything with the value...
 
-> Reverting to the old XOR check fixes both 6.12.y stable and 6.13-rc2 for me.
-> Otherwise they're both bad. Can you please look into it? I can share the
-> config I used for test builds if it would help.
-
-Can you run with the below to see what bits the guest is trying to set (or clear)?
-We could get the same info via tracepoints, but this will likely be faster/easier.
-
----
- arch/x86/kvm/svm/svm.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635655..5144d0283c9d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3195,11 +3195,14 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	case MSR_AMD64_DE_CFG: {
- 		u64 supported_de_cfg;
- 
--		if (svm_get_feature_msr(ecx, &supported_de_cfg))
-+		if (WARN_ON_ONCE(svm_get_feature_msr(ecx, &supported_de_cfg)))
- 			return 1;
- 
--		if (data & ~supported_de_cfg)
-+		if (data & ~supported_de_cfg) {
-+			pr_warn("DE_CFG supported = %llx, WRMSR = %llx\n",
-+				supported_de_cfg, data);
- 			return 1;
-+		}
- 
- 		/*
- 		 * Don't let the guest change the host-programmed value.  The
-@@ -3207,8 +3210,11 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		 * are completely unknown to KVM, and the one bit known to KVM
- 		 * is simply a reflection of hardware capabilities.
- 		 */
--		if (!msr->host_initiated && data != svm->msr_decfg)
-+		if (!msr->host_initiated && data != svm->msr_decfg) {
-+			pr_warn("DE_CFG current = %llx, WRMSR = %llx\n",
-+				svm->msr_decfg, data);
- 			return 1;
-+		}
- 
- 		svm->msr_decfg = data;
- 		break;
-
-base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
 -- 
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
 
