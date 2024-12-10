@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-33375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33376-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339609EA5EC
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 03:46:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A429EA607
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 03:52:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6BF32802B8
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 02:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E258328499A
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 02:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EF01D31A0;
-	Tue, 10 Dec 2024 02:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C938F1C242C;
+	Tue, 10 Dec 2024 02:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ILPnnNhu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L7G+jiN1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7556870838;
-	Tue, 10 Dec 2024 02:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C662A1A2550;
+	Tue, 10 Dec 2024 02:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733798727; cv=none; b=YQ56M2dKdmeQrGfp6rhfmMZ213AQGHnVxoFRH+9WTG1qAfC48CUacnq+fXdhgBiBwX0VcZhCip3x9gSIdCJ/jVOdrCTw70w+Go7kJVzuLgAKN8rMOkNcESH49oQuVvQWaC/dzEVtCfb2S7KgTV+1dQHCYZe6FadfeKb9kOsesGw=
+	t=1733799125; cv=none; b=KbzWGeHqYbXthq3th+IDYNmR0uTtAZcND7t2J3Cq0sU2ZRAneZpbdLd1lbtqd3/ES6egDB2VMRyCbWgIk8e1U2yBnaW7yCL66kjtNzlCJoUyg1SGkV6ue/MVmaL2PIF+B4qLh5ldf/J8ndkprAHYovavPRJQYHf8upBNp3qAc1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733798727; c=relaxed/simple;
-	bh=oEXR26jUiDEDJ8UqnJETJ/09aMdJnNdrpe0HfkS2Lo8=;
+	s=arc-20240116; t=1733799125; c=relaxed/simple;
+	bh=ClVyDaGFj9M5uw6bBVAR3oour6eApQIS+xBoSBMZ04o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZfscD+eTO0IJW8ana85/XEPzQQ2lZ39qZIvFC6N4XxNogCPgVol2TVhYckIXcMDqa+G/J3Pkabc4a+04QZMYMjqIvTntdJyCfFEknnpmAqATRrEXg+JAboKJiHknlkz7oWUVS+o1C6BPpdiHnZmztvRsPkRRmBacO6m1aZkKTIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ILPnnNhu; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=gfQKbVzI/If4fYNQ0wSX5IBamdz6j2YY/YWEO6SRlHlGMt4MkGTI2Yn9JB9bsWfWozrpgyFmvbXoCxWDx+LikG55ydEjZWC+6jjuj0qhZSFuTkE6y4vDH6oEvw33G2ExoMqr/x2cQLMwbkhKYaL8MxiRQ4hW/XugrNYDURu/I7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L7G+jiN1; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733798725; x=1765334725;
+  t=1733799123; x=1765335123;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=oEXR26jUiDEDJ8UqnJETJ/09aMdJnNdrpe0HfkS2Lo8=;
-  b=ILPnnNhuTI+ccB8akE7A4/+1/ZIGV+MD/PWTw34FdQpv3xIBa1qIfud0
-   a/lc2q4iVcR8PUekn63dhMBCk5YVolELGgShFcLkfk0FfhqGZlkW63qFr
-   Z8JWoJYnp5tDM5LeBwcDB7+Ki/sWgpy0nUO7Lvr/hCcAy2XzrAqf9Qw3H
-   y02HrQkX5XnXfN5fqN9K9t9VmCUU7Zg+W5Bp0auWq43+ixJIGkrWhTlAo
-   lce4qMaAcrBa9xcXWmBPXfZayKAyCb/ujll27XgT6NaCQPIUJW/jdAszq
-   k7fsUcvGU6X4dVVvVeUrKuPhqzzI48hux2HoAplFBbSU1AWEP91XHUGwe
+  bh=ClVyDaGFj9M5uw6bBVAR3oour6eApQIS+xBoSBMZ04o=;
+  b=L7G+jiN19/LpTblCnYB6Ye4hOTLy/49ybSs4fEsqZPArkO4ipDWAFBZ2
+   zEwObFudTbZe2w3kzCNQjZrliQMJ+LpuhxsbG8IKRF9fmJnACcQ1+IpyZ
+   sGYaVSi6NZQdeVT8xW4Yh1ffYT7CpHguA20nXWASoN9gjR2WC5lzhxuNk
+   T2PbX77dUPzy9WU5nQJDO1BLvorbVk43q8vde5sSGEQXdXAFpWS/Dkaq7
+   vWsT8Gjp/ZV1cJ3sZQr+uIU6npmyFyuO6Fm64WmpLORB/HvzZO8mHDKkW
+   C/d8BzWHPViE9ux9zi8KXoqoyR09w94iUY6YVvCHtQvr1wlwuKcEVoJjd
    w==;
-X-CSE-ConnectionGUID: Cy0h7W48T5mfqffRJ55gig==
-X-CSE-MsgGUID: o/twAY7HSsW85B/t3rlWug==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="37909639"
+X-CSE-ConnectionGUID: BGWl7ZvIRaunOKfkpVOVzQ==
+X-CSE-MsgGUID: Mtj+xeS3RUOxtDtHLvzbkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="38055956"
 X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="37909639"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:45:24 -0800
-X-CSE-ConnectionGUID: TMf5ozkRQAKc9GyKLHHzRA==
-X-CSE-MsgGUID: E6nLigQTQ8auIAhTpMCl9g==
+   d="scan'208";a="38055956"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:52:02 -0800
+X-CSE-ConnectionGUID: +CoZqUtaQHGGb0XWyvOLdA==
+X-CSE-MsgGUID: SLv2HwdASUSPMuRAGRpwfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="100317835"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:45:19 -0800
-Message-ID: <b0e9a17e-e94c-45f3-8869-8595c7aa58f0@intel.com>
-Date: Tue, 10 Dec 2024 10:45:16 +0800
+   d="scan'208";a="95078689"
+Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 18:51:59 -0800
+Message-ID: <e8163ac4-59cd-4beb-bb92-44aa2d7702ab@linux.intel.com>
+Date: Tue, 10 Dec 2024 10:51:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,231 +67,197 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] KVM: TDX: Add TSX_CTRL msr into uret_msrs list
-To: Adrian Hunter <adrian.hunter@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Huang, Kai"
- <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Yang, Weijiang" <weijiang.yang@intel.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "dmatlack@google.com" <dmatlack@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "x86@kernel.org" <x86@kernel.org>
-References: <b36dd125-ad80-4572-8258-7eea3a899bf9@intel.com>
- <Z04Ffd7Lqxr4Wwua@google.com>
- <c98556099074f52af1c81ec1e82f89bec92cb7cd.camel@intel.com>
- <Z05SK2OxASuznmPq@google.com>
- <60e2ed472e03834c13a48e774dc9f006eda92bf5.camel@intel.com>
- <9beb9e92-b98c-42a2-a2d3-35c5b681ad03@intel.com> <Z0+vdVRptHNX5LPo@intel.com>
- <0e34f9d0-0927-4ac8-b1cb-ef8500b8d877@intel.com> <Z0/4wsR2WCwWfZyV@intel.com>
- <2bcd34eb-0d1f-46c0-933f-fb1d70c70a1e@intel.com> <Z1A5QWaTswaQyE3k@intel.com>
- <c9b14955-6e2f-4490-a18c-0537ffdfff30@intel.com>
- <a005d50c-6ca8-4572-80ba-5207b95323fb@intel.com>
- <84964644-e53f-4aac-b827-5626393f8c25@intel.com>
- <3f52c362-ac1b-4435-92c8-81ec97992b02@intel.com>
- <c686e5b9-9136-49c1-ab3b-4b8ace97d6ac@intel.com>
- <5c0f3660-29cb-4035-979d-a89af5d0df6f@intel.com>
- <80dfeca4-246d-4ba4-b6c3-9a2e107c4a74@intel.com>
+Subject: Re: [PATCH 4/7] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
+To: Chao Gao <chao.gao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
+ yan.y.zhao@intel.com, michael.roth@amd.com, linux-kernel@vger.kernel.org
+References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+ <20241201035358.2193078-5-binbin.wu@linux.intel.com>
+ <Z1bmUCEdoZ87wIMn@intel.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <80dfeca4-246d-4ba4-b6c3-9a2e107c4a74@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z1bmUCEdoZ87wIMn@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 12/9/2024 3:08 PM, Adrian Hunter wrote:
-> On 9/12/24 04:46, Xiaoyao Li wrote:
->> On 12/6/2024 10:40 PM, Adrian Hunter wrote:
->>> On 6/12/24 05:37, Xiaoyao Li wrote:
->>>> On 12/6/2024 1:31 AM, Adrian Hunter wrote:
->>>>> On 4/12/24 17:33, Xiaoyao Li wrote:
->>>>>> On 12/4/2024 7:55 PM, Adrian Hunter wrote:
->>>>>>> On 4/12/24 13:13, Chao Gao wrote:
->>>>>>>> On Wed, Dec 04, 2024 at 08:57:23AM +0200, Adrian Hunter wrote:
->>>>>>>>> On 4/12/24 08:37, Chao Gao wrote:
->>>>>>>>>> On Wed, Dec 04, 2024 at 08:18:32AM +0200, Adrian Hunter wrote:
->>>>>>>>>>> On 4/12/24 03:25, Chao Gao wrote:
->>>>>>>>>>>>> +#define TDX_FEATURE_TSX (__feature_bit(X86_FEATURE_HLE) | __feature_bit(X86_FEATURE_RTM))
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static bool has_tsx(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
->>>>>>>>>>>>> +           (entry->ebx & TDX_FEATURE_TSX);
->>>>>>>>>>>>> +}
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static void clear_tsx(struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    entry->ebx &= ~TDX_FEATURE_TSX;
->>>>>>>>>>>>> +}
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static bool has_waitpkg(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    return entry->function == 7 && entry->index == 0 &&
->>>>>>>>>>>>> +           (entry->ecx & __feature_bit(X86_FEATURE_WAITPKG));
->>>>>>>>>>>>> +}
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static void clear_waitpkg(struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    entry->ecx &= ~__feature_bit(X86_FEATURE_WAITPKG);
->>>>>>>>>>>>> +}
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static void tdx_clear_unsupported_cpuid(struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    if (has_tsx(entry))
->>>>>>>>>>>>> +        clear_tsx(entry);
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +    if (has_waitpkg(entry))
->>>>>>>>>>>>> +        clear_waitpkg(entry);
->>>>>>>>>>>>> +}
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static bool tdx_unsupported_cpuid(const struct kvm_cpuid_entry2 *entry)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +    return has_tsx(entry) || has_waitpkg(entry);
->>>>>>>>>>>>> +}
->>>>>>>>>>>>
->>>>>>>>>>>> No need to check TSX/WAITPKG explicitly because setup_tdparams_cpuids() already
->>>>>>>>>>>> ensures that unconfigurable bits are not set by userspace.
->>>>>>>>>>>
->>>>>>>>>>> Aren't they configurable?
->>>>>>>>>>
->>>>>>>>>> They are cleared from the configurable bitmap by tdx_clear_unsupported_cpuid(),
->>>>>>>>>> so they are not configurable from a userspace perspective. Did I miss anything?
->>>>>>>>>> KVM should check user inputs against its adjusted configurable bitmap, right?
->>>>>>>>>
->>>>>>>>> Maybe I misunderstand but we rely on the TDX module to reject
->>>>>>>>> invalid configuration.  We don't check exactly what is configurable
->>>>>>>>> for the TDX Module.
->>>>>>>>
->>>>>>>> Ok, this is what I missed. I thought KVM validated user input and masked
->>>>>>>> out all unsupported features. sorry for this.
->>>>>>>>
->>>>>>>>>
->>>>>>>>> TSX and WAITPKG are not invalid for the TDX Module, but KVM
->>>>>>>>> must either support them by restoring their MSRs, or disallow
->>>>>>>>> them.  This patch disallows them for now.
->>>>>>>>
->>>>>>>> Yes. I agree. what if a new feature (supported by a future TDX module) also
->>>>>>>> needs KVM to restore some MSRs? current KVM will allow it to be exposed (since
->>>>>>>> only TSX/WAITPKG are checked); then some MSRs may get corrupted. I may think
->>>>>>>> this is not a good design. Current KVM should work with future TDX modules.
->>>>>>>
->>>>>>> With respect to CPUID, I gather this kind of thing has been
->>>>>>> discussed, such as here:
->>>>>>>
->>>>>>>        https://lore.kernel.org/all/ZhVsHVqaff7AKagu@google.com/
->>>>>>>
->>>>>>> and Rick and Xiaoyao are working on something.
->>>>>>>
->>>>>>> In general, I would expect a new TDX Module would advertise support for
->>>>>>> new features, but KVM would have to opt in to use them.
->>>>>>>
->>>>>>
->>>>>> There were discussion[1] on whether KVM to gatekeep the configurable/supported CPUIDs for TDX. I stand by Sean that KVM needs to do so.
->>>>>>
->>>>>> Regarding KVM opt in the new feature, KVM gatekeeps the CPUID bit that can be set by userspace is exactly the behavior of opt-in. i.e., for a given KVM, it only allows a CPUID set {S} to be configured by userspace, if new TDX module supports new feature X, it needs KVM to opt-in X by adding X to {S} so that X is allowed to be configured by userspace.
->>>>>>
->>>>>> Besides, I find current interface between KVM and userspace lacks the ability to tell userspace what bits are not supported by KVM. KVM_TDX_CAPABILITIES.cpuid doesn't work because it represents the configurable CPUIDs, not supported CPUIDs (I think we might rename it to configurable_cpuid to better reflect its meaning). So userspace has to hardcode that TSX and WAITPKG is not support itself.
->>>>>
->>>>> I don't follow why hardcoding would be necessary.
->>>>>
->>>>> If the leaf is represented in KVM_TDX_CAPABILITIES.cpuid, and
->>>>> the bits are 0 there, why would userspace try to set them to 1?
->>>>
->>>> Userspace doesn't set the bit to 1 in kvm_tdx_init_vm.cpuid, doesn't mean userspace wants the bit to be 0.
->>>>
->>>> Note, KVM_TDX_CAPABILITIES.cpuid reports the configurable bits. The value 0 of a bit in KVM_TDX_CAPABILITIES.cpuid means the bit is not configurable, not means the bit is unsupported.
->>>
->>> For features configurable by CPUID like TSX and WAITPKG,
->>> a value of 0 does mean unsupported, because the value
->>> has to be 1 to enable the feature.
->>>
->>>   From the TDX Module Base spec:
->>>
->>>      11.18. Transactional Synchronization Extensions (TSX)
->>>      The host VMM can enable TSX for a TD by configuring the following CPUID bits as enabled in the TD_PARAMS input to
->>>      TDH.MNG.INIT:
->>>      - CPUID(7,0).EBX[4] (HLE)
->>>      - CPUID(7,0).EBX[11] (RTM)
->>>      etc
->>>
->>>      11.19.4. WAITPKG: TPAUSE, UMONITOR and UMWAIT Instructions
->>>      The host VMM may allow guest TDs to use the TPAUSE, UMONITOR and UMWAIT instructions, if the CPU supports them,
->>>      by configuring the virtual value of CPUID(7,0).ECX[5] (WAITPKG) to 1 using the CPUID configuration table which is part
->>>      the TD_PARAMS input to TDH.MNG.INIT. Enabling CPUID(7,0).ECX[5] also enables TD access to IA32_UMWAIT_CONTROL
->>>      (MSR 0xE1).
->>>      If not allowed, then TD execution of TPAUSE, UMONITOR or UMWAIT results in a #UD, and access to
->>>      IA32_UMWAIT_CONTROL results in a #GP(0).
->>>
->>>> For kvm_tdx_init_vm.cpuid,
->>>>    - if the corresponding bit is reported as 1 in KVM_TDX_CAPABILITIES.cpuid, then a value 0 in kvm_tdx_init_vm.cpuid means userspace wants to configure it as 0.
->>>>    - if the corresponding bit is reported as 0 in KVM_TDX_CAPABILITIES.cpuid, then userspace has to pass a value 0 in kvm_tdx_init_vm.cpuid. But it doesn't mean the value of the bit will be 0.
->>>>
->>>> e.g., X2APIC bit is 0 in KVM_TDX_CAPABILITIES.cpuid, and it's also 0 in kvm_tdx_init_vm.cpuid, but TD guest sees a value of 1. In the view of QEMU, it maintains the bit of X2APIC as 1, and QEMU filters X2APIC bit when calling KVM_TDX_INIT_VM because X2APIC is not configurable.
->>>>
->>>> So when it comes to TSX and WAITPKG, QEMU also needs an interface to be informed that they are unsupported. Without the interface of fixed0 bits reported by KVM, QEMU needs to hardcode itself like [1]. The problem of hardcode is that it will conflict when future KVM allows them to be configurable.
->>>
->>> So TSX and WAITPKG support should be based on KVM_TDX_CAPABILITIES.cpuid, and not hardcoded.
+
+
+
+On 12/9/2024 8:45 PM, Chao Gao wrote:
+>> +/*
+>> + * Split into chunks and check interrupt pending between chunks.  This allows
+>> + * for timely injection of interrupts to prevent issues with guest lockup
+>> + * detection.
+> Would it cause any problems if an (intra-host or inter-host) migration happens
+> between chunks?
+>
+> My understanding is that KVM would lose track of the progress if
+> map_gpa_next/end are not migrated. I'm not sure if KVM should expose the
+> state or prevent migration in the middle. Or, we can let the userspace VMM
+> cut the range into chunks, making it the userspace VMM's responsibility to
+> ensure necessary state is migrated.
+>
+> I am not asking to fix this issue right now. I just want to ensure this issue
+> can be solved in a clean way when we start to support migration.
+How about:
+Before exiting to userspace, KVM always sets the start GPA to r11 and set
+return code to TDVMCALL_STATUS_RETRY.
+- If userspace finishes the part, the complete_userspace_io() callback will
+   be called and the return code will be set to TDVMCALL_STATUS_SUCCESS.
+- If the live migration interrupts the MapGAP in the userspace, and
+   complete_userspace_io() is not called, when the vCPU resumes from migration,
+   TDX guest will see the return code is TDVMCALL_STATUS_RETRY with the failed
+   GPA, and it can retry the MapGAP with the failed GAP.
+
+
+>
+>> + */
+>> +#define TDX_MAP_GPA_MAX_LEN (2 * 1024 * 1024)
+>> +static void __tdx_map_gpa(struct vcpu_tdx * tdx);
+>> +
+>> +static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct vcpu_tdx * tdx = to_tdx(vcpu);
+>> +
+>> +	if(vcpu->run->hypercall.ret) {
+>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>> +		kvm_r11_write(vcpu, tdx->map_gpa_next);
+> s/kvm_r11_write/tdvmcall_set_return_val
+>
+> please fix other call sites in this patch.
+
+I didn't use tdvmcall_set_return_val() because it's used for TDVMCALL
+like MMIO, PIO, etc..., which has a return value.
+For MapGPA, it's part of error information returned to TDX guest.
+So, I used the raw register name version.
+
+Let's see if others also think tdvmcall_set_return_val() is more clear
+for this case.
+
+>
+>> +		return 1;
+>> +	}
+>> +
+>> +	tdx->map_gpa_next += TDX_MAP_GPA_MAX_LEN;
+>> +	if (tdx->map_gpa_next >= tdx->map_gpa_end) {
+>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_SUCCESS);
+>> +		return 1;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Stop processing the remaining part if there is pending interrupt.
+>> +	 * Skip checking pending virtual interrupt (reflected by
+>> +	 * TDX_VCPU_STATE_DETAILS_INTR_PENDING bit) to save a seamcall because
+>> +	 * if guest disabled interrupt, it's OK not returning back to guest
+>> +	 * due to non-NMI interrupt. Also it's rare to TDVMCALL_MAP_GPA
+>> +	 * immediately after STI or MOV/POP SS.
+>> +	 */
+>> +	if (pi_has_pending_interrupt(vcpu) ||
+>> +	    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) {
+>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_RETRY);
+>> +		kvm_r11_write(vcpu, tdx->map_gpa_next);
+>> +		return 1;
+>> +	}
+>> +
+>> +	__tdx_map_gpa(tdx);
+>> +	/* Forward request to userspace. */
+>> +	return 0;
+>> +}
+>> +
+>> +static void __tdx_map_gpa(struct vcpu_tdx * tdx)
+>> +{
+>> +	u64 gpa = tdx->map_gpa_next;
+>> +	u64 size = tdx->map_gpa_end - tdx->map_gpa_next;
+>> +
+>> +	if(size > TDX_MAP_GPA_MAX_LEN)
+>> +		size = TDX_MAP_GPA_MAX_LEN;
+>> +
+>> +	tdx->vcpu.run->exit_reason       = KVM_EXIT_HYPERCALL;
+>> +	tdx->vcpu.run->hypercall.nr      = KVM_HC_MAP_GPA_RANGE;
+>> +	tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
+>> +	tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
+>> +	tdx->vcpu.run->hypercall.args[2] = vt_is_tdx_private_gpa(tdx->vcpu.kvm, gpa) ?
+>> +					   KVM_MAP_GPA_RANGE_ENCRYPTED :
+>> +					   KVM_MAP_GPA_RANGE_DECRYPTED;
+>> +	tdx->vcpu.run->hypercall.flags   = KVM_EXIT_HYPERCALL_LONG_MODE;
+>> +
+>> +	tdx->vcpu.arch.complete_userspace_io = tdx_complete_vmcall_map_gpa;
+>> +}
+>> +
+>> +static int tdx_map_gpa(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct vcpu_tdx * tdx = to_tdx(vcpu);
+>> +	u64 gpa = tdvmcall_a0_read(vcpu);
+>> +	u64 size = tdvmcall_a1_read(vcpu);
+>> +	u64 ret;
+>> +
+>> +	/*
+>> +	 * Converting TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE requires
+>> +	 * userspace to enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
+>> +	 * bit set.  If not, the error code is not defined in GHCI for TDX, use
+>> +	 * TDVMCALL_STATUS_INVALID_OPERAND for this case.
+>> +	 */
+>> +	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
+>> +		ret = TDVMCALL_STATUS_INVALID_OPERAND;
+>> +		goto error;
+>> +	}
+>> +
+>> +	if (gpa + size <= gpa || !kvm_vcpu_is_legal_gpa(vcpu, gpa) ||
+>> +	    !kvm_vcpu_is_legal_gpa(vcpu, gpa + size -1) ||
+>> +	    (vt_is_tdx_private_gpa(vcpu->kvm, gpa) !=
+>> +	     vt_is_tdx_private_gpa(vcpu->kvm, gpa + size -1))) {
+>> +		ret = TDVMCALL_STATUS_INVALID_OPERAND;
+>> +		goto error;
+>> +	}
+>> +
+>> +	if (!PAGE_ALIGNED(gpa) || !PAGE_ALIGNED(size)) {
+>> +		ret = TDVMCALL_STATUS_ALIGN_ERROR;
+>> +		goto error;
+>> +	}
+>> +
+>> +	tdx->map_gpa_end = gpa + size;
+>> +	tdx->map_gpa_next = gpa;
+>> +
+>> +	__tdx_map_gpa(tdx);
+>> +	/* Forward request to userspace. */
+>> +	return 0;
+>> +
+>> +error:
+>> +	tdvmcall_set_return_code(vcpu, ret);
+>> +	kvm_r11_write(vcpu, gpa);
+>> +	return 1;
+>> +}
+>> +
+>> static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>> {
+>> 	if (tdvmcall_exit_type(vcpu))
+>> 		return tdx_emulate_vmcall(vcpu);
 >>
->> This requires Userspace to have the knowledge that "TSX and WAITPKG is supposed to be configurable and reported as 1 in KVM_TDX_CAPABILITIES.cpuid in normal case". And if userspace gets a value 0 of TSX and Waitpkg in KVM_TDX_CAPABILITIES.cpuid, it means either KVM doesn't support/allow it or the underlying TDX module doesn't.
+>> 	switch (tdvmcall_leaf(vcpu)) {
+>> +	case TDVMCALL_MAP_GPA:
+>> +		return tdx_map_gpa(vcpu);
+>> 	default:
+>> 		break;
+>> 	}
+>> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+>> index 1abc94b046a0..bfae70887695 100644
+>> --- a/arch/x86/kvm/vmx/tdx.h
+>> +++ b/arch/x86/kvm/vmx/tdx.h
+>> @@ -71,6 +71,9 @@ struct vcpu_tdx {
 >>
->> I think it's an implicit form of hardcode. From the perspective of userspace, I would like to avoid all the special handling.
-> 
-> It is consistent with what is done for TD attributes and XFAM.  Presumably feature names must be mapped to capability bits and configuration bits, and that information has to be represented somewhere.
-
-Attrbutes and XFAM are different to cpuid either in KVM_TDX_CAPABILITIES 
-or in struct kvm_tdx_init_vm.
-
-KVM_TDX_CAPABILITIES reports the *supported* bits for Attributes and 
-XFAM while it reports the configurable bits for CPUID.
-
-The bits passed in struct kvm_tdx_init_vm for Attributes and XFAM are a 
-whole of the final value that will be set for TD guest. While the bits 
-passed in struct kvm_tdx_init_vm for cpuid are only the value of 
-configurable bits, the final value that will be set for TD guest needs 
-to be OR'ed with fixed1 bits.
-
- From the perspective of userspace,the information in 
-KVM_TDX_CAPABILITIES.supported_attributes and 
-KVM_TDX_CAPABILITIES.supported_xfam are enough, bits reported as 0 in 
-them means they are not supported. While for cpuid, in general, the bits 
-reported as 0 in KVM_TDX_CAPABILITIES.cpuid doesn't mean they are not 
-supported.
-
-Anyway, my point is, in general, value 0 of a bit in 
-KVM_TDX_CAPABILITIES.cpuid doesn't mean the bit is not supported for TD 
-guest. It's better to have KVM expose an interface to report the 
-unsupported bits. Without it, userspace has to hardcode some information 
-and maintain it itself.
-
-QEMU already hardcodes the fixed0 and fixed1 bits itself[1] according to 
-a specific version of TDX spec, while the tweak to TSX and WAITPKG in 
-KVM will require more specific handling in QEMU. It's not the fault of 
-the change to TSX/WAITPKG in KVM_TDX_CAPABILITIES.cpuid. It somehow 
-reveals it's getting messier when KVM cannot report enough information 
-to userspace.
-
-[1] 
-https://lore.kernel.org/qemu-devel/20241105062408.3533704-49-xiaoyao.li@intel.com/
+>> 	enum tdx_prepare_switch_state prep_switch_state;
+>> 	u64 msr_host_kernel_gs_base;
+>> +
+>> +	u64 map_gpa_next;
+>> +	u64 map_gpa_end;
+>> };
 >>
->>>>
->>>> In the future, if we have interface from KVM to report the fixed0 and fixed1 bit (on top of the proposal [2]), userspace can drop the hardcoded one it maintains. At that time, KVM can ensure no conflict by removing the bits from fixed0/1 array when allowing them to be configurable.
->>>>
->>>> [1] https://lore.kernel.org/qemu-devel/20241105062408.3533704-49-xiaoyao.li@intel.com/
->>>> [2] https://lore.kernel.org/all/43b26df1-4c27-41ff-a482-e258f872cc31@intel.com/
->>>>
->>>>>>
->>>>>> [1] https://lore.kernel.org/all/ZuM12EFbOXmpHHVQ@google.com/
->>>>>>
->>>>>
->>>>
->>>
+>> void tdh_vp_rd_failed(struct vcpu_tdx *tdx, char *uclass, u32 field, u64 err);
+>> -- 
+>> 2.46.0
 >>
-> 
 
 
