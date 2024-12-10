@@ -1,71 +1,70 @@
-Return-Path: <kvm+bounces-33448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA88B9EBA91
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 21:04:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 184469EBAA5
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 21:10:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95CDC283E25
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 20:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8951664EA
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 20:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDD6226884;
-	Tue, 10 Dec 2024 20:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB35A226891;
+	Tue, 10 Dec 2024 20:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2tfofUbI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQB1ttjY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCAB8633A
-	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 20:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C293D153BF6
+	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 20:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733861042; cv=none; b=Q1O/Ng+/c2TmkWutIV+220Bu4FrhrgdDvuNW8Eb5b7IRrGilP6jwk+woCVFXblYLdGL/vzd+p+Vm58IwqUgGSzna7JDC8sxqz+urtbH7E1cxnwf/dGeXB9LwRMhI1UEckiY6MR5CQreOnI46LNmOxT59MjQaQ23SQIwRNDP2PcQ=
+	t=1733861417; cv=none; b=TRj+rP9ynlWxlx5WGBuTV31KLccXYhaQnrq+nK+MIfWo7iDw0zx70g3b8A+HfbHqRnabw4Wc7c7UESSBv4kvAsetfmyaGZj1F6byTe+9xgRfqMrkjS/7kbgTGnLwf3GZV528AJ1omOQdMJ75x653tpeFRUS2n0KbvZ1ekatxgQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733861042; c=relaxed/simple;
-	bh=HthPYyWXM7ns7qJH1oxyyCxcTrMM61ei5KKI8AyghW4=;
+	s=arc-20240116; t=1733861417; c=relaxed/simple;
+	bh=ArH+BDaYBBobT5PIUMi1jnRalONERI4QUQnKck5+RtY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RmAgBOqy9q12QAMPGmzqW01JG6ZlbcxUsbGT+BQXyFr2z9HHgqwkui3VR1eHSy1iscmw3WtUK33xgf8plj93pgC+2yD0C9oTTZ2TqtDWuJ39mBDIWyije4fYLP1i3+2RtsS0fyJ4JIPV3n1C7DhiOEsrsANsPThSm0pzbqrv42E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2tfofUbI; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=DxOBKVePyax/Q3NycE3OpzkRAPiOofcM0fgfiLEO/X9YVcnv5FdOdpFR1cyQ7638KTnhL5nWSc4geaxOWFaPTGPxNGlPkYNONH73yWogpBrTJlTmvA2JjIrv0nAV1oqS1c8vmH/2k4v+MmW2bRFnanqtA4BXKKQBjm4e4Mk1P/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eQB1ttjY; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso2776395a91.0
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 12:04:01 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee31227b58so5768408a91.3
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 12:10:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733861040; x=1734465840; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1733861415; x=1734466215; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b12YP6LI5CxDMhQYfb1Kc2Pt0Ydr8IAu1z7uO7m4AgE=;
-        b=2tfofUbIx0yQiykosn9k27ps5u2wGOTNVFC2rD6w9AsQsXbL3PpnLpY5k4/9LT6TRk
-         AaFqixDmbw0aio+yXopjOtQFSU7lClp1l1nBREW/jQayJqGmsyeRZoH8MIdPBh151RxP
-         ae2J5+yI+mx1HNCrEEFEmM7J+IZFE8lyhqiyYiNAVsxAflDA5+tOUHGIHGxJBWmL3BIP
-         jkpGNYTDsG21NO/NxNiwyX7LmBbqgghhaLNP8Mp0/URWW3uaSgKlo1A/Rsv+qng3sZYx
-         lh9ldC4Q2dCboBA5AjIRQ+CVBUI6ilaMC1uWGkzKMiYsX6ztXTRqYnwxB6KtBedmeR+R
-         POtg==
+        bh=4CcZIj8yhvlL/w3reHOFOEqXMEvWzMLZVJVn1HvOF+k=;
+        b=eQB1ttjYKU3siMs7d/Kpgye6RWCC4nZrJCfZy96c3Db/uFjwSkNEgi2D5HxTzI8zWq
+         iF+X6qhP1FRW6gz2bcvv7XSbhX+6aoiYUvGi3AJBA+ufxj3eNDFhdQ5N67l6Vrd50gqb
+         hfjgGURZkkTUhlqKdNLrXMlN0d4g0HPBH6GIkoDu9bKzFU/fV64SXuHpBm6objz7sq90
+         5/CRXtheDNG8xU5UAebhTBq0lO7uY5eh1VSaSfeyMQpvtQhqQeNEbD/jhiAgVbx1qY0m
+         bdcesJOd+rZVgvshPrewJ//L6XufL32ZRW9YygLWgfC71BgvSiTVWn+vWg8/XDRdEt1b
+         WSKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733861040; x=1734465840;
+        d=1e100.net; s=20230601; t=1733861415; x=1734466215;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b12YP6LI5CxDMhQYfb1Kc2Pt0Ydr8IAu1z7uO7m4AgE=;
-        b=cCLnw5dHfycPRXbc6uZ0Xr7YKRIhBI5PLXxRjuGbyA4IHUTRM4pLKaSv6y/AUrq7sG
-         sTR3Wtv7Uw2xsNqeWiJTxIjdi5LxPUiTmqY9LQsLOgXkNEOEs93zn6gWMxHsdLYYB/du
-         gxByymsoX2qfNKPs9Mn2kGo560s9JfbppfhIrVilhWkOuVUS1E11/VTxo13IExBQVYI0
-         DTQOVrZJWJgesLHcA8H0u6xIh9a261CH7/x5Wsq7/7tjNh9Dkk8UF8h147wzGG41P3GR
-         mTSyw18UI5gQsP77UYZWBcawqVXGPmfpiVxt496GIdUgpr4qFDHv5ENh9Vmb9CEKJ+wr
-         enZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXPAKkEBrxqGp5vZnli6KO6rLOvC5+v1I2uSUQRgIG/21iBAdf75TuaXBWmZw1cwsjUDdQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmJmShQi/h1fumAt2UHG3p86Q33kDQjlGATZMQ4N7n9YhGOTtN
-	XR8Viww47gMbN1mNbEbsbQ3Z9URzgBivCB1rMDHmfQkUm3hJcQKsgBIbvARl3MJBUot6DjkRY2q
-	KZA==
-X-Google-Smtp-Source: AGHT+IGKnq0xwIL8hClvKg5o4OLBAI7YS3m+WXsr/V1moELCfZa0g1+/9+ClUPgspDlb4HQmNU67QxV+TNc=
-X-Received: from pjk8.prod.google.com ([2002:a17:90b:5588:b0:2ef:89a5:7810])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c52:b0:2ea:4c4f:bd20
- with SMTP id 98e67ed59e1d1-2f12804deeemr332807a91.32.1733861040651; Tue, 10
- Dec 2024 12:04:00 -0800 (PST)
-Date: Tue, 10 Dec 2024 12:03:59 -0800
-In-Reply-To: <6423ec9d-46a2-43a3-ae9a-8e074337cd84@redhat.com>
+        bh=4CcZIj8yhvlL/w3reHOFOEqXMEvWzMLZVJVn1HvOF+k=;
+        b=cGUbDMCTIb4SUCoxwrtMUBKBIJnEyEP1yIk1mqbpy1SKVXw7k/MpjzvKiEXf7p3Adh
+         Oip4OIUxM4E9cDgMt1V+e/TcHcF4ozi0piVSZ+vpmEkxTVZ839Sw6lfoZ8YqpoNXIRjU
+         29FA4q+/QgFCn5WtIrntTE4Kl6UqRuTjuynB3uCM7CtnFopE9sQsNj4iJ7y25T91Pnz9
+         L319up1cuV+F8H7/YTM6iNpv8qydXoA3sgJusEPbSpDwF69MoVUSeo233RSh7SWrWYEw
+         nXqW5NqYEiIEx0O6y6iGO1mFY8Esv3IhqkSVmclHs3glT3sIj/MaZNFnxML4o+1dW6ln
+         k9nA==
+X-Gm-Message-State: AOJu0YwXgMaduD+JPZt9km31jO2ZGF3hC+OIG6G1avuIGSxf7Gm2JWRk
+	ap28DL5bhHamHXFV/2KDf3MKxBJAsZEvo1Xt4pYPI0zC8Kz/8vYiTDborXAYdrPPcrW3Pv7W6FJ
+	7GA==
+X-Google-Smtp-Source: AGHT+IGdwFwyc/i49yH9lxYKjEfEPyXHxb0toroZJAgwWjp3C6PzPZ+OK/X2WpQK5laCaKj9suPGSlqcsLI=
+X-Received: from pjbsj11.prod.google.com ([2002:a17:90b:2d8b:b0:2d8:8340:8e46])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a:b0:2ee:df57:b194
+ with SMTP id 98e67ed59e1d1-2f127fdbf48mr395474a91.21.1733861415188; Tue, 10
+ Dec 2024 12:10:15 -0800 (PST)
+Date: Tue, 10 Dec 2024 12:10:13 -0800
+In-Reply-To: <ff1d01ff-5aa3-4ef7-a523-6bf4d29be6b6@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,42 +72,43 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241128004344.4072099-1-seanjc@google.com> <20241128004344.4072099-7-seanjc@google.com>
- <90577aad-552a-4cf8-a4a3-a4efcf997455@intel.com> <6423ec9d-46a2-43a3-ae9a-8e074337cd84@redhat.com>
-Message-ID: <Z1ier7QAy9qj7x4V@google.com>
+ <ff1d01ff-5aa3-4ef7-a523-6bf4d29be6b6@redhat.com>
+Message-ID: <Z1igJYxwSxTk_DHF@google.com>
 Subject: Re: [PATCH v4 6/6] KVM: x86: Refactor __kvm_emulate_hypercall() into
  a macro
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Dec 10, 2024, Paolo Bonzini wrote:
-> On 11/28/24 09:38, Adrian Hunter wrote:
-> > 
-> > For TDX, there is an RFC relating to using descriptively
-> > named parameters instead of register names for tdh_vp_enter():
-> > 
-> > 	https://lore.kernel.org/all/fa817f29-e3ba-4c54-8600-e28cf6ab1953@intel.com/
-> > 
-> > Please do give some feedback on that approach.  Note we
-> > need both KVM and x86 maintainer approval for SEAMCALL
-> > wrappers like tdh_vp_enter().
-> > 
-> > As proposed, that ends up with putting the values back into
-> > vcpu->arch.regs[] for __kvm_emulate_hypercall() which is not
-> > pretty:
+> On 11/28/24 01:43, Sean Christopherson wrote:
+> > +#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, complete_hypercall)	\
+> > +({												\
+> > +	int __ret;										\
+> > +												\
+> > +	__ret = ____kvm_emulate_hypercall(_vcpu,						\
+> > +					  kvm_##nr##_read(_vcpu), kvm_##a0##_read(_vcpu),	\
+> > +					  kvm_##a1##_read(_vcpu), kvm_##a2##_read(_vcpu),	\
+> > +					  kvm_##a3##_read(_vcpu), op_64_bit, cpl,		\
+> > +					  complete_hypercall);					\
+> > +												\
+> > +	if (__ret > 0)										\
+> > +		complete_hypercall(_vcpu);							\
 > 
-> If needed we can revert this patch, it's not a big problem.
+> So based on the review of the previous patch this should become
+> 
+> 	__ret = complete_hypercall(_vcpu);
+> 
+> Applied with this change to kvm-coco-queue, thanks.
 
-I don't care terribly about the SEAMCALL interfaces.  I have opinions on what
-would I think would be ideal, but I can live with whatever.
+I was planning on applying this for 6.14.  Should I still do that, or do you want
+to take the bulk of the series through kvm/next, or maybe let it set in
+kvm-coco-queue?  I can't think of any potential conflicts off the top of my head,
+and the refactoring is really only useful for TDX.
 
-What I do deeply care about though is consistency within KVM, across vendors and
-VM flavors.  And that means that guest registers absolutely need to be captured in
-vcpu->arch.regs[].  TDX already requires too much special cased code in KVM, there
-is zero reason to make TDX even more different and thus more difficult to maintain.
+Patch 1 should go in sooner than later though.
 
