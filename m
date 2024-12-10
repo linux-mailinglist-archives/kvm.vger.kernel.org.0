@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-33362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A7E9EA3DB
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 01:51:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 670369EA3DE
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 01:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B20EF188A1DD
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 00:51:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A54E188A2C2
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 00:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B34D1F63ED;
-	Tue, 10 Dec 2024 00:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65BC224884;
+	Tue, 10 Dec 2024 00:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KzfkqQvi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HCkScfyz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEC61D968E;
-	Tue, 10 Dec 2024 00:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CDF21E0AC;
+	Tue, 10 Dec 2024 00:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733791718; cv=none; b=Km975na3hUvgg8j26UU0RGYYVVjq2L+FlZMQTHLcM/P6uglJXklsFOZc6n3ss1NO8WqYdZZg0Gz+ow0SIGd8+iTxLILU94J74q53cp3nOLEg1PfUAqFRKiB+DslxmDi80zjYkEC7o2GDCbVwpftn4ncYs2Gebe0LKxYpz3CM3D8=
+	t=1733791721; cv=none; b=BIyfbIc0n4kMcgP1vaIjlQD4SExf/H63y0Vxiz5PPGI/pslcphGXIPfTTNylCutJuX2WjKhE+tGn1ZPOq3j240rNSxdUh8ejIUW62qNAaXsL6OdI42/tPcQS+NSzW4GOQg4MrSaYZsTt/xP9MbVJEkSZfrBHwZrlJbuNHL7pxAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733791718; c=relaxed/simple;
-	bh=abkJj1S2ONcjiOqFLrz1o9/veYrxrEpPuYVVFZmUZMA=;
+	s=arc-20240116; t=1733791721; c=relaxed/simple;
+	bh=fzLIhQN5WxLViXl8Ip86IRGpAtvCs3G+P+plG8lekls=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=It7Wv9qxdv031s6pTvV5h39Tx/ABMQQk5pxPOI2MWi55ILwMy7ucsmIBSjaOL43+/uhil+cZHOkMYNvqcHyizBtugwM8NU7qLDfORmIYu4cEoNYzt0tW/33+8i51xncMAJBWlEqiTML3jCPT/cjcvS5xYTCuO+3UpFAQabeq0VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KzfkqQvi; arc=none smtp.client-ip=192.198.163.9
+	 MIME-Version; b=s92zZM3jPQRbKjNXjE5DjV36lNa0JkFzcPMih6zy6ZqCwaj0EkXSd/b/k2pkZKssV83JLC+ikuVf08dojbXcHG9BGd4uMZp2rUFxjWFfDlthBHBfecbU6MKLALbcsOoWQ25B22qOSjyGK/RR6uxTPD/2LoI+T9Z9d9Y/78/DrIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HCkScfyz; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733791716; x=1765327716;
+  t=1733791720; x=1765327720;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=abkJj1S2ONcjiOqFLrz1o9/veYrxrEpPuYVVFZmUZMA=;
-  b=KzfkqQviz2CMx92tHJBCpq9JSJVRyAFiNDLZoNQUjNmQzRTeaIe1YS2r
-   cxCArLUgiOr4iRyP83aA7cp6A7RQTCt0/YvuZqcxMl75gcKByrsTPylAX
-   nbk3B1n0fC2PKMQVdMzdu5RfwWNT2iOH7CH9QYKeZN2UmZXuOONpzmNZK
-   J+eLYltGcVVfjwRnZK/RKEsSuzWBSpvizX9XU8QClsg5XjJEVCzovgU6c
-   ENYoihyqqqK+HYu3r6IV4gW0HfJBIZvezLcBSp6ECsz/SfQcyJWfzprrx
-   arU8Arfs/rZFpuXPVQBzrWbr2VneQ4aGr9HpO2n1aqtNyi83SD9zY1mc3
-   g==;
-X-CSE-ConnectionGUID: htfJSwhCTzm3blk9cfnxfA==
-X-CSE-MsgGUID: 1IZK7dRjRra00IFlb/BMEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44793762"
+  bh=fzLIhQN5WxLViXl8Ip86IRGpAtvCs3G+P+plG8lekls=;
+  b=HCkScfyzHtDWduSTLsHHsfUbCcgwMjz/QngC5pA1s2Xepq7UI+qRrqZ1
+   VummAl2Ykx2VNWJZBfI56eZYSfzZc45c4SaNCPrRdQJ35DvQvBZ1I2bvh
+   1pT/1STrIa2nm6M1P/kHSuHqet63AB5+jNJIJJ4yYonweeA/RCdllwrtF
+   OIC/stzgl4i+DR7zjq18iPfgBWk+0DHtrtVeTXd0BxMdvLrqVlSAFG71B
+   djYi4KB1Sed3YYlIyXw3ybwBeecIzgOdS1GKEnKCyY2elfQoKfiQ9LZAh
+   0fevKbfMHbbdroRzz3x2DKiY4Q/VbZA9qu6fMupVA/1nfdPYpPGmhOjDv
+   A==;
+X-CSE-ConnectionGUID: ffOn9efhQFCmultu3A8NAg==
+X-CSE-MsgGUID: vFMVC6/tTGGmzuTZsQohIg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44793770"
 X-IronPort-AV: E=Sophos;i="6.12,220,1728975600"; 
-   d="scan'208";a="44793762"
+   d="scan'208";a="44793770"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:36 -0800
-X-CSE-ConnectionGUID: IIyDdVHQQti7O3djBBLcAw==
-X-CSE-MsgGUID: ddFBGUKPRlWC+nXAWLG4uQ==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:40 -0800
+X-CSE-ConnectionGUID: rSh7Pie4TZ2CEc3uiWlqiw==
+X-CSE-MsgGUID: P57dJcm6R3uQBhx75zhw5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,220,1728975600"; 
-   d="scan'208";a="96033077"
+   d="scan'208";a="96033083"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:32 -0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 16:48:36 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH 13/18] KVM: TDX: Add methods to ignore VMX preemption timer
-Date: Tue, 10 Dec 2024 08:49:39 +0800
-Message-ID: <20241210004946.3718496-14-binbin.wu@linux.intel.com>
+Subject: [PATCH 14/18] KVM: TDX: Add methods to ignore accesses to TSC
+Date: Tue, 10 Dec 2024 08:49:40 +0800
+Message-ID: <20241210004946.3718496-15-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241210004946.3718496-1-binbin.wu@linux.intel.com>
 References: <20241210004946.3718496-1-binbin.wu@linux.intel.com>
@@ -89,61 +89,80 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX doesn't support VMX preemption timer.  Implement access methods for VMM
-to ignore VMX preemption timer.
+TDX protects TDX guest TSC state from VMM.  Implement access methods to
+ignore guest TSC.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX "the rest" breakout:
-- Dropped KVM_BUG_ON() in vt_cancel_hv_timer(). (Rick)
+- Dropped KVM_BUG_ON() in vt_get_l2_tsc_offset(). (Rick)
 ---
- arch/x86/kvm/vmx/main.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/main.c | 44 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index c97d0540a385..4a9b176b8a36 100644
+index 4a9b176b8a36..81ca5acb9964 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -757,6 +757,27 @@ static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
+@@ -757,6 +757,42 @@ static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
  	return vmx_set_identity_map_addr(kvm, ident_addr);
  }
  
-+#ifdef CONFIG_X86_64
-+static int vt_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
-+			      bool *expired)
++static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
 +{
-+	/* VMX-preemption timer isn't available for TDX. */
++	/* TDX doesn't support L2 guest at the moment. */
 +	if (is_td_vcpu(vcpu))
-+		return -EINVAL;
++		return 0;
 +
-+	return vmx_set_hv_timer(vcpu, guest_deadline_tsc, expired);
++	return vmx_get_l2_tsc_offset(vcpu);
 +}
 +
-+static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
++static u64 vt_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
 +{
-+	/* VMX-preemption timer can't be set.  See vt_set_hv_timer(). */
++	/* TDX doesn't support L2 guest at the moment. */
++	if (is_td_vcpu(vcpu))
++		return 0;
++
++	return vmx_get_l2_tsc_multiplier(vcpu);
++}
++
++static void vt_write_tsc_offset(struct kvm_vcpu *vcpu)
++{
++	/* In TDX, tsc offset can't be changed. */
 +	if (is_td_vcpu(vcpu))
 +		return;
 +
-+	vmx_cancel_hv_timer(vcpu);
++	vmx_write_tsc_offset(vcpu);
 +}
-+#endif
 +
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	if (!is_td(kvm))
-@@ -912,8 +933,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.pi_start_assignment = vmx_pi_start_assignment,
- 
++static void vt_write_tsc_multiplier(struct kvm_vcpu *vcpu)
++{
++	/* In TDX, tsc multiplier can't be changed. */
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_write_tsc_multiplier(vcpu);
++}
++
  #ifdef CONFIG_X86_64
--	.set_hv_timer = vmx_set_hv_timer,
--	.cancel_hv_timer = vmx_cancel_hv_timer,
-+	.set_hv_timer = vt_set_hv_timer,
-+	.cancel_hv_timer = vt_cancel_hv_timer,
- #endif
+ static int vt_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+ 			      bool *expired)
+@@ -914,10 +950,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
  
- 	.setup_mce = vmx_setup_mce,
+ 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+ 
+-	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
+-	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
+-	.write_tsc_offset = vmx_write_tsc_offset,
+-	.write_tsc_multiplier = vmx_write_tsc_multiplier,
++	.get_l2_tsc_offset = vt_get_l2_tsc_offset,
++	.get_l2_tsc_multiplier = vt_get_l2_tsc_multiplier,
++	.write_tsc_offset = vt_write_tsc_offset,
++	.write_tsc_multiplier = vt_write_tsc_multiplier,
+ 
+ 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 
 -- 
 2.46.0
 
