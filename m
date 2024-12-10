@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-33385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84FD89EA8B1
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 07:21:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46979EA8B6
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 07:22:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45549285726
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 06:21:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A1EC16A34F
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 06:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83BB22CBD2;
-	Tue, 10 Dec 2024 06:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9420122B8D7;
+	Tue, 10 Dec 2024 06:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NjPb8dKq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MH5izCcI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DA6226182;
-	Tue, 10 Dec 2024 06:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B44235967;
+	Tue, 10 Dec 2024 06:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733811668; cv=none; b=HtXVxSSN53czQOiD+eLsj9t8Rk67F7K4f8srz34Cnxxfu+usVXc4hqCLIhUDgY7OCDv+sux82240HVZ5wecy0CVPkFa1eWhtmU1o9cHqSgSaR0HrFLOARvEyP9bQO0Mv/bd5YutCLxyfPXK/hxuPG7FfVD27K5xHGAzrZu9cvao=
+	t=1733811750; cv=none; b=Sw6nhsqVKsPPQLCHmhSpKQFmHiMcZAApHcZ67ZCYUDTCdvZL5T+rjhCnpdcE9XO7Fw9kl5V3phcBCGoDw6NNryGA+fzXExkkLeF3T1lxa1RRnKinHDpjzb9N3h5/7SqSjQGceNHu8ihLopa+vE2NhssQ4k3RQJJ/tWhG69ssFRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733811668; c=relaxed/simple;
-	bh=gvyYavweTul/uYFkIKPLsimVQMnn3wsNlvpu7zAc+X8=;
+	s=arc-20240116; t=1733811750; c=relaxed/simple;
+	bh=C52ca7ldp7tKS2PLEUoErlOoMTwEGvbNIjRSGFP6HHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q4QjnbvTwtZq13UuqrNeIdGw9djqEy5YDsJLYLE6hLjmVl85Hrvj81SaOU4M/FiegzhBjO4QvZZTP/t7KSKQnU15nfOzkim1/NWpLMevZ4n7QFjeI96zS5Uj1Vp+Hj6bf5lrqSIZMx1bRjujfq+TYcXmNRNpHj6yg+0T7E9CLuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NjPb8dKq; arc=none smtp.client-ip=192.198.163.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQWR8reMM7iRUhDc+1oSs9llYcrN9OIrJSgiah1WLXThNn/Pb1BZdjzQfluMRY/dPBc6nmRAbyEzNhBjnKRtdqcO9BI1ioRUemT00opsuhv6yDRao+c0iFP6Wx41b5ico3jMe574k+F6fJjopX6YORGcFdjMylnbuDUgnup0ubE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MH5izCcI; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733811662; x=1765347662;
+  t=1733811749; x=1765347749;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=gvyYavweTul/uYFkIKPLsimVQMnn3wsNlvpu7zAc+X8=;
-  b=NjPb8dKqqtjgTUZO2q5EgTbdSjrYdHyvxtiIL+9sAv9F9OQd4nNqhp9J
-   qpl5ObUI12/sJn0PoafU/ZRqojN8lb9ODILUXDGZSbCzK6UZTGlT5b0Te
-   6vjOS6325Yhrz8xhJOMNSUTE8S0NLqvADLFA5zONJ+j7hWRGUOrGfgZr5
-   JW6zBld6W0L5h9u62VddMsuHKxiCCj4JQsj8ulBE6okxyZaVxKEQpJEcM
-   ra6n/r2E27PJKTkCtdVCNVvC+k3lKPid/LZmI+tkBnJbW3dmbp6MVm5tf
-   wbaVcVFCovWjBvxEQLdzb8adNj7hwl9lFe9DQi2s7iuv5tz3diZ40K/rk
-   A==;
-X-CSE-ConnectionGUID: FUephcQGTn6lxRk9NhLgTw==
-X-CSE-MsgGUID: tVqsU+omTR6DAPDEy/uoXg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="38069483"
+  bh=C52ca7ldp7tKS2PLEUoErlOoMTwEGvbNIjRSGFP6HHs=;
+  b=MH5izCcIEZM9KIFLpcPeF91P6BXMYK5M1ePjGHntsSBg79i7+yHK3wVF
+   Xd8D7oTf33XlR7obUCCkolxJ5huD4T305ZD/RwVzqj8UBG/yGpwaTk/+f
+   E20sAGDs3WwOhuJTY7yTtYQJmtU8bZKA7bW/iXaffRwVOyaXuORilWON4
+   nVsaUaSJXKRPnjh6mzLc5cgrYP1Y5g2hLENo1fGmiR/+im1sDTlw1Gq3Q
+   gIkzo3UOepdItX0t/jwooDAxUupNVT1gg6L8Sae+FbaHA8awA4MF8KQy/
+   j6Aa2vuPDRjsY6sQT9fDX87y076DN7TvgYeicSgHq32JW6fTKjehyJ5nv
+   Q==;
+X-CSE-ConnectionGUID: Zj7SKRhKQO6VDPmgChJxlg==
+X-CSE-MsgGUID: DCfkcEO+Sr6EANO//Z5bOw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44814992"
 X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="38069483"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:21:01 -0800
-X-CSE-ConnectionGUID: M6XQJAbXSGat2VMh9TrghA==
-X-CSE-MsgGUID: t+rNslufT9W+fe/21hLc7A==
+   d="scan'208";a="44814992"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:22:28 -0800
+X-CSE-ConnectionGUID: 3D73PjioRbm/NcXI/A9FOA==
+X-CSE-MsgGUID: N3i8LgfyTT6Y1ESBEScmKQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="95008679"
+   d="scan'208";a="95145761"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:20:56 -0800
-Date: Tue, 10 Dec 2024 07:17:55 +0100
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:22:24 -0800
+Date: Tue, 10 Dec 2024 07:19:23 +0100
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
@@ -73,12 +73,13 @@ Cc: kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	Shradha Gupta <shradhagupta@linux.microsoft.com>,
 	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>, Long Li <longli@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>
-Subject: Re: [PATCH v2 1/2] net: mana: Fix memory leak in mana_gd_setup_irqs
-Message-ID: <Z1fdE6ftFMtVFeW5@mev-dev.igk.intel.com>
+	Yury Norov <yury.norov@gmail.com>,
+	Michael Kelley <mhklinux@outlook.com>
+Subject: Re: [PATCH v2 2/2] net: mana: Fix irq_contexts memory leak in
+ mana_gd_setup_irqs
+Message-ID: <Z1fda7FRu+vmkt0S@mev-dev.igk.intel.com>
 References: <20241209175751.287738-1-mlevitsk@redhat.com>
- <20241209175751.287738-2-mlevitsk@redhat.com>
- <Z1fcIa7n+hI+v2Nq@mev-dev.igk.intel.com>
+ <20241209175751.287738-3-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,44 +88,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z1fcIa7n+hI+v2Nq@mev-dev.igk.intel.com>
+In-Reply-To: <20241209175751.287738-3-mlevitsk@redhat.com>
 
-On Tue, Dec 10, 2024 at 07:13:53AM +0100, Michal Swiatkowski wrote:
-> On Mon, Dec 09, 2024 at 12:57:50PM -0500, Maxim Levitsky wrote:
-> > Commit 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-> > added memory allocation in mana_gd_setup_irqs of 'irqs' but the code
-> > doesn't free this temporary array in the success path.
-> > 
-> > This was caught by kmemleak.
-> > 
-> > Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index e97af7ac2bb2..aba188f9f10f 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -1375,6 +1375,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> >  	gc->max_num_msix = nvec;
-> >  	gc->num_msix_usable = nvec;
-> >  	cpus_read_unlock();
-> > +	kfree(irqs);
+On Mon, Dec 09, 2024 at 12:57:51PM -0500, Maxim Levitsky wrote:
+> gc->irq_contexts is not freeded if one of the later operations
+> fail.
 > 
-> Ther is still memleak in case of jumping to free_irq_vector when
-> gc->irq_contexts allocation is failing.
+> Suggested-by: Michael Kelley <mhklinux@outlook.com>
+> Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/gdma_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-
-Ignore that, just took a look at second patch.
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index aba188f9f10f..6297c0869cd6 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -1318,7 +1318,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+>  				   GFP_KERNEL);
+>  	if (!gc->irq_contexts) {
+>  		err = -ENOMEM;
+> -		goto free_irq_vector;
+> +		goto free_irq_array;
+>  	}
+>  
+>  	for (i = 0; i < nvec; i++) {
+> @@ -1388,8 +1388,9 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+>  	}
+>  
+>  	kfree(gc->irq_contexts);
+> -	kfree(irqs);
+>  	gc->irq_contexts = NULL;
+> +free_irq_array:
+> +	kfree(irqs);
+>  free_irq_vector:
+>  	cpus_read_unlock();
+>  	pci_free_irq_vectors(pdev);
 
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> Thanks
-> >  	return 0;
-> >  
-> >  free_irq:
-> > -- 
-> > 2.26.3
+> -- 
+> 2.26.3
 
