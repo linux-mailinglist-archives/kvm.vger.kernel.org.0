@@ -1,83 +1,83 @@
-Return-Path: <kvm+bounces-33445-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A8C59EB946
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 19:24:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAFC9EB948
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 19:25:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 850421889E9F
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 18:24:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 105A5165AE9
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 18:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9EF0214202;
-	Tue, 10 Dec 2024 18:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE9D214200;
+	Tue, 10 Dec 2024 18:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQD1UpUL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FYGV5PKr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D75486357
-	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 18:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EE81850AF
+	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 18:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733855073; cv=none; b=ifsrEOwoIsfMyoG52JYkckIfnMhm6isf8WP4RkUFQd+9lPR5E+bFeDFmi2L/uOvTDsC9aRy2VzO05S8wqdgoiLarNH5Q7kDli4sPcjPs+Bwb9GSCFyOlhhfuY7fwKJvPoxxlTJ1nIUgEFlRmsDFAF22NDpuEDk2S/do+gl6uVBM=
+	t=1733855101; cv=none; b=Bdr572NZ8Cij5tEenLbf8s/Abhn8BMW7TJV4qDtIfGZTvMuG8miWkme7AJtP50ia1XANxiJtRfkKF/2WyiBvg3BhuYFX0z5LGPfFVhxNbOTd8yY4Ip7OE6Ka35Y3WEKhaDrl5TTybwU+DV0hLMXM62e6tpSivXXt+kA7VX+FYTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733855073; c=relaxed/simple;
+	s=arc-20240116; t=1733855101; c=relaxed/simple;
 	bh=7nhMPj/ozuoD9sVD9Ow1ZB9+eVVLEWg/CeyeINkPCXM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XLmIFytev/RL9AiRF6zQ52rjb+1BJBn68+wWythPkk+sLBYLd06JrZkvWVylyxUVQUY2sbvusDBqrRiqs2bxmthw59gAK9O4M6ACYrE+tr9eG1q0A5O9uACKrga2jK5yLviIdizbQYfP7wFGhNckEuLMWx5Q6BRLDkH+7l9wfRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQD1UpUL; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=aBerINq1PJvU+jG0F3iN8sDK4TiAEtbo/goEj+IXuNyuDmrGbSJM30ns4yQ1KzFU3953WS0mTLhYu07456zo/dUqoPceUy9UyujpEQdj6QLxfe7NyiI9YTQ5Zsp90jXSjkK2dgoJGPoSUI0r8DaZOjQDt3oZN674blkErrJjjpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FYGV5PKr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733855070;
+	s=mimecast20190719; t=1733855098;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
 	bh=7nhMPj/ozuoD9sVD9Ow1ZB9+eVVLEWg/CeyeINkPCXM=;
-	b=hQD1UpULTwfDyvi7xGmhSj8Wh2IM5Sm28LlxJncFNLWjX5Q97CIQ07SL05XY+mUUqWdbAf
-	s9hZsxj5XYZohR58cUno9zTdW1lSIZ4wP9QCGyacEERTS1HywLpPtI5bIkMIk/CglHOx4c
-	Rf1WM0PTS0JQFxbBx3tzfuk0UT21dX0=
+	b=FYGV5PKrpzLzC+7d9HGcuYbihD1d1vXh8WHTkCvA/Vm9TaxpB+koLL5xv49QDOkaxnO1vZ
+	rimf/NXP4DydL3LUHWUFFtYS7s/xFHUngoHSMwPPkerOeqqdYYoKnSCtmV5qVMNlFpRNnH
+	roXTlr6SR8c0FsA6WiXpG5GA9J4WY9A=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-52-aXBhC0dmPROaPbOTLTGUUA-1; Tue, 10 Dec 2024 13:24:29 -0500
-X-MC-Unique: aXBhC0dmPROaPbOTLTGUUA-1
-X-Mimecast-MFC-AGG-ID: aXBhC0dmPROaPbOTLTGUUA
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-434f7516bf2so12407455e9.1
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 10:24:29 -0800 (PST)
+ us-mta-427-yLO54oTzOWqhLWFdDyoaNw-1; Tue, 10 Dec 2024 13:24:57 -0500
+X-MC-Unique: yLO54oTzOWqhLWFdDyoaNw-1
+X-Mimecast-MFC-AGG-ID: yLO54oTzOWqhLWFdDyoaNw
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361ac607b6so3405105e9.0
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 10:24:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733855068; x=1734459868;
+        d=1e100.net; s=20230601; t=1733855096; x=1734459896;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
         bh=7nhMPj/ozuoD9sVD9Ow1ZB9+eVVLEWg/CeyeINkPCXM=;
-        b=LO1VUlaVeYwoBPZUm9emnFC/XIaCqWSJ+4eZnwT50YV4YgwIGStTYUXdB2WSTW5Uys
-         +7Z93K8NlyMMg8+SAfjlCQPqTeSjYJIjaKfCaTQ/VBZzdSY61LTmc6ves6R4GmTjzco/
-         vr5N3gR6uk0yY0fISAwFs0Ibkfhl+jVWKVVdjJlsptT7NKSW33B6ZKy/L7BKWZ62Qfod
-         PrOGnfHHf+IDgal+j5LY28Dh9wia0fx3hg5Rdb6dQ/DCalBVkrIvq7qsr+bKEOozX/fp
-         gmNHqJsDgzMkgJrCddI26dDvr5wzpdenOcLDmvTnd0XnVbKPiE7ohfAvmQnBq6Zme6oq
-         6ztQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVduaPDu+82aSjJ301XzZPrgxtg/DuZAEId81q9je2RHIyj7xfHNL/TsBFC3iUdtzjD2OA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2ylbiOtUVOeubWOTk/OMLAGVv+ZhNe5RjN22/GCg28FnQ2YKa
-	kcrbSlgRQQzI1zhQqIKSYP8raWuPC4zQ0gHJ6b9MIsHdML3OwafIAtZCeUxRtC9C0dqSEhNqO9S
-	hP/lGA+e0ncZHCVzuBL9mX+WDnGuxhfVTplxtbUdWvbPNbWpibw==
-X-Gm-Gg: ASbGncsw/+8gKhNQiN7faTyn6PcxRe2WYaNaExwTTCcsNmah22XrgLFIAtGFLjMrI5Q
-	YeKck/mMGpzImWY3Qy8DJdGcWz2KTPo0xd+DvWSMs0BZhrl++nzxcwI6NNV7kbsy3Hdst7uX18Z
-	yc0z5j6GBNOKAP8SjL/kXgtX4/40+nXPHdGyMu9Ym+PsbEtcc4mEVn4eYLGSGZhQ0tzka1cjaBF
-	E7fPgEV3YZZFQm29AgqStV5t2EzPX8rROE231F6g/4+PUfeCnBElYPf
-X-Received: by 2002:a05:6000:4022:b0:386:3672:73e4 with SMTP id ffacd0b85a97d-386469e981amr3473958f8f.26.1733855068208;
-        Tue, 10 Dec 2024 10:24:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGHx26Gp55ua37c5IiyimVcDcoJIraGmY0UGD9XeA5hsX3pXEMqbHtCokBGh2VOcCbGG9W5FA==
-X-Received: by 2002:a05:6000:4022:b0:386:3672:73e4 with SMTP id ffacd0b85a97d-386469e981amr3473943f8f.26.1733855067885;
-        Tue, 10 Dec 2024 10:24:27 -0800 (PST)
+        b=lBImHzUEEjM97quNqu/qdaYZatphxX6LlC5kLc8p4K8jOETVVeMPz3YEbuAZG6htE/
+         QbcTKPTAbzZXYf0fZwSu3EiMOdOxbLUfryyxl9XoZLyxzPfv7s+sAgOX8fsSR+DZEmD1
+         TtbQhM8JIHhXM1tHYNbMxtmFoZr9DoX4x5aWE0aPkTcUOJqjI2WW/ekj+2sLMEM9AgD+
+         bodNjAZPcW808+tFtzwKC65XhcjMIhRDpqM49PBlPoKTsWsApabkbZXoOo4IH9jvnEQV
+         d/v8klwAVufWQQBeLVZAkDJBXTM99UuIndaIJ8ZAO44fKeyKW3C6kPbwLvcIiY8U+m0Z
+         a8tA==
+X-Forwarded-Encrypted: i=1; AJvYcCVThm5hFqn0HmBlW6jtnUhGW1jedy1EYWkCvf1bfJMrL0janunRUpAhEEciWDgppa3Z3Rg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvvP+ysDhhtBThoMY5+Yc5x7BUY6/+IvoP6iQKj2Frf8Cr1qu+
+	udzssDysxKJU4p68VXWsWN9T1A23PVIWJZ0fansYzPNu2mEYvUQFU/yV2M9ddhTvEiJTFeoMGwI
+	/qIrO+wEwD7NFUlAJcQfglEiwZpiHjBbJ//VM01IK0OoQvujSUA==
+X-Gm-Gg: ASbGncuR11uCEJYeE5i85BOEdM3z4IMh8L2t8aI+EsDZw/gYlh6oKpOiggnSnwH3+dQ
+	wEzynAfCLDKPQAew1k4e/SwVID6eP1evRlvs4yFGNLDD2ChrXxaHPWZevVa4YJ/IyKEXu79/qZ5
+	RuxvqSItmW7MaDIcSJiPzNWy1CPU9keOURzVCE09aENFW9IwtVp5pkRB8iEUAGnZlO5jpJtdY7p
+	0r65NfO0EmEWnyXGcfxFOKIU0cLP+8U2W3EJdVPrHTPfHWJi+Nyv3TK
+X-Received: by 2002:a05:600c:3783:b0:434:f5c0:3288 with SMTP id 5b1f17b1804b1-434f5c03c29mr77923015e9.29.1733855096291;
+        Tue, 10 Dec 2024 10:24:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFGVB33V1sDjcLSxrWLFP1027Q9gKEuHcM2hmoJzAjxmJxwLeK8T8rsrCUfxuLrKG9f6RpLcg==
+X-Received: by 2002:a05:600c:3783:b0:434:f5c0:3288 with SMTP id 5b1f17b1804b1-434f5c03c29mr77922805e9.29.1733855095971;
+        Tue, 10 Dec 2024 10:24:55 -0800 (PST)
 Received: from [192.168.10.3] ([151.81.118.45])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d526ac03sm241795075e9.4.2024.12.10.10.24.26
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da11935asm200814405e9.37.2024.12.10.10.24.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 10:24:27 -0800 (PST)
+        Tue, 10 Dec 2024 10:24:55 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: Binbin Wu <binbin.wu@linux.intel.com>
 Cc: pbonzini@redhat.com,
@@ -92,13 +92,12 @@ Cc: pbonzini@redhat.com,
 	isaku.yamahata@intel.com,
 	yan.y.zhao@intel.com,
 	chao.gao@intel.com,
-	michael.roth@amd.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] KVM: TDX: TDX hypercalls may exit to userspace
-Date: Tue, 10 Dec 2024 19:24:19 +0100
-Message-ID: <20241210182418.251991-2-pbonzini@redhat.com>
+Subject: Re: [PATCH 00/16]  KVM: TDX: TDX interrupts
+Date: Tue, 10 Dec 2024 19:24:47 +0100
+Message-ID: <20241210182446.252044-2-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+In-Reply-To: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
 References: 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
