@@ -1,119 +1,152 @@
-Return-Path: <kvm+bounces-33428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8330B9EB529
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 16:37:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CC29EB557
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 16:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7348C188889E
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 15:37:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 649EB1886D44
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 15:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8301F1BBBD0;
-	Tue, 10 Dec 2024 15:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282A622FE04;
+	Tue, 10 Dec 2024 15:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bKt0MkRw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ks7eCByW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51921B0433;
-	Tue, 10 Dec 2024 15:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA63B19D060
+	for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 15:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733845052; cv=none; b=GtZ/8ESR8KNHOcmjnFD4wfPW+7111Yr+UqxebyA77CLyqsWSKFkCPjC7DuULNT+4doh3cUEw9fSpZAHpgZ749hq7zW1dN+sPReVC11JCt/eMj1wPGLtBH0XbZ6QNhn7fov1cVSOkpq4/Sxn4IGgIuJ5VopmEzP1pEWyLsMCgc24=
+	t=1733845647; cv=none; b=OyWvHisAbFeb5qqcM88yMBY+IfLvIGL48mcAzoYFnokCczZkLwb6r/9yT0KgQ/b+yFayq0mKo5fnzOawfasnY6V9rpNIxCqxg1nBdGMuQRA44GB/x49SmYBHIeYBCqQoHwCaoI2R93tEcgo65ZeDt/vs+I6xe6/lvW5sXwyWaFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733845052; c=relaxed/simple;
-	bh=5UBLnPT6HIvLsS5QH4WOu5G99eHjGBdiyV0YRvJPJ+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fQRVC/vzQ0SU46dUaYDKpXoHTNaJbBCsrscudlVkKXFtq02xVvoAEehOZANA6YKau/YtOMzkJlDNkoDIsUzuYMqrM0JDzIALaMr2e6FRH6/Q8cftx7aoZ5OyVJAI+Y6T9hs+7ffgY7cXftPE9iq+rhtiKS5PrnmcCFn4Ad/WRcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bKt0MkRw; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AFDDB40E0286;
-	Tue, 10 Dec 2024 15:37:28 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PWcxWWL22RTk; Tue, 10 Dec 2024 15:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1733845044; bh=VPjdw+Eb354bv9tVRWybjMpXb9OUxx59dMw+TfX0QJk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bKt0MkRwHOmpStr8nzizXL09CNjus+A2ice6mREZYCgGOksuD9Ix+ByXrhRlSdpYb
-	 z4k7yKLvYV2/pxhfAncP/nGXCI2fdR46a1cOGE2Ai/NZy0oizB8SKJD67WYDyULETe
-	 I8o7YegEhoiwSTYOsz0oAJ4v4hRDuAEEC8FCqpxwcanuNEndQEDDYEPfrnnDS6nWPF
-	 gHn7aaYu5c/v0iRfwctzITY2eHgxHhJY1ww6ZYWLsRnPSW4qSaDvUCcn7zX+K73ThA
-	 5EHGrim/JH8u/8tCI09DN8Cm9ENIEA0G9Clch9OoOM/BMD6q3i1HXoMQsPI3zsEIsM
-	 sE4zSttx/vgKMKq/36BXPP7AM2JgCcZv9PGxxoGgEZx+fi7FxQnfFk9qf/0/2keu52
-	 omfWiMslCr6KxN9m+WgRZCeH9M2YlF4krMIl1eWXsShRJQfjIJ+uQGRuCLOb/ppJaf
-	 y0KZrSPYuHK/98uObXlAnMSTkIfncu3VbslvjyQn3A/fVeaZSrudHanuIE0M/tvyZ6
-	 NQQ7dMh1xgt8im6lwZbrTrXe0WWIMhL8gXJApWWCabrcYdnkWO29juwxt+dsS/cLdF
-	 RAJ5ljElQ5s81AXcZPgFAuYxDtSiHY2Db7AdN1yXSJDB3LKwutduOuV1msoFhHq1Qx
-	 xKW0sAIv3zpVHMqW4+nuiKh4=
-Received: from zn.tnic (p200300eA971F930C329C23Fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:930c:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ADA2440E0288;
-	Tue, 10 Dec 2024 15:37:16 +0000 (UTC)
-Date: Tue, 10 Dec 2024 16:37:10 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Borislav Petkov <bp@kernel.org>,
-	Sean Christopherson <seanjc@google.com>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/4] x86/bugs: Add SRSO_USER_KERNEL_NO support
-Message-ID: <20241210153710.GJZ1hgJpVImYZq47Sv@fat_crate.local>
-References: <20241202120416.6054-1-bp@kernel.org>
- <20241202120416.6054-2-bp@kernel.org>
- <20241210065331.ojnespi77no7kfqf@jpoimboe>
+	s=arc-20240116; t=1733845647; c=relaxed/simple;
+	bh=1CUVzWgqlJWWmRwsJh1LsALpOZYBXhS4oaGhAijTERk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=F/qoDzsQSKVPPxiBqeX9ICTMcm0VUSRZWl6F09eHZbRTg7yh+kmwYYgMmu1UIWQNMuJkxMN7bSlsPP/yFQYYjuvixxdPMc7aTohNQxLEVR2eDOu8uABA0V0uXklV73oZEPVhm3KSjGE9wZRWsC27B6D/AuJyXmbwvv1f+oAwB24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ks7eCByW; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-728eb2e190cso121307b3a.3
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 07:47:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733845645; x=1734450445; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KTvSRRTfNZQvoZQzqZSdBQnAG8g17VjNF2nt+7pLczk=;
+        b=Ks7eCByWNdPHBkYEVLy09wezTPij72NUfjt8Kr6HeuBijlk/gGi8gnN1tko6jatETM
+         8icpN42BWiJgLha56Mlo2yvZh2epZZ3MaIGX43wa7N7P38X6G3QwtDdD7AdQ9gcBKlkL
+         o5lWI4Hvt7CeVDGUvCbiGChlKOMRVPhe7FJCn2U3ItWQMxXI3BmVQwMXEgn9dbrLTf8B
+         G4EwkSSGsQ+sQWQlqTLZ0DunmL4Jjbnjpu8VdUb7fFc4f9Z8+4jMgaLkclvLe7nYjX1n
+         zZOI8X6ik1Rk6HE2m0vOIXiPxQ6FgKDU6UV9uWnVJvEOI+hLEQIS9eeyEntF5kb6xCMa
+         ZTXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733845645; x=1734450445;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KTvSRRTfNZQvoZQzqZSdBQnAG8g17VjNF2nt+7pLczk=;
+        b=fWbngTIVBRbKmabY1nwt8Y7dR8d49e1RmhLuEKYla8lAz0Wt+N23BAc6K+rJQat10r
+         AKMaLY89WwtLAyDqOmqG3QUHO48vdb00xJoa9z7M4msV3+uGdGBmtlQuRM7sIUaA5IEy
+         QLGvYdgOaS8d9UbxHZ5YeVpz29jtFSegHEYhO65EZfZH00/wErAD9PdknbRmgHNLhoeG
+         E1UAH8srfkhS3EvVgsHRUKFGY/nITvXoGRgwfbjycZ1GS9NWv7FGVL0HdAwOBx3QC1c1
+         Yh4eDDV7IwSFProy+sIMOiE+ObsITa4GxXDqRmCheP/8YcEQOun/agEC2ILqdHFZnEHA
+         evfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWcEh89T+DIVcLv7CnkAljTl2Hci+jLHLIEki/tNP1BDLM3Wg4K7BbfoCUvEc85z3Le7BE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZossEp6P4o2X/HlV2rfH/MGJXN2juw8k0dQKsP8PSPoIrA+7V
+	foiddb/+LzWDS60TQQc/yu67+GYnV0m5XQiLvAFleENCHa/moDEFVDYN4j2Kf3eWPxvoC9dkQi0
+	90w==
+X-Google-Smtp-Source: AGHT+IGHIWibTQSvd05WcbKMeMUoU8sV0PDsPWhPYjcWh/orNjkXeSQt6HCj/nEUskeUrNyc9MtmCiSB0kw=
+X-Received: from pfbcp27.prod.google.com ([2002:a05:6a00:349b:b0:725:b203:3555])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:cd4:b0:725:b4f7:378e
+ with SMTP id d2e1a72fcca58-7273c7fdbf1mr7689740b3a.0.1733845645355; Tue, 10
+ Dec 2024 07:47:25 -0800 (PST)
+Date: Tue, 10 Dec 2024 07:47:23 -0800
+In-Reply-To: <52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241210065331.ojnespi77no7kfqf@jpoimboe>
+Mime-Version: 1.0
+References: <52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org>
+Message-ID: <Z1hiiz40nUqN2e5M@google.com>
+Subject: Re: [REGRESSION] from 74a0e79df68a8042fb84fd7207e57b70722cf825: VFIO
+ PCI passthrough no longer works
+From: Sean Christopherson <seanjc@google.com>
+To: Simon Pilkington <simonp.git@mailbox.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	regressions@lists.linux.dev, Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Dec 09, 2024 at 10:53:31PM -0800, Josh Poimboeuf wrote:
-> The presence of SRSO_USER_KERNEL_NO should indeed change the default,
-> but if the user requests "safe_ret" specifically, shouldn't we give it
-> to them?
++Tom
 
-Hardly a valid use case except for debugging but if you're doing that, you can
-change the kernel too.
+On Tue, Dec 10, 2024, Simon Pilkington wrote:
+> Hi,
+> 
+> With the aforementioned commit I am no longer able to use PCI passthrough to
+> a Windows guest on the X570 chipset with a 5950X CPU.
+> 
+> The minimal reproducer for me is to attach a GPU to the VM and attempt to
+> start Windows setup from an iso image. The VM will apparently livelock at the
+> setup splash screen before the spinner appears as one of my CPU cores goes up
+> to 100% usage until I force off the VM. This could be very machine-specific
+> though.
 
-Because we just fixed this and if some poor soul has left
-spec_rstack_overflow=safe-ret in her /etc/default/grub (it has happened to me
-a bunch on my test boxes), she'll never get her performance back and that
-would be a yucky situation.
+Ugh.  Yeah, it's pretty much guaranteed to be CPU specific behavior.
 
-> That would be more consistent with how we handle requested
-> mitigations.
+Tom, any idea what the guest might be trying to do?  It probably doesn't matter
+in the end, it's not like KVM does anything with the value...
 
-Yeah, but if there were a point to this, I guess. We don't really need this
-mitigation as there's nothing to mitigate on the user/kernel transition
-anymore.
+> Reverting to the old XOR check fixes both 6.12.y stable and 6.13-rc2 for me.
+> Otherwise they're both bad. Can you please look into it? I can share the
+> config I used for test builds if it would help.
 
-> Also it doesn't really make sense to add a printk here as the mitigation
-> will be printed at the end of the function.
+Can you run with the below to see what bits the guest is trying to set (or clear)?
+We could get the same info via tracepoints, but this will likely be faster/easier.
 
-This is us letting the user know that we don't need Safe-RET anymore and we're
-falling back. But I'm not that hung up on that printk...
+---
+ arch/x86/kvm/svm/svm.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Thx.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index dd15cc635655..5144d0283c9d 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3195,11 +3195,14 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	case MSR_AMD64_DE_CFG: {
+ 		u64 supported_de_cfg;
+ 
+-		if (svm_get_feature_msr(ecx, &supported_de_cfg))
++		if (WARN_ON_ONCE(svm_get_feature_msr(ecx, &supported_de_cfg)))
+ 			return 1;
+ 
+-		if (data & ~supported_de_cfg)
++		if (data & ~supported_de_cfg) {
++			pr_warn("DE_CFG supported = %llx, WRMSR = %llx\n",
++				supported_de_cfg, data);
+ 			return 1;
++		}
+ 
+ 		/*
+ 		 * Don't let the guest change the host-programmed value.  The
+@@ -3207,8 +3210,11 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		 * are completely unknown to KVM, and the one bit known to KVM
+ 		 * is simply a reflection of hardware capabilities.
+ 		 */
+-		if (!msr->host_initiated && data != svm->msr_decfg)
++		if (!msr->host_initiated && data != svm->msr_decfg) {
++			pr_warn("DE_CFG current = %llx, WRMSR = %llx\n",
++				svm->msr_decfg, data);
+ 			return 1;
++		}
+ 
+ 		svm->msr_decfg = data;
+ 		break;
 
+base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
