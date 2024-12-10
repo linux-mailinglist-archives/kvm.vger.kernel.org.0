@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-33414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 365039EB1D7
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 14:26:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B5C9EB1D8
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 14:26:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD08188A131
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 13:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5688228465A
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 13:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A86A1AA782;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE75D1AAA01;
 	Tue, 10 Dec 2024 13:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W4GZFqfX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F6DqMCih"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021031A9B2B;
-	Tue, 10 Dec 2024 13:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6765E1A9B35;
+	Tue, 10 Dec 2024 13:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733837137; cv=none; b=KcCdUPGfD9QIstHCwbaqp6CqbvcFUpwb5ibNzl+WdHvdtx35uACFe39LLxKGKe/ncZn5YiP8acRoicQwQzBQiDhfFiTW3DoQPGVligsQ9Q0R3aIoByv6IPioYSJlF268b4tjsdykBjoS5Y555JZjNFUMWxWXv37x/GX9RQEjBKI=
+	t=1733837138; cv=none; b=elbZUkFTj54KO+XSIKzSTnlwUc+x7LABm6J1GxmJJtS0AJSsLSBnOahogYG562a3y3xR/tzonS5OJ/BloWvTJIeHkT4mP/K0D/ZoW7U76n+pa/cI+N+UUoTDg3n5oHkLN64vRLsCoLGrBRn6s1LyBit6IMlTxiK+tqfzFJtCWWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733837137; c=relaxed/simple;
-	bh=KGE06P5wGdeAx3Y/4+t5a/rj5ZkKtAQ3902PJPsdsog=;
+	s=arc-20240116; t=1733837138; c=relaxed/simple;
+	bh=bi31w4C9P7/TJaW7cGQs0Y+Rs38Ld+aZeTlgD6CpGxM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DaLfrhmBNwo+WU9WSdtGy4V8ogFlK3l567Awh9QCYjlPc8CxHk8G2mMBiUuOHKUcXsAmmw9IBPwMl1EePNzw0reoZthNlt6YdEIFInsdueYXr4hQbmG1jmdAqnVcgI8ztTzM0f+06kuE395FKJ5/LDySn/fmyXCHxgAC9Kcfj2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W4GZFqfX; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=RDVo2QCKBITvmOdi330JZs/scjlZTLQv8cuouy54UsUiKBQCwddlNOz1zw9gyNSeU6glb/d0jaAewKlKIbNcvReNxp0ykfN5iZFT42+ku7UrDJSBch1YdfHvdVkYJv0ml7aW4psU9xadtl4LtrlWss/yWaj4uTEbjrEXlZZ7zRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F6DqMCih; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1733837136; x=1765373136;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KGE06P5wGdeAx3Y/4+t5a/rj5ZkKtAQ3902PJPsdsog=;
-  b=W4GZFqfXmWZNiswnlGuXhmOO8NyHlScMxHw/YjdeaQO8fIfLF3Bo/XfE
-   roYUOvLmMYrXTdqPHOk/hptuDpn02IrwelHx11K7S0oox4fz2uxKPciQ7
-   g1vRqeAQsjvojciCSdAYDXG5awNxpk96z48ZIdU3IxqXRixyGetA84b52
-   Q42fV/RnwxmArdLAZASerwxJwfulKsapeNPCPlMpWtL/UmSL7dtrH/cok
-   KAz0ic/zGOwyOrDmQnh3EFrybZlsFaiX94DoxuhbFBzvlyZtnhLwRkTof
-   YsjXTH4WNFkIQuuHGiiKBUBoOUoMUghoG2K/vPkIhyiDgE671wAe1w0Id
-   A==;
-X-CSE-ConnectionGUID: nKpQyM/8RhiK/yjrJ8rsCw==
-X-CSE-MsgGUID: mFdZsAA0SgK45AcaqU/oaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="37864751"
+  bh=bi31w4C9P7/TJaW7cGQs0Y+Rs38Ld+aZeTlgD6CpGxM=;
+  b=F6DqMCihYYsIXCZEtafPyN5nrKvs2B5tJza257eVOM+MYMZXSFizvV0X
+   RL6xhtllGHSLmPdSnQOxHb9fQc1Mcn8dhl4uDce7aVynuaN80LVWcmhwT
+   +5VmBJKVXYvP2kfKRE/5NBdN2Z0L2r/p9gGt6GHesedLIIj1cO2pNsXaE
+   GtHP/BmbP/SXD1+TotkINPVaCuPcdu3rEG4UpQ4udw+o5Kqus2Bxq8JlQ
+   PzHaIRNTimZD9wRKTaQjoBVwG3tnojBdkObFZjmWfOhT56NHP7/RoXYJI
+   4qw8uFI8wVE/2Hm0kmnU8pF8Y7GA7kZxc5vvb/aRqrWoB9PGe0h116E+F
+   w==;
+X-CSE-ConnectionGUID: nQARR9UGSxKYGBbOmbk58g==
+X-CSE-MsgGUID: ebumhScYRH+QXlMT3o/mxA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="37864755"
 X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="37864751"
+   d="scan'208";a="37864755"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 05:25:34 -0800
-X-CSE-ConnectionGUID: pkSpKLM5TzOryx0MbDlNpA==
-X-CSE-MsgGUID: JEKpzjIfSG6148RmiiCKpw==
+X-CSE-ConnectionGUID: xA0Vhk/WRHK7ZqrGa8LK6g==
+X-CSE-MsgGUID: IC4iE49KTOWRATKi0w7bCA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="95750020"
+   d="scan'208";a="95750023"
 Received: from rthomas.sc.intel.com ([172.25.112.51])
   by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 05:25:33 -0800
 From: Ramesh Thomas <ramesh.thomas@intel.com>
@@ -73,9 +73,9 @@ Cc: kvm@vger.kernel.org,
 	ramesh.thomas@intel.com,
 	kevin.tian@intel.com,
 	cho@microsoft.com
-Subject: [PATCH v3 1/2] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
-Date: Tue, 10 Dec 2024 05:19:37 -0800
-Message-Id: <20241210131938.303500-2-ramesh.thomas@intel.com>
+Subject: [PATCH v3 2/2] vfio/pci: Remove #ifdef iowrite64 and #ifdef ioread64
+Date: Tue, 10 Dec 2024 05:19:38 -0800
+Message-Id: <20241210131938.303500-3-ramesh.thomas@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241210131938.303500-1-ramesh.thomas@intel.com>
 References: <20241210131938.303500-1-ramesh.thomas@intel.com>
@@ -87,39 +87,89 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Definitions of ioread64 and iowrite64 macros in asm/io.h called by vfio
-pci implementations are enclosed inside check for CONFIG_GENERIC_IOMAP.
-They don't get defined if CONFIG_GENERIC_IOMAP is defined. Include
-linux/io-64-nonatomic-lo-hi.h to define iowrite64 and ioread64 macros
-when they are not defined. io-64-nonatomic-lo-hi.h maps the macros to
-generic implementation in lib/iomap.c. The generic implementation does
-64 bit rw if readq/writeq is defined for the architecture, otherwise it
-would do 32 bit back to back rw.
-
-Note that there are two versions of the generic implementation that
-differs in the order the 32 bit words are written if 64 bit support is
-not present. This is not the little/big endian ordering, which is
-handled separately. This patch uses the lo followed by hi word ordering
-which is consistent with current back to back implementation in the
-vfio/pci code.
+Remove the #ifdef iowrite64 and #ifdef ioread64 checks around calls to
+64 bit IO access. Since default implementations have been enabled, the
+checks are not required.
 
 Signed-off-by: Ramesh Thomas <ramesh.thomas@intel.com>
 ---
- drivers/vfio/pci/vfio_pci_rdwr.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/vfio/pci/vfio_pci_rdwr.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 66b72c289284..a0595c745732 100644
+index a0595c745732..78a3d0809415 100644
 --- a/drivers/vfio/pci/vfio_pci_rdwr.c
 +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -16,6 +16,7 @@
- #include <linux/io.h>
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
+@@ -62,9 +62,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_iowrite##size);
+ VFIO_IOWRITE(8)
+ VFIO_IOWRITE(16)
+ VFIO_IOWRITE(32)
+-#ifdef iowrite64
+ VFIO_IOWRITE(64)
+-#endif
  
- #include "vfio_pci_priv.h"
+ #define VFIO_IOREAD(size) \
+ int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
+@@ -90,9 +88,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_ioread##size);
+ VFIO_IOREAD(8)
+ VFIO_IOREAD(16)
+ VFIO_IOREAD(32)
+-#ifdef ioread64
+ VFIO_IOREAD(64)
+-#endif
  
+ #define VFIO_IORDWR(size)						\
+ static int vfio_pci_iordwr##size(struct vfio_pci_core_device *vdev,\
+@@ -128,9 +124,7 @@ static int vfio_pci_iordwr##size(struct vfio_pci_core_device *vdev,\
+ VFIO_IORDWR(8)
+ VFIO_IORDWR(16)
+ VFIO_IORDWR(32)
+-#if defined(ioread64) && defined(iowrite64)
+ VFIO_IORDWR(64)
+-#endif
+ 
+ /*
+  * Read or write from an __iomem region (MMIO or I/O port) with an excluded
+@@ -156,7 +150,6 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 		else
+ 			fillable = 0;
+ 
+-#if defined(ioread64) && defined(iowrite64)
+ 		if (fillable >= 8 && !(off % 8)) {
+ 			ret = vfio_pci_iordwr64(vdev, iswrite, test_mem,
+ 						io, buf, off, &filled);
+@@ -164,7 +157,6 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 				return ret;
+ 
+ 		} else
+-#endif
+ 		if (fillable >= 4 && !(off % 4)) {
+ 			ret = vfio_pci_iordwr32(vdev, iswrite, test_mem,
+ 						io, buf, off, &filled);
+@@ -382,12 +374,10 @@ static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
+ 		vfio_pci_core_iowrite32(ioeventfd->vdev, test_mem,
+ 					ioeventfd->data, ioeventfd->addr);
+ 		break;
+-#ifdef iowrite64
+ 	case 8:
+ 		vfio_pci_core_iowrite64(ioeventfd->vdev, test_mem,
+ 					ioeventfd->data, ioeventfd->addr);
+ 		break;
+-#endif
+ 	}
+ }
+ 
+@@ -441,10 +431,8 @@ int vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
+ 	      pos >= vdev->msix_offset + vdev->msix_size))
+ 		return -EINVAL;
+ 
+-#ifndef iowrite64
+ 	if (count == 8)
+ 		return -EINVAL;
+-#endif
+ 
+ 	ret = vfio_pci_core_setup_barmap(vdev, bar);
+ 	if (ret)
 -- 
 2.34.1
 
