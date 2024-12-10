@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-33402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED24E9EACDC
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 10:49:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693CF9EAD31
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 10:57:22 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF892844A6
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 09:49:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AE2C16B737
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 09:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE04F1DC98D;
-	Tue, 10 Dec 2024 09:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC9C1DC9BE;
+	Tue, 10 Dec 2024 09:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SOnANEQT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DWS9L0aC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F6D23A599;
-	Tue, 10 Dec 2024 09:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C5878F23;
+	Tue, 10 Dec 2024 09:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733823847; cv=none; b=J1jgUDaUiboSBG7grJCIQ+7kDrFdiJ/ZrBBkqY6ggoNc14Js+uQxH1OV8Q/N09QPmKfZqpuAlKYAJf87LAe/zPs2HHZKFHHVMrPTodktfCTRwuUmvPzhQicapfYYEei+nQZ3ncLxOLTjdwKt2uygNV5rrpg8yIUwPsjhZFgtvrs=
+	t=1733824246; cv=none; b=W/zIyiH8X/Gls3PFOXfaMwBkobzjoRSuYdVqqooV0Gj6VA5HUiue4gk3GsBOCggjSyBlWIYwvGdBM+QBhXwv+7RLBFA6zDb+WQxWRBKZaOwZ1ZGgf84azZ1j6ak84Ud/mRLPEBSjF+eZmA6kaXDLrr6HqniGD+aUkwxTzhZ0qn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733823847; c=relaxed/simple;
-	bh=vuEmmwVjJRFYSChDQkPZUyRxA/CC+H/HrJ4ih0N4Us8=;
+	s=arc-20240116; t=1733824246; c=relaxed/simple;
+	bh=qfDYEHjLp07MGd+9Ht9U14cysYZPaH49Zpe7AYdRDdQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iqNjKFSYA7zzjLnek8ArFxym6NIJUPi0vXjOjAzZDFnQFo6Nrf54VB/0byu3lrB2cbwVK9wVZWbgo30hNdtcAAW9joy5OOt6ABCyk2tUKDQFg/rZ5Ck4EeVXfTy6jHQCrIbBe8+iOYqSElD/EeXVBMnIPQK3DsPP0zWZBGZaOQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SOnANEQT; arc=none smtp.client-ip=192.198.163.11
+	 In-Reply-To:Content-Type; b=fDY85I/60jEtW4uR+F+gEcUoVPvgtZRuYU1zxfAVI7k/6zumgXF19vbSCDsxWRRP3ScuUv2AdQp5IhF8OWsaNeg6nFJ3i9v70VFnWH55yz7H/Ti+9BnyBqhRXRe6ujE+AiEP/HOFi6T2kmpNcCagOLfYz8faoOBkdd2kAHZ/hCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DWS9L0aC; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733823846; x=1765359846;
+  t=1733824245; x=1765360245;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=vuEmmwVjJRFYSChDQkPZUyRxA/CC+H/HrJ4ih0N4Us8=;
-  b=SOnANEQTgkEMgDSylr7JXEY7PMAcSWDV3zSxJ/+bQF+xnrRPI6mMTZsO
-   lQom1iTKtEyw01GsQTMgGkna7PQ7SzDlBJPlFT6JcxVKp9BUJpgwQWWvQ
-   7J92gMFTDJYU3Lf0ruAgXLV9jmdb31b9qjd0dFuStGBtNQNm9gr3g5Jx+
-   l6crBQ8kEeLVGBnOFrbYhaNwIfbifSnCX43SNJ/XYf7Vo1S/z7n9YoXDw
-   c7DxFFztajoGN+HMB0KWOxGipNcrLfqEvpVARYp4LvCI8ZW7xW0Utpm34
-   EzzOGT+JalvJUMyim4H2r9hor4+1jeoIoeFkdeH93+3PLjHj/YQP/F7ts
-   Q==;
-X-CSE-ConnectionGUID: Vn+KTwGCTmezYenssh6Waw==
-X-CSE-MsgGUID: Aq7ofonYQEehfQCWl4ORsg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="44762567"
+  bh=qfDYEHjLp07MGd+9Ht9U14cysYZPaH49Zpe7AYdRDdQ=;
+  b=DWS9L0aC7sTYf3ypS6hlx1zVn//4BbXNV1Y1Oxshbo+fPYqTrPvJCqPG
+   G73ZR7nzF204pAlLemyP2RTeBAXAqEfJsQV2RC0jMnPtsLd7XwqcfSdN4
+   EmgqlBcnvfl0NTXxjBjxaZc+AnJdGUw8loCQhK8aSbKJ1b0eqbED+ao/s
+   297EuigTgQK44qxdoL6sL+Bq3QbcHXeB7+Ui4G+mUiYYtfASqAa29zzF2
+   RbTF6Wr5O1N845CU5nuFRApfI9sKh30+DCFeqH6WpYKjq4IGVFzbpyw2Z
+   B3opwdb7EX8VzGps6Puotoe3Nwd/I8eF2dgLGhojIl1CMCtM++gQ/py5O
+   w==;
+X-CSE-ConnectionGUID: kgz5rg9JSzSSKxS3r/aKIg==
+X-CSE-MsgGUID: IxPCKYIFQxav2CBFo9GuvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="36992422"
 X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="44762567"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:44:04 -0800
-X-CSE-ConnectionGUID: qMB/gtfERZ6bFBXFj4djJA==
-X-CSE-MsgGUID: x92KKZSRQd+XTTpw9Mj40Q==
+   d="scan'208";a="36992422"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:50:40 -0800
+X-CSE-ConnectionGUID: zhTra15fRUKaWkvZNr0P/Q==
+X-CSE-MsgGUID: zwIr5JgBSQG50wkS2mFn/Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="95228417"
+   d="scan'208";a="100309246"
 Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:44:01 -0800
-Message-ID: <eaaaa2ce-bddd-4286-b86e-eace2ad1e5ea@linux.intel.com>
-Date: Tue, 10 Dec 2024 17:43:57 +0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:50:36 -0800
+Message-ID: <62b3c444-36db-4ac0-bc10-e8d8a5f553c9@linux.intel.com>
+Date: Tue, 10 Dec 2024 17:50:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/7] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+Subject: Re: [PATCH 6/7] KVM: TDX: Handle TDX PV port I/O hypercall
 To: Chao Gao <chao.gao@intel.com>
 Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
  rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
@@ -75,57 +75,45 @@ Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
  tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
  yan.y.zhao@intel.com, michael.roth@amd.com, linux-kernel@vger.kernel.org
 References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
- <20241201035358.2193078-6-binbin.wu@linux.intel.com>
- <Z1gEQF8LkIjON8wa@intel.com>
+ <20241201035358.2193078-7-binbin.wu@linux.intel.com>
+ <Z1gNIRWSMy2w7CYp@intel.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z1gEQF8LkIjON8wa@intel.com>
+In-Reply-To: <Z1gNIRWSMy2w7CYp@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
 
-On 12/10/2024 5:05 PM, Chao Gao wrote:
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index edc070c6e19b..bb39da72c647 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6815,6 +6815,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
->>    #define KVM_SYSTEM_EVENT_WAKEUP         4
->>    #define KVM_SYSTEM_EVENT_SUSPEND        5
->>    #define KVM_SYSTEM_EVENT_SEV_TERM       6
->> +  #define KVM_SYSTEM_EVENT_TDX_FATAL      7
->> 			__u32 type;
->>                          __u32 ndata;
->>                          __u64 data[16];
->> @@ -6841,6 +6842,13 @@ Valid values for 'type' are:
->>     reset/shutdown of the VM.
->>   - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
->>     The guest physical address of the guest's GHCB is stored in `data[0]`.
->> + - KVM_SYSTEM_EVENT_TDX_FATAL -- an TDX guest requested termination.
-> Not sure termination is an accurate interpretation of fatal errors. Maybe
-> just say: a fatal error reported by a TDX guest.
-OK, will update it as:
-"a TDX guest reported a fatal error state."
-
+On 12/10/2024 5:42 PM, Chao Gao wrote:
+>> +static int tdx_emulate_io(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+>> +	unsigned long val = 0;
+>> +	unsigned int port;
+>> +	int size, ret;
+>> +	bool write;
+> ..
 >
->> +   The error codes of the guest's GHCI is stored in `data[0]`.
-> what do you mean by "guest's GHCI"?
-I don't know what I was thinking about.
+>> +
+>> +	++vcpu->stat.io_exits;
+>> +
+>> +	size = tdvmcall_a0_read(vcpu);
+>> +	write = tdvmcall_a1_read(vcpu);
+> a1 (i.e., R13) should be either 0 or 1. Other values are reserved according to
+> the GHCI spec. It is not appropriate to cast it to a boolean. For example, if
+> R13=2, KVM shouldn't treat it as a write request; instead, this request should
+> be rejected.
+Right, will fix it.
 
-Will update it as:
-    The error code reported by the TDX guest is stored in `data[0]`, the error
-    code format is defined in TDX GHCI specification.
+Thanks!
 
->
->> +   If the bit 63 of `data[0]` is set, it indicates there is TD specified
->> +   additional information provided in a page, which is shared memory. The
->> +   guest physical address of the information page is stored in `data[1]`.
->> +   An optional error message is provided by `data[2]` ~ `data[9]`, which is
->> +   byte sequence, LSB filled first. Typically, ASCII code(0x20-0x7e) is filled.
->>   - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
->>     KVM has recognized a wakeup event. Userspace may honor this event by
->>     marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+>> +	port = tdvmcall_a2_read(vcpu);
+>> +
+>> +	if (size != 1 && size != 2 && size != 4) {
+>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>> +		return 1;
+>> +	}
 
 
