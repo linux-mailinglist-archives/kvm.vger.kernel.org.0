@@ -1,123 +1,306 @@
-Return-Path: <kvm+bounces-33397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33398-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A829EABF3
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 10:28:10 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2141886FFB
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 09:28:08 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC9B23498D;
-	Tue, 10 Dec 2024 09:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gl7jBWKX"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F289EAD0F
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 10:54:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B6722CBE5;
-	Tue, 10 Dec 2024 09:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B389528C0DD
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2024 09:54:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7A21578F;
+	Tue, 10 Dec 2024 09:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o3nLGlXV"
+X-Original-To: kvm@vger.kernel.org
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09B32080F7;
+	Tue, 10 Dec 2024 09:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733822872; cv=none; b=LV7YneDREBRHXiJCqCGB2aTpde0hc9nhvU+qRBz/keIl3vsYWOwMNCEPq4X48qTMJY8igkFAVayqkjt0QsWdhtIFtJljrpcLMrZxXqyj9OcnJRxxYUo1q0+BYY5A4D1E3Qy/X4qshj+V1WjNn1bBYtt23OXVbEn99EByyww4An8=
+	t=1733823272; cv=none; b=cjauxatRLw1bfK2souY/tdSZk8pXHUE6vXOIPtpx1jvOfR0tFaCv7T1Y78N+OrE3lvrLuYOElKEzzxtbll1IGax5r7piCsmHdx7cXg3SWE3Rl6zQ6FnZzPmg/xcjEdWGDRhgAJ/LsGq9P7dyCECLnqqKreqbThIr2qHfFa7r33Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733822872; c=relaxed/simple;
-	bh=JR5YBRhO//eu6p5VHl2Cy8j9Yv+oYzNRBr4D+Wdeu6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BCaHzDd6y8Yg1/1l0pjTdWwMJJCqQ0h6j2g8HEIm8rYMqi0ApKgc9GlDcYZSb1xxwyC4iRSgTR73X+TVAsExTAfsPnOuHrEUfLUcLhH43Fj2hs5s5lXsi41cQ33Jll2ZmBjGbRUyVRXE7A9ZwQVgzbgsaTMpEawdTGbm+0fa/Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gl7jBWKX; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733822870; x=1765358870;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=JR5YBRhO//eu6p5VHl2Cy8j9Yv+oYzNRBr4D+Wdeu6I=;
-  b=gl7jBWKXwxqetgqtvPNCDD2YC4mXnaRkwjc+SxAT0Cg2QgF36CcmYvIZ
-   HHdjwW5OsWj7CwYpE1Qd+YaRaFfKrR0UQCcQK+uA68G1oWL5wzQ/WKs4Z
-   HesZ5jMGpm2Gxj7cNR5vMJoeeTJp5T5hlGrBoM+zn/ecnQMChRMnMH9me
-   rZpnnEKfT20AuPy1pQ/qOXMcQPiuKf+IOJatkoYn57Z+60Ex1IbonHtYK
-   v9rjMQ7qvH2gvgVvWH20DEOgz2RHL7g5++DNN/Q+YcKePBbwxLfejbEoy
-   fqxj7tzkMCWdXgUJChkCecW/0j4rVrcYxRuepxRF2QMl6vuN1VXQcobv0
-   w==;
-X-CSE-ConnectionGUID: iqSi+UvGT4mepgFb2hdZuQ==
-X-CSE-MsgGUID: ickFTKs0SE2ZQsZHrRIn/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="21742799"
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="21742799"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:27:49 -0800
-X-CSE-ConnectionGUID: KFk3c24FS+eCAQsHuiup1g==
-X-CSE-MsgGUID: Xao4va4qRn2jUvn2fz3fNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="118600177"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.246.224])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:27:44 -0800
-Date: Tue, 10 Dec 2024 11:27:40 +0200
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
-	seanjc@google.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
-	kai.huang@intel.com, adrian.hunter@intel.com,
-	reinette.chatre@intel.com, xiaoyao.li@intel.com,
-	isaku.yamahata@intel.com, yan.y.zhao@intel.com,
-	michael.roth@amd.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/7] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-Message-ID: <Z1gJjCzDF6JNKCyl@tlindgre-MOBL1>
-References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
- <20241201035358.2193078-5-binbin.wu@linux.intel.com>
- <Z1bmUCEdoZ87wIMn@intel.com>
- <e8163ac4-59cd-4beb-bb92-44aa2d7702ab@linux.intel.com>
- <Z1gFhU0oTGUNssMP@intel.com>
+	s=arc-20240116; t=1733823272; c=relaxed/simple;
+	bh=VL9S1t6P9roMYEeS05t8Msy9iyzkB1wmY1RRZiH8utY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
+	 References:In-Reply-To; b=HjarU8D8tY6QBFHwxJi++lj4ja7tPcCCNV7iK1COOLV1vxV/vc/AtN5EnvQK0znGbCf/WyyVYmQtEgiLEd3CYs9UcC41HSlUeCQXYHPXpx5DQAMzy29L57W31VmNaamRfZM9V7FM5TtOkHT3SZfd1IyXTQLU6fAPi6HIIg+ukko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o3nLGlXV; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9NXEcZ032677;
+	Tue, 10 Dec 2024 09:34:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=hpoWtD
+	rIXUvzYQSAYm9mlRLAcxdm+lfkYTtlhMRxZWo=; b=o3nLGlXVsyGKhgUTgqJJUe
+	+EJ4JPiuG7BzUMx5Twuc+Rh7hqUzeozf9wJxve3uzjuqphXKYfE0aRT9VD+8xOtD
+	zuZ+7Ee/P/MDhl1W4ZwP2TcUaS01NxH9ZEn3pDKhgYDp2CHlVcjStN3MOdbr7xwa
+	2PB0FrOFMP3VyI9+0KRzHMYjuad9lJeigkbTCfCKgm/4pGmU2zPoDoOrcq+YgPPz
+	2RuInUtxXuhIQlJoWWOJO2bAGwxUD38kU8w6UHH6PBGnbIIwIbrgPKgRZfA2KHit
+	pgmSgrEGMhPQTHllqIw/4tFEY/92oc8CSP+OpVAbOXhh7ufbRdLKXmgEehhqTmvA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq5ft9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Dec 2024 09:34:24 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA8BS1T032491;
+	Tue, 10 Dec 2024 09:34:23 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d1pn2x8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Dec 2024 09:34:23 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BA9YGfe35258784
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 10 Dec 2024 09:34:16 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 78E6C20043;
+	Tue, 10 Dec 2024 09:34:16 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5341620040;
+	Tue, 10 Dec 2024 09:34:16 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.78.225])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 10 Dec 2024 09:34:16 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z1gFhU0oTGUNssMP@intel.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 10 Dec 2024 10:34:10 +0100
+Message-Id: <D67X1PKYYP7B.3AJ4BNEBAVI0Q@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v1 2/6] selftests: kvm: s390: Add ucontrol flic attr
+ selftests
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <kvm@vger.kernel.org>,
+        "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>,
+        "Janosch Frank" <frankja@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Paolo Bonzini"
+ <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>
+X-Mailer: aerc 0.18.2
+References: <20241209110717.77279-1-schlameuss@linux.ibm.com>
+ <20241209110717.77279-3-schlameuss@linux.ibm.com>
+ <20241209191432.03c98f38@p-imbrenda>
+In-Reply-To: <20241209191432.03c98f38@p-imbrenda>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: phykGnzjNe1YNmJ4kSBOlXfEoBf7KxUr
+X-Proofpoint-GUID: phykGnzjNe1YNmJ4kSBOlXfEoBf7KxUr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=808 adultscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412100070
 
-On Tue, Dec 10, 2024 at 05:10:29PM +0800, Chao Gao wrote:
-> On Tue, Dec 10, 2024 at 10:51:56AM +0800, Binbin Wu wrote:
-> >On 12/9/2024 8:45 PM, Chao Gao wrote:
-> >> > +/*
-> >> > + * Split into chunks and check interrupt pending between chunks.  This allows
-> >> > + * for timely injection of interrupts to prevent issues with guest lockup
-> >> > + * detection.
-> >> Would it cause any problems if an (intra-host or inter-host) migration happens
-> >> between chunks?
-> >> 
-> >> My understanding is that KVM would lose track of the progress if
-> >> map_gpa_next/end are not migrated. I'm not sure if KVM should expose the
-> >> state or prevent migration in the middle. Or, we can let the userspace VMM
-> >> cut the range into chunks, making it the userspace VMM's responsibility to
-> >> ensure necessary state is migrated.
-> >> 
-> >> I am not asking to fix this issue right now. I just want to ensure this issue
-> >> can be solved in a clean way when we start to support migration.
-> >How about:
-> >Before exiting to userspace, KVM always sets the start GPA to r11 and set
-> >return code to TDVMCALL_STATUS_RETRY.
-> >- If userspace finishes the part, the complete_userspace_io() callback will
-> >  be called and the return code will be set to TDVMCALL_STATUS_SUCCESS.
-> >- If the live migration interrupts the MapGAP in the userspace, and
-> >  complete_userspace_io() is not called, when the vCPU resumes from migration,
-> >  TDX guest will see the return code is TDVMCALL_STATUS_RETRY with the failed
-> >  GPA, and it can retry the MapGAP with the failed GAP.
-> 
-> Sounds good
+On Mon Dec 9, 2024 at 7:14 PM CET, Claudio Imbrenda wrote:
+> On Mon,  9 Dec 2024 12:07:13 +0100
+> Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
+>
+> > Add some superficial selftests for the floating interrupt controller
+> > when using ucontrol VMs. These tests are intended to cover very basic
+> > calls only.
+> >=20
+> > Some of the calls may trigger null pointer dereferences on kernels not
+> > containing the fixes in this patch series.
+> >=20
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> > ---
+> >  .../selftests/kvm/s390x/ucontrol_test.c       | 150 ++++++++++++++++++
+> >  1 file changed, 150 insertions(+)
+> >=20
+> > diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/=
+testing/selftests/kvm/s390x/ucontrol_test.c
+> > index 0c112319dab1..972fac1023b5 100644
+> > --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > @@ -635,4 +635,154 @@ TEST_F(uc_kvm, uc_skey)
+> >  	uc_assert_diag44(self);
+> >  }
+> > =20
+> > +static char uc_flic_b[PAGE_SIZE];
+> > +static struct kvm_s390_io_adapter uc_flic_ioa =3D { .id =3D 0 };
+> > +static struct kvm_s390_io_adapter_req uc_flic_ioam =3D { .id =3D 0 };
+> > +static struct kvm_s390_ais_req uc_flic_asim =3D { .isc =3D 0 };
+> > +static struct kvm_s390_ais_all uc_flic_asima =3D { .simm =3D 0 };
+> > +static struct uc_flic_attr_test {
+> > +	char *name;
+> > +	struct kvm_device_attr a;
+> > +	int hasrc;
+> > +	u64 getrc;
+> > +	int geterrno;
+> > +	u64 setrc;
+>
+> I wonder if you really need getrc and setrc? (see below)
+>
+> > +	int seterrno;
+> > +} uc_flic_attr_tests[] =3D {
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_GET_ALL_IRQS",
+> > +		.setrc =3D 1, .seterrno =3D EINVAL,
+>
+> please put them on separate lines ^ (if you end up keeping both)
+>
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_GET_ALL_IRQS,
+> > +			.addr =3D (u64)&uc_flic_b,
+> > +			.attr =3D PAGE_SIZE,
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_ENQUEUE",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.a =3D { .group =3D KVM_DEV_FLIC_ENQUEUE, },
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_CLEAR_IRQS",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.a =3D { .group =3D KVM_DEV_FLIC_CLEAR_IRQS, },
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_ADAPTER_REGISTER",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_ADAPTER_REGISTER,
+> > +			.addr =3D (u64)&uc_flic_ioa,
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_ADAPTER_MODIFY",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.setrc =3D 1, .seterrno =3D EINVAL,
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_ADAPTER_MODIFY,
+> > +			.addr =3D (u64)&uc_flic_ioam,
+> > +			.attr =3D sizeof(uc_flic_ioam),
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_CLEAR_IO_IRQ",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.setrc =3D 1, .seterrno =3D EINVAL,
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_CLEAR_IO_IRQ,
+> > +			.attr =3D 32,
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_AISM",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.setrc =3D 1, .seterrno =3D ENOTSUP,
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_AISM,
+> > +			.addr =3D (u64)&uc_flic_asim,
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_AIRQ_INJECT",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.a =3D { .group =3D KVM_DEV_FLIC_AIRQ_INJECT, },
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_AISM_ALL",
+> > +		.getrc =3D 1, .geterrno =3D ENOTSUP,
+> > +		.setrc =3D 1, .seterrno =3D ENOTSUP,
+> > +		.a =3D {
+> > +			.group =3D KVM_DEV_FLIC_AISM_ALL,
+> > +			.addr =3D (u64)&uc_flic_asima,
+> > +			.attr =3D sizeof(uc_flic_asima),
+> > +		},
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_APF_ENABLE",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.setrc =3D 1, .seterrno =3D EINVAL,
+> > +		.a =3D { .group =3D KVM_DEV_FLIC_APF_ENABLE, },
+> > +	},
+> > +	{
+> > +		.name =3D "KVM_DEV_FLIC_APF_DISABLE_WAIT",
+> > +		.getrc =3D 1, .geterrno =3D EINVAL,
+> > +		.setrc =3D 1, .seterrno =3D EINVAL,
+> > +		.a =3D { .group =3D KVM_DEV_FLIC_APF_DISABLE_WAIT, },
+> > +	},
+> > +};
+> > +
+> > +TEST_F(uc_kvm, uc_flic_attrs)
+> > +{
+> > +	struct kvm_create_device cd =3D { .type =3D KVM_DEV_TYPE_FLIC };
+> > +	struct kvm_device_attr attr;
+> > +	u64 value;
+> > +	int rc, i;
+> > +
+> > +	rc =3D ioctl(self->vm_fd, KVM_CREATE_DEVICE, &cd);
+> > +	ASSERT_EQ(0, rc) TH_LOG("create device failed with err %s (%i)",
+> > +				strerror(errno), errno);
+> > +
+> > +	for (i =3D 0; i < ARRAY_SIZE(uc_flic_attr_tests); i++) {
+> > +		TH_LOG("test %s", uc_flic_attr_tests[i].name);
+> > +		attr =3D (struct kvm_device_attr) {
+> > +			.group =3D uc_flic_attr_tests[i].a.group,
+> > +			.attr =3D uc_flic_attr_tests[i].a.attr,
+> > +			.addr =3D uc_flic_attr_tests[i].a.addr,
+> > +		};
+> > +		if (attr.addr =3D=3D 0)
+> > +			attr.addr =3D (u64)&value;
+> > +
+> > +		rc =3D ioctl(cd.fd, KVM_HAS_DEVICE_ATTR, &attr);
+> > +		EXPECT_EQ(uc_flic_attr_tests[i].hasrc, !!rc)
+> > +			TH_LOG("expected dev attr missing %s",
+> > +			       uc_flic_attr_tests[i].name);
+> > +
+> > +		rc =3D ioctl(cd.fd, KVM_GET_DEVICE_ATTR, &attr);
+> > +		EXPECT_EQ(uc_flic_attr_tests[i].getrc, !!rc)
+>
+> maybe you could just do:
+>
+> 	EXPECT_EQ(!!uc_flic_attr_tests[i].geterrno, !!rc)
+>
+> (unless I am missing something)
+>
+> this is not super important, though
+>
 
-Makes sense to me too.
+Yes, that should work. I will do that. Thanks!
 
-Regards,
+> > +			TH_LOG("get dev attr rc not expected on %s %s (%i)",
+> > +			       uc_flic_attr_tests[i].name,
+> > +			       strerror(errno), errno);
+> > +		if (uc_flic_attr_tests[i].geterrno)
+> > +			EXPECT_EQ(uc_flic_attr_tests[i].geterrno, errno)
+> > +				TH_LOG("get dev attr errno not expected on %s %s (%i)",
+> > +				       uc_flic_attr_tests[i].name,
+> > +				       strerror(errno), errno);
+> > +
+> > +		rc =3D ioctl(cd.fd, KVM_SET_DEVICE_ATTR, &attr);
+> > +		EXPECT_EQ(uc_flic_attr_tests[i].setrc, !!rc)
+> > +			TH_LOG("set sev attr rc not expected on %s %s (%i)",
+> > +			       uc_flic_attr_tests[i].name,
+> > +			       strerror(errno), errno);
+> > +		if (uc_flic_attr_tests[i].seterrno)
+> > +			EXPECT_EQ(uc_flic_attr_tests[i].seterrno, errno)
+> > +				TH_LOG("set dev attr errno not expected on %s %s (%i)",
+> > +				       uc_flic_attr_tests[i].name,
+> > +				       strerror(errno), errno);
+> > +	}
+> > +
+> > +	close(cd.fd);
+> > +}
+> > +
+> >  TEST_HARNESS_MAIN
 
-Tony
 
