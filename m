@@ -1,125 +1,212 @@
-Return-Path: <kvm+bounces-33510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8FF9ED76C
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 21:45:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 224E39ED775
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 21:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2056E283B1A
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 20:45:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C46283B0C
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 20:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76ED20B81C;
-	Wed, 11 Dec 2024 20:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB9E2288C2;
+	Wed, 11 Dec 2024 20:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6X/DBR/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHV2rwch"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AFB1BC085
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 20:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668DD2036F6;
+	Wed, 11 Dec 2024 20:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733949951; cv=none; b=ie0+9zbcGN/NPdUNPeE+7Gpsm5xQ5ww7gLj2/CxI3VTnV51j9w6KUrZS9RCSZHOhMAIhmnFzMWvY3pd+gxAMbiUA0cU/V1e+ISZL0hpbGs9D02hnwnrUWidoTdLiQj3Z8xiEhr79tgSjUAeqI9IEjOP96snmG4zrlO8Xgcvrpc8=
+	t=1733950031; cv=none; b=pqIUDbT5cl/INj/oofnuAA5QHbd4/eFLZHryhVB0D912N3vz2145R8WGbz+rqFet7JUTs2iFCZBx11mdaiMLyK8iSahdA1bYk+Px9LuuUt/+XOklHWP+5d7jaxTZW5Q/UV0AmY+pGO+EjQouBZYRQUSDHMN4goHWWEK9Z87zEWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733949951; c=relaxed/simple;
-	bh=x11F6rsThuI7COdxwbMUMCu//GFFQp6yj2Nz/5ckHOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=LSeKJRsW1Ge98xy/NqSzWIDwWG4L8LrH5SK88g1WVqCrjX0QOXsnJkHZXwo5HAQjc7eZ7OxemDqaO3uHIiEpVTbbyUx6c0GK0CEcYEYLRMaCeAf58fTU5WjQ71EjK382VwPKhn4mlssh/mnnh8/H/hmlTpJcC/a3F7o0Zo9JAY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6X/DBR/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733949948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=UyMoM9bjZ04mHDYoi6wDKE6GsVPbRehJbv3JnFdeW/o=;
-	b=N6X/DBR/KETaFzgcGqmVVqP50kl7VXatKzy8NWzWufP8seUORwK9vn7fNssOUMJb/pK+rV
-	TiVy0EnkSSNOLe3JKiVR0AVLe0mITdeInzFTSAzWSgRs2U/8odL44vfP9NEKw9dhmOtuTR
-	NhzV5Q8cnSsuVPcL1cRH0Ho4R5DKGnQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-342-vbhgswbMMQeMOXyFqk-5Fg-1; Wed, 11 Dec 2024 15:45:46 -0500
-X-MC-Unique: vbhgswbMMQeMOXyFqk-5Fg-1
-X-Mimecast-MFC-AGG-ID: vbhgswbMMQeMOXyFqk-5Fg
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-844ca9b7233so22083539f.3
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 12:45:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733949946; x=1734554746;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UyMoM9bjZ04mHDYoi6wDKE6GsVPbRehJbv3JnFdeW/o=;
-        b=Kk1uHnD/Tu+TlQ6CawvzW7MgGlAmNGKdF3QGIMmv8OHDS226BZnCaRVde99Imrx83e
-         dOw6FClcPRGVPX2rV3mToUQUyEq0uP1EwOIsrT+gpS/69xAvBRxS672FragO9nqqG9kE
-         S4jdPcMToW+zrjpgw6Va2EC3oS1W1aVz5rxmxzA9Ls5degqER4gobwhVJVaA2V9l0DAp
-         aXSM1wslNAzZLH50XWM6mgC58nXJNAGUNIVn/Iolh0cG1U8+st0UNFSaBpofk2ilCAvz
-         kyYvl0gC7ISYepUCqCl9UtPoeTKxTrQS2Rzo4GB3OnhSUVsh3zD0j1NK8VDjOqFbrKdz
-         kmSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlJ/YsQsMGV42vpb3U+oaSmNAk7j0I5D/V60KSWbqpEJ18h+BWKAvx1UsFyd3TUuAJ/Z0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+DvsuCnlOCX/wA8Icmyzg0dbFGyAf10N/V7qAVn0kQDv7d2Gm
-	/k8OtagBEOmOydizJhlUA0mycaN8Dews66FXUwBh3KhxCZXXFHE3NJH41wl79UZJYBk1zRXZh9I
-	2OmMEpyj+jS+TXFFLdW/OT9DFTV3zxHWjvJMgSC/RnfAgwMOO7A==
-X-Gm-Gg: ASbGncueCKVeAVUczFCVNn73dF/k9P/KFJYD6XMulhhmLbTe3WLo55SaFEY54JIeHCJ
-	AE1JVQxob+2FtGUsBp0yq85IVswMzi5ZPOp+xAxp1ySYZCfUrHibKxqH4xJ6BQ+Y8VKsV8k/1Sd
-	2vUnko+KyeYrQ6eISnOivZHT1KGbOsWa4vAECwvhftBzDuD2FFpDKy2RA2gImlTmAfJtzLHydHK
-	5NtGWSI+PTJdwCzPUfBXxEGvf/UckpAeeqbougbtvhWXe3EOJ6Kc+fgSQ==
-X-Received: by 2002:a05:6e02:1d1e:b0:3a7:bd4c:b17e with SMTP id e9e14a558f8ab-3ac4166f178mr3035335ab.0.1733949945926;
-        Wed, 11 Dec 2024 12:45:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHxWrkTgdBRegPreVCTs6CWNouMMcQJGsW+xbyXyWDuRP4He8ysmi1RzcbKSB8OX3c/jOYU1w==
-X-Received: by 2002:a05:6e02:1d1e:b0:3a7:bd4c:b17e with SMTP id e9e14a558f8ab-3ac4166f178mr3035265ab.0.1733949945622;
-        Wed, 11 Dec 2024 12:45:45 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a9cc5bf7b4sm23524695ab.72.2024.12.11.12.45.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 12:45:45 -0800 (PST)
-Date: Wed, 11 Dec 2024 13:45:43 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, Yishai Hadas <yishaih@nvidia.com>
-Subject: [GIT PULL] VFIO fixes for v6.13-rc3
-Message-ID: <20241211134543.715454ea.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733950031; c=relaxed/simple;
+	bh=aknAFx8VaUwPVga7KKu4RUZNHyfZuQaVaB1D3qt7qZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ohjzOWKYRnDh+qpHVoOjxyriUiGulEFGNBKnmMOaK7eQz5PaGCY9Y9PN7blJ/Y9ocgRFF6wU/a2O3YRXtUQ1QbBipQK93xPvoXhpgPxLwaKvjbjLOM/rOTJXy+ECiGUMJcDhCv8jqB+CzFSlAow4iKR/PDEOgzyw2Enn0HFUP9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHV2rwch; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69C9C4CED2;
+	Wed, 11 Dec 2024 20:47:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733950030;
+	bh=aknAFx8VaUwPVga7KKu4RUZNHyfZuQaVaB1D3qt7qZ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=QHV2rwch1gz59dvCZw7JoUC2YzoswfWi76w8T8rY/qqAxs688/XXJGJBv3TAGBpp5
+	 yYDg7ahXE+Ejki3N83rRS6ysfCK9v4XlLwwJKhPfR5ZijS8wQz1PZivpNbKNKsjjVO
+	 6TZ/b/cqGF6d++KC6QfNhZDi8Uf+GPB7+ztgmftdPXVN8grzfNMmcs0ahHNWYtPb1T
+	 CEVOOHbJohTaHYVWKW3au0/ZZAj4WVzR4vfIPB7cOgTpuWJqlR6at7IDrEgPlyDyTV
+	 Lfnn/lZNreZYil7ihPnRBzUtwkpcbUhqE+9g8PNO0JN9WCv5peVnziOvr8E8RZMVay
+	 vTUKhHoSbndtg==
+Date: Wed, 11 Dec 2024 14:47:09 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Jian-Hong Pan <jhp@endlessos.org>,
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	Nirmal Patel <nirmal.patel@linux.intel.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@endlessos.org,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	"David E. Box" <david.e.box@linux.intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v13] PCI/ASPM: Make pci_save_aspm_l1ss_state save both
+ child and parent's L1SS configuration
+Message-ID: <20241211204709.GA3305716@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241115072200.37509-3-jhp@endlessos.org>
 
-Hi Linus,
+[+to Alex, +cc kvm]
 
-The following changes since commit 40384c840ea1944d7c5a392e8975ed088ecf0b37:
+On Fri, Nov 15, 2024 at 03:22:02PM +0800, Jian-Hong Pan wrote:
+> PCI devices' parameters on the VMD bus have been programmed properly
+> originally. But, cleared after pci_reset_bus() and have not been restored
+> correctly. This leads the link's L1.2 between PCIe Root Port and child
+> device gets wrong configs.
 
-  Linux 6.13-rc1 (2024-12-01 14:28:56 -0800)
+17423360a27a ("PCI/ASPM: Save L1 PM Substates Capability for
+suspend/resume") appeared in v6.9 and added a bug in the save/restore
+path: we save the device L1SS state, but restore both the device L1SS
+state and the parent's L1SS state (when the parent state may be junk)
+afterwards.
 
-are available in the Git repository at:
+Jian-Hong sees this on VMD, which makes sense because vmd uses
+pci_reset_bus() when enabling the VMD domain.
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.13-rc3
+But this should be a problem for any device reset, so I added you,
+Alex, in case you've seen this with the resets VFIO does?
 
-for you to fetch changes up to 9c7c5430bca36e9636eabbba0b3b53251479c7ab:
+We also save/restore for suspend, but I suppose we don't notice the
+problem there because in that case we save state for *all* devices,
+so the parent state should be valid when we restore.
 
-  vfio/mlx5: Align the page tracking max message size with the device capability (2024-12-05 11:56:01 -0700)
+> Here is a failed example on ASUS B1400CEAE with enabled VMD. Both PCIe
+> bridge and NVMe device should have the same LTR1.2_Threshold value.
+> However, they are configured as different values in this case:
+> 
+> 10000:e0:06.0 PCI bridge [0604]: Intel Corporation 11th Gen Core Processor PCIe Controller [8086:9a09] (rev 01) (prog-if 00 [Normal decode])
+>   ...
+>   Capabilities: [200 v1] L1 PM Substates
+>     L1SubCtl1: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2+ ASPM_L1.1-
+>       T_CommonMode=0us LTR1.2_Threshold=0ns
+>     L1SubCtl2: T_PwrOn=0us
+> 
+> 10000:e1:00.0 Non-Volatile memory controller [0108]: Sandisk Corp WD Blue SN550 NVMe SSD [15b7:5009] (rev 01) (prog-if 02 [NVM Express])
+>   ...
+>   Capabilities: [900 v1] L1 PM Substates
+>     L1SubCtl1: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2+ ASPM_L1.1-
+>       T_CommonMode=0us LTR1.2_Threshold=101376ns
+>     L1SubCtl2: T_PwrOn=50us
 
-----------------------------------------------------------------
-VFIO fixes for v6.13-rc3
+I think T_PwrOn should also be the same for both devices, FWIW.
 
- - Fix migration dirty page tracking support in the mlx5-vfio-pci
-   variant driver in configurations where the system page size exceeds
-   the device maximum message size, and anticipate device updates where
-   the opposite may also be required. (Yishai Hadas)
+In fact, I think L1SS should be configured identically for both ends
+of the link, with the exceptions of Link Activation and
+Common_Mode_Restore_Time, which are RsvdP for the Upstream Port.
 
-----------------------------------------------------------------
-Yishai Hadas (1):
-      vfio/mlx5: Align the page tracking max message size with the device capability
-
- drivers/vfio/pci/mlx5/cmd.c | 47 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 12 deletions(-)
-
+> Here is VMD mapped PCI device tree:
+> 
+> -+-[0000:00]-+-00.0  Intel Corporation Device 9a04
+>  | ...
+>  \-[10000:e0]-+-06.0-[e1]----00.0  Sandisk Corp WD Blue SN550 NVMe SSD
+>               \-17.0  Intel Corporation Tiger Lake-LP SATA Controller
+> 
+> When pci_reset_bus() resets the bus [e1] of the NVMe, it only saves and
+> restores NVMe's state before and after reset. Then, when it restores the
+> NVMe's state, ASPM code restores L1SS for both the parent bridge and the
+> NVMe in pci_restore_aspm_l1ss_state(). The NVMe's L1SS is restored
+> correctly. But, the parent bridge's L1SS is restored with a wrong value 0x0
+> because the parent bridge's L1SS wasn't saved by pci_save_aspm_l1ss_state()
+> before reset.
+> 
+> To avoid pci_restore_aspm_l1ss_state() restore wrong value to the parent's
+> L1SS config like this example, make pci_save_aspm_l1ss_state() save the
+> parent's L1SS config, if the PCI device has a parent.
+> 
+> Link: https://lore.kernel.org/linux-pci/CAPpJ_eexU0gCHMbXw_z924WxXw0+B6SdS4eG9oGpEX1wmnMLkQ@mail.gmail.com/
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218394
+> Fixes: 17423360a27a ("PCI/ASPM: Save L1 PM Substates Capability for suspend/resume")
+> Suggested-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> Signed-off-by: Jian-Hong Pan <jhp@endlessos.org>
+> Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> Reviewed-by: David E. Box <david.e.box@linux.intel.com>
+> ---
+> v9:
+> - Drop the v8 fix about drivers/pci/pcie/aspm.c. Use this in VMD instead.
+> 
+> v10:
+> - Drop the v9 fix about drivers/pci/controller/vmd.c
+> - Fix in PCIe ASPM to make it symmetric between pci_save_aspm_l1ss_state()
+>   and pci_restore_aspm_l1ss_state()
+> 
+> v11:
+> - Introduce __pci_save_aspm_l1ss_state as a resusable helper function
+>   which is same as the original pci_configure_aspm_l1ss
+> - Make pci_save_aspm_l1ss_state invoke __pci_save_aspm_l1ss_state for
+>   both child and parent devices
+> - Smooth the commit message
+> 
+> v12:
+> - Update the commit message
+> 
+> v13:
+> - Tweak the commit message to make it more like a general fix
+> - When pci_alloc_dev() prepares the pci_dev, it sets the pci_dev's bus.
+>   So, let pci_save_aspm_l1ss_state() access pdev's bus directly.
+> - Add comment in pci_save_aspm_l1ss_state() to describe why it does not
+>   save both the PCIe device and the parent's L1SS config like
+>   pci_restore_aspm_l1ss_state() directly.
+> 
+>  drivers/pci/pcie/aspm.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> index 28567d457613..0bcd060aab32 100644
+> --- a/drivers/pci/pcie/aspm.c
+> +++ b/drivers/pci/pcie/aspm.c
+> @@ -79,7 +79,7 @@ void pci_configure_aspm_l1ss(struct pci_dev *pdev)
+>  			ERR_PTR(rc));
+>  }
+>  
+> -void pci_save_aspm_l1ss_state(struct pci_dev *pdev)
+> +static void __pci_save_aspm_l1ss_state(struct pci_dev *pdev)
+>  {
+>  	struct pci_cap_saved_state *save_state;
+>  	u16 l1ss = pdev->l1ss;
+> @@ -101,6 +101,22 @@ void pci_save_aspm_l1ss_state(struct pci_dev *pdev)
+>  	pci_read_config_dword(pdev, l1ss + PCI_L1SS_CTL1, cap++);
+>  }
+>  
+> +void pci_save_aspm_l1ss_state(struct pci_dev *pdev)
+> +{
+> +	struct pci_dev *parent = pdev->bus->self;
+> +
+> +	__pci_save_aspm_l1ss_state(pdev);
+> +
+> +	/*
+> +	 * Save parent's L1 substate configuration, if the parent has not saved
+> +	 * state. It avoids pci_restore_aspm_l1ss_state() restore wrong value to
+> +	 * parent's L1 substate configuration. However, the parent might be
+> +	 * nothing, if pdev is a PCI bridge.
+> +	 */
+> +	if (parent && !parent->state_saved)
+> +		__pci_save_aspm_l1ss_state(parent);
+> +}
+> +
+>  void pci_restore_aspm_l1ss_state(struct pci_dev *pdev)
+>  {
+>  	struct pci_cap_saved_state *pl_save_state, *cl_save_state;
+> -- 
+> 2.47.0
+> 
 
