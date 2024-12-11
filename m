@@ -1,151 +1,115 @@
-Return-Path: <kvm+bounces-33522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A579ED9AF
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:28:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9957D9ED9C7
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:32:53 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F16B1662BB
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 22:32:48 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858C1D8A0B;
+	Wed, 11 Dec 2024 22:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDlVokYh"
+X-Original-To: kvm@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79DAF282481
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 22:28:24 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B9E1F2C57;
-	Wed, 11 Dec 2024 22:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zdTAouF9"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A3C1F2383
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 22:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3D51F2388;
+	Wed, 11 Dec 2024 22:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733956066; cv=none; b=i2bjLlrxryPkQtlGp+CRLXNdjFSeJ5db1h2xMFRoOmxkUj4RooMTk5xUOMkt+bUfEgmcOIyP4URyIM4iY4U+ih/FNHroZpYr9BFXoRW68DvFbQ1UYjxlJOes2lD8Ntcd7qFfIU9erkRpi5eM21qpglhVfY99kYJF3dIJRdZ/vCQ=
+	t=1733956336; cv=none; b=ZtLHmRUgiZvriMOTkBfiOH7TgvdZGiWRUIbPDKcyYn0VG65K91o7HQQxC/bHIHn8Q7VHmth65zwTfKxrLU8KsVdAksoT3zzTOZ5qJbkbOGzyHbZYMG8GmPXIzGtljwbjHzn+GWkq7LmULVE9xSYrUeK2HWqamU5um2p2eD6PZQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733956066; c=relaxed/simple;
-	bh=zfvlbXt0pmSzkKhbUQaTnd9GPrIIyhoIklT1xW6Pt7Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fGtPZHXiMISpFHCXaLa+TlR+wCUi2O/Z68eFVgLF8BVg5H3WVbQ8Q9sswOAo1TYgQCr5kPJ8u1Cf7J9ExeUiDot10c3eK311Wjov6PXn3NKg9kvSMMJvlqDD9dDex+N2uAFBWIQFVwwsSHkDkZXlc8cKJgNFELGF68gi6gd4Vlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zdTAouF9; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9dbeb848so4042332a91.0
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 14:27:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733956065; x=1734560865; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Baoz8HDL/9D+jzuoT41t0AkYhSUuididMmHyAXJrHww=;
-        b=zdTAouF9XMk67ZfPM0jr0BrmI1e9RAsxvDwtitBmOn0vXcH9GckrVU14cz3g1CjyQd
-         bbu/NN/4nHJKmdTpf+fyXhcpibcksYI3LSjk1jjUBbydbL6rDlRM0pvFD6JMudxwg5/P
-         xlTc8yKRGOjwoj/RvRsQsYe2Yt25l6SgOvnpBKUPxs5KwUrXK5b4XyIbT3G1WI/90NY1
-         Vn60UVbWFk/mr+Gd7R6lzgpvs0y4569bKxzEaYhNCCcOcw9oxKpO+Gkyk7GQMz4cdRBH
-         a7RlAqGUDLHeF8C/JaV1UOZ6Png40PVO9btbFwfwn4h/chPNZvRQnNZ8HUy5el6fDD/g
-         IJDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733956065; x=1734560865;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Baoz8HDL/9D+jzuoT41t0AkYhSUuididMmHyAXJrHww=;
-        b=YSHnrMmQTtQjQb95ayGOFUTZufdbwcZOAq5u9QW5D2c9rrQh/iIC+3KUvPWVcNEYHS
-         c9BQrGR3XfYETPtzWPpHCcWgmGtdlBV2s0Tgw0lfIFNa5yyE2k8DJwuphuafVTXxMs7O
-         X4e8gpCdOx27qxdpsZbxBKhn0wMuDROxgRMbuSYy1wefkPxFnoerY+arCIENABBS0ViW
-         jIoBRsOrf9t61Lx6TCGuuPNbdvbHUwHHLzFUwIs54XqJu2/5DZ00GQCehFLjpBJOH/la
-         HHXqACSp9CuQnRfBADLutdvKTl+YPV+QunGE09LHFe2g5boRkFohf6yoOzY5Zm+wHVKE
-         /nAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEPix1ExRioIN1tpNlsG9NirXhO7xctfxL52hXp92+hGjnAtB/WINVufd6723VQQK91sM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9mQN7RoeZmQDdYeO9X9JTKxunAp5olBaKSGJS2+iU/v146h1N
-	PJDCGkGY5YjsL/ZvnROItJiUsc9fgEpji4sNVaiRodRO7PgIPZ2UkvLkkvX4UK8Syzq2ku9kbVb
-	JuQ==
-X-Google-Smtp-Source: AGHT+IF7Glp3nlBE0Tq75FWGp2Z+wd30I0Kg/yL9mErCj7/SwuZKuKJdgZl+9j5Z7gC8Ntc4Kg3i9rHQuKw=
-X-Received: from pjbqd13.prod.google.com ([2002:a17:90b:3ccd:b0:2ef:8ef8:2701])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f86:b0:2ef:31a9:95c6
- with SMTP id 98e67ed59e1d1-2f139293c58mr2630585a91.14.1733956064657; Wed, 11
- Dec 2024 14:27:44 -0800 (PST)
-Date: Wed, 11 Dec 2024 14:27:42 -0800
-In-Reply-To: <20241202120416.6054-4-bp@kernel.org>
+	s=arc-20240116; t=1733956336; c=relaxed/simple;
+	bh=awhd+qYBZdWAIqJRcAxRI8ocm3yOwTpT8RsZsQR3PAk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G1EaeKvyRhfSYJi7Pb85jVFOfDe8pu2XBz0gHAQLraL0a3IMQx2Z/cY++zvDCT0QYE1iB1pdC80Mbn6SwvuydRVpASunaspLiFNmErwzm2H6yX/hXZAY/VmB49qv/AbhaTeF4ZYDn1WNlY7wmR5wXRCfT1Wb6CDemf9jMmiW4Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDlVokYh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0BF6C4CED2;
+	Wed, 11 Dec 2024 22:32:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733956335;
+	bh=awhd+qYBZdWAIqJRcAxRI8ocm3yOwTpT8RsZsQR3PAk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RDlVokYh0l4AVx9EUxhtB7Pl4dZihyS9aPE4663P+x5ykYHBIc9Ir1CrrdeDXtzsp
+	 iwQwrJx/XOQMKP3c7yqhem1/iuE6FN0OUfXvl0ipFE42Hhea+t+EqAkvqFCjYqNGyR
+	 KCZnki4f6Pqba1ciquWr69X8whEgMReywX3iFv3/dpNSOczT8LePmK+pmflbCq86BK
+	 nCkOguK4Mf3Xb9+0/gJTuirhA9N+uawZaztOziKAnOUhyHKobudckD0JSnzr7HFzyD
+	 vvd0EPNUT6ie9EfVyom9Ue5ajs3C2ICsPvYKbY2faMDnnksBMPkcVWSVZTbwLPQ4Os
+	 N4V4Z9+pQUc0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34141380A965;
+	Wed, 11 Dec 2024 22:32:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241202120416.6054-1-bp@kernel.org> <20241202120416.6054-4-bp@kernel.org>
-Message-ID: <Z1oR3qxjr8hHbTpN@google.com>
-Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@kernel.org>
-Cc: X86 ML <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	"Borislav Petkov (AMD)" <bp@alien8.de>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v8 0/5] Add Svade and Svadu Extensions Support
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <173395635176.1729195.3092998721998204770.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Dec 2024 22:32:31 +0000
+References: <20240726084931.28924-1-yongxuan.wang@sifive.com>
+In-Reply-To: <20240726084931.28924-1-yongxuan.wang@sifive.com>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, greentime.hu@sifive.com,
+ vincent.chen@sifive.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu
 
-On Mon, Dec 02, 2024, Borislav Petkov wrote:
-> diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
-> index 2ad1c05b8c88..79a8f7dea06d 100644
-> --- a/Documentation/admin-guide/hw-vuln/srso.rst
-> +++ b/Documentation/admin-guide/hw-vuln/srso.rst
-> @@ -104,7 +104,17 @@ The possible values in this file are:
->  
->     (spec_rstack_overflow=ibpb-vmexit)
->  
-> + * 'Mitigation: Reduced Speculation':
->  
-> +   This mitigation gets automatically enabled when the above one "IBPB on
-> +   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
-> +
-> +   Currently, the mitigation is automatically enabled when KVM enables
-> +   virtualization and can incur some cost. 
+Hello:
 
-How much cost are we talking?
+This series was applied to riscv/linux.git (fixes)
+by Anup Patel <anup@brainfault.org>:
 
->  static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
-> @@ -2665,6 +2667,12 @@ static void __init srso_select_mitigation(void)
->  
->  ibpb_on_vmexit:
->  	case SRSO_CMD_IBPB_ON_VMEXIT:
-> +		if (boot_cpu_has(X86_FEATURE_SRSO_MSR_FIX)) {
-> +			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-> +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-> +			break;
-> +		}
-> +
->  		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
->  			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
->  				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index dd15cc635655..e4fad330cd25 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -608,6 +608,9 @@ static void svm_disable_virtualization_cpu(void)
->  	kvm_cpu_svm_disable();
->  
->  	amd_pmu_disable_virt();
-> +
-> +	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-> +		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
->  }
->  
->  static int svm_enable_virtualization_cpu(void)
-> @@ -685,6 +688,9 @@ static int svm_enable_virtualization_cpu(void)
->  		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
->  	}
->  
-> +	if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-> +		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+On Fri, 26 Jul 2024 16:49:25 +0800 you wrote:
+> Svade and Svadu extensions represent two schemes for managing the PTE A/D
+> bit. When the PTE A/D bits need to be set, Svade extension intdicates that
+> a related page fault will be raised. In contrast, the Svadu extension
+> supports hardware updating of PTE A/D bits. This series enables Svade and
+> Svadu extensions for both host and guest OS.
+> 
+> Regrading the mailing thread[1], we have 4 possible combinations of
+> these extensions in the device tree, the default hardware behavior for
+> these possibilities are:
+> 1) Neither Svade nor Svadu present in DT => It is technically
+>    unknown whether the platform uses Svade or Svadu. Supervisor
+>    software should be prepared to handle either hardware updating
+>    of the PTE A/D bits or page faults when they need updated.
+> 2) Only Svade present in DT => Supervisor must assume Svade to be
+>    always enabled.
+> 3) Only Svadu present in DT => Supervisor must assume Svadu to be
+>    always enabled.
+> 4) Both Svade and Svadu present in DT => Supervisor must assume
+>    Svadu turned-off at boot time. To use Svadu, supervisor must
+>    explicitly enable it using the SBI FWFT extension.
+> 
+> [...]
 
-IIUC, this magic bit reduces how much the CPU is allowed to speculate in order
-to mitigate potential VM=>host attacks, and that reducing speculation also reduces
-overall performance.
+Here is the summary with links:
+  - [v8,1/5] RISC-V: Add Svade and Svadu Extensions Support
+    https://git.kernel.org/riscv/c/94a7734d0967
+  - [v8,2/5] dt-bindings: riscv: Add Svade and Svadu Entries
+    https://git.kernel.org/riscv/c/b8d481671703
+  - [v8,3/5] RISC-V: KVM: Add Svade and Svadu Extensions Support for Guest/VM
+    https://git.kernel.org/riscv/c/97eccf7db4f2
+  - [v8,4/5] KVM: riscv: selftests: Fix compile error
+    (no matching commit)
+  - [v8,5/5] KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-list test
+    https://git.kernel.org/riscv/c/c74bfe4ffe8c
 
-If that's correct, then enabling the magic bit needs to be gated by an appropriate
-mitagation being enabled, not forced on automatically just because the CPU supports
-X86_FEATURE_SRSO_MSR_FIX.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-And depending on the cost, it might also make sense to set the bit on-demand, and
-then clean up when KVM disables virtualization.  E.g. wait to set the bit until
-entry to a guest is imminent.
+
 
