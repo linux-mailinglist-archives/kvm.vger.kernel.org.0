@@ -1,64 +1,67 @@
-Return-Path: <kvm+bounces-33532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7745C9EDC2E
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 00:47:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E22A9EDC2F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 00:47:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC2B5282785
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:47:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A703165EBF
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399361F4E2D;
-	Wed, 11 Dec 2024 23:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9C11F8667;
+	Wed, 11 Dec 2024 23:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjjbPw1X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Loz5Dw5d"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1A41F3D43
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 23:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6D1F4E3D;
+	Wed, 11 Dec 2024 23:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733960663; cv=none; b=c6EeCccMahQnBJw3xJzgPqntIPtJMvTY28yswJC2JABnxhv2kUE2DNtt0OEgJuJd/pOf3AQJJqPuOT3QC9qalD3qBqo//EqhwNsDU9PQB+N3V0FSB6jDOhGzHeeZKSCSzRoOAHLs/lcPstp7+pJziZVe6k6i7XhtmKZUqtAdCUc=
+	t=1733960668; cv=none; b=d35+hLkyKFHrG4tODsswPV+5llsTlJOK/jAE0byBLRbeGZEJO/N0d7EJ6cnOsePBG1WbpH3OH58RN/4L25iTZ2MQ7hbUj7FGpAo06K26aWbRh2TmEA25kTvIK4o2cTfF79cyOIU/eyiDizdYc/IrFb3gTG/9Bq6I6ZNUp99W1kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733960663; c=relaxed/simple;
-	bh=jeH4GZgYMjzsC79p4/GYsmGWcUTkTTIXW26ndg85N0E=;
+	s=arc-20240116; t=1733960668; c=relaxed/simple;
+	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GFDEWvQFXJUP87Kia+gce/l2/k+q5VskdgXfxO6MC/3PSYRtjEKxOsHUcFspYkYbomO+WH+Cvn1Ud1XqW59AUpbZRS70opSxkR2tO4hQiXLYZ0nLU3yKmRcsjhIxkpfVpZWQ1tBtAcAbF2a1HYrLCFN8livC9DuQNHj1N8KyASU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjjbPw1X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AEDC4CED7;
-	Wed, 11 Dec 2024 23:44:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UwTiOrt24GKzOEw0GBP4VJ7drS0qZUUpDdDIOwL9iC8uaMQjdaEHqWPZE6SzynLuFcM/PdEbl7ms2L89T6/0ejMA8YdoefyaIQSV14xcb8Ea8OUicz5HUQxLKq2QtrrxCoTVOiphvml5dl/JJyVinyYqkFxdrPd/Odknr2IAPTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Loz5Dw5d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F2BC4AF0B;
+	Wed, 11 Dec 2024 23:44:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733960662;
-	bh=jeH4GZgYMjzsC79p4/GYsmGWcUTkTTIXW26ndg85N0E=;
+	s=k20201202; t=1733960665;
+	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AjjbPw1X5lNveMFMXp6R8u+3/Bhr1L9sWoXHTjczmfEbvKTXb/FR/fsSfIiGrX1ZV
-	 Nb2vXNtzbNO/NMartFAhpE2gbzDsuB9LYbSm6J5r++1WgundcqC6sFYVX6ybl029wT
-	 EzBlCbrwDNUqeBAAV9o5hRUaNs4OasAIwZZuF6OffjAKmAI12TLIVNPbelbHMgYgzd
-	 LG2gsHPAB3FmOm9Us2XY9PP9BdOQ3+BTE7BdrwQn4psOkXDhoGMHQ5aSQW6i4zXxH/
-	 p5dZ7nn6qF1V9E4cYHYW1+zBqk8h7M2LKVTVfT52ODGxCjVKa0db9qImHK8atSa0HX
-	 K9LKS38dJN0dw==
+	b=Loz5Dw5dkLz7Jykt2rrpTouLZH3Gs2C/w+EJHtak+Jf5fXazB1SbzLsbJpNdDRJy0
+	 7WNZGb8AsPd0kZ9xWfJOiq6kBzVsce3R76h6EYpxnbBt46GBBm7d/qKfzrWc5i6PT6
+	 nxt0d3Omjq38QqbVNnIHZCTx8Ui3jJRd39GMZqHAshT/eX95+Uah3Ic4i7ZvQD1Wwo
+	 RMdpx+SAc/VfXWt0VOB1dq8466Ijf9B5iV4xalUTxZA58O4w12gZgdGnHBmEOuvaK4
+	 16pOWO7IF3lLGYIr5pZ8YvDT6ifmOIH05g7L2tTzD8Bk22cVbvNn9TMXzkaHxCs7wi
+	 pFoRm8rUUl95g==
 From: Will Deacon <will@kernel.org>
 To: julien.thierry.kdev@gmail.com,
 	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: catalin.marinas@arm.com,
 	kernel-team@android.com,
 	Will Deacon <will@kernel.org>,
 	maz@kernel.org,
 	oliver.upton@linux.dev,
+	apatel@ventanamicro.com,
 	andre.przywara@arm.com,
 	suzuki.poulose@arm.com,
-	apatel@ventanamicro.com
-Subject: Re: [PATCH kvmtool] builtin-run: Allow octal and hex numbers for -m/--mem
-Date: Wed, 11 Dec 2024 23:44:13 +0000
-Message-Id: <173395688697.2731841.12222331741553553547.b4-ty@kernel.org>
+	s.abdollahi22@imperial.ac.uk
+Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
+Date: Wed, 11 Dec 2024 23:44:14 +0000
+Message-Id: <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20241128135041.8737-1-alexandru.elisei@arm.com>
-References: <20241128135041.8737-1-alexandru.elisei@arm.com>
+In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
+References: <20241128151246.10858-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,21 +71,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Thu, 28 Nov 2024 13:50:41 +0000, Alexandru Elisei wrote:
-> There is no reason why -m/--mem should not allow the user to express the
-> desired memory size in octal or hexadecimal, especially when it's as easy
-> as changing the strtoull() 'base' parameter to 0, as per man 3 strtoull.
+On Thu, 28 Nov 2024 15:12:42 +0000, Alexandru Elisei wrote:
+> (resending because I accidently only sent the cover letter, sorry for that)
 > 
-> Before:
+> The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
+> the riscv maintainer because it looks to me like riscv is similarly
+> affected.
 > 
->   $ ./lkvm run -m 0x200 -k Image
+> Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
+> be controversial. Follows a bug report I received from Abdollahi Sina in
+> private. Details in the commit message, but the gist of the patch is that
+> the memory region where kernel + initrd + DTB are copied to are changed
+> from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
+> ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
+> users rely on finding the DTB and initrd at the current addresses, then I'm
+> not sure the patch is justified - after all, if someone really wants to use
+> such a large initrd instead of a disk image with virtio, then replacing
+> SZ_256M with SZ_512M locally doesn't look like a big ask.
 > 
 > [...]
 
-Applied to kvmtool (master), thanks!
+Applied to arm64 (sina), thanks!
 
-[1/1] builtin-run: Allow octal and hex numbers for -m/--mem
-      https://git.kernel.org/will/kvmtool/c/2be69d9d4ae3
+[1/4] arm: Fix off-by-one errors when computing payload memory layout
+      https://git.kernel.org/arm64/c/167aa1e
+[2/4] arm: Check return value for host_to_guest_flat()
+      https://git.kernel.org/arm64/c/ca57fb6
+[3/4] arm64: Use the kernel header image_size when loading into memory
+      https://git.kernel.org/arm64/c/32345de
+[4/4] arm64: Increase the payload memory region size to 512MB
+      https://git.kernel.org/arm64/c/9b26a8e
 
 Cheers,
 -- 
