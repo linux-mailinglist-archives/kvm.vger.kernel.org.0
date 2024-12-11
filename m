@@ -1,135 +1,79 @@
-Return-Path: <kvm+bounces-33520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6569ED986
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:20:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28809ED97E
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:20:10 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE1C4188457B
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 22:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94FB82823DA
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 22:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C37A1F2392;
-	Wed, 11 Dec 2024 22:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25BA1F0E46;
+	Wed, 11 Dec 2024 22:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBNirnu6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEGJ+njA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CD81C304A;
-	Wed, 11 Dec 2024 22:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A2A1A841F;
+	Wed, 11 Dec 2024 22:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733955609; cv=none; b=hLhP/vjTndfso2Xf3efgEI4kZFPcEV7MM467tRizoEbkaenisa9GdQgmvQyq0IORFqes/8ee/UAejThLiX4h2rhw4SShHtcjuEPd/NkWw/CFfgWTnYHt/J5/Q9w1tS/j46eYOXCe2oy93+eyCSkCV5iCw6KMwEAOV/FJiiZuHt8=
+	t=1733955601; cv=none; b=TT0WmDBqL9d0l4Ud+iQyJwF1lWghIIEkxvO5mj6LulSaUzH0x4kBsdOWGyEV77tY9FuxGsLWCcxkruyeNDDZrU5QSf3pTnH3qWUnJb8CsafYrlr8gOeWOok7HZdw8iEGBzTHeEu9wirEj72ApR7XONiIovJ8pMMzm4WTr8khFIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733955609; c=relaxed/simple;
-	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elv6m3HdSOdEICY/3aSSgbWXYNWERWVQvLHMz7jD+zQ5MPv52a+Ojl5HhSdtYC77lVZ9iESwHsvGc+MKnEAWdKjTCT3pPr5ThpQjkSNRYcPKX0UZGQkU0aRg9bEt5blGlf5OPECdYn7Ax1f0iOCkpbnZ9VWavFsACWBFOPOEfhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBNirnu6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576FC4CED2;
-	Wed, 11 Dec 2024 22:20:04 +0000 (UTC)
+	s=arc-20240116; t=1733955601; c=relaxed/simple;
+	bh=eSYCGPK4PvAqsXZyCXWW12lbDf1VapALJ3PXGKc5DrM=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Qnvof6nz8+ffQBjN+OrfNvh5t5mQ1ZmtZlFiCUAgFCPoXgPzFOQIWTGewuNqWuaTNJHK7ZobWBuu9vHG7SVT7s5VBJWCZrJlHL1eb2/FYzsbBUJZ6iIcQeuqHNtipk9uN9AmYa6hicVS29uOmMVbfM9qh+49eLpv2h4HdiXm0so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEGJ+njA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB085C4CED2;
+	Wed, 11 Dec 2024 22:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733955609;
-	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kBNirnu6kCr1d7gsDMgZrNuAXLYpD8uzILmzzbrNO1Mnk09f4n481Cndxfrau3+jJ
-	 FpLkwRUeISCmz/SpemPgohhlQ3XgJzMdmIoVZ+IhBa91qhgYo51NaglvZU5BDtIZwB
-	 //WGIgbYueq/MY8+Vmm6UVkGftTY+5cuZd/vROmxV6NP1K5rtWTWqMiA7gXfNGL2rJ
-	 x8QxUc2OB1rxoUChWT6mPdO+zhCO+RaRL8TgtaiQ2BKywx4s0f0kj5Ngw6pkMs+dfE
-	 zgxHiHxwQbMNfdTxhMs7Xm5RVvG80KHa9zyTwAQzCJbyWkRaNGRYrBbAH41l/rU6DO
-	 Lf0Zf/ATio7bQ==
-Date: Wed, 11 Dec 2024 22:20:00 +0000
-From: Will Deacon <will@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v4 04/18] iommu: add kernel-doc for iommu_unmap and
- iommu_unmap_fast
-Message-ID: <20241211222000.GH17486@willie-the-truck>
-References: <cover.1733398913.git.leon@kernel.org>
- <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
+	s=k20201202; t=1733955600;
+	bh=eSYCGPK4PvAqsXZyCXWW12lbDf1VapALJ3PXGKc5DrM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=BEGJ+njAEO8C7LvpUoeznO45Hnr7lQvxC8H3U8ckhugo0k3qydoOtfxqpAU7p+zMl
+	 UljpyYQzv03OnJ6RmMU/xunHyNRpPWUaoS0zRf2DkDPm8M2tNo0C/XypxK6S7cq2wD
+	 vLF6uCegajLFdQKEm6kIMIARAy08ikDEiPSYtHAE8jMlLEeuJRVgfkzjFMz7Tc7Fcm
+	 dp0cfwbDREfK7fSHOtI0jn+OJ94pvbgCZGbG739sPMhcOdQyaIUi3x1L0jyDHzXJTM
+	 6VRzrZPPK7UoWjzdOXn4SxP8IzdHbmlkhXrSiJHYVk4j5e9i7WpVDaRS4/fG6Rx63U
+	 QjW9z4aFIPKCA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3E2380A965;
+	Wed, 11 Dec 2024 22:20:17 +0000 (UTC)
+Subject: Re: [GIT PULL] VFIO fixes for v6.13-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241211134543.715454ea.alex.williamson@redhat.com>
+References: <20241211134543.715454ea.alex.williamson@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241211134543.715454ea.alex.williamson@redhat.com>
+X-PR-Tracked-Remote: https://github.com/awilliam/linux-vfio.git tags/vfio-v6.13-rc3
+X-PR-Tracked-Commit-Id: 9c7c5430bca36e9636eabbba0b3b53251479c7ab
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ec8e2d3889114f41d07cd341e80dc6de7f8eb213
+Message-Id: <173395561660.1747277.12280886869001491637.pr-tracker-bot@kernel.org>
+Date: Wed, 11 Dec 2024 22:20:16 +0000
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Yishai Hadas <yishaih@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Dec 05, 2024 at 03:21:03PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
-> existing limitation of underlying functions which can't split individual
-> ranges.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/iommu/iommu.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index ec75d14497bf..9eb7c7d7aa70 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2590,6 +2590,24 @@ size_t iommu_unmap(struct iommu_domain *domain,
->  }
->  EXPORT_SYMBOL_GPL(iommu_unmap);
->  
-> +/**
-> + * iommu_unmap_fast() - Remove mappings from a range of IOVA without IOTLB sync
-> + * @domain: Domain to manipulate
-> + * @iova: IO virtual address to start
-> + * @size: Length of the range starting from @iova
-> + * @iotlb_gather: range information for a pending IOTLB flush
-> + *
-> + * iommu_unmap_fast() will remove a translation created by iommu_map(). It cannot
-> + * subdivide a mapping created by iommu_map(), so it should be called with IOVA
-> + * ranges that match what was passed to iommu_map(). The range can aggregate
-> + * contiguous iommu_map() calls so long as no individual range is split.
-> + *
-> + * Basicly iommu_unmap_fast() as the same as iommu_unmap() but for callers
+The pull request you sent on Wed, 11 Dec 2024 13:45:43 -0700:
 
-Typo: s/Basicly/Basically/
-Typo: s/as the same/is the same/
+> https://github.com/awilliam/linux-vfio.git tags/vfio-v6.13-rc3
 
-> + * which manage IOTLB flush range externaly to perform batched sync.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ec8e2d3889114f41d07cd341e80dc6de7f8eb213
 
-Grammar: s/manage IOTLB flush range/manage the IOTLB flushing/
-Typo: s/externaly/externally/
-Grammar: s/to perform batched sync/to perform a batched sync/
+Thank you!
 
-With those:
-
-Acked-by: Will Deacon <will@kernel.org>
-
-Thank you for doing this!
-
-Will
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
