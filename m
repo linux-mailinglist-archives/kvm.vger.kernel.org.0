@@ -1,109 +1,154 @@
-Return-Path: <kvm+bounces-33463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0B29EC182
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 02:31:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10189EC184
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 02:33:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9EE3188A730
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 01:31:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C146169863
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 01:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BA97DA93;
-	Wed, 11 Dec 2024 01:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF013139CF2;
+	Wed, 11 Dec 2024 01:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JQQnkSS9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OkcAzRH8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DD52451E2;
-	Wed, 11 Dec 2024 01:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579782451E2
+	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 01:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733880676; cv=none; b=drzr9+IrhpPu62Bur2fcl9MACW+oe/pDs2zUUjFjNZZ/iUBJrcwQ8U4b/XwSy9hwf/SjUkxEwpc8mVgu93m7gnTcWpAsLuEuT+Z2obLnPvJ6N7/U/RjTeRkYR8AJESkSCBvp8GQKAvAo+cs9LyrFgERd8pzCeATpMrl3WqVmxdc=
+	t=1733880786; cv=none; b=XP07h0wWGjM+ZchGr22BuuSZvEzx0iLZMDZfJ1rE227p+8tvIyoDjIgMttqSwwJ6k7zWJdUPu5xCxsIAkUeh7Cwr2TY9b1Wv0nHlTqiWlWgdL8Ko3BGJtRs20DtU16CSKB7RAJ06te8q6IWv1p6YOnexXE80RLHBiTqf3nkYK4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733880676; c=relaxed/simple;
-	bh=yaftARiUbVgBvmlunQ3xyF3c9wGFVBGc/49CctniBO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LfGS+gpe95q8PGF8GwGK31DKwl4gGib10S0KtQTRw0MFv4HhxDAucZIjFJkGuAqzpZZamvrQIaCa08Iv7BzbgAWCcOg4Gv0DsirgAvMYlTztD5nsWawbmgdUjYS8wRfx4nilwgLd4ICaqhDwlS09qQJ/XCpFDcK/Fi/muLsw4Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JQQnkSS9; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733880675; x=1765416675;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yaftARiUbVgBvmlunQ3xyF3c9wGFVBGc/49CctniBO4=;
-  b=JQQnkSS9whdnpkPGMz7H3q4GImuTr6+kMWUOZitqoxxBhG1mzLqZSqta
-   UOlWtqEWVhXybSVUlq4aStBeol/ylUchvbJoUhlOhnyz42kRs+Tln2o6c
-   dzHWgBAEwI72wSCGfa5eVPcXtN9p8fgirHYkxc1cRFYEZSMS/kNNLrdRo
-   xDjU8R37/SWBla6R+zcY44OIgHNUwtVsNxP19ElvsnBkjAswGTSlgvsrP
-   t458eDYqx/aSvZh3tZSMepXMP4ASCCYbNzltLtc2XlRlEZ+RNlydalzpu
-   lCnVBD8owaBZQMrgyCkXUqBCEOPLiYx1+PBF2e9K9OL1iAHurvP3zilqN
-   A==;
-X-CSE-ConnectionGUID: eQsdeC+kSbCsgLMw7R1xig==
-X-CSE-MsgGUID: yTBluM0xQuqwi6lT1SKD1A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="33583246"
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="33583246"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 17:31:14 -0800
-X-CSE-ConnectionGUID: kqN5becJTOK3I2HK628D+Q==
-X-CSE-MsgGUID: +2W1NSC9QkSfNVJdHlqNpQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="100658085"
-Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 17:31:10 -0800
-Message-ID: <6251ba39-bc90-44ad-bdf3-8de2222dcb72@linux.intel.com>
-Date: Wed, 11 Dec 2024 09:31:08 +0800
+	s=arc-20240116; t=1733880786; c=relaxed/simple;
+	bh=uiLSkfoYikjxzNNPE91pULEMWx/aZZhxKXpCVFkXC9A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ic1p/1SOP/Mmb9aSHDMi3Yo47gbiUTSQfSfOes2y0dBa4Nz/pbkj43gTMeOMqA2e3h/0vXeVWzafPZEd60Nm+lq3Q144++crLJkU/5IKYlu+J5FSBl1ntVPncIF1cE0rSd0xJgOv17nSld5INaVuzUtjCLgEY8lZCAmID9aN22g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OkcAzRH8; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee36569f4cso6335822a91.2
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2024 17:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733880785; x=1734485585; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S0GM8PD/UxcwHjc3Q+9N5jJw/x8Oe5hUuW4U5Y6mpX8=;
+        b=OkcAzRH8sG2S2iNxQzFGhuUbFVkcW7zy1KnlVK3XHFS9jPh+hrON4jVWzD4U4bHFsZ
+         PrygSqRn1x8CWmFP2xP0T5RT72tbBRonXiOCmqzzL+JQVu6pMUCbMvczbJxaMfYdhnXy
+         lGIE9hetnIzfLKT7CXQLGIftMXt48CdznJBfADqSDlk4C9lrwNC5v+1bjUun/ZWfcpQM
+         2z+K03QzTjI0P0iPcr1DfTgH/euUgJ6PvlEDKX7jhOr3qHgMIaXxTV3Y+a5ajiEJ7FWM
+         RXO1eyp7LMU2ZBU+3wuX+hKJAeOJkNqh5vCTsR6zLXvnuVeSmOhxXNldBi2N2CfH4XOc
+         rP1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733880785; x=1734485585;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S0GM8PD/UxcwHjc3Q+9N5jJw/x8Oe5hUuW4U5Y6mpX8=;
+        b=QzPaAGJwtrdw5Prd241wkXbIKrBWxbFn9ydJWC0C0CD/DVeyHEsw81x67fgbmL2iqx
+         noFfah01BGv9YB0T6MXevj24rsYIkMCVrI5nyZpd8k8x6VZl6k5nrWRU6/4//0pB4Awl
+         jtP0AWl4M2WVk0EF4PRUkWzrz5IqcrHuoTh66+huMmNjfe4ba1A21IuTXIIKMzBDDBoH
+         KSAPX1PhKsS6YbcB7aKjuMvP7KyvAxEMLm8IHSLNesvvR1TPSUcP2OZLad8GNp1NKIHd
+         1VXT+mpUL1qCpHskRdr2C0+rv5b4AU+iC5+sShoVE/7D5A9g230NpkxmupfujwodYGEF
+         9tSw==
+X-Gm-Message-State: AOJu0YywIl/4klbAVxxqINKAVGSYPjqLNsY3xHsq847bTyfEidGRfAf5
+	2jy7HJS4mmuI7UP6msTtKrTtsQGjLkQbZvx9Lq/UcH7sA4LLad7IMIcZuLkYjR/v/rIzi70HF2Z
+	WXw==
+X-Google-Smtp-Source: AGHT+IENj0FzInkrDWVMNmBSkctAQAVJ7Y0SFirI4QVP6zzjY6m+DpZUmJ/HClMFz/Vos443aUuZzGxni+Q=
+X-Received: from pjbpl11.prod.google.com ([2002:a17:90b:268b:b0:2ef:7352:9e97])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d4f:b0:2ee:863e:9fe8
+ with SMTP id 98e67ed59e1d1-2f127feca46mr1713618a91.18.1733880784699; Tue, 10
+ Dec 2024 17:33:04 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 10 Dec 2024 17:32:57 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/18] KVM: TDX: TDX "the rest" part
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
- xiaoyao.li@intel.com, tony.lindgren@linux.intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
- linux-kernel@vger.kernel.org
-References: <20241210182512.252097-2-pbonzini@redhat.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20241210182512.252097-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241211013302.1347853-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: x86: Address xstate_required_size() perf regression
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+
+Fix a hilarious/revolting performance regression (relative to older CPU
+generations) in xstate_required_size() that pops up due to CPUID _in the
+host_ taking 3x-4x longer on Emerald Rapids than Skylake.
+
+The issue rears its head on nested virtualization transitions, as KVM
+(unnecessarily) performs runtime CPUID updates, including XSAVE sizes,
+multiple times per transition.  And calculating XSAVE sizes, especially
+for vCPUs with a decent number of supported XSAVE features and compacted
+format support, can add up to thousands of cycles.
+
+To fix the immediate issue, cache the CPUID output at kvm.ko load.  The
+information is static for a given CPU, i.e. doesn't need to be re-read
+from hardware every time.  That's patch 1, and eliminates pretty much all
+of the meaningful overhead.
+
+Patch 2 is a minor cleanup to try and make the code easier to read.
+
+Patch 3 fixes a wart in CPUID emulation where KVM does a moderately
+expensive (though cheap compared to CPUID, lol) MSR lookup that is likely
+unnecessary for the vast majority of VMs.
+
+Patches 4 and 5 address the problem of KVM doing runtime CPUID updates
+multiple times for each nested VM-Enter and VM-Exit, at least half of
+which are completely unnecessary (CPUID is a mandatory intercept on both
+Intel and AMD, so ensuring dynamic CPUID bits are up-to-date while running
+L2 is pointless).  The idea is fairly simple: lazily do the CPUID updates
+by deferring them until something might actually consume guest the relevant
+bits.
+
+This applies on the cpu_caps overhaul[*], as patches 3-5 would otherwise
+conflict, and I didn't want to think about how safe patch 5 is without
+the rework.
+
+That said, patch 1, which is the most important and tagged for stable,
+applies cleanly on 6.1, 6.6, and 6.12 (and the backport for 5.15 and
+earlier shouldn't be too horrific).
+
+Side topic, I can't help but wonder if the CPUID latency on EMR is a CPU
+or ucode bug.  For a number of leaves, KVM can emulate CPUID faster than
+the CPUID can execute the instruction.  I.e. the entire VM-Exit => emulate
+=> VM-Enter sequence takes less time than executing CPUID on bare metal.
+Which seems absolutely insane.  But, it shouldn't impact guest performance,
+so that's someone else's problem, at least for now.
+
+[*] https://lore.kernel.org/all/20241128013424.4096668-1-seanjc@google.com
+
+Sean Christopherson (5):
+  KVM: x86: Cache CPUID.0xD XSTATE offsets+sizes during module init
+  KVM: x86: Use for-loop to iterate over XSTATE size entries
+  KVM: x86: Apply TSX_CTRL_CPUID_CLEAR if and only if the vCPU has RTM
+    or HLE
+  KVM: x86: Query X86_FEATURE_MWAIT iff userspace owns the CPUID feature
+    bit
+  KVM: x86: Defer runtime updates of dynamic CPUID bits until CPUID
+    emulation
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            | 63 ++++++++++++++++++++++++---------
+ arch/x86/kvm/cpuid.h            | 10 +++++-
+ arch/x86/kvm/lapic.c            |  2 +-
+ arch/x86/kvm/smm.c              |  2 +-
+ arch/x86/kvm/svm/sev.c          |  2 +-
+ arch/x86/kvm/svm/svm.c          |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  2 +-
+ arch/x86/kvm/x86.c              | 22 +++++++++---
+ 9 files changed, 78 insertions(+), 28 deletions(-)
 
 
+base-commit: 06a4919e729761be751366716c00fb8c3f51d37e
+-- 
+2.47.0.338.g60cca15819-goog
 
-
-On 12/11/2024 2:25 AM, Paolo Bonzini wrote:
-> Applied to kvm-coco-queue, thanks.  For now I used v1 of "TDX vCPU
-> enter/exit" as it was posted, but I will check out the review comments
-> later.
->
-> Paolo
-Hi Paolo,
-
-The the following two fixup patches to v1 of "TDX vCPU enter/exit" related
-to the later sections.
-
-One is https://github.com/intel/tdx/commit/22b7001fbb58771bf133a64e1b22fb9e47d8a11f
-, make tdx_vcpu_enter_exit() noinstr based on the discussion:
-https://lore.kernel.org/kvm/Z0SVf8bqGej_-7Sj@google.com/
-
-
-The other is https://github.com/intel/tdx/commit/13828e0b586eed6618ccdef9e4f58b09358564d2
-, move the check of VCPU_TD_STATE_INITIALIZED from tdx_vcpu_run() to
-tdx_vcpu_pre_run() based on the discussion:
-https://lore.kernel.org/kvm/837bbbc7-e7f3-4362-a745-310fe369f43d@intel.com/
-So the check for VCPU_TD_STATE_INITIALIZED in tdx_handle_exit() is dropped in
-"TDX hypercalls may exit to userspace"
 
