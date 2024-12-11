@@ -1,131 +1,199 @@
-Return-Path: <kvm+bounces-33491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257C69ED3A9
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 18:32:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8419ED3DE
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 18:43:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A359C281F19
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 17:32:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B372835B2
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 17:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4BF1FF61D;
-	Wed, 11 Dec 2024 17:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46C81FF1B9;
+	Wed, 11 Dec 2024 17:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUfGzhSO"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="Nq4tv77V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B861FF1B9
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 17:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF741D6DA4;
+	Wed, 11 Dec 2024 17:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733938198; cv=none; b=WdjlFgvjC99KrbFEeeXS2LDVPGAUhSq9p1YwnIoW1qcbIVgiEeRM7JqBkzGpwqlbYfoJw1TXgbr1ri7kD/pXi35WPa94c9pl3BYDnDki0sc4TGJjxCmyXI6dSMTUs7/6iB5cerELpurA1QEdxlsv+i2jnG4B35vJ4QZw4zQ13cg=
+	t=1733938995; cv=none; b=ZB0f26VITb2JUdxnv1LoCPJVFybcFzh8fITT1MlHu04ECasNpwCayM6JgFkkS8uM+9A7+r7RPtgkhACcuf6Yhmu8KwlcJ6Sjvcghp+Pn799G6mjHjOppeNL4vpkdlxi4LS0eKMKYwdWp2wI8IxihbNLngfWan7etMUBl9Lel2f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733938198; c=relaxed/simple;
-	bh=Lk+Ha5wxFQ+Mh3b1LwsGP/EOGKHkzmqvcnz+ZP8JKUg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SIdTspNSQHLOSlICf3tRfyeXf+XbS5aCWppkVVH074A+OohfbLsvSfp7Y+99KdyQkzQGGm877qWwcGYtuCMeG/tXqOZPEv9aiv5t8tV/FcQ9pxCZMY6pqw9YCGFXyVNhcwehpQk7fQZzWD2jQ0QPKSVPqDVok92wr9lXxjEN+p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUfGzhSO; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so5261354a91.3
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 09:29:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733938196; x=1734542996; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cs2OyeuqVZvLJyvF9hJVcimYDZMHCiD1C4FXtPFGvoo=;
-        b=VUfGzhSOBiXl7PhmBtQS7TouC3yLN/c85kiqD38kGl2WfYvYei+T9HUKKLQ508STpg
-         bQJqP35zjjctlsoS8X0pd9/cotzJio9esuPESdprzdU0P3puDBl59Vo2BeRfXH699tuh
-         aoVpGRQmxYl51XT2Ai+XDktTYA/71e9FnKKeuurcc1b+yK2U/Sd1qERVV5KykOZ4iNwA
-         Kz3oBcmyFLqKtblhXB3chw0vd5zqvj5RWiQ2D1AeJwtdhRTLfMcnrSaDT/t9lar6muRU
-         PswXS/0p/vWWA2ggadgmZ48bXjvhAbaD+fnCEqW/Dm5fEK+65mJsfBO2sCgkkrtOXVWA
-         CG8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733938196; x=1734542996;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cs2OyeuqVZvLJyvF9hJVcimYDZMHCiD1C4FXtPFGvoo=;
-        b=foKBGjYslyOMJtin3YgTYpDfpOqS2ilU7opiW5MK5/c/IkxEXvmep5raqAsIfTpsXo
-         wUGT8LaSPVl9A6430gBKnr9ZcXk4EicQARK0uL7T23RsfGP4IfUq2gT01eoylahU9pty
-         jk1p/DfAFOhxTVTCQ94cgZqsMz0gkiw8GnJSBhqxI/beUuVtaw3WnD/CWqLNJnenfaKm
-         IyFf4yvWQ3HgwKE703hutYQU1a//puVMSBq4kjxZj67szqwqXoRlNE2CYXjayrEGWuiU
-         XC5hAvvrkgn5CEwqMBAjnYxgRUoVfIHFb+KUaaP4rzqd490HCywIrBPehqyxSQ1mAZj1
-         vAWQ==
-X-Gm-Message-State: AOJu0YyeqzK+ypZMS/CT0orr5MIw0WiwZNFMfAqXQN9nwJAJ4Mlvo46G
-	0Q5niOzTlCOhGXdWMFi+D06GC/N3nu70mmQC6AqlUShQh5RvgvSEoP4wjkIe/jmamv04bsDVUR1
-	UWw==
-X-Google-Smtp-Source: AGHT+IFufc8TXj11zrpajD1CnjIdyF+fE49Tlzc87TuIZTOcSb7mTLdHCVV9hJ4SvHQ7hecMnEHAOzzXzPI=
-X-Received: from pjg3.prod.google.com ([2002:a17:90b:3f43:b0:2ef:78ff:bc3b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1a8c:b0:2ee:45fe:63b5
- with SMTP id 98e67ed59e1d1-2f1392577ebmr1129021a91.3.1733938196340; Wed, 11
- Dec 2024 09:29:56 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Dec 2024 09:29:52 -0800
+	s=arc-20240116; t=1733938995; c=relaxed/simple;
+	bh=49SKRixadurapl3Gf/n3BAdrM2d4z6xw6c6GK+sdzfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bd7V1aOe+2NaxMGlSaXdDzqiMnZSZzXvMmtBOj9w6OcjE2wjU/v7YpLZWOFNnMLYzxhAakMAABiOoIuoa9DmbI0EZEtl8zPJpp3ZOQRe/DfBkr6/4c+YeehTBZBFKfgYLLg7OPowEyQQXQw+EEUsYCZTfPaxnph0tBQ/pdTjFhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=Nq4tv77V; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4Y7jcP3NMYz9tF2;
+	Wed, 11 Dec 2024 18:43:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1733938981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NMs1sLGLbCKoPzxD2qKl1ngo8hgDqG1n8l4Vt1q2uJM=;
+	b=Nq4tv77VX8S/nEzIV7jQ9qZ/gF1BEiP6Vzuqzywx2L+xZlmou1UQH6X4Rk5o/rKyb2oKbY
+	xN89lb7raDshjyJWzteYfpYoV6+FbPLFLg3JYinuSa6m/NOAWs4hRycedyHUyF/XhUqnj6
+	MSHClgxlxuq6Uwit7f0AI0JzFbHD5AjBgzYEcVvgauI7pw2iJCOWf9nBCYD27qo1+rFfiq
+	3mNvCCY9/+iKJr3HCLq0Z4G8z4nAB78XXay/fqesJU6R5g8ewVv81gDypLAJdVzQeD9c4Q
+	E5WaMjzdlW9JZOO5uyxMfONWguwydir4hC3YfieOXHg4eXop51PNpb5seRUKUw==
+Message-ID: <e1c96619-4402-4577-b2b8-a694bd5569c7@mailbox.org>
+Date: Wed, 11 Dec 2024 18:42:58 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241211172952.1477605-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Simon Pilkington <simonp.git@mailbox.org>, Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [REGRESSION] from 74a0e79df68a8042fb84fd7207e57b70722cf825: VFIO
+ PCI passthrough no longer works
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ regressions@lists.linux.dev
+References: <52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org>
+ <Z1hiiz40nUqN2e5M@google.com>
+ <93a3edef-dde6-4ef6-ae40-39990040a497@mailbox.org>
+ <9e827d41-a054-5c04-6ecb-b23f2a4b5913@amd.com> <Z1jEDFpanEIVz1sY@google.com>
+ <c64099db-33b3-9438-536e-7882bae614e0@amd.com>
+Content-Language: en-GB
+From: Simon Pilkington <simonp.git@mailbox.org>
+In-Reply-To: <c64099db-33b3-9438-536e-7882bae614e0@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-META: xdc69urognmmw5b6skbn8y398iernif8
+X-MBO-RS-ID: 73b08729dd3458e0d66
 
-Drop KVM's arbitrary behavior of making DE_CFG.LFENCE_SERIALIZE read-only
-for the guest, as rejecting writes can lead to guest crashes, e.g. Windows
-in particular doesn't gracefully handle unexpected #GPs on the WRMSR, and
-nothing in the AMD manuals suggests that LFENCE_SERIALIZE is read-only _if
-it exists_.
+On 11/12/2024 15:37, Tom Lendacky wrote:
+> On 12/10/24 16:43, Sean Christopherson wrote:
+>> On Tue, Dec 10, 2024, Tom Lendacky wrote:
+>>> On 12/10/24 14:33, Simon Pilkington wrote:
+>>>> On 10/12/2024 16:47, Sean Christopherson wrote:
+>>>>> Can you run with the below to see what bits the guest is trying to set (or clear)?
+>>>>> We could get the same info via tracepoints, but this will likely be faster/easier.
+>>>>>
+>>>>> ---
+>>>>>  arch/x86/kvm/svm/svm.c | 12 +++++++++---
+>>>>>  1 file changed, 9 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>>>> index dd15cc635655..5144d0283c9d 100644
+>>>>> --- a/arch/x86/kvm/svm/svm.c
+>>>>> +++ b/arch/x86/kvm/svm/svm.c
+>>>>> @@ -3195,11 +3195,14 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>>>>>  	case MSR_AMD64_DE_CFG: {
+>>>>>  		u64 supported_de_cfg;
+>>>>>  
+>>>>> -		if (svm_get_feature_msr(ecx, &supported_de_cfg))
+>>>>> +		if (WARN_ON_ONCE(svm_get_feature_msr(ecx, &supported_de_cfg)))
+>>>>>  			return 1;
+>>>>>  
+>>>>> -		if (data & ~supported_de_cfg)
+>>>>> +		if (data & ~supported_de_cfg) {
+>>>>> +			pr_warn("DE_CFG supported = %llx, WRMSR = %llx\n",
+>>>>> +				supported_de_cfg, data);
+>>>>>  			return 1;
+>>>>> +		}
+>>>>>  
+>>>>>  		/*
+>>>>>  		 * Don't let the guest change the host-programmed value.  The
+>>>>> @@ -3207,8 +3210,11 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>>>>>  		 * are completely unknown to KVM, and the one bit known to KVM
+>>>>>  		 * is simply a reflection of hardware capabilities.
+>>>>>  		 */
+>>>>> -		if (!msr->host_initiated && data != svm->msr_decfg)
+>>>>> +		if (!msr->host_initiated && data != svm->msr_decfg) {
+>>>>> +			pr_warn("DE_CFG current = %llx, WRMSR = %llx\n",
+>>>>> +				svm->msr_decfg, data);
+>>>>>  			return 1;
+>>>>> +		}
+>>>>>  
+>>>>>  		svm->msr_decfg = data;
+>>>>>  		break;
+>>>>>
+>>>>> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+>>>>
+>>>> Relevant dmesg output with some context below. VM locked up as expected.
+>>>>
+>>>> [   85.834971] vfio-pci 0000:0c:00.0: resetting
+>>>> [   85.937573] vfio-pci 0000:0c:00.0: reset done
+>>>> [   86.494210] vfio-pci 0000:0c:00.0: resetting
+>>>> [   86.494264] vfio-pci 0000:0c:00.1: resetting
+>>>> [   86.761442] vfio-pci 0000:0c:00.0: reset done
+>>>> [   86.761480] vfio-pci 0000:0c:00.1: reset done
+>>>> [   86.762392] vfio-pci 0000:0c:00.0: resetting
+>>>> [   86.865462] vfio-pci 0000:0c:00.0: reset done
+>>>> [   86.977360] virbr0: port 1(vnet1) entered learning state
+>>>> [   88.993052] virbr0: port 1(vnet1) entered forwarding state
+>>>> [   88.993057] virbr0: topology change detected, propagating
+>>>> [  103.459114] kvm_amd: DE_CFG current = 0, WRMSR = 2
+>>>> [  161.442032] virbr0: port 1(vnet1) entered disabled state // VM shut down
+>>>
+>>> That is the MSR_AMD64_DE_CFG_LFENCE_SERIALIZE bit. Yeah, that actually
+>>> does change the behavior of LFENCE and isn't just a reflection of the
+>>> hardware.
+>>>
+>>> Linux does set that bit on boot, too (if LFENCE always serializing isn't
+>>> advertised 8000_0021_EAX[2]), so I'm kind of surprised it didn't pop up
+>>> there.
+>>
+>> Linux may be running afoul of this, but it would only become visible if someone
+>> checked dmesg.  Even the "unsafe" MSR accesses in Linux gracefully handle faults
+>> these days, the only symptom would be a WARN.
+>>
+>>> I imagine that the above CPUID bit isn't set, so an attempt is made to
+>>> set the MSR bit.
+>>
+>> Yep.  And LFENCE_RDTSC _is_ supported, otherwise the supported_de_cfg check would
+>> have failed.  Which means it's a-ok for the guest to set the bit, i.e. KVM won't
+>> let the guest incorrectly think it's running on CPU for which LFENCE is serializing.
+>>
+>> Unless you (Tom) disagree, I vote to simply drop the offending code, i.e. make
+>> all supported bits fully writable from the guest.  KVM is firmly in the wrong here,
+>> and I can't think of any reason to disallow the guest from clearing LFENCE_SERIALIZE.
+>>
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 6a350cee2f6c..5a82ead3bf0f 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -3201,15 +3201,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>>                 if (data & ~supported_de_cfg)
+>>                         return 1;
+>>  
+>> -               /*
+>> -                * Don't let the guest change the host-programmed value.  The
+>> -                * MSR is very model specific, i.e. contains multiple bits that
+>> -                * are completely unknown to KVM, and the one bit known to KVM
+>> -                * is simply a reflection of hardware capabilities.
+>> -                */
+>> -               if (!msr->host_initiated && data != svm->msr_decfg)
+>> -                       return 1;
+>> -
+> 
+> That works for me.
+> 
+> Thanks,
+> Tom
+> 
+>>                 svm->msr_decfg = data;
+>>                 break;
+>>         }
+>>
 
-KVM only allows LFENCE_SERIALIZE to be set, by the guest or host, if the
-underlying CPU has X86_FEATURE_LFENCE_RDTSC, i.e. if LFENCE is guaranteed
-to be serializing.  So if the guest sets LFENCE_SERIALIZE, KVM will provide
-the desired/correct behavior without any additional action (the guest's
-value is never stuffed into hardware).  And having LFENCE be serializing
-even when it's not _required_ to be is a-ok from a functional perspective.
+Thanks for the prompt response on this Sean & Tom.
 
-Fixes: 74a0e79df68a ("KVM: SVM: Disallow guest from changing userspace's MSR_AMD64_DE_CFG value")
-Fixes: d1d93fa90f1a ("KVM: SVM: Add MSR-based feature support for serializing LFENCE")
-Reported-by: Simon Pilkington <simonp.git@mailbox.org>
-Closes: https://lore.kernel.org/all/52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 9 ---------
- 1 file changed, 9 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635655..21dacd312779 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3201,15 +3201,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		if (data & ~supported_de_cfg)
- 			return 1;
- 
--		/*
--		 * Don't let the guest change the host-programmed value.  The
--		 * MSR is very model specific, i.e. contains multiple bits that
--		 * are completely unknown to KVM, and the one bit known to KVM
--		 * is simply a reflection of hardware capabilities.
--		 */
--		if (!msr->host_initiated && data != svm->msr_decfg)
--			return 1;
--
- 		svm->msr_decfg = data;
- 		break;
- 	}
-
-base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
--- 
-2.47.0.338.g60cca15819-goog
-
+Regards,
+Simon
 
