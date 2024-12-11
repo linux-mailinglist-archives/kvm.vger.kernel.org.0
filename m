@@ -1,184 +1,110 @@
-Return-Path: <kvm+bounces-33507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644E09ED69F
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 20:38:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A54761885653
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 19:38:14 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72D0229666;
-	Wed, 11 Dec 2024 19:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djPAPY/5"
-X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F9B99ED743
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 21:32:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A9A2210EB
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 19:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733945842; cv=none; b=KEzDL8hwer8laaH41Kk28/Qu1+EQ5MgY+UaLkWa7Kz57Ja9MaXxX4Nk3GHrKBplLy92Ngcu0+/9KEOCujwZfWVXDgoiCTjT1Dx7UEdnLUiWsYtdcAwYgdu2jgyznX3FRJsyBUqAmJpey64k1tWuhPlM5Cok0kud/CzfQEUegHGQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733945842; c=relaxed/simple;
-	bh=SKU4owpgrLuU+O36UTv52dBkluhmqyl+EdfAMYBpPRs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B7GVjdCPDykfN6GKDAtjZO5m8EOrCrDtQmgVlLe32WG4cEpk3eDAXYnbEHyR5XoH48P4HLFkmmoxspHBAvsY1S+O84j03rfovDLBHSkS5egoWZ3fLoW1iPt9bIqc2A0wFlXfs5DbPlsWvqmPA0tYwtSnIuB1H7lVVx6kcqNvms8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djPAPY/5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733945839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oRbzOlXXgzk56NiVC7qJmmj47BtRpf1glV0jPA4JBGg=;
-	b=djPAPY/5bNT6VB/0EhlPfdcun28QbwsVZcMLjF12jAe+JkMuJ7ATozG8/6PD0qX2afEjME
-	rzmTpWYyxJ7RM8sPqysFT2QUJatw23lvnuSQjWocL0oLx20uX2Cv0Lfcy3srbsNx/YpTa1
-	Rq3twH3WfZuJVh4vNRDcxlLLJeHNy2s=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-1xFFN5XpMXe2ml3pKzlnUg-1; Wed,
- 11 Dec 2024 14:37:17 -0500
-X-MC-Unique: 1xFFN5XpMXe2ml3pKzlnUg-1
-X-Mimecast-MFC-AGG-ID: 1xFFN5XpMXe2ml3pKzlnUg
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C2C1281BB2
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 20:32:50 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F537211A0E;
+	Wed, 11 Dec 2024 20:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dV4d06UF"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 501C11944B11;
-	Wed, 11 Dec 2024 19:37:16 +0000 (UTC)
-Received: from starship.lan (unknown [10.22.82.46])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EB1FC1956052;
-	Wed, 11 Dec 2024 19:37:14 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 4/4] KVM: selftests: dirty_log_test: support multiple write retires
-Date: Wed, 11 Dec 2024 14:37:06 -0500
-Message-Id: <20241211193706.469817-5-mlevitsk@redhat.com>
-In-Reply-To: <20241211193706.469817-1-mlevitsk@redhat.com>
-References: <20241211193706.469817-1-mlevitsk@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3032594B5;
+	Wed, 11 Dec 2024 20:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733949161; cv=none; b=ILSy5IBpPbLnR9qQcDN1UeUZT1LHzcIW7CAUWsk2x/gxihphqA1hh5wD8QWQo4EWrw3cwZfFdRfScx5c4MWdKFxGyvWudTUoJp1ZW/mkPPW8HeGexse67fj+Mo6/GCBg6SLjH/aunFjv9wkEkCO9tHzDrM5y8z28M22wfci1K5I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733949161; c=relaxed/simple;
+	bh=pCrWNNBi554r6fF0yAoa4pQOPYVe5E43HR+EADonklY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B5CxP250NWkoLFOif2ceSfAix/0uSZH/RKbhiA/8BGVlL8Mb260cdn5VpfQe2qf6aB8Blt3Wi23mqN7ylWjKAc+NZDFAe6tvOJL3/VXsmYDrJ91N9z0+FkDmRSbZ1EgOZjEdMyx0K8E/EhztyjsuHrE1WM8bGEWRjCi3Tcps1AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dV4d06UF; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 91AEE40E0286;
+	Wed, 11 Dec 2024 20:32:35 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id kyvswteMX4sA; Wed, 11 Dec 2024 20:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1733949151; bh=6eD4Z40sb6Gr6OGjyS3lwQNEdVFubwhsek6uZmA3iKM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dV4d06UFZsmvyqfdidcNGtOHj0krL2ODfCAW4eKI4vSub0YeaBtbL4k9HgcWCJpYq
+	 kp2dmv1tylCLRKlUZl193quAlv61Yqs4IXaL+/8hTd/sUUIcdJS+RSRkX7uEFQHU9M
+	 XRf/DIkuHjXBDw9bAWVyPG/pek9Y8Nvm1FXsfrwo0/e4DG5SWt/tWAxR4nhZadXN2M
+	 tCU5flicQOCNvfikY9K095QmnZrLnzo/UKleLePtTnaYrrByenuDEKkzzuXpiyuGwK
+	 lSYAnDsHC/kuwFSo9S3GzXMvruzfzdO5m5hQg78MkqQccNhaGYANI5TU50pBTGVvHF
+	 n87du4npP/BugN7QmaXsYV1jRvgSeyYJSS9NIYEJolibXcYwAra0E8x2XwHfoQ/G4Q
+	 kh4ngUit8vX2ZVMVMhbiGoiLfEqHemuOvIksI/xr5jKLnddwaV0TMZPY+inMg/tXVP
+	 zsRFq+0UkZRvAKaLvSbiUT4HW3e3vEV4pbtEmUl7w40unRSwtZCNSz+ZH5biQZ12V9
+	 WTKG5bx69zJpUXGXb6XCNDhFYOg6BlRlVrRl59Wv16MNmCloPuCAB6J7TLxX09TEbY
+	 Ewm6/F43sqq/EXHAwA18cMvWsgv3wpBgRWWxmeqsQQTeTfVPn4rfd1uRkxvBbTkcGa
+	 WzjehDuic0DA3N1wGlZYWxMU=
+Received: from zn.tnic (p200300Ea971F93ce329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93ce:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 98EA640E0169;
+	Wed, 11 Dec 2024 20:32:20 +0000 (UTC)
+Date: Wed, 11 Dec 2024 21:32:14 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 07/13] x86/sev: Mark Secure TSC as reliable
+ clocksource
+Message-ID: <20241211203214.GDZ1n2zvfqjYj4TpzB@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-8-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241203090045.942078-8-nikunj@amd.com>
 
-If dirty_log_test is run nested, it is possible for entries in the emulated
-PML log to appear before the actual memory write is committed to the RAM,
-due to the way KVM retries memory writes as a response to a MMU fault.
+On Tue, Dec 03, 2024 at 02:30:39PM +0530, Nikunj A Dadhania wrote:
+> diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
+> index 774f9677458f..fa0bc52ef707 100644
+> --- a/arch/x86/mm/mem_encrypt_amd.c
+> +++ b/arch/x86/mm/mem_encrypt_amd.c
+> @@ -541,6 +541,10 @@ void __init sme_early_init(void)
+>  	 * kernel mapped.
+>  	 */
+>  	snp_update_svsm_ca();
+> +
+> +	/* Mark the TSC as reliable when Secure TSC is enabled */
+> +	if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
+> +		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
 
-In addition to that in some very rare cases retry can happen more than
-once, which will lead to the test failure because once the write is
-finally committed it may have a very outdated iteration value.
+What happens if someone writes MSR 0x10 on some CPU and thus makes the TSCs on
+the host unsynchronized and that CPU runs a SecureTSC guest?
 
-Detect and avoid this case.
+That guest would use RDTSC and get wrong values and turn the guest into
+a mess, right?
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 52 +++++++++++++++++++-
- 1 file changed, 50 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index a9428076a681..f07126b0205d 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -154,6 +154,7 @@ static atomic_t vcpu_sync_stop_requested;
-  * sem_vcpu_stop and before vcpu continues to run.
-  */
- static bool dirty_ring_vcpu_ring_full;
-+
- /*
-  * This is only used for verifying the dirty pages.  Dirty ring has a very
-  * tricky case when the ring just got full, kvm will do userspace exit due to
-@@ -168,7 +169,51 @@ static bool dirty_ring_vcpu_ring_full;
-  * dirty gfn we've collected, so that if a mismatch of data found later in the
-  * verifying process, we let it pass.
-  */
--static uint64_t dirty_ring_last_page;
-+static uint64_t dirty_ring_last_page = -1ULL;
-+
-+/*
-+ * In addition to the above, it is possible (especially if this
-+ * test is run nested) for the above scenario to repeat multiple times:
-+ *
-+ * The following can happen:
-+ *
-+ * - L1 vCPU:        Memory write is logged to PML but not committed.
-+ *
-+ * - L1 test thread: Ignores the write because its last dirty ring entry
-+ *                   Resets the dirty ring which:
-+ *                     - Resets the A/D bits in EPT
-+ *                     - Issues tlb flush (invept), which is intercepted by L0
-+ *
-+ * - L0: frees the whole nested ept mmu root as the response to invept,
-+ *       and thus ensures that when memory write is retried, it will fault again
-+ *
-+ * - L1 vCPU:        Same memory write is logged to the PML but not committed again.
-+ *
-+ * - L1 test thread: Ignores the write because its last dirty ring entry (again)
-+ *                   Resets the dirty ring which:
-+ *                     - Resets the A/D bits in EPT (again)
-+ *                     - Issues tlb flush (again) which is intercepted by L0
-+ *
-+ * ...
-+ *
-+ * N times
-+ *
-+ * - L1 vCPU:        Memory write is logged in the PML and then committed.
-+ *                   Lots of other memory writes are logged and committed.
-+ * ...
-+ *
-+ * - L1 test thread: Sees the memory write along with other memory writes
-+ *                   in the dirty ring, and since the write is usually not
-+ *                   the last entry in the dirty-ring and has a very outdated
-+ *                   iteration, the test fails.
-+ *
-+ *
-+ * Note that this is only possible when the write was the last log entry
-+ * write during iteration N-1, thus remember last iteration last log entry
-+ * and also don't fail when it is reported in the next iteration, together with
-+ * an outdated iteration count.
-+ */
-+static uint64_t dirty_ring_prev_iteration_last_page;
- 
- enum log_mode_t {
- 	/* Only use KVM_GET_DIRTY_LOG for logging */
-@@ -320,6 +365,8 @@ static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
- 	struct kvm_dirty_gfn *cur;
- 	uint32_t count = 0;
- 
-+	dirty_ring_prev_iteration_last_page = dirty_ring_last_page;
-+
- 	while (true) {
- 		cur = &dirty_gfns[*fetch_index % test_dirty_ring_count];
- 		if (!dirty_gfn_is_dirtied(cur))
-@@ -622,7 +669,8 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
- 					 */
- 					min_iter = iteration - 1;
- 					continue;
--				} else if (page == dirty_ring_last_page) {
-+				} else if (page == dirty_ring_last_page ||
-+					   page == dirty_ring_prev_iteration_last_page) {
- 					/*
- 					 * Please refer to comments in
- 					 * dirty_ring_last_page.
 -- 
-2.26.3
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
