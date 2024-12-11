@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-33496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449639ED487
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 19:15:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1409ED48C
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 19:16:22 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4EE4188AB2B
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 18:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D4E42811BA
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 18:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEFF201261;
-	Wed, 11 Dec 2024 18:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F62202F9D;
+	Wed, 11 Dec 2024 18:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y7IyQ7jJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2XZTIUu7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3985724632E
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 18:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522AB1DB55C
+	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 18:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733940942; cv=none; b=I98qs9/kgssJTeUoaDex6x1MuXmdq3H/8gaF4Az+Mi5n2QhD96tOZAoPjCNO2BwftJIx39lvkGB8cIhGklbF4a/YRRogUQywfkxKSiL3+RFsfIBv/3qa+Vsgv8kausaPaq/O4GWuZYcByJKznTFr+uH0kFWIvNBaAzAwbF87Djc=
+	t=1733940968; cv=none; b=JBEgtu8jArdQmPbdpOuRwTjZ+yzcenBlzzmfc0f5KgGZbQ0tLiEs9opKoOsObO7f2NN7HotZ9SRYtoRJQM2NdG1XXVZhuzCleRA1ZdNNYq5kaCDOiEdBGo+AukR2elrVSoTru5QVp4SP+Rf6EK9lQPXCEcFfj+fYkO8IHHNbTlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733940942; c=relaxed/simple;
-	bh=FCdpSIc+69N04n0hxak9XuRclAR88h+kQwVsgNXe9Qk=;
+	s=arc-20240116; t=1733940968; c=relaxed/simple;
+	bh=eMzuNypVlCf9Kg82lscOlenwY/vNl/fjamqKzyMx2EI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gWi8qrwqSPWEBEKJZZtfi7xkCU8zfqQ89Q1b+JzmcbRbrj9/dedHHiTiPo9SnipzIjW1tczOwmrX7IQERx+eq7dszalILxoNqr8+rTFVLabIWM/meEVEt0zL8UYwrCVGcaLHXyasJ4OmGpbsGbLuFctUt6dA18YnoYKW2hbEyGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y7IyQ7jJ; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=glJcumEbMEK0lYKyYvoz4Z9oeqJCJ8t1FPgwfpqXimhxAO6so8/fq2n/rytJl/r4F1ZBsVU+slbsuOnkVEWKuIxdoNzjhq/HaH2GaC9Cxz64v6TL6+XBjr7EJp0lpXvE9HDmvyI9kJr7iDWUCrfipVsskQkgvSDPZ7FmR+fOqVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2XZTIUu7; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so6221214a91.3
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 10:15:41 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2164861e1feso36030935ad.1
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 10:16:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733940940; x=1734545740; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1733940965; x=1734545765; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ATfgSyR4JYqUn5qUKdglRen9QnDSA+hMhyyb2LNpigg=;
-        b=Y7IyQ7jJYnbGauVjlZlmSA9P5oHs1Mu2yT8OLwgp2o2pCp1LEbUad8cxf+BeRsSlb4
-         QbnaI7XSQJXP6NIeLmXquihGA01VndlJUS3bngsYyKVwUXAw+tCpVjR6gxOVZVVA3C9W
-         4/nIWny6a1U7QEFyAuF1qtlCSn9BlahiNrKGmALV4z4fvo/16lplVrDat0LBAUAgHyh/
-         pWx6KGsVCNwixyHj+dIGoUsFJ70ytYQNhNzgatzKnlFHe0Ha9WISqkQQydShO+MvaVjd
-         /N0vE2PkN8cyT4xZDK1eVYMX2YrwbDJFbVCHxMvXc86WKz0UdtrRxQeTA509xsJ+6z7I
-         YlCg==
+        bh=2Rkf82Rck3Of1XQyRr3aB2y17npEYOSAr3hN4tIPqUw=;
+        b=2XZTIUu7vJ6MXofLHEKytkQBr77YQ3YSX63EAjfffVmKFvtjxWQ7HEE3v9gAYN4NL7
+         X2tsFJU2eoP87yqdWNnEn/ew6T/bkg1NXvDl4hMUWFCuxDkUWgyY8qKYdu2s4MNF+xjJ
+         dIFJ4VvJ8G0GV4wPp+FPPaqm/XFUiV+3EoKl5pbJlAuoNnr/CCxikjsKheUJQnzM6o5n
+         Oj4l1k2BGzFkwI365e3hQS1DG+fFGQtjsDnoc9Z3Zvt9ABcmQr2vVwtXl3Q3Acl03jO7
+         nMsRD/Vkmhg3uREIgqAH83WSO3Feqprg6tq5Z+wFRnHfS95pEiLSP8Q/FPgRHmUsUzaV
+         UhIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733940940; x=1734545740;
+        d=1e100.net; s=20230601; t=1733940965; x=1734545765;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ATfgSyR4JYqUn5qUKdglRen9QnDSA+hMhyyb2LNpigg=;
-        b=GCUfKYsGRfPE6QyXR47TKVfWkRNZxqfulGwGhyC1SZVpIgnuO95m/lq92fj7bY35QX
-         ++mYWNZ7EjpZN6+AEV6V+bkJrApvyCExrO5VZje6Mb+xtZpqh2qIRTgHlP+NA+s7Lf+K
-         TSaurYWuIJA5y2qpasQuKxemD4Hy5MdkByJg0Dg/8cYrQskBr0LQgYVIhi6KtCmDPWKI
-         hBXPdW7ncKiUWqVR3577/RbZ4f98AvRfr2u0YxIVLYD0U0XiCnr3FzOHaqJcAq3Y/nvd
-         WBjZgsApkKUN7s1xo4JHmqEGVmPN/X7RXrj26ogpJDzQKksusS4GLm54YI5pa6X0W0nm
-         7xrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWt2np7pxGykNCb6FDck7B59ysshrJpgtpa576iggEUOr69+jjjXP6cH2+Y92tYGeJNhF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmshI/DnNb3HbpWjNYcD1upx9an1st22ZGkyMfrqLIWV1HqGKl
-	snpMAliUSQj4IzKkrMwwJiCGekkStwkATdJXxJNnau+NM5qOliXg3FiaaPi2ysoF6mbiDQ1NJ6s
-	Osw==
-X-Google-Smtp-Source: AGHT+IEgf5FQGhJLsrt+78ycGixAnyhGYJ7MCNOZtILxmDM+1RBryh7akh70wZTflop8wQFyJPZmS5+I2ho=
-X-Received: from pjbtc7.prod.google.com ([2002:a17:90b:5407:b0:2ef:95f4:4619])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c04:b0:2ea:9ccb:d1f4
- with SMTP id 98e67ed59e1d1-2f127e07c25mr6607472a91.0.1733940940501; Wed, 11
- Dec 2024 10:15:40 -0800 (PST)
-Date: Wed, 11 Dec 2024 10:15:38 -0800
-In-Reply-To: <20241111102749.82761-4-iorlov@amazon.com>
+        bh=2Rkf82Rck3Of1XQyRr3aB2y17npEYOSAr3hN4tIPqUw=;
+        b=PfdG7UvNEbvWsi3wCCkdweIQ0WlmV2Tdd6QC+MAF4SqlHGsSWpv7syBZLQfBnkc3R/
+         lvZP1d5T4bGYJXwWWFv2vsBqLEiOx2Int8v20oDAIwtiTchgl+0sF1kPlGKth7nq5E7c
+         +ZWbUf8kE1CLIAAnaoerTCJkeKc17snjM8AujncBbpRPOU/Nk1lyVPOnYuqJBn0mA6a9
+         2oEazwn+aMQF5LYeNswZytPRKFQzfAGFrv9nD9b3EXvzMS5h1myokF/n1YUj5blwJAsB
+         siuqHVzsNPHzpgnQS6erAcd7kRZ5xZZd61KIJGoEZksXuQw/iId0fSoFP32pX03gU/ok
+         Snhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfDw7hDR/MFSaVCITipmW+ap8TUr/DdodaLAwAx3EBjaSmERdY2oQxl1scK9HiIAZWmig=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5W8wmIljuxEOivaJq4tPNNiRsoDi5fR8Cjh/oA45ANdFc3t4e
+	I+UGIBma2t6WMlaYTd8wf3b66/oKabkyJXnQOieRa+Nv2HuKffdQ31oRG6g7HCbocM3xc/Vr6Th
+	WhQ==
+X-Google-Smtp-Source: AGHT+IGMn9egCYfVZgafQPXP1ek0EEm5+YAe7GW3QcdDpZoFy4M0KjUP+DR+0RQkWGgc58ItkqwhAHD8F3w=
+X-Received: from plbw4.prod.google.com ([2002:a17:902:d3c4:b0:216:411e:f000])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea10:b0:215:acb3:3786
+ with SMTP id d9443c01a7336-2178ae5a469mr9706725ad.19.1733940965588; Wed, 11
+ Dec 2024 10:16:05 -0800 (PST)
+Date: Wed, 11 Dec 2024 10:16:03 -0800
+In-Reply-To: <20241111102749.82761-5-iorlov@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241111102749.82761-1-iorlov@amazon.com> <20241111102749.82761-4-iorlov@amazon.com>
-Message-ID: <Z1nWykQ3e4D5e2C-@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: VMX: Handle vectoring error in check_emulate_instruction
+References: <20241111102749.82761-1-iorlov@amazon.com> <20241111102749.82761-5-iorlov@amazon.com>
+Message-ID: <Z1nW4xTUjWry2qF4@google.com>
+Subject: Re: [PATCH v2 4/6] KVM: SVM: Handle MMIO during vectroing error
 From: Sean Christopherson <seanjc@google.com>
 To: Ivan Orlov <iorlov@amazon.com>
 Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
@@ -85,103 +85,47 @@ Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com,
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Nov 11, 2024, Ivan Orlov wrote:
-> Move unhandleable vmexit due to MMIO during vectoring error detection
-> into check_emulate_instruction. Implement a function which checks if
-> emul_type indicates MMIO so it can be used for both VMX and SVM.
-> 
-> Fix the comment about EMULTYPE_PF as this flag doesn't necessarily
-> mean MMIO anymore: it can also be set due to the write protection
-> violation.
+> Handle MMIO during vectoring error in check_emulate_instruction to
+> prevent infinite loop on SVM and eliminate the difference in how the
+> situation when the guest accesses MMIO during vectoring is handled on
+> SVM and VMX.
 > 
 > Signed-off-by: Ivan Orlov <iorlov@amazon.com>
 > ---
 > V1 -> V2:
-> - Detect the unhandleable vectoring error in vmx_check_emulate_instruction
+> - Detect the unhandleable vectoring error in svm_check_emulate_instruction
 > instead of handling it in the common MMU code (which is specific for
 > cached MMIO)
 > 
->  arch/x86/include/asm/kvm_host.h | 10 ++++++++--
->  arch/x86/kvm/vmx/vmx.c          | 25 ++++++++++++-------------
->  2 files changed, 20 insertions(+), 15 deletions(-)
+>  arch/x86/kvm/svm/svm.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index eb413079b7c6..3de9702a9135 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2017,8 +2017,8 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
->   *			VMware backdoor emulation handles select instructions
->   *			and reinjects the #GP for all other cases.
->   *
-> - * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
-> - *		 case the CR2/GPA value pass on the stack is valid.
-> + * EMULTYPE_PF - Set when an intercepted #PF triggers the emulation, in which case
-> + *		 the CR2/GPA value pass on the stack is valid.
->   *
->   * EMULTYPE_COMPLETE_USER_EXIT - Set when the emulator should update interruptibility
->   *				 state and inject single-step #DBs after skipping
-> @@ -2053,6 +2053,12 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
->  #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
->  #define EMULTYPE_WRITE_PF_TO_SP	    (1 << 8)
->  
-> +static inline bool kvm_is_emul_type_mmio(int emul_type)
-
-Hmm, this should probably be "pf_mmio", not just "mmio".  E.g. if KVM is emulating
-large swaths of guest code because unrestricted guest is disabled, then can end up
-emulating an MMIO access for "normal" emulation.
-
-Hmm, actually, what if we go with this?
-
-  static inline bool kvm_can_emulate_event_vectoring(int emul_type)
-  {
-	return !(emul_type & EMULTYPE_PF) ||
-	       (emul_type & EMULTYPE_WRITE_PF_TO_SP);
-  }
-
-The MMIO aspect isn't unique to VMX or SVM, and the above would allow handling
-other incompatible emulation types, should they ever arise (unlikely).
-
-More importantly, it provides a single location to document (via comment) exactly
-why KVM can't deal with MMIO emulation during event vectoring (and why KVM allows
-emulation of write-protect page faults).
-
-It would require using X86EMUL_UNHANDLEABLE_VECTORING instead of
-X86EMUL_UNHANDLEABLE_VECTORING_IO, but I don't think that's necessarily a bad
-thing.
-
-> +{
-> +	return (emul_type & EMULTYPE_PF) &&
-> +		!(emul_type & EMULTYPE_WRITE_PF_TO_SP);
-> +}
-> +
->  int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
->  int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
->  					void *insn, int insn_len);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f92740e7e107..a10f35d9704b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1693,6 +1693,8 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
->  int vmx_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
->  				  void *insn, int insn_len)
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index c1e29307826b..b69f0f98c576 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4797,9 +4797,16 @@ static void svm_enable_smi_window(struct kvm_vcpu *vcpu)
+>  static int svm_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
+>  					 void *insn, int insn_len)
 >  {
-> +	bool is_vect;
-> +
->  	/*
->  	 * Emulation of instructions in SGX enclaves is impossible as RIP does
->  	 * not point at the failing instruction, and even if it did, the code
-> @@ -1704,6 +1706,13 @@ int vmx_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
->  		kvm_queue_exception(vcpu, UD_VECTOR);
->  		return X86EMUL_PROPAGATE_FAULT;
->  	}
-> +
-> +	is_vect = to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK;
+> -	bool smep, smap, is_user;
+> +	bool smep, smap, is_user, is_vect;
+>  	u64 error_code;
+>  
+> +	is_vect = to_svm(vcpu)->vmcb->control.exit_int_info &
+> +		  SVM_EXITINTINFO_TYPE_MASK;
 > +
 > +	/* Emulation is not possible when MMIO happens during event vectoring. */
 > +	if (kvm_is_emul_type_mmio(emul_type) && is_vect)
 
-I definitely prefer to omit the local variable.  
+Same nit here, omit the local variable.
 
-	if ((to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
-	    !kvm_can_emulate_event_vectoring(emul_type))
-		return X86EMUL_UNHANDLEABLE_VECTORING;
+> +		return X86EMUL_UNHANDLEABLE_VECTORING_IO;
+> +
+>  	/* Emulation is always possible when KVM has access to all guest state. */
+>  	if (!sev_guest(vcpu->kvm))
+>  		return X86EMUL_CONTINUE;
+> -- 
+> 2.43.0
+> 
 
