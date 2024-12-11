@@ -1,67 +1,58 @@
-Return-Path: <kvm+bounces-33533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E22A9EDC2F
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 00:47:21 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25CF39EDC33
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 00:47:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A703165EBF
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EAF7281ED4
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 23:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9C11F8667;
-	Wed, 11 Dec 2024 23:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F0A1FA8D9;
+	Wed, 11 Dec 2024 23:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Loz5Dw5d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IzHdR2m1"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6D1F4E3D;
-	Wed, 11 Dec 2024 23:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C831FA246
+	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 23:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733960668; cv=none; b=d35+hLkyKFHrG4tODsswPV+5llsTlJOK/jAE0byBLRbeGZEJO/N0d7EJ6cnOsePBG1WbpH3OH58RN/4L25iTZ2MQ7hbUj7FGpAo06K26aWbRh2TmEA25kTvIK4o2cTfF79cyOIU/eyiDizdYc/IrFb3gTG/9Bq6I6ZNUp99W1kQ=
+	t=1733960672; cv=none; b=Bj8pcnnKQWNKqzX/kmzyi7Gp0xilBeHGYACf9G8V1wgAYYYzJt8zfy3sOzfnjInAimF+4t82T3JrUCIiEdYJtHSOUv2Mc4SLvNBCkKZHJbs6YcPyJWF9NJDAEkiBbLX5Sp0F5QP5DZYlosH9NBexQCMIRoPqL/IJQh3ARMr9tB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733960668; c=relaxed/simple;
-	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
+	s=arc-20240116; t=1733960672; c=relaxed/simple;
+	bh=xJBiiy1dPiFUJHk2IsbVTTbIQ0bCNnysNMUiT3TuuTE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UwTiOrt24GKzOEw0GBP4VJ7drS0qZUUpDdDIOwL9iC8uaMQjdaEHqWPZE6SzynLuFcM/PdEbl7ms2L89T6/0ejMA8YdoefyaIQSV14xcb8Ea8OUicz5HUQxLKq2QtrrxCoTVOiphvml5dl/JJyVinyYqkFxdrPd/Odknr2IAPTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Loz5Dw5d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F2BC4AF0B;
-	Wed, 11 Dec 2024 23:44:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=V579Iv0UvEu+3k7gFjFdxmFzbq8laKq/v60Z6sBO2X2llD5+vIWTvVnWx+UQ2cK7u/mNKxfi/UrlbfGGilDYkzvGT3cq7ThAAYbd5b5SOz5iJtw/Cf6dyc+SZR+2VWE5Xtk3Ggip5h9EZF9zBg/EEm0N3ZpzdI8vpFy82jFUshY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IzHdR2m1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 198AEC4CEDD;
+	Wed, 11 Dec 2024 23:44:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733960665;
-	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
+	s=k20201202; t=1733960672;
+	bh=xJBiiy1dPiFUJHk2IsbVTTbIQ0bCNnysNMUiT3TuuTE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Loz5Dw5dkLz7Jykt2rrpTouLZH3Gs2C/w+EJHtak+Jf5fXazB1SbzLsbJpNdDRJy0
-	 7WNZGb8AsPd0kZ9xWfJOiq6kBzVsce3R76h6EYpxnbBt46GBBm7d/qKfzrWc5i6PT6
-	 nxt0d3Omjq38QqbVNnIHZCTx8Ui3jJRd39GMZqHAshT/eX95+Uah3Ic4i7ZvQD1Wwo
-	 RMdpx+SAc/VfXWt0VOB1dq8466Ijf9B5iV4xalUTxZA58O4w12gZgdGnHBmEOuvaK4
-	 16pOWO7IF3lLGYIr5pZ8YvDT6ifmOIH05g7L2tTzD8Bk22cVbvNn9TMXzkaHxCs7wi
-	 pFoRm8rUUl95g==
+	b=IzHdR2m1cki3GjJDtv1GPpfN1MgcmhIUFaq1XjF/0qP/af5K1mmUkrI0cdZxHoEf2
+	 XvvB2or7vEBtKidynLBlL9aSxVPjt4Ok5H7bzpEfvfGFsjOf3xEwVG2nz/i2AEcilc
+	 hWch4cI930vyEbkhHXScoKbYysjDA8s8iPlE4E6neINIZL36fJvtI1gHSbpbTvoVxH
+	 qu4MxPUGTEZrzYuvcQJjCHyA1JfjUGtTNi3FdvlMj3+uwrpqF3/1lm5TWnA/+AW0Ip
+	 r4KCfgxqwuJKBrHpLnM2LUS0DV3c4uPY5JCcv6OFfI8IJco3iY4pyHjpG42LXyYhjt
+	 GOrYLahHWaFpA==
 From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvm@vger.kernel.org,
+	Keir Fraser <keirf@google.com>
 Cc: catalin.marinas@arm.com,
 	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	apatel@ventanamicro.com,
-	andre.przywara@arm.com,
-	suzuki.poulose@arm.com,
-	s.abdollahi22@imperial.ac.uk
-Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
-Date: Wed, 11 Dec 2024 23:44:14 +0000
-Message-Id: <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
+	Will Deacon <will@kernel.org>
+Subject: Re: [kvmtool] Reset all VCPUs before any entering run loops
+Date: Wed, 11 Dec 2024 23:44:17 +0000
+Message-Id: <173395914101.2740195.13361898570549964241.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
-References: <20241128151246.10858-1-alexandru.elisei@arm.com>
+In-Reply-To: <20241211094514.4152415-1-keirf@google.com>
+References: <20241211094514.4152415-1-keirf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,36 +62,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Thu, 28 Nov 2024 15:12:42 +0000, Alexandru Elisei wrote:
-> (resending because I accidently only sent the cover letter, sorry for that)
+On Wed, 11 Dec 2024 09:45:14 +0000, Keir Fraser wrote:
+> VCPU threads may currently enter their run loops before all other
+> VCPUs have "reset" to an appropriate initial state.
 > 
-> The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
-> the riscv maintainer because it looks to me like riscv is similarly
-> affected.
-> 
-> Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
-> be controversial. Follows a bug report I received from Abdollahi Sina in
-> private. Details in the commit message, but the gist of the patch is that
-> the memory region where kernel + initrd + DTB are copied to are changed
-> from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
-> ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
-> users rely on finding the DTB and initrd at the current addresses, then I'm
-> not sure the patch is justified - after all, if someone really wants to use
-> such a large initrd instead of a disk image with virtio, then replacing
-> SZ_256M with SZ_512M locally doesn't look like a big ask.
+> Actually this normally works okay, but on pKVM-ARM the VM's Hyp state
+> (including boot VCPU's initial state) gets set up by the first VCPU
+> thread to call ioctl(KVM_RUN). This races boot VCPU thread's
+> intialisation of register state, and can result in the boot VCPU
+> starting execution at PC=0.
 > 
 > [...]
 
-Applied to arm64 (sina), thanks!
+Applied to kvmtool (master), thanks!
 
-[1/4] arm: Fix off-by-one errors when computing payload memory layout
-      https://git.kernel.org/arm64/c/167aa1e
-[2/4] arm: Check return value for host_to_guest_flat()
-      https://git.kernel.org/arm64/c/ca57fb6
-[3/4] arm64: Use the kernel header image_size when loading into memory
-      https://git.kernel.org/arm64/c/32345de
-[4/4] arm64: Increase the payload memory region size to 512MB
-      https://git.kernel.org/arm64/c/9b26a8e
+[1/1] Reset all VCPUs before any entering run loops
+      https://git.kernel.org/will/kvmtool/c/6d754d01fe2c
 
 Cheers,
 -- 
