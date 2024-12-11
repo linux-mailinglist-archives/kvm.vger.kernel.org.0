@@ -1,224 +1,88 @@
-Return-Path: <kvm+bounces-33487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48AA39ED0F1
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 17:12:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF20D9ED263
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 17:43:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE90928F265
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 16:12:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 095201667AF
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2024 16:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137C61DD526;
-	Wed, 11 Dec 2024 16:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEC21DDC22;
+	Wed, 11 Dec 2024 16:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWP8K67v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dpt8QJ0r"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1FF1DB933
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 16:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC0619F131
+	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 16:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733933535; cv=none; b=nnNw17dC4U4gowbrk02BAZ97UWcVOO+90Gar/Jc40BfBHUt1U8HHmHsbsMhakR/wjzt8dfhS3upecikLQd1591gxD972/uTj5WMdzwnOlQ9gN9fQvc7gSz5GhXmaRGa2qkLuIRYQRVeRnl6GuMsNH1HDebnNPwiIEf0RUtisN/U=
+	t=1733935376; cv=none; b=djGfCL/09k1+srS5fi3yRcjt39NaWQ1R3L/l3z8/AwYHjzcKOpSAKDwZAT6SA8GTpJBwKClCQbMofbm3tEwMkUJ/DPN0T2yr2GI20r0zE10FHovV+iVNj5L4K5tLCjHKUlR+OMJUklHTdMubZqS86wnT+dPjkE7tqJJPAm8jHd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733933535; c=relaxed/simple;
-	bh=qKP/+FCxwB6yUfzOD256SYaGwM3RdiDXqzgfHFBwVDw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dRTQ8fDXFnKF+I3tD5YYU2oj+rJFAcTH6bHAhlb+sK5Homd/mIym6ly5magwJ4f8pESXBTVDGWjqi2i9tay3Hq0pmpkEgGf20GQTlx7k7yvljd31ILMviWux4V56Uq4oDVHVl3N9wgTSEtquC78/+vzrVCMXL29208ikGVg88OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWP8K67v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BFB4FC4CEDD
-	for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 16:12:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733933534;
-	bh=qKP/+FCxwB6yUfzOD256SYaGwM3RdiDXqzgfHFBwVDw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=eWP8K67vukFFJ29sHZZbo7qKbcx8RCZKKuCgMLOLcWcb0v5Ft3+A0cW0Jwh+LWyTY
-	 dVS3ko1DGYO3X3zk615KX8WvMlpdZVOO5PUMuTHQ8VSow2H5SU3tIhBzwapJlEzP7T
-	 9sZuhui+MQpXZ2mirTygRIQpxsNkeCEcHsbzHV6BNs8D/XfpJHX1jGy4X9fK2cQMF+
-	 B7opDlreMZhm6C/P8DxPHh3l9cnpG6vVM4tf2lM/ilL5ZvU2S45dDAVxWb3yGCj8Sf
-	 9A0xF21x6SlRb7i9KJuImw0YUyZSKtoW6Tylivw5KkcbsKWnuBxY/35NP1fbfQIGHV
-	 F84K2E/Zn9SPA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B1507C41615; Wed, 11 Dec 2024 16:12:14 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219588] [6.13.0-rc2+]WARNING: CPU: 52 PID: 12253 at
- arch/x86/kvm/mmu/tdp_mmu.c:1001 tdp_mmu_map_handle_target_level+0x1f0/0x310
- [kvm]
-Date: Wed, 11 Dec 2024 16:12:14 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219588-28872-nV9i5FgZJ2@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219588-28872@https.bugzilla.kernel.org/>
-References: <bug-219588-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1733935376; c=relaxed/simple;
+	bh=+IJL5ABy4FXfBSjS+ZC2D7SmHKapNA3892pbPXLw9c0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=p7AaMdP1e1sAz95Dat5pD/ItOLisQ1jkQHr79AvwVcNdT++mKwgYNtOgr8NwZ1A2RpRIwzZMBrdYrXPxWq6/zZq1Y3DiJK3BeFue1Aey8THF1vDYdcJMcGGQRVRMzgqzK+KEBTxdOcTJW5mEPnqEomuDaP2HqYIK1zTIVfH9FP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dpt8QJ0r; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9204f898so3594067a91.2
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2024 08:42:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733935374; x=1734540174; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+IJL5ABy4FXfBSjS+ZC2D7SmHKapNA3892pbPXLw9c0=;
+        b=Dpt8QJ0rZtSNfNfpZYIp5f52XkHfKGQHnB4GHiZw3M+dMvWDJn8zMVo7TpXmgp4L8g
+         vrDk7v5djdXUZppg3QGBlxYmTdKiFpO++UbYv19WWShdDweE8wlI5xvxEooz4KhI/wYa
+         l1K4c3A4xwatbHJaVLmYNkZNYRNzKQb43JcBurktjxXeA9WFpMrLmHV/ubk5IZgd5Xt4
+         EdWiCmbV2jdGSwHVNObb7AdzLEd1PDrBSdzmwRw+t19c5YF8vAocFscJUJFjCfw3X1yZ
+         NZvDauubjp9FFZTXd8mckiZ+32//axDu+lbcipfS6dRW6tR1iBJLywxAa02He58EBanr
+         C/EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733935374; x=1734540174;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+IJL5ABy4FXfBSjS+ZC2D7SmHKapNA3892pbPXLw9c0=;
+        b=w0/5Xv+DYtj6r1v5ED39zVTh5Im/W7A6bEGW/BI+VWdPvA7Z6M9XVHqli15kKPF/xu
+         HCTEvCGWHw80OrVHWyzGND75ZkJMlU8QLLV9w1tNTPWjNShqZ/L8yFSlC+PJoa4jOfVs
+         SoJxEfNEAnun77gXc9bEWuGyZKB7qnTLvnjSxbd9wKkKMQp+YHxpXH6S3Ho29FncAwC0
+         AWchBZqwlYKxD3XQzVclaBu95vBgKkzUdwjezOqEF7TKyMjpLpGKFTa67YJY+ofdiLPi
+         W+SLh8lwW53r09zHuuU00RrUxW00P0X7pmozo99jjCMFQJC7YKQZ3zug6BhwsuPJMpuy
+         o5Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3/2XUwhadTQoq1vgZNkYa2L6CqUjt88C5N8QSAIWeBkuweXIJwSKeSr9k7PudQWADocw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI+lcOHI2Opd6SmozdFlsP1b/sbUCJXhxkwHs0iSyZtmMvH8rW
+	2oE+h4bWW90mDfJ06PHxMh2HvtYJi9+s+ONKdnBFzTjuseoT+6cIZnxcD94LdEMjtvRn7L53Qg8
+	Kng==
+X-Google-Smtp-Source: AGHT+IFcLyF450FdGbFytuLxC3VtC4irjOelUzQ+tfSBiTLeGly2Al7QKHOvKwAGWqA/hARZu+PeJih5gHs=
+X-Received: from pjbqi13.prod.google.com ([2002:a17:90b:274d:b0:2ef:701e:21c1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c48:b0:2ee:d024:e4e2
+ with SMTP id 98e67ed59e1d1-2f127f565bbmr5844007a91.7.1733935374078; Wed, 11
+ Dec 2024 08:42:54 -0800 (PST)
+Date: Wed, 11 Dec 2024 08:42:52 -0800
+In-Reply-To: <20241211013302.1347853-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20241211013302.1347853-1-seanjc@google.com>
+Message-ID: <Z1nBDDidygRil1vG@google.com>
+Subject: Re: [PATCH 0/5] KVM: x86: Address xstate_required_size() perf regression
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219588
+On Tue, Dec 10, 2024, Sean Christopherson wrote:
+> CPUID is a mandatory intercept on both Intel and AMD
 
---- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-On Wed, Dec 11, 2024, bugzilla-daemon@kernel.org wrote:
-> I hit a bug on the intel host, this problem occurs randomly:
-> [  406.127925] ------------[ cut here ]------------
-> [  406.132572] WARNING: CPU: 52 PID: 12253 at arch/x86/kvm/mmu/tdp_mmu.c:=
-1001
-> tdp_mmu_map_handle_target_level+0x1f0/0x310 [kvm]
-
-Can you describe the host activity at the time of the WARN?  E.g. is it und=
-er
-memory pressure and potentially swapping, is KSM or NUMA balancing active? I
-have a sound theory for how the scenario occurs on KVM's end, but I still t=
-hink
-it's wrong for KVM to overwrite a writable SPTE with a read-only SPTE in th=
-is
-situation.
-
-And does the VM have device memory or any other type of VM_PFNMAP or VM_IO
-memory exposed to it?  E.g. an assigned device?  If so, can you provide the
-register
-state from the other WARNs?  If the PFNs are all in the same range, then ma=
-ybe
-this is something funky with the VM_PFNMAP | VM_IO path.
-
-The WARN is a sanity check I added because it should be impossible for KVM =
-to
-install a non-writable SPTE overtop an existing writable SPTE.  Or so I
-thought.
-The WARN is benign in the sense that nothing bad will happen _in KVM_; KVM
-correctly handles the unexpected change, the WARN is there purely to flag t=
-hat
-something unexpected happen.
-
-        if (new_spte =3D=3D iter->old_spte)
-                ret =3D RET_PF_SPURIOUS;
-        else if (tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-                return RET_PF_RETRY;
-        else if (is_shadow_present_pte(iter->old_spte) &&
-                 (!is_last_spte(iter->old_spte, iter->level) ||
-                  WARN_ON_ONCE(leaf_spte_change_needs_tlb_flush(iter->old_s=
-pte,
-new_spte)))) <=3D=3D=3D=3D
-                kvm_flush_remote_tlbs_gfn(vcpu->kvm, iter->gfn, iter->level=
-);
-
-Cross referencing the register state
-
-  RAX: 860000025e000bf7 RBX: ff4af92c619cf920 RCX: 0400000000000000
-  RDX: 0000000000000002 RSI: 0000000000000000 RDI: 0000000000000015
-  RBP: ff4af92c619cf9e8 R08: 800000025e0009f5 R09: 0000000000000002
-  R10: 000000005e000901 R11: 0000000000000001 R12: ff1e70694fc68000
-  R13: 0000000000000005 R14: 0000000000000000 R15: ff4af92c619a1000
-
-with the disassembly
-
-  4885C8                          TEST RAX,RCX
-  0F84EEFEFFFF                    JE 0000000000000-F1
-  4985C8                          TEST R8,RCX
-  0F85E5FEFFFF                    JNE 0000000000000-F1
-  0F0B                            UD2
-
-RAX is the old SPTE and RCX is the new SPTE, i.e. the SPTE change is:
-
-  860000025e000bf7
-  800000025e0009f5
-
-On Intel, bits 57 and 58 are the host-writable and MMU-writable flags
-
-  #define EPT_SPTE_HOST_WRITABLE        BIT_ULL(57)
-  #define EPT_SPTE_MMU_WRITABLE         BIT_ULL(58)
-
-which means KVM is overwriting a writable SPTE with a non-writable SPTE bec=
-ause
-the current vCPU (a) hit a READ or EXEC fault on a non-present SPTE and (b)
-retrieved
-a non-writable PFN from the primary MMU, and that fault raced with a WRITE
-fault
-on a different vCPU that retrieved and installed a writable PFN.
-
-On a READ or EXEC fault, this code in hva_to_pfn_slow() should get a writab=
-le
-PFN.
-Given that KVM has an valid writable SPTE, the corresponding PTE in the pri=
-mary
-MMU
-*must* be writable, otherwise there's a missing mmu_notifier invalidation.
-
-        /* map read fault as writable if possible */
-        if (!(flags & FOLL_WRITE) && kfp->map_writable &&
-            get_user_page_fast_only(kfp->hva, FOLL_WRITE, &wpage)) {
-                put_page(page);
-                page =3D wpage;
-                flags |=3D FOLL_WRITE;
-        }
-
-out:
-        *pfn =3D kvm_resolve_pfn(kfp, page, NULL, flags & FOLL_WRITE);
-        return npages;
-
-Hmm, gup_fast_folio_allowed() has a few conditions where it will reject fast
-GUP,
-but they should be mutually exclusive with KVM having a writable SPTE.  If =
-the
-mapping is truncated or the folio is swapped out, secondary MMUs need to be
-invalidated before folio->mapping is nullified.
-
-        /*
-         * The mapping may have been truncated, in any case we cannot deter=
-mine
-         * if this mapping is safe - fall back to slow path to determine ho=
-w to
-         * proceed.
-         */
-        if (!mapping)
-                return false;
-
-And secretmem can't be GUP'd, and it's not a long-term pin, so these checks
-don't
-apply either:
-
-        if (check_secretmem && secretmem_mapping(mapping))
-                return false;
-        /* The only remaining allowed file system is shmem. */
-        return !reject_file_backed || shmem_mapping(mapping);
-
-Similarly, hva_to_pfn_remapped() should get a writable PFN if said PFN is
-writable
-in the primary MMU, regardless of the fault type.
-
-If this turns out to get a legitimate scenario, then I think it makes sense=
- to
-add an is_access_allowed() check and treat the fault as spurious.  But I wo=
-uld
-like to try to bottom out on what exactly is happening, because I'm mildly
-concerned something is buggy in the primary MMU.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Jim pointed out that CPUID is NOT a mandatory intercept on AMD, and so while the
+code is correct, the changelogs are not.
 
