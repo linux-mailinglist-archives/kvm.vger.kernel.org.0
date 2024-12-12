@@ -1,92 +1,92 @@
-Return-Path: <kvm+bounces-33677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA8D9EFFB8
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 00:00:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2394618860B8
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:00:49 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8801DE893;
-	Thu, 12 Dec 2024 23:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DftIFAD/"
-X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7BE29EFFBC
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 00:01:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500401B07AE
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 23:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A210728328F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:01:08 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14FE1DE4FF;
+	Thu, 12 Dec 2024 23:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwuDMNtb"
+X-Original-To: kvm@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23611153800
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 23:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734044438; cv=none; b=BfQIYaXgG+mPr32ODf2cC2az5cE5dCVRZnBaILnVCe+u06Pn1r93r148rL2GRYyDsRXhwq61wga+LcMkx6ZB5jZbTbzmhRb3ZxEbW+JmKVPjmoq7JWvk9hgDyZgrUVAkblhWg9rZ5hosG+dyA2ikNtnBFiVnCTnz3jK56B6IxHU=
+	t=1734044455; cv=none; b=V9hMmLreApwz8ZSMD1qMuCtKTiOAwRAq4UMtYwCBr8aUVfWYpp7zK5/HD7SCHxw/7mET9qioZmyW+2v0VhJ8QbLd0pEDP5YQBfKI7nW3TCLwysbqZVyZlY6KPn6q/O66txC1gwgXJbt88xWhMDrAviwZ2fXPoUn9qz4agHp7oO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734044438; c=relaxed/simple;
-	bh=8Ky/PdCBxFxodcj+lZAwZxUspbI7FtF0gc31WFjA3/I=;
+	s=arc-20240116; t=1734044455; c=relaxed/simple;
+	bh=POweKR+oQWm79y6ZIx54huzt4wDLXVfmR5iAl/hBXto=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=reMXrqLRaF7d1q6P8K/cHJIIp1Z3ojEJgGmxBDqok7COelFbTG2g+wVIvM6aoeJSv4S7F4ilMBLw+9ErXs8l6p/xNNJ5iBo0kzvPo1bvYRH3CqwPZUFvozLHptzkHwAFjR1vc5DvEmMD/uI2scR/akSsBpvsOgE51jtsPciUG/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DftIFAD/; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=p9kgrFxT6WNEFSXUUTQ0Bs60KXDEVpNq4kdtDp9HJ7SwjaMw+AXBevo02K1TGjzIwPpD8dc9avq5CUup1a+aG5xP+NmcDFZQgIdkLpPrGw/DKuEwjuEviBFHDl3P45fDn3roejFoXN2e750pI5LuA2q9/mRXa5QNSIfIxsInYR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwuDMNtb; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734044434;
+	s=mimecast20190719; t=1734044451;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+/xngq+2LNLNGBD36koAj/Cnj8lCa6WRTkp0zEvxqRU=;
-	b=DftIFAD/gpkuddAWlFaHu5WV2MikZYnrYeTtm6gBC7sFtXv/1lH5zzdWqY0aEEMm4dKxNG
-	sMTeLE5UAYEfiMUdvzVwdogIS4f+25f8ozp2HF+f/Xzn0Sv5C2b6Mm/78wlUeGFq0TASAF
-	MIHODeBgkSY+D131PbAnp8aZV7koaIQ=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7XBtDygKdM3mSZBwxLArXSK70He1n+QHay7eKi5azak=;
+	b=MwuDMNtblIsu/Cc7WFpGdruzfAwlo4QXevlIyqduOyMwQzXzhdqNMGrVxxnFeu/DG4PxPC
+	H6ygD6cMSByvADcMwdZGJoMFfrwgIrBkoHW42rdymMEM0Igx5kkUQdFNmSgb+FZoSNQW+/
+	61cPA5U+ETwV5ylManYghrQfxpBksPw=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-bZLpVEbpM4qHrAHWXYHOig-1; Thu, 12 Dec 2024 18:00:33 -0500
-X-MC-Unique: bZLpVEbpM4qHrAHWXYHOig-1
-X-Mimecast-MFC-AGG-ID: bZLpVEbpM4qHrAHWXYHOig
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-844de07263bso7708039f.0
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:00:32 -0800 (PST)
+ us-mta-171-xne2Xr5-PWOas5MyUaYafA-1; Thu, 12 Dec 2024 18:00:50 -0500
+X-MC-Unique: xne2Xr5-PWOas5MyUaYafA-1
+X-Mimecast-MFC-AGG-ID: xne2Xr5-PWOas5MyUaYafA
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83b7cce903cso6418039f.2
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:00:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734044432; x=1734649232;
+        d=1e100.net; s=20230601; t=1734044450; x=1734649250;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+/xngq+2LNLNGBD36koAj/Cnj8lCa6WRTkp0zEvxqRU=;
-        b=IKXMZiuv1RTCe+8eTT/H/0eiUi6UhjNSFMLQiQtsQtCEexuMnjUX7fdm+H1DeWDnJq
-         9ZNeGWaxB1MxuSbSdM9jhmJS99XHekwzQJ2sh0ddVbS9fcRv1rjMQVjjAoJslUMybXZC
-         B2h73lJb0SBR+m+8YdOmYucsBNnKReIUiSXUKjRKBMJAj/HFoptujTFlNcBFihXHn6Rw
-         F719iejhhmd1CWTQAtLn6sVcYIzDvBIucnKa2HS3s9w0kkIN0U82pIVKrSltmkbB5sb1
-         2Lzm8WOv34F1zU7906qz3PJQIEf49PRBaeYYk50OMBNmCjRjcMUqHQBpooCmrd+tVM08
-         yNCA==
-X-Gm-Message-State: AOJu0Ywqul+2Eyyt99SrbppMqVyHciWwyBkmS5FBTo3XsB6bx6JS09Rx
-	5QAomSc/6u1kARAPVhKOy2i7cVMmJV8o/Ck0WsVUG+IEv7F8JOvrlAQg/XqGTXeA2vk549Xebsq
-	i/POEqLEWk+nkcQLuyqKXAWQca4WPMqseviNCMM+u03D4ACeDiQ==
-X-Gm-Gg: ASbGncuG5/ug9UyF+erd0eFaOaWqt9xdMBEjgtsqSELZlIKWUQUE6u4+gEKWCjI8xey
-	94y0+ZmVHk3U0cpl3w818gM5SlTV6i/ZRQ8vFPYqUDNPmjQyfLYwFJ+tMpey+Yn2vBtap8JzutQ
-	l+t510FAA/Sb87WZDAKE/17c8JOzNR5eJqGzw6FgjmLl8V9xUAgbJWO9gxmPrKfOWLiQDudvNL4
-	NTuX3EdK+BWLiHdH7oWJaJYgGXplRfSO8vSO8JxMJORCSMaLJ7AHo8J6XR8
-X-Received: by 2002:a05:6e02:1529:b0:3a7:c5bd:a5f4 with SMTP id e9e14a558f8ab-3afe87a6614mr1939675ab.0.1734044432210;
-        Thu, 12 Dec 2024 15:00:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGjk1lOCezhjb2FzYXTYNB8LRTr0Sefilu6Bk9IU4DTKysh3Af9MJAMfKx8EQ1tFXf+vDpOOw==
-X-Received: by 2002:a05:6e02:1529:b0:3a7:c5bd:a5f4 with SMTP id e9e14a558f8ab-3afe87a6614mr1939595ab.0.1734044431878;
-        Thu, 12 Dec 2024 15:00:31 -0800 (PST)
+        bh=7XBtDygKdM3mSZBwxLArXSK70He1n+QHay7eKi5azak=;
+        b=i3nyM6oWzgvXEQDd69Nsv+1FaNo2QYey9RpLGnNhhLMp0yYlyz1JCugNkBc6GT9QtI
+         qw0ONKN2Tm7XyzAyUCUiyN2SMoNXkIE/z8bo0GU5reC5G7xboTVAt/mbf9cxJjCoOFCS
+         iydeR6+2RP8nCaVx1pBHe0AZaQTVO3zXm4t21dtpNmKPRPsg/7j9N+AoxPbgzB6kLCnE
+         /cS7l1vTYg143F/jzTLoBA9WMMoSpkOzP6A9BNmNePsgTOStfbUhmL5758Hfmf/y3Dds
+         hxpQUuIvT7AbOX2iLr/66tIycKVeQ5UcfJnjEpImMGCF22IK1xmZ1TjtblI4g2kUlLCu
+         FdeQ==
+X-Gm-Message-State: AOJu0YzFIZWrgyWJZvpofIlwIIpcqwVRuWlX9diZRIQ4Roi5q/YxDtLJ
+	FEbwcKQLomZcfjT1NK0A1o1F96rZGMNrBa338oCakqIOxUsQHyuQEFmPIIymhrxvchRGV9tVVkX
+	S5LN31bF/ciMZ+cT0FOnpyByV1OzpvdggDTXQDaN5HO60hRdPGw==
+X-Gm-Gg: ASbGncv0n/yPshDkPsWQK8OLjzb2wOuiUMQqH9b7s4KODDTFaGApl1Cyh8FNxa5b0h5
+	OTdBFgQ0xBDFVcEGoUefd3+7zW0C+ylUwQvUUd/Qeq/KdpY0MLT5xntKbUDqq4yzXmo+Z/4KJVL
+	zXUNKMzAckQQLgzFLytJIiUc0CcOjZI5lzRRdRUTsKo32vIjqb5lDC6CHkCXD0wq6QDYQ9jtEas
+	Qwqg/pzrvG74Q1fmbycYoXCG9V8jMvw5mzwUM1rcgOvAg3rIe8Lghk5b8vW
+X-Received: by 2002:a92:c248:0:b0:3a7:bfad:5032 with SMTP id e9e14a558f8ab-3afeda2ec75mr1714305ab.1.1734044450029;
+        Thu, 12 Dec 2024 15:00:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF3ygWV263dn1mSnvphnYMpQmK5x7SPwwquGoo5b5qgP1bdCLIh79fu2gpZUeeOztuHiLVElA==
+X-Received: by 2002:a92:c248:0:b0:3a7:bfad:5032 with SMTP id e9e14a558f8ab-3afeda2ec75mr1714225ab.1.1734044449677;
+        Thu, 12 Dec 2024 15:00:49 -0800 (PST)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2bb66b0d7sm2480590173.91.2024.12.12.15.00.31
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a814886a1fsm38900965ab.58.2024.12.12.15.00.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 15:00:31 -0800 (PST)
-Date: Thu, 12 Dec 2024 16:00:30 -0700
+        Thu, 12 Dec 2024 15:00:49 -0800 (PST)
+Date: Thu, 12 Dec 2024 16:00:47 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Yunxiang Li <Yunxiang.Li@amd.com>
 Cc: <kvm@vger.kernel.org>, <kevin.tian@intel.com>, <yishaih@nvidia.com>,
  <ankita@nvidia.com>, <jgg@ziepe.ca>
-Subject: Re: [PATCH 2/3] vfio/pci: refactor vfio_pci_bar_rw
-Message-ID: <20241212160030.18b376fa.alex.williamson@redhat.com>
-In-Reply-To: <20241212205050.5737-2-Yunxiang.Li@amd.com>
+Subject: Re: [PATCH 3/3] vfio/pci: Expose setup ROM at ROM bar when needed
+Message-ID: <20241212160047.09bbe902.alex.williamson@redhat.com>
+In-Reply-To: <20241212205050.5737-3-Yunxiang.Li@amd.com>
 References: <20241212205050.5737-1-Yunxiang.Li@amd.com>
-	<20241212205050.5737-2-Yunxiang.Li@amd.com>
+	<20241212205050.5737-3-Yunxiang.Li@amd.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -97,119 +97,137 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Dec 2024 15:50:49 -0500
+On Thu, 12 Dec 2024 15:50:50 -0500
 Yunxiang Li <Yunxiang.Li@amd.com> wrote:
 
-> In the next patch the logic for reading ROM will get more complicated,
-> so decouple the ROM path from the normal path. Also check that for ROM
-> write is not allowed.
-
-This is already enforced by the caller.  Vague references to the next
-patch don't make a lot of sense once commits are in the tree, this
-should describe what you're preparing for.
-
+> If ROM bar is missing for any reason, we can fallback to using pdev->rom
+> to expose the ROM content to the guest. This fixes some passthrough use
+> cases where the upstream bridge does not have enough address window.
 > 
 > Signed-off-by: Yunxiang Li <Yunxiang.Li@amd.com>
 > ---
->  drivers/vfio/pci/vfio_pci_rdwr.c | 47 ++++++++++++++++----------------
->  1 file changed, 24 insertions(+), 23 deletions(-)
+>  drivers/vfio/pci/vfio_pci_config.c |  4 ++++
+>  drivers/vfio/pci/vfio_pci_core.c   | 35 +++++++++++++++---------------
+>  drivers/vfio/pci/vfio_pci_rdwr.c   | 14 ++++++++++--
+>  3 files changed, 34 insertions(+), 19 deletions(-)
 > 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index e41c3a965663e..4c673d842fb35 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -511,6 +511,10 @@ static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
+>  		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+>  		*vbar &= cpu_to_le32((u32)mask);
+> +	} else if (pdev->rom && pdev->romlen) {
+> +		mask = ~(roundup_pow_of_two(pdev->romlen) - 1);
+> +		mask |= PCI_ROM_ADDRESS_ENABLE;
+> +		*vbar &= cpu_to_le32((u32)mask);
+>  	} else {
+>  		*vbar = 0;
+>  	}
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index b49dd9cdc072a..3120c1e9f22cb 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1049,30 +1049,31 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
+>  		break;
+>  	case VFIO_PCI_ROM_REGION_INDEX: {
+>  		void __iomem *io;
+> -		size_t size;
+> +		size_t dont_care;
+
+It still receives the size even if we don't consume it.
+
+>  		u16 cmd;
+>  
+>  		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+>  		info.flags = 0;
+> +		info.size = 0;
+>  
+> -		/* Report the BAR size, not the ROM size */
+> -		info.size = pci_resource_len(pdev, info.index);
+> -		if (!info.size)
+> -			break;
+> -
+> -		/*
+> -		 * Is it really there?  Enable memory decode for implicit access
+> -		 * in pci_map_rom().
+> -		 */
+> -		cmd = vfio_pci_memory_lock_and_enable(vdev);
+> -		io = pci_map_rom(pdev, &size);
+> -		if (io) {
+> +		if (pci_resource_start(pdev, PCI_ROM_RESOURCE)) {
+> +			/* Check ROM content is valid. Need to enable memory
+
+Incorrect comment style.
+
+> +			 * decode for ROM access in pci_map_rom().
+> +			 */
+> +			cmd = vfio_pci_memory_lock_and_enable(vdev);
+> +			io = pci_map_rom(pdev, &dont_care);
+> +			if (io) {
+> +				info.flags = VFIO_REGION_INFO_FLAG_READ;
+> +				/* Report the BAR size, not the ROM size. */
+> +				info.size = pci_resource_len(pdev, PCI_ROM_RESOURCE);
+> +				pci_unmap_rom(pdev, io);
+> +			}
+> +			vfio_pci_memory_unlock_and_restore(vdev, cmd);
+> +		} else if (pdev->rom && pdev->romlen) {
+>  			info.flags = VFIO_REGION_INFO_FLAG_READ;
+> -			pci_unmap_rom(pdev, io);
+> -		} else {
+> -			info.size = 0;
+> +			/* Report BAR size as power of two. */
+> +			info.size = roundup_pow_of_two(pdev->romlen);
+>  		}
+> -		vfio_pci_memory_unlock_and_restore(vdev, cmd);
+>  
+>  		break;
+>  	}
 > diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-> index a1eeacad82120..4bed9fd5af50f 100644
+> index 4bed9fd5af50f..4ea983cf499d9 100644
 > --- a/drivers/vfio/pci/vfio_pci_rdwr.c
 > +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> @@ -236,10 +236,9 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  	struct pci_dev *pdev = vdev->pdev;
->  	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
->  	int bar = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-> -	size_t x_start = 0, x_end = 0;
-> +	size_t x_start, x_end;
->  	resource_size_t end;
->  	void __iomem *io;
-> -	struct resource *res = &vdev->pdev->resource[bar];
->  	ssize_t done;
+> @@ -243,6 +243,8 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 >  
 >  	if (pci_resource_start(pdev, bar))
-> @@ -253,41 +252,43 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  	count = min(count, (size_t)(end - pos));
+>  		end = pci_resource_len(pdev, bar);
+> +	else if (bar == PCI_ROM_RESOURCE && pdev->rom && pdev->romlen)
+> +		end = roundup_pow_of_two(pdev->romlen);
+>  	else
+>  		return -EINVAL;
 >  
->  	if (bar == PCI_ROM_RESOURCE) {
-> +		if (iswrite)
-> +			return -EINVAL;
->  		/*
->  		 * The ROM can fill less space than the BAR, so we start the
+> @@ -259,7 +261,12 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 >  		 * excluded range at the end of the actual ROM.  This makes
 >  		 * filling large ROM BARs much faster.
 >  		 */
->  		io = pci_map_rom(pdev, &x_start);
-> -		if (!io) {
-> -			done = -ENOMEM;
-> -			goto out;
-> -		}
-> +		if (!io)
-> +			return -ENOMEM;
->  		x_end = end;
-> +
-> +		done = vfio_pci_core_do_io_rw(vdev, 1, io, buf, pos,
-> +					      count, x_start, x_end, 0);
-> +
-> +		pci_unmap_rom(pdev, io);
->  	} else {
-> -		int ret = vfio_pci_core_setup_barmap(vdev, bar);
-> -		if (ret) {
-> -			done = ret;
-> -			goto out;
-> -		}
-> +		done = vfio_pci_core_setup_barmap(vdev, bar);
-> +		if (done)
-> +			return done;
->  
->  		io = vdev->barmap[bar];
-> -	}
->  
-> -	if (bar == vdev->msix_bar) {
-> -		x_start = vdev->msix_offset;
-> -		x_end = vdev->msix_offset + vdev->msix_size;
-> -	}
-> +		if (bar == vdev->msix_bar) {
-> +			x_start = vdev->msix_offset;
-> +			x_end = vdev->msix_offset + vdev->msix_size;
+> -		io = pci_map_rom(pdev, &x_start);
+> +		if (pci_resource_start(pdev, bar)) {
+> +			io = pci_map_rom(pdev, &x_start);
 > +		} else {
-> +			x_start = 0;
-> +			x_end = 0;
+> +			io = ioremap(pdev->rom, pdev->romlen);
+> +			x_start = pdev->romlen;
 > +		}
-
-There's a lot of semantic preference noise that obscures what you're
-actually trying to accomplish here, effectively this has only
-refactored the code to have separate calls to ..do_io_rw() for the ROM
-vs other case and therefore pushed the unmap into the ROM case,
-introducing various new exit paths.
-
+>  		if (!io)
+>  			return -ENOMEM;
+>  		x_end = end;
+> @@ -267,7 +274,10 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+>  		done = vfio_pci_core_do_io_rw(vdev, 1, io, buf, pos,
+>  					      count, x_start, x_end, 0);
 >  
-> -	done = vfio_pci_core_do_io_rw(vdev, res->flags & IORESOURCE_MEM, io, buf, pos,
-> +		done = vfio_pci_core_do_io_rw(vdev, pci_resource_flags(pdev, bar) & IORESOURCE_MEM, io, buf, pos,
-
-The line is too long already, now it's indented further and the
-wrapping needs to be adjusted.
-
->  				      count, x_start, x_end, iswrite);
-> -
-> -	if (done >= 0)
-> -		*ppos += done;
-> -
-> -	if (bar == PCI_ROM_RESOURCE)
 > -		pci_unmap_rom(pdev, io);
-> +	}
->  out:
+> +		if (pci_resource_start(pdev, bar))
+> +			pci_unmap_rom(pdev, io);
+> +		else
+> +			iounmap(io);
+>  	} else {
+>  		done = vfio_pci_core_setup_barmap(vdev, bar);
+>  		if (done)
 
-Both goto's to this label were removed above, none added.  Thanks,
+It's not clear why the refactoring of the previous patch was really
+necessary simply to have an alternate map and unmap path.  Thanks,
 
 Alex
-
-> +	if (done > 0)
-> +		*ppos += done;
->  	return done;
->  }
->  
 
 
