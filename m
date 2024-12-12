@@ -1,389 +1,180 @@
-Return-Path: <kvm+bounces-33675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBB59EFF74
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:39:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AC79EFFA9
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 00:00:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1AA2287E92
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 22:39:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60DE91885DB9
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063EF1DE3BF;
-	Thu, 12 Dec 2024 22:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C041DE2BC;
+	Thu, 12 Dec 2024 23:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dJ6Zrlh6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N30rrJwf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8B81DE2BF
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 22:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFF4153800
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 23:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734043170; cv=none; b=ThxPKZ/Jw3lRY2GHOWot982LnrpKgW/ZwI9x/OlubB0aKSlOump0nLCsU5gIfb4H0q4dtGIxVVwff5cudb2zjoJ0P5Hv+v9J/7lEDB8hxjnsULpnVAIGTbc+OgVcF283Rf5B0cyFIG63JPSZHL1emy25Ujm/0JbRC68SeHeBtTo=
+	t=1734044437; cv=none; b=run/HlrmIBLfhnC/uWAjExjg3PYxBkJP2Wf5qYCWwbCybtQTQ0C/YDQSbYWw5a39JA5PqfSYwBYZ9a/SGDDqj8nLl7/HhzHQ1ZUX+a5Ohmnv1sDw1AXd33AHme1GkEYOq4h2AOye1b/+D8tPYtOzru2Tf6+6FrRbsBN5dxK+VI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734043170; c=relaxed/simple;
-	bh=Dx1pCgOKfCM6Pfwcm0hvidzjoLxwUGW6oVYngdYvDnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rdVf6l9y7UV1gSiLy9iOOYgzg6bRIhzHM3rqAkQZTuco521T9tslqXy+9MXSXQHuTJSQBlG4GUwsE5z2owIqBiZMKMKwFMCwo7jPl2ZDU3y+BzGQs1IQbOuqgD7BCOgp3U272gfHaE2AlASej86OjMVJtGfcUoPv1e0Gn2KkSlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dJ6Zrlh6; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734043168; x=1765579168;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Dx1pCgOKfCM6Pfwcm0hvidzjoLxwUGW6oVYngdYvDnM=;
-  b=dJ6Zrlh6MO3lnsi1cWshRPwtivguozesQGrXyR176f+Ien0hBrzHLQdn
-   UouqYLID4qvDyDFev5ozXltRdGGFZV6t0cUti/mnnvQzyxRiRs9Trik5c
-   zc/c51WsCzz9Lfth6qLXnvD0CpFNjh9SRJvq0YD+DgkU/V+jRUeC271ik
-   hmriFg26KseDDTnjoKj2KWD4LXkXxPD2eBrazH4V1zASnQcoFvCHRUK4c
-   sBwstUDdZUwQKCqzMpP2mDdwb7kqRTSkGTN7vu5f8/gUoeG6xqrf87V93
-   31YrIuOG4ba3l7lHYNToVxS14hF/p7WN2JGXmxnl0tZbk6ftdSkA577KJ
-   A==;
-X-CSE-ConnectionGUID: c3rRIr4ITI+afjOvwc/svQ==
-X-CSE-MsgGUID: 8n6TQ/YtRd2/dPwzgp/V3w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="34402281"
-X-IronPort-AV: E=Sophos;i="6.12,229,1728975600"; 
-   d="scan'208";a="34402281"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:39:27 -0800
-X-CSE-ConnectionGUID: xhPMYdLvR1WtXCHM1WHLFA==
-X-CSE-MsgGUID: BiYusKpFQoib9L/irnMkzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="100522690"
-Received: from puneetse-mobl.amr.corp.intel.com (HELO localhost) ([10.125.110.112])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:39:25 -0800
-Date: Thu, 12 Dec 2024 16:39:23 -0600
-From: Ira Weiny <ira.weiny@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
-	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 41/60] hw/i386: add option to forcibly report edge
- trigger in acpi tables
-Message-ID: <Z1tmG63P4TR0UYO8@iweiny-mobl>
-References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
- <20241105062408.3533704-42-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1734044437; c=relaxed/simple;
+	bh=ksH4+Zb+0JTG3+9CTFqiTDaCW59z6+Q6UDq2Yq9kuLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NosmqN09WWUyG6csgZqE4rouEaxT216afSfYNK61H84grL19VNEyKY3RQx49GD6syE6Y4CKFGREIZPgW0BanxR+FCTmAYtEAf8dj/bcE1MplNoidRbQToibhqLQlFTLHDyCCoGP/fVpVUNlp2BfN6f3mv6gHE6qZrzFTd5QlNT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N30rrJwf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734044434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IiuE9FA1WMonxXg6t0oRy39y00CWPRIjL+lTv/pFKSk=;
+	b=N30rrJwfSclO2NdKsI6+2QAPRxlnLGjAZLKLXkxTqLcrRru6vOaR0PTGITIbGYwhxob97D
+	bHSz7JAHBbUE8kewxO/+4UCoSHzqXA10jfBVKtvzcnXR0wrpTuj65gznttaEEn/O9kU66b
+	FBUcEYoAbSKA8OG4sVeD2EgAkV3BF1g=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-382-IcMInGHrPqS6jmUxlbgHsw-1; Thu, 12 Dec 2024 18:00:30 -0500
+X-MC-Unique: IcMInGHrPqS6jmUxlbgHsw-1
+X-Mimecast-MFC-AGG-ID: IcMInGHrPqS6jmUxlbgHsw
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-844ca9b7233so15154239f.3
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:00:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734044430; x=1734649230;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IiuE9FA1WMonxXg6t0oRy39y00CWPRIjL+lTv/pFKSk=;
+        b=TrZHAnp8xz/MBJtVZbStN7JdvWBXmpH9KBXTB4sSrXqem7oQ0cf0tRXIqFWvs6XLCs
+         WhCzenjLrk9LDY6SkKUVVWzVyU/DkI59sRBys1wVh9/ZZt1j0BsG2MSUevp5DqNeCPTq
+         JpliC+/p0A58kZf/kTgYP2an2krp5kFq7qDlKORCGSxlA2zwMnZ1k+Bn230hFnTI7eYS
+         +cIdY5cabet4dFk+51HawuB4hbLRUTA1+jqYRBGYnbHcqyOnr+McXNF2TNcq/yCDHUj1
+         dEWECLFMIUPT+S8KOM02FvtMdOYMYZAHrEpOTgKpLYo4wiZPIeeSGohPRFBvhIzWMWeb
+         saxg==
+X-Gm-Message-State: AOJu0YxibMiU09+djwap9uRjla07AEoNJl6sKLxyYNbUQXrO/5jOv/9u
+	qWTgpqU80jkftuy+hZG/nU50YjkldvLONK5qbP+ZYSAcbDdrc/ALHruX+MeS1mOzHzgBio08H8B
+	aI3HO4PvWyyevyv2oLmSIkdu/jmQaiC5fxmWmKSStvUk89wpGdw==
+X-Gm-Gg: ASbGnctLNF7fBdMLDPLT+EYaKSNFsPcIOrqkO7xmhw6EjfFjbkGDmbqCoPuk5pj+0bB
+	3IEZa2w4kgPPFhRo62I9FXOLE7MKHaxBY8Qu/w8txGgmRe13rk9SzOcKJ2LBOVKqNoENp5s/erb
+	uak5piMTm+eNepP+NRB2dUgnvdspzx7uqrlfKuUwsbtiyPT4CGsxL3uLQATrd6I7ZAteEb5a7MY
+	o6tUV0G7ywrHbDJGpnYHjWNE8YwQHm/i63Sa7r9SdhyhyL4rwSlVl/Z8H/J
+X-Received: by 2002:a05:6e02:1565:b0:3a7:81cd:5c4a with SMTP id e9e14a558f8ab-3aff33952edmr1999925ab.7.1734044429694;
+        Thu, 12 Dec 2024 15:00:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEQz/YQPnCIhrpQJ2lHUW4Pkezpn4mXz2vBlDcW2Bhm/UCtG2f0t4QaXgGPJccw0ssQlVXJMg==
+X-Received: by 2002:a05:6e02:1565:b0:3a7:81cd:5c4a with SMTP id e9e14a558f8ab-3aff33952edmr1999435ab.7.1734044427605;
+        Thu, 12 Dec 2024 15:00:27 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2c57add37sm2112009173.120.2024.12.12.15.00.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 15:00:27 -0800 (PST)
+Date: Thu, 12 Dec 2024 16:00:24 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yunxiang Li <Yunxiang.Li@amd.com>
+Cc: <kvm@vger.kernel.org>, <kevin.tian@intel.com>, <yishaih@nvidia.com>,
+ <ankita@nvidia.com>, <jgg@ziepe.ca>
+Subject: Re: [PATCH 1/3] vfio/pci: Remove shadow rom specific code paths
+Message-ID: <20241212160024.38f6cd1b.alex.williamson@redhat.com>
+In-Reply-To: <20241212205050.5737-1-Yunxiang.Li@amd.com>
+References: <20241212205050.5737-1-Yunxiang.Li@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241105062408.3533704-42-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 05, 2024 at 01:23:49AM -0500, Xiaoyao Li wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> When level trigger isn't supported on x86 platform,
-> forcibly report edge trigger in acpi tables.
 
-This commit message is pretty sparse.  I was thinking of suggesting to squash
-this with patch 40 but it occurred to me that perhaps these are split to accept
-TDX specifics from general functionality.  Is that the case here?  Is that true
-with other patches in the series?  If so what other situations would require
-this in the generic code beyond TDX?
+Please us a cover letter for any multi-part series to describe your
+overall goal with the series.
 
-Ira
+On Thu, 12 Dec 2024 15:50:48 -0500
+Yunxiang Li <Yunxiang.Li@amd.com> wrote:
 
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> After 0c0e0736acad, the shadow rom works the same as regular ROM BARs so
+> these code paths are no longer needed.
+
+Commit references should be in the form of:
+
+  After commit 0c0e0736acad ("PCI: Set ROM shadow location in arch
+  code, not in PCI core"), the shadow...
+
+Thanks,
+Alex
+
+> Signed-off-by: Yunxiang Li <Yunxiang.Li@amd.com>
 > ---
->  hw/i386/acpi-build.c  | 99 ++++++++++++++++++++++++++++---------------
->  hw/i386/acpi-common.c | 45 +++++++++++++++-----
->  2 files changed, 101 insertions(+), 43 deletions(-)
+>  drivers/vfio/pci/vfio_pci_config.c |  8 ++------
+>  drivers/vfio/pci/vfio_pci_core.c   | 10 ++--------
+>  drivers/vfio/pci/vfio_pci_rdwr.c   |  3 ---
+>  3 files changed, 4 insertions(+), 17 deletions(-)
 > 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 4967aa745902..d0a5bfc69e9a 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -888,7 +888,8 @@ static void build_dbg_aml(Aml *table)
->      aml_append(table, scope);
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index ea2745c1ac5e6..e41c3a965663e 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -511,13 +511,9 @@ static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
+>  		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+>  		*vbar &= cpu_to_le32((u32)mask);
+> -	} else if (pdev->resource[PCI_ROM_RESOURCE].flags &
+> -					IORESOURCE_ROM_SHADOW) {
+> -		mask = ~(0x20000 - 1);
+> -		mask |= PCI_ROM_ADDRESS_ENABLE;
+> -		*vbar &= cpu_to_le32((u32)mask);
+> -	} else
+> +	} else {
+>  		*vbar = 0;
+> +	}
+>  
+>  	vdev->bardirty = false;
 >  }
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1ab58da9f38a6..b49dd9cdc072a 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1057,14 +1057,8 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
 >  
-> -static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
-> +static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg,
-> +                           bool level_trigger_unsupported)
->  {
->      Aml *dev;
->      Aml *crs;
-> @@ -900,7 +901,10 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
->      aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+>  		/* Report the BAR size, not the ROM size */
+>  		info.size = pci_resource_len(pdev, info.index);
+> -		if (!info.size) {
+> -			/* Shadow ROMs appear as PCI option ROMs */
+> -			if (pdev->resource[PCI_ROM_RESOURCE].flags &
+> -			    IORESOURCE_ROM_SHADOW)
+> -				info.size = 0x20000;
+> -			else
+> -				break;
+> -		}
+> +		if (!info.size)
+> +			break;
 >  
->      crs = aml_resource_template();
-> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
-> +                                  level_trigger_unsupported ?
-> +                                  AML_EDGE : AML_LEVEL,
-> +                                  AML_ACTIVE_HIGH,
->                                    AML_SHARED, irqs, ARRAY_SIZE(irqs)));
->      aml_append(dev, aml_name_decl("_PRS", crs));
+>  		/*
+>  		 * Is it really there?  Enable memory decode for implicit access
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 66b72c2892841..a1eeacad82120 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -244,9 +244,6 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 >  
-> @@ -924,7 +928,8 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
->      return dev;
->   }
+>  	if (pci_resource_start(pdev, bar))
+>  		end = pci_resource_len(pdev, bar);
+> -	else if (bar == PCI_ROM_RESOURCE &&
+> -		 pdev->resource[bar].flags & IORESOURCE_ROM_SHADOW)
+> -		end = 0x20000;
+>  	else
+>  		return -EINVAL;
 >  
-> -static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
-> +static Aml *build_gsi_link_dev(const char *name, uint8_t uid,
-> +                               uint8_t gsi, bool level_trigger_unsupported)
->  {
->      Aml *dev;
->      Aml *crs;
-> @@ -937,7 +942,10 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
->  
->      crs = aml_resource_template();
->      irqs = gsi;
-> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
-> +                                  level_trigger_unsupported ?
-> +                                  AML_EDGE : AML_LEVEL,
-> +                                  AML_ACTIVE_HIGH,
->                                    AML_SHARED, &irqs, 1));
->      aml_append(dev, aml_name_decl("_PRS", crs));
->  
-> @@ -956,7 +964,7 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
->  }
->  
->  /* _CRS method - get current settings */
-> -static Aml *build_iqcr_method(bool is_piix4)
-> +static Aml *build_iqcr_method(bool is_piix4, bool level_trigger_unsupported)
->  {
->      Aml *if_ctx;
->      uint32_t irqs;
-> @@ -964,7 +972,9 @@ static Aml *build_iqcr_method(bool is_piix4)
->      Aml *crs = aml_resource_template();
->  
->      irqs = 0;
-> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
-> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
-> +                                  level_trigger_unsupported ?
-> +                                  AML_EDGE : AML_LEVEL,
->                                    AML_ACTIVE_HIGH, AML_SHARED, &irqs, 1));
->      aml_append(method, aml_name_decl("PRR0", crs));
->  
-> @@ -998,7 +1008,7 @@ static Aml *build_irq_status_method(void)
->      return method;
->  }
->  
-> -static void build_piix4_pci0_int(Aml *table)
-> +static void build_piix4_pci0_int(Aml *table, bool level_trigger_unsupported)
->  {
->      Aml *dev;
->      Aml *crs;
-> @@ -1011,12 +1021,16 @@ static void build_piix4_pci0_int(Aml *table)
->      aml_append(sb_scope, pci0_scope);
->  
->      aml_append(sb_scope, build_irq_status_method());
-> -    aml_append(sb_scope, build_iqcr_method(true));
-> +    aml_append(sb_scope, build_iqcr_method(true, level_trigger_unsupported));
->  
-> -    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0")));
-> -    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1")));
-> -    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2")));
-> -    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3")));
-> +    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3"),
-> +                                        level_trigger_unsupported));
->  
->      dev = aml_device("LNKS");
->      {
-> @@ -1025,7 +1039,9 @@ static void build_piix4_pci0_int(Aml *table)
->  
->          crs = aml_resource_template();
->          irqs = 9;
-> -        aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
-> +        aml_append(crs, aml_interrupt(AML_CONSUMER,
-> +                                      level_trigger_unsupported ?
-> +                                      AML_EDGE : AML_LEVEL,
->                                        AML_ACTIVE_HIGH, AML_SHARED,
->                                        &irqs, 1));
->          aml_append(dev, aml_name_decl("_PRS", crs));
-> @@ -1111,7 +1127,7 @@ static Aml *build_q35_routing_table(const char *str)
->      return pkg;
->  }
->  
-> -static void build_q35_pci0_int(Aml *table)
-> +static void build_q35_pci0_int(Aml *table, bool level_trigger_unsupported)
->  {
->      Aml *method;
->      Aml *sb_scope = aml_scope("_SB");
-> @@ -1150,25 +1166,41 @@ static void build_q35_pci0_int(Aml *table)
->      aml_append(sb_scope, pci0_scope);
->  
->      aml_append(sb_scope, build_irq_status_method());
-> -    aml_append(sb_scope, build_iqcr_method(false));
-> +    aml_append(sb_scope, build_iqcr_method(false, level_trigger_unsupported));
->  
-> -    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA")));
-> -    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB")));
-> -    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC")));
-> -    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD")));
-> -    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE")));
-> -    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF")));
-> -    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG")));
-> -    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH")));
-> +    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG"),
-> +                                        level_trigger_unsupported));
-> +    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH"),
-> +                                        level_trigger_unsupported));
->  
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16));
-> -    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16,
-> +                                            level_trigger_unsupported));
-> +    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17,
-> +                                            level_trigger_unsupported));
->  
->      aml_append(table, sb_scope);
->  }
-> @@ -1350,6 +1382,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->      PCMachineState *pcms = PC_MACHINE(machine);
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
->      X86MachineState *x86ms = X86_MACHINE(machine);
-> +    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
->      AcpiMcfgInfo mcfg;
->      bool mcfg_valid = !!acpi_get_mcfg(&mcfg);
->      uint32_t nr_mem = machine->ram_slots;
-> @@ -1382,7 +1415,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
->              build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
->          }
-> -        build_piix4_pci0_int(dsdt);
-> +        build_piix4_pci0_int(dsdt, level_trigger_unsupported);
->      } else if (q35) {
->          sb_scope = aml_scope("_SB");
->          dev = aml_device("PCI0");
-> @@ -1426,7 +1459,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          if (pm->pcihp_bridge_en) {
->              build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
->          }
-> -        build_q35_pci0_int(dsdt);
-> +        build_q35_pci0_int(dsdt, level_trigger_unsupported);
->      }
->  
->      if (misc->has_hpet) {
-> diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
-> index 0cc2919bb851..ad38a6b31162 100644
-> --- a/hw/i386/acpi-common.c
-> +++ b/hw/i386/acpi-common.c
-> @@ -103,6 +103,7 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
->      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
->      AcpiTable table = { .sig = "APIC", .rev = 3, .oem_id = oem_id,
->                          .oem_table_id = oem_table_id };
-> +    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
->  
->      acpi_table_begin(&table, table_data);
->      /* Local APIC Address */
-> @@ -124,18 +125,42 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
->                       IO_APIC_SECONDARY_ADDRESS, IO_APIC_SECONDARY_IRQBASE);
->      }
->  
-> -    if (x86mc->apic_xrupt_override) {
-> -        build_xrupt_override(table_data, 0, 2,
-> -            0 /* Flags: Conforms to the specifications of the bus */);
-> -    }
-> +    if (level_trigger_unsupported) {
-> +        /* Force edge trigger */
-> +        if (x86mc->apic_xrupt_override) {
-> +            build_xrupt_override(table_data, 0, 2,
-> +                                 /* Flags: active high, edge triggered */
-> +                                 1 | (1 << 2));
-> +        }
-> +
-> +        for (i = x86mc->apic_xrupt_override ? 1 : 0; i < 16; i++) {
-> +            build_xrupt_override(table_data, i, i,
-> +                                 /* Flags: active high, edge triggered */
-> +                                 1 | (1 << 2));
-> +        }
-> +
-> +        if (x86ms->ioapic2) {
-> +            for (i = 0; i < 16; i++) {
-> +                build_xrupt_override(table_data, IO_APIC_SECONDARY_IRQBASE + i,
-> +                                     IO_APIC_SECONDARY_IRQBASE + i,
-> +                                     /* Flags: active high, edge triggered */
-> +                                     1 | (1 << 2));
-> +            }
-> +        }
-> +    } else {
-> +        if (x86mc->apic_xrupt_override) {
-> +            build_xrupt_override(table_data, 0, 2,
-> +                    0 /* Flags: Conforms to the specifications of the bus */);
-> +        }
->  
-> -    for (i = 1; i < 16; i++) {
-> -        if (!(x86ms->pci_irq_mask & (1 << i))) {
-> -            /* No need for a INT source override structure. */
-> -            continue;
-> +        for (i = 1; i < 16; i++) {
-> +            if (!(x86ms->pci_irq_mask & (1 << i))) {
-> +                /* No need for a INT source override structure. */
-> +                continue;
-> +            }
-> +            build_xrupt_override(table_data, i, i,
-> +                0xd /* Flags: Active high, Level Triggered */);
->          }
-> -        build_xrupt_override(table_data, i, i,
-> -            0xd /* Flags: Active high, Level Triggered */);
->      }
->  
->      if (x2apic_mode) {
-> -- 
-> 2.34.1
-> 
+
 
