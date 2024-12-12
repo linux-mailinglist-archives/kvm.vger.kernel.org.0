@@ -1,208 +1,226 @@
-Return-Path: <kvm+bounces-33657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C84DD9EFCAA
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 20:42:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE23E9EFCBD
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 20:49:45 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F25831887E6B
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 19:42:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA7428A268
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 19:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6969519E968;
-	Thu, 12 Dec 2024 19:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E461AD9ED;
+	Thu, 12 Dec 2024 19:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EI14KV3X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjOL4fMq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C4D18A6B5
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 19:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0FA1917E8
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 19:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734032561; cv=none; b=mHgWh28Bavhqu+bg+OTgk8UMgY/QzKt6gIC4LkU3AqV/rJBs9jQlx/GO2oZDfRu/6WyrxuL/27HAvZM2R5uZlEV97+Uy1tscjHiJXqWchygFJEUj3EAbSUzt7c0+VtgfZahyDF6R0mSYXfYfa0aYa9AztdwzC0wayu8oeiTrGcI=
+	t=1734032966; cv=none; b=fZ20CsXKevOPYeCXNe48+6xn7qXeaHGUqcB04WhryYFN7jPosUviEvcPVNB+UR4m/Xa5n38uXT/4A9rQtqpUa4MjqYRR9qst7jf9ziUnnvQ882vk8abRRoOQbX/6E4GWjgWiSMirwmbbm0YvCab22wf3wvcDxU9XIzNLq+grfkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734032561; c=relaxed/simple;
-	bh=8X2ml8a4omEZYrDIcf4Zr9KxwLsTCG9M47AiEeG4vsQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XNiwWMTBNIRG0w3H7uW/+uS7S7Z2rDkcSOfY0RAO/BMtSyR31cJkbdg57Aay9cuilp2xTLBamy3HtyeErbhwSZ4rSAvAzevKxSz1at+MrKH82oD/t2dbjSLsDV/AteZAnRNOd3yp00G8thTo/XD09Z3gxs+PHVTWGGR5b7UFfx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EI14KV3X; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so956282a91.2
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 11:42:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734032559; x=1734637359; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r95T7TRiWNq18LGJGEI5Uci5iW7usHmFMdrIwmgRTRE=;
-        b=EI14KV3Xtnoa4nmoV0q4MwPwLyri9mxKfecqgt2WwAcSePdn4J1a5FooicBxeshGOV
-         YSJ6qSrDymxSZmrA18PXeWNadfeTwbE59LvjOql+dLlDiiSK7q/CF0F62pKxHuq0sdSW
-         ck9DSQqwKXyB1038U50FMTlnGli5PBFKGY0EsEZo3xQt2+UJeGOnpQHMMIn2JpJGZ3El
-         KcK1bJuqd31D09zJcdppClcGQvpRlwmBiqWxgLvFIRWy1k/dvdP9/HeuQ9GzxcbKr+Bz
-         XmLSr52i91t5eKutPbnFIL9JSLJvAYnIKMSK3FtfM9WL7Rcx3EX8XS2/RFaTEy/ohdzU
-         5MVg==
+	s=arc-20240116; t=1734032966; c=relaxed/simple;
+	bh=c0lIVwJsvJS8Q8StF7zcpZ/c/aEc5d0bbzatxAJuRSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DiRCnQ5gyqjak7NKUpUSfQKjC1yJzSQuR8cax0PVla02TgrlBcbn9BR/5uR1bwKRzRe08kWOW46Qrk6qkmCDZPFpNCyhu6R4s2HV9f6Wf4hk5PwGXOUoGgLUOfSHBrmeZ/utOb9AeLx1kIjfZHLmmBnpzRKTwM5YIrPcrZcBnDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gjOL4fMq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734032963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sBiPw5OuI7dlO4Z4t4oS+jtz5kPmxd4ZnxuDxig2hUM=;
+	b=gjOL4fMqzHZ/IO3tgHl8lojM40em91HWsjhswwEkjgbgXAikWI9wt319d7d6BhryRyrxqm
+	U8bs5vPMtxGGa+G4RZvgeBjb8Q04zJU94syrREkfOpe37B4YCEaOQq1abGQ8RldEtWu4ew
+	69ZGaFqQRIWJB2FvH5E8/xoT5Y/JYto=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-311-ucTECYlrPW-68ISEhi7gag-1; Thu, 12 Dec 2024 14:49:22 -0500
+X-MC-Unique: ucTECYlrPW-68ISEhi7gag-1
+X-Mimecast-MFC-AGG-ID: ucTECYlrPW-68ISEhi7gag
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-844bf90c20aso12716639f.1
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 11:49:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734032559; x=1734637359;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r95T7TRiWNq18LGJGEI5Uci5iW7usHmFMdrIwmgRTRE=;
-        b=HGAaxBUukgZ6YnT0FcfTb145c7gLyPnZlpYTXToMVE4Jw0Qzbb/EfWkZAeQlC+DpT7
-         2eLQ6ErXbtQ6Eb+wZcWhmg+Qtm6uuNhGpUi5LoiFgmWQnnkW6vVgziidc6TgLMF6SCcW
-         7WtUCQrQBCqFuYwhtc4QA0Mij/FT24ufz0kBBdkHgeOJm/rJDuk5NAT08XtGiAVNP1SL
-         +Ry1evCFAlGVwzkg7BInccajcZo/Oymh575I1ftJPr3n9HtAoq0A9whG88RNgRv5pUOA
-         WhB0JQZItSC69Z2RbjpmGhzhFdQmUmf3l1RX81gl9jHYte5XLTW1G8fxdo+MB2olDYRE
-         LGKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX56wSWjuNKz1+LPtPv6ZqszBuJzwru5dNBwhFxstLy4AMAGNXxUv20Fl2410Ca17Kd3eA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwVQ3jOCd7ogn25FMNp4aObbQPCbkgHrGqEirgjL38QVulO/LD
-	wQppkoKqFNOEdS7oSBldz2XhCqvsUde6wFa6HGCrZrp2SAwPlhi8x4wciLVEXQEYTI98nvJT7pH
-	DZA==
-X-Google-Smtp-Source: AGHT+IG9o1Bf/No1iOsbt/K+mxuDw079R1+4DmqDcuQXHnaGDppsF0EXdHVH5jysLyJxiUW8ZQrl14ifYsg=
-X-Received: from pjf7.prod.google.com ([2002:a17:90b:3f07:b0:2ea:aa56:49c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b4d:b0:2ef:316b:53fe
- with SMTP id 98e67ed59e1d1-2f127fee811mr11048291a91.22.1734032559314; Thu, 12
- Dec 2024 11:42:39 -0800 (PST)
-Date: Thu, 12 Dec 2024 11:42:37 -0800
-In-Reply-To: <20241212164137.GA71156@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
+        d=1e100.net; s=20230601; t=1734032961; x=1734637761;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sBiPw5OuI7dlO4Z4t4oS+jtz5kPmxd4ZnxuDxig2hUM=;
+        b=jlVgueC3ban92O5ARMKYfoJadeDFNyYhWRFFH8Bb263fdcDor7ocrfAXDDvIvEuv/b
+         h3+ZsnSi68Bu4SOjzsqmxuioMitNqjthYh7DFtZzbPnB94J95sumFe/ZP9LOv/i9Pa6J
+         VZ2qDovX8TYXmQweGtc6BVHlUns2BGn5JGZfMj0Yfquqac2AEJBNP7E7WpJciZnfK4uv
+         yZvaaKM8WkzWGkt2Z7Cwho8QeBQvy9YWn1/i9w8AcXRZmhAQJg/ic39XqJqvkQobrL9W
+         d2W8/IXVCGk2K+MWkEOo1bCKhbFLF8OsCUQCYp4alAcyJDfLlaBomoHY8+8baQPZCwc1
+         j7Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9lM2EQHgkNrssDrFh88EMr/GF7uIWOxOAP7L+2CsryTjNGOsBRexQOW+27poPks57prk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrL6+nvX05QYCOlvzhryUYLjuGlGXJoiogwACoAY0cH/199P4m
+	bm95cNImJXdjOlG3sP+8znJMFbm77YM7Y56RU5iXQm8XCp6SLIgStX9v+W0IWu1M1NT6KnuwTyo
+	5jnJi0dyPwn6+8kN3Q6Ods1yiR0aVcf5WjiNpHwMoZ7cYSio/SA==
+X-Gm-Gg: ASbGncsRemuWTF+HjQ5JceaA7G48funHoxlIxEKpSR+dUxjzf0buRp8uoK5AfAB7cER
+	HoJgX9yctdI5H8c/0bvQIzE33QdcNlc9oc/Zvx9K90rpHaA4+ZUu0lCZuJyjT4I2mtsbBi45YRv
+	QsYpRioINnwHEVNpja7A4U6R2q1CnmM0qBYCWQauQ1jR0SeVUW1En5BuprT4lcc42PRbizcvFca
+	GYu8SSOf2AHKPfsSOh9GPqAnHc7Ay5hamVKweaUJNj+28YE/LM1fOKdEND+
+X-Received: by 2002:a05:6602:1593:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-844e8a3f0b7mr2641839f.5.1734032961304;
+        Thu, 12 Dec 2024 11:49:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IERcvaNomxn8th3z3SWMQIAn0f18rUBb5b4dBUVRvcRJcJEoHv6gpei7+xXPBScGwtQKEbPgQ==
+X-Received: by 2002:a05:6602:1593:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-844e8a3f0b7mr2638439f.5.1734032960861;
+        Thu, 12 Dec 2024 11:49:20 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-844737bc5e7sm434751139f.7.2024.12.12.11.49.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 11:49:20 -0800 (PST)
+Date: Thu, 12 Dec 2024 12:49:18 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Philipp Stanner <pstanner@redhat.com>, amien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
+ S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Mario Limonciello
+ <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>, Ricky Wu
+ <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
+ <leitao@debian.org>, Thomas Gleixner <tglx@linutronix.de>, Kevin Tian
+ <kevin.tian@intel.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
+ <chentao@kylinos.cn>, Dan Carpenter <dan.carpenter@linaro.org>, "Dr. David
+ Alan Gilbert" <linux@treblig.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
+ <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v3 06/11] vfio/pci: Use never-managed version of
+ pci_intx()
+Message-ID: <20241212124918.0dd284fe.alex.williamson@redhat.com>
+In-Reply-To: <20241212192130.GA3359535@bhelgaas>
+References: <20241209130632.132074-8-pstanner@redhat.com>
+	<20241212192130.GA3359535@bhelgaas>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241111102749.82761-1-iorlov@amazon.com> <20241111102749.82761-4-iorlov@amazon.com>
- <Z1nWykQ3e4D5e2C-@google.com> <2b75550c-0dc7-4bcc-ac60-9ad4402c17f8@gmail.com>
- <Z1o1013dUex8w9hK@google.com> <20241212164137.GA71156@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-Message-ID: <Z1s8rWBrDhQaUHuw@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: VMX: Handle vectoring error in check_emulate_instruction
-From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <iorlov@amazon.com>
-Cc: Ivan Orlov <ivan.orlov0322@gmail.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, pdurrant@amazon.co.uk, 
-	dwmw@amazon.co.uk
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 12, 2024, Ivan Orlov wrote:
-> On Wed, Dec 11, 2024 at 05:01:07PM -0800, Sean Christopherson wrote:
-> > > Hm, by the way, what is the desired behaviour if EMULTYPE_ALLOW_RETRY_PF is
-> > > set? Is it correct that we return an internal error if it is set during
-> > > vectoring? Or KVM may try to unprotect the page and re-execute?
-> > 
-> > Heh, it's sneaky, but EMULTYPE_ALLOW_RETRY_PF can be set if and only if
-> > RET_PF_WRITE_PROTECTED is set.  Hmm, that makes me think we should do the below
-> > (EMULTYPE_WRITE_PF_TO_SP was a recent addition).
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 2e713480933a..de5f6985d123 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9077,7 +9077,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > 
-> >         if ((emulation_type & EMULTYPE_ALLOW_RETRY_PF) &&
-> >             (WARN_ON_ONCE(is_guest_mode(vcpu)) ||
-> > -            WARN_ON_ONCE(!(emulation_type & EMULTYPE_PF))))
-> > +            WARN_ON_ONCE(!(emulation_type & EMULTYPE_WRITE_PF_TO_SP))))
-> >                 emulation_type &= ~EMULTYPE_ALLOW_RETRY_PF;
-> > 
+On Thu, 12 Dec 2024 13:21:30 -0600
+Bjorn Helgaas <helgaas@kernel.org> wrote:
+
+> [cc->to: Alex W]
 > 
-> What if we are handling a write to write-protected page, but not a write to
-> the page table? We still can retry after unprotecting the page, so
-> EMULTYPE_ALLOW_RETRY_PF should be enabled, right?
-
-Gah, I got my enums mixed up.  I conflated RET_PF_WRITE_PROTECTED with
-EMULTYPE_WRITE_PF_TO_SP.  Ignore the above.
-
-FWIW, KVM _can't_ unprotect and retry in the EMULTYPE_WRITE_PF_TO_SP case.  From
-kvm_unprotect_and_retry_on_failure():
-
-	/*
-	 * If the failed instruction faulted on an access to page tables that
-	 * are used to translate any part of the instruction, KVM can't resolve
-	 * the issue by unprotecting the gfn, as zapping the shadow page will
-	 * result in the instruction taking a !PRESENT page fault and thus put
-	 * the vCPU into an infinite loop of page faults.  E.g. KVM will create
-	 * a SPTE and write-protect the gfn to resolve the !PRESENT fault, and
-	 * then zap the SPTE to unprotect the gfn, and then do it all over
-	 * again.  Report the error to userspace.
-	 */
-	if (emulation_type & EMULTYPE_WRITE_PF_TO_SP)
-		return false;
-
-
-> >         r = kvm_check_emulate_insn(vcpu, emulation_type, insn, insn_len);
+> On Mon, Dec 09, 2024 at 02:06:28PM +0100, Philipp Stanner wrote:
+> > pci_intx() is a hybrid function which can sometimes be managed through
+> > devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> > port users to either an always-managed or a never-managed version.
 > > 
-> > That said, let me get back to you on this when my brain is less tired.  I'm not
-> > sure emulating when an exit occurred during event delivery is _ever_ correct.
+> > vfio enables its PCI-Device with pci_enable_device(). Thus, it
+> > needs the never-managed version.
 > > 
+> > Replace pci_intx() with pci_intx_unmanaged().
+> > 
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>  
 > 
-> I believe we can re-execute the instruction if exit happened during vectoring
-> due to exception (and if the address is not MMIO, e.g. when it's a write to
-> write-protected page, for instance when stack points to it).
+> Not applied yet, pending ack from Alex.
 
-Unprotect and re-execute is fine, what I'm worried about is *successfully*
-emulating the instruction.  E.g. 
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
-  1. CPU executes instruction X and hits a #GP.
-  2. While vectoring the #GP, a shadow #PF is taken.
-  3. On VM-Exit, KVM re-injects the #GP (see __vmx_complete_interrupts()).
-  4. KVM emulates because of the write-protected page.
-  5. KVM "successfully" emulates and also detects the #GP
-  6. KVM synthesizes a #GP, and because the vCPU already has injected #GP,
-     incorrectly escalates to a #DF.
-
-The above is a bit contrived, but I think it could happen if the guest reused a
-page that _was_ a page table, for a vCPU's kernel stack.
-
-> KVM unprotects the page, executes the instruction one more time and
-> (probably) gets this exception once again (but the page is already
-> unprotected, so vectoring succeeds without vmexit). If not
-> (e.g. exception conditions are not met anymore), guest shouldn't really
-> care and it can continue execution.
 > 
-> However, I'm not sure what happens if vectoring is caused by external
-> interrupt: if we unprotect the page and re-execute the instruction,
-> will IRQ be delivered nonetheless, or it will be lost as irq is
-> already in ISR? Do we need to re-inject it in such a case?
-
-In all cases, the event that was being vectored is re-injected.  Restarting from
-scratch would be a bug.  E.g. if the cause of initial exception was "fixed", say
-because the initial exception was #BP, and the guest finished patching out the INT3,
-then restarting would execute the _new_ instruction, and the INT3 would be lost.
-
-In most cases, the guest would never notice, but it's still undesriable for KVM
-to effectively rewrite history.
-
-As far as unprotect+retry being viable, I think we're on the same page.  What I'm
-getting at is that I think KVM should never allow emulating on #PF when the #PF
-occurred while vectoring.  E.g. this:
-
-  static inline bool kvm_can_emulate_event_vectoring(int emul_type)
-  {
-	return !(emul_type & EMULTYPE_PF);
-  }
-
-and then I believe this?  Where this diff can be a separate prep patch (though I'm
-pretty sure it's technically pointless without the vectoring angle, because shadow
-#PF can't coincide with any of the failure paths for kvm_check_emulate_insn()).
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 07c6f1d5323d..63361b2da450 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9107,6 +9107,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-                if (r == X86EMUL_RETRY_INSTR || r == X86EMUL_PROPAGATE_FAULT)
-                        return 1;
- 
-+               if (kvm_unprotect_and_retry_on_failure(vcpu, cr2_or_gpa,
-+                                                      emulation_type))
-+                       return 1;
-+
-                if (r == X86EMUL_UNHANDLEABLE_VECTORING_IO) {
-                        kvm_prepare_event_vectoring_exit(vcpu, cr2_or_gpa);
-                        return 0;
+> > ---
+> >  drivers/vfio/pci/vfio_pci_core.c  |  2 +-
+> >  drivers/vfio/pci/vfio_pci_intrs.c | 10 +++++-----
+> >  2 files changed, 6 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > index 1ab58da9f38a..90240c8d51aa 100644
+> > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > @@ -498,7 +498,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+> >  		if (vfio_pci_nointx(pdev)) {
+> >  			pci_info(pdev, "Masking broken INTx support\n");
+> >  			vdev->nointx = true;
+> > -			pci_intx(pdev, 0);
+> > +			pci_intx_unmanaged(pdev, 0);
+> >  		} else
+> >  			vdev->pci_2_3 = pci_intx_mask_supported(pdev);
+> >  	}
+> > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> > index 8382c5834335..40abb0b937a2 100644
+> > --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> > @@ -118,7 +118,7 @@ static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+> >  	 */
+> >  	if (unlikely(!is_intx(vdev))) {
+> >  		if (vdev->pci_2_3)
+> > -			pci_intx(pdev, 0);
+> > +			pci_intx_unmanaged(pdev, 0);
+> >  		goto out_unlock;
+> >  	}
+> >  
+> > @@ -132,7 +132,7 @@ static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+> >  		 * mask, not just when something is pending.
+> >  		 */
+> >  		if (vdev->pci_2_3)
+> > -			pci_intx(pdev, 0);
+> > +			pci_intx_unmanaged(pdev, 0);
+> >  		else
+> >  			disable_irq_nosync(pdev->irq);
+> >  
+> > @@ -178,7 +178,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
+> >  	 */
+> >  	if (unlikely(!is_intx(vdev))) {
+> >  		if (vdev->pci_2_3)
+> > -			pci_intx(pdev, 1);
+> > +			pci_intx_unmanaged(pdev, 1);
+> >  		goto out_unlock;
+> >  	}
+> >  
+> > @@ -296,7 +296,7 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
+> >  	 */
+> >  	ctx->masked = vdev->virq_disabled;
+> >  	if (vdev->pci_2_3) {
+> > -		pci_intx(pdev, !ctx->masked);
+> > +		pci_intx_unmanaged(pdev, !ctx->masked);
+> >  		irqflags = IRQF_SHARED;
+> >  	} else {
+> >  		irqflags = ctx->masked ? IRQF_NO_AUTOEN : 0;
+> > @@ -569,7 +569,7 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+> >  	 * via their shutdown paths.  Restore for NoINTx devices.
+> >  	 */
+> >  	if (vdev->nointx)
+> > -		pci_intx(pdev, 0);
+> > +		pci_intx_unmanaged(pdev, 0);
+> >  
+> >  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+> >  }
+> > -- 
+> > 2.47.1
+> >   
+> 
 
 
