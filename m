@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-33569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5FE9EE1CC
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 09:49:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50EC29EE1DF
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 09:51:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F6C4281053
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 08:49:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A0E0167528
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 08:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EED20E311;
-	Thu, 12 Dec 2024 08:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6693920E316;
+	Thu, 12 Dec 2024 08:51:41 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975F9202F88;
-	Thu, 12 Dec 2024 08:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B8920C499;
+	Thu, 12 Dec 2024 08:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733993345; cv=none; b=OBdf3T33N3p02SriLUiiWlwypWujv4QncyJyianfrF+8dmLsBdSaPyL8W7kVPVxBIkcks2sias69GoGOm2VEkTgKkb7JDVLvvpBf9BrnqgI5k4TEKokINRjGNXq6aZr5jRGQnxckHaiZXxEq1xHcQxqKgcERNVCMW7P5rKTUdLw=
+	t=1733993500; cv=none; b=H904vKbEvfQX05IfOeek2mZeELC6HfnOFGedHcm22lut07Q0Q9BOnFvV1evr1IrZ0G3MJ++VY5E41MnaIiya0rqqZSm0/A60JHZVpo1c4+I+k17sM6TIUBukNGervcANvZA9fhbdBV5vdM4QFT6f4mB6m5rUvnWUz4itHOH/HCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733993345; c=relaxed/simple;
-	bh=wNfdSZmyat0UwD7526wx2IW+8Fb/6Fxc7sKATjUY7Pc=;
+	s=arc-20240116; t=1733993500; c=relaxed/simple;
+	bh=iqBPjOHCYyKvzbs7HPUNqqYSdMIjZfsoY2MJDOOLROU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=so7/uMXLU9em7oTaW7vkuiq62EiEVQ5mBWiBnC9Aw1jEa3G12HDYzo2I8iwygg1ZPti9Omjg/qxz5+eua8rByuDa+/x8MOW3QmLjEzai2xvCL8X0l4w4DuVFL6OxeuXmyXxtSmonmzpkSPPH2+Mx20iSeL1wcjNSCgU46mRUxfE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iac3n6VRe0tEzRSt3wRx7zCrhAxKaq+W4GYJJkuBTDB1H6IMe/eU9W3Ge9O/msI/HgF2iwqKMxnjS+hNenyYQhjRbeb/p0F8PzCyxZdpRzVZRaJJQTF5K6odShWnriBSWCnf6ttBouvdePjVcINypeVzKjor/CQ8sCPDwLSAvtU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 594C268D1E; Thu, 12 Dec 2024 09:48:57 +0100 (CET)
-Date: Thu, 12 Dec 2024 09:48:56 +0100
+	id 96FF068D1F; Thu, 12 Dec 2024 09:51:31 +0100 (CET)
+Date: Thu, 12 Dec 2024 09:51:31 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
@@ -55,10 +55,9 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
 	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org, linux-mm@kvack.org,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v4 11/18] mm/hmm: let users to tag specific PFN with
- DMA mapped bit
-Message-ID: <20241212084856.GE9376@lst.de>
-References: <cover.1733398913.git.leon@kernel.org> <e4551571fc10d9c73ab9e38a75ea701c1b492686.1733398913.git.leon@kernel.org>
+Subject: Re: [PATCH v4 12/18] mm/hmm: provide generic DMA managing logic
+Message-ID: <20241212085131.GF9376@lst.de>
+References: <cover.1733398913.git.leon@kernel.org> <cc8a96bf19ca2dd404b55c20ac83fd1a600ad838.1733398913.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,32 +66,12 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e4551571fc10d9c73ab9e38a75ea701c1b492686.1733398913.git.leon@kernel.org>
+In-Reply-To: <cc8a96bf19ca2dd404b55c20ac83fd1a600ad838.1733398913.git.leon@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Dec 05, 2024 at 03:21:10PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
-> by HMM range fault. Such flag allows users to tag specific PFNs with information
-> if this specific PFN was already DMA mapped.
+> +dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
+> +			   size_t idx, struct pci_p2pdma_map_state *p2pdma_state);
 
-Missing line wrap at 73 characters here.
-
->  
-> @@ -253,14 +262,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
->  			cpu_flags = HMM_PFN_VALID;
->  			if (is_writable_device_private_entry(entry))
->  				cpu_flags |= HMM_PFN_WRITE;
-> -			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
-> +			*hmm_pfn = (*hmm_pfn & HMM_PFN_INOUT_FLAGS) | swp_offset_pfn(entry) | cpu_flags;
-
-Please avoid the overly long line here.
-
-That being said I hate the structure here.  Can't we just have a local
-variable for the actual new pfn value, and then a single goto label
-at the end that takes the keeper flags from the argument and assigning
-the new out value to *hmm_pfn instead of duplicating this in half a
-dozen places?
+Please avoid the overly long line.
 
 
