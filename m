@@ -1,145 +1,190 @@
-Return-Path: <kvm+bounces-33671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33672-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4789EFF04
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:11:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 998DC9EFF24
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:16:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E409287D0A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 22:11:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54D5D288C8B
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 22:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1331DB922;
-	Thu, 12 Dec 2024 22:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D137F1AF0AF;
+	Thu, 12 Dec 2024 22:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RwDp4vca"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XprJ5TFk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1879F1C9B62
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 22:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C9F1D9341
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 22:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734041482; cv=none; b=s1ysxPmI69jZYYzxXYKiNMJwtt1L+j3ZuJ2YbYV4Kr7Xt65N4jkgJT4VL+QBm3E6rdbQ6ILpMX0wYMWCG4rdLE5XNHJQrzaHDlAGbm3UHgYVCN+DfxY1DeXiJ0ZOz4mKa8ysdzPTRY7EFoa+Rw1GJSTuOYIS+hAFvD//+bgmTGg=
+	t=1734041796; cv=none; b=JjLACxbFfIQOJppV3vpHGo7nTOXV2zw8lB6CsiTuYQjPDdrzEbxooOnQftgCtVyCP/Tr3Y47w074Tj73PhwfeW3KIjnvAAenlItD1ex+bYaO5qs5iYINJQl/9gDhMvb5N8pFVQIt3XdQP9SObzR8JBsCUUdnwUEQJhT7OcyTJ+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734041482; c=relaxed/simple;
-	bh=13+8h6kI1TAfWW2u8Ca3Z2Xilpypvcr0DKeH7p6NqUY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=njvvPx6kGJQNMjJv4LwbGhLf/31foYJTG06cZ3mFXGkLAcNi6dQNLIQEYOfB1t6GeV/3BIzLty66kFffIK4c+S8W659LEAjJd5R4+fE8tqdf5OtdxLX698Eai0qSN5VWEIPhAYLUOkdVf2x21d+YHbRA0Lc0t3LodTcw5UJjG+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RwDp4vca; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-728e4bdd69eso1953807b3a.0
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 14:11:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734041478; x=1734646278; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O8hFG6HST0+xz5AWr8oNcEUA/Zcqg9a67DpfzgQIv1s=;
-        b=RwDp4vca5cYn+O3ANWmNzPfOW0bcTY6/nv5rKJOya+5pMyuHENj9uFkS0gqvvzMMWa
-         bjieClOFeQBPGl8g4k5lWHQLem/FZWjSoel7CJqbv7Zbs7KzOwEwNlq0eGdPVhFtZIAr
-         f/MPf1ovl3TZKH/aIM0e0fOPkA0UdwCawNq4URpX+UvhHs+I0c7ob6flbXSVFYtNuHR3
-         194F++j9KHkGZnIsog203jUXTUbymZqVI+KYIaOTWWc900Lzee7iqGkT+S9RvqbneJCL
-         YTTR4VG4rZWAmRQRfUdUai20X9YswsRkZ5M5aHSDzSrvCICKm8lf2tr+HJt22yrXZ2Dg
-         rmcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734041478; x=1734646278;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O8hFG6HST0+xz5AWr8oNcEUA/Zcqg9a67DpfzgQIv1s=;
-        b=DJU8TnrOZpJHqoqghg4iS7F9no4iVtazgOY4ZaXiSgQHn6Hu+CENM9fAdqP1GaKYz2
-         4pU11R7u6W8X9ce8ptNGe4uKl927Wi508uAirMc3FMdtBrmW+nrUUcZfvk6/yNwro4v2
-         Dgrp7H7HibyIMRZ/ggOI4q3KKoZ/e7HwpHBzs3z5GLvt8pLPDDAAoDlPjhRktLIQNIK/
-         oA6axB0Uw5Iw+ADemTZPenbSHoh0AY09nJN/LTzB1VkxTkV1ed2APLCrtHu7JL8n0nMh
-         fvRvLpsKK3UqWu3YDW4ZFCwOCoJ74NkXNdXkO84q05HmkwJeLN/IPhUaYo2n+PTgYR+u
-         el/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5BTilgjdQk8DhnemA4PWKEBwqBCkA+g8fqJr4zXWnFh1o7nlPtuqSGFMaYuxL+bhrMyg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNXufa+JHQriZsxKFtF44EF7A5XQpPvPOiiXuv53DxhkZVLJRl
-	XBnwBzHgZaovg4ZVusSsJl8b13VpglY/lzh+knvL6oITiCmu4azamPO8eeKNqqaDTUg+WVLSPkd
-	Gqg==
-X-Google-Smtp-Source: AGHT+IEYe3oACuEmMt/hCqKoxzL+HdkacaXms03GcWAAvu/hVYwocKnminOiRi57LHIwzOhfSkY+i2gDxzI=
-X-Received: from pfde6.prod.google.com ([2002:aa7:8c46:0:b0:725:e37e:7451])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2347:b0:725:f18a:da37
- with SMTP id d2e1a72fcca58-7290c3aee61mr234715b3a.0.1734041478467; Thu, 12
- Dec 2024 14:11:18 -0800 (PST)
-Date: Thu, 12 Dec 2024 14:11:16 -0800
-In-Reply-To: <5b8f7d63-ef0a-487f-bf9d-44421691fa85@redhat.com>
+	s=arc-20240116; t=1734041796; c=relaxed/simple;
+	bh=L0kUO9Zc9aPn1M/kjfuUhl6rSW2X2XL2ry4fhK9++8E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OjIaujqZt3p/ZkPnpBdgzo8DMWm24wn3SJ+IgzO9z6KVLg1t7GBuhZF/iTIQ3ZdMXGBWptk2oeTkJ+tovpNGTyiyKwoOQc6Bw6LqDZekfPazbF8ForpnDTpotWvWvalutoQBUw2tnkQCfxb4f1+d4Zd9zUDBdDe5M1douEGp3r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XprJ5TFk; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734041793; x=1765577793;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=L0kUO9Zc9aPn1M/kjfuUhl6rSW2X2XL2ry4fhK9++8E=;
+  b=XprJ5TFkpIzq/OHV0LaA4QDDCI63hCfWGo5NH0ekn7fTighdrOyVwmPT
+   AtC/SmbRPajmUNQM/IzQxc0wdhQkRngmqAFItP1yvKYKiWS0dPePjnPWy
+   7xebAP11pXNeCVzXKQUSmOxqm/A5+RruRYvi3AahP01nlwsP4RVP0UNT7
+   4qiTmfRKU8k8Fuswdj2ba2bFagGCFOwuMgIcO2JoleFa7sAPahNkdwiqO
+   6tIIA894q7/K+LnJvJahjy8IwNEMdJWWAKQx1dP2SD5Q1zJR9RADVMZFJ
+   fnG50eavO3+vIpKDeCPEAqDauz5Zfp3AbTmUImGW29TTSIUl0QFORHq3k
+   w==;
+X-CSE-ConnectionGUID: xf/m+Xj6R5uMPsWKaFzz4g==
+X-CSE-MsgGUID: Qa30NqZoRFWgDd69CB3uCA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="34400008"
+X-IronPort-AV: E=Sophos;i="6.12,229,1728975600"; 
+   d="scan'208";a="34400008"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:16:33 -0800
+X-CSE-ConnectionGUID: TRYlwhXoSOyJLm7Xz90EMg==
+X-CSE-MsgGUID: i7NLU5X2Ro+s+BIZxKpnOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="100935842"
+Received: from puneetse-mobl.amr.corp.intel.com (HELO localhost) ([10.125.110.112])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:16:31 -0800
+Date: Thu, 12 Dec 2024 16:16:29 -0600
+From: Ira Weiny <ira.weiny@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+	kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 35/60] i386/cpu: Introduce enable_cpuid_0x1f to force
+ exposing CPUID 0x1f
+Message-ID: <Z1tgvQdLeafHKXIe@iweiny-mobl>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-36-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241212032628.475976-1-binbin.wu@linux.intel.com>
- <Z1qZygKqvjIfpOXD@intel.com> <1a5e2988-9a7d-4415-86ad-8a7a98dbc5eb@redhat.com>
- <Z1s1yeWKnvmh718N@google.com> <5b8f7d63-ef0a-487f-bf9d-44421691fa85@redhat.com>
-Message-ID: <Z1tfhPaHruhS3teK@google.com>
-Subject: Re: [PATCH] i386/kvm: Set return value after handling KVM_EXIT_HYPERCALL
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Zhao Liu <zhao1.liu@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, xiaoyao.li@intel.com, 
-	qemu-devel@nongnu.org, michael.roth@amd.com, rick.p.edgecombe@intel.com, 
-	isaku.yamahata@intel.com, farrah.chen@intel.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105062408.3533704-36-xiaoyao.li@intel.com>
 
-On Thu, Dec 12, 2024, Paolo Bonzini wrote:
-> On 12/12/24 20:13, Sean Christopherson wrote:
-> > On Thu, Dec 12, 2024, Paolo Bonzini wrote:
-> > > If ret is less than zero, will stop the VM anyway as
-> > > RUN_STATE_INTERNAL_ERROR.
-> > > 
-> > > If this has to be fixed in QEMU, I think there's no need to set anything
-> > > if ret != 0; also because kvm_convert_memory() returns -1 on error and
-> > > that's not how the error would be passed to the guest.
-> > > 
-> > > However, I think the right fix should simply be this in KVM:
-> > > 
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 83fe0a78146f..e2118ba93ef6 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -10066,6 +10066,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> > >   		}
-> > >   		vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
-> > > +		vcpu->run->ret                = 0;
-> > 
-> > 		vcpu->run->hypercall.ret
-> > 
-> > >   		vcpu->run->hypercall.nr       = KVM_HC_MAP_GPA_RANGE;
-> > >   		vcpu->run->hypercall.args[0]  = gpa;
-> > >   		vcpu->run->hypercall.args[1]  = npages;
-> > > 
-> > > While there is arguably a change in behavior of the kernel both with
-> > > the patches in kvm-coco-queue and with the above one, _in practice_
-> > > the above change is one that userspace will not notice.
-> > 
-> > I agree that KVM should initialize "ret", but I don't think '0' is the right
-> > value.  KVM shouldn't assume userspace will successfully handle the hypercall.
-> > What happens if KVM sets vcpu->run->hypercall.ret to a non-zero value, e.g. -KVM_ENOSYS?
+On Tue, Nov 05, 2024 at 01:23:43AM -0500, Xiaoyao Li wrote:
+> Currently, QEMU exposes CPUID 0x1f to guest only when necessary, i.e.,
+> when topology level that cannot be enumerated by leaf 0xB, e.g., die or
+> module level, are configured for the guest, e.g., -smp xx,dies=2.
 > 
-> Unfortunately QEMU is never writing vcpu->run->hypercall.ret, so the guest
-> sees -KVM_ENOSYS; this is basically the same bug that Binbin is fixing, just
-> with a different value passed to the guest.
+> However, TDX architecture forces to require CPUID 0x1f to configure CPU
+> topology.
 > 
-> In other words, the above one-liner is pulling the "don't break userspace"
-> card.
+> Introduce a bool flag, enable_cpuid_0x1f, in CPU for the case that
+> requires CPUID leaf 0x1f to be exposed to guest.
+> 
+> Introduce a new function x86_has_cpuid_0x1f(), which is the warpper of
+> cpu->enable_cpuid_0x1f and x86_has_extended_topo() to check if it needs
+> to enable cpuid leaf 0x1f for the guest.
 
-But how is anything breaking userspace?  QEMU needs to opt-in to intercepting
-KVM_HC_MAP_GPA_RANGE, and this has been KVM's behavior since commit 0dbb11230437
-("KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall").
+Could you elaborate on the relation between cpuid_0x1f and the extended
+topology support?  I feel like x86_has_cpuid_0x1f() is a poor name for this
+check.
 
-Ah, "ret" happens to be deep in the union and KVM zero allocates vcpu->run, so
-QEMU gets lucky and "ret" happens to be zero because no other non-fatal userspace
-exit on x86 happens to need as many bytes.  Hilarious.
+Perhaps I'm just not understanding what is required here?
 
-FWIW, if TDX marshalls hypercall state into KVM's "normal" registers, then KVM's
-shenanigans with vcpu->run->hypercall.ret might go away?  Though regardless of
-what happens on that front, I think it makes to explicitly initialize "ret" to
-*something*.
+Ira
 
-I checked our VMM, and it does the right thing, so I don't have any objection
-to explicitly zeroing "ret".  Though it needs a comment explaining that it's a
-terrible hack for broken userspace ;-)
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  target/i386/cpu.c     | 4 ++--
+>  target/i386/cpu.h     | 9 +++++++++
+>  target/i386/kvm/kvm.c | 2 +-
+>  3 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 1ffbafef03e7..119b38bcb0c1 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6731,7 +6731,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          break;
+>      case 0x1F:
+>          /* V2 Extended Topology Enumeration Leaf */
+> -        if (!x86_has_extended_topo(env->avail_cpu_topo)) {
+> +        if (!x86_has_cpuid_0x1f(cpu)) {
+>              *eax = *ebx = *ecx = *edx = 0;
+>              break;
+>          }
+> @@ -7588,7 +7588,7 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>           * cpu->vendor_cpuid_only has been unset for compatibility with older
+>           * machine types.
+>           */
+> -        if (x86_has_extended_topo(env->avail_cpu_topo) &&
+> +        if (x86_has_cpuid_0x1f(cpu) &&
+>              (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
+>              x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
+>          }
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 59959b8b7a4d..dcc673262c06 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -2171,6 +2171,9 @@ struct ArchCPU {
+>      /* Compatibility bits for old machine types: */
+>      bool enable_cpuid_0xb;
+>  
+> +    /* Force to enable cpuid 0x1f */
+> +    bool enable_cpuid_0x1f;
+> +
+>      /* Enable auto level-increase for all CPUID leaves */
+>      bool full_cpuid_auto_level;
+>  
+> @@ -2431,6 +2434,12 @@ void host_cpuid(uint32_t function, uint32_t count,
+>                  uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
+>  bool cpu_has_x2apic_feature(CPUX86State *env);
+>  
+> +static inline bool x86_has_cpuid_0x1f(X86CPU *cpu)
+> +{
+> +    return cpu->enable_cpuid_0x1f ||
+> +           x86_has_extended_topo(cpu->env.avail_cpu_topo);
+> +}
+> +
+>  /* helper.c */
+>  void x86_cpu_set_a20(X86CPU *cpu, int a20_state);
+>  void cpu_sync_avx_hflag(CPUX86State *env);
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index dea0f83370d5..022809bad36e 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -1874,7 +1874,7 @@ uint32_t kvm_x86_build_cpuid(CPUX86State *env, struct kvm_cpuid_entry2 *entries,
+>              break;
+>          }
+>          case 0x1f:
+> -            if (!x86_has_extended_topo(env->avail_cpu_topo)) {
+> +            if (!x86_has_cpuid_0x1f(env_archcpu(env))) {
+>                  cpuid_i--;
+>                  break;
+>              }
+> -- 
+> 2.34.1
+> 
 
