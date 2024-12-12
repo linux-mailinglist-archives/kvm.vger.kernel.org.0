@@ -1,171 +1,220 @@
-Return-Path: <kvm+bounces-33587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660669EED71
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:46:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B41E3188C0EE
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 15:43:20 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C6C223711;
-	Thu, 12 Dec 2024 15:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPI5i7mW"
-X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 636A49EEE72
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:57:25 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB58223302
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C3CD286CF7
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 15:57:24 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4446222D7D;
+	Thu, 12 Dec 2024 15:56:41 +0000 (UTC)
+X-Original-To: kvm@vger.kernel.org
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8527A2210F2;
+	Thu, 12 Dec 2024 15:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734018133; cv=none; b=phgkAvyEhm4+dJr2EDfJiuU7Xs0reSt3f/AOdPcvD7QUM0RiXFHUI7puuZXny2y+SSoHoJydsV2ablfYqoQOl05BdKWziMLv53er7q1pwZwRz2j+yhsLgCKXuwOyCIds6Tkzvs8KIUFsLV8SokJCdSM6I3ETBAWgks+V3RCsZz0=
+	t=1734019001; cv=none; b=j57r/802gxmk8LuLcdw/1IWVBY9aCQX18IErNbXHlpnQvEAPHQa+rm1LMt+4tgWy9gI68LVoZ+Eg0+2wUBeLz5Sl6pb6TkzLvuXXx7WPc6s70FPBUEdVJ7aaKDCHOpDnbTohD7czD3p0tiLiEM/3aeGXPlBLXUt3Cg2kxddB/ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734018133; c=relaxed/simple;
-	bh=fukLmqnaJraW/2v7q2qULQxlYWaXiBQWviatK4l3x20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FqltWlD5G4f740gKqyFcAERO8gbw41Oe0nWG0B4aufqbGzntPIpntx1zbcSXXrOiK3IdvpFuTzGxYWstcXqqxKu/emah47lOBCmL3SZo4GX32W61S4Nsb0tOpiO2xuafmisQm2H9TCa37659Zrvl2va8EZG+eEyr5lIY+0uWuZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PPI5i7mW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734018130;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GwnYZoIOyRvAz2iL7Xc1JQqOWzhArnZy+3zS3Tov6v0=;
-	b=PPI5i7mWtwDAMdDL/cG61QBNSxlkpbDz/F2k5mlqlaS+S8GiqJQz4dTK28/xrJBfTrNHw1
-	PgB89BJVgxvc7DdELGW1PlLEqPNJl4FvDOxjH7ERLAkuuJsFhOxothyGsJnNZBSlWMtPbN
-	KQUgsD8qE2ccY1coF1oIaDTSNcBH4Xc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-JpfeG2suPtyQfJaLiCnr7g-1; Thu, 12 Dec 2024 10:42:07 -0500
-X-MC-Unique: JpfeG2suPtyQfJaLiCnr7g-1
-X-Mimecast-MFC-AGG-ID: JpfeG2suPtyQfJaLiCnr7g
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-434f3398326so9992455e9.0
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 07:42:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734018126; x=1734622926;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GwnYZoIOyRvAz2iL7Xc1JQqOWzhArnZy+3zS3Tov6v0=;
-        b=nGsTJa6XbAIKoLiqT8b+8JhFzPmbCWPJM3eIwIeZmVt9y3ACvqUZPLyFA1K/Dc01Ui
-         LsW3aDqSoEGXGgiSlF9icbvI4CczEFwUlzmNzi+xv/Ath9jHSm4EC7trPa/PF7EonYul
-         K9w5GqAzCimuh4TtzNa4p80lgcMJiFUGfqMpSH+ZOn3ELYO9ZApnp42cd8Kz0lUquXbO
-         clDlkIDEoZ/KPCnkk2bwK1IJH1uXxkhTyQ+bweLjJBwldPF5yRRC8kmfMUohEQUH633K
-         raPg3r8wI5yjiRDe6FOIlDLK7S14k+FQ0vgAp7L/f4+mzUPGy67z0MLhu+Xgo6JYWodk
-         sNOQ==
-X-Gm-Message-State: AOJu0YyKKYIGwArqkBfQqpmP7m670vVhHDVZoKKABymrGgVM28GPG5GT
-	ibFJnSfO9GUd+uNtofVTsqfVJANpQKWvc+mucWQ7FBXRGhHIl25cEb1KbtoX0xg2R2FPyWl3IPn
-	F6UcaPXtIkNv2x7z1/tBQRSeXEHpNmdBaHaRMKqu3iIMsIv37UA==
-X-Gm-Gg: ASbGncsY8KQXXwtfU4ojoGEJloXQgwdpDDMcULiXgbHdCf2p0Vwn0psn/TL0SzZ2idT
-	EHagPzMPCrf0AMzYLc051Z86kYAGhiKv3pAX/EKXXucZxuLMSADCT7i3+pyF/b3CWPmXu+8//L1
-	MPIbJABYpW1ahWHqLgpZatEZpVFPMAeJ++w9hUOIeQSlMq4liDlZ3vgspDmN0MW4lKVZ5xNW/EB
-	E1/3qbBM1fZsGuJKvqoHk6fuSsyYXwVNhYvjusg4ZzppDZTkcaurDzsq+9a
-X-Received: by 2002:a05:6000:2cf:b0:386:4332:cc99 with SMTP id ffacd0b85a97d-387888069d8mr3157732f8f.17.1734018126222;
-        Thu, 12 Dec 2024 07:42:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHsodZpbrf8J7/oaYzyqOrF+t95qa3MPBpLVtsfTFotrDy5D819vIPk3Y7tmLvjrhTY14AivA==
-X-Received: by 2002:a05:6000:2cf:b0:386:4332:cc99 with SMTP id ffacd0b85a97d-387888069d8mr3157708f8f.17.1734018125894;
-        Thu, 12 Dec 2024 07:42:05 -0800 (PST)
-Received: from [192.168.10.27] ([151.81.118.45])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3878248e61dsm4325250f8f.21.2024.12.12.07.42.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 07:42:05 -0800 (PST)
-Message-ID: <3b440ac3-391d-493b-9384-218bd61d7e67@redhat.com>
-Date: Thu, 12 Dec 2024 16:42:02 +0100
+	s=arc-20240116; t=1734019001; c=relaxed/simple;
+	bh=G96xLoC/eSHXYXHq+4DeBJeMDS2lbNoxJbax3AUA8J0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NWP2F1TmrHqwdNRQs1gr/0vjnd4OQFo+fcmpI4g8HB5sco0voNeYcHIadJtE9DaqSM3iN0pUKITuej+lMkaWGneXUBXFpCtv9uEwQLWDyYssMibJWMVlB+YcZx48m8oEllL+Jn4qEh5bSqLSDveseRkt4qgfKOtyvmiDwINhaQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E36B71762;
+	Thu, 12 Dec 2024 07:57:05 -0800 (PST)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.39.50])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B30E53F720;
+	Thu, 12 Dec 2024 07:56:33 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v6 00/43] arm64: Support for Arm CCA in KVM
+Date: Thu, 12 Dec 2024 15:55:25 +0000
+Message-ID: <20241212155610.76522-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/6] KVM: x86: Refactor __kvm_emulate_hypercall() into
- a macro
-To: Adrian Hunter <adrian.hunter@intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tom Lendacky <thomas.lendacky@amd.com>, Binbin Wu
- <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
- Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>
-References: <20241128004344.4072099-1-seanjc@google.com>
- <20241128004344.4072099-7-seanjc@google.com>
- <90577aad-552a-4cf8-a4a3-a4efcf997455@intel.com>
- <6423ec9d-46a2-43a3-ae9a-8e074337cd84@redhat.com>
- <Z1ier7QAy9qj7x4V@google.com>
- <0751a7b8-f8d3-4e27-b710-0a2bd7d06f7e@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <0751a7b8-f8d3-4e27-b710-0a2bd7d06f7e@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 12/12/24 08:32, Adrian Hunter wrote:
-> On 10/12/24 22:03, Sean Christopherson wrote:
->> What I do deeply care about though is consistency within KVM, across vendors and
->> VM flavors.  And that means that guest registers absolutely need to be captured in
->> vcpu->arch.regs[].
-> 
-> In general, TDX host VMM does not know what guest register
-> values are.
-> 
-> This case, where some GPRs are passed to the host VMM via
-> arguments of the TDG.VP.VMCALL TDCALL, is really just a
-> side effect of the choice of argument passing rather than
-> any attempt to share guest registers with the host VMM.
-> 
-> It could be regarded as more consistent to never use
-> vcpu->arch.regs[] for confidential guests.
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-Yes, that's where I stand as well.  There's reasons to use 
-vcpu->arch.regs[] when "decrypted" values are available, and reasons to 
-not use it at all.  Both of them could be considered the more consistent 
-choice, and I think I prefer slightly the latter, but it's definitely 
-not a hill to die on...
+The related guest support was merged for v6.13-rc1 so you no longer need
+that separately.
 
-Paolo
+There are numerous changes since v5, many thanks for the review
+comments. The highlights are below, and individual patches have a changelog.
+
+ * KVM_VCPU_MAX_FEATURES is incremented. *NOTE*: This effectively
+   exposes the nested virtualisation feature. So this series as it
+   stands has a dependency on that being finished before it can be
+   merged. See [2] for more details.
+
+ * Properly support the RMM providing a more limited number of GIC LRs
+   than the hardware.
+
+ * Drop patch tracking number of pages for the top level PGD, it's
+   easier calculating it when we need it.
+
+ * Drop the "spare page" - it was causing code complexity and it's a bit
+   premature to start making such optimisations before we've got real
+   platforms to benchmark.
+
+Major limitations:
+
+ * Only supports 4k host PAGE_SIZE (if PAGE_SIZE != 4k then the realm
+   extensions are disabled). I'm looking at removing this restriction,
+   but I didn't want to delay this posting.
+
+ * No support for huge pages when mapping the guest's pages. There is
+   some 'dead' code left over from before guest_mem was supported. This
+   is partly a current limitation of guest_memfd. It's also on my todo list to
+   look at improving this.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+
+This series is based on v6.13-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v6
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v4
+
+[1] https://developer.arm.com/documentation/den0137/1-0rel0/
+[2] https://lore.kernel.org/r/a7011738-a084-46fa-947f-395d90b37f8b%40arm.com
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (30):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  KVM: arm64: vgic: Provide helper for number of list registers
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+  KVM: arm64: Allow activating realms
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   40 +
+ arch/arm64/include/asm/kvm_host.h    |   17 +-
+ arch/arm64/include/asm/kvm_rme.h     |  152 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  259 +++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  174 ++-
+ arch/arm64/kvm/guest.c               |  107 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    6 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  195 +++-
+ arch/arm64/kvm/pmu-emul.c            |    6 +
+ arch/arm64/kvm/psci.c                |   29 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  195 ++++
+ arch/arm64/kvm/rme.c                 | 1588 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   79 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    5 +
+ arch/arm64/kvm/vgic/vgic.c           |   54 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   31 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 35 files changed, 3557 insertions(+), 103 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
+-- 
+2.43.0
 
 
