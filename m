@@ -1,303 +1,157 @@
-Return-Path: <kvm+bounces-33669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33670-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 426039EFE77
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 22:38:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B949EFEF3
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 23:04:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7D216C342
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 21:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0C3188A505
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 22:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426BC1DAC9B;
-	Thu, 12 Dec 2024 21:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9F71DB34B;
+	Thu, 12 Dec 2024 22:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JNjB5VCn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h/TQZS7f"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B27B1D79A0
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 21:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA1A15696E
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 22:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734039472; cv=none; b=UNj7K/+MnBGetGh2Ex/c4SupXYOTn7kxvIPuGG8SFRpwPegc+i1cQXWu/yaRZrkouXKIk68WZhzJ81l2KiX96jAphuMPkz1LqsF7EMsJ1OcjzHeyAZhhXZVmIlIV3FQ07+8yiyprmBMoDDRQYomNCOKg8cmILJnQFX+cnSnGQ7k=
+	t=1734041091; cv=none; b=Ex8sEnjf2tU8TCTOLHgooUuPz++vQdVXXqoriKjzW+ga5etG2XiY1GobSn8jG1KeiV5Ai0IpkyBojK+J6l4FmPanftf1HCXKZktGs2pnmQ5S8jEUlvS33rL3xo4/mVQ427kQ7yEBwKX388EZZNligehq/phzJnpPffogosSXVpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734039472; c=relaxed/simple;
-	bh=kaPZY6wsTh/Ec1bfnAaF3rdx+E8UORQZThv0ilb9dDE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lZdczVtDOP8qBmFqUBKF1pTOU0cLCE7gin6Jp3gFl+DrJnInLK9TI+Wfqa7sqK0/MiLwscxtmXymADJI81TEfK5gdaGnMkrdn7gqTT850HCno29e8Lk/fjlgw6GVr2Sq/l3qLVsaUwQdyBykEdjo0eNAaptw84HiPbLf4IbgElw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JNjB5VCn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734039468;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jKHzpPuGEO/3T/KEzMr/64WE4qzCFA/dEqv+m7ITukY=;
-	b=JNjB5VCn1cApMUsIZEAsiPwdBLgKY5C7QksLS1yNN1vmCaFThTQYD2c2XxMFVLSjwun2Hf
-	RACX9IMT02/WQsTGcFnvDX4gZC0fMYZwP326Au88sKf59r0xQmMM+mc5YIhj09/Fn8aR2N
-	aqed4OUWOZXqeVyo0YNqxM5VKcp4I5E=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-136-A0WkLOBvOHCnQK9X4blnXQ-1; Thu, 12 Dec 2024 16:37:47 -0500
-X-MC-Unique: A0WkLOBvOHCnQK9X4blnXQ-1
-X-Mimecast-MFC-AGG-ID: A0WkLOBvOHCnQK9X4blnXQ
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a9d195e6e5so10097485ab.2
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 13:37:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734039466; x=1734644266;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jKHzpPuGEO/3T/KEzMr/64WE4qzCFA/dEqv+m7ITukY=;
-        b=K2IYrrGy/2OCurCQzR8EqGEssXXGvlNyxHE1mEekemz85egsDPPbG3GLAMs3TH12vf
-         yr6BtlvSDYDl7nMJpw+u78YPKobOg85stqln7z2crHLxL5MJlHzRK3klxZpLGlASFy9W
-         1IFXEPyRHBkaBwy5M+k1WZDv94Up1fUEs6J1IBMwcJGJ+2wI1jR44Cll2gmJsbdJwoZZ
-         hMR+3CAaCHFn681OpF3W/U6UBz2h4HI7SccsWIPuJGGBkVpuqe1xIPnvtumKZ8g80UbM
-         hXraVz8Vh/gjGhwPXbInwnAh/bAFX32CFzHFuT9fcIMvJibM6xP/DGiO5FTBhCXmhfRw
-         AqqA==
-X-Gm-Message-State: AOJu0YwrnERLwnynjdNhz5NjGaZKKPf+PWTkLo3P4L/UNEhd+md0WLAx
-	E3f1bTwQ9cviT6ILcZW3DxxWZHqtTVLWwql2OxsIgOQsFCcoOjn0NcdbDJGVXvpQMqMZkp9G9v2
-	5suVoMufqU1giWsBOX8cOQhvZDzP37QlTwGYyunlq0UXONqhBfbp1rDezRA==
-X-Gm-Gg: ASbGncu+tA+Aw2cRjG+FnCHUJw4uawZXncjtPGinjArw8FpvSHdB/6/8zWsJLafT+2u
-	z5rvcn6gc/INVaEh2BHggDzT0lOL0JCCil4HnyTZc3IdquGXUsFWWA3a7xoy08bucM+UetOeo2Y
-	CHNDg++9l//V/PVe/7gkd4js0UPK/sI9LxCPsWNkm/p6JihhBW5r0+hRLJ3ErNQ+OKlqyDE5op1
-	+IeGIAQqGXjXL3r0ZvhT1AX3JPy6xw9+kO2zW4A/w2BBToAs0sBEJJt
-X-Received: by 2002:a05:6e02:152e:b0:3a7:6c5c:9aa4 with SMTP id e9e14a558f8ab-3aff039a391mr3984485ab.12.1734039466549;
-        Thu, 12 Dec 2024 13:37:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEeV195XzIYia2v2u9MDS/N8vM2Lw7lpW67TJ3ir6GUbqpYrtePcNFNOCHDFoVqZrzpzMNyiQ==
-X-Received: by 2002:a05:6e02:152e:b0:3a7:6c5c:9aa4 with SMTP id e9e14a558f8ab-3aff039a391mr3984305ab.12.1734039466125;
-        Thu, 12 Dec 2024 13:37:46 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2c5db2de1sm2002931173.32.2024.12.12.13.37.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 13:37:45 -0800 (PST)
-Message-ID: <a3e75091f2b6b13d4907ac2fdf09058ab88c4ebf.camel@redhat.com>
-Subject: Re: [PATCH 1/4] KVM: VMX: read the PML log in the same order as it
- was written
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, Paolo Bonzini
-	 <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, x86@kernel.org
-Date: Thu, 12 Dec 2024 16:37:44 -0500
-In-Reply-To: <Z1ox4OHNT6kkincQ@google.com>
-References: <20241211193706.469817-1-mlevitsk@redhat.com>
-	 <20241211193706.469817-2-mlevitsk@redhat.com> <Z1ox4OHNT6kkincQ@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	s=arc-20240116; t=1734041091; c=relaxed/simple;
+	bh=fcLqNUWXZKdJqXPcRRGkSkyE41XaNnf3cqr6Sktyuwg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i0cAoaG1dMh5g44+jANn5k1Rz85II4nPDVcviN7i8LOfGmtmxNbbhNakIY5Eo/0GmnZNkTe5oNLfGi1a7fLp+9fgg/qfN6JzrWFVvOg2Z8DbK+dPmU9E1X0Ti6wULks9ggy2A5+2ZtCIcGHlNdLM8gNhZ3mJ3+ae5V4GJC9Rh/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h/TQZS7f; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734041089; x=1765577089;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=fcLqNUWXZKdJqXPcRRGkSkyE41XaNnf3cqr6Sktyuwg=;
+  b=h/TQZS7fb6sI+bnREfnBjse+ATHi51XPlJc4mosm0yK6R8C2+59+JmSI
+   HBHhyQ2PNWq7xukUzZPweh1erjZ4nc5DCIi5PexQ6QqPjbKyKWxASdEIi
+   hE24n4+x73dHtcf5Ls7Q70Ygh8rnxN81jZnmGqQk0LaOxKlDn3qEhV/0S
+   dfPFjZxANX4UXTIq/aqFGq7I/SdY3R1CLRH/Y7b9aC7coDSAxB67JuUPp
+   Cdw37+8q4JAD63bSClIBptMY4d1dVz7hj72WcWrmsXj9KkfXm6AUaES+n
+   pJBjQUWE8w00uLJJLbKkzdiAj3HSadABFSLg26FOl9waDJbLE3UvlhnBF
+   g==;
+X-CSE-ConnectionGUID: zUjDKUAZRCOINy5IGj55NQ==
+X-CSE-MsgGUID: GV9SJowqST6lpw8/oMWh0w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="34614680"
+X-IronPort-AV: E=Sophos;i="6.12,229,1728975600"; 
+   d="scan'208";a="34614680"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:04:49 -0800
+X-CSE-ConnectionGUID: q2EolBEBSMe+Nve+GU6ohA==
+X-CSE-MsgGUID: xqpa35YQRpCHDYTgrkEiCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,229,1728975600"; 
+   d="scan'208";a="96589080"
+Received: from puneetse-mobl.amr.corp.intel.com (HELO localhost) ([10.125.110.112])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 14:04:47 -0800
+Date: Thu, 12 Dec 2024 16:04:44 -0600
+From: Ira Weiny <ira.weiny@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+	kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 34/60] i386/tdx: implement tdx_cpu_realizefn()
+Message-ID: <Z1td_BZPlZ5G9Zaq@iweiny-mobl>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-35-xiaoyao.li@intel.com>
+ <82b74218-f790-4300-ab3b-9c41de1f96b8@redhat.com>
+ <2bedfcda-c2e7-4e5b-87a7-9352dfe28286@intel.com>
+ <44627917-a848-4a86-bddb-20151ecfd39a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <44627917-a848-4a86-bddb-20151ecfd39a@redhat.com>
 
-On Wed, 2024-12-11 at 16:44 -0800, Sean Christopherson wrote:
-> On Wed, Dec 11, 2024, Maxim Levitsky wrote:
-> > X86 spec specifies that the CPU writes to the PML log 'backwards'
-> 
-> SDM, because this is Intel specific.
-True.
-> 
-> > or in other words, it first writes entry 511, then entry 510 and so on,
-> > until it writes entry 0, after which the 'PML log full' VM exit happens.
+On Tue, Nov 05, 2024 at 12:53:25PM +0100, Paolo Bonzini wrote:
+> On 11/5/24 12:38, Xiaoyao Li wrote:
+> > On 11/5/2024 6:06 PM, Paolo Bonzini wrote:
+> > > On 11/5/24 07:23, Xiaoyao Li wrote:
+> > > > +static void tdx_cpu_realizefn(X86ConfidentialGuest *cg, CPUState *cs,
+> > > > +                              Error **errp)
+> > > > +{
+> > > > +    X86CPU *cpu = X86_CPU(cs);
+> > > > +    uint32_t host_phys_bits = host_cpu_phys_bits();
+> > > > +
+> > > > +    if (!cpu->phys_bits) {
+> > > > +        cpu->phys_bits = host_phys_bits;
+> > > > +    } else if (cpu->phys_bits != host_phys_bits) {
+> > > > +        error_setg(errp, "TDX only supports host physical bits (%u)",
+> > > > +                   host_phys_bits);
+> > > > +    }
+> > > > +}
+> > > 
+> > > This should be already handled by host_cpu_realizefn(), which is
+> > > reached via cpu_exec_realizefn().
+> > > 
+> > > Why is it needed earlier, but not as early as instance_init?  If
+> > > absolutely needed I would do the assignment in patch 33, but I don't
+> > > understand why it's necessary.
 > > 
-> > I also confirmed on the bare metal that the CPU indeed writes the entries
-> > in this order.
+> > It's not called earlier but right after cpu_exec_realizefn().
 > > 
-> > KVM on the other hand, reads the entries in the opposite order, from the
-> > last written entry and towards entry 511 and dumps them in this order to
-> > the dirty ring.
+> > Patch 33 adds x86_confidenetial_guest_cpu_realizefn() right after
+> > ecpu_exec_realizefn(). This patch implements the callback and gets
+> > called in x86_confidenetial_guest_cpu_realizefn() so it's called after
+> > cpu_exec_realizefn().
 > > 
-> > Usually this doesn't matter, except for one complex nesting case:
+> > The reason why host_cpu_realizefn() cannot satisfy is that for normal
+> > VMs, the check in cpu_exec_realizefn() is just a warning and QEMU does
+> > allow the user to configure the physical address bit other than host's
+> > value, and the configured value will be seen inside guest. i.e., "-cpu
+> > phys-bits=xx" where xx != host_value works for normal VMs.
 > > 
-> > KVM reties the instructions that cause MMU faults.
-> > This might cause an emulated PML log entry to be visible to L1's hypervisor
-> > before the actual memory write was committed.
+> > But for TDX, KVM doesn't allow it and the value seen in TD guest is
+> > always the host value.  i.e., "-cpu phys-bits=xx" where xx != host_value
+> > doesn't work for TDX.
 > > 
-> > This happens when the L0 MMU fault is followed directly by the VM exit to
-> > L1, for example due to a pending L1 interrupt or due to the L1's 'PML log full'
-> > event.
-> 
-> Hmm, this an L0 bug.  Exiting to L1 to deliver a pending IRQ in the middle of an
-> instruction is a blatant architectural violation.  As discussed in the RSM =>
-> SHUTDOWN thread[*], fixing this would require adding a flag to note that the vCPU
-> needs to enter the guest before generating an exit to L1.
-
-Agree, note that this is to some extent visible not nested as well, for example 
-this workaround that the test has is for non nested case.
-
-One can argue that dirty ring is not an x86 feature, but I am sure that there are
-other more complicated cases in which retried write can be observed by this or
-other vCPUs in the violation of x86 spec.
-
-> 
-> Oof.  It's probably worse than that.  For this case, KVM would need to ensure the
-> original instruction *completed*.  That would get really, really ugly.  And for
-> something like VSCATTER, where each write can be completed independently, trying
-> to do the right thing for PML would be absurdly complex.
-
-I also agree. Instruction retry is much simpler and safer that emulating it, KVM
-really can't stop doing this.
-
-
-> I'm not opposed to fudging around processing the PML log in the "correct" order,
-> because irrespective of this bug, populating the dirty ring using order in which
-> accesses occurred is probably a good idea.
-> 
-> But, I can't help but wonder why KVM bothers emulating PML.  I can appreciate
-> that avoiding exits to L1 would be beneficial, but what use case actually cares
-> about dirty logging performance in L1?
-
-It does help with performance by a lot and the implementation is emulated and simple.
-
-For example this test without pml collects about 500 pages on each iteration
-with default parameters, and about 2400 pages per iteration with pml 
-(after the caches warm up).
-
-
-> 
-> [*] https://lore.kernel.org/all/ZcY_GbqcFXH2pR5E@google.com
-> 
-> > This problem doesn't have a noticeable real-world impact because this
-> > write retry is not much different from the guest writing to the same page
-> > multiple times, which is also not reflected in the dirty log. The users of
-> > the dirty logging only rely on correct reporting of the clean pages, or
-> > in other words they assume that if a page is clean, then no writes were
-> > committed to it since the moment it was marked clean.
+> > > Either way, the check should be in tdx_check_features.
 > > 
-> > However KVM has a kvm_dirty_log_test selftest, a test that tests both
-> > the clean and the dirty pages vs the memory contents, and can fail if it
-> > detects a dirty page which has an old value at the offset 0 which the test
-> > writes.
-> > 
-> > To avoid failure, the test has a workaround for this specific problem:
-> > 
-> > The test skips checking memory that belongs to the last dirty ring entry,
-> > which it has seen, relying on the fact that as long as memory writes are
-> > committed in-order, only the last entry can belong to a not yet committed
-> > memory write.
-> > 
-> > However, since L1's KVM is reading the PML log in the opposite direction
-> > that L0 wrote it, the last dirty ring entry often will be not the last
-> > entry written by the L0.
-> > 
-> > To fix this, switch the order in which KVM reads the PML log.
-> > 
-> > Note that this issue is not present on the bare metal, because on the
-> > bare metal, an update of the A/D bits of a present entry, PML logging and
-> > the actual memory write are all done by the CPU without any hypervisor
-> > intervention and pending interrupt evaluation, thus once a PML log and/or
-> > vCPU kick happens, all memory writes that are in the PML log are
-> > committed to memory.
-> > 
-> > The only exception to this rule is when the guest hits a not present EPT
-> > entry, in which case KVM first reads (backward) the PML log, dumps it to
-> > the dirty ring, and *then* sets up a SPTE entry with A/D bits set, and logs
-> > this to the dirty ring, thus making the entry be the last one in the
-> > dirty ring.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 32 +++++++++++++++++++++-----------
-> >  arch/x86/kvm/vmx/vmx.h |  1 +
-> >  2 files changed, 22 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 0f008f5ef6f0..6fb946b58a75 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6211,31 +6211,41 @@ static void vmx_flush_pml_buffer(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> >  	u64 *pml_buf;
-> > -	u16 pml_idx;
-> > +	u16 pml_idx, pml_last_written_entry;
-> > +	int i;
-> >  
-> >  	pml_idx = vmcs_read16(GUEST_PML_INDEX);
-> >  
-> >  	/* Do nothing if PML buffer is empty */
-> > -	if (pml_idx == (PML_ENTITY_NUM - 1))
-> > +	if (pml_idx == PML_LAST_ENTRY)
-> 
-> Heh, this is mildly confusing, in that the first entry filled is actually called
-> the "last" entry by KVM.  And then below, pml_list_written_entry could point at
-> the first entry.
-> 
-> The best idea I can come up with is PML_HEAD_INDEX and then pml_last_written_entry
-> becomes pml_tail_index.  It's not a circular buffer, but I think/hope head/tail
-> terminology would be intuitive for most readers.
+> > Good idea. I will try to implement it in tdx_check_features()
 
-I agree here. Your proposal does seem better to me, so I'll adopt it in v2.
-> 
-> E.g. the for-loop becomes:
-> 
-> 	for (i = PML_HEAD_INDEX; i >= pml_tail_index; i--)
-> 		u64 gpa;
-> 
-> 		gpa = pml_buf[i];
-> 		WARN_ON(gpa & (PAGE_SIZE - 1));
-> 		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> 	}
-> 
-> >  		return;
-> > +	/*
-> > +	 * PML index always points to the next available PML buffer entity
-> > +	 * unless PML log has just overflowed, in which case PML index will be
-> 
-
-
-
-> If you don't have a strong preference, I vote to do s/entity/entry and then rename
-> PML_ENTITY_NUM => NR_PML_ENTRIES (or maybe PML_LOG_NR_ENTRIES?).  I find the
-> existing "entity" terminology weird and unhelpful, and arguably wrong.
-
-I don't mind renaming this.
+Is there any reason the TDX code can't just force cpu->host_phys_bits to true?
 
 > 
->   entity - a thing with distinct and independent existence.
-> 
-> The things being consumed are entries in a buffer.
-> 
-> > +	 * 0xFFFF.
-> > +	 */
-> > +	pml_last_written_entry = (pml_idx >= PML_ENTITY_NUM) ? 0 : pml_idx + 1;
-> >  
-> > -	/* PML index always points to next available PML buffer entity */
-> > -	if (pml_idx >= PML_ENTITY_NUM)
-> > -		pml_idx = 0;
-> > -	else
-> > -		pml_idx++;
-> > -
-> > +	/*
-> > +	 * PML log is written backwards: the CPU first writes the entity 511
-> > +	 * then the entity 510, and so on, until it writes the entity 0 at which
-> > +	 * point the PML log full VM exit happens and the logging stops.
-> 
-> This is technically wrong.  The PML Full exit only occurs on the next write.
-> E.g. KVM could observe GUEST_PML_INDEX == -1 without ever seeing a PML Full exit.
+> Thanks, and I think there's no need to change cpu->phys_bits, either. So
+> x86_confidenetial_guest_cpu_realizefn() should not be necessary.
 
-I skipped over this part of the PRM when I was reading upon how PML works.
-I will drop this sentence in the next version.
+I was going to comment that patch 33 should be squashed here but better to just
+drop it.
+
+Ira
 
 > 
->   If the PML index is not in the range 0â€“511, there is a page-modification log-full
->   event and a VM exit occurs. In this case, the accessed or dirty flag is not set,
->   and the guest-physical access that triggered the event does not occur.
+> Paolo
 > 
-
-Do you have any comments for the rest of the patch series? If not then I'll send
-v2 of the patch series.
-
-
-Best regards,
-	Maxim Levitsky
-
 
