@@ -1,136 +1,80 @@
-Return-Path: <kvm+bounces-33544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3AC39EDE00
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 04:44:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA67018860DA
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 03:44:19 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E561531C4;
-	Thu, 12 Dec 2024 03:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b70e8/AF"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31EFE9EDE73
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 05:28:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EF138DDB
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 03:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8556281E9E
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 04:28:09 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42F7154BE4;
+	Thu, 12 Dec 2024 04:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="orWvcqpj"
+X-Original-To: kvm@vger.kernel.org
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3A82905
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 04:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733975053; cv=none; b=qQHieCAlxbsMe5DmH9mtJCwDl8wPHKStBf1+b5lMPUvStCZISrvNNSo0H9KqFH+6ilPQsjwi0BEKRORz2FQx/2wvXjyR13u+1NEbdEy3qxjfkRqiasaa18+KzHtHYj7OVFdSItX89X8qKUlr3kar6/khxlsBerH5HSlwdso2UUA=
+	t=1733977684; cv=none; b=TZIJwDWJxv/J7zqntyM2GIlOnj1VRBiJ29hJWZgOl230oBKejb6sah0NHHwXKF7SL/arn7M/RkorlquukXsgK89i/npbxejpbYsBW+JWaEqckve5r3/rUdbeI9wPHzRugsmSlIO817Vrdb68Y36raHlRKNCosp800JFkICbuO/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733975053; c=relaxed/simple;
-	bh=+wucua3PkIdimHEQpSJ5QJWaEULv43kIlkiXzrAGwhU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YKgh8/Nndqbec3aiHbSUPTHUH++MFTdAFBF+IzPc1uz9ccR5Ac7cHf6v8Q4dPdAzdnuekHEvZFz1OitOZIO6oyb8qgNpu28sAGcwhDk4mlb05tdacB2r9iPFYJiBm/r9cnCWeKccGWqejrZHcdlpg1Z2236OwinEnh24Vnua3uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b70e8/AF; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733975051; x=1765511051;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+wucua3PkIdimHEQpSJ5QJWaEULv43kIlkiXzrAGwhU=;
-  b=b70e8/AFGXCqSe4ZBIMmOAlIXx2pYn7AL8O/uk+iFhriwGKiYOpvYu7S
-   4bEhQLZviWwp1WwjmqIcm3o68RjpM6p2jvYf89imDEk+U0bBUZzlGI+p9
-   Qkd7Mj/w2w56EXKCXl50fzWIrU7JYzg3gl4oxtsIqwpCKSJUwbtO7YcqX
-   /0XSgbjj+0OpG2v4VSfMNZOvE0b8IA/FnOcIR53X6LJ5idEz3aYFrZLL9
-   tNFYx0tEotd+9sAxxJKpqgQzl1nMFVZne+onAGBPqdwhKOvluDsablcOE
-   OYUSTd+XHlOOfGkuM/0LyIdJHjGCVF0FdKGKnWCVcgF6yvqFKPvbQUFrW
-   g==;
-X-CSE-ConnectionGUID: FlOQMAB5Qy69ZjLsZyKTjQ==
-X-CSE-MsgGUID: 0aB7zYbtQmmzEtm2pOG+Cg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="33707635"
-X-IronPort-AV: E=Sophos;i="6.12,227,1728975600"; 
-   d="scan'208";a="33707635"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 19:44:10 -0800
-X-CSE-ConnectionGUID: iS/EYUjbQdaGI1JbhbAplw==
-X-CSE-MsgGUID: JCZugvyySKm22cOSJglwLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="101033599"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 19:44:08 -0800
-Message-ID: <2144c2c0-4a5d-4efd-b5e2-f2b4096c08b5@intel.com>
-Date: Thu, 12 Dec 2024 11:44:05 +0800
+	s=arc-20240116; t=1733977684; c=relaxed/simple;
+	bh=o84d+Sxih8rRh9Nu7iKpMQfmUQYcuPfGJiJ/okE+qEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uiixrJVuWfz4PpaoP/efHCj74djG8hrVrHEHLudGMKL9gFyx1PJ42tpBBjN5dgComFGz1Oy7g058xmwWElB13asM9/q/RxDsIUIyPqyDU4dlo1W6ZeFzII4SEfq/MYbFpAQHRiUxHLp2siU8VPBQ7rO1ZEGhH6mGTEzlk+Q0k+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=orWvcqpj; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lea2Bo2KNneyW0tmJJumuiWwfVEfyWRt00KyFXFpYec=; b=orWvcqpjd+3qyqimhAdBPKk5E+
+	Ll6mQqxsA/AEe7XJDyJU2rmaPy57tRuj+nVxI9Tm1/RGaPHrX8EnSSnGati9FDbCDbtvaxYIsi+OI
+	4+TLSvmmaNkh2LzXk2Xq1iG38tHh7Y5bNSolRSlCT2Pda0gCDEUY9246Eg+QLr1wq65QhaR1/O/Ac
+	idf5qp/MdUwx6zbwTxMz1rvLalWd19S47Gp04UwYqZVUR8p6z9ts9CrQSbWYJueLdbX6xLsAsNHJ8
+	c2iA6txRNmt3NOfyFLa91oq2Vok48fq31N/CLs+GIeL8B0mvSIb5qmHY59mqlRwKPBj204Rf9gMHs
+	6FnhRouw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tLanv-0000000GtMV-1EtZ;
+	Thu, 12 Dec 2024 04:27:59 +0000
+Date: Wed, 11 Dec 2024 20:27:59 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] driver core: class: remove class_compat code
+Message-ID: <Z1pmTxlEIEqeZf31@infradead.org>
+References: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i386/kvm: Set return value after handling
- KVM_EXIT_HYPERCALL
-To: Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
- qemu-devel@nongnu.org
-Cc: seanjc@google.com, michael.roth@amd.com, rick.p.edgecombe@intel.com,
- isaku.yamahata@intel.com, farrah.chen@intel.com, kvm@vger.kernel.org
-References: <20241212032628.475976-1-binbin.wu@linux.intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20241212032628.475976-1-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <147a2a3e-8227-4f1b-9ab4-d0b4f261d2a6@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 12/12/2024 11:26 AM, Binbin Wu wrote:
-> Userspace should set the ret field of hypercall after handling
-> KVM_EXIT_HYPERCALL.  Otherwise, a stale value could be returned to KVM.
+On Tue, Dec 03, 2024 at 09:08:55PM +0100, Heiner Kallweit wrote:
+> vfio/mdev is the last user of class_compat, and it doesn't use it for
+> the intended purpose. See kdoc of class_compat_register():
+> Compatibility class are meant as a temporary user-space compatibility
+> workaround when converting a family of class devices to a bus devices.
 > 
-> Fixes: 47e76d03b15 ("i386/kvm: Add KVM_EXIT_HYPERCALL handling for KVM_HC_MAP_GPA_RANGE")
-> Reported-by: Farrah Chen <farrah.chen@intel.com>
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Tested-by: Farrah Chen <farrah.chen@intel.com>
-> ---
-> To test the TDX code in kvm-coco-queue, please apply the patch to the QEMU,
-> otherwise, TDX guest boot could fail.
-> A matching QEMU tree including this patch is here:
-> https://github.com/intel-staging/qemu-tdx/releases/tag/tdx-qemu-upstream-v6.1-fix_kvm_hypercall_return_value
-> 
-> Previously, the issue was not triggered because no one would modify the ret
-> value. But with the refactor patch for __kvm_emulate_hypercall() in KVM,
-> https://lore.kernel.org/kvm/20241128004344.4072099-7-seanjc@google.com/, the
-> value could be modified.
-> ---
->   target/i386/kvm/kvm.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 8e17942c3b..4bcccb48d1 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -6005,10 +6005,14 @@ static int kvm_handle_hc_map_gpa_range(struct kvm_run *run)
->   
->   static int kvm_handle_hypercall(struct kvm_run *run)
->   {
-> +    int ret = -EINVAL;
-> +
->       if (run->hypercall.nr == KVM_HC_MAP_GPA_RANGE)
-> -        return kvm_handle_hc_map_gpa_range(run);
-> +        ret = kvm_handle_hc_map_gpa_range(run);
-> +
-> +    run->hypercall.ret = ret;
+> In addition it uses only a part of the class_compat functionality.
+> So inline the needed functionality, and afterwards all class_compat
+> code can be removed.
 
-Updating run->hypercall.ret is useful only when QEMU needs to re-enter 
-the guest. For the case of ret < 0, QEMU will stop the vcpu.
-
-I think we might need re-think on the handling of KVM_EXIT_HYPERCALL. 
-E.g., in what error case should QEMU stop the vcpu, and in what case can 
-QEMU return the error back to the guest via run->hypercall.ret.
-
-> -    return -EINVAL;
-> +    return ret;
->   }
->   
->   #define VMX_INVALID_GUEST_STATE 0x80000021
-> 
-> base-commit: ae35f033b874c627d81d51070187fbf55f0bf1a7
+Is there any reason it can't just be removed entirely?
 
 
