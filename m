@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-33613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685DC9EEEFA
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 17:06:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1DF9EEF3B
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 17:13:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FF828952F
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:06:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8A6118955C6
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C812238E22;
-	Thu, 12 Dec 2024 15:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0C6239BA0;
+	Thu, 12 Dec 2024 15:58:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDAB237FF1;
-	Thu, 12 Dec 2024 15:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A61B222D65;
+	Thu, 12 Dec 2024 15:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734019091; cv=none; b=sRl+MEYfJJ1bS3uQpmG72YqfuYHmL7D493PverBBtkMSHwzN2277iCj7Y+iZgSXDXm+5OL/T1flFnt3Vf/TOZaaHrx/L2MfS1CnuTffQWMWRb2HAzMg/N7pQjgPWyNxAEC9LsrOJeSQMY410ACw4baJGxgS124Es7fMaradKJaQ=
+	t=1734019094; cv=none; b=F6e9to9a1C/ueQsYerEMcKQ1r2m9KUt+Csitt3bA0C7hUcIk9KD6sCIf9JDuxqBnOfBjTcGzavScsKOQldQqISCcI0YDNZ+U3q7onrQzWZPyPsFm2Ef7rVCd+/nImDV/y5YUPP4Q050Q6jETSTQd93z4saT7AYmHQQZB3xEgrKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734019091; c=relaxed/simple;
-	bh=70yJkSyQVp8oU+83hbWdTMcgrpCupKcNUE5ia5RbTug=;
+	s=arc-20240116; t=1734019094; c=relaxed/simple;
+	bh=2Hi1FFkQkcx/oNreLOs7ct2e78tGIbYnvKqdxf4oUjk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lfv8apHYouNmVYnZNd4YzuK4GJgG15dcYvnhlzRzLj/SQe2QgJpyfInV5z1VaZz8NjNQXLmT/ixI5f0+F1K6aDosTZn6NVbrLt2jQSodRrGsmC/5A4+KyBEI8C6tsb1r2g56lgEICoRWQMOeRJ4D55tSyF0EzjuFLabGm0RQuF0=
+	 MIME-Version; b=HpWg5A/LkRgArc5SEhkNDqPPw4v9KIYd+XwAALpPCXFchB+82sAqZkz1GHanO2jFzNT8CDWJ2tO1J9xLavKTx8lM8EtWpCa2nToHl1zb7F5QPoX7xEKBJNoZbjLY/+6UH9al5UMqn3YSLpoGGlB3vx3iRvetzTAhr5BnSwpOUUs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5276D1762;
-	Thu, 12 Dec 2024 07:58:37 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 177111762;
+	Thu, 12 Dec 2024 07:58:41 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.39.50])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D35C73F7D8;
-	Thu, 12 Dec 2024 07:58:05 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 921403F720;
+	Thu, 12 Dec 2024 07:58:09 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -56,9 +56,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [PATCH v6 24/43] KVM: arm64: WARN on injected undef exceptions
-Date: Thu, 12 Dec 2024 15:55:49 +0000
-Message-ID: <20241212155610.76522-25-steven.price@arm.com>
+Subject: [PATCH v6 25/43] arm64: Don't expose stolen time for realm guests
+Date: Thu, 12 Dec 2024 15:55:50 +0000
+Message-ID: <20241212155610.76522-26-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241212155610.76522-1-steven.price@arm.com>
 References: <20241212155610.76522-1-steven.price@arm.com>
@@ -70,27 +70,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM doesn't allow injection of a undefined exception into a realm
-guest. Add a WARN to catch if this ever happens.
+It doesn't make much sense as a realm guest wouldn't want to trust the
+host. It will also need some extra work to ensure that KVM will only
+attempt to write into a shared memory region. So for now just disable
+it.
 
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/inject_fault.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/arm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 611867b81ac2..705463058ce0 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -226,6 +226,8 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
-+	if (vcpu_is_rec(vcpu))
-+		WARN(1, "Cannot inject undefined exception into REC. Continuing with unknown behaviour");
- 	if (vcpu_el1_is_32bit(vcpu))
- 		inject_undef32(vcpu);
- 	else
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index eff1a4ec892b..134acb4ee26f 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -432,7 +432,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = system_supports_mte();
+ 		break;
+ 	case KVM_CAP_STEAL_TIME:
+-		r = kvm_arm_pvtime_supported();
++		if (kvm_is_realm(kvm))
++			r = 0;
++		else
++			r = kvm_arm_pvtime_supported();
+ 		break;
+ 	case KVM_CAP_ARM_EL1_32BIT:
+ 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
 -- 
 2.43.0
 
