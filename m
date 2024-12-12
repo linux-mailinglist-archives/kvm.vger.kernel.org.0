@@ -1,74 +1,59 @@
-Return-Path: <kvm+bounces-33571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DDF9EE201
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 09:55:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F75C9EE347
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 10:41:45 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62ED41888DDA
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 08:55:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFB272829D8
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 09:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439CF20E32D;
-	Thu, 12 Dec 2024 08:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B62920E71D;
+	Thu, 12 Dec 2024 09:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ojj28dCC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olGgcMgg"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF91204C1D;
-	Thu, 12 Dec 2024 08:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE9320E315;
+	Thu, 12 Dec 2024 09:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733993697; cv=none; b=sJZEOsjdS3tGEskKn8wPdMuzWVtBcKvkgru15bMqHF8UHt2tYyXbDCSAan3bqk+rNbBI9ezHROcQDaQsZlZDDBYxHrJAfk19bifIqOaKQ0irlWOJCs79XxFOhWksz99GdEfT4XJuIKZAoI0Lpiw5EkbNrBlD1PpfpOLy6hD0tkQ=
+	t=1733996494; cv=none; b=MIVlC99gyGzLbgSlWRaZ0R9xjJajsB9biomZk84AL7ACIrcFM+ui70PWU/jI1o6EZm+CHje134nJKpd5z/Su27GPy/GtsU2RZyMn/O8jlPP974koEiiC1MxcaVSfVchZ4787qgZZzrzUFC7ynxCrEXdnXG+mfc5LqfzwLp1SdS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733993697; c=relaxed/simple;
-	bh=Fy4YngrVcpagRsu5yXaXhy6khObq1+63mtDUkXZu0Hs=;
+	s=arc-20240116; t=1733996494; c=relaxed/simple;
+	bh=8T9YqQIGe01+p2hPomlifpNUHNh46GGlOzTjpfIdD7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQ2wKUH+T7OjfNi/2jo8pes7/nQNW0dIYlRGh3kSL9F8Qau7LkxTW02S5/YTajzQLPMkVae3yiyESHD7kb16wtlBt9yKds/u4UTS+WGA9rHDPK+V+CjC8O17UZQrEO7f1tFEQtj2LHHGy/M3q72LLQ+qDNxxZBfDBEyzEA0Ei9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ojj28dCC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE6C8C4CECE;
-	Thu, 12 Dec 2024 08:54:55 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DxzQs34j1hO0zhrKyb5ZK6nCn4cuQekVQQL/jWw/upzncWF9yZ2CovrqvPJ8ESKzA4nfN0KPBHBRiSgWP+wvFsywS23nlA8W9QxAPCAHNyfO7sa8/DZGc8tx2XFm7ZZEKfAlZ4LSLHjdTmpUZ4+tlpuGnCZdKtnmSJKDaJPfcPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olGgcMgg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53F0C4CECE;
+	Thu, 12 Dec 2024 09:41:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733993696;
-	bh=Fy4YngrVcpagRsu5yXaXhy6khObq1+63mtDUkXZu0Hs=;
+	s=k20201202; t=1733996494;
+	bh=8T9YqQIGe01+p2hPomlifpNUHNh46GGlOzTjpfIdD7o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ojj28dCCyJsYWCQ3nZtMUHqqKD7pLZ/ITymNq/65CKEPSxvMwaKmSBEcXxLYPPKy0
-	 bCCF3nZPaJ7k//9SBQ/rYhvwJimsjRdm+91sZWCtORRbzPjDtteY0DSoFIUcv1x+Lr
-	 1CBtlVjnuOx8tTbgfpy+LEAsfWvTLFFTYZp7gkMuh4x2UvzAENWOExWVLSc4743UO9
-	 JCTRe0c+Y4hkv7hgXehu2a9IN4oO88rQf5qeTV3yngqTzQ8uA8ZEtTJYYWl8RkEd5C
-	 CPaD72/jVRnOkLoezb3tHNft0IcASYCJ/ywixjCc6QTi7fbpx3tk7LTpPjb2MxQzXP
-	 gZjbGel83uyhg==
-Date: Thu, 12 Dec 2024 10:54:52 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v4 11/18] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20241212085452.GI1245331@unreal>
-References: <cover.1733398913.git.leon@kernel.org>
- <e4551571fc10d9c73ab9e38a75ea701c1b492686.1733398913.git.leon@kernel.org>
- <20241212084856.GE9376@lst.de>
+	b=olGgcMggf0fE1LeSI76/UaPOD4ftsCZOroqJTEOGj9ippWzQmUy3icmHWXgt+n1hr
+	 NrEveF/eWzKta86ruTjo/akhkLAWp6ktgL5enw2HyOdSlQkXOlR+oZlUQr3Cu2AL8G
+	 k7819e9L+NedCTEbNku6Arlz0zh4rk/U2SnKV8VwxJBmH0xGtej74hu87oCbwcFxpv
+	 ausS4U8ybsPMwi4Ts9fxSO8/y3fkbu6u3OYJLiTsYHgrfpmCfRyPPl3jZKGGPlfnw5
+	 rgk5KsfvSXDEvRFKq6f1ceW7RUs41R4Ydi0GL8tlfiosLOMJi3EFfc5GPUt9uUTfxP
+	 YFr+SF2N/1thg==
+Date: Thu, 12 Dec 2024 09:41:28 +0000
+From: Will Deacon <will@kernel.org>
+To: julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, kernel-team@android.com, maz@kernel.org,
+	oliver.upton@linux.dev, apatel@ventanamicro.com,
+	andre.przywara@arm.com, suzuki.poulose@arm.com,
+	s.abdollahi22@imperial.ac.uk
+Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
+Message-ID: <20241212094127.GA18819@willie-the-truck>
+References: <20241128151246.10858-1-alexandru.elisei@arm.com>
+ <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,35 +62,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241212084856.GE9376@lst.de>
+In-Reply-To: <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Dec 12, 2024 at 09:48:56AM +0100, Christoph Hellwig wrote:
-> On Thu, Dec 05, 2024 at 03:21:10PM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
+On Wed, Dec 11, 2024 at 11:44:14PM +0000, Will Deacon wrote:
+> On Thu, 28 Nov 2024 15:12:42 +0000, Alexandru Elisei wrote:
+> > (resending because I accidently only sent the cover letter, sorry for that)
 > > 
-> > Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
-> > by HMM range fault. Such flag allows users to tag specific PFNs with information
-> > if this specific PFN was already DMA mapped.
+> > The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
+> > the riscv maintainer because it looks to me like riscv is similarly
+> > affected.
+> > 
+> > Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
+> > be controversial. Follows a bug report I received from Abdollahi Sina in
+> > private. Details in the commit message, but the gist of the patch is that
+> > the memory region where kernel + initrd + DTB are copied to are changed
+> > from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
+> > ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
+> > users rely on finding the DTB and initrd at the current addresses, then I'm
+> > not sure the patch is justified - after all, if someone really wants to use
+> > such a large initrd instead of a disk image with virtio, then replacing
+> > SZ_256M with SZ_512M locally doesn't look like a big ask.
+> > 
+> > [...]
 > 
-> Missing line wrap at 73 characters here.
+> Applied to arm64 (sina), thanks!
 > 
-> >  
-> > @@ -253,14 +262,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
-> >  			cpu_flags = HMM_PFN_VALID;
-> >  			if (is_writable_device_private_entry(entry))
-> >  				cpu_flags |= HMM_PFN_WRITE;
-> > -			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
-> > +			*hmm_pfn = (*hmm_pfn & HMM_PFN_INOUT_FLAGS) | swp_offset_pfn(entry) | cpu_flags;
-> 
-> Please avoid the overly long line here.
-> 
-> That being said I hate the structure here.  Can't we just have a local
-> variable for the actual new pfn value, and then a single goto label
-> at the end that takes the keeper flags from the argument and assigning
-> the new out value to *hmm_pfn instead of duplicating this in half a
-> dozen places?
+> [1/4] arm: Fix off-by-one errors when computing payload memory layout
+>       https://git.kernel.org/arm64/c/167aa1e
+> [2/4] arm: Check return value for host_to_guest_flat()
+>       https://git.kernel.org/arm64/c/ca57fb6
+> [3/4] arm64: Use the kernel header image_size when loading into memory
+>       https://git.kernel.org/arm64/c/32345de
+> [4/4] arm64: Increase the payload memory region size to 512MB
+>       https://git.kernel.org/arm64/c/9b26a8e
 
-Yes, sure, it makes sense, will do.
+Sorry, these links are all broken as I generated the thankyou note
+against a testing branch. Rest assured that the changes are pushed to
+the kvmtool.git:
 
-> 
+https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
+
+Will
 
