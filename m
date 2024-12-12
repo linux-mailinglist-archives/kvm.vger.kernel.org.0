@@ -1,226 +1,206 @@
-Return-Path: <kvm+bounces-33658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE23E9EFCBD
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 20:49:45 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CEC9EFDA7
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 21:51:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA7428A268
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 19:49:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51284188D049
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 20:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E461AD9ED;
-	Thu, 12 Dec 2024 19:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516FA1B0F14;
+	Thu, 12 Dec 2024 20:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjOL4fMq"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mvxPvr/b"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2060.outbound.protection.outlook.com [40.107.236.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0FA1917E8
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 19:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734032966; cv=none; b=fZ20CsXKevOPYeCXNe48+6xn7qXeaHGUqcB04WhryYFN7jPosUviEvcPVNB+UR4m/Xa5n38uXT/4A9rQtqpUa4MjqYRR9qst7jf9ziUnnvQ882vk8abRRoOQbX/6E4GWjgWiSMirwmbbm0YvCab22wf3wvcDxU9XIzNLq+grfkI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734032966; c=relaxed/simple;
-	bh=c0lIVwJsvJS8Q8StF7zcpZ/c/aEc5d0bbzatxAJuRSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DiRCnQ5gyqjak7NKUpUSfQKjC1yJzSQuR8cax0PVla02TgrlBcbn9BR/5uR1bwKRzRe08kWOW46Qrk6qkmCDZPFpNCyhu6R4s2HV9f6Wf4hk5PwGXOUoGgLUOfSHBrmeZ/utOb9AeLx1kIjfZHLmmBnpzRKTwM5YIrPcrZcBnDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gjOL4fMq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734032963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sBiPw5OuI7dlO4Z4t4oS+jtz5kPmxd4ZnxuDxig2hUM=;
-	b=gjOL4fMqzHZ/IO3tgHl8lojM40em91HWsjhswwEkjgbgXAikWI9wt319d7d6BhryRyrxqm
-	U8bs5vPMtxGGa+G4RZvgeBjb8Q04zJU94syrREkfOpe37B4YCEaOQq1abGQ8RldEtWu4ew
-	69ZGaFqQRIWJB2FvH5E8/xoT5Y/JYto=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-311-ucTECYlrPW-68ISEhi7gag-1; Thu, 12 Dec 2024 14:49:22 -0500
-X-MC-Unique: ucTECYlrPW-68ISEhi7gag-1
-X-Mimecast-MFC-AGG-ID: ucTECYlrPW-68ISEhi7gag
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-844bf90c20aso12716639f.1
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 11:49:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734032961; x=1734637761;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sBiPw5OuI7dlO4Z4t4oS+jtz5kPmxd4ZnxuDxig2hUM=;
-        b=jlVgueC3ban92O5ARMKYfoJadeDFNyYhWRFFH8Bb263fdcDor7ocrfAXDDvIvEuv/b
-         h3+ZsnSi68Bu4SOjzsqmxuioMitNqjthYh7DFtZzbPnB94J95sumFe/ZP9LOv/i9Pa6J
-         VZ2qDovX8TYXmQweGtc6BVHlUns2BGn5JGZfMj0Yfquqac2AEJBNP7E7WpJciZnfK4uv
-         yZvaaKM8WkzWGkt2Z7Cwho8QeBQvy9YWn1/i9w8AcXRZmhAQJg/ic39XqJqvkQobrL9W
-         d2W8/IXVCGk2K+MWkEOo1bCKhbFLF8OsCUQCYp4alAcyJDfLlaBomoHY8+8baQPZCwc1
-         j7Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9lM2EQHgkNrssDrFh88EMr/GF7uIWOxOAP7L+2CsryTjNGOsBRexQOW+27poPks57prk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrL6+nvX05QYCOlvzhryUYLjuGlGXJoiogwACoAY0cH/199P4m
-	bm95cNImJXdjOlG3sP+8znJMFbm77YM7Y56RU5iXQm8XCp6SLIgStX9v+W0IWu1M1NT6KnuwTyo
-	5jnJi0dyPwn6+8kN3Q6Ods1yiR0aVcf5WjiNpHwMoZ7cYSio/SA==
-X-Gm-Gg: ASbGncsRemuWTF+HjQ5JceaA7G48funHoxlIxEKpSR+dUxjzf0buRp8uoK5AfAB7cER
-	HoJgX9yctdI5H8c/0bvQIzE33QdcNlc9oc/Zvx9K90rpHaA4+ZUu0lCZuJyjT4I2mtsbBi45YRv
-	QsYpRioINnwHEVNpja7A4U6R2q1CnmM0qBYCWQauQ1jR0SeVUW1En5BuprT4lcc42PRbizcvFca
-	GYu8SSOf2AHKPfsSOh9GPqAnHc7Ay5hamVKweaUJNj+28YE/LM1fOKdEND+
-X-Received: by 2002:a05:6602:1593:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-844e8a3f0b7mr2641839f.5.1734032961304;
-        Thu, 12 Dec 2024 11:49:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IERcvaNomxn8th3z3SWMQIAn0f18rUBb5b4dBUVRvcRJcJEoHv6gpei7+xXPBScGwtQKEbPgQ==
-X-Received: by 2002:a05:6602:1593:b0:83a:acc8:5faf with SMTP id ca18e2360f4ac-844e8a3f0b7mr2638439f.5.1734032960861;
-        Thu, 12 Dec 2024 11:49:20 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-844737bc5e7sm434751139f.7.2024.12.12.11.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 11:49:20 -0800 (PST)
-Date: Thu, 12 Dec 2024 12:49:18 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Philipp Stanner <pstanner@redhat.com>, amien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Mario Limonciello
- <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>, Ricky Wu
- <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
- <leitao@debian.org>, Thomas Gleixner <tglx@linutronix.de>, Kevin Tian
- <kevin.tian@intel.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
- <chentao@kylinos.cn>, Dan Carpenter <dan.carpenter@linaro.org>, "Dr. David
- Alan Gilbert" <linux@treblig.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
- <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v3 06/11] vfio/pci: Use never-managed version of
- pci_intx()
-Message-ID: <20241212124918.0dd284fe.alex.williamson@redhat.com>
-In-Reply-To: <20241212192130.GA3359535@bhelgaas>
-References: <20241209130632.132074-8-pstanner@redhat.com>
-	<20241212192130.GA3359535@bhelgaas>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A281917D6
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 20:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734036667; cv=fail; b=YD4iSQuH0X5aAP5NARP8gy95G23vGC4yAYl1Z8QNZ3J+NAmfel+M4lmAfLczzPJkuMYf4vMSJ6IYnSa8BAmxP5sNY/lCNAtovC2aZD4QAg1Afoati8uuE1ulcqqt0oty67ps/Ra7caRYMBj3h2OqGuZOINXoRS26cO5C19mkVU8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734036667; c=relaxed/simple;
+	bh=S5y3h7Xth/igR+yzour97KJxr+0kGnGO/Z26uSm+Y9c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RXZ5U3D7dnODdYx7WRsC71ntS+/Vh7+z7G+OyX9dcQxy/nvy/jcYkxsV9mL/8BXVJTaMdEMcSlKGuz+IHw9ctXbTVODpA0DVoQeysAwgRP4huKhj+NNDECFzY5ZVeuVmjM2PY1eW16Xy0WVHTAu/174Zcz4lKy8OA4WfUm9S2Vk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mvxPvr/b; arc=fail smtp.client-ip=40.107.236.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zTza53URFa2551fPf3XlhqbumrADZhG8iBs73UjALcdSWDvDRqrleBdBFxlxWh43v/4O046tk/Ve0a18sHYJmhA0UYKDU7Rsct/3M4YiJ8uVCodf1I08x75aS3ORJlWkhYh3vCXwYHr3pYbBLdnFjopwgMMhlP/eLo1H56H14KpyVQhvk6TBCSzMsTCNKMDt//ZLle5I20u1mwv8GKh1umCQoVc37zdB+0Ex2OdhjNO12BOOSGctfqbm7Z3KP82h3AA47viaZCRnjXor8WyDIhVFPuaX3JeIfkWctNIekBTPbs7GCSIG8DLRMU7cSqW0HRwehMKBgSN97caO8OvL/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qtq/SYlUFbPDM/NMoKnQjKeup2NGg83meYOE7SHbmf4=;
+ b=bd/hJzXk+NHnafY2EFOLb8N9hl2cIhfxfNnvbflybzZvde95FjElEn2vxev8mAq+BJYOq1Cs0pYlbR7ZONVBwjFNP9UqGlciy4BklFRgzh12m6EVV4vOuKqjHdPf8Wcyw19h/wJ8zr57eQFR4pgJhUxbdg3DIJEMHbmwqkVYBtfR/AawfMBdRyF4w+TuEI12tDCgg6wynXKh0j8hMDmP6M/thYnknkT4szrMHsLun/XcDj0FA736PGd+dDPAeP6vMBeBwqmjhak50jdeahwHPCs3q704Z/KBcqkaiVwUX1LrQpXD+ntjLoPrlMPyJt0Z6mbaZWkZ8BIloeJslQK6LQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qtq/SYlUFbPDM/NMoKnQjKeup2NGg83meYOE7SHbmf4=;
+ b=mvxPvr/bzkdqPnMCzAIGjborH0lEKlCqj2IrCV3Ex1BvTeCxZ+x9BPVEfgIDdFe2Ky/GKuRU4ZlPIVytIiMl2NUa6dA0g7Vi4bg88YjibazYZ2N6Las4s2DJagCkhEsVGq/TCMfnrxtW8IxN/vU2RSzGU1WLS5zWieg/JHgJKTs=
+Received: from BN9PR03CA0368.namprd03.prod.outlook.com (2603:10b6:408:f7::13)
+ by CY8PR12MB8339.namprd12.prod.outlook.com (2603:10b6:930:7e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.17; Thu, 12 Dec
+ 2024 20:51:01 +0000
+Received: from BN1PEPF00004682.namprd03.prod.outlook.com
+ (2603:10b6:408:f7:cafe::fd) by BN9PR03CA0368.outlook.office365.com
+ (2603:10b6:408:f7::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.14 via Frontend Transport; Thu,
+ 12 Dec 2024 20:51:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN1PEPF00004682.mail.protection.outlook.com (10.167.243.88) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8251.15 via Frontend Transport; Thu, 12 Dec 2024 20:51:00 +0000
+Received: from MKM-L10-YUNXIA9.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Dec
+ 2024 14:50:59 -0600
+From: Yunxiang Li <Yunxiang.Li@amd.com>
+To: <kvm@vger.kernel.org>, <alex.williamson@redhat.com>
+CC: <kevin.tian@intel.com>, <yishaih@nvidia.com>, <ankita@nvidia.com>,
+	<jgg@ziepe.ca>, Yunxiang Li <Yunxiang.Li@amd.com>
+Subject: [PATCH 1/3] vfio/pci: Remove shadow rom specific code paths
+Date: Thu, 12 Dec 2024 15:50:48 -0500
+Message-ID: <20241212205050.5737-1-Yunxiang.Li@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004682:EE_|CY8PR12MB8339:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27328764-81cd-4d21-c079-08dd1aeeaf6e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?d+b5EdBvaypOYXw+NALNehKpGSVuLNAcmALBhf/ep0zDnQzciUFTBl9Xfd2w?=
+ =?us-ascii?Q?HX2QmmoxC76EZ8HLMJYX4PH888uByz7FLv2NlsaY8JW3SBp91KyZ7gkyC2el?=
+ =?us-ascii?Q?BgVGYGDabHPRwE4xsTIggK759dEdt1Prs36iAAFj3eqwf+2nEC+VsZYfX7jl?=
+ =?us-ascii?Q?p9N6VdLgYfCt+IAC0WVktO12yTGF/3DEOZ7ADWaiJFMFyBq3gBCbjnUfBl5s?=
+ =?us-ascii?Q?HdBXhu5lx8vB1dK3RQEgOJlm2VcGpOEWmamY1f115jLOk1lzHgtSG8MRfCYi?=
+ =?us-ascii?Q?WeyEf7K4AzPXtoiMwFLNBjO0hNLPTRWlo22HmPCy4HKDaoMfMcSbBp/cXPnJ?=
+ =?us-ascii?Q?Pj07F0TGAtlaaFBzBBxbfaz7T+D3CewvrtskkQabPy476nLJ7Cf92U8Ha/0c?=
+ =?us-ascii?Q?iqjemX7lsrzYQBFqAPcmfCUD4lR80TZwKXnARcR/m1e5V6ulpvYDij4/Enkz?=
+ =?us-ascii?Q?MNCK9rMtjFdLh1Kv9D8pyYY9a5ThIBzo2YU5k8hmGYlxW8mcAGKxtEvtXhEg?=
+ =?us-ascii?Q?pZO1e0Qq26SFvn0f6AL1I6QUVHKqZEgpYw0krAC/djs/qm45MzyVXOopwTyZ?=
+ =?us-ascii?Q?j9CSkukqoyWeuYHKyn2G0gOfrMXJk4ecI59oez4td602sON2pKgmwA5++515?=
+ =?us-ascii?Q?0r/N5Nx+YLlZ39ZepEC0eUJShwcsXwvjCmqml/I3QyVAP7EG4CdAhGP4Jdz1?=
+ =?us-ascii?Q?lQZxZWG6qP/yA1pFfS7OKg0w1m6P4dU8iFcdHoIjyyvfokWdCgs/G1NFtiVx?=
+ =?us-ascii?Q?YMZTFkvAvTTu2/WSTuH5JzXQFrLF6AIhShSIpuJDKPZoQYRTkSyTTOCCy1F5?=
+ =?us-ascii?Q?rulyDYaShu+0UiNunuUZSDafAfsQ2h9F6J9XN63z5wvm+0Z9uk8olR3k4FtA?=
+ =?us-ascii?Q?LelFTTPgFz0kFODrm1icsIa9w9GyMZnMnUfu5fqFYgCTyz5/2R/nQcnmmkMs?=
+ =?us-ascii?Q?e8uuZ/A2sL9tIdz20cuYIqw3cESM3E181gaH4rtSiJWEzOvtkfYPWUgnSeMt?=
+ =?us-ascii?Q?geadmcDCqD0ThOq9/LGRT8VTyC62wH5g5h8YngYLSVEWWuMhctm2Gp+Be1Q5?=
+ =?us-ascii?Q?XJOiPdehPzPz9hwSlrLHqMHPWv3sgKd1qLfsBBmfIdSs1ulow8ljggJYlURO?=
+ =?us-ascii?Q?p/IUgHFzrhf61jrizV50wZkwwrdANvAyPtyG5vmqwXigP9n01C3OFs/4BlH2?=
+ =?us-ascii?Q?CwjFaGRbbcJ1djhx4Mhx+XXC4ZaWPwL+8k4lIHspEeCCm8vwPYnYDozC64Dj?=
+ =?us-ascii?Q?G1Y8YH4m87p1N452S5uSLUrrQaGoXWoURxspzdq/+A/Hsz9Qhxz2PCro1VCM?=
+ =?us-ascii?Q?9gS6iEoEoi3Lshrfy0Dax8Pu7rMg+MYNyqBthh6J7AIm7D9DOhBin9Y5p47G?=
+ =?us-ascii?Q?A+/HCdyAJR8PPCd0moDYQVHCUfkGWl4FXUK3HHNlNIB1vh7bDiBhPmzGMjIr?=
+ =?us-ascii?Q?0DDwyg+DMiv/G5tA8IKTmg37mISEBKwg?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 20:51:00.3663
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27328764-81cd-4d21-c079-08dd1aeeaf6e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004682.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8339
 
-On Thu, 12 Dec 2024 13:21:30 -0600
-Bjorn Helgaas <helgaas@kernel.org> wrote:
+After 0c0e0736acad, the shadow rom works the same as regular ROM BARs so
+these code paths are no longer needed.
 
-> [cc->to: Alex W]
-> 
-> On Mon, Dec 09, 2024 at 02:06:28PM +0100, Philipp Stanner wrote:
-> > pci_intx() is a hybrid function which can sometimes be managed through
-> > devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> > port users to either an always-managed or a never-managed version.
-> > 
-> > vfio enables its PCI-Device with pci_enable_device(). Thus, it
-> > needs the never-managed version.
-> > 
-> > Replace pci_intx() with pci_intx_unmanaged().
-> > 
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>  
-> 
-> Not applied yet, pending ack from Alex.
+Signed-off-by: Yunxiang Li <Yunxiang.Li@amd.com>
+---
+ drivers/vfio/pci/vfio_pci_config.c |  8 ++------
+ drivers/vfio/pci/vfio_pci_core.c   | 10 ++--------
+ drivers/vfio/pci/vfio_pci_rdwr.c   |  3 ---
+ 3 files changed, 4 insertions(+), 17 deletions(-)
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-> 
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c  |  2 +-
-> >  drivers/vfio/pci/vfio_pci_intrs.c | 10 +++++-----
-> >  2 files changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 1ab58da9f38a..90240c8d51aa 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -498,7 +498,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
-> >  		if (vfio_pci_nointx(pdev)) {
-> >  			pci_info(pdev, "Masking broken INTx support\n");
-> >  			vdev->nointx = true;
-> > -			pci_intx(pdev, 0);
-> > +			pci_intx_unmanaged(pdev, 0);
-> >  		} else
-> >  			vdev->pci_2_3 = pci_intx_mask_supported(pdev);
-> >  	}
-> > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> > index 8382c5834335..40abb0b937a2 100644
-> > --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> > @@ -118,7 +118,7 @@ static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
-> >  	 */
-> >  	if (unlikely(!is_intx(vdev))) {
-> >  		if (vdev->pci_2_3)
-> > -			pci_intx(pdev, 0);
-> > +			pci_intx_unmanaged(pdev, 0);
-> >  		goto out_unlock;
-> >  	}
-> >  
-> > @@ -132,7 +132,7 @@ static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
-> >  		 * mask, not just when something is pending.
-> >  		 */
-> >  		if (vdev->pci_2_3)
-> > -			pci_intx(pdev, 0);
-> > +			pci_intx_unmanaged(pdev, 0);
-> >  		else
-> >  			disable_irq_nosync(pdev->irq);
-> >  
-> > @@ -178,7 +178,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
-> >  	 */
-> >  	if (unlikely(!is_intx(vdev))) {
-> >  		if (vdev->pci_2_3)
-> > -			pci_intx(pdev, 1);
-> > +			pci_intx_unmanaged(pdev, 1);
-> >  		goto out_unlock;
-> >  	}
-> >  
-> > @@ -296,7 +296,7 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
-> >  	 */
-> >  	ctx->masked = vdev->virq_disabled;
-> >  	if (vdev->pci_2_3) {
-> > -		pci_intx(pdev, !ctx->masked);
-> > +		pci_intx_unmanaged(pdev, !ctx->masked);
-> >  		irqflags = IRQF_SHARED;
-> >  	} else {
-> >  		irqflags = ctx->masked ? IRQF_NO_AUTOEN : 0;
-> > @@ -569,7 +569,7 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
-> >  	 * via their shutdown paths.  Restore for NoINTx devices.
-> >  	 */
-> >  	if (vdev->nointx)
-> > -		pci_intx(pdev, 0);
-> > +		pci_intx_unmanaged(pdev, 0);
-> >  
-> >  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
-> >  }
-> > -- 
-> > 2.47.1
-> >   
-> 
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index ea2745c1ac5e6..e41c3a965663e 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -511,13 +511,9 @@ static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
+ 		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+ 		mask |= PCI_ROM_ADDRESS_ENABLE;
+ 		*vbar &= cpu_to_le32((u32)mask);
+-	} else if (pdev->resource[PCI_ROM_RESOURCE].flags &
+-					IORESOURCE_ROM_SHADOW) {
+-		mask = ~(0x20000 - 1);
+-		mask |= PCI_ROM_ADDRESS_ENABLE;
+-		*vbar &= cpu_to_le32((u32)mask);
+-	} else
++	} else {
+ 		*vbar = 0;
++	}
+ 
+ 	vdev->bardirty = false;
+ }
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1ab58da9f38a6..b49dd9cdc072a 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1057,14 +1057,8 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
+ 
+ 		/* Report the BAR size, not the ROM size */
+ 		info.size = pci_resource_len(pdev, info.index);
+-		if (!info.size) {
+-			/* Shadow ROMs appear as PCI option ROMs */
+-			if (pdev->resource[PCI_ROM_RESOURCE].flags &
+-			    IORESOURCE_ROM_SHADOW)
+-				info.size = 0x20000;
+-			else
+-				break;
+-		}
++		if (!info.size)
++			break;
+ 
+ 		/*
+ 		 * Is it really there?  Enable memory decode for implicit access
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index 66b72c2892841..a1eeacad82120 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -244,9 +244,6 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 
+ 	if (pci_resource_start(pdev, bar))
+ 		end = pci_resource_len(pdev, bar);
+-	else if (bar == PCI_ROM_RESOURCE &&
+-		 pdev->resource[bar].flags & IORESOURCE_ROM_SHADOW)
+-		end = 0x20000;
+ 	else
+ 		return -EINVAL;
+ 
+-- 
+2.47.0
 
 
