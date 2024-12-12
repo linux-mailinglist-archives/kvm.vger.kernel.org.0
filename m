@@ -1,129 +1,144 @@
-Return-Path: <kvm+bounces-33561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE9D9EE04A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 08:33:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31FD19EE093
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 08:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC49128351A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 07:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF90280D5E
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 07:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9279B20B1E3;
-	Thu, 12 Dec 2024 07:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0CD20B21F;
+	Thu, 12 Dec 2024 07:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FNiUrBWH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LpIHTh2k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2867825949C;
-	Thu, 12 Dec 2024 07:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C131259483
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 07:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733988786; cv=none; b=MfR0PpaU0dCA6O6RDQJj03cyrXrd8Y4jOiC9U3+k40qBYd31+4EnqU7sU6pR+cd1NDMWkl0i27tC5SOBsDkycLdtaD6zmwyMD4p1UXZmsHYMuK7YNcg4olRyDyfymwu8/Pun4b7msgVnd3T0CcTCnXu/ztk6K07TrB8Lcug6d+U=
+	t=1733989768; cv=none; b=ObNgRCTEJG6AOyvMoFKU9Y89c5MeeYV/hCSCQY4RrU+3VzNloQz5jwWTSjHa101eUUjtMj1/gxpTBeaoamjBHI5ph7jyhlHbzvd/IASiSEyiz1JYaarw5OObI9quwaAz63HQ7HiwAVoS19jSypxp9jGoJPGSWkFEfRI1PLuZLpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733988786; c=relaxed/simple;
-	bh=HA2Z23rv2sDqT8HfUnkxHEbwOJHRuO5D9olRu6M6QIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OZV8L9guEA5Mk5QlKyd1rZEwx9EDjIYVBhnPScS5IG3ZX+BSwEC2aW2ZuyLVIE6QMTh4SrnYKZgNZyauOZ7nGE83NM1Jqo053dooKMuGzRFN8tZNKw/J8ok16ek0MuZllrxk064lzA5l4Q2CLxmOyT31ZUYBXiJP9e75PRsxrII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FNiUrBWH; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1733989768; c=relaxed/simple;
+	bh=mHjSpBL3vmykAIaKbW2WYbZBw4kigGEu4qrdClZvK5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MQ5/4Ox0vrkG74kj6joWVg6A9YCwIRv+7gfXjxwKt8lYTDIoLR4HfgZqBgxhklo/2A9xKiD3yQprlmwOTyZDifb/whXhI+BL7vIIcwBS+DpKdSIebkfHzw18sjDd4rX1WjydP0WIhyuI5P4pQprSvNzQe565EnzjMtsiAYeA+6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LpIHTh2k; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733988785; x=1765524785;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HA2Z23rv2sDqT8HfUnkxHEbwOJHRuO5D9olRu6M6QIk=;
-  b=FNiUrBWHSJjK2QP15vCcqcxVXPxCTCIM7uNZVvssJ6zdfzuZ/UUxKM5N
-   5H45dYZOxNJahmqr7xlWel29CoQ+qzNIdSdsPSpGoXrlhZyMXfm+DD5OT
-   vy4DbSE7UuRBAc/iYrpPy8kOBz8swU3KqfUPXF3AnVvh9rwfIyK0w2etr
-   UZzKDX02k29eRnCXn9pGasPWmC4uddfxNx1uDOpoDfp85TMCkgZDKugqu
-   Tlkl/JmwpdZRkOVee9srZmfgZ3EQf5Hnt126pQhymtkrQdCjcgJbBLx0L
-   h48mVIgqWDJK8x3LVVw64N1eBroEe6zJAxWVfr4GLBzS39lzk8y3BJCB0
-   A==;
-X-CSE-ConnectionGUID: 6oQt1jk5R1evBWhu9Y4nSg==
-X-CSE-MsgGUID: oLL4EwLVRMegWoh3S/5yag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="34301299"
+  t=1733989766; x=1765525766;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mHjSpBL3vmykAIaKbW2WYbZBw4kigGEu4qrdClZvK5U=;
+  b=LpIHTh2k3c25BR21Fjj/MD2WEMkVHpurm9ulpbdLzxB2n0dLEwkn+PZr
+   d6ZytAlL+2e9PTfAH/VCnX2wVwTaHr3fjaWVhj+gtgVB2PjgMGFh9yPgj
+   G4NBHssV73RdA8wXnKVEN/10TLn2HMoC9Hc3t5r7fUtzWZKr70oJ9loSQ
+   GtdnfIXIXBbnzVIPdHqb73lfIxQR4seeHaHON3mpgFTHzTG0ZuX0oHjHY
+   lxgzN4OiSoku6dDTTPHIKMqr4dSpHbos2X/9FNs4vjy0lecpiBYUgzxSz
+   1O9FctNKThyyGojQyI7NcDPsUEjUVyoLGR21ByEiThPIKQjJ/IUlokCpU
+   Q==;
+X-CSE-ConnectionGUID: DklQodldSY66avYwhi9v3A==
+X-CSE-MsgGUID: 2NLUpb6SQ5Cg8/0FcqPd0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="34439264"
 X-IronPort-AV: E=Sophos;i="6.12,227,1728975600"; 
-   d="scan'208";a="34301299"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 23:32:46 -0800
-X-CSE-ConnectionGUID: CgVLBUE4Swe4Pwfbw3tn0Q==
-X-CSE-MsgGUID: UPv8cmfnQomnWK9CqN+2ig==
+   d="scan'208";a="34439264"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 23:49:26 -0800
+X-CSE-ConnectionGUID: 7okOIhM0Td+7Ouqa45RhEA==
+X-CSE-MsgGUID: zmgxLfqXTWedfbcXlMc7xA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,227,1728975600"; 
-   d="scan'208";a="96385998"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 23:32:43 -0800
-Message-ID: <0751a7b8-f8d3-4e27-b710-0a2bd7d06f7e@intel.com>
-Date: Thu, 12 Dec 2024 09:32:36 +0200
+   d="scan'208";a="101179535"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa004.jf.intel.com with ESMTP; 11 Dec 2024 23:49:23 -0800
+Date: Thu, 12 Dec 2024 16:07:38 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: pbonzini@redhat.com, xiaoyao.li@intel.com, qemu-devel@nongnu.org,
+	seanjc@google.com, michael.roth@amd.com, rick.p.edgecombe@intel.com,
+	isaku.yamahata@intel.com, farrah.chen@intel.com,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] i386/kvm: Set return value after handling
+ KVM_EXIT_HYPERCALL
+Message-ID: <Z1qZygKqvjIfpOXD@intel.com>
+References: <20241212032628.475976-1-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/6] KVM: x86: Refactor __kvm_emulate_hypercall() into
- a macro
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tom Lendacky <thomas.lendacky@amd.com>, Binbin Wu
- <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
- Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>
-References: <20241128004344.4072099-1-seanjc@google.com>
- <20241128004344.4072099-7-seanjc@google.com>
- <90577aad-552a-4cf8-a4a3-a4efcf997455@intel.com>
- <6423ec9d-46a2-43a3-ae9a-8e074337cd84@redhat.com>
- <Z1ier7QAy9qj7x4V@google.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <Z1ier7QAy9qj7x4V@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212032628.475976-1-binbin.wu@linux.intel.com>
 
-On 10/12/24 22:03, Sean Christopherson wrote:
-> On Tue, Dec 10, 2024, Paolo Bonzini wrote:
->> On 11/28/24 09:38, Adrian Hunter wrote:
->>>
->>> For TDX, there is an RFC relating to using descriptively
->>> named parameters instead of register names for tdh_vp_enter():
->>>
->>> 	https://lore.kernel.org/all/fa817f29-e3ba-4c54-8600-e28cf6ab1953@intel.com/
->>>
->>> Please do give some feedback on that approach.  Note we
->>> need both KVM and x86 maintainer approval for SEAMCALL
->>> wrappers like tdh_vp_enter().
->>>
->>> As proposed, that ends up with putting the values back into
->>> vcpu->arch.regs[] for __kvm_emulate_hypercall() which is not
->>> pretty:
->>
->> If needed we can revert this patch, it's not a big problem.
+On Thu, Dec 12, 2024 at 11:26:28AM +0800, Binbin Wu wrote:
+> Date: Thu, 12 Dec 2024 11:26:28 +0800
+> From: Binbin Wu <binbin.wu@linux.intel.com>
+> Subject: [PATCH] i386/kvm: Set return value after handling
+>  KVM_EXIT_HYPERCALL
+> X-Mailer: git-send-email 2.46.0
 > 
-> I don't care terribly about the SEAMCALL interfaces.  I have opinions on what
-> would I think would be ideal, but I can live with whatever.
+> Userspace should set the ret field of hypercall after handling
+> KVM_EXIT_HYPERCALL.  Otherwise, a stale value could be returned to KVM.
 > 
-> What I do deeply care about though is consistency within KVM, across vendors and
-> VM flavors.  And that means that guest registers absolutely need to be captured in
-> vcpu->arch.regs[].
+> Fixes: 47e76d03b15 ("i386/kvm: Add KVM_EXIT_HYPERCALL handling for KVM_HC_MAP_GPA_RANGE")
+> Reported-by: Farrah Chen <farrah.chen@intel.com>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Tested-by: Farrah Chen <farrah.chen@intel.com>
+> ---
+> To test the TDX code in kvm-coco-queue, please apply the patch to the QEMU,
+> otherwise, TDX guest boot could fail.
+> A matching QEMU tree including this patch is here:
+> https://github.com/intel-staging/qemu-tdx/releases/tag/tdx-qemu-upstream-v6.1-fix_kvm_hypercall_return_value
+> 
+> Previously, the issue was not triggered because no one would modify the ret
+> value. But with the refactor patch for __kvm_emulate_hypercall() in KVM,
+> https://lore.kernel.org/kvm/20241128004344.4072099-7-seanjc@google.com/, the
+> value could be modified.
 
-In general, TDX host VMM does not know what guest register
-values are.
+Could you explain the specific reasons here in detail? It would be
+helpful with debugging or reproducing the issue.
 
-This case, where some GPRs are passed to the host VMM via
-arguments of the TDG.VP.VMCALL TDCALL, is really just a
-side effect of the choice of argument passing rather than
-any attempt to share guest registers with the host VMM.
+> ---
+>  target/i386/kvm/kvm.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 8e17942c3b..4bcccb48d1 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -6005,10 +6005,14 @@ static int kvm_handle_hc_map_gpa_range(struct kvm_run *run)
+>  
+>  static int kvm_handle_hypercall(struct kvm_run *run)
+>  {
+> +    int ret = -EINVAL;
+> +
+>      if (run->hypercall.nr == KVM_HC_MAP_GPA_RANGE)
+> -        return kvm_handle_hc_map_gpa_range(run);
+> +        ret = kvm_handle_hc_map_gpa_range(run);
+> +
+> +    run->hypercall.ret = ret;
 
-It could be regarded as more consistent to never use
-vcpu->arch.regs[] for confidential guests.
+ret may be negative but hypercall.ret is u64. Do we need to set it to
+-ret?
 
+> -    return -EINVAL;
+> +    return ret;
+>  }
+>  
+>  #define VMX_INVALID_GUEST_STATE 0x80000021
+> 
+> base-commit: ae35f033b874c627d81d51070187fbf55f0bf1a7
+> -- 
+> 2.46.0
+> 
+> 
 
