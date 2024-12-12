@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-33555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D968F9EDF8C
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 07:38:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B98789EDF8F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 07:39:02 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75314283FAC
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 06:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DECB16896F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 06:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271DB204C31;
-	Thu, 12 Dec 2024 06:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A82204C2E;
+	Thu, 12 Dec 2024 06:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Luiq8S4E"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ihi5b7tt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2061.outbound.protection.outlook.com [40.107.223.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77C9204C18;
-	Thu, 12 Dec 2024 06:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3587E54723;
+	Thu, 12 Dec 2024 06:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733985511; cv=fail; b=pCYDWiXfJwYaXXbg8+oqnGJ8xjH9eQavUw6cQYqTxeq5e+viglPaYr1qZ+6baweR6ikHLoOX/S2WIqsbjDc/Ab+jR1VHrPybHf1astc3Q8qHmRpjj3MiVNb2cV0Do3XqWxQ2eTLNvfP6ZmslywgDPpyv8zi7VHAluuChHogpGI0=
+	t=1733985532; cv=fail; b=YUNNcRNAYaQBIjFGsB7EbDFJ2iiN802r5Te/exPMi0LBt+ZO6bgiQiNBhHLk5bfpnqZt9yAM3nKctoex8DWgt/5dciXQBp/YM2A7q78u7TqxYFhvYKP9WgvqCZv74aJZy3XTQiz9vmXvK8sMyqTgU66Ye63In46kqz0vgYbrqFk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733985511; c=relaxed/simple;
-	bh=/U3Z3glLZUhwxfpxBGOK/7Yo6Qft9bQAcmaTSDVigH8=;
+	s=arc-20240116; t=1733985532; c=relaxed/simple;
+	bh=3S4FitfyvHq2biTg8nSnnFWWzhemMZx43KNm5Ur0f9o=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=axj3GT6Sgeh3czjGsJbgSbldO26GXd2OHeEHOY+stv1ia/0Dl7Wo2G7qwTOi36+Ezg3Kilm7ViL8ljLR3pmAd0sFtoaDL0nXoc5/R5cwPm4tE9ABtOVVGro8I9RlPykfUPQ+p5qm3at5BL4iPGiOukKXXoMcJk7DGy0CdvctqeI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Luiq8S4E; arc=fail smtp.client-ip=40.107.244.49
+	 MIME-Version:Content-Type; b=V+aDEdOnMK8+mkHdJOUBFh3NJT6WmZx24JvExZrqnO+eOdJh6O3QSJMOxKYYxvD8eok7d8GmsPDgKyXR1PVBguMxC1CECUr+hkq8wpiZCXxqCz5+LnmPEZBE3pO79sSGXTjZB2hwbkdjKBUucwUGcAHCxduEN2F9I+4wTSLLT8k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ihi5b7tt; arc=fail smtp.client-ip=40.107.223.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xtau7Aqv+u6p3il7C31tUgPiAltOmXOp24rTfwJnaz38Azg2DZLSwJxjdaNm0gMcqWw94zRfxCJJnjP3fQzwRFrbLGN2B0/J8FZNiDIo2p+fbTn3E/Q3KAJzELBThWGeL5wqUxNWuBOEewVRlF8Db4h44WlCpy4VSGKMdXggpXlidfHHk7XOAjViuLsysjHgK6/g4F6PlcV20sKFCLmiMuGLlz/6ITqrYTMSzyOV6WBqrbc9+zfOHbVQF7INwlypY/5/G7czoBBuoiR3DCrBNdnlLt2zIhbPf53unZ81k/HltUsO3pKB97h6r9O7ymakJVrHcVTy4ve6a8WB6hKXsg==
+ b=pbKKjn2e0zGLQgpKvShyDRy16+uXktqqPen22PpgC8dL5HxpG7u7XEWsFC6jnamRo7HfdrBox/N5L1xTDc+waNLqLBUOajuPOr5L3C97F+KYmGc73vIIXbb8lzrYYhTtFv4AKIlf4hxxtdVKwJlV+6TymTJeb1HDzgwxeRvUjW30q+Vl4vdggFSw+EuYfQjLhuujJlGPGlBSZ7Z7UI40bUPySE9C8loWxGxCtRzimlZSnuhcCvHn5hGclpptr58LyRZGGDAXOGe/cUID4P7I8OEIuJTDe6w/9IZ+yxlw6P47meCpNbv2T2zcZPVwwu+RzpOv9xJ6NGi0YmJfNrmHvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A9XYF0QJO5+ytlz+nk9KzbhWH+1hy5p4tpp3erNpAR4=;
- b=yPJ7wQrsNtWgxPBEzBTLreYoBNt5tA60zxhMQkAMkFCiFfP9hWtGhQMKLaJOcvgJMrmS729xrclmn+k2Ykwd8T56Sxw4EA2tmv4Own37e5CaXZSpAOGv7ZqqD3hyTaYv0CySm18d/6ag337aWHvROooxuoNyBTCCYixTCkpH7NP7WeY6gzdtBeZxMdEecuM5XgPZOBhrCO+tOO3Lq3/vjLqWgopXLPWdoOx22gPJ+4WNuGPsQzKSrU4h7Kqp8gl075LtkMfjAV5Z6cTES4N88/53FqOwLOycfwINq8kS/qNsgfrel12Ue0tOCu0pr5GHE6Ebo3Df2jAsJkLETB85Mw==
+ bh=4eGZxnQBjTodY1JhmVlQdeeW0tmFoosWN4I8NNqgCBw=;
+ b=Yx8pzXK3M+9IiMSEolyUYbhytN+QiWGlxhCW3Rr3D22fm3n+iNbjkarh6/lrWniTL3aRcVzLtO1u9/vpcJgtQtV0DPwX9JDStu/MKdBD0IJXCXjyiF4kdl0/xQf/4qQgs2WLfX+kee7rzmxRZy/b4/NB4gtSO40CsG7aTA+qMmbbkJfYgUHrKcCehp5eruk5boNWzeF+YtkRKADOyNgtgv7i57QdOdW/hU2yhjNtufVRRhugnt83KObJlO6FQLJj7nqNX+sIVZceSEUcXaM64I+MHxHM90FOquwuuV8ImyQ7FWW0PF9aEGHEo6+sr2PfbfB29p/Xn1p3J/yPNvzf+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A9XYF0QJO5+ytlz+nk9KzbhWH+1hy5p4tpp3erNpAR4=;
- b=Luiq8S4EpjzAZbRSNr3OEZ6mYgWZqjTTmBGkkt4i2xaY0+3XY3V5QUY2bKMvW0HEV5brlzlTMOxjBhT+HjUm1EAcSSPRTTD0gWPGgm1sUqCmGcieovqwxDHTLIjna24b0q3bwIbrQPOnl2nWU83lUeNVy6irA997gAwuy1UIulw=
-Received: from CH0PR03CA0234.namprd03.prod.outlook.com (2603:10b6:610:e7::29)
- by CH2PR12MB4184.namprd12.prod.outlook.com (2603:10b6:610:a7::9) with
+ bh=4eGZxnQBjTodY1JhmVlQdeeW0tmFoosWN4I8NNqgCBw=;
+ b=Ihi5b7tt5yg8MC85K42g3RMjnuiu/a11b/TlSlvfd5ql/uSbiitd5gXhjkhgBU+TIpmj4nLOj9NvMUWi6Hl0V4SLb2u6NnMWefB7zHGHh2HvFnpY9i0vDRi/3z6UqyRaIo1n9QSbJCLw+wQeDKig/A8q0mXwZYJfctijVJR86OE=
+Received: from CH2PR04CA0019.namprd04.prod.outlook.com (2603:10b6:610:52::29)
+ by CH3PR12MB7524.namprd12.prod.outlook.com (2603:10b6:610:146::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.21; Thu, 12 Dec
- 2024 06:38:25 +0000
-Received: from CH2PEPF0000009F.namprd02.prod.outlook.com
- (2603:10b6:610:e7:cafe::b8) by CH0PR03CA0234.outlook.office365.com
- (2603:10b6:610:e7::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.14 via Frontend Transport; Thu,
- 12 Dec 2024 06:38:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Thu, 12 Dec
+ 2024 06:38:46 +0000
+Received: from CH2PEPF0000009B.namprd02.prod.outlook.com
+ (2603:10b6:610:52:cafe::42) by CH2PR04CA0019.outlook.office365.com
+ (2603:10b6:610:52::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.15 via Frontend Transport; Thu,
+ 12 Dec 2024 06:38:46 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF0000009F.mail.protection.outlook.com (10.167.244.21) with Microsoft
+ CH2PEPF0000009B.mail.protection.outlook.com (10.167.244.23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8251.15 via Frontend Transport; Thu, 12 Dec 2024 06:38:25 +0000
+ 15.20.8251.15 via Frontend Transport; Thu, 12 Dec 2024 06:38:46 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Dec
- 2024 00:38:24 -0600
+ 2024 00:38:45 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -78,9 +78,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<amit.shah@amd.com>, <pratikrajesh.sampat@amd.com>, <ashish.kalra@amd.com>,
 	<liam.merwick@oracle.com>, <david@redhat.com>, <vannapurve@google.com>,
 	<ackerleytng@google.com>, <quic_eberman@quicinc.com>
-Subject: [PATCH 3/5] KVM: gmem: Hold filemap invalidate lock while allocating/preparing folios
-Date: Thu, 12 Dec 2024 00:36:33 -0600
-Message-ID: <20241212063635.712877-4-michael.roth@amd.com>
+Subject: [PATCH 4/5] KVM: SEV: Improve handling of large ranges in gmem prepare callback
+Date: Thu, 12 Dec 2024 00:36:34 -0600
+Message-ID: <20241212063635.712877-5-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241212063635.712877-1-michael.roth@amd.com>
 References: <20241212063635.712877-1-michael.roth@amd.com>
@@ -96,147 +96,279 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009F:EE_|CH2PR12MB4184:EE_
-X-MS-Office365-Filtering-Correlation-Id: be83d3cd-20d5-40b0-210f-08dd1a7794df
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000009B:EE_|CH3PR12MB7524:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01d338c7-cd1d-4308-e71a-08dd1a77a10e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|1800799024|82310400026;
+	BCL:0;ARA:13230040|1800799024|7416014|376014|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oN/MTV2i7zVlEcCb9zpOOX8bxmXnV/KyZYy70+wWj9RvacoX2P0g1wHrEllM?=
- =?us-ascii?Q?09A4GWQENKNvqdoowKL5HXi8y/SY0y5ihia/j2anghIYALZIs8xq3ZHgp31I?=
- =?us-ascii?Q?At+0W0D8fIyjVc747STmbSrrPLNs9W/OE42NMrsR6lUWOfp21OHxwHSPtqud?=
- =?us-ascii?Q?YpBf1jYwpi/e53TzVvqO+N3EsUkq08JGiB51lWZiYkLZFp0S4fuewQo/2BZ5?=
- =?us-ascii?Q?EEQR3sZ/Qa/YYBFAAHzQaTQ7XBzfeiM7CX7NGQu2DCscdtqAWkYO4TxxeAja?=
- =?us-ascii?Q?2mhIAzdJ/eZo03Cvz7NKOvmZ3E973IisafCtPBFgz4VoEgLFvBFZZH3eODXe?=
- =?us-ascii?Q?4h240dPs95ppYgfxNY3acEJjyoZyPIcm/FRxlTLc08LGAQvvFiEXM1Vb14i+?=
- =?us-ascii?Q?bh623cEcW/Bz3zuY+HZYoAu5HikcJIVlDXTghNEd73CBc0RqKALHKImDRddV?=
- =?us-ascii?Q?FmC0kd9mVGb9dhxLytQRwTG+9zkBVR4KYX2EJXLwLa2y/ShE6AWqcsmb04kG?=
- =?us-ascii?Q?Tvh7IRe+cBNrw4MKrIRV49RYwcc6ZMcFnnYLO0Tq5oH3TiJjV0ig6NExCwGy?=
- =?us-ascii?Q?4HIMI9e0DyrlM9bhKmSFDHYX+Hts1e8iT6nHtxwduxrQJoNuH+UjDHALjoL/?=
- =?us-ascii?Q?lfs9TqRwtNMRIx/RoZSdeW+r1S7HCJbescChOSArYg1U1GigAjCfomo6wcEi?=
- =?us-ascii?Q?ImJ9iUTRPkeuhfq163FDRT2IhClAGKLzy0fPSnIUzE3GBi2E+gkWihLEYqSj?=
- =?us-ascii?Q?sS6jcJJs/FAWwn1kDFzHN3zrt+v0jGtdDUPHnT/CbWvXOybYu3tbHSJKN+Zs?=
- =?us-ascii?Q?hCZGP5tKy4rkelz5Zjvr1n+7b2MdmC4e5oapIS+Ho+i85MyzhvYLFty7MGB5?=
- =?us-ascii?Q?hlXeI+Gg+qOsBMMaoWYjGcA57KRjbpmE8KrsGyuim90+sYnZnhlnnQNEQo7c?=
- =?us-ascii?Q?8SglhyP+XnZSWMy07WD9dmm6yxSFGcEEhXzqy4tBclswBmYI/hrJdnUNrNYW?=
- =?us-ascii?Q?yyjNIgOiPgD71YC0181y7/0xI5c+B7BBDfv4kDTOMwHEe8+FEM4AblU918nb?=
- =?us-ascii?Q?Lrd1rb6XjE9wjwJJZTwIQCgD21/jE902nOVjjmGDL05bnkw/UziXSZfLBN2N?=
- =?us-ascii?Q?YaCjdjk6KXuf4KwJbcU0gEJzw/APwBa8UZEIwRZ8h6Gvy/iEOS8kXgTnSZ/C?=
- =?us-ascii?Q?l5UWj4NmwhOZzT45MVxHU8G9jGaPbPVjzD524RPe4g2hMr7NHFkDn4CvzRtm?=
- =?us-ascii?Q?fbr7hKK0QH1qrqySchBtYTIUS/wtdI3NKrRCb2d4Ok5X0jvfScyLkCKrSQBu?=
- =?us-ascii?Q?5d0GtkJQEYUrKVA5btLGAJ/1BFGuhcv6V8qd9DN3AFjGAg+AGuJ4T0Nw64fV?=
- =?us-ascii?Q?ZyEqfydpebW/P1gNLhHu1sBtIowl8jJ9aN0kv0sPv+Sg04am68eGrWOuGprU?=
- =?us-ascii?Q?91sLgW86Lrtsny/LVdrRljTRd5l3eYdl?=
+	=?us-ascii?Q?iGMrAeweamXYwcYa/wSFB3TvgYzZ1Q8Sh/QVkAlLUy378wr74Bw2eQWHWH8i?=
+ =?us-ascii?Q?TiC6ici9NqVou7upkkerZQOxD3KBiOhCf62ApTK7yFiJEVzQPwkVC1xdTMkK?=
+ =?us-ascii?Q?1vDA3jlHgYi4XyKvI0Y97UOw0kMQDDe6jYh/T79xbpCSj0mc9A8NWIX59Dow?=
+ =?us-ascii?Q?qJrTfIMNHlhhIuXS8QVirFFSSXiVrekLdFkW+Y/wH0KAdI0EyVAO/NHSqxxN?=
+ =?us-ascii?Q?csdx98JrWr4LWGL6qwCYUVE2Q/xdCXVhj+mBRK7CoBKQntaFOuizWMEAi+PT?=
+ =?us-ascii?Q?bgkN3joYO1n9uGrRuys4OybsmRF2tC3Mtl67gfO9V+B/zXtQzt5fVtNHTJTW?=
+ =?us-ascii?Q?9O2BZAQuPGslN1nu6tqjO804NLHwQdjJpWbj+84HYdCurWz9lcZksgcrjhKZ?=
+ =?us-ascii?Q?rG0OlFCd/Yh/Tk+60UBzlEqDW4Jcp/FCZvpgHd3Xo6qR/lxFP9HbPAZ2nWSq?=
+ =?us-ascii?Q?lTtFWcnrvpoBpEnejQDa6N7Xc5coHXsfxgSK0ZvuvP9hrO8W/F+AZodAvq5R?=
+ =?us-ascii?Q?IjlvLKNKU0E90BPlmTINHfWbLxuRFj7kkylHmA4r1OLHAOY30VJ922aF8gPD?=
+ =?us-ascii?Q?bRrLYaK3qd3Sqhl33EEUEmyn8oFZnizz056w7/Up2P9rXWU1E3MMpTWysuuE?=
+ =?us-ascii?Q?jQK+mkSh0aid16CVdH0JQM2S5F9SdADpGQWSIHlp/ICN5qW+kBOvlef/P14p?=
+ =?us-ascii?Q?27txOOprNGo03se4+76FHxd/aAnb9/Y+h0PqB3HRUZjhkz8Bzl3+lcRtVNLC?=
+ =?us-ascii?Q?l+6oMW1ICa83qqKYFTz3o5lxE38ZBdVoVqItXqTwoC13lImEtOoYPi9VbeX+?=
+ =?us-ascii?Q?/c/6TpI12/tLmcPeaCMVJcxCrzk/7ppWn6axG76uOkdl1mMuF80V7EfbG4G7?=
+ =?us-ascii?Q?mAmUnA7UCVQwteFyuHV90ZbhHGHZS2ZWBfwskx0ym5cJ0MpU+XHzpMd3Hs1u?=
+ =?us-ascii?Q?1hD+rp9m5zKegU81+gN0w/K6hHCIsLzBwobZ+wxiKM1WDdK7Dq0oiLCTQZDM?=
+ =?us-ascii?Q?VQTkF0oZiwY1vat93YOAA0pCq0yNuut5Fls+0VVc6jcOFvQFBEAsSl8dkf6o?=
+ =?us-ascii?Q?obOB9Hhw6SMcbWNq4uX7AJCSjj7TW8gnyMiE40YcZIb0+tkJWBO1GJWRjjA6?=
+ =?us-ascii?Q?pia6Mv44Pup4GYPfhklmoUWsqGbDkSqQwgrf9r2rmWDhrQIPhtXvF/1GceMs?=
+ =?us-ascii?Q?I2+DfdU2nMER8eF5JT29TeJ2MI5LtpcSW/JNaYoIph7UT/IZIUJ1cA9VMy4U?=
+ =?us-ascii?Q?YN0zZhqQmqkCMs/1WjpRkUWdPPB2Ph9YyvSRBV+2SC9yf9MjA0N9aY2Tjbms?=
+ =?us-ascii?Q?IlVhjxzpAg/LjzvwJ+7OMAt8/gUEJW1KwJNx5hL5cb0alrC7cpzdF1ESKVyd?=
+ =?us-ascii?Q?efkxDap8/CgkKlDwxHU7bI+cgBKOesME4LdxKK6lrl4tKgb4gGetmzMirTOe?=
+ =?us-ascii?Q?Rma61f9W8kGWYSfoXojaNimosDH6JWkw?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 06:38:25.6309
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 06:38:46.1079
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be83d3cd-20d5-40b0-210f-08dd1a7794df
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01d338c7-cd1d-4308-e71a-08dd1a77a10e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009F.namprd02.prod.outlook.com
+	CH2PEPF0000009B.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4184
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7524
 
-Currently the preparedness tracking relies on holding a folio's lock
-to keep allocations/preparations and corresponding updates to the
-prepared bitmap atomic.
+The current code relies on the fact that guest_memfd will always call
+sev_gmem_prepare() for each initial access to a particular guest GFN.
+Once hugepage support is added to gmem, sev_gmem_prepare() might only
+be called once for an entire range of GFNs. The current code will handle
+this properly for 2MB folios if the entire range is currently shared and
+can be marked as private using a 2MB RMP entry, but if any sub-ranges
+were already in a prepared state (e.g. because they were part of the
+initial guest state prepared via kvm_gmem_populate(), or userspace
+initially had the 2MB region in a mixed attribute state for whatever
+reason), then only the specific 4K GFN will get updated. If gmem rightly
+decides it shouldn't have to call the prepare hook again for that range,
+then the RMP entries for the other GFNs will never get updated.
 
-However, on the invalidation side, the bitmap entry for the GFN/index
-corresponding to a folio might need to be cleared after truncation. In
-these cases the folio's are no longer part of the filemap, so nothing
-guards against a newly-allocated folio getting prepared for the same
-GFN/index, and then subsequently having its bitmap entry cleared by the
-concurrently executing invalidation code.
+Additionally, the current code assumes it will never be called for a
+range larger than 2MB. This obviously won't work when 1GB+ hugepage
+support is eventually added.
 
-Avoid this by ensuring that the filemap invalidation lock is held to
-ensure allocations/preparations and corresponding updates to the
-prepared bitmap are atomic even versus invalidations. Use a shared lock
-in the kvm_gmem_get_pfn() case so vCPUs can still fault in pages in
-parallel.
+Rework the logic to ensure everything in the entire range gets updated,
+with care taken to avoid ranges that are already private while still
+maximizing the RMP entry sizes used to fill in the shared gaps.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- virt/kvm/guest_memfd.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/x86/kvm/svm/sev.c | 163 ++++++++++++++++++++++++-----------------
+ 1 file changed, 96 insertions(+), 67 deletions(-)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 6907ae9fe149..9a5172de6a03 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -154,6 +154,8 @@ static void kvm_gmem_mark_prepared(struct file *file, pgoff_t index, int order)
- 	unsigned long npages = (1ul << order);
- 	unsigned long *p;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 418767dd69fa..40407768e4dd 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4777,100 +4777,129 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+ 	kvm_release_page_unused(page);
+ }
  
-+	rwsem_assert_held(&file->f_mapping->invalidate_lock);
+-static bool is_pfn_range_shared(kvm_pfn_t start, kvm_pfn_t end)
++/*
++ * Find the offset of the next contiguous shared PFN range within the bounds of
++ * pfn_start/npages_max. If no shared pages are present, 'offset' will correspond
++ * to the end off the range and 'npages_shared' will be 0.
++ */
++static int next_shared_offset(struct kvm *kvm, kvm_pfn_t pfn_start, long npages_max,
++			      kvm_pfn_t *offset, long *npages_shared)
+ {
+-	kvm_pfn_t pfn = start;
++	kvm_pfn_t pfn = pfn_start;
++	int ret;
+ 
+-	while (pfn < end) {
+-		int ret, rmp_level;
++	*offset = 0;
++	*npages_shared = 0;
 +
- 	/* The index isn't necessarily aligned to the requested order. */
- 	index &= ~(npages - 1);
- 	p = i_gmem->prepared + BIT_WORD(index);
-@@ -174,6 +176,8 @@ static void kvm_gmem_mark_range_unprepared(struct inode *inode, pgoff_t index, p
- 	struct kvm_gmem_inode *i_gmem = (struct kvm_gmem_inode *)inode->i_private;
- 	unsigned long *p = i_gmem->prepared + BIT_WORD(index);
++	while (pfn < pfn_start + npages_max) {
+ 		bool assigned;
++		int level;
  
-+	rwsem_assert_held(&inode->i_mapping->invalidate_lock);
+-		ret = snp_lookup_rmpentry(pfn, &assigned, &rmp_level);
++		ret = snp_lookup_rmpentry(pfn, &assigned, &level);
+ 		if (ret) {
+-			pr_warn_ratelimited("SEV: Failed to retrieve RMP entry: PFN 0x%llx GFN start 0x%llx GFN end 0x%llx RMP level %d error %d\n",
+-					    pfn, start, end, rmp_level, ret);
+-			return false;
++			pr_warn_ratelimited("SEV: Failed to retrieve RMP entry: PFN 0x%llx error %d\n",
++					    pfn, ret);
++			return -EINVAL;
+ 		}
+ 
+ 		if (assigned) {
+-			pr_debug("%s: overlap detected, PFN 0x%llx start 0x%llx end 0x%llx RMP level %d\n",
+-				 __func__, pfn, start, end, rmp_level);
+-			return false;
++			/* Continue if a shared range hasn't been found yet. */
++			if (*npages_shared)
++				break;
++		} else {
++			if (!*npages_shared)
++				*offset = pfn - pfn_start;
++			*npages_shared += PHYS_PFN(page_level_size(level));
+ 		}
+ 
+-		pfn++;
+-	}
+-
+-	return true;
+-}
+-
+-static u8 max_level_for_order(int order)
+-{
+-	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+-		return PG_LEVEL_2M;
+-
+-	return PG_LEVEL_4K;
+-}
++		pfn += PHYS_PFN(page_level_size(level));
+ 
+-static bool is_large_rmp_possible(struct kvm *kvm, kvm_pfn_t pfn, int order)
+-{
+-	kvm_pfn_t pfn_aligned = ALIGN_DOWN(pfn, PTRS_PER_PMD);
++		/*
++		 * Only possible if RMP entry size is larger than the folio,
++		 * which kvm_gmem_prepare() should never allow for.
++		 */
++		WARN_ON_ONCE(pfn > pfn_start + npages_max);
++	}
+ 
+-	/*
+-	 * If this is a large folio, and the entire 2M range containing the
+-	 * PFN is currently shared, then the entire 2M-aligned range can be
+-	 * set to private via a single 2M RMP entry.
+-	 */
+-	if (max_level_for_order(order) > PG_LEVEL_4K &&
+-	    is_pfn_range_shared(pfn_aligned, pfn_aligned + PTRS_PER_PMD))
+-		return true;
++	if (!*npages_shared)
++		*offset = npages_max;
+ 
+-	return false;
++	return 0;
+ }
+ 
++/*
++ * This relies on the fact that the folio backing the PFN range is locked while
++ * this callback is issued. Otherwise, concurrent accesses to the same folio
++ * could result in the RMP table getting out of sync with what gmem is tracking
++ * as prepared/unprepared, likely resulting in the vCPU looping on
++ * KVM_EXIT_MEMORY_FAULTs that are never resolved since gmem thinks it has
++ * already processed the RMP table updates.
++ *
++ * This also assumes gmem is using filemap invalidate locks (or some other
++ * mechanism) to ensure that invalidations/hole-punches don't get interleaved
++ * with prepare callbacks.
++ *
++ * The net affect of this is that RMP table checks/updates should be consistent
++ * for the range of PFNs/GFNs this function is called with.
++ */
+ int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	kvm_pfn_t pfn_aligned;
+-	gfn_t gfn_aligned;
+-	int level, rc;
+-	bool assigned;
++	unsigned long npages;
++	kvm_pfn_t pfn_start;
++	gfn_t gfn_start;
+ 
+ 	if (!sev_snp_guest(kvm))
+ 		return 0;
+ 
+-	rc = snp_lookup_rmpentry(pfn, &assigned, &level);
+-	if (rc) {
+-		pr_err_ratelimited("SEV: Failed to look up RMP entry: GFN %llx PFN %llx error %d\n",
+-				   gfn, pfn, rc);
+-		return -ENOENT;
+-	}
++	npages = (1ul << max_order);
++	pfn_start = ALIGN_DOWN(pfn, npages);
++	gfn_start = ALIGN_DOWN(gfn, npages);
 +
- 	index &= BITS_PER_LONG - 1;
- 	if (index) {
- 		int first_word_count = min(npages, BITS_PER_LONG - index);
-@@ -200,6 +204,8 @@ static bool kvm_gmem_is_prepared(struct file *file, pgoff_t index, int order)
- 	unsigned long *p;
- 	bool ret;
- 
-+	rwsem_assert_held(&file->f_mapping->invalidate_lock);
++	for (pfn = pfn_start, gfn = gfn_start; pfn < pfn_start + npages;) {
++		long npages_shared;
++		kvm_pfn_t offset;
++		int rc;
 +
- 	/* The index isn't necessarily aligned to the requested order. */
- 	index &= ~(npages - 1);
- 	p = i_gmem->prepared + BIT_WORD(index);
-@@ -232,6 +238,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct file *file,
- 	pgoff_t index, aligned_index;
- 	int r;
- 
-+	rwsem_assert_held(&file->f_mapping->invalidate_lock);
++		rc = next_shared_offset(kvm, pfn, npages - (pfn - pfn_start),
++					&offset, &npages_shared);
++		if (rc < 0)
++			return offset;
 +
- 	index = gfn - slot->base_gfn + slot->gmem.pgoff;
- 	nr_pages = (1ull << max_order);
- 	WARN_ON(nr_pages > folio_nr_pages(folio));
-@@ -819,12 +827,16 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	pgoff_t index = kvm_gmem_get_index(slot, gfn);
- 	struct file *file = kvm_gmem_get_file(slot);
- 	int max_order_local;
-+	struct address_space *mapping;
- 	struct folio *folio;
- 	int r = 0;
- 
- 	if (!file)
- 		return -EFAULT;
- 
-+	mapping = file->f_inode->i_mapping;
-+	filemap_invalidate_lock_shared(mapping);
++		pfn += offset;
++		gfn += offset;
 +
- 	/*
- 	 * The caller might pass a NULL 'max_order', but internally this
- 	 * function needs to be aware of any order limitations set by
-@@ -838,6 +850,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	folio = __kvm_gmem_get_pfn(file, slot, index, pfn, &max_order_local);
- 	if (IS_ERR(folio)) {
- 		r = PTR_ERR(folio);
-+		filemap_invalidate_unlock_shared(mapping);
- 		goto out;
++		while (npages_shared) {
++			int order, level;
++
++			if (IS_ALIGNED(pfn, 1ull << PMD_ORDER) &&
++			    npages_shared >= (1ul << PMD_ORDER)) {
++				order = PMD_ORDER;
++				level = PG_LEVEL_2M;
++			} else {
++				order = 0;
++				level = PG_LEVEL_4K;
++			}
+ 
+-	if (assigned) {
+-		pr_debug("%s: already assigned: gfn %llx pfn %llx max_order %d level %d\n",
+-			 __func__, gfn, pfn, max_order, level);
+-		return 0;
+-	}
++			pr_debug("%s: preparing sub-range: gfn 0x%llx pfn 0x%llx order %d npages_shared %ld\n",
++				 __func__, gfn, pfn, order, npages_shared);
+ 
+-	if (is_large_rmp_possible(kvm, pfn, max_order)) {
+-		level = PG_LEVEL_2M;
+-		pfn_aligned = ALIGN_DOWN(pfn, PTRS_PER_PMD);
+-		gfn_aligned = ALIGN_DOWN(gfn, PTRS_PER_PMD);
+-	} else {
+-		level = PG_LEVEL_4K;
+-		pfn_aligned = pfn;
+-		gfn_aligned = gfn;
+-	}
++			rc = rmp_make_private(pfn, gfn_to_gpa(gfn), level,
++					      sev->asid, false);
++			if (rc) {
++				pr_err_ratelimited("SEV: Failed to update RMP entry: GFN 0x%llx PFN 0x%llx order %d error %d\n",
++						   gfn, pfn, order, rc);
++				return rc;
++			}
+ 
+-	rc = rmp_make_private(pfn_aligned, gfn_to_gpa(gfn_aligned), level, sev->asid, false);
+-	if (rc) {
+-		pr_err_ratelimited("SEV: Failed to update RMP entry: GFN %llx PFN %llx level %d error %d\n",
+-				   gfn, pfn, level, rc);
+-		return -EINVAL;
++			gfn += (1ull << order);
++			pfn += (1ull << order);
++			npages_shared -= (1ul << order);
++		}
  	}
  
-@@ -845,6 +858,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		r = kvm_gmem_prepare_folio(kvm, file, slot, gfn, folio, max_order_local);
+-	pr_debug("%s: updated: gfn %llx pfn %llx pfn_aligned %llx max_order %d level %d\n",
+-		 __func__, gfn, pfn, pfn_aligned, max_order, level);
++	pr_debug("%s: updated: gfn_start 0x%llx pfn_start 0x%llx npages %ld max_order %d\n",
++		 __func__, gfn_start, pfn_start, npages, max_order);
  
- 	folio_unlock(folio);
-+	filemap_invalidate_unlock_shared(mapping);
- 
- 	if (!r)
- 		*page = folio_file_page(folio, index);
+ 	return 0;
+ }
 -- 
 2.25.1
 
