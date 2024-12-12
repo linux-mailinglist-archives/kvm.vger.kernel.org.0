@@ -1,200 +1,148 @@
-Return-Path: <kvm+bounces-33586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCAE39EED1A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:42:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD309164FEC
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 15:39:18 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973892185B1;
-	Thu, 12 Dec 2024 15:39:17 +0000 (UTC)
-X-Original-To: kvm@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 192179EEAAB
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 16:16:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33F86F2FE
-	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C22402818A8
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2024 15:16:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13318221DAB;
+	Thu, 12 Dec 2024 15:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3lPAPtFS"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED9B215048
+	for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 15:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734017957; cv=none; b=oDBgrw7X4x6ppb1DM5XuU1CI7itfVGSqBtHx9pdXBrKc32wea2ekxaNWCqxX/BTzLlr7V2wSTeW78H6xbGsTxKtZ3R1kIklruyKB1smoI2J/+TE3XvW/q6G3LIqHDXtvxVyH1HpfgBdeOWBYox362va4RA0f0B2vA43aXJr8EzI=
+	t=1734016570; cv=none; b=g/ls9mGZNddqusCe3jp5AtXAcQF55LBBmymXv+9LCuhBBxOpeIkFw6YRAY6Qdcm2LeHbu3Z3dKcrmqRPKkF99aLfsJzRc69x1j1V9/8ugk138/dOsgd4YVOPaq8Z8n2sQkXQgKXDVbsyg6hhA5jL8luuTODhs6CvYQN8yvhohMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734017957; c=relaxed/simple;
-	bh=YOOEBPTJZDrSeED6ji+So3Mj4MJWAInvl0Qni0IrTn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f1wXlyAatGhEUbaLJ2usyCKy/w1dt+lOwRhSyCFs9AXyGYbkAS+ODa0Jl3h81er9w2SMGRtogI9yqH/gpLzaAE1+YVE2n3jwuxtWCp0xJtFXOJkVyqXzYElYxLAZ+km1Uj+0mAcIlBxoh9grEczns+fBHv7IUxbvm8r0ApBc9c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1tLkXB-00000003f6l-1DsD;
-	Thu, 12 Dec 2024 15:51:21 +0100
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] target/i386: Reset TSCs of parked vCPUs too on VM reset
-Date: Thu, 12 Dec 2024 15:51:15 +0100
-Message-ID: <5a605a88e9a231386dc803c60f5fed9b48108139.1734014926.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1734016570; c=relaxed/simple;
+	bh=9fffTQdpWJhNALJxEvTaf/rO30fqud+Z6ubMNvTEEAc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MFEFhqlOhOBivfjya5rj29f3Ls2odrXkTCVE2jI3o/oIloyaHAKfeVcA1kut8yf6g15yg/5xs4y+gV+Sr/HwxeUH3m3p+RxB6WQ6dyxkHm7MI3p8HSOZyfZQmCaJ1iRp25RCXfJnbQeTQhiX2YirUDe7gO+9FTbHKY5w2wPDmLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3lPAPtFS; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9b9981f1so1046082a91.3
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 07:16:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734016568; x=1734621368; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0npqMPaizFs8y4cj6WS+6Zs4SEP8glO2GcWXj+/iPTE=;
+        b=3lPAPtFSrQhAULXygpaIYN89HCYKlyfITRb1+Fk5PHlOuJG0fT7eEh+or5WF6vmY/2
+         PE5hRt6kdlhR9dS9saOyF2mo/RA61so5GY3cOx1QKwkzKbJtCK2M2eBX2f7Kya9b5kbz
+         yQ+ODL2jXPY0wwX1rPDbDho/n0n0WLpOck7hJokBFriIPZ84TgRFa0YdLwcHoPEehR9b
+         AbLACOhlC3zLNBQthNkPRfYoumniXjIPetBgTRxVD/Iqz9+Yw0bLSE/gjad1/XtFqOEc
+         3s/lVn4Xz8jG8SnoVhn6uwOpg6V0yR+e72RxELM8zCs8fs8tpESlC7BZx3FkwaGBB71f
+         vX1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734016568; x=1734621368;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0npqMPaizFs8y4cj6WS+6Zs4SEP8glO2GcWXj+/iPTE=;
+        b=wwE/BokflGBS0FuDkjXipMSCbZ7BUBDmBEPx//+KTz/iMFeSXZefDxDip4GGP4qfK5
+         piKW8WTZwn2siQP1ipHuTZ0Up+SleqFLyuD80IFWTkanKK3cd2mp3cI2660pAZTfDl/H
+         Hwcex3pFch2QOdgjKh2w3sGKbCOhhemNtJAd6pHL+T6VMZBvJn6eSs2AwmMU6+7a4r2U
+         //uq4D9swBalu0Tp80ikG3P6BXvZ74ufjt3y46deNDq3RMJ8ggxWc7PdX+Yzty5w8a2R
+         Y1VqKEc7QwHF4F7AQPraDiWB+jJnodM16AHfFWDff84aK6XGzAPFv9WOTudC8/kTqEQ4
+         t1sg==
+X-Gm-Message-State: AOJu0Yxu8hro27nQtvH4xAiBPaSRvJiuANlkMU0sNyteQbdMDptnZzln
+	boUDTW7ZNp9pqoSqQdFrZa23SIvs1q9rwSZl8ww+hFg9J69O6v3WFVDZe1KEpWFjxQO4uYQuJSr
+	D8A==
+X-Google-Smtp-Source: AGHT+IGTokf0OQ+2hOIq2A7X6nwlSf69djBPoKd73hqVAlnzbubKxZpTaLfCT5yWO/S25l1vLxNaAVP4Pvg=
+X-Received: from pjbst8.prod.google.com ([2002:a17:90b:1fc8:b0:2ea:448a:8cd1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:180b:b0:2ee:b8ac:73b0
+ with SMTP id 98e67ed59e1d1-2f127f796bfmr10433341a91.2.1734016568047; Thu, 12
+ Dec 2024 07:16:08 -0800 (PST)
+Date: Thu, 12 Dec 2024 07:16:06 -0800
+In-Reply-To: <Z1q4vxmEmZbkOiqC@mias.mediconcil.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: mhej@vps-ovh.mhejs.net
+Mime-Version: 1.0
+References: <20241021102321.665060-1-bk@alpico.io> <Z1eXyv2VVsFiw_0i@google.com>
+ <Z1ecILHBlpkiAThl@google.com> <Z1f45XzpgDMC2cvI@mias.mediconcil.de>
+ <Z1nI22dBe01m3_k6@google.com> <Z1q4vxmEmZbkOiqC@mias.mediconcil.de>
+Message-ID: <Z1r-Nh0JAQdL_L8n@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Drop the kvm_has_noapic_vcpu optimization
+From: Sean Christopherson <seanjc@google.com>
+To: Bernhard Kauer <bk@alpico.io>
+Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Thu, Dec 12, 2024, Bernhard Kauer wrote:
+> On Wed, Dec 11, 2024 at 09:16:11AM -0800, Sean Christopherson wrote:
+> > On Tue, Dec 10, 2024, Bernhard Kauer wrote:
+> > > On Mon, Dec 09, 2024 at 05:40:48PM -0800, Sean Christopherson wrote:
+> > > > > With a single vCPU pinned to a single pCPU, the average latency for a CPUID exit
+> > > > > goes from 1018 => 1027 cycles, plus or minus a few.  With 8 vCPUs, no pinning
+> > > > > (mostly laziness), the average latency goes from 1034 => 1053.
+> > > 
+> > > Are these kind of benchmarks tracked somewhere automatically?
+> > 
+> > I'm not sure what you're asking.  The benchmark is KVM-Unit-Test's[*] CPUID test,
+> > e.g. "./x86/run x86/vmexit.flat -smp 1 -append 'cpuid'".
+> 
+> There are various issues with these benchmarks.
 
-Since commit 5286c3662294 ("target/i386: properly reset TSC on reset")
-QEMU writes the special value of "1" to each online vCPU TSC on VM reset
-to reset it.
+LOL, yes, they are far, far from perfect.  But they are good enough for developers
+to detect egregious bugs, trends across multiple kernels, etc.
 
-However parked vCPUs don't get that handling and due to that their TSCs
-get desynchronized when the VM gets reset.
-This in turn causes KVM to turn off PVCLOCK_TSC_STABLE_BIT in its exported
-PV clock.
-Note that KVM has no understanding of vCPU being currently parked.
+> 1. The absolute numbers depend on the particular CPU. My results
+>    can't be compared to your absolute results.
+> 
+> 2. They have a 1% accuracy when warming up and pinning to a CPU.
+>    Thus one has to do multiple runs.
+> 
+>       1 cpuid 1087
+>       1 cpuid 1092
+>       5 cpuid 1093
+>       4 cpuid 1094
+>       3 cpuid 1095
+>      11 cpuid 1096
+>       8 cpuid 1097
+>      24 cpuid 1098
+>      11 cpuid 1099
+>      17 cpuid 1100
+>       8 cpuid 1101
+>       1 cpuid 1102
+>       4 cpuid 1103
+>       1 cpuid 1104
+>       1 cpuid 1110
+> 
+> 3. Dynamic Frequency scaling makes it even more inaccurate.  A previously idle
+>    CPU can be as low as 1072 cycles and without pinning even 1050 cycles. 
+>    This 2.4% and 4.6% faster than the 1098 median.
+> 
+> 4. Patches that seem not to be worth checking for or where the impact is
+>    smaller than measurement uncertainties might make the system slowly
+>    slower.
+> 
+> 
+> Most of this goes away if a dedicated machine tracks performance numbers
+> continously.
 
-Without PVCLOCK_TSC_STABLE_BIT the sched clock is marked unstable in
-the guest's kvm_sched_clock_init().
-This causes a performance regressions to show in some tests.
+I don't disagree, but I also don't see this happening anytime soon, at least not
+for upstream kernels.  We don't even have meaningful CI testing for upstream
+kernels, for a variety of reasons (some good, some bad).  Getting an entire mini-
+fleet[*] of systems just for KVM performance testing of upstream kernels would be
+wonderful, but for me it's a very distant second after getting testing in place.
+Which I also don't see happening anytime soon, unfortunately.
 
-Fix this issue by writing the special value of "1" also to TSCs of parked
-vCPUs on VM reset.
-
-
-Reproducing the issue:
-1) Boot a VM with "-smp 2,maxcpus=3" or similar
-
-2) device_add host-x86_64-cpu,id=vcpu,node-id=0,socket-id=0,core-id=2,thread-id=0
-
-3) Wait a few seconds
-
-4) device_del vcpu
-
-5) Inside the VM run:
-# echo "t" >/proc/sysrq-trigger; dmesg | grep sched_clock_stable
-Observe the sched_clock_stable() value is 1.
-
-6) Reboot the VM
-
-7) Once the VM boots once again run inside it:
-# echo "t" >/proc/sysrq-trigger; dmesg | grep sched_clock_stable
-Observe the sched_clock_stable() value is now 0.
-
-
-Fixes: 5286c3662294 ("target/i386: properly reset TSC on reset")
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- accel/kvm/kvm-all.c                | 11 +++++++++++
- configs/targets/i386-softmmu.mak   |  1 +
- configs/targets/x86_64-softmmu.mak |  1 +
- include/sysemu/kvm.h               |  8 ++++++++
- target/i386/kvm/kvm.c              | 15 +++++++++++++++
- 5 files changed, 36 insertions(+)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 801cff16a5a2..dec1d1c16a0d 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -437,6 +437,16 @@ int kvm_unpark_vcpu(KVMState *s, unsigned long vcpu_id)
-     return kvm_fd;
- }
- 
-+static void kvm_reset_parked_vcpus(void *param)
-+{
-+    KVMState *s = param;
-+    struct KVMParkedVcpu *cpu;
-+
-+    QLIST_FOREACH(cpu, &s->kvm_parked_vcpus, node) {
-+        kvm_arch_reset_parked_vcpu(cpu->vcpu_id, cpu->kvm_fd);
-+    }
-+}
-+
- int kvm_create_vcpu(CPUState *cpu)
- {
-     unsigned long vcpu_id = kvm_arch_vcpu_id(cpu);
-@@ -2728,6 +2738,7 @@ static int kvm_init(MachineState *ms)
-     }
- 
-     qemu_register_reset(kvm_unpoison_all, NULL);
-+    qemu_register_reset(kvm_reset_parked_vcpus, s);
- 
-     if (s->kernel_irqchip_allowed) {
-         kvm_irqchip_create(s);
-diff --git a/configs/targets/i386-softmmu.mak b/configs/targets/i386-softmmu.mak
-index 2ac69d5ba370..2eb0e8625005 100644
---- a/configs/targets/i386-softmmu.mak
-+++ b/configs/targets/i386-softmmu.mak
-@@ -1,4 +1,5 @@
- TARGET_ARCH=i386
- TARGET_SUPPORTS_MTTCG=y
- TARGET_KVM_HAVE_GUEST_DEBUG=y
-+TARGET_KVM_HAVE_RESET_PARKED_VCPU=y
- TARGET_XML_FILES= gdb-xml/i386-32bit.xml
-diff --git a/configs/targets/x86_64-softmmu.mak b/configs/targets/x86_64-softmmu.mak
-index e12ac3dc59bf..920e9a42006f 100644
---- a/configs/targets/x86_64-softmmu.mak
-+++ b/configs/targets/x86_64-softmmu.mak
-@@ -2,4 +2,5 @@ TARGET_ARCH=x86_64
- TARGET_BASE_ARCH=i386
- TARGET_SUPPORTS_MTTCG=y
- TARGET_KVM_HAVE_GUEST_DEBUG=y
-+TARGET_KVM_HAVE_RESET_PARKED_VCPU=y
- TARGET_XML_FILES= gdb-xml/i386-64bit.xml
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index c3a60b28909a..ab17c09a551f 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -377,6 +377,14 @@ int kvm_arch_init(MachineState *ms, KVMState *s);
- int kvm_arch_init_vcpu(CPUState *cpu);
- int kvm_arch_destroy_vcpu(CPUState *cpu);
- 
-+#ifdef TARGET_KVM_HAVE_RESET_PARKED_VCPU
-+void kvm_arch_reset_parked_vcpu(unsigned long vcpu_id, int kvm_fd);
-+#else
-+static inline void kvm_arch_reset_parked_vcpu(unsigned long vcpu_id, int kvm_fd)
-+{
-+}
-+#endif
-+
- bool kvm_vcpu_id_is_valid(int vcpu_id);
- 
- /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 8e17942c3ba1..2ff618fbf138 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2415,6 +2415,21 @@ void kvm_arch_after_reset_vcpu(X86CPU *cpu)
-     }
- }
- 
-+void kvm_arch_reset_parked_vcpu(unsigned long vcpu_id, int kvm_fd)
-+{
-+    g_autofree struct kvm_msrs *msrs = NULL;
-+
-+    msrs = g_malloc0(sizeof(*msrs) + sizeof(msrs->entries[0]));
-+    msrs->entries[0].index = MSR_IA32_TSC;
-+    msrs->entries[0].data = 1; /* match the value in x86_cpu_reset() */
-+    msrs->nmsrs++;
-+
-+    if (ioctl(kvm_fd, KVM_SET_MSRS, msrs) != 1) {
-+        warn_report("parked vCPU %lu TSC reset failed: %d",
-+                    vcpu_id, errno);
-+    }
-+}
-+
- void kvm_arch_do_init_vcpu(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
+[*] Performance (and regular) testing requires multiple machines to cover Intel
+    vs. AMD, and the variety of hardware features/capabilities that KVM utilizes.
+    E.g. adding support for new features can and does introduce overhead in the
+    entry/exit flows.
 
