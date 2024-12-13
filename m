@@ -1,190 +1,133 @@
-Return-Path: <kvm+bounces-33758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E2709F13DF
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:38:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE1569F146B
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4B49281E4C
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:38:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0156280E6D
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9F01E570E;
-	Fri, 13 Dec 2024 17:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199F81E7668;
+	Fri, 13 Dec 2024 17:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EOB/VNal"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsGwzCps"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D904517B505;
-	Fri, 13 Dec 2024 17:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEF3187FFA;
+	Fri, 13 Dec 2024 17:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734111503; cv=none; b=EBJ/qSgGy0ZYCpaainMt8DANWI027DVaZsKDyaJGffNU3QuYJOT3zrHlRIpKZKv527aQU/SWL1s3movyfRv7FJ2IvcvtZytpP7JbB6XWvk2JbAUF9BZ6lvYOiyIjBq0nelwBFwJFa04R628FERyTD5CNS1XYROzkJxAWlYLeNUA=
+	t=1734112431; cv=none; b=Y5Uplpsd5HFc7QAKP0H6ZLhlhukl7L8K5m8IvH/fpmotA4wyoLjoxx2BmyMGfRe2hh4lrNu3xiAvtpu2PpO8bw6XVNZegVHmqFdN0ndh5kJsKtWEvbFi1pCwBz99pbeg88yI4Vav2eafIADm10pXdgNaC8ThQ1V9cjCd61BEDZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734111503; c=relaxed/simple;
-	bh=mPbgWOcMGYlFCPvbpDL+TlJdKHPaIYsXuCeD6gLUKgw=;
-	h=Subject:Date:From:To:CC:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bj93e6qwknfHQ43sEZdyqq92JNB00p5vEXovkhVecGIKZwxtYVsLvVNNgGCTX0xj8ZKHZsxvlc2j8FJ6r0XGzAH73fjRSz+7/ub6azpuhOotlabBlaecOtClJr+OwrJKH24NeiO+mQBuG1Fh1ZfSadQBt4fxk8Q0tVlYkhVuPt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EOB/VNal; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734111503; x=1765647503;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=9REjgkF9b+T7p8wApCqWiWDX78cu++CuxonPuil9yEk=;
-  b=EOB/VNal83o+FkZBCxzJdDMS7iwcxTllNG784hLD2iXdmuxJeUamZaQO
-   MTj6S8A+AOxqGbQhQHtLLLDkt8Pe//3QQgWNLtuGXPv3jTEZsTyYO/8b8
-   ZCycFnePzSG1aKTVVKNLJAttaEwYJd4bp3mCvlCepFGcK4PuHSqAyRg9M
-   I=;
-X-IronPort-AV: E=Sophos;i="6.12,231,1728950400"; 
-   d="scan'208";a="455875939"
-Subject: Re: [PATCH v2 3/6] KVM: VMX: Handle vectoring error in
- check_emulate_instruction
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 17:38:20 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.44.209:63734]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.24.38:2525] with esmtp (Farcaster)
- id efb3ffaa-b66f-42a9-8f38-cda355b95b6d; Fri, 13 Dec 2024 17:38:18 +0000 (UTC)
-X-Farcaster-Flow-ID: efb3ffaa-b66f-42a9-8f38-cda355b95b6d
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 17:38:17 +0000
-Received: from EX19MTAUEB002.ant.amazon.com (10.252.135.47) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 17:38:17 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-c4413280.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.135.97) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Fri, 13 Dec 2024 17:38:17 +0000
-Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
-	by email-imr-corp-prod-pdx-all-2c-c4413280.us-west-2.amazon.com (Postfix) with ESMTP id C22B8A0005;
-	Fri, 13 Dec 2024 17:38:16 +0000 (UTC)
-Received: by dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (Postfix, from userid 29210185)
-	id 570D64E3D; Fri, 13 Dec 2024 17:38:16 +0000 (UTC)
-Date: Fri, 13 Dec 2024 17:38:16 +0000
-From: Ivan Orlov <iorlov@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Ivan Orlov <ivan.orlov0322@gmail.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <mingo@redhat.com>, <pbonzini@redhat.com>,
-	<shuah@kernel.org>, <tglx@linutronix.de>, <hpa@zytor.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <x86@kernel.org>, <pdurrant@amazon.co.uk>,
-	<dwmw@amazon.co.uk>
-Message-ID: <20241213173816.GA7768@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-References: <20241111102749.82761-1-iorlov@amazon.com>
- <20241111102749.82761-4-iorlov@amazon.com>
- <Z1nWykQ3e4D5e2C-@google.com>
- <2b75550c-0dc7-4bcc-ac60-9ad4402c17f8@gmail.com>
- <Z1o1013dUex8w9hK@google.com>
- <20241212164137.GA71156@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
- <Z1s8rWBrDhQaUHuw@google.com>
+	s=arc-20240116; t=1734112431; c=relaxed/simple;
+	bh=giLsrBe+eXIr2Z5RCc4V156ArPFV4LhVw7wYhIzIoXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=TjxITHd02ehDSerFxudBlFZyRpdunAWlFjdwEpTml/F3ia7cY54S+XaZBEMNQArNH9g/91aQh+x/zgF2CC+HvFbYHuCSM546jDCbcmwUWegQ2wiKaR03J3dZoh8r0fBaOxGQxgCUfq0gjYoOoF9ETeTC8uZnzLx3jXWTxUvScTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsGwzCps; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6830CC4CED0;
+	Fri, 13 Dec 2024 17:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734112430;
+	bh=giLsrBe+eXIr2Z5RCc4V156ArPFV4LhVw7wYhIzIoXE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=dsGwzCpsHyKSEp5dYNZqIU7VIPCf1+1BvfLnsNExHvF+KgHEKWxdDya2OH4Yb1KdO
+	 xjyNZsn9LGsL+5ubm9YwLy6PfO1o9HHK4GH9HnfKOzJfFxn/wgTn1u4o1aUgnAXEWn
+	 GkW8WT5ub+1C8izqxGJm68p92qbUmH0Zz6j12LSWYDuKvCO0PKAmAIFG8J70k4DM58
+	 BkmbpSUnFf6MODuN2bFpAw11s14p/2yDMhpzWn6yJuuKNDwnCnEugjbstu3jKrQ4hZ
+	 YZx0beo5hpke+CycdWaTs127pteqlLsHIM7BixvuD11GKP+6nU5Tvb5YUerVZXNZPP
+	 DkNTiHRBWPZvw==
+Date: Fri, 13 Dec 2024 11:53:49 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Philipp Stanner <pstanner@redhat.com>,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	amien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>, Kunwu Chan <chentao@kylinos.cn>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>
+Subject: Re: [PATCH v3 09/11] wifi: qtnfmac: use always-managed version of
+ pcim_intx()
+Message-ID: <20241213175349.GA3421319@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z1s8rWBrDhQaUHuw@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <87cyhvoox9.fsf@kernel.org>
 
-On Thu, Dec 12, 2024 at 11:42:37AM -0800, Sean Christopherson wrote:
-> Gah, I got my enums mixed up.  I conflated RET_PF_WRITE_PROTECTED with
-> EMULTYPE_WRITE_PF_TO_SP.  Ignore the above.
-> 
-> FWIW, KVM _can't_ unprotect and retry in the EMULTYPE_WRITE_PF_TO_SP case.  From
-> kvm_unprotect_and_retry_on_failure():
-> 
+[+cc personal address for Igor]
 
-Ah alright, I guess I get it now :) So, EMULTYPE_ALLOW_RETRY_PF is set
-whenever there is a PF when accessing write-protected page, and
-EMULTYPE_WRITE_PF_TO_SP is set when this access touches SPTE used to
-translate the write itself. If both are set, we can't unprotect and
-retry, and the latter can be set only if the former is set.
+On Fri, Dec 13, 2024 at 12:30:42PM +0200, Kalle Valo wrote:
+> Bjorn Helgaas <helgaas@kernel.org> writes:
+> 
+> > [cc->to: Igor]
+> >
+> > On Mon, Dec 09, 2024 at 02:06:31PM +0100, Philipp Stanner wrote:
+> >> pci_intx() is a hybrid function which can sometimes be managed through
+> >> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> >> port users to either an always-managed or a never-managed version.
+> >> 
+> >> qtnfmac enables its PCI-Device with pcim_enable_device(). Thus, it needs
+> >> the always-managed version.
+> >> 
+> >> Replace pci_intx() with pcim_intx().
+> >> 
+> >> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> >> Acked-by: Kalle Valo <kvalo@kernel.org>
+> >
+> > Hoping for an ack from Igor, too.
+> 
+> Igor hasn't been around for a while so I'm not expecting see an ack from
+> him, I think the whole qtnfmac driver should be removed in the future.
+> Feel free to take the patch as is.
 
-> Unprotect and re-execute is fine, what I'm worried about is *successfully*
-> emulating the instruction.  E.g.
-> 
->   1. CPU executes instruction X and hits a #GP.
->   2. While vectoring the #GP, a shadow #PF is taken.
->   3. On VM-Exit, KVM re-injects the #GP (see __vmx_complete_interrupts()).
->   4. KVM emulates because of the write-protected page.
->   5. KVM "successfully" emulates and also detects the #GP
->   6. KVM synthesizes a #GP, and because the vCPU already has injected #GP,
->      incorrectly escalates to a #DF.
-> 
-> The above is a bit contrived, but I think it could happen if the guest reused a
-> page that _was_ a page table, for a vCPU's kernel stack.
-> 
-
-Does it work like that only for contributory exceptions / page faults?
-In case if it's not #GP but (for instance) #UD, (as far as I understand)
-KVM will queue only one of them without causing #DF so it's gonna be
-valid?
-
-> > However, I'm not sure what happens if vectoring is caused by external
-> > interrupt: if we unprotect the page and re-execute the instruction,
-> > will IRQ be delivered nonetheless, or it will be lost as irq is
-> > already in ISR? Do we need to re-inject it in such a case?
-> 
-> In all cases, the event that was being vectored is re-injected.  Restarting from
-> scratch would be a bug.  E.g. if the cause of initial exception was "fixed", say
-> because the initial exception was #BP, and the guest finished patching out the INT3,
-> then restarting would execute the _new_ instruction, and the INT3 would be lost.
-> 
-
-Cool, that is what I was concerned about, glad that it is already
-implemented :)
-
-> 
-> As far as unprotect+retry being viable, I think we're on the same page.  What I'm
-> getting at is that I think KVM should never allow emulating on #PF when the #PF
-> occurred while vectoring.  E.g. this:
-> 
->   static inline bool kvm_can_emulate_event_vectoring(int emul_type)
->   {
->         return !(emul_type & EMULTYPE_PF);
->   }
-> 
-
-Yeah, I agree. I'll post a V3 with suggested fixes (after running all of the
-selftests to be sure that it doesn't break anything).
-
-> and then I believe this?  Where this diff can be a separate prep patch (though I'm
-> pretty sure it's technically pointless without the vectoring angle, because shadow
-> #PF can't coincide with any of the failure paths for kvm_check_emulate_insn()).
-> 
-
-Looks good. If you don't mind, I could add this patch to the series with `Suggested-by`
-tag since it's neccessary to allow unprotect+retry in case of shadow #PF during
-vectoring.
-
---
-Kind regards,
-Ivan Orlov
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 07c6f1d5323d..63361b2da450 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9107,6 +9107,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->                 if (r == X86EMUL_RETRY_INSTR || r == X86EMUL_PROPAGATE_FAULT)
->                         return 1;
-> 
-> +               if (kvm_unprotect_and_retry_on_failure(vcpu, cr2_or_gpa,
-> +                                                      emulation_type))
-> +                       return 1;
-> +
->                 if (r == X86EMUL_UNHANDLEABLE_VECTORING_IO) {
->                         kvm_prepare_event_vectoring_exit(vcpu, cr2_or_gpa);
->                         return 0;
-> 
+Thanks, Kalle, will do.
 
