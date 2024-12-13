@@ -1,73 +1,72 @@
-Return-Path: <kvm+bounces-33774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25EFE9F16FB
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 21:02:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6309F9F1709
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 21:05:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 641687A1E37
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:02:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8D9D1884567
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF2D1F4E2D;
-	Fri, 13 Dec 2024 19:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8501F709B;
+	Fri, 13 Dec 2024 19:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhnRbkqY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I6rNM07Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474D1F37DB
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 19:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3891F63C0
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 19:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734119854; cv=none; b=ev3RGrgItCMhPSFRRI7jCyQzlKUGY5KzXgqVulkRrngBTUh4EHKFetErcdWyb7H/Xe1viRESjdcmruZYWOD7PkwasGQEjLTEbHejtLldAO8BXFOQEsT94bYfjfmPiIqEkjNXSGvSVFLW0xT4QhjgxPNs3XJ/5E9hZPteUKv6e7M=
+	t=1734119860; cv=none; b=dT8I5knliHrwtPxoIYFCQGa4xwbNYrDYPuPM/gwmdhI24mXal6erVVKTXcRZbwP7CJBriMD9h4NS06Obo8leHxVoJkJ6nKg8AVvn0OlvN1LE1qlnbylMSQUPeuKZKJc1XAdh9H3wb5EzxNzu2f2EArb7+YErbVQ9+q7/JMeDMPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734119854; c=relaxed/simple;
-	bh=bJG+SH41EJE43YyFPXyqT4pAiSbTZ9+R3eBWXrRChQA=;
+	s=arc-20240116; t=1734119860; c=relaxed/simple;
+	bh=lYNeaGQW+1p55Wfv52naT4o289TatlVExtv8p0xpiDE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lXD705YBNwuidBpNzElYY5KTCmtBXGlt6G9R1Xifhap2SjA+WpZ+Lpbi1kTUadjlmGFbM75fljiv/xMmMBLoYsME3hZoiY13eHT2iSjrs2CG8vZdgq/4O2feCFHD7Q5lNsEaMeXw/xGlBagguHlJlMcV0XUlEWui/r4iXevh8Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhnRbkqY; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=Aor8SXjG4/TNg4rZ3QUA/cwg2Lu1ky6Piunq2V/qUcVyMq4JsjTKZj/ZvPdbQbaQHZaEC23zqXM4WXIwp+w8sbgfUNJIH70P3iBU/tABDq1Kq9p+WYorcXkTvUaDOoA4K6kn4U3E1n6dl8SjdexK5BUph+uUYVctkNmw1qvo+3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I6rNM07Q; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734119851;
+	s=mimecast20190719; t=1734119858;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JwM84jzGYRRxlX/HMzFiLVkOP2ik5dUY8az+bzW03h8=;
-	b=NhnRbkqYrfZBUFmEC4vUFzzHLDvK1vKvwkrxjoXeyS5gmBmWi0FMKNEr5a3rx0njlM5HSX
-	S0KgEvwXcE5Fi52ucvcyOHEpti0BIRCo1kLzEUCl5bQNhyA/u6wAgc4QgHHwuexYphnk97
-	x7eGWsFzPOGTpNBwHlrPsOckcB1N/m0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=KwsFXFbqqb+aPaQsD7+tWuQAv6MSVcF8+RKXbUaF3CQ=;
+	b=I6rNM07Q5dj7iusQg6JkUGR4ixgdaihnKLrgnFaA2Uuz/+LDQAE0OKb2J71BVIcmNHdBnw
+	uDlHpVjJ20eGLBpL/GB9HTQSjTBaz/DElND6SBDtt2n+9BCJdR24C1KGFD3vJtu2Mne3hT
+	0VQ36948wJ29tr2y5QAPtVPkevHgsAU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-622-9TCrqlqaMR-9NVyxlPsDzg-1; Fri,
- 13 Dec 2024 14:57:28 -0500
-X-MC-Unique: 9TCrqlqaMR-9NVyxlPsDzg-1
-X-Mimecast-MFC-AGG-ID: 9TCrqlqaMR-9NVyxlPsDzg
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-277-kDunQUQEMAyaud-gyCPhXQ-1; Fri,
+ 13 Dec 2024 14:57:30 -0500
+X-MC-Unique: kDunQUQEMAyaud-gyCPhXQ-1
+X-Mimecast-MFC-AGG-ID: kDunQUQEMAyaud-gyCPhXQ
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 732C919560B4;
-	Fri, 13 Dec 2024 19:57:26 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 968D81956087;
+	Fri, 13 Dec 2024 19:57:27 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 62F791956089;
-	Fri, 13 Dec 2024 19:57:25 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A54E01956086;
+	Fri, 13 Dec 2024 19:57:26 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: yan.y.zhao@intel.com,
 	isaku.yamahata@intel.com,
 	binbin.wu@linux.intel.com,
-	rick.p.edgecombe@intel.com,
-	Sean Christopherson <seanjc@google.com>
-Subject: [PATCH 10/18] KVM: x86/tdp_mmu: Introduce KVM MMU root types to specify page table type
-Date: Fri, 13 Dec 2024 14:57:03 -0500
-Message-ID: <20241213195711.316050-11-pbonzini@redhat.com>
+	rick.p.edgecombe@intel.com
+Subject: [PATCH 11/18] KVM: x86/tdp_mmu: Take root in tdp_mmu_for_each_pte()
+Date: Fri, 13 Dec 2024 14:57:04 -0500
+Message-ID: <20241213195711.316050-12-pbonzini@redhat.com>
 In-Reply-To: <20241213195711.316050-1-pbonzini@redhat.com>
 References: <20241213195711.316050-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -82,159 +81,87 @@ X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Define an enum kvm_tdp_mmu_root_types to specify the KVM MMU root type [1]
-so that the iterator on the root page table can consistently filter the
-root page table type instead of only_valid.
+Take the root as an argument of tdp_mmu_for_each_pte() instead of looking
+it up in the mmu. With no other purpose of passing the mmu, drop it.
 
-TDX KVM will operate on KVM page tables with specified types.  Shared page
-table, private page table, or both.  Introduce an enum instead of bool
-only_valid so that we can easily enhance page table types applicable to
-shared, private, or both in addition to valid or not.  Replace
-only_valid=false with KVM_ANY_ROOTS and only_valid=true with
-KVM_ANY_VALID_ROOTS.  Use KVM_ANY_ROOTS and KVM_ANY_VALID_ROOTS to wrap
-KVM_VALID_ROOTS to avoid further code churn when direct vs mirror root
-concepts are introduced in future patches.
+Future changes will want to change which root is used based on the context
+of the MMU operation. So change the callers to pass in the root currently
+used, mmu->root.hpa in a preparatory patch to make the later one smaller
+and easier to review.
 
-Link: https://lore.kernel.org/kvm/ZivazWQw1oCU8VBC@google.com/ [1]
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Message-ID: <20240718211230.1492011-11-rick.p.edgecombe@intel.com>
+Message-ID: <20240718211230.1492011-12-rick.p.edgecombe@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 42 +++++++++++++++++++++-----------------
- arch/x86/kvm/mmu/tdp_mmu.h |  7 +++++++
- 2 files changed, 30 insertions(+), 19 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index fbf835469390..965fa3b5a00b 100644
+index 965fa3b5a00b..297d05e5a4cd 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -92,9 +92,13 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
+@@ -647,8 +647,8 @@ static inline void tdp_mmu_iter_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 			continue;					\
+ 		else
  
--static bool tdp_mmu_root_match(struct kvm_mmu_page *root, bool only_valid)
-+static bool tdp_mmu_root_match(struct kvm_mmu_page *root,
-+			       enum kvm_tdp_mmu_root_types types)
- {
--	if (only_valid && root->role.invalid)
-+	if (WARN_ON_ONCE(!(types & KVM_VALID_ROOTS)))
-+		return false;
-+
-+	if (root->role.invalid && !(types & KVM_INVALID_ROOTS))
- 		return false;
+-#define tdp_mmu_for_each_pte(_iter, _kvm, _mmu, _start, _end)		\
+-	for_each_tdp_pte(_iter, _kvm, root_to_sp(_mmu->root.hpa), _start, _end)
++#define tdp_mmu_for_each_pte(_iter, _kvm, _root, _start, _end)	\
++	for_each_tdp_pte(_iter, _kvm, _root, _start, _end)
  
- 	return true;
-@@ -102,17 +106,17 @@ static bool tdp_mmu_root_match(struct kvm_mmu_page *root, bool only_valid)
- 
- /*
-  * Returns the next root after @prev_root (or the first root if @prev_root is
-- * NULL).  A reference to the returned root is acquired, and the reference to
-- * @prev_root is released (the caller obviously must hold a reference to
-- * @prev_root if it's non-NULL).
-+ * NULL) that matches with @types.  A reference to the returned root is
-+ * acquired, and the reference to @prev_root is released (the caller obviously
-+ * must hold a reference to @prev_root if it's non-NULL).
-  *
-- * If @only_valid is true, invalid roots are skipped.
-+ * Roots that doesn't match with @types are skipped.
-  *
-  * Returns NULL if the end of tdp_mmu_roots was reached.
+ static inline bool __must_check tdp_mmu_iter_need_resched(struct kvm *kvm,
+ 							  struct tdp_iter *iter)
+@@ -1078,8 +1078,8 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
   */
- static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 					      struct kvm_mmu_page *prev_root,
--					      bool only_valid)
-+					      enum kvm_tdp_mmu_root_types types)
+ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  {
- 	struct kvm_mmu_page *next_root;
+-	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct kvm *kvm = vcpu->kvm;
++	struct kvm_mmu_page *root = root_to_sp(vcpu->arch.mmu->root.hpa);
+ 	struct tdp_iter iter;
+ 	struct kvm_mmu_page *sp;
+ 	int ret = RET_PF_RETRY;
+@@ -1090,7 +1090,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  
-@@ -133,7 +137,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 						   typeof(*next_root), link);
+ 	rcu_read_lock();
  
- 	while (next_root) {
--		if (tdp_mmu_root_match(next_root, only_valid) &&
-+		if (tdp_mmu_root_match(next_root, types) &&
- 		    kvm_tdp_mmu_get_root(next_root))
- 			break;
+-	tdp_mmu_for_each_pte(iter, kvm, mmu, fault->gfn, fault->gfn + 1) {
++	tdp_mmu_for_each_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
+ 		int r;
  
-@@ -158,20 +162,20 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-  * If shared is set, this function is operating under the MMU lock in read
-  * mode.
-  */
--#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _only_valid)	\
--	for (_root = tdp_mmu_next_root(_kvm, NULL, _only_valid);		\
-+#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _types)	\
-+	for (_root = tdp_mmu_next_root(_kvm, NULL, _types);		\
- 	     ({ lockdep_assert_held(&(_kvm)->mmu_lock); }), _root;		\
--	     _root = tdp_mmu_next_root(_kvm, _root, _only_valid))		\
-+	     _root = tdp_mmu_next_root(_kvm, _root, _types))		\
- 		if (_as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id) {	\
- 		} else
- 
- #define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id)	\
--	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, true)
-+	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, KVM_VALID_ROOTS)
- 
- #define for_each_tdp_mmu_root_yield_safe(_kvm, _root)			\
--	for (_root = tdp_mmu_next_root(_kvm, NULL, false);		\
-+	for (_root = tdp_mmu_next_root(_kvm, NULL, KVM_ALL_ROOTS);		\
- 	     ({ lockdep_assert_held(&(_kvm)->mmu_lock); }), _root;	\
--	     _root = tdp_mmu_next_root(_kvm, _root, false))
-+	     _root = tdp_mmu_next_root(_kvm, _root, KVM_ALL_ROOTS))
- 
- /*
-  * Iterate over all TDP MMU roots.  Requires that mmu_lock be held for write,
-@@ -180,18 +184,18 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-  * Holding mmu_lock for write obviates the need for RCU protection as the list
-  * is guaranteed to be stable.
-  */
--#define __for_each_tdp_mmu_root(_kvm, _root, _as_id, _only_valid)		\
-+#define __for_each_tdp_mmu_root(_kvm, _root, _as_id, _types)			\
- 	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)		\
- 		if (kvm_lockdep_assert_mmu_lock_held(_kvm, false) &&		\
- 		    ((_as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id) ||	\
--		     !tdp_mmu_root_match((_root), (_only_valid)))) {		\
-+		     !tdp_mmu_root_match((_root), (_types)))) {			\
- 		} else
- 
- #define for_each_tdp_mmu_root(_kvm, _root, _as_id)			\
--	__for_each_tdp_mmu_root(_kvm, _root, _as_id, false)
-+	__for_each_tdp_mmu_root(_kvm, _root, _as_id, KVM_ALL_ROOTS)
- 
- #define for_each_valid_tdp_mmu_root(_kvm, _root, _as_id)		\
--	__for_each_tdp_mmu_root(_kvm, _root, _as_id, true)
-+	__for_each_tdp_mmu_root(_kvm, _root, _as_id, KVM_VALID_ROOTS)
- 
- static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+ 		if (fault->nx_huge_page_workaround_enabled)
+@@ -1739,14 +1739,14 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+ 			 int *root_level)
  {
-@@ -1159,7 +1163,7 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
++	struct kvm_mmu_page *root = root_to_sp(vcpu->arch.mmu->root.hpa);
+ 	struct tdp_iter iter;
+-	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	gfn_t gfn = addr >> PAGE_SHIFT;
+ 	int leaf = -1;
+ 
+ 	*root_level = vcpu->arch.mmu->root_role.level;
+ 
+-	tdp_mmu_for_each_pte(iter, vcpu->kvm, mmu, gfn, gfn + 1) {
++	tdp_mmu_for_each_pte(iter, vcpu->kvm, root, gfn, gfn + 1) {
+ 		leaf = iter.level;
+ 		sptes[leaf] = iter.old_spte;
+ 	}
+@@ -1768,11 +1768,11 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+ u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 					u64 *spte)
  {
- 	struct kvm_mmu_page *root;
++	struct kvm_mmu_page *root = root_to_sp(vcpu->arch.mmu->root.hpa);
+ 	struct tdp_iter iter;
+-	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	tdp_ptep_t sptep = NULL;
  
--	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
-+	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, KVM_ALL_ROOTS)
- 		flush = tdp_mmu_zap_leafs(kvm, root, range->start, range->end,
- 					  range->may_block, flush);
- 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 51884fc6a512..a2028d036c0c 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -19,6 +19,13 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
- 
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root);
- 
-+enum kvm_tdp_mmu_root_types {
-+	KVM_INVALID_ROOTS = BIT(0),
-+
-+	KVM_VALID_ROOTS = BIT(1),
-+	KVM_ALL_ROOTS = KVM_VALID_ROOTS | KVM_INVALID_ROOTS,
-+};
-+
- bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush);
- bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
+-	tdp_mmu_for_each_pte(iter, vcpu->kvm, mmu, gfn, gfn + 1) {
++	tdp_mmu_for_each_pte(iter, vcpu->kvm, root, gfn, gfn + 1) {
+ 		*spte = iter.old_spte;
+ 		sptep = iter.sptep;
+ 	}
 -- 
 2.43.5
 
