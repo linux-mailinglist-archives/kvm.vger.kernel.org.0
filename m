@@ -1,145 +1,187 @@
-Return-Path: <kvm+bounces-33722-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33723-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B65D9F0A22
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:54:28 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F40CC188CDFB
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 10:54:12 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEC01C3C0F;
-	Fri, 13 Dec 2024 10:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LsRap7bg"
-X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC5969F0B34
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 12:34:02 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA21C3BEE
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 10:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDAA2834E3
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:34:01 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0151DF265;
+	Fri, 13 Dec 2024 11:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZSt1HQDo"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072A51AB528
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734087242; cv=none; b=jX7S78Z36EHY/V81F2ryiKsWKO3XsKEUwLJ/CtLXhkiC7sHijbUeV+rXWAJGtPzc/MDBepnSNQNMR/Ov9kh3K39Tej1B33oBO7+aWBgfDvS2Qi5QMVYImfmx0wQKOBf7nfrZekldwO3Ztg33QmlG7d6knxmcRTpRo8/9bxC3HYY=
+	t=1734089597; cv=none; b=av39605wZAsQ2R7fhz+ZCsuUI4AmRLY82ApAgAiGf4igSLP6fpCSgiLGO5RGMr/cy5MTxUKAPslOtdY73qztuJ68qgrpCqwdJ7H0m7Xx+a1Yb5T+A4csm7mNXs+3/U2w5mOvRCNa2lcORaRBUyWnDGYh27A9k9dM1cYorRhkYHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734087242; c=relaxed/simple;
-	bh=okqpacIbcOlbR8x92errleYPqAKmSIoPXXz7pzDyyqI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aDuUJXPyy3ko6TlbDqGZndaaI3obh06s3nMIs4QYEXLNXRI7McuWe0poJqSO+EYIe8Pl4JcHeNso1W1VSQG0E/cj9+vpACpY/VDMHaQNOUPhMZijbbzzUmr1HW9QhEywo4/hm7WSY040vngSoofL2fqad/l4vysd71b+5uN0cv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LsRap7bg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734087238;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tZP36RlbgyjCPid9qIB9xpaONyqLFu9PuB4d/BcSVyY=;
-	b=LsRap7bgoSHcgHTV4oLkKdWtl2Ym8iIwWt5OOyJOBnobwgAMey7ZYnyy4am7/9W6nI1ucV
-	55wsvAENP7WLm7W/IXpeedhuu6RsTWjZ0vLpFo71ZVrZ9WYCBkUaCdN+cJcRsLSJZxfpiT
-	RwQBpK3pp0hK3TJ/fxV+/bvXYim3ajI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-8-YaCI1KXrOnSgjFzCdZJLAA-1; Fri, 13 Dec 2024 05:53:57 -0500
-X-MC-Unique: YaCI1KXrOnSgjFzCdZJLAA-1
-X-Mimecast-MFC-AGG-ID: YaCI1KXrOnSgjFzCdZJLAA
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa691c09772so35397466b.1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 02:53:56 -0800 (PST)
+	s=arc-20240116; t=1734089597; c=relaxed/simple;
+	bh=tbP+jC6o0WUbBs5wzvPexsjiCSh2sPVpbTXynXjrfGk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CFns60WdUSZSrN2+2N8WEiuxkrAbL0r+QTM4yPVWVTianigJDdP/al0NgoG1DYtR3Ay+QkVNYmPImgzqtYRqSJqxkdUY2nvuW1KcCLkQcvszsuvNGANzn0jXy59XYrN7sdMwPVWgYLUsfXRfhlGqEC4/dBxNQzeFf92RvKbTvac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=ZSt1HQDo; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-20cf3e36a76so15665725ad.0
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 03:33:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1734089595; x=1734694395; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=26MbCcxBXRObwdyBKZjlPQXxYB9MTH5C48d0Ryy4x64=;
+        b=ZSt1HQDoJSRx7q43X8bBcy0emGKMjRnLv7yf4uUnJa2vL+ZoQcI3wlPhquGpsp6ND9
+         e/vntTexPmo+AWurBu2bPGvA3pwBdl3NhCLsZa65kWLFvV0tG3bB1nPjMvDWkUv/hHtJ
+         5ZZ3T0WiLkpYM8fpV0CMa34FwIXrXiBiEtQKExKFjJREoVmka0FY1YV4dG3gbzQqgAsu
+         mIhPaY6Wl5qNE/B9fKzkQL72Yp4KGzRnuj2zyMSsmsLptYk9/6x4XJCIQCuPKMQZQ2t7
+         PTz0NF+xNSTxvlnkQOqRvnToyZATqzaDvYZNPogv9QAMR5d4WGq0x58fXsmxxl1HPSa6
+         lvsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734087236; x=1734692036;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZP36RlbgyjCPid9qIB9xpaONyqLFu9PuB4d/BcSVyY=;
-        b=hSETeNd21gcHrYyZDU/0ZAqhsc7rmHPPAa+fEISPHVELrXV5IzkJSTQCOw8JME8kMU
-         fvcJWO92Jht/oUaGyAa3U5C3JGIZI3rQgUjJ+SKDUr1KOi9Q7ls40yVT6XB8pSyqg5C7
-         spF4OmeZGI7X/TcAcm9yd2ICB6E9FvduzeVlzWKPnC1+GU/z63+Xwa/1AckcOjrcEDVf
-         X3NWD3Ro3u/RRSU9Twsrncf8wEGCfG8DXkpmfTUWNQG9/wmnVXYVxkRd7tgmnj2/fclG
-         60BffaR7lFGJwVMdNzM7UW2KAmp1jU97fL0ZNI5uMAWmZqnG19nOeBKNSjEQD2WWHBhy
-         bMNQ==
-X-Gm-Message-State: AOJu0Yw5Hx51kvPu7fYUdWhGYS2qDoKy74h8NQSfTm3iOlMm7cIL1OJo
-	5uWyVc24KD23r1uUBpLLktSvmnWNTp3prY6/Fo5Pl8awk+4EKo1YcvtRPL0RjkHdL/CcHNhK0sS
-	PidAeRdBd84dClL07wGAgGH22qwI6FcffKm1Fu9heA5cLT9r+Pg==
-X-Gm-Gg: ASbGnct/ZlWtZm5CIyyqBrFjsrOPtTHXZiQ0rIbl9K+B/OnXUnpPvLpQ2ay9U9jJJ7B
-	gI+Ms1lz+AzGT/dha7wH+Tt60bi4LPIXEB2S524SzfuKGT7sW4Znll3vPvrnd8gAESXLx9aaO8I
-	ux5dMvne5Tq+qnh2EOLbLlz7+pDtDE/tiXybWgDelRklwfULUKsTHdPs2+5zjIa/kpaP5HnR6oW
-	YCO2o4imr6B+l+mZuCieFTCQ0VneT3IsdrgNeGztHFuOgDTG8s=
-X-Received: by 2002:a17:907:7853:b0:aa6:762e:8c20 with SMTP id a640c23a62f3a-aab77e96883mr225245566b.43.1734087236008;
-        Fri, 13 Dec 2024 02:53:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHpmtuh+bOXDCMGt5rVmLOBisZQNKYOnKYDf15tmo1bduSNwY/0Lm8b87Kpa+9sghGVqcOKLg==
-X-Received: by 2002:a17:907:7853:b0:aa6:762e:8c20 with SMTP id a640c23a62f3a-aab77e96883mr225242366b.43.1734087235662;
-        Fri, 13 Dec 2024 02:53:55 -0800 (PST)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa69f639f59sm513076066b.193.2024.12.13.02.53.54
+        d=1e100.net; s=20230601; t=1734089595; x=1734694395;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=26MbCcxBXRObwdyBKZjlPQXxYB9MTH5C48d0Ryy4x64=;
+        b=pI6D06h1VktH2/wwcmJnureDfrewCy50v/s5PUBFsJSD5dZt8wrlstudsfvUubhLyq
+         CKh7RikOf3AZ0VNORwQbHle9eawwOWCxmqKKxDy+HXXNDqfycBkk6CLHkWBWjP3PPghH
+         nP8187I88E4aeYx6uk9k5FLzD5AuCrBPL/Rr6nxmJGLvhS9VCJLzt9aT4HF34pLIzvBI
+         Um3U4Lc/4zSGGG1PCtHqvINkVufNGNjLVT2yuRHE0IKwrkEySGGC3UC+076W23XTUHbC
+         aLB9szAzRXvSdZQMTmV9rK6KslEH9i+Biu4OSFq+Dn4/K8p3lvxlatQpiShR5MpSIkqO
+         pXsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWY62vCv+wvLDm56+zYlogPNd3tYzS0roIS79+gS34qtunrwH9ri9/h7dt3M418Jlt9xVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF+6FUvej0S9+3IPu/MrpAf8HtsdsWPYuhu2xqTO13AENDZPtA
+	NQDphyXKX10VOiWmKaV1jRuNgnNcqbPxHsn7Zy3aEI82xvcSqpckHY7z7HO2NU0=
+X-Gm-Gg: ASbGnctdROPf/9tCqAJ2F7oreZYOqulR9RfO0gTJ/DVW3Kt/NJX5cDbf0aL8vzfqVb0
+	aP2nGu6EK3SHOGY8FHPSp+16MkwfbC3a8j2HVQBF8okxeVwLJc6Mk1iE6SI99XPRNfr56VTGvtQ
+	jT+kUVZeZfMCbEsO7ou+HIJj09Atj+CrkG3lN3hu/JhqsYRANlBCAHXY9VsYD9G6/CMVfI8AsvJ
+	FF4SGUsdXealZI9o/YQ+6Qoc2Byq8gSnq4A+imRAaJlRMQPUvD4tk0=
+X-Google-Smtp-Source: AGHT+IE2aHmaFHTR9iBiCUjqMgt+u4ssTP/m0KwR0xBzwYlNhga7euk988OdWGvjpY5KeC8o/0oqRQ==
+X-Received: by 2002:a17:902:d50c:b0:215:bc30:c952 with SMTP id d9443c01a7336-2189298a144mr36097955ad.6.1734089595266;
+        Fri, 13 Dec 2024 03:33:15 -0800 (PST)
+Received: from [127.0.1.1] ([210.176.154.34])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21631bd2c2dsm103327125ad.263.2024.12.13.03.33.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 02:53:55 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Jarkko
- Sakkinen <jarkko@kernel.org>
-Cc: kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, Hou
- Wenlong <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>,
- Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang
- <weijiang.yang@intel.com>, Robert Hoo <robert.hoo.linux@gmail.com>
-Subject: Re: [PATCH v3 01/57] KVM: x86: Use feature_bit() to clear
- CONSTANT_TSC when emulating CPUID
-In-Reply-To: <20241128013424.4096668-2-seanjc@google.com>
-References: <20241128013424.4096668-1-seanjc@google.com>
- <20241128013424.4096668-2-seanjc@google.com>
-Date: Fri, 13 Dec 2024 11:53:54 +0100
-Message-ID: <87ed2bsvjx.fsf@redhat.com>
+        Fri, 13 Dec 2024 03:33:14 -0800 (PST)
+From: Max Hsu <max.hsu@sifive.com>
+Subject: [PATCH RFC v4 0/3] riscv: add Svukte extension
+Date: Fri, 13 Dec 2024 19:33:06 +0800
+Message-Id: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHIbXGcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyTHQUlJIzE
+ vPSU3UzU4B8JSMDIxNDI0Nj3ZTUMt3cxIoM3eKy0uySVN0yE11jE0MDw9RkSxPTVEsloMaCotS
+ 0zAqwodFKQW7OSrG1tQCcvFY+aQAAAA==
+X-Change-ID: 20241213-dev-maxh-svukte-v4-34101ec945e9
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>
+Cc: Palmer Dabbelt <palmer@sifive.com>, Conor Dooley <conor@kernel.org>, 
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ kvm-riscv@lists.infradead.org, Max Hsu <max.hsu@sifive.com>, 
+ Samuel Holland <samuel.holland@sifive.com>, 
+ Deepak Gupta <debug@rivosinc.com>, Alexandre Ghiti <alexghiti@rivosinc.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3076; i=max.hsu@sifive.com;
+ h=from:subject:message-id; bh=tbP+jC6o0WUbBs5wzvPexsjiCSh2sPVpbTXynXjrfGk=;
+ b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBnXBt3nDotuBhQJRSQUC7kSPKHLLlxqASJuOrQK
+ U5Px7fhMk6JAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZ1wbdwAKCRDSA/2dB3lA
+ vcR4C/4irx2RT/e5bqfqAIm563+xO9z5R4UvXSir/eIK9aVaHYeMVqEdWbPauFsH5lGk+WLVpEh
+ B9p8z3ebch6wZM/EHolPkw5wCN6bU7kouNEK4mTX9ciVvsgk2viGkFg2kuwQvxkDyPPTI0lG8py
+ 1O3tqm3kG9nv6YuBgJE/jFYHQK7AWqyGq+Z97fxy1+je3mdJ360SkwAJwLJruDet2/B39bd0wud
+ Ye+9EUv44RY8nUGvq1E2teWhCcDGwysMSPwo1euaAG98AGzu82QpJMNE6CVjTcjryau0iu9eXBi
+ XYoOpu/POI0s/hE8t+RQpofxtx7Zxn0jbtV98fsNKJGCkHm2jPIwTetFCcRnxQ6+qY1Rv0FSUr3
+ rFMddvmyn+KHaBt0yccQpl8GOFWWUtn2G75N80wP5IUUW0H/6i/bCh45IGKSEVIMM/elBip6kNJ
+ 6sczUcrwCMH7g+b/5nuLrefqZXCg3p8Fk8/PBw0e9gXgz5aFBEX3c4jf/BR6ynSkuAHds=
+X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
+ fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
 
-Sean Christopherson <seanjc@google.com> writes:
+RISC-V privileged spec will be added with Svukte extension [1] 
 
-> When clearing CONSTANT_TSC during CPUID emulation due to a Hyper-V quirk,
-> use feature_bit() instead of SF() to ensure the bit is actually cleared.
-> SF() evaluates to zero if the _host_ doesn't support the feature.  I.e.
-> KVM could keep the bit set if userspace advertised CONSTANT_TSC despite
-> it not being supported in hardware.
+Svukte introduce senvcfg.UKTE and hstatus.HUKTE bitfield.
+which makes user-mode access to supervisor memory raise page faults
+in constant time, mitigating attacks that attempt to discover the 
+supervisor software's address-space layout.
 
-FWIW, I would strongly discourage such setups, all sorts of weird hangs
-will likely be observed with Windows guests if TSC rate actually
-changes.
+In the Linux kernel, since the hstatus.HU bit is not enabled,
+the following patches only enable the use of senvcfg.UKTE.
 
->
-> Note, translating from a scattered feature to a the hardware version is
-> done by __feature_translate(), not SF().  The sole purpose of SF() is to
-> check kernel support for the scattered feature, *before* translation.
->
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/cpuid.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 097bdc022d0f..776f24408fa3 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1630,7 +1630,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->  				*ebx &= ~(F(RTM) | F(HLE));
->  		} else if (function == 0x80000007) {
->  			if (kvm_hv_invtsc_suppressed(vcpu))
-> -				*edx &= ~SF(CONSTANT_TSC);
-> +				*edx &= ~feature_bit(CONSTANT_TSC);
->  		}
->  	} else {
->  		*eax = *ebx = *ecx = *edx = 0;
+For Guest environments, because a Guest OS (not limited to Linux)
+may hold mappings from GVA to GPA, the Guest OS should decide
+whether to enable the protection provided by the Svukte extension.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Since the Guest OS may utilize the Svukte extension simply by setting
+the senvcfg.UKTE without any trap to host. In the view of VMM, the
+Svukte extension should be always presented. Therefore adding an
+extra entry in kvm_riscv_vcpu_isa_disable_allowed().
 
+If the Guest environment wants to change senvcfg.UKTE, KVM already
+provides the senvcfg CSR swap support via 
+kvm_riscv_vcpu_swap_in_(host|guest)_state.
+Thus, there is no concern about the Guest OS affecting the Host OS. 
+
+The following patches add 
+- dt-binding of Svukte ISA string
+- CSR bit definition, ISA detection, senvcfg.UKTE enablement in kernel
+- KVM ISA support for Svukte extension
+
+Changes in v4:
+- rebase on riscv/for-next
+- add kvm_riscv_vcpu_isa_disable_allowed() entry addressed by Anup
+  and Andrew from v2/v3 patches.
+  - update the cover letter for the detailed reason
+- update the commit message on dt-binding for the Svukte ISA string
+- Link to v3: https://lore.kernel.org/all/20241120-dev-maxh-svukte-v3-v3-0-1e533d41ae15@sifive.com/
+
+Changes in v3: 
+- rebase on riscv/for-next
+- fixed typo in the dt-binding for the Svukte ISA string
+- updated the commit message for KVM support for the Svukte extension
+- Link to v2: https://lore.kernel.org/all/20240927-dev-maxh-svukte-rebase-2-v2-0-9afe57c33aee@sifive.com/
+
+Changes in v2: 
+- rebase on riscv/for-next (riscv-for-linus-6.12-mw1)
+- modify the description of dt-binding on Svukte ISA string
+- Link to v1: https://lore.kernel.org/all/20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com/
+
+Link: https://github.com/riscv/riscv-isa-manual/pull/1564 [1] 
+
+Signed-off-by: Max Hsu <max.hsu@sifive.com>
+
+---
+Max Hsu (3):
+      dt-bindings: riscv: Add Svukte entry
+      riscv: Add Svukte extension support
+      riscv: KVM: Add Svukte extension support for Guest/VM
+
+ Documentation/devicetree/bindings/riscv/extensions.yaml | 9 +++++++++
+ arch/riscv/include/asm/csr.h                            | 2 ++
+ arch/riscv/include/asm/hwcap.h                          | 1 +
+ arch/riscv/include/uapi/asm/kvm.h                       | 1 +
+ arch/riscv/kernel/cpufeature.c                          | 5 +++++
+ arch/riscv/kvm/vcpu_onereg.c                            | 2 ++
+ 6 files changed, 20 insertions(+)
+---
+base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+change-id: 20241213-dev-maxh-svukte-v4-34101ec945e9
+
+Best regards,
 -- 
-Vitaly
+Max Hsu <max.hsu@sifive.com>
 
 
