@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-33683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 604479F0277
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 02:58:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23B26188508B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 01:58:18 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA1B3B192;
-	Fri, 13 Dec 2024 01:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a1q+A77R"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF7BB9F0275
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 02:56:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB85B2E62B
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 01:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FFFB284BC9
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 01:56:25 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266EC38382;
+	Fri, 13 Dec 2024 01:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IMUf7F2I"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757AB8F6E
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 01:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734055090; cv=none; b=ddmauk878TeaSBNxqI8REtg7QDOVHGruarxqFeiyzFTJbheYV591cYxh45yuM7mJjNuyKHXwxEeXxE7XAJDBE3JoP0PnaAnoV4PKp/lJMAxVZmqjx7kdvtZDpaXV/IGyHnrV1EfIGgCWkuOW+SVj63KAHsMOpO+VxAvGtkrGxXc=
+	t=1734054980; cv=none; b=sf7jB5/lmcagqyjCuT/Uzt46Y+hWKNMaO9X+7hoTtbj2TBveQj5WC7heYKMxKE1Sik38dTVxOEPtUXuOhNxBGN0zsgHNV8Ehaa3rvRqk+0xZGjfvAzlTom1ANJCYa9Z1CKASlXIYaNkzKhxny8thDtNlJkfaddaaabtbdMGGgXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734055090; c=relaxed/simple;
-	bh=rEh6nEUB6b2gWFVudTedi+7SvZpJ1yXIcaAEvQ6Ls4c=;
+	s=arc-20240116; t=1734054980; c=relaxed/simple;
+	bh=NyAt7fLg31sOOP5MsQWn9EgGROvizgBib4DX+ww1UBw=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Zz9CqMWItmpfUXFfci6Wfoo5i/3c6BfYnCeFuy76GBhDcTTuZ1cN/a/bjoNTjlFtd3IeUcyYxLrvesx8SSjkLcGiIG9X7mcf8l1kXCyAbj+8FeACQF65bM51RgjaUZtx7Y32bk+rvbWd0vjBkgQM+uTlKR/FLv+F157KM7Xf/Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a1q+A77R; arc=none smtp.client-ip=192.198.163.9
+	 In-Reply-To:Content-Type; b=ZgqnEixKsO0zJz8Fh+XoRPWA+cTWLVci5I/lxFAKC5rgMVq2oKkLEzfqLY9iJHxdt0eUBl1AInm3BOZhpJ+qmcXwgZCbvea4n1tuiEgml2PvOkr7zqWo0/WldNDhZMLwN42z56wmB0c71m5kxCjF8ZX19+T5YCjx9oXnnKxPiBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IMUf7F2I; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734055088; x=1765591088;
+  t=1734054978; x=1765590978;
   h=message-id:date:mime-version:subject:from:to:cc:
    references:in-reply-to:content-transfer-encoding;
-  bh=rEh6nEUB6b2gWFVudTedi+7SvZpJ1yXIcaAEvQ6Ls4c=;
-  b=a1q+A77R+rod8tYtugwWlt2YZj1pmU2r9S0HGJTw9j2iQvwlxhGEDbK5
-   l6UHPUeYzkAtVrqS2SPgrYTP6giApxbxAxImCbjHnRe2SAeC/BVlvOCwb
-   EPdCLwb+5kID/3/KERViym4WOC8hxva8bd67iycTtn4sfdyJonE7KrRBi
-   aRHGZUSoJCCYuiHzdp6BgNiPwjL7sOoq6hI4JTP2A8j8KPz02orLxNn13
-   aYDDnTQ836hIa7OgxMa9IJGyZHEJ0VnYff9fyArqfum8+cJ2Zo9BC4BKy
-   FvaJ7JK+F6Wozm1ToifCYo6N9UbMUi7IPjAHeuFfM4+6noxguqq+qiN4p
+  bh=NyAt7fLg31sOOP5MsQWn9EgGROvizgBib4DX+ww1UBw=;
+  b=IMUf7F2IFF/UwLB6Qw6nWQSciCnD5p8IU77VgtrIa8pbE4UxvIysaDZG
+   nk6n7nHlGwaqTbQ4T2LW1nVuhFedLXtgSm+KUeGKk3/WfpjL911X8No6B
+   tVTaLoOYNHL66W1NO/CdkYjkSXjxPzXc9qa1xffn83vSDwdFBxlCX1REA
+   JDO2PeojGC2I1tGYSS+TkT0auRfhaP9Aa9PfYZJYBijDN7KJ3znhU40YP
+   9TAkoc81l/tYvMcL3U4FMO9fQUu5Zim9yGGg1LFEU5kYjLTV32KArqhjz
+   yNORX66RT/5R1XSxcLHByB8FnAwFtfbZx8zLxl2sS4iXia2LizSk2eLrP
    A==;
-X-CSE-ConnectionGUID: qk6N46QpRpqpAxdgkRclvg==
-X-CSE-MsgGUID: ADpGYrc5TX2lzAAVdlBvIg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="45188813"
+X-CSE-ConnectionGUID: jeJlxs5PQfqPoma2MSSNbA==
+X-CSE-MsgGUID: U69ra/UFShWm30V+gZZl8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="52025355"
 X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
-   d="scan'208";a="45188813"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:58:07 -0800
-X-CSE-ConnectionGUID: 3VN4NUYtTsGLF8+vnybM8g==
-X-CSE-MsgGUID: 0ou1/nhkTMiLJu+On8Y/Ig==
+   d="scan'208";a="52025355"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:56:14 -0800
+X-CSE-ConnectionGUID: D8jsdFF4RlyGSwH5qcdBcA==
+X-CSE-MsgGUID: YzFOYt+DRReDruSUNIs15g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
-   d="scan'208";a="101260708"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="96844586"
 Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:52:36 -0800
-Message-ID: <2cf8bf60-b36d-47ca-9aef-d477a841cbed@linux.intel.com>
-Date: Fri, 13 Dec 2024 09:52:34 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:56:11 -0800
+Message-ID: <4462ce8a-70dc-4f13-a1e4-2f75b38d5e25@linux.intel.com>
+Date: Fri, 13 Dec 2024 09:56:09 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -218,7 +218,9 @@ On 12/13/2024 9:46 AM, Binbin Wu wrote:
 >
 >         tdx->vcpu.run->exit_reason       = KVM_EXIT_HYPERCALL;
 > +       tdx->vcpu->run->ret              = 0;
->         tdx->vcpu.run->hypercall.nr      = KVM_HC_MAP_GPA_RANGE;
+Sorry, this should be  " tdx->vcpu.run->ret              = 0;"
+
+> tdx->vcpu.run->hypercall.nr      = KVM_HC_MAP_GPA_RANGE;
 >         tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
 >         tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
@@ -234,6 +236,5 @@ On 12/13/2024 9:46 AM, Binbin Wu wrote:
 >                 vcpu->run->hypercall.args[0]  = gpa;
 >                 vcpu->run->hypercall.args[1]  = npages;
 >
-Maybe we could add a helper to fill the vcpu->run?
 
 
