@@ -1,54 +1,85 @@
-Return-Path: <kvm+bounces-33760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4506E9F152B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 19:44:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37029188CFA0
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:44:46 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6691EB9F8;
-	Fri, 13 Dec 2024 18:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ceDcUwUH"
-X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8B49F1555
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 19:59:12 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8391E47D6;
-	Fri, 13 Dec 2024 18:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49ADF284016
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:59:11 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332A61EB9F4;
+	Fri, 13 Dec 2024 18:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lop/zUVh"
+X-Original-To: kvm@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E250C19CD08
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 18:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734115471; cv=none; b=l9ZaiXdSdj3UG/2GUaCfdVLGYagZB7d46JfwX/T99/yW1H8owYfmDXhkFP2u68bk890eq72xVnhzVsG3q1u8b7ZsuWhkau9GOADfcJyD0PeLOnAM/Ogwx8Jf+WHlnAQ+0v186qiAkDl5xBS7C+YDU7Xwb+RgIDQv2z2tAi75ryI=
+	t=1734116341; cv=none; b=OPabLrPOa1pqVJ8ZURmqF1tlIflOv5mU9snK9Y+fGvBKuZCG/XFs3UnklmuYXYfBHulq194F8GJVRZHVUSuZzPmf9BlFfSX9zHeO7yDPTyBOJTvFSfB6TOBsi6KtEP25pUkRNlF9zGXYqxHvi8w06/XJxkkHWMpLBls7ivNXNbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734115471; c=relaxed/simple;
-	bh=BGUhJ7s4wap9Trc0L03YqNCF5PervmrG+ZI0sPhI0Iw=;
+	s=arc-20240116; t=1734116341; c=relaxed/simple;
+	bh=t7Np4Aa+tgtujgWBmCLmpiOGbTdtLucpjvWi7GEHhkM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F+X0eYELlhdyFGb7fLZDc5M0aXIAzalKTjQiA/f8NHaYWz+6mZhBHL/2swnZIzWSYqY+53KC8jBVjl353r9x7jE4U/2GSKdCMzGtWwxwd8a3kCSUzh9XbqY9MfFEIGpCy3ODInRo4Yi3fUBTvzbUxUuVuRoxL+ThHE0H8d9ZHNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ceDcUwUH; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 4BDIhojZ1669908
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 13 Dec 2024 10:43:51 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 4BDIhojZ1669908
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024111601; t=1734115432;
-	bh=kBqPmg8+aysNeFRPWlQAPUCgrnX3967ZvJpr+SvfrL8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ceDcUwUH7CqZWX44iL17eN8nw5RrcS4vDK62vWEYOx4MA2DGTpGbKXJUh5TlTeB+a
-	 aQFSWvCltZZOqLjr4cPPbMpByK3RrMy0phB+cHueogz+2DWCNXidHXmLUFkiMPrDeC
-	 mNnA4D2qexyIfyH5SX+2yXuodvc8D4R0DBxs53a43VjZN52WzOd596ng7UDaSB5Hxi
-	 ESgZjFH4J9n8hz9A7Pze2/DwlX0Wy52BRKPmCfeF12MXVoWxUtGLIQ0dnvMFf/BPje
-	 aNuBH6LBP78BMPK21B+oCL1L3T7KCV9diN9ddD1rFUUZSpPY2tr/KhNpom3uXzMITo
-	 Blawug5XjYX7w==
-Message-ID: <832e87d1-8349-47f8-b1dc-33768b534b10@zytor.com>
-Date: Fri, 13 Dec 2024 10:43:49 -0800
+	 In-Reply-To:Content-Type; b=E+0PjT3HIG1gOAgsfXd8n1lrniP7dbgqLbi9l0jV+TwzgTtEbnXE7BikbqtHRThMQJm8OKfDYC0G5/QOxXG9pxxdB7OkQmPB+2pibi3flpHq9OaEGnfq7D5zpbgrUVwKas5Mt5S1fGMvWHvO22UDNuGG5wSb7XfnuYmEPbiFBUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lop/zUVh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734116338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=mI1mOtjG4nC/az8D+B88vVhaoQDxbNllCYmgLL5S3Ec=;
+	b=Lop/zUVhKwcCBwhc3+mGaKy6iTjNlfwwQlN0JRePiLfj9clSxXltzjGac1K/HSKT+53uUE
+	xnEl7K3vKpBdFGg/o7GW5VlzCM8U0/l2qjY9bjXhWmRrdyVnXOtVOFF2rhf/6konNrCxG2
+	mJoRfyPvc/BXxhsYa6uvNMsDQxILga0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-lraLPcoWPFG3tpZ3Vktdyg-1; Fri, 13 Dec 2024 13:58:57 -0500
+X-MC-Unique: lraLPcoWPFG3tpZ3Vktdyg-1
+X-Mimecast-MFC-AGG-ID: lraLPcoWPFG3tpZ3Vktdyg
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4359eb032c9so16758265e9.2
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 10:58:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734116336; x=1734721136;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mI1mOtjG4nC/az8D+B88vVhaoQDxbNllCYmgLL5S3Ec=;
+        b=k19NTRtiGAC0UVeU+oc9tp6Vc0jR5wKPnsxObNIAZZvEdjeu13Ya5jGAdW0BPbZhMB
+         HdJbQtmLw8vGvZNYIErpOGpMgWS3AegGFfmq5iVjSuPFH3Fk9JqhzTGYWKZBZjPhya5X
+         LQR+wmnviTeGi8BnoM8BbF79cdkAf+gkOzpU062jAPRdGP311hAVXqdSuGrvESyZIkTC
+         Phdx2RL3iTeRPOCRKazBwNvx0tUGTtzkUFP7S2YQNUiksk/MR57PS8HqqSKjtD2v78VG
+         B9rboIPBXDE+YdaTrUMBw6MK94pGFoVZVOTGp2baAGFmtYqOn+h2w9xHCCu25mQPk4ZI
+         0JwQ==
+X-Gm-Message-State: AOJu0YwNpHeXcgJslgA/XyXE5XlkJSLDIPjkWBwYn+IQOsoLLWZFgRuJ
+	ds8tzwZ8jrs1tbMjmybcZ3ZzKjjqHgi16eNtC1yoMdaVahR0Ye1M2WCue4JKo8DCxiwCL3SXQCA
+	9Ts++tHxUrOUIc1tR9NF56W7DBv2p4byWb3UVrzHiRWKhDQwg8asc0n9ybg==
+X-Gm-Gg: ASbGncsSM5SYe7uZrEpWMDIzw1kDxzIp1mkwXIDVeVYZZFGTf5jaToYgr9q7VfKR3C5
+	03UEq0qgi4ER2moS0wdjBCMIxPxwyKFIF2sOz+lAKkO1cuj52ypdkbERbk944ML4dM4zhtsBlNn
+	6h7drh6nSWsyUeywpf3wnLQUYi87eh1hG0wFdyOJYYHlNxCwEW7Q8CuCNKHhIA4m4XxmrG8ofoI
+	xUqcPq3JYZmhdZbjj4LZCnNuzim8FeP1/5oQYJp25/7jkhfsy8VzS9bIsY=
+X-Received: by 2002:a05:600c:190c:b0:42c:c28c:e477 with SMTP id 5b1f17b1804b1-4362aa9d675mr34183085e9.23.1734116335989;
+        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGCocN09lwrJ18yznQg6RRv3t1XmTAkjMEIYeGuE67QjSo4SyJA5WAXCajyTNxHaPEkuz0Z7A==
+X-Received: by 2002:a05:600c:190c:b0:42c:c28c:e477 with SMTP id 5b1f17b1804b1-4362aa9d675mr34182965e9.23.1734116335622;
+        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
+Received: from [192.168.10.3] ([151.81.118.45])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-388c80602a1sm251014f8f.97.2024.12.13.10.58.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
+Message-ID: <257491b6-f70a-4347-b97d-cc7fa22aac85@redhat.com>
+Date: Fri, 13 Dec 2024 19:58:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,87 +87,71 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 17/27] KVM: x86: Mark CR4.FRED as not reserved when
- guest can use FRED
+Subject: Re: [PATCH 0/5] KVM: x86: Address xstate_required_size() perf
+ regression
 To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
-        andrew.cooper3@citrix.com
-References: <20241001050110.3643764-1-xin@zytor.com>
- <20241001050110.3643764-18-xin@zytor.com> <Zxn0tfA+k4ppu2WL@intel.com>
- <3ec986fa-2bf0-4c78-b532-343ad19436b2@zytor.com>
- <Z1sz_oMq8yX--H7U@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jim Mattson <jmattson@google.com>
+References: <20241211013302.1347853-1-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <Z1sz_oMq8yX--H7U@google.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20241211013302.1347853-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/12/2024 11:05 AM, Sean Christopherson wrote:
-> On Thu, Dec 12, 2024, Xin Li wrote:
->> On 10/24/2024 12:18 AM, Chao Gao wrote:
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index 03f42b218554..bfdd10773136 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -8009,6 +8009,10 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->>>> 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LAM);
->>>> 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_FRED);
->>>>
->>>> +	/* Don't allow CR4.FRED=1 before all of FRED KVM support is in place. */
->>>> +	if (!guest_can_use(vcpu, X86_FEATURE_FRED))
->>>> +		vcpu->arch.cr4_guest_rsvd_bits |= X86_CR4_FRED;
->>>
->>> is this necessary? __kvm_is_valid_cr4() ensures that guests cannot set any bit
->>> which isn't supported by the hardware.
->>>
->>> To account for hardware/KVM caps, I think the following changes will work. This
->>> will fix all other bits besides X86_CR4_FRED.
->>
->> This seems a generic infra improvement, maybe it's better for you to
->> send it as an individual patch to Sean and the KVM mailing list?
+On 12/11/24 02:32, Sean Christopherson wrote:
+> Fix a hilarious/revolting performance regression (relative to older CPU
+> generations) in xstate_required_size() that pops up due to CPUID _in the
+> host_ taking 3x-4x longer on Emerald Rapids than Skylake.
 > 
-> Already ahead of y'all :-)  (I think, I didn't look closely at this).
+> The issue rears its head on nested virtualization transitions, as KVM
+> (unnecessarily) performs runtime CPUID updates, including XSAVE sizes,
+> multiple times per transition.  And calculating XSAVE sizes, especially
+> for vCPUs with a decent number of supported XSAVE features and compacted
+> format support, can add up to thousands of cycles.
 > 
-> https://lore.kernel.org/all/20241128013424.4096668-6-seanjc@google.com
+> To fix the immediate issue, cache the CPUID output at kvm.ko load.  The
+> information is static for a given CPU, i.e. doesn't need to be re-read
+> from hardware every time.  That's patch 1, and eliminates pretty much all
+> of the meaningful overhead.
 
-Ha, that is nice.  Thank you!
+Queued this one, thanks!
+
+Paolo
 
 
