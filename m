@@ -1,85 +1,86 @@
-Return-Path: <kvm+bounces-33761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8B49F1555
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 19:59:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1E389F1562
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:01:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49ADF284016
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:59:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71425188E8C0
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 19:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332A61EB9F4;
-	Fri, 13 Dec 2024 18:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5912118B47C;
+	Fri, 13 Dec 2024 19:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lop/zUVh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNBd8VZp"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E250C19CD08
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 18:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C671D13EFE3
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 19:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734116341; cv=none; b=OPabLrPOa1pqVJ8ZURmqF1tlIflOv5mU9snK9Y+fGvBKuZCG/XFs3UnklmuYXYfBHulq194F8GJVRZHVUSuZzPmf9BlFfSX9zHeO7yDPTyBOJTvFSfB6TOBsi6KtEP25pUkRNlF9zGXYqxHvi8w06/XJxkkHWMpLBls7ivNXNbY=
+	t=1734116451; cv=none; b=G5ZVlYurF0yTx1Uqa7+zgzfx8pP7wrGBzvd/1MD3MTQcAnZvK69Se07Srl2sHBX595KD5u0lUYfRqWdUA5Mio6NISqaeEbCNIcCZHN0W6BaqIz3HBNCMKhj9fQtD4jwR6YVoQoNVycxZBNLIDP+O0OZ5xvvF1jtNjPbiTkYp1s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734116341; c=relaxed/simple;
-	bh=t7Np4Aa+tgtujgWBmCLmpiOGbTdtLucpjvWi7GEHhkM=;
+	s=arc-20240116; t=1734116451; c=relaxed/simple;
+	bh=0lujD/MUSwnvlBmGwslECvBzigIFk8P9A9OdGCCEGck=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E+0PjT3HIG1gOAgsfXd8n1lrniP7dbgqLbi9l0jV+TwzgTtEbnXE7BikbqtHRThMQJm8OKfDYC0G5/QOxXG9pxxdB7OkQmPB+2pibi3flpHq9OaEGnfq7D5zpbgrUVwKas5Mt5S1fGMvWHvO22UDNuGG5wSb7XfnuYmEPbiFBUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lop/zUVh; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=QYABozWFHFWBZBUKlAB1mwc/MfCktQhiF15eYCN2YD07M8whBdasqhrbnIAUpuPSNapQd27oEHfcUIYg48NKmUuMEYh7+cZ1DLG8ho7bbw5q1EriUxTo/WtqHTJCRpYyYzYfYLU6zsQs6dyzP46pCNGa173yu5YEyiGyKRPzxcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aNBd8VZp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734116338;
+	s=mimecast20190719; t=1734116448;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mI1mOtjG4nC/az8D+B88vVhaoQDxbNllCYmgLL5S3Ec=;
-	b=Lop/zUVhKwcCBwhc3+mGaKy6iTjNlfwwQlN0JRePiLfj9clSxXltzjGac1K/HSKT+53uUE
-	xnEl7K3vKpBdFGg/o7GW5VlzCM8U0/l2qjY9bjXhWmRrdyVnXOtVOFF2rhf/6konNrCxG2
-	mJoRfyPvc/BXxhsYa6uvNMsDQxILga0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Hysh4G6LZrqgtBW9bf9kFNZmoNJmDm01ucGkIcE/z0g=;
+	b=aNBd8VZpGV93im/1VNy12IpXHExhZh8JuWG6vDuHQzb7mPjKkl11MzahWVrNeNN6DL8vrM
+	gPohArE/z7hIa/zU1sFkWO/f095uoYJyx7cnxvHa6eBOjNG77ByF46YIke38nl4rBVvbV/
+	Eni4TzSYzSg4ElyuODQSx/1HFd3CYsE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-lraLPcoWPFG3tpZ3Vktdyg-1; Fri, 13 Dec 2024 13:58:57 -0500
-X-MC-Unique: lraLPcoWPFG3tpZ3Vktdyg-1
-X-Mimecast-MFC-AGG-ID: lraLPcoWPFG3tpZ3Vktdyg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4359eb032c9so16758265e9.2
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 10:58:57 -0800 (PST)
+ us-mta-586-a4CXeujcPxSsj107E_qu8A-1; Fri, 13 Dec 2024 14:00:47 -0500
+X-MC-Unique: a4CXeujcPxSsj107E_qu8A-1
+X-Mimecast-MFC-AGG-ID: a4CXeujcPxSsj107E_qu8A
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385fdff9db5so367646f8f.0
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:00:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734116336; x=1734721136;
+        d=1e100.net; s=20230601; t=1734116446; x=1734721246;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mI1mOtjG4nC/az8D+B88vVhaoQDxbNllCYmgLL5S3Ec=;
-        b=k19NTRtiGAC0UVeU+oc9tp6Vc0jR5wKPnsxObNIAZZvEdjeu13Ya5jGAdW0BPbZhMB
-         HdJbQtmLw8vGvZNYIErpOGpMgWS3AegGFfmq5iVjSuPFH3Fk9JqhzTGYWKZBZjPhya5X
-         LQR+wmnviTeGi8BnoM8BbF79cdkAf+gkOzpU062jAPRdGP311hAVXqdSuGrvESyZIkTC
-         Phdx2RL3iTeRPOCRKazBwNvx0tUGTtzkUFP7S2YQNUiksk/MR57PS8HqqSKjtD2v78VG
-         B9rboIPBXDE+YdaTrUMBw6MK94pGFoVZVOTGp2baAGFmtYqOn+h2w9xHCCu25mQPk4ZI
-         0JwQ==
-X-Gm-Message-State: AOJu0YwNpHeXcgJslgA/XyXE5XlkJSLDIPjkWBwYn+IQOsoLLWZFgRuJ
-	ds8tzwZ8jrs1tbMjmybcZ3ZzKjjqHgi16eNtC1yoMdaVahR0Ye1M2WCue4JKo8DCxiwCL3SXQCA
-	9Ts++tHxUrOUIc1tR9NF56W7DBv2p4byWb3UVrzHiRWKhDQwg8asc0n9ybg==
-X-Gm-Gg: ASbGncsSM5SYe7uZrEpWMDIzw1kDxzIp1mkwXIDVeVYZZFGTf5jaToYgr9q7VfKR3C5
-	03UEq0qgi4ER2moS0wdjBCMIxPxwyKFIF2sOz+lAKkO1cuj52ypdkbERbk944ML4dM4zhtsBlNn
-	6h7drh6nSWsyUeywpf3wnLQUYi87eh1hG0wFdyOJYYHlNxCwEW7Q8CuCNKHhIA4m4XxmrG8ofoI
-	xUqcPq3JYZmhdZbjj4LZCnNuzim8FeP1/5oQYJp25/7jkhfsy8VzS9bIsY=
-X-Received: by 2002:a05:600c:190c:b0:42c:c28c:e477 with SMTP id 5b1f17b1804b1-4362aa9d675mr34183085e9.23.1734116335989;
-        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGCocN09lwrJ18yznQg6RRv3t1XmTAkjMEIYeGuE67QjSo4SyJA5WAXCajyTNxHaPEkuz0Z7A==
-X-Received: by 2002:a05:600c:190c:b0:42c:c28c:e477 with SMTP id 5b1f17b1804b1-4362aa9d675mr34182965e9.23.1734116335622;
-        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
+        bh=Hysh4G6LZrqgtBW9bf9kFNZmoNJmDm01ucGkIcE/z0g=;
+        b=QQsCzKv6gXIRNCcsDFGtqmSKMDHcOM6k0Ptg4rr0bSMV+R3ikyQNEiMBC8rzffumTv
+         TldS7BCQc5MMHMWZdghMW4KX3nzfD4H2rbVT7xJPglTH8EBxWmybVkXTGDRus741ClJW
+         YepG2lGY7Oicwh8LX8fcuaopSAjf+g0CiKWqwCZWoyxFT/qrOQiBFgl4sTlOjzzTGNGi
+         +NK4SVoVgwSaJzMjfCLVGqtshQpjdjlQ+WdvZtKv8aO0327rU5O8qbPocH5B63h3aRv4
+         VZcHXKP/Vbn92DaoeHyQY0NnNSXIlXNCdTFI2e/zqpsToZgWYXneYsu1OOXcOKnRFP+c
+         2fmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUr7akmkicr/QV+I/LGMaVAPzLjbclgAxc+8JIC2XVDYwVVuHp0n1HWehIlCTD0xh0tJP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytsPOZ95RDYicoYKb/R+JOTMUVaUSSodBqDkscDq/oeGwlHfsa
+	Fv6XBopkmi8uogeJY9AHrFKGsr9rhheiwO5Psy8zCfb2uOoyvuqt+KEG7c+65WUKJCB7/U+Lx1H
+	AiC86LkVxeeBgOd43p/lmbdTbfu3q8RTUoCiHYGwVHQLm5NbvbUrffqummQ==
+X-Gm-Gg: ASbGncuB3ea5Gl0L1tG/PThKNiu9kB4mCR20DUfNYxoiL8WKo8EQUL+j5q/OXn8+ghH
+	A6MZueyUYG5gHc059yXiSrgNpYB6JhbB1JepbB9YzZpJl8QWnVgB3QrHF2ekFr996MP0VCM7O/c
+	/tM85vknGL5bvny7ABHNHTY59LUq7LordCZC3wLgavY5csMd1OmUb8KJcvv+OtsK35UE9u6lFYX
+	Xv7YdexP4Cx1nuudNYH4zX4t4Xy6cSJfqnaq3SOnzaVcLjtxDpO01VbRQc=
+X-Received: by 2002:a5d:6d0e:0:b0:386:1cd3:8a0e with SMTP id ffacd0b85a97d-3888e0c06demr3587774f8f.48.1734116446025;
+        Fri, 13 Dec 2024 11:00:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMH7LHX8WyO4OyUiDC3F6CeTLqdILBLsfBgGhgRF00YfuJYsdMc4uonnm76mxzCZ6tmKlPlw==
+X-Received: by 2002:a5d:6d0e:0:b0:386:1cd3:8a0e with SMTP id ffacd0b85a97d-3888e0c06demr3587756f8f.48.1734116445672;
+        Fri, 13 Dec 2024 11:00:45 -0800 (PST)
 Received: from [192.168.10.3] ([151.81.118.45])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-388c80602a1sm251014f8f.97.2024.12.13.10.58.54
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-388c801ace1sm286162f8f.60.2024.12.13.11.00.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2024 10:58:55 -0800 (PST)
-Message-ID: <257491b6-f70a-4347-b97d-cc7fa22aac85@redhat.com>
-Date: Fri, 13 Dec 2024 19:58:54 +0100
+        Fri, 13 Dec 2024 11:00:45 -0800 (PST)
+Message-ID: <98b25b36-7a19-452a-87e6-a78ae238716f@redhat.com>
+Date: Fri, 13 Dec 2024 20:00:44 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,12 +88,16 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] KVM: x86: Address xstate_required_size() perf
- regression
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jim Mattson <jmattson@google.com>
-References: <20241211013302.1347853-1-seanjc@google.com>
+Subject: Re: [GIT PULL] KVM/riscv fixes for 6.13 take #1
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt
+ <palmer@rivosinc.com>, Atish Patra <atishp@atishpatra.org>,
+ Atish Patra <atishp@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>,
+ KVM General <kvm@vger.kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)"
+ <kvm-riscv@lists.infradead.org>,
+ linux-riscv <linux-riscv@lists.infradead.org>
+References: <CAAhSdy35NO2fUrgER57qgOHRSZYbGLvmKDPjdfpXOP04C1AhMg@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -130,28 +135,49 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241211013302.1347853-1-seanjc@google.com>
+In-Reply-To: <CAAhSdy35NO2fUrgER57qgOHRSZYbGLvmKDPjdfpXOP04C1AhMg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/11/24 02:32, Sean Christopherson wrote:
-> Fix a hilarious/revolting performance regression (relative to older CPU
-> generations) in xstate_required_size() that pops up due to CPUID _in the
-> host_ taking 3x-4x longer on Emerald Rapids than Skylake.
+On 12/13/24 16:43, Anup Patel wrote:
+> Hi Paolo,
 > 
-> The issue rears its head on nested virtualization transitions, as KVM
-> (unnecessarily) performs runtime CPUID updates, including XSAVE sizes,
-> multiple times per transition.  And calculating XSAVE sizes, especially
-> for vCPUs with a decent number of supported XSAVE features and compacted
-> format support, can add up to thousands of cycles.
+> We have just one fix related to the HVIEN CSR update
+> for the 6.13 kernel.
 > 
-> To fix the immediate issue, cache the CPUID output at kvm.ko load.  The
-> information is static for a given CPU, i.e. doesn't need to be re-read
-> from hardware every time.  That's patch 1, and eliminates pretty much all
-> of the meaningful overhead.
+> Please pull.
+> 
+> Regards,
+> Anup
+> 
+> The following changes since commit 40384c840ea1944d7c5a392e8975ed088ecf0b37:
+> 
+>    Linux 6.13-rc1 (2024-12-01 14:28:56 -0800)
+> 
+> are available in the Git repository at:
+> 
+>    https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.13-1
+> 
+> for you to fetch changes up to ea6398a5af81e3e7fb3da5d261694d479a321fd9:
+> 
+>    RISC-V: KVM: Fix csr_write -> csr_set for HVIEN PMU overflow bit
+> (2024-12-06 18:42:38 +0530)
 
-Queued this one, thanks!
+Pulled, thanks!
 
 Paolo
+
+> ----------------------------------------------------------------
+> KVM/riscv fixes for 6.13, take #1
+> 
+> - Replace csr_write() with csr_set() for HVIEN PMU overflow bit
+> 
+> ----------------------------------------------------------------
+> Michael Neuling (1):
+>        RISC-V: KVM: Fix csr_write -> csr_set for HVIEN PMU overflow bit
+> 
+>   arch/riscv/kvm/aia.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
 
