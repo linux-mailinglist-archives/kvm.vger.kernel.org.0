@@ -1,165 +1,104 @@
-Return-Path: <kvm+bounces-33726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271119F0B4A
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 12:35:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142519F0B86
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 12:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87B42164D92
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C671881F97
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E361E0DD5;
-	Fri, 13 Dec 2024 11:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="TDHYwHqU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3811DEFD9;
+	Fri, 13 Dec 2024 11:43:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B511E009B
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAAB1DF279
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734089607; cv=none; b=e+hjapV07+9oqc43VPu0q96R4v26cRg8BDCGApFFxPw0QVeUmK4doMdYXkm9+9HJS+nZ3t7gYBPXuciyVgBaXwIU3VSHOm+cBbRqAVTOFAMASm86hE19I8OF223sYHaSuFN0SNODhOt6I5307zwzKq20rIqybovqHpcbJ0AePb8=
+	t=1734090185; cv=none; b=YMYEvFjHxWQNUZ/5VboNMmpk6cx7Q5RR65kRlVnnSXROivd47EZnlGcwKYdiAliSjGv9dNh2jY+oeRl4V/dyahse/nq1XLb8J7KWtTwTmFuk/fmNOqwIHYOmEGaBtbtF5EsXxswp3SEZgZVD63qQAxbhleS6ga0QYKUNMoAX28M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734089607; c=relaxed/simple;
-	bh=dkJiuVnAYPALmPp61+7Ff1id1Mwaw6rbYo70OgRM4jg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Hx2I6QA1f8QgbRVDpZp6TwIPanrSdMCk8SXs1Kted7ZTJACJuqvyn5KVtIeELJmrACf1YCh8t2CHtF1RWwEI3nTuVxjtSky/2owdeJLvyW/rOmZ2lZ8tlneFom7kbNe9Eu5Ei8VrkW7Q22wIbbxM1g2iMmdZIXXvMIJ4KafskKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=TDHYwHqU; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2163bd70069so16744655ad.0
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 03:33:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1734089605; x=1734694405; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NEtptHTU3kr3P35YLmk81GIPaJu3IDUx/dDsQSqkBrs=;
-        b=TDHYwHqUVtmP5626+IALUU49ujdgxq0aGbdfhUfNtvLsu2ImX3hnOPD9Ryo62qX3ij
-         vyMoERxBaHtIxZoUemp3F95bV0YWY3WUhZ5Fbz3616y4ijsln0eSZf7BLuoZsJ3Eyixo
-         JAEwo8cJc+yVq82TCdb3MxTgS0j60AAxej2jftImBdyUjONsWFC320PCVjHVzaFX0rqy
-         MJaxNgPuJBolPf682aJkIsMluWY1rcSVGsXAkapnwbgVrFYP3BQIHMJA7WdexFOFf8ql
-         jAbmEUH0lBOwNeywtK/IfnM7L1nJXApVueD9Bu6z4C5GQfxnKTomlpQzSrrVdgLnzqcH
-         mRcQ==
+	s=arc-20240116; t=1734090185; c=relaxed/simple;
+	bh=estDcRIo9Ps/V70akpJUOEghJnsuWqhCaWrCUbyCJD8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=BH2TtFEiqLPK4AbXw59CjJBK47E1Qd0oaiPAkTTbBhLxJfw8vnCmvSukkTsv7j05GFxOGAZCFEBjwxH6OyCPQJzT6iqXAJ3lao4qCb7kv7jsDrLghKD+RTOkG8j5LGuSxHTfRlYSbRxNprDyI+NgLhaK/808febIjnmcQ+MhAxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83e5dd390bfso237528839f.1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 03:43:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734089605; x=1734694405;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NEtptHTU3kr3P35YLmk81GIPaJu3IDUx/dDsQSqkBrs=;
-        b=KxjNE/QPvHta1P5JKuhB46/XGbffB4Syw2J9LSJYk863ynBdOCJWxU+3s0NNSc1lfH
-         nSWIbr2zvBho0IiOdLtki6pfHJEsyDhz8Ovv0A3jFC+eYU78JWU4Bf1CIJ49Ryn6rn+J
-         TCisNKE3Sfa3bWkCMgQnyABrvTr8HjzfBUVLWfy8xZw98MfibFtKgptUxj+NXXViR6rH
-         7yvKKy0Szv/ur+TShYPdpxqkYTRb1WZl7KWNZEmWYopKnW/UsopdawDnKA7tn+vnFkXt
-         UtVuaYpW+r09JhPiVRfTeGpKcQZzpk3ejpeiDzjPTa9Wzd0gux3gcVrJRFJxVz0FFzfq
-         3hoA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKPsKIQ0HU+1KGRnfSJw5bLJA/jQad2hhZla8NZiXxrDkSmuK5SgSQT+lktvXqp9TFtVM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1eFf32x+tU+QOTbhaQsSxvcqtU65YaG62Kz8vm9SEwudarow0
-	cjvyUQdr//lWP+gvdtXR5NJskkYBe3CJEfyMj+PFWPO/tLMJgC99ku9Om/+72IA=
-X-Gm-Gg: ASbGncsqwyTAsJTMqECkYHLKj0fvuA2ZxI/iGqNEWJbEGuClKNH0WgWPX+iLqiyM4dZ
-	iTAPoOHloc8YsFoUgRlGKg41uSQonYhMLqj7XnbUyyuaNQ0m6Qht8VJtRXyGdLBcIiRnnp1Q+mW
-	OTlK2jp4IWu/O8DOTmJgjsxawovuiofaiKOh5ebfXhqcNxHpqZpYCDNdlxk1zng/049wgv1ngGz
-	Wc838ZBvb2KAvnbkVH6xeWUwDgOWb1YsQo2RDt+QOv/76y7Ez8QdJE=
-X-Google-Smtp-Source: AGHT+IGqLFD7+ohjLCw5KHfPU8C+4COV+XiGB8UR/WxQfVhsIQvvpPgvT8BLHFS9OjcnFJAe1uWA+w==
-X-Received: by 2002:a17:903:191:b0:212:55c0:7e80 with SMTP id d9443c01a7336-218929b9b15mr27260825ad.20.1734089605533;
-        Fri, 13 Dec 2024 03:33:25 -0800 (PST)
-Received: from [127.0.1.1] ([210.176.154.34])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21631bd2c2dsm103327125ad.263.2024.12.13.03.33.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 03:33:25 -0800 (PST)
-From: Max Hsu <max.hsu@sifive.com>
-Date: Fri, 13 Dec 2024 19:33:09 +0800
-Subject: [PATCH RFC v4 3/3] riscv: KVM: Add Svukte extension support for
- Guest/VM
+        d=1e100.net; s=20230601; t=1734090182; x=1734694982;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6njtYwuuhlt+oJFig9mpzBM61IwvHlJyPr4iUNckOYs=;
+        b=ElvqmOYwZMuBg7uYAK2Let89rL0izm4s/6tIn9SplycGJB8YTqbgPHoHEyaqLEOFJ7
+         Ikswz9u2wassEWb9gxh5w1Ip6igWLBvZuPfVUJnmcZG1fkRxOh5rFksdRcRq3phuyBXk
+         0KCeXTNGuqW9UV8bKn7xPB9JSTK2g2c9q9VHAY+0fxIi3LxxyQjl6LQU8a6bwI063Io+
+         kAGSTDHULzPCJ22cHlvzos6MYjprVdfC3Y7y170+iTfSlmOKb1sy+f/fpcXT3gojygq0
+         BMqH1uBfi6vU0g5eDwByn+28qrYoU0/rIHmINV11maDjxeo8qMVYMmL5GTHvOslXzyTl
+         U+qg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnOA35pU7e8uCHXByBBz7QjbHDzdzQ9THWiUkjMfmy+yefL+wNr/pyK2A90J9E6yDAuRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyrFksYxYwQJ5SBVrGV1taBWUsHi6lim9T6RGeuSEroU8okohn
+	vj1iYvAyjbsyCmYzkVgYkHUwasPgYkWYBrgs8oa0CqDwYh8lwvRGW96CPBC4DiqfcxBihZssZV1
+	LXkUKxN7TtmuLJqOPIPA08IrPSloB6+MG0vrTX4CIXIqlSIlzMrUkEdE=
+X-Google-Smtp-Source: AGHT+IHDAFY/TJurokeAD58Ic6k8Gv/vDg0siFvYAkQ1NFVck19SuU1w02dmhAQMhWSSadJDht8QTW+J8baOcxgzM5T4zE7FxWYz
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241213-dev-maxh-svukte-v4-v4-3-92762c67f743@sifive.com>
-References: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
-In-Reply-To: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>
-Cc: Palmer Dabbelt <palmer@sifive.com>, Conor Dooley <conor@kernel.org>, 
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- kvm-riscv@lists.infradead.org, Max Hsu <max.hsu@sifive.com>, 
- Samuel Holland <samuel.holland@sifive.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1889; i=max.hsu@sifive.com;
- h=from:subject:message-id; bh=dkJiuVnAYPALmPp61+7Ff1id1Mwaw6rbYo70OgRM4jg=;
- b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBnXBt3hKCUiKWCXnJ+7Ph45oRx31ZpZbzWBP7Ga
- j9uhhsDjAiJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZ1wbdwAKCRDSA/2dB3lA
- vewBDACLJG8wmLy2oyopVjS0Gh86DuPlouo7WZyKUbQtzArWQ+Ar+yE2dNY2VOstAKk6TnsyA9e
- V9qsd8G9KerwiJMf1Zfq1DM6cw/JsErLXMQ5aFnKT0UcbnFK6g2vx0VsF4yRF5T7xhXHJfOZ7Yh
- gMIRyvjrb7G+98hgjec4LDP4snG4/wDt+DDc2hXR096zGtsmpNUSBTC3GWz2YZGUyVs4buSoHaI
- OQ6dViZ4g/If+kSyd9w+i8ivWppTY8O3Chuermdf1DUAj7cBLDHnRiDTxWY7odfEt3F/FuTavRU
- VDp1vrJt4MJErbMJ5Z0v+cbh0Rw7Dv+QxGR5ozvJTxs4g6eRQl3T8CPRkW5e7mezG4Jly5XE5bQ
- FPiATWmhpzvKkqJWIaPUKMyIDsik7dapDN5adPUKa8HPpCwJtVS7Au09SAGzfPIiUiph74LCF/L
- Py+0lp5CJ9El/UnUBZBQZLr5wR3ZJSNsF9uVdYEuWeTuD9hT8dDXWcpsD9SdQB3UFYIWw=
-X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
- fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
+X-Received: by 2002:a05:6e02:1c47:b0:3a7:c81e:825f with SMTP id
+ e9e14a558f8ab-3b02d78812bmr23955515ab.9.1734090182295; Fri, 13 Dec 2024
+ 03:43:02 -0800 (PST)
+Date: Fri, 13 Dec 2024 03:43:02 -0800
+In-Reply-To: <675b61aa.050a0220.599f4.00bb.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <675c1dc6.050a0220.17d782.000c.GAE@google.com>
+Subject: Re: [syzbot] [tipc?] kernel BUG in __pskb_pull_tail
+From: syzbot <syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com>
+To: alsa-devel@alsa-project.org, asml.silence@gmail.com, axboe@kernel.dk, 
+	clm@fb.com, davem@davemloft.net, dennis.dalessandro@cornelisnetworks.com, 
+	dsterba@suse.com, edumazet@google.com, eric.dumazet@gmail.com, 
+	horms@kernel.org, io-uring@vger.kernel.org, jasowang@redhat.com, 
+	jdamato@fastly.com, jgg@ziepe.ca, jmaloy@redhat.com, josef@toxicpanda.com, 
+	kuba@kernel.org, kvm@vger.kernel.org, leon@kernel.org, 
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, miklos@szeredi.hu, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pbonzini@redhat.com, 
+	perex@perex.cz, stable@vger.kernel.org, stefanha@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net, 
+	tiwai@suse.com, viro@zeniv.linux.org.uk, 
+	virtualization@lists.linux-foundation.org, ying.xue@windriver.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add KVM_RISCV_ISA_EXT_SVUKTE for VMM to detect the enablement
-for the Svukte extension on Guest/VM.
+syzbot has bisected this issue to:
 
-Since the Guest OS may utilize the Svukte extension simply by setting
-the senvcfg.UKTE without any trap to host. In the view of VMM, the
-Svukte extension should be always presented. Therefore adding an
-extra entry kvm_riscv_vcpu_isa_disable_allowed().
+commit de4f5fed3f231a8ff4790bf52975f847b95b85ea
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Wed Mar 29 14:52:15 2023 +0000
 
-Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
-Signed-off-by: Max Hsu <max.hsu@sifive.com>
----
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu_onereg.c      | 2 ++
- 2 files changed, 3 insertions(+)
+    iov_iter: add iter_iovec() helper
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 3482c9a73d1b644385182436192914f34b50b997..57b3abfbbabd967721f140b65f58f002e770eb6a 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -179,6 +179,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_SSNPM,
- 	KVM_RISCV_ISA_EXT_SVADE,
- 	KVM_RISCV_ISA_EXT_SVADU,
-+	KVM_RISCV_ISA_EXT_SVUKTE,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
-diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 753f66c8b70a72e76210075b4e07849741f614d4..50fbbe5bade6af83977bac6d381688fea80e7945 100644
---- a/arch/riscv/kvm/vcpu_onereg.c
-+++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -46,6 +46,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
- 	KVM_ISA_EXT_ARR(SVINVAL),
- 	KVM_ISA_EXT_ARR(SVNAPOT),
- 	KVM_ISA_EXT_ARR(SVPBMT),
-+	KVM_ISA_EXT_ARR(SVUKTE),
- 	KVM_ISA_EXT_ARR(ZACAS),
- 	KVM_ISA_EXT_ARR(ZAWRS),
- 	KVM_ISA_EXT_ARR(ZBA),
-@@ -145,6 +146,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
- 	case KVM_RISCV_ISA_EXT_SSTC:
- 	case KVM_RISCV_ISA_EXT_SVINVAL:
- 	case KVM_RISCV_ISA_EXT_SVNAPOT:
-+	case KVM_RISCV_ISA_EXT_SVUKTE:
- 	case KVM_RISCV_ISA_EXT_ZACAS:
- 	case KVM_RISCV_ISA_EXT_ZAWRS:
- 	case KVM_RISCV_ISA_EXT_ZBA:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17424730580000
+start commit:   96b6fcc0ee41 Merge branch 'net-dsa-cleanup-eee-part-1'
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14c24730580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10c24730580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1362a5aee630ff34
+dashboard link: https://syzkaller.appspot.com/bug?extid=4f66250f6663c0c1d67e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166944f8580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1287ecdf980000
 
--- 
-2.43.2
+Reported-by: syzbot+4f66250f6663c0c1d67e@syzkaller.appspotmail.com
+Fixes: de4f5fed3f23 ("iov_iter: add iter_iovec() helper")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
