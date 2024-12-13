@@ -1,111 +1,99 @@
-Return-Path: <kvm+bounces-33786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C249F18F4
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 23:26:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620BE9F1B36
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04CFD16B98B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 22:26:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3EC0188EDF0
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 00:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A3A19F49E;
-	Fri, 13 Dec 2024 22:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0A41F4273;
+	Fri, 13 Dec 2024 23:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OUXqNWTY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kfhldL39"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1F4185949;
-	Fri, 13 Dec 2024 22:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EEF1F2C48
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 23:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734128330; cv=none; b=t3zJGm5LiLIHpEE6uAlLxTW9Gl9gTEIOaPL1n5qf+FK1ojipP3j2j7mlhM3t+8DU7LK80pG8L8xAP6KzLkG7Y1s4OLIUXt+pXf4kzEjvF8giHPXLTcXjaWfqfSUYXUHBaWZ31b6sNqXdVRWkIjHqeorMf59swmj9b43sKF/3GSE=
+	t=1734134305; cv=none; b=nIbN4yHqhzpX2LTpL1PdqOa0S4hM9naUIiY/28McWixGmD1x0Bb5296zzTHF6AQVxLXJrdOkbjtwvaKmz9GZuegFTU8SFA0vdyH/yUVgG2Xc1SJKZ+iFFra+sNn7ALBM9K3iK8ASl+/83s83trsmiAr1UtgKvu+vwmeOTu52hHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734128330; c=relaxed/simple;
-	bh=yGVF+lGT8ur8QZFdxP3rJGdxQv5/psNez7G9/LlnyAo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k7c1h3UoF9ZrJTNfNa0KosM+3xva0NH+lycpLQKItuMPhf6BFYUDjhoctZagm1er1cjpQWDx/iVCe96uw2LyKEhgWMt+bIcKlLyOVlwR4tp2nraPE5NlsJZU19/YbVF4EZuLzMf9rWAI6s8k1LO+E2mNsYNyI/7Mmz1bwl7A5Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OUXqNWTY; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734128329; x=1765664329;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yGVF+lGT8ur8QZFdxP3rJGdxQv5/psNez7G9/LlnyAo=;
-  b=OUXqNWTYlBzbvRqM+qKeVVc4M4q9SM7LEXOk+5ei+E/0FrT3/YMUKmtz
-   si9i3bp+bffBTixi3wt3cchanWo3cxOYK4+hcj3pIl1IJCleSapnoH7e9
-   ntqDfPE0kMD7UO5WBk6Mlpg+RSYG9wxKQQTjzSrZgVg2n7rLgWw6+16NL
-   5eJ7BH06Gwg35yBinH9AcSiwtvv9Xx/Z91T8DTSTtayZ5F2n1PgumU++L
-   /ioz70YfrN1D6xx2ImT96QhLZBGH+EfM9RbX9JQ1/VfxxSCahlVKJbhxG
-   6BcNSp4i+Hc1ocNSQUm/Unn5jfD+VwGt++IYY3NrekXJ3lpb5nGhFh5Kn
-   w==;
-X-CSE-ConnectionGUID: UcEOFs5GQ1W0S9Z/foQ1fg==
-X-CSE-MsgGUID: YYHLya8YSYm6UKBfkkU6ag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="38526460"
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="38526460"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 14:18:48 -0800
-X-CSE-ConnectionGUID: cYDbbYl9QR2Pm3TS6wPPlw==
-X-CSE-MsgGUID: CyLYLFNcQ4Cbf0jiSe7UyA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,232,1728975600"; 
-   d="scan'208";a="96708626"
-Received: from rchatre-desk1.jf.intel.com ([10.165.154.99])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 14:18:48 -0800
-From: Reinette Chatre <reinette.chatre@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	shuah@kernel.org
-Cc: isaku.yamahata@intel.com,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	reinette.chatre@intel.com
-Subject: [PATCH] KVM: selftests: Add printf attribute to _no_printf()
-Date: Fri, 13 Dec 2024 14:30:00 -0800
-Message-ID: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1734134305; c=relaxed/simple;
+	bh=OGq5+hgs9dJ1yb7kwu/w29GCqzBZmKeO5Y+Ru+siBvE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CpBgW3AC8u1oR4iBPYqKrLRIuI3Rc2BT4GgEwKGMHM44vwbKrl8p3b8gb9/noIdqSV4TvxnEg2x22ldA3RdIjKpXTl2Bab+jCqNFjemWkE3HAkKfycaeZiiwDUn3dib4AXyZ+jJzPTa+/RJ6Eu0/VDHumP3p3gbHphwNiLgJ7N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kfhldL39; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-211c1c131c4so28409335ad.1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 15:58:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734134304; x=1734739104; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pUgYlM58E1ID1zBsFizknmN76M0X0I58a2gj7PTiNA8=;
+        b=kfhldL39TBzg9mfNZ38MUKouWW9n3KF8rCW8KQmRe1H0hGO3EhPDeZXjXTlhoquyrR
+         1CLApWPe8V31MNazpfb28xvW+4gfohLNIfOLrlVr482N2e/jfUbauX7klRetYEEht73L
+         gsZnytOQRypwAUUOoDHoiJ6qgRHFavAGtEBu9Bc1zrQ2Myg55pMRCiyhcLxQPAJeDyDI
+         3vCh5/hwZ6bZ7Oh/3S4u20eKFDUlPzDMTQCmD0b3FBFrEgDrJmh5liv6r9qb7o0mFqH5
+         2xqUzIYFRK0unNWhPBqWsHEzecJ3EWI/lM2KQXPhNUyt6doxo6BZKmXkvUDO0cCRq4Lg
+         eyBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734134304; x=1734739104;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pUgYlM58E1ID1zBsFizknmN76M0X0I58a2gj7PTiNA8=;
+        b=oBJVgSSQJtN67lBOz9jhba5jLn/kHyX+OPvrbW7rrZL2yR7fzvsgCjSu0m5Qe7pOCG
+         aj9JZzg52n+r9QinTahbYWxk7r2oSyWXNZEchh1K3gwIkD595fUwHB4NZhAYR09Xil94
+         OhUgHI8/eWPAwrQCEqE82rKCozlb99c23AAnwC0un79niEKmI9BlsVpephfLm1CcVwYq
+         +zdifadnbM0HufSy8Brq81s5QqFsJxE4GAzs3B+m0sbiwfq8OZ51OspWwkQSyMNJRTO1
+         7izpPE6P+ITkJirDhKXtxw/qJolOikntkMZ9zM2rayCWrJ7DIL0KdI1XC42BxrrXVFPU
+         Dqhw==
+X-Gm-Message-State: AOJu0YyzPd5BAeBYKNywNeUVWQy/6O9f0KKnI0BQ8n5qcghkyMbKt+FT
+	PWzAJsPqtC5MoqprVxF8rxBMB0SSiuRjFrKAeNyl46zdBiLTpWJFScin1xBS8jAsyUssOjq73iv
+	k2A==
+X-Google-Smtp-Source: AGHT+IEx2eqGQFBGQTUi/pn7XgE3bLWI9EM+6VGiZXjWJeNOX1FQChOgohoyAT6tKICqO9oQPQKyJbJfX0k=
+X-Received: from pjyd4.prod.google.com ([2002:a17:90a:dfc4:b0:2ef:973a:3caf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c02:b0:2ee:7e53:bfae
+ with SMTP id 98e67ed59e1d1-2f29166c324mr6176343a91.10.1734134303859; Fri, 13
+ Dec 2024 15:58:23 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 13 Dec 2024 15:58:21 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241213235821.2270353-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.12.17 *** On Tuesday the 17th!!! ***
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+*** LOOK HERE ***
 
-Annotate the KVM selftests' _no_printf() with the printf format attribute
-so that the compiler can help check parameters provided to pr_debug() and
-pr_info() irrespective of DEBUG and QUIET being defined.
+Due to holiday schedules, next week's PUCK will be on Tuesday the 17th (regular
+time), not on Wednesday.
 
-[reinette: move attribute right after storage class, rework changelog]
+There is no scheduled topic (which is code for "SNP, TDX, and guest_memfd").
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
----
- tools/testing/selftests/kvm/include/test_util.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index 3e473058849f..77d13d7920cb 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -22,7 +22,7 @@
- 
- #define msecs_to_usecs(msec)    ((msec) * 1000ULL)
- 
--static inline int _no_printf(const char *format, ...) { return 0; }
-+static inline __printf(1, 2) int _no_printf(const char *format, ...) { return 0; }
- 
- #ifdef DEBUG
- #define pr_debug(...) printf(__VA_ARGS__)
--- 
-2.47.1
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
 
+Future Schedule:
+Dec 17th - No topic
+Dec 25th - Canceled
+Jan 1sth - Canceled
 
