@@ -1,118 +1,153 @@
-Return-Path: <kvm+bounces-33687-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33688-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5879F0427
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 06:26:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE26616A298
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 05:26:16 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C765C18A6D7;
-	Fri, 13 Dec 2024 05:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bw4/mjm1"
-X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 194999F04B3
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 07:19:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD8679F5;
-	Fri, 13 Dec 2024 05:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9506284359
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 06:19:31 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616EC18C03F;
+	Fri, 13 Dec 2024 06:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w5x1RRPl"
+X-Original-To: kvm@vger.kernel.org
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15763161320
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 06:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734067563; cv=none; b=tDUI9nfiQaKi+grH21AcKQ1JxeNRuftcT95DkRAhAHZuRJgq7g+OAd60Lg7+CVqOhBvU9Yds9wVyQue0AoXcF1ECLvRjksRbvCAHkIdzKPx7KN2Gx8Mly4I5fHcQGtwAESs2yjMgopCBC0fLVmw1pjH3d2PVheMBBvecCGudjdw=
+	t=1734070763; cv=none; b=WNXvSZspCMFZa6ffQiAKAa+2OHfMBzEQ9+W46mnY28Y0H7CEyTn2Z3rZyN38E73JW4vywKWlv/YUrlEXPM15jylK4GoyeJmX7Z5X2mMgWGBwGhp16unDq/GRrgLxTEo8gqRYB1ZBFBNCBGbzgPmrNZKYEXy7zb/Uv6Qehn93SZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734067563; c=relaxed/simple;
-	bh=M2xdmdLNhUnONPFOKg4DD+NknFYDEaK+x9KyPHrv24s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HJye4tLFOdtdtJRylVIdQ4swmLY/OK3kSO2urkQcPjcal6j87Mjdp1IVM0b8DA19An3kk4HkmEGFZXWi+UbPJYzPohvPHb1X+GJdzWpf7taYDwOFxTQGhGtV7lHtIvK4tx8JeRqKY+0YW6hmfm5UX2ki3Gh5OTj16nt1TS6RxF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bw4/mjm1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D513C4CED1;
-	Fri, 13 Dec 2024 05:25:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734067562;
-	bh=M2xdmdLNhUnONPFOKg4DD+NknFYDEaK+x9KyPHrv24s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bw4/mjm10HI4gIYEq6PcUyF1AyHtdTx8xY1u9mQ/MqJN77zbADAxHBaxyRlLd3fvm
-	 K+xp87WmOhOZL0i+Bq0ipg5X8v20dbpQflvkGqWjrmRLY/0GuREkoyHJNVYE+cNf5x
-	 z8LCuZGHvDXUpEOFv59Bb7IqvPJLfr+Ey53P+W4LJrWqp6nhL8os12GgjvLuqPfWM7
-	 tQzQgeo6YclbvdVoVzle3X83Llu3G9oxPWspWAnjZkdc3+GZOJaUxSQ04u5mGgaPm3
-	 thWesm1LM0XsGyHp4VpoNWDNgdZGRIRa8iRReDoOdNpvWyxV8vC93Zm54QQh6yd+QZ
-	 BUiwJG/w6t0xg==
-Date: Fri, 13 Dec 2024 06:25:47 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Philipp Stanner <pstanner@redhat.com>,
-	amien Le Moal <dlemoal@kernel.org>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yi Liu <yi.l.liu@intel.com>, Kunwu Chan <chentao@kylinos.cn>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v3 00/11] Remove implicit devres from pci_intx()
-Message-ID: <Z1vFWyHkBD4d5xnG@ryzen>
-References: <20241209130632.132074-2-pstanner@redhat.com>
- <20241212192118.GA3359591@bhelgaas>
+	s=arc-20240116; t=1734070763; c=relaxed/simple;
+	bh=K/4DN4i60pVUUdRoPlxfp3YaDzkLkgpBAjbBqyN1pa8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OF9aKtp8xDuy1Mkc/9JRm/vXEiRZzR96zwc0Pc6nGWkWywA9git4JMh5E3tvTBm3XlYf6ffOwoibL46yyfab5n6qM7MrKg5haSw+FLkmJg9Bdhs6YpdjtoOikB7NUfFk0q33dJaPjRq1GnftjqTlxvhI4FQ3PuwnQLG7HEnit0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w5x1RRPl; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21638389f63so12280105ad.1
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2024 22:19:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734070761; x=1734675561; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n5oF9jov6joYFA3TQsmrGHK73Ci9n0mNzk5UXN2ZVo0=;
+        b=w5x1RRPl0jnjljVk8biKm5FuC20tYdGff1zmva7uY1u2Ss8Tb8m4x8jc+MiNYwy20j
+         wUD3hq3WifxRErQRK0AtuLtjOXELCG4FthSHyJN5PznZdCog+mxHJJXcmWl5Ut+RhCtZ
+         lrCcy3TLe4xjf0RhOeJydRecwzcUDxQfKxgFfeJ9UVa3rJX6z6KrZZwZTQAL2EI1uQFc
+         v0FVcQQCeYZ9UzjSsYiiZB/YEFqefj85CH0sUShmXPLSnDlo09wAZdtYIaR3stwf5jo9
+         AFxGMVafsss1lni47OLUdlIRl3J/q6SsXuFjCa7gRYayRGBASAcwCeVZl8blwBvYHiji
+         NWjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734070761; x=1734675561;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n5oF9jov6joYFA3TQsmrGHK73Ci9n0mNzk5UXN2ZVo0=;
+        b=KTfMltSA+hPppKy2J3FeBMZtA9kBaCvVH4tAeW6VidDlWlOkc63Ya9Li8qerikG0xE
+         XdTRcjCcOFkhWJs35qvvTucrBh8wBq9TnHy8cS6ZscG2FAq8GZ4g0XzzU1/LOmc6yZjG
+         f74IO4RFJPWL2ir72n68gtVoJ23yVtEvh9IFyjC0hsk5IU3mwHo/xEheG3P8Xjg6e5++
+         u/2DagtBhvUtCXS1eOatuCO6Wt4uYOiIdN72/FLmjdLZ1f6kqxsVeNYMc7KZQ41jSWbg
+         Vd4YUeLJ+Po7H2shKzmtAiQqwlv9QaUJNUdlnQnUUeTJ0GSJSgygYRQzMHHzpp/+fUgQ
+         HDsA==
+X-Gm-Message-State: AOJu0YxYKfZEPIAisQIXz594mplzkJfBKLvAtiM9qpsLQ52hERzU8T2x
+	J6rMQwiB9rCfG30njtxnTgdvCMBx72xMmqjS+m8hmYYHc+i5+RJ1/9cRH8q7132JFz4r7rLCoux
+	ncQ==
+X-Google-Smtp-Source: AGHT+IH8Tju6InYA6vGPE54wU0lZHft8YC7vV4TPTHR62raRBFJyNNwUg/F/hXnhEEHuLnSIeoRbN1q7Bg4=
+X-Received: from plqs9.prod.google.com ([2002:a17:902:a509:b0:216:2fcc:4084])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:234d:b0:216:70b6:8723
+ with SMTP id d9443c01a7336-21892a5440cmr20189615ad.44.1734070761077; Thu, 12
+ Dec 2024 22:19:21 -0800 (PST)
+Date: Thu, 12 Dec 2024 22:19:07 -0800
+In-Reply-To: <a3e75091f2b6b13d4907ac2fdf09058ab88c4ebf.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212192118.GA3359591@bhelgaas>
+Mime-Version: 1.0
+References: <20241211193706.469817-1-mlevitsk@redhat.com> <20241211193706.469817-2-mlevitsk@redhat.com>
+ <Z1ox4OHNT6kkincQ@google.com> <a3e75091f2b6b13d4907ac2fdf09058ab88c4ebf.camel@redhat.com>
+Message-ID: <Z1vR25ylN5m_DRSy@google.com>
+Subject: Re: [PATCH 1/4] KVM: VMX: read the PML log in the same order as it
+ was written
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Dec 12, 2024 at 01:21:18PM -0600, Bjorn Helgaas wrote:
-> On Mon, Dec 09, 2024 at 02:06:22PM +0100, Philipp Stanner wrote:
+On Thu, Dec 12, 2024, Maxim Levitsky wrote:
+> On Wed, 2024-12-11 at 16:44 -0800, Sean Christopherson wrote:
+> > But, I can't help but wonder why KVM bothers emulating PML.  I can appreciate
+> > that avoiding exits to L1 would be beneficial, but what use case actually cares
+> > about dirty logging performance in L1?
 > 
-> Applied the ones with maintainer acks to pci/devres for v6.14, thanks!
+> It does help with performance by a lot and the implementation is emulated and simple.
 
-I don't see this on:
-https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git/
+Yeah, it's not a lot of complexity, but it's architecturally flawed.  And I get
+that it helps with performance, I'm just stumped as to the use case for dirty
+logging in a nested VM in the first place.
 
-Did you perhaps forget to push?
+> Do you have any comments for the rest of the patch series? If not then I'll send
+> v2 of the patch series.
 
+*sigh*
 
-Kind regards,
-Niklas
+I do.  Through no fault of your own.  I was trying to figure out a way to ensure
+the vCPU made meaningful progress, versus just guaranteeing at least one write,
+and stumbled onto a plethora of flaws and unnecessary complexity in the test.
+
+Can you post this patch as a standalone v2?  I'd like to do a more agressive
+cleanup of the selftest, but I don't want to hold this up, and there's no hard
+dependency.
+
+As for the issues I encountered with the selftest:
+
+ 1. Tracing how many pages have been written for the current iteration with a
+    guest side counter doesn't work without more fixes, because the test doesn't
+    collect all dirty entries for the current iterations.  For the dirty ring,
+    this results in a vCPU *starting* an iteration with a full dirty ring, and
+    the test hangs because the guest can't make forward progress until
+    log_mode_collect_dirty_pages() is called.
+
+ 2. The test presumably doesn't collect all dirty entries because of the weird
+    and unnecessary kick in dirty_ring_collect_dirty_pages(), and all the
+    synchronization that comes with it.  The kick is "justified" with a comment
+    saying "This makes sure that hardware PML cache flushed", but there's no
+    reason to do *if* pages that the test collects dirty pages *after* stopping
+    the vCPU.  Which is easy to do while also collecting while the vCPU is
+    running, if the kick+synchronization is eliminated (i.e. it's a self-inflicted
+    wound of sorts).
+
+ 3. dirty_ring_after_vcpu_run() doesn't honor vcpu_sync_stop_requested, and so
+    every other iteration runs until the ring is full.  Testing the "soft full"
+    logic is interesting, but not _that_ interesting, and filling the dirty ring
+    basically ignores the "interval".  Fixing this reduces the runtime by a
+    significant amount, especially on nested, at the cost of providing less
+    coverage for the dirty ring with default interval in a nested VM (but if
+    someone cares about testing the dirty ring soft full in a nested VM, they
+    can darn well bump the interval).
+
+ 4. Fixing the test to collect all dirty entries for the current iteration
+    exposes another flaw.  The bitmaps (not dirty ring) start with all bits
+    set.  And so the first iteration can see "dirty" pages that have never
+    been written, but only when applying your fix to limit the hack to s390.
+
+ 5. "iteration" is synched to the guest *after* the vCPU is restarted, i.e. the
+    guest could see a stale iteration if the main thread is delayed.
+
+ 6. host_bmap_track and all of the weird exemptions for writes from previous
+    iterations goes away if all entries are collected for the current iteration
+    (though a second bitmap is needed to handle the second collection; KVM's
+    "get" of the bitmap clobbers the previous value).
+
+I have everything more or less coded up, but I need to split it into patches,
+write changelogs, and interleave it with your fixes.  Hopefully I'll get to that
+tomorrow.
 
