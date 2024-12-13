@@ -1,78 +1,79 @@
-Return-Path: <kvm+bounces-33723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5969F0B34
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 12:34:02 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6FD9F0B3E
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 12:34:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDAA2834E3
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:34:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 978331885DBC
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0151DF265;
-	Fri, 13 Dec 2024 11:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1A71DF97F;
+	Fri, 13 Dec 2024 11:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZSt1HQDo"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="h0+UIcqJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072A51AB528
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9504E1DF756
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 11:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734089597; cv=none; b=av39605wZAsQ2R7fhz+ZCsuUI4AmRLY82ApAgAiGf4igSLP6fpCSgiLGO5RGMr/cy5MTxUKAPslOtdY73qztuJ68qgrpCqwdJ7H0m7Xx+a1Yb5T+A4csm7mNXs+3/U2w5mOvRCNa2lcORaRBUyWnDGYh27A9k9dM1cYorRhkYHg=
+	t=1734089601; cv=none; b=WO3xJq2YrQl1+wZWwmjIg2TldQJPYiZrW9BtWfACRWPvWcFYhelg35LgvFifpb0GisftJWVkgqwpfugay1lXwOGbPQFOgVzBtR1aVLv8c2DUFM7YTK9G4nh5qx0P0aDOIeOQU2HXL8/c+o7CqRZ1YnvUFyrfCOEz7F6urEwlEIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734089597; c=relaxed/simple;
-	bh=tbP+jC6o0WUbBs5wzvPexsjiCSh2sPVpbTXynXjrfGk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CFns60WdUSZSrN2+2N8WEiuxkrAbL0r+QTM4yPVWVTianigJDdP/al0NgoG1DYtR3Ay+QkVNYmPImgzqtYRqSJqxkdUY2nvuW1KcCLkQcvszsuvNGANzn0jXy59XYrN7sdMwPVWgYLUsfXRfhlGqEC4/dBxNQzeFf92RvKbTvac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=ZSt1HQDo; arc=none smtp.client-ip=209.85.214.196
+	s=arc-20240116; t=1734089601; c=relaxed/simple;
+	bh=xbIhDp8oO/WOy54HbWEh0DC1K4YkZwzlD2oINXShTDI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=tkHo1aTe7BH1fBQCalFlrHwF8JI9gteLRp4WFoVxA6ingwczs6oUxhH3PzGDULpc8u60d8OY1M0/SF71dY0BnSXYa7SikEfSUR9b/oYCeSxB80OFlA74OLrkSN95Sg7VLVyb0Wvn/nKPVKR7y/aDG+UcyOsyzjCjnaNvHngSL3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=h0+UIcqJ; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-20cf3e36a76so15665725ad.0
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 03:33:15 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2165448243fso17162855ad.1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 03:33:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1734089595; x=1734694395; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=26MbCcxBXRObwdyBKZjlPQXxYB9MTH5C48d0Ryy4x64=;
-        b=ZSt1HQDoJSRx7q43X8bBcy0emGKMjRnLv7yf4uUnJa2vL+ZoQcI3wlPhquGpsp6ND9
-         e/vntTexPmo+AWurBu2bPGvA3pwBdl3NhCLsZa65kWLFvV0tG3bB1nPjMvDWkUv/hHtJ
-         5ZZ3T0WiLkpYM8fpV0CMa34FwIXrXiBiEtQKExKFjJREoVmka0FY1YV4dG3gbzQqgAsu
-         mIhPaY6Wl5qNE/B9fKzkQL72Yp4KGzRnuj2zyMSsmsLptYk9/6x4XJCIQCuPKMQZQ2t7
-         PTz0NF+xNSTxvlnkQOqRvnToyZATqzaDvYZNPogv9QAMR5d4WGq0x58fXsmxxl1HPSa6
-         lvsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734089595; x=1734694395;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=sifive.com; s=google; t=1734089599; x=1734694399; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=26MbCcxBXRObwdyBKZjlPQXxYB9MTH5C48d0Ryy4x64=;
-        b=pI6D06h1VktH2/wwcmJnureDfrewCy50v/s5PUBFsJSD5dZt8wrlstudsfvUubhLyq
-         CKh7RikOf3AZ0VNORwQbHle9eawwOWCxmqKKxDy+HXXNDqfycBkk6CLHkWBWjP3PPghH
-         nP8187I88E4aeYx6uk9k5FLzD5AuCrBPL/Rr6nxmJGLvhS9VCJLzt9aT4HF34pLIzvBI
-         Um3U4Lc/4zSGGG1PCtHqvINkVufNGNjLVT2yuRHE0IKwrkEySGGC3UC+076W23XTUHbC
-         aLB9szAzRXvSdZQMTmV9rK6KslEH9i+Biu4OSFq+Dn4/K8p3lvxlatQpiShR5MpSIkqO
-         pXsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWY62vCv+wvLDm56+zYlogPNd3tYzS0roIS79+gS34qtunrwH9ri9/h7dt3M418Jlt9xVM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyF+6FUvej0S9+3IPu/MrpAf8HtsdsWPYuhu2xqTO13AENDZPtA
-	NQDphyXKX10VOiWmKaV1jRuNgnNcqbPxHsn7Zy3aEI82xvcSqpckHY7z7HO2NU0=
-X-Gm-Gg: ASbGnctdROPf/9tCqAJ2F7oreZYOqulR9RfO0gTJ/DVW3Kt/NJX5cDbf0aL8vzfqVb0
-	aP2nGu6EK3SHOGY8FHPSp+16MkwfbC3a8j2HVQBF8okxeVwLJc6Mk1iE6SI99XPRNfr56VTGvtQ
-	jT+kUVZeZfMCbEsO7ou+HIJj09Atj+CrkG3lN3hu/JhqsYRANlBCAHXY9VsYD9G6/CMVfI8AsvJ
-	FF4SGUsdXealZI9o/YQ+6Qoc2Byq8gSnq4A+imRAaJlRMQPUvD4tk0=
-X-Google-Smtp-Source: AGHT+IE2aHmaFHTR9iBiCUjqMgt+u4ssTP/m0KwR0xBzwYlNhga7euk988OdWGvjpY5KeC8o/0oqRQ==
-X-Received: by 2002:a17:902:d50c:b0:215:bc30:c952 with SMTP id d9443c01a7336-2189298a144mr36097955ad.6.1734089595266;
-        Fri, 13 Dec 2024 03:33:15 -0800 (PST)
+        bh=icgAGsVOjevpWNQPqv7Ss8LxbqZxAhRJ45E0lQlPi0I=;
+        b=h0+UIcqJeL6avbhJmsL2RWM6yBYea32f5AvroSCAZYYqcTFiKgzRsRasy71LKq14Db
+         CRm/SJkqMv6mIXKN53P6JGOk9pwFK/z17sQFC+2xAEgLdMDo69Uvwcv5YXhTyolM8gtk
+         Lj828gDdObZdoSkEiOx0NcDufAJ0DjQW2ejlgcFWVzJDNgF9KOWK4+yBvW/7Aw1rnueo
+         VyX43YK/UJp1ONmpf5xmtZSK9UV7m722C3JE230BTCM0yI6SNUB9ht3KgnAK7N2J9v2H
+         HwoCMgbapUtFf8siKGnTCLMTPPfov1zDsPG4QLP5CRoiQB5k6ggJIVc5nuUZ7/pozWdF
+         Q6ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734089599; x=1734694399;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=icgAGsVOjevpWNQPqv7Ss8LxbqZxAhRJ45E0lQlPi0I=;
+        b=MXLQU+PYXIiYM8i+s+d1HUs5WtrAz+WOYzIrRe1x60IPsF/txdo4WmeMTzHxhn85/v
+         d/cerrbYgoNDQBnOkAVy1C8RpefgE1urA2LpaTxGZadZ6qfnh1P9QcPt2OjAa0WKqLCx
+         Du7d7IHifOtphyLzY6Ai/KqnfOEs7ZTdO1YcjjvXMaLESJzQ9O0S6GFQMQ6RnZFvAaIb
+         +FK0gK4nDUVyrRZxyWfUOUU+bilmy/TpOA8sqa5dbkJ0v4MzPju6OMNQ8oCA1UO9K4KZ
+         37B8eaFO96pg7uEQtqLSagay2PCuQ2w4qvLnox/vCD+l8UA9NugeRlsFR9QPHkZL/SPw
+         WVqA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5LwclD8lxFC7yc2hwId04s4zCoPeXfdivEGcrwbaVIFTwDilFo1/pwdj9cfv+5IT5cdQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRPMJs3a+z8mPZLnpGytMQDchahT0trFqe/CdYZbAmw14gdBOP
+	eYy3DryiS0M5R0YBoTeWFlFgEX3225Ca5pqs06MQ6n2lx/dwwxj/6oXMuhOMD+I=
+X-Gm-Gg: ASbGncvmtrl4Eo+HPognrXhCD8xnsZDViwlKuR5/UWYWjhpjG5yOtpVHV3NVtS0LWza
+	qF62xfrXHMZ6QMY+tix9HquC7gewIpdXpAmI2+kR8hP0Glky+39TnXcGZ8GbtDgXTrKBVMIVonN
+	qkyYpEW/uv+IB05I2bjpplQsqtJ4MXKvK2A1tti2Pk02lB0hX5T6mrw7Gm3H4fBYs4wX41MDrfD
+	sO3jzqyxMCxFRg0HnPfmCeGsIoe+d/fTKYbGGt8cWAZQXOFHaJajgI=
+X-Google-Smtp-Source: AGHT+IH2nEHURvGX68aXCJdkw52YFqLvsUkNAPq2G06B97z/rQ/3gyN8DcjgMGnawbesNCdYSpjEag==
+X-Received: by 2002:a17:903:944:b0:216:356b:2685 with SMTP id d9443c01a7336-21892997a65mr37133475ad.11.1734089598772;
+        Fri, 13 Dec 2024 03:33:18 -0800 (PST)
 Received: from [127.0.1.1] ([210.176.154.34])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21631bd2c2dsm103327125ad.263.2024.12.13.03.33.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21631bd2c2dsm103327125ad.263.2024.12.13.03.33.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 03:33:14 -0800 (PST)
+        Fri, 13 Dec 2024 03:33:18 -0800 (PST)
 From: Max Hsu <max.hsu@sifive.com>
-Subject: [PATCH RFC v4 0/3] riscv: add Svukte extension
-Date: Fri, 13 Dec 2024 19:33:06 +0800
-Message-Id: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
+Date: Fri, 13 Dec 2024 19:33:07 +0800
+Subject: [PATCH RFC v4 1/3] dt-bindings: riscv: Add Svukte entry
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,10 +82,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHIbXGcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyTHQUlJIzE
- vPSU3UzU4B8JSMDIxNDI0Nj3ZTUMt3cxIoM3eKy0uySVN0yE11jE0MDw9RkSxPTVEsloMaCotS
- 0zAqwodFKQW7OSrG1tQCcvFY+aQAAAA==
-X-Change-ID: 20241213-dev-maxh-svukte-v4-34101ec945e9
+Message-Id: <20241213-dev-maxh-svukte-v4-v4-1-92762c67f743@sifive.com>
+References: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
+In-Reply-To: <20241213-dev-maxh-svukte-v4-v4-0-92762c67f743@sifive.com>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
  Conor Dooley <conor+dt@kernel.org>, 
  Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -97,91 +97,53 @@ Cc: Palmer Dabbelt <palmer@sifive.com>, Conor Dooley <conor@kernel.org>,
  Samuel Holland <samuel.holland@sifive.com>, 
  Deepak Gupta <debug@rivosinc.com>, Alexandre Ghiti <alexghiti@rivosinc.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3076; i=max.hsu@sifive.com;
- h=from:subject:message-id; bh=tbP+jC6o0WUbBs5wzvPexsjiCSh2sPVpbTXynXjrfGk=;
- b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBnXBt3nDotuBhQJRSQUC7kSPKHLLlxqASJuOrQK
- U5Px7fhMk6JAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZ1wbdwAKCRDSA/2dB3lA
- vcR4C/4irx2RT/e5bqfqAIm563+xO9z5R4UvXSir/eIK9aVaHYeMVqEdWbPauFsH5lGk+WLVpEh
- B9p8z3ebch6wZM/EHolPkw5wCN6bU7kouNEK4mTX9ciVvsgk2viGkFg2kuwQvxkDyPPTI0lG8py
- 1O3tqm3kG9nv6YuBgJE/jFYHQK7AWqyGq+Z97fxy1+je3mdJ360SkwAJwLJruDet2/B39bd0wud
- Ye+9EUv44RY8nUGvq1E2teWhCcDGwysMSPwo1euaAG98AGzu82QpJMNE6CVjTcjryau0iu9eXBi
- XYoOpu/POI0s/hE8t+RQpofxtx7Zxn0jbtV98fsNKJGCkHm2jPIwTetFCcRnxQ6+qY1Rv0FSUr3
- rFMddvmyn+KHaBt0yccQpl8GOFWWUtn2G75N80wP5IUUW0H/6i/bCh45IGKSEVIMM/elBip6kNJ
- 6sczUcrwCMH7g+b/5nuLrefqZXCg3p8Fk8/PBw0e9gXgz5aFBEX3c4jf/BR6ynSkuAHds=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1527; i=max.hsu@sifive.com;
+ h=from:subject:message-id; bh=xbIhDp8oO/WOy54HbWEh0DC1K4YkZwzlD2oINXShTDI=;
+ b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBnXBt33aT8cTBv8JfrlGJUVUqAqLodDIB5ZxZhE
+ 4P4NvcJji6JAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZ1wbdwAKCRDSA/2dB3lA
+ vQgKC/0X8yRuSVKFECTI3UVo5o8Yu8z7bDY6iBTo9p0YPcST9UEA2hm3B1sYvcLLIPqJfY/FHfm
+ fDxqXZbAHlkAc9PlOwh13cx1ruE81roJ/R0HQ+cwtti1f63c9NKk/j6+jUZa2vc3WV58HGhR2ia
+ +75mY06ejduOZ5ZIZOzxsQb5zRV6MHMGvYZEE/6jlgImAIKuiPjk+jPlNPRKvQ1hgej0mCWsDeo
+ 2EBIaKveoleQgmZOH9bTY/AiU6QtofpWkhUCjKyMWVgSpRzvKEAMSS/e4FiVPNRagaEjZMUSKPR
+ nNZADAPlSHPkXUqZ8IiCyaTC2CgzPqLG011MoG6NF3foWxxC3uUWITrw4V0wX7LhuGRsN1Da3b4
+ 7SxHbyHtkMzmlqoVc+QfBpB0T9klnw/P91dVZFAXotI/gM4mQwPk40KLHBvwdJytvabCH1ZWvs7
+ 5NMae2znE4oN066eZIGKaIZYBHUC9VSkEEpSJM4fGNrnsYrd3sgCSaRHh4t2pUZqwtMA0=
 X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
  fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
 
-RISC-V privileged spec will be added with Svukte extension [1] 
+Add an entry for the Svukte extension to the riscv,isa-extensions
+property.
 
-Svukte introduce senvcfg.UKTE and hstatus.HUKTE bitfield.
-which makes user-mode access to supervisor memory raise page faults
-in constant time, mitigating attacks that attempt to discover the 
-supervisor software's address-space layout.
-
-In the Linux kernel, since the hstatus.HU bit is not enabled,
-the following patches only enable the use of senvcfg.UKTE.
-
-For Guest environments, because a Guest OS (not limited to Linux)
-may hold mappings from GVA to GPA, the Guest OS should decide
-whether to enable the protection provided by the Svukte extension.
-
-Since the Guest OS may utilize the Svukte extension simply by setting
-the senvcfg.UKTE without any trap to host. In the view of VMM, the
-Svukte extension should be always presented. Therefore adding an
-extra entry in kvm_riscv_vcpu_isa_disable_allowed().
-
-If the Guest environment wants to change senvcfg.UKTE, KVM already
-provides the senvcfg CSR swap support via 
-kvm_riscv_vcpu_swap_in_(host|guest)_state.
-Thus, there is no concern about the Guest OS affecting the Host OS. 
-
-The following patches add 
-- dt-binding of Svukte ISA string
-- CSR bit definition, ISA detection, senvcfg.UKTE enablement in kernel
-- KVM ISA support for Svukte extension
-
-Changes in v4:
-- rebase on riscv/for-next
-- add kvm_riscv_vcpu_isa_disable_allowed() entry addressed by Anup
-  and Andrew from v2/v3 patches.
-  - update the cover letter for the detailed reason
-- update the commit message on dt-binding for the Svukte ISA string
-- Link to v3: https://lore.kernel.org/all/20241120-dev-maxh-svukte-v3-v3-0-1e533d41ae15@sifive.com/
-
-Changes in v3: 
-- rebase on riscv/for-next
-- fixed typo in the dt-binding for the Svukte ISA string
-- updated the commit message for KVM support for the Svukte extension
-- Link to v2: https://lore.kernel.org/all/20240927-dev-maxh-svukte-rebase-2-v2-0-9afe57c33aee@sifive.com/
-
-Changes in v2: 
-- rebase on riscv/for-next (riscv-for-linus-6.12-mw1)
-- modify the description of dt-binding on Svukte ISA string
-- Link to v1: https://lore.kernel.org/all/20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com/
-
-Link: https://github.com/riscv/riscv-isa-manual/pull/1564 [1] 
-
+Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+Reviewed-by: Deepak Gupta <debug@rivosinc.com>
+Reviewed-by: Alexandre Ghiti <alexghiti@rivosinc.com>
 Signed-off-by: Max Hsu <max.hsu@sifive.com>
-
 ---
-Max Hsu (3):
-      dt-bindings: riscv: Add Svukte entry
-      riscv: Add Svukte extension support
-      riscv: KVM: Add Svukte extension support for Guest/VM
-
  Documentation/devicetree/bindings/riscv/extensions.yaml | 9 +++++++++
- arch/riscv/include/asm/csr.h                            | 2 ++
- arch/riscv/include/asm/hwcap.h                          | 1 +
- arch/riscv/include/uapi/asm/kvm.h                       | 1 +
- arch/riscv/kernel/cpufeature.c                          | 5 +++++
- arch/riscv/kvm/vcpu_onereg.c                            | 2 ++
- 6 files changed, 20 insertions(+)
----
-base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
-change-id: 20241213-dev-maxh-svukte-v4-34101ec945e9
+ 1 file changed, 9 insertions(+)
 
-Best regards,
+diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+index 9c7dd7e75e0ca35f76eb666cdacfc297a7570958..b5d90765a376e065797ffdddf35302ed51ca7df1 100644
+--- a/Documentation/devicetree/bindings/riscv/extensions.yaml
++++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+@@ -217,6 +217,15 @@ properties:
+             memory types as ratified in the 20191213 version of the privileged
+             ISA specification.
+ 
++        - const: svukte
++          description:
++            The standard Svukte supervisor-level extension for making user-mode
++            accesses to supervisor memory raise page faults in constant time,
++            mitigating attacks that attempt to discover the supervisor
++            software's address-space layout. Currently under review as Pull
++            Request number 1564 at commit 932cfa4 ("Move senvcfg.UKTE to correct
++            position") of riscv-isa-manual.
++
+         - const: svvptc
+           description:
+             The standard Svvptc supervisor-level extension for
+
 -- 
-Max Hsu <max.hsu@sifive.com>
+2.43.2
 
 
