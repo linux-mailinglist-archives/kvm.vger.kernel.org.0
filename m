@@ -1,209 +1,111 @@
-Return-Path: <kvm+bounces-33785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E01B9F1766
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 21:32:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C249F18F4
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 23:26:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB175188CE08
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04CFD16B98B
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 22:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6005191F9C;
-	Fri, 13 Dec 2024 20:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A3A19F49E;
+	Fri, 13 Dec 2024 22:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CvQpIg44"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OUXqNWTY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98275286A1
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 20:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1F4185949;
+	Fri, 13 Dec 2024 22:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734121909; cv=none; b=sVbfm/mdERfolvfTReSkNxNTp6cSUJ+rP4Fuf0YAzH62+MEAee2fVpYG8b0JKeSkpEj1Z9NzjGjp3/JEZohi/cOEw7zFaQr/2g0D8yIgpjShhETFa3AzrH3E/vVKlRZG2aa3Tv0HvhIWR9+1zf58dWMA+xpExvC0XPfLuP2s0e8=
+	t=1734128330; cv=none; b=t3zJGm5LiLIHpEE6uAlLxTW9Gl9gTEIOaPL1n5qf+FK1ojipP3j2j7mlhM3t+8DU7LK80pG8L8xAP6KzLkG7Y1s4OLIUXt+pXf4kzEjvF8giHPXLTcXjaWfqfSUYXUHBaWZ31b6sNqXdVRWkIjHqeorMf59swmj9b43sKF/3GSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734121909; c=relaxed/simple;
-	bh=9xB5zQII9gByqe2ZXP6h5gt/kFUwGFWsEl1xx4H4JHY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bIMdvjbCt53u1C6UFIxqZaiweBzd3cFal7A3OpXeG8Vq7gbRaIz26JDWb1yFujHe5Og7bxgkudupxh4IvuCEgrI/UqEI6if9lL0UChvYMHhUIbBxDZw39i8TyWIuuL9TH8sp/RqXpv6sWHiFh9BWh7GpfyZCyf3AqW7NdJTNy1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CvQpIg44; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so2047038a91.1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 12:31:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734121907; x=1734726707; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWHqkJtQWzEFFZ8Kp1Au9t//E/0RpuQvQSaS19c/OkQ=;
-        b=CvQpIg44ZNBRi7gExue7K2x33dAUYK5CL9Dopxlmto6J/SL5jwmmZZIGYWVAq4HYg0
-         z/SVLHF5R9tZmE45hOBmoKIeA7kJy4npQZtaHFxRB1cpx6J9yw1V+Pc8tt0mC+xh4OOU
-         osefJQrfx8L0hTVP4yisNjW00V+kSNSyVwLKwh0dXn8C26sL5rirRPtcti1W78jkeVuq
-         nYO0ExnllNjk5TEY9kD5YjBtJb4YzqtupBo32JU8YuewRFoBZDCCjOOInWse4RReMnhZ
-         I/FjPGFYhBzrBZ59KXVKQr14EDOITvfsQNsUwfWpVJ6Vdi5im2/90UsmLflx+qhkVInO
-         Km5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734121907; x=1734726707;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWHqkJtQWzEFFZ8Kp1Au9t//E/0RpuQvQSaS19c/OkQ=;
-        b=iiZuNua4ik/r0+y/78TprYlZpGPKUA1/XCUTe/7r51p6pi0z0s3pqlKchgRFRM0Onq
-         aCDar2MaH4N7X3wohuDGzA8E0OiQRahqAXUh+XByFUWAiqz4G8eoJExbyvAbY1Q7mB18
-         AT9R8i/nGUBQZLsvNgsrZ39jwQXFWrbNwAQqZRQ6eJbBw/T2k/68jccjfXxLw4olWwn3
-         x7tq7wioWrU2PbyA/HSDq01lXf/wm1SS1tPdwBlGNfuWXPoEw3KtkLiYZ4IUQ1HlzKs/
-         gWzVWQpWxneW5wZ4cILHS9Hpg3wG19BHoRvZC8iNh/TtFfYqlbR2WVgetyx/dma1XbMd
-         nY8Q==
-X-Gm-Message-State: AOJu0YzI06lindjasDuTkGpcN/Uyeuxazd1QqXOk09WTmhmjO2CZE90F
-	RzAbKngQXQsGpWXHHZGlDcA1g57Cva74MtIoTvE0tLDuoA2Qxy+hKpCqtPpMSOa89wOv1ojtjkg
-	OTw==
-X-Google-Smtp-Source: AGHT+IHmL+ftw/cybJHUE3JtWq+YXSDYzxtQNtcJvZnpiaDeGGmJ22cl+McBVze/UuOAIfzl+cLHrIzNtHY=
-X-Received: from pjbpl7.prod.google.com ([2002:a17:90b:2687:b0:2e9:ee22:8881])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3952:b0:2ee:db8a:29f0
- with SMTP id 98e67ed59e1d1-2f2900a6ef2mr5918047a91.27.1734121906955; Fri, 13
- Dec 2024 12:31:46 -0800 (PST)
-Date: Fri, 13 Dec 2024 12:31:45 -0800
-In-Reply-To: <88706b97f374bd425da82e78789e6234cb6baed2.camel@redhat.com>
+	s=arc-20240116; t=1734128330; c=relaxed/simple;
+	bh=yGVF+lGT8ur8QZFdxP3rJGdxQv5/psNez7G9/LlnyAo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k7c1h3UoF9ZrJTNfNa0KosM+3xva0NH+lycpLQKItuMPhf6BFYUDjhoctZagm1er1cjpQWDx/iVCe96uw2LyKEhgWMt+bIcKlLyOVlwR4tp2nraPE5NlsJZU19/YbVF4EZuLzMf9rWAI6s8k1LO+E2mNsYNyI/7Mmz1bwl7A5Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OUXqNWTY; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734128329; x=1765664329;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yGVF+lGT8ur8QZFdxP3rJGdxQv5/psNez7G9/LlnyAo=;
+  b=OUXqNWTYlBzbvRqM+qKeVVc4M4q9SM7LEXOk+5ei+E/0FrT3/YMUKmtz
+   si9i3bp+bffBTixi3wt3cchanWo3cxOYK4+hcj3pIl1IJCleSapnoH7e9
+   ntqDfPE0kMD7UO5WBk6Mlpg+RSYG9wxKQQTjzSrZgVg2n7rLgWw6+16NL
+   5eJ7BH06Gwg35yBinH9AcSiwtvv9Xx/Z91T8DTSTtayZ5F2n1PgumU++L
+   /ioz70YfrN1D6xx2ImT96QhLZBGH+EfM9RbX9JQ1/VfxxSCahlVKJbhxG
+   6BcNSp4i+Hc1ocNSQUm/Unn5jfD+VwGt++IYY3NrekXJ3lpb5nGhFh5Kn
+   w==;
+X-CSE-ConnectionGUID: UcEOFs5GQ1W0S9Z/foQ1fg==
+X-CSE-MsgGUID: YYHLya8YSYm6UKBfkkU6ag==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="38526460"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="38526460"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 14:18:48 -0800
+X-CSE-ConnectionGUID: cYDbbYl9QR2Pm3TS6wPPlw==
+X-CSE-MsgGUID: CyLYLFNcQ4Cbf0jiSe7UyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,232,1728975600"; 
+   d="scan'208";a="96708626"
+Received: from rchatre-desk1.jf.intel.com ([10.165.154.99])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 14:18:48 -0800
+From: Reinette Chatre <reinette.chatre@intel.com>
+To: pbonzini@redhat.com,
+	seanjc@google.com,
+	shuah@kernel.org
+Cc: isaku.yamahata@intel.com,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	reinette.chatre@intel.com
+Subject: [PATCH] KVM: selftests: Add printf attribute to _no_printf()
+Date: Fri, 13 Dec 2024 14:30:00 -0800
+Message-ID: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241211193706.469817-1-mlevitsk@redhat.com> <20241211193706.469817-2-mlevitsk@redhat.com>
- <Z1ox4OHNT6kkincQ@google.com> <a3e75091f2b6b13d4907ac2fdf09058ab88c4ebf.camel@redhat.com>
- <Z1vR25ylN5m_DRSy@google.com> <88706b97f374bd425da82e78789e6234cb6baed2.camel@redhat.com>
-Message-ID: <Z1yZsUFKhuw6KASe@google.com>
-Subject: Re: [PATCH 1/4] KVM: VMX: read the PML log in the same order as it
- was written
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 13, 2024, Maxim Levitsky wrote:
-> On Thu, 2024-12-12 at 22:19 -0800, Sean Christopherson wrote:
-> > On Thu, Dec 12, 2024, Maxim Levitsky wrote:
-> > > On Wed, 2024-12-11 at 16:44 -0800, Sean Christopherson wrote:
-> > > > But, I can't help but wonder why KVM bothers emulating PML.  I can appreciate
-> > > > that avoiding exits to L1 would be beneficial, but what use case actually cares
-> > > > about dirty logging performance in L1?
-> > > 
-> > > It does help with performance by a lot and the implementation is emulated and simple.
-> > 
-> > Yeah, it's not a lot of complexity, but it's architecturally flawed.  And I get
-> > that it helps with performance, I'm just stumped as to the use case for dirty
-> > logging in a nested VM in the first place.
-> > 
-> > > Do you have any comments for the rest of the patch series? If not then I'll send
-> > > v2 of the patch series.
-> > 
-> > *sigh*
-> > 
-> > I do.  Through no fault of your own.  I was trying to figure out a way to ensure
-> > the vCPU made meaningful progress, versus just guaranteeing at least one write,
-> > and stumbled onto a plethora of flaws and unnecessary complexity in the test.
-> > 
-> > Can you post this patch as a standalone v2?  I'd like to do a more agressive
-> > cleanup of the selftest, but I don't want to hold this up, and there's no hard
-> > dependency.
-> > 
-> > As for the issues I encountered with the selftest:
-> > 
-> >  1. Tracing how many pages have been written for the current iteration with a
-> >     guest side counter doesn't work without more fixes, because the test doesn't
-> >     collect all dirty entries for the current iterations.  For the dirty ring,
-> >     this results in a vCPU *starting* an iteration with a full dirty ring, and
-> >     the test hangs because the guest can't make forward progress until
-> >     log_mode_collect_dirty_pages() is called.
-> > 
-> >  2. The test presumably doesn't collect all dirty entries because of the weird
-> >     and unnecessary kick in dirty_ring_collect_dirty_pages(), and all the
-> >     synchronization that comes with it.  The kick is "justified" with a comment
-> >     saying "This makes sure that hardware PML cache flushed", but there's no
-> >     reason to do *if* pages that the test collects dirty pages *after* stopping
-> >     the vCPU.  Which is easy to do while also collecting while the vCPU is
-> >     running, if the kick+synchronization is eliminated (i.e. it's a self-inflicted
-> >     wound of sorts).
-> > 
-> >  3. dirty_ring_after_vcpu_run() doesn't honor vcpu_sync_stop_requested, and so
-> >     every other iteration runs until the ring is full.  Testing the "soft full"
-> >     logic is interesting, but not _that_ interesting, and filling the dirty ring
-> >     basically ignores the "interval".  Fixing this reduces the runtime by a
-> >     significant amount, especially on nested, at the cost of providing less
-> >     coverage for the dirty ring with default interval in a nested VM (but if
-> >     someone cares about testing the dirty ring soft full in a nested VM, they
-> >     can darn well bump the interval).
-> > 
-> >  4. Fixing the test to collect all dirty entries for the current iteration
-> >     exposes another flaw.  The bitmaps (not dirty ring) start with all bits
-> >     set.  And so the first iteration can see "dirty" pages that have never
-> >     been written, but only when applying your fix to limit the hack to s390.
-> > 
-> >  5. "iteration" is synched to the guest *after* the vCPU is restarted, i.e. the
-> >     guest could see a stale iteration if the main thread is delayed.
-> > 
-> >  6. host_bmap_track and all of the weird exemptions for writes from previous
-> >     iterations goes away if all entries are collected for the current iteration
-> >     (though a second bitmap is needed to handle the second collection; KVM's
-> >     "get" of the bitmap clobbers the previous value).
-> > 
-> > I have everything more or less coded up, but I need to split it into patches,
-> > write changelogs, and interleave it with your fixes.  Hopefully I'll get to that
-> > tomorrow.
-> > 
-> 
-> Hi!
-> 
-> I will take a look at your patch series once you post it.
-> I also think that the logic in the test is somewhat broken, but then this also 
-> serves as a way to cause as much havoc as possible.
-> 
-> The fact that not all dirty pages are collected is because the ring harvest happens
-> at the same time the guest continues dirtying the pages, adding more entries to the
-> ring, simulating what would happen during real-life migration.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-But as above, that behavior is trivially easy to mimic even when collecting all
-entries simply by playing nice with multiple collections per iteration.  
+Annotate the KVM selftests' _no_printf() with the printf format attribute
+so that the compiler can help check parameters provided to pr_debug() and
+pr_info() irrespective of DEBUG and QUIET being defined.
 
-> kicking the guest just before ring harvest is also IMHO a good thing as it also
-> simulates the IRQ load that would happen.
+[reinette: move attribute right after storage class, rework changelog]
 
-I am not at all convinced that's interesting.  And *if* it's really truly all
-that interesting, then the kick should be done for all flavors.
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+---
+ tools/testing/selftests/kvm/include/test_util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Unless the host is tickless, the vCPU will get interrupt from time to time, at
-least for any decently large interval.  The kick from the test itself adds an
-absurd amount of complexity for no meaningful test coverage.
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index 3e473058849f..77d13d7920cb 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -22,7 +22,7 @@
+ 
+ #define msecs_to_usecs(msec)    ((msec) * 1000ULL)
+ 
+-static inline int _no_printf(const char *format, ...) { return 0; }
++static inline __printf(1, 2) int _no_printf(const char *format, ...) { return 0; }
+ 
+ #ifdef DEBUG
+ #define pr_debug(...) printf(__VA_ARGS__)
+-- 
+2.47.1
 
-> we can avoid kicking the guest if it is already stopped due to dirty ring, in fact,
-> the fact that we still kick it, delays the kick to the point where we resume the guest
-> and wait for it to stop again before the do the verify step, which makes it often
-> exit not due to log full event.
-> 
-> I did this but this makes the test be way less random, and the whole point of this
-> test is to cause as much havoc as possible.
-
-I agree randomness is a good thing for testing, but this is more noise than
-random/controlled chaos.
-
-E.g. we can do _far_ better for large interval numbers.  As is, collecting _once_
-per iteration means the vCPU is all but guarantee to stall on a dirty ring for
-any decently large interval.
-
-And conversely, not honor the "stop" request means every other iteration is all
-but guaranteed to fill the dirty ring, even for small intervals.
-
-> I do think that we don't need to stop the guest during verify for the
-> dirty-ring case, this is probably a code that only dirty bitmap part of the
-> test needs.
-
-Not stopping the vCPU would reduce test coverage (which is one of my complaints
-with not fully harvesting the dirty entries).  If KVM misses a dirty log event
-on iteration X, and the vCPU also writes the same page in iteration X+1, then the
-test will get a false pass because iteration X+1 will see the page as dirty and
-think all is well.
 
