@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-33749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A359F12EC
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:52:44 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2289F12D7
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:51:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EEA01882EFD
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 16:51:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E809E280EA6
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 16:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1811F37CF;
-	Fri, 13 Dec 2024 16:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225221F4262;
+	Fri, 13 Dec 2024 16:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t4XViSSs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="07b0Ny0F"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059941F37BE
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 16:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E34F1F3D34
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 16:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734108515; cv=none; b=A9M9nKUHaH3lyr6twkhQ7Ut98Ig5MQmvM2aBkgHPX2npXXSaXQu3OpY4gCyVUDwCgu2e/FUErVetlcCTw2qe2Ljh9KYYUZdPrsyS1StbP1+gaF1EN7EVZEdvGrikUcAON+de3kf1WGps2/OVBawc7Vpoqtskx3nMy48Of5Z5SO0=
+	t=1734108518; cv=none; b=mfJV/15dyOl0wPEgOVs8BlkJRi+nDyO3ZPveBCtRkWwg4abonCIEM5So22iANpH/6A3IllMoSjPVJs/uBIM8WYIByQCsD6WsqfqYloRHIYRNI+qKY5z8oRe6qvpWIFfGlw0hRYjVmuz5karYA6+dnBEuBwU+ZbbA33rdKC1bkWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734108515; c=relaxed/simple;
-	bh=M7+MFZiu3/ijUuLXmaqnRaTq0ZymjLSw2DyjVM//qRY=;
+	s=arc-20240116; t=1734108518; c=relaxed/simple;
+	bh=nTUBEGVYkg9r5vYRMcM+vZaIEl5r6n5mctx7ZVr18aY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SIeDAEYW2hUtLkqb1P/tPN3opXCH+Fm3xZs18rR9bSOSgV3Jd5nfDkoRWTNrvCqPWL3FEhTjY9GX9xn0qXRACPsYKBWtlk7pRQFKLVtkmhwTHSo6+cZq+Snq0Va1AFcrSutiupGKDhP692karDP6F5HdX3u23o0lus6I8zPQIiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t4XViSSs; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=SjGVIty6KhoD61z8/XWiXQLynPl/FA7e2HrLKtXGKLOHajpENXh3OeFsOtgsVJdN1KRTcL+G5pfOR6dwfP/ZXtx0nugFS4NmwPFn0gGuMR1uwaLcH+h8/bu7jM0AELSRLkqhmMYIxHdhQaOimizG1npkNZAgrhulX84409PgDpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=07b0Ny0F; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-436289a570eso12992595e9.0
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 08:48:33 -0800 (PST)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso11574955e9.2
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 08:48:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734108512; x=1734713312; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734108515; x=1734713315; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksEVsaSQioDaJqKOOzrRTGd2BPTgCKjKlBLY+w56wZo=;
-        b=t4XViSSs+C2EkTS1htUgQwfH3VoPbpCYP73PF2tFIoR7eAlk5hYRmeHLEZt6Phmj6B
-         omFOrsaLOzN/wRDhvpi9DX+7vIftqUdFk2i+C8CjCYHDMOXaY53cbhEQaH5yFSqgVlws
-         xGHMbGOJgiGofKGCSCAoOeGcrZ4OEz9S4I7Tv2EC4+QWYWfPn8UlIPiJl8qOTWu3vp+A
-         0LixCqGUVAxf3cQ0n1kFjF8HUOmmcSluB/TR4iNEx+2rZuu+cOf2AxQ7rfLkfr09pSwb
-         bbu4RVGWv3C0AYNi88bi7/sAzKzURHHAUz4XZV8wUlW57227wa3j+iEBFy7oDwZniEJb
-         K5MA==
+        bh=WsEDyhBns9NxCkCIdpMm4WAodyMfjoY3V2TpfAI1mN0=;
+        b=07b0Ny0FBWrMRLUo1E3nN+OZc0bp3yqnm5vz3ssSUF83tn9fCwrfy+nMTJuHh6Gd1P
+         VWrNEiNsy0bAfcdfo5Gvnkar6pBD5zjEr9b7AZ81XYf/qDpmOVtv1veKmVO3JYQpQdy4
+         bhBOqR7rNMWPRqKWQ6oKgjJWhkXyqVlF7MfdMQQ0zQkqFeo4czJRC9gcsOd4lDp2Klwa
+         JrglEiuF8Q5P1apAA7IwtuP/+32z4/aZ2kLHStlIV9d3uU1OhV/+yJ9nyretsphtln1o
+         SpaRTs8D8kYdCgF/sTYXtHxKfwNuMwtGHgGWieF5T2UZf5WuNigoDuwnBgbP9rk/9Egj
+         JFGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734108512; x=1734713312;
+        d=1e100.net; s=20230601; t=1734108515; x=1734713315;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksEVsaSQioDaJqKOOzrRTGd2BPTgCKjKlBLY+w56wZo=;
-        b=WHxzvoSsi4ifTKuVuwU2JQn1mWfCMSY1eYXH/L8FIr/u/M+hxPMiEurO931I+r1zyk
-         sIzVUe4aVh7gcMAkCMBAfgUBqISFrRvdVRZbpGxx9NVmhOKiDLq43O/XWS3BrM1H4Xj6
-         0ux2eo0Jnh6Q9T2NzsjxjfZGNVSMhpaJHypM53/0tBKHMwBkUcui2fbFbcOrFG+EyvZr
-         jN6eAEi9EBMk3ER9mOzPIA8/eTXbn/cxZwUB91s8ZkZG87BzIv894J5lSppN+tfpo0xp
-         XKMvWoHDQvwuHU/gj6xJ4g5YLXv3YSaA0wVtxwE/LVtWqBCbG0ZqSrP5MpeooCQ1iE9G
-         8e1A==
-X-Gm-Message-State: AOJu0YwRaClAi4XvTQlxpN1nOQJxPubZO42JXn70/FUvVs5wlkh8OA9z
-	+Mxyv+uv8M8nVrD2bkaMufQsaikGlSkKCosz7c31ni3Zx2bv9vsOK6vKLO6ZFnOmO0DYEo/GDi4
-	l0Xea5gr3zcWfZe+p1hBG681x28Sp9OGz7V/wxaelq6wqAxOTcHRNDuq78VPXGw3/ZDXnFuswFz
-	y1qVGgEQJyHGKnd1Dwn72WPy0=
-X-Google-Smtp-Source: AGHT+IEt4pXQrhABH8gera5DOjDskLThzt7L9I5lJj6Vxwq11yPrteBm6Llct58hlLMQdsD4E964MjHJuQ==
-X-Received: from wmbg15.prod.google.com ([2002:a05:600c:a40f:b0:436:1534:b059])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:6549:b0:434:f0df:9fd
- with SMTP id 5b1f17b1804b1-4362aa1b061mr38281225e9.2.1734108512506; Fri, 13
- Dec 2024 08:48:32 -0800 (PST)
-Date: Fri, 13 Dec 2024 16:48:05 +0000
+        bh=WsEDyhBns9NxCkCIdpMm4WAodyMfjoY3V2TpfAI1mN0=;
+        b=W0N4s8vHaAi8dNtO0HT4ufSSEphWjfxYOnQbxUH8VG4HkTp3m+c4IOvz/ZScji53yP
+         XbgzSwXmlbn145Iu87//nUioLmm+Kemvy0xsuuNDqT6vTewi5Ekk9uaj/Nro6FF9SqQH
+         v07Bb8hkwPBXz5X462NjX06NfupIC0BnEs1rdoiUK9R6etJQtvwnScEaEKkTXcT4lMPJ
+         caAy6qPuDoWf9o3qMyK/ddJourajr8EzWtVtGxWbrdZBdQp77hbfwRwZGj1UEgXn7iwZ
+         pURm7apepiic+5t9buXmNjaMwq/qLih/a0GaeOa9m8/1beIMq/BLJymfd2lElyX3e8gj
+         lPuQ==
+X-Gm-Message-State: AOJu0Yz3qSMJALdD0ROIbbZgJ9j1R5jc3KL1sOXqOKF6D2QZF9pR+mQG
+	ZRgkDqjE2cZVNvkixO2MjBk6aT8V4Z5NzJv00pLaXKOZZ/Q4zTCX36cDesoec58ccwDXg6UbEvW
+	KWH5L8sS1RfjPlY9+9XzNlcYETVQzjc7GNXUJl/FocsiEBkP3ZcBRf8Kqzc+k6SRBZM1/1OaMXo
+	dUzAzn5NENQdD03cTx4PfIEpQ=
+X-Google-Smtp-Source: AGHT+IGBPIX0XH2E/QAG4VVkoTgxq7y6qEK9iHPxA7arOJ8hwxyGtcqtTyclPQC42evEdmBRc/aMqmUXOw==
+X-Received: from wmox24.prod.google.com ([2002:a05:600c:1798:b0:434:f7cf:3389])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1da4:b0:434:faa9:5266
+ with SMTP id 5b1f17b1804b1-4362aa43222mr32447565e9.13.1734108514902; Fri, 13
+ Dec 2024 08:48:34 -0800 (PST)
+Date: Fri, 13 Dec 2024 16:48:06 +0000
 In-Reply-To: <20241213164811.2006197-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241213164811.2006197-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241213164811.2006197-10-tabba@google.com>
-Subject: [RFC PATCH v4 09/14] KVM: guest_memfd: Add KVM capability to check if
- guest_memfd is host mappable
+Message-ID: <20241213164811.2006197-11-tabba@google.com>
+Subject: [RFC PATCH v4 10/14] KVM: guest_memfd: Add a guest_memfd() flag to
+ initialize it as mappable
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -100,42 +100,97 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	jthoughton@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Add the KVM capability KVM_CAP_GUEST_MEMFD_MAPPABLE, which is
-true if mapping guest memory is supported by the host.
+Not all use cases require guest_memfd() to be mappable by the
+host when first created. Add a new flag,
+GUEST_MEMFD_FLAG_INIT_MAPPABLE, which when set on
+KVM_CREATE_GUEST_MEMFD initializes the memory as mappable by the
+host. Otherwise, memory is private until shared by the guest with
+the host.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/kvm_main.c      | 4 ++++
- 2 files changed, 5 insertions(+)
+ Documentation/virt/kvm/api.rst                 | 4 ++++
+ include/uapi/linux/kvm.h                       | 1 +
+ tools/testing/selftests/kvm/guest_memfd_test.c | 7 +++++--
+ virt/kvm/guest_memfd.c                         | 6 +++++-
+ 4 files changed, 15 insertions(+), 3 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 454c2aaa155e..60b65d9b8077 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6380,6 +6380,10 @@ most one mapping per page, i.e. binding multiple memory regions to a single
+ guest_memfd range is not allowed (any number of memory regions can be bound to
+ a single guest_memfd file, but the bound ranges must not overlap).
+ 
++If the capability KVM_CAP_GUEST_MEMFD_MAPPABLE is supported, then the flags
++field supports GUEST_MEMFD_FLAG_INIT_MAPPABLE, which initializes the memory
++as mappable by the host.
++
+ See KVM_SET_USER_MEMORY_REGION2 for additional details.
+ 
+ 4.143 KVM_PRE_FAULT_MEMORY
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 502ea63b5d2e..021f8ef9979b 100644
+index 021f8ef9979b..b34aed04ffa5 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -933,6 +933,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_PRE_FAULT_MEMORY 236
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
-+#define KVM_CAP_GUEST_MEMFD_MAPPABLE 239
+@@ -1566,6 +1566,7 @@ struct kvm_memory_attributes {
+ #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
  
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 53692feb6213..0d1c2e95e771 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4979,6 +4979,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #ifdef CONFIG_KVM_PRIVATE_MEM
- 	case KVM_CAP_GUEST_MEMFD:
- 		return !kvm || kvm_arch_has_private_mem(kvm);
-+#endif
-+#ifdef CONFIG_KVM_GMEM_MAPPABLE
-+	case KVM_CAP_GUEST_MEMFD_MAPPABLE:
-+		return !kvm || kvm_arch_has_private_mem(kvm);
- #endif
- 	default:
- 		break;
+ #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
++#define GUEST_MEMFD_FLAG_INIT_MAPPABLE		(1UL << 0)
+ 
+ struct kvm_create_guest_memfd {
+ 	__u64 size;
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index ce687f8d248f..04b4111b7190 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -123,7 +123,7 @@ static void test_invalid_punch_hole(int fd, size_t page_size, size_t total_size)
+ static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+ {
+ 	size_t page_size = getpagesize();
+-	uint64_t flag;
++	uint64_t flag = BIT(0);
+ 	size_t size;
+ 	int fd;
+ 
+@@ -134,7 +134,10 @@ static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+ 			    size);
+ 	}
+ 
+-	for (flag = BIT(0); flag; flag <<= 1) {
++	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MAPPABLE))
++		flag = GUEST_MEMFD_FLAG_INIT_MAPPABLE << 1;
++
++	for (; flag; flag <<= 1) {
+ 		fd = __vm_create_guest_memfd(vm, page_size, flag);
+ 		TEST_ASSERT(fd == -1 && errno == EINVAL,
+ 			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 3d3645924db9..f33a577295b3 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -939,7 +939,8 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 		goto err_gmem;
+ 	}
+ 
+-	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE)) {
++	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&
++	    (flags & GUEST_MEMFD_FLAG_INIT_MAPPABLE)) {
+ 		err = gmem_set_mappable(file_inode(file), 0, size >> PAGE_SHIFT);
+ 		if (err) {
+ 			fput(file);
+@@ -968,6 +969,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ 	u64 flags = args->flags;
+ 	u64 valid_flags = 0;
+ 
++	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE))
++		valid_flags |= GUEST_MEMFD_FLAG_INIT_MAPPABLE;
++
+ 	if (flags & ~valid_flags)
+ 		return -EINVAL;
+ 
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
