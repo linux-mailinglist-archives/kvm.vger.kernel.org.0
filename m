@@ -1,782 +1,300 @@
-Return-Path: <kvm+bounces-33697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37759F0536
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 08:10:05 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1BC169A0D
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 07:09:56 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015DA18FC85;
-	Fri, 13 Dec 2024 07:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpR+xUK4"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12AC9F054A
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 08:15:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C735119006B
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 07:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734073780; cv=none; b=sqxbAFOG1AP334WTq7CVxptT6PM9YNLz7umtoGnFlXnv9vWa/hZO4ClQt4psqSamhsF+UaUemJhtyzIHJZMDjl9YyUPtSHVbJKZYmkunrtFsmsT51oyPZzp383YKKexnX6iQY5OxRW2yErFOUEfqBR3GfNJv9u35cmQkQeqZlQ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734073780; c=relaxed/simple;
-	bh=t+LB+Ns9IyXdCBWhMrXMtMR2X8Lk7IJwTq/0yEzRAaU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ra8Ka15Bw53cjt9HmGlgWFBc2CGOPAv0IR+IlRZL+xJSL4EkzQKzyVEI+9tMKazAdwSQxGa48I7ITyvIsqaDGilNMQPHluP7gqX3taWW1sZn5AdZEMS+AIiLSAKKtR9AMiBpAXGtG6EOgJviA1h01gEa5MzWecHzdFfZ7znT+po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpR+xUK4; arc=none smtp.client-ip=198.175.65.10
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D42F282652
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 07:15:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404C318C018;
+	Fri, 13 Dec 2024 07:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gDDsTwZT"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B5A1552FC
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 07:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734074150; cv=fail; b=YH5y8SI53CDNa8YC9Yr2/u4BX7lMHWW64mnN4kKCBAB/b5lFA7aqYfy5ZuqmuFPxU9AZ1SgGVYgKmZDdN//l1Lv3kWSF4JKHJsKQ7zxdZDIayClYKfGGDMxHMowklvcrMzNsWpg84F4iCP/lSM8Z6LuvUcE1wtfTNEYHkiW6r2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734074150; c=relaxed/simple;
+	bh=GnP8kAHjjQXv9z4XewKKgw9V11+eQtMGFd00RMXeg8U=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XPxzG9hQp5GimztjpFZAHCbELZyvJuzWAxMCrxQS/G4dSqgXl+cCW3Rob474P1FW9ipovNqB0miheDPr8GIqCuc96e0Dd6UI1GTfnmwygDMipW1DFEnDv/VwxIaJoEBgTZkT4ixfACcd642bY977eTb3Mfy50BS/8L8z/9Cvk70=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gDDsTwZT; arc=fail smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734073778; x=1765609778;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t+LB+Ns9IyXdCBWhMrXMtMR2X8Lk7IJwTq/0yEzRAaU=;
-  b=FpR+xUK4FHYRXQYR47nKrHxN5DUxoU/LmOz3F/ehhdzzWZOaX5Lgh+4Q
-   mjf1aelr9fs9wP/+E50EQnquedVhrjpTGHfnP/EPjJMQyztQ6jiLZuq8E
-   0iwvF8+qH0E9LoOcrF/0kC9Zn4/SR/yUFy6v68HRVjHtUCar6K2QtsoBK
-   iQPQh5cNOsCN/eE+zK1bCu1Mw54K2tc2gT4PfSBm9/NEyJJ9+tWh4eSWV
-   zKlXeH/Qj0v8Vh4rld4HZDFzGiwKC9vE/ya8BtsfF8FOOERH2TwRq92SM
-   V1BkByGdqVa6HwrZ5RQOmXa5ZQ6qhPE8zGI6Jol5g1cRgoBRqAYbBl6hb
+  t=1734074148; x=1765610148;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=GnP8kAHjjQXv9z4XewKKgw9V11+eQtMGFd00RMXeg8U=;
+  b=gDDsTwZTkG8mRgt2AFP1TYpdbc0YehHOJqIvopwBbrP+eVuHqgc2Fapk
+   J/t0TBQXCtuuzUM/uF32xJCOtGm76G9c1OECTRkuO7pVcuB7whSdTY+jN
+   TPe5URRoOSNN7H50pBhryRchYz/Jn3MRzgsBCu5WTPN2iaVGsUH8EClAm
+   qI0sIP46HBCRjVno26JyTpWry3EB5iOLsGW1eD7m1mi1kYLIZW6W2vp1t
+   pO8aFwW5zY5T7oW0SgwitzDQizzTNHkUIS+pu86wgqhXjLl8qaPIyBhnt
+   1Pnsncs3oSIalt4ATND+9Lbf+wOK8yILn1VfN5/FrW9mTS25wtKvFTBt/
    g==;
-X-CSE-ConnectionGUID: AxRolGBxRmK2CVK8PiZ5mg==
-X-CSE-MsgGUID: smAFfKDPTRqmvREA37MgMQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="51937109"
+X-CSE-ConnectionGUID: UxSlT+AeTqyq26Vfl9rMBQ==
+X-CSE-MsgGUID: ahQTo+RATX+mrCu894GyCg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="34660330"
 X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
-   d="scan'208";a="51937109"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 23:09:38 -0800
-X-CSE-ConnectionGUID: oYKPgmgOTZGMb6AP0BKP5w==
-X-CSE-MsgGUID: y5rdZvvoRtibrtxIQBkOlg==
+   d="scan'208";a="34660330"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 23:15:48 -0800
+X-CSE-ConnectionGUID: bb0hT2c3SeCA8fqMHnZnDg==
+X-CSE-MsgGUID: 6LiYHKDDQ5uVXvwbC7n6QQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
-   d="scan'208";a="96365590"
-Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 23:09:35 -0800
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-To: David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>,
-	Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: [RFC PATCH 7/7] memory: Add a new argument to indicate the request attribute in RamDismcardManager helpers
-Date: Fri, 13 Dec 2024 15:08:49 +0800
-Message-ID: <20241213070852.106092-8-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241213070852.106092-1-chenyi.qiang@intel.com>
-References: <20241213070852.106092-1-chenyi.qiang@intel.com>
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="96318307"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2024 23:15:48 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 12 Dec 2024 23:15:47 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 12 Dec 2024 23:15:47 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 12 Dec 2024 23:15:44 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=chgbONWJkXWNTsTu5v7IWxHRMuplAXCDbkP1TqHxvBIIgeA6VzlO+5Zy8rSaAd7pK+/zOLU9FOwrI2Uv0LwWcfOdpXz+0/ELwGcJ4hLIyluNBZy4lQHfSdLqA/NE49D49pougz38CQl1496dIr8FRkqIGjfy0HKVyGYtCGSRvDf7Rl5ZRU5/0qFQeDNlag7KSweckfXhyMOuYg1Zt8UmXF7kPKWqJf+O8wYqehw5b+9YpgCNSZhQ/rypBZWj7lUDVY83WpQhBislJto/y+6C7l7Pr3igqFdIEdWovX5DZEs7peHXVEumjicNVdsE0l7vRhW08ghwfXH925fXZbYf6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z5k0tA64QxPLdQPP2CXROcfS7CurMqgooJPdKYiwxvA=;
+ b=kSgQeWe0wq9yjtlnUqIRLseLz/oAvvhA69Q72N1SVADYAkpcbOPAFS2g66ECPLXySctn+l9qZFaW5RnpMywnRn2NLQGhu2xQtE0MxufmTexoHmap6k0jrx53KQ/1tk3oOR2gdTdWk6MsxA5c50KYj7fQyvtDlWN1CBdP1RlPT90PkJ3y6IioTPV2LuphLszzbC/i80j4eCyNITU+oAAGUXbKuiNKWLBJdBXaJIvr3TsxLkKgqFJP6IHMLdMDrXY6lJfwlK2eVupAEBlvycNIph7KJsbbTnrF0umfUXdNoSC5/7P3RoFGmK9Ae0eLZ8ga0+4gDr5kAIyky/BliOww2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA1PR11MB8522.namprd11.prod.outlook.com (2603:10b6:806:3b1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.18; Fri, 13 Dec
+ 2024 07:14:56 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%5]) with mapi id 15.20.8251.008; Fri, 13 Dec 2024
+ 07:14:56 +0000
+Message-ID: <c91ea47c-ca71-4b37-b66c-821c92e3d191@intel.com>
+Date: Fri, 13 Dec 2024 15:19:55 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 08/12] iommufd: Enforce pasid compatible domain for
+ PASID-capable device
+To: "Tian, Kevin" <kevin.tian@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: "joro@8bytes.org" <joro@8bytes.org>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"vasant.hegde@amd.com" <vasant.hegde@amd.com>
+References: <20241104132513.15890-1-yi.l.liu@intel.com>
+ <20241104132513.15890-9-yi.l.liu@intel.com>
+ <39a68273-fd4b-4586-8b4a-27c2e3c8e106@intel.com>
+ <20241206175804.GQ1253388@nvidia.com>
+ <0f93cdeb-2317-4a8f-be22-d90811cb243b@intel.com>
+ <20241209145718.GC2347147@nvidia.com>
+ <9a3b3ae5-10d2-4ad6-9e3b-403e526a7f17@intel.com>
+ <BN9PR11MB5276563840B2D015C0F1104B8C3E2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <a9e7c4cd-b93f-4bc9-8389-8e5e8f3ba8af@intel.com>
+ <BN9PR11MB52762E5F7077BF8107BDE07C8C3F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <98229361-52a8-43ef-a803-90a3c7b945a7@intel.com>
+ <BN9PR11MB5276E01F29F76F38BE4909828C382@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB5276E01F29F76F38BE4909828C382@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR02CA0057.apcprd02.prod.outlook.com
+ (2603:1096:4:54::21) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB8522:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59a74241-03e8-4117-85de-08dd1b45d8d0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NDBmOXFYZVBaTkhqOFA3My9kRUQwbUVXUWxLem9KWTB6eDVLM1daYUwraGxy?=
+ =?utf-8?B?NlZHNDJYMWdoazhrSGlVYU1Ea240Sm5LQ0d1K013dkg1U2prZnJVWDV5Z3V2?=
+ =?utf-8?B?OXhHSmU0N0hLYzJ5U1pOd1Z3OGJ0Tm5LN01sWllRSVBqamNhVFVONVRJRUlN?=
+ =?utf-8?B?OWtlM1VyUU1BTnpYcXp1ZmVadk9jdmRpK1hxemY0Ry9lcllqZHRsZElzczdP?=
+ =?utf-8?B?TlFkODI5KytqU2Uyd3JRanVDOHdSa1pyamhnc2hjb2toUWRVSGRKWXJoaVI4?=
+ =?utf-8?B?VzB2SytWb2lNTEQrSUNxV3RUbTRtdVBTWjBwbWdlbkFxM0l3RzZvQ2M3cXow?=
+ =?utf-8?B?OXFvKzRZOGhHb3F6Y1F0WXdPVEh6TTUwd1pQTXNpM0pQNzB2MzA4bktxbW1q?=
+ =?utf-8?B?Z3BjVDA1cnFaUUdpdnJvazFFaEZSaHRlSzVqRmtKOW1wQjFsRkVqRzVCdnpu?=
+ =?utf-8?B?SUptWVFqazhiZE5sVFlwcFhxdjBVZXB4c2FUYnJUNWd4NHpIelBHZ0FHUExv?=
+ =?utf-8?B?elBMekNLUHh4MTREenBwSFBObzZGaG56REN3OEVhM0hSdDZHMTRBd2dFTmpC?=
+ =?utf-8?B?V1lBMmZqblM4OGozNVNYTk5tV2xqdkorazdRZHZ2S0IrQ2hnNk5ZZzl5Vkh4?=
+ =?utf-8?B?SHlHZWY0UkluTGZkSDIyb2tweFlBQnpVdUZqTi9lYUs3VDVkL0ZwWis3ek1m?=
+ =?utf-8?B?UzdITTRxbDNyaVVyUTdxYUh5cVFuVHV6UmJhNXdwTXFYRGhXMzA2SUNRdXhm?=
+ =?utf-8?B?aXM4WWJ1VlNiVVRvRGo5YnlJV0pkaHUwOXhWaEpZNmRsMTRUWGVFSDNiTm1j?=
+ =?utf-8?B?NVVVc2dVUUk2RVdnc0t0VHYzM1pvRVJNTmJKOEpYTlR3Z0crT1YzdjJyTGxU?=
+ =?utf-8?B?TzdwLzlxajFlSVk5a1dzWjg5alRqNTI0Ykhkak5CSUtxb09LQ1BDSHZtdDNV?=
+ =?utf-8?B?ai9aRlhGREFLN1JHWHVLazAyWGRXZHBIUDFUTStWSEkvbEI0Z0RnSGVNZ3pT?=
+ =?utf-8?B?SFZxeHVPelE0ZVZZRUVWbDBzQXRHSnh6V1JHOGZXRXJzS29LakJodEI0cDVl?=
+ =?utf-8?B?ZkExU1M3ckJHOHA2MnZ6WWcrWDhGSWc2VWVEcGZVQ2h3cE5kZ0dFbHNTMWJu?=
+ =?utf-8?B?dENFQitNYmdBODFGdk1FZVNmcEpwSVN0U1NnNW5RY3Z5dFE2VzRobkU2VzhR?=
+ =?utf-8?B?VnAxYmNuWjZna0ovSURTUEFJeW1WT3p1WFlNSW41QXh2elBsZmw4YjdBMDcv?=
+ =?utf-8?B?UWNIZU5VOHdydzJXUldqOUpveWkyYWg3c0xTS0ttYXlha3V4VjJuais1WXZX?=
+ =?utf-8?B?YjkrNFR5UHJxLytZUU9GL2NsTXNuYm9MK1JoYVZMNW12bGJHVzJ0Y2ZZNEVu?=
+ =?utf-8?B?SE8vdEJyaERsM2xpQkg0enhvcHdUYjJEMlZTV0NmQVZ5KzNyWjdubDZ5RGVG?=
+ =?utf-8?B?K0JGTndvYWk3K0ZESWh1Skl0SE1tYzBTeUpqR1k0K001MTFkSnJUNnllVUNK?=
+ =?utf-8?B?T3BpZ1VRZGp2cXczU2FEU3ZydEkxbG9zMDVYUUEzUjZocHhJUVQ3Kzd2VFoz?=
+ =?utf-8?B?cjgxVXZyRy9JRHp2T1JEOVBsbW1yY2MrbGU0YU80ZWhSN0hLTHo5cW05MUU4?=
+ =?utf-8?B?QjZBcXdMZGZBVHdkY245UGZvejlYcnl4T0NPSElGNjFwVG5FSTVZaUM5U0dO?=
+ =?utf-8?B?NXNPeHRMMEsrdFRnN2lwcThHOWlLNzh5N2tXeTJITGdpN1hWeVRPMDBFSjcw?=
+ =?utf-8?B?dG1iSlhmaHVVajFZZkNTWEVNRGY5QmlGWUErNTVrbHlpYXN5QkVsZzAxSkVY?=
+ =?utf-8?B?MDluc1hMK3dtWFpyRWpldz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YmdkN0pPSStCdnArOGQxeTAvYjhobDdEcURpYTR5WjloRk1JWis4T1JkOHZm?=
+ =?utf-8?B?TDVlK2plZVFsQUZEVnFPSVR6dGZzbVpwQjhQNWlqY2JGVWtzeWJtcnRvRGV6?=
+ =?utf-8?B?c3d3eXFHalYzdXRIRnVBNmFnc21HMkdNOGNYVVJJMGNENU95K1I0MVJrNm83?=
+ =?utf-8?B?N3ZCNVZIMFVrRkx1WllSb1dnU2p4amw5SFdoL2RBNkJyd0w4R1ZWVXpEQi9C?=
+ =?utf-8?B?SGxQQUdkeHdER3NiQ1FwYm8xTkJkUEZBeVBRNzVPeUlFR2RqOURqc1pWUlov?=
+ =?utf-8?B?MnhCQUFGZGR0aFBKWFQxZGhHR2VGU2JOSlFDRzBRTUtKemkzc2Z2emxXQVJR?=
+ =?utf-8?B?SEJaSjZLZ1Frd0VNRnBPM3VTNDFZK01QWElCbE1uQVExQnJZRnpHT0RaKzJX?=
+ =?utf-8?B?N2x5b3JoS1FJVzBSUHhMK3llclJDa1gzT0NiTXlkOTVnczdiT3l4dW5GaE9N?=
+ =?utf-8?B?c3NrWk9ndlA1Vit3L3MxQm40NHhBMWtkTTc0cExzbk5tR09FWjFSR2h0YkYy?=
+ =?utf-8?B?YnRHUEVwSkpvSWk5WEJLRHlxQ1FFQ2psTVpQdTl4MUU0VzFqbmFPWjd0aDdv?=
+ =?utf-8?B?bHRoRVVtS1d5OGlKLzVUZ0dXQ1ZITkd2UmpIOUI0Mmp2SDRzMjlFT0pRUUJS?=
+ =?utf-8?B?d1hQWmR0dFhtWTJjK1dhT091dE5CdDRELzIwNXkyNlA2UWZHcW10akxnZ1Nm?=
+ =?utf-8?B?ZFpqOGp1cTd5SFFwK0xEaWx3MHcyZ1lXSktBaEtaVkpudjBDTGx5QXhsdGZj?=
+ =?utf-8?B?Q1plY1BUWnVTL1lRVEFVZEFQdFZ2cW5EUUZTZDQvK0I4cGw0aTB5clM5akNa?=
+ =?utf-8?B?WTZQYmRabGErbDhrcWM5b3dpNExsTGhURUlBWW0xUnY4R0ZkbmVwcDhydVlm?=
+ =?utf-8?B?RlE3ekMyOUc5emNFLytCS1JPWWRnRmJPem4yMXZQNFBieE9qYzZHNW45NmZK?=
+ =?utf-8?B?WjBtQkFhS2lMcjFZZEoyTmV1TXRmV0xoZlpiUi9xSzk3cTRaN0RVSzVBc0d2?=
+ =?utf-8?B?aloyVm4wOXNWSjZ4TEZ0b1BmaEJ2M1RpbzFZRjdMbWZUY1R0ZlI1VGZvN0Zk?=
+ =?utf-8?B?ZnJBdkx2SS9KRDRlOWZZaTFvRlVjRTRha203dGJPTU9SYXcwT29VVG5PTnZC?=
+ =?utf-8?B?Qk5GMi9hL29GRU9VY1VqV05JaTBDQVBxbVA1L1o4ZWhWWjQyNnNjTnBIeVNK?=
+ =?utf-8?B?dHMxSnVxSng3UFV3MWJSSjAvQlZwWFQ2YWVTV3ptbzM1WE10dGRkOVQ1QW9j?=
+ =?utf-8?B?ZTJreGxvV1B5KzBYNDN4K2drczhKZlR0SktyU1BMdlBkcmJUMHZxcDhaRFZY?=
+ =?utf-8?B?bXZuSldrQWQ2bXppNGs0OFAxYVBIc1hLbjVrOW1iT3VFR0YvZWVrVXBPMTZG?=
+ =?utf-8?B?KzZHZi9HZkJGV24xWFU1STRMUnJQNFo2THYyZVF3Q1hQQkpBS2RSU2JiWjlF?=
+ =?utf-8?B?Z2IremQ2MTUxOVBYNEkwTkZTMk0xL0ttaENYY3UzZEZZVEZMWXp1VDJDVlZX?=
+ =?utf-8?B?aThadlVDSzlBMDBNbEZZWU5hSUNpTEJMUE52aHFFNWJnVXd4MGZqUVlLdWtx?=
+ =?utf-8?B?ZjdjVnViOFQ5eW52em1UbjJkbCs1bFYzNVNiRzFqTjlwQVY5emhLMDJlVDVL?=
+ =?utf-8?B?ZUtDU25pekVHWDdZUFlNWmRkZmdYUEZlS2hydDVKdWpNUDQ4eG4xOFF3Zjc1?=
+ =?utf-8?B?L05YdzFaVWVKK3M1N09oMGw0YmpPODZwR2xSY3dqdFY2QjVhd0pJamtRRCsv?=
+ =?utf-8?B?MFl4RUdtZXpNS1lqU3lYUmphUWJQZmw4aUM5Q1JhSUZ5TG9oU3NTeHJ2d01q?=
+ =?utf-8?B?eDZmYmI2WkV3Yk9pa3FKdzRyYUFNNmNQUWwzdWxEeXpyYXNHYVlnM0pUenN5?=
+ =?utf-8?B?b3g2Mjg1R0FqUUZQaUxWYVcvYVF6Q1BvNjY5WHpMVkNZV1BzSHorenpGelRP?=
+ =?utf-8?B?Uk9GNjBQaVBvSkpaZEhIRXg2V0ZwMTZQWlZnaEl6NCtMRU9Db01aYVBhQVc4?=
+ =?utf-8?B?eXcydTMwcXd5WllkNEJrenVVcFZGV3pVVS8rejQvK0VPSGN1ZXd0NndYTEh2?=
+ =?utf-8?B?a1gxTWMyb0F5RWxDbGI5QXlNWGhRNm1WUEt2cHRvTmdrUUtSbnAyMHVZV2hO?=
+ =?utf-8?Q?5/UJPiBIH/kft9LRz+tL4L8Gh?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59a74241-03e8-4117-85de-08dd1b45d8d0
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2024 07:14:56.3961
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZCEh9Cx+qhYhC7wuHMAC1CZ2+z21ffLDp6pQDPlCzEp1YBJOV7GEKiDgvUtbBxk4PSIuKdeq6avobYhj135p9w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8522
+X-OriginatorOrg: intel.com
 
-For each ram_discard_manager helper, add a new argument 'is_private' to
-indicate the request attribute. If is_private is true, the operation
-targets the private range in the section. For example,
-replay_populate(true) will replay the populate operation on private part
-in the MemoryRegionSection, while replay_popuate(false) will replay
-population on shared part.
+On 2024/12/13 10:43, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Thursday, December 12, 2024 3:13 PM
+>>
+>> On 2024/12/12 13:51, Tian, Kevin wrote:
+>>>> From: Liu, Yi L <yi.l.liu@intel.com>
+>>>> Sent: Thursday, December 12, 2024 11:15 AM
+>>>>
+>>>> So maybe we should not stick with the initial purpose of ALLOC_PASID flag.
+>>>> It actually means selecting V2 page table. But the definition of it allows
+>>>> us to consider the nested domains to be pasid-compat as Intel allows it.
+>>>> And, a sane userspace running on ARM/AMD will never attach nested
+>>>> domain
+>>>> to PASIDs. Even it does, the ARM SMMU and AMD iommu driver can fail
+>> such
+>>>> attempts. In this way, we can enforce the ALLOC_PASID flag for any
+>> domains
+>>>> used by PASID-capable devices in iommufd. This suits the existing
+>>>> ALLOC_PASID definition as well.
+>>>
+>>> Isn't it what I was suggesting? IOMMUFD just enforces that flag must
+>>> be set if a domain will be attached to PASID, and drivers will do
+>>> additional restrictions e.g. AMD/ARM allows the flag only on paging
+>>> domain while VT-d allows it for any type.
+>>
+>> A slight difference. :) I think we also need to enforce it for the
+>> non-PASID path. If not, the PASID path cannot work according to the
+>> ALLOC_PASID definition. But we are on the same page about the additional
+>> restrictions in ARM/AMD drivers about the nested domain used on PASIDs.
+>> This is supposed to be done in attach phase instead of domain allocation
+>> time.
+>>
+> 
+> Here is my full picture:
+> 
+> At domain allocation the driver should decide whether the setting of
+> ALLOC_PASID is compatible to the given domain type.
+> 
+> If paging and iommu supports pasid then ALLOC_PASID is allowed. This
+> applies to all drivers. AMD driver will further select V1 vs. V2 according
+> to the flag bit.
+> 
+> If nesting, AMR/ARM drivers will reject the bit as a CD/PASID table
+> cannot be attached to a PASID. Intel driver allows it if pasid is supported
+> by iommu.
 
-This helps to distinguish between the states of private/shared and
-discarded/populated. It is essential for guest_memfd_manager which uses
-RamDiscardManager interface but can't treat private memory as discarded
-memory. This is because it does not align with the expectation of
-current RamDiscardManager users (e.g. live migration), who expect that
-discarded memory is hot-removed and can be skipped when processing guest
-memory. Treating private memory as discarded won't work in the future if
-live migration needs to handle private memory. For example, live
-migration needs to migrate private memory.
+Following your opinion, I think the enforcement is something like this,
+it only checks pasid_compat for the PASID path.
 
-The user of the helper needs to figure out which attribute to
-manipulate. For legacy VM case, use is_private=true by default. Private
-attribute is only valid in a guest_memfd based VM.
++	if (idev->dev->iommu->max_pasids && pasid != IOMMU_NO_PASID && 
+!hwpt->pasid_compat)
++		return -EINVAL;
 
-Opportunistically rename the guest_memfd_for_each_{discarded,
-populated}_section() to guest_memfd_for_each_{private, shared)_section()
-to distinguish between private/shared and discarded/populated at the
-same time.
+This means the RID path is not surely be attached to pasid-comapt domain
+or not. either iommufd or iommu driver should do across check between the
+RID and PASID path. It is failing attaching non-pasid compat domain to RID
+if PASID has been attached, and vice versa, attaching PASIDs should be
+failed if RID has been attached to non pasid comapt domain. I doubt if this
+can be done easily as there is no lock between RID and PASID paths. Maybe
+it can still be done by enforcing pasid-comapt for pasid-capable device.
+But this may be done in iommu drivers? If still done in iommufd. It would
+be like:
 
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
- hw/vfio/common.c             |  22 ++++++--
- hw/virtio/virtio-mem.c       |  23 ++++----
- include/exec/memory.h        |  23 ++++++--
- migration/ram.c              |  14 ++---
- system/guest-memfd-manager.c | 106 +++++++++++++++++++++++------------
- system/memory.c              |  13 +++--
- system/memory_mapping.c      |   4 +-
- 7 files changed, 135 insertions(+), 70 deletions(-)
++	if (idev->dev->iommu->max_pasids && !hwpt->pasid_compat)
++		return -EINVAL;
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index dcef44fe55..a6f49e6450 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -345,7 +345,8 @@ out:
- }
- 
- static void vfio_ram_discard_notify_discard(RamDiscardListener *rdl,
--                                            MemoryRegionSection *section)
-+                                            MemoryRegionSection *section,
-+                                            bool is_private)
- {
-     VFIORamDiscardListener *vrdl = container_of(rdl, VFIORamDiscardListener,
-                                                 listener);
-@@ -354,6 +355,11 @@ static void vfio_ram_discard_notify_discard(RamDiscardListener *rdl,
-     const hwaddr iova = section->offset_within_address_space;
-     int ret;
- 
-+    if (is_private) {
-+        /* Not support discard private memory yet. */
-+        return;
-+    }
-+
-     /* Unmap with a single call. */
-     ret = vfio_container_dma_unmap(bcontainer, iova, size , NULL);
-     if (ret) {
-@@ -363,7 +369,8 @@ static void vfio_ram_discard_notify_discard(RamDiscardListener *rdl,
- }
- 
- static int vfio_ram_discard_notify_populate(RamDiscardListener *rdl,
--                                            MemoryRegionSection *section)
-+                                            MemoryRegionSection *section,
-+                                            bool is_private)
- {
-     VFIORamDiscardListener *vrdl = container_of(rdl, VFIORamDiscardListener,
-                                                 listener);
-@@ -374,6 +381,11 @@ static int vfio_ram_discard_notify_populate(RamDiscardListener *rdl,
-     void *vaddr;
-     int ret;
- 
-+    if (is_private) {
-+        /* Not support discard private memory yet. */
-+        return 0;
-+    }
-+
-     /*
-      * Map in (aligned within memory region) minimum granularity, so we can
-      * unmap in minimum granularity later.
-@@ -390,7 +402,7 @@ static int vfio_ram_discard_notify_populate(RamDiscardListener *rdl,
-                                      vaddr, section->readonly);
-         if (ret) {
-             /* Rollback */
--            vfio_ram_discard_notify_discard(rdl, section);
-+            vfio_ram_discard_notify_discard(rdl, section, false);
-             return ret;
-         }
-     }
-@@ -1248,7 +1260,7 @@ out:
- }
- 
- static int vfio_ram_discard_get_dirty_bitmap(MemoryRegionSection *section,
--                                             void *opaque)
-+                                             bool is_private, void *opaque)
- {
-     const hwaddr size = int128_get64(section->size);
-     const hwaddr iova = section->offset_within_address_space;
-@@ -1293,7 +1305,7 @@ vfio_sync_ram_discard_listener_dirty_bitmap(VFIOContainerBase *bcontainer,
-      * We only want/can synchronize the bitmap for actually mapped parts -
-      * which correspond to populated parts. Replay all populated parts.
-      */
--    return ram_discard_manager_replay_populated(rdm, section,
-+    return ram_discard_manager_replay_populated(rdm, section, false,
-                                               vfio_ram_discard_get_dirty_bitmap,
-                                                 &vrdl);
- }
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index e3d1ccaeeb..e7304c7e47 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -312,14 +312,14 @@ static int virtio_mem_notify_populate_cb(MemoryRegionSection *s, void *arg)
- {
-     RamDiscardListener *rdl = arg;
- 
--    return rdl->notify_populate(rdl, s);
-+    return rdl->notify_populate(rdl, s, false);
- }
- 
- static int virtio_mem_notify_discard_cb(MemoryRegionSection *s, void *arg)
- {
-     RamDiscardListener *rdl = arg;
- 
--    rdl->notify_discard(rdl, s);
-+    rdl->notify_discard(rdl, s, false);
-     return 0;
- }
- 
-@@ -334,7 +334,7 @@ static void virtio_mem_notify_unplug(VirtIOMEM *vmem, uint64_t offset,
-         if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-             continue;
-         }
--        rdl->notify_discard(rdl, &tmp);
-+        rdl->notify_discard(rdl, &tmp, false);
-     }
- }
- 
-@@ -350,7 +350,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
-         if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-             continue;
-         }
--        ret = rdl->notify_populate(rdl, &tmp);
-+        ret = rdl->notify_populate(rdl, &tmp, false);
-         if (ret) {
-             break;
-         }
-@@ -367,7 +367,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
-             if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-                 continue;
-             }
--            rdl2->notify_discard(rdl2, &tmp);
-+            rdl2->notify_discard(rdl2, &tmp, false);
-         }
-     }
-     return ret;
-@@ -383,7 +383,7 @@ static void virtio_mem_notify_unplug_all(VirtIOMEM *vmem)
- 
-     QLIST_FOREACH(rdl, &vmem->rdl_list, next) {
-         if (rdl->double_discard_supported) {
--            rdl->notify_discard(rdl, rdl->section);
-+            rdl->notify_discard(rdl, rdl->section, false);
-         } else {
-             virtio_mem_for_each_plugged_section(vmem, rdl->section, rdl,
-                                                 virtio_mem_notify_discard_cb);
-@@ -1685,7 +1685,8 @@ static uint64_t virtio_mem_rdm_get_min_granularity(const RamDiscardManager *rdm,
- }
- 
- static bool virtio_mem_rdm_is_populated(const RamDiscardManager *rdm,
--                                        const MemoryRegionSection *s)
-+                                        const MemoryRegionSection *s,
-+                                        bool is_private)
- {
-     const VirtIOMEM *vmem = VIRTIO_MEM(rdm);
-     uint64_t start_gpa = vmem->addr + s->offset_within_region;
-@@ -1712,11 +1713,12 @@ static int virtio_mem_rdm_replay_populated_cb(MemoryRegionSection *s, void *arg)
- {
-     struct VirtIOMEMReplayData *data = arg;
- 
--    return ((ReplayRamPopulate)data->fn)(s, data->opaque);
-+    return ((ReplayRamPopulate)data->fn)(s, false, data->opaque);
- }
- 
- static int virtio_mem_rdm_replay_populated(const RamDiscardManager *rdm,
-                                            MemoryRegionSection *s,
-+                                           bool is_private,
-                                            ReplayRamPopulate replay_fn,
-                                            void *opaque)
- {
-@@ -1736,12 +1738,13 @@ static int virtio_mem_rdm_replay_discarded_cb(MemoryRegionSection *s,
- {
-     struct VirtIOMEMReplayData *data = arg;
- 
--    ((ReplayRamDiscard)data->fn)(s, data->opaque);
-+    ((ReplayRamDiscard)data->fn)(s, false, data->opaque);
-     return 0;
- }
- 
- static void virtio_mem_rdm_replay_discarded(const RamDiscardManager *rdm,
-                                             MemoryRegionSection *s,
-+                                            bool is_private,
-                                             ReplayRamDiscard replay_fn,
-                                             void *opaque)
- {
-@@ -1783,7 +1786,7 @@ static void virtio_mem_rdm_unregister_listener(RamDiscardManager *rdm,
-     g_assert(rdl->section->mr == &vmem->memdev->mr);
-     if (vmem->size) {
-         if (rdl->double_discard_supported) {
--            rdl->notify_discard(rdl, rdl->section);
-+            rdl->notify_discard(rdl, rdl->section, false);
-         } else {
-             virtio_mem_for_each_plugged_section(vmem, rdl->section, rdl,
-                                                 virtio_mem_notify_discard_cb);
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index ec7bc641e8..8aac61af08 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -508,9 +508,11 @@ struct IOMMUMemoryRegionClass {
- 
- typedef struct RamDiscardListener RamDiscardListener;
- typedef int (*NotifyRamPopulate)(RamDiscardListener *rdl,
--                                 MemoryRegionSection *section);
-+                                 MemoryRegionSection *section,
-+                                 bool is_private);
- typedef void (*NotifyRamDiscard)(RamDiscardListener *rdl,
--                                 MemoryRegionSection *section);
-+                                 MemoryRegionSection *section,
-+                                 bool is_private);
- 
- struct RamDiscardListener {
-     /*
-@@ -566,8 +568,8 @@ static inline void ram_discard_listener_init(RamDiscardListener *rdl,
-     rdl->double_discard_supported = double_discard_supported;
- }
- 
--typedef int (*ReplayRamPopulate)(MemoryRegionSection *section, void *opaque);
--typedef void (*ReplayRamDiscard)(MemoryRegionSection *section, void *opaque);
-+typedef int (*ReplayRamPopulate)(MemoryRegionSection *section, bool is_private, void *opaque);
-+typedef void (*ReplayRamDiscard)(MemoryRegionSection *section, bool is_private, void *opaque);
- 
- /*
-  * RamDiscardManagerClass:
-@@ -632,11 +634,13 @@ struct RamDiscardManagerClass {
-      *
-      * @rdm: the #RamDiscardManager
-      * @section: the #MemoryRegionSection
-+     * @is_private: the attribute of the request section
-      *
-      * Returns whether the given range is completely populated.
-      */
-     bool (*is_populated)(const RamDiscardManager *rdm,
--                         const MemoryRegionSection *section);
-+                         const MemoryRegionSection *section,
-+                         bool is_private);
- 
-     /**
-      * @replay_populated:
-@@ -648,6 +652,7 @@ struct RamDiscardManagerClass {
-      *
-      * @rdm: the #RamDiscardManager
-      * @section: the #MemoryRegionSection
-+     * @is_private: the attribute of the populated parts
-      * @replay_fn: the #ReplayRamPopulate callback
-      * @opaque: pointer to forward to the callback
-      *
-@@ -655,6 +660,7 @@ struct RamDiscardManagerClass {
-      */
-     int (*replay_populated)(const RamDiscardManager *rdm,
-                             MemoryRegionSection *section,
-+                            bool is_private,
-                             ReplayRamPopulate replay_fn, void *opaque);
- 
-     /**
-@@ -665,11 +671,13 @@ struct RamDiscardManagerClass {
-      *
-      * @rdm: the #RamDiscardManager
-      * @section: the #MemoryRegionSection
-+     * @is_private: the attribute of the discarded parts
-      * @replay_fn: the #ReplayRamDiscard callback
-      * @opaque: pointer to forward to the callback
-      */
-     void (*replay_discarded)(const RamDiscardManager *rdm,
-                              MemoryRegionSection *section,
-+                             bool is_private,
-                              ReplayRamDiscard replay_fn, void *opaque);
- 
-     /**
-@@ -709,15 +717,18 @@ uint64_t ram_discard_manager_get_min_granularity(const RamDiscardManager *rdm,
-                                                  const MemoryRegion *mr);
- 
- bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
--                                      const MemoryRegionSection *section);
-+                                      const MemoryRegionSection *section,
-+                                      bool is_private);
- 
- int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
-                                          MemoryRegionSection *section,
-+                                         bool is_private,
-                                          ReplayRamPopulate replay_fn,
-                                          void *opaque);
- 
- void ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-                                           MemoryRegionSection *section,
-+                                          bool is_private,
-                                           ReplayRamDiscard replay_fn,
-                                           void *opaque);
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index 05ff9eb328..b9efba1d14 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -838,7 +838,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
- }
- 
- static void dirty_bitmap_clear_section(MemoryRegionSection *section,
--                                       void *opaque)
-+                                       bool is_private, void *opaque)
- {
-     const hwaddr offset = section->offset_within_region;
-     const hwaddr size = int128_get64(section->size);
-@@ -884,7 +884,7 @@ static uint64_t ramblock_dirty_bitmap_clear_discarded_pages(RAMBlock *rb)
-             .size = int128_make64(qemu_ram_get_used_length(rb)),
-         };
- 
--        ram_discard_manager_replay_discarded(rdm, &section,
-+        ram_discard_manager_replay_discarded(rdm, &section, false,
-                                              dirty_bitmap_clear_section,
-                                              &cleared_bits);
-     }
-@@ -907,7 +907,7 @@ bool ramblock_page_is_discarded(RAMBlock *rb, ram_addr_t start)
-             .size = int128_make64(qemu_ram_pagesize(rb)),
-         };
- 
--        return !ram_discard_manager_is_populated(rdm, &section);
-+        return !ram_discard_manager_is_populated(rdm, &section, false);
-     }
-     return false;
- }
-@@ -1539,7 +1539,7 @@ static inline void populate_read_range(RAMBlock *block, ram_addr_t offset,
- }
- 
- static inline int populate_read_section(MemoryRegionSection *section,
--                                        void *opaque)
-+                                        bool is_private, void *opaque)
- {
-     const hwaddr size = int128_get64(section->size);
-     hwaddr offset = section->offset_within_region;
-@@ -1579,7 +1579,7 @@ static void ram_block_populate_read(RAMBlock *rb)
-             .size = rb->mr->size,
-         };
- 
--        ram_discard_manager_replay_populated(rdm, &section,
-+        ram_discard_manager_replay_populated(rdm, &section, false,
-                                              populate_read_section, NULL);
-     } else {
-         populate_read_range(rb, 0, rb->used_length);
-@@ -1614,7 +1614,7 @@ void ram_write_tracking_prepare(void)
- }
- 
- static inline int uffd_protect_section(MemoryRegionSection *section,
--                                       void *opaque)
-+                                       bool is_private, void *opaque)
- {
-     const hwaddr size = int128_get64(section->size);
-     const hwaddr offset = section->offset_within_region;
-@@ -1638,7 +1638,7 @@ static int ram_block_uffd_protect(RAMBlock *rb, int uffd_fd)
-             .size = rb->mr->size,
-         };
- 
--        return ram_discard_manager_replay_populated(rdm, &section,
-+        return ram_discard_manager_replay_populated(rdm, &section, false,
-                                                     uffd_protect_section,
-                                                     (void *)(uintptr_t)uffd_fd);
-     }
-diff --git a/system/guest-memfd-manager.c b/system/guest-memfd-manager.c
-index b6a32f0bfb..50802b34d7 100644
---- a/system/guest-memfd-manager.c
-+++ b/system/guest-memfd-manager.c
-@@ -23,39 +23,51 @@ OBJECT_DEFINE_SIMPLE_TYPE_WITH_INTERFACES(GuestMemfdManager,
-                                           { })
- 
- static bool guest_memfd_rdm_is_populated(const RamDiscardManager *rdm,
--                                         const MemoryRegionSection *section)
-+                                         const MemoryRegionSection *section,
-+                                         bool is_private)
- {
-     const GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
-     uint64_t first_bit = section->offset_within_region / gmm->block_size;
-     uint64_t last_bit = first_bit + int128_get64(section->size) / gmm->block_size - 1;
-     unsigned long first_discard_bit;
- 
--    first_discard_bit = find_next_zero_bit(gmm->bitmap, last_bit + 1, first_bit);
-+    if (is_private) {
-+        /* Check if the private section is populated */
-+        first_discard_bit = find_next_bit(gmm->bitmap, last_bit + 1, first_bit);
-+    } else {
-+        /* Check if the shared section is populated */
-+        first_discard_bit = find_next_zero_bit(gmm->bitmap, last_bit + 1, first_bit);
-+    }
-+
-     return first_discard_bit > last_bit;
- }
- 
--typedef int (*guest_memfd_section_cb)(MemoryRegionSection *s, void *arg);
-+typedef int (*guest_memfd_section_cb)(MemoryRegionSection *s, bool is_private,
-+                                      void *arg);
- 
--static int guest_memfd_notify_populate_cb(MemoryRegionSection *section, void *arg)
-+static int guest_memfd_notify_populate_cb(MemoryRegionSection *section, bool is_private,
-+                                          void *arg)
- {
-     RamDiscardListener *rdl = arg;
- 
--    return rdl->notify_populate(rdl, section);
-+    return rdl->notify_populate(rdl, section, is_private);
- }
- 
--static int guest_memfd_notify_discard_cb(MemoryRegionSection *section, void *arg)
-+static int guest_memfd_notify_discard_cb(MemoryRegionSection *section, bool is_private,
-+                                         void *arg)
- {
-     RamDiscardListener *rdl = arg;
- 
--    rdl->notify_discard(rdl, section);
-+    rdl->notify_discard(rdl, section, is_private);
- 
-     return 0;
- }
- 
--static int guest_memfd_for_each_populated_section(const GuestMemfdManager *gmm,
--                                                  MemoryRegionSection *section,
--                                                  void *arg,
--                                                  guest_memfd_section_cb cb)
-+static int guest_memfd_for_each_shared_section(const GuestMemfdManager *gmm,
-+                                               MemoryRegionSection *section,
-+                                               bool is_private,
-+                                               void *arg,
-+                                               guest_memfd_section_cb cb)
- {
-     unsigned long first_one_bit, last_one_bit;
-     uint64_t offset, size;
-@@ -76,7 +88,7 @@ static int guest_memfd_for_each_populated_section(const GuestMemfdManager *gmm,
-             break;
-         }
- 
--        ret = cb(&tmp, arg);
-+        ret = cb(&tmp, is_private, arg);
-         if (ret) {
-             break;
-         }
-@@ -88,10 +100,11 @@ static int guest_memfd_for_each_populated_section(const GuestMemfdManager *gmm,
-     return ret;
- }
- 
--static int guest_memfd_for_each_discarded_section(const GuestMemfdManager *gmm,
--                                                  MemoryRegionSection *section,
--                                                  void *arg,
--                                                  guest_memfd_section_cb cb)
-+static int guest_memfd_for_each_private_section(const GuestMemfdManager *gmm,
-+                                                MemoryRegionSection *section,
-+                                                bool is_private,
-+                                                void *arg,
-+                                                guest_memfd_section_cb cb)
- {
-     unsigned long first_zero_bit, last_zero_bit;
-     uint64_t offset, size;
-@@ -113,7 +126,7 @@ static int guest_memfd_for_each_discarded_section(const GuestMemfdManager *gmm,
-             break;
-         }
- 
--        ret = cb(&tmp, arg);
-+        ret = cb(&tmp, is_private, arg);
-         if (ret) {
-             break;
-         }
-@@ -146,8 +159,9 @@ static void guest_memfd_rdm_register_listener(RamDiscardManager *rdm,
- 
-     QLIST_INSERT_HEAD(&gmm->rdl_list, rdl, next);
- 
--    ret = guest_memfd_for_each_populated_section(gmm, section, rdl,
--                                                 guest_memfd_notify_populate_cb);
-+    /* Populate shared part */
-+    ret = guest_memfd_for_each_shared_section(gmm, section, false, rdl,
-+                                              guest_memfd_notify_populate_cb);
-     if (ret) {
-         error_report("%s: Failed to register RAM discard listener: %s", __func__,
-                      strerror(-ret));
-@@ -163,8 +177,9 @@ static void guest_memfd_rdm_unregister_listener(RamDiscardManager *rdm,
-     g_assert(rdl->section);
-     g_assert(rdl->section->mr == gmm->mr);
- 
--    ret = guest_memfd_for_each_populated_section(gmm, rdl->section, rdl,
--                                                 guest_memfd_notify_discard_cb);
-+    /* Discard shared part */
-+    ret = guest_memfd_for_each_shared_section(gmm, rdl->section, false, rdl,
-+                                              guest_memfd_notify_discard_cb);
-     if (ret) {
-         error_report("%s: Failed to unregister RAM discard listener: %s", __func__,
-                      strerror(-ret));
-@@ -181,16 +196,18 @@ typedef struct GuestMemfdReplayData {
-     void *opaque;
- } GuestMemfdReplayData;
- 
--static int guest_memfd_rdm_replay_populated_cb(MemoryRegionSection *section, void *arg)
-+static int guest_memfd_rdm_replay_populated_cb(MemoryRegionSection *section,
-+                                               bool is_private, void *arg)
- {
-     struct GuestMemfdReplayData *data = arg;
-     ReplayRamPopulate replay_fn = data->fn;
- 
--    return replay_fn(section, data->opaque);
-+    return replay_fn(section, is_private, data->opaque);
- }
- 
- static int guest_memfd_rdm_replay_populated(const RamDiscardManager *rdm,
-                                             MemoryRegionSection *section,
-+                                            bool is_private,
-                                             ReplayRamPopulate replay_fn,
-                                             void *opaque)
- {
-@@ -198,22 +215,31 @@ static int guest_memfd_rdm_replay_populated(const RamDiscardManager *rdm,
-     struct GuestMemfdReplayData data = { .fn = replay_fn, .opaque = opaque };
- 
-     g_assert(section->mr == gmm->mr);
--    return guest_memfd_for_each_populated_section(gmm, section, &data,
--                                                  guest_memfd_rdm_replay_populated_cb);
-+    if (is_private) {
-+        /* Replay populate on private section */
-+        return guest_memfd_for_each_private_section(gmm, section, is_private, &data,
-+                                                    guest_memfd_rdm_replay_populated_cb);
-+    } else {
-+        /* Replay populate on shared section */
-+        return guest_memfd_for_each_shared_section(gmm, section, is_private, &data,
-+                                                   guest_memfd_rdm_replay_populated_cb);
-+    }
- }
- 
--static int guest_memfd_rdm_replay_discarded_cb(MemoryRegionSection *section, void *arg)
-+static int guest_memfd_rdm_replay_discarded_cb(MemoryRegionSection *section,
-+                                               bool is_private, void *arg)
- {
-     struct GuestMemfdReplayData *data = arg;
-     ReplayRamDiscard replay_fn = data->fn;
- 
--    replay_fn(section, data->opaque);
-+    replay_fn(section, is_private, data->opaque);
- 
-     return 0;
- }
- 
- static void guest_memfd_rdm_replay_discarded(const RamDiscardManager *rdm,
-                                              MemoryRegionSection *section,
-+                                             bool is_private,
-                                              ReplayRamDiscard replay_fn,
-                                              void *opaque)
- {
-@@ -221,8 +247,16 @@ static void guest_memfd_rdm_replay_discarded(const RamDiscardManager *rdm,
-     struct GuestMemfdReplayData data = { .fn = replay_fn, .opaque = opaque };
- 
-     g_assert(section->mr == gmm->mr);
--    guest_memfd_for_each_discarded_section(gmm, section, &data,
--                                           guest_memfd_rdm_replay_discarded_cb);
-+
-+    if (is_private) {
-+        /* Replay discard on private section */
-+        guest_memfd_for_each_private_section(gmm, section, is_private, &data,
-+                                             guest_memfd_rdm_replay_discarded_cb);
-+    } else {
-+        /* Replay discard on shared section */
-+        guest_memfd_for_each_shared_section(gmm, section, is_private, &data,
-+                                            guest_memfd_rdm_replay_discarded_cb);
-+    }
- }
- 
- static bool guest_memfd_is_valid_range(GuestMemfdManager *gmm,
-@@ -257,8 +291,9 @@ static void guest_memfd_notify_discard(GuestMemfdManager *gmm,
-             continue;
-         }
- 
--        guest_memfd_for_each_populated_section(gmm, &tmp, rdl,
--                                               guest_memfd_notify_discard_cb);
-+        /* For current shared section, notify to discard shared parts */
-+        guest_memfd_for_each_shared_section(gmm, &tmp, false, rdl,
-+                                            guest_memfd_notify_discard_cb);
-     }
- }
- 
-@@ -276,8 +311,9 @@ static int guest_memfd_notify_populate(GuestMemfdManager *gmm,
-             continue;
-         }
- 
--        ret = guest_memfd_for_each_discarded_section(gmm, &tmp, rdl,
--                                                     guest_memfd_notify_populate_cb);
-+        /* For current private section, notify to populate the shared parts */
-+        ret = guest_memfd_for_each_private_section(gmm, &tmp, false, rdl,
-+                                                   guest_memfd_notify_populate_cb);
-         if (ret) {
-             break;
-         }
-@@ -295,8 +331,8 @@ static int guest_memfd_notify_populate(GuestMemfdManager *gmm,
-                 continue;
-             }
- 
--            guest_memfd_for_each_discarded_section(gmm, &tmp, rdl2,
--                                                   guest_memfd_notify_discard_cb);
-+            guest_memfd_for_each_private_section(gmm, &tmp, false, rdl2,
-+                                                 guest_memfd_notify_discard_cb);
-         }
-     }
-     return ret;
-diff --git a/system/memory.c b/system/memory.c
-index ddcec90f5e..d3d5a04f98 100644
---- a/system/memory.c
-+++ b/system/memory.c
-@@ -2133,34 +2133,37 @@ uint64_t ram_discard_manager_get_min_granularity(const RamDiscardManager *rdm,
- }
- 
- bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
--                                      const MemoryRegionSection *section)
-+                                      const MemoryRegionSection *section,
-+                                      bool is_private)
- {
-     RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_GET_CLASS(rdm);
- 
-     g_assert(rdmc->is_populated);
--    return rdmc->is_populated(rdm, section);
-+    return rdmc->is_populated(rdm, section, is_private);
- }
- 
- int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
-                                          MemoryRegionSection *section,
-+                                         bool is_private,
-                                          ReplayRamPopulate replay_fn,
-                                          void *opaque)
- {
-     RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_GET_CLASS(rdm);
- 
-     g_assert(rdmc->replay_populated);
--    return rdmc->replay_populated(rdm, section, replay_fn, opaque);
-+    return rdmc->replay_populated(rdm, section, is_private, replay_fn, opaque);
- }
- 
- void ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-                                           MemoryRegionSection *section,
-+                                          bool is_private,
-                                           ReplayRamDiscard replay_fn,
-                                           void *opaque)
- {
-     RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_GET_CLASS(rdm);
- 
-     g_assert(rdmc->replay_discarded);
--    rdmc->replay_discarded(rdm, section, replay_fn, opaque);
-+    rdmc->replay_discarded(rdm, section, is_private, replay_fn, opaque);
- }
- 
- void ram_discard_manager_register_listener(RamDiscardManager *rdm,
-@@ -2221,7 +2224,7 @@ bool memory_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
-          * Disallow that. vmstate priorities make sure any RamDiscardManager
-          * were already restored before IOMMUs are restored.
-          */
--        if (!ram_discard_manager_is_populated(rdm, &tmp)) {
-+        if (!ram_discard_manager_is_populated(rdm, &tmp, false)) {
-             error_setg(errp, "iommu map to discarded memory (e.g., unplugged"
-                          " via virtio-mem): %" HWADDR_PRIx "",
-                          iotlb->translated_addr);
-diff --git a/system/memory_mapping.c b/system/memory_mapping.c
-index ca2390eb80..c55c0c0c93 100644
---- a/system/memory_mapping.c
-+++ b/system/memory_mapping.c
-@@ -249,7 +249,7 @@ static void guest_phys_block_add_section(GuestPhysListener *g,
- }
- 
- static int guest_phys_ram_populate_cb(MemoryRegionSection *section,
--                                      void *opaque)
-+                                      bool is_private, void *opaque)
- {
-     GuestPhysListener *g = opaque;
- 
-@@ -274,7 +274,7 @@ static void guest_phys_blocks_region_add(MemoryListener *listener,
-         RamDiscardManager *rdm;
- 
-         rdm = memory_region_get_ram_discard_manager(section->mr);
--        ram_discard_manager_replay_populated(rdm, section,
-+        ram_discard_manager_replay_populated(rdm, section, false,
-                                              guest_phys_ram_populate_cb, g);
-         return;
-     }
--- 
-2.43.5
+If so, ARM/AMD drivers need to allow allocating nested domain with
+ALLOC_PASID flag. If not, attaching nested domain to RID would be failed.
+That's why I intend to allow it, while let ARM/AMD drivers fail the
+attempt of attaching nested domain to PASIDs.
 
+> At attach phase, a domain with ALLOC_PASID can be attached to RID
+> of any device no matter the device supports pasid or not. But a domain
+> must have ALLOC_PASID set for attaching to a PASID (if the device has
+> non-zero max_pasids), enforced by iommufd.
+
+
+Regards,
+Yi Liu
 
