@@ -1,189 +1,86 @@
-Return-Path: <kvm+bounces-33732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B089F0F72
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 15:45:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C909F0FAE
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 15:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFE0D188222E
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 14:45:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8B9188508A
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 14:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B793F1E1C09;
-	Fri, 13 Dec 2024 14:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7612D1E231D;
+	Fri, 13 Dec 2024 14:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lXV2bbiZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gJsLon66"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A79D1DF759
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 14:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65781E1C3A
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 14:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734101126; cv=none; b=uxM/drHcIJf4z0fz9nq0o527qbev51lUC4/JorG8H8yvtJg5+NjyESZZ6TtLtNYXmWJrFLQQhfhkJFcknAevbPOfAY/MrBQIZcOpNoOeq+cAtnVtGaD6DGw2Sc1yHaqSLGzut4Fd5MZpgphoYEIhtEqWtUDiq33sGnORVny17Ms=
+	t=1734101635; cv=none; b=g9m6epK0X548csSFEDOn/UZnvD6oBfqH4hmo3SFrTLNtxde8rcZIR+D6iv9VOWSVMJo1TPXw5njOEpOacjx2TpiMwMjbdtXSJQuEtIYY/QP9YnLNI49APL6g+uR4vow3Nyt4XekxCmUsQ4sSclKDvb8qXIg5w8aC0M09UsgDp+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734101126; c=relaxed/simple;
-	bh=wsjq53tN9X3E2vd6ChcRBXvCUBErMqkOdMcwSBo+Qa0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gI5ZpgKEqLW6hM83MM0q4ki1ybHPMMi6QYp1vgfJgCQRGmRjlIf8CBZz/byBVCnL3PpJDLMyybBH03kbtpyzQzgeUXRGJ7kQ9UlTapzuK4iCS4hooGLUR28kQ02FfeOKXYkYu/nP1iLf4vRPpUmuLPzvQy28Iat7iuwP6BpLB0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lXV2bbiZ; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4678c9310afso213501cf.1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 06:45:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734101124; x=1734705924; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=S0WatgwCXgaiexp3EUWavIB0qKEFBmaEgS2C+Zdx+jU=;
-        b=lXV2bbiZ+P//ul3TheZ9vwgQ9CqFZA6G6XEpvTfo/223BTwnzWv/IxSc5ZwHfutyyQ
-         s6rxYsoHA/tAhxldYpujt1sRVLr9QjA8EkNB7dKv9Qczs99IzCCU3PAiC88Gb60BegSc
-         a2AiAteYQ9tShT7fHqQyEBXclqaYrazL+qiUnXJ+Gno77I6G7w3/NpeddAoF/Fq14lI6
-         zJa37dwURA7FLMDIGHTPIjYahOx72kqGbxnOWPsJpwN9Qez/mypabyVgwqbJzVma0EAW
-         e5LKAUgdLfuJg+Ka7BLX9GrKydA2gyoYUxHP+UUrt11YtWOB8W3Wr52CpomPHjSblquu
-         nAPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734101124; x=1734705924;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S0WatgwCXgaiexp3EUWavIB0qKEFBmaEgS2C+Zdx+jU=;
-        b=nc0uJ/ajxtXLxYZQDNd3NwST2Wta411zpjTSq/9KKU8iNhnXzOR4lISeplFeCBfv4o
-         n2QnoE6Iv+z2pcPwfSeEdTIfNsWT1BK2aBeeI+ikLKdY4SYDn9sFQaVjiGGNs5u2/D8c
-         oybmbjX6TXWhIX8FVSp6NXViMrdOGL7tqohQk6uo6I5D7efXQSkd5D1K6MauMIIU74c1
-         uunGHD7uwqvbeHMRd9zSTh8HTwpCz8XNfaBaBkKdae66EGRNAPdJm5z9nJa9xGSES5VC
-         069a5GUsW8HKAMYuiGutcdbfZELIeNm/0lMfuacsMvvp6ZlFfA9WOcKouZdXMflvH68M
-         LqxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLhKMmklBrGg/7L6l7G5N49mqRlMVM2H/Woldlb5EQ5CCOBGzP0N1dJ7Ak0rEWuTjv84w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXfdDWL9ZtlwKJ3cClao9R1y9LDQspRTO+GfvuxaK10QVAI9Ux
-	g3u5kBT3nW/JVAriRyQ3L9sYi7G2ujuhooaFyxyCwKW6Vzg1ZUIL7PPvfLEuN7vd91/7ag/SKvT
-	cLM2+nsAy51TqqjpkF66B+EmSWrbYvfkoAUJ9
-X-Gm-Gg: ASbGncsJTy4Dpbz7R5C1npQolEXB8x5R6BSnIUxyzxXJ32qS1pGoiEvu5eoyFfteJAw
-	UOdNJnVInq5q38xZxIHuReowGp5VzTWuiuqTheM2w6ueo2XWHvvbFUQbj1ameTKYdjGTN
-X-Google-Smtp-Source: AGHT+IEulUNhWHEGdVnNmWeLRkX9kVqow/MtXl0sKlndp32zeoeYmhYBDZQU3OnF3mEh0MhlawQpXGzdXkpWw1k/Cvc=
-X-Received: by 2002:a05:622a:4d43:b0:466:8618:90df with SMTP id
- d75a77b69052e-467a40f3bf2mr4195931cf.2.1734101124142; Fri, 13 Dec 2024
- 06:45:24 -0800 (PST)
+	s=arc-20240116; t=1734101635; c=relaxed/simple;
+	bh=JOEGtmL+jHWWNqH4mOU0I1yh2kI8+LQtfytEHW0l2QM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JuqSjGB02tb3xqEXigQDWWB/EkCv9E1NS/crtwVLziFo47VwkBTQ2FkmtBmQgyZZTtYcTAca8IU10uWLqcL+DGLMB4xUf8U43spnhxZeQ72jiCM+Ob55Eo1/Cw8Dcy+P2nTvq3aMMFGLG8YbgrBzaXxlEnUsfkxcQs0KVPz3vhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gJsLon66; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=jyJ5tb2FeeXPtSINp0fMJl/JE+YXb8u8zW47UoIvsB4=; b=gJsLon66j0ACIvBR96cExs8S/O
+	bJV9+vjjGYrZBC+TC5NUJpj7Apd++92E8i1lMMBE68KeMKn5Q2Sak1VahwuMuIMq2LvarC3+SWyMh
+	nWjpkGpd4zcTNLDLP4y7kP4N6lY89A6zgw01w0SEEf5cYdwV0WA4BX0A+tH+32x0OkDM26bnDieNS
+	AonUCwjrctJJ4ZrgsBWix0y+ilg3L2AOBMlMzmK2ruxCCFqr05IHmC28db2PUEibHO2aQvesH3ApX
+	iUknkYpjlU6Au+jgqKSX/Dg9YpzYcpa5QTzElZBy2SD7amm3V6ZgyaOH6chUsGrKRJRM8NiDzVKDt
+	c0PFe/kQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tM739-00000004AJ0-0r1u;
+	Fri, 13 Dec 2024 14:53:51 +0000
+Date: Fri, 13 Dec 2024 06:53:51 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] vfio/mdev: inline needed class_compat functionality
+Message-ID: <Z1xKf-RQmXGv7sC7@infradead.org>
+References: <fb0fc57d-955f-404e-a222-e3864cce2b14@gmail.com>
+ <2024120410-promoter-blandness-efa1@gregkh>
+ <20241204123040.7e3483a4.alex.williamson@redhat.com>
+ <9015ce52-e4f3-459c-bd74-b8707cf8fd88@gmail.com>
+ <2024120617-icon-bagel-86b3@gregkh>
+ <20241206093733.1d887dfc.alex.williamson@redhat.com>
+ <2024120721-parasite-thespian-84e0@gregkh>
+ <4b9781d5-5cbc-4254-9753-014cf5a8438d@gmail.com>
+ <Z1ppnnRV4aN4mZGy@infradead.org>
+ <20241212111200.79b565e1.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
- <20240712-asi-rfc-24-v1-1-144b319a40d8@google.com> <20241025113455.GMZxuCX2Tzu8ulwN3o@fat_crate.local>
- <CA+i-1C3SZ4FEPJyvbrDfE-0nQtB_8L_H_i67dQb5yQ2t8KJF9Q@mail.gmail.com>
- <ab8ef5ef-f51c-4940-9094-28fbaa926d37@google.com> <878qu6205g.ffs@tglx>
- <d0a38982-b811-4429-8b89-81e5da3aaf72@google.com> <87cyjevgx4.ffs@tglx>
-In-Reply-To: <87cyjevgx4.ffs@tglx>
-From: Brendan Jackman <jackmanb@google.com>
-Date: Fri, 13 Dec 2024 15:45:13 +0100
-X-Gm-Features: AbW1kvYeFSt9oq4jpITmiWkujPAqQ3h82SGc6hTAa_TaGY28cvqrpIH9-qf3xtU
-Message-ID: <CA+i-1C1z35M8wA_4AwMq7--c1OgjNoLGTkn4+Td5gKg7QQAzWw@mail.gmail.com>
-Subject: Re: [PATCH 01/26] mm: asi: Make some utility functions noinstr compatible
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Junaid Shahid <junaids@google.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexandre Chartre <alexandre.chartre@oracle.com>, Liran Alon <liran.alon@oracle.com>, 
-	Jan Setje-Eilers <jan.setjeeilers@oracle.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@suse.de>, 
-	Lorenzo Stoakes <lstoakes@gmail.com>, David Hildenbrand <david@redhat.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Michal Hocko <mhocko@kernel.org>, Khalid Aziz <khalid.aziz@oracle.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Valentin Schneider <vschneid@redhat.com>, Paul Turner <pjt@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Ofir Weisse <oweisse@google.com>, Yosry Ahmed <yosryahmed@google.com>, 
-	Patrick Bellasi <derkling@google.com>, KP Singh <kpsingh@google.com>, 
-	Alexandra Sandulescu <aesa@google.com>, Matteo Rizzo <matteorizzo@google.com>, Jann Horn <jannh@google.com>, 
-	x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kvm@vger.kernel.org, linux-toolchains@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212111200.79b565e1.alex.williamson@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, 1 Nov 2024 at 21:27, Thomas Gleixner <tglx@linutronix.de> wrote:
-> On Thu, Oct 31 2024 at 18:44, Junaid Shahid wrote:
-> What actually works by some definition of "works" is:
->
->        static __always_inline void __foo(void) { }
->
->        static inline void foo(void)
->        {
->                 __(foo);
->        }
->
->        static inline noinstr void foo_noinstr(void)
->        {
->                 __(foo);
->        }
->
-> The problem is that both GCC and clang optimize foo[_noinstr]() away and
-> then follow the __always_inline directive of __foo() even if I make
-> __foo() insanely large and have a gazillion of different functions
-> marked noinline invoking foo() or foo_noinstr(), unless I add -fno-inline
-> to the command line.
+On Thu, Dec 12, 2024 at 11:12:00AM -0700, Alex Williamson wrote:
+> userspace.  The "just remove it anyway" stance seems to be in conflict
+> with the "don't break userspace" policy and I don't think we can
+> instantly fix this.  Thanks,
 
-In this experiment did you modify the definition of noinstr to remove
-noinline? Otherwise I always get out-of-line calls (as you'd expect
-from the noinline).
+The just remove was about the sample, which are explicitly samples
+and not something that is part of the kernel ABI gurantee. 
 
-> Which means it's not much different from just having '__always_inline
-> foo()' without the wrappers....
->
-> Compilers clearly lack a --do-what-I-mean command line option.
->
-> Now if I'm truly nasty then both compilers do what I mean even without a
-> magic command line option:
->
->        static __always_inline void __foo(void) { }
->
->        static __maybe_unused void foo(void)
->        {
->                 __(foo);
->        }
->
->        static __maybe_unused noinstr void foo_noinstr(void)
->        {
->                 __(foo);
->        }
-
-I don't see any difference with __maybe_unused: if the noinline is
-there it's never inlined, otherwise with the wrapper technique it's
-always inlined regardless of __maybe_unused:
-
-static __always_inline void __big(void)
-{
-        asm volatile(
-                "nop; nop; nop; nop; nop; nop; nop; nop; nop;"
-                // and so on
-                "nop; nop; nop; nop; nop; nop; nop; nop; nop;"
-        );
-}
-
-static inline __section(".noinstr.text") void big_noinstr(void)
-{
-        __big();
-}
-
-When I call big_noinstr() from a noinstr function I see:
-
-Dump of assembler code for function asi_exit:
-   0xffffffff811e0080 <+0>:     endbr64
-   0xffffffff811e0084 <+4>:     nop
-   0xffffffff811e0085 <+5>:     nop
-...and so on
-
-I'm using GCC 14.2.0.
-
-(I thought maybe this was because I used asm volatile nops to embiggen
-the function but I see the same thing with a big stream of volatile C
-statements).
-
-I think we might have no choice but to always use
-__always_inline/noinline for code that's called from both sections -
-seems there's no way to tell the compiler "I don't care if you inline
-it, but it we can't cross a section boundary". Am I missing anything?
 
