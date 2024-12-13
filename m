@@ -1,156 +1,209 @@
-Return-Path: <kvm+bounces-33784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 557259F1740
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 21:12:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E01B9F1766
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 21:32:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48F56188ADC2
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:12:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB175188CE08
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 20:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF26E198836;
-	Fri, 13 Dec 2024 20:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6005191F9C;
+	Fri, 13 Dec 2024 20:31:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2DHYIITn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CvQpIg44"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AB342A92
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 20:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98275286A1
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 20:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734120564; cv=none; b=jcenPPxHoy6d0+vs3DmUKu2XaB/OrZkqto/AaCLduYNUX5uCjReGx8m1eee5vcGy9Gnbpq9lr570B0zbgUfxquIyWtPbazPCNdYA+PMM2Ae46Mr9M0nF6pq0VmFF7BA8yZpz0LhoncSO+pKoF1zLRYcTyrD/sieOmru8SYa2pCI=
+	t=1734121909; cv=none; b=sVbfm/mdERfolvfTReSkNxNTp6cSUJ+rP4Fuf0YAzH62+MEAee2fVpYG8b0JKeSkpEj1Z9NzjGjp3/JEZohi/cOEw7zFaQr/2g0D8yIgpjShhETFa3AzrH3E/vVKlRZG2aa3Tv0HvhIWR9+1zf58dWMA+xpExvC0XPfLuP2s0e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734120564; c=relaxed/simple;
-	bh=zC9BTE/86XdOFOIMDJ2jwHIkedHbdzd5NbKps9y9TkY=;
+	s=arc-20240116; t=1734121909; c=relaxed/simple;
+	bh=9xB5zQII9gByqe2ZXP6h5gt/kFUwGFWsEl1xx4H4JHY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GZ9I8gNsVnXCOX1VlwWw2czWI689ngSQO4A/O+yenanccxsqVBZpPUQP0d9HZupXzPL04eWJ9dKQSGyQhzpdVHjZuoztaRfbM12xAMeD9GUGGXZwbu818mdk339ItdyrbkfXVx6UN4a++S7S/qNEljJsvXEWehsosHJjU9gakMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2DHYIITn; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=bIMdvjbCt53u1C6UFIxqZaiweBzd3cFal7A3OpXeG8Vq7gbRaIz26JDWb1yFujHe5Og7bxgkudupxh4IvuCEgrI/UqEI6if9lL0UChvYMHhUIbBxDZw39i8TyWIuuL9TH8sp/RqXpv6sWHiFh9BWh7GpfyZCyf3AqW7NdJTNy1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CvQpIg44; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee36569f4cso1998512a91.2
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 12:09:23 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so2047038a91.1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 12:31:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734120563; x=1734725363; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734121907; x=1734726707; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWe44j1VIg6qYkfEWkPdzcvfPT6QWStum/CznGoFe/4=;
-        b=2DHYIITne1PuECM3caXKH0QY60u+gf+wqHmJOGkOkKdPL5mh69Iw5ceDDrogeglIxa
-         Rez+A94sWizI/YVTG43j5saJBhfVQ6lKNd430Ilc7myuQijGMYGn+Pft7ZtGdx1Xe7X5
-         uS+AnpBHSA/Vp7DOSjEvsuBkofOC6oIDhK/wkd1jP8I+N4GkHNtLZMRTQUHEniVvfYR0
-         Srj9hX/ivCLkWBfK3gYV+UfF1uzcsTaceOmD5+sStVswnWed2thtaJAngsrVcKgI5epm
-         02XEKARl3UR4THnbuDRXUajaUy9HzZ7+uFbRG5m5CNECD+wT9g1fmkxeqUSFcmwLM1jK
-         T8rA==
+        bh=kWHqkJtQWzEFFZ8Kp1Au9t//E/0RpuQvQSaS19c/OkQ=;
+        b=CvQpIg44ZNBRi7gExue7K2x33dAUYK5CL9Dopxlmto6J/SL5jwmmZZIGYWVAq4HYg0
+         z/SVLHF5R9tZmE45hOBmoKIeA7kJy4npQZtaHFxRB1cpx6J9yw1V+Pc8tt0mC+xh4OOU
+         osefJQrfx8L0hTVP4yisNjW00V+kSNSyVwLKwh0dXn8C26sL5rirRPtcti1W78jkeVuq
+         nYO0ExnllNjk5TEY9kD5YjBtJb4YzqtupBo32JU8YuewRFoBZDCCjOOInWse4RReMnhZ
+         I/FjPGFYhBzrBZ59KXVKQr14EDOITvfsQNsUwfWpVJ6Vdi5im2/90UsmLflx+qhkVInO
+         Km5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734120563; x=1734725363;
+        d=1e100.net; s=20230601; t=1734121907; x=1734726707;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWe44j1VIg6qYkfEWkPdzcvfPT6QWStum/CznGoFe/4=;
-        b=ayIbGkzPjW7S+1JxcpfPRbhiXEyfafr4oixixF2SCgs45h4e/AjhXPWZQVz5wcF0yE
-         bTdxmyvFCBfk90IQY1NB3cIiiu6UBGjxT81KKJ/VUjmWAPZ8jAlJfvnpY3M9PvyD3/NP
-         Bo2UZZMPf6vb1awDAGscZNWvGA0QFp6B7VqQHCsQVRVMQi/gd7hj8A10XzXFBCkYqobO
-         mtsbMyH3phRKmS3yrRa15WbMMglUQC2rFOKi8JsletwwSZHUWFAjz7dwscb5n008FjbU
-         P7D21vaQSTb3CYZUvB+CIc21/RkLoyQkjb5dwm2FgB2isHKZ7+7f6iXNGMJcU5Osojhx
-         FYtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhQn69l0sX099VdenY6HGdsRqDCuc/YYxJiGLQykPmjd7IORgdyhtsMjnvybZmxz7Xhpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLBW2Hd0Ie9RSw2M9xozXIidGpmdSn8Ns6S6kijVII8iILIN+p
-	gPg5BsY94O0k0PgSf5PdigIpAxpquo3YAVFrqUkuxZzyMYcHhTYCpdQ4OyK7lumWiP0bHX+lWWz
-	9BQ==
-X-Google-Smtp-Source: AGHT+IG8Z8XXK8zlWOr0tzLqr/7Y+eTDpG0yEYtLy8WZ30WPxxdX4TRITnkAN6UZ0AGz++ZFXz5Zc2FUM4k=
-X-Received: from pjbrr6.prod.google.com ([2002:a17:90b:2b46:b0:2d8:8d32:2ea3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2651:b0:2ee:7c65:ae8e
- with SMTP id 98e67ed59e1d1-2f28fb6f0c2mr5583098a91.11.1734120562799; Fri, 13
- Dec 2024 12:09:22 -0800 (PST)
-Date: Fri, 13 Dec 2024 12:09:21 -0800
-In-Reply-To: <20241213173816.GA7768@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
+        bh=kWHqkJtQWzEFFZ8Kp1Au9t//E/0RpuQvQSaS19c/OkQ=;
+        b=iiZuNua4ik/r0+y/78TprYlZpGPKUA1/XCUTe/7r51p6pi0z0s3pqlKchgRFRM0Onq
+         aCDar2MaH4N7X3wohuDGzA8E0OiQRahqAXUh+XByFUWAiqz4G8eoJExbyvAbY1Q7mB18
+         AT9R8i/nGUBQZLsvNgsrZ39jwQXFWrbNwAQqZRQ6eJbBw/T2k/68jccjfXxLw4olWwn3
+         x7tq7wioWrU2PbyA/HSDq01lXf/wm1SS1tPdwBlGNfuWXPoEw3KtkLiYZ4IUQ1HlzKs/
+         gWzVWQpWxneW5wZ4cILHS9Hpg3wG19BHoRvZC8iNh/TtFfYqlbR2WVgetyx/dma1XbMd
+         nY8Q==
+X-Gm-Message-State: AOJu0YzI06lindjasDuTkGpcN/Uyeuxazd1QqXOk09WTmhmjO2CZE90F
+	RzAbKngQXQsGpWXHHZGlDcA1g57Cva74MtIoTvE0tLDuoA2Qxy+hKpCqtPpMSOa89wOv1ojtjkg
+	OTw==
+X-Google-Smtp-Source: AGHT+IHmL+ftw/cybJHUE3JtWq+YXSDYzxtQNtcJvZnpiaDeGGmJ22cl+McBVze/UuOAIfzl+cLHrIzNtHY=
+X-Received: from pjbpl7.prod.google.com ([2002:a17:90b:2687:b0:2e9:ee22:8881])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3952:b0:2ee:db8a:29f0
+ with SMTP id 98e67ed59e1d1-2f2900a6ef2mr5918047a91.27.1734121906955; Fri, 13
+ Dec 2024 12:31:46 -0800 (PST)
+Date: Fri, 13 Dec 2024 12:31:45 -0800
+In-Reply-To: <88706b97f374bd425da82e78789e6234cb6baed2.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241111102749.82761-1-iorlov@amazon.com> <20241111102749.82761-4-iorlov@amazon.com>
- <Z1nWykQ3e4D5e2C-@google.com> <2b75550c-0dc7-4bcc-ac60-9ad4402c17f8@gmail.com>
- <Z1o1013dUex8w9hK@google.com> <20241212164137.GA71156@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
- <Z1s8rWBrDhQaUHuw@google.com> <20241213173816.GA7768@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-Message-ID: <Z1yHAAomsCdn5B8z@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: VMX: Handle vectoring error in check_emulate_instruction
+References: <20241211193706.469817-1-mlevitsk@redhat.com> <20241211193706.469817-2-mlevitsk@redhat.com>
+ <Z1ox4OHNT6kkincQ@google.com> <a3e75091f2b6b13d4907ac2fdf09058ab88c4ebf.camel@redhat.com>
+ <Z1vR25ylN5m_DRSy@google.com> <88706b97f374bd425da82e78789e6234cb6baed2.camel@redhat.com>
+Message-ID: <Z1yZsUFKhuw6KASe@google.com>
+Subject: Re: [PATCH 1/4] KVM: VMX: read the PML log in the same order as it
+ was written
 From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <iorlov@amazon.com>
-Cc: Ivan Orlov <ivan.orlov0322@gmail.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, pdurrant@amazon.co.uk, 
-	dwmw@amazon.co.uk
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Dec 13, 2024, Ivan Orlov wrote:
-> On Thu, Dec 12, 2024 at 11:42:37AM -0800, Sean Christopherson wrote:
-> > Unprotect and re-execute is fine, what I'm worried about is *successfully*
-> > emulating the instruction.  E.g.
+On Fri, Dec 13, 2024, Maxim Levitsky wrote:
+> On Thu, 2024-12-12 at 22:19 -0800, Sean Christopherson wrote:
+> > On Thu, Dec 12, 2024, Maxim Levitsky wrote:
+> > > On Wed, 2024-12-11 at 16:44 -0800, Sean Christopherson wrote:
+> > > > But, I can't help but wonder why KVM bothers emulating PML.  I can appreciate
+> > > > that avoiding exits to L1 would be beneficial, but what use case actually cares
+> > > > about dirty logging performance in L1?
+> > > 
+> > > It does help with performance by a lot and the implementation is emulated and simple.
 > > 
-> >   1. CPU executes instruction X and hits a #GP.
-> >   2. While vectoring the #GP, a shadow #PF is taken.
-> >   3. On VM-Exit, KVM re-injects the #GP (see __vmx_complete_interrupts()).
-> >   4. KVM emulates because of the write-protected page.
-> >   5. KVM "successfully" emulates and also detects the #GP
-> >   6. KVM synthesizes a #GP, and because the vCPU already has injected #GP,
-> >      incorrectly escalates to a #DF.
+> > Yeah, it's not a lot of complexity, but it's architecturally flawed.  And I get
+> > that it helps with performance, I'm just stumped as to the use case for dirty
+> > logging in a nested VM in the first place.
 > > 
-> > The above is a bit contrived, but I think it could happen if the guest reused a
-> > page that _was_ a page table, for a vCPU's kernel stack.
+> > > Do you have any comments for the rest of the patch series? If not then I'll send
+> > > v2 of the patch series.
+> > 
+> > *sigh*
+> > 
+> > I do.  Through no fault of your own.  I was trying to figure out a way to ensure
+> > the vCPU made meaningful progress, versus just guaranteeing at least one write,
+> > and stumbled onto a plethora of flaws and unnecessary complexity in the test.
+> > 
+> > Can you post this patch as a standalone v2?  I'd like to do a more agressive
+> > cleanup of the selftest, but I don't want to hold this up, and there's no hard
+> > dependency.
+> > 
+> > As for the issues I encountered with the selftest:
+> > 
+> >  1. Tracing how many pages have been written for the current iteration with a
+> >     guest side counter doesn't work without more fixes, because the test doesn't
+> >     collect all dirty entries for the current iterations.  For the dirty ring,
+> >     this results in a vCPU *starting* an iteration with a full dirty ring, and
+> >     the test hangs because the guest can't make forward progress until
+> >     log_mode_collect_dirty_pages() is called.
+> > 
+> >  2. The test presumably doesn't collect all dirty entries because of the weird
+> >     and unnecessary kick in dirty_ring_collect_dirty_pages(), and all the
+> >     synchronization that comes with it.  The kick is "justified" with a comment
+> >     saying "This makes sure that hardware PML cache flushed", but there's no
+> >     reason to do *if* pages that the test collects dirty pages *after* stopping
+> >     the vCPU.  Which is easy to do while also collecting while the vCPU is
+> >     running, if the kick+synchronization is eliminated (i.e. it's a self-inflicted
+> >     wound of sorts).
+> > 
+> >  3. dirty_ring_after_vcpu_run() doesn't honor vcpu_sync_stop_requested, and so
+> >     every other iteration runs until the ring is full.  Testing the "soft full"
+> >     logic is interesting, but not _that_ interesting, and filling the dirty ring
+> >     basically ignores the "interval".  Fixing this reduces the runtime by a
+> >     significant amount, especially on nested, at the cost of providing less
+> >     coverage for the dirty ring with default interval in a nested VM (but if
+> >     someone cares about testing the dirty ring soft full in a nested VM, they
+> >     can darn well bump the interval).
+> > 
+> >  4. Fixing the test to collect all dirty entries for the current iteration
+> >     exposes another flaw.  The bitmaps (not dirty ring) start with all bits
+> >     set.  And so the first iteration can see "dirty" pages that have never
+> >     been written, but only when applying your fix to limit the hack to s390.
+> > 
+> >  5. "iteration" is synched to the guest *after* the vCPU is restarted, i.e. the
+> >     guest could see a stale iteration if the main thread is delayed.
+> > 
+> >  6. host_bmap_track and all of the weird exemptions for writes from previous
+> >     iterations goes away if all entries are collected for the current iteration
+> >     (though a second bitmap is needed to handle the second collection; KVM's
+> >     "get" of the bitmap clobbers the previous value).
+> > 
+> > I have everything more or less coded up, but I need to split it into patches,
+> > write changelogs, and interleave it with your fixes.  Hopefully I'll get to that
+> > tomorrow.
 > > 
 > 
-> Does it work like that only for contributory exceptions / page faults?
+> Hi!
+> 
+> I will take a look at your patch series once you post it.
+> I also think that the logic in the test is somewhat broken, but then this also 
+> serves as a way to cause as much havoc as possible.
+> 
+> The fact that not all dirty pages are collected is because the ring harvest happens
+> at the same time the guest continues dirtying the pages, adding more entries to the
+> ring, simulating what would happen during real-life migration.
 
-The #DF case, yes.
+But as above, that behavior is trivially easy to mimic even when collecting all
+entries simply by playing nice with multiple collections per iteration.  
 
-> In case if it's not #GP but (for instance) #UD, (as far as I understand)
-> KVM will queue only one of them without causing #DF so it's gonna be
-> valid?
+> kicking the guest just before ring harvest is also IMHO a good thing as it also
+> simulates the IRQ load that would happen.
 
-No, it can still be invalid.  E.g. initialize hit a #BP, replace it with a #UD,
-but there may be guest-visibile side effects from the original #BP.
+I am not at all convinced that's interesting.  And *if* it's really truly all
+that interesting, then the kick should be done for all flavors.
 
-> > > However, I'm not sure what happens if vectoring is caused by external
-> > > interrupt: if we unprotect the page and re-execute the instruction,
-> > > will IRQ be delivered nonetheless, or it will be lost as irq is
-> > > already in ISR? Do we need to re-inject it in such a case?
-> > 
-> > In all cases, the event that was being vectored is re-injected.  Restarting from
-> > scratch would be a bug.  E.g. if the cause of initial exception was "fixed", say
-> > because the initial exception was #BP, and the guest finished patching out the INT3,
-> > then restarting would execute the _new_ instruction, and the INT3 would be lost.
-> > 
-> 
-> Cool, that is what I was concerned about, glad that it is already
-> implemented :)
-> 
-> > 
-> > As far as unprotect+retry being viable, I think we're on the same page.  What I'm
-> > getting at is that I think KVM should never allow emulating on #PF when the #PF
-> > occurred while vectoring.  E.g. this:
-> > 
-> >   static inline bool kvm_can_emulate_event_vectoring(int emul_type)
-> >   {
-> >         return !(emul_type & EMULTYPE_PF);
-> >   }
-> > 
-> 
-> Yeah, I agree. I'll post a V3 with suggested fixes (after running all of the
-> selftests to be sure that it doesn't break anything).
-> 
-> > and then I believe this?  Where this diff can be a separate prep patch (though I'm
-> > pretty sure it's technically pointless without the vectoring angle, because shadow
-> > #PF can't coincide with any of the failure paths for kvm_check_emulate_insn()).
-> > 
-> 
-> Looks good. If you don't mind, I could add this patch to the series with `Suggested-by`
-> tag since it's neccessary to allow unprotect+retry in case of shadow #PF during
-> vectoring.
+Unless the host is tickless, the vCPU will get interrupt from time to time, at
+least for any decently large interval.  The kick from the test itself adds an
+absurd amount of complexity for no meaningful test coverage.
 
-Ya, go for it.
+> we can avoid kicking the guest if it is already stopped due to dirty ring, in fact,
+> the fact that we still kick it, delays the kick to the point where we resume the guest
+> and wait for it to stop again before the do the verify step, which makes it often
+> exit not due to log full event.
+> 
+> I did this but this makes the test be way less random, and the whole point of this
+> test is to cause as much havoc as possible.
+
+I agree randomness is a good thing for testing, but this is more noise than
+random/controlled chaos.
+
+E.g. we can do _far_ better for large interval numbers.  As is, collecting _once_
+per iteration means the vCPU is all but guarantee to stall on a dirty ring for
+any decently large interval.
+
+And conversely, not honor the "stop" request means every other iteration is all
+but guaranteed to fill the dirty ring, even for small intervals.
+
+> I do think that we don't need to stop the guest during verify for the
+> dirty-ring case, this is probably a code that only dirty bitmap part of the
+> test needs.
+
+Not stopping the vCPU would reduce test coverage (which is one of my complaints
+with not fully harvesting the dirty entries).  If KVM misses a dirty log event
+on iteration X, and the vCPU also writes the same page in iteration X+1, then the
+test will get a false pass because iteration X+1 will see the page as dirty and
+think all is well.
 
