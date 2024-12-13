@@ -1,125 +1,122 @@
-Return-Path: <kvm+bounces-33719-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33720-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A03B99F0968
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:27:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287779F0982
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 11:31:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7DC8165928
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 10:27:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B212188C9F5
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 10:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E1A1B87EA;
-	Fri, 13 Dec 2024 10:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9971C3BE2;
+	Fri, 13 Dec 2024 10:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwAmFDLe"
 X-Original-To: kvm@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33C91AF0BA;
-	Fri, 13 Dec 2024 10:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861481B6CFD;
+	Fri, 13 Dec 2024 10:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734085658; cv=none; b=mxQ8zSNP3lpYcUfAtF3ozTKj9kLofNokTZss0DC4Zfovp97KvQFNq7kkcuU4lklxmIR9GmsDPdPw9BmhHt2cDMcWgZnlT3DkYfh77flHrmRj+kPlN4cLrvpcxlUaVLeBAVy50cKrWPo3m3RzcOWVwdm0gyt3VR5NxhrzomYSSHs=
+	t=1734085856; cv=none; b=ExWiUu+qloeSOTopfgIQ9bPgCOOylAEjCHTZrBRaZpNeLCL4dnSX2ydekr6qxtmiZkMZnaEakQhRa1z2Cma+cCgVmK+aNVFtVA/CPkIpNL/SDJomq/gJUJFPZSmQiTPzwAEtWoMC1yMsFSg6/aq863ygOIvMH9+ArmeNWzMJE3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734085658; c=relaxed/simple;
-	bh=rrFLr8CNUec5XTWiJRpluJNFyXGGpTR84FLKjriRXKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ePc3rSZYzlcuQDSFwLpdA+qU8/sfJfPPEiNMpPv0T+jBDj1Rx+u4AUs/waVF46EH8VnD1cjPTkBtKBBYwV55Q92sFeNCBkyW+tIbOKLVW1DTK2pCSJAQqltkY0/EVWJCbsB+45g4loP9zm2jggcMppb7vmbGgUCYCnSTF4sHwdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Y8ls307LNz9sSd;
-	Fri, 13 Dec 2024 11:27:35 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w4LjWUMC-i0O; Fri, 13 Dec 2024 11:27:34 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Y8ls26Grzz9sSH;
-	Fri, 13 Dec 2024 11:27:34 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id C07B88B773;
-	Fri, 13 Dec 2024 11:27:34 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id SmQbPCkQpRec; Fri, 13 Dec 2024 11:27:34 +0100 (CET)
-Received: from [192.168.232.97] (unknown [192.168.232.97])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 679968B763;
-	Fri, 13 Dec 2024 11:27:33 +0100 (CET)
-Message-ID: <3a2fadc3-f594-492f-805a-148043436995@csgroup.eu>
-Date: Fri, 13 Dec 2024 11:27:32 +0100
+	s=arc-20240116; t=1734085856; c=relaxed/simple;
+	bh=BTQhG+pcPpVWdFU7M6WGNSEHiOAWlPk9OMovbRGe8jk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=dnKbCgMEx1TUk/UVLXfkPV6OB9XV2Fse775L3/C86brW6n5/9Ax5EqtJDZ7F9AxqcmUF1IwI9wRjUcktS2q+fO2FtqFG2HaoHwFDqlDlRq6Yv+yKAoetO4sb16Z8KJQqxCGiND+c9GM/a1SvPK1W0UfXn8jxQ9lBz8mTmQ5H6kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwAmFDLe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65922C4CED0;
+	Fri, 13 Dec 2024 10:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734085855;
+	bh=BTQhG+pcPpVWdFU7M6WGNSEHiOAWlPk9OMovbRGe8jk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=KwAmFDLewAK8qtG2JcgTDln5oAPvX7T6s21n+sVrQK/zovEQltlKTZMfOOydVCYBZ
+	 wexQmXSVYI3h7TBHmpxxuKJCAtIKDA3xJNa8/Im/UBR7LXeWQh180GN2AD0v8T0VFC
+	 xau4jIIld3rUWglJe0O5Ly1c3n+LVRPKkn4Ap2bFPikm9rfX1t0FvFxCEdhmOO7GmQ
+	 T1Kv1o7hm5xTuEGg8jC3v4laVOub2r/1lqEAAYkD9VqHdQWO6/vYMu4tQswLjScRFC
+	 qcBNgWj6+WXQRdmWrvKriaNXsmUfp6QHYu1lvvdq1sD36YHJ/Kyex37L0CjkCkv8o5
+	 SYIrwECkF64TQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Philipp Stanner <pstanner@redhat.com>,  Igor Mitsyanko
+ <imitsyanko@quantenna.com>,  amien Le Moal <dlemoal@kernel.org>,  Niklas
+ Cassel <cassel@kernel.org>,  Basavaraj Natikar
+ <basavaraj.natikar@amd.com>,  Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>,  Arnd Bergmann <arnd@arndb.de>,  Sergey
+ Matyukevich <geomatsi@gmail.com>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  Alex Dubov <oakad@yahoo.com>,  Sudarsana
+ Kalluru <skalluru@marvell.com>,  Manish Chopra <manishc@marvell.com>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rasesh Mody
+ <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com,  Sanjay R Mehta
+ <sanju.mehta@amd.com>,  Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,  Jon
+ Mason <jdmason@kudzu.us>,  Dave Jiang <dave.jiang@intel.com>,  Allen Hubbe
+ <allenbh@gmail.com>,  Bjorn Helgaas <bhelgaas@google.com>,  Alex
+ Williamson <alex.williamson@redhat.com>,  Juergen Gross <jgross@suse.com>,
+  Stefano Stabellini <sstabellini@kernel.org>,  Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Mario Limonciello
+ <mario.limonciello@amd.com>,  Chen Ni <nichen@iscas.ac.cn>,  Ricky Wu
+ <ricky_wu@realtek.com>,  Al Viro <viro@zeniv.linux.org.uk>,  Breno Leitao
+ <leitao@debian.org>,  Thomas Gleixner <tglx@linutronix.de>,  Kevin Tian
+ <kevin.tian@intel.com>,  Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>,  Mostafa Saleh <smostafa@google.com>,
+  Jason Gunthorpe <jgg@ziepe.ca>,  Yi Liu <yi.l.liu@intel.com>,  Kunwu Chan
+ <chentao@kylinos.cn>,  Dan Carpenter <dan.carpenter@linaro.org>,  "Dr.
+ David Alan Gilbert" <linux@treblig.org>,  Ankit Agrawal
+ <ankita@nvidia.com>,  Reinette Chatre <reinette.chatre@intel.com>,  Eric
+ Auger <eric.auger@redhat.com>,  Ye Bin <yebin10@huawei.com>,
+  linux-ide@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-input@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  ntb@lists.linux.dev,
+  linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+  xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v3 09/11] wifi: qtnfmac: use always-managed version of
+ pcim_intx()
+References: <20241212192935.GA3360239@bhelgaas>
+Date: Fri, 13 Dec 2024 12:30:42 +0200
+In-Reply-To: <20241212192935.GA3360239@bhelgaas> (Bjorn Helgaas's message of
+	"Thu, 12 Dec 2024 13:29:35 -0600")
+Message-ID: <87cyhvoox9.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 3/5] powerpc: kvm: drop 32-bit book3s
-To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
- kvm@vger.kernel.org
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Huacai Chen <chenhuacai@kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Alexander Graf <graf@amazon.com>, Crystal Wood <crwood@redhat.com>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-References: <20241212125516.467123-1-arnd@kernel.org>
- <20241212125516.467123-4-arnd@kernel.org>
- <2809dcce-3405-430e-b43d-d75f35bdb7d5@csgroup.eu>
- <3380464f-5db4-487d-936f-1b5503905793@app.fastmail.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <3380464f-5db4-487d-936f-1b5503905793@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+Bjorn Helgaas <helgaas@kernel.org> writes:
 
+> [cc->to: Igor]
+>
+> On Mon, Dec 09, 2024 at 02:06:31PM +0100, Philipp Stanner wrote:
+>> pci_intx() is a hybrid function which can sometimes be managed through
+>> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+>> port users to either an always-managed or a never-managed version.
+>> 
+>> qtnfmac enables its PCI-Device with pcim_enable_device(). Thus, it needs
+>> the always-managed version.
+>> 
+>> Replace pci_intx() with pcim_intx().
+>> 
+>> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+>> Acked-by: Kalle Valo <kvalo@kernel.org>
+>
+> Hoping for an ack from Igor, too.
 
-Le 13/12/2024 à 11:04, Arnd Bergmann a écrit :
-> diff --git a/arch/powerpc/kernel/head_32.h b/arch/powerpc/kernel/head_32.h
-> index 9cba7dbf58dd..24e89dadc74d 100644
-> --- a/arch/powerpc/kernel/head_32.h
-> +++ b/arch/powerpc/kernel/head_32.h
-> @@ -172,7 +172,6 @@ _ASM_NOKPROBE_SYMBOL(\name\()_virt)
->   #define	START_EXCEPTION(n, label)		\
->   	__HEAD;					\
->   	. = n;					\
-> -	DO_KVM n;				\
->   label:
->   
->   #else
+Igor hasn't been around for a while so I'm not expecting see an ack from
+him, I think the whole qtnfmac driver should be removed in the future.
+Feel free to take the patch as is.
 
-Then the complete macro should go away because both versions are now 
-identical:
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
--#ifdef CONFIG_PPC_BOOK3S
--#define	START_EXCEPTION(n, label)		\
--	__HEAD;					\
--	. = n;					\
--label:
--
--#else
-  #define	START_EXCEPTION(n, label)		\
-  	__HEAD;					\
-  	. = n;					\
-  label:
-
--#endif
-
-
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
