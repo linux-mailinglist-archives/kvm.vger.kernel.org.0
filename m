@@ -1,111 +1,117 @@
-Return-Path: <kvm+bounces-33756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CEA9F138F
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:25:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165579F13D9
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 18:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BB61281554
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:25:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB718280CA2
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 17:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E9361E500C;
-	Fri, 13 Dec 2024 17:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C9A1E5711;
+	Fri, 13 Dec 2024 17:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty6KmMvA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FczdbIr3"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EBF1422D4
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 17:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674C71E411D;
+	Fri, 13 Dec 2024 17:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734110748; cv=none; b=rqFzMBQyyrTVpD/ZkoreP7Z6AlmYbt2K+DJRvMy00c6eUdMYniv6SmGh7gOisYQT32WFJ1p/vE5R1CPIboja7Jvw13UDFCRKZJi9X3gmlr189iR47HfA+DGcU+aAukw0+enyy3axKUVwY7JCQpZVg6d2wwEvOg3osEEc0C6RAJE=
+	t=1734111423; cv=none; b=mS1GbyQkBBYBE1HsLVBUcKNLp4215oEXxcd+McXlXSMVxO6orNasCVusztc3Y4byaswC8N7eMNFzkSvuStmS5l5FMaiFm1InUdeYnEhiJDYNXKynyrFtgfzOgupaOuFInKUEW0XfzlKQvaU9Lf0SmfHaSIbmw+2bMKMN5NsnE+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734110748; c=relaxed/simple;
-	bh=NQ3ch2rMJkO6pTAQsDIELog8cM1tR9Db3DznuJsMgLA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KOPTbHHPlUfv2JMyzDCX0Zms3Ch1MkZRCZapYAG5Qkw0SUxNfLIw2rm3vlizEOP5Uke8OZ4/h71f2a7GK+gHvH+hJ6dkzxalPfYBodz3PjGtw46Y4lktsn/CZpIBOPaEqKoo8TcOCL+5EyoqmyBgdC/izOWAilGhVGQsTdN2OxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty6KmMvA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED991C4CEE3
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 17:25:47 +0000 (UTC)
+	s=arc-20240116; t=1734111423; c=relaxed/simple;
+	bh=TPjNyO3hUQt1c7Qv2LFixn3eov+lAMQBbXMkeYju2CA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=u7kdhD/SeppqtSRasDYx+qCv6lSq/JAul4zsDWFSxVqv5dbqH2Hd3xUXIC9+4fysD1JBdhC0rZShzcHYVUxlObG021Ol/GKTk06h1d9tLwibtJjTmo9FyNqBchisdXuYGDYaNXY66BDyKzw0/xODmSj6+G6ygWc/FjYebt1IM64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FczdbIr3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21232C4CED0;
+	Fri, 13 Dec 2024 17:37:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734110748;
-	bh=NQ3ch2rMJkO6pTAQsDIELog8cM1tR9Db3DznuJsMgLA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Ty6KmMvA5xkJqA/omJJfimDNI561GQt96HvmW6muNFm+7x2lloJbDckTp0qXlHeQ9
-	 flAXOV3f34RGjindQpoToT/YKfRk7O0v5laO7yR0i5VtsmCBL2FQCDi/WWlrx8Mspa
-	 Ev7lLmkOQ2hO14dhw/9RVFOPvsqA0+ZMBMue2TZS0uzjpgSZpr2wZ+qry5fRWkoiPl
-	 eAj/HpmxVzHjgfmgAGqig3pwAmPJBzBd2bWhQ0swTYrPc+RsjyGRhPN+r5vMfbZxBq
-	 3CVxQby7cZSBRpVh00N+I7KTrORig+n6KkIoaXxWTzZy7ia01rET+zH2v1tF/x09DV
-	 vuyFNAXl6nvFg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E5143C41614; Fri, 13 Dec 2024 17:25:47 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple Windows VMs
- hang
-Date: Fri, 13 Dec 2024 17:25:47 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mlevitsk@redhat.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218267-28872-7E0jDCZcud@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218267-28872@https.bugzilla.kernel.org/>
-References: <bug-218267-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1734111423;
+	bh=TPjNyO3hUQt1c7Qv2LFixn3eov+lAMQBbXMkeYju2CA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=FczdbIr3msWtbFOtXybKq+61kkP/SsP//pjuHuvnT+St79Nx0v6Ckn4JTGlBoQYwc
+	 qGOcuMymOBbiD5mUbuIk94lUq0TwDqH4Q99QTPS/WSP8MZTLyUzvsB2E2k+nT3Xu5x
+	 AmGh9/Nsy0Wew64KNqZbGeHjJ2dgziu0VRkAydQqSxk0ISh/S5c2+m1t8WiY7MyZ7V
+	 9Wn0oc4R1nhR4O9k4hMmF9fWMb5gpHU9aJoirDe13nZvAuGZOWerGR6UV0RgYdlCls
+	 rs6XbgLIuWlc8CNCnoQuyICn181YAGjyJH8AaX8JFhYIVM8RUAW8ACOTCh2EoW2wuw
+	 tIiuJP7yq06wg==
+Date: Fri, 13 Dec 2024 11:37:01 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: zhangdongdong@eswincomputing.com
+Cc: alex.williamson@redhat.com, bhelgaas@google.com, yishaih@nvidia.com,
+	avihaih@nvidia.com, yi.l.liu@intel.com, ankita@nvidia.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH] PCI: Remove redundant macro
+Message-ID: <20241213173701.GA3419486@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241213094617.1149-1-zhangdongdong@eswincomputing.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
+On Fri, Dec 13, 2024 at 05:46:17PM +0800, zhangdongdong@eswincomputing.com wrote:
+> From: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+> 
+> Removed the duplicate macro definition PCI_VSEC_HDR from
+> pci_regs.h to avoid redundancy. Updated the VFIO PCI code
+> to use the existing `PCI_VNDR_HEADER` macro for consistency,
+> ensuring minimal changes to the codebase.
+> 
+> Signed-off-by: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_config.c | 3 ++-
+>  include/uapi/linux/pci_regs.h      | 1 -
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index ea2745c1ac5e..c30748912ff1 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1389,7 +1389,8 @@ static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epo
+>  
+>  	switch (ecap) {
+>  	case PCI_EXT_CAP_ID_VNDR:
+> -		ret = pci_read_config_dword(pdev, epos + PCI_VSEC_HDR, &dword);
+> +		ret = pci_read_config_dword(pdev, epos + PCI_VNDR_HEADER,
+> +					    &dword);
+>  		if (ret)
+>  			return pcibios_err_to_errno(ret);
+>  
+> diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
+> index 1601c7ed5fab..7b6cad788de3 100644
+> --- a/include/uapi/linux/pci_regs.h
+> +++ b/include/uapi/linux/pci_regs.h
+> @@ -1001,7 +1001,6 @@
+>  #define PCI_ACS_CTRL		0x06	/* ACS Control Register */
+>  #define PCI_ACS_EGRESS_CTL_V	0x08	/* ACS Egress Control Vector */
+>  
+> -#define PCI_VSEC_HDR		4	/* extended cap - vendor-specific */
+>  #define  PCI_VSEC_HDR_LEN_SHIFT	20	/* shift for length field */
 
---- Comment #6 from mlevitsk@redhat.com ---
-On Mon, 2024-04-08 at 17:22 +0000, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
->=20
-> --- Comment #4 from Sean Christopherson (seanjc@google.com) ---
-> On Mon, Apr 08, 2024, bugzilla-daemon@kernel.org wrote:
-> > This is not considered a Linux/KVM issue.
->=20
-> Can you elaborate?  E.g. if this an SPR ucode/CPU bug, it would be nice to
-> know
-> what's going wrong, so that at the very least we can more easily triage
-> issues.
->=20
+We should resolve the duplication of PCI_VSEC_HDR and PCI_VNDR_HEADER,
+but I don't like the fact that we're left with this dangling
+PCI_VSEC_HDR_LEN_SHIFT.
 
-Hi!
+That leaves vfio using PCI_VNDR_HEADER and PCI_VSEC_HDR_LEN_SHIFT,
+which don't match at all.
 
-Any update on this? We seem to hit this bug as well but so far I don't have=
- new
-details on what is going on.
+I think you should remove PCI_VSEC_HDR_LEN_SHIFT as well and change
+vfio to use PCI_VNDR_HEADER_LEN() instead.
 
+It's somewhat dicey removing things from pci_regs.h since it's in
+include/uapi/, but this is such a niche thing we might be able to get
+away with it.
 
-Best regards,
-        Maxim Levitsky
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Bjorn
 
