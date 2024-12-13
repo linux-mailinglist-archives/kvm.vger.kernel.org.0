@@ -1,102 +1,179 @@
-Return-Path: <kvm+bounces-33730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 756049F0F63
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 15:40:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A929F0F69
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 15:43:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AAA0164D18
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 14:40:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0950F164FFF
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 14:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7541E1C01;
-	Fri, 13 Dec 2024 14:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98911E231A;
+	Fri, 13 Dec 2024 14:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n7cm5HXO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bpS+5qr7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1881DF975
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 14:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0C01E0E10
+	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 14:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734100804; cv=none; b=p9AEH7N7lDHv1wQWkWheONii34Kx8y1ELYLFPudG1AKMToQKeY+3jeLVtx4XeYnBBcwrMQ08/8RW/HCtc8EB2UFXvx6cCyOPrPqat42/HCCxi50nXJf7IpRVy063e56+84Ks9z3gzTaLg7o0zlqzqexbGwMeuV57g56MfD+SJC4=
+	t=1734100965; cv=none; b=ZCcTklSP9uKL/VeYDvTmTsy75HMUcSxLlfSa4SfMuopERos4jPbw6vStRVcIi4qD3N6mdFZx+io6ylZ5AmHedyW7ci39d44m6zQ/bRWoZSK23NUyYY72KFz7KhtbGy012VpNB6nlvgtI5fGJRg9LeaFBk7uo6R9P3E2ePjugvDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734100804; c=relaxed/simple;
-	bh=wBqUYrDGzq8/Ph2W7HoSJKRld+XHMM3JOZ3PqC7C6+0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JpjzHyRgbpjDToJ/fHAYc/I4gg/b0poqYD8yXS1spttXjhH0ajrL4mvFd5Y0NP0N25xHbppV3vIwdwjMXNLnWNB/ZaRox3oIjcvP7hg8LUEup5o4sl/ewiXcdPph/7RqEvthNGuWXG8KHp1Zjtol2MxFwSUUUpLjcQPVJkQZJRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n7cm5HXO; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a7dfcd40fcso168815ab.1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 06:40:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734100802; x=1734705602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y1o6cXCczlOJrW820tbI3ejXvq3a/VUwUy4HgwjZcug=;
-        b=n7cm5HXOII7l0pifckG1G0KO5jIfknmR/vRJSZsnyjND9PnQuX7g6B+lJvUF+4zBxi
-         eC6OW3yBky/+tXdDqRhB7ut+kCzqIHo5jXn+gBy5GctznrfFL+SPmiEQD6gk+Rd3EUIJ
-         kMvRngSsg2/FfdyOKSo9eVYMmAFT0oDs1fb0kHD3jCBfQUHgjIldEHjYgzLYYSgIWY9R
-         WJrockPS/4csYzk3gJFE7330vyEEnmJtod9RPNQJF88qmT8KpeJrg2/KdBX1kt3wdI1g
-         T3z4UFxBlbK7ZqVwKiwo1ai+11VGD78rjIrT1mHios6KrDhVDThK0oYq7KTzYVQSYb1q
-         Atzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734100802; x=1734705602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y1o6cXCczlOJrW820tbI3ejXvq3a/VUwUy4HgwjZcug=;
-        b=sfnTC8M7NOJuItegPK0uzjnRXvAJzHJql4B3CfoDNkH3LVzIu0CF3tql+w+HZg3kgA
-         BCsHlnFHp6d6aWVf6YVQYOnz0t/O0zKarYpQ74mwav/9Bi2Ixto5Mn+NE6oezKd9Ht1k
-         5HmF9ENxMKyfQH+N8KNoeNhduTLzGgDKTyMwKNimWPD6o2pDiLpZ0/rq8+XCMRO57KJl
-         GANnIdLOxWoOepVOcdDRh8/ycFCNhzbgbUsv8QWcKmTof3UK8yBrjf/u8MJ+O4sYcff6
-         DE5jD5PKztUHQ6rjsV2mhLJRDA9YEUqRIupwEX9slylAldgi26mZAh30iA0WGofXE+FK
-         jeQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHbQpFZHfdKu3U5iAzkpzRzSfTPO71yIXSITNMaRtXYicoCZsDltJpdmDP7ZawZsK6xV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTVVFuSguThlvPljOav3JJTHQQF/hq4mDab1Vx5V7cErMPcRJV
-	/ROKu5njh0jGRxmKGhfH1Gwz+mLlEdSZ5m0IDN7hkjy1JcKQgukMfECNjhtuOn+4JoBgHfK7885
-	i4Fl8+cJPofeqdzNlfAHPiZZfFhnoAQfGxwUy
-X-Gm-Gg: ASbGncvzzN9YK9Et9cRQgPX/Ig70W8WNcSoe+vuKVVvdVlOzdZAxUIeNsufcMwcl9aL
-	1KT7l84xyjqWRxFrD80bIO2arskpr9fhj8a5/
-X-Google-Smtp-Source: AGHT+IG9Da28jDo3gMfdHEXumlT9aNakfaU2EFaMPQ/m5hhfUBa5umXHfjGD94SKFdUR9uWgqT27M8DdZa0v4Faq+Cc=
-X-Received: by 2002:a92:912:0:b0:3a7:deca:1fe6 with SMTP id
- e9e14a558f8ab-3b0287e813cmr2140715ab.13.1734100802321; Fri, 13 Dec 2024
- 06:40:02 -0800 (PST)
+	s=arc-20240116; t=1734100965; c=relaxed/simple;
+	bh=ewF6klg4X9hljS7CKMG70YMyGmFT9UUVDYLBQ26g12E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GnSUUB/ISqUJ372rt4rkWjSHWsuvR5qUJVMrY8wtALvSDjQt7EEiX1MZ7DFKw8DGD4+TOGp/zUQmdBou8V+xi/hlP25A4aPhHCOpqBF8OwdTlXBd9xf+VBfrrS3cSRXpALxSNs/kr5h8pFUXTPiL1/yoghRoXAsAiU03aWMT0bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpS+5qr7; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734100963; x=1765636963;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ewF6klg4X9hljS7CKMG70YMyGmFT9UUVDYLBQ26g12E=;
+  b=bpS+5qr79tB1vYLKJ7wVjewcVZ4A5dRyo6wrSanuxYsxcGEfjrqNQZRL
+   gIn8wbH/f9SNTykuhAhBZIkSWwjUr5jEfMjsB59LSto/nNNugDbqk9Lgc
+   M3V71ASF+OLSHHhEw//ONs2FtpNnopZnAofmnF0xOndKGQ5LkOxLjaZUV
+   u7tEa3Uc4QHwUEXBxdMzcfJbVifVq59bDPccfDwsPTZHLa7yyL+aojMpo
+   vGAfCrT8WfFWqfnZmoPtxSGY7wKuZznWi54OwZ2TBoMn8QGAAUvq7fx+n
+   MfKVuzFKzO41NHUP4R8PRU78LPBGNCow3+zPUF9HiN4a4+B4IrYEkaBuO
+   w==;
+X-CSE-ConnectionGUID: MfEgUEvWS6KrCH9yTvUE6Q==
+X-CSE-MsgGUID: 6mZgouHtSwq13POR2HQmAg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11285"; a="33881428"
+X-IronPort-AV: E=Sophos;i="6.12,231,1728975600"; 
+   d="scan'208";a="33881428"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 06:42:27 -0800
+X-CSE-ConnectionGUID: WUSWQzgSTt+pHbHcWopBQQ==
+X-CSE-MsgGUID: e6gS6JrRTEWFSxL5eKTxfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,231,1728975600"; 
+   d="scan'208";a="96438363"
+Received: from ldmartin-desk2.corp.intel.com (HELO localhost) ([10.125.110.201])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 06:42:25 -0800
+Date: Fri, 13 Dec 2024 08:42:22 -0600
+From: Ira Weiny <ira.weiny@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+	kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 43/60] i386/tdx: Only configure MSR_IA32_UCODE_REV in
+ kvm_init_msrs() for TDs
+Message-ID: <Z1xHztTldnFDih8W@iweiny-mobl>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-44-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241211013302.1347853-1-seanjc@google.com> <20241211013302.1347853-4-seanjc@google.com>
-In-Reply-To: <20241211013302.1347853-4-seanjc@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Fri, 13 Dec 2024 06:39:51 -0800
-Message-ID: <CALMp9eQjGXrCpuwqYc5sddrTNWRO+gA-P0jONtzfb8W-E2STBw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: x86: Apply TSX_CTRL_CPUID_CLEAR if and only if
- the vCPU has RTM or HLE
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105062408.3533704-44-xiaoyao.li@intel.com>
 
-On Tue, Dec 10, 2024 at 5:33=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> When emulating CPUID, retrieve MSR_IA32_TSX_CTRL.TSX_CTRL_CPUID_CLEAR if
-> and only if RTM and/or HLE feature bits need to be cleared.  Getting the
-> MSR value is unnecessary if neither bit is set, and avoiding the lookup
-> saves ~80 cycles for vCPUs without RTM or HLE.
->
-> Cc: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, Nov 05, 2024 at 01:23:51AM -0500, Xiaoyao Li wrote:
+> For TDs, only MSR_IA32_UCODE_REV in kvm_init_msrs() can be configured
+> by VMM, while the features enumerated/controlled by other MSRs except
+> MSR_IA32_UCODE_REV in kvm_init_msrs() are not under control of VMM.
 
-I'm not sure why you cc'd me :), but...
+I'm confused by this commit message.  If these features are not under VMM
+control with TDX who controls them?  I assume it is the TDX module.  But where
+are the qemu hooks to talk to the module?  Are they not needed in qemu at all?
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Also, why are the has_msr_* flags true for a TDX TD in the first place?
+
+Ira
+
+> 
+> Only configure MSR_IA32_UCODE_REV for TDs.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  target/i386/kvm/kvm.c | 44 ++++++++++++++++++++++---------------------
+>  1 file changed, 23 insertions(+), 21 deletions(-)
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 595439f4a4d6..8909fce14909 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -3852,32 +3852,34 @@ static void kvm_init_msrs(X86CPU *cpu)
+>      CPUX86State *env = &cpu->env;
+>  
+>      kvm_msr_buf_reset(cpu);
+> -    if (has_msr_arch_capabs) {
+> -        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> -                          env->features[FEAT_ARCH_CAPABILITIES]);
+> -    }
+> -
+> -    if (has_msr_core_capabs) {
+> -        kvm_msr_entry_add(cpu, MSR_IA32_CORE_CAPABILITY,
+> -                          env->features[FEAT_CORE_CAPABILITY]);
+> -    }
+> -
+> -    if (has_msr_perf_capabs && cpu->enable_pmu) {
+> -        kvm_msr_entry_add_perf(cpu, env->features);
+> +
+> +    if (!is_tdx_vm()) {
+> +        if (has_msr_arch_capabs) {
+> +            kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> +                                env->features[FEAT_ARCH_CAPABILITIES]);
+> +        }
+> +
+> +        if (has_msr_core_capabs) {
+> +            kvm_msr_entry_add(cpu, MSR_IA32_CORE_CAPABILITY,
+> +                                env->features[FEAT_CORE_CAPABILITY]);
+> +        }
+> +
+> +        if (has_msr_perf_capabs && cpu->enable_pmu) {
+> +            kvm_msr_entry_add_perf(cpu, env->features);
+> +        }
+> +
+> +        /*
+> +         * Older kernels do not include VMX MSRs in KVM_GET_MSR_INDEX_LIST, but
+> +         * all kernels with MSR features should have them.
+> +         */
+> +        if (kvm_feature_msrs && cpu_has_vmx(env)) {
+> +            kvm_msr_entry_add_vmx(cpu, env->features);
+> +        }
+>      }
+>  
+>      if (has_msr_ucode_rev) {
+>          kvm_msr_entry_add(cpu, MSR_IA32_UCODE_REV, cpu->ucode_rev);
+>      }
+> -
+> -    /*
+> -     * Older kernels do not include VMX MSRs in KVM_GET_MSR_INDEX_LIST, but
+> -     * all kernels with MSR features should have them.
+> -     */
+> -    if (kvm_feature_msrs && cpu_has_vmx(env)) {
+> -        kvm_msr_entry_add_vmx(cpu, env->features);
+> -    }
+> -
+>      assert(kvm_buf_set_msrs(cpu) == 0);
+>  }
+>  
+> -- 
+> 2.34.1
+> 
 
