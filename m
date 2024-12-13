@@ -1,117 +1,118 @@
-Return-Path: <kvm+bounces-33679-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33680-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC2E9F0180
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 02:05:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74B1716B21C
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 01:05:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF49179BF;
-	Fri, 13 Dec 2024 01:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ddN2ZPLJ"
-X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EF5D9F023D
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 02:30:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7F117BA1;
-	Fri, 13 Dec 2024 01:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDEDF28286D
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2024 01:30:52 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A903B2AE8B;
+	Fri, 13 Dec 2024 01:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q9TU2t1B"
+X-Original-To: kvm@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC401373;
+	Fri, 13 Dec 2024 01:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734051900; cv=fail; b=psP0LM7dkmxZWRH+RyYkKJRzPCBpavqalOE03nPI+HGvL2K1tUu+Lm7UysTEZ/b7TmB9BRKv7njeFwXQxynWyfgr45t/B1i2yIBRzLAsJPxR4VAsLETIxr7eKvN+MaLTqud3N1edwSHOIcnZ5r8ZenwgVeBGXURKJzsZdU3vQzU=
+	t=1734053445; cv=fail; b=smeSh7EHnzR05lPwC/PqxTZu78/PaSXOp7frbtEH9+hfVQBp/aBA9sX/vHphDglHKAhk8XHdvU1B1jkZjHXPq1oL3c1aB8aWc/VaPtCAMWkok5/ZNQ5EH6Tcv96wxGKV1HCOZv6VNfCscn31T7qNBFfJ1AWoL3J+k7Cj0KIyHcc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734051900; c=relaxed/simple;
-	bh=CXYE2Y6UCHUEno8H+lZTIzJiqssEIn1DeKpCxfGak9M=;
+	s=arc-20240116; t=1734053445; c=relaxed/simple;
+	bh=j0HgcO2RHOWuJ9GJqFdfSlYKITgDdDFADK68QqZ6p/A=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Ulq7jeXTeWXw7uG4zC5iJj7hP4xSavu0HaE7de8r0XbEDNQgWzkwQk2yGJ34JZSonUgBGM/QcoR72XcSYYNJg34vMlZXtSRkaehn+Y4j2f5eW5zJfUA7vCIeTc0jD/yrIfBOK+olNqPKaxY7H4TOsFZ6cXqdK3LQc9k5hNkhPeQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ddN2ZPLJ; arc=fail smtp.client-ip=198.175.65.18
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GEcb8YREQ2Ypdwvn8erx+hcpIuaUWsujmQgMXEsR/cef7WfCpogs8murz21CvsuuSDEwd7nqvERFZun6ksxb5k2rsODECoXJ/R/6pSdoYO2fsDVfeRtcUfEUjj3lgvOH3L5PEnt+7swgNwLdXt7bjPkBv/WS/hSFtxUfh1cpUac=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q9TU2t1B; arc=fail smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734051899; x=1765587899;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
+  t=1734053444; x=1765589444;
+  h=date:from:to:cc:subject:message-id:references:
    in-reply-to:mime-version;
-  bh=CXYE2Y6UCHUEno8H+lZTIzJiqssEIn1DeKpCxfGak9M=;
-  b=ddN2ZPLJeb/e1ROGMv41LPI0Ve9OjCEqo6H1P2I3PORBkSFRL/+3hO2t
-   +FlWBot1vZmZWZG1mZeugEViqtOjevZlS+ddN1vZ3xqW9RMOAmNZWGFMu
-   Q+WWKa+bI7jkAEdFo8F4Uud+dq71VvbXJaT5WOqilyZ1BQDgCIFWeqR+H
-   BgyULtdagSHUVAy7stA2ECcK4pVrafZ8AWsMSUaWGoy8foGgozlf3dFPy
-   lre4oqvwMNPVq5sr5bTWjAkAkVLjxY+IPG6o0bkmYfziRa3kCIzgDW97H
-   XtpkeGj4hca31+VBBzvWlfwEDbnQhldwXrmBpuByzmXsQWvDUtoZ5RUue
-   w==;
-X-CSE-ConnectionGUID: 0BRuXv35RiKSV3NvjcRoTw==
-X-CSE-MsgGUID: pss+q7MGTwKNjtM9eSbm2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="34628073"
+  bh=j0HgcO2RHOWuJ9GJqFdfSlYKITgDdDFADK68QqZ6p/A=;
+  b=Q9TU2t1Bhdux2J3qk0K3PTlsEy88zTsaOIlAeQw3ThQPS5nh8LvNakEB
+   roWzQFaKnP79yYDUX8UTkSXw9hMm8IbDMLhIii3kH7Fm/NsN3JKGiEEzS
+   6TOP4CsFpyEduB/5Kl6FDppzUnvNO7amN4hHvdPRM+Ixm4RDq4rr1Siyw
+   PbgnlBya6+UYw55qe13BAJJPeHbAOd0bALXCd0up2B1v2PHMUcp5visGZ
+   gL4UvBErsQdOhbRSiTBOV8nGhSaXKggUyXVawm/tF7Y3KxXkvaoBTPQTt
+   W1WG2ftgILOu9B+sgc7vrT8GTodDXxZStHDQbz0yJ0ihxMZPPvNgdgB0R
+   A==;
+X-CSE-ConnectionGUID: zNrM1RiYQc2oVf56eRXAgw==
+X-CSE-MsgGUID: IOnw55QlRHiQfdcsAkzf3Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="38277275"
 X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
-   d="scan'208";a="34628073"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:04:58 -0800
-X-CSE-ConnectionGUID: ZMh/2N/LT125kJUoJ+AfiQ==
-X-CSE-MsgGUID: xyqt7ATVRBGIqvi5KGcF2Q==
+   d="scan'208";a="38277275"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 17:30:43 -0800
+X-CSE-ConnectionGUID: +6/wfkqkQ2ibrzn0Xq34qg==
+X-CSE-MsgGUID: VqvPK2V9QsWjCsvaOQGv/A==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="100555479"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2024 17:04:57 -0800
+X-IronPort-AV: E=Sophos;i="6.12,230,1728975600"; 
+   d="scan'208";a="101425843"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2024 17:30:43 -0800
 Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 12 Dec 2024 17:04:57 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ 15.1.2507.44; Thu, 12 Dec 2024 17:30:42 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
  orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 12 Dec 2024 17:04:57 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.44 via Frontend Transport; Thu, 12 Dec 2024 17:30:42 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.48) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 12 Dec 2024 17:04:56 -0800
+ 15.1.2507.39; Thu, 12 Dec 2024 17:30:42 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=weJ4I9FWpJri1L1mLigEb/3JBy3tfBdGeDL0EZn7GWRERnDGWxT7j3CDQigEMsuPrIhqCI6fb2OIjIovE8POclOfjcjuJnvV0NcVAFCMyCnlbcjUEMhDCNBl3Ij0Bnjhhd/wX7NrwuVFH9736AYONEY8P0hl/KXQD847rHXE67sVXgtNhpD3Tgf/SFj8IPwKnTxQQxmGcj8YbjY0sK9/FpqGK3JxSNiXLGmeH23auVrvq31HcZdTD5rz8tLhzdZ+/71FESrgmpZrqEtiAcCmnUdjsU2ZaIa8Yd2Cb8uV4rT1qYZIEMnuwE4X6t+9Iy7KnMrQ8qYzVf5Oax5fA2+M8w==
+ b=rQemuHqBnCWqMY6P4PnAdkG6ySgAE2KAQ6ROO4HNNxT1URGXE3P2GdTGXSJ4AhPN9s4cKuRcfxeTRv6O2oKTKZMjtHR+chszkCE1hdTmSAk0ZzzuR9yd4xIt+Q4P6PmMOk8KrQ4XNwQ59SeYgTukDxQEokqDcHUxcj+09mggndcPa/CMDLVvJe6hAXVfrsEifQ77KbuMZESykRM5Wtqdrago9ZtIN4X6cU2Z9aMWicZAt5iT1R9xW1PyD9Q4b05Kk88YEhz8JPpFlVk22SxK4irAaLvYgO3+SbT+fo45kTiQbFJvDUor736SL2elWYSZwev0N/SlnMUiA91dJfOW4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wJvTH9YzvHjq2RhQFuyiKZGU3pFXacA3nNuO7F3ZXxo=;
- b=c00JPFMk7CCCWi6njRiEAdrI2M7c+CB0OCbx8B8SDoez0SPf8lHWzeNuTgcBkupuFQlEvKMHFp2PUWgQJlboxKaPoPb0g79wucDU7FukMK0GkchVmEyJISTb+JzCUriIZyHt7E7sNvvVHMpfuMM5VLN9Rq6epg+DzfLBgjB4z7F5bYO1aOdSDIKaWFKfP7eGqr4htacytR/+UPzSg8aDRNNiitfrlnEZNOX/CFtJ5BknjzkljviHXxcfaqw/sRRmVW4BaJl0nvE6zjm/NNa5aYjezCZn7jDJR90blgFL+cG1QyuMW7ciPm9YTv8Gs6RynIQ5mHRrcZMrjvnxFpPP1Q==
+ bh=iF8NGVAF1mYfqgSbBg9v738SRNDrEohxCeGXJ0cR/TI=;
+ b=vRZdKUc8X1JiMJOPJH/u1hWaxuo1RFR5XLFHBB0Q+hAH+0cE8pI/Q7vCl3JtXjUZecgvnJn4UcLXbduwji60jGAs++67XIPN0hSGMGETQntobRhRilQyyCIJaw5WQQJNJTpg6euKZDx8pw1hbc9CBl0uejn3ynHu9eFi+BDSc8fqyPT5/gCShVSO6SC/6sri2LW8sklP+H+ey2WBoouC9bUgNHnomMeW50/Ddkzow7SUvesFLTpNLtADDqfqZXUsD0uW2KE8ffylSj5bNOW+HGPt5uB5ZWU0Sx5Mp2ypeFwLeJ2UifuwEHHWsLXpRz3hN8hS9SAXw8u6VDxEkdgt2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- IA1PR11MB6194.namprd11.prod.outlook.com (2603:10b6:208:3ea::22) with
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by SA1PR11MB5899.namprd11.prod.outlook.com (2603:10b6:806:22a::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Fri, 13 Dec
- 2024 01:04:26 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8230.016; Fri, 13 Dec 2024
- 01:04:26 +0000
-Date: Fri, 13 Dec 2024 09:01:34 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: <pbonzini@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>
-CC: <dave.hansen@linux.intel.com>, <rick.p.edgecombe@intel.com>,
-	<kai.huang@intel.com>, <adrian.hunter@intel.com>,
-	<reinette.chatre@intel.com>, <xiaoyao.li@intel.com>,
-	<tony.lindgren@intel.com>, <binbin.wu@linux.intel.com>,
-	<dmatlack@google.com>, <isaku.yamahata@intel.com>,
-	<isaku.yamahata@gmail.com>, <nik.borisov@suse.com>,
-	<linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: Re: [RFC PATCH 0/2] SEPT SEAMCALL retry proposal
-Message-ID: <Z1uHbl0AeGsjLf5K@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20241112073327.21979-1-yan.y.zhao@intel.com>
- <20241121115139.26338-1-yan.y.zhao@intel.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.20; Fri, 13 Dec
+ 2024 01:30:36 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%2]) with mapi id 15.20.8251.015; Fri, 13 Dec 2024
+ 01:30:36 +0000
+Date: Fri, 13 Dec 2024 09:30:25 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
+	<vkuznets@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	<kvm@vger.kernel.org>, <linux-sgx@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, "Hou
+ Wenlong" <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>,
+	"Binbin Wu" <binbin.wu@linux.intel.com>, Yang Weijiang
+	<weijiang.yang@intel.com>, Robert Hoo <robert.hoo.linux@gmail.com>
+Subject: Re: [PATCH v3 05/57] KVM: x86: Account for KVM-reserved CR4 bits
+ when passing through CR4 on VMX
+Message-ID: <Z1uOMdYiWz68LAPo@intel.com>
+References: <20241128013424.4096668-1-seanjc@google.com>
+ <20241128013424.4096668-6-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20241121115139.26338-1-yan.y.zhao@intel.com>
-X-ClientProxiedBy: SG2PR06CA0216.apcprd06.prod.outlook.com
- (2603:1096:4:68::24) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+In-Reply-To: <20241128013424.4096668-6-seanjc@google.com>
+X-ClientProxiedBy: SG2PR06CA0214.apcprd06.prod.outlook.com
+ (2603:1096:4:68::22) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -119,260 +120,100 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|IA1PR11MB6194:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ad23246-8089-4e71-8ce4-08dd1b1216bb
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA1PR11MB5899:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71a264fb-e954-4edc-51a4-08dd1b15bead
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016|3613699012;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?G81piytwT+pyFHbpfz3eJWaMQsyAq1nHxiBYfBvQCs3S8T1WSGemS5WqWHBU?=
- =?us-ascii?Q?qA5LfXUblqies5gY02gbncfnyv8WeGtJ9rnfWR3CQF3XOpBtiePIZ4e0E7U1?=
- =?us-ascii?Q?YzTjW/16FuLzMf6Z5VmrA8xqzAj42y8KJ9FKxZjPiNX+oSubVCx3qn0ApCDr?=
- =?us-ascii?Q?bIJqqAf5WaMSOWp6JEhDgpU5d71MFy85bQvzwlNPXgpt3IUFSFi4CD7FlKSd?=
- =?us-ascii?Q?W6xSBuRIPOduo7w4ha1LBwdlf6adVD70vHlgwxuKj2OoRODmPm1y1uY8PdSi?=
- =?us-ascii?Q?jTC3PORJYasi/j64zoEqsmTlMPlGyC4rlpFjyjiMSKyh2YRrlgmw7OemQjAo?=
- =?us-ascii?Q?zQlwvMLhgy1y7vjsQmnz20ll0kSp8t6mKrT6e+DBowt7pa5zgU6nOyPjD3mi?=
- =?us-ascii?Q?EYCiHvZqjdiUoSiLBLGG0eT7Aa+VpRF6bw0qOARxvaVPc50CEKXfylKOzhXE?=
- =?us-ascii?Q?idvp6USu+nK9OrzdZbzsxpTegWx2eiZne3kbNh5rXqME0ylNBMMwQBl/vE5S?=
- =?us-ascii?Q?jlgzc39Io4mR/lWlXIjnHPwCypuV8zXTJdQ9uU0BWXp2/RNwiKXCTidwhggS?=
- =?us-ascii?Q?tN/nox23jX5YVD0qyzUnCEsBcRL5hbmFVdPDnlyUpP7+0Y7YjtbiYASU5nbA?=
- =?us-ascii?Q?b++2G85/wSb/0tVuDqRRHCxTubvhuEXGoMvVRrAk+9eVCEPtYS2OQ9gZ8mBl?=
- =?us-ascii?Q?yO+doDtnfAByXUY2sLiwaO2SO8F8VTvRV0QPRw157FISb2CpPohg6H6FX2ii?=
- =?us-ascii?Q?5yn66LkuNKQI3HFDtJIpxWsWMVPeL3CKYhjTBJ6otaU8Jm8KbsaEkUkOSU2B?=
- =?us-ascii?Q?T1DvSxUB2KEHXZfmRYjzUkQ91NLxekbM9ms/zogSFrQjyagW6lqqZFvsTN8A?=
- =?us-ascii?Q?wtB7pMf5X/FJxPpKdiAZOjqQcYXGS1uhDGAQhdXzz8xcWm3aKGHIf7CHIa7B?=
- =?us-ascii?Q?hJF3gh5Ce+7LKLGF6v0lcRzMELVDsvW8lXmCqgyG1gTazbxVSDAhxkSzxVMs?=
- =?us-ascii?Q?foJVtTHsDRZw5Sy1tGDnjLh8vVKXwuhf3nUN2bS7M0t6ufvDCoCvI1jWzIVw?=
- =?us-ascii?Q?+2VObZGOUWUCTwTg/60iTMfwaZfnnLuDFFF3Q1NzH7jR+4szPyFr7gKarG5R?=
- =?us-ascii?Q?g/oZ4ppXu9fEsKMDlXvPe+x9khvhpjc3QBJTr03/aVAx+09cm0DjA8yisi7p?=
- =?us-ascii?Q?jc6v5ShohVG0vula3DKzGgXKf8JEDvCksACqkWOMehONnUt8nIpGJqrjElJ7?=
- =?us-ascii?Q?o8O5WgIqCThxn/h0p5L2wFzkI4NxF1Yfbx7RgZN7LUf845L0thnDx8wZwTtX?=
- =?us-ascii?Q?AJEdGxtdf1Q1EEGHd2TieSPQudQLCJ/hxIgw4BrMhdqILCdVlvVhwkdq9ktS?=
- =?us-ascii?Q?OzfAVW8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(3613699012);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?fQZCSzQt39gV/nHNSTD6B7YWplTo+QmDAQIWg6AI/ncCFEeOUq2AAcjVWvQg?=
+ =?us-ascii?Q?uhEfXrfsG6SPPfe4WNA3RGuQkRVJHwSTdebOdn5Vq45H0/WLPc+zjS6sin94?=
+ =?us-ascii?Q?E/ic6oqJOw8hYgNbJ1E5YghLgFduP+kujwOCJNx18nwNi/uMMVS+BMqAU8As?=
+ =?us-ascii?Q?h8RmwerlstfEK1zhLcAiKWSClqPqDsjdjMvlusT/SMDoPTZ9lzHKue0ehCpZ?=
+ =?us-ascii?Q?5HLwEdaRRYd1ouygpyqtjTR1nSh0zpZYdjEhvkutmrbXkOl0bJwAcU9ksFsl?=
+ =?us-ascii?Q?9ILFHsVWiSWEwhqQcAtCvbEiHxUenmfK5s4yCbxmsc6S9N+qPci7QAE7GSXc?=
+ =?us-ascii?Q?vPU245dsmWfozwA7I5PZQRKDl7UbQbS9IuGPlv5M5VIqxVzpfEhHNGQ0PJNE?=
+ =?us-ascii?Q?ulg3roAtnG4YnTD45OfgNVHVU2uv7TJsmA1XLgkSPya+l61boxvAlJ2JOOyz?=
+ =?us-ascii?Q?BHRJCuxFvC3TrI6qhnlNKUvkdRaxp3OKol5MB8ud5E8CrwcJlgH+EN058oXK?=
+ =?us-ascii?Q?Fo3kUXBWyzpa83/843p6qF+WhKYhgrW3kQsCWhIioThP0LKZ/RORjmBfHG+2?=
+ =?us-ascii?Q?7KQXyu5SFqchIXGbg8gBr/G6KL61KeYRpg8l5IPJqUuHP82V/OXONTpiA8no?=
+ =?us-ascii?Q?kDW1uL4hp1/2d4OFnbtaubdfRJ/2JGWHeIjmmbW9Jn5OWRYDD6YTSzXVx464?=
+ =?us-ascii?Q?5DDgD20JzDUJnZSj8IsJi/75cOe1LBRW7mtKvRVrYsRfAEWSfBpYjJpMmDX0?=
+ =?us-ascii?Q?DBQQwM4EQCecKf16cf7zzfLskiMsGeZPtspbo/jLp+uZCKy5+HU3TzMNzlFg?=
+ =?us-ascii?Q?lyG3Nada2vL2wIhqYpsllBHlsj5hkfhfOnxmeTr64RJ+FSn4BIi6BiFAEAUR?=
+ =?us-ascii?Q?JrcsU1pkhIk7wt2fXqyBEG0xK73m95MBfrJY+2TGJDBXvpbEQgSnehSqBIvy?=
+ =?us-ascii?Q?wi07UbMrWauhc/xjxQCjbWX/0eW4yx4k1aZqLRhSB7zH64X4mKQg8Y31yErZ?=
+ =?us-ascii?Q?Qae7F93+JoNVU0Cacqk3G0DZGt/x9GFjnqUukO2RBwSqG7k03inexIzpcNnC?=
+ =?us-ascii?Q?SpJ14sel5LfQ/0iZaATac4/rFkpqBOxSSBshmnYb/Q4cbWIgjJZ3Z49aRmaM?=
+ =?us-ascii?Q?9547mYCyeibAFOufzyjTIcNqxge28N/pKS5q24zO/mZyUpyAhQFjGdTrmV2e?=
+ =?us-ascii?Q?6ZV5MmZmCXm6Wz4vgN3hnT57LOu0MpL/3mvCbCwMwC+04nU5qDDazlMNr8jh?=
+ =?us-ascii?Q?SlyWzUnHyQE0JtCM0uQ88j1zaPn0+OOS1b313H3LLix/1ZPxd2pTKZ4HrkqA?=
+ =?us-ascii?Q?Ocs/hcwryKtHTMH/TEZyvYSTkTFlr4CBi3Q35tTHXbmW2A=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DUfZ9BmVXe3AzqQR35un401ISByZDThxjj/nFq20J+33Dx9fWFSTwwTs167d?=
- =?us-ascii?Q?ISh5ARmJIrqPik0iLv5v2kfK71DvZ62HYAMikosbyMbuJe/1XJ7VlKO99ljk?=
- =?us-ascii?Q?W82mBn9T+MAl6Hk1zNjt5SGZg9NrPMZZzXx62/dM2ZCf5gBea+q18f02SZdl?=
- =?us-ascii?Q?BlRdaMw+DO1GLK5svMP2lZ3pO2r2yYgRjpKpITEdCXESNmK0M4guBSxnn4eS?=
- =?us-ascii?Q?CuLt0NHB05AX25sXXkIJOXnsg5yYVtJdHoz7PFN+IS/R9uRId4kvs3GHFv1b?=
- =?us-ascii?Q?fNcsPAozjMR31UPwXFFBbEL2IdgbYu2CfJpORWNCxFKdNCSOAiRSe6ou/EUJ?=
- =?us-ascii?Q?uNkMaaCrAU9euZiaYDoJKVOyQgzHV2Nrx8bc+TO4yLgP/q+RZDWC+4yBc/+U?=
- =?us-ascii?Q?75lWIoPNmZ0tSNq+umqhmC8WD8MSzJNeR96eO55qCOwfiQNFB0JU3HXzmM8N?=
- =?us-ascii?Q?HRVqFy7PkHYhIPQ+Rph0bY12iwgsvQScYdb0uIt/EEIWSJWta93EZWyMUdzd?=
- =?us-ascii?Q?2bxpbPZBbKYMDgmVuBxtNVMF6h/sD7R9knzZSg43wN9c3mjRCgdrktSOyhuA?=
- =?us-ascii?Q?wb0OL4pDBnU/DNknXGt1XJCGFexfU98IqyKU8I3XK8ksknRZs1K5nJ+4eO1b?=
- =?us-ascii?Q?g18CxZy8Gzk7v54gcmQgid4jDA3lh6OlfbgXWLxB55hy122TvqtwK6q7tCjK?=
- =?us-ascii?Q?YuevconZFo5Ull7Z8mOP0ZfTGKLHd6urobfyprR6W6x2J9Vrdp8Thu/sbVcm?=
- =?us-ascii?Q?2f7b/XYl2XHKsjGHF0XDrvIiTsCgwk7HQ2WAKKkNTwU5pPrim3uSyuKYvqZn?=
- =?us-ascii?Q?OWvKDX9c+20yo3I42ENklhPl5M+VMAuZZP9bJQQ4aoMRRS0VKyqyXQDjNBZE?=
- =?us-ascii?Q?MQtU9ZOSbKYeJI17gQ08H2ZKBvFGzCDwndT44hxaDuDAp873KCzn2DWp1eY8?=
- =?us-ascii?Q?Kdk5AJYbDgGFwu14tydWC6Ju4sOy5RiCN3i8I3Mn/6x1eEZL5h+kQ0bCN5v6?=
- =?us-ascii?Q?HdtfEWz2inMu0QGdU/LjRgTANs1bJCQgcx0gGEAnCcRFLiveBgUYa4+XiI+O?=
- =?us-ascii?Q?Ut6ewOI/URMYQoTYVGBpwloF2EtKHgK82kMUi/JIIoWjsKFPLqNSh4A2r++r?=
- =?us-ascii?Q?NdDGOI6ujWifmGgyJ6j5gyrYQ8MfIY5SuPug51KFyTdtcK1qKmhd3zxR8uBm?=
- =?us-ascii?Q?zPr3MpTCKxkPkz4yMcP/89FNfFOxnqD2CHX7jV+Gj4demvDKZ3CPASyZvMvN?=
- =?us-ascii?Q?PWmT7U0JmltZOVVYziGzMIORR/Agoa3rZwdmMmgXQmihLt/y+tJ4wA79YIgn?=
- =?us-ascii?Q?BEYnpIOM7A7OgmJklKX5tOu8ITpb3c0tdxb4HGaMJ3g02uT8Yt3+gjEsC9Ww?=
- =?us-ascii?Q?kr7HaKl5YjLJyM/83XZ7AOUcFJCfhR68d4hciDUq8n3IV7jTCum3VlP+EBbp?=
- =?us-ascii?Q?6IjJRWaoD0KYwfTD4yTybMDAkygprfnhZplax3rI1USe8dHGec2FbAxOj0+N?=
- =?us-ascii?Q?XVAsDn4MNl+LKHs/4G3nMxYfOU1iESpK5/ebxeR9odPIWjvNfCeCoyJtN0Y5?=
- =?us-ascii?Q?GxsapU8buy3PO75c9xwDCYx0DvhKgZace8Y+ASNh?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ad23246-8089-4e71-8ce4-08dd1b1216bb
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GYKioX5043gZRrUM6LXwfb6Gc3rrX3cxLwBmZx/UuAaSwxYbOs3CehfezEKk?=
+ =?us-ascii?Q?WJ9rw7Na0NPZhl4TyfqHJNZWTjbGiMIOBc0n6XDhGcl7cPboHi2MBQHUJCQt?=
+ =?us-ascii?Q?36Qr9eoG4H/W0EfJYEzAnbtHozjwmKswDEjFedQgm6NyulloA3HrlROqwQHU?=
+ =?us-ascii?Q?8h4ujDyW7Yy2fB5z7gkXrPv7BhGv3mcZHoXynPSpaCK/lLQf8N280ybbokQO?=
+ =?us-ascii?Q?+O6XQdreElseFHFHZ7wSdIXn8dwuNcoiNt44mhhMp1DLat8EGUbo6c/vSaIn?=
+ =?us-ascii?Q?Gripyyd18luBW3q92SyUvJi6XCMjPvAYbjhegKgdbtLeK3pwyPIJ5jpKUnTn?=
+ =?us-ascii?Q?0e9b6M53j90mqPf/wyWORaOojHsl+lyih47I/Zq3gM+VOGs0LX6iYLsC49g7?=
+ =?us-ascii?Q?3/PJQoL+zVPr0a7x0qkxBdIexB0bDolrKIsniITZJc0i4ZTUL48gGBnEYUct?=
+ =?us-ascii?Q?Elu+XluaDaBOqk9EiWEWjpjSEpMsdLLxrnZ13vPPpqJc3jaIXL708sxzhM+O?=
+ =?us-ascii?Q?tB1DzACSdQKYjW69gwhnZYe6gZPU3yaGPcYwLzBI6hKDI5MRn31U0b9y3ctO?=
+ =?us-ascii?Q?81d9qezqtRU6uNPNad1NVNZeKKe95n7ntTY5rc88IQBHfikff6espZOEpqQt?=
+ =?us-ascii?Q?NuEOcoc59Y3ZkZiYBiwwi1RuIGBpGA54fv4PaKhs4BAn+stLaT1GllMaSjH/?=
+ =?us-ascii?Q?DnZjfIl1m6Ae3JgWDmPPso3L4xWjmgv77ZMklTrz1s6FSIXHDnD0m4blZ5yo?=
+ =?us-ascii?Q?92YdMcXktrRGA1EJTkuKvprDpZe9RjSI/7ZxThTrRwM4E2Q/zLCsShqzDmAR?=
+ =?us-ascii?Q?fkkSspeZ+cpb0wJ1q8AiS8hHfnSR6SJIihgA0aPs9nMel0oeHlM3dmCEB25H?=
+ =?us-ascii?Q?z2bbEuS4ucj/XwkBKvwtfwumDwcOOilEnFMUZm/NJ0gs9etTJKTPJTAXMlcu?=
+ =?us-ascii?Q?HcM5QIK+H6fIl47QhqznDl+esnia4xq4ZxKp//htLh7DnLJocGHtEWNPXWi8?=
+ =?us-ascii?Q?IDrqYj485NWJ0ZrO2i1ygHvaYcTrpVjc+/pBI497haOK0eCCpdpCSNSCapmr?=
+ =?us-ascii?Q?Fhf3hAOOZ2S3NQa++MrKyRycxijq6dUGyqPeU8kXpWP+brjsFp73OXCBdDmb?=
+ =?us-ascii?Q?1N3NddF7TK3w6r1qa6dsxXWNBoMgmLlE+wqD4EzrDNZ+8cVDn7QfqNuG0ibK?=
+ =?us-ascii?Q?gvPQrIH7zhFiSnXK24cNOZ1GG0xaU3SgQXIv7ScOCM1gAAmcGO4QqXR1E9X/?=
+ =?us-ascii?Q?p111yXkYfGXu56L++PkDyKKQw1REYE5Jvk0Vz+KNlQNjwqjDcuaeF6i53SuS?=
+ =?us-ascii?Q?HiDAIhO//KewsXdJgS0JfLlv1b2IUf57S+hhFSJ8Ru8K8Z4OOUieJ8/MIT7f?=
+ =?us-ascii?Q?GE/rvbnzh8ymKgjE2HdEmzfamMmMRXmPwOR4pupxwyFRtJcPUy2JWEu70L0Q?=
+ =?us-ascii?Q?dnVMibPGzkrLgbjx3agTJn0jLgiHNls3jbPKbR3kC2jRdMtevHMW4PIQs2Yp?=
+ =?us-ascii?Q?XBJlIDJJsRJCJznA0cOnxhC5ozpOek/9cGmFIfJLUiVlmPTVBN3kRROvA31i?=
+ =?us-ascii?Q?+XGvWzUZLA1nzQ9UFw5XJR+vwrWZIhznY3qON7qz?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71a264fb-e954-4edc-51a4-08dd1b15bead
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2024 01:04:26.3164
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2024 01:30:36.5438
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XbXsif2LyZMD0P6dfNvZLk9l6BgfLqDQfxiMke2KbnoXSgiYn1CTloX2gddpOBAPk9K47QfX/T5A1vtYghSEaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6194
+X-MS-Exchange-CrossTenant-UserPrincipalName: gmnO7ilTYdVIZdj9UxgDoGlGIPMGWD4y/B1K++YUdZzO3YLh2xL8f0WEyNbYjgWbclRDP8h6aNnLgmKWDdXt6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5899
 X-OriginatorOrg: intel.com
 
-On Thu, Nov 21, 2024 at 07:51:39PM +0800, Yan Zhao wrote:
-> This SEPT SEAMCALL retry proposal aims to remove patch
-> "[HACK] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with operand SEPT"
-> [1] at the tail of v2 series "TDX MMU Part 2".
-> 
-> ==brief history==
-> 
-> In the v1 series 'TDX MMU Part 2', there were several discussions regarding
-> the necessity of retrying SEPT-related SEAMCALLs up to 16 times within the
-> SEAMCALL wrapper tdx_seamcall_sept().
-> 
-> The lock status of each SEAMCALL relevant to KVM was analyzed in [2].
-> 
-> The conclusion was that 16 retries was necessary because
-> - tdh_vp_enter() contends with tdh_mem*() when 0-stepping is suspected.
-> 
->   When the TDX module detects that EPT violations are caused by the same
->   RIP as in the last tdh_vp_enter() for 6 consecutive times, tdh_vp_enter()
->   will take SEPT tree lock and contend with tdh_mem*().
-> 
-> - tdg_mem_page_accept() can contend with other tdh_mem*().
-> 
-> 
-> Sean provided several good suggestions[3], including:
-> - Implement retries within TDX code when the TDP MMU returns
->   RET_PF_RETRY_FOZEN (for RET_PF_RETRY and frozen SPTE) to avoid triggering
->   0-step mitigation.
-> - It's not necessary for tdg_mem_page_accept() to contend with tdh_mem*()
->   inside TDX module.
-> - Use a method similar to KVM_REQ_MCLOCK_INPROGRESS to kick off vCPUs and
->   prevent tdh_vp_enter() during page uninstallation.
-> 
-> Yan later found out that only retry RET_PF_RETRY_FOZEN within TDX code is
-> insufficient to prevent 0-step mitigation [4].
-> 
-> Rick and Yan then consulted TDX module team with findings that:
-> - The threshold of zero-step mitigation is counted per vCPU.
->   It's of value 6 because
-> 
->     "There can be at most 2 mapping faults on instruction fetch
->      (x86 macro-instructions length is at most 15 bytes) when the
->      instruction crosses page boundary; then there can be at most 2
->      mapping faults for each memory operand, when the operand crosses
->      page boundary. For most of x86 macro-instructions, there are up to 2
->      memory operands and each one of them is small, which brings us to
->      maximum 2+2*2 = 6 legal mapping faults."
->   
-> - Besides tdg_mem_page_accept(),  tdg_mem_page_attr_rd/wr() can also 
->   contend with SEAMCALLs tdh_mem*().
-> 
-> So, we decided to make a proposal to tolerate 0-step mitigation.
-> 
-> ==proposal details==
-> 
-> The proposal discusses SEPT-related and TLB-flush-related SEAMCALLs
-> together which are required for page installation and uninstallation.
-> 
-> These SEAMCALLs can be divided into three groups:
-> Group 1: tdh_mem_page_add().
->          The SEAMCALL is invoked only during TD build time and therefore
->          KVM has ensured that no contention will occur.
-> 
->          Proposal: (as in patch 1)
->          Just return error when TDX_OPERAND_BUSY is found.
-> 
-> Group 2: tdh_mem_sept_add(), tdh_mem_page_aug().
->          These two SEAMCALLs are invoked for page installation. 
->          They return TDX_OPERAND_BUSY when contending with tdh_vp_enter()
-> 	 (due to 0-step mitigation) or TDCALLs tdg_mem_page_accept(),
-> 	 tdg_mem_page_attr_rd/wr().
-> 
->          Proposal: (as in patch 1)
->          - Return -EBUSY in KVM for TDX_OPERAND_BUSY to cause RET_PF_RETRY
->            to be returned in kvm_mmu_do_page_fault()/kvm_mmu_page_fault().
->          
->          - Inside TDX's EPT violation handler, retry on RET_PF_RETRY as
->            long as there are no pending signals/interrupts.
-Alternatively, we can have the tdx_handle_ept_violation() do not retry
-internally TDX.
-Instead, keep the 16 times retries in tdx_seamcall_sept() for                    
-tdh_mem_sept_add() and tdh_mem_page_aug() only, i.e. only for SEAMCALLs in       
-Group 2.
+On Wed, Nov 27, 2024 at 05:33:32PM -0800, Sean Christopherson wrote:
+>Drop x86.c's local pre-computed cr4_reserved bits and instead fold KVM's
+>reserved bits into the guest's reserved bits.  This fixes a bug where VMX's
+>set_cr4_guest_host_mask() fails to account for KVM-reserved bits when
+>deciding which bits can be passed through to the guest.  In most cases,
+>letting the guest directly write reserved CR4 bits is ok, i.e. attempting
+>to set the bit(s) will still #GP, but not if a feature is available in
+>hardware but explicitly disabled by the host, e.g. if FSGSBASE support is
+>disabled via "nofsgsbase".
+>
+>Note, the extra overhead of computing host reserved bits every time
+>userspace sets guest CPUID is negligible.  The feature bits that are
+>queried are packed nicely into a handful of words, and so checking and
+>setting each reserved bit costs in the neighborhood of ~5 cycles, i.e. the
+>total cost will be in the noise even if the number of checked CR4 bits
+>doubles over the next few years.  In other words, x86 will run out of CR4
+>bits long before the overhead becomes problematic.
+>
+>Note #2, __cr4_reserved_bits() starts from CR4_RESERVED_BITS, which is
+>why the existing __kvm_cpu_cap_has() processing doesn't explicitly OR in
+>CR4_RESERVED_BITS (and why the new code doesn't do so either).
+>
+>Fixes: 2ed41aa631fc ("KVM: VMX: Intercept guest reserved CR4 bits to inject #GP fault")
+>Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-> 
->          The retry inside TDX aims to reduce the count of tdh_vp_enter()
->          before resolving EPT violations in the local vCPU, thereby
->          minimizing contentions with other vCPUs. However, it can't
->          completely eliminate 0-step mitigation as it exits when there're
->          pending signals/interrupts and does not (and cannot) remove the
->          tdh_vp_enter() caused by KVM_EXIT_MEMORY_FAULT.
-> 
->          Resources    SHARED  users      EXCLUSIVE users
->          ------------------------------------------------------------
->          SEPT tree  tdh_mem_sept_add     tdh_vp_enter(0-step mitigation)
->                     tdh_mem_page_aug
->          ------------------------------------------------------------
->          SEPT entry                      tdh_mem_sept_add (Host lock)
->                                          tdh_mem_page_aug (Host lock)
->                                          tdg_mem_page_accept (Guest lock)
->                                          tdg_mem_page_attr_rd (Guest lock)
->                                          tdg_mem_page_attr_wr (Guest lock)
-> 
-> Group 3: tdh_mem_range_block(), tdh_mem_track(), tdh_mem_page_remove().
->          These three SEAMCALLs are invoked for page uninstallation, with
->          KVM mmu_lock held for writing.
-> 
->          Resources     SHARED users      EXCLUSIVE users
->          ------------------------------------------------------------
->          TDCS epoch    tdh_vp_enter      tdh_mem_track
->          ------------------------------------------------------------
->          SEPT tree  tdh_mem_page_remove  tdh_vp_enter (0-step mitigation)
->                                          tdh_mem_range_block   
->          ------------------------------------------------------------
->          SEPT entry                      tdh_mem_range_block (Host lock)
->                                          tdh_mem_page_remove (Host lock)
->                                          tdg_mem_page_accept (Guest lock)
->                                          tdg_mem_page_attr_rd (Guest lock)
->                                          tdg_mem_page_attr_wr (Guest lock)
-> 
->          Proposal: (as in patch 2)
->          - Upon detection of TDX_OPERAND_BUSY, retry each SEAMCALL only
->            once.
->          - During the retry, kick off all vCPUs and prevent any vCPU from
->            entering to avoid potential contentions.
-> 
->          This is because tdh_vp_enter() and TDCALLs are not protected by
->          KVM mmu_lock, and remove_external_spte() in KVM must not fail.
-> 
-> 
-> 
-> SEAMCALL                Lock Type        Resource 
-> -----------------------------Group 1--------------------------------
-> tdh_mem_page_add        EXCLUSIVE        TDR
->                         NO_LOCK          TDCS
->                         NO_LOCK          SEPT tree
->                         EXCLUSIVE        page to add
-> 
-> ----------------------------Group 2--------------------------------
-> tdh_mem_sept_add        SHARED           TDR
->                         SHARED           TDCS
->                         SHARED           SEPT tree
->                         HOST,EXCLUSIVE   SEPT entry to modify
->                         EXCLUSIVE        page to add
-> 
-> 
-> tdh_mem_page_aug        SHARED           TDR
->                         SHARED           TDCS
->                         SHARED           SEPT tree
->                         HOST,EXCLUSIVE   SEPT entry to modify
->                         EXCLUSIVE        page to aug
-> 
-> ----------------------------Group 3--------------------------------
-> tdh_mem_range_block     SHARED           TDR
->                         SHARED           TDCS
->                         EXCLUSIVE        SEPT tree
->                         HOST,EXCLUSIVE   SEPT entry to modify
-> 
-> tdh_mem_track           SHARED           TDR
->                         SHARED           TDCS
->                         EXCLUSIVE        TDCS epoch
-> 
-> tdh_mem_page_remove     SHARED           TDR
->                         SHARED           TDCS
->                         SHARED           SEPT tree
->                         HOST,EXCLUSIVE   SEPT entry to modify
->                         EXCLUSIVE        page to remove
-> 
-> 
-> [1] https://lore.kernel.org/all/20241112073909.22326-1-yan.y.zhao@intel.com
-> [2] https://lore.kernel.org/kvm/ZuP5eNXFCljzRgWo@yzhao56-desk.sh.intel.com
-> [3] https://lore.kernel.org/kvm/ZuR09EqzU1WbQYGd@google.com
-> [4] https://lore.kernel.org/kvm/Zw%2FKElXSOf1xqLE7@yzhao56-desk.sh.intel.com
-> 
-> Yan Zhao (2):
->   KVM: TDX: Retry in TDX when installing TD private/sept pages
->   KVM: TDX: Kick off vCPUs when SEAMCALL is busy during TD page removal
-> 
->  arch/x86/include/asm/kvm_host.h |   2 +
->  arch/x86/kvm/mmu/mmu.c          |   2 +-
->  arch/x86/kvm/vmx/tdx.c          | 102 +++++++++++++++++++++++++-------
->  3 files changed, 85 insertions(+), 21 deletions(-)
-> 
-> -- 
-> 2.43.2
-> 
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 
