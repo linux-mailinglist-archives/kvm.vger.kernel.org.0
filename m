@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-33803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4A29F1BC2
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 02:11:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FDFA9F1BC4
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 02:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FD03162D54
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:11:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE06F188E799
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8DC192B63;
-	Sat, 14 Dec 2024 01:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E399F194A43;
+	Sat, 14 Dec 2024 01:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A8LbnI+x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="huFZsV8i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D011917E6
-	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 01:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75B71922DC
+	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 01:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734138465; cv=none; b=eCghWSZmUibEtVbQ+qI/UMUoHIl+lenFb0DwALbzr1M+uGlyI9LTsIHZ20EUWAYYJei5jDXJar+jSC6E33xBVrPaR+6kOjA/5iNokiUPZU/wjGMj5EQpDySWK9EpSdMIwffGH789LxNO2GIMzy5on0p9rJxA8fe0lduZ2TLHKnI=
+	t=1734138467; cv=none; b=CSBmUJSSFE1Oskual1VtuxFEo2BKXmuiXS42l/SNAkfwe7u85AH/GULzxajwFa/o9e1fSGlcIuF87v2J/WTih0oSjEIEuirleS9l/hLOG+NgZXfndubJEmTw2d3aMu6s4+GvpROpUN+HmcJRl0DfBc3Eiu8WMUhpeFcxx9UEFMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734138465; c=relaxed/simple;
-	bh=3sfvgMqPiGr/4hRycKbPGFa+ObbRBz+P/dL5LYIATKQ=;
+	s=arc-20240116; t=1734138467; c=relaxed/simple;
+	bh=QVWmEN93U4wXoW46HSHclbwWmnJqdA1R3pFC8wdRuNY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T6tYKhuEHILpTl3wmifu4i3JBKuZXfAgw25svrlwMMSEE+FTqpv3D1uslK1BpQseFcVxV+yaRwlkVhkDRUiaJsLtlXONZ/9wJHXG4V1rdJr0CcmgQiplTrwihcDLTCeLpQGyQGy5gG+8oUb7cESikRD7yj5a2/OxpG2YkjsrHYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A8LbnI+x; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=oH7x0BCSoij4ImKsnQkv+KdU6BD/T4j3rkfn+6tXNiA5i4ouVAw8z9OkijNtC4AaLUH/9UwREHCKMktsZ+RvB7n/YlKLdB5QRprfDvvLrDImoX8RFyyR2SSNptBbOIJOeewyTHkJxunTkpoTU8cy77NuupqjB24z+gXf2c8mhno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=huFZsV8i; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2eedd15c29eso2040806a91.3
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 17:07:43 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725e4bee252so1931133b3a.1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 17:07:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734138463; x=1734743263; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734138465; x=1734743265; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=YB7ROV39Pzlxg3CsT+e1YkqRcv/fedX8ByOvnUPuqfA=;
-        b=A8LbnI+xIsAvTqlyukc1yVRx4tejiaNyu/a4+/94cvGB9W252yqIkxT4rJCe1xG4ki
-         z+1acdIjdnwxDjV5jkpD5HhB956dW/9rRqxrcDTrkUaE163xdvOEdIrrxg14GbkFBWT9
-         t2LYCyjCv3+cHyF3jbX5CDuYlBE1ZSwQe/ZdWhKhir5996+dNUbYLrW0DGJQb5mGui7J
-         wGYFx5kYaNg/pdwyc+Bkfb/I3+00CLreDSD9dM5Kl4kGk19rXac6pBhxNPvCRHX4q69b
-         HpPOTXYka95xQo8Wi9H+u4/mbJlnF6Sdej2UdIlrgkSuAURri4O1Is9f5Z8tS2GSwyjw
-         EyBA==
+        bh=bHCBDGsUVxz6SdxgZL4telXbGroEPmY7oNy/cAKGEh8=;
+        b=huFZsV8ix67y/CtSdBH9UwyPXgzRjw9UA3PvnFvoXjHrzhuc8dFo4pgJIFpJ+jb1O1
+         YwdjYTuaYk2b5Zvmg3gQNlTrSjnyfslGRMbNDjesouGEKw0jKDpjfYAmGaKxpux9TTUa
+         f/JrBnYADH/mtRGMsBdVcV51gvk9+2ruPl9IoMHMZkwZDq+iy5WKPX4SzPg7mCN59F8V
+         j1Xxpafi3uHfdADD35rhHpcTg053zf8PTZEwefBH8FnJkeceXlQ+hn0FsQ3eMaZTDCil
+         /j/uA6shixfj/Ve6lGqMYuJVE/fO0xNOFlgoin3xHHshqJlK4DV2I+gKcSvOZ21v7FBs
+         iprA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734138463; x=1734743263;
+        d=1e100.net; s=20230601; t=1734138465; x=1734743265;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YB7ROV39Pzlxg3CsT+e1YkqRcv/fedX8ByOvnUPuqfA=;
-        b=ZIzF9IiUcZVipNJJPIBLoJSthRYBA9uonADXF8wqbRbnK+l+n4c44ooMNmj9DCtlML
-         YueuzGUYIErOysLOgd/WfKU7Xk8tLRKAE1nb/3wRGsmihmAllG48b2MW26c2Kh1WItkA
-         ZSUXTPB34qX/38Sx5o/FxSWSgi8FbjFYJEih89l5v/G+KsQwfFJmdz9YvNg0CI4lUwT2
-         ZclvTwcKECMSHr55h1UEvT1ydWRhzIgY9M9oK4q1b0Vp1iAyoXWMMcqMpB3CGYdqWdGp
-         KIA45kTeVm/BfHO56Pp1StsN0Fyns0GNeeCj2JUh0WCX1tDa8SXQNKKoLxBEiMsUyBeI
-         r7bg==
-X-Gm-Message-State: AOJu0YxoYR7sGFVxTEa3a62AQKTP5M5s0J5PkPqDbfGxi3r0brTHNfAR
-	iDY+boicy89G8oK+nCI67ZAUUshFMeXQ69FP1SS5LFSwPpWITEBSRnrb79+nzhJ8SrEz6TfWgZf
-	Phw==
-X-Google-Smtp-Source: AGHT+IGLm+tWav0mdJroXvXIQGQc9a1oseLEfkqvEWloBr+EUUQt8A3f4c9LKw5WCptpE+rDX+y7oQPeGEI=
-X-Received: from pjuj8.prod.google.com ([2002:a17:90a:d008:b0:2e0:aba3:662a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c8a:b0:2ee:8008:b583
- with SMTP id 98e67ed59e1d1-2f28fb7216emr7811449a91.16.1734138463343; Fri, 13
- Dec 2024 17:07:43 -0800 (PST)
+        bh=bHCBDGsUVxz6SdxgZL4telXbGroEPmY7oNy/cAKGEh8=;
+        b=qR1iqvDz8+JRIJBySpKLd1sYG+doE6iXMuxUG35GuJN3Au5Ai9PDtdLmPNvqtORN8c
+         Jq4VEtjzxApetYQp1iVaMHZWAZW89jZ0uRP+HPIfom1Rx6Vi4pV/ygEXB/vv3vtQ0Abd
+         DO6bXrZCy/yREqc8QOhThMDuJSYmfcebbkr5lKTyWNhf/0jVEetaMLiI/vTHhqfybv76
+         KdQm/BX3uIuaQ+1EaoNlNNtj7I52ELWNWcetEhZSKyzm5LnYSau0SwMVZ78toCXhT+vT
+         eXlt3XeMO2esydceI14bnn3JSj00LqUiLcXOT+DChALh95Y7H8oqePayjcwMgL91LRVe
+         1IRg==
+X-Gm-Message-State: AOJu0YzpwyksJhiOiLseTsjD2MA3F4stden4+CJZa5gg79EMg/08ejSy
+	bBJoBiVDW+9USusrHtQjmlThuoGWgCAfwXXSG8v1yjrqQcZLdDSBlFivTwRmCsNSJwMy67ffVXB
+	V/g==
+X-Google-Smtp-Source: AGHT+IHI7aNGyUVYAZRaIfM3tqmWl5rQShpzYJGmkFTVL8PahcKsfjqTBmmhSQLHOzhneJg36ly7uAtGOuQ=
+X-Received: from pfvf8.prod.google.com ([2002:a05:6a00:1ac8:b0:725:d24b:1b95])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1483:b0:728:e906:e45a
+ with SMTP id d2e1a72fcca58-7290c269159mr7557525b3a.24.1734138465060; Fri, 13
+ Dec 2024 17:07:45 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 13 Dec 2024 17:07:12 -0800
+Date: Fri, 13 Dec 2024 17:07:13 -0800
 In-Reply-To: <20241214010721.2356923-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241214010721.2356923-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241214010721.2356923-12-seanjc@google.com>
-Subject: [PATCH 11/20] KVM: selftests: Post to sem_vcpu_stop if and only if
- vcpu_stop is true
+Message-ID: <20241214010721.2356923-13-seanjc@google.com>
+Subject: [PATCH 12/20] KVM: selftests: Use continue to handle all "pass"
+ scenarios in dirty_log_test
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,84 +85,55 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When running dirty_log_test using the dirty ring, post to sem_vcpu_stop
-only when the main thread has explicitly requested that the vCPU stop.
-Synchronizing the vCPU and main thread whenever the dirty ring happens to
-be full is unnecessary, as KVM's ABI is to actively prevent the vCPU from
-running until the ring is no longer full.  I.e. attempting to run the vCPU
-will simply result in KVM_EXIT_DIRTY_RING_FULL without ever entering the
-guest.  And if KVM doesn't exit, e.g. let's the vCPU dirty more pages,
-then that's a KVM bug worth finding.
+When verifying pages in dirty_log_test, immediately continue on all "pass"
+scenarios to make the logic consistent in how it handles pass vs. fail.
 
-Posting to sem_vcpu_stop on ring full also makes it difficult to get the
-test logic right, e.g. it's easy to let the vCPU keep running when it
-shouldn't, as a ring full can essentially happen at any given time.
-
-Opportunistically rework the handling of dirty_ring_vcpu_ring_full to
-leave it set for the remainder of the iteration in order to simplify the
-surrounding logic.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/dirty_log_test.c | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_test.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 40c8f5551c8e..8544e8425f9c 100644
+index 8544e8425f9c..d7cf1840bd80 100644
 --- a/tools/testing/selftests/kvm/dirty_log_test.c
 +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -379,12 +379,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (get_ucall(vcpu, NULL) == UCALL_SYNC) {
- 		vcpu_handle_sync_stop();
- 	} else if (run->exit_reason == KVM_EXIT_DIRTY_RING_FULL) {
--		/* Update the flag first before pause */
- 		WRITE_ONCE(dirty_ring_vcpu_ring_full, true);
--		sem_post(&sem_vcpu_stop);
--		pr_info("Dirty ring full, waiting for it to be collected\n");
--		sem_wait(&sem_vcpu_cont);
--		WRITE_ONCE(dirty_ring_vcpu_ring_full, false);
-+		vcpu_handle_sync_stop();
- 	} else {
- 		TEST_ASSERT(false, "Invalid guest sync status: "
- 			    "exit_reason=%s",
-@@ -743,7 +739,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
- 
- 	while (iteration < p->iterations) {
--		bool saw_dirty_ring_full = false;
- 		unsigned long i;
- 
- 		dirty_ring_prev_iteration_last_page = dirty_ring_last_page;
-@@ -775,19 +770,12 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			 * the ring on every pass would make it unlikely the
- 			 * vCPU would ever fill the fing).
- 			 */
--			if (READ_ONCE(dirty_ring_vcpu_ring_full))
--				saw_dirty_ring_full = true;
--			if (i && !saw_dirty_ring_full)
-+			if (i && !READ_ONCE(dirty_ring_vcpu_ring_full))
- 				continue;
- 
- 			log_mode_collect_dirty_pages(vcpu, TEST_MEM_SLOT_INDEX,
- 						     bmap, host_num_pages,
- 						     &ring_buf_idx);
--
--			if (READ_ONCE(dirty_ring_vcpu_ring_full)) {
--				pr_info("Dirty ring emptied, restarting vCPU\n");
--				sem_post(&sem_vcpu_cont);
--			}
+@@ -510,8 +510,6 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
  		}
  
- 		/*
-@@ -829,6 +817,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			WRITE_ONCE(host_quit, true);
- 		sync_global_to_guest(vm, iteration);
+ 		if (__test_and_clear_bit_le(page, bmap)) {
+-			bool matched;
+-
+ 			nr_dirty_pages++;
  
-+		WRITE_ONCE(dirty_ring_vcpu_ring_full, false);
-+
- 		sem_post(&sem_vcpu_cont);
- 	}
+ 			/*
+@@ -519,9 +517,10 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 			 * the corresponding page should be either the
+ 			 * previous iteration number or the current one.
+ 			 */
+-			matched = (val == iteration || val == iteration - 1);
++			if (val == iteration || val == iteration - 1)
++				continue;
  
+-			if (host_log_mode == LOG_MODE_DIRTY_RING && !matched) {
++			if (host_log_mode == LOG_MODE_DIRTY_RING) {
+ 				if (val == iteration - 2 && min_iter <= iteration - 2) {
+ 					/*
+ 					 * Short answer: this case is special
+@@ -567,10 +566,8 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 				}
+ 			}
+ 
+-			TEST_ASSERT(matched,
+-				    "Set page %"PRIu64" value %"PRIu64
+-				    " incorrect (iteration=%"PRIu64")",
+-				    page, val, iteration);
++			TEST_FAIL("Dirty page %lu value (%lu) != iteration (%lu)",
++				  page, val, iteration);
+ 		} else {
+ 			nr_clean_pages++;
+ 			/*
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
