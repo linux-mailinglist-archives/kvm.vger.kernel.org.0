@@ -1,114 +1,128 @@
-Return-Path: <kvm+bounces-33813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33814-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3DFC9F1BE5
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 02:34:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 966AC9F1D0A
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 07:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6E8A16A069
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:34:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AB3C7A07F2
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 06:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2E311187;
-	Sat, 14 Dec 2024 01:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EFA1531DC;
+	Sat, 14 Dec 2024 06:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCjXD9Qo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ranguvar.io header.i=@ranguvar.io header.b="Lo1AA0qS"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A989C11185
-	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 01:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC015914C
+	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 06:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734140040; cv=none; b=d7zGDyFhq7Z+gdpbZCGuisLwS83XnFDFU9pK6aWiTTIL48aQQPw6FS8PXB6qlkUm6JKcXK8bMITcP/N2ezChgTEqHO5G/r/X8I3MQ3AslIVtWRCs4+jsU675iIKPUvfMBzqeyYvYKzKpdkVm0C/XL+n9lGGhY/KpTr2KlO+SUvc=
+	t=1734157992; cv=none; b=loKEJ3/BJafOQnsZapNkVkq67U7o+78slBv5M6f0833JFYOJ+MYOIbzWQuCywqDEzxU0GTzGnVYBZhwvCH+zkZLWyBgfYfkO3bOPpNBVeAcBVyEXHJ53RWiBMALUym7YiA+wv2SZ5i6RrVUkkLxp6aB3FfFA2U3RSVAcg69YMKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734140040; c=relaxed/simple;
-	bh=0V+BvBbqJaj9CMfPRu9w7OP3dLEzbI5XfvYVGvZfmbs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kI4njYx5Q17R5Mahro/glGSVSLjZcIWYdrxU3a/QN84JAOkD+noWyCSdjDsrhsJ4r2Nf7M9vBKVenZNJf31/pU8BdBIijJtl6WO/oJC+kpQ4opoSmFBs2nH+rN4yFL5KqhvDXZyGP2lhTyO5YgLE5jZKuqcPqY0T8bJOjFHBBEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vCjXD9Qo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ADFDC4CEDE
-	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 01:34:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734140040;
-	bh=0V+BvBbqJaj9CMfPRu9w7OP3dLEzbI5XfvYVGvZfmbs=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=vCjXD9QoQkZryOEBHROuPacx8g4m/DT98dgpfRizZ5zPLo0gCI/z8/EDPSeNArZ6D
-	 QVxxk6miOS9++LPbKQfzo2XJXIC9WDAMIobEMn4vqN9eJgCl2ogjYSSwGhdAjtt3ZZ
-	 PgPcLP7nipOEDFqeJO1tLgyLXdEBNIiBHhcbZd4p4od76y0JpCBWehr+BaGuv1w0yr
-	 luVBTNTFWK8cyqfhMtcEHQkyfdjllgAYeVkEID1Y5L+xolQ2a8UlBhgFELt8RfEzWN
-	 KzVxAZqQGzykC0Xf6HDa6R/Nprs03faSsfYJjWVxiEgDeycCbWxeWHUKXkcO5fUwQM
-	 tBbDWwrLs9+mw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 122DFC41606; Sat, 14 Dec 2024 01:34:00 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple Windows VMs
- hang
-Date: Sat, 14 Dec 2024 01:33:59 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: chao.gao@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218267-28872-AU7abJu6jG@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218267-28872@https.bugzilla.kernel.org/>
-References: <bug-218267-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1734157992; c=relaxed/simple;
+	bh=ievqeHVfDN1p5eeUqf09eDC9oeLJXp2DUIrALupbiTc=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ucO69cLBP4bN8QqwKEhrH6s+STzKBUmKbofSwNI5qGTJ+wH6ksFl5IvpMM8NKMEDsoXz0qtqSyBwygUCa+Qjw2zfz+TCfhmEZd4+Thbos3DNv4GYogj7e5JOn98h1I+bd4+oSSY7I+mTmB+a0jPohcrsI/nm71fX3tU3Inxdl60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ranguvar.io; spf=pass smtp.mailfrom=ranguvar.io; dkim=pass (2048-bit key) header.d=ranguvar.io header.i=@ranguvar.io header.b=Lo1AA0qS; arc=none smtp.client-ip=188.165.51.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ranguvar.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ranguvar.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ranguvar.io;
+	s=protonmail3; t=1734157981; x=1734417181;
+	bh=ievqeHVfDN1p5eeUqf09eDC9oeLJXp2DUIrALupbiTc=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
+	 List-Unsubscribe:List-Unsubscribe-Post;
+	b=Lo1AA0qSzQJTJKMajvxYqwDGjWAbrWc0jLytj2YyxV9CyuAjjscbPD/WXCJyuYRqP
+	 mDGxnd5Onj24epykQ/I2WKMDi8NjHsw2cYKduHqQAY6drz9gUgRQ/1pTPSY+W2AWVW
+	 Gy3KlKEC0sNvKN+QoFwvVSkcQ+zjzmusiEKEJSjD1ioUCNVWHa5gqJ3wh0hunpCE18
+	 sLFnTl8iXRKwAAQSBZgFRz1JAkI0ycaR42OLh9hyFVEdWvhMEVOwXFkrSgLilT4mGP
+	 P1/2BKEikVb4Cs0wX8V0QTKr2D3IRrATySNP5UHQ+492YNQOjbMfH1pySa0rLKJ0pT
+	 mOwpiZhxyD1Ww==
+Date: Sat, 14 Dec 2024 06:32:57 +0000
+To: Peter Zijlstra <peterz@infradead.org>, "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+From: Ranguvar <ranguvar@ranguvar.io>
+Cc: "regressions@leemhuis.info" <regressions@leemhuis.info>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [REGRESSION][BISECTED] from bd9bbc96e835: cannot boot Win11 KVM guest
+Message-ID: <jGQc86Npv2BVcA61A7EPFQYcclIuxb07m-UqU0w22FA8_o3-0_xc6OQPp_CHDBZhId9acH4hyiOqki9w7Q0-WmuoVqsCoQfefaHNdfcV2ww=@ranguvar.io>
+Feedback-ID: 7618196:user:proton
+X-Pm-Message-ID: 17d298ae81f0994ea02c3104009042b0d1197e8b
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
+Hello, all,
 
---- Comment #7 from Chao Gao (chao.gao@intel.com) ---
-Hi Maxim,
+Any assistance with proper format and process is appreciated as I am new to=
+ these lists.
+After the commit bd9bbc96e835 "sched: Rework dl_server" I am no longer able=
+ to boot my Windows 11 23H2 guest using pinned/exclusive CPU cores and pass=
+ing a PCIe graphics card.
+This setup worked for me since at least 5.10, likely earlier, with minimal =
+changes.
 
-I was told the erratum writeup and microcode fix would be released this mon=
-th.
+Most or all cores assigned to guest VM report 100% usage, and many tasks on=
+ the host hang indefinitely (10min+) until the guest is forcibly stopped.
+This happens only once the Windows kernel begins loading - its spinner appe=
+ars and freezes.
 
-I just checked the microcode release
-https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/release=
-s.
-The microcode fix hasn't been released yet, but the erratum is already in
-SPR/EMR specification. e.g., for SPR,
+Still broken on 6.13-rc2, as well as 6.12.4 from Arch's repository.
+When testing these, the failure is similar, but tasks on the host are slow =
+to execute instead of stalling indefinitely, and hung tasks are not reporte=
+d in dmesg. Only one guest core may show 100% utilization instead of many o=
+r all of them. This seems to be due to a separate regression which also imp=
+acts my usecase [0].
+After patching it [1], I then find the same behavior as bd9bbc96e835, with =
+hung tasks on host.
 
-SPR141. VM Exit Following MOV to CR8 Instruction May Lead to Unexpected
-IDT Vectoring-Information
-Problem: Under certain conditions, a VM exit following execution of the MOV=
- to
-CR8
-instruction may unexpectedly result in setting the Valid bit (bit 31) of the
-IDTVectoring Information Field in the Virtual Machine Control Structure (VM=
-CS).
-Implication: Depending on the operation of the virtual-machine monitor (VMM=
-),
-this
-may result in unexpected VM behavior.
-Workaround: It may be possible for the BIOS to contain a workaround for this
-erratum
+git bisect log: [2]
+dmesg from 6.11.0-rc1-1-git-00057-gbd9bbc96e835, with decoded hung task bac=
+ktraces: [3]
+dmesg from arch 6.12.4: [4]
+dmesg from arch 6.12.4 patched for svm.c regression, has hung tasks, backtr=
+aces could not be decoded: [5]
+config for 6.11.0-rc1-1-git-00057-gbd9bbc96e835: [6]
+config for arch 6.12.4: [7]
 
---=20
-You may reply to this email to add a comment.
+If it helps, my host uses an AMD Ryzen 5950X CPU with latest UEFI and AMD W=
+X 5100 (Polaris, GCN 4.0) PCIe graphics.
+I use libvirt 10.10 and qemu 9.1.2, and I am passing three PCIe devices eac=
+h from dedicated IOMMU groups: NVIDIA RTX 3090 graphics, a Renesas uPD72020=
+1 USB controller, and a Samsung 970 EVO NVMe disk.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+I have in kernel cmdline `iommu=3Dpt isolcpus=3D1-7,17-23 rcu_nocbs=3D1-7,1=
+7-23 nohz_full=3D1-7,17-23`.
+Removing iommu=3Dpt does not produce a change, and dropping the core isolat=
+ion freezes the host on VM startup.
+Enabling/disabling kvm_amd.nested or kvm.enable_virt_at_load did not produc=
+e a change.
+
+Thank you for your attention.
+- Devin
+
+#regzbot introduced: bd9bbc96e8356886971317f57994247ca491dbf1
+
+[0]: https://lore.kernel.org/regressions/52914da7-a97b-45ad-86a0-affdf8266c=
+61@mailbox.org/
+[1]: https://lore.kernel.org/regressions/376c445a-9437-4bdd-9b67-e7ce786ae2=
+c4@mailbox.org/
+[2]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/bisect.log
+[3]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.11.0-rc=
+1-1-git-00057-gbd9bbc96e835-decoded.log
+[4]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.12.4-ar=
+ch1-1.log
+[5]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.12.4-ar=
+ch1-1-patched.log
+[6]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/config-6.11.0-r=
+c1-1-git-00057-gbd9bbc96e835
+[7]: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/raw/=
+6.12.4.arch1-1/config
 
