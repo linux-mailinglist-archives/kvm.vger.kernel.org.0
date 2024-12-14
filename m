@@ -1,63 +1,88 @@
-Return-Path: <kvm+bounces-33825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CF09F207E
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 19:53:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B51019F2153
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 23:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE25B167E05
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 18:53:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4639B18871FB
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 22:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171581AB510;
-	Sat, 14 Dec 2024 18:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351A11B6CE0;
+	Sat, 14 Dec 2024 22:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Mac2ZTDV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dizwexfw"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9E280C02;
-	Sat, 14 Dec 2024 18:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763D87DA9C;
+	Sat, 14 Dec 2024 22:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734202373; cv=none; b=apVEDI8ViEDRzAFw4/XlTzGr01ObtK0Oj5VMGbWTh+PtDvB1WEmb0s4GGyVkiHD2JbTSAvTuJWr4h41BvNjo9GAIYwkZKkbAPQaaU6xBz51filtL5zR1f1zvReVvvx5qrL/aphNmUlR02y/123XFZhwfqc20IwABmQF0I3b1U/c=
+	t=1734216459; cv=none; b=Zpz4dFg9dFHg2VEM1ZFMi2E0SZghCjM0YYJO1Fty4rKCp7ZHhnzk02koAGgSHvEMJ2H47069eGTjFfoTsbmQPsVEngPfO2w9qelsLSu4SAcyzXad5qhEd9mhLbDrtaeYS1JJDcpwkWM5/aDAIcMrDkjr4G5zX6np929/Ju2gsEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734202373; c=relaxed/simple;
-	bh=qvDZd12YYrswCqKpLw2h01S+pNThNTn3rqTN1AKKnR8=;
+	s=arc-20240116; t=1734216459; c=relaxed/simple;
+	bh=AKxRtbsHNV4cXXEwh68zgfEHkimry76rewwLYZhrLjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A7xRRYSUt+UudYoPxZm/aIPRXErOZ1tIgZUAm/qib6R6I6aGdn6WQ/EU2OG0jOKhI/4q8vSy48/TdTnjf9hI+03NKuUdfZnV2NtDp/xNfgrdvB+ZD9boYTv+i1GCisGUOBhOrqPRECsWs74l1ztwhODx0p0kpoYxEJY1qWowruA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Mac2ZTDV; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=enJMTLniBM5Kp6PifMU8jQddSGPI7IJTI9vrCiUjSbE=; b=Mac2ZTDVexMsCT4rWTuHkNcmiz
-	DwSjvN+8pUkcFoGn97WBGxCO3qkG1vDbkpocoXooQ7TiQxSZyyrLXAPwkxSa1LRKyeWlZe03VSEoR
-	6MGpYQFxQ/JBsSUXKQY+IC65KOoz5z/lwzCsUWGjSu4SBYMiFJZHgEhx8/XEtcdvtLbO4pL5LKCma
-	aniEMp1EnR0LJc72OHZto0MRKN9mMDNdqAd7pUZnomjVxKOnFSRTokt5JF29jfFOEiSk6/PBEuJcJ
-	eRCL9zvMOher6Rco634WbPh/3kLTY/zITGrJAk/NCKv/eWyaoVXEPq/j6ab5kUcka8pVMUt5M65i3
-	WO6tbSBg==;
-Received: from 77-249-17-89.cable.dynamic.v4.ziggo.nl ([77.249.17.89] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tMXFx-00000004TCr-0jUV;
-	Sat, 14 Dec 2024 18:52:49 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A1D9930035F; Sat, 14 Dec 2024 19:52:48 +0100 (CET)
-Date: Sat, 14 Dec 2024 19:52:48 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Ranguvar <ranguvar@ranguvar.io>, Juri Lelli <juri.lelli@gmail.com>
-Cc: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"regressions@leemhuis.info" <regressions@leemhuis.info>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [REGRESSION][BISECTED] from bd9bbc96e835: cannot boot Win11 KVM
- guest
-Message-ID: <20241214185248.GE10560@noisy.programming.kicks-ass.net>
-References: <jGQc86Npv2BVcA61A7EPFQYcclIuxb07m-UqU0w22FA8_o3-0_xc6OQPp_CHDBZhId9acH4hyiOqki9w7Q0-WmuoVqsCoQfefaHNdfcV2ww=@ranguvar.io>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tuTtudvcEQxgNlLfSV+ZpRrV8e8gkzL1KdC6TR/Ol/M/XayeMA2L7rxwab0+qDom4CKI6uqLg3tW8Jbk46KFmhpksu8Z7TBE9Hnm0rvmvAEUBA4g7EEGFSpnOlqPmPAJs8tEDtPiDLfOqifM7T+6CXvTAgBosgnkmMz69J6vmlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dizwexfw; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734216457; x=1765752457;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AKxRtbsHNV4cXXEwh68zgfEHkimry76rewwLYZhrLjc=;
+  b=dizwexfwZN8zALBhZUV8ET9Py6Vxoiz5we0qMKOVGj0vabriqSymMU6j
+   KgX9AWKsKGEKdBl7jW8nNb6JgOCiS2QQIqA+9fpVK1FctkFiEtMpZ19LV
+   rw2Y6caS8lvQnpekT54lcigBkP1qKq2B0g5YhO7XNB+A3WOCJWRY2qqJh
+   VjTlx9wLx39bmugAPXJx2x6ijOXiIA+IkdNmszcvCujuxCH0ronT/odiW
+   +u6kJypB/3Zu2pdxnN3X1bHVQqEMch9N3NqWH6g8IswvAqwAHwwtK0nMM
+   Y51PhB4gcWPoJkzP5JN3KFoT0fiq1HgkfyC6r+/qBuRJUzEnb0i1kZRGh
+   A==;
+X-CSE-ConnectionGUID: 9PBOz4MkQmafGexfv94pIA==
+X-CSE-MsgGUID: cG3xQD0tQ7O4ADP2q6I1Rg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11286"; a="45329652"
+X-IronPort-AV: E=Sophos;i="6.12,235,1728975600"; 
+   d="scan'208";a="45329652"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2024 14:47:36 -0800
+X-CSE-ConnectionGUID: GKJobGtzR7membUQCuxeXw==
+X-CSE-MsgGUID: IF8cd/2vSpiSpmThf6WLqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="96705256"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 14 Dec 2024 14:47:32 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tMav3-000DIU-13;
+	Sat, 14 Dec 2024 22:47:29 +0000
+Date: Sun, 15 Dec 2024 06:46:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: James Houghton <jthoughton@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	James Houghton <jthoughton@google.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+	David Matlack <dmatlack@google.com>, Wang@google.com,
+	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 10/13] KVM: selftests: Add KVM Userfault mode to
+ demand_paging_test
+Message-ID: <202412150600.wLk8rmZf-lkp@intel.com>
+References: <20241204191349.1730936-11-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,54 +91,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <jGQc86Npv2BVcA61A7EPFQYcclIuxb07m-UqU0w22FA8_o3-0_xc6OQPp_CHDBZhId9acH4hyiOqki9w7Q0-WmuoVqsCoQfefaHNdfcV2ww=@ranguvar.io>
+In-Reply-To: <20241204191349.1730936-11-jthoughton@google.com>
 
-On Sat, Dec 14, 2024 at 06:32:57AM +0000, Ranguvar wrote:
-> Hello, all,
-> 
-> Any assistance with proper format and process is appreciated as I am new to these lists.
-> After the commit bd9bbc96e835 "sched: Rework dl_server" I am no longer able to boot my Windows 11 23H2 guest using pinned/exclusive CPU cores and passing a PCIe graphics card.
-> This setup worked for me since at least 5.10, likely earlier, with minimal changes.
-> 
-> Most or all cores assigned to guest VM report 100% usage, and many tasks on the host hang indefinitely (10min+) until the guest is forcibly stopped.
-> This happens only once the Windows kernel begins loading - its spinner appears and freezes.
-> 
-> Still broken on 6.13-rc2, as well as 6.12.4 from Arch's repository.
-> When testing these, the failure is similar, but tasks on the host are slow to execute instead of stalling indefinitely, and hung tasks are not reported in dmesg. Only one guest core may show 100% utilization instead of many or all of them. This seems to be due to a separate regression which also impacts my usecase [0].
-> After patching it [1], I then find the same behavior as bd9bbc96e835, with hung tasks on host.
-> 
-> git bisect log: [2]
-> dmesg from 6.11.0-rc1-1-git-00057-gbd9bbc96e835, with decoded hung task backtraces: [3]
-> dmesg from arch 6.12.4: [4]
-> dmesg from arch 6.12.4 patched for svm.c regression, has hung tasks, backtraces could not be decoded: [5]
-> config for 6.11.0-rc1-1-git-00057-gbd9bbc96e835: [6]
-> config for arch 6.12.4: [7]
-> 
-> If it helps, my host uses an AMD Ryzen 5950X CPU with latest UEFI and AMD WX 5100 (Polaris, GCN 4.0) PCIe graphics.
-> I use libvirt 10.10 and qemu 9.1.2, and I am passing three PCIe devices each from dedicated IOMMU groups: NVIDIA RTX 3090 graphics, a Renesas uPD720201 USB controller, and a Samsung 970 EVO NVMe disk.
-> 
-> I have in kernel cmdline `iommu=pt isolcpus=1-7,17-23 rcu_nocbs=1-7,17-23 nohz_full=1-7,17-23`.
-> Removing iommu=pt does not produce a change, and dropping the core isolation freezes the host on VM startup.
-> Enabling/disabling kvm_amd.nested or kvm.enable_virt_at_load did not produce a change.
-> 
-> Thank you for your attention.
-> - Devin
-> 
-> #regzbot introduced: bd9bbc96e8356886971317f57994247ca491dbf1
-> 
-> [0]: https://lore.kernel.org/regressions/52914da7-a97b-45ad-86a0-affdf8266c61@mailbox.org/
-> [1]: https://lore.kernel.org/regressions/376c445a-9437-4bdd-9b67-e7ce786ae2c4@mailbox.org/
-> [2]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/bisect.log
-> [3]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.11.0-rc1-1-git-00057-gbd9bbc96e835-decoded.log
+Hi James,
 
-Hmm, this has:
+kernel test robot noticed the following build errors:
 
-[  978.035637] sched: DL replenish lagged too much
+[auto build test ERROR on 4d911c7abee56771b0219a9fbf0120d06bdc9c14]
 
-Juri, have we seen that before?
+url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM-Add-KVM_MEM_USERFAULT-memslot-flag-and-bitmap/20241205-032516
+base:   4d911c7abee56771b0219a9fbf0120d06bdc9c14
+patch link:    https://lore.kernel.org/r/20241204191349.1730936-11-jthoughton%40google.com
+patch subject: [PATCH v1 10/13] KVM: selftests: Add KVM Userfault mode to demand_paging_test
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241215/202412150600.wLk8rmZf-lkp@intel.com/reproduce)
 
-> [4]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.12.4-arch1-1.log
-> [5]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/dmesg-6.12.4-arch1-1-patched.log
-> [6]: https://ranguvar.io/pub/paste/linux-6.12-vm-regression/config-6.11.0-rc1-1-git-00057-gbd9bbc96e835
-> [7]: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/raw/6.12.4.arch1-1/config
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412150600.wLk8rmZf-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> demand_paging_test.c:220:2: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned long *' invalid)
+     220 |         atomic_fetch_and_explicit(bitmap_chunk,
+         |         ^                         ~~~~~~~~~~~~
+   /opt/cross/clang-ab51eccf88/lib/clang/19/include/stdatomic.h:169:35: note: expanded from macro 'atomic_fetch_and_explicit'
+     169 | #define atomic_fetch_and_explicit __c11_atomic_fetch_and
+         |                                   ^
+   1 error generated.
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
