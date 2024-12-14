@@ -1,99 +1,126 @@
-Return-Path: <kvm+bounces-33787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620BE9F1B36
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:10:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EF329F1B4A
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 01:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3EC0188EDF0
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 00:10:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41A1E16B181
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2024 00:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0A41F4273;
-	Fri, 13 Dec 2024 23:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4417BE4A;
+	Sat, 14 Dec 2024 00:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kfhldL39"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL8yWSHN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EEF1F2C48
-	for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 23:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B0B8F58
+	for <kvm@vger.kernel.org>; Sat, 14 Dec 2024 00:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734134305; cv=none; b=nIbN4yHqhzpX2LTpL1PdqOa0S4hM9naUIiY/28McWixGmD1x0Bb5296zzTHF6AQVxLXJrdOkbjtwvaKmz9GZuegFTU8SFA0vdyH/yUVgG2Xc1SJKZ+iFFra+sNn7ALBM9K3iK8ASl+/83s83trsmiAr1UtgKvu+vwmeOTu52hHE=
+	t=1734135519; cv=none; b=dffoShXWufF4Y3dTGF/3ap2UgLhtHLzwFGq3SwEpArTf37l4eVXh02+uE7Et9ch03zq9IWQFKAfjbkAT9ZY5u7T9lZ808WVCdidAnmoWhi2rBRP/NTP7rt8GoO5OOjylOFJiNweqKqOtQeqxyd1CC9xaNelX7EgVGSFva9C9Uro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734134305; c=relaxed/simple;
-	bh=OGq5+hgs9dJ1yb7kwu/w29GCqzBZmKeO5Y+Ru+siBvE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CpBgW3AC8u1oR4iBPYqKrLRIuI3Rc2BT4GgEwKGMHM44vwbKrl8p3b8gb9/noIdqSV4TvxnEg2x22ldA3RdIjKpXTl2Bab+jCqNFjemWkE3HAkKfycaeZiiwDUn3dib4AXyZ+jJzPTa+/RJ6Eu0/VDHumP3p3gbHphwNiLgJ7N0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kfhldL39; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-211c1c131c4so28409335ad.1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 15:58:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734134304; x=1734739104; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pUgYlM58E1ID1zBsFizknmN76M0X0I58a2gj7PTiNA8=;
-        b=kfhldL39TBzg9mfNZ38MUKouWW9n3KF8rCW8KQmRe1H0hGO3EhPDeZXjXTlhoquyrR
-         1CLApWPe8V31MNazpfb28xvW+4gfohLNIfOLrlVr482N2e/jfUbauX7klRetYEEht73L
-         gsZnytOQRypwAUUOoDHoiJ6qgRHFavAGtEBu9Bc1zrQ2Myg55pMRCiyhcLxQPAJeDyDI
-         3vCh5/hwZ6bZ7Oh/3S4u20eKFDUlPzDMTQCmD0b3FBFrEgDrJmh5liv6r9qb7o0mFqH5
-         2xqUzIYFRK0unNWhPBqWsHEzecJ3EWI/lM2KQXPhNUyt6doxo6BZKmXkvUDO0cCRq4Lg
-         eyBg==
+	s=arc-20240116; t=1734135519; c=relaxed/simple;
+	bh=lApcg+XXZww9WwvnD0AMKer2n8WL8oN6MXtt3baYYwk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ePCkLbTwx3ORwuKjoA5/9rUsIVIdUZw1xrfO9cAFjBRvdrVXKKD//Vj0W0XI/fdiP0BgZzvo0CI/kRQUYM+aLd9E19k+7dRepxBfUD1LDDqb3b8hKfnLmoV3ZBln/MeVhPa9/uKjaovlqjki+ySFyRd8IgNiLhWCMn9ocdPcJqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gL8yWSHN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734135516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BGDfSsoL/iHf6CkmxjfloR3zp5vabdt6vbA+uv50OxE=;
+	b=gL8yWSHNeHxMdtG3HySVBUWgPlBii0QFqWmIzQbzy2D7XPJA1ZY7ThBf7BtgC/28OAmA+L
+	YsZVG6sPeVcBQwtKMjwIYKAEc6g8VEq5hyppPHGFLAqv+vO1E739OaukvSUKgWWVjtO63U
+	14eaHxqIC7AUqZCNdd4xf1z3iAqdY2I=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-6l-eGyH8OHW3pPVL7aXG9w-1; Fri, 13 Dec 2024 19:18:35 -0500
+X-MC-Unique: 6l-eGyH8OHW3pPVL7aXG9w-1
+X-Mimecast-MFC-AGG-ID: 6l-eGyH8OHW3pPVL7aXG9w
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-844e344b0b5so169382439f.0
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2024 16:18:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734134304; x=1734739104;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pUgYlM58E1ID1zBsFizknmN76M0X0I58a2gj7PTiNA8=;
-        b=oBJVgSSQJtN67lBOz9jhba5jLn/kHyX+OPvrbW7rrZL2yR7fzvsgCjSu0m5Qe7pOCG
-         aj9JZzg52n+r9QinTahbYWxk7r2oSyWXNZEchh1K3gwIkD595fUwHB4NZhAYR09Xil94
-         OhUgHI8/eWPAwrQCEqE82rKCozlb99c23AAnwC0un79niEKmI9BlsVpephfLm1CcVwYq
-         +zdifadnbM0HufSy8Brq81s5QqFsJxE4GAzs3B+m0sbiwfq8OZ51OspWwkQSyMNJRTO1
-         7izpPE6P+ITkJirDhKXtxw/qJolOikntkMZ9zM2rayCWrJ7DIL0KdI1XC42BxrrXVFPU
-         Dqhw==
-X-Gm-Message-State: AOJu0YyzPd5BAeBYKNywNeUVWQy/6O9f0KKnI0BQ8n5qcghkyMbKt+FT
-	PWzAJsPqtC5MoqprVxF8rxBMB0SSiuRjFrKAeNyl46zdBiLTpWJFScin1xBS8jAsyUssOjq73iv
-	k2A==
-X-Google-Smtp-Source: AGHT+IEx2eqGQFBGQTUi/pn7XgE3bLWI9EM+6VGiZXjWJeNOX1FQChOgohoyAT6tKICqO9oQPQKyJbJfX0k=
-X-Received: from pjyd4.prod.google.com ([2002:a17:90a:dfc4:b0:2ef:973a:3caf])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c02:b0:2ee:7e53:bfae
- with SMTP id 98e67ed59e1d1-2f29166c324mr6176343a91.10.1734134303859; Fri, 13
- Dec 2024 15:58:23 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 13 Dec 2024 15:58:21 -0800
+        d=1e100.net; s=20230601; t=1734135514; x=1734740314;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BGDfSsoL/iHf6CkmxjfloR3zp5vabdt6vbA+uv50OxE=;
+        b=wW+xyYJw4da7FnQwEiqvMuXe1Qwb/53qbWKt2be9KarEoD08gWjhIvw7Se3k7eV1lk
+         f8WWAGvmG0mSUv5KRpN/Cfk9xIBUkYoqJ8PAthhWsN0uVk3+ThbTFMS1eCG1CipR5rDT
+         thUHx2jvxGtwHWvRI8rDdV8LQNOzVk1ikFhDKYqwYTHQEd4ePAQs0xWbt1TahHofLluO
+         U6pcHlNX8IVr620YqcG41frl2pgDq6VKno3UrhCQC6w9ytGV+DQK8DqJnovWB6WU3C9P
+         VkY4FPnYZ5xTHsihuOwRb3DeaeGasYQPrLzOSzlSKRVE3JhjUC++ljgJmybDCbh+RBGd
+         OIJg==
+X-Gm-Message-State: AOJu0YzdSbCOl6xPL538ny9a+XhDQ3kGFYTRBK7k9tSYaFVMOkXTifCl
+	zJlfzdDfT9ErGwI4MVZlruLXBojJ+umpFkDo7gxEUQ/p5bMzXJzas2zTA7vAkLyxiZ8kcgeTsOm
+	mdAYCVmyCXnFGsWKHM2Z3QKhi6G7Eeg0gW0u3c6Cah7sDFW7s98b6FVOZWGEed8fyNsNxNXCj9W
+	fHND10m27Y+jznaOa/jwfzyp7h3Of2UzzWKQ==
+X-Gm-Gg: ASbGncvoTw4nAxEju1ZF7ym0LjbojaND47WJlfk8vFpPVpW1AHivaQ5P1Erp34Ifz1k
+	gcqwJSqvhZjOtMVl+jkkTEohTY2WcdMz8C6KYMnFKpRasmXSm1A0iI/dP09LMQMTA4wNsidx0Yz
+	gTD5zGM4I4W6i83Vd82q6v3dmy10mDJ50luCVdhv5fEdAnD8FJtpZo1n91bRUs4gloeBuV2RokK
+	2Z+TnizBkZU8wyTLwnI4lg+f5ABFsFi04U50/Nn1r8XDKdq4ocaoF+l
+X-Received: by 2002:a05:6602:6b8b:b0:83e:5860:5189 with SMTP id ca18e2360f4ac-844e88a1dd9mr499458439f.10.1734135514597;
+        Fri, 13 Dec 2024 16:18:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1UnjiQm2T6wIp4WnMim9T3FpcGrTCc/ZS1z15n/iRnc56AFJSGhajOtvulMhtu2my8yUzvg==
+X-Received: by 2002:a05:6602:6b8b:b0:83e:5860:5189 with SMTP id ca18e2360f4ac-844e88a1dd9mr499456239f.10.1734135514186;
+        Fri, 13 Dec 2024 16:18:34 -0800 (PST)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e5e0f3ea0asm121930173.79.2024.12.13.16.18.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2024 16:18:33 -0800 (PST)
+Message-ID: <af6a4b2a4ff81818e4c06a985d96423971f4101f.camel@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] pmu_lbr: drop check for MSR_LBR_TOS != 0
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>
+Date: Fri, 13 Dec 2024 19:18:32 -0500
+In-Reply-To: <e8aff39851876ffd3a555dea6bd8157833c2a336.camel@redhat.com>
+References: <20241002235658.215903-1-mlevitsk@redhat.com>
+	 <3956ad6d2261105c479a68c55acc87bd94ab202d.camel@redhat.com>
+	 <e8aff39851876ffd3a555dea6bd8157833c2a336.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241213235821.2270353-1-seanjc@google.com>
-Subject: [ANNOUNCE] PUCK Agenda - 2024.12.17 *** On Tuesday the 17th!!! ***
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-*** LOOK HERE ***
+On Thu, 2024-11-21 at 20:33 -0500, Maxim Levitsky wrote:
+> On Sun, 2024-11-03 at 16:06 -0500, Maxim Levitsky wrote:
+> > A very kind ping on this patch.
+> > 
+> > 
+> > 
+> > Best regards,
+> > 
+> >         Maxim Levitsky
+> 
+> Another very kind ping on this patch.
 
-Due to holiday schedules, next week's PUCK will be on Tuesday the 17th (regular
-time), not on Wednesday.
 
-There is no scheduled topic (which is code for "SNP, TDX, and guest_memfd").
+Any update?
 
-Time:     6am PDT
-Video:    https://meet.google.com/vdb-aeqo-knk
-Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+Best regards,
+	Maxim Levitsky
 
-Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+> 
+> Best regards,
+>         Maxim Levitsky
+> 
 
-Future Schedule:
-Dec 17th - No topic
-Dec 25th - Canceled
-Jan 1sth - Canceled
+
 
