@@ -1,129 +1,123 @@
-Return-Path: <kvm+bounces-33833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B6329F27BC
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 02:23:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2049F27CE
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 02:36:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6BBF1656F1
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 01:23:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0AC164EE9
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 01:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD9A171BB;
-	Mon, 16 Dec 2024 01:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F6717C8D;
+	Mon, 16 Dec 2024 01:36:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774AF2CA6;
-	Mon, 16 Dec 2024 01:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D2A8BE8;
+	Mon, 16 Dec 2024 01:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734312171; cv=none; b=OJVScy+mWFdDUYc4ihkL0fAXGiRN0UeJZQ7X50P4tJx8uFAsbLkHFTEXyahLvfNu7A5ZRsUXniFtXWYYqJ1w8/Ns28m/5ecQw/qlhUBSJffuP1GJkuNOOTT499AthMeu+96nvELtdpEJariWwNXUYGext4j5YN1i/bSbeZyfAmQ=
+	t=1734312966; cv=none; b=TvNKZgzUdvf1UY0PuYCzHv8JG7iOmrzM5zErltT60cIvPHHHAlHSGYPSSFFJQixJ0nXLXUFhfMo9ZOF9ys/2bQYrRepmKt3Kmhko7yNgmZrlf7am/E+FJVIyp7yrbnjJfTa804akzHaJ1nD9dA0q0fJyCFQktp2oFpf76LVNgFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734312171; c=relaxed/simple;
-	bh=abaqUQmPi9dUAarrBgOBHejwvwZrA16gNm/tc8XDrLE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Ws8gnlzGSpQnR95MD2mwWNJKQgifVejV+ZswXf+lEvib43/yveg6c2QJC+N/d5DqSlcsCdJ6/59MDLP0+OmDMqFJY0uaPHLwAhSF6eRPZP25tYoXl9S4AswZUv9eoHsGneoL2yPiO6aRjVdWJv2ZCJpwjM0WcQWmBtSn70cxZdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=129.150.39.64
+	s=arc-20240116; t=1734312966; c=relaxed/simple;
+	bh=eWgUJAmz47HFCOh4aIEmrxNlaOSMz0Zxku7oakMFQ3E=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=iates0D4nEFstfFD97K8qow7YvAnQEr+rEKXkoPw+lQbM+z1/UFfN8Aqi8zNCT+2hFI1eMIEBoamxomyi+vdc6m66he6HrNRYc8U3WoDK7r+uQgKzARGTQF8FB5GCxX7PHMGyU+A9EMKJBMhfo0EwIYg6qgbcaJaR90OGRgDRTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=159.65.134.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from zhangdongdong$eswincomputing.com ( [10.12.96.111] ) by
- ajax-webmail-app2 (Coremail) ; Mon, 16 Dec 2024 09:22:14 +0800 (GMT+08:00)
-Date: Mon, 16 Dec 2024 09:22:14 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: DongdongZhang <zhangdongdong@eswincomputing.com>
-To: "Bjorn Helgaas" <helgaas@kernel.org>
-Cc: alex.williamson@redhat.com, bhelgaas@google.com, yishaih@nvidia.com,
-	avihaih@nvidia.com, yi.l.liu@intel.com, ankita@nvidia.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+Received: from ubuntu18.eswin.cn (unknown [10.12.192.151])
+	by app1 (Coremail) with SMTP id TAJkCgDXG6Xsg19nlw8DAA--.14605S4;
+	Mon, 16 Dec 2024 09:35:41 +0800 (CST)
+From: zhangdongdong@eswincomputing.com
+To: alex.williamson@redhat.com
+Cc: bhelgaas@google.com,
+	zhangdongdong@eswincomputing.com,
+	yishaih@nvidia.com,
+	avihaih@nvidia.com,
+	yi.l.liu@intel.com,
+	ankita@nvidia.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-pci@vger.kernel.org
-Subject: Re: Re: [PATCH] PCI: Remove redundant macro
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241010(a2f59183) Copyright (c) 2002-2024 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <20241213173701.GA3419486@bhelgaas>
-References: <20241213173701.GA3419486@bhelgaas>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v2] PCI: Remove redundant macro
+Date: Mon, 16 Dec 2024 09:35:36 +0800
+Message-Id: <20241216013536.4487-1-zhangdongdong@eswincomputing.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:TAJkCgDXG6Xsg19nlw8DAA--.14605S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1DKFyUJF17uFWUtrWkJFb_yoW8ury8pr
+	s8Ca4xGr45XF4Y9a1qya45A3W5Xa9xAryI93y7u343KFy3tw10vrWFyr42kryagrWxAF45
+	JrsY9r90gF9F93JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBq14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw2
+	8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
+	x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrw
+	CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI
+	42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z2
+	80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbknY7UUUUU==
+X-CM-SenderInfo: x2kd0wpgrqwvxrqjqvxvzl0uprps33xlqjhudrp/1tbiAgENCmdfBKsMWAABsG
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <4c254df0.780.193cd0f0589.Coremail.zhangdongdong@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TQJkCgC3I2rGgF9nzAsDAA--.790W
-X-CM-SenderInfo: x2kd0wpgrqwvxrqjqvxvzl0uprps33xlqjhudrp/1tbiAgENCmdfB
-	KsMWAAAsH
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWDJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
 
-CkhpIEJqb3JuLMKgwqAKCgpUaGFuayB5b3UgZm9yIHJldmlld2luZyBteSBwYXRjaCBhbmQgcHJv
-dmlkaW5nIGRldGFpbGVkIGZlZWRiYWNrIcKgwqAKCgpJIGFncmVlIHdpdGggeW91ciBvYnNlcnZh
-dGlvbiByZWdhcmRpbmcgdGhlIG1pc21hdGNoIGxlZnQgYmV0d2VlbiAKYFBDSV9WTkRSX0hFQURF
-UmAgYW5kIGBQQ0lfVlNFQ19IRFJfTEVOX1NISUZUYC4gQmFzZWQgb24geW91ciBzdWdnZXN0aW9u
-LCAKSSBwbGFuIHRvIGFkZHJlc3MgdGhpcyBieTrCoMKgCgoKMS4gUmVtb3ZpbmcgYFBDSV9WU0VD
-X0hEUl9MRU5fU0hJRlRgIGVudGlyZWx5LsKgwqAKMi4gVXBkYXRpbmcgdGhlIFZGSU8gUENJIGNv
-ZGUgdG8gdXNlIGBQQ0lfVk5EUl9IRUFERVJfTEVOKClgIGluc3RlYWQsIAogICBlbnN1cmluZyBj
-b25zaXN0ZW50IG5hbWluZyBhbmQgZnVuY3Rpb25hbGl0eS7CoMKgCjMuIEp1c3RpZnlpbmcgdGhl
-IHJlbW92YWwgb2YgdGhlc2UgbWFjcm9zIChgUENJX1ZTRUNfSERSYCBhbmQgYFBDSV9WU0VDX0hE
-Ul9MRU5fU0hJRlRgKSAKICAgaW4gYHBjaV9yZWdzLmhgLCBkZXNwaXRlIGl0IGJlaW5nIHBhcnQg
-b2YgYGluY2x1ZGUvdWFwaS9gLiBBcyB5b3Ugbm90ZWQsIAogICB0aGlzIGlzIGEgbmljaGUgY2Fz
-ZSwgYW5kIHRoZSBpbXBhY3Qgb24gdXNlcnNwYWNlIHNob3VsZCBiZSBtaW5pbWFsLsKgwqAKCgpJ
-4oCZbGwgc2VuZCBhbiB1cGRhdGVkIHBhdGNoIHNob3J0bHksIGluY29ycG9yYXRpbmcgdGhlc2Ug
-Y2hhbmdlcyBhbmQgCnRlc3RpbmcgdG8gZW5zdXJlIGV2ZXJ5dGhpbmcgd29ya3MgYXMgZXhwZWN0
-ZWQuwqDCoAoKClRoYW5rcyBhZ2FpbiBmb3IgeW91ciBpbnNpZ2h0cyEgUGxlYXNlIGxldCBtZSBr
-bm93IGlmIHRoZXJl4oCZcyBhbnl0aGluZyAKZWxzZSBJIHNob3VsZCBhZGRyZXNzIGluIHRoZSBy
-ZXZpc2VkIHBhdGNoLsKgwqAKCgpCZXN0IHJlZ2FyZHMswqDCoApEb25nZG9uZyBaaGFuZ8KgwqAK
-CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiQmpvcm4gSGVsZ2FhcyIg
-PGhlbGdhYXNAa2VybmVsLm9yZz4KPiDlj5HpgIHml7bpl7Q6MjAyNC0xMi0xNCAwMTozNzowMSAo
-5pif5pyf5YWtKQo+IOaUtuS7tuS6ujogemhhbmdkb25nZG9uZ0Blc3dpbmNvbXB1dGluZy5jb20K
-PiDmioTpgIE6IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tLCBiaGVsZ2Fhc0Bnb29nbGUuY29t
-LCB5aXNoYWloQG52aWRpYS5jb20sIGF2aWhhaWhAbnZpZGlhLmNvbSwgeWkubC5saXVAaW50ZWwu
-Y29tLCBhbmtpdGFAbnZpZGlhLmNvbSwga3ZtQHZnZXIua2VybmVsLm9yZywgbGludXgta2VybmVs
-QHZnZXIua2VybmVsLm9yZywgbGludXgtcGNpQHZnZXIua2VybmVsLm9yZwo+IOS4u+mimDogUmU6
-IFtQQVRDSF0gUENJOiBSZW1vdmUgcmVkdW5kYW50IG1hY3JvCj4gCj4gT24gRnJpLCBEZWMgMTMs
-IDIwMjQgYXQgMDU6NDY6MTdQTSArMDgwMCwgemhhbmdkb25nZG9uZ0Blc3dpbmNvbXB1dGluZy5j
-b20gd3JvdGU6Cj4gPiBGcm9tOiBEb25nZG9uZyBaaGFuZyA8emhhbmdkb25nZG9uZ0Blc3dpbmNv
-bXB1dGluZy5jb20+Cj4gPiAKPiA+IFJlbW92ZWQgdGhlIGR1cGxpY2F0ZSBtYWNybyBkZWZpbml0
-aW9uIFBDSV9WU0VDX0hEUiBmcm9tCj4gPiBwY2lfcmVncy5oIHRvIGF2b2lkIHJlZHVuZGFuY3ku
-IFVwZGF0ZWQgdGhlIFZGSU8gUENJIGNvZGUKPiA+IHRvIHVzZSB0aGUgZXhpc3RpbmcgYFBDSV9W
-TkRSX0hFQURFUmAgbWFjcm8gZm9yIGNvbnNpc3RlbmN5LAo+ID4gZW5zdXJpbmcgbWluaW1hbCBj
-aGFuZ2VzIHRvIHRoZSBjb2RlYmFzZS4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogRG9uZ2Rvbmcg
-WmhhbmcgPHpoYW5nZG9uZ2RvbmdAZXN3aW5jb21wdXRpbmcuY29tPgo+ID4gLS0tCj4gPiAgZHJp
-dmVycy92ZmlvL3BjaS92ZmlvX3BjaV9jb25maWcuYyB8IDMgKystCj4gPiAgaW5jbHVkZS91YXBp
-L2xpbnV4L3BjaV9yZWdzLmggICAgICB8IDEgLQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMiBpbnNl
-cnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92
-ZmlvL3BjaS92ZmlvX3BjaV9jb25maWcuYyBiL2RyaXZlcnMvdmZpby9wY2kvdmZpb19wY2lfY29u
-ZmlnLmMKPiA+IGluZGV4IGVhMjc0NWMxYWM1ZS4uYzMwNzQ4OTEyZmYxIDEwMDY0NAo+ID4gLS0t
-IGEvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9jb25maWcuYwo+ID4gKysrIGIvZHJpdmVycy92
-ZmlvL3BjaS92ZmlvX3BjaV9jb25maWcuYwo+ID4gQEAgLTEzODksNyArMTM4OSw4IEBAIHN0YXRp
-YyBpbnQgdmZpb19leHRfY2FwX2xlbihzdHJ1Y3QgdmZpb19wY2lfY29yZV9kZXZpY2UgKnZkZXYs
-IHUxNiBlY2FwLCB1MTYgZXBvCj4gPiAgCj4gPiAgCXN3aXRjaCAoZWNhcCkgewo+ID4gIAljYXNl
-IFBDSV9FWFRfQ0FQX0lEX1ZORFI6Cj4gPiAtCQlyZXQgPSBwY2lfcmVhZF9jb25maWdfZHdvcmQo
-cGRldiwgZXBvcyArIFBDSV9WU0VDX0hEUiwgJmR3b3JkKTsKPiA+ICsJCXJldCA9IHBjaV9yZWFk
-X2NvbmZpZ19kd29yZChwZGV2LCBlcG9zICsgUENJX1ZORFJfSEVBREVSLAo+ID4gKwkJCQkJICAg
-ICZkd29yZCk7Cj4gPiAgCQlpZiAocmV0KQo+ID4gIAkJCXJldHVybiBwY2liaW9zX2Vycl90b19l
-cnJubyhyZXQpOwo+ID4gIAo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9wY2lf
-cmVncy5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L3BjaV9yZWdzLmgKPiA+IGluZGV4IDE2MDFjN2Vk
-NWZhYi4uN2I2Y2FkNzg4ZGUzIDEwMDY0NAo+ID4gLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L3Bj
-aV9yZWdzLmgKPiA+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9wY2lfcmVncy5oCj4gPiBAQCAt
-MTAwMSw3ICsxMDAxLDYgQEAKPiA+ICAjZGVmaW5lIFBDSV9BQ1NfQ1RSTAkJMHgwNgkvKiBBQ1Mg
-Q29udHJvbCBSZWdpc3RlciAqLwo+ID4gICNkZWZpbmUgUENJX0FDU19FR1JFU1NfQ1RMX1YJMHgw
-OAkvKiBBQ1MgRWdyZXNzIENvbnRyb2wgVmVjdG9yICovCj4gPiAgCj4gPiAtI2RlZmluZSBQQ0lf
-VlNFQ19IRFIJCTQJLyogZXh0ZW5kZWQgY2FwIC0gdmVuZG9yLXNwZWNpZmljICovCj4gPiAgI2Rl
-ZmluZSAgUENJX1ZTRUNfSERSX0xFTl9TSElGVAkyMAkvKiBzaGlmdCBmb3IgbGVuZ3RoIGZpZWxk
-ICovCj4gCj4gV2Ugc2hvdWxkIHJlc29sdmUgdGhlIGR1cGxpY2F0aW9uIG9mIFBDSV9WU0VDX0hE
-UiBhbmQgUENJX1ZORFJfSEVBREVSLAo+IGJ1dCBJIGRvbid0IGxpa2UgdGhlIGZhY3QgdGhhdCB3
-ZSdyZSBsZWZ0IHdpdGggdGhpcyBkYW5nbGluZwo+IFBDSV9WU0VDX0hEUl9MRU5fU0hJRlQuCj4g
-Cj4gVGhhdCBsZWF2ZXMgdmZpbyB1c2luZyBQQ0lfVk5EUl9IRUFERVIgYW5kIFBDSV9WU0VDX0hE
-Ul9MRU5fU0hJRlQsCj4gd2hpY2ggZG9uJ3QgbWF0Y2ggYXQgYWxsLgo+IAo+IEkgdGhpbmsgeW91
-IHNob3VsZCByZW1vdmUgUENJX1ZTRUNfSERSX0xFTl9TSElGVCBhcyB3ZWxsIGFuZCBjaGFuZ2UK
-PiB2ZmlvIHRvIHVzZSBQQ0lfVk5EUl9IRUFERVJfTEVOKCkgaW5zdGVhZC4KPiAKPiBJdCdzIHNv
-bWV3aGF0IGRpY2V5IHJlbW92aW5nIHRoaW5ncyBmcm9tIHBjaV9yZWdzLmggc2luY2UgaXQncyBp
-bgo+IGluY2x1ZGUvdWFwaS8sIGJ1dCB0aGlzIGlzIHN1Y2ggYSBuaWNoZSB0aGluZyB3ZSBtaWdo
-dCBiZSBhYmxlIHRvIGdldAo+IGF3YXkgd2l0aCBpdC4KPiAKPiBCam9ybgo=
+From: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+
+Removed the duplicate macro `PCI_VSEC_HDR` and its related macro
+`PCI_VSEC_HDR_LEN_SHIFT` from `pci_regs.h` to avoid redundancy and
+inconsistencies. Updated VFIO PCI code to use `PCI_VNDR_HEADER` and
+`PCI_VNDR_HEADER_LEN()` for consistent naming and functionality.
+
+These changes aim to streamline header handling while minimizing
+impact, given the niche usage of these macros in userspace.
+
+Signed-off-by: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+---
+ drivers/vfio/pci/vfio_pci_config.c | 5 +++--
+ include/uapi/linux/pci_regs.h      | 3 ---
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index ea2745c1ac5e..5572fd99b921 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1389,11 +1389,12 @@ static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epo
+ 
+ 	switch (ecap) {
+ 	case PCI_EXT_CAP_ID_VNDR:
+-		ret = pci_read_config_dword(pdev, epos + PCI_VSEC_HDR, &dword);
++		ret = pci_read_config_dword(pdev, epos + PCI_VNDR_HEADER,
++					    &dword);
+ 		if (ret)
+ 			return pcibios_err_to_errno(ret);
+ 
+-		return dword >> PCI_VSEC_HDR_LEN_SHIFT;
++		return PCI_VNDR_HEADER_LEN(dword);
+ 	case PCI_EXT_CAP_ID_VC:
+ 	case PCI_EXT_CAP_ID_VC9:
+ 	case PCI_EXT_CAP_ID_MFVC:
+diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
+index 1601c7ed5fab..bcd44c7ca048 100644
+--- a/include/uapi/linux/pci_regs.h
++++ b/include/uapi/linux/pci_regs.h
+@@ -1001,9 +1001,6 @@
+ #define PCI_ACS_CTRL		0x06	/* ACS Control Register */
+ #define PCI_ACS_EGRESS_CTL_V	0x08	/* ACS Egress Control Vector */
+ 
+-#define PCI_VSEC_HDR		4	/* extended cap - vendor-specific */
+-#define  PCI_VSEC_HDR_LEN_SHIFT	20	/* shift for length field */
+-
+ /* SATA capability */
+ #define PCI_SATA_REGS		4	/* SATA REGs specifier */
+ #define  PCI_SATA_REGS_MASK	0xF	/* location - BAR#/inline */
+-- 
+2.17.1
+
 
