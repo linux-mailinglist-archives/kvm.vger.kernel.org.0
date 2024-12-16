@@ -1,123 +1,189 @@
-Return-Path: <kvm+bounces-33834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2049F27CE
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 02:36:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055629F2954
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 05:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0AC164EE9
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 01:36:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8A0D188614C
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 04:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F6717C8D;
-	Mon, 16 Dec 2024 01:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0EF1B87ED;
+	Mon, 16 Dec 2024 04:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eUKbPwqq"
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D2A8BE8;
-	Mon, 16 Dec 2024 01:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F1DA41;
+	Mon, 16 Dec 2024 04:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734312966; cv=none; b=TvNKZgzUdvf1UY0PuYCzHv8JG7iOmrzM5zErltT60cIvPHHHAlHSGYPSSFFJQixJ0nXLXUFhfMo9ZOF9ys/2bQYrRepmKt3Kmhko7yNgmZrlf7am/E+FJVIyp7yrbnjJfTa804akzHaJ1nD9dA0q0fJyCFQktp2oFpf76LVNgFo=
+	t=1734323861; cv=none; b=Y/bAFZCT5tsuSqGRzFKkx8/amUs2JvYSaILIle7XyedmKRxHASYXPIDeMKhekdKQrMs2XfE8g1bKi5v1D0b42YJtlCM6Vbcm7J7Gv9zn+V7gXMxYslyCvLO8xxmv2dJ4ce7VS0pdSzI5RMSKiqh5RBgd/5mgbBYAQLoGk05MV6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734312966; c=relaxed/simple;
-	bh=eWgUJAmz47HFCOh4aIEmrxNlaOSMz0Zxku7oakMFQ3E=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=iates0D4nEFstfFD97K8qow7YvAnQEr+rEKXkoPw+lQbM+z1/UFfN8Aqi8zNCT+2hFI1eMIEBoamxomyi+vdc6m66he6HrNRYc8U3WoDK7r+uQgKzARGTQF8FB5GCxX7PHMGyU+A9EMKJBMhfo0EwIYg6qgbcaJaR90OGRgDRTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=159.65.134.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from ubuntu18.eswin.cn (unknown [10.12.192.151])
-	by app1 (Coremail) with SMTP id TAJkCgDXG6Xsg19nlw8DAA--.14605S4;
-	Mon, 16 Dec 2024 09:35:41 +0800 (CST)
-From: zhangdongdong@eswincomputing.com
-To: alex.williamson@redhat.com
-Cc: bhelgaas@google.com,
-	zhangdongdong@eswincomputing.com,
-	yishaih@nvidia.com,
-	avihaih@nvidia.com,
-	yi.l.liu@intel.com,
-	ankita@nvidia.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: [PATCH v2] PCI: Remove redundant macro
-Date: Mon, 16 Dec 2024 09:35:36 +0800
-Message-Id: <20241216013536.4487-1-zhangdongdong@eswincomputing.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:TAJkCgDXG6Xsg19nlw8DAA--.14605S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1DKFyUJF17uFWUtrWkJFb_yoW8ury8pr
-	s8Ca4xGr45XF4Y9a1qya45A3W5Xa9xAryI93y7u343KFy3tw10vrWFyr42kryagrWxAF45
-	JrsY9r90gF9F93JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBq14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw2
-	8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
-	x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrw
-	CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI
-	42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z2
-	80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbknY7UUUUU==
-X-CM-SenderInfo: x2kd0wpgrqwvxrqjqvxvzl0uprps33xlqjhudrp/1tbiAgENCmdfBKsMWAABsG
+	s=arc-20240116; t=1734323861; c=relaxed/simple;
+	bh=/ZLxmtpD7i77LgMQtthygKh9darH2+HxDdhqKF+SxZ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pw7YjdqbqLivNny1m0y+LeXpL0GPhWp+O2/ap8sLqlPQzfNx3+zFI62KcnPAQ/ZCYJktEG/yWeiuGRNwloaOTU05n48Ul8WC4fdl8+z0Nyn1q5Aiomp2nLi+iw3DmnWmr3fIrtZSK7pMFKwqP5p3Tck8b7588snzB3JjI7hVOzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eUKbPwqq; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734323859; x=1765859859;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/ZLxmtpD7i77LgMQtthygKh9darH2+HxDdhqKF+SxZ4=;
+  b=eUKbPwqqhzuSMmPnu78bak2eKKaWFa3b6Ol8DdJE3WGrblP1wt09p7tG
+   qm5q24Aw/6jnCaKF6Q8Yrt6jGwDMd4ZL5DRS0/ijqNruDp8GpYbM2FD0Q
+   IPz3pM3zGI3+DtoKIkRL1f3sL8PsAFhLqx3T00OPh8Ot6PURPszVgoMWg
+   vmoJ+9E5hDpsGAavIlF5K54bPexvK8eD858bjf3yIGnUx92p2MF34bK6i
+   mTrEWjh02yi2lHaSXJSLbEAiIt0SqWu5u6Ix1jPuQTj0E0PpC5XaiPLvV
+   YU0DKngniyoiOdVGQDD+Wf77UxNZUsKQu/xEg22ATKqY4R5Fqe30rGuqX
+   A==;
+X-CSE-ConnectionGUID: Rd9b3sWeQEiM3EDaIJ9KCw==
+X-CSE-MsgGUID: Z6qkA69gTcSgnJiz56lHgg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11287"; a="34732467"
+X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
+   d="scan'208";a="34732467"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 20:37:39 -0800
+X-CSE-ConnectionGUID: hB2F3kOKRVK/ZBxkreQCXA==
+X-CSE-MsgGUID: R+AidrljTfqnvygPxOJ+tw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,237,1728975600"; 
+   d="scan'208";a="101937650"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2024 20:37:36 -0800
+Message-ID: <646990e1-cce6-4040-af40-6d80e0cd954a@intel.com>
+Date: Mon, 16 Dec 2024 12:37:32 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] KVM: TDX: Add a place holder to handle TDX VM exit
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ michael.roth@amd.com, linux-kernel@vger.kernel.org
+References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+ <20241201035358.2193078-2-binbin.wu@linux.intel.com>
+ <28930ac3-f4af-4d93-a766-11a5fedb321e@intel.com>
+ <25a042e8-c39a-443c-a2e4-10f515b1f2af@linux.intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <25a042e8-c39a-443c-a2e4-10f515b1f2af@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+On 12/16/2024 8:54 AM, Binbin Wu wrote:
+> 
+> 
+> 
+> On 12/13/2024 4:57 PM, Xiaoyao Li wrote:
+>> On 12/1/2024 11:53 AM, Binbin Wu wrote:
+...
+>>
+>>>   }
+>>>     void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int 
+>>> pgd_level)
+>>> @@ -1135,6 +1215,88 @@ int tdx_sept_remove_private_spte(struct kvm 
+>>> *kvm, gfn_t gfn,
+>>>       return tdx_sept_drop_private_spte(kvm, gfn, level, pfn);
+>>>   }
+>>>   +int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>>> +{
+>>> +    struct vcpu_tdx *tdx = to_tdx(vcpu);
+>>> +    u64 vp_enter_ret = tdx->vp_enter_ret;
+>>> +    union vmx_exit_reason exit_reason;
+>>> +
+>>> +    if (fastpath != EXIT_FASTPATH_NONE)
+>>> +        return 1;
+>>> +
+>>> +    /*
+>>> +     * Handle TDX SW errors, including TDX_SEAMCALL_UD, 
+>>> TDX_SEAMCALL_GP and
+>>> +     * TDX_SEAMCALL_VMFAILINVALID.
+>>> +     */
+>>> +    if (unlikely((vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR)) {
+>>> +        KVM_BUG_ON(!kvm_rebooting, vcpu->kvm);
+>>> +        goto unhandled_exit;
+>>> +    }
+>>> +
+>>> +    /*
+>>> +     * Without off-TD debug enabled, failed_vmentry case must have
+>>> +     * TDX_NON_RECOVERABLE set.
+>>> +     */
+>>
+>> This comment is confusing. I'm not sure why it is put here. Below code 
+>> does nothing with exit_reason.failed_vmentry.
+> 
+> Because when failed_vmentry occurs, vp_enter_ret will have
+> TDX_NON_RECOVERABLE set, so it will be handled below.
 
-Removed the duplicate macro `PCI_VSEC_HDR` and its related macro
-`PCI_VSEC_HDR_LEN_SHIFT` from `pci_regs.h` to avoid redundancy and
-inconsistencies. Updated VFIO PCI code to use `PCI_VNDR_HEADER` and
-`PCI_VNDR_HEADER_LEN()` for consistent naming and functionality.
+The words somehow is confusing, which to me is implying something like:
 
-These changes aim to streamline header handling while minimizing
-impact, given the niche usage of these macros in userspace.
+	WARN_ON(!debug_td() && exit_reason.failed_vmentry &&
+                 !(vp_enter_ret & TDX_NON_RECOVERABLE))
 
-Signed-off-by: Dongdong Zhang <zhangdongdong@eswincomputing.com>
----
- drivers/vfio/pci/vfio_pci_config.c | 5 +++--
- include/uapi/linux/pci_regs.h      | 3 ---
- 2 files changed, 3 insertions(+), 5 deletions(-)
+Besides, VMX returns KVM_EXIT_FAIL_ENTRY for vm-entry failure. So the 
+question is why TDX cannot do it same way?
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index ea2745c1ac5e..5572fd99b921 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1389,11 +1389,12 @@ static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epo
- 
- 	switch (ecap) {
- 	case PCI_EXT_CAP_ID_VNDR:
--		ret = pci_read_config_dword(pdev, epos + PCI_VSEC_HDR, &dword);
-+		ret = pci_read_config_dword(pdev, epos + PCI_VNDR_HEADER,
-+					    &dword);
- 		if (ret)
- 			return pcibios_err_to_errno(ret);
- 
--		return dword >> PCI_VSEC_HDR_LEN_SHIFT;
-+		return PCI_VNDR_HEADER_LEN(dword);
- 	case PCI_EXT_CAP_ID_VC:
- 	case PCI_EXT_CAP_ID_VC9:
- 	case PCI_EXT_CAP_ID_MFVC:
-diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
-index 1601c7ed5fab..bcd44c7ca048 100644
---- a/include/uapi/linux/pci_regs.h
-+++ b/include/uapi/linux/pci_regs.h
-@@ -1001,9 +1001,6 @@
- #define PCI_ACS_CTRL		0x06	/* ACS Control Register */
- #define PCI_ACS_EGRESS_CTL_V	0x08	/* ACS Egress Control Vector */
- 
--#define PCI_VSEC_HDR		4	/* extended cap - vendor-specific */
--#define  PCI_VSEC_HDR_LEN_SHIFT	20	/* shift for length field */
--
- /* SATA capability */
- #define PCI_SATA_REGS		4	/* SATA REGs specifier */
- #define  PCI_SATA_REGS_MASK	0xF	/* location - BAR#/inline */
--- 
-2.17.1
+>>
+>>> +    if (unlikely(vp_enter_ret & (TDX_ERROR | TDX_NON_RECOVERABLE))) {
+>>> +        /* Triple fault is non-recoverable. */
+>>> +        if (unlikely(tdx_check_exit_reason(vcpu, 
+>>> EXIT_REASON_TRIPLE_FAULT)))
+>>> +            return tdx_handle_triple_fault(vcpu);
+>>> +
+>>> +        kvm_pr_unimpl("TD vp_enter_ret 0x%llx, hkid 0x%x hkid pa 
+>>> 0x%llx\n",
+>>> +                  vp_enter_ret, to_kvm_tdx(vcpu->kvm)->hkid,
+>>> +                  set_hkid_to_hpa(0, to_kvm_tdx(vcpu->kvm)->hkid));
+>>
+>> It indeed needs clarification for the need of "hkid" and "hkid pa". 
+>> Especially the "hkdi pa", which is the result of applying HKID of the 
+>> current TD to a physical address 0. I cannot think of any reason why 
+>> we need such info.
+> Yes, set_hkid_to_hpa(0, to_kvm_tdx(vcpu->kvm)->hkid) should be removed.
+> I didn't notice it.
+
+don't forget to justify why HKID is useful here. To me, HKID can be 
+dropped as well.
+
+> Thanks!
+> 
+> 
+>>
+>>> +        goto unhandled_exit;
+>>> +    }
+>>> +
+>>> +    /* From now, the seamcall status should be TDX_SUCCESS. */
+>>> +    WARN_ON_ONCE((vp_enter_ret & TDX_SEAMCALL_STATUS_MASK) != 
+>>> TDX_SUCCESS);
+>>
+>> Is there any case that TDX_SUCCESS with additional non-zero 
+>> information in the lower 32-bits? I thought TDX_SUCCESS is a whole 64- 
+>> bit status code.
+> TDX status code uses the upper 32-bits.
+> 
+> When the status code is TDX_SUCCESS and has a valid VMX exit reason, the 
+> lower
+> 32-bit is the VMX exit reason.
+> 
+> You can refer to the TDX module ABI spec or 
+> interface_function_completion_status.json
+> from the intel-tdx-module-1.5-abi-table for details.
+> 
+
+I see. (I asked a silly question that I even missed the normal Exit case)
 
 
