@@ -1,246 +1,219 @@
-Return-Path: <kvm+bounces-33873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F25CD9F394D
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 19:51:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3AD59F3978
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 20:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 316EC16A6BC
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 18:51:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBA1E1671CB
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 19:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C745D207A31;
-	Mon, 16 Dec 2024 18:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A706207DE7;
+	Mon, 16 Dec 2024 19:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i1Qz3GlO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TkfX2/vr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B92345C1C
-	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 18:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8AF1CD213
+	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 19:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734375078; cv=none; b=L1ViQ/c7m/W28y9ciS2gnnU6yOhYTJFOsvmrb7Y75+Gh0Sa9grdroKSG/I932jIzkoWTl4z6RYCTZz1GOSElOL+4uWXcqt2kZ+RrsipPbahsERWlkTJA9FOYU66sZcA73A5qmwk2wCilY4A+vd3y1TlaabPLPTsZjhqYKvJi5vw=
+	t=1734376094; cv=none; b=OZMG5YTgFJ9mxPEee6b9MCZoY6gE+UUsHfYZh9LuP//7CJCKLFHl16pgT07rTyZ0eQ5jBMvaXU7OIXWFgnst92nSiXu9FGH1oLdWVYVSg8KCtEh5m1+cThXuMMcaJsn/na8PDTq5j+wwpWz7hTs08LI+i6I006TFnW8C3w14y0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734375078; c=relaxed/simple;
-	bh=HkIO0XQYqz3cAZDQsG913wPRFn/kho7r6jvSNHliltg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O/H2fUL+0c4STGdw30mPH3j02iWVUFxXhloAxUOJabYJ3TyJx+21s1bwC59dxHWvr5kquqd4GyBcSllZmI762rT2/LSy9qsnQ7uC7mnP2u/n9wvbQQTBUe+0wPUNT5kKdoZSFkotCT8zHp69zb2eyb95D9cJxAhXNNJEpS6vVuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i1Qz3GlO; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-728e3d9706dso3909586b3a.3
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 10:51:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734375075; x=1734979875; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLoNLY5L/ShxOSwj9IhGgOpBuBhnacmRbyveuEehm/0=;
-        b=i1Qz3GlORdlyTqRz4zcLithoFqFDcZvGJ7IS5MLiHGM9JfUL6oGgub3+9nNg6mzlxW
-         /L9fCyxH+DpRxQnq5UirhxIiuiljp6eaiO4i9w83SgEvlwn8fS43mP5NK3m97sev5Yqm
-         085f2KoiOKS1H9vs958H3cgZXODGqw4cOIA/ss2a28gnUR10So/5K6bI9T/Blwme2brw
-         jlMXs0p3nMppCbLBps2VJAWfvxtF3CqDXIl7cLyB7n3iqPqQy4zxDBreryFU9uBkXODV
-         EJ+Ge5vhRJ6RK7/dZTEqIPmSN9g4V0B7HVwsXp4+bVmSL4OCotulUhK680tFNh5Sqb0O
-         Eidg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734375075; x=1734979875;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLoNLY5L/ShxOSwj9IhGgOpBuBhnacmRbyveuEehm/0=;
-        b=vQG/mTvzQVWu5eF1pV/zyokKo+8SVX9zYiy2CUMJHyqQwzUXTrmQ+k+X+QV4JQwYxS
-         d3NF/XhNvfm3UpB3yZ5JCgiCilLG/8V8u1w8sZoQWhmEyoL/yGdGDoPtGvjKWngh4tVt
-         OczdktDARJzxJ9UoYfYlrhX2H5lieOZFqUerMHQT5njiBj3RsXbrN4XHSKxa2LcyjmR6
-         C3uKywvC56S4ZREIVbkZKw5SifPD55MAyjQXJIZiNbQY7CicKcIKlpQ+Gs/sFEPyOtLS
-         XJ9DqE1AI2pN0yKAqWOyMjeWzs2UcH3RVMacV6iG3pziXD1SBeBH1YOMCUwkT4VgejM1
-         E7sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRM1CTR4ZbA0ATvdbuO2NxUkRvrb/8M4hP8UAa/toS3wbmV25nqy8Hj71ap4TpgY3Ja2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFMRnLVJfRWUwIndJtyM6hd1P5Cds18C6DRzRjY8GxkchO08A
-	spdabAhUKpAsQ82TAHk/nXwMvDBelR65TISIJmoOO/wrRyho3vWIZNJv1PhheHe8LTjzGm1XGhU
-	wpA==
-X-Google-Smtp-Source: AGHT+IGhW7jZdnGmxiJJkLet2z5eeW6CYDtlLgSGQkyPA6NHGvymoWrHZBjqv7w88bhkzeMkZyGmoVjBFik=
-X-Received: from pgqm11.prod.google.com ([2002:a65:530b:0:b0:7fd:5126:2bab])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1796:b0:1e0:ca95:3cb3
- with SMTP id adf61e73a8af0-1e1dfe96d96mr21339997637.37.1734375074665; Mon, 16
- Dec 2024 10:51:14 -0800 (PST)
-Date: Mon, 16 Dec 2024 10:51:13 -0800
-In-Reply-To: <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
+	s=arc-20240116; t=1734376094; c=relaxed/simple;
+	bh=XHY6RRaofeSqNpkhu+XLNYYsg9u82MtyFmn0jiwVWsA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LuRVDFLVcVDgB3QGUJmhCM4+m9loW6YFB1GLqUDsPN1s6kO4p36TDJcYUUFDDtnu1/JdH1gMihi7g+45Tgs43G8bk+Vle2jjdyCS08AxkIS3rIHbj4YGVV1t2HlapdKxrj+rPZlW/njs30WbUd9R1xakY1uuwKx75K6kalHGooI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TkfX2/vr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39216C4CEE2
+	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 19:08:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734376094;
+	bh=XHY6RRaofeSqNpkhu+XLNYYsg9u82MtyFmn0jiwVWsA=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=TkfX2/vrJe5kDcuLTFaUaWx08VpRm4uXSE8szVaU7qVRHQN8OZd6l1JGnQw7x4SGd
+	 cNevUAUyIXyj09UZoCc15JLZ/yA+9IKRbpRnPA7u2Aa15n0TrJxLSDjHCGM+Zl+XdN
+	 NQO6N60LBfGcgklotDOA1buuKzHla36A3ECkDCtWToY1PVyAPwCMZFy/2ikehq9wJA
+	 8b/fYJw2tglJsLtT0t2/Flw2Hig5/j0lxPiNEbdt3WsplFeUkc6j8oiSOQkRZg41LN
+	 VrvtN5Dlf7ck/2yPKf4o9P7J3grHvFHkGt2hERXeTHDBc3nwsuz+tIAq733KioZHAe
+	 yPLi+pxjdKKIg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 2EFA0C41614; Mon, 16 Dec 2024 19:08:14 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple Windows VMs
+ hang
+Date: Mon, 16 Dec 2024 19:08:13 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: seanjc@google.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218267-28872-5V2mMZW0sp@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218267-28872@https.bugzilla.kernel.org/>
+References: <bug-218267-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241202120416.6054-1-bp@kernel.org> <20241202120416.6054-4-bp@kernel.org>
- <Z1oR3qxjr8hHbTpN@google.com> <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
-Message-ID: <Z2B2oZ0VEtguyeDX@google.com>
-Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-On Mon, Dec 16, 2024, Borislav Petkov wrote:
-> On Wed, Dec 11, 2024 at 02:27:42PM -0800, Sean Christopherson wrote:
-> > How much cost are we talking?
-> 
-> Likely 1-2%.
-> 
-> That's why I'm simply enabling it by default.
-> 
-> > IIUC, this magic bit reduces how much the CPU is allowed to speculate in order
-> > to mitigate potential VM=>host attacks, and that reducing speculation also reduces
-> > overall performance.
-> > 
-> > If that's correct, then enabling the magic bit needs to be gated by an appropriate
-> > mitagation being enabled, not forced on automatically just because the CPU supports
-> > X86_FEATURE_SRSO_MSR_FIX.
-> 
-> Well, in  the default case we have safe-RET - the default - but since it is
-> not needed anymore, it falls back to this thing which is needed when the
-> mitigation is enabled.
-> 
-> That's why it also is in the SRSO_CMD_IBPB_ON_VMEXIT case as it is part of the
-> spec_rstack_overflow=ibpb-vmexit mitigation option.
-> 
-> So it kinda already does that. When you disable the mitigation, this one won't
-> get enabled either.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
 
-But it's a hardware-defined feature flag, so won't it be set by this code?
+--- Comment #8 from Sean Christopherson (seanjc@google.com) ---
+Thanks Chao!
 
-	if (c->extended_cpuid_level >= 0x8000001f)
-		c->x86_capability[CPUID_8000_001F_EAX] = cpuid_eax(0x8000001f);
+Until the ucode update is available, I think we can workaround the issue in=
+ KVM
+by clearing VECTORING_INFO_VALID_MASK _immediately_ after exit, i.e. before
+queueing the event for re-injection, if it should be impossible for the exi=
+t to
+have occurred while vectoring.  I'm not sure I want to carry something like
+this long-term since a ucode fix is imminent, but at the least it can hopef=
+ully
+unblock end users.
 
-srso_select_mitigation() checks the flag for SRSO_CMD_IBPB_ON_VMEXIT
+The below uses a fairly conservative list of exits (a false positive could =
+be
+quite painful).  A slightly less conservative approach would be to also
+include:
 
-	case SRSO_CMD_IBPB_ON_VMEXIT:
-		if (boot_cpu_has(X86_FEATURE_SRSO_MSR_FIX)) {
-			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-			break;
-		}
+case EXIT_REASON_EXTERNAL_INTERRUPT:
+case EXIT_REASON_TRIPLE_FAULT:
+case EXIT_REASON_INIT_SIGNAL:
+case EXIT_REASON_SIPI_SIGNAL:
+case EXIT_REASON_INTERRUPT_WINDOW:
+case EXIT_REASON_NMI_WINDOW:
 
-but I don't see any code that would clear X86_FEATURE_SRSO_MSR_FIX.  Am I missing
-something?
-
-> > And depending on the cost, it might also make sense to set the bit on-demand, and
-> > then clean up when KVM disables virtualization.  E.g. wait to set the bit until
-> > entry to a guest is imminent.
-> 
-> So the "when to set that bit" discussion kinda remained unfinished the last
-> time.
-
-Gah, sorry.  I suspect I got thinking about how best to "set it only when really
-needed", and got lost in analysis paralysis.
-
-> Here's gist:
-> 
-> You:
-> 
-> | "It's not strictly KVM module load, it's when KVM enables virtualization.  E.g.
-> | if userspace clears enable_virt_at_load, the MSR will be toggled every time the
-> | number of VMs goes from 0=>1 and 1=>0.
-> | 
-> | But why do this in KVM?  E.g. why not set-and-forget in init_amd_zen4()?"
-> 
-> I:
-> 
-> | "Because there's no need to impose an unnecessary - albeit small - perf impact
-> | on users who don't do virt.
-> | 
-> | I'm currently gravitating towards the MSR toggling thing, i.e., only when the
-> | VMs number goes 0=>1 but I'm not sure. If udev rules *always* load kvm.ko then
-> | yes, the toggling thing sounds better. I.e., set it only when really needed."
-> 
-> So to answer your current question, it sounds like the user can control the
-> on-demand thing with enable_virt_at_load=0, right?
-
-To some extent.  But I strongly suspect that the vast, vast majority of end users
-will end up with systems that automatically load kvm.ko, but don't run VMs the
-majority of the time.  Expecting non-KVM to users to detect a 1-2% regression and
-track down enable_virt_at_load doesn't seem like a winning strategy.
-
-> Or do you mean something else different?
-
-The other possibility would be to wait to set the bit until a CPU is actually
-going to do VMRUN.  If we use KVM's "user-return MSR" framework, the bit would
-be cleared when the CPU returns to userspace.  The only downside to that is KVM
-would toggle the bit on CPUs running vCPUs on every exit to userspace, e.g. to
-emulate MMIO/IO and other things.
-
-But, userspace exits are relatively slow paths, so if the below is a wash for
-performance when running VMs, i.e. the cost of the WRMSRs is either in the noise
-or is offset by the regained 1-2% performance for userspace, then I think it's a
-no-brainer.
-
-Enabling "full" speculation on return to usersepace means non-KVM tasks won't be
-affected, and there's no "sticky" behavior.  E.g. another idea would be to defer
-setting the bit until VMRUN is imminent, but then wait to clear the bit until
-virtualization is disabled.  But that has the downside of the bit being set on all
-CPUs over time, especially if enable_virt_at_load is true.
+as those exits should all be recognized only at instruction boundaries.
 
 Compile tested only...
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e4fad330cd25..061ac5940432 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -256,6 +256,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
-  * defer the restoration of TSC_AUX until the CPU returns to userspace.
-  */
- static int tsc_aux_uret_slot __read_mostly = -1;
-+static int zen4_bp_cfg_uret_slot __ro_after_init = -1;
- 
- static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
- 
-@@ -608,9 +609,6 @@ static void svm_disable_virtualization_cpu(void)
-        kvm_cpu_svm_disable();
- 
-        amd_pmu_disable_virt();
--
--       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
--               msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
- }
- 
- static int svm_enable_virtualization_cpu(void)
-@@ -688,9 +686,6 @@ static int svm_enable_virtualization_cpu(void)
-                rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
-        }
- 
--       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
--               msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
--
-        return 0;
- }
- 
-@@ -1547,6 +1542,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-            (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
-                kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
- 
-+       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-+               kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
-+                                       MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT,
-+                                       MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+---
+ arch/x86/kvm/vmx/vmx.c | 66 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 893366e53732..7240bd72b5f2 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -147,6 +147,9 @@ module_param_named(preemption_timer,
+enable_preemption_timer, bool, S_IRUGO);
+ extern bool __read_mostly allow_smaller_maxphyaddr;
+ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
+
++static bool __ro_after_init enable_spr141_erratum_workaround =3D true;
++module_param(enable_spr141_erratum_workaround, bool, S_IRUGO);
 +
-        svm->guest_state_loaded = true;
+ #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
+ #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
+ #define KVM_VM_CR0_ALWAYS_ON                           \
+@@ -7163,8 +7166,67 @@ static void __vmx_complete_interrupts(struct kvm_vcpu
+*vcpu,
+        }
  }
- 
-@@ -5313,6 +5313,14 @@ static __init int svm_hardware_setup(void)
- 
-        tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
- 
-+       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX)) {
-+               zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
-+               if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot) < 0) {
-+                       r = -EIO;
-+                       goto err;
-+               }
+
++static bool is_vectoring_on_exit_impossible(struct vcpu_vmx *vmx)
++{
++       switch (vmx->exit_reason.basic) {
++       case EXIT_REASON_CPUID:
++       case EXIT_REASON_HLT:
++       case EXIT_REASON_INVD:
++       case EXIT_REASON_INVLPG:
++       case EXIT_REASON_RDPMC:
++       case EXIT_REASON_RDTSC:
++       case EXIT_REASON_VMCALL:
++       case EXIT_REASON_VMCLEAR:
++       case EXIT_REASON_VMLAUNCH:
++       case EXIT_REASON_VMPTRLD:
++       case EXIT_REASON_VMPTRST:
++       case EXIT_REASON_VMREAD:
++       case EXIT_REASON_VMRESUME:
++       case EXIT_REASON_VMWRITE:
++       case EXIT_REASON_VMOFF:
++       case EXIT_REASON_VMON:
++       case EXIT_REASON_CR_ACCESS:
++       case EXIT_REASON_DR_ACCESS:
++       case EXIT_REASON_IO_INSTRUCTION:
++       case EXIT_REASON_MSR_READ:
++       case EXIT_REASON_MSR_WRITE:
++       case EXIT_REASON_MSR_LOAD_FAIL:
++       case EXIT_REASON_MWAIT_INSTRUCTION:
++       case EXIT_REASON_MONITOR_TRAP_FLAG:
++       case EXIT_REASON_MONITOR_INSTRUCTION:
++       case EXIT_REASON_PAUSE_INSTRUCTION:
++       case EXIT_REASON_TPR_BELOW_THRESHOLD:
++       case EXIT_REASON_GDTR_IDTR:
++       case EXIT_REASON_LDTR_TR:
++       case EXIT_REASON_INVEPT:
++       case EXIT_REASON_RDTSCP:
++       case EXIT_REASON_PREEMPTION_TIMER:
++       case EXIT_REASON_INVVPID:
++       case EXIT_REASON_WBINVD:
++       case EXIT_REASON_XSETBV:
++       case EXIT_REASON_APIC_WRITE:
++       case EXIT_REASON_RDRAND:
++       case EXIT_REASON_INVPCID:
++       case EXIT_REASON_VMFUNC:
++       case EXIT_REASON_ENCLS:
++       case EXIT_REASON_RDSEED:
++       case EXIT_REASON_XSAVES:
++       case EXIT_REASON_XRSTORS:
++       case EXIT_REASON_UMWAIT:
++       case EXIT_REASON_TPAUSE:
++               return true;
 +       }
 +
-        if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
-                kvm_enable_efer_bits(EFER_AUTOIBRS);
++       return false;
++}
++
+ static void vmx_complete_interrupts(struct vcpu_vmx *vmx)
+ {
++       if ((vmx->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
++           enable_spr141_erratum_workaround &&
++           is_vectoring_on_exit_impossible(vmx))
++               vmx->idt_vectoring_info &=3D ~VECTORING_INFO_VALID_MASK;
++
+        __vmx_complete_interrupts(&vmx->vcpu, vmx->idt_vectoring_info,
+                                  VM_EXIT_INSTRUCTION_LEN,
+                                  IDT_VECTORING_ERROR_CODE);
+@@ -8487,6 +8549,10 @@ __init int vmx_hardware_setup(void)
+        if (!enable_apicv || !cpu_has_vmx_ipiv())
+                enable_ipiv =3D false;
 
++       if (boot_cpu_data.x86_vfm !=3D INTEL_SAPPHIRERAPIDS_X &&
++           boot_cpu_data.x86_vfm !=3D INTEL_EMERALDRAPIDS_X)
++               enable_spr141_erratum_workaround =3D false;
++
+        if (cpu_has_vmx_tsc_scaling())
+                kvm_caps.has_tsc_control =3D true;
+
+
+base-commit: 50e5669285fc2586c9f946c1d2601451d77cb49e
+--
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
