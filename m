@@ -1,136 +1,96 @@
-Return-Path: <kvm+bounces-33846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C2339F2CE0
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 10:23:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0100A9F2CE2
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 10:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA6FB1665E8
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 09:22:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0231884B70
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 09:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E17C202C3A;
-	Mon, 16 Dec 2024 09:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95824201100;
+	Mon, 16 Dec 2024 09:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="b+X+o9Dk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3lzmvYm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19154200BBD;
-	Mon, 16 Dec 2024 09:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4151FFC6E
+	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 09:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734340938; cv=none; b=Wq2EgvIMw2Sqe06p9sNc9zYeWYw2gXGrjtKV0hkymlh/p1CAjPQ73gmL7fJvaMg5CENhHtntbPZ63uUO2jqfUGgHY1r2O8EPfTxi3OLE1eks8kZdmsPdRGVqxYE6pnRHohJU1psk2pdZ6sZnzj11xII7sbihooD17mqFmpgEQS8=
+	t=1734340960; cv=none; b=LH4emZnoxoep8QZnfSjjnX5v+XJ7k5lYq+nvLcGJOckj/Q8iMuBmOfpuYxG5ubEXhoGcYjl3OXoULsI7e/0+lJeWOmANZkGuaxJ/5bkq6GoE4O2wLxtN960GcINLkVMt44zOj1moK2zOvQvLSPcIuGDjjbjnV39HdIgM74Q8sEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734340938; c=relaxed/simple;
-	bh=6EfLlCPdQN+dTd2subfxyisFwKaGrX3I583/bK5A7fI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VIZglhQ7n9ypp8DzXcH7rMDFZWCWOsGMmlEmDixuSG3CekliCEcRsoApA46IxYpJhhRgamuGEmP5CUauPW7VlRRYuwpwS+qyMnTOz7jScAvr3EyuyDShDWKkCOScKOspKp0/swl3mY1kP+fUbsgO+hfqJHwAKqNvDhr7XqJIilI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b+X+o9Dk; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG3qtnL020220;
-	Mon, 16 Dec 2024 09:22:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=+NodavmKFTUM6prHe
-	atyonTh+dE3Y4X02W2UrRce8U8=; b=b+X+o9Dk2P0L8/HZAiuVZUR+8FNZjei7J
-	Dkl50HowR3Phpd2zAKLXiSuH2ACzEuUQaG4mHL6TXrvW6eT/3/T3BBFSCcAPefNs
-	++W/RIpH5/LWGFcOy2AUS3N8grLghj5k/SNlbFdnzzLjYDZgs8XbAr+3LxPrTot0
-	KMr74SN1+cu097IU4sIi/dsN6zMML1KXs/sla9emz+s7WaA7SqfmwfC4vZQf37Jl
-	Mgk8wLGjcc+ZQxeTqGj/meWLL4YmNRqRbFROBEVu7wj1K0G36+EUOQUGRC2rF4qU
-	BIJoJdF8LTMBZ+UaycuQZkzZI7di3Um5Y+XZFyJ9SuD8E99V2MdzA==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43jcpgsakn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Dec 2024 09:22:07 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG70TAS014391;
-	Mon, 16 Dec 2024 09:22:06 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hq21cv7x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Dec 2024 09:22:06 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BG9M3VH55705864
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Dec 2024 09:22:03 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 48A9E20043;
-	Mon, 16 Dec 2024 09:22:03 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A08A2004D;
-	Mon, 16 Dec 2024 09:22:02 +0000 (GMT)
-Received: from darkmoore.ibmuc.com (unknown [9.179.0.126])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 16 Dec 2024 09:22:02 +0000 (GMT)
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+	s=arc-20240116; t=1734340960; c=relaxed/simple;
+	bh=0YbztXg+uS7nE+smxjJ3yIA+JgXvXTIRM9za3d02Slw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NuBBQnue7qeIpegGpDfaM4J6O1xdtbjBvn4QWwtW7gtwBfwMfn4EjWEVPWSQ2aDGVo6AR3M4jOvt0n0cIg3AVClLwQqi9v6bz/AZJvyDiC4pBc94i9CYqqa31NfcGJgRl2x3PERYCBzYXRpTwEayH+o7+V5VfjLPBOGAS8PfHMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3lzmvYm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 385BFC4CEDD
+	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 09:22:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734340960;
+	bh=0YbztXg+uS7nE+smxjJ3yIA+JgXvXTIRM9za3d02Slw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=X3lzmvYm1v+0PtDKTd/EzM44osdt72V9IYZY9yZHaX4f9IkNMnQ2NbvtyjXgcVdGM
+	 iF0duVJjbruugqlxMe6MaE4miQSKag6m6YzPfkrEUt72gXBJVBERar7cn8v7M148Vh
+	 bMphpiCDSb1eOIhfRBejPOS+Ftlsvx9pHj5VM6Ql7Ez8cfS7htRxlGjCBsv/4wXxHc
+	 ozbnckKg6llyEq0QloJX5tmAimqQqItqrSIrMjJDP/tlwyXgo1V0EsqkNpZTFvm8ez
+	 NweVe67krrtEbickx7j9JRhFYIB4Q9RzXQsmQBs+2EX0TtaO25M8amOPh+mxk/w+mN
+	 3P1dlL5UReagA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 2C73CC41614; Mon, 16 Dec 2024 09:22:40 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Ulrich Weigand <ulrich.weigand@de.ibm.com>,
-        Dominik Dingel <dingel@linux.vnet.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v2 6/6] selftests: kvm: s390: Add has device attr check to uc_attr_mem_limit selftest
-Date: Mon, 16 Dec 2024 10:21:40 +0100
-Message-ID: <20241216092140.329196-7-schlameuss@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241216092140.329196-1-schlameuss@linux.ibm.com>
-References: <20241216092140.329196-1-schlameuss@linux.ibm.com>
+Subject: [Bug 219602] Default of kvm.enable_virt_at_load breaks other
+ virtualization solutions (by default)
+Date: Mon, 16 Dec 2024 09:22:39 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: acmelab@proton.me
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cf_bisect_commit cf_kernel_version cf_regression
+Message-ID: <bug-219602-28872-YNWHJIP8RR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219602-28872@https.bugzilla.kernel.org/>
+References: <bug-219602-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Lun59pA_LAadI8EXdv29cXPeB6FqrTa2
-X-Proofpoint-ORIG-GUID: Lun59pA_LAadI8EXdv29cXPeB6FqrTa2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- mlxscore=0 phishscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0
- spamscore=0 mlxlogscore=806 malwarescore=0 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2412160074
 
-Fixup the uc_attr_mem_limit test case to also cover the
-KVM_HAS_DEVICE_ATTR ioctl.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219602
 
-Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/ucontrol_test.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Pinky (acmelab@proton.me) changed:
 
-diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-index ef3e391811b3..087496fe264d 100644
---- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-+++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-@@ -206,10 +206,13 @@ TEST_F(uc_kvm, uc_attr_mem_limit)
- 	struct kvm_device_attr attr = {
- 		.group = KVM_S390_VM_MEM_CTRL,
- 		.attr = KVM_S390_VM_MEM_LIMIT_SIZE,
--		.addr = (unsigned long)&limit,
-+		.addr = (u64)&limit,
- 	};
- 	int rc;
- 
-+	rc = ioctl(self->vm_fd, KVM_HAS_DEVICE_ATTR, &attr);
-+	EXPECT_EQ(0, rc);
-+
- 	rc = ioctl(self->vm_fd, KVM_GET_DEVICE_ATTR, &attr);
- 	EXPECT_EQ(0, rc);
- 	EXPECT_EQ(~0UL, limit);
--- 
-2.47.1
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+ Bisected commit-id|                            |b4886fab6fb620b96ad7eeefb98
+                   |                            |01c42dfa91741
+     Kernel Version|                            |6.12
+         Regression|No                          |Yes
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
