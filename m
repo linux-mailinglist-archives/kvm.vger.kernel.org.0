@@ -1,87 +1,117 @@
-Return-Path: <kvm+bounces-33868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346D59F36E3
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 18:02:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AAA9F3765
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 18:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B032618905CF
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 17:00:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7FA11882C43
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 17:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F363620B815;
-	Mon, 16 Dec 2024 16:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9827D2066CB;
+	Mon, 16 Dec 2024 17:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udS4EU0e"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ws7DxjwJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D1B2063DB;
-	Mon, 16 Dec 2024 16:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9344C2063D2;
+	Mon, 16 Dec 2024 17:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734368064; cv=none; b=t9gup852UDYIrMz25gqRtWQEU2eo7XxxrHYHvjThA1DPRRSb6TlMusC4iSPfj/fdDh4+wwPkOSzi6U1oR6iTAgcOPzRBjP1UW7sGG7+yJhrsrCyBi2Tr0b2zDvySnssmDYmjoqBzHvpMBFzhWvrzfAqkvQzRmpUoPuQZgjWUgtc=
+	t=1734369689; cv=none; b=PjEtAiK17aRgAlegkToeeTn6Q/OJY2LYvQwOkEACp0Tnq9iNqWxEIdllqp9foiW+YRU36sLX6FRfcuC5jPgfLRe27HQResydvhrvCMNLn6l58yI9GSsMXtFlN8pBta3osaKEgNzly0cfUFaccXPwNLeZJC9Evtem0GGtyQ3UYRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734368064; c=relaxed/simple;
-	bh=fGSmira3qY0qu6Pm6drcj0Bgb5kegO5+9l28c2GA9N8=;
+	s=arc-20240116; t=1734369689; c=relaxed/simple;
+	bh=PJhBIGavO75oUIuythOpbZQWf9qeJaB0K5qVu5wRzkE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z7zLN937ymvCsN9BwuHX2OlbPwEs5Gq3zmqUIDhaRT9eqoouaxaPLxgfWXQKL3XP6pjiXINH/BGy0TFjAg6+4bn4OimLK/awp7ZT/1pacqaQd+bgzaXnHiAD/x0lRrR8d9Zq7CzHYj39w+nIODHfJzYTq47WuBsoYxTkO4JOJF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udS4EU0e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8293C4CED0;
-	Mon, 16 Dec 2024 16:54:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734368063;
-	bh=fGSmira3qY0qu6Pm6drcj0Bgb5kegO5+9l28c2GA9N8=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ylb1LalVjLH3Dclb4C/aD1v1Bi6zFfsIoPRW5M89U0PYDjLn8q2b01gcaFoqR82oEgzR5/apP+ORZBKVXL/blPxQw1Qrw+CcZrhXPZbvZlaSJ87OlBAHPgEUkYsz1IMgZadZk6LNhQqk4cCQUXIE1tEO+wb7gSHpwNE6MBa6JS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Ws7DxjwJ; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7CCDA40E0288;
+	Mon, 16 Dec 2024 17:21:25 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id QPd-heR1xPtD; Mon, 16 Dec 2024 17:21:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1734369682; bh=DTLKHvlsb1eT4f3pms2ceKzfQpmWFZnGKQx2hbANbbU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=udS4EU0eMphp2mwSceRBJPdkzI/VrMjsXMZp5BmFC6BJIef/c+Wcn/96KxFZSFhLf
-	 zCdiTCat+WhHh33aYZkXmyx516q+wuMyPUcLHUJBgJysU04T1nvGhORixryddbu7Ed
-	 b59uYs2I8PloVltK5pPPXEq1WLTYZ1yfYwcw5a+LwthvfygLaPUcUtwi9oRGpmwze7
-	 Q+277JErXes6oeSNNAXda7wLXaCRYGWQGhOsalIoUDudcrkXWTPPXYENUlazJeApFR
-	 rSBGjokABEG3AhTpTDmLLgffEMycIVFjgu3a/NYPIj3jmBcDXxtoNo4YHAnFXyyqG+
-	 WxobQh8faXkdg==
-Date: Mon, 16 Dec 2024 09:54:20 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Wei Lin Guay <wguay@fb.com>, alex.williamson@redhat.com,
-	dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-	linux-rdma@vger.kernel.org, jgg@nvidia.com,
-	vivek.kasireddy@intel.com, dagmoxnes@meta.com, nviljoen@meta.com,
-	Wei Lin Guay <wguay@meta.com>, Oded Gabbay <ogabbay@kernel.org>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>, Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Message-ID: <Z2BbPKvbxm7jvJL9@kbusch-mbp.dhcp.thefacebook.com>
-References: <20241216095429.210792-1-wguay@fb.com>
- <89d9071b-0d3e-4fcd-963b-7aa234031a38@amd.com>
+	b=Ws7DxjwJAaS5Qqpo5ej3UO95Rh4aPePSbYeFKFafIe/OvTlavkhytZiSOXupjPFiA
+	 mf8jqV/hIuZOom3l5cbYsbf5/J1gcJoMZp/q0UuAzBbV+3wac0b6LRuqAY1EvV5NHr
+	 fgny2vvR0FBNuVyX0RQ1IB1euAwX54BHkSmjIBbKpC59s8uyYVE/Zr5odCTsKsNjr0
+	 kfl1uAqvrtSe1e3V/4lUHj2XrhBLx+pmKZ+Z5tQZnmgpqYQ5/9BFtGB+iLgPQwlJvW
+	 tHmtMGIv5AVQgd9FCZjuS8ADmxmE1cWxi52bfbhNnLoLjB7KsYZCDEIZj2+UJVMvYQ
+	 xsV/Kl/JpKlKFFOwKnDdtLuy3jSVURI2AuqSrnv/QzT1orawjlijVXfrTgJ7U9Abvb
+	 Pog8o66wNoVtuFle2czYoYgWPSdYvYaGck1mktaI/Df8PhbZFzCJs2S/qggp7J8O8U
+	 k89U3C9XN9G+PseMKd+QRVqdc8FuMck4qf8Y/odd4w8Hi4usBOk4VpXVRoVZttvIC5
+	 CXNfXf7TvjqCXB5mcgHnWyMRUm/UI5tNAzbtTK5jajzvkT9KkqV8Tic4PODxJAGmGg
+	 Xu/0F32LPT/6j8Uv63kkeCGMJ3biB/l3zwyRVVlKthaRntFUO10539A5X4Gj5Ji4sG
+	 T8oRAKyvUtZ4F/SUwTREMpQs=
+Received: from zn.tnic (p200300EA971F937D329C23Fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:937d:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E63C940E0286;
+	Mon, 16 Dec 2024 17:21:13 +0000 (UTC)
+Date: Mon, 16 Dec 2024 18:21:13 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Borislav Petkov <bp@kernel.org>,
+	X86 ML <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/4] x86/bugs: Add SRSO_USER_KERNEL_NO support
+Message-ID: <20241216172113.GCZ2BhiQlgqYtpQ5lC@fat_crate.local>
+References: <20241202120416.6054-1-bp@kernel.org>
+ <20241202120416.6054-2-bp@kernel.org>
+ <20241210065331.ojnespi77no7kfqf@jpoimboe>
+ <20241210153710.GJZ1hgJpVImYZq47Sv@fat_crate.local>
+ <20241211075315.grttcgu2ht2vuq5d@jpoimboe>
+ <20241211203816.GHZ1n4OFXK8KS4K6dC@fat_crate.local>
+ <Z1oTu37PmOvK6OlN@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <89d9071b-0d3e-4fcd-963b-7aa234031a38@amd.com>
+In-Reply-To: <Z1oTu37PmOvK6OlN@google.com>
 
-On Mon, Dec 16, 2024 at 11:21:39AM +0100, Christian König wrote:
-> Am 16.12.24 um 10:54 schrieb Wei Lin Guay:
-> > From: Wei Lin Guay <wguay@meta.com>
-> > However, as a general mechanism, it can support many other scenarios with
-> > VFIO. I imagine this dmabuf approach to be usable by iommufd as well for
-> > generic and safe P2P mappings.
+On Wed, Dec 11, 2024 at 02:35:39PM -0800, Sean Christopherson wrote:
+> On Wed, Dec 11, 2024, Borislav Petkov wrote:
+> > Btw, Sean, how should we merge this?
 > > 
-> > This series goes after the "Break up ioctl dispatch functions to one
-> > function per ioctl" series.
+> > Should I take it all through tip and give you an immutable branch?
 > 
-> Yeah that sounds like it should work.
+> Hmm, that should work.  I don't anticipate any conflicts other than patch 2
+> (Advertise SRSO_USER_KERNEL_NO to userspace), which is amusingly the most trivial
+> patch.
 > 
-> But where is the rest of the series, I only see the cover letter?
+> Patch 2 is going to conflict with the CPUID/cpu_caps rework[*], but the conflict
+> won't be hard to resolve, and I'm pretty sure that if I merge in your branch after
+> applying the rework, the merge commit will show an "obviously correct" resolution.
+> Or if I screw it up, an obviously wrong resolution :-)
+> 
+> Alternatively, take 1, 3, and 4 through tip, and 2 through my tree, but that
+> seems unnecessarily convoluted.
 
-Should be here:
+Ok, lemme queue them all through tip and we'll see what conflicts we encounter
+along the way and then sync again.
 
-  https://lore.kernel.org/linux-rdma/20241216095429.210792-2-wguay@fb.com/T/#u
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
