@@ -1,231 +1,266 @@
-Return-Path: <kvm+bounces-33853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9B19F2D98
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 11:00:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DAA9F2E16
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 11:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9F6818828AD
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 10:00:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4F29165483
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 10:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3B9202F88;
-	Mon, 16 Dec 2024 09:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2EF2036FB;
+	Mon, 16 Dec 2024 10:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="Z9Fci3BW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="F40+TpwR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE50A201269
-	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 09:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734343190; cv=none; b=LVNUgMOfKH3kVBD0zhmHQXgeNEt/a4eSxKgs771vb1fN/T1v0XP+yxSIqlD55sZ+LsIs/Ai4y+fguwPD/VxaxjJRr0ET8d0tbNkZYLPanK/y6azwlcPmGUksvkkq3TvZSnMWVWYxvvf2mgFVBwRzfM9IjaLSregwvsMCGYgqvNo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734343190; c=relaxed/simple;
-	bh=uz4wHCSnWJTNPll4b5euHgZgBe9SVb4ShU51S6mnk5I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HHpfFX+HoGVyB8YDipQAUOgj9l5MUIqJToHL86ssu/wH03FvVhZ62HmrZWmtCJntHo0YuAnfNQ6wJW2H2LxmqKygclDZTtq69xky3QL3dJV2oUmooh8OVqR5jrU8NcWowv0P+9w7nqyyjlncdTjqNjk4iVuSIQgBrSH7UtBd4B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b=Z9Fci3BW; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG7vNCM000407
-	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 01:59:48 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=facebook; bh=F
-	ViO/GG+RK+U6PNdQVar6FXzIzCS7v+deFT5xR57T6M=; b=Z9Fci3BWOQ4aNCmdt
-	WBV/qAj3yh+MnehyABwRPqcgVVfeq8rOy0aaKQQmsOKhX14H4KIAShDEUiEuz4KF
-	rY1wGHoXL+wHQ7rwIlmlvl++6H0aEziVZ6djR7FvlmutU+H3H0R/zmQEik19Hd92
-	BgEJlO2B3L1nHuBcg0vZuBY550=
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43jg8pgje7-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 01:59:48 -0800 (PST)
-Received: from twshared24170.03.ash8.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Mon, 16 Dec 2024 09:59:31 +0000
-Received: by devvm12370.nha0.facebook.com (Postfix, from userid 624418)
-	id 3BEC110A1F71A; Mon, 16 Dec 2024 01:59:30 -0800 (PST)
-From: Wei Lin Guay <wguay@fb.com>
-To: <alex.williamson@redhat.com>, <dri-devel@lists.freedesktop.org>,
-        <kvm@vger.kernel.org>, <linux-rdma@vger.kernel.org>
-CC: <jgg@nvidia.com>, <vivek.kasireddy@intel.com>, <dagmoxnes@meta.com>,
-        <kbusch@kernel.org>, <nviljoen@meta.com>,
-        Wei Lin Guay <wguay@meta.com>
-Subject: [PATCH 4/4] vfio/pci: Allow export dmabuf without move_notify from importer
-Date: Mon, 16 Dec 2024 01:59:18 -0800
-Message-ID: <20241216095920.237117-5-wguay@fb.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241216095920.237117-1-wguay@fb.com>
-References: <20241216095920.237117-1-wguay@fb.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A0E2010EF;
+	Mon, 16 Dec 2024 10:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734344511; cv=fail; b=laYB8/M4BVTsojh2sgpIk1MNqxZo2g5wwncmXvS43fgFeoek1+syUmXIdThcztFqkl0ytkdgZSA7Z3cYNuHJ2cOAS0RnLtMOBsojOJ9vcXB4vd8tLnODmCLYttbErmjXrwQ2/CzmP70p9Jz6LZeQbfl21+pQnlna9RDISAEyyXA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734344511; c=relaxed/simple;
+	bh=CvwcumhO6zPq38BmkTARCm5R3lMcIHp7Sz9uBvKarSY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oAxvsSo+jSiuAjAalApWjEF5rQlfjDSYW4BnFkEFUPQBHjOfn2uvoqpo9zJpmdIbsYfJwNla8UrVVt9nIqixLIU9Od98WcKa5JH9cZqlIVQs7AFjaNpszgFSAOhUWCh3ZzYh6mnzZcUW3jxjo6khwkqdzM1odLrPhXVb+zRY2Kg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=F40+TpwR; arc=fail smtp.client-ip=40.107.220.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yMhHyz+dJyUH7d+rSZvgHpjhsZeijKk2evxp3CFC5lD8yxh8TWocasaNagVPo5PmRs+cQEEFZz1VHF+pJ5P3WzhPgw8/sRZJYBAJGrGSj1V2Q9PKiMQtuOkjO71dVwBjpwYqoeqel30nCFbr+ED5Nj/+dZwNgqGQAXsAn03m7wovvppQ0w9qIxm8dxM4muqCjnOium3aAF0VDWkUpZEAslRuC0/htVFoSNcKbc6BhNY7b7w1031J0DbYQzhPyYCQPV+p3LeIcHATSDGhSkKzADY5lSY2l9kkk0O8a77m56btweQnnMyg6Puf2res/J/l/tx/5NdDE6vr/b4N/zI0nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=46IYkEOoE7Z7L9QzfxmOohW9pkOy8J+1Lk8p+DUCDZ0=;
+ b=Zq4vsE8QTPPjyCUmw5Drzb62FxGqn5FmqEVglWZAXQCrV4cfDxiKekuXIYtmm+dOpU69zEkf/wYIuUDxfOlR78UfNwh+1KBvNzMOaqJafZbvL/dBW2TDIPr8YaeZsNYeE4YQV9lpRSwUePnGYfEEEXH1+3TFJcvs9mumYkfMVA+dAvEEfDcbAT2d7Vz02KOAl0soZWVbVaOUyk2ew1ogjQ1C4ptjpn6W+JdNXihwgSVadFsIaTryn5Uy5BU64RI418sGYsmuSOBBJWvA899ULH2uTFb0YefHIVlh0zvDRAawOsWy449qh2Vbc8aCB/OecNKXia473fmAhODGHq2MEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=46IYkEOoE7Z7L9QzfxmOohW9pkOy8J+1Lk8p+DUCDZ0=;
+ b=F40+TpwRA5LI5kSTdh/9T18M76GRHYpXbmpM+YW0mhAR7CIgdo3271WPzDRRXQIKiDFRC7XBlmNUV3W3+RX94LxsKTgeR/MAVzhWfqiIA0Jots8OPewU8Rz1998OVDlC0FuY64pccSl7miVSljbByyKlE9xcht8gsdeU8fmlMDk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by SJ0PR12MB8140.namprd12.prod.outlook.com (2603:10b6:a03:4e3::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.21; Mon, 16 Dec
+ 2024 10:21:46 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8251.015; Mon, 16 Dec 2024
+ 10:21:46 +0000
+Message-ID: <89d9071b-0d3e-4fcd-963b-7aa234031a38@amd.com>
+Date: Mon, 16 Dec 2024 11:21:39 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
+ through dmabuf
+To: Wei Lin Guay <wguay@fb.com>, alex.williamson@redhat.com,
+ dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Cc: jgg@nvidia.com, vivek.kasireddy@intel.com, dagmoxnes@meta.com,
+ kbusch@kernel.org, nviljoen@meta.com, Wei Lin Guay <wguay@meta.com>,
+ Oded Gabbay <ogabbay@kernel.org>, Daniel Vetter <daniel.vetter@ffwll.ch>,
+ Leon Romanovsky <leon@kernel.org>, Maor Gottlieb <maorg@nvidia.com>
+References: <20241216095429.210792-1-wguay@fb.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <20241216095429.210792-1-wguay@fb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR5P281CA0014.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f2::7) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: ejnuGihPTJTgBh_Fb4rJsrol0McHBiZb
-X-Proofpoint-ORIG-GUID: ejnuGihPTJTgBh_Fb4rJsrol0McHBiZb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SJ0PR12MB8140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d00e44f-099a-44cb-fd7d-08dd1dbb71dd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YVFYb1d1SXJXTmlaR3V3anBnaG1CVnJvazd6eVVSMS9kQ2FoRVlMeVdUT0xP?=
+ =?utf-8?B?dit0Qm9yaGpxdTh4OHBGVjU2enpUSEJEUFZFR3oxZm81dDArRXVZNHhWdWY1?=
+ =?utf-8?B?SXJIcnU0TVJpRVp2WEJ4WDB3d2EzdldOSFp5MHVxMFQ0QWl4VG5YYWRHaUZE?=
+ =?utf-8?B?QjdNeEFlaHBDWi9NRktuOWlZUll6a0tqamV6VzZSNGxocFl1M1RUaUpJTWRk?=
+ =?utf-8?B?Y3NWbEVNaUtUcEhnWUxLdkdod2JKZkF3VGptZnpIMjFYQ2M5dVNsS08xNHR2?=
+ =?utf-8?B?ckV4dDNGVW1GNnVMYUlMbWg2RHNYQTVJVHpPVWNZeWlQVUlzWlpYWldWWDVa?=
+ =?utf-8?B?cjQ4dmVCNS84TFh6YnF2YlByc2piQVFYc2xnRFJrUmRBc0NCOVFqcGJuakh2?=
+ =?utf-8?B?RTJja1BYZ0ZsM25nYWJaaWZVYStzci9OSHQ2cUNjbGZQazhCMThqVXVhVU12?=
+ =?utf-8?B?bDBFeXY0MVhLNDJMQTNiSTNPL2R5UUQ1eWRlbExzZ1VoNEdFdFpvbWNmTy9t?=
+ =?utf-8?B?d0hJeHB0KzZVMWNWRHFyeEh1Yi9ueVpsaFBadm16QzV4YysrOVhwWXZFWVYz?=
+ =?utf-8?B?QkJOWlM0MkxCdW9WamJON1RIWFBTQzhUNEpFcFJXaUc5ZkYxRkpOWC9JUk5Q?=
+ =?utf-8?B?TlloR2p6RGFFMTNybytzbHFLdHJkMzNNczk1VWVMMnYzZkJJSFBka1ZLdVBi?=
+ =?utf-8?B?K3dXOGkvZUd4RnZnTGZlZ2ZQQnZZL2dodk8vemhScXluamt2bloxT3FPOUdR?=
+ =?utf-8?B?cmkxOXdPZlJOckh1dWJWK0ExbDNrYzA3WkNsV0prWWxCTGRQVU4wZUg3dUhF?=
+ =?utf-8?B?cCtvWUFxZHUzVnNYNHdQa0dmVWQ5cTlUT0lPMFB6SWZWc1RXb1RsL3NHbStq?=
+ =?utf-8?B?Tk0wQkt2NzI0MDdhT3M2eFYyRlY1UndkbnloTWh2RWJlSE5GVnF3aHlmMHhK?=
+ =?utf-8?B?V0ZxV09GcEJyYStiVno1SXViRGw2S1gwRkEwL3MvaWNRWmtubGxVeEUvNXpU?=
+ =?utf-8?B?YjRzL2M0ck1obklMMkljU1lzNHJlQW5kdmgwQzJBWS9WemIyeDBqT242NFNT?=
+ =?utf-8?B?Y2ZaUDVmSlFWOWcyZnlWOXhMMDhZbE42T2owMTRHdGxNNmNLOVdaaWRSOHdV?=
+ =?utf-8?B?a1FYYmtNbE9PcDBkZS9wTVh3ZkFHSGxMYkJsRDk5NFVGdVhRbnM3a3Z5Q1Nl?=
+ =?utf-8?B?SDBrZFgxdkZCa2lqck9oNkxvQVMwWTVmNDdsTGNRbGVxdWRPUlZUdzRhaUxy?=
+ =?utf-8?B?TlIxQ3p6bkIzMjVOR2Z3WUt4YjBDUkhjbElYa1lCWUs5RUpNS0JFODhUZ2lF?=
+ =?utf-8?B?OE9IU1RHSUxEeFp4RDI0QkZRWjVNc3RXZ2pGZVU1US95WWhVUlZ4Mjk1TEgr?=
+ =?utf-8?B?YU9QazRoNFc2cDNaTXY0d3QycHFIWDVXZDdVVEdpQlRsSzVSb2tkU1FtNkYx?=
+ =?utf-8?B?dnl0Z0JqWUFTWlhiQnlvSlB2dTVTa3NaNy9pcG5kK3VqekM3enNKdy9YbzZH?=
+ =?utf-8?B?Rnd0K1JkNFVYMjJTTXNkbFZORUZva2VLblZSVUd2S1F3MllHa0QvRnNUVi9n?=
+ =?utf-8?B?Yy8rN0l1QTQvOUViVWlDVFJVRWVrNFoySVhNL0pzSHNCTGxmVXF1SjBoSkhB?=
+ =?utf-8?B?ekQ5VWptR25ra2JGb0xVU0E3MmpIRzhTSHFZZ0ZyTU1YMHVmSXJWUDlOV2lu?=
+ =?utf-8?B?dzg2eXQ2dktsdUZmTHZ0SGlqL0VMTnl1emxWeGxDMi9Tam05RVEzM3REYXA0?=
+ =?utf-8?B?M0xCdTVFS2VCTzBEemZKVXZZQ1htZDNoQWhXL0VLbTdlZDdVbzR0VXNZL1FK?=
+ =?utf-8?B?MUZETDB0Uk04bTd5S3hocEUzc2piM2xaZkhEd3VQNjl6RDdvamZNd0huenA2?=
+ =?utf-8?B?RUhMUVFYbFhWV284cW5QNjVwYW5GY21SdnFQVDRPQUQxblE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SHJlNGZjUTNrQzVrZUNleFEvNDFCblpoWW5FM1ZjcXoxRkdRd0JMUy82Q3F1?=
+ =?utf-8?B?MVEzd3ZWdWp4S0FoMEhwU0hnb0o1QU9oUmY1eHo3REtSNWtIVzNEOENNa2ow?=
+ =?utf-8?B?Y1VrL2ZZRk5HZlN2OVh6cHlVc3d0T2dDTzJpOEVDUExHR1MvT0hKTzBVQU1M?=
+ =?utf-8?B?OUpBTGdHc0hBWmROb2MwaEtuV0s5T1FEOEhGM2xnMlZYUXhIU2pwWWxyN293?=
+ =?utf-8?B?S3VBd2NWMzh3MXZTcXU0VytLR3UxKzJDTmd3T1lkNkhoZVYxR3VpbjBCQktk?=
+ =?utf-8?B?OEJzQ2pZWkQ0Z3NvOWswQlRGZFpWalJjbFo5dW9vVkJseVFncTNzaW5OSElO?=
+ =?utf-8?B?Vm93bTR5anFTdkc5K042TUVQTUgyN2NlTEtRTElQVU12YlVWNjdoQ0JxWTNJ?=
+ =?utf-8?B?Y3RXdjVuYmtoU3JvdlBwUFM4QVVwMjVWZ0doMFFqMXFuNCtoMWFPRksrNGlx?=
+ =?utf-8?B?Q1NJb1hmMjNVY1Zrb091SVZrOGlES005bm53Y3M4RmhUbGdhU0kyWFp0ME5D?=
+ =?utf-8?B?dTk5b2R1ckRWTlRuek02dUtTdTd6N29xcFhMd3NpamhEbDF0ZVhGckFpdGsx?=
+ =?utf-8?B?MitlT1lSOGtqa1dPZmlwaVZLZ2pZRkRMRjVUbHE1Y2ZNYzNsbktXME5HanFU?=
+ =?utf-8?B?VnFaNW1vQys4UHJiaUp1R2tOMktDamNiakQ5bHlsUWoyK3NybjBiamNieGxu?=
+ =?utf-8?B?N25ZYnMydUJ0UXY5NE8rcEhMV3EzVmxReEVyaTRQVzQwckwxZkM3NTR1RDhC?=
+ =?utf-8?B?UEZXK1ZEKzlBWUJyZy9lUk42aThUZm5mUkNpaGFyVUZmYTc1MFIzbDJFZk9o?=
+ =?utf-8?B?VTI3SHFoU3EzeGFSeGV2SUdvQ0hZZXhpTk1mK2pUS3djeGlva2MxVTVKS1g2?=
+ =?utf-8?B?ZENTUytLdExqSGttR2toL21KM0FudnRZbnZ2aXhxNllLZi9rd3dLWWtGWnRP?=
+ =?utf-8?B?M1c3SEZ5TGkyVy9HOE9oQktBVjVHTzIzcHNlMm1tSWhtd2xxSExDNXpKUldy?=
+ =?utf-8?B?TkJsdDJVdmdSc1FYTnJOaFV2YkVpREZidkRaNFo2YWczWlkyY2pZSEJnSWEz?=
+ =?utf-8?B?Ukd5aitmZFZTd1VkZWZyNmZmbWhRb1graUk2RTNkV3pUc0Q5Y2d0ZEhaamlQ?=
+ =?utf-8?B?WDZCdXlKdWlIdXlIU3NYM1RkMWVMS2N4Z3Q3L29tMW14dWlsS2NsWjUycVYr?=
+ =?utf-8?B?ME5YSGxQTWlnTlM2ZUpLTDdNcG5LYSttMys1MElwMExYMzZKVWwxZTFLWEp3?=
+ =?utf-8?B?ajI5cklIT3B0WTVpRmtHUFNXT09OczkzaE0vY05UNnE1T3U0TzdFMGZwbGRa?=
+ =?utf-8?B?WVBLU3pZazJNSDVDRWZMNFRDMTl5T1pXTlp3WmVDTHdFYXo0YkhweUxjT0Zx?=
+ =?utf-8?B?ZnJSTmxLRFlSd29HcDk5bTM1ZUt2VGFMRHFSY1crK05INGlDZ1BhTDQva0Uy?=
+ =?utf-8?B?VnByeXVjeGFLZmI4R01tNUlTT3NBc1VJNi9icjhjSTMrL0g3QU1ScVJXUHB0?=
+ =?utf-8?B?TUNOVlUrQk1mZ0NraWcvTDY4U1ZQdk1jb25tZGhCUmR5T1B0OUZZTXJQTGZo?=
+ =?utf-8?B?cmhoOS9xL3NtSTVRUy9Ca0xrQmljbngydGtKV1gvdDgrM21CTk9xYTY4MEkx?=
+ =?utf-8?B?MkJQSzliSW9SRmFFZ01kRHFOSDRJYTFENkhGUVVmZWRSd2VneGFmaW5zM0xO?=
+ =?utf-8?B?Q1VFRmtBSkQ3Tm1rMTJWTkFLcUdKeU13SFE1d0dEaWd4Y0ZoMVB5NktwRVBY?=
+ =?utf-8?B?Y2diNE1HUDRTUEF6WFVYU2tNME9NY0h5ZWUwQ3VFM05iZzVnbDZ0a2w1NmRP?=
+ =?utf-8?B?T0ttZU15RVdNdEtyeXRteUNIV1JSQWZWeS9HQ29UWnI2NzNrQWJESytOVkFl?=
+ =?utf-8?B?WkdiU2NRUVNCU1pucGNuZXVtVWgyNDhzOXk3RXpuQlcyUmMzc2RkdEIxRlNh?=
+ =?utf-8?B?SU1mVlB6TEo4RzFPVEVJclRrRzVUcXdwKzd4Z0g4dUdEUDBYTkVKQUNkcjBH?=
+ =?utf-8?B?VG5kdjJ5cXFzanB5K0ZNTUdZN3VsSlc2UFRaNUd2ZEJlbHQrK0F5cXd5L3BE?=
+ =?utf-8?B?c3dWOWd0WXJMWWQ1Y1hQTVdDQzNJL04rZy92WEozRUxXWXU0NkF4S29OdEtD?=
+ =?utf-8?Q?LX93mh259xM9gubwp6qVrgMmh?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d00e44f-099a-44cb-fd7d-08dd1dbb71dd
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2024 10:21:46.5838
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WkYqgi14TwSMqgXESEsE6VtUMjLBW7T11pGuAZoiGYiJM/wNousxU07Fj8rwkeWW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8140
 
-From: Wei Lin Guay <wguay@meta.com>
+Am 16.12.24 um 10:54 schrieb Wei Lin Guay:
+> From: Wei Lin Guay <wguay@meta.com>
+>
+> This is another attempt to revive the patches posted by Jason
+> Gunthorpe and Vivek Kasireddy, at
+> https://patchwork.kernel.org/project/linux-media/cover/0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
+> https://lwn.net/Articles/970751/
+>
+> In addition to the initial proposal by Jason, another promising
+> application is exposing memory from an AI accelerator (bound to VFIO)
+> to an RDMA device. This would allow the RDMA device to directly access
+> the accelerator's memory, thereby facilitating direct data
+> transactions between the RDMA device and the accelerator.
+>
+> Below is from the text/motivation from the orginal cover letter.
+>
+> dma-buf has become a way to safely acquire a handle to non-struct page
+> memory that can still have lifetime controlled by the exporter. Notably
+> RDMA can now import dma-buf FDs and build them into MRs which allows for
+> PCI P2P operations. Extend this to allow vfio-pci to export MMIO memory
+> from PCI device BARs.
+>
+> This series supports a use case for SPDK where a NVMe device will be owned
+> by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+> may directly access the NVMe CMB or directly manipulate the NVMe device's
+> doorbell using PCI P2P.
+>
+> However, as a general mechanism, it can support many other scenarios with
+> VFIO. I imagine this dmabuf approach to be usable by iommufd as well for
+> generic and safe P2P mappings.
+>
+> This series goes after the "Break up ioctl dispatch functions to one
+> function per ioctl" series.
 
-Summary:
-Support vfio to export dmabuf to importer such as RDMA NIC that does
-not support move_notify callback, since not all RDMA driver support
-on-demand-paging (ODP).
+Yeah that sounds like it should work.
 
-There are some use-cases such as bind accelerator that always pinned
-the device memory via vfio and export it to RDMA NIC such as EFA, BNXT_RE
-or IRDMA that does not support ODP.
+But where is the rest of the series, I only see the cover letter?
 
-Signed-off-by: Wei Lin Guay <wguay@meta.com>
-Reviewed-by: Dag Moxnes <dagmoxnes@meta.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Nic Viljoen <nviljoen@meta.com>
----
- drivers/vfio/pci/dma_buf.c       | 32 +++++++++++++++++++++++++++-----
- drivers/vfio/pci/vfio_pci_core.c | 16 ++++++++++++++++
- drivers/vfio/pci/vfio_pci_priv.h |  7 +++++++
- 3 files changed, 50 insertions(+), 5 deletions(-)
+>
+> v2:
+>   - Name the new file dma_buf.c
+>   - Restore orig_nents before freeing
+>   - Fix reversed logic around priv->revoked
+>   - Set priv->index
+>   - Rebased on v2 "Break up ioctl dispatch functions"
+> v1: https://lore.kernel.org/r/0-v1-9e6e1739ed95+5fa-vfio_dma_buf_jgg@nvidia.com
+> Cc: linux-rdma@vger.kernel.org
+> Cc: Oded Gabbay <ogabbay@kernel.org>
+> Cc: Christian König <christian.koenig@amd.com>
+> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Maor Gottlieb <maorg@nvidia.com>
+> Cc: dri-devel@lists.freedesktop.org
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>
+> Jason Gunthorpe (3):
+>    vfio: Add vfio_device_get()
+>    dma-buf: Add dma_buf_try_get()
 
-diff --git a/drivers/vfio/pci/dma_buf.c b/drivers/vfio/pci/dma_buf.c
-index fd772b520cd7..8017f48296cb 100644
---- a/drivers/vfio/pci/dma_buf.c
-+++ b/drivers/vfio/pci/dma_buf.c
-@@ -17,6 +17,7 @@ struct vfio_pci_dma_buf {
- 	unsigned int orig_nents;
- 	size_t offset;
- 	bool revoked;
-+	bool pinned;
- };
+That is usually a no-go. We have rejected adding dma_buf_try_get() 
+multiple times.
 
- static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-@@ -32,17 +33,38 @@ static int vfio_pci_dma_buf_attach(struct dma_buf *dm=
-abuf,
- 	return 0;
- }
+Please explain *exactly* what you need that for and how you protect 
+against races with tearndown.
 
-+bool vfio_pci_dma_buf_pinned(struct vfio_pci_core_device *vdev)
-+{
-+	struct vfio_pci_dma_buf *priv;
-+	struct vfio_pci_dma_buf *tmp;
-+	bool pinned =3D false;
-+
-+	down_write(&vdev->memory_lock);
-+	list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
-+		if (!dma_buf_try_get(priv->dmabuf))
-+			continue;
-+		if (priv->pinned) {
-+			pinned =3D true;
-+			break;
-+		}
-+	}
-+	up_write(&vdev->memory_lock);
-+	return pinned;
-+}
-+
- static void vfio_pci_dma_buf_unpin(struct dma_buf_attachment *attachment=
-)
- {
-+	struct vfio_pci_dma_buf *priv =3D attachment->dmabuf->priv;
-+
-+	priv->pinned =3D false;
- }
+Regards,
+Christian.
 
- static int vfio_pci_dma_buf_pin(struct dma_buf_attachment *attachment)
- {
--	/*
--	 * Uses the dynamic interface but must always allow for
--	 * dma_buf_move_notify() to do revoke
--	 */
--	return -EINVAL;
-+	struct vfio_pci_dma_buf *priv =3D attachment->dmabuf->priv;
-+
-+	priv->pinned =3D true;
-+	return 0;
- }
+>    vfio/pci: Allow MMIO regions to be exported through dma-buf
+>
+> Wei Lin Guay (1):
+>    vfio/pci: Allow export dmabuf without move_notify from importer
+>
+>   drivers/vfio/pci/Makefile          |   1 +
+>   drivers/vfio/pci/dma_buf.c         | 291 +++++++++++++++++++++++++++++
+>   drivers/vfio/pci/vfio_pci_config.c |   8 +-
+>   drivers/vfio/pci/vfio_pci_core.c   |  44 ++++-
+>   drivers/vfio/pci/vfio_pci_priv.h   |  30 +++
+>   drivers/vfio/vfio_main.c           |   1 +
+>   include/linux/dma-buf.h            |  13 ++
+>   include/linux/vfio.h               |   6 +
+>   include/linux/vfio_pci_core.h      |   1 +
+>   include/uapi/linux/vfio.h          |  18 ++
+>   10 files changed, 405 insertions(+), 8 deletions(-)
+>   create mode 100644 drivers/vfio/pci/dma_buf.c
+>
+> --
+> 2.43.5
 
- static struct sg_table *
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci=
-_core.c
-index bb97b4d94eb7..db28fa2cc9a8 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1246,6 +1246,13 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_co=
-re_device *vdev,
- 	 */
- 	vfio_pci_set_power_state(vdev, PCI_D0);
-
-+	/*
-+	 * prevent reset if dma_buf is pinned to avoid stale pinned
-+	 * expose to the dmabuf exporter.
-+	 */
-+	if (vfio_pci_dma_buf_pinned(vdev))
-+		return -EINVAL;
-+
- 	vfio_pci_dma_buf_move(vdev, true);
- 	ret =3D pci_try_reset_function(vdev->pdev);
- 	if (__vfio_pci_memory_enabled(vdev))
-@@ -2444,6 +2451,15 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_=
-device_set *dev_set,
- 			break;
- 		}
-
-+		/*
-+		 * prevent reset if dma_buf is pinned to avoid stale pinned
-+		 * expose to the dmabuf exporter.
-+		 */
-+		if (vfio_pci_dma_buf_pinned(vdev)) {
-+			ret =3D -EINVAL;
-+			break;
-+		}
-+
- 		/*
- 		 * Take the memory write lock for each device and zap BAR
- 		 * mappings to prevent the user accessing the device while in
-diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci=
-_priv.h
-index 09d3c300918c..43c40dc4751c 100644
---- a/drivers/vfio/pci/vfio_pci_priv.h
-+++ b/drivers/vfio/pci/vfio_pci_priv.h
-@@ -107,6 +107,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_cor=
-e_device *vdev, u32 flags,
- 				  size_t argsz);
- void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev);
- void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revok=
-ed);
-+bool vfio_pci_dma_buf_pinned(struct vfio_pci_core_device *vdev);
- #else
- static int
- vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 fla=
-gs,
-@@ -115,6 +116,12 @@ vfio_pci_core_feature_dma_buf(struct vfio_pci_core_d=
-evice *vdev, u32 flags,
- {
- 	return -ENOTTY;
- }
-+
-+static inline bool vfio_pci_dma_buf_pinned(struct vfio_pci_core_device *=
-vdev)
-+{
-+	return false;
-+}
-+
- static inline void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device =
-*vdev)
- {
- }
---
-2.43.5
 
