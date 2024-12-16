@@ -1,128 +1,157 @@
-Return-Path: <kvm+bounces-33878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA33A9F3DA2
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 23:33:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E467A9F3E00
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 00:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F9AE1628ED
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 22:33:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C368116A9F9
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2024 23:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8701D8A12;
-	Mon, 16 Dec 2024 22:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C2E1D90A9;
+	Mon, 16 Dec 2024 23:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bUgJRyml"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rreLxLUj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1280E1D63D0
-	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 22:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819DE1C2443
+	for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 23:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734388408; cv=none; b=nahdPho6F1UpzcLQmHlbotbyUHbV4Vpok1gMOV7BZDQcbprd8WZ3bPQV9K8H2DiNqXldtwG+mchzB0w+CdsFJ6F7acJimMTJa1jC5aLMUGET8icyFBZ9Nx2Q3bzFK9rsHMJ3zE12YMnXcjR/Wgp4THehJxKZoBg+k01iyCdTz9A=
+	t=1734390349; cv=none; b=QH77mwyo+kDp2mHk1cFdbtqlBE7qi1DdLQlWeh9Cw4H0dxoGSoZdPxILaBUKpT6E/XCAlLbvhiBQpSqw1FDH4rbNuox7syl+w/PtSfBfCoUPkfQmWsgiHeUgCLR11H4XC8vGFa5ELK6r0Mn3vPXGGgZw3jg0Sv4ndpYKvyB/4uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734388408; c=relaxed/simple;
-	bh=AQ6L0FE4N7ae+Cg2Eu7wbgOie9mHJiVhQr34moiqfqI=;
+	s=arc-20240116; t=1734390349; c=relaxed/simple;
+	bh=/CZU2qilU52W3Yy/AO6zdTEIKuU4RdrYP5QOXhyd4Ds=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=RVBr1YMstbHizWKDqlM28A9i/DGildA+WpkE3jw0GK7r4ZU0d4So8iP6wA/H6Qzc2xAahlVfQ25X7NBQSbUolXh5K7HEQclx7MwI/yWO/Ny4/9+IECTEKrjPQXaKsSRJrYQd3yTTCQWHLKy6mDlrCGjz7/ufmTOZW3X6/QrOKm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bUgJRyml; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=D4i/muWwGt/n1LojetBp2zzSNazaI/ESbJ3aU+7wRExkYT9vvGm/jrwaLb2edwknpqA5Ine1w03PBKb7Vp8hmCkfIXIpdexPvjXub7nilaBp9/Y6p/HYF7ku/uOLb7NxmxKCW2SDxJhiO1lw+t9Qae9E+Vqh/0NU/F6ahEurehs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rreLxLUj; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee86953aeaso4067022a91.2
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 14:33:26 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725cab4d72bso3581354b3a.2
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 15:05:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734388406; x=1734993206; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9jJCzoGzQp+cdjga58qGUwc3ffJR9vhNALvR1f7QLKI=;
-        b=bUgJRymlxUYtLkubw2seHPAskoB6hY8bgUddpHzw1r6UwGxxMKD3Jtf8AfaAPrIu1n
-         73jHT+y6D8Z8QfDC2wqSVn9L0nSFBnhkO2HK0lrmhwkuGBpM10ecYCQN+aVg3Bh9q81n
-         4jyfGxceCKVMKZw0LirEBk+iYusKf5bFAzigNM+Nuq8vZAhEWEZIRomgUHhLpmy0njKT
-         Ga6kWyQZ95nn6fp0gbU4IUIDDStPM1ol56mXtBY4tHpkXrFdKK/trrddUY1VyU8nMQ3R
-         xWUAz9PiZeGC6gxn0N1pd+f9jrh8uYyvrkeqEedR2+S4NkWh3AcYHL/mcAiQf0cTkfuD
-         eLuQ==
+        d=google.com; s=20230601; t=1734390347; x=1734995147; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PPJ0WAdgf7OkLCa8bcCnWwCBX5F1e7NxMFOdjOrU2OQ=;
+        b=rreLxLUjAFCkVhBYMjMkWDyyzgX5DQj8gaLJPBJ9F9VLOKfvHedkr42BK8J82ChEkv
+         kTWiLSkqVyijsOYjhhzlDn82BKFZ80VwnXFrKsDgTKmhcDBNE0Q2JwsS7SbUaIbt71Bg
+         o0BdX7UybBj+uhe6Kb8lTR/XLNgLWhWTPW4z/5oCnm8uVV06d5Ye8arms0MMH9GaB6gd
+         0BKGEzEH+7fG1f5FvxU43ITMktRwBMCdHlFAzaFuq1ehhQy3QsWOOubRCC0qUhIAvsz6
+         jpws9hVWf5Tt44NliuiNLEaVRs5M7vtSLDO/xrxdLgpHwh0mLhwRkQV6gieUHFGr25hW
+         eq/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734388406; x=1734993206;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jJCzoGzQp+cdjga58qGUwc3ffJR9vhNALvR1f7QLKI=;
-        b=UY+bo06cv+b7uFgpQ8UfrUQ6QiCAUcxDKRHCGEEEscD24tvMREeZgCRh9p8eeYwmES
-         J3fdPTvSmCqOuFX5YM7V1kOPL0PpL1Cob3L+pcpDXcddwj7ej9FzwuiT88KRa78p65XP
-         7uvR65DSRTUIbHvt+DOOEi1WbV8/aztoHQ1Ke0B1wE0lFVRwIAnpmjtGENzOyj6IW9af
-         Z8uqvYNEOIao2sGTW9OIXc7QnOVIUZJFtEbvYuDfZg59UWrbl5iDNV+6FSf5/81HsrM7
-         XyeJ+iQz2lXGYsrPJvCdubv95KqrOJPTfGnPNv3VN5IQWbPghM3HB6KfEzqPLVJtkzz2
-         l0vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVerJe4gDDeCnd2i2reie/ChVpUjBkDzackiNO6eJB/fJw5is7yX+SDMjQarm6V65jiUjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWtwp5IWWrrQx2qA8DVpccqFQKIgNnVG77bBChimvi22w3zg2d
-	eusp4Jl7HCFUOtEJ8YCVepaTOGgvr8Q1trX2yvWoXlsX10gu85is6y06s5+z0u6pCKh6uflskbg
-	pPw==
-X-Google-Smtp-Source: AGHT+IHhtWHdid0XDbI59B1aoA+CN7rFIH/zmVAk3APPQqAwY7oJZB6TaL0aH/5JThWes+dWQrGdtB7EGl0=
-X-Received: from pjd5.prod.google.com ([2002:a17:90b:54c5:b0:2ef:8eb8:e4eb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c887:b0:2ee:6e22:bfd0
- with SMTP id 98e67ed59e1d1-2f2d7eece80mr1530327a91.21.1734388406334; Mon, 16
- Dec 2024 14:33:26 -0800 (PST)
-Date: Mon, 16 Dec 2024 14:33:24 -0800
-In-Reply-To: <20241128005547.4077116-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1734390347; x=1734995147;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PPJ0WAdgf7OkLCa8bcCnWwCBX5F1e7NxMFOdjOrU2OQ=;
+        b=odgHVyUvCbXgAxQn1fqHl6hPXtDNPrPyAa7AG7lp72PhPsNcvrkYQHa0rf+Na+/iym
+         prgg7TqULtBw/gnKOZ8HFju+9I2sPPvj8Ol2Vzoqt8IEAQrrClZfjqj2SvzScz5GvonJ
+         wj+kxBQyUc9NSD1kFp/gQSPoUi/OaWx3JkyYpMCs8UZWhahNYnovUkTVKzHqTZgl9gKM
+         125wyUKF+M1//prKVcEp4O+hT7CVpINa89bQrBHTgbix4n61CuGfYctGrxA1+wwks/1q
+         UCCQ2uq41RhCdgqfXexUZDvO/SBxrRtNvrPGH5hhwoKEnZ3/oWeI0oYLlGeQkFCrOKH1
+         VIXg==
+X-Gm-Message-State: AOJu0Yy8FoQsz7BaTAF616/5nag0szS8ed2Mw7yqbjaVu2B4lQh2zZBH
+	fIpeHTJsyC72qrr1l9RKZ7sOMFlPFApxL5/iwepRigboPwwTgEH8/q1NRxiywvLAx0D2RhK9ZRW
+	2jQ==
+X-Google-Smtp-Source: AGHT+IEMZqtcQtp95LRMQYHysa5Xvsj6OG23GJvw2DUU0qnuBEdP/5dEVz6RoR8u71rW4iq3bNrPmEAD0Pg=
+X-Received: from pfmx2.prod.google.com ([2002:a62:fb02:0:b0:725:936f:c305])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a11:b0:1e1:aef4:9ce8
+ with SMTP id adf61e73a8af0-1e1dfe6a00bmr22630610637.28.1734390346831; Mon, 16
+ Dec 2024 15:05:46 -0800 (PST)
+Date: Mon, 16 Dec 2024 15:05:45 -0800
+In-Reply-To: <8889dc3b-d672-41c3-8d11-e88861b7b38e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241128005547.4077116-1-seanjc@google.com>
-Message-ID: <Z2CqtL1R0-368hO-@google.com>
-Subject: Re: [PATCH v4 00/16] KVM: selftests: "tree" wide overhauls
+References: <20241009150455.1057573-1-seanjc@google.com> <20241009150455.1057573-5-seanjc@google.com>
+ <1baf4159-ce53-4a75-99bf-adf4b89dd07b@redhat.com> <ZwgTUNCOIh2xwU6e@google.com>
+ <8889dc3b-d672-41c3-8d11-e88861b7b38e@redhat.com>
+Message-ID: <Z2CySZTaW8CXPmEP@google.com>
+Subject: Re: [PATCH 4/6] Revert "KVM: Fix vcpu_array[0] races"
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Andrew Jones <ajones@ventanamicro.com>, James Houghton <jthoughton@google.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Will Deacon <will@kernel.org>, Michal Luczaj <mhal@rbox.co>, Alexander Potapenko <glider@google.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 27, 2024, Sean Christopherson wrote:
-> Two separate series (mmu_stress_test[1] and $ARCH[2]), posted as one to
-> avoid unpleasant conflicts, and because I hope to land both in kvm/next
-> shortly after 6.12-rc1 since they impact all of KVM selftests.
-> 
-> mmu_stress_test
-> ---------------
-> Convert the max_guest_memory_test into a more generic mmu_stress_test.
-> The basic gist of the "conversion" is to have the test do mprotect() on
-> guest memory while vCPUs are accessing said memory, e.g. to verify KVM
-> and mmu_notifiers are working as intended.
-> 
-> The original plan was that patch 3 would be a single patch, but things
-> snowballed in order to rework vcpu_get_reg() to return a value instead
-> of using an out-param.  Having to define a variable just to bump the
-> program counter on arm64 annoyed me.
-> 
-> $ARCH
-> -----
-> Play nice with treewrite builds of unsupported architectures, e.g. arm
-> (32-bit), as KVM selftests' Makefile doesn't do anything to ensure the
-> target architecture is actually one KVM selftests supports.
-> 
-> The last two patches are opportunistic changes (since the above Makefile
-> change will generate conflicts everywhere) to switch to using $(ARCH)
-> instead of the target triple for arch specific directories, e.g. arm64
-> instead of aarch64, mainly so as not to be different from the rest of
-> the kernel.
+On Sun, Oct 20, 2024, Paolo Bonzini wrote:
+> On 10/10/24 19:48, Sean Christopherson wrote:
+> > On Thu, Oct 10, 2024, Paolo Bonzini wrote:
 
-Paolo,
+...
 
-Unless you or someone else have concerns, can you apply this to kvm/next sooner
-than later?  I'd like to start applying selftests changes for 6.14 and don't want
-generate conflicts, and I really don't want to have to rebase and push this series
-out again.
+> > > > @@ -4298,12 +4299,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+> > > >    	kvm_get_kvm(kvm);
+> > > >    	r = create_vcpu_fd(vcpu);
+> > > >    	if (r < 0)
+> > > > -		goto kvm_put_xa_release;
+> > > > -
+> > > > -	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+> > > > -		r = -EINVAL;
+> > > > -		goto kvm_put_xa_release;
+> > > > -	}
+> > > > +		goto kvm_put_xa_erase;
+> > > 
+> > > I also find it a bit jarring though that we have to undo the insertion. This
+> > > is a chicken-and-egg situation where you are pick one operation B that will
+> > > have to undo operation A if it fails.  But what xa_store is doing, is
+> > > breaking this deadlock.
+> > > 
+> > > The code is a bit longer, sure, but I don't see the point in complicating
+> > > the vcpu_array invariants and letting an entry disappear.
+> > 
+> > But we only need one rule: vcpu_array[x] is valid if and only if 'x' is less than
+> > online_vcpus.  And that rule is necessary regardless of whether or not vcpu_array[x]
+> > is filled before success is guaranteed.
+> 
+> Even if the invariant is explainable I still find xa_erase to be uglier than
+> xa_release, but maybe it's just me.
 
-Thanks!
+It's uglier, but has the distinct advantage of not being broken :-D
+
+And while uglier, IMO there's value in having a way for fuzzers to test KVM's
+online_vcpus logic.  As evidenced by patches 1-3, accessing vcpu_array[] without
+first checking online_vcpus is dangerous regardless of how vcpu_array[] is populated.
+
+Allowing fuzzers to trigger removal vcpu_array[] in KASAN kernels provides meaningful
+coverage for that code (see Michal's original bug report).   While well-intentioned,
+Michal's change in afb2acb2e3a3 simply blamed the wrong code.  Denying ourselves that
+coverage and carrying flawed code just because the correct code isn't the prettiest
+doesn't seem like a good tradeoff.
+
+> The reason I'm not fully convinced by the explanation is that...
+> 
+> > I'm not concerned about the code length, it's that we need to do _something_ if
+> > xa_store() fails.  Yeah, it should never happen, but knowingly doing nothing feels
+> > all kinds of wrong.
+> 
+> ... it seems to me that this is not just an issue in KVM code; it should
+> apply to other uses of xa_reserve()/xa_store() as well.  If xa_store() fails
+> after xa_reserve(), you're pretty much using the xarray API incorrectly...
+> and then, just make it a BUG()?  I know that BUG() is frowned upon, but if
+> the API causes invalid memory accesses when used incorrectly, one might as
+> well fail as early as possible and before the invalid memory access becomes
+> exploitable.
+> 
+> > I don't like BUG(), because it's obviously very doable to
+> > gracefully handle failure.	
+> 
+> Yes, you can by using a different API.  But the point is that in the
+> reserve/store case the insert failure becomes a reserve failure, never a
+> store failure.
+> 
+> Maybe there should be an xa_store_reserved() that BUGs on failure, I don't
+> know.
+
+I agree a version of xa_store() that guarantees success would be nice to have,
+but I'm not exactly eager to potentially start a fight Willy *and* Linus :-)
 
