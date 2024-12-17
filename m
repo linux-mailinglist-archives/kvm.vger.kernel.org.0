@@ -1,198 +1,130 @@
-Return-Path: <kvm+bounces-33994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA4EF9F55E0
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 19:18:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B33C9F55E2
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 19:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23045161E52
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 18:18:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D75F4164C00
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 18:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332641FA260;
-	Tue, 17 Dec 2024 18:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4781F8AD9;
+	Tue, 17 Dec 2024 18:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kg3lP7/Z"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="DlxnkylK"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C925C1F8AEC;
-	Tue, 17 Dec 2024 18:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A001F8691
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 18:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734459331; cv=none; b=qSE4KdURYSIfI/xtH4AijpoLO+AMv5lxzR6ydOulDa9yWS34w0q7eHpoVT7yBUKHHxIuqZV7qQcNrwQm5z39HJY6VSk9wcKx1ey3nypP4i3Ve2OWob2y2xabpOJx28m3wXfXWj4fl5paUCCD1EBy6qAe07gI0lKzW3PazzVbssE=
+	t=1734459502; cv=none; b=Y8vA8+UxMWOZOw/cE0wPB2T5wxbGjrJwQUdlTBepD/E1t6huNNzNFJ50c2pcnd+zTc2K4rkDj+wXWhcLcMlTce8mwkJLPcyaTzv2DyaZ24pAo4/IuaUblkPtPh5JegV7j2pb4vXlDWTNFEJJKkiBt5vKhugztm/L7wH86mZKXAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734459331; c=relaxed/simple;
-	bh=m06ZpDC3ycQiyX/+jlw0dUpUrcyKmws5uuBN48CVKV0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JF+u2pZsqfMy6FTUQ3za/OtOhA9OYwwrr0yXUNbZlgpfiqIrAqX4q4lT2JhGZfJjHOBkhdW00SA/9sCC0F6KEb+DOI1SWlSBvzkwehiGpNkrUMN6zHW60RuoUyhQaNDdX9/dn1eoA7BeoZ9EeaK9hVHV+EmLPIQpoL4mWTaBL44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kg3lP7/Z; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734459330; x=1765995330;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S/cIqhO28REfnE/vFnzIeOr5dRvBYI+ntt7bRR/bpmY=;
-  b=kg3lP7/ZM7ZGkqJKMVT1OVhRLKPGTAOjMxsk3Hxf7miVHrLFwNi1Sd0H
-   SLjgWyO8twxBkcq8fBEx1tP7pXF+G8D3R/Gqn6icMbIUkGLGv3FXHstTk
-   uLfRx/RGZBvi+AVNwM43Ir0pcVNE8kzNNGEef932AqS5i/M2QANTmxsKs
-   g=;
-X-IronPort-AV: E=Sophos;i="6.12,242,1728950400"; 
-   d="scan'208";a="361530438"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2024 18:15:27 +0000
-Received: from EX19MTAUEC002.ant.amazon.com [10.0.29.78:18585]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.88.227:2525] with esmtp (Farcaster)
- id 9034aab4-d5a5-48ae-aaf5-29c92cc03174; Tue, 17 Dec 2024 18:15:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 9034aab4-d5a5-48ae-aaf5-29c92cc03174
-Received: from EX19D008UEC002.ant.amazon.com (10.252.135.242) by
- EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 17 Dec 2024 18:15:22 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
- EX19D008UEC002.ant.amazon.com (10.252.135.242) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 17 Dec 2024 18:15:22 +0000
-Received: from email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Tue, 17 Dec 2024 18:15:22 +0000
-Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
-	by email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com (Postfix) with ESMTPS id 38EFFA0790;
-	Tue, 17 Dec 2024 18:15:20 +0000 (UTC)
-From: Ivan Orlov <iorlov@amazon.com>
-To: <bp@alien8.de>, <dave.hansen@linux.intel.com>, <mingo@redhat.com>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
-	<tglx@linutronix.de>
-CC: Ivan Orlov <iorlov@amazon.com>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<x86@kernel.org>, <dwmw@amazon.co.uk>, <pdurrant@amazon.co.uk>,
-	<jalliste@amazon.co.uk>
-Subject: [PATCH v3 7/7] selftests: KVM: Add test case for MMIO during vectoring
-Date: Tue, 17 Dec 2024 18:14:58 +0000
-Message-ID: <20241217181458.68690-8-iorlov@amazon.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20241217181458.68690-1-iorlov@amazon.com>
-References: <20241217181458.68690-1-iorlov@amazon.com>
+	s=arc-20240116; t=1734459502; c=relaxed/simple;
+	bh=7z5UD01m+BMZRZdko2viTt+Edc9+VFcuJb9yDHIzrgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ENhfo3sSKiITV/o4+4TmwHeoEm7vUxCra1TEUIiIzWVgcsA15KSh1Z5si6Zsg1ZQF3lZyq8a/ye44pw2V5EThz0UXmDTMFMYMX/AHUme/B6116jCI798b2Mjtvs9cv8Nl6z+igZFj8rnEOiGaaYzexj4Hy18ik1ptpnWMT3ITtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=DlxnkylK; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=y9lH
+	6rj0++VWbw14s+yHgf4Y2V3DFMzP2Oa4flb5k0o=; b=DlxnkylKrScDpOtpacem
+	sSZzh2U2rL9X+2Mnqmxth8WDbvATJvAr62gAQse0tGlQFnw+njIcbfA1xNoBy7Pg
+	zqWq2ibHRkfCd3u54Dy1xR0g0sUFZPqRs6B5TPB847TePwmndkw7HFpesG2XehZR
+	ODA1byktlaccsE/IQYvYwDnbggMPpCtpkjI38PfZNOyThy8b0k+giRLqezp/MLlR
+	XQ6Y+hFYsPcX3npibQR73RTagAVhjQD/bKdOUYkYA9me4fUmpLN5zM8JmvLiv2/d
+	uO9cg0k7uiITEGcASPqfUpwLJV/bQyWx5jpaPclmCZ7s7NEVMVUXX0VVPJ0CMln6
+	AA==
+Received: (qmail 4172729 invoked from network); 17 Dec 2024 19:18:11 +0100
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 17 Dec 2024 19:18:11 +0100
+X-UD-Smtp-Session: l3s3148p1@FwHfUXsp2rkujnsY
+Date: Tue, 17 Dec 2024 19:18:11 +0100
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [PATCH] KVM: VMX: don't include '<linux/find.h>' directly
+Message-ID: <Z2HAY3rDzUMVmGZW@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+References: <20241217070539.2433-2-wsa+renesas@sang-engineering.com>
+ <Z2Goxx27WL-G-13y@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="o97KPok2X6w3MXQH"
+Content-Disposition: inline
+In-Reply-To: <Z2Goxx27WL-G-13y@google.com>
 
-Extend the 'set_memory_region_test' with a test case which covers the
-MMIO during vectoring error handling. The test case
 
-1) Sets an IDT descriptor base to point to an MMIO address
-2) Generates a #GP in the guest
-3) Verifies that we got a correct exit reason and suberror code
-4) Verifies that we got a corrent reported GPA in internal.data[3]
+--o97KPok2X6w3MXQH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Also, add a definition of non-canonical address to processor.h
+Hi Sean,
 
-Signed-off-by: Ivan Orlov <iorlov@amazon.com>
----
-V1 -> V2:
-- Get rid of pronouns, redundant comments and incorrect wording
-- Define noncanonical address in processor.h
-- Fix indentation and wrap lines at 80 columns
-V2 -> V3:
-- Move "NONCANONICAL" definition to the beginning of the file
+> I definitely don't object to the KVM change, but the if y'all expect developers
+> to actually honor the "rule", it needs to have teeth.  As evidenced by a similar
+> rule in arch/x86/include/asm/bitops.h that also gets ignored, an #error that's
+> buried under an include guard and triggers on a macro that's never #undef'd is
+> quite useless.
 
- .../selftests/kvm/include/x86_64/processor.h  |  2 +
- .../selftests/kvm/set_memory_region_test.c    | 51 +++++++++++++++++++
- 2 files changed, 53 insertions(+)
+I went for the minimal change here. But if agreed, we could change
+bitmap.h to the pattern spinlock.h is using. Similar to your suggestion,
+yet with more readable names IMHO:
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 69938c649a5e..6b8d12f042a8 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -29,6 +29,8 @@ extern uint64_t guest_tsc_khz;
- #define MAX_NR_CPUID_ENTRIES 100
- #endif
- 
-+#define NONCANONICAL 0xaaaaaaaaaaaaaaaaull
-+
- /* Forced emulation prefix, used to invoke the emulator unconditionally. */
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index a1c53cc854a5..d65a9f20aa1a 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -553,6 +553,56 @@ static void test_add_overlapping_private_memory_regions(void)
- 	close(memfd);
- 	kvm_vm_free(vm);
- }
-+
-+static void guest_code_mmio_during_vectoring(void)
-+{
-+	const struct desc_ptr idt_desc = {
-+		.address = MEM_REGION_GPA,
-+		.size = 0xFFF,
-+	};
-+
-+	set_idt(&idt_desc);
-+
-+	/* Generate a #GP by dereferencing a non-canonical address */
-+	*((uint8_t *)NONCANONICAL) = 0x1;
-+
-+	GUEST_ASSERT(0);
-+}
-+
-+/*
-+ * This test points the IDT descriptor base to an MMIO address. It should cause
-+ * a KVM internal error when an event occurs in the guest.
-+ */
-+static void test_mmio_during_vectoring(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	u64 expected_gpa;
-+
-+	pr_info("Testing MMIO during vectoring error handling\n");
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_mmio_during_vectoring);
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 1);
-+
-+	run = vcpu->run;
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTERNAL_ERROR);
-+	TEST_ASSERT(run->internal.suberror == KVM_INTERNAL_ERROR_DELIVERY_EV,
-+		    "Unexpected suberror = %d", vcpu->run->internal.suberror);
-+	TEST_ASSERT(run->internal.ndata != 4, "Unexpected internal error data array size = %d",
-+		    run->internal.ndata);
-+
-+	/* The reported GPA should be IDT base + offset of the GP vector */
-+	expected_gpa = MEM_REGION_GPA + GP_VECTOR * sizeof(struct idt_entry);
-+
-+	TEST_ASSERT(run->internal.data[3] == expected_gpa,
-+		    "Unexpected GPA = %llx (expected %lx)",
-+		    vcpu->run->internal.data[3], expected_gpa);
-+
-+	kvm_vm_free(vm);
-+}
- #endif
- 
- int main(int argc, char *argv[])
-@@ -568,6 +618,7 @@ int main(int argc, char *argv[])
- 	 * KVM_RUN fails with ENOEXEC or EFAULT.
- 	 */
- 	test_zero_memory_regions();
-+	test_mmio_during_vectoring();
- #endif
- 
- 	test_invalid_memory_region_flags();
--- 
-2.43.0
+#define __LINUX_INSIDE_SPINLOCK_H
 
+...
+
+#undef __LINUX_INSIDE_SPINLOCK_H
+
+Happy hacking,
+
+   Wolfram
+
+
+--o97KPok2X6w3MXQH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmdhwF8ACgkQFA3kzBSg
+KbaosA/+IQZ34X/KeM5qWpQfbE/EOZqrjrnixGoL6kBfYn8LMjMLdRWMf42GuRYQ
+QTlQ/qPYma4fhV0bL5c27YSszvxQi85/SbvXnVSnDED75890loGGlfwDf/Wo5w5W
+27gbogs8LEMBiw6Mtv8IN1aqRbw+Geg4jfo60cf684EwR4X79BZnjcUXBRec1jIJ
+/6Pv245ecFCn3Dca0gL2eI7ziTzkXzYHp4bAw+bNbc3pwLpaKUpci87OkwY32SXN
+XN9nMhrXzMGoTUK3Blqc4C6IGMWqJ7gaOFJmIcgGVM9u+/Oy8NCcGmxH/+l7K1im
+f10GdaHmaGkDv1H8Tt/mZ9WyuNV0rqi00BzdfSH/9b2Jb+KG0tNXNMIwxGzd/fpL
+ZKJIm1s7UGtHi+EvLKZ0adxRwmgTJRuP8OjiTtXAeBw1KYa09WhIEiWgWjcaIK2r
++Mqicw1H0uAsVBEBavmI9tcO3sSjkmZmk50EtM4syk2+7EuUaTlwWT6teU5hzEyZ
+ioelFfQOGrjVnlrEx09UmDvGdwL/aMi5UG58cRvNYtve5jS82mX0iVEWFYsXYEzZ
++LWoPPMmekqXzISO/QeT78cvw7v4dpp+hRbBLr8HsTD//deKJeI0zulFaXQKkKUm
+Yw2YbUiIA7cI+SUEyCR9/iadZuU6hsFguTNqHRN8J0QiAyRXn8E=
+=bo/a
+-----END PGP SIGNATURE-----
+
+--o97KPok2X6w3MXQH--
 
