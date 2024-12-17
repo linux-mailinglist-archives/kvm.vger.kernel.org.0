@@ -1,103 +1,116 @@
-Return-Path: <kvm+bounces-33975-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33976-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090B19F504F
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 17:07:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD869F5066
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 17:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5DBA7A488B
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 16:06:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238801886C48
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 16:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8C81F9A98;
-	Tue, 17 Dec 2024 15:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E0B1FAC4C;
+	Tue, 17 Dec 2024 15:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL8fTSN2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9NN28U+"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3431F75B7
-	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 15:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091A21FA8FB;
+	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734450760; cv=none; b=o/Qoj3lCucIJHWXMaDN/tONkV0/d6rXw3ussRNF+8MZNFAKJSbghwP6lr55CNcjDzaO4NTgsgs+19yq5PgB0w4qvoFDdLwZP1LvA8EDTZZQATl5AhsnE+iCDp4OF2c5oENeUwvIg/t5rQLHF6pl9aAJCO9/d25BqgK3yU/519bw=
+	t=1734450961; cv=none; b=nFi/1+307g+zLhnG1uv/P4G/+kbqJRhfmtOhthJwWW9dvOLi46769bzmqW/CCQV6/18KCfkwJcLF4mxBpfdgW9HHtXNNMQDgBSr6J6hkrxFkBmL7VGTo74U+9Yqt1SDwdk+mrMCFEAc7zliwZGgKRopT6yKBONkJtjY4aLjeyFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734450760; c=relaxed/simple;
-	bh=JZij+wD+aNQXqNIXiQsIf0+y4ig+Hkuohj66YlIjbPQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VPgrtdTZ20WZZGUMI2srCwkwuOnaMdHZ0eXxoUQdr5uNSJUJoZ3GJBgS682SAfinjDeuoVuSYAoEWuYKBB5tJ5AERPDMFfAc29LEGEe0kniQo0LGziGugbFGzPsfXY06UqbWBD5/gOmUWkzmzota+cBH6w/w1GJRAEAaS8gH5k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL8fTSN2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ECE3DC4CEDE
-	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 15:52:39 +0000 (UTC)
+	s=arc-20240116; t=1734450961; c=relaxed/simple;
+	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j/p7FXqNDSYY01o6xeStCoBMm5d/psYChGLr1yQbYuiE9AMrhk+5kr3aIPBMKxI+TQuxRMT+LW27FMzMVb99mRvRZ/LYJPLNm00gx5mVm6c6BA3ZkBYFvUz1kBVlf+A15eoBc7IlUZ/EbdbG5VRxO6j5TwG1O88KrXiCUbWxkew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9NN28U+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F3FC4CED6;
+	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734450760;
-	bh=JZij+wD+aNQXqNIXiQsIf0+y4ig+Hkuohj66YlIjbPQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ZL8fTSN2PxPtMMPC21WYYZz8bipy5W7XXjFhMH3smAaH2eDp+7taInMHtP0v8vfiH
-	 1mw8NfgEyPpfDdA6uKDR9zWtzE6FKYLXqIxb9qKQBSt5PilgNPsNHiXnqRJWuTEoAA
-	 HWoIsydB/Npvr+Sxa5mzmCvgRRjE/UTxeL5182S2uFyTA2Rd83VS6DSRr5jQyhrx/O
-	 wZ//UGsKje0AeCpMJk/dOzcExw8oQV+tN7/dCjzOwkCQIKHCB8nKu05Mwukmq0VAjL
-	 dIpBKn/1spSUqfe2M4gih+4cWsm1TW2FEVI1huxfxEWQG5/k51C3mkLEgl07J8fRoU
-	 r7a/gPZhvCScg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E0791C41606; Tue, 17 Dec 2024 15:52:39 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219602] By default kvm.enable_virt_at_load breaks other
- virtualization solutions
-Date: Tue, 17 Dec 2024 15:52:39 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: acmelab@proton.me
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219602-28872-7SvCKPgI24@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219602-28872@https.bugzilla.kernel.org/>
-References: <bug-219602-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1734450960;
+	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=L9NN28U+JGrpcx/66+ZeOSHqeE5mltmLAXtDfsyUVLMgujnJaPgOXjpeBBZzyWegm
+	 4/YJfQgDBcVPsa9H2WCm7nAwVJREzYYrFAeFwM6ikVbDDaNb4TPPrj5SSktawWRqog
+	 8MET55XR+pb5FyIpMszmUPrwj30RT8RNaUqR0qaGLioxAriRg5DNh59XL3nw8KJtpt
+	 11RhM4FjCGzUco4J9T42f3Th7kK/i8oJppgL9TcZsnpPWXvn6R8eQ+CqiMwatrS1EZ
+	 ERxoq6hpdlPQ0fen7uh2F5IHIUV5vhkNNyOkNO0Pcl4fQFSbzZ5qwM3QA9yoUnGSAY
+	 udLrLtIhRiGqA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tNZvS-004cWL-OM;
+	Tue, 17 Dec 2024 15:55:58 +0000
+Date: Tue, 17 Dec 2024 15:55:57 +0000
+Message-ID: <86o71aqp6a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
+In-Reply-To: <b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
+References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
+	<875xnisocy.wl-maz@kernel.org>
+	<53b40aa8-f51c-4c4e-a4ad-e6a9512e5197@sirena.org.uk>
+	<86v7viqusg.wl-maz@kernel.org>
+	<b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219602
+On Tue, 17 Dec 2024 15:10:28 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Tue, Dec 17, 2024 at 01:54:39PM +0000, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > > The selftests are shipped as part of the kernel source and frequently
+> > > used for testing the kernel, it's all one source base and we want to
+> > > ensure that for example the test fix gets backported if the relevant
+> > > kernel patch does.
+> 
+> > That's not what Fixes: describes. If you want to invent a new tag that
+> > expresses a dependency, do that. Don't use these tags to misrepresent
+> > what the patches does.
+> 
+> No, this isn't a new use - a Fixes: tag indicates that the referenced
+> commit introduced the problem being fixed and that is exactly what's
+> going on here.  Like I say the selftests are not a completely separate
+> project, they are a part of the same source release as the rest of the
+> kernel and it is helpful to track information like this.
 
---- Comment #2 from Pinky (acmelab@proton.me) ---
-(In reply to hch from comment #1)
-> On Mon, Dec 16, 2024 at 09:15:22AM +0000, bugzilla-daemon@kernel.org wrot=
-e:
-> > Previously (kernel 6.11 and lower) VMs of other virtualization solutions
-> such
-> > as VirtualBox could be started with the KVM module enabled.
->=20
-> There is no other in-tree user of the hardware virtualization
-> capabilities, so this can't break anything by definition.
+Well, we'll have to agree to disagree.
 
-That sounds like a dead-end argument to me. What is the use case for this n=
-ew
-feature actually? What would be the disadvantage to turn this off by defaul=
-t?
+	M.
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+-- 
+Without deviation from the norm, progress is not possible.
 
