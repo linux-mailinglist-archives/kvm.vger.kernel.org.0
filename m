@@ -1,139 +1,169 @@
-Return-Path: <kvm+bounces-33913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255EF9F47A8
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 10:35:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B3F9F47C9
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 10:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D8361886723
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 09:35:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07FDA1883BA3
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 09:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2EA1DE2B3;
-	Tue, 17 Dec 2024 09:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5421DED56;
+	Tue, 17 Dec 2024 09:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="eLs4+xIM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XfL3iiSm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3393D69;
-	Tue, 17 Dec 2024 09:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F831D45EF
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 09:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734428105; cv=none; b=QzRgBv37wvrsuekYwI/KX3jXLSUnFPBzrdv6ITI6vEKDpaqE1SBCVsEYizy8f835LBUBlR5i0nhjLkbrdU710kSZx5prQharsk4rqgkofthNXoCe0KOL6fVdZKxVuD8HMyYiFHkdKf+UvbojSjqr1YPQO9Bc0i+CVh+M7KrkGSY=
+	t=1734428510; cv=none; b=BFveo3gDVxfJwBZAaxf1gG491psJi+/3XOOOpjeoQwQvqVvZeGNNVsLh2Ke4WqLHWd0tNaDHXGiuZcGzaxq0avMQndvNJgAxLHdnHoiN6ODVzPNNT0KjckWlw6kxu5Z5l28wHvkdxVBkliRzGirfMr6IEKGSUaM1XIMhV1PspaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734428105; c=relaxed/simple;
-	bh=1AJeEumsisBIcR+JufyuUwYLbSkLC/Ur83iQEoQOhe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MP+yUHsrdu4j4h/Gb4BAfxbit0xov8wZZVgTt4u4ocMZu3SaXDqDYt2mRjgZBYKu4vbjWMgrpAq/H1EkWEX7irtJ4so40j3bqoLwVkkZlfvTBmsT9nYJ0C17ZmubLn9iApzpUx9pZu6CyOg8bAYrq1SvJeFrS3yTFblqf3cM9xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=eLs4+xIM; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7953340E0286;
-	Tue, 17 Dec 2024 09:34:53 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Dn0QhEwr2mS6; Tue, 17 Dec 2024 09:34:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1734428089; bh=wSjX9WLP8G/CpiJV3A+YyrZ3lZplv3XGyo+yd5lLDq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eLs4+xIMsnGtZRuNsewsQds9pbLFglNr5P2jXYs5sxuvJnkjcMqo/htEqU9miKR+g
-	 1aU5c/VgKAA3jC6YnD0JgAX3vKJCgdQTZZ/OPyCRf7oReMDAgw4GJJnfxSIE4Jwf4Z
-	 Z2jawIXv0tZZ7zpjH/mqkWRoA0MfMODI4onvNBvIR8gkeeNLzJtFcq96rx+GePuHXW
-	 toDUMmkwNto6b/9O+HEt0oPrZ9dRUbXAnTPj31DM0h9ncF/XGRQ/4NNBcrIsvYdoyo
-	 duZyTXoWXtrXIyJy4Wrj/M7zxTRUoPDu3wnIBR/F9Bw9vCztElHFRi80lcNlCglxYZ
-	 T9pwZ20oZAYO4uW7P4lqJeAbD6dn3n1nWXMZUin6c5qVmgAEOkLZJnxhYynWnY9dD5
-	 +UK2he33HengycfUlc5yrqEzYiErjsTIJvEsPvP6sBQEpNSw2CjPvz+WqIH41bn4sb
-	 gUolDl/uSKakDWsK6M/UySh4zhxJHhyHviv78DsxjYdut5GIrNTT4C9NWa0mmY2BCM
-	 kyERc40gqpUeBXapIz2p5DS9LiF5OKiaQ5xrgzLnXUWPBEsllCmriqcsaJ5GP87JrQ
-	 pfM9Ja4mTp7lR7Qtsd0zVYgIQVbTE641tM0aUfeZZ8DXpH0gZsoMaQFQAtCyFfdIBY
-	 /wwUmh3A1qz1ln+EUb0jwKZM=
-Received: from zn.tnic (p200300EA971f937D329c23FFFEa6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:937d:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D275440E01F9;
-	Tue, 17 Dec 2024 09:34:40 +0000 (UTC)
-Date: Tue, 17 Dec 2024 10:34:34 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20241217093434.GAZ2FFqiC_pFimdoYu@fat_crate.local>
-References: <20241202120416.6054-1-bp@kernel.org>
- <20241202120416.6054-4-bp@kernel.org>
- <Z1oR3qxjr8hHbTpN@google.com>
- <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
- <Z2B2oZ0VEtguyeDX@google.com>
+	s=arc-20240116; t=1734428510; c=relaxed/simple;
+	bh=O7iWLI/j+BiMLlgdZy77+6GKClT1MsHhGkVoQjlkJBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tT5do5HUfG+ls0VjTeietzvKsfzDg6KoInH+zG14jdxG6m+XoY5AeIMnt5rpmkRPsomWIjg4MK/9881mRA67RTCPcy4bHMuAaHb50HMwyVcBAmDWODcsrUocmNbt0B7OTY8P4fRIKZFPLHQ0FuxsIne18vENcu/tNejtK+pjxfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XfL3iiSm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734428508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fXqH9um9w5h8Ggdovb54C2n4fbfuDUHfmKGXh4mGHQA=;
+	b=XfL3iiSmmj4XLmQS/zAtK+6aQggqr4+kypIz3X2uYIIKRo99lDj7RUkR0Ipf1xIoiCCf5F
+	L420Xq0yf12An3ELnsy4j+CWfy87cK4QgrAqDU0lVH7y7f6kEhwuD21MB5En0OiJ/xd+1A
+	n+lHSYVQh1o+XLwiTsHInU/npBWtKSI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-4uJsW3ADOlWum1ye4iR46w-1; Tue, 17 Dec 2024 04:41:45 -0500
+X-MC-Unique: 4uJsW3ADOlWum1ye4iR46w-1
+X-Mimecast-MFC-AGG-ID: 4uJsW3ADOlWum1ye4iR46w
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385e3cbf308so2091706f8f.2
+        for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 01:41:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734428504; x=1735033304;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fXqH9um9w5h8Ggdovb54C2n4fbfuDUHfmKGXh4mGHQA=;
+        b=mNZNUjztAfJfT2n5CCdOjMLloiYT8kfBLJNDh7DvLH7nVU/efi79gwprkHtvRJJt5N
+         LBFlxDmXpg+4lMW5jmKLaburzKmRZy+4Fwu4FqD6xAsjZIpSqmlM/6vymktKI0Xj5tT2
+         kruR3EPSWLc0VMEwe93xU2XY18BYGKBX54lWA9J5kZpSFuBCXr+EHYKlwxUxfUX0VNba
+         1Jo2ATtpBrw3MITzhpYKQvRQSW8UwfZEHeITq5B1iaTl+8oVM5FgXa29Q0skwVim7y3+
+         SyxEAPVQCpxJj08C1l111+Hht+5MwKrw5VwJLJ7s20mivzkAEZgLw5bZLMiu73LTiaIk
+         wdtA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYf1iE3DdPBKENw6qBriDk9bWaoOPk30oK7TJX5+B4vS0LYDHcEILMBs+V/PwMn4Zp5L0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrsBXdEL0GZng18NNRMjwIUEKoT3+D35VFIAYi8mw5wTHrz1CB
+	Nxtd0YWTvbPnz0EIZ57CzrETsG4bEelkxvZ4WNetnd5AcwT+vEgyDEfM62bM0q1JUbhaj1/8ViU
+	vUrq/lYPKLWRs1SxXrPkh6PVOoC5n/bZpiGu30/2HH4YcN9aADQ==
+X-Gm-Gg: ASbGnctpbz6W3WPK5WqyZue2SVGvXBxDjj/ToORxr4VDl7EbLkcwB/LkdrcGVD0koPU
+	GZB6qqOeSN6IWHUYhVvqokzkCyv+NOdCLEEf7DkKP6U2FcEnqiS9bO28hEoGDByFZ6JVzKX1Aol
+	eQFysQPSCzRbkjXFklLoymn8LeSO/3SzlK4ZYhNAX9SsWi1PdEqlwikBqRhv7xarwecsujB6ecT
+	vcD/pZFyAqSi6dl7xEqaXp6pBe5abq0OKfcgl88YXYK7dSEqa7DFILSFP2p
+X-Received: by 2002:a5d:648a:0:b0:385:f677:8594 with SMTP id ffacd0b85a97d-3888e0f30ccmr11614376f8f.43.1734428503928;
+        Tue, 17 Dec 2024 01:41:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEpe13aD2kSJpTmfKM9PKcTiCkzTDRM65j9w6bpOOqimB7xacV0EEtG4T0dXT4blDMOwOlxUg==
+X-Received: by 2002:a5d:648a:0:b0:385:f677:8594 with SMTP id ffacd0b85a97d-3888e0f30ccmr11614339f8f.43.1734428503582;
+        Tue, 17 Dec 2024 01:41:43 -0800 (PST)
+Received: from [192.168.10.47] ([151.81.118.45])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-388c801a8bbsm10648723f8f.56.2024.12.17.01.41.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 01:41:42 -0800 (PST)
+Message-ID: <8011ba26-d0eb-4e18-be8d-b464235e89b8@redhat.com>
+Date: Tue, 17 Dec 2024 10:41:36 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z2B2oZ0VEtguyeDX@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 43/60] i386/tdx: Only configure MSR_IA32_UCODE_REV in
+ kvm_init_msrs() for TDs
+To: Ira Weiny <ira.weiny@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Ani Sinha <anisinha@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, rick.p.edgecombe@intel.com,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-44-xiaoyao.li@intel.com>
+ <Z1xHztTldnFDih8W@iweiny-mobl>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <Z1xHztTldnFDih8W@iweiny-mobl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 16, 2024 at 10:51:13AM -0800, Sean Christopherson wrote:
-> but I don't see any code that would clear X86_FEATURE_SRSO_MSR_FIX.  Am I missing
-> something?
-
-Ah, you want the toggles in svm_{enable,disable}_virtualization_cpu() to not
-happen when the mitigation is disabled. Yeah, I guess we should clear the flag
-when the mitigation is disabled...
-
-> Gah, sorry.  I suspect I got thinking about how best to "set it only when really
-> needed", and got lost in analysis paralysis.
-
-I know *exactly* what you're talking about :-P
-
-> To some extent.  But I strongly suspect that the vast, vast majority of end users
-> will end up with systems that automatically load kvm.ko, but don't run VMs the
-> majority of the time.  Expecting non-KVM to users to detect a 1-2% regression and
-> track down enable_virt_at_load doesn't seem like a winning strategy.
-
-Yap, that was my fear too.  Frankly, I don't have a really good answer to
-that yet.
-
-> The other possibility would be to wait to set the bit until a CPU is actually
-> going to do VMRUN.  If we use KVM's "user-return MSR" framework, the bit would
-> be cleared when the CPU returns to userspace.  The only downside to that is KVM
-> would toggle the bit on CPUs running vCPUs on every exit to userspace, e.g. to
-> emulate MMIO/IO and other things.
+On 12/13/24 15:42, Ira Weiny wrote:
+> On Tue, Nov 05, 2024 at 01:23:51AM -0500, Xiaoyao Li wrote:
+>> For TDs, only MSR_IA32_UCODE_REV in kvm_init_msrs() can be configured
+>> by VMM, while the features enumerated/controlled by other MSRs except
+>> MSR_IA32_UCODE_REV in kvm_init_msrs() are not under control of VMM.
 > 
-> But, userspace exits are relatively slow paths, so if the below is a wash for
-> performance when running VMs, i.e. the cost of the WRMSRs is either in the noise
-> or is offset by the regained 1-2% performance for userspace, then I think it's a
-> no-brainer.
-> 
-> Enabling "full" speculation on return to usersepace means non-KVM tasks won't be
-> affected, and there's no "sticky" behavior.  E.g. another idea would be to defer
-> setting the bit until VMRUN is imminent, but then wait to clear the bit until
-> virtualization is disabled.  But that has the downside of the bit being set on all
-> CPUs over time, especially if enable_virt_at_load is true.
+> I'm confused by this commit message.  If these features are not under VMM
+> control with TDX who controls them?  I assume it is the TDX module.  But where
+> are the qemu hooks to talk to the module?  Are they not needed in qemu at all?
 
-Yeah, I think we should keep it simple initially and only do anything more
-involved when it turns out that we really need it.
+The TDX module controls the values of the MSRs, and the values cannot be 
+affected by QEMU so there is nothing that QEMU needs to (or can) do.
 
-> Compile tested only...
+> Also, why are the has_msr_* flags true for a TDX TD in the first place?
 
-Thanks, looks good, I'll run it after I get back from vacation to make sure
-we're good and then we'll talk again. :)
+KVM only provides a system ioctl for this purpose, not a VM ioctl; so 
+there is currently no way to obtain the information for the VM.
 
--- 
-Regards/Gruss,
-    Boris.
+Paolo
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
