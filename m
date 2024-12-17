@@ -1,341 +1,175 @@
-Return-Path: <kvm+bounces-33919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5700A9F4AD7
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 13:20:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2219D9F4B70
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 14:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 223757A25C3
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 12:19:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3EF5162BDC
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 13:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442EE1F12FA;
-	Tue, 17 Dec 2024 12:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393791F4709;
+	Tue, 17 Dec 2024 13:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ao0GrP4a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2+t6vZC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672381D5CCC;
-	Tue, 17 Dec 2024 12:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734437984; cv=fail; b=AeCL2fRQdye9Ohf5eU6t1UB54JD2bj10p2UxP8YoNGEVBs0O7uHw/bIL3TWd4/b2HYNX5RjZX3vbsg+wZy582rxXZUZ3qiEGgHceDa9k2MIBkrKWhRP73TUToV/VSoOEITBbBVRDGXQq6Z0iK0r26shLXIZFckS4LPSIwCRJCms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734437984; c=relaxed/simple;
-	bh=BzuY1zNqE8GvN5aOhtf7y9rRG5yjA73zxB+3ugtxwFo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=Vu08cQQwyX0b60Qa57Qc2cKmkdOzHvFqs3tezYfKwWkRvDarlCaZ172RzBEnApeo+3976LwTmRvTqZ4j5xEIxcmd5CEwMcvqTcJqa0Iqr6RgB9ARsdZNTJ7B2mLyvdlCCbXfVE7wTnADoYso2xYSzK5GDsUZxyabAbGCZxJ0bkU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ao0GrP4a; arc=fail smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BHBdghp025795;
-	Tue, 17 Dec 2024 04:19:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-id:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	s2048-2021-q4; bh=7PhX5+gAyT+SuAHokI7gYmLvSRCIT6LH6p/xGnoyraY=; b=
-	ao0GrP4a0neACxaJgRt6AIdjNgsmOF6pihlsS3t3tejofmPVRHdl2n+VJprTNSEf
-	9DqTuxfR2HXsqvdfQcFlc2hy2q6jonuq3TDiZXc12hOigMR9us6QxRAqmNcQVrLM
-	ysSDY5YDgvysQxJKh/xsvrJV6bGRpn8bLJnH+xQovThyY8ARGXGww16tALhIK/e8
-	ykHKdkytrM3LhV8sMHliaftmzwEy9dDN8ssSbwpbCHtfdKt+PekO5i9EPuoiOitN
-	Y+N44oXYD+x/y1cJrfI55/0Qcr8qVxhuL8wZ1tPWnEoVWrMYsFcDYuyY1vjLqZIE
-	+QxJOcFdUP519S4UG0Tjmg==
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43k80a0cus-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Dec 2024 04:19:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ri02mZaX17lVahVopvEyapePkm1YxpXQy8sISrZ8sE83T7Gg3WAA/4KdygPeXlN4WHR7KeMC/qbcI8nWaRTI9KIxYhuKLE7RrqGS3vPN2WOXsHUB/CeFz91hlkq4bOYHR6cKB5qxCA1EZnXWRFn4TcqUuhRbDOkUJcVfENv/79DSr4v3tVkzgcvg2tE3/ty9MY5dPqTnOPeL2b0AREUe3kDVqSaDctVafvYVKyL7zfrw9o2wEZax66gNK0q5K/ZNoZikwJjbxM1hW4Czc9sTFr4JeZOC16H58FsqT5f8ICLI4RbBnWhs37dT4veMB+wt2Zdx/K79qE6+9i+DyOEE3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rDAWTkzs725ZwSElirwfGYQpPSay644swGxAyIDOWvM=;
- b=fgj8RTLMsRjJUcdMlMYicCj6YbJR3HxGk7+pk8OpAbxhXBnJy4FbzAGTsUL20VU27zGSStYvV5ePItiRLHkBJy+pWLYcGbcnL2/tycAx5zlUmH+SFc5jyFCeEVc4dO7SUxuS6sJJE7klQPpDE6LDHqHaup1veLW19REO5xcFSntBkMDRmondNH+c1pR/F3TiiimGdk3Nkg8O+kPJpMrtYEWZhLPrsrOc/l56KmcllvACNI/zT5zKos41KyzxbK2y8pQGRZJcrGlsWfpNM51C1exfjJQbwn6Ey1TW+A5fhv4w6VUKtB9T007KfdywvTbFeNs+5vZiYcXi7lx988ef1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
- dkim=pass header.d=meta.com; arc=none
-Received: from SA1PR15MB5258.namprd15.prod.outlook.com (2603:10b6:806:22a::12)
- by PH0PR15MB4815.namprd15.prod.outlook.com (2603:10b6:510:ac::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Tue, 17 Dec
- 2024 12:19:36 +0000
-Received: from SA1PR15MB5258.namprd15.prod.outlook.com
- ([fe80::a29e:a332:eb15:993c]) by SA1PR15MB5258.namprd15.prod.outlook.com
- ([fe80::a29e:a332:eb15:993c%4]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
- 12:19:36 +0000
-From: Wei Lin Guay <wguay@meta.com>
-To: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>
-CC: Wei Lin Guay <wguay@meta.com>,
-        "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>,
-        "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>,
-        "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>, Dag Moxnes
-	<dagmoxnes@meta.com>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        Nicolaas
- Viljoen <nviljoen@meta.com>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>,
-        Daniel
- Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, Maor
- Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Thread-Topic: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Thread-Index: AQHbT6O5Loc/d/3VGEWjEKeLiKCgu7LpIlYAgAE6MQA=
-Date: Tue, 17 Dec 2024 12:19:36 +0000
-Message-ID: <924671F4-E8B5-4007-BE5D-29ED58B95F46@meta.com>
-References: <20241216095920.237117-1-wguay@fb.com>
- <IA0PR11MB7185FDD56CFDD0A2B8D21468F83B2@IA0PR11MB7185.namprd11.prod.outlook.com>
-In-Reply-To:
- <IA0PR11MB7185FDD56CFDD0A2B8D21468F83B2@IA0PR11MB7185.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR15MB5258:EE_|PH0PR15MB4815:EE_
-x-ms-office365-filtering-correlation-id: f69ba188-a026-42b4-fe4a-08dd1e95124a
-x-fb-source: Internal
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|10070799003|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?OFYrUEhZNzZJNHBYUXhLR3YzUHY1dEl1bitKWk1pODVWY0Fsa0o1VktFNndz?=
- =?utf-8?B?WWFJVSsrSFdFWkZ1R3JxNEhTUHpMQlFtcnU4K3o1b3B3UXMyekVTMzRQeDln?=
- =?utf-8?B?S1hqWHVobk1iS1RrNEJuY05XZUovVlhqcWVoaHEyS3hmT1F4NnRuK0puZ1F3?=
- =?utf-8?B?T3ZpZFJ5bnVJT0Y4T29ycGZVcmlEVUVZTnYvcjBuT3FYbjY0U0tSRm5pamQ0?=
- =?utf-8?B?SmFwZDVhb2dVdVJSZzBMdERPZWVtRStQbDJOSWZhSmQybmJmcG9wR3gyNlUw?=
- =?utf-8?B?WFZNellLYUdpMzRsM3Y2Z1FoTGFlQzVOdzFwVUJaMmNyczQ1eVZoMGFmOTNx?=
- =?utf-8?B?WVJZWjFpaEJJNTErbHhKNlVMWHRZTmNBYmZORmpPZ1ZXWEtjOWpKZU9qWStZ?=
- =?utf-8?B?RHowdWlCUFN2L05lK201cEpkSDMrNSsyNk0xSVlSUEppekdlUkNuN1JvQ3hs?=
- =?utf-8?B?ZG5Vd0tzN0tKekZIc0pRcmJtREVPeEhSQW5SeFNKMG9EbUFsRmlMUTg0NHUv?=
- =?utf-8?B?QWg1dEduSHJVRU5BYmpVcmgwQ1k4UEd5NUZkUXJnU09jY3E3aHNsL0JHQ0hF?=
- =?utf-8?B?UmRlVDJHRTZhZHl2ODZ6WFV3Z2Rvd0c2LzA1Q2pJazhXWkkrYnA0WlFCYVNv?=
- =?utf-8?B?OHd2RTB2VkN2WjFJNmd6YXJLcG90ckJ3bHFXeXZFZk02K2dpaTRLVUpKRlM0?=
- =?utf-8?B?QjFaaFlLQWhQbWhKM1JtZzdvWG9ncDRBN1Vpay9YcTZYWWlqNzdhVDc3dUVI?=
- =?utf-8?B?emtBanJpZG9KSEVLcFgyVjhGZlRmVzJyOGxZVmxvc0hYdmJGYXBUN1BVZEk1?=
- =?utf-8?B?TkM2K2o5WDRHVW03cVRXdGJkNk1qVUxaSEVzNzVseGxmaEM3aHEvY0FUNll4?=
- =?utf-8?B?NW5OUTVHb3ZvRzJpSG1WUXEvQzRrb2R4WjFhTks5RDBrL2tHSG1IZjVQemF1?=
- =?utf-8?B?R2tLR3pjQy9JczhTcVUxQXJ2ZktaYU9SSytoWEcyK0JvQUhMc1BGemlGMitn?=
- =?utf-8?B?MDNRZzkwUTlvQ0hURkNtb0YzZ3YyWCtnN3k4VFMyMmRIVGMxcUN4NE54c0Jp?=
- =?utf-8?B?YzFvWXZkWWdCejZtUzRXWDcvQmxXZXVROWJPNzNVVDlmWVM3eVpydTdCSVdL?=
- =?utf-8?B?THg1U0ZNUnB1alEwNzVUTWJadVlRYXpwNlQrcjE4NUY5NnErN2ZuZjhVOG40?=
- =?utf-8?B?VXhiczd6YjUrU1FHUjFxY2lNcUFUVTBqRm8xY1lEN0xBMHFEVUlCN0hab1BO?=
- =?utf-8?B?RU4xanRlSzY3bDBLRGFFNW5FNTZzbmExaEVUTEtjTjdHRjZwd3RFa1BvT3ZJ?=
- =?utf-8?B?TjBEblZiRGhBaytmeDhVajVQelU2bkNoT1ArMUI5ODYzejZtWUwvbGFZN2ky?=
- =?utf-8?B?ZldURXg3RmxRNnA1ZGxlb0tVendSQWtZR3o4S3Q3azE4UFlzb0RlRzgxNGdh?=
- =?utf-8?B?eGZDNjdvenZuNjEyaklZMkxncC85K2kza1RUcGd5S0RaRjF0YVFOL3NyZ05L?=
- =?utf-8?B?Yk8yL003MVptcGRuaXhDZ1pSN1J5bEYxNngvSHVaRXFjQ2R4ZHV1UHM1b2Rk?=
- =?utf-8?B?QXRYeU9IbVIwT1BQVENNTnY0QkJ2TWpBNUM4UFBLRVpyZW54emJUSzFwdHNw?=
- =?utf-8?B?T1k1MDVzUEY2ZHp2eGlxZ1BBSWZFUnhqZWlEREZXd05VdUpHKzJXZzNUQ2RQ?=
- =?utf-8?B?bUFNM3RmWDRoR1JaMVgvWkpIVVRvb0tSc3ErMFNNbUlFL3pzbHN4UHMwejVk?=
- =?utf-8?B?Z3N2UWFlWThGRjFMNVdyZk1xR3JNVktSaDJwSHlzbGIwYktjTHRlaEFtTC9u?=
- =?utf-8?B?YzRkdGI5eUI4dHVOS3p3aXJmQUhNeUpNenBMS0hDRkk3a2JLd053L2JoK0N3?=
- =?utf-8?B?VmhFTkZndVhaYnphQ0pkQWl4b05NdmdvY1NjbTd5djVDSjVuRnhUallCdW1I?=
- =?utf-8?Q?3cOMzZT6pNMxxgjcNd1Um8yIvBj+h0Xt?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR15MB5258.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(10070799003)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?TFgzS1VaU1ZOZWVrYzVkY1hWa1ZQeUF0Vy82ZWc4UjZsSm5RS2JzbjU2WjN0?=
- =?utf-8?B?eUxIbncxa3JIcHRoVDl6TUw1QTJIem5iWmpldVR4MlJVdTA4aXZrNUpKL2pS?=
- =?utf-8?B?U3E1M1ZrU01SSnlDcU1XT0hscDk1M2FBeG03WTBXMmpVOWxPSGJQbVg1Q2s5?=
- =?utf-8?B?b3RrbGM0cmdTUEZicjRJTGladGE2bEppUFgyb3pLc3M3ZWlSa0JJME5JZFNG?=
- =?utf-8?B?aTlBSFBtcENQQlZsenA2c2dyKzVMS3JneUxraDNVUCtZRVg1WG9jMVdGbkVZ?=
- =?utf-8?B?NTk2RGZlSThKMzgxc3pVcFpRYXYrMVdGQWRoWjYveWljK0cxbUJ5M2hRRXdo?=
- =?utf-8?B?d1E4eWVOOTFSakttVXJJWksxRnozYjRNRkVzMVdOWWs3TVcrVmNLc0hXMzdK?=
- =?utf-8?B?RmQxejgyNlE1RUY3dForNGw3N3pTczhHeHZiZVpEZ1ZuTitsWUxweWdibENp?=
- =?utf-8?B?QU1xNXVDOXdIbU5xMVpBcHYxTk1ydEN1NWEvYllQS2szUGNETW8zOHBWVFFp?=
- =?utf-8?B?MGhsYnFpUTVUR3RVeFlyNVo0QzB1UytadUVMRHFmNGVCREFHNFhQeTUzeUNt?=
- =?utf-8?B?WStJNUNoTlF6bmpHTHZHWjJmWkp6MzhIeTU1Yko1REhMRExKdGtwREhOemFu?=
- =?utf-8?B?TUVZTW1zVDUvVGJJL2FFU2RHNzJ6RVRQakM5Q295S3ZGTElVdnVxOVFDSmxO?=
- =?utf-8?B?SXBHd2FiZzR3cnpNd292SFNpOS9US2JnMS9wZldqRnVuYkprNjMvREtteE5X?=
- =?utf-8?B?aXpRUy9GcDk3R0J1dENzUDJFVUV6ek5XQm5jamNOdVJabVN4NlQ2Qm9PTW9Z?=
- =?utf-8?B?SWRrRlAzMGI3VzFrb2pIRU0xL002TE94Ym92aFBmcEZ0MjZTNSsxNTJDbVdP?=
- =?utf-8?B?dFpiOXRSMkNlQzgvcGZTYkFITEEwMUxrS3hhcnlIRDc4QU1CR1ZwZ1crendH?=
- =?utf-8?B?SFBjS2c0cGlrT2RvNmZNTUhvRnpEcjlPd0tRV1p1c3JUQ21zRkl4Rk12MUxN?=
- =?utf-8?B?R1VoSGZsUWJnb2ZHT0ttY1R2T3p0U0JNS2dsVVV0TDFpc25SM0tLeXg5SnIv?=
- =?utf-8?B?aE45TVlRRU0xL2ZVdFJXRW55cUJhSEVIZXpxREpOeFRsaS9wb1FjVjRTelFF?=
- =?utf-8?B?Qm5pNGVQNTMvcmZkcnp3Qk8xR00zMnhGYTB6d1ovUEtMa2tZb3JNVWxpR3hm?=
- =?utf-8?B?RVpIUGJyUjBkMWJ2MzM4NTBnUzA3NXltR3BkSUthSUJTSVBkaW5MSFFJVml6?=
- =?utf-8?B?SFlKUWJvbHZDZFdEME1qaTlDcW5wRlFDTGdKR1hNYnk1VFZqa1BXUTFyRUJl?=
- =?utf-8?B?U1ExNG9VSFdCNFpvZTJocndQSzArK3RCR3QyZnVQUXdTWUdhL2FYaDJyWVo1?=
- =?utf-8?B?NlB0TXlCT3BsMTQ1bGRlVUMrT0tlcFh0VU5uaGRpQXpmbzByZmZlVnFrYzl0?=
- =?utf-8?B?RE9JRVlabWhiNFVDVFAySldKWG44YUoxZUdQVlJwVmZpbXpTRnR0RXFWNkhB?=
- =?utf-8?B?Tldsc2NmQ2FHcGdQNjd3RHpzVUdYNVBKbEV0K2NrbUhpc1lnaHdlN3BpRWdH?=
- =?utf-8?B?eHk1cG9QMURvaDJsbGpSMTR1LzJJeWRTYjg2S3JEazVMUTM3RzgvTnl2NHhB?=
- =?utf-8?B?UkdxRU9rc0s1TFRnM0t5TE5QdlM3K2FuekdSakwrY1R2TGhLa1hnMzFOR3pS?=
- =?utf-8?B?VkNHUHZ6MEhRNUlyaktPdFBkZnQzOU5DQmp2VVJKV24yNU1FTnc2VWkvU01V?=
- =?utf-8?B?R01NYldjUlpsMTZCQmJzMjBXOG51c1lZdjdIMFhSN1ZrajVSTkpsNlArR1F3?=
- =?utf-8?B?bDlzSHJiOGRuOVJiNnVOTHU5RWs5V3pMd0k5TVJQQzhZWDJmSWhHcFRZZERj?=
- =?utf-8?B?QmkyQk51dnBiTk9ycWJEQi9OYndBZVpOTzZndTJtSDg2MlNKY3Y2dTBkRE0w?=
- =?utf-8?B?QmlDa0FaV2s2ZjVSV3YyMzNqcGs4T1dZeGQ4Z0NKR3F4TENwMWkvMXJVSmRK?=
- =?utf-8?B?UlI4S0haWGFHSEpOWTRZUzNmajJzbHBJRkFxZ25NQlNUYXRpaEJ4NVA4Z1M3?=
- =?utf-8?B?akxQRFk1L3JWWVVaalptVHJLdUlIVmxQVVFNQVZMTWNTOURPRzF0OE5qdmtp?=
- =?utf-8?B?L1F3MU9KbU5STTlyNlNBRWRRQTZMakpGUThPcXdWenZGVit5S1RZaWJxT3hi?=
- =?utf-8?B?Vmc9PQ==?=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8CCA29;
+	Tue, 17 Dec 2024 13:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734440460; cv=none; b=T0i8pGvy9aSH6Z5h8rZBAud8bM8HIkUq/NNl79H5Uqzt/Tex+uu8Jrc2aX+g2SGHLlxaxItwCQqvIxXCInK9Be/UlR/Uyo678D0ojhITz+Ylftfxb3e+QRpc5XNDWALjfEHwkycg2AudyNiRxkTNXmtxkVfpt3MMuNKof3M8vWI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734440460; c=relaxed/simple;
+	bh=WUcPWFcOfeUf/sio4O36o8I8jrOpMF9pl2t7YRV1K7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kcTmF/0zmtc5jZ7AU0mCs3x//4cIg/ucroYFKLpQ4S3z9U5MNDxZxlU4PR2jRWurhgviUWga87KOOnECbNO2g/lbzcLa+hZbZ58ZBILPvjLenLc9plBsb8igbNcTbDoZV5m2LisOAnW4jJWUua/jTL4E+fqLCh0PZdnwr56o55U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2+t6vZC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E42C4CED3;
+	Tue, 17 Dec 2024 13:00:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734440459;
+	bh=WUcPWFcOfeUf/sio4O36o8I8jrOpMF9pl2t7YRV1K7c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=W2+t6vZC3dFZWGD+hxEMeEPE1EEKt40fCuWrdg3SEm/26SFd4QEg0tiIvT2/Wek19
+	 ipbNsM3RLXl0RvFJrTnmhBFYT5MAx6OqnZ/oOKDrKGf32XUg477wAJn6V2jcBjZO/8
+	 Ii8+JaZkyyMGebvolPyBm40JjRdZQhIhr9H3yf5kaiaiXVcPFmwe/C4LJJ4P6impvd
+	 8/hR+n5YTMhKvuP9ew3PL2463hfk0ZudfO9HpYVaOpExaxG4v5E7GWf3f90dIP2oBV
+	 GHJCkATLPfGc2ofcLdQ0kQuhsYKz0DBm7jEilkgCea7JLERhDeOtEVUaSSk2h/iHeZ
+	 SwmUwQ1h0ckQQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v5 00/17] Provide a new two step DMA mapping API
+Date: Tue, 17 Dec 2024 15:00:18 +0200
+Message-ID: <cover.1734436840.git.leon@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: meta.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR15MB5258.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f69ba188-a026-42b4-fe4a-08dd1e95124a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2024 12:19:36.2096
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yB8+puUbr6xKLvVrz2XWgK0hsZKwv4qVOjd+3Gtc5VJ+2hPECSs0VQHuTB8kgdV7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR15MB4815
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-ID: <5208929DDE666848BE3848801C422EF4@namprd15.prod.outlook.com>
-X-Proofpoint-ORIG-GUID: lr7YsLGrSChE0dkh5IuizdpCZ80SwwVj
-X-Proofpoint-GUID: lr7YsLGrSChE0dkh5IuizdpCZ80SwwVj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+Content-Transfer-Encoding: 8bit
 
-Hi Vivek,=20
+Changelog:
+v5:
+ * Trimmed long lines in all patches.
+ * Squashed "dma-mapping: Add check if IOVA can be used" into
+   "dma: Provide an interface to allow allocate IOVA" patch.
+ * Added tags from Christoph and Will.
+ * Fixed spelling/grammar errors.
+ * Change title from "dma: Provide an  ..." to be "dma-mapping: Provide an ...".
+ * Slightly changed hmm patch to set sticky flags in one place.
+v4: https://lore.kernel.org/all/cover.1733398913.git.leon@kernel.org
+ * Added extra patch to add kernel-doc for iommu_unmap and
+ * iommu_unmap_fast
+ * Rebased to v6.13-rc1
+ * Added Will's tags
+v3: https://lore.kernel.org/all/cover.1731244445.git.leon@kernel.org
+ * Added DMA_ATTR_SKIP_CPU_SYNC to p2p pages in HMM.
+ * Fixed error unwind if dma_iova_sync fails in HMM.
+ * Clear all PFN flags which were set in map to make code.
+   more clean, the callers anyway cleaned them.
+ * Generalize sticky PFN flags logic in HMM.
+ * Removed not-needed #ifdef-#endif section.
+v2: https://lore.kernel.org/all/cover.1730892663.git.leon@kernel.org
+ * Fixed docs file as Randy suggested
+ * Fixed releases of memory in HMM path. It was allocated with kv..
+   variants but released with kfree instead of kvfree.
+ * Slightly changed commit message in VFIO patch.
+v1: https://lore.kernel.org/all/cover.1730298502.git.leon@kernel.org
+ * Squashed two VFIO patches into one
+ * Added Acked-by/Reviewed-by tags
+ * Fix docs spelling errors
+ * Simplified dma_iova_sync() API
+ * Added extra check in dma_iova_destroy() if mapped size to make code
+ * more clear
+ * Fixed checkpatch warnings in p2p patch
+ * Changed implementation of VFIO mlx5 mlx5vf_add_migration_pages() to
+   be more general
+ * Reduced the number of changes in VFIO patch
+v0: https://lore.kernel.org/all/cover.1730037276.git.leon@kernel.org
 
-> On 16 Dec 2024, at 18:34, Kasireddy, Vivek <vivek.kasireddy@intel.com> wr=
-ote:
->=20
-> >=20
-> Hi Wei Lin,
->=20
->> Subject: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
->> through dmabuf
->>=20
->> From: Wei Lin Guay <wguay@meta.com>
->>=20
->> This is another attempt to revive the patches posted by Jason
->> Gunthorpe and Vivek Kasireddy, at
->> https://patchwork.kernel.org/project/linux-media/cover/0-v2-
->> 472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
->> https://urldefense.com/v3/__https://lwn.net/Articles/970751/__;!!Bt8RZUm=
-9aw!5uPrlSI9DhXVIeRMntADbkdWcu4YYhAzGN0OwyQ2NHxrN7bYE9f1eQBXUD8xHHPxiJorSkY=
-hNjIRwdG4PsD2$
-> v2: https://lore.kernel.org/dri-devel/20240624065552.1572580-1-vivek.kasi=
-reddy@intel.com/
-> addresses review comments from Alex and Jason and also includes the abili=
-ty
-> to create the dmabuf from multiple ranges. This is really needed to futur=
-e-proof
-> the feature.=20
+----------------------------------------------------------------------------
 
-The good thing is that your patch series addressed Christian=E2=80=99s conc=
-erns of adding dma_buf_try_get().
 
-However, several questions regarding your v2 patch: =20
-- The dma-buf still support redundant mmap handler? (One of review comments=
- from v1?)=20
-- Rather than handle different regions within a single dma-buf, would vfio-=
-user open multiple distinct file descriptors work?
-For our specific use case, we don't require multiple regions and prefer Jas=
-on=E2=80=99s original patch.
+Christoph Hellwig (6):
+  PCI/P2PDMA: Refactor the p2pdma mapping helpers
+  dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+  iommu: generalize the batched sync after map interface
+  iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+  dma-mapping: add a dma_need_unmap helper
+  docs: core-api: document the IOVA-based API
 
->=20
-> Also, my understanding is that this patchset cannot proceed until Leon's =
-series is merged:
-> https://lore.kernel.org/kvm/cover.1733398913.git.leon@kernel.org/
+Leon Romanovsky (11):
+  iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
+  dma-mapping: Provide an interface to allow allocate IOVA
+  dma-mapping: Implement link/unlink ranges API
+  mm/hmm: let users to tag specific PFN with DMA mapped bit
+  mm/hmm: provide generic DMA managing logic
+  RDMA/umem: Store ODP access mask information in PFN
+  RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+    linkage
+  RDMA/umem: Separate implicit ODP initialization from explicit ODP
+  vfio/mlx5: Explicitly use number of pages instead of allocated length
+  vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+  vfio/mlx5: Enable the DMA link API
 
-Thanks for the pointer.=20
-I will rebase my local patch series on top of that.=20
+ Documentation/core-api/dma-api.rst   |  70 +++++
+ drivers/infiniband/core/umem_odp.c   | 250 +++++----------
+ drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+ drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
+ drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+ drivers/iommu/dma-iommu.c            | 454 +++++++++++++++++++++++----
+ drivers/iommu/iommu.c                |  84 ++---
+ drivers/pci/p2pdma.c                 |  38 +--
+ drivers/vfio/pci/mlx5/cmd.c          | 376 +++++++++++-----------
+ drivers/vfio/pci/mlx5/cmd.h          |  35 ++-
+ drivers/vfio/pci/mlx5/main.c         |  87 +++--
+ include/linux/dma-map-ops.h          |  54 ----
+ include/linux/dma-mapping.h          |  86 +++++
+ include/linux/hmm-dma.h              |  33 ++
+ include/linux/hmm.h                  |  21 ++
+ include/linux/iommu.h                |   4 +
+ include/linux/pci-p2pdma.h           |  84 +++++
+ include/rdma/ib_umem_odp.h           |  25 +-
+ kernel/dma/direct.c                  |  44 +--
+ kernel/dma/mapping.c                 |  18 ++
+ mm/hmm.c                             | 264 ++++++++++++++--
+ 21 files changed, 1423 insertions(+), 693 deletions(-)
+ create mode 100644 include/linux/hmm-dma.h
 
-Thanks,
-Wei Lin
-
->=20
->=20
-> Thanks,
-> Vivek
->=20
->>=20
->> In addition to the initial proposal by Jason, another promising
->> application is exposing memory from an AI accelerator (bound to VFIO)
->> to an RDMA device. This would allow the RDMA device to directly access
->> the accelerator's memory, thereby facilitating direct data
->> transactions between the RDMA device and the accelerator.
->>=20
->> Below is from the text/motivation from the orginal cover letter.
->>=20
->> dma-buf has become a way to safely acquire a handle to non-struct page
->> memory that can still have lifetime controlled by the exporter. Notably
->> RDMA can now import dma-buf FDs and build them into MRs which allows
->> for
->> PCI P2P operations. Extend this to allow vfio-pci to export MMIO memory
->> from PCI device BARs.
->>=20
->> This series supports a use case for SPDK where a NVMe device will be own=
-ed
->> by SPDK through VFIO but interacting with a RDMA device. The RDMA device
->> may directly access the NVMe CMB or directly manipulate the NVMe device's
->> doorbell using PCI P2P.
->>=20
->> However, as a general mechanism, it can support many other scenarios with
->> VFIO. I imagine this dmabuf approach to be usable by iommufd as well for
->> generic and safe P2P mappings.
->>=20
->> This series goes after the "Break up ioctl dispatch functions to one
->> function per ioctl" series.
->>=20
->> v2:
->> - Name the new file dma_buf.c
->> - Restore orig_nents before freeing
->> - Fix reversed logic around priv->revoked
->> - Set priv->index
->> - Rebased on v2 "Break up ioctl dispatch functions"
->> v1: https://lore.kernel.org/r/0-v1-9e6e1739ed95+5fa-
->> vfio_dma_buf_jgg@nvidia.com
->> Cc: linux-rdma@vger.kernel.org
->> Cc: Oded Gabbay <ogabbay@kernel.org>
->> Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
->> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
->> Cc: Leon Romanovsky <leon@kernel.org>
->> Cc: Maor Gottlieb <maorg@nvidia.com>
->> Cc: dri-devel@lists.freedesktop.org
->> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->>=20
->> Jason Gunthorpe (3):
->>  vfio: Add vfio_device_get()
->>  dma-buf: Add dma_buf_try_get()
->>  vfio/pci: Allow MMIO regions to be exported through dma-buf
->>=20
->> Wei Lin Guay (1):
->>  vfio/pci: Allow export dmabuf without move_notify from importer
->>=20
->> drivers/vfio/pci/Makefile          |   1 +
->> drivers/vfio/pci/dma_buf.c         | 291 +++++++++++++++++++++++++++++
->> drivers/vfio/pci/vfio_pci_config.c |   8 +-
->> drivers/vfio/pci/vfio_pci_core.c   |  44 ++++-
->> drivers/vfio/pci/vfio_pci_priv.h   |  30 +++
->> drivers/vfio/vfio_main.c           |   1 +
->> include/linux/dma-buf.h            |  13 ++
->> include/linux/vfio.h               |   6 +
->> include/linux/vfio_pci_core.h      |   1 +
->> include/uapi/linux/vfio.h          |  18 ++
->> 10 files changed, 405 insertions(+), 8 deletions(-)
->> create mode 100644 drivers/vfio/pci/dma_buf.c
->>=20
->> --
->> 2.43.5
+-- 
+2.47.0
 
 
