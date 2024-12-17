@@ -1,73 +1,96 @@
-Return-Path: <kvm+bounces-33901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D4B9F41AC
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 05:20:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0469F41AD
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 05:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FB8B7A3A84
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 04:20:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 350C17A5756
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 04:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9855F1487C1;
-	Tue, 17 Dec 2024 04:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEEF1531D5;
+	Tue, 17 Dec 2024 04:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LsXaMRtY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUjqBDDM"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE81313D25E
-	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 04:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD92014F135
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 04:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734409201; cv=none; b=GWK7Ec7lQLl17jVpUhEJj4zIwmCcaOItZyvXeJvJDAj6Fvf0UDlETVNWfb3P6EIUox4yhhlM4WfsM7JGrDggsk9oQGOAJqXFgaDXfYAtTTsYGoQZBxa9f6UwT3GcKFXbujyVAwvM9etMEtKNT6sUowQBY7wXnKdl3BjAvMTsx9A=
+	t=1734409202; cv=none; b=UTgc9rasllG8zol31Wr4mTZu3cMU/ztIyZpoX7hIunoCKYcx4MiTKx+q2FLUYOIBKEXrrCmwOci1QmyiVAXnRQmO0TSdGOOIP1XhGJrRNHj/7GnO68k4eVXvlgi0hDchOvMCj0RpMkqJabtA6+xAaOCHiJ5PWGBMh7RspVDl3Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734409201; c=relaxed/simple;
-	bh=s9T29V1WVMbjgigs6hlEyulQNsZX5W4uOHfEhbJEI6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BA2nQLCtb+RCH62IOnxnrixAZfA0++ryQH9iPcjJcN26wiQOrShZ1cIekyl9E6teiOEl/O9GZpCg+eexPBa2VMm4FSUhOIRtxn6cneBKVMLN5UrCT60FI+tZ+WQsfsf3WeQG3x3qidkz5VORWxMi7yxSaGOVp+Airli4FkNtbkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LsXaMRtY; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=s9T29V1WVMbjgigs6hlEyulQNsZX5W4uOHfEhbJEI6M=; b=LsXaMRtY8mrXbsg7z50suoem3J
-	yGG40GCqCdqyUYxYaDjGuQylH/YpUzC2EsbXkFflPqovEqjkSHPbt/PoUlpP05FmuiThluGaaDla5
-	TSNZ49Guz/OqT/Okn0zKT31NiFIr7pEHW3mAxdEifnHpp4S+9MmN9BTMZrjXMY9gO71rZaRUcscP9
-	0Yd+jo+Mgm3PN+n42v2J+nfVLzALiqmMPOmyFZ4UBtvikqAn41zybNvoLzCBSggAG96qr6vKrZulH
-	HrO1s+s0T7/sdDmVx9js6NK90W7MRNecxiP1WFx/QwApkFK6eJ3bvTOZafMz5gUjx5EZX5wxtPg0K
-	V8t7N6Ng==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tNP3v-0000000C8QJ-1nRu;
-	Tue, 17 Dec 2024 04:19:59 +0000
-Date: Mon, 16 Dec 2024 20:19:59 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: bugzilla-daemon@kernel.org
-Cc: kvm@vger.kernel.org
-Subject: Re: [Bug 219602] New: Default of kvm.enable_virt_at_load breaks
- other virtualization solutions (by default)
-Message-ID: <Z2D77wbGIptAC_wv@infradead.org>
+	s=arc-20240116; t=1734409202; c=relaxed/simple;
+	bh=BZ+0aMRtkTHw4hiZS4dpDrHsWMmkMYrYGVKjJ7dr9ow=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EXplY8aiBXV61J6aGDwODC54CcXcMY0JuRdShY6Q3SoFfmR+lURV3DnWHQEvr8WOVHTjjkONfPcykBfVqsIBWIOOeW103A5134Xn+XLbH3aCKvSi1ghmMvCRAy2nPVcXrKMtFg+56w63Xb8Sl+/P35e0pGaZrwQP1CZNxzD1MAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUjqBDDM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D9EDC4CED7
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 04:20:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734409202;
+	bh=BZ+0aMRtkTHw4hiZS4dpDrHsWMmkMYrYGVKjJ7dr9ow=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=YUjqBDDMfvEgkzktuiWS0pK0zLo0F9g31QXub+SQj9yLJsf7oMsZzYKZb0pdsWwvp
+	 FUDtNO78sKsfhbDeEE5J2+M4AbiVeKHRhiZZ6aKWTn2GYPE6ULp1okNZEBmrXT8ig3
+	 dmDH5NZ95OhpytGk88O7cGskD9kLxpp/84TIWyy5IZcxSpn2AbMw7gbQXASGUz26Hq
+	 CpCE3Ek8Xjzw7hWR0tVJ+cP6s3u8pZgqd0vS7GH7TboABeWK32wLPL7bfjCdTfyA2x
+	 IacQCYVX/8qYFD9yYzBTigaXcI6UJb/M+WnulQwuZGl5/jpzidFW8XYLV8n85/pwJJ
+	 lSmQsdk2rGHVQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 75195C41615; Tue, 17 Dec 2024 04:20:02 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219602] By default kvm.enable_virt_at_load breaks other
+ virtualization solutions
+Date: Tue, 17 Dec 2024 04:20:02 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hch@infradead.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219602-28872-hRFFciAPBp@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219602-28872@https.bugzilla.kernel.org/>
 References: <bug-219602-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bug-219602-28872@https.bugzilla.kernel.org/>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219602
+
+--- Comment #1 from hch@infradead.org ---
 On Mon, Dec 16, 2024 at 09:15:22AM +0000, bugzilla-daemon@kernel.org wrote:
-> Previously (kernel 6.11 and lower) VMs of other virtualization solutions such
+> Previously (kernel 6.11 and lower) VMs of other virtualization solutions =
+such
 > as VirtualBox could be started with the KVM module enabled.
 
 There is no other in-tree user of the hardware virtualization
 capabilities, so this can't break anything by definition.
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
