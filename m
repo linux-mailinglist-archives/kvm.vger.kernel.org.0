@@ -1,113 +1,149 @@
-Return-Path: <kvm+bounces-33957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A37129F4F09
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 16:14:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618F89F4F11
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 16:14:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F33DE1893311
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 15:10:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60C987A3B97
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 15:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B341F7545;
-	Tue, 17 Dec 2024 15:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14921F76BF;
+	Tue, 17 Dec 2024 15:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ey09IHrb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pH1ZKaeU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3C61F4E3D;
-	Tue, 17 Dec 2024 15:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EA01F7561;
+	Tue, 17 Dec 2024 15:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734448234; cv=none; b=f29q2Nhwt/UC96+pw+g7TVXp4iSOziYfjd2Oobcfcm3LdbTQujlp2zFblpffTeLzSJRDAjRw/Gza42CHwbA+g8tHuN9MB8ZS65SutWA33B3pTa3uSfjKT0CsWWlHIXzWI2xKSizNIOIJSNATXJdurUOGk1iQJTVavH8BoBeig6g=
+	t=1734448445; cv=none; b=szYLQ8tNeLqg7VU6b+Hi3HZ4TTFptSlBGZVRleccXUKT1WuYGzyu3YllGC5FUZkiMa5PJD/8gKpTkTQpWGZsgHJlTRp7+7/x1kO4wqaiHBwswclAFpmhRDlcjJCK64ytmjGL8pgmKAQJibTCo8T3z/JDMgJqEkZdf5VUKD+/1pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734448234; c=relaxed/simple;
-	bh=ks+Jrej2tEqHYg73tSV5p376J4HoYDZUNHAtN+M5N9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYROlxmD/VPrqHshYUBduDu9e4RTWA/j7kIenbdHKN6VMprxxhIat2qmvfJ0hfYraQNOJw90WTuOzkZHbn0f2iTaLZBjDJXeX8OqgLYzdCVGKm1gugpfI+XIYkk1lB1OpazFBcRE1aPhtpX3jbl1Qg3aLJCSbOFyZjYxRj5kj3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ey09IHrb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A822FC4CED3;
-	Tue, 17 Dec 2024 15:10:31 +0000 (UTC)
+	s=arc-20240116; t=1734448445; c=relaxed/simple;
+	bh=GlgUN4izxMEky7tzraNnnv/jpJYjLpUaIla9Xa9CfCY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=caJ44FIM/Hr4w9e67hU0eAB2HuTI2eXA0xjftVa0ORdyhB5c0HSQqmpikPA5zZwQhFjoNvtocTmdrqmrdc0/6dL4gGnbO3eh9QFQ3GqnaHHnimI011ldnJ3DOAA1YfcqZlkYhMB/3lr4Gt78T3St0+JH80+UvB9/4Su9CBkkErY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pH1ZKaeU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85822C4CED3;
+	Tue, 17 Dec 2024 15:14:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734448234;
-	bh=ks+Jrej2tEqHYg73tSV5p376J4HoYDZUNHAtN+M5N9A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ey09IHrbr7Yeo/hHbNyOC1q8L2tFrcqYO6xRTNl0WBPcHSFEfq4JHrdHVZKjYSlI3
-	 wf7PGFRu/34ToHvYjeTTTp4RxEGjSGIyuWD6vY5FbTqHdgqbfAuUWyYabU2ACW6Ekz
-	 f1MErYPfWkPGztFitNV+RarkjaCEWLBh+id+sa6V+nCi15iKg0m10fZjpIY8uPp8WA
-	 nnIslgDQftF2bzymJw7lxBAM/N7y7yieXwGsOmBFKRCyqr0WnGknBuSYGBsj7t1wRv
-	 hTkvwmUBWpknSuYqPLSDkRL9tsBvjN/y2QBTyZKfTOnNd7H7NcAp8dtcaFkrsmNjO6
-	 sY8Yrdk9ivDcw==
-Date: Tue, 17 Dec 2024 15:10:28 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1734448444;
+	bh=GlgUN4izxMEky7tzraNnnv/jpJYjLpUaIla9Xa9CfCY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pH1ZKaeUHV0XgCBkPG3x79QX0bgIRWkcZYCDBfqVdQk0ouMtb4eq+bgo9ItZxZBpW
+	 Cd0JIrPBsVM5/kVT/F1lbjKtU9lCDKi4GbCfOr7EPGx6dggzuTNqF4tBjSFS4bY9P0
+	 qp16qxE18aOu0vY8v18ygZuHawbjv7sh2SWqS2h/6WnFZhabhH8sDUfaI2g2d9uYYd
+	 hyRG692otoYTmhGRPlSdEe/PFrp7o3pRGvdafW7JAAjUtcfAQwZdLnBaEwUL9rblg0
+	 fiZ5o5+yzqCTmwNMQgiUkVreTroXW8/7V1iPR53Av2J5HWHRwhNjeIzSCx3KOdPqZ6
+	 uUqVVYSrd8wRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tNZGs-004bWV-Cs;
+	Tue, 17 Dec 2024 15:14:02 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS
- becoming unwritable
-Message-ID: <b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
-References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
- <875xnisocy.wl-maz@kernel.org>
- <53b40aa8-f51c-4c4e-a4ad-e6a9512e5197@sirena.org.uk>
- <86v7viqusg.wl-maz@kernel.org>
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eauger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH 00/16] KVM: arm64: Add NV GICv3 support
+Date: Tue, 17 Dec 2024 15:13:15 +0000
+Message-Id: <20241217151331.934077-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Z4QihPqeM7ahcPAw"
-Content-Disposition: inline
-In-Reply-To: <86v7viqusg.wl-maz@kernel.org>
-X-Cookie: The sum of the Universe is zero.
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eauger@redhat.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+As a pendant to the timer code, here's the basic support for GICv3 for
+NV.
 
---Z4QihPqeM7ahcPAw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Compared to the versions that have existed in the past, this is a
+significant improvement, as the maintenance interrupt is finally
+behaving correctly, and I have dropped the horrible hacks that only
+gave the impression something was working.
 
-On Tue, Dec 17, 2024 at 01:54:39PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+The code is much simpler, isolated, and can even make some sense if
+you have the correct pink-ish glasses.
 
-> > The selftests are shipped as part of the kernel source and frequently
-> > used for testing the kernel, it's all one source base and we want to
-> > ensure that for example the test fix gets backported if the relevant
-> > kernel patch does.
+As for the timer code, this has been tested as part of my integration
+branch [1].
 
-> That's not what Fixes: describes. If you want to invent a new tag that
-> expresses a dependency, do that. Don't use these tags to misrepresent
-> what the patches does.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
 
-No, this isn't a new use - a Fixes: tag indicates that the referenced
-commit introduced the problem being fixed and that is exactly what's
-going on here.  Like I say the selftests are not a completely separate
-project, they are a part of the same source release as the rest of the
-kernel and it is helpful to track information like this.
+Andre Przywara (1):
+  KVM: arm64: nv: Allow userland to set VGIC maintenance IRQ
 
---Z4QihPqeM7ahcPAw
-Content-Type: application/pgp-signature; name="signature.asc"
+Jintack Lim (1):
+  KVM: arm64: nv: Respect virtual HCR_EL2.TWx setting
 
------BEGIN PGP SIGNATURE-----
+Marc Zyngier (12):
+  arm64: sysreg: Add layout for ICH_HCR_EL2
+  arm64: sysreg: Add layout for ICH_VTR_EL2
+  arm64: sysreg: Add layout for ICH_MISR_EL2
+  KVM: arm64: nv: Load timer before the GIC
+  KVM: arm64: nv: Add ICH_*_EL2 registers to vpcu_sysreg
+  KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses
+  KVM: arm64: nv: Sanitise ICH_HCR_EL2 accesses
+  KVM: arm64: nv: Nested GICv3 emulation
+  KVM: arm64: nv: Handle L2->L1 transition on interrupt injection
+  KVM: arm64: nv: Add Maintenance Interrupt emulation
+  KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
+  KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdhlGMACgkQJNaLcl1U
-h9BuXAf/dx2R8YpYX3/jMtIRY2yeLN7a+p7w0DV7dBaLXFEcPUxaS9GC2Qv71kJS
-XgZe44QxPXpIWnNMnlPWO+TsfX/Y9KLoXfiHQa7PLc4jegXgSE9t1cCd4DO//iqN
-sPerZxeVN5K6flV6SRIjmwY+67zE+0m3aituAPK/6GKjr/Jr1GTCbr46LVPWaWr6
-+Se2L+CiAPJIiYV+h1K0IPwjSkTChZAt/Ve43bKZY+3jcVbYx4unuWrSsyNGPjSD
-Xg9+XnQfdvRoSTwaipg4T+I1+CYf29gzyze7fUZ61d1YHEnNQoMXSGlnDEEcyBFf
-/OJ9bIk+wiiKn/luwRZn5hT33yU33g==
-=qHT9
------END PGP SIGNATURE-----
+Oliver Upton (2):
+  KVM: arm64: Move host SVE/SME state flags out of vCPU
+  KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
 
---Z4QihPqeM7ahcPAw--
+ .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
+ arch/arm64/include/asm/kvm_emulate.h          |  13 +
+ arch/arm64/include/asm/kvm_host.h             |  71 ++-
+ arch/arm64/include/asm/kvm_hyp.h              |   2 +
+ arch/arm64/include/asm/sysreg.h               |  30 --
+ arch/arm64/include/uapi/asm/kvm.h             |   1 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |  13 +-
+ arch/arm64/kvm/emulate-nested.c               |  18 +-
+ arch/arm64/kvm/fpsimd.c                       |  12 +-
+ arch/arm64/kvm/handle_exit.c                  |   6 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  16 +-
+ arch/arm64/kvm/nested.c                       |  12 +
+ arch/arm64/kvm/sys_regs.c                     |  95 +++-
+ arch/arm64/kvm/vgic-sys-reg-v3.c              |   8 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |  22 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          | 409 ++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  44 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                 |  18 +-
+ arch/arm64/kvm/vgic/vgic.c                    |  38 ++
+ arch/arm64/kvm/vgic/vgic.h                    |   6 +
+ arch/arm64/tools/sysreg                       |  48 ++
+ drivers/irqchip/irq-apple-aic.c               |   8 +-
+ include/kvm/arm_vgic.h                        |  10 +
+ tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
+ tools/arch/arm64/include/asm/sysreg.h         |  30 --
+ 27 files changed, 841 insertions(+), 133 deletions(-)
+ create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+
+-- 
+2.39.2
+
 
