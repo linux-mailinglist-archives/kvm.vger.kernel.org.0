@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-33929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8B89F4BB8
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 14:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 982D79F4B94
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 14:08:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A12172574
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 13:05:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E29CB1710AD
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 13:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4E21F471D;
-	Tue, 17 Dec 2024 13:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653BE1F7075;
+	Tue, 17 Dec 2024 13:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdACD9MK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFwhKA/z"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833321F03F1;
-	Tue, 17 Dec 2024 13:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9201F669E;
+	Tue, 17 Dec 2024 13:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734440498; cv=none; b=JgtyeapUYdc7jIcZR7kAr+bj06lkFHjitMI9I73VGnPhTxqeC5OPb32+Ba7QHgL6v8rJzxo0uqP2ZApNvxMPNBpnzH+Q7s8+Ety3vtpnLXq1wBR+EF3D9OpimJADniB3fO0/TE2y7JNmRODxq223RvqD0J6/JAMoUcwikhy3dgA=
+	t=1734440481; cv=none; b=mEgshV+JrWGBlNEl+5l5EiffkByJQ8ez4cGy9HiKZNkio0hiyBQ3icLlH67+8fhjNe6K1wr382BG0jHVY7pILB4vZ5FBvUSMSM3FIDzZG4fgn7lnSMwvODdG18EUEsFePM6wJBW4Es3vxkkV3sGEmIyxhhSZgOVktBgcw1JGIgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734440498; c=relaxed/simple;
-	bh=txr0vDjl8mznkO+cXTCQ+EHv0Saw9V/4thNLzvjUkyQ=;
+	s=arc-20240116; t=1734440481; c=relaxed/simple;
+	bh=d/zWaTbRWl2SeZvtdCC9mFOn7TRDMhrcIPAPxHQpIr4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NiHNihAI9/RdHXmWpJzmgBvMl4XjDQg1n74bhKOLwbnX0wNTUcLC/3t+ssV/oeFzJe1mOIoDbmZlpKk41b9ic/D2BcKxuvnuGFflEBgbttcRQ+De1tEEXJJhUf/UY2E/MCIDOauaTZ12wyYDlg6LfyimU84Fl7eWQJS4qMeczbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdACD9MK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE30C4CED4;
-	Tue, 17 Dec 2024 13:01:37 +0000 (UTC)
+	 MIME-Version; b=MA5zg4GVcxcS3684huE823PJkUfYq8vXLCJ+JM4C1AQsAfdw+s2XxLHVsD4BMxLq6Fv9njztUTCq0aLg+vJwD5GFEtoPyFt8Kjl0mIVDdygULrwadR0HBThj3AccdUv6ptLBu9FBsOYGo6eqtGK8JulLUzxU6va+ESW184u8VUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFwhKA/z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0224C4CED3;
+	Tue, 17 Dec 2024 13:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734440498;
-	bh=txr0vDjl8mznkO+cXTCQ+EHv0Saw9V/4thNLzvjUkyQ=;
+	s=k20201202; t=1734440480;
+	bh=d/zWaTbRWl2SeZvtdCC9mFOn7TRDMhrcIPAPxHQpIr4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LdACD9MKWm1D6X4kRWaGTcthlF/q9vCUHezCoZOdL0kT2cXJttd2ePXuz/zIlQNyl
-	 p1T9uZdqg7os8bvNjLWvtY/Lr5cR2Z6JNP5SfO4oN3KqvQr2euWy6ueUFvzxsHQDwC
-	 R45dGMGpmp5NuG7inw7meA1EvPtQkjchsEYMbFYmmszNsEWpE+01zji7p4Mx25xe6B
-	 mrP6eP1QXEnn8RWQ6/61RZRHfZJSAS8otC1BZrVeMEHTBEdyH9ULX4tUYI+DZpbVrA
-	 FT6u2VbZ7DoMdvqfBKNbj2KHcChAxZFAfQfGV2qhyQFOB5pBToEvmDShClNsfty4Qt
-	 I2BRfo/20eJ5Q==
+	b=RFwhKA/zJWrblb4tpgarpe8NCYl7Kl2IT/4LiFu4JEiCX69VRrPbAZkQAGaOJEJUG
+	 5fkoMi3XhIgW1V/eBjC2CzrDZRR9pd4IGf/8iULSNVoGyZUk5C77Hy3XkWv4AzJe87
+	 2B/s9yHsmSXseje9qkDjFCbbmpqKc211dWgcz+iNybtlScOcz31SGjfAWmfy1E0t40
+	 HXFObjwTar9/gFpvUpIoYpBsTSr0MSqYqFUdxfZyVTd0gnZkOaD0gwlnkMF6G5rmhk
+	 cAQnHnoGyVL1zogPve1mYPzmZSR28x+EXnYsqaCcz4YDsseXmIRuy0SMaKi0w4hDzK
+	 bl050WlzPuL5g==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -49,8 +49,7 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Will Deacon <will@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
+Cc: Keith Busch <kbusch@kernel.org>,
 	Bjorn Helgaas <bhelgaas@google.com>,
 	Logan Gunthorpe <logang@deltatee.com>,
 	Yishai Hadas <yishaih@nvidia.com>,
@@ -70,11 +69,10 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v5 04/17] iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
-Date: Tue, 17 Dec 2024 15:00:22 +0200
-Message-ID: <0ae577f8b99f7e03c679729434c87ea7daf78955.1734436840.git.leon@kernel.org>
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v5 06/17] iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+Date: Tue, 17 Dec 2024 15:00:24 +0200
+Message-ID: <e5a21b5619f0984e14bf8d351cb256f2ee27146e.1734436840.git.leon@kernel.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <cover.1734436840.git.leon@kernel.org>
 References: <cover.1734436840.git.leon@kernel.org>
@@ -86,50 +84,113 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Christoph Hellwig <hch@lst.de>
 
-Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
-existing limitation of underlying functions which can't split individual
-ranges.
+Split the iommu logic from iommu_dma_map_page into a separate helper.
+This not only keeps the code neatly separated, but will also allow for
+reuse in another caller.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Acked-by: Will Deacon <will@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/iommu/iommu.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/iommu/dma-iommu.c | 73 ++++++++++++++++++++++-----------------
+ 1 file changed, 41 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index ec75d14497bf..c86a57abe292 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2590,6 +2590,25 @@ size_t iommu_unmap(struct iommu_domain *domain,
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index 5906b47a300c..d473ea4329ab 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -1161,6 +1161,43 @@ void iommu_dma_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
+ 			arch_sync_dma_for_device(sg_phys(sg), sg->length, dir);
  }
- EXPORT_SYMBOL_GPL(iommu_unmap);
  
-+/**
-+ * iommu_unmap_fast() - Remove mappings from a range of IOVA without IOTLB sync
-+ * @domain: Domain to manipulate
-+ * @iova: IO virtual address to start
-+ * @size: Length of the range starting from @iova
-+ * @iotlb_gather: range information for a pending IOTLB flush
-+ *
-+ * iommu_unmap_fast() will remove a translation created by iommu_map().
-+ * It can't subdivide a mapping created by iommu_map(), so it should be
-+ * called with IOVA ranges that match what was passed to iommu_map(). The
-+ * range can aggregate contiguous iommu_map() calls so long as no individual
-+ * range is split.
-+ *
-+ * Basically iommu_unmap_fast() is the same as iommu_unmap() but for callers
-+ * which manage the IOTLB flushing externally to perform a batched sync.
-+ *
-+ * Returns: Number of bytes of IOVA unmapped. iova + res will be the point
-+ * unmapping stopped.
-+ */
- size_t iommu_unmap_fast(struct iommu_domain *domain,
- 			unsigned long iova, size_t size,
- 			struct iommu_iotlb_gather *iotlb_gather)
++static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
++		size_t size, enum dma_data_direction dir, unsigned long attrs)
++{
++	struct iommu_domain *domain = iommu_get_dma_domain(dev);
++	struct iova_domain *iovad = &domain->iova_cookie->iovad;
++
++	if (!is_swiotlb_active(dev)) {
++		dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
++		return DMA_MAPPING_ERROR;
++	}
++
++	trace_swiotlb_bounced(dev, phys, size);
++
++	phys = swiotlb_tbl_map_single(dev, phys, size, iova_mask(iovad), dir,
++			attrs);
++
++	/*
++	 * Untrusted devices should not see padding areas with random leftover
++	 * kernel data, so zero the pre- and post-padding.
++	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
++	 * the contents of the original memory buffer.
++	 */
++	if (phys != DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
++		size_t start, virt = (size_t)phys_to_virt(phys);
++
++		/* Pre-padding */
++		start = iova_align_down(iovad, virt);
++		memset((void *)start, 0, virt - start);
++
++		/* Post-padding */
++		start = virt + size;
++		memset((void *)start, 0, iova_align(iovad, start) - start);
++	}
++
++	return phys;
++}
++
+ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+ 	      unsigned long offset, size_t size, enum dma_data_direction dir,
+ 	      unsigned long attrs)
+@@ -1174,42 +1211,14 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+ 	dma_addr_t iova, dma_mask = dma_get_mask(dev);
+ 
+ 	/*
+-	 * If both the physical buffer start address and size are
+-	 * page aligned, we don't need to use a bounce page.
++	 * If both the physical buffer start address and size are page aligned,
++	 * we don't need to use a bounce page.
+ 	 */
+ 	if (dev_use_swiotlb(dev, size, dir) &&
+ 	    iova_offset(iovad, phys | size)) {
+-		if (!is_swiotlb_active(dev)) {
+-			dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
+-			return DMA_MAPPING_ERROR;
+-		}
+-
+-		trace_swiotlb_bounced(dev, phys, size);
+-
+-		phys = swiotlb_tbl_map_single(dev, phys, size,
+-					      iova_mask(iovad), dir, attrs);
+-
++		phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
+ 		if (phys == DMA_MAPPING_ERROR)
+-			return DMA_MAPPING_ERROR;
+-
+-		/*
+-		 * Untrusted devices should not see padding areas with random
+-		 * leftover kernel data, so zero the pre- and post-padding.
+-		 * swiotlb_tbl_map_single() has initialized the bounce buffer
+-		 * proper to the contents of the original memory buffer.
+-		 */
+-		if (dev_is_untrusted(dev)) {
+-			size_t start, virt = (size_t)phys_to_virt(phys);
+-
+-			/* Pre-padding */
+-			start = iova_align_down(iovad, virt);
+-			memset((void *)start, 0, virt - start);
+-
+-			/* Post-padding */
+-			start = virt + size;
+-			memset((void *)start, 0,
+-			       iova_align(iovad, start) - start);
+-		}
++			return phys;
+ 	}
+ 
+ 	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
 -- 
 2.47.0
 
