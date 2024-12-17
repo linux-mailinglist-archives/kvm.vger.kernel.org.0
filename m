@@ -1,114 +1,149 @@
-Return-Path: <kvm+bounces-33894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4F39F3ECC
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 01:30:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF4F9F3F45
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 01:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FDBE16DC13
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 00:30:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B6371890C57
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 00:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F5220B22;
-	Tue, 17 Dec 2024 00:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEE82557A;
+	Tue, 17 Dec 2024 00:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wrP2M+ww"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nUAQSvwk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9F018035
-	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 00:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303D71DA53
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 00:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734395376; cv=none; b=iUpkOGQUgNrcg+OWP9kJAzDK6u63KfMEC29hCMaIuiBWl+69J2re2yT2oz7Ap7YDMpKR8DvUKHNW5oXSHpAeIt1ZHjtSSNCcfyy4J7ohsXbNu2S1G1OcBAmoRVSsJFrfxgPeKNhPS2VtG6eSRHXBVfW4MaVbLbIuebA4nglf4Bo=
+	t=1734396083; cv=none; b=dKHUeFNt0CnM48ZUEFVT63ylNGn2BLmLHjqhyDE/lTTdM7HVPYT0veHaashn/nliokfH+mcihaRVXbCLuYbr51AZGcZ2Abt88d/yvtVuTAWrY+3rVtGBqTgn3xoBXfR1fofhojuet9/RM7pbaZ3cTV7JVwGdFcmCiSxdqGigS+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734395376; c=relaxed/simple;
-	bh=tKgUb236+UPmH908Ihb+K0eHexiRBeuza+BHm3B48YY=;
+	s=arc-20240116; t=1734396083; c=relaxed/simple;
+	bh=TIrEvm9eCLPEeAmjEw4NIDu5yd1DyCHtbm9pQstqZTY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mdwaoXJkkvszv54qqdIiCh2HS9Ydi61eILWg55RBebA+Z4H4viXEGTOMJoyyNbc58u5JriUdqf9O8ruumFXMSN5gcGalNLrtAVum9uicGkTYraMaV8eKCcIz9K4bpqhiwM9gLLY49BfzkTjg+kllGx2Ku11X42iUJ/jrnm3xPrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wrP2M+ww; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=Gb7fqvxib4fUmUirRzMenWFaHzYdChCKUAaZhvqmIZj0+NW20Vl81xN+//D9RgulWjzaOu0g4TC0yJkvIRy/fnpw48k6k+IKMfUu2duW4PGV1nEydzZn0J8xa2al+PWSkd+eBKW+YoX5w35BrdVuDAfcFrLK5AYYVLoumVejc9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nUAQSvwk; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7fd3ea0ff8eso3076774a12.0
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 16:29:34 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7fd3c241975so4681309a12.0
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2024 16:41:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734395374; x=1735000174; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734396081; x=1735000881; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Db/ZmD8RsS+Ekv1pMP4d94SEiz9JgoOtJsiGIN6ZfPs=;
-        b=wrP2M+ww2GXNXy0EeLfKYbum7tW6pdjMeD33J7j0F1Sq78agC+bNg3W5IRqv4WFlOb
-         UT4W7rKDb/XxjWhtqgg5a1vbHDAnAihGFL5X2S94LVloN4Qw5zM2vvlFbWXmAxXirRd7
-         T7rMay4+bN3gF6XRJXP7DOYF06I9kXIbySi6mZoXrmPkcmaU0vbOxc97hr3bj8JU7eWM
-         E6+9+slkHMIi+ck8fI6QRQ61SJDeY1F4yKy8Obm+EJ189plv1cZTMwUdXgaTvC62cIgZ
-         KDZW7CDc9KpcCTVHddexPAxgBohvxl2s1wq7Mi55pUAJP3jnAkhYAXFrq2qbDzhBSuJ5
-         TKAg==
+        bh=SVZE8ww7hlxXIAgiO38dFZnYzWTiCGe7yyX71jozgqI=;
+        b=nUAQSvwkCU+gUPGff1wlDPXFx/C7latUyv0qU2QmnSrGivbCr98dFznHdTLnrfAqgW
+         Ozu0pfBlHejPcgbj5VEbhsLcoN6eADcWhNt1M2nFJvTrCLINiBNJxw77K1oR/9C3+MCK
+         IqMA88XQM2ikammbiRv6rKRZ/fd7DU3ZbEq5o9xLLtlKNzAnYhMRQltiiJN9irRVqFMy
+         AiZSdxR1++HJOFQL/dYg+jhB7iepZUjxU/KZo5dKcmnsM6PLhhhRdVdP4MpL2lZLe03B
+         pmMojhsJJokmEMpu5zrh2mrnSxVCac9p5tWJ1IKJHY30qtjkcjbsLeZNPVHd/LTsqdZQ
+         YPrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734395374; x=1735000174;
+        d=1e100.net; s=20230601; t=1734396081; x=1735000881;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Db/ZmD8RsS+Ekv1pMP4d94SEiz9JgoOtJsiGIN6ZfPs=;
-        b=fOp1zUP3+E1Hc3KQ3o4RI7Rhzq/JftSwJX6R66GukPb/x1Rlyj0cSCaaF3yYPy6LhM
-         mabzdYDUxfqdVFn7xQjTyuqky0w9mbUm4DZr+b4uCupzCqbGm3ZLyX6jXO5UHVA7v0vW
-         ME9gQCjHFrtA1gBo/nqZehetyRayw+U+R2bqq8szaSIGfd1pktXZt6u1SzI4xsZ5Yfe3
-         gl3WfL20Ail+AiFSqtP9PfLd3If+CJtKI7tppALy8hZZ/paLHkoYqEEUXyGTsgHZ5ykf
-         dI71+KJiJxS2ggnTZTGCuOgrdr5wlN4ya/THwO5kOxlhwK8046SWnnxz+czaLx+XU1ps
-         I/tg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeJYKk3petn7ugO1O7ltO3Fc5KKSDsvenTlr1/ULws9oQeSKS7UIwhizcEXXYm/RCmubE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjoFftQs/PLiVxG0Tp38TI1UPS7M85H+8HA5H1jY/FCmKLMpfw
-	mU0qVXcZEZ1LIrNcAur2Onfmz/4HmcjCQD6+mnF9F049ermor9nSDDubtLEUBtS4GVEbzDwIf4j
-	/5w==
-X-Google-Smtp-Source: AGHT+IHjgHrA7xG0NpkEgyerFx4NYRTJeFfDwmp5imjiS4hM3JmM9g8Y/8s0n5IjWFI1IdYyAKTqLOiDHjQ=
-X-Received: from pjbsj13.prod.google.com ([2002:a17:90b:2d8d:b0:2ef:79ee:65c0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6cb:b0:2ea:5e0c:2847
- with SMTP id 98e67ed59e1d1-2f2d7eece3fmr1895400a91.22.1734395374509; Mon, 16
- Dec 2024 16:29:34 -0800 (PST)
-Date: Mon, 16 Dec 2024 16:29:33 -0800
-In-Reply-To: <20241206221257.7167-1-huibo.wang@amd.com>
+        bh=SVZE8ww7hlxXIAgiO38dFZnYzWTiCGe7yyX71jozgqI=;
+        b=tAUlukGnyEJHjmu0wzs0zELrZIZ+53A+aRqGJit7B4CUXpw9fokYEt5uTYJEA2UwMp
+         yC1ZvfC9SoecvS+Fp0meihDuuoI/MW+66hQwWsjCTz68RFe48i5aKU2BFqDm6i8+4Nju
+         jsjtbWVBYmgmpL17+i083w0NZrQnIMQK0uYzgq8J6hTw4paqx5lAKEnBE3jujnAOq5dD
+         AWBe8z3V9xpdR1/Pv7sQU6eO7bs29oTp+CnxmR/fMVaADv01AlZtgh39j6sNV7AAFFVj
+         LnTzMAq1WyMIenap/qKT3AjBbUeZM2EPe9ZgxzjDwZX/bXj0TgWKt6Ex4Y9Iv/eIrTa3
+         BklQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4fzIMwsInZ6CD2dq4D6Eq3r2+JQzAX/EDXlCsOpC7hQeuLYoIdc6n2768p1nkC2Xhxdw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7E7FLT2+5YiLqFkjDq02yC5mbCyPvqaYqW5NBjvAYegmMg//v
+	oAxifpZO6w3Lzr0loIh5G5BBEaU4slUBKh6dmgpMaItXNQSdLXVzSs64Avf0W6A12fEM/ByqC4v
+	HGQ==
+X-Google-Smtp-Source: AGHT+IHW1a+Hg5MKGxBMSOoxx7zV4eOyFes0F4KwkjEBriafCpzRCcvlXIeQi9ilKpK0TbR6J7H3aIaPLiI=
+X-Received: from pjf3.prod.google.com ([2002:a17:90b:3f03:b0:2ea:29de:af10])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c105:b0:2ee:5c9b:35c0
+ with SMTP id 98e67ed59e1d1-2f2d880e0bemr2010019a91.9.1734396081493; Mon, 16
+ Dec 2024 16:41:21 -0800 (PST)
+Date: Mon, 16 Dec 2024 16:41:19 -0800
+In-Reply-To: <20241206221257.7167-2-huibo.wang@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241206221257.7167-1-huibo.wang@amd.com>
-Message-ID: <Z2DF7UFNt1vayroN@google.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Make VMGEXIT GHCB exit codes more readable
+References: <20241206221257.7167-1-huibo.wang@amd.com> <20241206221257.7167-2-huibo.wang@amd.com>
+Message-ID: <Z2DIrxpwg1dUdm3y@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Convert plain error code numbers to defines
 From: Sean Christopherson <seanjc@google.com>
 To: Melody Wang <huibo.wang@amd.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, 
 	LKML <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Dhaval Giani <dhaval.giani@amd.com>
+	Dhaval Giani <dhaval.giani@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Dec 06, 2024, Melody Wang wrote:
-> Hi all,
+> Convert VMGEXIT SW_EXITINFO1 codes from plain numbers to proper defines.
 > 
-> Here are two patches to make VMGEXIT GHCB exit codes more readable. All
-> feedback is appreciated.
+> No functionality changed.
 > 
-> Thanks,
-> Melody
+> Signed-off-by: Melody Wang <huibo.wang@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Reviewed-by: Pavan Kumar Paluri <papaluri@amd.com>
+> ---
+>  arch/x86/include/asm/sev-common.h |  8 ++++++++
+>  arch/x86/kvm/svm/sev.c            | 12 ++++++------
+>  arch/x86/kvm/svm/svm.c            |  2 +-
+>  3 files changed, 15 insertions(+), 7 deletions(-)
 > 
-> Melody Wang (2):
->   KVM: SVM: Convert plain error code numbers to defines
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 98726c2b04f8..01d4744e880a 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -209,6 +209,14 @@ struct snp_psc_desc {
+>  
+>  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+>  
+> +/*
+> + * Error codes of the GHCB SW_EXITINFO1 related to GHCB input that can be
+> + * communicated back to the guest
+> + */
+> +#define GHCB_HV_RESP_SUCCESS		0
 
-When adding patches to a series, please treat the "new" series as a continuation
-of the previous series, and follow all of the normal "rules" for documenting the
-delta between versions.  I.e. this should be v3, since patch 1 was posted as v2.
+Somewhat of a nit, but I don't think "SUCCESS" is appropriate due to the bizarre
+return codes for Page State Change (PSC) requests.  For unknown reasons (really,
+why!?!?), PSC requests apparently always get back '0', but then put a bunch of
+errors into SW_EXITINFO2, including cases that are clearly not "success".
 
-https://lore.kernel.org/all/20241202214032.350109-1-huibo.wang@amd.com
+FWIW, "no action" isn't much better, because it too directly conflicts with
+the documentation for PSC:
 
->   KVM: SVM: Provide helpers to set the error code
-> 
->  arch/x86/include/asm/sev-common.h |  8 +++++++
->  arch/x86/kvm/svm/sev.c            | 39 +++++++++++++++++--------------
->  arch/x86/kvm/svm/svm.c            |  6 +----
->  arch/x86/kvm/svm/svm.h            | 24 +++++++++++++++++++
->  4 files changed, 54 insertions(+), 23 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
+  The page state change request was interrupted, retry the request.
+                                                 ^^^^^^^^^^^^^^^^^
+I'm all for having svm_vmgexit_success(), but I think the macro needs to be
+NO_ACTION (even though it too is flawed), because I strongly suspect that patch 2
+deliberately avoided SUCCESS in snp_handle_guest_req() and snp_complete_psc()
+specifically because you knew SUCCESS would be misleading.
+
+> +#define GHCB_HV_RESP_ISSUE_EXCEPTION	1
+> +#define GHCB_HV_RESP_MALFORMED_INPUT	2
+
+Where is '2' actually documented?  I looked all over the GHCB and the only ones
+I can find are '0' and '1'.
+
+  0x0000
+    o No action requested by the hypervisor.
+  0x0001
+    o The hypervisor has requested an exception be issued
+
+And again, somewhat of a nit, but PSC ruins all the fun once more, because it
+quite clearly has multiple "malformed input" responses.  So if PSC can get rejected
+with "bad input", why on earth would it not use GHCB_HV_RESP_MALFORMED_INPUT?
+
+  o SW_EXITINFO2[31:0] == 0x00000001
+    The page_state_change_header structure is not valid
+
+  o SW_EXITINFO2[31:0] == 0x00000002
+    The page_state_change_entry structure, identified by
+    page_state_change_header.cur_entry, is not valid.
 
