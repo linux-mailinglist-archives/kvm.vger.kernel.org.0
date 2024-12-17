@@ -1,138 +1,152 @@
-Return-Path: <kvm+bounces-33909-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-33910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B78339F4612
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 09:30:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFB29F46A3
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 09:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08FC4163F7D
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 08:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239A81889646
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2024 08:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412EE1DB95D;
-	Tue, 17 Dec 2024 08:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE58C1DE2D8;
+	Tue, 17 Dec 2024 08:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l71SWLKk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFCw6vNY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5132342AA1;
-	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7A192B66
+	for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 08:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734424242; cv=none; b=RH1VoDeGzHk13AXVEOsiOUT8zl7Qht+k9CuZlDgH13MrSSLXibbOWJ7RkrFM/3YvHqAe+cY1BAjbJz8AGBBzI1sq6pAk0wD/AWHJYTob4I2m6hEAt5j17AJ1z4GIk45Mf5DyHHVqBJPyWGfgWsLk5vUC1r6RVbdb7jRZgpANYtU=
+	t=1734425841; cv=none; b=QzpibvsYd1TrjAgJTx5cncos8JqmyySKwJabM6Bop8lH4iPL/NBcbYpuF+AA4saWDSnqXCQzM02wMfNZq3IWAKo6keVGsYWU2AklKjLMeY7WvQJ8ay8rUTsw24iyQWfT9A0co2YOa6Ez7whUuJRYHBaMv9atDI4oZzgiHzuoCgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734424242; c=relaxed/simple;
-	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K+HAseZuvJUF0HZxal4awqmQ16CGFCO9sKdOxr2ML6PzDoH6Gb48NK5xtpxnlOwnLcteW59dMJdypW1/CANg5H23c3OizQoP1gHityStU221d/9Jb2mTDT+QsjIINZhIvMIH02eT3GJTQBu9+Y9G33+rqGpyWLvu278k8GfxM1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l71SWLKk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4114C4CED3;
-	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734424241;
-	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l71SWLKkp5Nr6M3mGg7Pnz7kNu8F11xrwYQn0V5no43bAVGRUefq9YI++b48YR2iF
-	 XLzjqUZM8Kxrli6aeQOs/nhmsuSFeNGB58flYwT/Osicp7ooEbd8k/maROtfilItWx
-	 95hl/39ExSBwDRDk4bJtjMT+Nbyye7DCJ6/WPw2lkagcGYv4pi58fdXz5JhxWL9ESo
-	 53w70EyCfe9PH5Z07DepXeIuhq7+cIVJYuMQ5oEEGF242D6/uau1OwGXGUfVnf37WB
-	 drfRHAwCnDGcxlCO89pXxOsWD7CExbpQTB5CIAN+tPV64VgIdYVKDufjF/4KaiRUPP
-	 dE4KMrklV1DIQ==
-Received: from [82.132.185.145] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNSyV-004TdD-Hg;
-	Tue, 17 Dec 2024 08:30:39 +0000
-Date: Tue, 17 Dec 2024 08:30:37 +0000
-Message-ID: <875xnisocy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
-In-Reply-To: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
-References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1734425841; c=relaxed/simple;
+	bh=my89gapazaRXABx0ds8EDdV5LyYYL2x4cidIM74wTVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBC1brqDFL/oUPaxAtll8ORaa9tuNUvaIqkY0sLdMYseuH/33h6Yq2m7tGRDLYNMUjeODlbQv/E2hrZq4TNFMVY3Oc2+IqqQqh110l5oUW1Td0mhgeThJkfg19BlwtU/vBLgh8mfhSyiXqh5HO8weOqqmNQe/n5esFYSFKUziN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFCw6vNY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734425838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e36MqRAUUxdsVobCeHh3rEjTnXYHMB/28HuSecqnBzU=;
+	b=jFCw6vNYan504jBB4wZB9SbjOBHITFDAg51rRIikZ7zjte6SXLjM/ETav1Ygwe83k4CPOC
+	oD+jYi+rXshEBZItmoOMRk4oY0ow1pIsK2lMWH8W+CYbdYhA9O5XM+VKvZigpYKLYtaT9d
+	lzo7CeluNgWScLqOV8HwGU5dB5zDbxA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-556-3L0nztTZPjGW9DtLi7gXvQ-1; Tue, 17 Dec 2024 03:57:17 -0500
+X-MC-Unique: 3L0nztTZPjGW9DtLi7gXvQ-1
+X-Mimecast-MFC-AGG-ID: 3L0nztTZPjGW9DtLi7gXvQ
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6d8f0b1023bso56485106d6.0
+        for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 00:57:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734425837; x=1735030637;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e36MqRAUUxdsVobCeHh3rEjTnXYHMB/28HuSecqnBzU=;
+        b=WM9EwwXzD3dKmKiZF9V1er0Y54IZF97YyWNxSvOA4w55cF1mfl8itrwQoMSZa5WPlI
+         cqx8wJ7QAgof6iDUZ/p9YrP46+ufsRJNSGD7dd9M+a/1kpv7id93fGo9EwblOtArqh6b
+         odr0XDiVzYhxylIqNz5ME3BUBURtVtYYvHDBTPdtQjyMJwwEspGVd5CuIncZ6rckf87I
+         Cpc7a+xBYtn3/2uEtHSslFGYfU1mGM6CZese07KD6IOH+7GCaO4tK0z5cldJ0ve2qTLt
+         85KQ1Z/FCCGylwDHBpQLi14NLQfLytv4HXxeOB1b3w6pLwT+IBRfFuez2C6zf/jdmer/
+         p2iA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdYkptn1AN/5FGjaIlLB23F3tMBEESuxQ1fzyPPSGYw0BwUoEQt8PZE/HuHEjOmPhHWl8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU8wlnNMMjdRTATyKHG8GDjUIwtrKOxK5yTV6Ni5JCZJWDsNee
+	MqxU7HJICWGtrRo2XtjJ29PtJza1a+tygWsENwJIFBJHu4PED53wMZI9zKKfO7rigcX57aaSPuB
+	J7mPPaRnlDvm42iSrMFAQTWr8f/tJ/6nigztBP1kMu044WaQRtg==
+X-Gm-Gg: ASbGncsoGgK55IOo2Nd5fYgF8jwddCMUmWtL20nvaAyIXpGfilNn4/eiKDsbErGVpjj
+	7CqEvrWUBy95cnTrYiagAeS1+3sQRjGPSClZwwOyX9T/98g8w8NWOLMB+IKvwAU94SWS1sYAgJQ
+	JdqpQAInkDp7VmncY6WPDXy6bFbRpjiCcmFH/6eom2kpQHJG0unr2DBS173p2soNNTnbq2fcGee
+	6x/1KKaYFPjcXBlf8X+ZyTSwNaZx4AxTfj5YcBLBi3MLBDFRFXsqNJWjTF6orQjx5VY2kURZu3R
+	glErqJYqnp16qwyU5/sNm1Y3yYvUgr1bdnUng2uI1pw=
+X-Received: by 2002:ad4:5c6f:0:b0:6d8:a32e:8426 with SMTP id 6a1803df08f44-6dc86ad7976mr257129846d6.3.1734425837029;
+        Tue, 17 Dec 2024 00:57:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7OHDlYB62X/RjbCS6tlztv/Jo/Zkez7NULudfz1M3aDsbY23BSx9G1w3C9AIZrsP6H+k8zA==
+X-Received: by 2002:ad4:5c6f:0:b0:6d8:a32e:8426 with SMTP id 6a1803df08f44-6dc86ad7976mr257129666d6.3.1734425836698;
+        Tue, 17 Dec 2024 00:57:16 -0800 (PST)
+Received: from jlelli-thinkpadt14gen4.remote.csb (host-80-40-237-196.as13285.net. [80.40.237.196])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dccd25a0c9sm36322796d6.33.2024.12.17.00.57.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 00:57:16 -0800 (PST)
+Date: Tue, 17 Dec 2024 08:57:11 +0000
+From: Juri Lelli <juri.lelli@redhat.com>
+To: Ranguvar <ranguvar@ranguvar.io>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@gmail.com>,
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+	"regressions@leemhuis.info" <regressions@leemhuis.info>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [REGRESSION][BISECTED] from bd9bbc96e835: cannot boot Win11 KVM
+ guest
+Message-ID: <Z2E858-8jA6_xWFd@jlelli-thinkpadt14gen4.remote.csb>
+References: <jGQc86Npv2BVcA61A7EPFQYcclIuxb07m-UqU0w22FA8_o3-0_xc6OQPp_CHDBZhId9acH4hyiOqki9w7Q0-WmuoVqsCoQfefaHNdfcV2ww=@ranguvar.io>
+ <20241214185248.GE10560@noisy.programming.kicks-ass.net>
+ <gvam6amt25mlvpxlpcra2caesdfpr5a75cba3e4n373tzqld3k@ciutribtvmjj>
+ <Z2BaZSKtaAPGSCqb@google.com>
+ <b6d8WzC2p_tpdLs36QeL_oqtEKy_pRy-PdeOxa08JtTcPhHNNOCjN73b799C0gv8NnmIJKH9gD6J4W-Dv5JKEVdrbMoVUp3wSOrqEY_LrDg=@ranguvar.io>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.185.145
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6d8WzC2p_tpdLs36QeL_oqtEKy_pRy-PdeOxa08JtTcPhHNNOCjN73b799C0gv8NnmIJKH9gD6J4W-Dv5JKEVdrbMoVUp3wSOrqEY_LrDg=@ranguvar.io>
 
-On Mon, 16 Dec 2024 19:28:24 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On 16/12/24 20:40, Ranguvar wrote:
+> On Monday, December 16th, 2024 at 16:50, Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > On Mon, Dec 16, 2024, Juri Lelli wrote:
+> > 
+> > > On 14/12/24 19:52, Peter Zijlstra wrote:
+> > > 
+> > > > On Sat, Dec 14, 2024 at 06:32:57AM +0000, Ranguvar wrote:
+> > > > 
+> > > > > I have in kernel cmdline `iommu=pt isolcpus=1-7,17-23 rcu_nocbs=1-7,17-23 nohz_full=1-7,17-23`. Removing iommu=pt does not produce a change, and
+> > > > > dropping the core isolation freezes the host on VM startup.
+> > 
+> > As in, dropping all of isolcpus, rcu_nocbs, and nohz_full? Or just dropping
+> > isolcpus?
 > 
-> In commit 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits
-> to be overridden") we made that bitfield in the ID registers unwritable
-> however the change neglected to make the corresponding update to set_id_regs
-> resulting in it failing:
+> Thanks for looking.
+> I had dropped all three, but not altered the VM guest config, which is:
 > 
-> # ok 56 ID_AA64MMFR0_EL1_BIGEND
-> # ==== Test Assertion Failure ====
-> #   aarch64/set_id_regs.c:434: masks[idx] & ftr_bits[j].mask == ftr_bits[j].mask
-> #   pid=5566 tid=5566 errno=22 - Invalid argument
-> #      1	0x00000000004034a7: test_vm_ftr_id_regs at set_id_regs.c:434
-> #      2	0x0000000000401b53: main at set_id_regs.c:684
-> #      3	0x0000ffff8e6b7543: ?? ??:0
-> #      4	0x0000ffff8e6b7617: ?? ??:0
-> #      5	0x0000000000401e6f: _start at ??:?
-> #   0 != 0xf0 (masks[idx] & ftr_bits[j].mask != ftr_bits[j].mask)
-> not ok 8 selftests: kvm: set_id_regs # exit=254
-> 
-> Remove ID_AA64MMFR1_EL1.ASIDBITS from the set of bitfields we test for
-> writeability.
-> 
-> Fixes: 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be overridden")
+> <cputune>
+> <vcpupin vcpu='0' cpuset='2'/>
+> <vcpupin vcpu='1' cpuset='18'/>
+> ...
+> <vcpupin vcpu='11' cpuset='23'/>
+> <emulatorpin cpuset='1,17'/>
+> <iothreadpin iothread='1' cpuset='1,17'/>
+> <vcpusched vcpus='0' scheduler='fifo' priority='95'/>
+> ...
+> <iothreadsched iothreads='1' scheduler='fifo' priority='50'/>
 
-A patch for a test doesn't fix anything in the kernel.
+Are you disabling/enabling/configuring RT throttling (sched_rt_{runtime,
+period}_us) in your configuration?
 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 -
->  1 file changed, 1 deletion(-)
+> </cputune>
 > 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index a79b7f18452d2ec336ae623b8aa5c9cf329b6b4e..3a97c160b5fec990aaf8dfaf100a907b913f057c 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -152,7 +152,6 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGENDEL0, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, SNSMEM, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGEND, 0),
-> -	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ASIDBITS, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, PARANGE, 0),
->  	REG_FTR_END,
->  };
+> CPU mode is host-passthrough, cache mode is passthrough.
+> 
+> The 24GB VRAM did cause trouble when setting up resizeable BAR months ago as well. It necessitated a special qemu config:
+> <qemu:commandline>
+> <qemu:arg value='-fw_cfg'/>
+> <qemu:arg value='opt/ovmf/PciMmio64Mb,string=65536'/>
+> </qemu:commandline>
 > 
 
-With the Fixes: line dropped,
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
