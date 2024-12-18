@@ -1,148 +1,133 @@
-Return-Path: <kvm+bounces-34056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D2B9F6A73
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:52:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD90A9F6A9D
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:59:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33612172078
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 15:52:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58AFC172507
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 15:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8396413D518;
-	Wed, 18 Dec 2024 15:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C151F239E;
+	Wed, 18 Dec 2024 15:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DP5wJBUx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xzxVwNOR"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2417D1E9B09;
-	Wed, 18 Dec 2024 15:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734537152; cv=fail; b=gC2Fwj5755253EMmvbvccXCMYD9me8quF7v4jh4aDUojrRZDYO68ZAHQtqokJjWbRsRkh+YHbgjRe2gDzmUjH6UQhJR1MlDK16ku7gSYeVoYq6N2tJUSudI3kMxt0b4M3CF0gLlHlvd7uJSYwDupHaW5gMaFlRQefVA1aqtfc1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734537152; c=relaxed/simple;
-	bh=fkyqUrU4iRsz/Xp5Wq+jUQ9e/E0Nz5riqen+uLFjJ/E=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FJw240pAAevw8NCwADdw2NHxGAdLgQ8Q0GDTIy/Gj4nIOVi3Mf+RVJoIIQy0NflEfRYaRZfxASK3904Gyauf/30gEgrxpjbNTWT7vrq5fPHQrrA/jMx7gYw9f4MSZnSz6juXNQtL3YMM3vqi5k3ZuOgmwC3suajPfHo1KoF0684=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DP5wJBUx; arc=fail smtp.client-ip=40.107.92.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o31zz18C/mNYRqPjki0XRpLCqjUox3VzJY6ru4Mfwj8i9ITPyTS5dztkVrA3dgWlBqFRSYfvFWgbRjMCje/gt26tF33fLl3h5up5qfvxjsMYEZPbDWtLRrIR4Od1XtwVPZDNZPHrEUeXKoRUBPBs8i0NBaLoKYbZBcst5ln/hrTk/lQ8Yk9TTzYpuN3JlM1R9cS7j3y1efBFtiDqm1eoIGS9nJZQRfi3+X4SglyJwekp3/gWq87C96JHL7l3YPRf39qjTywG1CYJHtm6rxlqTAVn6jb69dt1gPJGihImjX2qeX5irUHU76JaUc+TqnyxjOmcj67vwkM2JrVZRU3yhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fkyqUrU4iRsz/Xp5Wq+jUQ9e/E0Nz5riqen+uLFjJ/E=;
- b=SD4E4NZYOjibbQamnN9INa1v/CSzogO0V69W5952/faJ6tMcMbG5rriiyE8mBkPQudZaC2bqh1IqHYmJ8DdAxFSPMqAExVeI07QqWdxwMZnGARlpJ+I5VUfYwsnzbN+MI7lOM7ntlHFN2cnErjaEzfycr5NQkZsCQxEt46cr2owkzIeNrbVEMvsXiU12sMpbLEHcW2E8Xvrjl34dH3wKLmLVqfH65h7tMy9Jd9aqQxgLd4YuLsGypq5dDpqyO7Wjw1yEFJ8BeLjAhPAk3ZF/86iNUev79mAn5n4WKZTqYVP1VrSjltOujuqvB/PnXj0pkNyGWWSzSj95NG3ZBYPLnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fkyqUrU4iRsz/Xp5Wq+jUQ9e/E0Nz5riqen+uLFjJ/E=;
- b=DP5wJBUx5DiebOXtlkxiCwnfJJtqXU9Z57uFEo2qj50D6PYgjkHIOZaLfEzWDvtVe0yuimmN9SeStw6N5KudDUBLWwv+XlEqPeK8Jd9LE1Ry52y8hrOEaWCa84Tc4lwsx/H05ZedGBFGfuE02aKBtXKpyuukeitH5ivtDIRci3A=
-Received: from SJ0PR13CA0111.namprd13.prod.outlook.com (2603:10b6:a03:2c5::26)
- by BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Wed, 18 Dec
- 2024 15:52:24 +0000
-Received: from CO1PEPF000075F1.namprd03.prod.outlook.com
- (2603:10b6:a03:2c5:cafe::c5) by SJ0PR13CA0111.outlook.office365.com
- (2603:10b6:a03:2c5::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.21 via Frontend Transport; Wed,
- 18 Dec 2024 15:52:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000075F1.mail.protection.outlook.com (10.167.249.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8251.15 via Frontend Transport; Wed, 18 Dec 2024 15:52:23 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 18 Dec
- 2024 09:52:22 -0600
-Date: Wed, 18 Dec 2024 09:52:02 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <jroedel@suse.de>,
-	<thomas.lendacky@amd.com>, <ashish.kalra@amd.com>, <liam.merwick@oracle.com>,
-	<pankaj.gupta@amd.com>, <dionnaglaze@google.com>, <huibo.wang@amd.com>
-Subject: Re: [PATCH v3 0/2] SEV-SNP: Add KVM support for SNP certificate
- fetching
-Message-ID: <20241218155202.avikupjxut5gy3pc@amd.com>
-References: <20241218152226.1113411-1-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989ED1E9B09
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 15:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734537558; cv=none; b=rp3ohicNgTsK0KZHMjx4tMAlufCGtlc1Ndk1G1eYlC7IahxCfnqk05xNWXmSt3bPCcKXwYvjjtCnXQr0PeatyrDyo2nUNsZM9uFATjK/2L5LB5nYWicntUe58mLwlltoe2Ny6UH+tSPm8YIDbduf/7JKqjZQjz3lDUeGeWx6Poc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734537558; c=relaxed/simple;
+	bh=ry8HfpfC+kZEiVKDjXPRFoyqUscbKyjdliANu1nPYo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WSLyd7sMrlRMUN6Sm4MiwRqK7njF1rtzB41W6mGg4QAMdSjcQl6Mamp2KhwIsqoEVAV1tcndbTZQ0mzEQj6tHEa6gqu6X22o7ugbivHz08KTOGXc2zNEFitbHh3vKB2P5cj1QATNeEtS9eUGSyohwmHrSSJwmc1EO4vJ5JCZam0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xzxVwNOR; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3863703258fso629238f8f.1
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 07:59:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1734537555; x=1735142355; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=o7TTefP9nXOqik7RDcZbvdDuVx9jkgFOarBEq8+dT6A=;
+        b=xzxVwNORfQS3zP4ZCsTpaH7Zi56ay9S1aCkGf6RXpXZBrXkqeuADbH1e6ctzOuVw8Y
+         WL0zpoQ06C+1DSEA9lEmLfyr3A9RZUOz5QiwFDQGyUOeEImDpZ5eF6oHWzHLSZsLWarS
+         5I2D4aiYdsscrZkEBYXidQg72mk3oPd6z9NbBLoxWlLKwgwd4dw5+n7bNtP3S5UtcgfF
+         qjGlfaTiKOrkP39bnTmTvDvCIWl5sS9tR2VG1P1DYu13Rb77MhiYUnJqsUpoGXvizAt1
+         qADJSHxyoaMy6GzWi5iAuUClPc3nm/zL84yqCZBLKS2iQJspBmMekbIf5t+URgnL5MrK
+         e79g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734537555; x=1735142355;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o7TTefP9nXOqik7RDcZbvdDuVx9jkgFOarBEq8+dT6A=;
+        b=H2FTQzcWdaJ2Bz7dPUW3G7eTO9wOm3t2uC5bf7I9SRFWMIWtKOIsfk+fCQcufvSEFl
+         CSmlj+MxTrQQo5mFuFEXtqKNiz+isiTQVczDcxZKzxpf7Fz8VjlluMUiSTS6OuA2bZj6
+         IEQnB7LCtz4/VRYkIkW1zZLr2AR1dNShyX1hqfRFcn4OYw9yHa+AdQ7vmNKJnirqLntd
+         fHfmKgOOpbQ541hIBulP6jFmX8iOYAxNbCzoB9HFw9B3zU8ZzWtzegDsJ9wSnlW8Q4j+
+         OTqm/dwIFIFu7H/BSibzEI8V6yIPvuYsT+UDFeKmxVNMfYYOcS9YgmRWxglcqsESo0Ka
+         +ohA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbg+VbJMm/1uGCVf15m2fc5W4/n5kiUzOGyte56QbSNnDN2QRHf5+JkehWxeHx4nArNdA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2l9MePkZCNoW1LharaJCPBNICxUjMiRcCl+SRYYsaWeKcMAht
+	xqy3f7gccBCgb+4MfEPp+0X9a9wTlGOWvjTZjO1W1BBDnd3boOr9MPTK/HJ5+dI=
+X-Gm-Gg: ASbGncskNjZmXoVlxfQTiNz70Usgx+f5kqwXA3z9U5xbI/b/07egy0a93vjAS6jSgxR
+	5jpy3R3oCRUU5AV1OWS87h43bEVNodv66pCfgc145vmjBa+VnxSQMs6H9seY1+6lZkmYXhgeJgd
+	0NeDUFs7/jiUxM5Ok5rR6sNm6BOMntoHdaBu8oTDzLrP+14yQwf25OSMzdD5flWngbA3Oxzth8u
+	vwR4raLPK5hMwUV+KUurXzPytCt0/wbpd5r5ExsbIpEDlY8PmhbIa4bXiiWGgNmSdTNA+nRHzeB
+	pLat
+X-Google-Smtp-Source: AGHT+IELZ+GggeTZx48MEhW7+44jizCcSkYTHAep0mIEWWuSZqv0/tl8cNaTNgN3QB2V/mBJ1CUGnQ==
+X-Received: by 2002:adf:fa0f:0:b0:386:4570:ee3d with SMTP id ffacd0b85a97d-388e4e79284mr2556298f8f.24.1734537554946;
+        Wed, 18 Dec 2024 07:59:14 -0800 (PST)
+Received: from localhost.localdomain ([78.196.4.158])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c801a628sm14684705f8f.47.2024.12.18.07.59.13
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 18 Dec 2024 07:59:14 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Eric Farman <farman@linux.ibm.com>,
+	kvm@vger.kernel.org,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Thomas Huth <thuth@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-ppc@nongnu.org,
+	Zhao Liu <zhao1.liu@intel.com>,
+	qemu-s390x@nongnu.org,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>
+Subject: [PATCH 0/2] system/confidential-guest-support: Header cleanups
+Date: Wed, 18 Dec 2024 16:59:11 +0100
+Message-ID: <20241218155913.72288-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241218152226.1113411-1-michael.roth@amd.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075F1:EE_|BL1PR12MB5995:EE_
-X-MS-Office365-Filtering-Correlation-Id: acf95bcc-1148-4d98-a340-08dd1f7bf6ba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?tPW2rgWZoT/izfMgyBJjt34zwierBvtiPvD4WelJuOb8boUrffy0cpmaDiX/?=
- =?us-ascii?Q?WrQRAMf9s7wvydtilSEI1VXi7MpipaoTY3W+tSGgBmCvp9xP7Oqm3dQNZcJv?=
- =?us-ascii?Q?70HBrloEHEG8xV0sEuyZovRGszYNY5bhLxMZm/+gc3bSqUdYTVng80thJ9p1?=
- =?us-ascii?Q?L3wVp9JfNOPbbZglPi+X9q+FpsJ2+wr05WxYnsfRFyc25oaSb967NlROu3wD?=
- =?us-ascii?Q?0YcqfCdhrxPCxeXW6P7JWogJRRHjVs09zVNz0OuislNZfj0WllBizGhzgxxE?=
- =?us-ascii?Q?ntwDp00m3i0VP2fz9//d/+aq2kBk4Iv0EuDC87kw42bnIBPY4Cuh3MfD+/jq?=
- =?us-ascii?Q?FF5yJX7n7teYz/Ga1kgzdoP33vR0jfBOtREI58AZiG1ak60gcN2Qp/XLhlq3?=
- =?us-ascii?Q?3aDDEd60QQtvFh5XSHmHrsTQCS7kAwSwiyPi2RLdP3kiaNt64srdpX2qkb58?=
- =?us-ascii?Q?oDOyi36w1WAviJBnkallLcJvtPJYfIRIZU1GIvj9iCiP/6w4ac/Vp0sRB4gt?=
- =?us-ascii?Q?jT7l2WzFeVlnlojSKaTSe8NCP1MAMlIoycLyz00U6jvUfzu0SZ8JzNQM8J1I?=
- =?us-ascii?Q?cA/Lg6MZb74TsY+DDspTYqKIYVZeBGXrBzu8SMJ/FGGp9jlRhzkCa7V8MSZg?=
- =?us-ascii?Q?vWXaLlrDCvf03yEeiBnFKhIc/MtlwiQZotkg2ydRBTBUG6TVWLimx+ZnZJSZ?=
- =?us-ascii?Q?1NBozNcivXZ7KdeMvzLEEIzbsC1tR/AwbMkxmKFeBNZjhSoeK5DyEZM2yylt?=
- =?us-ascii?Q?fWqG8ncGmKVQy7BXdu68TPQg6Xgn0Tmw9YUNuTrdFdxGGYlOx9NYNnzfNgD6?=
- =?us-ascii?Q?scg5sfLCCdRPvBa22E5173YCZuNmH9shI4kgWWFCyxbVLmaprDtBI8NsCOWm?=
- =?us-ascii?Q?sNzokZzNFFO5IY5tCurSNc5aLC7zDiLejgYbBnm91mtY7TF6YxQbu51OCauN?=
- =?us-ascii?Q?Q2NldzDg7Db9RUB74MFeb6vfsWIWzSa1a3K79hgXzQk+cfTk97KquacWPTyk?=
- =?us-ascii?Q?1yXFqoWmnhlj3MvYR7NA366ppQs6lKFD0UGFc8BSsCINtdsSlF7j92ABV9X5?=
- =?us-ascii?Q?thYMHLIuWt63D40VWnlL6c0+02UMIUyTjTwsrCJDEmttTxcXcjy9M7jRmNE9?=
- =?us-ascii?Q?/9L9NqjzXxFTI/JG/fREsmyX+i2mroEaWXaaikOOHulPYQRu18PHSxHYuyt+?=
- =?us-ascii?Q?ghnlXCxP4m6/SRODOZoCLPQbIOmdLwnMAblAAgUh3ERwqF7Qk4EiKoz5Im47?=
- =?us-ascii?Q?VjSofLixo9aJMn5iRyS5ETp8DzsZNsji7BMhgD2GnDxqgakYmKqqKsGhH4Ol?=
- =?us-ascii?Q?dLizAjXYnct488rb9bDVTf3iZ/0emFuQpGxs0uNLsJHIDi0ncUXMhypJubxB?=
- =?us-ascii?Q?pxAT6n9qOHZ7E0C8fDGsAds4Iuy+2jphyLVlsOy9u4z0Bz+rXuklyFBj8k3y?=
- =?us-ascii?Q?FDizNMxBBKY5LEe2iV7UREC8vcZHcEOuHUbeEgYPN9Px+rfHdrA8YCcXzgy9?=
- =?us-ascii?Q?Q2A1BTiaTGyb+38=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2024 15:52:23.4375
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: acf95bcc-1148-4d98-a340-08dd1f7bf6ba
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075F1.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5995
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-> [PATCH v3 0/2] SEV-SNP: Add KVM support for SNP certificate fetching
+Restrict "confidential-guest-support.h" to system
+emulation, remove few SEV declarations on user mode.
 
-Sorry, please ignore the 0/2 reference in the subject line. There is now
-only 1 patch in this series.
+Philippe Mathieu-Daudé (2):
+  system: Move 'exec/confidential-guest-support.h' to system/
+  target/i386/sev: Reduce system specific declarations
+
+ .../confidential-guest-support.h              |  6 ++--
+ target/i386/confidential-guest.h              |  2 +-
+ target/i386/sev.h                             | 29 ++++++++++---------
+ backends/confidential-guest-support.c         |  2 +-
+ hw/core/machine.c                             |  2 +-
+ hw/i386/pc_sysfw.c                            |  2 +-
+ hw/ppc/pef.c                                  |  2 +-
+ hw/ppc/spapr.c                                |  2 +-
+ hw/s390x/s390-virtio-ccw.c                    |  2 +-
+ system/vl.c                                   |  2 +-
+ target/s390x/kvm/pv.c                         |  2 +-
+ 11 files changed, 28 insertions(+), 25 deletions(-)
+ rename include/{exec => system}/confidential-guest-support.h (96%)
+
+-- 
+2.45.2
+
 
