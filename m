@@ -1,100 +1,156 @@
-Return-Path: <kvm+bounces-34075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6136E9F6D8F
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 19:45:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB449F6DD3
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 20:11:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1800B7A1421
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 18:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EC77168A2E
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 19:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383B11FBCAF;
-	Wed, 18 Dec 2024 18:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626AB1FC0F1;
+	Wed, 18 Dec 2024 19:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kiq1TdhH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6cbz8jy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2124E1A23A4
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114641FA828
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 19:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734547494; cv=none; b=nFdJLzyhcHytLfOC8N5/At6b3G6AG7hgXnFrSL7dTOfRT8wicAClukM0otAwtWrRV3bgJD7ypSi98cupKeJxXbhezmqb78SCp6DVGeVoTPlbyxHA9qurd4M+JVkoLShS90Ij7KFlBAV/AqwT7hJ/A2PeLhZXHVdmaPa9gRhd64M=
+	t=1734549051; cv=none; b=ieGVimPqtACBE6wfcFGmGy7BuSCdK9g5JUYi2oW6k3DQEoG1UG1a5inP5/Yr5aqVAl0acOFjnPjXl5iZvPBWpoqM6U1Lj+yDAAft7PVGHj1J2iz1p9hsapO3rF9g7m7ofDEXJjz1BU3pVKNDg8PPSaLf6OOBlcST2fMi9TsyxtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734547494; c=relaxed/simple;
-	bh=9N1nw5pDv+lDvi7BeKzhIjUt9l0WZpYj+8WvPGktrTo=;
+	s=arc-20240116; t=1734549051; c=relaxed/simple;
+	bh=jMj1OzrDjIrxeMoYOsAPw/b7S6pBg2XX6eTDS2vTCUk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gSEo/xNqNn8cBb5njMlfCwhqMt1Uw9HmCtTnk2XmSQEFYcPR9jkmbe4nl8HE3bZZmd3DK3Bniu3Gx/aup/azWFBAsBhJ089Fu+s+oEtWgq5k4Oabb5GuJz9zvYbhgvL2PJDbXnrqzGhuyIKZsaFIHu2oEe55aRcztQw/P9jV/zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kiq1TdhH; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=VXHUlA/IpSPxGv73BZqZmI+jTVw5umdI/Ej8lF82dfu7t60vTmM+hIParYKWa/8kCK+dxm8O2L8YuTNP2QGir//K247+E8mlWUYiMuF8Z8w1NvY08J4tNECP0N4+LoTd+30KgpdeX+LY8jNRtcGws9iiO74vanirDNPtcF9zFag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6cbz8jy; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7f3e30a441aso4035989a12.2
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 10:44:53 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725d8bdc634so27071b3a.3
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 11:10:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734547492; x=1735152292; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAiuyQN341JkpI4EyBxh+99WaLVM7eEU9nP2zLmsuDM=;
-        b=Kiq1TdhHidnc4A//NzLJne0SvsBj5ZP4gzPCRsrN95BrhNbNomhnFJWvRX+3E3qLOf
-         7KTrPJws4xD0+vSbUSsUbn/lU9QWZHUbd3sVgfvfjRNnXuLwDOk0j84zBnuXwRa1CIO2
-         KienbbW77DzFUj6dLmWWdg+Z6S52oMnCcF/pia6T525MUzZlCPs520QRvTmJfEFnv0ks
-         I81KYPGmYHIqe8WLJHpKpkUa+iT9kRe38gNWUSNYS0wS+KcaEgI35Dyv/Q81evkhi496
-         lVP9xkVUIoTd9b/UH0irfG3cTGhtuhnAejNkb3pZuuodgTqtbZEIJccxXotchxSQkN/M
-         /8MA==
+        d=google.com; s=20230601; t=1734549049; x=1735153849; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
+        b=i6cbz8jyMqb2VdeZyEovdZzi5pM+Rs5D/WSs9i3tQmh6UMfUTPdTgNtV4e4UARhmWk
+         9cEtf4hNwByGUaUzv2CCXvcn3gORXmn8bVVJ+1NmskffzmbrFnFLHZRyKCyms+2XckbV
+         APnwB1Rda19/wgFQ/G6NuDQY8+gav4ruFaTyrFa1UyPip1WfyaC53ZRxP2lS8GZBLYiK
+         aCkgAq2t4tIpG2FwbIQferNWkQudyd/NFp+rBwNb/QSLu2trX5OlM1k9KlY+oIKj/HUz
+         uOAdBAqDCfZsP9gRFWW0OEi+GmWsBZH56XOTOnT1tkHkfLmRhzej/C9GxsTIMKF5fG9/
+         C99g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734547492; x=1735152292;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAiuyQN341JkpI4EyBxh+99WaLVM7eEU9nP2zLmsuDM=;
-        b=A7gWQ4DOiyyAg2nuVL4pLiPCvUxnRS+0UH3zwr0m6CNieGdSllIATseXq0WdRfb2mO
-         b5R1eZB0sWGAq84REkWaUzAN2FfWOnyzzixTOWpHgL1jlNjdR1fxPxDdw3llK2wi7NEu
-         mAfLOZI/nVQHmsP5knZQ2dKXIiM0uFYH5/voKvB8GlWExh6yFRyW352s1Q2DePmykdUF
-         zjgPippIS1aWr7MYpysQeX+MJPO2anVUGC5wB9dtXCq+0zky1NubvworJz1XEuS0Oxs5
-         tRhLWnkaVCsi2Rlv2l/xSOZ59H6QpVZiDBAz6p6v1lU5sFnxhdwvtmqRJMN+odZ9LmfB
-         v3ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOGavASacdiGeEgWHxsSqaAwap+A45g3AjaW+SUT2nV6r2octZTWPWuDHYlBM9YHRAPGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7bLlcOME/r0VZv5/ERuk1mS3Rr5OHrOODfnUW3g0SrTZD3Jbq
-	EBz2K2DwdMZ/dEadb0Mh7FRWN3yCJlQL1PWPHxEB1hgwE142OMquWYSz9TeiUPm5CeSpsTmfi4O
-	4qQ==
-X-Google-Smtp-Source: AGHT+IH+sl+v/O3EB94NvcKnWSkH0NdBBH9kGuVv5fLPWor3f5h3drQQPuJCwiKgIop1mJ7cvRHthevdpiE=
-X-Received: from pfbna12.prod.google.com ([2002:a05:6a00:3e0c:b0:72a:83ec:b170])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:999c:b0:1d9:3acf:8bdc
- with SMTP id adf61e73a8af0-1e5c76f91b4mr440300637.46.1734547492547; Wed, 18
- Dec 2024 10:44:52 -0800 (PST)
-Date: Wed, 18 Dec 2024 10:44:50 -0800
-In-Reply-To: <20241217181458.68690-1-iorlov@amazon.com>
+        d=1e100.net; s=20230601; t=1734549049; x=1735153849;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
+        b=Tg2N5fK/SrvIhEcAf3Z38hlYQWb2wPboiKdpaG65WSZ1oGY91eYGK48ZgYTd696Yly
+         qTg1/5OOa4WBVeB6Cd/IES+w6BwElkcou0u3dJkbvYJ0lvGEE3xlBC4YfEOOw8Xs9bFX
+         GHtpbC3AM1KSp6Zm7N9VkjG50eilG/b/TwAyq+prPgrcBY0ytK++OpzQjRV/2+Jzk54P
+         16+bPrM6E/bNh9iTxLhZCUdaD1D9++w3TaLUhZCNyllhm9TwLCB7bWt1V1rba4/ioOWe
+         KMqYms5cBXvvie4/gT+U8fA6rWFuldRgAXdQ5tbcJ6g3xKvlEO5YbTSh6xrmRiT7ioIG
+         QEmg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQe4JwTXWLLTm9BvDdsq+5lZB15URj/LlFDUR21NIItsbx5/mXO+BRC+APF7yQyPHmsHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKap89XndgatmNS8eZWb8ocr3wRVbwNzadBzpU9R0av8AvmEk/
+	sNm9leHbayoBTAH3nCAWB2DHfMqUGvBuiUUq35yGAjb8c6cUq13NfkjpEgwlbD0JbifBBXntlUd
+	1Pg==
+X-Google-Smtp-Source: AGHT+IH1B/bbkp0G6ABRo9fqVZ6adP+tKt8f/j21FuyOVEbiorHToFEL5buQ5JKv3Q2UPzxlMkYtWT3lSj0=
+X-Received: from pgda26.prod.google.com ([2002:a63:7f1a:0:b0:7fd:561e:62dd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e68f:b0:1e1:aa24:2e56
+ with SMTP id adf61e73a8af0-1e5c76afd3emr528641637.30.1734549049187; Wed, 18
+ Dec 2024 11:10:49 -0800 (PST)
+Date: Wed, 18 Dec 2024 11:10:47 -0800
+In-Reply-To: <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241217181458.68690-1-iorlov@amazon.com>
-Message-ID: <Z2MYImBJGSjmBOII@google.com>
-Subject: Re: [PATCH v3 0/7] Enhance event delivery error handling
+References: <cover.1734392473.git.ashish.kalra@amd.com> <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
+ <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com> <Z2HvJESqpc7Gd-dG@google.com> <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+Message-ID: <Z2MeN9z69ul3oGiN@google.com>
+Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
 From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <iorlov@amazon.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
-	pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com, 
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, dwmw@amazon.co.uk, 
-	pdurrant@amazon.co.uk, jalliste@amazon.co.uk
-Content-Type: text/plain; charset="us-ascii"
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 17, 2024, Ivan Orlov wrote:
-> Currently, the unhandleable vectoring (e.g. when guest accesses MMIO
-> during vectoring) is handled differently on VMX and SVM: on VMX KVM
-> returns internal error, when SVM goes into infinite loop trying to
-> deliver an event again and again.
-> 
-> This patch series eliminates this difference by returning a KVM internal
-> error when KVM can't emulate during vectoring for both VMX and SVM.
-> 
-> Also, introduce a selftest test case which covers the error handling
-> mentioned above.
+On Tue, Dec 17, 2024, Ashish Kalra wrote:
+> On 12/17/2024 3:37 PM, Sean Christopherson wrote:
+> > On Tue, Dec 17, 2024, Ashish Kalra wrote:
+> >> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
+> >>> On Mon, Dec 16, 2024 at 3:57=E2=80=AFPM Ashish Kalra <Ashish.Kalra@am=
+d.com> wrote:
+> >>>>
+> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
+> >>>
+> >>>> The on-demand SEV initialization support requires a fix in QEMU to
+> >>>> remove check for SEV initialization to be done prior to launching
+> >>>> SEV/SEV-ES VMs.
+> >>>> NOTE: With the above fix for QEMU, older QEMU versions will be broke=
+n
+> >>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM a=
+s
+> >>>> older QEMU versions require SEV initialization to be done before
+> >>>> launching SEV/SEV-ES VMs.
+> >>>>
+> >>>
+> >>> I don't think this is okay. I think you need to introduce a KVM
+> >>> capability to switch over to the new way of initializing SEV VMs and
+> >>> deprecate the old way so it doesn't need to be supported for any new
+> >>> additions to the interface.
+> >>>
+> >>
+> >> But that means KVM will need to support both mechanisms of doing SEV
+> >> initialization - during KVM module load time and the deferred/lazy
+> >> (on-demand) SEV INIT during VM launch.
+> >=20
+> > What's the QEMU change?  Dionna is right, we can't break userspace, but=
+ maybe
+> > there's an alternative to supporting both models.
+>=20
+> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP
+> driver ioctl to check if SEV is in INIT state)
+> =20
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 1a4eb1ada6..4fa8665395 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSu=
+pport *cgs, Error **errp)
+>          }
+>      }
+>=20
+> -    if (sev_es_enabled() && !sev_snp_enabled()) {
+> -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+> -            error_setg(errp, "%s: guest policy requires SEV-ES, but "
+> -                         "host SEV-ES support unavailable",
+> -                         __func__);
+> -            return -1;
+> -        }
+> -    }
 
-A few nits throughout, but I'll address them when applying.  Thanks!
+Aside from breaking userspace, removing a sanity check is not a "fix".
+
+Can't we simply have the kernel do __sev_platform_init_locked() on-demand f=
+or
+SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initializa=
+tion
+until it's necessary so that userspace can do firmware updates.  And it's q=
+uite
+clearly necessary in this case, so...
 
