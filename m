@@ -1,130 +1,309 @@
-Return-Path: <kvm+bounces-34085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41889F6FE8
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 23:12:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E83C79F6FFC
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 23:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC7B77A4148
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 22:12:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38547169FFD
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 22:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E37B1FCF53;
-	Wed, 18 Dec 2024 22:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49911FCD13;
+	Wed, 18 Dec 2024 22:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z0EBWwqX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ul9u/xl/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30BE1FC0FD
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 22:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312CF17A586
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 22:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734559941; cv=none; b=FAkU6LD83SJ8qkKWS5qQ5eP7uXWf7VH/q/Y5aqx3oUGxnSJOCr8PM4jgGJ62lBYp+6lpXEloB8zwmdOvwNn8MMWv66mv4lm5pViEUc4JrWUeTjT6S8jJkWZvf9TvJq1IUjPdW/+asE8c0+Wz1DAM1jf/DkmoMeW9CCd8lfMOpns=
+	t=1734560596; cv=none; b=ix06wBilaz20Rp8u3jZrLUXtWX+/pLI1morukZtN0ZZhY+ROSmI3xGpbkACrJWLqqKE2vXQUhv79iKFXaoPfIMzxH+vEQtCC1ZGBAr38jPimqyZDiL7y/+KqgdC6ikRGQGLWd9jHSebkyi+FUygKaQ7RTac3PxPWX2zmBpMJ4xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734559941; c=relaxed/simple;
-	bh=9ElCmbEdpmXTkkl32gV25N180alLg2mTUaxIcxwRA9s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fC5kS1T4YH0ElSeLavpsHDmBcGoS3DG53B9cdlR0VQYI9rdblZ0tZH5i6vDkeRp4eanl33IqAduId/hm0uisYn1eeNMHi8urtio9hOXMWWHVV82y6zSqIw329ph12XP8bu6eTnC1S+5mWds8Dyywpts4FrXDcTcEmZRHVnP7iR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z0EBWwqX; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1734560596; c=relaxed/simple;
+	bh=e54dzShIhWtAvpJM+N0g5H7FNJbiDV4gjPM03z+nUcY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TxiOvTI8VNwjYBPkLlxfbZM2Sp4pzbhB7dBJqE4FwTpatY756hSHEKUYzztjHA+wl6RgnyKGvCQj5jNtxZzD4U4R8cqxvLcnUfVsnEwWT4PVKpzOCi26JrDGGY9mq+4hYqvs/25OM7lWMu201WETQe7Tg3XxdP15rJXJiq1lbJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ul9u/xl/; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so130535a91.1
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 14:12:19 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a9d0c28589so27995ab.0
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 14:23:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734559939; x=1735164739; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H8/Bx7vVXdjG8Qup6CRv0EW1z1SiIeJxiXGSb6iiEaI=;
-        b=z0EBWwqXMZj4T9d9nQxkYJbDWp7S1zrFN5n373gc7feuVX+CaqxsSuP1x2cIy4hDnV
-         vlA26mWmkN0JQKYIGTqJsVOHCQ1YynIjHiANAg2j3VHMRC+F4t5JapRUoKbiYNrGVb6E
-         StFOnG4zjjLx6bGwyB6ETkNxBXwQl39NbPe3drpAqMKjbJ1fwcwQertqhQ+kUHpdIL1+
-         PDgazaPYqzYyrgZEB+xmFUIsp89K8gtX7posg39rFqoivvkaZpcHSJw6r/81LNqftqMi
-         /ZodtNkQgox4QinVR7RTUIKpOiAIR6KiCraj6/GJlitORvXF9k+iFEwP+tpaKtpKPVVX
-         gmCQ==
+        d=google.com; s=20230601; t=1734560594; x=1735165394; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BMgNXVsDBO2oQT0Up+C0FnN7vyy4sTLkPXPENnLdaSc=;
+        b=ul9u/xl/iM0PUYj7YmN24/hpCYbC4NQSXJvWyeuhol8cYVPzzWBnq0L/9ZuBhWD7cA
+         Nac58sIXLq3oIITulYTuT+si6XhzmbVCyNskPPfpuf3vSA/z6kBBxPvzGv+v+mI7mSWC
+         q+DxzhnKc/Y+MtQVv6nMafV+rEZIJvleSfD73RahQER9xXquT6ZP2xtMPr7zZQtckLho
+         q9WJU86eImyejWRtSW/akerZn+H2E9y2sJVIYiBEGJxUILIgqBNZYz+c/3OKieAMeS64
+         36BuO1qpwWsi+4HL8vrwQ9ImRso353N74HHvHQ2VLxCElYnV39gHvT2Fprf5LUONqQAs
+         vv+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734559939; x=1735164739;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H8/Bx7vVXdjG8Qup6CRv0EW1z1SiIeJxiXGSb6iiEaI=;
-        b=oeIE0hA/9fJqYD55uooAG8xZIeKohVO6Tupjk/xPFcO+Uc/eGTUuJdQaqpysIR+VJK
-         jNTBVfGH0p6wHTcaMg3LQT2kY/DuCpQC/dMzkJgr/MYB40/31J4v+DOwhTfo0LNnyuoz
-         Gv0UGnNJdwYYHO2JbK9Im3mQ8IG/1Zi4wCdmEJ7S8VTYZv3vyX/gUVmsWXuK6GvAiEUz
-         UGfgMFke5V3a3Bgf3XDImvJMbAjgsF/ugDoiO0X384CMYZV1WBavRSTLX9co7EPQ97+z
-         dWI9rUtrvYbJlSp2oqhSSl0dObrmU0aR4wXWARtKxLcJ4x7vQl+jHXJMC/biOawJy669
-         jQew==
-X-Forwarded-Encrypted: i=1; AJvYcCWpiCaTSbnVSeYHMWlEabwQV542ax0dOob44wDuxDI+UQmTj5oV4IF5O371age1Q/btYPk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/oHI7Vw2u+JHG3TQXlGdZPlaidZkM0HVteTo5Hwm5ze/bZc61
-	Lhk/wN4zEqNs9lny6aYk+BkegAsy017fbZjBtOhEpviZKdxYz05Bwl5SQf8hlqoLHFKyUOeFn25
-	ogg==
-X-Google-Smtp-Source: AGHT+IErnWAR5psGjYVEFgNdPO9Ra9c1ykxsWobkdL6749/rPBHLJQjHXddkE3dKVeRJv5MVr7RsZhgUpzE=
-X-Received: from pjuj8.prod.google.com ([2002:a17:90a:d008:b0:2ea:7d73:294e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:134d:b0:2ea:37b4:5373
- with SMTP id 98e67ed59e1d1-2f443ce8daamr1395725a91.10.1734559939355; Wed, 18
- Dec 2024 14:12:19 -0800 (PST)
-Date: Wed, 18 Dec 2024 14:12:18 -0800
-In-Reply-To: <173455833964.3185228.5614329030867008316.b4-ty@google.com>
+        d=1e100.net; s=20230601; t=1734560594; x=1735165394;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BMgNXVsDBO2oQT0Up+C0FnN7vyy4sTLkPXPENnLdaSc=;
+        b=oX4+yZf2yHobH82/EYBdz+o0eLWXHalSeLSBUeakeUpo9XWq7TCdDRqakaYgyarilK
+         IZAWbg94VrFbNcMdwfgESrVckgltgP3WvLhJ+RQAZyFxJZ3vZYIT5b82GFflJ5oTb1yG
+         hdr2+AoVMP8Pl71LP1NMn0DJjCFm04/leis2mrVYvkD46WavMjp2Yht7t5+RcizhsZcc
+         ckFH2r9LG0iJ5ycmQsHdC9uCP9rzwAChIY5WTBXq4gwWxdx6INieCTetixbGeyFKhhwC
+         JF/9qAwlNsLfd0znHVajOzRfPsz8th+rhQ8DPD6yAbPXYOSYCJdR4jV+8gFR2IALvKNS
+         fPrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdPclFm+tcFQNCsmrE1w85JlgkqBmiotmmJ27pepXwq558lQ3Ccz6d5JatF5cfMmwKGJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG0rYZwQ4O6tpf8RheqFzV3N8MKiIwKFNEuzT8FvfF+D2Zl5/Z
+	th58adLduMnxWeYug2af0l4FE0OMM23gWTi85j+VQkILRoEfFNoRh7EjpxP1zqDK+MI0fMDaAM3
+	6Ta/muP+Npymb0GTBa/PI63bAvvTLnYVMUeFx
+X-Gm-Gg: ASbGnctxHxY/BxR4OhSIRqcsokf5FhEFgg2+qpCZ/Ytgo9orTGKRA+McocDMmXrsiuy
+	jLz4mtVEBH0tensvi+yjmoj9Of/etU9S2VrDJqQ80hou0fKQgzOYptZ31lcCQ+jNllg==
+X-Google-Smtp-Source: AGHT+IHEoM0w7xN78CqOGUAuwh1KfJWMPbmxCRhMlqM+KRO4ynNFWgb6bwpwXY7zH/xdoruJi1B2K7QgbUwEhIYNU2w=
+X-Received: by 2002:a05:6e02:1d86:b0:3a7:c7fc:1fdd with SMTP id
+ e9e14a558f8ab-3c0aa57583amr163515ab.3.1734560594112; Wed, 18 Dec 2024
+ 14:23:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241128005547.4077116-1-seanjc@google.com> <173455833964.3185228.5614329030867008316.b4-ty@google.com>
-Message-ID: <Z2NIwmRDaZBc_V4o@google.com>
-Subject: Re: [PATCH v4 00/16] KVM: selftests: "tree" wide overhauls
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Andrew Jones <ajones@ventanamicro.com>, James Houghton <jthoughton@google.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20241121185315.3416855-1-mizhang@google.com> <Z0-R-_GPWu-iVAYM@google.com>
+ <CALMp9eTCe1-ZA47kcktTQ4WZ=GUbg8x3HpBd0Rf9Yx_pDFkkNg@mail.gmail.com>
+ <Z0-3bc1reu1slCtL@google.com> <CALMp9eRqHkiZMMJ2MDXOHPbGx1rE9n5R2aR-F=qkuGo0BPS=og@mail.gmail.com>
+ <Z1MnoQcYpzE-4EZy@google.com>
+In-Reply-To: <Z1MnoQcYpzE-4EZy@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 18 Dec 2024 14:23:03 -0800
+Message-ID: <CALMp9eSbRzDs2iSEL=rAXTzj822bhzpm69qGWkt5n4Tk72JJcw@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/22] KVM: x86: Virtualize IA32_APERF and IA32_MPERF MSRs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
+	Mario Limonciello <mario.limonciello@amd.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Len Brown <lenb@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Perry Yuan <perry.yuan@amd.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024, Sean Christopherson wrote:
-> On Wed, 27 Nov 2024 16:55:31 -0800, Sean Christopherson wrote:
-> > Two separate series (mmu_stress_test[1] and $ARCH[2]), posted as one to
-> > avoid unpleasant conflicts, and because I hope to land both in kvm/next
-> > shortly after 6.12-rc1 since they impact all of KVM selftests.
-> > 
-> > mmu_stress_test
-> > ---------------
-> > Convert the max_guest_memory_test into a more generic mmu_stress_test.
-> > The basic gist of the "conversion" is to have the test do mprotect() on
-> > guest memory while vCPUs are accessing said memory, e.g. to verify KVM
-> > and mmu_notifiers are working as intended.
-> > 
-> > [...]
-> 
-> As I am running out of time before I disappear for two weeks, applied to:
-> 
->    https://github.com/kvm-x86/linux.git selftests_arch
-> 
-> Other KVM maintainers, that branch is officially immutable.  I also pushed a tag,
-> kvm-selftests-arch-6.14, just in case I pull a stupid and manage to clobber the
-> branch.  My apologies if this causes pain.  AFAICT, there aren't any queued or
-> in-flight patches that git's rename magic can't automatically handle, so hopefully
-> this ends up being pain-free.
-> 
-> Paolo, here's a pull request if you want to pull this into kvm/next long before
-> the 6.14 merge window.  Diff stats at the very bottom (hilariously long).
+On Fri, Dec 6, 2024 at 8:34=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, Dec 04, 2024, Jim Mattson wrote:
+> > Wherever the context-switching happens, I contend that there is no
+> > "clean" virtualization of APERF. If it comes down to just a question
+> > of VM-entry/VM-exit or vcpu_load()/vcpu_put(), we can collect some
+> > performance numbers and try to come to a consensus, but if you're
+> > fundamentally opposed to virtualizing APERF, because it's messy, then
+> > I don't see any point in pursuing this further.
+>
+> I'm not fundamentally opposed to virtualizing the feature.  My complaints=
+ with
+> the series are that it doesn't provide sufficient information to make it =
+feasible
+> for reviewers to provide useful feedback.  The history you provided is a =
+great
+> start, but that's still largely just background information.  For a featu=
+re as
+> messy and subjective as APERF/MPERF, I think we need at least the followi=
+ng:
+>
+>   1. What use cases are being targeted (e.g. because targeting only SoH w=
+ould
+>      allow for a different implementation).
+>   2. The exact requirements, especially with respect to host usage.  And =
+the
+>      the motivation behind those requirements.
+>   3. The high level design choices, and what, if any, alternatives were c=
+onsidered.
+>   4. Basic rules of thumb for what is/isn't accounted in APERF/MPERF, so =
+that it's
+>      feasible to actually maintain support long-term.
+>
+> E.g. does the host need to retain access to APERF/MPERF at all times?  If=
+ so, why?
+> Do we care about host kernel accesses, e.g. in the scheduler, or just use=
+rspace
+> accesses, e.g. turbostat?
+>
+> What information is the host intended to see?  E.g. should APERF and MPER=
+F stop
+> when transitioning to the guest?  If not, what are the intended semantics=
+ for the
+> host's view when running VMs with HLT-exiting disabled?  If the host's vi=
+ew of
+> APERF and MPREF account guest time, how does that mesh with upcoming medi=
+ated PMU,
+> where the host is disallowed from observing the guest?
+>
+> Is there a plan for supporting VMs with a different TSC frequency than th=
+e host?
+> How will live migration work, without generating too much slop/skew betwe=
+en MPERF
+> and GUEST_TSC?
+>
+> I don't expect the series to answer every possible question upfront, but =
+the RFC
+> provided _nothing_, just a "here's what we implemented, please review".
 
-Argh!  I completely forget to build test this on non-x86, and missed that arm64
-snuck in 75cd027cbcb1 ("KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely 
-ignored").  *sigh*
+Sean,
 
-Given that I just sent out mail, I'm going to cross my fingers and hope that no
-one has merged the above branch/tag.  I've deleted the branch and tags from the
-remote, but kept the tag locally just in case.
+Thanks for the thoughtful pushback. You're right: the RFC needs more
+context about our design choices and rationale.
 
-Please holler if you managed to grab the broken branch/tag.  If no one screams,
-I'll assume I got luckly and will push a fixed version (with different names) later
-today.
+My response has been delayed as I've been researching the reads of
+IA32_APERF and IA32_MPERF on every scheduler tick. Thanks for pointing
+me to commit 1567c3e3467c ("x86, sched: Add support for frequency
+invariance") off-list. Frequency-invariant scheduling was, in fact,
+the original source of these RDMSRs.
+
+The code in the aforementioned commit would have allowed us to
+virtualize APERFMPERF without triggering these frequent MSR reads,
+because arch_scale_freq_tick() had an early return if
+arch_scale_freq_invariant() was false. And since KVM does not
+virtualize MSR_TURBO_RATIO_LIMIT, arch_scale_freq_invariant() would be
+false in a VM.
+
+However, in commit bb6e89df9028 ("x86/aperfmperf: Make parts of the
+frequency invariance code unconditional"), the early return was
+weakened to only bail out if
+cpu_feature_enabled(X86_FEATURE_APERFMPERF) is false. Hence, even if
+frequency-invariant scheduling is disabled, Linux will read the MSRs
+every scheduler tick when APERFMPERF is available.
+
+As we discussed off-list, it appears that the primary motivation for
+this change was to minimize the crosscalls executed when examining
+/proc/cpuinfo. I don't really think that use case justifies reading
+these MSRs *every scheduler tick*, but I'm admittedly biased.
+
+1. Guest Requirements
+
+Unlike vPMU, which is primarily a development tool, our customers want
+APERFMPERF enabled on their production VMs, and they are unwilling to
+trade any amount of performance for the feature. They don't want
+frequency-invariant scheduling; they just want to observe the
+effective frequency (possibly via /proc/cpuinfo).
+
+These requests are not limited to slice-of-hardware VMs. No one can
+tell me what customers expect with respect to KVM "steal time," but it
+seems to me that it would be disingenuous to ignore "steal time." By
+analogy with HDC, the effective frequency should drop to zero when the
+vCPU is "forced idle."
+
+2. Host Requirements
+
+The host needs reliable APERF/MPERF access for:
+- Frequency-invariant scheduling
+- Monitoring through /proc/cpuinfo
+- Turbostat, maybe?
+
+Our goal was for host APERFMPERF to work as it always has, counting
+both host cycles and guest cycles. We lose cycles on every WRMSR, but
+most of the time, the loss should be very small relative to the
+measurement.
+
+To be honest, we had not even considered breaking APERF/MPERF on the
+host. We didn't think such an approach would have any chance of
+upstream acceptance.
+
+3. Design Choices
+
+We evaluated three approaches:
+
+a) Userspace virtualization via MSR filtering
+
+   This approach was implemented before we knew about
+   frequency-invariant scheduling. Because of the frequent guest
+   reads, we observed a 10-16% performance hit, depending on vCPU
+   count. The performance impact was exacerbated by contention for a
+   legacy PIC mutex on KVM_RUN, but even if the mutex were replaced
+   with a reader/writer lock, the performance impact would be too
+   high. Hence, we abandoned this approach.
+
+b) KVM intercepts RDMSR of APERF/MPERF
+
+   This approach was ruled out by back-of-the-envelope
+   calculation. We're not going to be able to provide this feature for
+   free, but we could argue that 0.01% overhead is negligible. On a 2
+   GHz processor that gives us a budget of 200,000 cycles per
+   second. With a 250 Hz guest tick generating 500 RDMSR intercepts
+   per second, we have a budget of just 400 cycles per
+   intercept. That's likely to be insufficient for most platforms. A
+   guest with CONFIG_HZ_1000 would drop the budget to just 100 cycles
+   per intercept. That's unachievable.
+
+   We should have a discussion about just how much overhead is
+   negligible, and that may open the door to other implementation
+   options.
+
+c) Current RDMSR pass-through approach
+
+   The biggest downside is the loss of cycles on every WRMSR. An NMI
+   or SMI in the critical region could result in millions of lost
+   cycles. However, the damage only persists until all in-progress
+   measurements are completed.
+
+   We had considered context-switching host and guest values on
+   VM-entry and VM-exit. This would have kept everything within KVM,
+   as long as the host doesn't access the MSRs during an NMI or
+   SMI. However, 4 additional RDMSRs and 4 additional WRMSRs on a
+   VM-enter/VM-exit round-trip would have blown the budget. Even
+   without APERFMPERF, an active guest vCPU takes a minimum of two
+   VM-exits per timer tick, so we have even less budget per
+   VM-enter/VM-exit round-trip than we had per RDMSR intercept in (b).
+
+   Internally, we have already moved the mediated vPMU context-switch
+   from VM-entry/VM-exit to the KVM_RUN loop boundaries, so it seemed
+   natural to do the same for APERFMPERF. I don't have a
+   back-of-the-envelope calculation for this overhead, but I have run
+   Virtuozzo's cpuid_rate benchmark in a guest with and without
+   APERFMPERF, 100 times for each configuration, and a Student's
+   t-test showed that there is no statistically significant difference
+   between the means of the two datasets.
+
+4. APERF/MPERF Accounting
+
+   Virtual MPERF cycles are easy to define. They accumulate at the
+   virtual TSC frequency as long as the vCPU is in C0. There are only
+   a few ways the vCPU can leave C0. If HLT or MWAIT exiting is
+   disabled, then the vCPU can leave C) in VMX non-root operation (or
+   AMD guest mode). If HLT exiting is not disabled, then the vCPU will
+   leave C0 when a HLT instruction is intercepted, and it will reenter
+   C0 when it receives an interrupt (or a PV kick) and starts running
+   again.
+
+   Virtual APERF cycles are more ambiguous, especially in VMX root
+   operation (or AMD host mode). I think we can all agree that they
+   should accumulate at some non-zero rate as long as the code being
+   executed on the logical processor contributes in some way to guest
+   vCPU progress, but should the virtual APERF accumulate cycles at
+   the same frequency as the physical APERF? Probably not. Ultimately,
+   the decision was pragmatic. Virtual APERF accumulates at the same
+   rate as physical APERF while the guest context is live in the
+   MSR. Doing anything else would have been too expensive.
+
+5. Live Migration
+
+   The IA32_MPERF MSR is serialized independently of the
+   IA32_TIME_STAMP_COUNTER MSR. Yes, this means that the two MSRs do
+   not advance in lock step across live migration, but this is no
+   different from a general purpose vPMU counter programmed to count
+   "unhalted reference cycles." In general, our implementation of
+   guest IA32_MPERF is far superior to the vPMU implementation of
+   "unhalted reference cycles."
+
+6. Guest TSC Scaling
+
+   It is not possible to support TSC scaling with IA32_MPERF
+   RDMSR-passthrough on Intel CPUs, because reads of IA32_MPERF in VMX
+   non-root operation are not scaled by the hardware. It is possible
+   to support TSC scaling with IA32_MPERF RDMSR-passthrough on AMD
+   CPUs, but the implementation is left as an exercise for the reader.
 
