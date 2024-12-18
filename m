@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-34060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 860379F6AAF
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 17:02:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3D39F6AB3
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 17:04:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3DAF171457
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:02:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C623D1887D0F
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EA41D45FC;
-	Wed, 18 Dec 2024 16:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD7E1C2304;
+	Wed, 18 Dec 2024 16:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORUe4DzU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abb/tyBM"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E4F12A177
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 16:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0561B12A177
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 16:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734537761; cv=none; b=qNiUs9s6OyrnS+GtCKY5To3DHa93F7qdsi1OOYg0DWSpzgsTTCAdi39lGXESKfyLY0677xUMAFnGxzn7zgg5MKL8n5Zl1oXHIaa1paZZIVpURy4BylCKzp0x62uKg3gACax2TZJYdP/EhTu/GQBBmigoLS9veuT/QwcGDPW02oU=
+	t=1734537878; cv=none; b=IShEpjz70035KxKMM7CWv2nK1q10rEm6lnycZFiare+QidDUJv86WMI0B+z1P/imd5HFlf70EkIOGdy6Hwxtyxs1ORyOmTKbcsVKC/PLS54vqzNUpQmTb2ymBpumhh40b43275bVROww+I2M8sjFKMHTHdyfG4NT4QTC1ITfI4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734537761; c=relaxed/simple;
-	bh=ipwWPfFJbSUfc3mWcfI0Cxr2pUpE2GvE+eFO7CUR/iw=;
+	s=arc-20240116; t=1734537878; c=relaxed/simple;
+	bh=bJh6OhQpvFhgsFqWFSGrLYgOQ1NX6UEY5Zu1RMI3Bkg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=daL+AVMGOiNXNLiu/W8HkReI+taneEIZcBey7kXHk6hFpPu8NiNuvvs7FOblHobooh2uC/Vw3OwjYGVpCUxmDyPaj+hjmWmzFDR+6QbqZeLj07tLYNtIo0gClspnYaqOxNge/An5QgGsA9SrkaWxKdtky4tgoS40tDuq5d5XTo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ORUe4DzU; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Q3iV+7igKS9GJbLswP4oL2pZH87Zo+lgweGQD/Af4srMrFkoBtUXUYqqMyj+8H//Kxc/PqCVdd54PHTYdtnvbnMrT+sXuZ1XLz4H6066AcWg34VNXemz9SHDjSx7hKDYX9hIvySprLBrMJumAd3PEcrT8k4iMUL1ztOOwTLQhc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=abb/tyBM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734537758;
+	s=mimecast20190719; t=1734537876;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1RVHCfcdqcEQIiL70TH4TJkxTcYPAUx4uhixmbAGrhM=;
-	b=ORUe4DzUgtYpSB9g1TtPoP976IN8znc5I4BNkAZBgGzslP8lCL/8bZTpacbDdihCUB3HFE
-	h2pvTGLqUF43UJOwQACJiJ5mjtyu0IUkO5IXiGyTvxgnVL3gxRE08QPpg/gwoe7l0iBBz3
-	mHaL2cpGnIopzVyxxsjpYS9kxQdlGOA=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=eijY6uFF4aHcithl4FrOqhaAxTgCEPVuy4PHaqDgwrY=;
+	b=abb/tyBMp0rjyowEJQ8KLuyqyFAHQh5wtG9ZW7sRdKtpMqyJcxcNJaLuTDOUBBjwREXIOA
+	wD7uxonpgIA87i1A3lXGPcCSJxAkUY9DRT2WYj0X1ygaVs+vqVoWlywxg2iy27V28D13KQ
+	hb2YXLZqyrpAY8cDajzs3jkx3ijSb48=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-421-ZoWtHm4fOUSCAXWrEuUZJA-1; Wed, 18 Dec 2024 11:02:37 -0500
-X-MC-Unique: ZoWtHm4fOUSCAXWrEuUZJA-1
-X-Mimecast-MFC-AGG-ID: ZoWtHm4fOUSCAXWrEuUZJA
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b6ef2163d9so1351269485a.0
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 08:02:37 -0800 (PST)
+ us-mta-115-CjOFIUk6OrCuZ5qh-Glgew-1; Wed, 18 Dec 2024 11:04:34 -0500
+X-MC-Unique: CjOFIUk6OrCuZ5qh-Glgew-1
+X-Mimecast-MFC-AGG-ID: CjOFIUk6OrCuZ5qh-Glgew
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-467b19b5641so95823171cf.3
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 08:04:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734537757; x=1735142557;
+        d=1e100.net; s=20230601; t=1734537874; x=1735142674;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1RVHCfcdqcEQIiL70TH4TJkxTcYPAUx4uhixmbAGrhM=;
-        b=CPBF+lOxPfDA1Q/F5/b/D2Eyv34xzE6/tTncwrMJtTa2fgSyMTNBWHTa8gXXWS2lr6
-         +TlpWIoAtBnZlWmZHcPv4Q5EOytkR1hzU9sQD+MUVXAjDmaRMTlWVeHKIdo6ynGqFj/p
-         luK2ppbiF2mqpLPfqN8pVpuMCNRkVeWkSUMF8XdSCiQrBKe9Nu6Xk7w37iloTZlpY2Yo
-         wAcw5SEeAqjOWcoEGyHZC2lcLA5tTGLDwRhlIKJhwN24wpsVMKpV2/x1Rn6YarrfUpHf
-         H/lb8kFsIOM9ke8Qj7tweswFAS5j8j4ob5K4MTeoURFKMcEeNcFndys+5beo1cPf1LQG
-         fZpA==
-X-Forwarded-Encrypted: i=1; AJvYcCXv3kVUUQfWCZqMc28uUjSgy7bcV33936DLZEkz3Qj9ZsHBautlYkIe0OQrtrpb15lJlGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrxaqez0v1eTs6mFLtmdaFv4cSv0fI5rjiMWjtwMtR/EsVAdbg
-	qtLEOCHvzpx0PO1cU5R1zPIGeh9/4CqxaMN98gHa+vXo0YusfST0O6SukZH7BbJx7HYhKw9NVYZ
-	EXaqUpVUDOp0ZxAKzPtABd7YmDnLQR7gmboSoC07sBcROwshz/w==
-X-Gm-Gg: ASbGnctwYuRk+UQtR8QLOvg0WqIOZN5Cqvx3ZeBfOQLlOS57Im09957ZfCTdcTo+YDF
-	aSJGKs1PzcO/G+JOox2o7xEptyvcImxASVOZLqezsRcsCpz69bwJRAmSt7XWGEoD9D14J9VJQIR
-	bXqfWV+OUPbmb7fyalb1qY0bbBye+JgqnezBB2J7BNlsmWa9eBmTfEa1wQe/gqhwc7oe14edgAT
-	D/xhnlxGktgtG7DtrqQD324q2dVL5MY2VoQUUgave2RNuawjm92HUP6nYZc46eq+UZJe+krEVIq
-	Uew2Cu1V3SdV
-X-Received: by 2002:a05:620a:44d3:b0:7b6:d6e5:ac6e with SMTP id af79cd13be357-7b8636e6e09mr424918885a.4.1734537756979;
-        Wed, 18 Dec 2024 08:02:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEk8K8Li40AVxD7oY68g+83EbML+bij5y1nsmF6JgePbttJbriFRdhTg65OIR7WoiH27Z5Cpw==
-X-Received: by 2002:a05:620a:44d3:b0:7b6:d6e5:ac6e with SMTP id af79cd13be357-7b8636e6e09mr424913285a.4.1734537756673;
-        Wed, 18 Dec 2024 08:02:36 -0800 (PST)
+        bh=eijY6uFF4aHcithl4FrOqhaAxTgCEPVuy4PHaqDgwrY=;
+        b=ObWqhk7VQw2XFRtnjR/R+daSroBvVLpI/zK4w6V2jvIHs+AbnAK0ylD/9y/H05VtCM
+         wYwEXZcH3Je0yzfeyKETh8JVCUTQISOp2c39Nr5DcIuVGfhoPAoMOCYXh9Y0kYbXeA7k
+         CcoXOpEgGHfwpA9Evf+yxlRlR6gwwPhEge1Y4UPscKPJ3unUYyec/ucZ/C5HoJ68jnhZ
+         K07j66aXvct9g3tLEFhc0DGy4pqsQN52/xh+fg7z//CvGqi4hXk+2plYUyWxHOqIM1RS
+         0dZfmVGVw3rFlJlC+5Fa/adlzWD3nl8MfRLI46bhTlt2sBjJ2Kig0adAPXev7sEtljsm
+         D7vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCxPFzYOvbrJwti+4GlVY2uLEajyghhxuhuty31oISDONGnYnPYAWRgxN+3xxS82skl28=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy83t4sLR5XRmTy8scNCCoz547tl54loeH65GFaUvD38pNGv7AZ
+	hvNgYmDDgfrAzUm0iZbXnPJGaGXpEC9lkWQHM8dpYkMzHgRvzEu7g6DAoqxgYXrSio3+lJyDsWM
+	aK3bxjSaLb4moDqiCNoTLuMx/d0MZTGdtGC6GvLGZVLLt39rMhQ==
+X-Gm-Gg: ASbGncvMitF/1GvHe86dSnLFK7EN4QniF56PJREO2+TEU3u4MA+/WPDcX4DtY0df0DC
+	W7Dymhd7SDZv/67HU05GyeLAJkW3S0fyt8OKw7V0Be6iPhLbCXc4VVzXeESCBS002KFTW1EH0aJ
+	oFDZuKDvbwPm39iNU0x4WOTgSYDQ1ewaSeCkIkNnPO0yCpmHXbkAUG84XPQLiS5L/fix5gx2G5P
+	n/TFiXrrmAuHXWf3Q57RfxWUknwQ05cl4OnfKwjzqupLrs1TkVghG+7Ctt5zRytCHhidgnfS+sh
+	t0V9aLLqbEa2
+X-Received: by 2002:ac8:5d09:0:b0:463:788e:7912 with SMTP id d75a77b69052e-46a3a8dc8d7mr263051cf.56.1734537874025;
+        Wed, 18 Dec 2024 08:04:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5eVeUSsIFvvfwdP4DtQxkyrCvGf5+mj8b7Ot8GVwFXCI/qUzKVfb7SeZDSgBcKmd4E/+UEQ==
+X-Received: by 2002:ac8:5d09:0:b0:463:788e:7912 with SMTP id d75a77b69052e-46a3a8dc8d7mr262521cf.56.1734537873547;
+        Wed, 18 Dec 2024 08:04:33 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-42-49-186.web.vodafone.de. [109.42.49.186])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b7048bb8b6sm438319585a.89.2024.12.18.08.02.31
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-467b2e8097asm52098001cf.63.2024.12.18.08.04.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Dec 2024 08:02:36 -0800 (PST)
-Message-ID: <d34b78bd-4add-4123-b0e7-5c5afb8a9e67@redhat.com>
-Date: Wed, 18 Dec 2024 17:02:30 +0100
+        Wed, 18 Dec 2024 08:04:33 -0800 (PST)
+Message-ID: <b126810a-c6a8-492d-8fdd-652019dd0b7b@redhat.com>
+Date: Wed, 18 Dec 2024 17:04:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] system: Move 'exec/confidential-guest-support.h' to
- system/
+Subject: Re: [PATCH 2/2] target/i386/sev: Reduce system specific declarations
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org,
@@ -107,7 +106,7 @@ Cc: Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org,
  Harsh Prateek Bora <harshpb@linux.ibm.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
 References: <20241218155913.72288-1-philmd@linaro.org>
- <20241218155913.72288-2-philmd@linaro.org>
+ <20241218155913.72288-3-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -152,33 +151,20 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20241218155913.72288-2-philmd@linaro.org>
+In-Reply-To: <20241218155913.72288-3-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 18/12/2024 16.59, Philippe Mathieu-Daudé wrote:
-> "exec/confidential-guest-support.h" is specific to system
-> emulation, so move it under the system/ namespace.
-> Mechanical change doing:
-> 
->    $ sed -i \
->      -e 's,exec/confidential-guest-support.h,sysemu/confidential-guest-support.h,' \
->          $(git grep -l exec/confidential-guest-support.h)
+> "system/confidential-guest-support.h" is not needed,
+> remove it. Reorder #ifdef'ry to reduce declarations
+> exposed on user emulation.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/{exec => system}/confidential-guest-support.h | 6 +++---
->   target/i386/confidential-guest.h                      | 2 +-
->   target/i386/sev.h                                     | 2 +-
->   backends/confidential-guest-support.c                 | 2 +-
->   hw/core/machine.c                                     | 2 +-
->   hw/ppc/pef.c                                          | 2 +-
->   hw/ppc/spapr.c                                        | 2 +-
->   hw/s390x/s390-virtio-ccw.c                            | 2 +-
->   system/vl.c                                           | 2 +-
->   target/s390x/kvm/pv.c                                 | 2 +-
->   10 files changed, 12 insertions(+), 12 deletions(-)
->   rename include/{exec => system}/confidential-guest-support.h (96%)
+>   target/i386/sev.h  | 29 ++++++++++++++++-------------
+>   hw/i386/pc_sysfw.c |  2 +-
+>   2 files changed, 17 insertions(+), 14 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
