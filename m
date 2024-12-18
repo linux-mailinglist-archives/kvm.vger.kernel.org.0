@@ -1,118 +1,132 @@
-Return-Path: <kvm+bounces-34041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D889F6275
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 11:13:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77AD9F63A1
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 11:45:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64E8116CD50
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 10:13:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6A6189536A
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 10:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A02619755B;
-	Wed, 18 Dec 2024 10:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302E319CC20;
+	Wed, 18 Dec 2024 10:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r7yjB8hB"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="B5oQE4Y/"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9548E18CC0B
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 10:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA96C199FDD
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 10:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734516824; cv=none; b=Wy58g+lqJSF575AT9/jl9P6wQInOusCFegZ7zp9/Qju2XJBxCYAuPDICFWJwY+btC0NoKWhb/oOyE2t933KO1ZBt09tyhdIvZcYgQ0eNzOVU35Ee8qE/wYCY1i2dzWzT8KouTVaWuYNl35Ab2otbY0HoItunuFOoyBnWWw285cY=
+	t=1734518685; cv=none; b=YcZo02GdZ/cOH0t3/syxEvbpi0Bew2tG2JLrGBUfIMfuMf51Vl3rElFn5/yTqP1YFY0pJz4BrhgmUyP6uEvp0UgWrjiVx1nh/G6VShp7lax2nHxZ8qcvShUXiH17KFaRs+uGTykB5Ve5IOIkfZyxGU4htg/tyHqIu91Z6PlwmKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734516824; c=relaxed/simple;
-	bh=ruwETCgGr1HK0aQBaEDjqXsWNsHBavmfSpgWmZA9Wo8=;
+	s=arc-20240116; t=1734518685; c=relaxed/simple;
+	bh=FgzAKdbWXLWHun90WMZSodB7l80udUFu2CLZktDUfm4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eb42bmJDxa4puw+gr1k/bY0QuBkZGcJjxPh/HM9nVisd2ketffvHahBYnFc1oLL3hS6ePFNtMsQy5rrxJo9E0Peh0Rtr2xlL7VY/Uhhvoexpy/jSarU/58AIETKzXw80ATlUFTLl+79d/WAnd0YaONi0TjZi8vlyrCErQMNl25w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r7yjB8hB; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 18 Dec 2024 11:13:38 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734516820;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OveAGhn86eJdz/Spx4SXPWRtOVC+MXVXDzm1h+uRiOk=;
-	b=r7yjB8hBMf0jo5MPCtjS7m4yEObclGK866BAf46NHuBKwyh9kb6YDw4QBhLLVZxZNrSY5O
-	rgdk8Io+PgkOtonh/ltZApyc18gUt7LWQepvWDpzN6Uqb/sJFVWlK6y3ukMouvAniw97ux
-	6SM+09jPyJSCjy+AWFMdbaMGponqTqk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Samuel Holland <samuel.holland@sifive.com>
-Cc: kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 1/3] riscv: Add Image header to flat
- binaries
-Message-ID: <20241218-d2753dad681a37b3b15c7c75@orel>
-References: <20241210044442.91736-1-samuel.holland@sifive.com>
- <20241210044442.91736-2-samuel.holland@sifive.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gU6lSdiOschfoUxPK/1e/TVjEGwwn7hAb7wbkfO57Bc7rOIoqo4phAcOYQTr4c7HmixIb3UUh1VpvJix+cftkxAwsKm93/cUwQjgs5bKKjsiRE2pFrmPSfMgdDKl6JpHyx+tKEXV+JGrwUkFrhmAEobV5iLy4JksNcPl4dIK0Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=B5oQE4Y/; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-385d7f19f20so3199325f8f.1
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 02:44:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1734518682; x=1735123482; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NQPNbO4Jh28X15Px0+LkPPkbR4yLtap4Vaw9U0pvMDM=;
+        b=B5oQE4Y/BQCIREbjvnSQay2KhiUuxk3xnjDOCdI+tNcq6XQL7O+EW8ZiphrPSvCqvt
+         D1VM8l+O4o9YFSLKtaMYnUMmJzY9kQLeN/Ggc5k90jA50a1bGrdLDvzUDSd26lGkZKXE
+         w1OrzDtWIbaI0eEz7A3cTFhPQ98wdZHgsN9rk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734518682; x=1735123482;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NQPNbO4Jh28X15Px0+LkPPkbR4yLtap4Vaw9U0pvMDM=;
+        b=NP4GLlf/eY2y7/2c3k1Tm8z7ktuSWj7v1Bj22cBWNijWL+6h2gfNTDZ5NW5K3161gh
+         UC4kqNimCw2FtbNoNJ+eg7vowqQzcDISu3OB3L6HxRIrQeDsmMyPxf114QOK1FOlTPGf
+         CHZIBeUgjQxSgHuPuNgE4MDo+uY4eCvvauBVBlzc1+UdLnWglToSmkZSw5mnDrJEjDZ7
+         5VjgpG5Uj6gXz3fksiAU5gfUX6PyTf68S0a0OW1AJW5H5OV0jggGVUf+OFWu5iYGuvUP
+         4+7pdNneK3TxkXZbwuRMWHeYA84ihGqhaJ8CYe+UcFnbMLZfHjUv9PEsNlS0KvgkFWs9
+         ikpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOCm1g0wOBNq6MMExOiokjpkQ5umA6OkRNx+nDMKNL/LvBxm+QRxX6guUcUbvaJjZgtFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCp9M7e/+on3EHzMjuEYD5FypBtK91X4bkC4A5y51Mo7p4YUYT
+	68IVT7qYRnzdUd4zmbDq+2uaruTpaj2HFYM610B7MjhaSKw6pP+PN9itPe+dUvw=
+X-Gm-Gg: ASbGncsXRnZ2YNEZjGKhkLenSxjE3wouBsXoYJRhmKd+RNJUIGAkY/x9ugM5VC/eBpn
+	953SG6/06tlukqoeDA2Sd68OKLtQcLWY0IXpsUcwsQydmlj5LnV4oSf1GtuMtQXFpboawzCb2yr
+	W0ulPlXr4iWVJlMMrh4S1BHgQJ89+htWa06R4HgJY/QrczQ5KFz6GFM56Ne8eNLrLYxXlYdb+po
+	5ZHTOK2g01yHK+2XiZGBo63zqOQGNES8J+iY/m8apHfCOOBmJbj7SB2jA5028scMDWr
+X-Google-Smtp-Source: AGHT+IHcanVPmRLlzM2e6vfR41Z6Bf/R2ewaujydkQ7EOTyW5LtKeaoeAxoDwby+iMKdhpEeJt9o4w==
+X-Received: by 2002:a5d:6da6:0:b0:382:6f3:a20f with SMTP id ffacd0b85a97d-388e4d2de58mr2369209f8f.11.1734518682020;
+        Wed, 18 Dec 2024 02:44:42 -0800 (PST)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c8046c05sm13901360f8f.73.2024.12.18.02.44.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 02:44:41 -0800 (PST)
+Date: Wed, 18 Dec 2024 11:44:39 +0100
+From: Simona Vetter <simona.vetter@ffwll.ch>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Keith Busch <kbusch@kernel.org>, Wei Lin Guay <wguay@fb.com>,
+	alex.williamson@redhat.com, dri-devel@lists.freedesktop.org,
+	kvm@vger.kernel.org, linux-rdma@vger.kernel.org, jgg@nvidia.com,
+	vivek.kasireddy@intel.com, dagmoxnes@meta.com, nviljoen@meta.com,
+	Wei Lin Guay <wguay@meta.com>, Oded Gabbay <ogabbay@kernel.org>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Leon Romanovsky <leon@kernel.org>, Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
+ through dmabuf
+Message-ID: <Z2Knl1omccV-8Oa7@phenom.ffwll.local>
+References: <20241216095429.210792-1-wguay@fb.com>
+ <89d9071b-0d3e-4fcd-963b-7aa234031a38@amd.com>
+ <Z2BbPKvbxm7jvJL9@kbusch-mbp.dhcp.thefacebook.com>
+ <0f207bf8-572a-4d32-bd24-602a0bf02d90@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241210044442.91736-2-samuel.holland@sifive.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f207bf8-572a-4d32-bd24-602a0bf02d90@amd.com>
+X-Operating-System: Linux phenom 6.12.3-amd64 
 
-On Mon, Dec 09, 2024 at 10:44:40PM -0600, Samuel Holland wrote:
-> This allows flat binaries to be understood by U-Boot's booti command and
-> its PXE boot flow.
+On Tue, Dec 17, 2024 at 10:53:32AM +0100, Christian König wrote:
+> Am 16.12.24 um 17:54 schrieb Keith Busch:
+> > On Mon, Dec 16, 2024 at 11:21:39AM +0100, Christian König wrote:
+> > > Am 16.12.24 um 10:54 schrieb Wei Lin Guay:
+> > > > From: Wei Lin Guay <wguay@meta.com>
+> > > > However, as a general mechanism, it can support many other scenarios with
+> > > > VFIO. I imagine this dmabuf approach to be usable by iommufd as well for
+> > > > generic and safe P2P mappings.
+> > > > 
+> > > > This series goes after the "Break up ioctl dispatch functions to one
+> > > > function per ioctl" series.
+> > > Yeah that sounds like it should work.
+> > > 
+> > > But where is the rest of the series, I only see the cover letter?
+> > Should be here:
+> > 
+> >    https://lore.kernel.org/linux-rdma/20241216095429.210792-2-wguay@fb.com/T/#u
 > 
-> Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
-> ---
->  riscv/cstart.S | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+> Please send that out once more with me on explicit CC.
 > 
-> diff --git a/riscv/cstart.S b/riscv/cstart.S
-> index b7ee9b9c..106737a1 100644
-> --- a/riscv/cstart.S
-> +++ b/riscv/cstart.S
-> @@ -39,15 +39,29 @@
->   * The hartid of the current core is in a0
->   * The address of the devicetree is in a1
->   *
-> - * See Linux kernel doc Documentation/riscv/boot.rst
-> + * See Linux kernel doc Documentation/arch/riscv/boot.rst and
-> + * Documentation/arch/riscv/boot-image-header.rst
->   */
->  .global start
->  start:
-> +	j	1f
-> +	.balign	8
-> +	.dword	0				// text offset
+> Apart from that I have to reject the adding of dma_buf_try_get(), that is
+> clearly not something we should do.
 
-When I added a header like this for the bpi I needed the text offset to be
-0x200000, like Linux has it.  Did you do something to avoid that?
-
-> +	.dword	stacktop - ImageBase		// image size
-> +	.dword	0				// flags
-> +	.word	(0 << 16 | 2 << 0)		// version
-> +	.word	0				// res1
-> +	.dword	0				// res2
-> +	.ascii	"RISCV\0\0\0"			// magic
-> +	.ascii	"RSC\x05"			// magic2
-> +	.word	0				// res3
-> +
->  	/*
->  	 * Stash the hartid in scratch and shift the dtb address into a0.
->  	 * thread_info_init() will later promote scratch to point at thread
->  	 * local storage.
->  	 */
-> +1:
->  	csrw	CSR_SSCRATCH, a0
->  	mv	a0, a1
->  
-> -- 
-> 2.39.3 (Apple Git-146)
->
-
-Thanks,
-drew
+Yeah if we do try_get it would need to be at least on a specific dma_buf
+type (so checking for dma_buf->ops), since in general this does not work
+(unless we add the general code in dma_buf.c somehow to make it work).
+Aside from any other design concerns.
+-Sima
+-- 
+Simona Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
