@@ -1,157 +1,131 @@
-Return-Path: <kvm+bounces-34029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31C169F5D96
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 04:44:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A629F5E32
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 06:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3098116251A
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 03:44:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31ACF7A25EC
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 05:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C09E14F9E7;
-	Wed, 18 Dec 2024 03:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D02153808;
+	Wed, 18 Dec 2024 05:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JuViTJyE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c2kGuL+h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301CA14B075
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 03:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCF96026A;
+	Wed, 18 Dec 2024 05:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734493437; cv=none; b=ggxUiGZXLVtCnknrBOMDNWme3ccg1KOzb86L0zmR6RYQEarxE4dTL+2LCJvjPcJ6mKNEc1ASGSHwiVSx2RZvU9/iz/95gHtNJnCZRBYU2w+rsNE2ZXhWQG3XgU+9TdVd7mQN1jCsGnK/GfKWtiit1+ohd60g6/QtRYnhi/8uBus=
+	t=1734498564; cv=none; b=MrgLYbyLbMz9I8ygcOngg5Q1268aBNjh6yxtqHef9cS3AD3dFFbglCYFwctzUUuj+zDvNM23SRQkjudnWVS9WREdJP7aMEGfd05DL64knFVYyI+ukB6A3uS0YFGQ1LDClaL+0b9/dOwWB7qrh8h33mWSd0VzM1dwaXP1IH43P3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734493437; c=relaxed/simple;
-	bh=T9P0nKFIxiPyS8k4DExDFRUY23tQRBPVrKGYouHSjtg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gU0POLDZtwUUG54r7G6IABqBsn7okj9UjFtd2k4ptGvPuC1el9LJgrc1CrBHskri2GHsj0zGMrAR+tZxKokzCqk75mHcwkS70QEKb3Bb+JEsLyjRi+PkLfIDCjVPBTUCByxBtTNsaGS1Q2S+Ur+JquUhBS+OeTFLLZ8jMupZaSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JuViTJyE; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef79d9c692so8166398a91.0
-        for <kvm@vger.kernel.org>; Tue, 17 Dec 2024 19:43:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734493435; x=1735098235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vMvxGFaauCT6EXkSSVcakmGQcSaxmrUYWuzpakI6n64=;
-        b=JuViTJyEXDRPQmhzC6lKYjIAQtYMNGSxDFvZ+5JPzBOXlHOSG0FJrWO3kBuk8XX9Z+
-         aW6ayge6DkIwnTBJFrbPfgTJDXW6xUfhli9YoULF4OODZbZlHENwUCh6uzvh/FuqGm2k
-         ulDiKeFRmN9UUI+XKFQPGynMeXTEsb5kmnP0eMQpnrtzeMQ/Th14xvyxlQLD8auv5+YJ
-         TxG8BvhhRrlPHGkXU78SsNMD8OqYrMojb306HstcrZRTjP1g7iRqNiI7y1sTzW1tMpv2
-         GQjwjFrzptar6PRmTRi4z5rhM0hFzwljnkvjEG73nVhXdIhCzH+yJTZ+MW1T7L0DHHPK
-         zkHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734493435; x=1735098235;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vMvxGFaauCT6EXkSSVcakmGQcSaxmrUYWuzpakI6n64=;
-        b=e1ucQqBBe7281QMjhAeXOssBnNLV9phWaY9gRTwXOmaWhBhvD2S3zS5r5TLLSY7Dwc
-         lrzjpTlZQyASr5m1HL/HyOq51vPCnefjX1wI3NWjui8ClpQf04MkACh5S22QesEwOgbG
-         O5IaqSb7BGsuQoe05GZGWgNNby7s8VRcZ/JhaZ+xjQ4apXzLSH6w25tMl5RQfK3b7Qag
-         RV7mkDjsKoSDx0iHRKfyqhAxCzcSxNj66xq9Xbevk2Ov5QXnvnYtkPd1ix4AHuxAMTHG
-         TKhKYfFpPtCSSSWlgwjxpH2oVjCM+G0+rtftJqyYWCfVAU+93CgE8Uf79ja2xcYoCFGf
-         ODNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIHPIR626wjPYDbz+NVrnJ/xZqSzyypWy1HFBgWKG5s7CIaNXOJUdFDCV9gk17Re9SSlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf7s8tTAg7iuO1/0vy6pIWkvKUWXxW/7bN0uDfke4Ah/DOjALn
-	yGO695prL9RtvOV66AcF0nytd9uDYqVwWbJ7+6vBGtWkLotOZfESOls1ryeeLgKrKKq0TeMOfwa
-	HPQ==
-X-Google-Smtp-Source: AGHT+IEgztvLWb52BnIZoHvncjnNyp90SJMgAHmmjKQFhaCOV0qDcxqDayfebRz4dcLnBBg0mCziG+9A4kQ=
-X-Received: from pjuw4.prod.google.com ([2002:a17:90a:d604:b0:2da:5868:311c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:544e:b0:2ee:dcf6:1c8f
- with SMTP id 98e67ed59e1d1-2f2e91f29ffmr2409883a91.16.1734493435506; Tue, 17
- Dec 2024 19:43:55 -0800 (PST)
-Date: Tue, 17 Dec 2024 19:43:54 -0800
-In-Reply-To: <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
+	s=arc-20240116; t=1734498564; c=relaxed/simple;
+	bh=LF1BvL5APEXR/Vq1F+OYGrBroEZEjlB5dri92/wjmXs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=hJwEdHaGwzo44NLqNibrAS/QCCaYhBargimyjjc1oFIcgj4C1n7r5hB85vO/qNg8WjWFXW3DFH+XiVIuOIiPLrEGlsjLLoZDW2wu3zpMLzeKwb23/02SbJ7DVvyMVUNAm6XVtX1BRWjy5/U1q7V3MrQQeNluIiqB8UzSrg8lvw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c2kGuL+h; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734498562; x=1766034562;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=LF1BvL5APEXR/Vq1F+OYGrBroEZEjlB5dri92/wjmXs=;
+  b=c2kGuL+hLqe0BYH9PyFKJi3T2d7IndZ4JyjYbO5V5tBJDJH/8rw7udNZ
+   Ds0MScJIi8fr2QLChwij6FVXTKt7RyIXzuzKaZ9N26gToyOYr71aue0ot
+   9jAECvy1szMr0wx5xEyaQZtv4iYW9WcEXxiMXv8OaZHzOrrIjvsV/JHf3
+   cuan1UZskjeMUXnED/GAJybhAKOYO0Md4gPVNbQsPnTEvL5d3SimxVBds
+   TAU0E5yW2GWs3Z4x9QEDOfSHOYZt8kg36owDhZloH2rGxM3uEg2pevn6m
+   Y29ccPUgP0VZXbRjPPfZEt2VxpgBf5fMavuu/35Z6u3wLdFStQlF9+21i
+   g==;
+X-CSE-ConnectionGUID: P3+D2p5+SHqv61opUryATw==
+X-CSE-MsgGUID: uJRfg40JTvW2pyYz8BMn9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11289"; a="38895108"
+X-IronPort-AV: E=Sophos;i="6.12,243,1728975600"; 
+   d="scan'208";a="38895108"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2024 21:09:22 -0800
+X-CSE-ConnectionGUID: lPLDNuxNShCy5bOD1i/Fsg==
+X-CSE-MsgGUID: 5jZhzAMpRniMmDP6plIb6Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="101885146"
+Received: from unknown (HELO [10.238.9.154]) ([10.238.9.154])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2024 21:09:19 -0800
+Message-ID: <377a2e4f-91bf-4156-86e4-feaddf90113e@linux.intel.com>
+Date: Wed, 18 Dec 2024 13:09:16 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
- <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com> <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
- <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
- <CADH9ctA_C1dAOus1K+wOH_SOKTb=-X1sVawt5R=dkH1iGt8QUg@mail.gmail.com>
- <CABgObfZrTyft-3vqMz5w0ZiAhp-v6c32brgftynZGJO8OafrdA@mail.gmail.com>
- <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com>
- <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com> <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
- <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
-Message-ID: <Z2IXvsM0olS5GvbR@google.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-From: Sean Christopherson <seanjc@google.com>
-To: Doug Covelli <doug.covelli@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Rusin <zack.rusin@broadcom.com>, 
-	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/7] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ michael.roth@amd.com, linux-kernel@vger.kernel.org
+References: <20241201035358.2193078-1-binbin.wu@linux.intel.com>
+ <20241201035358.2193078-5-binbin.wu@linux.intel.com>
+ <d3adecc6-b2b9-42ba-8c0f-bd66407e61f0@intel.com>
+ <692aacc1-809f-449d-8f67-8e8e7ede8c8d@linux.intel.com>
+ <edc7f1f3-e498-44cc-aa3c-994d3f290e01@intel.com>
+ <fc0306fe-8a78-4024-9b67-0f8cb9f7450a@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <fc0306fe-8a78-4024-9b67-0f8cb9f7450a@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024, Doug Covelli wrote:
-> On Thu, Nov 14, 2024 at 10:45=E2=80=AFAM Doug Covelli <doug.covelli@broad=
-com.com> wrote:
-> > > For LINT1, it should be less performance critical; if it's possible
-> > > to just go through all vCPUs, and do KVM_GET_LAPIC to check who you
-> > > should send a KVM_NMI to, then I'd do that.  I'd also accept a patch
-> > > that adds a VM-wide KVM_NMI ioctl that does the same in the hyperviso=
-r
-> > > if it's useful for you.
-> >
-> > Thanks for the patch - I'll get it a try but it might not be right away=
-.
-> >
-> > > And since I've been proven wrong already, what do you need INIT/SIPI =
-for?
-> >
-> > I don't think this one is as critical.  I believe the reason it was
-> > added was so that we can synchronize startup of the APs with execution
-> > of the BSP for guests that do not do a good job of that (Windows).
-> >
-> > Doug
->=20
-> We were able to get the in-kernel APIC working with our code using the sp=
-lit
-> IRQ chip option with our virtual EFI FW even w/o the traps for SVR and LV=
-T0
-> writes.  Performance of Windows VMs is greatly improved as expected.
-> Unfortunately our ancient legacy BIOS will not work with > 1 VCPU due to =
-lack
-> of support for IPIs with an archaic delivery mode of remote read which it=
- uses
-> to discover APs by attempting to read their APIC ID register.  MSFT WHP s=
-upports
-> this functionality via an option, WHvPartitionPropertyCodeApicRemoteReadS=
-upport.
->=20
-> Changing our legacy BIOS is not an option so in order to support Windows =
-VMs
-> with the legacy BIOS with decent performance we would either need to add =
-support
-> for remote reads of the APIC ID register to KVM or support CR8 accesses w=
-/o
-> exiting w/o the in-kernel APIC in order.  Do you have a preference?
 
-I didn't quite follow the CR8 access thing.  If the choice is between emula=
-ting
-Remote Read IPIs and using a userspace local APIC, then I vote with both ha=
-nds
-for emulating Remote Reads, especially if we can do a half-assed version th=
-at
-provides only what your crazy BIOS needs :-)
 
-The biggest wrinkle I can think of is that KVM uses the Remote Read IPI enc=
-oding
-for a paravirt vCPU kick feature, but I doubt that's used by Windows guests=
- and
-so can be sacrificed on the Altar of Ancient BIOS.
+
+On 12/18/2024 9:38 AM, Binbin Wu wrote:
+>
+>
+>
+> On 12/16/2024 2:03 PM, Xiaoyao Li wrote:
+>> On 12/16/2024 9:08 AM, Binbin Wu wrote:
+>>>
+>>>
+>>>
+>>> On 12/13/2024 5:32 PM, Xiaoyao Li wrote:
+>>>> On 12/1/2024 11:53 AM, Binbin Wu wrote:
+>>>>
+>>> [...]
+>>>>> +
+>>>>> +static int tdx_map_gpa(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +    struct vcpu_tdx * tdx = to_tdx(vcpu);
+>>>>> +    u64 gpa = tdvmcall_a0_read(vcpu);
+>>>>
+>>>> We can use kvm_r12_read() directly, which is more intuitive. And we can drop the MACRO for a0/a1/a2/a3 accessors in patch 022.
+>>> I am neutral about it.
+>>>
+>>
+>> a0, a1, a2, a3, are the name convention for KVM's hypercall. It makes sense when serving as the parameters to __kvm_emulate_hypercall().
+>>
+>> However, now __kvm_emulate_hypercall() is made to a MACRO and we don't need the temp variable like a0 = kvm_xx_read().
+>>
+>> For TDVMCALL leafs other than normal KVM hypercalls, they are all TDX specific and defined in TDX GHCI spec, a0/a1/a2/a3 makes no sense for them.
+> OK, make sense.
+>
+> Thanks!
+>
+>
+I will leave it as it is for now.
+
+There is an RFC proposal from Hunter about using descriptively named parameters
+https://lore.kernel.org/all/fa817f29-e3ba-4c54-8600-e28cf6ab1953@intel.com/
+
+It can wait until there is a final conclusion.
 
