@@ -1,208 +1,131 @@
-Return-Path: <kvm+bounces-34068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0539F6AFA
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 17:22:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86C29F6ACB
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 17:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D0A37A2279
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:22:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A8F1896B63
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2024 16:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8141E1F37C9;
-	Wed, 18 Dec 2024 16:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCE51C5CD5;
+	Wed, 18 Dec 2024 16:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N8fFVxge"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OuC44nx+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D0F4690
-	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 16:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA9A149E16
+	for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 16:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734538943; cv=none; b=ujURUW22xp7lOpPS+bXnsvIfVm7Xi84FJGBfcT36NcIleXqPPn2GcbmpOCuOlYdeKHfUDZuAuIb+et59z0VaaRSh168zMeGDaGVXeZMjPfM0Vn6xf+si5FHTL+7fWVvww8LyLNQYBAbBsfjSDz0qi6fLNXZYtoq0jSHO0848l4o=
+	t=1734538330; cv=none; b=qwBIQfMpvQUihIZdZ8c9FP/fXDoKpD/v2rOhKuD0r/cQj7uPsc7Uk7lNHW94l9LW+m3SOIHapDnRR+Gb9LuqLSBzpiz2688McBj6D5cc7fKLqcfe192MN0yXE0DDijRyL6T+EFb/9TN//7TIAxriRLlbnMMb19ZNORhiCJr15hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734538943; c=relaxed/simple;
-	bh=+nRIYLUx18Ckri8uJLJpopqFBHt1t36pFVSdfNkPfpo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EV2uHdlC3Vd8/JcodERbfrQZ8SyE9TInKak5FfxsAh8p5B7qXQsDot+qYdixGKBZ96URyflcAv/DsN39zqqlzSORgglIbIa/TOvPyhi1Wxc/K3uqhyMDN9WX5doJa6eAS/szIUqZ83Qes1tNjOfh5VObNkzmNMfk3X5/piJIuW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=N8fFVxge; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43618283d48so48554675e9.1
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 08:22:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734538939; x=1735143739; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DBGqBoFFTtrTgjei5JE6lR139nQig/betbm5L9Jguls=;
-        b=N8fFVxgeQmxwPy7VnJPgESZ0gk0TUxN/dh//2eGLms11lhVMxlgZ72hfDUvnMqkIUZ
-         NNLXSY1LxKTk6o2uixWnKOoRKMzj2VJi21qtjAcdvA6X1sSSFc1P1OXy5IksdqiNuKGP
-         7B97JVuyWEHGInEmarlGerroyt7MI6+ZwaiziP74KVJHioAzeVIsPQ6Poc9CoiTpXO5E
-         Zn7bWsJwX0p7bV9GejbnNlsA3FGZaGLb7n5ohP/qKXb4/QlXTKY1VL+tbcl1iWeg8jL4
-         WLzq8LoZl+1Zsqaqnr0NhwpDG4/yZw2g2iSjqs06ffGpC2dW3QqxhzT3ydVlM0bwoutZ
-         B7hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734538939; x=1735143739;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DBGqBoFFTtrTgjei5JE6lR139nQig/betbm5L9Jguls=;
-        b=hJlRG/C3QlKfcEQnpLIiIoACzkTWskaHzGOz6p+JBXSprutGniCQQBrTMaQOHLsvNr
-         btDVBGe89LOrLkEOVj7z1GbJfNp5RabR2K7vQ+jOV1hh2+PMGtorqh+zWNe1jhQuript
-         xqx97PBQLlm4gpNtAlukMkzBFJ0GWjimSijJ4+/OzsY1IGWp7HDAl+/CGLPyVkpBV32Z
-         9Le7UqL6LCHgLwHwO55htHtyJoTsMY6y1PP5kaQMV5EO+dINR76vT69sBJJxgBOyXosa
-         83UyJQRY7ZSDJp99cF5GgtV9mZ9FA/UQo0rREZp+rekUoB4bA6BqLCEE1wTs9CHsAG/r
-         07zw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSEnI2B6Grj6Ih9nKIyswmiRbOgxlwlOxiP5+T5Vp2Txx0QRBPWlM7P5H0k9nqaZWxzms=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIZK4ITzwyTF0ZRZ0zquAzZguTh4q1+uaecolpoSCzmPvWSWSl
-	NBfXrI61AoCy68DTCUV4gjqC+77GY7j807RLrN0gj8z3d4/b2kteBty0EFXL484=
-X-Gm-Gg: ASbGncsmcWl9h1pzPsvnGS4WWWT4HNTmrwVLYiXbFLwA0U3GP1ZF8u8ztRXp6kuXffB
-	yySS9p5WEqVdlpDyq7SkcvSrMD7AAvbfpEWeB2bLloyYvfDamtyiw06igc113XrUijx2zxHxize
-	n8kJW9sBRJhvDpe3JmLhfNRae5uPIKIgBjSVU/D0HVrYxn0ZNlCgufQSXOq2julTvB+qUtpYO7X
-	tpWfxuOZ/Uq1KVVcXxA9Wi61nIbkCeFQjRsqjlO6A7YsAXmlSeaQOUBqNW58igeOgojH3JI
-X-Google-Smtp-Source: AGHT+IGdFMvwZNNIwVpThNbKf0YkrO9/XNDycyE19O9fkL4PvUz6c2Tkd/A2lNWHlCWOeP2NEK6MgQ==
-X-Received: by 2002:a05:600c:2e49:b0:434:fbda:1f36 with SMTP id 5b1f17b1804b1-436553ec834mr26884775e9.20.1734538939077;
-        Wed, 18 Dec 2024 08:22:19 -0800 (PST)
-Received: from [192.168.1.117] ([78.196.4.158])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656afc179sm24856065e9.3.2024.12.18.08.22.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Dec 2024 08:22:18 -0800 (PST)
-Message-ID: <098c063d-ce67-4f2e-aa25-6eac7db9b170@linaro.org>
-Date: Wed, 18 Dec 2024 17:22:17 +0100
+	s=arc-20240116; t=1734538330; c=relaxed/simple;
+	bh=ucG6hpTV+IReE+lOfCzMaRfXRUtudEvIopsU4oH+NGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YSsHdjZlCjX1oYAGUsvceRXMDpTZzwIbYe5S3Iim+R9bvx9lm3Y3CCxTGOSyHB7P6bVrC4WO9AorLO7hbuAR8GTZ7TroEx3KcFuY4PSMmZqhNmSBq8arI/6Mj5ZRv2y11d79oYG81CaGwIW4+698mMXY8AWr80KhKsK/Fzn2nWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OuC44nx+; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734538328; x=1766074328;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=ucG6hpTV+IReE+lOfCzMaRfXRUtudEvIopsU4oH+NGE=;
+  b=OuC44nx+E55fTdMxoIIib4El/Uz+DB1une806QE27kD7EKG/zHg7DNrj
+   Zp6UYHR3uFC84+MBdgVs/yoCc3nRnS0KtwWkLL42QfnXPXAWe8nl/u3Kh
+   ZYPZ5RfLeSvi5Duh53em+4zdV7ik/J7b+1dmNwBTSSYtSJWEQ+N0THCvX
+   pPzVt1Hjt7UV6Mr0N1JLL8jD3uFPOJppxG25oT5oqAKCUoXCvqrFuSyAr
+   IZ93Umy/+mRFibDY8ThA9HGyM1jQumEcfE4b9JKyUDmmZ35wi9kYVlvL0
+   0PF2rTpD+gpd0M/gZ3QB8L3fflY5mfhVqGNd8HKaoQK+bA2CYfK8IScc0
+   A==;
+X-CSE-ConnectionGUID: r7YM3V41T/qM+BM+q18Eyg==
+X-CSE-MsgGUID: 60qIU2wiQUmct/xJfW2gZA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11290"; a="46029667"
+X-IronPort-AV: E=Sophos;i="6.12,245,1728975600"; 
+   d="scan'208";a="46029667"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2024 08:12:06 -0800
+X-CSE-ConnectionGUID: tmGK/hGKRq60K++Lad7knw==
+X-CSE-MsgGUID: fWJY/bGUTrOKqmE5Tbi2rw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="98724460"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa008.jf.intel.com with ESMTP; 18 Dec 2024 08:12:02 -0800
+Date: Thu, 19 Dec 2024 00:30:41 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Eric Farman <farman@linux.ibm.com>,
+	kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/2] system: Move 'exec/confidential-guest-support.h' to
+ system/
+Message-ID: <Z2L4seQo7Z7LPpTh@intel.com>
+References: <20241218155913.72288-1-philmd@linaro.org>
+ <20241218155913.72288-2-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] target/i386/sev: Reduce system specific declarations
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Farman <farman@linux.ibm.com>,
- kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- David Hildenbrand <david@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-ppc@nongnu.org, Zhao Liu <zhao1.liu@intel.com>, qemu-s390x@nongnu.org,
- Yanan Wang <wangyanan55@huawei.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
-References: <20241218155913.72288-1-philmd@linaro.org>
- <20241218155913.72288-3-philmd@linaro.org> <Z2L1o7xesp5EcRuW@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <Z2L1o7xesp5EcRuW@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241218155913.72288-2-philmd@linaro.org>
 
-On 18/12/24 17:17, Daniel P. BerrangÃ© wrote:
-> On Wed, Dec 18, 2024 at 04:59:13PM +0100, Philippe Mathieu-DaudÃ© wrote:
->> "system/confidential-guest-support.h" is not needed,
->> remove it. Reorder #ifdef'ry to reduce declarations
->> exposed on user emulation.
->>
->> Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@linaro.org>
->> ---
->>   target/i386/sev.h  | 29 ++++++++++++++++-------------
->>   hw/i386/pc_sysfw.c |  2 +-
->>   2 files changed, 17 insertions(+), 14 deletions(-)
->>
->> diff --git a/target/i386/sev.h b/target/i386/sev.h
->> index 2664c0b1b6c..373669eaace 100644
->> --- a/target/i386/sev.h
->> +++ b/target/i386/sev.h
->> @@ -18,7 +18,17 @@
->>   #include CONFIG_DEVICES /* CONFIG_SEV */
->>   #endif
->>   
->> -#include "system/confidential-guest-support.h"
->> +#if !defined(CONFIG_SEV) || defined(CONFIG_USER_ONLY)
->> +#define sev_enabled() 0
->> +#define sev_es_enabled() 0
->> +#define sev_snp_enabled() 0
->> +#else
->> +bool sev_enabled(void);
->> +bool sev_es_enabled(void);
->> +bool sev_snp_enabled(void);
->> +#endif
->> +
->> +#if !defined(CONFIG_USER_ONLY)
+On Wed, Dec 18, 2024 at 04:59:12PM +0100, Philippe Mathieu-Daudé wrote:
+> Date: Wed, 18 Dec 2024 16:59:12 +0100
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Subject: [PATCH 1/2] system: Move 'exec/confidential-guest-support.h' to
+>  system/
+> X-Mailer: git-send-email 2.45.2
 > 
-> I'm surprised any of this header file is relevant to
-> user mode. If something is mistakely calling sev_ functions
-> from user mode compiled code, I'd be inclined to fix the
-> caller such that its #include ".../sev.h" can be wrapped
-> by !CONFIG_USER_ONLY
-
-I forgot to mention and just replied in another post:
-
-   The motivation is to reduce system-specific definitions
-   exposed to user-mode in target/i386/cpu.c, like hwaddr &co,
-   but I'm not there yet and have too many local patches so
-   starting to send what's ready.
-
-WRT SEV what is bugging me is in cpu_x86_cpuid():
-
-target/i386/cpu.c-7137-    case 0x8000001F:
-target/i386/cpu.c-7138-        *eax = *ebx = *ecx = *edx = 0;
-target/i386/cpu.c:7139:        if (sev_enabled()) {
-target/i386/cpu.c-7140-            *eax = 0x2;
-target/i386/cpu.c-7141-            *eax |= sev_es_enabled() ? 0x8 : 0;
-target/i386/cpu.c-7142-            *eax |= sev_snp_enabled() ? 0x10 : 0;
-target/i386/cpu.c-7143-            *ebx = sev_get_cbit_position() & 
-0x3f; /* EBX[5:0] */
-target/i386/cpu.c-7144-            *ebx |= (sev_get_reduced_phys_bits() 
-& 0x3f) << 6; /* EBX[11:6] */
-target/i386/cpu.c-7145-        }
-target/i386/cpu.c-7146-        break;
-
-but maybe I can use #ifdef'ry around CONFIG_USER_ONLY like
-with SGX:
-
-     case 0x12:
-#ifndef CONFIG_USER_ONLY
-         if (count > 1) {
-             uint64_t epc_addr, epc_size;
-
-             if (sgx_epc_get_section(count - 2, &epc_addr, &epc_size)) {
-                 *eax = *ebx = *ecx = *edx = 0;
-                 break;
-             }
-             ...
-#endif
-         break;
-
+> "exec/confidential-guest-support.h" is specific to system
+> emulation, so move it under the system/ namespace.
+> Mechanical change doing:
 > 
->>   
->>   #define TYPE_SEV_COMMON "sev-common"
->>   #define TYPE_SEV_GUEST "sev-guest"
->> @@ -45,18 +55,6 @@ typedef struct SevKernelLoaderContext {
->>       size_t cmdline_size;
->>   } SevKernelLoaderContext;
->>   
->> -#ifdef CONFIG_SEV
->> -bool sev_enabled(void);
->> -bool sev_es_enabled(void);
->> -bool sev_snp_enabled(void);
->> -#else
->> -#define sev_enabled() 0
->> -#define sev_es_enabled() 0
->> -#define sev_snp_enabled() 0
->> -#endif
->> -
->> -uint32_t sev_get_cbit_position(void);
->> -uint32_t sev_get_reduced_phys_bits(void);
->>   bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp);
->>   
->>   int sev_encrypt_flash(hwaddr gpa, uint8_t *ptr, uint64_t len, Error **errp);
+>   $ sed -i \
+>     -e 's,exec/confidential-guest-support.h,sysemu/confidential-guest-support.h,' \
+>         $(git grep -l exec/confidential-guest-support.h)
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>  include/{exec => system}/confidential-guest-support.h | 6 +++---
+>  target/i386/confidential-guest.h                      | 2 +-
+>  target/i386/sev.h                                     | 2 +-
+>  backends/confidential-guest-support.c                 | 2 +-
+>  hw/core/machine.c                                     | 2 +-
+>  hw/ppc/pef.c                                          | 2 +-
+>  hw/ppc/spapr.c                                        | 2 +-
+>  hw/s390x/s390-virtio-ccw.c                            | 2 +-
+>  system/vl.c                                           | 2 +-
+>  target/s390x/kvm/pv.c                                 | 2 +-
+>  10 files changed, 12 insertions(+), 12 deletions(-)
+>  rename include/{exec => system}/confidential-guest-support.h (96%)
+> 
+
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+
+(MAINTAINERS is missed to change? :-))
 
 
