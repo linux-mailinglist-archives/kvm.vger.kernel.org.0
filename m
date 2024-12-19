@@ -1,130 +1,107 @@
-Return-Path: <kvm+bounces-34096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276E39F72BE
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:39:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6BD9F72C2
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:41:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0975C1888FF1
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:39:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2897160DCF
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AC986327;
-	Thu, 19 Dec 2024 02:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4BB86327;
+	Thu, 19 Dec 2024 02:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPfxqSt7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PkM2umIm"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6805D477
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B394C98
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734575973; cv=none; b=FGlh3ZYGYzXR9zu5SSaw4e5TiCF0Otf8mX666Mw4pRKqnU76ueqkT6mYVoMasgZTYyZAIRJZ7N87pTDXqdCCnCVat6+409mkXTnwBC9GYsX6EtymdP2PVnK2eEtRVmOZszTqHYsAAEI//ZsVclAPqdWjFO9/McGooVeYGT1S3p4=
+	t=1734576060; cv=none; b=DaVTogguMfdhCLyWp43zOwtlKNAYAW694HAkxkcfAxjRZFpQ62HHe5YdUdfh4l/M3x2gOl85j2ifyaccbYevcL/1CONdCCxXVy7PzReu1wD+3m99klMg2ZBRGlOMzSUfZGykVwS6o/7NHb3TmX6w+pNTpogANPFXAn0fMhWStV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734575973; c=relaxed/simple;
-	bh=Xh0rRgh/7wTx9OjJbX6VMZNNlvLeBESz6cghvubzIN8=;
+	s=arc-20240116; t=1734576060; c=relaxed/simple;
+	bh=+DcBHZpNNqOm285hoPxcCIysOOvvqtDjFWcnC9l7Hxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mkG9ZLALHEIHmcfv/KP0RpnSKWZiGCrce0MqnEVVsRTtjHM/OZKFR5Th+ShseAWAXoMgMe9rXTPlMDWRS8qsDGQq1UPPHAUea4hM8MIb9qncShcKrwrbqkmPlPAGX7gjrPhctXAlxO/CDl1q4GKoWaY4TXTSEAXgkoG7h/ILA/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gPfxqSt7; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=j34wDlyRdXc6A32kIBmL+XkLtsaPJ1qVOlOt/iiCf8Vno8K87oX3gEpko/z0Df650XbutZGDjtTnnShBc4rrwUY3t3nD0+kdA+l9Us6e6r6N3JIiUdKP1TEdAHdKBYCNXU1CWDXsnh5iQnbz0xmdjCvaCbGgqKmFcOYST5ApsXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PkM2umIm; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216405eea1fso3329245ad.0
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:39:31 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2163dc0f5dbso3413595ad.2
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734575970; x=1735180770; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734576057; x=1735180857; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HHYSbe9XQeZJstEpYH57Z9R8AR6J6LY/n+7Uz7s2cjk=;
-        b=gPfxqSt7gCm/K+DeOXqKCugyYmTfCcYFXa4KP6ot8aFka4a10+Fr3hpaqdF2Lkbrgp
-         +zg7Vh5GqXHoMkt1eyrlh5Kr+9oxJLwMVIPxLgqj7qm1EbAXnkRDLfZpfu4qpM8VDgVX
-         mWBLDREpqMUgrHM1c108e4IwHPSLsc4AlUPqV+7rsvsUQuX3HlhCHb4tJzU7nkZ4MeuE
-         5GGjk0d9nyiP+8QiX0w18waLU/ExU05bQt5/jCpP1vf+IXyVKGskPnqdnKYTcBfydXFa
-         Vpi4aNly62aWPdyHJlpRuxs/xe2iCLC98AR/tozJe2zdBSFY3AAk6dGy0jS2vGCHb9/X
-         BvLw==
+        bh=3YyWPXzt5cEQ8LbwdPBgR5Uv3TNAW7IqFu7SoMnw0Mo=;
+        b=PkM2umImkPYrGmwVjNA2vNfAEApjJbkZU1P6iZ2+gEu8bLlqIHk7BLoa6UgEWPzyQa
+         6yELRzgDDTvHM2dz9QhTBAqmnOcj7vtnnA5eyaCOpD1jiMkCE2V7hVV/mEYQkJnWBSRt
+         TU1g1ItgyCr8FhhUaFlzQ4+xnwygCfKo5rjwJzPzwjh7hTa8qnbXE5+8EYjJPHEDchQF
+         gMI2YCRnwCIR+jAJD2pqL/VYbBzkE2EURyXQRSCyHfmTYqEKlF5ojXlHwdujD0i+4m8F
+         ioAgLMFxmbk5qg0yQjMi88EGHwWoBH5LkfdcffZuWvvioswSEN67PMBLF7Swx6guYb+B
+         JmMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734575970; x=1735180770;
+        d=1e100.net; s=20230601; t=1734576057; x=1735180857;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HHYSbe9XQeZJstEpYH57Z9R8AR6J6LY/n+7Uz7s2cjk=;
-        b=DKRwLxLSmfeCHRaISjWrjkGvPi75LbNg0m0TAe4rv1TE1TavfKtU2HKZ26ldLj0tuX
-         KFmPrOMVSlGMT6ZswCwNNmdTbWqYndEN0BEQ7Hd7TiJf9k4XD2m4qXY+YM6vKi2ldcWU
-         FLnzs26uZ2IximToCjYNy/n7VK5w/HG809U05H3pD1VT/rFvAMZYA/1y4WeWnivuEuww
-         /Ur5gcyxhqoZkEmt+1E+FYxEoXaPFASn9/7TKUBsFLN+Fx2FIBvf8bPdq8jlc2O9RvV5
-         /elBP0ZYg8ee5CZJWiyvGnhG7cGg79xLxOohnAzFq4RAxuPBTqVomNs+UwfB2RGhUNCI
-         aNyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsyNEe8q+3x8Dy9QaLQEn4PQ8Ow7wKWgQzGHYlPLICN0S74bt2PLFibybHhogmFW7d8vI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO2ME2MI4B5S+1gFaM6tia/avwV//n/dr9SH+e4R1jqrXzqNmi
-	ULBo9yQZs/LdwTKIlVRIlQ2VwnVZsQ9+xo6cDxxvTf3LR5x+2UL2ZgyfBXbpptuE+479Im5Om0f
-	8Pg==
-X-Google-Smtp-Source: AGHT+IHj8XfMyZosspL2p28bl03iG3qIPDqUHcjBsXSpFYg/u147eJg72V6x67HacWjUgwfmDcZPxQb4Wd4=
-X-Received: from pjbsd6.prod.google.com ([2002:a17:90b:5146:b0:2ef:8055:93d9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ecd1:b0:216:2804:a241
- with SMTP id d9443c01a7336-218d7269e2bmr78557255ad.37.1734575970540; Wed, 18
- Dec 2024 18:39:30 -0800 (PST)
-Date: Wed, 18 Dec 2024 18:39:29 -0800
-In-Reply-To: <Z2N8bl6ofE2ocQsW@yzhao56-desk.sh.intel.com>
+        bh=3YyWPXzt5cEQ8LbwdPBgR5Uv3TNAW7IqFu7SoMnw0Mo=;
+        b=CBhz+gTW8h5qqAaR4pMaGAYAZvcyEN8mLjF2NcU6TRXcj+yx+3knYnCgiiSd3T3/y3
+         iPlPxspkkeXRmjVNbnSSTmIsW5+Vrs/3tzJLdp6F5TVLEy6APU8alxCk07+24PY5PG9u
+         7Nzl628odjTW54zo98Ylmz9dJQ1mZI3yMajTm1G30nCh7Ry3LSAkps8kpBBCKRYoWozc
+         IKQIIcc8zMXR9UOiGZGl/2f60IlszN/WjnRwmAFOAi4RX3tBDxnnV0LZgw9OyqNfbtKs
+         09J6iGJG4S1TaQNNpgn2/qOMCCExyvQcMKhP55lVrx6NxktgwI6lKhY8E6An3iFBDejQ
+         HrXw==
+X-Gm-Message-State: AOJu0YySx+fdQewU5cHbDd7o2IbqF41TBbmTQNePYHUbJSvTUz3eZHhU
+	Ex29r4JgxHshJPFcDLyAYYpKzTEDKcF/zekJCZAZScquzUVT/bc+X2+mJk4czk36KvFSj1qfE8x
+	ncw==
+X-Google-Smtp-Source: AGHT+IFSqRB/jorPK12xjKa7nxtmU419TCJiC2zX6LV9UiMIGXIuBRRufnwUW0vpp/BvWMaUpKtuGFF6y+8=
+X-Received: from plqw11.prod.google.com ([2002:a17:902:a70b:b0:216:1ebc:1f93])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f712:b0:216:59ed:1aa3
+ with SMTP id d9443c01a7336-218d71030ddmr65136645ad.27.1734576057630; Wed, 18
+ Dec 2024 18:40:57 -0800 (PST)
+Date: Wed, 18 Dec 2024 18:40:38 -0800
+In-Reply-To: <20241211172952.1477605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241121115139.26338-1-yan.y.zhao@intel.com> <20241121115703.26381-1-yan.y.zhao@intel.com>
- <Z2IJP-T8NVsanjNd@google.com> <Z2JhXfA14UjC1/fs@yzhao56-desk.sh.intel.com>
- <Z2L0CPLKg9dh6imZ@google.com> <Z2N8bl6ofE2ocQsW@yzhao56-desk.sh.intel.com>
-Message-ID: <Z2OHYWZeHeKMHfDy@google.com>
-Subject: Re: [RFC PATCH 2/2] KVM: TDX: Kick off vCPUs when SEAMCALL is busy
- during TD page removal
+References: <20241211172952.1477605-1-seanjc@google.com>
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <173457547595.3295170.16244454188182708227.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, dave.hansen@linux.intel.com, 
-	rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, tony.lindgren@intel.com, 
-	binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	isaku.yamahata@gmail.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org, 
-	x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Simon Pilkington <simonp.git@mailbox.org>, Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Thu, Dec 19, 2024, Yan Zhao wrote:
-> On Wed, Dec 18, 2024 at 08:10:48AM -0800, Sean Christopherson wrote:
-> > On Wed, Dec 18, 2024, Yan Zhao wrote:
-> > > > Anyways, I don't see any reason to make this an arch specific request.
-> > > After making it non-arch specific, probably we need an atomic counter for the
-> > > start/stop requests in the common helpers. So I just made it TDX-specific to
-> > > keep it simple in the RFC.
-> > 
-> > Oh, right.  I didn't consider the complications with multiple users.  Hrm.
-> > 
-> > Actually, this doesn't need to be a request.  KVM_REQ_OUTSIDE_GUEST_MODE will
-> > forces vCPUs to exit, at which point tdx_vcpu_run() can return immediately with
-> > EXIT_FASTPATH_EXIT_HANDLED, which is all that kvm_vcpu_exit_request() does.  E.g.
-> > have the zap side set wait_for_sept_zap before blasting the request to all vCPU,
-> Hmm, the wait_for_sept_zap also needs to be set and unset in all vCPUs except
-> the current one.
+On Wed, 11 Dec 2024 09:29:52 -0800, Sean Christopherson wrote:
+> Drop KVM's arbitrary behavior of making DE_CFG.LFENCE_SERIALIZE read-only
+> for the guest, as rejecting writes can lead to guest crashes, e.g. Windows
+> in particular doesn't gracefully handle unexpected #GPs on the WRMSR, and
+> nothing in the AMD manuals suggests that LFENCE_SERIALIZE is read-only _if
+> it exists_.
+> 
+> KVM only allows LFENCE_SERIALIZE to be set, by the guest or host, if the
+> underlying CPU has X86_FEATURE_LFENCE_RDTSC, i.e. if LFENCE is guaranteed
+> to be serializing.  So if the guest sets LFENCE_SERIALIZE, KVM will provide
+> the desired/correct behavior without any additional action (the guest's
+> value is never stuffed into hardware).  And having LFENCE be serializing
+> even when it's not _required_ to be is a-ok from a functional perspective.
+> 
+> [...]
 
-Why can't it be a VM-wide flag?  The current vCPU isn't going to do VP.ENTER, is
-it?  If it is, I've definitely missed something :-)
+Applied to kvm-x86 fixes, thanks!
 
-> >         /* TDX exit handle takes care of this error case. */
-> >         if (unlikely(tdx->state != VCPU_TD_STATE_INITIALIZED)) {
-> >                 tdx->vp_enter_ret = TDX_SW_ERROR;
-> > @@ -921,6 +924,9 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
-> >                 return EXIT_FASTPATH_NONE;
-> >         }
-> >  
-> > +       if (unlikely(to_kvm_tdx(vcpu->kvm)->wait_for_sept_zap))
-> > +               return EXIT_FASTPATH_EXIT_HANDLED;
-> > +
-> >         trace_kvm_entry(vcpu, force_immediate_exit);
-> >  
-> >         if (pi_test_on(&tdx->pi_desc)) {
-> Thanks for this suggestion.
-> But what's the advantage of this checking wait_for_sept_zap approach?
-> Is it to avoid introducing an arch specific request?
+[1/1] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
+      https://github.com/kvm-x86/linux/commit/2778c9a4687d
 
-Yes, and unless I've missed something, "releasing" vCPUs can be done by clearing
-a single variable.
+--
+https://github.com/kvm-x86/linux/tree/next
 
