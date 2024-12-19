@@ -1,106 +1,104 @@
-Return-Path: <kvm+bounces-34097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6BD9F72C2
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:41:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110649F72C4
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2897160DCF
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D639118909E8
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4BB86327;
-	Thu, 19 Dec 2024 02:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C29812B169;
+	Thu, 19 Dec 2024 02:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PkM2umIm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zZGXKNuE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B394C98
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E381979C0
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734576060; cv=none; b=DaVTogguMfdhCLyWp43zOwtlKNAYAW694HAkxkcfAxjRZFpQ62HHe5YdUdfh4l/M3x2gOl85j2ifyaccbYevcL/1CONdCCxXVy7PzReu1wD+3m99klMg2ZBRGlOMzSUfZGykVwS6o/7NHb3TmX6w+pNTpogANPFXAn0fMhWStV8=
+	t=1734576068; cv=none; b=Z+2PXn9tlYpYjN8k/zEg7vDz2WAWuzwYgP228AltFcnqOhAFosUCBHA9IAsed4uHMV9MdUjpMRpufoTp7FEHyJCYhs62JONZuiQDAqdNMpF0yBn4ualNzsF1LaGQgeiceofD7djKs2oWt9O7XrYBkwGDsD3QCFRG07REdW6kzUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734576060; c=relaxed/simple;
-	bh=+DcBHZpNNqOm285hoPxcCIysOOvvqtDjFWcnC9l7Hxk=;
+	s=arc-20240116; t=1734576068; c=relaxed/simple;
+	bh=eOEL2WrHWEpi5a9iSwUIEOE+/AdQwi0qQZiUtbWyh/w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j34wDlyRdXc6A32kIBmL+XkLtsaPJ1qVOlOt/iiCf8Vno8K87oX3gEpko/z0Df650XbutZGDjtTnnShBc4rrwUY3t3nD0+kdA+l9Us6e6r6N3JIiUdKP1TEdAHdKBYCNXU1CWDXsnh5iQnbz0xmdjCvaCbGgqKmFcOYST5ApsXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PkM2umIm; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=gUG2Rpu7OpjfBebTlAn/5tI+zT04xfSmqY+XRIMNo5IgK1Ywlrkk4RX3ZCz0p88+mayjrMkJUzZN4fj2VpXiE0RQLv7oogc0diFoI75TSAGyJnFbUCGudnDx1A6QPy8U39FqpAUEqzIDvqhy/D/e80okvR7DjfIW4gO2Z3d4jkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zZGXKNuE; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2163dc0f5dbso3413595ad.2
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:40:58 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee6b027a90so426699a91.1
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:41:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734576057; x=1735180857; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734576066; x=1735180866; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YyWPXzt5cEQ8LbwdPBgR5Uv3TNAW7IqFu7SoMnw0Mo=;
-        b=PkM2umImkPYrGmwVjNA2vNfAEApjJbkZU1P6iZ2+gEu8bLlqIHk7BLoa6UgEWPzyQa
-         6yELRzgDDTvHM2dz9QhTBAqmnOcj7vtnnA5eyaCOpD1jiMkCE2V7hVV/mEYQkJnWBSRt
-         TU1g1ItgyCr8FhhUaFlzQ4+xnwygCfKo5rjwJzPzwjh7hTa8qnbXE5+8EYjJPHEDchQF
-         gMI2YCRnwCIR+jAJD2pqL/VYbBzkE2EURyXQRSCyHfmTYqEKlF5ojXlHwdujD0i+4m8F
-         ioAgLMFxmbk5qg0yQjMi88EGHwWoBH5LkfdcffZuWvvioswSEN67PMBLF7Swx6guYb+B
-         JmMg==
+        bh=wbb0Eg3UwwWOo11oZmbLgzoTMJnGZQROUXn+RBNp/VQ=;
+        b=zZGXKNuE3bXxB6jH6QiaCs2HXi6g2PFVze+0fIkwJNgN5VxlYzaVM1zLuDXkI2I7Zt
+         5Z4cQIzJXnGAGrgj+xWJA5mvkjvHn8mMwJ7Y5zIwUZMmroKYME1IPx15Qrk/yKMM4cGf
+         erIWNoXJevdRypNBYZNfJT9Ru5yi41/Pj2L11vo2ZhO2mWQ6Znv2iZjGI21q5rdu4rGB
+         TVFxiSrH7NN3bIrtUjaXcJskr0t2BI/croZmObypi5zc0u+9eTFo7XrAnr2XEL+rqkA0
+         yLp3cGmLFcwJIiwNYs4i4Y5JgWV86BmAZSXG3mkSrtb70Ll3VEvKQBpt11OvybRwVzUm
+         KlxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734576057; x=1735180857;
+        d=1e100.net; s=20230601; t=1734576066; x=1735180866;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YyWPXzt5cEQ8LbwdPBgR5Uv3TNAW7IqFu7SoMnw0Mo=;
-        b=CBhz+gTW8h5qqAaR4pMaGAYAZvcyEN8mLjF2NcU6TRXcj+yx+3knYnCgiiSd3T3/y3
-         iPlPxspkkeXRmjVNbnSSTmIsW5+Vrs/3tzJLdp6F5TVLEy6APU8alxCk07+24PY5PG9u
-         7Nzl628odjTW54zo98Ylmz9dJQ1mZI3yMajTm1G30nCh7Ry3LSAkps8kpBBCKRYoWozc
-         IKQIIcc8zMXR9UOiGZGl/2f60IlszN/WjnRwmAFOAi4RX3tBDxnnV0LZgw9OyqNfbtKs
-         09J6iGJG4S1TaQNNpgn2/qOMCCExyvQcMKhP55lVrx6NxktgwI6lKhY8E6An3iFBDejQ
-         HrXw==
-X-Gm-Message-State: AOJu0YySx+fdQewU5cHbDd7o2IbqF41TBbmTQNePYHUbJSvTUz3eZHhU
-	Ex29r4JgxHshJPFcDLyAYYpKzTEDKcF/zekJCZAZScquzUVT/bc+X2+mJk4czk36KvFSj1qfE8x
-	ncw==
-X-Google-Smtp-Source: AGHT+IFSqRB/jorPK12xjKa7nxtmU419TCJiC2zX6LV9UiMIGXIuBRRufnwUW0vpp/BvWMaUpKtuGFF6y+8=
-X-Received: from plqw11.prod.google.com ([2002:a17:902:a70b:b0:216:1ebc:1f93])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f712:b0:216:59ed:1aa3
- with SMTP id d9443c01a7336-218d71030ddmr65136645ad.27.1734576057630; Wed, 18
- Dec 2024 18:40:57 -0800 (PST)
-Date: Wed, 18 Dec 2024 18:40:38 -0800
-In-Reply-To: <20241211172952.1477605-1-seanjc@google.com>
+        bh=wbb0Eg3UwwWOo11oZmbLgzoTMJnGZQROUXn+RBNp/VQ=;
+        b=FBCt7QCBDiHQMUJBv0Z2d7obyrwIhCAenQOUM/cycasdlrc2Hx0LXVbLtME/t88mow
+         dhqPKDeNlyqhr7hz4lfaI2Xj1EZ4KPzgmghQG2fTWcK5OJV5ew7aYAPhGxyIuN/z16Ll
+         Nnm/RJT/foy87D/MQu1XvXgPYSd/Bs1JcmgsTEn5Zgkn/+niFDVGNGHigGsBZMHqjMOO
+         BIEnns1JvGbArNtp5VTbfaUN2IlSzM1cDmc5z8Uae+SbJwMl7Kz/hVdE+V+oHd81aOxK
+         W6LfPcPYaNI6XMhUYS77Dr7BuplVSwRXDk8HXvzygLq8JLPrX6myoUSW5A2CHsP6BURZ
+         JMdA==
+X-Gm-Message-State: AOJu0YzO3E81t7OvlzJ70f6aBLd1yIkmrroldL9lnoS2SqH7pW4dieXE
+	VfnGoHVKQg8ofQkDQB0GjzHcTu2flPPOh/5tMrsD+OG60/zqKe5CPkG2Aett12Y+SGJPQeydVTu
+	89w==
+X-Google-Smtp-Source: AGHT+IEl3DvR3M/c9bCjK2ANMoW4EFH4x1PqaTfKCv68PUYqHPtTY4zB/lpzw11QdmFBnIAwBuNWFaHe5Ak=
+X-Received: from pjbpa1.prod.google.com ([2002:a17:90b:2641:b0:2ea:5fc2:b503])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e70b:b0:2ee:aef4:2c5d
+ with SMTP id 98e67ed59e1d1-2f2e933c2ebmr6902161a91.26.1734576066328; Wed, 18
+ Dec 2024 18:41:06 -0800 (PST)
+Date: Wed, 18 Dec 2024 18:40:40 -0800
+In-Reply-To: <20241218213611.3181643-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241211172952.1477605-1-seanjc@google.com>
+References: <20241218213611.3181643-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173457547595.3295170.16244454188182708227.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
+Message-ID: <173457570836.3297396.12144430815948289089.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Treat TDP MMU faults as spurious if access
+ is already allowed
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Simon Pilkington <simonp.git@mailbox.org>, Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, leiyang@redhat.com
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 11 Dec 2024 09:29:52 -0800, Sean Christopherson wrote:
-> Drop KVM's arbitrary behavior of making DE_CFG.LFENCE_SERIALIZE read-only
-> for the guest, as rejecting writes can lead to guest crashes, e.g. Windows
-> in particular doesn't gracefully handle unexpected #GPs on the WRMSR, and
-> nothing in the AMD manuals suggests that LFENCE_SERIALIZE is read-only _if
-> it exists_.
+On Wed, 18 Dec 2024 13:36:11 -0800, Sean Christopherson wrote:
+> Treat slow-path TDP MMU faults as spurious if the access is allowed given
+> the existing SPTE to fix a benign warning (other than the WARN itself)
+> due to replacing a writable SPTE with a read-only SPTE, and to avoid the
+> unnecessary LOCK CMPXCHG and subsequent TLB flush.
 > 
-> KVM only allows LFENCE_SERIALIZE to be set, by the guest or host, if the
-> underlying CPU has X86_FEATURE_LFENCE_RDTSC, i.e. if LFENCE is guaranteed
-> to be serializing.  So if the guest sets LFENCE_SERIALIZE, KVM will provide
-> the desired/correct behavior without any additional action (the guest's
-> value is never stuffed into hardware).  And having LFENCE be serializing
-> even when it's not _required_ to be is a-ok from a functional perspective.
+> If a read fault races with a write fault, fast GUP fails for any reason
+> when trying to "promote" the read fault to a writable mapping, and KVM
+> resolves the write fault first, then KVM will end up trying to install a
+> read-only SPTE (for a !map_writable fault) overtop a writable SPTE.
 > 
 > [...]
 
-Applied to kvm-x86 fixes, thanks!
+Applied very quickly to kvm-x86 fixes, so that it can get at least one day in
+-next before I send it to Paolo.
 
-[1/1] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
-      https://github.com/kvm-x86/linux/commit/2778c9a4687d
+[1/1] KVM: x86/mmu: Treat TDP MMU faults as spurious if access is already allowed
+      https://github.com/kvm-x86/linux/commit/55f60a6498e7
 
 --
 https://github.com/kvm-x86/linux/tree/next
