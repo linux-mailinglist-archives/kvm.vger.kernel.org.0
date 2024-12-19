@@ -1,152 +1,287 @@
-Return-Path: <kvm+bounces-34164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907BF9F7DE5
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:24:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790BE9F7E84
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F92166E45
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 15:24:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7012A162E67
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 15:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3958822654C;
-	Thu, 19 Dec 2024 15:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D33227575;
+	Thu, 19 Dec 2024 15:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AKXo0KBP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EigtaQQw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82E1221D86
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB29122616E;
+	Thu, 19 Dec 2024 15:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734621840; cv=none; b=jNvT1Zw1V8ODj/GO8hZWFO4XyNKx2aNfrecviI7vVahur9QdABhlA1BALHJMuG/6LAn8cUgz4GCI4Pe6LOdGoIX5spVUI9rnZsgcFzlkmAE9UYOnfx3L4bPdCMqWkhHeazebn/X1fieudvsqAxjHOUF6eQCbI2zm4Z+zqhsHFDQ=
+	t=1734623568; cv=none; b=TMCX7vRVlQQO1PPX5BX5zZPAREfJhXVV3aEcZNdLnL8NYrSVgZXiODqlXXdFHNcWZ7QjjtRMFm2w0gQBh3vcZ4PO7BcDHqONPQpjVmlPCmMwx57b41Cs2V3Hy+5AEW++hhSF0OXABwVrtnUnsgS4UhJUGeN3Jv2tWrJcWz+lJWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734621840; c=relaxed/simple;
-	bh=vQ52mRiElqCZNzqac3CSN8kfDYDhKf+LTt9VTB9knUM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SfledfWJEeIbtsUUCMN1tr9ds8KHzL7kD1PnpfKi9FvRfnrvLTxBbbQm8RV6HK9XUMF/mfFPeG19xZ6sdx1DCrtu6EFm03Hs7JxCR7QWsghQsnKnmKXyCRK6Pn3/s7XvaD6m2rTWaFVaHjG+IVNpRzx9Itjjmwjhsp0ygiBh238=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AKXo0KBP; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-728f1c4b95aso961702b3a.0
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 07:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734621838; x=1735226638; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tWsNmzzST8lcMxSYcBiJLWeTL6YuFmSorOwIwOomjFE=;
-        b=AKXo0KBPpF20Nk7y2gEsktTi7MxfhjFPHIUscAF5WukhU05OMGF5EHIGf5kblKmHKO
-         Xk2oq+GUOUnuKXeGMT5A3kMJSR4Hnff4ud/lDrJ3zHQTjs/n3yfs2Gc6AxQE/kSgPenN
-         EZ4jOD58Jl9CoXB8YH45Hy9xCkMyALZ39vpim6Ow8Pa7CQUwXwGjSviPRIbYQDVmHbFn
-         Rh0GBj4quGN1qw6B92FwGWBP8FLEewMbowijB9vBxpO4GP1ZK2WxBxM4uVTgIZVBPfSv
-         F7oruY/hv57IXicNvoMoxWYlmNsaWww5mjh5RTmkYSLpRsgV+w/7fz26kUNums5M+jCX
-         mxmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734621838; x=1735226638;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tWsNmzzST8lcMxSYcBiJLWeTL6YuFmSorOwIwOomjFE=;
-        b=jb06tIGilERtpH/WbzOgwPgK9+vYGaatYLBdpbWyFjsKWOGuekHBS1Gi/YtVE9x7sp
-         +dh25BWEb/JSTJv240iAIfrX0ueQbe6MAJBc1J6N19wf5qtmh514JeTjgoOdC/41atMN
-         d30bNPNOa46PtbtTOZrRms9FhiGBvgScqRncckXcmNXxnA3lKokb0brlkSChWOzSMD5N
-         9nP/LXx5b+6CAJCAWoqVde5Ah6Qe5cq/imiNHYsFxn+ekzc/volln/GGz6L8Oc9g6zkW
-         zLT1eecSZxXPxvuM/EQ07/1OVYfIDjMSfJqOepXnbonPcoH4sBXF2J+Cz5bz9yq6PoS4
-         hZwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVb1opTZd0jN5j+6JNzYG+gKMCdxIfJSsauZ6Ek/lq4ZB/EyMXdI2MkeVi2JxoYNXZljCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqeqjRUgXkQdQJ+C1aMmZwz5NINDQb3Va5T2S6en19+lccW9Aa
-	WcPC8cN1ebKtSMTF+qASHUbrZdGmmWrbulwpu3+CnJuGIR7WdXo9cxcIpjKgwOATUtNS76XEDub
-	gIA==
-X-Google-Smtp-Source: AGHT+IGmUvtSYpU2PNr3cYRU0AgkhwMuw643VsMeCpo/v6gnGPtYySVv5u88L3bISsqAABXTw/MmgDxPDcE=
-X-Received: from pfbeh4.prod.google.com ([2002:a05:6a00:8084:b0:728:958a:e45c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1311:b0:72a:8b90:92e9
- with SMTP id d2e1a72fcca58-72a8d0310c1mr12598351b3a.5.1734621838249; Thu, 19
- Dec 2024 07:23:58 -0800 (PST)
-Date: Thu, 19 Dec 2024 07:23:56 -0800
-In-Reply-To: <faccf4390776ca78da25821e151a4827b1f8b3a9.camel@redhat.com>
+	s=arc-20240116; t=1734623568; c=relaxed/simple;
+	bh=pZS0z/+QmAkuWRS00bA7z53xQJNLEdQgeveeVGf3BtM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=Az+rHSp/T09sE8VSp/iBvipiLE5N3fMzYkapqAc6RjcOcNMKnLsAJx/wyMYRHAZuQZyTJz4BELgS+srrH48tdC6s+QZVUecD+2t6I1dFPQuBEKqHP3nefWrO4k/3wOMlUHR0b/Pl/T8BfumltFT/nYqLfewE5iGdcvC3n3jCXwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EigtaQQw; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BJEHjlQ026270;
+	Thu, 19 Dec 2024 15:52:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=HP4gNt
+	CVE41AhqwbvJgSpDbsQIUOJMCKdPKKLcAwHWI=; b=EigtaQQw1ryQcuKHtZPZdI
+	fbT27M8xyGXXFao5Cqs3z6hz5mOfz42I6uFeaBSL6yLHEFwfpgKBjrCGJLxbn5jh
+	rk2mHZNPXRfW8hCbbVVDhAX08donDmDn0JA/8HQvaQCfo+KLytaeH2Tw6BVX8fTG
+	J3iDL6D42BM5GllyFrSsBONHJsZLhGgBLB02ON7KKYs4hGh0i5u/OieghINWVNoU
+	VgiYUiMGJCO0vD4pfORX9W3lE+FImbOc29NbrihzPLGaAcawFftrdFkl0OlaT8sq
+	ed8kPJGy+SWuL6ZPMPyVB+c+XD4zl3wJvkrRb3Vvyy/bnybiDOaX7gpxkDss1Jyw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43mbyhu3d0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Dec 2024 15:52:40 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BJDmrBf011271;
+	Thu, 19 Dec 2024 15:52:40 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hpjkdjh2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Dec 2024 15:52:40 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BJFqcwW22151748
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 19 Dec 2024 15:52:38 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 404F058043;
+	Thu, 19 Dec 2024 15:52:38 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A9C6158055;
+	Thu, 19 Dec 2024 15:52:37 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 19 Dec 2024 15:52:37 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241214010721.2356923-1-seanjc@google.com> <20241214010721.2356923-10-seanjc@google.com>
- <39f309e4a15ee7901f023e04162d6072b53c07d8.camel@redhat.com>
- <Z2N-SamWEAIeaeeX@google.com> <faccf4390776ca78da25821e151a4827b1f8b3a9.camel@redhat.com>
-Message-ID: <Z2Q6jK1E0KfX7n7l@google.com>
-Subject: Re: [PATCH 09/20] KVM: selftests: Honor "stop" request in dirty ring test
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Date: Thu, 19 Dec 2024 16:52:37 +0100
+From: Hariharan Mari <hari55@linux.ibm.com>
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Cc: kvm@vger.kernel.org, Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda
+ <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo
+ Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Ulrich Weigand
+ <ulrich.weigand@de.ibm.com>,
+        Dominik Dingel <dingel@linux.vnet.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 2/6] selftests: kvm: s390: Add ucontrol flic attr
+ selftests
+In-Reply-To: <20241216092140.329196-3-schlameuss@linux.ibm.com>
+References: <20241216092140.329196-1-schlameuss@linux.ibm.com>
+ <20241216092140.329196-3-schlameuss@linux.ibm.com>
+Message-ID: <0cc5df8fb51600c1c9d843ba36becf95@linux.ibm.com>
+X-Sender: hari55@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: EsgNTH-R3NbOTXGvfxBx1ZKrGfhFlt1q
+X-Proofpoint-GUID: EsgNTH-R3NbOTXGvfxBx1ZKrGfhFlt1q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 bulkscore=0 clxscore=1015 phishscore=0
+ mlxscore=0 lowpriorityscore=0 mlxlogscore=908 malwarescore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412190124
 
-On Thu, Dec 19, 2024, Maxim Levitsky wrote:
-> On Wed, 2024-12-18 at 18:00 -0800, Sean Christopherson wrote:
-> > On Tue, Dec 17, 2024, Maxim Levitsky wrote:
-> > > On Fri, 2024-12-13 at 17:07 -0800, Sean Christopherson wrote:
-> > > > Now that the vCPU doesn't dirty every page on the first iteration for
-> > > > architectures that support the dirty ring, honor vcpu_stop in the dirty
-> > > > ring's vCPU worker, i.e. stop when the main thread says "stop".  This will
-> > > > allow plumbing vcpu_stop into the guest so that the vCPU doesn't need to
-> > > > periodically exit to userspace just to see if it should stop.
-> > > 
-> > > This is very misleading - by the very nature of this test it all runs in
-> > > userspace, so every time KVM_RUN ioctl exits, it is by definition an
-> > > userspace VM exit.
-> > 
-> > I honestly don't see how being more precise is misleading.
+On 2024-12-16 10:21, Christoph Schlameuss wrote:
+> Add some superficial selftests for the floating interrupt controller
+> when using ucontrol VMs. These tests are intended to cover very basic
+> calls only.
 > 
-> "Exit to userspace" is misleading - the *whole test* is userspace.
+> Some of the calls may trigger null pointer dereferences on kernels not
+> containing the fixes in this patch series.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-No, the test has a guest component.  Just because the host portion of the test
-only runs in userspace doesn't make KVM go away.  If this were pure emulation,
-then I would completely agree, but there multiple distinct components here, one
-of which is host userspace.
-
-> You treat vCPU worker thread as if it not userspace, but it is *userspace* by
-> the definition of how KVM works.
-
-By simply "vCPU" I am strictly referring to the guest entity.  I refered to the
-host side worker as "vCPU woker" to try to distinguish between the two.
-
-> Right way to say it is something like 'don't pause the vCPU worker thread
-> when its not needed' or something like that.
-
-That's inaccurate though.  GUEST_SYNC() doesn't pause the vCPU, it forces it to
-exit to userspace.  The test forces the vCPU to exit to check to see if it needs
-to pause/stop, which I'm contending is wasteful and unnecessarily complex.  The
-vCPU can instead check to see if it needs to stop simply by reading the global
-variable.
-
-If vcpu_sync_stop_requested is false, the worker thread immediated resumes the
-vCPU.
-
-  /* Should only be called after a GUEST_SYNC */
-  static void vcpu_handle_sync_stop(void)
-  {
-	if (atomic_read(&vcpu_sync_stop_requested)) {
-		/* It means main thread is sleeping waiting */
-		atomic_set(&vcpu_sync_stop_requested, false);
-		sem_post(&sem_vcpu_stop);
-		sem_wait_until(&sem_vcpu_cont);
-	}
-  }
-
-The future cleanup is to change the guest loop to keep running _in the guest_
-until a stop is requested.  Whereas the current code exits to userspace every
-4096 writes to see if it should stop.  But as above, the vCPU doesn't actually
-stop on each exit.
-
-@@ -112,7 +111,7 @@ static void guest_code(void)
- #endif
- 
- 	while (true) {
--		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
-+		while (!READ_ONCE(vcpu_stop)) {
- 			addr = guest_test_virt_mem;
- 			addr += (guest_random_u64(&guest_rng) % guest_num_pages)
- 				* guest_page_size;
+Reviewed-by: Hariharan Mari <hari55@linux.ibm.com>
+> ---
+>  .../selftests/kvm/s390x/ucontrol_test.c       | 148 ++++++++++++++++++
+>  1 file changed, 148 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> index 0c112319dab1..b003abda8495 100644
+> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> @@ -635,4 +635,152 @@ TEST_F(uc_kvm, uc_skey)
+>  	uc_assert_diag44(self);
+>  }
+> 
+> +static char uc_flic_b[PAGE_SIZE];
+> +static struct kvm_s390_io_adapter uc_flic_ioa = { .id = 0 };
+> +static struct kvm_s390_io_adapter_req uc_flic_ioam = { .id = 0 };
+> +static struct kvm_s390_ais_req uc_flic_asim = { .isc = 0 };
+> +static struct kvm_s390_ais_all uc_flic_asima = { .simm = 0 };
+> +static struct uc_flic_attr_test {
+> +	char *name;
+> +	struct kvm_device_attr a;
+> +	int hasrc;
+> +	int geterrno;
+> +	int seterrno;
+> +} uc_flic_attr_tests[] = {
+> +	{
+> +		.name = "KVM_DEV_FLIC_GET_ALL_IRQS",
+> +		.seterrno = EINVAL,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_GET_ALL_IRQS,
+> +			.addr = (u64)&uc_flic_b,
+> +			.attr = PAGE_SIZE,
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_ENQUEUE",
+> +		.geterrno = EINVAL,
+> +		.a = { .group = KVM_DEV_FLIC_ENQUEUE, },
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_CLEAR_IRQS",
+> +		.geterrno = EINVAL,
+> +		.a = { .group = KVM_DEV_FLIC_CLEAR_IRQS, },
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_ADAPTER_REGISTER",
+> +		.geterrno = EINVAL,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_ADAPTER_REGISTER,
+> +			.addr = (u64)&uc_flic_ioa,
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_ADAPTER_MODIFY",
+> +		.geterrno = EINVAL,
+> +		.seterrno = EINVAL,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_ADAPTER_MODIFY,
+> +			.addr = (u64)&uc_flic_ioam,
+> +			.attr = sizeof(uc_flic_ioam),
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_CLEAR_IO_IRQ",
+> +		.geterrno = EINVAL,
+> +		.seterrno = EINVAL,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_CLEAR_IO_IRQ,
+> +			.attr = 32,
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_AISM",
+> +		.geterrno = EINVAL,
+> +		.seterrno = ENOTSUP,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_AISM,
+> +			.addr = (u64)&uc_flic_asim,
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_AIRQ_INJECT",
+> +		.geterrno = EINVAL,
+> +		.a = { .group = KVM_DEV_FLIC_AIRQ_INJECT, },
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_AISM_ALL",
+> +		.geterrno = ENOTSUP,
+> +		.seterrno = ENOTSUP,
+> +		.a = {
+> +			.group = KVM_DEV_FLIC_AISM_ALL,
+> +			.addr = (u64)&uc_flic_asima,
+> +			.attr = sizeof(uc_flic_asima),
+> +		},
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_APF_ENABLE",
+> +		.geterrno = EINVAL,
+> +		.seterrno = EINVAL,
+> +		.a = { .group = KVM_DEV_FLIC_APF_ENABLE, },
+> +	},
+> +	{
+> +		.name = "KVM_DEV_FLIC_APF_DISABLE_WAIT",
+> +		.geterrno = EINVAL,
+> +		.seterrno = EINVAL,
+> +		.a = { .group = KVM_DEV_FLIC_APF_DISABLE_WAIT, },
+> +	},
+> +};
+> +
+> +TEST_F(uc_kvm, uc_flic_attrs)
+> +{
+> +	struct kvm_create_device cd = { .type = KVM_DEV_TYPE_FLIC };
+> +	struct kvm_device_attr attr;
+> +	u64 value;
+> +	int rc, i;
+> +
+> +	rc = ioctl(self->vm_fd, KVM_CREATE_DEVICE, &cd);
+> +	ASSERT_EQ(0, rc) TH_LOG("create device failed with err %s (%i)",
+> +				strerror(errno), errno);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(uc_flic_attr_tests); i++) {
+> +		TH_LOG("test %s", uc_flic_attr_tests[i].name);
+> +		attr = (struct kvm_device_attr) {
+> +			.group = uc_flic_attr_tests[i].a.group,
+> +			.attr = uc_flic_attr_tests[i].a.attr,
+> +			.addr = uc_flic_attr_tests[i].a.addr,
+> +		};
+> +		if (attr.addr == 0)
+> +			attr.addr = (u64)&value;
+> +
+> +		rc = ioctl(cd.fd, KVM_HAS_DEVICE_ATTR, &attr);
+> +		EXPECT_EQ(uc_flic_attr_tests[i].hasrc, !!rc)
+> +			TH_LOG("expected dev attr missing %s",
+> +			       uc_flic_attr_tests[i].name);
+> +
+> +		rc = ioctl(cd.fd, KVM_GET_DEVICE_ATTR, &attr);
+> +		EXPECT_EQ(!!uc_flic_attr_tests[i].geterrno, !!rc)
+> +			TH_LOG("get dev attr rc not expected on %s %s (%i)",
+> +			       uc_flic_attr_tests[i].name,
+> +			       strerror(errno), errno);
+> +		if (uc_flic_attr_tests[i].geterrno)
+> +			EXPECT_EQ(uc_flic_attr_tests[i].geterrno, errno)
+> +				TH_LOG("get dev attr errno not expected on %s %s (%i)",
+> +				       uc_flic_attr_tests[i].name,
+> +				       strerror(errno), errno);
+> +
+> +		rc = ioctl(cd.fd, KVM_SET_DEVICE_ATTR, &attr);
+> +		EXPECT_EQ(!!uc_flic_attr_tests[i].seterrno, !!rc)
+> +			TH_LOG("set sev attr rc not expected on %s %s (%i)",
+> +			       uc_flic_attr_tests[i].name,
+> +			       strerror(errno), errno);
+> +		if (uc_flic_attr_tests[i].seterrno)
+> +			EXPECT_EQ(uc_flic_attr_tests[i].seterrno, errno)
+> +				TH_LOG("set dev attr errno not expected on %s %s (%i)",
+> +				       uc_flic_attr_tests[i].name,
+> +				       strerror(errno), errno);
+> +	}
+> +
+> +	close(cd.fd);
+> +}
+> +
+>  TEST_HARNESS_MAIN
 
