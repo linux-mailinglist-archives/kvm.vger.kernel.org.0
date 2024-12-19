@@ -1,98 +1,95 @@
-Return-Path: <kvm+bounces-34168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E847B9F7EA7
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 819749F7EB3
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 17:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 837427A2E5C
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 15:58:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3B267A1B63
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1179227583;
-	Thu, 19 Dec 2024 15:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F017E22756E;
+	Thu, 19 Dec 2024 15:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HGjeLgGe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xn5aPA4V"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3964B22756C
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1C226878
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734623826; cv=none; b=ei4SIyfHOVxL6UygYm3IWxeSm/gebtItxaqi0lIGRUCh9TrHvcVATxao+cZ89ljZn3IZaWBPNAVk41VFi0GvjJwRzfpFUQhMkGT2Z38sJd5Af3E1AqbQe2hdFQg3Fs22NhGPujjaUxfjTKFCe3lxovvVdppSxh5eSdti4qHSZec=
+	t=1734623980; cv=none; b=XJx7x8E2DFlSlzAW3STsOhnGFEiaGNVqMhRN0aFDq77dacHSCohJ/4+sbyOowtjfWO6CEVbqhmynPNxTY3DPk1cCHXGZNBffEbUFb9/Wxte9P+Mxb0bWYtd1yUm5NbGDD828NXjwSp2Fgd+vXLEMzdWEXBEL2srbZkwFLtOx0FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734623826; c=relaxed/simple;
-	bh=NZXbDOnsbueY/bTYnolr7LLXf3fkhWEB1EVBmrjmw3s=;
+	s=arc-20240116; t=1734623980; c=relaxed/simple;
+	bh=vstkUh+2Dh8QsDKfIb3fgarlbj/1KRA/Pe+Z3osIq20=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dLYixCU2KMYip9yYL2hYkuxv/gZj5ZzuzjCwvN3qOXTLxc/yUKZ14rwnPHUGLGJTHVwLQQR4Y5gbsxeOtVOi/y/iA+JoBmXhhNIurEipmGg7p629oU2m2f9g5j2c6iDem/zyseOsEzjv6vFt8xgJS4fUh97Ab3WydUchBVnwyHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HGjeLgGe; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=dJy3dXdG8+HUaTufhW+RaAIjfZSt0bt2/4A1ud7oabKnWmrohL76QKfiacV1Ni+kjpP1nKMlQjrn3Acxw5fNFO0rkrLol3EO75zJc9T4wwkd0k5Zz8q7v6zroiRWpg7477EdKfde3mX7UYnIyLoyJv7gu5hz81ctcUPDFMUL+Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xn5aPA4V; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734623824;
+	s=mimecast20190719; t=1734623976;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BSRf2lahUcjGUrwQe+FmSLq/2A9QSO0QlymJM9SaP8g=;
-	b=HGjeLgGesdKTcvw6l0FXS7haCsvieYDsACCnvVSkL7914CoCfLM8EBJPIZeEsG5/+PL22q
-	33Xxk2rqvzY2poYC4TAb8QKEvHTec9Ty7rxjo5/T50f4DHvL0RccrgQB48OVOrEPCPPdr9
-	7Kkr9ynsVEo5wORQiXsv1jEUSW8WDSk=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=dxrNaP+mOwWmMIE3wAYCd8ImS2/Ci2QbbaSTvbXTQEs=;
+	b=Xn5aPA4VKxCN6/m1S36hbUOMCXIfag/1C+jNcRuTBGdV8BY5uOiCBhtp9ZSD4MRm+qjB//
+	1dlxeCz7DA0jRGnoO2WMkUSGwN6zo9hZRAjJm0DKzRTM8heh1nYyJnN3LeRAj8PocfN17F
+	E88mmMFINWZQbplTsqFzD+CRgde9zrI=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-7p2Jxd7uNzuG20ofBYw60g-1; Thu, 19 Dec 2024 10:57:02 -0500
-X-MC-Unique: 7p2Jxd7uNzuG20ofBYw60g-1
-X-Mimecast-MFC-AGG-ID: 7p2Jxd7uNzuG20ofBYw60g
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a7d60252cbso8626765ab.0
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 07:57:02 -0800 (PST)
+ us-mta-682-OTa99QRsNMS-GScQNqQpew-1; Thu, 19 Dec 2024 10:59:35 -0500
+X-MC-Unique: OTa99QRsNMS-GScQNqQpew-1
+X-Mimecast-MFC-AGG-ID: OTa99QRsNMS-GScQNqQpew
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a9d195e6e5so7850125ab.2
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 07:59:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734623822; x=1735228622;
+        d=1e100.net; s=20230601; t=1734623974; x=1735228774;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BSRf2lahUcjGUrwQe+FmSLq/2A9QSO0QlymJM9SaP8g=;
-        b=layJGibVy31Z7eii8BjUvv8he8LrVbncOUg3muXTzkiWzicij549K0qV23VLerCO10
-         Yo4eR2gH5cACe6XEiFyznfjbZS5nNcj2B0hyFnYYaVq6J9ahSmebl/DDOU7uq+EPCAqc
-         Xm0xLOWNVN29XI+5DWgN+AzVKMyKo5BPBDRSQQ+XtLFWhec3A5HBTdyvTRp/Sgn2/wk/
-         hC/bvPUZY4gJv0ddFIRR1lwmKBUTsVKX2XTVdss8a+I4rfzRD6zrBq1m+9y1yy/G/XFT
-         jrvPOP1shC1xoUZdwHTnrjzzC7koToPEwtWZRYqBRXxC+A35tnefQi27qb7Nq/xI6goO
-         HTcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDMRbIpd8pMDRXJXSFAum/01H1cB91jSjf0BfaedQhY1nMWPQKo/suLpbWLoh/Fil8mCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9TmibUSZdBjtErq4Jf/ttc/BVRQ6LVJBzVfvdTj4k7M5z8dKB
-	dgSfusS6du1QIEjb/qJtmtUMAWwXbSq8Q07zofBRfNZE/YjbMXNhG0HEWwJxxZY/p3nmzp2r+6z
-	ojTlpjS4ecpTAFyPj0x4Wm6usvlGYMEAsA0paUjXk22PW9/nXdA==
-X-Gm-Gg: ASbGncvh5Qi+HEnMyFAowgpTFFFZc2bSASqCVGPB7IoBGjLPhQakqoP6XpqQKw2K8GV
-	qvhEsA8odXZKgClrGUFI52YVuFnN+lArnA6UJ0ciY6C31iDs59t+WU/GdIWjFJOP/keJ+NMvkjA
-	NoYDl2AWt7PqC/CEYRmQ43B56CRG4z4Vgex2gU8Odt8uDS4vVKF9kxeeltF8XOSUWXmL1eY5aTV
-	Y06ah4JwqXOhgUvbnbX2Z2xGkGyIZxDTooumT7j10TWRjWZ94zfp/M/
-X-Received: by 2002:a05:6e02:3b03:b0:3a7:d02b:f653 with SMTP id e9e14a558f8ab-3c02773b83emr24377795ab.0.1734623822064;
-        Thu, 19 Dec 2024 07:57:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFTroMO2mMF9jsTs4bhAlwpMmc55xNPTwCrKo0X1dMF4R3mM/rFQFiTHfNe78bttZIpNUF0Aw==
-X-Received: by 2002:a05:6e02:3b03:b0:3a7:d02b:f653 with SMTP id e9e14a558f8ab-3c02773b83emr24377655ab.0.1734623821762;
-        Thu, 19 Dec 2024 07:57:01 -0800 (PST)
+        bh=dxrNaP+mOwWmMIE3wAYCd8ImS2/Ci2QbbaSTvbXTQEs=;
+        b=WICGqGi58fY296C+lV9G3AacTq7Um7whcdpSzNDrwbzeM3YoY5wQf36+wfZSV+un6f
+         2cG/FXdzOdiNy7pXwws0OYaDPLHrtz2P/mwgEEwm8fVPlPpPIZ3aNcxKvFuMmkJbnfKK
+         s9V0+l5X6BoDECrF8WAWz7KuAO0erIPDK+3wPzLFK53xtj4MW0GslukhsZcNCwmgxM34
+         vD+wLEcQg6IspphnYB9mRs4VvYBpqIwdazHkPkZ2dRY1NhQRgCsrWSS2ZvE5kw68XlHL
+         bh0VRN8zdlMsVwBPNG+Mzvvlt1xpog86XbAiRb8ujMrGQN4OgS3h7LnmSMMG7YwSrrE4
+         cW+Q==
+X-Gm-Message-State: AOJu0YzTtMovAJsRSfMtIH9LzKWSnz4RUdHlhMJmRxJ0naHHHVkBuIlo
+	Tgs/rtvFwFJtSDMEZj+Y4tmg+l3LZUrzjURA/+lYditBrQ7O0Z49BqiLzvI7droWjINDE36ohwq
+	Cb/PrdkhPq7dPr1OYhzVPQLKyHlslLofbx/7fd/iVu4ix1FEvHQ==
+X-Gm-Gg: ASbGnctxBaS/0316a0x8R2wl9Vaf7JSuX5QlCghhWgN5FyhITYz7kJWRF1QX/Tg/nW9
+	vPGQO4KhxaqRias5nw8KlSFXwioe/LX55IaMMtx88xaXdCWnIo+A/j7R2nzccEr60MNSs0wqnZE
+	4IU0LT7Je3Lf3N1b1MgbPNAcbPOzfHSwz/Tu5ggnUMSZZ+8iFS5/2cfy6RMCD53yoi9+nY185L4
+	LQQTDKytGOlENr+mbm51ii68HKif+eTUb+oYmFSmiwBeQ/cVH9Zz5dp
+X-Received: by 2002:a05:6e02:23c2:b0:3a7:e592:55cd with SMTP id e9e14a558f8ab-3c012205493mr34305855ab.14.1734623974414;
+        Thu, 19 Dec 2024 07:59:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7q4OCIWQObaDh6WJ2EVqupo9F0rdQ4zcibZ9hdNHcRzliO0WxMlnVTjBxChbpBhdW5C6RxQ==
+X-Received: by 2002:a05:6e02:23c2:b0:3a7:e592:55cd with SMTP id e9e14a558f8ab-3c012205493mr34305675ab.14.1734623974083;
+        Thu, 19 Dec 2024 07:59:34 -0800 (PST)
 Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3c0de052f2dsm3679865ab.9.2024.12.19.07.57.00
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68bf64f29sm337134173.43.2024.12.19.07.59.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 07:57:01 -0800 (PST)
-Message-ID: <bed60b1b671be1e4e2a747b4e6d42ab280e69ab9.camel@redhat.com>
-Subject: Re: [PATCH 09/20] KVM: selftests: Honor "stop" request in dirty
- ring test
+        Thu, 19 Dec 2024 07:59:33 -0800 (PST)
+Message-ID: <e7d0218056d9df962bdea8322956e6ec78201515.camel@redhat.com>
+Subject: Re: [PATCH 10/20] KVM: selftests: Keep dirty_log_test vCPU in guest
+ until it needs to stop
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
-Date: Thu, 19 Dec 2024 10:57:00 -0500
-In-Reply-To: <Z2Q6jK1E0KfX7n7l@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Peter Xu
+	 <peterx@redhat.com>
+Date: Thu, 19 Dec 2024 10:59:32 -0500
+In-Reply-To: <f2f0fdcd52ed2b11b15a95a569306b3d820fec13.camel@redhat.com>
 References: <20241214010721.2356923-1-seanjc@google.com>
-	 <20241214010721.2356923-10-seanjc@google.com>
-	 <39f309e4a15ee7901f023e04162d6072b53c07d8.camel@redhat.com>
-	 <Z2N-SamWEAIeaeeX@google.com>
-	 <faccf4390776ca78da25821e151a4827b1f8b3a9.camel@redhat.com>
-	 <Z2Q6jK1E0KfX7n7l@google.com>
+	 <20241214010721.2356923-11-seanjc@google.com>
+	 <f2f0fdcd52ed2b11b15a95a569306b3d820fec13.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -103,79 +100,140 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-12-19 at 07:23 -0800, Sean Christopherson wrote:
-> On Thu, Dec 19, 2024, Maxim Levitsky wrote:
-> > On Wed, 2024-12-18 at 18:00 -0800, Sean Christopherson wrote:
-> > > On Tue, Dec 17, 2024, Maxim Levitsky wrote:
-> > > > On Fri, 2024-12-13 at 17:07 -0800, Sean Christopherson wrote:
-> > > > > Now that the vCPU doesn't dirty every page on the first iteration for
-> > > > > architectures that support the dirty ring, honor vcpu_stop in the dirty
-> > > > > ring's vCPU worker, i.e. stop when the main thread says "stop".  This will
-> > > > > allow plumbing vcpu_stop into the guest so that the vCPU doesn't need to
-> > > > > periodically exit to userspace just to see if it should stop.
-> > > > 
-> > > > This is very misleading - by the very nature of this test it all runs in
-> > > > userspace, so every time KVM_RUN ioctl exits, it is by definition an
-> > > > userspace VM exit.
-> > > 
-> > > I honestly don't see how being more precise is misleading.
-> > 
-> > "Exit to userspace" is misleading - the *whole test* is userspace.
+On Tue, 2024-12-17 at 19:01 -0500, Maxim Levitsky wrote:
+> On Fri, 2024-12-13 at 17:07 -0800, Sean Christopherson wrote:
+> > In the dirty_log_test guest code, exit to userspace
 > 
-> No, the test has a guest component.  Just because the host portion of the test
-> only runs in userspace doesn't make KVM go away.  If this were pure emulation,
-> then I would completely agree, but there multiple distinct components here, one
-> of which is host userspace.
-> 
-> > You treat vCPU worker thread as if it not userspace, but it is *userspace* by
-> > the definition of how KVM works.
-> 
-> By simply "vCPU" I am strictly referring to the guest entity.  I refered to the
-> host side worker as "vCPU woker" to try to distinguish between the two.
-> 
-> > Right way to say it is something like 'don't pause the vCPU worker thread
-> > when its not needed' or something like that.
-> 
-> That's inaccurate though.  GUEST_SYNC() doesn't pause the vCPU, it forces it to
-> exit to userspace.  The test forces the vCPU to exit to check to see if it needs
-> to pause/stop, which I'm contending is wasteful and unnecessarily complex.  The
-> vCPU can instead check to see if it needs to stop simply by reading the global
-> variable.
-> 
-> If vcpu_sync_stop_requested is false, the worker thread immediated resumes the
-> vCPU.
-> 
->   /* Should only be called after a GUEST_SYNC */
->   static void vcpu_handle_sync_stop(void)
->   {
-> 	if (atomic_read(&vcpu_sync_stop_requested)) {
-> 		/* It means main thread is sleeping waiting */
-> 		atomic_set(&vcpu_sync_stop_requested, false);
-> 		sem_post(&sem_vcpu_stop);
-> 		sem_wait_until(&sem_vcpu_cont);
-> 	}
->   }
-> 
-> The future cleanup is to change the guest loop to keep running _in the guest_
-> until a stop is requested.  Whereas the current code exits to userspace every
-> 4096 writes to see if it should stop.  But as above, the vCPU doesn't actually
-> stop on each exit.
-> 
-> @@ -112,7 +111,7 @@ static void guest_code(void)
->  #endif
->  
->  	while (true) {
-> -		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
-> +		while (!READ_ONCE(vcpu_stop)) {
->  			addr = guest_test_virt_mem;
->  			addr += (guest_random_u64(&guest_rng) % guest_num_pages)
->  				* guest_page_size;
-> 
+> Once again, "exit to userspace" is misleading.
 
-Ah OK, I missed the "This *will* allow plumbing", that is the fact this this patch
-is only a preparation for this.
+OK, I understand now, this patch does make sense.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
-	Maxim levitsky
+	Maxim Levitsky
+
+
+> 
+> >  only when the vCPU is
+> > explicitly told to stop.  Periodically exiting just to check if a flag has
+> > been set is unnecessary, weirdly complex, and wastes time handling exits
+> > that could be used to dirty memory.
+> > Opportunistically convert 'i' to a uint64_t to guard against the unlikely
+> > scenario that guest_num_pages exceeds the storage of an int.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/dirty_log_test.c | 43 ++++++++++----------
+> >  1 file changed, 22 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> > index 8d31e275a23d..40c8f5551c8e 100644
+> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> > @@ -31,9 +31,6 @@
+> >  /* Default guest test virtual memory offset */
+> >  #define DEFAULT_GUEST_TEST_MEM		0xc0000000
+> >  
+> > -/* How many pages to dirty for each guest loop */
+> > -#define TEST_PAGES_PER_LOOP		1024
+> > -
+> >  /* How many host loops to run (one KVM_GET_DIRTY_LOG for each loop) */
+> >  #define TEST_HOST_LOOP_N		32UL
+> >  
+> > @@ -75,6 +72,7 @@ static uint64_t host_page_size;
+> >  static uint64_t guest_page_size;
+> >  static uint64_t guest_num_pages;
+> >  static uint64_t iteration;
+> > +static bool vcpu_stop;
+> >  
+> >  /*
+> >   * Guest physical memory offset of the testing memory slot.
+> > @@ -96,9 +94,10 @@ static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
+> >  static void guest_code(void)
+> >  {
+> >  	uint64_t addr;
+> > -	int i;
+> >  
+> >  #ifdef __s390x__
+> > +	uint64_t i;
+> > +
+> >  	/*
+> >  	 * On s390x, all pages of a 1M segment are initially marked as dirty
+> >  	 * when a page of the segment is written to for the very first time.
+> > @@ -112,7 +111,7 @@ static void guest_code(void)
+> >  #endif
+> >  
+> >  	while (true) {
+> > -		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
+> > +		while (!READ_ONCE(vcpu_stop)) {
+> >  			addr = guest_test_virt_mem;
+> >  			addr += (guest_random_u64(&guest_rng) % guest_num_pages)
+> >  				* guest_page_size;
+> > @@ -140,14 +139,7 @@ static uint64_t host_track_next_count;
+> >  /* Whether dirty ring reset is requested, or finished */
+> >  static sem_t sem_vcpu_stop;
+> >  static sem_t sem_vcpu_cont;
+> > -/*
+> > - * This is only set by main thread, and only cleared by vcpu thread.  It is
+> > - * used to request vcpu thread to stop at the next GUEST_SYNC, since GUEST_SYNC
+> > - * is the only place that we'll guarantee both "dirty bit" and "dirty data"
+> > - * will match.  E.g., SIG_IPI won't guarantee that if the vcpu is interrupted
+> > - * after setting dirty bit but before the data is written.
+> > - */
+> > -static atomic_t vcpu_sync_stop_requested;
+> > +
+> >  /*
+> >   * This is updated by the vcpu thread to tell the host whether it's a
+> >   * ring-full event.  It should only be read until a sem_wait() of
+> > @@ -272,9 +264,7 @@ static void clear_log_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+> >  /* Should only be called after a GUEST_SYNC */
+> >  static void vcpu_handle_sync_stop(void)
+> >  {
+> > -	if (atomic_read(&vcpu_sync_stop_requested)) {
+> > -		/* It means main thread is sleeping waiting */
+> > -		atomic_set(&vcpu_sync_stop_requested, false);
+> > +	if (READ_ONCE(vcpu_stop)) {
+> >  		sem_post(&sem_vcpu_stop);
+> >  		sem_wait(&sem_vcpu_cont);
+> >  	}
+> > @@ -801,11 +791,24 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  		}
+> >  
+> >  		/*
+> > -		 * See vcpu_sync_stop_requested definition for details on why
+> > -		 * we need to stop vcpu when verify data.
+> > +		 * Stop the vCPU prior to collecting and verifying the dirty
+> > +		 * log.  If the vCPU is allowed to run during collection, then
+> > +		 * pages that are written during this iteration may be missed,
+> > +		 * i.e. collected in the next iteration.  And if the vCPU is
+> > +		 * writing memory during verification, pages that this thread
+> > +		 * sees as clean may be written with this iteration's value.
+> >  		 */
+> > -		atomic_set(&vcpu_sync_stop_requested, true);
+> > +		WRITE_ONCE(vcpu_stop, true);
+> > +		sync_global_to_guest(vm, vcpu_stop);
+> >  		sem_wait(&sem_vcpu_stop);
+> > +
+> > +		/*
+> > +		 * Clear vcpu_stop after the vCPU thread has acknowledge the
+> > +		 * stop request and is waiting, i.e. is definitely not running!
+> > +		 */
+> > +		WRITE_ONCE(vcpu_stop, false);
+> > +		sync_global_to_guest(vm, vcpu_stop);
+> > +
+> >  		/*
+> >  		 * NOTE: for dirty ring, it's possible that we didn't stop at
+> >  		 * GUEST_SYNC but instead we stopped because ring is full;
+> > @@ -813,8 +816,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  		 * the flush of the last page, and since we handle the last
+> >  		 * page specially verification will succeed anyway.
+> >  		 */
+> > -		assert(host_log_mode == LOG_MODE_DIRTY_RING ||
+> > -		       atomic_read(&vcpu_sync_stop_requested) == false);
+> >  		vm_dirty_log_verify(mode, bmap);
+> >  
+> >  		/*
+
 
 
