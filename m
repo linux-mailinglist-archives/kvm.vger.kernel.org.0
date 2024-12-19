@@ -1,100 +1,99 @@
-Return-Path: <kvm+bounces-34105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC319F72DB
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:45:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B93C9F72DD
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0236E188B1E9
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD5D168455
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069C619D070;
-	Thu, 19 Dec 2024 02:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B992E19E7F8;
+	Thu, 19 Dec 2024 02:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cSUMewXS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LePb9dWG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D326919C578
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A612E19D8AC
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734576166; cv=none; b=LT+VEybGamPfBORjkOWz6q36f0kqFDNfZhZJ1iv6VRnFsnPghUv6fLrFXSgjTuoky7bPp+3HLaXesAoxoz2/Dn5YpX2S6fenQbNUo4P0bBeYHatukq4jJqtXLb7KSyn8q7uVwha6i3sWLiQ9egA7Vgc6xsyElczamF5JE9Pbg/M=
+	t=1734576171; cv=none; b=FBYDGdfI9CE8RAcHYVo4CriO9MSYlCV5/RKmiv/heLV7qhLJ5vmiDxpLVl1m00HQoCV9Yydp/0HiA90LBlpPLK589xxv+QJQz30aq2BAWhKYn2DgXwNjzzJwta7vqG1c2xXoL7lMbi9Gg4j3MjDby+MInGTwGVQ0eVIh9M9IAjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734576166; c=relaxed/simple;
-	bh=Ow+XQIFONE++dFaRdXSVqCnFN+5Ly/hPoUmrK42qwQQ=;
+	s=arc-20240116; t=1734576171; c=relaxed/simple;
+	bh=LxXbH5f3h4PRJiVUHsxPzQgteJf+DMDYOHShv1+JTb8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XKg8HWVodNZfjgDRaJ5ols7INfOw6WD+YdOtY+wFkeyxrJ3IJmHXMUgi02awVA24CilgcliHpJV4J+3Pdmx2pJqiWhGe4zB3HzTXqmEr3K6KvGF/RB5MBtxC5spIu7HJBF+fL/MpC10gbFbg5qtM+ZmDNVyDptbY/lkLkYkVreQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cSUMewXS; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=GNb4idhCZaebtaixWH707EJeDOHE8NpQaAK4Y78JOhkZx0QZUHnJqEiqZDHKxREf6pjfkD3aW/3A1NSy+Cr4MJDj8ykF+TZQNA7PwERHthocJayEyDTO8NQb4Pgg271NTjnbBZMHGmoYrOr+cfXIdyoeRMYLjDCt70JMzwzmvJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LePb9dWG; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso438959a91.0
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:42:44 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216387ddda8so3100345ad.3
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:42:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734576164; x=1735180964; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734576169; x=1735180969; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpgQ7c/gh9pTvPo1fv6avyHn2AMQRIWRGPo+ny66dNA=;
-        b=cSUMewXShGTPV/u5zYZGNSRWvpb9GHgfYWj+9YBRwvWyKdjUbWh7Ecs+KI7KPNVfTA
-         8/ZJl3KIvEmDPfWC7zLBqLCUZaHdmpM6CooXZGNP77hFYa3RKzfxIfbeFfrLKe0mEMKq
-         iAvEJWZkB1UMlgmqdqKhyvEYK6lQBIUHq9+cB30y+M9PX6EiTw+5PeIsNv1BUiNP+9qV
-         Pm7zbenkVlzpqx5tQ/53gukeFAmqxQR25DmCsB3SkkADagK8nyqFmN95xa0WohfFgU2J
-         CKjAPowfVXU8YvCNC6l71lvkaKa4pyGdH36n5T7vWmUHP0M3OYxJuUbugcqOy5GSLJsq
-         G5Dg==
+        bh=QIYGiv5DaA/0XRyx3nZgU80HwBa/oLiccayQGifN5RA=;
+        b=LePb9dWGWmBITN79Em3/+rio2Akka0Rr3rax8OQY2oQZijj2Rew7Zej4N70liFQF0u
+         l7fq618PfJj7xxG1QRBJEaT+ir+gh6fkGGw3h7Ut+wKcEzZGjqr/QitdOXwAq/E2JzXI
+         +JWeRci3jd40z5Ucu1fR07PeDF6w+tw16m+VegPRUQPfxHaxae5kwxOJW2EafaSBf2fc
+         ZeGoM/Tr2OzQtfJ/ItfNc0DArSek3WF0yXeGiv2OrTvb0sO+dQv+XEhr9YolxwUbwU+4
+         fxL5ig9BZH5XnYrG4kp4C8e1UciuuCH4pgNFtynn6uMvUSkyowW4zjDClKiZ8jahVKPV
+         sN0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734576164; x=1735180964;
+        d=1e100.net; s=20230601; t=1734576169; x=1735180969;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpgQ7c/gh9pTvPo1fv6avyHn2AMQRIWRGPo+ny66dNA=;
-        b=ANzwGjqTEM1VRACjO0tt3PVYZs3tU7uhaB3c1fXB++hA9DOhCaDXdmdVTik2PjdiME
-         jBspvIPfN/m9ryMPLyIKMYN31nfsCQEBRtFUoTUg3gt6rDqs1FHvNnRBPPPEzMXSoO12
-         2qlaVNX1NM9rS5Nlh2GSBxiAiUjQe8/ldi9zUyKWWaxGaGtYYUlpOYLfTNtJ9DEuMGOR
-         kmGScDrmDnP70SUQsYBE99Zwb4xaGm4DkVEHRxV7dgfpfL5uYiCSxCpSM2cLXOomqjEX
-         2Fbfs2ZSuJYEAP7EqBAzkc3Gob2pEwTq59hZK236K5lTjWVKWOsY4LbRTAphOYwf2OF0
-         YZQg==
-X-Gm-Message-State: AOJu0YzBMriXhsM7920F4m+IE+DlnIMYwAlQquVjHG9dqQ/naoytP84D
-	+XYN3kRdma8IfHfV+Gb5Ch9o+AknJiU3NMaXh4UKdW9jGqTLXLqV+6UdC2WLYi2HQ/osGS66of1
-	rIg==
-X-Google-Smtp-Source: AGHT+IFZeQS1NSGNlM06VusjOeMOEVgvUbj/YdOLiMA/d7yhaud9CJY++nh9sZ9f2BQkJqhxkv+HyxqKa4w=
-X-Received: from pjch10.prod.google.com ([2002:a17:90a:3d0a:b0:2f2:e933:8ba6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:540d:b0:2ee:c9b6:c266
- with SMTP id 98e67ed59e1d1-2f2e91d6a12mr7103266a91.13.1734576164230; Wed, 18
- Dec 2024 18:42:44 -0800 (PST)
-Date: Wed, 18 Dec 2024 18:40:54 -0800
-In-Reply-To: <20241127234659.4046347-1-seanjc@google.com>
+        bh=QIYGiv5DaA/0XRyx3nZgU80HwBa/oLiccayQGifN5RA=;
+        b=ffNNz57WDZdv21Oiq51H4SFJjzXYvLeHR2ftGvBI4eZDuw3eJFPLQxN7enfXJA7msU
+         PfkO9t9MBgj+l7O4ewX0RDiVw8b1WODgzHtVLAv4QbmN3A/7A4iUROqWRY21g88dznzp
+         xZr2n2CxLjP/0L3QrvQKkFb4qcZF8IL2JpdKp1YxW1Z4TxMoGgWY1o5WdiOcN/1rknNR
+         pt1fHK5VCScJex9fj2iND4unTXGEbSOKmDHuDxzrkJ5YdLaxsDDxI7HiRbBrF2U4q44i
+         KU+cJuaISoWPzs6iR9Lgj4M5W0bgLr/FksWOvFS2aY1ydr10y0cTbSpA3pyBSTgJzq+p
+         2hMw==
+X-Gm-Message-State: AOJu0YwFFAmCf2eQ2rFl+oD9Rx8DJZoQWGSsGdzeRlFAEqn7d+n4hhkZ
+	LV/vpb/dnoYVx0u+9rMZ2ebUo4ex1rhZmTu7dci6NRfAMjSLDWPObxqCaBW63k6lCGXkWVfhPDU
+	d+A==
+X-Google-Smtp-Source: AGHT+IF+mwNeoNKaVpmXAqA3BPkjzHttO8B0iBTkIkT3jkgvEUbIMU3sV1dg9hKlskxDl893AiSkk4l/YLw=
+X-Received: from pjbta6.prod.google.com ([2002:a17:90b:4ec6:b0:2ef:95f4:4619])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51c4:b0:2ee:5bc9:75b5
+ with SMTP id 98e67ed59e1d1-2f2e91c2df0mr7443398a91.4.1734576169016; Wed, 18
+ Dec 2024 18:42:49 -0800 (PST)
+Date: Wed, 18 Dec 2024 18:40:56 -0800
+In-Reply-To: <20241127235312.4048445-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241127234659.4046347-1-seanjc@google.com>
+References: <20241127235312.4048445-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173457545920.3294890.15735431566312816303.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: SVM: Macrofy SEV=n versions of sev_xxx_guest()
+Message-ID: <173457546228.3295022.11879746560606212523.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: SVM: Remove redundant TLB flush on guest CR4.PGE change
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 27 Nov 2024 15:46:59 -0800, Sean Christopherson wrote:
-> Define sev_{,es_,snp_}guest() as "false" when SEV is disabled via Kconfig,
-> i.e. when CONFIG_KVM_AMD_SEV=n.  Despite the helpers being __always_inline,
-> gcc-12 is somehow incapable of realizing that the return value is a
-> compile-time constant and generates sub-optimal code.
+On Wed, 27 Nov 2024 15:53:12 -0800, Sean Christopherson wrote:
+> Drop SVM's direct TLB flush when CR4.PGE is toggled and NPT is enabled, as
+> KVM already guarantees TLBs are flushed appropriately.
 > 
-> Opportunistically clump the paths together to reduce the amount of
-> ifdeffery.
+> For the call from cr_trap(), kvm_post_set_cr4() requests TLB_FLUSH_GUEST
+> (which is a superset of TLB_FLUSH_CURRENT) when CR4.PGE is toggled,
+> regardless of whether or not KVM is using TDP.
 > 
 > [...]
 
 Applied to kvm-x86 svm, thanks!
 
-[1/1] KVM: SVM: Macrofy SEV=n versions of sev_xxx_guest()
-      https://github.com/kvm-x86/linux/commit/45d522d3ee9c
+[1/1] KVM: SVM: Remove redundant TLB flush on guest CR4.PGE change
+      https://github.com/kvm-x86/linux/commit/036e78a942b4
 
 --
 https://github.com/kvm-x86/linux/tree/next
