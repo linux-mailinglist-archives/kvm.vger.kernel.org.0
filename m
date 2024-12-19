@@ -1,118 +1,129 @@
-Return-Path: <kvm+bounces-34141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1935A9F79B8
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 11:39:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7203F9F7A46
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 12:22:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE127A3A8B
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 10:39:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 928537A4E7D
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 11:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E076223323;
-	Thu, 19 Dec 2024 10:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30F0223C4C;
+	Thu, 19 Dec 2024 11:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/43WoyN"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="bq7NSf9U"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2ED221DB2
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 10:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBCD22146C
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 11:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734604727; cv=none; b=LndO5X+YsQdMUPeQlTZRFw8Zz8JCzKzaIeDlbeEs3I2XhqVlYMxrPvXpKPf5dCK0V5jicUgCLl+XfJW5QlYW4iftu6Z7SXKJjdafGslQSwQEVfxR1/WLQIn0qNEJYLu8jNd8TECtUYs2lVPV3GbTVUfiK/xj1gqQVBAsDKQFt+k=
+	t=1734607306; cv=none; b=MCfrUe7c07Ph0PYZBneey14jKmt4D3u0qJ7gbCK13t6Ov/4oLXPu8yqOOIf8OQh54uO8IP++VpXiXAN9wKlShGMhuCuSO0n1RDUQr0YRLpgEiiDEgPCS0ao5MrQDmrzNZCJ3lCWDXof9yQvfWJfLJZ7p21BjfPfkQf2lSzLihVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734604727; c=relaxed/simple;
-	bh=DPmWrav8mPAsVCxJgpSudbk0PrfP+mG4vkwDLcZsJrE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t2jasaniEEA0aXnVnD8kS4OSGuewcmz05H9BVXX+QN7OlaT4fRjSYqm9/JiChn4NXgt2+p7YZEkUVastbeRoOv/WTq5RmMmcRKPH1YXJTyUG6MDMR1JgeSAIn0VNpK4rwPGI1PJnF/6Lp1TsARCXj2Zl2F/9Y79JDABUNdPAozg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M/43WoyN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734604724;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0GjqLR85RKltTkbESZcmcm9ul9rbVN2oBs4OUn61pgc=;
-	b=M/43WoyNJzxQXVpGERn/2aJJgnXNNNc/Q+AmMK8k6NQeoZgQkahXtCD2dvtIslTQDNK7EZ
-	e7eKoj7Ht+/CkjAfmA4zWtODB7SKcwi8kkQBw+zEEwqD55MJRIZ/u8VD+1Ql0gh8mze00L
-	L+AIu76Alek/L1nrmCUz0uurxk6kOjs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-568-Re7v6zcdNUWt1BLp5OE2Ug-1; Thu,
- 19 Dec 2024 05:38:40 -0500
-X-MC-Unique: Re7v6zcdNUWt1BLp5OE2Ug-1
-X-Mimecast-MFC-AGG-ID: Re7v6zcdNUWt1BLp5OE2Ug
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 893A31955F06;
-	Thu, 19 Dec 2024 10:38:39 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AD16219560AD;
-	Thu, 19 Dec 2024 10:38:38 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
-	stable@vger.kernel.org,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] KVM: SVM: allow flipping the LFENCE_SERIALIZE bit
-Date: Thu, 19 Dec 2024 05:38:37 -0500
-Message-ID: <20241219103837.325113-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1734607306; c=relaxed/simple;
+	bh=og3bxqkl6A2sUuc2XQTD2nz9L7b5HVspSYCy+EAH59M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=STH1CsK9o9y2eDooSIaqICggW/BI7i4rKIFiiLdwFISRKUfspfv5borXItCNIACes6Hq4qyKOKe/b3j0r0pjcyKwp+yWZjCixntOS/u652+EGIEM+JqwGu1Ny7eeTew5PVLp29C7rTO64RH+n2obVc8v/fo+mk8AtdGgt2TUK6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=bq7NSf9U; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=VYKy
+	amdsuIeuxGPUqFPAGVbzAqPu7W0X+5ZSU0lQyuU=; b=bq7NSf9UMH4NV/ENEh9y
+	9Y7plcrlm/PE9Ky15Hw4N3nps4ztYK6CanxBfp7c1OPo7xsY4fAOul+ElpaCJ3y3
+	7CgAT709cqADi4k2k2iALLhN3wcwlP3wGfQ0T+VMcaDD1qi/lXaUiO+GYpHQdSzL
+	drM5iy5sa2QzDsMZbRfIDdvf0xFy0xRJS3iu7JK6jQCxvn8jh/aKRmLA+OsCP6A0
+	WeQU5Or+ornfWZ9NiycCLCuq29TViEYBzZWjcheAgT3b/aruHHF34S1SFOcPFD9Z
+	6YRPl+8HpYr/uq3WU//6LWOTt/FrChVT9axAG+EVPUpMko8xruq0IIMCecqKRCc5
+	RQ==
+Received: (qmail 649199 invoked from network); 19 Dec 2024 12:21:32 +0100
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 19 Dec 2024 12:21:32 +0100
+X-UD-Smtp-Session: l3s3148p1@LWJ4u50pZo8gAwDPXwAQAA/MfjDm1Sk8
+Date: Thu, 19 Dec 2024 12:21:31 +0100
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [PATCH] KVM: VMX: don't include '<linux/find.h>' directly
+Message-ID: <Z2QBu4qIsJERcbHF@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+References: <20241217070539.2433-2-wsa+renesas@sang-engineering.com>
+ <Z2Goxx27WL-G-13y@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Lz7/8WUBvPzVMeRB"
+Content-Disposition: inline
+In-Reply-To: <Z2Goxx27WL-G-13y@google.com>
 
-Allow the guest to both clear and set the LFENCE_SERIALIZE bit as long as
-it is set in the host.  It is absolutely okay for the guest to set it if
-LFENCE_RDTSC is supported but userspace left it cleared; and it is also
-acceptable that the guest clears the bit even if this will actually have
-no effect.
 
-This fixes booting Windows in some configuration where it tries to set
-the bit, and hangs if it does not succeed.
+--Lz7/8WUBvPzVMeRB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Fixes: 74a0e79df68a ("KVM: SVM: Disallow guest from changing userspace's MSR_AMD64_DE_CFG value")
-Cc: stable@vger.kernel.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 9 ---------
- 1 file changed, 9 deletions(-)
+On Tue, Dec 17, 2024 at 08:37:27AM -0800, Sean Christopherson wrote:
+> +Yury and Rasmus
+>=20
+> On Tue, Dec 17, 2024, Wolfram Sang wrote:
+> > The header clearly states that it does not want to be included directly,
+>=20
+> I definitely don't object to the KVM change, but the if y'all expect deve=
+lopers
+> to actually honor the "rule", it needs to have teeth.  As evidenced by a =
+similar
+> rule in arch/x86/include/asm/bitops.h that also gets ignored, an #error t=
+hat's
+> buried under an include guard and triggers on a macro that's never #undef=
+'d is
+> quite useless.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635655..21dacd312779 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3201,15 +3201,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		if (data & ~supported_de_cfg)
- 			return 1;
- 
--		/*
--		 * Don't let the guest change the host-programmed value.  The
--		 * MSR is very model specific, i.e. contains multiple bits that
--		 * are completely unknown to KVM, and the one bit known to KVM
--		 * is simply a reflection of hardware capabilities.
--		 */
--		if (!msr->host_initiated && data != svm->msr_decfg)
--			return 1;
--
- 		svm->msr_decfg = data;
- 		break;
- 	}
--- 
-2.43.5
+To follow up, I am willing to do the proposed change. But before sending
+this out, it would be nice if the existing broken includes would be
+fixed. So, can this patch be applied first?
 
+
+--Lz7/8WUBvPzVMeRB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmdkAbgACgkQFA3kzBSg
+KbbcuA/+P8GZIsARGnJ/fg/J8q1So5PbMPIOPkQasYlmgcplWOZ6V8HCJwOvz8wr
+VaQSArBBL/ahfcOxIaFjlhvdfc621yJAIMrplOTauAR20v/qvqNafYBd0sWl/g47
+cAu+wy+l1mi7rXaGyDqU6sC9sRS+QJpZ7mJl3o9aQ50x8YSqn1Y3RDn27gHTdgd1
+6tqWbfe9Jaw+G/58J5liDlQpz6fveX1GlVl0E4k8YiZ7XDlBBnScmPWQ6DkcKcwx
+GAs8jRnOoEsXqfWj0Ef9GhUPtg0JL8T/wV01SoRX9TrSOZf81zkFo03uTyxm2XlE
+zlViO9lr3lni+2t7Bf31exwkZ48D7GtJrnUNnFwKADBmIvgeubEMjy4pHfBy+S3p
+JK70hrU4mbeOxqZ1zQbgGUwF0g+q+KP4Si8M0N/rPOdKtO18G7xrdQM2T5RCY3iS
+hfmRltS78rZBUOnX41lOp189LkyN3E0msbwlS4ImPEZVscbtuhGlbGMK4/1ag+u9
+2xN0WIezKF1qkpeYgOF6MZ9HzqexYoUSfhQ6ln7VZBLcJKfVOSP/27a8+K9LneN+
+cyi4eL0ZIy0cFaSTc4SSVWxWVGfDwmNM06OcLe5vSrOpXL0vaYjqZWwJhbU/SODI
+3Sy+8c/budV6XYKFgTH+tdwQPnNrvL8oXUGMqXy9M6h9k2sifRQ=
+=uGQR
+-----END PGP SIGNATURE-----
+
+--Lz7/8WUBvPzVMeRB--
 
