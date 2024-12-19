@@ -1,140 +1,117 @@
-Return-Path: <kvm+bounces-34186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 581089F886D
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 00:20:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2204B9F8889
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 00:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30BC1694B2
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 23:20:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51731638D2
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 23:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4BB1DC9B8;
-	Thu, 19 Dec 2024 23:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35711DD529;
+	Thu, 19 Dec 2024 23:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BNl7AOgI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKBm8tn0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AFC1BC9E2;
-	Thu, 19 Dec 2024 23:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F6E14E2CF;
+	Thu, 19 Dec 2024 23:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734650410; cv=none; b=ufbUvh4+5uIa0wSdNCWwdRKt5Tnn5Zua9kTbtEybb2wClUJJPpTrX97ZABoO+6e4DrK0lTY/C+UWdy7j5unXnwicVuS7JMPGg2hW+clXdwLg/sIP8KiRXdt3L+O4HRFLu4IX5kCvFs+lCDpYRuNUKykt86h2zARg4UizIo6se9I=
+	t=1734651103; cv=none; b=LGcDUJD2gxBjnPRXihhwfETGrgohutCpH1FvJYqh7nQLHMYruIuZoDPgV8K4uZvHd1Aen+HhbI/xK7UvW43eW4Ft9AO6a3HDFAuSwQP6ekHh50XLxiX4Sm36cmn+N4eD0bDg9vQE3XLMPRju/t8SfpPNTA0tetjPO9DT+nRDwig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734650410; c=relaxed/simple;
-	bh=q8GWX1k/JqInj+D9puv5zulzbKpKHFJrsUcxLaO3tnM=;
-	h=Subject:Date:From:To:CC:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JWQiTZJei0hDyTLutclYYK6yRwXe1ARp+KPfET5d+hKE5hMCu7tWN1MRJ+iU12OS+mk0w1awhJedkh3OMNQrwxcws0LkS+RPJn7fTg/35JQYldRwuxvcxnQInrUlnJlIvV3lW7L2GlhVBBBL70U1sWenE2g4iXkf3galhGXbzAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BNl7AOgI; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734650408; x=1766186408;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=ylam2A8WL6Y39bN1NcplgYgTXD/E8crnsGDHgkTN84o=;
-  b=BNl7AOgI52CGWYixPSwRAII+moJQ7ZNqJ2y5xpAXI/ghYUU5KOxmK4UZ
-   ti+s1dbryP0+CdNS1g/FJcGRI1AfaVnKfVBuOKH9tPAnTeK4R4L5vhRHf
-   zPkRaQ68QreK7W+EGmMiuSpc9hMsmqFCeAVSFabx2QY+AFxlpeFMcduTa
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.12,249,1728950400"; 
-   d="scan'208";a="50842765"
-Subject: Re: [PATCH v3 0/7] Enhance event delivery error handling
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 23:20:05 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.0.204:48486]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.15.239:2525] with esmtp (Farcaster)
- id fba20d9f-9d29-4652-a9e3-5c8b998f5a39; Thu, 19 Dec 2024 23:20:05 +0000 (UTC)
-X-Farcaster-Flow-ID: fba20d9f-9d29-4652-a9e3-5c8b998f5a39
-Received: from EX19D008UEC001.ant.amazon.com (10.252.135.232) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 19 Dec 2024 23:19:56 +0000
-Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
- EX19D008UEC001.ant.amazon.com (10.252.135.232) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 19 Dec 2024 23:19:56 +0000
-Received: from email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 19 Dec 2024 23:19:56 +0000
-Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
-	by email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com (Postfix) with ESMTP id 78FFB40593;
-	Thu, 19 Dec 2024 23:19:56 +0000 (UTC)
-Received: by dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (Postfix, from userid 29210185)
-	id 35D194F9A; Thu, 19 Dec 2024 23:19:56 +0000 (UTC)
-Date: Thu, 19 Dec 2024 23:19:56 +0000
-From: Ivan Orlov <iorlov@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <bp@alien8.de>, <dave.hansen@linux.intel.com>, <mingo@redhat.com>,
-	<pbonzini@redhat.com>, <shuah@kernel.org>, <tglx@linutronix.de>,
-	<hpa@zytor.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <x86@kernel.org>, <dwmw@amazon.co.uk>,
-	<pdurrant@amazon.co.uk>, <jalliste@amazon.co.uk>
-Message-ID: <20241219231956.GA75820@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-References: <20241217181458.68690-1-iorlov@amazon.com>
- <173457555486.3295983.11848882309599168611.b4-ty@google.com>
+	s=arc-20240116; t=1734651103; c=relaxed/simple;
+	bh=AU2CVWuRs++1FqmY9wCE27mMOhiyZPeKHk1XZrig3UM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hFQEM6MiaQu0NkzvnIeBU+OCuSjcktwAvoghVlzSN7aNz5E0/WcGoCiJp9q18bZBCnmU3Z5NL6yfngGb6DLicMvBJph7V5ZdhcxeK+P1EesdyF0Ek27wRSU0o+6nyAq+BUUOkhVS5jHHVCEBQWTPgFGblTg3EFN4G3zMUHROO9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKBm8tn0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADC8CC4CECE;
+	Thu, 19 Dec 2024 23:31:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734651103;
+	bh=AU2CVWuRs++1FqmY9wCE27mMOhiyZPeKHk1XZrig3UM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mKBm8tn0LtIFRN5SqSSTcRIWI+9CXNHNLISghGJRD/u0OcF3g49Y6g4NXFS9+9pxn
+	 6dQFiR+WxwG9fxICpMMX+eepFqeIqU6oCNkqKTTQasKuVu8jh43/ysuNRdPP5IhKFy
+	 NS6Z3B5QlovxgcymwUqPWZe+NRDxG7fYlaf3/7r66rPfPL1Yk6C/MoGYqS1I2IZNjQ
+	 kBAH2Pczo0n6Xqifey1XQQKZa50Y5d27HnOXRYjy7AfHYhUI7LPrIa/QvF/EPTnsTB
+	 eZ0rPN8bZQ4sG+rpx3JhdFWP6S5eiif3jIFfXASFr6/H1OWC5OhSc4tNfcCoLpFNGh
+	 eTh76rgMQlffg==
+Date: Thu, 19 Dec 2024 16:31:40 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	michael.christie@oracle.com, Tejun Heo <tj@kernel.org>,
+	Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@fb.com>,
+	axboe@kernel.dk
+Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
+Message-ID: <Z2Ss3ALr5QgHo4UP@kbusch-mbp.dhcp.thefacebook.com>
+References: <20241108130737.126567-1-pbonzini@redhat.com>
+ <Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefacebook.com>
+ <fdb5aac8-a657-40ec-9e0b-5340bc144b7b@redhat.com>
+ <Z2RhNcJbP67CRqaM@kbusch-mbp.dhcp.thefacebook.com>
+ <CABgObfYUztpGfBep4ewQXUVJ2vqG_BLrn7c19srBoiXbV+O3+w@mail.gmail.com>
+ <Z2Scxe34IR5jRfdd@kbusch-mbp.dhcp.thefacebook.com>
+ <6b0c90e6-6b38-4ff3-8778-1857cd66c206@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <173457555486.3295983.11848882309599168611.b4-ty@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <6b0c90e6-6b38-4ff3-8778-1857cd66c206@redhat.com>
 
-On Wed, Dec 18, 2024 at 06:40:46PM -0800, Sean Christopherson wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On Tue, 17 Dec 2024 18:14:51 +0000, Ivan Orlov wrote:
-> > Currently, the unhandleable vectoring (e.g. when guest accesses MMIO
-> > during vectoring) is handled differently on VMX and SVM: on VMX KVM
-> > returns internal error, when SVM goes into infinite loop trying to
-> > deliver an event again and again.
-> >
-> > This patch series eliminates this difference by returning a KVM internal
-> > error when KVM can't emulate during vectoring for both VMX and SVM.
-> >
-> > [...]
-> 
-> Applied to kvm-x86 misc, thanks!  If you get a chance, please double check that
-> I didn't fat-finger anything.
-> 
-> [1/7] KVM: x86: Add function for vectoring error generation
->       https://github.com/kvm-x86/linux/commit/11c98fa07a79
-> [2/7] KVM: x86: Add emulation status for unhandleable vectoring
->       https://github.com/kvm-x86/linux/commit/5c9cfc486636
-> [3/7] KVM: x86: Unprotect & retry before unhandleable vectoring check
->       https://github.com/kvm-x86/linux/commit/704fc6021b9e
-> [4/7] KVM: VMX: Handle vectoring error in check_emulate_instruction
->       https://github.com/kvm-x86/linux/commit/47ef3ef843c0
-> [5/7] KVM: SVM: Handle vectoring error in check_emulate_instruction
->       https://github.com/kvm-x86/linux/commit/7bd7ff99110a
-> [6/7] selftests: KVM: extract lidt into helper function
->       https://github.com/kvm-x86/linux/commit/4e9427aeb957
-> [7/7] selftests: KVM: Add test case for MMIO during vectoring
->       https://github.com/kvm-x86/linux/commit/62e41f6b4f36
-> 
-> --
-> https://github.com/kvm-x86/linux/tree/next
+On Thu, Dec 19, 2024 at 11:57:40PM +0100, Paolo Bonzini wrote:
+> It could be as simple as this on the kernel side: [adding Jens for
+> a first look]
 
-Hi Sean,
+Cc'ing his @kernel email; first message:
 
-The commits (and the messages specifically) look good to me, thanks a
-lot for making the changelogs better! :)
+	https://lore.kernel.org/linux-kernel/20241108130737.126567-1-pbonzini@redhat.com/
+ 
+> =============== 8< ===========
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> Subject: [PATCH] fs: proc: mark user and I/O workers as "kernel threads"
+> 
+> A Rust library called "minijail" is looking at procfs to check if
+> the current task has multiple threads, and to prevent fork() if it
+> does.  This is because fork() is in general ill-advised in
+> multi-threaded programs, for example if another thread might have
+> taken locks.
+> 
+> However, this attempt falls afoul of kernel threads that are children
+> of the user process that they serve.  These are not a problem when
+> forking, but they are still present in procfs.  The library should
+> discard them, but there is currently no way for userspace to detect
+> PF_USER_WORKER or PF_IO_WORKER threads.
+> 
+> The closest is the "Kthread" key in /proc/PID/task/TID/status.  Extend
+> it instead of introducing another keyl tasks that are marked with
+> PF_USER_WORKER or PF_IO_WORKER are not kthreads, but they are close
+> enough for basically all intents and purposes.
 
-Also, I ran the selftests for the `next` branch on both Intel and AMD
-platforms, and all of them seem to pass.
+Yes, this looks good to me. But I also would have thought the original
+patch was safe too :). Hopefully nothing depends on the current value
+for these... there is often something making it difficult to have nice
+things.
 
---
-Kind regards,
-Ivan Orlov
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> diff --git a/fs/proc/array.c b/fs/proc/array.c
+> index 34a47fb0c57f..f702fb50c8ef 100644
+> --- a/fs/proc/array.c
+> +++ b/fs/proc/array.c
+> @@ -221,7 +221,7 @@ static inline void task_state(struct seq_file *m, struct pid_namespace *ns,
+>  #endif
+>  	seq_putc(m, '\n');
+> -	seq_printf(m, "Kthread:\t%c\n", p->flags & PF_KTHREAD ? '1' : '0');
+> +	seq_printf(m, "Kthread:\t%c\n", p->flags & (PF_KTHREAD | PF_USER_WORKER | PF_IO_WORKER) ? '1' : '0');
+>  }
+>  void render_sigset_t(struct seq_file *m, const char *header,UBLK_U_IO_REGISTER_ZC_RING
 
