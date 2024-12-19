@@ -1,118 +1,110 @@
-Return-Path: <kvm+bounces-34101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C3F9F72CC
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:42:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2E79F72D0
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 03:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8A131677AD
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:42:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 576487A2E39
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 02:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFF278F44;
-	Thu, 19 Dec 2024 02:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A7713B787;
+	Thu, 19 Dec 2024 02:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YWbCxTAY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O/kZiP7m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4F554727
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DD179C0
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 02:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734576130; cv=none; b=tlm43tKCYWmZ81wOIpIxtajyaaphAKTQbN12wOyaRi7o2pOoauqvtLeTDXn87nAUetItY629Td+2/8cclXWX/Rtq0mRAkqyhIs9TsZyRnSUnZpoKq+OM16Gz3ZXQxYuiR1mEP7MbBBQJkTaWTvK6ssJlxOxuSVaJRNdnn6Dqx7k=
+	t=1734576140; cv=none; b=M4TOLsda3DG7i0JIVAlqEpUq/yh1K7+4vfMMkTinvUx/YqvWV/xhlwaIqd0jnrM5kems8QiN45TyvV7pY01IItHinD/8Ge5zPy1LPNQI+OnHVtnWiUuhUHhwLJcE6rh+I3ojGoKxbXUG4YFDBzmPxCN3PhHQc1Zq9feG9A11bnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734576130; c=relaxed/simple;
-	bh=+0YB1wnZO+N4Mgt+2ULmShqZq3rw6HcIFLVbUH2eZuw=;
+	s=arc-20240116; t=1734576140; c=relaxed/simple;
+	bh=IOeCgEezv1qZV+HFIqplbuQakLO0VSOS7XBt8hE170g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t8YvYPN9n3fNTUaBfCmrAJcH5EAE2TvQiL2+dgMKnQP+Fv3cR09aWLZJ+BNiM3kWD72wb8GasiPiFCTPDWXQGzR/tobITE78z/ZVBwjuhMQa+xelDx7yeqG50QKrpgMre71eGkFxx/gCg3Sn4ew8iR06qMUN4+bjoY0KKQIBJlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YWbCxTAY; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=QpvoQy6wGBaLa24U9vG4E+spFN3p1ttjNV0PZfZezQ9eH/UxkemKRKV/nsVIuaT1teea2rUcmYrcPNorV+onq0AQIIwzHQ2ZK9DJIK6tYaL/pEAPNVn3CdKgIWOCsmK2kmYzMjSlkciv0/uY37UDgkEsF75EAiw/E/n+vGusLUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O/kZiP7m; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efc3292021so437405a91.1
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:42:09 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725e59e41d2so348322b3a.0
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2024 18:42:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734576129; x=1735180929; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734576138; x=1735180938; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m0Cubv7YLSSEZBcbcu/q09glZ18XxGHJ6dVd9FcHtzc=;
-        b=YWbCxTAYzCw3rL0VtmJprR2WLwkCsLQS/+LIa/g9XDenXlJIn3Za7I/i9r8eWT9PL7
-         dUvOWIoAUkZkPEWEDaXPVV9yKlwyD11VB20AnU9Isde704rZgBJVOCYofEeFqkq+gukk
-         RVs6Jrbb91XMR0fP1EhxKc9rqV5wJad8daZhhO8BW5tQyqal3LR1H2v2H2DNDyeJmAw+
-         XTZZe3LzRwlD1i7Iud9HpTxKn0PS7L/M6fD2boj9w7rGIqzIS9Q/LxkWgmWN1EphAFJZ
-         1yNVDu9yInr6z2jpu2NM8gbnX1/MyEW6GupHk1Dikf3kirISp2QYx99Jnom/aScoEGO2
-         QtxA==
+        bh=j3283AMqQi025NW8+V+BiFmLe0wWecaptec9DJ50LSI=;
+        b=O/kZiP7mvKKoCu9sHmk07lk8zN6lCoRlnS8fVfOjJA6WCMOWxgWGy1fZwAITyLuS2c
+         mIvVNf7NnRLHDrbA/DbeadM9MiuJiqdOmoBZXx3qvlOVD/2I67FHKkRjXvxkI6iEky8x
+         GCUW97naLK4bUDb5fyHHefWqj9ebdYi8xv1+IjjYDg6v3yS/q9JXv1j2Jdtozp99+QvM
+         ettprKeV3lUsYEBjYY+0huEd94vXXa8+2M/ej++3KyG0JHhJbMSa9QSMZyJvm+2lXii9
+         5LgiFPPRx70ImMfRiLgh1/qfQv2Ytn8uRqPL3njyJU5SyrPU/MMAf6J7yvaeLq0JXjKZ
+         z+Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734576129; x=1735180929;
+        d=1e100.net; s=20230601; t=1734576138; x=1735180938;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m0Cubv7YLSSEZBcbcu/q09glZ18XxGHJ6dVd9FcHtzc=;
-        b=b4tBZC8Lb/8K4A7/lI2ioBLxHdBI8d5JgFwuDU8CR7/m6AEU/cBJdurh6Faw5WQSWy
-         yE7rLZYtHnnFY2/2zCzdtVpthJTxIGWVnj49Gn0sJw4u4U9PrZOpNKxHHk61MkSQYRlU
-         rvJZcMWBEdaLqAeSZX7q8pJ7ZRhoTWxyHtnV3hnEYPzYqyLCtL/yPdfWQeCIMAGZ6x8z
-         VPT3e2oEe3KxlqicNJ773MLoPzjUEK+9G6AiYbqkGcQUHhkSBC7pOoM+6PJoZd07Rq6/
-         dtOTFAyGW7ozJ+LOgmVl8O3jLIFV+uF4J980/VEw7VCzH2h8Pa9glUpdhvQrmBHc4Fk6
-         QnHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXDZCLE9myNcfVjDLM+Xxv3sFcpGGVG4wmEGmrh+lv8mXHFYSSYW3uOPDdkt/bdkquTDVk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAuQocvAUqz9ZdJCDfZG3XGaMZN+Q4h8Mtys/Xd/VMOLzDe06e
-	rk1abOG0e19YKSEI1YIDbddw/KaZMkROzok+7gUtxgmtIJHPfnCaj25Khf8bxLfd0w3yoq/pb2t
-	S6Q==
-X-Google-Smtp-Source: AGHT+IEnYzmbvfGN7/B6ViEtGfWEw0anaTCEutqaOfeDitWi6EveqXP0+98dhgD6pETsbyq/KQ5AnaRCuh4=
-X-Received: from pjbso12.prod.google.com ([2002:a17:90b:1f8c:b0:2ef:85ba:108f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d648:b0:2ee:9b2c:3253
- with SMTP id 98e67ed59e1d1-2f443d45292mr2198688a91.30.1734576128828; Wed, 18
- Dec 2024 18:42:08 -0800 (PST)
-Date: Wed, 18 Dec 2024 18:40:46 -0800
-In-Reply-To: <20241217181458.68690-1-iorlov@amazon.com>
+        bh=j3283AMqQi025NW8+V+BiFmLe0wWecaptec9DJ50LSI=;
+        b=qb0uRNbcGfQKERDHrFTfniJS9ra/b8c834QtEJmAEPABjjYBdPz7CNTAES8AU5hjBp
+         eq5E/DAcAGq6qAX6VTJ5UY+tpfgx32fQm1Wkw/b9vovsn2m47H05/enZMjqOKuDAgcMi
+         GlWnstTBumpKjlVny0XsCIjqzu65tJ18+ylTceT8Vl7lYCwUUk1cvZyjy76HffpB8Q2J
+         /fmHI5mAhPNOpkX4i/gM2DeDPNsKXgJeman+3K+AagzcUqPXUZ11HIm+sjWm9DXp/DNY
+         UU+fYHJJ+WRf/vY4TXCN6Yrhr3Fp4d1Yv1t8aeHMUI2B1+rqxtR5ebFW7HAEMpRrL0WQ
+         tvDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXw2LFLkdrfuTAnL2Fjwwmwxx3gNr7+HZpv747e7rOPoDUiiVP1OonERaYZwuFNQG+ymb0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWw2iaBmu33/1RiYE7kvDED4R79vcmxzVLsiMbiWXm37nu5VCn
+	Vr788QDbJNRcRGFb/RKMVT673kIKeXtJBm2lNfy1GiiQfuS1Zg0IaItlblXqV4T/Tg7y5sf2wce
+	EDw==
+X-Google-Smtp-Source: AGHT+IGhmFauhF888d5szWbyDxdRHy45rePRnJAHnmrPsIVy7VA2wuAOWE1A4elWDBQU2S46kXuqnWwGvyg=
+X-Received: from pfne17.prod.google.com ([2002:aa7:8251:0:b0:72a:9fce:4f44])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:1588:b0:1e0:c432:32fe
+ with SMTP id adf61e73a8af0-1e5b4820e66mr6858473637.26.1734576138081; Wed, 18
+ Dec 2024 18:42:18 -0800 (PST)
+Date: Wed, 18 Dec 2024 18:40:48 -0800
+In-Reply-To: <20240910200350.264245-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241217181458.68690-1-iorlov@amazon.com>
+References: <20240910200350.264245-1-mlevitsk@redhat.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173457555486.3295983.11848882309599168611.b4-ty@google.com>
-Subject: Re: [PATCH v3 0/7] Enhance event delivery error handling
+Message-ID: <173457564700.3296873.12953215674601470528.b4-ty@google.com>
+Subject: Re: [PATCH v5 0/3] KVM: x86: tracepoint updates
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
-	Ivan Orlov <iorlov@amazon.com>
-Cc: hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, dwmw@amazon.co.uk, 
-	pdurrant@amazon.co.uk, jalliste@amazon.co.uk
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Cc: x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 17 Dec 2024 18:14:51 +0000, Ivan Orlov wrote:
-> Currently, the unhandleable vectoring (e.g. when guest accesses MMIO
-> during vectoring) is handled differently on VMX and SVM: on VMX KVM
-> returns internal error, when SVM goes into infinite loop trying to
-> deliver an event again and again.
+On Tue, 10 Sep 2024 16:03:47 -0400, Maxim Levitsky wrote:
+> This patch series is intended to add some selected information
+> to the kvm tracepoints to make it easier to gather insights about
+> running nested guests.
 > 
-> This patch series eliminates this difference by returning a KVM internal
-> error when KVM can't emulate during vectoring for both VMX and SVM.
+> This patch series was developed together with a new x86 performance analysis tool
+> that I developed recently (https://gitlab.com/maximlevitsky/kvmon)
+> which aims to be a better kvm_stat, and allows you at glance
+> to see what is happening in a VM, including nesting.
 > 
 > [...]
 
-Applied to kvm-x86 misc, thanks!  If you get a chance, please double check that
-I didn't fat-finger anything.
+Applied 1 and 2 to kvm-x86 misc, with the massaging to patch 1 I detailed earlier.
+Again, please holler if you disagree with anything.  Thanks!
 
-[1/7] KVM: x86: Add function for vectoring error generation
-      https://github.com/kvm-x86/linux/commit/11c98fa07a79
-[2/7] KVM: x86: Add emulation status for unhandleable vectoring
-      https://github.com/kvm-x86/linux/commit/5c9cfc486636
-[3/7] KVM: x86: Unprotect & retry before unhandleable vectoring check
-      https://github.com/kvm-x86/linux/commit/704fc6021b9e
-[4/7] KVM: VMX: Handle vectoring error in check_emulate_instruction
-      https://github.com/kvm-x86/linux/commit/47ef3ef843c0
-[5/7] KVM: SVM: Handle vectoring error in check_emulate_instruction
-      https://github.com/kvm-x86/linux/commit/7bd7ff99110a
-[6/7] selftests: KVM: extract lidt into helper function
-      https://github.com/kvm-x86/linux/commit/4e9427aeb957
-[7/7] selftests: KVM: Add test case for MMIO during vectoring
-      https://github.com/kvm-x86/linux/commit/62e41f6b4f36
+[1/3] KVM: x86: add more information to the kvm_entry tracepoint
+      https://github.com/kvm-x86/linux/commit/3e633e7e7d07
+[2/3] KVM: x86: add information about pending requests to kvm_exit tracepoint
+      https://github.com/kvm-x86/linux/commit/0e77b324110c
+[3/3] KVM: x86: add new nested vmexit tracepoints
+      (no commit info)
 
 --
 https://github.com/kvm-x86/linux/tree/next
