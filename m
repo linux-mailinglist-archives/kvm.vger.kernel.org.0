@@ -1,111 +1,152 @@
-Return-Path: <kvm+bounces-34163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED4BE9F7DDB
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:20:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 907BF9F7DE5
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 16:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E464167337
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 15:20:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F92166E45
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 15:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E545226175;
-	Thu, 19 Dec 2024 15:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3958822654C;
+	Thu, 19 Dec 2024 15:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sKXcP/mL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AKXo0KBP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229D9224887
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82E1221D86
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734621606; cv=none; b=DpQ1S2POkGLe9N7jGPp/mOapV4hXIvbth53IPN2sCwErGXTSigANI3v4PAT8ZwYQ3lzTqnUdAJfQOwCT9fuC+Z8jgte3FeJ4JGMBjMBEjJd1EVLzCpYh30DCl90JW5ShhyvEIfoI0DhRrfKZi964c1q0aMyfivmtUWmEHJVRm+Q=
+	t=1734621840; cv=none; b=jNvT1Zw1V8ODj/GO8hZWFO4XyNKx2aNfrecviI7vVahur9QdABhlA1BALHJMuG/6LAn8cUgz4GCI4Pe6LOdGoIX5spVUI9rnZsgcFzlkmAE9UYOnfx3L4bPdCMqWkhHeazebn/X1fieudvsqAxjHOUF6eQCbI2zm4Z+zqhsHFDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734621606; c=relaxed/simple;
-	bh=b/b6r6b/COseRN02rYeAj1TZ2F8d2AxJIGmqaMlv6uU=;
+	s=arc-20240116; t=1734621840; c=relaxed/simple;
+	bh=vQ52mRiElqCZNzqac3CSN8kfDYDhKf+LTt9VTB9knUM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H7VO2Zla0XJTzti7wyyp5/Hg0pleSPstAQQM9mQJmbaoDmilEPpXwRAvt5OcdGkFl+rzIY3GMFbY5Q+CbbPc4fPSO0SE/URtqm14thxjH9QXMTgAS7CNA9LMvuSYJJW65ic8quHplZkPkktsOJRZpp1Xy6CqZJMqtftyY7o8LD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sKXcP/mL; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=SfledfWJEeIbtsUUCMN1tr9ds8KHzL7kD1PnpfKi9FvRfnrvLTxBbbQm8RV6HK9XUMF/mfFPeG19xZ6sdx1DCrtu6EFm03Hs7JxCR7QWsghQsnKnmKXyCRK6Pn3/s7XvaD6m2rTWaFVaHjG+IVNpRzx9Itjjmwjhsp0ygiBh238=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AKXo0KBP; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7fcb7afb4e1so862428a12.0
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 07:20:04 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-728f1c4b95aso961702b3a.0
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 07:23:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734621604; x=1735226404; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734621838; x=1735226638; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VFayNOW4b1jyIMCl98EpM1xSihyyfKaX8YnLIZw5b2g=;
-        b=sKXcP/mLRevloY4k9IH9doanv/dNPnm343f7qRxL8NmwKNoy0aY/XdwdTlt2ex+opQ
-         Jz+3MoPUBtS7Wts5mvnP1WZGPnWfxZ+M82ryNxUotfe629gTmTNYS9ldWFTppHiD39/X
-         M8CnEUI3ZjVHX5aS0U7hKhHXio6vYNI4QwZDVnlObRa04DJ5OSrNtor4f07H29IEIOCv
-         CR+e9M0IUSA78Mjh+Y2aVF0epGb0l8gYqKO1MlZfpQf1uVAXpjD+RKBljFbqeLs6Dfug
-         rD3R03vo/y6bPibrFheER7tY4jiBl3Ps5MgUUXebeykPGzSU/B5CiyTOlTZCnFFUqIyo
-         NElA==
+        bh=tWsNmzzST8lcMxSYcBiJLWeTL6YuFmSorOwIwOomjFE=;
+        b=AKXo0KBPpF20Nk7y2gEsktTi7MxfhjFPHIUscAF5WukhU05OMGF5EHIGf5kblKmHKO
+         Xk2oq+GUOUnuKXeGMT5A3kMJSR4Hnff4ud/lDrJ3zHQTjs/n3yfs2Gc6AxQE/kSgPenN
+         EZ4jOD58Jl9CoXB8YH45Hy9xCkMyALZ39vpim6Ow8Pa7CQUwXwGjSviPRIbYQDVmHbFn
+         Rh0GBj4quGN1qw6B92FwGWBP8FLEewMbowijB9vBxpO4GP1ZK2WxBxM4uVTgIZVBPfSv
+         F7oruY/hv57IXicNvoMoxWYlmNsaWww5mjh5RTmkYSLpRsgV+w/7fz26kUNums5M+jCX
+         mxmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734621604; x=1735226404;
+        d=1e100.net; s=20230601; t=1734621838; x=1735226638;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VFayNOW4b1jyIMCl98EpM1xSihyyfKaX8YnLIZw5b2g=;
-        b=qZhOBgGPDZQoOTmY5/8krhcfIhg21a4UscjGIjb5/N/5U5f9LsWqaqSuju3+qBbw0/
-         xBtMUk+5tPI4DOUbrwYeZmQBvy7WXYfT7yeFoEFxDrmNr+lJWPO3sd4lzwblJsiYp6xQ
-         Et66MhJLKkgVB9Rs3nneC5BDw//LzCjgmVRtBwCHcuLKU5pZix/NzOpwPKtZT/SmcsQI
-         1l09d5boXPBeSrS6r368z7SdP7pMaJYK7usGlpTV7j8a4EEiP3QXfjgzVU6jdXsqsisr
-         jk1pHAd/YS9jEX3ABpVIYa/csOuoEtjAWD8K9/T9KDbY22KhNaPalCKx4iOPsTos3T9Z
-         IYCg==
-X-Gm-Message-State: AOJu0YxGVmfjWBUUqIRPv/oJM2S6CCjca7Rv8jM5w6I9Qnka0SvJ9G+r
-	rgEbcTDxYKKrkSHSRA4ErtfJRJ7iaWGQTj0+4Tvl5IFB0JR6guvnknqAlTzv6Pfu63EAaEttGlo
-	wsQ==
-X-Google-Smtp-Source: AGHT+IHWv5oKAY/0CIJF6KIKdjzGfI9ldz228nqoFj9Fjpq7z1K1R6o7J6SudZI7DItFZ9NpcfuUqPKohSc=
-X-Received: from pglr14.prod.google.com ([2002:a63:514e:0:b0:7fd:4ce4:e9e3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1643:b0:1e1:afa9:d397
- with SMTP id adf61e73a8af0-1e5b48067demr13046226637.15.1734621604301; Thu, 19
- Dec 2024 07:20:04 -0800 (PST)
-Date: Thu, 19 Dec 2024 07:20:02 -0800
-In-Reply-To: <c20368b8-ef6b-4be5-b9c6-46a577564f79@redhat.com>
+        bh=tWsNmzzST8lcMxSYcBiJLWeTL6YuFmSorOwIwOomjFE=;
+        b=jb06tIGilERtpH/WbzOgwPgK9+vYGaatYLBdpbWyFjsKWOGuekHBS1Gi/YtVE9x7sp
+         +dh25BWEb/JSTJv240iAIfrX0ueQbe6MAJBc1J6N19wf5qtmh514JeTjgoOdC/41atMN
+         d30bNPNOa46PtbtTOZrRms9FhiGBvgScqRncckXcmNXxnA3lKokb0brlkSChWOzSMD5N
+         9nP/LXx5b+6CAJCAWoqVde5Ah6Qe5cq/imiNHYsFxn+ekzc/volln/GGz6L8Oc9g6zkW
+         zLT1eecSZxXPxvuM/EQ07/1OVYfIDjMSfJqOepXnbonPcoH4sBXF2J+Cz5bz9yq6PoS4
+         hZwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVb1opTZd0jN5j+6JNzYG+gKMCdxIfJSsauZ6Ek/lq4ZB/EyMXdI2MkeVi2JxoYNXZljCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqeqjRUgXkQdQJ+C1aMmZwz5NINDQb3Va5T2S6en19+lccW9Aa
+	WcPC8cN1ebKtSMTF+qASHUbrZdGmmWrbulwpu3+CnJuGIR7WdXo9cxcIpjKgwOATUtNS76XEDub
+	gIA==
+X-Google-Smtp-Source: AGHT+IGmUvtSYpU2PNr3cYRU0AgkhwMuw643VsMeCpo/v6gnGPtYySVv5u88L3bISsqAABXTw/MmgDxPDcE=
+X-Received: from pfbeh4.prod.google.com ([2002:a05:6a00:8084:b0:728:958a:e45c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1311:b0:72a:8b90:92e9
+ with SMTP id d2e1a72fcca58-72a8d0310c1mr12598351b3a.5.1734621838249; Thu, 19
+ Dec 2024 07:23:58 -0800 (PST)
+Date: Thu, 19 Dec 2024 07:23:56 -0800
+In-Reply-To: <faccf4390776ca78da25821e151a4827b1f8b3a9.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241211172952.1477605-1-seanjc@google.com> <173457547595.3295170.16244454188182708227.b4-ty@google.com>
- <c20368b8-ef6b-4be5-b9c6-46a577564f79@redhat.com>
-Message-ID: <Z2Q5ovivF849OPcZ@google.com>
-Subject: Re: [PATCH] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
+References: <20241214010721.2356923-1-seanjc@google.com> <20241214010721.2356923-10-seanjc@google.com>
+ <39f309e4a15ee7901f023e04162d6072b53c07d8.camel@redhat.com>
+ <Z2N-SamWEAIeaeeX@google.com> <faccf4390776ca78da25821e151a4827b1f8b3a9.camel@redhat.com>
+Message-ID: <Z2Q6jK1E0KfX7n7l@google.com>
+Subject: Re: [PATCH 09/20] KVM: selftests: Honor "stop" request in dirty ring test
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Simon Pilkington <simonp.git@mailbox.org>, Tom Lendacky <thomas.lendacky@amd.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Dec 19, 2024, Paolo Bonzini wrote:
-> On 12/19/24 03:40, Sean Christopherson wrote:
-> > On Wed, 11 Dec 2024 09:29:52 -0800, Sean Christopherson wrote:
-> > > Drop KVM's arbitrary behavior of making DE_CFG.LFENCE_SERIALIZE read-only
-> > > for the guest, as rejecting writes can lead to guest crashes, e.g. Windows
-> > > in particular doesn't gracefully handle unexpected #GPs on the WRMSR, and
-> > > nothing in the AMD manuals suggests that LFENCE_SERIALIZE is read-only _if
-> > > it exists_.
+On Thu, Dec 19, 2024, Maxim Levitsky wrote:
+> On Wed, 2024-12-18 at 18:00 -0800, Sean Christopherson wrote:
+> > On Tue, Dec 17, 2024, Maxim Levitsky wrote:
+> > > On Fri, 2024-12-13 at 17:07 -0800, Sean Christopherson wrote:
+> > > > Now that the vCPU doesn't dirty every page on the first iteration for
+> > > > architectures that support the dirty ring, honor vcpu_stop in the dirty
+> > > > ring's vCPU worker, i.e. stop when the main thread says "stop".  This will
+> > > > allow plumbing vcpu_stop into the guest so that the vCPU doesn't need to
+> > > > periodically exit to userspace just to see if it should stop.
 > > > 
-> > > KVM only allows LFENCE_SERIALIZE to be set, by the guest or host, if the
-> > > underlying CPU has X86_FEATURE_LFENCE_RDTSC, i.e. if LFENCE is guaranteed
-> > > to be serializing.  So if the guest sets LFENCE_SERIALIZE, KVM will provide
-> > > the desired/correct behavior without any additional action (the guest's
-> > > value is never stuffed into hardware).  And having LFENCE be serializing
-> > > even when it's not _required_ to be is a-ok from a functional perspective.
-> > > 
-> > > [...]
+> > > This is very misleading - by the very nature of this test it all runs in
+> > > userspace, so every time KVM_RUN ioctl exits, it is by definition an
+> > > userspace VM exit.
 > > 
-> > Applied to kvm-x86 fixes, thanks!
-> > 
-> > [1/1] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
-> >        https://github.com/kvm-x86/linux/commit/2778c9a4687d
+> > I honestly don't see how being more precise is misleading.
 > 
-> Oh, I missed this!  I assume you're going to send me a pull request today or
-> tomorrow?
+> "Exit to userspace" is misleading - the *whole test* is userspace.
 
-Yep, I'll get it to you today.
+No, the test has a guest component.  Just because the host portion of the test
+only runs in userspace doesn't make KVM go away.  If this were pure emulation,
+then I would completely agree, but there multiple distinct components here, one
+of which is host userspace.
+
+> You treat vCPU worker thread as if it not userspace, but it is *userspace* by
+> the definition of how KVM works.
+
+By simply "vCPU" I am strictly referring to the guest entity.  I refered to the
+host side worker as "vCPU woker" to try to distinguish between the two.
+
+> Right way to say it is something like 'don't pause the vCPU worker thread
+> when its not needed' or something like that.
+
+That's inaccurate though.  GUEST_SYNC() doesn't pause the vCPU, it forces it to
+exit to userspace.  The test forces the vCPU to exit to check to see if it needs
+to pause/stop, which I'm contending is wasteful and unnecessarily complex.  The
+vCPU can instead check to see if it needs to stop simply by reading the global
+variable.
+
+If vcpu_sync_stop_requested is false, the worker thread immediated resumes the
+vCPU.
+
+  /* Should only be called after a GUEST_SYNC */
+  static void vcpu_handle_sync_stop(void)
+  {
+	if (atomic_read(&vcpu_sync_stop_requested)) {
+		/* It means main thread is sleeping waiting */
+		atomic_set(&vcpu_sync_stop_requested, false);
+		sem_post(&sem_vcpu_stop);
+		sem_wait_until(&sem_vcpu_cont);
+	}
+  }
+
+The future cleanup is to change the guest loop to keep running _in the guest_
+until a stop is requested.  Whereas the current code exits to userspace every
+4096 writes to see if it should stop.  But as above, the vCPU doesn't actually
+stop on each exit.
+
+@@ -112,7 +111,7 @@ static void guest_code(void)
+ #endif
+ 
+ 	while (true) {
+-		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
++		while (!READ_ONCE(vcpu_stop)) {
+ 			addr = guest_test_virt_mem;
+ 			addr += (guest_random_u64(&guest_rng) % guest_num_pages)
+ 				* guest_page_size;
 
