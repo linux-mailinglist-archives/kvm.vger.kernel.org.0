@@ -1,85 +1,86 @@
-Return-Path: <kvm+bounces-34146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0CA9F7BCB
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 13:48:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DA39F7BD2
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 13:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B49E07A581A
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 12:47:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8463F7A0665
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 12:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA94224B0C;
-	Thu, 19 Dec 2024 12:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B91224AE3;
+	Thu, 19 Dec 2024 12:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lz5+tZMk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWcgpOzO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719C3224AED
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 12:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4142C2746D
+	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 12:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734612460; cv=none; b=syaZ0CzU7Js1g9/7AN6+fcgDlvA+EqNvK4QkhfBsNnUD7OE1uhjmfnK9jyokQ2r7bEHLNOUD7nFQantG6bcYrRDymGv8PmBlj0JXGOWiluyK7/RhimusLMiQH7sQPInQySF1ERghDS12dLOYfBkkp0d4dQtGKLTgD2SwRvMkCpE=
+	t=1734612706; cv=none; b=t4yYC6ca9GkLlTJZJbPi4hZxDRff6lqPP16Kz43lkx9yULsCv0SfLG0XSk+VNGu1NZHhCYMHaH35JJLxLqgv1LyfJuINqPF+knzJ4V5gh4UpFM3df6+HZ1vJmo6vlxLZQmey6gjdS/7HyKO5OaofN3dfoehbp6681KQFkSkpJDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734612460; c=relaxed/simple;
-	bh=ftZIq9qfm0/IYvT7EbMRkTEOVbbyy9BOTA99CQw+pX0=;
+	s=arc-20240116; t=1734612706; c=relaxed/simple;
+	bh=2FnKTgHs+nYr7nZ8AFFh32DXV0gUdeBWrY6eHEwRvaQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RQeGSoa2u51ofNheH10qD3/xaUGzBRUXEGaXxZ+YKrZ7GB+GaZIDb5ZJjD0dFWE0yDbUOWDJJpvSHt5HSFcpv1x1nsgGRrpH3cRhGhz5MJ+0OOB4OY0m0N/c1+qhW0yOFAYaTynn39q4swUaVWOlW9tK65bDh56gJ2JR9yVa9wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lz5+tZMk; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=BmlGyfXRIDp27Jwl2ChFbE6hiFc5j87z2jKy6cWiKm/XeF6vGGEttykm5JnPqM+3yoniX6pKDQVG7uPWPSsQICKIF10NS46CXKnTxVVLDp9fgD0al5hMBsnK0F8sIk1MKFKkUO6PHsgLcAj1SrVBuElxlqYkswtyLi9TVGvAG/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PWcgpOzO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734612457;
+	s=mimecast20190719; t=1734612704;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=g1HYznC2LCvYpHJ+sLM4nudgW0A3OVD92QPOK6iMV/g=;
-	b=Lz5+tZMklyVZCXt3li4CWLEuF3vyJg09ySx+12wDuLfkiO2fyfzJ45/3unsu9npwnN7u8+
-	jap2ozzzknoWAX0lRcG06mOQxIQgNC4Pi6cnxphsb5CZHQ0o9fbg9cw6YqfCR2hBkOBKRO
-	TMQdZoj/iDN4+yVlnzBgF3A+425dNzA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7c8saus9YLZhVfJ1KTMCJAG76jnz4bfOn7VY82l2UQo=;
+	b=PWcgpOzODnA0Mls8EY5SkxTq+iKUxmTaG9q2Bfj6zKyQkwTXm1kLw4wBiVswoBPt+TyjCm
+	nE5JE8syPkkL/FKj4ddwxGFEhiIolZBf2jJnm9Elj4xFeD9iNM8y3aQMFWIh1+HuiEWm/g
+	5BoQc3xfGRGt8jvV956Swuuse8vaf3A=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-7XAu84PkOvKQXJKxdP9_NQ-1; Thu, 19 Dec 2024 07:47:36 -0500
-X-MC-Unique: 7XAu84PkOvKQXJKxdP9_NQ-1
-X-Mimecast-MFC-AGG-ID: 7XAu84PkOvKQXJKxdP9_NQ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43628594d34so4578215e9.2
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 04:47:35 -0800 (PST)
+ us-mta-397-JMvrVlRhO6mFiAxhJZExwA-1; Thu, 19 Dec 2024 07:51:42 -0500
+X-MC-Unique: JMvrVlRhO6mFiAxhJZExwA-1
+X-Mimecast-MFC-AGG-ID: JMvrVlRhO6mFiAxhJZExwA
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43619b135bcso4526355e9.1
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 04:51:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734612455; x=1735217255;
+        d=1e100.net; s=20230601; t=1734612702; x=1735217502;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g1HYznC2LCvYpHJ+sLM4nudgW0A3OVD92QPOK6iMV/g=;
-        b=CNuLxT4QY9reYMIsJAVcH+vcisHviJ4TPXtYEWaaz+Xe3MQO144xXaBBKI+YaKt0oB
-         Wj2V7AEzF4jGkhTRHDSzTlFwUKEAe5yZQ0KZduFxlf7GpmjozZ1J/LpsTCrt6+RhcBsg
-         fUzNqAmkIPdjE+noiho1sIppNRgdhCBxEuU7zIPgRW1K+GW1rNkxDM6ZZRhB/gBHmfJQ
-         Qr5i8nXjHNiU5XXnKHFWpqQAFLim4/vH6VxcjIQ3oX4IY5kaiWo6m/6TDlVIW8LGIl5/
-         tcdbNKupMKvewN/c/TqRJAvDkMM07GS36UhxFoYDA939wkaDa6elac4DGPP4OnP3DOhU
-         +liQ==
-X-Gm-Message-State: AOJu0Ywbieg4igpGtvn4HP97I9CRKW6Us2F7d6jL241cYoVKy6Qg9nFE
-	5bloQ0hiexOMsRVVqwQjiqQVNIIpOzDHzHr1i1G8BlqjtM2/HnpWkkPnXmFbfJreaURUP/SytQh
-	JDE3/4Kw1UESjRUJ+7ZQfqxD8oYtERcD8dYw/OMfap+RuymJy5w==
-X-Gm-Gg: ASbGncsS10/SH3x0WNSWjHZacPxgUBzIAa4v5xWVMFDxWxsvHzxrTPLXjwrSq0gNMTe
-	2J2mIJ7Z8k4XBnXWrmuV0ceFNcHJ2OHSyrDocgQWp6Qmsw1MjEw0SKBOokcpndYUmGB2lX37InL
-	S1XpKIkzA1vBwNpdRown1roz/HbEobkuOkExa3Bhcqnay4wxqbIBZVdrQv5MKl/oOVVMn8JDPvD
-	zPVBti4+mWVOYBxhi+PgyxcJpLWrGNhMAuQugMQwid0nypgCcSgLp5QYQCr
-X-Received: by 2002:a05:600c:1994:b0:434:9f81:76d5 with SMTP id 5b1f17b1804b1-4365c7c991bmr23666635e9.22.1734612454742;
-        Thu, 19 Dec 2024 04:47:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEy03z21PozpIW6HImzk1RmN3tYMqTY4e6pqfiJFKvld9W7AYkse87HA4IPEGy82MEoaAzmkQ==
-X-Received: by 2002:a05:600c:1994:b0:434:9f81:76d5 with SMTP id 5b1f17b1804b1-4365c7c991bmr23666395e9.22.1734612454422;
-        Thu, 19 Dec 2024 04:47:34 -0800 (PST)
+        bh=7c8saus9YLZhVfJ1KTMCJAG76jnz4bfOn7VY82l2UQo=;
+        b=oVRWot+76nfWZQg01QKWv51AShHyGKsvjghuucrbnnoBostAY7YNXfk5d9cM69OZ9E
+         p7GYeTXP5ZpyyEvkRaI6CntNP3tj0HOr7A4Szqb4HC98PQdH9qsaAjShfjeWVIoDk3hg
+         /TjrGnMD4V29+WlcrQC4TUDqdM89FVF3GCjcDqyCIOm5ER4LapSz+DUrwWMlxvplEW9N
+         f2KeC5+pACeHYDFbMeI7mZ3GzzgCjMFKrZFvOTKouer1kld7K+f0jXIw19Lw0QvpkSrP
+         D2VGN87i4PKkLEQzwOfwzJaTP9AJ6vITBXP8zE96iHjFJd4B/BHdzZlR82aPcgcKwv8U
+         nw3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVIhGXMKQOfzAZjSIlvI8NV3gtdzP+qfmOT9MvnSzPDBj5wc4ZwbFEi87nZu62a3CT2tB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcc9xUfSDPzuuypq1dU+efGn9nrwylnr6mEgFDbJ8zDUMCEpmf
+	+9vvA2iydoO3StwEYm+WP7St4amUUfvzullEEUlU0U8JFY5OALH0I6SnApRP0uyJV09aCWkcAMS
+	qQ0oDaLnf3iBa205LfEAB9ukEEKzDzBzj+G8+rZyOvsLj6DotTA==
+X-Gm-Gg: ASbGnctvSg/DZsEPgz246ztaC2t1XziLcWCw6n+EkOz0pLVD/diiKLKbzcqrlwsnMKx
+	queS3gUCZW4rekGxW7ukUl/rMG3s5d2XfKQNPhfmR1NGos63Gav7tTeIDYy0ygxktHUdn3OCvMA
+	ervL/02shH5vPrgi1R3AevHjobbX4pbFRvMzZh+IaXW18qHE5F1CcuMgCBhAcyMUHe5U/vrQwqN
+	cS7w75wQ2XO29P5WWTGbnJKerG5kPYYHD/d5NTyWzbt4sOFjx6S3Zl1RJf9
+X-Received: by 2002:a05:600c:1c95:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-4365c7d05a7mr26149665e9.21.1734612701681;
+        Thu, 19 Dec 2024 04:51:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGi6kT1YUYVhMLCGFvM9zRpWd8/VGVfy+jl/VcBcc+w951wALdRk+vWkS9XaX3I8AkE4IXmYA==
+X-Received: by 2002:a05:600c:1c95:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-4365c7d05a7mr26149385e9.21.1734612701311;
+        Thu, 19 Dec 2024 04:51:41 -0800 (PST)
 Received: from [192.168.10.27] ([151.81.118.45])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a1c8acabbsm1473745f8f.93.2024.12.19.04.47.33
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-436611ea40csm17411745e9.1.2024.12.19.04.51.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2024 04:47:33 -0800 (PST)
-Message-ID: <c20368b8-ef6b-4be5-b9c6-46a577564f79@redhat.com>
-Date: Thu, 19 Dec 2024 13:47:31 +0100
+        Thu, 19 Dec 2024 04:51:40 -0800 (PST)
+Message-ID: <6887b48c-b1ef-418b-90e7-fa95fedc71f2@redhat.com>
+Date: Thu, 19 Dec 2024 13:51:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,13 +88,23 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Pilkington <simonp.git@mailbox.org>,
- Tom Lendacky <thomas.lendacky@amd.com>
-References: <20241211172952.1477605-1-seanjc@google.com>
- <173457547595.3295170.16244454188182708227.b4-ty@google.com>
+Subject: Re: [PATCH v4 00/16] KVM: selftests: "tree" wide overhauls
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Andrew Jones <ajones@ventanamicro.com>,
+ James Houghton <jthoughton@google.com>,
+ Muhammad Usama Anjum <usama.anjum@collabora.com>
+References: <20241128005547.4077116-1-seanjc@google.com>
+ <173455833964.3185228.5614329030867008316.b4-ty@google.com>
+ <Z2NIwmRDaZBc_V4o@google.com> <Z2N-UlxgYlGT_1Or@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -131,34 +142,40 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <173457547595.3295170.16244454188182708227.b4-ty@google.com>
+In-Reply-To: <Z2N-UlxgYlGT_1Or@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/19/24 03:40, Sean Christopherson wrote:
-> On Wed, 11 Dec 2024 09:29:52 -0800, Sean Christopherson wrote:
->> Drop KVM's arbitrary behavior of making DE_CFG.LFENCE_SERIALIZE read-only
->> for the guest, as rejecting writes can lead to guest crashes, e.g. Windows
->> in particular doesn't gracefully handle unexpected #GPs on the WRMSR, and
->> nothing in the AMD manuals suggests that LFENCE_SERIALIZE is read-only _if
->> it exists_.
->>
->> KVM only allows LFENCE_SERIALIZE to be set, by the guest or host, if the
->> underlying CPU has X86_FEATURE_LFENCE_RDTSC, i.e. if LFENCE is guaranteed
->> to be serializing.  So if the guest sets LFENCE_SERIALIZE, KVM will provide
->> the desired/correct behavior without any additional action (the guest's
->> value is never stuffed into hardware).  And having LFENCE be serializing
->> even when it's not _required_ to be is a-ok from a functional perspective.
->>
->> [...]
-> 
-> Applied to kvm-x86 fixes, thanks!
-> 
-> [1/1] KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
->        https://github.com/kvm-x86/linux/commit/2778c9a4687d
-
-Oh, I missed this!  I assume you're going to send me a pull request 
-today or tomorrow?
+On 12/19/24 03:00, Sean Christopherson wrote:
+> On Wed, Dec 18, 2024, Sean Christopherson wrote:
+>> On Wed, Dec 18, 2024, Sean Christopherson wrote:
+>>> On Wed, 27 Nov 2024 16:55:31 -0800, Sean Christopherson wrote:
+>>>> Two separate series (mmu_stress_test[1] and $ARCH[2]), posted as one to
+>>>> avoid unpleasant conflicts, and because I hope to land both in kvm/next
+>>>> shortly after 6.12-rc1 since they impact all of KVM selftests.
+>>>>
+>>>> mmu_stress_test
+>>>> ---------------
+>>>> Convert the max_guest_memory_test into a more generic mmu_stress_test.
+>>>> The basic gist of the "conversion" is to have the test do mprotect() on
+>>>> guest memory while vCPUs are accessing said memory, e.g. to verify KVM
+>>>> and mmu_notifiers are working as intended.
+>>>>
+>>>> [...]
+>>>
+>>> As I am running out of time before I disappear for two weeks, applied to:
+>>>
+>>>     https://github.com/kvm-x86/linux.git selftests_arch
+>>>
+>>> Other KVM maintainers, that branch is officially immutable.  I also pushed a tag,
+>>> kvm-selftests-arch-6.14, just in case I pull a stupid and manage to clobber the
+>>> branch.  My apologies if this causes pain.  AFAICT, there aren't any queued or
+>>> in-flight patches that git's rename magic can't automatically handle, so hopefully
+>>> this ends up being pain-free.
+>>>
+>>> Paolo, here's a pull request if you want to pull this into kvm/next long before
+>>> the 6.14 merge window.  Diff stats at the very bottom (hilariously long).
+Pulled, thanks.
 
 Paolo
 
