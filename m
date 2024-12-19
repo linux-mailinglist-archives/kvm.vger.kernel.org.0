@@ -1,258 +1,140 @@
-Return-Path: <kvm+bounces-34185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3997F9F8863
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 00:13:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 581089F886D
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 00:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AE34188952E
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 23:13:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30BC1694B2
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 23:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092961DC9B8;
-	Thu, 19 Dec 2024 23:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4BB1DC9B8;
+	Thu, 19 Dec 2024 23:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2sBXEQSz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BNl7AOgI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8021D278B
-	for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 23:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AFC1BC9E2;
+	Thu, 19 Dec 2024 23:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734649989; cv=none; b=TZ37zh1utp9gX4i0WbsRo95FMn1kHF9DeGR1n/eWyf9zpgQNgoCz71aMr/N51UNOT4IpTzFjLPLHLNBZw90n991/Z0/kAp13c8n561irF5JkIAmowdhnr1/Flr9/NJz7Sr/ts/JAbABAffaB4W/MzKljcSs/YtNNVUD1XUzUbbo=
+	t=1734650410; cv=none; b=ufbUvh4+5uIa0wSdNCWwdRKt5Tnn5Zua9kTbtEybb2wClUJJPpTrX97ZABoO+6e4DrK0lTY/C+UWdy7j5unXnwicVuS7JMPGg2hW+clXdwLg/sIP8KiRXdt3L+O4HRFLu4IX5kCvFs+lCDpYRuNUKykt86h2zARg4UizIo6se9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734649989; c=relaxed/simple;
-	bh=vfTOYxh/W8fA0AZ1VgdPTr352ErbEQpVq+gf7IEjRQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=txUh+wfXYeyIJK6F6mlIEQxZtGk8nmSRUGF1tFkKFXq0snimGO195laytk3VLyz1rp2g4nKujf6hyOvsPg4yphB9zo5I3w0pBzin0G0sGx0GtIYOu2fq061PvhJUazcQyifH0IBEATC+ZNdb6NZW2NZb905Ux1LLc9+iLUV4P4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2sBXEQSz; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9e8522445dso264149566b.1
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 15:13:06 -0800 (PST)
+	s=arc-20240116; t=1734650410; c=relaxed/simple;
+	bh=q8GWX1k/JqInj+D9puv5zulzbKpKHFJrsUcxLaO3tnM=;
+	h=Subject:Date:From:To:CC:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JWQiTZJei0hDyTLutclYYK6yRwXe1ARp+KPfET5d+hKE5hMCu7tWN1MRJ+iU12OS+mk0w1awhJedkh3OMNQrwxcws0LkS+RPJn7fTg/35JQYldRwuxvcxnQInrUlnJlIvV3lW7L2GlhVBBBL70U1sWenE2g4iXkf3galhGXbzAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BNl7AOgI; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734649985; x=1735254785; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mD4Thd4KkzdBJGBYH3K6zTCq+7QOeoHZ6dpA6P0m5yE=;
-        b=2sBXEQSzkxwuuzbJJeJ9yEuAoHjPKcgmEW1neHGsAG2gi+tcr4kwD7bjgy+cXOgn5m
-         liU13Q5WzX0S+rs4bS4I7PSzefTtraxTTH0qttxou7ot4xGjcIksnzFaBXryXNS/aQ1U
-         g9NBaxZoVawvHlnw/+guvKWMyk1FtSHhjdjWNexCTHfwk4fb7++uVw+Wk3YYkaWijgb3
-         MO2DJkUEnuH07XvqLJ4/Jmo4vx23vp2LBeTG3SLWFeqTww7eUsKij7vnurHACrKMDnuw
-         D69kunSMdxE9MUxG+50Lhe9eR0l0rEnMdlVWn4CZilKaZXXT0SiEiEoikPlnjpt7B2KW
-         0QMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734649985; x=1735254785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mD4Thd4KkzdBJGBYH3K6zTCq+7QOeoHZ6dpA6P0m5yE=;
-        b=v0ymp4XR/VUsojtjpOb4EMwe2wfAAPXC8DWsam4twjc0VIZgrZfDzWzxCNtFA/l3Df
-         uLXRbsxPuC0gT2SUCGN5UVQKOtJe1C2zI4PqhvFCcmICjxCr+cy4SPDF/ov4CeOYSkdN
-         o+uXlfTGLbf0rpseAofZEAa0VVFm5Q5ZM5o8kXZfBdqicUZ2qJoq5JhkZ4gBeoFp2kNk
-         IIwXGja19ujPukmItdMMe0LOlTB0+tycdHDNYrAQNpDR/wJf8fprM7dvRewT64cW5tbg
-         KUh2WUVc3RnTMY9j82Hf6el4cc0pxcaS2lhrOD+f17yuC2hdFIdleFMbBj//vxAt31qa
-         Cd1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXMSBJkINv1/6WerBLYPqh4TPHt8xUwOaNL5aItqLvjMOkWlFZZdgntJ8F75Kwsn0gPb34=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgCF4rOBRlyfGGUMMMieDboxkVyQ/IvPPqUdGqrqMhPs6ciSCc
-	lOe3Lk9PGtBTluNd8RradjunTOCUx6Ry22RTyf5bIBDMNdDT4AccQf2qlQ5MNtBefZLUXrcTXzy
-	+0spIxQGsQKc1iPP9AFfp0HAlZDu2FLsVLlik
-X-Gm-Gg: ASbGncu//55BlByb+Yt0+0J2eZ8UhKOLwBdmyeWWWGcr8zW5pV9e/rYEYK0R+1hqbVO
-	9fNon3YURPiOK9KDp0c8hcNO2r0TdWqsSIRg9tmzp9yOvVuVUuHEZDP/TgBOGdRo=
-X-Google-Smtp-Source: AGHT+IGAap4dLIZqyAkAJDuWCVAogXcnseA3ZJrMdxYOYUi/GG/q1lfxHW3tUgVkG41qVSJO7JW5GjpL+2yAH21h7CY=
-X-Received: by 2002:a17:907:3607:b0:aa6:88f5:5fef with SMTP id
- a640c23a62f3a-aac2c9948d6mr45830866b.32.1734649985445; Thu, 19 Dec 2024
- 15:13:05 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1734650408; x=1766186408;
+  h=date:from:to:cc:message-id:references:mime-version:
+   in-reply-to:subject;
+  bh=ylam2A8WL6Y39bN1NcplgYgTXD/E8crnsGDHgkTN84o=;
+  b=BNl7AOgI52CGWYixPSwRAII+moJQ7ZNqJ2y5xpAXI/ghYUU5KOxmK4UZ
+   ti+s1dbryP0+CdNS1g/FJcGRI1AfaVnKfVBuOKH9tPAnTeK4R4L5vhRHf
+   zPkRaQ68QreK7W+EGmMiuSpc9hMsmqFCeAVSFabx2QY+AFxlpeFMcduTa
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.12,249,1728950400"; 
+   d="scan'208";a="50842765"
+Subject: Re: [PATCH v3 0/7] Enhance event delivery error handling
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2024 23:20:05 +0000
+Received: from EX19MTAUEC001.ant.amazon.com [10.0.0.204:48486]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.15.239:2525] with esmtp (Farcaster)
+ id fba20d9f-9d29-4652-a9e3-5c8b998f5a39; Thu, 19 Dec 2024 23:20:05 +0000 (UTC)
+X-Farcaster-Flow-ID: fba20d9f-9d29-4652-a9e3-5c8b998f5a39
+Received: from EX19D008UEC001.ant.amazon.com (10.252.135.232) by
+ EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 19 Dec 2024 23:19:56 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D008UEC001.ant.amazon.com (10.252.135.232) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 19 Dec 2024 23:19:56 +0000
+Received: from email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com
+ (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Thu, 19 Dec 2024 23:19:56 +0000
+Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
+	by email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com (Postfix) with ESMTP id 78FFB40593;
+	Thu, 19 Dec 2024 23:19:56 +0000 (UTC)
+Received: by dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (Postfix, from userid 29210185)
+	id 35D194F9A; Thu, 19 Dec 2024 23:19:56 +0000 (UTC)
+Date: Thu, 19 Dec 2024 23:19:56 +0000
+From: Ivan Orlov <iorlov@amazon.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <bp@alien8.de>, <dave.hansen@linux.intel.com>, <mingo@redhat.com>,
+	<pbonzini@redhat.com>, <shuah@kernel.org>, <tglx@linutronix.de>,
+	<hpa@zytor.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <x86@kernel.org>, <dwmw@amazon.co.uk>,
+	<pdurrant@amazon.co.uk>, <jalliste@amazon.co.uk>
+Message-ID: <20241219231956.GA75820@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
+References: <20241217181458.68690-1-iorlov@amazon.com>
+ <173457555486.3295983.11848882309599168611.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1734392473.git.ashish.kalra@amd.com> <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
- <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com> <Z2HvJESqpc7Gd-dG@google.com>
- <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com> <Z2MeN9z69ul3oGiN@google.com>
- <3ef3f54c-c55f-482d-9c1f-0d40508e2002@amd.com> <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
-In-Reply-To: <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Thu, 19 Dec 2024 15:12:54 -0800
-X-Gm-Features: AbW1kvZoEAvkgy4KZcubE0kRWNzUwRqTCGcArrMk-RXVnif4_hRKzZpl9mHjKHc
-Message-ID: <CAAH4kHYE6WQ3NXm9iwcf1FJo8SioZCU7iyU6=9omQ8YQb+czCA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <173457555486.3295983.11848882309599168611.b4-ty@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Thu, Dec 19, 2024 at 2:04=E2=80=AFPM Kalra, Ashish <ashish.kalra@amd.com=
-> wrote:
->
->
->
-> On 12/18/2024 7:11 PM, Kalra, Ashish wrote:
+On Wed, Dec 18, 2024 at 06:40:46PM -0800, Sean Christopherson wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+> 
+> 
+> 
+> On Tue, 17 Dec 2024 18:14:51 +0000, Ivan Orlov wrote:
+> > Currently, the unhandleable vectoring (e.g. when guest accesses MMIO
+> > during vectoring) is handled differently on VMX and SVM: on VMX KVM
+> > returns internal error, when SVM goes into infinite loop trying to
+> > deliver an event again and again.
 > >
-> > On 12/18/2024 1:10 PM, Sean Christopherson wrote:
-> >> On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >>> On 12/17/2024 3:37 PM, Sean Christopherson wrote:
-> >>>> On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >>>>> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
-> >>>>>> On Mon, Dec 16, 2024 at 3:57=E2=80=AFPM Ashish Kalra <Ashish.Kalra=
-@amd.com> wrote:
-> >>>>>>>
-> >>>>>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>>>>
-> >>>>>>> The on-demand SEV initialization support requires a fix in QEMU t=
-o
-> >>>>>>> remove check for SEV initialization to be done prior to launching
-> >>>>>>> SEV/SEV-ES VMs.
-> >>>>>>> NOTE: With the above fix for QEMU, older QEMU versions will be br=
-oken
-> >>>>>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KV=
-M as
-> >>>>>>> older QEMU versions require SEV initialization to be done before
-> >>>>>>> launching SEV/SEV-ES VMs.
-> >>>>>>>
-> >>>>>>
-> >>>>>> I don't think this is okay. I think you need to introduce a KVM
-> >>>>>> capability to switch over to the new way of initializing SEV VMs a=
-nd
-> >>>>>> deprecate the old way so it doesn't need to be supported for any n=
-ew
-> >>>>>> additions to the interface.
-> >>>>>>
-> >>>>>
-> >>>>> But that means KVM will need to support both mechanisms of doing SE=
-V
-> >>>>> initialization - during KVM module load time and the deferred/lazy
-> >>>>> (on-demand) SEV INIT during VM launch.
-> >>>>
-> >>>> What's the QEMU change?  Dionna is right, we can't break userspace, =
-but maybe
-> >>>> there's an alternative to supporting both models.
-> >>>
-> >>> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via=
- PSP
-> >>> driver ioctl to check if SEV is in INIT state)
-> >>>
-> >>> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> >>> index 1a4eb1ada6..4fa8665395 100644
-> >>> --- a/target/i386/sev.c
-> >>> +++ b/target/i386/sev.c
-> >>> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGue=
-stSupport *cgs, Error **errp)
-> >>>          }
-> >>>      }
-> >>>
-> >>> -    if (sev_es_enabled() && !sev_snp_enabled()) {
-> >>> -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-> >>> -            error_setg(errp, "%s: guest policy requires SEV-ES, but =
-"
-> >>> -                         "host SEV-ES support unavailable",
-> >>> -                         __func__);
-> >>> -            return -1;
-> >>> -        }
-> >>> -    }
-> >>
-> >> Aside from breaking userspace, removing a sanity check is not a "fix".
+> > This patch series eliminates this difference by returning a KVM internal
+> > error when KVM can't emulate during vectoring for both VMX and SVM.
 > >
-> > Actually this sanity check is not really required, if SEV INIT is not d=
-one before
-> > launching a SEV/SEV-ES VM, then LAUNCH_START will fail with invalid pla=
-tform state
-> > error as below:
-> >
-> > ...
-> > qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=3D1 fw_error=3D1=
- 'Platform state is invalid'
-> > ...
-> >
-> > So we can safely remove this check without causing a SEV/SEV-ES VM to b=
-low up or something.
-> >
-> >>
-> >> Can't we simply have the kernel do __sev_platform_init_locked() on-dem=
-and for
-> >> SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initi=
-alization
-> >> until it's necessary so that userspace can do firmware updates.  And i=
-t's quite
-> >> clearly necessary in this case, so...
-> >
-> > I don't think we want to do that, probably want to return "raw" status =
-back to userspace,
-> > if SEV INIT has not been done we probably need to return back that stat=
-us, otherwise
-> > it may break some other userspace tool.
-> >
-> > Now, looking at this qemu check we will always have issues launching SE=
-V/SEV-ES VMs
-> > with SEV INIT on demand as this check enforces SEV INIT to be done befo=
-re launching
-> > the VMs. And then this causes issues with SEV firmware hotloading as th=
-e check
-> > enforces SEV INIT before launching VMs and once SEV INIT is done we can=
-'t do
-> > firmware  hotloading.
-> >
-> > But, i believe there is another alternative approach :
-> >
-> > - PSP driver can call SEV Shutdown right before calling DLFW_EX and the=
-n do
-> > a SEV INIT after successful DLFW_EX, in other words, we wrap DLFW_EX wi=
-th
-> > SEV_SHUTDOWN prior to it and SEV INIT post it. This approach will also =
-allow
-> > us to do both SNP and SEV INIT at KVM module load time, there is no nee=
-d to
-> > do SEV INIT lazily or on demand before SEV/SEV-ES VM launch.
-> >
-> > This approach should work without any changes in qemu and also allow
-> > SEV firmware hotloading without having any concerns about SEV INIT stat=
-e.
-> >
->
-> And to add here that SEV Shutdown will succeed with active SEV and SNP gu=
-ests.
->
-> SEV Shutdown (internally) marks all SEV asids as invalid and decommission=
- all
-> SEV guests and does not affect SNP guests.
->
-> So any active SEV guests will be implicitly shutdown and SNP guests will =
-not be
-> affected after SEV Shutdown right before doing SEV firmware hotloading an=
-d
-> calling DLFW_EX command.
->
+> > [...]
+> 
+> Applied to kvm-x86 misc, thanks!  If you get a chance, please double check that
+> I didn't fat-finger anything.
+> 
+> [1/7] KVM: x86: Add function for vectoring error generation
+>       https://github.com/kvm-x86/linux/commit/11c98fa07a79
+> [2/7] KVM: x86: Add emulation status for unhandleable vectoring
+>       https://github.com/kvm-x86/linux/commit/5c9cfc486636
+> [3/7] KVM: x86: Unprotect & retry before unhandleable vectoring check
+>       https://github.com/kvm-x86/linux/commit/704fc6021b9e
+> [4/7] KVM: VMX: Handle vectoring error in check_emulate_instruction
+>       https://github.com/kvm-x86/linux/commit/47ef3ef843c0
+> [5/7] KVM: SVM: Handle vectoring error in check_emulate_instruction
+>       https://github.com/kvm-x86/linux/commit/7bd7ff99110a
+> [6/7] selftests: KVM: extract lidt into helper function
+>       https://github.com/kvm-x86/linux/commit/4e9427aeb957
+> [7/7] selftests: KVM: Add test case for MMIO during vectoring
+>       https://github.com/kvm-x86/linux/commit/62e41f6b4f36
+> 
+> --
+> https://github.com/kvm-x86/linux/tree/next
 
-Please don't implicitly shut down VMs. At least have a safe and unsafe
-option for dlfw_ex where the default is to not destroy active
-workloads.
-That's why the 2022 patch series for Intel SGX EUPDATESVN on microcode
-hotload was shot down.
-It's very rude to destroy running workloads because a system update
-was scheduled.
+Hi Sean,
 
-> It should be fine to expect that there are no active SEV guests or any ac=
-tive
-> SEV guests will be shutdown as part of SEV firmware hotloading while keep=
-ing
-> SNP guests running.
->
-> Thanks,
-> Ashish
+The commits (and the messages specifically) look good to me, thanks a
+lot for making the changelogs better! :)
 
+Also, I ran the selftests for the `next` branch on both Intel and AMD
+platforms, and all of them seem to pass.
 
-
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
+--
+Kind regards,
+Ivan Orlov
 
