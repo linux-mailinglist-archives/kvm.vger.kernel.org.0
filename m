@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-34136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA8059F791E
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 11:03:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF609F791F
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 11:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07C5216D5C3
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 10:02:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BB5216E09E
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2024 10:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6064322256E;
-	Thu, 19 Dec 2024 10:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4AA422258E;
+	Thu, 19 Dec 2024 10:02:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC97222568;
-	Thu, 19 Dec 2024 10:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBF6221DB1;
+	Thu, 19 Dec 2024 10:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734602513; cv=none; b=jR2a17uRHwA6paX3C0yA/v1R+lnPgsQn/Mqd4ikCh4dqeXLNUceV8GvtA0RKRy2Ipp0vbiBr7WZSbTmozL4nrENkQivtoLev3LTsu+zFIzuiHCdkqHttQ8VILpGAZsvrMmbZK7LWV2dVEq33L0Gp5fSfQKQcKVx800F3IeQ1iic=
+	t=1734602530; cv=none; b=u46NajBzSDLOQ3qRKU4uHUuVN7mPP2a9xiuaStwaU/7PsdqUcAK3XLNs5X7PDgF38cM6+vFgNTiVyWDDD+I0eaxuhyfmNk/0EhauOwf+iwqbDGKK4bg1hBfhWJ2YRXxFkVm9QC7BHjMxHh5W3/mLtpQPZS+FMozNbCdzL8wrHzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734602513; c=relaxed/simple;
-	bh=jZIQujhrzpF88cFsNA5aYOgOk/UYFHiZiyKbJpaLwsU=;
+	s=arc-20240116; t=1734602530; c=relaxed/simple;
+	bh=ofxL27DVbZHsz37vNL6uYIhVtWYLNzPsb3/EqgL/2hY=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=T13UI2sab3n7j1ixyJ8or+X8N7fTyzUDzXm6REoP7WZtrwdg6e7gumyK+Q8JR3jmb+zti3DwIT6LsezQVTJ8vDlsSDZUrROUEPEIiO5jlwZudG7qSPK4KcE99LpPMqlakRgiPM9iyddGllrImhqN7V2SHt/an9NSaVqN6DMEhy0=
+	 Content-Type:MIME-Version; b=UaHpDRjI0wgQePwUz6q05EN1xFwVCtKXq4DBsZQuId9mfwVpk6eHyqZbvR6BFvbaVek9D+Iaf2shqAv2C6nIngesEaWef5LTD+0nmASMaSOs+RRPcf4wI9zVSuc1URNaT6soJq+BpDfSndElHvnZSVGUQOM6Xxl33zT6MieZrGM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YDQwM5LKHz6HJgC;
-	Thu, 19 Dec 2024 17:58:11 +0800 (CST)
-Received: from frapeml100008.china.huawei.com (unknown [7.182.85.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0FB24140133;
-	Thu, 19 Dec 2024 18:01:50 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YDQzb3gCrz6LDFf;
+	Thu, 19 Dec 2024 18:00:59 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9F0D01400D4;
+	Thu, 19 Dec 2024 18:02:05 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100008.china.huawei.com (7.182.85.131) with Microsoft SMTP Server
+ frapeml500005.china.huawei.com (7.182.85.13) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 19 Dec 2024 11:01:49 +0100
+ 15.1.2507.39; Thu, 19 Dec 2024 11:02:05 +0100
 Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
  frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Thu, 19 Dec 2024 11:01:49 +0100
+ Thu, 19 Dec 2024 11:02:05 +0100
 From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
 	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, "Jonathan
@@ -49,16 +49,16 @@ To: liulongfang <liulongfang@huawei.com>, "alex.williamson@redhat.com"
 CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v2 4/5] hisi_acc_vfio_pci: bugfix the problem of
- uninstalling driver
-Thread-Topic: [PATCH v2 4/5] hisi_acc_vfio_pci: bugfix the problem of
- uninstalling driver
-Thread-Index: AQHbUfdXF9fcgrR0EEaxzuZgh8D7aLLtUWHA
-Date: Thu, 19 Dec 2024 10:01:49 +0000
-Message-ID: <743007b791a34489b34d78328e895062@huawei.com>
+Subject: RE: [PATCH v2 5/5] hisi_acc_vfio_pci: bugfix live migration function
+ without VF device driver
+Thread-Topic: [PATCH v2 5/5] hisi_acc_vfio_pci: bugfix live migration function
+ without VF device driver
+Thread-Index: AQHbUfdpaoWs/QPcLkOOam77+OpMRbLtUYjQ
+Date: Thu, 19 Dec 2024 10:02:05 +0000
+Message-ID: <a39f57190a46497e816eefa6b649b583@huawei.com>
 References: <20241219091800.41462-1-liulongfang@huawei.com>
- <20241219091800.41462-5-liulongfang@huawei.com>
-In-Reply-To: <20241219091800.41462-5-liulongfang@huawei.com>
+ <20241219091800.41462-6-liulongfang@huawei.com>
+In-Reply-To: <20241219091800.41462-6-liulongfang@huawei.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -82,45 +82,76 @@ MIME-Version: 1.0
 > <jonathan.cameron@huawei.com>
 > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
 > linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
-> Subject: [PATCH v2 4/5] hisi_acc_vfio_pci: bugfix the problem of uninstal=
-ling
-> driver
+> Subject: [PATCH v2 5/5] hisi_acc_vfio_pci: bugfix live migration function
+> without VF device driver
 >=20
-> In a live migration scenario. If the number of VFs at the destination is
-> greater than the source, the recovery operation will fail and qemu will n=
-ot
-> be able to complete the process and exit after shutting down the device F=
-D.
+> If the driver of the VF device is not loaded in the Guest OS,
+> then perform device data migration. The migrated data address will
+> be NULL.
+> The live migration recovery operation on the destination side will
+> access a null address value, which will cause access errors.
 >=20
-> This will cause the driver to be unable to be unloaded normally due to
-> abnormal reference counting of the live migration driver caused by the
-> abnormal closing operation of fd.
+> Therefore, live migration of VMs without added VF device drivers
+> does not require device data migration.
+> In addition, when the queue address data obtained by the destination
+> is empty, device queue recovery processing will not be performed.
 >=20
-> Fixes:b0eed085903e("hisi_acc_vfio_pci: Add support for VFIO live
-> migration")
 > Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+
+Why this doesn't need a Fixes tag?
+
 > ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >=20
 > diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
 > b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index c057c0e24693..8d9e07ebf4fd 100644
+> index 8d9e07ebf4fd..9a5f7e9bc695 100644
 > --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
 > +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1501,6 +1501,7 @@ static void hisi_acc_vfio_pci_close_device(struct
-> vfio_device *core_vdev)
->  	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> hisi_acc_get_vf_dev(core_vdev);
->  	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
+> @@ -436,6 +436,7 @@ static int vf_qm_get_match_data(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev,
+>  				struct acc_vf_data *vf_data)
+>  {
+>  	struct hisi_qm *pf_qm =3D hisi_acc_vdev->pf_qm;
+> +	struct hisi_qm *vf_qm =3D &hisi_acc_vdev->vf_qm;
+>  	struct device *dev =3D &pf_qm->pdev->dev;
+>  	int vf_id =3D hisi_acc_vdev->vf_id;
+>  	int ret;
+> @@ -460,6 +461,13 @@ static int vf_qm_get_match_data(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return ret;
+>  	}
 >=20
-> +	hisi_acc_vf_disable_fds(hisi_acc_vdev);
->  	mutex_lock(&hisi_acc_vdev->open_mutex);
->  	hisi_acc_vdev->dev_opened =3D false;
->  	iounmap(vf_qm->io_base);
+> +	/* Get VF driver insmod state */
+> +	ret =3D qm_read_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state,
+> 1);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_VF_STATE!\n");
+> +		return ret;
+> +	}
+> +
+>  	return 0;
+>  }
+>=20
+> @@ -499,6 +507,12 @@ static int vf_qm_load_data(struct
+> hisi_acc_vf_core_device *hisi_acc_vdev,
+>  	qm->qp_base =3D vf_data->qp_base;
+>  	qm->qp_num =3D vf_data->qp_num;
+>=20
+> +	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
+> +	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
+> +		dev_err(dev, "resume dma addr is NULL!\n");
+> +		return -EINVAL;
+> +	}
+> +
 
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+So this is to cover the corner case where the Guest has loaded the driver
+(QM_READY set) but not configured the DMA address? When this will happen?
+I thought we are setting QM_READY in guest after all configurations.
 
 Thanks,
 Shameer
+
+
 
