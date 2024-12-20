@@ -1,220 +1,212 @@
-Return-Path: <kvm+bounces-34207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34212-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6339F8E32
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 09:50:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1679F8FD3
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 11:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1830316C3B1
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 08:50:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4106A7A2C42
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 10:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D331A840D;
-	Fri, 20 Dec 2024 08:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85A71C5486;
+	Fri, 20 Dec 2024 10:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNtUwniK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RF1xPt/K"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498F31A3A8A
-	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 08:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734684614; cv=none; b=KKWHwBivHT1dbO4G8G4QfSsZBEsjSaKJqeM9Wcig3yls9t311lxdTiDAzroph/9J9WwCeCBtqkA6UHCsJ6pFEs1THE5pbefE8G4gyy80neRwBK5kRDBdL2ckj0N1msJRveqFbI6RSfow4buMV7+aK8An48LN47MXgKf3zcIoHdM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734684614; c=relaxed/simple;
-	bh=rNRZpmgraUANDH2jZ6sUmUZn3g5rRxPqAWkAjC2sBmE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qe+ARc7H9R/MsIPhRpit8+a1QjL9wDjjPAHxeYZ5wlgh7gk8l+xksE6luRsP0hGSid8z9QBzXpP2u2+n8uAQRzth+mxfrraiqpCsW0xrglNBOITX90RiR/FnKtfpm8yAjU9fTt/UAsxO8zDso5nEGNXHTV2RMWKBC9HTqKk0cjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KNtUwniK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734684610;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4MakEP/4RexV/dDE7ZdqDPKSl2XmZLeyzYBNKEexLSo=;
-	b=KNtUwniK/1+YGU2Rm2eCJX8sJBiKyrIfmUXzxevkE1o2SPJzU9fo0jMYnqEhTo0vZTZfio
-	7qri+93KXw7pLU4meohvAI3oauqSS2Vcap7M5iR/aw229EM/06wMFPnu2m4lyavoIL0ORB
-	smNqwefPT+G8yWeYGmnWCFB1TcqTykE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-cCkXZFqqM1SD8GX2JakT2Q-1; Fri,
- 20 Dec 2024 03:50:07 -0500
-X-MC-Unique: cCkXZFqqM1SD8GX2JakT2Q-1
-X-Mimecast-MFC-AGG-ID: cCkXZFqqM1SD8GX2JakT2Q
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5CE61956072;
-	Fri, 20 Dec 2024 08:50:03 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.4])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6885A1956096;
-	Fri, 20 Dec 2024 08:49:57 +0000 (UTC)
-Date: Fri, 20 Dec 2024 08:49:54 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	thomas.lendacky@amd.com, john.allen@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	michael.roth@amd.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
-Message-ID: <Z2UvlXeG6Iqd9eFQ@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1734392473.git.ashish.kalra@amd.com>
- <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
- <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com>
- <Z2HvJESqpc7Gd-dG@google.com>
- <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
- <Z2MeN9z69ul3oGiN@google.com>
- <3ef3f54c-c55f-482d-9c1f-0d40508e2002@amd.com>
- <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1A91C463F;
+	Fri, 20 Dec 2024 10:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734689225; cv=fail; b=hMMo3OANquU4qcIRc0WPn931P4lhZsFnLByF/kd9bsZZjp+YEGOq38cO3NfpO5mvFu/w4VB+nlveVHhdIum1UhWpV/z0h3gE7aTtzsizwIwx11+Hqf8GSHS1SNSsf2d02nO4Im6sBwHXj3gvigZZnBqGmc1/qZPRSdWzgejI6mg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734689225; c=relaxed/simple;
+	bh=akt3I8GrW5nVcAl0vOcCtRJCyEEV9ZInakHvKWbMnAU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dXxEMV83rV/0euG4Q2OPrL+mR8NygSH3aYeSHJvwm6w7ugkWPn7SkLFMNVzMEZPEVz2QSb+Wac4CGIwo6xLGb5var298V8+gvR+vAnxpYvT3Awe0aZXxulKHtni/WxNEBAro1k0bI9LMqO6w44MaMeWfk9kGP7b6TRchswX+OLA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RF1xPt/K; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734689223; x=1766225223;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=akt3I8GrW5nVcAl0vOcCtRJCyEEV9ZInakHvKWbMnAU=;
+  b=RF1xPt/KwRAe1gi4VW/ks2HHHD2ksTjg8eg96GnJsG+KA2Gn65J1CJHe
+   TDwfB1tDkMH/7AjHCjkuJmQQwLZvtfJhHelTcexm3LEYyDHgDRYdh/YeM
+   fCn7G+tKl6N6y1DrdkimHl2kh1poK/9eci6rCspxgjAX8nqwEiMRGc4xD
+   yYE3kBi0XL6XhK8keB3LedzB10jZoXw9eXB3UwZu09dITYOXGUfvXYBCX
+   5CKG5nMjOYHXnIjxWnCx16YiI8VzDwOFLhVll/uoPE3f7929a5GAFPmZ8
+   YVxRaoFlmGpeGUsWo8capjwTWZSEi/8sSAz/vZeLdnXlynM5VSi9O/zoa
+   A==;
+X-CSE-ConnectionGUID: kfZ6evEHQLSYbUgYk6aeIg==
+X-CSE-MsgGUID: 8qB0OC6dT3S6S8tkekJIGQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11291"; a="39017442"
+X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
+   d="scan'208";a="39017442"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 02:07:02 -0800
+X-CSE-ConnectionGUID: JqWRDiYNQO25h/J1RwG6zQ==
+X-CSE-MsgGUID: Zasr/cgMQuG00b+l9DTklg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="103457930"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Dec 2024 02:07:02 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 20 Dec 2024 02:07:02 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Fri, 20 Dec 2024 02:07:02 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 20 Dec 2024 02:07:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=suhZQ4K+F3Tqo07r8bOc17MDvybJwx3O3XN6hCTKpGRTk55jJ/bg8XQ/TKZcJPa9vbIb6ofwr60WoRF1hHk0tczM3gJql8+rktVKwZpWSqbte3gziGYgSv7wA/FfYAZ8QlV3L/f8oKibxKFg9qeQScA+4rmCGt2ZR2lcaCjmdR7t6TyAaVOsqyWqcwwlK/99BYRIn3V8JFk1nbcBVlQZ6yUNvzhhEdeRuJN1vTVrvDTtOi/KFPUVNvkor/c3jA4Ooxe90yC6jRpNK4MKMB95ZnnR4tOT3X8vkI5QK8vtqR4b/5LoBoz8B4GyFY2ydFs4NTJUPXJq6k10Gv+fUkf9WQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mclQDGzDkAusJl/espMVRC+PjL5bENDJyjBluNrmtVk=;
+ b=HHuWy54NavrYvD3xRN3WLkJsCN/nEiYNqmtH8e8e0qrNul9qg8hd7DYVT00SbJ5JaJ/X3SVUEyyamOEB8mHzOdKRe+k3r4nywn/9SpRmEaGbdcbMlnJK+J7lg4xRID2dixymDOYy330U+1B3aR8u1tbr5rL5hX86ymbBgSuK7JFEv5DoRoGV0SWcbKwgZpf1QqC2JxwUntVFyfOniQEgzdZgRW42TcmG4fUzsKCS3BOQ3QWSiP6YmGFlemYN3H3088TliNiopx/Gxci87cn1PuBihIWvaw79Vppk3K5sCiG0jEdU2dR2/kctDp33FpYBGuvXBPAOMHYGaT8+wdqqlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ SN7PR11MB6948.namprd11.prod.outlook.com (2603:10b6:806:2ab::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.13; Fri, 20 Dec
+ 2024 10:06:33 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%7]) with mapi id 15.20.8272.005; Fri, 20 Dec 2024
+ 10:06:32 +0000
+Date: Fri, 20 Dec 2024 17:32:13 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v5 00/18] TDX MMU prep series part 1
+Message-ID: <Z2U5nR9/w7baSAKp@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20241213195711.316050-1-pbonzini@redhat.com>
+ <2db0db045563378d224ac9af9c8211b8da15ec2b.camel@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <2db0db045563378d224ac9af9c8211b8da15ec2b.camel@intel.com>
+X-ClientProxiedBy: SG2PR01CA0173.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::29) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SN7PR11MB6948:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32f5c53a-f32d-49be-edd5-08dd20ddfb06
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?AtQL88IxDzSr7MaQ51S+koNNxiWLAULCnnnnIBjnnBuLReEdKC0VtPCNW/fb?=
+ =?us-ascii?Q?BmxvaZwflZv+QL+I/JrtzEwsHzeKiF+tgtTOGXLCMd/pBv517gy1JiAjywNw?=
+ =?us-ascii?Q?b7tmqwKUYF96TFxxVMY1iCxhioJOIMWZE84TEXl9dDFZikPXyTn8mtNXVu77?=
+ =?us-ascii?Q?lgZ3xMgHpCSuhHWEGsRbMuWj51qGAfVJ01mVedid5flHJp/JsoIFOoz13lNQ?=
+ =?us-ascii?Q?H4lHQZwy1j0qMAtFzKfeFpSQd6Ei08hY82tPDFCBhFY1DIHuqS7Q5ccZDLDN?=
+ =?us-ascii?Q?AgyKf/cjt1UCIraum1fF+WDcIuTYMNAhhc6bmipwLUkS6fblPX426ugZpsmb?=
+ =?us-ascii?Q?wA+p4CW8F0Lqvd6gH1g/OWjGc2HmQsQJDxgDnr85+HS4jEsDgLhYhQmp/prG?=
+ =?us-ascii?Q?3g9eBprwmmDrts2VH4xO2dkx/fGlkPx2/RftxwZs1wdM9+p5nZMUGwUQiuQf?=
+ =?us-ascii?Q?6QfLzdakckpQLTr8Lzv7fFDN6UPEU8iTfo0EtVwZZ+K/nebO2sH1AiSW0ZKJ?=
+ =?us-ascii?Q?Et5dp199FcV41zyWgfbUOfZBOhPFT/iaULcTNBqvLtSk/nsrKLxpum9llniI?=
+ =?us-ascii?Q?KLalEbCfIZRxeNGKz5Gue8k2Mv3IlNgUWfA00XFw+mPt7Vuk3H+x2hf0vaer?=
+ =?us-ascii?Q?7ufu6UggPfYZGmAG1nVCOaHFUln+jP1s4Xj5IAj1NIi8is0IbveiHHkHj3ID?=
+ =?us-ascii?Q?b4hMvovnIhC2NrlQ8xLaQhRHpi9jNAtxmAZtReQWraYDfZum/qRPFsU9ftU7?=
+ =?us-ascii?Q?rwaU8o+4ZeJvFpcVd7ghjxCB+Go4xYNZsihtzioxHVjpvxUwQpIQJq6xW06j?=
+ =?us-ascii?Q?gBQ6v+WvlaJa46tv0hbz4D0ecihWVolyAJ0psOgrtQQ39gMF8xSkXVpvDcKA?=
+ =?us-ascii?Q?0blngFSdxGlyp8Dbvqgel2SVDKzkfX8tcrop/Fv7QpsQOIDwpn6aLjBW0EHY?=
+ =?us-ascii?Q?qK2OheoHx/86v9t6uJIpkXUJDD/Vr1rM200V0K6gBMNiOVvOA6vUGB7ioson?=
+ =?us-ascii?Q?lDJDoT9b0GkSP9RX6bd6RGXIznIw7qnoNT+ItWMOyITXoxFw2VBF5MxOq/Kr?=
+ =?us-ascii?Q?oc8d1FQxhPdYYWko6aG+LiPzzsvkMGOKrWc4glzA18mq4d97Gq8bo0HIQsGD?=
+ =?us-ascii?Q?At+5+ubEhEXnipKKXr7i8FcfMSoHxNdwDqAqvxWVjaZWj0aOkcZt0BgvafUG?=
+ =?us-ascii?Q?sc1RwQ8O7ipQIalyYnb9juLXwt3dsAO6SI0jkuZh0BFzCfkJNSkr+Hw9eGql?=
+ =?us-ascii?Q?0WXZzQvcHISBwet8gEWqYTMHlHOk3jHY44F47EEj3xBLJ9oihxUyWCEH2KWx?=
+ =?us-ascii?Q?krV6E5YlT9ZF2rnlltK2dpJJqmZ1CkvFJzrceBVMOsLCbA=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Xn/rsoXoCt56ieFQdTCLc7ypOjyx2p/LK4KHP4SChPivsU+CuGJq3efhAv0Q?=
+ =?us-ascii?Q?ENgnH0XBadJYre/8fj6BW5l2Wq8otjsWUYar3CPbXzInqOk5CzGwIS/thK84?=
+ =?us-ascii?Q?jC5NJcWlxZf7NVBFs7cmw0DesyR0Vusoc2K2YCpSlAhdIOuHto1+3xSvFXiU?=
+ =?us-ascii?Q?6ZylGiBXXhkWWVGQZ7juwb8MZYUYDXHfVnI/QmC32+eSz+IlxybrFBls7GPQ?=
+ =?us-ascii?Q?HJhSp5NOaAAESiDyQaRb5wRKhdtPB68AjRLBRKpBPU9aWvazMKdEEpZM0E7O?=
+ =?us-ascii?Q?BP+fcfkhGIHfwfBgOPcvCvUStAzhWc8/lKjKQTJB7e1GwGr+WbF51ln45IYh?=
+ =?us-ascii?Q?OqhfqjKvEjz0WExTROJttG7zcdNmPBYfkVeS+X5Pm+wX+8hZ+70yopsep1VS?=
+ =?us-ascii?Q?b9anlo7A7LqUx5xE8RSN0op3E2nQZ1U0G1nz9w5P88VOWPUnA0PcrXpLZ42I?=
+ =?us-ascii?Q?NqCdJknxXLXj2hy/1K7zQOBUftsFP12oGQK/YUJS4JeAJadyDArTCcWWGRFZ?=
+ =?us-ascii?Q?gJKQKihFzU9c3+6fvB1E1wH42h60ChrNrKYrIld2TequQi7R7RFk/+m0gTkM?=
+ =?us-ascii?Q?A4605az8lC5MFJcyyJHIajpRO+02l0dzT+Vgn/vQwxjuNLxv6w/7SlbQAryC?=
+ =?us-ascii?Q?vnlp/RGyCuiGiv0XqI7XScAG3ahloZE5D9N4pt8UF2tySHlJ0OACUTgOcXCd?=
+ =?us-ascii?Q?UQU6vvtP27kS/jTir5OZLNRCor5PymBqjNZAn/t8o6ytxZHstOZvjjb1yFya?=
+ =?us-ascii?Q?OZCr2y8Tw7h0gG7B0ugjzd9+KAL4VbFv7pUYTmYqNf+Ywq80cg6hJNIQoo8K?=
+ =?us-ascii?Q?e8cVxibEpdqX7Xl6OJbWJBIn/ZY5uQeYX7PJNPkbJc2b+jkkk06q4VeQLcVB?=
+ =?us-ascii?Q?1U5qa6PefK1/nOtIBqh/Gsys07OJRGP2z3eNltzQUElJHVZVb9iTEw/3n/8H?=
+ =?us-ascii?Q?e3gzMY9oOGok9xhSQlZvQwJ+HaZNKN9+IfpoUi63Vy/VgsHfQwQ/ug8aMZxg?=
+ =?us-ascii?Q?9EqfDl5vEcxH6xLWLs9QeUlxPnGiDsbw5EbsYaPDeYqHPXdJvfuKEtcD5kc6?=
+ =?us-ascii?Q?8hxq3EnhAUVxkuWK5t4pfzfmGbVcfFpw7Ykqz+bSW6jGY2EQZtlfZRQW9ZN/?=
+ =?us-ascii?Q?ybRjIQUD/jDIOZp5YoVYpm7GzUKWJyV4LjCPu/qxlYNg6CsTExU9LIYgFHbs?=
+ =?us-ascii?Q?l3AUWN/dVWKBhBm7G6TLBj3Ad0CRoyAjhPT0hIA6Q6YBfpjH6dNKSFX8oUbO?=
+ =?us-ascii?Q?bb1TiAL+cUpYjRv4m43SCUFJrJPrfhNfa4jGcdZlbNaSuYJsN0AG9Pmpbnrq?=
+ =?us-ascii?Q?OhYALB0XvvV9rip9ClLbVAWTm5XT/JJBt6N5Dvofskgt27sqb6HPmEh9c7v/?=
+ =?us-ascii?Q?dAXy4f7ihrguhBAbdswuSLk0x5pRE6a2WA/PvwXnnqUPcr8M7iwa0uHuk0tW?=
+ =?us-ascii?Q?scaiKcTE+pcskgTVBnma7soHbULAaZtqjDa5O2lzVAat7ac4mAyOF0Z6bcwb?=
+ =?us-ascii?Q?0D7GNcT2xbZ28jIy3tjthfCds3U7epwUGSJcmLRlsMztpjhf4+DEQy8TOFCB?=
+ =?us-ascii?Q?RjVzILB2uG/cReXBxv2R/99Y0Pfu+5XfVtE98sja?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32f5c53a-f32d-49be-edd5-08dd20ddfb06
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 10:06:32.8987
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kmbc+Au66G2MFbkd8kdD34zaofgXjiKJEJylLUEHi85uwpz/5NO4e367i2hH3BEOKAQEAHuy8MlZGC8YPBxjog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6948
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 19, 2024 at 04:04:45PM -0600, Kalra, Ashish wrote:
-> 
-> 
-> On 12/18/2024 7:11 PM, Kalra, Ashish wrote:
+On Wed, Dec 18, 2024 at 08:34:41AM +0800, Edgecombe, Rick P wrote:
+> On Fri, 2024-12-13 at 14:56 -0500, Paolo Bonzini wrote:
+> > Hi,
 > > 
-> > On 12/18/2024 1:10 PM, Sean Christopherson wrote:
-> >> On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >>> On 12/17/2024 3:37 PM, Sean Christopherson wrote:
-> >>>> On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >>>>> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
-> >>>>>> On Mon, Dec 16, 2024 at 3:57 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> >>>>>>>
-> >>>>>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>>>>
-> >>>>>>> The on-demand SEV initialization support requires a fix in QEMU to
-> >>>>>>> remove check for SEV initialization to be done prior to launching
-> >>>>>>> SEV/SEV-ES VMs.
-> >>>>>>> NOTE: With the above fix for QEMU, older QEMU versions will be broken
-> >>>>>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM as
-> >>>>>>> older QEMU versions require SEV initialization to be done before
-> >>>>>>> launching SEV/SEV-ES VMs.
-> >>>>>>>
-> >>>>>>
-> >>>>>> I don't think this is okay. I think you need to introduce a KVM
-> >>>>>> capability to switch over to the new way of initializing SEV VMs and
-> >>>>>> deprecate the old way so it doesn't need to be supported for any new
-> >>>>>> additions to the interface.
-> >>>>>>
-> >>>>>
-> >>>>> But that means KVM will need to support both mechanisms of doing SEV
-> >>>>> initialization - during KVM module load time and the deferred/lazy
-> >>>>> (on-demand) SEV INIT during VM launch.
-> >>>>
-> >>>> What's the QEMU change?  Dionna is right, we can't break userspace, but maybe
-> >>>> there's an alternative to supporting both models.
-> >>>
-> >>> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP
-> >>> driver ioctl to check if SEV is in INIT state)
-> >>>  
-> >>> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> >>> index 1a4eb1ada6..4fa8665395 100644
-> >>> --- a/target/i386/sev.c
-> >>> +++ b/target/i386/sev.c
-> >>> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-> >>>          }
-> >>>      }
-> >>>
-> >>> -    if (sev_es_enabled() && !sev_snp_enabled()) {
-> >>> -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-> >>> -            error_setg(errp, "%s: guest policy requires SEV-ES, but "
-> >>> -                         "host SEV-ES support unavailable",
-> >>> -                         __func__);
-> >>> -            return -1;
-> >>> -        }
-> >>> -    }
-> >>
-> >> Aside from breaking userspace, removing a sanity check is not a "fix".
-> > 
-> > Actually this sanity check is not really required, if SEV INIT is not done before 
-> > launching a SEV/SEV-ES VM, then LAUNCH_START will fail with invalid platform state
-> > error as below:
-> > 
-> > ...
-> > qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=1 fw_error=1 'Platform state is invalid'
-> > ...
-> > 
-> > So we can safely remove this check without causing a SEV/SEV-ES VM to blow up or something.
-> > 
-> >>
-> >> Can't we simply have the kernel do __sev_platform_init_locked() on-demand for
-> >> SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initialization
-> >> until it's necessary so that userspace can do firmware updates.  And it's quite
-> >> clearly necessary in this case, so...
-> > 
-> > I don't think we want to do that, probably want to return "raw" status back to userspace,
-> > if SEV INIT has not been done we probably need to return back that status, otherwise
-> > it may break some other userspace tool.
-> > 
-> > Now, looking at this qemu check we will always have issues launching SEV/SEV-ES VMs
-> > with SEV INIT on demand as this check enforces SEV INIT to be done before launching
-> > the VMs. And then this causes issues with SEV firmware hotloading as the check 
-> > enforces SEV INIT before launching VMs and once SEV INIT is done we can't do 
-> > firmware  hotloading.
-> > 
-> > But, i believe there is another alternative approach : 
-> > 
-> > - PSP driver can call SEV Shutdown right before calling DLFW_EX and then do
-> > a SEV INIT after successful DLFW_EX, in other words, we wrap DLFW_EX with 
-> > SEV_SHUTDOWN prior to it and SEV INIT post it. This approach will also allow
-> > us to do both SNP and SEV INIT at KVM module load time, there is no need to
-> > do SEV INIT lazily or on demand before SEV/SEV-ES VM launch.
-> > 
-> > This approach should work without any changes in qemu and also allow 
-> > SEV firmware hotloading without having any concerns about SEV INIT state.
-> > 
-> 
-> And to add here that SEV Shutdown will succeed with active SEV and SNP guests. 
-> 
-> SEV Shutdown (internally) marks all SEV asids as invalid and decommission all
-> SEV guests and does not affect SNP guests. 
-> 
-> So any active SEV guests will be implicitly shutdown and SNP guests will not be 
-> affected after SEV Shutdown right before doing SEV firmware hotloading and
-> calling DLFW_EX command. 
-> 
-> It should be fine to expect that there are no active SEV guests or any active
-> SEV guests will be shutdown as part of SEV firmware hotloading while keeping 
-> SNP guests running.
+> > this is the essentially final version of the TDX MMU prep series, focusing
+Except the nits, other patches look good to me.
 
-That's a pretty subtle distinction that I don't think host admins will
-be likely to either learn about or remember. IMHO if there are active
-SEV guests, the kernel should refuse the run the operation, rather
-than kill running guests. The host admin must decide whether it is
-appropriate to shutdown the guests in order to be able to run the
-upgrade.
+> > on supporting TDX's separation of EPT into a direct part (for shared pages)
+> > and a part that is managed by the TDX module and cached (into a "mirror"
+> > EPT) by KVM.
+> > 
+> > The changes from v4 (https://patchew.org/linux/20240718211230.1492011-1-rick.p.edgecombe@intel.com/)
+> > are minor:
+> 
+> Do we want to include these?
+> https://lore.kernel.org/kvm/20241115084600.12174-1-yan.y.zhao@intel.com/
+This is to have kvm_zap_gfn_range() only zap direct roots, a counterpart of the
+kvm_tdp_mmu_unmap_gfn_range() in patch 13.
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> https://lore.kernel.org/kvm/20241104084137.29855-1-yan.y.zhao@intel.com/
+This is the RCU related fixes to MMU part 1.
 
+> 
+> They still apply cleanly.
 
