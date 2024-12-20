@@ -1,193 +1,158 @@
-Return-Path: <kvm+bounces-34258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 357A89F9B1D
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 21:23:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FAFB9F9BB7
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 22:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88ED816A13B
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 20:23:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A624B188D82F
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 21:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E512236E8;
-	Fri, 20 Dec 2024 20:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="atFDGkeH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15B32248AD;
+	Fri, 20 Dec 2024 21:13:59 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from isrv.corpit.ru (isrv.corpit.ru [86.62.121.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF95221478
-	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 20:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E302236F8
+	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 21:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=86.62.121.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734726196; cv=none; b=N6wb1R2goIVXk4A4dy+vn8GYvRKF0hdjZ2Sb36S57NbE0/v4g3R5bQdphuxWdnQyXtowPI7jiRpV7JclXsxDOSVJFLtitxuah4FIsUYF4iarIJmvw/UgsJKZGKvbAuhLc1HjTarVOLbfVDMUDxmaoVhV8uVPEGBbbZHzSC8KPJo=
+	t=1734729239; cv=none; b=G4YgtHJuwKZPoF+ZbU0doqGig8aT0emerCRKrIaoadhjJwgUW7mgfvzDTduMKmKQWmEgsXS2PTklsYAy2WOZyoENmLnhBjpquGWeApEOfXDRlAA4Tyjd869C4exgVYUrJyzLusP21+JUopq+78lI9DXn45yo+wZsnZrFvTlPyFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734726196; c=relaxed/simple;
-	bh=OiEnaYKVTru9CvGb8SDnTIaGyMxvjLzhjo7l20sAJN4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=trO+Y9fpgUtwiFzjtc+ga8hIL9gZD0smhv7BdcoNAuX9mdS1nmhbn/DSGS6L8fzJ4r84K54XJrPBfIufZliRF7tKg+nzd/mhHid1OX7pht8X1+XHHNJ1xe3THu3F+6t/3PCT404wKUp6x9u2O82jycNyLMaQB5cvXNgfz494eh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=atFDGkeH; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734726195; x=1766262195;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OiEnaYKVTru9CvGb8SDnTIaGyMxvjLzhjo7l20sAJN4=;
-  b=atFDGkeHHNnoZ2v6ABiIv6DNVqeqtj7D31VsKEexTssn8ENH09CFkUZ+
-   vprIGB6ZlhmGyP4ZWyTjaOZaDSLnbRFm1Fx9it0L2UnCihOYtopP0qcnf
-   Sb1PxkzU9T4VDUbpoLg0YyfHNtrOCWwL7fbSLpA5FTd8RnXb9B/dIp7Yz
-   yo2caTcpPf7DefcPNeP9Iw4BMZh+h55e4c0+lliDJt3muPM338NiF1tP9
-   EGg4ApIlw7v/Az+i3O1f1+QltoleCjkuGEJl2YriSEwWW9uN3jhrLmW5C
-   fLP7JHbFSJsnZFJ6ZLF5nOJjdYeiu0VBacx0YEzNTLyK9KtQBlWdEPHPO
-   g==;
-X-CSE-ConnectionGUID: Oip0XtQ3Tf2Vpul6U0RRXg==
-X-CSE-MsgGUID: gfYS7rwDQ8iu3/0UXcYrRQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="39220606"
-X-IronPort-AV: E=Sophos;i="6.12,251,1728975600"; 
-   d="scan'208";a="39220606"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 12:23:14 -0800
-X-CSE-ConnectionGUID: YCDnzWfwS9qEmJAgJimJmQ==
-X-CSE-MsgGUID: RBH11xyITEi/eokTGaxxPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="99082474"
-Received: from lkp-server01.sh.intel.com (HELO a46f226878e0) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 20 Dec 2024 12:23:12 -0800
-Received: from kbuild by a46f226878e0 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tOjWf-0001eg-1g;
-	Fri, 20 Dec 2024 20:23:09 +0000
-Date: Sat, 21 Dec 2024 04:22:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yunxiang Li <Yunxiang.Li@amd.com>, kvm@vger.kernel.org,
-	alex.williamson@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kevin.tian@intel.com, yishaih@nvidia.com, ankita@nvidia.com,
-	jgg@ziepe.ca, Yunxiang Li <Yunxiang.Li@amd.com>
-Subject: Re: [PATCH 2/3] vfio/pci: refactor vfio_pci_bar_rw
-Message-ID: <202412210450.yl9DrP8o-lkp@intel.com>
-References: <20241212205050.5737-2-Yunxiang.Li@amd.com>
+	s=arc-20240116; t=1734729239; c=relaxed/simple;
+	bh=X2seDnAil9mM1c8ds0k8ERwSIaeeratkW969SSHdu3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uC5gLQg4pqziNUBho+t3X0hkP6xk803ozAv5bHWjQgLGPvkfNN8ES+ufAZ4OTv+8fbtELQN1NpGWCAx0Dzqr837f+TEu2Q1dAzCu7e9yrE0IBKxYsWHzidK30ViENYcvqi4ydsY2FLpPPhnJJ45A+q058HfX5hGmdO5BPwTH1ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru; spf=pass smtp.mailfrom=tls.msk.ru; arc=none smtp.client-ip=86.62.121.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tls.msk.ru
+Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
+	by isrv.corpit.ru (Postfix) with ESMTP id 10935C822C;
+	Sat, 21 Dec 2024 00:04:22 +0300 (MSK)
+Received: from [192.168.177.130] (mjt.wg.tls.msk.ru [192.168.177.130])
+	by tsrv.corpit.ru (Postfix) with ESMTP id 574B618C9D9;
+	Sat, 21 Dec 2024 00:04:50 +0300 (MSK)
+Message-ID: <c62b0d60-2815-41e1-9e56-7bec83640208@tls.msk.ru>
+Date: Sat, 21 Dec 2024 00:04:50 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212205050.5737-2-Yunxiang.Li@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/11 for v9.2?] i386/cpu: Mark avx10_version filtered
+ when prefix is NULL
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Tao Su <tao1.su@linux.intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
+ Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ qemu-stable@nongnu.org
+References: <20241106030728.553238-1-zhao1.liu@intel.com>
+ <20241106030728.553238-2-zhao1.liu@intel.com>
+Content-Language: en-US, ru-RU
+From: Michael Tokarev <mjt@tls.msk.ru>
+Autocrypt: addr=mjt@tls.msk.ru; keydata=
+ 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
+In-Reply-To: <20241106030728.553238-2-zhao1.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Yunxiang,
+06.11.2024 06:07, Zhao Liu wrote:
+> In x86_cpu_filter_features(), if host doesn't support AVX10, the
+> configured avx10_version should be marked as filtered regardless of
+> whether prefix is NULL or not.
+> 
+> Check prefix before warn_report() instead of checking for
+> have_filtered_features.
+> 
+> Cc: qemu-stable@nongnu.org
+> Fixes: commit bccfb846fd52 ("target/i386: add AVX10 feature and AVX10 version property")
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
-kernel test robot noticed the following build warnings:
+Hi!
 
-[auto build test WARNING on awilliam-vfio/next]
-[also build test WARNING on awilliam-vfio/for-linus linus/master v6.13-rc3 next-20241220]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Has this patch been forgotten?  9.2 is out already and I'm collecting fixes for it...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yunxiang-Li/vfio-pci-refactor-vfio_pci_bar_rw/20241213-045257
-base:   https://github.com/awilliam/linux-vfio.git next
-patch link:    https://lore.kernel.org/r/20241212205050.5737-2-Yunxiang.Li%40amd.com
-patch subject: [PATCH 2/3] vfio/pci: refactor vfio_pci_bar_rw
-config: i386-buildonly-randconfig-004-20241220 (https://download.01.org/0day-ci/archive/20241221/202412210450.yl9DrP8o-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241221/202412210450.yl9DrP8o-lkp@intel.com/reproduce)
+Thanks,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412210450.yl9DrP8o-lkp@intel.com/
+/mjt
 
-All warnings (new ones prefixed by >>):
+> ---
+> v5: new commit.
+> ---
+>   target/i386/cpu.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3baa95481fbc..77c1233daa13 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7711,8 +7711,10 @@ static bool x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+>               env->avx10_version = version;
+>               have_filtered_features = true;
+>           }
+> -    } else if (env->avx10_version && prefix) {
+> -        warn_report("%s: avx10.%d.", prefix, env->avx10_version);
+> +    } else if (env->avx10_version) {
+> +        if (prefix) {
+> +            warn_report("%s: avx10.%d.", prefix, env->avx10_version);
+> +        }
+>           have_filtered_features = true;
+>       }
+>   
 
-   In file included from drivers/vfio/pci/vfio_pci_rdwr.c:14:
-   In file included from include/linux/pci.h:1650:
-   In file included from include/linux/dmapool.h:14:
-   In file included from include/linux/scatterlist.h:8:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/vfio/pci/vfio_pci_rdwr.c:289:1: warning: unused label 'out' [-Wunused-label]
-     289 | out:
-         | ^~~~
-   2 warnings generated.
-
-
-vim +/out +289 drivers/vfio/pci/vfio_pci_rdwr.c
-
-0d77ed3589ac054 Alex Williamson 2018-03-21  232  
-536475109c82841 Max Gurtovoy    2021-08-26  233  ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
-89e1f7d4c66d85f Alex Williamson 2012-07-31  234  			size_t count, loff_t *ppos, bool iswrite)
-89e1f7d4c66d85f Alex Williamson 2012-07-31  235  {
-89e1f7d4c66d85f Alex Williamson 2012-07-31  236  	struct pci_dev *pdev = vdev->pdev;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  237  	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  238  	int bar = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-1378a17537c2699 Yunxiang Li     2024-12-12  239  	size_t x_start, x_end;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  240  	resource_size_t end;
-906ee99dd2a5c81 Alex Williamson 2013-02-14  241  	void __iomem *io;
-906ee99dd2a5c81 Alex Williamson 2013-02-14  242  	ssize_t done;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  243  
-a13b64591747e8a Alex Williamson 2016-02-22  244  	if (pci_resource_start(pdev, bar))
-89e1f7d4c66d85f Alex Williamson 2012-07-31  245  		end = pci_resource_len(pdev, bar);
-a13b64591747e8a Alex Williamson 2016-02-22  246  	else
-a13b64591747e8a Alex Williamson 2016-02-22  247  		return -EINVAL;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  248  
-906ee99dd2a5c81 Alex Williamson 2013-02-14  249  	if (pos >= end)
-89e1f7d4c66d85f Alex Williamson 2012-07-31  250  		return -EINVAL;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  251  
-906ee99dd2a5c81 Alex Williamson 2013-02-14  252  	count = min(count, (size_t)(end - pos));
-89e1f7d4c66d85f Alex Williamson 2012-07-31  253  
-89e1f7d4c66d85f Alex Williamson 2012-07-31  254  	if (bar == PCI_ROM_RESOURCE) {
-1378a17537c2699 Yunxiang Li     2024-12-12  255  		if (iswrite)
-1378a17537c2699 Yunxiang Li     2024-12-12  256  			return -EINVAL;
-906ee99dd2a5c81 Alex Williamson 2013-02-14  257  		/*
-906ee99dd2a5c81 Alex Williamson 2013-02-14  258  		 * The ROM can fill less space than the BAR, so we start the
-906ee99dd2a5c81 Alex Williamson 2013-02-14  259  		 * excluded range at the end of the actual ROM.  This makes
-906ee99dd2a5c81 Alex Williamson 2013-02-14  260  		 * filling large ROM BARs much faster.
-906ee99dd2a5c81 Alex Williamson 2013-02-14  261  		 */
-89e1f7d4c66d85f Alex Williamson 2012-07-31  262  		io = pci_map_rom(pdev, &x_start);
-1378a17537c2699 Yunxiang Li     2024-12-12  263  		if (!io)
-1378a17537c2699 Yunxiang Li     2024-12-12  264  			return -ENOMEM;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  265  		x_end = end;
-1378a17537c2699 Yunxiang Li     2024-12-12  266  
-1378a17537c2699 Yunxiang Li     2024-12-12  267  		done = vfio_pci_core_do_io_rw(vdev, 1, io, buf, pos,
-1378a17537c2699 Yunxiang Li     2024-12-12  268  					      count, x_start, x_end, 0);
-1378a17537c2699 Yunxiang Li     2024-12-12  269  
-1378a17537c2699 Yunxiang Li     2024-12-12  270  		pci_unmap_rom(pdev, io);
-0d77ed3589ac054 Alex Williamson 2018-03-21  271  	} else {
-1378a17537c2699 Yunxiang Li     2024-12-12  272  		done = vfio_pci_core_setup_barmap(vdev, bar);
-1378a17537c2699 Yunxiang Li     2024-12-12  273  		if (done)
-1378a17537c2699 Yunxiang Li     2024-12-12  274  			return done;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  275  
-89e1f7d4c66d85f Alex Williamson 2012-07-31  276  		io = vdev->barmap[bar];
-89e1f7d4c66d85f Alex Williamson 2012-07-31  277  
-89e1f7d4c66d85f Alex Williamson 2012-07-31  278  		if (bar == vdev->msix_bar) {
-89e1f7d4c66d85f Alex Williamson 2012-07-31  279  			x_start = vdev->msix_offset;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  280  			x_end = vdev->msix_offset + vdev->msix_size;
-1378a17537c2699 Yunxiang Li     2024-12-12  281  		} else {
-1378a17537c2699 Yunxiang Li     2024-12-12  282  			x_start = 0;
-1378a17537c2699 Yunxiang Li     2024-12-12  283  			x_end = 0;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  284  		}
-89e1f7d4c66d85f Alex Williamson 2012-07-31  285  
-1378a17537c2699 Yunxiang Li     2024-12-12  286  		done = vfio_pci_core_do_io_rw(vdev, pci_resource_flags(pdev, bar) & IORESOURCE_MEM, io, buf, pos,
-bc93b9ae0151ae5 Alex Williamson 2020-08-17  287  				      count, x_start, x_end, iswrite);
-1378a17537c2699 Yunxiang Li     2024-12-12  288  	}
-abafbc551fddede Alex Williamson 2020-04-22 @289  out:
-1378a17537c2699 Yunxiang Li     2024-12-12  290  	if (done > 0)
-1378a17537c2699 Yunxiang Li     2024-12-12  291  		*ppos += done;
-906ee99dd2a5c81 Alex Williamson 2013-02-14  292  	return done;
-89e1f7d4c66d85f Alex Williamson 2012-07-31  293  }
-84237a826b261de Alex Williamson 2013-02-18  294  
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+GPG Key transition (from rsa2048 to rsa4096) since 2024-04-24.
+New key: rsa4096/61AD3D98ECDF2C8E  9D8B E14E 3F2A 9DD7 9199  28F1 61AD 3D98 ECDF 2C8E
+Old key: rsa2048/457CE0A0804465C5  6EE1 95D1 886E 8FFB 810D  4324 457C E0A0 8044 65C5
+Transition statement: http://www.corpit.ru/mjt/gpg-transition-2024.txt
 
