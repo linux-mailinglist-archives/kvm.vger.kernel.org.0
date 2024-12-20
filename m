@@ -1,69 +1,70 @@
-Return-Path: <kvm+bounces-34193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3789F8965
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 02:26:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52ED49F8994
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 02:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6831B16FC13
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 01:26:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 945C91697AC
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 01:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825B7134AC;
-	Fri, 20 Dec 2024 01:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CF217578;
+	Fri, 20 Dec 2024 01:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kVbg8OIm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIhDHY2f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A6353AC
-	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 01:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B3F5672
+	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 01:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734657982; cv=none; b=m/2Pv/M5UGXwiaIvNsIEmLptH8RuZoZsvJm7AWnUZSQKMzPyAnPkMapW2vu85epoNSCyADKv88pxnsnaVEc9VdZgF2Q3UPVAH8i5MBO3Y8qx1Rf3oZRBTDcHw9YVoUL5LYrsw+WVFwhagoy3Uh/daUOas/hiU/IFvE2IMH3YrxI=
+	t=1734658750; cv=none; b=LgRJzaaX+vpzzC57B1ewXjpmDPJKg1VANOUCiUhCzKn/+jB8veoacGPC3Hj/B4/PVY9Ct3osuIzKo4J53otzArvIYrXjkUlJNa/qSQv0YGNWqlxb59R/lpmU4BK5OTjZY8owVzQQMvuMfLd7mBfgld6S3exKXBbYIyZHQ2SB0v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734657982; c=relaxed/simple;
-	bh=TCLXqwFwmLMDrwmuSpqcyB7EUIXvzRWGraQwEAz73Oo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H4AWCVpmm9+qy93T9t2IE9WFAP13GzcwAVy/mqTL8XVo8bVxKKZB1Ku+o7B/74CIZcJSzhhedQSXl0rUha5KG+0jjAZRtKmj2hioXoy9LOCHsMokw/cKGQ28TZy6PB3Xx2OBK/Byy7HcrPrvkAKgVOcex42BcT0EVyKaNcU7ogY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kVbg8OIm; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1734658750; c=relaxed/simple;
+	bh=iOtbn0YZnKIsu57KSQS/WdzlFtmyeZ6SuWU2WK8fyWM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KY0E2ZLZOhQGsg/JTIB6paOSusbH3fYMwbrL6MSusVGEppt0H8PcqULMO4J05kF7DfCEQRX+u+62QOhka7ZoKlhjP6mAUi/OCVquRmASN+kQtWkNtcidXbTqGeDL6eZ4E0zpxm8gPLELxRsafauCWNdZjvVE9h0zX6s6pQPtIHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UIhDHY2f; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so1309461a91.2
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 17:26:19 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7fb966ee0cdso1054860a12.1
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 17:39:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734657979; x=1735262779; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734658748; x=1735263548; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QWYvHz9fM4KjcB+AnKzAVNHAbTmmX5uwW6sODCmo1gs=;
-        b=kVbg8OImxs8HMioudnOESEpoV5qjw2ULbRWsXxk90pyLAk6ys4Ar9Jb4AHCLb96Ue6
-         EurutWzgF76yGIGO52IVnYPKPsLL7HjDhWU2s95PZ89F7CIx/8ETG6+I4OrnCDYi3wKB
-         yMesN4OcUXQyCX8UxBufq01ryR/BjHyQoyBAfg7Qoyqr+OLdqddgaU/U/Ifoo9Z8UBiv
-         eJgBnUW2fyp844vuMgCPmmZXaBPTX/GEt3lHeVlL8jpWZtnLRznaYYKpvYUBsHvB3+JO
-         wVOX7c7dP5SzZUkwVS824bb0ZDnIBbSbUZ1U5WdPV0lRTEr6XyPGcLyjxUsPGT/bMQly
-         z97g==
+        bh=cRDKUGnjPxUGgjTzF3qCkNkq62oEn2vSDO7JvD7Kppc=;
+        b=UIhDHY2fEZ2IElrSXBSnRu2AblLKDQeH5kIyaUP9VqifompF1py7Zr4Q0Gn2TmF7Ry
+         30S06XpDgXi/63tJWFBgitHNW13yfQkyMj8b+2Wng+SzPiPNmHqZcFuI3CuUnwx7oMNf
+         3HB6NqKmnis/mrshNDH2VRTDKWIlzpzd5G7Uhu+vLf05Ct8MNHwpklffa3gEe+TECvKc
+         Ttbt0hO5Ue3x3ZS5LJKNxekxjrHb0ubnudvJyFACx4UVPpp+KT7ff0YRhsQi2bBpUq8e
+         xLQH3GEBsAdmtEFrN5YJXmvcaVoK6YWKK19PEYNZUlclY2TUwoMquc6WmYAJPyl6RARD
+         s7Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734657979; x=1735262779;
+        d=1e100.net; s=20230601; t=1734658748; x=1735263548;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWYvHz9fM4KjcB+AnKzAVNHAbTmmX5uwW6sODCmo1gs=;
-        b=btQJl9mcNgO6i0lWZE4DN8YaadfyGG4f4jrClwmDSS5cvvMChF9t21pinqTsML/AKO
-         TQLk17kQRLdrWfD+Rs9YV5CvPB8A5OWiw74mRzivHo7Ww5FQo88BJTkoNCeYNF9DYQJG
-         8G40YN7ZEJHIqQmJ9yVQf0cMgvZus529p+RB8Q6he9e5l/KpPbjJserNVLFTzIWCihL6
-         i5xp9lywPlsotTMOMBZZRyn+Uz9znVB7FIGRUQtisbszK++rb+910HhGLgVK64RC4oZy
-         f55vJhevciOdjw2qfyW/3eel20HPdkVWkMHSMAp42hfuv1TCxtlCSnUWF1NRznV8rgW9
-         WSrQ==
-X-Gm-Message-State: AOJu0Yy4nNyI5Bwzeu1AG1zn/rqHBTKG5TpLkwFCNsWJXe3o/FetjqGX
-	DuLf1vvuWfClIxJGc8YyvXV0HL+53tG/s+dxxeU2qOyZ/fZf/tZ9fcwG8vtlC/hYFbVbnZuswc9
-	uKA==
-X-Google-Smtp-Source: AGHT+IG+5c9SrJO5xry8RVPssSWfXw9IHN+FSthC+5Hv7QBecTBRBBhL3VDJOaA1466ABt58kduoIeSJmJc=
-X-Received: from pjyr15.prod.google.com ([2002:a17:90a:e18f:b0:2f4:47fc:7f17])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5183:b0:2ee:5111:a54b
- with SMTP id 98e67ed59e1d1-2f452eec7dcmr1409339a91.31.1734657979513; Thu, 19
- Dec 2024 17:26:19 -0800 (PST)
+        bh=cRDKUGnjPxUGgjTzF3qCkNkq62oEn2vSDO7JvD7Kppc=;
+        b=hOWiDzoRldijJgTpQHad4NuJ2wmgEFnb+OIU/amLcLrNbPw46zNiZtqasH0USe9MS3
+         99OIkBOCoTmEY6Ofq3tkyOG7LbTGx2qROEVapbHZDtcVGInRy6Ikj5mhj61ztM+RPTc1
+         iE3Y35kf9vkX/DtlVQY5xk5Nh91MX7joZDMzqCO6FsEwx5wx73jHMk/zqITPtzIdFON4
+         9zB2/1kFRuqdgI8TEO/G3G1ig31GahDLxjxUadfC9uAC3w4JJaMVnRPclthjvzHzMXoS
+         k243RqhW1VJ7VaysxwMeGjn6aZ+SdYwLtbjQXDGWA0SCC0TTZtO5bDsQvfzd5hm0oyHF
+         kBYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqJzQF0cwlAJKP7UbfO6VmXUSSLoF9r/sheUtJoiLBSVq7EQ/ZyAzJcZBynJ4HUEji39A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnjblpN1lUkWlEPTI0JVniCSp96SGrUHgLbiboN+Lh1xrN1tu3
+	KFY/8ZjPVkKikzMU9R+mOPnlgsTE7HIydJb2xowUjiICm+pDDbVFzIzJtNFMVJ2SXpTTbW/Acy9
+	hJA==
+X-Google-Smtp-Source: AGHT+IGKk1u1qooE3KT9EvHF6/wnmuA9XWAa8TXLf9DPPdKposqbF1SIF5jz7mHb6qxYFc6rf04T8dQlWu4=
+X-Received: from pgbda1.prod.google.com ([2002:a05:6a02:2381:b0:7fd:4bf0:25fa])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7fa6:b0:1e3:c763:74d4
+ with SMTP id adf61e73a8af0-1e5c6d6b62dmr8239281637.0.1734658748516; Thu, 19
+ Dec 2024 17:39:08 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 19 Dec 2024 17:26:17 -0800
+Date: Thu, 19 Dec 2024 17:38:58 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,180 +72,70 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241220012617.3513898-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Add helpers for locally (un)blocking IRQs on x86
+Message-ID: <20241220013906.3518334-1-seanjc@google.com>
+Subject: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Manali Shukla <Manali.Shukla@amd.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Copy KVM-Unit-Tests' x86 helpers for emitting STI and CLI, comments and
-all, and use them throughout x86 selftests.  The safe_halt() and sti_nop()
-logic in particular benefits from centralized comments, as the behavior
-isn't obvious unless the reader is already aware of the STI shadow.
+Fix a handful of bugs in the binary stats infrastructure, expand support
+to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
+enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
+getting a stat that actually exists.
 
-Cc: Manali Shukla <Manali.Shukla@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/x86/processor.h     | 40 +++++++++++++++++++
- tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  6 ++-
- .../selftests/kvm/x86/svm_int_ctl_test.c      |  5 +--
- .../selftests/kvm/x86/ucna_injection_test.c   |  2 +-
- .../selftests/kvm/x86/xapic_ipi_test.c        |  3 +-
- .../selftests/kvm/x86/xapic_state_test.c      |  4 +-
- .../selftests/kvm/x86/xen_shinfo_test.c       |  5 +--
- 7 files changed, 51 insertions(+), 14 deletions(-)
+Most of the bugs are benign, and AFAICT, none actually cause problems in
+the current code base.  The worst of the bugs is lack of validation that
+the requested stat actually exists, which is quite annoying if someone
+fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index d60da8966772..1f9798ed71f1 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1339,6 +1339,46 @@ static inline void kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
- 	GUEST_ASSERT(!ret);
- }
- 
-+/*
-+ * Execute HLT in an STI interrupt shadow to ensure that a pending IRQ that's
-+ * intended to be a wake event arrives *after* HLT is executed.  Modern CPUs,
-+ * except for a few oddballs that KVM is unlikely to run on, block IRQs for one
-+ * instruction after STI, *if* RFLAGS.IF=0 before STI.  Note, Intel CPUs may
-+ * block other events beyond regular IRQs, e.g. may block NMIs and SMIs too.
-+ */
-+static inline void safe_halt(void)
-+{
-+	asm volatile("sti; hlt");
-+}
-+
-+/*
-+ * Enable interrupts and ensure that interrupts are evaluated upon return from
-+ * this function, i.e. execute a nop to consume the STi interrupt shadow.
-+ */
-+static inline void sti_nop(void)
-+{
-+	asm volatile ("sti; nop");
-+}
-+
-+/*
-+ * Enable interrupts for one instruction (nop), to allow the CPU to process all
-+ * interrupts that are already pending.
-+ */
-+static inline void sti_nop_cli(void)
-+{
-+	asm volatile ("sti; nop; cli");
-+}
-+
-+static inline void sti(void)
-+{
-+	asm volatile("sti");
-+}
-+
-+static inline void cli(void)
-+{
-+	asm volatile ("cli");
-+}
-+
- void __vm_xsave_require_permission(uint64_t xfeature, const char *name);
- 
- #define vm_xsave_require_permission(xfeature)	\
-diff --git a/tools/testing/selftests/kvm/x86/hyperv_ipi.c b/tools/testing/selftests/kvm/x86/hyperv_ipi.c
-index 22c0c124582f..2b5b4bc6ef7e 100644
---- a/tools/testing/selftests/kvm/x86/hyperv_ipi.c
-+++ b/tools/testing/selftests/kvm/x86/hyperv_ipi.c
-@@ -63,8 +63,10 @@ static void receiver_code(void *hcall_page, vm_vaddr_t pgs_gpa)
- 	/* Signal sender vCPU we're ready */
- 	ipis_rcvd[vcpu_id] = (u64)-1;
- 
--	for (;;)
--		asm volatile("sti; hlt; cli");
-+	for (;;) {
-+		safe_halt();
-+		cli();
-+	}
- }
- 
- static void guest_ipi_handler(struct ex_regs *regs)
-diff --git a/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c b/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
-index 916e04248fbb..917b6066cfc1 100644
---- a/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
-+++ b/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
-@@ -42,10 +42,7 @@ static void l2_guest_code(struct svm_test_data *svm)
- 	x2apic_write_reg(APIC_ICR,
- 		APIC_DEST_SELF | APIC_INT_ASSERT | INTR_IRQ_NUMBER);
- 
--	__asm__ __volatile__(
--		"sti\n"
--		"nop\n"
--	);
-+	sti_nop();
- 
- 	GUEST_ASSERT(vintr_irq_called);
- 	GUEST_ASSERT(intr_irq_called);
-diff --git a/tools/testing/selftests/kvm/x86/ucna_injection_test.c b/tools/testing/selftests/kvm/x86/ucna_injection_test.c
-index 57f157c06b39..1e5e564523b3 100644
---- a/tools/testing/selftests/kvm/x86/ucna_injection_test.c
-+++ b/tools/testing/selftests/kvm/x86/ucna_injection_test.c
-@@ -86,7 +86,7 @@ static void ucna_injection_guest_code(void)
- 	wrmsr(MSR_IA32_MCx_CTL2(UCNA_BANK), ctl2 | MCI_CTL2_CMCI_EN);
- 
- 	/* Enables interrupt in guest. */
--	asm volatile("sti");
-+	sti();
- 
- 	/* Let user space inject the first UCNA */
- 	GUEST_SYNC(SYNC_FIRST_UCNA);
-diff --git a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-index a76078a08ff8..6228c0806e89 100644
---- a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-+++ b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-@@ -106,7 +106,8 @@ static void halter_guest_code(struct test_data_page *data)
- 		data->halter_tpr = xapic_read_reg(APIC_TASKPRI);
- 		data->halter_ppr = xapic_read_reg(APIC_PROCPRI);
- 		data->hlt_count++;
--		asm volatile("sti; hlt; cli");
-+		safe_halt();
-+		cli();
- 		data->wake_count++;
- 	}
- }
-diff --git a/tools/testing/selftests/kvm/x86/xapic_state_test.c b/tools/testing/selftests/kvm/x86/xapic_state_test.c
-index 88bcca188799..fdebff1165c7 100644
---- a/tools/testing/selftests/kvm/x86/xapic_state_test.c
-+++ b/tools/testing/selftests/kvm/x86/xapic_state_test.c
-@@ -18,7 +18,7 @@ struct xapic_vcpu {
- 
- static void xapic_guest_code(void)
- {
--	asm volatile("cli");
-+	cli();
- 
- 	xapic_enable();
- 
-@@ -38,7 +38,7 @@ static void xapic_guest_code(void)
- 
- static void x2apic_guest_code(void)
- {
--	asm volatile("cli");
-+	cli();
- 
- 	x2apic_enable();
- 
-diff --git a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
-index a59b3c799bb2..287829f850f7 100644
---- a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
-@@ -191,10 +191,7 @@ static void guest_code(void)
- 	struct vcpu_runstate_info *rs = (void *)RUNSTATE_VADDR;
- 	int i;
- 
--	__asm__ __volatile__(
--		"sti\n"
--		"nop\n"
--	);
-+	sti_nop();
- 
- 	/* Trigger an interrupt injection */
- 	GUEST_SYNC(TEST_INJECT_VECTOR);
+FWIW, I'm not entirely convinced enumerating all stats is worth doing in
+selftests.  It seems nice to have?  But I don't know that it'll be worth
+the maintenance cost.  It was easy enough to implement, so here it is...
+
+Sean Christopherson (8):
+  KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+  KVM: selftests: Close VM's binary stats FD when releasing VM
+  KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+  KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name
+    string
+  KVM: selftests: Add struct and helpers to wrap binary stats cache
+  KVM: selftests: Get VM's binary stats FD when opening VM
+  KVM: selftests: Add infrastructure for getting vCPU binary stats
+  KVM: selftests: Add compile-time assertions to guard against stats
+    typos
+
+Sean Christopherson (8):
+  KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+  KVM: selftests: Close VM's binary stats FD when releasing VM
+  KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+  KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name
+    string
+  KVM: selftests: Add struct and helpers to wrap binary stats cache
+  KVM: selftests: Get VM's binary stats FD when opening VM
+  KVM: selftests: Add infrastructure for getting vCPU binary stats
+  KVM: selftests: Add compile-time assertions to guard against stats
+    typos
+
+ .../kvm/include/arm64/kvm_util_arch.h         |  12 ++
+ .../testing/selftests/kvm/include/kvm_util.h  |  49 ++++++--
+ .../selftests/kvm/include/kvm_util_types.h    |   6 +
+ .../kvm/include/riscv/kvm_util_arch.h         |  14 +++
+ .../kvm/include/s390/kvm_util_arch.h          | 113 ++++++++++++++++++
+ .../selftests/kvm/include/x86/kvm_util_arch.h |  52 ++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  79 ++++++------
+ .../kvm/x86/dirty_log_page_splitting_test.c   |   6 +-
+ .../selftests/kvm/x86/nx_huge_pages_test.c    |   4 +-
+ .../selftests/kvm/x86/xapic_ipi_test.c        |   2 +
+ 10 files changed, 286 insertions(+), 51 deletions(-)
+
 
 base-commit: dcab55cef6f247a71a75a239d4063018dc83a671
 -- 
