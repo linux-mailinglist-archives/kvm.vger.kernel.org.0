@@ -1,349 +1,220 @@
-Return-Path: <kvm+bounces-34210-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9150C9F8E6A
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 09:58:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6339F8E32
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 09:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1813160486
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 08:58:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1830316C3B1
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 08:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC101A9B48;
-	Fri, 20 Dec 2024 08:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D331A840D;
+	Fri, 20 Dec 2024 08:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iW5ftIgB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNtUwniK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F1E1A707D;
-	Fri, 20 Dec 2024 08:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498F31A3A8A
+	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 08:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734685090; cv=none; b=ZOxDijqKoNOOjvFW10siU7EDQigzHNkSQ3YQmk/EY26DiljbWn5JQmUJ/1MRxJlMD+5IORUoLCmvtfmLFQ7+Hm30Un0pIrtkVL2YvptnGtEWq6GfZqSIVVgjIz/X9eet6776pJ9d/4k0bOdVcGSoNB53ZJUiuwDRQQEWvvIltUk=
+	t=1734684614; cv=none; b=KKWHwBivHT1dbO4G8G4QfSsZBEsjSaKJqeM9Wcig3yls9t311lxdTiDAzroph/9J9WwCeCBtqkA6UHCsJ6pFEs1THE5pbefE8G4gyy80neRwBK5kRDBdL2ckj0N1msJRveqFbI6RSfow4buMV7+aK8An48LN47MXgKf3zcIoHdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734685090; c=relaxed/simple;
-	bh=2M1ZKDHj1ahtpOdevTF1TPstBMgTAUOSLTlSFITzBis=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ri0SXy36zEALGZfLwJ0pjDAqihsb+T3gpFexYLuudHbaGVsyVwxwPS6mJWLSHx/6c+tqeFbaJz6dJlApg3FP1WLpxV8FfC63H0sSgdwRwCpx1QQTO0mDuVy20xK2vh8T33xf8fzbljTcGYpsiAgVlHAGVaPBgYdEA0BmEduVJVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iW5ftIgB; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734685088; x=1766221088;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2M1ZKDHj1ahtpOdevTF1TPstBMgTAUOSLTlSFITzBis=;
-  b=iW5ftIgBT7gdQcr0nUu9Wb7x/yin7oV/+NP7B47KIu3X7faxLTGLOT8B
-   pOyDgsndQLJ/OPB9P/R5mBfCD0EeYiNOWckaDGcdbcjmfkhkB63x49AGQ
-   /yGMvpR/YE/JXjKgvkEa5JW2ATYWKNyYieWzya4/HF5nTSZ1HUb4hUSdd
-   QxuWq4kTdiF+8XALJAQhAUBfHYNSlpmiOEbT/TITQMYN5HrbHXAn51h6u
-   Sb2fbB60XXqINwG+xbLkE45VpOP6FSkFa9TZEb0/hKwtwmFEaOkzn0EVL
-   f4LqmDjgZi65AwJWlCREhxTMCClBK6WCygGuhXzVjFH6Bvc6rPiD8S/r3
-   w==;
-X-CSE-ConnectionGUID: KFROoET5RUCe+CEtMlpnZg==
-X-CSE-MsgGUID: u85kcWxYSUuLO5cvKYj1fw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11291"; a="60610846"
-X-IronPort-AV: E=Sophos;i="6.12,250,1728975600"; 
-   d="scan'208";a="60610846"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 00:58:08 -0800
-X-CSE-ConnectionGUID: +AsmofAeRIWJc6Bq//PSNg==
-X-CSE-MsgGUID: Qgz7xLTTTqKYFqD9qVpvUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="98284698"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 00:58:05 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: peterx@redhat.com,
-	rick.p.edgecombe@intel.com,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 2/2] KVM: selftests: TDX: Test dirty ring on a gmemfd slot
-Date: Fri, 20 Dec 2024 16:23:46 +0800
-Message-ID: <20241220082346.15914-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20241220082027.15851-1-yan.y.zhao@intel.com>
-References: <20241220082027.15851-1-yan.y.zhao@intel.com>
+	s=arc-20240116; t=1734684614; c=relaxed/simple;
+	bh=rNRZpmgraUANDH2jZ6sUmUZn3g5rRxPqAWkAjC2sBmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qe+ARc7H9R/MsIPhRpit8+a1QjL9wDjjPAHxeYZ5wlgh7gk8l+xksE6luRsP0hGSid8z9QBzXpP2u2+n8uAQRzth+mxfrraiqpCsW0xrglNBOITX90RiR/FnKtfpm8yAjU9fTt/UAsxO8zDso5nEGNXHTV2RMWKBC9HTqKk0cjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KNtUwniK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734684610;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4MakEP/4RexV/dDE7ZdqDPKSl2XmZLeyzYBNKEexLSo=;
+	b=KNtUwniK/1+YGU2Rm2eCJX8sJBiKyrIfmUXzxevkE1o2SPJzU9fo0jMYnqEhTo0vZTZfio
+	7qri+93KXw7pLU4meohvAI3oauqSS2Vcap7M5iR/aw229EM/06wMFPnu2m4lyavoIL0ORB
+	smNqwefPT+G8yWeYGmnWCFB1TcqTykE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-cCkXZFqqM1SD8GX2JakT2Q-1; Fri,
+ 20 Dec 2024 03:50:07 -0500
+X-MC-Unique: cCkXZFqqM1SD8GX2JakT2Q-1
+X-Mimecast-MFC-AGG-ID: cCkXZFqqM1SD8GX2JakT2Q
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C5CE61956072;
+	Fri, 20 Dec 2024 08:50:03 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.4])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6885A1956096;
+	Fri, 20 Dec 2024 08:49:57 +0000 (UTC)
+Date: Fri, 20 Dec 2024 08:49:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	thomas.lendacky@amd.com, john.allen@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	michael.roth@amd.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
+Message-ID: <Z2UvlXeG6Iqd9eFQ@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <cover.1734392473.git.ashish.kalra@amd.com>
+ <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
+ <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com>
+ <Z2HvJESqpc7Gd-dG@google.com>
+ <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+ <Z2MeN9z69ul3oGiN@google.com>
+ <3ef3f54c-c55f-482d-9c1f-0d40508e2002@amd.com>
+ <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <d0ba5153-3d52-4481-82af-d5c7ee18725f@amd.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Slots with the KVM_MEM_GUEST_MEMFD flag do not support dirty bit tracking.
-However, it is still possible for userspace to trigger the resetting of the
-dirty ring, asking KVM to reset SPTEs in the mirror root by clearing the
-accessed bit or write bit.
+On Thu, Dec 19, 2024 at 04:04:45PM -0600, Kalra, Ashish wrote:
+> 
+> 
+> On 12/18/2024 7:11 PM, Kalra, Ashish wrote:
+> > 
+> > On 12/18/2024 1:10 PM, Sean Christopherson wrote:
+> >> On Tue, Dec 17, 2024, Ashish Kalra wrote:
+> >>> On 12/17/2024 3:37 PM, Sean Christopherson wrote:
+> >>>> On Tue, Dec 17, 2024, Ashish Kalra wrote:
+> >>>>> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
+> >>>>>> On Mon, Dec 16, 2024 at 3:57 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >>>>>>>
+> >>>>>>> From: Ashish Kalra <ashish.kalra@amd.com>
+> >>>>>>
+> >>>>>>> The on-demand SEV initialization support requires a fix in QEMU to
+> >>>>>>> remove check for SEV initialization to be done prior to launching
+> >>>>>>> SEV/SEV-ES VMs.
+> >>>>>>> NOTE: With the above fix for QEMU, older QEMU versions will be broken
+> >>>>>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM as
+> >>>>>>> older QEMU versions require SEV initialization to be done before
+> >>>>>>> launching SEV/SEV-ES VMs.
+> >>>>>>>
+> >>>>>>
+> >>>>>> I don't think this is okay. I think you need to introduce a KVM
+> >>>>>> capability to switch over to the new way of initializing SEV VMs and
+> >>>>>> deprecate the old way so it doesn't need to be supported for any new
+> >>>>>> additions to the interface.
+> >>>>>>
+> >>>>>
+> >>>>> But that means KVM will need to support both mechanisms of doing SEV
+> >>>>> initialization - during KVM module load time and the deferred/lazy
+> >>>>> (on-demand) SEV INIT during VM launch.
+> >>>>
+> >>>> What's the QEMU change?  Dionna is right, we can't break userspace, but maybe
+> >>>> there's an alternative to supporting both models.
+> >>>
+> >>> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP
+> >>> driver ioctl to check if SEV is in INIT state)
+> >>>  
+> >>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> >>> index 1a4eb1ada6..4fa8665395 100644
+> >>> --- a/target/i386/sev.c
+> >>> +++ b/target/i386/sev.c
+> >>> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+> >>>          }
+> >>>      }
+> >>>
+> >>> -    if (sev_es_enabled() && !sev_snp_enabled()) {
+> >>> -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+> >>> -            error_setg(errp, "%s: guest policy requires SEV-ES, but "
+> >>> -                         "host SEV-ES support unavailable",
+> >>> -                         __func__);
+> >>> -            return -1;
+> >>> -        }
+> >>> -    }
+> >>
+> >> Aside from breaking userspace, removing a sanity check is not a "fix".
+> > 
+> > Actually this sanity check is not really required, if SEV INIT is not done before 
+> > launching a SEV/SEV-ES VM, then LAUNCH_START will fail with invalid platform state
+> > error as below:
+> > 
+> > ...
+> > qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=1 fw_error=1 'Platform state is invalid'
+> > ...
+> > 
+> > So we can safely remove this check without causing a SEV/SEV-ES VM to blow up or something.
+> > 
+> >>
+> >> Can't we simply have the kernel do __sev_platform_init_locked() on-demand for
+> >> SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initialization
+> >> until it's necessary so that userspace can do firmware updates.  And it's quite
+> >> clearly necessary in this case, so...
+> > 
+> > I don't think we want to do that, probably want to return "raw" status back to userspace,
+> > if SEV INIT has not been done we probably need to return back that status, otherwise
+> > it may break some other userspace tool.
+> > 
+> > Now, looking at this qemu check we will always have issues launching SEV/SEV-ES VMs
+> > with SEV INIT on demand as this check enforces SEV INIT to be done before launching
+> > the VMs. And then this causes issues with SEV firmware hotloading as the check 
+> > enforces SEV INIT before launching VMs and once SEV INIT is done we can't do 
+> > firmware  hotloading.
+> > 
+> > But, i believe there is another alternative approach : 
+> > 
+> > - PSP driver can call SEV Shutdown right before calling DLFW_EX and then do
+> > a SEV INIT after successful DLFW_EX, in other words, we wrap DLFW_EX with 
+> > SEV_SHUTDOWN prior to it and SEV INIT post it. This approach will also allow
+> > us to do both SNP and SEV INIT at KVM module load time, there is no need to
+> > do SEV INIT lazily or on demand before SEV/SEV-ES VM launch.
+> > 
+> > This approach should work without any changes in qemu and also allow 
+> > SEV firmware hotloading without having any concerns about SEV INIT state.
+> > 
+> 
+> And to add here that SEV Shutdown will succeed with active SEV and SNP guests. 
+> 
+> SEV Shutdown (internally) marks all SEV asids as invalid and decommission all
+> SEV guests and does not affect SNP guests. 
+> 
+> So any active SEV guests will be implicitly shutdown and SNP guests will not be 
+> affected after SEV Shutdown right before doing SEV firmware hotloading and
+> calling DLFW_EX command. 
+> 
+> It should be fine to expect that there are no active SEV guests or any active
+> SEV guests will be shutdown as part of SEV firmware hotloading while keeping 
+> SNP guests running.
 
-Test this to ensure that TDs are not negatively impacted.
+That's a pretty subtle distinction that I don't think host admins will
+be likely to either learn about or remember. IMHO if there are active
+SEV guests, the kernel should refuse the run the operation, rather
+than kill running guests. The host admin must decide whether it is
+appropriate to shutdown the guests in order to be able to run the
+upgrade.
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/tdx_dirty_ring.c     | 231 ++++++++++++++++++
- 2 files changed, 232 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 46fd2194add3..46ee465a0443 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -157,6 +157,7 @@ TEST_GEN_PROGS_x86_64 += pre_fault_memory_test
- TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
- TEST_GEN_PROGS_x86_64 += x86_64/tdx_shared_mem_test
- TEST_GEN_PROGS_x86_64 += x86_64/tdx_upm_test
-+TEST_GEN_PROGS_x86_64 += x86_64/tdx_dirty_ring
- 
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-diff --git a/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c b/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
-new file mode 100644
-index 000000000000..ffeb0a2a70aa
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
-@@ -0,0 +1,231 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <signal.h>
-+
-+#include <asm/barrier.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "tdx/tdcall.h"
-+#include "tdx/tdx.h"
-+#include "tdx/tdx_util.h"
-+#include "tdx/test_util.h"
-+#include "test_util.h"
-+
-+#define TDX_TEST_DIRTY_RING_GPA (0xc0400000)
-+#define TDX_TEST_DIRTY_RING_GVA (0x90400000)
-+#define TDX_TEST_DIRTY_RING_REGION_SLOT 11
-+#define TDX_TEST_DIRTY_RING_REGION_SIZE 0x200000
-+
-+#define TDX_TEST_DIRTY_RING_REPORT_PORT 0x50
-+#define TDX_TEST_DIRTY_RING_REPORT_SIZE 4
-+#define TDX_TEST_DIRTY_RING_COUNT 256
-+#define TDX_TEST_DIRTY_RING_GUEST_WRITE_MAX_CNT 3
-+
-+static int reset_index;
-+
-+/*
-+ * Write to a private GPA in a guest_memfd slot.
-+ * Exit to host after each write to allow host to check dirty ring.
-+ */
-+void guest_code_dirty_gpa(void)
-+{
-+	uint64_t count = 0;
-+
-+	while (count <= TDX_TEST_DIRTY_RING_GUEST_WRITE_MAX_CNT) {
-+		count++;
-+		memset((void *)TDX_TEST_DIRTY_RING_GVA, 1, 8);
-+		tdg_vp_vmcall_instruction_io(TDX_TEST_DIRTY_RING_REPORT_PORT,
-+					     TDX_TEST_DIRTY_RING_REPORT_SIZE,
-+					     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE,
-+					     &count);
-+	}
-+	tdx_test_success();
-+}
-+
-+/*
-+ * Verify that KVM_MEM_LOG_DIRTY_PAGES cannot be set on a memslot with flag
-+ * KVM_MEM_GUEST_MEMFD.
-+ */
-+static void verify_turn_on_log_dirty_pages_flag(struct kvm_vcpu *vcpu)
-+{
-+	struct userspace_mem_region *region;
-+	int ret;
-+
-+	region = memslot2region(vcpu->vm, TDX_TEST_DIRTY_RING_REGION_SLOT);
-+	region->region.flags |= KVM_MEM_LOG_DIRTY_PAGES;
-+
-+	ret = __vm_ioctl(vcpu->vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
-+
-+	TEST_ASSERT(ret, "KVM_SET_USER_MEMORY_REGION2 incorrectly succeeds\n"
-+		    "ret: %i errno: %i slot: %u new_flags: 0x%x",
-+		    ret, errno, region->region.slot, region->region.flags);
-+	region->region.flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
-+}
-+
-+static inline bool dirty_gfn_is_dirtied(struct kvm_dirty_gfn *gfn)
-+{
-+	return smp_load_acquire(&gfn->flags) == KVM_DIRTY_GFN_F_DIRTY;
-+}
-+
-+static inline void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
-+{
-+	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_RESET);
-+}
-+
-+static bool dirty_ring_empty(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_dirty_gfn *dirty_gfns = vcpu_map_dirty_ring(vcpu);
-+	struct kvm_dirty_gfn *cur;
-+	int i;
-+
-+	for (i = 0; i < TDX_TEST_DIRTY_RING_COUNT; i++) {
-+		cur = &dirty_gfns[i];
-+
-+		if (dirty_gfn_is_dirtied(cur))
-+			return false;
-+	}
-+	return true;
-+}
-+
-+/*
-+ * Purposely reset the dirty ring incorrectly by resetting a dirty ring entry
-+ * even when KVM does not report the entry as dirty.
-+ *
-+ * In the entry, a slot with flag KVM_MEM_GUEST_MEMFD (which does not allow
-+ * dirty page tracking) is specified.
-+ *
-+ * This is to verify that userspace cannot do anything wrong to cause entries
-+ * in private EPT get zapped (caused by incorrect write permission reduction).
-+ */
-+static void reset_dirty_ring(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_dirty_gfn *dirty_gfns = vcpu_map_dirty_ring(vcpu);
-+	struct kvm_dirty_gfn *cur = &dirty_gfns[reset_index];
-+	uint32_t cleared;
-+
-+	cur->slot = TDX_TEST_DIRTY_RING_REGION_SLOT;
-+	cur->offset = 0;
-+	dirty_gfn_set_collected(cur);
-+	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
-+	reset_index += cleared;
-+
-+	TEST_ASSERT(cleared == 1, "Unexpected cleared count %d\n", cleared);
-+}
-+
-+/*
-+ * The vCPU worker to loop vcpu_run(). After each vCPU access to a GFN, check if
-+ * the dirty ring is empty and reset the dirty ring.
-+ */
-+static void reset_dirty_ring_worker(struct kvm_vcpu *vcpu)
-+{
-+	while (1) {
-+		vcpu_run(vcpu);
-+
-+		if (vcpu->run->exit_reason == KVM_EXIT_IO &&
-+		    vcpu->run->io.port == TDX_TEST_SUCCESS_PORT &&
-+		    vcpu->run->io.size == TDX_TEST_SUCCESS_SIZE &&
-+		    vcpu->run->io.direction == TDG_VP_VMCALL_INSTRUCTION_IO_WRITE)
-+			break;
-+
-+		if (vcpu->run->exit_reason == KVM_EXIT_IO &&
-+		    vcpu->run->io.port == TDX_TEST_DIRTY_RING_REPORT_PORT &&
-+		    vcpu->run->io.size == TDX_TEST_DIRTY_RING_REPORT_SIZE &&
-+		    vcpu->run->io.direction == TDG_VP_VMCALL_INSTRUCTION_IO_WRITE) {
-+			TEST_ASSERT(dirty_ring_empty(vcpu),
-+				    "Guest write on a gmemfd slot should not cause GFN dirty\n");
-+			reset_dirty_ring(vcpu);
-+		}
-+	}
-+	TDX_TEST_ASSERT_SUCCESS(vcpu);
-+}
-+
-+void reset_dirty_ring_on_gmemfd_slot(bool manual_protect_and_init_set)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = td_create();
-+	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+
-+	vm_enable_dirty_ring(vm, TDX_TEST_DIRTY_RING_COUNT * sizeof(struct kvm_dirty_gfn));
-+
-+	/*
-+	 * Let KVM detect that kvm_dirty_log_manual_protect_and_init_set() is
-+	 * true in kvm_arch_mmu_enable_log_dirty_pt_masked() to check if
-+	 * kvm_mmu_slot_gfn_write_protect() will be called on a memslot that
-+	 * does not have dirty track enabled.
-+	 */
-+	if (manual_protect_and_init_set) {
-+		u64 manual_caps;
-+
-+		manual_caps = kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-+
-+		manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-+				KVM_DIRTY_LOG_INITIALLY_SET);
-+
-+		if (!manual_caps)
-+			return;
-+
-+		vm_enable_cap(vm, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, manual_caps);
-+	}
-+
-+	vcpu = td_vcpu_add(vm, 0, guest_code_dirty_gpa);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    TDX_TEST_DIRTY_RING_GPA,
-+				    TDX_TEST_DIRTY_RING_REGION_SLOT,
-+				    TDX_TEST_DIRTY_RING_REGION_SIZE / getpagesize(),
-+				    KVM_MEM_GUEST_MEMFD);
-+	vm->memslots[MEM_REGION_TEST_DATA] = TDX_TEST_DIRTY_RING_REGION_SLOT;
-+
-+	____vm_vaddr_alloc(vm, TDX_TEST_DIRTY_RING_REGION_SIZE,
-+			   TDX_TEST_DIRTY_RING_GVA,
-+			   TDX_TEST_DIRTY_RING_GPA, MEM_REGION_TEST_DATA, true);
-+	td_finalize(vm);
-+
-+	printf("Verifying reset dirty ring on gmemfd slot with dirty log initially %s:\n",
-+	       manual_protect_and_init_set ? "set" : "unset");
-+
-+	verify_turn_on_log_dirty_pages_flag(vcpu);
-+	reset_dirty_ring_worker(vcpu);
-+
-+	kvm_vm_free(vm);
-+	printf("\t ... PASSED\n");
-+}
-+
-+/*
-+ * Test if resetting a GFN in a memslot with the KVM_MEM_GUEST_MEMFD flag in the
-+ * dirty ring does not negatively impact TDs.
-+ * (when manual protect and initially_set is off)
-+ */
-+void verify_reset_dirty_ring_config1(void)
-+{
-+	reset_dirty_ring_on_gmemfd_slot(false);
-+}
-+
-+/*
-+ * Test if resetting a GFN in a memslot with the KVM_MEM_GUEST_MEMFD flag in the
-+ * dirty ring does not negatively impact TDs.
-+ * (when manual protect and initially_set is on)
-+ */
-+void verify_reset_dirty_ring_config2(void)
-+{
-+	reset_dirty_ring_on_gmemfd_slot(true);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	ksft_print_header();
-+
-+	if (!is_tdx_enabled())
-+		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
-+
-+	ksft_set_plan(2);
-+	ksft_test_result(!run_in_new_process(&verify_reset_dirty_ring_config1),
-+			 "verify_reset_dirty_ring_config1\n");
-+	ksft_test_result(!run_in_new_process(&verify_reset_dirty_ring_config2),
-+			 "verify_reset_dirty_ring_config2\n");
-+	ksft_finished();
-+	return 0;
-+}
+With regards,
+Daniel
 -- 
-2.43.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
