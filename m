@@ -1,228 +1,253 @@
-Return-Path: <kvm+bounces-34192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377909F8963
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 02:26:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3789F8965
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 02:26:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 355D017179F
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 01:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6831B16FC13
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 01:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292FA12E7F;
-	Fri, 20 Dec 2024 01:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825B7134AC;
+	Fri, 20 Dec 2024 01:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lfp6YqhT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kVbg8OIm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96A33C17
-	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 01:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A6353AC
+	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 01:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734657848; cv=none; b=eDpWxrvMceXkuP1V0jOH73CddAPj98psmQFAj51n28TOfbbil6MNKAlreH0t2fof8DT/KAiqPpcsvRc6xbR457Y/eFhtYZT7sInHphBfpzzkODcgetcJv5ifGDwccVWmFvteqIlojZS/3T6dmbBPNC0W89eYecjtz5tSIxlihZU=
+	t=1734657982; cv=none; b=m/2Pv/M5UGXwiaIvNsIEmLptH8RuZoZsvJm7AWnUZSQKMzPyAnPkMapW2vu85epoNSCyADKv88pxnsnaVEc9VdZgF2Q3UPVAH8i5MBO3Y8qx1Rf3oZRBTDcHw9YVoUL5LYrsw+WVFwhagoy3Uh/daUOas/hiU/IFvE2IMH3YrxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734657848; c=relaxed/simple;
-	bh=8GnVLy3WxH8MHh61XU+uwkJIUpoe1l+BMa19fC/TvVE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PuCsqqA42mpkcB16GJJSXyLVxKzNb1ZkBHM4xEkppy156m/9f6Zk8oJrRRXzNfKGZ7VgX8Er4q9jHt6Lp7ETwNu1CNBQBpHULVBa8uavfVmQz0vHbOOry/I5mzuhPhvMzyx5ICPkIGpipDw5o2xhvaxllAvQxT8pFKOx5xHvNoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lfp6YqhT; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1734657982; c=relaxed/simple;
+	bh=TCLXqwFwmLMDrwmuSpqcyB7EUIXvzRWGraQwEAz73Oo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H4AWCVpmm9+qy93T9t2IE9WFAP13GzcwAVy/mqTL8XVo8bVxKKZB1Ku+o7B/74CIZcJSzhhedQSXl0rUha5KG+0jjAZRtKmj2hioXoy9LOCHsMokw/cKGQ28TZy6PB3Xx2OBK/Byy7HcrPrvkAKgVOcex42BcT0EVyKaNcU7ogY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kVbg8OIm; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7fb966ee0cdso1045435a12.1
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 17:24:06 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so1309461a91.2
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2024 17:26:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734657846; x=1735262646; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk4j8JTVHQOiMaCDiVYlXhwVvvaes6nEmniuo7V7flw=;
-        b=lfp6YqhT4WcaepQPmFRLvh4JdNRMGLPKYdMMfRYqRmfLLDrZFUNQQxqWE1t8GsvC96
-         NYT4+2meiijB4WE56dyUVbx63BwFK7l+WHW5YvbEP6XUY938ZAorSYqgPXBjhBB+D2ft
-         hKdGQlgN9Xes27xH7IMBYAPiB/XDyw50L8fFOSj5uAUfJ1IyP+BIHY53iAVYbWgGnno9
-         1HL/1OqP1g4R/in+Ud9QKf+Mq7gE3nnVLadT+4k88TruaOFKyydGXgN7DTjPcWHhAd1L
-         3ksjaoAjFu2nLvqIy167mKBnwptRzT6AvHdi39Mr6Ma1jA5/8D5BCr34g0GjZ+shf1zN
-         qkIQ==
+        d=google.com; s=20230601; t=1734657979; x=1735262779; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QWYvHz9fM4KjcB+AnKzAVNHAbTmmX5uwW6sODCmo1gs=;
+        b=kVbg8OImxs8HMioudnOESEpoV5qjw2ULbRWsXxk90pyLAk6ys4Ar9Jb4AHCLb96Ue6
+         EurutWzgF76yGIGO52IVnYPKPsLL7HjDhWU2s95PZ89F7CIx/8ETG6+I4OrnCDYi3wKB
+         yMesN4OcUXQyCX8UxBufq01ryR/BjHyQoyBAfg7Qoyqr+OLdqddgaU/U/Ifoo9Z8UBiv
+         eJgBnUW2fyp844vuMgCPmmZXaBPTX/GEt3lHeVlL8jpWZtnLRznaYYKpvYUBsHvB3+JO
+         wVOX7c7dP5SzZUkwVS824bb0ZDnIBbSbUZ1U5WdPV0lRTEr6XyPGcLyjxUsPGT/bMQly
+         z97g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734657846; x=1735262646;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk4j8JTVHQOiMaCDiVYlXhwVvvaes6nEmniuo7V7flw=;
-        b=qlzN8f2aKrOV2uzi6aH8dfVOSLJfz6z81xELjDziLG9KqWV/J3SrNFb3thD1gVR5G+
-         plxIHmDzJ0lqMJ0v1mM357xHjstCQMMvr3+3m6mDt1/UuuIDb6oTBoqCDhaqRJlYGmSC
-         G74yrdhz7dBGwBFeXbH9/2eh1u9AcHT1qIgD+6mVxr0f2PCQYzzUgYz9aQN+FoUegtBu
-         V/CCdlNSJACFORlCoDyK0+nQNWqvWq58N/76ZdDRZJ9cCjbMcF/WrvZyhKB+adwCv3Dg
-         evX+CzKGFRobTfjJy/dXfzxdt+lRbm5sgod03lucWJqNt8J6nrJmRcrTIWdc3ID8Nf+f
-         ekjw==
-X-Gm-Message-State: AOJu0YxAddSjpfm3qHIFZcwtBc9iUcntfa5Hi6xbycvZ0kMtrItlnKm3
-	pO0xfKn9r+hxMovs1QnLxmXT8bWRAEm8EAunZxDfXak/2aBeXbBbF4rM9IUwPL+SaGwrTO3nVVC
-	5rA==
-X-Google-Smtp-Source: AGHT+IE11Aj7IoplDRwG4H2peO9aIht5R4MJfLCRSrr7R5tCASKDGbadiWctiBzePtGnjsIZaySDeUGW2pc=
-X-Received: from pfba9.prod.google.com ([2002:a05:6a00:ac09:b0:728:aad0:33a4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3382:b0:1e1:9e9f:ae4
- with SMTP id adf61e73a8af0-1e5e1e87c5bmr1223977637.13.1734657846090; Thu, 19
- Dec 2024 17:24:06 -0800 (PST)
-Date: Thu, 19 Dec 2024 17:24:04 -0800
-In-Reply-To: <20241022054810.23369-5-manali.shukla@amd.com>
+        d=1e100.net; s=20230601; t=1734657979; x=1735262779;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QWYvHz9fM4KjcB+AnKzAVNHAbTmmX5uwW6sODCmo1gs=;
+        b=btQJl9mcNgO6i0lWZE4DN8YaadfyGG4f4jrClwmDSS5cvvMChF9t21pinqTsML/AKO
+         TQLk17kQRLdrWfD+Rs9YV5CvPB8A5OWiw74mRzivHo7Ww5FQo88BJTkoNCeYNF9DYQJG
+         8G40YN7ZEJHIqQmJ9yVQf0cMgvZus529p+RB8Q6he9e5l/KpPbjJserNVLFTzIWCihL6
+         i5xp9lywPlsotTMOMBZZRyn+Uz9znVB7FIGRUQtisbszK++rb+910HhGLgVK64RC4oZy
+         f55vJhevciOdjw2qfyW/3eel20HPdkVWkMHSMAp42hfuv1TCxtlCSnUWF1NRznV8rgW9
+         WSrQ==
+X-Gm-Message-State: AOJu0Yy4nNyI5Bwzeu1AG1zn/rqHBTKG5TpLkwFCNsWJXe3o/FetjqGX
+	DuLf1vvuWfClIxJGc8YyvXV0HL+53tG/s+dxxeU2qOyZ/fZf/tZ9fcwG8vtlC/hYFbVbnZuswc9
+	uKA==
+X-Google-Smtp-Source: AGHT+IG+5c9SrJO5xry8RVPssSWfXw9IHN+FSthC+5Hv7QBecTBRBBhL3VDJOaA1466ABt58kduoIeSJmJc=
+X-Received: from pjyr15.prod.google.com ([2002:a17:90a:e18f:b0:2f4:47fc:7f17])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5183:b0:2ee:5111:a54b
+ with SMTP id 98e67ed59e1d1-2f452eec7dcmr1409339a91.31.1734657979513; Thu, 19
+ Dec 2024 17:26:19 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 19 Dec 2024 17:26:17 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241022054810.23369-1-manali.shukla@amd.com> <20241022054810.23369-5-manali.shukla@amd.com>
-Message-ID: <Z2THNLATHFyEw01j@google.com>
-Subject: Re: [PATCH v4 4/4] KVM: selftests: KVM: SVM: Add Idle HLT intercept test
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241220012617.3513898-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Add helpers for locally (un)blocking IRQs on x86
 From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Manali Shukla <Manali.Shukla@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Oct 22, 2024, Manali Shukla wrote:
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.c b/tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.c
-> new file mode 100644
-> index 000000000000..fe2ea96695e4
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.c
-> @@ -0,0 +1,89 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + *  Copyright (C) 2024 Advanced Micro Devices, Inc.
-> + *
-> + */
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +#include <test_util.h>
-> +#include "svm_util.h"
-> +#include "apic.h"
-> +
-> +#define VINTR_VECTOR     0x30
+Copy KVM-Unit-Tests' x86 helpers for emitting STI and CLI, comments and
+all, and use them throughout x86 selftests.  The safe_halt() and sti_nop()
+logic in particular benefits from centralized comments, as the behavior
+isn't obvious unless the reader is already aware of the STI shadow.
 
-Drop the "V".  From the guest's perspective, it's simply the interrupt vector.
-The "V" suggests there's nested SVM stuff going on, e.g. to virtualize an interrupt
-for L2 or something.
+Cc: Manali Shukla <Manali.Shukla@amd.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ .../selftests/kvm/include/x86/processor.h     | 40 +++++++++++++++++++
+ tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  6 ++-
+ .../selftests/kvm/x86/svm_int_ctl_test.c      |  5 +--
+ .../selftests/kvm/x86/ucna_injection_test.c   |  2 +-
+ .../selftests/kvm/x86/xapic_ipi_test.c        |  3 +-
+ .../selftests/kvm/x86/xapic_state_test.c      |  4 +-
+ .../selftests/kvm/x86/xen_shinfo_test.c       |  5 +--
+ 7 files changed, 51 insertions(+), 14 deletions(-)
 
-> +#define NUM_ITERATIONS   1000
-> +
-> +static bool irq_received;
-> +
-> +/*
-> + * The guest code instruments the scenario where there is a V_INTR pending
-> + * event available while hlt instruction is executed. The HLT VM Exit doesn't
-> + * occur in above-mentioned scenario if Idle HLT intercept feature is enabled.
-> + */
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index d60da8966772..1f9798ed71f1 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -1339,6 +1339,46 @@ static inline void kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
+ 	GUEST_ASSERT(!ret);
+ }
+ 
++/*
++ * Execute HLT in an STI interrupt shadow to ensure that a pending IRQ that's
++ * intended to be a wake event arrives *after* HLT is executed.  Modern CPUs,
++ * except for a few oddballs that KVM is unlikely to run on, block IRQs for one
++ * instruction after STI, *if* RFLAGS.IF=0 before STI.  Note, Intel CPUs may
++ * block other events beyond regular IRQs, e.g. may block NMIs and SMIs too.
++ */
++static inline void safe_halt(void)
++{
++	asm volatile("sti; hlt");
++}
++
++/*
++ * Enable interrupts and ensure that interrupts are evaluated upon return from
++ * this function, i.e. execute a nop to consume the STi interrupt shadow.
++ */
++static inline void sti_nop(void)
++{
++	asm volatile ("sti; nop");
++}
++
++/*
++ * Enable interrupts for one instruction (nop), to allow the CPU to process all
++ * interrupts that are already pending.
++ */
++static inline void sti_nop_cli(void)
++{
++	asm volatile ("sti; nop; cli");
++}
++
++static inline void sti(void)
++{
++	asm volatile("sti");
++}
++
++static inline void cli(void)
++{
++	asm volatile ("cli");
++}
++
+ void __vm_xsave_require_permission(uint64_t xfeature, const char *name);
+ 
+ #define vm_xsave_require_permission(xfeature)	\
+diff --git a/tools/testing/selftests/kvm/x86/hyperv_ipi.c b/tools/testing/selftests/kvm/x86/hyperv_ipi.c
+index 22c0c124582f..2b5b4bc6ef7e 100644
+--- a/tools/testing/selftests/kvm/x86/hyperv_ipi.c
++++ b/tools/testing/selftests/kvm/x86/hyperv_ipi.c
+@@ -63,8 +63,10 @@ static void receiver_code(void *hcall_page, vm_vaddr_t pgs_gpa)
+ 	/* Signal sender vCPU we're ready */
+ 	ipis_rcvd[vcpu_id] = (u64)-1;
+ 
+-	for (;;)
+-		asm volatile("sti; hlt; cli");
++	for (;;) {
++		safe_halt();
++		cli();
++	}
+ }
+ 
+ static void guest_ipi_handler(struct ex_regs *regs)
+diff --git a/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c b/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
+index 916e04248fbb..917b6066cfc1 100644
+--- a/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
++++ b/tools/testing/selftests/kvm/x86/svm_int_ctl_test.c
+@@ -42,10 +42,7 @@ static void l2_guest_code(struct svm_test_data *svm)
+ 	x2apic_write_reg(APIC_ICR,
+ 		APIC_DEST_SELF | APIC_INT_ASSERT | INTR_IRQ_NUMBER);
+ 
+-	__asm__ __volatile__(
+-		"sti\n"
+-		"nop\n"
+-	);
++	sti_nop();
+ 
+ 	GUEST_ASSERT(vintr_irq_called);
+ 	GUEST_ASSERT(intr_irq_called);
+diff --git a/tools/testing/selftests/kvm/x86/ucna_injection_test.c b/tools/testing/selftests/kvm/x86/ucna_injection_test.c
+index 57f157c06b39..1e5e564523b3 100644
+--- a/tools/testing/selftests/kvm/x86/ucna_injection_test.c
++++ b/tools/testing/selftests/kvm/x86/ucna_injection_test.c
+@@ -86,7 +86,7 @@ static void ucna_injection_guest_code(void)
+ 	wrmsr(MSR_IA32_MCx_CTL2(UCNA_BANK), ctl2 | MCI_CTL2_CMCI_EN);
+ 
+ 	/* Enables interrupt in guest. */
+-	asm volatile("sti");
++	sti();
+ 
+ 	/* Let user space inject the first UCNA */
+ 	GUEST_SYNC(SYNC_FIRST_UCNA);
+diff --git a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
+index a76078a08ff8..6228c0806e89 100644
+--- a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
+@@ -106,7 +106,8 @@ static void halter_guest_code(struct test_data_page *data)
+ 		data->halter_tpr = xapic_read_reg(APIC_TASKPRI);
+ 		data->halter_ppr = xapic_read_reg(APIC_PROCPRI);
+ 		data->hlt_count++;
+-		asm volatile("sti; hlt; cli");
++		safe_halt();
++		cli();
+ 		data->wake_count++;
+ 	}
+ }
+diff --git a/tools/testing/selftests/kvm/x86/xapic_state_test.c b/tools/testing/selftests/kvm/x86/xapic_state_test.c
+index 88bcca188799..fdebff1165c7 100644
+--- a/tools/testing/selftests/kvm/x86/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86/xapic_state_test.c
+@@ -18,7 +18,7 @@ struct xapic_vcpu {
+ 
+ static void xapic_guest_code(void)
+ {
+-	asm volatile("cli");
++	cli();
+ 
+ 	xapic_enable();
+ 
+@@ -38,7 +38,7 @@ static void xapic_guest_code(void)
+ 
+ static void x2apic_guest_code(void)
+ {
+-	asm volatile("cli");
++	cli();
+ 
+ 	x2apic_enable();
+ 
+diff --git a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
+index a59b3c799bb2..287829f850f7 100644
+--- a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
++++ b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
+@@ -191,10 +191,7 @@ static void guest_code(void)
+ 	struct vcpu_runstate_info *rs = (void *)RUNSTATE_VADDR;
+ 	int i;
+ 
+-	__asm__ __volatile__(
+-		"sti\n"
+-		"nop\n"
+-	);
++	sti_nop();
+ 
+ 	/* Trigger an interrupt injection */
+ 	GUEST_SYNC(TEST_INJECT_VECTOR);
 
-So the only thing thing that is idle-HLT specific in this test is that final
-TEST_ASSERT_EQ().  Rather than make this test depend on idle-HLT, we should
-tweak it run on all hardware, and then:
+base-commit: dcab55cef6f247a71a75a239d4063018dc83a671
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
-	if (kvm_cpu_has(X86_FEATURE_IDLE_HLT))
-		TEST_ASSERT_EQ(halt_exits, 0);
-	else
-		TEST_ASSERT_EQ(halt_exits, NUM_ITERATIONS);
-
-Not sure about the name.  Maybe hlt_ipi_test or ipi_hlt_test?
-
-> +static void guest_code(void)
-> +{
-> +	uint32_t icr_val;
-> +	int i;
-> +
-> +	xapic_enable();
-
-Hmm, I think we should have this test force x2APIC mode.  KVM emulates x2APIC
-in software (if it's not accerlated by APICv), i.e. it's always available.  That
-will allow using this test to do performance testing of KVM's fastpath handling
-of handle_fastpath_set_x2apic_icr_irqoff().
-
-Of course, KVM only uses the fastpath for non-shorthand IPIs, and any setup that
-can do self-IPI fully in the fastpath (via virtual interrupt delivery) won't exit
-in the first place (virtualized by hardware), i.e. there's probably no point in
-adding self-IPIs to the fastpath.
-
-But maybe in the future I can convince someone to enhance this test to do
-cross-vCPU IPI testing.
-
-> +
-> +	icr_val = (APIC_DEST_SELF | APIC_INT_ASSERT | VINTR_VECTOR);
-> +
-> +	for (i = 0; i < NUM_ITERATIONS; i++) {
-> +		cli();
-> +		xapic_write_reg(APIC_ICR, icr_val);
-> +		safe_halt();
-> +		GUEST_ASSERT(READ_ONCE(irq_received));
-> +		WRITE_ONCE(irq_received, false);
-> +	}
-> +	GUEST_DONE();
-> +}
-> +
-> +static void guest_vintr_handler(struct ex_regs *regs)
-> +{
-> +	WRITE_ONCE(irq_received, true);
-> +	xapic_write_reg(APIC_EOI, 0x00);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	struct ucall uc;
-> +	uint64_t  halt_exits, vintr_exits;
-> +
-> +	/* Check the extension for binary stats */
-
-Pointless comment, the code below is self-explanatory.
-
-> +	TEST_REQUIRE(this_cpu_has(X86_FEATURE_IDLE_HLT));
-
-This needs to check *KVM* support.  I.e. kvm_cpu_has().
-
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_BINARY_STATS_FD));
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +
-> +	vm_install_exception_handler(vm, VINTR_VECTOR, guest_vintr_handler);
-> +	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-> +
-> +	vcpu_run(vcpu);
-> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-> +
-> +	halt_exits = vcpu_get_stat(vcpu, halt_exits);
-> +	vintr_exits = vcpu_get_stat(vcpu, irq_window_exits);
-> +
-> +	switch (get_ucall(vcpu, &uc)) {
-> +	case UCALL_ABORT:
-> +		REPORT_GUEST_ASSERT(uc);
-> +		/* NOT REACHED */
-> +	case UCALL_DONE:
-> +		break;
-> +
-> +	default:
-> +		TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-> +	}
-> +
-> +	TEST_ASSERT_EQ(halt_exits, 0);
-> +	pr_debug("Guest executed VINTR followed by halts: %d times.\n"
-> +		 "The guest exited due to halt: %ld times and number\n"
-> +		 "of vintr exits: %ld.\n",
-> +		 NUM_ITERATIONS, halt_exits, vintr_exits);
-
-halt_exits obviously is '0' at this point, so I don't see any point in printing
-it out.
-
-As for vintr_exits, I vote to drop it, for now at least.  At some point in the
-future, I would like to expand this test so that it can be used for a rudimentary
-IPI+HLT perf test.  But for now, I think it makes sense to keep it simple, e.g.
-so that nothing needs to be unwound if improvements are made in the future.
-
-> +
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
-> -- 
-> 2.34.1
-> 
 
