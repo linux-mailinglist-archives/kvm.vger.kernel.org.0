@@ -1,118 +1,132 @@
-Return-Path: <kvm+bounces-34277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D709F9F94
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 10:14:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF2D9F9FF5
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 10:57:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C1D1188598F
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 09:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92F9816865B
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 09:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077511F190A;
-	Sat, 21 Dec 2024 09:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4161F190A;
+	Sat, 21 Dec 2024 09:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DKFenMMX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXIavt0c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F021EE7D8;
-	Sat, 21 Dec 2024 09:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9FA1EE7D9;
+	Sat, 21 Dec 2024 09:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734772425; cv=none; b=Ax/PHLoDVNxSNTIIZ1xGbr6HGJ0o6CaISOBJ/6E/VKA+xMButJQaW7zwQCsvWHKmHjC2L04R9WU17eht6OGZNQZj26do4XxEiBQ3fdjsvHWaNnuR95PYWxZUzDIZ2LV0ApDywcJ61yERXpmfTSrzFk7wrsCFJKKA7i3BTQHwz60=
+	t=1734775068; cv=none; b=W/OyvzrGGltXiIj6a9+zS2YduhC9EOzLSreolXyGuTZ2IdALOG3m74bmmEsWsMyUiIOu8wRPYXBTP+5FwrAjw+NYuJqteGGhH58XcKgl9HfkoVosWkZ+23CYayElLNv0gLJZTyKSyHxxTqdljXy0HKzsfu/KKxzlFRFE+dAA6VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734772425; c=relaxed/simple;
-	bh=jwhbVVy5x9KOUNzFAy26thYoNFh2zn5o9tfZg3OUQxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oxPI8dCNIOIskA+ca6Pparib9/BhfbP3jnLKaRmM0E/qiyOkHS8u4U1hupo2z2OHLdOWU23o9UfGiZEcvXua651wZTzePDbULd/TpbAQiN4W7DR9cWeyVh9MejKsHMmjtEbEjLp3NZaPdG6XN/ZO+2JHOYi+LBjVBbVpDxqFFxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=DKFenMMX; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 94B7140E015F;
-	Sat, 21 Dec 2024 09:13:40 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id xkmdq_0uuHUI; Sat, 21 Dec 2024 09:13:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1734772417; bh=GBbnq6RLYfEGx3TrrPKpgrWKUH1pskvqzUeFhNPscNY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DKFenMMX/ateXnZ1lW+mj4YQKofF8uD7yWAIdSOcdAEa8QH4cdAzhQ4uXLeQOfxTu
-	 rPmkhMcMDD4eTHOGL8IHrXBKW2rL9P9Why2UtdhM+iZDwY1lS/bVdaN23mcifWKP+Q
-	 TlIicCGS7WomKvMKygrugCFNQVw15YWtTwzuCI6iIIlj2p05H/q3WqNTTssL93/QaW
-	 rlHcWGISPYTLj7DgrtKw3ytFR3VG0/+FQW9iJtjNB8Om3A2Xe/XEx/87qo964qv0v/
-	 gyxYVq7QtgHFsTXAY/Uqo7RAN8KUiXDsPSsXjAWv0iG9X7QHz1aJ9r5NRjT60HB+xW
-	 fVavqy4UxnmGXqJz8FmmkEeBrQoEJqLbbFOnG+RMMPKAA8vQv1HnMU9pKr1S1urUVf
-	 hH9g3A6rBW6zkCm3HP9aywkZZ9lAZpLUmi/9EzODNXs/v/9hs39YfcV2ecyrxUWXQt
-	 T5fyeqe0+3ugL5GwV4+50/G9N7XQUNdhb5pt7jpMmR8ot3PvkSACdrYUV4mWqvQHA7
-	 MyzdEeg9cCGmH/HwpMTFTvQkNw0njffC3fsPGGpVWIac2oG2FhJuq8kdPZLOM+bR9r
-	 VqOsIWC8U76PvqXZUOZ7HTC/iyLeirhNSRkMHatb0D4DJp3+VCnzopK1O2HNsFhDAc
-	 jXetpNsfh3my1JH2r4pejhSI=
-Received: from nazgul.tnic (dynamic-176-005-148-127.176.5.pool.telefonica.de [176.5.148.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F1D5B40E02C1;
-	Sat, 21 Dec 2024 09:13:12 +0000 (UTC)
-Date: Sat, 21 Dec 2024 10:13:11 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, amit@kernel.org, kvm@vger.kernel.org,
-	amit.shah@amd.com, thomas.lendacky@amd.com, tglx@linutronix.de,
-	peterz@infradead.org, corbet@lwn.net, mingo@redhat.com,
-	dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-	pbonzini@redhat.com, daniel.sneddon@linux.intel.com,
-	kai.huang@intel.com, sandipan.das@amd.com,
-	boris.ostrovsky@oracle.com, Babu.Moger@amd.com,
-	david.kaplan@amd.com, dwmw@amazon.co.uk, andrew.cooper3@citrix.com
-Subject: Re: [PATCH v2 1/2] x86/bugs: Don't fill RSB on VMEXIT with
- eIBRS+retpoline
-Message-ID: <20241221091311.GCZ2aGp1JeqKBL_PzL@fat_crate.local>
-References: <cover.1732219175.git.jpoimboe@kernel.org>
- <9bd7809697fc6e53c7c52c6c324697b99a894013.1732219175.git.jpoimboe@kernel.org>
- <20241130153125.GBZ0svzaVIMOHBOBS2@fat_crate.local>
- <20241202233521.u2bygrjg5toyziba@desk>
- <20241203112015.GBZ07pb74AGR-TDWt7@fat_crate.local>
- <20241205231207.ywcruocjqtyjsvxx@jpoimboe>
+	s=arc-20240116; t=1734775068; c=relaxed/simple;
+	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MUlj6t6Tb82WQjIbpDsmqQU5PjrgSGEaikqkmj9OYTBoLgTGfSrpzyP2XFutLeX+f4WJciY//e+W8rfI4j7hkh8PdvrjXKXxBr/rN8GAhr0CLkNFz2GLFijQ5JurB29v2Lf+MP/Uw5CmQhK6rGaiOn9rmS4tuI9xpHX4paEiWPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXIavt0c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB42DC4CECE;
+	Sat, 21 Dec 2024 09:57:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734775067;
+	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DXIavt0ctCzoRX6EWaFKlPy82zEACQJDe+Dy1mSS0OhpFN+1N4KNG+FFMTl1+ADv3
+	 OhxofaFzqqou8Osw/eOxOX/YcfWtMpQe/+LoVXJLj1nRvvB2BYf/m0YzPXFMKytp1Y
+	 P1OmYOcAMAuxK/W0ypddKUw2tgSuv923hTIx0HYOb+BZJIMUHmaYgXlaspkPCG4RjW
+	 NqNKzvVNGRRdRRqIY1o6Yt7dG9upzA+w8nVJ4qiKTA4S2Pa/TDfgkl97xE1T7lfwp2
+	 POWK/P3oLwsWUn+iC5uA36EXyJ7oEIbSnMM2QJus3XD5+WWvhfKx7qvTHl4bQ8VrlV
+	 YyJLgGqsldSkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tOwEz-005u3E-7c;
+	Sat, 21 Dec 2024 09:57:45 +0000
+Date: Sat, 21 Dec 2024 09:57:44 +0000
+Message-ID: <874j2xs6hz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v2 01/12] KVM: arm64: nv: Add handling of EL2-specific timer registers
+In-Reply-To: <Z2Yb8BWnqpt441V-@linux.dev>
+References: <20241217142321.763801-1-maz@kernel.org>
+	<20241217142321.763801-2-maz@kernel.org>
+	<Z2Yb8BWnqpt441V-@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241205231207.ywcruocjqtyjsvxx@jpoimboe>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Dec 05, 2024 at 03:12:07PM -0800, Josh Poimboeuf wrote:
-> Ok, I'll try to write up a document.  I'm thinking it should go in its
-> own return-based-attacks.rst file rather than spectre.rst, which is more
-> of an outdated historical document at this point.
+On Sat, 21 Dec 2024 01:38:28 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Tue, Dec 17, 2024 at 02:23:09PM +0000, Marc Zyngier wrote:
+> > @@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> >  	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> > +	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
+> >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> >  	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+> >  	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
+> > +	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
+> >  };
+> 
+> Huh. You know, I had always thought we hid 32-bit EL0 from nested
+> guests, but I now realize that isn't the case. Of course, we don't have
+> the necessary trap reflection for exits that came out of a 32-bit EL0,
+> nor should we bother.
+> 
+> Of the 4 NV2 implementations I'm aware of (Neoverse-V1, Neoverse-V2,
+> AmpereOne, M2) only Neoverse-V1 supports 32-bit userspace. And even
+> then, a lot of deployments of V1 have a broken NV2 implementation.
+> 
+> What do you think about advertising a 64-bit only EL0 for nested VMs?
 
-Thanks!
+I'm completely OK with that.
 
-> And we want this document to actually be read (and kept up to date) by
-> developers instead of mostly ignored like the others.
+Actually, we already nuke the guest if exiting from 32bit context, no
+matter the EL (vcpu_mode_is_bad_32bit() is where this happens).  But
+we're missing the ID_AA64PFR0_EL1.EL0 sanitising, which is a bug. I'll
+send a patch shortly.
 
-Good idea.
+Now, for this particular patch, I still think we should gracefully
+handle access to the EL1 timer from a 32bit capable, non-NV guest.
+Just in case we end-up with a CPU with a broken CNTVOFF_EL2 *and*
+32bit capability.
 
-Now how do we enforce this?
+In the end, it doesn't cost us much to support this case, and it helps
+that we can verify that we handle all registers without exception.
 
-We could add a rule to checkpatch or to some other patch checking script
-like mine here for example :-)
+Thoughts?
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bp/bp.git/log/?h=vp
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
 
